@@ -15,42 +15,43 @@ X_NAMESPACE_BEGIN(core)
 
 class GrowingMicroAllocator
 {
-	/// \brief The header stored for each chunk of each growing pool.
-	/// \details In order to keep track of the pool allocator that satisfied an allocation request, we store the
-	/// allocator's index into the look-up table in a header. This header is accessed whenever an allocation needs
-	/// to be freed.
 	X_PACK_PUSH(1)
+#if X_USE_FULL_LOOKUP_TABLE
+
 	struct ChunkHeader
 	{
 		uint16_t allocatorIndex_;
 	};
-	X_PACK_POP
 
 	static_assert(sizeof(ChunkHeader) == 2, "Chunkheader size is incorrect");
 
+#else
+
+	struct ChunkHeader
+	{
+		int8_t allocatorIndex_;
+	};
+
+	static_assert(sizeof(ChunkHeader) == 1, "Chunkheader size is incorrect");
+
+#endif // !X_USE_FULL_LOOKUP_TABLE
+	X_PACK_POP
+
+
 public:
-	/// Defines the maximum allocation size that is handled by the micro allocator.
 	static const size_t MAX_ALLOCATION_SIZE = 256;
 
-	/// \brief Constructs a micro allocator.
-	/// \details The allocator will never grow a pool larger than \a maxSizeInBytesPerPool, and only grows each pool in
-	/// \a growSize chunks. Each chunk will reserve \c sizeof(ChunkHeader) bytes at the end of a chunk in order to store the header data.
+public:
 	GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, uint32_t growSize, size_t maxAlignment, size_t offset );
 
-	/// \brief Allocates raw memory.
-	/// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
 	void* allocate( size_t size, size_t alignment, size_t offset );
 
-	/// Frees an allocation.
 	void free( void* ptr );
 	void free(void* ptr, size_t size);
 
-	/// Returns the size of an allocation.
 	X_INLINE size_t getSize(void* ptr) const;
-
 	X_INLINE size_t usableSize(void* ptr) const;
 
-	/// Returns statistics regarding the allocations made by the allocator.
 	MemoryAllocatorStatistics getStatistics(void) const;
 
 	/// Returns whether a given allocation belongs to this allocator.
@@ -60,7 +61,6 @@ public:
 
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	/// Updates the allocator's statistics.
 	void updateStatistics(void);
 #endif
 

@@ -69,7 +69,11 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 		X_ASSERT( false, "Micro Can't allocate more than %d bytes", MAX_ALLOCATION_SIZE )( size );
 	}
 
+#if X_USE_FULL_LOOKUP_TABLE
 	static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= MAX_ALLOCATION_SIZE, "Can't store allocation indexes");
+#else
+	static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= X_ARRAY_SIZE(poolAllocators_), "Can't store allocation indexes");
+#endif // !X_USE_FULL_LOOKUP_TABLE
 
 	ChunkHeader chunkHeader;
 
