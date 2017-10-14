@@ -34,14 +34,16 @@ X_NAMESPACE_BEGIN(core)
 /// each allocation, and should therefore be disabled in retail builds.
 class GrowingStackAllocator
 {
+	X_PACK_PUSH(4)
 	struct BlockHeader
 	{
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
 		uint32_t AllocationID_;
 #endif
-		size_t allocationOffset_;
-		size_t AllocationSize_;
+		uint32_t allocationOffset_;
+		uint32_t allocationSize_;
 	};
+	X_PACK_POP;
 
 public:
 	/// \brief Constructs a stack allocator.

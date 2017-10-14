@@ -12,7 +12,7 @@ inline size_t GrowingStackAllocator::getSize(void* allocation) const
 
 	// grab the allocation's size from the first N bytes before the user data
 	as_void = allocation;
-	return as_header[-1].AllocationSize_;
+	return as_header[-1].allocationSize_;
 }
 
 

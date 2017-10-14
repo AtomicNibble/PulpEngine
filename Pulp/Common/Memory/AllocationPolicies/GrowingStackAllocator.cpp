@@ -99,8 +99,8 @@ void* GrowingStackAllocator::allocate(size_t size, size_t alignment, size_t offs
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
 	as_header->AllocationID_ = allocationID_++;
 #endif
-	as_header->allocationOffset_ = allocationOffset;
-	as_header->AllocationSize_ = allocationSize;
+	as_header->allocationOffset_ = safe_static_cast<uint32_t>(allocationOffset);
+	as_header->allocationSize_ = safe_static_cast<uint32_t>(allocationSize);
 	as_char += sizeof(BlockHeader);
 
 	void* userPtr = as_void;
