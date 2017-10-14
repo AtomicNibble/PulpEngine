@@ -39,6 +39,8 @@ public:
 
 	/// Returns the size of an allocation.
 	X_INLINE size_t getSize(void* ptr) const;
+	
+	X_INLINE size_t usableSize(void* allocation) const;
 
 	/// Returns statistics regarding the allocations made by the allocator.
 	MemoryAllocatorStatistics getStatistics(void) const;

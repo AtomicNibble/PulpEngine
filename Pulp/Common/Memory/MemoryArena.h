@@ -72,10 +72,6 @@ public:
 
 	static const bool IS_THREAD_SAFE = ThreadPolicy::IS_THREAD_SAFE;
 
-	/// \brief Constructs an arena that uses a given allocator for satisfying allocation requests.
-	/// \details The \a name argument can be used to identify different memory arenas.
-	/// \remark Ownership of the provided allocator stays at the calling site.
-	/// \remark The given \a name must be a constant string/string literal.
 	MemoryArena(AllocationPolicy* allocator, const char* name);
 
 	/// Empty destructor.
@@ -88,11 +84,12 @@ public:
 		X_MEM_HUMAN_IDS_CB(const char* typeName) 
 		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_FINAL;
 
-	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_FINAL;
 	virtual void free(void* ptr, size_t size) X_FINAL;
 
 	virtual size_t getSize(void* ptr) X_FINAL;
+
+	virtual size_t usableSize(void* ptr) const X_FINAL;
 
 	/// Returns statistics regarding the allocations made by the memory arena.
 	virtual MemoryArenaStatistics getStatistics(void) const X_FINAL;

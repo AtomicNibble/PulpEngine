@@ -47,3 +47,11 @@ inline size_t LinearAllocator::getSize(void* allocation) const
 	as_char -= sizeof(size_t);
 	return (*as_size);
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+inline size_t LinearAllocator::usableSize(void* allocation) const
+{
+	return getSize(allocation);
+}
+

@@ -8,11 +8,19 @@ inline size_t StackAllocator::getSize(void* allocation) const
 	{
 		void* as_void;
 		char* as_char;
-		size_t* as_size_t;
+		BlockHeader* as_header;
 	};
 
 	// grab the allocation's size from the first N bytes before the user data
 	as_void = allocation;
-	as_char -= sizeof(size_t);
-	return (*as_size_t);
+	return as_header[-1].AllocationSize_;
 }
+
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+inline size_t StackAllocator::usableSize(void* allocation) const
+{
+	return getSize(allocation);
+}
+

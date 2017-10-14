@@ -112,6 +112,12 @@ namespace AK
 				return 0;
 			}
 
+			virtual size_t usableSize(void* ptr) const X_FINAL {
+				X_UNUSED(ptr);
+				X_ASSERT_UNREACHABLE();
+				return 0;
+			}
+
 			virtual core::MemoryArenaStatistics getStatistics(void) const X_FINAL {
 				return statistics_;
 			}

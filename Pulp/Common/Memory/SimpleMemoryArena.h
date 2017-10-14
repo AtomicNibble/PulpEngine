@@ -35,6 +35,8 @@ public:
 
 	virtual size_t getSize(void* ptr) X_FINAL;
 
+	virtual size_t usableSize(void* ptr) const X_FINAL;
+
 	/// Returns statistics regarding the allocations made by the memory arena.
 	virtual MemoryArenaStatistics getStatistics(void) const X_FINAL;
 	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_FINAL;

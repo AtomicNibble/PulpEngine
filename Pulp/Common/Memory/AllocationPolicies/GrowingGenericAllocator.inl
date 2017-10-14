@@ -81,3 +81,18 @@ X_INLINE size_t GrowingGenericAllocator::getSize(void* ptr) const
 		return blockAllocator_.getSize(ptr);
 	}
 }
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+X_INLINE size_t GrowingGenericAllocator::usableSize(void* ptr) const
+{
+	if (microAllocator_.containsAllocation(ptr))
+	{
+		return microAllocator_.usableSize(ptr);
+	}
+	else
+	{
+		return blockAllocator_.usableSize(ptr);
+	}
+
+}

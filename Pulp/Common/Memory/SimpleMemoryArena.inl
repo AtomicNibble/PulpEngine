@@ -81,6 +81,14 @@ size_t SimpleMemoryArena<AllocationPolicy>::getSize(void* ptr)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template <class AllocationPolicy>
+size_t SimpleMemoryArena<AllocationPolicy>::usableSize(void* ptr) const
+{
+	return allocator_->usableSize(ptr);
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class AllocationPolicy>
 MemoryArenaStatistics SimpleMemoryArena<AllocationPolicy>::getStatistics(void) const
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS

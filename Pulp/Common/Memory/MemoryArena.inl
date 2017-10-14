@@ -192,6 +192,27 @@ size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryT
 	return allocationSize;
 }
 
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
+template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
+size_t MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::usableSize(void* ptr) const
+{
+	union
+	{
+		void* as_void;
+		char* as_char;
+	};
+
+	// remember that the user allocation does not necessarily point to the original raw allocation.
+	// bytes at front and at the back could be guard bytes used by the bounds checker.
+	as_void = ptr;
+
+	char* frontGuard = as_char - BoundsCheckingPolicy::SIZE_FRONT;
+	char* originalRawMemory = frontGuard;
+	const size_t useableSize = allocator_->usableSize(originalRawMemory);
+
+	return useableSize;
+}
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

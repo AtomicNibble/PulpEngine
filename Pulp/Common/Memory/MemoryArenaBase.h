@@ -26,25 +26,22 @@ public:
 #endif // !X_COMPILER_CLANG
 
 public:
-	/// Empty destructor.
 	virtual ~MemoryArenaBase(void) {}
 
-	/// \brief Allocates a certain amount of raw memory.
-	/// \details Most of the parameters expected by this function are passed by either the \ref X_NEW or \ref X_NEW_ARRAY macros.
-	/// The \a ID of an allocation is a human-readable string that is used to identify an allocation, and the \a typeName is
-	/// a human-readable string that denotes the type of an allocation.
-	/// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
+	/// The ID of an allocation is a human-readable string that is used to identify an allocation.
+	/// typeName is a human-readable string that denotes the type of an allocation.
 	virtual void* allocate(size_t size, size_t alignment, size_t offset
 		X_MEM_HUMAN_IDS_CB(const char* ID) 
 		X_MEM_HUMAN_IDS_CB(const char* typeName) 
 		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_ABSTRACT;
 
-	/// Frees memory previously allocated by Allocate().
 	virtual void free(void* ptr) X_ABSTRACT;
 	virtual void free(void* ptr, size_t size) X_ABSTRACT;
 
-	/// Frees memory previously allocated by Allocate().
 	virtual size_t getSize(void* ptr) X_ABSTRACT;
+
+	/// Returns how much of the buffer you can use.
+	virtual size_t usableSize(void* ptr) const X_ABSTRACT;
 
 	/// Returns statistics regarding the allocations made by the memory arena.
 	virtual MemoryArenaStatistics getStatistics(void) const X_ABSTRACT;
