@@ -17,6 +17,7 @@ GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, ui
 {
 	chunkSize_ = growSize;
 
+#if X_USE_FULL_LOOKUP_TABLE
 
 	// setup lookup table.
 	int32_t i = 0;
@@ -40,6 +41,19 @@ GrowingMicroAllocator::GrowingMicroAllocator( uint32_t maxSizeInBytesPerPool, ui
 		poolAllocators_[i] = &poolAllocator256_;
 	}
 
+#else
+
+	poolAllocators_[0] = &poolAllocator8_; 
+	poolAllocators_[1] = &poolAllocator8_; 
+	poolAllocators_[2] = &poolAllocator8_; 
+	poolAllocators_[3] = &poolAllocator16_;  
+	poolAllocators_[4] = &poolAllocator32_; 
+	poolAllocators_[5] = &poolAllocator64_; 
+	poolAllocators_[6] = &poolAllocator128_; 
+	poolAllocators_[7] = &poolAllocator256_;
+
+#endif // !X_USE_FULL_LOOKUP_TABLE
+
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 
 	zero_object( statistics_ );
@@ -58,9 +72,19 @@ void* GrowingMicroAllocator::allocate( size_t size, size_t alignment, size_t off
 	static_assert(std::numeric_limits<decltype(ChunkHeader::allocatorIndex_)>::max() >= MAX_ALLOCATION_SIZE, "Can't store allocation indexes");
 
 	ChunkHeader chunkHeader;
+
+#if X_USE_FULL_LOOKUP_TABLE
 	chunkHeader.allocatorIndex_ = safe_static_cast<decltype(ChunkHeader::allocatorIndex_)>(size);
 
-	void* pMem = poolAllocators_[ size ]->allocate<ChunkHeader>( size, alignment, offset, chunkHeader );
+	void* pMem = poolAllocators_[size]->allocate<ChunkHeader>(size, alignment, offset, chunkHeader);
+#else
+
+	int32_t index = core::bitUtil::ScanBits<int32_t>(((int32_t)size) - 1);
+	chunkHeader.allocatorIndex_ = safe_static_cast<decltype(ChunkHeader::allocatorIndex_)>(index);
+
+	void* pMem = poolAllocators_[index]->allocate<ChunkHeader>(size, alignment, offset, chunkHeader);
+
+#endif // !X_USE_FULL_LOOKUP_TABLE
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	updateStatistics();

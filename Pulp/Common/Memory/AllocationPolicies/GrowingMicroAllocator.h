@@ -9,38 +9,10 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Memory
-/// \brief A class that implements an allocation policy for memory arenas.
-/// \details This class implements the concepts of an allocation policy as expected by the MemoryArena class.
-///
-/// The allocation scheme employed by this class is that of a growing micro allocator. The allocator is not restricted
-/// to working within a fixed region of memory, but rather grows towards a predefined upper limit. Furthermore,
-/// the micro allocator puts allocations of different sizes into different pools. The way this works is as follows:
-/// - The micro allocator stores several pools, with each one being responsible for differently sized allocations.
-/// - The pools hold power-of-two-sized allocations, hence the different pools are responsible for allocating 8, 16, 32,
-/// 64, 128 and 256 bytes.
-/// - Whenever an allocation request is made, the size of the allocation is rounded up to the next power-of-two, and
-/// the corresponding pool is used to satisfy the request.
-/// - In order to speed-up rounding and accessing the different pools, a small look-up table is used. This look-up table
-/// can simply be indexed with an allocation's size, returning the correct pool.
-/// - Whenever an allocation is freed, the allocator needs to know which pool was originally used to make the allocation.
-/// This is achieved by storing a small header for each chunk in each growing pool, with the header simply storing the
-/// index into the look-up table. Upon freeing an allocation, the chunk header can be accessed by rounding the
-/// address to the chunk size, and subtracting the header's size. This works because all pools grow the same, according
-/// to a specific size.
-///
-/// The allocator will initially only reserve virtual address space without allocating any physical memory. As the allocator needs to
-/// grow, more and more physical memory is allocated, up to a given maximum size. Whenever an allocations is freed, the
-/// allocator doesn't return physical memory to the OS.
-///
-/// Growing is implemented by making use of the virtual memory system. At first, the given amount of virtual address
-/// space is reserved without allocating any physical memory. Whenever an allocation no longer fits into the currently
-/// allocated physical memory, additional memory will be requested from the OS. The granularity with which the allocator
-/// grows is provided by the user.
-///
-/// \remark Statistics gathering can be enabled/disabled via the preprocessor option \ref X_ENABLE_MEMORY_ALLOCATOR_STATISTICS.
-/// If statistics are disabled, the allocator will still return a valid MemoryAllocatorStatistics object which is
-/// initialized to its default values.
+// not using full lookup table is 1ns slower in micro benchmarks.
+// but we don't have a 2kb lookup table to thrash the cache with.
+#define X_USE_FULL_LOOKUP_TABLE 0
+
 class GrowingMicroAllocator
 {
 	/// \brief The header stored for each chunk of each growing pool.
@@ -97,7 +69,12 @@ private:
 	GrowingPoolAllocator poolAllocator64_;
 	GrowingPoolAllocator poolAllocator128_;
 	GrowingPoolAllocator poolAllocator256_;
+
+#if X_USE_FULL_LOOKUP_TABLE
 	GrowingPoolAllocator* poolAllocators_[257];
+#else
+	GrowingPoolAllocator* poolAllocators_[8];
+#endif // !X_USE_FULL_LOOKUP_TABLE
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
 	MemoryAllocatorStatistics statistics_;
