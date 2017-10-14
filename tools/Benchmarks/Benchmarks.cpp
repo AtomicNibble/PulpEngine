@@ -51,9 +51,9 @@ typedef core::MemoryArena<
 core::MemoryArenaBase* g_arena = nullptr;
 
 
-int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
+int APIENTRY WinMain(_In_ HINSTANCE hInstance,
                      _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPWSTR    lpCmdLine,
+                     _In_ LPSTR    lpCmdLine,
                      _In_ int       nCmdShow)
 {
 	core::Console console(L"Engine Benchmark Log");
@@ -70,16 +70,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	{
 		EngineApp engine;
 
-		if (engine.Init(hInstance, lpCmdLine, console))
-		{
-			
+		if (engine.Init(hInstance, ::GetCommandLineW(), console))
+		{		
 			X_ASSERT_NOT_NULL(gEnv);
 			X_ASSERT_NOT_NULL(gEnv->pCore);
 			
 			::benchmark::Initialize(&__argc, __argv);
 			::benchmark::RunSpecifiedBenchmarks();
 
-			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
+			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, "-CI")) {
 				console.PressToContinue();
 			}
 		}
