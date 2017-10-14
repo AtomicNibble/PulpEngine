@@ -472,6 +472,7 @@
     <ClCompile Include="tests\memcpy.cpp" />
     <ClCompile Include="tests\random.cpp" />
     <ClCompile Include="tests\string.cpp" />
+    <ClCompile Include="tests\threading.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Benchmarks.rc" />
