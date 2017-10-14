@@ -801,8 +801,10 @@ namespace V2
 
 		{
 			CriticalSection::ScopedLock lock(condCS_);
-			cond_.Wait(condCS_);
-
+			if (thread.ShouldRun()) // check after we got lock, as may have shutdown right away.
+			{
+				cond_.Wait(condCS_);
+			}
 #if X_ENABLE_JOBSYS_PROFILER
 			stats_[currentHistoryIdx_].workerAwokenMask |= static_cast<int32_t>(BIT(threadIdx));
 #endif // !X_ENABLE_JOBSYS_PROFILER
