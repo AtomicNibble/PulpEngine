@@ -143,12 +143,11 @@ namespace strUtil
 		}
 
 
-#ifndef X_COMPILER_CLANG 
+#if X_COMPILER_MSVC
 
 		template <size_t N>
 		struct Implementation {};
 
-		/// Template specialization for 4-byte types.
 		template <>
 		struct Implementation<8u>
 		{
@@ -244,7 +243,7 @@ namespace strUtil
 
 	size_t strlen(const char* str)
 	{
-#ifdef X_COMPILER_CLANG 
+#if X_COMPILER_CLANG 
 		return std::strlen(str);
 #else
 		return static_cast<size_t>(Implementation<sizeof(const char*)>::strlen(str));
