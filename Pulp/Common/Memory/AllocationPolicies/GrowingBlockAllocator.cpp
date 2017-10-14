@@ -121,6 +121,10 @@ void GrowingBlockAllocator::free(void* ptr, size_t size)
 	free(ptr);
 }
 
+size_t GrowingBlockAllocator::usableSize(void* ptr) const
+{
+	return mspace_usable_size(ptr);
+}
 
 
 MemoryAllocatorStatistics GrowingBlockAllocator::getStatistics(void) const

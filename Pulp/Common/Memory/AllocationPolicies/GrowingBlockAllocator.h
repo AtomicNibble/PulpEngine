@@ -50,6 +50,8 @@ public:
 	void free(void* ptr);
 	void free(void* ptr, size_t size);
 
+	size_t usableSize(void* ptr) const;
+
 	/// Returns the original allocation size for an allocation.
 	X_INLINE size_t getSize(void* ptr) const;
 
