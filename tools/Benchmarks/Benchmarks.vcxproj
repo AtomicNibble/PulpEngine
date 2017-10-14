@@ -470,6 +470,7 @@
     </ClCompile>
     <ClCompile Include="tests\allocators.cpp" />
     <ClCompile Include="tests\memcpy.cpp" />
+    <ClCompile Include="tests\random.cpp" />
     <ClCompile Include="tests\string.cpp" />
   </ItemGroup>
   <ItemGroup>
