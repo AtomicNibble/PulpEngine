@@ -9,26 +9,20 @@ extern "C"
 
 	typedef void* mspace;
 
-	/// \ingroup dlmalloc
-	/// \brief Creates a memory space.
 	extern mspace create_mspace(size_t capacity, int locked);
 
-	/// \ingroup dlmalloc
-	/// \brief Creates a memory space containing a pre-allocated region of memory.
 	extern mspace create_mspace_with_base(void* base, size_t capacity, int locked);
 
-	/// \ingroup dlmalloc
-	/// \brief Destroys a memory space.
 	extern size_t destroy_mspace(mspace msp);
 
 
-	/// \ingroup dlmalloc
-	/// \brief Allocates raw memory from a memory space.
 	extern void* mspace_malloc(mspace msp, size_t bytes);
 
-	/// \ingroup dlmalloc
-	/// \brief Frees memory in a memory space.
+	extern void* mspace_memalign(mspace msp, size_t alignment, size_t bytes);
+
 	extern void mspace_free(mspace msp, void* mem);
+
+	extern size_t mspace_usable_size(const void* mem);
 
 	struct mallinfo
 	{
