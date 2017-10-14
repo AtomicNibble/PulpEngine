@@ -4,8 +4,7 @@
 template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
 MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::MemoryArena(AllocationPolicy* allocator, const char* name) :
 	allocator_(allocator),
-	name_(name),
-	isFrozen_(false)
+	name_(name)
 {
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
 	statistics_.arenaName_ = name;
@@ -37,7 +36,6 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
 {
 	X_ASSERT(bitUtil::IsPowerOfTwo(alignment), "Alignment is not a power-of-two.")(size, alignment, offset);
 	X_ASSERT((offset % 4) == 0, "Offset is not a multiple of 4.")(size, alignment, offset);
-	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be allocated.", name_)();
 
 	threadGuard_.Enter();
 
@@ -98,7 +96,6 @@ template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy
 void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::free(void* ptr)
 {
 	X_ASSERT_NOT_NULL(ptr);
-	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be freed.", name_)();
 
 	threadGuard_.Enter();
 
@@ -139,7 +136,6 @@ template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy
 void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::free(void* ptr, size_t size)
 {
 	X_ASSERT_NOT_NULL(ptr);
-	X_ASSERT(!isFrozen_, "Memory arena \"%s\" is frozen, no memory can be freed.", name_)();
 
 	threadGuard_.Enter();
 
@@ -242,25 +238,6 @@ bool MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy,
 {
 	return IS_THREAD_SAFE;
 }
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
-template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::freeze(void)
-{
-	isFrozen_ = true;
-}
-
-
-// ---------------------------------------------------------------------------------------------------------------------
-// ---------------------------------------------------------------------------------------------------------------------
-template <class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy, class MemoryTrackingPolicy, class MemoryTaggingPolicy>
-inline void MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::unfreeze(void)
-{
-	isFrozen_ = false;
-}
-
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

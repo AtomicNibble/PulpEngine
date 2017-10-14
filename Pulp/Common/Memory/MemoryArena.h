@@ -101,14 +101,6 @@ public:
 
 	virtual bool isThreadSafe(void) const X_FINAL;
 
-	/// \brief Freezes the memory arena.
-	/// \details When an arena is frozen, no allocations can be made or freed.
-	inline void freeze(void);
-
-	/// \brief Unfreezes the memory arena.
-	/// \details When an arena is frozen, no allocations can be made or freed.
-	inline void unfreeze(void);
-
 	/// Returns the memory requirement for an allocation of \a size, taking into account bounds checking and other potential overhead.
 	static constexpr inline size_t getMemoryRequirement(size_t size);
 
@@ -129,7 +121,6 @@ private:
 	MemoryTaggingPolicy memoryTagger_;
 
 	const char* name_;
-	bool isFrozen_;
 
 #if X_ENABLE_MEMORY_ARENA_STATISTICS
 	MemoryArenaStatistics statistics_;
