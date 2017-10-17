@@ -313,7 +313,18 @@ void Anim::timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) co
 	frame.frame1 = frameNum % (numFrames);
 	frame.frame2 = frame.frame1 + 1;
 	if (frame.frame2 >= numFrames) {
-		frame.frame2 = 0;
+		if (cycles == 0)
+		{
+			frame.frame2 = 0;
+		}
+		else
+		{
+			frame.frame1 = numFrames - 1;
+			frame.frame2 = frame.frame1;
+			frame.backlerp = 0.0f;
+			frame.frontlerp = 1.0f;
+			return;
+		}
 	}
 
 	// work out lerps.
