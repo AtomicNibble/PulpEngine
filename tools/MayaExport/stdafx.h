@@ -1,8 +1,5 @@
 #pragma once
 
-#include "targetver.h"
-
-
 #include <EngineCommon.h>
 
 #include <Util\UniquePointer.h>
