@@ -13,24 +13,28 @@ void redirectQtMsgToEngineLog(QtMsgType type, const QMessageLogContext &context,
 {
 	QByteArray localMsg = msg.toLocal8Bit();
 
+#if X_ENABLE_LOGGING_SOURCE_INFO
 	X_NAMESPACE(core)::SourceInfo srcInfo("core", context.file, context.line, context.function, context.function);
+#else
+	X_UNUSED(context);
+#endif // !X_ENABLE_LOGGING_SOURCE_INFO
 
  	switch (type)
 	{
 	case QtDebugMsg:
-		gEnv->pLog->Log(srcInfo, "Qt", 0, localMsg.constData());
+		gEnv->pLog->Log(X_SOURCE_INFO_LOG_CA(srcInfo) "Qt", 0, localMsg.constData());
 		break;
 	case QtInfoMsg:
-		gEnv->pLog->Log(srcInfo, "Qt", 0, localMsg.constData());
+		gEnv->pLog->Log(X_SOURCE_INFO_LOG_CA(srcInfo) "Qt", 0, localMsg.constData());
 		break;
 	case QtWarningMsg:
-		gEnv->pLog->Warning(srcInfo, "Qt", localMsg.constData());
+		gEnv->pLog->Warning(X_SOURCE_INFO_LOG_CA(srcInfo) "Qt", localMsg.constData());
 		break;
 	case QtCriticalMsg:
-		gEnv->pLog->Error(srcInfo, "Qt", localMsg.constData());
+		gEnv->pLog->Error(X_SOURCE_INFO_LOG_CA(srcInfo) "Qt", localMsg.constData());
 		break;
 	case QtFatalMsg:
-		gEnv->pLog->Fatal(srcInfo, "Qt", localMsg.constData());
+		gEnv->pLog->Fatal(X_SOURCE_INFO_LOG_CA(srcInfo) "Qt", localMsg.constData());
 
 	}
 }
