@@ -6,6 +6,16 @@
 
 
 
+#ifdef X_LIB
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
+
+X_LINK_LIB("engine_Core")
+X_LINK_LIB("engine_RenderNull")
+
+#endif // !X_LIB
+
+
+
 AssetHandler::AssetHandler(void)
 {
 }
