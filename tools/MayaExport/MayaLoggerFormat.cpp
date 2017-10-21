@@ -19,7 +19,7 @@ void LoggerMayaFormatPolicy::Exit(void)
 
 /// Formats the given message.
 uint32_t LoggerMayaFormatPolicy::Format(core::LoggerBase::Line& line, const char* indentation,
-	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
+	core::LogType::Enum type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
 	const char* channel, size_t verbosity, const char* format, va_list args)
 {
 	X_UNUSED(type, verbosity, channel, indentation);

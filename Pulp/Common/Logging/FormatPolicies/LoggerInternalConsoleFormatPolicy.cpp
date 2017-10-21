@@ -22,19 +22,17 @@ void LoggerInternalConsoleFormatPolicy::Exit(void)
 
 /// Formats the given message.
 uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const char* indentation,
-	const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&) const char* channel,
-	size_t verbosity, const char* format, va_list args
-	)
+	LogType::Enum type, X_SOURCE_INFO_LOG_CA(const SourceInfo&) const char* channel,
+	size_t verbosity, const char* format, va_list args)
 {
 	X_UNUSED(indentation, type, verbosity);
-
 
 	int bytesWritten;
 	char colorCode = '7';
 
-	if (!core::strUtil::IsEqual(type, "INFO")) 
+	if (type != LogType::INFO) 
 	{
-		if (core::strUtil::IsEqual(type, "WARNING")) {
+		if (type == LogType::WARNING) {
 			colorCode = '6';
 		}
 		else  {

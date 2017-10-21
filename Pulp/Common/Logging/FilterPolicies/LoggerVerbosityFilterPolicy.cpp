@@ -45,7 +45,7 @@ void LoggerVerbosityFilterPolicy::RegisterVars(void)
 	}
 }
 
-bool LoggerVerbosityFilterPolicy::Filter(const char* type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
+bool LoggerVerbosityFilterPolicy::Filter(LogType::Enum type, X_SOURCE_INFO_LOG_CA(const SourceInfo&)
 	const char* channel, int verbosity, const char* format, va_list args)
 {
 	X_UNUSED(type, channel, format, args);

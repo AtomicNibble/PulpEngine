@@ -22,6 +22,14 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_DECLARE_ENUM(LogType)(
+	INFO,
+	WARNING,
+	ERROR,
+	FATAL,
+	ASSERT
+);
+
 class LoggerBase;
 
 struct ILog
