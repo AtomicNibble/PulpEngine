@@ -30,6 +30,13 @@ namespace compileTime
 	{
 		static const bool Value = true;
 	};
+
+	template <size_t N>
+	struct IsStringLiteral<const char(&)[N]>
+	{
+		static const bool Value = true;
+	};
+
 }
 
 X_NAMESPACE_END
