@@ -61,7 +61,35 @@
             "Mover" : {
                 "start" : {"x": -280, "y": 128, "z": 8},
                 "end" : {"x": -500, "y": 128, "z": 8},
-                "time" : 10.0
+                "time" : 3.0
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": 280, "y": -128, "z": 8},
+            "angles" : {"p": 90, "y": 0, "r": 0},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "MeshCollider" : {
+            },
+            "Mover" : {
+                "start" : {"x": -80, "y": -270, "z": 8},
+                "end" : {"x": -80, "y": -270, "z": -256},
+                "time" : 4.0
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": -128, "y": -128, "z": 64},
+
+            "Mesh" : {
+                "name" : "test/arms/view_jap"
+            },
+            "MeshRenderer" : {
             }
         }
         /*
