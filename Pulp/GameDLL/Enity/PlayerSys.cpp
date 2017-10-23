@@ -226,6 +226,27 @@ namespace entity
 			}
 		}
 
+		// if we have arms, shove them where we want the gun pos, as gun animations
+		// are positioned based on arms.
+		// TODO: use `tag_view` in arms?
+		if(player.armsEnt != entity::INVALID_ENT_ID)
+		{
+			auto& armsTrans = reg.get<TransForm>(player.armsEnt);
+			auto& armsRendMesh = reg.get<MeshRenderer>(player.armsEnt);
+
+			const Vec3f& viewOrigin = player.firstPersonViewOrigin;
+			Matrix33f viewAxis = player.firstPersonViewAxis;
+
+			viewAxis.rotate(Vec3f::zAxis(), ::toRadians(90.f));
+
+			const Vec3f gunPos = vars_.gunOffset_;
+			Vec3f origin = viewOrigin + (viewAxis * gunPos);
+			
+			armsTrans.quat = Quatf(viewAxis);
+			armsTrans.pos = origin;
+
+			p3DWorld->updateRenderEnt(armsRendMesh.pRenderEnt, armsTrans);
+		}
 	}
 
 	void PlayerSystem::updateViewBob(core::FrameTimeData& timeInfo, Player& player)
