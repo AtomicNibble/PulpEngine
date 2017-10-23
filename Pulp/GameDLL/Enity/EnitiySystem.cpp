@@ -260,11 +260,7 @@ namespace entity
 		core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
 
 		core::json::Document d;
-#if X_DEBUG
 		if (d.ParseStream<core::json::kParseCommentsFlag>(is).HasParseError()) 
-#else
-		if (d.ParseStream(is).HasParseError())
-#endif
 		{
 			auto err = d.GetParseError();
 			const char* pErrStr = core::json::GetParseError_En(err);
