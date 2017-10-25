@@ -1405,7 +1405,8 @@ bool AssetDB::GetNumAssets(ModId modId, int32_t& numOut)
 }
 
 
-AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId)
+AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, ModId modId, 
+	AssetType::Enum type, const core::string& name, AssetId* pId)
 {
 	if (modId == INVALID_MOD_ID) {
 		X_ERROR("AssetDB", "Invalid modId passed to AddAsset!");
