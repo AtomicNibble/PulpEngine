@@ -589,6 +589,10 @@ void AssetServer::AddAsset(const ProtoBuf::AssetDB::AddAsset& add, ResponseBuffe
 	core::CriticalSection::ScopedLock slock(lock_);
 
 	auto res = db_.AddAsset(type, name);
+	if (res == assetDb::AssetDB::Result::NAME_TAKEN) {
+		X_WARNING("AssetServer", "Name Taken: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
+	}
+
 	writeResponse(response, outputBuffer, res);
 }
 
@@ -632,6 +636,10 @@ void AssetServer::RenameAsset(const ProtoBuf::AssetDB::RenameAsset& rename, Resp
 	core::CriticalSection::ScopedLock slock(lock_);
 
 	auto res = db_.RenameAsset(type, name, newName);
+	if (res == assetDb::AssetDB::Result::NAME_TAKEN) {
+		X_WARNING("RenameAsset", "Name Taken: \"%s\" name: \"%s\"", AssetType::ToString(type), name.c_str());
+	}
+
 	writeResponse(response, outputBuffer, res);
 }
 
