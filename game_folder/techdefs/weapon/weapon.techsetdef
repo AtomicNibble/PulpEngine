@@ -1,0 +1,18 @@
+#include <wpn_base>
+
+
+Technique( "lit" )
+{
+    state = "replace + depth"
+
+    vs = "vs_default"
+    ps = "ps_default"
+}
+
+Technique( "unlit" )
+{
+    state = "replace + depth"
+
+    vs = "vs_default"
+    ps = "ps_default"
+}
