@@ -1036,7 +1036,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			CursorPos_--;
 
 			// support moving whole words
-			if (event.modifiers.IsSet(input::ModifiersMasks::Shift))
+			if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl))
 			{
 				while (CursorPos_ && InputBuffer_[CursorPos_] != ' ') {
 					CursorPos_--;
@@ -1078,7 +1078,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 			CursorPos_++;
 
 			// support moving whole words
-			if (event.modifiers.IsSet(input::ModifiersMasks::Shift))
+			if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl))
 			{
 				while (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())
 					&& InputBuffer_[CursorPos_] != ' ') {
