@@ -8,10 +8,10 @@
 X_NAMESPACE_BEGIN(physics)
 
 X_DECLARE_ENUM(StepperType) (
-	DEBUG_STEPPER,
-	FIXED_STEPPER,
-	INVERTED_FIXED_STEPPER,
-	VARIABLE_STEPPER
+	DEBUG_STEPPER,				// none multi threaded, and one step each frame of fixed delta.
+	FIXED_STEPPER,				// try's to run a fixed amount of simulates.
+	INVERTED_FIXED_STEPPER,		
+	VARIABLE_STEPPER			// keeps the update rate between min and max.
 );
 
 
