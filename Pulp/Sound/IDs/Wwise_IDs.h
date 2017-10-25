@@ -17,6 +17,7 @@ namespace AK
         static const AkUniqueID DRY_FIRE_RIFLE = 2650650540U;
         static const AkUniqueID DRY_FIRE_SMG = 318360149U;
         static const AkUniqueID FIRE_MG42 = 643229082U;
+        static const AkUniqueID FIRE_PPSH = 1281059477U;
         static const AkUniqueID PAIN = 1996139369U;
         static const AkUniqueID PLAY_AMBIENT = 1562304622U;
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
