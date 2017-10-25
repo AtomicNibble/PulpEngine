@@ -196,6 +196,8 @@ void DebugStepper::substepStrategy(const float32_t stepSize, uint32_t& substepCo
 
 bool DebugStepper::advance(physx::PxScene* pScene, float32_t dt, void* scratchBlock, uint32_t scratchBlockSize)
 {
+	X_UNUSED(dt);
+
 	timer_.Start();
 
 	{
