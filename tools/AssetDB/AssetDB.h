@@ -103,7 +103,7 @@ public:
 	X_DECLARE_ENUM(Result)(
 		OK, 
 		NOT_FOUND,
-		NAME_TAKEN,
+		NAME_TAKEN, // should maybe call this 'exsists' ?
 		UNCHANGED,
 		HAS_REFS,
 		ERROR
@@ -184,7 +184,7 @@ public:
 	bool IterateAssets(AssetType::Enum type, AssetDelegate func);
 
 	// AddAsset with grouped transation, trans is not just touched, just required to make sure you call it with one.
-	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);
+	Result::Enum AddAsset(const sql::SqlLiteTransaction& trans, ModId modId, AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);
 
 	// none batched Add/delete/rename api
 	Result::Enum AddAsset(AssetType::Enum type, const core::string& name, AssetId* pId = nullptr);

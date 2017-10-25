@@ -797,10 +797,10 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 				{
 					core::string name = randomAssetName(assetNameLenMin, assetNameLenMax);
 
-					auto result = AddAsset(trans, type, name);
+					auto result = AddAsset(trans, modId_, type, name);
 					while (result == Result::NAME_TAKEN) {
 						name = randomAssetName(assetNameLenMin, assetNameLenMax);
-						result = AddAsset(trans, type, name);
+						result = AddAsset(trans, modId_, type, name);
 					}
 				}
 			}
@@ -1405,8 +1405,12 @@ bool AssetDB::GetNumAssets(ModId modId, int32_t& numOut)
 }
 
 
-AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, AssetType::Enum type, const core::string& name, int32_t* pId)
+AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, ModId modId, AssetType::Enum type, const core::string& name, int32_t* pId)
 {
+	if (modId == INVALID_MOD_ID) {
+		X_ERROR("AssetDB", "Invalid modId passed to AddAsset!");
+		return Result::ERROR;
+	}
 	if (name.isEmpty()) {
 		X_ERROR("AssetDB", "Asset with empty name not allowed");
 		return Result::ERROR;
@@ -1416,10 +1420,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, As
 		return Result::ERROR;
 	}
 
-	if (!isModSet()) {
-		X_ERROR("AssetDB", "Mod must be set before calling AddAsset!");
-		return Result::ERROR;
-	}
+
 
 	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
 	cmd.bind(1, name.c_str());
@@ -1457,39 +1458,13 @@ AssetDB::Result::Enum AssetDB::AddAsset(AssetType::Enum type, const core::string
 
 AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const core::string& name, AssetId* pId)
 {
-	if (name.isEmpty()) {
-		X_ERROR("AssetDB", "Asset with empty name not allowed");
-		return Result::ERROR;
-	}
-	if (!ValidName(name)) {
-		X_ERROR("AssetDB", "Asset name \"%s\" is invalid", name.c_str());
-		return Result::ERROR;
-	}
-
 	sql::SqlLiteTransaction trans(db_);
-	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
-	cmd.bind(1, name.c_str());
-	cmd.bind(2, type);
-	cmd.bind(3, modId);
-
-
-	sql::Result::Enum res = cmd.execute();
-	if (res != sql::Result::OK)
-	{
-		if (res == sql::Result::CONSTRAINT) {
-			return Result::NAME_TAKEN;
-		}
-
-		return Result::ERROR;
+	auto res = AddAsset(trans, modId, type, name, pId);
+	if (res == Result::OK) {
+		trans.commit();
 	}
 
-	trans.commit();
-
-	if (pId) {
-		*pId = safe_static_cast<AssetId, sql::SqlLiteDb::RowId>(db_.lastInsertRowid());
-	}
-
-	return Result::OK;
+	return res;
 }
 
 
