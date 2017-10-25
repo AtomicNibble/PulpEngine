@@ -50,8 +50,8 @@ typedef core::MemoryArena<core::MallocFreeAllocator, core::MultiThreadPolicy<cor
 #endif
 
 
-char* g_createUiScript = "poatoCreateUI";
-char* g_destroyUiScript = "poatoDestroyUI";
+const char* g_createUiScript = "poatoCreateUI";
+const char* g_destroyUiScript = "poatoDestroyUI";
 
 namespace
 {
