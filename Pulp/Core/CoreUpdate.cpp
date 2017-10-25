@@ -135,7 +135,7 @@ bool XCore::Update(void)
 
 	if (env_.pPhysics) {
 		env_.pPhysics->onTickPreRender(
-			frameData.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSeconds(),
+			frameData.timeInfo.deltas[core::ITimer::Timer::GAME],
 			AABB(Vec3f::zero(), 2000.f)
 		);
 	}
@@ -262,7 +262,7 @@ void XCore::RenderEnd(core::FrameData& frameData)
 		X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
 
 		if (env_.pPhysics) {
-			env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSeconds());
+			env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME]);
 		}
 
 #if X_ENABLE_PROFILER

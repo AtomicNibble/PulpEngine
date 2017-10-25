@@ -5,6 +5,7 @@
 #define _X_PHYSICS_I_H_
 
 #include <IConverterModule.h>
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_BEGIN(physics)
 
@@ -941,8 +942,8 @@ struct IPhysics
 	virtual void shutDown(void) X_ABSTRACT;
 	virtual void release(void) X_ABSTRACT;
 
-	virtual void onTickPreRender(float dtime, const AABB& debugVisCullBounds) X_ABSTRACT;
-	virtual void onTickPostRender(float dtime) X_ABSTRACT;
+	virtual void onTickPreRender(core::TimeVal, const AABB& debugVisCullBounds) X_ABSTRACT;
+	virtual void onTickPostRender(core::TimeVal dtime) X_ABSTRACT;
 	virtual void render(void) X_ABSTRACT; // render stuff like debug shapes.
 
 	// if you create a full physics instance you get cooking with it.

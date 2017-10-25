@@ -378,7 +378,7 @@ void XPhysics::release(void)
 }
 
 
-void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
+void XPhysics::onTickPreRender(core::TimeVal dtime, const AABB& debugVisCullBounds)
 {
 	stepperType_ = vars_.getStepperType();
 
@@ -418,7 +418,7 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 
 		waitForResults_ = false;
 
-		waitForResults_ = pStepper->advance(pScene->getPxScene(), dtime, pScratchBlock_,
+		waitForResults_ = pStepper->advance(pScene->getPxScene(), dtime.GetSeconds(), pScratchBlock_,
 			safe_static_cast<uint32_t, size_t>(scratchBlockSize_));
 
 		// tells the stepper shape data is not going to be accessed until next frame 
@@ -428,7 +428,7 @@ void XPhysics::onTickPreRender(float dtime, const AABB& debugVisCullBounds)
 }
 
 
-void XPhysics::onTickPostRender(float dtime)
+void XPhysics::onTickPostRender(core::TimeVal dtime)
 {
 	if (!IsPaused() && waitForResults_ && activeScenes_.isNotEmpty())
 	{
@@ -444,7 +444,7 @@ void XPhysics::onTickPostRender(float dtime)
 		X_LOG0_EVERY_N(30, "Phys", "Sim time: %gms transforms: %" PRIuS, simTime.GetMilliSeconds(), numTransforms);
 
 		if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
-			pStepper->postRender(dtime);
+			pStepper->postRender(dtime.GetSeconds());
 		}
 	}
 
