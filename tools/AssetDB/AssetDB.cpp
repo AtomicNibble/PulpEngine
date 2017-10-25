@@ -1420,7 +1420,11 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, Mo
 		return Result::ERROR;
 	}
 
-
+	// previously I would not check if asset already exsist, and let the unique constraint fail.
+	// but I error for that, in my sql. so this is more cleaner.
+	if (AssetExsists(type, name)) {
+		return Result::NAME_TAKEN;
+	}
 
 	sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
 	cmd.bind(1, name.c_str());
