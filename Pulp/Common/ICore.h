@@ -74,6 +74,9 @@ X_NAMESPACE_DECLARE(physics,
 X_NAMESPACE_DECLARE(net,
 	struct INet;
 )
+X_NAMESPACE_DECLARE(video,
+	struct IVideoSys;
+)
 
 X_USING_NAMESPACE;
 
@@ -232,6 +235,7 @@ struct SCoreGlobals // obbject is zerod on start.
 	net::INet*					pNet;
 	core::V2::JobSystem*		pJobSys;
 	core::profiler::IProfiler*  pProfiler;
+	video::IVideoSys*			pVideoSys;
 
 	core::IXDirectoryWatcher*   pDirWatcher;
 	core::IXHotReloadManager*   pHotReload;

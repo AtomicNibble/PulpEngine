@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include "XVideo.h"
+
 #include <ModuleExports.h>
 #include <IEngineModule.h>
 
@@ -55,12 +57,10 @@ class XEngineModule_Video : public IEngineModule
 		X_ASSERT_NOT_NULL(gEnv->pConsole);
 		X_UNUSED(initParams);
 
-	//	video::IVideo* pVideo = nullptr;
-	//
-	//	g_VideoArena = X_NEW(VideoArena, gEnv->pArena, "VideoArena")(&g_VideoAlloc, "VideoArena");
-	//	pVideo = X_NEW(video::XVideo, g_VideoArena, "VideoSys")(g_VideoArena);
+		g_VideoArena = X_NEW(VideoArena, gEnv->pArena, "VideoArena")(&g_VideoAlloc, "VideoArena");
+		auto* pVideoSys = X_NEW(video::XVideoSys, g_VideoArena, "VideoSys")(g_VideoArena);
 
-		// env.pVideo = pVideo;
+		env.pVideoSys = pVideoSys;
 		return true;
 	}
 
