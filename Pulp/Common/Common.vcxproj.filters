@@ -229,6 +229,9 @@
     <Filter Include="Interfaces_h\Animation">
       <UniqueIdentifier>{fb6b25a9-7d62-4aaa-bb68-f4d3a1d75d7f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Video">
+      <UniqueIdentifier>{47092fce-4e79-4f73-8d69-d0e74103385b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1275,6 +1278,9 @@
     </ClInclude>
     <ClInclude Include="Assets\AssetBase.h">
       <Filter>Headers\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="IVideo.h">
+      <Filter>Interfaces_h\Video</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

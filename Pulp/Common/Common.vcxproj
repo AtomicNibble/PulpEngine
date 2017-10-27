@@ -191,6 +191,7 @@
     <ClInclude Include="ISound.h" />
     <ClInclude Include="ITexture.h" />
     <ClInclude Include="ITimer.h" />
+    <ClInclude Include="IVideo.h" />
     <ClInclude Include="IWeapon.h" />
     <ClInclude Include="IWorld3D.h" />
     <ClInclude Include="Logging\FilterPolicies\LoggerNoFilterPolicy.h" />
