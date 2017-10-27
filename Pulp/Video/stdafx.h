@@ -4,3 +4,6 @@
 
 
 #include <IVideo.h>
+
+
+extern core::MemoryArenaBase* g_VideoArena;
