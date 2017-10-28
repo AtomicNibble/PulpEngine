@@ -68,6 +68,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 	params.hInstance = hInstance;
 	params.bSkipInput = false;
 	params.bEnableNetowrking = true;
+	params.bEnableVideo = true;
 	params.bProfileSysEnabled = true;
 	params.pCoreArena = pArena_;
 

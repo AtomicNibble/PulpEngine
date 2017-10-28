@@ -35,6 +35,7 @@
 #include <INetwork.h>
 #include <ISound.h>
 #include <IPhysics.h>
+#include <IVideo.h>
 
 #include <Extension\IPotatoUnknown.h>
 #include <Extension\IPotatoFactory.h>
@@ -73,6 +74,7 @@ X_USING_NAMESPACE;
 #define DLL_GAME_DLL		"Engine_GameDLL"
 #define DLL_PHYSICS			"Engine_Physics"
 #define DLL_NET				"Engine_Network"
+#define DLL_VIDEO			"Engine_Video"
 
 
 
@@ -527,6 +529,14 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 		}
 	}
 
+	if (startupParams.bEnableVideo)
+	{
+		// #------------------------- Video -------------------------
+		if (!InitVideo(startupParams)) {
+			return false;
+		}
+	}
+
 
 	if (!startupParams.bTesting && !startupParams.isCoreOnly())
 	{
@@ -910,6 +920,26 @@ bool XCore::InitNet(const SCoreInitParams& initParams)
 
 	return true;
 }
+
+bool XCore::InitVideo(const SCoreInitParams& initParams)
+{
+	if (!IntializeEngineModule(DLL_VIDEO, "Engine_Video", initParams)) {
+		return false;
+	}
+
+	X_ASSERT_NOT_NULL(env_.pVideoSys);
+
+	env_.pVideoSys->registerVars();
+	env_.pVideoSys->registerCmds();
+
+	if (!env_.pVideoSys->init()) {
+		X_ERROR("Video", "failed to init video system");
+		return false;
+	}
+
+	return true;
+}
+
 
 bool XCore::InitScriptSys(const SCoreInitParams& initParams)
 {

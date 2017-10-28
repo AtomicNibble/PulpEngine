@@ -169,6 +169,7 @@ private:
 	bool InitGameDll(const SCoreInitParams &startupParams);
 	bool InitPhysics(const SCoreInitParams &startupParams);
 	bool InitNet(const SCoreInitParams &startupParams);
+	bool InitVideo(const SCoreInitParams &startupParams);
 	
 	
 	void registerVars(const SCoreInitParams& initParams);

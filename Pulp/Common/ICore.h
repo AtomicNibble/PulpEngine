@@ -146,6 +146,7 @@ struct SCoreInitParams
 	bool bEnableBasicConsole; // when in core only mode, optional enable a basic console.
 	bool bEnableJobSystem;
 	bool bEnableNetowrking;
+	bool bEnableVideo;
 	bool bLoadSymbols;
 	bool bFileSysWorkingDir;
 	bool bThreadSafeStringAlloc;
@@ -194,6 +195,7 @@ struct SCoreInitParams
 		bEnableBasicConsole(false),
 		bEnableJobSystem(true),
 		bEnableNetowrking(false),
+		bEnableVideo(false),
 		bLoadSymbols(true),
 		bFileSysWorkingDir(false),
 		bThreadSafeStringAlloc(true),
