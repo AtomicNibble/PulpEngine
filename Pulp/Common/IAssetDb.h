@@ -45,7 +45,9 @@ X_DECLARE_ENUM(AssetType)(
 	// that can be played.
 	// option to loop, hude hud, trigger note tracks..
 	// basically a anim for the camera
-	CAMERA
+	CAMERA,
+
+	VIDEO
 );
 
 
