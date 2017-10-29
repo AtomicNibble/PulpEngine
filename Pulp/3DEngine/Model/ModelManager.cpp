@@ -335,9 +335,8 @@ void XModelManager::dispatchLoadRequest(ModelLoadRequest* pLoadReq)
 	core::Path<char> path;
 	path /= "models";
 	path /= pLoadReq->pModel->getName();
-	path.setExtension(".model");
+	path.setExtension(MODEL_FILE_EXTENSION);
 
-	// dispatch a read request baby!
 	core::IoRequestOpen open;
 	open.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
