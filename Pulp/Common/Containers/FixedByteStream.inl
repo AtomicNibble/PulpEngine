@@ -48,12 +48,9 @@ inline FixedByteStreamStackPolicy<N>::~FixedByteStreamStackPolicy()
 
 
 inline FixedByteStreamBase::FixedByteStreamBase(size_type numBytes) :
-	numBytes_(numBytes),
-	readByteIdx_(0),
-	byteIdx_(0),
-	pBegin_(nullptr)
+	FixedByteStreamBase(nullptr, numBytes)
 {
-
+	
 }
 
 inline FixedByteStreamBase::FixedByteStreamBase(TypePtr pBegin, size_type numBytes) :
