@@ -16,12 +16,21 @@
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{f7af34a7-e77b-4e52-b8da-41ef7bcc326d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\libyuv">
+      <UniqueIdentifier>{b7c6e084-7595-499c-a3f5-bb767b2bf2b9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="XVideoSys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="XVideo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="IVFTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -32,8 +41,55 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\convert_argb.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\cpu_id.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\planar_functions.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\row_any.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\row_common.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\row_win.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\rotate_any.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\rotate_common.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\rotate_win.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\scale.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\scale_any.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\scale_win.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\3rdparty\source\libyuv\source\scale_common.cc">
+      <Filter>Source Files\libyuv</Filter>
+    </ClCompile>
+    <ClCompile Include="XVideoSys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
     <ClCompile Include="XVideo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="XVideo.inl">
+      <Filter>Header Files</Filter>
+    </None>
   </ItemGroup>
 </Project>

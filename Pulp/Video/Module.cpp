@@ -1,6 +1,6 @@
 #include "stdafx.h"
 
-#include "XVideo.h"
+#include "XVideoSys.h"
 
 #include <ModuleExports.h>
 #include <IEngineModule.h>
