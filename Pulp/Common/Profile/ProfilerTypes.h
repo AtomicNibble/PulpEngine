@@ -40,6 +40,7 @@ namespace profiler
 		GAME,
 		PHYSICS,
 		NETWORK,
+		VIDEO,
 		TOOL,
 		UNITTEST
 	);
