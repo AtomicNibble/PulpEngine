@@ -8,7 +8,6 @@
 
 
 #include "Containers\Array.h"
-#include "Containers\FixedRingBuffer.h"
 #include "Containers\Fifo.h"
 
 #include "Threading\Thread.h"

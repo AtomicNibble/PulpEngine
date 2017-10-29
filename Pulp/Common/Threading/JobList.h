@@ -6,7 +6,6 @@
 #include "Time\TimeVal.h"
 
 #include "Containers\Array.h"
-#include "Containers\FixedRingBuffer.h"
 #include "Containers\FixedFifo.h"
 
 #include "Threading\Thread.h"
