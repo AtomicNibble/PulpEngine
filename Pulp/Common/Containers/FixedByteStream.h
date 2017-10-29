@@ -113,7 +113,7 @@ public:
 	~FixedByteStreamStackPolicy();
 
 protected:
-	Type buf_[N];
+	Type buf_[N]; // this is fine, since will only ever be 8bit type.
 };
 
 template<class StorageType>
