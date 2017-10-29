@@ -472,17 +472,12 @@ void XModelManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoReq
 
 void XModelManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
-	X_UNUSED(pData);
+	X_UNUSED(jobSys, threadIdx, pJob, pData);
 
-	ModelLoadRequest* pLoadReq = static_cast<ModelLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-	XModel* pModel = pLoadReq->pModel;
+	auto* pLoadReq = static_cast<ModelLoadRequest*>(X_ASSERT_NOT_NULL(pData));
+	auto* pModel = pLoadReq->pModel;
 
-	
 	pModel->processData(pLoadReq->hdr, std::move(pLoadReq->data), X_ASSERT_NOT_NULL(engine::gEngEnv.pMaterialMan_));
-
 
 	loadRequestCleanup(pLoadReq);
 }
