@@ -29,6 +29,7 @@ X_LINK_LIB("engine_3DEngine")
 X_LINK_LIB("engine_Physics")
 X_LINK_LIB("engine_GameDLL")
 X_LINK_LIB("engine_Network")
+X_LINK_LIB("engine_Video")
 
 X_FORCE_LINK_FACTORY("XEngineModule_Input")
 X_FORCE_LINK_FACTORY("XEngineModule_Font")
@@ -38,6 +39,7 @@ X_FORCE_LINK_FACTORY("XEngineModule_3DEngine")
 X_FORCE_LINK_FACTORY("XEngineModule_Physics")
 X_FORCE_LINK_FACTORY("XEngineModule_Game")
 X_FORCE_LINK_FACTORY("XEngineModule_Network")
+X_FORCE_LINK_FACTORY("XEngineModule_Video")
 
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@render@Potato@@0V1234@A");
