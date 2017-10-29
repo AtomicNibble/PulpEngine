@@ -165,6 +165,8 @@ namespace profiler
 
 		ProfileTimer::CalculateCPUSpeed();
 
+		static_assert(profiler::SubSys::ENUM_COUNT == 14, "Added subsys? this code needs updating");
+
 		core::zero_object(subSystemInfo_);
 		subSystemInfo_[profiler::SubSys::CORE].pName = "Core";
 		subSystemInfo_[profiler::SubSys::ENGINE3D].pName = "3DEngine";
@@ -176,6 +178,7 @@ namespace profiler
 		subSystemInfo_[profiler::SubSys::GAME].pName = "Game";
 		subSystemInfo_[profiler::SubSys::PHYSICS].pName = "Physics";
 		subSystemInfo_[profiler::SubSys::NETWORK].pName = "Network";
+		subSystemInfo_[profiler::SubSys::VIDEO].pName = "Video";
 		subSystemInfo_[profiler::SubSys::UNCLASSIFIED].pName = "UnClassified";
 		subSystemInfo_[profiler::SubSys::TOOL].pName = "Tool";
 		subSystemInfo_[profiler::SubSys::UNITTEST].pName = "UnitTests";
@@ -190,6 +193,7 @@ namespace profiler
 		subSystemInfo_[profiler::SubSys::GAME].col = Col_Purple;
 		subSystemInfo_[profiler::SubSys::PHYSICS].col = Col_Magenta;
 		subSystemInfo_[profiler::SubSys::NETWORK].col = Col_Pink;
+		subSystemInfo_[profiler::SubSys::VIDEO].col = Col_Blue;
 		subSystemInfo_[profiler::SubSys::UNCLASSIFIED].col = Col_Coral;
 		subSystemInfo_[profiler::SubSys::TOOL].col = Col_Teal;
 		subSystemInfo_[profiler::SubSys::UNITTEST].col = Col_Olive;
