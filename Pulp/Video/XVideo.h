@@ -36,6 +36,7 @@ public:
 	X_INLINE uint16_t getHeight(void) const;
 	X_INLINE uint32_t getFps(void) const;
 	X_INLINE uint32_t getNumFrames(void) const;
+	X_INLINE size_t getBufferSize(void) const;
 
 private:
 

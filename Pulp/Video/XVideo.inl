@@ -21,5 +21,10 @@ X_INLINE uint32_t Video::getNumFrames(void) const
 	return numFrames_;
 }
 
+X_INLINE size_t Video::getBufferSize(void) const
+{
+	return ringBuffer_.size();
+}
+
 
 X_NAMESPACE_END
