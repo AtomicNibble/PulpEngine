@@ -3,6 +3,8 @@
 #include <Assets\AssetBase.h>
 #include <Threading\Signal.h>
 
+#include <Containers\FixedByteStreamRing.h>
+
 X_NAMESPACE_BEGIN(video)
 
 struct IVFHdr;
@@ -16,14 +18,11 @@ struct FrameData
 
 class Video : public core::AssetBase, public IVideo
 {
-	// max io requests active, if we add request priority, could dispatch more with just with lower pri.
-	// as the first ones should still complete sooner. 
-	const int32_t IO_REQUEST_ACTIVE = 4;
-	const int32_t IO_REQUEST_GRAN = 1024 * 64;
-	const int32_t BUFFER_SIZE = IO_REQUEST_GRAN * 16; // 64k * 16 = 1MB
+	const int32_t IO_BUFFER_SIZE = 1024 * 64;
+	const int32_t RING_BUFFER_SIZE = 1024 * 1024; // 1MB
 
 	typedef core::Array<bool> BoolArr;
-	typedef core::Array<uint8_t> DataVec;
+	typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 64>, core::growStrat::Multiply> DataVec;
 
 
 public:
@@ -45,9 +44,12 @@ private:
 	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
 		core::XFileAsync* pFile, uint32_t bytesTransferred);
 
-	int32_t avalibleBlocks(void) const;
-	void dispatchReads(void);
+	void dispatchRead(void);
+	
+	bool decodeFrame(void);
 
+private:
+	void DecodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
 	vpx_codec_ctx_t codec_;
@@ -61,20 +63,17 @@ private:
 
 	// Loading stuff
 	core::CriticalSection cs_;
-	core::Signal signal_;
 
 	core::XFileAsync* pFile_;
 
-	uint64_t fileOffset_;		// the file offset we last read from.
+	uint64_t fileOffset_;	// the file offset we last read from.
 	uint64_t fileLength_;	// the total file length;
 
-	int32_t readBlock_;
-	int32_t writeBlock_;
-	int32_t totalBlocks_;
-	int32_t loadingBlocks_;
+	core::FixedByteStreamOwning ringBuffer_; // buffer that hold pending IO data.
 
-	BoolArr loadedBuffers_; // support the IO responses out of order.
-	DataVec buffer_; // the ring buffer we read / write to
+	DataVec ioBuffer_;		// file data read into here
+	DataVec encodedFrame_;	// a frame that's about to be decoded is place here.
+	DataVec decodedFrame_;	// a decoded frame, read for uploading to gpu.
 };
 
 

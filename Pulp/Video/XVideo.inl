@@ -21,4 +21,5 @@ X_INLINE uint32_t Video::getNumFrames(void) const
 	return numFrames_;
 }
 
+
 X_NAMESPACE_END
