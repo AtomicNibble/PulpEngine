@@ -59,7 +59,7 @@ OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 	const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
-	int32_t delay = pFileSys->getVars().artOpenDelay;
+	int32_t delay = pFileSys->getVars().artOpenDelay_;
 	if (delay) {
 		core::Thread::Sleep(delay);
 	}

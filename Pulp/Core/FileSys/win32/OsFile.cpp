@@ -33,7 +33,7 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 	
 	const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
-	int32_t delay = pFileSys->getVars().artOpenDelay;
+	int32_t delay = pFileSys->getVars().artOpenDelay_;
 	if (delay) {
 		core::Thread::Sleep(delay);
 	}
@@ -103,7 +103,7 @@ size_t OsFile::read(void* buffer, size_t length)
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 		const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
-		int32_t delay = pFileSys->getVars().artReadDelay;
+		int32_t delay = pFileSys->getVars().artReadDelay_;
 		if (delay) {
 			core::Thread::Sleep(delay);
 		}
@@ -147,7 +147,7 @@ size_t OsFile::write(const void* buffer, size_t length)
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
 		const auto* pFileSys = static_cast<const xFileSys*>(gEnv->pFileSys);
-		int32_t delay = pFileSys->getVars().artWriteDelay;
+		int32_t delay = pFileSys->getVars().artWriteDelay_;
 		if (delay) {
 			core::Thread::Sleep(delay);
 		}

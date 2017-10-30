@@ -17,18 +17,18 @@ public:
 	void registerVars(void);
 
 public:
-	int32_t debug;
-	int32_t QueDebug;
-	int32_t numVirtualDir;
+	int32_t debug_;
+	int32_t queueDebug_;
+	int32_t numVirtualDir_;
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 	// artificial delays
-	int32_t artOpenDelay;
-	int32_t artReadDelay;
-	int32_t artWriteDelay;
+	int32_t artOpenDelay_;
+	int32_t artReadDelay_;
+	int32_t artWriteDelay_;
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
-	core::ICVar* pVirtualDirs[core::FS_MAX_VIRTUAL_DIR];
+	core::ICVar* pVirtualDirs_[core::FS_MAX_VIRTUAL_DIR];
 };
 
 X_NAMESPACE_END
