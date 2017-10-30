@@ -125,6 +125,8 @@ inline void FixedByteStreamBase::read(Type* pBuf, size_type numBytes)
 
 inline void FixedByteStreamBase::skip(size_type numBytes)
 {
+	X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
+
 	readByteIdx_ += numBytes;
 }
 
