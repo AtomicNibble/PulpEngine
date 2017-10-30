@@ -56,9 +56,9 @@ public:
 	// clears the stream setting the cursor back to the start.
 	void reset(void);
 
-	size_type capacity(void) const;
 	size_type size(void) const;
-
+	
+	size_type capacity(void) const;
 	// returns the amount of bits that can be added.
 	size_type freeSpace(void) const;
 	// returns true if the stream is full.
