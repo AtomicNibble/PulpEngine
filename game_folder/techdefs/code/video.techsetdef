@@ -1,0 +1,27 @@
+#include <states>
+
+
+// define a sampler for it, that can't be edited in AssMan.
+Sampler( "videoTextureSampler" )
+{
+	repeat   = "tile both"
+	filter = "linear (mip none)"
+}
+
+Technique( "unlit" )
+{
+	state = "blend + depth"
+	source = "techsetdef_unlit.hlsl"
+
+	vs = VertexShader()
+	{
+	//	entry = "techsetdef_unlit"
+	}
+	ps = PixelShader()
+	{
+	//	entry = "techsetdef_unlit"
+
+    	diffuseSampler = "videoTextureSampler"
+		diffuse = CodeTexture( "codeTexture0" )
+	}
+}
