@@ -86,6 +86,7 @@
     <ClInclude Include="Containers\FixedArray.h" />
     <ClInclude Include="Containers\FixedBitStream.h" />
     <ClInclude Include="Containers\FixedByteStream.h" />
+    <ClInclude Include="Containers\FixedByteStreamRing.h" />
     <ClInclude Include="Containers\FixedFifo.h" />
     <ClInclude Include="Containers\FixedRingBuffer.h" />
     <ClInclude Include="Containers\FixedStack.h" />
@@ -711,6 +712,7 @@
     <None Include="Containers\FixedArray.inl" />
     <None Include="Containers\FixedBitStream.inl" />
     <None Include="Containers\FixedByteStream.inl" />
+    <None Include="Containers\FixedByteStreamRing.inl" />
     <None Include="Containers\FixedFifo.inl" />
     <None Include="Containers\FixedRingBuffer.inl" />
     <None Include="Containers\FixedStack.inl" />

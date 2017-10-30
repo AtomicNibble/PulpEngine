@@ -1282,6 +1282,9 @@
     <ClInclude Include="IVideo.h">
       <Filter>Interfaces_h\Video</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedByteStreamRing.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1619,6 +1622,9 @@
     </None>
     <None Include="Math\XAngles.inl">
       <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="Containers\FixedByteStreamRing.inl">
+      <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
