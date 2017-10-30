@@ -21,9 +21,7 @@ class Video : public core::AssetBase, public IVideo
 	const int32_t IO_BUFFER_SIZE = 1024 * 64;
 	const int32_t RING_BUFFER_SIZE = 1024 * 1024; // 1MB
 
-	typedef core::Array<bool> BoolArr;
 	typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 64>, core::growStrat::Multiply> DataVec;
-
 
 public:
 	Video(core::string name, core::MemoryArenaBase* arena);
