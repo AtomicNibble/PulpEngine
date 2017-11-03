@@ -405,7 +405,7 @@ void XConsole::registerVars(void)
 	ADD_CVAR_REF_NO_NAME(console_disable_mouse, 2, 0, 2, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, 
 		"Disable mouse input when console open. 1=expanded only 2=always");
 
-	ADD_CVAR_REF_NO_NAME(console_output_font_size, CONSOLE_DEFAULT_LOG_FONT_SIZE, 1, 128, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
+	ADD_CVAR_REF_NO_NAME(console_output_font_size, CONSOLE_DEFAULT_LOG_FONT_SIZE, 1, 256, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Font size of log messages");
 	ADD_CVAR_REF_NO_NAME(console_output_font_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 0.1f, 10.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
 		"Line height of log messages");
