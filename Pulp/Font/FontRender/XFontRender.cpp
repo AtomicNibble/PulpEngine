@@ -2,9 +2,18 @@
 #include "XFontRender.h"
 #include "XFontGlyph.h"
 
+
+extern "C" {
+
+	void computegradient(double *img, int w, int h, double *gx, double *gy);
+	void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx, short *disty, double *dist);
+}
+
+
 X_NAMESPACE_BEGIN(font)
 
-XFontRender::XFontRender() : 
+XFontRender::XFontRender(core::MemoryArenaBase* arena) :
+	arena_(arena),
 	pLibrary_(nullptr),
 	pFace_(nullptr),
 	encoding_(FontEncoding::Unicode),
@@ -12,7 +21,14 @@ XFontRender::XFontRender() :
 	sizeRatio_(0.8f),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
-	data_(g_fontArena)
+	data_(arena),
+	xdist_(arena),
+	ydist_(arena),
+	gx_(arena),
+	gy_(arena),
+	outside_(arena),
+	inside_(arena),
+	tmpData_(arena)
 {
 
 }
@@ -243,6 +259,117 @@ void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 	}
 }
 
+void XFontRender::GenerateSDF(XGlyph& glphy, XGlyphBitmap& bitMap)
+{
+	X_UNUSED(glphy);
+
+	auto& buffer = bitMap.GetBuffer();
+	const uint32 glyphWidth = bitMap.GetWidth();
+	const uint32 glyphHeight = bitMap.GetHeight();
+	const uint32_t numPixel = glyphWidth * glyphHeight;
+
+	// find minimimum and maximum values
+	double imgMin = std::numeric_limits<double>::max();
+	double imgMax = std::numeric_limits<double>::min();
+
+	tmpData_.resize(numPixel);
+
+	for (uint32_t i = 0; i < numPixel; ++i)
+	{
+		double v = buffer[i];
+
+		tmpData_[i] = v;
+		if (v > imgMax) {
+			imgMax = v;
+		}
+		if (v < imgMin) {
+			imgMin = v;
+		}
+	}
+
+	// Map values from 0 - 255 to 0.0 - 1.0
+	for (uint32_t i = 0; i < numPixel; ++i) {
+		tmpData_[i] = (buffer[i] - imgMin) / imgMax;
+	}
+
+	makeDistanceMapd(tmpData_, glyphWidth, glyphHeight);
+
+	// map values from 0.0 - 1.0 to 0 - 255
+	for (uint32_t i = 0; i < numPixel; ++i) {
+		buffer[i] = safe_static_cast<uint8_t>(static_cast<int32_t>(255 * (1 - tmpData_[i])));
+	}
+
+	tmpData_.clear();
+}
+
+void XFontRender::makeDistanceMapd(DoubleArr& data, uint32_t width, uint32_t height)
+{
+	const uint32_t totalPixel = width * height;
+
+	xdist_.resize(totalPixel);
+	ydist_.resize(totalPixel);
+	gx_.resize(totalPixel);
+	gy_.resize(totalPixel);
+	outside_.resize(totalPixel);
+	inside_.resize(totalPixel);
+
+	double vmin = std::numeric_limits<double>::max();
+	
+	// Compute outside = edtaa3(bitmap); % Transform background (0's)
+	computegradient(data.data(), width, height, gx_.data(), gy_.data());
+	edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), outside_.data());
+	for (uint32_t i = 0; i < totalPixel; ++i) {
+		if (outside_[i] < 0.0) {
+			outside_[i] = 0.0;
+		}
+	}
+
+	// Compute inside = edtaa3(1-bitmap); % Transform foreground (1's)
+	std::memset(gx_.data(), 0, sizeof(double) * gx_.size());
+	std::memset(gy_.data(), 0, sizeof(double) * gy_.size());
+	for (uint32_t i = 0; i < totalPixel; ++i) {
+		data[i] = 1 - data[i];
+	}
+
+	computegradient(data.data(), width, height, gx_.data(), gy_.data());
+	edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), inside_.data());
+	for (uint32_t i = 0; i < totalPixel; ++i) {
+		if (inside_[i] < 0) {
+			inside_[i] = 0.0;
+		}
+	}
+
+	// distmap = outside - inside; % Bipolar distance field
+	for (uint32_t i = 0; i<totalPixel; ++i)
+	{
+		outside_[i] -= inside_[i];
+		if (outside_[i] < vmin) {
+			vmin = outside_[i];
+		}
+	}
+
+	vmin = math<double>::abs(vmin);
+
+	for (uint32_t i = 0; i<totalPixel; ++i)
+	{
+		double v = outside_[i];
+		if (v < -vmin) {
+			outside_[i] = -vmin;
+		}
+		else if (v > +vmin) {
+			outside_[i] = +vmin;
+		}
+		data[i] = (outside_[i] + vmin) / (2 * vmin);
+	}
+
+	xdist_.clear();
+	ydist_.clear();
+	gx_.clear();
+	gy_.clear();
+	outside_.clear();
+	inside_.clear();
+}
+
 
 //------------------------------------------------------------------------------------------------- 
 
@@ -255,5 +382,6 @@ const char* XFontRender::errToStr(FT_Error err)
     #include FT_ERRORS_H
     return "<ukn>";
 }
+
 
 X_NAMESPACE_END

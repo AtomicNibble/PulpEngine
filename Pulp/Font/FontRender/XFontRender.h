@@ -20,8 +20,11 @@ class XFontRender
 	X_NO_COPY(XFontRender);
 	X_NO_ASSIGN(XFontRender);
 
+	typedef core::Array<int16_t> Int16Arr;
+	typedef core::Array<double> DoubleArr;
+
 public:
-	XFontRender();
+	XFontRender(core::MemoryArenaBase* arena);
 	~XFontRender();
 
 	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
@@ -45,10 +48,15 @@ public:
 	X_INLINE const Metrics& GetMetrics(void) const;
 
 private:
+	void GenerateSDF(XGlyph& glphy, XGlyphBitmap& bitMap);
+	void makeDistanceMapd(DoubleArr& data, uint32_t width, uint32_t height);
+
+private:
 	static const char* errToStr(FT_Error err);
 
 
 private:
+	core::MemoryArenaBase* arena_;
 	core::UniquePointer<uint8_t[]> data_; // must stay valid for lifetime of FT_Face
 
 	FT_Library		pLibrary_;
@@ -62,6 +70,15 @@ private:
 	int32_t			glyphBitmapHeight_;
 
 	Metrics			metrics_;
+
+	// sdf stuff.
+	Int16Arr xdist_;
+	Int16Arr ydist_;
+	DoubleArr gx_;
+	DoubleArr gy_;
+	DoubleArr outside_;
+	DoubleArr inside_;
+	DoubleArr tmpData_;
 };
 
 

@@ -116,6 +116,9 @@
     <ClCompile Include="Sys\XFontSystem.cpp">
       <Filter>Source Files\Sys</Filter>
     </ClCompile>
+    <ClCompile Include="FontRender\edtaa3func.c">
+      <Filter>Source Files\FontRender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Vars\FontVars.inl">

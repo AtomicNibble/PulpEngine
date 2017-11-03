@@ -9,6 +9,7 @@ X_NAMESPACE_BEGIN(font)
 
 XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	vars_(vars),
+	fontRenderer_(arena),
 	glyphBitmapWidth_(0),
 	glyphBitmapHeight_(0),
 	scaledGlyphWidth_(0),
