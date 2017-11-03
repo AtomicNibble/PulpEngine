@@ -379,8 +379,9 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 		textureBuffer_.ptr(),
 		0,					// srcX
 		0,					// srcY
-		pSlot->charWidth,	// srcWidth
-		pSlot->charHeight,	// srcHeight
+		// always copy the whole buffer, we may of blended.
+		cellWidth_, //	pSlot->charWidth,	// srcWidth
+		cellHeight_, //	pSlot->charHeight,	// srcHeight
 		slotBufferX * cellWidth_,		// destx
 		slotBufferY * cellHeight_,	// desy
 		width_				// destWidth / stride
