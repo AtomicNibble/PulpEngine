@@ -223,6 +223,15 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		pSlot->charOffsetX >>= offsetMult >> 1;
 		pSlot->charOffsetY >>= offsetMult >> 1;
 
+		// Hack: need to handle updating these values better so don't clip bits.
+		const uint32_t paddingX = (pSlot->glyphBitmap.GetWidth() - pSlot->charWidth) / 2;
+		const uint32_t paddingY = (pSlot->glyphBitmap.GetHeight() - pSlot->charHeight) / 2;
+
+		pSlot->bitmapOffsetX = safe_static_cast<int8_t>(paddingX);
+		pSlot->bitmapOffsetY = safe_static_cast<int8_t>(paddingY);
+		pSlot->charWidth += 1;
+		pSlot->charHeight += 1;
+		// ~hack
 		scaleBitmap_->BlitScaledTo8(
 			pSlot->glyphBitmap.GetBuffer(),
 			0,
