@@ -48,6 +48,6 @@ public:
 	XGlyphBitmap	glyphBitmap;
 };
 
-X_ENSURE_SIZE(XGlyph, 64);
+X_ENSURE_LE(sizeof(XGlyph), 64, "Bigger than cache line");
 
 X_NAMESPACE_END
