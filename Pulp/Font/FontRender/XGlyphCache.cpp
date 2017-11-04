@@ -232,6 +232,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 		pSlot->charWidth += 1;
 		pSlot->charHeight += 1;
 		// ~hack
+
 		scaleBitmap_->BlitScaledTo8(
 			pSlot->glyphBitmap.GetBuffer(),
 			0,
