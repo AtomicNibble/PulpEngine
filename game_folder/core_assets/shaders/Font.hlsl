@@ -43,10 +43,45 @@ VS_OUTPUT BasicVS(VS_INPUT input)
 }
 
 
+float contour( in float d, in float w ){
+    return smoothstep(0.5 - w, 0.5 + w, d);
+}
+float samp( in float2 uv, float w ){
+    return contour(fontCache.Sample(fontCacheSampler, uv).a, w );
+}
+
 PS_OUTPUT FontPS(PS_INPUT input)
 {
     PS_OUTPUT output;
     output.color = input.color;
-    output.color.a *= fontCache.Sample(fontCacheSampler, input.texCoord).a;
+
+#if 0 // enable supersample.
+    float2 uv = input.texCoord;
+    float dist = fontCache.Sample(fontCacheSampler, uv).a;
+    float width = fwidth(dist);
+    float alpha = contour( dist, width );
+
+    float dscale = 0.354; // half of 1/sqrt2; you can play with this
+    float2 duv = dscale * (ddx(uv) + ddy(uv));
+    float4 box = float4(uv-duv, uv+duv);
+
+    float asum = samp( box.xy, width )
+               + samp( box.zw, width )
+               + samp( box.xw, width )
+               + samp( box.zy, width );
+
+    // weighted average, with 4 extra points having 0.5 weight each,
+    // so 1 + 0.5*4 = 3 is the divisor
+    alpha = (alpha + 0.5 * asum) / 3.;
+
+    output.color.a *= alpha;
+#else
+    float dist = fontCache.Sample(fontCacheSampler, input.texCoord).a;
+    float edgeDistance = 0.5;
+    float edgeWidth = 0.7 * length(float2(ddx(dist), ddy(dist)));
+    float opacity = smoothstep(edgeDistance - edgeWidth, edgeDistance + edgeWidth, dist);
+
+    output.color.a *= opacity;
+#endif
     return output;
 }
