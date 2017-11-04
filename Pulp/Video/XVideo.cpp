@@ -51,26 +51,6 @@ Video::~Video()
 
 void Video::update(const core::FrameTimeData& frameTimeInfo)
 {
-	/*
-		we need to tick..
-
-		we need to keep filling the IO buffer untill it's full or we have read the whole file.
-		we should not wait a frame before dispatching each io request.
-		so after each IO request just see if we can dispach another, so IO is not limited by fps.
-		
-		when the io buffer is full tho, we will need to trigger IO request after eating data from the iobuffer.
-
-		when we have enougth data to decode a frame we decode it.
-		only if we have a fre ebuffer to decode into.
-		might be nice to have two decoded frame buffers, so can have next ready.
-
-		we only want to update the gpu buffer at the frame rate.
-		so i need to track when the camel came to play.
-
-
-
-	*/
-
 	// TODO: this assumes header finished loading.
 	if (!pTexture_) {
 		pTexture_ = gEnv->pRender->createTexture(
@@ -229,78 +209,10 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 
 		ringBuffer_.write(pBuf, bytesTransferred);
 
-
 		if (ringBuffer_.freeSpace() >= IO_BUFFER_SIZE) {
 			dispatchRead();
 		}
-#if 0
-		// look for full frame.
-		if (ringBuffer_.size() > sizeof(IVFFrameHdr))
-		{
-			auto& hdr = ringBuffer_.peek<IVFFrameHdr>();
-
-			if (ringBuffer_.size() >= (hdr.frameDataSize + sizeof(IVFFrameHdr)))
-			{
-				// we have a full frame.
-				ringBuffer_.skip(sizeof(IVFFrameHdr));
-
-				encodedFrame_.resize(hdr.frameDataSize);
-
-				ringBuffer_.read(encodedFrame_.data(), encodedFrame_.size());
-
-				// we now want to decode the frame.
-
-				gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::DecodeFrame_job,
-					nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
-			}
-		}
-#endif
 	}
-
-	/*
-		1. read the header.
-		2. allocate buffer for IO requests.
-		3. when data is loaded, copy it into ring buffer, and dispatch another request
-			- only one in flight request at a time.
-		4. when the ring buffer has a full frame in it, copy the frame to temp memory.
-		5. dispatch a job to decode this frame.
-		6. dispatch a job to convert the decoded data to RGBA.
-			- when finished, we are able to decode another frame.
-
-		7. we have a frame.
-
-		8. copy the decoded frame to device texture.
-			- means we need to decoded frame to stay in memory for basically a whole frame.
-					which means we can't decode the next one till that has happend.
-
-			- if the video is been played in multiple locations, should just use same texture.
-			- but if we have multiple textures it's okay for now.
-
-			- who will create the device texture?
-			- i think the video can create texture, that way we can just submit update commands here.
-
-		so now we create and update a device texture.
-		we have a texture id that can be used to render with.
-		we just need to make it work with materials.
-
-		like a mterial needs to say i want 'this' videos texture please.
-		well we need like a techdef in order to setup the correct state and video params.
-		then the material needs to select the def.
-
-		how do i link this fucking texture lol.
-		when i load the material i should work it out and set the texture id.
-
-		techdefs can refrence textures that will only exsist at runtime, just like the fonts.
-		but we must wire them in, the 3dengine needs todo this.
-
-		the material needs to store what video tho.
-		how should the engine know this kinda shit needs to be done.
-
-
-
-	*/
-
-
 }
 
 void Video::dispatchRead(void)
