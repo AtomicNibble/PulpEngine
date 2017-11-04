@@ -197,7 +197,7 @@ bool XGlyphBitmap::BlitScaledTo8(DataVec& destBuffer,
 	int32_t srcWidth, int32_t srcHeight, 
 	int32_t destX, int32_t destY, 
 	int32_t destWidth, int32_t destHeight, 
-	int32_t destBufferWidth)
+	int32_t destBufferWidth) const
 {
 	X_UNUSED(destY);
 	X_UNUSED(srcX);
@@ -268,7 +268,7 @@ bool XGlyphBitmap::BlitScaledTo32(DataVec& destBuffer,
 	int32_t srcWidth, int32_t srcHeight, 
 	int32_t destX, int32_t destY, 
 	int32_t destWidth, int32_t destHeight, 
-	int32_t destBufferWidth)
+	int32_t destBufferWidth) const
 {
 	X_UNUSED(destY);
 	X_UNUSED(srcX);
@@ -339,7 +339,7 @@ bool XGlyphBitmap::BlitTo8(uint8_t* pBuffer,
 	int32_t srcX, int32_t srcY, 
 	int32_t srcWidth, int32_t srcHeight, 
 	int32_t destX, int32_t destY, 
-	int32_t destWidth)
+	int32_t destWidth) const
 {
 	int32_t ySrcOffset, yDestOffset;
 
@@ -365,7 +365,7 @@ bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 	int32_t srcX, int32_t srcY,
 	int32_t srcWidth, int32_t srcHeight,
 	int32_t destX, int32_t destY,
-	int32_t destWidth)
+	int32_t destWidth) const
 {
 	int32_t ySrcOffset, yDestOffset;
 	char cColor;
