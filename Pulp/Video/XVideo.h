@@ -83,6 +83,8 @@ private:
 	bool presentFrame_;
 	bool _pad[2];
 
+	core::V2::Job* pDecodeJob_;
+
 	// Loading stuff
 	core::CriticalSection cs_;
 

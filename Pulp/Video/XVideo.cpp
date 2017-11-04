@@ -30,7 +30,8 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
 	ioBuffer_(arena),
 	encodedFrame_(arena),
 	decodedFrame_(arena),
-	pTexture_(nullptr)
+	pTexture_(nullptr),
+	pDecodeJob_(nullptr)
 {
 
 	core::zero_object(codec_);
@@ -92,6 +93,8 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 	// do we need a new encoded frame?
 	if (encodedFrame_.isEmpty())
 	{
+		X_ASSERT(pDecodeJob_ == nullptr, "Deocde job not null")(pDecodeJob_);
+
 		if (ringBuffer_.size() > sizeof(IVFFrameHdr))
 		{
 			auto& hdr = ringBuffer_.peek<IVFFrameHdr>();
@@ -106,9 +109,13 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 				ringBuffer_.read(encodedFrame_.data(), encodedFrame_.size());
 
 				// we now want to decode the frame.
-				gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::DecodeFrame_job,
+				pDecodeJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::DecodeFrame_job,
 					nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
 			}
+		}
+
+		if (!pDecodeJob_) {
+			X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
 		}
 	}
 
@@ -141,7 +148,13 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 		X_WARNING("Video", "No frame to present");
 		return;
 	}
-		 
+	
+	// stall untill the decode has finished.
+	X_ASSERT_NOT_NULL(pDecodeJob_);
+
+	gEnv->pJobSys->Wait(pDecodeJob_);
+	pDecodeJob_ = nullptr;
+
 	// we want to submit a draw
 	render::Commands::CopyTextureBufferData* pCopyCmd = bucket.addCommand<render::Commands::CopyTextureBufferData>(0, 0);
 	pCopyCmd->textureId = pTexture_->getTexID();
