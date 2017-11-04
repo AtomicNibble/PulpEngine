@@ -4,6 +4,7 @@
 #include <Threading\Signal.h>
 
 #include <Containers\FixedByteStreamRing.h>
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_DECLARE(core,
 struct IoRequestBase;
