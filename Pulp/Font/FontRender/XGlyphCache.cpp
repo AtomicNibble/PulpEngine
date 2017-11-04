@@ -79,6 +79,8 @@ bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t 
 	}
 
 	if (vars_.glyphCachePreWarm()) {
+		X_PROFILE_NO_HISTORY_BEGIN("FontWarmCache", core::profiler::SubSys::FONT);
+
 		PreWarmCache();
 	}
 
