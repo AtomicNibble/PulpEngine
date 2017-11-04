@@ -44,4 +44,6 @@ public:
 	XGlyphBitmap	glyphBitmap;
 };
 
+X_ENSURE_SIZE(XGlyph, 64);
+
 X_NAMESPACE_END
