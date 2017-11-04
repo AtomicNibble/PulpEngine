@@ -256,6 +256,32 @@ void XVideoSys::release(void)
 
 }
 
+void XVideoSys::update(const core::FrameTimeData& frameTimeInfo)
+{
+	core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+	for (const auto& video : videos_)
+	{
+		auto* pVideoRes = video.second;
+
+		pVideoRes->update(frameTimeInfo);
+	}
+}
+
+void XVideoSys::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
+{
+	core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+	for (const auto& video : videos_)
+	{
+		auto* pVideoRes = video.second;
+
+		if (pVideoRes->hasFrame()) {
+			pVideoRes->appendDirtyBuffers(bucket);
+		}
+	}
+}
+
 
 IVideo* XVideoSys::findVideo(const char* pVideoName) const
 {
@@ -504,11 +530,15 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
 
 	X_LOG0("Video", "------------ ^8Videos(%" PRIuS ")^7 ---------------", sorted_videos.size());
 
+	core::HumanSize::Str sizeStr;
 	for (const auto* pVideo : sorted_videos)
 	{
-		X_LOG0("Video", "^2%-32s^7 dim:^2%ix%i^7 fps:^2%i^7 frames:^2%i^7 Refs:^2%i",
+		X_LOG0("Video", "^2%-32s^7 dim:^2%ix%i^7 fps:^2%i^7 frame:^2%i/%i^7 bufferSize: ^2%s^7 state: ^2%s^7 Refs:^2%i",
 			pVideo->getName(), pVideo->getWidth(), pVideo->getHeight(), pVideo->getFps(),
-			pVideo->getNumFrames(), pVideo->getRefCount());
+			pVideo->getCurFrame(), pVideo->getNumFrames(),
+			core::HumanSize::toString(sizeStr, pVideo->getBufferSize()),
+			VideoState::ToString(pVideo->getState()),
+			pVideo->getRefCount());
 	}
 
 	X_LOG0("Video", "------------ ^8Videos End^7 --------------");

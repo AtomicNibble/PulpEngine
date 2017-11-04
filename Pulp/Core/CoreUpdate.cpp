@@ -8,7 +8,7 @@
 #include <ISound.h>
 #include <IScriptSys.h>
 #include <IPhysics.h>
-
+#include <IVideo.h>
 
 #include <IFrameData.h>
 
@@ -96,6 +96,10 @@ bool XCore::Update(void)
 	// we must call this on same thread as window.
 	if (env_.pInput) {
 		env_.pInput->Update(frameData);
+	}
+
+	if (env_.pInput) {
+		env_.pVideoSys->update(frameData.timeInfo);
 	}
 
 	// top job that we can use to wait for the chain of jobs to complete.

@@ -140,15 +140,18 @@ public:
 	void shutDown(void) X_FINAL;
 	void release(void) X_FINAL;
 
+	void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
+
 	bool asyncInitFinalize(void);
 	void dispatchPendingLoads(void);
+
+	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
 
 	IVideo* findVideo(const char* pVideoName) const X_FINAL;
 	IVideo* loadVideo(const char* pVideoName) X_FINAL;
 
 	void releaseVideo(IVideo* pVid) X_FINAL;
-
 	bool waitForLoad(IVideo* pVideo) X_FINAL; // returns true if load succeed.
 
 	void listVideos(const char* pSearchPatten = nullptr) const;
