@@ -18,7 +18,6 @@ struct XGlyph
 	X_INLINE void reset(void)
 	{
 		usage = 0;
-		cacheSlot = 0;
 		currentChar = static_cast<wchar_t>(~0);
 
 		advanceX = 0;
@@ -26,13 +25,14 @@ struct XGlyph
 		charHeight = 0;
 		charOffsetX = 0;
 		charOffsetY = 0;
+		bitmapOffsetX = 0;
+		bitmapOffsetY = 0;
 
 		glyphBitmap.Clear();
 	}
 
 public:
 	uint32			usage;
-	int32_t			cacheSlot;
 	wchar_t			currentChar;
 
 	uint16_t		advanceX;
@@ -40,6 +40,10 @@ public:
 	uint8_t			charHeight;		// size in pixel
 	int8_t			charOffsetX;	// these can be negative.
 	int8_t			charOffsetY;
+
+	int8_t			bitmapOffsetX;
+	int8_t			bitmapOffsetY;
+	int8_t			_pad[2];
 
 	XGlyphBitmap	glyphBitmap;
 };

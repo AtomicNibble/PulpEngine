@@ -191,7 +191,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 
 		X_ASSERT_NOT_NULL(pSlot);
 		X_ASSERT_NOT_NULL(scaleBitmap_.get());
-		if (!fontRenderer_.GetGlyph(*pSlot, *scaleBitmap_, 0, 0, cChar))
+		if (!fontRenderer_.GetGlyph(*pSlot, *scaleBitmap_, cChar))
 		{
 			// failed to render
 			return false;
@@ -219,7 +219,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	else
 	{
 		X_ASSERT_NOT_NULL(pSlot);
-		if (!fontRenderer_.GetGlyph(*pSlot, pSlot->glyphBitmap, 0, 0, cChar))
+		if (!fontRenderer_.GetGlyph(*pSlot, pSlot->glyphBitmap, cChar))
 		{
 			// failed to render
 			return false;
@@ -296,8 +296,7 @@ XGlyph* XGlyphCache::GetMRUSlot(void)
 
 //------------------------------------------------------------------------------------------------- 
 
-XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, int8_t& charOffsetX, int8_t& charOffsetY,
-	uint16_t& advanceX, wchar_t cChar)
+const XGlyph* XGlyphCache::GetGlyph(wchar_t cChar)
 {
 	// glyph already chached?
 	XCacheTable::iterator pItor = cacheTable_.find(cChar);
@@ -319,12 +318,7 @@ XGlyphBitmap* XGlyphCache::GetGlyph(uint8_t& width, uint8_t& height, int8_t& cha
 	// update usage for LRU
 	pGlyph->usage = usage_++;
 
-	width = pGlyph->charWidth;
-	height = pGlyph->charHeight;
-	charOffsetX = pGlyph->charOffsetX;
-	charOffsetY = pGlyph->charOffsetY;
-	advanceX = pGlyph->advanceX;
-	return &pGlyph->glyphBitmap;
+	return pGlyph;
 }
 
 //------------------------------------------------------------------------------------------------- 
@@ -342,7 +336,6 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 		}
 
 		slot.reset();
-		slot.cacheSlot = static_cast<uint32_t>(i);
 	}
 
 	return true;

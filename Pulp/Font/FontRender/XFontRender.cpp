@@ -10,6 +10,7 @@ extern "C" {
 }
 
 
+
 X_NAMESPACE_BEGIN(font)
 
 XFontRender::XFontRender(core::MemoryArenaBase* arena) :
@@ -87,7 +88,7 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode)
+bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode)
 { 
 	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
@@ -109,11 +110,11 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t dest
 	const uint32 dstGlyphHeight = destBitMap.GetHeight();
 	const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
 
-#if X_DEBUG
-
 	// make sure we not relying on zero initialize.
-	// since i only copy pixels i have.
-	std::memset(buffer.data(), 0xFF, buffer.size());
+	// this is needed for SDF.
+	std::memset(buffer.data(), 0x00, buffer.size());
+
+#if X_DEBUG
 
 	// some sanity checks for my understanding of FreeType.
 	// they are not very accurate out by few pixels in some cases so keep disabled when not testing.
@@ -139,26 +140,23 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t dest
 #endif // !X_DEBUG
 
 	// does the bitmap fit into the dest are the requested offset?
-	if (dstGlyphWidth < (pGlyph->bitmap.width + destOffsetX) || dstGlyphHeight < (pGlyph->bitmap.rows + destOffsetY))
+	if (dstGlyphWidth < pGlyph->bitmap.width || dstGlyphHeight < pGlyph->bitmap.rows)
 	{
-		if (destOffsetX || destOffsetY)
-		{
-			X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap at offsets %" PRIi32 ", %" PRIi32 ", clipping.",
-				charCode, destOffsetX, destOffsetY);
-		}
-		else
-		{
-			X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.",charCode);
-		}
+		X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.",charCode);
 	}
 
-	const uint32_t colsToCopy = core::Min(dstGlyphWidth, destOffsetX + pGlyph->bitmap.width);
-	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, destOffsetY + pGlyph->bitmap.rows);
+	// i want to center the bitmap.
+	// so that if we perform SDF it's got good spacing around edges.
+
+	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph->bitmap.width);
+	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph->bitmap.rows);
+	const uint32_t paddingX = (dstGlyphWidth - colsToCopy) / 2;
+	const uint32_t paddingY = (dstGlyphHeight - rowsToCopy) / 2;
 
 	for (uint32_t row = 0; row < rowsToCopy; row++)
 	{
-		const int32_t dstX = destOffsetX;
-		const int32_t dstY = row + destOffsetY;
+		const int32_t dstX = paddingX;
+		const int32_t dstY = row + paddingY;
 		const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
 		const int32_t srcOffset = (row * pGlyph->bitmap.pitch);
@@ -181,11 +179,16 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t dest
 	const auto offsetY = static_cast<uint32_t>(glyphBitmapHeight_ - pGlyph->bitmap_top);
 
 	glphy.currentChar = charCode;
-	glphy.advanceX = safe_static_cast<uint16_t>(pGlyph->advance.x / 64);
+	glphy.advanceX = safe_static_cast<decltype(glphy.advanceX)>(pGlyph->advance.x / 64);
 	glphy.charOffsetX = safe_static_cast<decltype(glphy.charOffsetX)>(pGlyph->bitmap_left);
 	glphy.charOffsetY = safe_static_cast<decltype(glphy.charOffsetX)>(offsetY);
-	glphy.charWidth = safe_static_cast<uint8_t>(colsToCopy);
-	glphy.charHeight = safe_static_cast<uint8_t>(rowsToCopy);
+	glphy.charWidth = safe_static_cast<decltype(glphy.charWidth)>(colsToCopy);
+	glphy.charHeight = safe_static_cast<decltype(glphy.charHeight)>(rowsToCopy);
+	glphy.bitmapOffsetX = safe_static_cast<decltype(glphy.bitmapOffsetX)>(paddingX);
+	glphy.bitmapOffsetY = safe_static_cast<decltype(glphy.bitmapOffsetY)>(paddingY);
+
+	GenerateSDF(destBitMap);
+
 	return true;
 }
 
@@ -259,10 +262,8 @@ void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 	}
 }
 
-void XFontRender::GenerateSDF(XGlyph& glphy, XGlyphBitmap& bitMap)
+void XFontRender::GenerateSDF(XGlyphBitmap& bitMap)
 {
-	X_UNUSED(glphy);
-
 	auto& buffer = bitMap.GetBuffer();
 	const uint32 glyphWidth = bitMap.GetWidth();
 	const uint32 glyphHeight = bitMap.GetHeight();

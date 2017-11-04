@@ -17,13 +17,6 @@ X_NAMESPACE_BEGIN(font)
 
 class FontVars;
 
-// the glyph spacing in font texels between characters in proportional font mode (more correct would be to take the value in the character)
-// #define X_FONT_GLYPH_PROP_SPACING		(1)
-// the size of a rendered space, this value gets multiplied by the default characted width
-// #define X_FONT_SPACE_SIZE				(0.5f)
-// don't draw this char (used to avoid drawing color codes)
-// #define X_FONT_NOT_DRAWABLE_CHAR		(0xffff)
-
 // we cache glyphs with "Least Recently Used (LRU)"
 // so if we run out of slots the slot that is LRU
 // is replaced.
@@ -39,14 +32,16 @@ struct XTextureSlot
 {
 	uint16_t	slotUsage;			// for LRU strategy, 0xffff is never released
 	wchar_t		currentChar;		// ~0 if not used for characters
-	int32_t		textureSlot;		
 	float		texCoord[2];		// character position in the texture (not yet half texel corrected)
 	uint8_t		charWidth;			// size in pixel
 	uint8_t		charHeight;			// size in pixel
 	int8_t		charOffsetX;
 	int8_t		charOffsetY;
+	int8_t		paddingX;
+	int8_t		paddingY;
 	uint16_t	advanceX;
-	uint16_t	advanceY;
+//	uint8_t		advanceY;
+	int32_t		textureSlot;		
 
 	X_INLINE void reset(void)
 	{
@@ -56,8 +51,10 @@ struct XTextureSlot
 		charHeight = 0;
 		charOffsetX = 0;
 		charOffsetY = 0;
+		paddingX = 0;
+		paddingY = 0;
 		advanceX = 0;
-		advanceY = 0;
+	//	advanceY = 0;
 	}
 
 	X_INLINE void setNotReusable(void) { // this slot can't be reused for somthing else.

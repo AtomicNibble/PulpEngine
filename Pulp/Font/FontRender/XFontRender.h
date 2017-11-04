@@ -30,7 +30,7 @@ public:
 	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
 	bool Release(void); 
 
-	bool GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, int32_t destOffsetX, int32_t destOffsetY, wchar_t charCode);
+	bool GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode);
 
 	X_INLINE bool ValidFace(void) const;
 	X_INLINE void EnabledDebugRender(bool enable);
@@ -48,7 +48,7 @@ public:
 	X_INLINE const Metrics& GetMetrics(void) const;
 
 private:
-	void GenerateSDF(XGlyph& glphy, XGlyphBitmap& bitMap);
+	void GenerateSDF(XGlyphBitmap& bitMap);
 	void makeDistanceMapd(DoubleArr& data, uint32_t width, uint32_t height);
 
 private:

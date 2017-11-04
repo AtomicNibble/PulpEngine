@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "XFontTexture.h"
+#include "XFontGlyph.h"
 
 #include "Vars\FontVars.h"
 
@@ -361,30 +362,37 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 	pSlot->slotUsage = slotUsage;
 	pSlot->currentChar = cChar;
 
+	auto* pGlyph = glyphCache_.GetGlyph(cChar);
 
-	XGlyphBitmap* pGlyphBitmap = glyphCache_.GetGlyph(pSlot->charWidth, pSlot->charHeight,
-		pSlot->charOffsetX, pSlot->charOffsetY, pSlot->advanceX, cChar);
-
-	if(!pGlyphBitmap)
+	if(!pGlyph)
 	{
 		X_ERROR("Font", "Failed to get glyph for char: '%lc'", cChar);
 		return false;
 	}
 
+	pSlot->charWidth = pGlyph->charWidth;
+	pSlot->charHeight = pGlyph->charHeight;
+	pSlot->charOffsetX = pGlyph->charOffsetX;
+	pSlot->charOffsetY = pGlyph->charOffsetY;
+	pSlot->paddingX = pGlyph->bitmapOffsetX;
+	pSlot->paddingY = pGlyph->bitmapOffsetY;
+	pSlot->advanceX = pGlyph->advanceX;
+//	pSlot->advanceY = 0;
+
 	const int32_t slotBufferX = pSlot->textureSlot % widthCellCount_;
 	const int32_t slotBufferY = pSlot->textureSlot / widthCellCount_;
 
 	// blit the glyp to my buffer
-	pGlyphBitmap->BlitTo8(
+	// always copy the whole buffer, we may of blended.
+	pGlyph->glyphBitmap.BlitTo8(
 		textureBuffer_.ptr(),
-		0,					// srcX
-		0,					// srcY
-		// always copy the whole buffer, we may of blended.
-		cellWidth_, //	pSlot->charWidth,	// srcWidth
-		cellHeight_, //	pSlot->charHeight,	// srcHeight
+		0,								// srcX
+		0,								// srcY
+		cellWidth_,						// srcWidth
+		cellHeight_,					// srcHeight
 		slotBufferX * cellWidth_,		// destx
-		slotBufferY * cellHeight_,	// desy
-		width_				// destWidth / stride
+		slotBufferY * cellHeight_,		// desy
+		width_							// destWidth / stride
 	);
 
 	return true;
@@ -551,15 +559,17 @@ bool XFontTexture::WriteToFile(const char* filename)
 
 void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const
 {
-	if (!pSlot) {
-		return;	// expected behavior
-	}
+	X_ASSERT_NOT_NULL(pSlot);
 
 	const int32_t chWidth = pSlot->charWidth;
 	const int32_t chHeight = pSlot->charHeight;
-	const float slotCoord0 = pSlot->texCoord[0];
-	const float slotCoord1 = pSlot->texCoord[1];
+	float slotCoord0 = pSlot->texCoord[0];
+	float slotCoord1 = pSlot->texCoord[1];
 
+	slotCoord0 += static_cast<float>(pSlot->paddingX * invWidth_);
+	slotCoord1 += static_cast<float>(pSlot->paddingY * invHeight_);
+
+	// i need to offset corrds by padding.
 	cords.texCoords[0] = slotCoord0;
 	cords.texCoords[1] = slotCoord1;
 	cords.texCoords[2] = slotCoord0 + static_cast<float>(chWidth * invWidth_);

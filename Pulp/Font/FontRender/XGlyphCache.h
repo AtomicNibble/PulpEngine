@@ -58,8 +58,7 @@ public:
 	XGlyph* GetLRUSlot(void);
 	XGlyph* GetMRUSlot(void);
 
-	XGlyphBitmap* GetGlyph(uint8_t& width, uint8_t& height, int8_t& charOffsetX, int8_t& charOffsetY, 
-		uint16_t& advanceX, wchar_t cChar);
+	const XGlyph* GetGlyph(wchar_t cChar);
 
 
 private:
