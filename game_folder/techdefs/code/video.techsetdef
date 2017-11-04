@@ -10,7 +10,7 @@ Sampler( "videoTextureSampler" )
 
 Technique( "unlit" )
 {
-	state = "blend + depth"
+	state = "replace + depth"
 	source = "techsetdef_unlit.hlsl"
 
 	vs = VertexShader()
