@@ -372,8 +372,8 @@ bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cCh
 
 	pSlot->charWidth = pGlyph->charWidth;
 	pSlot->charHeight = pGlyph->charHeight;
-	pSlot->charOffsetX = pGlyph->charOffsetX;
-	pSlot->charOffsetY = pGlyph->charOffsetY;
+	pSlot->charOffsetX = safe_static_cast<decltype(pSlot->charOffsetX)>(pGlyph->charOffsetX);
+	pSlot->charOffsetY = safe_static_cast<decltype(pSlot->charOffsetY)>(pGlyph->charOffsetY);
 	pSlot->paddingX = pGlyph->bitmapOffsetX;
 	pSlot->paddingY = pGlyph->bitmapOffsetY;
 	pSlot->advanceX = pGlyph->advanceX;
