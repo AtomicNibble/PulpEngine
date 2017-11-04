@@ -6,6 +6,25 @@
 
 X_NAMESPACE_BEGIN(font)
 
+namespace
+{
+	int32_t getOffsetMulti(FontSmoothAmount::Enum smoothAmount)
+	{
+		int32_t offsetMult = 1;
+
+		switch (smoothAmount)
+		{
+			case FontSmoothAmount::X2:
+				offsetMult = 2;
+				break;
+			case FontSmoothAmount::X4:
+				offsetMult = 4;
+				break;
+		}
+		return offsetMult;
+	}
+
+} // namespace
 
 XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	vars_(vars),
@@ -186,17 +205,7 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 	// scaling 
 	if (scaleBitmap_)
 	{
-		int32_t offsetMult = 1;
-
-		switch (smoothAmount_)
-		{
-			case FontSmoothAmount::X2:
-				offsetMult = 2;
-			break;
-			case FontSmoothAmount::X4:
-				offsetMult = 4;
-			break;
-		}
+		int32_t offsetMult = getOffsetMulti(smoothAmount_);
 
 		scaleBitmap_->Clear();
 
