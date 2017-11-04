@@ -1156,7 +1156,10 @@ void XPhysics::setupDefaultRigidDynamic(physx::PxRigidDynamic& body, bool kinema
 {
 	body.setActorFlag(physx::PxActorFlag::eVISUALIZATION, true);
 	body.setAngularDamping(0.5f);
-	body.setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, kinematic);
+
+	if (kinematic) {
+		body.setRigidBodyFlag(physx::PxRigidBodyFlag::eKINEMATIC, true);
+	}
 }
 
 
