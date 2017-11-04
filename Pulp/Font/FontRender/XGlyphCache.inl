@@ -20,7 +20,7 @@ X_INLINE FontEncoding::Enum XGlyphCache::GetEncoding(void) const
 
 X_INLINE const Metrics& XGlyphCache::GetMetrics(void) const
 {
-	return fontRenderer_.GetMetrics();
+	return metrics_; // fontRenderer_.GetMetrics();
 }
 
 

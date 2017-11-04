@@ -69,6 +69,7 @@ private:
 	const FontVars& vars_;
 	XFontRender		fontRenderer_;
 	core::UniquePointer<XGlyphBitmap> scaleBitmap_;
+	Metrics			metrics_;
 
 	int32_t			glyphBitmapWidth_;
 	int32_t			glyphBitmapHeight_;

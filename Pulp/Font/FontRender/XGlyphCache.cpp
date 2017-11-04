@@ -25,7 +25,7 @@ XGlyphCache::XGlyphCache(const FontVars& vars, core::MemoryArenaBase* arena) :
 	slotList_(arena),
 	cacheTable_(arena, 8)
 {
-
+	core::zero_object(metrics_);
 }
 
 XGlyphCache::~XGlyphCache()
@@ -46,6 +46,17 @@ bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t 
 	}
 	else {
 		fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_, sizeRatio);
+	}
+
+	metrics_ = fontRenderer_.GetMetrics();
+
+	if (smoothMethod_ == FontSmooth::SUPERSAMPLE)
+	{
+		auto offsetMult = getOffsetMulti(smoothAmount_);
+
+		metrics_.ascender >>= offsetMult >> 1;
+		metrics_.descender >>= offsetMult >> 1;
+		metrics_.max_advance >>= offsetMult >> 1;
 	}
 
 	if (vars_.glyphCachePreWarm()) {
