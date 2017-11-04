@@ -217,11 +217,11 @@ bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 			return false;
 		}
 
+		pSlot->advanceX >>= offsetMult >> 1;
 		pSlot->charWidth >>= offsetMult >> 1;
 		pSlot->charHeight >>= offsetMult >> 1;
 		pSlot->charOffsetX >>= offsetMult >> 1;
 		pSlot->charOffsetY >>= offsetMult >> 1;
-		pSlot->advanceX >>= offsetMult >> 1;
 
 		scaleBitmap_->BlitScaledTo8(
 			pSlot->glyphBitmap.GetBuffer(),
