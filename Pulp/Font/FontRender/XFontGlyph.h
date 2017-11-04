@@ -5,9 +5,9 @@
 
 X_NAMESPACE_BEGIN(font)
 
+X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
-
-struct XGlyph
+X_ALIGNED_SYMBOL(struct XGlyph, 64)
 {
 	XGlyph() :
 		glyphBitmap(g_fontArena)
@@ -47,6 +47,9 @@ public:
 
 	XGlyphBitmap	glyphBitmap;
 };
+
+X_ENABLE_WARNING(4324)
+
 
 X_ENSURE_LE(sizeof(XGlyph), 64, "Bigger than cache line");
 
