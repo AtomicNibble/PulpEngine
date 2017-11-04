@@ -38,12 +38,12 @@ public:
 	uint16_t		advanceX;
 	uint8_t			charWidth;		// size in pixel
 	uint8_t			charHeight;		// size in pixel
-	int8_t			charOffsetX;	// these can be negative.
-	int8_t			charOffsetY;
+	// these are 16bit as can be big if downsampling.
+	int16_t			charOffsetX;	// these can be negative.
+	int16_t			charOffsetY;	
 
 	int8_t			bitmapOffsetX;
 	int8_t			bitmapOffsetY;
-	int8_t			_pad[2];
 
 	XGlyphBitmap	glyphBitmap;
 };
