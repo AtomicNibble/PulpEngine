@@ -30,7 +30,7 @@ public:
 	bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
 	bool Release(void); 
 
-	bool GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode);
+	bool GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf);
 
 	X_INLINE bool ValidFace(void) const;
 	X_INLINE void EnabledDebugRender(bool enable);

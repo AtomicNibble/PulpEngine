@@ -88,7 +88,7 @@ bool XFontRender::Release(void)
 }
 
 
-bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode)
+bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf)
 { 
 	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
@@ -187,7 +187,9 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t char
 	glphy.bitmapOffsetX = safe_static_cast<decltype(glphy.bitmapOffsetX)>(paddingX);
 	glphy.bitmapOffsetY = safe_static_cast<decltype(glphy.bitmapOffsetY)>(paddingY);
 
-	GenerateSDF(destBitMap);
+	if (sdf) {
+		GenerateSDF(destBitMap);
+	}
 
 	return true;
 }
