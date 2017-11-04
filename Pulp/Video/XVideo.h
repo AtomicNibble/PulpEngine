@@ -28,8 +28,8 @@ X_DECLARE_ENUM8(VideoState)(
 
 class Video : public core::AssetBase, public IVideo
 {
-	const int32_t IO_BUFFER_SIZE = 1024 * 64;
-	const int32_t RING_BUFFER_SIZE = 1024 * 1024 * 1; // 1MB
+	const size_t IO_BUFFER_SIZE = 1024 * 64;
+	const size_t RING_BUFFER_SIZE = 1024 * 1024 * 1; // 1MB
 
 	typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 64>, core::growStrat::Multiply> DataVec;
 
