@@ -9,14 +9,32 @@ class CommandListManger;
 
 X_NAMESPACE_BEGIN(render)
 
+/*
+
+LinearAllocator:
+UseCase: Lots of small allocations per frame.
+Cleanup: Automatic
+
+Details:
+	The linera allocator allocates 'pages' of memory and sub allocates the block
+	returning DynAlloc.
+
+	You can't make a single allocation bigger than size of a single page.
+	Multiple pages will be made per frame if needed.
+
+	All the pages for a frame are automatically cleaned up once the required fence value has been reached
+	to signal the buffers are no longer in use.
+
+*/
 
 X_DECLARE_ENUM(LinearAllocatorType)(
 	GPU_EXCLUSIVE,
 	CPU_WRITABLE
 );
 
-
-// Various types of allocations may contain NULL pointers.  Check before dereferencing if you are unsure.
+// DynAlloc holds infomation about a allocation.
+// Various types of allocations may contain NULL pointers.
+// Check before dereferencing if you are unsure.
 struct DynAlloc
 {
 	DynAlloc(GpuResource& baseResource, size_t offset, size_t size);
