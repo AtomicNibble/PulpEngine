@@ -7,7 +7,10 @@
 
 X_NAMESPACE_BEGIN(render)
 
-const uint32_t DescriptorTypeAllocatorPool::NUM_DESCRIPTORS_PER_HEAP[2] = { 1024, 512 };
+const uint32_t DescriptorTypeAllocatorPool::NUM_DESCRIPTORS_PER_HEAP[DescriptorHeapType::ENUM_COUNT] = { 
+	1024, // CBV_SRV_UAV
+	512   // SAMPLER
+};
 
 
 DescriptorTypeAllocatorPool::DescriptorTypeAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
@@ -105,8 +108,8 @@ DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, I
 	static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER == 1, "Heap enum value has changed");
 
 	// do a runtime check also.
-	X_ASSERT(allocators_[D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, "Index error")();
-	X_ASSERT(allocators_[D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, "Index error")();
+	X_ASSERT(allocators_[DescriptorHeapType::CBV_SRV_UAV].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, "Index error")();
+	X_ASSERT(allocators_[DescriptorHeapType::SAMPLER].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, "Index error")();
 }
 
 void DescriptorAllocatorPool::destoryAll(void)

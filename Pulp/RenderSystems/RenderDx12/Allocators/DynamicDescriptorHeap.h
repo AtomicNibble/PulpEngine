@@ -12,7 +12,7 @@ class CommandListManger;
 class DescriptorTypeAllocatorPool
 {
 public:
-	static const uint32_t NUM_DESCRIPTORS_PER_HEAP[2];
+	static const uint32_t NUM_DESCRIPTORS_PER_HEAP[DescriptorHeapType::ENUM_COUNT];
 
 public:
 	DescriptorTypeAllocatorPool(core::MemoryArenaBase* arena, ID3D12Device* pDevice, CommandListManger& commandManager, D3D12_DESCRIPTOR_HEAP_TYPE type);
