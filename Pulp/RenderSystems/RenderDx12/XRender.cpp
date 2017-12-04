@@ -21,52 +21,6 @@
 
 X_NAMESPACE_BEGIN(render)
 
-namespace
-{
-
-
-
-	// Samplers.
-#if 0
-	samplerLinearWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerLinearWrap_.create(pDevice_, descriptorAllocator, samplerLinearWrapDesc_);
-
-	samplerAnisoWrapDesc_.MaxAnisotropy = 8;
-	samplerAnisoWrap_.create(pDevice_, descriptorAllocator, samplerAnisoWrapDesc_);
-
-	samplerShadowDesc_.Filter = D3D12_FILTER_COMPARISON_MIN_MAG_LINEAR_MIP_POINT;
-	samplerShadowDesc_.ComparisonFunc = D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-	samplerShadowDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerShadow_.create(pDevice_, descriptorAllocator, samplerShadowDesc_);
-
-	samplerLinearClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerLinearClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerLinearClamp_.create(pDevice_, descriptorAllocator, samplerLinearClampDesc_);
-
-	samplerVolumeWrapDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerVolumeWrap_.create(pDevice_, descriptorAllocator, samplerVolumeWrapDesc_);
-
-	samplerPointClampDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerPointClampDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
-	samplerPointClamp_.create(pDevice_, descriptorAllocator, samplerPointClampDesc_);
-
-	samplerPointBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_LINEAR;
-	samplerPointBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
-	samplerPointBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
-	samplerPointBorder_.create(pDevice_, descriptorAllocator, samplerPointBorderDesc_);
-
-	samplerLinearBorderDesc_.Filter = D3D12_FILTER_MIN_MAG_MIP_POINT;
-	samplerLinearBorderDesc_.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_BORDER);
-	samplerLinearBorderDesc_.setBorderColor(Colorf(0.0f, 0.0f, 0.0f, 0.0f));
-	samplerLinearBorder_.create(pDevice_, descriptorAllocator, samplerLinearBorderDesc_);
-#endif
-
-
-	
-
-
-} // namespace
-
 
 XRender::Stats::Stats()
 {
