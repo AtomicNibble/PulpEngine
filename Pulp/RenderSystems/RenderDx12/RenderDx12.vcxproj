@@ -284,7 +284,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
@@ -296,7 +295,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -319,7 +317,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
@@ -331,7 +328,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -484,6 +480,7 @@
     <ClInclude Include="Util\DebugNameUtil.h" />
     <ClInclude Include="Util\DxTypeHelpers.h" />
     <ClInclude Include="Util\StateHelpers.h" />
+    <ClInclude Include="Util\Types.h" />
     <ClInclude Include="Vars\RenderVars.h" />
     <ClInclude Include="XRender.h" />
   </ItemGroup>
