@@ -17,7 +17,6 @@ public:
 	bool create(ID3D12Device* pDevice);
 	void shutdown(void);
 
-	X_INLINE bool IsReady(void) const;
 	uint64_t incrementFence(void);
 	X_INLINE uint64_t getNextFenceValue(void) const;
 	bool isFenceComplete(uint64_t fenceValue);

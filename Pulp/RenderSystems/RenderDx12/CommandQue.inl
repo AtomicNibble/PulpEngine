@@ -2,12 +2,6 @@
 
 X_NAMESPACE_BEGIN(render)
 
-
-X_INLINE bool CommandQue::IsReady(void) const
-{
-	return pCommandQueue_ != nullptr;
-}
-
 X_INLINE ID3D12CommandQueue* CommandQue::getCommandQueue(void)
 {
 	return pCommandQueue_;
