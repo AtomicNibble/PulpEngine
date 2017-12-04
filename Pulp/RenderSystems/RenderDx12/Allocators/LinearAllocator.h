@@ -25,6 +25,8 @@ Details:
 	All the pages for a frame are automatically cleaned up once the required fence value has been reached
 	to signal the buffers are no longer in use.
 
+LinearAllocator's is more like a contex for allocating, and LinearAllocatorManager is persistent.
+
 */
 
 X_DECLARE_ENUM(LinearAllocatorType)(
@@ -130,6 +132,7 @@ public:
 
 public:
 	LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorManager& manager, LinearAllocatorType::Enum Type);
+	~LinearAllocator();
 
 	DynAlloc allocate(size_t sizeInBytes, size_t alignment = DEFAULT_ALIGN);
 	void cleanupUsedPages(uint64_t fenceID);

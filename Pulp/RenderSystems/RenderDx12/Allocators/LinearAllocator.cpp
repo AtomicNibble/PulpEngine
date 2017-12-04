@@ -192,6 +192,13 @@ LinearAllocator::LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorMa
 	}
 }
 
+LinearAllocator::~LinearAllocator()
+{
+	X_ASSERT(pCurPage_ == nullptr, "Current page was not cleaned up")(pCurPage_);
+	X_ASSERT(retiredPages_.isEmpty(), "Retired pages where not discarded")(retiredPages_.size());
+}
+
+
 DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 {
 	X_ASSERT(sizeInBytes <= pageSize_, "Exceeded max linear allocator page size with single allocation")(sizeInBytes, pageSize_);
