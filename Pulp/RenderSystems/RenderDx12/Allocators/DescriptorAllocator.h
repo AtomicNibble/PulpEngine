@@ -21,7 +21,7 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE currentHandle_;
 	uint32_t descriptorSize_;
 	uint32_t remainingFreeHandles_;
-
+	
 	DescriptorAllocator& allocator_;
 };
 
@@ -29,6 +29,9 @@ private:
 class DescriptorAllocator
 {
 	friend class DescriptorTypeAllocator;
+
+	typedef std::array<DescriptorTypeAllocator, D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES> DescriptorAllocatorsArr;
+
 
 public:
 	DescriptorAllocator(core::MemoryArenaBase* arena, ID3D12Device* pDevice);
@@ -42,19 +45,12 @@ protected:
 	ID3D12DescriptorHeap* requestNewHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t num);
 
 private:
-	std::array<DescriptorTypeAllocator, D3D12_DESCRIPTOR_HEAP_TYPE_NUM_TYPES> allocators_;
+	DescriptorAllocatorsArr allocators_;
 	ID3D12Device* pDevice_;
 
 	core::CriticalSection cs_;
 	core::Array<ID3D12DescriptorHeap*> descriptorHeaps_;
 };
-
-
-X_INLINE D3D12_CPU_DESCRIPTOR_HANDLE DescriptorAllocator::allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE type, uint32_t num)
-{
-	return allocators_[type].allocate(num);
-}
-
 
 
 class DescriptorHandle
