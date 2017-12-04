@@ -45,6 +45,15 @@ X_NAMESPACE_BEGIN(texture)
 
 	}
 
+
+	void TextureManager::registerCmds(void)
+	{
+		ADD_COMMAND_MEMBER("listDeviceImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
+			"List all the device textures");
+
+	}
+
+
 	bool TextureManager::init(void)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
@@ -65,13 +74,6 @@ X_NAMESPACE_BEGIN(texture)
 		return true;
 	}
 
-
-	void TextureManager::registerCmds(void)
-	{
-		ADD_COMMAND_MEMBER("listDeviceImages", this, TextureManager, &TextureManager::Cmd_ListTextures, core::VarFlag::SYSTEM,
-			"List all the device textures");
-		
-	}
 
 	DXGI_FORMAT TextureManager::getDepthFmt(void) const
 	{

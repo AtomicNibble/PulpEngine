@@ -34,10 +34,11 @@ public:
 		render::DescriptorAllocator& descriptorAlloc, DXGI_FORMAT depthFmt, bool reverseZ);
 	~TextureManager();
 
+	void registerCmds(void);
+
 	bool init(void);
 	bool shutDown(void);
 
-	void registerCmds(void);
 
 	DXGI_FORMAT getDepthFmt(void) const;
 
