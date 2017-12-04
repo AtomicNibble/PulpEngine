@@ -3,8 +3,22 @@
 
 X_NAMESPACE_BEGIN(render)
 
+/*
+
+DescriptorAllocator:
+UseCase: Allocation descriptors. (CBV_SRV_UAV, SAMPLER, RTV, DSV)
+Cleanup: ?
+
+Details:
+This is a linear allocator for dynamic generated descriptor tables.
+
+See below..
+*/
+
+
 class DescriptorAllocator;
 
+// Allocates a descriptor of a spicific type.
 class DescriptorTypeAllocator
 {
 	static const uint32_t NUM_DESCRIPTORS_PER_HEAP = 256;

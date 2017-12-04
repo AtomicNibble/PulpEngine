@@ -5,6 +5,18 @@
 
 X_NAMESPACE_BEGIN(render)
 
+/*
+
+DynamicDescriptorHeap:
+UseCase: Setting descriptor heaps, between each draw.
+Cleanup: ?
+
+Details:
+	This is a linear allocator for dynamic generated descriptor tables.
+
+	See below..
+*/
+
 class RootSignature;
 class CommandContext;
 class CommandListManger;
