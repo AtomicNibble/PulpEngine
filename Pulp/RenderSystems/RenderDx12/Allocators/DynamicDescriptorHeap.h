@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DescriptorAllocator.h" // DescriptorHandle
+#include "DescriptorHandle.h"
 #include <Containers\Fifo.h>
 
 X_NAMESPACE_BEGIN(render)

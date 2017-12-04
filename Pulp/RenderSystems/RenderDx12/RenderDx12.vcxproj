@@ -453,6 +453,7 @@
   <ItemGroup>
     <ClInclude Include="Allocators\CommandAllocatorPool.h" />
     <ClInclude Include="Allocators\DescriptorAllocator.h" />
+    <ClInclude Include="Allocators\DescriptorHandle.h" />
     <ClInclude Include="Allocators\DynamicDescriptorHeap.h" />
     <ClInclude Include="Allocators\LinearAllocator.h" />
     <ClInclude Include="Buffers\BufferManager.h" />
@@ -531,6 +532,7 @@
   <ItemGroup>
     <None Include="Allocators\CommandAllocatorPool.inl" />
     <None Include="Allocators\DescriptorAllocator.inl" />
+    <None Include="Allocators\DescriptorHandle.inl" />
     <None Include="Allocators\DynamicDescriptorHeap.inl" />
     <None Include="Allocators\LinearAllocator.inl" />
     <None Include="Buffers\BufferManager.inl" />

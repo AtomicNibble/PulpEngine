@@ -140,6 +140,9 @@
     <ClInclude Include="Util\Types.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Allocators\DescriptorHandle.h">
+      <Filter>Header Files\Allocators</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -287,6 +290,9 @@
     </None>
     <None Include="Util\StateHelpers.inl">
       <Filter>Header Files\Util</Filter>
+    </None>
+    <None Include="Allocators\DescriptorHandle.inl">
+      <Filter>Header Files\Allocators</Filter>
     </None>
   </ItemGroup>
 </Project>
