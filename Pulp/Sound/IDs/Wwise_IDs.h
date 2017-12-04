@@ -24,6 +24,7 @@ namespace AK
         static const AkUniqueID PLAYER_FOOTSTEP = 2453392179U;
         static const AkUniqueID PLAYER_JUMP = 1305133589U;
         static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
+        static const AkUniqueID VIDEO_RICKROLL = 3469944817U;
         static const AkUniqueID WEAP_LOWER = 1994352680U;
         static const AkUniqueID WEAP_RAISE = 2611048663U;
     } // namespace EVENTS
@@ -91,6 +92,7 @@ namespace AK
         static const AkUniqueID AMBIENT = 77978275U;
         static const AkUniqueID EVENTS = 1381315342U;
         static const AkUniqueID PLAYERSOUNDS = 1327972334U;
+        static const AkUniqueID VIDEO = 2982943478U;
         static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BANKS
 
