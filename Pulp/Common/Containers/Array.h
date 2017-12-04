@@ -133,7 +133,7 @@ public:
 	void remove(const T& item); // finds the item then calls removeIndex.
 	
 	// stable remove
-	bool removeIndexStable(size_type idx);
+	void removeIndexStable(size_type idx);
 	void removeStable(const T& item);
 
 	Iterator erase(ConstIterator first);

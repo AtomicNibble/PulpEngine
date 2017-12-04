@@ -646,6 +646,29 @@ void Array<T, Allocator, GrowPolicy>::remove(const T& item)
 }
 
 template<typename T, class Allocator, class GrowPolicy>
+void Array<T, Allocator, GrowPolicy>::removeIndexStable(size_type idx)
+{
+	X_ASSERT_NOT_NULL(list_);
+	X_ASSERT(idx < num_, "index is out of bounds")(idx, num_);
+
+	T* pItem = &list_[idx];
+
+	Mem::Destruct(pItem);
+
+	num_--;
+
+	const bool itemsLeft = (num_ > 0);
+	const bool isLast = (idx == num_);
+
+	if (itemsLeft && !isLast)
+	{
+		// move everything down.
+		Iterator end = Mem::Move<T>(pItem + 1, end(), pItem);
+		Mem::Destruct(end);
+	}
+}
+
+template<typename T, class Allocator, class GrowPolicy>
 typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::erase(ConstIterator _first)
 {
 	X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")(_first, begin(), end());
