@@ -53,7 +53,7 @@ namespace
 			return __rdtsc();
 		}
 
-		X_INLINE float32_t toMS(const uint64_t &t) 
+		X_INLINE float32_t toMS(uint64_t t) 
 		{
 			return float32_t(t) / g_cpuspeed;
 		}
