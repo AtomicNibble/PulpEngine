@@ -463,7 +463,7 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 	uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		uint32_t firstSubresource, uint32_t numSubresources) const
+		uint32_t firstSubresource, uint32_t numSubresources)
 	{
 		const D3D12_RESOURCE_DESC desc = pDestinationResource->GetDesc();
 		uint64_t requiredSize = 0;

@@ -67,8 +67,8 @@ private:
 	X_INLINE bool updateTextureData(Texture* pTex, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const;
 	bool updateTextureData(render::GpuResource& dest, uint32_t numSubresources, D3D12_SUBRESOURCE_DATA* pSubData) const;
 
-	uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
-		uint32_t firstSubresource, uint32_t numSubresources) const;
+	static uint64_t getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
+		uint32_t firstSubresource, uint32_t numSubresources);
 
 private:
 	void releasePixelBuffer_internal(render::IPixelBuffer* pPixelBuf);
