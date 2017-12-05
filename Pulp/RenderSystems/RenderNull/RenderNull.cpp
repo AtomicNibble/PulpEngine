@@ -284,7 +284,10 @@ void RenderNull::destoryState(StateHandle handle)
 	X_UNUSED(handle);
 }
 
-
+void RenderNull::getStats(Stats& stats)
+{
+	X_UNUSED(stats);
+}
 
 
 X_NAMESPACE_END

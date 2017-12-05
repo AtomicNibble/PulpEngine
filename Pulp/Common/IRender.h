@@ -344,7 +344,18 @@ struct IPixelBuffer : public IDeviceTexture
 typedef IPixelBuffer IRenderTarget;
 typedef IPixelBuffer IDepthBuffer;
 
+struct Stats
+{
+	Stats() {
+		core::zero_this(this);
+	}
 
+	uint32_t numPassStates;
+	uint32_t maxPassStates;
+
+	uint32_t numStates;
+	uint32_t maxStates;
+};
 
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
 X_DECLARE_ENUM(BufUsage)(
@@ -428,6 +439,8 @@ struct IRender
 
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
+
+	virtual void getStats(Stats& stats) X_ABSTRACT;
 
 };
 

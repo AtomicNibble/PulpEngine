@@ -21,13 +21,6 @@
 
 X_NAMESPACE_BEGIN(render)
 
-
-XRender::Stats::Stats()
-{
-	core::zero_this(this);
-}
-
-
 // ---------------------------------------------------------------------
 
 XRender::XRender(core::MemoryArenaBase* arena) :
@@ -1075,6 +1068,11 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 	X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
 
 	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
+}
+
+void XRender::getStats(Stats& stats)
+{
+	stats = stats_;
 }
 
 // cb's

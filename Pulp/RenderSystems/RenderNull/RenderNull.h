@@ -67,6 +67,7 @@ public:
 	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
 	void destoryState(StateHandle handle) X_FINAL;
 
+	void getStats(Stats& stats) X_FINAL;
 };
 
 

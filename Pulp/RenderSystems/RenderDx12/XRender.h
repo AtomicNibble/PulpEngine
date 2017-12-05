@@ -129,18 +129,6 @@ class XRender : public IRender
 		D3D12_PRIMITIVE_TOPOLOGY topo;
 	};
 
-
-	struct Stats
-	{
-		Stats();
-
-		uint32_t numPassStates;
-		uint32_t maxPassStates;
-		
-		uint32_t numStates;
-		uint32_t maxStates;
-	};
-
 	static const size_t MAX_STATES = 1024 * 4;
 	static const size_t MAX_STATE_ALOC_SIZE = core::Max(sizeof(PassState), sizeof(DeviceState));
 	static const size_t MAX_STATE_ALOC_ALIGN = core::Max(X_ALIGN_OF(PassState), X_ALIGN_OF(DeviceState));
@@ -222,6 +210,8 @@ public:
 
 	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
+
+	void getStats(Stats& stats) X_FINAL;
 
 private:
 	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
