@@ -346,15 +346,27 @@ typedef IPixelBuffer IDepthBuffer;
 
 struct Stats
 {
-	Stats() {
+	typedef core::StackString512 Str;
+
+	X_INLINE Stats() {
 		core::zero_this(this);
 	}
 
-	uint32_t numPassStates;
-	uint32_t maxPassStates;
+	X_INLINE const Str::char_type* toString(Str& buf) const {
 
-	uint32_t numStates;
-	uint32_t maxStates;
+		core::HumanSize::Str str;
+
+		buf.clear();
+		buf.appendFmt("NumPassState: ^6%" PRIi32 "^~\n", numPassStates);
+		buf.appendFmt("NumState: ^6%" PRIi32 "^~\n", numStates);
+		return buf.c_str();
+	}
+
+	int32_t numPassStates;
+	int32_t maxPassStates;
+
+	int32_t numStates;
+	int32_t maxStates;
 };
 
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
@@ -440,8 +452,7 @@ struct IRender
 	virtual void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 	virtual void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_ABSTRACT;
 
-	virtual void getStats(Stats& stats) X_ABSTRACT;
-
+	virtual Stats getStats(void) const X_ABSTRACT;
 };
 
 

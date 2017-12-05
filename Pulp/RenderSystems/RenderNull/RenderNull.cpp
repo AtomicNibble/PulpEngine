@@ -284,9 +284,9 @@ void RenderNull::destoryState(StateHandle handle)
 	X_UNUSED(handle);
 }
 
-void RenderNull::getStats(Stats& stats)
+Stats RenderNull::getStats(void) const 
 {
-	X_UNUSED(stats);
+	return Stats();
 }
 
 

@@ -1070,9 +1070,13 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 	pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
 
-void XRender::getStats(Stats& stats)
+Stats XRender::getStats(void) const
 {
+	Stats stats;
+
 	stats = stats_;
+
+	return stats;
 }
 
 // cb's

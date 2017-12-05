@@ -211,7 +211,7 @@ public:
 	void getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 	void getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize = nullptr) X_FINAL;
 
-	void getStats(Stats& stats) X_FINAL;
+	Stats getStats(void) const X_FINAL;
 
 private:
 	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
