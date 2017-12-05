@@ -14,7 +14,7 @@ X_INLINE uint64_t CommandQue::getNextFenceValue(void) const
 
 X_INLINE void CommandQue::waitForIdle(void)
 {
-	waitForFence(nextFenceValue_ - 1);
+	waitForFence(incrementFence());
 }
 
 
