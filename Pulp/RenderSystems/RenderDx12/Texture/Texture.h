@@ -53,6 +53,8 @@ class TextureManager;
 		X_INLINE const TextureType::Enum getTextureType(void) const X_FINAL;
 		X_INLINE const TextureFlags getFlags(void) const X_FINAL;
 		X_INLINE const Texturefmt::Enum getFormat(void) const X_FINAL;
+		X_INLINE const render::BufUsage::Enum getUsage(void) const;
+
 		const DXGI_FORMAT getFormatDX(void) const;
 
 		void setProperties(const XTextureFile& imgFile) X_FINAL;
@@ -79,6 +81,7 @@ class TextureManager;
 
 		X_INLINE void setFormat(Texturefmt::Enum fmt);
 		X_INLINE void setType(TextureType::Enum type);
+		X_INLINE void setUsage(render::BufUsage::Enum usage);
 		X_INLINE void setWidth(uint16_t width);
 		X_INLINE void setHeight(uint16_t height);
 		X_INLINE void setDepth(uint8_t depth);
@@ -105,7 +108,7 @@ class TextureManager;
 		uint8_t				depth_;
 		uint8_t				numFaces_;
 
-
+		render::BufUsage::Enum usage_;
 		render::PixelBufferType::Enum pixelBufType_;
 		union {
 			render::ColorBuffer* pColorBuf_;

@@ -192,12 +192,10 @@ IDeviceTexture* RenderNull::getDeviceTexture(int32_t id)
 }
 
 
-IDeviceTexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+IDeviceTexture* RenderNull::createTexture(const char* pNickName, Vec2i dim, 
+	texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData)
 {
-	X_UNUSED(pNickName);
-	X_UNUSED(dim);
-	X_UNUSED(fmt);
-	X_UNUSED(pInitialData);
+	X_UNUSED(pNickName, dim, fmt, usage, pInitialData);
 
 	return nullptr;
 }

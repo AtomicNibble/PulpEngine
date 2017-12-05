@@ -403,7 +403,7 @@ struct IRender
 	virtual bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
 
 	// creates a texture for dynamic content, no data loaded from disk.
-	virtual IDeviceTexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
+	virtual IDeviceTexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
 	
 	// shaders
 	// new api for creating techs in 3dengine

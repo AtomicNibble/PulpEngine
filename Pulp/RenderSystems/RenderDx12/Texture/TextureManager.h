@@ -44,7 +44,8 @@ public:
 
 	Texture* getDeviceTexture(int32_t id);
 
-	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, const uint8_t* pInitialData = nullptr);
+	Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, 
+		render::BufUsage::Enum usage, const uint8_t* pInitialData = nullptr);
 	
 	// this is used for creating textures that can be used for more than just SRV's
 	Texture* createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,

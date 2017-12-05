@@ -106,7 +106,7 @@ X_NAMESPACE_BEGIN(texture)
 	}
 
 	Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
-		texture::Texturefmt::Enum fmt, const uint8_t* pInitialData)
+		texture::Texturefmt::Enum fmt, render::BufUsage::Enum usage, const uint8_t* pInitialData)
 	{
 		core::string name(pNickName);
 
@@ -139,6 +139,7 @@ X_NAMESPACE_BEGIN(texture)
 			pTexRes->setHeight(dim.y);
 			pTexRes->setFormat(fmt);
 			pTexRes->setType(texture::TextureType::T2D);
+			pTexRes->setUsage(usage);
 
 			if (!initDeviceTexture(pTexRes)) {
 				X_ERROR("Texture", "Failed to create device texture");

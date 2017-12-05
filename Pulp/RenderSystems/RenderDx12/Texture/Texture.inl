@@ -63,6 +63,13 @@ X_NAMESPACE_BEGIN(texture)
 		return format_;
 	}
 
+
+	X_INLINE const render::BufUsage::Enum Texture::getUsage(void) const
+	{
+		return usage_;
+	}
+
+
 	// IPixelBuffer
 	X_INLINE render::PixelBufferType::Enum Texture::getBufferType(void) const
 	{
@@ -126,6 +133,11 @@ X_NAMESPACE_BEGIN(texture)
 	X_INLINE void Texture::setType(TextureType::Enum type)
 	{
 		type_ = type;
+	}
+
+	X_INLINE void Texture::setUsage(render::BufUsage::Enum usage)
+	{
+		usage_ = usage;
 	}
 
 	X_INLINE void Texture::setWidth(uint16_t width)

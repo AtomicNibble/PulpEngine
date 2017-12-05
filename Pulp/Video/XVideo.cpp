@@ -56,7 +56,8 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 		pTexture_ = gEnv->pRender->createTexture(
 			name_.c_str(),
 			Vec2i(width_, height_),
-			texture::Texturefmt::B8G8R8A8
+			texture::Texturefmt::B8G8R8A8,
+			render::BufUsage::DYNAMIC
 		);
 	}
 

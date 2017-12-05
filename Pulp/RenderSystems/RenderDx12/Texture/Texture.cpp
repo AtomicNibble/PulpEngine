@@ -7,7 +7,7 @@
 
 
 // Img Lib
-#include <../../tools/ImgLib/ImgLib.h>
+#include <../../tools/ImgLib/ImgLib.h>	
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -24,6 +24,7 @@ X_NAMESPACE_BEGIN(texture)
 		depth_ = 0;
 		numFaces_ = 0;
 
+		usage_ = render::BufUsage::IMMUTABLE;
 		pixelBufType_ = render::PixelBufferType::NONE;
 		pPixelBuffer_ = nullptr;
 	}
