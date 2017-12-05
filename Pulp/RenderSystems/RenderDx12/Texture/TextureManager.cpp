@@ -332,16 +332,18 @@ X_NAMESPACE_BEGIN(texture)
 	bool TextureManager::updateTextureData(render::CommandContext& contex, TexID texId, const uint8_t* pSrc, uint32_t srcSize) const
 	{
 		Texture* pTex = getByID(texId);
+
+		X_ASSERT(pTex->getUsage() != render::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE texture")(pTex->getUsage());
+
 		auto& dest = pTex->getGpuResource();
 
 		const size_t rowBytes = Util::rowBytes(pTex->getWidth(), 1, pTex->getFormat());
+		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, 1);
 
 		D3D12_SUBRESOURCE_DATA texResource;
 		texResource.pData = pSrc;
 		texResource.RowPitch = rowBytes;
 		texResource.SlicePitch = texResource.RowPitch * pTex->getHeight();
-
-		const uint64_t uploadBufSize = getRequiredIntermediateSize(dest.getResource(), 0, 1);
 
 		// allocate a temp buffer that will get deleted after fence reached..
 		auto buf = contex.AllocUploadBuffer(uploadBufSize);
