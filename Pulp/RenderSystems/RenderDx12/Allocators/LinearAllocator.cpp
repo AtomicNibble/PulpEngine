@@ -50,6 +50,7 @@ LinearAllocatorPageManager::LinearAllocatorPageManager(core::MemoryArenaBase* ar
 	cmdMan_(cmdMan),
 	allocationType_(type),
 	pagePool_(arena),
+	deletedPages_(arena),
 	retiredPages_(arena),
 	availablePages_(arena)
 {
@@ -87,12 +88,36 @@ LinearAllocationPage* LinearAllocatorPageManager::requestPage(void)
 	return pPagePtr;
 }
 
+LinearAllocationPage* LinearAllocatorPageManager::allocatePage(size_t sizeInBytes)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	return createNewPage(sizeInBytes);
+}
+
 void LinearAllocatorPageManager::discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
 	for (auto iter = pages.begin(); iter != pages.end(); ++iter) {
 		retiredPages_.push(std::make_pair(fenceID, *iter));
+	}
+}
+
+void LinearAllocatorPageManager::freePages(uint64_t fenceID, const LineraAllocationPageArr& pages)
+{
+	core::CriticalSection::ScopedLock lock(cs_);
+
+	while (deletedPages_.isNotEmpty() && cmdMan_.isFenceComplete(deletedPages_.peek().first))
+	{
+		X_DELETE(deletedPages_.peek().second, nullptr);
+		deletedPages_.pop();
+	}
+
+	for (auto iter = pages.begin(); iter != pages.end(); ++iter) {
+		// Unmap now?
+		// (*iter);
+		deletedPages_.push(std::make_pair(fenceID, *iter));
 	}
 }
 
@@ -105,7 +130,7 @@ void LinearAllocatorPageManager::destroy(void)
 	pagePool_.clear();
 }
 
-LinearAllocationPage* LinearAllocatorPageManager::createNewPage(void)
+LinearAllocationPage* LinearAllocatorPageManager::createNewPage(size_t sizeInBytes)
 {
 	D3D12_HEAP_PROPERTIES HeapProps;
 	HeapProps.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN;
@@ -129,14 +154,14 @@ LinearAllocationPage* LinearAllocatorPageManager::createNewPage(void)
 	if (allocationType_ == LinearAllocatorType::GPU_EXCLUSIVE)
 	{
 		HeapProps.Type = D3D12_HEAP_TYPE_DEFAULT;
-		ResourceDesc.Width = GPU_ALLOCATOION_PAGE_SIZE;
+		ResourceDesc.Width = sizeInBytes == 0 ? GPU_ALLOCATOION_PAGE_SIZE : sizeInBytes;
 		ResourceDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS;
 		defaultUsage = D3D12_RESOURCE_STATE_UNORDERED_ACCESS;
 	}
 	else
 	{
 		HeapProps.Type = D3D12_HEAP_TYPE_UPLOAD;
-		ResourceDesc.Width = CPU_ALLOCATOION_PAGE_SIZE;
+		ResourceDesc.Width = sizeInBytes == 0 ? CPU_ALLOCATOION_PAGE_SIZE : sizeInBytes;
 		ResourceDesc.Flags = D3D12_RESOURCE_FLAG_NONE;
 		defaultUsage = D3D12_RESOURCE_STATE_GENERIC_READ;
 	}
@@ -184,7 +209,8 @@ LinearAllocator::LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorMa
 	pageSize_(0),
 	curOffset_(0),
 	pCurPage_(nullptr),
-	retiredPages_(arena)
+	retiredPages_(arena),
+	largePages_(arena)
 {
 	pageSize_ = LinearAllocatorPageManager::CPU_ALLOCATOION_PAGE_SIZE;
 	if (type == LinearAllocatorType::GPU_EXCLUSIVE) {
@@ -196,6 +222,7 @@ LinearAllocator::~LinearAllocator()
 {
 	X_ASSERT(pCurPage_ == nullptr, "Current page was not cleaned up")(pCurPage_);
 	X_ASSERT(retiredPages_.isEmpty(), "Retired pages where not discarded")(retiredPages_.size());
+	X_ASSERT(largePages_.isEmpty(), "Large pages where not discarded")(largePages_.size());
 }
 
 
@@ -207,6 +234,10 @@ DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 	X_ASSERT(core::bitUtil::IsPowerOfTwo(alignment), "alignment must be power of two")(alignment);
 
 	const size_t alignedSize = core::bitUtil::RoundUpToMultiple(sizeInBytes, alignment);
+
+	if (alignedSize > pageSize_) {
+		return allocateLarge(sizeInBytes);
+	}
 
 	curOffset_ = core::bitUtil::RoundUpToMultiple(curOffset_, alignment);
 
@@ -236,6 +267,17 @@ DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 	return ret;
 }
 
+DynAlloc LinearAllocator::allocateLarge(size_t sizeInBytes)
+{
+	LinearAllocationPage* pPage = manager_.allocatePage(allocationType_, sizeInBytes);
+	largePages_.push_back(pPage);
+
+	DynAlloc ret(*pPage, 0, sizeInBytes);
+	ret.setData(pPage->cpuVirtualAddress(), pPage->getGpuVirtualAddress());
+
+	return ret;
+}
+
 void LinearAllocator::cleanupUsedPages(uint64_t fenceID)
 {
 	if (!pCurPage_) {
@@ -247,7 +289,10 @@ void LinearAllocator::cleanupUsedPages(uint64_t fenceID)
 	curOffset_ = 0;
 
 	manager_.discardPages(allocationType_, fenceID, retiredPages_);
+	manager_.freePages(allocationType_, fenceID, largePages_);
+	
 	retiredPages_.clear();
+	largePages_.clear();
 }
 
 

@@ -88,11 +88,13 @@ public:
 	~LinearAllocatorPageManager();
 
 	LinearAllocationPage* requestPage(void);
+	LinearAllocationPage* allocatePage(size_t sizeInBytes);
 	void discardPages(uint64_t fenceID, const LineraAllocationPageArr& pages);
+	void freePages(uint64_t fenceID, const LineraAllocationPageArr& pages);
 	void destroy(void);
 
 private:
-	LinearAllocationPage* createNewPage(void);
+	LinearAllocationPage* createNewPage(size_t sizeInbytes = 0);
 
 private:
 	core::MemoryArenaBase* arena_;
@@ -102,6 +104,7 @@ private:
 
 	LinearAllocatorType::Enum allocationType_;
 	LineraAllocationPageArr pagePool_;
+	AllocationFencePageQueue deletedPages_;
 	AllocationFencePageQueue retiredPages_;
 	AllocationPageQueue availablePages_;
 };
@@ -116,7 +119,9 @@ public:
 		CommandListManger& cmdMan);
 
 	X_INLINE LinearAllocationPage* requestPage(LinearAllocatorType::Enum type);
+	X_INLINE LinearAllocationPage* allocatePage(LinearAllocatorType::Enum type, size_t sizeInBytes);
 	X_INLINE void discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const LineraAllocationPageArr& pages);
+	X_INLINE void freePages(LinearAllocatorType::Enum type, uint64_t fenceID, const LineraAllocationPageArr& pages);
 	void destroy(void);
 
 private:
@@ -138,12 +143,17 @@ public:
 	void cleanupUsedPages(uint64_t fenceID);
 
 private:
+	DynAlloc allocateLarge(size_t sizeInBytes);
+
+
+private:
 	LinearAllocatorManager& manager_;
 	LinearAllocatorType::Enum allocationType_;
 	size_t pageSize_;
 	size_t curOffset_;
 	LinearAllocationPage* pCurPage_;
 	LineraAllocationPageArr retiredPages_;
+	LineraAllocationPageArr largePages_;
 };
 
 

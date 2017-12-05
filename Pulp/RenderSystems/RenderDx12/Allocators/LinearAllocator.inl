@@ -54,9 +54,20 @@ X_INLINE LinearAllocationPage* LinearAllocatorManager::requestPage(LinearAllocat
 	return pageAllocators_[type].requestPage();
 }
 
+X_INLINE LinearAllocationPage* LinearAllocatorManager::allocatePage(LinearAllocatorType::Enum type, size_t sizeInBytes)
+{
+	return pageAllocators_[type].allocatePage(sizeInBytes);
+}
+
+
 X_INLINE void LinearAllocatorManager::discardPages(LinearAllocatorType::Enum type, uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages)
 {
 	return pageAllocators_[type].discardPages(fenceID, pages);
+}
+
+X_INLINE void LinearAllocatorManager::freePages(LinearAllocatorType::Enum type, uint64_t fenceID, const core::Array<LinearAllocationPage*>& pages)
+{
+	return pageAllocators_[type].freePages(fenceID, pages);
 }
 
 
