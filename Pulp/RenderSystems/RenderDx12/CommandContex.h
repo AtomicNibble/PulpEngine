@@ -112,6 +112,8 @@ public:
 	X_INLINE void copyBufferRegionRaw(GpuResource& dest, size_t destOffset, ID3D12Resource* pSrc, size_t srcOffset, size_t numBytes);
 	X_INLINE void copyResourceRaw(GpuResource& dest, ID3D12Resource* pSrc);
 
+	X_INLINE DynAlloc AllocUploadBuffer(size_t sizeInBytes);
+
 	// used for compute shaders
 	void copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& src);
 	void resetCounter(StructuredBuffer& buf, uint32_t value = 0);

@@ -56,6 +56,11 @@ X_INLINE void CommandContext::copyResourceRaw(GpuResource& dest, ID3D12Resource*
 	pCommandList_->CopyResource(dest.getResource(), pSrc);
 }
 
+X_INLINE DynAlloc CommandContext::AllocUploadBuffer(size_t sizeInBytes)
+{
+	return cpuLinearAllocator_.allocate(sizeInBytes);
+}
+
 X_INLINE void CommandContext::insertTimeStamp(ID3D12QueryHeap* pQueryHeap, uint32_t queryIdx)
 {
 	pCommandList_->EndQuery(pQueryHeap, D3D12_QUERY_TYPE_TIMESTAMP, queryIdx);
