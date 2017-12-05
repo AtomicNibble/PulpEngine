@@ -548,6 +548,18 @@ namespace profiler
 
 			}
 
+			if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('r')))
+			{
+				render::Stats::Str str;
+				render::Stats stats = gEnv->pRender->getStats();
+				
+				stats.toString(str);
+
+				area = RenderStr(pos, L"Render Stats", str);
+				pos.x += area.x + padding;
+
+			}
+
 #if X_ENABLE_PROFILER_WARNINGS
 			drawWarnings();
 #endif // !X_ENABLE_PROFILER_WARNINGS
