@@ -348,9 +348,9 @@ typedef IPixelBuffer IDepthBuffer;
 
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
 X_DECLARE_ENUM(BufUsage)(
-	IMMUTABLE,  // never changes
-	STATIC,	    // changes sometimes not every frame.
-	DYNAMIC		// stuff that changes every frame
+	IMMUTABLE,		// never changes
+	DYNAMIC,	    // changes sometimes not every frame.
+	PER_FRAME		// stuff that changes every frame
 );
 
 typedef Flags<CpuAccess> CpuAccessFlags;

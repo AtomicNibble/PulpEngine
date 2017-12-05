@@ -1209,7 +1209,7 @@ bool XFont::CreateDeviceTexture(void)
 		name.c_str(),
 		pFontTexture_->GetSize(),
 		texture::Texturefmt::A8,
-		render::BufUsage::STATIC,
+		render::BufUsage::DYNAMIC,
 		buf.data()
 	);
 

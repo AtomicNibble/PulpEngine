@@ -315,7 +315,7 @@ void PrimativeContextSharedResources::InstancedPage::createVB(render::IRender* p
 	instBufHandle = pRender->createVertexBuffer(
 		sizeof(IPrimativeContext::ShapeInstanceData),
 		NUM_INSTANCE_PER_PAGE,
-		render::BufUsage::DYNAMIC,
+		render::BufUsage::PER_FRAME,
 		render::CpuAccess::WRITE
 	);
 }
@@ -538,7 +538,7 @@ void PrimativeContext::VertexPage::createVB(render::IRender* pRender)
 	vertexBufHandle = pRender->createVertexBuffer(
 		sizeof(IPrimativeContext::PrimVertex),
 		NUMVERTS_PER_PAGE,
-		render::BufUsage::DYNAMIC,
+		render::BufUsage::PER_FRAME,
 		render::CpuAccess::WRITE
 	);
 }
