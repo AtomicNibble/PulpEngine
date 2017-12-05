@@ -102,7 +102,7 @@ private:
 	CommandListManger& cmdMan_;
 	core::CriticalSection cs_;
 
-	LinearAllocatorType::Enum allocationType_;
+	const LinearAllocatorType::Enum allocationType_;
 	LineraAllocationPageArr pagePool_;
 	AllocationFencePageQueue deletedPages_;
 	AllocationFencePageQueue retiredPages_;
@@ -148,8 +148,8 @@ private:
 
 private:
 	LinearAllocatorManager& manager_;
-	LinearAllocatorType::Enum allocationType_;
-	size_t pageSize_;
+	const LinearAllocatorType::Enum allocationType_;
+	const size_t pageSize_;
 	size_t curOffset_;
 	LinearAllocationPage* pCurPage_;
 	LineraAllocationPageArr retiredPages_;

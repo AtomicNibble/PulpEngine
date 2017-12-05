@@ -206,16 +206,15 @@ void LinearAllocatorManager::destroy(void)
 LinearAllocator::LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorManager& manager, LinearAllocatorType::Enum type) :
 	manager_(manager),
 	allocationType_(type),
-	pageSize_(0),
+	pageSize_(type == LinearAllocatorType::GPU_EXCLUSIVE ?
+		LinearAllocatorPageManager::GPU_ALLOCATOION_PAGE_SIZE :
+		LinearAllocatorPageManager::CPU_ALLOCATOION_PAGE_SIZE),
 	curOffset_(0),
 	pCurPage_(nullptr),
 	retiredPages_(arena),
 	largePages_(arena)
 {
-	pageSize_ = LinearAllocatorPageManager::CPU_ALLOCATOION_PAGE_SIZE;
-	if (type == LinearAllocatorType::GPU_EXCLUSIVE) {
-		pageSize_ = LinearAllocatorPageManager::GPU_ALLOCATOION_PAGE_SIZE;
-	}
+
 }
 
 LinearAllocator::~LinearAllocator()
