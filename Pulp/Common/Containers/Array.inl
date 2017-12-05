@@ -663,8 +663,8 @@ void Array<T, Allocator, GrowPolicy>::removeIndexStable(size_type idx)
 	if (itemsLeft && !isLast)
 	{
 		// move everything down.
-		Iterator end = Mem::Move<T>(pItem + 1, end(), pItem);
-		Mem::Destruct(end);
+		Iterator last = Mem::Move(pItem + 1, end(), pItem);
+		Mem::Destruct(last);
 	}
 }
 
