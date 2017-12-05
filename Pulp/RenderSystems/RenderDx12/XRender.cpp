@@ -434,6 +434,15 @@ void XRender::release(void)
 
 void XRender::renderBegin(void)
 {
+#if RENDER_STATS
+	core::atomic::Exchange(&stats_.numBatches, 0);
+	core::atomic::Exchange(&stats_.numDrawCall, 0);
+	core::atomic::Exchange(&stats_.numPoly, 0);
+	core::atomic::Exchange(&stats_.numStatesChanges, 0);
+	core::atomic::Exchange(&stats_.numVariableStateChanges, 0);
+	core::atomic::Exchange(&stats_.numVBChanges, 0);
+#endif // !RENDER_STATS
+
 	ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
 	
 	D3D12_CPU_DESCRIPTOR_HANDLE RTVs[] = {
@@ -483,6 +492,10 @@ void XRender::renderEnd(void)
 
 void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 {
+#if RENDER_STATS
+	++stats_.numBatches;
+#endif // !RENDER_STATS
+
 	const auto& sortedIdx = cmdBucket.getSortedIdx();
 	const auto& packets = cmdBucket.getPackets();
 //	const auto& keys = cmdBucket.getKeys();
@@ -611,6 +624,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					context.draw(pDraw->vertexCount, pDraw->startVertex);
+
+#if RENDER_STATS
+					++curState.numDrawCall;
+					curState.numPoly += pDraw->vertexCount;
+#endif // !RENDER_STATS
 					break;
 				}
 				case Commands::Command::DRAW_INDEXED:
@@ -625,10 +643,19 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					ApplyIndexBuffer(context, curState, pDraw->indexBuffer);
 
 					context.drawIndexed(pDraw->indexCount, pDraw->startIndex, pDraw->baseVertex);
+
+#if RENDER_STATS
+					++curState.numDrawCall;
+					curState.numPoly += pDraw->indexCount;
+#endif // !RENDER_STATS
 					break;
 				}
 				case Commands::Command::DRAW_INSTANCED:
 				{
+#if RENDER_STATS
+					++curState.numDrawCall;
+#endif // !RENDER_STATS
+
 					const Commands::DrawInstanced* pDraw = reinterpret_cast<const Commands::DrawInstanced*>(pCmd);
 
 					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
@@ -636,6 +663,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					context.drawInstanced(pDraw->vertexCountPerInstance, pDraw->instanceCount, 
 						pDraw->startVertexLocation, pDraw->startInstanceLocation);
+
+#if RENDER_STATS
+					++curState.numDrawCall;
+					curState.numPoly += (pDraw->vertexCountPerInstance * pDraw->instanceCount);
+#endif // !RENDER_STATS
 					break;
 				}
 				case Commands::Command::DRAW_INSTANCED_INDEXED:
@@ -651,6 +683,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					context.drawIndexedInstanced(pDraw->indexCountPerInstance, pDraw->instanceCount,
 						pDraw->startIndexLocation, pDraw->baseVertexLocation, pDraw->startInstanceLocation);
+
+#if RENDER_STATS
+					++curState.numDrawCall;
+					curState.numPoly += (pDraw->indexCountPerInstance * pDraw->instanceCount);
+#endif // !RENDER_STATS
 					break;
 				}
 				case Commands::Command::COPY_CONST_BUF_DATA:
@@ -751,6 +788,15 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	// for now wait.
 	pContext->finishAndFree(true);
 
+
+#if RENDER_STATS
+	core::atomic::Add(&stats_.numDrawCall, curState.numDrawCall);
+	core::atomic::Add(&stats_.numPoly, curState.numPoly);
+	core::atomic::Add(&stats_.numStatesChanges, curState.numStatesChanges);
+	core::atomic::Add(&stats_.numVariableStateChanges, curState.numVariableStateChanges);
+	core::atomic::Add(&stats_.numVBChanges, curState.numVBChanges);
+#endif // !RENDER_STATS
+
 }
 
 X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
@@ -791,6 +837,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 	if (curState.handle != handle) // if the handle is the same, everything is the same.
 	{
+#if RENDER_STATS
+		++curState.numStatesChanges;
+#endif // !RENDER_STATS
+
 		// the render system should not have to check ever state is valid, the 3dengine should check at creation time.
 		// so it's a one off cost not a cost we pay for every fucking state change.
 		X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")(handle, INVALID_STATE_HANLDE);
@@ -817,6 +867,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 	// later i will try make the handles smaller tho ideally 16bit.
 	if (std::memcmp(curState.vertexBuffers.data(), vertexBuffers.data(), sizeof(vertexBuffers)) != 0)
 	{
+#if RENDER_STATS
+		++curState.numVBChanges;
+#endif // !RENDER_STATS
+
 		curState.vertexBuffers = vertexBuffers;
 
 		uint32_t numVertexStreams = 0;
@@ -844,6 +898,10 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 	{
 		std::memcpy(curState.variableState, pStateData, resourceState.getStateSize());
 		curState.variableStateSize = resourceState.getStateSize();
+
+#if RENDER_STATS
+		++curState.numVariableStateChanges;
+#endif // !RENDER_STATS
 
 		if (resourceState.anySet())
 		{

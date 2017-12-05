@@ -112,6 +112,14 @@ class XRender : public IRender
 
 			variableStateSize = 0;
 			core::zero_object(variableState);
+
+#if RENDER_STATS
+			numDrawCall = 0;
+			numPoly = 0;
+			numStatesChanges = 0;
+			numVariableStateChanges = 0;
+			numVBChanges = 0;
+#endif // !RENDER_STATS
 		}
 
 		StateHandle handle;
@@ -127,6 +135,14 @@ class XRender : public IRender
 		ID3D12RootSignature* pRootSig;
 		ID3D12PipelineState* pPso;
 		D3D12_PRIMITIVE_TOPOLOGY topo;
+
+#if RENDER_STATS
+		int32_t numDrawCall;
+		int32_t numPoly;
+		int32_t numStatesChanges;
+		int32_t numVariableStateChanges;
+		int32_t numVBChanges;
+#endif // !RENDER_STATS
 	};
 
 	static const size_t MAX_STATES = 1024 * 4;

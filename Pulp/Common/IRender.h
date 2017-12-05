@@ -358,7 +358,13 @@ struct Stats
 
 		buf.clear();
 		buf.appendFmt("NumPassState: ^6%" PRIi32 "^~\n", numPassStates);
-		buf.appendFmt("NumState: ^6%" PRIi32 "^~\n", numStates);
+		buf.appendFmt("NumState: ^6%" PRIi32 "^~\n\n", numStates);
+
+		buf.appendFmt("NumBatches: ^6%" PRIi32 "^~\n", numBatches);
+		buf.appendFmt("NumDrawCall: ^6%" PRIi32 " Poly(%" PRIi32 ") ^~\n", numDrawCall, numPoly);
+		buf.appendFmt("StateChanges: ^6%" PRIi32 "^~\n", numStatesChanges);
+		buf.appendFmt("StateChanges(V): ^6%" PRIi32 "^~\n", numVariableStateChanges);
+		buf.appendFmt("BufChanges(VB): ^6%" PRIi32 "^~\n", numVBChanges);
 		return buf.c_str();
 	}
 
@@ -367,6 +373,15 @@ struct Stats
 
 	int32_t numStates;
 	int32_t maxStates;
+
+	int32_t numBatches;
+	int32_t numDrawCall;
+	int32_t numPoly;
+	int32_t numStatesChanges;
+	int32_t numVariableStateChanges;
+	int32_t numVBChanges;
+
+
 };
 
 X_DECLARE_FLAGS(CpuAccess)(WRITE, READ);
