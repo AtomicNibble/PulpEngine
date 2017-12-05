@@ -333,6 +333,9 @@ X_NAMESPACE_BEGIN(texture)
 	{
 		Texture* pTex = getByID(texId);
 
+		// TODO: better handle PER_FRAME usage, by directly copying to GPU and skip swizzle.
+		// Maybe also have 1-2 device textures just for PER_FRAME texture that we flip between.
+		// removing the need to stall eachframe, before we can upload new cpu data.
 		X_ASSERT(pTex->getUsage() != render::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE texture")(pTex->getUsage());
 
 		auto& dest = pTex->getGpuResource();
