@@ -119,6 +119,8 @@ class XRender : public IRender
 			numStatesChanges = 0;
 			numVariableStateChanges = 0;
 			numVBChanges = 0;
+			numTexUpload = 0;
+			numTexUploadSize = 0;
 #endif // !RENDER_STATS
 		}
 
@@ -142,6 +144,8 @@ class XRender : public IRender
 		int32_t numStatesChanges;
 		int32_t numVariableStateChanges;
 		int32_t numVBChanges;
+		int32_t numTexUpload;
+		int32_t numTexUploadSize;
 #endif // !RENDER_STATS
 	};
 

@@ -365,6 +365,7 @@ struct Stats
 		buf.appendFmt("StateChanges: ^6%" PRIi32 "^~\n", numStatesChanges);
 		buf.appendFmt("StateChanges(V): ^6%" PRIi32 "^~\n", numVariableStateChanges);
 		buf.appendFmt("BufChanges(VB): ^6%" PRIi32 "^~\n", numVBChanges);
+		buf.appendFmt("TextureUploads: ^6%" PRIi32 "^~ Data: ^6%s ^~\n", numTexUpload, core::HumanSize::toString(str, (int64_t)numTexUploadSize));
 		return buf.c_str();
 	}
 
@@ -380,7 +381,8 @@ struct Stats
 	int32_t numStatesChanges;
 	int32_t numVariableStateChanges;
 	int32_t numVBChanges;
-
+	int32_t numTexUpload;
+	int32_t numTexUploadSize;
 
 };
 

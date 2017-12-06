@@ -441,6 +441,8 @@ void XRender::renderBegin(void)
 	core::atomic::Exchange(&stats_.numStatesChanges, 0);
 	core::atomic::Exchange(&stats_.numVariableStateChanges, 0);
 	core::atomic::Exchange(&stats_.numVBChanges, 0);
+	core::atomic::Exchange(&stats_.numTexUpload, 0);
+	core::atomic::Exchange(&stats_.numTexUploadSize, 0);
 #endif // !RENDER_STATS
 
 	ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
@@ -733,6 +735,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					const Commands::CopyTextureBufferData& updateTex = *reinterpret_cast<const Commands::CopyTextureBufferData*>(pCmd);
 					
 					pTextureMan_->updateTextureData(context, updateTex.textureId, static_cast<const uint8_t*>(updateTex.pData), updateTex.size);
+
+#if RENDER_STATS
+					++curState.numTexUpload;
+					curState.numTexUploadSize += updateTex.size;
+#endif // !RENDER_STATS
 				}
 				break;
 
@@ -741,6 +748,11 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 					const Commands::CopyTextureSubRegionBufferData& updateSubTex = *reinterpret_cast<const Commands::CopyTextureSubRegionBufferData*>(pCmd);
 				
 					pTextureMan_->updateTextureData(context, updateSubTex.textureId, static_cast<const uint8_t*>(updateSubTex.pData), updateSubTex.size);
+
+#if RENDER_STATS
+					++curState.numTexUpload;
+					curState.numTexUploadSize += updateSubTex.size;
+#endif // !RENDER_STATS
 				}
 				break;
 
@@ -795,6 +807,8 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 	core::atomic::Add(&stats_.numStatesChanges, curState.numStatesChanges);
 	core::atomic::Add(&stats_.numVariableStateChanges, curState.numVariableStateChanges);
 	core::atomic::Add(&stats_.numVBChanges, curState.numVBChanges);
+	core::atomic::Add(&stats_.numTexUpload, curState.numTexUpload);
+	core::atomic::Add(&stats_.numTexUploadSize, curState.numTexUploadSize);
 #endif // !RENDER_STATS
 
 }
