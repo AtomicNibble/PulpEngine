@@ -45,9 +45,9 @@ public:
 	struct ThumbInfo
 	{
 		X_INLINE ThumbInfo();
-		X_INLINE ThumbInfo(int32_t id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::MD5Digest& hash);
+		X_INLINE ThumbInfo(ThumbId id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::MD5Digest& hash);
 
-		int32_t id;
+		ThumbId id;
 		int32_t fileSize;
 		Vec2i thumbDim;	// thumb dim
 		Vec2i srcDim;		// dim of src, might be zero
@@ -93,11 +93,12 @@ public:
 	typedef assetDb::AssetId AssetId;
 	typedef assetDb::ModId ModId;
 	typedef assetDb::ProfileId ProfileId;
+	typedef assetDb::ThumbId ThumbId;
 
 	static const ModId INVALID_MOD_ID = assetDb::INVALID_MOD_ID;
 	static const AssetId INVALID_ASSET_ID = assetDb::INVALID_ASSET_ID;
 	static const AssetId INVALID_RAWFILE_ID = assetDb::INVALID_RAWFILE_ID;
-	static const AssetId INVALID_THUMB_ID = assetDb::INVALID_THUMB_ID;
+	static const ThumbId INVALID_THUMB_ID = assetDb::INVALID_THUMB_ID;
 
 	typedef assetDb::AssetType AssetType;
 	X_DECLARE_ENUM(Result)(
@@ -249,7 +250,7 @@ private:
 private:
 	bool GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
 	bool GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut);
-	bool GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, int32_t* pThumbId = nullptr);
+	bool GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pThumbId = nullptr);
 	bool MergeArgs(AssetId assetId, core::string& argsInOut);
 	bool getDBVersion(int32_t& versionOut);
 	bool setDBVersion(int32_t version);

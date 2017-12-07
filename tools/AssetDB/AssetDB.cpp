@@ -2891,7 +2891,7 @@ bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
 	return true;
 }
 
-bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, int32_t* pThumbId)
+bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pThumbId)
 {
 	sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, "
 	" thumbs.srcWidth, thumbs.srcHeight, thumbs.size, thumbs.hash FROM thumbs "
@@ -2906,7 +2906,7 @@ bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, int32_t* pT
 
 	const auto& row = (*it);
 
-	dataOut.id = row.get<int32_t>(0);
+	dataOut.id = safe_static_cast<ThumbId>(row.get<int32_t>(0));
 	dataOut.thumbDim.x = row.get<int32_t>(1);
 	dataOut.thumbDim.y = row.get<int32_t>(2);
 

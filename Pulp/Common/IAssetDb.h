@@ -17,11 +17,12 @@ static const size_t ASSET_NAME_MIN_LENGTH = 2; // ban single char asset names?
 typedef int32_t AssetId;
 typedef int32_t ModId;
 typedef int32_t ProfileId;
+typedef int32_t ThumbId;
 
 static const ModId INVALID_MOD_ID = -1;
 static const AssetId INVALID_ASSET_ID = -1;
 static const AssetId INVALID_RAWFILE_ID = -1;
-static const AssetId INVALID_THUMB_ID = -1;
+static const ThumbId INVALID_THUMB_ID = -1;
 
 X_DECLARE_ENUM(AssetType)(
 	MODEL, 
