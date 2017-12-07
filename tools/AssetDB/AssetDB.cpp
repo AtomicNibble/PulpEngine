@@ -663,7 +663,7 @@ bool AssetDB::PerformMigrations(void)
 	return true;
 }
 
-bool AssetDB::chkdsk(bool updateDB)
+bool AssetDB::Chkdsk(bool updateDB)
 {
 	if (updateDB)
 	{

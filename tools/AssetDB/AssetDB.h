@@ -135,7 +135,7 @@ public:
 	bool AddDefaultMods(void);
 	bool AddDefaultProfiles(void);
 	bool PerformMigrations(void);
-	bool chkdsk(bool updateDB = false);
+	bool Chkdsk(bool updateDB = false);
 	bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
 	// Conversion Profile api.
