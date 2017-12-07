@@ -1145,9 +1145,9 @@ void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, i
 Stats XRender::getStats(void) const
 {
 	Stats stats;
-
+#if RENDER_STATS
 	stats = stats_;
-
+#endif // !RENDER_STATS
 	return stats;
 }
 
