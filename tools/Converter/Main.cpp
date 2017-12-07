@@ -50,7 +50,7 @@ typedef core::MemoryArena<
 
 namespace
 {
-	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL, CLEAN, GEN_THUMBS);
+	X_DECLARE_ENUM(ConvertMode)(SINGLE, ALL, CLEAN, GEN_THUMBS, CHKDSK);
 
 
 	bool GetMode(ConvertMode::Enum& mode)
@@ -73,6 +73,10 @@ namespace
 			else if (core::strUtil::IsEqualCaseInsen(pMode, L"gen_thumbs"))
 			{
 				mode = ConvertMode::GEN_THUMBS;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"chkdsk"))
+			{
+				mode = ConvertMode::CHKDSK;
 			}
 			else
 			{
@@ -219,6 +223,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				else if (mode == ConvertMode::GEN_THUMBS)
 				{
 					con.GenerateThumbs();
+				}
+				else if (mode == ConvertMode::CHKDSK)
+				{
+					con.Chkdsk();
 				}
 				else if (mode == ConvertMode::ALL)
 				{

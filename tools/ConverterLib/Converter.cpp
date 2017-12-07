@@ -406,6 +406,14 @@ bool Converter::GenerateThumbs(void)
 	return true;
 }
 
+bool Converter::Chkdsk(void)
+{
+	X_LOG0("Converter", "Chkdsk");
+	
+	return db_.chkdsk(false);
+}
+
+
 
 bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 {

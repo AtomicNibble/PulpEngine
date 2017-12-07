@@ -54,6 +54,7 @@ public:
 
 	// generates thumbs for assets that don't have thumbs already and we support auto thumb generation.
 	CONVERTERLIB_EXPORT bool GenerateThumbs(void);
+	CONVERTERLIB_EXPORT bool Chkdsk(void);
 
 	// IConverterHost
 	CONVERTERLIB_EXPORT virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_FINAL;
