@@ -21,7 +21,7 @@ X_INLINE AssetDB::ThumbInfo::ThumbInfo(int32_t id_, int32_t fileSize_, Vec2i thu
 // -----------------------------------------------------
 
 
-X_INLINE AssetDB::Mod::Mod(int32_t modId, core::string name_, core::Path<char>& outdir) :
+X_INLINE AssetDB::Mod::Mod(ModId modId, core::string name_, core::Path<char>& outdir) :
 	modId(modId),
 	name(name_),
 	outDir(outdir)
@@ -29,7 +29,7 @@ X_INLINE AssetDB::Mod::Mod(int32_t modId, core::string name_, core::Path<char>& 
 
 }
 
-X_INLINE AssetDB::Mod::Mod(int32_t modId, const char* pName, const char* pOutDir) :
+X_INLINE AssetDB::Mod::Mod(ModId modId, const char* pName, const char* pOutDir) :
 	modId(modId),
 	name(pName),
 	outDir(pOutDir)
@@ -47,7 +47,7 @@ X_INLINE AssetDB::AssetInfo::AssetInfo() :
 
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const char* pName, AssetType::Enum type_) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, const char* pName, AssetType::Enum type_) :
 	id(id_),
 	parentId(parentId_),
 	type(type_),
@@ -56,7 +56,7 @@ X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const cha
 
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(int32_t id_, int32_t parentId_, const core::string& name_, AssetType::Enum type_) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, const core::string& name_, AssetType::Enum type_) :
 	id(id_),
 	parentId(parentId_),
 	type(type_),
@@ -75,7 +75,7 @@ X_INLINE AssetDB::AssetRef::AssetRef() :
 
 }
 
-X_INLINE AssetDB::AssetRef::AssetRef(int32_t id, int32_t toId, int32_t fromId) :
+X_INLINE AssetDB::AssetRef::AssetRef(int32_t id, AssetId toId, AssetId fromId) :
 	id(id),
 	toId(toId),
 	fromId(fromId)

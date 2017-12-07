@@ -2204,7 +2204,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 }
 
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, int32_t* pIdOut, ModId* pModIdOut)
+bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut, ModId* pModIdOut)
 {
 	if (name.isEmpty()) {
 		return false;

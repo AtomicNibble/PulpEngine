@@ -57,10 +57,10 @@ public:
 	struct Mod
 	{
 		X_INLINE Mod() = default;
-		X_INLINE Mod(int32_t modId, core::string, core::Path<char>& path);
-		X_INLINE Mod(int32_t modId, const char* pName, const char* pOutDir);
+		X_INLINE Mod(ModId modId, core::string, core::Path<char>& path);
+		X_INLINE Mod(ModId modId, const char* pName, const char* pOutDir);
 
-		int32_t modId;
+		ModId modId;
 		core::string name;
 		core::Path<char> outDir;
 	};
@@ -232,13 +232,13 @@ public:
 	bool GetAssetRefsFrom(AssetId assetId, AssetIdArr& refsOut); // returns a list of assets that assetId refrences.
 	bool GetAssetRefsFrom(AssetId assetId, RefsArr& refsOut); // returns a list of refs that assetId refrences.
 
-	Result::Enum AddAssertRef(AssetId assetId, int32_t targetAssetId);
-	Result::Enum RemoveAssertRef(AssetId assetId, int32_t targetAssetId);
+	Result::Enum AddAssertRef(AssetId assetId, AssetId targetAssetId);
+	Result::Enum RemoveAssertRef(AssetId assetId, AssetId targetAssetId);
 
 	// parent
-	bool AssetHasParent(AssetId assetId, int32_t* pParentId = nullptr);
+	bool AssetHasParent(AssetId assetId, AssetId* pParentId = nullptr);
 	bool AssetIsParent(AssetId assetId); // check if this asset has a parent.
-	Result::Enum SetAssetParent(AssetId assetId, int32_t parentAssetIt);
+	Result::Enum SetAssetParent(AssetId assetId, AssetId parentAssetId);
 	Result::Enum RemoveAssetParent(AssetId assetId);
 
 private:
