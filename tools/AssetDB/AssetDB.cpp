@@ -1746,7 +1746,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetId assetId, const DataArr
 {
 	AssetInfo info;
 
-	if (GetAssetInfoForAsset(assetId, info)) {
+	if (!GetAssetInfoForAsset(assetId, info)) {
 		return Result::ERROR;
 	}
 
