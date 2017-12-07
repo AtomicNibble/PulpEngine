@@ -218,15 +218,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 				if (mode == ConvertMode::CLEAN)
 				{
-					con.CleanAll();
+					if (!con.CleanAll())
+					{
+						X_ERROR("Convert", "Failed to perform clearAll");
+					}
 				}
 				else if (mode == ConvertMode::GEN_THUMBS)
 				{
-					con.GenerateThumbs();
+					if (!con.GenerateThumbs())
+					{
+						X_ERROR("Convert", "Failed to generate thumbs");
+					}
 				}
 				else if (mode == ConvertMode::CHKDSK)
 				{
-					con.Chkdsk();
+					if(!con.Chkdsk())
+					{
+						X_ERROR("Convert", "Failed to perform Chkdsk");
+					}
 				}
 				else if (mode == ConvertMode::ALL)
 				{
