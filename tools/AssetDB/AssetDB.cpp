@@ -3163,7 +3163,7 @@ bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& 
 	core::LinearAllocator allocator(buf, buf + sizeof(buf));
 
 	if (!core::Compression::ICompressor::validBuffer(deflated)) {
-		X_ERROR("AssetDB", "Tried to invalid a invalid buffer");
+		X_ERROR("AssetDB", "Tried to inflate a invalid buffer");
 		return false;
 	}
 
