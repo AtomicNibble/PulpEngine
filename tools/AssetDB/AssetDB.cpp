@@ -687,7 +687,6 @@ bool AssetDB::chkdsk(bool updateDB)
 
 	core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
-
 	auto it = qry.begin();
 	for (; it != qry.end(); ++it)
 	{
@@ -701,6 +700,8 @@ bool AssetDB::chkdsk(bool updateDB)
 			X_ERROR("AssetDB", "Failed to get rawfile path");
 			return false;
 		}
+
+		X_LOG1("AssetDB", "Checking: ^5%s", rawfileInfo.path.c_str());
 
 		core::Path<char> filePath;
 		AssetPathForRawFile(rawfileInfo, filePath);
@@ -762,6 +763,8 @@ bool AssetDB::chkdsk(bool updateDB)
 			}
 		}
 	}
+
+	X_LOG0("AssetDB", "chkdsk complete");
 
 	trans.commit();
 	return true;
