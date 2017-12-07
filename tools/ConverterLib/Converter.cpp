@@ -101,7 +101,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str()))
 	{
 		// se if stale.
-		if (db_.IsAssetStale(assetId)) {
+		if (!db_.IsAssetStale(assetId)) {
 			X_LOG1("Converter", "Skipping conversion, asset is not stale");
 			return true;
 		}

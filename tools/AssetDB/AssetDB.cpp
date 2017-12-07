@@ -2496,14 +2496,14 @@ bool AssetDB::IsAssetStale(AssetId assetId)
 	const auto it = qry.begin();
 
 	if (it == qry.end()) {
-		return false;
+		return true;
 	}
 
 	auto row = *it;
 
 	// ever compiled?
 	if (row.columnType(0) == sql::ColumType::SNULL) {
-		return false;
+		return true;
 	}
 
 	const int32_t compiledHash = row.get<int32_t>(0);
@@ -2514,7 +2514,7 @@ bool AssetDB::IsAssetStale(AssetId assetId)
 	// work out if somethings changed.
 	const int32_t mergedHash = core::Crc32::Combine(argsHash, rawFileHash, rawFileSize);
 	
-	return mergedHash == compiledHash;
+	return mergedHash != compiledHash;
 }
 
 bool AssetDB::OnAssetCompiled(AssetId assetId)
