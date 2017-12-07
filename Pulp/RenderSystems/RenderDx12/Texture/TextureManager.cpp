@@ -349,7 +349,7 @@ X_NAMESPACE_BEGIN(texture)
 		texResource.SlicePitch = texResource.RowPitch * pTex->getHeight();
 
 		// allocate a temp buffer that will get deleted after fence reached..
-		auto buf = contex.AllocUploadBuffer(uploadBufSize);
+		auto buf = contex.AllocUploadBuffer(safe_static_cast<size_t>(uploadBufSize));
 
 		contex.transitionResource(dest, D3D12_RESOURCE_STATE_COPY_DEST, true);
 		contex.updateSubresources<1>(pDevice_, dest, buf.getBuffer().getResource(), 0, 0, 1, &texResource);
