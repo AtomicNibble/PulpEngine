@@ -1487,6 +1487,8 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
 		return Result::ERROR;
 	}
 
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")();
+
 	// do we have any refs ?
 	uint32_t numRefs;
 	if (!GetAssetRefCount(assetId, numRefs)) {
@@ -1583,6 +1585,8 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 	if (AssetExsists(type, newName)) {
 		return Result::NAME_TAKEN; 
 	}
+
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")();
 
 	// check for raw assets that need renaming to keep things neat.
 	{
@@ -1998,6 +2002,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 		return Result::NOT_FOUND;
 	}
 
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name);
+
 	core::string args(argsOpt);
 
 	if (!MergeArgs(assetId, args)) {
@@ -2040,6 +2046,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 		return Result::NOT_FOUND;
 	}
 
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name);
+
 	return UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
 }
 
@@ -2078,6 +2086,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 	if (!AssetExsists(type, name, &assetId)) {
 		return Result::NOT_FOUND;
 	}
+
+	X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name);
 
 	return UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
 }
