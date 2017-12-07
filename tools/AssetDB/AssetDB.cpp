@@ -1790,7 +1790,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetId assetId, const DataArr
 	// we make use of the asset name and type, so the main logic is in that one.
 	AssetInfo info;
 
-	if (GetAssetInfoForAsset(assetId, info)) {
+	if (!GetAssetInfoForAsset(assetId, info)) {
 		return Result::ERROR;
 	}
 
