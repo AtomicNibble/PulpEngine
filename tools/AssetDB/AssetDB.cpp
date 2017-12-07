@@ -865,7 +865,7 @@ bool AssetDB::ProfileExsists(const core::string& name, ProfileId* pProfileId)
 		return false;
 	}
 	if (pProfileId) {
-		*pProfileId = (*it).get<int32_t>(0);
+		*pProfileId = safe_static_cast<ProfileId>((*it).get<int32_t>(0));
 	}
 
 	return true;
