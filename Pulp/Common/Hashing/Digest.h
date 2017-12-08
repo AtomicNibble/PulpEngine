@@ -8,7 +8,7 @@ namespace Hash
 	struct DigestBase
 	{
 	protected:
-		static const char* ToString(char* pBuf, const uint8_t* pDigest, size_t numBytes);
+		static const char* ToString(char* pBuf, size_t bufSize, const uint8_t* pDigest, size_t numBytes);
 	};
 
 	template<size_t NumBytes>
@@ -25,7 +25,7 @@ namespace Hash
 		}
 
 		X_INLINE const char* ToString(String& buf) const {
-			return DigestBase::ToString(buf, bytes, NumBytes);
+			return DigestBase::ToString(buf, sizeof(buf), bytes, NumBytes);
 		}
 
 		X_INLINE bool operator ==(const Digest& oth) const {

@@ -7,8 +7,10 @@ X_NAMESPACE_BEGIN(core)
 namespace Hash
 {
 	
-	const char* DigestBase::ToString(char* pBuf, const uint8_t* pDigest, size_t numBytes)
+	const char* DigestBase::ToString(char* pBuf, size_t bufSize, const uint8_t* pDigest, size_t numBytes)
 	{
+		X_ASSERT(bufSize >= ((numBytes * 2) + 1), "Buffer too small")(bufSize, numBytes);
+
 		const char hexDigits[] = { "0123456789abcdef" };
 
 		for (int32_t hashByte = static_cast<int32_t>(numBytes); --hashByte >= 0;)
