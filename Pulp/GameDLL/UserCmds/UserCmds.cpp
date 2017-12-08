@@ -209,11 +209,11 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
 	auto ub = getUserButton(key);
 	if (down)
 	{
-		buttonStates_[ub]++;
+		++buttonStates_[ub];
 	}
 	else
 	{
-		buttonStates_[ub]--;
+		--buttonStates_[ub];
 
 		if (buttonStates_[ub] < 0) {
 			buttonStates_[ub] = 0;
