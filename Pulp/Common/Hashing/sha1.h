@@ -20,8 +20,8 @@ namespace Hash
 		~SHA1();
 
 		void reset(void);
-		void update(const void* buf, size_t length);
-		void update(const char* str);
+		void update(const void* pBuf, size_t length);
+		void update(const char* pStr);
 
 		template<typename T>
 		void update(const T& obj) {

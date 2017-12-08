@@ -58,21 +58,21 @@ namespace Hash
 		numBytes_ = 0;
 	}
 
-	void SHA1::update(const void* buf, size_t length)
+	void SHA1::update(const void* pBuf, size_t length)
 	{
 		size_t index = numBytes_ % BLOCK_BYTES;
 		size_t firstpart = BLOCK_BYTES - index;
 		size_t i;
 
-		const uint8_t* input = reinterpret_cast<const uint8_t*>(buf);
+		const uint8_t* pInput = reinterpret_cast<const uint8_t*>(pBuf);
 
 		if (length >= firstpart)
 		{
-			memcpy(&buffer_[index], input, firstpart);
+			memcpy(&buffer_[index], pInput, firstpart);
 			transform(buffer_);
 
 			for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
-				transform(&input[i]);
+				transform(&pInput[i]);
 			}
 
 			index = 0;
@@ -84,12 +84,12 @@ namespace Hash
 
 		numBytes_ += length;
 
-		memcpy(&buffer_[index], &input[i], length - i);
+		memcpy(&buffer_[index], &pInput[i], length - i);
 	}
 
-	void SHA1::update(const char* str)
+	void SHA1::update(const char* pStr)
 	{
-		update(reinterpret_cast<const void*>(str), ::strlen(str));
+		update(reinterpret_cast<const void*>(pStr), core::strUtil::strlen(pStr));
 	}
 
 	SHA1Digest SHA1::finalize(void)
@@ -114,10 +114,9 @@ namespace Hash
 		numBits[1] = _byteswap_ulong(static_cast<uint32_t>(size));
 		update(numBits, 8);
 
-		for (size_t i = 0; i < 20; ++i)
+		for (int32_t i = 0; i < 20; ++i)
 		{
-			res.bytes[i] = static_cast<uint8_t>((digest_[i >> 2] >> ((3 -
-				(i & 3)) * 8)) & 0xFF);
+			res.bytes[i] = static_cast<uint8_t>((digest_[i >> 2] >> ((3 - (i & 3)) * 8)) & 0xFF);
 		}
 
 		reset();

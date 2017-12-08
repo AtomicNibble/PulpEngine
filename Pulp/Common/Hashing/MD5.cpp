@@ -104,18 +104,18 @@ void MD5::reset(void)
 	zero_object(buffer_);
 }
 
-void MD5::update(const char* str)
+void MD5::update(const char* pStr)
 {
-	size_t length = strlen(str);
-	update(reinterpret_cast<const unsigned char*>(str), length);
+	size_t length = core::strUtil::strlen(pStr);
+	update(reinterpret_cast<const unsigned char*>(pStr), length);
 }
 
-void MD5::update(const char* buf, size_t length)
+void MD5::update(const char* pBuf, size_t length)
 {	
-	update(reinterpret_cast<const unsigned char*>(buf), length);
+	update(reinterpret_cast<const unsigned char*>(pBuf), length);
 }
 
-void MD5::update(const uint8_t* input, size_t length)
+void MD5::update(const uint8_t* pInput, size_t length)
 {
 	// compute number of bytes mod 64
 	size_t index = count_[0] / 8 % blocksize;
@@ -135,12 +135,12 @@ void MD5::update(const uint8_t* input, size_t length)
 	if (length >= firstpart)
 	{
 		// fill buffer_ first, transform
-		memcpy(&buffer_[index], input, firstpart);
+		memcpy(&buffer_[index], pInput, firstpart);
 		transform(buffer_);
 
 		// transform chunks of blocksize (64 bytes)
 		for (i = firstpart; i + blocksize <= length; i += blocksize) {
-			transform(&input[i]);
+			transform(&pInput[i]);
 		}
 
 		index = 0;
@@ -151,7 +151,7 @@ void MD5::update(const uint8_t* input, size_t length)
 	}
 
 	// buffer_ remaining input
-	memcpy(&buffer_[index], &input[i], length - i);
+	memcpy(&buffer_[index], &pInput[i], length - i);
 }
 
 MD5Digest& MD5::finalize(void)
@@ -277,23 +277,23 @@ void MD5::transform(const uint8_t block[blocksize])
 }
 
 
-void MD5::decode(uint32_t* output, const uint8_t* input, size_t len)
+void MD5::decode(uint32_t* pOutput, const uint8_t* pInput, size_t len)
 {
-	for (unsigned int i = 0, j = 0; j < len; i++, j += 4)
-		output[i] = ((uint32_t)input[j]) | (((uint32_t)input[j + 1]) << 8) |
-		(((uint32_t)input[j + 2]) << 16) | (((uint32_t)input[j + 3]) << 24);
+	for (size_t i = 0, j = 0; j < len; i++, j += 4)
+		pOutput[i] = ((uint32_t)pInput[j]) | (((uint32_t)pInput[j + 1]) << 8) |
+		(((uint32_t)pInput[j + 2]) << 16) | (((uint32_t)pInput[j + 3]) << 24);
 }
 
 
 // encodes input (uint32) into output (unsigned char). Assumes len is
 // a multiple of 4.
-void MD5::encode(uint8_t* output, const uint32_t* input, size_t len)
+void MD5::encode(uint8_t* pOutput, const uint32_t* pInput, size_t len)
 {
 	for (size_t i = 0, j = 0; j < len; i++, j += 4) {
-		output[j] = input[i] & 0xff;
-		output[j + 1] = (input[i] >> 8) & 0xff;
-		output[j + 2] = (input[i] >> 16) & 0xff;
-		output[j + 3] = (input[i] >> 24) & 0xff;
+		pOutput[j] = pInput[i] & 0xff;
+		pOutput[j + 1] = (pInput[i] >> 8) & 0xff;
+		pOutput[j + 2] = (pInput[i] >> 16) & 0xff;
+		pOutput[j + 3] = (pInput[i] >> 24) & 0xff;
 	}
 }
 

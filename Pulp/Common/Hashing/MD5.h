@@ -19,9 +19,9 @@ namespace Hash
 		~MD5();
 
 		void reset(void);
-		void update(const uint8_t* buf, size_t length);
-		void update(const char* buf, size_t length);
-		void update(const char* str);
+		void update(const uint8_t* pBuf, size_t length);
+		void update(const char* pBuf, size_t length);
+		void update(const char* pStr);
 
 		MD5Digest& finalize(void);
 
@@ -29,8 +29,8 @@ namespace Hash
 		static const int blocksize = 64;
 
 		void transform(const uint8_t block[blocksize]);
-		static void decode(uint32_t* output, const uint8_t* input, size_t len);
-		static void encode(uint8_t* output, const uint32_t* input, size_t len);
+		static void decode(uint32_t* output, const uint8_t* pInput, size_t len);
+		static void encode(uint8_t* output, const uint32_t* pInput, size_t len);
 
 	private:
 		uint32_t state_[4];
