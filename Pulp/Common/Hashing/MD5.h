@@ -29,8 +29,8 @@ namespace Hash
 		static const int blocksize = 64;
 
 		void transform(const uint8_t block[blocksize]);
-		static void decode(uint32_t* output, const uint8_t* pInput, size_t len);
-		static void encode(uint8_t* output, const uint32_t* pInput, size_t len);
+		static void decode(uint32_t* pOutput, const uint8_t* pInput, size_t len);
+		static void encode(uint8_t* pOutput, const uint32_t* pInput, size_t len);
 
 	private:
 		uint32_t state_[4];
