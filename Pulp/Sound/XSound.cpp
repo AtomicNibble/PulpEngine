@@ -1382,7 +1382,7 @@ AkBankID XSound::getBankId(const char* pName) const
 	name.toLower();
 	name.removeExtension();
 
-	return GetIDFromStr(name.c_str());
+	return getIDFromStr(name.c_str());
 }
 
 XSound::Bank* XSound::getBankForID(AkBankID id)

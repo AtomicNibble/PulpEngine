@@ -51,7 +51,7 @@ namespace weapon
 		// build the sound event hashes.
 		for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++) {
 			if (hdr_.sndSlots[i] != 0) {
-				soundHashes_[i] = sound::GetIDFromStr(getSoundSlot(static_cast<SoundSlot::Enum>(i)));
+				soundHashes_[i] = sound::getIDFromStr(getSoundSlot(static_cast<SoundSlot::Enum>(i)));
 			}
 		}
 
