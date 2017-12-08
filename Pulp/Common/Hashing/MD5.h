@@ -3,31 +3,14 @@
 #ifndef X_HASH_MD5_H_
 #define X_HASH_MD5_H_
 
+#include "Digest.h"
 
 X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
-	struct MD5Digest
-	{
-		typedef char String[41];
 
-		MD5Digest();
-
-		const char* ToString(String& buf) const;
-
-		X_INLINE bool operator ==(const MD5Digest& oth) const {
-			return memcmp(data, oth.data, sizeof(data)) == 0;
-		}
-		X_INLINE bool operator !=(const MD5Digest& oth) const {
-			return !(*this == oth);
-		}
-
-		union {
-			uint8_t bytes[16];
-			uint32_t data[4];
-		};
-	};
+	typedef Digest<16> MD5Digest;
 
 	class MD5
 	{

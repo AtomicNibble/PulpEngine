@@ -35,28 +35,6 @@ namespace Hash
 //#pragma warning(push)
 //#pragma warning(disable: 4127)
 
-
-	SHA1Digest::SHA1Digest()
-	{
-		zero_this(this);
-	}
-
-	const char* SHA1Digest::ToString(String& buf) const
-	{
-		const char hexDigits[] = { "0123456789abcdef" };
-
-		const uint8_t* pBytes = bytes;
-
-		for (int hashByte = 20; --hashByte >= 0;)
-		{
-			buf[hashByte << 1] = hexDigits[(pBytes[hashByte] >> 4) & 0xf];
-			buf[(hashByte << 1) + 1] = hexDigits[pBytes[hashByte] & 0xf];
-		}
-
-		buf[40] = 0;
-		return buf;
-	}
-
 	// ---------------------------------------------------------
 
 	SHA1::SHA1()

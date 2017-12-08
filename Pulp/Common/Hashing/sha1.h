@@ -4,37 +4,14 @@
 #ifndef X_HASH_SHA1_H_
 #define X_HASH_SHA1_H_
 
+#include "Digest.h"
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
 
-	struct SHA1Digest
-	{
-		typedef char String[41];
-	public:
-		SHA1Digest();
-		SHA1Digest(const std::array<uint8_t, 20>& arr) {
-			std::memcpy(bytes, arr.data(), arr.size());
-		}
-
-		const char* ToString(String& buf) const;
-
-		X_INLINE bool operator ==(const SHA1Digest& oth) const {
-			return memcmp(data, oth.data, sizeof(data)) == 0;
-		}
-		X_INLINE bool operator !=(const SHA1Digest& oth) const {
-			return !(*this == oth);
-		}
-		void Clear(void) {
-			zero_this(this);
-		}
-
-		union {
-			uint8_t bytes[20];
-			uint32_t data[5];
-		};
-	};
+	typedef Digest<20> SHA1Digest;
 
 	class SHA1
 	{

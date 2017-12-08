@@ -77,28 +77,6 @@ namespace Hash
 	} // namespace
 
 
-
-MD5Digest::MD5Digest()
-{
-	zero_this(this);
-}
-
-const char* MD5Digest::ToString(String& buf) const
-{
-	const char hexDigits[] = { "0123456789abcdef" };
-
-	const uint8_t* pBytes = bytes;
-
-	for (int hashByte = 16; --hashByte >= 0;)
-	{
-		buf[hashByte << 1] = hexDigits[(pBytes[hashByte] >> 4) & 0xf];
-		buf[(hashByte << 1) + 1] = hexDigits[pBytes[hashByte] & 0xf];
-	}
-
-	buf[32] = 0;
-	return buf;
-}
-
 // ------------------------------------
 
 MD5::MD5()

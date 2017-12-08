@@ -145,6 +145,7 @@
     <ClInclude Include="Extension\XExtensionMacros.h" />
     <ClInclude Include="Hashing\Adler32.h" />
     <ClInclude Include="Hashing\crc32.h" />
+    <ClInclude Include="Hashing\Digest.h" />
     <ClInclude Include="Hashing\Fnva1Hash.h" />
     <ClInclude Include="Hashing\crc32.inl" />
     <ClInclude Include="Hashing\MD5.h" />
@@ -699,6 +700,7 @@
     </ClCompile>
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
+    <ClCompile Include="Hashing\Digest.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />

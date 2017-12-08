@@ -1285,6 +1285,9 @@
     <ClInclude Include="Containers\FixedByteStreamRing.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Hashing\Digest.h">
+      <Filter>Headers\Hashing</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2006,6 +2009,9 @@
     </ClCompile>
     <ClCompile Include="Buffer.cpp">
       <Filter>Interfaces_h\Render</Filter>
+    </ClCompile>
+    <ClCompile Include="Hashing\Digest.cpp">
+      <Filter>SourceFiles\Hashing</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

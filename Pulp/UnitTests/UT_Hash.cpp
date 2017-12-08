@@ -214,14 +214,22 @@ TEST(Hash, SHA512_blank)
 	Hash::SHA512Digest val, expected;
 	Hash::SHA512Digest::String str;
 
-	expected.data[0] = Endian::swap(0xcf83e1357eefb8bd);
-	expected.data[1] = Endian::swap(0xf1542850d66d8007);
-	expected.data[2] = Endian::swap(0xd620e4050b5715dc);
-	expected.data[3] = Endian::swap(0x83f4a921d36ce9ce);
-	expected.data[4] = Endian::swap(0x47d0d13c5d85f2b0);
-	expected.data[5] = Endian::swap(0xff8318d2877eec2f);
-	expected.data[6] = Endian::swap(0x63b931bd47417a81);
-	expected.data[7] = Endian::swap(0xa538327af927da3e);
+	expected.data[0] = Endian::swap(0xcf83e135);
+	expected.data[1] = Endian::swap(0x7eefb8bd);
+	expected.data[2] = Endian::swap(0xf1542850);
+	expected.data[3] = Endian::swap(0xd66d8007);
+	expected.data[4] = Endian::swap(0xd620e405);
+	expected.data[5] = Endian::swap(0x0b5715dc);
+	expected.data[6] = Endian::swap(0x83f4a921);
+	expected.data[7] = Endian::swap(0xd36ce9ce);
+	expected.data[8] = Endian::swap(0x47d0d13c);
+	expected.data[9] = Endian::swap(0x5d85f2b0);
+	expected.data[10] = Endian::swap(0xff8318d2);
+	expected.data[11] = Endian::swap(0x877eec2f);
+	expected.data[12] = Endian::swap(0x63b931bd);
+	expected.data[13] = Endian::swap(0x47417a81);
+	expected.data[14] = Endian::swap(0xa538327a);
+	expected.data[15] = Endian::swap(0xf927da3e);
 
 	Hash::SHA512 sha512;
 	sha512.update("");
@@ -239,14 +247,22 @@ TEST(Hash, SHA512_abc)
 	Hash::SHA512Digest val, expected;
 	Hash::SHA512Digest::String str;
 
-	expected.data[0] = Endian::swap(0xddaf35a193617aba);
-	expected.data[1] = Endian::swap(0xcc417349ae204131);
-	expected.data[2] = Endian::swap(0x12e6fa4e89a97ea2);
-	expected.data[3] = Endian::swap(0x0a9eeee64b55d39a);
-	expected.data[4] = Endian::swap(0x2192992a274fc1a8);
-	expected.data[5] = Endian::swap(0x36ba3c23a3feebbd);
-	expected.data[6] = Endian::swap(0x454d4423643ce80e);
-	expected.data[7] = Endian::swap(0x2a9ac94fa54ca49f);
+	expected.data[0] = Endian::swap(0xddaf35a1);
+	expected.data[1] = Endian::swap(0x93617aba);
+	expected.data[2] = Endian::swap(0xcc417349);
+	expected.data[3] = Endian::swap(0xae204131);
+	expected.data[4] = Endian::swap(0x12e6fa4e); 
+	expected.data[5] = Endian::swap(0x89a97ea2);
+	expected.data[6] = Endian::swap(0x0a9eeee6); 
+	expected.data[7] = Endian::swap(0x4b55d39a);
+	expected.data[8] = Endian::swap(0x2192992a); 
+	expected.data[9] = Endian::swap(0x274fc1a8);
+	expected.data[10] = Endian::swap(0x36ba3c23); 
+	expected.data[11] = Endian::swap(0xa3feebbd);
+	expected.data[12] = Endian::swap(0x454d4423);
+	expected.data[13] = Endian::swap(0x643ce80e);
+	expected.data[14] = Endian::swap(0x2a9ac94f); 
+	expected.data[15] = Endian::swap(0xa54ca49f);
 
 	Hash::SHA512 sha512;
 	sha512.update("abc");
@@ -264,14 +280,22 @@ TEST(Hash, SHA512_896)
 	Hash::SHA512Digest val, expected;
 	Hash::SHA512Digest::String str;
 
-	expected.data[0] = Endian::swap(0x8e959b75dae313da);
-	expected.data[1] = Endian::swap(0x8cf4f72814fc143f);
-	expected.data[2] = Endian::swap(0x8f7779c6eb9f7fa1);
-	expected.data[3] = Endian::swap(0x7299aeadb6889018);
-	expected.data[4] = Endian::swap(0x501d289e4900f7e4);
-	expected.data[5] = Endian::swap(0x331b99dec4b5433a);
-	expected.data[6] = Endian::swap(0xc7d329eeb6dd2654);
-	expected.data[7] = Endian::swap(0x5e96e55b874be909);
+	expected.data[0] = Endian::swap(0x8e959b75);
+	expected.data[1] = Endian::swap(0xdae313da);
+	expected.data[2] = Endian::swap(0x8cf4f728);
+	expected.data[3] = Endian::swap(0x14fc143f);
+	expected.data[4] = Endian::swap(0x8f7779c6);
+	expected.data[5] = Endian::swap(0xeb9f7fa1);
+	expected.data[6] = Endian::swap(0x7299aead);
+	expected.data[7] = Endian::swap(0xb6889018);
+	expected.data[8] = Endian::swap(0x501d289e);
+	expected.data[9] = Endian::swap(0x4900f7e4);
+	expected.data[10] = Endian::swap(0x331b99de);
+	expected.data[11] = Endian::swap(0xc4b5433a);
+	expected.data[12] = Endian::swap(0xc7d329ee);
+	expected.data[13] = Endian::swap(0xb6dd2654);
+	expected.data[14] = Endian::swap(0x5e96e55b);
+	expected.data[15] = Endian::swap(0x874be909);
 
 	Hash::SHA512 sha512;
 	sha512.update("abcdefghbcdefghicdefghijdefghijkefghijklfghijklmghijklmnhi"
@@ -291,14 +315,22 @@ TEST(Hash, SHA512_1000000)
 	Hash::SHA512Digest val, expected;
 	Hash::SHA512Digest::String str;
 
-	expected.data[0] = Endian::swap(0xe718483d0ce76964);
-	expected.data[1] = Endian::swap(0x4e2e42c7bc15b463);
-	expected.data[2] = Endian::swap(0x8e1f98b13b204428);
-	expected.data[3] = Endian::swap(0x5632a803afa973eb);
-	expected.data[4] = Endian::swap(0xde0ff244877ea60a);
-	expected.data[5] = Endian::swap(0x4cb0432ce577c31b);
-	expected.data[6] = Endian::swap(0xeb009c5c2c49aa2e);
-	expected.data[7] = Endian::swap(0x4eadb217ad8cc09b);
+	expected.data[0] = Endian::swap(0xe718483d);
+	expected.data[1] = Endian::swap(0x0ce76964);
+	expected.data[2] = Endian::swap(0x4e2e42c7);
+	expected.data[3] = Endian::swap(0xbc15b463);
+	expected.data[4] = Endian::swap(0x8e1f98b1);
+	expected.data[5] = Endian::swap(0x3b204428);
+	expected.data[6] = Endian::swap(0x5632a803);
+	expected.data[7] = Endian::swap(0xafa973eb);
+	expected.data[8] = Endian::swap(0xde0ff244);
+	expected.data[9] = Endian::swap(0x877ea60a);
+	expected.data[10] = Endian::swap(0x4cb0432c);
+	expected.data[11] = Endian::swap(0xe577c31b);
+	expected.data[12] = Endian::swap(0xeb009c5c);
+	expected.data[13] = Endian::swap(0x2c49aa2e);
+	expected.data[14] = Endian::swap(0x4eadb217);
+	expected.data[15] = Endian::swap(0xad8cc09b);
 
 	Hash::SHA512 sha512;
 

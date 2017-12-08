@@ -82,28 +82,6 @@ namespace Hash
 		0x5fcb6fab3ad6faecULL, 0x6c44198c4a475817ULL,
 	};
 
-
-	SHA512Digest::SHA512Digest()
-	{
-		zero_this(this);
-	}
-
-	const char* SHA512Digest::ToString(String& buf) const
-	{
-		const char hexDigits[] = { "0123456789abcdef" };
-
-		const uint8_t* pBytes = reinterpret_cast<const uint8_t*>(data);
-
-		for (int hashByte = 64; --hashByte >= 0;)
-		{
-			buf[hashByte << 1] = hexDigits[(pBytes[hashByte] >> 4) & 0xf];
-			buf[(hashByte << 1) + 1] = hexDigits[pBytes[hashByte] & 0xf];
-		}
-
-		buf[64 * 2] = 0;
-		return buf;
-	}
-
 	// ---------------------------------------------------------
 
 	SHA512::SHA512()

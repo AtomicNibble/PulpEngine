@@ -4,34 +4,14 @@
 #ifndef X_HASH_SHA512_H_
 #define X_HASH_SHA512_H_
 
+#include "Digest.h"
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
 
-	struct SHA512Digest
-	{
-		typedef char String[132];
-
-	public:
-		SHA512Digest();
-		const char* ToString(String& buf) const;
-
-		X_INLINE bool operator ==(const SHA512Digest& oth) const {
-			return memcmp(data, oth.data, sizeof(data)) == 0;
-		}
-		X_INLINE bool operator !=(const SHA512Digest& oth) const {
-			return !(*this == oth);
-		}
-		X_INLINE void Clear(void) {
-			zero_this(this);
-		}
-
-		union {
-			uint8_t bytes[64];
-			uint64_t data[8];
-		};
-	};
+	typedef Digest<64> SHA512Digest;
 
 	class SHA512
 	{
