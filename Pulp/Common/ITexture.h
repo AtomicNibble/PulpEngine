@@ -179,58 +179,6 @@ X_DECLARE_ENUM(ImgFileFormat) (
 );
 
 /*
-We can request a texture and one is always returned.
-it may point to the deafault texture.
-
-then we can request it to be loaded.
-this will attempt to find the file and load it into memory.
-
-but rendering is still safe, since a texture object will always point to
-a texture be it default or the real one.
-
-we support loading of many diffrent formats, in dev mode.
-to make working on things quicker.
-
-how to find out what format img X is currently be saved as.
-
-Possible strats:
-
-1.  define a order of loading for images:
-	EG: .ci .dds .tga .psd
-
-	then load which ever one we find first.
-
-	this has the problem of if they have made a .ci version that will be loaded.
-	instead of the one they are updating.
-	
-	maybe do reverse order:
-
-	.psd .tga .dds .ci
-
-	that means anytime there is a psd that will be loaded, if not .ci is loaded.
-	and when they want to release we switch to .ci loading only.
-
-2.  since a image is only used from a material.
-	we could maybe store the format they first added the image as.
-
-	then just check if we can find that format.
-
-	this has the problem of if they switch format they will need to update the 
-	material.
-
-Summary:
-
-	if we use order loading of images, people might get confused if they change format
-	and old format is getting loaded, meaning they will have to delete it.
-
-	which would mean they would have to be aware of the order formats are looked for.
-	so I think it's best to make it so they have to update the material, at the cost of 
-	a extra step we help remove a 'scratches head' momments for dev's.
-
-	This step also only has to be done when they want to change the format
-	the image is AFTER they have previously created the material, so the issues is
-	small.
-
 Streaming:
 
 some images can be streamed in, not all since it don't make sense to stream.
@@ -265,8 +213,6 @@ What are the downsides?
 
 1. if we are storing another image where the small mips use to be, and we are wanting
 	to start using the smaller mips, we are going to have to put the old image back
-	very quickly otherwise we could have what i'm gonna call 'cherry-pop' where a
-	diffrent texture is beening used untill old data is placed back.
 
 	a potential solution could be to force the gpu to use the higer images
 	untill we have got the correct small mips back into memory.
@@ -280,52 +226,6 @@ block 1 in vram again.
 bacon for thought...
 
 :::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-we refrrence textures by name, but can we also do a id system?
-to work along side the names for better speed, but still able to print names 
-for convience.
-
-we could store it's hash to save computing it.
-
-IdSystem:
-
-if we do id's we should do 32bit ones giving us 4mill possible asset id's.
-might not be enougth HUHUHUH. 
-
-but then what is going to provide these id's?
-
-I guess we can load a texture by name then once loaded it's assigned a ID.
-which means we load by name but can then just use the id of the texture.
-
-we could just keep a pointer to the interface but we save 4 bytes on 64bit
-and virtual calls, by using a 32bit id.
-
-so the answer is the resource manager will give us the ID.
-
-which we then can use to render, WHOOP.
-
-:::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
-
-
-we have difrrent texuture objects.
-
-* FileTexuture: XTextureFile
-		this is a texture we have loaded from a file.
-
-		and of hte loaders must return a object of this type.
-		we then use this to make a Device Texture.
-
-* Device texture: -> XTexture
-		This texture is on the GPU device.
-		it can be binded and used for rendering.
-
-
-The code for handling the textures is common code,
-only the code for diffrent API will be diffrent.
-
-so we could split the deffinition between 2 files one for common stuff,
-another has the API shizz, gonna have to change my folder structure a bit.
-
 
 */
 
