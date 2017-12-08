@@ -14,6 +14,8 @@ namespace Hash
 
 	class MD5
 	{
+		static const int blocksize = 64;
+
 	public:
 		MD5();
 		~MD5();
@@ -26,7 +28,6 @@ namespace Hash
 		MD5Digest& finalize(void);
 
 	private:
-		static const int blocksize = 64;
 
 		void transform(const uint8_t block[blocksize]);
 		static void decode(uint32_t* pOutput, const uint8_t* pInput, size_t len);

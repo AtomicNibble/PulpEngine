@@ -15,6 +15,10 @@ namespace Hash
 
 	class SHA1
 	{
+		static const uint32_t DIGEST_INTS = 5;
+		static const uint32_t BLOCK_INTS = 16;
+		static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
+
 	public:
 		SHA1();
 		~SHA1();
@@ -31,13 +35,9 @@ namespace Hash
 		SHA1Digest finalize(void);
 
 	private:
-		static const uint32_t DIGEST_INTS = 5;
-		static const uint32_t BLOCK_INTS = 16;
-		static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
-
-	private:
 		void transform(const uint8_t* pBuffer);
 
+	private:
 		uint8_t buffer_[BLOCK_BYTES];
 
 		union
