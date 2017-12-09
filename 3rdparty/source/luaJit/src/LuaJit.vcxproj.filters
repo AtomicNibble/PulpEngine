@@ -375,4 +375,48 @@
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
+  <ItemGroup>
+    <Object Include="lj_vm.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_aux.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_base.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_bit.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_debug.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_ffi.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_init.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_io.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_jit.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_math.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_os.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_package.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_string.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+    <Object Include="lib_table.obj">
+      <Filter>Source Files</Filter>
+    </Object>
+  </ItemGroup>
 </Project>
