@@ -347,8 +347,19 @@ LUALIB_API lua_State *luaL_newstate(void)
 LUA_API lua_State *lua_newstate(lua_Alloc f, void *ud)
 {
   UNUSED(f); UNUSED(ud);
+#if 1 // TOM: enable custom 64-bit allocators.
+
+  lua_State *L;
+  L = lj_state_newstate(f, ud);
+  if (L) {
+	  G(L)->panic = panic;
+  }
+  return L;
+
+#else
   fputs("Must use luaL_newstate() for 64 bit target\n", stderr);
   return NULL;
+#endif
 }
 #endif
 
