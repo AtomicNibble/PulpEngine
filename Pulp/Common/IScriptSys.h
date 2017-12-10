@@ -10,10 +10,15 @@ X_NAMESPACE_BEGIN(script)
 static const char* X_SCRIPT_FILE_EXTENSION = "lua";
 
 
-X_DECLARE_ENUM(ScriptMoudles)(
+X_DECLARE_ENUM(Moudles)(
+	GLOBAL,
 	CORE, 
 	SCRIPT, 
 	SOUND, 
+	GAME,
+	PHYSICS,
+	NETWORK,
+	VIDEO,
 	IO
 );
 
@@ -47,26 +52,16 @@ static const ScriptFunctionHandle INVALID_HANLDE = 0;
 
 // note this is a union not a struct
 // Used for storing full range int's in lua.
-union ScriptHandle
+union Handle
 {
-	ScriptHandle() : pPtr(0) {}
-	ScriptHandle(size_t i) : id(i) {}
-	ScriptHandle(void* p) : pPtr(p) {}
+	Handle() : pPtr(0) {}
+	Handle(size_t i) : id(i) {}
+	Handle(void* p) : pPtr(p) {}
 
 	size_t id;
 	void* pPtr;
 };
 
-//	ScriptValue(bool, int) : type_(Type::BOOLEAN) {};
-//	ScriptValue(int, int) : type_(Type::NUMBER) {};
-//	ScriptValue(unsigned int, int) : type_(Type::NUMBER) {};
-//	ScriptValue(float, int) : type_(Type::NUMBER) {};
-//	ScriptValue(const char*, int) : type_(Type::STRING) {};
-//	ScriptValue(IScriptTable*, int);
-//	ScriptValue(HSCRIPTFUNCTION, int) : type_(Type::FUNCTION) {};
-//	ScriptValue(ScriptHandle value, int) : type_(Type::HANDLE) { X_UNUSED(value); };
-//	ScriptValue(const Vec3f&, int) : type_(Type::VECTOR) {};
-//	ScriptValue(const SmartScriptTable &value, int);
 
 template<typename T>
 struct ValueType {
@@ -103,7 +98,7 @@ struct ValueType<ScriptFunctionHandle> {
 	static const Type::Enum Type = Type::FUNCTION;
 };
 template<>
-struct ValueType<ScriptHandle> {
+struct ValueType<Handle> {
 	static const Type::Enum Type = Type::HANDLE;
 };
 template<>
@@ -131,7 +126,7 @@ struct ScriptValue
 	X_INLINE ScriptValue(const char* pValue);
 	X_INLINE ScriptValue(IScriptTable* pTable_);
 	X_INLINE ScriptValue(ScriptFunctionHandle function);
-	X_INLINE ScriptValue(ScriptHandle value);
+	X_INLINE ScriptValue(Handle value);
 	X_INLINE ScriptValue(const Vec3f& vec);
 	X_INLINE ScriptValue(const SmartScriptTable& value);
 	X_INLINE ScriptValue(Type::Enum type);
@@ -152,7 +147,7 @@ struct ScriptValue
 	X_INLINE bool CopyTo(float& value) const;
 	X_INLINE bool CopyTo(const char* &value) const;
 	X_INLINE bool CopyTo(char* &value) const;
-	X_INLINE bool CopyTo(ScriptHandle &value) const;
+	X_INLINE bool CopyTo(Handle &value) const;
 	X_INLINE bool CopyTo(ScriptFunctionHandle &value) const;
 	X_INLINE bool CopyTo(Vec3f& value) const;
 	X_INLINE bool CopyTo(IScriptTable*& value) const;
@@ -186,6 +181,7 @@ struct IScriptSys : public core::IEngineSysBase
 
 	virtual void Update(void) X_ABSTRACT;
 
+	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_ABSTRACT;
 
 	// you must release function handles.
 	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_ABSTRACT;
@@ -276,79 +272,37 @@ struct IScriptSys : public core::IEngineSysBase
 struct IFunctionHandler
 {
 	virtual ~IFunctionHandler() {}
-	// Summary:
-	//	 Returns pointer to the script system.
-	virtual IScriptSys* GetIScriptSystem() X_ABSTRACT;
+	
+	virtual IScriptSys* getIScriptSystem(void) X_ABSTRACT;
 
-	virtual void* GetThis() X_ABSTRACT;
-	virtual bool GetSelfAny(ScriptValue &any) X_ABSTRACT;
+	virtual void* getThis(void) X_ABSTRACT;
+	virtual const char* getFuncName(void) X_ABSTRACT;
 
-	// Description:
-	//    Retrieves the value of the self passed when calling the table.
-	// Notes:
-	//	  Always the 1st argument of the function.
+	virtual int32_t getParamCount(void) X_ABSTRACT;
+
+	virtual Type::Enum getParamType(int32_t idx) X_ABSTRACT;
+	virtual bool getSelfAny(ScriptValue& any) X_ABSTRACT;
+	virtual bool getParamAny(int32_t idx, ScriptValue& any) X_ABSTRACT;
+
+	virtual int32_t endFunctionAny(const ScriptValue& any) X_ABSTRACT;
+	virtual int32_t endFunctionAny(const ScriptValue& any1, const ScriptValue& any2) X_ABSTRACT;
+	virtual int32_t endFunctionAny(const ScriptValue& any1, const ScriptValue& any2, const ScriptValue& any3) X_ABSTRACT;
+
 	template <class T>
-	bool GetSelf(T &value)
-	{
-		ScriptValue any(value, 0);
-		return GetSelfAny(any) && any.CopyTo(value);
-	}
+	X_INLINE bool getSelf(T& value);
 
-	// Description:
-	//     Returns the function name of the currently called function.
-	// Notes:
-	//     Use this only used for error reporting.
-	virtual const char* GetFuncName() X_ABSTRACT;
-
-	// Description:
-	//    Gets the number of parameter at specified index passed by the Lua.
-	virtual int GetParamCount() X_ABSTRACT;
-
-	// Description:
-	//    Gets the type of the parameter at specified index passed by the Lua.
-	virtual Type::Enum GetParamType(int nIdx) X_ABSTRACT;
-
-	// Description:
-	//    Gets the nIdx param passed by the script.
-	// Arguments:
-	//    nIdx - 1-based index of the parameter.
-	//    val  - Reference to the C++ variable that will store the value.
-	virtual bool GetParamAny(int nIdx, ScriptValue &any) X_ABSTRACT;
-
-	// Description:
-	//    Get the nIdx param passed by the script.
-	// Arguments:
-	//    nIdx - 1-based index of the parameter.
-	//    val  - Reference to the C++ variable that will store the value.
 	template <typename T>
-	bool GetParam(int nIdx, T &value)
-	{
-		ScriptValue any(ValueType<T>::Type);
-		return GetParamAny(nIdx, any) && any.CopyTo(value);
-	}
+	X_INLINE bool getParam(int32_t idx, T &value);
 
-	// Description:
-	//    
-	virtual int EndFunctionAny(const ScriptValue& any) X_ABSTRACT;
-	virtual int EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2) X_ABSTRACT;
-	virtual int EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2, const ScriptValue& any3) X_ABSTRACT;
-	virtual int EndFunction() X_ABSTRACT;
+	X_INLINE int endFunction(void);
+	X_INLINE int endFunctionNull(void);
 
 	template <class T>
-	int EndFunction(const T &value) {
-		return EndFunctionAny(value);
-	}
+	X_INLINE int endFunction(const T &value);
 	template <class T1, class T2>
-	int EndFunction(const T1 &value1, const T2 &value2) { 
-		return EndFunctionAny(value1, value2); 
-	}
+	X_INLINE int endFunction(const T1 &value1, const T2 &value2);
 	template <class T1, class T2, class T3>
-	int EndFunction(const T1 &value1, const T2 &value2, const T3 &value3) { 
-		return EndFunctionAny(value1, value2, value3); 
-	}
-	int EndFunctionNull() {
-		return EndFunction(); 
-	}
+	X_INLINE int endFunction(const T1 &value1, const T2 &value2, const T3 &value3);
 
 };
 
@@ -536,18 +490,18 @@ struct IScriptTable
 	struct XUserFunctionDesc
 	{
 		XUserFunctionDesc() :
-			sFunctionName(""),
-			sFunctionParams(""),
-			sGlobalName(""),
+			pFunctionName(""),
+			pFunctionParams(""),
+			pGlobalName(""),
 			nParamIdOffset(0),
 			userDataSize(0),
 			pDataBuffer(nullptr),
 			pUserDataFunc(nullptr)
 		{}
 
-		const char* sFunctionName;			// Name of function.
-		const char* sFunctionParams;		// List of parameters (ex "nSlot,vDirection" ).
-		const char* sGlobalName;			// Name of global table (ex "Core")
+		const char* pFunctionName;			// Name of function.
+		const char* pFunctionParams;		// List of parameters (ex "nSlot,vDirection" ).
+		const char* pGlobalName;			// Name of global table (ex "Core")
 		ScriptFunction function;			// Pointer to simple function.
 		int   nParamIdOffset;				// Offset of the parameter to accept as 1st function argument.
 		int   userDataSize;

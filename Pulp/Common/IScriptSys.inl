@@ -56,7 +56,7 @@ X_INLINE ScriptValue::ScriptValue(ScriptFunctionHandle function) :
 	pFunction_ = function; 
 }
 
-X_INLINE ScriptValue::ScriptValue(ScriptHandle value) : 
+X_INLINE ScriptValue::ScriptValue(Handle value) :
 	type_(Type::HANDLE) 
 { 
 	pPtr_ = value.pPtr;
@@ -217,7 +217,7 @@ X_INLINE bool ScriptValue::CopyTo(char* &value) const
 	return false; 
 }
 
-X_INLINE bool ScriptValue::CopyTo(ScriptHandle &value) const 
+X_INLINE bool ScriptValue::CopyTo(Handle &value) const
 { 
 	if (type_ == Type::HANDLE) { 
 		value.pPtr = const_cast<void*>(pPtr_); 
@@ -284,5 +284,48 @@ X_INLINE bool IScriptSys::getGlobalValue(const char* pKey, T& value)
 }
 
 
+// ------------------------------------------------------------------------
+
+template <class T>
+X_INLINE bool IFunctionHandler::getSelf(T& value)
+{
+	ScriptValue any(value, 0);
+	return getSelfAny(any) && any.CopyTo(value);
+}
+
+template <typename T>
+X_INLINE bool IFunctionHandler::getParam(int32_t idx, T &value)
+{
+	ScriptValue any(ValueType<T>::Type);
+	return getParamAny(idx, any) && any.CopyTo(value);
+}
+
+X_INLINE int32_t IFunctionHandler::endFunction(void)
+{
+	return 0;
+}
+
+X_INLINE int32_t IFunctionHandler::endFunctionNull(void)
+{
+	return 0;
+}
+
+template <class T>
+X_INLINE int IFunctionHandler::endFunction(const T &value)
+{
+	return endFunctionAny(value);
+}
+
+template <class T1, class T2>
+X_INLINE int IFunctionHandler::endFunction(const T1 &value1, const T2 &value2)
+{
+	return endFunctionAny(value1, value2);
+}
+
+template <class T1, class T2, class T3>
+X_INLINE int IFunctionHandler::endFunction(const T1 &value1, const T2 &value2, const T3 &value3)
+{
+	return endFunctionAny(value1, value2, value3);
+}
 
 X_NAMESPACE_END

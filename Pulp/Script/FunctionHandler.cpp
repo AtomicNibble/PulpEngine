@@ -4,6 +4,15 @@
 
 X_NAMESPACE_BEGIN(script)
 
+using namespace lua;
+
+XFunctionHandler::XFunctionHandler(XScriptSys* pSS, lua_State* lState, const char* pFuncName, int32_t paramIdOffset)
+{
+	pSS_ = pSS;
+	L_ = lState;
+	pFuncName_ = pFuncName;
+	paramIdOffset_ = paramIdOffset;
+}
 
 
 XFunctionHandler::~XFunctionHandler()
@@ -11,111 +20,102 @@ XFunctionHandler::~XFunctionHandler()
 
 }
 
-IScriptSys* XFunctionHandler::GetIScriptSystem()
+IScriptSys* XFunctionHandler::getIScriptSystem()
 {
 	return pSS_;
 }
 
-void* XFunctionHandler::GetThis()
+void* XFunctionHandler::getThis(void)
 {
-	void *ptr = NULL;
+	void* pPtr = nullptr;
+
 	// Get implicit self table.
-	if (paramIdOffset_ > 0 && lua_type(L, 1) == LUA_TTABLE)
+	if (paramIdOffset_ > 0 && stack::get_type(L_, 1) == LUA_TTABLE)
 	{
 		// index "__this" member.
-		lua_pushstring(L, "__this");
-		lua_rawget(L, 1);
-		if (lua_type(L, -1) == LUA_TLIGHTUSERDATA)
-			ptr = const_cast<void*>(lua_topointer(L, -1));
-		lua_pop(L, 1); // pop result.
+		stack::pushliteral(L_, "__this");
+
+		lua_rawget(L_, 1);
+		if (stack::get_type(L_) == LUA_TLIGHTUSERDATA) {
+			pPtr = const_cast<void*>(stack::as_pointer(L_));
+		}
+
+		stack::pop(L_);
 	}
-	return ptr;
+
+	return pPtr;
 }
 
-bool XFunctionHandler::GetSelfAny(ScriptValue &any)
+bool XFunctionHandler::getSelfAny(ScriptValue &any)
 {
 	bool bRes = false;
-	if (paramIdOffset_ > 0)
-	{
-		bRes = pSS_->ToAny(any, 1);
+
+	if (paramIdOffset_ > 0) {
+		bRes = pSS_->toAny(any, 1);
 	}
+
 	return bRes;
 }
 
-const char* XFunctionHandler::GetFuncName()
+const char* XFunctionHandler::getFuncName(void)
 {
-	return sFuncName_;
+	return pFuncName_;
 }
 
-int XFunctionHandler::GetParamCount()
+int XFunctionHandler::getParamCount(void)
 {
-	return core::Max(lua_gettop(L) - paramIdOffset_, 0);
+	return core::Max(lua_gettop(L_) - paramIdOffset_, 0);
 }
 
-Type::Enum XFunctionHandler::GetParamType(int nIdx)
+Type::Enum XFunctionHandler::getParamType(int idx)
 {
-	int nRealIdx = nIdx + paramIdOffset_;
-	Type::Enum type = Type::NONE;
-	int luatype = lua_type(L, nRealIdx);
-	switch (luatype)
-	{
-		case LUA_TNIL: type = Type::NIL; break;
-		case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
-		case LUA_TNUMBER: type = Type::NUMBER; break;
-		case LUA_TSTRING: type = Type::STRING; break;
-		case LUA_TFUNCTION: type = Type::FUNCTION; break;
-		case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
-		case LUA_TTABLE: type = Type::TABLE; break;
+	const int realIdx = idx + paramIdOffset_;
+	const int luatype = stack::get_type(L_, realIdx);
+
+	return typeFormLua(luatype);
+}
+
+
+bool XFunctionHandler::getParamAny(int nIdx, ScriptValue &any)
+{
+	int realIdx = nIdx + paramIdOffset_;
+
+	if (pSS_->toAny(any, realIdx)) {
+		return true;
 	}
-	return type;
+
+
+	Type::Enum paramType = getParamType(nIdx);
+	const char* sParamType = Type::ToString(paramType);
+	const char* sType = Type::ToString(any.getType());
+	// Report wrong param.
+	X_WARNING("Script", "Wrong parameter type. Function %s expect parameter %d of type %s (Provided type %s)",
+		pFuncName_, nIdx, sType, sParamType);
+
+	//		pSS_->LogStackTrace();
+	return false;
 }
 
-
-bool XFunctionHandler::GetParamAny(int nIdx, ScriptValue &any)
+int XFunctionHandler::endFunctionAny(const ScriptValue& any)
 {
-	int nRealIdx = nIdx + paramIdOffset_;
-	bool bRes = pSS_->ToAny(any, nRealIdx);
-	if (!bRes)
-	{
-
-		Type::Enum paramType = GetParamType(nIdx);
-		const char* sParamType = Type::ToString(paramType);
-		const char* sType = Type::ToString(any.getType());
-		// Report wrong param.
-		X_WARNING("Script","Wrong parameter type. Function %s expect parameter %d of type %s (Provided type %s)", 
-			sFuncName_, nIdx, sType, sParamType);
-	
-//		pSS_->LogStackTrace();
-	}
-	return bRes;
-}
-
-int XFunctionHandler::EndFunctionAny(const ScriptValue& any)
-{
-	pSS_->PushAny(any);
+	pSS_->pushAny(any);
 	return (any.getType() == Type::NIL) ? 0 : 1;
 }
 
-int XFunctionHandler::EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2)
+int XFunctionHandler::endFunctionAny(const ScriptValue& any1, const ScriptValue& any2)
 {
-	pSS_->PushAny(any1);
-	pSS_->PushAny(any2);
+	pSS_->pushAny(any1);
+	pSS_->pushAny(any2);
 	return 2;
 }
 
-int XFunctionHandler::EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2,
+int XFunctionHandler::endFunctionAny(const ScriptValue& any1, const ScriptValue& any2,
 	const ScriptValue& any3)
 {
-	pSS_->PushAny(any1);
-	pSS_->PushAny(any2);
-	pSS_->PushAny(any3);
+	pSS_->pushAny(any1);
+	pSS_->pushAny(any2);
+	pSS_->pushAny(any3);
 	return 3;
 }
-
-int XFunctionHandler::EndFunction()
-{
-	return 0;
-}
-
 
 X_NAMESPACE_END

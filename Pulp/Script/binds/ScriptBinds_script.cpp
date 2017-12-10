@@ -45,13 +45,13 @@ int XBinds_Script::Load(IFunctionHandler* pH)
 //	bool reload = false;
 //	bool raiseError = true;
 	const char* fileName = nullptr;
-	if (pH->GetParam(1, fileName))
+	if (pH->getParam(1, fileName))
 	{
 	//	if (pScriptSys_->ExecuteFile(fileName, raiseError, reload)) {
-	//		return pH->EndFunction(1);
+	//		return pH->endFunction(1);
 	//	}
 	}
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Script::ReLoad(IFunctionHandler* pH)
@@ -59,13 +59,13 @@ int XBinds_Script::ReLoad(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* fileName = nullptr;
-	if (pH->GetParam(1, fileName))
+	if (pH->getParam(1, fileName))
 	{
 	//	if (pScriptSys_->ReloadScript(fileName, true)) {
-	//		return pH->EndFunction(1);
+	//		return pH->endFunction(1);
 	//	}
 	}
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Script::UnLoad(IFunctionHandler* pH)
@@ -73,14 +73,14 @@ int XBinds_Script::UnLoad(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* fileName = nullptr;
-	if (pH->GetParam(1, fileName))
+	if (pH->getParam(1, fileName))
 	{
 	//	if (pScriptSys_->UnLoadScript(fileName)) {
-	//		return pH->EndFunction(1);
+	//		return pH->endFunction(1);
 	//	}
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Script::ListLoaded(IFunctionHandler* pH)
@@ -89,7 +89,7 @@ int XBinds_Script::ListLoaded(IFunctionHandler* pH)
 
 //	pScriptSys_->ListLoadedScripts();
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 X_NAMESPACE_END

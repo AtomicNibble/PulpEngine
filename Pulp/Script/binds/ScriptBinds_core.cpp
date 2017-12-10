@@ -66,20 +66,20 @@ int XBinds_Core::GetDvarInt(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* varName = nullptr;
-	pH->GetParam(1, varName);
+	pH->getParam(1, varName);
 
 	core::ICVar* var = pConsole_->GetCVar(varName);
 
 	if (var)
 	{
-		return pH->EndFunction(var->GetInteger());
+		return pH->endFunction(var->GetInteger());
 	}
 	else
 	{
 		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
@@ -87,20 +87,20 @@ int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* varName = nullptr;
-	pH->GetParam(1, varName);
+	pH->getParam(1, varName);
 
 	core::ICVar* var = pConsole_->GetCVar(varName);
 
 	if (var)
 	{
-		return pH->EndFunction(var->GetFloat());
+		return pH->endFunction(var->GetFloat());
 	}
 	else
 	{
 		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::GetDvar(IFunctionHandler* pH)
@@ -108,23 +108,23 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* varName = nullptr;
-	pH->GetParam(1, varName);
+	pH->getParam(1, varName);
 
 	core::ICVar* var = pConsole_->GetCVar(varName);
 
 	if (var)
 	{
 		if (var->GetType() == core::VarFlag::INT)
-			return pH->EndFunction(var->GetInteger());
+			return pH->endFunction(var->GetInteger());
 		if (var->GetType() == core::VarFlag::FLOAT)
-			return pH->EndFunction(var->GetFloat());
+			return pH->endFunction(var->GetFloat());
 
 		{
 			core::ICVar::StrBuf strBuf;
 			if (var->GetType() == core::VarFlag::STRING)
-				return pH->EndFunction(var->GetString(strBuf));
+				return pH->endFunction(var->GetString(strBuf));
 			if (var->GetType() == core::VarFlag::COLOR)
-				return pH->EndFunction(var->GetString(strBuf));
+				return pH->endFunction(var->GetString(strBuf));
 		}
 	}
 	else
@@ -132,7 +132,7 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
 		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 
@@ -141,24 +141,24 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(2);
 
 	const char* varName = nullptr;
-	pH->GetParam(1, varName);
+	pH->getParam(1, varName);
 
 	core::ICVar* var = pConsole_->GetCVar(varName);
 
 	if (var)
 	{
-		Type::Enum type = pH->GetParamType(2);
+		Type::Enum type = pH->getParamType(2);
 
 		if (type == Type::NUMBER)
 		{
 			float fValue = 0;
-			pH->GetParam(2, fValue);
+			pH->getParam(2, fValue);
 			var->Set(fValue);
 		}
 		else if (type == Type::STRING)
 		{
 			const char* sValue = "";
-			pH->GetParam(2, sValue);
+			pH->getParam(2, sValue);
 			var->Set(sValue);
 		}
 	}
@@ -167,7 +167,7 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 		pScriptSys_->onScriptError("GetDvar Failed to fine dvar: \"%s\"", varName);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 
@@ -177,7 +177,7 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	ScriptValue value;
-	pH->GetParamAny(1,value);
+	pH->getParamAny(1,value);
 	switch (value.getType())
 	{
 		case Type::STRING:
@@ -188,12 +188,12 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 	}
 
 //	const char* str = nullptr;
-//	if (pH->GetParam(1, str))
+//	if (pH->getParam(1, str))
 //	{
 //		X_LOG0("Script", str);
 //	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::Warning(IFunctionHandler* pH)
@@ -201,12 +201,12 @@ int XBinds_Core::Warning(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* str = nullptr;
-	if (pH->GetParam(1, str))
+	if (pH->getParam(1, str))
 	{
 		X_WARNING("Script", str);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::Error(IFunctionHandler* pH)
@@ -214,12 +214,12 @@ int XBinds_Core::Error(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 
 	const char* str = nullptr;
-	if (pH->GetParam(1, str))
+	if (pH->getParam(1, str))
 	{
 		X_ERROR("Script", str);
 	}
 	
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 // -----------------------------------------------
@@ -231,13 +231,13 @@ int XBinds_Core::DrawLine(IFunctionHandler* pH)
 	Vec3f v0, v1;
 	Color fcol;
 
-	pH->GetParam(1,v0);
-	pH->GetParam(2,v1);
+	pH->getParam(1,v0);
+	pH->getParam(2,v1);
 
-	pH->GetParam(3, fcol.r);
-	pH->GetParam(4, fcol.g);
-	pH->GetParam(5, fcol.b);
-	pH->GetParam(6, fcol.a);
+	pH->getParam(3, fcol.r);
+	pH->getParam(4, fcol.g);
+	pH->getParam(5, fcol.b);
+	pH->getParam(6, fcol.a);
 
 	Color8u col(fcol);
 #if 1
@@ -249,7 +249,7 @@ int XBinds_Core::DrawLine(IFunctionHandler* pH)
 	pRenderAuxGeom->drawLine(v0, col, v1, col);
 #endif
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
@@ -259,8 +259,8 @@ int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
 	Vec3f v0, v1;
 	Color fcol;
 
-	pH->GetParam(1, v0);
-	pH->GetParam(2, v1);
+	pH->getParam(1, v0);
+	pH->getParam(2, v1);
 
 	const float c_Normalize2Dx(1.0f / 800.0f);
 	const float c_Normalize2Dy(1.0f / 600.0f);
@@ -269,10 +269,10 @@ int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
 	v1.x *= c_Normalize2Dx;
 	v1.y *= c_Normalize2Dy;
 
-	pH->GetParam(3, fcol.r);
-	pH->GetParam(4, fcol.g);
-	pH->GetParam(5, fcol.b);
-	pH->GetParam(6, fcol.a);
+	pH->getParam(3, fcol.r);
+	pH->getParam(4, fcol.g);
+	pH->getParam(5, fcol.b);
+	pH->getParam(6, fcol.a);
 
 	Color8u col(fcol);
 
@@ -291,7 +291,7 @@ int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
 	pRenderAuxGeom->drawLine(v0, col, v1, col);
 #endif
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::DrawText(IFunctionHandler *pH)
@@ -301,7 +301,7 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	font::IFontSys* pFontSys = gEnv->pFontSys;
 
 	if (!pFontSys)
-		return pH->EndFunction();
+		return pH->endFunction();
 
 
 	float x = 0;
@@ -314,21 +314,21 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	float b = 1;
 	float a = 1;
 
-	pH->GetParam(1, x);
-	pH->GetParam(2, y);
-	pH->GetParam(3, text);
-	pH->GetParam(4, fontName);
-	pH->GetParam(5, size);
-	pH->GetParam(6, r);
-	pH->GetParam(7, g);
-	pH->GetParam(8, b);
-	pH->GetParam(9, a);
+	pH->getParam(1, x);
+	pH->getParam(2, y);
+	pH->getParam(3, text);
+	pH->getParam(4, fontName);
+	pH->getParam(5, size);
+	pH->getParam(6, r);
+	pH->getParam(7, g);
+	pH->getParam(8, b);
+	pH->getParam(9, a);
 
 	font::IFont* pFont = pFontSys->GetFont(fontName);
 
 	if (!pFont)
 	{
-		return pH->EndFunction();
+		return pH->endFunction();
 	}
 
 
@@ -341,7 +341,7 @@ int XBinds_Core::DrawText(IFunctionHandler *pH)
 	X_ASSERT_NOT_IMPLEMENTED();
 //	pFont->DrawString(x, y, text, ctx);
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Core::DrawCone(IFunctionHandler *pH)
@@ -352,16 +352,16 @@ int XBinds_Core::DrawCone(IFunctionHandler *pH)
 	float radius, height;
 	Color fcol;
 
-	pH->GetParam(1, pos);
-	pH->GetParam(2, dir);
+	pH->getParam(1, pos);
+	pH->getParam(2, dir);
 
-	pH->GetParam(3, radius);
-	pH->GetParam(4, height);
+	pH->getParam(3, radius);
+	pH->getParam(4, height);
 
-	pH->GetParam(5, fcol.r);
-	pH->GetParam(6, fcol.g);
-	pH->GetParam(7, fcol.b);
-	pH->GetParam(8, fcol.a);
+	pH->getParam(5, fcol.r);
+	pH->getParam(6, fcol.g);
+	pH->getParam(7, fcol.b);
+	pH->getParam(8, fcol.a);
 
 	Color8u col(fcol);
 
@@ -374,7 +374,7 @@ int XBinds_Core::DrawCone(IFunctionHandler *pH)
 	pRenderAuxGeom->drawCone(pos, dir, radius, height, col);
 #endif
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 // -----------------------------------------------
@@ -391,7 +391,7 @@ int XBinds_Core::GetCurrTime(IFunctionHandler *pH)
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	float fTime = 0.f; // pTimer_->GetCurrTime();
-	return pH->EndFunction(fTime);
+	return pH->endFunction(fTime);
 }
 
 int XBinds_Core::GetCurrAsyncTime(IFunctionHandler *pH)
@@ -400,7 +400,7 @@ int XBinds_Core::GetCurrAsyncTime(IFunctionHandler *pH)
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	float fTime = 0.f; // pTimer_->GetAsyncCurTime();
-	return pH->EndFunction(fTime);
+	return pH->endFunction(fTime);
 }
 
 int XBinds_Core::GetFrameTime(IFunctionHandler *pH)
@@ -409,7 +409,7 @@ int XBinds_Core::GetFrameTime(IFunctionHandler *pH)
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	float fTime = 0.f; // pTimer_->GetFrameTime();
-	return pH->EndFunction(fTime);
+	return pH->endFunction(fTime);
 }
 
 int XBinds_Core::GetTimeScale(IFunctionHandler *pH)
@@ -418,7 +418,7 @@ int XBinds_Core::GetTimeScale(IFunctionHandler *pH)
 	X_ASSERT_NOT_IMPLEMENTED();
 
 	float scale = 0.f; // pTimer_->GetTimeScale();
-	return pH->EndFunction(scale);
+	return pH->endFunction(scale);
 }
 
 

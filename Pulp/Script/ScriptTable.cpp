@@ -5,11 +5,11 @@
 
 #include <Util\ToggleChecker.h>
 
-
 #include "wrapper\types.h"
 
 X_NAMESPACE_BEGIN(script)
 
+using namespace lua;
 
 namespace
 {
@@ -45,8 +45,9 @@ IScriptSys* XScriptTable::GetScriptSystem() const
 
 void XScriptTable::Delegate(IScriptTable* pMetatable)
 {
-	if (!pMetatable)
+	if (!pMetatable) {
 		return;
+	}
 
 	X_LUA_CHECK_STACK(L);
 
@@ -54,7 +55,7 @@ void XScriptTable::Delegate(IScriptTable* pMetatable)
 	lua_pushstring(L, "__index"); // push key.	
 	PushRef(pMetatable);
 	lua_rawset(L, -3); // sets metatable.__index = metatable
-	lua_pop(L, 1); // pop metatable from stack.
+	stack::pop(L); // pop metatable from stack.
 
 	SetMetatable(pMetatable);
 }
@@ -63,7 +64,7 @@ void* XScriptTable::GetUserDataValue()
 {
 	PushRef();
 	void * ptr = lua_touserdata(L, -1);
-	lua_pop(L, 1);
+	stack::pop(L);
 	return ptr;
 }
 
@@ -80,8 +81,9 @@ void XScriptTable::EndSetGetChain()
 {
 	g_setChainActive = false;
 
-	if (lua_istable(L, -1))
-		lua_pop(L, 1);
+	if (stack::istable(L)) {
+		stack::pop(L);
+	}
 	else
 	{
 		X_ASSERT(false, "Mismatch in Set/Get Chain")();
@@ -98,13 +100,14 @@ void XScriptTable::SetValueAny(const char* sKey, const ScriptValue& any, bool bC
 	ScriptValue oldValue;
 	if (lua_getmetatable(L, -1))	// if there is no metatable nothing is pushed
 	{
-		lua_pop(L, 1);	// pop the metatable - we only care that it exists, not about the value
+		stack::pop(L);	// pop the metatable - we only care that it exists, not about the value
 		if (GetValueAny(sKey, oldValue, bChain) && oldValue == any)
 			return;
 	}
 
-	if (!bChain)
+	if (!bChain) {
 		PushRef();
+	}
 
 	size_t len = strlen(sKey);
 
@@ -119,7 +122,7 @@ void XScriptTable::SetValueAny(const char* sKey, const ScriptValue& any, bool bC
 			lua_pushlstring(L, "x", 1);
 			lua_gettable(L, -2);
 			bool bXIsNumber = lua_isnumber(L, -1) != 0;
-			lua_pop(L, 1); // pop x value.
+			stack::pop(L); // pop x value.
 			if (bXIsNumber)
 			{
 				// Assume its a vector, just fill it with new vector values.
@@ -137,10 +140,10 @@ void XScriptTable::SetValueAny(const char* sKey, const ScriptValue& any, bool bC
 				return;
 			}
 		}
-		lua_pop(L, 1); // pop key value.
+		stack::pop(L); // pop key value.
 	}
 	lua_pushlstring(L, sKey, len);
-	pScriptSystem_->PushAny(any);
+	pScriptSystem_->pushAny(any);
 	lua_settable(L, -3);
 	lua_settop(L, top);
 }
@@ -154,7 +157,7 @@ bool XScriptTable::GetValueAny(const char* sKey, ScriptValue& any, bool bChain)
 	bool res = false;
 	lua_pushstring(L, sKey);
 	lua_gettable(L, -2);
-	res = pScriptSystem_->PopAny(any);
+	res = pScriptSystem_->popAny(any);
 	lua_settop(L, top);
 	return res;
 }
@@ -164,9 +167,9 @@ void XScriptTable::SetAtAny(int nIndex, const ScriptValue &any)
 {
 	X_LUA_CHECK_STACK(L);
 	PushRef();
-	pScriptSystem_->PushAny(any);
+	pScriptSystem_->pushAny(any);
 	lua_rawseti(L, -2, nIndex);
-	lua_pop(L, 1); // Pop table.
+	stack::pop(L); // Pop table.
 }
 
 bool XScriptTable::GetAtAny(int nIndex, ScriptValue &any)
@@ -175,8 +178,8 @@ bool XScriptTable::GetAtAny(int nIndex, ScriptValue &any)
 	bool res = false;
 	PushRef();
 	lua_rawgeti(L, -1, nIndex);
-	res = pScriptSystem_->PopAny(any);
-	lua_pop(L, 1); // Pop table.
+	res = pScriptSystem_->popAny(any);
+	stack::pop(L); // Pop table.
 
 	return res;
 }
@@ -184,27 +187,14 @@ bool XScriptTable::GetAtAny(int nIndex, ScriptValue &any)
 Type::Enum XScriptTable::GetValueType(const char* sKey)
 {
 	X_LUA_CHECK_STACK(L);
-	Type::Enum type = Type::NONE;
 
 	PushRef();
 	lua_pushstring(L, sKey);
 	lua_gettable(L, -2);
 	int luatype = lua_type(L, -1);
-
-	switch (luatype)
-	{
-		case LUA_TNIL: type = Type::NONE; break;
-		case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
-		case LUA_TNUMBER: type = Type::NUMBER; break;
-		case LUA_TSTRING: type = Type::STRING; break;
-		case LUA_TFUNCTION: type = Type::FUNCTION; break;
-		case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
-		case LUA_TTABLE: type = Type::TABLE; break;
-	}
-
 	lua_pop(L, 2); // Pop value and table.
 
-	return type;
+	return lua::typeFormLua(luatype);
 }
 
 Type::Enum XScriptTable::GetAtType(int nIdx)
@@ -215,7 +205,7 @@ Type::Enum XScriptTable::GetAtType(int nIdx)
 
 //	if (luaL_getn(L, -1) < nIdx)
 //	{
-//		lua_pop(L, 1);
+//		stack::pop(L);
 //		return svtNull;
 //	}
 
@@ -268,24 +258,25 @@ IScriptTable::Iterator XScriptTable::BeginIteration()
 
 bool XScriptTable::MoveNext(Iterator& iter)
 {
-	if (!iter.internal)
+	if (!iter.internal) {
 		return false;
+	}
 
 	int nTop = iter.internal - 1;
 
 	//leave only the index into the stack
 	while ((lua_gettop(L) - (nTop + 1))>1)
 	{
-		lua_pop(L, 1);
+		stack::pop(L);
 	}
 
 	bool res = lua_next(L, nTop + 1) != 0;
 	if (res)
 	{
 		iter.value.clear();
-		res = pScriptSystem_->PopAny(iter.value);
+		res = pScriptSystem_->popAny(iter.value);
 		// Get current key.
-		pScriptSystem_->ToAny(iter.key, -1);
+		pScriptSystem_->toAny(iter.key, -1);
 		if (lua_type(L, -1) == LUA_TSTRING)
 		{
 			// String key.
@@ -332,13 +323,13 @@ void XScriptTable::Clear()
 	lua_pushnil(L);  // first key
 	while (lua_next(L, trgTable) != 0)
 	{
-		lua_pop(L, 1); // pop value, leave index.
+		stack::pop(L); // pop value, leave index.
 		lua_pushvalue(L, -1); // Push again index.
 		lua_pushnil(L);
 		lua_rawset(L, trgTable);
 	}
 	X_ASSERT(lua_istable(L, -1),"should be a table")();
-	lua_pop(L, 1);
+	stack::pop(L);
 }
 
 int XScriptTable::Count()
@@ -347,7 +338,7 @@ int XScriptTable::Count()
 
 	PushRef();
 	int count = luaL_getn(L, -1);
-	lua_pop(L, 1);
+	stack::pop(L);
 
 	return count;
 }
@@ -386,8 +377,9 @@ bool XScriptTable::Clone(IScriptTable* pSrcTable, bool bDeepCopy, bool bCopyByRe
 
 void XScriptTable::Dump(IScriptTableDumpSink* p)
 {
-	if (!p)
+	if (!p) {
 		return;
+	}
 
 	X_LUA_CHECK_STACK(L);
 	int top = lua_gettop(L);
@@ -401,10 +393,10 @@ void XScriptTable::Dump(IScriptTableDumpSink* p)
 	while (lua_next(L, trgTable) != 0)
 	{
 		// `key' is at index -2 and `value' at index -1
-		if (lua_type(L, -2) == LUA_TSTRING)
+		if (stack::get_type(L, -2) == LUA_TSTRING)
 		{
-			const char *sName = lua_tostring(L, -2); // again index
-			switch (lua_type(L, -1))
+			const char* sName = stack::as_string(L, -2); // again index
+			switch (stack::get_type(L, -1))
 			{
 				case LUA_TNIL: p->OnElementFound(sName, Type::NIL); break;
 				case LUA_TBOOLEAN: p->OnElementFound(sName, Type::BOOLEAN); break;
@@ -418,8 +410,8 @@ void XScriptTable::Dump(IScriptTableDumpSink* p)
 		}
 		else
 		{
-			int nIdx = (int)lua_tonumber(L, -2); // again index
-			switch (lua_type(L, -1))
+			int nIdx = stack::as_int(L, -2); // again index
+			switch (stack::get_type(L))
 			{
 				case LUA_TNIL: p->OnElementFound(nIdx, Type::NIL); break;
 				case LUA_TBOOLEAN: p->OnElementFound(nIdx, Type::BOOLEAN); break;
@@ -433,7 +425,7 @@ void XScriptTable::Dump(IScriptTableDumpSink* p)
 		}
 		lua_settop(L, reftop); // pop value, leave index.
 	}
-	lua_pop(L, 1); // pop table ref
+	stack::pop(L); // pop table ref
 }
 
 bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
@@ -443,10 +435,10 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 
 	// Make function signature.
 	core::StackString<256> funcSig;
-	funcSig.appendFmt( "%s.%s(%s)", fd.sGlobalName, fd.sFunctionName, fd.sFunctionParams);
+	funcSig.appendFmt( "%s.%s(%s)", fd.pGlobalName, fd.pFunctionName, fd.pFunctionParams);
 
 	PushRef();
-	lua_pushstring(L, fd.sFunctionName);
+	lua_pushstring(L, fd.pFunctionName);
 
 	int8 nParamIdOffset = safe_static_cast<int8,int>(fd.nParamIdOffset);
 	if (fd.function)
@@ -483,7 +475,7 @@ bool XScriptTable::AddFunction(const XUserFunctionDesc& fd)
 
 
 	lua_rawset(L, -3);
-	lua_pop(L, 1); // pop table.
+	stack::pop(L); // pop table.
 	return true;
 }
 
@@ -504,9 +496,11 @@ int XScriptTable::GetRef()
 
 void XScriptTable::Attach()
 {
-	if (luaRef_ != lua::Ref::Nil)
-		lua_unref(L, luaRef_);
-	luaRef_ = lua_ref(L, 1);
+	if (luaRef_ != lua::Ref::Nil) {
+		state::remove_ref(L, luaRef_);
+	}
+
+	luaRef_ = stack::pop_to_ref(L);
 
 	s_allTables_.insert(this);
 }
@@ -526,12 +520,13 @@ void XScriptTable::DeleteThis()
 
 	s_allTables_.erase(this);
 
-	if (luaRef_ != lua::Ref::Nil)
-		lua_unref(L, luaRef_);
+	if (luaRef_ != lua::Ref::Nil) {
+		state::remove_ref(L, luaRef_);
+	}
 
 	luaRef_ = lua::Ref::Deleted;
 
-	X_DELETE(this,g_ScriptArena);
+	X_DELETE(this, g_ScriptArena);
 }
 
 // Create object from pool.
@@ -544,20 +539,20 @@ void XScriptTable::SetMetatable(IScriptTable* pMetatable)
 	PushRef(); // -2
 	PushRef(pMetatable); // -1
 	lua_setmetatable(L, -2);
-	lua_pop(L, 1); // pop table
+	stack::pop(L); // pop table
 }
 
 // Push reference of this object to the stack.
 void XScriptTable::PushRef()
 {
-	if (luaRef_ != lua::Ref::Deleted && luaRef_ != lua::Ref::Nil)
-		lua_getref(L, luaRef_);
+	if (luaRef_ != lua::Ref::Deleted && luaRef_ != lua::Ref::Nil) {
+		stack::push_ref(L, luaRef_);
+	}
 	else
 	{
-		lua_pushnil(L);
+		stack::pushnil(L);
 		if (luaRef_ == lua::Ref::Deleted)
 		{
-
 			X_FATAL("Script", "Access to deleted script object: %p", this);
 		}
 		else
@@ -570,9 +565,10 @@ void XScriptTable::PushRef()
 // Push reference to specified script table to the stack.
 void XScriptTable::PushRef(IScriptTable* pObj)
 {
-	int nRef = ((XScriptTable*)pObj)->luaRef_;
-	if (nRef != lua::Ref::Deleted)
-		lua_getref(L, nRef);
+	int ref = ((XScriptTable*)pObj)->luaRef_;
+	if (ref != lua::Ref::Deleted) {
+		stack::push_ref(L, ref);
+	}
 	else
 	{
 		X_FATAL("Script", "Access to deleted script object");
@@ -581,10 +577,12 @@ void XScriptTable::PushRef(IScriptTable* pObj)
 
 
 X_DISABLE_WARNING(4458) // declaration of 'L' hides class member
+
+
+
 int XScriptTable::StdCFunction(lua_State* L)
 {
-	unsigned char* pBuffer = (unsigned char*)lua_touserdata(L, lua_upvalueindex(1));
-
+	uint8_t* pBuffer = reinterpret_cast<uint8_t*>(lua_touserdata(L, lua_upvalueindex(1)));
 
 	ScriptFunction* function = (ScriptFunction*)pBuffer;
 	int8 nParamIdOffset = *(int8*)(pBuffer + sizeof(ScriptFunction));
@@ -598,7 +596,7 @@ int XScriptTable::StdCFunction(lua_State* L)
 
 int XScriptTable::StdCUserDataFunction(lua_State* L)
 {
-	unsigned char *pBuffer = (unsigned char*)lua_touserdata(L, lua_upvalueindex(1));
+	uint8_t* pBuffer = reinterpret_cast<uint8_t*>(lua_touserdata(L, lua_upvalueindex(1)));
 
 	UserDataFunction::Pointer* pFunction = (UserDataFunction::Pointer*)pBuffer;
 
@@ -644,7 +642,7 @@ void XScriptTable::CloneTable_r(int srcTable, int trgTable)
 			lua_pushvalue(L, -2); // Push value.
 			lua_rawset(L, trgTable);
 		}
-		lua_pop(L, 1); // pop value, leave index.
+		stack::pop(L); // pop value, leave index.
 	}
 	lua_settop(L, top); // Restore stack.
 }
@@ -673,7 +671,7 @@ void XScriptTable::ReferenceTable_r(int srcTable, int trgTable)
 			ReferenceTable_r(srct, trgt);
 			lua_rawset(L, trgTable); // Set new table to trgtable.
 		}
-		lua_pop(L, 1); // pop value, leave index.
+		stack::pop(L); // pop value, leave index.
 	}
 	lua_settop(L, top); // Restore stack.
 }
@@ -690,7 +688,7 @@ void XScriptTable::CloneTable(int srcTable, int trgTable)
 		lua_pushvalue(L, -2); // Push again index.
 		lua_pushvalue(L, -2); // Push value.
 		lua_rawset(L, trgTable);
-		lua_pop(L, 1); // pop value, leave index.
+		stack::pop(L); // pop value, leave index.
 	}
 	lua_settop(L, top); // Restore stack.
 }

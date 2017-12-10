@@ -10,6 +10,23 @@ X_NAMESPACE_BEGIN(script)
 
 class XScriptTable : public IScriptTable
 {
+	X_PACK_PUSH(1);
+	struct CFunctionData
+	{
+		ScriptFunction pFunction;
+		int8_t paramIdOffset;
+		const char funcName[1];
+	};
+
+	struct UserDataFunctionData
+	{
+		UserDataFunction::Pointer* pFunction;
+		int16_t dataSize;
+		int8_t paramIdOffset;
+		const char funcName[1];
+	};
+	X_PACK_POP;
+
 public:
 	XScriptTable();
 	~XScriptTable() X_OVERRIDE;
@@ -63,7 +80,7 @@ public:
 	// Push reference of this object to the stack.
 	void PushRef();
 	// Push reference to specified script table to the stack.
-	void PushRef(IScriptTable* pObj);
+	static void PushRef(IScriptTable* pObj);
 
 public:
 	static lua_State* L;

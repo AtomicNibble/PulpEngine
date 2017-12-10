@@ -6,32 +6,6 @@ X_NAMESPACE_BEGIN(script)
 
 namespace lua
 {
-	struct lua_nil_t {};
-	const lua_nil_t lua_nil{};
-
-	typedef lua_nil_t nil_t;
-	const nil_t nil{};
-
-	inline bool operator==(lua_nil_t, lua_nil_t) {
-		return true;
-	}
-	inline bool operator!=(lua_nil_t, lua_nil_t) {
-		return false;
-	}
-
-	struct ref_index 
-	{
-		ref_index(int idx) :
-			index(idx) {
-		}
-
-		operator int() const {
-			return index;
-		}
-
-		int index;
-	};
-
 
 	X_DECLARE_FLAGS(lib)(
 		base,
@@ -70,7 +44,74 @@ namespace lua
 	static_assert(Type::USERDATA == LUA_TUSERDATA, "Enum mismtach");
 	// static_assert(Type::HANDLE == LUA_THANDLE, "Enum mismtach");
 
+	X_INLINE Type::Enum typeFormLua(int32_t luaType)
+	{
+		Type::Enum type = Type::NONE;
 
+		switch (luaType)
+		{
+			case LUA_TNIL: type = Type::NIL; break;
+			case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
+			case LUA_TNUMBER: type = Type::NUMBER; break;
+			case LUA_TSTRING: type = Type::STRING; break;
+			case LUA_TFUNCTION: type = Type::FUNCTION; break;
+			case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
+			case LUA_TTABLE: type = Type::TABLE; break;
+		}
+
+		return type;
+	}
+
+	X_INLINE bool isTypeCompatible(Type::Enum type, int32_t luaType)
+	{
+		switch (luaType)
+		{
+			case LUA_TNIL:
+				if (type != Type::NIL) {
+					return false;
+				}
+				break;
+			case LUA_TBOOLEAN:
+				if (type != Type::BOOLEAN) {
+					return false;
+				}
+				break;
+			case LUA_TLIGHTUSERDATA:
+				if (type != Type::HANDLE) {
+					return false;
+				}
+				break;
+			case LUA_TNUMBER:
+				if (type != Type::NUMBER && type != Type::BOOLEAN) {
+					return false;
+				}
+				break;
+			case LUA_TSTRING:
+				if (type != Type::STRING) {
+					return false;
+				}
+				break;
+			case LUA_TTABLE:
+				if (type != Type::TABLE && type != Type::VECTOR) {
+					return false;
+				}
+				break;
+			case LUA_TUSERDATA:
+				if (type == Type::TABLE) {
+					return false;
+				}
+				break;
+			case LUA_TFUNCTION:
+				if (type == Type::FUNCTION) {
+					return false;
+				}
+				break;
+			case LUA_TTHREAD:
+				break;
+		}
+
+		return true;
+	}
 
 } // namespace lua
 

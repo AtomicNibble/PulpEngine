@@ -17,7 +17,7 @@ class XScriptableBase;
 
 class XScriptBinds
 {
-	typedef core::FixedArray<core::UniquePointer<XScriptableBase>, ScriptMoudles::ENUM_COUNT> ScriptModels;
+	typedef core::FixedArray<core::UniquePointer<XScriptableBase>, Moudles::ENUM_COUNT> ScriptModels;
 
 public:
 	XScriptBinds();

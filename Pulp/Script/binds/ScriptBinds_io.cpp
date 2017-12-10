@@ -65,18 +65,18 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 	X_ASSERT_NOT_NULL(pH);
 
 	SmartScriptTable tbl;
-	Type::Enum type = pH->GetParamType(index);
+	Type::Enum type = pH->getParamType(index);
 
 	if (type == Type::POINTER) // this is a script handle
 	{
-		ScriptHandle fileHandle;
-		if (!pH->GetParam(index, fileHandle)) {
+		Handle fileHandle;
+		if (!pH->getParam(index, fileHandle)) {
 			return nullptr;
 		}
 
 		return static_cast<core::XFile*>(fileHandle.pPtr);
 	}
-	else if (pH->GetParam(1, tbl))
+	else if (pH->getParam(1, tbl))
 	{
 		void* ptr = (static_cast<XScriptTable*>(tbl.GetPtr()))->GetUserDataValue();
 		if (!ptr) {
@@ -103,11 +103,11 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 
 	if ((pFile = getFile(pH)) != nullptr)
 	{
-		numArgs = pH->GetParamCount() - 1;
+		numArgs = pH->getParamCount() - 1;
 		for (arg = 2; numArgs--; arg++)
 		{
 			ScriptValue value;
-			pH->GetParamAny(arg, value);
+			pH->getParamAny(arg, value);
 			switch (value.getType())
 			{
 				case Type::STRING:
@@ -126,7 +126,7 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 		}
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Io_File::read(IFunctionHandler* pH)
@@ -149,7 +149,7 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 
 	if ((pFile = getFile(pH)) != nullptr)
 	{
-		numArgs = pH->GetParamCount() - 1;
+		numArgs = pH->getParamCount() - 1;
 		if (numArgs == 0)
 		{
 			// read line mode
@@ -163,18 +163,18 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 			{
 				const char* mode;
 
-				if (pH->GetParamType(arg) == Type::NUMBER)
+				if (pH->getParamType(arg) == Type::NUMBER)
 				{
 					// read this number of bytes.
 					// not gonna use float(aka lua number) since who the flying
 					// gypsy fuck is gonna open a >2gb file via lua o.o !!
 					int numbytes;
-					if (pH->GetParam(arg, numbytes))
+					if (pH->getParam(arg, numbytes))
 					{
 
 					}
 				}
-				if (pH->GetParam(arg,mode))
+				if (pH->getParam(arg,mode))
 				{
 					if (core::strUtil::strlen(mode) == 2 && mode[0] == '*')
 					{
@@ -225,8 +225,9 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 	modeStr = nullptr;
 	offset = 0;
 
-	if (pH->GetParam(1, modeStr))
-		pH->GetParam(2, offset);
+	if (pH->getParam(1, modeStr)) {
+		pH->getParam(2, offset);
+	}
 	else
 	{
 		modeStr = "cur";
@@ -257,7 +258,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 		if (i == numModes)
 		{ 
 			pScriptSys_->onScriptError("Unknown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
-			return pH->EndFunction();
+			return pH->endFunction();
 		}
 	}
 
@@ -268,7 +269,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 		pFile->seek(offset, mode);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Io_File::close(IFunctionHandler* pH)
@@ -282,7 +283,7 @@ int XBinds_Io_File::close(IFunctionHandler* pH)
 		}
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 // ------------------------- read util -----------------------------
@@ -292,7 +293,7 @@ int XBinds_Io_File::readNumber(IFunctionHandler* pH, core::XFile* pFile)
 	X_ASSERT_NOT_NULL(pFile);
 	X_ASSERT_NOT_IMPLEMENTED();
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Io_File::readLine(IFunctionHandler* pH, core::XFile* pFile, bool keepEol)
@@ -300,7 +301,7 @@ int XBinds_Io_File::readLine(IFunctionHandler* pH, core::XFile* pFile, bool keep
 	X_ASSERT_NOT_NULL(pFile);
 	X_ASSERT_NOT_IMPLEMENTED();
 	X_UNUSED(keepEol);
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Io_File::readBytes(IFunctionHandler* pH, core::XFile* pFile, uint32_t numBytes)
@@ -324,7 +325,7 @@ int XBinds_Io_File::readBytes(IFunctionHandler* pH, core::XFile* pFile, uint32_t
 
 	// mem is freed after on scope exit.
 	// lua will of made it's own copy by then.
-	return pH->EndFunctionAny(temp.ptr());
+	return pH->endFunctionAny(temp.ptr());
 }
 
 // --------------------------- static ------------------------------
@@ -343,12 +344,12 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 		else
 		{
 
-			pH->GetIScriptSystem()->onScriptError( "Failed to close file");	
+			pH->getIScriptSystem()->onScriptError( "Failed to close file");	
 		}
 	}
 
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 // --------------------------------------------------
@@ -441,8 +442,8 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 	core::fileModeFlags flags = core::fileMode::READ | fileMode::RANDOM_ACCESS;
 
-	pH->GetParam(1, fileName);
-	if (pH->GetParam(2, mode))
+	pH->getParam(1, fileName);
+	if (pH->getParam(2, mode))
 	{		
 		for (i = 0; i < numModes; i++)
 		{
@@ -467,17 +468,17 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 	if (path.length() == 0)
 	{
 		pScriptSys_->onScriptError("invalid filename: %s", fileName);
-		return pH->EndFunction();
+		return pH->endFunction();
 	}
 
 
 	XFile* pFile = pFileSys_->openFile(path.c_str(), flags);
 
 	if (pFile) {
-		return pH->EndFunction(WrapFileReturn(pFile));
+		return pH->endFunction(WrapFileReturn(pFile));
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
@@ -519,7 +520,7 @@ int XBinds_Io::closeFile(IFunctionHandler* pH)
 		pFileSys_->closeFile(pFile);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 

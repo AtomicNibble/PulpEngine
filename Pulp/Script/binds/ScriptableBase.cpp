@@ -76,8 +76,8 @@ void XScriptableBase::RegisterFunction(const char* pFuncName,
 	if (pMethodsTable_)
 	{
 		IScriptTable::XUserFunctionDesc fd;
-		fd.sGlobalName = name_.c_str();
-		fd.sFunctionName = pFuncName;
+		fd.pGlobalName = name_.c_str();
+		fd.pFunctionName = pFuncName;
 		fd.function = function;
 		fd.nParamIdOffset = paramIdOffset_;
 

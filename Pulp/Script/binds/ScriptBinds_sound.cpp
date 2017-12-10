@@ -50,22 +50,22 @@ void XBinds_Sound::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 
 int32_t XBinds_Sound::PostEvent(IFunctionHandler* pH)
 {
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetSwitch(IFunctionHandler* pH)
 {
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetStages(IFunctionHandler* pH)
 {
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetParam(IFunctionHandler* pH)
 {
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetMasterVol(IFunctionHandler* pH)
@@ -73,11 +73,11 @@ int32_t XBinds_Sound::SetMasterVol(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	float vol;
 
-	if (pH->GetParam(0, vol)) {
+	if (pH->getParam(0, vol)) {
 		pSoundSys_->setMasterVolume(vol);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetMusicVol(IFunctionHandler* pH)
@@ -85,11 +85,11 @@ int32_t XBinds_Sound::SetMusicVol(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	float vol;
 
-	if (pH->GetParam(0, vol)) {
+	if (pH->getParam(0, vol)) {
 		pSoundSys_->setMusicVolume(vol);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetVoiceVol(IFunctionHandler* pH)
@@ -97,11 +97,11 @@ int32_t XBinds_Sound::SetVoiceVol(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	float vol;
 
-	if (pH->GetParam(0, vol)) {
+	if (pH->getParam(0, vol)) {
 		pSoundSys_->setVoiceVolume(vol);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int32_t XBinds_Sound::SetSFXVol(IFunctionHandler* pH)
@@ -109,11 +109,11 @@ int32_t XBinds_Sound::SetSFXVol(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	float vol;
 
-	if (pH->GetParam(0, vol)) {
+	if (pH->getParam(0, vol)) {
 		pSoundSys_->setSFXVolume(vol);
 	}
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 
@@ -125,7 +125,7 @@ int XBinds_Sound::Play(IFunctionHandler* pH)
 	// <sound_event>
 
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 
 int XBinds_Sound::PlayEx(IFunctionHandler* pH)
@@ -133,7 +133,7 @@ int XBinds_Sound::PlayEx(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	// <sound_event>
 
-	return pH->EndFunction();
+	return pH->endFunction();
 }
 */
 

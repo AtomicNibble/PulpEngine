@@ -8,6 +8,22 @@ namespace lua
 {
 	namespace stack
 	{
+		// misc
+		X_INLINE bool is_empty(lua_State* L)
+		{
+			return lua_gettop(L) == 0;
+		}
+
+		X_INLINE int32_t num(lua_State* L)
+		{
+			return lua_gettop(L);
+		}
+
+		X_INLINE int32_t top(lua_State* L)
+		{
+			return lua_gettop(L);
+		}
+
 		// types
 		X_INLINE int32_t get_type(lua_State* L)
 		{
@@ -38,6 +54,11 @@ namespace lua
 		X_INLINE bool istable(lua_State* L)
 		{
 			return lua_istable(L, -1);
+		}
+
+		X_INLINE bool isnumber(lua_State* L)
+		{
+			return lua_isnumber(L, -1) != 0;
 		}
 
 		X_INLINE bool islightuserdata(lua_State* L)
@@ -73,12 +94,23 @@ namespace lua
 			push(L, pStr, core::strUtil::strlen(pStr));
 		}
 
+		template<size_t N>
+		X_INLINE void pushliteral(lua_State* L, const char(&buf)[N])
+		{
+			push(L, buf, sizeof(buf) - 1);
+		}
+
 		X_INLINE void push(lua_State* L, bool b)
 		{
 			lua_pushboolean(L, b);
 		}
 
 		X_INLINE void push(lua_State* L, double n)
+		{
+			lua_pushnumber(L, n);
+		}
+
+		X_INLINE void push(lua_State* L, int32_t n)
 		{
 			lua_pushnumber(L, n);
 		}
@@ -110,6 +142,17 @@ namespace lua
 			return true;
 		}
 
+		X_INLINE void push_table_value(lua_State* L, int32_t tableIdx, const char* pKey)
+		{
+			push(L, pKey);
+			lua_gettable(L, tableIdx);
+		}
+
+		X_INLINE void push_table_value(lua_State* L, int32_t tableIdx, int32_t idx)
+		{
+			push(L, idx);
+			lua_gettable(L, tableIdx);
+		}
 
 		// refrences 
 		X_INLINE void push_ref(lua_State* L, int32_t ref)
@@ -127,12 +170,57 @@ namespace lua
 			return luaL_ref(L, LUA_REGISTRYINDEX);
 		}
 
-		
+
 
 		// as values.
+		X_INLINE const void* as_pointer(lua_State* L, int32_t idx)
+		{
+			return lua_topointer(L, idx);
+		}
+
 		X_INLINE const void* as_pointer(lua_State* L)
 		{
 			return lua_topointer(L, -1);
+		}
+
+		X_INLINE bool as_bool(lua_State* L, int32_t idx)
+		{
+			return lua_toboolean(L, idx) != 0;
+		}
+
+		X_INLINE bool as_bool(lua_State* L)
+		{
+			return lua_toboolean(L, -1) != 0;
+		}
+
+		X_INLINE double as_number(lua_State* L, int32_t idx)
+		{
+			return lua_tonumber(L, idx);
+		}
+
+		X_INLINE double as_number(lua_State* L)
+		{
+			return lua_tonumber(L, -1);
+		}
+
+		X_INLINE int32_t as_int(lua_State* L, int32_t idx)
+		{
+			return static_cast<int32_t>(lua_tonumber(L, idx));
+		}
+
+		X_INLINE int32_t as_int(lua_State* L)
+		{
+			return static_cast<int32_t>(lua_tonumber(L, -1));
+		}
+
+		X_INLINE const char* as_string(lua_State* L, int32_t idx, size_t* size = nullptr)
+		{
+			return lua_tolstring(L, idx, size);
+		}
+
+		X_INLINE const char* as_string(lua_State* L, size_t* size = nullptr)
+		{
+			return lua_tolstring(L, -1, size);
 		}
 
 	}
@@ -175,6 +263,8 @@ namespace lua
 		X_INLINE lua_State* luaState(void) const;
 		X_INLINE operator lua_State*() const;
 
+		X_INLINE bool loadScript(const char* pBegin, const char* pEnd, const char* pChunkName);
+
 
 	private:
 		lua_State* L_;
@@ -191,7 +281,12 @@ namespace lua
 		return L_;
 	}
 
+	X_INLINE bool StateView::loadScript(const char* pBegin, const char* pEnd, const char* pChunkName)
+	{
+		int status = luaL_loadbuffer(L_, pBegin, pEnd - pBegin, pChunkName);
 
+		return status == 0;
+	}
 
 } // namespace lua
 

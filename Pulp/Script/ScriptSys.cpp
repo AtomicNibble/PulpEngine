@@ -171,6 +171,8 @@ namespace
 	}
 #endif
 
+
+
 	int g_pErrorHandlerFunc;
 
 	inline XScriptTable* AllocTable()
@@ -185,7 +187,7 @@ namespace
 XScriptSys::XScriptSys() :
 	initialised_(false)
 {
-
+	L = nullptr;
 }
 
 XScriptSys::~XScriptSys()
@@ -216,7 +218,6 @@ bool XScriptSys::init(void)
 	X_LOG0("Script", "Starting script system");
 	X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
-	pFileSys_ = gEnv->pFileSys;
 
 #if 0
 	// lj_state_newstate(mem_alloc, mem_create());
@@ -335,6 +336,47 @@ void XScriptSys::Update(void)
 }
 
 
+bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
+{
+	lua::State state(g_ScriptArena);
+
+	state.openLibs(
+		lua::libs(
+			lua::lib::base |
+			lua::lib::package |
+			lua::lib::os |
+			lua::lib::io |
+			lua::lib::ffi |
+			lua::lib::jit
+		)
+	);
+
+	lua_pushcfunction(state, XScriptSys::ErrorHandler);
+	int32_t errorHandler = lua_ref(state, 1);
+
+	if (!state.loadScript(pBegin, pEnd, "Sandbox")) {
+		return false;
+	}
+
+	// the compiled code is on stack as a function.
+	// we can call it.
+	int base = stack::top(state);
+
+	lua_getref(state, errorHandler);
+	lua_insert(state, base);
+
+	auto status = lua_pcall(state, 0, LUA_MULTRET, base);
+
+	lua_remove(state, base);
+
+	if (status != 0)
+	{
+
+	}
+
+	return true;
+}
+
 
 ScriptFunctionHandle XScriptSys::getFunctionPtr(const char* pFuncName)
 {
@@ -420,7 +462,7 @@ void XScriptSys::setGlobalValue(const char* pKey, const ScriptValue& any)
 {
 	X_LUA_CHECK_STACK(L);
 
-	PushAny(any);
+	pushAny(any);
 	
 	stack::pop_to_global(L, pKey);
 }
@@ -439,14 +481,14 @@ bool XScriptSys::getGlobalValue(const char* pKey, ScriptValue& any)
 		getGlobalValue(key1.c_str(), globalAny);
 		if (globalAny.getType() == Type::TABLE)
 		{
-			return GetRecursiveAny(globalAny.pTable_, key1, any);
+			return getRecursiveAny(globalAny.pTable_, key1, any);
 		}
 
 		return false;
 	}
 
 	stack::push_global(L, pKey);
-	if (!PopAny(any)) {
+	if (!popAny(any)) {
 		return false;
 	}
 
@@ -479,7 +521,7 @@ void XScriptSys::onScriptError(const char* pFmt, ...)
 
 
 
-bool XScriptSys::GetRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any)
+bool XScriptSys::getRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any)
 {
 	core::StackString<256> key1;
 	core::StackString<256> key2;
@@ -507,15 +549,14 @@ bool XScriptSys::GetRecursiveAny(IScriptTable* pTable, const core::StackString<2
 	}
 	else if (localAny.getType() == Type::TABLE && nullptr != sep)
 	{
-		return GetRecursiveAny(localAny.pTable_, key2, any);
+		return getRecursiveAny(localAny.pTable_, key2, any);
 	}
 
 	return false;
 }
 
 
-
-void XScriptSys::PushAny(const ScriptValue& var)
+void XScriptSys::pushAny(const ScriptValue& var)
 {
 	switch (var.getType())
 	{
@@ -536,7 +577,7 @@ void XScriptSys::PushAny(const ScriptValue& var)
 			break;
 		case Type::TABLE:
 			if (var.pTable_) {
-				PushTable(var.pTable_);
+				pushTable(var.pTable_);
 			}
 			else {
 				stack::pushnil(L);
@@ -547,7 +588,7 @@ void XScriptSys::PushAny(const ScriptValue& var)
 			X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
 			break;
 		case Type::VECTOR:
-			PushVec3(Vec3f(var.vec3_.x, var.vec3_.y, var.vec3_.z));
+			pushVec3(Vec3f(var.vec3_.x, var.vec3_.y, var.vec3_.z));
 			break;
 
 		default:
@@ -555,68 +596,21 @@ void XScriptSys::PushAny(const ScriptValue& var)
 	}
 }
 
-bool XScriptSys::PopAny(ScriptValue &var)
+bool XScriptSys::popAny(ScriptValue &var)
 {
-	bool res = ToAny(var, -1);
+	bool res = toAny(var, -1);
 	stack::pop(L);
 	return res;
 }
 
-
-bool isTypeCompatible(Type::Enum type, int32_t luaType)
+bool XScriptSys::toAny(ScriptValue& var, int index)
 {
-	switch (luaType)
-	{
-		case LUA_TNIL:
-			if (type != Type::NIL) {
-				return false;
-			}
-			break;
-		case LUA_TBOOLEAN:
-			if (type != Type::BOOLEAN) {
-				return false;
-			}
-			break;
-		case LUA_TLIGHTUSERDATA:
-			if (type != Type::HANDLE) {
-				return false;
-			}
-			break;
-		case LUA_TNUMBER:
-			if (type != Type::NUMBER && type != Type::BOOLEAN) {
-				return false;
-			}
-			break;
-		case LUA_TSTRING:
-			if (type != Type::STRING) {
-				return false;
-			}
-			break;
-		case LUA_TTABLE:
-			if (type != Type::TABLE && type != Type::VECTOR) {
-				return false;
-			}
-			break;
-		case LUA_TUSERDATA:
-			if (type == Type::TABLE) {
-				return false;
-			}
-			break;
-		case LUA_TFUNCTION:
-			if (type == Type::FUNCTION) {
-				return false;
-			}
-			break;
-		case LUA_TTHREAD:
-			break;
-	}
-
-	return true;
+	return toAny(L, var, index);
 }
 
-bool XScriptSys::ToAny(ScriptValue& var, int index)
+bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 {
-	if (!lua_gettop(L)) {
+	if (stack::is_empty(L)) {
 		return false;
 	}
 
@@ -635,21 +629,21 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 			var.type_ = Type::NIL;
 			break;
 		case LUA_TBOOLEAN:
-			var.bool_ = lua_toboolean(L, index) != 0;
+			var.bool_ = stack::as_bool(L, index) != 0;
 			var.type_ = Type::BOOLEAN;
 			break;
 		case LUA_TLIGHTUSERDATA:
-			var.pPtr_ = lua_topointer(L, index);
+			var.pPtr_ = stack::as_pointer(L, index);
 			var.type_ = Type::HANDLE;
 			break;
 		case LUA_TNUMBER:
-			var.number_ = (float)lua_tonumber(L, index);
+			var.number_ = static_cast<float>(stack::as_number(L, index));
 			var.type_ = Type::NUMBER;
 			break;
 		case LUA_TSTRING:
 		{
 			size_t len = 0;
-			var.str_.pStr = lua_tolstring(L, index, &len);
+			var.str_.pStr = stack::as_string(L, index, &len);
 			var.str_.len = safe_static_cast<int32_t>(len);
 			var.type_ = Type::STRING;
 		}
@@ -662,7 +656,7 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 				var.pTable_->addRef();
 			}
 			lua_pushvalue(L, index);
-			AttachTable(var.pTable_);
+			((XScriptTable*)var.pTable_)->Attach();
 			var.type_ = Type::TABLE;
 			break;
 		case LUA_TFUNCTION:
@@ -670,8 +664,7 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 			var.type_ = Type::FUNCTION;
 			// Make reference to function.
 			lua_pushvalue(L, index);
-			X_ASSERT_NOT_IMPLEMENTED();
-			//	var.pFunction_ = reinterpret_cast<ScriptFunctionHandle>(luaL_ref(L, 1));
+			var.pFunction_ = static_cast<ScriptFunctionHandle>(luaL_ref(L, 1));
 		}
 		break;
 		case LUA_TTHREAD:
@@ -681,6 +674,103 @@ bool XScriptSys::ToAny(ScriptValue& var, int index)
 
 	return true;
 }
+
+void XScriptSys::pushVec3(const Vec3f& vec)
+{
+	state::new_table(L);
+
+	stack::pushliteral(L, "x");
+	stack::push(L, vec.x);
+	state::set_table_value(L);
+
+	stack::pushliteral(L, "y");
+	stack::push(L, vec.y);
+	state::set_table_value(L);
+
+	stack::pushliteral(L, "z");
+	stack::push(L, vec.z);
+	state::set_table_value(L);
+}
+
+bool XScriptSys::toVec3(Vec3f& vec, int tableIndex)
+{
+	X_LUA_CHECK_STACK(L);
+
+	if (tableIndex < 0) {
+		tableIndex = stack::num(L) + tableIndex + 1;
+	}
+
+	if (stack::get_type(L, tableIndex) != LUA_TTABLE) {
+		return false;
+	}
+
+
+	lua_Number x, y, z;
+	stack::push_table_value(L, tableIndex, "x");
+
+	if (stack::isnumber(L))
+	{
+		x = stack::as_number(L);
+		stack::pop(L);
+
+		stack::push_table_value(L, tableIndex, "y");
+		if (!stack::isnumber(L)) {
+			stack::pop(L);
+			return false;
+		}
+
+		y = stack::as_number(L);
+		stack::pop(L);
+
+		stack::push_table_value(L, tableIndex, "z");
+		if (!stack::isnumber(L)) {
+			stack::pop(L);
+			return false;
+		}
+
+		z = stack::as_number(L);
+		stack::pop(L);
+
+		vec.x = safe_static_cast<float>(x);
+		vec.y = safe_static_cast<float>(y);
+		vec.z = safe_static_cast<float>(z);
+		return true;
+	}
+
+
+	stack::pop(L);
+
+	// Try an indexed table.
+
+	stack::push_table_value(L, tableIndex, 1);
+	if (!stack::isnumber(L)) {
+		stack::pop(L);
+		return false;
+	}
+	x = stack::as_number(L);
+
+	stack::push_table_value(L, tableIndex, 2);
+	if (!stack::isnumber(L)) {
+		stack::pop(L);
+		return false;
+	}
+	y = stack::as_number(L);
+
+	stack::push_table_value(L, tableIndex, 3);
+	if (!stack::isnumber(L)) {
+		stack::pop(L);
+		return false;
+	}
+	z = stack::as_number(L);
+	stack::pop(L);
+
+	vec.x = safe_static_cast<float>(x);
+	vec.y = safe_static_cast<float>(y);
+	vec.z = safe_static_cast<float>(z);
+	return true;
+}
+
+
 
 #if 0
 
@@ -791,7 +881,7 @@ void XScriptSys::removeFileName(const char* name)
 void XScriptSys::SetGlobalAny(const char* Key, const ScriptValue& any)
 {
 	X_LUA_CHECK_STACK(L);
-	PushAny(any);
+	pushAny(any);
 	lua_setglobal(L, Key);
 }
 
@@ -864,116 +954,15 @@ void XScriptSys::ReleaseFunc(ScriptFunctionHandle f)
 
 
 
-void XScriptSys::PushTable(IScriptTable *pTable)
+void XScriptSys::pushTable(IScriptTable *pTable)
 {
 	((XScriptTable*)pTable)->PushRef();
 };
 
 
-void XScriptSys::AttachTable(IScriptTable *pTable)
+void XScriptSys::attachTable(IScriptTable *pTable)
 {
 	((XScriptTable*)pTable)->Attach();
-}
-
-void XScriptSys::PushVec3(const Vec3f& vec)
-{
-	state::new_table(L);
-
-	stack::push(L, "x", 1);
-	stack::push(L, vec.x);
-	state::set_table_value(L);
-
-	stack::push(L, "y", 1);
-	stack::push(L, vec.y);
-	state::set_table_value(L);
-
-	stack::push(L, "z", 1);
-	stack::push(L, vec.z);
-	state::set_table_value(L);
-}
-
-bool XScriptSys::ToVec3(Vec3f& vec, int tableIndex)
-{
-	X_LUA_CHECK_STACK(L);
-
-	if (tableIndex < 0)
-	{
-		tableIndex = lua_gettop(L) + tableIndex + 1;
-	}
-
-	if (lua_type(L, tableIndex) != LUA_TTABLE)
-	{
-		return false;
-	}
-
-
-	lua_Number x, y, z;
-	lua_pushlstring(L, "x", 1);
-	lua_gettable(L, tableIndex);
-	if (!lua_isnumber(L, -1))
-	{
-		lua_pop(L, 1); // pop x value.
-
-		// Try an indexed table.
-		lua_pushnumber(L, 1);
-		lua_gettable(L, tableIndex);
-		if (!lua_isnumber(L, -1))
-		{
-			lua_pop(L, 1); // pop value.
-			return false;
-		}
-		x = lua_tonumber(L, -1);
-		lua_pushnumber(L, 2);
-		lua_gettable(L, tableIndex);
-		if (!lua_isnumber(L, -1))
-		{
-			lua_pop(L, 2); // pop value.
-			return false;
-		}
-		y = lua_tonumber(L, -1);
-		lua_pushnumber(L, 3);
-		lua_gettable(L, tableIndex);
-		if (!lua_isnumber(L, -1))
-		{
-			lua_pop(L, 3); // pop value.
-			return false;
-		}
-		z = lua_tonumber(L, -1);
-		lua_pop(L, 3); // pop value.
-
-		vec.x = safe_static_cast<float>(x);
-		vec.y = safe_static_cast<float>(y);
-		vec.z = safe_static_cast<float>(z);
-		return true;
-	}
-
-	x = lua_tonumber(L, -1);
-	lua_pop(L, 1); // pop value.
-
-	lua_pushlstring(L, "y", 1);
-	lua_gettable(L, tableIndex);
-	if (!lua_isnumber(L, -1))
-	{
-		lua_pop(L, 1); // pop table.
-		return false;
-	}
-	y = lua_tonumber(L, -1);
-	lua_pop(L, 1); // pop value.
-
-	lua_pushlstring(L, "z", 1);
-	lua_gettable(L, tableIndex);
-	if (!lua_isnumber(L, -1))
-	{
-		lua_pop(L, 1); // pop table.
-		return false;
-	}
-	z = lua_tonumber(L, -1);
-	lua_pop(L, 1); // pop value.
-
-	vec.x = safe_static_cast<float>(x);
-	vec.y = safe_static_cast<float>(y);
-	vec.z = safe_static_cast<float>(z);
-	return true;
 }
 
 
@@ -1074,8 +1063,6 @@ void XScriptSys::TraceScriptError()
 
 int XScriptSys::ErrorHandler(lua_State *L)
 {
-	XScriptSys* pThis = static_cast<XScriptSys*>(gEnv->pScriptSys);
-
 //	lua_Debug ar;
 //	core::zero_object(ar);
 
@@ -1089,7 +1076,7 @@ int XScriptSys::ErrorHandler(lua_State *L)
 	//	pThis->TraceScriptError();
 	}
 
-	pThis->DumpStateToFile("lua_error_state_dump");
+	// static_cast<XScriptSys*>(gEnv->pScriptSys)->DumpStateToFile(L, "lua_error_state_dump");
 
 	X_ERROR("ScriptError", "------------------------------------------");
 	return 0;
@@ -1181,7 +1168,7 @@ struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
 };
 
 //////////////////////////////////////////////////////////////////////////
-static void RecursiveTableDump(XScriptSys* pSS, lua_State* L, int idx, int nLevel, 
+static void RecursiveTableDump(lua_State* L, int idx, int nLevel, 
 	IRecursiveLuaDump *sink, std::set<void*>& tables)
 {
 	const char *sKey = 0;
@@ -1218,7 +1205,7 @@ static void RecursiveTableDump(XScriptSys* pSS, lua_State* L, int idx, int nLeve
 				if (!(sKey != 0 && nLevel == 0 && strcmp(sKey, "_G") == 0))
 				{
 					sink->OnBeginTable(nLevel, sKey, nKey);
-					RecursiveTableDump(pSS, L, lua_gettop(L), nLevel + 1, sink, tables);
+					RecursiveTableDump(L, lua_gettop(L), nLevel + 1, sink, tables);
 					sink->OnEndTable(nLevel);
 				}
 			}
@@ -1226,7 +1213,7 @@ static void RecursiveTableDump(XScriptSys* pSS, lua_State* L, int idx, int nLeve
 			default:
 			{
 				ScriptValue any;
-				pSS->ToAny(any, -1);
+				XScriptSys::toAny(L, any, -1);
 				sink->OnElement(nLevel, sKey, nKey, any);
 			}
 			break;
@@ -1236,8 +1223,10 @@ static void RecursiveTableDump(XScriptSys* pSS, lua_State* L, int idx, int nLeve
 }
 
 
+// X_DISABLE_WARNING(2220)
 
-bool XScriptSys::DumpStateToFile(const char* name)
+
+bool XScriptSys::DumpStateToFile(lua_State* L, const char* name)
 {
 	X_LUA_CHECK_STACK(L);
 
@@ -1249,7 +1238,7 @@ bool XScriptSys::DumpStateToFile(const char* name)
 	if (sink.file_)
 	{
 		std::set<void*> tables;
-		RecursiveTableDump(this, L, LUA_GLOBALSINDEX, 0, &sink, tables);
+		RecursiveTableDump(L, LUA_GLOBALSINDEX, 0, &sink, tables);
 
 		X_LUA_CHECK_STACK(L);
 
@@ -1259,7 +1248,7 @@ bool XScriptSys::DumpStateToFile(const char* name)
 			XScriptTable* pTable = *it;
 
 			pTable->PushRef();
-			RecursiveTableDump(this, L, lua_gettop(L), 1, &sink, tables);
+			RecursiveTableDump(L, lua_gettop(L), 1, &sink, tables);
 			lua_pop(L, 1);
 			sink.OnEndTable(0);
 		}

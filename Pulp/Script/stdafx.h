@@ -17,5 +17,6 @@ X_LINK_LIB("luajitr")
 
 #include "wrapper\types.h"
 #include "wrapper\state.h"
+#include "wrapper\state_view.h"
 
 extern core::MemoryArenaBase* g_ScriptArena;

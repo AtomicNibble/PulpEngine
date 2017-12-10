@@ -86,6 +86,7 @@ public:
 
 	virtual void Update(void) X_FINAL;
 
+	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_FINAL;
 
 	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_FINAL;
 	virtual	ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_FINAL;
@@ -113,18 +114,19 @@ public:
 
 public:
 
-	bool GetRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any);
+	bool getRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any);
 
-	void PushAny(const ScriptValue &var);
-	bool PopAny(ScriptValue& var);
-	bool ToAny(ScriptValue& var, int index);
-	void PushVec3(const Vec3f& vec);
-	bool ToVec3(Vec3f& vec, int index);
+	void pushAny(const ScriptValue &var);
+	bool popAny(ScriptValue& var);
+	bool toAny(ScriptValue& var, int index);
+	static bool toAny(lua_State* L, ScriptValue& var, int index);
+	void pushVec3(const Vec3f& vec);
+	bool toVec3(Vec3f& vec, int index);
 
-	void PushTable(IScriptTable* pTable);
-	void AttachTable(IScriptTable* pTable);
+	void pushTable(IScriptTable* pTable);
+	void attachTable(IScriptTable* pTable);
 
-	bool DumpStateToFile(const char* name);
+	static bool DumpStateToFile(lua_State* L, const char* name);
 
 	X_INLINE lua_State* getLuaState(void) {
 		return L;
@@ -148,9 +150,7 @@ private:
 	bool initialised_;
 	lua_State* L;
 
-	core::IFileSys* pFileSys_;
 	XScriptBinds binds_;
-
 	ScriptFileList fileList_;
 };
 
