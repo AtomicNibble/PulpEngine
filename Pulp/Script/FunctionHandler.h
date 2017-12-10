@@ -25,7 +25,7 @@ public:
 	virtual const char* GetFuncName() X_OVERRIDE;
 
 	virtual int GetParamCount() X_OVERRIDE;
-	virtual ScriptValueType::Enum GetParamType(int nIdx) X_OVERRIDE;
+	virtual Type::Enum GetParamType(int nIdx) X_OVERRIDE;
 
 
 	virtual bool GetParamAny(int nIdx, ScriptValue &any) X_OVERRIDE;

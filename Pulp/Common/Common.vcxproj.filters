@@ -232,6 +232,9 @@
     <Filter Include="Interfaces_h\Video">
       <UniqueIdentifier>{47092fce-4e79-4f73-8d69-d0e74103385b}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Script">
+      <UniqueIdentifier>{2c76c073-5702-474f-bddb-b976b000f2dd}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -588,9 +591,6 @@
     </ClInclude>
     <ClInclude Include="Math\XPair.h">
       <Filter>Headers\Math</Filter>
-    </ClInclude>
-    <ClInclude Include="IScriptSys.h">
-      <Filter>Interfaces_h</Filter>
     </ClInclude>
     <ClInclude Include="Memory\dlmalloc-2.8.6.h">
       <Filter>Headers\Memory</Filter>
@@ -1287,6 +1287,12 @@
     </ClInclude>
     <ClInclude Include="Hashing\Digest.h">
       <Filter>Headers\Hashing</Filter>
+    </ClInclude>
+    <ClInclude Include="IScriptSys.h">
+      <Filter>Interfaces_h\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="IScriptSys.inl">
+      <Filter>Interfaces_h\Script</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

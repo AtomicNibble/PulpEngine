@@ -35,8 +35,8 @@ public:
 	virtual void SetAtAny(int nIndex, const ScriptValue &any) X_OVERRIDE;
 	virtual bool GetAtAny(int nIndex, ScriptValue &any) X_OVERRIDE;
 
-	virtual ScriptValueType::Enum GetValueType(const char* sKey) X_OVERRIDE;
-	virtual ScriptValueType::Enum GetAtType(int nIdx) X_OVERRIDE;
+	virtual Type::Enum GetValueType(const char* sKey) X_OVERRIDE;
+	virtual Type::Enum GetAtType(int nIdx) X_OVERRIDE;
 
 	// Iteration.
 	virtual IScriptTable::Iterator BeginIteration() X_OVERRIDE;

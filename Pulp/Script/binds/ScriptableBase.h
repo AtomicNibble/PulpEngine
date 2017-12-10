@@ -13,14 +13,14 @@ X_NAMESPACE_BEGIN(script)
 #define SCRIPT_CHECK_PARAMETERS(_n) \
 if (pH->GetParamCount() != _n) \
 {  \
-	pH->GetIScriptSystem()->OnScriptError("[%s] %d arguments passed, " #_n " expected)", __FUNCTION__, pH->GetParamCount()); \
+	pH->GetIScriptSystem()->onScriptError("[%s] %d arguments passed, " #_n " expected)", __FUNCTION__, pH->GetParamCount()); \
 	return pH->EndFunction();  \
 }
 
 #define SCRIPT_CHECK_PARAMETERS_MIN(_n) \
 if (pH->GetParamCount() < _n) \
 {  \
-	pH->GetIScriptSystem()->OnScriptError("[%s] %d arguments passed, at least " #_n " expected)", __FUNCTION__, pH->GetParamCount()); \
+	pH->GetIScriptSystem()->onScriptError("[%s] %d arguments passed, at least " #_n " expected)", __FUNCTION__, pH->GetParamCount()); \
 	return pH->EndFunction(); \
 }
 

@@ -76,7 +76,7 @@ int XBinds_Core::GetDvarInt(IFunctionHandler* pH)
 	}
 	else
 	{
-		pScriptSys_->OnScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
 	return pH->EndFunction();
@@ -97,7 +97,7 @@ int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
 	}
 	else
 	{
-		pScriptSys_->OnScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
 	return pH->EndFunction();
@@ -129,7 +129,7 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
 	}
 	else
 	{
-		pScriptSys_->OnScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
 	}
 
 	return pH->EndFunction();
@@ -147,15 +147,15 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 
 	if (var)
 	{
-		ScriptValueType::Enum type = pH->GetParamType(2);
+		Type::Enum type = pH->GetParamType(2);
 
-		if (type == ScriptValueType::NUMBER)
+		if (type == Type::NUMBER)
 		{
 			float fValue = 0;
 			pH->GetParam(2, fValue);
 			var->Set(fValue);
 		}
-		else if (type == ScriptValueType::STRING)
+		else if (type == Type::STRING)
 		{
 			const char* sValue = "";
 			pH->GetParam(2, sValue);
@@ -164,7 +164,7 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 	}
 	else
 	{
-		pScriptSys_->OnScriptError("GetDvar Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("GetDvar Failed to fine dvar: \"%s\"", varName);
 	}
 
 	return pH->EndFunction();
@@ -180,9 +180,9 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 	pH->GetParamAny(1,value);
 	switch (value.getType())
 	{
-		case ScriptValueType::STRING:
+		case Type::STRING:
 
-		X_LOG0("Script", value.str);
+		X_LOG0("Script", value.str_.pStr);
 
 		break;
 	}

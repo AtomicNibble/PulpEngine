@@ -10,8 +10,8 @@ X_LINK_LIB("luajitd")
 X_LINK_LIB("luajitr")
 #endif 
 
-
 #include <IScriptSys.h>
+
 #include "ScriptSys.h"
 
 

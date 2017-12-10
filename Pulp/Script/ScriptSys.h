@@ -75,51 +75,43 @@ class XScriptSys : public IScriptSys, public core::IXHotReload
 public:
 	XScriptSys();
 	// IScriptSys
-	~XScriptSys() X_OVERRIDE;
+	~XScriptSys() X_FINAL;
 
-	virtual void registerVars(void) X_OVERRIDE;
-	virtual void registerCmds(void) X_OVERRIDE;
+	virtual void registerVars(void) X_FINAL;
+	virtual void registerCmds(void) X_FINAL;
 
-	virtual bool init(void) X_OVERRIDE;
-	virtual void shutDown(void) X_OVERRIDE;
-	virtual void release(void) X_OVERRIDE;
+	virtual bool init(void) X_FINAL;
+	virtual void shutDown(void) X_FINAL;
+	virtual void release(void) X_FINAL;
 
-	virtual void Update(void) X_OVERRIDE;
-
-	virtual bool ExecuteFile(const char* FileName, bool silent, bool forceReload) X_OVERRIDE;
-	virtual bool UnLoadScript(const char* FileName) X_OVERRIDE;
-	virtual void UnloadScripts() X_OVERRIDE;
-	virtual bool ReloadScript(const char* FileName, bool silent) X_OVERRIDE;
-	virtual bool ReloadScripts() X_OVERRIDE;
-	virtual void ListLoadedScripts(void) X_OVERRIDE;
-	virtual void LogStackTrace(void) X_OVERRIDE;
-	virtual void SetGlobalAny(const char* Key, const ScriptValue& val) X_OVERRIDE;
+	virtual void Update(void) X_FINAL;
 
 
-	virtual HSCRIPTFUNCTION GetFunctionPtr(const char* sFuncName) X_OVERRIDE;
-	virtual	HSCRIPTFUNCTION GetFunctionPtr(const char* sTableName, const char* sFuncName) X_OVERRIDE;
+	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_FINAL;
+	virtual	ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_FINAL;
+	virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_FINAL;
+	virtual void releaseFunc(ScriptFunctionHandle f) X_FINAL;
 
-	virtual HSCRIPTFUNCTION AddFuncRef(HSCRIPTFUNCTION f) X_OVERRIDE;
-	virtual bool CompareFuncRef(HSCRIPTFUNCTION f1, HSCRIPTFUNCTION f2) X_OVERRIDE;
-	virtual void ReleaseFunc(HSCRIPTFUNCTION f) X_OVERRIDE;
+	virtual IScriptTable* createTable(bool bEmpty = false) X_FINAL;
 
-	virtual IScriptTable* CreateTable(bool bEmpty = false) X_OVERRIDE;
 
-	virtual bool GetGlobalAny(const char* Key, ScriptValue& any) X_OVERRIDE;
+	virtual void setGlobalValue(const char* pKey, const ScriptValue& val) X_FINAL;
+	virtual bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
 
-	virtual IScriptTable* CreateUserData(void* ptr, size_t size) X_OVERRIDE;
+	virtual IScriptTable* createUserData(void* ptr, size_t size) X_FINAL;
 
-	virtual void OnScriptError(const char* fmt, ...) X_OVERRIDE;
+	virtual void onScriptError(const char* fmt, ...) X_FINAL;
 
 	// ~IScriptSys
 
+
 	// IXHotReload
 	
-	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
+	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 
 	// ~IXHotReload
 
-
+public:
 
 	bool GetRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any);
 
@@ -160,8 +152,6 @@ private:
 	XScriptBinds binds_;
 
 	ScriptFileList fileList_;
-
-	int c_script_draw_memory_stats_;
 };
 
 

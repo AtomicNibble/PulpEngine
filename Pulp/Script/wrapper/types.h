@@ -50,24 +50,26 @@ namespace lua
 
 	typedef Flags<lib> libs;
 
-	struct Type
+	struct Ref
 	{
-		enum Enum : int 
+		enum Enum : int32_t
 		{
-			none = LUA_TNONE,
-			lua_nil = LUA_TNIL,
-			nil = lua_nil,
-			string = LUA_TSTRING,
-			number = LUA_TNUMBER,
-			thread = LUA_TTHREAD,
-			boolean = LUA_TBOOLEAN,
-			function = LUA_TFUNCTION,
-			userdata = LUA_TUSERDATA,
-			lightuserdata = LUA_TLIGHTUSERDATA,
-			table = LUA_TTABLE,
-			poly = -0xFFFF
+			Deleted = LUA_NOREF,
+			Nil = LUA_REFNIL,
 		};
 	};
+
+
+	static_assert(Type::NIL == LUA_TNIL, "Enum mismtach");
+	static_assert(Type::POINTER == LUA_TLIGHTUSERDATA, "Enum mismtach");
+	static_assert(Type::BOOLEAN == LUA_TBOOLEAN, "Enum mismtach");
+	static_assert(Type::NUMBER == LUA_TNUMBER, "Enum mismtach");
+	static_assert(Type::STRING == LUA_TSTRING, "Enum mismtach");
+	static_assert(Type::TABLE == LUA_TTABLE, "Enum mismtach");
+	static_assert(Type::FUNCTION == LUA_TFUNCTION, "Enum mismtach");
+	static_assert(Type::USERDATA == LUA_TUSERDATA, "Enum mismtach");
+	// static_assert(Type::HANDLE == LUA_THANDLE, "Enum mismtach");
+
 
 
 } // namespace lua

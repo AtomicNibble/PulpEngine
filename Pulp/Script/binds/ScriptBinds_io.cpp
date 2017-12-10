@@ -65,16 +65,16 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 	X_ASSERT_NOT_NULL(pH);
 
 	SmartScriptTable tbl;
-	ScriptValueType::Enum type = pH->GetParamType(index);
+	Type::Enum type = pH->GetParamType(index);
 
-	if (type == ScriptValueType::POINTER) // this is a script handle
+	if (type == Type::POINTER) // this is a script handle
 	{
 		ScriptHandle fileHandle;
 		if (!pH->GetParam(index, fileHandle)) {
 			return nullptr;
 		}
 
-		return static_cast<core::XFile*>(fileHandle.ptr);
+		return static_cast<core::XFile*>(fileHandle.pPtr);
 	}
 	else if (pH->GetParam(1, tbl))
 	{
@@ -110,16 +110,15 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 			pH->GetParamAny(arg, value);
 			switch (value.getType())
 			{
-				case ScriptValueType::STRING:
+				case Type::STRING:
 			//	pFile->writeString(value.str);
 			// no null term Plz!
-				pFile->write(value.str, safe_static_cast<uint32_t, size_t>(
-					core::strUtil::strlen(value.str)));
+				pFile->write(value.str_.pStr, safe_static_cast<uint32_t>(value.str_.len));
 				break;
-				case ScriptValueType::NUMBER:
+				case Type::NUMBER:
 			//	pFile->writeObj(value.number);
 			// write it as a string.
-				pFile->printf(LUA_NUMBER_FMT, value.number);
+				pFile->printf(LUA_NUMBER_FMT, value.number_);
 				break;
 				default:
 					break;
@@ -164,7 +163,7 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 			{
 				const char* mode;
 
-				if (pH->GetParamType(arg) == ScriptValueType::NUMBER)
+				if (pH->GetParamType(arg) == Type::NUMBER)
 				{
 					// read this number of bytes.
 					// not gonna use float(aka lua number) since who the flying
@@ -195,14 +194,14 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 							total += readLine(pH, pFile, true);
 							break;
 						default:
-							pScriptSys_->OnScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
+							pScriptSys_->onScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 							break;
 						}
 
 					}
 					else
 					{
-						pScriptSys_->OnScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
+						pScriptSys_->onScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 					}
 				}
 			}
@@ -257,7 +256,7 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{ 
-			pScriptSys_->OnScriptError("Unknown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
+			pScriptSys_->onScriptError("Unknown file:seek mode: \"%s\" valid modes: cur,set,end", mode);
 			return pH->EndFunction();
 		}
 	}
@@ -344,7 +343,7 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 		else
 		{
 
-			pH->GetIScriptSystem()->OnScriptError( "Failed to close file");	
+			pH->GetIScriptSystem()->onScriptError( "Failed to close file");	
 		}
 	}
 
@@ -456,7 +455,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 		if (i == numModes)
 		{
-			pScriptSys_->OnScriptError("Unknown fileopen mode: \"%s\" valid modes: r,w,a,r+,w+", mode);
+			pScriptSys_->onScriptError("Unknown fileopen mode: \"%s\" valid modes: r,w,a,r+,w+", mode);
 		}
 	}
 
@@ -467,7 +466,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 	if (path.length() == 0)
 	{
-		pScriptSys_->OnScriptError("invalid filename: %s", fileName);
+		pScriptSys_->onScriptError("invalid filename: %s", fileName);
 		return pH->EndFunction();
 	}
 
@@ -483,7 +482,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
 {
-	SmartScriptTable userData = pScriptSys_->CreateUserData(&pFile, sizeof(pFile));
+	SmartScriptTable userData = pScriptSys_->createUserData(&pFile, sizeof(pFile));
 	
 
 	// files have to be explicitly closed.

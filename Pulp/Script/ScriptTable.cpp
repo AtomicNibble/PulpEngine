@@ -6,6 +6,8 @@
 #include <Util\ToggleChecker.h>
 
 
+#include "wrapper\types.h"
+
 X_NAMESPACE_BEGIN(script)
 
 
@@ -13,14 +15,6 @@ namespace
 {
 	core::ToggleChecker g_setChainActive(false);
 
-	struct ScriptTableRed
-	{
-		enum Enum
-		{
-			REF_DELETED = LUA_NOREF,
-			REF_NULL = LUA_REFNIL,
-		};
-	};
 
 }
 
@@ -33,7 +27,7 @@ std::set<class XScriptTable*> XScriptTable::s_allTables_;
 
 XScriptTable::XScriptTable() :
 	refCount_(0),
-	luaRef_(ScriptTableRed::REF_NULL)
+	luaRef_(lua::Ref::Nil)
 {
 
 }
@@ -114,7 +108,7 @@ void XScriptTable::SetValueAny(const char* sKey, const ScriptValue& any, bool bC
 
 	size_t len = strlen(sKey);
 
-	if (any.getType() == ScriptValueType::VECTOR)
+	if (any.getType() == Type::VECTOR)
 	{
 		// Check if we can reuse Vec3 value already in the table.
 		lua_pushlstring(L, sKey, len);
@@ -130,13 +124,13 @@ void XScriptTable::SetValueAny(const char* sKey, const ScriptValue& any, bool bC
 			{
 				// Assume its a vector, just fill it with new vector values.
 				lua_pushlstring(L, "x", 1);
-				lua_pushnumber(L, any.vec3.x);
+				lua_pushnumber(L, any.vec3_.x);
 				lua_settable(L, -3);
 				lua_pushlstring(L, "y", 1);
-				lua_pushnumber(L, any.vec3.y);
+				lua_pushnumber(L, any.vec3_.y);
 				lua_settable(L, -3);
 				lua_pushlstring(L, "z", 1);
-				lua_pushnumber(L, any.vec3.z);
+				lua_pushnumber(L, any.vec3_.z);
 				lua_settable(L, -3);
 
 				lua_settop(L, top);
@@ -187,10 +181,10 @@ bool XScriptTable::GetAtAny(int nIndex, ScriptValue &any)
 	return res;
 }
 
-ScriptValueType::Enum XScriptTable::GetValueType(const char* sKey)
+Type::Enum XScriptTable::GetValueType(const char* sKey)
 {
 	X_LUA_CHECK_STACK(L);
-	ScriptValueType::Enum type = ScriptValueType::NONE;
+	Type::Enum type = Type::NONE;
 
 	PushRef();
 	lua_pushstring(L, sKey);
@@ -199,13 +193,13 @@ ScriptValueType::Enum XScriptTable::GetValueType(const char* sKey)
 
 	switch (luatype)
 	{
-		case LUA_TNIL: type = ScriptValueType::NONE; break;
-		case LUA_TBOOLEAN: type = ScriptValueType::BOOLEAN; break;
-		case LUA_TNUMBER: type = ScriptValueType::NUMBER; break;
-		case LUA_TSTRING: type = ScriptValueType::STRING; break;
-		case LUA_TFUNCTION: type = ScriptValueType::FUNCTION; break;
-		case LUA_TLIGHTUSERDATA: type = ScriptValueType::POINTER; break;
-		case LUA_TTABLE: type = ScriptValueType::TABLE; break;
+		case LUA_TNIL: type = Type::NONE; break;
+		case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
+		case LUA_TNUMBER: type = Type::NUMBER; break;
+		case LUA_TSTRING: type = Type::STRING; break;
+		case LUA_TFUNCTION: type = Type::FUNCTION; break;
+		case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
+		case LUA_TTABLE: type = Type::TABLE; break;
 	}
 
 	lua_pop(L, 2); // Pop value and table.
@@ -213,10 +207,10 @@ ScriptValueType::Enum XScriptTable::GetValueType(const char* sKey)
 	return type;
 }
 
-ScriptValueType::Enum XScriptTable::GetAtType(int nIdx)
+Type::Enum XScriptTable::GetAtType(int nIdx)
 {
 	X_LUA_CHECK_STACK(L);
-	ScriptValueType::Enum svtRetVal = ScriptValueType::NONE;
+	Type::Enum svtRetVal = Type::NONE;
 	PushRef();
 
 //	if (luaL_getn(L, -1) < nIdx)
@@ -229,31 +223,31 @@ ScriptValueType::Enum XScriptTable::GetAtType(int nIdx)
 
 	if (lua_isnil(L, -1))
 	{
-		svtRetVal = ScriptValueType::TNIL;
+		svtRetVal = Type::NIL;
 	}
 	else if (lua_isnone(L, -1))
 	{
-		svtRetVal = ScriptValueType::NONE;
+		svtRetVal = Type::NONE;
 	}
 	else if (lua_isfunction(L, -1))
 	{
-		svtRetVal = ScriptValueType::FUNCTION;
+		svtRetVal = Type::FUNCTION;
 	}
 	else if (lua_isnumber(L, -1))
 	{
-		svtRetVal = ScriptValueType::NUMBER;
+		svtRetVal = Type::NUMBER;
 	}
 	else if (lua_isstring(L, -1))
 	{
-		svtRetVal = ScriptValueType::STRING;
+		svtRetVal = Type::STRING;
 	}
 	else if (lua_istable(L, -1))
 	{
-		svtRetVal = ScriptValueType::TABLE;
+		svtRetVal = Type::TABLE;
 	}
 	else if (lua_isboolean(L, -1))
 	{
-		svtRetVal = ScriptValueType::BOOLEAN;
+		svtRetVal = Type::BOOLEAN;
 	}
 
 	lua_pop(L, 2);
@@ -288,7 +282,7 @@ bool XScriptTable::MoveNext(Iterator& iter)
 	bool res = lua_next(L, nTop + 1) != 0;
 	if (res)
 	{
-		iter.value.Clear();
+		iter.value.clear();
 		res = pScriptSystem_->PopAny(iter.value);
 		// Get current key.
 		pScriptSystem_->ToAny(iter.key, -1);
@@ -412,13 +406,13 @@ void XScriptTable::Dump(IScriptTableDumpSink* p)
 			const char *sName = lua_tostring(L, -2); // again index
 			switch (lua_type(L, -1))
 			{
-				case LUA_TNIL: p->OnElementFound(sName, ScriptValueType::TNIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(sName, ScriptValueType::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(sName, ScriptValueType::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(sName, ScriptValueType::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(sName, ScriptValueType::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(sName, ScriptValueType::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(sName, ScriptValueType::FUNCTION); break;
+				case LUA_TNIL: p->OnElementFound(sName, Type::NIL); break;
+				case LUA_TBOOLEAN: p->OnElementFound(sName, Type::BOOLEAN); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(sName, Type::POINTER); break;
+				case LUA_TNUMBER: p->OnElementFound(sName, Type::NUMBER); break;
+				case LUA_TSTRING: p->OnElementFound(sName, Type::STRING); break;
+				case LUA_TTABLE: p->OnElementFound(sName, Type::TABLE); break;
+				case LUA_TFUNCTION: p->OnElementFound(sName, Type::FUNCTION); break;
 		//		case LUA_TUSERDATA: p->OnElementFound(sName, svtUserData); break;
 			};
 		}
@@ -427,13 +421,13 @@ void XScriptTable::Dump(IScriptTableDumpSink* p)
 			int nIdx = (int)lua_tonumber(L, -2); // again index
 			switch (lua_type(L, -1))
 			{
-				case LUA_TNIL: p->OnElementFound(nIdx, ScriptValueType::TNIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(nIdx, ScriptValueType::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(nIdx, ScriptValueType::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(nIdx, ScriptValueType::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(nIdx, ScriptValueType::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(nIdx, ScriptValueType::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(nIdx, ScriptValueType::FUNCTION); break;
+				case LUA_TNIL: p->OnElementFound(nIdx, Type::NIL); break;
+				case LUA_TBOOLEAN: p->OnElementFound(nIdx, Type::BOOLEAN); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(nIdx, Type::POINTER); break;
+				case LUA_TNUMBER: p->OnElementFound(nIdx, Type::NUMBER); break;
+				case LUA_TSTRING: p->OnElementFound(nIdx, Type::STRING); break;
+				case LUA_TTABLE: p->OnElementFound(nIdx, Type::TABLE); break;
+				case LUA_TFUNCTION: p->OnElementFound(nIdx, Type::FUNCTION); break;
 		//		case LUA_TUSERDATA: p->OnElementFound(nIdx, svtUserData); break;
 			};
 		}
@@ -510,7 +504,7 @@ int XScriptTable::GetRef()
 
 void XScriptTable::Attach()
 {
-	if (luaRef_ != ScriptTableRed::REF_NULL)
+	if (luaRef_ != lua::Ref::Nil)
 		lua_unref(L, luaRef_);
 	luaRef_ = lua_ref(L, 1);
 
@@ -525,17 +519,17 @@ void XScriptTable::AttachToObject(IScriptTable* so)
 
 void XScriptTable::DeleteThis()
 {
-	if (luaRef_ == ScriptTableRed::REF_DELETED)
+	if (luaRef_ == lua::Ref::Deleted)
 	{
 		X_FATAL("Script", "attempt to Release already released script table.");
 	}
 
 	s_allTables_.erase(this);
 
-	if (luaRef_ != ScriptTableRed::REF_NULL)
+	if (luaRef_ != lua::Ref::Nil)
 		lua_unref(L, luaRef_);
 
-	luaRef_ = ScriptTableRed::REF_DELETED;
+	luaRef_ = lua::Ref::Deleted;
 
 	X_DELETE(this,g_ScriptArena);
 }
@@ -556,12 +550,12 @@ void XScriptTable::SetMetatable(IScriptTable* pMetatable)
 // Push reference of this object to the stack.
 void XScriptTable::PushRef()
 {
-	if (luaRef_ != ScriptTableRed::REF_DELETED && luaRef_ != ScriptTableRed::REF_NULL)
+	if (luaRef_ != lua::Ref::Deleted && luaRef_ != lua::Ref::Nil)
 		lua_getref(L, luaRef_);
 	else
 	{
 		lua_pushnil(L);
-		if (luaRef_ == ScriptTableRed::REF_DELETED)
+		if (luaRef_ == lua::Ref::Deleted)
 		{
 
 			X_FATAL("Script", "Access to deleted script object: %p", this);
@@ -577,7 +571,7 @@ void XScriptTable::PushRef()
 void XScriptTable::PushRef(IScriptTable* pObj)
 {
 	int nRef = ((XScriptTable*)pObj)->luaRef_;
-	if (nRef != ScriptTableRed::REF_DELETED)
+	if (nRef != lua::Ref::Deleted)
 		lua_getref(L, nRef);
 	else
 	{

@@ -52,20 +52,20 @@ int XFunctionHandler::GetParamCount()
 	return core::Max(lua_gettop(L) - paramIdOffset_, 0);
 }
 
-ScriptValueType::Enum XFunctionHandler::GetParamType(int nIdx)
+Type::Enum XFunctionHandler::GetParamType(int nIdx)
 {
 	int nRealIdx = nIdx + paramIdOffset_;
-	ScriptValueType::Enum type = ScriptValueType::NONE;
+	Type::Enum type = Type::NONE;
 	int luatype = lua_type(L, nRealIdx);
 	switch (luatype)
 	{
-		case LUA_TNIL: type = ScriptValueType::TNIL; break;
-		case LUA_TBOOLEAN: type = ScriptValueType::BOOLEAN; break;
-		case LUA_TNUMBER: type = ScriptValueType::NUMBER; break;
-		case LUA_TSTRING: type = ScriptValueType::STRING; break;
-		case LUA_TFUNCTION: type = ScriptValueType::FUNCTION; break;
-		case LUA_TLIGHTUSERDATA: type = ScriptValueType::POINTER; break;
-		case LUA_TTABLE: type = ScriptValueType::TABLE; break;
+		case LUA_TNIL: type = Type::NIL; break;
+		case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
+		case LUA_TNUMBER: type = Type::NUMBER; break;
+		case LUA_TSTRING: type = Type::STRING; break;
+		case LUA_TFUNCTION: type = Type::FUNCTION; break;
+		case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
+		case LUA_TTABLE: type = Type::TABLE; break;
 	}
 	return type;
 }
@@ -78,14 +78,14 @@ bool XFunctionHandler::GetParamAny(int nIdx, ScriptValue &any)
 	if (!bRes)
 	{
 
-		ScriptValueType::Enum paramType = GetParamType(nIdx);
-		const char* sParamType = ScriptValueType::ToString(paramType);
-		const char* sType = ScriptValueType::ToString(any.getType());
+		Type::Enum paramType = GetParamType(nIdx);
+		const char* sParamType = Type::ToString(paramType);
+		const char* sType = Type::ToString(any.getType());
 		// Report wrong param.
 		X_WARNING("Script","Wrong parameter type. Function %s expect parameter %d of type %s (Provided type %s)", 
 			sFuncName_, nIdx, sType, sParamType);
 	
-		pSS_->LogStackTrace();
+//		pSS_->LogStackTrace();
 	}
 	return bRes;
 }
@@ -93,7 +93,7 @@ bool XFunctionHandler::GetParamAny(int nIdx, ScriptValue &any)
 int XFunctionHandler::EndFunctionAny(const ScriptValue& any)
 {
 	pSS_->PushAny(any);
-	return (any.getType() == ScriptValueType::TNIL) ? 0 : 1;
+	return (any.getType() == Type::NIL) ? 0 : 1;
 }
 
 int XFunctionHandler::EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2)

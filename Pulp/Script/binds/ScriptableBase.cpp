@@ -15,7 +15,7 @@ XScriptableBase::XScriptableBase() :
 XScriptableBase::~XScriptableBase()
 {
 	if (!name_.isEmpty() && pScriptSys_) {
-		pScriptSys_->SetGlobalToNull(name_.c_str());
+		pScriptSys_->setGlobalToNull(name_.c_str());
 	}
 	core::SafeRelease(pMethodsTable_);
 }
@@ -27,7 +27,7 @@ void XScriptableBase::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 
 	pCore_ = pCore;
 	pScriptSys_ = pSS;
-	pMethodsTable_ = pSS->CreateTable();
+	pMethodsTable_ = pSS->createTable();
 	pMethodsTable_->addRef();
 	paramIdOffset_ = paramIdOffset;
 }
@@ -40,7 +40,7 @@ void XScriptableBase::SetGlobalName(const char* pGlobalName)
 	name_.set(pGlobalName);
 
 	if (pMethodsTable_) {
-		pScriptSys_->SetGlobalValue(name_.c_str(), pMethodsTable_);
+		pScriptSys_->setGlobalValue(name_.c_str(), pMethodsTable_);
 	}
 }
 
@@ -61,12 +61,12 @@ IScriptTable* XScriptableBase::GetMethodsTable(void)
 
 void XScriptableBase::RegisterGlobal(const char* pName, float value)
 {
-	pScriptSys_->SetGlobalValue(pName, value);
+	pScriptSys_->setGlobalValue(pName, value);
 }
 
 void XScriptableBase::RegisterGlobal(const char* pName, int value)
 {
-	pScriptSys_->SetGlobalValue(pName, value);
+	pScriptSys_->setGlobalValue(pName, value);
 }
 
 

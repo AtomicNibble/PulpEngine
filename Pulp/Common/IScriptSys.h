@@ -5,8 +5,9 @@
 
 #include "Util\Delegate.h"
 
-
 X_NAMESPACE_BEGIN(script)
+
+static const char* X_SCRIPT_FILE_EXTENSION = "lua";
 
 
 X_DECLARE_ENUM(ScriptMoudles)(
@@ -16,19 +17,20 @@ X_DECLARE_ENUM(ScriptMoudles)(
 	IO
 );
 
-X_DECLARE_ENUM(ScriptValueType)(
-	TNIL, 
-	NONE, 
+X_DECLARE_ENUM(Type)(
+	NIL, 
 	BOOLEAN, 
+	POINTER, 
 	NUMBER, 
 	STRING, 
 	TABLE, 
-	VECTOR, 
 	FUNCTION, 
-	POINTER, 
+	USERDATA,
 	HANDLE, 
-	USERDATA
+	VECTOR, 
+	NONE
 );
+
 
 class SmartScriptTable;
 
@@ -36,95 +38,183 @@ struct IScriptTableDumpSink;
 struct IScriptTableIterator;
 struct IScriptTable;
 
-struct XScriptFuncHandle {};
-typedef XScriptFuncHandle* HSCRIPTFUNCTION;
+
+// the only reason this is uinptr is so it's a diffrent type than int32_t.
+// we onlt need 32bit's for the data, but need it to be a strong type.
+typedef uintptr_t ScriptFunctionHandle;
+
+static const ScriptFunctionHandle INVALID_HANLDE = 0;
 
 // note this is a union not a struct
+// Used for storing full range int's in lua.
 union ScriptHandle
 {
-	ScriptHandle() : ptr(0) {};
-	ScriptHandle(int i) : id(i) {};
-	ScriptHandle(void* p) : ptr(p) {};
+	ScriptHandle() : pPtr(0) {}
+	ScriptHandle(size_t i) : id(i) {}
+	ScriptHandle(void* p) : pPtr(p) {}
 
-	UINT_PTR id;
-	void* ptr;
+	size_t id;
+	void* pPtr;
 };
+
+//	ScriptValue(bool, int) : type_(Type::BOOLEAN) {};
+//	ScriptValue(int, int) : type_(Type::NUMBER) {};
+//	ScriptValue(unsigned int, int) : type_(Type::NUMBER) {};
+//	ScriptValue(float, int) : type_(Type::NUMBER) {};
+//	ScriptValue(const char*, int) : type_(Type::STRING) {};
+//	ScriptValue(IScriptTable*, int);
+//	ScriptValue(HSCRIPTFUNCTION, int) : type_(Type::FUNCTION) {};
+//	ScriptValue(ScriptHandle value, int) : type_(Type::HANDLE) { X_UNUSED(value); };
+//	ScriptValue(const Vec3f&, int) : type_(Type::VECTOR) {};
+//	ScriptValue(const SmartScriptTable &value, int);
+
+template<typename T>
+struct ValueType {
+
+};
+
+template<>
+struct ValueType<bool> {
+	static const Type::Enum Type = Type::BOOLEAN;
+};
+template<>
+struct ValueType<int32_t> {
+	static const Type::Enum Type = Type::NUMBER;
+};
+template<>
+struct ValueType<uint32_t> {
+	static const Type::Enum Type = Type::NUMBER;
+};
+template<>
+struct ValueType<float> {
+	static const Type::Enum Type = Type::NUMBER;
+};
+template<>
+struct ValueType<double> {
+	static const Type::Enum Type = Type::NUMBER;
+};
+template<>
+struct ValueType<const char*> {
+	static const Type::Enum Type = Type::STRING;
+};
+
+template<>
+struct ValueType<ScriptFunctionHandle> {
+	static const Type::Enum Type = Type::FUNCTION;
+};
+template<>
+struct ValueType<ScriptHandle> {
+	static const Type::Enum Type = Type::HANDLE;
+};
+template<>
+struct ValueType<Vec3f> {
+	static const Type::Enum Type = Type::VECTOR;
+};
+
+template<>
+struct ValueType<IScriptTable*> {
+	static const Type::Enum Type = Type::TABLE;
+};
+template<>
+struct ValueType<SmartScriptTable> {
+	static const Type::Enum Type = Type::TABLE;
+};
+
 
 struct ScriptValue
 {
-	typedef ScriptValueType Type;
+	X_INLINE ScriptValue(bool value);
+	X_INLINE ScriptValue(int32_t value);
+	X_INLINE ScriptValue(uint32_t value);
+	X_INLINE ScriptValue(float value);
+	X_INLINE ScriptValue(double value);
+	X_INLINE ScriptValue(const char* pValue);
+	X_INLINE ScriptValue(IScriptTable* pTable_);
+	X_INLINE ScriptValue(ScriptFunctionHandle function);
+	X_INLINE ScriptValue(ScriptHandle value);
+	X_INLINE ScriptValue(const Vec3f& vec);
+	X_INLINE ScriptValue(const SmartScriptTable& value);
+	X_INLINE ScriptValue(Type::Enum type);
+	X_INLINE ScriptValue();
+	X_INLINE ~ScriptValue();
 
-	ScriptValue(bool value) : type_(Type::BOOLEAN) { b = value; }
-	ScriptValue(int value) : type_(Type::NUMBER) { number = (float)value; }
-	ScriptValue(unsigned int value) : type_(Type::NUMBER) { number = (float)value; }
-	ScriptValue(float value) : type_(Type::NUMBER) { number = value; }
-	ScriptValue(const char* value) : type_(Type::STRING) { str = value; }
-	ScriptValue(IScriptTable* pTable_);
-	ScriptValue(HSCRIPTFUNCTION function) : type_(Type::FUNCTION) { pFunction = function; }
-	ScriptValue(ScriptHandle value) : type_(Type::HANDLE) { ptr = value.ptr; }
-	ScriptValue(const Vec3f& vec) : type_(Type::VECTOR) { vec3.x = vec.x; vec3.y = vec.y; vec3.z = vec.z; }
-	ScriptValue(const SmartScriptTable& value);
-	ScriptValue() : type_(Type::NONE), pTable(nullptr) {
-	}
-
-	ScriptValue(bool, int) : type_(Type::BOOLEAN) {};
-	ScriptValue(int, int) : type_(Type::NUMBER) {};
-	ScriptValue(unsigned int, int) : type_(Type::NUMBER) {};
-	ScriptValue(float, int) : type_(Type::NUMBER) {};
-	ScriptValue(const char*, int) : type_(Type::STRING) {};
-	ScriptValue(IScriptTable*, int);
-	ScriptValue(HSCRIPTFUNCTION, int) : type_(Type::FUNCTION) {};
-	ScriptValue(ScriptHandle value, int) : type_(Type::HANDLE) { X_UNUSED(value); };
-	ScriptValue(const Vec3f&, int) : type_(Type::VECTOR) {};
-	ScriptValue(const SmartScriptTable &value, int);
-
-	~ScriptValue() {
-		Clear();
-	}
-
-	X_INLINE void Clear()
-	{
-		type_ = Type::NONE;
-	}
-
-	X_INLINE Type::Enum getType(void) const {
-		return type_;
-	}
+	X_INLINE void clear();
+	X_INLINE Type::Enum getType(void) const;
 
 	X_INLINE ScriptValue& operator=(const ScriptValue& rhs);
 	X_INLINE bool operator==(const ScriptValue& rhs) const;
 	X_INLINE bool operator!=(const ScriptValue& rhs) const;
-	X_INLINE void Swap(ScriptValue& value);
+	X_INLINE void swap(ScriptValue& value);
 
-	X_INLINE bool CopyTo(bool &value) const { if (type_ == Type::BOOLEAN) { value = b; return true; }; return false; };
-	X_INLINE bool CopyTo(int &value) const { if (type_ == Type::NUMBER) { value = (int)number; return true; }; return false; };
-	X_INLINE bool CopyTo(unsigned int &value) const { if (type_ == Type::NUMBER) { value = (unsigned int)number; return true; }; return false; };
-	X_INLINE bool CopyTo(float &value) const { if (type_ == Type::NUMBER) { value = number; return true; }; return false; };
-	X_INLINE bool CopyTo(const char *&value) const { if (type_ == Type::STRING) { value = str; return true; }; return false; };
-	X_INLINE bool CopyTo(char *&value) const { if (type_ == Type::STRING) { value = (char*)str; return true; }; return false; };
-	X_INLINE bool CopyTo(ScriptHandle &value) const { if (type_ == Type::HANDLE) { value.ptr = const_cast<void*>(ptr); return true; }; return false; };
-	X_INLINE bool CopyTo(HSCRIPTFUNCTION &value) const;
-	X_INLINE bool CopyTo(Vec3f& value) const { if (type_ == Type::VECTOR) { value.x = vec3.x; value.y = vec3.y; value.z = vec3.z; return true; }; return false; };
-	X_INLINE bool CopyTo(IScriptTable*& value) const; // implemented at the end of header
-	X_INLINE bool CopyTo(SmartScriptTable& value) const; // implemented at the end of header
+	X_INLINE bool CopyTo(bool& value) const;
+	X_INLINE bool CopyTo(int32_t& value) const;
+	X_INLINE bool CopyTo(uint32_t& value) const;
+	X_INLINE bool CopyTo(float& value) const;
+	X_INLINE bool CopyTo(const char* &value) const;
+	X_INLINE bool CopyTo(char* &value) const;
+	X_INLINE bool CopyTo(ScriptHandle &value) const;
+	X_INLINE bool CopyTo(ScriptFunctionHandle &value) const;
+	X_INLINE bool CopyTo(Vec3f& value) const;
+	X_INLINE bool CopyTo(IScriptTable*& value) const;
+	X_INLINE bool CopyTo(SmartScriptTable& value) const; 
 
 
+public:
 	Type::Enum type_;
 
 	union
 	{
-		bool b;
-		float number;
-		const char* str;
-		const void* ptr;
-		IScriptTable* pTable;
-		HSCRIPTFUNCTION pFunction;
-		struct { float x, y, z; } vec3;
-		struct { void * ptr; int nRef; } ud;
+		bool bool_;
+		double number_;
+		const void* pPtr_;
+		IScriptTable* pTable_;
+		ScriptFunctionHandle pFunction_;
+		// const char* pStr_;
+		struct { const char* pStr; int32_t len; } str_;
+		struct { float x, y, z; } vec3_;
+		struct { void* pPtr; int32_t ref; } ud_;
 	};
-
 };
 
+
+#if 1
+
+
+struct IScriptSys : public core::IEngineSysBase
+{
+	virtual ~IScriptSys() {};
+
+	virtual void Update(void) X_ABSTRACT;
+
+
+	// you must release function handles.
+	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_ABSTRACT;
+	virtual	ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_ABSTRACT;
+	virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_ABSTRACT;
+	virtual void releaseFunc(ScriptFunctionHandle f) X_ABSTRACT;
+
+	virtual IScriptTable* createTable(bool bEmpty = false) X_ABSTRACT;
+
+	// set values.
+	virtual void setGlobalValue(const char* pKey, const ScriptValue& any) X_ABSTRACT;
+	virtual bool getGlobalValue(const char* pKey, ScriptValue& value) X_ABSTRACT;
+
+	template <class T>
+	X_INLINE void setGlobalValue(const char* pKey, const T& value);
+	
+	X_INLINE void setGlobalToNull(const char* pKey);
+
+	// Get Global value.
+	template <class T>
+	X_INLINE bool getGlobalValue(const char* pKey, T& value);
+
+	virtual IScriptTable* createUserData(void* ptr, size_t size) X_ABSTRACT;
+
+	virtual void onScriptError(const char* fmt, ...) X_ABSTRACT;
+};
+
+
+#else
 
 
 struct IScriptSys : public core::IEngineSysBase
@@ -144,24 +234,20 @@ struct IScriptSys : public core::IEngineSysBase
 	virtual void SetGlobalAny(const char* Key, const ScriptValue& val) X_ABSTRACT;
 
 
-	virtual HSCRIPTFUNCTION GetFunctionPtr(const char* sFuncName) X_ABSTRACT;
-	virtual	HSCRIPTFUNCTION GetFunctionPtr(const char* sTableName, const char* sFuncName) X_ABSTRACT;
+	virtual ScriptFunctionHandle GetFunctionPtr(const char* sFuncName) X_ABSTRACT;
+	virtual	ScriptFunctionHandle GetFunctionPtr(const char* sTableName, const char* sFuncName) X_ABSTRACT;
 
-	virtual HSCRIPTFUNCTION AddFuncRef(HSCRIPTFUNCTION f) X_ABSTRACT;
-	virtual bool CompareFuncRef(HSCRIPTFUNCTION f1, HSCRIPTFUNCTION f2) X_ABSTRACT;
-	virtual void ReleaseFunc(HSCRIPTFUNCTION f) X_ABSTRACT;
+	virtual ScriptFunctionHandle AddFuncRef(ScriptFunctionHandle f) X_ABSTRACT;
+	virtual bool CompareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_ABSTRACT;
+	virtual void ReleaseFunc(ScriptFunctionHandle f) X_ABSTRACT;
 
 
-	// Summary
-	//   Creates a new IScriptTable table accessible to the scripts.
-	// Return Value:
-	//	 A  pointer to the created object, with the reference count of 0.
 	virtual IScriptTable* CreateTable(bool bEmpty = false) X_ABSTRACT;
 	// Get Global value.
 	virtual bool GetGlobalAny(const char* Key, ScriptValue& any) X_ABSTRACT;
 	// Set Global value to Null.
 	virtual void SetGlobalToNull(const char* Key) {
-		SetGlobalAny(Key, ScriptValue(ScriptValueType::TNIL)); 
+		SetGlobalAny(Key, ScriptValue(Type::NIL)); 
 	}
 
 
@@ -185,6 +271,7 @@ struct IScriptSys : public core::IEngineSysBase
 	virtual void OnScriptError(const char* fmt, ...) X_ABSTRACT;
 };
 
+#endif
 
 struct IFunctionHandler
 {
@@ -219,7 +306,7 @@ struct IFunctionHandler
 
 	// Description:
 	//    Gets the type of the parameter at specified index passed by the Lua.
-	virtual ScriptValueType::Enum GetParamType(int nIdx) X_ABSTRACT;
+	virtual Type::Enum GetParamType(int nIdx) X_ABSTRACT;
 
 	// Description:
 	//    Gets the nIdx param passed by the script.
@@ -236,7 +323,7 @@ struct IFunctionHandler
 	template <typename T>
 	bool GetParam(int nIdx, T &value)
 	{
-		ScriptValue any(value, 0);
+		ScriptValue any(ValueType<T>::Type);
 		return GetParamAny(nIdx, any) && any.CopyTo(value);
 	}
 
@@ -244,8 +331,7 @@ struct IFunctionHandler
 	//    
 	virtual int EndFunctionAny(const ScriptValue& any) X_ABSTRACT;
 	virtual int EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2) X_ABSTRACT;
-	virtual int EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2, 
-		const ScriptValue& any3) X_ABSTRACT;
+	virtual int EndFunctionAny(const ScriptValue& any1, const ScriptValue& any2, const ScriptValue& any3) X_ABSTRACT;
 	virtual int EndFunction() X_ABSTRACT;
 
 	template <class T>
@@ -270,8 +356,8 @@ struct IFunctionHandler
 struct IScriptTableDumpSink
 {
 	virtual ~IScriptTableDumpSink(){}
-	virtual void OnElementFound(const char* name, ScriptValueType::Enum type) X_ABSTRACT;
-	virtual void OnElementFound(int nIdx, ScriptValueType::Enum type) X_ABSTRACT;
+	virtual void OnElementFound(const char* name, Type::Enum type) X_ABSTRACT;
+	virtual void OnElementFound(int nIdx, Type::Enum type) X_ABSTRACT;
 };
 
 
@@ -317,7 +403,7 @@ struct IScriptTable
 	//	 Gets value of a table member.
 	template <class T>
 	bool GetValue(const char *sKey, T &value) {
-		ScriptValue any(value, 0);
+		ScriptValue any(ValueType<T>::Type);
 		return GetValueAny(sKey, any) && any.CopyTo(value);
 	}
 
@@ -328,7 +414,7 @@ struct IScriptTable
 
 		switch (any.getType())
 		{
-			case ScriptValueType::NONE:
+			case Type::NONE:
 				return false;
 			default:
 				return true;
@@ -338,7 +424,7 @@ struct IScriptTable
 
 	//	 Sets member value to nil.
 	void SetToNull(const char* sKey)  { 
-		SetValueAny(sKey, ScriptValue(ScriptValueType::NONE));
+		SetValueAny(sKey, ScriptValue(Type::NONE));
 	}
 
 	// Summary:
@@ -360,12 +446,12 @@ struct IScriptTable
 		return GetValueAny(sKey, any, true) && any.CopyTo(value);
 	}
 	void SetToNullChain(const char *sKey)  {
-		SetValueChain(sKey, ScriptValue(ScriptValueType::NONE)); 
+		SetValueChain(sKey, ScriptValue(Type::NONE)); 
 	}
 
 
-	virtual ScriptValueType::Enum GetValueType(const char* sKey) X_ABSTRACT;
-	virtual ScriptValueType::Enum GetAtType(int nIdx) X_ABSTRACT;
+	virtual Type::Enum GetValueType(const char* sKey) X_ABSTRACT;
+	virtual Type::Enum GetAtType(int nIdx) X_ABSTRACT;
 
 	// Description:
 	//    Sets the value of a member variable at the specified index
@@ -396,13 +482,13 @@ struct IScriptTable
 	{
 		ScriptValue any;
 		GetAtAny(elem, any);
-		return any.getType() != ScriptValueType::NONE;
+		return any.getType() != Type::NONE;
 	}
 
 	// Description:
 	//    Sets the value of a member variable to nil at the specified index.
 	void SetNullAt(int nIndex) { 
-		SetAtAny(nIndex, ScriptValue(ScriptValueType::NONE));
+		SetAtAny(nIndex, ScriptValue(Type::NONE));
 	}
 
 	// Description:
@@ -515,7 +601,7 @@ public:
 
 	explicit SmartScriptTable(IScriptSys* pSS, bool bCreateEmpty = false)
 	{
-		pTable = pSS->CreateTable(bCreateEmpty);
+		pTable = pSS->createTable(bCreateEmpty);
 		pTable->addRef();
 	}
 	~SmartScriptTable() {
@@ -545,7 +631,7 @@ public:
 	{
 		if (pTable)
 			pTable->release();
-		pTable = pSS->CreateTable(bCreateEmpty);
+		pTable = pSS->createTable(bCreateEmpty);
 		pTable->addRef();
 		return (pTable) ? true : false;
 	}
@@ -553,101 +639,11 @@ public:
 private:
 	IScriptTable* pTable;
 };
-
-X_INLINE ScriptValue::ScriptValue(IScriptTable* table) :
-type_(Type::TABLE)
-{
-	pTable = table;
-	if (pTable)
-		pTable->addRef();
-}
-
-X_INLINE ScriptValue::ScriptValue(const SmartScriptTable &value) :
-type_(Type::TABLE)
-{
-	pTable = value;
-	if (pTable)
-		pTable->addRef();
-}	
-
-X_INLINE ScriptValue::ScriptValue(IScriptTable* table, int) :
-type_(Type::TABLE)
-{
-	pTable = table;
-	if (pTable)
-		pTable->addRef();
-}
-
-X_INLINE ScriptValue::ScriptValue(const SmartScriptTable &value, int) : 
-type_(Type::TABLE)
-{
-	pTable = value;
-	if (pTable)
-		pTable->addRef();
-}
-
-X_INLINE bool ScriptValue::CopyTo(IScriptTable*& value) const
-{
-	if (type_ == Type::TABLE) {
-		value = pTable;
-		return true;
-	}
-	return false;
-}
-
-X_INLINE bool ScriptValue::CopyTo(SmartScriptTable& value) const
-{
-	if (type_ == Type::TABLE) {
-		value = pTable;
-		return true;
-	}
-	return false;
-}
-
-X_INLINE ScriptValue& ScriptValue::operator = (const ScriptValue& rhs)
-{
-	memcpy(this, &rhs, sizeof(ScriptValue));
-	return *this;
-}
-
-X_INLINE bool ScriptValue::operator == (const ScriptValue& rhs) const
-{
-	bool result = type_ == rhs.type_;
-	if (result)
-	{
-		switch (type_)
-		{
-			case Type::BOOLEAN: result = b == rhs.b; break;
-			case Type::NUMBER: result = number == rhs.number; break;
-			case Type::STRING: result = str == rhs.str; break;
-			case Type::VECTOR: result = vec3.x == rhs.vec3.x && vec3.y == rhs.vec3.y && vec3.z == rhs.vec3.z; break;
-			case Type::TABLE: result = pTable == rhs.pTable; break;
-			case Type::HANDLE: result = ptr == rhs.ptr; break;
-			case Type::FUNCTION: result = gEnv->pScriptSys->CompareFuncRef(pFunction, rhs.pFunction); break;
-				//		case Type::USERDATA: result = ud.nRef == rhs.ud.nRef && ud.ptr == rhs.ud.ptr; break;
-
-			default:
-				X_ASSERT_NOT_IMPLEMENTED();
-				break;
-		}
-	}
-	return result;
-}
-
-X_INLINE bool ScriptValue::operator != (const ScriptValue& rhs) const 
-{
-	return !(*this == rhs);
-};
-
-X_INLINE void ScriptValue::Swap(ScriptValue& value)
-{
-	core::Swap(*this,value);
-}
-
-
+	
 
 
 X_NAMESPACE_END
 
+#include "IScriptSys.inl"
 
 #endif // !_X_SCRIPT_SYS_I_H_

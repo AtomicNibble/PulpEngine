@@ -319,6 +319,7 @@
     <ClInclude Include="Random\XorShift.h" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sampler.h" />
+    <ClInclude Include="IScriptSys.inl" />
     <ClInclude Include="Sorting\RadixSort.h" />
     <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\CmdArgs.h" />
