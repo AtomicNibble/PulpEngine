@@ -5,10 +5,6 @@
 
 #include <Util\ToggleChecker.h>
 
-extern "C"
-{
-	#include "lua\lauxlib.h"
-}
 
 X_NAMESPACE_BEGIN(script)
 

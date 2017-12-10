@@ -9,14 +9,6 @@
 #include <IRender.h>
 
 
-
-extern "C"
-{
-	#include "lua\lobject.h"
-	#include "lua\lauxlib.h"
-	#include "lua\lualib.h"
-}
-
 #if X_DEBUG == 1
 // X_LINK_LIB("lua51d")
 
@@ -48,6 +40,7 @@ extern "C"
 
 	static const int max_stack_lvl = sizeof(g_StackLevel) / sizeof(g_StackLevel[0]);
 
+#if 0
 	void DumpCallStack(lua_State *L)
 	{
 		lua_Debug ar;
@@ -115,6 +108,7 @@ extern "C"
 
 		return g_LuaAllocator.allocate(nsize, 4,0);
 	}
+#endif
 
 } // Extern C !END!
 
@@ -229,7 +223,7 @@ bool XScriptSys::init(void)
 
 	pFileSys_ = gEnv->pFileSys;
 
-
+#if 0
 	// lj_state_newstate(mem_alloc, mem_create());
 	// L = lua_newstate(custom_lua_alloc, NULL);
 	L = luaL_newstate();
@@ -257,6 +251,27 @@ bool XScriptSys::init(void)
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
 
 	initialised_ = true;
+
+#endif
+
+	// new stuff
+	{
+		lua::State state(g_ScriptArena);
+
+		state.openLibs(lua::libs(
+				lua::lib::base |
+				lua::lib::package |
+				lua::lib::os |
+				lua::lib::io |
+				lua::lib::ffi |
+				lua::lib::jit
+			)
+		);
+
+
+	}
+
+
 	return true;
 }
 
@@ -306,9 +321,9 @@ void XScriptSys::Update(void)
 {
 	X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 
-	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
+//	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
 
-	SetGlobalValue("_time", time);
+//	SetGlobalValue("_time", time);
 
 	{
 		X_PROFILE_BEGIN("Lua GC", core::profiler::SubSys::SCRIPT);
@@ -319,7 +334,7 @@ void XScriptSys::Update(void)
 		// experimentally tune the value of data.The function returns 1 if the step 
 		// finished a garbage - collection cycle.
 
-		lua_gc(L, LUA_GCSTEP, 2);
+//		lua_gc(L, LUA_GCSTEP, 2);
 	}
 
 
@@ -795,7 +810,7 @@ bool XScriptSys::ToVec3(Vec3f& vec, int tableIndex)
 	}
 
 
-	float x, y, z;
+	lua_Number x, y, z;
 	lua_pushlstring(L, "x", 1);
 	lua_gettable(L, tableIndex);
 	if (!lua_isnumber(L, -1))
@@ -829,12 +844,12 @@ bool XScriptSys::ToVec3(Vec3f& vec, int tableIndex)
 		z = lua_tonumber(L, -1);
 		lua_pop(L, 3); // pop value.
 
-		vec.x = x;
-		vec.y = y;
-		vec.z = z;
+		vec.x = safe_static_cast<float>(x);
+		vec.y = safe_static_cast<float>(y);
+		vec.z = safe_static_cast<float>(z);
 		return true;
-
 	}
+
 	x = lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop value.
 
@@ -858,9 +873,9 @@ bool XScriptSys::ToVec3(Vec3f& vec, int tableIndex)
 	z = lua_tonumber(L, -1);
 	lua_pop(L, 1); // pop value.
 
-	vec.x = x;
-	vec.y = y;
-	vec.z = z;
+	vec.x = safe_static_cast<float>(x);
+	vec.y = safe_static_cast<float>(y);
+	vec.z = safe_static_cast<float>(z);
 	return true;
 }
 
@@ -1024,7 +1039,7 @@ bool XScriptSys::ExecuteBuffer(const char* sBuffer, size_t nSize, const char* De
 
 void XScriptSys::LogStackTrace()
 {
-	DumpCallStack(L);
+//	DumpCallStack(L);
 }
 
 void XScriptSys::TraceScriptError()
@@ -1112,7 +1127,7 @@ struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
 
 	virtual void OnElement(int nLevel, const char* sKey, int nKey, ScriptValue& value) X_FINAL
 	{
-		nSize += sizeof(Node);
+	//	nSize += sizeof(Node);
 		if (sKey)
 			nSize += core::strUtil::strlen(sKey) + 1;
 		else
@@ -1150,8 +1165,8 @@ struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
 	}
 	virtual void OnBeginTable(int nLevel, const char* sKey, int nKey) X_FINAL
 	{
-		nSize += sizeof(Node);
-		nSize += sizeof(Table);
+	//	nSize += sizeof(Node);
+	//	nSize += sizeof(Table);
 		file_.printf("[%6d] %s %s = {\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
 	}
 	virtual void OnEndTable(int nLevel) X_FINAL

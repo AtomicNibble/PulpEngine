@@ -3,12 +3,6 @@
 #ifndef _X_SCRIPT_SYS_H_
 #define _X_SCRIPT_SYS_H_
 
-extern "C"
-{
-#include "lua\lua.h"
-#include "lua\lualib.h"
-}
-
 #include "binds\ScriptBinds.h"
 #include <String\Path.h>
 
