@@ -44,7 +44,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 	params.bEnableJobSystem = false;
 	params.pConsoleWnd = &Console;
 	params.pCoreArena = arena;
-	params.bFileSysWorkingDir = true;
+	// params.bFileSysWorkingDir = true;
 	params.bScriptSystem = true;
 
 #ifdef X_LIB
