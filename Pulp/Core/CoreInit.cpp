@@ -512,6 +512,17 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 	}
+	else
+	{
+		// optional enable script system in core only mode.
+		if (startupParams.ScriptSystem())
+		{
+			if (!InitScriptSys(startupParams)) {
+				return false;
+			}
+		}
+
+	}
 
 #if X_ENABLE_PROFILER
 	if (pProfiler_) {

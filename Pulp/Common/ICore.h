@@ -151,6 +151,7 @@ struct SCoreInitParams
 	bool bFileSysWorkingDir;
 	bool bThreadSafeStringAlloc;
 	bool bProfileSysEnabled;
+	bool bScriptSystem;
 	bool bVsLog;
 	bool bConsoleLog;
 
@@ -180,6 +181,10 @@ struct SCoreInitParams
 		return bProfileSysEnabled;
 	}
 
+	const bool ScriptSystem(void) const {
+		return bScriptSystem;
+	}
+
 	SCoreInitParams() :
 		hInstance(nullptr),
 		hWnd(nullptr),
@@ -200,6 +205,7 @@ struct SCoreInitParams
 		bFileSysWorkingDir(false),
 		bThreadSafeStringAlloc(true),
 		bProfileSysEnabled(false),
+		bScriptSystem(false),
 
 #if X_DEBUG 
 		bVsLog(true),
