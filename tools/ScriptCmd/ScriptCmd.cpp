@@ -42,7 +42,57 @@ namespace
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> ScriptCmdArena;
 
-	
+	X_DECLARE_ENUM(ScriptMode)(
+		CHECK,
+		RUN,
+		BAKE
+	);
+
+	bool GetMode(ScriptMode::Enum& mode)
+	{
+		const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+		if (pMode)
+		{
+			if (core::strUtil::IsEqualCaseInsen(pMode, L"check"))
+			{
+				mode = ScriptMode::CHECK;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"run"))
+			{
+				mode = ScriptMode::RUN;
+			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"bake"))
+			{
+				mode = ScriptMode::BAKE;
+			}
+			else
+			{
+				X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+				return false;
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	bool GetInputFile(core::string& inputFile)
+	{
+		const wchar_t* pInputFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
+		if (pInputFile)
+		{
+			core::StackString512 narrowName(pInputFile);
+
+			inputFile = narrowName.c_str();
+			return true;
+		}
+
+		X_ERROR("Converter", "missing input file");
+		return false;
+	}
+
+
 
 } // namespace 
 
@@ -59,12 +109,42 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 	core::MallocFreeAllocator allocator;
 	ScriptCmdArena arena(&allocator, "ScriptCmdArena");
 
-	EngineApp app;
-
 	int res = -1;
+	
+	{
+		EngineApp app;
 
-	if (!app.Init(hInstance, &arena, lpCmdLine, Console)) {
-		return -1;
+		if (app.Init(hInstance, &arena, lpCmdLine, Console))
+		{
+			script::IScriptSys* pScriptSys = gEnv->pScriptSys;
+
+			core::string inputFile;
+			ScriptMode::Enum mode;
+
+			if (!GetMode(mode)) {
+				mode = ScriptMode::RUN;
+			}
+
+			if (!GetInputFile(inputFile)) {
+				return -1;
+			}
+
+			if (mode == ScriptMode::RUN)
+			{
+
+
+			}
+			else if (mode == ScriptMode::CHECK)
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+
+			}
+			else if (mode == ScriptMode::BAKE)
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+
+			}
+		}
 	}
 
 	return res;
