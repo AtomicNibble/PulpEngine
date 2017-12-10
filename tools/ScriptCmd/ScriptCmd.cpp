@@ -7,15 +7,8 @@
 
 #include <Platform\Console.h>
 
-#include <String\HumanSize.h>
-#include <String\HumanDuration.h>
-
-#include <Time\StopWatch.h>
-
-#include <Util\UniquePointer.h>
-
-#include <ICompression.h>
 #include <IFileSys.h>
+#include <IScriptSys.h>
 
 #ifdef X_LIB
 
@@ -77,14 +70,14 @@ namespace
 		return false;
 	}
 
-	bool GetInputFile(core::string& inputFile)
+	bool GetInputFile(core::Path<char>& inputFile)
 	{
 		const wchar_t* pInputFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
 		if (pInputFile)
 		{
 			core::StackString512 narrowName(pInputFile);
 
-			inputFile = narrowName.c_str();
+			inputFile.set(narrowName.begin(), narrowName.end());
 			return true;
 		}
 
@@ -118,7 +111,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 		{
 			script::IScriptSys* pScriptSys = gEnv->pScriptSys;
 
-			core::string inputFile;
+			core::Path<char> inputFile;
 			ScriptMode::Enum mode;
 
 			if (!GetMode(mode)) {
@@ -129,10 +122,28 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 				return -1;
 			}
 
+			core::Path<char> inputPath;
+
+			inputPath = "scripts";
+			inputPath /= inputFile;
+
 			if (mode == ScriptMode::RUN)
 			{
+				core::XFileMemScoped file;
 
+				if (!file.openFile(inputPath.c_str(), core::fileMode::READ | core::fileMode::SHARE))
+				{
+					X_ERROR("Script", "Failed to open file: \"%s\"", inputFile.c_str());
+					return -1;
+				}
 
+				if (!pScriptSys->runScriptInSandbox(file->getBufferStart(), file->getBufferEnd()))
+				{
+					X_ERROR("Script", "Error running script: \"%s\"", inputFile.c_str());
+					return -1;
+				}
+
+				return 0;
 			}
 			else if (mode == ScriptMode::CHECK)
 			{
