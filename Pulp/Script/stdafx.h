@@ -8,12 +8,15 @@
 #include <lua.hpp>
 
 #include <IScriptSys.h>
-#include "ScriptSys.h"
+
+#include "Util\Config.h"
 
 #include "wrapper\types.h"
 #include "wrapper\util.h"
 #include "wrapper\state.h"
 #include "wrapper\state_view.h"
+
+#include "ScriptSys.h"
 
 extern core::MemoryArenaBase* g_ScriptArena;
 

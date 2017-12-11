@@ -21,6 +21,15 @@
     <Filter Include="Source Files\wrapper">
       <UniqueIdentifier>{0f651ffe-7477-4df7-b5dd-ff34a9cd49d3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Util">
+      <UniqueIdentifier>{2b7727cf-5d75-42df-9e5d-e3c702f84088}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{7dc97199-f6d7-41c3-aac4-25c0ee5d83d5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{d85462c4-9d24-4dac-b8b0-a8e34289f8e0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -70,6 +79,12 @@
     </ClInclude>
     <ClInclude Include="wrapper\DumpToFile.h">
       <Filter>Header Files\wrapper</Filter>
+    </ClInclude>
+    <ClInclude Include="Util\Config.h">
+      <Filter>Header Files\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\ScriptVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -121,5 +136,13 @@
     <ClCompile Include="wrapper\DumpToFile.cpp">
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\ScriptVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\ScriptVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
   </ItemGroup>
 </Project>

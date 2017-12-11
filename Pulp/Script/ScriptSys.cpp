@@ -46,8 +46,7 @@ XScriptSys::~XScriptSys()
 
 void XScriptSys::registerVars(void)
 {
-
-
+	vars_.registerVars();
 }
 
 void XScriptSys::registerCmds(void)
@@ -193,7 +192,7 @@ void XScriptSys::Update(void)
 		// experimentally tune the value of data.The function returns 1 if the step 
 		// finished a garbage - collection cycle.
 
-//		lua_gc(L, LUA_GCSTEP, 2);
+		state::gc_step(L, vars_.gcStepSize());
 	}
 
 }

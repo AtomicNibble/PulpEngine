@@ -476,6 +476,8 @@
     <ClInclude Include="ScriptTable.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TableDump.h" />
+    <ClInclude Include="Util\Config.h" />
+    <ClInclude Include="Vars\ScriptVars.h" />
     <ClInclude Include="wrapper\DumpToFile.h" />
     <ClInclude Include="wrapper\util.h" />
     <ClInclude Include="wrapper\state.h" />
@@ -510,10 +512,14 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="TableDump.cpp" />
+    <ClCompile Include="Vars\ScriptVars.cpp" />
     <ClCompile Include="wrapper\DumpToFile.cpp" />
     <ClCompile Include="wrapper\state.cpp" />
     <ClCompile Include="wrapper\state_view.cpp" />
     <ClCompile Include="wrapper\util.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Vars\ScriptVars.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

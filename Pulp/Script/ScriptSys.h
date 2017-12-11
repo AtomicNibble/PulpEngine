@@ -1,9 +1,8 @@
 #pragma once
 
-#ifndef _X_SCRIPT_SYS_H_
-#define _X_SCRIPT_SYS_H_
 
-#include "wrapper\types.h"
+#include "Vars\ScriptVars.h"
+
 #include "binds\ScriptBinds.h"
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
@@ -105,6 +104,8 @@ private:
 
 	lua::RefId errrorHandler_;
 
+	ScriptVars vars_;
+
 	XScriptBinds binds_;
 	ScriptFileList fileList_;
 	bool initialised_;
@@ -117,4 +118,3 @@ X_INLINE lua_State* XScriptSys::getLuaState(void)
 
 X_NAMESPACE_END
 
-#endif // !_X_SCRIPT_SYS_H_

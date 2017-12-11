@@ -35,7 +35,7 @@ namespace lua
 		lua_State* pLS_;
 	};
 	
-	#if X_DEBUG
+#if X_ENABLE_STACK_CHECK
 
 	struct LuaStackValidator
 	{
@@ -60,9 +60,9 @@ namespace lua
 	};
 
 	#define X_LUA_CHECK_STACK(L) LuaStackValidator __stackCheck__((L),__FUNCTION__);
-	#else //_DEBUG
+#else 
 	#define X_LUA_CHECK_STACK(L) X_UNUSED(L);
-	#endif //_DEBUG
+#endif X_ENABLE_STACK_CHECK
 
 } // namespace lua
 
