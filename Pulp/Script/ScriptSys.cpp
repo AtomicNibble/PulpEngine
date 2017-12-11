@@ -3,195 +3,17 @@
 #include "ScriptTable.h"
 
 #include <ICore.h>
-#include <ITimer.h>
-#include <IConsole.h>
 #include <IFileSys.h>
 #include <IRender.h>
 
-#include "wrapper\state_view.h"
-
 #include <Memory\VirtualMem.h>
-
-
-extern "C"
-{
-
-	static const char* g_StackLevel[] = 
-	{
-		"",
-		"  ",
-		"    ",
-		"      ",
-		"        ",
-		"          ",
-		"            ",
-		"              ",
-	};
-
-	static const int max_stack_lvl = sizeof(g_StackLevel) / sizeof(g_StackLevel[0]);
-
-#if 0
-	void DumpCallStack(lua_State *L)
-	{
-		lua_Debug ar;
-		core::zero_object(ar);
-
-		X_LOG_BULLET;
-
-		int level = 0;
-		while (lua_getstack(L, level++, &ar))
-		{
-			if (level >= max_stack_lvl) {
-				level = max_stack_lvl - 1;
-			}
-
-			int res = lua_getinfo(L, "lnS", &ar);
-			X_UNUSED(res); // TODO
-			if (ar.name)
-			{
-				X_LOG0("ScriptError", "%s> %s, (%s: %i)",
-					g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
-			}
-			else
-			{
-				X_LOG0("ScriptError", "%s> (null) (%s: %i)", 
-					g_StackLevel[level], ar.short_src, ar.currentline);
-			}
-		}
-	}
-
-	static int custom_lua_panic(lua_State *L)
-	{
-		DumpCallStack(L);
-		return 0;
-	}
-
-
-#endif
-
-} // Extern C !END!
 
 X_NAMESPACE_BEGIN(script)
 
 using namespace lua;
 
-
 namespace
 {
-
-#if 0
-	void LoadScriptCmd(core::IConsoleCmdArgs* pArgs)
-	{
-		size_t num = pArgs->GetArgCount();
-		if (num < 2)
-		{
-			X_WARNING("Script", "script_load <filename>");
-			return;
-		}
-
-		for (size_t i = 1; i<num; i++)
-		{
-			const char* Filename = pArgs->GetArg(i);
-
-			if (gEnv->pScriptSys->ExecuteFile(Filename, true, true))
-			{
-				X_LOG0("Script", "Loaded: %s", Filename);
-			}
-		}
-	}
-
-	void ListScriptCmd(core::IConsoleCmdArgs* pArgs)
-	{
-		X_UNUSED(pArgs);
-		gEnv->pScriptSys->ListLoadedScripts();
-	}
-
-	void ReloadScriptCmd(core::IConsoleCmdArgs* pArgs)
-	{
-		size_t num = pArgs->GetArgCount();
-		if (num < 2)
-		{
-			X_WARNING("Script", "script_reload <filename>");
-			return;
-		}
-
-		for (size_t i = 1; i<num; i++)
-		{
-			const char* Filename = pArgs->GetArg(i);
-
-			if (gEnv->pScriptSys->ReloadScript(Filename, true))
-			{
-				X_LOG0("Script", "ReLoaded: %s", Filename);
-			}
-		}
-	}
-
-	void LuaDumpState(core::IConsoleCmdArgs* pArgs)
-	{
-		const char* pfileName = "LuaState.txt";
-		if (pArgs->GetArgCount() > 0)
-		{
-			pfileName =	pArgs->GetArg(0);
-		}
-
-		static_cast<XScriptSys*>(gEnv->pScriptSys)->DumpStateToFile(pfileName);
-	}
-#endif
-
-	int ErrorHandler(lua_State *L)
-	{
-		//	lua_Debug ar;
-		//	core::zero_object(ar);
-
-		const char* Err = lua_tostring(L, 1);
-
-		X_ERROR("ScriptError", "------------------------------------------");
-		{
-			X_LOG0("ScriptError", "%s", Err);
-			//	X_LOG_BULLET;
-
-			//	pThis->TraceScriptError();
-		}
-
-		// static_cast<XScriptSys*>(gEnv->pScriptSys)->DumpStateToFile(L, "lua_error_state_dump");
-
-		X_ERROR("ScriptError", "------------------------------------------");
-		return 0;
-	}
-
-	bool DumpStateToFile(lua_State* L, const char* name)
-	{
-		X_LUA_CHECK_STACK(L);
-
-		core::Path<char> path(name);
-		path.setExtension(".txt");
-
-//		XRecursiveLuaDumpToFile sink(path.c_str());
-
-#if 0
-		if (sink.file_)
-		{
-			std::set<void*> tables;
-			RecursiveTableDump(L, LUA_GLOBALSINDEX, 0, &sink, tables);
-
-			X_LUA_CHECK_STACK(L);
-
-			for (std::set<XScriptTable*>::iterator it = XScriptTable::s_allTables_.begin();
-				it != XScriptTable::s_allTables_.end(); ++it)
-			{
-				XScriptTable* pTable = *it;
-
-				pTable->PushRef();
-				RecursiveTableDump(L, lua_gettop(L), 1, &sink, tables);
-				lua_pop(L, 1);
-				sink.OnEndTable(0);
-			}
-		}
-#endif
-
-		return false;
-	}
-
 
 	static const size_t POOL_ALLOC_MAX = 1024 * 4; // script tables
 	static const size_t POOL_ALLOCATION_SIZE = sizeof(XScriptTable);
@@ -213,8 +35,9 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 	),
 	poolArena_(&poolAllocator_, "TablePool")
 {
-
 	arena->addChildArena(&poolArena_);
+
+	errrorHandler_ = Ref::Nil;
 }
 
 XScriptSys::~XScriptSys()
@@ -245,35 +68,48 @@ bool XScriptSys::init(void)
 	X_LOG0("Script", "Starting script system");
 	X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
-
-#if 0
-	// lj_state_newstate(mem_alloc, mem_create());
-	// L = lua_newstate(custom_lua_alloc, NULL);
 	L = luaL_newstate();
 
-	X_ASSERT_NOT_NULL(pFileSys_);
-	X_ASSERT_NOT_NULL(L);
+	lua::StateView view(L);
+	view.setPanic(myLuaPanic);
+	view.openLibs(
+		lua::libs(
+			lua::lib::Base |
+			lua::lib::Package |
+			lua::lib::Os |
+			lua::lib::Io |
+			lua::lib::Ffi |
+			lua::lib::Jit
+		)	
+	);
 
-	lua_atpanic(L, &custom_lua_panic);
-
-//	luaL_openlibs(L);
-	x_openlibs(L);
-
+	stack::push(L, myErrorHandler);
+	errrorHandler_ = stack::pop_to_ref(L);
 
 	XScriptTable::L = L;
 	XScriptTable::pScriptSystem_ = this;
 
-	binds_.Init(this, gEnv->pCore);
-
-	setGlobalValue("_time", 0);
-
-	lua_pushcfunction(L, XScriptSys::ErrorHandler);
-	g_pErrorHandlerFunc = lua_ref(L, 1);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
 
 	initialised_ = true;
+
+#if 0
+	// lj_state_newstate(mem_alloc, mem_create());
+	// L = lua_newstate(custom_lua_alloc, NULL);
+
+	X_ASSERT_NOT_NULL(pFileSys_);
+	X_ASSERT_NOT_NULL(L);
+
+
+
+
+	binds_.Init(this, gEnv->pCore);
+
+	setGlobalValue("_time", 0);
+
+
 
 #endif
 
@@ -378,7 +214,8 @@ bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
 		)
 	);
 
-	stack::push(state, ErrorHandler);
+	// can we just push the function?
+	stack::push(state, myErrorHandler);
 	int32_t errorHandlerRef = stack::pop_to_ref(state);
 
 	if (!state.loadScript(pBegin, pEnd, "Sandbox")) {
@@ -868,151 +705,6 @@ void XScriptSys::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<
 }
 
 // ~IXHotReload
-
-
-struct XRecursiveLuaDumpToFile : public IRecursiveLuaDump
-{
-	XRecursiveLuaDumpToFile(const char* filename)
-	{
-		file_.openFile(filename, core::fileMode::WRITE | core::fileMode::RECREATE);
-		nSize = 0;
-	}
-	~XRecursiveLuaDumpToFile() X_FINAL {
-
-	}
-
-	core::XFileScoped file_;
-
-	char sLevelOffset[1024];
-	char sKeyStr[32];
-	size_t nSize;
-
-	const char* GetOffsetStr(int nLevel)
-	{
-		if (nLevel > sizeof(sLevelOffset)-1)
-			nLevel = sizeof(sLevelOffset)-1;
-		memset(sLevelOffset, '\t', nLevel);
-		sLevelOffset[nLevel] = 0;
-		return sLevelOffset;
-	}
-	const char* GetKeyStr(const char *sKey, int nKey)
-	{
-		if (sKey)
-			return sKey;
-		sprintf(sKeyStr, "[%02d]", nKey);
-		return sKeyStr;
-	}
-
-	virtual void OnElement(int nLevel, const char* sKey, int nKey, ScriptValue& value) X_FINAL
-	{
-	//	nSize += sizeof(Node);
-		if (sKey)
-			nSize += core::strUtil::strlen(sKey) + 1;
-		else
-			nSize += sizeof(int);
-		switch (value.getType())
-		{
-			case Type::BOOLEAN:
-			if (value.bool_)
-				file_.printf( "[%6d] %s %s=true\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
-			else
-				file_.printf("[%6d] %s %s=false\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
-			break;
-			case Type::HANDLE:
-				file_.printf("[%6d] %s %s=%p\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey), value.pPtr_);
-			break;
-			case Type::NUMBER:
-				file_.printf( "[%6d] %s %s=%g\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey), value.number_);
-			break;
-			case Type::STRING:
-			file_.printf("[%6d] %s %s=%s\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey), value.str_.pStr);
-			nSize += value.str_.len + 1;
-			break;
-			//case ANY_TTABLE:
-			case Type::FUNCTION:
-			file_.printf("[%6d] %s %s()\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
-			break;
-		//	case Type::USERDATA:
-		//	fprintf(file, "[%6d] %s [userdata] %s\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
-		//	break;
-			case Type::VECTOR:
-			file_.printf("[%6d] %s %s=%g,%g,%g\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey), value.vec3_.x, value.vec3_.y, value.vec3_.z);
-			nSize += sizeof(Vec3f);
-			break;
-		}
-	}
-	virtual void OnBeginTable(int nLevel, const char* sKey, int nKey) X_FINAL
-	{
-	//	nSize += sizeof(Node);
-	//	nSize += sizeof(Table);
-		file_.printf("[%6d] %s %s = {\n", nSize, GetOffsetStr(nLevel), GetKeyStr(sKey, nKey));
-	}
-	virtual void OnEndTable(int nLevel) X_FINAL
-	{
-		file_.printf("[%6d] %s }\n", nSize, GetOffsetStr(nLevel));
-	}
-};
-
-//////////////////////////////////////////////////////////////////////////
-static void RecursiveTableDump(lua_State* L, int idx, int nLevel, 
-	IRecursiveLuaDump *sink, std::set<void*>& tables)
-{
-	const char *sKey = 0;
-	int nKey = 0;
-
-	X_LUA_CHECK_STACK(L);
-
-	void* pTable = (void*)lua_topointer(L, idx);
-	if (tables.find(pTable) != tables.end())
-	{
-		// This table was already dumped.
-		return;
-	}
-	tables.insert(pTable);
-
-	lua_pushnil(L);
-	while (lua_next(L, idx) != 0)
-	{
-		// `key' is at index -2 and `value' at index -1
-		if (lua_type(L, -2) == LUA_TSTRING)
-			sKey = lua_tostring(L, -2);
-		else
-		{
-			sKey = 0;
-			nKey = (int)lua_tonumber(L, -2); // key index.
-		}
-		int type = lua_type(L, -1);
-		switch (type)
-		{
-			case LUA_TNIL:
-			break;
-			case LUA_TTABLE:
-			{
-				if (!(sKey != 0 && nLevel == 0 && strcmp(sKey, "_G") == 0))
-				{
-					sink->OnBeginTable(nLevel, sKey, nKey);
-					RecursiveTableDump(L, lua_gettop(L), nLevel + 1, sink, tables);
-					sink->OnEndTable(nLevel);
-				}
-			}
-			break;
-			default:
-			{
-				ScriptValue any;
-				XScriptSys::toAny(L, any, -1);
-				sink->OnElement(nLevel, sKey, nKey, any);
-			}
-			break;
-		}
-		lua_pop(L, 1);
-	}
-}
-
-
-// X_DISABLE_WARNING(2220)
-
-
-
 
 
 X_NAMESPACE_END

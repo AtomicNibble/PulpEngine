@@ -10,6 +10,8 @@ namespace lua
 	#define LUA_OK 0
 	#endif
 
+	typedef int32_t RefId;
+
 	X_DECLARE_FLAGS(lib)(
 		Base,
 		Table,

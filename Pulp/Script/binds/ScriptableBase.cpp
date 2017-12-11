@@ -79,6 +79,4 @@ void XScriptableBase::RegisterFunction(const char* pFuncName,
 }
 
 
-
-
 X_NAMESPACE_END

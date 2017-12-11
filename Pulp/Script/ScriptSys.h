@@ -3,6 +3,7 @@
 #ifndef _X_SCRIPT_SYS_H_
 #define _X_SCRIPT_SYS_H_
 
+#include "wrapper\types.h"
 #include "binds\ScriptBinds.h"
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
@@ -17,14 +18,6 @@ X_DISABLE_WARNING(4702)
 X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(script)
-
-struct IRecursiveLuaDump
-{
-	virtual ~IRecursiveLuaDump(){}
-	virtual void OnElement(int nLevel, const char *sKey, int nKey, ScriptValue &value) X_ABSTRACT;
-	virtual void OnBeginTable(int nLevel, const char *sKey, int nKey) X_ABSTRACT;
-	virtual void OnEndTable(int nLevel) X_ABSTRACT;
-};
 
 class XScriptTable;
 
@@ -109,6 +102,8 @@ private:
 	core::MemoryArenaBase*		arena_;
 	PoolArena::AllocationPolicy poolAllocator_;
 	PoolArena					poolArena_;
+
+	lua::RefId errrorHandler_;
 
 	XScriptBinds binds_;
 	ScriptFileList fileList_;

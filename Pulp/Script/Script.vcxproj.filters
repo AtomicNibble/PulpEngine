@@ -68,6 +68,9 @@
     <ClInclude Include="wrapper\util.h">
       <Filter>Header Files\wrapper</Filter>
     </ClInclude>
+    <ClInclude Include="wrapper\DumpToFile.h">
+      <Filter>Header Files\wrapper</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -110,6 +113,12 @@
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
     <ClCompile Include="wrapper\state_view.cpp">
+      <Filter>Source Files\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="wrapper\util.cpp">
+      <Filter>Source Files\wrapper</Filter>
+    </ClCompile>
+    <ClCompile Include="wrapper\DumpToFile.cpp">
       <Filter>Source Files\wrapper</Filter>
     </ClCompile>
   </ItemGroup>

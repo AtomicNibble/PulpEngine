@@ -84,6 +84,11 @@ void XScriptTable::setValueAny(const char* pKey, const ScriptValue& any, bool bC
 	if (!bChain) {
 		pushRef();
 	}
+	else {
+#if X_DEBUG
+		X_ASSERT(setChainActive_, "begin chain not called")();
+#endif // !X_DEBUG
+	}
 
 	size_t len = strlen(pKey);
 
@@ -132,6 +137,11 @@ bool XScriptTable::getValueAny(const char* pKey, ScriptValue& any, bool bChain)
 
 	if (!bChain) {
 		pushRef();
+	}
+	else {
+#if X_DEBUG
+		X_ASSERT(setChainActive_, "begin chain not called")();
+#endif // !X_DEBUG
 	}
 	
 	stack::push_table_value(L, -2, pKey);
@@ -316,7 +326,7 @@ void XScriptTable::end(const Iterator& iter)
 {
 	if (iter.internal)
 	{
-		lua_settop(L, iter.internal - 1);
+		stack::settop(L, iter.internal - 1);
 	}
 }
 
@@ -373,34 +383,35 @@ void XScriptTable::dump(IScriptTableDumpSink* p)
 		// `key' is at index -2 and `value' at index -1
 		if (stack::get_type(L, -2) == LUA_TSTRING)
 		{
-			const char* sName = stack::as_string(L, -2); // again index
-			switch (stack::get_type(L, -1))
+			const char* pName = stack::as_string(L, -2); // again index
+			switch (stack::get_type(L))
 			{
-				case LUA_TNIL: p->OnElementFound(sName, Type::NIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(sName, Type::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(sName, Type::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(sName, Type::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(sName, Type::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(sName, Type::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(sName, Type::FUNCTION); break;
-		//		case LUA_TUSERDATA: p->OnElementFound(sName, svtUserData); break;
+				case LUA_TNIL: p->OnElementFound(pName, Type::NIL); break;
+				case LUA_TBOOLEAN: p->OnElementFound(pName, Type::BOOLEAN); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(pName, Type::POINTER); break;
+				case LUA_TNUMBER: p->OnElementFound(pName, Type::NUMBER); break;
+				case LUA_TSTRING: p->OnElementFound(pName, Type::STRING); break;
+				case LUA_TTABLE: p->OnElementFound(pName, Type::TABLE); break;
+				case LUA_TFUNCTION: p->OnElementFound(pName, Type::FUNCTION); break;
+		//		case LUA_TUSERDATA: p->OnElementFound(pName, svtUserData); break;
 			};
 		}
 		else
 		{
-			int nIdx = stack::as_int(L, -2); // again index
+			int idx = stack::as_int(L, -2); // again index
 			switch (stack::get_type(L))
 			{
-				case LUA_TNIL: p->OnElementFound(nIdx, Type::NIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(nIdx, Type::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(nIdx, Type::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(nIdx, Type::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(nIdx, Type::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(nIdx, Type::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(nIdx, Type::FUNCTION); break;
-		//		case LUA_TUSERDATA: p->OnElementFound(nIdx, svtUserData); break;
+				case LUA_TNIL: p->OnElementFound(idx, Type::NIL); break;
+				case LUA_TBOOLEAN: p->OnElementFound(idx, Type::BOOLEAN); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(idx, Type::POINTER); break;
+				case LUA_TNUMBER: p->OnElementFound(idx, Type::NUMBER); break;
+				case LUA_TSTRING: p->OnElementFound(idx, Type::STRING); break;
+				case LUA_TTABLE: p->OnElementFound(idx, Type::TABLE); break;
+				case LUA_TFUNCTION: p->OnElementFound(idx, Type::FUNCTION); break;
+		//		case LUA_TUSERDATA: p->OnElementFound(idx, svtUserData); break;
 			};
 		}
+
 		stack::settop(L, reftop); // pop value, leave index.
 	}
 	stack::pop(L); // pop table ref
@@ -478,8 +489,6 @@ void XScriptTable::deleteThis(void)
 	pScriptSystem_->freeTable(this);
 }
 
-// Create object from pool.
-// Assign a metatable to a table.
 void XScriptTable::setMetatable(IScriptTable* pMetatable)
 {
 	X_LUA_CHECK_STACK(L);
@@ -615,20 +624,20 @@ void XScriptTable::ReferenceTable_r(int srcTable, int trgTable)
 
 	int top = stack::top(L);
 
-	lua_newtable(L);									// push new meta table
-	lua_pushlstring(L, "__index", strlen("__index"));	// push __index
+	state::new_table(L);									// push new meta table
+	stack::pushliteral(L, "__index");					// push __index
 	lua_pushvalue(L, srcTable);							// push src table
 	lua_rawset(L, -3);									// meta.__index==src table
 	lua_setmetatable(L, trgTable);						// set meta table
 
-	lua_pushnil(L);  // first key
+	stack::pushnil(L);  // first key
 	while (lua_next(L, srcTable) != 0)
 	{
 		if (lua_type(L, -1) == LUA_TTABLE)
 		{
 			int srct = stack::top(L);
 			lua_pushvalue(L, -2); // Push again index.
-			lua_newtable(L);      // Make value.
+			state::new_table(L);      // Make value.
 			int trgt = stack::top(L);
 			ReferenceTable_r(srct, trgt);
 			lua_rawset(L, trgTable); // Set new table to trgtable.
@@ -643,7 +652,7 @@ void XScriptTable::CloneTable(int srcTable, int trgTable)
 	X_LUA_CHECK_STACK(L);
 
 	int top = stack::top(L);
-	lua_pushnil(L);  // first key
+	stack::pushnil(L);  // first key
 	while (lua_next(L, srcTable) != 0)
 	{
 		// `key' is at index -2 and `value' at index -1

@@ -351,6 +351,27 @@ namespace lua
 			return pUserPtr;
 		}
 
+		X_INLINE void gc_full(lua_State* L)
+		{
+			lua_gc(L, LUA_GCCOLLECT, 0);
+		}
+
+		X_INLINE void gc_step(lua_State* L, int32_t size)
+		{
+			lua_gc(L, LUA_GCSTEP, size);
+		}
+
+		X_INLINE void gc_stop(lua_State* L)
+		{
+			lua_gc(L, LUA_GCSTOP, 0);
+		}
+
+		X_INLINE void gc_start(lua_State* L)
+		{
+			lua_gc(L, LUA_GCRESTART, 0);
+		}
+
+		
 
 	} // namespace state
 

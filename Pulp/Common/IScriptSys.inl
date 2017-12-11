@@ -369,4 +369,86 @@ ScriptFunctionDesc::ScriptFunctionDesc() :
 }
 
 
+
+// ----------------------------------------------------------------
+
+
+template <class T>
+X_INLINE void IScriptTable::pushBack(const T& value)
+{
+	const int32_t pos = count() + 1;
+	setValueAny(pos, value);
+}
+
+template <class T>
+X_INLINE void IScriptTable::setValue(const char* pKey, const T &value)
+{
+	return setValueAny(pKey, value);
+}
+
+template <class T>
+X_INLINE void IScriptTable::setValue(int idx, const T& value)
+{
+	return setValueAny(idx, value);
+}
+
+template <class T>
+X_INLINE void IScriptTable::setValueChain(const char* pKey, const T &value)
+{
+	return setValueAny(idx, value, true);
+}
+
+//	 Gets value of a table member.
+template <class T>
+X_INLINE bool IScriptTable::getValue(const char* pKey, T& value)
+{
+	ScriptValue any(ValueType<T>::Type);
+	return getValueAny(pKey, any) && any.CopyTo(value);
+}
+
+template <class T>
+X_INLINE bool IScriptTable::getValue(int idx, T& value)
+{
+	ScriptValue any(ValueType<T>::Type);
+	return getValueAny(idx, any) && any.CopyTo(value);
+}
+
+template <class T>
+X_INLINE bool IScriptTable::getValueChain(const char* pKey, T &value)
+{
+	ScriptValue any(ValueType<T>::Type);
+	return getValueAny(idx, any, true) && any.CopyTo(value);
+}
+
+
+X_INLINE bool IScriptTable::haveValue(const char* pKey)
+{
+	X_UNUSED(pKey);
+	X_ASSERT_NOT_IMPLEMENTED();
+	return false;
+}
+
+X_INLINE bool IScriptTable::haveValue(int idx)
+{
+	X_UNUSED(idx);
+	X_ASSERT_NOT_IMPLEMENTED();
+	return false;
+}
+
+X_INLINE void IScriptTable::setToNull(const char* pKey)
+{
+	setValueAny(pKey, ScriptValue(Type::NIL));
+}
+
+X_INLINE void IScriptTable::setToNull(int idx)
+{
+	setValueAny(idx, ScriptValue(Type::NIL));
+}
+
+X_INLINE void IScriptTable::setToNullChain(const char* pKey)
+{
+	setValueAny(pKey, ScriptValue(Type::NIL), true);
+}
+
+
 X_NAMESPACE_END

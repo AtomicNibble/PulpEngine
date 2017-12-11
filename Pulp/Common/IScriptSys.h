@@ -374,17 +374,17 @@ public:
 	X_INLINE void setValue(int idx, const T& value);
 
 	template <class T>
-	X_INLINE void setValueChain(const char *sKey, const T &value);
+	X_INLINE void setValueChain(const char* pKey, const T &value);
 
 	//	 Gets value of a table member.
 	template <class T>
 	X_INLINE bool getValue(const char* pKey, T& value);
 
 	template <class T>
-	X_INLINE bool getAt(int idx, T& value);
+	X_INLINE bool getValue(int idx, T& value);
 
 	template <class T> 
-	X_INLINE bool getValueChain(const char *sKey, T &value);
+	X_INLINE bool getValueChain(const char* pKey, T &value);
 
 	
 	X_INLINE bool haveValue(const char* pKey);
