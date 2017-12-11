@@ -67,67 +67,67 @@ namespace lua
 
 	void StateView::openLibs(libs l)
 	{
-		if (l.IsSet(lib::base))
+		if (l.IsSet(lib::Base))
 		{
 			luaL_requiref(L_, "base", luaopen_base, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::table))
+		if (l.IsSet(lib::Table))
 		{
 			luaL_requiref(L_, "table", luaopen_table, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::string))
+		if (l.IsSet(lib::String))
 		{
 			luaL_requiref(L_, "string", luaopen_string, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::math))
+		if (l.IsSet(lib::Math))
 		{
 			luaL_requiref(L_, "math", luaopen_math, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::debug))
+		if (l.IsSet(lib::Debug))
 		{
 			luaL_requiref(L_, "debug", luaopen_debug, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::bit32))
+		if (l.IsSet(lib::Bit32))
 		{
 			luaL_requiref(L_, "bit", luaopen_bit, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::package))
+		if (l.IsSet(lib::Package))
 		{
 			luaL_requiref(L_, "package", luaopen_package, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::os))
+		if (l.IsSet(lib::Os))
 		{
 			luaL_requiref(L_, "os", luaopen_os, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::io))
+		if (l.IsSet(lib::Io))
 		{
 			luaL_requiref(L_, "io", luaopen_io, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::ffi))
+		if (l.IsSet(lib::Ffi))
 		{
 			luaL_requiref(L_, "ffi", luaopen_ffi, 1);
 			lua_pop(L_, 1);
 		}
 
-		if (l.IsSet(lib::jit))
+		if (l.IsSet(lib::Jit))
 		{
 			luaL_requiref(L_, "jit", luaopen_jit, 1);
 			lua_pop(L_, 1);

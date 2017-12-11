@@ -78,15 +78,15 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 	}
 	else if (pH->getParam(1, tbl))
 	{
-		void* ptr = (static_cast<XScriptTable*>(tbl.GetPtr()))->GetUserDataValue();
-		if (!ptr) {
+		void* pPtr = (static_cast<XScriptTable*>(tbl.GetPtr()))->getUserData();
+		if (!pPtr) {
 			return nullptr;
 		}
 
-		core::XFile* pFile = *static_cast<core::XFile**>(ptr);
+		core::XFile* pFile = *static_cast<core::XFile**>(pPtr);
 
 		if (nullPointer) {
-			*static_cast<core::XFile**>(ptr) = nullptr;
+			*static_cast<core::XFile**>(pPtr) = nullptr;
 		}
 
 		return pFile;
@@ -502,7 +502,7 @@ SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
 #endif
 
 
-	(static_cast<XScriptTable*>(userData.GetPtr()))->Delegate(file_.GetMethodsTable());
+//	(static_cast<XScriptTable*>(userData.GetPtr()))->Delegate(file_.GetMethodsTable());
 
 	return userData;
 }

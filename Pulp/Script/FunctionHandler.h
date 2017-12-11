@@ -25,13 +25,12 @@ public:
 	virtual int32_t endFunctionAny(const ScriptValue& any) X_FINAL;
 	virtual int32_t endFunctionAny(const ScriptValue& any1, const ScriptValue& any2) X_FINAL;
 	virtual int32_t endFunctionAny(const ScriptValue& any1, const ScriptValue& any2, const ScriptValue& any3) X_FINAL;
-	
 
 private:
 	XScriptSys* pSS_;
 	lua_State* L_;
 	const char* pFuncName_;
-	int paramIdOffset_;
+	int32_t paramIdOffset_;
 };
 
 X_NAMESPACE_END

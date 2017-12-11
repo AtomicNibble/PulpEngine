@@ -44,9 +44,10 @@ struct IScriptTableIterator;
 struct IScriptTable;
 
 
-// the only reason this is uinptr is so it's a diffrent type than int32_t.
-// we onlt need 32bit's for the data, but need it to be a strong type.
-typedef uintptr_t ScriptFunctionHandle;
+// the only reason this is a custom type instead of a 32bit int.
+// if for type resolution in tempaltes / overloads. if we had strong types could use that.
+struct ScriptFunctionHandleType {};
+typedef ScriptFunctionHandleType* ScriptFunctionHandle;
 
 static const ScriptFunctionHandle INVALID_HANLDE = 0;
 
@@ -210,69 +211,10 @@ struct IScriptSys : public core::IEngineSysBase
 };
 
 
-#else
-
-
-struct IScriptSys : public core::IEngineSysBase
-{
-	virtual ~IScriptSys(){};
-
-	virtual void Update(void) X_ABSTRACT;
-
-	virtual bool ExecuteFile(const char* FileName, bool bRaiseError, bool bForceReload) X_ABSTRACT;
-	virtual bool UnLoadScript(const char* FileName) X_ABSTRACT;
-	virtual void UnloadScripts() X_ABSTRACT;
-	virtual bool ReloadScript(const char* FileName, bool raiseError) X_ABSTRACT;
-	virtual bool ReloadScripts() X_ABSTRACT;
-	virtual void ListLoadedScripts(void) X_ABSTRACT;
-	virtual void LogStackTrace(void) X_ABSTRACT;
-
-	virtual void SetGlobalAny(const char* Key, const ScriptValue& val) X_ABSTRACT;
-
-
-	virtual ScriptFunctionHandle GetFunctionPtr(const char* sFuncName) X_ABSTRACT;
-	virtual	ScriptFunctionHandle GetFunctionPtr(const char* sTableName, const char* sFuncName) X_ABSTRACT;
-
-	virtual ScriptFunctionHandle AddFuncRef(ScriptFunctionHandle f) X_ABSTRACT;
-	virtual bool CompareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_ABSTRACT;
-	virtual void ReleaseFunc(ScriptFunctionHandle f) X_ABSTRACT;
-
-
-	virtual IScriptTable* CreateTable(bool bEmpty = false) X_ABSTRACT;
-	// Get Global value.
-	virtual bool GetGlobalAny(const char* Key, ScriptValue& any) X_ABSTRACT;
-	// Set Global value to Null.
-	virtual void SetGlobalToNull(const char* Key) {
-		SetGlobalAny(Key, ScriptValue(Type::NIL)); 
-	}
-
-
-	// Set Global value.
-	template <class T>
-	void SetGlobalValue(const char* Key, const T& value) {
-		SetGlobalAny(Key, ScriptValue(value));
-	}
-
-	// Get Global value.
-	template <class T>
-	bool GetGlobalValue(const char* Key, T& value)
-	{
-		ScriptValue any(value, 0);
-		return GetGlobalAny(Key, any) && any.CopyTo(value);
-	}
-
-
-	virtual IScriptTable* CreateUserData(void* ptr, size_t size) X_ABSTRACT;
-
-	virtual void OnScriptError(const char* fmt, ...) X_ABSTRACT;
-};
-
-#endif
-
 struct IFunctionHandler
 {
 	virtual ~IFunctionHandler() {}
-	
+
 	virtual IScriptSys* getIScriptSystem(void) X_ABSTRACT;
 
 	virtual void* getThis(void) X_ABSTRACT;
@@ -294,17 +236,33 @@ struct IFunctionHandler
 	template <typename T>
 	X_INLINE bool getParam(int32_t idx, T &value);
 
+	template <typename T>
+	X_INLINE bool getParam(T& value);
+	template <typename T, typename T2>
+	X_INLINE bool getParam(T& value1, T2& value2);
+	template <typename T, typename T2, typename T3>
+	X_INLINE bool getParam(T& value1, T2& value2, T3& value3);
+	template <typename T, typename T2, typename T3, typename T4>
+	X_INLINE bool getParam(T& value1, T2& value2, T3& value3, T4& value4);
+
+
 	X_INLINE int endFunction(void);
 	X_INLINE int endFunctionNull(void);
 
 	template <class T>
-	X_INLINE int endFunction(const T &value);
+	X_INLINE int endFunction(const T& value);
 	template <class T1, class T2>
-	X_INLINE int endFunction(const T1 &value1, const T2 &value2);
+	X_INLINE int endFunction(const T1& value1, const T2& value2);
 	template <class T1, class T2, class T3>
-	X_INLINE int endFunction(const T1 &value1, const T2 &value2, const T3 &value3);
+	X_INLINE int endFunction(const T1& value1, const T2& value2, const T3& value3);
 
 };
+
+
+#else
+
+#endif
+
 
 
 struct IScriptTableDumpSink
@@ -314,6 +272,7 @@ struct IScriptTableDumpSink
 	virtual void OnElementFound(int nIdx, Type::Enum type) X_ABSTRACT;
 };
 
+/*
 
 struct IScriptTableIterator
 {
@@ -325,137 +284,31 @@ struct IScriptTableIterator
 
 	virtual bool Next(ScriptValue &var);
 };
+*/
+
+struct ScriptFunctionDesc
+{
+	typedef core::Delegate<int(IFunctionHandler*)> ScriptFunction;
+	typedef core::traits::Function<int(IFunctionHandler* pH, void* pBuffer, int32_t size)> UserDataFunction;
+
+	X_INLINE ScriptFunctionDesc();
+
+	const char* pFunctionName;			// Name of function.
+	const char* pFunctionParams;		// List of parameters (ex "nSlot,vDirection" ).
+	const char* pGlobalName;			// Name of global table (ex "Core")
+	ScriptFunction function;			// Pointer to simple function.
+	int   paramIdOffset;				// Offset of the parameter to accept as 1st function argument.
+	int   userDataSize;
+	void* pDataBuffer;
+	UserDataFunction::Pointer pUserDataFunc;
+};
+
 
 struct IScriptTable
 {
-	virtual ~IScriptTable(){}
-	typedef core::Delegate<int(IFunctionHandler*)> ScriptFunction;
-	typedef core::traits::Function < int(IFunctionHandler* pH, void* pBuffer, int size)> UserDataFunction;
-	// typedef int(*UserDataFunction)(IFunctionHandler* pH, void *pBuffer, int nSize);
+	typedef ScriptFunctionDesc::ScriptFunction ScriptFunction;
+	typedef ScriptFunctionDesc::UserDataFunction UserDataFunction;
 
-
-	virtual IScriptSys* GetScriptSystem() const X_ABSTRACT;
-
-	virtual void addRef(void) X_ABSTRACT;
-	virtual void release(void) X_ABSTRACT;
-
-	virtual void Delegate(IScriptTable *pObj) X_ABSTRACT;
-	virtual void* GetUserDataValue() X_ABSTRACT;
-
-
-	//	 Sets the value of a table member.
-	virtual void SetValueAny(const char *sKey, const ScriptValue &any, bool bChain = false) X_ABSTRACT;
-	//	 Gets the value of a table member.
-	virtual bool GetValueAny(const char *sKey, ScriptValue &any, bool bChain = false) X_ABSTRACT;
-
-	//	 Sets value of a table member.
-	template <class T> 
-	void SetValue(const char *sKey, const T &value) { 
-		SetValueAny(sKey, value); 
-	}
-
-	//	 Gets value of a table member.
-	template <class T>
-	bool GetValue(const char *sKey, T &value) {
-		ScriptValue any(ValueType<T>::Type);
-		return GetValueAny(sKey, any) && any.CopyTo(value);
-	}
-
-	bool HaveValue(const char * sKey)
-	{
-		ScriptValue any;
-		GetValueAny(sKey, any);
-
-		switch (any.getType())
-		{
-			case Type::NONE:
-				return false;
-			default:
-				return true;
-		}
-	}
-
-
-	//	 Sets member value to nil.
-	void SetToNull(const char* sKey)  { 
-		SetValueAny(sKey, ScriptValue(Type::NONE));
-	}
-
-	// Summary:
-	//	 Sets/Gets Chain.
-	// Notes:
-	//	 Is a faster version when doing a big amount of SetValue/GetValue.
-	virtual bool BeginSetGetChain() X_ABSTRACT;
-	virtual void EndSetGetChain() X_ABSTRACT;
-
-	//	 Sets value of a table member.
-	template <class T> 
-	void SetValueChain(const char *sKey, const T &value) { 
-		SetValueAny(sKey, value, true);
-	}
-	//	 Gets value of a table member.
-	template <class T> 
-	bool GetValueChain(const char *sKey, T &value) {
-		ScriptValue any(value, 0);
-		return GetValueAny(sKey, any, true) && any.CopyTo(value);
-	}
-	void SetToNullChain(const char *sKey)  {
-		SetValueChain(sKey, ScriptValue(Type::NONE)); 
-	}
-
-
-	virtual Type::Enum GetValueType(const char* sKey) X_ABSTRACT;
-	virtual Type::Enum GetAtType(int nIdx) X_ABSTRACT;
-
-	// Description:
-	//    Sets the value of a member variable at the specified index
-	//    this means that you will use the object as vector into the script.
-	virtual void SetAtAny(int nIndex, const ScriptValue& any) X_ABSTRACT;
-
-	// Description:
-	//    Gets the value of a member variable at the specified index.
-	virtual bool GetAtAny(int nIndex, ScriptValue& any) X_ABSTRACT;
-
-	// Description:
-	//    Sets the value of a member variable at the specified index.
-	template <class T> 
-	void SetAt(int nIndex, const T& value) { 
-		SetAtAny(nIndex, value);
-	}
-
-	// Description:
-	//    Gets the value of a member variable at the specified index.
-	template <class T>
-	bool GetAt(int nIndex, T& value)
-	{
-		ScriptValue any(value, 0);
-		return GetAtAny(nIndex, any) && any.CopyTo(value);
-	}
-
-	bool HaveAt(int elem)
-	{
-		ScriptValue any;
-		GetAtAny(elem, any);
-		return any.getType() != Type::NONE;
-	}
-
-	// Description:
-	//    Sets the value of a member variable to nil at the specified index.
-	void SetNullAt(int nIndex) { 
-		SetAtAny(nIndex, ScriptValue(Type::NONE));
-	}
-
-	// Description:
-	//	 Adds value at next available index.
-	template <class T> 
-	void PushBack(const T& value)
-	{
-		int nNextPos = Count() + 1;
-		SetAtAny(nNextPos, value);
-	}
-
-	// Summary:
-	// Iteration over table parameters.
 	struct Iterator
 	{
 		ScriptValue value;
@@ -463,54 +316,83 @@ struct IScriptTable
 		int internal;
 	};
 
-	virtual IScriptTable::Iterator BeginIteration() X_ABSTRACT;
-	virtual bool MoveNext(Iterator &iter) X_ABSTRACT;
-	virtual void EndIteration(const Iterator &iter) X_ABSTRACT;
+public:
 
-	// Summary:
-	//	 Clears the table,removes all the entries in the table.
-	virtual void Clear() X_ABSTRACT;
-	// Summary:
-	//	 Gets the count of elements into the object.
-	virtual int Count() X_ABSTRACT;
+	virtual ~IScriptTable(){}
+
+	virtual IScriptSys* getIScriptSystem(void) const X_ABSTRACT;
+
+	virtual void addRef(void) X_ABSTRACT;
+	virtual void release(void) X_ABSTRACT;
+
+	virtual void* getUserData(void) X_ABSTRACT;
+
+	virtual void setValueAny(const char* pKey, const ScriptValue& any, bool bChain = false) X_ABSTRACT;
+	virtual bool getValueAny(const char* pKey, ScriptValue& any, bool bChain = false) X_ABSTRACT;
+
+	virtual void setValueAny(int32_t idx, const ScriptValue& any) X_ABSTRACT;
+	virtual bool getValueAny(int32_t idx, ScriptValue& any) X_ABSTRACT;
+
+	virtual Type::Enum getValueType(const char* pKey) X_ABSTRACT;
+	virtual Type::Enum getValueType(int32_t idx) X_ABSTRACT;
+
+	virtual bool beginChain(void) X_ABSTRACT;
+	virtual void endChain(void) X_ABSTRACT;
+
+	virtual void clear(void) X_ABSTRACT; // clears the table, removes all the entries in the table.
+	virtual int32_t count(void) X_ABSTRACT; // gets the count of elements into the object.
+
+	// member iteration.
+	virtual IScriptTable::Iterator begin(void) X_ABSTRACT;
+	virtual bool next(Iterator &iter) X_ABSTRACT;
+	virtual void end(const Iterator &iter) X_ABSTRACT;
+
 
 	// Description:
 	//    Produces a copy of the src table.
 	// Arguments
-	//    pSrcTable - Source table to clone from.
 	//    bDeepCopy - Defines if source table is cloned recursively or not,
 	//                if bDeepCopy is false Only does shallow copy (no deep copy, table entries are not cloned hierarchically).
 	//                If bDeepCopy is true, all sub tables are also cloned recursively.
 	//                If bDeepCopy is true and bCopyByReference is true, the table structure is copied but the tables are left empty and the metatable is set to point at the original table.
-	virtual bool Clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_ABSTRACT;
+	virtual bool clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_ABSTRACT;
 
-	virtual void Dump(IScriptTableDumpSink* p) X_ABSTRACT;
+	virtual void dump(IScriptTableDumpSink* p) X_ABSTRACT;
 
+	virtual bool addFunction(const ScriptFunctionDesc& fd) X_ABSTRACT;
 
-	struct XUserFunctionDesc
-	{
-		XUserFunctionDesc() :
-			pFunctionName(""),
-			pFunctionParams(""),
-			pGlobalName(""),
-			nParamIdOffset(0),
-			userDataSize(0),
-			pDataBuffer(nullptr),
-			pUserDataFunc(nullptr)
-		{}
+	// -------------- helpers --------------
 
-		const char* pFunctionName;			// Name of function.
-		const char* pFunctionParams;		// List of parameters (ex "nSlot,vDirection" ).
-		const char* pGlobalName;			// Name of global table (ex "Core")
-		ScriptFunction function;			// Pointer to simple function.
-		int   nParamIdOffset;				// Offset of the parameter to accept as 1st function argument.
-		int   userDataSize;
-		void* pDataBuffer;
-		UserDataFunction::Pointer pUserDataFunc;
-	};
+	// push to next available index.
+	template <class T>
+	X_INLINE void pushBack(const T& value);
+
+	template <class T> 
+	X_INLINE void setValue(const char* pKey, const T &value);
+
+	template <class T>
+	X_INLINE void setValue(int idx, const T& value);
+
+	template <class T>
+	X_INLINE void setValueChain(const char *sKey, const T &value);
+
+	//	 Gets value of a table member.
+	template <class T>
+	X_INLINE bool getValue(const char* pKey, T& value);
+
+	template <class T>
+	X_INLINE bool getAt(int idx, T& value);
+
+	template <class T> 
+	X_INLINE bool getValueChain(const char *sKey, T &value);
 
 	
-	virtual bool AddFunction(const XUserFunctionDesc& fd) X_ABSTRACT;
+	X_INLINE bool haveValue(const char* pKey);
+	X_INLINE bool haveValue(int idx);
+
+	X_INLINE void setToNull(const char* pKey);
+	X_INLINE void setToNull(int idx);
+	X_INLINE void setToNullChain(const char* pKey);
 };
 
 

@@ -44,13 +44,6 @@ void XScriptableBase::SetGlobalName(const char* pGlobalName)
 	}
 }
 
-void XScriptableBase::Delegate(XScriptableBase* pScriptableBase)
-{
-	if (pMethodsTable_ && pScriptableBase) {
-		pMethodsTable_->Delegate(pScriptableBase->pMethodsTable_);
-	}
-}
-
 IScriptTable* XScriptableBase::GetMethodsTable(void)
 {
 	return pMethodsTable_;
@@ -75,13 +68,13 @@ void XScriptableBase::RegisterFunction(const char* pFuncName,
 {
 	if (pMethodsTable_)
 	{
-		IScriptTable::XUserFunctionDesc fd;
+		ScriptFunctionDesc fd;
 		fd.pGlobalName = name_.c_str();
 		fd.pFunctionName = pFuncName;
 		fd.function = function;
-		fd.nParamIdOffset = paramIdOffset_;
+		fd.paramIdOffset = paramIdOffset_;
 
-		pMethodsTable_->AddFunction(fd);
+		pMethodsTable_->addFunction(fd);
 	}
 }
 

@@ -4,9 +4,12 @@
 #define _X_SCRIPT_SYS_H_
 
 #include "binds\ScriptBinds.h"
-#include <String\Path.h>
 
-#include <IDirectoryWatcher.h>
+#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
+#include <Memory\HeapArea.h>
 
 // TODO: temp
 X_DISABLE_WARNING(4702)
@@ -14,51 +17,6 @@ X_DISABLE_WARNING(4702)
 X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(script)
-
-
-struct LuaStackGuard
-{
-	LuaStackGuard(lua_State *p)
-	{
-		m_pLS = p;
-		m_nTop = lua_gettop(m_pLS);
-	}
-	~LuaStackGuard()
-	{
-		lua_settop(m_pLS, m_nTop);
-	}
-private:
-	int m_nTop;
-	lua_State *m_pLS;
-};
-
-#if defined(X_DEBUG) && 1
-
-struct LuaStackValidator
-{
-	const char *text;
-	lua_State *L;
-	int top;
-	LuaStackValidator(lua_State *pL, const char *sText)
-	{
-		text = sText;
-		L = pL;
-		top = lua_gettop(L);
-	}
-	~LuaStackValidator()
-	{
-		if (top != lua_gettop(L))
-		{
-			X_ASSERT(false, "Lua Stack Validation Failed")();
-			lua_settop(L, top);
-		}
-	}
-};
-
-#define X_LUA_CHECK_STACK(L) LuaStackValidator __stackCheck__((L),__FUNCTION__);
-#else //_DEBUG
-#define X_LUA_CHECK_STACK(L) (void)0;
-#endif //_DEBUG
 
 struct IRecursiveLuaDump
 {
@@ -68,12 +26,28 @@ struct IRecursiveLuaDump
 	virtual void OnEndTable(int nLevel) X_ABSTRACT;
 };
 
+class XScriptTable;
+
 class XScriptSys : public IScriptSys, public core::IXHotReload
 {
 	typedef std::set<core::string> ScriptFileList;
 
+	typedef core::MemoryArena<
+		core::GrowingPoolAllocator,
+		core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+		core::SimpleBoundsChecking,
+		core::SimpleMemoryTracking,
+		core::SimpleMemoryTagging
+#else
+		core::NoBoundsChecking,
+		core::NoMemoryTracking,
+		core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+	> PoolArena;
+
 public:
-	XScriptSys();
+	XScriptSys(core::MemoryArenaBase* arena);
 	// IScriptSys
 	~XScriptSys() X_FINAL;
 
@@ -104,56 +78,47 @@ public:
 	virtual void onScriptError(const char* fmt, ...) X_FINAL;
 
 	// ~IScriptSys
-
-
-	// IXHotReload
-	
-	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-
-	// ~IXHotReload
-
 public:
+	X_INLINE lua_State* getLuaState(void);
+
+	XScriptTable* allocTable(void);
+	void freeTable(XScriptTable* pTable);
 
 	bool getRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any);
 
-	void pushAny(const ScriptValue &var);
 	bool popAny(ScriptValue& var);
-	bool toAny(ScriptValue& var, int index);
-	static bool toAny(lua_State* L, ScriptValue& var, int index);
+	void pushAny(const ScriptValue &var);
 	void pushVec3(const Vec3f& vec);
-	bool toVec3(Vec3f& vec, int index);
-
 	void pushTable(IScriptTable* pTable);
-	void attachTable(IScriptTable* pTable);
+	bool toVec3(Vec3f& vec, int index);
+	bool toAny(ScriptValue& var, int index);
 
-	static bool DumpStateToFile(lua_State* L, const char* name);
-
-	X_INLINE lua_State* getLuaState(void) {
-		return L;
-	}
+	static bool toAny(lua_State* L, ScriptValue& var, int index);
 
 private:
 
-	bool ExecuteFile_Internal(const core::Path<char>& path, bool silent);
-	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);
+//	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);
 
-	void TraceScriptError();
-
-
-	void addFileName(const char* name);
-	void removeFileName(const char* name);
-
-
-	static int ErrorHandler(lua_State *L);
+	// IXHotReload
+	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+	// ~IXHotReload
 
 private:
-	bool initialised_;
 	lua_State* L;
+
+	core::MemoryArenaBase*		arena_;
+	PoolArena::AllocationPolicy poolAllocator_;
+	PoolArena					poolArena_;
 
 	XScriptBinds binds_;
 	ScriptFileList fileList_;
+	bool initialised_;
 };
 
+X_INLINE lua_State* XScriptSys::getLuaState(void)
+{
+	return L;
+}
 
 X_NAMESPACE_END
 

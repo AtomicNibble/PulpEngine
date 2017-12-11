@@ -476,9 +476,9 @@
     <ClInclude Include="ScriptTable.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="TableDump.h" />
+    <ClInclude Include="wrapper\util.h" />
     <ClInclude Include="wrapper\state.h" />
     <ClInclude Include="wrapper\state_view.h" />
-    <ClInclude Include="wrapper\table.h" />
     <ClInclude Include="wrapper\types.h" />
   </ItemGroup>
   <ItemGroup>
@@ -511,7 +511,6 @@
     <ClCompile Include="TableDump.cpp" />
     <ClCompile Include="wrapper\state.cpp" />
     <ClCompile Include="wrapper\state_view.cpp" />
-    <ClCompile Include="wrapper\table.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

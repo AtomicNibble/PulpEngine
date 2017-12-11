@@ -3,7 +3,9 @@
 #ifndef X_SCRIPT_TABLE_H_
 #define X_SCRIPT_TABLE_H_
 
-#include "Util\ReferenceCounted.h"
+#include <Util\ReferenceCounted.h>
+#include <Util\ToggleChecker.h>
+
 
 X_NAMESPACE_BEGIN(script)
 
@@ -15,91 +17,102 @@ class XScriptTable : public IScriptTable
 	{
 		ScriptFunction pFunction;
 		int8_t paramIdOffset;
-		const char funcName[1];
+		char funcName[1];
+
+		X_INLINE static constexpr size_t requiredSize(size_t nameSize) {
+			return sizeof(CFunctionData) + nameSize;
+		}
 	};
 
 	struct UserDataFunctionData
 	{
-		UserDataFunction::Pointer* pFunction;
-		int16_t dataSize;
+		UserDataFunction::Pointer pFunction;
+		uint8_t nameSize;
 		int8_t paramIdOffset;
-		const char funcName[1];
+		int16_t dataSize;
+		char funcName[1];
+
+		X_INLINE static constexpr size_t requiredSize(size_t nameSize, size_t dataSize) {
+			return sizeof(UserDataFunctionData) + nameSize + dataSize;
+		}
+
+		X_INLINE void* getBuffer(void) const {
+			return (void*)(reinterpret_cast<const char*>(this) + sizeof(*this) + nameSize);
+		}
 	};
 	X_PACK_POP;
 
 public:
 	XScriptTable();
-	~XScriptTable() X_OVERRIDE;
+	~XScriptTable() X_FINAL;
 
 	// IScriptTable 
-	virtual void addRef(void) X_OVERRIDE{ refCount_++; }
-	virtual void release(void) X_OVERRIDE{ if (--refCount_ <= 0) DeleteThis(); }
+	void addRef(void) X_FINAL;
+	void release(void) X_FINAL;
 
-	virtual IScriptSys* GetScriptSystem() const X_OVERRIDE;
-	virtual void Delegate(IScriptTable *pMetatable) X_OVERRIDE;
-	virtual void* GetUserDataValue() X_OVERRIDE;
+	IScriptSys* getIScriptSystem(void) const X_FINAL;
+	
+	void* getUserData(void) X_FINAL;
 
+	void setValueAny(const char* pKey, const ScriptValue& any, bool bChain = false) X_FINAL;
+	bool getValueAny(const char* pKey, ScriptValue& any, bool bChain = false) X_FINAL;
 
-	// Set/Get chain.
-	virtual bool BeginSetGetChain() X_OVERRIDE;
-	virtual void EndSetGetChain() X_OVERRIDE;
+	void setValueAny(int32_t idx, const ScriptValue& any) X_FINAL;
+	bool getValueAny(int32_t idx, ScriptValue& any) X_FINAL;
 
-	//////////////////////////////////////////////////////////////////////////
-	virtual void SetValueAny(const char *sKey, const ScriptValue& any, bool bChain = false) X_OVERRIDE;
-	virtual bool GetValueAny(const char *sKey, ScriptValue& any, bool bChain = false) X_OVERRIDE;
+	Type::Enum getValueType(const char* pKey) X_FINAL;
+	Type::Enum getValueType(int32_t idx) X_FINAL;
 
-	//////////////////////////////////////////////////////////////////////////
-	virtual void SetAtAny(int nIndex, const ScriptValue &any) X_OVERRIDE;
-	virtual bool GetAtAny(int nIndex, ScriptValue &any) X_OVERRIDE;
+	bool beginChain(void) X_FINAL;
+	void endChain(void) X_FINAL;
 
-	virtual Type::Enum GetValueType(const char* sKey) X_OVERRIDE;
-	virtual Type::Enum GetAtType(int nIdx) X_OVERRIDE;
+	void clear(void) X_FINAL; // clears the table, removes all the entries in the table.
+	int32_t count(void) X_FINAL; // gets the count of elements into the object.
 
-	// Iteration.
-	virtual IScriptTable::Iterator BeginIteration() X_OVERRIDE;
-	virtual bool MoveNext(Iterator& iter) X_OVERRIDE;
-	virtual void EndIteration(const Iterator& iter) X_OVERRIDE;
+	// member iteration.
+	IScriptTable::Iterator begin(void) X_FINAL;
+	bool next(Iterator &iter) X_FINAL;
+	void end(const Iterator &iter) X_FINAL;
 
-	virtual void Clear() X_OVERRIDE;
-	virtual int  Count() X_OVERRIDE;
-	virtual bool Clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_OVERRIDE;
-	virtual void Dump(IScriptTableDumpSink* p) X_OVERRIDE;
+	bool clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_FINAL;
+	void dump(IScriptTableDumpSink* p) X_FINAL;
 
-	virtual bool AddFunction(const XUserFunctionDesc& fd) X_OVERRIDE;
+	bool addFunction(const ScriptFunctionDesc& fd) X_FINAL;
 
 	// --------------------------------------------------------------------------
-	void CreateNew();
-	int  GetRef();
-	void Attach();
-	void AttachToObject(IScriptTable* so);
-	void DeleteThis();
 
-	// Create object from pool.
-	// Assign a metatable to a table.
-	void SetMetatable(IScriptTable* pMetatable);
-	// Push reference of this object to the stack.
-	void PushRef();
-	// Push reference to specified script table to the stack.
-	static void PushRef(IScriptTable* pObj);
+	void createNew(void);
+	void deleteThis(void);
+	void setMetatable(IScriptTable* pMetatable); // Assign a metatable to a table.
+	
+	int32_t getRef(void) const;
+	void attach(IScriptTable* pSO); // push that table and aattach.
+	void attach(void); // attaches table to value at top of stack.
+	void pushRef(void);
 
 public:
-	static lua_State* L;
-	static XScriptSys* pScriptSystem_;
-
-	static std::set<class XScriptTable*> s_allTables_;
-
+	static void pushRef(IScriptTable* pObj);
+	
 private:
-	static int StdCFunction(lua_State* L);
-	static int StdCUserDataFunction(lua_State* L);
+	static int32_t s_CFunction(lua_State* L);
+	static int32_t s_CUserDataFunction(lua_State* L);
 
 	static void CloneTable(int srcTable, int trgTable);
 	static void CloneTable_r(int srcTable, int trgTable);
 	static void ReferenceTable_r(int scrTable, int trgTable);
 
-private:
-	int refCount_;
-	int luaRef_;
+public:
+	static lua_State* L;
+	static XScriptSys* pScriptSystem_;
+	static std::set<class XScriptTable*> s_allTables_;
 
+private:
+	int32_t refCount_;
+	int32_t luaRef_;
+
+#if X_DEBUG
+	core::ToggleChecker setChainActive_;
+#endif // !X_DEBUG
 };
 
 X_NAMESPACE_END

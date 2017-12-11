@@ -36,7 +36,6 @@ public:
 
 	virtual void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_ABSTRACT;
 	void SetGlobalName(const char* GlobalName);
-	void Delegate(XScriptableBase* pScriptableBase);
 
 	IScriptTable* GetMethodsTable(void);
 

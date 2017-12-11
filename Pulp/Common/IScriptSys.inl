@@ -300,6 +300,32 @@ X_INLINE bool IFunctionHandler::getParam(int32_t idx, T &value)
 	return getParamAny(idx, any) && any.CopyTo(value);
 }
 
+
+template <typename T>
+X_INLINE bool IFunctionHandler::getParam(T& value)
+{
+	return getParam<T>(value);
+}
+
+template <typename T, typename T2>
+X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2)
+{
+	return getParam<T>(value1) && getParam<T2>(value2);
+}
+
+template <typename T, typename T2, typename T3>
+X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2, T3& value3)
+{
+	return getParam<T>(value1) && getParam<T2>(value2) && getParam<T3>(value3);
+}
+
+template <typename T, typename T2, typename T3, typename T4>
+X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2, T3& value3, T4& value4)
+{
+	return getParam<T>(value1) && getParam<T2>(value2) && getParam<T3>(value3) && getParam<T4>(value4);
+}
+
+
 X_INLINE int32_t IFunctionHandler::endFunction(void)
 {
 	return 0;
@@ -317,15 +343,30 @@ X_INLINE int IFunctionHandler::endFunction(const T &value)
 }
 
 template <class T1, class T2>
-X_INLINE int IFunctionHandler::endFunction(const T1 &value1, const T2 &value2)
+X_INLINE int IFunctionHandler::endFunction(const T1& value1, const T2& value2)
 {
 	return endFunctionAny(value1, value2);
 }
 
 template <class T1, class T2, class T3>
-X_INLINE int IFunctionHandler::endFunction(const T1 &value1, const T2 &value2, const T3 &value3)
+X_INLINE int IFunctionHandler::endFunction(const T1& value1, const T2& value2, const T3& value3)
 {
 	return endFunctionAny(value1, value2, value3);
 }
+
+// ------------------------------------------------------------------------
+
+ScriptFunctionDesc::ScriptFunctionDesc() :
+	pFunctionName(""),
+	pFunctionParams(""),
+	pGlobalName(""),
+	paramIdOffset(0),
+	userDataSize(0),
+	pDataBuffer(nullptr),
+	pUserDataFunc(nullptr)
+{
+
+}
+
 
 X_NAMESPACE_END

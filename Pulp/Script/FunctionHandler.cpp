@@ -64,7 +64,7 @@ const char* XFunctionHandler::getFuncName(void)
 
 int XFunctionHandler::getParamCount(void)
 {
-	return core::Max(lua_gettop(L_) - paramIdOffset_, 0);
+	return core::Max(stack::top(L_) - paramIdOffset_, 0);
 }
 
 Type::Enum XFunctionHandler::getParamType(int idx)

@@ -6,23 +6,60 @@ X_NAMESPACE_BEGIN(script)
 
 namespace lua
 {
+	#ifndef LUA_OK
+	#define LUA_OK 0
+	#endif
 
 	X_DECLARE_FLAGS(lib)(
-		base,
-		table,
-		string,
-		math,
-		debug,
-		bit32,
-		package,
-		os,
-		io,
+		Base,
+		Table,
+		String,
+		Math,
+		Debug,
+		Bit32,
+		Package,
+		Os,
+		Io,
 		// some LuaJit libs
-		ffi,
-		jit
+		Ffi,
+		Jit
 	);
 
 	typedef Flags<lib> libs;
+
+	X_DECLARE_ENUM(CallResult)(
+		Ok,
+		Yield,
+		RunTime,
+		Syntax,
+		Memory,
+		Handler,
+		File
+	);
+
+	static_assert(CallResult::Ok == LUA_OK, "Enum mismtach");
+	static_assert(CallResult::Yield == LUA_YIELD, "Enum mismtach");
+	static_assert(CallResult::RunTime == LUA_ERRRUN, "Enum mismtach");
+	static_assert(CallResult::Syntax == LUA_ERRSYNTAX, "Enum mismtach");
+	static_assert(CallResult::Memory == LUA_ERRMEM, "Enum mismtach");
+	static_assert(CallResult::Handler == LUA_ERRERR, "Enum mismtach");
+	static_assert(CallResult::File == LUA_ERRFILE, "Enum mismtach");
+
+
+	X_DECLARE_ENUM(LoadResult)(
+		Ok,
+		_blank1,
+		_blank2,
+		Syntax,
+		Memory,
+		_blank3,
+		File
+	);
+
+	static_assert(LoadResult::Ok == LUA_OK, "Enum mismtach");
+	static_assert(LoadResult::Syntax == LUA_ERRSYNTAX, "Enum mismtach");
+	static_assert(LoadResult::Memory == LUA_ERRMEM, "Enum mismtach");
+	static_assert(LoadResult::File == LUA_ERRFILE, "Enum mismtach");
 
 	struct Ref
 	{

@@ -57,7 +57,7 @@ class XEngineModule_Script : public IEngineModule
 		script::IScriptSys *pScript = nullptr;
 
 		g_ScriptArena = X_NEW_ALIGNED(ScriptArena, gEnv->pArena, "ScriptArena", X_ALIGN_OF(ScriptArena))(&g_ScriptAlloc, "ScriptArena");
-		pScript = X_NEW_ALIGNED(script::XScriptSys, g_ScriptArena, "ScriptSys", X_ALIGN_OF(script::XScriptSys));
+		pScript = X_NEW_ALIGNED(script::XScriptSys, g_ScriptArena, "ScriptSys", X_ALIGN_OF(script::XScriptSys))(g_ScriptArena);
 
 		env.pScriptSys = pScript;
 		return true;
