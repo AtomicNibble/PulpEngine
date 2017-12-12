@@ -6,6 +6,17 @@ X_NAMESPACE_BEGIN(script)
 
 namespace lua
 {
+	X_INLINE int32_t functionHandleToRef(ScriptFunctionHandle ref)
+	{
+		return safe_static_cast<int32_t>(reinterpret_cast<intptr_t>(ref));
+	}
+
+	X_INLINE ScriptFunctionHandle refToScriptHandle(int32_t ref)
+	{
+		return reinterpret_cast<ScriptFunctionHandle>(static_cast<intptr_t>(ref));
+	}
+
+
 	namespace stack
 	{
 		// misc
@@ -49,12 +60,12 @@ namespace lua
 			lua_pushvalue(L, idx);
 		}
 
-		X_INLINE int32_t rawlen(lua_State* L, int32_t idx)
+		X_INLINE size_t rawlen(lua_State* L, int32_t idx)
 		{
 			return lua_objlen(L, idx);
 		}
 
-		X_INLINE int32_t rawlen(lua_State* L)
+		X_INLINE size_t rawlen(lua_State* L)
 		{
 			return lua_objlen(L, -1);
 		}
@@ -223,7 +234,7 @@ namespace lua
 
 		X_INLINE void push_ref(lua_State* L, ScriptFunctionHandle ref)
 		{
-			lua_rawgeti(L, LUA_REGISTRYINDEX, reinterpret_cast<int32_t>(ref));
+			lua_rawgeti(L, LUA_REGISTRYINDEX, functionHandleToRef(ref));
 		}
 
 		X_INLINE int32_t pop_to_ref(lua_State* L)
@@ -319,7 +330,7 @@ namespace lua
 
 		X_INLINE void remove_ref(lua_State* L, ScriptFunctionHandle ref)
 		{
-			luaL_unref(L, LUA_REGISTRYINDEX, reinterpret_cast<int32_t>(ref));
+			luaL_unref(L, LUA_REGISTRYINDEX, functionHandleToRef(ref));
 		}
 
 		X_INLINE void new_table(lua_State* L)

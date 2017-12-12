@@ -250,12 +250,12 @@ void XScriptTable::clear(void)
 	stack::pop(L);
 }
 
-int XScriptTable::count(void)
+size_t XScriptTable::count(void)
 {
 	X_LUA_CHECK_STACK(L);
 
 	pushRef();
-	int count = stack::rawlen(L);
+	size_t count = stack::rawlen(L);
 	stack::pop(L);
 	return count;
 }

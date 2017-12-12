@@ -252,7 +252,7 @@ ScriptFunctionHandle XScriptSys::getFunctionPtr(const char* pFuncName)
 		return INVALID_HANLDE;
 	}
 
-	return reinterpret_cast<ScriptFunctionHandle>(stack::pop_to_ref(L));
+	return refToScriptHandle(stack::pop_to_ref(L));
 }
 
 ScriptFunctionHandle XScriptSys::getFunctionPtr(const char* pTableName, const char* pFuncName)
@@ -268,7 +268,7 @@ ScriptFunctionHandle XScriptSys::getFunctionPtr(const char* pTableName, const ch
 		return INVALID_HANLDE;
 	}
 
-	return reinterpret_cast<ScriptFunctionHandle>(stack::pop_to_ref(L));
+	return refToScriptHandle(stack::pop_to_ref(L));
 }
 
 bool XScriptSys::compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2)
@@ -631,7 +631,7 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 			var.type_ = Type::FUNCTION;
 			// Make reference to function.
 			lua_pushvalue(L, index);
-			var.pFunction_ = reinterpret_cast<ScriptFunctionHandle>(luaL_ref(L, 1));
+			var.pFunction_ = refToScriptHandle(luaL_ref(L, 1));
 		}
 		break;
 		case LUA_TTHREAD:

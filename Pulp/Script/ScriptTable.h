@@ -67,7 +67,7 @@ public:
 	void endChain(void) X_FINAL;
 
 	void clear(void) X_FINAL; // clears the table, removes all the entries in the table.
-	int32_t count(void) X_FINAL; // gets the count of elements into the object.
+	size_t count(void) X_FINAL; // gets the count of elements into the object.
 
 	// member iteration.
 	IScriptTable::Iterator begin(void) X_FINAL;

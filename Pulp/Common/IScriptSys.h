@@ -340,7 +340,7 @@ public:
 	virtual void endChain(void) X_ABSTRACT;
 
 	virtual void clear(void) X_ABSTRACT; // clears the table, removes all the entries in the table.
-	virtual int32_t count(void) X_ABSTRACT; // gets the count of elements into the object.
+	virtual size_t count(void) X_ABSTRACT; // gets the count of elements into the object.
 
 	// member iteration.
 	virtual IScriptTable::Iterator begin(void) X_ABSTRACT;
