@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "XSound.h"
 
+#include "ScriptBinds\ScriptBinds_sound.h"
 
 // id's
 #include "IDs\Wwise_IDs.h"
@@ -212,7 +213,8 @@ XSound::XSound(core::MemoryArenaBase* arena) :
 	occlusion_(arena_),
 	comsSysInit_(false),
 	outputCaptureEnabled_(false),
-	bankSignal_(true)
+	bankSignal_(true),
+	pScriptBinds_(nullptr)
 {
 	objects_.reserve(128);
 
@@ -254,12 +256,20 @@ void XSound::registerCmds(void)
 
 }
 
+void XSound::registerScriptBinds(void)
+{
+	auto* pScriptSys = gEnv->pScriptSys;
 
+	pScriptBinds_ = X_NEW(ScriptBinds_Sound, arena_, "SoundScriptBinds")(pScriptSys, this);
+}
 
 bool XSound::init(void)
 {
 	X_LOG0("SoundSys", "Starting");
 	X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
+
+	// TODO: call from somewhere.
+	registerScriptBinds();
 
 	AkMemSettings memSettings;
 
@@ -539,6 +549,11 @@ bool XSound::asyncInitFinalize(void)
 void XSound::shutDown(void)
 {
 	X_LOG0("SoundSys", "Shutting Down");
+
+	if (pScriptBinds_) {
+		X_DELETE(pScriptBinds_, arena_);
+	}
+
 #if X_SUPER == 0
 	if (comsSysInit_) {
 		Comm::Term();

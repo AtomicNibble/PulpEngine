@@ -497,6 +497,11 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 			return false;
 		}
 
+		// #------------------------- ScriptSys -------------------------
+		if (!InitScriptSys(startupParams)) {
+			return false;
+		}
+
 		// #------------------------- Sound -------------------------
 		if (!InitSound(startupParams)) {
 			return false;
@@ -504,11 +509,6 @@ bool XCore::Init(const SCoreInitParams &startupParams)
 
 		// #------------------------- Physics -------------------------
 		if (!InitPhysics(startupParams)) {
-			return false;
-		}
-
-		// #------------------------- ScriptSys -------------------------
-		if (!InitScriptSys(startupParams)) {
 			return false;
 		}
 	}

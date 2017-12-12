@@ -10,6 +10,7 @@
 
 #include <Threading\Signal.h>
 #include <Assets\AssertContainer.h>
+#include <Util\UniquePointer.h>
 
 #include <ICore.h>
 
@@ -30,6 +31,7 @@ X_NAMESPACE_DECLARE(physics,
 
 X_NAMESPACE_BEGIN(sound)
 
+class ScriptBinds_Sound;
 
 X_DECLARE_FLAGS8(SoundFlag)(
 	Registered,
@@ -97,6 +99,7 @@ public:
 
 	void registerVars(void) X_FINAL;
 	void registerCmds(void) X_FINAL;
+	void registerScriptBinds(void);
 
 	bool init(void) X_FINAL;
 	bool asyncInitFinalize(void) X_FINAL;
@@ -211,6 +214,8 @@ private:
 	Transformf listenerTrans_;
 
 	core::Signal bankSignal_;
+
+	ScriptBinds_Sound* pScriptBinds_;
 };
 
 X_NAMESPACE_END
