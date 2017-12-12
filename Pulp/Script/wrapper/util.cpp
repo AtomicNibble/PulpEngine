@@ -59,21 +59,19 @@ namespace lua
 		X_ERROR("ScriptError", "------------------------------------------");
 		X_ERROR("ScriptError", "Lua Panic");
 
-		// TODO: dump callstack etc..
 		dumpCallStack(L);
-
 		return 0;
 	}
 
 	int32_t myErrorHandler(lua_State *L)
 	{
-		const char* Err = lua_tostring(L, 1);
+		const char* pErr = stack::as_string(L, 1);
 
 		X_ERROR("ScriptError", "------------------------------------------");
 		{
-			X_LOG0("ScriptError", "%s", Err);
+			X_LOG0("ScriptError", "%s", pErr);
 
-			// TODO: dump state / trace.
+			dumpCallStack(L);
 		}
 
 		X_ERROR("ScriptError", "------------------------------------------");
