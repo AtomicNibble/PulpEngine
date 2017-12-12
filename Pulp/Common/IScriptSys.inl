@@ -41,6 +41,13 @@ X_INLINE ScriptValue::ScriptValue(const char* pValue) :
 	str_.len = safe_static_cast<int32_t>(::strlen(pValue));
 }
 
+X_INLINE ScriptValue::ScriptValue(core::StringRange<char>& value) :
+	type_(Type::String)
+{
+	str_.pStr = value.GetStart();
+	str_.len = safe_static_cast<int32_t>(value.GetLength());
+}
+
 X_INLINE ScriptValue::ScriptValue(IScriptTable* table) :
 	type_(Type::Table)
 {
@@ -215,6 +222,15 @@ X_INLINE bool ScriptValue::copyTo(char* &value) const
 		return true; 
 	} 
 	return false; 
+}
+
+X_INLINE bool ScriptValue::copyTo(core::StringRange<char>& value) const
+{
+	if (type_ == Type::String) {
+		value = core::StringRange<char>((char*)str_.pStr, (char*)str_.pStr + str_.len);
+		return true;
+	}
+	return false;
 }
 
 X_INLINE bool ScriptValue::copyTo(Handle &value) const

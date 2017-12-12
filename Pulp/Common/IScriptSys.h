@@ -95,6 +95,10 @@ template<>
 struct ValueType<const char*> {
 	static const Type::Enum Type = Type::String;
 };
+template<>
+struct ValueType<core::StringRange<char>> {
+	static const Type::Enum Type = Type::String;
+};
 
 template<>
 struct ValueType<ScriptFunctionHandle> {
@@ -127,6 +131,7 @@ struct ScriptValue
 	X_INLINE ScriptValue(float value);
 	X_INLINE ScriptValue(double value);
 	X_INLINE ScriptValue(const char* pValue);
+	X_INLINE ScriptValue(core::StringRange<char>& value);
 	X_INLINE ScriptValue(IScriptTable* pTable_);
 	X_INLINE ScriptValue(ScriptFunctionHandle function);
 	X_INLINE ScriptValue(Handle value);
@@ -150,6 +155,7 @@ struct ScriptValue
 	X_INLINE bool copyTo(float& value) const;
 	X_INLINE bool copyTo(const char* &value) const;
 	X_INLINE bool copyTo(char* &value) const;
+	X_INLINE bool copyTo(core::StringRange<char>& value) const;
 	X_INLINE bool copyTo(Handle &value) const;
 	X_INLINE bool copyTo(ScriptFunctionHandle &value) const;
 	X_INLINE bool copyTo(Vec3f& value) const;
