@@ -326,12 +326,12 @@ X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2, T3& value3, T4& 
 }
 
 
-X_INLINE int32_t IFunctionHandler::endFunction(void)
+X_INLINE int32_t IFunctionHandler::endFunction(void) const
 {
 	return 0;
 }
 
-X_INLINE int32_t IFunctionHandler::endFunctionNull(void)
+X_INLINE int32_t IFunctionHandler::endFunctionNull(void) const
 {
 	return 0;
 }

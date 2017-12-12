@@ -246,8 +246,8 @@ struct IFunctionHandler
 	X_INLINE bool getParam(T& value1, T2& value2, T3& value3, T4& value4);
 
 
-	X_INLINE int endFunction(void);
-	X_INLINE int endFunctionNull(void);
+	X_INLINE int32_t endFunction(void) const;
+	X_INLINE int32_t endFunctionNull(void) const;
 
 	template <class T>
 	X_INLINE int endFunction(const T& value);
