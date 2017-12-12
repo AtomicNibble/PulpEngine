@@ -5,35 +5,37 @@
 
 #include "Util\Delegate.h"
 
+#include "String\StringRange.h"
+
 X_NAMESPACE_BEGIN(script)
 
 static const char* X_SCRIPT_FILE_EXTENSION = "lua";
 
 
 X_DECLARE_ENUM(Moudles)(
-	GLOBAL,
-	CORE, 
-	SCRIPT, 
-	SOUND, 
-	GAME,
-	PHYSICS,
-	NETWORK,
-	VIDEO,
-	IO
+	Global,
+	Core, 
+	Script, 
+	Sound, 
+	Game,
+	Physics,
+	Network,
+	Video,
+	Io
 );
 
 X_DECLARE_ENUM(Type)(
-	NIL, 
-	BOOLEAN, 
-	POINTER, 
-	NUMBER, 
-	STRING, 
-	TABLE, 
-	FUNCTION, 
-	USERDATA,
-	HANDLE, 
-	VECTOR, 
-	NONE
+	Nil, 
+	Boolean, 
+	Pointer, 
+	Number, 
+	String, 
+	Table, 
+	Function, 
+	Userdata,
+	Handle, 
+	Vector, 
+	None
 );
 
 
@@ -71,49 +73,49 @@ struct ValueType {
 
 template<>
 struct ValueType<bool> {
-	static const Type::Enum Type = Type::BOOLEAN;
+	static const Type::Enum Type = Type::Boolean;
 };
 template<>
 struct ValueType<int32_t> {
-	static const Type::Enum Type = Type::NUMBER;
+	static const Type::Enum Type = Type::Number;
 };
 template<>
 struct ValueType<uint32_t> {
-	static const Type::Enum Type = Type::NUMBER;
+	static const Type::Enum Type = Type::Number;
 };
 template<>
 struct ValueType<float> {
-	static const Type::Enum Type = Type::NUMBER;
+	static const Type::Enum Type = Type::Number;
 };
 template<>
 struct ValueType<double> {
-	static const Type::Enum Type = Type::NUMBER;
+	static const Type::Enum Type = Type::Number;
 };
 template<>
 struct ValueType<const char*> {
-	static const Type::Enum Type = Type::STRING;
+	static const Type::Enum Type = Type::String;
 };
 
 template<>
 struct ValueType<ScriptFunctionHandle> {
-	static const Type::Enum Type = Type::FUNCTION;
+	static const Type::Enum Type = Type::Function;
 };
 template<>
 struct ValueType<Handle> {
-	static const Type::Enum Type = Type::HANDLE;
+	static const Type::Enum Type = Type::Handle;
 };
 template<>
 struct ValueType<Vec3f> {
-	static const Type::Enum Type = Type::VECTOR;
+	static const Type::Enum Type = Type::Vector;
 };
 
 template<>
 struct ValueType<IScriptTable*> {
-	static const Type::Enum Type = Type::TABLE;
+	static const Type::Enum Type = Type::Table;
 };
 template<>
 struct ValueType<SmartScriptTable> {
-	static const Type::Enum Type = Type::TABLE;
+	static const Type::Enum Type = Type::Table;
 };
 
 

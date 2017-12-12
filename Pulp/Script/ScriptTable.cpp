@@ -92,7 +92,7 @@ void XScriptTable::setValueAny(const char* pKey, const ScriptValue& any, bool bC
 
 	size_t len = strlen(pKey);
 
-	if (any.getType() == Type::VECTOR)
+	if (any.getType() == Type::Vector)
 	{
 		// Check if we can reuse Vec3 value already in the table.
 		lua_pushlstring(L, pKey, len);
@@ -386,13 +386,13 @@ void XScriptTable::dump(IScriptTableDumpSink* p)
 			const char* pName = stack::as_string(L, -2); // again index
 			switch (stack::get_type(L))
 			{
-				case LUA_TNIL: p->OnElementFound(pName, Type::NIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(pName, Type::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(pName, Type::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(pName, Type::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(pName, Type::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(pName, Type::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(pName, Type::FUNCTION); break;
+				case LUA_TNIL: p->OnElementFound(pName, Type::Nil); break;
+				case LUA_TBOOLEAN: p->OnElementFound(pName, Type::Boolean); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(pName, Type::Pointer); break;
+				case LUA_TNUMBER: p->OnElementFound(pName, Type::Number); break;
+				case LUA_TSTRING: p->OnElementFound(pName, Type::String); break;
+				case LUA_TTABLE: p->OnElementFound(pName, Type::Table); break;
+				case LUA_TFUNCTION: p->OnElementFound(pName, Type::Function); break;
 		//		case LUA_TUSERDATA: p->OnElementFound(pName, svtUserData); break;
 			};
 		}
@@ -401,13 +401,13 @@ void XScriptTable::dump(IScriptTableDumpSink* p)
 			int idx = stack::as_int(L, -2); // again index
 			switch (stack::get_type(L))
 			{
-				case LUA_TNIL: p->OnElementFound(idx, Type::NIL); break;
-				case LUA_TBOOLEAN: p->OnElementFound(idx, Type::BOOLEAN); break;
-				case LUA_TLIGHTUSERDATA: p->OnElementFound(idx, Type::POINTER); break;
-				case LUA_TNUMBER: p->OnElementFound(idx, Type::NUMBER); break;
-				case LUA_TSTRING: p->OnElementFound(idx, Type::STRING); break;
-				case LUA_TTABLE: p->OnElementFound(idx, Type::TABLE); break;
-				case LUA_TFUNCTION: p->OnElementFound(idx, Type::FUNCTION); break;
+				case LUA_TNIL: p->OnElementFound(idx, Type::Nil); break;
+				case LUA_TBOOLEAN: p->OnElementFound(idx, Type::Boolean); break;
+				case LUA_TLIGHTUSERDATA: p->OnElementFound(idx, Type::Pointer); break;
+				case LUA_TNUMBER: p->OnElementFound(idx, Type::Number); break;
+				case LUA_TSTRING: p->OnElementFound(idx, Type::String); break;
+				case LUA_TTABLE: p->OnElementFound(idx, Type::Table); break;
+				case LUA_TFUNCTION: p->OnElementFound(idx, Type::Function); break;
 		//		case LUA_TUSERDATA: p->OnElementFound(idx, svtUserData); break;
 			};
 		}

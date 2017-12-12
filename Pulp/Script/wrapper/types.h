@@ -73,29 +73,29 @@ namespace lua
 	};
 
 
-	static_assert(Type::NIL == LUA_TNIL, "Enum mismtach");
-	static_assert(Type::POINTER == LUA_TLIGHTUSERDATA, "Enum mismtach");
-	static_assert(Type::BOOLEAN == LUA_TBOOLEAN, "Enum mismtach");
-	static_assert(Type::NUMBER == LUA_TNUMBER, "Enum mismtach");
-	static_assert(Type::STRING == LUA_TSTRING, "Enum mismtach");
-	static_assert(Type::TABLE == LUA_TTABLE, "Enum mismtach");
-	static_assert(Type::FUNCTION == LUA_TFUNCTION, "Enum mismtach");
-	static_assert(Type::USERDATA == LUA_TUSERDATA, "Enum mismtach");
-	// static_assert(Type::HANDLE == LUA_THANDLE, "Enum mismtach");
+	static_assert(Type::Nil == LUA_TNIL, "Enum mismtach");
+	static_assert(Type::Pointer == LUA_TLIGHTUSERDATA, "Enum mismtach");
+	static_assert(Type::Boolean == LUA_TBOOLEAN, "Enum mismtach");
+	static_assert(Type::Number == LUA_TNUMBER, "Enum mismtach");
+	static_assert(Type::String == LUA_TSTRING, "Enum mismtach");
+	static_assert(Type::Table == LUA_TTABLE, "Enum mismtach");
+	static_assert(Type::Function == LUA_TFUNCTION, "Enum mismtach");
+	static_assert(Type::Userdata == LUA_TUSERDATA, "Enum mismtach");
+	// static_assert(Type::Handle == LUA_THANDLE, "Enum mismtach");
 
 	X_INLINE Type::Enum typeFormLua(int32_t luaType)
 	{
-		Type::Enum type = Type::NONE;
+		Type::Enum type = Type::None;
 
 		switch (luaType)
 		{
-			case LUA_TNIL: type = Type::NIL; break;
-			case LUA_TBOOLEAN: type = Type::BOOLEAN; break;
-			case LUA_TNUMBER: type = Type::NUMBER; break;
-			case LUA_TSTRING: type = Type::STRING; break;
-			case LUA_TFUNCTION: type = Type::FUNCTION; break;
-			case LUA_TLIGHTUSERDATA: type = Type::POINTER; break;
-			case LUA_TTABLE: type = Type::TABLE; break;
+			case LUA_TNIL: type = Type::Nil; break;
+			case LUA_TBOOLEAN: type = Type::Boolean; break;
+			case LUA_TNUMBER: type = Type::Number; break;
+			case LUA_TSTRING: type = Type::String; break;
+			case LUA_TFUNCTION: type = Type::Function; break;
+			case LUA_TLIGHTUSERDATA: type = Type::Pointer; break;
+			case LUA_TTABLE: type = Type::Table; break;
 		}
 
 		return type;
@@ -106,42 +106,42 @@ namespace lua
 		switch (luaType)
 		{
 			case LUA_TNIL:
-				if (type != Type::NIL) {
+				if (type != Type::Nil) {
 					return false;
 				}
 				break;
 			case LUA_TBOOLEAN:
-				if (type != Type::BOOLEAN) {
+				if (type != Type::Boolean) {
 					return false;
 				}
 				break;
 			case LUA_TLIGHTUSERDATA:
-				if (type != Type::HANDLE) {
+				if (type != Type::Handle) {
 					return false;
 				}
 				break;
 			case LUA_TNUMBER:
-				if (type != Type::NUMBER && type != Type::BOOLEAN) {
+				if (type != Type::Number && type != Type::Boolean) {
 					return false;
 				}
 				break;
 			case LUA_TSTRING:
-				if (type != Type::STRING) {
+				if (type != Type::String) {
 					return false;
 				}
 				break;
 			case LUA_TTABLE:
-				if (type != Type::TABLE && type != Type::VECTOR) {
+				if (type != Type::Table && type != Type::Vector) {
 					return false;
 				}
 				break;
 			case LUA_TUSERDATA:
-				if (type == Type::TABLE) {
+				if (type == Type::Table) {
 					return false;
 				}
 				break;
 			case LUA_TFUNCTION:
-				if (type == Type::FUNCTION) {
+				if (type == Type::Function) {
 					return false;
 				}
 				break;

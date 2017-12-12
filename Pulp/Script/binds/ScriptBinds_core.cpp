@@ -148,13 +148,13 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 	{
 		Type::Enum type = pH->getParamType(2);
 
-		if (type == Type::NUMBER)
+		if (type == Type::Number)
 		{
 			float fValue = 0;
 			pH->getParam(2, fValue);
 			var->Set(fValue);
 		}
-		else if (type == Type::STRING)
+		else if (type == Type::String)
 		{
 			const char* sValue = "";
 			pH->getParam(2, sValue);
@@ -179,7 +179,7 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 	pH->getParamAny(1,value);
 	switch (value.getType())
 	{
-		case Type::STRING:
+		case Type::String:
 
 		X_LOG0("Script", value.str_.pStr);
 

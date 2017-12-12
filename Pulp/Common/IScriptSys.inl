@@ -5,44 +5,44 @@ X_NAMESPACE_BEGIN(script)
 
 
 X_INLINE ScriptValue::ScriptValue(bool value) : 
-	type_(Type::BOOLEAN) 
+	type_(Type::Boolean) 
 { 
 	bool_ = value; 
 }
 
 X_INLINE ScriptValue::ScriptValue(int32_t value) :
-	type_(Type::NUMBER) 
+	type_(Type::Number) 
 { 
 	number_ = static_cast<double>(value); 
 }
 
 X_INLINE ScriptValue::ScriptValue(uint32_t value) : 
-	type_(Type::NUMBER) 
+	type_(Type::Number) 
 { 
 	number_ = static_cast<double>(value);
 }
 
 X_INLINE ScriptValue::ScriptValue(float value) : 
-	type_(Type::NUMBER) 
+	type_(Type::Number) 
 {
 	number_ = value; 
 }
 
 X_INLINE ScriptValue::ScriptValue(double value) :
-	type_(Type::NUMBER)
+	type_(Type::Number)
 {
 	number_ = value;
 }
 
 X_INLINE ScriptValue::ScriptValue(const char* pValue) :
-	type_(Type::STRING) 
+	type_(Type::String) 
 { 
 	str_.pStr = pValue;
 	str_.len = safe_static_cast<int32_t>(::strlen(pValue));
 }
 
 X_INLINE ScriptValue::ScriptValue(IScriptTable* table) :
-	type_(Type::TABLE)
+	type_(Type::Table)
 {
 	pTable_ = table;
 	if (pTable_) {
@@ -51,19 +51,19 @@ X_INLINE ScriptValue::ScriptValue(IScriptTable* table) :
 }
 
 X_INLINE ScriptValue::ScriptValue(ScriptFunctionHandle function) :
-	type_(Type::FUNCTION) 
+	type_(Type::Function) 
 { 
 	pFunction_ = function; 
 }
 
 X_INLINE ScriptValue::ScriptValue(Handle value) :
-	type_(Type::HANDLE) 
+	type_(Type::Handle) 
 { 
 	pPtr_ = value.pPtr;
 }
 
 X_INLINE ScriptValue::ScriptValue(const Vec3f& vec) : 
-	type_(Type::VECTOR) 
+	type_(Type::Vector) 
 { 
 	vec3_.x = vec.x; 
 	vec3_.y = vec.y; 
@@ -71,7 +71,7 @@ X_INLINE ScriptValue::ScriptValue(const Vec3f& vec) :
 }
 
 X_INLINE ScriptValue::ScriptValue(const SmartScriptTable& value) :
-	type_(Type::TABLE)
+	type_(Type::Table)
 {
 	pTable_ = value;
 	if (pTable_) {
@@ -87,7 +87,7 @@ X_INLINE ScriptValue::ScriptValue(Type::Enum type) :
 }
 
 X_INLINE ScriptValue::ScriptValue() :
-	type_(Type::NONE)
+	type_(Type::None)
 {
 }
 
@@ -99,7 +99,7 @@ X_INLINE ScriptValue::~ScriptValue()
 
 X_INLINE void ScriptValue::clear(void)
 {
-	type_ = Type::NONE;
+	type_ = Type::None;
 }
 
 X_INLINE Type::Enum ScriptValue::getType(void) const
@@ -121,25 +121,25 @@ X_INLINE bool ScriptValue::operator==(const ScriptValue& rhs) const
 	{
 		switch (type_)
 		{
-			case Type::BOOLEAN:
+			case Type::Boolean:
 				result = bool_ == rhs.bool_;
 				break;
-			case Type::NUMBER:
+			case Type::Number:
 				result = number_ == rhs.number_; 
 				break;
-			case Type::STRING:
+			case Type::String:
 				result = (str_.len == rhs.str_.len && str_.pStr == rhs.str_.pStr);
 				break;
-			case Type::VECTOR:
+			case Type::Vector:
 				result = vec3_.x == rhs.vec3_.x && vec3_.y == rhs.vec3_.y && vec3_.z == rhs.vec3_.z;
 				break;
-			case Type::TABLE:
+			case Type::Table:
 				result = pTable_ == rhs.pTable_; 
 				break;
-			case Type::HANDLE:
+			case Type::Handle:
 				result = pPtr_ == rhs.pPtr_;
 				break;
-			case Type::FUNCTION:
+			case Type::Function:
 				result = gEnv->pScriptSys->compareFuncRef(pFunction_, rhs.pFunction_); 
 				break;
 				//		case Type::USERDATA: result = ud.nRef == rhs.ud.nRef && ud.ptr == rhs.ud.ptr; break;
@@ -165,7 +165,7 @@ X_INLINE void ScriptValue::swap(ScriptValue& value)
 
 X_INLINE bool ScriptValue::copyTo(bool& value) const
 {
-	if (type_ == Type::BOOLEAN) {
+	if (type_ == Type::Boolean) {
 		value = bool_;
 		return true;
 	}
@@ -174,7 +174,7 @@ X_INLINE bool ScriptValue::copyTo(bool& value) const
 
 X_INLINE bool ScriptValue::copyTo(int32_t& value) const
 {
-	if (type_ == Type::NUMBER) {
+	if (type_ == Type::Number) {
 		value = static_cast<int32_t>(number_);
 		return true;
 	}
@@ -183,7 +183,7 @@ X_INLINE bool ScriptValue::copyTo(int32_t& value) const
 
 X_INLINE bool ScriptValue::copyTo(uint32_t& value) const
 {
-	if (type_ == Type::NUMBER) {
+	if (type_ == Type::Number) {
 		value = static_cast<uint32_t>(number_);
 		return true;
 	}
@@ -192,7 +192,7 @@ X_INLINE bool ScriptValue::copyTo(uint32_t& value) const
 
 X_INLINE bool ScriptValue::copyTo(float& value) const
 {
-	if (type_ == Type::NUMBER) {
+	if (type_ == Type::Number) {
 		value = static_cast<float>(number_);
 		return true;
 	}
@@ -201,7 +201,7 @@ X_INLINE bool ScriptValue::copyTo(float& value) const
 
 X_INLINE bool ScriptValue::copyTo(const char* &value) const
 {
-	if (type_ == Type::STRING) {
+	if (type_ == Type::String) {
 		value = str_.pStr;
 		return true;
 	}
@@ -210,7 +210,7 @@ X_INLINE bool ScriptValue::copyTo(const char* &value) const
 
 X_INLINE bool ScriptValue::copyTo(char* &value) const
 { 
-	if (type_ == Type::STRING) { 
+	if (type_ == Type::String) {
 		value = (char*)str_.pStr; 
 		return true; 
 	} 
@@ -219,7 +219,7 @@ X_INLINE bool ScriptValue::copyTo(char* &value) const
 
 X_INLINE bool ScriptValue::copyTo(Handle &value) const
 { 
-	if (type_ == Type::HANDLE) { 
+	if (type_ == Type::Handle) { 
 		value.pPtr = const_cast<void*>(pPtr_); 
 		return true;
 	}
@@ -234,7 +234,7 @@ X_INLINE bool ScriptValue::copyTo(ScriptFunctionHandle &value) const
 
 X_INLINE bool ScriptValue::copyTo(Vec3f& value) const 
 { 
-	if (type_ == Type::VECTOR) { 
+	if (type_ == Type::Vector) { 
 		value.x = vec3_.x; 
 		value.y = vec3_.y; 
 		value.z = vec3_.z; 
@@ -245,7 +245,7 @@ X_INLINE bool ScriptValue::copyTo(Vec3f& value) const
 
 X_INLINE bool ScriptValue::copyTo(IScriptTable*& value) const
 {
-	if (type_ == Type::TABLE) {
+	if (type_ == Type::Table) {
 		value = pTable_;
 		return true;
 	}
@@ -254,7 +254,7 @@ X_INLINE bool ScriptValue::copyTo(IScriptTable*& value) const
 
 X_INLINE bool ScriptValue::copyTo(SmartScriptTable& value) const
 {
-	if (type_ == Type::TABLE) {
+	if (type_ == Type::Table) {
 		value = pTable_;
 		return true;
 	}
@@ -273,7 +273,7 @@ X_INLINE void IScriptSys::setGlobalValue(const char* pKey, const T& value)
 
 X_INLINE void IScriptSys::setGlobalToNull(const char* pKey)
 {
-	setGlobalValue(pKey, ScriptValue(Type::NIL));
+	setGlobalValue(pKey, ScriptValue(Type::Nil));
 }
 
 template <class T>
@@ -437,17 +437,17 @@ X_INLINE bool IScriptTable::haveValue(int idx)
 
 X_INLINE void IScriptTable::setToNull(const char* pKey)
 {
-	setValueAny(pKey, ScriptValue(Type::NIL));
+	setValueAny(pKey, ScriptValue(Type::Nil));
 }
 
 X_INLINE void IScriptTable::setToNull(int idx)
 {
-	setValueAny(idx, ScriptValue(Type::NIL));
+	setValueAny(idx, ScriptValue(Type::Nil));
 }
 
 X_INLINE void IScriptTable::setToNullChain(const char* pKey)
 {
-	setValueAny(pKey, ScriptValue(Type::NIL), true);
+	setValueAny(pKey, ScriptValue(Type::Nil), true);
 }
 
 // ----------------------------------------------------------------

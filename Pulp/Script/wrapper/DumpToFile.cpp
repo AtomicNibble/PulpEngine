@@ -32,30 +32,30 @@ namespace lua
 
 		switch (value.getType())
 		{
-			case Type::BOOLEAN:
+			case Type::Boolean:
 				if (value.bool_)
 					file_.printf("[%6d] %s %s=true\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey));
 				else
 					file_.printf("[%6d] %s %s=false\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey));
 				break;
-			case Type::HANDLE:
+			case Type::Handle:
 				file_.printf("[%6d] %s %s=%p\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey), value.pPtr_);
 				break;
-			case Type::NUMBER:
+			case Type::Number:
 				file_.printf("[%6d] %s %s=%g\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey), value.number_);
 				break;
-			case Type::STRING:
+			case Type::String:
 				file_.printf("[%6d] %s %s=%s\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey), value.str_.pStr);
 				size_ += value.str_.len + 1;
 				break;
 				//case ANY_TTABLE:
-			case Type::FUNCTION:
+			case Type::Function:
 				file_.printf("[%6d] %s %s()\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey));
 				break;
 				//	case Type::USERDATA:
 				//	fprintf(file, "[%6d] %s [userdata] %s\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey));
 				//	break;
-			case Type::VECTOR:
+			case Type::Vector:
 				file_.printf("[%6d] %s %s=%g,%g,%g\n", size_, GetOffsetStr(level), GetKeyStr(sKey, nKey), value.vec3_.x, value.vec3_.y, value.vec3_.z);
 				size_ += sizeof(Vec3f);
 				break;

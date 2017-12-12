@@ -335,7 +335,7 @@ bool XScriptSys::getGlobalValue(const char* pKey, ScriptValue& any)
 		core::StackString<256> key1(pKey, pSep);
 
 		getGlobalValue(key1.c_str(), globalAny);
-		if (globalAny.getType() == Type::TABLE)
+		if (globalAny.getType() == Type::Table)
 		{
 			return getRecursiveAny(globalAny.pTable_, key1, any);
 		}
@@ -405,12 +405,12 @@ bool XScriptSys::getRecursiveAny(IScriptTable* pTable, const core::StackString<2
 		return false;
 	}
 
-	if (localAny.getType() == Type::FUNCTION && nullptr == pSep)
+	if (localAny.getType() == Type::Function && nullptr == pSep)
 	{
 		any = localAny;
 		return true;
 	}
-	else if (localAny.getType() == Type::TABLE && nullptr != pSep)
+	else if (localAny.getType() == Type::Table && nullptr != pSep)
 	{
 		return getRecursiveAny(localAny.pTable_, key2, any);
 	}
@@ -430,22 +430,22 @@ void XScriptSys::pushAny(const ScriptValue& var)
 {
 	switch (var.getType())
 	{
-		case Type::NIL:
+		case Type::Nil:
 			stack::pushnil(L);
 			break;
-		case Type::BOOLEAN:
+		case Type::Boolean:
 			stack::push(L, var.bool_);
 			break;
-		case Type::HANDLE:
+		case Type::Handle:
 			lua_pushlightuserdata(L, const_cast<void*>(var.pPtr_));
 			break;
-		case Type::NUMBER:
+		case Type::Number:
 			stack::push(L, var.number_);
 			break;
-		case Type::STRING:
+		case Type::String:
 			stack::push(L, var.str_.pStr, var.str_.len);
 			break;
-		case Type::TABLE:
+		case Type::Table:
 			if (var.pTable_) {
 				pushTable(var.pTable_);
 			}
@@ -453,11 +453,11 @@ void XScriptSys::pushAny(const ScriptValue& var)
 				stack::pushnil(L);
 			}
 			break;
-		case Type::FUNCTION:
+		case Type::Function:
 			stack::push_ref(L, var.pFunction_);
 			X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
 			break;
-		case Type::VECTOR:
+		case Type::Vector:
 			pushVec3(Vec3f(var.vec3_.x, var.vec3_.y, var.vec3_.z));
 			break;
 
@@ -580,33 +580,33 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 
 	int luaType = stack::get_type(L, index);
 
-	if (var.getType() != Type::NONE && !isTypeCompatible(var.getType(), luaType)) {
+	if (var.getType() != Type::None && !isTypeCompatible(var.getType(), luaType)) {
 		return false;
 	}
 
 	switch (luaType)
 	{
 		case LUA_TNIL:
-			var.type_ = Type::NIL;
+			var.type_ = Type::Nil;
 			break;
 		case LUA_TBOOLEAN:
 			var.bool_ = stack::as_bool(L, index) != 0;
-			var.type_ = Type::BOOLEAN;
+			var.type_ = Type::Boolean;
 			break;
 		case LUA_TLIGHTUSERDATA:
 			var.pPtr_ = stack::as_pointer(L, index);
-			var.type_ = Type::HANDLE;
+			var.type_ = Type::Handle;
 			break;
 		case LUA_TNUMBER:
 			var.number_ = static_cast<float>(stack::as_number(L, index));
-			var.type_ = Type::NUMBER;
+			var.type_ = Type::Number;
 			break;
 		case LUA_TSTRING:
 		{
 			size_t len = 0;
 			var.str_.pStr = stack::as_string(L, index, &len);
 			var.str_.len = safe_static_cast<int32_t>(len);
-			var.type_ = Type::STRING;
+			var.type_ = Type::String;
 		}
 		break;
 		case LUA_TTABLE:
@@ -618,11 +618,11 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 			}
 			stack::push_copy(L, index);
 			static_cast<XScriptTable*>(var.pTable_)->attach();
-			var.type_ = Type::TABLE;
+			var.type_ = Type::Table;
 			break;
 		case LUA_TFUNCTION:
 		{
-			var.type_ = Type::FUNCTION;
+			var.type_ = Type::Function;
 			// Make reference to function.
 			lua_pushvalue(L, index);
 			var.pFunction_ = refToScriptHandle(luaL_ref(L, 1));

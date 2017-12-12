@@ -99,7 +99,7 @@ bool XFunctionHandler::getParamAny(int nIdx, ScriptValue &any)
 int XFunctionHandler::endFunctionAny(const ScriptValue& any)
 {
 	pSS_->pushAny(any);
-	return (any.getType() == Type::NIL) ? 0 : 1;
+	return (any.getType() == Type::Nil) ? 0 : 1;
 }
 
 int XFunctionHandler::endFunctionAny(const ScriptValue& any1, const ScriptValue& any2)

@@ -67,7 +67,7 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 	SmartScriptTable tbl;
 	Type::Enum type = pH->getParamType(index);
 
-	if (type == Type::POINTER) // this is a script handle
+	if (type == Type::Pointer) // this is a script handle
 	{
 		Handle fileHandle;
 		if (!pH->getParam(index, fileHandle)) {
@@ -110,12 +110,12 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 			pH->getParamAny(arg, value);
 			switch (value.getType())
 			{
-				case Type::STRING:
+				case Type::String:
 			//	pFile->writeString(value.str);
 			// no null term Plz!
 				pFile->write(value.str_.pStr, safe_static_cast<uint32_t>(value.str_.len));
 				break;
-				case Type::NUMBER:
+				case Type::Number:
 			//	pFile->writeObj(value.number);
 			// write it as a string.
 				pFile->printf(LUA_NUMBER_FMT, value.number_);
@@ -163,7 +163,7 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 			{
 				const char* mode;
 
-				if (pH->getParamType(arg) == Type::NUMBER)
+				if (pH->getParamType(arg) == Type::Number)
 				{
 					// read this number of bytes.
 					// not gonna use float(aka lua number) since who the flying
