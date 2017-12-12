@@ -142,17 +142,17 @@ struct ScriptValue
 	X_INLINE bool operator!=(const ScriptValue& rhs) const;
 	X_INLINE void swap(ScriptValue& value);
 
-	X_INLINE bool CopyTo(bool& value) const;
-	X_INLINE bool CopyTo(int32_t& value) const;
-	X_INLINE bool CopyTo(uint32_t& value) const;
-	X_INLINE bool CopyTo(float& value) const;
-	X_INLINE bool CopyTo(const char* &value) const;
-	X_INLINE bool CopyTo(char* &value) const;
-	X_INLINE bool CopyTo(Handle &value) const;
-	X_INLINE bool CopyTo(ScriptFunctionHandle &value) const;
-	X_INLINE bool CopyTo(Vec3f& value) const;
-	X_INLINE bool CopyTo(IScriptTable*& value) const;
-	X_INLINE bool CopyTo(SmartScriptTable& value) const; 
+	X_INLINE bool copyTo(bool& value) const;
+	X_INLINE bool copyTo(int32_t& value) const;
+	X_INLINE bool copyTo(uint32_t& value) const;
+	X_INLINE bool copyTo(float& value) const;
+	X_INLINE bool copyTo(const char* &value) const;
+	X_INLINE bool copyTo(char* &value) const;
+	X_INLINE bool copyTo(Handle &value) const;
+	X_INLINE bool copyTo(ScriptFunctionHandle &value) const;
+	X_INLINE bool copyTo(Vec3f& value) const;
+	X_INLINE bool copyTo(IScriptTable*& value) const;
+	X_INLINE bool copyTo(SmartScriptTable& value) const; 
 
 
 public:

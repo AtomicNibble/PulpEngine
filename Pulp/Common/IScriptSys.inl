@@ -163,7 +163,7 @@ X_INLINE void ScriptValue::swap(ScriptValue& value)
 }
 
 
-X_INLINE bool ScriptValue::CopyTo(bool& value) const
+X_INLINE bool ScriptValue::copyTo(bool& value) const
 {
 	if (type_ == Type::BOOLEAN) {
 		value = bool_;
@@ -172,7 +172,7 @@ X_INLINE bool ScriptValue::CopyTo(bool& value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(int32_t& value) const
+X_INLINE bool ScriptValue::copyTo(int32_t& value) const
 {
 	if (type_ == Type::NUMBER) {
 		value = static_cast<int32_t>(number_);
@@ -181,7 +181,7 @@ X_INLINE bool ScriptValue::CopyTo(int32_t& value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(uint32_t& value) const
+X_INLINE bool ScriptValue::copyTo(uint32_t& value) const
 {
 	if (type_ == Type::NUMBER) {
 		value = static_cast<uint32_t>(number_);
@@ -190,7 +190,7 @@ X_INLINE bool ScriptValue::CopyTo(uint32_t& value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(float& value) const
+X_INLINE bool ScriptValue::copyTo(float& value) const
 {
 	if (type_ == Type::NUMBER) {
 		value = static_cast<float>(number_);
@@ -199,7 +199,7 @@ X_INLINE bool ScriptValue::CopyTo(float& value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(const char* &value) const
+X_INLINE bool ScriptValue::copyTo(const char* &value) const
 {
 	if (type_ == Type::STRING) {
 		value = str_.pStr;
@@ -208,7 +208,7 @@ X_INLINE bool ScriptValue::CopyTo(const char* &value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(char* &value) const
+X_INLINE bool ScriptValue::copyTo(char* &value) const
 { 
 	if (type_ == Type::STRING) { 
 		value = (char*)str_.pStr; 
@@ -217,7 +217,7 @@ X_INLINE bool ScriptValue::CopyTo(char* &value) const
 	return false; 
 }
 
-X_INLINE bool ScriptValue::CopyTo(Handle &value) const
+X_INLINE bool ScriptValue::copyTo(Handle &value) const
 { 
 	if (type_ == Type::HANDLE) { 
 		value.pPtr = const_cast<void*>(pPtr_); 
@@ -226,13 +226,13 @@ X_INLINE bool ScriptValue::CopyTo(Handle &value) const
 	return false; 
 }
 
-X_INLINE bool ScriptValue::CopyTo(ScriptFunctionHandle &value) const
+X_INLINE bool ScriptValue::copyTo(ScriptFunctionHandle &value) const
 {
 	X_UNUSED(value);
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-X_INLINE bool ScriptValue::CopyTo(Vec3f& value) const 
+X_INLINE bool ScriptValue::copyTo(Vec3f& value) const 
 { 
 	if (type_ == Type::VECTOR) { 
 		value.x = vec3_.x; 
@@ -243,7 +243,7 @@ X_INLINE bool ScriptValue::CopyTo(Vec3f& value) const
 	return false; 
 }
 
-X_INLINE bool ScriptValue::CopyTo(IScriptTable*& value) const
+X_INLINE bool ScriptValue::copyTo(IScriptTable*& value) const
 {
 	if (type_ == Type::TABLE) {
 		value = pTable_;
@@ -252,7 +252,7 @@ X_INLINE bool ScriptValue::CopyTo(IScriptTable*& value) const
 	return false;
 }
 
-X_INLINE bool ScriptValue::CopyTo(SmartScriptTable& value) const
+X_INLINE bool ScriptValue::copyTo(SmartScriptTable& value) const
 {
 	if (type_ == Type::TABLE) {
 		value = pTable_;
@@ -280,7 +280,7 @@ template <class T>
 X_INLINE bool IScriptSys::getGlobalValue(const char* pKey, T& value)
 {
 	ScriptValue any(ValueType<T>::Type);
-	return getGlobalValue(pKey, any) && any.CopyTo(value);
+	return getGlobalValue(pKey, any) && any.copyTo(value);
 }
 
 
@@ -290,14 +290,14 @@ template <class T>
 X_INLINE bool IFunctionHandler::getSelf(T& value)
 {
 	ScriptValue any(value, 0);
-	return getSelfAny(any) && any.CopyTo(value);
+	return getSelfAny(any) && any.copyTo(value);
 }
 
 template <typename T>
 X_INLINE bool IFunctionHandler::getParam(int32_t idx, T &value)
 {
 	ScriptValue any(ValueType<T>::Type);
-	return getParamAny(idx, any) && any.CopyTo(value);
+	return getParamAny(idx, any) && any.copyTo(value);
 }
 
 
@@ -403,21 +403,21 @@ template <class T>
 X_INLINE bool IScriptTable::getValue(const char* pKey, T& value)
 {
 	ScriptValue any(ValueType<T>::Type);
-	return getValueAny(pKey, any) && any.CopyTo(value);
+	return getValueAny(pKey, any) && any.copyTo(value);
 }
 
 template <class T>
 X_INLINE bool IScriptTable::getValue(int idx, T& value)
 {
 	ScriptValue any(ValueType<T>::Type);
-	return getValueAny(idx, any) && any.CopyTo(value);
+	return getValueAny(idx, any) && any.copyTo(value);
 }
 
 template <class T>
 X_INLINE bool IScriptTable::getValueChain(const char* pKey, T &value)
 {
 	ScriptValue any(ValueType<T>::Type);
-	return getValueAny(idx, any, true) && any.CopyTo(value);
+	return getValueAny(idx, any, true) && any.copyTo(value);
 }
 
 
