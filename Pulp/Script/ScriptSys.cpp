@@ -89,25 +89,16 @@ bool XScriptSys::init(void)
 	XScriptTable::pScriptSystem_ = this;
 
 
+	binds_.Init(this, gEnv->pCore);
+
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
 
 	initialised_ = true;
 
 #if 0
-	// lj_state_newstate(mem_alloc, mem_create());
-	// L = lua_newstate(custom_lua_alloc, NULL);
-
-	X_ASSERT_NOT_NULL(pFileSys_);
-	X_ASSERT_NOT_NULL(L);
-
-
-
 
 	binds_.Init(this, gEnv->pCore);
-
-	setGlobalValue("_time", 0);
-
 
 
 #endif
@@ -200,8 +191,10 @@ void XScriptSys::Update(void)
 
 bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
 {
-	lua::State state(g_ScriptArena);
+//	lua::State state(g_ScriptArena);
+	lua::StateView state(L);
 
+#if 0
 	state.openLibs(
 		lua::libs(
 			lua::lib::Base |
@@ -212,6 +205,7 @@ bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
 			lua::lib::Jit
 		)
 	);
+#endif
 
 	// can we just push the function?
 	stack::push(state, myErrorHandler);

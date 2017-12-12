@@ -3,8 +3,6 @@
 #ifndef X_SCRIPT_BINDS_CORE_H_
 #define X_SCRIPT_BINDS_CORE_H_
 
-#include "ScriptableBase.h"
-
 X_NAMESPACE_DECLARE(core, 
 struct IConsole;
 struct ITimer;
@@ -22,7 +20,7 @@ public:
 	XBinds_Core();
 	~XBinds_Core() X_OVERRIDE;
 
-	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int GetDvarInt(IFunctionHandler* pH);
 	int GetDvarFloat(IFunctionHandler* pH);

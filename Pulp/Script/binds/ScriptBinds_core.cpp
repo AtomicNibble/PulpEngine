@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(script)
 #define X_CORE_REG_FUNC(func)  \
 {	ScriptFunction Delegate; \
 	Delegate.Bind<XBinds_Core, &XBinds_Core::func>(this); \
-	RegisterFunction(#func, Delegate); }
+	registerFunction(#func, Delegate); }
 
 
 XBinds_Core::XBinds_Core()
@@ -26,9 +26,9 @@ XBinds_Core::~XBinds_Core()
 }
 
 
-void XBinds_Core::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Core::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, pCore, paramIdOffset);
 
 	X_ASSERT_NOT_NULL(pCore->GetIConsole());
 	X_ASSERT_NOT_NULL(pCore->GetITimer());
@@ -36,8 +36,7 @@ void XBinds_Core::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 	pConsole_ = pCore->GetIConsole();
 	pTimer_ = pCore->GetITimer();
 
-	XScriptableBase::Init(pSS, pCore);
-	SetGlobalName("Core");
+	setGlobalName("Core");
 
 	X_CORE_REG_FUNC(GetDvarInt);
 	X_CORE_REG_FUNC(GetDvarFloat);

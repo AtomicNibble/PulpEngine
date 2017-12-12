@@ -395,6 +395,49 @@ public:
 	X_INLINE void setToNullChain(const char* pKey);
 };
 
+class XScriptableBase
+{
+public:
+	typedef IScriptTable::ScriptFunction ScriptFunction;
+
+public:
+	X_INLINE XScriptableBase();
+	X_INLINE virtual ~XScriptableBase();
+
+	X_INLINE virtual void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0);
+	X_INLINE void setGlobalName(const char* GlobalName);
+
+	X_INLINE IScriptTable* getMethodsTable(void);
+
+protected:
+	X_INLINE void registerGlobal(const char* pName, float value);
+	X_INLINE void registerGlobal(const char* pName, int value);
+
+	X_INLINE void registerFunction(const char* pFuncName, const IScriptTable::ScriptFunction& function);
+
+protected:
+	core::StackString<60> name_;
+	ICore* pCore_;
+	IScriptSys* pScriptSys_;
+	IScriptTable* pMethodsTable_;
+	int paramIdOffset_;
+};
+
+
+#define SCRIPT_CHECK_PARAMETERS(_n) \
+if (pH->getParamCount() != _n) \
+{  \
+	pH->getIScriptSystem()->onScriptError("[%s] %d arguments passed, " #_n " expected)", __FUNCTION__, pH->getParamCount()); \
+	return pH->endFunction();  \
+}
+
+#define SCRIPT_CHECK_PARAMETERS_MIN(_n) \
+if (pH->getParamCount() < _n) \
+{  \
+	pH->getIScriptSystem()->onScriptError("[%s] %d arguments passed, at least " #_n " expected)", __FUNCTION__, pH->getParamCount()); \
+	return pH->endFunction(); \
+}
+
 
 // ===========================================================
 class SmartScriptTable

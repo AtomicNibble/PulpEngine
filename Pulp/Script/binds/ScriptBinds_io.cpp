@@ -15,14 +15,14 @@ X_NAMESPACE_BEGIN(script)
 { \
 	ScriptFunction Delegate; \
 	Delegate.Bind<XBinds_Io, &XBinds_Io::func>(this); \
-	RegisterFunction(#func, Delegate); \
+	registerFunction(#func, Delegate); \
 }
 
 #define X_IO_FILE_REG_FUNC(func)  \
 { \
 	ScriptFunction Delegate; \
 	Delegate.Bind<XBinds_Io_File, &XBinds_Io_File::func>(this); \
-	RegisterFunction(#func, Delegate); \
+	registerFunction(#func, Delegate); \
 }
 
 XBinds_Io_File::XBinds_Io_File()
@@ -35,9 +35,9 @@ XBinds_Io_File::~XBinds_Io_File()
 
 }
 
-void XBinds_Io_File::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Io_File::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, pCore, paramIdOffset);
 
 	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
@@ -364,9 +364,9 @@ XBinds_Io::~XBinds_Io()
 
 }
 
-void XBinds_Io::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Io::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, pCore, paramIdOffset);
 
 	X_ASSERT_NOT_NULL(pCore_);
 	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
@@ -374,16 +374,14 @@ void XBinds_Io::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 	pCore_ = pCore;
 	pFileSys_ = pCore->GetIFileSys();
 
-
-	XScriptableBase::Init(pSS, pCore);
-	SetGlobalName("io");
+	setGlobalName("io");
 
 
 	X_IO_REG_FUNC(openFile);
 	X_IO_REG_FUNC(closeFile);
 
 
-	file_.Init(pSS, pCore, paramIdOffset);
+	file_.init(pSS, pCore, paramIdOffset);
 }
 
 

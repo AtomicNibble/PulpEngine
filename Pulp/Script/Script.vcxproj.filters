@@ -44,9 +44,6 @@
     <ClInclude Include="binds\ScriptBinds_core.h">
       <Filter>Binds</Filter>
     </ClInclude>
-    <ClInclude Include="binds\ScriptableBase.h">
-      <Filter>Binds</Filter>
-    </ClInclude>
     <ClInclude Include="ScriptTable.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -117,9 +114,6 @@
     </ClCompile>
     <ClCompile Include="TableDump.cpp">
       <Filter>Header Files</Filter>
-    </ClCompile>
-    <ClCompile Include="binds\ScriptableBase.cpp">
-      <Filter>Binds</Filter>
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>

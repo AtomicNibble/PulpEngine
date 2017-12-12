@@ -465,7 +465,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="binds\ScriptableBase.h" />
     <ClInclude Include="binds\ScriptBinds.h" />
     <ClInclude Include="binds\ScriptBinds_core.h" />
     <ClInclude Include="binds\ScriptBinds_io.h" />
@@ -485,7 +484,6 @@
     <ClInclude Include="wrapper\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="binds\ScriptableBase.cpp" />
     <ClCompile Include="binds\ScriptBinds.cpp" />
     <ClCompile Include="binds\ScriptBinds_core.cpp" />
     <ClCompile Include="binds\ScriptBinds_io.cpp" />

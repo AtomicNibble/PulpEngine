@@ -3,8 +3,6 @@
 #ifndef X_SCRIPT_BINDS_IO_H_
 #define X_SCRIPT_BINDS_IO_H_
 
-#include "ScriptableBase.h"
-
 X_NAMESPACE_DECLARE(core,
 struct IFileSys;
 struct XFile;
@@ -20,7 +18,7 @@ public:
 	XBinds_Io_File();
 	~XBinds_Io_File() X_OVERRIDE;
 
-	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int write(IFunctionHandler* pH);
 	int read(IFunctionHandler* pH);
@@ -47,7 +45,7 @@ public:
 	XBinds_Io();
 	~XBinds_Io() X_OVERRIDE;
 
-	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int openFile(IFunctionHandler* pH);
 	int closeFile(IFunctionHandler* pH);

@@ -3,8 +3,6 @@
 #ifndef X_SCRIPT_BINDS_SOUND_H_
 #define X_SCRIPT_BINDS_SOUND_H_
 
-#include "ScriptableBase.h"
-
 
 X_NAMESPACE_DECLARE(sound,
 struct ISound;
@@ -18,7 +16,7 @@ public:
 	XBinds_Sound();
 	~XBinds_Sound() X_OVERRIDE;
 
-	void Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
 
 	int32_t PostEvent(IFunctionHandler* pH);
 	int32_t SetSwitch(IFunctionHandler* pH);

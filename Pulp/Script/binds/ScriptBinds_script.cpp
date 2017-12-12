@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(script)
 { \
 	ScriptFunction Delegate; \
 	Delegate.Bind<XBinds_Script, &XBinds_Script::func>(this); \
-	RegisterFunction(#func, Delegate); \
+	registerFunction(#func, Delegate); \
 }
 
 
@@ -25,11 +25,11 @@ XBinds_Script::~XBinds_Script()
 }
 
 
-void XBinds_Script::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Script::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, pCore, paramIdOffset);
 
-	SetGlobalName("Script");
+	setGlobalName("Script");
 
 	X_SCRIPT_REG_FUNC(Load);
 	X_SCRIPT_REG_FUNC(ReLoad);

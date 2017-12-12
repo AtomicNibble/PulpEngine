@@ -12,7 +12,7 @@ using namespace sound;
 { \
 	ScriptFunction Delegate; \
 	Delegate.Bind<XBinds_Sound, &XBinds_Sound::func>(this); \
-	RegisterFunction(#func, Delegate); \
+	registerFunction(#func, Delegate); \
 }
 
 
@@ -25,17 +25,15 @@ XBinds_Sound::~XBinds_Sound()
 
 }
 
-void XBinds_Sound::Init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Sound::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 {
-	XScriptableBase::Init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, pCore, paramIdOffset);
 	
 	X_ASSERT_NOT_NULL(pCore->GetISound());
 
 	pSoundSys_ = pCore->GetISound();
 
-	XScriptableBase::Init(pSS, pCore);
-	SetGlobalName("Sound");
-
+	setGlobalName("Sound");
 
 	X_SOUND_REG_FUNC(PostEvent);
 	X_SOUND_REG_FUNC(SetSwitch);

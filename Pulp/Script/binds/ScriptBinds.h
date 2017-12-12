@@ -13,8 +13,6 @@
 X_NAMESPACE_BEGIN(script)
 
 
-class XScriptableBase;
-
 class XScriptBinds
 {
 	typedef core::FixedArray<core::UniquePointer<XScriptableBase>, Moudles::ENUM_COUNT> ScriptModels;
