@@ -280,12 +280,12 @@ bool XScriptSys::compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2
 
 	// load the pointer values and compare.
 	stack::push_ref(L, f1);
-	X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
+	X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
 	const void* f1p = stack::as_pointer(L);
 	stack::pop(L);
 
 	stack::push_ref(L, f1);
-	X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
+	X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
 	const void* f2p = stack::as_pointer(L);
 	stack::pop(L);
 
@@ -301,7 +301,7 @@ void XScriptSys::releaseFunc(ScriptFunctionHandle f)
 	{
 #ifdef _DEBUG
 		stack::push_ref(L, f);
-		X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
+		X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
 		stack::pop(L);
 #endif
 
@@ -465,7 +465,7 @@ void XScriptSys::pushAny(const ScriptValue& var)
 			break;
 		case Type::Function:
 			stack::push_ref(L, var.pFunction_);
-			X_ASSERT(stack::get_type(L) == LUA_TFUNCTION, "type should be function")(stack::get_type(L));
+			X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
 			break;
 		case Type::Vector:
 			pushVec3(Vec3f(var.vec3_.x, var.vec3_.y, var.vec3_.z));
@@ -506,7 +506,7 @@ bool XScriptSys::toVec3(Vec3f& vec, int tableIndex)
 		tableIndex = stack::num(L) + tableIndex + 1;
 	}
 
-	if (stack::get_type(L, tableIndex) != LUA_TTABLE) {
+	if (stack::get_type(L, tableIndex) != Type::Table) {
 		return false;
 	}
 
@@ -596,22 +596,22 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 
 	switch (luaType)
 	{
-		case LUA_TNIL:
+		case Type::Nil:
 			var.type_ = Type::Nil;
 			break;
-		case LUA_TBOOLEAN:
+		case Type::Boolean:
 			var.bool_ = stack::as_bool(L, index) != 0;
 			var.type_ = Type::Boolean;
 			break;
-		case LUA_TLIGHTUSERDATA:
+		case Type::Pointer:
 			var.pPtr_ = stack::as_pointer(L, index);
 			var.type_ = Type::Handle;
 			break;
-		case LUA_TNUMBER:
+		case Type::Number:
 			var.number_ = static_cast<float>(stack::as_number(L, index));
 			var.type_ = Type::Number;
 			break;
-		case LUA_TSTRING:
+		case Type::String:
 		{
 			size_t len = 0;
 			var.str_.pStr = stack::as_string(L, index, &len);
@@ -619,8 +619,8 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 			var.type_ = Type::String;
 		}
 		break;
-		case LUA_TTABLE:
-		case LUA_TUSERDATA:
+		case Type::Table:
+		case Type::Userdata:
 			if (!var.pTable_)
 			{
 				var.pTable_ = static_cast<XScriptSys*>(gEnv->pScriptSys)->allocTable();
@@ -629,7 +629,7 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 			static_cast<XScriptTable*>(var.pTable_)->attach();
 			var.type_ = Type::Table;
 			break;
-		case LUA_TFUNCTION:
+		case Type::Function:
 		{
 			var.type_ = Type::Function;
 			// Make reference to function.
