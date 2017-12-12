@@ -109,9 +109,12 @@ bool XScriptSys::init(void)
 
 		state.openLibs(lua::libs(
 				lua::lib::Base |
-				lua::lib::Package |
-				lua::lib::Os |
-				lua::lib::Io |
+				lua::lib::Math |
+				lua::lib::Table |
+				lua::lib::String |
+				lua::lib::Bit32 |
+				// lua::lib::Os |
+				//lua::lib::Io |
 				lua::lib::Ffi |
 				lua::lib::Jit
 			)
