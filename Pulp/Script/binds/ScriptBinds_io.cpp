@@ -25,9 +25,9 @@ X_NAMESPACE_BEGIN(script)
 	registerFunction(#func, Delegate); \
 }
 
-XBinds_Io_File::XBinds_Io_File()
+XBinds_Io_File::XBinds_Io_File(IScriptSys* pSS, ICore* pCore)
 {
-
+	init(pSS, pCore);
 }
 
 XBinds_Io_File::~XBinds_Io_File()
@@ -35,13 +35,13 @@ XBinds_Io_File::~XBinds_Io_File()
 
 }
 
-void XBinds_Io_File::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Io_File::init(IScriptSys* pSS, ICore* pCore)
 {
-	XScriptableBase::init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS, 1);
 
 	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
-	pFileSys_ = pCore->GetIFileSys();
+	pFileSys_ = X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
 	X_IO_FILE_REG_FUNC(write);
 	X_IO_FILE_REG_FUNC(read);
@@ -60,10 +60,11 @@ void XBinds_Io_File::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 #endif
 }
 
-core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullPointer)
+core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH)
 {
-	X_ASSERT_NOT_NULL(pH);
+	return static_cast<core::XFile*>(pH->getThis());
 
+#if 0
 	SmartScriptTable tbl;
 	Type::Enum type = pH->getParamType(index);
 
@@ -91,38 +92,37 @@ core::XFile* XBinds_Io_File::getFile(IFunctionHandler* pH, int index, bool nullP
 
 		return pFile;
 	}
-
 	return nullptr;
+#endif
 }
 
 
 int XBinds_Io_File::write(IFunctionHandler* pH)
 {
-	core::XFile* pFile;
-	int arg, numArgs;
+	core::XFile* pFile = getFile(pH);
+	if (!pFile) {
+		return pH->endFunction();
+	}
 
-	if ((pFile = getFile(pH)) != nullptr)
+	int numArgs = pH->getParamCount();
+	for (int arg = 1; numArgs--; arg++)
 	{
-		numArgs = pH->getParamCount() - 1;
-		for (arg = 2; numArgs--; arg++)
+		ScriptValue value;
+		pH->getParamAny(arg, value);
+		switch (value.getType())
 		{
-			ScriptValue value;
-			pH->getParamAny(arg, value);
-			switch (value.getType())
-			{
-				case Type::String:
-			//	pFile->writeString(value.str);
-			// no null term Plz!
+			case Type::String:
+				//	pFile->writeString(value.str);
+				// no null term Plz!
 				pFile->write(value.str_.pStr, safe_static_cast<uint32_t>(value.str_.len));
 				break;
-				case Type::Number:
-			//	pFile->writeObj(value.number);
-			// write it as a string.
+			case Type::Number:
+				//	pFile->writeObj(value.number);
+				// write it as a string.
 				pFile->printf(LUA_NUMBER_FMT, value.number_);
 				break;
-				default:
-					break;
-			}
+			default:
+				break;
 		}
 	}
 
@@ -132,7 +132,10 @@ int XBinds_Io_File::write(IFunctionHandler* pH)
 int XBinds_Io_File::read(IFunctionHandler* pH)
 {
 	// <foramt>
-	core::XFile* pFile;
+	core::XFile* pFile = getFile(pH);
+	if (!pFile) {
+		return pH->endFunction();
+	}
 
 /*
 	"*n": reads a number; this is the only format that returns a number instead of a string.
@@ -142,45 +145,40 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 	number : reads a string with up to this number of bytes, returning nil on end of file. If number is zero, 
 			 it reads nothing and returns an empty string, or nil on end of file.
 */
-	int arg, numArgs;
-	int total;
+	int total = 0;
 
-	total = 0;
-
-	if ((pFile = getFile(pH)) != nullptr)
+	int numArgs = pH->getParamCount();
+	if (numArgs == 0)
 	{
-		numArgs = pH->getParamCount() - 1;
-		if (numArgs == 0)
-		{
-			// read line mode
-			readLine(pH, pFile);
+		// read line mode
+		readLine(pH, pFile);
 
-		}
-		else
+	}
+	else
+	{
+		// need to check for stack space.
+		for (int arg = 1; numArgs--; arg++)
 		{
-			// need to check for stack space.
-			for (arg = 2; numArgs--; arg++)
+			const char* mode;
+
+			if (pH->getParamType(arg) == Type::Number)
 			{
-				const char* mode;
-
-				if (pH->getParamType(arg) == Type::Number)
+				// read this number of bytes.
+				// not gonna use float(aka lua number) since who the flying
+				// gypsy fuck is gonna open a >2gb file via lua o.o !!
+				int numbytes;
+				if (pH->getParam(arg, numbytes))
 				{
-					// read this number of bytes.
-					// not gonna use float(aka lua number) since who the flying
-					// gypsy fuck is gonna open a >2gb file via lua o.o !!
-					int numbytes;
-					if (pH->getParam(arg, numbytes))
-					{
 
-					}
 				}
-				if (pH->getParam(arg,mode))
+			}
+			if (pH->getParam(arg, mode))
+			{
+				if (core::strUtil::strlen(mode) == 2 && mode[0] == '*')
 				{
-					if (core::strUtil::strlen(mode) == 2 && mode[0] == '*')
+					char m = mode[1];
+					switch (m)
 					{
-						char m = mode[1];
-						switch (m)
-						{
 						case 'n':
 							total += readNumber(pH, pFile);
 							break;
@@ -196,13 +194,12 @@ int XBinds_Io_File::read(IFunctionHandler* pH)
 						default:
 							pScriptSys_->onScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 							break;
-						}
+					}
 
-					}
-					else
-					{
-						pScriptSys_->onScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
-					}
+				}
+				else
+				{
+					pScriptSys_->onScriptError("Unknown file:read mode: \"%s\" valid modes: *n,*a,*l,*L", mode);
 				}
 			}
 		}
@@ -216,21 +213,21 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 	// <where(str)> <offset(int)>
 	using namespace core;
 
-	XFile* pFile;
-	SeekMode::Enum mode;
-	const char* modeStr;
-	int offset;
+	core::XFile* pFile = getFile(pH);
+	if (!pFile) {
+		return pH->endFunction();
+	}
 
-	mode = SeekMode::CUR;
-	modeStr = nullptr;
-	offset = 0;
+	SeekMode::Enum mode = SeekMode::CUR;
+	const char* pModeStr = nullptr;
+	int offset = 0;
 
-	if (pH->getParam(1, modeStr)) {
+	if (pH->getParam(1, pModeStr)) {
 		pH->getParam(2, offset);
 	}
 	else
 	{
-		modeStr = "cur";
+		pModeStr = "cur";
 	}
 
 	struct SeekMap {
@@ -238,18 +235,17 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 		SeekMode::Enum mode;
 	};
 
-	SeekMap seekLookup[] = {
+	const SeekMap seekLookup[] = {
 		{ "cur", SeekMode::CUR },
 		{ "set", SeekMode::SET },
 		{ "end", SeekMode::END }
 	};
 
 	const uint32_t numModes = SeekMode::FLAGS_COUNT;
-	uint32_t i;
 
-	for (i = 0; i < numModes; i++)
+	for (uint32_t i = 0; i < numModes; i++)
 	{
-		if (core::strUtil::IsEqualCaseInsen(modeStr, seekLookup[i].str))
+		if (core::strUtil::IsEqualCaseInsen(pModeStr, seekLookup[i].str))
 		{
 			mode = seekLookup[i].mode;
 			break;
@@ -262,27 +258,23 @@ int XBinds_Io_File::seek(IFunctionHandler* pH)
 		}
 	}
 
-	if ((pFile = getFile(pH)) != nullptr)
-	{
-		// if random access is not set, file system will print error.
-		// may add a check here, and handle it diffrently.
-		pFile->seek(offset, mode);
-	}
+	
+	// if random access is not set, file system will print error.
+	// may add a check here, and handle it diffrently.
+	pFile->seek(offset, mode);
 
 	return pH->endFunction();
 }
 
 int XBinds_Io_File::close(IFunctionHandler* pH)
 {
-	core::XFile* pFile;
-
-	if ((pFile = getFile(pH,1,true)) != nullptr)
-	{
-		if (pFile) {
-			pFileSys_->closeFile(pFile);
-		}
+	core::XFile* pFile = getFile(pH);
+	if (!pFile) {
+		return pH->endFunction();
 	}
 
+	pFileSys_->closeFile(pFile);
+	
 	return pH->endFunction();
 }
 
@@ -354,9 +346,10 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 
 // --------------------------------------------------
 
-XBinds_Io::XBinds_Io()
+XBinds_Io::XBinds_Io(IScriptSys* pSS, ICore* pCore) :
+	file_(pSS, pCore)
 {
-
+	init(pSS, pCore);
 }
 
 XBinds_Io::~XBinds_Io()
@@ -364,24 +357,16 @@ XBinds_Io::~XBinds_Io()
 
 }
 
-void XBinds_Io::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Io::init(IScriptSys* pSS, ICore* pCore)
 {
-	XScriptableBase::init(pSS, pCore, paramIdOffset);
-
-	X_ASSERT_NOT_NULL(pCore_);
-	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
-
-	pCore_ = pCore;
+	XScriptableBase::init(pSS);
+	
 	pFileSys_ = pCore->GetIFileSys();
 
 	setGlobalName("io");
 
-
 	X_IO_REG_FUNC(openFile);
 	X_IO_REG_FUNC(closeFile);
-
-
-	file_.init(pSS, pCore, paramIdOffset);
 }
 
 
@@ -481,7 +466,8 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
 
 SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
 {
-	SmartScriptTable userData = pScriptSys_->createUserData(&pFile, sizeof(pFile));
+//	SmartScriptTable userData = pScriptSys_->createUserData(&pFile, sizeof(pFile));
+	SmartScriptTable userData(pScriptSys_);
 	
 
 	// files have to be explicitly closed.
@@ -499,8 +485,9 @@ SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
 	file_.GetMethodsTable()->AddFunction(fd);
 #endif
 
-
-//	(static_cast<XScriptTable*>(userData.GetPtr()))->Delegate(file_.GetMethodsTable());
+	// I want to associate members with this handle.
+	userData->setMetatable(file_.getMethodsTable());
+	userData->setValue("__this", Handle(pFile));
 
 	return userData;
 }
@@ -511,10 +498,14 @@ int XBinds_Io::closeFile(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	using namespace core;
 
-	core::XFile* pFile;
-
-	if ((pFile = XBinds_Io_File::getFile(pH,1,true)) != nullptr)
+	SmartScriptTable tbl;
+	if (!pH->getParam(1, tbl))
 	{
+		return pH->endFunction();
+	}
+	
+	core::XFile* pFile = static_cast<core::XFile*>(tbl->getThis());
+	if (pFile) {
 		pFileSys_->closeFile(pFile);
 	}
 

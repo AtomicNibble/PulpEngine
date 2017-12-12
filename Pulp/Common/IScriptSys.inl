@@ -88,7 +88,8 @@ X_INLINE ScriptValue::ScriptValue(const SmartScriptTable& value) :
 
 
 X_INLINE ScriptValue::ScriptValue(Type::Enum type) :
-	type_(type)
+	type_(type),
+	pPtr_(nullptr)
 {
 
 }
@@ -96,16 +97,27 @@ X_INLINE ScriptValue::ScriptValue(Type::Enum type) :
 X_INLINE ScriptValue::ScriptValue() :
 	type_(Type::None)
 {
+
 }
 
 
 X_INLINE ScriptValue::~ScriptValue()
 {
+	clear();
 }
 
 
 X_INLINE void ScriptValue::clear(void)
 {
+	if (type_ == Type::Table && pTable_)
+	{
+		pTable_->release();
+	}
+	else if (type_ == Type::Function && pFunction_)
+	{
+		gEnv->pScriptSys->releaseFunc(pFunction_);
+	}
+
 	type_ = Type::None;
 }
 
@@ -484,15 +496,12 @@ X_INLINE XScriptableBase::~XScriptableBase()
 	core::SafeRelease(pMethodsTable_);
 }
 
-X_INLINE void XScriptableBase::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+X_INLINE void XScriptableBase::init(IScriptSys* pSS, int paramIdOffset)
 {
-	X_ASSERT_NOT_NULL(pCore);
 	X_ASSERT_NOT_NULL(pSS);
 
-	pCore_ = pCore;
 	pScriptSys_ = pSS;
 	pMethodsTable_ = pSS->createTable();
-	pMethodsTable_->addRef();
 	paramIdOffset_ = paramIdOffset;
 }
 
@@ -536,5 +545,157 @@ X_INLINE void XScriptableBase::registerFunction(const char* pFuncName, const ISc
 		pMethodsTable_->addFunction(fd);
 	}
 }
+
+// ------------------------------------------------------------------------
+
+X_INLINE SmartScriptTable::SmartScriptTable() :
+	pTable_(nullptr)
+{
+
+}
+
+X_INLINE SmartScriptTable::SmartScriptTable(const SmartScriptTable& st)
+{
+	pTable_ = st.pTable_;
+	if (pTable_) {
+		pTable_->addRef();
+	}
+}
+
+X_INLINE SmartScriptTable::SmartScriptTable::SmartScriptTable(SmartScriptTable&& st)
+{
+	pTable_ = st.pTable_;
+	st.pTable_ = nullptr;
+}
+
+X_INLINE SmartScriptTable::SmartScriptTable(IScriptTable* pNew)
+{
+	if (pNew) {
+		pNew->addRef();
+	}
+	pTable_ = pNew;
+}
+
+X_INLINE SmartScriptTable::SmartScriptTable(IScriptSys* pSS, bool createEmpty = false)
+{
+	pTable_ = pSS->createTable(createEmpty);
+}
+
+X_INLINE SmartScriptTable::~SmartScriptTable() {
+	if (pTable_) {
+		pTable_->release();
+	}
+}
+
+// Copy operator.
+X_INLINE SmartScriptTable& SmartScriptTable::operator=(IScriptTable* pNew)
+{
+	if (pNew) {
+		pNew->addRef();
+	}
+	if (pTable_) {
+		pTable_->release();
+	}
+	pTable_ = pNew;
+	return *this;
+}
+
+// Copy operator.
+X_INLINE SmartScriptTable& SmartScriptTable::operator=(const SmartScriptTable& st)
+{
+	if (st.pTable_) {
+		st.pTable_->addRef();
+	}
+	if (pTable_) {
+		pTable_->release();
+	}
+	pTable_ = st.pTable_;
+	return *this;
+}
+
+X_INLINE SmartScriptTable& SmartScriptTable::operator=(SmartScriptTable&& st)
+{
+	if (pTable_) {
+		pTable_->release();
+	}
+	pTable_ = st.pTable_;
+	st.pTable_ = nullptr;
+	return *this;
+}
+
+
+
+// Casts
+X_INLINE IScriptTable* SmartScriptTable::operator->() const 
+{ 
+	return pTable_;
+}
+X_INLINE IScriptTable* SmartScriptTable::operator*() const 
+{ 
+	return pTable_;
+}
+X_INLINE SmartScriptTable::operator const IScriptTable*() const 
+{ 
+	return pTable_;
+}
+X_INLINE SmartScriptTable::operator IScriptTable*() const 
+{ 
+	return pTable_;
+}
+X_INLINE SmartScriptTable::operator bool() const 
+{ 
+	return pTable_ != nullptr;
+}
+
+// Boolean comparasions.
+X_INLINE bool SmartScriptTable::operator!() const 
+{
+	return pTable_ == nullptr;
+}
+
+X_INLINE bool SmartScriptTable::operator ==(const IScriptTable* p2) const
+{
+	return pTable_ == p2;
+}
+
+X_INLINE bool SmartScriptTable::operator ==(IScriptTable* p2) const
+{
+	return pTable_ == p2;
+}
+
+X_INLINE bool SmartScriptTable::operator !=(const IScriptTable* p2) const
+{
+	return pTable_ != p2;
+}
+
+X_INLINE bool SmartScriptTable::operator !=(IScriptTable* p2) const
+{
+	return pTable_ != p2;
+}
+
+X_INLINE bool SmartScriptTable::operator < (const IScriptTable* p2) const
+{
+	return pTable_ < p2;
+}
+
+X_INLINE bool SmartScriptTable::operator >(const IScriptTable* p2) const 
+{ 
+	return pTable_ > p2;
+}
+
+X_INLINE IScriptTable* SmartScriptTable::getPtr(void) const 
+{ 
+	return pTable_;
+}
+
+X_INLINE bool SmartScriptTable::create(IScriptSys* pSS, bool createEmpty = false)
+{
+	if (pTable_) {
+		pTable_->release();
+	}
+	pTable_ = pSS->createTable(createEmpty);
+	return pTable_ != nullptr;
+}
+
 
 X_NAMESPACE_END

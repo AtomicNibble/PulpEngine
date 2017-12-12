@@ -30,23 +30,24 @@ void* XFunctionHandler::getThis(void)
 	void* pPtr = nullptr;
 
 	// Get implicit self table.
-	if (paramIdOffset_ > 0 && stack::get_type(L_, 1) == LUA_TTABLE)
+	if (paramIdOffset_ > 0 && stack::get_type(L_, 1) == Type::Table)
 	{
 		// index "__this" member.
 		stack::pushliteral(L_, "__this");
-
-		lua_rawget(L_, 1);
-		if (stack::get_type(L_) == LUA_TLIGHTUSERDATA) {
+		stack::push_table_value_raw(L_, 1);
+		if (stack::get_type(L_) == Type::Pointer) {
 			pPtr = const_cast<void*>(stack::as_pointer(L_));
 		}
 
 		stack::pop(L_);
+		return pPtr;
 	}
 
+	X_WARNING("Script", "GetThis called without param offset");
 	return pPtr;
 }
 
-bool XFunctionHandler::getSelfAny(ScriptValue &any)
+bool XFunctionHandler::getSelfAny(ScriptValue& any)
 {
 	bool bRes = false;
 
@@ -76,23 +77,23 @@ Type::Enum XFunctionHandler::getParamType(int idx)
 }
 
 
-bool XFunctionHandler::getParamAny(int nIdx, ScriptValue &any)
+bool XFunctionHandler::getParamAny(int idx, ScriptValue& any)
 {
-	int realIdx = nIdx + paramIdOffset_;
+	int realIdx = idx + paramIdOffset_;
 
 	if (pSS_->toAny(any, realIdx)) {
 		return true;
 	}
 
+	Type::Enum paramType = getParamType(idx);
+	const char* pParamType = Type::ToString(paramType);
+	const char* pType = Type::ToString(any.getType());
 
-	Type::Enum paramType = getParamType(nIdx);
-	const char* sParamType = Type::ToString(paramType);
-	const char* sType = Type::ToString(any.getType());
 	// Report wrong param.
-	X_WARNING("Script", "Wrong parameter type. Function %s expect parameter %d of type %s (Provided type %s)",
-		pFuncName_, nIdx, sType, sParamType);
+	X_WARNING("Script", "Wrong parameter type. Function %s expect parameter %" PRIi32 " of type %s (Provided type %s)",
+		pFuncName_, idx, pType, pParamType);
 
-	//		pSS_->LogStackTrace();
+	pSS_->logCallStack();
 	return false;
 }
 

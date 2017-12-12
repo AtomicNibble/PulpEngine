@@ -4,14 +4,14 @@
 #define X_SCRIPT_BINDS_SCRIPT_H_
 
 X_NAMESPACE_BEGIN(script)
-
 class XBinds_Script : public XScriptableBase
 {
 public:
-	XBinds_Script();
+	XBinds_Script(IScriptSys* pSS);
 	~XBinds_Script() X_OVERRIDE;
 
-	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+private:
+	void init(IScriptSys* pSS);
 
 	int Load(IFunctionHandler* pH);
 	int ReLoad(IFunctionHandler* pH);

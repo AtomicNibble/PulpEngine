@@ -33,6 +33,12 @@
     <Filter Include="Source Files\Util">
       <UniqueIdentifier>{62740949-68fa-4655-8840-8c9b584124e5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\ScriptBinds">
+      <UniqueIdentifier>{951113b5-d16b-4b3e-9bfa-e6770ac9a18b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\ScriptBinds">
+      <UniqueIdentifier>{0977e85c-e5ad-45c0-a4e7-4a73b0cc21d0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -65,6 +71,9 @@
     <ClInclude Include="Util\Allocators.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptBinds\ScriptBinds_sound.h">
+      <Filter>Header Files\ScriptBinds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -87,6 +96,9 @@
     </ClCompile>
     <ClCompile Include="Util\Allocators.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptBinds\ScriptBinds_sound.cpp">
+      <Filter>Source Files\ScriptBinds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

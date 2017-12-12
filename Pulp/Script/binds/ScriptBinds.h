@@ -5,7 +5,6 @@
 #define X_SCRIPT_BINDS_H_
 
 #include <Containers\FixedArray.h>
-#include <String\StackString.h>
 
 #include <Util\SmartPointer.h>
 #include <Util\UniquePointer.h>
@@ -28,7 +27,6 @@ private:
 
 	ScriptModels modules_;
 };
-
 
 
 X_NAMESPACE_END

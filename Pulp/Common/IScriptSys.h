@@ -216,6 +216,7 @@ struct IScriptSys : public core::IEngineSysBase
 	virtual IScriptTable* createUserData(void* ptr, size_t size) X_ABSTRACT;
 
 	virtual void onScriptError(const char* fmt, ...) X_ABSTRACT;
+	virtual void logCallStack(void) X_ABSTRACT;
 };
 
 
@@ -276,8 +277,8 @@ struct IFunctionHandler
 struct IScriptTableDumpSink
 {
 	virtual ~IScriptTableDumpSink(){}
-	virtual void OnElementFound(const char* name, Type::Enum type) X_ABSTRACT;
-	virtual void OnElementFound(int nIdx, Type::Enum type) X_ABSTRACT;
+	virtual void OnElementFound(const char* pName, Type::Enum type) X_ABSTRACT;
+	virtual void OnElementFound(int idx, Type::Enum type) X_ABSTRACT;
 };
 
 /*
@@ -350,6 +351,10 @@ public:
 	virtual void clear(void) X_ABSTRACT; // clears the table, removes all the entries in the table.
 	virtual size_t count(void) X_ABSTRACT; // gets the count of elements into the object.
 
+	virtual void* getThis(void) X_ABSTRACT;
+
+	virtual void setMetatable(IScriptTable* pMetatable) X_ABSTRACT; // Assign a metatable to a table.
+	
 	// member iteration.
 	virtual IScriptTable::Iterator begin(void) X_ABSTRACT;
 	virtual bool next(Iterator &iter) X_ABSTRACT;
@@ -365,7 +370,7 @@ public:
 	//                If bDeepCopy is true and bCopyByReference is true, the table structure is copied but the tables are left empty and the metatable is set to point at the original table.
 	virtual bool clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_ABSTRACT;
 
-	virtual void dump(IScriptTableDumpSink* p) X_ABSTRACT;
+	virtual void dump(IScriptTableDumpSink* pSink) X_ABSTRACT;
 
 	virtual bool addFunction(const ScriptFunctionDesc& fd) X_ABSTRACT;
 
@@ -412,7 +417,8 @@ public:
 	X_INLINE XScriptableBase();
 	X_INLINE virtual ~XScriptableBase();
 
-	X_INLINE virtual void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0);
+protected:
+	X_INLINE void init(IScriptSys* pSS, int paramIdOffset = 0);
 	X_INLINE void setGlobalName(const char* GlobalName);
 
 	X_INLINE IScriptTable* getMethodsTable(void);
@@ -425,7 +431,6 @@ protected:
 
 protected:
 	core::StackString<60> name_;
-	ICore* pCore_;
 	IScriptSys* pScriptSys_;
 	IScriptTable* pMethodsTable_;
 	int paramIdOffset_;
@@ -451,82 +456,40 @@ if (pH->getParamCount() < _n) \
 class SmartScriptTable
 {
 public:
-	SmartScriptTable() : pTable(nullptr) {};
-	SmartScriptTable(const SmartScriptTable& st)
-	{
-		pTable = st.pTable;
-		if (pTable) 
-			pTable->addRef();
-	}
-	SmartScriptTable(IScriptTable* newp)
-	{
-		if (newp) 
-			newp->addRef();
-		pTable = newp;
-	}
+	X_INLINE SmartScriptTable();
+	X_INLINE SmartScriptTable(const SmartScriptTable& st);
+	X_INLINE SmartScriptTable(SmartScriptTable&& st);
+	X_INLINE SmartScriptTable(IScriptTable* pNew);
+	X_INLINE explicit SmartScriptTable(IScriptSys* pSS, bool createEmpty);
+	X_INLINE ~SmartScriptTable();
 
-	// Copy operator.
-	SmartScriptTable& operator=(IScriptTable* newp)
-	{
-		if (newp) 
-			newp->addRef();
-		if (pTable) 
-			pTable->release();
-		pTable = newp;
-		return *this;
-	}
-	// Copy operator.
-	SmartScriptTable& operator=(const SmartScriptTable& st)
-	{
-		if (st.pTable) 
-			st.pTable->addRef();
-		if (pTable) 
-			pTable->release();
-		pTable = st.pTable;
-		return *this;
-	}
-
-	explicit SmartScriptTable(IScriptSys* pSS, bool bCreateEmpty = false)
-	{
-		pTable = pSS->createTable(bCreateEmpty);
-		pTable->addRef();
-	}
-	~SmartScriptTable() {
-		if (pTable) 
-			pTable->release();
-	}
+	X_INLINE SmartScriptTable& operator=(IScriptTable* pNew);
+	X_INLINE SmartScriptTable& operator=(const SmartScriptTable& st);
+	X_INLINE SmartScriptTable& operator=(SmartScriptTable&& st);
 
 	// Casts
-	IScriptTable* operator->() const { return pTable; }
-	IScriptTable* operator*() const { return pTable; }
-	operator const IScriptTable*() const { return pTable; }
-	operator IScriptTable*() const { return pTable; }
-	operator bool() const { return (pTable != nullptr); }
+	X_INLINE IScriptTable* operator->() const;
+	X_INLINE IScriptTable* operator*() const;
+	X_INLINE operator const IScriptTable*() const;
+	X_INLINE operator IScriptTable*() const;
+	X_INLINE operator bool() const;
 
 	// Boolean comparasions.
-	bool operator ! () const { return pTable == nullptr; };
-	bool operator ==(const IScriptTable* p2) const { return pTable == p2; };
-	bool operator ==(IScriptTable* p2) const  { return pTable == p2; };
-	bool operator !=(const IScriptTable* p2) const { return pTable != p2; };
-	bool operator !=(IScriptTable* p2) const { return pTable != p2; };
-	bool operator < (const IScriptTable* p2) const { return pTable < p2; };
-	bool operator >(const IScriptTable* p2) const { return pTable > p2; };
+	X_INLINE bool operator ! () const;
+	X_INLINE bool operator ==(const IScriptTable* p2) const;
+	X_INLINE bool operator ==(IScriptTable* p2) const;
+	X_INLINE bool operator !=(const IScriptTable* p2) const;
+	X_INLINE bool operator !=(IScriptTable* p2) const;
+	X_INLINE bool operator < (const IScriptTable* p2) const;
+	X_INLINE bool operator >(const IScriptTable* p2) const;
 
-	IScriptTable* GetPtr() const { return pTable; }
+	X_INLINE IScriptTable* getPtr(void) const;
 
-	bool Create(IScriptSys* pSS, bool bCreateEmpty = false)
-	{
-		if (pTable)
-			pTable->release();
-		pTable = pSS->createTable(bCreateEmpty);
-		pTable->addRef();
-		return (pTable) ? true : false;
-	}
+	X_INLINE bool create(IScriptSys* pSS, bool createEmpty);
 
 private:
-	IScriptTable* pTable;
+	IScriptTable* pTable_;
 };
-	
 
 
 X_NAMESPACE_END

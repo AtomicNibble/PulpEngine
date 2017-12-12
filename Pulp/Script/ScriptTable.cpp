@@ -19,12 +19,12 @@ namespace
 lua_State* XScriptTable::L = nullptr;
 XScriptSys* XScriptTable::pScriptSystem_ = nullptr;
 
-std::set<class XScriptTable*> XScriptTable::s_allTables_;
+// std::set<class XScriptTable*> XScriptTable::s_allTables_;
 
 
 
 XScriptTable::XScriptTable() :
-	refCount_(0),
+	refCount_(1),
 	luaRef_(lua::Ref::Nil)
 #if X_DEBUG
 	, setChainActive_(false)
@@ -260,7 +260,43 @@ size_t XScriptTable::count(void)
 	return count;
 }
 
+void XScriptTable::setMetatable(IScriptTable* pMetatable)
+{
+	X_LUA_CHECK_STACK(L);
 
+	pushRef(pMetatable);
+	stack::pushliteral(L, "__index"); // push key.	
+	pushRef(pMetatable);
+	stack::pop_value_to_table(L, -3); // sets metatable.__index = metatable
+	stack::pop(L); // pop metatable from stack.
+
+
+
+	// Set metatable for this script object.
+	pushRef(); // -2
+	pushRef(pMetatable); // -1
+	stack::setmetatable(L, -2);
+	stack::pop(L); // pop table
+}
+
+void* XScriptTable::getThis(void)
+{
+	void* pPtr = nullptr;
+
+	if (stack::get_type(L, 1) == Type::Table)
+	{
+		// index "__this" member.
+		stack::pushliteral(L, "__this");
+		stack::push_table_value_raw(L, 1);
+		if (stack::get_type(L) == Type::Pointer) {
+			pPtr = const_cast<void*>(stack::as_pointer(L));
+		}
+
+		stack::pop(L);
+	}
+
+	return pPtr;
+}
 
 // Iteration.
 IScriptTable::Iterator XScriptTable::begin(void)
@@ -478,7 +514,7 @@ void XScriptTable::deleteThis(void)
 		X_FATAL("Script", "attempt to Release already released script table.");
 	}
 
-	s_allTables_.erase(this);
+//	s_allTables_.erase(this);
 
 	if (luaRef_ != lua::Ref::Nil) {
 		state::remove_ref(L, luaRef_);
@@ -487,17 +523,6 @@ void XScriptTable::deleteThis(void)
 	luaRef_ = lua::Ref::Deleted;
 
 	pScriptSystem_->freeTable(this);
-}
-
-void XScriptTable::setMetatable(IScriptTable* pMetatable)
-{
-	X_LUA_CHECK_STACK(L);
-
-	// Set metatable for this script object.
-	pushRef(); // -2
-	pushRef(pMetatable); // -1
-	lua_setmetatable(L, -2);
-	stack::pop(L); // pop table
 }
 
 int32_t XScriptTable::getRef(void) const
@@ -513,7 +538,7 @@ void XScriptTable::attach(void)
 
 	luaRef_ = stack::pop_to_ref(L);
 
-	s_allTables_.insert(this);
+//	s_allTables_.insert(this);
 }
 
 void XScriptTable::attach(IScriptTable* pSO)

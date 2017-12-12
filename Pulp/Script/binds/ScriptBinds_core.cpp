@@ -15,9 +15,9 @@ X_NAMESPACE_BEGIN(script)
 	registerFunction(#func, Delegate); }
 
 
-XBinds_Core::XBinds_Core()
+XBinds_Core::XBinds_Core(IScriptSys* pSS, ICore* pCore)
 {
-
+	init(pSS, pCore);
 }
 
 XBinds_Core::~XBinds_Core()
@@ -26,15 +26,12 @@ XBinds_Core::~XBinds_Core()
 }
 
 
-void XBinds_Core::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Core::init(IScriptSys* pSS, ICore* pCore)
 {
-	XScriptableBase::init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS);
 
-	X_ASSERT_NOT_NULL(pCore->GetIConsole());
-	X_ASSERT_NOT_NULL(pCore->GetITimer());
-
-	pConsole_ = pCore->GetIConsole();
-	pTimer_ = pCore->GetITimer();
+	pConsole_ = X_ASSERT_NOT_NULL(pCore->GetIConsole());
+	pTimer_ = X_ASSERT_NOT_NULL(pCore->GetITimer());
 
 	setGlobalName("Core");
 
@@ -47,16 +44,9 @@ void XBinds_Core::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
 	X_CORE_REG_FUNC(Warning);
 	X_CORE_REG_FUNC(Error);
 
-	X_CORE_REG_FUNC(DrawLine);
-	X_CORE_REG_FUNC(DrawLine2D);
-	X_CORE_REG_FUNC(DrawText);
-	X_CORE_REG_FUNC(DrawCone);
 
 
-	X_CORE_REG_FUNC(GetCurrTime);
-	X_CORE_REG_FUNC(GetCurrAsyncTime);
-	X_CORE_REG_FUNC(GetFrameTime);
-	X_CORE_REG_FUNC(GetTimeScale);
+
 }
 
 
@@ -217,205 +207,6 @@ int XBinds_Core::Error(IFunctionHandler* pH)
 	}
 	
 	return pH->endFunction();
-}
-
-// -----------------------------------------------
-
-int XBinds_Core::DrawLine(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(6);
-
-	Vec3f v0, v1;
-	Color fcol;
-
-	pH->getParam(1,v0);
-	pH->getParam(2,v1);
-
-	pH->getParam(3, fcol.r);
-	pH->getParam(4, fcol.g);
-	pH->getParam(5, fcol.b);
-	pH->getParam(6, fcol.a);
-
-	Color8u col(fcol);
-#if 1
-	X_ASSERT_UNREACHABLE();
-#else
-	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
-
-	pRenderAuxGeom->setRenderFlags(render::AuxGeom_Defaults::Def3DRenderflags);
-	pRenderAuxGeom->drawLine(v0, col, v1, col);
-#endif
-
-	return pH->endFunction();
-}
-
-int XBinds_Core::DrawLine2D(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(6);
-
-	Vec3f v0, v1;
-	Color fcol;
-
-	pH->getParam(1, v0);
-	pH->getParam(2, v1);
-
-	const float c_Normalize2Dx(1.0f / 800.0f);
-	const float c_Normalize2Dy(1.0f / 600.0f);
-	v0.x *= c_Normalize2Dx;
-	v0.y *= c_Normalize2Dy;
-	v1.x *= c_Normalize2Dx;
-	v1.y *= c_Normalize2Dy;
-
-	pH->getParam(3, fcol.r);
-	pH->getParam(4, fcol.g);
-	pH->getParam(5, fcol.b);
-	pH->getParam(6, fcol.a);
-
-	Color8u col(fcol);
-
-#if 1
-	X_ASSERT_UNREACHABLE();
-#else
-	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
-	render::XAuxGeomRenderFlags flags(render::AuxGeom_Defaults::Def2DPRenderflags);
-
-	if (fcol.r < 1.f)
-	{
-		flags.SetAlphaBlendMode(render::AuxGeom_AlphaBlendMode::AlphaBlended);
-	}
-
-	pRenderAuxGeom->setRenderFlags(flags);
-	pRenderAuxGeom->drawLine(v0, col, v1, col);
-#endif
-
-	return pH->endFunction();
-}
-
-int XBinds_Core::DrawText(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(9);
-
-	font::IFontSys* pFontSys = gEnv->pFontSys;
-
-	if (!pFontSys)
-		return pH->endFunction();
-
-
-	float x = 0;
-	float y = 0;
-	const char *text = "";
-	const char *fontName = "default";
-	float size = 16;
-	float r = 1;
-	float g = 1;
-	float b = 1;
-	float a = 1;
-
-	pH->getParam(1, x);
-	pH->getParam(2, y);
-	pH->getParam(3, text);
-	pH->getParam(4, fontName);
-	pH->getParam(5, size);
-	pH->getParam(6, r);
-	pH->getParam(7, g);
-	pH->getParam(8, b);
-	pH->getParam(9, a);
-
-	font::IFont* pFont = pFontSys->GetFont(fontName);
-
-	if (!pFont)
-	{
-		return pH->endFunction();
-	}
-
-
-	font::TextDrawContext ctx;
-	ctx.SetColor(Color(r, g, b, a));
-	ctx.SetSize(Vec2f(size, size));
-//	ctx.SetProportional(true);
-//	ctx.SetSizeIn800x600(true);
-
-	X_ASSERT_NOT_IMPLEMENTED();
-//	pFont->DrawString(x, y, text, ctx);
-
-	return pH->endFunction();
-}
-
-int XBinds_Core::DrawCone(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(8);
-
-	Vec3f pos, dir;
-	float radius, height;
-	Color fcol;
-
-	pH->getParam(1, pos);
-	pH->getParam(2, dir);
-
-	pH->getParam(3, radius);
-	pH->getParam(4, height);
-
-	pH->getParam(5, fcol.r);
-	pH->getParam(6, fcol.g);
-	pH->getParam(7, fcol.b);
-	pH->getParam(8, fcol.a);
-
-	Color8u col(fcol);
-
-#if 1
-	X_ASSERT_UNREACHABLE();
-#else
-	render::IRenderAux* pRenderAuxGeom = gEnv->pRender->GetIRenderAuxGeo();
-	render::XAuxGeomRenderFlags flags(render::AuxGeom_Defaults::Def3DRenderflags);
-
-	pRenderAuxGeom->drawCone(pos, dir, radius, height, col);
-#endif
-
-	return pH->endFunction();
-}
-
-// -----------------------------------------------
-
-
-// alot of these should be removed.
-// and we should not really expose all these values it's confusing.
-// we just want to give them: real time, and unscaled time.
-
-
-int XBinds_Core::GetCurrTime(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(0);
-	X_ASSERT_NOT_IMPLEMENTED();
-
-	float fTime = 0.f; // pTimer_->GetCurrTime();
-	return pH->endFunction(fTime);
-}
-
-int XBinds_Core::GetCurrAsyncTime(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(0);
-	X_ASSERT_NOT_IMPLEMENTED();
-
-	float fTime = 0.f; // pTimer_->GetAsyncCurTime();
-	return pH->endFunction(fTime);
-}
-
-int XBinds_Core::GetFrameTime(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(0);
-	X_ASSERT_NOT_IMPLEMENTED();
-
-	float fTime = 0.f; // pTimer_->GetFrameTime();
-	return pH->endFunction(fTime);
-}
-
-int XBinds_Core::GetTimeScale(IFunctionHandler *pH)
-{
-	SCRIPT_CHECK_PARAMETERS(0);
-	X_ASSERT_NOT_IMPLEMENTED();
-
-	float scale = 0.f; // pTimer_->GetTimeScale();
-	return pH->endFunction(scale);
 }
 
 

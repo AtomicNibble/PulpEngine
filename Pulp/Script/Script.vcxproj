@@ -469,7 +469,6 @@
     <ClInclude Include="binds\ScriptBinds_core.h" />
     <ClInclude Include="binds\ScriptBinds_io.h" />
     <ClInclude Include="binds\ScriptBinds_script.h" />
-    <ClInclude Include="binds\ScriptBinds_sound.h" />
     <ClInclude Include="FunctionHandler.h" />
     <ClInclude Include="ScriptSys.h" />
     <ClInclude Include="ScriptTable.h" />
@@ -488,7 +487,6 @@
     <ClCompile Include="binds\ScriptBinds_core.cpp" />
     <ClCompile Include="binds\ScriptBinds_io.cpp" />
     <ClCompile Include="binds\ScriptBinds_script.cpp" />
-    <ClCompile Include="binds\ScriptBinds_sound.cpp" />
     <ClCompile Include="FunctionHandler.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="ScriptSys.cpp" />

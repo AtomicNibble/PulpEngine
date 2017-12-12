@@ -71,14 +71,14 @@ namespace lua
 		}
 
 		// types
-		X_INLINE int32_t get_type(lua_State* L)
+		X_INLINE Type::Enum get_type(lua_State* L)
 		{
-			return lua_type(L, -1);
+			return static_cast<Type::Enum>(lua_type(L, -1));
 		}
 
-		X_INLINE int32_t get_type(lua_State* L, int32_t index)
+		X_INLINE Type::Enum get_type(lua_State* L, int32_t index)
 		{
-			return lua_type(L, index);
+			return static_cast<Type::Enum>(lua_type(L, index));
 		}
 
 		// type helpers.
@@ -210,6 +210,11 @@ namespace lua
 			lua_rawgeti(L, tableIdx, idx);
 		}
 
+		X_INLINE void push_table_value_raw(lua_State* L, int32_t tableIdx)
+		{
+			lua_rawget(L, tableIdx);
+		}
+
 
 		X_INLINE void pop_value_to_table(lua_State* L, int32_t tableIdx, int32_t idx)
 		{
@@ -242,7 +247,19 @@ namespace lua
 			return luaL_ref(L, LUA_REGISTRYINDEX);
 		}
 
+		// meta tables.
+		X_INLINE void setmetatable(lua_State* L, int32_t destTableIdx)
+		{
+			lua_setmetatable(L, destTableIdx);
+		}
 
+		X_INLINE void setmetatable(lua_State* L, int32_t tableRef, int32_t metaTableRef)
+		{
+			push_ref(L, tableRef);
+			push_ref(L, metaTableRef);
+			setmetatable(L, -2);
+			pop(L); // pop table
+		}
 
 		// as values.
 		X_INLINE const void* as_pointer(lua_State* L, int32_t idx)

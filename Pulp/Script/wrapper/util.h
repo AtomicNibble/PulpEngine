@@ -4,6 +4,7 @@ X_NAMESPACE_BEGIN(script)
 
 namespace lua
 {
+	void dumpCallStack(lua_State *L);
 	int32_t myLuaPanic(lua_State *L);
 	int32_t myErrorHandler(lua_State *L);
 

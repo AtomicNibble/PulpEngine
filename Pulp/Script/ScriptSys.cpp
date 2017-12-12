@@ -137,6 +137,7 @@ void XScriptSys::shutDown(void)
 	// must be done before lua closes.
 	binds_.Shutdown();
 
+#if 0
 	for (std::set<XScriptTable*>::iterator it = XScriptTable::s_allTables_.begin();
 		it != XScriptTable::s_allTables_.end(); )
 	{
@@ -150,6 +151,7 @@ void XScriptSys::shutDown(void)
 	}
 
 	XScriptTable::s_allTables_.clear();
+#endif
 
 	if (L != nullptr) {
 		lua_close(L);
@@ -374,6 +376,11 @@ void XScriptSys::onScriptError(const char* pFmt, ...)
 	X_WARNING("Script", error.c_str());
 }
 
+void XScriptSys::logCallStack(void)
+{
+	lua::dumpCallStack(L);
+}
+
 XScriptTable* XScriptSys::allocTable(void)
 {
 	return X_NEW(XScriptTable, &poolArena_, "ScriptTable");
@@ -578,7 +585,7 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 
 	X_LUA_CHECK_STACK(L);
 
-	int luaType = stack::get_type(L, index);
+	auto luaType = stack::get_type(L, index);
 
 	if (var.getType() != Type::None && !isTypeCompatible(var.getType(), luaType)) {
 		return false;
@@ -614,7 +621,6 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 			if (!var.pTable_)
 			{
 				var.pTable_ = static_cast<XScriptSys*>(gEnv->pScriptSys)->allocTable();
-				var.pTable_->addRef();
 			}
 			stack::push_copy(L, index);
 			static_cast<XScriptTable*>(var.pTable_)->attach();

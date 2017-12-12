@@ -68,6 +68,7 @@ public:
 	virtual IScriptTable* createUserData(void* ptr, size_t size) X_FINAL;
 
 	virtual void onScriptError(const char* fmt, ...) X_FINAL;
+	virtual void logCallStack(void) X_FINAL;
 
 	// ~IScriptSys
 public:

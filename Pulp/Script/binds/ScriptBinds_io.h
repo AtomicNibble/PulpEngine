@@ -15,16 +15,16 @@ class XBinds_Io_File : public XScriptableBase
 {
 	friend class XBinds_Io;
 public:
-	XBinds_Io_File();
+	XBinds_Io_File(IScriptSys* pSS, ICore* pCore);
 	~XBinds_Io_File() X_OVERRIDE;
 
-	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+private:
+	void init(IScriptSys* pSS, ICore* pCore);
 
 	int write(IFunctionHandler* pH);
 	int read(IFunctionHandler* pH);
 	int seek(IFunctionHandler* pH);
 	int close(IFunctionHandler* pH);
-
 
 private:
 	int readNumber(IFunctionHandler* pH, core::XFile* pFile);
@@ -35,17 +35,18 @@ protected:
 	core::IFileSys* pFileSys_;
 
 	static int garbageCollect(IFunctionHandler* pH, void* pBuffer, int size);
-	static core::XFile* getFile(IFunctionHandler* pH, int index = 1, bool nullPointer = false);
+	static core::XFile* getFile(IFunctionHandler* pH);
 };
 
 
 class XBinds_Io : public XScriptableBase
 {
 public:
-	XBinds_Io();
+	XBinds_Io(IScriptSys* pSS, ICore* pCore);
 	~XBinds_Io() X_OVERRIDE;
 
-	void init(IScriptSys* pSS, ICore* pCore, int paramIdOffset = 0) X_OVERRIDE;
+private:
+	void init(IScriptSys* pSS, ICore* pCore);
 
 	int openFile(IFunctionHandler* pH);
 	int closeFile(IFunctionHandler* pH);

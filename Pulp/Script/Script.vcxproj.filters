@@ -53,9 +53,6 @@
     <ClInclude Include="binds\ScriptBinds_script.h">
       <Filter>Binds</Filter>
     </ClInclude>
-    <ClInclude Include="binds\ScriptBinds_sound.h">
-      <Filter>Binds</Filter>
-    </ClInclude>
     <ClInclude Include="binds\ScriptBinds_io.h">
       <Filter>Binds</Filter>
     </ClInclude>
@@ -107,9 +104,6 @@
       <Filter>Binds</Filter>
     </ClCompile>
     <ClCompile Include="binds\ScriptBinds_io.cpp">
-      <Filter>Binds</Filter>
-    </ClCompile>
-    <ClCompile Include="binds\ScriptBinds_sound.cpp">
       <Filter>Binds</Filter>
     </ClCompile>
     <ClCompile Include="TableDump.cpp">

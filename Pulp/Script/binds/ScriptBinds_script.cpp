@@ -13,10 +13,9 @@ X_NAMESPACE_BEGIN(script)
 
 
 
-XBinds_Script::XBinds_Script()
+XBinds_Script::XBinds_Script(IScriptSys* pSS)
 {
-
-
+	init(pSS);
 }
 
 XBinds_Script::~XBinds_Script()
@@ -25,9 +24,9 @@ XBinds_Script::~XBinds_Script()
 }
 
 
-void XBinds_Script::init(IScriptSys* pSS, ICore* pCore, int paramIdOffset)
+void XBinds_Script::init(IScriptSys* pSS)
 {
-	XScriptableBase::init(pSS, pCore, paramIdOffset);
+	XScriptableBase::init(pSS);
 
 	setGlobalName("Script");
 

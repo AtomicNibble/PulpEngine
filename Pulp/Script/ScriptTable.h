@@ -69,10 +69,15 @@ public:
 	void clear(void) X_FINAL; // clears the table, removes all the entries in the table.
 	size_t count(void) X_FINAL; // gets the count of elements into the object.
 
+	void setMetatable(IScriptTable* pMetatable) X_FINAL; // Assign a metatable to a table.
+
+	void* getThis(void) X_FINAL;
+
 	// member iteration.
 	IScriptTable::Iterator begin(void) X_FINAL;
-	bool next(Iterator &iter) X_FINAL;
-	void end(const Iterator &iter) X_FINAL;
+	bool next(Iterator& iter) X_FINAL;
+	void end(const Iterator& iter) X_FINAL;
+	
 
 	bool clone(IScriptTable* pSrcTable, bool bDeepCopy = false, bool bCopyByReference = false) X_FINAL;
 	void dump(IScriptTableDumpSink* p) X_FINAL;
@@ -83,7 +88,6 @@ public:
 
 	void createNew(void);
 	void deleteThis(void);
-	void setMetatable(IScriptTable* pMetatable); // Assign a metatable to a table.
 	
 	int32_t getRef(void) const;
 	void attach(IScriptTable* pSO); // push that table and aattach.
@@ -104,11 +108,11 @@ private:
 public:
 	static lua_State* L;
 	static XScriptSys* pScriptSystem_;
-	static std::set<class XScriptTable*> s_allTables_;
+	// static std::set<class XScriptTable*> s_allTables_;
 
 private:
-	int32_t refCount_;
 	int32_t luaRef_;
+	int32_t refCount_;
 
 #if X_DEBUG
 	core::ToggleChecker setChainActive_;

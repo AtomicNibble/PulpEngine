@@ -7,7 +7,7 @@ namespace lua
 {
 	namespace
 	{
-		static const char* g_StackLevel[] =
+		const char* g_StackLevel[] =
 		{
 			"",
 			"  ",
@@ -19,39 +19,39 @@ namespace lua
 			"              ",
 		};
 
-		static const int max_stack_lvl = sizeof(g_StackLevel) / sizeof(g_StackLevel[0]);
+		const int max_stack_lvl = X_ARRAY_SIZE(g_StackLevel);
 
-		void dumpCallStack(lua_State *L)
-		{
-			lua_Debug ar;
-			core::zero_object(ar);
-
-			X_LOG_BULLET;
-
-			int level = 0;
-			while (lua_getstack(L, level++, &ar))
-			{
-				if (level >= max_stack_lvl) {
-					level = max_stack_lvl - 1;
-				}
-
-				int res = lua_getinfo(L, "lnS", &ar);
-				X_UNUSED(res); // TODO
-				if (ar.name)
-				{
-					X_LOG0("ScriptError", "%s> %s, (%s: %i)",
-						g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
-				}
-				else
-				{
-					X_LOG0("ScriptError", "%s> (null) (%s: %i)",
-						g_StackLevel[level], ar.short_src, ar.currentline);
-				}
-			}
-		}
 
 	} // namespace
 
+
+	void dumpCallStack(lua_State *L)
+	{
+		lua_Debug ar;
+		core::zero_object(ar);
+
+		X_LOG_BULLET;
+		X_ERROR("ScriptError", "CallStack");
+
+		int level = 0;
+		while (lua_getstack(L, level++, &ar))
+		{
+			level = core::Min(level, max_stack_lvl - 1);
+
+			int res = lua_getinfo(L, "lnS", &ar);
+			X_UNUSED(res); // TODO
+			if (ar.name)
+			{
+				X_LOG0("ScriptError", "%s> %s, (%s: %i)",
+					g_StackLevel[level], ar.name, ar.short_src, ar.currentline);
+			}
+			else
+			{
+				X_LOG0("ScriptError", "%s> (null) (%s: %i)",
+					g_StackLevel[level], ar.short_src, ar.currentline);
+			}
+		}
+	}
 
 	int32_t myLuaPanic(lua_State *L)
 	{
