@@ -180,9 +180,7 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 	switch (value.getType())
 	{
 		case Type::String:
-
 		X_LOG0("Script", value.str_.pStr);
-
 		break;
 	}
 
