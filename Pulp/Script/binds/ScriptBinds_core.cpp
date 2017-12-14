@@ -44,9 +44,6 @@ void XBinds_Core::init(IScriptSys* pSS, ICore* pCore)
 	X_CORE_REG_FUNC(Warning);
 	X_CORE_REG_FUNC(Error);
 
-
-
-
 }
 
 
@@ -57,15 +54,15 @@ int XBinds_Core::GetDvarInt(IFunctionHandler* pH)
 	const char* varName = nullptr;
 	pH->getParam(1, varName);
 
-	core::ICVar* var = pConsole_->GetCVar(varName);
+	core::ICVar* pVar = pConsole_->GetCVar(varName);
 
-	if (var)
+	if (pVar)
 	{
-		return pH->endFunction(var->GetInteger());
+		return pH->endFunction(pVar->GetInteger());
 	}
 	else
 	{
-		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to find dvar: \"%s\"", varName);
 	}
 
 	return pH->endFunction();
@@ -78,15 +75,15 @@ int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
 	const char* varName = nullptr;
 	pH->getParam(1, varName);
 
-	core::ICVar* var = pConsole_->GetCVar(varName);
+	core::ICVar* pVar = pConsole_->GetCVar(varName);
 
-	if (var)
+	if (pVar)
 	{
-		return pH->endFunction(var->GetFloat());
+		return pH->endFunction(pVar->GetFloat());
 	}
 	else
 	{
-		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to find dvar: \"%s\"", varName);
 	}
 
 	return pH->endFunction();
@@ -99,26 +96,31 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
 	const char* varName = nullptr;
 	pH->getParam(1, varName);
 
-	core::ICVar* var = pConsole_->GetCVar(varName);
+	core::ICVar* pVar = pConsole_->GetCVar(varName);
 
-	if (var)
+	if (pVar)
 	{
-		if (var->GetType() == core::VarFlag::INT)
-			return pH->endFunction(var->GetInteger());
-		if (var->GetType() == core::VarFlag::FLOAT)
-			return pH->endFunction(var->GetFloat());
-
-		{
-			core::ICVar::StrBuf strBuf;
-			if (var->GetType() == core::VarFlag::STRING)
-				return pH->endFunction(var->GetString(strBuf));
-			if (var->GetType() == core::VarFlag::COLOR)
-				return pH->endFunction(var->GetString(strBuf));
+		if (pVar->GetType() == core::VarFlag::INT) {
+			return pH->endFunction(pVar->GetInteger());
 		}
+		if (pVar->GetType() == core::VarFlag::FLOAT) {
+			return pH->endFunction(pVar->GetFloat());
+		}
+
+		core::ICVar::StrBuf strBuf;
+		if (pVar->GetType() == core::VarFlag::STRING) {
+			return pH->endFunction(pVar->GetString(strBuf));
+		}
+		if (pVar->GetType() == core::VarFlag::COLOR) {
+			return pH->endFunction(pVar->GetString(strBuf));
+		}
+
+		X_ASSERT_NOT_IMPLEMENTED();
+
 	}
 	else
 	{
-		pScriptSys_->onScriptError("Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("Failed to find dvar: \"%s\"", varName);
 	}
 
 	return pH->endFunction();
@@ -132,9 +134,9 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 	const char* varName = nullptr;
 	pH->getParam(1, varName);
 
-	core::ICVar* var = pConsole_->GetCVar(varName);
+	core::ICVar* pVar = pConsole_->GetCVar(varName);
 
-	if (var)
+	if (pVar)
 	{
 		Type::Enum type = pH->getParamType(2);
 
@@ -142,18 +144,22 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
 		{
 			float fValue = 0;
 			pH->getParam(2, fValue);
-			var->Set(fValue);
+			pVar->Set(fValue);
 		}
 		else if (type == Type::String)
 		{
 			const char* sValue = "";
 			pH->getParam(2, sValue);
-			var->Set(sValue);
+			pVar->Set(sValue);
+		}
+		else
+		{
+			X_ASSERT_NOT_IMPLEMENTED();
 		}
 	}
 	else
 	{
-		pScriptSys_->onScriptError("GetDvar Failed to fine dvar: \"%s\"", varName);
+		pScriptSys_->onScriptError("GetDvar Failed to find dvar: \"%s\"", varName);
 	}
 
 	return pH->endFunction();
@@ -172,13 +178,11 @@ int XBinds_Core::Log(IFunctionHandler* pH)
 		case Type::String:
 		X_LOG0("Script", value.str_.pStr);
 		break;
+		default:
+			X_LOG0("Script", "Can't log type: %s", Type::ToString(value.getType()));
+		break;
 	}
 
-//	const char* str = nullptr;
-//	if (pH->getParam(1, str))
-//	{
-//		X_LOG0("Script", str);
-//	}
 
 	return pH->endFunction();
 }

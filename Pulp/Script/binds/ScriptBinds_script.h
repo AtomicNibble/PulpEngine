@@ -17,8 +17,6 @@ private:
 	int ReLoad(IFunctionHandler* pH);
 	int UnLoad(IFunctionHandler* pH);
 
-	int ListLoaded(IFunctionHandler* pH);
-
 private:
 };
 

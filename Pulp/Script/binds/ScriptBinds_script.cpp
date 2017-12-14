@@ -34,7 +34,6 @@ void XBinds_Script::init(IScriptSys* pSS)
 	X_SCRIPT_REG_FUNC(ReLoad);
 	X_SCRIPT_REG_FUNC(UnLoad);
 
-	X_SCRIPT_REG_FUNC(ListLoaded);
 }
 
 int XBinds_Script::Load(IFunctionHandler* pH)
@@ -78,15 +77,6 @@ int XBinds_Script::UnLoad(IFunctionHandler* pH)
 	//		return pH->endFunction(1);
 	//	}
 	}
-
-	return pH->endFunction();
-}
-
-int XBinds_Script::ListLoaded(IFunctionHandler* pH)
-{
-	SCRIPT_CHECK_PARAMETERS(0);
-
-//	pScriptSys_->ListLoadedScripts();
 
 	return pH->endFunction();
 }
