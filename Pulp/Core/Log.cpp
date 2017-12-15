@@ -9,24 +9,22 @@ X_NAMESPACE_BEGIN(core)
 namespace {
 
 	const char *const INDENTATION_STRINGS[16] = {
-
-		"| ",
-		"|    ",
-		"|      ",
-		"|        ",
-		"|          ",
-		"|			  ",
-		"|              ",
-		"|                ",
-		"|                  ",
-		"|                    ",
-		"|                      ",
-		"|                        ",
-		"|                          ",
-		"|                            ",
-		"|                              ",
-		"|                                "
-
+		"",
+		"  ",
+		"    ",
+		"      ",
+		"        ",
+		"          ",
+		"            ",
+		"              ",
+		"                ",
+		"                  ",
+		"                    ",
+		"                      ",
+		"                        ",
+		"                          ",
+		"                            ",
+		"                               "
 	};
 
 	#define X_CALL_LOGGERS( pfnc ) \

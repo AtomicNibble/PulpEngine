@@ -30,12 +30,12 @@ uint32_t LoggerExtendedFormatPolicy::Format(LoggerBase::Line& line, const char* 
 	int bytesWritten; 
 
 #if X_ENABLE_LOGGING_SOURCE_INFO
-	bytesWritten = _snprintf_s(line, _TRUNCATE, "%s(%d): [%s:%s] %s",  
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "%s(%d): [%s:%s] | %s",  
 		sourceInfo.file_, sourceInfo.line_, sourceInfo.module_, channel, 
 		indentation
 	);
 #else
-	bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s] %s", channel, indentation);
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s] | %s", channel, indentation);
 #endif // !X_ENABLE_LOGGING_SOURCE_INFO
 
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);

@@ -39,13 +39,13 @@ uint32_t LoggerFullFormatPolicy::Format(LoggerBase::Line& line, const char* inde
 	time.ToString(TimeStr);
 
 #if X_ENABLE_LOGGING_SOURCE_INFO
-	int32_t bytesWritten = _snprintf_s( line, _TRUNCATE, "[%s %s] %s(%d): [%s:%s] %s", 
+	int32_t bytesWritten = _snprintf_s( line, _TRUNCATE, "[%s %s] %s(%d): [%s:%s] | %s", 
 		DateStr, TimeStr,
 		sourceInfo.file_, sourceInfo.line_, sourceInfo.module_, 
 		channel, indentation
 	);
 #else
-	int32_t bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s %s] : [%s] %s", DateStr, TimeStr, channel, indentation);
+	int32_t bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s %s] : [%s] | %s", DateStr, TimeStr, channel, indentation);
 #endif // !X_ENABLE_LOGGING_SOURCE_INFO
 
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);

@@ -40,7 +40,7 @@ uint32_t LoggerInternalConsoleFormatPolicy::Format(LoggerBase::Line& line, const
 		}
 	} 
 
-	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-15s^%c", channel, colorCode);
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "^4%-15s^%c%s", channel, colorCode, indentation);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");
 

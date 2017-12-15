@@ -28,7 +28,7 @@ uint32_t LoggerSimpleFormatPolicy::Format(LoggerBase::Line& line, const char* in
 	X_UNUSED(type, verbosity);
 	
 	int32_t bytesWritten;
-	bytesWritten = _snprintf_s(line, _TRUNCATE, "%-20s%s", channel, indentation);
+	bytesWritten = _snprintf_s(line, _TRUNCATE, "%-20s| %s", channel, indentation);
 	bytesWritten += vsnprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, format, args);
 	bytesWritten += _snprintf_s(&line[bytesWritten], sizeof(LoggerBase::Line) - bytesWritten, _TRUNCATE, "\n");
 
