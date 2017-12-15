@@ -91,6 +91,19 @@
     <ClInclude Include="lualib.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="lib_aux.c" />
+    <ClCompile Include="lib_base.c" />
+    <ClCompile Include="lib_bit.c" />
+    <ClCompile Include="lib_debug.c" />
+    <ClCompile Include="lib_ffi.c" />
+    <ClCompile Include="lib_init.c" />
+    <ClCompile Include="lib_io.c" />
+    <ClCompile Include="lib_jit.c" />
+    <ClCompile Include="lib_math.c" />
+    <ClCompile Include="lib_os.c" />
+    <ClCompile Include="lib_package.c" />
+    <ClCompile Include="lib_string.c" />
+    <ClCompile Include="lib_table.c" />
     <ClCompile Include="lj_alloc.c">
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <PreprocessorDefinitions Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -338,19 +351,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <Object Include="lib_aux.obj" />
-    <Object Include="lib_base.obj" />
-    <Object Include="lib_bit.obj" />
-    <Object Include="lib_debug.obj" />
-    <Object Include="lib_ffi.obj" />
-    <Object Include="lib_init.obj" />
-    <Object Include="lib_io.obj" />
-    <Object Include="lib_jit.obj" />
-    <Object Include="lib_math.obj" />
-    <Object Include="lib_os.obj" />
-    <Object Include="lib_package.obj" />
-    <Object Include="lib_string.obj" />
-    <Object Include="lib_table.obj" />
     <Object Include="lj_vm.obj" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
