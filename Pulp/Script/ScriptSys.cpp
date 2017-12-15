@@ -867,10 +867,12 @@ void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
 	
 	for (auto* pBind : scriptBinds_)
 	{
-		X_LOG0("Script", "^2%s", pBind->getGlobalName());
-		X_LOG_BULLET;
-
-		pBind->getMethodsTable()->dump(&dumper);
+		X_LOG0("Script", "^2%s^7 = {", pBind->getGlobalName());
+		{
+			X_LOG_BULLET;
+			pBind->getMethodsTable()->dump(&dumper);
+		}
+		X_LOG0("Script", "}");
 	}
 
 	X_LOG0("Script", "------------- ^8Binds End^7 --------------");
