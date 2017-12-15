@@ -100,9 +100,6 @@
     <ClCompile Include="binds\ScriptBinds_io.cpp">
       <Filter>Binds</Filter>
     </ClCompile>
-    <ClCompile Include="TableDump.cpp">
-      <Filter>Header Files</Filter>
-    </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
@@ -119,6 +116,9 @@
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
     <ClCompile Include="ScriptBinds.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="TableDump.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
