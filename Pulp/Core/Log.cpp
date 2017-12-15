@@ -8,6 +8,8 @@ X_NAMESPACE_BEGIN(core)
 
 namespace {
 
+	// Could potentially add the '|' back here.
+	// and just have the internal console format policy +1 on the indentation string it's given.
 	const char *const INDENTATION_STRINGS[16] = {
 		"",
 		"  ",
@@ -50,7 +52,7 @@ XLog::~XLog()
 void XLog::Init(void)
 {
 	// no point printing a 'starting msg' since  log system 
-	// not quite ready yet xD
+	// not quite ready yet :)
 
 //	ADD_CVAR_REF("log_verbosity", logVerbosity_, 0, 0, 2, 0, "Logging verbosity");
 
