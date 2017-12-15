@@ -60,10 +60,22 @@ public:
 	virtual void releaseFunc(ScriptFunctionHandle f) X_FINAL;
 
 	virtual IScriptTable* createTable(bool bEmpty = false) X_FINAL;
-
-
+	
 	virtual void setGlobalValue(const char* pKey, const ScriptValue& val) X_FINAL;
 	virtual bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
+
+	virtual bool call(ScriptFunctionHandle f) X_FINAL;
+
+	virtual bool beginCall(ScriptFunctionHandle f) X_FINAL;
+	virtual bool beginCall(const char* pFunName) X_FINAL;
+	virtual bool beginCall(const char* pTableName, const char* pFunName) X_FINAL;
+	virtual bool beginCall(IScriptTable* pTable, const char* pFunName) X_FINAL;
+
+	virtual void pushCallArg(const ScriptValue& any) X_FINAL;
+
+	bool endCall(int32_t numReturnValues);
+	virtual bool endCall(void) X_FINAL;
+	virtual bool endCall(ScriptValue& value) X_FINAL;
 
 	virtual IScriptTable* createUserData(void* ptr, size_t size) X_FINAL;
 
@@ -104,6 +116,7 @@ private:
 	PoolArena					poolArena_;
 
 	lua::RefId errrorHandler_;
+	int32_t numCallParams_;
 
 	ScriptVars vars_;
 

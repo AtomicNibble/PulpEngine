@@ -33,7 +33,8 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 		PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
 		PoolArena::getMemoryOffsetRequirement()
 	),
-	poolArena_(&poolAllocator_, "TablePool")
+	poolArena_(&poolAllocator_, "TablePool"),
+	numCallParams_(-1)
 {
 	arena->addChildArena(&poolArena_);
 
@@ -355,6 +356,135 @@ bool XScriptSys::getGlobalValue(const char* pKey, ScriptValue& any)
 
 	return true;
 }
+
+bool XScriptSys::call(ScriptFunctionHandle f)
+{
+	if (!beginCall(f)) {
+		return false;
+	}
+
+	return endCall(0);
+}
+
+bool XScriptSys::beginCall(ScriptFunctionHandle f)
+{
+	X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
+
+	if (f == INVALID_HANLDE) {
+		return false;
+	}
+
+	stack::push_ref(L, f);
+
+	X_ASSERT(stack::isfunction(L), "Invalid function handle")(f);
+	return true;
+}
+
+bool XScriptSys::beginCall(const char* pFunName) 
+{
+	X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
+
+	stack::push_global(L, pFunName);
+
+	if (stack::isfunction(L)) {
+		X_ERROR("Script", "Function \"%s\" not found.", pFunName);
+		return false;
+	}
+
+	numCallParams_ = 0;
+	return true;
+}
+
+
+bool XScriptSys::beginCall(const char* pTableName, const char* pFunName) 
+{
+	X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
+
+	stack::push_global(L, pTableName);
+
+	if (!stack::istable(L)) {
+		X_ERROR("Script", "Table \"%s\" not found", pTableName);
+		return false;
+	}
+
+	stack::push_table_value(L, -2, pFunName);
+	stack::remove(L, -2);
+
+	if (!stack::isfunction(L)) {
+		X_ERROR("Script", "Function \"%s\" not found on table: \"%s\"", pFunName, pTableName);
+		return false;
+	}
+
+	numCallParams_ = 0;
+	return true;
+}
+
+bool XScriptSys::beginCall(IScriptTable* pTable, const char* pFunName) 
+{
+	X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
+
+	pushTable(pTable);
+
+	stack::push_table_value(L, -2, pFunName);
+	stack::remove(L, -2);
+
+	if (!stack::isfunction(L)) {
+		X_ERROR("Script", "Function \"%s\" not found on table: %p", pFunName, pTable);
+		return false;
+	}
+
+	numCallParams_ = 0;
+	return true;
+}
+
+
+void XScriptSys::pushCallArg(const ScriptValue& any)
+{
+	X_ASSERT(numCallParams_ >= 0, "PushFuncArg called without a valid begin call")(numCallParams_);
+
+	pushAny(any);
+	++numCallParams_;
+}
+
+bool XScriptSys::endCall(int32_t numReturnValues)
+{
+	X_ASSERT(numCallParams_ >= 0, "endCall called without a valid begin call")(numCallParams_);
+
+	int32_t fucIndex = stack::top(L) - numCallParams_;
+
+	stack::push_ref(L, errrorHandler_);
+	stack::move_top_to(L, fucIndex); 
+
+	auto status = stack::pcall(L, numCallParams_, numReturnValues, fucIndex);
+
+	stack::remove(L, fucIndex);
+
+	numCallParams_ = -1;
+
+	if (status != CallResult::Ok)
+	{
+		X_ERROR("Script", "Function call failed: %s", CallResult::ToString(status));
+		return false;
+	}
+
+	return true;
+}
+
+
+bool XScriptSys::endCall(void) 
+{
+	return endCall(0);
+}
+
+bool XScriptSys::endCall(ScriptValue& value) 
+{
+	if (!endCall(1)) {
+		return false;
+	}
+
+	return popAny(value);
+}
+
 
 IScriptTable* XScriptSys::createUserData(void* pPtr, size_t size)
 {

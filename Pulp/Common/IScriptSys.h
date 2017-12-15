@@ -213,6 +213,24 @@ struct IScriptSys : public core::IEngineSysBase
 	template <class T>
 	X_INLINE bool getGlobalValue(const char* pKey, T& value);
 
+	// Call api
+	// 
+	// beginCall(...);
+	// pushFuncArg("meow");
+	// pushFuncArg(2);
+	// endCall();
+	virtual bool call(ScriptFunctionHandle f) X_ABSTRACT;
+
+	virtual bool beginCall(ScriptFunctionHandle f) X_ABSTRACT;
+	virtual bool beginCall(const char* pFunName) X_ABSTRACT;
+	virtual bool beginCall(const char* pTableName, const char* pFunName) X_ABSTRACT;
+	virtual bool beginCall(IScriptTable* pTable, const char* pFunName) X_ABSTRACT;
+
+	virtual void pushCallArg(const ScriptValue& any) X_ABSTRACT;
+
+	virtual bool endCall(void) X_ABSTRACT;
+	virtual bool endCall(ScriptValue& value) X_ABSTRACT;
+
 	virtual IScriptTable* createUserData(void* ptr, size_t size) X_ABSTRACT;
 
 	virtual void onScriptError(const char* fmt, ...) X_ABSTRACT;
