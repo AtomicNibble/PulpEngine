@@ -1959,7 +1959,8 @@ void XConsole::ExecuteCommand(const ConsoleCommand &cmd,
 {
 	str.replace('"', '\'');
 
-	X_LOG_BULLET;
+	// dunno what I added this for but it's annoying.
+	// X_LOG_BULLET;
 
 	if (cmd.Flags.IsSet(VarFlag::CHEAT))
 	{
