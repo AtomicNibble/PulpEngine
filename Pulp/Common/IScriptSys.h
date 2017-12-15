@@ -290,28 +290,12 @@ struct IFunctionHandler
 
 #endif
 
-
-
 struct IScriptTableDumpSink
 {
 	virtual ~IScriptTableDumpSink(){}
 	virtual void OnElementFound(const char* pName, Type::Enum type) X_ABSTRACT;
 	virtual void OnElementFound(int idx, Type::Enum type) X_ABSTRACT;
 };
-
-/*
-
-struct IScriptTableIterator
-{
-	virtual ~IScriptTableIterator(){}
-	virtual void AddRef();
-	// Summary:
-	//	 Decrements reference delete script table iterator.
-	virtual void Release();
-
-	virtual bool Next(ScriptValue &var);
-};
-*/
 
 struct ScriptFunctionDesc
 {
