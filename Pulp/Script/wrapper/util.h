@@ -40,24 +40,24 @@ namespace lua
 
 	struct LuaStackValidator
 	{
-		LuaStackValidator(lua_State *pL, const char *sText)
+		LuaStackValidator(lua_State* pL, const char* sText)
 		{
-			text = sText;
-			L = pL;
-			top = lua_gettop(L);
+			pText_ = sText;
+			L_ = pL;
+			top_ = lua_gettop(L_);
 		}
 		~LuaStackValidator()
 		{
-			if (top != lua_gettop(L))
+			if (top_ != lua_gettop(L_))
 			{
-				X_ASSERT(false, "Lua Stack Validation Failed")();
-				lua_settop(L, top);
+				X_ASSERT(false, "Lua Stack Validation Failed")(pText_);
+				lua_settop(L_, top_);
 			}
 		}
 
-		const char *text;
-		lua_State *L;
-		int top;
+		const char* pText_;
+		lua_State *L_;
+		int top_;
 	};
 
 	#define X_LUA_CHECK_STACK(L) LuaStackValidator __stackCheck__((L),__FUNCTION__);
