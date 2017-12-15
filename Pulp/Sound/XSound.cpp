@@ -261,6 +261,8 @@ void XSound::registerScriptBinds(void)
 	auto* pScriptSys = gEnv->pScriptSys;
 
 	pScriptBinds_ = X_NEW(ScriptBinds_Sound, arena_, "SoundScriptBinds")(pScriptSys, this);
+
+	pScriptBinds_->bind();
 }
 
 bool XSound::init(void)
