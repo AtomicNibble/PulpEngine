@@ -697,5 +697,73 @@ X_INLINE bool SmartScriptTable::create(IScriptSys* pSS, bool createEmpty = false
 	return pTable_ != nullptr;
 }
 
+// ------------------------------------------------------------------------
+
+X_INLINE SmartScriptFunction::SmartScriptFunction() :
+	func_(INVALID_HANLDE),
+	pSS_(nullptr)
+{
+
+}
+
+X_INLINE SmartScriptFunction::SmartScriptFunction(IScriptSys* pSS, ScriptFunctionHandle func) :
+	func_(func),
+	pSS_(pSS)
+{
+
+}
+
+
+X_INLINE SmartScriptFunction::SmartScriptFunction(SmartScriptFunction&& oth) :
+	func_(oth.func_),
+	pSS_(oth.pSS_)
+{
+	oth.func_ = INVALID_HANLDE;
+	oth.pSS_ = nullptr;
+}
+
+X_INLINE SmartScriptFunction::~SmartScriptFunction()
+{
+	if (func_ != INVALID_HANLDE) {
+		pSS_->releaseFunc(func_);
+	}
+}
+
+X_INLINE SmartScriptFunction& SmartScriptFunction::operator=(SmartScriptFunction&& oth)
+{
+	func_ = oth.func_;
+	pSS_ = oth.pSS_;
+
+	oth.func_ = INVALID_HANLDE;
+	oth.pSS_ = nullptr;
+	return *this;
+}
+
+X_INLINE SmartScriptFunction::operator ScriptFunctionHandle() const
+{
+	return func_;
+}
+
+X_INLINE ScriptFunctionHandle SmartScriptFunction::get(void) const
+{
+	return func_;
+}
+
+X_INLINE void SmartScriptFunction::swap(SmartScriptFunction& oth)
+{
+	core::Swap(func_, oth.func_);
+	core::Swap(pSS_, oth.pSS_);
+}
+
+X_INLINE void SmartScriptFunction::reset(void)
+{
+	SmartScriptFunction().swap(*this);
+}
+
+X_INLINE void SmartScriptFunction::reset(IScriptSys* pSS, ScriptFunctionHandle func)
+{
+	SmartScriptFunction(pSS, func).swap(*this);
+}
+
 
 X_NAMESPACE_END

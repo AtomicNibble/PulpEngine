@@ -493,6 +493,30 @@ private:
 	IScriptTable* pTable_;
 };
 
+class SmartScriptFunction
+{
+public:
+	X_INLINE SmartScriptFunction();
+	X_INLINE SmartScriptFunction(IScriptSys* pSS, ScriptFunctionHandle func);
+	X_INLINE SmartScriptFunction(const SmartScriptFunction& other) = delete;
+	X_INLINE SmartScriptFunction(SmartScriptFunction&& other);
+	X_INLINE ~SmartScriptFunction();
+
+	X_INLINE SmartScriptFunction& operator=(const SmartScriptFunction& other) = delete;
+	X_INLINE SmartScriptFunction& operator=(SmartScriptFunction&& other);
+
+	X_INLINE operator ScriptFunctionHandle() const;
+	X_INLINE ScriptFunctionHandle get(void) const;
+
+	X_INLINE void swap(SmartScriptFunction& other);
+	X_INLINE void reset(void);
+	X_INLINE void reset(IScriptSys* pSS, ScriptFunctionHandle func);
+
+private:
+	ScriptFunctionHandle func_;
+	IScriptSys* pSS_;
+};
+
 
 X_NAMESPACE_END
 
