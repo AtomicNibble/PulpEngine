@@ -120,7 +120,7 @@ private:
 
 	ScriptVars vars_;
 
-	XScriptBinds binds_;
+	XScriptBinds baseBinds_;
 	ScriptFileList fileList_;
 	bool initialised_;
 };

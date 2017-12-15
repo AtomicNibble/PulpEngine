@@ -90,7 +90,7 @@ bool XScriptSys::init(void)
 	XScriptTable::pScriptSystem_ = this;
 
 
-	binds_.Init(this, gEnv->pCore);
+	baseBinds_.Init(this, gEnv->pCore);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
@@ -99,7 +99,7 @@ bool XScriptSys::init(void)
 
 #if 0
 
-	binds_.Init(this, gEnv->pCore);
+	baseBinds_.Init(this, gEnv->pCore);
 
 
 #endif
@@ -139,7 +139,7 @@ void XScriptSys::shutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, X_SCRIPT_FILE_EXTENSION);
 
 	// must be done before lua closes.
-	binds_.Shutdown();
+	baseBinds_.Shutdown();
 
 #if 0
 	for (std::set<XScriptTable*>::iterator it = XScriptTable::s_allTables_.begin();
