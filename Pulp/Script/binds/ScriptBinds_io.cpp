@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "ScriptBinds_io.h"
 
+
 #include <IFileSys.h>
 
 #include "ScriptTable.h"
@@ -11,23 +12,12 @@
 
 X_NAMESPACE_BEGIN(script)
 
-#define X_IO_REG_FUNC(func)  \
-{ \
-	ScriptFunction Delegate; \
-	Delegate.Bind<XBinds_Io, &XBinds_Io::func>(this); \
-	registerFunction(#func, Delegate); \
-}
 
-#define X_IO_FILE_REG_FUNC(func)  \
-{ \
-	ScriptFunction Delegate; \
-	Delegate.Bind<XBinds_Io_File, &XBinds_Io_File::func>(this); \
-	registerFunction(#func, Delegate); \
-}
-
-XBinds_Io_File::XBinds_Io_File(IScriptSys* pSS, ICore* pCore)
+XBinds_Io_File::XBinds_Io_File(XScriptSys* pSS) :
+	XScriptBindsBase(pSS),
+	pFileSys_(nullptr)
 {
-	init(pSS, pCore);
+	
 }
 
 XBinds_Io_File::~XBinds_Io_File()
@@ -35,18 +25,19 @@ XBinds_Io_File::~XBinds_Io_File()
 
 }
 
-void XBinds_Io_File::init(IScriptSys* pSS, ICore* pCore)
+void XBinds_Io_File::bind(ICore* pCore)
 {
-	XScriptableBase::init(pSS, 1);
-
 	X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
 	pFileSys_ = X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
-	X_IO_FILE_REG_FUNC(write);
-	X_IO_FILE_REG_FUNC(read);
-	X_IO_FILE_REG_FUNC(seek);
-	X_IO_FILE_REG_FUNC(close);
+	createBindTable();
+	
+
+	X_SCRIPT_BIND(XBinds_Io_File, write);
+	X_SCRIPT_BIND(XBinds_Io_File, read);
+	X_SCRIPT_BIND(XBinds_Io_File, seek);
+	X_SCRIPT_BIND(XBinds_Io_File, close);
 
 #if 0
 	IScriptTable::XUserFunctionDesc fd;
@@ -346,10 +337,12 @@ int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size
 
 // --------------------------------------------------
 
-XBinds_Io::XBinds_Io(IScriptSys* pSS, ICore* pCore) :
-	file_(pSS, pCore)
+XBinds_Io::XBinds_Io(XScriptSys* pSS) :
+	XScriptBindsBase(pSS),
+	pFileSys_(nullptr),
+	file_(pSS)
 {
-	init(pSS, pCore);
+
 }
 
 XBinds_Io::~XBinds_Io()
@@ -357,16 +350,15 @@ XBinds_Io::~XBinds_Io()
 
 }
 
-void XBinds_Io::init(IScriptSys* pSS, ICore* pCore)
+void XBinds_Io::bind(ICore* pCore)
 {
-	XScriptableBase::init(pSS);
-	
 	pFileSys_ = pCore->GetIFileSys();
 
+	createBindTable();
 	setGlobalName("io");
 
-	X_IO_REG_FUNC(openFile);
-	X_IO_REG_FUNC(closeFile);
+	X_SCRIPT_BIND(XBinds_Io, openFile);
+	X_SCRIPT_BIND(XBinds_Io, closeFile);
 }
 
 

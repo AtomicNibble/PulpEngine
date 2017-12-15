@@ -9,15 +9,11 @@
 
 X_NAMESPACE_BEGIN(script)
 
-#define X_CORE_REG_FUNC(func)  \
-{	ScriptFunction Delegate; \
-	Delegate.Bind<XBinds_Core, &XBinds_Core::func>(this); \
-	registerFunction(#func, Delegate); }
 
-
-XBinds_Core::XBinds_Core(IScriptSys* pSS, ICore* pCore)
+XBinds_Core::XBinds_Core(XScriptSys* pSS) :
+	XScriptBindsBase(pSS)
 {
-	init(pSS, pCore);
+	
 }
 
 XBinds_Core::~XBinds_Core()
@@ -26,23 +22,22 @@ XBinds_Core::~XBinds_Core()
 }
 
 
-void XBinds_Core::init(IScriptSys* pSS, ICore* pCore)
+void XBinds_Core::bind(ICore* pCore)
 {
-	XScriptableBase::init(pSS);
-
 	pConsole_ = X_ASSERT_NOT_NULL(pCore->GetIConsole());
 	pTimer_ = X_ASSERT_NOT_NULL(pCore->GetITimer());
 
+	createBindTable();
 	setGlobalName("Core");
 
-	X_CORE_REG_FUNC(GetDvarInt);
-	X_CORE_REG_FUNC(GetDvarFloat);
-	X_CORE_REG_FUNC(GetDvar);
-	X_CORE_REG_FUNC(SetDvar);
+	X_SCRIPT_BIND(XBinds_Core, GetDvarInt);
+	X_SCRIPT_BIND(XBinds_Core, GetDvarFloat);
+	X_SCRIPT_BIND(XBinds_Core, GetDvar);
+	X_SCRIPT_BIND(XBinds_Core, SetDvar);
 
-	X_CORE_REG_FUNC(Log);
-	X_CORE_REG_FUNC(Warning);
-	X_CORE_REG_FUNC(Error);
+	X_SCRIPT_BIND(XBinds_Core, Log);
+	X_SCRIPT_BIND(XBinds_Core, Warning);
+	X_SCRIPT_BIND(XBinds_Core, Error);
 
 }
 

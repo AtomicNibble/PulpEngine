@@ -480,71 +480,28 @@ X_INLINE void IScriptTable::setToNullChain(const char* pKey)
 
 // ----------------------------------------------------------------
 
-X_INLINE XScriptableBase::XScriptableBase() :
-	pScriptSys_(nullptr),
-	pMethodsTable_(nullptr),
-	paramIdOffset_(0)
+X_INLINE IScriptBindsBase::IScriptBindsBase(IScriptSys* pScriptSys) :
+	pScriptSys_(pScriptSys),
+	pBindTable_(nullptr)
 {
 
 }
 
-X_INLINE XScriptableBase::~XScriptableBase()
+X_INLINE IScriptTable* IScriptBindsBase::getMethodsTable(void)
 {
-	if (!name_.isEmpty() && pScriptSys_) {
-		pScriptSys_->setGlobalToNull(name_.c_str());
-	}
-	core::SafeRelease(pMethodsTable_);
+	return pBindTable_->getMethodsTable();
 }
 
-X_INLINE void XScriptableBase::init(IScriptSys* pSS, int paramIdOffset)
+X_INLINE void IScriptBindsBase::createBindTable(void)
 {
-	X_ASSERT_NOT_NULL(pSS);
-
-	pScriptSys_ = pSS;
-	pMethodsTable_ = pSS->createTable();
-	paramIdOffset_ = paramIdOffset;
+	pBindTable_ = pScriptSys_->createScriptBind();
 }
 
-
-X_INLINE void XScriptableBase::setGlobalName(const char* pGlobalName)
+X_INLINE void IScriptBindsBase::setGlobalName(const char* pGlobalName)
 {
-	name_.set(X_ASSERT_NOT_NULL(pGlobalName));
-
-	if (pMethodsTable_) {
-		pScriptSys_->setGlobalValue(name_.c_str(), pMethodsTable_);
-	}
+	pBindTable_->setGlobalName(pGlobalName);
 }
 
-X_INLINE IScriptTable* XScriptableBase::getMethodsTable(void)
-{
-	return pMethodsTable_;
-}
-
-
-X_INLINE void XScriptableBase::registerGlobal(const char* pName, float value)
-{
-	pScriptSys_->setGlobalValue(pName, value);
-}
-
-X_INLINE void XScriptableBase::registerGlobal(const char* pName, int value)
-{
-	pScriptSys_->setGlobalValue(pName, value);
-}
-
-
-X_INLINE void XScriptableBase::registerFunction(const char* pFuncName, const IScriptTable::ScriptFunction& function)
-{
-	if (pMethodsTable_)
-	{
-		ScriptFunctionDesc fd;
-		fd.pGlobalName = name_.c_str();
-		fd.pFunctionName = pFuncName;
-		fd.function = function;
-		fd.paramIdOffset = paramIdOffset_;
-
-		pMethodsTable_->addFunction(fd);
-	}
-}
 
 // ------------------------------------------------------------------------
 

@@ -6,14 +6,14 @@ X_NAMESPACE_BEGIN(sound)
 
 class XSound;
 
-class ScriptBinds_Sound : public script::XScriptableBase
+class ScriptBinds_Sound : public script::IScriptBindsBase
 {
 public:
 	ScriptBinds_Sound(script::IScriptSys* pSS, XSound* pSound);
-	~ScriptBinds_Sound() X_OVERRIDE;
+	~ScriptBinds_Sound();
 
 private:
-	void init(script::IScriptSys* pSS);
+	void bind(void);
 
 	int32_t PostEvent(script::IFunctionHandler* pH);
 	int32_t SetSwitch(script::IFunctionHandler* pH);

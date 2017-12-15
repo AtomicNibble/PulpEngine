@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef X_SCRIPT_BINDS_IO_H_
-#define X_SCRIPT_BINDS_IO_H_
+#include "ScriptBinds.h"
+
 
 X_NAMESPACE_DECLARE(core,
 struct IFileSys;
@@ -10,16 +10,20 @@ struct XFile;
 
 X_NAMESPACE_BEGIN(script)
 
+
+class XScriptableBase;
+class XScriptSys;
+
 class XBinds_Io;
-class XBinds_Io_File : public XScriptableBase
+class XBinds_Io_File : public XScriptBindsBase
 {
 	friend class XBinds_Io;
 public:
-	XBinds_Io_File(IScriptSys* pSS, ICore* pCore);
-	~XBinds_Io_File() X_OVERRIDE;
+	XBinds_Io_File(XScriptSys* pSS);
+	~XBinds_Io_File();
 
 private:
-	void init(IScriptSys* pSS, ICore* pCore);
+	void bind(ICore* pCore) X_FINAL;
 
 	int write(IFunctionHandler* pH);
 	int read(IFunctionHandler* pH);
@@ -32,21 +36,22 @@ private:
 	int readBytes(IFunctionHandler* pH, core::XFile* pFile, uint32_t numBytes);
 
 protected:
-	core::IFileSys* pFileSys_;
-
 	static int garbageCollect(IFunctionHandler* pH, void* pBuffer, int size);
 	static core::XFile* getFile(IFunctionHandler* pH);
+
+protected:
+	core::IFileSys* pFileSys_;
 };
 
 
-class XBinds_Io : public XScriptableBase
+class XBinds_Io : public XScriptBindsBase
 {
 public:
-	XBinds_Io(IScriptSys* pSS, ICore* pCore);
-	~XBinds_Io() X_OVERRIDE;
+	XBinds_Io(XScriptSys* pSS);
+	~XBinds_Io();
 
-private:
-	void init(IScriptSys* pSS, ICore* pCore);
+	void bind(ICore* pCore) X_FINAL;
+private: 
 
 	int openFile(IFunctionHandler* pH);
 	int closeFile(IFunctionHandler* pH);
@@ -62,4 +67,3 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_SCRIPT_BINDS_IO_H_

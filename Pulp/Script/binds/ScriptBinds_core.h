@@ -12,16 +12,21 @@ struct ITimer;
 #undef DrawText
 #endif // !DrawText
 
+#include "ScriptBinds.h"
+
 X_NAMESPACE_BEGIN(script)
 
-class XBinds_Core : public XScriptableBase
+class XScriptableBase;
+class XScriptSys;
+
+class XBinds_Core : public XScriptBindsBase
 {
 public:
-	XBinds_Core(IScriptSys* pSS, ICore* pCore);
-	~XBinds_Core() X_OVERRIDE;
+	XBinds_Core(XScriptSys* pSS);
+	~XBinds_Core();
 
 private:
-	void init(IScriptSys* pSS, ICore* pCore);
+	void bind(ICore* pCore) X_FINAL;
 
 	int GetDvarInt(IFunctionHandler* pH);
 	int GetDvarFloat(IFunctionHandler* pH);

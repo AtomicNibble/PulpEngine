@@ -4,18 +4,11 @@
 
 X_NAMESPACE_BEGIN(script)
 
-#define X_SCRIPT_REG_FUNC(func)  \
-{ \
-	ScriptFunction Delegate; \
-	Delegate.Bind<XBinds_Script, &XBinds_Script::func>(this); \
-	registerFunction(#func, Delegate); \
-}
 
-
-
-XBinds_Script::XBinds_Script(IScriptSys* pSS)
+XBinds_Script::XBinds_Script(XScriptSys* pSS) :
+	XScriptBindsBase(pSS)
 {
-	init(pSS);
+	
 }
 
 XBinds_Script::~XBinds_Script()
@@ -24,15 +17,16 @@ XBinds_Script::~XBinds_Script()
 }
 
 
-void XBinds_Script::init(IScriptSys* pSS)
+void XBinds_Script::bind(ICore* pCore)
 {
-	XScriptableBase::init(pSS);
+	X_UNUSED(pCore);
 
+	createBindTable();
 	setGlobalName("Script");
 
-	X_SCRIPT_REG_FUNC(Load);
-	X_SCRIPT_REG_FUNC(ReLoad);
-	X_SCRIPT_REG_FUNC(UnLoad);
+	X_SCRIPT_BIND(XBinds_Script, Load);
+	X_SCRIPT_BIND(XBinds_Script, ReLoad);
+	X_SCRIPT_BIND(XBinds_Script, UnLoad);
 
 }
 

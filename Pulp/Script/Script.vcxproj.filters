@@ -38,9 +38,6 @@
     <ClInclude Include="ScriptSys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="binds\ScriptBinds.h">
-      <Filter>Binds</Filter>
-    </ClInclude>
     <ClInclude Include="binds\ScriptBinds_core.h">
       <Filter>Binds</Filter>
     </ClInclude>
@@ -80,6 +77,9 @@
     <ClInclude Include="Vars\ScriptVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="ScriptBinds.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -87,9 +87,6 @@
     </ClCompile>
     <ClCompile Include="ScriptSys.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="binds\ScriptBinds.cpp">
-      <Filter>Binds</Filter>
     </ClCompile>
     <ClCompile Include="binds\ScriptBinds_core.cpp">
       <Filter>Binds</Filter>
@@ -126,6 +123,9 @@
     </ClCompile>
     <ClCompile Include="Vars\ScriptVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="ScriptBinds.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

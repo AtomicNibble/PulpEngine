@@ -465,11 +465,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="binds\ScriptBinds.h" />
     <ClInclude Include="binds\ScriptBinds_core.h" />
     <ClInclude Include="binds\ScriptBinds_io.h" />
     <ClInclude Include="binds\ScriptBinds_script.h" />
     <ClInclude Include="FunctionHandler.h" />
+    <ClInclude Include="ScriptBinds.h" />
     <ClInclude Include="ScriptSys.h" />
     <ClInclude Include="ScriptTable.h" />
     <ClInclude Include="stdafx.h" />
@@ -483,12 +483,12 @@
     <ClInclude Include="wrapper\types.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="binds\ScriptBinds.cpp" />
     <ClCompile Include="binds\ScriptBinds_core.cpp" />
     <ClCompile Include="binds\ScriptBinds_io.cpp" />
     <ClCompile Include="binds\ScriptBinds_script.cpp" />
     <ClCompile Include="FunctionHandler.cpp" />
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="ScriptBinds.cpp" />
     <ClCompile Include="ScriptSys.cpp" />
     <ClCompile Include="ScriptTable.cpp" />
     <ClCompile Include="stdafx.cpp">

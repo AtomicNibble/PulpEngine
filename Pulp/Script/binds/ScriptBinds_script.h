@@ -1,17 +1,19 @@
 #pragma once
 
-#ifndef X_SCRIPT_BINDS_SCRIPT_H_
-#define X_SCRIPT_BINDS_SCRIPT_H_
+#include "ScriptBinds.h"
 
 X_NAMESPACE_BEGIN(script)
-class XBinds_Script : public XScriptableBase
+
+
+
+class XBinds_Script : public XScriptBindsBase
 {
 public:
-	XBinds_Script(IScriptSys* pSS);
-	~XBinds_Script() X_OVERRIDE;
+	XBinds_Script(XScriptSys* pSS);
+	~XBinds_Script();
 
 private:
-	void init(IScriptSys* pSS);
+	void bind(ICore* pCore) X_FINAL;
 
 	int Load(IFunctionHandler* pH);
 	int ReLoad(IFunctionHandler* pH);
@@ -22,4 +24,3 @@ private:
 
 X_NAMESPACE_END
 
-#endif // !X_SCRIPT_BINDS_SCRIPT_H_

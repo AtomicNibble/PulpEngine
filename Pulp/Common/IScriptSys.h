@@ -44,7 +44,7 @@ class SmartScriptTable;
 struct IScriptTableDumpSink;
 struct IScriptTableIterator;
 struct IScriptTable;
-
+struct IScriptBinds;
 
 // the only reason this is a custom type instead of a 32bit int.
 // if for type resolution in tempaltes / overloads. if we had strong types could use that.
@@ -198,7 +198,8 @@ struct IScriptSys : public core::IEngineSysBase
 	virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_ABSTRACT;
 	virtual void releaseFunc(ScriptFunctionHandle f) X_ABSTRACT;
 
-	virtual IScriptTable* createTable(bool bEmpty = false) X_ABSTRACT;
+	virtual IScriptTable* createTable(bool empty = false) X_ABSTRACT;
+	virtual IScriptBinds* createScriptBind(void) X_ABSTRACT;
 
 	// set values.
 	virtual void setGlobalValue(const char* pKey, const ScriptValue& any) X_ABSTRACT;
@@ -410,33 +411,44 @@ public:
 	X_INLINE void setToNullChain(const char* pKey);
 };
 
-class XScriptableBase
+
+
+struct IScriptBinds
 {
-public:
 	typedef IScriptTable::ScriptFunction ScriptFunction;
 
-public:
-	X_INLINE XScriptableBase();
-	X_INLINE virtual ~XScriptableBase();
+	virtual ~IScriptBinds() {}
 
-protected:
-	X_INLINE void init(IScriptSys* pSS, int paramIdOffset = 0);
-	X_INLINE void setGlobalName(const char* GlobalName);
+	virtual void setGlobalName(const char* pGlobalName) X_ABSTRACT;
+	virtual void setParamOffset(int paramIdOffset) X_ABSTRACT;
+	virtual IScriptTable* getMethodsTable(void) X_ABSTRACT;
+
+	virtual void registerFunction(const char* pFuncName, const IScriptTable::ScriptFunction& function) X_ABSTRACT;
+
+};
+
+struct IScriptBindsBase
+{
+public:
+	X_INLINE IScriptBindsBase(IScriptSys* pScriptSys);
 
 	X_INLINE IScriptTable* getMethodsTable(void);
+	
+	X_INLINE void createBindTable(void);
+	X_INLINE void setGlobalName(const char* pGlobalName);
+
 
 protected:
-	X_INLINE void registerGlobal(const char* pName, float value);
-	X_INLINE void registerGlobal(const char* pName, int value);
-
-	X_INLINE void registerFunction(const char* pFuncName, const IScriptTable::ScriptFunction& function);
-
-protected:
-	core::StackString<60> name_;
 	IScriptSys* pScriptSys_;
-	IScriptTable* pMethodsTable_;
-	int paramIdOffset_;
+	IScriptBinds* pBindTable_;
 };
+
+#define X_SCRIPT_BIND(classname, func)  \
+{ \
+	script::IScriptBinds::ScriptFunction Delegate; \
+	Delegate.Bind<classname, &classname::func>(this); \
+	pBindTable_->registerFunction(#func, Delegate); \
+}
 
 
 #define SCRIPT_CHECK_PARAMETERS(_n) \

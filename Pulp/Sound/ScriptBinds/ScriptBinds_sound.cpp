@@ -5,18 +5,11 @@
 
 X_NAMESPACE_BEGIN(sound)
 
-#define X_SOUND_REG_FUNC(func)  \
-{ \
-	ScriptFunction Delegate; \
-	Delegate.Bind<ScriptBinds_Sound, &ScriptBinds_Sound::func>(this); \
-	registerFunction(#func, Delegate); \
-}
-
-
 ScriptBinds_Sound::ScriptBinds_Sound(script::IScriptSys* pSS, XSound* pSound) :
+	IScriptBindsBase(pSS),
 	pSound_(X_ASSERT_NOT_NULL(pSound))
 {
-	init(pSS);
+	
 }
 
 ScriptBinds_Sound::~ScriptBinds_Sound()
@@ -24,21 +17,20 @@ ScriptBinds_Sound::~ScriptBinds_Sound()
 
 }
 
-void ScriptBinds_Sound::init(script::IScriptSys* pSS)
+void ScriptBinds_Sound::bind(void)
 {
-	XScriptableBase::init(pSS);
-
+	createBindTable();
 	setGlobalName("Sound");
 
-	X_SOUND_REG_FUNC(PostEvent);
-	X_SOUND_REG_FUNC(SetSwitch);
-	X_SOUND_REG_FUNC(SetStages);
-	X_SOUND_REG_FUNC(SetParam);
+	X_SCRIPT_BIND(ScriptBinds_Sound, PostEvent);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetSwitch);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetStages);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetParam);
 
-	X_SOUND_REG_FUNC(SetMasterVol);
-	X_SOUND_REG_FUNC(SetMusicVol);
-	X_SOUND_REG_FUNC(SetVoiceVol);
-	X_SOUND_REG_FUNC(SetSFXVol);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetMasterVol);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetMusicVol);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetVoiceVol);
+	X_SCRIPT_BIND(ScriptBinds_Sound, SetSFXVol);
 }
 
 

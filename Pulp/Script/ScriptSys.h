@@ -1,9 +1,8 @@
 #pragma once
 
+#include "ScriptBinds.h"
 
 #include "Vars\ScriptVars.h"
-
-#include "binds\ScriptBinds.h"
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
@@ -11,18 +10,30 @@
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\HeapArea.h>
 
+#include <Containers\Array.h>
+
 // TODO: temp
 X_DISABLE_WARNING(4702)
 #include <set>
 X_ENABLE_WARNING(4702)
 
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs
+);
+
 X_NAMESPACE_BEGIN(script)
 
 class XScriptTable;
+class XScriptBinds;
 
 class XScriptSys : public IScriptSys, public core::IXHotReload
 {
 	typedef std::set<core::string> ScriptFileList;
+
+	typedef core::Array<XScriptTable*> ScriptTableArr;
+	typedef core::Array<XScriptBinds*> ScriptBindsArr;
+	typedef core::Array<XScriptBindsBase*> ScriptBindsBaseArr;
+	
 
 	typedef core::MemoryArena<
 		core::GrowingPoolAllocator,
@@ -59,8 +70,9 @@ public:
 	virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_FINAL;
 	virtual void releaseFunc(ScriptFunctionHandle f) X_FINAL;
 
-	virtual IScriptTable* createTable(bool bEmpty = false) X_FINAL;
-	
+	virtual IScriptTable* createTable(bool empty = false) X_FINAL;
+	virtual IScriptBinds* createScriptBind(void) X_FINAL;
+
 	virtual void setGlobalValue(const char* pKey, const ScriptValue& val) X_FINAL;
 	virtual bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
 
@@ -102,11 +114,13 @@ public:
 
 private:
 
-//	bool ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description);
-
 	// IXHotReload
 	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 	// ~IXHotReload
+
+private:
+
+	void listBinds(core::IConsoleCmdArgs* pArgs);
 
 private:
 	lua_State* L;
@@ -120,7 +134,9 @@ private:
 
 	ScriptVars vars_;
 
-	XScriptBinds baseBinds_;
+	ScriptBindsArr scriptBinds_;
+	ScriptBindsBaseArr baseBinds_;
+
 	ScriptFileList fileList_;
 	bool initialised_;
 };

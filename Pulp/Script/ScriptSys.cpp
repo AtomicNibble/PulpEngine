@@ -1,10 +1,17 @@
 #include "stdafx.h"
 #include "ScriptSys.h"
 #include "ScriptTable.h"
+#include "TableDump.h"
+#include "ScriptBinds.h"
+
+#include "binds\ScriptBinds_core.h"
+#include "binds\ScriptBinds_io.h"
+#include "binds\ScriptBinds_script.h"
 
 #include <ICore.h>
 #include <IFileSys.h>
 #include <IRender.h>
+#include <IConsole.h>
 
 #include <Memory\VirtualMem.h>
 
@@ -34,7 +41,9 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 		PoolArena::getMemoryOffsetRequirement()
 	),
 	poolArena_(&poolAllocator_, "TablePool"),
-	numCallParams_(-1)
+	numCallParams_(-1),
+	scriptBinds_(arena),
+	baseBinds_(arena)
 {
 	arena->addChildArena(&poolArena_);
 
@@ -43,6 +52,7 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 
 XScriptSys::~XScriptSys()
 {
+
 }
 
 void XScriptSys::registerVars(void)
@@ -59,6 +69,8 @@ void XScriptSys::registerCmds(void)
 //	ADD_COMMAND("scriptList", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
 //	ADD_COMMAND("scriptReload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
 //	ADD_COMMAND("scriptDumpState", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
+
+	ADD_COMMAND_MEMBER("listScriptBinds", this, XScriptSys, &XScriptSys::listBinds, core::VarFlag::SYSTEM, "List script binds");
 
 }
 
@@ -90,40 +102,21 @@ bool XScriptSys::init(void)
 	XScriptTable::pScriptSystem_ = this;
 
 
-	baseBinds_.Init(this, gEnv->pCore);
+	//baseBinds_.Init(this, gEnv->pCore);
 
 	// hotreload
 	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
 
 	initialised_ = true;
 
-#if 0
+	baseBinds_.append(X_NEW(XBinds_Script, arena_, "ScriptBinds")(this));
+	baseBinds_.append(X_NEW(XBinds_Core, arena_, "CoreBinds")(this));
+	baseBinds_.append(X_NEW(XBinds_Io, arena_, "IoBinds")(this));
 
-	baseBinds_.Init(this, gEnv->pCore);
-
-
-#endif
-
-	// new stuff
+	for (auto* pBind : baseBinds_)
 	{
-		lua::State state(g_ScriptArena);
-
-		state.openLibs(lua::libs(
-				lua::lib::Base |
-				lua::lib::Math |
-				lua::lib::Table |
-				lua::lib::String |
-				lua::lib::Bit32 |
-				// lua::lib::Os |
-				//lua::lib::Io |
-			//	lua::lib::Ffi |
-				lua::lib::Jit
-			)
-		);
-
-
+		pBind->bind(gEnv->pCore);
 	}
-
 
 	return true;
 }
@@ -139,7 +132,15 @@ void XScriptSys::shutDown(void)
 	gEnv->pHotReload->addfileType(nullptr, X_SCRIPT_FILE_EXTENSION);
 
 	// must be done before lua closes.
-	baseBinds_.Shutdown();
+	//baseBinds_.Shutdown();
+
+
+	for (auto* pBind : baseBinds_)
+	{
+		X_DELETE(pBind, arena_);
+	}
+
+	baseBinds_.clear();
 
 #if 0
 	for (std::set<XScriptTable*>::iterator it = XScriptTable::s_allTables_.begin();
@@ -310,14 +311,25 @@ void XScriptSys::releaseFunc(ScriptFunctionHandle f)
 	}
 }
 
-IScriptTable* XScriptSys::createTable(bool bEmpty)
+IScriptTable* XScriptSys::createTable(bool empty)
 {
-	XScriptTable* pObj = allocTable();
-	if (!bEmpty) {
-		pObj->createNew();
+	XScriptTable* pTable = allocTable();
+	if (!empty) {
+		pTable->createNew();
 	}
-	return pObj;
+		
+	return pTable;
 }
+
+IScriptBinds* XScriptSys::createScriptBind(void)
+{
+	XScriptBinds* pScriptBase = X_NEW(XScriptBinds, arena_, "ScriptBase")(this);
+
+	scriptBinds_.push_back(pScriptBase);
+
+	return pScriptBase;
+}
+
 
 
 void XScriptSys::setGlobalValue(const char* pKey, const ScriptValue& any)
@@ -837,6 +849,34 @@ void XScriptSys::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<
 }
 
 // ~IXHotReload
+
+void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+	
+	// i want to be able to iterate all the binds.
+	// they are all registered in script table.
+	// should I just keep a list of all registerd functions?
+	// if i did not keep a function list, i would have to know the tables.
+	// and iterate them.
+	// i also think listBinds will be more helpful, if it's using real state.
+	// so i need a list of tables with binds.
+
+	XScriptTableDumpConsole dumper;
+
+	X_LOG0("Script", "--------------- ^8Binds^7 ----------------");
+	
+	for (auto* pBind : scriptBinds_)
+	{
+		X_LOG0("Script", "^2%s", pBind->getGlobalName());
+		X_LOG_BULLET;
+
+		pBind->getMethodsTable()->dump(&dumper);
+	}
+
+	X_LOG0("Script", "------------- ^8Binds End^7 --------------");
+}
+
 
 
 X_NAMESPACE_END
