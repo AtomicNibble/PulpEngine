@@ -111,16 +111,7 @@ void XLog::RemoveLogger(LoggerBase* logger)
 
 const char* XLog::GetIndentation(void)
 {
-	const char* pResult;
-
-	if (logVerbosity_ < 16) {
-		pResult = INDENTATION_STRINGS[logVerbosity_];
-	}
-	else {
-		pResult = "|                                  ";
-	}
-
-	return pResult;
+	return INDENTATION_STRINGS[logVerbosity_ & 0xF];
 }
 
 void XLog::Indent(void)
