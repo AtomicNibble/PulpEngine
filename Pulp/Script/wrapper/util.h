@@ -60,7 +60,7 @@ namespace lua
 		int top_;
 	};
 
-	#define X_LUA_CHECK_STACK(L) LuaStackValidator __stackCheck__((L),__FUNCTION__);
+	#define X_LUA_CHECK_STACK(L) lua::LuaStackValidator __stackCheck__((L),__FUNCTION__);
 #else 
 	#define X_LUA_CHECK_STACK(L) X_UNUSED(L);
 #endif X_ENABLE_STACK_CHECK
