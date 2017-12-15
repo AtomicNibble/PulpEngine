@@ -12,10 +12,6 @@
 
 #include <Containers\Array.h>
 
-// TODO: temp
-X_DISABLE_WARNING(4702)
-#include <set>
-X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_DECLARE(core,
 	struct IConsoleCmdArgs
@@ -28,7 +24,6 @@ class XScriptBinds;
 
 class XScriptSys : public IScriptSys, public core::IXHotReload
 {
-	typedef std::set<core::string> ScriptFileList;
 
 	typedef core::Array<XScriptTable*> ScriptTableArr;
 	typedef core::Array<XScriptBinds*> ScriptBindsArr;
@@ -137,7 +132,7 @@ private:
 	ScriptBindsArr scriptBinds_;
 	ScriptBindsBaseArr baseBinds_;
 
-	ScriptFileList fileList_;
+	
 	bool initialised_;
 };
 

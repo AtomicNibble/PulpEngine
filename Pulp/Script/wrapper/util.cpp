@@ -1,6 +1,11 @@
 #include "stdafx.h"
 #include "util.h"
 
+X_DISABLE_WARNING(4702)
+#include <set>
+X_ENABLE_WARNING(4702)
+
+
 X_NAMESPACE_BEGIN(script)
 
 namespace lua
