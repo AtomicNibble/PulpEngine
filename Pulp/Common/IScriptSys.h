@@ -293,8 +293,8 @@ struct IFunctionHandler
 struct IScriptTableDumpSink
 {
 	virtual ~IScriptTableDumpSink(){}
-	virtual void OnElementFound(const char* pName, Type::Enum type) X_ABSTRACT;
-	virtual void OnElementFound(int idx, Type::Enum type) X_ABSTRACT;
+	virtual void onElementFound(const char* pName, Type::Enum type) X_ABSTRACT;
+	virtual void onElementFound(int idx, Type::Enum type) X_ABSTRACT;
 };
 
 struct ScriptFunctionDesc

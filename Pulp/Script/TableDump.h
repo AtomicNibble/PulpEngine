@@ -13,8 +13,8 @@ public:
 	XScriptTableDumpConsole();
 	~XScriptTableDumpConsole() X_OVERRIDE;
 
-	void OnElementFound(const char* name, Type::Enum type) X_OVERRIDE;
-	void OnElementFound(int idx, Type::Enum type) X_OVERRIDE;
+	void onElementFound(const char* pName, Type::Enum type) X_OVERRIDE;
+	void onElementFound(int idx, Type::Enum type) X_OVERRIDE;
 };
 
 X_NAMESPACE_END

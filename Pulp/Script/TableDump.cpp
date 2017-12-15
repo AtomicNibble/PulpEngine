@@ -15,13 +15,13 @@ XScriptTableDumpConsole::~XScriptTableDumpConsole()
 
 }
 
-void XScriptTableDumpConsole::OnElementFound(const char* name, Type::Enum type)
+void XScriptTableDumpConsole::onElementFound(const char* pName, Type::Enum type)
 {
-	X_LOG0("Script", "%s %s", name, Type::ToString(type));
+	X_LOG0("Script", "%s %s", pName, Type::ToString(type));
 
 }
 
-void XScriptTableDumpConsole::OnElementFound(int idx, Type::Enum type)
+void XScriptTableDumpConsole::onElementFound(int idx, Type::Enum type)
 {
 	X_LOG0("Script", "%i> %s", idx, Type::ToString(type));
 }
