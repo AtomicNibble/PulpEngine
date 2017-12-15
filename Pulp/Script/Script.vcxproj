@@ -476,7 +476,6 @@
     <ClInclude Include="TableDump.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Vars\ScriptVars.h" />
-    <ClInclude Include="wrapper\DumpToFile.h" />
     <ClInclude Include="wrapper\util.h" />
     <ClInclude Include="wrapper\state.h" />
     <ClInclude Include="wrapper\state_view.h" />
@@ -509,7 +508,6 @@
     </ClCompile>
     <ClCompile Include="TableDump.cpp" />
     <ClCompile Include="Vars\ScriptVars.cpp" />
-    <ClCompile Include="wrapper\DumpToFile.cpp" />
     <ClCompile Include="wrapper\state.cpp" />
     <ClCompile Include="wrapper\state_view.cpp" />
     <ClCompile Include="wrapper\util.cpp" />

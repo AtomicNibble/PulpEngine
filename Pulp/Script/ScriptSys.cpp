@@ -331,7 +331,6 @@ IScriptBinds* XScriptSys::createScriptBind(void)
 }
 
 
-
 void XScriptSys::setGlobalValue(const char* pKey, const ScriptValue& any)
 {
 	X_LUA_CHECK_STACK(L);
