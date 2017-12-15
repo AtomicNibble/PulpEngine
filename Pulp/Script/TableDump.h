@@ -25,7 +25,7 @@ struct XRecursiveLuaDumpToFile : public lua::IRecursiveLuaDump
 	XRecursiveLuaDumpToFile(core::XFile& file);
 	~XRecursiveLuaDumpToFile() X_FINAL;
 
-	virtual void onElement(int level, const char* sKey, int nKey, ScriptValue& value) X_FINAL;
+	void onElement(int level, const char* sKey, int nKey, ScriptValue& value) X_FINAL;
 	void onBeginTable(int level, const char* sKey, int nKey) X_FINAL;
 	void onEndTable(int level) X_FINAL;
 
