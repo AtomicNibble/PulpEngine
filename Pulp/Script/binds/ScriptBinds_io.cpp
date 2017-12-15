@@ -32,7 +32,7 @@ void XBinds_Io_File::bind(ICore* pCore)
 	pFileSys_ = X_ASSERT_NOT_NULL(pCore->GetIFileSys());
 
 	createBindTable();
-	
+	setName("Io::File");
 
 	X_SCRIPT_BIND(XBinds_Io_File, write);
 	X_SCRIPT_BIND(XBinds_Io_File, read);

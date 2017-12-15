@@ -17,6 +17,7 @@ public:
 
 	void createBindTable(void);
 
+	void setName(const char* pName);
 	void setGlobalName(const char* pGlobalName);
 	void setParamOffset(int paramIdOffset);
 	XScriptTable* getMethodsTable(void);
@@ -33,6 +34,7 @@ public:
 	XScriptBinds(XScriptSys* pScriptSys);
 	virtual ~XScriptBinds() X_FINAL;
 
+	void setName(const char* pName);
 	void setGlobalName(const char* pGlobalName) X_FINAL;
 	void setParamOffset(int paramIdOffset) X_FINAL;
 	IScriptTable* getMethodsTable(void) X_FINAL;

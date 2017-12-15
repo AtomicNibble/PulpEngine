@@ -19,6 +19,12 @@ void XScriptBindsBase::createBindTable(void)
 }
 
 
+void XScriptBindsBase::setName(const char* pName)
+{
+	pBindTable_->setName(pName);
+}
+
+
 void XScriptBindsBase::setGlobalName(const char* pGlobalName)
 {
 	pBindTable_->setGlobalName(pGlobalName);
@@ -52,6 +58,12 @@ XScriptBinds::~XScriptBinds()
 
 	core::SafeRelease(pMethodsTable_);
 }
+
+void XScriptBinds::setName(const char* pName)
+{
+	name_.set(pName);
+}
+
 
 void XScriptBinds::setGlobalName(const char* pGlobalName)
 {
