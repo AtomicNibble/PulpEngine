@@ -98,7 +98,7 @@ namespace lua
 		while (lua_next(L, idx) != 0)
 		{
 			// `key' is at index -2 and `value' at index -1
-			if (stack::get_type(L, -2) == LUA_TSTRING) {
+			if (stack::get_type(L, -2) == Type::String) {
 				pKey = stack::as_string(L, -2);
 			}
 			else
@@ -107,12 +107,12 @@ namespace lua
 				key = stack::as_int(L, -2); // key index.
 			}
 
-			int type = stack::get_type(L);
+			auto type = stack::get_type(L);
 			switch (type)
 			{
-				case LUA_TNIL:
+				case Type::Nil:
 					break;
-				case LUA_TTABLE:
+				case Type::Table:
 				{
 					if (!(pKey != nullptr && level == 0 && strcmp(pKey, "_G") == 0))
 					{
