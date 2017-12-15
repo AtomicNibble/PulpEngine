@@ -12,9 +12,9 @@ public:
 	ScriptBinds_Sound(script::IScriptSys* pSS, XSound* pSound);
 	~ScriptBinds_Sound();
 
-private:
 	void bind(void);
 
+private:
 	int32_t PostEvent(script::IFunctionHandler* pH);
 	int32_t SetSwitch(script::IFunctionHandler* pH);
 	int32_t SetStages(script::IFunctionHandler* pH);
