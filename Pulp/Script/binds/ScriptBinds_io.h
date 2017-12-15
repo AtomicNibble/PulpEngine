@@ -53,8 +53,8 @@ public:
 	void bind(ICore* pCore) X_FINAL;
 private: 
 
-	int openFile(IFunctionHandler* pH);
-	int closeFile(IFunctionHandler* pH);
+	int OpenFile(IFunctionHandler* pH);
+	int CloseFile(IFunctionHandler* pH);
 
 	SmartScriptTable WrapFileReturn(core::XFile* pFile);
 
