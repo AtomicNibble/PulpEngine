@@ -853,14 +853,6 @@ void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
 {
 	X_UNUSED(pArgs);
 	
-	// i want to be able to iterate all the binds.
-	// they are all registered in script table.
-	// should I just keep a list of all registerd functions?
-	// if i did not keep a function list, i would have to know the tables.
-	// and iterate them.
-	// i also think listBinds will be more helpful, if it's using real state.
-	// so i need a list of tables with binds.
-
 	XScriptTableDumpConsole dumper;
 
 	X_LOG0("Script", "--------------- ^8Binds^7 ----------------");
