@@ -774,8 +774,8 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 		{
 			var.type_ = Type::Function;
 			// Make reference to function.
-			lua_pushvalue(L, index);
-			var.pFunction_ = refToScriptHandle(luaL_ref(L, 1));
+			stack::push_copy(L, index);
+			var.pFunction_ = refToScriptHandle(stack::pop_to_ref(L));
 		}
 		break;
 		case LUA_TTHREAD:
