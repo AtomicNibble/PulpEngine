@@ -569,6 +569,12 @@ LJ_NOINLINE void lj_err_run(lua_State *L)
   lj_err_throw(L, LUA_ERRRUN);
 }
 
+/* Try again. */
+LJ_NOINLINE void lj_err_tryagain(lua_State *L)
+{
+	lj_err_throw(L, LUA_EAGAIN);
+}
+
 /* Formatted runtime error message. */
 LJ_NORET LJ_NOINLINE static void err_msgv(lua_State *L, ErrMsg em, ...)
 {
@@ -769,6 +775,13 @@ LUA_API int lua_error(lua_State *L)
   lj_err_run(L);
   return 0;  /* unreachable */
 }
+
+LUA_API int lua_tryagain(lua_State *L)
+{
+  lj_err_tryagain(L);
+  return 0;  /* unreachable */
+}
+
 
 LUALIB_API int luaL_argerror(lua_State *L, int narg, const char *msg)
 {

@@ -45,7 +45,7 @@
 #define LUA_ERRSYNTAX	3
 #define LUA_ERRMEM	4
 #define LUA_ERRERR	5
-
+#define LUA_EAGAIN  7
 
 typedef struct lua_State lua_State;
 
@@ -234,7 +234,8 @@ LUA_API int (lua_gc) (lua_State *L, int what, int data);
 ** miscellaneous functions
 */
 
-LUA_API int   (lua_error) (lua_State *L);
+LUA_API int   (lua_error)(lua_State *L);
+LUA_API int   (lua_tryagain) (lua_State *L);
 
 LUA_API int   (lua_next) (lua_State *L, int idx);
 
