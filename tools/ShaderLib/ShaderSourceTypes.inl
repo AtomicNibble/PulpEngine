@@ -58,12 +58,6 @@ namespace shader
 		ILFlags_ = flags;
 	}
 
-	X_INLINE void SourceFile::addRefrence(const core::string& name)
-	{
-		refrences_.insert(name);
-	}
-
-
 
 } // namespace shader
 

@@ -26,7 +26,6 @@ namespace shader
 	{
 	public:
 		typedef core::Array<SourceFile*> IncludedSourceArr;
-		typedef std::unordered_set<core::string, core::hash<core::string>> RefrenceMap;
 		typedef core::Array<uint8_t> ByteArr;
 
 		typedef core::SharedLock LockType;
@@ -49,8 +48,6 @@ namespace shader
 		X_INLINE void setSourceCrc32(uint32_t crc);
 		X_INLINE void setILFlags(ILFlags flags);
 
-		X_INLINE void addRefrence(const core::string& name);
-
 	public:
 		mutable core::SharedLock lock;
 
@@ -58,7 +55,6 @@ namespace shader
 		core::string name_;
 		ByteArr fileData_;
 		IncludedSourceArr includedFiles_;
-		RefrenceMap refrences_;
 		ILFlags ILFlags_;
 		uint32_t sourceCrc32_;
 	};
