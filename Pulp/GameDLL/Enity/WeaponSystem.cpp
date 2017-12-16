@@ -52,9 +52,13 @@ namespace entity
 
 			auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
-			core::StackString256 ammoText;
-			ammoText.appendFmt("AmmoInClip: %i", wpn.ammoInClip);
 
+			core::StackString256 ammoText;
+	
+			{
+				auto& inv = pReg_->get<Inventory>(wpn.ownerEnt);
+				ammoText.appendFmt("AmmoInClip: %i\nAmmoStore: %i", wpn.ammoInClip, inv.ammo);
+			}
 			font::TextDrawContext con;
 			con.col = Col_Mintcream;
 			con.size = Vec2f(24.f, 24.f);
