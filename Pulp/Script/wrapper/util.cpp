@@ -74,7 +74,7 @@ namespace lua
 
 		X_ERROR("ScriptError", "------------------------------------------");
 		{
-			X_LOG0("ScriptError", "%s", pErr);
+			X_LOG0("ScriptError", "Error: %s", pErr);
 
 			dumpCallStack(L);
 		}
