@@ -4,8 +4,6 @@
 
 X_NAMESPACE_BEGIN(script)
 
-
-
 class XBinds_Script : public XScriptBindsBase
 {
 public:
