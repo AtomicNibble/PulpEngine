@@ -507,14 +507,15 @@ private:
 
 class SmartScriptFunction
 {
+	X_NO_COPY(SmartScriptFunction);
+	X_NO_ASSIGN(SmartScriptFunction);
+
 public:
 	X_INLINE SmartScriptFunction();
 	X_INLINE SmartScriptFunction(IScriptSys* pSS, ScriptFunctionHandle func);
-	X_INLINE SmartScriptFunction(const SmartScriptFunction& other) = delete;
 	X_INLINE SmartScriptFunction(SmartScriptFunction&& other);
 	X_INLINE ~SmartScriptFunction();
 
-	X_INLINE SmartScriptFunction& operator=(const SmartScriptFunction& other) = delete;
 	X_INLINE SmartScriptFunction& operator=(SmartScriptFunction&& other);
 
 	X_INLINE operator ScriptFunctionHandle() const;
