@@ -48,7 +48,8 @@ X_DECLARE_ENUM(AssetType)(
 	// basically a anim for the camera
 	CAMERA,
 
-	VIDEO
+	VIDEO,
+	SCRIPT
 );
 
 
