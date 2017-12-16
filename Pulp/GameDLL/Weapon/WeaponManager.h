@@ -68,7 +68,7 @@ namespace weapon
 
 		bool waitForLoad(core::AssetBase* pWeaponDef) X_FINAL;
 		bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
-		void releaseWeaponDef(WeaponDef* pMat);
+		void releaseWeaponDef(WeaponDef* pWeaponDef);
 
 	private:
 		bool initDefaults(void);
