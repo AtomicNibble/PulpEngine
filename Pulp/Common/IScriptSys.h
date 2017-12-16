@@ -181,7 +181,6 @@ public:
 };
 
 
-#if 1
 
 
 struct IScriptSys : public core::IEngineSysBase
@@ -286,10 +285,6 @@ struct IFunctionHandler
 
 };
 
-
-#else
-
-#endif
 
 struct IScriptTableDumpSink
 {
