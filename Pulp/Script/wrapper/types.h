@@ -36,7 +36,9 @@ namespace lua
 		Syntax,
 		Memory,
 		Handler,
-		File
+		File,
+		TryAgain,
+		None
 	);
 
 	static_assert(CallResult::Ok == LUA_OK, "Enum mismtach");
