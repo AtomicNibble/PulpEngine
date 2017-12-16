@@ -262,7 +262,7 @@ struct IFunctionHandler
 	X_INLINE bool getSelf(T& value);
 
 	template <typename T>
-	X_INLINE bool getParam(int32_t idx, T &value);
+	X_INLINE bool getParam(int32_t idx, T& value);
 
 	template <typename T>
 	X_INLINE bool getParam(T& value);
@@ -360,8 +360,8 @@ public:
 	
 	// member iteration.
 	virtual IScriptTable::Iterator begin(void) X_ABSTRACT;
-	virtual bool next(Iterator &iter) X_ABSTRACT;
-	virtual void end(const Iterator &iter) X_ABSTRACT;
+	virtual bool next(Iterator& iter) X_ABSTRACT;
+	virtual void end(const Iterator& iter) X_ABSTRACT;
 
 
 	// Description:
@@ -384,13 +384,13 @@ public:
 	X_INLINE void pushBack(const T& value);
 
 	template <class T> 
-	X_INLINE void setValue(const char* pKey, const T &value);
+	X_INLINE void setValue(const char* pKey, const T& value);
 
 	template <class T>
 	X_INLINE void setValue(int idx, const T& value);
 
 	template <class T>
-	X_INLINE void setValueChain(const char* pKey, const T &value);
+	X_INLINE void setValueChain(const char* pKey, const T& value);
 
 	//	 Gets value of a table member.
 	template <class T>
@@ -400,7 +400,7 @@ public:
 	X_INLINE bool getValue(int idx, T& value);
 
 	template <class T> 
-	X_INLINE bool getValueChain(const char* pKey, T &value);
+	X_INLINE bool getValueChain(const char* pKey, T& value);
 
 	
 	X_INLINE bool haveValue(const char* pKey);
