@@ -50,7 +50,7 @@ namespace lua
 		{
 			if (top_ != lua_gettop(L_))
 			{
-				X_ASSERT(false, "Lua Stack Validation Failed")(pText_);
+				X_ASSERT(false, "Lua Stack Validation Failed")(pText_, top_, lua_gettop(L_));
 				lua_settop(L_, top_);
 			}
 		}
