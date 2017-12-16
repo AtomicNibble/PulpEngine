@@ -69,7 +69,11 @@ public:
 	Assert& Variable(const char* const name, const T* const var);
 
 	/// Dispatches the name and value of a generic type.
-	template <typename T>
+	template <typename T, class = typename std::enable_if< std::is_enum<T>::value >::type>
+	Assert& Variable(const char* const name, const T var);
+
+	/// Dispatches the name and value of a generic type.
+	template <typename T, class = typename std::enable_if< !std::is_enum<T>::value >::type>
 	Assert& Variable(const char* const name, const T& var);
 
 private:
