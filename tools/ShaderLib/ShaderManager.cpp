@@ -485,7 +485,7 @@ namespace shader
 		// optional search criteria
 		const char* pSearchPatten = nullptr;
 
-		if (pArgs->GetArgCount() >= 2) {
+		if (pArgs->GetArgCount() > 1) {
 			pSearchPatten = pArgs->GetArg(1);
 		}
 
@@ -497,7 +497,7 @@ namespace shader
 		// optional search criteria
 		const char* pSearchPatten = nullptr;
 
-		if (pArgs->GetArgCount() >= 2) {
+		if (pArgs->GetArgCount() > 1) {
 			pSearchPatten = pArgs->GetArg(1);
 		}
 
