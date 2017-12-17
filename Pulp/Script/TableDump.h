@@ -41,7 +41,7 @@ private:
 	size_t size_;
 };
 
-bool dumpStateToFile(lua_State* L, const char* pName);
+bool dumpStateToFile(lua_State* L, const char* pFileName);
 
 
 X_NAMESPACE_END

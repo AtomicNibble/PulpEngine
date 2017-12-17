@@ -114,8 +114,14 @@ private:
 	// ~IXHotReload
 
 private:
+	void listBinds(void) const;
+	void listScripts(const char* pSearchPatten = nullptr) const;
 
+
+private:
 	void listBinds(core::IConsoleCmdArgs* pArgs);
+	void listScripts(core::IConsoleCmdArgs* pArgs);
+	void dumpState(core::IConsoleCmdArgs* pArgs);
 
 private:
 	lua_State* L;

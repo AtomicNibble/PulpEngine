@@ -63,15 +63,10 @@ void XScriptSys::registerVars(void)
 void XScriptSys::registerCmds(void)
 {
 	// add the shieeeeeeet.
-//	ADD_COMMAND("listScipts", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
-//
-//	ADD_COMMAND("scriptLoad", LoadScriptCmd, core::VarFlag::SYSTEM, "Load and run a script file");
-//	ADD_COMMAND("scriptList", ListScriptCmd, core::VarFlag::SYSTEM, "List loaded script files");
-//	ADD_COMMAND("scriptReload", ReloadScriptCmd, core::VarFlag::SYSTEM, "Reload a given script <filename>");
-//	ADD_COMMAND("scriptDumpState", LuaDumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
-
 	ADD_COMMAND_MEMBER("listScriptBinds", this, XScriptSys, &XScriptSys::listBinds, core::VarFlag::SYSTEM, "List script binds");
+	ADD_COMMAND_MEMBER("listScipts", this, XScriptSys, &XScriptSys::listScripts, core::VarFlag::SYSTEM, "List loaded script files");
 
+	ADD_COMMAND_MEMBER("scriptDumpState", this, XScriptSys, &XScriptSys::dumpState, core::VarFlag::SYSTEM, "Dump the lua state to a file <filename>");
 }
 
 
@@ -849,14 +844,12 @@ void XScriptSys::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<
 
 // ~IXHotReload
 
-void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
+void XScriptSys::listBinds(void) const
 {
-	X_UNUSED(pArgs);
-	
 	XScriptTableDumpConsole dumper;
 
 	X_LOG0("Script", "--------------- ^8Binds^7 ----------------");
-	
+
 	for (auto* pBind : scriptBinds_)
 	{
 		X_LOG0("Script", "^2%s^7 = {", pBind->getGlobalName());
@@ -870,6 +863,70 @@ void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
 	X_LOG0("Script", "------------- ^8Binds End^7 --------------");
 }
 
+void XScriptSys::listScripts(const char* pSearchPatten) const
+{
+	core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
+	core::Array<ScriptResource*> sorted_scripts(arena_);
+	sorted_scripts.setGranularity(scripts_.size());
+
+	for (const auto& script : scripts_)
+	{
+		auto* pScriptRes = script.second;
+
+		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pScriptRes->getName()))
+		{
+			sorted_scripts.push_back(pScriptRes);
+		}
+	}
+
+	std::sort(sorted_scripts.begin(), sorted_scripts.end(), [](ScriptResource* a, ScriptResource* b) {
+		const auto& nameA = a->getName();
+		const auto& nameB = b->getName();
+		return nameA.compareInt(nameB) < 0;
+	}
+	);
+
+	X_LOG0("Script", "------------ ^8Scripts(%" PRIuS ")^7 ---------------", sorted_scripts.size());
+
+	for (const auto* pScript : sorted_scripts)
+	{
+		X_LOG0("Script", "^2%-32s^7 Status: ^2%s^7 Refs:^2%i",
+			pScript->getName(), lua::CallResult::ToString(pScript->getLastCallResult()), pScript->getRefCount());
+	}
+
+	X_LOG0("Script", "------------ ^8Scripts End^7 --------------");
+
+}
+
+
+void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
+{
+	X_UNUSED(pArgs);
+	
+	listBinds();
+}
+
+void XScriptSys::listScripts(core::IConsoleCmdArgs* pArgs)
+{
+	const char* pSearchPatten = nullptr;
+
+	if (pArgs->GetArgCount() > 1) {
+		pSearchPatten = pArgs->GetArg(1);
+	}
+
+	listScripts(pSearchPatten);
+}
+
+void XScriptSys::dumpState(core::IConsoleCmdArgs* pArgs)
+{
+	const char* pFileName = "lua_state.txt";
+	if (pArgs->GetArgCount() > 1)
+	{
+		pFileName = pArgs->GetArg(1);
+	}
+
+	dumpStateToFile(L, pFileName);
+}
 
 X_NAMESPACE_END
