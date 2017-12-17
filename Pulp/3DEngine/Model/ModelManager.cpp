@@ -284,18 +284,6 @@ void XModelManager::dispatchPendingLoads(void)
 }
 
 
-bool XModelManager::waitForLoad(core::AssetBase* pModel)
-{
-	X_ASSERT(pModel->getType() == assetDb::AssetType::MODEL, "Invalid asset passed")();
-
-	if (pModel->isLoaded()) {
-		return true;
-	}
-
-	return waitForLoad(static_cast<XModel*>(pModel));
-}
-
-
 bool XModelManager::waitForLoad(XModel* pModel)
 {
 	{

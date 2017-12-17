@@ -18,8 +18,21 @@ struct IModelManager : public core::IAssetLoader
 	virtual XModel* getDefaultModel(void) const X_ABSTRACT;
 
 	virtual bool waitForLoad(XModel* pModel) X_ABSTRACT; // returns true if load succeed.
-
+	
+	X_INLINE bool waitForLoad(core::AssetBase* pModel) X_FINAL;
 };
+
+
+X_INLINE bool IModelManager::waitForLoad(core::AssetBase* pModel)
+{
+	X_ASSERT(pModel->getType() == assetDb::AssetType::MODEL, "Invalid asset passed")();
+
+	if (pModel->isLoaded()) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<XModel*>(pModel));
+}
 
 
 X_NAMESPACE_END
