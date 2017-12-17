@@ -28,7 +28,7 @@ namespace Hash
 
 		HashVal finalize(void);
 
-		static HashVal getHash(const void* pInput, size_t length, uint32_t seed);
+		static HashVal getHash(const void* pInput, size_t length, uint32_t seed = 0);
 	
 	private:
 		struct { long long ll[6]; } state_;
@@ -55,7 +55,7 @@ namespace Hash
 
 		HashVal finalize(void);
 
-		static HashVal getHash(const void* pInput, size_t length, uint64_t seed);
+		static HashVal getHash(const void* pInput, size_t length, uint64_t seed = 0);
 
 	private:
 		struct { long long ll[11]; } state_;
