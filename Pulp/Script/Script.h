@@ -7,7 +7,9 @@ X_NAMESPACE_BEGIN(script)
 class XScriptTable;
 class XScriptBinds;
 
-class Script : public core::AssetBase
+class Script : 
+	public core::AssetBase,
+	public IScript
 {
 	X_NO_COPY(Script);
 	X_NO_ASSIGN(Script);

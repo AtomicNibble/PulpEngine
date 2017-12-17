@@ -75,9 +75,13 @@ public:
 
 	virtual void Update(void) X_FINAL;
 
-	virtual void loadFileAsync(const char* pFileName) X_FINAL;
-	Script* findScript(const char* pFileName);
-	Script* loadScript(const char* pFileName);
+	virtual IScript* findScript(const char* pFileName);
+	virtual IScript* loadScript(const char* pFileName) X_FINAL;
+	
+	virtual bool waitForLoad(core::AssetBase* pScript) X_FINAL;
+	virtual bool waitForLoad(IScript* pScript) X_FINAL; // returns true if load succeed.
+
+
 	bool processLoadedScript(Script* pScript);
 
 	bool onInclude(const char* pFileName);

@@ -3,9 +3,11 @@
 #ifndef _X_SCRIPT_SYS_I_H_
 #define _X_SCRIPT_SYS_I_H_
 
-#include "Util\Delegate.h"
+#include <IAsyncLoad.h>
 
-#include "String\StringRange.h"
+#include <Assets\AssetBase.h>
+#include <Util\Delegate.h>
+#include <String\StringRange.h>
 
 X_NAMESPACE_BEGIN(script)
 
@@ -184,9 +186,17 @@ public:
 
 X_ENSURE_SIZE(ScriptValue, 24);
 
+struct IScript
+{
+	virtual ~IScript() {}
 
 
-struct IScriptSys : public core::IEngineSysBase
+
+};
+
+struct IScriptSys : 
+	public core::IEngineSysBase,
+	public core::IAssetLoader
 {
 	virtual ~IScriptSys() {};
 
@@ -194,14 +204,10 @@ struct IScriptSys : public core::IEngineSysBase
 
 	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_ABSTRACT;
 
-	// i need some sort of api for loading scripts.
-	// the loading of a script should be async like other assets.
-	// how do we know when a script has finished loading.
-	// we need to return a handle / 
-	// then wait for the script to complete.
-	// i don't think it will be too bad, as all the included scripts will be loaded as a result.
-	// so engine code will typically just be loading one file.
-	virtual void loadFileAsync(const char* pFileName) X_ABSTRACT;
+	virtual IScript* findScript(const char* pFileName) X_ABSTRACT;
+	virtual IScript* loadScript(const char* pFileName) X_ABSTRACT;
+
+	virtual bool waitForLoad(IScript* pScript) X_ABSTRACT; // returns true if load succeed.
 
 	// you must release function handles.
 	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_ABSTRACT;

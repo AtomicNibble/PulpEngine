@@ -118,7 +118,7 @@ bool XScriptSys::init(void)
 		pBind->bind(gEnv->pCore);
 	}
 
-	loadFileAsync("main");
+	loadScript("main");
 
 	return true;
 }
@@ -277,7 +277,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
 	if (result == CallResult::TryAgain)
 	{
 		const char* pFileName = stack::as_string(L);
-		Script* pInclude = loadScript(pFileName);
+		Script* pInclude = static_cast<Script*>(loadScript(pFileName));
 
 		pScript->setPendingInclude(X_ASSERT_NOT_NULL(pInclude));
 		stack::pop(L);
@@ -294,12 +294,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
 }
 
 
-void XScriptSys::loadFileAsync(const char* pFileName)
-{
-	loadScript(pFileName);
-}
-
-Script* XScriptSys::findScript(const char* pFileName)
+IScript* XScriptSys::findScript(const char* pFileName)
 {
 	core::Path<char> nameNoExt(pFileName);
 	nameNoExt.removeExtension();
@@ -316,7 +311,7 @@ Script* XScriptSys::findScript(const char* pFileName)
 	return nullptr;
 }
  
-Script* XScriptSys::loadScript(const char* pFileName)
+IScript* XScriptSys::loadScript(const char* pFileName)
 {
 	// I allow extension to be passed, unlike other assets, since it's allowed in includes.
 	core::Path<char> nameNoExt(pFileName);
@@ -340,10 +335,53 @@ Script* XScriptSys::loadScript(const char* pFileName)
 	return pScriptRes;
 }
 
+bool XScriptSys::waitForLoad(core::AssetBase* pScript)
+{
+	X_ASSERT(pScript->getType() == assetDb::AssetType::SCRIPT, "Invalid asset passed")();
+
+	if (pScript->isLoaded()) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<IScript*>(static_cast<Script*>(pScript)));
+}
+
+bool XScriptSys::waitForLoad(IScript* pIScript)
+{
+	Script* pScript = static_cast<Script*>(pIScript);
+
+	{
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		while (pScript->getStatus() == core::LoadStatus::Loading)
+		{
+			loadCond_.Wait(loadReqLock_);
+		}
+	}
+
+	// did we fail? or never sent a dispatch?
+	auto status = pScript->getStatus();
+	if (status == core::LoadStatus::Complete)
+	{
+		return true;
+	}
+	else if (status == core::LoadStatus::Error)
+	{
+		return false;
+	}
+	else if (status == core::LoadStatus::NotLoaded)
+	{
+		// request never sent?
+	}
+
+	X_ASSERT_UNREACHABLE();
+	return false;
+}
+
+
 bool XScriptSys::onInclude(const char* pFileName)
 {
 	{
-		Script* pScriptRes = findScript(pFileName);
+		Script* pScriptRes = static_cast<Script*>(findScript(pFileName));
 		if (pScriptRes) {
 			// do we need to run it?
 
