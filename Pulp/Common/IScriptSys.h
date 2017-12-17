@@ -182,6 +182,7 @@ public:
 	};
 };
 
+X_ENSURE_SIZE(ScriptValue, 24);
 
 
 
