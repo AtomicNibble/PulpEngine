@@ -637,7 +637,7 @@ namespace Hash
 
 	xxHash32::xxHash32()
 	{
-		core::zero_object(state_);
+		reset(0);
 	}
 
 
@@ -697,7 +697,7 @@ namespace Hash
 
 	xxHash64::xxHash64()
 	{
-		core::zero_object(state_);
+		reset(0);
 	}
 
 

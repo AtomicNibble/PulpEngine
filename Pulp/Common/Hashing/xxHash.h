@@ -18,7 +18,6 @@ namespace Hash
 		xxHash32();
 		~xxHash32() = default;
 
-		// must call this before using.
 		void reset(uint32_t seed = 0);
 		bool update(const void* pBuf, size_t length);
 		template<typename T>
@@ -44,7 +43,6 @@ namespace Hash
 		xxHash64();
 		~xxHash64() = default;
 
-		// must call this before using.
 		void reset(uint64_t seed = 0);
 
 		bool update(const void* pBuf, size_t length);
