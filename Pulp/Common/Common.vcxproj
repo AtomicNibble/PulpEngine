@@ -61,6 +61,7 @@
   <ItemGroup>
     <ClInclude Include="Assets\AssertContainer.h" />
     <ClInclude Include="Assets\AssetBase.h" />
+    <ClInclude Include="Assets\AssetManagerBase.h" />
     <ClInclude Include="Buffer.h" />
     <ClInclude Include="Casts\safe_static_cast.h" />
     <ClInclude Include="Casts\union_cast.h" />

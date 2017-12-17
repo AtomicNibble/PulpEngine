@@ -1294,6 +1294,9 @@
     <ClInclude Include="IScriptSys.inl">
       <Filter>Interfaces_h\Script</Filter>
     </ClInclude>
+    <ClInclude Include="Assets\AssetManagerBase.h">
+      <Filter>Headers\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
