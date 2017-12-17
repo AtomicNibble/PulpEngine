@@ -9,7 +9,7 @@
 
 X_NAMESPACE_BEGIN(script)
 
-static const char* X_SCRIPT_FILE_EXTENSION = "lua";
+static const char* SCRIPT_FILE_EXTENSION = "lua";
 
 static const uint32_t SCRIPT_MAX_LOADED = 256;
 
@@ -193,6 +193,15 @@ struct IScriptSys : public core::IEngineSysBase
 	virtual void Update(void) X_ABSTRACT;
 
 	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_ABSTRACT;
+
+	// i need some sort of api for loading scripts.
+	// the loading of a script should be async like other assets.
+	// how do we know when a script has finished loading.
+	// we need to return a handle / 
+	// then wait for the script to complete.
+	// i don't think it will be too bad, as all the included scripts will be loaded as a result.
+	// so engine code will typically just be loading one file.
+	virtual void loadFileAsync(const char* pFileName) X_ABSTRACT;
 
 	// you must release function handles.
 	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_ABSTRACT;

@@ -3,6 +3,7 @@
 #include "ScriptTable.h"
 #include "TableDump.h"
 #include "ScriptBinds.h"
+#include "Script.h"
 
 #include "binds\ScriptBinds_core.h"
 #include "binds\ScriptBinds_io.h"
@@ -13,7 +14,10 @@
 #include <IRender.h>
 #include <IConsole.h>
 
+#include <Threading\JobSystem2.h>
+
 #include <Memory\VirtualMem.h>
+
 
 X_NAMESPACE_BEGIN(script)
 
@@ -30,9 +34,8 @@ namespace
 
 
 XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
+	AssetManagerBase(arena, arena),
 	L(nullptr),
-	initialised_(false),
-	arena_(arena),
 	poolAllocator_(PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * POOL_ALLOC_MAX,
 		core::VirtualMem::GetPageSize() * 4,
 		0,
@@ -43,7 +46,10 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 	poolArena_(&poolAllocator_, "TablePool"),
 	numCallParams_(-1),
 	scriptBinds_(arena),
-	baseBinds_(arena)
+	baseBinds_(arena),
+	scripts_(arena, sizeof(ScriptResource), X_ALIGN_OF(ScriptResource), "ScriptPool"),
+	completedLoads_(arena),
+	initialised_(false)
 {
 	arena->addChildArena(&poolArena_);
 
@@ -75,6 +81,8 @@ bool XScriptSys::init(void)
 	X_LOG0("Script", "Starting script system");
 	X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
+	initialised_ = true;
+
 	L = luaL_newstate();
 
 	lua::StateView view(L);
@@ -93,16 +101,13 @@ bool XScriptSys::init(void)
 	stack::push(L, myErrorHandler);
 	errrorHandler_ = stack::pop_to_ref(L);
 
+	// Janky!
 	XScriptTable::L = L;
 	XScriptTable::pScriptSystem_ = this;
 
-
-	//baseBinds_.Init(this, gEnv->pCore);
-
 	// hotreload
-	gEnv->pHotReload->addfileType(this, X_SCRIPT_FILE_EXTENSION);
+	gEnv->pHotReload->addfileType(this, SCRIPT_FILE_EXTENSION);
 
-	initialised_ = true;
 
 	baseBinds_.append(X_NEW(XBinds_Script, arena_, "ScriptBinds")(this));
 	baseBinds_.append(X_NEW(XBinds_Core, arena_, "CoreBinds")(this));
@@ -112,6 +117,8 @@ bool XScriptSys::init(void)
 	{
 		pBind->bind(gEnv->pCore);
 	}
+
+	loadFileAsync("main");
 
 	return true;
 }
@@ -124,10 +131,7 @@ void XScriptSys::shutDown(void)
 
 	X_LOG0("ScriptSys", "Shutting Down");
 
-	gEnv->pHotReload->addfileType(nullptr, X_SCRIPT_FILE_EXTENSION);
-
-	// must be done before lua closes.
-	//baseBinds_.Shutdown();
+	gEnv->pHotReload->addfileType(nullptr, SCRIPT_FILE_EXTENSION);
 
 
 	for (auto* pBind : baseBinds_)
@@ -158,7 +162,6 @@ void XScriptSys::shutDown(void)
 		L = nullptr;
 	}
 
-
 	initialised_ = false;
 }
 
@@ -173,23 +176,209 @@ void XScriptSys::Update(void)
 	X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 
 //	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
-
 //	setGlobalValue("_time", time);
+	{
+
+		while (completedLoads_.isNotEmpty())
+		{
+			X_LUA_CHECK_STACK(L);
+
+			Script* pScript = completedLoads_.peek();
+
+			// if the script already fully run script processing.
+			if (pScript->getLastCallResult() == lua::CallResult::Ok) {
+				completedLoads_.pop();
+				continue;
+			}
+
+			// the script can either error.
+			// fail on dependancy
+			// or run okay.
+			// we only don't remove if we are waiting for a depedancy,
+			if (!processLoadedScript(pScript)) {
+
+			}
+			
+			if(!pScript->hasPendingInclude())
+			{
+				completedLoads_.pop();
+			}
+			else
+			{
+				break;
+			}
+		}
+
+	}
 
 	{
 		X_PROFILE_BEGIN("Lua GC", core::profiler::SubSys::SCRIPT);
-
-		// LUA_GCSTEP: performs an incremental step of garbage collection.
-		// The step "size" is controlled by data(larger values mean more steps) 
-		// in a non - specified way.If you want to control the step size you must 
-		// experimentally tune the value of data.The function returns 1 if the step 
-		// finished a garbage - collection cycle.
-
 		state::gc_step(L, vars_.gcStepSize());
 	}
-
 }
 
+
+// return true if not 'error'
+bool XScriptSys::processLoadedScript(Script* pScript)
+{
+	X_ASSERT(pScript->getStatus() == core::LoadStatus::Complete, "Script was not loaded")(pScript->getStatus());
+	X_ASSERT(pScript->getLastCallResult() == lua::CallResult::None ||
+		pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")(pScript->getLastCallResult());
+
+	if (pScript->hasPendingInclude())
+	{
+		X_ASSERT(pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")(pScript->getLastCallResult());
+
+		auto* pInclude = X_ASSERT_NOT_NULL(pScript->getPendingInclude());
+		if (pInclude->getStatus() == core::LoadStatus::Error)
+		{
+			X_ERROR("Script", "\"%s\" depeancy failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
+			return false;
+		}
+		
+		// if our include has not loaded from disk yet, wait.
+		if (pInclude->getStatus() != core::LoadStatus::Complete) {
+			return true;
+		}
+
+		if (!processLoadedScript(pInclude))
+		{
+			X_ERROR("Script", "\"%s\" depeancy failed to load: \"%s\"", pScript->getName().c_str(), pInclude->getName().c_str());
+			return false;
+		}
+
+		// may not of been a error, but could have a child include.
+		if (pInclude->getLastCallResult() != lua::CallResult::Ok) {
+			return true;
+		}
+
+
+		// sanity check the dependancy
+		X_ASSERT(pInclude->getStatus() == core::LoadStatus::Complete, "Script is not loaded")(pInclude->getStatus());
+		X_ASSERT(pInclude->getLastCallResult() == lua::CallResult::Ok, "Script did not run ok")(pInclude->getLastCallResult());
+		X_ASSERT(!pInclude->hasPendingInclude(), "Script has pending include")(pInclude->hasPendingInclude());
+		pScript->setPendingInclude(nullptr);
+	}
+
+	X_ASSERT(!pScript->hasPendingInclude(), "Script has pending include")(pScript->hasPendingInclude());
+	X_LUA_CHECK_STACK(L);
+
+	auto chunk = pScript->getChunk(L);
+	if (chunk == lua::Ref::Nil) {
+		return false;
+	}
+
+	auto result = stack::pcall(L, 0, LUA_MULTRET, errrorHandler_, chunk);
+
+	pScript->setLastCallResult(result);
+
+	// script had a include, that's not loaded, rip.
+	// we must dispatch a load and wait for the result of that.
+	if (result == CallResult::TryAgain)
+	{
+		const char* pFileName = stack::as_string(L);
+		Script* pInclude = loadScript(pFileName);
+
+		pScript->setPendingInclude(X_ASSERT_NOT_NULL(pInclude));
+		stack::pop(L);
+		return true;
+	}
+
+	if (result != CallResult::Ok) {
+		X_ERROR("Script", "\"%s\" failed to exec: \"%s\"", pScript->getName().c_str(), CallResult::ToString(result));
+		stack::pop(L);
+	}
+
+	
+	return true;
+}
+
+
+void XScriptSys::loadFileAsync(const char* pFileName)
+{
+	loadScript(pFileName);
+}
+
+Script* XScriptSys::findScript(const char* pFileName)
+{
+	core::Path<char> nameNoExt(pFileName);
+	nameNoExt.removeExtension();
+
+	core::string name(nameNoExt.begin(), nameNoExt.end());
+
+	core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
+
+	ScriptResource* pScript = scripts_.findAsset(name);
+	if (pScript) {
+		return pScript;
+	}
+
+	return nullptr;
+}
+ 
+Script* XScriptSys::loadScript(const char* pFileName)
+{
+	// I allow extension to be passed, unlike other assets, since it's allowed in includes.
+	core::Path<char> nameNoExt(pFileName);
+	nameNoExt.removeExtension();
+
+	core::string name(nameNoExt.begin(), nameNoExt.end());
+
+	core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
+
+	ScriptResource* pScriptRes = scripts_.findAsset(name);
+	if (pScriptRes)
+	{
+		pScriptRes->addReference();
+		return pScriptRes;
+	}
+
+	pScriptRes = scripts_.createAsset(name, arena_, name);
+
+	addLoadRequest(pScriptRes);
+
+	return pScriptRes;
+}
+
+bool XScriptSys::onInclude(const char* pFileName)
+{
+	{
+		Script* pScriptRes = findScript(pFileName);
+		if (pScriptRes) {
+			// do we need to run it?
+
+			return true;
+		}
+	}
+
+	// Throw a expection, the return won't run.
+	lua_tryagain(L);
+	return false;
+}
+
+bool XScriptSys::executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc)
+{
+	lua::StateView state(L);
+
+	if (!state.loadScript(pBegin, pEnd, pDesc)) {
+		return false;
+	}
+
+	int base = stack::top(state);
+	stack::push_ref(state, errrorHandler_);
+	stack::move_top_to(state, base); // move the error hander before the script.
+
+	auto status = stack::pcall(state, 0, LUA_MULTRET, base);
+
+	stack::remove(state, base);
+
+	if (status != CallResult::Ok)
+	{
+		stack::pop(L);
+	}
+
+	return true;
+}
 
 bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
 {
@@ -230,7 +419,7 @@ bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
 
 	if (status != CallResult::Ok)
 	{
-
+		stack::pop(L);
 	}
 
 	return true;
@@ -783,45 +972,193 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 
 // ~IScriptSys
 
+// -----------------------------------------------------------------
 
-#if 0
 
-bool XScriptSys::ExecuteBuffer(const char* sBuffer, size_t nSize, const char* Description)
+void XScriptSys::releaseScript(Script* pScript)
 {
-	int status;
-
-	status = luaL_loadbuffer(L, sBuffer, nSize, Description);
-
-	if (status == 0)
+	ScriptResource* pScriptRes = reinterpret_cast<ScriptResource*>(pScript);
+	if (pScriptRes->removeReference() == 0)
 	{
-		int base = lua_gettop(L);  // function index.
+		scripts_.releaseAsset(pScriptRes);
+	}
+}
 
-		lua_getref(L, g_pErrorHandlerFunc);
-		lua_insert(L, base);
 
-		status = lua_pcall(L, 0, LUA_MULTRET, base);  // call main
+void XScriptSys::addLoadRequest(ScriptResource* pScript)
+{
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-		lua_remove(L, base);
+	pScript->addReference(); // prevent instance sweep
+	pScript->setStatus(core::LoadStatus::Loading);
+
+	dispatchLoad(pScript, lock);
+}
+
+void XScriptSys::dispatchLoad(Script* pScript, core::CriticalSection::ScopedLock&)
+{
+	X_ASSERT(pScript->getStatus() == core::LoadStatus::Loading || pScript->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
+
+	auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pScript);
+
+	// dispatch IO 
+	dispatchLoadRequest(loadReq.get());
+
+	pendingRequests_.emplace_back(loadReq.release());
+}
+
+void XScriptSys::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
+{
+	core::Path<char> path;
+	path /= "scripts";
+	path /= pLoadReq->pAsset->getName();
+	path.setExtension(SCRIPT_FILE_EXTENSION);
+
+	// dispatch a read request baby!
+	core::IoRequestOpen open;
+	open.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
+	open.pUserData = pLoadReq;
+	open.mode = core::fileMode::READ;
+	open.path = path;
+
+	gEnv->pFileSys->AddIoRequestToQue(open);
+}
+
+void XScriptSys::onLoadRequestFail(AssetLoadRequest* pLoadReq)
+{
+	auto* pScript = pLoadReq->pAsset;
+
+	pScript->setStatus(core::LoadStatus::Error);
+
+	loadRequestCleanup(pLoadReq);
+}
+
+void XScriptSys::loadRequestCleanup(AssetLoadRequest* pLoadReq)
+{
+	auto status = pLoadReq->pAsset->getStatus();
+	X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
+
+	{
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+		pendingRequests_.remove(pLoadReq);
 	}
 
-	if (status != 0)
+	if (pLoadReq->pFile) {
+		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
+	}
+
+	// release our ref.
+	releaseScript(static_cast<Script*>(pLoadReq->pAsset));
+
+	X_DELETE(pLoadReq, arena_);
+
+	loadCond_.NotifyAll();
+}
+
+void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+	core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+	core::IoRequest::Enum requestType = pRequest->getType();
+	AssetLoadRequest* pLoadReq = pRequest->getUserData<AssetLoadRequest>();
+	Script* pScript = static_cast<Script*>(pLoadReq->pAsset);
+
+	if (requestType == core::IoRequest::OPEN)
 	{
-		const char* Err = lua_tostring(L, -1);
-		if (Description && strlen(Description) != 0)
+		if (!pFile)
 		{
-			X_ERROR("Script", "Failed to execute file %s: %s", Description, Err);
-		}
-		else
-		{
-			X_WARNING("Script", "Error executing lua %s", Err);
+			X_ERROR("Script", "Failed to load: \"%s\"", pScript->getName().c_str());
+			onLoadRequestFail(pLoadReq);
+			return;
 		}
 
-		lua_pop(L, 1);
+		pLoadReq->pFile = pFile;
+
+		// read the whole file.
+		uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
+		X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
+		pLoadReq->data = core::makeUnique<char[]>(blockArena_, fileSize, 16);
+		pLoadReq->dataSize = fileSize;
+
+		core::IoRequestRead read;
+		read.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
+		read.pUserData = pLoadReq;
+		read.pFile = pFile;
+		read.dataSize = fileSize;
+		read.offset = 0;
+		read.pBuf = pLoadReq->data.ptr();
+		fileSys.AddIoRequestToQue(read);
+	}
+	else if (requestType == core::IoRequest::READ)
+	{
+		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
+
+		X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")();
+
+		if (bytesTransferred != pReadReq->dataSize)
+		{
+			X_ERROR("Script", "Failed to read Script data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);
+			onLoadRequestFail(pLoadReq);
+			return;
+		}
+
+		gEnv->pJobSys->CreateMemberJobAndRun<XScriptSys>(this, &XScriptSys::processData_job,
+			pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::SCRIPT));
+	}
+}
+
+void XScriptSys::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+	X_UNUSED(jobSys, threadIdx, pJob, pData);
+
+	AssetLoadRequest* pLoadReq = static_cast<AssetLoadRequest*>(X_ASSERT_NOT_NULL(pData));
+	Script* pScript = static_cast<Script*>(pLoadReq->pAsset);
+
+	if (!processData(pScript, std::move(pLoadReq->data), pLoadReq->dataSize))
+	{
+		onLoadRequestFail(pLoadReq);
+	}
+	else
+	{
+		loadRequestCleanup(pLoadReq);
+	}
+}
+
+bool XScriptSys::processData(Script* pScript, core::UniquePointer<char[]> data, uint32_t dataSize)
+{
+	if (!pScript->processData(std::move(data), dataSize)) {
+		pScript->setStatus(core::LoadStatus::Error);
 		return false;
 	}
+
+	// how to solve a problem like maria
+	/*
+		- we ask for a script to be loaded.
+		- the file data gets loaded in background.
+		- once that script is loaded it needs to be loading into lua.
+			- in a thread safe manner.
+			 1. have a list of pending buffer loads, and each Update() process the files.
+				problem with this is min latency for a file load is one frame.
+				also if we have a dependancy chain 10 deep, it's a min of 10 frames to load.
+			 
+			 Can I come up with a way to load the lua state without having to wait a frame?
+			 If I add sync to the global state can do it from here.
+			 but adds overhead.
+
+			 need to work out how to deal with threads for C functions
+			 and calling of lua code.
+
+			 if i have simular style to gSc
+			 where we just responding to actions and events.
+			 maybe we will just collect them all up then run from single thread, dunno.
+		
+	*/
+
+	completedLoads_.push(pScript);
+
+	pScript->setStatus(core::LoadStatus::Complete);
 	return true;
 }
-#endif 
+
 
 // IXHotReload
 
@@ -887,15 +1224,16 @@ void XScriptSys::listScripts(const char* pSearchPatten) const
 	}
 	);
 
-	X_LOG0("Script", "------------ ^8Scripts(%" PRIuS ")^7 ---------------", sorted_scripts.size());
+	X_LOG0("Script", "------------ ^8Scripts(%" PRIuS ")^7 --------------", sorted_scripts.size());
 
 	for (const auto* pScript : sorted_scripts)
 	{
-		X_LOG0("Script", "^2%-32s^7 Status: ^2%s^7 Refs:^2%i",
-			pScript->getName(), lua::CallResult::ToString(pScript->getLastCallResult()), pScript->getRefCount());
+		X_LOG0("Script", "^2%-32s^7 Hash: ^20x%016" PRIx64 "^7 Status: ^2%s^7 Refs:^2%i",
+			pScript->getName(), pScript->getHash(),
+			lua::CallResult::ToString(pScript->getLastCallResult()), pScript->getRefCount());
 	}
 
-	X_LOG0("Script", "------------ ^8Scripts End^7 --------------");
+	X_LOG0("Script", "------------ ^8Scripts End^7 -------------");
 
 }
 

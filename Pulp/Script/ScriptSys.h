@@ -10,20 +10,37 @@
 #include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 #include <Memory\HeapArea.h>
 
-#include <Containers\Array.h>
+#include <Assets\AssertContainer.h>
+#include <Assets\AssetBase.h>
+#include <Assets\AssetManagerBase.h>
 
 
 X_NAMESPACE_DECLARE(core,
+	namespace V2 {
+		struct Job;
+		class JobSystem;
+	}
+	struct XFileAsync;
+	struct IoRequestBase;
+
 	struct IConsoleCmdArgs
 );
 
 X_NAMESPACE_BEGIN(script)
 
-class XScriptTable;
-class XScriptBinds;
+class Script;
 
-class XScriptSys : public IScriptSys, public core::IXHotReload
+class XScriptSys : 
+	public IScriptSys, 
+	public core::IXHotReload,
+	public core::AssetManagerBase
 {
+	
+	typedef core::AssetContainer<Script, SCRIPT_MAX_LOADED, core::SingleThreadPolicy> ScriptContainer;
+	typedef ScriptContainer::Resource ScriptResource;
+
+
+	typedef core::Fifo<Script*> ScriptQueue;
 
 	typedef core::Array<XScriptTable*> ScriptTableArr;
 	typedef core::Array<XScriptBinds*> ScriptBindsArr;
@@ -57,6 +74,14 @@ public:
 	virtual void release(void) X_FINAL;
 
 	virtual void Update(void) X_FINAL;
+
+	virtual void loadFileAsync(const char* pFileName) X_FINAL;
+	Script* findScript(const char* pFileName);
+	Script* loadScript(const char* pFileName);
+	bool processLoadedScript(Script* pScript);
+
+	bool onInclude(const char* pFileName);
+	bool executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc);
 
 	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_FINAL;
 
@@ -108,6 +133,24 @@ public:
 	static bool toAny(lua_State* L, ScriptValue& var, int index);
 
 private:
+	void releaseScript(Script* pScript);
+
+	void addLoadRequest(ScriptResource* pScript);
+	void dispatchLoad(Script* pScript, core::CriticalSection::ScopedLock&);
+	void dispatchLoadRequest(AssetLoadRequest* pLoadReq);
+
+	// load / processing
+	void onLoadRequestFail(AssetLoadRequest* pLoadReq);
+	void loadRequestCleanup(AssetLoadRequest* pLoadReq);
+
+	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+		core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+	void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+
+	bool processData(Script* pScript, core::UniquePointer<char[]> data, uint32_t dataSize);
+
+private:
 
 	// IXHotReload
 	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
@@ -124,9 +167,8 @@ private:
 	void dumpState(core::IConsoleCmdArgs* pArgs);
 
 private:
-	lua_State* L;
+	lua_State* L; // hot
 
-	core::MemoryArenaBase*		arena_;
 	PoolArena::AllocationPolicy poolAllocator_;
 	PoolArena					poolArena_;
 
@@ -138,7 +180,12 @@ private:
 	ScriptBindsArr scriptBinds_;
 	ScriptBindsBaseArr baseBinds_;
 
+	ScriptContainer	scripts_;
+
+	// loading
+	ScriptQueue completedLoads_;
 	
+
 	bool initialised_;
 };
 
