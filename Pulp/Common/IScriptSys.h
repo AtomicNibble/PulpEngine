@@ -11,6 +11,8 @@ X_NAMESPACE_BEGIN(script)
 
 static const char* X_SCRIPT_FILE_EXTENSION = "lua";
 
+static const uint32_t SCRIPT_MAX_LOADED = 256;
+
 
 X_DECLARE_ENUM(Moudles)(
 	Global,
