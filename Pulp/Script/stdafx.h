@@ -1,13 +1,15 @@
 #pragma once
 
 #include <EngineCommon.h>
+#include <IDirectoryWatcher.h>
+#include <IScriptSys.h>
+
 
 #include <String\Path.h>
-#include <IDirectoryWatcher.h>
+#include <Util\UniquePointer.h>
 
 #include <lua.hpp>
 
-#include <IScriptSys.h>
 
 #include "Util\Config.h"
 
