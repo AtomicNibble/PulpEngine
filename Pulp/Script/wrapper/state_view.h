@@ -335,6 +335,20 @@ namespace lua
 		}
 
 
+
+		X_INLINE CallResult::Enum pcall(lua_State* L, int32_t numArgs, int32_t numResults, RefId errorHandle, RefId chunk)
+		{
+			int base = stack::top(L) + 1;
+			push_ref(L, errorHandle);
+			push_ref(L, chunk);
+
+			auto result = static_cast<CallResult::Enum>(lua_pcall(L, numArgs, numResults, base));
+
+			stack::remove(L, base);
+
+			return result;
+		}
+
 	}
 
 	namespace state
