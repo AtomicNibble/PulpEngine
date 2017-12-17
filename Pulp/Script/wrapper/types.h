@@ -48,6 +48,7 @@ namespace lua
 	static_assert(CallResult::Memory == LUA_ERRMEM, "Enum mismtach");
 	static_assert(CallResult::Handler == LUA_ERRERR, "Enum mismtach");
 	static_assert(CallResult::File == LUA_ERRFILE, "Enum mismtach");
+	static_assert(CallResult::TryAgain == LUA_EAGAIN, "Enum mismtach");
 
 
 	X_DECLARE_ENUM(LoadResult)(
