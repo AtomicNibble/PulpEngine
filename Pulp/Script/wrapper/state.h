@@ -11,13 +11,14 @@ namespace lua
 	{
 		typedef std::unique_ptr<lua_State, void(*)(lua_State*)> unique_base;
 
+		X_NO_COPY(State);
+		X_NO_ASSIGN(State);
+
 	public:
 		State(core::MemoryArenaBase* arena);
-		State(const State&) = delete;
 		State(State&&) = default;
 		~State();
 
-		State& operator=(const State&) = delete;
 		State& operator=(State&& that);
 
 	private:
