@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IRender.h>
+#include <IAsyncLoad.h>
 
 
 X_NAMESPACE_DECLARE(core,
@@ -22,7 +23,7 @@ struct IVideo
 };
 
 
-struct IVideoSys : public core::IEngineSysBase
+struct IVideoSys : public core::IEngineSysBase, public core::IAssetLoader
 {
 
 	virtual ~IVideoSys() {}

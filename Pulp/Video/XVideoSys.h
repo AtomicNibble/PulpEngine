@@ -152,6 +152,7 @@ public:
 	IVideo* loadVideo(const char* pVideoName) X_FINAL;
 
 	void releaseVideo(IVideo* pVid) X_FINAL;
+	bool waitForLoad(core::AssetBase* pVideo) X_FINAL; // returns true if load succeed.
 	bool waitForLoad(IVideo* pVideo) X_FINAL; // returns true if load succeed.
 
 	void listVideos(const char* pSearchPatten = nullptr) const;

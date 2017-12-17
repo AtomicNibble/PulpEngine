@@ -126,6 +126,18 @@ void XVideoSys::releaseVideo(IVideo* pVideo)
 	}
 }
 
+bool XVideoSys::waitForLoad(core::AssetBase* pVideo)
+{
+	X_ASSERT(pVideo->getType() == assetDb::AssetType::VIDEO, "Invalid asset passed")();
+
+	if (pVideo->isLoaded()) {
+		return true;
+	}
+
+	return waitForLoad(static_cast<IVideo*>(static_cast<Video*>(pVideo)));
+}
+
+
 bool XVideoSys::waitForLoad(IVideo* pIVideo)
 {
 	Video* pVideo = static_cast<Video*>(pIVideo);
