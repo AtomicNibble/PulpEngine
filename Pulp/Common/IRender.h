@@ -398,8 +398,6 @@ typedef Flags<CpuAccess> CpuAccessFlags;
 
 struct IRender
 {
-	// physics has it's own Aux render que so to speak, other que's can be added.
-	// they are not thread safe, but it's fine to populate diffrent aux instances in diffrent threads.
 	virtual ~IRender() {};
 
 	virtual void registerVars(void) X_ABSTRACT;
@@ -437,7 +435,6 @@ struct IRender
 	// cb's
 	virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 
-	// this creates a texture for a given textureFile, the cpu data is only uploaded if requested.
 	virtual IDeviceTexture* getDeviceTexture(int32_t id) X_ABSTRACT;
 	virtual bool initDeviceTexture(IDeviceTexture* pTex) X_ABSTRACT;
 	virtual bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
