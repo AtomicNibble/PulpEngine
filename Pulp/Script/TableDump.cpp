@@ -115,17 +115,19 @@ const char* XRecursiveLuaDumpToFile::GetKeyStr(const char* pKey, int key)
 	return keyStr_;
 }
 
-bool dumpStateToFile(lua_State* L, const char* name)
+bool dumpStateToFile(lua_State* L, const char* pFileName)
 {
 	X_LUA_CHECK_STACK(L);
 
-	core::Path<char> path(name);
+	core::Path<char> path(pFileName);
 	path.setExtension(".txt");
 
 	core::XFileScoped file;
 	if (!file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE)) {
 		return false;
 	}
+
+	X_LOG0("Script", "Dumping state to: \"%s\"", pFileName);
 
 	XRecursiveLuaDumpToFile sink(*file.GetFile());
 
