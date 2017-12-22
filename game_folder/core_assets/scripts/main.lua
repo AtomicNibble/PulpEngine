@@ -1,35 +1,40 @@
-Script.Load("scripts/util.lua");	
+Script.Load("util.lua");
 
 function OnInit()
 
---	Core.Warning("test");
+	Core.Log("Hello world!!");
+	Core.Warning("fuck you");
+	Core.Error("stu not fnd");
 end
 
 function TestFile()
 
-	file = io.openFile("test.dat","w")
-	
+	file = Io.OpenFile("test.dat","w")
+
 	-- writes a string and a number
 	file:write("potato", 5)
 	-- just a string
 	file:write("--test");
 	file:write(0.45454);
+
+	file:write("--test");
+
 	-- random number :D
 	file:write(math.random())
-		
-	io.closeFile(file)
+
+	Io.CloseFile(file)
 end
 
 function TestRead()
 
-	file = io.openFile("test.dat","r")
-	
-	data = file:read("*a")
-	
+	file = Io.OpenFile("test.dat","r")
+
+	local data = file:read("*a")
+
 	file:close()
-	
-	Log("File Contents: ^1" .. data)
-	
+
+	Core.Log("File Contents: ^5\"" .. data .. "\"")
+
 end
 
 
@@ -46,7 +51,7 @@ end
 --Game = Game or {}
 --Game.__index = Game
 
--- OnInit();
--- TestFile();
--- TestRead();
-TestVector();
+OnInit();
+TestFile();
+TestRead();
+---TestVector();
