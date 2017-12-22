@@ -1,3 +1,8 @@
 /*.exe
 /*.exp
 /*.lib
+/lj_folddef.h
+/lj_bcdef.h
+/lj_ffdef.h
+/lj_libdef.h
+/lj_recdef.h
