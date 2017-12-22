@@ -16,7 +16,7 @@ namespace HumanSize
 		// i use each type untill there is 10,240 of them.
 		if (numBytes <= 10240)
 		{
-			str.appendFmt("%" PRIu64 "bytes", numBytes);
+			str.appendFmt("%" PRIu32 "bytes", numBytes);
 		}
 		else if (numBytes <= 10485760)
 		{
@@ -83,7 +83,7 @@ namespace HumanSize
 		// i use each type untill there is 10,240 of them.
 		if (numBytes <= 10240)
 		{
-			str.appendFmt("%s%" PRIu64 "bytes", pSign, numBytes);
+			str.appendFmt("%s%" PRIi64 "bytes", pSign, numBytes);
 		}
 		else if (numBytes <= 10485760)
 		{
