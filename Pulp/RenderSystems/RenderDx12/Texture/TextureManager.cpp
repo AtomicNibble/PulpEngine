@@ -560,7 +560,7 @@ X_NAMESPACE_BEGIN(texture)
 
 		for (const auto* pTex : sorted_texs)
 		{
-			X_LOG0("Texture", "^2\"%s\"^7 dim: ^2%" PRIi32 "x%" PRIi32 " ^7mips: ^2%" PRIi32 " ^7fmt: ^2%s ^7refs: ^2%" PRIi32,
+			X_LOG0("Texture", "^2\"%s\"^7 Dim: ^2%" PRIi32 "x%" PRIi32 " ^7Mips: ^2%" PRIi32 " ^7Fmt: ^2%s ^7Refs: ^2%" PRIi32,
 				pTex->getName(), pTex->getWidth(), pTex->getHeight(), pTex->getNumMips(), 
 				Texturefmt::ToString(pTex->getFormat()), pTex->getRefCount());
 		}

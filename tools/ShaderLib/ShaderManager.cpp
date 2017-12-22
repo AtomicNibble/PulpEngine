@@ -434,7 +434,7 @@ namespace shader
 		{
 			const auto* pShader = it;
 
-			X_LOG0("Shader", "Name: ^2\"%s\"^7 Status: ^2%s^7 type: ^2%s^7 IL: ^2%s^7 numInst: ^2%" PRIi32 "^7 refs: ^2%" PRIi32,
+			X_LOG0("Shader", "Name: ^2\"%s\"^7 Status: ^2%s^7 Type: ^2%s^7 IL: ^2%s^7 NumInst: ^2%" PRIi32 "^7 Refs: ^2%" PRIi32,
 				pShader->getName().c_str(),
 				ShaderStatus::ToString(pShader->getStatus()),
 				ShaderType::ToString(pShader->getType()),

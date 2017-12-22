@@ -1446,7 +1446,7 @@ void XSound::listBanks(const char* pSearchPatten) const
 
 	for (const auto* pBank : sorted_banks)
 	{
-		X_LOG0("SoundSys", "^2%-32s^7 ID:^2%-10i^7 Status:^2%s",
+		X_LOG0("SoundSys", "^2%-32s^7 ID: ^20x%08" PRIx32 "^7 Status: ^2%s",
 			pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
 	}
 

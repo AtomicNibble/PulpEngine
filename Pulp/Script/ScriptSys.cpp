@@ -1266,7 +1266,7 @@ void XScriptSys::listScripts(const char* pSearchPatten) const
 
 	for (const auto* pScript : sorted_scripts)
 	{
-		X_LOG0("Script", "^2%-32s^7 Hash: ^20x%016" PRIx64 "^7 Status: ^2%s^7 Refs:^2%i",
+		X_LOG0("Script", "^2%-32s^7 Hash: ^20x%016" PRIx64 "^7 Status: ^2%s^7 Refs: ^2%" PRIi32,
 			pScript->getName(), pScript->getHash(),
 			lua::CallResult::ToString(pScript->getLastCallResult()), pScript->getRefCount());
 	}
