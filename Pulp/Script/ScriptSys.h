@@ -66,20 +66,20 @@ public:
 	// IScriptSys
 	~XScriptSys() X_FINAL;
 
-	virtual void registerVars(void) X_FINAL;
-	virtual void registerCmds(void) X_FINAL;
+	void registerVars(void) X_FINAL;
+	void registerCmds(void) X_FINAL;
 
-	virtual bool init(void) X_FINAL;
-	virtual void shutDown(void) X_FINAL;
-	virtual void release(void) X_FINAL;
+	bool init(void) X_FINAL;
+	void shutDown(void) X_FINAL;
+	void release(void) X_FINAL;
 
-	virtual void Update(void) X_FINAL;
+	void Update(void) X_FINAL;
 
-	virtual IScript* findScript(const char* pFileName);
-	virtual IScript* loadScript(const char* pFileName) X_FINAL;
+	IScript* findScript(const char* pFileName);
+	IScript* loadScript(const char* pFileName) X_FINAL;
 	
-	virtual bool waitForLoad(core::AssetBase* pScript) X_FINAL;
-	virtual bool waitForLoad(IScript* pScript) X_FINAL; // returns true if load succeed.
+	bool waitForLoad(core::AssetBase* pScript) X_FINAL;
+	bool waitForLoad(IScript* pScript) X_FINAL; // returns true if load succeed.
 
 
 	bool processLoadedScript(Script* pScript);
@@ -87,36 +87,36 @@ public:
 	bool onInclude(const char* pFileName);
 	bool executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc);
 
-	virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_FINAL;
+	bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_FINAL;
 
-	virtual ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_FINAL;
-	virtual	ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_FINAL;
-	virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_FINAL;
-	virtual void releaseFunc(ScriptFunctionHandle f) X_FINAL;
+	ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_FINAL;
+	ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_FINAL;
+	bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_FINAL;
+	void releaseFunc(ScriptFunctionHandle f) X_FINAL;
 
-	virtual IScriptTable* createTable(bool empty = false) X_FINAL;
-	virtual IScriptBinds* createScriptBind(void) X_FINAL;
+	IScriptTable* createTable(bool empty = false) X_FINAL;
+	IScriptBinds* createScriptBind(void) X_FINAL;
 
-	virtual void setGlobalValue(const char* pKey, const ScriptValue& val) X_FINAL;
-	virtual bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
+	void setGlobalValue(const char* pKey, const ScriptValue& val) X_FINAL;
+	bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
 
-	virtual bool call(ScriptFunctionHandle f) X_FINAL;
+	bool call(ScriptFunctionHandle f) X_FINAL;
 
-	virtual bool beginCall(ScriptFunctionHandle f) X_FINAL;
-	virtual bool beginCall(const char* pFunName) X_FINAL;
-	virtual bool beginCall(const char* pTableName, const char* pFunName) X_FINAL;
-	virtual bool beginCall(IScriptTable* pTable, const char* pFunName) X_FINAL;
+	bool beginCall(ScriptFunctionHandle f) X_FINAL;
+	bool beginCall(const char* pFunName) X_FINAL;
+	bool beginCall(const char* pTableName, const char* pFunName) X_FINAL;
+	bool beginCall(IScriptTable* pTable, const char* pFunName) X_FINAL;
 
-	virtual void pushCallArg(const ScriptValue& any) X_FINAL;
+	void pushCallArg(const ScriptValue& any) X_FINAL;
 
 	bool endCall(int32_t numReturnValues);
-	virtual bool endCall(void) X_FINAL;
-	virtual bool endCall(ScriptValue& value) X_FINAL;
+	bool endCall(void) X_FINAL;
+	bool endCall(ScriptValue& value) X_FINAL;
 
-	virtual IScriptTable* createUserData(void* ptr, size_t size) X_FINAL;
+	IScriptTable* createUserData(void* ptr, size_t size) X_FINAL;
 
-	virtual void onScriptError(const char* fmt, ...) X_FINAL;
-	virtual void logCallStack(void) X_FINAL;
+	void onScriptError(const char* fmt, ...) X_FINAL;
+	void logCallStack(void) X_FINAL;
 
 	// ~IScriptSys
 public:
