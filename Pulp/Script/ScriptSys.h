@@ -128,7 +128,7 @@ public:
 	bool getRecursiveAny(IScriptTable* pTable, const core::StackString<256>& key, ScriptValue& any);
 
 	bool popAny(ScriptValue& var);
-	void pushAny(const ScriptValue &var);
+	void pushAny(const ScriptValue& var);
 	void pushVec3(const Vec3f& vec);
 	void pushTable(IScriptTable* pTable);
 	bool toVec3(Vec3f& vec, int index);
