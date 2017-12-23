@@ -2283,7 +2283,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 
 				// generate a nonce, for password if requried.
 				core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
-				core::Hash::SHA1 hash;
+				NonceHash hash;
 				hash.update(timeNow);
 				for (size_t i = 0; i < 16; i++) {
 					hash.update(core::random::MultiplyWithCarry());
@@ -2308,7 +2308,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 	SystemAddressEx bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
-	core::Hash::SHA1Digest nonce;
+	NonceHashDigest nonce;
 
 	bs.read(clientGuid);
 	bindingAdd.fromBitStream(bs);
