@@ -363,7 +363,6 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	for (const auto& s : samplers_)
 	{
 		// even tho could just write enums this is a bit more robust.
-		// since i read it out as sampler, might re order the members etc..
 		render::SamplerState sampler;
 		sampler.filter = s.filterType;
 		sampler.repeat = s.texRepeat;
