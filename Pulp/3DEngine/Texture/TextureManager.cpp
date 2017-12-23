@@ -78,20 +78,22 @@ bool TextureManager::init(void)
 
 	textureLoaders_.append(pCILoader_);
 
-	if (vars_.allowFmtDDS()) {
-		textureLoaders_.append(X_NEW(texture::DDS::XTexLoaderDDS, arena_, "DDSLoader"));
-	}
-	if (vars_.allowFmtJPG()) {
-		textureLoaders_.append(X_NEW(texture::JPG::XTexLoaderJPG, arena_, "JPGLoader"));
-	}
-	if (vars_.allowFmtPNG()) {
-		textureLoaders_.append(X_NEW(texture::PNG::XTexLoaderPNG, arena_, "PNGLoader"));
-	}
-	if (vars_.allowFmtPSD()) {
-		textureLoaders_.append(X_NEW(texture::PSD::XTexLoaderPSD, arena_, "PSDLoader"));
-	}
-	if (vars_.allowFmtTGA()) {
-		textureLoaders_.append(X_NEW(texture::TGA::XTexLoaderTGA, arena_, "TGALoader"));
+	if (vars_.allowRawImgLoading()) {
+		if (vars_.allowFmtDDS()) {
+			textureLoaders_.append(X_NEW(texture::DDS::XTexLoaderDDS, arena_, "DDSLoader"));
+		}
+		if (vars_.allowFmtJPG()) {
+			textureLoaders_.append(X_NEW(texture::JPG::XTexLoaderJPG, arena_, "JPGLoader"));
+		}
+		if (vars_.allowFmtPNG()) {
+			textureLoaders_.append(X_NEW(texture::PNG::XTexLoaderPNG, arena_, "PNGLoader"));
+		}
+		if (vars_.allowFmtPSD()) {
+			textureLoaders_.append(X_NEW(texture::PSD::XTexLoaderPSD, arena_, "PSDLoader"));
+		}
+		if (vars_.allowFmtTGA()) {
+			textureLoaders_.append(X_NEW(texture::TGA::XTexLoaderTGA, arena_, "TGALoader"));
+		}
 	}
 
 	if (!loadDefaultTextures()) {
