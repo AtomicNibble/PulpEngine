@@ -233,7 +233,7 @@ class XPeer : public IPeer
 	> BlockAlocArena;
 
 
-	static std::array<uint32_t, 3> MTUSizesArr;
+	static const std::array<uint32_t, 3> MTUSizesArr;
 
 public:
 	XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaBase* arena);

@@ -242,7 +242,7 @@ void RemoteSystem::onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime
 
 // -----------------------------------
 
-std::array<uint32_t, 3> XPeer::MTUSizesArr = { MAX_MTU_SIZE, 1200, 576 };
+const std::array<uint32_t, 3> XPeer::MTUSizesArr = { MAX_MTU_SIZE, 1200, 576 };
 
 XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaBase* arena) :
 	vars_(vars),
