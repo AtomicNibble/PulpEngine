@@ -398,6 +398,11 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		}
 	}
 
+	if (cryptRnd_.init()) {
+		X_ERROR("Net", "Failed to init rnd");
+		return StartupResult::Error;
+	}
+
 	if (vars_.debugEnabled() > 1)
 	{
 		NetGuidStr guidStr;
@@ -2285,9 +2290,17 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 				core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 				NonceHash hash;
 				hash.update(timeNow);
+
+				std::array<uint8_t, 16> randBytes;
+				cryptRnd_.genBytes(randBytes.data(), randBytes.size());
+
 				for (size_t i = 0; i < 16; i++) {
-					hash.update(core::random::MultiplyWithCarry());
+					hash.update(randBytes.data(), randBytes.size());
 				}
+
+				hash.update(core::TimeStamp::GetSystemTime());
+				hash.update(core::Thread::GetCurrentID());
+
 				pRemoteSys->nonce = hash.finalize();
 
 				bsOut.write(pRemoteSys->nonce);

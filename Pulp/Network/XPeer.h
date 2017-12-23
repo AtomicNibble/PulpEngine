@@ -10,6 +10,7 @@
 #include <Memory\HeapArea.h>
 #include <Hashing\sha1.h>
 #include <Time\TimeStamp.h>
+#include <Random\CryptRand.h>
 
 #include "Sockets\Socket.h"
 #include "Reliability\ReliabilityLayer.h"
@@ -467,6 +468,8 @@ private:
 	BlockAlocArena		blockArena_;
 
 	PasswordStr password_; // 12345
+
+	core::random::CryptRand cryptRnd_;
 };
 
 
