@@ -27,6 +27,8 @@ namespace random
 	{
 		static_assert(sizeof(hProvider_) == sizeof(HCRYPTPROV), "invalid size");
 
+		X_ASSERT(hProvider_ == 0, "Provider already created")(hProvider_);
+
 		if (!CryptAcquireContextW(
 			(HCRYPTPROV*)&hProvider_,
 			NULL,
