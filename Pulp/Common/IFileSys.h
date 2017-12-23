@@ -99,7 +99,7 @@ struct XFile
 	inline size_t writeObj(const T* objects, size_t num) {
 		return write(objects,(sizeof(T)* num));
 	}
-	inline size_t writeString(core::string& str) {
+	inline size_t writeString(const core::string& str) {
 		return write(str.c_str(), str.length() + 1);
 	}
 	inline size_t writeString(const char* str) {
@@ -109,7 +109,7 @@ struct XFile
 		return write(str, Length);
 	}
 
-	inline size_t writeStringNNT(core::string& str) {
+	inline size_t writeStringNNT(const core::string& str) {
 		return write(str.c_str(), (str.length()));
 	}
 	inline size_t writeStringNNT(const char* str) {
@@ -735,7 +735,7 @@ public:
 		return pFile_->write(pBuf, Len);
 	}
 
-	inline size_t writeString(core::string& str) {
+	inline size_t writeString(const core::string& str) {
 		return pFile_->writeString(str);
 	}
 	inline size_t writeString(const char* str) {
@@ -745,7 +745,7 @@ public:
 		return pFile_->writeString(str, Length);
 	}
 
-	inline size_t writeStringNNT(core::string& str) {
+	inline size_t writeStringNNT(const core::string& str) {
 		return pFile_->writeStringNNT(str);
 	}
 	inline size_t writeStringNNT(const char* str) {
@@ -900,7 +900,7 @@ public:
 		return pFile_->write(pBuf, Len);
 	}
 
-	inline size_t writeString(core::string& str) {
+	inline size_t writeString(const core::string& str) {
 		return pFile_->writeString(str);
 	}
 	inline size_t writeString(const char* str) {
@@ -910,7 +910,7 @@ public:
 		return pFile_->writeString(str, Length);
 	}
 
-	inline size_t writeStringNNT(core::string& str) {
+	inline size_t writeStringNNT(const core::string& str) {
 		return pFile_->writeStringNNT(str);
 	}
 	inline size_t writeStringNNT(const char* str) {
