@@ -21,7 +21,6 @@ X_NAMESPACE_BEGIN(net)
 class NetVars;
 
 typedef core::Hash::SHA1 NonceHash;
-typedef NonceHash::Digest NonceHashDigest;
 
 X_DECLARE_ENUM(ConnectState)(
 	NoAction,
@@ -142,7 +141,7 @@ public:
 
 	ReliabilityLayer relLayer;
 
-	NonceHashDigest nonce;
+	NonceHash::Digest nonce;
 };
 
 struct RequestConnection

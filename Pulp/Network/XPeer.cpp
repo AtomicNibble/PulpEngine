@@ -2321,7 +2321,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 	SystemAddressEx bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
-	NonceHashDigest nonce;
+	NonceHash::Digest nonce;
 
 	bs.read(clientGuid);
 	bindingAdd.fromBitStream(bs);
