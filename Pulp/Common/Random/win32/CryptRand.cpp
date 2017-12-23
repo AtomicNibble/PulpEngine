@@ -25,8 +25,10 @@ namespace random
 
 	bool CryptRand::init(void)
 	{
+		static_assert(sizeof(hProvider_) == sizeof(HCRYPTPROV), "invalid size");
+
 		if (!CryptAcquireContextW(
-			&hProvider_,
+			(HCRYPTPROV*)&hProvider_,
 			NULL,
 			NULL,
 			PROV_RSA_FULL,
