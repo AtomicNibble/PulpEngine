@@ -235,6 +235,9 @@
     <Filter Include="Interfaces_h\Script">
       <UniqueIdentifier>{2c76c073-5702-474f-bddb-b976b000f2dd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="SourceFiles\Random\win32">
+      <UniqueIdentifier>{1af050cd-8ea9-4633-b1ed-3e72c664e943}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1297,6 +1300,9 @@
     <ClInclude Include="Assets\AssetManagerBase.h">
       <Filter>Headers\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="Random\CryptRand.h">
+      <Filter>Headers\Random</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2021,6 +2027,9 @@
     </ClCompile>
     <ClCompile Include="Hashing\Digest.cpp">
       <Filter>SourceFiles\Hashing</Filter>
+    </ClCompile>
+    <ClCompile Include="Random\win32\CryptRand.cpp">
+      <Filter>SourceFiles\Random\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

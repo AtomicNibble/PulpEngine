@@ -316,6 +316,7 @@
     <ClInclude Include="IPrimativeContext.h" />
     <ClInclude Include="Prepro\PreproWiden.h" />
     <ClInclude Include="Profile\ProfilerTypes.h" />
+    <ClInclude Include="Random\CryptRand.h" />
     <ClInclude Include="Random\MultiplyWithCarry.h" />
     <ClInclude Include="Random\XorShift.h" />
     <ClInclude Include="resource.h" />
@@ -703,6 +704,7 @@
     <ClCompile Include="Buffer.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Hashing\Digest.cpp" />
+    <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
