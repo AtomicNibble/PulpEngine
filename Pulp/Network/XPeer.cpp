@@ -1454,7 +1454,7 @@ int32_t XPeer::getLastPing(SystemHandle systemHandle) const
 		return -1;
 	}
 
-	return pRemoteSys->lowestPing;
+	return pRemoteSys->pings[pRemoteSys->lastPingIdx].pingTime;
 }
 
 int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
@@ -1466,7 +1466,7 @@ int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
 		return -1;
 	}
 
-	return pRemoteSys->pings[pRemoteSys->lastPingIdx].pingTime;
+	return pRemoteSys->lowestPing;
 }
 
 
