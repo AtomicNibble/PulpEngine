@@ -17,6 +17,9 @@ namespace Hash
 		static const int blocksize = 64;
 
 	public:
+		typedef MD5Digest Digest;
+
+	public:
 		MD5();
 		~MD5();
 

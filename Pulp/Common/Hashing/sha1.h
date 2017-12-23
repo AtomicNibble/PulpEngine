@@ -18,6 +18,9 @@ namespace Hash
 		static const uint32_t DIGEST_INTS = 5;
 		static const uint32_t BLOCK_INTS = 16;
 		static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
+	
+	public:
+		typedef SHA1Digest Digest;
 
 	public:
 		SHA1();

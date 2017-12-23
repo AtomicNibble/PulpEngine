@@ -16,6 +16,9 @@ namespace Hash
 	class SHA512
 	{
 	public:
+		typedef SHA512Digest Digest;
+
+	public:
 		SHA512();
 		~SHA512();
 
