@@ -21,6 +21,8 @@ X_NAMESPACE_BEGIN(net)
 class NetVars;
 
 typedef core::Hash::SHA1 NonceHash;
+// Change sha1 for something much stronger / salted if this code is used for something other than game server passwords.
+typedef core::Hash::SHA1 PasswdHash; 
 
 X_DECLARE_ENUM(ConnectState)(
 	NoAction,

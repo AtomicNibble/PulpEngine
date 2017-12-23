@@ -2359,7 +2359,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
 					bsOut.write(pReq->password.isNotEmpty());
 					if (pReq->password.isNotEmpty()) 
 					{
-						core::Hash::SHA1 hash;
+						PasswdHash hash;
 						hash.update(nonce);
 						hash.update(pReq->password.c_str(), pReq->password.length());
 						auto digest = hash.finalize();
@@ -2468,7 +2468,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 	bs.read(timeStamp);
 	bs.read(passwordInc);
 
-	core::Hash::SHA1Digest passwordDisget;
+	PasswdHash::Digest passwordDisget;
 	if (passwordInc) {
 		bs.readAligned(passwordDisget);
 	}
@@ -2483,7 +2483,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
 
 	if (password_.isNotEmpty() || invalidPassord)
 	{
-		core::Hash::SHA1 hash;
+		PasswdHash hash;
 		hash.update(rs.nonce);
 		hash.update(password_.c_str(), password_.length());
 		auto serverPassDigest = hash.finalize();
