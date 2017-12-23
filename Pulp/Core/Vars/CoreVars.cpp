@@ -55,6 +55,8 @@ void CoreVars::registerVars(void)
 		VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
 	ADD_CVAR_STRING("build_ref", X_STRINGIZE(X_ENGINE_BUILD_REF), 
 		VarFlag::SYSTEM | VarFlag::READONLY, "Engine Version");
+	ADD_CVAR_STRING("build_date", X_ENGINE_BUILD_DATE,
+		VarFlag::SYSTEM | VarFlag::READONLY, "Engine Build Date");
 }
 
 void CoreVars::updateWinPos(int32_t x, int32_t y)

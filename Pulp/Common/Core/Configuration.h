@@ -79,6 +79,7 @@
 #define X_ENGINE_VERSION_STR	X_STRINGIZE(X_ENGINE_VERSION)
 #define	X_BUILD_STRING			X_PLATFORM_STR "-" X_CPUSTRING
 #define X_ENGINE_BUILD_REF		-1 // branch-ref
+#define X_ENGINE_BUILD_DATE		(__DATE__ " " __TIME__)
 
 #define X_INCLUDE(path)			X_STRINGIZE(path)
 
