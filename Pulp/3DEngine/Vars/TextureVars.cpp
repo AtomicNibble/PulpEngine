@@ -21,7 +21,7 @@ TextureVars::TextureVars()
 void TextureVars::registerVars(void)
 {
 	ADD_CVAR_REF("img_allow_raw_fmt", allowRawImgLoading_, allowRawImgLoading_, 0, 1,
-		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Allows loading of none compiled images. dds,tga,png,jpg,psd...");
 
 
