@@ -13,6 +13,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+using namespace core::Hash::Fnv1Literals;
 
 namespace techset
 {
@@ -425,8 +426,7 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		// BlendState, State, StencilState
 
 		// how best to find each type since the token can contain more than just the name i think.
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "BlendState"_fnv1a:
@@ -598,8 +598,7 @@ bool TechSetDef::parseBlendStateData(core::XParser& lex, render::BlendState& ble
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "colorBlendFunc"_fnv1a:
@@ -748,8 +747,7 @@ bool TechSetDef::parseStencilStateData(core::XParser& lex, StencilState& stencil
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "enable"_fnv1a:
@@ -864,8 +862,7 @@ bool TechSetDef::parseStateData(core::XParser& lex, render::StateDesc& state)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			// anything that is not Stencil or blend.
@@ -1136,8 +1133,7 @@ bool TechSetDef::parsePrimitiveTypeData(core::XParser& lex, render::TopoType::En
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			// anything that is not Stencil or blend.
@@ -1227,8 +1223,7 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "source"_fnv1a:
@@ -1356,8 +1351,7 @@ bool TechSetDef::parseTechnique(core::XParser& lex)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "state"_fnv1a:
@@ -1507,8 +1501,7 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 bool TechSetDef::parseParamFloat1(core::XParser& lex)
 {
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Float1, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1528,8 +1521,7 @@ bool TechSetDef::parseParamFloat1(core::XParser& lex)
 
 bool TechSetDef::parseParamFloat2(core::XParser& lex)
 {
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Float2, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1554,8 +1546,7 @@ bool TechSetDef::parseParamFloat2(core::XParser& lex)
 
 bool TechSetDef::parseParamFloat4(core::XParser& lex)
 {
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Float4, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1591,8 +1582,7 @@ bool TechSetDef::parseParamFloat4(core::XParser& lex)
 bool TechSetDef::parseParamColor(core::XParser& lex)
 {
 	// for color it's just single prop.
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Color, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 		
 		bool isExplicit = false;
@@ -1616,8 +1606,7 @@ bool TechSetDef::parseParamColor(core::XParser& lex)
 
 bool TechSetDef::parseParamInt(core::XParser& lex)
 {
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1637,8 +1626,7 @@ bool TechSetDef::parseParamInt(core::XParser& lex)
 
 bool TechSetDef::parseParamBool(core::XParser& lex)
 {
-	using namespace core::Hash::Fnv1Literals;
-
+	
 	return parseParamHelper(lex, ParamType::Bool, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1748,8 +1736,7 @@ bool TechSetDef::parseParamTexture(core::XParser& lex)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "image"_fnv1a:
@@ -1897,8 +1884,7 @@ bool TechSetDef::parseParamSampler(core::XParser& lex)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		bool isExplicit;
 
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
@@ -2011,8 +1997,7 @@ bool TechSetDef::parseParamHelper(core::XParser& lex, ParamType::Enum type, Para
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		const auto hash = core::Hash::Fnv1aHash(token.begin(), token.length());
 		switch (hash)
 		{
@@ -2060,8 +2045,7 @@ bool TechSetDef::parseAssPropsData(core::XParser& lex, AssManProps& props)
 			return true;
 		}
 
-		using namespace core::Hash::Fnv1Literals;
-
+		
 		switch (core::Hash::Fnv1aHash(token.begin(), token.length()))
 		{
 			case "cat"_fnv1a:
