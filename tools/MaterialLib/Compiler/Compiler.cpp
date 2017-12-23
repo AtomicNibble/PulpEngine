@@ -316,7 +316,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
 bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 {
-	// lets check asset will fit.
+	// lets check asset name will fit.
 	// I don't do this in IMaterial.h just to save including IAssetDb.h in the header.
 	static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<decltype(MaterialTextureHdr::nameLen)>::max(),
 		"Material only supports 255 max name len");
