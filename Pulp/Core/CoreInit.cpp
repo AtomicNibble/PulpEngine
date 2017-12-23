@@ -758,7 +758,7 @@ bool XCore::parseSeed(Vec4i seed)
 }
 
 
-bool XCore::InitFileSys(const SCoreInitParams &initParams)
+bool XCore::InitFileSys(const SCoreInitParams& initParams)
 {
 	X_UNUSED(initParams);
 	env_.pFileSys = X_NEW_ALIGNED( core::xFileSys, g_coreArena, "FileSys", 8)(g_coreArena);
@@ -777,7 +777,7 @@ bool XCore::InitFileSys(const SCoreInitParams &initParams)
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-bool XCore::InitLogging(const SCoreInitParams &initParams)
+bool XCore::InitLogging(const SCoreInitParams& initParams)
 {
 	env_.pLog = X_NEW_ALIGNED( core::XLog, g_coreArena, "LogSystem", 8);
 
@@ -817,7 +817,7 @@ bool XCore::InitLogging(const SCoreInitParams &initParams)
 	return env_.pLog != nullptr;
 }
 
-bool XCore::InitConsole(const SCoreInitParams &initParams)
+bool XCore::InitConsole(const SCoreInitParams& initParams)
 {
 	// console can load it's render resources now.
 	if (!initParams.basicConsole())
@@ -831,7 +831,7 @@ bool XCore::InitConsole(const SCoreInitParams &initParams)
 }
 
 
-bool XCore::InitInput(const SCoreInitParams &initParams)
+bool XCore::InitInput(const SCoreInitParams& initParams)
 {
 	if (initParams.bSkipInput) {
 		env_.pInput = X_NEW(input::XNullInput, g_coreArena,"NullInput");
@@ -855,7 +855,7 @@ bool XCore::InitInput(const SCoreInitParams &initParams)
 	return true;
 }
 
-bool XCore::InitFont(const SCoreInitParams &initParams)
+bool XCore::InitFont(const SCoreInitParams& initParams)
 {
 	if (!IntializeEngineModule(DLL_FONT, "Engine_Font", initParams)) {
 		return false;

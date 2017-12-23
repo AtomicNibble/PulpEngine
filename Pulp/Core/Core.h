@@ -89,7 +89,7 @@ public:
 	XCore();
 	~XCore() X_FINAL;
 
-	virtual bool Init(const SCoreInitParams &startupParams) X_FINAL;
+	virtual bool Init(const SCoreInitParams& startupParams) X_FINAL;
 	virtual bool InitAsyncWait(void) X_FINAL;
 	virtual void ShutDown(void); // not part of ICore currently
 	virtual void Release(void) X_FINAL;
@@ -152,24 +152,24 @@ private:
 	core::Module::Handle LoadDLL(const char* pDllName);
 
 	bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName,
-		const SCoreInitParams &initParams);
+		const SCoreInitParams& initParams);
 	
 	bool ParseCmdArgs(const wchar_t* pArgs);
 	bool parseSeed(Vec4i seed);
 
-	bool InitConsole(const SCoreInitParams &initParams);
-	bool InitFileSys(const SCoreInitParams &startupParams);
-	bool InitLogging(const SCoreInitParams &startupParams);
-	bool InitInput(const SCoreInitParams &startupParams);
-	bool InitFont(const SCoreInitParams &startupParams);
-	bool InitSound(const SCoreInitParams &startupParams);
-	bool InitScriptSys(const SCoreInitParams &startupParams);
-	bool InitRenderSys(const SCoreInitParams &startupParams);
-	bool Init3DEngine(const SCoreInitParams &startupParams);
-	bool InitGameDll(const SCoreInitParams &startupParams);
-	bool InitPhysics(const SCoreInitParams &startupParams);
-	bool InitNet(const SCoreInitParams &startupParams);
-	bool InitVideo(const SCoreInitParams &startupParams);
+	bool InitConsole(const SCoreInitParams& initParams);
+	bool InitFileSys(const SCoreInitParams& startupParams);
+	bool InitLogging(const SCoreInitParams& startupParams);
+	bool InitInput(const SCoreInitParams& startupParams);
+	bool InitFont(const SCoreInitParams& startupParams);
+	bool InitSound(const SCoreInitParams& startupParams);
+	bool InitScriptSys(const SCoreInitParams& startupParams);
+	bool InitRenderSys(const SCoreInitParams& startupParams);
+	bool Init3DEngine(const SCoreInitParams& startupParams);
+	bool InitGameDll(const SCoreInitParams& startupParams);
+	bool InitPhysics(const SCoreInitParams& startupParams);
+	bool InitNet(const SCoreInitParams& startupParams);
+	bool InitVideo(const SCoreInitParams& startupParams);
 	
 	
 	void registerVars(const SCoreInitParams& initParams);
