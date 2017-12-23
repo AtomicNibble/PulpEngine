@@ -2288,16 +2288,13 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 
 				// generate a nonce, for password if requried.
 				core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
-				NonceHash hash;
-				hash.update(timeNow);
-
-				std::array<uint8_t, 16> randBytes;
+				
+				std::array<uint8_t, NonceHash::Digest::NUM_BYTES> randBytes;
 				cryptRnd_.genBytes(randBytes.data(), randBytes.size());
 
-				for (size_t i = 0; i < 16; i++) {
-					hash.update(randBytes.data(), randBytes.size());
-				}
-
+				NonceHash hash;
+				hash.update(timeNow);				
+				hash.update(randBytes.data(), randBytes.size());
 				hash.update(core::TimeStamp::GetSystemTime());
 				hash.update(core::Thread::GetCurrentID());
 
