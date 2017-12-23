@@ -42,9 +42,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="small.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
     <Image Include="Converter.ico">
       <Filter>Resource Files</Filter>
     </Image>
