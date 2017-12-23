@@ -2287,6 +2287,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 				bsOut.write<uint16_t>(mtu);
 
 				// generate a nonce, for password if requried.
+				// I use a hash just as conventint way to generate a random set of bytes.
 				core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 				
 				std::array<uint8_t, NonceHash::Digest::NUM_BYTES> randBytes;
