@@ -16,6 +16,9 @@ namespace Hash
 	{
 		typedef char String[(NumBytes + 1) * 2];
 
+		static const int32_t NUM_BYTES = NumBytes;
+		static const int32_t NUM_BITS = NumBytes * 8;
+
 	public:
 		X_INLINE Digest() {
 			zero_this(this);
