@@ -103,6 +103,11 @@ X_INLINE core::xWindow* XCore::GetGameWindow(void)
 	return pWindow_;
 }
 
+X_INLINE core::AssetLoader* XCore::GetAssetLoader(void)
+{
+	return &assetLoader_;
+}
+
 X_INLINE SCoreGlobals* XCore::GetGlobalEnv(void)
 {
 	return &env_;

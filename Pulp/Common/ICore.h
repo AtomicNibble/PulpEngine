@@ -46,6 +46,7 @@ class Console;
 class xWindow;
 class MallocFreeAllocator;
 class MemoryArenaBase;
+class AssetLoader;
 
 namespace V2 {
 	class JobSystem;
@@ -361,6 +362,7 @@ struct ICore
 	virtual core::Crc32* GetCrc32(void) X_ABSTRACT;
 	virtual core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;
 	virtual core::xWindow* GetGameWindow(void) X_ABSTRACT;
+	virtual core::AssetLoader* GetAssetLoader(void) X_ABSTRACT;
 
 	// ~Assert
 	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_ABSTRACT;

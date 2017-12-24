@@ -36,6 +36,7 @@
 #include "Memory\AllocationPolicies\GrowingGenericAllocator.h"
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
+#include <Assets\AssetLoader.h>
 
 struct IPotatoFactoryRegistryImpl;
 struct IEngineModule;
@@ -125,6 +126,7 @@ public:
 	X_INLINE core::CpuInfo*	GetCPUInfo(void) X_FINAL;
 	
 	X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
+	X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
 
 	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
 	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
@@ -252,6 +254,8 @@ private:
 
 	// args
 	CmdArgs args_;
+
+	core::AssetLoader assetLoader_;
 };
 
 X_NAMESPACE_BEGIN(core)
