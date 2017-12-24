@@ -274,7 +274,6 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 			}
 
-			// TODO: pool allocations.
 			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
 
 			if (!file->valid()) {
