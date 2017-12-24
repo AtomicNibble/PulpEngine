@@ -678,7 +678,8 @@ struct IFileSys
 class XFileMemScoped
 {
 public:
-	XFileMemScoped() : pFile_(nullptr)
+	XFileMemScoped() : 
+		pFile_(nullptr)
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pFileSys);
@@ -840,7 +841,8 @@ private:
 class XFileScoped
 {
 public:
-	XFileScoped() : pFile_(nullptr) 
+	XFileScoped() :
+		pFile_(nullptr) 
 	{
 		X_ASSERT_NOT_NULL(gEnv);
 		X_ASSERT_NOT_NULL(gEnv->pFileSys);
