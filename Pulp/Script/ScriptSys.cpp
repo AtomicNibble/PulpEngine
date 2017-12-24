@@ -15,8 +15,9 @@
 #include <IConsole.h>
 
 #include <Threading\JobSystem2.h>
-
 #include <Memory\VirtualMem.h>
+
+#include <Assets\AssetLoader.h>
 
 
 X_NAMESPACE_BEGIN(script)
@@ -34,7 +35,8 @@ namespace
 
 
 XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
-	AssetManagerBase(arena, arena),
+	arena_(arena),
+	pAssetLoader_(nullptr),
 	L(nullptr),
 	poolAllocator_(PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * POOL_ALLOC_MAX,
 		core::VirtualMem::GetPageSize() * 4,
@@ -82,6 +84,9 @@ bool XScriptSys::init(void)
 	X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
 	initialised_ = true;
+
+	pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+	pAssetLoader_->registerAssetType(assetDb::AssetType::SCRIPT, this, SCRIPT_FILE_EXTENSION);
 
 	L = luaL_newstate();
 
@@ -350,31 +355,7 @@ bool XScriptSys::waitForLoad(IScript* pIScript)
 {
 	Script* pScript = static_cast<Script*>(pIScript);
 
-	{
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		while (pScript->getStatus() == core::LoadStatus::Loading)
-		{
-			loadCond_.Wait(loadReqLock_);
-		}
-	}
-
-	// did we fail? or never sent a dispatch?
-	auto status = pScript->getStatus();
-	if (status == core::LoadStatus::Complete)
-	{
-		return true;
-	}
-	else if (status == core::LoadStatus::Error)
-	{
-		return false;
-	}
-	else if (status == core::LoadStatus::NotLoaded)
-	{
-		// request never sent?
-	}
-
-	X_ASSERT_UNREACHABLE();
-	return false;
+	return pAssetLoader_->waitForLoad(pScript);
 }
 
 
@@ -1025,175 +1006,27 @@ void XScriptSys::releaseScript(Script* pScript)
 
 void XScriptSys::addLoadRequest(ScriptResource* pScript)
 {
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
-
 	pScript->addReference(); // prevent instance sweep
-	pScript->setStatus(core::LoadStatus::Loading);
 
-	dispatchLoad(pScript, lock);
+	pAssetLoader_->addLoadRequest(pScript);
 }
 
-void XScriptSys::dispatchLoad(Script* pScript, core::CriticalSection::ScopedLock&)
+void XScriptSys::onLoadRequestFail(core::AssetBase* pAsset)
 {
-	X_ASSERT(pScript->getStatus() == core::LoadStatus::Loading || pScript->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
+	X_UNUSED(pAsset);
 
-	auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pScript);
-
-	// dispatch IO 
-	dispatchLoadRequest(loadReq.get());
-
-	pendingRequests_.emplace_back(loadReq.release());
 }
 
-void XScriptSys::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
+
+bool XScriptSys::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-	core::Path<char> path;
-	path /= "scripts";
-	path /= pLoadReq->pAsset->getName();
-	path.setExtension(SCRIPT_FILE_EXTENSION);
+	auto* pScript = static_cast<Script*>(pAsset);
 
-	// dispatch a read request baby!
-	core::IoRequestOpen open;
-	open.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
-	open.pUserData = pLoadReq;
-	open.mode = core::fileMode::READ;
-	open.path = path;
-
-	gEnv->pFileSys->AddIoRequestToQue(open);
-}
-
-void XScriptSys::onLoadRequestFail(AssetLoadRequest* pLoadReq)
-{
-	auto* pScript = pLoadReq->pAsset;
-
-	pScript->setStatus(core::LoadStatus::Error);
-
-	loadRequestCleanup(pLoadReq);
-}
-
-void XScriptSys::loadRequestCleanup(AssetLoadRequest* pLoadReq)
-{
-	auto status = pLoadReq->pAsset->getStatus();
-	X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
-
-	{
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		pendingRequests_.remove(pLoadReq);
-	}
-
-	if (pLoadReq->pFile) {
-		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
-	}
-
-	// release our ref.
-	releaseScript(static_cast<Script*>(pLoadReq->pAsset));
-
-	X_DELETE(pLoadReq, arena_);
-
-	loadCond_.NotifyAll();
-}
-
-void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-	core::IoRequest::Enum requestType = pRequest->getType();
-	AssetLoadRequest* pLoadReq = pRequest->getUserData<AssetLoadRequest>();
-	Script* pScript = static_cast<Script*>(pLoadReq->pAsset);
-
-	if (requestType == core::IoRequest::OPEN)
-	{
-		if (!pFile)
-		{
-			X_ERROR("Script", "Failed to load: \"%s\"", pScript->getName().c_str());
-			onLoadRequestFail(pLoadReq);
-			return;
-		}
-
-		pLoadReq->pFile = pFile;
-
-		// read the whole file.
-		uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
-		X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
-		pLoadReq->data = core::makeUnique<char[]>(blockArena_, fileSize, 16);
-		pLoadReq->dataSize = fileSize;
-
-		core::IoRequestRead read;
-		read.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
-		read.pUserData = pLoadReq;
-		read.pFile = pFile;
-		read.dataSize = fileSize;
-		read.offset = 0;
-		read.pBuf = pLoadReq->data.ptr();
-		fileSys.AddIoRequestToQue(read);
-	}
-	else if (requestType == core::IoRequest::READ)
-	{
-		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
-
-		X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")();
-
-		if (bytesTransferred != pReadReq->dataSize)
-		{
-			X_ERROR("Script", "Failed to read Script data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);
-			onLoadRequestFail(pLoadReq);
-			return;
-		}
-
-		gEnv->pJobSys->CreateMemberJobAndRun<XScriptSys>(this, &XScriptSys::processData_job,
-			pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::SCRIPT));
-	}
-}
-
-void XScriptSys::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys, threadIdx, pJob, pData);
-
-	AssetLoadRequest* pLoadReq = static_cast<AssetLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-	Script* pScript = static_cast<Script*>(pLoadReq->pAsset);
-
-	if (!processData(pScript, std::move(pLoadReq->data), pLoadReq->dataSize))
-	{
-		onLoadRequestFail(pLoadReq);
-	}
-	else
-	{
-		loadRequestCleanup(pLoadReq);
-	}
-}
-
-bool XScriptSys::processData(Script* pScript, core::UniquePointer<char[]> data, uint32_t dataSize)
-{
 	if (!pScript->processData(std::move(data), dataSize)) {
-		pScript->setStatus(core::LoadStatus::Error);
 		return false;
 	}
 
-	// how to solve a problem like maria
-	/*
-		- we ask for a script to be loaded.
-		- the file data gets loaded in background.
-		- once that script is loaded it needs to be loading into lua.
-			- in a thread safe manner.
-			 1. have a list of pending buffer loads, and each Update() process the files.
-				problem with this is min latency for a file load is one frame.
-				also if we have a dependancy chain 10 deep, it's a min of 10 frames to load.
-			 
-			 Can I come up with a way to load the lua state without having to wait a frame?
-			 If I add sync to the global state can do it from here.
-			 but adds overhead.
-
-			 need to work out how to deal with threads for C functions
-			 and calling of lua code.
-
-			 if i have simular style to gSc
-			 where we just responding to actions and events.
-			 maybe we will just collect them all up then run from single thread, dunno.
-		
-	*/
-
 	completedLoads_.push(pScript);
-
-	pScript->setStatus(core::LoadStatus::Complete);
 	return true;
 }
 

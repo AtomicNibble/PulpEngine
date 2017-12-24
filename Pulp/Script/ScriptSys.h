@@ -12,7 +12,7 @@
 
 #include <Assets\AssertContainer.h>
 #include <Assets\AssetBase.h>
-#include <Assets\AssetManagerBase.h>
+#include <Assets\AssetLoader.h>
 
 
 X_NAMESPACE_DECLARE(core,
@@ -23,7 +23,9 @@ X_NAMESPACE_DECLARE(core,
 	struct XFileAsync;
 	struct IoRequestBase;
 
-	struct IConsoleCmdArgs
+	struct IConsoleCmdArgs;
+
+	class AssetLoader;
 );
 
 X_NAMESPACE_BEGIN(script)
@@ -33,12 +35,11 @@ class Script;
 class XScriptSys : 
 	public IScriptSys, 
 	public core::IXHotReload,
-	public core::AssetManagerBase
+	private core::IAssetLoadSink
 {
 	
 	typedef core::AssetContainer<Script, SCRIPT_MAX_LOADED, core::SingleThreadPolicy> ScriptContainer;
 	typedef ScriptContainer::Resource ScriptResource;
-
 
 	typedef core::Fifo<Script*> ScriptQueue;
 
@@ -140,19 +141,8 @@ private:
 	void releaseScript(Script* pScript);
 
 	void addLoadRequest(ScriptResource* pScript);
-	void dispatchLoad(Script* pScript, core::CriticalSection::ScopedLock&);
-	void dispatchLoadRequest(AssetLoadRequest* pLoadReq);
-
-	// load / processing
-	void onLoadRequestFail(AssetLoadRequest* pLoadReq);
-	void loadRequestCleanup(AssetLoadRequest* pLoadReq);
-
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
-	bool processData(Script* pScript, core::UniquePointer<char[]> data, uint32_t dataSize);
+	void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+	bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
 private:
 
@@ -164,13 +154,15 @@ private:
 	void listBinds(void) const;
 	void listScripts(const char* pSearchPatten = nullptr) const;
 
-
 private:
 	void listBinds(core::IConsoleCmdArgs* pArgs);
 	void listScripts(core::IConsoleCmdArgs* pArgs);
 	void dumpState(core::IConsoleCmdArgs* pArgs);
 
 private:
+	core::MemoryArenaBase* arena_;
+	core::AssetLoader* pAssetLoader_;
+
 	lua_State* L; // hot
 
 	PoolArena::AllocationPolicy poolAllocator_;
@@ -189,7 +181,6 @@ private:
 	// loading
 	ScriptQueue completedLoads_;
 	
-
 	bool initialised_;
 };
 
