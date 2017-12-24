@@ -52,6 +52,10 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
 
 bool AssetLoader::waitForLoad(AssetBase* pAsset)
 {
+	if (pAsset->getStatus() == core::LoadStatus::Complete) {
+		return true;
+	}
+
 	{
 		// TODO: work out if this lock is really required.
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
