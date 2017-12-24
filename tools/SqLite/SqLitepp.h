@@ -179,6 +179,11 @@ public:
 	Result::Enum bind(int idx);
 	Result::Enum bind(int idx, null_type);
 
+	template <typename T, class = typename std::enable_if< std::is_enum<T>::value >::type>
+	X_INLINE Result::Enum bind(int idx, T value) {
+		return bind(idx, static_cast<int>(value));
+	}
+
 	Result::Enum bind(const char* pName, int value);
 	Result::Enum bind(const char* pName, double value);
 	Result::Enum bind(const char* pName, long long int value);
@@ -187,6 +192,11 @@ public:
 	Result::Enum bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
 	Result::Enum bind(const char* pName);
 	Result::Enum bind(const char* pName, null_type);
+
+	template <typename T, class = typename std::enable_if< std::is_enum<T>::value >::type>
+	X_INLINE Result::Enum bind(const char* pName, T value) {
+		return bind(pName, static_cast<int>(value));
+	}
 
 protected:
 	SqlLiteDb& db_;
