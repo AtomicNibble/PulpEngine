@@ -2,6 +2,7 @@
 
 #include <Util\EnumMacros.h>
 #include <Util\NamespaceMacros.h>
+#include <Util\UniquePointer.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -20,6 +21,14 @@ struct IAssetLoader
 	virtual ~IAssetLoader() {}
 
 	virtual bool waitForLoad(AssetBase* passet) X_ABSTRACT;
+};
+
+struct IAssetLoadSink
+{
+	virtual ~IAssetLoadSink() {}
+
+	virtual bool processData(AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_ABSTRACT;
+	virtual void onLoadRequestFail(AssetBase* pAsset) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

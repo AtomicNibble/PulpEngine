@@ -1297,11 +1297,11 @@
     <ClInclude Include="IScriptSys.inl">
       <Filter>Interfaces_h\Script</Filter>
     </ClInclude>
-    <ClInclude Include="Assets\AssetManagerBase.h">
-      <Filter>Headers\Assets</Filter>
-    </ClInclude>
     <ClInclude Include="Random\CryptRand.h">
       <Filter>Headers\Random</Filter>
+    </ClInclude>
+    <ClInclude Include="Assets\AssetLoader.h">
+      <Filter>Headers\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2030,6 +2030,9 @@
     </ClCompile>
     <ClCompile Include="Random\win32\CryptRand.cpp">
       <Filter>SourceFiles\Random\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Assets\AssetLoader.cpp">
+      <Filter>SourceFiles\Assets</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
