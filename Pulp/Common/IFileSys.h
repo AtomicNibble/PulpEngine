@@ -321,6 +321,12 @@ struct XFileFixedBuf : public XFile
 		X_ASSERT_NOT_NULL(end);
 		X_ASSERT(end >= begin, "invalid buffer")(begin, end);
 	}
+
+	XFileFixedBuf(const char* begin, const char* end) :
+		XFileFixedBuf(reinterpret_cast<const uint8_t*>(begin), reinterpret_cast<const uint8_t*>(end))
+	{
+	}
+
 	~XFileFixedBuf() X_OVERRIDE {
 	}
 
