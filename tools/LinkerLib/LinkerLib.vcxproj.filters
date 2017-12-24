@@ -25,7 +25,7 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="LinkerLib.cpp">
+    <ClCompile Include="Linker.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
