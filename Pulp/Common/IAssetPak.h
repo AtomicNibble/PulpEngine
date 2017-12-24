@@ -96,8 +96,9 @@ static const uint8_t  PAK_VERSION = 1;
 static const char* PAK_FILE_EXTENSION = "ap";
 
 
-static const uint32_t PAX_ASSET_PADDING = 64;
-static const uint64_t PAK_MAX_SIZE = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) * PAX_ASSET_PADDING;
+static const size_t PAK_BLOCK_PADDING = 16; // each section of the pak file is aligned to this, aka string / entry data.
+static const uint32_t PAK_ASSET_PADDING = 64;
+static const uint64_t PAK_MAX_SIZE = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) * PAK_ASSET_PADDING;
 static const uint32_t PAK_MAX_ASSETS = std::numeric_limits<uint32_t>::max();
 static const uint32_t PAK_MAX_ASSET_SIZE = std::numeric_limits<uint32_t>::max();
 
@@ -111,13 +112,13 @@ static const uint32_t PAK_FU_SPARE_ASSET_SLOTS = 128;
 static const uint32_t PAK_STR_POOL_BLOCK_SIZE = 16; // smaller = less waste / larger = more capaciy.
 
 
-X_ENSURE_GE(PAK_STR_POOL_BLOCK_SIZE,8, "padding must be greater or equal to 8");
+X_ENSURE_GE(PAK_STR_POOL_BLOCK_SIZE, 8, "padding must be greater or equal to 8");
 
 
 struct AssetOffset
 {
 	static const uint64_t SHIFT_VALUE = 6ull;
-	static_assert((1 << SHIFT_VALUE) == PAX_ASSET_PADDING, "Incorrect shift value");
+	static_assert((1 << SHIFT_VALUE) == PAK_ASSET_PADDING, "Incorrect shift value");
 
 	operator uint64_t() const {
 		return ((uint64_t)(offset_)) << 6ull;
@@ -148,6 +149,8 @@ typedef Flags8<APakEntryFlag> APakEntryFlags;
 typedef assetDb::AssetType AssetType;
 typedef uint32_t AssetID;
 
+X_PACK_PUSH(4)
+
 struct APakSharedDicHdr
 {
 	uint32_t offset;
@@ -170,8 +173,13 @@ struct APakHeader
 	uint64_t	size;			
 	uint64_t	inflatedSize;
 	uint32_t	numAssets;
-
 	core::DateTimeStampSmall modified; // 8
+
+	uint32_t stringDataOffset;
+	uint32_t entryTableOffset;
+	uint32_t dataOffset;
+
+	uint32_t _pad[5];
 };
 
 struct APakStrPool
@@ -183,25 +191,27 @@ struct APakStrPool
 	uint16_t maxIndex;	// poolsize / padscheme
 };
 
+
 struct APakEntry
 {
 	AssetID							id;
 	AssetType::Enum					type; //  1byte
 	APakEntryFlags					flags;
 	AssetOffset						offset;
-	uint16_t						unused;	
 	uint32_t						size;
 	uint32_t						inflatedSize;
 };
+
+X_PACK_POP
 
 
 // check sizes.
 X_ENSURE_SIZE(AssetOffset, 4);
 X_ENSURE_SIZE(APakSharedDicHdr, 8);
 
-X_ENSURE_SIZE(APakHeader, 32);
+X_ENSURE_SIZE(APakHeader, 64);
 X_ENSURE_SIZE(APakStrPool, 16);
-X_ENSURE_SIZE(APakEntry, 28);
+X_ENSURE_SIZE(APakEntry, 24);
 
 
 
