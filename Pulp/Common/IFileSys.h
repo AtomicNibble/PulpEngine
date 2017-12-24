@@ -810,6 +810,11 @@ public:
 		return pFile_->tell();
 	}
 
+	inline void setSize(int64_t numBytes) {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->setSize(numBytes);
+	}
+
 	inline uint64_t remainingBytes(void) const {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->remainingBytes();
@@ -974,6 +979,11 @@ public:
 	inline uint64_t tell(void) const {
 		X_ASSERT_NOT_NULL(pFile_);
 		return pFile_->tell();
+	}
+
+	inline void setSize(int64_t numBytes) {
+		X_ASSERT_NOT_NULL(pFile_);
+		return pFile_->setSize(numBytes);
 	}
 
 	inline uint64_t remainingBytes(void) const {
