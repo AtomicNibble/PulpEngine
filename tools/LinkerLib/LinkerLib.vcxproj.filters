@@ -23,12 +23,18 @@
     <ClInclude Include="Linker.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="AssetPak.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Linker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetPak.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Module.cpp">
