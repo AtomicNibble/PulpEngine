@@ -166,6 +166,10 @@ struct APakDictInfo
 
 struct APakHeader
 {
+	X_INLINE bool isValid(void) const {
+		return magic == PAK_MAGIC;
+	}
+
 	uint32_t	magic;
 	uint8_t		version;
 	APakFlags	flags;
