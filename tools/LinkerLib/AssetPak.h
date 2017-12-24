@@ -6,15 +6,16 @@
 
 X_NAMESPACE_BEGIN(AssetPak)
 
+typedef core::Array<uint8_t> DataVec;
 
 struct Asset
 {
-	Asset(core::string& name, AssetType::Enum type, core::MemoryArenaBase* arena);
+	Asset(const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
 
 	core::string name;
 	AssetType::Enum type;
 
-	core::ByteStream data;
+	DataVec data;
 };
 
 
@@ -27,7 +28,7 @@ public:
 
 	bool save(core::Path<char>& path);
 
-	void addAsset(core::string& name, AssetType::Enum type);
+	void addAsset(const core::string& name, AssetType::Enum type, DataVec&& vec);
 
 private:
 	core::MemoryArenaBase* arena_;

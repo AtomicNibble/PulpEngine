@@ -91,6 +91,11 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 		return false;
 	}
 
+	// AssetDB
+	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
+		return false;
+	}
+
 	return true;
 }
 

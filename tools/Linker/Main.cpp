@@ -13,6 +13,7 @@
 
 #include <../LinkerLib/LinkerLib.h>
 X_LINK_LIB("engine_LinkerLib")
+X_LINK_LIB("engine_assetDB")
 
 
 #ifdef X_LIB
@@ -96,6 +97,36 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 		if (app.Init(hInstance, &arena, lpCmdLine, Console))
 		{
+			assetDb::AssetDB db;
+
+			linker::Linker linker(db, &arena);
+			linker.PrintBanner();
+
+			if (linker.Init())
+			{
+				LinkMode::Enum mode;
+
+				if (!GetMode(mode)) {
+					mode = LinkMode::BUILD;
+				}
+
+				core::StopWatch timer;
+
+				if (mode == LinkMode::BUILD)
+				{
+					if (!linker.Build())
+					{
+						X_ERROR("Linker", "Failed to perform build");
+					}
+				}
+
+				X_LOG0("Linker", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+
+			}
+			else
+			{
+				X_ERROR("Linker", "Failed to init linker");
+			}
 
 			Console.PressToContinue();
 		}
