@@ -7,6 +7,10 @@
 #include <Util\FlagsMacros.h>
 #include <Time\CompressedStamps.h>
 
+#include <IAssetDb.h>
+
+#include <array>
+
 X_NAMESPACE_BEGIN(AssetPak)
 
 // AssetPak: 
@@ -81,11 +85,23 @@ X_NAMESPACE_BEGIN(AssetPak)
 //
 //
 //
-//
+//	How do i want looks to work?
+//  I want to be able to ask for a file and open it.
+//  so need a lookup based on name, the index of the name will be the index in the table.
+//  basically want a hash index i think.
 
 
 static const uint32_t PAK_MAGIC = core::X_FOURCC<uint32_t>('a', 'p', 'a', 'k');
 static const uint8_t  PAK_VERSION = 1;
+static const char* PAK_FILE_EXTENSION = "ap";
+
+
+static const uint32_t PAX_ASSET_PADDING = 64;
+static const uint64_t PAK_MAX_SIZE = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) * PAX_ASSET_PADDING;
+static const uint32_t PAK_MAX_ASSETS = std::numeric_limits<uint32_t>::max();
+static const uint32_t PAK_MAX_ASSET_SIZE = std::numeric_limits<uint32_t>::max();
+
+
 
 // Fast Update defines
 static const uint32_t PAK_FU_STRING_POOL_RESERVER = 2048;
@@ -98,8 +114,11 @@ static const uint32_t PAK_STR_POOL_BLOCK_SIZE = 16; // smaller = less waste / la
 X_ENSURE_GE(PAK_STR_POOL_BLOCK_SIZE,8, "padding must be greater or equal to 8");
 
 
-struct assetOffset
+struct AssetOffset
 {
+	static const uint64_t SHIFT_VALUE = 6ull;
+	static_assert((1 << SHIFT_VALUE) == PAX_ASSET_PADDING, "Incorrect shift value");
+
 	operator uint64_t() const {
 		return ((uint64_t)(offset_)) << 6ull;
 	}
@@ -111,35 +130,48 @@ private:
 	uint32_t offset_;
 };
 
+X_DECLARE_FLAGS8(APakFlag)(
+	DIRTY, 
+	FAST_UPDATE, 
+	FULL_LOAD,
+	SHARED_DICTS		// Pack contains shared dictonaries.
+);
 
-struct AssetType
+typedef Flags8<APakFlag> APakFlags;
+
+X_DECLARE_FLAGS8(APakEntryFlag)(
+	FORCE_REBUILD
+);
+
+typedef Flags8<APakEntryFlag> APakEntryFlags;
+
+typedef assetDb::AssetType AssetType;
+typedef uint32_t AssetID;
+
+struct APakSharedDicHdr
 {
-	enum Enum : uint8
-	{
-		TEXTURE = 1,
-		MODEL,
-		ANIMATION,
-		SOUND,
-		SCRIPT,
-		CONFIG,
-		SHADER
-	};
+	uint32_t offset;
+	uint32_t size;
 };
 
-X_DECLARE_FLAGS(APakFlag)(DIRTY, FAST_UPDATE, FULLLOAD);
-X_DECLARE_FLAGS(APakEntryFlag)(FORCE_REBUILD);
+typedef std::array<APakSharedDicHdr, AssetType::ENUM_COUNT> APakSharedDicArr;
 
-typedef uint32_t AssetID;
+struct APakDictInfo
+{
+	APakSharedDicArr sharedHdrs;
+};
 
 struct APakHeader
 {
 	uint32_t	magic;
 	uint8_t		version;
-	uint8_t		flags;
+	APakFlags	flags;
 	uint16_t	unused;
 	uint64_t	size;			
 	uint64_t	inflatedSize;
 	uint32_t	numAssets;
+
+	core::DateTimeStampSmall modified; // 8
 };
 
 struct APakStrPool
@@ -153,24 +185,23 @@ struct APakStrPool
 
 struct APakEntry
 {
-	AssetID				id;
-	AssetType::Enum		type; //  1byte
-	uint8_t				flags;
-	uint16_t			crc16;	// not used.
-	assetOffset			offset;
-	uint32_t			size;
-	uint32_t			inflatedSize;
+	AssetID							id;
+	AssetType::Enum					type; //  1byte
+	APakEntryFlags					flags;
+	AssetOffset						offset;
+	uint16_t						unused;	
+	uint32_t						size;
+	uint32_t						inflatedSize;
 };
 
 
-
-
 // check sizes.
-X_ENSURE_SIZE(assetOffset, 4);
+X_ENSURE_SIZE(AssetOffset, 4);
+X_ENSURE_SIZE(APakSharedDicHdr, 8);
 
 X_ENSURE_SIZE(APakHeader, 32);
 X_ENSURE_SIZE(APakStrPool, 16);
-X_ENSURE_SIZE(APakEntry, 20);
+X_ENSURE_SIZE(APakEntry, 28);
 
 
 
