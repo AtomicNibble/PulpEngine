@@ -9,6 +9,9 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
+    <Filter Include="Source Files\EngineModule">
+      <UniqueIdentifier>{8d3a7a09-2920-4236-9000-82e94d9f4e06}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -27,6 +30,9 @@
     </ClCompile>
     <ClCompile Include="Linker.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Module.cpp">
+      <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
