@@ -144,7 +144,6 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 	auto type = pAsset->getType();
 
 	core::Path<char> path;
-	// path /= "scripts";
 	path /= assetDb::AssetType::ToString(pAsset->getType());
 	path.append('s', 1);
 	path /= pAsset->getName();
