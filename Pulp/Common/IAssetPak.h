@@ -93,7 +93,7 @@ X_NAMESPACE_BEGIN(AssetPak)
 
 static const uint32_t PAK_MAGIC = core::X_FOURCC<uint32_t>('a', 'p', 'a', 'k');
 static const uint8_t  PAK_VERSION = 1;
-static const char* PAK_FILE_EXTENSION = "ap";
+static const char* PAK_FILE_EXTENSION = "apak";
 
 
 static const size_t PAK_BLOCK_PADDING = 16; // each section of the pak file is aligned to this, aka string / entry data.
