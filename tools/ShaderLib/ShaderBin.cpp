@@ -42,7 +42,7 @@ namespace shader
 			uint32_t blobLength;
 			uint32_t deflatedLength;
 		//	uint32_t ___pad;
-			core::dateTimeStampSmall modifed;
+			core::DateTimeStampSmall modifed;
 
 			// i now save reflection info.
 			uint8_t numInputParams;
@@ -122,7 +122,7 @@ namespace shader
 		hdr.profileMajorVersion = profileVersion.first;
 		hdr.profileMinorVersion = profileVersion.second;
 		hdr.flags.Set(BinFileFlag::COMPRESSED);
-		hdr.modifed = core::dateTimeStampSmall::systemDateTime();
+		hdr.modifed = core::DateTimeStampSmall::systemDateTime();
 		hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
 		hdr.sourceCRC32 = pShader->getShaderSource()->getSourceCrc32();
 		hdr.compileFlags = pShader->getCompileFlags();

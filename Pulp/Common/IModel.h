@@ -633,7 +633,7 @@ struct ModelHeader // File header.
 	uint8_t numLod;
 	uint16_t boneDataSize;	// size of the bone data (nameIdx, hierarchy,angles,pos)
 
-	core::dateTimeStampSmall modified; // 4
+	core::DateTimeStampSmall modified; // 4
 
 	uint32_t dataSize;				// filesize - sizeof(ModelHeader).
 	uint32_t meshDataSize;			// mesh heads + meshdata + bone data(not names)

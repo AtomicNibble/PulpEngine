@@ -541,7 +541,7 @@ struct FileHeader
 
 	LevelFileFlags flags;
 
-	core::dateTimeStampSmall modified; // 4
+	core::DateTimeStampSmall modified; // 4
 
 	// size of all nodes
 	uint32_t totalDataSize;

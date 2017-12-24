@@ -711,7 +711,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 	hdr.fourCC = LVL_FOURCC_INVALID;
 	hdr.version = LVL_VERSION;
 	hdr.datacrc32 = 0;
-	hdr.modified = core::dateTimeStampSmall::systemDateTime();
+	hdr.modified = core::DateTimeStampSmall::systemDateTime();
 	hdr.numStrings = safe_static_cast<uint32_t>(stringTable_.numStrings());
 
 

@@ -9,11 +9,11 @@ X_NAMESPACE_BEGIN(core)
 // a compressed date stamp.
 // can store 127 year span.
 // bits: | year(7) | month(4) | day(5) | = 16
-struct dateStampSmall
+struct DateStampSmall
 {
-	dateStampSmall() : date_(0) {}
+	DateStampSmall() : date_(0) {}
 
-	dateStampSmall(int year, int month, int day) {
+	DateStampSmall(int year, int month, int day) {
 		setDate(year, month, day);
 	}
 
@@ -25,7 +25,7 @@ struct dateStampSmall
 	int month(void) const { return (date_ >> 5) & 0xF; }
 	int day(void) const { return date_ & 0x1F; }
 
-	static dateStampSmall systemDate(void);
+	static DateStampSmall systemDate(void);
 
 protected:
 	uint16_t date_;
@@ -61,26 +61,26 @@ protected:
 
 
 // Compressed Time & Date stamp.
-struct dateTimeStampSmall :
+struct DateTimeStampSmall :
 	public TimeStampSmall,
-	public dateStampSmall
+	public DateStampSmall
 {
-	dateTimeStampSmall() {}
+	DateTimeStampSmall() {}
 
-	dateTimeStampSmall(int year, int month, int day,
+	DateTimeStampSmall(int year, int month, int day,
 		int hour, int min, int second) {
 		setDate(year, month, day);
 		setTime(hour, min, second);
 	}
 
-	static dateTimeStampSmall systemDateTime(void);
+	static DateTimeStampSmall systemDateTime(void);
 
 
 };
 
 X_ENSURE_SIZE(TimeStampSmall, 2);
-X_ENSURE_SIZE(dateStampSmall, 2);
-X_ENSURE_SIZE(dateTimeStampSmall, 4);
+X_ENSURE_SIZE(DateStampSmall, 2);
+X_ENSURE_SIZE(DateTimeStampSmall, 4);
 
 
 X_NAMESPACE_END

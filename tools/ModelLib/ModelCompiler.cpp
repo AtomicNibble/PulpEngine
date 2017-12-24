@@ -965,7 +965,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 	header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
 	header.numLod = safe_static_cast<uint8_t, size_t>(compiledLods_.size());
 	header.numMesh = safe_static_cast<uint8_t, size_t>(totalMeshes());
-	header.modified = core::dateTimeStampSmall::systemDateTime();
+	header.modified = core::DateTimeStampSmall::systemDateTime();
 
 	header.vertexFmt = render::shader::VertexFormat::P3F_T2S;
 

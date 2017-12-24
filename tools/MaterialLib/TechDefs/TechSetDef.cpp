@@ -41,7 +41,7 @@ namespace techset
 			uint8_t _pad[2];
 
 			uint32_t crc32;
-			core::dateTimeStampSmall modifed;
+			core::DateTimeStampSmall modifed;
 
 			uint8_t numTechs;
 			uint8_t numParams;
@@ -278,7 +278,7 @@ bool BaseTechSetDef::SSave(core::XFile* pFile) const
 	hdr.version = TechSetDefBinHeader::VERSION;
 
 	hdr.crc32 = 0;
-	hdr.modifed = core::dateTimeStampSmall::systemDateTime();
+	hdr.modifed = core::DateTimeStampSmall::systemDateTime();
 
 	hdr.numTechs = safe_static_cast<uint8_t>(techs_.size());
 	hdr.numParams = safe_static_cast<uint8_t>(params_.size());

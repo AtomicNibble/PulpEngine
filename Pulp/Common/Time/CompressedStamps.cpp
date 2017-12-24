@@ -4,12 +4,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
-dateStampSmall dateStampSmall::systemDate(void)
+DateStampSmall DateStampSmall::systemDate(void)
 {
 	_SYSTEMTIME time;
 	GetLocalTime(&time);
 
-	return dateStampSmall(time.wYear,time.wMonth,time.wDay);
+	return DateStampSmall(time.wYear,time.wMonth,time.wDay);
 }
 
 
@@ -22,12 +22,12 @@ TimeStampSmall TimeStampSmall::systemTime(void)
 }
 
 
-dateTimeStampSmall dateTimeStampSmall::systemDateTime(void)
+DateTimeStampSmall DateTimeStampSmall::systemDateTime(void)
 {
 	_SYSTEMTIME time;
 	GetLocalTime(&time);
 
-	return dateTimeStampSmall(time.wYear, time.wMonth, time.wDay,
+	return DateTimeStampSmall(time.wYear, time.wMonth, time.wDay,
 		time.wHour, time.wMinute, time.wSecond);
 }
 
