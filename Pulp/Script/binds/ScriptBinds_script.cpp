@@ -35,14 +35,12 @@ int XBinds_Script::Load(IFunctionHandler* pH)
 	SCRIPT_CHECK_PARAMETERS(1);
 	
 	const char* pFileName = nullptr;
-	if (!pH->getParam(1, pFileName)) {
-		return pH->endFunction();
+	if (pH->getParam(1, pFileName)) {
+		if (pScriptSys_->onInclude(pFileName)) {
+			return pH->endFunction(1);
+		}
 	}
 
-	if (pScriptSys_->onInclude(pFileName)) {
-		return pH->endFunction(1);
-	}
-	
 	return pH->endFunction();
 }
 
