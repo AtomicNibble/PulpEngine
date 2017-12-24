@@ -14,8 +14,7 @@ namespace V2 {
 	class JobSystem;
 }
 
-struct XFileAsync;
-struct IoRequestBase;
+class AssetLoader;
 )
 
 X_NAMESPACE_BEGIN(game)
@@ -24,31 +23,13 @@ namespace weapon
 {
 	class WeaponDef;
 
-	struct WeaponDefLoadRequest
-	{
-		WeaponDefLoadRequest(WeaponDef* pWeaponDef) :
-			pFile(nullptr),
-			pWeaponDef(pWeaponDef),
-			dataSize(0)
-		{
-		}
-
-		core::XFileAsync* pFile;
-		WeaponDef* pWeaponDef;
-		core::UniquePointer<uint8_t[]> data;
-		uint32_t dataSize;
-	};
-
-
 	class WeaponDefManager :
 		public core::IAssetLoader,
-		public core::IXHotReload
+		public core::IXHotReload,
+		private core::IAssetLoadSink
 	{
 		typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
 		typedef WeaponDefContainer::Resource WeaponDefResource;
-
-		typedef core::Array<WeaponDefLoadRequest*> WeaponDefLoadRequestArr;
-		typedef core::Fifo<WeaponDefResource*> WeaponDefQueue;
 
 	public:
 		WeaponDefManager(core::MemoryArenaBase* arena);
@@ -75,18 +56,8 @@ namespace weapon
 		void freeDangling(void);
 
 		void addLoadRequest(WeaponDefResource* pWeaponDef);
-		void dispatchLoad(WeaponDef* pWeaponDef, core::CriticalSection::ScopedLock&);
-		void dispatchLoadRequest(WeaponDefLoadRequest* pLoadReq);
-
-
-		// load / processing
-		void onLoadRequestFail(WeaponDefLoadRequest* pLoadReq);
-		void loadRequestCleanup(WeaponDefLoadRequest* pLoadReq);
-
-		void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-			core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-		void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+		void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+		bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
 		bool processData(WeaponDef* pWeaponDef, core::XFile* pFile);
 
@@ -97,15 +68,9 @@ namespace weapon
 
 	private:
 		core::MemoryArenaBase* arena_;
-		core::MemoryArenaBase* blockArena_;
+		core::AssetLoader* pAssetLoader_;
 
 		WeaponDef* pDefaultWeaponDef_;
-
-		// loading
-		core::CriticalSection loadReqLock_;
-		core::ConditionVariable loadCond_;
-
-		WeaponDefLoadRequestArr pendingRequests_;
 
 		WeaponDefContainer weaponDefs_;
 	};
