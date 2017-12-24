@@ -257,6 +257,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "LinkerLib", "..\tools\Linke
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Linker", "..\tools\Linker\Linker.vcxproj", "{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}"
+	ProjectSection(ProjectDependencies) = postProject
+		{72841EB6-08EF-400C-8366-12A8A62D1C16} = {72841EB6-08EF-400C-8366-12A8A62D1C16}
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic - Clang|Win32 = Debug Dynamic - Clang|Win32
@@ -1260,6 +1266,34 @@ Global
 		{72841EB6-08EF-400C-8366-12A8A62D1C16}.Super|Win32.Build.0 = Super|Win32
 		{72841EB6-08EF-400C-8366-12A8A62D1C16}.Super|x64.ActiveCfg = Super|x64
 		{72841EB6-08EF-400C-8366-12A8A62D1C16}.Super|x64.Build.0 = Super|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic - Clang|Win32.ActiveCfg = Debug Dynamic - Clang|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic - Clang|Win32.Build.0 = Debug Dynamic - Clang|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic - Clang|x64.ActiveCfg = Debug Dynamic - Clang|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic - Clang|x64.Build.0 = Debug Dynamic - Clang|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug|Win32.ActiveCfg = Debug|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug|Win32.Build.0 = Debug|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug|x64.ActiveCfg = Debug|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Debug|x64.Build.0 = Debug|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release Dynamic|Win32.ActiveCfg = Release Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release Dynamic|Win32.Build.0 = Release Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release Dynamic|x64.ActiveCfg = Release Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release Dynamic|x64.Build.0 = Release Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release|Win32.ActiveCfg = Release|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release|Win32.Build.0 = Release|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release|x64.ActiveCfg = Release|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Release|x64.Build.0 = Release|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super Dynamic|Win32.ActiveCfg = Super Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super Dynamic|Win32.Build.0 = Super Dynamic|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super|Win32.ActiveCfg = Super|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super|Win32.Build.0 = Super|Win32
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super|x64.ActiveCfg = Super|x64
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C}.Super|x64.Build.0 = Super|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1302,6 +1336,7 @@ Global
 		{85B7FFB4-F01C-43B9-AFCE-3C68F8C490A4} = {8955E779-D1DB-47E2-9534-73BE843ED106}
 		{5D58BD45-FE74-48FA-84A6-06ED0B86C959} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
 		{72841EB6-08EF-400C-8366-12A8A62D1C16} = {82394A53-778F-4F3C-845C-BA3940464D74}
+		{C4BBD705-671D-4CD6-94D0-31C0CBEF0B0C} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C210B0E9-1C7C-4621-93AE-D9FE065678CB}
