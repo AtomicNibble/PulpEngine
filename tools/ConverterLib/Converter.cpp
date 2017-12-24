@@ -735,9 +735,6 @@ void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::strin
 {
 	GetOutputPathForAssetType(assType, modPath, pathOut);
 
-	// make sure output folder is valid.
-	gEnv->pFileSys->createDirectoryTree(pathOut.c_str());
-
 	pathOut /= name;
 	pathOut.replaceSeprators();
 
