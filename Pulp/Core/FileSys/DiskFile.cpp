@@ -28,7 +28,7 @@ size_t XDiskFile::write(const void* buffer, size_t length)
 
 void XDiskFile::seek(int64_t position, SeekMode::Enum origin)
 {
-	file_.seek(position, origin);
+	file_.seek(position, origin, true);
 }
 
 uint64_t XDiskFile::remainingBytes(void) const

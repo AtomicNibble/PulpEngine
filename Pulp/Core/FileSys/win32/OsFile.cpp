@@ -58,7 +58,7 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 #endif // !X_ENABLE_FILE_STATS
 
 		if (mode.IsSet(IFileSys::fileModeFlags::APPEND)) {
-			this->seek(0, SeekMode::END);
+			this->seek(0, SeekMode::END, false);
 		}
 	}
 }
@@ -165,10 +165,11 @@ size_t OsFile::write(const void* buffer, size_t length)
 }
 
 
-void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin)
+void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requireRandomAccess)
 {
-	// is this condition correct?
-	if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {
+	// seeking is allowed by win32 when RANDOM_ACCESS is not passed.
+	// but i want to prevent a user trying to seek if they did not use RANDOM_ACCESS.
+	if (requireRandomAccess && !mode_.IsSet(fileMode::RANDOM_ACCESS)) {
 		IFileSys::fileModeFlags::Description Dsc;
 		X_ERROR("File", "can't seek in file, requires random access. Flags: %s", mode_.ToString(Dsc));
 		return;
@@ -231,7 +232,7 @@ void OsFile::setSize(int64_t numBytes)
 {
 	uint64_t currentPos = tell();
 
-	seek(numBytes, SeekMode::SET);
+	seek(numBytes, SeekMode::SET, false);
 
 	if (!::SetEndOfFile(file_))
 	{
@@ -239,7 +240,7 @@ void OsFile::setSize(int64_t numBytes)
 		X_ERROR("File", "Failed to setSize: %Iu. Error: %s", numBytes, lastError::ToString(dsc));
 	}
 
-	seek(currentPos, SeekMode::SET);
+	seek(currentPos, SeekMode::SET, false);
 }
 
 bool OsFile::valid(void) const

@@ -26,7 +26,7 @@ public:
 	size_t read(void* buffer, size_t length);
 	size_t write(const void* buffer, size_t length);
 
-	void seek(int64_t position, IFileSys::SeekMode::Enum origin);
+	void seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requireRandomAccess);
 
 	uint64_t tell(void) const;
 	uint64_t remainingBytes(void) const;
