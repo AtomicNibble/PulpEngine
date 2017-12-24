@@ -147,7 +147,7 @@ X_DECLARE_FLAGS8(APakEntryFlag)(
 typedef Flags8<APakEntryFlag> APakEntryFlags;
 
 typedef assetDb::AssetType AssetType;
-typedef uint32_t AssetID;
+typedef assetDb::AssetId AssetId;
 
 X_PACK_PUSH(4)
 
