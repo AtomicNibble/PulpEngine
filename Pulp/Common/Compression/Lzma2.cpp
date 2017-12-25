@@ -53,13 +53,13 @@ namespace Compression
 		int32_t compressLevelToDictSize(CompressLevel::Enum lvl)
 		{
 			if (lvl == CompressLevel::LOW) {
-				return 1 << 14; // 16kb
+				return 1024 * 16; // 16kb
 			}
 			if (lvl == CompressLevel::NORMAL) {
-				return 1 << 16; // 64kb
+				return 1024 * 1024; // 1MB
 			}
 			if (lvl == CompressLevel::HIGH) {
-				return 1 << 20; // 1024kb
+				return 1024 * 1024 * 16; // 16MB
 			}
 
 			X_ASSERT_UNREACHABLE();
