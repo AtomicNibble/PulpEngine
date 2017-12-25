@@ -74,6 +74,7 @@
     <ClInclude Include="CompileTime\IsPOD.h" />
     <ClInclude Include="CompileTime\IsPointer.h" />
     <ClInclude Include="CompileTime\IsStringLiteral.h" />
+    <ClInclude Include="Compression\CompressorAlloc.h" />
     <ClInclude Include="Compression\DictBuilder.h" />
     <ClInclude Include="Compression\LZ4.h" />
     <ClInclude Include="Compression\LZ5.h" />
@@ -703,6 +704,7 @@
     </ClCompile>
     <ClCompile Include="Assets\AssetLoader.cpp" />
     <ClCompile Include="Buffer.cpp" />
+    <ClCompile Include="Compression\CompressorAlloc.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Hashing\Digest.cpp" />
     <ClCompile Include="Random\win32\CryptRand.cpp" />

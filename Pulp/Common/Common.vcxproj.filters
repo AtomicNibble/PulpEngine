@@ -1303,6 +1303,9 @@
     <ClInclude Include="Assets\AssetLoader.h">
       <Filter>Headers\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="Compression\CompressorAlloc.h">
+      <Filter>Headers\Compression</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2033,6 +2036,9 @@
     </ClCompile>
     <ClCompile Include="Assets\AssetLoader.cpp">
       <Filter>SourceFiles\Assets</Filter>
+    </ClCompile>
+    <ClCompile Include="Compression\CompressorAlloc.cpp">
+      <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
