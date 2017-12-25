@@ -77,7 +77,6 @@ bool XMaterialManager::init(void)
 	}
 
 	// hotreload support.
-	gEnv->pHotReload->addfileType(this, MTL_FILE_EXTENSION);
 	gEnv->pHotReload->addfileType(this, MTL_B_FILE_EXTENSION);
 
 	return true;
@@ -1070,14 +1069,8 @@ void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core:
 
 	fileExt = core::strUtil::FileExtension(name);
 	if (fileExt)
-	{
-		if (core::strUtil::IsEqual(MTL_FILE_EXTENSION, fileExt))
-		{
-			X_LOG0("Material", "reload material: \"%s\"", name);
-
-
-		}
-		else if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
+	{	
+		if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
 		{
 			//	X_LOG0("Material", "reload material: \"%s\"", name);
 
