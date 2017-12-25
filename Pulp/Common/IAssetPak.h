@@ -188,6 +188,8 @@ struct APakHeader
 
 	// not needed to unpack, just meta data.
 	CompressionAlgoArr algos;
+
+	uint8_t pad[17];
 };
 
 struct APakStrPool
@@ -218,7 +220,7 @@ X_PACK_POP
 X_ENSURE_SIZE(AssetOffset, 4);
 X_ENSURE_SIZE(APakSharedDicHdr, 8);
 
-X_ENSURE_SIZE(APakHeader, 64);
+X_ENSURE_SIZE(APakHeader, 80);
 X_ENSURE_SIZE(APakStrPool, 16);
 X_ENSURE_SIZE(APakEntry, 20);
 

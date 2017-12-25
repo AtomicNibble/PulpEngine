@@ -264,6 +264,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	}
 
 	APakHeader hdr;
+	core::zero_object(hdr.pad);
 	hdr.algos.fill(core::Compression::Algo::STORE);
 	hdr.magic = PAK_MAGIC;
 	hdr.version = PAK_VERSION;
