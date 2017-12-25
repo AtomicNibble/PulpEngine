@@ -105,6 +105,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 	mode.Set(core::fileMode::SHARE);
 
 	if (!file.openFile(assetPath.c_str(), mode)) {
+		X_ERROR("Linker", "Failed to open asset: \"%s\"", name.c_str());
 		return false;
 	}
 
@@ -114,6 +115,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 	data.resize(fileSize);
 
 	if (file.read(data.data(), data.size()) != fileSize) {
+		X_ERROR("Linker", "Failed to read data for %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
 		return false;
 	}
 
