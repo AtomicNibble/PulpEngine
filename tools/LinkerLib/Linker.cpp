@@ -57,7 +57,7 @@ bool Linker::Build(void)
 		return false;
 	}
 
-	X_LOG0("Linker", "%" PRIi32 " asset(s)", numAssets);
+	X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
 
 	assetDb::AssetDB::AssetDelegate func;
 	func.Bind<Linker, &Linker::AddAsset>(this);
