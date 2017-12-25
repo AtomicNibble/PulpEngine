@@ -101,7 +101,7 @@ static const size_t PAK_BLOCK_PADDING = 16; // each section of the pak file is a
 static const uint32_t PAK_ASSET_PADDING = 64;
 static const uint64_t PAK_MAX_SIZE = static_cast<uint64_t>(std::numeric_limits<uint32_t>::max()) * PAK_ASSET_PADDING;
 static const uint32_t PAK_MAX_ASSETS = std::numeric_limits<uint32_t>::max();
-static const uint32_t PAK_MAX_ASSET_SIZE = std::numeric_limits<uint32_t>::max();
+static const uint32_t PAK_MAX_ASSET_SIZE = 1024 * 1024 * 1024; // allow from for some compression algo's that use 32bit signed types.
 
 
 
