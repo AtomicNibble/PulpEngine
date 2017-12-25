@@ -34,11 +34,13 @@ struct CompressionOptions
 {
 	CompressionOptions() :
 		enabled(false),
+		maxRatio(0.95f),
 		algo(core::Compression::Algo::STORE)
 	{
 	}
 
 	bool enabled;
+	float maxRatio;
 	core::Compression::Algo::Enum algo;
 };
 

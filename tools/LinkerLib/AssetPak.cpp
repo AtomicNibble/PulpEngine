@@ -4,12 +4,8 @@
 #include <IAssetPak.h>
 #include <IFileSys.h>
 
+#include <Compression\CompressorAlloc.h>
 #include <Compression\DictBuilder.h>
-#include <Compression\LZ4.h>
-#include <Compression\LZ5.h>
-#include <Compression\Zlib.h>
-#include <Compression\Lzma2.h>
-
 
 #include <Time\StopWatch.h>
 #include <String\HumanSize.h>
@@ -44,12 +40,22 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
 {
 	assets_.reserve(1024);
 
+	compression_[AssetType::ANIM].enabled = true;
+	compression_[AssetType::ANIM].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::MODEL].enabled = true;
+	compression_[AssetType::MODEL].algo = core::Compression::Algo::LZ5;
+	compression_[AssetType::MATERIAL].enabled = true;
+	compression_[AssetType::MATERIAL].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::WEAPON].enabled = true;
+	compression_[AssetType::WEAPON].algo = core::Compression::Algo::LZ4;
+
 	compression_[AssetType::IMG].enabled = true;
-	compression_[AssetType::IMG].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::IMG].maxRatio = 0.75f;
+	compression_[AssetType::IMG].algo = core::Compression::Algo::LZMA;
 
 	// per asset shared dictonary.
 	dictonaries_.fill(nullptr);
-//	dictonaries_[AssetType::IMG] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
+	// dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
 }
 
 AssetPakBuilder::~AssetPakBuilder()
@@ -61,6 +67,9 @@ AssetPakBuilder::~AssetPakBuilder()
 		}
 	}
 }
+
+
+
 
 bool AssetPakBuilder::bake(void)
 {
@@ -142,6 +151,9 @@ bool AssetPakBuilder::bake(void)
 		X_LOG0("AssetPak", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 	}
 
+	DataVec compData(arena_);
+	compData.reserve(1024 * 512);
+
 	// compression.
 	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 	{
@@ -151,7 +163,12 @@ bool AssetPakBuilder::bake(void)
 			continue;
 		}
 
-		DataVec compData(arena_);
+		auto algo = compression_[type].algo;
+		const float maxRatio = compression_[type].maxRatio;
+
+		core::Compression::CompressorAlloc comp(algo);
+
+		X_LOG0("AssetPak", "===== Compressing type \"%s\" maxRatio: ^1%.2f^7 =====", AssetType::ToString(type), maxRatio);
 
 		for (auto& a : assets_)
 		{
@@ -159,10 +176,9 @@ bool AssetPakBuilder::bake(void)
 				continue;
 			}
 
-#if 0
-			core::Compression::Compressor<core::Compression::LZ4> comp;
+#if 1
 
-			comp.deflate(arena_, a.data, compData, core::Compression::CompressLevel::HIGH);
+			comp->deflate(arena_, a.data, compData, core::Compression::CompressLevel::HIGH);
 #else
 			core::Compression::LZ4Stream comp(arena_);
 
@@ -172,24 +188,24 @@ bool AssetPakBuilder::bake(void)
 			}
 
 			compData.resize(comp.requiredDeflateDestBuf(a.data.size()));
-
 			auto comptSize = comp.compressContinue(a.data.data(), a.data.size(), compData.data(), compData.size(), core::Compression::CompressLevel::HIGH);
-
 			compData.resize(comptSize);
 #endif
 
-			if (a.data.size() <= compData.size()) {
-				X_LOG0("AssetPak", "\"%s\" skipped compression, result was larger than original", a.name.c_str());
+			float ratio = static_cast<float>(compData.size()) / static_cast<float>(a.data.size());
+
+			if (ratio >= maxRatio) {
+				X_LOG0("AssetPak", "-> ^5%-29s ^7ratio above threshold. ratio: ^1%.2f ^7max: ^1%.2f", a.name.c_str(), ratio, maxRatio);
 				continue;
 			}
 
-			a.data.swap(compData);
-
-			float percentage = (float)a.data.size() / (float)a.infaltedSize;
-			X_LOG0("AssetPak", "\"%s\" original: ^6%s^7 compressed: ^6%s ^1%.2f", a.name.c_str(),
+			a.data.resize(compData.size());
+			std::memcpy(a.data.data(), compData.begin(), compData.size());
+			
+			X_LOG0("AssetPak", "^5%-32s ^7original: ^6%s^7 compressed: ^6%s ^1%.2f", a.name.c_str(),
 				core::HumanSize::toString(sizeStr, a.infaltedSize),
 				core::HumanSize::toString(sizeStr1, a.data.size()),
-				percentage
+				ratio
 			);
 		}
 
