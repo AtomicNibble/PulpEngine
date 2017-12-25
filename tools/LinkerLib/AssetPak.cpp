@@ -241,7 +241,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	}
 
 	APakHeader hdr;
-	core::zero_object(hdr._pad);
+	hdr.algos.fill(core::Compression::Algo::STORE);
 	hdr.magic = PAK_MAGIC;
 	hdr.version = PAK_VERSION;
 	hdr.flags.Clear();
@@ -250,6 +250,15 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	hdr.inflatedSize = 0;
 	hdr.numAssets = safe_static_cast<uint32_t>(assets_.size());
 	hdr.modified = core::DateTimeStampSmall::systemDateTime();
+
+	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	{
+		if (!compression_[i].enabled) {
+			continue;
+		}
+
+		hdr.algos[i] = compression_[i].algo;
+	}
 
 	core::ByteStream strings(arena_);
 	core::ByteStream entries(arena_);
@@ -524,7 +533,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 
 	core::HumanSize::Str sizeStr;
 	APakFlags::Description flagStr;
-	X_LOG0("AssetPak", "Pak Meta");
+	X_LOG0("AssetPak", "^9PakMeta");
 	X_LOG_BULLET;
 	X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, pathExt.fileName(), hdr.version);
 	X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
@@ -550,6 +559,22 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 			X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIi32 " %-10" PRIi32 " %-16s %-8.2f",
 				AssetType::ToString(type), assetCounts[i], compressedCounts[i],
 				core::HumanSize::toString(sizeStr, assetSize[type]), sizePercent);
+		}
+	}
+
+
+	{
+		X_LOG0("AssetPak", "^8CompressionInfo");
+		X_LOG_BULLET;
+		X_LOG0("AssetPak", "%-16s %-8s", "Type", "Algo");
+
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			auto type = static_cast<AssetType::Enum>(i);
+
+	
+			X_LOG0("AssetPak", "^5%-16s ^6%s",
+				AssetType::ToString(type), core::Compression::Algo::ToString(hdr.algos[i]));
 		}
 	}
 

@@ -8,6 +8,7 @@
 #include <Time\CompressedStamps.h>
 
 #include <IAssetDb.h>
+#include <ICompression.h>
 
 #include <array>
 
@@ -158,6 +159,7 @@ struct APakSharedDicHdr
 };
 
 typedef std::array<APakSharedDicHdr, AssetType::ENUM_COUNT> APakSharedDicArr;
+typedef std::array<core::Compression::Algo::Enum, AssetType::ENUM_COUNT> CompressionAlgoArr;
 
 struct APakDictInfo
 {
@@ -184,7 +186,7 @@ struct APakHeader
 	uint32_t dictOffset;
 	uint32_t dataOffset;
 
-	uint32_t _pad[4];
+	CompressionAlgoArr algos;
 };
 
 struct APakStrPool
