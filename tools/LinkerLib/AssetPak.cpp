@@ -230,8 +230,7 @@ bool AssetPakBuilder::bake(void)
 			pJobSys->Run(pJob);
 		}
 
-		pJobSys->Run(pRoot);
-		pJobSys->Wait(pRoot);
+		pJobSys->RunAndWait(pRoot);
 	}
 
 	return true;
