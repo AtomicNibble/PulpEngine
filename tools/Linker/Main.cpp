@@ -4,6 +4,7 @@
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
+#include <String\HumanDuration.h>
 #include <Platform\Console.h>
 #include <Time\StopWatch.h>
 #include <Hashing\Fnva1Hash.h>
@@ -151,7 +152,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					}
 				}
 
-				X_LOG0("Linker", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+				core::HumanDuration::Str timeStr;
+				X_LOG0("Linker", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 
 			}
 			else
