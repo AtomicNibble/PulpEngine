@@ -6,7 +6,7 @@
 X_NAMESPACE_BEGIN(texture)
 
 
-static const char*		CI_FILE_EXTENSION = ".ci";
+static const char*		CI_FILE_EXTENSION = "ci";
 static const uint32_t	CI_FOURCC = X_TAG('c', 'i', 'm', 'g');
 static const uint8_t	CI_VERSION = 3;
 // these are format limits.
