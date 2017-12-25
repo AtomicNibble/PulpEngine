@@ -84,13 +84,13 @@ size_t OsFile::read(void* buffer, size_t length)
 		return 0;
 	}
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return 0;
 	}
+
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	DWORD NumRead = 0;
 	if (::ReadFile(file_, buffer, length32, &NumRead, 0)) {
@@ -129,13 +129,13 @@ size_t OsFile::write(const void* buffer, size_t length)
 		return 0;
 	}
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return 0;
 	}
+	
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	DWORD NumWrite = 0;
 	if (::WriteFile(file_, buffer, length32, &NumWrite, 0)) {

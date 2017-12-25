@@ -103,13 +103,13 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 	pOverlapped->Offset = large.LowPart;
 	pOverlapped->OffsetHigh = large.HighPart;
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
+
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	if (::ReadFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
@@ -133,13 +133,13 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 {
 	XOsFileAsyncOperation op(overlappedArena_, hFile_, position);
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
+
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	if (::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
@@ -172,13 +172,13 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 	pOverlapped->Offset = large.LowPart;
 	pOverlapped->OffsetHigh = large.HighPart;
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a read request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
+	
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	if (::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutine))
 	{
@@ -202,13 +202,13 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 {
 	XOsFileAsyncOperationCompiltion op(overlappedArena_, hFile_, position, callBack);
 
-	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
-
 	if (length > std::numeric_limits<uint32_t>::max()) {
 		core::HumanSize::Str humanStr;
 		X_ERROR("AsyncFile", "Can't make a write request bigger than 4gb. requested size: %s", core::HumanSize::toString(humanStr, length));
 		return op;
 	}
+	
+	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
 	if (::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutine))
 	{
