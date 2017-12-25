@@ -443,6 +443,11 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	hdr.dictOffset = safe_static_cast<uint32_t>(dictsOffset);
 	hdr.dataOffset = safe_static_cast<uint32_t>(dataOffset);
 
+	if(totalFileSize > 1024 * 1024 * 100) {
+		core::HumanSize::Str sizeStr;
+		X_LOG0("AssetPak", "Writing %s pak...", core::HumanSize::toString(sizeStr, totalFileSize));
+	}
+
 	if (file.writeObj(hdr) != sizeof(hdr)) {
 		X_ERROR("AssetPak", "Failed to write header");
 		return false;
