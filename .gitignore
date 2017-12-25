@@ -163,6 +163,8 @@ $RECYCLE.BIN/
 # asset packs.
 *.apak
 
+scriptDumpState.txt
+
 # unit test data
 /game_folder/**/*.ut_dat
 /game_folder/compiled_images
