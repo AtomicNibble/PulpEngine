@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "AssetDB.h"
+#include "AssetFileExtensions.h"
 
 #include <Containers\Array.h>
 #include <Hashing\crc32.h>
@@ -3065,6 +3066,26 @@ void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOu
 	pathOut.replaceSeprators();
 }
 
+void AssetDB::GetOutputPathForAssetType(assetDb::AssetType::Enum assType,
+	const core::Path<char>& modPath, core::Path<char>& pathOut)
+{
+	pathOut.clear();
+	pathOut /= modPath;
+	pathOut /= assetDb::AssetType::ToString(assType);
+	pathOut += "s";
+	pathOut.toLower();
+	pathOut.replaceSeprators();
+}
+
+void AssetDB::GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
+	const core::Path<char>& modPath, core::Path<char>& pathOut)
+{
+	GetOutputPathForAssetType(assType, modPath, pathOut);
+
+	pathOut /= name;
+	pathOut.replaceSeprators();
+	pathOut.setExtension(getAssetTypeExtension(assType));
+}
 
 bool AssetDB::ValidName(const core::string& name)
 {

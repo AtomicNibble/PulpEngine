@@ -242,6 +242,13 @@ public:
 	Result::Enum SetAssetParent(AssetId assetId, AssetId parentAssetId);
 	Result::Enum RemoveAssetParent(AssetId assetId);
 
+
+	static void GetOutputPathForAssetType(assetDb::AssetType::Enum assType,
+		const core::Path<char>& modPath, core::Path<char>& pathOut);
+	static void GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
+		const core::Path<char>& modPath, core::Path<char>& pathOut);
+
+
 private:
 	Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
 		AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc);
