@@ -181,9 +181,10 @@ struct APakHeader
 
 	uint32_t stringDataOffset;
 	uint32_t entryTableOffset;
+	uint32_t dictOffset;
 	uint32_t dataOffset;
 
-	uint32_t _pad[5];
+	uint32_t _pad[4];
 };
 
 struct APakStrPool
@@ -198,9 +199,10 @@ struct APakStrPool
 
 struct APakEntry
 {
-	AssetID							id;
-	AssetType::Enum					type; //  1byte
+	AssetId							id;
+	AssetType::Enum					type; 
 	APakEntryFlags					flags;
+	uint16_t						_pad;
 	AssetOffset						offset;
 	uint32_t						size;
 	uint32_t						inflatedSize;
@@ -215,7 +217,7 @@ X_ENSURE_SIZE(APakSharedDicHdr, 8);
 
 X_ENSURE_SIZE(APakHeader, 64);
 X_ENSURE_SIZE(APakStrPool, 16);
-X_ENSURE_SIZE(APakEntry, 24);
+X_ENSURE_SIZE(APakEntry, 20);
 
 
 

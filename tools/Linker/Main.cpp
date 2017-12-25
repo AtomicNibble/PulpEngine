@@ -48,7 +48,7 @@ typedef core::MemoryArena<
 
 namespace
 {
-	X_DECLARE_ENUM(LinkMode)(BUILD);
+	X_DECLARE_ENUM(LinkMode)(BUILD, META);
 
 
 	bool GetMode(LinkMode::Enum& mode)
@@ -60,6 +60,10 @@ namespace
 			{
 				mode = LinkMode::BUILD;
 			}
+			else if (core::strUtil::IsEqualCaseInsen(pMode, L"meta"))
+			{
+				mode = LinkMode::META;
+			}
 			else
 			{
 				X_ERROR("Linker", "Unknown mode: \"%ls\"", pMode);
@@ -69,6 +73,21 @@ namespace
 			return true;
 		}
 
+		return false;
+	}
+
+	bool GetInputfile(core::Path<char>& name, bool slient = false)
+	{
+		const wchar_t* pFileName = gEnv->pCore->GetCommandLineArgForVarW(L"if");
+		if (pFileName)
+		{
+			core::StackString512 nameNarrow(pFileName);
+
+			name = core::Path<char>(nameNarrow.begin(), nameNarrow.end());
+			return true;
+		}
+
+		X_ERROR_IF(!slient, "Linker", "missing input file");
 		return false;
 	}
 
@@ -83,7 +102,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
 	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Linker");
 	Console.RedirectSTD();
-	Console.SetSize(60, 40, 2000);
+	Console.SetSize(90, 40, 2000);
 	Console.MoveTo(10, 10);
 
 
@@ -117,6 +136,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 					if (!linker.Build())
 					{
 						X_ERROR("Linker", "Failed to perform build");
+					}
+				}
+				else if (mode == LinkMode::META)
+				{
+					core::Path<char> inputFile;
+
+					if (GetInputfile(inputFile))
+					{
+						if (!linker.dumpMeta(inputFile))
+						{
+							X_ERROR("Linker", "Failed to dump meta");
+						}
 					}
 				}
 

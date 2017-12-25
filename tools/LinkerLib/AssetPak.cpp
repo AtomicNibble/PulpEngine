@@ -4,14 +4,35 @@
 #include <IAssetPak.h>
 #include <IFileSys.h>
 
+#include <Compression\DictBuilder.h>
+#include <Compression\LZ4.h>
+#include <Compression\LZ5.h>
+#include <Compression\Zlib.h>
+#include <Compression\Lzma2.h>
+
+
+#include <Time\StopWatch.h>
+#include <String\HumanSize.h>
+#include <String\HumanDuration.h>
+
 X_NAMESPACE_BEGIN(AssetPak)
 
-Asset::Asset(const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
+Asset::Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
 	name(name),
+	id(id),
 	type(type),
+	infaltedSize(data.size()),
 	data(std::move(data))
 {
+	X_ASSERT(infaltedSize > 0, "size is zero")(infaltedSize, data.size(), this->data.size());
 	X_UNUSED(arena);
+}
+
+
+SharedDict::SharedDict(core::MemoryArenaBase* arena) :
+	dict(arena)
+{
+
 }
 
 
@@ -22,6 +43,159 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
 	assets_(arena)
 {
 	assets_.reserve(1024);
+
+	compression_[AssetType::IMG].enabled = true;
+	compression_[AssetType::IMG].algo = core::Compression::Algo::LZ4;
+
+	// per asset shared dictonary.
+	dictonaries_.fill(nullptr);
+//	dictonaries_[AssetType::IMG] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
+}
+
+AssetPakBuilder::~AssetPakBuilder()
+{
+	for (auto* pDict : dictonaries_)
+	{
+		if (pDict) {
+			X_DELETE(pDict, arena_);
+		}
+	}
+}
+
+bool AssetPakBuilder::bake(void)
+{
+	// this is where we perform any kinky logic like training compression dictonaries.
+	// and compresssing data.
+	// also ordering the assets if desired.
+	core::Array<size_t> sampleSizes(arena_);
+	sampleSizes.setGranularity(256);
+
+	DataVec sampleData(arena_);
+
+	const size_t maxDictSize = std::numeric_limits<uint16_t>::max() - sizeof(core::Compression::SharedDictHdr);
+
+	core::HumanSize::Str sizeStr, sizeStr1;
+
+	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	{
+		auto type = static_cast<AssetType::Enum>(i);
+
+		if (!dictonaries_[type] || !compression_[type].enabled) {
+			continue;
+		}
+
+		// work out required buffer size.
+		const auto sampleDataSize = core::accumulate(assets_.begin(), assets_.end(), 0_sz, [type](const Asset& a) -> size_t {
+			if (a.type != type) {
+				return 0;
+			}
+			return core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
+		});
+
+
+		sampleSizes.clear();
+		sampleData.resize(sampleDataSize);
+
+		size_t currentOffset = 0;
+
+		for (const auto& a : assets_)
+		{
+			if (a.type != type) {
+				continue;
+			}
+
+			const size_t sampleSize = core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
+
+			std::memcpy(&sampleData[currentOffset], a.data.data(), sampleSize);
+
+			sampleSizes.push_back(sampleSize);
+			currentOffset += sampleSize;
+		}
+
+		X_ASSERT(currentOffset == sampleDataSize, "Failed to write all sample data")(currentOffset, sampleDataSize);
+
+		// train.
+		X_LOG0("AssetPak", "Training for assetType \"%s\" with ^6%s^7 sample data, ^6%" PRIuS "^7 files, avg size: ^6%s",
+			AssetType::ToString(type),
+			core::HumanSize::toString(sizeStr, sampleData.size()), sampleSizes.size(),
+			core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
+
+		core::StopWatch timer;
+
+		if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictonaries_[type]->dict, maxDictSize))
+		{
+			X_ERROR("AssetPak", "Fail to train dictionary for assetType: \"%s\"", AssetType::ToString(type));
+			return false;
+		}
+
+
+		core::Compression::SharedDictHdr& hdr = *(core::Compression::SharedDictHdr*)dictonaries_[type]->dict.data();
+		hdr.magic = core::Compression::SharedDictHdr::MAGIC;
+		hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
+		
+		const auto size = dictonaries_[type]->dict.size() - sizeof(hdr);
+		
+		hdr.size = safe_static_cast<uint32_t>(size);
+
+		const float trainTime = timer.GetMilliSeconds();
+		core::HumanDuration::Str timeStr;
+		X_LOG0("AssetPak", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
+	}
+
+	// compression.
+	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	{
+		auto type = static_cast<AssetType::Enum>(i);
+
+		if (!compression_[type].enabled) {
+			continue;
+		}
+
+		DataVec compData(arena_);
+
+		for (auto& a : assets_)
+		{
+			if (a.type != type) {
+				continue;
+			}
+
+#if 0
+			core::Compression::Compressor<core::Compression::LZ4> comp;
+
+			comp.deflate(arena_, a.data, compData, core::Compression::CompressLevel::HIGH);
+#else
+			core::Compression::LZ4Stream comp(arena_);
+
+			if (dictonaries_[type]) {
+				auto& dict = dictonaries_[type]->dict;
+				comp.loadDict(dict.data(), dict.size());
+			}
+
+			compData.resize(comp.requiredDeflateDestBuf(a.data.size()));
+
+			auto comptSize = comp.compressContinue(a.data.data(), a.data.size(), compData.data(), compData.size(), core::Compression::CompressLevel::HIGH);
+
+			compData.resize(comptSize);
+#endif
+
+			if (a.data.size() <= compData.size()) {
+				X_LOG0("AssetPak", "\"%s\" skipped compression, result was larger than original", a.name.c_str());
+				continue;
+			}
+
+			a.data.swap(compData);
+
+			float percentage = (float)a.data.size() / (float)a.infaltedSize;
+			X_LOG0("AssetPak", "\"%s\" original: ^6%s^7 compressed: ^6%s ^1%.2f", a.name.c_str(),
+				core::HumanSize::toString(sizeStr, a.infaltedSize),
+				core::HumanSize::toString(sizeStr1, a.data.size()),
+				percentage
+			);
+		}
+
+	}
+
+	return true;
 }
 
 bool AssetPakBuilder::save(core::Path<char>& path)
@@ -61,12 +235,9 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	hdr.numAssets = safe_static_cast<uint32_t>(assets_.size());
 	hdr.modified = core::DateTimeStampSmall::systemDateTime();
 
-	// not sure if want this in header or not.
-	APakDictInfo dictInfo;
-	core::zero_object(dictInfo.sharedHdrs);
-
 	core::ByteStream strings(arena_);
 	core::ByteStream entries(arena_);
+	core::ByteStream sharedDictsData(arena_);
 	core::ByteStream data(arena_);
 
 
@@ -105,12 +276,13 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 			X_ASSERT_ALIGNMENT(assetOffset, PAK_ASSET_PADDING, 0);
 			
 			APakEntry entry;
-			entry.id = -1;
+			entry._pad = 0xffff;
+			entry.id = a.id;
 			entry.type = a.type;
 			entry.flags.Clear();
 			entry.offset = assetOffset;
-			entry.size = safe_static_cast<uint32_t>(a.data.size());
-			entry.inflatedSize = 0;
+			entry.size = safe_static_cast<uint32_t>(a.data.size());;
+			entry.inflatedSize = safe_static_cast<uint32_t>(a.infaltedSize);
 
 			entries.write(entry);
 
@@ -118,6 +290,50 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 		}
 
 		entries.alignWrite(PAK_BLOCK_PADDING);
+	}
+
+	// shared dic
+	if (std::any_of(dictonaries_.begin(), dictonaries_.end(), [](const SharedDict* pDict) { return pDict != nullptr && pDict->dict.isNotEmpty(); }))
+	{
+		hdr.flags.Set(APakFlag::SHARED_DICTS);
+
+		// not sure if want this in header or not.
+		APakDictInfo dictInfo;
+		core::zero_object(dictInfo.sharedHdrs);
+
+		uint32_t offset = sizeof(dictInfo);
+
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			auto type = static_cast<AssetType::Enum>(i);
+			if (dictonaries_[type] && compression_[type].enabled)
+			{
+				const auto* pDict = dictonaries_[type];
+
+				dictInfo.sharedHdrs[type].size = safe_static_cast<uint32_t>(pDict->dict.size());
+				dictInfo.sharedHdrs[type].offset = offset;
+
+				offset = safe_static_cast<uint32_t>(offset + pDict->dict.size());
+			}
+		}
+
+		sharedDictsData.reserve(offset);
+		sharedDictsData.write(dictInfo);
+
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			auto type = static_cast<AssetType::Enum>(i);
+			if (dictonaries_[type] && compression_[type].enabled)
+			{
+				const auto* pDict = dictonaries_[type];
+
+				sharedDictsData.write(pDict->dict.data(), pDict->dict.size());
+			}
+		}
+
+		X_ASSERT(offset == sharedDictsData.size(), "Size calculation errro")(offset, sharedDictsData.size());
+
+		sharedDictsData.alignWrite(PAK_ASSET_PADDING);
 	}
 
 	// write all the asset data.
@@ -145,12 +361,14 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 
 	// calculate the offsets of the data.
 	const uint64_t entryTableOffset = core::bitUtil::RoundUpToMultiple(sizeof(hdr) + strings.size(), PAK_BLOCK_PADDING);
-	const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple(entryTableOffset + entryTablesize, PAK_BLOCK_PADDING);
+	const uint64_t dictsOffset = core::bitUtil::RoundUpToMultiple(entryTableOffset + entryTablesize, PAK_BLOCK_PADDING);
+	const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple(dictsOffset + sharedDictsData.size(), PAK_BLOCK_PADDING);
 
 	uint64_t totalFileSize = 0;
 	totalFileSize += sizeof(hdr);
 	totalFileSize += stringDataSize;
 	totalFileSize += entryTablesize;
+	totalFileSize += sharedDictsData.size();
 	totalFileSize += dataSize;
 
 	if (totalFileSize > PAK_MAX_SIZE) {
@@ -170,8 +388,10 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	file.setSize(static_cast<int64_t>(totalFileSize));
 
 	hdr.size = totalFileSize;
+	hdr.inflatedSize = totalFileSize;
 	hdr.stringDataOffset = sizeof(hdr);
 	hdr.entryTableOffset = safe_static_cast<uint32_t>(entryTableOffset);
+	hdr.dictOffset = safe_static_cast<uint32_t>(dictsOffset);
 	hdr.dataOffset = safe_static_cast<uint32_t>(dataOffset);
 
 	if (file.writeObj(hdr) != sizeof(hdr)) {
@@ -193,6 +413,16 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 		return false;
 	}
 
+	if (hdr.flags.IsSet(APakFlag::SHARED_DICTS))
+	{
+		X_ASSERT_ALIGNMENT(file.tell(), PAK_BLOCK_PADDING, 0);
+
+		if (file.write(sharedDictsData.data(), sharedDictsData.size()) != sharedDictsData.size()) {
+			X_ERROR("AssetPak", "Failed to write data");
+			return false;
+		}
+	}
+
 	X_ASSERT_ALIGNMENT(file.tell(), PAK_BLOCK_PADDING, 0);
 
 	if (file.write(data.data(), data.size()) != data.size()) {
@@ -209,9 +439,124 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 }
 
 
-void AssetPakBuilder::addAsset(const core::string& name, AssetType::Enum type, DataVec&& data)
+void AssetPakBuilder::addAsset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data)
 {
-	assets_.emplace_back(name, type, std::move(data), arena_);
+	X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")();
+	X_ASSERT(name.isNotEmpty(), "Empty name")(name.length());
+	X_ASSERT(data.isNotEmpty(), "Empty data")(data.size());
+
+	assets_.emplace_back(id, name, type, std::move(data), arena_);
 }
+
+bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
+{
+	core::XFileScoped file;
+	core::fileModeFlags mode;
+	mode.Set(core::fileMode::SHARE);
+	mode.Set(core::fileMode::READ);
+	mode.Set(core::fileMode::RANDOM_ACCESS);
+
+	// ensure correct extension.
+	core::Path<char> pathExt(pakPath);
+	pathExt.setExtension(PAK_FILE_EXTENSION);
+
+	if (!file.openFile(pathExt.c_str(), mode)) {
+		X_ERROR("AssetPak", "Failed to open file for saving");
+		return false;
+	}
+
+	APakHeader hdr;
+	if (file.readObj(hdr) != sizeof(hdr)) {
+		X_ERROR("AssetPak", "Failed to open file for saving");
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		X_ERROR("AssetPak", "Invalid header");
+		return false;
+	}
+
+	if (hdr.version != PAK_VERSION) {
+		X_ERROR("AssetPak", "Version incorrect. got %" PRIu8 " require %" PRIu8, hdr.version, PAK_VERSION);
+		return false;
+	}
+
+	std::array<int32_t, AssetType::ENUM_COUNT> assetCounts, compressedCounts;
+	std::array<uint64_t, AssetType::ENUM_COUNT> assetSize;
+	assetCounts.fill(0);
+	compressedCounts.fill(0);
+	assetSize.fill(0);
+
+	core::Array<APakEntry> entries(arena_);
+	entries.resize(hdr.numAssets);
+
+	file.seek(hdr.entryTableOffset, core::SeekMode::SET);
+	file.readObjs(entries.data(), entries.size());
+
+	for (const auto& ae : entries)
+	{
+		++assetCounts[ae.type];
+
+		if (ae.inflatedSize != ae.size) {
+			++compressedCounts[ae.type];
+		}
+
+		assetSize[ae.type] += ae.size;
+	}
+
+	const auto numCompressed = core::accumulate(compressedCounts.begin(), compressedCounts.end(), 0_sz);
+
+	core::HumanSize::Str sizeStr;
+	APakFlags::Description flagStr;
+	X_LOG0("AssetPak", "Pak Meta");
+	X_LOG_BULLET;
+	X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, pathExt.fileName(), hdr.version);
+	X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
+	X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ")", core::HumanSize::toString(sizeStr, hdr.size), hdr.size);
+	X_LOG0("AssetPak", "StringDataOffset: ^6%" PRIu32, hdr.stringDataOffset);
+	X_LOG0("AssetPak", "EntryTableOffset: ^6%" PRIu32, hdr.entryTableOffset);
+	X_LOG0("AssetPak", "DictOffset: ^6%" PRIu32, hdr.dictOffset);
+	X_LOG0("AssetPak", "DataOffset: ^6%" PRIu32, hdr.dataOffset);
+	X_LOG0("AssetPak", "NumAssets: ^6%" PRIu32 " ^7compressed: ^6%" PRIuS, hdr.numAssets, numCompressed);
+	
+	{
+		X_LOG0("AssetPak", "^8AssetInfo");
+
+		X_LOG_BULLET;
+		X_LOG0("AssetPak", "%-16s %-8s %-10s %-16s %-8s", "Type", "Num", "Compressed", "Size", "Pak%");
+
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			auto type = static_cast<AssetType::Enum>(i);
+
+			float sizePercent = core::PercentageOf(assetSize[type], hdr.size);
+
+			X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIi32 " %-10" PRIi32 " %-16s %-8.2f",
+				AssetType::ToString(type), assetCounts[i], compressedCounts[i],
+				core::HumanSize::toString(sizeStr, assetSize[type]), sizePercent);
+		}
+	}
+
+	if (hdr.flags.IsSet(APakFlag::SHARED_DICTS))
+	{
+		APakDictInfo dictInfo;
+
+		file.seek(hdr.dictOffset, core::SeekMode::SET);
+		file.readObj(dictInfo);
+
+		X_LOG0("AssetPak", "^8Dictinfo");
+		X_LOG_BULLET;
+		X_LOG0("AssetPak", "%-16s %-8s %-10s", "Type", "Offset", "Size");
+
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+		{
+			X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIu32 " %-10" PRIu32, 
+				AssetType::ToString(i), dictInfo.sharedHdrs[i].offset, dictInfo.sharedHdrs[i].size);
+		}
+	}
+
+	return true;
+}
+
 
 X_NAMESPACE_END

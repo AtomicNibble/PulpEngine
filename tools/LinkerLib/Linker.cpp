@@ -39,11 +39,16 @@ bool Linker::Init(void)
 	return true;
 }
 
+bool Linker::dumpMeta(core::Path<char>& inputFile)
+{
+	return builder_.dumpMeta(inputFile);
+}
+
 
 bool Linker::Build(void)
 {
 	core::Path<char> outPath;
-	outPath = "test";
+	outPath = "asset_pack_01";
 
 
 	int32_t numAssets = 0;
@@ -68,6 +73,7 @@ bool Linker::Build(void)
 	X_LOG0("Linker", "Added %" PRIi32 " asset(s) in ^6%s", numAssets,
 		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 
+	builder_.bake();
 	builder_.save(outPath);
 
 	return true;
@@ -117,7 +123,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 		return false;
 	}
 
-	builder_.addAsset(name, assType, std::move(data));
+	builder_.addAsset(assetId, name, assType, std::move(data));
 	return true;
 }
 

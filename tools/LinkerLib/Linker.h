@@ -18,6 +18,7 @@ public:
 	LINKERLIB_EXPORT void PrintBanner(void);
 	LINKERLIB_EXPORT bool Init(void);
 
+	LINKERLIB_EXPORT bool dumpMeta(core::Path<char>& inputFile);
 
 	LINKERLIB_EXPORT bool Build(void);
 

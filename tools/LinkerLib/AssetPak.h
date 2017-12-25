@@ -4,36 +4,68 @@
 #include <Containers\Array.h>
 #include <IAssetPak.h>
 
+#include <ICompression.h>
+
 X_NAMESPACE_BEGIN(AssetPak)
 
 typedef core::Array<uint8_t> DataVec;
 
 struct Asset
 {
-	Asset(const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
+	Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
 
 	core::string name;
+	AssetId id;
 	AssetType::Enum type;
 
-	DataVec data;
+	size_t infaltedSize;
+	DataVec data; // may be compressed.
 };
 
+struct SharedDict
+{
+	SharedDict(core::MemoryArenaBase* arena);
+
+	size_t numSamples;
+	DataVec dict;
+};
+
+struct CompressionOptions
+{
+	CompressionOptions() :
+		enabled(false),
+		algo(core::Compression::Algo::STORE)
+	{
+	}
+
+	bool enabled;
+	core::Compression::Algo::Enum algo;
+};
 
 class AssetPakBuilder
 {
 	typedef core::Array<Asset, core::ArrayAllocator<Asset>, core::growStrat::Multiply> AssetArr;
+	typedef std::array<SharedDict*, AssetType::ENUM_COUNT> SharedDicArr;
+	typedef std::array<CompressionOptions, AssetType::ENUM_COUNT> CompressionOptionsArr;
+
 
 public:
 	AssetPakBuilder(core::MemoryArenaBase* arena);
+	~AssetPakBuilder();
 
+	bool dumpMeta(core::Path<char>& pakPath);
+
+	bool bake(void);
 	bool save(core::Path<char>& path);
 
-	void addAsset(const core::string& name, AssetType::Enum type, DataVec&& vec);
+	void addAsset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& vec);
 
 private:
 	core::MemoryArenaBase* arena_;
 
 	AssetArr assets_;
+	CompressionOptionsArr compression_;
+	SharedDicArr dictonaries_;
 };
 
 X_NAMESPACE_END
