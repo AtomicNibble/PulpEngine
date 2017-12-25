@@ -31,7 +31,8 @@ namespace {
 		COL_RED_LIGHT,
 
 		COL_ORANGE,
-		COL_LIGHTPINK
+		COL_LIGHTPINK,
+		COL_PINK
 	};
 
 	X_INLINE unsigned __int16 MakeColor( Cols For, Cols Back )
@@ -57,9 +58,8 @@ namespace {
 		RGB(0xcc, 0, 0),
 
 		RGB( 0xcc, 0x70, 0 ), 
-		RGB( 0xff, 0xaa, 0x9b ),
-		0x000000,  
-
+		RGB(0xff, 0xaa, 0x9b),
+		RGB( 0xff, 0x69, 0xc8 ),
 	};
 
 	unsigned __int16 COLOR_CODE_TABLE[10] = {
@@ -72,7 +72,7 @@ namespace {
 		MakeColor(COL_ORANGE, COL_GRAY),
 		MakeColor(COL_WHITE, COL_GRAY),
 		MakeColor(COL_GREEN, COL_GRAY),
-		MakeColor(COL_GREEN, COL_GRAY),
+		MakeColor(COL_PINK, COL_GRAY),
 	};
 
 }
