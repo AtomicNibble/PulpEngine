@@ -657,12 +657,14 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 		}
 	}
 
-	X_LOG0("AssetPak", "^8AssetNames");
+	X_LOG0("AssetPak", "^8Assets");
 	X_LOG_BULLET;
+	X_LOG0("AssetPak", "%-4s %-31s %-16s %s", "Idx", "Name", "Offset", "Size");
 
 	for (size_t i=0; i<strings.size(); i++)
 	{
-		X_LOG0("AssetPak", "%-4" PRIuS " %s", i, strings[i]);
+		X_LOG0("AssetPak", "%-4" PRIuS " ^5%-31s ^6%-16" PRIu64 " %" PRIu32, i, strings[i], 
+			(uint64_t)entries[i].offset, entries[i].size);
 	}
 
 	return true;
