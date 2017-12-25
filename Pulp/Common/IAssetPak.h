@@ -186,6 +186,7 @@ struct APakHeader
 	uint32_t dictOffset;
 	uint32_t dataOffset;
 
+	// not needed to unpack, just meta data.
 	CompressionAlgoArr algos;
 };
 
