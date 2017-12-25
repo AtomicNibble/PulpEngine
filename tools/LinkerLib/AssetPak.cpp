@@ -542,6 +542,8 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 	file.seek(hdr.entryTableOffset, core::SeekMode::SET);
 	file.readObjs(entries.data(), entries.size());
 
+	uint64_t totalInflatedSize = 0;
+
 	for (const auto& ae : entries)
 	{
 		++assetCounts[ae.type];
@@ -551,17 +553,20 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 		}
 
 		assetSize[ae.type] += ae.size;
+		totalInflatedSize += ae.inflatedSize;
 	}
 
 	const auto numCompressed = core::accumulate(compressedCounts.begin(), compressedCounts.end(), 0_sz);
 
-	core::HumanSize::Str sizeStr;
+	core::HumanSize::Str sizeStr, sizeStr2;
 	APakFlags::Description flagStr;
 	X_LOG0("AssetPak", "^9PakMeta");
 	X_LOG_BULLET;
 	X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, pathExt.fileName(), hdr.version);
 	X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
-	X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ")", core::HumanSize::toString(sizeStr, hdr.size), hdr.size);
+	X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ")",
+		core::HumanSize::toString(sizeStr, hdr.size), hdr.size, 
+		core::HumanSize::toString(sizeStr2, totalInflatedSize), totalInflatedSize);
 	X_LOG0("AssetPak", "StringDataOffset: ^6%" PRIu32, hdr.stringDataOffset);
 	X_LOG0("AssetPak", "EntryTableOffset: ^6%" PRIu32, hdr.entryTableOffset);
 	X_LOG0("AssetPak", "DictOffset: ^6%" PRIu32, hdr.dictOffset);
