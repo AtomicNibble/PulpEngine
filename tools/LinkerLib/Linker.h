@@ -25,10 +25,6 @@ public:
 private:
 	bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);
 
-
-	void GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
-		const core::Path<char>& modPath, core::Path<char>& pathOut);
-
 private:
 	core::MemoryArenaBase* scratchArea_;
 	assetDb::AssetDB& db_;

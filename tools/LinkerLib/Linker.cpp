@@ -82,10 +82,6 @@ bool Linker::Build(void)
 
 bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name)
 {
-	if (assType != assetDb::AssetType::IMG) {
-		return true;
-	}
-
 	assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
 	assetDb::AssetDB::ModId modId;
 	if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
@@ -100,9 +96,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 	}
 
 	core::Path<char> assetPath;
-	GetOutputPathForAsset(assType, name, modInfo.outDir, assetPath);
-
-	assetPath.setExtension("ci");
+	assetDb::AssetDB::GetOutputPathForAsset(assType, name, modInfo.outDir, assetPath);
 
 	// load it.
 	core::XFileScoped file;
@@ -125,33 +119,6 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 
 	builder_.addAsset(assetId, name, assType, std::move(data));
 	return true;
-}
-
-void GetOutputPathForAssetType(assetDb::AssetType::Enum assType,
-	const core::Path<char>& modPath, core::Path<char>& pathOut)
-{
-	pathOut.clear();
-	pathOut /= modPath;
-	pathOut /= assetDb::AssetType::ToString(assType);
-	pathOut += "s";
-	pathOut.toLower();
-	pathOut.replaceSeprators();
-}
-
-void Linker::GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
-	const core::Path<char>& modPath, core::Path<char>& pathOut)
-{
-	GetOutputPathForAssetType(assType, modPath, pathOut);
-
-	pathOut /= name;
-	pathOut.replaceSeprators();
-
-	// get the extension that will be used.
-	// so we can actually find the output file on disk if we want.
-//	IConverter* pCon = GetConverter(assType);
-//	if (pCon) {
-//		pathOut.setExtension(pCon->getOutExtension());
-//	}
 }
 
 
