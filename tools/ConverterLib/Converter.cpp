@@ -95,7 +95,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 	}
 
 	core::Path<char> pathOut;
-	GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
+	assetDb::AssetDB::GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
 	// file exist already?
 	if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str()))
@@ -334,7 +334,7 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 			AssetType::Enum assType = static_cast<AssetType::Enum>(i);
 
 			core::Path<char> assetPath;
-			GetOutputPathForAssetType(assType, outDir, assetPath);
+			assetDb::AssetDB::GetOutputPathForAssetType(assType, outDir, assetPath);
 
 			if (pFileSys->directoryExists(assetPath.c_str()))
 			{
@@ -719,31 +719,5 @@ void Converter::UnloadConverters(void)
 	}
 }
 
-void Converter::GetOutputPathForAssetType(AssetType::Enum assType,
-	const core::Path<char>& modPath, core::Path<char>& pathOut)
-{
-	pathOut.clear();
-	pathOut /= modPath;
-	pathOut /= AssetType::ToString(assType);
-	pathOut += "s";
-	pathOut.toLower();
-	pathOut.replaceSeprators();
-}
-
-void Converter::GetOutputPathForAsset(AssetType::Enum assType, const core::string& name,
-	const core::Path<char>& modPath, core::Path<char>& pathOut)
-{
-	GetOutputPathForAssetType(assType, modPath, pathOut);
-
-	pathOut /= name;
-	pathOut.replaceSeprators();
-
-	// get the extension that will be used.
-	// so we can actually find the output file on disk if we want.
-	IConverter* pCon = GetConverter(assType);
-	if (pCon) {
-		pathOut.setExtension(pCon->getOutExtension());
-	}
-}
 
 X_NAMESPACE_END
