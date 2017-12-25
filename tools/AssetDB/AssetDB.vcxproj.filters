@@ -26,6 +26,9 @@
     <ClInclude Include="AssetDB.h">
       <Filter>Header Files\AssetDB</Filter>
     </ClInclude>
+    <ClInclude Include="AssetFileExtensions.h">
+      <Filter>Header Files\AssetDB</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -39,6 +42,9 @@
     </ClCompile>
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetFileExtensions.cpp">
+      <Filter>Source Files\AssetDB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
