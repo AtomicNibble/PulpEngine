@@ -11,7 +11,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-
 	X_DECLARE_ENUM8(Algo)(STORE, LZ4, LZ4HC, LZMA, ZLIB, LZ5, LZ5HC);
 	X_DECLARE_ENUM(CompressLevel)(
 		LOW, // speed
@@ -211,6 +210,7 @@ namespace Compression
 		// buffer than source is garanted to fit into.
 		virtual size_t requiredDeflateDestBuf(size_t sourceLen) const X_FINAL
 		{
+			X_ASSERT(sourceLen <= T::maxSourceSize(), "Source len exceeds max source size")(sourceLen, T::maxSourceSize());
 			return T::requiredDeflateDestBuf(sourceLen) + sizeof(BufferHdr);
 		}
 
