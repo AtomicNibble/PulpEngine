@@ -114,7 +114,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 		return false;
 	}
 
-	const auto fileSize = file.remainingBytes();
+	const auto fileSize = safe_static_cast<size_t>(file.remainingBytes());
 
 	core::Array<uint8_t> data(scratchArea_);
 	data.resize(fileSize);

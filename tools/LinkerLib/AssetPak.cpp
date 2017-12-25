@@ -251,9 +251,9 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 			stringDataSize += core::strUtil::StringBytesIncNull(a.name);
 		}
 
-		stringDataSize = core::bitUtil::RoundUpToMultiple(stringDataSize, PAK_BLOCK_PADDING);
+		stringDataSize = core::bitUtil::RoundUpToMultiple<uint64_t>(stringDataSize, PAK_BLOCK_PADDING);
 
-		strings.reserve(stringDataSize);
+		strings.reserve(safe_static_cast<size_t>(stringDataSize));
 
 		for (const auto& a : assets_)
 		{
@@ -267,7 +267,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	const uint64_t entryTablesize = sizeof(APakEntry) * assets_.size();
 
 	{
-		entries.reserve(entryTablesize);
+		entries.reserve(safe_static_cast<size_t>(entryTablesize));
 
 		uint64_t assetOffset = 0;
 
@@ -348,7 +348,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 			dataSize += core::bitUtil::RoundUpToMultiple<uint64_t>(a.data.size(), PAK_ASSET_PADDING);
 		}
 
-		data.reserve(dataSize);
+		data.reserve(safe_static_cast<size_t>(dataSize));
 
 		for (const auto& a : assets_)
 		{
@@ -361,8 +361,8 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 
 	// calculate the offsets of the data.
 	const uint64_t entryTableOffset = core::bitUtil::RoundUpToMultiple(sizeof(hdr) + strings.size(), PAK_BLOCK_PADDING);
-	const uint64_t dictsOffset = core::bitUtil::RoundUpToMultiple(entryTableOffset + entryTablesize, PAK_BLOCK_PADDING);
-	const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple(dictsOffset + sharedDictsData.size(), PAK_BLOCK_PADDING);
+	const uint64_t dictsOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(entryTableOffset + entryTablesize, PAK_BLOCK_PADDING);
+	const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(dictsOffset + sharedDictsData.size(), PAK_BLOCK_PADDING);
 
 	uint64_t totalFileSize = 0;
 	totalFileSize += sizeof(hdr);
