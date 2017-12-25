@@ -15,7 +15,7 @@ Linker::Linker(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
 	db_(db),
 	builder_(scratchArea)
 {
-
+	X_ASSERT(scratchArea->isThreadSafe(), "Scratch arena must be thread safe")();
 }
 
 Linker::~Linker()

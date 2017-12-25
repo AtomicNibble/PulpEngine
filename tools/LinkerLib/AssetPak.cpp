@@ -11,7 +11,28 @@
 #include <String\HumanSize.h>
 #include <String\HumanDuration.h>
 
+#include <Threading\JobSystem2.h>
+
 X_NAMESPACE_BEGIN(AssetPak)
+
+namespace
+{
+	struct JobData
+	{
+		JobData(Asset* pAsset, const CompressionOptions* pCompOpt, core::MemoryArenaBase* scratchArena) :
+			pAsset(pAsset),
+			pCompOpt(pCompOpt),
+			scratchArena(scratchArena)
+		{
+
+		}
+
+		Asset* pAsset;
+		const CompressionOptions* pCompOpt;
+		core::MemoryArenaBase* scratchArena;
+	};
+
+} // namespace
 
 Asset::Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
 	name(name),
@@ -68,107 +89,134 @@ AssetPakBuilder::~AssetPakBuilder()
 	}
 }
 
-
-
-
-bool AssetPakBuilder::bake(void)
+void compression_job(core::V2::JobSystem&, size_t threadIdx, core::V2::Job* job, void* jobData)
 {
-	// this is where we perform any kinky logic like training compression dictonaries.
-	// and compresssing data.
-	// also ordering the assets if desired.
-	core::Array<size_t> sampleSizes(arena_);
-	sampleSizes.setGranularity(256);
+	const JobData* pData = reinterpret_cast<const JobData*>(jobData);
+	auto& asset = *pData->pAsset;
+	auto& compOpt = *pData->pCompOpt;
 
-	DataVec sampleData(arena_);
+	DataVec compData(pData->scratchArena);
+	compData.reserve(1024 * 512);
 
-	const size_t maxDictSize = std::numeric_limits<uint16_t>::max() - sizeof(core::Compression::SharedDictHdr);
+	core::Compression::CompressorAlloc comp(compOpt.algo);
+
+	comp->deflate(pData->scratchArena, asset.data, compData, core::Compression::CompressLevel::HIGH);
+
+	float ratio = static_cast<float>(compData.size()) / static_cast<float>(asset.data.size());
+	bool keep = ratio < compOpt.maxRatio;
+
+	if (keep) {
+		asset.data.resize(compData.size());
+		std::memcpy(asset.data.data(), compData.begin(), compData.size());
+	}
 
 	core::HumanSize::Str sizeStr, sizeStr1;
 
-	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	X_LOG0("AssetPak", "^5%-32s ^7orig: ^6%-10s^7 comp: ^6%-10s ^1%-6.2f %s", asset.name.c_str(),
+		core::HumanSize::toString(sizeStr, asset.infaltedSize),
+		core::HumanSize::toString(sizeStr1, asset.data.size()),
+		ratio,
+		keep ? "^8<keep>" : "^1<original>"
+	);
+}
+
+bool AssetPakBuilder::bake(void)
+{
+	X_LOG0("AssetPak", "===== Processing %" PRIuS " asset(s) =====", assets_.size());
+
+	// dict training.
 	{
-		auto type = static_cast<AssetType::Enum>(i);
+		const size_t maxDictSize = std::numeric_limits<uint16_t>::max() - sizeof(core::Compression::SharedDictHdr);
+		
+		DataVec sampleData(arena_);
 
-		if (!dictonaries_[type] || !compression_[type].enabled) {
-			continue;
-		}
+		core::Array<size_t> sampleSizes(arena_);
+		sampleSizes.setGranularity(256);
 
-		// work out required buffer size.
-		const auto sampleDataSize = core::accumulate(assets_.begin(), assets_.end(), 0_sz, [type](const Asset& a) -> size_t {
-			if (a.type != type) {
-				return 0;
-			}
-			return core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
-		});
+		core::HumanSize::Str sizeStr, sizeStr1;
 
-
-		sampleSizes.clear();
-		sampleData.resize(sampleDataSize);
-
-		size_t currentOffset = 0;
-
-		for (const auto& a : assets_)
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 		{
-			if (a.type != type) {
+			auto type = static_cast<AssetType::Enum>(i);
+
+			if (!dictonaries_[type] || !compression_[type].enabled) {
 				continue;
 			}
 
-			const size_t sampleSize = core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
+			// work out required buffer size.
+			const auto sampleDataSize = core::accumulate(assets_.begin(), assets_.end(), 0_sz, [type](const Asset& a) -> size_t {
+				if (a.type != type) {
+					return 0;
+				}
+				return core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
+			});
 
-			std::memcpy(&sampleData[currentOffset], a.data.data(), sampleSize);
 
-			sampleSizes.push_back(sampleSize);
-			currentOffset += sampleSize;
+			sampleSizes.clear();
+			sampleData.resize(sampleDataSize);
+
+			size_t currentOffset = 0;
+
+			for (const auto& a : assets_)
+			{
+				if (a.type != type) {
+					continue;
+				}
+
+				const size_t sampleSize = core::Min<size_t>(a.data.size(), core::Compression::DICT_SAMPLER_SIZE_MAX);
+
+				std::memcpy(&sampleData[currentOffset], a.data.data(), sampleSize);
+
+				sampleSizes.push_back(sampleSize);
+				currentOffset += sampleSize;
+			}
+
+			X_ASSERT(currentOffset == sampleDataSize, "Failed to write all sample data")(currentOffset, sampleDataSize);
+
+			// train.
+			X_LOG0("AssetPak", "Training for assetType \"%s\" with ^6%s^7 sample data, ^6%" PRIuS "^7 files, avg size: ^6%s",
+				AssetType::ToString(type),
+				core::HumanSize::toString(sizeStr, sampleData.size()), sampleSizes.size(),
+				core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
+
+			core::StopWatch timer;
+
+			if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictonaries_[type]->dict, maxDictSize))
+			{
+				X_ERROR("AssetPak", "Fail to train dictionary for assetType: \"%s\"", AssetType::ToString(type));
+				return false;
+			}
+
+
+			core::Compression::SharedDictHdr& hdr = *(core::Compression::SharedDictHdr*)dictonaries_[type]->dict.data();
+			hdr.magic = core::Compression::SharedDictHdr::MAGIC;
+			hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
+
+			const auto size = dictonaries_[type]->dict.size() - sizeof(hdr);
+
+			hdr.size = safe_static_cast<uint32_t>(size);
+
+			const float trainTime = timer.GetMilliSeconds();
+			core::HumanDuration::Str timeStr;
+			X_LOG0("AssetPak", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 		}
-
-		X_ASSERT(currentOffset == sampleDataSize, "Failed to write all sample data")(currentOffset, sampleDataSize);
-
-		// train.
-		X_LOG0("AssetPak", "Training for assetType \"%s\" with ^6%s^7 sample data, ^6%" PRIuS "^7 files, avg size: ^6%s",
-			AssetType::ToString(type),
-			core::HumanSize::toString(sizeStr, sampleData.size()), sampleSizes.size(),
-			core::HumanSize::toString(sizeStr1, sampleData.size() / sampleSizes.size()));
-
-		core::StopWatch timer;
-
-		if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictonaries_[type]->dict, maxDictSize))
-		{
-			X_ERROR("AssetPak", "Fail to train dictionary for assetType: \"%s\"", AssetType::ToString(type));
-			return false;
-		}
-
-
-		core::Compression::SharedDictHdr& hdr = *(core::Compression::SharedDictHdr*)dictonaries_[type]->dict.data();
-		hdr.magic = core::Compression::SharedDictHdr::MAGIC;
-		hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
-		
-		const auto size = dictonaries_[type]->dict.size() - sizeof(hdr);
-		
-		hdr.size = safe_static_cast<uint32_t>(size);
-
-		const float trainTime = timer.GetMilliSeconds();
-		core::HumanDuration::Str timeStr;
-		X_LOG0("AssetPak", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 	}
 
-	DataVec compData(arena_);
-	compData.reserve(1024 * 512);
+	auto* pJobSys = gEnv->pJobSys;
 
 	// compression.
 	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 	{
 		auto type = static_cast<AssetType::Enum>(i);
+		const auto& compOpt = compression_[type];
 
-		if (!compression_[type].enabled) {
+		if (!compOpt.enabled) {
 			continue;
 		}
 
-		auto algo = compression_[type].algo;
-		const float maxRatio = compression_[type].maxRatio;
+		X_LOG0("AssetPak", "===== Compressing type \"%s\" maxRatio: ^1%.2f^7 =====", AssetType::ToString(type), compOpt.maxRatio);
 
-		core::Compression::CompressorAlloc comp(algo);
-
-		X_LOG0("AssetPak", "===== Compressing type \"%s\" maxRatio: ^1%.2f^7 =====", AssetType::ToString(type), maxRatio);
+		auto* pRoot = pJobSys->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::TOOL));
 
 		for (auto& a : assets_)
 		{
@@ -176,39 +224,14 @@ bool AssetPakBuilder::bake(void)
 				continue;
 			}
 
-#if 1
+			JobData data(&a, &compOpt, arena_);
 
-			comp->deflate(arena_, a.data, compData, core::Compression::CompressLevel::HIGH);
-#else
-			core::Compression::LZ4Stream comp(arena_);
-
-			if (dictonaries_[type]) {
-				auto& dict = dictonaries_[type]->dict;
-				comp.loadDict(dict.data(), dict.size());
-			}
-
-			compData.resize(comp.requiredDeflateDestBuf(a.data.size()));
-			auto comptSize = comp.compressContinue(a.data.data(), a.data.size(), compData.data(), compData.size(), core::Compression::CompressLevel::HIGH);
-			compData.resize(comptSize);
-#endif
-
-			float ratio = static_cast<float>(compData.size()) / static_cast<float>(a.data.size());
-
-			if (ratio >= maxRatio) {
-				X_LOG0("AssetPak", "-> ^5%-29s ^7ratio above threshold. ratio: ^1%.2f ^7max: ^1%.2f", a.name.c_str(), ratio, maxRatio);
-				continue;
-			}
-
-			a.data.resize(compData.size());
-			std::memcpy(a.data.data(), compData.begin(), compData.size());
-			
-			X_LOG0("AssetPak", "^5%-32s ^7original: ^6%s^7 compressed: ^6%s ^1%.2f", a.name.c_str(),
-				core::HumanSize::toString(sizeStr, a.infaltedSize),
-				core::HumanSize::toString(sizeStr1, a.data.size()),
-				ratio
-			);
+			auto* pJob = pJobSys->CreateJobAsChild<JobData>(pRoot, compression_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
+			pJobSys->Run(pJob);
 		}
 
+		pJobSys->Run(pRoot);
+		pJobSys->Wait(pRoot);
 	}
 
 	return true;
