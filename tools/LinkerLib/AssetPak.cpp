@@ -62,17 +62,17 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
 	assets_.reserve(1024);
 
 	compression_[AssetType::ANIM].enabled = true;
-	compression_[AssetType::ANIM].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::ANIM].algo = core::Compression::Algo::LZ4HC;
 	compression_[AssetType::MODEL].enabled = true;
-	compression_[AssetType::MODEL].algo = core::Compression::Algo::LZ5;
-	compression_[AssetType::MATERIAL].enabled = true;
-	compression_[AssetType::MATERIAL].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::MODEL].algo = core::Compression::Algo::LZ4HC;
+	// compression_[AssetType::MATERIAL].enabled = true;
+	// compression_[AssetType::MATERIAL].algo = core::Compression::Algo::LZ4;
 	compression_[AssetType::WEAPON].enabled = true;
-	compression_[AssetType::WEAPON].algo = core::Compression::Algo::LZ4;
+	compression_[AssetType::WEAPON].algo = core::Compression::Algo::LZ4HC;
 
 	compression_[AssetType::IMG].enabled = true;
-	compression_[AssetType::IMG].maxRatio = 0.75f;
-	compression_[AssetType::IMG].algo = core::Compression::Algo::LZMA;
+	compression_[AssetType::IMG].maxRatio = 0.85f;
+	compression_[AssetType::IMG].algo = core::Compression::Algo::LZ4HC;
 
 	// per asset shared dictonary.
 	dictonaries_.fill(nullptr);
