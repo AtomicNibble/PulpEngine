@@ -7,11 +7,7 @@
 
 #include <Platform\Console.h>
 
-#include <Compression\LZ4.h>
-#include <Compression\LZ5.h>
-#include <Compression\Lzma2.h>
-#include <Compression\Zlib.h>
-#include <Compression\Store.h>
+#include <Compression\CompressorAlloc.h>
 #include <Compression\DictBuilder.h>
 
 #include <String\HumanSize.h>
@@ -58,43 +54,6 @@ namespace
 	using core::Compression::BufferHdr;
 	using core::Compression::ICompressor;
 	using core::Compression::Compressor;
-
-	core::UniquePointer<ICompressor> getCompressor(core::MemoryArenaBase* arena, core::Compression::Algo::Enum algo)
-	{
-		core::UniquePointer<ICompressor> comp(arena);
-
-		static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
-
-		switch (algo)
-		{
-			case Algo::LZ4:
-				comp = core::makeUnique<Compressor<core::Compression::LZ4>>(arena, "LZ4");
-				break;
-			case Algo::LZ4HC:
-				comp = core::makeUnique<Compressor<core::Compression::LZ4HC>>(arena, "LZ4HC");
-				break;
-			case Algo::LZ5:
-				comp = core::makeUnique<Compressor<core::Compression::LZ4>>(arena, "LZ4");
-				break;
-			case Algo::LZ5HC:
-				comp = core::makeUnique<Compressor<core::Compression::LZ4HC>>(arena, "LZ4HC");
-				break;
-			case Algo::LZMA:
-				comp = core::makeUnique<Compressor<core::Compression::LZMA>>(arena, "LZMA");
-				break;
-			case Algo::ZLIB:
-				comp = core::makeUnique<Compressor<core::Compression::Zlib>>(arena, "ZLIB");
-				break;
-			case Algo::STORE:
-				comp = core::makeUnique<Compressor<core::Compression::Store>>(arena, "Store");
-				break;
-			default:
-				X_ASSERT_UNREACHABLE();
-				break;
-		}
-
-		return comp;
-	}
 
 	bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
 	{
@@ -253,7 +212,7 @@ namespace
 			algo = ICompressor::getAlgo(inFileData);
 		}
 
-		auto compressor = getCompressor(&arena, algo);
+		core::Compression::CompressorAlloc compressor(algo);
 
 		// auto out file name.
 		if (defalte && outFile.empty())

@@ -30,8 +30,6 @@ class DLL_EXPORT AssetDB
 	static const char* RAW_FILES_FOLDER;
 	static const char* THUMBS_FOLDER;
 
-	static const size_t MAX_COMPRESSOR_SIZE;
-
 	struct RawFile
 	{
 		int32_t file_id;
@@ -270,7 +268,6 @@ private:
 	static void ThumbPathForThumb(const ThumbInfo& info, core::Path<char>& pathOut);
 	static bool ValidName(const core::string& name);
 
-	static core::Compression::ICompressor* AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo);
 	static bool InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated);
 	static bool DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated, 
 		core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl);

@@ -9,11 +9,7 @@
 #include <IFileSys.h>
 #include <ICompression.h>
 
-#include <Compression\LZ4.h>
-#include <Compression\LZ5.h>
-#include <Compression\Lzma2.h>
-#include <Compression\Zlib.h>
-#include <Compression\Store.h>
+#include <Compression\CompressorAlloc.h>
 
 #include <String\Json.h>
 #include <String\HumanSize.h>
@@ -93,25 +89,6 @@ const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME"_asset.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 const char* AssetDB::THUMBS_FOLDER = "thumbs";
-
-static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
-
-const size_t AssetDB::MAX_COMPRESSOR_SIZE = core::Max<size_t>(
-	core::Max(
-		core::Max(
-			core::Max(
-				core::Max(
-					core::Max(
-						core::Max(
-							sizeof(core::Compression::Compressor<core::Compression::LZ4>),
-							sizeof(core::Compression::Compressor<core::Compression::LZ4HC>)),
-						sizeof(core::Compression::Compressor<core::Compression::LZ5>)),
-					sizeof(core::Compression::Compressor<core::Compression::LZ5HC>)),
-				sizeof(core::Compression::Compressor<core::Compression::LZMA>)),
-			sizeof(core::Compression::Compressor<core::Compression::Zlib>)),
-		sizeof(core::Compression::Compressor<core::Compression::Store>)),
-	16) + 256;
-
 
 AssetDB::AssetDB() :
 	modId_(INVALID_MOD_ID),
@@ -1758,15 +1735,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
 	// compress it.
-	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
-	core::LinearAllocator allocator(buf, buf + sizeof(buf));
-
-	auto* pCompressor = AllocCompressor(&allocator, algo);
+	core::Compression::CompressorAlloc compressor(algo);
 
 	core::StopWatch timer;
 
 	DataArr compressed(data.getArena());
-	if (!pCompressor->deflate(data.getArena(), data, compressed, lvl))
+	if (!compressor->deflate(data.getArena(), data, compressed, lvl))
 	{
 		X_ERROR("AssetDB", "Failed to defalte raw file data");
 		return Result::ERROR;
@@ -1783,8 +1757,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 			percentageSize,
 			elapsed);
 	}
-
-	core::Mem::Destruct(pCompressor);
 
 	return UpdateAssetRawFile(type, name, compressed);
 }
@@ -3150,65 +3122,18 @@ bool AssetDB::ValidName(const core::string& name)
 	return true;
 }
 
-core::Compression::ICompressor* AssetDB::AllocCompressor(core::LinearAllocator* pAllocator, core::Compression::Algo::Enum algo)
-{
-	core::Compression::ICompressor* pCom = nullptr;
-
-	static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
-
-	switch (algo)
-	{
-	case core::Compression::Algo::LZ4:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
-		break;
-	case core::Compression::Algo::LZ4HC:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4HC>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4HC>), 0));
-		break;
-	case core::Compression::Algo::LZ5:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ5>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ5>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ5>), 0));
-		break;
-	case core::Compression::Algo::LZ5HC:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ5HC>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ5HC>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ5HC>), 0));
-		break;
-	case core::Compression::Algo::LZMA:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
-		break;
-	case core::Compression::Algo::ZLIB:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::LZ4>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::LZ4>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::LZ4>), 0));
-		break;
-	case core::Compression::Algo::STORE:
-		pCom = core::Mem::Construct<core::Compression::Compressor<core::Compression::Store>>(pAllocator->allocate(sizeof(core::Compression::Compressor<core::Compression::Store>), X_ALIGN_OF(core::Compression::Compressor<core::Compression::Store>), 0));
-		break;
-
-	default:
-		X_ASSERT_UNREACHABLE();
-		break;
-	}
-
-	return pCom;
-}
 
 bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated)
 {
-	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
-	core::LinearAllocator allocator(buf, buf + sizeof(buf));
-
 	if (!core::Compression::ICompressor::validBuffer(deflated)) {
 		X_ERROR("AssetDB", "Tried to inflate a invalid buffer");
 		return false;
 	}
 
-	const core::Compression::Algo::Enum algo = core::Compression::ICompressor::getAlgo(deflated);
+	const auto algo = core::Compression::ICompressor::getAlgo(deflated);
+	core::Compression::CompressorAlloc compressor(algo);
 
-	auto* pCompressor = AllocCompressor(&allocator, algo);
-	if (!pCompressor) {
-		X_ERROR("AssetDB", "Failed to get compressor");
-		return false;
-	}
-
-	bool result = pCompressor->inflate(scratchArena, deflated, inflated);
-
-	core::Mem::Destruct(pCompressor);
+	bool result = compressor->inflate(scratchArena, deflated, inflated);
 
 	return result;
 }
@@ -3216,18 +3141,9 @@ bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& 
 bool AssetDB::DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated,
 	core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
-	X_ALIGNED_SYMBOL(char buf[MAX_COMPRESSOR_SIZE], 16);
-	core::LinearAllocator allocator(buf, buf + sizeof(buf));
+	core::Compression::CompressorAlloc compressor(algo);
 
-	auto* pCompressor = AllocCompressor(&allocator, algo);
-	if (!pCompressor) {
-		X_ERROR("AssetDB", "Failed to get compressor");
-		return false;
-	}
-
-	bool result = pCompressor->deflate(scratchArena, data, deflated, lvl);
-
-	core::Mem::Destruct(pCompressor);
+	bool result = compressor->deflate(scratchArena, data, deflated, lvl);
 
 	return result;
 }
