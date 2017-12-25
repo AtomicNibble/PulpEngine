@@ -603,8 +603,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 				continue;
 			}
 
-			X_LOG0("AssetPak", "^5%-16s ^6%s",
-				AssetType::ToString(i), core::Compression::Algo::ToString(hdr.algos[i]));
+			X_LOG0("AssetPak", "^5%-16s ^6%s", AssetType::ToString(i), core::Compression::Algo::ToString(hdr.algos[i]));
 		}
 	}
 
