@@ -24,7 +24,7 @@ static const AssetId INVALID_ASSET_ID = -1;
 static const AssetId INVALID_RAWFILE_ID = -1;
 static const ThumbId INVALID_THUMB_ID = -1;
 
-X_DECLARE_ENUM(AssetType)(
+X_DECLARE_ENUM8(AssetType)(
 	MODEL, 
 	ANIM,
 	MATERIAL, 
