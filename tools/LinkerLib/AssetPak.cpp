@@ -594,11 +594,12 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 
 		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 		{
-			auto type = static_cast<AssetType::Enum>(i);
+			if (assetCounts[i] == 0) {
+				continue;
+			}
 
-	
 			X_LOG0("AssetPak", "^5%-16s ^6%s",
-				AssetType::ToString(type), core::Compression::Algo::ToString(hdr.algos[i]));
+				AssetType::ToString(i), core::Compression::Algo::ToString(hdr.algos[i]));
 		}
 	}
 
@@ -615,6 +616,10 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 
 		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 		{
+			if (assetCounts[i] == 0) {
+				continue;
+			}
+
 			X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIu32 " %-10" PRIu32, 
 				AssetType::ToString(i), dictInfo.sharedHdrs[i].offset, dictInfo.sharedHdrs[i].size);
 		}
