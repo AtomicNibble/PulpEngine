@@ -167,7 +167,7 @@ void xFileSys::shutDown(void)
 
 	for (search_s* s = searchPaths_; s; ) {
 		search_s* cur = s;
-		s = cur->next_;
+		s = cur->pNext;
 		if (cur->dir) {
 			X_DELETE(cur->dir, g_coreArena);
 		}
@@ -666,7 +666,7 @@ void xFileSys::addModDir(pathTypeW path)
 
 	// work out if this directory is a sub directory of any of the current
 	// searxh paths.
-	for (search_s* s = searchPaths_; s; s = s->next_)
+	for (search_s* s = searchPaths_; s; s = s->pNext)
 	{
 		if (strUtil::FindCaseInsensitive(fixedPath, s->dir->path.c_str()) != nullptr)
 		{
@@ -682,7 +682,7 @@ void xFileSys::addModDir(pathTypeW path)
 	search->dir->path = fixedPath;
 	search->dir->path.ensureSlash();
 	search->pak = nullptr;
-	search->next_ = searchPaths_;
+	search->pNext = searchPaths_;
 	searchPaths_ = search;
 
 	// add hotreload dir.
@@ -1082,7 +1082,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
 	core::FixedArray<wchar_t, 128> DriveLettters;
 
 
-	for (search_s* s = searchPaths_; s; s = s->next_)
+	for (search_s* s = searchPaths_; s; s = s->pNext)
 	{
 		if (s->dir)
 		{

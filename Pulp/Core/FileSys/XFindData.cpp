@@ -42,11 +42,14 @@ XFindData::~XFindData()
 
 bool XFindData::findnext(_wfinddatai64_t* fi) 
 {
-	if (!current_)
+	if (!current_) {
 		return returnFalse(fi);
+	}
 
-	if (current_->dir)
+	if (current_->dir) {
 		return searchDir(current_->dir, fi);
+	}
+
 	return searchPak(fi);
 }
 
@@ -81,8 +84,10 @@ bool XFindData::searchDir(directory_s* dir, _wfinddatai64_t* fi)
 
 		handle_ = _wfindfirst64(temp.c_str(), &fdw);
 
-		if (handle_ == -1) // if nothing found in this dir, move on.
+		if (handle_ == -1) { // if nothing found in this dir, move on.
 			return returnFindhNext(fi);
+		}
+
 		// we have found somthing.
 		updateFindInfo(fi);
 		return true;
@@ -128,7 +133,7 @@ inline bool XFindData::returnFalse(_wfinddatai64_t* fi)
 
 inline bool XFindData::returnFindhNext(_wfinddatai64_t* findinfo)
 {
-	current_ = current_->next_;
+	current_ = current_->pNext;
 	return findnext(findinfo);
 }
 

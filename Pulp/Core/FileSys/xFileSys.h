@@ -45,7 +45,7 @@ struct search_s
 {
 	directory_s* dir;
 	pak_s* pak;
-	struct search_s* next_;
+	search_s* pNext;
 };
 
 
