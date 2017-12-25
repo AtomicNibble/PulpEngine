@@ -515,6 +515,7 @@ public:
 
 
 	void Run(Job* pJob);
+	X_INLINE void RunAndWait(Job* pJob);
 	void Wait(Job* pJob);
 	void WaitWithoutHelp(Job* pJob) const;
 	bool HelpWithWork(void); // must be a job thread / main thread that calls this, return true if ran a job.

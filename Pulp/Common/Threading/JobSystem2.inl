@@ -337,7 +337,11 @@ namespace V2
 		return CreateJobAsChild(pPaerent, EmptyJob, nullptr JOB_SYS_SUB_PASS(subSystem));
 	}
 
-
+	X_INLINE void JobSystem::RunAndWait(Job* pJob)
+	{
+		Run(pJob);
+		Wait(pJob);
+	}
 
 #if X_ENABLE_JOBSYS_PROFILER
 
