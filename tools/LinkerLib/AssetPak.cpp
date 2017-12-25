@@ -330,7 +330,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 			entry.type = a.type;
 			entry.flags.Clear();
 			entry.offset = assetOffset;
-			entry.size = safe_static_cast<uint32_t>(a.data.size());;
+			entry.size = safe_static_cast<uint32_t>(a.data.size());
 			entry.inflatedSize = safe_static_cast<uint32_t>(a.infaltedSize);
 
 			entries.write(entry);
