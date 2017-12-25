@@ -66,6 +66,22 @@ namespace Compression
 			return 1;
 		}
 
+		int32_t compressLevelToWordSize(CompressLevel::Enum lvl)
+		{
+			if (lvl == CompressLevel::LOW) {
+				return 32; 
+			}
+			if (lvl == CompressLevel::NORMAL) {
+				return 64; 
+			}
+			if (lvl == CompressLevel::HIGH) {
+				return 192; 
+			}
+
+			X_ASSERT_UNREACHABLE();
+			return 1;
+		}
+
 		struct ArenaAlloc : public ISzAlloc
 		{
 			ArenaAlloc(core::MemoryArenaBase* arena) :
@@ -133,7 +149,7 @@ namespace Compression
 			-1,  // lc
 			-1,  // lp
 			-1,  // pb
-			-1,  // fb
+			compressLevelToWordSize(lvl),  // fb
 			1,    // numthreads
 			&allocForLzma,
 			&allocForLzma
