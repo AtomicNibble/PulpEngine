@@ -571,6 +571,37 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 		}
 	}
 
+	const size_t stringDataSize = hdr.entryTableOffset - hdr.stringDataOffset;
+	
+	core::Array<char> stringData(arena_);
+	core::Array<const char*> strings(arena_);
+	stringData.resize(stringDataSize);
+	strings.reserve(hdr.numAssets);
+
+	file.seek(hdr.stringDataOffset, core::SeekMode::SET);
+	file.read(stringData.data(), stringData.size());
+
+
+	strings.push_back(stringData.begin());
+
+
+	for (size_t i = 0; i < stringData.size() && strings.size() < hdr.numAssets; i++)
+	{
+		if (stringData[i] == '\0')
+		{
+			strings.push_back(&stringData[i+1]);
+			++i;
+		}
+	}
+
+	X_LOG0("AssetPak", "^8AssetNames");
+	X_LOG_BULLET;
+
+	for (size_t i=0; i<strings.size(); i++)
+	{
+		X_LOG0("AssetPak", "%-4" PRIuS " %s", i, strings[i]);
+	}
+
 	return true;
 }
 
