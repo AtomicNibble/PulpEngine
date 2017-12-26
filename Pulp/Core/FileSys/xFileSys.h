@@ -2,7 +2,7 @@
 
 #include <IFileSys.h>
 
-#include "String\Path.h"
+#include <String\Path.h>
 #include "Vars\FileSysVars.h"
 
 #include <Containers\HashMap.h>
@@ -17,8 +17,8 @@ X_ENABLE_WARNING(4702)
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\HeapArea.h>
 
-#include "Threading\ThreadQue.h"
-#include "Threading\Thread.h"
+#include <Threading\ThreadQue.h>
+#include <Threading\Thread.h>
 
 #include <IFileSysStats.h>
 
