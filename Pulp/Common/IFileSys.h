@@ -238,78 +238,6 @@ private:
 	char* end_;
 };
 
-struct XFileStream : public XFile
-{
-	XFileStream(core::MemoryArenaBase* arena) :
-		buf_(arena)
-	{
-		X_ASSERT_NOT_NULL(arena);
-
-		buf_.setGranularity(1024 * 16);
-	}
-	~XFileStream() X_OVERRIDE {
-	}
-
-	virtual size_t read(void* pBuf, size_t len) X_FINAL
-	{
-		X_UNUSED(pBuf);
-		X_UNUSED(len);
-		X_ASSERT_NOT_IMPLEMENTED();
-		return 0;
-	}
-
-	virtual size_t write(const void* pBuf, size_t len) X_FINAL
-	{
-		const size_t offset = buf_.size();
-
-		buf_.resize(offset + len);
-
-		std::memcpy(&buf_[offset], pBuf, len);
-		return len;
-	}
-
-	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL 
-	{
-		X_UNUSED(position);
-		X_UNUSED(origin);
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
-
-	virtual uint64_t remainingBytes(void) const X_FINAL {
-		return 0;
-	}
-	virtual uint64_t tell(void) const X_FINAL {
-		return buf_.size();
-	}
-	virtual void setSize(int64_t numBytes) X_FINAL {
-		X_UNUSED(numBytes);
-		X_ASSERT_UNREACHABLE();
-	}
-
-	// none overriding.
-	inline void setGranularity(size_t gran) {
-		buf_.setGranularity(gran);
-	}
-
-	inline uint64_t getSize(void) const {
-		return buf_.size();
-	}
-
-	inline bool isEof(void) const X_FINAL {
-		return remainingBytes() == 0;
-	}
-
-	inline const core::Array<uint8_t>& buffer(void) const {
-		return buf_;
-	}
-
-
-private:
-	core::Array<uint8_t> buf_;
-};
-
-
-
 struct XFileFixedBuf : public XFile
 {
 	XFileFixedBuf(const uint8_t* begin, const uint8_t* end) :
@@ -399,6 +327,73 @@ private:
 };
 
 
+struct XFileStream : public XFile
+{
+	typedef core::Array<uint8_t> DataVec;
+
+	XFileStream(core::MemoryArenaBase* arena) :
+		buf_(arena)
+	{
+		X_ASSERT_NOT_NULL(arena);
+
+		buf_.setGranularity(1024 * 16);
+	}
+	~XFileStream() X_OVERRIDE {
+	}
+
+	virtual size_t read(void* pBuf, size_t len) X_FINAL
+	{
+		X_UNUSED(pBuf);
+		X_UNUSED(len);
+		X_ASSERT_NOT_IMPLEMENTED();
+		return 0;
+	}
+
+	virtual size_t write(const void* pBuf, size_t len) X_FINAL
+	{
+		const size_t offset = buf_.size();
+
+		buf_.resize(offset + len);
+
+		std::memcpy(&buf_[offset], pBuf, len);
+		return len;
+	}
+
+	virtual void seek(int64_t position, SeekMode::Enum origin) X_FINAL
+	{
+		X_UNUSED(position);
+		X_UNUSED(origin);
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	virtual uint64_t remainingBytes(void) const X_FINAL {
+		return 0;
+	}
+	virtual uint64_t tell(void) const X_FINAL {
+		return buf_.size();
+	}
+	virtual void setSize(int64_t numBytes) X_FINAL {
+		X_UNUSED(numBytes);
+		X_ASSERT_UNREACHABLE();
+	}
+
+	inline uint64_t getSize(void) const {
+		return buf_.size();
+	}
+
+	inline bool isEof(void) const X_FINAL {
+		return remainingBytes() == 0;
+	}
+
+	inline const DataVec& buffer(void) const {
+		return buf_;
+	}
+
+private:
+	DataVec buf_;
+};
+
+
 struct XFileByteStream : public XFile
 {
 	XFileByteStream(core::ByteStream& stream) :
@@ -446,6 +441,7 @@ struct XFileByteStream : public XFile
 private:
 	core::ByteStream& stream_;
 };
+
 
 // stuff for io requests
 X_DECLARE_ENUM(IoRequest)(
