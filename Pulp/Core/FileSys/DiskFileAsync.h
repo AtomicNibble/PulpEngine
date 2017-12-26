@@ -9,9 +9,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
-
-
 class XDiskFileAsync : public XFileAsync
 {
 public:
@@ -59,7 +56,5 @@ X_INLINE size_t XDiskFileAsync::WaitUntilFinished(const XFileAsyncOperation& ope
 }
 
 X_NAMESPACE_END
-
-
 
 #endif // !X_CORE_FILESYS_DISK_FILE_ASYNC_H_
