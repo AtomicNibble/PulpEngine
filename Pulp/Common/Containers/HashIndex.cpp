@@ -14,7 +14,7 @@ XHashIndex::XHashIndex(core::MemoryArenaBase* arena) :
 
 XHashIndex::XHashIndex(core::MemoryArenaBase* arena, const size_type initialHashSize, const size_type initialIndexSize)
 {
-	arena_ = arena;
+	arena_ = X_ASSERT_NOT_NULL(arena);
 
 	X_ASSERT(core::bitUtil::IsPowerOfTwo(initialHashSize), "size must be power of 2")(initialHashSize);
 
@@ -112,7 +112,7 @@ void XHashIndex::clear(void)
 {
 	// only clear the hash table because clearing the indexChain is not really needed
 	if (hash_ != INVALID_INDEX) {
-		memset(hash_, 0xff, hashSize_ * sizeof(hash_[0]));
+		std::memset(hash_, 0xff, hashSize_ * sizeof(hash_[0]));
 	}
 }
 
@@ -126,8 +126,6 @@ void XHashIndex::clear(const size_type newHashSize, const size_type newIndexSize
 
 void XHashIndex::free(void)
 {
-	X_ASSERT_NOT_NULL(arena_);
-
 	if (hash_ != INVALID_INDEX) {
 		X_DELETE_ARRAY(hash_,arena_);
 		hash_ = INVALID_INDEX;
@@ -215,15 +213,12 @@ void XHashIndex::removeIndex(const uint32_t key, const index_type index)
 
 void XHashIndex::resizeIndex(const size_type newIndexSize)
 {
-	X_ASSERT_NOT_NULL(arena_);
-
-	int* oldIndexChain, mod, newSize;
-
 	if (newIndexSize <= indexSize_) {
 		return;
 	}
 
-	mod = newIndexSize % granularity_;
+	int mod = newIndexSize % granularity_;
+	int newSize;
 	if (!mod) {
 		newSize = newIndexSize;
 	}
@@ -236,10 +231,10 @@ void XHashIndex::resizeIndex(const size_type newIndexSize)
 		return;
 	}
 
-	oldIndexChain = indexChain_;
+	index_type* oldIndexChain = indexChain_;
 	indexChain_ = X_NEW_ARRAY(index_type, newSize, arena_, "index");
-	memcpy(indexChain_, oldIndexChain, indexSize_ * sizeof(int));
-	memset(indexChain_ + indexSize_, 0xff, (newSize - indexSize_) * sizeof(int));
+	memcpy(indexChain_, oldIndexChain, indexSize_ * sizeof(index_type));
+	memset(indexChain_ + indexSize_, 0xff, (newSize - indexSize_) * sizeof(index_type));
 	X_DELETE_ARRAY(oldIndexChain, arena_);
 	indexSize_ = newSize;
 }
@@ -290,10 +285,10 @@ void XHashIndex::allocate(const size_type newHashSize, const size_type newIndexS
 
 	free();
 	hashSize_ = newHashSize;
-	hash_ = X_NEW_ARRAY(int, hashSize_, arena_, "hash");
+	hash_ = X_NEW_ARRAY(index_type, hashSize_, arena_, "hash");
 	memset(hash_, 0xff, hashSize_ * sizeof(hash_[0]));
 	indexSize_ = newIndexSize;
-	indexChain_ = X_NEW_ARRAY(int, indexSize_, arena_, "index");
+	indexChain_ = X_NEW_ARRAY(index_type, indexSize_, arena_, "index");
 	memset(indexChain_, 0xff, indexSize_ * sizeof(indexChain_[0]));
 	hashMask_ = hashSize_ - 1;
 	lookupMask_ = -1;
