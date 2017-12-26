@@ -14,6 +14,9 @@ class Path : public StackString<MAX_PATH, TChar>
 	typedef StackString<MAX_PATH, TChar> BaseType;
 
 public:
+	static const size_t BUF_SIZE = MAX_PATH;
+
+public:
 #ifdef X_PLATFORM_WIN32
 	static const TChar NATIVE_SLASH = '\\';
 	static const TChar NON_NATIVE_SLASH = '/';
