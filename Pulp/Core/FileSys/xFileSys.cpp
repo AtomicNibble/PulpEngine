@@ -165,14 +165,14 @@ void xFileSys::shutDown(void)
 
 	ShutDownRequestWorker();
 
-	for (search_s* s = searchPaths_; s; ) {
-		search_s* cur = s;
+	for (Search* s = searchPaths_; s; ) {
+		Search* cur = s;
 		s = cur->pNext;
-		if (cur->dir) {
-			X_DELETE(cur->dir, g_coreArena);
+		if (cur->pDir) {
+			X_DELETE(cur->pDir, g_coreArena);
 		}
 		else {
-			X_DELETE(cur->pak, g_coreArena);
+			X_DELETE(cur->pPak, g_coreArena);
 		}
 		X_DELETE(cur, g_coreArena);
 	}
@@ -629,8 +629,8 @@ bool xFileSys::setGameDir(pathTypeW path)
 
 	addModDir(path);
 	X_ASSERT_NOT_NULL(searchPaths_);
-	X_ASSERT_NOT_NULL(searchPaths_->dir);
-	gameDir_ = searchPaths_->dir;
+	X_ASSERT_NOT_NULL(searchPaths_->pDir);
+	gameDir_ = searchPaths_->pDir;
 
 	return true;
 }
@@ -647,15 +647,10 @@ void xFileSys::addModDir(pathTypeW path)
 	}
 
 	// ok remove any ..//
-	DWORD  retval = 0;
-	TCHAR  fixedPath[512];
+	core::Path<wchar_t> fixedPath;
 
-	retval = GetFullPathNameW(path, 512, fixedPath, nullptr);
-	if (retval == 0)
-	{
-		core::lastError::Description Dsc;
-		X_ERROR("FileSys", "addModDir full path name creation failed: %s", 
-			core::lastError::ToString(Dsc));
+	if (!PathUtil::GetFullPath(path, fixedPath)) {
+		X_ERROR("FileSys", "addModDir full path name creation failed");
 		return;
 	}
 
@@ -666,27 +661,27 @@ void xFileSys::addModDir(pathTypeW path)
 
 	// work out if this directory is a sub directory of any of the current
 	// searxh paths.
-	for (search_s* s = searchPaths_; s; s = s->pNext)
+	for (Search* s = searchPaths_; s; s = s->pNext)
 	{
-		if (strUtil::FindCaseInsensitive(fixedPath, s->dir->path.c_str()) != nullptr)
+		if (strUtil::FindCaseInsensitive(fixedPath.c_str(), s->pDir->path.c_str()) != nullptr)
 		{
 			X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%ls\" -> \"%ls\"",
-				fixedPath, s->dir->path.c_str());
+				fixedPath, s->pDir->path.c_str());
 			return;
 		}
 	}
 
 	// at it to virtual file system.
-	search_s* search = X_NEW( search_s, g_coreArena, "FileSysSearch");
-	search->dir = X_NEW( directory_s, g_coreArena, "FileSysDir");
-	search->dir->path = fixedPath;
-	search->dir->path.ensureSlash();
-	search->pak = nullptr;
+	Search* search = X_NEW( Search, g_coreArena, "FileSysSearch");
+	search->pDir = X_NEW( directory_s, g_coreArena, "FileSysDir");
+	search->pDir->path = fixedPath;
+	search->pDir->path.ensureSlash();
+	search->pPak = nullptr;
 	search->pNext = searchPaths_;
 	searchPaths_ = search;
 
 	// add hotreload dir.
-	gEnv->pDirWatcher->addDirectory(fixedPath);
+	gEnv->pDirWatcher->addDirectory(fixedPath.c_str());
 }
 
 
@@ -1079,27 +1074,26 @@ size_t xFileSys::getMinimumSectorSize(void) const
 	size_t sectorSize = 0;
 	fileModeFlags mode(fileMode::READ);
 
-	core::FixedArray<wchar_t, 128> DriveLettters;
+	core::FixedArray<wchar_t, 128> driveLettters;
 
-
-	for (search_s* s = searchPaths_; s; s = s->pNext)
+	for (Search* s = searchPaths_; s; s = s->pNext)
 	{
-		if (s->dir)
+		if (s->pDir)
 		{
-			const core::Path<wchar_t>& path = s->dir->path;	
+			const auto& path = s->pDir->path;
 			int8_t driveIdx = path.getDriveNumber(); // watch this be a bug at somepoint.
 			if(driveIdx >= 0)
 			{
 				wchar_t driveLetter = (L'A' + driveIdx);
 
-				if (std::find(DriveLettters.begin(), DriveLettters.end(), driveLetter) == DriveLettters.end()) {
-					DriveLettters.append(driveLetter);
+				if (std::find(driveLettters.begin(), driveLettters.end(), driveLetter) == driveLettters.end()) {
+					driveLettters.append(driveLetter);
 				}		
 			}
 		}
 	}
 
-	for (const auto d : DriveLettters)
+	for (const auto d : driveLettters)
 	{
 		core::StackString<64, wchar_t> device(L"\\\\.\\");
 

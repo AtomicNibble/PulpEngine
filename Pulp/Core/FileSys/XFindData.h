@@ -9,7 +9,8 @@ X_NAMESPACE_BEGIN(core)
 
 class xFileSys;
 struct directory_s;
-struct search_s;
+struct Search;
+struct Pak;
 
 
 struct XFindData
@@ -37,7 +38,7 @@ private:
 	intptr_t		handle_;
 	_wfinddata64_t	fdw;
 
-	search_s*		current_;
+	Search*			current_;
 	xFileSys*		pFileSys_;
 };
 

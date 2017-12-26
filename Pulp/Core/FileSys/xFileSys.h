@@ -30,7 +30,7 @@ X_NAMESPACE_BEGIN(core)
 // we will need the folder name.
 // a search can also be a PAK since that is like a directory of files.
 
-struct pak_s
+struct Pak
 {
 	StackString<64> name;
 };
@@ -41,11 +41,15 @@ struct directory_s
 
 };
 
-struct search_s
+struct Search
 {
-	directory_s* dir;
-	pak_s* pak;
-	search_s* pNext;
+	Search() {
+		core::zero_this(this);
+	}
+
+	directory_s* pDir;
+	Pak* pPak;
+	Search* pNext;
 };
 
 
@@ -285,7 +289,7 @@ private:
 #endif // !X_DEBUG
 
 	directory_s* gameDir_;
-	search_s* searchPaths_;
+	Search* searchPaths_;
 
 	XFileSysVars vars_;
 

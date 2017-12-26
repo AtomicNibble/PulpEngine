@@ -24,7 +24,7 @@ XFindData::XFindData(const char* path, xFileSys* pFileSys) :
 	current_(pFileSys->searchPaths_),
 	pFileSys_(pFileSys)
 {
-	wchar_t pathW[512];
+	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
 
 	path_ = strUtil::Convert(path, pathW, sizeof(pathW));
 
@@ -46,8 +46,8 @@ bool XFindData::findnext(_wfinddatai64_t* fi)
 		return returnFalse(fi);
 	}
 
-	if (current_->dir) {
-		return searchDir(current_->dir, fi);
+	if (current_->pDir) {
+		return searchDir(current_->pDir, fi);
 	}
 
 	return searchPak(fi);
@@ -57,8 +57,8 @@ bool XFindData::getOSPath(core::Path<wchar_t>& path, _wfinddatai64_t* fi)
 {
 	X_ASSERT_NOT_NULL(fi);
 
-	if (current_->dir) {
-		path /= current_->dir->path / fi->name;
+	if (current_->pDir) {
+		path /= current_->pDir->path / fi->name;
 		return true;
 	}
 
