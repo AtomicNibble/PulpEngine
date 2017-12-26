@@ -384,7 +384,7 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	findhandle findFirst(const wchar_t* path, _wfinddatai64_t& findInfo)
+	findhandle findFirst(const wchar_t* path, findData& findInfo)
 	{
 		intptr_t handle = _wfindfirst64(path, &findInfo);
 		if (handle == -1) {
@@ -394,7 +394,7 @@ namespace PathUtil
 		return handle;
 	}
 
-	bool findNext(findhandle handle, _wfinddatai64_t& findInfo)
+	bool findNext(findhandle handle, findData& findInfo)
 	{
 		if (_wfindnext64(handle, &findInfo) == 0) {
 			return true;
