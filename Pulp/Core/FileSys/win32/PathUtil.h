@@ -21,6 +21,9 @@ namespace PathUtil
 
 	core::Path<wchar_t> GetCurrentDirectory(void);
 
+	bool GetFullPath(const core::Path<wchar_t>& filePath, core::Path<wchar_t>& pathOut);
+	bool GetFullPath(const wchar_t* pFilePath, core::Path<wchar_t>& pathOut);
+
 	bool DeleteFile(const core::Path<wchar_t>& filePath);
 	bool DeleteFile(const wchar_t* pFilePath);
 

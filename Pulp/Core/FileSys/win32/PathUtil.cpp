@@ -30,6 +30,29 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
+	bool GetFullPath(const core::Path<wchar_t>& filePath, core::Path<wchar_t>& pathOut)
+	{
+		return GetFullPath(filePath.c_str(), pathOut);
+	}
+
+	bool GetFullPath(const wchar_t* pFilePath, core::Path<wchar_t>& pathOut)
+	{
+		wchar_t buf[core::Path<wchar_t>::BUF_SIZE];
+
+		DWORD retval = GetFullPathNameW(pFilePath, X_ARRAY_SIZE(buf), buf, nullptr);
+		if (retval > 0 && retval < X_ARRAY_SIZE(buf))
+		{
+			pathOut = buf;
+			return true;
+		}
+
+		core::lastError::Description Dsc;
+		X_ERROR("FileSys", "GetFullPathName failed. Error: %s", lastError::ToString(Dsc));
+		return false;
+	}
+
+	// ------------------------------------------------
+
 
 	bool DeleteFile(const core::Path<wchar_t>& filePath)
 	{
