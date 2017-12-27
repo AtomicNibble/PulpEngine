@@ -134,6 +134,9 @@
     <ClInclude Include="FileSys\PakFileAsync.h">
       <Filter>Header Files\FileSys</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\FileSysVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
