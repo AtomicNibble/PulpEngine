@@ -56,7 +56,7 @@ namespace
 
 		core::HumanSize::Str sizeStr, sizeStr1;
 
-		X_LOG0("AssetPak", "^5%-32s ^7orig: ^6%-10s^7 comp: ^6%-10s ^1%-6.2f %s", asset.name.c_str(),
+		X_LOG0("AssetPak", "^5%-46s ^7orig: ^6%-10s^7 comp: ^6%-10s ^1%-6.2f %s", asset.name.c_str(),
 			core::HumanSize::toString(sizeStr, asset.infaltedSize),
 			core::HumanSize::toString(sizeStr1, asset.data.size()),
 			ratio,
