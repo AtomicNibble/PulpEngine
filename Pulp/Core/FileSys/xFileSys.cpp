@@ -68,9 +68,9 @@ namespace
 } // namespace
 
 
-xFileSys::PendingOp::PendingOp(IoRequestBase* pReq, const XFileAsyncOperationCompiltion& op) :
+xFileSys::PendingOp::PendingOp(IoRequestBase* pReq, XFileAsyncOperationCompiltion&& op) :
 	pRequest(X_ASSERT_NOT_NULL(pReq)),
-	op(op)
+	op(std::forward<XFileAsyncOperationCompiltion>(op))
 {
 
 }
@@ -1558,7 +1558,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				pOpenRead->pBuf = pData;
 				pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
 
-				pendingOps_.emplace_back(requestPtr.release(), operation);
+				pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
 			}
 			
 		}
@@ -1589,7 +1589,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			pendingOps_.emplace_back(requestPtr.release(), operation);
+			pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
 		}
 		else if (type == IoRequest::CLOSE)
 		{
@@ -1619,9 +1619,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			operation.hasFinished();
-
-			pendingOps_.emplace_back(requestPtr.release(), operation);
+				pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
 		}
 		else if (type == IoRequest::WRITE)
 		{
@@ -1639,7 +1637,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			pendingOps_.emplace_back(requestPtr.release(), operation);
+			pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
 		}
 
 	nextRequest:;

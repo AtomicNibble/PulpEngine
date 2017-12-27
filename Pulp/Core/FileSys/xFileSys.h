@@ -106,7 +106,7 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 {
 	struct PendingOp
 	{
-		PendingOp(IoRequestBase* pReq, const XFileAsyncOperationCompiltion& op);
+		PendingOp(IoRequestBase* pReq, XFileAsyncOperationCompiltion&& op);
 
 		IoRequest::Enum getType(void) const;
 
