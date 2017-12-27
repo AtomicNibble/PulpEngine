@@ -39,7 +39,7 @@ void PhysXVars::RegisterVars(void)
 
 	pVarScratchBufSize_ = ADD_CVAR_INT("phys_scratch_buf_size", scratchBufferDefaultSize_, 0, std::numeric_limits<int32_t>::max(),
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED, 
-		"Size of the scratch buffer in kib, must be a multiple of 16.");
+		"Size of the scratch buffer in KiB, must be a multiple of 16.");
 
 	ADD_CVAR_REF("phys_alloc_track", trackAllocations_, trackAllocations_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
 		"Enable physics allocation tracking");
