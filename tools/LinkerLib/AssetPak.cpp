@@ -10,6 +10,7 @@
 #include <Time\StopWatch.h>
 #include <String\HumanSize.h>
 #include <String\HumanDuration.h>
+#include <String\StringHash.h>
 
 #include <Threading\JobSystem2.h>
 
@@ -670,12 +671,12 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 
 	X_LOG0("AssetPak", "^8Assets");
 	X_LOG_BULLET;
-	X_LOG0("AssetPak", "%-4s %-31s %-16s %s", "Idx", "Name", "Offset", "Size");
+	X_LOG0("AssetPak", "%-4s %-45s %-10s %-10s %s", "Idx", "Name", "Offset", "Size", "NameHash");
 
 	for (size_t i=0; i<strings.size(); i++)
 	{
-		X_LOG0("AssetPak", "%-4" PRIuS " ^5%-31s ^6%-16" PRIu64 " %" PRIu32, i, strings[i], 
-			(uint64_t)entries[i].offset, entries[i].size);
+		X_LOG0("AssetPak", "%-4" PRIuS " ^5%-45s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32, i, strings[i], 
+			(uint64_t)entries[i].offset, entries[i].size, core::StrHash(strings[i]));
 	}
 
 	return true;
