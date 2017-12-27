@@ -75,6 +75,23 @@ xFileSys::PendingOp::PendingOp(IoRequestBase* pReq, XFileAsyncOperationCompiltio
 
 }
 
+xFileSys::PendingOp::PendingOp(PendingOp&& oth) :
+	pRequest(oth.pRequest),
+	op(std::move(oth.op))
+{
+	// needed?
+	oth.pRequest = nullptr;
+}
+
+xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
+{
+	pRequest = oth.pRequest;
+	op = std::move(oth.op);
+
+	oth.pRequest = nullptr;
+	return *this;
+}
+
 
 X_INLINE IoRequest::Enum xFileSys::PendingOp::getType(void) const
 {
