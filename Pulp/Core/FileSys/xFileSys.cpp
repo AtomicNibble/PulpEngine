@@ -286,14 +286,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	}
 	else
 	{
-		// TODO: make createOSPath variation that takes a VirtualDirectory arg
-		if (location == VirtualDirectory::GAME) {
-			createOSPath(gameDir_, path, real_path);
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
+		createOSPath(gameDir_, path, location, real_path);
 
 		if (isDebug()) {
 			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
@@ -341,14 +334,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 	}
 	else
 	{
-		// TODO: make createOSPath variation that takes a VirtualDirectory arg
-		if (location == VirtualDirectory::GAME) {
-			createOSPath(gameDir_, path, real_path);
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
+		createOSPath(gameDir_, path, location, real_path);
 
 		if (isDebug()) {
 			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
@@ -368,7 +354,6 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 void xFileSys::closeFile(XFile* file)
 {
 	X_ASSERT_NOT_NULL(file);
-
 	X_DELETE(file, &filePoolArena_);
 }
 
@@ -402,14 +387,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 	}
 	else
 	{
-		if (location == VirtualDirectory::GAME)
-		{
-			createOSPath(gameDir_, path, real_path);
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
+		createOSPath(gameDir_, path, location, real_path);
 
 		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 	}
@@ -448,14 +426,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 	}
 	else
 	{
-		if (location == VirtualDirectory::GAME) 
-		{
-			createOSPath(gameDir_, path, real_path);
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
+		createOSPath(gameDir_, path, location, real_path);
 
 		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 	}
@@ -471,7 +442,6 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 void xFileSys::closeFileAsync(XFileAsync* file)
 {
 	X_ASSERT_NOT_NULL(file);
-	// meow meow!
 	X_DELETE(file, &filePoolArena_);
 }
 
@@ -931,60 +901,32 @@ bool xFileSys::createDirectoryTree(pathTypeW _path, VirtualDirectory::Enum locat
 
 bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return fileExistsOS(buf);
 }
 
 bool xFileSys::fileExists(pathTypeW path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return fileExistsOS(buf);
 }
 
 bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return directoryExistsOS(buf);
 }
 
 bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return directoryExistsOS(buf);
 }
@@ -992,30 +934,16 @@ bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) 
 
 bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return isDirectoryOS(buf);
 }
 
 bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
 {
-	X_ASSERT_NOT_NULL(path);
 	Path<wchar_t> buf;
-
-	if (location == VirtualDirectory::GAME) {
-		createOSPath(gameDir_, path, buf);
-	}
-	else {
-		X_ASSERT_NOT_IMPLEMENTED();
-	}
+	createOSPath(gameDir_, path, location, buf);
 
 	return isDirectoryOS(buf);
 }
@@ -1169,6 +1097,31 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 // --------------------------------------------------
 
 // Ajust path
+
+const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path,
+	VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
+{
+	if (location != VirtualDirectory::GAME) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
+	strUtil::Convert(path, pathW, sizeof(pathW));
+
+	return createOSPath(dir, pathW, buffer);
+}
+
+const wchar_t* xFileSys::createOSPath(directory_s* dir, pathTypeW path, 
+	VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
+{
+	if (location != VirtualDirectory::GAME) {
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
+
+	return createOSPath(dir, path, buffer);
+}
+
+
 const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const
 {
 	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];

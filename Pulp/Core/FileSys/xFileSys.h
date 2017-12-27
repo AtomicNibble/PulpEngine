@@ -331,8 +331,12 @@ private:
 
 
 	// Ajust path
+	const wchar_t* createOSPath(directory_s* dir, pathType path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(directory_s* dir, pathTypeW path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
+	
 	const wchar_t* createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const;
 	const wchar_t* createOSPath(directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const;
+
 	bool isAbsolute(pathType path) const;
 	bool isAbsolute(pathTypeW path) const;
 	
