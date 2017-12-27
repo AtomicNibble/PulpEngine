@@ -32,6 +32,37 @@ namespace
 		core::MemoryArenaBase* scratchArena;
 	};
 
+	void compression_job(core::V2::JobSystem&, size_t threadIdx, core::V2::Job* job, void* jobData)
+	{
+		const JobData* pData = reinterpret_cast<const JobData*>(jobData);
+		auto& asset = *pData->pAsset;
+		auto& compOpt = *pData->pCompOpt;
+
+		DataVec compData(pData->scratchArena);
+		compData.reserve(1024 * 512);
+
+		core::Compression::CompressorAlloc comp(compOpt.algo);
+
+		comp->deflate(pData->scratchArena, asset.data, compData, core::Compression::CompressLevel::HIGH);
+
+		float ratio = static_cast<float>(compData.size()) / static_cast<float>(asset.data.size());
+		bool keep = ratio < compOpt.maxRatio;
+
+		if (keep) {
+			asset.data.resize(compData.size());
+			std::memcpy(asset.data.data(), compData.begin(), compData.size());
+		}
+
+		core::HumanSize::Str sizeStr, sizeStr1;
+
+		X_LOG0("AssetPak", "^5%-32s ^7orig: ^6%-10s^7 comp: ^6%-10s ^1%-6.2f %s", asset.name.c_str(),
+			core::HumanSize::toString(sizeStr, asset.infaltedSize),
+			core::HumanSize::toString(sizeStr1, asset.data.size()),
+			ratio,
+			keep ? "^8<keep>" : "^1<original>"
+		);
+	}
+
 } // namespace
 
 Asset::Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
@@ -96,36 +127,6 @@ void AssetPakBuilder::setFlags(PakBuilderFlags flags)
 	flags_ = flags;
 }
 
-void compression_job(core::V2::JobSystem&, size_t threadIdx, core::V2::Job* job, void* jobData)
-{
-	const JobData* pData = reinterpret_cast<const JobData*>(jobData);
-	auto& asset = *pData->pAsset;
-	auto& compOpt = *pData->pCompOpt;
-
-	DataVec compData(pData->scratchArena);
-	compData.reserve(1024 * 512);
-
-	core::Compression::CompressorAlloc comp(compOpt.algo);
-
-	comp->deflate(pData->scratchArena, asset.data, compData, core::Compression::CompressLevel::HIGH);
-
-	float ratio = static_cast<float>(compData.size()) / static_cast<float>(asset.data.size());
-	bool keep = ratio < compOpt.maxRatio;
-
-	if (keep) {
-		asset.data.resize(compData.size());
-		std::memcpy(asset.data.data(), compData.begin(), compData.size());
-	}
-
-	core::HumanSize::Str sizeStr, sizeStr1;
-
-	X_LOG0("AssetPak", "^5%-32s ^7orig: ^6%-10s^7 comp: ^6%-10s ^1%-6.2f %s", asset.name.c_str(),
-		core::HumanSize::toString(sizeStr, asset.infaltedSize),
-		core::HumanSize::toString(sizeStr1, asset.data.size()),
-		ratio,
-		keep ? "^8<keep>" : "^1<original>"
-	);
-}
 
 bool AssetPakBuilder::bake(void)
 {
