@@ -1696,26 +1696,38 @@ bool xFileSys::openPak(const char* pName)
 	// Entries
 	// Dict
 	// Data
+	PakMode::Enum pakMode = PakMode::MEMORY;
 
-	const size_t metaBlockSize = hdr.dataOffset - hdr.stringDataOffset;
+	if (pakMode == PakMode::MEMORY)
+	{
+		if (hdr.size > std::numeric_limits<int32_t>::max())
+		{
+			core::HumanSize::Str str;
+			X_ERROR("AssetPak", "Can't load pak in memory mode it's too large, size: %s", core::HumanSize::toString(str, hdr.size));
+			return false;
+		}
+	}
+
 	const size_t stringBlockSize = hdr.entryTableOffset - hdr.stringDataOffset;
-	const size_t entryDataOffset = hdr.entryTableOffset - hdr.stringDataOffset;
+	const size_t dataSize = (pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
 	auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
 	pPak->name.set(pName);
+	pPak->mode = pakMode;
 	pPak->pFile = pFile;
 	pPak->numAssets = hdr.numAssets;
 	pPak->dataOffset = hdr.dataOffset;
-	pPak->data.resize(metaBlockSize);
+	pPak->data.resize(dataSize);
 	pPak->strings.reserve(hdr.numAssets);
 
-	op = pFile->readAsync(pPak->data.data(), pPak->data.size(), hdr.stringDataOffset);
+	// read all the data.
+	op = pFile->readAsync(pPak->data.data(), pPak->data.size(), 0);
 	if (op.waitUntilFinished() != pPak->data.size()) {
 		X_ERROR("AssetPak", "Error reading pak data");
 		return false;
 	}
 
-	core::MemCursor cursor(pPak->data.data(), stringBlockSize);
+	core::MemCursor cursor(pPak->data.data() + hdr.stringDataOffset, stringBlockSize);
 
 	pPak->strings.push_back(cursor.getPtr<const char>());
 
@@ -1737,7 +1749,7 @@ bool xFileSys::openPak(const char* pName)
 
 	auto numassetsPow2 = core::bitUtil::NextPowerOfTwo(hdr.numAssets);
 
-	pPak->pEntires = reinterpret_cast<const AssetPak::APakEntry*>(pPak->data.data() + entryDataOffset);
+	pPak->pEntires = reinterpret_cast<const AssetPak::APakEntry*>(pPak->data.data() + hdr.entryTableOffset);
 	pPak->hash.setGranularity(numassetsPow2);
 	pPak->hash.clear(numassetsPow2 * 4, numassetsPow2);
 
