@@ -5,6 +5,7 @@
 #include "PakFileAsync.h"
 
 #include "PathUtil.h"
+#include "XFindData.h"
 
 #include <Util\LastError.h>
 #include <Util\UniquePointer.h>
@@ -12,7 +13,6 @@
 #include <IConsole.h>
 #include <IDirectoryWatcher.h>
 
-#include "XFindData.h"
 
 #include <IAssetPak.h>
 
