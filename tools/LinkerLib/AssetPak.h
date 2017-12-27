@@ -8,6 +8,13 @@
 
 X_NAMESPACE_BEGIN(AssetPak)
 
+X_DECLARE_FLAGS(PakBuilderFlag)(
+	COMPRESSION,
+	SHARED_DICT
+);
+
+typedef Flags<PakBuilderFlag> PakBuilderFlags;
+
 typedef core::Array<uint8_t> DataVec;
 
 struct Asset
@@ -55,6 +62,8 @@ public:
 	AssetPakBuilder(core::MemoryArenaBase* arena);
 	~AssetPakBuilder();
 
+	void setFlags(PakBuilderFlags flags);
+
 	bool dumpMeta(core::Path<char>& pakPath);
 
 	bool bake(void);
@@ -64,6 +73,7 @@ public:
 
 private:
 	core::MemoryArenaBase* arena_;
+	PakBuilderFlags flags_;
 
 	AssetArr assets_;
 	CompressionOptionsArr compression_;

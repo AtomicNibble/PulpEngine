@@ -77,6 +77,8 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
 	// per asset shared dictonary.
 	dictonaries_.fill(nullptr);
 	// dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
+
+	flags_.Set(PakBuilderFlag::COMPRESSION);
 }
 
 AssetPakBuilder::~AssetPakBuilder()
@@ -87,6 +89,11 @@ AssetPakBuilder::~AssetPakBuilder()
 			X_DELETE(pDict, arena_);
 		}
 	}
+}
+
+void AssetPakBuilder::setFlags(PakBuilderFlags flags)
+{
+	flags_ = flags;
 }
 
 void compression_job(core::V2::JobSystem&, size_t threadIdx, core::V2::Job* job, void* jobData)
@@ -125,6 +132,7 @@ bool AssetPakBuilder::bake(void)
 	X_LOG0("AssetPak", "===== Processing %" PRIuS " asset(s) =====", assets_.size());
 
 	// dict training.
+	if(flags_.IsSet(PakBuilderFlag::SHARED_DICT))
 	{
 		const size_t maxDictSize = std::numeric_limits<uint16_t>::max() - sizeof(core::Compression::SharedDictHdr);
 		
@@ -204,33 +212,36 @@ bool AssetPakBuilder::bake(void)
 
 	auto* pJobSys = gEnv->pJobSys;
 
-	// compression.
-	for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
+	if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
 	{
-		auto type = static_cast<AssetType::Enum>(i);
-		const auto& compOpt = compression_[type];
-
-		if (!compOpt.enabled) {
-			continue;
-		}
-
-		X_LOG0("AssetPak", "===== Compressing type \"%s\" maxRatio: ^1%.2f^7 =====", AssetType::ToString(type), compOpt.maxRatio);
-
-		auto* pRoot = pJobSys->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::TOOL));
-
-		for (auto& a : assets_)
+		// compression.
+		for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++)
 		{
-			if (a.type != type) {
+			auto type = static_cast<AssetType::Enum>(i);
+			const auto& compOpt = compression_[type];
+
+			if (!compOpt.enabled) {
 				continue;
 			}
 
-			JobData data(&a, &compOpt, arena_);
+			X_LOG0("AssetPak", "===== Compressing type \"%s\" maxRatio: ^1%.2f^7 =====", AssetType::ToString(type), compOpt.maxRatio);
 
-			auto* pJob = pJobSys->CreateJobAsChild<JobData>(pRoot, compression_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
-			pJobSys->Run(pJob);
+			auto* pRoot = pJobSys->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::TOOL));
+
+			for (auto& a : assets_)
+			{
+				if (a.type != type) {
+					continue;
+				}
+
+				JobData data(&a, &compOpt, arena_);
+
+				auto* pJob = pJobSys->CreateJobAsChild<JobData>(pRoot, compression_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
+				pJobSys->Run(pJob);
+			}
+
+			pJobSys->RunAndWait(pRoot);
 		}
-
-		pJobSys->RunAndWait(pRoot);
 	}
 
 	return true;
