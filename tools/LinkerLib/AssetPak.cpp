@@ -110,7 +110,6 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
 	dictonaries_.fill(nullptr);
 	// dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
 
-	flags_.Set(PakBuilderFlag::COMPRESSION);
 }
 
 AssetPakBuilder::~AssetPakBuilder()
