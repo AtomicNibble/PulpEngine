@@ -16,8 +16,10 @@
 #include <IAssetPak.h>
 
 #include <Memory\VirtualMem.h>
+#include <Memory\MemCursor.h>
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
+#include <String\StringHash.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -1784,6 +1786,112 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	return Thread::ReturnValue(0);
 }
 
+bool xFileSys::openPak(const char* pName)
+{
+	// you can only open pak's from inside the virtual filesystem.
+	// so file is opened as normal.
+	fileModeFlags mode;
+	mode.Set(fileMode::READ);
+	mode.Set(fileMode::RANDOM_ACCESS);
+	// I'm not sharing, fuck you!
+
+	auto* pFile = openFileAsync(pName, mode);
+	if (!pFile) {
+
+		return false;
+	}
+
+	// we need the header Wagg man.
+	AssetPak::APakHeader hdr;
+
+	auto op = pFile->readAsync(&hdr, sizeof(hdr), 0);
+	if (op.waitUntilFinished() != sizeof(hdr)) {
+		X_ERROR("AssetPak", "Failed to open file for saving");
+		return false;
+	}
+
+	if (!hdr.isValid()) {
+		X_ERROR("AssetPak", "Invalid header");
+		return false;
+	}
+
+	if (hdr.version != AssetPak::PAK_VERSION) {
+		X_ERROR("AssetPak", "Version incorrect. got %" PRIu8 " require %" PRIu8, hdr.version, AssetPak::PAK_VERSION);
+		return false;
+	}
+
+	if (hdr.numAssets == 0) {
+		X_ERROR("AssetPak", "Pak is empty.");
+		return false;
+	}
+
+	// Strings
+	// Entries
+	// Dict
+	// Data
+
+	const size_t metaBlockSize = hdr.dataOffset - hdr.stringDataOffset;
+	const size_t stringBlockSize = hdr.entryTableOffset - hdr.stringDataOffset;
+	const size_t entryDataOffset = hdr.entryTableOffset - hdr.stringDataOffset;
+
+	auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
+	pPak->name.set(pName);
+	pPak->pFile = pFile;
+	pPak->numAssets = hdr.numAssets;
+	pPak->dataOffset = hdr.dataOffset;
+	pPak->data.resize(metaBlockSize);
+	pPak->strings.reserve(hdr.numAssets);
+
+	op = pFile->readAsync(pPak->data.data(), pPak->data.size(), hdr.stringDataOffset);
+	if (op.waitUntilFinished() != pPak->data.size()) {
+		X_ERROR("AssetPak", "Error reading pak data");
+		return false;
+	}
+
+	core::MemCursor cursor(pPak->data.data(), stringBlockSize);
+
+	pPak->strings.push_back(cursor.getPtr<const char>());
+
+	for (auto* pData = cursor.begin(); pData < cursor.end(); ++pData)
+	{
+		if (*pData == '\0')
+		{
+			pPak->strings.push_back(pData + 1);
+			if (pPak->strings.size() == hdr.numAssets) {
+				break;
+			}
+		}
+	}
+
+	if (pPak->strings.size() != hdr.numAssets) {
+		X_ERROR("AssetPak", "Error loading pak");
+		return false;
+	}
+
+	auto numassetsPow2 = core::bitUtil::NextPowerOfTwo(hdr.numAssets);
+
+	pPak->pEntires = reinterpret_cast<const AssetPak::APakEntry*>(pPak->data.data() + entryDataOffset);
+	pPak->hash.setGranularity(numassetsPow2);
+	pPak->hash.clear(numassetsPow2 * 4, numassetsPow2);
+
+	// we need to build a hash table of the goat.
+	for (size_t i = 0; i < pPak->strings.size(); ++i)
+	{
+		const char* pString = pPak->strings[i];
+		core::StrHash hash(pString, core::strUtil::strlen(pString));
+		
+		pPak->hash.add(hash, safe_static_cast<int32_t>(i));
+	}
+
+	// all done?
+	Search* pSearch = X_NEW(Search, g_coreArena, "FileSysSearch");
+	pSearch->pDir = nullptr;
+	pSearch->pPak = pPak.release();
+	pSearch->pNext = searchPaths_;
+	searchPaths_ = pSearch;
+
+	return true;
+}
 
 
 X_NAMESPACE_END

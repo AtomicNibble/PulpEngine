@@ -6,6 +6,7 @@
 #include "Vars\FileSysVars.h"
 
 #include <Containers\HashMap.h>
+#include <Containers\HashIndex.h>
 #include <Containers\PriorityQueue.h>
 #include <Containers\FixedFifo.h>
 
@@ -21,6 +22,7 @@ X_ENABLE_WARNING(4702)
 #include <Threading\Thread.h>
 
 #include <IFileSysStats.h>
+#include <IAssetPak.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -30,10 +32,53 @@ X_NAMESPACE_BEGIN(core)
 // we will need the folder name.
 // a search can also be a PAK since that is like a directory of files.
 
+X_DECLARE_ENUM(PakMode)(
+	MEMORY,	// pak is kept in memory
+	STREAM  // all reads are async disk OP's
+);
+
 struct Pak
 {
+	Pak(core::MemoryArenaBase* arena);
+
 	StackString<64> name;
+
+	// have you seen this pak format?
+	// oh my!, yes it's very sexy I must say.
+	// thanks..
+
+	XFileAsync* pFile; // handle to the file.
+
+	// when i open a pack i want to load all the strings and the entry table.
+	// then i parse the null terms like a hot mess.
+	// 
+	uint32_t numAssets;
+	uint32_t dataOffset;
+
+	PakMode::Enum mode;
+
+	core::Array<uint8_t> data;
+	core::Array<const char*> strings;
+	
+	const AssetPak::APakEntry* pEntires;
+
+	core::XHashIndex hash;
 };
+
+
+inline Pak::Pak(core::MemoryArenaBase* arena) :
+	pFile(nullptr),
+	numAssets(0),
+	dataOffset(0),
+	mode(PakMode::STREAM),
+	data(arena),
+	strings(arena),
+	pEntires(nullptr),
+	hash(arena)
+{
+
+}
+
 
 struct directory_s
 {
@@ -260,6 +305,11 @@ private:
 	// ThreadAbstract
 	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
 	// ~ThreadAbstract
+
+private:
+
+	bool openPak(const char* pName);
+
 
 private:
 
