@@ -50,7 +50,11 @@ bool XFindData::findnext(_wfinddatai64_t* fi)
 		return searchDir(current_->pDir, fi);
 	}
 
-	return searchPak(fi);
+	if (current_->pPak) {
+	// return searchPak(current_->pPak, fi);
+	}
+
+	return returnFindhNext(fi);
 }
 
 bool XFindData::getOSPath(core::Path<wchar_t>& path, _wfinddatai64_t* fi)
