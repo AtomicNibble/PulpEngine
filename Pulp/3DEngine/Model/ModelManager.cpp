@@ -320,16 +320,16 @@ void XModelManager::dispatchLoadRequest(ModelLoadRequest* pLoadReq)
 {
 	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
 
-	core::Path<char> path;
-	path /= "models";
-	path /= pLoadReq->pModel->getName();
-	path.setExtension(MODEL_FILE_EXTENSION);
+	auto& name = pLoadReq->pModel->getName();
 
 	core::IoRequestOpen open;
 	open.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = path;
+	open.path = "models/";
+	open.path.append(name.begin(), name.end());
+	open.path.setExtension(MODEL_FILE_EXTENSION);
+
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }

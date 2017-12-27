@@ -209,11 +209,7 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	// lets dispatch a IO request to read the image data.
 	// where to we store the data?
 	// we want fixed buffers for streaming.
-	core::Path<char> path;
-	path /= "imgs";
-	path /= pTexture->getName();
-	path.toLower(); 
-	path.setExtension(texture::CI_FILE_EXTENSION);
+	auto& name = pTexture->getName();
 
 	core::IFileSys::fileModeFlags mode;
 	mode.Set(core::IFileSys::fileMode::READ);
@@ -226,7 +222,9 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	req.callback = del;
 	req.pUserData = pTexture;
 	req.mode = mode;
-	req.path = path;
+	req.path = "imgs/";
+	req.path.append(name.begin(), name.end());
+	req.path.setExtension(texture::CI_FILE_EXTENSION);
 	
 	gEnv->pFileSys->AddIoRequestToQue(req);
 }

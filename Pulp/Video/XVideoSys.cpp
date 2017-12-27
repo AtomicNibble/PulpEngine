@@ -190,16 +190,15 @@ void XVideoSys::queueLoadRequest(VideoResource* pVideoRes)
 
 void XVideoSys::dispatchLoadRequest(VideoLoadRequest* pLoadReq)
 {
-	core::Path<char> path;
-	path /= "videos";
-	path /= pLoadReq->pVideo->getName();
-	path.setExtension(VIDEO_FILE_EXTENSION);
+	auto& name = pLoadReq->pVideo->getName();
 
 	core::IoRequestOpen open;
 	open.callback.Bind<XVideoSys, &XVideoSys::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = path;
+	open.path = "videos/";
+	open.path.append(name.begin(), name.end());
+	open.path.setExtension(VIDEO_FILE_EXTENSION);
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }

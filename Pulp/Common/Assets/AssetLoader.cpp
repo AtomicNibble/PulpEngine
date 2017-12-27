@@ -147,19 +147,19 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 	auto* pAsset = pLoadReq->pAsset;
 	auto type = pAsset->getType();
 
-	core::Path<char> path;
-	path /= assetDb::AssetType::ToString(pAsset->getType());
-	path.append('s', 1);
-	path /= pAsset->getName();
-	path.setExtension(assetExt_[type]);
-	path.toLower();
+	auto& name = pLoadReq->pAsset->getName();
 
 	// dispatch a read request baby!
 	core::IoRequestOpen open;
 	open.callback.Bind<AssetLoader, &AssetLoader::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = path;
+	open.path = assetDb::AssetType::ToString(pAsset->getType());
+	open.path.append('s', 1);
+	open.path.append('/', 1);
+	open.path.toLower();
+	open.path.append(name.begin(), name.end());
+	open.path.setExtension(assetExt_[type]);
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }

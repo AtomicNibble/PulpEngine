@@ -277,17 +277,16 @@ void AnimManager::dispatchLoadRequest(AnimLoadRequest* pLoadReq)
 {
 	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
 
-	core::Path<char> path;
-	path /= "anims";
-	path /= pLoadReq->pAnim->getName();
-	path.setExtension(".anim");
+	auto& name = pLoadReq->pAnim->getName();
 
 	// dispatch a read request baby!
 	core::IoRequestOpen open;
 	open.callback.Bind<AnimManager, &AnimManager::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = path;
+	open.path = "anims/";
+	open.path.append(name.begin(), name.end());
+	open.path.setExtension(anim::ANIM_FILE_EXTENSION);
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }
