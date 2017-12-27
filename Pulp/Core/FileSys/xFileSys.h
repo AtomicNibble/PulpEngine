@@ -26,6 +26,7 @@ X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(core)
 
+struct IConsoleCmdArgs;
 
 
 // we want multiple search path's so we can add folders into the search.
@@ -291,6 +292,8 @@ public:
 	bool StartRequestWorker(void);
 	void ShutDownRequestWorker(void);
 
+	void listPaks(const char* pSearchPatten = nullptr) const;
+
 private:
 	IoRequestBase* popRequest(void);
 	IoRequestBase* tryPopRequest(void);
@@ -331,6 +334,9 @@ private:
 	bool isAbsolute(pathTypeW path) const;
 	
 	bool isDebug(void) const;
+
+private:
+	void Cmd_ListPaks(IConsoleCmdArgs* pCmd);
 
 private:
 #if X_DEBUG == 1

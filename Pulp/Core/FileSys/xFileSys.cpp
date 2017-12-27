@@ -134,7 +134,7 @@ void xFileSys::registerVars(void)
 
 void xFileSys::registerCmds(void)
 {
-
+	ADD_COMMAND_MEMBER("listPaks", this, xFileSys, &xFileSys::Cmd_ListPaks, core::VarFlag::SYSTEM, "List open asset pak's");
 }
 
 bool xFileSys::init(const SCoreInitParams& params)
@@ -1891,6 +1891,40 @@ bool xFileSys::openPak(const char* pName)
 	searchPaths_ = pSearch;
 
 	return true;
+}
+
+void xFileSys::listPaks(const char* pSearchPatten) const
+{
+	X_UNUSED(pSearchPatten);
+
+	size_t numPacks = 0;
+
+	X_LOG0("FileSys", "-------------- ^8Paks(%" PRIuS ")^7 ---------------", numPacks);
+	
+	for (Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
+	{
+		if (!pSearch->pPak) {
+			continue;
+		}
+
+		auto* pPak = pSearch->pPak;
+
+		X_LOG0("FileSys", "^2%-32s ^7assets: ^2%" PRIu32 " ^7mode: ^2%s", pPak->name.c_str(), pPak->numAssets, PakMode::ToString(pPak->mode));
+
+	}
+
+	X_LOG0("FileSys", "-------------- ^8Paks End^7 --------------");
+}
+
+void xFileSys::Cmd_ListPaks(IConsoleCmdArgs* pCmd)
+{
+	const char* pSearchPattern = nullptr;
+
+	if (pCmd->GetArgCount() > 1) {
+		pSearchPattern = pCmd->GetArg(1);
+	}
+
+	listPaks(pSearchPattern);
 }
 
 
