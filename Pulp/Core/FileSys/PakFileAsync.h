@@ -51,7 +51,7 @@ public:
 	void setSize(int64_t numBytes) X_FINAL;
 
 private:
-	uint64_t getPosition(uint64_t pos) const;
+	uint64_t getPosition(size_t length, uint64_t pos) const;
 
 private:
 	const Pak* pPack_;

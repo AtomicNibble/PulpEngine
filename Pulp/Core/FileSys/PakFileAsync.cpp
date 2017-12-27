@@ -21,7 +21,7 @@ XPakFileAsync::~XPakFileAsync()
 
 XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	uint64_t pakPos = getPosition(position);
+	uint64_t pakPos = getPosition(length, position);
 	return pPack_->pFile->readAsync(pBuffer, length, pakPos);
 }
 
@@ -31,13 +31,14 @@ XFileAsyncOperation XPakFileAsync::writeAsync(const void* pBuffer, size_t length
 	X_UNUSED(pBuffer, length, position);
 	X_ASSERT_UNREACHABLE();
 
-	uint64_t pakPos = getPosition(position);
+	uint64_t pakPos = getPosition(length, position);
 	return pPack_->pFile->writeAsync(pBuffer, length, pakPos);
 }
 
 XFileAsyncOperationCompiltion XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
 {
-	uint64_t pakPos = getPosition(position);	
+	uint64_t pakPos = getPosition(length, position);
+
 	return pPack_->pFile->readAsync(pBuffer, length, pakPos, callBack);
 }
 
@@ -47,7 +48,7 @@ XFileAsyncOperationCompiltion XPakFileAsync::writeAsync(void* pBuffer, size_t le
 	X_UNUSED(pBuffer, length, position, callBack);
 	X_ASSERT_UNREACHABLE();
 
-	uint64_t pakPos = getPosition(position);
+	uint64_t pakPos = getPosition(length, position);
 	return pPack_->pFile->writeAsync(pBuffer, length, pakPos, callBack);
 }
 
@@ -79,8 +80,11 @@ size_t XPakFileAsync::waitUntilFinished(const XFileAsyncOperation& operation)
 }
 
 
-X_INLINE uint64_t XPakFileAsync::getPosition(uint64_t pos) const
+X_INLINE uint64_t XPakFileAsync::getPosition(size_t length, uint64_t pos) const
 {
+	const uint32_t end = safe_static_cast<uint32_t>(pos + length);
+	X_ASSERT(end <= entry_.inflatedSize, "Read past end of file in pak")(pos, length, end);
+
 	return pPack_->dataOffset + entry_.offset + pos;
 }
 
