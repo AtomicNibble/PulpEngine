@@ -1197,25 +1197,10 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 // Ajust path
 const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const
 {
-	wchar_t pathW[256];
+	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
 	strUtil::Convert(path, pathW, sizeof(pathW));
 
-	// is it absolute?
-	if (!isAbsolute(path)) {
-
-		buffer = dir->path / pathW;
-	}
-	else {
-		// the engine should never be trying to load a absolute path.
-		// unless filesystem been used in a tool.
-		// but then again tool could probs just use relative paths also.
-		// i think I'll only disable it when used in game.exe
-
-		buffer = pathW;
-	}
-
-	buffer.replaceSeprators();
-	return buffer.c_str();
+	return createOSPath(dir, pathW, buffer);
 }
 
 const wchar_t* xFileSys::createOSPath(directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const
