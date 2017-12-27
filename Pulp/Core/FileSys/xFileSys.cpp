@@ -258,97 +258,74 @@ core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
 
 XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
-	X_ASSERT_NOT_NULL(path);
-
-	XDiskFile* pFile = nullptr;
 	core::Path<wchar_t> real_path;
 
-	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
-		_wfinddatai64_t findinfo;
-
+		PathUtil::findData findinfo;
 		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
-		{
-			FindData.getOSPath(real_path, &findinfo);
-
-			if (isDebug()) {
-				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
-			}
-
-			pFile = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
-		}
-		else
+	
+		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+			return nullptr;
 		}
+		
+		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
 	{
 		createOSPath(gameDir_, path, location, real_path);
-
-		if (isDebug()) {
-			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
-		}
-
-		pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
 	}
 
-	if (!pFile->valid()) {
-		closeFile(pFile);
-		return nullptr;
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 	}
 
-	return pFile;
+	XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
+	if (pFile->valid()) {
+		return pFile;
+	}
+		
+	closeFile(pFile);
+	return nullptr;
 }
 
 XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
-	X_ASSERT_NOT_NULL(path);
-
-	XDiskFile* pFile = nullptr;
 	core::Path<wchar_t> real_path;
-	
-	XFindData FindData(path, this);
-	
+		
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
-		_wfinddatai64_t findinfo;
+		PathUtil::findData findinfo;
+		XFindData FindData(path, this);
 
-		if (FindData.findnext(&findinfo))
-		{
-			FindData.getOSPath(real_path, &findinfo);
-
-			if (isDebug()) {
-				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
-			}
-
-			pFile = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
-		}
-		else
+		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",	path, mode.ToString(Dsc));
+			return nullptr;
 		}
+		
+		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
 	{
 		createOSPath(gameDir_, path, location, real_path);
-
-		if (isDebug()) {
-			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
-		}
-
-		pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
 	}
 
-	if (!pFile->valid()) {
-		closeFile(pFile);
-		return nullptr;
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 	}
 
-	return pFile;
+	XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
+	if (pFile->valid()) {
+		return pFile;
+	}
+
+	closeFile(pFile);
+	return nullptr;
 }
 
 void xFileSys::closeFile(XFile* file)
@@ -363,80 +340,74 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
-	X_ASSERT_NOT_NULL(path);
-
-	XDiskFileAsync* pFile = nullptr;
 	core::Path<wchar_t> real_path;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
-		_wfinddatai64_t findinfo;
-
+		PathUtil::findData findinfo;
 		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
-		{
-			FindData.getOSPath(real_path, &findinfo);
 
-			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
-		}
-		else
+		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+			return nullptr;
 		}
+		
+		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
 	{
 		createOSPath(gameDir_, path, location, real_path);
-
-		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 	}
 
-	if (!pFile->valid()) {
-		closeFileAsync(pFile);
-		return nullptr;
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
 	}
 
-	return pFile;
+	XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+	if (pFile->valid()) {
+		return pFile;
+	}
+
+	closeFileAsync(pFile);
+	return nullptr;
 }
 
 XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
-	X_ASSERT_NOT_NULL(path);
-
-	XDiskFileAsync* pFile = nullptr;
 	core::Path<wchar_t> real_path;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
-		_wfinddatai64_t findinfo;
-
+		PathUtil::findData findinfo;
 		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
-		{
-			FindData.getOSPath(real_path, &findinfo);
 
-			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
-		}
-		else
+		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
+			return nullptr;
 		}
+		
+		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
 	{
 		createOSPath(gameDir_, path, location, real_path);
-
-		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 	}
 
-	if (!pFile->valid()) {
-		closeFileAsync(pFile);
-		return nullptr;
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
 	}
 
-	return pFile;
+	XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+	if (pFile->valid()) {
+		return pFile;
+	}
+
+	closeFileAsync(pFile);
+	return nullptr;
 }
 
 void xFileSys::closeFileAsync(XFileAsync* file)
@@ -449,91 +420,84 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 {
-	X_ASSERT_NOT_NULL(path);
-
 	if (mode.IsSet(fileMode::WRITE)) {
 		X_ERROR("FileSys", "can't open a memory file for writing.");
 		return nullptr;
 	}
 
-	XFileMem* pFile = nullptr;
 
-	_wfinddatai64_t findinfo;
-
+	PathUtil::findData findinfo;
 	XFindData FindData(path, this);
-	if (FindData.findnext(&findinfo))
-	{
-		core::Path<wchar_t> real_path;
-		FindData.getOSPath(real_path, &findinfo);
-
-		OsFile file(real_path.c_str(), mode);
-
-		if (file.valid())
-		{
-			size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-			char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-			if (file.read(pBuf, size) == size)
-			{
-				pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-			}
-			else
-			{
-				X_DELETE_ARRAY(pBuf, &memFileArena_);
-			}
-		}
-	}
-	else
+	if (!FindData.findnext(&findinfo))
 	{
 		fileModeFlags::Description Dsc;
 		X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+		return nullptr;
 	}
 
+	core::Path<wchar_t> real_path;
+	FindData.getOSPath(real_path, &findinfo);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
+	}
+
+	OsFile file(real_path.c_str(), mode);
+	if (!file.valid()) {
+		return nullptr;
+	}
+	
+	size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+	char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
+
+	if (file.read(pBuf, size) != size) {
+		X_DELETE_ARRAY(pBuf, &memFileArena_);
+		return nullptr;
+	}
+
+	XFileMem* pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
+	
 	return pFile;
 }
 
 
 XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
 {
-	X_ASSERT_NOT_NULL(path);
-
 	if (mode.IsSet(fileMode::WRITE)) {
 		X_ERROR("FileSys", "can't open a memory file for writing.");
 		return nullptr;
 	}
 
-	XFileMem* pFile = nullptr;
-
-	_wfinddatai64_t findinfo;
-
+	PathUtil::findData findinfo;
 	XFindData FindData(path, this);
-	if (FindData.findnext(&findinfo))
-	{
-		core::Path<wchar_t> real_path;
-		FindData.getOSPath(real_path, &findinfo);
-
-		OsFile file(real_path.c_str(), mode);
-
-		if (file.valid())
-		{
-			size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-			char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-			if (file.read(pBuf, size) == size)
-			{
-				pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-			}
-			else
-			{
-				X_DELETE_ARRAY(pBuf, &memFileArena_);
-			}
-		}
-	}
-	else
+	if (!FindData.findnext(&findinfo))
 	{
 		fileModeFlags::Description Dsc;
-		X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
+		X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+		return nullptr;
 	}
+
+	core::Path<wchar_t> real_path;
+	FindData.getOSPath(real_path, &findinfo);
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
+	}
+
+	OsFile file(real_path.c_str(), mode);
+	if (!file.valid()) {
+		return nullptr;
+	}
+
+	size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+	char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
+
+	if (file.read(pBuf, size) != size) {
+		X_DELETE_ARRAY(pBuf, &memFileArena_);
+		return nullptr;
+	}
+
+	XFileMem* pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
 
 	return pFile;
 }
