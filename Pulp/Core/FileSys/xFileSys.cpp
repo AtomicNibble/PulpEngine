@@ -1692,11 +1692,15 @@ bool xFileSys::openPak(const char* pName)
 		return false;
 	}
 
-	// Strings
-	// Entries
-	// Dict
-	// Data
-	PakMode::Enum pakMode = PakMode::MEMORY;
+
+	// for now switch to memory loading if below setting.
+	// dunno if want to be more smart about which pak's we load to memory..
+	PakMode::Enum pakMode = PakMode::STREAM;
+
+	if (hdr.size <= vars_.pakMemorySizeLimitMB_ * (1024 * 1024))
+	{
+		pakMode = PakMode::MEMORY;
+	}
 
 	if (pakMode == PakMode::MEMORY)
 	{
