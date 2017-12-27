@@ -48,7 +48,7 @@ struct XFileAsync
 	virtual void cancelAll(void) const X_ABSTRACT;
 
 	/// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
-	virtual size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
+	virtual size_t waitUntilFinished(const XFileAsyncOperation& operation) X_ABSTRACT;
 
 	virtual uint64_t fileSize(void) const X_ABSTRACT;
 	virtual void setSize(int64_t numBytes) X_ABSTRACT;

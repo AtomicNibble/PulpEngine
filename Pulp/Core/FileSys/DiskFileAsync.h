@@ -28,7 +28,7 @@ public:
 	X_INLINE void cancelAll(void) const X_FINAL;
 
 	// Waits until the asynchronous operation has finished, and returns the number of transferred bytes.
-	X_INLINE size_t WaitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
+	X_INLINE size_t waitUntilFinished(const XFileAsyncOperation& operation) X_FINAL;
 	
 	uint64_t fileSize(void) const X_FINAL;
 
@@ -50,7 +50,7 @@ X_INLINE void XDiskFileAsync::cancelAll(void) const
 }
 
 
-X_INLINE size_t XDiskFileAsync::WaitUntilFinished(const XFileAsyncOperation& operation)
+X_INLINE size_t XDiskFileAsync::waitUntilFinished(const XFileAsyncOperation& operation)
 {
 	return operation.waitUntilFinished();
 }
