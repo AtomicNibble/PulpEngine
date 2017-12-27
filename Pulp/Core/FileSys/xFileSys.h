@@ -3,6 +3,8 @@
 #include <IFileSys.h>
 
 #include <String\Path.h>
+#include <String\StringHash.h>
+
 #include "Vars\FileSysVars.h"
 
 #include <Containers\HashMap.h>
@@ -42,6 +44,9 @@ struct Pak
 {
 	Pak(core::MemoryArenaBase* arena);
 
+	int32_t find(core::StrHash hash, const char* pName) const;
+
+
 	StackString<64> name;
 
 	// have you seen this pak format?
@@ -79,6 +84,19 @@ inline Pak::Pak(core::MemoryArenaBase* arena) :
 {
 
 }
+
+inline int32_t Pak::find(core::StrHash nameHash, const char* pName) const
+{
+	auto idx = hash.first(nameHash);
+	while (idx != -1 && strUtil::IsEqual(strings[idx], pName) == false)
+	{
+		idx = hash.next(idx);
+	}
+
+	return idx;
+}
+
+
 
 
 struct Directory
