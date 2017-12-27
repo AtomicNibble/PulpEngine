@@ -3041,12 +3041,11 @@ void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOu
 void AssetDB::GetOutputPathForAssetType(assetDb::AssetType::Enum assType,
 	const core::Path<char>& modPath, core::Path<char>& pathOut)
 {
-	pathOut.clear();
-	pathOut /= modPath;
-	pathOut /= assetDb::AssetType::ToString(assType);
-	pathOut += "s";
+	pathOut = modPath;
+	pathOut.ensureSlash();
+	pathOut.append(assetDb::AssetType::ToString(assType));
+	pathOut.append('s', 1);
 	pathOut.toLower();
-	pathOut.replaceSeprators();
 }
 
 void AssetDB::GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
@@ -3054,8 +3053,8 @@ void AssetDB::GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core
 {
 	GetOutputPathForAssetType(assType, modPath, pathOut);
 
-	pathOut /= name;
-	pathOut.replaceSeprators();
+	pathOut.append(ASSET_NAME_SLASH, 1);
+	pathOut.append(name.begin(), name.end());
 	pathOut.setExtension(getAssetTypeExtension(assType));
 }
 
@@ -3064,10 +3063,10 @@ void AssetDB::GetRelativeOutputPathForAsset(assetDb::AssetType::Enum assType, co
 {
 	pathOut.clear();
 	pathOut = assetDb::AssetType::ToString(assType);
-	pathOut += "s";
+	pathOut.append('s', 1);
 	pathOut.toLower();
-	pathOut /= name;
-	pathOut.replaceSeprators();
+	pathOut.append(ASSET_NAME_SLASH, 1);
+	pathOut.append(name.begin(), name.end());
 	pathOut.setExtension(getAssetTypeExtension(assType));
 }
 
