@@ -11,17 +11,17 @@ X_NAMESPACE_BEGIN(core)
 namespace PathUtil
 {
 
-	core::Path<wchar_t> GetCurrentDirectory(void)
+	Path GetCurrentDirectory(void)
 	{
 		WCHAR workingDir[_MAX_PATH] = { 0 };
-		core::Path<wchar_t> dir;
+		Path dir;
 
 		if (!GetCurrentDirectoryW(sizeof(workingDir), workingDir)) {
 			core::lastError::Description Dsc;
 			X_ERROR("FileSys", "GetCurrentDirectory failed. Error: %s", lastError::ToString(Dsc));
 		}
 		else {
-			dir = core::Path<wchar_t>(workingDir);
+			dir = Path(workingDir);
 			dir.ensureSlash();
 		}
 
@@ -30,14 +30,14 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	bool GetFullPath(const core::Path<wchar_t>& filePath, core::Path<wchar_t>& pathOut)
+	bool GetFullPath(const Path& filePath, Path& pathOut)
 	{
 		return GetFullPath(filePath.c_str(), pathOut);
 	}
 
-	bool GetFullPath(const wchar_t* pFilePath, core::Path<wchar_t>& pathOut)
+	bool GetFullPath(const wchar_t* pFilePath, Path& pathOut)
 	{
-		wchar_t buf[core::Path<wchar_t>::BUF_SIZE];
+		wchar_t buf[Path::BUF_SIZE];
 
 		DWORD retval = GetFullPathNameW(pFilePath, X_ARRAY_SIZE(buf), buf, nullptr);
 		if (retval > 0 && retval < X_ARRAY_SIZE(buf))
@@ -54,7 +54,7 @@ namespace PathUtil
 	// ------------------------------------------------
 
 
-	bool DeleteFile(const core::Path<wchar_t>& filePath)
+	bool DeleteFile(const Path& filePath)
 	{
 		return DeleteFile(filePath.c_str());
 	}
@@ -73,7 +73,7 @@ namespace PathUtil
 	// ------------------------------------------------
 
 
-	bool DeleteDirectory(const core::Path<wchar_t>& dir, bool resursive)
+	bool DeleteDirectory(const Path& dir, bool resursive)
 	{
 		return DeleteDirectory(dir.c_str(), resursive);
 	}
@@ -95,7 +95,7 @@ namespace PathUtil
 		// SHFileOperationW seams to be crashing when called in a qt app.
 		// so just gonna do the delete logic myself.
 		// we need to empty the dir before we can call RemoveDirectory.
-		core::Path<wchar_t> searchPath(pDir);
+		Path searchPath(pDir);
 
 		const wchar_t* pDirEnd = pDir + searchPath.length();
 
@@ -106,7 +106,7 @@ namespace PathUtil
 		uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
 		if (handle != PathUtil::INVALID_FIND_HANDLE)
 		{
-			core::Path<wchar_t> dirItem;
+			Path dirItem;
 
 			do
 			{
@@ -175,7 +175,7 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	bool CreateDirectory(const core::Path<wchar_t>& dir)
+	bool CreateDirectory(const Path& dir)
 	{
 		return CreateDirectory(dir.c_str());
 	}
@@ -199,7 +199,7 @@ namespace PathUtil
 	}
 
 	// ------------------------------------------------
-	bool CreateDirectoryTree(const core::Path<wchar_t>& dir)
+	bool CreateDirectoryTree(const Path& dir)
 	{
 		return CreateDirectoryTree(dir.c_str());
 	}
@@ -210,9 +210,9 @@ namespace PathUtil
 			return true;
 		}
 
-		Path<wchar_t> path(L"");
+		Path path(L"");
 
-		core::StringTokenizer<wchar_t> tokenizer(pDir, pDir + core::strUtil::strlen(pDir), Path<wchar_t>::NATIVE_SLASH_W);
+		core::StringTokenizer<wchar_t> tokenizer(pDir, pDir + core::strUtil::strlen(pDir), Path::NATIVE_SLASH_W);
 		core::StringRange<wchar_t> range(nullptr, nullptr);
 
 		while (tokenizer.ExtractToken(range))
@@ -234,7 +234,7 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	uint64_t GetFileSize(const core::Path<wchar_t>& filePath)
+	uint64_t GetFileSize(const Path& filePath)
 	{
 		return GetFileSize(filePath.c_str());
 	}
@@ -259,7 +259,7 @@ namespace PathUtil
 	// ------------------------------------------------
 
 
-	bool DoesDirectoryExist(const core::Path<wchar_t>& dirPath)
+	bool DoesDirectoryExist(const Path& dirPath)
 	{
 		return DoesDirectoryExist(dirPath.c_str());
 	}
@@ -292,7 +292,7 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	bool DoesFileExist(const core::Path<wchar_t>& filePath)
+	bool DoesFileExist(const Path& filePath)
 	{
 		return DoesFileExist(filePath.c_str());
 	}
@@ -339,7 +339,7 @@ namespace PathUtil
 	// ------------------------------------------------
 
 
-	bool DoesPathExist(const core::Path<wchar_t>& path)
+	bool DoesPathExist(const Path& path)
 	{
 		return DoesPathExist(path.c_str());
 	}
@@ -351,7 +351,7 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	bool IsDirectory(const core::Path<wchar_t>& path)
+	bool IsDirectory(const Path& path)
 	{
 		return IsDirectory(path.c_str());
 	}
@@ -384,7 +384,7 @@ namespace PathUtil
 
 
 
-	bool MoveFile(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew)
+	bool MoveFile(const Path& fullPath, const Path& fullPathNew)
 	{
 		return MoveFile(fullPath.c_str(), fullPathNew.c_str());
 	}
