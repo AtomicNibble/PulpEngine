@@ -122,16 +122,13 @@ X_INLINE uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
 {
 	// same as above but with bWait = true;
 	DWORD bytesTransferred = 0;
-	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, true))
-	{
+	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, true)) {
 		return safe_static_cast<uint32_t>(bytesTransferred);
 	}
-	else
-	{
-		// some goaty error
-		core::lastError::Description Dsc;
-		X_ERROR("AsyncFile", "Failed to wait until async request has finsihed. Error: %s", core::lastError::ToString(Dsc));
-	}
+	
+	// some goaty error
+	core::lastError::Description Dsc;
+	X_ERROR("AsyncFile", "Failed to wait until async request has finsihed. Error: %s", core::lastError::ToString(Dsc));
 
 	// nope.
 	return 0;
