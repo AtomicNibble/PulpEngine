@@ -292,12 +292,12 @@ namespace PathUtil
 
 	// ------------------------------------------------
 
-	bool DoesFileExist(const Path& filePath)
+	bool DoesFileExist(const Path& filePath, bool supressMissingDirWarn)
 	{
-		return DoesFileExist(filePath.c_str());
+		return DoesFileExist(filePath.c_str(), supressMissingDirWarn);
 	}
 
-	bool DoesFileExist(const wchar_t* pFilePath)
+	bool DoesFileExist(const wchar_t* pFilePath, bool supressMissingDirWarn)
 	{
 		DWORD dwAttrib = GetFileAttributesW(pFilePath);
 
@@ -315,7 +315,7 @@ namespace PathUtil
 		// This means we checked for a file in a directory that don't exsists.
 		if (err == ERROR_PATH_NOT_FOUND)
 		{
-			X_LOG2("FileSys", "FileExsits failed, a parent directory does not exsist: \"%ls\"", pFilePath);
+			X_LOG2_IF(!supressMissingDirWarn, "FileSys", "FileExsits failed, a parent directory does not exsist: \"%ls\"", pFilePath);
 		}
 		else if (err != ERROR_FILE_NOT_FOUND)
 		{

@@ -44,8 +44,8 @@ namespace PathUtil
 	bool DoesDirectoryExist(const Path& dirPath);
 	bool DoesDirectoryExist(const wchar_t* pDir);
 
-	bool DoesFileExist(const Path& filePath);
-	bool DoesFileExist(const wchar_t* pFilePath);
+	bool DoesFileExist(const Path& filePath, bool supressMissingDirWarn = false);
+	bool DoesFileExist(const wchar_t* pFilePath, bool supressMissingDirWarn = false);
 
 	bool DoesPathExist(const Path& path);
 	bool DoesPathExist(const wchar_t* pDir);
