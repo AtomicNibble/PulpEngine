@@ -1057,7 +1057,7 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 
 // Ajust path
 
-const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path,
+const wchar_t* xFileSys::createOSPath(const directory_s* dir, pathType path,
 	VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
 {
 	if (location != VirtualDirectory::GAME) {
@@ -1070,7 +1070,7 @@ const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path,
 	return createOSPath(dir, pathW, buffer);
 }
 
-const wchar_t* xFileSys::createOSPath(directory_s* dir, pathTypeW path, 
+const wchar_t* xFileSys::createOSPath(const directory_s* dir, pathTypeW path,
 	VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
 {
 	if (location != VirtualDirectory::GAME) {
@@ -1081,7 +1081,7 @@ const wchar_t* xFileSys::createOSPath(directory_s* dir, pathTypeW path,
 }
 
 
-const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path, Path<wchar_t>& buffer) const
+const wchar_t* xFileSys::createOSPath(const  directory_s* dir, pathType path, Path<wchar_t>& buffer) const
 {
 	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
 	strUtil::Convert(path, pathW, sizeof(pathW));
@@ -1089,7 +1089,7 @@ const wchar_t* xFileSys::createOSPath(directory_s* dir, pathType path, Path<wcha
 	return createOSPath(dir, pathW, buffer);
 }
 
-const wchar_t* xFileSys::createOSPath(directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const
+const wchar_t* xFileSys::createOSPath(const directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const
 {
 	// is it absolute?
 	if (!isAbsolute(path)) {
