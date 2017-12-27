@@ -91,17 +91,15 @@ X_INLINE bool XOsFileAsyncOperationBase::hasFinished(uint32_t* pNumBytes) const
 		}
 		return true;
 	}
-	else if (core::lastError::Get() == ERROR_IO_INCOMPLETE)
-	{
+
+	auto err = core::lastError::Get();
+	if (err == ERROR_IO_INCOMPLETE) {
 		return false;
 	}
-	else
-	{
-		// some goaty error
-		core::lastError::Description Dsc;
-		X_ERROR("AsyncFile", "Failed to check if async request has finsihed. Error: %s", core::lastError::ToString(Dsc));
-	}
 
+	// some goaty error
+	core::lastError::Description Dsc;
+	X_ERROR("AsyncFile", "Failed to check if async request has finsihed. Error: %s", core::lastError::ToString(err, Dsc));
 	return false;
 }
 
