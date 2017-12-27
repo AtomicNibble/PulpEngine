@@ -95,7 +95,7 @@ void PhysXVars::RegisterVars(void)
 	core::ConsoleVarFunc scaleChangedDel;
 	scaleChangedDel.Bind<PhysXVars, &PhysXVars::Var_OnScaleChanged>(this);
 
-	// we have to define the names manually since physx declares anormal enum so we don't have tostring like engine enums.
+	// we have to define the names manually since physx declares a normal enum so we don't have toString() like engine enums.
 	// plus defining the full name as a const char means we don't have to allocate memory for each one to store the full name.
 	scaleVarNames_[physx::PxVisualizationParameter::eSCALE]   					= "phys_draw_debug_scale";
 	scaleVarNames_[physx::PxVisualizationParameter::eWORLD_AXES]   				= "phys_draw_debug_scale_world_axes";
@@ -122,7 +122,7 @@ void PhysXVars::RegisterVars(void)
 	scaleVarNames_[physx::PxVisualizationParameter::eJOINT_LIMITS]   			= "phys_draw_debug_scale_joint_limits";
 	// skipped particle ones for now
 	// ..
-// this enalbes cull box not visulization of cull box.
+// this enables cull box not visulization of cull box.
 //	scaleVarNames_[physx::PxVisualizationParameter::eCULL_BOX]   				= "phys_draw_debug_scale_cull_box";
 	// skipped cloth ones for now
 	// ..
