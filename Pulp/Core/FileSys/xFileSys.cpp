@@ -281,8 +281,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 		}
 	}
 	else
@@ -337,8 +336,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",	path, mode.ToString(Dsc));
 		}
 	}
 	else
@@ -399,8 +397,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 		}
 	}
 	else
@@ -446,8 +443,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
 		}
 	}
 	else
@@ -519,8 +515,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 		}
 	}
 	else
@@ -572,8 +567,7 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
 		else
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",
-				path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
 		}
 	}
 	else
