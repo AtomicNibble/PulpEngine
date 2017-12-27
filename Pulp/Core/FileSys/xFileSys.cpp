@@ -451,48 +451,42 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 {
 	X_ASSERT_NOT_NULL(path);
 
+	if (mode.IsSet(fileMode::WRITE)) {
+		X_ERROR("FileSys", "can't open a memory file for writing.");
+		return nullptr;
+	}
+
 	XFileMem* pFile = nullptr;
 
-	if (mode.IsSet(fileMode::READ))
+	_wfinddatai64_t findinfo;
+
+	XFindData FindData(path, this);
+	if (FindData.findnext(&findinfo))
 	{
-		_wfinddatai64_t findinfo;
+		core::Path<wchar_t> real_path;
+		FindData.getOSPath(real_path, &findinfo);
 
-		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
+		OsFile file(real_path.c_str(), mode);
+
+		if (file.valid())
 		{
-			core::Path<wchar_t> real_path;
-			FindData.getOSPath(real_path, &findinfo);
+			size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+			char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
 
-			OsFile file(real_path.c_str(), mode);
-
-			if (file.valid())
+			if (file.read(pBuf, size) == size)
 			{
-				size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-				char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-				if (file.read(pBuf, size) == size)
-				{
-					pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-
-				}
-				else
-				{
-					X_DELETE_ARRAY(pBuf, &memFileArena_);
-				}
-
+				pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
 			}
-		}
-		else
-		{
-			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+			else
+			{
+				X_DELETE_ARRAY(pBuf, &memFileArena_);
+			}
 		}
 	}
 	else
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
-
-		X_ERROR("FileSys", "can't open a memory file for writing.");
+		fileModeFlags::Description Dsc;
+		X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 	}
 
 	return pFile;
@@ -503,48 +497,42 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
 {
 	X_ASSERT_NOT_NULL(path);
 
+	if (mode.IsSet(fileMode::WRITE)) {
+		X_ERROR("FileSys", "can't open a memory file for writing.");
+		return nullptr;
+	}
+
 	XFileMem* pFile = nullptr;
 
-	if (mode.IsSet(fileMode::READ))
+	_wfinddatai64_t findinfo;
+
+	XFindData FindData(path, this);
+	if (FindData.findnext(&findinfo))
 	{
-		_wfinddatai64_t findinfo;
+		core::Path<wchar_t> real_path;
+		FindData.getOSPath(real_path, &findinfo);
 
-		XFindData FindData(path, this);
-		if (FindData.findnext(&findinfo))
+		OsFile file(real_path.c_str(), mode);
+
+		if (file.valid())
 		{
-			core::Path<wchar_t> real_path;
-			FindData.getOSPath(real_path, &findinfo);
+			size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+			char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
 
-			OsFile file(real_path.c_str(), mode);
-
-			if (file.valid())
+			if (file.read(pBuf, size) == size)
 			{
-				size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-				char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-				if (file.read(pBuf, size) == size)
-				{
-					pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-
-				}
-				else
-				{
-					X_DELETE_ARRAY(pBuf, &memFileArena_);
-				}
-
+				pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
 			}
-		}
-		else
-		{
-			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
+			else
+			{
+				X_DELETE_ARRAY(pBuf, &memFileArena_);
+			}
 		}
 	}
 	else
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
-
-		X_ERROR("FileSys", "can't open a memory file for writing.");
+		fileModeFlags::Description Dsc;
+		X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
 	}
 
 	return pFile;
