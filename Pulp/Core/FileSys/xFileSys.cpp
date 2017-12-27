@@ -337,7 +337,6 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 			}
 
-			// TODO: pool allocations.
 			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
 
 			if (!file->valid()) {
@@ -405,7 +404,6 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		{
 			FindData.getOSPath(real_path, &findinfo);
 
-			// TODO: pool allocations.
 			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 			if (!pFile->valid()) {
@@ -458,7 +456,6 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 		{
 			FindData.getOSPath(real_path, &findinfo);
 
-			// TODO: pool allocations.
 			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 
 			if (!pFile->valid()) {
