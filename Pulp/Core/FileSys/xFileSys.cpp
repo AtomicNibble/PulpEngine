@@ -2,6 +2,7 @@
 #include "xFileSys.h"
 #include "DiskFile.h"
 #include "DiskFileAsync.h"
+#include "PakFileAsync.h"
 
 #include "PathUtil.h"
 
@@ -30,10 +31,16 @@ namespace
 	const size_t MAX_ASYNC_OP = 1024;
 
 	const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile),
-		core::Max(sizeof(XDiskFileAsync), sizeof(XFileMem)));
+		core::Max(sizeof(XDiskFileAsync), 
+			core::Max(sizeof(XFileMem), sizeof(XPakFileAsync))
+		)
+	);
 
 	const size_t FILE_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(XDiskFile),
-		core::Max(X_ALIGN_OF(XDiskFileAsync), X_ALIGN_OF(XFileMem)));
+		core::Max(X_ALIGN_OF(XDiskFileAsync), 
+			core::Max(X_ALIGN_OF(XFileMem), X_ALIGN_OF(XPakFileAsync))
+		)
+	);
 
 
 	const size_t ASYNC_OP_ALLOCATION_SIZE = sizeof(XOsFileAsyncOperation::AsyncOp);

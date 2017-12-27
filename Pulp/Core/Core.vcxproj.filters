@@ -131,6 +131,9 @@
     <ClInclude Include="FileSys\win32\PathUtil.h">
       <Filter>Header Files\FileSys\win32</Filter>
     </ClInclude>
+    <ClInclude Include="FileSys\PakFileAsync.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -210,6 +213,9 @@
     </ClCompile>
     <ClCompile Include="Profile\XProfile.cpp">
       <Filter>Source Files\Profile</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\PakFileAsync.cpp">
+      <Filter>Source Files\FileSys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
