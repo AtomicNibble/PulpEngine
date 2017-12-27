@@ -311,10 +311,10 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s",	path, mode.ToString(Dsc));
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
 			return nullptr;
 		}
-		
+
 		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
