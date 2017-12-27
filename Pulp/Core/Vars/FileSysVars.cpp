@@ -8,7 +8,8 @@ X_NAMESPACE_BEGIN(core)
 XFileSysVars::XFileSysVars() :
 	debug_(0),
 	queueDebug_(0),
-	numVirtualDir_(0)
+	numVirtualDir_(0),
+	pakMemorySizeLimitMB_(64)
 {
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 	artOpenDelay_ = 0;
@@ -28,6 +29,9 @@ void XFileSysVars::registerVars(void)
 		"Filesystem debug. 0=off 1=on");
 	ADD_CVAR_REF("filesys_queue_debug", queueDebug_, 0, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Filesystem que debug. 0=off 1=on");
+
+	ADD_CVAR_REF("filesys_pak_memory_load_max_size", pakMemorySizeLimitMB_, 64, 0, 1024, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Max size of pak's loaded into memory in MB");
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 	ADD_CVAR_REF("filesys_art_open_delay", artOpenDelay_, artOpenDelay_, 0, 100000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

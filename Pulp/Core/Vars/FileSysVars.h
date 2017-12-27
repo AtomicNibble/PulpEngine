@@ -21,6 +21,8 @@ public:
 	int32_t queueDebug_;
 	int32_t numVirtualDir_;
 
+	int32_t pakMemorySizeLimitMB_;
+
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 	// artificial delays
 	int32_t artOpenDelay_;
