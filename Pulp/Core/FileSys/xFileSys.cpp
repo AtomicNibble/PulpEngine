@@ -1658,7 +1658,7 @@ bool xFileSys::openPak(const char* pName)
 
 	auto* pFile = openFileAsync(pName, mode);
 	if (!pFile) {
-
+		X_ERROR("AssetPak", "Failed to open pak");
 		return false;
 	}
 
