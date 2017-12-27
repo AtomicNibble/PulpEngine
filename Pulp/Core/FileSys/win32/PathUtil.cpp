@@ -301,38 +301,29 @@ namespace PathUtil
 	{
 		DWORD dwAttrib = GetFileAttributesW(pFilePath);
 
-		bool result = false;
-
 		if (dwAttrib != INVALID_FILE_ATTRIBUTES) // make sure we did not fail for some shit, like permissions
 		{
-			if (dwAttrib & FILE_ATTRIBUTE_DIRECTORY) // herp derp.
+			if ((dwAttrib & FILE_ATTRIBUTE_DIRECTORY) == 0) // herp derp.
 			{
-				X_ERROR("FileSys", "FileExsits check was ran on a directory");
+				return true;
 			}
-			else
-			{
-				// hi there Mr File
-				result = true;
-			}
+		
+			X_ERROR("FileSys", "FileExsits check was ran on a directory");
 		}
 
-		if (!result)
+		DWORD err = lastError::Get();
+		// This means we checked for a file in a directory that don't exsists.
+		if (err == ERROR_PATH_NOT_FOUND)
 		{
-			DWORD err = lastError::Get();
-			// This means we checked for a file in a directory that don't exsists.
-			if (err == ERROR_PATH_NOT_FOUND)
-			{
-				X_LOG2("FileSys", "FileExsits failed, the target directory does not exsist: \"%ls\"",
-					pFilePath);
-			}
-			else if (err != ERROR_FILE_NOT_FOUND)
-			{
-				lastError::Description Dsc;
-				X_ERROR("FileSys", "FileExsits failed. Error: %s", lastError::ToString(err, Dsc));
-			}
+			X_LOG2("FileSys", "FileExsits failed, a parent directory does not exsist: \"%ls\"", pFilePath);
+		}
+		else if (err != ERROR_FILE_NOT_FOUND)
+		{
+			lastError::Description Dsc;
+			X_ERROR("FileSys", "FileExsits failed. Error: %s", lastError::ToString(err, Dsc));
 		}
 
-		return result;
+		return false;
 	}
 
 
