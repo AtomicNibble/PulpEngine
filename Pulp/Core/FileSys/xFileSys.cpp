@@ -1703,8 +1703,8 @@ bool xFileSys::openPak(const char* pName)
 		if (hdr.size > std::numeric_limits<int32_t>::max())
 		{
 			core::HumanSize::Str str;
-			X_ERROR("AssetPak", "Can't load pak in memory mode it's too large, size: %s", core::HumanSize::toString(str, hdr.size));
-			return false;
+			X_WARNING("AssetPak", "Can't load pak in memory mode it's too large, steaming instead. size: %s", core::HumanSize::toString(str, hdr.size));
+			pakMode = PakMode::STREAM;
 		}
 	}
 
