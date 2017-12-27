@@ -19,9 +19,10 @@ typedef core::Array<uint8_t> DataVec;
 
 struct Asset
 {
-	Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
+	Asset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
 
 	core::string name;
+	core::string relativePath;
 	AssetId id;
 	AssetType::Enum type;
 
@@ -69,7 +70,7 @@ public:
 	bool bake(void);
 	bool save(core::Path<char>& path);
 
-	void addAsset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& vec);
+	void addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& vec);
 
 private:
 	core::MemoryArenaBase* arena_;

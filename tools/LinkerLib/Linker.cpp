@@ -128,7 +128,10 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 		return false;
 	}
 
-	builder_.addAsset(assetId, name, assType, std::move(data));
+	core::Path<char> relAssPath;
+	assetDb::AssetDB::GetRelativeOutputPathForAsset(assType, name, relAssPath);
+
+	builder_.addAsset(assetId, name, core::string(relAssPath.begin(), relAssPath.end()), assType, std::move(data));
 	return true;
 }
 

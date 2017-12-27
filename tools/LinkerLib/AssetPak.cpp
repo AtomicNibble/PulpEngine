@@ -66,8 +66,10 @@ namespace
 
 } // namespace
 
-Asset::Asset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
+Asset::Asset(AssetId id, const core::string& name, core::string&& relativePath, 
+	AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
 	name(name),
+	relativePath(relativePath),
 	id(id),
 	type(type),
 	infaltedSize(data.size()),
@@ -308,7 +310,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 	{
 		for (const auto& a : assets_)
 		{
-			stringDataSize += core::strUtil::StringBytesIncNull(a.name);
+			stringDataSize += core::strUtil::StringBytesIncNull(a.relativePath);
 		}
 
 		stringDataSize = core::bitUtil::RoundUpToMultiple<uint64_t>(stringDataSize, PAK_BLOCK_PADDING);
@@ -317,7 +319,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 
 		for (const auto& a : assets_)
 		{
-			strings.write(a.name.data(), core::strUtil::StringBytesIncNull(a.name));
+			strings.write(a.relativePath.data(), core::strUtil::StringBytesIncNull(a.relativePath));
 		}
 
 		strings.alignWrite(PAK_BLOCK_PADDING);
@@ -504,13 +506,13 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 }
 
 
-void AssetPakBuilder::addAsset(AssetId id, const core::string& name, AssetType::Enum type, DataVec&& data)
+void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data)
 {
 	X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")();
 	X_ASSERT(name.isNotEmpty(), "Empty name")(name.length());
 	X_ASSERT(data.isNotEmpty(), "Empty data")(data.size());
 
-	assets_.emplace_back(id, name, type, std::move(data), arena_);
+	assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
 }
 
 bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
