@@ -260,7 +260,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 {
 	X_ASSERT_NOT_NULL(path);
 
-	XDiskFile* file = nullptr;
+	XDiskFile* pFile = nullptr;
 	core::Path<wchar_t> real_path;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) )
@@ -276,12 +276,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 			}
 
-			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
-
-			if (!file->valid()) {
-				closeFile(file);
-				file = nullptr;
-			}
+			pFile = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
 		}
 		else
 		{
@@ -305,22 +300,22 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 		}
 
-		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
-
-		if (!file->valid()) {
-			closeFile(file);
-			file = nullptr;
-		}
+		pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
 	}
 
-	return file;
+	if (!pFile->valid()) {
+		closeFile(pFile);
+		return nullptr;
+	}
+
+	return pFile;
 }
 
 XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
 	X_ASSERT_NOT_NULL(path);
 
-	XDiskFile* file = nullptr;
+	XDiskFile* pFile = nullptr;
 	core::Path<wchar_t> real_path;
 	
 	XFindData FindData(path, this);
@@ -337,12 +332,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 				X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 			}
 
-			file = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
-
-			if (!file->valid()) {
-				closeFile(file);
-				file = nullptr;
-			}
+			pFile = X_NEW(XDiskFile, &filePoolArena_, "DiskFile")(real_path.c_str(), mode);
 		}
 		else
 		{
@@ -366,15 +356,15 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 			X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
 		}
 
-		file = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
-
-		if (!file->valid()) {
-			closeFile(file);
-			file = nullptr;
-		}
+		pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
 	}
 
-	return file;
+	if (!pFile->valid()) {
+		closeFile(pFile);
+		return nullptr;
+	}
+
+	return pFile;
 }
 
 void xFileSys::closeFile(XFile* file)
@@ -405,11 +395,6 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 			FindData.getOSPath(real_path, &findinfo);
 
 			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
-
-			if (!pFile->valid()) {
-				closeFileAsync(pFile);
-				pFile = nullptr;
-			}
 		}
 		else
 		{
@@ -430,11 +415,11 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
 		}
 
 		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+	}
 
-		if (!pFile->valid()) {
-			closeFileAsync(pFile);
-			pFile = nullptr;
-		}
+	if (!pFile->valid()) {
+		closeFileAsync(pFile);
+		return nullptr;
 	}
 
 	return pFile;
@@ -457,11 +442,6 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 			FindData.getOSPath(real_path, &findinfo);
 
 			pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
-
-			if (!pFile->valid()) {
-				closeFileAsync(pFile);
-				pFile = nullptr;
-			}
 		}
 		else
 		{
@@ -482,11 +462,11 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
 		}
 
 		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+	}
 
-		if (!pFile->valid()) {
-			closeFileAsync(pFile);
-			pFile = nullptr;
-		}
+	if (!pFile->valid()) {
+		closeFileAsync(pFile);
+		return nullptr;
 	}
 
 	return pFile;
