@@ -13,7 +13,7 @@ namespace PathUtil
 
 	Path GetCurrentDirectory(void)
 	{
-		WCHAR workingDir[_MAX_PATH] = { 0 };
+		WCHAR workingDir[Path::BUF_SIZE] = { 0 };
 		Path dir;
 
 		if (!GetCurrentDirectoryW(sizeof(workingDir), workingDir)) {
