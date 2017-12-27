@@ -81,7 +81,7 @@ inline Pak::Pak(core::MemoryArenaBase* arena) :
 }
 
 
-struct directory_s
+struct Directory
 {
 	Path<wchar_t> path;
 
@@ -93,7 +93,7 @@ struct Search
 		core::zero_this(this);
 	}
 
-	directory_s* pDir;
+	Directory* pDir;
 	Pak* pPak;
 	Search* pNext;
 };
@@ -331,11 +331,11 @@ private:
 
 
 	// Ajust path
-	const wchar_t* createOSPath(const directory_s* dir, pathType path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
-	const wchar_t* createOSPath(const directory_s* dir, pathTypeW path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(const Directory* dir, pathType path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(const Directory* dir, pathTypeW path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
 	
-	const wchar_t* createOSPath(const directory_s* dir, pathType path, Path<wchar_t>& buffer) const;
-	const wchar_t* createOSPath(const directory_s* dir, pathTypeW path, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const;
+	const wchar_t* createOSPath(const Directory* dir, pathTypeW path, Path<wchar_t>& buffer) const;
 
 	bool isAbsolute(pathType path) const;
 	bool isAbsolute(pathTypeW path) const;
@@ -351,7 +351,7 @@ private:
 	findDataSet findData_;
 #endif // !X_DEBUG
 
-	directory_s* gameDir_;
+	Directory* gameDir_;
 	Search* searchPaths_;
 
 	XFileSysVars vars_;

@@ -8,9 +8,9 @@
 X_NAMESPACE_BEGIN(core)
 
 class xFileSys;
-struct directory_s;
-struct Search;
+struct Directory;
 struct Pak;
+struct Search;
 
 
 struct XFindData
@@ -24,7 +24,7 @@ struct XFindData
 
 private:
 
-	bool searchDir(directory_s* dir, _wfinddatai64_t* fi);
+	bool searchDir(Directory* dir, _wfinddatai64_t* fi);
 
 	inline void updateFindInfo(_wfinddatai64_t* fi);
 	inline bool searchPak(_wfinddatai64_t* fi);

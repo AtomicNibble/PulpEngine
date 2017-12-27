@@ -69,7 +69,7 @@ bool XFindData::getOSPath(core::Path<wchar_t>& path, _wfinddatai64_t* fi)
 	return false;
 }
 
-bool XFindData::searchDir(directory_s* dir, _wfinddatai64_t* fi)
+bool XFindData::searchDir(Directory* dir, _wfinddatai64_t* fi)
 {
 	if (handle_ == -1) {
 		// new search dir.
