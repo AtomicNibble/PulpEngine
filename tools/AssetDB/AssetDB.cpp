@@ -3059,6 +3059,18 @@ void AssetDB::GetOutputPathForAsset(assetDb::AssetType::Enum assType, const core
 	pathOut.setExtension(getAssetTypeExtension(assType));
 }
 
+void AssetDB::GetRelativeOutputPathForAsset(assetDb::AssetType::Enum assType, const core::string& name,
+	core::Path<char>& pathOut)
+{
+	pathOut.clear();
+	pathOut = assetDb::AssetType::ToString(assType);
+	pathOut += "s";
+	pathOut.toLower();
+	pathOut /= name;
+	pathOut.replaceSeprators();
+	pathOut.setExtension(getAssetTypeExtension(assType));
+}
+
 bool AssetDB::ValidName(const core::string& name)
 {
 	if (name.length() > ASSET_NAME_MAX_LENGTH) {
