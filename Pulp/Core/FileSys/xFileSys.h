@@ -199,6 +199,9 @@ public:
 	typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
 	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
 
+	typedef core::PriorityQueue<IoRequestBase*, core::Array<IoRequestBase*>, iorequest_less> IoRequestPriorityQueue;
+
+
 public:
 	xFileSys(core::MemoryArenaBase* arena);
 	~xFileSys() X_FINAL;
@@ -367,7 +370,7 @@ private:
 	core::CriticalSection requestLock_;
 	core::Signal requestSignal_;
 
-	core::PriorityQueue<IoRequestBase*, core::Array<IoRequestBase*>, iorequest_less> requests_;
+	IoRequestPriorityQueue requests_;
 	core::MemoryArenaBase* ioQueueDataArena_;
 
 	AsyncOps pendingOps_;
