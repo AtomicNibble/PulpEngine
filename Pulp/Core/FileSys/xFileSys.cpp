@@ -263,6 +263,7 @@ core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
 
 // --------------------- Open / Close ---------------------
 
+
 XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
 	core::Path<wchar_t> real_path;
@@ -271,14 +272,14 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	{
 		PathUtil::findData findinfo;
 		XFindData FindData(path, this);
-	
+
 		if (!FindData.findnext(&findinfo))
 		{
 			fileModeFlags::Description Dsc;
 			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 			return nullptr;
 		}
-		
+
 		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
@@ -294,7 +295,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 	if (pFile->valid()) {
 		return pFile;
 	}
-		
+
 	closeFile(pFile);
 	return nullptr;
 }
@@ -302,7 +303,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
 	core::Path<wchar_t> real_path;
-		
+
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
 		PathUtil::findData findinfo;
