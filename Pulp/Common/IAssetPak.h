@@ -171,6 +171,9 @@ struct APakHeader
 	X_INLINE bool isValid(void) const {
 		return magic == PAK_MAGIC;
 	}
+	X_INLINE bool isCompressed(void) const {
+		return size != inflatedSize;
+	}
 
 	uint32_t	magic;
 	uint8_t		version;
@@ -204,6 +207,10 @@ struct APakStrPool
 
 struct APakEntry
 {
+	X_INLINE bool isCompressed(void) const {
+		return size != inflatedSize;
+	}
+
 	AssetId							id;
 	AssetType::Enum					type; 
 	APakEntryFlags					flags;
