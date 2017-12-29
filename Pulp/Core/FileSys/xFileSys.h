@@ -56,27 +56,45 @@ struct Search
 
 
 struct XFindData;
-struct PendingOp;
+struct PendingCompiltionOp;
 
 class xFileSys : public IFileSys, private core::ThreadAbstract
 {
-	struct PendingOp
+	struct PendingOpBase
 	{
-		PendingOp(IoRequestBase* pReq, XFileAsyncOperationCompiltion&& op);
-		PendingOp(PendingOp&& oth);
+		PendingOpBase(core::UniquePointer<IoRequestBase>&& req);
+		PendingOpBase(PendingOpBase&& oth);
 
-		PendingOp& operator=(PendingOp&& oth);
-
+		PendingOpBase& operator=(PendingOpBase&& oth);
 
 		IoRequest::Enum getType(void) const;
 
 		template<typename T>
 		X_INLINE T* as(void) const {
-			return reinterpret_cast<T*>(pRequest);
+			return reinterpret_cast<T*>(pRequest.get());
 		}
 
-		IoRequestBase* pRequest;
+		core::UniquePointer<IoRequestBase> pRequest;
+	};
+
+	struct PendingCompiltionOp : public PendingOpBase
+	{
+		PendingCompiltionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op);
+		PendingCompiltionOp(PendingCompiltionOp&& oth);
+
+		PendingCompiltionOp& operator=(PendingCompiltionOp&& oth);
+
 		XFileAsyncOperationCompiltion op;
+	};
+
+	struct PendingOp : public PendingOpBase
+	{
+		PendingOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperation&& op);
+		PendingOp(PendingOp&& oth);
+
+		PendingOp& operator=(PendingOp&& oth);
+
+		XFileAsyncOperation op;
 	};
 
 	struct iorequest_less
@@ -157,6 +175,7 @@ public:
 	static const size_t PENDING_IO_QUE_SIZE = 0x100;
 
 	typedef std::array<uint8_t, MAX_REQ_SIZE> RequestBuffer;
+	typedef core::FixedArray<PendingCompiltionOp, PENDING_IO_QUE_SIZE> AsyncComplitionOps;
 	typedef core::FixedArray<PendingOp, PENDING_IO_QUE_SIZE> AsyncOps;
 
 	typedef core::PriorityQueue<IoRequestBase*, core::Array<IoRequestBase*>, iorequest_less> IoRequestPriorityQueue;
@@ -260,7 +279,7 @@ public:
 private:
 	IoRequestBase* popRequest(void);
 	IoRequestBase* tryPopRequest(void);
-	void onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd);
+	void onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd);
 
 	void AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd);
 
@@ -337,6 +356,7 @@ private:
 	IoRequestPriorityQueue requests_;
 	core::MemoryArenaBase* ioQueueDataArena_;
 
+	AsyncComplitionOps pendingCompOps_;
 	AsyncOps pendingOps_;
 
 #if X_ENABLE_FILE_STATS

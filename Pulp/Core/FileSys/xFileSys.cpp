@@ -22,6 +22,8 @@
 #include <Time\StopWatch.h>
 #include <String\StringHash.h>
 
+#include "Pak.h"
+
 X_NAMESPACE_BEGIN(core)
 
 namespace
@@ -68,34 +70,78 @@ namespace
 } // namespace
 
 
-xFileSys::PendingOp::PendingOp(IoRequestBase* pReq, XFileAsyncOperationCompiltion&& op) :
-	pRequest(X_ASSERT_NOT_NULL(pReq)),
+// ------------------------------------
+
+xFileSys::PendingOpBase::PendingOpBase(core::UniquePointer<IoRequestBase>&& req) :
+	pRequest(std::forward<core::UniquePointer<IoRequestBase>>(req))
+{
+
+}
+
+xFileSys::PendingOpBase::PendingOpBase(PendingOpBase&& oth) :
+	pRequest(std::move(oth.pRequest))
+{
+	
+}
+
+xFileSys::PendingOpBase& xFileSys::PendingOpBase::operator=(PendingOpBase&& oth)
+{
+	pRequest = std::move(oth.pRequest);
+	return *this;
+}
+
+
+X_INLINE IoRequest::Enum xFileSys::PendingOpBase::getType(void) const
+{
+	return pRequest->getType();
+}
+
+
+// ------------------------------------
+
+xFileSys::PendingCompiltionOp::PendingCompiltionOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperationCompiltion&& op) :
+	PendingOpBase(std::forward<core::UniquePointer<IoRequestBase>>(req)),
 	op(std::forward<XFileAsyncOperationCompiltion>(op))
 {
 
 }
 
-xFileSys::PendingOp::PendingOp(PendingOp&& oth) :
-	pRequest(oth.pRequest),
+xFileSys::PendingCompiltionOp::PendingCompiltionOp(PendingCompiltionOp&& oth) :
+	PendingOpBase(std::move(oth)),
 	op(std::move(oth.op))
 {
-	// needed?
-	oth.pRequest = nullptr;
+
 }
 
-xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
+xFileSys::PendingCompiltionOp& xFileSys::PendingCompiltionOp::operator=(PendingCompiltionOp&& oth)
 {
-	pRequest = oth.pRequest;
+	PendingOpBase::operator=(std::move(oth));
 	op = std::move(oth.op);
-
-	oth.pRequest = nullptr;
 	return *this;
 }
 
 
-X_INLINE IoRequest::Enum xFileSys::PendingOp::getType(void) const
+// ------------------------------------
+
+xFileSys::PendingOp::PendingOp(core::UniquePointer<IoRequestBase>&& req, XFileAsyncOperation&& op) :
+	PendingOpBase(std::forward<core::UniquePointer<IoRequestBase>>(req)),
+	op(std::forward<XFileAsyncOperation>(op))
 {
-	return pRequest->getType();
+
+}
+
+xFileSys::PendingOp::PendingOp(PendingOp&& oth) :
+	PendingOpBase(std::move(oth)),
+	op(std::move(oth.op))
+{
+
+}
+
+xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
+{
+	PendingOpBase::operator=(std::move(oth));
+	op = std::move(oth.op);
+	return *this;
 }
 
 
@@ -1335,7 +1381,7 @@ IoRequestBase* xFileSys::tryPopRequest(void)
 	return pReq;
 }
 
-void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
+void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
 {
 	if (asyncOp.getType() == IoRequest::READ)
 	{
@@ -1456,18 +1502,17 @@ void xFileSys::onOpFinsihed(PendingOp& asyncOp, uint32_t bytesTransferd)
 
 void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd)
 {
-	X_ASSERT(pendingOps_.isNotEmpty(), "Recived a unexpected Async complition")(pOperation, bytesTransferd);
+	X_ASSERT(pendingCompOps_.isNotEmpty(), "Recived a unexpected Async complition")(pOperation, bytesTransferd);
 
-	for (size_t i = 0; i < pendingOps_.size(); i++)
+	for (size_t i = 0; i < pendingCompOps_.size(); i++)
 	{
-		PendingOp& asyncOp = pendingOps_[i];
+		PendingCompiltionOp& asyncOp = pendingCompOps_[i];
 
 		if (asyncOp.op.ownsAsyncOp(pOperation))
 		{
 			onOpFinsihed(asyncOp, bytesTransferd);
 
-			X_DELETE(asyncOp.pRequest, ioQueueDataArena_);
-			pendingOps_.removeIndex(i);
+			pendingCompOps_.removeIndex(i);
 			return;
 		}
 	}
@@ -1489,7 +1534,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	while (thread.ShouldRun())
 	{
-		if (pendingOps_.isEmpty())
+		if (pendingCompOps_.isEmpty())
 		{
 			pRequest = popRequest();
 		}
@@ -1505,7 +1550,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
 
 #if X_ENABLE_FILE_STATS
-				stats_.PendingOps = pendingOps_.size();
+				stats_.PendingOps = pendingCompOps_.size();
 #endif // !X_ENABLE_FILE_STATS
 			}
 
@@ -1576,7 +1621,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				pOpenRead->pBuf = pData;
 				pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
 
-				pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
+				pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
 			}
 			
 		}
@@ -1607,7 +1652,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
+			pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
 		}
 		else if (type == IoRequest::CLOSE)
 		{
@@ -1637,7 +1682,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-				pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
+				pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
 		}
 		else if (type == IoRequest::WRITE)
 		{
@@ -1655,7 +1700,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				compRoutine
 			);
 
-			pendingOps_.emplace_back(requestPtr.release(), std::move(operation));
+			pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
 		}
 
 	nextRequest:;
