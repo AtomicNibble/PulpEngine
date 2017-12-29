@@ -78,26 +78,36 @@ namespace Compression
 	struct ICompressor
 	{
 		virtual ~ICompressor() {}
+		
+		// ad span<T> would be nice here.
+		static inline Algo::Enum getAlgo(const core::Array<uint8_t>& data) {
+			return getAlgo(data.data(), data.size());
+		}
 
-		static Algo::Enum getAlgo(const core::Array<uint8_t>& data) {
-			X_ASSERT(data.size() >= sizeof(BufferHdr), "Buffer is too small to contain BufferHdr")(sizeof(BufferHdr), data.size());
-			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(data.ptr());
+		static inline bool validBuffer(const core::Array<uint8_t>& data) {
+			return validBuffer(data.data(), data.size());
+		}
+
+		static Algo::Enum getAlgo(const uint8_t* pData, size_t length) {
+			X_ASSERT(length >= sizeof(BufferHdr), "Buffer is too small to contain BufferHdr")(sizeof(BufferHdr), length);
+			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(pData);
 			X_ASSERT(pHdr->IsMagicValid(), "Compressed buffer header is not valid")();
 			return pHdr->algo;
 		}
 
-		static bool validBuffer(const core::Array<uint8_t>& data) {
-			if (data.size() < sizeof(BufferHdr)) {
+
+		static bool validBuffer(const uint8_t* pData, size_t length) {
+			if (length < sizeof(BufferHdr)) {
 				return false;
 			}
-			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(data.ptr());
+			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(pData);
 			if (!pHdr->IsMagicValid()) {
 				return false;
 			}
 			if (static_cast<uint32_t>(pHdr->algo) >= Algo::ENUM_COUNT) {
 				return false;
 			}
-			
+
 			return true;
 		}
 
