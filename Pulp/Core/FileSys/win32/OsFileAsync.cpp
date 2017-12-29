@@ -118,12 +118,15 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 		++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 	}
-	else if (lastError::Get() != ERROR_IO_PENDING)
+	else 
 	{
-		lastError::Description dsc;
-		X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
-			length, position, lastError::ToString(dsc));
-
+		auto err = lastError::Get();
+		if (err != ERROR_IO_PENDING)
+		{
+			lastError::Description dsc;
+			X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
+				length, position, lastError::ToString(err, dsc));
+		}
 	}
 
 	return op;
@@ -148,11 +151,15 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 	}
-	else if (lastError::Get() != ERROR_IO_PENDING)
+	else
 	{
-		lastError::Description dsc;
-		X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
-			length, position, lastError::ToString(dsc));
+		auto err = lastError::Get();
+		if (err != ERROR_IO_PENDING)
+		{
+			lastError::Description dsc;
+			X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
+				length, position, lastError::ToString(err, dsc));
+		}
 
 	}
 
@@ -187,12 +194,15 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 		++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 	}
-	else if (lastError::Get() != ERROR_IO_PENDING)
+	else 
 	{
-		lastError::Description dsc;
-		X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
-			length, position, lastError::ToString(dsc));
-
+		auto err = lastError::Get();
+		if (err != ERROR_IO_PENDING)
+		{
+			lastError::Description dsc;
+			X_ERROR("AsyncFile", "Failed to read %d bytes, position: %d from a file. Error: %s",
+				length, position, lastError::ToString(err, dsc));
+		}
 	}
 
 	return op;
@@ -217,12 +227,15 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 	}
-	else if (lastError::Get() != ERROR_IO_PENDING)
+	else 
 	{
-		lastError::Description dsc;
-		X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
-			length, position, lastError::ToString(dsc));
-
+		auto err = lastError::Get();
+		if (err != ERROR_IO_PENDING)
+		{
+			lastError::Description dsc;
+			X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
+				length, position, lastError::ToString(err, dsc));
+		}
 	}
 
 	return op;
