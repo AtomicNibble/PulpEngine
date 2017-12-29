@@ -20,9 +20,11 @@ public:
 	/// Gains ownership of the given instance, deleting it using the provided arena as soon as its reference count reaches zero.
 	X_INLINE ReferenceCountedOwner(T* instance, MemoryArenaBase* arena);
 	X_INLINE ReferenceCountedOwner(const ReferenceCountedOwner<T>& other);
+	X_INLINE ReferenceCountedOwner(ReferenceCountedOwner<T>&& other);
 	X_INLINE ~ReferenceCountedOwner(void);
 
 	X_INLINE ReferenceCountedOwner<T>& operator=(const ReferenceCountedOwner<T>& other);
+	X_INLINE ReferenceCountedOwner<T>& operator=(ReferenceCountedOwner<T>&& other);
 
 	X_INLINE T* operator->(void);
 	X_INLINE const T* operator->(void) const;

@@ -23,32 +23,49 @@ ReferenceCountedOwner<T>::ReferenceCountedOwner(const ReferenceCountedOwner<T>& 
 	instance_->addReference();
 }
 
+template <class T>
+X_INLINE ReferenceCountedOwner<T>::ReferenceCountedOwner(ReferenceCountedOwner<T>&& other) :
+	instance_(other.instance_),
+	arena_(other.arena_)
+{
+	other.instance_ = nullptr;
+}
 
 template <class T>
 ReferenceCountedOwner<T>& ReferenceCountedOwner<T>::operator=(const ReferenceCountedOwner<T>& other)
 {
 	if (this != &other)
 	{
-		if (instance_->removeReference() == 0)
+		if (instance_ && instance_->removeReference() == 0)
 		{
 			X_DELETE(instance_, arena_);
 		}
 
 		instance_ = other.instance_;
-		instance_->addReference();
-
+		if (instance_) {
+			instance_->addReference();
+		}
 		arena_ = other.arena_;
 	}
 
 	return *this;
 }
 
+template <class T>
+ReferenceCountedOwner<T>& ReferenceCountedOwner<T>::operator=(ReferenceCountedOwner<T>&& other)
+{
+	instance_ = other.instance_;
+	arena_ = other.arena_;
+
+	other.instance_ = nullptr;
+	return *this;
+}
 
 template <class T>
 ReferenceCountedOwner<T>::~ReferenceCountedOwner(void)
 {
 	// delete the instance as soon as its reference count reaches zero
-	if (instance_->removeReference() == 0)
+	if (instance_ && instance_->removeReference() == 0)
 	{
 		X_DELETE(instance_, arena_);
 	}
