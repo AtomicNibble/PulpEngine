@@ -112,14 +112,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (::ReadFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
-	{
-#if X_ENABLE_FILE_STATS
-		s_stats.NumBytesRead += length;
-		++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
-	}
-	else 
+	if (!::ReadFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
@@ -129,6 +122,11 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 				length, position, lastError::ToString(err, dsc));
 		}
 	}
+
+#if X_ENABLE_FILE_STATS
+	s_stats.NumBytesWrite += length;
+	++s_stats.NumWrties;
+#endif // !X_ENABLE_FILE_STATS
 
 	return op;
 }
@@ -145,14 +143,7 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
-	{
-#if X_ENABLE_FILE_STATS
-		s_stats.NumBytesWrite += length;
-		++s_stats.NumWrties;
-#endif // !X_ENABLE_FILE_STATS
-	}
-	else
+	if (!::WriteFile(hFile_, pBuffer, length32, nullptr, op.getOverlapped()))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
@@ -161,8 +152,14 @@ XOsFileAsyncOperation OsFileAsync::writeAsync(const void* pBuffer, size_t length
 			X_ERROR("AsyncFile", "Failed to write %d bytes, position: %d to a file. Error: %s",
 				length, position, lastError::ToString(err, dsc));
 		}
-
 	}
+
+	// add to stats now, since I don't have a good way to collect once requet finishes.
+	// if do it in the XOsFileAsyncOperation, could double count values.
+#if X_ENABLE_FILE_STATS
+	s_stats.NumBytesWrite += length;
+	++s_stats.NumWrties;
+#endif // !X_ENABLE_FILE_STATS
 
 	return op;
 }
