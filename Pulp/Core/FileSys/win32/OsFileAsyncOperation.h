@@ -26,6 +26,7 @@ public:
 	typedef MyOVERLAPPED AsyncOp;
 
 public:
+	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes);
 	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
 	XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
 	X_INLINE XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth);
@@ -42,6 +43,9 @@ public:
 
 	X_INLINE AsyncOp* getOverlapped(void);
 	X_INLINE const AsyncOp* getOverlapped(void) const;
+
+protected:
+	X_INLINE bool isFakeHandle(void) const;
 
 protected:
 	HANDLE hFile_;

@@ -5,6 +5,16 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_INLINE XOsFileAsyncOperationBase::XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes) :
+	hFile_(INVALID_HANDLE_VALUE),
+	overlapped_(X_NEW(MyOVERLAPPED, arena, "OVERLAPPED"), arena)
+{
+	auto* pOverlapped = getOverlapped();
+	core::zero_this<OVERLAPPED>(pOverlapped);
+
+	pOverlapped->Internal = numBytes;
+}
+
 X_INLINE XOsFileAsyncOperationBase::XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position) :
 	hFile_(hFile),
 	overlapped_(X_NEW(MyOVERLAPPED, arena, "OVERLAPPED"), arena)
@@ -46,6 +56,10 @@ X_INLINE void XOsFileAsyncOperationBase::cancel(void)
 {
 	DWORD bytesTransferred = 0;
 
+	if (isFakeHandle()) {
+		return;
+	}
+
 	if (::CancelIoEx(hFile_, getOverlapped()))
 	{
 		// wait for it to finish.
@@ -66,19 +80,13 @@ X_INLINE void XOsFileAsyncOperationBase::cancel(void)
 }
 
 
-X_INLINE XOsFileAsyncOperationBase::AsyncOp* XOsFileAsyncOperationBase::getOverlapped(void)
-{
-	return overlapped_.instance();
-}
-
-X_INLINE const XOsFileAsyncOperationBase::AsyncOp* XOsFileAsyncOperationBase::getOverlapped(void) const
-{
-	return overlapped_.instance();
-}
-
-
 X_INLINE bool XOsFileAsyncOperationBase::hasFinished(uint32_t* pNumBytes) const
 {
+	if (isFakeHandle()) {
+		*pNumBytes = safe_static_cast<uint32_t>(getOverlapped()->Internal);
+		return true;
+	}
+
 	// early out with fast check.
 	if (!HasOverlappedIoCompleted(overlapped_.instance())) {
 		return false;
@@ -103,6 +111,23 @@ X_INLINE bool XOsFileAsyncOperationBase::hasFinished(uint32_t* pNumBytes) const
 	return false;
 }
 
+
+X_INLINE XOsFileAsyncOperationBase::AsyncOp* XOsFileAsyncOperationBase::getOverlapped(void)
+{
+	return overlapped_.instance();
+}
+
+X_INLINE const XOsFileAsyncOperationBase::AsyncOp* XOsFileAsyncOperationBase::getOverlapped(void) const
+{
+	return overlapped_.instance();
+}
+
+X_INLINE bool XOsFileAsyncOperationBase::isFakeHandle(void) const
+{
+	return hFile_ == INVALID_HANDLE_VALUE;
+}
+
+
 // --------------------------------------------------------------------
 
 X_INLINE XOsFileAsyncOperationCompiltion::XOsFileAsyncOperationCompiltion(MemoryArenaBase* arena, 
@@ -120,6 +145,10 @@ X_INLINE XOsFileAsyncOperationCompiltion::XOsFileAsyncOperationCompiltion(Memory
 
 X_INLINE uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
 {
+	if (isFakeHandle()) {
+		return safe_static_cast<uint32_t>(getOverlapped()->Internal);
+	}
+
 	// same as above but with bWait = true;
 	DWORD bytesTransferred = 0;
 	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, true)) {
