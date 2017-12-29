@@ -35,6 +35,8 @@ public:
 
 	bool valid(void) const;
 
+	Type::Enum getType(void) const X_FINAL;
+
 	XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_FINAL;
 	XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_FINAL;
 
@@ -57,6 +59,11 @@ private:
 	const Pak* pPack_;
 	const AssetPak::APakEntry& entry_;
 };
+
+X_INLINE XPakFileAsync::Type::Enum XPakFileAsync::getType(void) const
+{
+	return Type::VIRTUAL;
+}
 
 #endif
 

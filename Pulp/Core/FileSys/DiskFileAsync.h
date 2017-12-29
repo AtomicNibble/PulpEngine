@@ -19,6 +19,8 @@ public:
 	/// Returns whether the disk file is valid.
 	X_INLINE bool valid(void) const;
 
+	Type::Enum getType(void) const X_FINAL;
+
 	XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_FINAL;
 	XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_FINAL;
 
@@ -37,6 +39,11 @@ public:
 private:
 	OsFileAsync file_;
 };
+
+X_INLINE XDiskFileAsync::Type::Enum XDiskFileAsync::getType(void) const
+{
+	return Type::DISK;
+}
 
 X_INLINE bool XDiskFileAsync::valid(void) const
 {

@@ -33,11 +33,16 @@ X_DECLARE_FLAG_OPERATORS(fileModeFlags);
 typedef core::XOsFileAsyncOperation XFileAsyncOperation;
 typedef core::XOsFileAsyncOperationCompiltion XFileAsyncOperationCompiltion;
 
+
 struct XFileAsync
 {
+	X_DECLARE_ENUM(Type)(DISK, VIRTUAL);
+
 	typedef XOsFileAsyncOperation::ComplitionRotinue ComplitionRotinue;
 
 	virtual ~XFileAsync() {};
+
+	virtual Type::Enum getType(void) const X_ABSTRACT;
 
 	virtual XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
 	virtual XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_ABSTRACT;
