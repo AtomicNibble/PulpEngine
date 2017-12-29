@@ -41,10 +41,6 @@ private:
 	core::MemoryArenaBase* overlappedArena_;
 	IFileSys::fileModeFlags mode_;
 	HANDLE hFile_;
-
-#if X_ENABLE_FILE_STATS
-	static XFileStats s_stats;
-#endif // !X_ENABLE_FILE_STATS
 };
 
 X_NAMESPACE_END

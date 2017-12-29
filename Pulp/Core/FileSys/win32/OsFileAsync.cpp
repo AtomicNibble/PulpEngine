@@ -14,11 +14,16 @@ X_NAMESPACE_BEGIN(core)
 
 namespace
 {
+#if X_ENABLE_FILE_STATS
+	static XFileStats s_stats;
+#endif // !X_ENABLE_FILE_STATS
 
 	VOID CALLBACK s_CompiletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
 	{
-		X_UNUSED(dwErrorCode);
-		X_UNUSED(dwNumberOfBytesTransfered);
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesRead += dwNumberOfBytesTransfered;
+		++s_stats.NumReads;
+#endif // !X_ENABLE_FILE_STATS
 
 		if (dwErrorCode == ERROR_OPERATION_ABORTED)
 		{
@@ -34,10 +39,6 @@ namespace
 	}
 
 } // namespace
-
-#if X_ENABLE_FILE_STATS
-XFileStats OsFileAsync::s_stats;
-#endif // !X_ENABLE_FILE_STATS
 
 
 OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
@@ -187,14 +188,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 	
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutine))
-	{
-#if X_ENABLE_FILE_STATS
-		s_stats.NumBytesRead += length;
-		++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
-	}
-	else 
+	if (!::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutine))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
@@ -220,14 +214,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 	
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutine))
-	{
-#if X_ENABLE_FILE_STATS
-		s_stats.NumBytesWrite += length;
-		++s_stats.NumWrties;
-#endif // !X_ENABLE_FILE_STATS
-	}
-	else 
+	if (!::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutine))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
