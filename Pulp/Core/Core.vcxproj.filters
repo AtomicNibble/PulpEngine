@@ -137,6 +137,9 @@
     <ClInclude Include="Vars\FileSysVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
+    <ClInclude Include="FileSys\Pak.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

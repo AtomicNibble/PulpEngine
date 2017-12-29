@@ -480,6 +480,7 @@
     <ClInclude Include="FileSys\DiskFile.h" />
     <ClInclude Include="FileSys\DiskFileAsync.h" />
     <ClInclude Include="FileSys\OsFile.h" />
+    <ClInclude Include="FileSys\Pak.h" />
     <ClInclude Include="FileSys\PakFileAsync.h" />
     <ClInclude Include="FileSys\PathUtil.h" />
     <ClInclude Include="FileSys\win32\OsFile.h" />
