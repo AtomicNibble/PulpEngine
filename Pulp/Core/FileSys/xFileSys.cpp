@@ -614,11 +614,12 @@ void xFileSys::addModDir(pathTypeW path)
 
 	// ok remove any ..//
 	core::Path<wchar_t> fixedPath;
-
 	if (!PathUtil::GetFullPath(path, fixedPath)) {
 		X_ERROR("FileSys", "addModDir full path name creation failed");
 		return;
 	}
+
+
 
 	if (!this->directoryExistsOS(fixedPath)) {
 		X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath);
