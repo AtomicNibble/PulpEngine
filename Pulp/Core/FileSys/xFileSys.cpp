@@ -1719,7 +1719,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 				pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
 			}
-			else
+			else if (fileType == XFileAsync::Type::VIRTUAL)
 			{
 				XPakFileAsync* pFile = static_cast<XPakFileAsync*>(pRead->pFile);
 
@@ -1751,11 +1751,17 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 					}
 				}
 			}
+			else
+			{
+				X_ASSERT_UNREACHABLE();
+			}
 		}
 		else if (type == IoRequest::WRITE)
 		{
 			IoRequestWrite* pWrite = static_cast<IoRequestWrite*>(pRequest);
 			XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pWrite->pFile);
+
+			X_ASSERT(pWrite->pFile->getType() != XFileAsync::Type::VIRTUAL, "Tried to write to virtual file")(pWrite->pFile->getType());
 
 #if X_ENABLE_FILE_STATS
 			stats_.NumBytesWrite += pWrite->dataSize;
