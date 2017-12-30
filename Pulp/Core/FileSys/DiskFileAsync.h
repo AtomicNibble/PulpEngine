@@ -24,8 +24,8 @@ public:
 	XFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position) X_FINAL;
 	XFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position) X_FINAL;
 
-	XFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_FINAL;
-	XFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack) X_FINAL;
+	XFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack);
+	XFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack);
 
 	X_INLINE void cancelAll(void) const X_FINAL;
 

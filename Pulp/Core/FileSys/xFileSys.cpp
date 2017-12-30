@@ -1575,7 +1575,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		else if (type == IoRequest::OPEN_READ_ALL)
 		{
 			IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
-			XFileAsync* pFile = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
+			XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode));
 
 			// make sure it's safe to allocate the buffer in this thread.
 			X_ASSERT_NOT_NULL(pOpenRead->arena);
@@ -1628,7 +1628,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		else if (type == IoRequest::OPEN_WRITE_ALL)
 		{
 			IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
-			XFileAsync* pFile = openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE);
+			XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE));
 
 			X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
 			X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());
@@ -1669,25 +1669,30 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 		else if (type == IoRequest::READ)
 		{
 			IoRequestRead* pRead = static_cast<IoRequestRead*>(pRequest);
-			XFileAsync* pFile = pRead->pFile;
-
+			auto fileType = pRead->pFile->getType();
+		
 #if X_ENABLE_FILE_STATS
 			stats_.NumBytesRead += pRead->dataSize;
 #endif // !X_ENABLE_FILE_STATS
 
-			XFileAsyncOperationCompiltion operation = pFile->readAsync(
-				pRead->pBuf,
-				pRead->dataSize,
-				pRead->offset,
-				compRoutine
-			);
+			if (fileType == XFileAsync::Type::DISK)
+			{
+				XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pRead->pFile);
+
+				XFileAsyncOperationCompiltion operation = pFile->readAsync(
+					pRead->pBuf,
+					pRead->dataSize,
+					pRead->offset,
+					compRoutine
+				);
 
 				pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
+			}
 		}
 		else if (type == IoRequest::WRITE)
 		{
 			IoRequestWrite* pWrite = static_cast<IoRequestWrite*>(pRequest);
-			XFileAsync* pFile = pWrite->pFile;
+			XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pWrite->pFile);
 
 #if X_ENABLE_FILE_STATS
 			stats_.NumBytesWrite += pWrite->dataSize;
