@@ -10,6 +10,7 @@
 #include <Util\LastError.h>
 #include <Util\UniquePointer.h>
 
+#include <ITimer.h>
 #include <IConsole.h>
 #include <IDirectoryWatcher.h>
 
@@ -182,6 +183,11 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 	currentRequestIdx_(0),
 	requestSignal_(true),
 	requests_(arena),
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	delayedOps_(arena),
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 	ioQueueDataArena_(arena)
 {
 	arena->addChildArena(&filePoolArena_);
@@ -1438,7 +1444,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
 		XFileAsync* pReqFile = pAsyncReq->pFile;
 
 		static_assert(core::compileTime::IsTrivialDestruct<IoRequestRead>::Value, "Need to call destructor");
-
+		
 		if (vars_.queueDebug_)
 		{
 			uint32_t threadId = core::Thread::GetCurrentID();
@@ -1559,20 +1565,55 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
 
 		if (asyncOp.op.ownsAsyncOp(pOperation))
 		{
-			onOpFinsihed(asyncOp, bytesTransferd);
-
-			pendingCompOps_.removeIndex(i);
-
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+			{
+				auto type = asyncOp.getType();
+				int32_t delayMS = 0;
+				if (type == IoRequest::READ)
+				{
+					delayMS = vars_.artReadDelay_;
+				}
+				else if (type == IoRequest::WRITE)
+				{
+					delayMS = vars_.artWriteDelay_;
+				}
+					
+				if (delayMS > 0)
+				{
+					const auto delay = core::TimeVal::fromMS(delayMS);
 
 #if X_ENABLE_FILE_STATS
-			stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
+					stats_.RequestTime[type] += delay.GetValue();
 #endif // !X_ENABLE_FILE_STATS
+
+					auto time = gEnv->pTimer->GetTimeNowReal() + delay;
+					 
+					delayedOps_.emplace(DelayedPendingCompiltionOp(std::move(asyncOp), time));
+					pendingCompOps_.removeIndex(i);
+
+					stats_.DelayedOps = delayedOps_.size();
+					return;
+				}
+			}
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+			onOpFinsihed(asyncOp, bytesTransferd);
+			pendingCompOps_.removeIndex(i);
+
+			updatePendingOpsStats();
 			return;
 		}
 	}
 
 	// failed to fine the op ;(
 	X_ASSERT_UNREACHABLE();
+}
+
+void xFileSys::updatePendingOpsStats(void)
+{
+#if X_ENABLE_FILE_STATS
+	stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
+#endif // !X_ENABLE_FILE_STATS
 }
 
 Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
@@ -1595,20 +1636,46 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				if (pendingOps_[i].op.hasFinished(&bytesTrans))
 				{
 					onOpFinsihed(pendingOps_[i], bytesTrans);
-
 					pendingOps_.removeIndex(i);
 
-#if X_ENABLE_FILE_STATS
-					stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
-#endif // !X_ENABLE_FILE_STATS
+					updatePendingOpsStats();
 				}
 			}
 		}
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+		if (delayedOps_.isNotEmpty())
+		{
+			auto now = gEnv->pTimer->GetTimeNowReal();
+
+			while (delayedOps_.isNotEmpty() && delayedOps_.peek().time < now)
+			{
+				auto& delayedOp = delayedOps_.peek().op;
+
+				uint32_t bytesTrans;
+				X_ASSERT(delayedOp.op.hasFinished(&bytesTrans), "Delayed op should be always be finished")();
+
+				onOpFinsihed(delayedOp, bytesTrans);
+
+				delayedOps_.pop();
+			}
+
+			stats_.DelayedOps = delayedOps_.size();
+		}
+#endif
+	};
+
+	auto noPendingOps = [&]() -> bool {
+		return pendingOps_.isEmpty()
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+			&& delayedOps_.isEmpty()
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+			;
 	};
 
 	while (thread.ShouldRun())
 	{
-		if (pendingCompOps_.isEmpty() && pendingOps_.isEmpty())
+		if (pendingCompOps_.isEmpty() && noPendingOps())
 		{
 			pRequest = popRequest();
 		}
@@ -1619,16 +1686,16 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			// we just stay in a alertable state, so that any pending requests can handled.
 			requestSignal_.wait(0, true);
 
-			if (pendingOps_.isNotEmpty()) {
-				checkForCompletedOps();
-			}
+			checkForCompletedOps();
 
 			while((pRequest = tryPopRequest()) == nullptr)
 			{
-				if (pendingOps_.isEmpty()) {
+				if (noPendingOps())
+				{
 					requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
 				}
-				else {
+				else 
+				{
 					// if we have some op's not waiting for APC wake up periodically and check them.
 					requestSignal_.wait(2, true);
 					

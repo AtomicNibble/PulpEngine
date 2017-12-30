@@ -109,6 +109,40 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 		}
 	};
 
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+	struct DelayedPendingCompiltionOp
+	{
+		DelayedPendingCompiltionOp(PendingCompiltionOp&& op, core::TimeVal time) :
+			op(std::move(op)),
+			time(time)
+		{
+		}
+
+		DelayedPendingCompiltionOp(DelayedPendingCompiltionOp&& oth) = default;
+
+		DelayedPendingCompiltionOp& operator=(DelayedPendingCompiltionOp&& oth) = default;
+
+		mutable PendingCompiltionOp op;
+		core::TimeVal time;
+	};
+
+	struct pendingop_less
+	{
+		bool operator()(const DelayedPendingCompiltionOp& lhs, const DelayedPendingCompiltionOp& rhs) const
+		{
+			return (lhs.time < rhs.time);
+		}
+	};
+
+	typedef core::PriorityQueue<DelayedPendingCompiltionOp, 
+		core::Array<DelayedPendingCompiltionOp>, pendingop_less> PendingComplitionOpPriorityQueue;
+
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
+
+
 	typedef core::MemoryArena<
 		core::PoolAllocator,
 		core::MultiThreadPolicy<core::Spinlock>,
@@ -328,6 +362,8 @@ private:
 	
 	bool isDebug(void) const;
 
+	void updatePendingOpsStats(void);
+
 private:
 	void Cmd_ListPaks(IConsoleCmdArgs* pCmd);
 
@@ -365,6 +401,11 @@ private:
 
 	AsyncComplitionOps pendingCompOps_;
 	AsyncOps pendingOps_;
+
+#if X_ENABLE_FILE_ARTIFICAIL_DELAY
+	PendingComplitionOpPriorityQueue delayedOps_;
+#endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
+
 
 #if X_ENABLE_FILE_STATS
 	IOQueueStats stats_;
