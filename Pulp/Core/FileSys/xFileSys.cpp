@@ -2014,8 +2014,8 @@ void xFileSys::listPaks(const char* pSearchPatten) const
 
 		auto* pPak = pSearch->pPak;
 
-		X_LOG0("FileSys", "^2%-32s ^7assets: ^2%" PRIu32 " ^7mode: ^2%s", pPak->name.c_str(), pPak->numAssets, PakMode::ToString(pPak->mode));
-
+		X_LOG0("FileSys", "^2%-32s ^7assets: ^2%" PRIu32 " ^7mode: ^2%s ^7openHandles: ^2%" PRIi32, 
+			pPak->name.c_str(), pPak->numAssets, PakMode::ToString(pPak->mode), pPak->openHandles);
 	}
 
 	X_LOG0("FileSys", "-------------- ^8Paks End^7 --------------");
