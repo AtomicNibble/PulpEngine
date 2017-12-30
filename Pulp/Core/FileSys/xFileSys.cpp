@@ -1767,7 +1767,7 @@ bool xFileSys::openPak(const char* pName)
 	mode.Set(fileMode::RANDOM_ACCESS);
 	// I'm not sharing, fuck you!
 
-	auto* pFile = openFileAsync(pName, mode);
+	auto* pFile = openOsFileAsync(pName, mode);
 	if (!pFile) {
 		X_ERROR("AssetPak", "Failed to open pak");
 		return false;

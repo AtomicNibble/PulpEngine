@@ -23,12 +23,8 @@ struct Pak
 	// oh my!, yes it's very sexy I must say.
 	// thanks..
 
-	// OsFileAsync* pFile; // handle to the file.
-	XFileAsync* pFile; // handle to the file.
-
-						// when i open a pack i want to load all the strings and the entry table.
-						// then i parse the null terms like a hot mess.
-						// 
+	OsFileAsync* pFile; 
+	
 	uint32_t numAssets;
 	uint32_t dataOffset;
 
@@ -36,9 +32,9 @@ struct Pak
 
 	core::Array<uint8_t> data; // from 0-data (or whole file if memory mode)
 	core::Array<const char*> strings;
-
 	const AssetPak::APakEntry* pEntires;
 
+	// 
 	core::XHashIndex hash;
 
 	core::AtomicInt openHandles;
