@@ -411,32 +411,80 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
-	core::Path<wchar_t> real_path;
+	core::Path<wchar_t> fullPath;
+
+	// so this needs to handle opening both disk files from the virtual dir's
+	// or opening files from a pak.
+	// the pak file don't need any disk paths.
+	// you can only open a pak file if no write access tho.
+	// we have search priority also.
+	// so specific dir's / pak's are checked first.
+	// if we have lots of packs and they all have same priority, i want a quicker lookup.
+	// like a pak group that has a hash of all files and pak index.
+	// but we do want override pak's like ones from mod dir so the file is taken from that first.
+	// i think the linked list layout is still appropriate, just might add a pak group node.
+	XDiskFileAsync* pFile = nullptr;
 
 	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
 	{
-		PathUtil::findData findinfo;
-		XFindData FindData(path, this);
+		// so we are going to look in the search list, till we find a file.
+		// findData can't deal with files in pak's correcly, it has the wrong api.
+		core::StrHash hash(path, strUtil::strlen(path));
 
-		if (!FindData.findnext(&findinfo))
+		for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
 		{
-			fileModeFlags::Description Dsc;
-			X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+			if (pSearch->pDir)
+			{
+				const auto* pDir = pSearch->pDir;
+
+				createOSPath(pDir, path, location, fullPath);
+
+				if (PathUtil::DoesFileExist(fullPath, true))
+				{
+					if (isDebug()) {
+						X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
+					}
+
+					pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath.c_str(), mode, &asyncOpPoolArena_);
+					break;
+				}
+			}
+			else if (pSearch->pPak) 
+			{
+				auto* pPak = pSearch->pPak;
+
+				auto idx = pPak->find(hash, path);
+				if (idx != -1)
+				{
+					if (isDebug()) {
+						X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", path, pPak->name.c_str());
+					}
+
+					auto& entry = pPak->pEntires[idx];
+					return X_NEW(XPakFileAsync, &filePoolArena_, "PakFileAsync")(pPak, entry, &asyncOpPoolArena_);
+				}
+			}
+			else
+			{
+				X_ASSERT_UNREACHABLE();
+			}	
+		}
+
+		if (!pFile) {
 			return nullptr;
 		}
-		
-		FindData.getOSPath(real_path, &findinfo);
 	}
 	else
 	{
-		createOSPath(gameDir_, path, location, real_path);
+		createOSPath(gameDir_, path, location, fullPath);
+
+		if (isDebug()) {
+			X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
+		}
+
+		pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath.c_str(), mode, &asyncOpPoolArena_);
 	}
 
-	if (isDebug()) {
-		X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
-	}
-
-	XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
 	if (pFile->valid()) {
 		return pFile;
 	}
