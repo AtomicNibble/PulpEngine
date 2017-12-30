@@ -188,10 +188,10 @@ bool Video::processHdr(core::XFileAsync* pFile, const IVFHdr& hdr)
 		return false;
 	}
 
-	vpx_codec_iface_t* interface = vpx_codec_vp8_dx();
+	vpx_codec_iface_t* pInterface = vpx_codec_vp8_dx();
 
 	int flags = 0;
-	if (vpx_codec_dec_init(&codec_, interface, nullptr, flags)) {
+	if (vpx_codec_dec_init(&codec_, pInterface, nullptr, flags)) {
 		X_ERROR("Vid", "Failed to initialize decoder: %s", vpx_codec_error_detail(&codec_));
 		return false;
 	}
