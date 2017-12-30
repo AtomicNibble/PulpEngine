@@ -677,7 +677,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 	for (size_t i=0; i<strings.size(); i++)
 	{
 		X_LOG0("AssetPak", "%-4" PRIuS " ^5%-45s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32, i, strings[i], 
-			(uint64_t)entries[i].offset, entries[i].size, core::StrHash(strings[i]));
+			(uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]));
 	}
 
 	return true;
