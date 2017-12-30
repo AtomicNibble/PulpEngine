@@ -1769,7 +1769,7 @@ bool xFileSys::openPak(const char* pName)
 
 	auto* pFile = openOsFileAsync(pName, mode);
 	if (!pFile) {
-		X_ERROR("AssetPak", "Failed to open pak");
+		X_ERROR("FileSys", "Failed to open pak");
 		return false;
 	}
 
@@ -1778,22 +1778,22 @@ bool xFileSys::openPak(const char* pName)
 
 	auto op = pFile->readAsync(&hdr, sizeof(hdr), 0);
 	if (op.waitUntilFinished() != sizeof(hdr)) {
-		X_ERROR("AssetPak", "Failed to open file for saving");
+		X_ERROR("FileSys", "Failed to read pak hdr");
 		return false;
 	}
 
 	if (!hdr.isValid()) {
-		X_ERROR("AssetPak", "Invalid header");
+		X_ERROR("FileSys", "Invalid pak header");
 		return false;
 	}
 
 	if (hdr.version != AssetPak::PAK_VERSION) {
-		X_ERROR("AssetPak", "Version incorrect. got %" PRIu8 " require %" PRIu8, hdr.version, AssetPak::PAK_VERSION);
+		X_ERROR("FileSys", "Pak Version incorrect. got %" PRIu8 " require %" PRIu8, hdr.version, AssetPak::PAK_VERSION);
 		return false;
 	}
 
 	if (hdr.numAssets == 0) {
-		X_ERROR("AssetPak", "Pak is empty.");
+		X_ERROR("FileSys", "Pak is empty.");
 		return false;
 	}
 
@@ -1832,7 +1832,7 @@ bool xFileSys::openPak(const char* pName)
 	// read all the data.
 	op = pFile->readAsync(pPak->data.data(), pPak->data.size(), 0);
 	if (op.waitUntilFinished() != pPak->data.size()) {
-		X_ERROR("AssetPak", "Error reading pak data");
+		X_ERROR("FileSys", "Error reading pak data");
 		return false;
 	}
 
@@ -1852,7 +1852,7 @@ bool xFileSys::openPak(const char* pName)
 	}
 
 	if (pPak->strings.size() != hdr.numAssets) {
-		X_ERROR("AssetPak", "Error loading pak");
+		X_ERROR("FileSys", "Error loading pak");
 		return false;
 	}
 
