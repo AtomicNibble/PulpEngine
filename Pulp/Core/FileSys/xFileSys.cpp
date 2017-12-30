@@ -1608,8 +1608,6 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 	while (thread.ShouldRun())
 	{
-		checkForCompletedOps();
-
 		if (pendingCompOps_.isEmpty() && pendingOps_.isEmpty())
 		{
 			pRequest = popRequest();
@@ -1621,16 +1619,21 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 			// we just stay in a alertable state, so that any pending requests can handled.
 			requestSignal_.wait(0, true);
 
+			if (pendingOps_.isNotEmpty()) {
+				checkForCompletedOps();
+			}
+
 			while((pRequest = tryPopRequest()) == nullptr)
 			{
 				if (pendingOps_.isEmpty()) {
 					requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
 				}
 				else {
+					// if we have some op's not waiting for APC wake up periodically and check them.
 					requestSignal_.wait(2, true);
+					
+					checkForCompletedOps();
 				}
-
-				checkForCompletedOps();
 			}
 
 			// we have a request.
