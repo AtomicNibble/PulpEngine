@@ -24,6 +24,7 @@ public:
 	
 	uint32_t numAssets;
 	uint32_t dataOffset;
+	uint64_t fileSize;
 
 	PakMode::Enum mode;
 
