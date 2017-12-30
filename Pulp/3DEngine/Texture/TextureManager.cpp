@@ -206,6 +206,8 @@ void TextureManager::dispatchRead(Texture* pTexture)
 {
 	X_UNUSED(pTexture);
 
+	pTexture->setStatus(core::LoadStatus::Loading);
+
 	// lets dispatch a IO request to read the image data.
 	// where to we store the data?
 	// we want fixed buffers for streaming.
