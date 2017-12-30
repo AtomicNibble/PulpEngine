@@ -5,6 +5,7 @@
 #define X_MODEL_H_
 
 #include <Util\UniquePointer.h>
+#include <Util\Span.h>
 #include <Assets\AssetBase.h>
 
 #include <IModel.h>
@@ -52,7 +53,7 @@ public:
 
 	X_INLINE const char* getBoneName(size_t idx) const;
 	X_INLINE BoneHandle getBoneHandle(const char* pName) const;
-	X_INLINE const uint8_t*	getTagTree(void) const;
+	X_INLINE core::span<const uint8_t> getTagTree(void) const;
 	X_INLINE const XQuatCompressedf& getBoneAngle(size_t idx) const;
 	X_INLINE const XQuatCompressedf& getBoneAngleRel(size_t idx) const;
 	X_INLINE const Vec3f getBonePosRel(size_t idx) const;

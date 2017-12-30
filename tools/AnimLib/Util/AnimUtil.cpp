@@ -10,14 +10,14 @@ namespace Util
 
 
 	void transformBones(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats, 
-		const uint8_t* pParents, const int32_t firstJoint, const int32_t lastJoint)
+		core::span<const uint8_t> parents, const int32_t firstJoint, const int32_t lastJoint)
 	{
 		X_ASSERT(lastJoint < safe_static_cast<int32_t>(mats.size()), "out of range")(lastJoint, mats.size());
 		X_ASSERT(firstJoint <= lastJoint, "out of range")(firstJoint, lastJoint);
 
 		for (int32_t i = firstJoint; i <= lastJoint; i++) {
 			
-			auto parentIdx = pParents[i];
+			auto parentIdx = parents[i];
 			X_ASSERT(parentIdx  < mats.size(), "Parent out of range")(parentIdx);
 
 			// make sure our parent has been transformed.

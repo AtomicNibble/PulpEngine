@@ -120,9 +120,9 @@ X_INLINE BoneHandle XModel::getBoneHandle(const char* pName) const
 	return INVALID_BONE_HANDLE;
 }
 
-X_INLINE const uint8_t*	XModel::getTagTree(void) const
+X_INLINE core::span<const uint8_t>XModel::getTagTree(void) const
 {
-	return pTagTree_;
+	return core::make_span(pTagTree_, getNumBones());
 }
 
 X_INLINE const XQuatCompressedf& XModel::getBoneAngle(size_t idx) const
