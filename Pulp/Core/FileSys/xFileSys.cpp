@@ -1938,7 +1938,7 @@ bool xFileSys::openPak(const char* pName)
 	}
 
 	const size_t stringBlockSize = hdr.entryTableOffset - hdr.stringDataOffset;
-	const size_t dataSize = (pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
+	const size_t dataSize = safe_static_cast<size_t>(pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
 	auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
 	pPak->name.set(pName);

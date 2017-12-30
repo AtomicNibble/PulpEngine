@@ -95,7 +95,7 @@ private:
 
 private:
 	uint64_t getPosition(uint64_t pos) const;
-	uint64_t getLength(size_t length, uint64_t pos) const;
+	size_t getLength(size_t length, uint64_t pos) const;
 
 private:
 	core::MemoryArenaBase* overlappedArena_;
