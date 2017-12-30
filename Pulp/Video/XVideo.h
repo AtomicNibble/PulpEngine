@@ -82,7 +82,8 @@ private:
 
 	VideoState::Enum state_;	
 	bool presentFrame_;
-	bool _pad[2];
+	bool isStarved_;
+	bool ioRequestPending_;
 
 	core::V2::Job* pDecodeJob_;
 

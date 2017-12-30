@@ -23,6 +23,8 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
 	curFrame_(0),
 	state_(VideoState::Playing),
 	presentFrame_(false),
+	isStarved_(false),
+	ioRequestPending_(false),
 	pFile_(nullptr),
 	fileOffset_(0),
 	fileLength_(0),
@@ -96,7 +98,11 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 		}
 
 		if (!pDecodeJob_) {
+			isStarved_ = true;
 			X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
+		}
+		else {
+			isStarved_ = false;
 		}
 	}
 
@@ -130,6 +136,10 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 		return;
 	}
 	
+	if (isStarved_) {
+		return;
+	}
+
 	// stall untill the decode has finished.
 	X_ASSERT_NOT_NULL(pDecodeJob_);
 
@@ -207,8 +217,10 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 
 		// the io buffer has loaded, copy into ring buffer.
 		X_ASSERT(ringBuffer_.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(ringBuffer_.freeSpace(), pReadReq->dataSize);
-
+	
 		ringBuffer_.write(pBuf, bytesTransferred);
+
+		ioRequestPending_ = false;
 
 		if (ringBuffer_.freeSpace() >= IO_BUFFER_SIZE) {
 			dispatchRead();
@@ -220,6 +232,13 @@ void Video::dispatchRead(void)
 {
 	core::CriticalSection::ScopedLock lock(cs_);
 
+	// we have one IO buffer currently.
+	// could add multiple if decide it's worth dispatching multiple requests.
+	// i think having atleast 2 active would be worth it.
+	if (ioRequestPending_) {
+		return;
+	}
+
 	if (ringBuffer_.freeSpace() < IO_BUFFER_SIZE) {
 		return;
 	}
@@ -228,6 +247,8 @@ void Video::dispatchRead(void)
 	if (bytesLeft == 0) {
 		return;
 	}
+
+	ioRequestPending_ = true;
 
 	auto requestSize = core::Min<uint64_t>(IO_BUFFER_SIZE, bytesLeft);
 
