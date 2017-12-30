@@ -18,15 +18,9 @@ namespace
 	static XFileStats s_stats;
 #endif // !X_ENABLE_FILE_STATS
 
-	VOID CALLBACK s_CompiletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
+	inline VOID CALLBACK s_CompiletionRoutine(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
 	{
-#if X_ENABLE_FILE_STATS
-		s_stats.NumBytesRead += dwNumberOfBytesTransfered;
-		++s_stats.NumReads;
-#endif // !X_ENABLE_FILE_STATS
-
-		if (dwErrorCode == ERROR_OPERATION_ABORTED)
-		{
+		if (dwErrorCode == ERROR_OPERATION_ABORTED) {
 			X_WARNING("AsyncFile", "Operation was aborted");
 		}
 
@@ -36,6 +30,27 @@ namespace
 		X_ASSERT(pOverlap->callback, "Callback not valid")();
 
 		pOverlap->callback.Invoke(pOverlap, static_cast<uint32_t>(dwNumberOfBytesTransfered));
+	}
+
+
+	VOID CALLBACK s_CompiletionRoutineWrite(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
+	{
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesWrite += dwNumberOfBytesTransfered;
+		++s_stats.NumReads;
+#endif // !X_ENABLE_FILE_STATS
+
+		s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
+	}
+
+	VOID CALLBACK s_CompiletionRoutineRead(DWORD dwErrorCode, DWORD dwNumberOfBytesTransfered, LPOVERLAPPED lpOverlap)
+	{
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesRead += dwNumberOfBytesTransfered;
+		++s_stats.NumReads;
+#endif // !X_ENABLE_FILE_STATS
+
+		s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
 	}
 
 } // namespace
@@ -124,7 +139,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 	}
 
 #if X_ENABLE_FILE_STATS
-	s_stats.NumBytesWrite += length;
+	s_stats.NumBytesRead += length;
 	++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 
@@ -185,7 +200,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::readAsync(void* pBuffer, size_t len
 	
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (!::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutine))
+	if (!::ReadFileEx(hFile_, pBuffer, length32, pOverlapped, s_CompiletionRoutineRead))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
@@ -211,7 +226,7 @@ XOsFileAsyncOperationCompiltion OsFileAsync::writeAsync(void* pBuffer, size_t le
 	
 	uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
-	if (!::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutine))
+	if (!::WriteFileEx(hFile_, pBuffer, length32, op.getOverlapped(), s_CompiletionRoutineWrite))
 	{
 		auto err = lastError::Get();
 		if (err != ERROR_IO_PENDING)
