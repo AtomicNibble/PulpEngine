@@ -210,11 +210,20 @@ uint64_t OsFile::tell(void) const
 
 uint64_t OsFile::remainingBytes(void) const
 {
-	_BY_HANDLE_FILE_INFORMATION info;
-
 #if X_ENABLE_FILE_STATS
 	s_stats.NumByteLeftChecks++;
 #endif // !X_ENABLE_FILE_STATS
+
+	uint64_t size = fileSize();
+	uint64_t offset = tell();
+	X_ASSERT(size >= offset, "File offset is larger than file size")(size, offset);
+	return size - offset;
+}
+
+
+uint64_t OsFile::fileSize(void) const
+{
+	_BY_HANDLE_FILE_INFORMATION info;
 
 	if (!GetFileInformationByHandle(file_, &info))
 	{
@@ -223,10 +232,9 @@ uint64_t OsFile::remainingBytes(void) const
 	}
 
 	uint64_t fileSize = (static_cast<uint64_t>(info.nFileSizeHigh) << 32) | static_cast<uint64_t>(info.nFileSizeLow);
-	uint64_t offset = tell();
-	X_ASSERT(fileSize >= offset, "File offset is larger than file size")(fileSize, offset);
-	return fileSize - offset;
+	return fileSize;
 }
+
 
 void OsFile::setSize(int64_t numBytes)
 {

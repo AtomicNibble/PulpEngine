@@ -30,6 +30,7 @@ public:
 
 	uint64_t tell(void) const;
 	uint64_t remainingBytes(void) const;
+	uint64_t fileSize(void) const;
 	void setSize(int64_t numBytes);
 
 	bool valid(void) const;
