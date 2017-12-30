@@ -2,16 +2,51 @@
 #include "PakFileAsync.h"
 
 #include "xFileSys.h"
+#include "Pak.h"
+
+#include <Threading\JobSystem2.h>
+
+#include <ICompression.h>
+#include <Compression\CompressorAlloc.h>
+
+#include X_INCLUDE(X_PLATFORM/OsFileAsync.h)
+
 
 X_NAMESPACE_BEGIN(core)
 
-#if 1
+namespace
+{
+
+#if X_ENABLE_FILE_STATS
+	static XFileStats s_stats;
+#endif // !X_ENABLE_FILE_STATS
+
+	struct CopyJobData
+	{
+		void* pBuffer;
+		size_t position; // 32bit since can't have large pak's in mmeory.
+		size_t length;
+	};
+
+	struct InflateJobData
+	{
+		core::MemoryArenaBase* arena;
+		const void* pBuffer;
+		void* pDst;
+		size_t length;
+		size_t dstLength;
+	};
+
+
+} // namespace
+
 
 XPakFileAsync::XPakFileAsync(const Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena) :
 	pPack_(pPack),
-	entry_(entry)
+	entry_(entry),
+	overlappedArena_(asyncOpArena)
 {
-	X_UNUSED(asyncOpArena);
+	
 }
 
 XPakFileAsync::~XPakFileAsync()
@@ -19,41 +54,117 @@ XPakFileAsync::~XPakFileAsync()
 
 }
 
+void XPakFileAsync::Job_copyData(core::V2::JobSystem&, size_t, core::V2::Job*, void* jobData)
+{
+	const CopyJobData* pData = static_cast<const CopyJobData*>(jobData);
+
+	std::memcpy(pData->pBuffer, &pPack_->data[pData->position], pData->length);
+}
+
+void XPakFileAsync::Job_InflateData(core::V2::JobSystem&, size_t, core::V2::Job*, void* jobData)
+{
+	const InflateJobData* pData = static_cast<const InflateJobData*>(jobData);
+	const uint8_t* pBuffer = static_cast<const uint8_t*>(pData->pBuffer);
+	uint8_t* pDst = static_cast<uint8_t*>(pData->pDst);
+
+	if (!core::Compression::ICompressor::validBuffer(make_span(pBuffer, pData->length))) {
+		X_FATAL("PakFile", "Data is not a valid compressed buffer");
+		return;
+	}
+
+	auto algo = core::Compression::ICompressor::getAlgo(make_span(pBuffer, pData->length));
+	core::Compression::CompressorAlloc comp(algo);
+
+	if (!comp->inflate(pData->arena, pBuffer, pBuffer + pData->length, pDst, pDst + pData->dstLength))
+	{
+		// shiieeet.
+		X_FATAL("PakFile", "failed to inflate");
+	}
+}
+
+
 XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	uint64_t pakPos = getPosition(length, position);
-	return pPack_->pFile->readAsync(pBuffer, length, pakPos);
+	X_ASSERT((length == entry_.size || length == entry_.inflatedSize) && position == 0, "Partial reads not supported for compressed files.")(length, position);
+
+	uint64_t pakPos = getPosition(position);
+	size_t pakLength = getLength(length, position);
+
+	if (pPack_->mode == PakMode::MEMORY)
+	{
+#if X_ENABLE_FILE_STATS
+		s_stats.NumBytesWrite += pakLength;
+		++s_stats.NumWrties;
+#endif // !X_ENABLE_FILE_STATS
+
+		auto* pSrc = &pPack_->data[safe_static_cast<size_t>(pakPos)];
+		auto length32 = safe_static_cast<uint32_t>(pakLength);
+
+		if (entry_.isCompressed())
+		{
+			InflateJobData data;
+			data.arena = g_coreArena;
+			data.pBuffer = pSrc;
+			data.length = entry_.size;
+			data.pDst = pBuffer;
+			data.dstLength = pakLength;
+
+			auto* pJob = gEnv->pJobSys->CreateMemberJobAndRun<XPakFileAsync>(this, &XPakFileAsync::Job_InflateData, data
+				JOB_SYS_SUB_PASS(profiler::SubSys::CORE));
+
+			return XFileAsyncOperation(overlappedArena_, length32, pJob);
+		}
+
+		if (length32 > (1024 * 1024 * 4))
+		{
+			CopyJobData data;
+			data.pBuffer = pBuffer;
+			data.length = pakLength;
+			data.position = safe_static_cast<size_t>(pakPos);
+
+			auto* pJob = gEnv->pJobSys->CreateMemberJobAndRun<XPakFileAsync>(this, &XPakFileAsync::Job_copyData, data
+				JOB_SYS_SUB_PASS(profiler::SubSys::CORE));
+
+			return XFileAsyncOperation(overlappedArena_, length32, pJob);
+		}
+
+		std::memcpy(pBuffer, pSrc, pakLength);
+
+		return XFileAsyncOperation(overlappedArena_, length32);
+	}
+
+	return pPack_->pFile->readAsync(pBuffer, pakLength, pakPos);
 }
 
 XFileAsyncOperation XPakFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
 {
-	// not allowed
-	X_UNUSED(pBuffer, length, position);
+	// not allowed to write to pak
 	X_ASSERT_UNREACHABLE();
 
-	uint64_t pakPos = getPosition(length, position);
-	return pPack_->pFile->writeAsync(pBuffer, length, pakPos);
+	uint64_t pakPos = getPosition(position);
+	size_t pakLength = getLength(length, position);
+
+	return pPack_->pFile->writeAsync(pBuffer, pakLength, pakPos);
 }
 
 XFileAsyncOperationCompiltion XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
 {
-	uint64_t pakPos = getPosition(length, position);
+	X_ASSERT(supportsComplitionRoutine(), "Competition routine not supported")(supportsComplitionRoutine());
 
-	return pPack_->pFile->readAsync(pBuffer, length, pakPos, callBack);
+	uint64_t pakPos = getPosition(position);
+	size_t pakLength = getLength(length, position);
+
+	return pPack_->pFile->readAsync(pBuffer, pakLength, pakPos, callBack);
 }
 
-XFileAsyncOperationCompiltion XPakFileAsync::writeAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
-{
-	// not allowed
-	X_UNUSED(pBuffer, length, position, callBack);
-	X_ASSERT_UNREACHABLE();
-
-	uint64_t pakPos = getPosition(length, position);
-	return pPack_->pFile->writeAsync(pBuffer, length, pakPos, callBack);
-}
 
 uint64_t XPakFileAsync::fileSize(void) const
 {
+	if (pPack_->mode == PakMode::STREAM)
+	{
+		return entry_.size;
+	}
+	
 	return entry_.inflatedSize;
 }
 
@@ -69,6 +180,11 @@ bool XPakFileAsync::valid(void) const
 	return true;
 }
 
+bool XPakFileAsync::supportsComplitionRoutine(void) const
+{
+	return pPack_->mode == PakMode::STREAM && !entry_.isCompressed();
+}
+
 void XPakFileAsync::cancelAll(void) const
 {
 	X_ASSERT_NOT_IMPLEMENTED();
@@ -80,14 +196,30 @@ size_t XPakFileAsync::waitUntilFinished(const XFileAsyncOperation& operation)
 }
 
 
-X_INLINE uint64_t XPakFileAsync::getPosition(size_t length, uint64_t pos) const
+X_INLINE uint64_t XPakFileAsync::getPosition(uint64_t pos) const
 {
-	const uint32_t end = safe_static_cast<uint32_t>(pos + length);
-	X_ASSERT(end <= entry_.inflatedSize, "Read past end of file in pak")(pos, length, end);
-
 	return pPack_->dataOffset + entry_.offset + pos;
 }
 
-#endif
+X_INLINE size_t XPakFileAsync::getLength(size_t length, uint64_t pos) const
+{
+	const auto end = pos + length;
+	const auto size = fileSize();
+
+	if (end > size) {
+		X_WARNING("PakFile", "Attempted to read past end of file in pak");
+		return safe_static_cast<size_t>(size - pos);
+	}
+
+	return length;
+}
+
+
+#if X_ENABLE_FILE_STATS
+XFileStats& XPakFileAsync::fileStats(void)
+{
+	return s_stats;
+}
+#endif // !X_ENABLE_FILE_STATS
 
 X_NAMESPACE_END
