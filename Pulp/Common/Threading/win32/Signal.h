@@ -23,7 +23,7 @@ public:
 
 	// if we waited post wake up the state is auto set to 'none-signaled' 
 	// if multiple threads are waiting only one will wake.
-	bool wait(uint32_t timeout = WAIT_INFINITE, bool alertable = false);
+	bool wait(uint32_t timeoutMS = WAIT_INFINITE, bool alertable = false);
 
 
 private:
