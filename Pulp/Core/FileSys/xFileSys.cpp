@@ -1581,11 +1581,6 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
 				if (delayMS > 0)
 				{
 					const auto delay = core::TimeVal::fromMS(delayMS);
-
-#if X_ENABLE_FILE_STATS
-					stats_.RequestTime[type] += delay.GetValue();
-#endif // !X_ENABLE_FILE_STATS
-
 					auto time = gEnv->pTimer->GetTimeNowReal() + delay;
 					 
 					delayedOps_.emplace(DelayedPendingCompiltionOp(std::move(asyncOp), time));
