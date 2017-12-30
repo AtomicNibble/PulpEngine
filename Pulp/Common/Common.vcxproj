@@ -436,6 +436,7 @@
     <ClInclude Include="Util\Process.h" />
     <ClInclude Include="Util\ReferenceCounted.h" />
     <ClInclude Include="Util\ReferenceCountedOwner.h" />
+    <ClInclude Include="Util\Span.h" />
     <ClInclude Include="Util\UniquePointer.h" />
     <ClInclude Include="Util\SmartPointer.h" />
     <ClInclude Include="Util\SourceInfo.h" />

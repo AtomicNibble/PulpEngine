@@ -1306,6 +1306,9 @@
     <ClInclude Include="Compression\CompressorAlloc.h">
       <Filter>Headers\Compression</Filter>
     </ClInclude>
+    <ClInclude Include="Util\Span.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
