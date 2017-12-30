@@ -411,7 +411,7 @@ void TextureManager::listTextures(const char* pSearchPattern)
 
 	for (const auto* pTex : sorted_texs)
 	{
-		X_LOG0("Texture", "^2\"%s\"^7 Dim: ^2%" PRIi32 "x%" PRIi32 " ^7Mips: ^2%" PRIi32 "^7 Fmt: ^2%s ^7Refs: ^2%" PRIi32,
+		X_LOG0("Texture", "^2%-32s^7 Dim: ^2%" PRIi32 "x%" PRIi32 " ^7Mips: ^2%" PRIi32 "^7 Fmt: ^2%s ^7Refs: ^2%" PRIi32,
 			pTex->getName(), pTex->getWidth(), pTex->getHeight(), pTex->getNumMips(), 
 			texture::Texturefmt::ToString(pTex->getFormat()), pTex->getRefCount());
 	}
