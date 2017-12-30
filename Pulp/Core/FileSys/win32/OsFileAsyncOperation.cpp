@@ -1,9 +1,7 @@
 #include "stdafx.h"
 #include "OsFileAsyncOperation.h"
 
-#include <Util\LastError.h>
 
-#include <Threading\JobSystem2.h>
 
 
 X_NAMESPACE_BEGIN(core)
@@ -86,35 +84,6 @@ bool XOsFileAsyncOperationBase::hasFinished(uint32_t* pNumBytes) const
 	core::lastError::Description Dsc;
 	X_ERROR("AsyncFile", "Failed to check if async request has finsihed. Error: %s", core::lastError::ToString(err, Dsc));
 	return false;
-}
-
-// --------------------------------------------------------------------
-
-uint32_t XOsFileAsyncOperation::waitUntilFinished(void) const
-{
-	if (isFakeHandle()) {
-
-		auto* pOverlapped = getOverlapped();
-		if (pOverlapped->Pointer) {
-			auto* pJob = reinterpret_cast<core::V2::Job*>(pOverlapped->Pointer);
-			gEnv->pJobSys->Wait(pJob);
-		}
-
-		return safe_static_cast<uint32_t>(pOverlapped->Internal);
-	}
-
-	// same as above but with bWait = true;
-	DWORD bytesTransferred = 0;
-	if (::GetOverlappedResult(hFile_, overlapped_.instance(), &bytesTransferred, true)) {
-		return safe_static_cast<uint32_t>(bytesTransferred);
-	}
-
-	// some goaty error
-	core::lastError::Description Dsc;
-	X_ERROR("AsyncFile", "Failed to wait until async request has finsihed. Error: %s", core::lastError::ToString(Dsc));
-
-	// nope.
-	return 0;
 }
 
 

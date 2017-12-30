@@ -3,8 +3,11 @@
 #ifndef _X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_
 #define _X_FILE_SYSTEM_OSFILE_ASYNC_OPERATION_H_
 
-#include "Util\ReferenceCounted.h"
-#include "Util\ReferenceCountedOwner.h"
+#include <Util\ReferenceCounted.h>
+#include <Util\ReferenceCountedOwner.h>
+
+#include <Threading\JobSystem2.h>
+#include <Util\LastError.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -71,7 +74,7 @@ public:
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.
-	uint32_t waitUntilFinished(void) const;
+	X_INLINE uint32_t waitUntilFinished(void) const;
 };
 
 
