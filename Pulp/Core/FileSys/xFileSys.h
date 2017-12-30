@@ -28,6 +28,8 @@ X_ENABLE_WARNING(4702)
 
 X_NAMESPACE_BEGIN(core)
 
+class OsFileAsync;
+
 struct IConsoleCmdArgs;
 
 
@@ -292,6 +294,9 @@ private:
 	// ~ThreadAbstract
 
 private:
+
+	OsFileAsync* openOsFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME);
+
 
 	bool openPak(const char* pName);
 

@@ -1720,6 +1720,44 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	return Thread::ReturnValue(0);
 }
 
+OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
+{
+	core::Path<wchar_t> real_path;
+
+	if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE))
+	{
+		PathUtil::findData findinfo;
+		XFindData FindData(path, this);
+
+		if (!FindData.findnext(&findinfo))
+		{
+			fileModeFlags::Description Dsc;
+			X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
+			return nullptr;
+		}
+
+		FindData.getOSPath(real_path, &findinfo);
+	}
+	else
+	{
+		createOSPath(gameDir_, path, location, real_path);
+	}
+
+	if (isDebug()) {
+		X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
+	}
+
+
+	OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+	if (pFile->valid()) {
+		return pFile;
+	}
+
+	X_DELETE(pFile, &filePoolArena_);
+	return nullptr;
+
+}
+
 bool xFileSys::openPak(const char* pName)
 {
 	// you can only open pak's from inside the virtual filesystem.
