@@ -5,6 +5,11 @@
       <Item Name="[size]" ExcludeView="simple">byteIdx_ - readByteIdx_</Item>
       <Item Name="[capacity]" ExcludeView="simple">numBytes_</Item>
       <Item Name="[freespace]" ExcludeView="simple">numBytes_ - (byteIdx_ - readByteIdx_)</Item>
+      <Item Name="[begin]" ExcludeView="simple">(char*)(pBegin_)</Item>
+      <Item Name="[write_idx]" ExcludeView="simple">byteIdx_ % numBytes_</Item>
+      <Item Name="[read_idx]" ExcludeView="simple">readByteIdx_ % numBytes_</Item>
+      <Item Name="[read_ptr]" ExcludeView="simple">(uint8_t*)(pBegin_ + (readByteIdx_ % numBytes_))</Item>
+      <Item Name="[mask]" ExcludeView="simple">mask_</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
