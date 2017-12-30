@@ -1378,6 +1378,7 @@
     <Natvis Include="ByteStream.natvis" />
     <Natvis Include="FiFo.natvis" />
     <Natvis Include="FixedArray.natvis" />
+    <Natvis Include="FixedByteStreamRing.natvis" />
     <Natvis Include="Math.natvis" />
     <Natvis Include="Pointer.natvis" />
     <Natvis Include="ResourceStateBase.natvis" />

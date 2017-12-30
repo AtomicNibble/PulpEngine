@@ -2075,5 +2075,8 @@
     <Natvis Include="ResourceStateBase.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="FixedByteStreamRing.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::FixedByteStreamRingBase">
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">byteIdx_ - readByteIdx_</Item>
+      <Item Name="[capacity]" ExcludeView="simple">numBytes_</Item>
+      <Item Name="[freespace]" ExcludeView="simple">numBytes_ - (byteIdx_ - readByteIdx_)</Item>
+    </Expand>
+  </Type>
+</AutoVisualizer>
