@@ -82,7 +82,13 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 		{
 			auto& hdr = ringBuffer_.peek<IVFFrameHdr>();
 
-			if (ringBuffer_.size() >= (hdr.frameDataSize + sizeof(IVFFrameHdr)))
+			const auto totalFrameSize = (hdr.frameDataSize + sizeof(IVFFrameHdr));
+
+			if (totalFrameSize  > RING_BUFFER_SIZE) {
+				X_ERROR("Video", "Single frame in \"%s\" is bigger than buffer size", name_.c_str());
+			}
+
+			if (ringBuffer_.size() >= totalFrameSize)
 			{
 				// we have a full frame.
 				ringBuffer_.skip(sizeof(IVFFrameHdr));
