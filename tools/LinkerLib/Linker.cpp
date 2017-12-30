@@ -73,6 +73,11 @@ bool Linker::Build(void)
 	X_LOG0("Linker", "Added %" PRIi32 " asset(s) in ^6%s", numAssets,
 		core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 
+	AssetPak::PakBuilderFlags flags;
+	flags.Set(AssetPak::PakBuilderFlag::COMPRESSION);
+
+	builder_.setFlags(flags);
+
 	builder_.bake();
 	builder_.save(outPath);
 
