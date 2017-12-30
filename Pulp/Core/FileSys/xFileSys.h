@@ -77,6 +77,7 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 			return reinterpret_cast<T*>(pRequest.get());
 		}
 
+	private:
 		core::UniquePointer<IoRequestBase> pRequest;
 	};
 
