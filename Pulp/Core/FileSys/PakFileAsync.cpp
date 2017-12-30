@@ -41,24 +41,24 @@ namespace
 } // namespace
 
 
-XPakFileAsync::XPakFileAsync(const Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena) :
-	pPack_(pPack),
+XPakFileAsync::XPakFileAsync(Pak* pPack, const AssetPak::APakEntry& entry, core::MemoryArenaBase* asyncOpArena) :
+	pPak_(pPack),
 	entry_(entry),
 	overlappedArena_(asyncOpArena)
 {
-	
+	++pPak_->openHandles;
 }
 
 XPakFileAsync::~XPakFileAsync()
 {
-
+	--pPak_->openHandles;
 }
 
 void XPakFileAsync::Job_copyData(core::V2::JobSystem&, size_t, core::V2::Job*, void* jobData)
 {
 	const CopyJobData* pData = static_cast<const CopyJobData*>(jobData);
 
-	std::memcpy(pData->pBuffer, &pPack_->data[pData->position], pData->length);
+	std::memcpy(pData->pBuffer, &pPak_->data[pData->position], pData->length);
 }
 
 void XPakFileAsync::Job_InflateData(core::V2::JobSystem&, size_t, core::V2::Job*, void* jobData)
@@ -90,14 +90,14 @@ XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint6
 	uint64_t pakPos = getPosition(position);
 	size_t pakLength = getLength(length, position);
 
-	if (pPack_->mode == PakMode::MEMORY)
+	if (pPak_->mode == PakMode::MEMORY)
 	{
 #if X_ENABLE_FILE_STATS
 		s_stats.NumBytesWrite += pakLength;
 		++s_stats.NumWrties;
 #endif // !X_ENABLE_FILE_STATS
 
-		auto* pSrc = &pPack_->data[safe_static_cast<size_t>(pakPos)];
+		auto* pSrc = &pPak_->data[safe_static_cast<size_t>(pakPos)];
 		auto length32 = safe_static_cast<uint32_t>(pakLength);
 
 		if (entry_.isCompressed())
@@ -133,7 +133,7 @@ XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint6
 		return XFileAsyncOperation(overlappedArena_, length32);
 	}
 
-	return pPack_->pFile->readAsync(pBuffer, pakLength, pakPos);
+	return pPak_->pFile->readAsync(pBuffer, pakLength, pakPos);
 }
 
 XFileAsyncOperation XPakFileAsync::writeAsync(const void* pBuffer, size_t length, uint64_t position)
@@ -144,7 +144,7 @@ XFileAsyncOperation XPakFileAsync::writeAsync(const void* pBuffer, size_t length
 	uint64_t pakPos = getPosition(position);
 	size_t pakLength = getLength(length, position);
 
-	return pPack_->pFile->writeAsync(pBuffer, pakLength, pakPos);
+	return pPak_->pFile->writeAsync(pBuffer, pakLength, pakPos);
 }
 
 XFileAsyncOperationCompiltion XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
@@ -154,13 +154,13 @@ XFileAsyncOperationCompiltion XPakFileAsync::readAsync(void* pBuffer, size_t len
 	uint64_t pakPos = getPosition(position);
 	size_t pakLength = getLength(length, position);
 
-	return pPack_->pFile->readAsync(pBuffer, pakLength, pakPos, callBack);
+	return pPak_->pFile->readAsync(pBuffer, pakLength, pakPos, callBack);
 }
 
 
 uint64_t XPakFileAsync::fileSize(void) const
 {
-	if (pPack_->mode == PakMode::STREAM)
+	if (pPak_->mode == PakMode::STREAM)
 	{
 		return entry_.size;
 	}
@@ -182,7 +182,7 @@ bool XPakFileAsync::valid(void) const
 
 bool XPakFileAsync::supportsComplitionRoutine(void) const
 {
-	return pPack_->mode == PakMode::STREAM && !entry_.isCompressed();
+	return pPak_->mode == PakMode::STREAM && !entry_.isCompressed();
 }
 
 void XPakFileAsync::cancelAll(void) const
@@ -198,7 +198,7 @@ size_t XPakFileAsync::waitUntilFinished(const XFileAsyncOperation& operation)
 
 X_INLINE uint64_t XPakFileAsync::getPosition(uint64_t pos) const
 {
-	return pPack_->dataOffset + entry_.offset + pos;
+	return pPak_->dataOffset + entry_.offset + pos;
 }
 
 X_INLINE size_t XPakFileAsync::getLength(size_t length, uint64_t pos) const
