@@ -87,7 +87,6 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 		PendingCompiltionOp(PendingCompiltionOp&& oth);
 
 		PendingCompiltionOp& operator=(PendingCompiltionOp&& oth);
-
 		XFileAsyncOperationCompiltion op;
 	};
 
