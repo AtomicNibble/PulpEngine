@@ -19,6 +19,7 @@ X_ENABLE_WARNING(4702)
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\HeapArea.h>
+#include <Util\UniquePointer.h>
 
 #include <Threading\ThreadQue.h>
 #include <Threading\Thread.h>
