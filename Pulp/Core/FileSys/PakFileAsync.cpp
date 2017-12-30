@@ -85,7 +85,9 @@ void XPakFileAsync::Job_InflateData(core::V2::JobSystem&, size_t, core::V2::Job*
 
 XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
-	X_ASSERT((length == entry_.size || length == entry_.inflatedSize) && position == 0, "Partial reads not supported for compressed files.")(length, position);
+	if (entry_.isCompressed()) {
+		X_ASSERT( length == fileSize() && position == 0, "Partial reads not supported for compressed files.")(length, position, fileSize());
+	}
 
 	uint64_t pakPos = getPosition(position);
 	size_t pakLength = getLength(length, position);
