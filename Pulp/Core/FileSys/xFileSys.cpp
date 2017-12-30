@@ -1595,13 +1595,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				if (pendingOps_[i].op.hasFinished(&bytesTrans))
 				{
 					onOpFinsihed(pendingOps_[i], bytesTrans);
-				}
 
-				pendingOps_.removeIndex(i);
+					pendingOps_.removeIndex(i);
 
 #if X_ENABLE_FILE_STATS
-				stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
+					stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
 #endif // !X_ENABLE_FILE_STATS
+				}
 			}
 		}
 	};
