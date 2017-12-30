@@ -102,6 +102,21 @@ namespace Compression
 			return true;
 		}
 
+		static const BufferHdr* getBufferHdr(core::span<const uint8_t> data) {
+			if (data.length() < sizeof(BufferHdr)) {
+				return nullptr;
+			}
+			const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(data.data());
+			if (!pHdr->IsMagicValid()) {
+				return nullptr;
+			}
+			if (static_cast<uint32_t>(pHdr->algo) >= Algo::ENUM_COUNT) {
+				return nullptr;
+			}
+
+			return pHdr;
+		}
+
 		// max source buffer size.
 		virtual size_t maxSourceSize(void) const X_ABSTRACT;
 		// buffer than source is garanted to fit into.
