@@ -520,6 +520,8 @@ public:
 	void WaitWithoutHelp(Job* pJob) const;
 	bool HelpWithWork(void); // must be a job thread / main thread that calls this, return true if ran a job.
 
+	X_INLINE static bool IsEmptyJob(Job* pJob);
+	X_INLINE static bool HasJobCompleted(Job* pJob);
 
 private:
 	Job* AllocateJob(void);
@@ -531,9 +533,6 @@ private:
 	ThreadQue* GetWorkerThreadQueue(size_t threadIdx) const;
 	ThreadJobAllocator* GetWorkerThreadAllocator(void) const;
 	ThreadJobAllocator* GetWorkerThreadAllocator(size_t threadIdx) const;
-
-	X_INLINE bool IsEmptyJob(Job* pJob) const;
-	X_INLINE bool HasJobCompleted(Job* pJob) const;
 
 	Job* GetJob(void);
 	Job* GetJob(ThreadQue& queue);

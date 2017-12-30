@@ -102,12 +102,12 @@ namespace V2
 
 	// =============================================
 
-	X_INLINE bool JobSystem::IsEmptyJob(Job* pJob) const
+	X_INLINE bool JobSystem::IsEmptyJob(Job* pJob)
 	{
 		return pJob == nullptr;
 	}
 
-	X_INLINE bool JobSystem::HasJobCompleted(Job* pJob) const
+	X_INLINE bool JobSystem::HasJobCompleted(Job* pJob)
 	{
 		return pJob->unfinishedJobs == 0;
 	}
