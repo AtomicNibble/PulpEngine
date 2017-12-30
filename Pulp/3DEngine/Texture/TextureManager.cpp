@@ -270,6 +270,7 @@ void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRe
 		// if we have loaded the data, we now need to process it.
 		if (bytesRead != pReadReq->dataSize)
 		{
+			X_ERROR("Texture", "Failed to read full buffer got: %" PRIu32 " want: %" PRIu32, bytesRead, pReadReq->dataSize);
 			pTexture->setStatus(core::LoadStatus::Error);
 			loadComplete_.raise();
 			return;
