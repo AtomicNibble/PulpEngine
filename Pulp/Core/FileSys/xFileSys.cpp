@@ -1514,6 +1514,11 @@ void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOpera
 			onOpFinsihed(asyncOp, bytesTransferd);
 
 			pendingCompOps_.removeIndex(i);
+
+
+#if X_ENABLE_FILE_STATS
+			stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
+#endif // !X_ENABLE_FILE_STATS
 			return;
 		}
 	}
@@ -1533,9 +1538,31 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 	XOsFileAsyncOperation::ComplitionRotinue compRoutine;
 	compRoutine.Bind<xFileSys, &xFileSys::AsyncIoCompletetionRoutine>(this);
 
+	auto checkForCompletedOps = [&] {
+		if (pendingOps_.isNotEmpty())
+		{
+			for (size_t i = 0; i < pendingOps_.size(); i++)
+			{
+				uint32_t bytesTrans = 0;
+				if (pendingOps_[i].op.hasFinished(&bytesTrans))
+				{
+					onOpFinsihed(pendingOps_[i], bytesTrans);
+				}
+
+				pendingOps_.removeIndex(i);
+
+#if X_ENABLE_FILE_STATS
+				stats_.PendingOps = pendingCompOps_.size() + pendingOps_.size();
+#endif // !X_ENABLE_FILE_STATS
+			}
+		}
+	};
+
 	while (thread.ShouldRun())
 	{
-		if (pendingCompOps_.isEmpty())
+		checkForCompletedOps();
+
+		if (pendingCompOps_.isEmpty() && pendingOps_.isEmpty())
 		{
 			pRequest = popRequest();
 		}
@@ -1548,11 +1575,14 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 			while((pRequest = tryPopRequest()) == nullptr)
 			{
-				requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
+				if (pendingOps_.isEmpty()) {
+					requestSignal_.wait(core::Signal::WAIT_INFINITE, true);
+				}
+				else {
+					requestSignal_.wait(2, true);
+				}
 
-#if X_ENABLE_FILE_STATS
-				stats_.PendingOps = pendingCompOps_.size();
-#endif // !X_ENABLE_FILE_STATS
+				checkForCompletedOps();
 			}
 
 			// we have a request.
@@ -1688,6 +1718,38 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 				);
 
 				pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
+			}
+			else
+			{
+				XPakFileAsync* pFile = static_cast<XPakFileAsync*>(pRead->pFile);
+
+				if (pFile->supportsComplitionRoutine())
+				{
+					pendingCompOps_.emplace_back(std::move(requestPtr), pFile->readAsync(
+						pRead->pBuf,
+						pRead->dataSize,
+						pRead->offset,
+						compRoutine
+					));
+				}
+				else
+				{
+					PendingOp op(std::move(requestPtr), pFile->readAsync(
+						pRead->pBuf,
+						pRead->dataSize,
+						pRead->offset
+					));
+
+					uint32_t bytesTrans = 0;
+					if (op.op.hasFinished(&bytesTrans))
+					{
+						onOpFinsihed(op, bytesTrans);
+					}
+					else
+					{
+						pendingOps_.emplace_back(std::move(op));
+					}
+				}
 			}
 		}
 		else if (type == IoRequest::WRITE)
