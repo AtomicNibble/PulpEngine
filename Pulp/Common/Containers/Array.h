@@ -20,7 +20,9 @@ public:
 	typedef T  Type;
 	typedef T  value_type;
 	typedef T* TypePtr;
+	typedef T* pointer;
 	typedef const T* ConstTypePtr;
+	typedef const T* const_pointer;
 	typedef T* Iterator;
 	typedef const T* ConstIterator;
 	typedef T* iterator;
