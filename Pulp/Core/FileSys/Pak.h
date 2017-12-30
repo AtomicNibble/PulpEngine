@@ -16,13 +16,10 @@ struct Pak
 
 	int32_t find(core::StrHash hash, const char* pName) const;
 
-
-	StackString<64> name;
-
+public:
 	// have you seen this pak format?
 	// oh my!, yes it's very sexy I must say.
 	// thanks..
-
 	OsFileAsync* pFile; 
 	
 	uint32_t numAssets;
@@ -33,9 +30,10 @@ struct Pak
 	core::Array<uint8_t> data; // from 0-data (or whole file if memory mode)
 	core::Array<const char*> strings;
 	const AssetPak::APakEntry* pEntires;
-
-	// 
 	core::XHashIndex hash;
+
+	// shove name down here so openhandles in it's own cache lane.
+	StackString<64> name;
 
 	core::AtomicInt openHandles;
 };
