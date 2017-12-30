@@ -8,6 +8,10 @@
 
 X_NAMESPACE_BEGIN(core)
 
+namespace V2
+{
+	struct Job;
+} // namespace V2
 
 class XOsFileAsyncOperationBase
 {
@@ -26,6 +30,7 @@ public:
 	typedef MyOVERLAPPED AsyncOp;
 
 public:
+	XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes, core::V2::Job* pJob);
 	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes);
 	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
 	XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
@@ -37,9 +42,9 @@ public:
 	X_INLINE bool operator==(const XOsFileAsyncOperationBase& oth) const;
 	X_INLINE bool ownsAsyncOp(const AsyncOp* pOp) const;
 
-	X_INLINE void cancel(void);
+	void cancel(void);
 
-	X_INLINE bool hasFinished(uint32_t* pNumBytes = nullptr) const;
+	bool hasFinished(uint32_t* pNumBytes = nullptr) const;
 
 	X_INLINE AsyncOp* getOverlapped(void);
 	X_INLINE const AsyncOp* getOverlapped(void) const;
@@ -66,7 +71,7 @@ public:
 
 	// Waits until the asynchronous operation has finished
 	// returns the number of transferred bytes.
-	X_INLINE uint32_t waitUntilFinished(void) const;
+	uint32_t waitUntilFinished(void) const;
 };
 
 

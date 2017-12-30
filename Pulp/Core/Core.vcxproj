@@ -516,6 +516,7 @@
     <ClCompile Include="FileSys\PakFileAsync.cpp" />
     <ClCompile Include="FileSys\win32\OsFile.cpp" />
     <ClCompile Include="FileSys\win32\OsFileAsync.cpp" />
+    <ClCompile Include="FileSys\win32\OsFileAsyncOperation.cpp" />
     <ClCompile Include="FileSys\win32\PathUtil.cpp" />
     <ClCompile Include="FileSys\xFileSys.cpp" />
     <ClCompile Include="FileSys\XFindData.cpp" />

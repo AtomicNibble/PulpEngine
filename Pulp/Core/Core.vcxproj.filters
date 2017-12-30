@@ -223,6 +223,9 @@
     <ClCompile Include="FileSys\PakFileAsync.cpp">
       <Filter>Source Files\FileSys</Filter>
     </ClCompile>
+    <ClCompile Include="FileSys\win32\OsFileAsyncOperation.cpp">
+      <Filter>Source Files\FileSys\win32</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="win32\SystemTimer.inl">
