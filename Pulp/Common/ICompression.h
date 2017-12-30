@@ -132,6 +132,8 @@ namespace Compression
 		bool inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd,
 			core::Array<T>& inflated);
 
+		bool inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd,
+			uint8_t* pInflatedBegin, uint8_t* pInflatedEnd);
 
 	private:
 		virtual bool deflate_int(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
@@ -204,6 +206,19 @@ namespace Compression
 
 		return inflate_int(arena, pHdr + 1, dataSize - sizeof(BufferHdr),
 			inflated.ptr(), inflated.size() * sizeof(T));
+	}
+
+	X_INLINE bool ICompressor::inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd,
+		uint8_t* pInflatedBegin,  uint8_t* pInflatedEnd)
+	{
+		size_t dataSize = union_cast<size_t>(pEnd - pBegin);
+		size_t dstDataSize = union_cast<size_t>(pInflatedEnd - pInflatedBegin);
+
+		BufferHdr* pHdr = union_cast<BufferHdr*, const uint8_t*>(pBegin);
+
+		X_ASSERT(dstDataSize == pHdr->inflatedSize, "Dest buffer incorrect size")(dstDataSize, pHdr->inflatedSize);
+
+		return inflate_int(arena, pHdr + 1, dataSize - sizeof(BufferHdr), pInflatedBegin, dstDataSize);
 	}
 
 	template<typename T>
