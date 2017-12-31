@@ -12,7 +12,7 @@ namespace PNG
 {
 	#define VALIDATE_IDAT_CRC 1
 
-	class IMGLIB_EXPORT XTexLoaderPNG : public ITextureFmt
+	class XTexLoaderPNG : public ITextureFmt
 	{
 		static const int32_t BLOCK_SIZE = 1024 * 32; // save as 32kb chunks.
 		static const int32_t IO_READ_BLOCK_SIZE = (1024 * 4) * 4; // read the IDAT in max of 16kb chunks regardless of it's size.
@@ -22,20 +22,20 @@ namespace PNG
 		static const char* EXTENSION;
 
 	public:
-		XTexLoaderPNG();
-		~XTexLoaderPNG();
+		IMGLIB_EXPORT XTexLoaderPNG();
+		IMGLIB_EXPORT ~XTexLoaderPNG();
 
-		static bool isValidData(const DataVec& fileData);
+		IMGLIB_EXPORT static bool isValidData(const DataVec& fileData);
 
 		// ITextureFmt
-		virtual const char* getExtension(void) const X_FINAL;
-		virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
-		virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
-		virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
-		virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
+		IMGLIB_EXPORT virtual const char* getExtension(void) const X_FINAL;
+		IMGLIB_EXPORT virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
+		IMGLIB_EXPORT virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
+		IMGLIB_EXPORT virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
+		IMGLIB_EXPORT virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 
-		virtual bool canWrite(void) const X_FINAL { return true; }
-		virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
+		IMGLIB_EXPORT virtual bool canWrite(void) const X_FINAL { return true; }
+		IMGLIB_EXPORT virtual bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 		// ~ITextureFmt
 
 	private:
