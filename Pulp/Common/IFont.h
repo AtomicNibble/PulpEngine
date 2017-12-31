@@ -5,6 +5,7 @@
 
 #include <ITexture.h>
 #include <IRender.h>
+#include <IConverterModule.h>
 
 struct ICore;
 
@@ -14,6 +15,13 @@ X_NAMESPACE_DECLARE(core, struct FrameTimeData);
 
 
 X_NAMESPACE_BEGIN(font)
+
+static const char* FONT_FILE_EXTENSION = "baked";
+
+struct IFontLib : public IConverter
+{
+
+};
 
 
 struct IFont;
