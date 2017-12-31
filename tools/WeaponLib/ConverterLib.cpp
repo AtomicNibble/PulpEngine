@@ -25,7 +25,7 @@ class XConverterLib_Weapon : public IConverterModule
 
 	virtual const char* GetName(void) X_OVERRIDE
 	{
-		return "Material";
+		return "Weapon";
 	}
 
 	virtual IConverter* Initialize(void) X_OVERRIDE
@@ -35,7 +35,7 @@ class XConverterLib_Weapon : public IConverterModule
 
 		g_WeaponLibArena = X_NEW(WeaponLibArena, gEnv->pArena, "WeaponLibArena")(&g_WeaponLibAlloc, "WeaponLibArena");
 
-		return X_NEW(game::weapon::WeaponLib, g_WeaponLibArena, "IMaterialLib")();
+		return X_NEW(game::weapon::WeaponLib, g_WeaponLibArena, "WeaponLib")();
 	}
 
 	virtual bool ShutDown(IConverter* pCon) X_OVERRIDE
