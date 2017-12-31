@@ -9,8 +9,8 @@ X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
 
 X_ALIGNED_SYMBOL(struct XGlyph, 64)
 {
-	XGlyph() :
-		glyphBitmap(g_fontArena)
+	XGlyph(core::MemoryArenaBase* arena) :
+		glyphBitmap(arena)
 	{
 
 	}

@@ -47,12 +47,12 @@ class XEngineModule_Font : public IEngineModule
 		LinkModule(pCore, "XFont");
 
 		// kinky shit.
-		g_fontArena = X_NEW(FontArena, gEnv->pArena, "FontArena")(&g_fontAlloc, "FontArena");
+		g_fontArena = X_NEW(FontArena, env.pArena, "FontArena")(&g_fontAlloc, "FontArena");
 
 
 		font::IFontSys* pFontSys = nullptr;
 
-		if (gEnv->IsDedicated())
+		if (env.IsDedicated())
 		{
 #if defined(X_USE_NULLFONT)
 			pFontSys = X_NEW(font::XFontSysNull, g_fontArena, "FontSysNull")();
@@ -67,6 +67,11 @@ class XEngineModule_Font : public IEngineModule
 #else
 
 		pFontSys = X_NEW(font::XFontSystem, g_fontArena, "fontSys")(pCore);
+
+		if (!pCore->IntializeLoadedConverterModule("Engine_FontLib", "Engine_FontLib")) {
+			X_ERROR("Font", "Failed to init FontLib");
+			return false;
+		}
 #endif // !X_USE_NULLFONT
 
 		if (!pFontSys) {

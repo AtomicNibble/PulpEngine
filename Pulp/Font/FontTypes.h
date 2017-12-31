@@ -18,12 +18,6 @@ struct FontEffect
 	core::FixedArray<FontPass, MAX_FONT_PASS> passes;
 };
 
-struct Metrics
-{
-	int32_t ascender;
-	int32_t descender;
-	int32_t max_advance;
-};
 
 typedef core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> FontNameStr;
 typedef core::StackString<128> SourceNameStr;

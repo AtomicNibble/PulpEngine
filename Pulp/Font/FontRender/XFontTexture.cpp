@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "XFontTexture.h"
-#include "XFontGlyph.h"
 
 #include "Vars\FontVars.h"
 

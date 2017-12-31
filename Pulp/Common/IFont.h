@@ -23,6 +23,12 @@ struct IFontLib : public IConverter
 
 };
 
+struct Metrics
+{
+	int32_t ascender;
+	int32_t descender;
+	int32_t max_advance;
+};
 
 struct IFont;
 

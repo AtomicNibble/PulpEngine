@@ -357,11 +357,11 @@ const XGlyph* XGlyphCache::GetGlyph(wchar_t cChar)
 
 bool XGlyphCache::CreateSlotList(size_t listSize)
 {
-	slotList_.resize(listSize);
+	slotList_.reserve(listSize);
 
 	for (size_t i = 0; i < listSize; i++)
 	{
-		XGlyph& slot = slotList_[i];
+		XGlyph& slot = slotList_.AddOne(g_fontArena);
 		if (!slot.glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
 		{
 			return false;

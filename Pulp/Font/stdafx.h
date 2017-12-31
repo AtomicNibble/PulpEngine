@@ -51,10 +51,7 @@ typedef core::MemoryArena<
 
 extern FontArena* g_fontArena;
 
+#include <../../tools/FontLib/FontLib.h>
 
-#if X_DEBUG
-X_LINK_LIB("freetype265d");
-#else
-X_LINK_LIB("freetype265");
-#endif // !X_DEBUG
 
+X_LINK_LIB("engine_FontLib");

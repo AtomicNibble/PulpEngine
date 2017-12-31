@@ -463,10 +463,7 @@
   <ItemGroup>
     <ClInclude Include="Constants.h" />
     <ClInclude Include="Font.h" />
-    <ClInclude Include="FontRender\XFontGlyph.h" />
-    <ClInclude Include="FontRender\XFontRender.h" />
     <ClInclude Include="FontRender\XFontTexture.h" />
-    <ClInclude Include="FontRender\XGlyphBitmap.h" />
     <ClInclude Include="FontRender\XGlyphCache.h" />
     <ClInclude Include="FontTypes.h" />
     <ClInclude Include="Null\XNullfont.h" />
@@ -478,25 +475,7 @@
     <ClCompile Include="EngineModule\Module.cpp" />
     <ClCompile Include="Font.cpp" />
     <ClCompile Include="FontLoad.cpp" />
-    <ClCompile Include="FontRender\edtaa3func.c">
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">NotUsing</PrecompiledHeader>
-      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">NotUsing</PrecompiledHeader>
-    </ClCompile>
-    <ClCompile Include="FontRender\XFontRender.cpp" />
     <ClCompile Include="FontRender\XFontTexture.cpp" />
-    <ClCompile Include="FontRender\XGlyphBitmap.cpp" />
     <ClCompile Include="FontRender\XGlyphCache.cpp" />
     <ClCompile Include="Null\XNullfont.cpp" />
     <ClCompile Include="Sys\XFontSystem.cpp" />
@@ -519,9 +498,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="FontRender\XFontRender.inl" />
     <None Include="FontRender\XFontTexture.inl" />
-    <None Include="FontRender\XGlyphBitmap.inl" />
     <None Include="FontRender\XGlyphCache.inl" />
     <None Include="Vars\FontVars.inl" />
   </ItemGroup>

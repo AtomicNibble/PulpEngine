@@ -13,9 +13,6 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="FreeType">
-      <UniqueIdentifier>{8b576eb3-b52f-4c6c-a546-9680b3f40136}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\EngineModule">
       <UniqueIdentifier>{fc51956f-9c3e-4683-8c97-b0f40afbca67}</UniqueIdentifier>
     </Filter>
@@ -60,16 +57,7 @@
     <ClInclude Include="Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="FontRender\XFontGlyph.h">
-      <Filter>Header Files\FontRender</Filter>
-    </ClInclude>
-    <ClInclude Include="FontRender\XFontRender.h">
-      <Filter>Header Files\FontRender</Filter>
-    </ClInclude>
     <ClInclude Include="FontRender\XFontTexture.h">
-      <Filter>Header Files\FontRender</Filter>
-    </ClInclude>
-    <ClInclude Include="FontRender\XGlyphBitmap.h">
       <Filter>Header Files\FontRender</Filter>
     </ClInclude>
     <ClInclude Include="FontRender\XGlyphCache.h">
@@ -95,13 +83,7 @@
     <ClCompile Include="FontLoad.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="FontRender\XFontRender.cpp">
-      <Filter>Source Files\FontRender</Filter>
-    </ClCompile>
     <ClCompile Include="FontRender\XFontTexture.cpp">
-      <Filter>Source Files\FontRender</Filter>
-    </ClCompile>
-    <ClCompile Include="FontRender\XGlyphBitmap.cpp">
       <Filter>Source Files\FontRender</Filter>
     </ClCompile>
     <ClCompile Include="FontRender\XGlyphCache.cpp">
@@ -116,21 +98,12 @@
     <ClCompile Include="Sys\XFontSystem.cpp">
       <Filter>Source Files\Sys</Filter>
     </ClCompile>
-    <ClCompile Include="FontRender\edtaa3func.c">
-      <Filter>Source Files\FontRender</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Vars\FontVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
-    <None Include="FontRender\XFontRender.inl">
-      <Filter>Header Files\FontRender</Filter>
-    </None>
     <None Include="FontRender\XFontTexture.inl">
-      <Filter>Header Files\FontRender</Filter>
-    </None>
-    <None Include="FontRender\XGlyphBitmap.inl">
       <Filter>Header Files\FontRender</Filter>
     </None>
     <None Include="FontRender\XGlyphCache.inl">

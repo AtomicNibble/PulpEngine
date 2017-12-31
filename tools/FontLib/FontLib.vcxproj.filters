@@ -22,6 +22,12 @@
     <Filter Include="Source Files\Lib">
       <UniqueIdentifier>{2e0db088-9f78-45bd-bcd6-b359b064b39d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\FontRender">
+      <UniqueIdentifier>{3570980c-3737-44e9-8168-f71de3569cb0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\FontRender">
+      <UniqueIdentifier>{fb16bf80-ff55-471e-894a-94a42a0c8ff0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -29,6 +35,18 @@
     </ClInclude>
     <ClInclude Include="Lib\FontLib.h">
       <Filter>Header Files\Lib</Filter>
+    </ClInclude>
+    <ClInclude Include="FontRender\XFontRender.h">
+      <Filter>Header Files\FontRender</Filter>
+    </ClInclude>
+    <ClInclude Include="FontRender\XFontGlyph.h">
+      <Filter>Header Files\FontRender</Filter>
+    </ClInclude>
+    <ClInclude Include="FontRender\XGlyphBitmap.h">
+      <Filter>Header Files\FontRender</Filter>
+    </ClInclude>
+    <ClInclude Include="FontLib.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -41,7 +59,22 @@
     <ClCompile Include="Lib\FontLib.cpp">
       <Filter>Source Files\Lib</Filter>
     </ClCompile>
+    <ClCompile Include="FontRender\edtaa3func.c">
+      <Filter>Source Files\FontRender</Filter>
+    </ClCompile>
+    <ClCompile Include="FontRender\XFontRender.cpp">
+      <Filter>Source Files\FontRender</Filter>
+    </ClCompile>
+    <ClCompile Include="FontRender\XGlyphBitmap.cpp">
+      <Filter>Source Files\FontRender</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
+    <None Include="FontRender\XGlyphBitmap.inl">
+      <Filter>Header Files\FontRender</Filter>
+    </None>
+    <None Include="FontRender\XFontRender.inl">
+      <Filter>Header Files\FontRender</Filter>
+    </None>
   </ItemGroup>
 </Project>

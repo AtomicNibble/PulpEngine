@@ -4,13 +4,7 @@
 #define _X_FONT_GLYPH_CACHE_H_
 
 #include <Util\UniquePointer.h>
-
-#include "XGlyphBitmap.h"
-#include "XFontGlyph.h"
-#include "XFontRender.h"
-
 #include <Containers\HashMap.h>
-
 
 X_NAMESPACE_BEGIN(font)
 

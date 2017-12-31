@@ -1,6 +1,7 @@
 #pragma once
 
 #include <EngineCommon.h>
+#include <IFont.h>
 
 
 #include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
@@ -24,4 +25,20 @@ typedef core::MemoryArena<
 extern FontLibArena* g_FontLibArena;
 
 
-#include <IFont.h>
+
+#ifdef X_LIB
+#define FONTLIB_EXPORT
+#else
+#ifdef FONT_LIB_EXPORT
+#define FONTLIB_EXPORT X_EXPORT
+#else
+#define FONTLIB_EXPORT X_IMPORT
+#endif // !FONT_LIB_EXPORT
+#endif // X_LIB
+
+
+#if X_DEBUG
+X_LINK_LIB("freetype265d");
+#else
+X_LINK_LIB("freetype265");
+#endif // !X_DEBUG
