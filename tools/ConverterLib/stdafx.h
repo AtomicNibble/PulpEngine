@@ -22,11 +22,15 @@ X_LINK_LIB("engine_ModelLib")
 X_LINK_LIB("engine_AnimLib")
 X_LINK_LIB("engine_ImgLib")
 X_LINK_LIB("engine_MaterialLib")
+X_LINK_LIB("engine_WeaponLib")
+X_LINK_LIB("engine_FontLib")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Model");
 X_FORCE_LINK_FACTORY("XConverterLib_Anim");
 X_FORCE_LINK_FACTORY("XConverterLib_Img");
 X_FORCE_LINK_FACTORY("XConverterLib_Material");
+X_FORCE_LINK_FACTORY("XConverterLib_Weapon");
+X_FORCE_LINK_FACTORY("XConverterLib_Font");
 
 
 #endif // !X_LIB
