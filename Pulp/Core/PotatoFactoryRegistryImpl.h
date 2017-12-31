@@ -34,7 +34,6 @@ private:
 		bool operator <(const FactoryByCName& rhs) const { return strcmp(pCname, rhs.pCname) < 0; }
 	};
 
-	typedef core::FixedArray<FactoryByCName, 16> FactoriesByCName;
 
 	struct FactoryByID
 	{
@@ -46,9 +45,10 @@ private:
 		bool operator <(const FactoryByID& rhs) const { if (id != rhs.id) return id < rhs.id; return pPtr < rhs.pPtr; }
 	};
 
-	typedef core::FixedArray<FactoryByID, 16> FactoriesByID;
+	typedef core::FixedArray<FactoryByCName, 20> FactoriesByCName;
+	typedef core::FixedArray<FactoryByID, 20> FactoriesByID;
 
-
+private:
 
 	bool GetInsertionPos(IPotatoFactory* pFactory,
 		FactoriesByCName::iterator& itPosForCName, FactoriesByID::iterator& itPosForId);
