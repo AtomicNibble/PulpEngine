@@ -237,7 +237,7 @@ namespace shader
 					return false;
 				}
 
-				if (hdr.blobLength < 1)
+				if (hdr.blobLength == 0)
 				{
 					X_WARNING("Shader", "bin shader has invalid blob length");
 					return false;
