@@ -49,7 +49,8 @@ X_DECLARE_ENUM8(AssetType)(
 	CAMERA,
 
 	VIDEO,
-	SCRIPT
+	SCRIPT,
+	FONT
 );
 
 
