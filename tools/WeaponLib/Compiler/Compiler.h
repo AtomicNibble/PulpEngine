@@ -61,6 +61,6 @@ namespace weapon
 		WeaponHdr::FloatArr<StateTimer::ENUM_COUNT> stateTimers_;
 	};
 
-}
+} // namespace weapon
 
 X_NAMESPACE_END
