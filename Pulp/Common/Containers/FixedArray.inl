@@ -170,6 +170,7 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 {
 	size_type off = position - begin();
 
+	X_ASSERT(size() < capacity(), "No space")(size(), capacity());
 	X_ASSERT(off < N, "invalid position for FixedArray: out of bounds")(N, off);
 
 	T* pArr = begin();
