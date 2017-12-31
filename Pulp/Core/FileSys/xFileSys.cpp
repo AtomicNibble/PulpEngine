@@ -553,8 +553,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 
 	PathUtil::findData findinfo;
 	XFindData FindData(path, this);
-	if (!FindData.findnext(&findinfo))
-	{
+	if (!FindData.findnext(&findinfo)) {
 		fileModeFlags::Description Dsc;
 		X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 		return nullptr;
@@ -595,8 +594,7 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
 
 	PathUtil::findData findinfo;
 	XFindData FindData(path, this);
-	if (!FindData.findnext(&findinfo))
-	{
+	if (!FindData.findnext(&findinfo)) {
 		fileModeFlags::Description Dsc;
 		X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
 		return nullptr;
@@ -1200,7 +1198,7 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path,
 }
 
 
-const wchar_t* xFileSys::createOSPath(const  Directory* dir, pathType path, Path<wchar_t>& buffer) const
+const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const
 {
 	wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
 	strUtil::Convert(path, pathW, sizeof(pathW));
