@@ -15,7 +15,7 @@ public:
 	FONTLIB_EXPORT XGlyphBitmap(core::MemoryArenaBase* arena, int32_t width, int32_t height);
 	FONTLIB_EXPORT ~XGlyphBitmap();
 
-	FONTLIB_EXPORT bool Create(int32_t width, int32_t height);
+	FONTLIB_EXPORT void Create(int32_t width, int32_t height);
 	FONTLIB_EXPORT void Release(void);
 
 	X_INLINE DataVec& GetBuffer(void);

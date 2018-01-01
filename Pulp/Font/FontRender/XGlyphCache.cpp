@@ -129,14 +129,8 @@ bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
 	if (scaledGlyphWidth_ > 0)
 	{
 		scaleBitmap_.reset(X_NEW(XGlyphBitmap, scaleBitmap_.getArena(), "BitMap")(g_fontArena));
-
-		if (!scaleBitmap_->Create(scaledGlyphWidth_, scaledGlyphHeight_))
-		{
-			Release();
-			return false;
-		}
+		scaleBitmap_->Create(scaledGlyphWidth_, scaledGlyphHeight_);
 	}
-
 
 	return true;
 }
@@ -362,12 +356,8 @@ bool XGlyphCache::CreateSlotList(size_t listSize)
 	for (size_t i = 0; i < listSize; i++)
 	{
 		XGlyph& slot = slotList_.AddOne(g_fontArena);
-		if (!slot.glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_))
-		{
-			return false;
-		}
-
 		slot.reset();
+		slot.glyphBitmap.Create(glyphBitmapWidth_, glyphBitmapHeight_);
 	}
 
 	return true;

@@ -24,18 +24,15 @@ XGlyphBitmap::XGlyphBitmap(core::MemoryArenaBase* arena, int32_t width, int32_t 
 
 XGlyphBitmap::~XGlyphBitmap()
 {
-	Release();
+
 }
 
 
-bool XGlyphBitmap::Create(int32_t width, int32_t height)
+void XGlyphBitmap::Create(int32_t width, int32_t height)
 {
-	Release();
-
 	buffer_.resize(width*height);
 	width_ = width;
 	height_ = height;
-	return true;
 }
 
 
