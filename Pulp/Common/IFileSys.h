@@ -857,10 +857,12 @@ public:
 	}
 
 	inline bool openFile(const char* path, IFileSys::fileModeFlags mode) {
+		X_ASSERT(pFile_ == nullptr, "File already open")();
 		pFile_ = pFileSys_->openFile(path, mode);
 		return pFile_ != nullptr;
 	}
 	inline bool openFile(const wchar_t* path, IFileSys::fileModeFlags mode) {
+		X_ASSERT(pFile_ == nullptr, "File already open")(); 
 		pFile_ = pFileSys_->openFile(path, mode);
 		return pFile_ != nullptr;
 	}
