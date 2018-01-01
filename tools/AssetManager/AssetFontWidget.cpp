@@ -19,11 +19,11 @@ AssetFontWidget::AssetFontWidget(QWidget *parent, IAssetEntry* pAssEntry, const 
 	QWidget(parent),
 	pAssEntry_(pAssEntry),
 	pProgress_(nullptr),
-	loader_(g_arena, assetDb::AssetType::IMG)
+	loader_(g_arena, assetDb::AssetType::FONT)
 {
 	X_UNUSED(value);
 
-	QPixmap imgPix(":/assetDb/img/Drop_img.png");
+	QPixmap imgPix(":/assetDb/img/Drop_font.png");
 	pDropZone_ = new QLabel();
 	pDropZone_->setPixmap(imgPix);
 	pDropZone_->installEventFilter(this);
