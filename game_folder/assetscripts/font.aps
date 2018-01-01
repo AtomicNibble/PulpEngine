@@ -3,13 +3,14 @@
 
 void GenerateUI( asset& Asset )
 {
-
+    Asset.AddFont("srcFile", "").SetTitle( "Src Font" );
 
 
     Asset.BeginGroup("Options");
     {
         Asset.AddInt( "glyphWidth", 32, 0, 512 ).SetTitle("Glyph Width");
         Asset.AddInt( "glyphHeight", 32, 0, 512 ).SetTitle("Glyph Height");
+        Asset.AddFloat( "sizeRatio", 1, 0, 1 ).SetTitle("Size Ratio");
 
         Asset.AddCheckBox( "f_sdf", true ).SetTitle( "Sdf" ).SetToolTip("Signed Distance field");
 
