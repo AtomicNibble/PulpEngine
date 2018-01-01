@@ -26,6 +26,7 @@ class AssetSpinBoxWidget;
 class AssetDoubleSpinBoxWidget;
 class AssetPathWidget;
 class AssetTextWidget;
+class AssetFontWidget;
 class AssetTextureWidget;
 class AssetModelWidget;
 class AssetAnimWidget;
@@ -59,6 +60,7 @@ public:
 		VEC3,
 		VEC4,
 
+		FONT,
 		IMAGE,
 		MODEL,
 		ANIM,
@@ -206,6 +208,7 @@ private:
 		AssetDoubleSpinBoxWidget* pDoubleSpinBoxWidget_;
 		AssetPathWidget* pPathWidget_;
 		AssetTextWidget* pTextWidget_;
+		AssetFontWidget* pFontWidget_;
 		AssetTextureWidget* pTextureWidget_;
 		AssetModelWidget* pModelWidget_;
 		AssetAnimWidget* pAnimWidget_;

@@ -11,6 +11,7 @@
 #include "AssetStringWidget.h"
 #include "AssetLineEditWidget.h"
 #include "AssetTextWidget.h"
+#include "AssetFontWidget.h"
 #include "AssetTextureWidget.h"
 #include "AssetModelWidget.h"
 #include "AssetAnimWidget.h"
@@ -97,6 +98,9 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::LINEEDIT:
 		pLineEditWidget_ = new AssetLineEditWidget(pParent, val);
 		break;
+	case PropertyType::FONT:
+		pFontWidget_ = new AssetFontWidget(pParent, pAssEntry, val);
+		break;
 	case PropertyType::IMAGE:
 		pTextureWidget_ = new AssetTextureWidget(pParent, pAssEntry, val);
 		break;
@@ -152,6 +156,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::INT:
 	case PropertyType::FLOAT:
 	case PropertyType::PATH:
+	case PropertyType::FONT:
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
@@ -336,6 +341,9 @@ void AssetProperty::show(bool vis)
 	case PropertyType::TEXT:
 		pTextWidget_->setVisible(vis);
 		break;
+	case PropertyType::FONT:
+		pFontWidget_->setVisible(vis);
+		break;
 	case PropertyType::IMAGE:
 		pTextureWidget_->setVisible(vis);
 		break;
@@ -392,6 +400,9 @@ void AssetProperty::enable(bool val)
 		break;
 	case PropertyType::TEXT:
 		pTextWidget_->setEnabled(val);
+		break;
+	case PropertyType::FONT:
+		pFontWidget_->setEnabled(val);
 		break;
 	case PropertyType::IMAGE:
 		pTextureWidget_->setEnabled(val);
@@ -1190,6 +1201,7 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::TEXT:
 		case AssetProperty::PropertyType::PATH:
 		case AssetProperty::PropertyType::LINEEDIT:
+		case AssetProperty::PropertyType::FONT:
 		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::MODEL:
 		case AssetProperty::PropertyType::ANIM:

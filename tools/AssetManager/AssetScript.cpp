@@ -185,6 +185,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectBehaviour("asset", asBEHAVE_RELEASE, "void f()", asMETHOD(AssetScriptProps, release), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	
 //	r = pEngine_->RegisterObjectMethod("asset", "asset &opAssign(const asset &in)", asMETHODPR(AssetScriptProps, operator=, (const AssetScriptProps&), AssetScriptProps&), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddFont(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddFont), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddTexture(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddTexture), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddModel(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddModel), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddAnim(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddAnim), asCALL_THISCALL); BUG_CHECK(r >= 0);

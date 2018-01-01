@@ -79,6 +79,7 @@ public:
 	void release(void);
 
 
+	AssetScriptProperty* AddFont(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddTexture(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddModel(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddAnim(const std::string& key, const std::string& default);
