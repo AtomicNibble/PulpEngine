@@ -90,6 +90,8 @@ bool XFontRender::Release(void)
 
 bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf)
 { 
+	X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")();
+
 	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
 	if (err) {
 		X_ERROR("Font", "Failed to render glyp for char: '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
