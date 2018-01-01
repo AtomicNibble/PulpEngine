@@ -99,6 +99,8 @@ namespace
 		{
 			core::StackString<128, char> assetTypeStr(pAssetType);
 
+			static_assert(converter::AssetType::ENUM_COUNT == 16, "More asset types :[] ? this code might need updating.");
+
 			switch (core::Hash::Fnv1aHash(assetTypeStr.c_str(), assetTypeStr.length()))
 			{
 				case "model"_fnv1a:
@@ -115,6 +117,9 @@ namespace
 					break;
 				case "weapon"_fnv1a:
 					assType = converter::AssetType::WEAPON;
+					break;
+				case "font"_fnv1a:
+					assType = converter::AssetType::FONT;
 					break;
 
 				default:
