@@ -5,5 +5,14 @@ void GenerateUI( asset& Asset )
 {
 
 
+
+    Asset.BeginGroup("Options");
+    {
+        Asset.AddInt( "glyphWidth", 32, 0, 512 ).SetTitle("Glyph Width");
+        Asset.AddInt( "glyphHeight", 32, 0, 512 ).SetTitle("Glyph Height");
+
+        Asset.AddCheckBox( "f_sdf", true ).SetTitle( "Sdf" ).SetToolTip("Signed Distance field");
+
+    }
 }
 
