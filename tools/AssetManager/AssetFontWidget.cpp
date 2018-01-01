@@ -40,12 +40,17 @@ AssetFontWidget::AssetFontWidget(QWidget *parent, IAssetEntry* pAssEntry, const 
 	//  P
 	QGridLayout* pLayout = new QGridLayout();
 	{
+		pLabel_ = new QLabel();
+		pLabel_->installEventFilter(this);
+		pLabel_->setAcceptDrops(true);
+
 		QVBoxLayout* pVertLayout = new QVBoxLayout();
 		pVertLayout->setContentsMargins(0, 0, 0, 0);
 		
 		QHBoxLayout* pHozLayout = new QHBoxLayout();
 		pHozLayout->setContentsMargins(0, 0, 0, 0);
-		pHozLayout->addWidget(pDropZone_, 2);
+		pHozLayout->addWidget(pDropZone_);
+		pHozLayout->addWidget(pLabel_, 2);
 		pHozLayout->addWidget(pBrowse);
 
 		pLayout->addLayout(pVertLayout, 0, 0, 2, 1);
@@ -57,6 +62,8 @@ AssetFontWidget::AssetFontWidget(QWidget *parent, IAssetEntry* pAssEntry, const 
 	connect(&loader_, &RawFileLoader::setProgress, this, &AssetFontWidget::setProgress, Qt::QueuedConnection);
 	connect(&loader_, &RawFileLoader::setProgressLabel, this, &AssetFontWidget::setProgressLabel, Qt::QueuedConnection);
 	connect(&loader_, SIGNAL(finished()), this, SLOT(rawFileLoaded()));
+
+	setValue(value);
 }
 
 AssetFontWidget::~AssetFontWidget()
@@ -82,6 +89,13 @@ void AssetFontWidget::setPromptDialogFilter(const QString& filter)
 QString AssetFontWidget::promptDialogFilter(void) const
 {
 	return dialogFilter_;
+}
+
+void AssetFontWidget::setValue(const std::string& value)
+{
+	const char* pFileName = core::strUtil::FileName(value.c_str());
+
+	pLabel_->setText(pFileName);
 }
 
 void AssetFontWidget::loadFile(const QString& filePath)
@@ -150,12 +164,12 @@ bool AssetFontWidget::loadFont(const QString& path)
 	QFileInfo fi(path);
 
 	if (path.isEmpty() || !fi.exists()) {
-		X_ERROR("Img", "Failed to load image, src file missing");
+		X_ERROR("Font", "Failed to load image, src file missing");
 		return false;
 	}
 
 	if (!fileExtensionValid(path)) {
-		X_ERROR("Img", "Failed to load image, invalid extension");
+		X_ERROR("Font", "Failed to load image, invalid extension");
 		return false;
 	}
 
@@ -177,7 +191,7 @@ bool AssetFontWidget::eventFilter(QObject* pObject, QEvent* pEvent)
 {
 	const auto type = pEvent->type();
 
-	if (pObject == pDropZone_)
+	if (pObject == pDropZone_ || pObject == pLabel_)
 	{
 		if (type == QEvent::DragEnter)
 		{
@@ -243,7 +257,7 @@ void AssetFontWidget::dropEvent(QDropEvent* event)
 
 void AssetFontWidget::showError(const QString& msg)
 {
-	QMessageBox::critical(ICore::mainWindow(), "Image", msg);
+	QMessageBox::critical(ICore::mainWindow(), "Font", msg);
 }
 
 void AssetFontWidget::browseClicked(void)
@@ -310,6 +324,12 @@ void AssetFontWidget::rawFileLoaded(void)
 
 	// src image data
 	pAssEntry_->updateRawFile(srcData);
+
+	auto path = loader_.getPath().toStdString();
+
+	setValue(path);
+
+	emit valueChanged(path);
 }
 
 X_NAMESPACE_END

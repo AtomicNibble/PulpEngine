@@ -24,6 +24,7 @@ public:
 	QString promptDialogFilter(void) const;
 
 private:
+	void setValue(const std::string& value);
 	void loadFile(const QString& filePath);
 	QString makeDialogTitle(const QString& title);
 	static bool fileExtensionValid(const QString& paht);
@@ -44,7 +45,7 @@ private slots:
 	void setProgress(int32_t pro);
 	void setProgressLabel(const QString& label, int32_t pro);
 	void rawFileLoaded(void);
-
+	
 private:
 	IAssetEntry* pAssEntry_;
 
@@ -54,6 +55,7 @@ private:
 
 private:
 	QLabel* pDropZone_;
+	QLabel* pLabel_;
 
 	QString dialogFilter_;
 	QString dialogTitleOverride_;
