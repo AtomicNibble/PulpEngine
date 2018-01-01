@@ -392,7 +392,6 @@ bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 	int32_t destWidth) const
 {
 	int32_t ySrcOffset, yDestOffset;
-	char cColor;
 
 	X_ASSERT(srcWidth <= width_ && srcHeight <= height_, "Out of range")(srcWidth, width_, srcHeight, height_);
 
@@ -403,7 +402,7 @@ bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 
 		for (int32_t x = 0; x < srcWidth; x++)
 		{
-			cColor = buffer_[ySrcOffset + srcX + x];
+			uint8_t cColor = buffer_[ySrcOffset + srcX + x];
 
 			// solid RGB
 			pBuffer[yDestOffset + destX + x] = (cColor << 24) | (255 << 16) | (255 << 8) | 255;
