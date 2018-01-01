@@ -76,7 +76,7 @@ X_NAMESPACE_BEGIN(font)
 		}
 
 		FontCompiler compiler(g_FontLibArena);	
-		if (!compiler.setFont(fileData, width, height, sizeRatio)) {
+		if (!compiler.setFont(std::move(fileData), width, height, sizeRatio)) {
 			X_ERROR("Font", "Failed to set source font data");
 			return false;
 		}

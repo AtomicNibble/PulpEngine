@@ -30,6 +30,8 @@ namespace
 		uint16_t glyphHeight;
 
 		Metrics metrics;
+
+		uint32_t sourceFontSize;
 	};
 
 
@@ -53,6 +55,7 @@ namespace
 FontCompiler::FontCompiler(core::MemoryArenaBase* arena) :
 	arena_(arena),
 	glyphs_(arena),
+	sourceFontData_(arena),
 	render_(arena)
 {
 
@@ -63,7 +66,7 @@ FontCompiler::~FontCompiler()
 
 }
 
-bool FontCompiler::setFont(const DataVec& trueTypeData, int32_t width, int32_t height, float sizeRatio)
+bool FontCompiler::setFont(DataVec&& trueTypeData, int32_t width, int32_t height, float sizeRatio)
 {
 	int32_t length = safe_static_cast<int32_t>(trueTypeData.size());
 
@@ -76,6 +79,8 @@ bool FontCompiler::setFont(const DataVec& trueTypeData, int32_t width, int32_t h
 	}
 
 	render_.SetGlyphBitmapSize(width, height, sizeRatio);
+	
+	sourceFontData_ = std::move(trueTypeData);
 	return true;
 }
 
@@ -127,14 +132,15 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
 	hdr.numGlyphs = safe_static_cast<uint16_t>(glyphs_.size());
 	hdr.glyphWidth = safe_static_cast<uint16_t>(width);
 	hdr.glyphHeight = safe_static_cast<uint16_t>(height);
-
 	hdr.metrics = render_.GetMetrics();
+	hdr.sourceFontSize = safe_static_cast<uint32_t>(sourceFontData_.size());
 
 	// what do i want the format tobe?
 	// basically I need all the info for each glyph.
 
 	size_t dataSize = (sizeof(GlyphHdr) + (width * height)) * glyphs_.size();
 	dataSize += sizeof(hdr);
+	dataSize += sourceFontData_.size();
 
 	core::ByteStream stream(arena_);
 	stream.reserve(dataSize);
@@ -160,6 +166,10 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
 		stream.write(glyphHdr);
 		stream.write(bitmap.data(), bitmap.size());
 	}
+
+	stream.write(sourceFontData_.data(), sourceFontData_.size());
+
+	X_ASSERT(stream.size() == dataSize, "Datasize mismatch")(stream.size(), dataSize);
 
 	if (pFile->write(stream.data(), stream.size()) != stream.size()) {
 		X_ERROR("Font", "Failed to write data");

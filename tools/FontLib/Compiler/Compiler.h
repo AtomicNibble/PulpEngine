@@ -20,7 +20,7 @@ public:
 	FontCompiler(core::MemoryArenaBase* arena);
 	~FontCompiler();
 
-	bool setFont(const DataVec& trueTypeData, int32_t width, int32_t height, float sizeRatio);
+	bool setFont(DataVec&& trueTypeData, int32_t width, int32_t height, float sizeRatio);
 	bool bake(bool sdf = true);
 
 	bool writeToFile(core::XFile* pFile) const;
@@ -31,6 +31,7 @@ private:
 	core::MemoryArenaBase* arena_;
 	XGlyphArr glyphs_;
 
+	DataVec sourceFontData_;
 
 	XFontRender render_;
 };
