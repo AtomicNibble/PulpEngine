@@ -18,6 +18,11 @@ X_NAMESPACE_BEGIN(font)
 
 static const char* FONT_FILE_EXTENSION = "baked";
 
+static const wchar_t FONT_PRECACHE_STR[190] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
+	"^_`abcdefghijklmnopqrstuvwxyz{|}~Ά£¤¥¦§¨©ª«¬­®―°±²³΄µ¶·ΈΉΊ»Ό½ΎΏ"
+	"ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡÒΣΤΥΦΧΨΩΪΫάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώÿ";
+
+
 struct IFontLib : public IConverter
 {
 
