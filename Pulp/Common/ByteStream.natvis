@@ -2,9 +2,11 @@
 <AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
   <Type Name="Potato::core::ByteStream">
     <Expand>
-      <Item Name="[size]" ExcludeView="simple">current_ - start_</Item>
+      <Item Name="[size]" ExcludeView="simple">write_ - read_</Item>
+      <Item Name="[tell]" ExcludeView="simple">read_ - start_</Item>
+      <Item Name="[tellWrite]" ExcludeView="simple">write_ - start_</Item>
       <Item Name="[allocate]" ExcludeView="simple">end_ - start_</Item>
-      <Item Name="[freespace]" ExcludeView="simple">end_ - current_</Item>
+      <Item Name="[freespace]" ExcludeView="simple">end_ - write_</Item>
     </Expand>
   </Type>
 </AutoVisualizer>
