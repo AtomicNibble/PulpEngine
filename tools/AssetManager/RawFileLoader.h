@@ -19,6 +19,7 @@ public:
 
 	void loadFile(const QString& path);
 
+	QString getPath(void) const;
 	Vec2i getSrcDim(void) const;
 	const DataArr& getCompressedSrc(void) const;
 	const DataArr& getThumbData(void) const;

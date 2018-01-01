@@ -31,6 +31,11 @@ void RawFileLoader::loadFile(const QString& path)
 	start();
 }
 
+QString RawFileLoader::getPath(void) const
+{
+	return path_;
+}
+
 Vec2i RawFileLoader::getSrcDim(void) const
 {
 	return srcDim_;
