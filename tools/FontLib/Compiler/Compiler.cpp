@@ -161,7 +161,10 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
 		stream.write(bitmap.data(), bitmap.size());
 	}
 
-	pFile->write(stream.data(), stream.size());
+	if (pFile->write(stream.data(), stream.size()) != stream.size()) {
+		X_ERROR("Font", "Failed to write data");
+		return false;
+	}
 
 	return true;
 }
@@ -176,8 +179,6 @@ bool FontCompiler::writeImageToFile(core::XFile* pFile) const
 	core::zero_object(infoHeader);
 
 	int32_t numGlyphs = safe_static_cast<int32_t>(glyphs_.size());
-	// work out size of image we want to make?
-	// dunno just fixed width?
 
 	int32_t width = 0;
 	int32_t height = 0;
@@ -187,25 +188,19 @@ bool FontCompiler::writeImageToFile(core::XFile* pFile) const
 	render_.GetGlyphBitmapSize(&glyphWidth, &glyphHeight);
 
 	{
-
-		int32_t pixelsWide = numGlyphs * glyphWidth;
-
-		if (pixelsWide < 512)
+		int32_t totalPixelsWide = numGlyphs * (glyphWidth * glyphHeight);
+		int32_t dim = 32;
+		while (1)
 		{
-			width = core::bitUtil::NextPowerOfTwo(pixelsWide);
-			height = glyphHeight;
-		}
-		else
-		{
-			// calculate a height.
-			width = 512;
+			int32_t space = (dim * dim);
+			if (space >= totalPixelsWide) {
+				break;
+			}
 
-			int32_t numRows = (pixelsWide / width) + 1;
-
-			height = numRows * glyphHeight;
-			height = core::bitUtil::NextPowerOfTwo(height);
+			dim <<= 1;
 		}
 
+		width = height = dim;
 		perRow = width / glyphWidth;
 	}
 
@@ -251,9 +246,20 @@ bool FontCompiler::writeImageToFile(core::XFile* pFile) const
 	}
 
 
-	pFile->writeObj(header);
-	pFile->writeObj(infoHeader);
-	pFile->write(imgData.data(), imgData.size());
+	if (pFile->writeObj(header) != sizeof(header)) {
+		X_ERROR("Font", "Failed to write header");
+		return false;
+	}
+
+	if (pFile->writeObj(infoHeader) != sizeof(infoHeader)) {
+		X_ERROR("Font", "Failed to write info header");
+		return false;
+	}
+	
+	if (pFile->write(imgData.data(), imgData.size()) != imgData.size()) {
+		X_ERROR("Font", "Failed to write data");
+		return false;
+	}
 
 	return true;
 }
