@@ -16,7 +16,7 @@ X_NAMESPACE_DECLARE(core, struct FrameTimeData);
 
 X_NAMESPACE_BEGIN(font)
 
-static const char* FONT_FILE_EXTENSION = "baked";
+static const char* FONT_FILE_EXTENSION = "fnt";
 
 static const wchar_t FONT_PRECACHE_STR[190] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
 	"^_`abcdefghijklmnopqrstuvwxyz{|}~╯丰戍貝物洎悖停眾斯須號獄播噶"
