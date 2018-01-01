@@ -423,7 +423,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 		return false;
 	}
 
-	if (db_.AssetHasThumb(assetId)) {
+	if (!forceConvert_ && db_.AssetHasThumb(assetId)) {
 		return true;
 	}
 
