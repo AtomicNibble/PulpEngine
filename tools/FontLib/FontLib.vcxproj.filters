@@ -28,6 +28,12 @@
     <Filter Include="Source Files\FontRender">
       <UniqueIdentifier>{fb16bf80-ff55-471e-894a-94a42a0c8ff0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Compiler">
+      <UniqueIdentifier>{9d64bff5-f805-4e20-983b-9a6c17bb2259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Compiler">
+      <UniqueIdentifier>{a107c9c2-7f2a-4684-8d37-b27582458a60}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -48,6 +54,9 @@
     <ClInclude Include="FontLib.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Compiler\Compiler.h">
+      <Filter>Header Files\Compiler</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -67,6 +76,9 @@
     </ClCompile>
     <ClCompile Include="FontRender\XGlyphBitmap.cpp">
       <Filter>Source Files\FontRender</Filter>
+    </ClCompile>
+    <ClCompile Include="Compiler\Compiler.cpp">
+      <Filter>Source Files\Compiler</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
