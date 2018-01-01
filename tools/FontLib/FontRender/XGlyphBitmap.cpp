@@ -356,7 +356,34 @@ bool XGlyphBitmap::BlitTo8(uint8_t* pBuffer,
 	return true;
 }
 
+bool XGlyphBitmap::BlitTo24(uint8_t* pBuffer,
+	int32_t srcX, int32_t srcY,
+	int32_t srcWidth, int32_t srcHeight,
+	int32_t destX, int32_t destY,
+	int32_t destWidth) const
+{
+	int32_t ySrcOffset, yDestOffset;
 
+	X_ASSERT(srcWidth <= width_ && srcHeight <= height_, "Out of range")(srcWidth, width_, srcHeight, height_);
+
+	for (int32_t y = 0; y < srcHeight; y++)
+	{
+		ySrcOffset = (srcY + y) * width_;
+		yDestOffset = (destY + y) * (destWidth * 3);
+
+		for (int32_t x = 0; x < srcWidth; x++)
+		{
+			uint8_t cColor = buffer_[ySrcOffset + srcX + x];
+
+			uint8_t* pDst = &pBuffer[yDestOffset + ((destX + x) * 3)];
+			pDst[0] = cColor;
+			pDst[1] = cColor;
+			pDst[2] = cColor;
+		}
+	}
+
+	return true;
+}
 
 bool XGlyphBitmap::BlitTo32(uint32_t* pBuffer,
 	int32_t srcX, int32_t srcY,
