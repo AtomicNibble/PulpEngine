@@ -166,7 +166,7 @@ void RawFileLoader::run()
 		QBuffer buffer(&bytes);
 		buffer.open(QIODevice::WriteOnly);
 		if (!thumbImg.save(&buffer, "PNG")) {
-			X_ERROR("Texture", "Failed to save thumb");
+			X_ERROR("Img", "Failed to save thumb");
 		}
 		else
 		{
