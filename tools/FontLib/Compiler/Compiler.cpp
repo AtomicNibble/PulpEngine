@@ -180,8 +180,8 @@ bool FontCompiler::writeImageToFile(core::XFile* pFile) const
 
 	int32_t numGlyphs = safe_static_cast<int32_t>(glyphs_.size());
 
-	int32_t width = 0;
-	int32_t height = 0;
+	int32_t width = 32;
+	int32_t height = 32;
 	int32_t perRow = 0;
 
 	int32_t glyphWidth, glyphHeight;
@@ -189,18 +189,22 @@ bool FontCompiler::writeImageToFile(core::XFile* pFile) const
 
 	{
 		int32_t totalPixelsWide = numGlyphs * (glyphWidth * glyphHeight);
-		int32_t dim = 32;
+		
 		while (1)
 		{
-			int32_t space = (dim * dim);
+			int32_t space = (width * height);
 			if (space >= totalPixelsWide) {
 				break;
 			}
 
-			dim <<= 1;
+			if (width == height) {
+				height <<= 1;
+			}
+			else {
+				width <<= 1;
+			}
 		}
 
-		width = height = dim;
 		perRow = width / glyphWidth;
 	}
 
