@@ -35,7 +35,7 @@ ICore* ICore::instance(void)
 
 QString ICore::versionString(void)
 {
-	return tr(X_ENGINE_NAME " - Asset Manager %1").arg(QLatin1String(Constants::ASSMAN_VERSION_LONG));
+	return tr(X_ENGINE_NAME " - Editor %1").arg(QLatin1String(Constants::EDITOR_VERSION_LONG));
 }
 
 QWidget* ICore::mainWindow(void)

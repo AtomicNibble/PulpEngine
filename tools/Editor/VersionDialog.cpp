@@ -23,8 +23,8 @@ VersionDialog::VersionDialog(QWidget *parent)
 		"<br/>")
 		.arg(ICore::versionString(),
 			QLatin1String(__DATE__), QLatin1String(__TIME__),
-			QLatin1String(Constants::ASSMAN_YEAR),
-			QLatin1String(Constants::ASSMAN_AUTHOR));
+			QLatin1String(Constants::EDITOR_YEAR),
+			QLatin1String(Constants::EDITOR_AUTHOR));
 
 
 	QLabel* pCopyRightLabel = new QLabel(description);
@@ -38,7 +38,7 @@ VersionDialog::VersionDialog(QWidget *parent)
 	connect(pButtonBox, SIGNAL(rejected()), this, SLOT(reject()));
 
 	QLabel* pLogoLabel = new QLabel;
-	pLogoLabel->setPixmap(QPixmap(QLatin1String(Constants::ICON_LOGO_CRY_128)));
+	pLogoLabel->setPixmap(QPixmap(QLatin1String(Constants::ICON_LOGO_128)));
 	pLayout->addWidget(pLogoLabel, 0, 0, 1, 1);
 	pLayout->addWidget(pCopyRightLabel, 0, 1, 4, 4);
 	pLayout->addWidget(pButtonBox, 4, 0, 1, 5);

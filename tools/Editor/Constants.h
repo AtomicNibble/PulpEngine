@@ -7,9 +7,9 @@ X_NAMESPACE_BEGIN(editor)
 namespace Constants
 {
 
-	const char* const ASSMAN_VERSION_LONG = "1.0.0.0";
-	const char* const ASSMAN_AUTHOR = "Tom Crowley";
-	const char* const ASSMAN_YEAR = "2016";
+	const char* const EDITOR_VERSION_LONG = "1.0.0.0";
+	const char* const EDITOR_AUTHOR = "Tom Crowley";
+	const char* const EDITOR_YEAR = "2018";
 
 
 	// Default groups
@@ -136,8 +136,6 @@ namespace Constants
 	const char ICON_LOGO_32[] = ":/misc/img/icon.png";
 	const char ICON_LOGO_64[] = ":/misc/img/logo_64.png";
 	const char ICON_LOGO_128[] = ":/misc/img/logo_128.png";
-	const char ICON_LOGO_CRY_64[] = ":/misc/img/logo_cry_128.png";
-	const char ICON_LOGO_CRY_128[] = ":/misc/img/logo_cry_128.png";
 
 	// Editors
 	const char ASSETPROP_EDITOR_ID[] = "AssetProp.Editor";
