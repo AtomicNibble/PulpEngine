@@ -10,9 +10,6 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = 0;
@@ -101,9 +98,8 @@ int main(int argc, char *argv[])
 #endif
 
 
-	// this is a engine app now :)
 	core::MallocFreeAllocator allocator;
-	AssetManagerArena arena(&allocator, "AssetManagerArena");
+	AssetManagerArena arena(&allocator, "EditorArena");
 	g_arena = &arena;
 
 	int32_t res = -1;

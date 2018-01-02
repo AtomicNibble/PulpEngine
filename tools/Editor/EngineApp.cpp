@@ -1,18 +1,12 @@
 #include "stdafx.h"
 #include "EngineApp.h"
 
+#include <Platform\MessageBox.h>
 
-
-extern HINSTANCE g_hInstance;
-
-void Error(const char* sErrorText)
-{
-	MessageBoxA(0, sErrorText, X_ENGINE_NAME" Start Error", MB_OK | MB_DEFAULT_DESKTOP_ONLY);
-}
 
 EngineApp::EngineApp() :
 	pICore_(nullptr),
-	hSystemHandle_(NULL)
+	hSystemHandle_(nullptr)
 {
 }
 
@@ -30,7 +24,7 @@ EngineApp::~EngineApp()
 bool EngineApp::Init(const wchar_t* sInCmdLine)
 {
 	SCoreInitParams params;
-	params.hInstance = g_hInstance;
+	params.hInstance = 0;
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
 	params.bSkipSound = true;
@@ -110,7 +104,6 @@ bool EngineApp::ShutDown(void)
 	return true;
 }
 
-
 void EngineApp::OnAssert(const core::SourceInfo& sourceInfo)
 {
 	X_UNUSED(sourceInfo);
@@ -122,3 +115,14 @@ void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
 	X_UNUSED(sourceInfo);
 
 }
+
+
+void EngineApp::Error(const char* pErrorText)
+{
+	core::msgbox::show(pErrorText,
+		X_ENGINE_NAME" Start Error",
+		core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+		core::msgbox::Buttons::OK
+	);
+}
+
