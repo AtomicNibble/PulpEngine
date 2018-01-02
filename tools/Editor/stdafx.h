@@ -19,20 +19,8 @@ extern core::MemoryArenaBase* g_arena;
 
 // ----------------------------
 
-#define ANGELSCRIPT_DLL_LIBRARY_IMPORT
-#define AS_PROCESS_METADATA 0
-#include <angelscript\include\angelscript.h>
-
-#if X_DEBUG
-X_LINK_LIB("angelscriptd");
-#else
-X_LINK_LIB("angelscript");
-#endif // !X_DEBUG
-
-// ----------------------------
-
 // qt wants this..
-#pragma comment(lib, "Dwrite")
+X_LINK_LIB("Dwrite")
 
 // ----------------------------
 

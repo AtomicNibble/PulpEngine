@@ -844,7 +844,7 @@
     <ClCompile Include="AssetEntryModel.cpp" />
     <ClCompile Include="Debug Dynamic\moc_Editor.cpp" />
     <ClCompile Include="Editor.cpp" />
-    <ClCompile Include="assetmanager_plugin_import.cpp" />
+    <ClCompile Include="editor_plugin_import.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
     <ClCompile Include="ColorPreviewWidget.cpp" />
     <ClCompile Include="ColorSelectorWidget.cpp" />

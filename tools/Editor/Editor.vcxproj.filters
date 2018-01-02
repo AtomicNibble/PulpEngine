@@ -136,9 +136,6 @@
     <Filter Include="Source Files\Widgets\Dialogs">
       <UniqueIdentifier>{a61de4b7-cf63-4ac4-8406-232bde90b65d}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Widgets\AssetScript">
-      <UniqueIdentifier>{33522b2b-f5ad-495b-976f-0c2ef9023ed2}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\OutputPanes">
       <UniqueIdentifier>{5227bd49-a2dc-4ef5-989b-419789e0a421}</UniqueIdentifier>
     </Filter>
@@ -469,9 +466,6 @@
       <Filter>Source Files\Misc</Filter>
     </ClCompile>
     <ClCompile Include="logging.cpp">
-      <Filter>Source Files\Misc</Filter>
-    </ClCompile>
-    <ClCompile Include="assetmanager_plugin_import.cpp">
       <Filter>Source Files\Misc</Filter>
     </ClCompile>
     <ClCompile Include="modproject.cpp">
@@ -1206,6 +1200,9 @@
     <ClCompile Include="Debug Dynamic\moc_Editor.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="editor_plugin_import.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="session.h">
@@ -1214,9 +1211,6 @@
     <CustomBuild Include="stdafx.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <ClInclude Include="GeneratedFiles\ui_assetmanager.h">
-      <Filter>Generated Files</Filter>
-    </ClInclude>
     <ClInclude Include="EngineApp.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -1466,6 +1460,9 @@
     </ClInclude>
     <ClInclude Include="StrUtil.h">
       <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="GeneratedFiles\ui_editor.h">
+      <Filter>Generated Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
