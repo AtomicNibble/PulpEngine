@@ -18,7 +18,7 @@ namespace Constants
 	const char G_DEFAULT_THREE[] = "Group.Default.Three";
 
 
-	const char C_GLOBAL[] = "AssMan Context";
+	const char C_GLOBAL[] = "Editor Context";
 	const char C_EDITORMANAGER[] = "EditorManager";
 	const char C_GENERAL_OUTPUT_PANE[] = "GeneralOutputPane";
 
