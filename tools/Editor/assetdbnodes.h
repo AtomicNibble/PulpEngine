@@ -4,8 +4,6 @@
 
 X_NAMESPACE_BEGIN(editor)
 
-class ConverterHost;
-
 namespace AssetExplorer
 {
 
@@ -59,8 +57,6 @@ namespace AssetExplorer
 		virtual bool isEnabled(void) const;
 
 		virtual QList<ProjectAction> supportedActions(Node *node) const;
-
-		virtual bool build(ConverterHost& conHost, bool force = false) const X_ABSTRACT;
 
 		void setName(const QString& name);
 		void setIcon(const QIcon& icon);
@@ -194,8 +190,6 @@ namespace AssetExplorer
 		virtual bool addSubProjects(const QStringList& projectNames) X_ABSTRACT;
 		virtual bool removeSubProjects(const QStringList& projectNames) X_ABSTRACT;
 
-		virtual bool clean(ConverterHost& conHost) const X_ABSTRACT;
-
 
 		QList<NodesWatcher*> watchers(void) const;
 		void registerWatcher(NodesWatcher* pWatcher);
@@ -242,8 +236,6 @@ namespace AssetExplorer
 		void unregisterWatcher(NodesWatcher* pWatcher);
 
 		bool isEnabled(void) const X_OVERRIDE;
-
-		bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;
 
 	protected:
 		void addProjectNodes(const QList<ProjectNode*>& projectNodes);

@@ -148,12 +148,6 @@
     <Filter Include="Source Files\Logger">
       <UniqueIdentifier>{53f62975-1d2d-42d1-8eeb-f6cdbc645842}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Converter">
-      <UniqueIdentifier>{4401c038-0426-4108-b461-0d73bbbe3928}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Converter">
-      <UniqueIdentifier>{858bbc31-a08d-470c-b906-2431078c2dbc}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Generated Files\Release Dynamic">
       <UniqueIdentifier>{c3965725-0233-443f-bfe1-f31f4ec0d7df}</UniqueIdentifier>
     </Filter>
@@ -978,24 +972,6 @@
     <ClCompile Include="StrUtil.cpp">
       <Filter>Source Files\Misc</Filter>
     </ClCompile>
-    <ClCompile Include="ConverterHost.cpp">
-      <Filter>Source Files\Converter</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_ConverterHost.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_ConverterHost.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_ConverterHost.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_ConverterHost.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_ConverterHost.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_LoggerOutputWindowWritePolicy.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -1093,9 +1069,6 @@
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release Dynamic\moc_Context.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_ConverterHost.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release Dynamic\moc_CustomTabWidget.cpp">
@@ -1318,9 +1291,6 @@
     </CustomBuild>
     <CustomBuild Include="ParameterAction.h">
       <Filter>Header Files\Actions</Filter>
-    </CustomBuild>
-    <CustomBuild Include="ConverterHost.h">
-      <Filter>Header Files\Converter</Filter>
     </CustomBuild>
     <CustomBuild Include="LoggerOutputWindowWritePolicy.h">
       <Filter>Header Files\Logger</Filter>

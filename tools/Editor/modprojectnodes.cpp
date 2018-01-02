@@ -1,8 +1,6 @@
 #include "modprojectnodes.h"
 #include "modproject.h"
 
-#include "ConverterHost.h"
-
 X_NAMESPACE_BEGIN(editor)
 
 
@@ -581,35 +579,11 @@ bool ModProjectNode::removeFile(const core::string& name, assetDb::AssetType::En
 	return pProject_->removeFile(name, type);
 }
 
-bool ModProjectNode::clean(ConverterHost& conHost) const
-{
-	int32_t modId = pProject_->modId();
-
-	// les warn, might be miss click.
-	const auto result = QMessageBox::warning(ICore::mainWindow(), "Clean Mod", 
-		"Confirm Clean mod.\n\nThis will delete all coverted assets for the selected mod",
-		QMessageBox::Ok | QMessageBox::Cancel,
-		QMessageBox::Cancel);
-	
-	if (result == QMessageBox::Ok) {
-		conHost.cleanMod(modId);
-	}
-
-	return true;
-}
-
 ModProject* ModProjectNode::getModProject(void)
 {
     return pProject_;
 }
 
-bool ModProjectNode::build(ConverterHost& conHost, bool force) const
-{
-	int32_t modId = pProject_->modId();
-
-	conHost.convertMod(modId, force);
-	return true;
-}
 
 // -------------------------------------------------------------------
 
@@ -738,20 +712,6 @@ bool ModVirtualFolderNode::removeFile(const core::string& name, assetDb::AssetTy
 }
 
 
-bool ModVirtualFolderNode::build(ConverterHost& conHost, bool force) const
-{
-	ModProjectNode* pProjectNode = qobject_cast<ModProjectNode*>(projectNode());
-	if (!pProjectNode) {
-		return false;
-	}
-
-	ModProject* pProject = pProjectNode->getModProject();
-	int32_t modId = pProject->modId();
-
-	conHost.convertMod(modId, assetType(), force);
-	return true;
-}
-
 // -------------------------------------------------------------------
 
 
@@ -761,28 +721,6 @@ ModFolderNode::ModFolderNode(const QString &name) :
 
 }
 
-bool ModFolderNode::build(ConverterHost& conHost, bool force) const
-{
-	const auto folders = subFolderNodes();
-	for (const auto& f : folders)
-	{
-		if (!f->build(conHost, force)) {
-			// we should probs have a setting that allow continue on single build failure.
-			// but actually this is not building but scheduling build.
-			return false;
-		}
-	}
-
-	const auto files = fileNodes();
-	for (const auto& f : files)
-	{
-		if (!f->build(conHost, force)) {
-			return false;
-		}
-	}
-
-	return true;
-}
 
 // -------------------------------------------------------------------
 
@@ -794,13 +732,5 @@ ModFileNode::ModFileNode(const QString& displayName, const QString& name, AssetT
 
 }
 
-bool ModFileNode::build(ConverterHost& conHost, bool force) const
-{
-	const auto array = name().toLocal8Bit();
-	core::string nameNarrow(array.data());
-
-	conHost.convertAsset(nameNarrow, assetType(), force);
-	return true;
-}
 
 X_NAMESPACE_END

@@ -20,8 +20,6 @@
 
 #include <../AssetDB/AssetDB.h>
 
-#include "ConverterHost.h"
-
 X_NAMESPACE_BEGIN(editor)
 
 namespace AssetExplorer
@@ -35,9 +33,8 @@ AssetExplorer *AssetExplorer::instance()
 }
 
 
-AssetExplorer::AssetExplorer(assetDb::AssetDB& db, ConverterHost& conHost)  :
+AssetExplorer::AssetExplorer(assetDb::AssetDB& db)  :
 	db_(db),
-	conHost_(conHost),
     currentProject_(nullptr),
     currentNode_(nullptr)
 {
@@ -788,7 +785,7 @@ void AssetExplorer::build(void)
 	}
 
 
-	currentNode_->build(conHost_);
+//	currentNode_->build(conHost_);
 }
 
 
@@ -804,7 +801,7 @@ void AssetExplorer::buildForce(void)
 	}
 
 
-	currentNode_->build(conHost_, true);
+//	currentNode_->build(conHost_, true);
 }
 
 
@@ -817,7 +814,7 @@ void AssetExplorer::cleanMod(void)
 	}
 
 	if (ProjectNode* pProjectNode = qobject_cast<ProjectNode*>(currentNode_)) {
-		pProjectNode->clean(conHost_);
+	//	pProjectNode->clean(conHost_);
 	}
 }
 

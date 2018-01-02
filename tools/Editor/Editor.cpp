@@ -21,7 +21,6 @@
 #include "IAssetEntry.h"
 
 #include <../AssetDB/AssetDB.h>
-#include "ConverterHost.h"
 
 #include <qfilesystemwatcher.h>
 
@@ -41,7 +40,6 @@ Editor::Editor(QWidget* pParent) :
 	pActionManager_(nullptr),
 	pEditorManager_(nullptr),
 	pDb_(nullptr),
-	pConHost_(nullptr),
 	pAssetDbexplorer_(nullptr),
 	additionalContexts_(Constants::C_GLOBAL) // always have global contex
 {
@@ -73,10 +71,6 @@ Editor::Editor(QWidget* pParent) :
 		}
 	}
 
-	pConHost_ = new ConverterHost(*pDb_, g_arena);
-	pConHost_->init();
-	pConHost_->setConversionProfile(core::string("dev"));
-
 	connect(pWatcher_, SIGNAL(fileChanged(const QString &)),
 		this, SLOT(fileChanged(const QString &)));
 
@@ -97,7 +91,7 @@ Editor::Editor(QWidget* pParent) :
 //	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
 
 	{
-		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_, *pConHost_);
+		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_);
 		if (!pAssetDbexplorer_->init()) {
 			QMessageBox::critical(this, tr("Error"), "Failed to init AssetExpolrer");
 		}
@@ -143,10 +137,6 @@ Editor::~Editor()
 	}
 
 	OutputPaneManager::destroy();
-
-	if (pConHost_) {
-		delete pConHost_;
-	}
 
 	if (pDb_) {
 		pDb_->CloseDB();

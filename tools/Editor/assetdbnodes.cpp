@@ -666,14 +666,6 @@ bool SessionNode::isEnabled(void) const
 	return true;
 }
 
-bool SessionNode::build(ConverterHost& conHost, bool force) const
-{
-	for(ProjectNode* pProject : projectNodes_) {
-		pProject->build(conHost, force);
-	}
-
-	return true;
-}
 
 
 QList<ProjectNode*> SessionNode::projectNodes(void) const

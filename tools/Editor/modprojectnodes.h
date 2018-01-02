@@ -24,12 +24,7 @@ public:
 	bool addFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
 	bool removeFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
 
-	bool clean(ConverterHost& conHost) const X_OVERRIDE;
-
 	ModProject* getModProject(void);
-
-private:
-	bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;
 
 private:
 	ModProject* pProject_;
@@ -55,9 +50,6 @@ public:
 	bool removeFile(const core::string& name, assetDb::AssetType::Enum type) X_OVERRIDE;
 
 private:
-	bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;
-
-private:
 	QString displayName_;
 	int32_t numAssets_;
 };
@@ -70,9 +62,6 @@ public:
 	explicit ModFolderNode(const QString& name);
 
 private:
-	bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;
-
-private:
 };
 
 
@@ -82,9 +71,6 @@ class ModFileNode : public AssetExplorer::FileNode
 
 public:
 	explicit ModFileNode(const QString& displayName, const QString& name, AssetType::Enum type);
-
-private:
-	bool build(ConverterHost& conHost, bool force) const X_OVERRIDE;
 
 
 private:

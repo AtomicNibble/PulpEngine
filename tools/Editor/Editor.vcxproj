@@ -842,7 +842,18 @@
     <ClCompile Include="assetdbwidget.cpp" />
     <ClCompile Include="AssetEntryManager.cpp" />
     <ClCompile Include="AssetEntryModel.cpp" />
-    <ClCompile Include="Debug Dynamic\moc_Editor.cpp" />
+    <ClCompile Include="Debug Dynamic\moc_Editor.cpp">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
+    </ClCompile>
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="editor_plugin_import.cpp" />
     <ClCompile Include="BaseWindow.cpp" />
@@ -850,7 +861,6 @@
     <ClCompile Include="ColorSelectorWidget.cpp" />
     <ClCompile Include="Command.cpp" />
     <ClCompile Include="Context.cpp" />
-    <ClCompile Include="ConverterHost.cpp" />
     <ClCompile Include="CustomTabWidget.cpp" />
     <ClCompile Include="Debug Dynamic\moc_ActionContainer.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
@@ -1033,18 +1043,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_Context.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_ConverterHost.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
@@ -1621,18 +1619,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Debug\moc_Context.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_ConverterHost.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
@@ -2298,20 +2284,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_ConverterHost.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">false</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Release Dynamic\moc_CustomTabWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -2952,18 +2924,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Release\moc_ConverterHost.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Release\moc_CustomTabWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
@@ -3537,18 +3497,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="Super Dynamic\moc_Context.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_ConverterHost.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
@@ -4136,18 +4084,6 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
-    <ClCompile Include="Super\moc_ConverterHost.cpp">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
     <ClCompile Include="Super\moc_CustomTabWidget.cpp">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
@@ -4537,56 +4473,6 @@
     <ClCompile Include="WindowTileBar.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="ConverterHost.h">
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DX_DLL=1 -D_DEBUG -DX_DEBUG=1 -DX_RELEASE=0 -DX_SUPER=0 -DX_64=1 -D_AMD64_ -D_WIN64 -D_ALLOW_RTCc_IN_STL=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\debug" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DX_DLL=1 -D_DEBUG -DX_DEBUG=1 -DX_RELEASE=0 -DX_SUPER=0 -DX_64=0 -D_ALLOW_RTCc_IN_STL=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\debug" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=0 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -D_DEBUG -DX_DEBUG=1 -DX_RELEASE=0 -DX_SUPER=0 -DX_64=0 -D_ALLOW_RTCc_IN_STL=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\debug" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DLL=1 -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DLL=1 -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DLL=1 -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=0 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DLL=1 -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=0 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Super|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Super|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Super|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DEBUG=0 -DX_RELEASE=0 -DX_SUPER=1 -DX_64=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -D_DEBUG -DX_DEBUG=1 -DX_RELEASE=0 -DX_SUPER=0 -DX_64=1 -D_AMD64_ -D_WIN64 -D_ALLOW_RTCc_IN_STL=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\debug" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DEBUG=0 -DX_RELEASE=1 -DX_SUPER=0 -DX_64=0 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
-      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Moc%27ing ConverterHost.h...</Message>
-      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
-      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../ConverterHost.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DEBUG=0 -DX_RELEASE=1 -DX_SUPER=0 -DX_64=1 -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
-    </CustomBuild>
     <CustomBuild Include="RawFileLoader.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>
       <Message Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Moc%27ing RawFileLoader.h...</Message>
