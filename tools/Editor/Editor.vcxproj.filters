@@ -151,6 +151,9 @@
     <Filter Include="Generated Files\Release Dynamic">
       <UniqueIdentifier>{c3965725-0233-443f-bfe1-f31f4ec0d7df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\img">
+      <UniqueIdentifier>{047fff29-7f43-439a-8c79-558c0ff5222b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -1358,45 +1361,9 @@
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
-    <None Include="img\File_default.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\File_mesh.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\Folder.Closed.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\Folder.Open.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\Mod_Project_Node_32.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch-closed.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch-end.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch-more.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch-open.png">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch_closed.gif">
-      <Filter>Resource Files</Filter>
-    </None>
-    <None Include="img\branch_open.gif">
-      <Filter>Resource Files</Filter>
-    </None>
     <CustomBuild Include="resources.qrc">
       <Filter>Resource Files</Filter>
     </CustomBuild>
-    <None Include="img\vline.png">
-      <Filter>Resource Files</Filter>
-    </None>
     <None Include="Id.inl">
       <Filter>Header Files\Contex</Filter>
     </None>
@@ -1412,11 +1379,36 @@
     <None Include="EditorView.inl">
       <Filter>Header Files\Editor</Filter>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Image Include="img\icon.ico">
-      <Filter>Resource Files</Filter>
-    </Image>
+    <None Include="img\branch_closed.gif">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\branch_open.gif">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\branch-closed.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\branch-end.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\branch-more.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\branch-open.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\File_default.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\File_mesh.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\Folder.Closed.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\Folder.Open.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="assert_qt.h">
@@ -1439,5 +1431,18 @@
     <ResourceCompile Include="Editor.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="img\Mod_Project_Node_32.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+    <None Include="img\vline.png">
+      <Filter>Resource Files\img</Filter>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="img\icon.ico">
+      <Filter>Resource Files\img</Filter>
+    </Image>
   </ItemGroup>
 </Project>
