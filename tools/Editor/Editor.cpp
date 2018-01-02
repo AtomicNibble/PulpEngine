@@ -15,8 +15,6 @@
 #include "project.h"
 
 #include "AssetEntryManager.h"
-#include "AssetPropertyEditorFactory.h"
-#include "AssetScript.h"
 #include "Command.h"
 
 #include "IEditor.h"
@@ -92,15 +90,11 @@ Editor::Editor(QWidget* pParent) :
 
 	// ----------------------------------
 
-	pAssetScripts_ = new AssetPropsScriptManager();
-	if (!pAssetScripts_->init()) {
-		QMessageBox::critical(this, tr("Error"), "Failed to init AssetScript manager");
-	}
 
 	// needs to be done after menu's created
 	pEditorManager_ = new EditorManager(this);
 	pEditorManager_->init();
-	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
+//	pEditorManager_->AddFactory(new AssetPropertyEditorFactory(*pDb_, pAssetScripts_, this));
 
 	{
 		pAssetDbexplorer_ = new AssetExplorer::AssetExplorer(*pDb_, *pConHost_);
@@ -152,10 +146,6 @@ Editor::~Editor()
 
 	if (pConHost_) {
 		delete pConHost_;
-	}
-
-	if (pAssetScripts_) {
-		delete pAssetScripts_;
 	}
 
 	if (pDb_) {

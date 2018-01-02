@@ -124,26 +124,11 @@
     <Filter Include="Source Files\Editor\Types">
       <UniqueIdentifier>{ae44c3ea-1acf-40f5-8f42-d9a26ec4835e}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\AssetScript">
-      <UniqueIdentifier>{8fe7c15e-69fb-437e-8197-2aa685414083}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\AssetScript">
-      <UniqueIdentifier>{7b0e4ad4-6c1e-41c4-b1fd-b777c007e1e5}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\AssetScript\modules">
-      <UniqueIdentifier>{b841e4b0-f92c-4064-993e-fbf6b7d7a59b}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\AssetScript\modules">
-      <UniqueIdentifier>{9b60db6a-cdeb-46f6-9d06-862c9ab15d11}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Widgets">
       <UniqueIdentifier>{2a39591a-c923-479e-a98c-7fe7909d751b}</UniqueIdentifier>
     </Filter>
     <Filter Include="Header Files\Widgets\Dialogs">
       <UniqueIdentifier>{3ef6360a-a062-4441-ac4b-6bf78c49afad}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Header Files\Widgets\AssetScript">
-      <UniqueIdentifier>{9b06e878-0ce1-475c-b2e3-ce087ef7e0ac}</UniqueIdentifier>
     </Filter>
     <Filter Include="Source Files\Widgets">
       <UniqueIdentifier>{11af5ceb-f7df-45f1-a5b4-3355a863e8c3}</UniqueIdentifier>
@@ -666,42 +651,6 @@
     <ClCompile Include="Release\moc_IEditorFactory.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="AssetPropertyEditor.cpp">
-      <Filter>Source Files\Editor\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetPropertyEditorFactory.cpp">
-      <Filter>Source Files\Editor\Types</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_BaseWindow.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -756,218 +705,11 @@
     <ClCompile Include="WindowTileBar.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
-    <ClCompile Include="AssetScript.cpp">
-      <Filter>Source Files\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="assetscript\scriptstdstring.cpp">
-      <Filter>Source Files\AssetScript\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="assetscript\scriptbuilder.cpp">
-      <Filter>Source Files\AssetScript\modules</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetScriptTypes.cpp">
-      <Filter>Source Files\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetScript.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetScript.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetScript.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetScript.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetScript.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="StatusBar.cpp">
       <Filter>Source Files\Widgets</Filter>
     </ClCompile>
     <ClCompile Include="VersionDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetColorWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetComboBoxWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetLineEditWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetTextWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetTextWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetTextWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetTextWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetTextWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetTextWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetPathWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetTextureWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetCheckBoxWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetSpinBoxWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetGroupWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetStringWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_ColorPreviewWidget.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
@@ -1185,24 +927,6 @@
     <ClCompile Include="ShowRefsDialog.cpp">
       <Filter>Source Files\Widgets\Dialogs</Filter>
     </ClCompile>
-    <ClCompile Include="AssetPropertyEditorActionHandler.cpp">
-      <Filter>Source Files\Editor\Types</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_SaveItemsDialog.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -1293,24 +1017,6 @@
     <ClCompile Include="Release\moc_LoggerOutputWindowWritePolicy.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
-    <ClCompile Include="AssetModelWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_RawFileLoader.cpp">
       <Filter>Generated Files\Debug Dynamic</Filter>
     </ClCompile>
@@ -1327,42 +1033,6 @@
       <Filter>Generated Files\Super Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_RawFileLoader.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetAnimWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="AssetAssetRefWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetAssetRefWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetAssetRefWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetAssetRefWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetAssetRefWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetAssetRefWidget.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="SelectAssetDialog.cpp">
@@ -1398,21 +1068,6 @@
     <ClCompile Include="Release Dynamic\moc_AddModDialog.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetAnimWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetAssetRefWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetCheckBoxWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetColorWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetComboBoxWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
     <ClCompile Include="Release Dynamic\moc_assetdbexplorer.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
@@ -1429,42 +1084,6 @@
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release Dynamic\moc_AssetEntryModel.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetGroupWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetLineEditWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetModelWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetPathWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditor.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditorActionHandler.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetPropertyEditorFactory.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetScript.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetSpinBoxWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetStringWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetTextureWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetTextWidget.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release Dynamic\moc_BaseWindow.cpp">
@@ -1581,27 +1200,6 @@
     <ClCompile Include="Release Dynamic\moc_WindowTileBar.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
-    <ClCompile Include="AssetFontWidget.cpp">
-      <Filter>Source Files\Widgets\AssetScript</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_AssetFontWidget.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
     <ClCompile Include="Editor.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -1667,12 +1265,6 @@
     <CustomBuild Include="IAssetEntryFactory.h">
       <Filter>Header Files\Interfaces</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetPropertyEditor.h">
-      <Filter>Header Files\Editor\Types</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetPropertyEditorFactory.h">
-      <Filter>Header Files\Editor\Types</Filter>
-    </CustomBuild>
     <CustomBuild Include="BaseWindow.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
@@ -1682,44 +1274,11 @@
     <CustomBuild Include="WindowTileBar.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetScript.h">
-      <Filter>Header Files\AssetScript</Filter>
-    </CustomBuild>
     <CustomBuild Include="StatusBar.h">
       <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetScriptTypes.h">
-      <Filter>Header Files\AssetScript</Filter>
-    </CustomBuild>
     <CustomBuild Include="VersionDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetColorWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetComboBoxWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetLineEditWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetPathWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetTextureWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetCheckBoxWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetSpinBoxWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetGroupWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetStringWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
     <CustomBuild Include="ColorPreviewWidget.h">
       <Filter>Header Files\Widgets</Filter>
@@ -1757,9 +1316,6 @@
     <CustomBuild Include="ShowRefsDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetPropertyEditorActionHandler.h">
-      <Filter>Header Files\Editor\Types</Filter>
-    </CustomBuild>
     <CustomBuild Include="SaveItemsDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
     </CustomBuild>
@@ -1775,26 +1331,11 @@
     <CustomBuild Include="LoggerOutputWindowWritePolicy.h">
       <Filter>Header Files\Logger</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetModelWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
     <CustomBuild Include="RawFileLoader.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
-    <CustomBuild Include="AssetAnimWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetAssetRefWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
     <CustomBuild Include="SelectAssetDialog.h">
       <Filter>Header Files\Widgets\Dialogs</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetTextWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
-    </CustomBuild>
-    <CustomBuild Include="AssetFontWidget.h">
-      <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
     <CustomBuild Include="editor.ui">
       <Filter>Form Files</Filter>
@@ -1922,12 +1463,6 @@
     </ClInclude>
     <ClInclude Include="DirectionConstants.h">
       <Filter>Header Files\Editor</Filter>
-    </ClInclude>
-    <ClInclude Include="assetscript\scriptstdstring.h">
-      <Filter>Header Files\AssetScript\modules</Filter>
-    </ClInclude>
-    <ClInclude Include="assetscript\scriptbuilder.h">
-      <Filter>Header Files\AssetScript\modules</Filter>
     </ClInclude>
     <ClInclude Include="StrUtil.h">
       <Filter>Header Files\Misc</Filter>
