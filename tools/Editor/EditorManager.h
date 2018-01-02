@@ -5,7 +5,7 @@
 #include "AssetEntryModel.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class IAssetEntry;
 class IEditor;
@@ -194,7 +194,7 @@ private:
 
 	static void ShowDropOverlay(bool show, const QRect& rect);
 
-	friend class AssetManager;
+	friend class Editor;
 	friend class SplitterOrView;
 	friend class EditorView;
 	friend class CustomTabWidget;

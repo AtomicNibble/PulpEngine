@@ -1,4 +1,4 @@
-#include "assetmanager.h"
+#include "Editor.h"
 #include <QApplication>
 #include <QFile>
 #include <qstylefactory.h>
@@ -56,8 +56,8 @@ X_USING_NAMESPACE;
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-  //  a.setApplicationDisplayName("AssetManager");
-//    a.setApplicationName("AssetManager");
+  //  a.setApplicationDisplayName("Editor");
+//    a.setApplicationName("Editor");
     a.setApplicationVersion("0.0.0.1");
 	a.setOrganizationName("Tom Crowley");
 	a.setOrganizationDomain(X_ENGINE_NAME " - Engine");
@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
 			const QtMessageHandler oldMsgHandler = qInstallMessageHandler(redirectQtMsgToEngineLog);
 #endif // REDIRECT_QT_LOGGS 
 
-			assman::AssetManager w;
+			editor::Editor w;
 			w.show();
 
 			res = a.exec();

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "ProxyAction.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 

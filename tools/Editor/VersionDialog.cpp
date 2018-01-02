@@ -1,14 +1,14 @@
 #include "stdafx.h"
 #include "VersionDialog.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 
 VersionDialog::VersionDialog(QWidget *parent)
 	: QDialog(parent)
 {
-	setWindowTitle(tr("About AssetManager"));
+	setWindowTitle(tr("About Editor"));
 	setWindowFlags(windowFlags() & ~Qt::WindowContextHelpButtonHint);
 	QGridLayout* pLayout = new QGridLayout(this);
 	pLayout->setSizeConstraint(QLayout::SetFixedSize);

@@ -3,7 +3,7 @@
 
 #include "ColorSelectorWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetColorWidget::AssetColorWidget(QWidget *parent, const std::string& value) :

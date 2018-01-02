@@ -2,7 +2,7 @@
 #include "AssetCheckBoxWidget.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 AssetCheckBoxWidget::AssetCheckBoxWidget(QWidget *parent, const std::string& val) :
 	QCheckBox(parent)

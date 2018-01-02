@@ -1,4 +1,4 @@
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 #include <limits.h>
 

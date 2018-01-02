@@ -4,7 +4,7 @@
 #include "AssetPropertyEditorActionHandler.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetPropertyEditorFactory::AssetPropertyEditorFactory(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, QObject *parent) :

@@ -7,7 +7,7 @@ X_NAMESPACE_DECLARE(assetDb,
 );
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class IAssetEntry;
 class AssetProperty;

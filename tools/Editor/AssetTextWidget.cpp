@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AssetTextWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 AssetTextWidget::AssetTextWidget(QWidget *parent, const std::string& value) :
 	QWidget(parent)

@@ -2,7 +2,7 @@
 #include "DisplayPixDialog.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 DisplayPixDialog::DisplayPixDialog(QWidget *parent, QPixmap& pix)

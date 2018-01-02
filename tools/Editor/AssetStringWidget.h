@@ -2,7 +2,7 @@
 
 #include <QObject>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 // had to place this here since a class with Q_OBJECT in cpp makes qt plugin fuck shit up.

@@ -11,7 +11,7 @@ X_NAMESPACE_DECLARE(engine,
 	} // namespace techset
 );
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 // ----------------------------------------------
 

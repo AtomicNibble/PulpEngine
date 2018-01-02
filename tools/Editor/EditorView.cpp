@@ -7,7 +7,7 @@
 #include "EditorManager.h"
 #include "BaseWindow.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 DiamondBut::DiamondBut(QWidget* parent) : 

@@ -1,7 +1,7 @@
 #include "LoggerOutputWindowWritePolicy.h"
 #include "OutputWindowWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 LoggerOutputWindowWritePolicy::LogData::LogData(const QLatin1String& latin, const QTextCharFormat& fmt) :

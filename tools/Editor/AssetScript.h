@@ -14,7 +14,7 @@ X_NAMESPACE_DECLARE(engine,
 );
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class AssetProperties;
 

@@ -18,7 +18,7 @@
 #include "DirectionConstants.h"
 #include "BaseWindow.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 namespace 
@@ -1347,7 +1347,7 @@ void EditorManager::autoSave(void)
 
 void EditorManager::updateWindowTitle(void)
 {
-	QString windowTitle = tr("AssetManager");
+	QString windowTitle = tr("Editor");
 	const QString dashSep = QLatin1String(" - ");
 	QString vcsTopic;
 	IAssetEntry* pAssetEntry = currentAssetEntry();
@@ -1761,7 +1761,7 @@ void EditorManager::splitNewWindow(EditorView* pView, IEditor* pEditor)
 
 	RemoveSplitIfEmpty(pView);
 
-	pNewWindow->setWindowTitle(pEditor->assetEntry()->displayName() + " - AssetManager");
+	pNewWindow->setWindowTitle(pEditor->assetEntry()->displayName() + " - Editor");
 	pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
 	pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
 	pNewWindow->resize(size);
@@ -2064,7 +2064,7 @@ void EditorManager::splitDragEnd(SplitterOrView* pSplitter)
 		// ok we add the pickle to a new window.
 		BaseWindow* pNewWindow = new BaseWindow;
 
-		pNewWindow->setWindowTitle(editor->assetEntry()->displayName() + " - AssetManager");
+		pNewWindow->setWindowTitle(editor->assetEntry()->displayName() + " - Editor");
 		pNewWindow->setAttribute(Qt::WA_DeleteOnClose);
 		pNewWindow->setAttribute(Qt::WA_QuitOnClose, false); // close when main window closes.
 		pNewWindow->resize(size);

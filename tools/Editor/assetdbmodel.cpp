@@ -9,7 +9,7 @@
 #include <QFileInfo>
 #include <QStringList>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace AssetExplorer
 {

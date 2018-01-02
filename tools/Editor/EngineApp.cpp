@@ -85,7 +85,7 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 
 	pICore_->RegisterAssertHandler(this);
 
-	LinkModule(pICore_, "AssetManager");
+	LinkModule(pICore_, "Editor");
 
 	// ConverterLib
 	if (!pICore_->IntializeLoadedEngineModule("Engine_ConverterLib", "Engine_ConverterLib")) {

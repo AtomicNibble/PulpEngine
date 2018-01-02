@@ -1,5 +1,5 @@
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 X_INLINE QAction* Shortcut::action(void) const

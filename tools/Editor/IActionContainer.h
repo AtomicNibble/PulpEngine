@@ -8,7 +8,7 @@ class QMenuBar;
 class QAction;
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class Context;
 class ICommand;

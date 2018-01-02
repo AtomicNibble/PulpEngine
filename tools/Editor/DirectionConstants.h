@@ -2,7 +2,7 @@
 
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 // this just saves including the EditorView def.
 

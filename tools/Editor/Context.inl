@@ -1,5 +1,5 @@
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 X_INLINE Context::Context(Id c1)

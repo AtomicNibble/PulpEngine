@@ -3,7 +3,7 @@
 #include <QObject>
 #include <QPlainTextEdit>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class OutputWindow : public QPlainTextEdit
 {

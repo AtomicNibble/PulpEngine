@@ -4,7 +4,7 @@
 #include "ActionManager.h"
 #include "Constants.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 

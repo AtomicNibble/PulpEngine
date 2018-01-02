@@ -1,4 +1,4 @@
-#include "assetmanager.h"
+#include "Editor.h"
 #include "assetdbwidget.h"
 #include "assetdbexplorer.h"
 #include "ActionManager.h"
@@ -27,14 +27,14 @@
 
 #include <qfilesystemwatcher.h>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
-const char* AssetManager::SETTINGS_GROUP = "MainWindow";
-const char* AssetManager::WINDOW_GEOMETRY_KEY = "WindowGeometry";
-const char* AssetManager::WINDOW_STATE_KEY = "WindowState";
+const char* Editor::SETTINGS_GROUP = "MainWindow";
+const char* Editor::WINDOW_GEOMETRY_KEY = "WindowGeometry";
+const char* Editor::WINDOW_STATE_KEY = "WindowState";
 
 
-AssetManager::AssetManager(QWidget* pParent) :
+Editor::Editor(QWidget* pParent) :
 	BaseWindow(pParent),
 	pVersionDialog_(nullptr),
 	pLayout_(nullptr),
@@ -134,14 +134,14 @@ AssetManager::AssetManager(QWidget* pParent) :
 
 	readSettings();
 
-	QTimer::singleShot(0, this, &AssetManager::restoreWindowState);
+	QTimer::singleShot(0, this, &Editor::restoreWindowState);
 
 	if (!pAssetDbexplorer_->delayedInit()) {
 
 	}
 }
 
-AssetManager::~AssetManager()
+Editor::~Editor()
 {
 	if (pLoggerPolicy_) {
 		gEnv->pLog->RemoveLogger(pLoggerPolicy_);
@@ -191,17 +191,17 @@ AssetManager::~AssetManager()
 
 
 
-IContext* AssetManager::currentContextObject(void) const
+IContext* Editor::currentContextObject(void) const
 {
 	return activeContext_.isEmpty() ? nullptr : activeContext_.first();
 }
 
-IContext* AssetManager::contextObject(QWidget* pWidget)
+IContext* Editor::contextObject(QWidget* pWidget)
 {
 	return contextWidgets_.value(pWidget);
 }
 
-void AssetManager::addContextObject(IContext* pContex)
+void Editor::addContextObject(IContext* pContex)
 {
 	if (!pContex) {
 		return;
@@ -215,7 +215,7 @@ void AssetManager::addContextObject(IContext* pContex)
 	contextWidgets_.insert(pWidget, pContex);
 }
 
-void AssetManager::removeContextObject(IContext* pContex)
+void Editor::removeContextObject(IContext* pContex)
 {
 	if (!pContex) {
 		return;
@@ -233,18 +233,18 @@ void AssetManager::removeContextObject(IContext* pContex)
 	}
 }
 
-QSettings* AssetManager::settings(QSettings::Scope scope) const
+QSettings* Editor::settings(QSettings::Scope scope) const
 {
 	X_UNUSED(scope);
 	return pSettings_;
 }
 
-MyStatusBar* AssetManager::statusBar(void)
+MyStatusBar* Editor::statusBar(void)
 {
 	return pStatusBar_;
 }
 
-void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
+void Editor::updateFocusWidget(QWidget* old, QWidget* now)
 {
 	X_UNUSED(old);
 
@@ -279,7 +279,7 @@ void AssetManager::updateFocusWidget(QWidget* old, QWidget* now)
 	}
 }
 
-void AssetManager::updateContextObject(const QList<IContext*>& context)
+void Editor::updateContextObject(const QList<IContext*>& context)
 {
 	emit pCoreImpl_->contextAboutToChange(context);
 
@@ -298,7 +298,7 @@ void AssetManager::updateContextObject(const QList<IContext*>& context)
 #endif // !X_DEBUG && CONTEXT_DEBUGGING
 }
 
-void AssetManager::updateContext(void)
+void Editor::updateContext(void)
 {
 	Context contexts;
 
@@ -322,7 +322,7 @@ void AssetManager::updateContext(void)
 }
 
 
-void AssetManager::createActions(void)
+void Editor::createActions(void)
 {
 	// File
 	pNewFileAct_ = new QAction(QIcon(":/misc/img/NewFile.png"), tr("New Asset..."), this);
@@ -382,8 +382,8 @@ void AssetManager::createActions(void)
 	connect(pReloadStyleAct_, SIGNAL(triggered()), this, SLOT(reloadStyle()));
 
 	// Help
-	pAboutAct_ = new QAction(tr("About AssetManager"), this);
-	pAboutAct_->setStatusTip(tr("Show the AssetManager's' About box"));
+	pAboutAct_ = new QAction(tr("About Editor"), this);
+	pAboutAct_->setStatusTip(tr("Show the Editor's' About box"));
 	connect(pAboutAct_, SIGNAL(triggered()), this, SLOT(about()));
 
 	pAboutQtAct_ = new QAction(tr("About &Qt"), this);
@@ -392,7 +392,7 @@ void AssetManager::createActions(void)
 
 }
 
-void AssetManager::createMenus(void)
+void Editor::createMenus(void)
 {
 	ActionContainer* pMenuBar = ActionManager::createMenuBar(Constants::MENU_BAR);
 
@@ -603,13 +603,13 @@ void AssetManager::createMenus(void)
 }
 
 
-void AssetManager::createStatusBar(void)
+void Editor::createStatusBar(void)
 {
 
 }
 
 template<class T>
-T* AssetManager::AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
+T* Editor::AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
 {
 	QDockWidget* pDock = new QDockWidget(tr(pName), this);
 	pDock->setAllowedAreas(areas);
@@ -624,7 +624,7 @@ T* AssetManager::AddDockItem(const char* pName, Qt::DockWidgetAreas areas, Qt::D
 }
 
 template<class T>
-void AssetManager::AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
+void Editor::AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetAreas areas, Qt::DockWidgetArea start)
 {
 	QDockWidget* pDock = new QDockWidget(tr(pName), this);
 	pDock->setAllowedAreas(areas);
@@ -635,7 +635,7 @@ void AssetManager::AddDockItem(const char* pName, T* pWidget, Qt::DockWidgetArea
 }
 
 
-void AssetManager::createDockWindows(void)
+void Editor::createDockWindows(void)
 {
 	pAssetViewWidget_ = new AssetExplorer::AssetDbViewWidget(*pDb_);
 
@@ -649,7 +649,7 @@ void AssetManager::createDockWindows(void)
 
 // =======================  View Menu Actions =======================
 
-void AssetManager::aboutToShowViewMenu(void)
+void Editor::aboutToShowViewMenu(void)
 {
 	ActionContainer* pActionContainer = ActionManager::actionContainer(Constants::M_VIEW);
 	ActionContainer* pActionContainerToolBar = ActionManager::actionContainer(Constants::M_VIEW_TOOLBAR);
@@ -684,7 +684,7 @@ void AssetManager::aboutToShowViewMenu(void)
 
 // ======================= File Menu Actions =======================
 
-void AssetManager::newFile(void)
+void Editor::newFile(void)
 {
 	AddAssetDialog dialog(ICore::mainWindow(), *pDb_);
 
@@ -696,25 +696,25 @@ void AssetManager::newFile(void)
 	dialog.exec();
 }
 
-void AssetManager::newMod(void)
+void Editor::newMod(void)
 {
 	AddModDialog dialog(ICore::mainWindow(), *pDb_);
 
 	dialog.exec();
 }
 
-void AssetManager::save(void)
+void Editor::save(void)
 {
 	EditorManager::saveAssetEntry();
 }
 
 
-void AssetManager::saveAll(void)
+void Editor::saveAll(void)
 {
 	AssetEntryManager::saveAllModifiedAssetEntrysSilently();
 }
 
-void AssetManager::aboutToShowRecentFiles(void)
+void Editor::aboutToShowRecentFiles(void)
 {
 	ActionContainer* aci = ActionManager::actionContainer(Constants::M_FILE_RECENTFILES);
 	aci->menu()->clear();
@@ -747,7 +747,7 @@ void AssetManager::aboutToShowRecentFiles(void)
 	}
 }
 
-void AssetManager::openRecentFile(void)
+void Editor::openRecentFile(void)
 {
 	QAction *action = qobject_cast<QAction *>(sender());
 	if (action)
@@ -759,18 +759,18 @@ void AssetManager::openRecentFile(void)
 
 // =======================  Window Menu Actions =======================
 
-void AssetManager::resetLayout(void)
+void Editor::resetLayout(void)
 {
 
 }
 
 
-void AssetManager::reloadStyle(void)
+void Editor::reloadStyle(void)
 {
 	reloadStyle("style\\style.qss");
 }
 
-void AssetManager::aboutToShowWindowMenu(void)
+void Editor::aboutToShowWindowMenu(void)
 {
 	// show list of open editors.
 	ActionContainer* pActionContainer = ActionManager::actionContainer(Constants::M_WINDOW_WINDOWS);
@@ -806,7 +806,7 @@ void AssetManager::aboutToShowWindowMenu(void)
 
 
 
-void AssetManager::windowListSetActiveEditor(void)
+void Editor::windowListSetActiveEditor(void)
 {
 	QAction* pAction = qobject_cast<QAction *>(sender());
 	if (pAction)
@@ -821,7 +821,7 @@ void AssetManager::windowListSetActiveEditor(void)
 
 // =======================  Help Menu Actions =======================
 
-void AssetManager::about(void)
+void Editor::about(void)
 {
 	if (!pVersionDialog_) {
 		pVersionDialog_ = new VersionDialog(this);
@@ -832,7 +832,7 @@ void AssetManager::about(void)
 	pVersionDialog_->show();
 }
 
-void AssetManager::destroyAboutDialog(void)
+void Editor::destroyAboutDialog(void)
 {
 	if (pVersionDialog_) {
 		pVersionDialog_->deleteLater();
@@ -842,7 +842,7 @@ void AssetManager::destroyAboutDialog(void)
 
 // =======================  Misc Slots =======================
 
-void AssetManager::fileChanged(const QString& path)
+void Editor::fileChanged(const QString& path)
 {
 	reloadStyle(path);
 }
@@ -850,7 +850,7 @@ void AssetManager::fileChanged(const QString& path)
 // ----------------------------------------------------
 
 
-void AssetManager::closeEvent(QCloseEvent *event)
+void Editor::closeEvent(QCloseEvent *event)
 {
 	ICore::saveSettings();
 
@@ -872,7 +872,7 @@ void AssetManager::closeEvent(QCloseEvent *event)
 	event->accept();
 }
 
-bool AssetManager::event(QEvent *e)
+bool Editor::event(QEvent *e)
 {
 	if (e->type() == QEvent::StatusTip && pStatusBar_)
 	{
@@ -889,13 +889,13 @@ bool AssetManager::event(QEvent *e)
 	return BaseWindow::event(e);
 }
 
-void AssetManager::readSettings(void)
+void Editor::readSettings(void)
 {
 
 
 }
 
-void AssetManager::saveWindowState(void)
+void Editor::saveWindowState(void)
 {
 	QSettings* pSettings = settings(QSettings::UserScope);
 	pSettings->beginGroup(QLatin1String(SETTINGS_GROUP));
@@ -905,7 +905,7 @@ void AssetManager::saveWindowState(void)
 }
 
 
-void AssetManager::restoreWindowState(void)
+void Editor::restoreWindowState(void)
 {
 	QSettings* pSettings = settings(QSettings::UserScope);
 	pSettings->beginGroup(QLatin1String(SETTINGS_GROUP));
@@ -924,7 +924,7 @@ void AssetManager::restoreWindowState(void)
 // ----------------------------------------------------
 
 
-void AssetManager::reloadStyle(const QString& path)
+void Editor::reloadStyle(const QString& path)
 {
 	if (path.contains(".qss"))
 	{
@@ -937,16 +937,16 @@ void AssetManager::reloadStyle(const QString& path)
 			QApplication* pApp = (static_cast<QApplication *>(QCoreApplication::instance()));
 			pApp->setStyleSheet(ts.readAll());
 
-			X_LOG1("AssetManager", "style reloaded..");
+			X_LOG1("Editor", "style reloaded..");
 		}
 		else
 		{
-			X_ERROR("AssetManager", "Failed to load style sheet: \"%ls\"", path.data());
+			X_ERROR("Editor", "Failed to load style sheet: \"%ls\"", path.data());
 		}
 	}
 	else
 	{
-		X_ERROR("AssetManager", "Failed to load style sheet, invalid extension: \"%ls\"", path.data());
+		X_ERROR("Editor", "Failed to load style sheet, invalid extension: \"%ls\"", path.data());
 	}
 }
 

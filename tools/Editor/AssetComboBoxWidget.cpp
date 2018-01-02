@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AssetComboBoxWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetComboBoxWidget::AssetComboBoxWidget(QWidget *parent, const std::string& value, const std::string& valuesStr, bool editable) :

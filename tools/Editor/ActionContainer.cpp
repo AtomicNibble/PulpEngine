@@ -8,7 +8,7 @@
 #include <QAction>
 #include <QMenuBar>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 ActionContainer::ActionContainer(Id id) :

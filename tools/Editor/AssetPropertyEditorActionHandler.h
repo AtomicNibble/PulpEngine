@@ -5,7 +5,7 @@
 class QAction;
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class ICore;
 class IEditor;

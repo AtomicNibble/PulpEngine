@@ -4,7 +4,7 @@
 
 class QEvent;
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class VersionDialog : public QDialog
 {

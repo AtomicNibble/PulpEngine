@@ -1,20 +1,20 @@
 #include "stdafx.h"
 #include "ICore.h"
 
-#include "assetmanager.h"
+#include "Editor.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace
 {
 
 	static ICore* pInstance = nullptr;
-	static AssetManager* pMainwindow = nullptr;
+	static Editor* pMainwindow = nullptr;
 
 } // namespace 
 
 
-ICore::ICore(AssetManager* pMainWindow)
+ICore::ICore(Editor* pMainWindow)
 {
 	pInstance = this;
 	pMainwindow = pMainWindow;

@@ -10,7 +10,7 @@
 #include "EditorManager.h"
 #include "IEditor.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 OutputPanePlaceHolder* OutputPanePlaceHolder::pCurrent_ = nullptr;

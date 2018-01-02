@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "WindowButton.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 WindowButton::WindowButton(ButtonType type, QWidget *parent) : QPushButton(parent),

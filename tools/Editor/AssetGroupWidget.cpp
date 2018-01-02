@@ -3,7 +3,7 @@
 
 #include "AssetScriptTypes.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 AssetGroupWidget::AssetGroupWidget(QWidget *parent) :
 	QToolButton(parent)

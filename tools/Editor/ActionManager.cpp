@@ -4,7 +4,7 @@
 #include "ActionContainer.h"
 #include "Command.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace
 {

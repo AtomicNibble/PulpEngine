@@ -5,7 +5,7 @@
 #include "assetdbexplorer.h"
 #include "EditorManager.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace AssetExplorer 
 {

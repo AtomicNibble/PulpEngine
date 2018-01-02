@@ -16,7 +16,7 @@ X_NAMESPACE_DECLARE(assetDb,
 	class AssetDB;
 );
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class ConverterHost;
 class ActionManager;
@@ -32,7 +32,7 @@ class OutputWindow;
 typedef core::Logger<
 	core::LoggerNoFilterPolicy,
 	core::LoggerSimpleFormatPolicyStripColors,
-	assman::LoggerOutputWindowWritePolicy>
+	editor::LoggerOutputWindowWritePolicy>
 	OutputWindowWrtiePolicy;
 
 
@@ -41,7 +41,7 @@ namespace AssetExplorer {
     class AssetExplorer;
 }
 
-class AssetManager : public BaseWindow
+class Editor : public BaseWindow
 {
 	Q_OBJECT
 
@@ -50,8 +50,8 @@ class AssetManager : public BaseWindow
 	static const char* WINDOW_STATE_KEY;
 
 public:
-    explicit AssetManager(QWidget* pParent = nullptr);
-    ~AssetManager();
+    explicit Editor(QWidget* pParent = nullptr);
+    ~Editor();
 
 	IContext* currentContextObject(void) const;
 	IContext* contextObject(QWidget* pWidget);

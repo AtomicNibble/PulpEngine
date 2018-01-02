@@ -26,7 +26,7 @@
 #include <String\Json.h>
 #include <../AssetDB/AssetDB.h>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 

@@ -2,7 +2,7 @@
 #include "AssetSpinBoxWidget.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetDoubleSpinBoxWidget::AssetDoubleSpinBoxWidget(QWidget *parent, const std::string& val,

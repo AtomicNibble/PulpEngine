@@ -7,18 +7,18 @@ class QSettings;
 class QShortcut;
 class QString;
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class ActionContainer;
 class ICommand;
 class Context;
-class AssetManager;
+class Editor;
 
 class ActionManager : public QObject
 {
 	Q_OBJECT
 
-	friend class AssetManager;
+	friend class Editor;
 
 private:
 	ActionManager(QObject *parent = 0);

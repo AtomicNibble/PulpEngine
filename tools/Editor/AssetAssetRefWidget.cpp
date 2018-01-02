@@ -5,7 +5,7 @@
 
 #include <../AssetDB/AssetDB.h>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, IAssetEntry* pAssEntry, 

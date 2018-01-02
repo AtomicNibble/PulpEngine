@@ -5,7 +5,7 @@
 #include <../AssetDB/AssetDB.h>
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 RenameAssetDialog::RenameAssetDialog(QWidget *parent, assetDb::AssetDB& db, assetDb::AssetType::Enum type, const QString& name) :

@@ -2,7 +2,7 @@
 
 #include <QWidget>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 class StyledBar : public QWidget

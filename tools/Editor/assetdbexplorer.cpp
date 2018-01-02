@@ -22,7 +22,7 @@
 
 #include "ConverterHost.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace AssetExplorer
 {
@@ -67,7 +67,7 @@ bool AssetExplorer::init(void)
 	connect(pSessionManager, SIGNAL(startupProjectChanged(Project*)),
 		this, SLOT(startupProjectChanged()));
 
-    Context globalcontext(assman::Constants::C_GLOBAL);
+    Context globalcontext(editor::Constants::C_GLOBAL);
     Context projecTreeContext(Constants::C_ASSETDB_EXPLORER);
 
 
@@ -210,64 +210,64 @@ bool AssetExplorer::init(void)
 
 	// Shieeeeeeeeet for the file.
 
-	pCmd = ActionManager::registerAction(openAssetAction_, assman::AssetExplorer::Constants::OPEN_ASSET, projecTreeContext);
+	pCmd = ActionManager::registerAction(openAssetAction_, editor::AssetExplorer::Constants::OPEN_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Open);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OPEN);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OPEN);
 
 
-	pCmd = ActionManager::registerAction(renameAssetAction_, assman::AssetExplorer::Constants::RENAME_ASSET, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	pCmd = ActionManager::registerAction(renameAssetAction_, editor::AssetExplorer::Constants::RENAME_ASSET, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
-	pCmd = ActionManager::registerAction(deleteAssetAction_, assman::AssetExplorer::Constants::DELETE_ASSET, projecTreeContext);
+	pCmd = ActionManager::registerAction(deleteAssetAction_, editor::AssetExplorer::Constants::DELETE_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Delete);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
-	pCmd = ActionManager::registerAction(cutAssetAction_, assman::AssetExplorer::Constants::CUT_ASSET, projecTreeContext);
+	pCmd = ActionManager::registerAction(cutAssetAction_, editor::AssetExplorer::Constants::CUT_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Cut);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
-	pCmd = ActionManager::registerAction(copyAssetAction_, assman::AssetExplorer::Constants::COPY_ASSET, projecTreeContext);
+	pCmd = ActionManager::registerAction(copyAssetAction_, editor::AssetExplorer::Constants::COPY_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Copy);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
-	pCmd = ActionManager::registerAction(pasteAssetAction_, assman::AssetExplorer::Constants::PASTE_ASSET, projecTreeContext);
+	pCmd = ActionManager::registerAction(pasteAssetAction_, editor::AssetExplorer::Constants::PASTE_ASSET, projecTreeContext);
 	pCmd->setDefaultKeySequence(QKeySequence::Paste);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
-	pCmd = ActionManager::registerAction(copyAssetNameAction_, assman::AssetExplorer::Constants::COPY_ASSET_NAME, projecTreeContext);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_OTHER);
+	pCmd = ActionManager::registerAction(copyAssetNameAction_, editor::AssetExplorer::Constants::COPY_ASSET_NAME, projecTreeContext);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_OTHER);
 
 
 	// add new
-	pCmd = ActionManager::registerAction(addNewAssetAction_, assman::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
-	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_FILES);
-	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FIRST);
-	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_FILES);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_NEW);
+	pCmd = ActionManager::registerAction(addNewAssetAction_, editor::AssetExplorer::Constants::NEW_ASSET, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_SESSION_FILES);
+	mprojectContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_PROJECT_FIRST);
+	mfolderContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FOLDER_FILES);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_NEW);
 
 	// add new Type
-	pCmd = ActionManager::registerAction(addNewAssetTypeAction_, assman::AssetExplorer::Constants::NEW_ASSET_TYPE, projecTreeContext);
+	pCmd = ActionManager::registerAction(addNewAssetTypeAction_, editor::AssetExplorer::Constants::NEW_ASSET_TYPE, projecTreeContext);
 	pCmd->setAttribute(Command::CommandAttribute::UpdateText);
-	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_FILES);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_NEW);
+	mfolderContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FOLDER_FILES);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_NEW);
 
 	// build action
-	pCmd = ActionManager::registerAction(buildAction_, assman::AssetExplorer::Constants::BUILD, projecTreeContext);
-	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_BUILD);
-	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
-	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
+	pCmd = ActionManager::registerAction(buildAction_, editor::AssetExplorer::Constants::BUILD, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_SESSION_BUILD);
+	mprojectContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_PROJECT_FILES);
+	mfolderContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FOLDER_COMPILE);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_COMPILE);
 
 	// re-build action
-	pCmd = ActionManager::registerAction(reBuildAction_, assman::AssetExplorer::Constants::REBUILD, projecTreeContext);
-	msessionContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_SESSION_REBUILD);
-	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
-	mfolderContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FOLDER_COMPILE);
-	mfileContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_FILE_COMPILE);
+	pCmd = ActionManager::registerAction(reBuildAction_, editor::AssetExplorer::Constants::REBUILD, projecTreeContext);
+	msessionContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_SESSION_REBUILD);
+	mprojectContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_PROJECT_FILES);
+	mfolderContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FOLDER_COMPILE);
+	mfileContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_FILE_COMPILE);
 
 	// clean action
-	pCmd = ActionManager::registerAction(cleanModAction_, assman::AssetExplorer::Constants::CLEAN, projecTreeContext);
-	mprojectContextMenu->addAction(pCmd, assman::AssetExplorer::Constants::G_PROJECT_FILES);
+	pCmd = ActionManager::registerAction(cleanModAction_, editor::AssetExplorer::Constants::CLEAN, projecTreeContext);
+	mprojectContextMenu->addAction(pCmd, editor::AssetExplorer::Constants::G_PROJECT_FILES);
 
 	// Set start up project
 	pCmd = ActionManager::registerAction(setStartupModAction_, Constants::SETSTARTUP, projecTreeContext);
@@ -623,7 +623,7 @@ void AssetExplorer::openAsset(void)
 	BUG_ASSERT(currentNode_, return);
 
 	if (FileNode* pFileNode = qobject_cast<FileNode*>(currentNode_)) {
-		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
+		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), editor::Constants::ASSETPROP_EDITOR_ID);
 	}
 }
 

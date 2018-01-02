@@ -4,7 +4,7 @@
 #include "IAssetEntry.h"
 #include "IEditor.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetEntryModel::Entry::Entry(IAssetEntry* pAssetEntry, QWidget* pEditorWidget,

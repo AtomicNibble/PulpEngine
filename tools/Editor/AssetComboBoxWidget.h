@@ -4,7 +4,7 @@
 #include <QComboBox>
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 class AssetComboBoxWidget : public QComboBox

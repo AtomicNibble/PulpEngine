@@ -5,7 +5,7 @@
 
 class ICommand;
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 class ActionContainer : public IActionContainer

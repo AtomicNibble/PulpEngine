@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "AssetLineEditWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 AssetLineEditWidget::AssetLineEditWidget(QWidget *parent, const std::string& value) :
 	QLineEdit(parent)

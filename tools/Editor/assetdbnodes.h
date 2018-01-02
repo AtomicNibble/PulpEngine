@@ -2,7 +2,7 @@
 #define ASSETDBNODES_H
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class ConverterHost;
 

@@ -3,7 +3,7 @@
 #include <QObject>
 #include "Context.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class IEditor;
 
@@ -21,14 +21,14 @@ public:
 };
 
 
-class AssetManager;
+class Editor;
 
 class ICore : public QObject
 {
 	Q_OBJECT
 
 public:
-	ICore(AssetManager* pMainWindow);
+	ICore(Editor* pMainWindow);
 	~ICore();
 
 public:

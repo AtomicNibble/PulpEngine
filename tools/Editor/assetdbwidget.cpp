@@ -17,7 +17,7 @@
 #include <QFocusEvent>
 #include <QAbstractItemModel>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace AssetExplorer
 {
@@ -329,7 +329,7 @@ AssetDbViewWidget::AssetDbViewWidget(AssetDB& db, QWidget *parent) :
 
 	// make whole widget have assDB context, not just the tree.
 	pContext_ = new IContext(this);
-	pContext_->setContext(Context(assman::AssetExplorer::Constants::C_ASSETDB_EXPLORER));
+	pContext_->setContext(Context(editor::AssetExplorer::Constants::C_ASSETDB_EXPLORER));
 	pContext_->setWidget(this);
 	ICore::addContextObject(pContext_);
 
@@ -452,7 +452,7 @@ void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
     }
 
 	if (FileNode* pFileNode = qobject_cast<FileNode*>(pNode)) {
-		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
+		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), editor::Constants::ASSETPROP_EDITOR_ID);
 	}
 }
 

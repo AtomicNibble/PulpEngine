@@ -6,7 +6,7 @@
 #include <Containers\Array.h>
 #include <QTextCharFormat>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class OutputWindow;
 

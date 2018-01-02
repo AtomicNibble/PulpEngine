@@ -7,7 +7,7 @@
 
 #include "AssetPropertyEditor.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 AssetPropsEditorActionHandler::AssetPropsEditorActionHandler(QObject *parent, Id contextId, uint optionalActions) :

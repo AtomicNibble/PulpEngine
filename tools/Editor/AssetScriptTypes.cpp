@@ -7,7 +7,7 @@
 
 #include <../../tools/MaterialLib/MatLib.h>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 // -----------------------------------------------------------

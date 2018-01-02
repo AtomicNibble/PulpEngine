@@ -4,7 +4,7 @@
 #include <Threading\JobSystem2.h>
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 ConverterHost::ConverterHost(assetDb::AssetDB& db, core::MemoryArenaBase* arena) :

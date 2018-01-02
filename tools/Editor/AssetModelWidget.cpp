@@ -4,7 +4,7 @@
 #include "IAssetEntry.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 AssetModelWidget::AssetModelWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value) :
 	QWidget(parent),

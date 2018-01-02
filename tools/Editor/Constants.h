@@ -1,7 +1,7 @@
 #pragma once
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 namespace Constants

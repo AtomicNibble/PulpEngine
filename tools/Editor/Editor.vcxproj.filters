@@ -177,9 +177,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="assetmanager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -250,21 +247,6 @@
       <Filter>Generated Files\Super Dynamic</Filter>
     </ClCompile>
     <ClCompile Include="Release\moc_modproject.cpp">
-      <Filter>Generated Files\Release</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug Dynamic\moc_assetmanager.cpp">
-      <Filter>Generated Files\Debug Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Super\moc_assetmanager.cpp">
-      <Filter>Generated Files\Super</Filter>
-    </ClCompile>
-    <ClCompile Include="Debug\moc_assetmanager.cpp">
-      <Filter>Generated Files\Debug</Filter>
-    </ClCompile>
-    <ClCompile Include="Super Dynamic\moc_assetmanager.cpp">
-      <Filter>Generated Files\Super Dynamic</Filter>
-    </ClCompile>
-    <ClCompile Include="Release\moc_assetmanager.cpp">
       <Filter>Generated Files\Release</Filter>
     </ClCompile>
     <ClCompile Include="Debug Dynamic\moc_assetdbwidget.cpp">
@@ -1455,9 +1437,6 @@
     <ClCompile Include="Release Dynamic\moc_AssetLineEditWidget.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
-    <ClCompile Include="Release Dynamic\moc_assetmanager.cpp">
-      <Filter>Generated Files\Release Dynamic</Filter>
-    </ClCompile>
     <ClCompile Include="Release Dynamic\moc_AssetModelWidget.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
@@ -1623,11 +1602,14 @@
     <ClCompile Include="Release Dynamic\moc_AssetFontWidget.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="Editor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_Editor.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <CustomBuild Include="assetmanager.h">
-      <Filter>Header Files</Filter>
-    </CustomBuild>
     <CustomBuild Include="session.h">
       <Filter>Header Files</Filter>
     </CustomBuild>
@@ -1816,6 +1798,9 @@
     </CustomBuild>
     <CustomBuild Include="editor.ui">
       <Filter>Form Files</Filter>
+    </CustomBuild>
+    <CustomBuild Include="Editor.h">
+      <Filter>Header Files</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

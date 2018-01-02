@@ -3,7 +3,7 @@
 #include <QObject>
 #include "Context.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 class ICommand : public QObject
 {

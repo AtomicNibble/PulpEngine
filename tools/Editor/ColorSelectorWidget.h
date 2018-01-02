@@ -4,7 +4,7 @@
 
 #include "ColorPreviewWidget.h"
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 class ColorSelector : public ColorPreview

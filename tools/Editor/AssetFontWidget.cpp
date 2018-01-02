@@ -9,7 +9,7 @@
 #include <Compression\LZ4.h>
 #include <Time\StopWatch.h>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 
 // ----------------------------------

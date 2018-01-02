@@ -2,7 +2,7 @@
 #include "ParameterAction.h"
 
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 /*
 The ParameterAction class is intended for actions that act on a 'current',

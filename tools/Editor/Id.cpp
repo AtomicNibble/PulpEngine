@@ -6,7 +6,7 @@
 #include <QHash>
 #include <QVariant>
 
-X_NAMESPACE_BEGIN(assman)
+X_NAMESPACE_BEGIN(editor)
 
 namespace
 {
