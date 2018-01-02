@@ -550,7 +550,6 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
 		return nullptr;
 	}
 
-
 	PathUtil::findData findinfo;
 	XFindData FindData(path, this);
 	if (!FindData.findnext(&findinfo)) {
