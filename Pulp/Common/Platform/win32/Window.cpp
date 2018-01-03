@@ -241,7 +241,7 @@ void xWindow::MoveTo(const Position& position)
 }
 
 
-void xWindow::AlignTo(const Recti& Rect, AlignmentFlags alignment)
+void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
 {
 	RECT _Rect;
 	GetWindowRect( window_, &_Rect );
