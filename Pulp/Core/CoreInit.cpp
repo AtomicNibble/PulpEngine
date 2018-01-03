@@ -1006,6 +1006,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 	else
 	{
 		if (!pWindow_) {
+			X_ERROR("Core", "Failed to init render system, no window");
 			return false;
 		}
 
