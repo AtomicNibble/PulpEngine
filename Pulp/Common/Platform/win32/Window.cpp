@@ -14,10 +14,73 @@ X_NAMESPACE_BEGIN(core)
 
 namespace 
 {
-	static const char* g_EngineName = X_ENGINE_NAME"Engine";
+	const char* g_ClassName = X_ENGINE_NAME"Engine";
+	bool g_ClassRegisterd = false;
 
-	BOOL g_ClassRegisterd = FALSE;
-	
+	LRESULT CALLBACK PreWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
+	void RegisterClass(void)
+	{
+		if (!g_ClassRegisterd)
+		{
+			wchar_t classNameWide[128];
+			core::strUtil::Convert(g_ClassName, classNameWide);
+
+			auto hInstance = GetModuleHandle(NULL);
+			WNDCLASSEXW wcex;
+
+			if (GetClassInfoExW(hInstance, classNameWide, &wcex)) {	
+				return;
+			}
+		
+			wcex.cbSize = sizeof(wcex);
+			wcex.style = /*CS_HREDRAW | CS_VREDRAW |*/ CS_DBLCLKS | CS_OWNDC;
+			wcex.lpfnWndProc = PreWndProc;
+			wcex.cbClsExtra = 0;
+			wcex.cbWndExtra = 0;
+			wcex.hInstance = hInstance;
+			wcex.hIcon = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ENGINE_LOGO));
+			wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
+			wcex.hbrBackground = 0;
+			wcex.lpszMenuName = 0;
+			wcex.lpszClassName = classNameWide;
+			wcex.hIconSm = 0;
+
+			if (RegisterClassExW(&wcex) == 0)
+			{
+				core::lastError::Description Dsc;
+				X_ERROR("Window", "Failed to register class. Err: %s", core::lastError::ToString(Dsc));
+				return;
+			}
+			
+			g_ClassRegisterd = true;
+		}
+
+	}
+
+	void UnRegisterClass(void)
+	{
+		// I can't really safley unregister this.
+		// since if another dll in the process registeres it
+		// i can't know when it will unregister it.
+
+#if 0
+		if (g_ClassRegisterd)
+		{
+			g_ClassRegisterd = false;
+
+			wchar_t classNameWide[256] = { 0 };
+			core::strUtil::Convert(g_ClassName, classNameWide);
+
+			if (!UnregisterClassW(classNameWide, GetModuleHandle(NULL)))
+			{
+
+			}
+		}
+#endif
+	}
+
+
 	// We have a pre and final winproc.
 	// The pre one waits untill we can get the class pointer.
 	// Then switches to a lightweight winproc as each window is only created once.
@@ -54,51 +117,6 @@ namespace
 
 int32_t xWindow::s_var_windowDebug = 0;
 
-uint32_t xWindow::s_numwindows = 0;
-
-void xWindow::RegisterClass(void)
-{
-	if (!g_ClassRegisterd)
-	{
-		// Register the class
-		WNDCLASSEXW wcex;
-
-		wchar_t wTxt[256];
-		core::strUtil::Convert(g_EngineName, wTxt);
-
-		wcex.cbSize = sizeof(wcex);
-		wcex.style = /*CS_HREDRAW | CS_VREDRAW |*/ CS_DBLCLKS | CS_OWNDC;
-		wcex.lpfnWndProc = PreWndProc;
-		wcex.cbClsExtra = 0;
-		wcex.cbWndExtra = 0;
-		wcex.hInstance = GetModuleHandle(NULL);
-		wcex.hIcon = LoadIcon(wcex.hInstance, MAKEINTRESOURCE(IDI_ENGINE_LOGO));
-		wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
-		wcex.hbrBackground = 0;
-		wcex.lpszMenuName = 0;
-		wcex.lpszClassName = wTxt;
-		wcex.hIconSm = 0;
-
-		RegisterClassExW(&wcex);
-
-		g_ClassRegisterd = TRUE;
-	}
-	s_numwindows++;
-}
-
-
-void xWindow::UnRegisterClass(void)
-{
-	s_numwindows--;
-	if (s_numwindows == 0 && g_ClassRegisterd) 
-	{
-		wchar_t wTxt[256] = { 0 };
-		core::strUtil::Convert(g_EngineName, wTxt);
-
-		UnregisterClassW(wTxt, GetModuleHandle(NULL));
-		g_ClassRegisterd = FALSE;
-	}
-}
 
 
 /// --------------------------------------------------------------------------------------------------------
@@ -132,7 +150,7 @@ void xWindow::RegisterVars(void)
 		"Window debug. 0=disable, 1=enable.");
 }
 
-xWindow::Notification::Enum xWindow::PumpMessages(void) const
+xWindow::Notification::Enum xWindow::PumpMessages(void)
 {
 	MSG msg;
 	uint32_t msgNumStart = numMsgs_;
@@ -142,8 +160,9 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 	{
 		numMsgs_++;
 
-		if (msg.message == WM_CLOSE)
+		if (msg.message == WM_CLOSE) {
 			return Notification::CLOSE;
+		}
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg);
@@ -153,8 +172,9 @@ xWindow::Notification::Enum xWindow::PumpMessages(void) const
 	{
 		numMsgs_++;
 
-		if(msg.message == WM_CLOSE)
+		if (msg.message == WM_CLOSE) {
 			return Notification::CLOSE;
+		}
 
 		TranslateMessage(&msg);
 		DispatchMessage(&msg); 
@@ -277,10 +297,9 @@ Recti xWindow::GetDesktopRect(void)
 bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int height, xWindow::Mode::Enum mode)
 {
 	lastError::Description Dsc;
-	wchar_t wTxt[256] = { 0 };
 
 	if( !g_ClassRegisterd ) {
-		X_FATAL( "Window", "You cannot create a window before xlib has been started.", Title, lastError::ToString( Dsc ) );
+		X_FATAL( "Window", "Class not registered.");
 		return false;
 	}
 
@@ -299,7 +318,8 @@ bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int he
 		height = safe_static_cast<int,LONG>( Rect.bottom - Rect.top );
 	}
 
-	core::strUtil::Convert(g_EngineName, wTxt);
+	wchar_t wTxt[128] = { 0 };
+	core::strUtil::Convert(g_ClassName, wTxt);
 
 	window_ = CreateWindowExW( 
 		0, 

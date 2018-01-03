@@ -56,7 +56,7 @@ public:
 
 	bool Create(const wchar_t* const Title, int x, int y, int width, int height, Mode::Enum mode);
 
-	Notification::Enum PumpMessages(void) const;
+	Notification::Enum PumpMessages(void);
 
 	void CustomFrame(bool val);
 
@@ -87,7 +87,7 @@ public:
 public:
 
 	X_INLINE const uint32_t GetNumMsgs(void) const;
-	X_INLINE const uint32_t GetNumMsgsClear(void) const;
+	X_INLINE const uint32_t GetNumMsgsClear(void);
 
 	X_INLINE uint32_t GetClientWidth(void) const;
 	X_INLINE uint32_t GetClientHeight(void) const;
@@ -104,19 +104,16 @@ public:
 	virtual LRESULT WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 	 
 private:
-	static void RegisterClass();
-	static void UnRegisterClass();
 
 	X_INLINE static bool isDebugEnable(void);
 
 protected:
-	mutable uint32_t numMsgs_;
+	uint32_t numMsgs_;
 	PLATFORM_HWND window_;
 	bool hideClientCursor_;
 
 	xFrame* pFrame_;
 
-	static uint32_t s_numwindows;
 	static int32_t s_var_windowDebug;
 };
 

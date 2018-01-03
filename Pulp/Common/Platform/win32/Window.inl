@@ -76,7 +76,7 @@ X_INLINE const uint32_t xWindow::GetNumMsgs(void) const
 	return numMsgs_; 
 }
 
-X_INLINE const uint32_t xWindow::GetNumMsgsClear(void) const
+X_INLINE const uint32_t xWindow::GetNumMsgsClear(void)
 {
 	uint32_t ret = numMsgs_;
 	numMsgs_ = 0;
