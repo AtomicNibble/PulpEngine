@@ -3,6 +3,8 @@
 #include <QFile>
 #include <qstylefactory.h>
 
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
+
 
 #include "logging.h"
 #include "EngineApp.h"
@@ -29,7 +31,7 @@ X_LINK_LIB("engine_MaterialLib")
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,
