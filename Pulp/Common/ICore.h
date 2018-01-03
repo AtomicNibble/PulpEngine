@@ -133,7 +133,7 @@ struct IAssertHandler
 struct SCoreInitParams
 {
 	void* hInstance;								
-	void* hWnd;
+	PLATFORM_HWND hWnd;
 	const wchar_t* pCmdLine;
 
 	core::Console* pConsoleWnd;

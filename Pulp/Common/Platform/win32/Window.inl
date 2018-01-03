@@ -11,12 +11,12 @@ X_INLINE uint32_t xWindow::GetClientHeight(void) const
 }
 
 
-X_INLINE HWND xWindow::GetNativeWindow(void)
+X_INLINE PLATFORM_HWND xWindow::GetNativeWindow(void)
 {
 	return window_;
 }
 
-X_INLINE const HWND xWindow::GetNativeWindow(void) const
+X_INLINE const PLATFORM_HWND xWindow::GetNativeWindow(void) const
 {
 	return window_;
 }

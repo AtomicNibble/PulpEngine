@@ -93,8 +93,8 @@ public:
 	// Returns the xRect of the complete desktop area, spanning all monitors and overlapping the taskbar.
 	static Rect GetDesktopRect(void);
 
-	X_INLINE HWND GetNativeWindow(void);
-	X_INLINE const HWND GetNativeWindow(void) const;
+	X_INLINE PLATFORM_HWND GetNativeWindow(void);
+	X_INLINE const PLATFORM_HWND GetNativeWindow(void) const;
 
 	virtual LRESULT WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 	 
@@ -109,7 +109,7 @@ private:
 
 protected:
 	mutable uint32_t numMsgs_;
-	HWND window_;
+	PLATFORM_HWND window_;
 	bool hideClientCursor_;
 
 	xFrame* pFrame_;
