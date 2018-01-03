@@ -4,12 +4,15 @@
 #define _X_WINDOW_H_
 
 
-// #include "System\CustomFrame.h"
-
-
 #ifdef CreateWindow
 #undef CreateWindow
 #endif
+
+
+#ifdef RegisterClass
+#undef RegisterClass
+#endif
+
 
 X_NAMESPACE_BEGIN(core)
 
@@ -20,7 +23,9 @@ class xFrame;
 
 class xWindow
 {
-public:
+	X_NO_COPY(xWindow);
+	X_NO_ASSIGN(xWindow);
+
 
 public:
 	/// Types for position size etc.
@@ -99,9 +104,6 @@ public:
 	virtual LRESULT WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam );
 	 
 private:
-	X_NO_COPY(xWindow);
-	X_NO_ASSIGN(xWindow);
-
 	static void RegisterClass();
 	static void UnRegisterClass();
 

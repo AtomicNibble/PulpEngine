@@ -104,9 +104,9 @@ void xWindow::UnRegisterClass(void)
 /// --------------------------------------------------------------------------------------------------------
 
 xWindow::xWindow() : 
-numMsgs_(0),
-hideClientCursor_(FALSE),
-pFrame_(nullptr)
+	numMsgs_(0),
+	hideClientCursor_(false),
+	pFrame_(nullptr)
 {
 	RegisterClass();
 }
@@ -358,8 +358,9 @@ LRESULT xWindow::WndProc( HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam )
 			break;
 	}
 
-	if( pFrame_ ) 
-		return pFrame_->DrawFrame( hWnd, msg, wParam, lParam );		
+	if (pFrame_) {
+		return pFrame_->DrawFrame(hWnd, msg, wParam, lParam);
+	}
 
 	return DefWindowProc( hWnd, msg, wParam, lParam );
 }
