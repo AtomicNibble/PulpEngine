@@ -364,7 +364,6 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		for (auto* pWorld : worlds_)
 		{
 			static_cast<World3D*>(pWorld)->renderView(frame, geoBucket);
-			pWorld = nullptr;
 		}
 
 		geoBucket.sort();
