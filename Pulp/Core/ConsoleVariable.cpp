@@ -79,14 +79,14 @@ CVarBase::~CVarBase()
 
 }
 
-void CVarBase::ForceSet(const char* s)
+void CVarBase::ForceSet(const char* pStr)
 {
-	X_UNUSED(s);
+	X_UNUSED(pStr);
 }
 
-void CVarBase::SetDefault(const char* s)
+void CVarBase::SetDefault(const char* pStr)
 {
-	X_UNUSED(s);
+	X_UNUSED(pStr);
 }
 
 ICVar::FlagType CVarBase::GetFlags(void) const
@@ -160,9 +160,9 @@ void CVarBase::Reset(void)
 
 
 template<class T>
-void CVarInt<T>::Set(const char* s)
+void CVarInt<T>::Set(const char* pStr)
 {
-	int32_t val = TextToInt(s, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
 	Set(val);
 }
@@ -170,9 +170,9 @@ void CVarInt<T>::Set(const char* s)
 
 // ========================================================
 
-void CVarIntRef::Set(const char* s)
+void CVarIntRef::Set(const char* pStr)
 {
-	int32_t val = TextToInt(s, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+	int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
 	Set(val);
 }
@@ -185,17 +185,16 @@ bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool silent)
 	return Color::fromString(pStr, pStr + strlen(pStr), out, silent);
 }
 
-void CVarColRef::Set(const char* s)
+void CVarColRef::Set(const char* pStr)
 {
-	X_ASSERT_NOT_NULL(s);
+	X_ASSERT_NOT_NULL(pStr);
 
 	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
 		return;
 	}
 
 	Color col;
-
-	if (!ColorFromString(s, col, false)) {
+	if (!ColorFromString(pStr, col, false)) {
 		return;
 	}
 
@@ -256,9 +255,9 @@ bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
 	return true;
 }
 
-void CVarVec3Ref::Set(const char* s)
+void CVarVec3Ref::Set(const char* pStr)
 {
-	X_ASSERT_NOT_NULL(s);
+	X_ASSERT_NOT_NULL(pStr);
 
 	if (flags_.IsSet(VarFlag::READONLY)) {
 		return;
@@ -266,7 +265,7 @@ void CVarVec3Ref::Set(const char* s)
 
 	Vec3f vec;
 
-	if (!Vec3FromString(s, vec, false)) {
+	if (!Vec3FromString(pStr, vec, false)) {
 		return;
 	}
 
