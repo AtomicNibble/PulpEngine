@@ -2261,17 +2261,42 @@ void World3D::drawDebug(void)
 
 void World3D::debugDraw_AreaBounds(void) const
 {
-	if (vars_.drawAreaBounds())
-	{
-		Color color = Col_Red;
+	if (!vars_.drawAreaBounds()) {
+		return;
+	}
 
-		if (vars_.drawAreaBounds() == 1 || vars_.drawAreaBounds() == 3)
+	Color color = Col_Red;
+
+	if (vars_.drawAreaBounds() == 1 || vars_.drawAreaBounds() == 3)
+	{
+		for (const auto& a : areas_)
+		{
+			if (isAreaVisible(a))
+			{
+				pPrimContex_->drawAABB(a.pMesh->boundingBox, false, color);
+			}
+		}
+	}
+	else // all
+	{
+		for (const auto& a : areas_)
+		{
+			pPrimContex_->drawAABB(a.pMesh->boundingBox, false, color);
+		}
+	}
+
+	if (vars_.drawAreaBounds() > 2)
+	{
+		color.a = 0.2f;
+
+		// visible only
+		if (vars_.drawAreaBounds() == 3)
 		{
 			for (const auto& a : areas_)
 			{
 				if (isAreaVisible(a))
 				{
-					pPrimContex_->drawAABB(a.pMesh->boundingBox, false, color);
+					pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
 				}
 			}
 		}
@@ -2279,31 +2304,7 @@ void World3D::debugDraw_AreaBounds(void) const
 		{
 			for (const auto& a : areas_)
 			{
-				pPrimContex_->drawAABB(a.pMesh->boundingBox, false, color);
-			}
-		}
-
-		if (vars_.drawAreaBounds() > 2)
-		{
-			color.a = 0.2f;
-
-			// visible only
-			if (vars_.drawAreaBounds() == 3)
-			{
-				for (const auto& a : areas_)
-				{
-					if (isAreaVisible(a))
-					{
-						pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
-					}
-				}
-			}
-			else // all
-			{
-				for (const auto& a : areas_)
-				{
-					pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
-				}
+				pPrimContex_->drawAABB(a.pMesh->boundingBox, true, color);
 			}
 		}
 	}
@@ -2311,42 +2312,43 @@ void World3D::debugDraw_AreaBounds(void) const
 
 void World3D::debugDraw_Portals(void) const
 {
-	if (vars_.drawPortals() > 0 /* && !outsideWorld_ */)
+	if (!vars_.drawPortals()) {
+		return;
+	}
+
+	// draw the portals.
+	AreaArr::ConstIterator areaIt = areas_.begin();
+	for (; areaIt != areas_.end(); ++areaIt)
 	{
-		// draw the portals.
-		AreaArr::ConstIterator areaIt = areas_.begin();
-		for (; areaIt != areas_.end(); ++areaIt)
+		if (!isAreaVisible(*areaIt)) {
+			continue;
+		}
+
+		if (vars_.drawPortals() > 1)
 		{
-			if (!isAreaVisible(*areaIt)) {
-				continue;
-			}
+			pPrimContex_->setDepthTest(1);
+		}
 
-			if (vars_.drawPortals() > 1)
+		Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
+		for (; apIt != areaIt->portals.end(); ++apIt)
+		{
+			const AreaPortal& portal = *apIt;
+
+			if (isAreaVisible(areas_[portal.areaTo]))
 			{
-				pPrimContex_->setDepthTest(1);
+				pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+					portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
 			}
-
-			Area::AreaPortalArr::ConstIterator apIt = areaIt->portals.begin();
-			for (; apIt != areaIt->portals.end(); ++apIt)
+			else
 			{
-				const AreaPortal& portal = *apIt;
-
-				if (isAreaVisible(areas_[portal.areaTo]))
-				{
-					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(0.f, 1.f, 0.f, 0.35f));
-				}
-				else
-				{
-					pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
-						portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
-				}
+				pPrimContex_->drawTriangle(portal.debugVerts.ptr(),
+					portal.debugVerts.size(), Colorf(1.f, 0.f, 0.f, 0.3f));
 			}
+		}
 
-			if (vars_.drawPortals() > 1)
-			{
-				pPrimContex_->setDepthTest(0);
-			}
+		if (vars_.drawPortals() > 1)
+		{
+			pPrimContex_->setDepthTest(0);
 		}
 	}
 }
@@ -2354,73 +2356,74 @@ void World3D::debugDraw_Portals(void) const
 
 void World3D::debugDraw_PortalStacks(void) const
 {
-	if (vars_.drawPortalStacks())
-	{
-		// i wanna draw me the planes!
-		// we have a clipped shape, described by a collection of planes.
-		// how to i turn that into a visible shape.
-		// in order to create the shape we need to clip the planes with each other.
+	if (!vars_.drawPortalStacks()) {
+		return;
+	}
 
-		for (const auto& a : areas_)
+	// i wanna draw me the planes!
+	// we have a clipped shape, described by a collection of planes.
+	// how to i turn that into a visible shape.
+	// in order to create the shape we need to clip the planes with each other.
+
+	for (const auto& a : areas_)
+	{
+		if (!isAreaVisible(a)) {
+			continue;
+		}
+
+		for (const auto& vp : a.visPortals)
 		{
-			if (!isAreaVisible(a)) {
-				continue;
+			const auto& portalPlanes = vp.planes;
+
+			XWinding* windings[PortalStack::MAX_PORTAL_PLANES] = { nullptr };
+			XWinding* w;
+
+			size_t i, j;
+			for (i = 0; i < portalPlanes.size(); i++)
+			{
+				const Planef& plane = portalPlanes[i];
+
+				w = X_NEW(XWinding, g_3dEngineArena, "PortalStackDebugWinding")(plane);
+
+				for (j = 0; j < portalPlanes.size() && w; j++)
+				{
+					if (i == j) {
+						continue;
+					}
+
+					if (!w->clip(portalPlanes[j], 0.01f)) {
+						X_DELETE_AND_NULL(w, g_3dEngineArena);
+					}
+				}
+
+				windings[i] = w;
 			}
 
-			for (const auto& vp : a.visPortals)
+			Color8u col = Col_Limegreen;
+
+			for (i = 0; i < portalPlanes.size(); i++)
 			{
-				const auto& portalPlanes = vp.planes;
-
-				XWinding* windings[PortalStack::MAX_PORTAL_PLANES] = { nullptr };
-				XWinding* w;
-
-				size_t i, j;
-				for (i = 0; i < portalPlanes.size(); i++)
-				{
-					const Planef& plane = portalPlanes[i];
-
-					w = X_NEW(XWinding, g_3dEngineArena, "PortalStackDebugWinding")(plane);
-
-					for (j = 0; j < portalPlanes.size() && w; j++)
-					{
-						if (i == j) {
-							continue;
-						}
-
-						if (!w->clip(portalPlanes[j], 0.01f)) {
-							X_DELETE_AND_NULL(w, g_3dEngineArena);
-						}
-					}
-
-					windings[i] = w;
+				if (!windings[i]) {
+					continue;
 				}
 
-				Color8u col = Col_Limegreen;
+				w = windings[i];
 
-				for (i = 0; i < portalPlanes.size(); i++)
+				size_t numPoints = w->getNumPoints();
+				for (j = 0; j < numPoints; j++)
 				{
-					if (!windings[i]) {
-						continue;
-					}
-
-					w = windings[i];
-
-					size_t numPoints = w->getNumPoints();
-					for (j = 0; j < numPoints; j++)
-					{
-						Vec3f start = (*w)[j].asVec3();
-						Vec3f end = (*w)[(j + 1) % numPoints].asVec3();
-						pPrimContex_->drawLine(start, end, col);
-					}
+					Vec3f start = (*w)[j].asVec3();
+					Vec3f end = (*w)[(j + 1) % numPoints].asVec3();
+					pPrimContex_->drawLine(start, end, col);
 				}
+			}
 
-				for (i = 0; i < portalPlanes.size(); i++)
-				{
-					if (!windings[i]) {
-						continue;
-					}
-					X_DELETE(windings[i], g_3dEngineArena);
+			for (i = 0; i < portalPlanes.size(); i++)
+			{
+				if (!windings[i]) {
+					continue;
 				}
+				X_DELETE(windings[i], g_3dEngineArena);
 			}
 		}
 	}
