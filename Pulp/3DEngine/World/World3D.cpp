@@ -209,6 +209,7 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
 	areaNodes_(arena),
 	modelRefs_(arena),
 	visibleAreas_(arena),
+	lights_(arena),
 	staticModels_(arena),
 	renderEnts_(arena)
 {
@@ -666,6 +667,20 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 		}
 	}
 
+	// lights
+	{
+		core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::LIGHTS_STATIC);
+
+		size_t numLights = safe_static_cast<size_t>(file.getSize() / sizeof(level::Light));
+
+		if (numLights)
+		{
+			lights_.resize(numLights);
+
+			file.readObj(lights_.data(), lights_.size());
+		}
+	}
+
 
 	return true;
 }
@@ -718,6 +733,7 @@ void World3D::updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool fo
 	pRenderEnt->lastModifiedFrameNum = frameNumber_;
 	pRenderEnt->trans = trans;
 
+//	createEntityRefs(pRenderEnt);
 }
 
 bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num)
@@ -753,6 +769,13 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
 	}
 
 	return true;
+}
+
+IRenderLight* World3D::addRenderLight(RenderLightDesc& ent)
+{
+	X_UNUSED(ent);
+
+	return nullptr;
 }
 
 
@@ -954,7 +977,6 @@ void World3D::pushFrustumIntoTree(RenderEnt* pEnt)
 
 void World3D::addEntityToArea(Area& area, RenderEnt* pEnt)
 {
-
 
 	area.renderEnts.push_back(pEnt);
 }
@@ -1765,6 +1787,11 @@ void World3D::drawRenderEnts()
 		model::RenderModel* pModel = static_cast<model::RenderModel*>(pRendEnt->pModel);
 		size_t lodIdx = 0;
 
+		if (!pModel->isLoaded())
+		{
+			continue;
+		}
+
 		if (!pModel->canRenderLod(lodIdx))
 		{
 			pModel->createRenderBuffersForLod(lodIdx, gEnv->pRender);
@@ -2225,6 +2252,7 @@ void World3D::drawDebug(void)
 	debugDraw_AreaBounds();
 	debugDraw_Portals();
 	debugDraw_PortalStacks();
+	debugDraw_Lights();
 	//	debugDraw_StaticModelCullVis();
 	//	debugDraw_ModelBones();
 	//	debugDraw_DrawDetachedCam();
@@ -2397,5 +2425,18 @@ void World3D::debugDraw_PortalStacks(void) const
 		}
 	}
 }
+
+void World3D::debugDraw_Lights(void) const
+{
+	pPrimContex_->setDepthTest(true);
+	for (auto& light : lights_)
+	{
+		Sphere s(light.pos, 2.f);
+
+		pPrimContex_->drawSphere(s, light.col, true);
+	}
+}
+
+
 
 X_NAMESPACE_END

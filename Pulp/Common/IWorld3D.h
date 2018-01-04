@@ -13,11 +13,27 @@ struct RenderEntDesc
 	Transformf trans;
 };
 
+
+
+struct RenderLightDesc
+{
+	Transformf trans;
+
+	Colorf col;
+};
+
+
 struct IRenderEnt
 {
 
 
 };
+
+struct IRenderLight
+{
+
+};
+
 
 struct IWorld3D
 {
@@ -29,6 +45,9 @@ struct IWorld3D
 	virtual IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_ABSTRACT;
 	virtual void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force = false) X_ABSTRACT;
 	virtual bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_ABSTRACT;
+
+	virtual IRenderLight* addRenderLight(RenderLightDesc& ent) X_ABSTRACT;
+
 };
 
 

@@ -50,6 +50,18 @@ public:
 };
 
 
+class RenderLight : public IRenderLight
+{
+public:
+	RenderLight();
+
+public:
+	Transformf trans;
+
+
+	Colorf col;
+};
+
 struct AreaNode
 {
 	static const int32_t CHILDREN_HAVE_MULTIPLE_AREAS = -2;
@@ -163,6 +175,7 @@ class World3D : public IWorld3D
 	typedef std::array<level::FileAreaRefHdr, level::MAP_MAX_MULTI_REF_LISTS> AreaMultiRefsHdrArr;
 	typedef std::array<uint32_t, level::MAP_MAX_MULTI_REF_LISTS> AreaVisFlags;
 	typedef core::Array<level::StaticModel> StaticModelsArr;
+	typedef core::Array<level::Light> StaticLightssArr;
 	typedef core::Array<RenderEnt*> RenderEntPtrArr;
 
 
@@ -192,6 +205,9 @@ public:
 	IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_FINAL;
 	void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force) X_FINAL;
 	bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_FINAL;
+
+	IRenderLight* addRenderLight(RenderLightDesc& ent) X_FINAL;
+
 
 	// util
 	X_INLINE size_t numAreas(void) const;
@@ -257,6 +273,7 @@ private:
 	void debugDraw_AreaBounds(void) const;
 	void debugDraw_Portals(void) const;
 	void debugDraw_PortalStacks(void) const;
+	void debugDraw_Lights(void) const;
 	void debugDraw_StaticModelCullVis(void) const;
 	void debugDraw_ModelBones(void) const;
 	void debugDraw_DrawDetachedCam(void) const;
@@ -284,6 +301,9 @@ private:
 	AreaNodeArr areaNodes_;
 
 	AreaRefInfo modelRefs_;
+
+	// lights
+	StaticLightssArr lights_;
 
 	// all static models
 	StaticModelsArr staticModels_;

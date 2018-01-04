@@ -525,13 +525,11 @@ X_DECLARE_ENUM8(LightType)(
 
 struct Light
 {
-	LightType::Enum type;
-
 	Vec3f pos;
 	Quatf angle;
 
-
 	Colorf col;
+	LightType::Enum type;
 };
 
 
