@@ -24,7 +24,7 @@ struct VS_OUTPUT
     float4 ssPosition           	: SV_POSITION;
     float4 color                	: COLOR;
 #if X_TEXTURED
-    float2 texCoord               : TEXCOORD0;
+    float2 texCoord                 : TEXCOORD0;
 #endif // !X_TEXTURED
 };
 
@@ -33,17 +33,17 @@ struct PS_INPUT
     float4 ssPosition           	: SV_POSITION;
     float4 color                	: COLOR0;
 #if X_TEXTURED
-    float2 texCoord               : TEXCOORD0;
+    float2 texCoord                 : TEXCOORD0;
 #endif // !X_TEXTURED
 };
 
 struct PS_OUTPUT
 {
-    float4 color                : SV_TARGET0;
+    float4 color                    : SV_TARGET0;
 };
 
 #if X_TEXTURED
-Texture2D          colorMap : register(t0);
+Texture2D           colorMap : register(t0);
 SamplerState        colorSampler;
 
 #endif // !X_TEXTURED
@@ -75,8 +75,8 @@ PS_OUTPUT PrimPS( PS_INPUT IN )
 	output.color = IN.color;
 
 #if X_TEXTURED
-          float4 texCol = colorMap.Sample(colorSampler, IN.texCoord);
-          output.color = output.color *  texCol;
+    float4 texCol = colorMap.Sample(colorSampler, IN.texCoord);
+    output.color = output.color *  texCol;
 #endif // !X_TEXTURED
 
 	return output;
