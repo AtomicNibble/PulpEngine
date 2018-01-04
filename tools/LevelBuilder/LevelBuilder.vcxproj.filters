@@ -146,9 +146,6 @@
     <ClCompile Include="LvlBuilder.cpp">
       <Filter>Source Files\Lvl</Filter>
     </ClCompile>
-    <ClCompile Include="LvlProcess.cpp">
-      <Filter>Source Files\Lvl</Filter>
-    </ClCompile>
     <ClCompile Include="BSPPortals.cpp">
       <Filter>Source Files\BSP</Filter>
     </ClCompile>

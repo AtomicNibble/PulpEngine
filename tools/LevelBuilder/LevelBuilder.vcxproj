@@ -328,7 +328,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
@@ -342,7 +341,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -357,7 +355,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -371,7 +368,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <StackReserveSize>4194304</StackReserveSize>
     </Link>
   </ItemDefinitionGroup>
@@ -385,7 +381,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <StackReserveSize>4194304</StackReserveSize>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
@@ -400,7 +395,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <StackReserveSize>4194304</StackReserveSize>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
     </Link>
@@ -417,7 +411,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
@@ -434,7 +427,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysXPROFILE.dll;PhysXCharacterKinematicPROFILE.dll;PhysXCommonPROFILE.dll;PhysXCookingPROFILE.dll</DelayLoadDLLs>
@@ -452,7 +444,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
@@ -470,7 +461,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -488,7 +478,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -505,7 +494,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;PhysX.dll;PhysXCharacterKinematic.dll;PhysXCommon.dll;PhysXCooking.dll</DelayLoadDLLs>
@@ -522,7 +510,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -539,7 +526,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <DelayLoadDLLs>WINMM.dll</DelayLoadDLLs>
@@ -586,7 +572,6 @@
     <ClCompile Include="LvlFmts\mapFile\MapTypes.cpp" />
     <ClCompile Include="LvlFmts\mapFile\Util.cpp" />
     <ClCompile Include="LvlMaterial.cpp" />
-    <ClCompile Include="LvlProcess.cpp" />
     <ClCompile Include="BSPTypes.cpp" />
     <ClCompile Include="EngineApp.cpp" />
     <ClCompile Include="LvlBuilder.cpp" />
