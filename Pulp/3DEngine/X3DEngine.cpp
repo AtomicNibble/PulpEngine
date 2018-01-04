@@ -9,6 +9,7 @@
 #include <CBuffer.h>
 #include <IFrameData.h>
 #include <IFont.h>
+#include <IVideo.h>
 
 #include <Time\StopWatch.h>
 #include <String\StringHash.h>
@@ -453,6 +454,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		// prim drawing.
 		// unless only way to draw text is with prim humm.... !
 		gEnv->pFontSys->appendDirtyBuffers(primBucket);
+		gEnv->pVideoSys->appendDirtyBuffers(primBucket);
 
 		for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
 		{
