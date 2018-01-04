@@ -427,7 +427,9 @@ X_DECLARE_ENUM(FileNodes) (
 	AREA_COLLISION,		// the collision data for each area.
 	STATIC_MODELS,		// all the static models in the map.
 	BSP_TREE,
-	ENTITIES
+	ENTITIES,
+	LIGHTS_STATIC,
+	LIGHTS_DYNAMIC
 );
 
 
@@ -514,6 +516,23 @@ static_assert(std::numeric_limits<decltype(AreaCollisionDataHdr::dataSize)>::max
 X_ENSURE_SIZE(AreaCollisionHdr, 16);
 X_ENSURE_SIZE(AreaCollisionGroupHdr, 12);
 X_ENSURE_SIZE(AreaCollisionDataHdr, 2);
+
+
+X_DECLARE_ENUM8(LightType)(
+	Point,
+	Spot
+);
+
+struct Light
+{
+	LightType::Enum type;
+
+	Vec3f pos;
+	Quatf angle;
+
+
+	Colorf col;
+};
 
 
 X_PACK_POP

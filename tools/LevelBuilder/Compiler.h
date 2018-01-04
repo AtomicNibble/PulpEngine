@@ -54,6 +54,7 @@ class Compiler
 	typedef core::Array<LvlEntity> LvlEntsArr;
 	typedef core::Array<LvlArea> LvlAreaArr;
 	typedef ArrayExpGrow<level::FileStaticModel> StaticModelsArr;
+	typedef ArrayExpGrow<level::Light> LightsArr;
 	typedef std::array<core::Array<level::MultiAreaEntRef>,
 		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
 
@@ -76,6 +77,7 @@ private:
 	void areasForBounds_r(AreaIdArr& areaList, const Sphere& sphere,
 		const Vec3f boundsPoints[8], bspNode* pNode);
 
+	bool createLightList(LvlEntsArr& ents);
 	bool createStaticModelList(LvlEntity& ent, LvlEntsArr& ents);
 	bool createCollisionData(LvlEntity& ent);
 
@@ -97,8 +99,9 @@ private:
 	// Compiled data
 	LvlAreaArr areas_;
 
-	StaticModelsArr staticModels_;
+	LightsArr lights_;
 
+	StaticModelsArr staticModels_;
 	MultiRefArr multiModelRefLists_;
 
 	StringTableUnique stringTable_;

@@ -142,6 +142,7 @@ Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhys
 	windingDataArena_(&windingDataAllocator_, "WindingDataArena"),
 
 	areas_(arena),
+	lights_(arena),
 	staticModels_(arena),
 	multiModelRefLists_{
 		X_PP_REPEAT_COMMA_SEP(8, arena)
@@ -320,6 +321,10 @@ bool Compiler::processWorldModel(LvlEntsArr& ents, LvlEntity& ent)
 	}
 
 	if (!createStaticModelList(ent, ents)) {
+		return false;
+	}
+
+	if (!createLightList(ents)) {
 		return false;
 	}
 
@@ -529,7 +534,46 @@ void Compiler::areasForBounds_r(AreaIdArr& areaList, const Sphere& sphere,
 	}
 }
 
+bool Compiler::createLightList(LvlEntsArr& ents)
+{
 
+	for (size_t i = 0; i < ents.size(); i++)
+	{
+		auto& ent = ents[i];
+		if (ent.classType != game::ClassType::LIGHT) {
+			continue;
+		}
+
+		level::Light l;
+		l.pos = ent.origin;
+		l.angle = Quatf(toRadians(ent.angle.x), toRadians(ent.angle.y), toRadians(ent.angle.z));
+		l.type = level::LightType::Point;
+
+		{
+			auto it = ent.epairs.find(X_CONST_STRING("_color"));
+			if (it == ent.epairs.end())
+			{
+				X_WARNING("Entity", "light missing '_color' kvp at: (^8%g,%g,%g^7)",
+					ent.origin[0], ent.origin[1], ent.origin[2]);
+				continue;
+			}
+
+			const core::string& str = it->second;
+			
+			if (!Color::fromString(str.begin(), str.end(), l.col))
+			{
+				X_WARNING("Entity", "Failed to parse light color kvp \"%s\" at: (^8%g,%g,%g^7)",
+					str.c_str(), ent.origin[0], ent.origin[1], ent.origin[2]);
+				continue;
+			}
+
+		}
+		
+		lights_.append(l);
+	}
+
+	return true;
+}
 
 bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 {
@@ -698,7 +742,7 @@ bool Compiler::createCollisionData(LvlEntity& ent)
 bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 {
 	std::array<core::ByteStream, FileNodes::ENUM_COUNT> nodeStreams{
-		X_PP_REPEAT_COMMA_SEP(8, g_arena)
+		X_PP_REPEAT_COMMA_SEP(10, g_arena)
 	};
 
 	for (uint32_t i = 0; i < FileNodes::ENUM_COUNT; i++) {
@@ -976,7 +1020,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 			core::ArrayAllocator<const level::LvlEntity*>, 
 			core::growStrat::Multiply>, game::ClassType::ENUM_COUNT
 				> classEnts{
-			X_PP_REPEAT_COMMA_SEP(6, g_arena)
+			X_PP_REPEAT_COMMA_SEP(7, g_arena)
 		};
 
 		for (size_t i = 0; i < ents.size(); i++)
@@ -1022,6 +1066,21 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 		writer.EndObject();
 
 		jsonBuf.Put('\0');
+	}
+
+
+	// lights static
+	{
+		auto& stream = nodeStreams[FileNodes::LIGHTS_STATIC];
+
+		stream.write(lights_.ptr(), lights_.size());
+	}
+
+	// lights dynamic
+	{
+		auto& stream = nodeStreams[FileNodes::LIGHTS_DYNAMIC];
+
+
 	}
 
 	// update FourcCC to mark this bsp as valid.

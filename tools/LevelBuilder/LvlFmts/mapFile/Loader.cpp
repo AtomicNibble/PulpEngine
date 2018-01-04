@@ -140,6 +140,9 @@ namespace mapFile
 				case "script_origin"_fnv1a:
 					ent.classType = game::ClassType::SCRIPT_ORIGIN;
 					break;
+				case "light"_fnv1a:
+					ent.classType = game::ClassType::LIGHT;
+					break;
 				default:
 					X_WARNING("Lvl", "ent has unknown class type: \"%s\"", classname.c_str());
 					break;
