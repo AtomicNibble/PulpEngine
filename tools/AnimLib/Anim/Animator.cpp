@@ -634,7 +634,7 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
 
 	font::TextDrawContext ctx;
 	ctx.col = Col_White;
-	ctx.size = Vec2f(3.f, 3.f);
+	ctx.size = Vec2f(14.f, 14.f);
 	ctx.effectId = 0;
 	ctx.pFont = gEnv->pFontSys->GetDefault();
 	ctx.flags.Set(font::DrawTextFlag::FRAMED);
