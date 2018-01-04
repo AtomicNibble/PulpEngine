@@ -47,10 +47,13 @@ class Compiler
 
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 
+	template<typename T>
+	using ArrayExpGrow = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
+
 	typedef core::Array<int32_t> AreaIdArr;
 	typedef core::Array<LvlEntity> LvlEntsArr;
 	typedef core::Array<LvlArea> LvlAreaArr;
-	typedef core::Array<level::FileStaticModel> StaticModelsArr;
+	typedef ArrayExpGrow<level::FileStaticModel> StaticModelsArr;
 	typedef std::array<core::Array<level::MultiAreaEntRef>,
 		level::MAP_MAX_MULTI_REF_LISTS> MultiRefArr;
 

@@ -542,7 +542,6 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
 	}
 
 	staticModels_.reserve(ents.size() / 2);
-	staticModels_.setGranularity(128);
 
 	Vec3f boundsPoints[8];
 
