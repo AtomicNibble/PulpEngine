@@ -638,9 +638,12 @@ bool xFileSys::setGameDir(pathTypeW path)
 {
 	X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path,gameDir_);
 
+
 	// check if the irectory is even valid.
 	if (!this->directoryExistsOS(path)) {
-		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%ls\"", path);
+		core::Path<wchar_t> fullPath;
+		PathUtil::GetFullPath(path, fullPath);
+		X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%ls\"", fullPath.c_str());
 		return false;
 	}
 
@@ -669,8 +672,6 @@ void xFileSys::addModDir(pathTypeW path)
 		X_ERROR("FileSys", "addModDir full path name creation failed");
 		return;
 	}
-
-
 
 	if (!this->directoryExistsOS(fixedPath)) {
 		X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath);
