@@ -104,6 +104,13 @@ class xFileSys : public IFileSys, private core::ThreadAbstract
 	{
 		bool operator()(const IoRequestBase* lhs, const IoRequestBase* rhs) const
 		{
+#if 0 // sort reads by offset?
+			if (lhs->getType() == IoRequest::READ && lhs->getType() == IoRequest::READ) {
+				auto* pReadLhs = static_cast<const IoRequestRead*>(lhs);
+				auto* pReadRhs = static_cast<const IoRequestRead*>(rhs);
+				return pReadLhs->offset < pReadRhs->offset;
+			}
+#endif
 			return (lhs->getType() < rhs->getType());
 		}
 	};
