@@ -21,7 +21,7 @@ bool ColorT<float>::fromString(const char* pBegin, const char* pEnd, ColorT<floa
 			}
 			else
 			{
-				X_ERROR_IF(!Slient, "Cvar", "failed to set color, invalid input");
+				X_ERROR_IF(!Slient, "Color", "failed to set color, invalid input");
 				return false;
 			}
 		}
@@ -43,7 +43,7 @@ bool ColorT<float>::fromString(const char* pBegin, const char* pEnd, ColorT<floa
 			}
 			else
 			{
-				X_ERROR_IF(!Slient, "Cvar", "failed to set color, require either 1 or 4 real numbers");
+				X_ERROR_IF(!Slient, "Color", "failed to set color, require either 1 or 4 real numbers");
 				return false;
 			}
 		}
