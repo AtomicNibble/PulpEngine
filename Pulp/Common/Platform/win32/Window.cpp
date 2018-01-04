@@ -334,10 +334,11 @@ bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int he
 		this // required for winproc
 	);
 
-
+#if 0
 	HICON hIcon = NULL; //  LoadIcon(GetModuleHandle(NULL), MAKEINTRESOURCE(IDI_ENGINE_LOGO));
 	SendMessage(window_, WM_SETICON, ICON_SMALL, (LPARAM)hIcon);
 	SendMessage(window_, WM_SETICON, ICON_BIG, (LPARAM)hIcon);
+#endif
 
 	X_ERROR_IF( window_ == NULL, "Window", "Failed to create window. Title: '%s'. Error: %s", Title, lastError::ToString( Dsc ) );
 
