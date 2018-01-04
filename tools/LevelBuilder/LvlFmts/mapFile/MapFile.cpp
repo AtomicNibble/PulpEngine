@@ -574,7 +574,6 @@ namespace mapFile
 			entities_.push_back(mapEnt.release());
 		}
 
-		PrimtPrimMemInfo();
 		return true;
 	}
 

@@ -37,6 +37,7 @@ public:
 	~XMapFile();
 
 	bool Parse(const char* pData, size_t length);
+	void PrimtPrimMemInfo(void) const;
 
 	X_INLINE size_t getNumEntities(void) const;
 	X_INLINE XMapEntity* getEntity(size_t i) const;
@@ -48,7 +49,6 @@ private:
 	bool isLayerIgnored(const core::string& layerName) const;
 	void ListLayers(void) const;
 
-	void PrimtPrimMemInfo(void) const;
 
 private:
 	GrowingPool<PrimativePoolArena> pool_;

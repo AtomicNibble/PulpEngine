@@ -35,6 +35,10 @@ namespace mapFile
 			return false;
 		}
 
+#if 0
+		map.PrimtPrimMemInfo();
+#endif
+
 		// process it.
 		if (map.getNumEntities() == 0) {
 			X_ERROR("Lvl", "Map has zero entites, atleast one is required");
