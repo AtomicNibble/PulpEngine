@@ -180,61 +180,9 @@ void CVarIntRef::Set(const char* s)
 // ========================================================
 
 
-bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool Slient)
+bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool silent)
 {
-	Color col;
-	int i;
-
-	core::XLexer lex(pStr, pStr + strlen(pStr));
-	core::XLexToken token;
-
-	for (i = 0; i < 4; i++)
-	{
-		if (lex.ReadToken(token))
-		{
-			if (token.GetType() == TokenType::NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
-			{
-				col[i] = token.GetFloatValue();
-			}
-			else
-			{
-				X_ERROR_IF(!Slient,"Cvar", "failed to set color, invalid input");
-				return false;
-			}
-		}
-		else
-		{
-			if (i == 1)
-			{
-				// we allow all 4 colors to be set with 1 color.
-				// could cap here for a saving if you really wish :P
-				col.g = col.r;
-				col.b = col.r;
-				col.a = col.r;
-				break;
-			}
-			if (i == 3)
-			{
-				// solid alpha.
-				col.a = 1.f;
-			}
-			else
-			{
-				X_ERROR_IF(!Slient, "Cvar", "failed to set color, require either 1 or 4 real numbers");
-				return false;
-			}
-		}
-	}
-
-
-	// cap any values.
-	col.r = core::Min(1.f, core::Max(0.f, col.r));
-	col.g = core::Min(1.f, core::Max(0.f, col.g));
-	col.b = core::Min(1.f, core::Max(0.f, col.b));
-	col.a = core::Min(1.f, core::Max(0.f, col.a));
-
-	out = col; 
-	return true;
+	return Color::fromString(pStr, pStr + strlen(pStr), out, silent);
 }
 
 void CVarColRef::Set(const char* s)
