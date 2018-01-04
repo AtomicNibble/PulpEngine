@@ -23,6 +23,7 @@ public:
 	X_INLINE int32_t drawArea(void) const;
 	X_INLINE int32_t drawCurrentAreaOnly(void) const;
 	X_INLINE int32_t drawStats(void) const;
+	X_INLINE int32_t drawLightDebug(void) const;
 	X_INLINE int32_t drawModelBounds(void) const;
 	X_INLINE int32_t drawModelBones(void) const;
 	X_INLINE int32_t drawModelBoneNames(void) const;
@@ -44,6 +45,7 @@ private:
 	int32_t drawArea_;
 	int32_t drawCurrentAreaOnly_;
 	int32_t drawStats_;
+	int32_t drawLightDebug_;
 	int32_t drawModelBounds_;
 	int32_t drawModelBones_;
 	int32_t drawModelBoneNames_;

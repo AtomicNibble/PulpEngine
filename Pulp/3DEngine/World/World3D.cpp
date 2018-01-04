@@ -2431,7 +2431,10 @@ void World3D::debugDraw_PortalStacks(void) const
 
 void World3D::debugDraw_Lights(void) const
 {
-	pPrimContex_->setDepthTest(true);
+	if (!vars_.drawLightDebug()) {
+		return;
+	}
+
 	for (auto& light : lights_)
 	{
 		Sphere s(light.pos, 2.f);

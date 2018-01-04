@@ -42,6 +42,10 @@ X_INLINE int32_t DrawVars::drawStats(void) const
 	return drawStats_;
 }
 
+X_INLINE int32_t DrawVars::drawLightDebug(void) const
+{
+	return drawLightDebug_;
+}
 
 X_INLINE int32_t DrawVars::drawModelBounds(void) const
 {
