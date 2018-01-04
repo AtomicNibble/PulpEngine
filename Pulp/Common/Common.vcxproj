@@ -708,6 +708,7 @@
     <ClCompile Include="Compression\CompressorAlloc.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Hashing\Digest.cpp" />
+    <ClCompile Include="Math\XColor.cpp" />
     <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />

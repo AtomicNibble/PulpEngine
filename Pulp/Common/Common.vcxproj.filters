@@ -2043,6 +2043,9 @@
     <ClCompile Include="Compression\CompressorAlloc.cpp">
       <Filter>SourceFiles\Compression</Filter>
     </ClCompile>
+    <ClCompile Include="Math\XColor.cpp">
+      <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">

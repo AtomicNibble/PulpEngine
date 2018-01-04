@@ -125,6 +125,8 @@ struct ColorT
 		return ColorT<T>(CHANTRAIT<T>::convert(red), CHANTRAIT<T>::convert(green), CHANTRAIT<T>::convert(blue), CHANTRAIT<T>::convert(alpha));
 	}
 
+	static bool fromString(const char* pBegin, const char* pEnd, ColorT<T>& out, bool slient = true);
+
 };
 
 #include "XColor.inl"
