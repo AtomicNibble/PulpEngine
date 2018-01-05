@@ -1,0 +1,25 @@
+#include <states>
+
+
+// define a sampler for it, that can't be edited in AssMan.
+Sampler( "TextureSampler" )
+{
+	repeat   = "tile both"
+	filter = "linear (mip none)"
+}
+
+Technique( "unlit" )
+{
+	state = "disable"
+	source = "FullScreen.hlsl"
+
+	vs = VertexShader()
+	{
+
+	}
+	ps = PixelShader()
+	{
+    	colorSampler = "TextureSampler"
+		colorMap = CodeTexture( "codeTexture0" )
+	}
+}
