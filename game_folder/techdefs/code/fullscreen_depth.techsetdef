@@ -25,5 +25,7 @@ Technique( "unlit" )
 	{
     	colorSampler = "TextureSampler"
 		colorMap = CodeTexture( "codeTexture0" )
+
+		entry = "ps_depth"
 	}
 }
