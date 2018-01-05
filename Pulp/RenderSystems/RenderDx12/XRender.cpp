@@ -937,6 +937,8 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 					context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 
 					textureSRVS[t] = pTex->getSRV();
+
+					X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
 				}
 
 				// for now assume all slots are linera and no gaps.
