@@ -27,7 +27,7 @@ public:
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getDSV_DepthReadOnly(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getDSV_StencilReadOnly(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getDSV_ReadOnly(void) const;
-	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getDepthSRV(void) const;
+	const D3D12_CPU_DESCRIPTOR_HANDLE& getDepthSRV(void) const;
 	X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& getStencilSRV(void) const;
 
 	X_INLINE float32_t getClearDepth(void) const;
@@ -40,7 +40,9 @@ private:
 	float32_t clearDepth_;
 	uint32_t clearStencil_;
 	D3D12_CPU_DESCRIPTOR_HANDLE hDSV_[4];
-	D3D12_CPU_DESCRIPTOR_HANDLE hDepthSRV_;
+//  The shader resource view for depth, is now just stored in the texture::Texture(), as it makes drawing with it simple.
+//	But currently you can't ever bind the stencilSRV, not sure how to expose that in API.
+//	D3D12_CPU_DESCRIPTOR_HANDLE hDepthSRV_;
 	D3D12_CPU_DESCRIPTOR_HANDLE hStencilSRV_;
 };
 

@@ -21,10 +21,6 @@ X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& DepthBuffer::getDSV_ReadOnly(void) c
 	return hDSV_[3];
 }
 
-X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& DepthBuffer::getDepthSRV(void) const
-{
-	return hDepthSRV_;
-}
 
 X_INLINE const D3D12_CPU_DESCRIPTOR_HANDLE& DepthBuffer::getStencilSRV(void) const
 { 

@@ -17,7 +17,6 @@ DepthBuffer::DepthBuffer(::texture::Texture& textInst, float32_t clearDepth, uin
 	hDSV_[1].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	hDSV_[2].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	hDSV_[3].ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
-	hDepthSRV_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 	hStencilSRV_.ptr = D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
 }
 
@@ -107,9 +106,13 @@ void DepthBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 		hDSV_[3] = hDSV_[1];
 	}
 
-	if (hDepthSRV_.ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
-		hDepthSRV_ = allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	auto& tex = getTex();
+	
+	if (tex.getSRV().ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN) {
+		tex.setSRV(allocator.allocateDescriptor(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV));
 	}
+
+	auto& srv = tex.getSRV();
 
 	// Create the shader resource view
 	D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc = {};
@@ -124,7 +127,7 @@ void DepthBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 		SRVDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2DMS;
 	}
 	SRVDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
-	pDevice->CreateShaderResourceView(pResource, &SRVDesc, hDepthSRV_);
+	pDevice->CreateShaderResourceView(pResource, &SRVDesc, srv);
 
 	if (stencilReadFormat != DXGI_FORMAT_UNKNOWN)
 	{
@@ -135,6 +138,11 @@ void DepthBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
 		SRVDesc.Format = stencilReadFormat;
 		pDevice->CreateShaderResourceView(pResource, &SRVDesc, hStencilSRV_);
 	}
+}
+
+const D3D12_CPU_DESCRIPTOR_HANDLE& DepthBuffer::getDepthSRV(void) const
+{
+	return getTex().getSRV();
 }
 
 
