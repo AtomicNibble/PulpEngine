@@ -15,11 +15,10 @@ Technique( "unlit" )
 
 	vs = VertexShader()
 	{
-	//	entry = "techsetdef_unlit"
+
 	}
 	ps = PixelShader()
 	{
-	//	entry = "techsetdef_unlit"
 
     	diffuseSampler = "videoTextureSampler"
 		diffuse = CodeTexture( "codeTexture0" )
