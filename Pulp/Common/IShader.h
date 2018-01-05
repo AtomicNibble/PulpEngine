@@ -148,7 +148,9 @@ X_DECLARE_ENUM8(VertexFormat)(
 	P3F_T2F_C4B,  // used by gui.
 
 				  // double coords
-	P3F_T4F_C4B_N3F
+	P3F_T4F_C4B_N3F,
+
+	NONE
 );
 
 
@@ -248,7 +250,9 @@ X_DECLARE_ENUM8(InputLayoutFormat)(
 	POS_UV_COL_NORM_TAN,
 	POS_UV_COL_NORM_TAN_BI,
 
-	POS_UV2_COL_NORM
+	POS_UV2_COL_NORM,
+
+	NONE // shaders that don't take verts.
 );
 
 
