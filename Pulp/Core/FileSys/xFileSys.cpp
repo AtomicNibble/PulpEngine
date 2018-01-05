@@ -250,6 +250,10 @@ void xFileSys::shutDown(void)
 			X_DELETE(cur->pDir, g_coreArena);
 		}
 		else {
+			if (cur->pPak->pFile) {
+				X_DELETE_AND_NULL(cur->pPak->pFile, &filePoolArena_);
+			}
+
 			X_DELETE(cur->pPak, g_coreArena);
 		}
 		X_DELETE(cur, g_coreArena);
