@@ -13,6 +13,7 @@ X_DECLARE_ENUM(PakMode)(
 struct Pak
 {
 	Pak(core::MemoryArenaBase* arena);
+	~Pak();
 
 	int32_t find(core::StrHash hash, const char* pName) const;
 
@@ -52,6 +53,12 @@ inline Pak::Pak(core::MemoryArenaBase* arena) :
 {
 
 }
+
+inline Pak::~Pak()
+{
+	X_ASSERT(pFile != nullptr, "")(pFile);
+}
+
 
 inline int32_t Pak::find(core::StrHash nameHash, const char* pName) const
 {
