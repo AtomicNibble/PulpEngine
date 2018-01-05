@@ -569,6 +569,13 @@ namespace shader
 					}
 				}
 
+				// just ignore the 'SV_VertexID' semantic, since we don't have to pass it ourself.
+				// and if nothing else is passed the input layout will end up as none.
+				if (core::strUtil::IsEqual("SV_VertexID", InputDsc.SemanticName))
+				{
+					continue;
+				}
+
 				pILnode = pILnode->GetChildWithSemtaic(InputDsc.SemanticName);
 				if (!pILnode)
 				{

@@ -85,6 +85,8 @@ namespace shader
 		{
 			isInit = true;
 
+			blank.SetFormat(InputLayoutFormat::NONE);
+
 			ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
 			uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
 				AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
