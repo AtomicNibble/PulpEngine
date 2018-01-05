@@ -51,3 +51,30 @@ PS_OUTPUT ps_main( VS_OUTPUT IN )
 
     return output;
 }
+
+
+float LinearizeDepth(float2 uv)
+{
+    float zNear = 0.5;
+    float zFar  = 2048.0;
+    float depth = colorMap.Sample(colorSampler, uv).x;
+
+    return depth * 20;
+    // depth = 1.f - depth;
+    //return 1.f - (depth * 25);
+//    return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+}
+
+PS_OUTPUT ps_depth( VS_OUTPUT IN )
+{
+    PS_OUTPUT output;
+    output.color = float4(1,1,1,1);
+
+#if X_TEXTURED
+    float d = LinearizeDepth(IN.texCoord);
+    output.color = float4(d,0,0,1);
+
+#endif // !X_TEXTURED
+
+    return output;
+}
