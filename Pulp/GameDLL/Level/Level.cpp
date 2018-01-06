@@ -12,6 +12,7 @@
 
 #include "UserCmds\UserCmdMan.h"
 
+using namespace sound::literals;
 
 X_NAMESPACE_BEGIN(game)
 
@@ -332,6 +333,10 @@ bool World::loadMap(const char* pMapName)
 	level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
 	level_->load(pMapName);
 
+	// TEMP
+	gEnv->pSound->postEvent(force_hash<"play_ambient"_soundId>(), sound::GLOBAL_OBJECT_ID);
+	// gEnv->pSound->postEvent(force_hash<"video_rickroll"_soundId>(), sound::GLOBAL_OBJECT_ID);
+	
 	return true;
 }
 
@@ -375,6 +380,7 @@ void World::spawnPlayer(entity::EntityId id)
 	auto& trans = ents_.getRegister().get<entity::TransForm>(id);
 	trans.pos = Vec3f(-80, 0, 10);
 	ents_.addController(id);
+
 
 	userCmdMan_.resetPlayer(id);
 }
