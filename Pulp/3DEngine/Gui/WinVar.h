@@ -572,16 +572,24 @@ namespace gui
 			XWinVar::Init(_name, win);
 		}
 		virtual void Set(const char* val) X_OVERRIDE {
+			
+			// TODO: use Color::fromString
+			Color col;
 			// make comma optional.
-			if (strchr(val, ','))
-				sscanf(val, "%f,%f,%f,%f", &value.r, &value.g, &value.b, &value.a);
-			else
-				sscanf(val, "%f %f %f %f", &value.r, &value.g, &value.b, &value.a);
+			if (strchr(val, ',')) {
+				sscanf(val, "%f,%f,%f,%f", &col.r, &col.g, &col.b, &col.a);
+			}
+			else {
+				sscanf(val, "%f %f %f %f", &col.r, &col.g, &col.b, &col.a);
+			}
+
+			value = col;
 		}
 		virtual void Update(void) X_OVERRIDE {
 			//		const char* s = getName();
 		}
 		virtual const char* c_str() const X_OVERRIDE {
+			// TODO make thread safe?
 			static core::StackString<256> temp;
 			temp.clear();
 			temp.appendFmt("%f %f %f %f", value.r, value.g, value.b, value.a);
@@ -591,10 +599,7 @@ namespace gui
 			return VarType::COLOR;
 		}
 		virtual void Set(const Vec4f& oth) {
-			value.r = oth.x;
-			value.g = oth.y;
-			value.b = oth.z;
-			value.a = oth.w;
+			value = Color(oth);
 		}
 
 		XWinColor& operator=(const XWinColor& oth) {
@@ -603,16 +608,16 @@ namespace gui
 			return *this;
 		}
 
-		Color& operator=(const Color& oth) {
+		Color8u& operator=(const Color8u& oth) {
 			value = oth;
 			return value;
 		}
 
-		bool operator==(const Color& oth) {
+		bool operator==(const Color8u& oth) {
 			return (value == oth);
 		}
 
-		operator const Color&() const {
+		operator const Color8u&() const {
 			return value;
 		}
 
@@ -633,7 +638,7 @@ namespace gui
 		virtual void toFile(core::XFile* pFile) X_OVERRIDE;
 
 	protected:
-		Color value;
+		Color8u value;
 	};
 
 

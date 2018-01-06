@@ -1406,8 +1406,8 @@ void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawR
 					break;
 				case WindowBorderStyle::RAISED:
 				{
-					const Color LTColor = borderColor_;
-					Color BRColor = borderColor_;
+					const Color8u LTColor = borderColor_;
+					Color8u BRColor = borderColor_;
 
 					BRColor.shade(-30.f);
 
@@ -1428,8 +1428,8 @@ void XWindow::drawBorder(engine::IPrimativeContext* pDrawCon, const Rectf& drawR
 				}
 				case WindowBorderStyle::SUNKEN:
 				{
-					Color LTColor = borderColor_;
-					Color BRColor = borderColor_;
+					Color8u BRColor = borderColor_;
+					Color8u LTColor = borderColor_;
 
 					LTColor.shade(-30.f);
 
@@ -1522,7 +1522,7 @@ void XWindow::draw(engine::IPrimativeContext* pDrawCon, core::TimeVal time, floa
 
 	font::TextDrawContext contex;
 	contex.widthScale = 1.0f;
-	contex.col = Colorf(foreColor_);
+	contex.col = Color8u(foreColor_);
 
 	if (!flags_.IsSet(WindowFlags::NO_CLIP))
 	{

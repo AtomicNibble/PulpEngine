@@ -26,10 +26,6 @@ namespace gui
 	{
 		int i;
 		Vec4f v;
-		Vec2f v2;
-		Vec3f v3;
-		Rectf rect;
-		Color color;
 
 		if (!enabled_ || var_ == nullptr) {
 			return;
@@ -50,37 +46,46 @@ namespace gui
 				break;
 
 			case RegisterType::VEC2:
-				v2 = *static_cast<XWinVec2*>(var_);
+			{
+				Vec2f v2 = *static_cast<XWinVec2*>(var_);
 				v[0] = v2[0];
 				v[1] = v2[1];
 				break;
+			}
 
 			case RegisterType::VEC3:
-				v3 = *static_cast<XWinVec3*>(var_);
+			{
+				Vec3f v3 = *static_cast<XWinVec3*>(var_);
 				v[0] = v3[0];
 				v[1] = v3[1];
 				v[2] = v3[2];
 				break;
+			}
 
 			case RegisterType::VEC4:
 				v = *static_cast<XWinVec4*>(var_);
 				break;
 
 			case RegisterType::RECT:
-				rect = *static_cast<XWinRect*>(var_);
+			{
+				Rectf rect = *static_cast<XWinRect*>(var_);
 				v.x = rect.x1;
 				v.y = rect.y1;
 				v.z = rect.x2;
 				v.w = rect.y2;
 				break;
+			}
 
 			case RegisterType::COLOR:
-				color = *static_cast<XWinColor*>(var_);
-				v.x = color.r;
-				v.y = color.g;
-				v.z = color.b;
-				v.w = color.a;
+			{
+				Color8u color = *static_cast<XWinColor*>(var_);
+				auto colF = Color(color);
+				v.x = colF.r;
+				v.y = colF.g;
+				v.z = colF.b;
+				v.w = colF.a;
 				break;
+			}
 
 #if X_DEBUG
 			default:
