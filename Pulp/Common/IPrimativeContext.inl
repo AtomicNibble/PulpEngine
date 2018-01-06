@@ -3,34 +3,34 @@ X_NAMESPACE_BEGIN(engine)
 
 
 X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float height,
-	const Color8u& col, const Color8u& borderCol)
+	Color8u col, Color8u borderCol)
 {
 	drawQuadSS(x, y, width, height, col);
 	drawRectSS(x, y, width, height, borderCol);
 }
 
 
-X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color8u& col)
+X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, Color8u col)
 {
 	const Rectf rect(x, y, x + width, y + height);
 	drawQuadImageSS(rect, pMaterial, col);
 }
 
 
-X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float height, const Color8u& col)
+X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float height, Color8u col)
 {
 	const Rectf rect(x, y, x + width, y + height);
 	drawRectSS(rect, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
-	float w, float h, Material* pMaterial, const Color8u& col)
+	float w, float h, Material* pMaterial, Color8u col)
 {
 	drawImage(xpos, ypos, 0.f, w, h, pMaterial, 0, 1, 1, 0, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, Material* pMaterial,
-	const Color8u& col)
+	Color8u col)
 {
 	drawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(),
 		pMaterial, 0, 1, 1, 0, col);
@@ -50,26 +50,26 @@ X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, floa
 	drawImageWithUV(xpos, ypos, z, w, h, pMaterial, s, t, col, filtered);
 }
 
-X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height, const Color8u& col)
+X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height, Color8u col)
 {
 	drawQuad(x, y, 0.f, width, height, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height,
-	const Color8u& col, const Color8u& borderCol)
+	Color8u col, Color8u borderCol)
 {
 	drawQuad(x, y, 0.f, width, height, col);
 	drawRect(x, y, width, height, borderCol);
 }
 
 X_INLINE void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height,
-	const Color8u& col, const Color8u& borderCol)
+	Color8u col, Color8u borderCol)
 {
 	drawQuad(x, y, z, width, height, col);
 	drawRect(x, y, width, height, borderCol);
 }
 
-X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float height, const Color8u& col)
+X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float height, Color8u col)
 {
 	drawQuad(pos.x, pos.y, width, height, col);
 }
@@ -88,7 +88,7 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 	pLine[1].st = core::XHalf2::zero();
 }
 
-X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color8u& color1, const Vec3f& pos2, const Color8u& color2)
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, Color8u color1, const Vec3f& pos2, Color8u color2)
 {
 	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
@@ -98,7 +98,7 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Color8u& colo
 	pLine[1].color = color2;
 }
 
-X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color8u& color1)
+X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, Color8u color1)
 {
 	PrimVertex* pLine = addPrimative(2, PrimitiveType::LINELIST);
 
@@ -110,7 +110,7 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, 
 
 
 // Points
-X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size)
+X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, Color8u col, uint8_t size)
 {
 	X_UNUSED(size);
 
@@ -120,7 +120,7 @@ X_INLINE void IPrimativeContext::drawPoint(const Vec3f &pos, const Color8u& col,
 	pVertices->color = col;
 }
 
-X_INLINE void IPrimativeContext::drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size)
+X_INLINE void IPrimativeContext::drawPoints(const Vec3f* pPoints, uint32_t numPoints, Color8u col, uint8_t size)
 {
 	X_UNUSED(size);
 
@@ -147,9 +147,9 @@ X_INLINE void IPrimativeContext::drawPoints(const Vec3f* pPoints, uint32_t numPo
 }
 
 // Triangle
-X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Color8u& col0,
-	const Vec3f& v1, const Color8u& col1,
-	const Vec3f& v2, const Color8u& col2)
+X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, Color8u col0,
+	const Vec3f& v1, Color8u col1,
+	const Vec3f& v2, Color8u col2)
 {
 	PrimVertex* pVertices = addPrimative(3, PrimitiveType::TRIANGLELIST);
 
@@ -163,7 +163,7 @@ X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Color8u& co
 	pVertices[2].color = col2;
 }
 
-X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col)
+X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color8u col)
 {
 	PrimVertex* pVertices = addPrimative(3, PrimitiveType::TRIANGLELIST);
 
@@ -178,7 +178,7 @@ X_INLINE void IPrimativeContext::drawTriangle(const Vec3f& v0, const Vec3f& v1, 
 }
 
 
-X_INLINE void IPrimativeContext::drawBone(const Matrix44f& rParent, const Matrix44f& rBone, const Color8u& col)
+X_INLINE void IPrimativeContext::drawBone(const Matrix44f& rParent, const Matrix44f& rBone, Color8u col)
 {
 	// just make them quat trans cus yer.
 	drawBone(Transformf(rParent), Transformf(rBone), col);

@@ -63,85 +63,85 @@ public:
 	// TODO: all these Color8u need replacing with Color8u.
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
-	void drawQuadSS(float x, float y, float width, float height, const Color8u& col);
-	void drawQuadSS(const Rectf& rect, const Color8u& col);
-	X_INLINE void drawQuadSS(float x, float y, float width, float height, const Color8u& col, const Color8u& borderCol);
-	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color8u& col);
-	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color8u& col);
-	X_INLINE void drawRectSS(float x, float y, float width, float height, const Color8u& col);
-	void drawRectSS(const Rectf& rect, const Color8u& col);
-	void drawLineSS(const Vec2f& vPos1, const Color8u& color1,
-		const Vec2f& vPos2, const Color8u& vColor2);
+	void drawQuadSS(float x, float y, float width, float height, Color8u col);
+	void drawQuadSS(const Rectf& rect, Color8u col);
+	X_INLINE void drawQuadSS(float x, float y, float width, float height, Color8u col, Color8u borderCol);
+	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, Color8u col);
+	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, Color8u col);
+	X_INLINE void drawRectSS(float x, float y, float width, float height, Color8u col);
+	void drawRectSS(const Rectf& rect, Color8u col);
+	void drawLineSS(const Vec2f& vPos1, Color8u color1,
+		const Vec2f& vPos2, Color8u vColor2);
 
-	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, const Color8u& col);
-	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, const Color8u& col);
+	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, Color8u col);
+	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, Color8u col);
 
 	// for 2d, z is depth not position
-	void drawQuad(float x, float y, float z, float width, float height, const Color8u& col);
-	X_INLINE void drawQuad(float x, float y, float z, float width, float height, const Color8u& col, const Color8u& borderCol);
-	X_INLINE void drawQuad(float x, float y, float width, float height, const Color8u& col);
-	X_INLINE void drawQuad(float x, float y, float width, float height, const Color8u& col, const Color8u& borderCol);
-	X_INLINE void drawQuad(Vec2<float> pos, float width, float height, const Color8u& col);
+	void drawQuad(float x, float y, float z, float width, float height, Color8u col);
+	X_INLINE void drawQuad(float x, float y, float z, float width, float height, Color8u col, Color8u borderCol);
+	X_INLINE void drawQuad(float x, float y, float width, float height, Color8u col);
+	X_INLINE void drawQuad(float x, float y, float width, float height, Color8u col, Color8u borderCol);
+	X_INLINE void drawQuad(Vec2<float> pos, float width, float height, Color8u col);
 	// draw a quad in 3d z is position not depth.
-	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color8u& col);
+	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, Color8u col);
 
-	void drawLines(const Vec3f* pPoints, uint32_t num, const Color8u& col);
+	void drawLines(const Vec3f* pPoints, uint32_t num, Color8u col);
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
-	X_INLINE void drawLine(const Vec3f& pos1, const Color8u& color1,
-		const Vec3f& pos2, const Color8u& color2);
-	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, const Color8u& color1);
+	X_INLINE void drawLine(const Vec3f& pos1, Color8u color1,
+		const Vec3f& pos2, Color8u color2);
+	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, Color8u color1);
 
-	void drawRect(float x, float y, float width, float height, const Color8u& col);
-	void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, const Color8u& col);
+	void drawRect(float x, float y, float width, float height, Color8u col);
+	void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
 
 	// ya fucking what!
 	void drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
-		float padding, uint32_t max, const Color8u& col);
+		float padding, uint32_t max, Color8u col);
 
 	// Points
-	X_INLINE void drawPoint(const Vec3f &pos, const Color8u& col, uint8_t size = 1);
-	X_INLINE void drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u& col, uint8_t size = 1);
+	X_INLINE void drawPoint(const Vec3f &pos, Color8u col, uint8_t size = 1);
+	X_INLINE void drawPoints(const Vec3f* pPoints, uint32_t numPoints, Color8u col, uint8_t size = 1);
 	X_INLINE void drawPoints(const Vec3f* pPoints, uint32_t numPoints, const Color8u* pCol, uint8_t size = 1);
 
 	// Triangle
-	X_INLINE void drawTriangle(const Vec3f& v0, const Color8u& col0,
-		const Vec3f& v1, const Color8u& col1,
-		const Vec3f& v2, const Color8u& col2);
-	X_INLINE void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, const Color8u& col);
+	X_INLINE void drawTriangle(const Vec3f& v0, Color8u col0,
+		const Vec3f& v1, Color8u col1,
+		const Vec3f& v2, Color8u col2);
+	X_INLINE void drawTriangle(const Vec3f& v0, const Vec3f& v1, const Vec3f& v2, Color8u col);
 
-	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u& c0);
+	void drawTriangle(const Vec3f* pPoints, size_t numPoints, Color8u c0);
 	void drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u* pCol);
 
 	// AABB
-	void drawAABB(const AABB& aabb, bool solid, const Color8u& col);
+	void drawAABB(const AABB& aabb, bool solid, Color8u col);
 
 	// OBB
-	void drawOBB(const OBB& obb, bool solid, const Color8u& col);
-	void drawOBB(const OBB& obb, const Vec3f& offset, bool solid, const Color8u& col);
+	void drawOBB(const OBB& obb, bool solid, Color8u col);
+	void drawOBB(const OBB& obb, const Vec3f& offset, bool solid, Color8u col);
 
 
 	// Sphere
-	void drawSphere(const Sphere& sphere, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
-	void drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
+	void drawSphere(const Sphere& sphere, Color8u col, bool solid = true, int32_t lodIdx = 0);
+	void drawSphere(const Sphere& sphere, const Matrix34f& mat, Color8u col, bool solid = true, int32_t lodIdx = 0);
 
 	// Cone
-	void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
+	void drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, Color8u col, bool solid = true, int32_t lodIdx = 0);
 
 	// Cylinder
-	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, const Color8u& col, bool solid = true, int32_t lodIdx = 0);
+	void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, Color8u col, bool solid = true, int32_t lodIdx = 0);
 
 	// Bone
-	void drawBone(const Transformf& rParent, const Transformf& rBone, const Color8u& col);
-	X_INLINE void drawBone(const Matrix44f& rParent, const Matrix44f& rBone, const Color8u& col);
+	void drawBone(const Transformf& rParent, const Transformf& rBone, Color8u col);
+	X_INLINE void drawBone(const Matrix44f& rParent, const Matrix44f& rBone, Color8u col);
 
 	// Frustum - Sexyyyyyyyyyy
-	void drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid = false);
+	void drawFrustum(const XFrustum& frustum, Color8u nearCol, Color8u farCol, bool solid = false);
 
 	// Arrow
-	void drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color);
+	void drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u color);
 
 	// CrosssHair
-	void drawCrosshair(const Vec3f& pos, float size, const Color8u& color);
+	void drawCrosshair(const Vec3f& pos, float size, Color8u color);
 
 	// format buffer is 2048 in size.
 	X_INLINE void drawText(const Vec3f& pos, const font::TextDrawContext& con, const char* pFormat, va_list args);

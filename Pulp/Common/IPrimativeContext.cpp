@@ -17,7 +17,7 @@ IPrimativeContext::~IPrimativeContext()
 
 }
 
-void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, const Color8u& col)
+void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, Color8u col)
 {
 	// input is 0-2
 	// directx is like so:
@@ -65,7 +65,7 @@ void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, 
 	}
 }
 
-void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color8u& col)
+void IPrimativeContext::drawQuadSS(const Rectf& rect, Color8u col)
 {
 	// input is 0-2
 	// directx is like so:
@@ -112,7 +112,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color8u& col)
 }
 
 
-void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color8u& col)
+void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, Color8u col)
 {
 	float x1, y1, x2, y2;
 	float z;
@@ -160,7 +160,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 	pQuad[5] = pQuad[1];
 }
 
-void IPrimativeContext::drawRectSS(const Rectf& rect, const Color8u& col)
+void IPrimativeContext::drawRectSS(const Rectf& rect, Color8u col)
 {
 	float x1, y1, x2, y2;
 
@@ -188,8 +188,8 @@ void IPrimativeContext::drawRectSS(const Rectf& rect, const Color8u& col)
 	drawLine(tr, col, br, col);
 }
 
-void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color8u& color1,
-	const Vec2f& vPos2, const Color8u& color2)
+void IPrimativeContext::drawLineSS(const Vec2f& vPos1, Color8u color1,
+	const Vec2f& vPos2, Color8u color2)
 {
 	Vec3f pos1, pos2;
 
@@ -202,7 +202,7 @@ void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color8u& color1,
 	drawLine(pos1, color1, pos2, color2);
 }
 
-void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, const Color8u& col)
+void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, Color8u col)
 {
 	const float fx = x;
 	const float fy = y;
@@ -237,7 +237,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 }
 
 
-void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color8u& col)
+void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, Color8u col)
 {
 	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
@@ -253,7 +253,7 @@ void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const V
 	}
 }
 
-void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, const Color8u& col)
+void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, Color8u col)
 {
 	X_ASSERT_NOT_NULL(pPoints);
 	X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num);
@@ -276,7 +276,7 @@ void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, const Colo
 }
 
 
-void IPrimativeContext::drawRect(float x, float y, float width, float height, const Color8u& col)
+void IPrimativeContext::drawRect(float x, float y, float width, float height, Color8u col)
 {
 	const float x1 = x;
 	const float y1 = y;
@@ -291,7 +291,7 @@ void IPrimativeContext::drawRect(float x, float y, float width, float height, co
 	drawRect(tl, tr, bl, br, col);
 }
 
-void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, const Color8u& col)
+void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
 {
 	const Vec3f points[8] = {
 		tl, tr,
@@ -304,7 +304,7 @@ void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 }
 
 void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
-	float padding, uint32_t max, const Color8u& col)
+	float padding, uint32_t max, Color8u col)
 {
 	X_ASSERT_NOT_NULL(pHeights);
 	X_ASSERT(num <= max, "Darw Chart has more items than max")(num, max);
@@ -372,7 +372,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
 }
 
 
-void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, const Color8u& c0)
+void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Color8u c0)
 {
 	if (numPoints == 0) {
 		return;
@@ -408,7 +408,7 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, con
 	}
 }
 
-void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& col)
+void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
 {
 	// for now we do this none indexed
 	if (!solid)
@@ -587,7 +587,7 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, const Color8u& co
 	}
 }
 
-void IPrimativeContext::drawOBB(const OBB& obb, bool solid, const Color8u& col)
+void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
 {
 	const auto& or = obb.orientation();
 	const auto& pos = obb.center();
@@ -758,7 +758,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, bool solid, const Color8u& col)
 }
 
 
-void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, const Color8u& col)
+void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, Color8u col)
 {
 	const auto& or = obb.orientation();
 	const auto& max = obb.halfVec();
@@ -930,7 +930,7 @@ void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid,
 
 
 // Sphere
-void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, bool solid, int32_t lodIdx)
+void IPrimativeContext::drawSphere(const Sphere& sphere, Color8u col, bool solid, int32_t lodIdx)
 {
 	if (sphere.radius() > 0.0f)
 	{
@@ -943,7 +943,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Color8u& col, boo
 	}
 }
 
-void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, const Color8u& col, bool solid, int32_t lodIdx)
+void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, Color8u col, bool solid, int32_t lodIdx)
 {
 	if (sphere.radius() > 0.0f)
 	{
@@ -959,7 +959,7 @@ void IPrimativeContext::drawSphere(const Sphere& sphere, const Matrix34f& mat, c
 
 // Cone
 void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radius, float height, 
-	const Color8u& col, bool solid, int32_t lodIdx)
+	Color8u col, bool solid, int32_t lodIdx)
 {
 	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
 	{
@@ -984,7 +984,7 @@ void IPrimativeContext::drawCone(const Vec3f& pos, const Vec3f& dir, float radiu
 
 // Cylinder
 void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, 
-	const Color8u& col, bool solid, int32_t lodIdx)
+	Color8u col, bool solid, int32_t lodIdx)
 {
 	if (radius > 0.0f && height > 0.0f && dir.lengthSquared() > 0.0f)
 	{
@@ -1008,7 +1008,7 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
 }
 
 // Bone
-void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, const Color8u& col)
+void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, Color8u col)
 {
 	Vec3f p = rParent.getPosition();
 	Vec3f c = rChild.getPosition();
@@ -1111,7 +1111,7 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 
 
 // Frustum - Sexyyyyyyyyyy
-void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& nearCol, const Color8u& farCol, bool solid)
+void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Color8u farCol, bool solid)
 {
 	std::array<Vec3f, 8> v;
 	frustum.GetFrustumVertices(v);
@@ -1205,7 +1205,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, const Color8u& near
 }
 
 // Arrow
-void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, const Color8u& color)
+void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u color)
 {
 	const Vec3f t0 = (posB - posA).normalized();
 	const Vec3f a = math<float32_t>::abs(t0.x) < 0.707f ? Vec3f(1, 0, 0) : Vec3f(0, 1, 0);
@@ -1223,7 +1223,7 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, const Co
 	drawLines(points, X_ARRAY_SIZE(points), color);
 }
 
-void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, const Color8u& color)
+void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u color)
 {
 	Vec3f points[4] = {
 		Vec3f(pos.x - size, pos.y, pos.z), // left
