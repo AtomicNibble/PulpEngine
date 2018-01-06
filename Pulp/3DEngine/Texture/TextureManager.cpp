@@ -6,6 +6,9 @@
 #include <IConsole.h>
 #include <ICi.h>
 #include <IFileSys.h>
+#include <ICompression.h>
+
+#include <Compression\CompressorAlloc.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -20,6 +23,7 @@ namespace
 
 
 } // namespace 
+
 
 
 TextureManager::TextureManager(core::MemoryArenaBase* arena) :
@@ -292,6 +296,37 @@ void TextureManager::processCIFile_job(core::V2::JobSystem& jobSys, size_t threa
 {
 	X_UNUSED(jobSys, threadIdx, pJob);
 	CIFileJobData* pJobData = static_cast<CIFileJobData*>(pData);
+
+#if 1 
+	// support the textures been compressed, stil not fully happy on this logic.
+	// ideally want something more generic for compressed asset loading.	
+	{
+		const uint8_t* pBuffer = pJobData->pData;
+		size_t length = pJobData->length;
+
+		auto* pCompHdr = core::Compression::ICompressor::getBufferHdr(core::make_span(pBuffer, length));
+		if (pCompHdr)
+		{
+			uint8_t* pInflatedBuffer = X_NEW_ARRAY_ALIGNED(uint8_t, pCompHdr->inflatedSize, &blockArena_, "TextureFileData", 16);
+
+			core::Compression::CompressorAlloc comp(pCompHdr->algo);
+
+			if (!comp->inflate(arena_, pBuffer, pBuffer + length, pInflatedBuffer, pInflatedBuffer + pCompHdr->inflatedSize))
+			{
+				// shiieeet.
+				X_LOG0("Texture", "failed to inflate");
+			}
+
+			auto* pOldBuf = pJobData->pData;
+
+			pJobData->length = pCompHdr->inflatedSize;
+			pJobData->pData = pInflatedBuffer;
+
+		
+			X_DELETE_ARRAY(pOldBuf, &blockArena_);
+		}
+	}
+#endif
 
 	processCIFile(pJobData->pTexture, pJobData->pData, pJobData->length);
 
