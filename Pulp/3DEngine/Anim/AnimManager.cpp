@@ -43,8 +43,6 @@ bool AnimManager::init(void)
 
 	gEnv->pHotReload->addfileType(this, ANIM_FILE_EXTENSION);
 
-
-
 	return true;
 }
 
@@ -119,6 +117,9 @@ Anim* AnimManager::loadAnim(const char* pAnimName)
 
 	// add to list of anims that need loading.
 	queueLoadRequest(pAnimRes);
+
+	// TEMP
+	dispatchPendingLoads();
 
 	return pAnimRes;
 }
