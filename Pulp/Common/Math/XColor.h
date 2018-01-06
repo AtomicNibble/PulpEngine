@@ -62,10 +62,10 @@ struct ColorT
 	X_INLINE bool operator==(const ColorT<T>& rhs) const;
 	X_INLINE bool operator != (const ColorT<T>& rhs) const;
 
-	X_INLINE float length() const;
+	X_INLINE float length(void) const;
 	// tests for zero-length
-	X_INLINE ColorT<T>& normalize();
-	X_INLINE ColorT<T> premultiplied() const;
+	X_INLINE ColorT<T>& normalize(void);
+	X_INLINE ColorT<T> premultiplied(void) const;
 
 	X_INLINE typename CHANTRAIT<T>::Accum lengthSquared() const;
 	X_INLINE ColorT<T> lerp(float fact, const ColorT<T> &d) const;
@@ -73,30 +73,30 @@ struct ColorT
 	X_INLINE bool compare(const ColorT<T>& oth, const T epsilon = EPSILON_VALUEf);
 
 	// expose packing util.
-	X_INLINE uint8_t  asRGB332()	const;
-	X_INLINE uint16_t asARGB4444()	const;
-	X_INLINE uint16_t asRGB555()	const;
-	X_INLINE uint16_t asRGB565()	const;
-	X_INLINE uint32_t asBGR888()	const;
-	X_INLINE uint32_t asRGB888()	const;
-	X_INLINE uint32_t asABGR8888()	const;
-	X_INLINE uint32_t asARGB8888()	const;
+	X_INLINE uint8_t  asRGB332(void)	const;
+	X_INLINE uint16_t asARGB4444(void)	const;
+	X_INLINE uint16_t asRGB555(void)	const;
+	X_INLINE uint16_t asRGB565(void)	const;
+	X_INLINE uint32_t asBGR888(void)	const;
+	X_INLINE uint32_t asRGB888(void)	const;
+	X_INLINE uint32_t asABGR8888(void)	const;
+	X_INLINE uint32_t asARGB8888(void)	const;
 
 	// darken with negative values etc.
 	X_INLINE void shade(const float percent);
 
 	// ><><><><><<><><><><><><><><<><><><><><><><><<><><><><><><
-	static ColorT<T> zero()
+	static ColorT<T> zero(void)
 	{
 		return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(0));
 	}
 
-	static ColorT<T> black()
+	static ColorT<T> black(void)
 	{
 		return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), CHANTRAIT<T>::max());
 	}
 
-	static ColorT<T> white()
+	static ColorT<T> white(void)
 	{
 		return ColorT<T>(CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max());
 	}

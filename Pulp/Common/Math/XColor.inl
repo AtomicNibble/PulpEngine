@@ -257,14 +257,14 @@ X_INLINE bool ColorT<T>::operator != (const ColorT<T>& rhs) const
 }
 
 template<typename T>
-X_INLINE float ColorT<T>::length() const
+X_INLINE float ColorT<T>::length(void) const
 {
 	return math<float>::sqrt(static_cast<float>(r*r + g*g + b*b));
 }
 
 // tests for zero-length
 template<typename T>
-X_INLINE ColorT<T>& ColorT<T>::normalize()
+X_INLINE ColorT<T>& ColorT<T>::normalize(void)
 {
 	float s = length();
 	if (s > 0.0f) {
@@ -276,13 +276,13 @@ X_INLINE ColorT<T>& ColorT<T>::normalize()
 }
 
 template<typename T>
-X_INLINE ColorT<T> ColorT<T>::premultiplied() const
+X_INLINE ColorT<T> ColorT<T>::premultiplied(void) const
 {
 	return ColorT<T>(r * a, g * a, b * a, a);
 }
 
 template<typename T>
-X_INLINE typename CHANTRAIT<T>::Accum ColorT<T>::lengthSquared() const
+X_INLINE typename CHANTRAIT<T>::Accum ColorT<T>::lengthSquared(void) const
 {
 	return r * r + g * g + b * b;
 }
@@ -308,7 +308,7 @@ X_INLINE bool ColorT<T>::compare(const ColorT<T>& oth, const T epsilon)
 
 // expose packing util.
 template<typename T> 
-X_INLINE uint8_t ColorT<T>::asRGB332()		const 
+X_INLINE uint8_t ColorT<T>::asRGB332(void)		const
 { 
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -318,7 +318,7 @@ X_INLINE uint8_t ColorT<T>::asRGB332()		const
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asARGB4444()	const 
+X_INLINE uint16_t ColorT<T>::asARGB4444(void)	const
 {
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -329,7 +329,7 @@ X_INLINE uint16_t ColorT<T>::asARGB4444()	const
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asRGB555()		const 
+X_INLINE uint16_t ColorT<T>::asRGB555(void)		const
 {
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -339,7 +339,7 @@ X_INLINE uint16_t ColorT<T>::asRGB555()		const
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asRGB565()		const 
+X_INLINE uint16_t ColorT<T>::asRGB565(void)		const
 {
 	uint16_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint16_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -349,7 +349,7 @@ X_INLINE uint16_t ColorT<T>::asRGB565()		const
 }
 
 template<typename T>
-X_INLINE uint32_t ColorT<T>::asBGR888()		const 
+X_INLINE uint32_t ColorT<T>::asBGR888(void)		const
 { 
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -359,7 +359,7 @@ X_INLINE uint32_t ColorT<T>::asBGR888()		const
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asRGB888()		const 
+X_INLINE uint32_t ColorT<T>::asRGB888(void)		const
 {
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -369,7 +369,7 @@ X_INLINE uint32_t ColorT<T>::asRGB888()		const
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asABGR8888()	const 
+X_INLINE uint32_t ColorT<T>::asABGR8888(void)	const
 {
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
@@ -380,7 +380,7 @@ X_INLINE uint32_t ColorT<T>::asABGR8888()	const
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asARGB8888()	const 
+X_INLINE uint32_t ColorT<T>::asARGB8888(void)	const
 {
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
