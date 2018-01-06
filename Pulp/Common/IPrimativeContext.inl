@@ -3,34 +3,34 @@ X_NAMESPACE_BEGIN(engine)
 
 
 X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float height,
-	const Color& col, const Color& borderCol)
+	const Color8u& col, const Color8u& borderCol)
 {
 	drawQuadSS(x, y, width, height, col);
 	drawRectSS(x, y, width, height, borderCol);
 }
 
 
-X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color& col)
+X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color8u& col)
 {
 	const Rectf rect(x, y, x + width, y + height);
 	drawQuadImageSS(rect, pMaterial, col);
 }
 
 
-X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float height, const Color& col)
+X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float height, const Color8u& col)
 {
 	const Rectf rect(x, y, x + width, y + height);
 	drawRectSS(rect, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
-	float w, float h, Material* pMaterial, const Color& col)
+	float w, float h, Material* pMaterial, const Color8u& col)
 {
 	drawImage(xpos, ypos, 0.f, w, h, pMaterial, 0, 1, 1, 0, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, Material* pMaterial,
-	const Color& col)
+	const Color8u& col)
 {
 	drawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(),
 		pMaterial, 0, 1, 1, 0, col);
@@ -50,26 +50,26 @@ X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, floa
 	drawImageWithUV(xpos, ypos, z, w, h, pMaterial, s, t, col, filtered);
 }
 
-X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height, const Color& col)
+X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height, const Color8u& col)
 {
 	drawQuad(x, y, 0.f, width, height, col);
 }
 
 X_INLINE void IPrimativeContext::drawQuad(float x, float y, float width, float height,
-	const Color& col, const Color& borderCol)
+	const Color8u& col, const Color8u& borderCol)
 {
 	drawQuad(x, y, 0.f, width, height, col);
 	drawRect(x, y, width, height, borderCol);
 }
 
 X_INLINE void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height,
-	const Color& col, const Color& borderCol)
+	const Color8u& col, const Color8u& borderCol)
 {
 	drawQuad(x, y, z, width, height, col);
 	drawRect(x, y, width, height, borderCol);
 }
 
-X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float height, const Color& col)
+X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float height, const Color8u& col)
 {
 	drawQuad(pos.x, pos.y, width, height, col);
 }

@@ -60,30 +60,30 @@ public:
 	virtual void reset(void) X_ABSTRACT;
 	virtual void setDepthTest(bool enabled) X_ABSTRACT;
 
-	// TODO: all these Color need replacing with Color8u.
+	// TODO: all these Color8u need replacing with Color8u.
 
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
-	void drawQuadSS(float x, float y, float width, float height, const Color& col);
-	void drawQuadSS(const Rectf& rect, const Color& col);
-	X_INLINE void drawQuadSS(float x, float y, float width, float height, const Color& col, const Color& borderCol);
-	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color& col);
-	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color& col);
-	X_INLINE void drawRectSS(float x, float y, float width, float height, const Color& col);
-	void drawRectSS(const Rectf& rect, const Color& col);
-	void drawLineSS(const Vec2f& vPos1, const Color& color1,
-		const Vec2f& vPos2, const Color& vColor2);
+	void drawQuadSS(float x, float y, float width, float height, const Color8u& col);
+	void drawQuadSS(const Rectf& rect, const Color8u& col);
+	X_INLINE void drawQuadSS(float x, float y, float width, float height, const Color8u& col, const Color8u& borderCol);
+	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, const Color8u& col);
+	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color8u& col);
+	X_INLINE void drawRectSS(float x, float y, float width, float height, const Color8u& col);
+	void drawRectSS(const Rectf& rect, const Color8u& col);
+	void drawLineSS(const Vec2f& vPos1, const Color8u& color1,
+		const Vec2f& vPos2, const Color8u& vColor2);
 
-	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, const Color& col);
-	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, const Color& col);
+	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, const Color8u& col);
+	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, const Color8u& col);
 
 	// for 2d, z is depth not position
-	void drawQuad(float x, float y, float z, float width, float height, const Color& col);
-	X_INLINE void drawQuad(float x, float y, float z, float width, float height, const Color& col, const Color& borderCol);
-	X_INLINE void drawQuad(float x, float y, float width, float height, const Color& col);
-	X_INLINE void drawQuad(float x, float y, float width, float height, const Color& col, const Color& borderCol);
-	X_INLINE void drawQuad(Vec2<float> pos, float width, float height, const Color& col);
+	void drawQuad(float x, float y, float z, float width, float height, const Color8u& col);
+	X_INLINE void drawQuad(float x, float y, float z, float width, float height, const Color8u& col, const Color8u& borderCol);
+	X_INLINE void drawQuad(float x, float y, float width, float height, const Color8u& col);
+	X_INLINE void drawQuad(float x, float y, float width, float height, const Color8u& col, const Color8u& borderCol);
+	X_INLINE void drawQuad(Vec2<float> pos, float width, float height, const Color8u& col);
 	// draw a quad in 3d z is position not depth.
-	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col);
+	void drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color8u& col);
 
 	void drawLines(const Vec3f* pPoints, uint32_t num, const Color8u& col);
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);

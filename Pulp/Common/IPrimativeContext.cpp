@@ -17,7 +17,7 @@ IPrimativeContext::~IPrimativeContext()
 
 }
 
-void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, const Color& col)
+void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, const Color8u& col)
 {
 	// input is 0-2
 	// directx is like so:
@@ -65,7 +65,7 @@ void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, 
 	}
 }
 
-void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
+void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color8u& col)
 {
 	// input is 0-2
 	// directx is like so:
@@ -112,7 +112,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, const Color& col)
 }
 
 
-void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color& col)
+void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, const Color8u& col)
 {
 	float x1, y1, x2, y2;
 	float z;
@@ -160,7 +160,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 	pQuad[5] = pQuad[1];
 }
 
-void IPrimativeContext::drawRectSS(const Rectf& rect, const Color& col)
+void IPrimativeContext::drawRectSS(const Rectf& rect, const Color8u& col)
 {
 	float x1, y1, x2, y2;
 
@@ -188,8 +188,8 @@ void IPrimativeContext::drawRectSS(const Rectf& rect, const Color& col)
 	drawLine(tr, col, br, col);
 }
 
-void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color& color1,
-	const Vec2f& vPos2, const Color& color2)
+void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color8u& color1,
+	const Vec2f& vPos2, const Color8u& color2)
 {
 	Vec3f pos1, pos2;
 
@@ -202,7 +202,7 @@ void IPrimativeContext::drawLineSS(const Vec2f& vPos1, const Color& color1,
 	drawLine(pos1, color1, pos2, color2);
 }
 
-void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, const Color& col)
+void IPrimativeContext::drawQuad(float x, float y, float z, float width, float height, const Color8u& col)
 {
 	const float fx = x;
 	const float fy = y;
@@ -237,7 +237,7 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 }
 
 
-void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color& col)
+void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, const Color8u& col)
 {
 	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
