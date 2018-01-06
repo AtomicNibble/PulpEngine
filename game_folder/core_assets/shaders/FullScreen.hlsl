@@ -59,10 +59,11 @@ float LinearizeDepth(float2 uv)
     float zFar  = 2048.0;
     float depth = colorMap.Sample(colorSampler, uv).x;
 
-    return depth * 20;
-    // depth = 1.f - depth;
-    //return 1.f - (depth * 25);
-//    return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
+    // depth is 1.f close and 0.0 far.
+    // since I use reverse Z.
+    depth = 1 - depth;
+
+    return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }
 
 PS_OUTPUT ps_depth( VS_OUTPUT IN )
@@ -72,8 +73,7 @@ PS_OUTPUT ps_depth( VS_OUTPUT IN )
 
 #if X_TEXTURED
     float d = LinearizeDepth(IN.texCoord);
-    output.color = float4(d,0,0,1);
-
+    output.color = float4(d,d,d,1);
 #endif // !X_TEXTURED
 
     return output;
