@@ -1,12 +1,14 @@
 
 template<typename T>
-X_INLINE ColorT<T>::ColorT() : r(0), g(0), b(0), a(0)
+X_INLINE ColorT<T>::ColorT() :
+	r(0), g(0), b(0), a(0)
 {
 }
 
 
 template<typename T>
-X_INLINE ColorT<T>::ColorT(T r, T g, T b, T a) : r(r), g(g), b(b), a(a)
+X_INLINE ColorT<T>::ColorT(T r, T g, T b, T a) :
+	r(r), g(g), b(b), a(a)
 {
 }
 
@@ -65,7 +67,8 @@ X_INLINE ColorT<float32_t>::ColorT(const ColorT<uint8_t>& src)
 
 // Can use it like rgb
 template<typename T>
-X_INLINE ColorT<T>::ColorT(T r, T g, T b) : r(r), g(g), b(b), a(CHANTRAIT<T>::convert(1.0f))
+X_INLINE ColorT<T>::ColorT(T r, T g, T b) : 
+	r(r), g(g), b(b), a(CHANTRAIT<T>::convert(1.0f))
 {
 }
 
@@ -114,22 +117,22 @@ X_INLINE ColorT<T> ColorT<T>::operator=(const ColorT<T>& rhs)
 template<typename T>
 X_INLINE const T& ColorT<T>::operator[](int i) const {
 	X_ASSERT(i >= 0 && i < 4, "out of range")(i);
-		return (&r)[i];
+	return (&r)[i];
 }
 
 template<typename T>
 X_INLINE T& ColorT<T>::operator[](int i) {
 	X_ASSERT(i >= 0 && i < 4, "out of range")(i);
-		return (&r)[i];
+	return (&r)[i];
 }
 
 
 template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator+(const ColorT<T> &rhs) const {
- return ColorT<T>(r + rhs.r, g + rhs.g, b + rhs.b, a + rhs.a); 
+	return ColorT<T>(r + rhs.r, g + rhs.g, b + rhs.b, a + rhs.a); 
 }
 
 template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator-(const ColorT<T> &rhs) const {
- return ColorT<T>(r - rhs.r, g - rhs.g, b - rhs.b, a - rhs.a); 
+	return ColorT<T>(r - rhs.r, g - rhs.g, b - rhs.b, a - rhs.a); 
 }
 
 template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator*(const ColorT<T> &rhs) const {
@@ -152,47 +155,57 @@ X_INLINE ColorT<uint8> ColorT<uint8>::operator*(const ColorT<uint8>& rhs) const 
 
 
 template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator/(const ColorT<T> &rhs) const {
- return ColorT<T>(r / rhs.r, g / rhs.g, b / rhs.b, a / rhs.a); 
+	return ColorT<T>(r / rhs.r, g / rhs.g, b / rhs.b, a / rhs.a); 
 }
 
 template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator+=(const ColorT<T> &rhs) {
- r += rhs.r; g += rhs.g; b += rhs.b; a += rhs.a; return *this; 
+	r += rhs.r; g += rhs.g; b += rhs.b; a += rhs.a; 
+	return *this; 
 }
 
 template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator-=(const ColorT<T> &rhs) {
- r -= rhs.r; g -= rhs.g; b -= rhs.b; a -= rhs.a;	return *this; 
+	r -= rhs.r; g -= rhs.g; b -= rhs.b; a -= rhs.a;	
+	return *this; 
 }
 
 template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator*=(const ColorT<T> &rhs) {
- r *= rhs.r; g *= rhs.g; b *= rhs.b; a *= rhs.a; return *this; 
+	r *= rhs.r; g *= rhs.g; b *= rhs.b; a *= rhs.a; 
+	return *this; 
 }
 
-template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator/=(const ColorT<T> &rhs) {
- r /= rhs.r; g /= rhs.g; b /= rhs.b; a /= rhs.a;	return *this; 
+template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator/=(const ColorT<T> &rhs) 
+{
+	r /= rhs.r; g /= rhs.g; b /= rhs.b; a /= rhs.a;	
+	return *this; 
 }
 
-template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator+(T rhs) const {
- return ColorT<T>(r + rhs, g + rhs, b + rhs, a + rhs); 
+template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator+(T rhs) const 
+{
+	return ColorT<T>(r + rhs, g + rhs, b + rhs, a + rhs); 
 }
 
-template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator-(T rhs) const {
- return ColorT<T>(r - rhs, g - rhs, b - rhs, a - rhs); 
+template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator-(T rhs) const 
+{
+	return ColorT<T>(r - rhs, g - rhs, b - rhs, a - rhs); 
 }
 
-template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator*(T rhs) const {
- return ColorT<T>(r * rhs, g * rhs, b * rhs, a * rhs); 
+template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator*(T rhs) const 
+{
+	return ColorT<T>(r * rhs, g * rhs, b * rhs, a * rhs); 
 }
 
 
 template<typename T>
 template<typename OtherT>
-X_INLINE ColorT<T>	ColorT<T>::operator*(OtherT rhs) const {
+X_INLINE ColorT<T>	ColorT<T>::operator*(OtherT rhs) const 
+{
 	return ColorT<T>(r * rhs, g * rhs, b * rhs, a * rhs);
 }
 
 template<>
 template<>
-X_INLINE ColorT<uint8_t> ColorT<uint8_t>::operator*(float rhs) const {
+X_INLINE ColorT<uint8_t> ColorT<uint8_t>::operator*(float rhs) const 
+{
 	return ColorT<uint8_t>(
 		static_cast<uint8_t>((float)r * rhs),
 		static_cast<uint8_t>((float)g * rhs),
@@ -201,34 +214,45 @@ X_INLINE ColorT<uint8_t> ColorT<uint8_t>::operator*(float rhs) const {
 	);
 }
 
-template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator/(T rhs) const {
- return ColorT<T>(r / rhs, g / rhs, b / rhs, a / rhs); 
+template<typename T> X_INLINE ColorT<T>	ColorT<T>::operator/(T rhs) const 
+{
+	return ColorT<T>(r / rhs, g / rhs, b / rhs, a / rhs); 
 }
 
-template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator+=(T rhs) {
- r += rhs; g += rhs; b += rhs; a += rhs; return *this; 
+template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator+=(T rhs) 
+{
+	r += rhs; g += rhs; b += rhs; a += rhs; 
+	return *this; 
 }
 
-template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator-=(T rhs) {
- r -= rhs; g -= rhs; b -= rhs; a -= rhs; return *this; 
+template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator-=(T rhs) 
+{
+	r -= rhs; g -= rhs; b -= rhs; a -= rhs; 
+	return *this; 
 }
 
-template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator*=(T rhs) {
- r *= rhs; g *= rhs; b *= rhs; a *= rhs; return *this; 
+template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator*=(T rhs) 
+{
+	r *= rhs; g *= rhs; b *= rhs; a *= rhs; 
+	return *this; 
 }
 
-template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator/=(T rhs) {
- r /= rhs; g /= rhs; b /= rhs; a /= rhs; return *this; 
+template<typename T> X_INLINE const ColorT<T>&	ColorT<T>::operator/=(T rhs) 
+{
+	r /= rhs; g /= rhs; b /= rhs; a /= rhs; 
+	return *this; 
 }
 
 
 template<typename T>
-X_INLINE bool ColorT<T>::operator==(const ColorT<T>& rhs) const {
+X_INLINE bool ColorT<T>::operator==(const ColorT<T>& rhs) const 
+{
 	return r == rhs.r && g == rhs.g && b == rhs.b && a == rhs.a;
 }
 
 template<typename T>
-X_INLINE bool ColorT<T>::operator != (const ColorT<T>& rhs) const {
+X_INLINE bool ColorT<T>::operator != (const ColorT<T>& rhs) const 
+{
 	return !(*this == rhs);
 }
 
@@ -284,7 +308,8 @@ X_INLINE bool ColorT<T>::compare(const ColorT<T>& oth, const T epsilon)
 
 // expose packing util.
 template<typename T> 
-X_INLINE uint8_t ColorT<T>::asRGB332()		const { 
+X_INLINE uint8_t ColorT<T>::asRGB332()		const 
+{ 
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -293,7 +318,8 @@ X_INLINE uint8_t ColorT<T>::asRGB332()		const {
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asARGB4444()	const { 
+X_INLINE uint16_t ColorT<T>::asARGB4444()	const 
+{
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -303,7 +329,8 @@ X_INLINE uint16_t ColorT<T>::asARGB4444()	const {
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asRGB555()		const {
+X_INLINE uint16_t ColorT<T>::asRGB555()		const 
+{
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -312,7 +339,8 @@ X_INLINE uint16_t ColorT<T>::asRGB555()		const {
 }
 
 template<typename T> 
-X_INLINE uint16_t ColorT<T>::asRGB565()		const {
+X_INLINE uint16_t ColorT<T>::asRGB565()		const 
+{
 	uint16_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint16_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint16_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -321,7 +349,8 @@ X_INLINE uint16_t ColorT<T>::asRGB565()		const {
 }
 
 template<typename T>
-X_INLINE uint32_t ColorT<T>::asBGR888()		const { 
+X_INLINE uint32_t ColorT<T>::asBGR888()		const 
+{ 
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -330,7 +359,8 @@ X_INLINE uint32_t ColorT<T>::asBGR888()		const {
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asRGB888()		const {
+X_INLINE uint32_t ColorT<T>::asRGB888()		const 
+{
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -339,7 +369,8 @@ X_INLINE uint32_t ColorT<T>::asRGB888()		const {
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asABGR8888()	const {
+X_INLINE uint32_t ColorT<T>::asABGR8888()	const 
+{
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
@@ -349,7 +380,8 @@ X_INLINE uint32_t ColorT<T>::asABGR8888()	const {
 }
 
 template<typename T> 
-X_INLINE uint32_t ColorT<T>::asARGB8888()	const {
+X_INLINE uint32_t ColorT<T>::asARGB8888()	const 
+{
 	uint8_t cr = CHANTRAIT<uint8_t>::convert(r);
 	uint8_t cg = CHANTRAIT<uint8_t>::convert(g);
 	uint8_t cb = CHANTRAIT<uint8_t>::convert(b);
