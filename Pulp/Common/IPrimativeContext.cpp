@@ -1113,7 +1113,7 @@ void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rC
 // Frustum - Sexyyyyyyyyyy
 void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Color8u farCol, bool solid)
 {
-	std::array<Vec3f, 8> v;
+	XFrustum::FarNearVertsArr v;
 	frustum.GetFrustumVertices(v);
 
 	if (!solid)
