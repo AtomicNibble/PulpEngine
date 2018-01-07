@@ -1120,7 +1120,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Co
 	{
 		PrimVertex* pLines = addPrimative(4 * 6, PrimitiveType::LINELIST);
 
-		for (size_t i = 0; i < 4; i++)
+		for (int32_t i = 0; i < 4; i++)
 		{
 			pLines[0].pos = v[i];
 			pLines[0].color = farCol;
@@ -1182,7 +1182,7 @@ void IPrimativeContext::drawFrustum(const XFrustum& frustum, Color8u nearCol, Co
 		lineColFar.a = 255;
 		lineColNear.a = 255;
 
-		for (size_t i = 0; i < 4; i++)
+		for (int32_t i = 0; i < 4; i++)
 		{
 			pLines[0].pos = v[i];
 			pLines[0].color = lineColFar;
@@ -1263,7 +1263,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	pQuad[3].pos.y = ypos + h;
 	pQuad[3].pos.z = z;
 
-	for (int32 i = 0; i < 6; ++i)
+	for (int32_t i = 0; i < 6; ++i)
 	{
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
