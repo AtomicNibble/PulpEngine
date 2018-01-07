@@ -18,7 +18,11 @@ namespace shader
 {
 	// these are just types for loading the .shader format and holding hlsl source.
 
-	X_DECLARE_FLAGS(TechniquePrams) (NAME, VERTEX_FNC, PIXEL_FNC);
+	X_DECLARE_FLAGS(TechniquePrams) (
+		NAME, 
+		VERTEX_FNC, 
+		PIXEL_FNC
+	);
 
 
 	// a hlsl
