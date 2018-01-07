@@ -1238,11 +1238,9 @@ void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u colo
 
 
 void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w, float h,
-	Material* pMaterial, const float* s, const float* t,
+	Material* pMaterial, const CoordArr& s, const CoordArr& t,
 	const Colorf& col, bool filtered)
 {
-	X_ASSERT_NOT_NULL(s);
-	X_ASSERT_NOT_NULL(t);
 	X_UNUSED(filtered);
 
 	PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);

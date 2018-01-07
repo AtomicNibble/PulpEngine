@@ -50,6 +50,8 @@ public:
 	typedef Vertex_P3F_T2S_C4B PrimVertex;
 	static const auto VERTEX_FMT = render::shader::VertexFormat::P3F_T2S_C4B;
 
+	typedef std::array<float, 4> CoordArr;
+
 protected:
 	IPrimativeContext();
 public:
@@ -167,7 +169,7 @@ private:
 		Material* pMaterial, float s0, float t0, float s1, float t1, const Colorf& col, bool filtered = true);
 
 	void drawImageWithUV(float xpos, float ypos, float z, float w, float h,
-		Material* pMaterial, const float* s, const float* t, const Colorf& col, bool filtered = true);
+		Material* pMaterial, const CoordArr& s, const CoordArr& t, const Colorf& col, bool filtered = true);
 
 public:
 	virtual PrimVertex* addPrimative(uint32_t num, PrimitiveType::Enum type, Material* pMaterial) X_ABSTRACT;

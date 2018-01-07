@@ -40,7 +40,7 @@ X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, floa
 	Material* pMaterial, float s0, float t0, float s1, float t1,
 	const Colorf& col, bool filtered)
 {
-	float s[4], t[4];
+	CoordArr s, t;
 
 	s[0] = s0;	t[0] = 1.0f - t0;
 	s[1] = s1;	t[1] = 1.0f - t0;
