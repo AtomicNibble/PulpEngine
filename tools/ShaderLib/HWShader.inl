@@ -83,7 +83,7 @@ namespace shader
 		return IlFmt_ != InputLayoutFormat::Invalid;
 	}
 
-	X_INLINE bool XHWShader::FailedtoCompile(void) const
+	X_INLINE bool XHWShader::hasFailedtoCompile(void) const
 	{
 		return status_ == ShaderStatus::FailedToCompile;
 	}

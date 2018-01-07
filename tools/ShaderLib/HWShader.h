@@ -75,7 +75,7 @@ namespace shader
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
 		X_INLINE bool isILFmtValid(void) const;
-		X_INLINE bool FailedtoCompile(void) const;
+		X_INLINE bool hasFailedtoCompile(void) const;
 		X_INLINE bool isCompiling(void) const;
 
 		X_INLINE const CBufferArr& getCBuffers(void) const;
