@@ -61,8 +61,6 @@ namespace entity
 		// rotation.rotate(Vec3f::yAxis(), ::toRadians(90.f));
 		// rotation.rotate(Vec3f::yAxis(), ::toRadians(90.f));
 
-		auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
-
 		const auto ellapsedTime = time.ellapsed[core::Timer::GAME];
 		const auto delta = time.deltas[core::Timer::GAME];
 		const float deltaSec = delta.GetSeconds();
@@ -161,6 +159,8 @@ namespace entity
 			}
 		}
 
+		auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::CONSOLE);
+
 		auto view = reg.view<Animator, Mesh, MeshRenderer, TransForm>();
 		for (auto entity : view)
 		{
@@ -169,7 +169,8 @@ namespace entity
 			auto& rendEnt = reg.get<MeshRenderer>(entity);
 
 			X_UNUSED(pPrim, trans);
-		//	an.pAnimator->renderInfo(ellapsedTime, trans.pos + Vec3f(0.f, 0.f, -20.f), rotation, pPrim);
+		//	rotation = Matrix33f::identity();
+		//	an.pAnimator->renderInfo(ellapsedTime, Vec3f(1300.f, 100.f, 0.f), rotation, pPrim);
 
 			if (!an.pAnimator->isAnimating(ellapsedTime)) {
 				continue;
