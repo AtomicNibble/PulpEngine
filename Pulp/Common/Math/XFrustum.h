@@ -36,6 +36,10 @@ X_DECLARE_ENUM(PlaneVert)(TLEFT,TRIGHT,BLEFT,BRIGHT);
 class XFrustum
 {
 public:
+	typedef std::array<Vec3f, 8> FarNearVertsArr;
+	typedef std::array<Vec3f, 12> FarProNearVertsArr;
+
+public:
 	XFrustum();
 
 	void setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
@@ -88,8 +92,8 @@ public:
 	CullResult::Enum cullSphere_FastT(const Sphere& sphere) const;
 	CullResult::Enum cullSphere_ExactT(const Sphere& sphere) const;
 
-	void GetFrustumVertices(std::array<Vec3f, 8>& verts) const;
-	void GetFrustumVertices(std::array<Vec3f, 12>& verts) const;
+	void GetFrustumVertices(FarNearVertsArr& verts) const;
+	void GetFrustumVertices(FarProNearVertsArr& verts) const;
 
 	void getNearPlaneCoordinates(Vec3f* pTopLeft, Vec3f* pTopRight,
 		Vec3f* pBottomLeft, Vec3f* pBottomRight) const;

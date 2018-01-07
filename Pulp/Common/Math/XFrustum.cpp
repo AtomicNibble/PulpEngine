@@ -209,7 +209,7 @@ void XFrustum::UpdateFrustum(void)
 
 // --------------------------------
 
-void XFrustum::GetFrustumVertices(std::array<Vec3f, 8>& verts) const
+void XFrustum::GetFrustumVertices(FarNearVertsArr& verts) const
 {
 	Matrix33f m33 = Matrix33f(mat_);
 	Vec3f pos = getPosition();
@@ -226,7 +226,7 @@ void XFrustum::GetFrustumVertices(std::array<Vec3f, 8>& verts) const
 }
 
 
-void XFrustum::GetFrustumVertices(std::array<Vec3f, 12>& verts) const
+void XFrustum::GetFrustumVertices(FarProNearVertsArr& verts) const
 {
 	Matrix33f m33 = Matrix33f(mat_);
 	Vec3f pos = getPosition();
