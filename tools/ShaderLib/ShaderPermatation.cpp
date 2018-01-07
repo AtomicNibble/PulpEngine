@@ -67,7 +67,7 @@ namespace shader
 	{
 		for (const auto* pShader : stages_)
 		{
-			if (pShader && pShader->getStatus() != ShaderStatus::ReadyToRock) {
+			if (pShader && pShader->getStatus() != ShaderStatus::Ready) {
 				return false;
 			}
 		}
@@ -115,7 +115,7 @@ namespace shader
 		{
 			if (pShader)
 			{
-				X_ASSERT(pShader->getStatus() == ShaderStatus::ReadyToRock, "All shaders should be compiled when creating CB links")();
+				X_ASSERT(pShader->getStatus() == ShaderStatus::Ready, "All shaders should be compiled when creating CB links")();
 				addCbufstoLink(pShader);
 
 				totalCBs += pShader->getNumConstantBuffers();
@@ -171,19 +171,19 @@ namespace shader
 		bool canDraw = true;
 
 		if (pVertexShader) {
-			canDraw &= pVertexShader->getStatus() == ShaderStatus::ReadyToRock;
+			canDraw &= pVertexShader->getStatus() == ShaderStatus::Ready;
 		}
 		if (pPixelShader) {
-			canDraw &= pPixelShader->getStatus() == ShaderStatus::ReadyToRock;
+			canDraw &= pPixelShader->getStatus() == ShaderStatus::Ready;
 		}
 		if (pGeoShader) {
-			canDraw &= pGeoShader->getStatus() == ShaderStatus::ReadyToRock;
+			canDraw &= pGeoShader->getStatus() == ShaderStatus::Ready;
 		}
 		if (pHullShader) {
-			canDraw &= pHullShader->getStatus() == ShaderStatus::ReadyToRock;
+			canDraw &= pHullShader->getStatus() == ShaderStatus::Ready;
 		}
 		if (pDomainShader) {
-			canDraw &= pDomainShader->getStatus() == ShaderStatus::ReadyToRock;
+			canDraw &= pDomainShader->getStatus() == ShaderStatus::Ready;
 		}
 
 		return canDraw;

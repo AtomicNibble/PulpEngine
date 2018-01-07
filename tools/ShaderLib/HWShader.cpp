@@ -58,7 +58,7 @@ namespace shader
 		bool res = compileFromSource(source, compileFlags);
 
 		if (res) {
-			status_ = ShaderStatus::ReadyToRock;
+			status_ = ShaderStatus::Ready;
 		}
 		else
 		{

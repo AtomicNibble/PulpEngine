@@ -155,7 +155,7 @@ namespace shader
 	bool XShaderManager::compileShader(XHWShader* pHWShader, CompileFlags flags)
 	{
 		const auto status = pHWShader->getStatus();
-		if (status == ShaderStatus::ReadyToRock) {
+		if (status == ShaderStatus::Ready) {
 			return true;;
 		}
 
@@ -171,7 +171,7 @@ namespace shader
 
 			// try load it from cache.
 			if (vars_.useCache() && shaderBin_.loadShader(pHWShader)) {
-				X_ASSERT(pHWShader->getStatus() == ShaderStatus::ReadyToRock, "Sahder from cache is not read to rock")();
+				X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")();
 				return true;
 			}
 
@@ -216,7 +216,7 @@ namespace shader
 			while (1)
 			{
 				const auto status = pHWShader->getStatus();
-				if (status == ShaderStatus::ReadyToRock)
+				if (status == ShaderStatus::Ready)
 				{
 					break;
 				}

@@ -340,7 +340,7 @@ namespace shader
 				}
 
 				// ready to use.
-				pShader->status_ = ShaderStatus::ReadyToRock;
+				pShader->status_ = ShaderStatus::Ready;
 				return true;
 			}
 		}

@@ -75,7 +75,7 @@ namespace shader
 
 	X_INLINE bool XHWShader::isValid(void) const
 	{
-		return status_ == ShaderStatus::ReadyToRock;
+		return status_ == ShaderStatus::Ready;
 	}
 
 	X_INLINE bool XHWShader::isILFmtValid(void) const

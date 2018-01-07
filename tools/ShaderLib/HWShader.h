@@ -24,7 +24,7 @@ namespace shader
 		NotCompiled,
 		Compiling,
 		AsyncCompileDone,
-		ReadyToRock,
+		Ready,
 		FailedToCompile
 	);
 
