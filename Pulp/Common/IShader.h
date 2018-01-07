@@ -35,6 +35,10 @@ static const uint32_t MAX_SHADER_PERMS = 512;
 static const uint32_t MAX_SHADER_CB_PER_PERM = 16; // max const buffers allowed for a permatation.
 
 
+static const char*	SOURCE_FILE_EXTENSION = "hlsl";
+static const char*	SOURCE_INCLUDE_FILE_EXTENSION = "inc";
+static const char*	SOURCE_MERGED_FILE_EXTENSION = "fxcb.hlsl"; // merged source.
+static const char*	COMPILED_SHADER_FILE_EXTENSION = "fxcb";
 
 // we have shader params that will need to be updated at diffrent rates.
 // so we should group them.

@@ -206,7 +206,7 @@ namespace shader
 		ID3DBlob* pErrorBlob = nullptr;
 
 		core::StopWatch timer;
-		core::string sourcName = name_ + ".fxcb.hlsl";
+		core::string sourcName = name_ + "." + SOURCE_MERGED_FILE_EXTENSION;
 
 		const char* pEntry = entryPoint_.c_str();
 		if (entryPoint_.isEmpty())

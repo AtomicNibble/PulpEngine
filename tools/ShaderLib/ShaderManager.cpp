@@ -102,9 +102,9 @@ namespace shader
 		X_PROFILE_NO_HISTORY_BEGIN("ShaderMan", core::profiler::SubSys::RENDER);
 
 		// hotreload support.
-		gEnv->pHotReload->addfileType(this, "hlsl");
-		gEnv->pHotReload->addfileType(this, "inc");
-		gEnv->pHotReload->addfileType(this, "fxcb");
+		gEnv->pHotReload->addfileType(this, SOURCE_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(this, SOURCE_INCLUDE_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(this, COMPILED_SHADER_FILE_EXTENSION);
 
 
 		return true;
@@ -117,9 +117,9 @@ namespace shader
 		X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
 		// remove the hotreloads.
-		gEnv->pHotReload->addfileType(nullptr, "hlsl");
-		gEnv->pHotReload->addfileType(nullptr, "inc");
-		gEnv->pHotReload->addfileType(nullptr, "fxcb");
+		gEnv->pHotReload->addfileType(nullptr, SOURCE_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(nullptr, SOURCE_INCLUDE_FILE_EXTENSION);
+		gEnv->pHotReload->addfileType(nullptr, COMPILED_SHADER_FILE_EXTENSION);
 
 		freeSourcebin();
 		freeHwShaders();
@@ -327,7 +327,7 @@ namespace shader
 	void XShaderManager::getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut)
 	{
 		srcOut.clear();
-		srcOut.appendFmt("shaders/temp/%s.fxcb.hlsl", pShader->getName().c_str());
+		srcOut.appendFmt("shaders/temp/%s.fxcb.%s", pShader->getName().c_str(), SOURCE_FILE_EXTENSION);
 
 		// make sure the directory is created.
 		gEnv->pFileSys->createDirectoryTree(srcOut.c_str());
@@ -465,12 +465,12 @@ namespace shader
 		if (pExt)
 		{
 			// this is just a cache update ignore this.
-			if (core::strUtil::IsEqualCaseInsen(pExt, "fxcb")) {
+			if (core::strUtil::IsEqualCaseInsen(pExt, COMPILED_SHADER_FILE_EXTENSION)) {
 				return;
 			}
 
 			// ignore .fxcb.hlsl which are merged sources saved out for debuggin.
-			if (name.findCaseInsen(".fxcb.hlsl")) {
+			if (name.findCaseInsen(SOURCE_MERGED_FILE_EXTENSION)) {
 				return;
 			}
 
