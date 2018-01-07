@@ -4,6 +4,12 @@
 #include <IFrameData.h>
 #include <ITimer.h>
 #include <IWorld3D.h>
+#include <I3DEngine.h>
+
+#include <Hashing\Fnva1Hash.h>
+
+using namespace core::Hash::Fnv1Literals;
+using namespace sound::literals;
 
 X_NAMESPACE_BEGIN(game)
 
@@ -70,6 +76,10 @@ namespace entity
 		if (enterCrouch) {
 			state.Set(Player::State::Crouch);
 			crouched = true;
+
+			
+			gEnv->pSound->postEvent(force_hash<"player_brag"_soundId>(), sound::GLOBAL_OBJECT_ID);
+
 		}
 		else if (leaveCrouch) {
 			state.Remove(Player::State::Crouch);
@@ -80,8 +90,9 @@ namespace entity
 		if (userCmd.buttons.IsSet(Button::JUMP) && !state.IsSet(Player::State::Jump))
 		{
 			state.Set(Player::State::Jump);
-
 			player.jumpTime = core::TimeVal(0ll);
+
+			gEnv->pSound->postEvent(force_hash<"player_jump"_soundId>(), sound::GLOBAL_OBJECT_ID);
 		}
 
 
@@ -137,6 +148,17 @@ namespace entity
 				displacement.x += userCmd.moveRight * timeDelta * speed;
 			}
 
+			if (userCmd.moveForwrd || userCmd.moveRight)
+			{
+				static int frames = 0;
+
+				// HACK: untill have animations playing and can que it from notrtracks in anim.
+				++frames;
+				if (frames == 15) {
+					frames = 0;
+					gEnv->pSound->postEvent(force_hash<"player_footstep"_soundId>(), sound::GLOBAL_OBJECT_ID);
+				}
+			}
 
 			auto rotation = player.viewAngles.toMat3(); //  player.firstPersonViewAxis;
 
