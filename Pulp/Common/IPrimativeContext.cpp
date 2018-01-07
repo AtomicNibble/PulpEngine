@@ -58,7 +58,7 @@ void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, 
 	pQuad[3].pos.y = y2;
 	pQuad[3].pos.z = z;
 
-	for (uint32 i = 0; i<4; ++i)
+	for (int32_t i = 0; i < 4; ++i)
 	{
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::zero();
@@ -104,7 +104,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, Color8u col)
 	pQuad[3].pos.z = z;
 
 
-	for (uint32 i = 0; i<4; ++i)
+	for (int32_t i = 0; i < 4; ++i)
 	{
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::zero();
@@ -116,7 +116,7 @@ void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, 
 {
 	float x1, y1, x2, y2;
 	float z;
-	float s[4], t[4];
+	CoordArr s, t;
 
 	s[0] = 0;	t[0] = 1.0f - 1;
 	s[1] = 1;	t[1] = 1.0f - 1;
@@ -1263,7 +1263,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
 	pQuad[3].pos.y = ypos + h;
 	pQuad[3].pos.z = z;
 
-	for (uint32 i = 0; i<6; ++i)
+	for (int32 i = 0; i < 6; ++i)
 	{
 		pQuad[i].color = col;
 		pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
