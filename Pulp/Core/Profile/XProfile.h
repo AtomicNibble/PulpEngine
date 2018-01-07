@@ -42,7 +42,7 @@ namespace profiler
 
 			const char* pName;
 			engine::Material* pWarningMat;
-			Colorf col;
+			Color8u col;
 		};
 
 		typedef std::pair<core::TimeVal, engine::Material*> WarningEntry;
