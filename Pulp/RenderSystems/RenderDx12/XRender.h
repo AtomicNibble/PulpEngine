@@ -234,14 +234,14 @@ public:
 	Stats getStats(void) const X_FINAL;
 
 private:
-	void CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
+	void createVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 		D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams);
 
-	void ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
+	void applyState(GraphicsContext& context, State& curState, const StateHandle handle,
 		const VertexHandleArr& vertexBuffers,
 		const Commands::ResourceStateBase& resourceState, const char* pStateData);
 
-	void ApplyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib);
+	void applyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib);
 
 private:
 	bool freeSwapChainResources(void);

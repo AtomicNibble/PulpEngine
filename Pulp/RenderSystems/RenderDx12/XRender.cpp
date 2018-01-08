@@ -622,7 +622,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				{
 					const Commands::Draw* pDraw = reinterpret_cast<const Commands::Draw*>(pCmd);
 					
-					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+					applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					context.draw(pDraw->vertexCount, pDraw->startVertex);
@@ -637,12 +637,12 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				{
 					const Commands::DrawIndexed* pDraw = reinterpret_cast<const Commands::DrawIndexed*>(pCmd);
 
-					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+					applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
 
-					ApplyIndexBuffer(context, curState, pDraw->indexBuffer);
+					applyIndexBuffer(context, curState, pDraw->indexBuffer);
 
 					context.drawIndexed(pDraw->indexCount, pDraw->startIndex, pDraw->baseVertex);
 
@@ -660,7 +660,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 					const Commands::DrawInstanced* pDraw = reinterpret_cast<const Commands::DrawInstanced*>(pCmd);
 
-					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+					applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					context.drawInstanced(pDraw->vertexCountPerInstance, pDraw->instanceCount, 
@@ -676,12 +676,12 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 				{
 					const Commands::DrawInstancedIndexed* pDraw = reinterpret_cast<const Commands::DrawInstancedIndexed*>(pCmd);
 
-					ApplyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
+					applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
 						pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
 					X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
 
-					ApplyIndexBuffer(context, curState, pDraw->indexBuffer);
+					applyIndexBuffer(context, curState, pDraw->indexBuffer);
 
 					context.drawIndexedInstanced(pDraw->indexCountPerInstance, pDraw->instanceCount,
 						pDraw->startIndexLocation, pDraw->baseVertexLocation, pDraw->startInstanceLocation);
@@ -813,7 +813,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
 
 }
 
-X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
+X_INLINE void XRender::createVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 	D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams)
 {
 	numVertexStreams = 0;
@@ -844,7 +844,7 @@ X_INLINE void XRender::CreateVBView(GraphicsContext& context, const VertexHandle
 }
 
 
-void XRender::ApplyState(GraphicsContext& context, State& curState, const StateHandle handle,
+void XRender::applyState(GraphicsContext& context, State& curState, const StateHandle handle,
 	const VertexHandleArr& vertexBuffers, const Commands::ResourceStateBase& resourceState, const char* pStateData)
 {
 	const DeviceState& newState = *reinterpret_cast<const DeviceState*>(handle);
@@ -889,7 +889,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 		uint32_t numVertexStreams = 0;
 		D3D12_VERTEX_BUFFER_VIEW vertexViews[VertexStream::ENUM_COUNT] = { 0 };
-		CreateVBView(context, vertexBuffers, vertexViews, numVertexStreams);
+		createVBView(context, vertexBuffers, vertexViews, numVertexStreams);
 
 		context.setVertexBuffers(0, numVertexStreams, vertexViews);
 	}
@@ -1049,7 +1049,7 @@ void XRender::ApplyState(GraphicsContext& context, State& curState, const StateH
 
 }
 
-void XRender::ApplyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib)
+void XRender::applyIndexBuffer(GraphicsContext& context, State& curState, IndexBufferHandle ib)
 {
 	if (curState.indexBuffer != ib) {
 		curState.indexBuffer = ib;
