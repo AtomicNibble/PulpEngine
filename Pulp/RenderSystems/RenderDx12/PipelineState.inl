@@ -3,7 +3,8 @@ X_NAMESPACE_BEGIN(render)
 
 X_INLINE PSO::PSO()
 {
-
+	pRootSignature_ = nullptr;
+	pPSO_ = nullptr;
 }
 
 X_INLINE PSO::~PSO()
