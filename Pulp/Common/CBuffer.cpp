@@ -157,18 +157,21 @@ namespace shader
 		}
 
 		if (bindPoint_ != oth.bindPoint_) {
-			X_WARNING("CBuffer", "buffer has same name but diffrent bind point");
+			X_WARNING("CBuffer", "buffer \"%s\" has same name but diffrent bind point %" PRIi16 " -> %" PRIi16,
+				oth.name_.c_str(), bindPoint_, oth.bindPoint_);
 
 			return false;
 		}
 		if (bindCount_ != oth.bindCount_) {
-			X_WARNING("CBuffer", "buffer has same name but diffrent bind count");
+			X_WARNING("CBuffer", "buffer \"%s\" has same name but diffrent bind count %" PRIi16 " -> %" PRIi16,
+				bindCount_, oth.bindCount_, oth.name_.c_str());
 			return false;
 		}
 
 		// now check all the params are the smae.
 		if (params_.size() != oth.params_.size()) {
-			X_WARNING("CBuffer", "buffer has same name but diffrent params");
+			X_WARNING("CBuffer", "buffer \"%s\" has same name but diffrent params %" PRIuS " -> %" PRIuS,
+				oth.name_.c_str(), params_.size() != oth.params_.size());
 			return false;
 		}
 
@@ -177,7 +180,7 @@ namespace shader
 			if (!params_[i].isEqual(oth.params_[i])) {
 				// i put this hear as I want to see the scenarios this happens.
 				// as i potentially need to handle the fact some params may be marked as unused in one stage and not in others.
-				X_WARNING("CBuffer", "buffer has same name but diffrent params");
+				X_WARNING("CBuffer", "buffer \"%s\" has same name but diffrent params", oth.name_.c_str());
 				return false;
 			}
 		}
