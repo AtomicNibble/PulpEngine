@@ -91,6 +91,7 @@ namespace shader
 
 		SHADERLIB_EXPORT bool compileShader(XHWShader* pHWShader, CompileFlags flags);
 		SHADERLIB_EXPORT shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages);
+		SHADERLIB_EXPORT bool compilePermatation(shader::IShaderPermatation* pPerm); // used to recompile a perm, hot reloading only
 		SHADERLIB_EXPORT void releaseShaderPermatation(shader::IShaderPermatation* pPerm);
 		
 		X_INLINE ShaderVars& getShaderVars(void);

@@ -252,52 +252,9 @@ namespace shader
 		static_assert(decltype(permArena_)::IS_THREAD_SAFE, "PermArena must be thread safe");
 		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stagesIn, arena_);
 
-		if (!pPerm->isCompiled())
+		if (!compilePermatation(pPerm.get()))
 		{
-			CompileFlags flags;
-
-#if X_DEBUG
-			flags = CompileFlags::OptimizationLvl0 | CompileFlags::Debug;
-#else
-			flags = CompileFlags::OptimizationLvl2;
-#endif // !X_DEBUG
-
-			// we want to compile this then work out the cbuffer links.
-			const auto& stages = pPerm->getStages();
-			core::FixedArray<CompileJobInfo, ShaderStage::FLAGS_COUNT> jobInfo;
-
-			// dispatch jobs, to compile all da stages yo.
-			for (auto* pHWShader : stages)
-			{
-				if (!pHWShader) {
-					continue;
-				}
-
-				jobInfo.emplace_back(pHWShader, flags);
-			}
-
-			core::Delegate<void(CompileJobInfo*, uint32_t)> del;
-			del.Bind<XShaderManager, &XShaderManager::compileShader_job>(this);
-
-			auto* pJob = gEnv->pJobSys->parallel_for_member<XShaderManager>(
-				del, 
-				jobInfo.data(), 
-				static_cast<uint32_t>(jobInfo.size()), 
-				core::V2::CountSplitter(1)
-				JOB_SYS_SUB_ARG(core::profiler::SubSys::RENDER)
-			);
-		
-			gEnv->pJobSys->Run(pJob);
-			gEnv->pJobSys->Wait(pJob);
-
-			for (const auto& info : jobInfo)
-			{
-				if (!info.result)
-				{
-					X_ERROR("ShadersManager", "Failed to compile shader for permatation");
-					return false;
-				}
-			}
+			return nullptr;
 		}
 
 		// we still need to make cb links and get ilFmt even if all the hardware shaders are compiled.
@@ -306,6 +263,62 @@ namespace shader
 		return pPerm.release();
 	}
 	
+	bool XShaderManager::compilePermatation(shader::IShaderPermatation* pIPerm)
+	{
+		ShaderPermatation* pPerm = static_cast<ShaderPermatation*>(pIPerm);
+
+		if (pPerm->isCompiled()) {
+			return true;
+		}
+
+		CompileFlags flags;
+
+#if X_DEBUG
+		flags = CompileFlags::OptimizationLvl0 | CompileFlags::Debug;
+#else
+		flags = CompileFlags::OptimizationLvl2;
+#endif // !X_DEBUG
+
+		// we want to compile this then work out the cbuffer links.
+		const auto& stages = pPerm->getStages();
+		core::FixedArray<CompileJobInfo, ShaderStage::FLAGS_COUNT> jobInfo;
+
+		// dispatch jobs, to compile all da stages yo.
+		for (auto* pHWShader : stages)
+		{
+			if (!pHWShader) {
+				continue;
+			}
+
+			jobInfo.emplace_back(pHWShader, flags);
+		}
+
+		core::Delegate<void(CompileJobInfo*, uint32_t)> del;
+		del.Bind<XShaderManager, &XShaderManager::compileShader_job>(this);
+
+		auto* pJob = gEnv->pJobSys->parallel_for_member<XShaderManager>(
+			del,
+			jobInfo.data(),
+			static_cast<uint32_t>(jobInfo.size()),
+			core::V2::CountSplitter(1)
+			JOB_SYS_SUB_ARG(core::profiler::SubSys::RENDER)
+		);
+
+		gEnv->pJobSys->Run(pJob);
+		gEnv->pJobSys->Wait(pJob);
+
+		for (const auto& info : jobInfo)
+		{
+			if (!info.result)
+			{
+				X_ERROR("ShadersManager", "Failed to compile shader for permatation");
+				return false;
+			}
+		}
+
+		return true;
+	}
+
 	void XShaderManager::releaseShaderPermatation(shader::IShaderPermatation* pIPerm)
 	{
 		// term the perm!
