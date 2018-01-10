@@ -71,7 +71,9 @@ namespace shader
 
 	bool XHWShader::compileFromSource(const ByteArr& source, CompileFlags flags)
 	{
-		X_LOG0("Shader", "Compiling shader: \"%s\" tid: %" PRIX32, name_.c_str(), core::Thread::GetCurrentID());
+		const auto id = core::Thread::GetCurrentID();
+
+		X_LOG0("Shader", "(%" PRIu32 ") Compiling shader: \"%s\" tid: %" PRIX32, id, name_.c_str(), core::Thread::GetCurrentID());
 
 		compileFlags_ = flags;
 
@@ -196,7 +198,7 @@ namespace shader
 		// log the macros
 		for (const auto& macro : macros)
 		{
-			X_LOG0("Shader", "Macro: name: \"%s\" value: \"%s\"", macro.Name, macro.Definition);
+			X_LOG0("Shader", "(%" PRIu32 ") Macro: name: \"%s\" value: \"%s\"", id, macro.Name, macro.Definition);
 		}
 
 		// add blank one.
