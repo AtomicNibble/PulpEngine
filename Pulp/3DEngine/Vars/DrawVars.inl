@@ -68,6 +68,10 @@ X_INLINE int32_t DrawVars::drawPortalStacks(void) const
 	return drawPortalStacks_;
 }
 
+X_INLINE int32_t DrawVars::drawDepth(void) const
+{
+	return drawDepth_;
+}
 
 X_INLINE int32_t DrawVars::detachCam(void) const
 {

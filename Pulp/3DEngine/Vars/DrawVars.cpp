@@ -69,6 +69,10 @@ void DrawVars::registerVars(void)
 	ADD_CVAR_REF("r_drawPortalStacks", drawPortalStacks_, 0, 0, 1,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws portal stacks");
 
+	ADD_CVAR_REF("r_drawDepth", drawDepth_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws depth buffer");
+
+
 	ADD_CVAR_REF("r_detachCam", detachCam_, 0, 0, 2,
 		core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
 
