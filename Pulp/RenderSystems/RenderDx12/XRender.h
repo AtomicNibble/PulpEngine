@@ -234,6 +234,9 @@ public:
 	Stats getStats(void) const X_FINAL;
 
 private:
+	bool buildPSO(GraphicsPSO& pso, const PassState* pPassState,
+		const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm);
+	
 	void createVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
 		D3D12_VERTEX_BUFFER_VIEW viewsOut[VertexStream::ENUM_COUNT], uint32_t& numVertexStreams);
 

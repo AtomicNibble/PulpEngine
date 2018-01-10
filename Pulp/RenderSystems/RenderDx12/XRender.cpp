@@ -1442,6 +1442,28 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// we need to create a PSO.
 	GraphicsPSO pso;
 
+	if (!buildPSO(pso, pPassState, desc, rootSig, perm)) {
+		X_DELETE(pState, &statePool_);
+		return INVALID_STATE_HANLDE;
+	}
+
+	pState->pPso = pso.getPipelineStateObject();
+	pState->topo = topoFromDesc(desc);
+	pState->texStates.resize(numStates);
+	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
+
+#if RENDER_STATS
+	++stats_.numStates;
+	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
+#endif // !RENDER_STATS
+
+	return reinterpret_cast<StateHandle>(pState);
+}
+
+bool XRender::buildPSO(GraphicsPSO& pso, const PassState* pPassState,
+	const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm)
+{
+
 	DXGI_FORMAT RTVFormats[MAX_RENDER_TARGETS];
 	DXGI_FORMAT DSVFormat = DXGI_FORMAT_UNKNOWN;
 	core::zero_object(RTVFormats);
@@ -1450,8 +1472,8 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		RTVFormats[i] = texture::Util::DXGIFormatFromTexFmt(pPassState->rtfs[i]);
 	}
 
-// we can leave depth bound if if not testing no?
-//	if (desc.stateFlags.IsSet(StateFlag::DEPTHWRITE))
+	// we can leave depth bound if if not testing no?
+	//	if (desc.stateFlags.IsSet(StateFlag::DEPTHWRITE))
 	{
 		DSVFormat = pTextureMan_->getDepthFmt();
 	}
@@ -1479,6 +1501,9 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	X_ASSERT_NOT_NULL(pInputLayout);
 
+	// this must stay valid during call to finalize.
+	VertexLayoutDescArr inputDesc;
+
 	if (desc.stateFlags.IsSet(StateFlag::INSTANCED_POS_COLOR))
 	{
 		if (desc.stateFlags.IsSet(StateFlag::HWSKIN)) {
@@ -1487,7 +1512,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		}
 
 		// make a copy and append instanced descriptions.
-		VertexLayoutDescArr inputDesc(*pInputLayout);
+		inputDesc = *pInputLayout;
 		for (const auto& il : ilInstanced_) {
 			inputDesc.append(il);
 		}
@@ -1497,7 +1522,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	else if (desc.stateFlags.IsSet(StateFlag::HWSKIN))
 	{
 		// make a copy and append instanced descriptions.
-		VertexLayoutDescArr inputDesc(*pInputLayout);
+		inputDesc = *pInputLayout;
 		for (const auto& il : ilHwSkin_) {
 			inputDesc.append(il);
 		}
@@ -1525,25 +1550,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		X_ERROR("Dx12", "Domain, Hull, Geo are not enabled currently");
 	}
 
-
 	if (!pso.finalize(*pPSOCache_)) {
-		X_DELETE(pState, &statePool_);
-		return INVALID_STATE_HANLDE;
+		return false;
 	}
 
-
-	pState->pPso = pso.getPipelineStateObject();
-	pState->topo = topoFromDesc(desc);
-	pState->texStates.resize(numStates);
-	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
-
-#if RENDER_STATS
-	++stats_.numStates;
-	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
-#endif // !RENDER_STATS
-
-	return reinterpret_cast<StateHandle>(pState);
-}
 
 void XRender::destoryState(StateHandle handle)
 {
