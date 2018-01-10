@@ -58,6 +58,17 @@ namespace shader
 		ILFlags_ = flags;
 	}
 
+	X_INLINE void SourceFile::addRefrence(const core::string& name)
+	{
+		LockType::ScopedLock writeLock(lock);
+
+		if(refrences_.find(name) == RefrenceArr::invalid_index)
+		{
+			refrences_.push_back(name);
+		}
+	}
+
+
 
 } // namespace shader
 

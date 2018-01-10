@@ -6,8 +6,6 @@
 #include <Containers\HashMap.h>
 #include <Threading\SharedLock.h>
 
-#include <unordered_set>
-
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
 );
@@ -31,6 +29,7 @@ namespace shader
 	public:
 		typedef core::Array<SourceFile*> IncludedSourceArr;
 		typedef core::Array<uint8_t> ByteArr;
+		typedef core::Array<core::string> RefrenceArr;
 
 		typedef core::SharedLock LockType;
 
@@ -39,6 +38,7 @@ namespace shader
 		~SourceFile() = default;
 
 		void writeSourceToFile(core::XFile* pFile) const;
+		void applyRefrences(void);
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const ByteArr& getFileData(void) const;
@@ -52,6 +52,8 @@ namespace shader
 		X_INLINE void setSourceCrc32(uint32_t crc);
 		X_INLINE void setILFlags(ILFlags flags);
 
+		X_INLINE void addRefrence(const core::string& name);
+
 	public:
 		mutable core::SharedLock lock;
 
@@ -61,6 +63,8 @@ namespace shader
 		IncludedSourceArr includedFiles_;
 		ILFlags ILFlags_;
 		uint32_t sourceCrc32_;
+
+		RefrenceArr refrences_; // the reverse of includedfiles, so can see what shaders included this source.
 	};
 
 

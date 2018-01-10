@@ -17,6 +17,7 @@ namespace shader
 		name_(name),
 		fileData_(arena),
 		includedFiles_(arena),
+		refrences_(arena),
 		sourceCrc32_(0)
 	{
 
@@ -28,6 +29,14 @@ namespace shader
 
 		pFile->printf("\n// ======== %s ========\n\n", getName().c_str());
 		pFile->write(fileData_.begin(), fileData_.size());
+	}
+
+
+	void SourceFile::applyRefrences(void)
+	{
+		for (const auto& pIncSource : includedFiles_) {
+			pIncSource->addRefrence(name_);
+		}
 	}
 
 
