@@ -141,10 +141,6 @@ namespace shader
 
 	bool SourceBin::getMergedSource(const SourceFile* pSourceFile, ByteArr& merged)
 	{
-		std::vector<uint8_t> goat, goat2;
-
-		goat.insert(goat.end(), goat2.begin(), goat2.end());
-
 		if (pSourceFile)
 		{
 			// we take read locks of everything while building merged source.
