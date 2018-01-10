@@ -77,6 +77,8 @@ namespace shader
 		X_INLINE bool isILFmtValid(void) const;
 		X_INLINE bool hasFailedtoCompile(void) const;
 		X_INLINE bool isCompiling(void) const;
+		X_INLINE void markStale(void);
+
 
 		X_INLINE const CBufferArr& getCBuffers(void) const;
 		X_INLINE CBufferArr& getCBuffers(void);

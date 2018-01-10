@@ -93,6 +93,12 @@ namespace shader
 		return status_ == ShaderStatus::Compiling || status_ == ShaderStatus::AsyncCompileDone;
 	}
 
+	X_INLINE void XHWShader::markStale(void)
+	{
+		if (isValid()) {
+			status_ = ShaderStatus::NotCompiled;
+		}
+	}
 
 	X_INLINE const XHWShader::CBufferArr& XHWShader::getCBuffers(void) const
 	{
