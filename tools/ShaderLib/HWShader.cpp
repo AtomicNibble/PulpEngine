@@ -80,6 +80,9 @@ namespace shader
 			return false;
 		}
 
+	
+		X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")();
+
 		compileFlags_ = flags;
 
 		DWORD D3DCompileflags = 0;
