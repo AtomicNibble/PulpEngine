@@ -58,6 +58,10 @@ namespace shader
 		{
 			IlFmt_ = getStage(ShaderType::Vertex)->getILFormat();
 		}
+		else
+		{
+			X_ASSERT(IlFmt_ == InputLayoutFormat::Invalid, "Il should be invalid")();
+		}
 
 		createCBLinks();
 	}
