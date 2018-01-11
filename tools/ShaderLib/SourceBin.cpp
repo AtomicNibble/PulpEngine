@@ -237,6 +237,15 @@ namespace shader
 
 		uint32_t crc32 = pCrc32_->GetCRC32(data.data(), data.size());
 
+		auto process = [&](SourceFile* pSourceFile) {
+			pSourceFile->setFileData(std::move(data), crc32);
+
+			// load any files it includes.
+			parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
+
+			pSourceFile->applyRefrences();
+		};
+
 		if (reload)
 		{
 			auto* pSourceFile = *pSourceFileRef;
@@ -250,10 +259,8 @@ namespace shader
 			core::ScopedLock<SourceFile::LockType> lock(pSourceFile->lock);
 
 			pSourceFile->getIncludeArr().clear();
-			pSourceFile->setFileData(std::move(data), crc32);
 
-			// load any files it includes.
-			parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr(), reload);
+			process(pSourceFile);
 
 			return pSourceFile;
 		}
@@ -263,8 +270,7 @@ namespace shader
 		auto* pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(namelc, arena_);
 		pSourceFile->setFileData(std::move(data), crc32);
 
-		// load any files it includes.
-		parseIncludesAndPrePro_r(pSourceFile, pSourceFile->getIncludeArr());
+		process(pSourceFile);
 
 		*pSourceFileRef = pSourceFile;
 		return pSourceFile;
