@@ -80,6 +80,19 @@ namespace shader
 			return false;
 		}
 
+		// need to clear as we might be recompiling.
+#if X_ENABLE_RENDER_SHADER_RELOAD
+		{
+			numInputParams_ = 0;
+			numRenderTargets_ = 0;
+			numInstructions_ = 0;
+
+			cbuffers_.clear();
+			samplers_.clear();
+			textures_.clear();
+			buffers_.clear();
+		}
+#endif
 	
 		X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")();
 
