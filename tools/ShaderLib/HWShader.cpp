@@ -91,6 +91,7 @@ namespace shader
 			samplers_.clear();
 			textures_.clear();
 			buffers_.clear();
+			bytecode_.clear();
 		}
 #endif
 	
