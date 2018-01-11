@@ -17,7 +17,7 @@
 #include "CmdBucket.h"
 
 #include <IConsole.h>
-
+#include <String\HumanSize.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -33,7 +33,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 	pContextMan_(nullptr),
 	cmdListManager_(arena),
 	pBuffMan_(nullptr),
-	dedicatedvideoMemory_(0),
+	adapterIdx_(-1),
+	adapters_(arena),
 	pDescriptorAllocator_(nullptr),
 	pDescriptorAllocatorPool_(nullptr),
 	pRootSigCache_(nullptr),
@@ -60,6 +61,8 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 
 	pTexVars_ = X_NEW(texture::TextureVars, arena_, "TextVars");
 	pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
+
+	adapters_.setGranularity(2);
 }
 
 XRender::~XRender()
@@ -91,6 +94,9 @@ void XRender::registerVars(void)
 
 void XRender::registerCmds(void)
 {
+	ADD_COMMAND_MEMBER("r_listAdapters", this, XRender, &XRender::Cmd_ListAdapters,
+		core::VarFlag::SYSTEM, "List the gpu adapters");
+
 	ADD_COMMAND_MEMBER("r_list_device_features", this, XRender, &XRender::Cmd_ListDeviceFeatures,
 		core::VarFlag::SYSTEM, "List the gpu devices features");
 
@@ -150,37 +156,43 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	{
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
 
+		featureLvl_ = D3D_FEATURE_LEVEL_11_0;
+
 		for (uint32_t Idx = 0; DXGI_ERROR_NOT_FOUND != dxgiFactory->EnumAdapters1(Idx, &adapter); ++Idx)
 		{
 			DXGI_ADAPTER_DESC1 desc;
 			adapter->GetDesc1(&desc);
-			if (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) {
+
+			Adapter& a = adapters_.AddOne();
+			a.deviceName.set(desc.Description);
+			a.dedicatedSystemMemory = desc.DedicatedSystemMemory;
+			a.dedicatedvideoMemory = desc.DedicatedVideoMemory;
+			a.sharedSystemMemory = desc.SharedSystemMemory;
+			a.software = (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0;
+
+			if (adapterIdx_ >= 0 || a.software) {
 				continue;
 			}
 
-			featureLvl_ = D3D_FEATURE_LEVEL_11_0;
+			X_ASSERT(pAdapter_ == nullptr, "pAdapter already valid")(pAdapter_);
 
 			hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
-			if (SUCCEEDED(hr))
-			{
-				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)", desc.Description, desc.DedicatedVideoMemory >> 20);
-
-				deviceName_.set(desc.Description);
-				dedicatedvideoMemory_ = desc.DedicatedVideoMemory;
-
-				{
-					Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
-					adapter.As(&adapter3);
-
-					pAdapter_ = adapter3.Detach();
-				}
-				break;
+			if (FAILED(hr)) {
+				X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %" PRIu32, a.deviceName.c_str(), hr);
+				continue;
 			}
-			else
+
+			adapterIdx_ = safe_static_cast<int32_t>(Idx);
+
+			X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)", desc.Description, desc.DedicatedVideoMemory >> 20);
 			{
-				X_WARNING("Dx12", "Failed to create device for adpater index %" PRIu32 " res: %" PRIu32, Idx, hr);
+				Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
+				adapter.As(&adapter3);
+
+				pAdapter_ = adapter3.Detach();
 			}
 		}
+
 	}
 
 	if (!pDevice_) {
@@ -2073,56 +2085,74 @@ bool XRender::deviceIsSupported(void) const
 	return true;
 }
 
+void XRender::Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd)
+{
+	core::HumanSize::Str sizeStr;
+	for (int32_t i = 0; i < adapters_.size(); i++)
+	{
+		const auto& a = adapters_[i];
 
+		X_LOG0("Dx12", "Name: \"%ls\" active: %s", a.deviceName.c_str(), i == adapterIdx_ ? "^81" : "^10");
+		X_LOG0("Dx12", "DedicatedVideoMemory: ^6%s (%" PRIuS ")",core::HumanSize::toString(sizeStr, a.dedicatedvideoMemory), a.dedicatedvideoMemory);
+		X_LOG0("Dx12", "DedicatedSystemMemory: ^6%s (%" PRIuS ")", core::HumanSize::toString(sizeStr, a.dedicatedSystemMemory), a.dedicatedSystemMemory);
+		X_LOG0("Dx12", "SharedSystemMemory: ^6%s (%" PRIuS ")", core::HumanSize::toString(sizeStr, a.sharedSystemMemory), a.sharedSystemMemory);
+		X_LOG0("Dx12", "Software: ^6%s", a.software ? "true" : "false");
+	}
+}
 
 void XRender::Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd)
 {
 	X_UNUSED(pCmd);
 
+	if (adapterIdx_ < 0) {
+		return;
+	}
+
+	const auto& a = adapters_[adapterIdx_];
 
 	X_LOG0("Dx12", "------ Device Info ------");
-	X_LOG0("Dx12", "Name: \"%ls\"", deviceName_.c_str());
-	X_LOG0("Dx12", "MaxTextureWidth: %" PRIu32, features_.maxTextureWidth);
-	X_LOG0("Dx12", "MaxTextureHeight: %" PRIu32, features_.maxTextureHeight);
-	X_LOG0("Dx12", "MaxTextureDepth: %" PRIu32, features_.maxTextureDepth);
-	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureCubeSize);
-	X_LOG0("Dx12", "MaxTextureCubeSize: %" PRIu32, features_.maxTextureArrayLength);
+	X_LOG0("Dx12", "Name: \"%ls\"", a.deviceName.c_str());
+	X_LOG0("Dx12", "MaxTextureWidth: ^6%" PRIu32, features_.maxTextureWidth);
+	X_LOG0("Dx12", "MaxTextureHeight: ^6%" PRIu32, features_.maxTextureHeight);
+	X_LOG0("Dx12", "MaxTextureDepth: ^6%" PRIu32, features_.maxTextureDepth);
+	X_LOG0("Dx12", "MaxTextureCubeSize: ^6%" PRIu32, features_.maxTextureCubeSize);
+	X_LOG0("Dx12", "MaxTextureCubeSize: ^6%" PRIu32, features_.maxTextureArrayLength);
 
-	X_LOG0("Dx12", "MaxVertexTextureUnits: %" PRIu8, features_.maxVertexTextureUnits);
-	X_LOG0("Dx12", "MaxPixelTextureUnits: %" PRIu8, features_.maxPixelTextureUnits);
-	X_LOG0("Dx12", "MaxGeometryTextureUnits: %" PRIu8, features_.maxGeometryTextureUnits);
-	X_LOG0("Dx12", "MaxSimultaneousRts: %" PRIu8, features_.maxSimultaneousRts);
-	X_LOG0("Dx12", "MaxSimultaneousUavs: %" PRIu8, features_.maxSimultaneousUavs);
-	X_LOG0("Dx12", "MaxVertexStreams: %" PRIu8, features_.maxVertexStreams);
-	X_LOG0("Dx12", "MaxTextureAnisotropy: %" PRIu8, features_.maxTextureAnisotropy);
+	X_LOG0("Dx12", "MaxVertexTextureUnits: ^6%" PRIu8, features_.maxVertexTextureUnits);
+	X_LOG0("Dx12", "MaxPixelTextureUnits: ^6%" PRIu8, features_.maxPixelTextureUnits);
+	X_LOG0("Dx12", "MaxGeometryTextureUnits: ^6%" PRIu8, features_.maxGeometryTextureUnits);
+	X_LOG0("Dx12", "MaxSimultaneousRts: ^6%" PRIu8, features_.maxSimultaneousRts);
+	X_LOG0("Dx12", "MaxSimultaneousUavs: ^6%" PRIu8, features_.maxSimultaneousUavs);
+	X_LOG0("Dx12", "MaxVertexStreams: ^6%" PRIu8, features_.maxVertexStreams);
+	X_LOG0("Dx12", "MaxTextureAnisotropy: ^6%" PRIu8, features_.maxTextureAnisotropy);
 
-	X_LOG0("Dx12", "TileBasedRenderer: %s", features_.isTbdr ? "true" : "false");
-	X_LOG0("Dx12", "UnifiedMemoryArchitecture: %s", features_.isUMA ? "true" : "false");
-	X_LOG0("Dx12", "UMACacheCoherent: %s", features_.isUMACacheCoherent ? "true" : "false");
+	X_LOG0("Dx12", "TileBasedRenderer: ^6%s", features_.isTbdr ? "true" : "false");
+	X_LOG0("Dx12", "UnifiedMemoryArchitecture: ^6%s", features_.isUMA ? "true" : "false");
+	X_LOG0("Dx12", "UMACacheCoherent: ^6%s", features_.isUMACacheCoherent ? "true" : "false");
 
-	X_LOG0("Dx12", "hwInstancingSupport: %s", features_.hwInstancingSupport ? "true" : "false");
-	X_LOG0("Dx12", "instanceIdSupport: %s", features_.instanceIdSupport ? "true" : "false");
-	X_LOG0("Dx12", "streamOutputSupport: %s", features_.streamOutputSupport ? "true" : "false");
-	X_LOG0("Dx12", "alphaToCoverageSupport: %s", features_.alphaToCoverageSupport ? "true" : "false");
-	X_LOG0("Dx12", "primitiveRestartSupport: %s", features_.primitiveRestartSupport ? "true" : "false");
-	X_LOG0("Dx12", "multithreadRenderingSupport: %s", features_.multithreadRenderingSupport ? "true" : "false");
-	X_LOG0("Dx12", "multithreadResCreatingSupport: %s", features_.multithreadResCreatingSupport ? "true" : "false");
-	X_LOG0("Dx12", "mrtIndependentBitDepthsSupport: %s", features_.mrtIndependentBitDepthsSupport ? "true" : "false");
-	X_LOG0("Dx12", "standardDerivativesSupport: %s", features_.standardDerivativesSupport ? "true" : "false");
-	X_LOG0("Dx12", "shaderTextureLodSupport: %s", features_.shaderTextureLodSupport ? "true" : "false");
-	X_LOG0("Dx12", "logicOpSupport: %s", features_.logicOpSupport ? "true" : "false");
-	X_LOG0("Dx12", "independentBlendSupport: %s", features_.independentBlendSupport ? "true" : "false");
-	X_LOG0("Dx12", "depthTextureSupport: %s", features_.depthTextureSupport ? "true" : "false");
-	X_LOG0("Dx12", "fpColorSupport: %s", features_.fpColorSupport ? "true" : "false");
-	X_LOG0("Dx12", "packToRgbaRequired: %s", features_.packToRgbaRequired ? "true" : "false");
-	X_LOG0("Dx12", "drawIndirectSupport: %s", features_.drawIndirectSupport ? "true" : "false");
-	X_LOG0("Dx12", "noOverwriteSupport: %s", features_.noOverwriteSupport ? "true" : "false");
-	X_LOG0("Dx12", "fullNpotTextureSupport: %s", features_.fullNpotTextureSupport ? "true" : "false");
-	X_LOG0("Dx12", "renderToTextureArraySupport: %s", features_.renderToTextureArraySupport ? "true" : "false");
-	X_LOG0("Dx12", "gsSupport: %s", features_.gsSupport ? "true" : "false");
-	X_LOG0("Dx12", "csSupport: %s", features_.csSupport ? "true" : "false");
-	X_LOG0("Dx12", "hsSupport: %s", features_.hsSupport ? "true" : "false");
-	X_LOG0("Dx12", "dsSupport: %s", features_.dsSupport ? "true" : "false");
+	X_LOG0("Dx12", "hwInstancingSupport: ^6%s", features_.hwInstancingSupport ? "true" : "false");
+	X_LOG0("Dx12", "instanceIdSupport: ^6%s", features_.instanceIdSupport ? "true" : "false");
+	X_LOG0("Dx12", "streamOutputSupport: ^6%s", features_.streamOutputSupport ? "true" : "false");
+	X_LOG0("Dx12", "alphaToCoverageSupport: ^6%s", features_.alphaToCoverageSupport ? "true" : "false");
+	X_LOG0("Dx12", "primitiveRestartSupport: ^6%s", features_.primitiveRestartSupport ? "true" : "false");
+	X_LOG0("Dx12", "multithreadRenderingSupport: ^6%s", features_.multithreadRenderingSupport ? "true" : "false");
+	X_LOG0("Dx12", "multithreadResCreatingSupport: ^6%s", features_.multithreadResCreatingSupport ? "true" : "false");
+	X_LOG0("Dx12", "mrtIndependentBitDepthsSupport: ^6%s", features_.mrtIndependentBitDepthsSupport ? "true" : "false");
+	X_LOG0("Dx12", "standardDerivativesSupport: ^6%s", features_.standardDerivativesSupport ? "true" : "false");
+	X_LOG0("Dx12", "shaderTextureLodSupport: ^6%s", features_.shaderTextureLodSupport ? "true" : "false");
+	X_LOG0("Dx12", "logicOpSupport: ^6%s", features_.logicOpSupport ? "true" : "false");
+	X_LOG0("Dx12", "independentBlendSupport: ^6%s", features_.independentBlendSupport ? "true" : "false");
+	X_LOG0("Dx12", "depthTextureSupport: ^6%s", features_.depthTextureSupport ? "true" : "false");
+	X_LOG0("Dx12", "fpColorSupport: ^6%s", features_.fpColorSupport ? "true" : "false");
+	X_LOG0("Dx12", "packToRgbaRequired: ^6%s", features_.packToRgbaRequired ? "true" : "false");
+	X_LOG0("Dx12", "drawIndirectSupport: ^6%s", features_.drawIndirectSupport ? "true" : "false");
+	X_LOG0("Dx12", "noOverwriteSupport: ^6%s", features_.noOverwriteSupport ? "true" : "false");
+	X_LOG0("Dx12", "fullNpotTextureSupport: ^6%s", features_.fullNpotTextureSupport ? "true" : "false");
+	X_LOG0("Dx12", "renderToTextureArraySupport: ^6%s", features_.renderToTextureArraySupport ? "true" : "false");
+	X_LOG0("Dx12", "gsSupport: ^6%s", features_.gsSupport ? "true" : "false");
+	X_LOG0("Dx12", "csSupport: ^6%s", features_.csSupport ? "true" : "false");
+	X_LOG0("Dx12", "hsSupport: ^6%s", features_.hsSupport ? "true" : "false");
+	X_LOG0("Dx12", "dsSupport: ^6%s", features_.dsSupport ? "true" : "false");
 
 
 	X_LOG0("Dx12", "-------------------------");

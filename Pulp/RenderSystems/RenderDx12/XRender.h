@@ -56,6 +56,16 @@ class XRender : public IRender
 	typedef std::array<ConstantBufferHandle, MAX_CONST_BUFFERS_BOUND> ConstBuffersArr;
 	typedef VertexBufferHandleArr VertexHandleArr;
 
+	struct Adapter
+	{
+		core::StackString<128, wchar_t> deviceName;
+		size_t dedicatedvideoMemory;
+		size_t dedicatedSystemMemory;
+		size_t sharedSystemMemory;
+		bool software;
+	};
+
+	typedef core::Array<Adapter> AdapterArr;
 
 	struct PassState
 	{
@@ -263,6 +273,7 @@ private:
 //	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
 
 private:
+	void Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd);
 	void Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd);
 
 
@@ -310,8 +321,9 @@ private:
 	D3D_FEATURE_LEVEL featureLvl_;
 	GpuFeatures features_;
 
-	core::StackString<128, wchar_t> deviceName_;
-	size_t dedicatedvideoMemory_;
+	int32_t adapterIdx_;
+	AdapterArr adapters_;
+
 
 #if RENDER_STATS
 	Stats stats_;
