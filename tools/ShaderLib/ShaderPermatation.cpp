@@ -59,7 +59,7 @@ namespace shader
 			IlFmt_ = getStage(ShaderType::Vertex)->getILFormat();
 		}
 
-		createCbLinks();
+		createCBLinks();
 	}
 
 
@@ -105,7 +105,7 @@ namespace shader
 	}
 
 
-	void ShaderPermatation::createCbLinks(void)
+	void ShaderPermatation::createCBLinks(void)
 	{
 		cbLinks_.clear();
 
@@ -116,7 +116,7 @@ namespace shader
 			if (pShader)
 			{
 				X_ASSERT(pShader->getStatus() == ShaderStatus::Ready, "All shaders should be compiled when creating CB links")();
-				addCbufstoLink(pShader);
+				addCBufsToLink(pShader);
 
 				totalCBs += pShader->getNumConstantBuffers();
 			}
@@ -128,7 +128,7 @@ namespace shader
 		}
 	}
 
-	void ShaderPermatation::addCbufstoLink(XHWShader* pShader)
+	void ShaderPermatation::addCBufsToLink(XHWShader* pShader)
 	{
 		auto& cbufs = pShader->getCBuffers();
 		auto stage = staderTypeToStageFlag(pShader->getType());

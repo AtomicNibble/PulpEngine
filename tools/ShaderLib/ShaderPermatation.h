@@ -41,8 +41,8 @@ public:
 	X_INLINE const HWShaderStagesArr& getStages(void) const;
 
 private:
-	void createCbLinks(void);
-	void addCbufstoLink(XHWShader* pShader);
+	void createCBLinks(void);
+	void addCBufsToLink(XHWShader* pShader);
 
 
 private:
