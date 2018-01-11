@@ -64,7 +64,9 @@ namespace shader
 		ILFlags ILFlags_;
 		uint32_t sourceCrc32_;
 
+#if X_ENABLE_RENDER_SHADER_RELOAD
 		RefrenceArr refrences_; // the reverse of includedfiles, so can see what shaders included this source.
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	};
 
 

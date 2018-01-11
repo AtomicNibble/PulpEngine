@@ -34,9 +34,11 @@ namespace shader
 
 	void SourceFile::applyRefrences(void)
 	{
+#if X_ENABLE_RENDER_SHADER_RELOAD
 		for (const auto& pIncSource : includedFiles_) {
 			pIncSource->addRefrence(name_);
 		}
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	}
 
 

@@ -60,12 +60,16 @@ namespace shader
 
 	X_INLINE void SourceFile::addRefrence(const core::string& name)
 	{
+#if X_ENABLE_RENDER_SHADER_RELOAD
 		LockType::ScopedLock writeLock(lock);
 
 		if(refrences_.find(name) == RefrenceArr::invalid_index)
 		{
 			refrences_.push_back(name);
 		}
+#else
+		X_UNUSED(name);
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	}
 
 
