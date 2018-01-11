@@ -38,7 +38,8 @@ namespace shader
 		~SourceFile() = default;
 
 		void writeSourceToFile(core::XFile* pFile) const;
-		void applyRefrences(void);
+		void applyRefrences(void) const;
+		void removeRefrences(void) const;
 
 		X_INLINE const core::string& getName(void) const;
 		X_INLINE const ByteArr& getFileData(void) const;
@@ -53,6 +54,7 @@ namespace shader
 		X_INLINE void setILFlags(ILFlags flags);
 
 		X_INLINE void addRefrence(const core::string& name);
+		X_INLINE void removeRefrence(const core::string& name);
 
 	public:
 		mutable core::SharedLock lock;

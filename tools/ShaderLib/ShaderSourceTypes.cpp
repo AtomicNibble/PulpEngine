@@ -32,7 +32,7 @@ namespace shader
 	}
 
 
-	void SourceFile::applyRefrences(void)
+	void SourceFile::applyRefrences(void) const
 	{
 #if X_ENABLE_RENDER_SHADER_RELOAD
 		for (const auto& pIncSource : includedFiles_) {
@@ -41,6 +41,14 @@ namespace shader
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	}
 
+	void SourceFile::removeRefrences(void) const
+	{
+#if X_ENABLE_RENDER_SHADER_RELOAD
+		for (const auto& pIncSource : includedFiles_) {
+			pIncSource->removeRefrence(name_);
+		}
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+	}
 
 } // namespace shader
 

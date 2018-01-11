@@ -72,7 +72,16 @@ namespace shader
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	}
 
+	X_INLINE void SourceFile::removeRefrence(const core::string& name)
+	{
+#if X_ENABLE_RENDER_SHADER_RELOAD
+		LockType::ScopedLock writeLock(lock);
 
+		refrences_.remove(name);
+#else
+		X_UNUSED(name);
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+	}
 
 } // namespace shader
 
