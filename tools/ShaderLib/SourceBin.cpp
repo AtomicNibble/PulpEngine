@@ -164,6 +164,12 @@ namespace shader
 			}
 
 			merged.append(pSourceFile->getFileData());
+
+			if (merged.isEmpty()) {
+				X_BREAKPOINT;
+				return false;
+			}
+
 			return true;
 		}
 
