@@ -332,12 +332,12 @@ namespace shader
 	}
 
 
-	bool XHWShader::reflectShader(ID3D10Blob* pshaderBlob)
+	bool XHWShader::reflectShader(ID3D10Blob* pShaderBlob)
 	{
 		ID3D12ShaderReflection* pShaderReflection;
 		ID3D12ShaderReflectionConstantBuffer* pCB;
 
-		auto hr = D3DReflect(pshaderBlob->GetBufferPointer(), pshaderBlob->GetBufferSize(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection);
+		auto hr = D3DReflect(pShaderBlob->GetBufferPointer(), pShaderBlob->GetBufferSize(), IID_ID3D12ShaderReflection, (void **)&pShaderReflection);
 		if(FAILED(hr))
 		{
 			X_ERROR("Shader", "D3D reflect failed(%" PRIi32 "): %s", hr, name_.c_str());

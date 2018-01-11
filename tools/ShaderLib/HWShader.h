@@ -95,7 +95,7 @@ namespace shader
 
 	private:
 		bool compileFromSource(const ByteArr& source, CompileFlags compileFlags);
-		bool reflectShader(ID3D10Blob* pshaderBlob);
+		bool reflectShader(ID3D10Blob* pShaderBlob);
 
 	protected:
 		LockType lock_;
