@@ -266,6 +266,9 @@ namespace shader
 
 			pSourceFile->getIncludeArr().clear();
 
+			// we should clear refrences, they may of changed.
+			pSourceFile->removeRefrences();
+
 			process(pSourceFile);
 
 			return pSourceFile;
