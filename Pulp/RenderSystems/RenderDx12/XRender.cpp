@@ -2027,12 +2027,51 @@ void XRender::populateFeatureInfo(void)
 	{
 		D3D12_FEATURE_DATA_ARCHITECTURE archFeature;
 		archFeature.NodeIndex = 0;
-		pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
+		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
+		if (FAILED(hr))
+		{
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+			return;
+		}
 
 		features_.isTbdr = archFeature.TileBasedRenderer ? true : false;
 		features_.isUMA = archFeature.UMA ? true : false;
 		features_.isUMACacheCoherent = archFeature.CacheCoherentUMA ? true : false;
 	}
+
+	{
+		D3D12_FEATURE_DATA_FEATURE_LEVELS featureLevels;
+		core::zero_object(featureLevels);
+		D3D_FEATURE_LEVEL FeatureLevelsList[] = {
+			D3D_FEATURE_LEVEL_11_0,
+			D3D_FEATURE_LEVEL_11_1,
+			D3D_FEATURE_LEVEL_12_0,
+			D3D_FEATURE_LEVEL_12_1,
+		};
+		featureLevels.NumFeatureLevels = X_ARRAY_SIZE(FeatureLevelsList);
+		featureLevels.pFeatureLevelsRequested = FeatureLevelsList;
+
+		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featureLevels, sizeof(featureLevels));
+		if (FAILED(hr))
+		{
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+			return;
+		}
+
+		featureLvl_ = featureLevels.MaxSupportedFeatureLevel;
+	}
+
+	{
+		D3D12_FEATURE_DATA_D3D12_OPTIONS options;
+		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options));
+		if (FAILED(hr))
+		{
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+			return;
+		}
+
+	}
+
 
 	features_.hwInstancingSupport = true;
 	features_.instanceIdSupport = true;
