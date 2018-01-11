@@ -248,11 +248,11 @@ namespace shader
 
 				filterd.stripTrailing('\n');
 
-				X_ERROR("Shader", "Failed to compile(%x): %s", hr, filterd.c_str());
+				X_ERROR("Shader", "(%" PRIu32 ") Failed to compile(%x): %s", id, hr, filterd.c_str());
 			}
 			else
 			{
-				X_ERROR("Shader", "Failed to compile: %x", hr);
+				X_ERROR("Shader", "(%" PRIu32 ") Failed to compile: %x", id, hr);
 			}
 
 			core::SafeReleaseDX(pErrorBlob);
@@ -262,7 +262,7 @@ namespace shader
 
 		if (!reflectShader(pBlob)) {
 			core::SafeReleaseDX(pBlob);
-			X_ERROR("Shader", "Failed to reflect shader");
+			X_ERROR("Shader", "(%" PRIu32 ") Failed to reflect shader", id);
 			return false;
 		}
 
@@ -283,7 +283,7 @@ namespace shader
 			if (SUCCEEDED(hr))
 			{
 				const size_t strippedBytes = preStripSize - pStripped->GetBufferSize();
-				X_LOG2("Shader", "Stripped %" PRIuS " bytes from shader", strippedBytes);
+				X_LOG2("Shader", "(%" PRIu32 ") Stripped %" PRIuS " bytes from shader", id, strippedBytes);
 
 				core::SafeReleaseDX(pBlob);
 				pBlob = pStripped;
@@ -291,7 +291,7 @@ namespace shader
 			else
 			{
 				core::SafeReleaseDX(pStripped);
-				X_ERROR("Shader", "Failed to strip blob: %x", hr);
+				X_ERROR("Shader", "(%" PRIu32 ") Failed to strip blob: %x", id, hr);
 			}
 		}
 
@@ -304,7 +304,7 @@ namespace shader
 		core::SafeReleaseDX(pBlob);
 
 		const float elapsed = timer.GetMilliSeconds();
-		X_LOG0("Shader", "Compile complete: ^6%.3fms", elapsed);
+		X_LOG0("Shader", "(%" PRIu32 ") Compile complete: ^6%.3fms", id, elapsed);
 
 		return true;
 	}
