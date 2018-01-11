@@ -73,7 +73,12 @@ namespace shader
 	{
 		const auto id = core::Thread::GetCurrentID();
 
-		X_LOG0("Shader", "(%" PRIu32 ") Compiling shader: \"%s\" tid: %" PRIX32, id, name_.c_str(), core::Thread::GetCurrentID());
+		X_LOG0("Shader", "(%" PRIu32 ") Compiling shader: \"%s\"", id, name_.c_str());
+
+		if (source.isEmpty()) {
+			X_ERROR("Shader", "(%" PRIu32 ") Source empty: \"%s\"", id, name_.c_str());
+			return false;
+		}
 
 		compileFlags_ = flags;
 
