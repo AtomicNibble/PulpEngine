@@ -2143,7 +2143,7 @@ bool XRender::deviceIsSupported(void) const
 void XRender::Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd)
 {
 	core::HumanSize::Str sizeStr;
-	for (int32_t i = 0; i < adapters_.size(); i++)
+	for (size_t i = 0; i < adapters_.size(); i++)
 	{
 		const auto& a = adapters_[i];
 
