@@ -169,12 +169,13 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 			a.dedicatedvideoMemory = desc.DedicatedVideoMemory;
 			a.sharedSystemMemory = desc.SharedSystemMemory;
 			a.software = (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0;
-
-			// sort them?
-			std::sort(adapters_.begin(), adapters_.end(), [](const Adapter& lhs, const Adapter& rhs) {
-				return lhs.dedicatedvideoMemory > rhs.dedicatedvideoMemory;
-			});
 		}
+
+		// sort them?
+		std::sort(adapters_.begin(), adapters_.end(), [](const Adapter& lhs, const Adapter& rhs) {
+			return lhs.dedicatedvideoMemory > rhs.dedicatedvideoMemory;
+		});
+			
 
 		for (size_t i = 0; i < adapters_.size(); i++)
 		{
