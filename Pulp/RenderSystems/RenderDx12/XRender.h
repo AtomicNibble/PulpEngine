@@ -80,12 +80,16 @@ class XRender : public IRender
 
 		DeviceState(core::MemoryArenaBase* arena) :
 			rootSig(arena),
-			texStates(arena)
+			texStates(arena),
+			pPso(nullptr)
 		{
+			texRootIdxBase = std::numeric_limits<decltype(texRootIdxBase)>::max();
+			samplerRootIdxBase = std::numeric_limits<decltype(samplerRootIdxBase)>::max();
 			cbRootIdxBase = std::numeric_limits<decltype(cbRootIdxBase)>::max();
-			bufferRootIdxBase = std::numeric_limits<decltype(cbRootIdxBase)>::max();
+			bufferRootIdxBase = std::numeric_limits<decltype(bufferRootIdxBase)>::max();
 
 #if PSO_HOT_RELOAD
+			pPassState = nullptr;
 			pPerm = nullptr;
 #endif // !PSO_HOT_RELOAD
 		}
