@@ -53,7 +53,7 @@ namespace shader
 			core::bitUtil::RoundUpToMultiple<size_t>(
 				PoolArena::getMemoryRequirement(sizeof(ShaderPermatation)) * MAX_SHADER_PERMS,
 				core::VirtualMem::GetPageSize()
-				)
+			)
 		),
 		permAllocator_(permHeap_.start(), permHeap_.end(),
 			PoolArena::getMemoryRequirement(sizeof(SourceFile)),
