@@ -1663,12 +1663,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 
 
-#if X_DEBUG
+#if X_ENABLE_ASSERTIONS
 		const auto fileSize = file.tell();
 		const auto headerRel = (fileSize - sizeof(header));
 		
 		X_ASSERT((headerRel % 16) == 0, "Not aligned")(fileSize, headerRel);
-#endif
+#endif // !X_ENABLE_ASSERTIONS
 
 		if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
 			X_ERROR("Model", "Failed to write mesh stream");
@@ -1676,11 +1676,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		}
 	}
 
-
-#if X_DEBUG
 	X_ASSERT(file.tell() == (header.dataSize + sizeof(header)), "Incorrect header size")(file.tell(), header.dataSize + sizeof(header));
-#endif // X_DEBUG
-
 	return true;
 }
 
