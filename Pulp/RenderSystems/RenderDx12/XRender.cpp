@@ -1365,9 +1365,16 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	if (!perm.isCompiled()) {
 
+#if X_ENABLE_RENDER_SHADER_RELOAD
 		// this could of happend if we hot reloaded the shader.
-		
+		X_WARNING("Dx12", "Compining perm in state creation, shader was likley reloaded");
+
+		if (!pShaderMan_->compilePermatation(const_cast<shader::IShaderPermatation*>(pPerm))) {
+			return INVALID_STATE_HANLDE;
+		}
+#else
 		return INVALID_STATE_HANLDE;
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 	}
 
 	if (perm.getILFmt() != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
