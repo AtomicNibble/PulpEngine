@@ -3001,7 +3001,7 @@ size_t ModelCompiler::getBatchSize(size_t elementSizeBytes)
 {
 	size_t batchSize = 0;
 
-	core::CpuInfo* pInfo = gEnv->pCore->GetCPUInfo();
+	const core::CpuInfo* pInfo = gEnv->pCore->GetCPUInfo();
 
 	size_t numL2info = pInfo->GetL2CacheCount();
 	if (numL2info > 0) {

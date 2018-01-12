@@ -360,7 +360,7 @@ struct ICore
 	virtual core::IXHotReloadManager* GetHotReloadMan(void) X_ABSTRACT;
 	virtual ICoreEventDispatcher* GetCoreEventDispatcher(void) X_ABSTRACT;
 	virtual core::Crc32* GetCrc32(void) X_ABSTRACT;
-	virtual core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;
+	virtual const core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;
 	virtual core::xWindow* GetGameWindow(void) X_ABSTRACT;
 	virtual core::AssetLoader* GetAssetLoader(void) X_ABSTRACT;
 

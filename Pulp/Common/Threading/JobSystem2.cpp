@@ -206,7 +206,7 @@ namespace V2
 		if (threadCount == AUTO_THREAD_COUNT)
 		{
 			ICore* pCore = gEnv->pCore;
-			CpuInfo* pCpu = pCore->GetCPUInfo();
+			const CpuInfo* pCpu = pCore->GetCPUInfo();
 
 			uint32_t numCores = pCpu->GetCoreCount();
 			numThreads_ = math<uint32_t>::clamp(numCores - HW_THREAD_NUM_DELTA, 1u, HW_THREAD_MAX);

@@ -92,7 +92,7 @@ X_INLINE core::Crc32* XCore::GetCrc32(void)
 	return pCrc32_;
 }
 
-X_INLINE core::CpuInfo* XCore::GetCPUInfo(void)
+X_INLINE const core::CpuInfo* XCore::GetCPUInfo(void)
 {
 	return pCpuInfo_;
 }

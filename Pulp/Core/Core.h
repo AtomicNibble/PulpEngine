@@ -123,7 +123,7 @@ public:
 	X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
 	X_INLINE core::ILog* GetILog(void) X_FINAL;
 	X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
-	X_INLINE core::CpuInfo*	GetCPUInfo(void) X_FINAL;
+	X_INLINE const core::CpuInfo* GetCPUInfo(void) X_FINAL;
 	
 	X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
 	X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;

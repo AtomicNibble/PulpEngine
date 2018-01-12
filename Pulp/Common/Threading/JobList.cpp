@@ -551,7 +551,7 @@ void jobListRunner::StartUp(void)
 
 	// get the num HW threads
 	ICore* pCore = (ICore*)gEnv->pCore;
-	CpuInfo* pCpu = pCore->GetCPUInfo();
+	const CpuInfo* pCpu = pCore->GetCPUInfo();
 
 	int32_t numCores = pCpu->GetCoreCount();
 	numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
