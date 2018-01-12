@@ -24,7 +24,7 @@ X_NAMESPACE_BEGIN(model)
 
 namespace
 {
-	uint32_t hashsingle(float f)
+	inline uint32_t hashsingle(float f)
 	{
 		union {
 			unsigned int ui;
@@ -34,7 +34,7 @@ namespace
 		return ((ui & 0xfffff000) >> 12);
 	}
 
-	int64 Hash(float x, float y, float z)
+	inline int64 Hash(float x, float y, float z)
 	{
 		int64 h1 = hashsingle(x);
 		int64 h2 = hashsingle(y);
@@ -42,7 +42,7 @@ namespace
 		return (h1 << 40) | (h2 << 20) | h3;
 	}
 
-	int64 vertHash(const ModelCompiler::Vert& vert)
+	inline int64 vertHash(const ModelCompiler::Vert& vert)
 	{
 		return Hash(vert.pos_[0], vert.pos_[1], vert.pos_[2]);
 	}
