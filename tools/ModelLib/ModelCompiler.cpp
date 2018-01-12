@@ -1830,14 +1830,6 @@ size_t ModelCompiler::calculateHitBoxDataSize(void) const
 
 bool ModelCompiler::ProcessModel(void)
 {
-	// ok so things are a little strange now, since rawmodel format is differnt style to 
-	// compiled model, meaning we have to create diffrent representation of the data.
-
-	// we need to create the compiled verts from the tris at somepoint
-	// when is best time todo that.
-	// 
-
-
 	// steps:
 	// 1. drop weights from the raw model verts 
 	// 2. merge raw mesh that share materials
