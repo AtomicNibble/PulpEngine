@@ -347,7 +347,7 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
 	SuspendThread(hThread);
 
 	CONTEXT ctx;
-	memset(&ctx, sizeof(ctx), 0);
+	core::zero_object(ctx);
 	ctx.ContextFlags = CONTEXT_ALL;
 	if (GetThreadContext(hThread, &ctx) == 0)
 	{
