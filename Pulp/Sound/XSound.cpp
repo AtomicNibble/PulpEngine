@@ -1528,9 +1528,11 @@ void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPt
 
 	core::CriticalSection::ScopedLock lock(cs_);
 
-	std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
+	auto it = std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
 		return b.bankID == bankID;
 	});
+
+	banks_.erase(it, banks_.end());
 }
 
 
