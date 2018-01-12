@@ -74,7 +74,7 @@
 #endif
 
 
-#define X_ENGINE_NAME			"Potato"
+#define X_ENGINE_NAME			"Blade"
 #define X_ENGINE_OUTPUT_PREFIX	"engine_"
 #define X_ENGINE_VERSION		0.1
 #define X_ENGINE_VERSION_STR	X_STRINGIZE(X_ENGINE_VERSION)
