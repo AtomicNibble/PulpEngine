@@ -44,6 +44,7 @@ class GraphicsContext;
 template<typename>
 class CommandBucket;
 
+class GraphicsPSO;
 
 class XRender : public IRender
 {
