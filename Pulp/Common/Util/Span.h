@@ -469,7 +469,7 @@ public:
 	constexpr index_type length_bytes(void) const { return size_bytes(); }
 	constexpr index_type size_bytes(void) const
 	{
-		return size() * narrow_cast<index_type>(sizeof(element_type));
+		return size() * safe_static_cast<index_type>(sizeof(element_type));
 	}
 	constexpr bool empty(void) const { return size() == 0; }
 
