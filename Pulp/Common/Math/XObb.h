@@ -32,8 +32,7 @@ public:
 
 	X_INLINE const Vec3f& center(void) const;	// the center point of the box
 	X_INLINE Vec3f center(void);	// the center point of the box
-	X_INLINE const Vec3f& size(void) const;	// the size of the box.
-	X_INLINE Vec3f size(void);	// the size of the box.
+	X_INLINE Vec3f size(void) const;	// the size of the box.
 	X_INLINE const Vec3f& halfVec(void) const;	// 
 	X_INLINE Vec3f halfVec(void);	// 
 	X_INLINE const Quatf& orientation(void) const;

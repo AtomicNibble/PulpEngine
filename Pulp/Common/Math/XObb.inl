@@ -50,12 +50,7 @@ X_INLINE Vec3f OBB::center(void)
 	return center_;
 }
 
-X_INLINE const Vec3f& OBB::size(void) const
-{
-	return halfLVec_ * 2.f;
-}
-
-X_INLINE Vec3f OBB::size(void)
+X_INLINE Vec3f OBB::size(void) const
 {
 	return halfLVec_ * 2.f;
 }
