@@ -1580,6 +1580,8 @@ bool XRender::buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 		return false;
 	}
 
+	return true;
+}
 
 void XRender::destoryState(StateHandle handle)
 {
