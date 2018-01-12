@@ -46,7 +46,12 @@ struct BindParameters
 
 struct SendParameters
 {
-	X_INLINE SendParameters() : ttl(0) { }
+	X_INLINE SendParameters() : 
+		pData(nullptr),
+		length(0),
+		ttl(0)
+	{ 
+	}
 
 	X_INLINE void setData(core::BitStream& bs) {
 		pData = bs.data();
