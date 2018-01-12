@@ -8,7 +8,7 @@
 #include <icore.h>
 
 #include <Extension\FactoryRegNode.h>
-#include <Extension\IPotatoFactoryRegistryImpl.h>
+#include <Extension\IEngineFactoryRegistryImpl.h>
 
 #include <Debugging\InvalidParameterHandler.h>
 #include <Debugging\PureVirtualFunctionCallHandler.h>
@@ -56,8 +56,8 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 #if  !defined(X_LIB)
 	if (pCore)
 	{
-		IPotatoFactoryRegistryImpl* pGoatFactoryImpl = 
-			static_cast<IPotatoFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
+		IEngineFactoryRegistryImpl* pGoatFactoryImpl = 
+			static_cast<IEngineFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
 		pGoatFactoryImpl->RegisterFactories(g_pHeadToRegFactories);
 	}
 #endif

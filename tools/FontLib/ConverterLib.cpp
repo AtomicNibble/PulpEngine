@@ -49,7 +49,7 @@ class XConverterLib_Font : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Font);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Font);
 
 
 XConverterLib_Font::XConverterLib_Font()

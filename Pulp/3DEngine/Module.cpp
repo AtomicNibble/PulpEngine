@@ -93,7 +93,7 @@ class XEngineModule_3DEngine : public IEngineModule
 
 
 
-X_POTATO_REGISTER_CLASS(XEngineModule_3DEngine);
+X_ENGINE_REGISTER_CLASS(XEngineModule_3DEngine);
 
 XEngineModule_3DEngine::XEngineModule_3DEngine()
 {

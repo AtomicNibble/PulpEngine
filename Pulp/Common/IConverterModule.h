@@ -4,7 +4,7 @@
 #ifndef X_CONVETER_MODULE_I_H_
 #define X_CONVETER_MODULE_I_H_
 
-#include <Extension\IPotatoUnknown.h>
+#include <Extension\IEngineUnknown.h>
 #include <Containers\Array.h>
 
 #include <IAssetDb.h>
@@ -22,9 +22,9 @@ struct IPhysLib
 )
 
 struct IConverter;
-struct IConverterModule : public IPotatoUnknown
+struct IConverterModule : public IEngineUnknown
 {
-	POTATO_INTERFACE_DECLARE(IConverterModule, 0x695c4e33, 0x4481, 0x45a7, 0x91, 0xe8, 0xb6, 0x4b, 0x67, 0x13, 0xe1, 0x6d );
+	ENGINE_INTERFACE_DECLARE(IConverterModule, 0x695c4e33, 0x4481, 0x45a7, 0x91, 0xe8, 0xb6, 0x4b, 0x67, 0x13, 0xe1, 0x6d );
 
 	virtual const char* GetName(void) X_ABSTRACT;
 

@@ -7,8 +7,8 @@
 #include <IFileSys.h>
 #include <IPhysics.h>
 
-#include <Extension\IPotatoFactory.h>
-#include <Extension\PotatoCreateClass.h>
+#include <Extension\IEngineFactory.h>
+#include <Extension\EngineCreateClass.h>
 
 #include <Containers\Array.h>
 

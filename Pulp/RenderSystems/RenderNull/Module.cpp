@@ -54,7 +54,7 @@ class XEngineModule_Render : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Render);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Render);
 
 XEngineModule_Render::XEngineModule_Render()
 {

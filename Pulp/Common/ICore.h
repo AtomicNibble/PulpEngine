@@ -23,7 +23,7 @@
 #include <ILog.h>
 
 struct ICore;
-struct IPotatoFactoryRegistry;
+struct IEngineFactoryRegistry;
 
 struct IConverterModule;
 struct IConverter;
@@ -338,7 +338,7 @@ struct ICore
 		IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_ABSTRACT;
 	virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_ABSTRACT;
 
-	virtual IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
+	virtual IEngineFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 
 	virtual SCoreGlobals* GetGlobalEnv(void) X_ABSTRACT;
 	virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_ABSTRACT;

@@ -41,7 +41,7 @@ class XEngineModule_SqLite : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_SqLite);
+X_ENGINE_REGISTER_CLASS(XEngineModule_SqLite);
 
 
 XEngineModule_SqLite::XEngineModule_SqLite()

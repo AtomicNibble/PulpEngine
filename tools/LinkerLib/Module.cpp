@@ -41,7 +41,7 @@ class XEngineModule_LinkerLib : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_LinkerLib);
+X_ENGINE_REGISTER_CLASS(XEngineModule_LinkerLib);
 
 
 XEngineModule_LinkerLib::XEngineModule_LinkerLib()

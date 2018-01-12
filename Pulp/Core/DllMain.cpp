@@ -52,8 +52,8 @@ extern "C"
 #if defined(X_LIB)
 		if (pCore)
 		{
-			IPotatoFactoryRegistryImpl* pGoatFactoryImpl =
-				static_cast<IPotatoFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
+			IEngineFactoryRegistryImpl* pGoatFactoryImpl =
+				static_cast<IEngineFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
 			pGoatFactoryImpl->RegisterFactories(g_pHeadToRegFactories);
 		}
 #endif

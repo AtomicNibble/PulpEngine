@@ -41,7 +41,7 @@ class XEngineModule_ConverterLib : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_ConverterLib);
+X_ENGINE_REGISTER_CLASS(XEngineModule_ConverterLib);
 
 
 XEngineModule_ConverterLib::XEngineModule_ConverterLib()

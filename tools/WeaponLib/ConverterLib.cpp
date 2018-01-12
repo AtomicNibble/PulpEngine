@@ -49,7 +49,7 @@ class XConverterLib_Weapon : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Weapon);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Weapon);
 
 
 XConverterLib_Weapon::XConverterLib_Weapon()

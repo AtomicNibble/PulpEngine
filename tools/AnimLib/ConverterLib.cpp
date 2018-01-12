@@ -53,7 +53,7 @@ class XConverterLib_Anim : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Anim);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Anim);
 
 
 XConverterLib_Anim::XConverterLib_Anim()

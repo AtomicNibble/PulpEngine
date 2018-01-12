@@ -3,8 +3,8 @@
 
 #include "Core.h"
 
-#include <Extension\IPotatoUnknown.h>
-#include <Extension\IPotatoFactory.h>
+#include <Extension\IEngineUnknown.h>
+#include <Extension\IEngineFactory.h>
 #include <Extension\FactoryRegNode.h>
 
 #include <algorithm>
@@ -27,7 +27,7 @@ XPotatoFactoryRegistryImpl::XPotatoFactoryRegistryImpl()
 }
 
 
-IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const char* cname) const
+IEngineFactory* XPotatoFactoryRegistryImpl::GetFactory(const char* cname) const
 {
 	if (!cname) {
 		return nullptr;
@@ -38,7 +38,7 @@ IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const char* cname) const
 	return it != byCName_.end() && !(search < *it) ? (*it).pPtr : nullptr;
 }
 
-IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const PotatoGUID& guid) const
+IEngineFactory* XPotatoFactoryRegistryImpl::GetFactory(const EngineGUID& guid) const
 {
 	const FactoryByID search(guid);
 
@@ -47,7 +47,7 @@ IPotatoFactory* XPotatoFactoryRegistryImpl::GetFactory(const PotatoGUID& guid) c
 }
 
 
-bool XPotatoFactoryRegistryImpl::GetInsertionPos(IPotatoFactory* pFactory,
+bool XPotatoFactoryRegistryImpl::GetInsertionPos(IEngineFactory* pFactory,
 	FactoriesByCName::iterator& itPosForCName, FactoriesByID::iterator& itPosForId)
 {
 	FactoryByCName searchByCName(pFactory);
@@ -77,7 +77,7 @@ void XPotatoFactoryRegistryImpl::RegisterFactories(const XRegFactoryNode* pFacto
 	const XRegFactoryNode* p = pFactories;
 	while (p)
 	{
-		IPotatoFactory* pFactory = p->pFactory;
+		IEngineFactory* pFactory = p->pFactory;
 		if (pFactory)
 		{
 			FactoriesByCName::iterator itPosForCName;
@@ -100,7 +100,7 @@ void XPotatoFactoryRegistryImpl::UnregisterFactories(const XRegFactoryNode* pFac
 	X_ASSERT_NOT_IMPLEMENTED();
 }
 
-IPotatoFactoryRegistry* XCore::GetFactoryRegistry() const
+IEngineFactoryRegistry* XCore::GetFactoryRegistry() const
 {
 	return &XPotatoFactoryRegistryImpl::Access();
 }

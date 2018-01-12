@@ -8,8 +8,8 @@
 
 #include "TypeList.h"
 
-#include "IPotatoUnknown.h"
-#include "IPotatoFactory.h"
+#include "IEngineUnknown.h"
+#include "IEngineFactory.h"
 
 #include "FactoryRegNode.h"
 
@@ -32,12 +32,12 @@ namespace Internal
 	};
 
 	template<>
-	struct InterfaceCast<IPotatoUnknown>
+	struct InterfaceCast<IEngineUnknown>
 	{
 		template<class T>
 		static void* Op(T* p)
 		{
-			return const_cast<IPotatoUnknown*>(static_cast<const IPotatoUnknown*>(static_cast<const void*>(p)));
+			return const_cast<IEngineUnknown*>(static_cast<const IEngineUnknown*>(static_cast<const void*>(p)));
 		}
 	};
 }
@@ -49,7 +49,7 @@ template<>
 struct InterfaceCast<TL::NullType>
 {
 	template<class T>
-	static void* Op(T*, const PotatoGUID&)
+	static void* Op(T*, const EngineGUID&)
 	{
 		return nullptr;
 	}
@@ -59,9 +59,9 @@ template<class Head, class Tail>
 struct InterfaceCast<TL::Typelist<Head, Tail>>
 {
 	template<class T>
-	static void* Op(T* p, const PotatoGUID& iid)
+	static void* Op(T* p, const EngineGUID& iid)
 	{
-		if (PotatoIdOf<Head>() == iid) {
+		if (EngineIdOf<Head>() == iid) {
 			return Internal::InterfaceCast<Head>::Op(p);
 		}
 		return InterfaceCast<Tail>::Op(p, iid);
@@ -75,7 +75,7 @@ struct FillIIDs;
 template<>
 struct FillIIDs<TL::NullType>
 {
-	static void Op(PotatoGUID*)
+	static void Op(EngineGUID*)
 	{
 	}
 };
@@ -83,16 +83,16 @@ struct FillIIDs<TL::NullType>
 template<class Head, class Tail>
 struct FillIIDs<TL::Typelist<Head, Tail>>
 {
-	static void Op(PotatoGUID* p)
+	static void Op(EngineGUID* p)
 	{
-		*p++ = PotatoIdOf<Head>();
+		*p++ = EngineIdOf<Head>();
 		FillIIDs<Tail>::Op(p);
 	}
 };
 
 
 template<typename T>
-class XFactory : public IPotatoFactory
+class XFactory : public IEngineFactory
 {
 
 public:
@@ -101,7 +101,7 @@ public:
 		pIIDs_(nullptr),
 		registerFactory_()
 	{
-		static PotatoGUID supportedIIDs[TL::Length < typename T::FullInterfaceList > ::value];
+		static EngineGUID supportedIIDs[TL::Length < typename T::FullInterfaceList > ::value];
 		FillIIDs<typename T::FullInterfaceList>::Op(supportedIIDs);
 		pIIDs_ = &supportedIIDs[0];
 		numIIDs_ = TL::Length<typename T::FullInterfaceList>::value;
@@ -115,12 +115,12 @@ public:
 		return T::GetSName();
 	}
 
-	virtual const PotatoGUID& GetGUID(void) const X_OVERRIDE
+	virtual const EngineGUID& GetGUID(void) const X_OVERRIDE
 	{
 		return T::GetSGUID();
 	}
 
-	virtual bool ClassSupports(const PotatoGUID& iid) const X_OVERRIDE
+	virtual bool ClassSupports(const EngineGUID& iid) const X_OVERRIDE
 	{
 		for (size_t i = 0; i < numIIDs_; ++i)
 		{
@@ -132,7 +132,7 @@ public:
 	}
 
 public:
-	virtual IPotatoUnknown* CreateInstance(void) const X_OVERRIDE
+	virtual IEngineUnknown* CreateInstance(void) const X_OVERRIDE
 	{
 		return new T;
 	}
@@ -143,7 +143,7 @@ private:
 
 private:
 	size_t		numIIDs_;
-	PotatoGUID*	pIIDs_;
+	EngineGUID*	pIIDs_;
 	XRegFactoryNode registerFactory_; 
 };
 
@@ -157,51 +157,51 @@ public:
 	{
 	}
 
-	virtual IPotatoUnknown* CreateInstance(void) const X_OVERRIDE
+	virtual IEngineUnknown* CreateInstance(void) const X_OVERRIDE
 	{
-		static IPotatoUnknown* pInst = XFactory<T>::CreateInstance();
+		static IEngineUnknown* pInst = XFactory<T>::CreateInstance();
 		return pInst;
 	}
 };
 
 
-// #define POTATO_FACTORY_DECLARE(implclassname) \
+// #define ENGINE_FACTORY_DECLARE(implclassname) \
 //   private:                                 \
 //     static XFactory<implclassname> s_factory;
 
-#define _POTATO_FACTORY_DECLARE_SINGLETON(implclassname) \
+#define _ENGINE_FACTORY_DECLARE_SINGLETON(implclassname) \
   private:                                           \
     friend class XFactory<implclassname>;            \
     static XSingletonFactory<implclassname> s_factory;
 
 
-#define _POTATO_IMPLEMENT_IPOTATOUNKNOWN()                                        \
+#define _ENGINE_IMPLEMENT_IENGINEUNKNOWN()                                        \
   public:                                                                  \
-    virtual IPotatoFactory* GetFactory() const X_OVERRIDE                  \
+    virtual IEngineFactory* GetFactory() const X_OVERRIDE                  \
     {                                                                      \
       return &s_factory;                                                   \
     }                                                                      \
                                                                            \
   protected:															   \
-	virtual void* QueryInterface(const PotatoGUID &iid) const override	   \
+	virtual void* QueryInterface(const EngineGUID &iid) const override	   \
     {                                                                      \
 	  return InterfaceCast<FullInterfaceList>::Op(this, iid);          \
     }
 
-#define _POTATO_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11) \
+#define _ENGINE_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11) \
 public: \
 	static const char* GetSName(void) \
 	{\
 		return cname; \
 	}\
-	static const PotatoGUID& GetSGUID(void)  \
+	static const EngineGUID& GetSGUID(void)  \
 	{ \
-		static const PotatoGUID id(uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11);		\
+		static const EngineGUID id(uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11);		\
 		return id;  \
 	} \
 	static std::shared_ptr<classname> CreateInstance(void)\
 	{\
-		IPotatoUnknown* p = s_factory.CreateInstance(); \
+		IEngineUnknown* p = s_factory.CreateInstance(); \
 		return std::shared_ptr<classname>(*static_cast<std::shared_ptr<classname>*>(static_cast<void*>(&p))); \
 	} \
                                  \
@@ -210,13 +210,13 @@ public: \
     virtual ~classname();
 
 
-#define X_POTATO_INTERFACE_BEGIN() \
+#define X_ENGINE_INTERFACE_BEGIN() \
   private:                   \
-    typedef TL::MakeTypelist < IPotatoUnknown
+    typedef TL::MakeTypelist < IEngineUnknown
 
-#define X_POTATO_INTERFACE_ADD(iname)                        , iname
+#define X_ENGINE_INTERFACE_ADD(iname)                        , iname
 
-#define X_POTATO_INTERFACE_END()                             > ::Result _UserDefinedPartialInterfaceList; \
+#define X_ENGINE_INTERFACE_END()                             > ::Result _UserDefinedPartialInterfaceList; \
   protected:                                                                                        \
     typedef TL::NoDuplicates<_UserDefinedPartialInterfaceList>::Result FullInterfaceList;
 
@@ -224,20 +224,20 @@ public: \
 
 
 #define  X_ENGINE_INTERFACE_SIMPLE(iname) \
-  X_POTATO_INTERFACE_BEGIN()             \
-  X_POTATO_INTERFACE_ADD(iname)          \
-  X_POTATO_INTERFACE_END()
+  X_ENGINE_INTERFACE_BEGIN()             \
+  X_ENGINE_INTERFACE_ADD(iname)          \
+  X_ENGINE_INTERFACE_END()
 
 
 
 #define X_ENGINE_GENERATE_SINGLETONCLASS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)\
-	_POTATO_FACTORY_DECLARE_SINGLETON(classname) \
-	_POTATO_IMPLEMENT_IPOTATOUNKNOWN() \
-	_POTATO_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)
+	_ENGINE_FACTORY_DECLARE_SINGLETON(classname) \
+	_ENGINE_IMPLEMENT_IENGINEUNKNOWN() \
+	_ENGINE_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)
 
 
 
-#define X_POTATO_REGISTER_CLASS(classname)\
+#define X_ENGINE_REGISTER_CLASS(classname)\
 	XSingletonFactory<classname> classname::s_factory;
 
 

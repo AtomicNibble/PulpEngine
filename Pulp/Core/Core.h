@@ -38,7 +38,7 @@
 
 #include <Assets\AssetLoader.h>
 
-struct IPotatoFactoryRegistryImpl;
+struct IEngineFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
@@ -131,7 +131,7 @@ public:
 	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
 	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
-	IPotatoFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
+	IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 
 private:
 	static SCoreGlobals env_;

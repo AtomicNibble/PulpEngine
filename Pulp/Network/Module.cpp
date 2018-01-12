@@ -63,7 +63,7 @@ class XEngineModule_Network : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Network);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Network);
 
 XEngineModule_Network::XEngineModule_Network()
 {

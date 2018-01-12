@@ -138,11 +138,11 @@
     <ClInclude Include="EngineCommon.h" />
     <ClInclude Include="Extension\FactoryRegNode.h" />
     <ClInclude Include="Extension\GUID.h" />
-    <ClInclude Include="Extension\PotatoCreateClass.h" />
-    <ClInclude Include="Extension\IPotatoUnknown.h" />
-    <ClInclude Include="Extension\IPotatoFactory.h" />
-    <ClInclude Include="Extension\IPotatoFactoryRegistry.h" />
-    <ClInclude Include="Extension\IPotatoFactoryRegistryImpl.h" />
+    <ClInclude Include="Extension\EngineCreateClass.h" />
+    <ClInclude Include="Extension\IEngineUnknown.h" />
+    <ClInclude Include="Extension\IEngineFactory.h" />
+    <ClInclude Include="Extension\IEngineFactoryRegistry.h" />
+    <ClInclude Include="Extension\IEngineFactoryRegistryImpl.h" />
     <ClInclude Include="Extension\TypeList.h" />
     <ClInclude Include="Extension\XExtensionMacros.h" />
     <ClInclude Include="Hashing\Adler32.h" />

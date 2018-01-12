@@ -69,7 +69,7 @@ class XEngineModule_AssetDB : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_AssetDB);
+X_ENGINE_REGISTER_CLASS(XEngineModule_AssetDB);
 
 
 XEngineModule_AssetDB::XEngineModule_AssetDB()

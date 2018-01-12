@@ -37,9 +37,9 @@
 #include <IPhysics.h>
 #include <IVideo.h>
 
-#include <Extension\IPotatoUnknown.h>
-#include <Extension\IPotatoFactory.h>
-#include <Extension\PotatoCreateClass.h>
+#include <Extension\IEngineUnknown.h>
+#include <Extension\IEngineFactory.h>
+#include <Extension\EngineCreateClass.h>
 
 #include <Memory\MemInfo.h>
 #include <Platform\MessageBox.h>
@@ -137,7 +137,7 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 #endif
 
 	std::shared_ptr<IEngineModule> pModule;
-	if (PotatoCreateClassInstance(pModuleClassName, pModule))
+	if (EngineCreateClassInstance(pModuleClassName, pModule))
 	{
 		if (!pModule->Initialize(env_, initParams_)) {
 			X_ERROR("Core", "failed to initialize IEng: %s -> %s", pDllName, pModuleClassName);
@@ -195,7 +195,7 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 	std::shared_ptr<IConverterModule> pModule;
 	IConverter* pConverter = nullptr;
 
-	if (PotatoCreateClassInstance(pModuleClassName, pModule))
+	if (EngineCreateClassInstance(pModuleClassName, pModule))
 	{
 		pConverter = pModule->Initialize();
 		if (!pConverter) {
@@ -287,7 +287,7 @@ bool XCore::IntializeEngineModule(const char *dllName, const char *moduleClassNa
 
 
 	std::shared_ptr<IEngineModule> pModule;
-	if (PotatoCreateClassInstance(moduleClassName, pModule))
+	if (EngineCreateClassInstance(moduleClassName, pModule))
 	{
 		res = pModule->Initialize(env_, initParams);
 	}

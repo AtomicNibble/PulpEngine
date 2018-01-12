@@ -53,7 +53,7 @@ class XConverterLib_Material : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Material);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Material);
 
 
 XConverterLib_Material::XConverterLib_Material()

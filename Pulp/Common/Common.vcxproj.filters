@@ -1036,18 +1036,6 @@
     <ClInclude Include="Time\StopWatch.h">
       <Filter>Headers\Time</Filter>
     </ClInclude>
-    <ClInclude Include="Extension\IPotatoFactory.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IPotatoFactoryRegistry.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IPotatoFactoryRegistryImpl.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\PotatoCreateClass.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
     <ClInclude Include="IConverterModule.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
@@ -1157,9 +1145,6 @@
       <Filter>Interfaces_h\Render</Filter>
     </ClInclude>
     <ClInclude Include="Extension\GUID.h">
-      <Filter>Headers\Extension</Filter>
-    </ClInclude>
-    <ClInclude Include="Extension\IPotatoUnknown.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
     <ClInclude Include="Extension\TypeList.h">
@@ -1308,6 +1293,21 @@
     </ClInclude>
     <ClInclude Include="Util\Span.h">
       <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IEngineFactory.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IEngineUnknown.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IEngineFactoryRegistry.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\IEngineFactoryRegistryImpl.h">
+      <Filter>Headers\Extension</Filter>
+    </ClInclude>
+    <ClInclude Include="Extension\EngineCreateClass.h">
+      <Filter>Headers\Extension</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

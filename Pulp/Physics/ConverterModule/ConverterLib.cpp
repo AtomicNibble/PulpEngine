@@ -16,9 +16,9 @@ namespace {
 class XConverterLib_Phys : public IConverterModule
 {
 	// X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
-	X_POTATO_INTERFACE_BEGIN()             
-	X_POTATO_INTERFACE_ADD(IConverterModule)
-	X_POTATO_INTERFACE_END()
+	X_ENGINE_INTERFACE_BEGIN()             
+	X_ENGINE_INTERFACE_ADD(IConverterModule)
+	X_ENGINE_INTERFACE_END()
 
 
 	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Phys, "Engine_PhysLib",
@@ -63,7 +63,7 @@ class XConverterLib_Phys : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Phys);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Phys);
 
 
 XConverterLib_Phys::XConverterLib_Phys()

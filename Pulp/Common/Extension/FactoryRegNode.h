@@ -1,7 +1,7 @@
 #pragma once
 
 
-struct IPotatoFactory;
+struct IEngineFactory;
 struct XRegFactoryNode;
 
 extern XRegFactoryNode* g_pHeadToRegFactories;
@@ -13,7 +13,7 @@ struct XRegFactoryNode
 	{
 	}
 
-	XRegFactoryNode(IPotatoFactory* pFactory) :
+	XRegFactoryNode(IEngineFactory* pFactory) :
 		pFactory(pFactory),
 		pNext(g_pHeadToRegFactories)
 	{
@@ -29,7 +29,7 @@ struct XRegFactoryNode
 	{
 	}
 
-	IPotatoFactory* pFactory;
+	IEngineFactory* pFactory;
 	XRegFactoryNode* pNext;
 };
 

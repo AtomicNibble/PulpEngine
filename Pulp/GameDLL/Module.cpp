@@ -66,7 +66,7 @@ class XEngineModule_Game : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Game);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Game);
 
 XEngineModule_Game::XEngineModule_Game()
 {

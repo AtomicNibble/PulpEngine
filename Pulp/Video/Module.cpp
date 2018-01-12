@@ -77,7 +77,7 @@ class XEngineModule_Video : public IEngineModule
 
 
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Video);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Video);
 
 XEngineModule_Video::XEngineModule_Video()
 {

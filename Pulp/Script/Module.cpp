@@ -77,7 +77,7 @@ class XEngineModule_Script : public IEngineModule
 
 
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Script);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Script);
 
 XEngineModule_Script::XEngineModule_Script()
 {

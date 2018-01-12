@@ -82,7 +82,7 @@ class XEngineModule_Sound : public IEngineModule
 
 
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Sound);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Sound);
 
 XEngineModule_Sound::XEngineModule_Sound()
 {

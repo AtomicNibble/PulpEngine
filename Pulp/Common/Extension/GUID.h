@@ -7,15 +7,15 @@
 
 #include <Platform\Types.h>
 
-struct PotatoGUID
+struct EngineGUID
 {
-	PotatoGUID();
-	PotatoGUID(uint32_t id, uint16_t id1, uint16_t id2,
+	EngineGUID();
+	EngineGUID(uint32_t id, uint16_t id1, uint16_t id2,
 		uint8_t byte_1, uint8_t byte_2, uint8_t byte_3, uint8_t byte_4, uint8_t byte_5, uint8_t byte_6, uint8_t byte_7, uint8_t byte_8);
 
-	inline bool operator==(const PotatoGUID& rhs) const;
-	inline bool operator!=(const PotatoGUID& rhs) const;
-	inline bool operator<(const PotatoGUID& rhs) const;
+	inline bool operator==(const EngineGUID& rhs) const;
+	inline bool operator!=(const EngineGUID& rhs) const;
+	inline bool operator<(const EngineGUID& rhs) const;
 
 
 	uint64_t hi;
@@ -23,7 +23,7 @@ struct PotatoGUID
 };
 
 
-inline PotatoGUID::PotatoGUID() :
+inline EngineGUID::EngineGUID() :
 	hi(0),
 	low(0)
 {
@@ -31,7 +31,7 @@ inline PotatoGUID::PotatoGUID() :
 }
 
 
-inline PotatoGUID::PotatoGUID(uint32_t id, uint16_t id1, uint16_t id2,
+inline EngineGUID::EngineGUID(uint32_t id, uint16_t id1, uint16_t id2,
 	uint8_t byte_1, uint8_t byte_2, uint8_t byte_3, uint8_t byte_4, uint8_t byte_5, uint8_t byte_6, uint8_t byte_7, uint8_t byte_8)
 {
 	hi = (static_cast<uint64_t>(id) << 32) | (static_cast<uint64_t>(id1) << 16 | static_cast<uint64_t>(id2));
@@ -53,17 +53,17 @@ inline PotatoGUID::PotatoGUID(uint32_t id, uint16_t id1, uint16_t id2,
 	low = as_int64;
 }
 
-inline bool PotatoGUID::operator==(const PotatoGUID& rhs) const
+inline bool EngineGUID::operator==(const EngineGUID& rhs) const
 {
 	return hi == rhs.hi && low == rhs.low;
 }
 
-inline bool PotatoGUID::operator!=(const PotatoGUID& rhs) const
+inline bool EngineGUID::operator!=(const EngineGUID& rhs) const
 {
 	return hi != rhs.hi || low != rhs.low;
 }
 
-inline bool PotatoGUID::operator<(const PotatoGUID& rhs) const
+inline bool EngineGUID::operator<(const EngineGUID& rhs) const
 {
 	return hi == rhs.hi ? (low < rhs.low) : (hi < rhs.hi);
 }

@@ -94,7 +94,7 @@ class XEngineModule_Input : public IEngineModule
 
 
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Input);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Input);
 
 XEngineModule_Input::XEngineModule_Input()
 {

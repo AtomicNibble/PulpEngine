@@ -93,7 +93,7 @@ class XEngineModule_Font : public IEngineModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XEngineModule_Font);
+X_ENGINE_REGISTER_CLASS(XEngineModule_Font);
 
 XEngineModule_Font::XEngineModule_Font()
 {

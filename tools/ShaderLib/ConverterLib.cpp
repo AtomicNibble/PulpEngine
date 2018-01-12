@@ -54,7 +54,7 @@ class XConverterLib_Shader : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Shader);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Shader);
 
 
 XConverterLib_Shader::XConverterLib_Shader()

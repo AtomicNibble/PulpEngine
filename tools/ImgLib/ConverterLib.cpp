@@ -52,7 +52,7 @@ class XConverterLib_Img : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Img);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Img);
 
 
 XConverterLib_Img::XConverterLib_Img()

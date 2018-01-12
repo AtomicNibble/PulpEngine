@@ -53,7 +53,7 @@ class XConverterLib_Model : public IConverterModule
 	}
 };
 
-X_POTATO_REGISTER_CLASS(XConverterLib_Model);
+X_ENGINE_REGISTER_CLASS(XConverterLib_Model);
 
 
 XConverterLib_Model::XConverterLib_Model()
