@@ -183,7 +183,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 // -----------------------------------------------------------------------
 
 TechDefState::TechDefState(core::MemoryArenaBase* arena) :
-	techs_(arena)
+	techs_(arena),
+	pTechSecDef_(nullptr)
 {
 	X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
 
