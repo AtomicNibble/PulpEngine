@@ -82,9 +82,10 @@ namespace bitUtil
 			{
 				static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
-				unsigned long index = 0;
 
 #if X_64
+				unsigned long index = 0;
+
 				const unsigned char result = _BitScanReverse64(&index, static_cast<uint64_t>(value));
 				if (result == 0) {
 					return NO_BIT_SET;
