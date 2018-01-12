@@ -170,43 +170,43 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 			a.sharedSystemMemory = desc.SharedSystemMemory;
 			a.software = (desc.Flags & DXGI_ADAPTER_FLAG_SOFTWARE) != 0;
 
-		// sort them?
-		std::sort(adapters_.begin(), adapters_.end(), [](const Adapter& lhs, const Adapter& rhs) {
-			return lhs.dedicatedvideoMemory > rhs.dedicatedvideoMemory;
-		});
+			// sort them?
+			std::sort(adapters_.begin(), adapters_.end(), [](const Adapter& lhs, const Adapter& rhs) {
+				return lhs.dedicatedvideoMemory > rhs.dedicatedvideoMemory;
+			});
 
-		for (size_t i=0; i<adapters_.size(); i++)
-		{
-			Adapter& a = adapters_[i];
-			if (a.software) {
-				continue;
-			}
-
-			if (DXGI_ERROR_NOT_FOUND == dxgiFactory->EnumAdapters1(static_cast<uint32_t>(i), &adapter)) {
-				X_FATAL("Dx12", "Adapater lookup failure");
-				continue;
-			}
-
-			hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
-			if (FAILED(hr)) {
-				X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %" PRIu32, a.deviceName.c_str(), hr);
-				continue;
-			}
-
-			adapterIdx_ = safe_static_cast<int32_t>(i);
-
-			X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)", a.deviceName.c_str(), a.dedicatedvideoMemory >> 20);
+			for (size_t i = 0; i < adapters_.size(); i++)
 			{
-				Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
-				adapter.As(&adapter3);
+				Adapter& a = adapters_[i];
+				if (a.software) {
+					continue;
+				}
 
-				X_ASSERT(pAdapter_ == nullptr, "pAdapter already valid")(pAdapter_);
-				pAdapter_ = adapter3.Detach();
+				if (DXGI_ERROR_NOT_FOUND == dxgiFactory->EnumAdapters1(static_cast<uint32_t>(i), &adapter)) {
+					X_FATAL("Dx12", "Adapater lookup failure");
+					continue;
+				}
+
+				hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
+				if (FAILED(hr)) {
+					X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %" PRIu32, a.deviceName.c_str(), hr);
+					continue;
+				}
+
+				adapterIdx_ = safe_static_cast<int32_t>(i);
+
+				X_LOG0("Dx12", "D3D12-capable hardware found: \"%ls\" (%u MB)", a.deviceName.c_str(), a.dedicatedvideoMemory >> 20);
+				{
+					Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
+					adapter.As(&adapter3);
+
+					X_ASSERT(pAdapter_ == nullptr, "pAdapter already valid")(pAdapter_);
+					pAdapter_ = adapter3.Detach();
+				}
+
+				break;
 			}
-
-			break;
 		}
-
 	}
 
 	if (!pDevice_) {
