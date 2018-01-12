@@ -38,9 +38,9 @@ core::MemoryArenaBase* g_3dEngineArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_3DEngine : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_3DEngine, "Engine_3DEngine",
 	0x99ba3725, 0xbfd1, 0x4950, 0xbc, 0xc4, 0xda, 0xe7, 0xce, 0x71, 0xef, 0xe6);
 
 

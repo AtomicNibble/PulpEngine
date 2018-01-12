@@ -223,14 +223,14 @@ public: \
 
 
 
-#define  X_POTATO_INTERFACE_SIMPLE(iname) \
+#define  X_ENGINE_INTERFACE_SIMPLE(iname) \
   X_POTATO_INTERFACE_BEGIN()             \
   X_POTATO_INTERFACE_ADD(iname)          \
   X_POTATO_INTERFACE_END()
 
 
 
-#define X_POTATO_GENERATE_SINGLETONCLASS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)\
+#define X_ENGINE_GENERATE_SINGLETONCLASS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)\
 	_POTATO_FACTORY_DECLARE_SINGLETON(classname) \
 	_POTATO_IMPLEMENT_IPOTATOUNKNOWN() \
 	_POTATO_ADD_MEMBERS(classname, cname, uuid_1, uuid_2, uuid_3, uuid_4, uuid_5,uuid_6,uuid_7,uuid_8,uuid_9,uuid_10,uuid_11)

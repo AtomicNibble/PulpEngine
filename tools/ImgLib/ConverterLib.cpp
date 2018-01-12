@@ -18,9 +18,9 @@ ImgLibArena* g_ImgLibArena = nullptr;
 
 class XConverterLib_Img : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Img, "Engine_ImgLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Img, "Engine_ImgLib",
 	0xdf24d6ac, 0x121c, 0x4c33, 0x8d, 0x59, 0xee, 0xc9, 0x30, 0xad, 0x36, 0x5f);
 
 

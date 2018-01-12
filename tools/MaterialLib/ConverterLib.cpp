@@ -19,9 +19,9 @@ MatLibArena* g_MatLibArena = nullptr;
 
 class XConverterLib_Material : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Material, "Engine_MaterialLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Material, "Engine_MaterialLib",
 	0x6d9a2569, 0xb55f, 0x4c76, 0x90, 0x85, 0x8e, 0x4e, 0x16, 0xac, 0xae, 0xeb);
 
 

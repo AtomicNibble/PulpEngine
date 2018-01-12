@@ -15,13 +15,13 @@ namespace {
 
 class XConverterLib_Phys : public IConverterModule
 {
-	// X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	// X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 	X_POTATO_INTERFACE_BEGIN()             
 	X_POTATO_INTERFACE_ADD(IConverterModule)
 	X_POTATO_INTERFACE_END()
 
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Phys, "Engine_PhysLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Phys, "Engine_PhysLib",
 		0x25f95d5f, 0xef87, 0x4b24, 0x95, 0xd2, 0x2b, 0xc, 0xb0, 0x76, 0xd5, 0x96);
 
 

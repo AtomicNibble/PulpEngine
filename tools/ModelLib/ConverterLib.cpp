@@ -19,9 +19,9 @@ ModelLibrena* g_ModelLibArena = nullptr;
 
 class XConverterLib_Model : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Model, "Engine_ModelLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Model, "Engine_ModelLib",
 	0x20a3b762, 0x30f5, 0x41d9, 0xb4, 0xad, 0xcb, 0x40, 0x2b, 0x2, 0xbd, 0x1b);
 
 

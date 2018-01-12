@@ -44,9 +44,9 @@ core::MemoryArenaBase* g_InputArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Input : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Input, "Engine_Input",	
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_Input, "Engine_Input",	
 	 0x334db037, 0xc459, 0x4b59, 0x9b, 0x3c, 0x3f, 0x59, 0x79, 0x2, 0x8c, 0x8d);
 
 

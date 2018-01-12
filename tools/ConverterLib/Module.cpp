@@ -12,9 +12,9 @@ X_USING_NAMESPACE;
 
 class XEngineModule_ConverterLib : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_ConverterLib, "Engine_ConverterLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_ConverterLib, "Engine_ConverterLib",
 	0x4283dc03, 0x903, 0x43d4, 0x8b, 0xf8, 0x38, 0x40, 0x14, 0xf, 0x8d, 0xe5);
 
 

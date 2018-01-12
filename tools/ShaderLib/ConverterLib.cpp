@@ -21,9 +21,9 @@ ShaderLibArena* g_ShaderLibArena = nullptr;
 
 class XConverterLib_Shader : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Shader, "Engine_ShaderLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Shader, "Engine_ShaderLib",
 	0xd5c97196, 0x6f7c, 0x4294, 0xa5, 0x19, 0xfb, 0x11, 0xf1, 0x1f, 0xfb, 0xc3);
 
 

@@ -24,9 +24,9 @@ core::MemoryArenaBase* g_PhysicsArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Physics : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Physics, "Engine_Physics",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_Physics, "Engine_Physics",
 	0xdd6730a7, 0x51f2, 0x42bc, 0x82, 0x71, 0xae, 0xe0, 0xc1, 0x85, 0xba, 0x71);
 
 

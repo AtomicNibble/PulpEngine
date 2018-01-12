@@ -18,9 +18,9 @@ WeaponLibArena* g_WeaponLibArena = nullptr;
 
 class XConverterLib_Weapon : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Weapon, "Engine_WeaponLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Weapon, "Engine_WeaponLib",
 		0x33ed9f6, 0xb67, 0x45a6, 0xa7, 0x5c, 0xaa, 0xfb, 0xe, 0xea, 0xf3, 0x3e);
 
 	virtual const char* GetName(void) X_OVERRIDE

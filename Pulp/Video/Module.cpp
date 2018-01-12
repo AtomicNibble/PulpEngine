@@ -41,9 +41,9 @@ core::MemoryArenaBase* g_VideoArena = nullptr;
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Video : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_Video, "Engine_Video",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_Video, "Engine_Video",
 		0xe659551d, 0x16dd, 0x4f84, 0xb3, 0xa1, 0x85, 0x99, 0x90, 0xf0, 0x73, 0x85);
 
 	//////////////////////////////////////////////////////////////////////////

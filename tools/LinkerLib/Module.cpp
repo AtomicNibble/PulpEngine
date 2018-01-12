@@ -12,9 +12,9 @@ X_USING_NAMESPACE;
 
 class XEngineModule_LinkerLib : public IEngineModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IEngineModule);
+	X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XEngineModule_LinkerLib, "Engine_LinkerLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XEngineModule_LinkerLib, "Engine_LinkerLib",
 		0x88ac2aa9, 0xcda5, 0x4d13, 0x87, 0x4, 0x9e, 0x6d, 0x8f, 0x2d, 0x9, 0xf2);
 
 

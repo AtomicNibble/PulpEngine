@@ -18,9 +18,9 @@ FontLibArena* g_FontLibArena = nullptr;
 
 class XConverterLib_Font : public IConverterModule
 {
-	X_POTATO_INTERFACE_SIMPLE(IConverterModule);
+	X_ENGINE_INTERFACE_SIMPLE(IConverterModule);
 
-	X_POTATO_GENERATE_SINGLETONCLASS(XConverterLib_Font, "Engine_FontLib",
+	X_ENGINE_GENERATE_SINGLETONCLASS(XConverterLib_Font, "Engine_FontLib",
 		0xd20a012, 0xcb88, 0x4531, 0x83, 0x32, 0xb9, 0x99, 0x8c, 0x3e, 0x87, 0x25);
 
 	virtual const char* GetName(void) X_OVERRIDE
