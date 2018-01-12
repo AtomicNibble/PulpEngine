@@ -36,6 +36,7 @@
 #define X_RETURN_ADDRESS()							_ReturnAddress()
 #define X_FORCE_SYMBOL_LINK(symbolName)				X_PRAGMA(comment(linker, X_PP_JOIN("/include:", symbolName)))
 #define X_LINK_LIB(libName)							X_PRAGMA(comment(lib, libName))
+#define X_LINK_ENGINE_LIB(libName)					X_PRAGMA(comment(lib, X_ENGINE_OUTPUT_PREFIX libName))
 #define X_MULTILINE_MACRO_BEGIN						X_DISABLE_WARNING(4127) do {
 #define X_MULTILINE_MACRO_END						} while (0) X_ENABLE_WARNING(4127)
 #define X_IMPORT									__declspec(dllimport)
