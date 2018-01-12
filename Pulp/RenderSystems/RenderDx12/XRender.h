@@ -84,11 +84,20 @@ class XRender : public IRender
 		{
 			cbRootIdxBase = std::numeric_limits<decltype(cbRootIdxBase)>::max();
 			bufferRootIdxBase = std::numeric_limits<decltype(cbRootIdxBase)>::max();
+
+#if PSO_HOT_RELOAD
+			pPerm = nullptr;
+#endif // !PSO_HOT_RELOAD
 		}
 
 #if DEVICE_STATE_STORE_CPU_DESC
 		StateDesc cpuDesc;
 #endif // !DEVICE_STATE_STORE_CPU_DESC
+
+#if PSO_HOT_RELOAD
+		const PassState* pPassState;
+		const shader::IShaderPermatation* pPerm;
+#endif // !PSO_HOT_RELOAD
 
 		RootSignature rootSig; // dam rootsig is a chunky fucker.
 		ID3D12PipelineState* pPso;
@@ -179,6 +188,10 @@ class XRender : public IRender
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> StatePoolArena;
 
+	template<typename T>
+	using ExpaningArr = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
+
+	typedef ExpaningArr<DeviceState*> DeviceStateArr;
 
 public:
 	XRender(core::MemoryArenaBase* arena);
@@ -227,6 +240,8 @@ public:
 
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
 	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
+	bool updateStateState(DeviceState* pState);
+
 
 	// Release
 	void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;
@@ -325,6 +340,9 @@ private:
 	int32_t adapterIdx_;
 	AdapterArr adapters_;
 
+#if PSO_HOT_RELOAD
+	DeviceStateArr deviceStates_;
+#endif // !PSO_HOT_RELOAD
 
 #if RENDER_STATS
 	Stats stats_;

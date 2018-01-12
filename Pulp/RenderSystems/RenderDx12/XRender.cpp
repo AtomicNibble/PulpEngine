@@ -54,6 +54,10 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 		StatePoolArena::getMemoryOffsetRequirement()
 	),
 	statePool_(&statePoolAllocator_, "StatePool")
+
+#if PSO_HOT_RELOAD
+	, deviceStates_(arena)
+#endif // !PSO_HOT_RELOAD
 {	
 	core::zero_object(pDisplayPlanes_);
 
@@ -172,10 +176,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		}
 
 		// sort them?
+#if 0
 		std::sort(adapters_.begin(), adapters_.end(), [](const Adapter& lhs, const Adapter& rhs) {
 			return lhs.dedicatedvideoMemory > rhs.dedicatedvideoMemory;
 		});
-			
+#endif		
 
 		for (size_t i = 0; i < adapters_.size(); i++)
 		{
@@ -462,6 +467,25 @@ void XRender::release(void)
 
 void XRender::renderBegin(void)
 {
+
+#if PSO_HOT_RELOAD
+	
+	// forgive me.
+	for (auto* pState : deviceStates_)
+	{
+		const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
+
+		if (!perm.isCompiled())
+		{
+			// would be nice if we only did this loop 
+			// if a shader ws recently invalidated which i think we can do.
+			updateStateState(pState);
+		}
+	}
+
+#endif // !PSO_HOT_RELOAD
+
+
 #if RENDER_STATS
 	core::atomic::Exchange(&stats_.numBatches, 0);
 	core::atomic::Exchange(&stats_.numDrawCall, 0);
@@ -1300,6 +1324,35 @@ D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderStageFlags sta
 	}
 }
 
+bool XRender::updateStateState(DeviceState* pState)
+{
+	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
+	const PassState* pPassState = pState->pPassState;
+	const StateDesc& desc = pState->cpuDesc;
+	const RootSignature& rootSig = pState->rootSig;
+
+	// shaders only for now?
+	if (perm.isCompiled()) {
+		return false;
+	}
+
+	// need to compile the shaders.
+	if (!pShaderMan_->compilePermatation(const_cast<shader::IShaderPermatation*>(pState->pPerm))) {
+		return false;
+	}
+
+	// new PSO BOI !
+	GraphicsPSO pso;
+
+	if (!buildPSO(pso, pPassState, desc, rootSig, perm)) {
+		return false;
+	}
+
+	pState->pPso = pso.getPipelineStateObject();
+	return true;
+}
+
+
 StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
 	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
 {
@@ -1311,8 +1364,12 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pPerm);
 
 	if (!perm.isCompiled()) {
+
+		// this could of happend if we hot reloaded the shader.
+		
 		return INVALID_STATE_HANLDE;
 	}
+
 	if (perm.getILFmt() != shader::Util::ILfromVertexFormat(desc.vertexFmt)) {
 		X_ERROR("Dx12", "Hardware tech's input layout does not match state description \"%s\" -> %s",
 			shader::InputLayoutFormat::ToString(perm.getILFmt()),
@@ -1346,6 +1403,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	pState->cpuDesc = desc;
 #endif // !DEVICE_STATE_STORE_CPU_DESC
 
+#if PSO_HOT_RELOAD
+	pState->pPassState = pPassState;
+	pState->pPerm = pPerm;
+#endif // !PSO_HOT_RELOAD
 
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
@@ -1485,8 +1546,31 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
 #endif // !RENDER_STATS
 
+#if PSO_HOT_RELOAD
+	deviceStates_.push_back(pState);
+#endif // !PSO_HOT_RELOAD
+
 	return reinterpret_cast<StateHandle>(pState);
 }
+
+void XRender::destoryState(StateHandle handle)
+{
+	// this implies you are not checking they are valid when creating, which you should!
+	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
+
+	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
+
+#if PSO_HOT_RELOAD
+	deviceStates_.remove(pState);
+#endif // !PSO_HOT_RELOAD
+
+#if RENDER_STATS
+	--stats_.numStates;
+#endif // !RENDER_STATS
+
+	X_DELETE(pState, &statePool_);
+}
+
 
 bool XRender::buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 	const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm)
@@ -1583,20 +1667,6 @@ bool XRender::buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 	}
 
 	return true;
-}
-
-void XRender::destoryState(StateHandle handle)
-{
-	// this implies you are not checking they are valid when creating, which you should!
-	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
-
-	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
-
-#if RENDER_STATS
-	--stats_.numStates;
-#endif // !RENDER_STATS
-
-	X_DELETE(pState, &statePool_);
 }
 
 
