@@ -217,8 +217,6 @@ public:
 	X_INLINE const KeyArr& getKeys(void);
 
 private:
-	core::AtomicInt current_;	
-
 	// offset and coutns for each thread adding commands
 	X_ALIGNED_SYMBOL(AlignedIntArr, 64) threadSlotsInfo_;
 
