@@ -194,9 +194,6 @@ namespace JPG
 		struct my_error_mgr jerr;
 		struct jpeg_xfile_src_mgr file_reader;
 
-		JSAMPROW* row_pointer;
-		uint32_t row_stride, inflated_size;
-
 		core::zero_object(cinfo);
 
 		cinfo.err = jpeg_std_error(&jerr.pub);
@@ -233,10 +230,11 @@ namespace JPG
 			longjmp(jerr.setjmp_buffer, 1);
 		}
 
-		inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
-		row_stride = cinfo.output_width * cinfo.output_components;
-		row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
+		uint32_t inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
+		uint32_t row_stride = cinfo.output_width * cinfo.output_components;
+		JSAMPROW* row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
+		X_UNUSED(inflated_size);
 
 		if (cinfo.out_color_space != JCS_RGB)
 		{
