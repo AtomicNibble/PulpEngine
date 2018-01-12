@@ -18,12 +18,12 @@
 
 #ifdef X_LIB
 
-X_LINK_LIB("engine_ModelLib")
-X_LINK_LIB("engine_AnimLib")
-X_LINK_LIB("engine_ImgLib")
-X_LINK_LIB("engine_MaterialLib")
-X_LINK_LIB("engine_WeaponLib")
-X_LINK_LIB("engine_FontLib")
+X_LINK_ENGINE_LIB("ModelLib")
+X_LINK_ENGINE_LIB("AnimLib")
+X_LINK_ENGINE_LIB("ImgLib")
+X_LINK_ENGINE_LIB("MaterialLib")
+X_LINK_ENGINE_LIB("WeaponLib")
+X_LINK_ENGINE_LIB("FontLib")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Model");
 X_FORCE_LINK_FACTORY("XConverterLib_Anim");

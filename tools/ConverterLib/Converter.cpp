@@ -17,7 +17,7 @@
 #include <Time\StopWatch.h>
 
 // need assetDB.
-X_LINK_LIB("engine_AssetDb")
+X_LINK_ENGINE_LIB("AssetDb")
 
 X_NAMESPACE_BEGIN(converter)
 

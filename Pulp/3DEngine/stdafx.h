@@ -29,10 +29,10 @@
 // Model Lib
 #include <../../tools/ModelLib/ModelLib.h>
 
-X_LINK_LIB("engine_ImgLib");
-X_LINK_LIB("engine_MaterialLib");
-X_LINK_LIB("engine_ModelLib");
-X_LINK_LIB("engine_AnimLib");
+X_LINK_ENGINE_LIB("ImgLib");
+X_LINK_ENGINE_LIB("MaterialLib");
+X_LINK_ENGINE_LIB("ModelLib");
+X_LINK_ENGINE_LIB("AnimLib");
 
 
 extern core::MemoryArenaBase* g_3dEngineArena;

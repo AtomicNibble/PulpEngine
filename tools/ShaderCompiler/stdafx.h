@@ -10,5 +10,5 @@
 #include <../MaterialLib/MatLib.h>
 #include <../ShaderLib/ShaderLib.h>
 
-X_LINK_LIB("engine_MaterialLib")
-X_LINK_LIB("engine_ShaderLib")
+X_LINK_ENGINE_LIB("MaterialLib")
+X_LINK_ENGINE_LIB("ShaderLib")

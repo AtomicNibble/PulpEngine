@@ -54,4 +54,4 @@ extern FontArena* g_fontArena;
 #include <../../tools/FontLib/FontLib.h>
 
 
-X_LINK_LIB("engine_FontLib");
+X_LINK_ENGINE_LIB("FontLib");

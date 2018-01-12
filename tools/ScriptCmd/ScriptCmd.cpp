@@ -14,7 +14,7 @@
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
-X_LINK_LIB("engine_Core")
+X_LINK_ENGINE_LIB("Core")
 
 #endif // !X_LIB
 

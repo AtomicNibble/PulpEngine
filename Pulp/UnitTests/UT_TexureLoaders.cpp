@@ -7,7 +7,7 @@
 
 #include <../../tools/ImgLib/ImgLib.h>
 
-X_LINK_LIB("engine_ImgLib")
+X_LINK_ENGINE_LIB("ImgLib")
 
 
 X_USING_NAMESPACE;

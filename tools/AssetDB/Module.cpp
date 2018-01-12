@@ -10,7 +10,7 @@
 X_USING_NAMESPACE;
 
 
-X_LINK_LIB("engine_SqLite")
+X_LINK_ENGINE_LIB("SqLite")
 
 #ifdef X_LIB
 

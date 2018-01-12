@@ -38,8 +38,8 @@ X_LINK_LIB("d3dcompiler.lib")
 #include <../../tools/ShaderLib/ShaderLib.h>
 
 
-X_LINK_LIB("engine_ImgLib");
-X_LINK_LIB("engine_ShaderLib");
+X_LINK_ENGINE_LIB("ImgLib");
+X_LINK_ENGINE_LIB("ShaderLib");
 
 X_NAMESPACE_BEGIN(render)
 

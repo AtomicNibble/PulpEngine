@@ -14,16 +14,16 @@
 #include <IAnimation.h>
 
 #include <../ConverterLib/ConverterLib.h>
-X_LINK_LIB("engine_ConverterLib")
-X_LINK_LIB("engine_assetDB")
+X_LINK_ENGINE_LIB("ConverterLib")
+X_LINK_ENGINE_LIB("assetDB")
 
 
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
-X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_RenderNull")
+X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("RenderNull")
 
 
 X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");

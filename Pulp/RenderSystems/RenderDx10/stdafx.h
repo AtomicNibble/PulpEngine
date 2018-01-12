@@ -33,7 +33,7 @@ X_ENABLE_WARNING(4005)
 // Img Lib
 #include <../../tools/ImgLib/ImgLib.h>
 
-X_LINK_LIB("engine_ImgLib");
+X_LINK_ENGINE_LIB("ImgLib");
 
 extern core::MemoryArenaBase* g_rendererArena;
 extern core::MemoryArenaBase* g_textureDataArena;

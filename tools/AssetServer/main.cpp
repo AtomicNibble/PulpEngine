@@ -10,8 +10,8 @@
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
-X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_RenderNull")
+X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("RenderNull")
 
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@@0V12@A")
 // X_FORCE_LINK_FACTORY("XEngineModule_Render")
