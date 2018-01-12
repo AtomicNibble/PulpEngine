@@ -974,12 +974,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		&& !streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
 		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B;
 	}
-	else if (streamsFlags.IsSet(model::StreamType::NORMALS)
+	else if (streamsFlags.IsSet(model::StreamType::COLOR)
 		&& streamsFlags.IsSet(model::StreamType::NORMALS)
 		&& !streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
 		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B_N3F;
 	}
-	else if (streamsFlags.IsSet(model::StreamType::TANGENT_BI)
+	else if (streamsFlags.IsSet(model::StreamType::COLOR)
 		&& streamsFlags.IsSet(model::StreamType::NORMALS)
 		&& streamsFlags.IsSet(model::StreamType::TANGENT_BI)) {
 		header.vertexFmt = render::shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F;
