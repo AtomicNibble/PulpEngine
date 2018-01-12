@@ -45,8 +45,9 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 	core::abortHandler::Startup();
 #endif // !X_NO_DEBUG_HANDLERS
 
-	if (gEnv) // Already registered.
+	if (gEnv) { // Already registered.
 		return;
+	}
 
 	if (pCore) {
 		gEnv = pCore->GetGlobalEnv();
