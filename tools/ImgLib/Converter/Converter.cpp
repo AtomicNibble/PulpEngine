@@ -594,7 +594,7 @@ namespace Converter
 
 					X_ASSERT((rowsPerJob % 4) == 0, "Rows to process should be multiple of 4")(rowsPerJob);
 
-					if (!core::bitUtil::IsPowerOfTwo(inputImg.height) || !core::bitUtil::IsPowerOfTwo(inputImg.height)) {
+					if (!core::bitUtil::IsPowerOfTwo(inputImg.height) || !core::bitUtil::IsPowerOfTwo(inputImg.width)) {
 						X_ASSERT_NOT_IMPLEMENTED();
 					}
 
