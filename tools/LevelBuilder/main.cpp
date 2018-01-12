@@ -38,17 +38,17 @@ namespace
 
 } // namespace
 
-X_LINK_LIB("engine_MaterialLib");
-X_LINK_LIB("engine_ModelLib");
-X_LINK_LIB("engine_Physics");
+X_LINK_ENGINE_LIB("MaterialLib");
+X_LINK_ENGINE_LIB("ModelLib");
+X_LINK_ENGINE_LIB("Physics");
 
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
-// X_LINK_LIB("engine_Font")
-X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_RenderNull")
-X_LINK_LIB("engine_Physics");
+// X_LINK_ENGINE_LIB("Font")
+X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("RenderNull")
+X_LINK_ENGINE_LIB("Physics");
 
 X_FORCE_LINK_FACTORY("XConverterLib_Material")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")

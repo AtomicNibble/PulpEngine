@@ -18,18 +18,18 @@
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
-X_LINK_LIB("engine_Input")
-X_LINK_LIB("engine_Font")
-X_LINK_LIB("engine_Core")
-X_LINK_LIB("engine_Script")
-X_LINK_LIB("engine_Sound")
-//X_LINK_LIB("engine_RenderDx10")
-X_LINK_LIB("engine_RenderDx12")
-X_LINK_LIB("engine_3DEngine")
-X_LINK_LIB("engine_Physics")
-X_LINK_LIB("engine_GameDLL")
-X_LINK_LIB("engine_Network")
-X_LINK_LIB("engine_Video")
+X_LINK_ENGINE_LIB("Input")
+X_LINK_ENGINE_LIB("Font")
+X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("Script")
+X_LINK_ENGINE_LIB("Sound")
+//X_LINK_ENGINE_LIB("RenderDx10")
+X_LINK_ENGINE_LIB("RenderDx12")
+X_LINK_ENGINE_LIB("3DEngine")
+X_LINK_ENGINE_LIB("Physics")
+X_LINK_ENGINE_LIB("GameDLL")
+X_LINK_ENGINE_LIB("Network")
+X_LINK_ENGINE_LIB("Video")
 
 X_FORCE_LINK_FACTORY("XEngineModule_Input")
 X_FORCE_LINK_FACTORY("XEngineModule_Font")
@@ -45,10 +45,10 @@ X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSinglet
 // X_FORCE_SYMBOL_LINK("?factory__@XFactory@XEngineModule_Render@render@Potato@@0V1234@A");
 
 // some libs that w link against.
-X_LINK_LIB("engine_ImgLib")
-X_LINK_LIB("engine_ShaderLib")
-X_LINK_LIB("engine_ModelLib")
-X_LINK_LIB("engine_AnimLib")
+X_LINK_ENGINE_LIB("ImgLib")
+X_LINK_ENGINE_LIB("ShaderLib")
+X_LINK_ENGINE_LIB("ModelLib")
+X_LINK_ENGINE_LIB("AnimLib")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Img")
 X_FORCE_LINK_FACTORY("XConverterLib_Shader")
