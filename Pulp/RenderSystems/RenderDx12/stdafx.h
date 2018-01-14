@@ -22,6 +22,7 @@ X_DISABLE_WARNING(4005)
 X_ENABLE_WARNING(4005)
 
 #include "Util/Config.h"
+#include "Util/ErrorStr.h"
 #include "Util/Types.h"
 #include "Util/Constants.h"
 #include "Util/DxTypeHelpers.h"

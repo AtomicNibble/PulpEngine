@@ -480,6 +480,7 @@
     <ClInclude Include="Util\Constants.h" />
     <ClInclude Include="Util\DebugNameUtil.h" />
     <ClInclude Include="Util\DxTypeHelpers.h" />
+    <ClInclude Include="Util\ErrorStr.h" />
     <ClInclude Include="Util\StateHelpers.h" />
     <ClInclude Include="Util\Types.h" />
     <ClInclude Include="Vars\RenderVars.h" />
@@ -525,6 +526,7 @@
     <ClCompile Include="Texture\TextureManager.cpp" />
     <ClCompile Include="Texture\TextureUtil.cpp" />
     <ClCompile Include="Texture\TextureVars.cpp" />
+    <ClCompile Include="Util\ErrorStr.cpp" />
     <ClCompile Include="Util\StateHelpers.cpp" />
     <ClCompile Include="Vars\RenderVars.cpp" />
     <ClCompile Include="XRender.cpp" />
