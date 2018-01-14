@@ -76,7 +76,8 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
 	{
 		HRESULT hr = pDevice_->CreateGraphicsPipelineState(&gpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
-			X_ERROR("Dx12", "Failed to create graphics PSO: %" PRIi32, hr);
+			Error::Description Dsc;
+			X_ERROR("Dx12", "Failed to create graphics PSO: %s", Error::ToString(hr, Dsc));
 			
 			// so other threads waiting can find out that this failed.
 			*pPSORef = reinterpret_cast<ID3D12PipelineState*>(INVALID_PSO);
@@ -132,7 +133,8 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 	{
 		HRESULT hr = pDevice_->CreateComputePipelineState(&cpsoDesc, IID_PPV_ARGS(pPSO));
 		if (FAILED(hr)) {
-			X_FATAL("Dx12", "Failed to create compute PSO: %" PRIi32, hr);
+			Error::Description Dsc;
+			X_FATAL("Dx12", "Failed to create compute PSO: %s", Error::ToString(hr, Dsc));
 			*pPSORef = reinterpret_cast<ID3D12PipelineState *>(-1);
 			return false;
 		}

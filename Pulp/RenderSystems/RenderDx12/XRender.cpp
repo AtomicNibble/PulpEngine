@@ -128,6 +128,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 	HRESULT hr;
 
+	Error::Description Dsc;
+
 #if X_DEBUG && 1
 	// force enable debug layer.
 #else
@@ -139,7 +141,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		Microsoft::WRL::ComPtr<ID3D12Debug> debugInterface;
 		hr = D3D12GetDebugInterface(IID_PPV_ARGS(&debugInterface));
 		if (FAILED(hr)) {
-			X_ERROR("Dx12", "Failed to CreateDevice: 0x%x", hr);
+			X_ERROR("Dx12", "Failed to CreateDevice: %s", Error::ToString(hr, Dsc));
 			return false;
 		}
 
@@ -152,7 +154,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	hr = CreateDXGIFactory2(0, IID_PPV_ARGS(&dxgiFactory));
 
 	if (FAILED(hr)) {
-		X_ERROR("Dx12", "Failed to create DXGI Factory");
+		X_ERROR("Dx12", "Failed to create DXGI Factory %s", Error::ToString(hr, Dsc));
 		return false;
 	}
 
@@ -196,7 +198,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 			hr = D3D12CreateDevice(adapter.Get(), D3D_FEATURE_LEVEL_11_0, IID_PPV_ARGS(&pDevice_));
 			if (FAILED(hr)) {
-				X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %" PRIu32, a.deviceName.c_str(), hr);
+				X_WARNING("Dx12", "Failed to create device for adpater: \"%s\" res: %s", a.deviceName.c_str(), Error::ToString(hr, Dsc));
 				continue;
 			}
 
@@ -217,7 +219,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	}
 
 	if (!pDevice_) {
-		X_ERROR("Dx12", "Failed to CreateDevice: %" PRIu32, hr);
+		X_ERROR("Dx12", "Failed to CreateDevice: %s", Error::ToString(hr, Dsc));
 		return false;
 	}
 
@@ -254,7 +256,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 			hr = pInfoQueue->PushStorageFilter(&NewFilter);
 			if (FAILED(hr)) {
-				X_ERROR("Dx12", "failed to push storage filter: %" PRId32, hr);
+				X_ERROR("Dx12", "failed to push storage filter: %s", Error::ToString(hr, Dsc));
 			}
 
 			pInfoQueue->Release();
@@ -327,7 +329,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 	hr = dxgiFactory->CreateSwapChainForHwnd(cmdListManager_.getCommandQueue(), hWnd,
 		&swapChainDesc, nullptr, nullptr, &swapChain);
 	if (FAILED(hr)) {
-		X_ERROR("Dx12", "failed to create swap chain: %" PRId32, hr);
+		X_ERROR("Dx12", "failed to create swap chain: %s", Error::ToString(hr, Dsc));
 		return false;
 	}
 
@@ -343,7 +345,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 		Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
 		hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&displayPlane));
 		if (FAILED(hr)) {
-			X_ERROR("Dx12", "failed to get swap chain buffer: %" PRId32, hr);
+			X_ERROR("Dx12", "failed to get swap chain buffer: %s", Error::ToString(hr, Dsc));
 			return false;
 		}
 
@@ -544,7 +546,8 @@ void XRender::renderEnd(void)
 
 	HRESULT hr = pSwapChain_->Present(0, 0);
 	if (FAILED(hr)) {
-		X_ERROR("Dx12", "Present failed. err: %" PRIu32, hr);
+		Error::Description Dsc;
+		X_ERROR("Dx12", "Present failed. err: %s", Error::ToString(hr, Dsc));
 	}
 
 	currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
@@ -2033,7 +2036,8 @@ bool XRender::resize(uint32_t width, uint32_t height)
 		ID3D12Resource* pDisplayPlane;
 		HRESULT hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&pDisplayPlane));
 		if (FAILED(hr)) {
-			X_ERROR("Dx12", "failed to get swap chain buffer: %" PRId32, hr);
+			Error::Description Dsc;
+			X_ERROR("Dx12", "Failed to get swap chain buffer: %s", Error::ToString(hr, Dsc));
 			return false;
 		}
 
@@ -2124,9 +2128,9 @@ void XRender::populateFeatureInfo(void)
 		D3D12_FEATURE_DATA_ARCHITECTURE archFeature;
 		archFeature.NodeIndex = 0;
 		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_ARCHITECTURE, &archFeature, sizeof(archFeature));
-		if (FAILED(hr))
-		{
-			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+		if (FAILED(hr)) {
+			Error::Description Dsc;
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %s", Error::ToString(hr, Dsc));
 			return;
 		}
 
@@ -2148,9 +2152,9 @@ void XRender::populateFeatureInfo(void)
 		featureLevels.pFeatureLevelsRequested = FeatureLevelsList;
 
 		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_FEATURE_LEVELS, &featureLevels, sizeof(featureLevels));
-		if (FAILED(hr))
-		{
-			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+		if (FAILED(hr)) {
+			Error::Description Dsc;
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %s", Error::ToString(hr, Dsc));
 			return;
 		}
 
@@ -2160,9 +2164,9 @@ void XRender::populateFeatureInfo(void)
 	{
 		D3D12_FEATURE_DATA_D3D12_OPTIONS options;
 		auto hr = pDevice_->CheckFeatureSupport(D3D12_FEATURE_D3D12_OPTIONS, &options, sizeof(options));
-		if (FAILED(hr))
-		{
-			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %" PRIu32, hr);
+		if (FAILED(hr)) {
+			Error::Description Dsc;
+			X_ERROR("Dx12", "CheckFeatureSupport failed. err: %s", Error::ToString(hr, Dsc));
 			return;
 		}
 
