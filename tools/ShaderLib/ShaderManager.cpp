@@ -448,14 +448,17 @@ namespace shader
 		{
 			const auto* pShader = it;
 
-			const char* pFmt = "Name: ^2\"%s\"^7 Status: ^2%s^7 Type: ^2%s^7 IL: ^2%s^7 NumInst: ^2%" PRIi32 "^7 Refs: ^2%" PRIi32
+			const char* pFmt = "Name: ^2\"%s\"^7 Status: ^2%s^7 Type: ^2%s^7 IL: ^2%s^7 NumInst: ^2%" PRIi32 
+				"^7 Refs: ^2%" PRIi32
+				"^7 CompCnt: ^2%" PRIi32;
+
+			int32_t compileCount = -1;
+
 #if X_ENABLE_RENDER_SHADER_RELOAD
-				"^7 CompileCnt: ^2%" PRIi32
+			compileCount = pShader->getCompileCount();
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
-			;
 
 			// little ugly as can't #if def inside macro call.
-#if X_ENABLE_RENDER_SHADER_RELOAD
 			X_LOG0("Shader", pFmt,
 				pShader->getName().c_str(),
 				ShaderStatus::ToString(pShader->getStatus()),
@@ -463,18 +466,9 @@ namespace shader
 				InputLayoutFormat::ToString(pShader->getILFormat()),
 				pShader->getNumInstructions(),
 				pShader->getRefCount(),
-				pShader->getCompileCount()
+				compileCount
 			);
-#else
-			X_LOG0("Shader", pFmt,
-				pShader->getName().c_str(),
-				ShaderStatus::ToString(pShader->getStatus()),
-				ShaderType::ToString(pShader->getType()),
-				InputLayoutFormat::ToString(pShader->getILFormat()),
-				pShader->getNumInstructions(),
-				pShader->getRefCount()
-			);
-#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+
 		}
 		X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
 	}
