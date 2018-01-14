@@ -52,6 +52,7 @@ namespace shader
 		X_INLINE ParamType::Enum getType(void) const;
 		X_INLINE ParamFlags getFlags(void) const;
 		X_INLINE int16_t getBindPoint(void) const;
+		X_INLINE int16_t getBindOffset(void) const;
 		X_INLINE int16_t getNumVecs(void) const;
 
 

@@ -74,6 +74,11 @@ namespace shader
 		return bindPoint_;
 	}
 
+	X_INLINE int16_t XShaderParam::getBindOffset(void) const
+	{
+		return bindPoint_ * 16;
+	}
+
 	X_INLINE int16_t XShaderParam::getNumVecs(void) const
 	{
 		return numParameters_;
