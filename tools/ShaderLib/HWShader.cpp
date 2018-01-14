@@ -3,6 +3,7 @@
 #include "HWShader.h"
 #include "ShaderUtil.h"
 #include "ShaderBin.h"
+#include "ShaderVars.h"
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -22,10 +23,11 @@ namespace shader
 
 	  // -------------------------------------------------------------------
 
-	XHWShader::XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
+	XHWShader::XHWShader(const ShaderVars& vars, ShaderType::Enum type, const core::string& name,
 		const core::string& entry, const core::string& customDefines,
-		SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags) :
-		name_(pName),
+		SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena) :
+		vars_(vars),
+		name_(name),
 		pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
 		entryPoint_(entry),
 		customDefines_(customDefines),

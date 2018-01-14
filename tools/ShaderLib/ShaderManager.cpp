@@ -397,14 +397,15 @@ namespace shader
 
 		pHWShaderRes = hwShaders_.createAsset(
 			nameStr, 
-			arena_, 
+			vars_,
 			type,
-			name.c_str(), 
+			nameStr, 
 			entry, 
 			customDefines,
 			pSourceFile,
 			permFlags,
-			ILFlags
+			ILFlags,
+			arena_
 		);
 
 		return pHWShaderRes;

@@ -31,6 +31,7 @@ namespace shader
 
 	class ShaderBin;
 	class SourceFile;
+	class ShaderVars;
 
 	X_ALIGNED_SYMBOL(class XHWShader, 64) : public IHWShader
 	{
@@ -46,9 +47,9 @@ namespace shader
 		typedef core::Spinlock LockType;
 
 	public:
-		SHADERLIB_EXPORT XHWShader(core::MemoryArenaBase* arena, ShaderType::Enum type, const char* pName, 
+		SHADERLIB_EXPORT XHWShader(const ShaderVars& vars, ShaderType::Enum type, const core::string& name,
 			const core::string& entry, const core::string& customDefines,
-			SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags);
+			SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena);
 		SHADERLIB_EXPORT ~XHWShader();
 
 		X_INLINE const int32_t getID(void) const;
@@ -100,6 +101,8 @@ namespace shader
 	protected:
 		LockType lock_;
 		
+		const ShaderVars& vars_;
+
 		core::string name_;
 		core::string entryPoint_;
 		core::string customDefines_;
