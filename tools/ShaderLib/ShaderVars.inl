@@ -19,16 +19,15 @@ namespace shader
 		return writeMergedSource_ != 0;
 	}
 
-//	X_INLINE bool ShaderVars::asyncCompile(void) const
-//	{
-//		return asyncShaderCompile_ != 0;
-//	}
-
 	X_INLINE bool ShaderVars::helpWithWorkOnShaderStall(void) const
 	{
 		return helpWithWorkOnShaderStall_ != 0;
 	}
 
+	X_INLINE bool ShaderVars::compileDebug(void) const
+	{
+		return compileDebug_ != 0;
+	}
 
 	X_INLINE void ShaderVars::setUseCache(bool use)
 	{

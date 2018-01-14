@@ -15,7 +15,7 @@ namespace shader
 		useCache_ = 1;
 		writeCompiledShaders_ = 1;
 		writeMergedSource_ = 1;
-	//	asyncShaderCompile_ = 1;
+		compileDebug_ = 0;
 		helpWithWorkOnShaderStall_ = 1;
 	}
 
@@ -37,6 +37,10 @@ namespace shader
 		ADD_CVAR_REF("shader_stall_help_with_work", helpWithWorkOnShaderStall_, helpWithWorkOnShaderStall_, 0, 1,
 			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 			"When waiting for another thread to finish compiling a shader, help process worker jobs");
+
+		ADD_CVAR_REF("shader_compileDebug", compileDebug_, compileDebug_, 0, 1,
+			core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+			"Shader compile debug logging");
 	}
 
 } // namespace shader
