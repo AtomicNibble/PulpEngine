@@ -72,6 +72,14 @@ namespace shader
 		return compileFlags_;
 	}
 
+#if X_ENABLE_RENDER_SHADER_RELOAD
+
+	X_INLINE int32_t XHWShader::getCompileCount(void) const
+	{
+		return compileCount_;
+	}
+
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 
 	X_INLINE bool XHWShader::isValid(void) const
 	{

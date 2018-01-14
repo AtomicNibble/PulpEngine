@@ -72,6 +72,9 @@ namespace shader
 		X_INLINE int32_t getNumInputParams(void) const;
 		X_INLINE int32_t getNumInstructions(void) const;
 		X_INLINE CompileFlags getCompileFlags(void) const;
+#if X_ENABLE_RENDER_SHADER_RELOAD
+		X_INLINE int32_t getCompileCount(void) const;
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 
 		X_INLINE ShaderStatus::Enum getStatus(void) const;
 		X_INLINE bool isValid(void) const;
@@ -108,6 +111,9 @@ namespace shader
 		core::string customDefines_;
 
 		int32_t id_;
+#if X_ENABLE_RENDER_SHADER_RELOAD
+		int32_t compileCount_;
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 
 		SourceFile* pSourceFile_;
 
