@@ -444,6 +444,12 @@ namespace shader
 					bind.setType(pEntry->type);
 					bind.setUpdateRate(pEntry->updateRate);
 
+					if (vars_.compileDebug())
+					{
+						X_LOG0("Shader", "input var \"%s\" type: \"%s\" bindPoint: ^6%" PRIi16,
+							CDesc.Name, ParamType::ToString(pEntry->type), bind.getBindPoint());
+					}
+
 					if (pEntry->flags.IsSet(ParamFlag::MATRIX))
 					{
 						if (CTDesc.Class != D3D_SVC_MATRIX_COLUMNS && CTDesc.Class != D3D_SVC_MATRIX_ROWS)
@@ -479,7 +485,6 @@ namespace shader
 						return false;
 					}
 				}
-
 
 				cbuf.addParam(std::move(bind));
 			}
