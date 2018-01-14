@@ -24,6 +24,12 @@
     <Filter Include="Source Files\Manager">
       <UniqueIdentifier>{db0b9cf8-c582-472f-9985-038abd44b7e0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{03b35a77-cec7-4e1e-b25e-37625a740dda}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{28b52e0c-a86f-496b-9782-b28f5d9005fb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -60,7 +66,7 @@
       <Filter>Header Files\Manager</Filter>
     </ClInclude>
     <ClInclude Include="ShaderVars.h">
-      <Filter>Header Files\Manager</Filter>
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -98,7 +104,7 @@
       <Filter>Source Files\Manager</Filter>
     </ClCompile>
     <ClCompile Include="ShaderVars.cpp">
-      <Filter>Source Files\Manager</Filter>
+      <Filter>Source Files\Vars</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -114,14 +120,14 @@
     <None Include="ShaderPermatation.inl">
       <Filter>Header Files\Manager</Filter>
     </None>
-    <None Include="ShaderVars.inl">
-      <Filter>Header Files\Manager</Filter>
-    </None>
     <None Include="ShaderManager.inl">
       <Filter>Header Files\Manager</Filter>
     </None>
     <None Include="ShaderBin.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="ShaderVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>
