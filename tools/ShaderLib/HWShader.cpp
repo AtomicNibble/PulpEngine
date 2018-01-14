@@ -219,10 +219,13 @@ namespace shader
 			}
 		}
 
-		// log the macros
-		for (const auto& macro : macros)
+		if (vars_.compileDebug())
 		{
-			X_LOG0("Shader", "(%" PRIu32 ") Macro: name: \"%s\" value: \"%s\"", id, macro.Name, macro.Definition);
+			// log the macros
+			for (const auto& macro : macros)
+			{
+				X_LOG0("Shader", "(%" PRIu32 ") Macro: name: \"%s\" value: \"%s\"", id, macro.Name, macro.Definition);
+			}
 		}
 
 		// add blank one.
@@ -306,8 +309,11 @@ namespace shader
 
 			if (SUCCEEDED(hr))
 			{
-				const size_t strippedBytes = preStripSize - pStripped->GetBufferSize();
-				X_LOG2("Shader", "(%" PRIu32 ") Stripped %" PRIuS " bytes from shader", id, strippedBytes);
+				if (vars_.compileDebug())
+				{
+					const size_t strippedBytes = preStripSize - pStripped->GetBufferSize();
+					X_LOG0("Shader", "(%" PRIu32 ") Stripped %" PRIuS " bytes from shader", id, strippedBytes);
+				}
 
 				core::SafeReleaseDX(pBlob);
 				pBlob = pStripped;
@@ -349,13 +355,15 @@ namespace shader
 		D3D12_SHADER_DESC shaderDesc;
 		pShaderReflection->GetDesc(&shaderDesc);
 
-		X_LOG_BULLET;
-		X_LOG0("Shader", "Instructions: %i", shaderDesc.InstructionCount);
-		X_LOG0("Shader", "ConstantBuffers: %i", shaderDesc.ConstantBuffers);
-		X_LOG0("Shader", "BoundResources: %i", shaderDesc.BoundResources);
-		X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
-		X_LOG0("Shader", "OutputParameters: %i", shaderDesc.OutputParameters);
-
+		if (vars_.compileDebug())
+		{
+			X_LOG_BULLET;
+			X_LOG0("Shader", "Instructions: %i", shaderDesc.InstructionCount);
+			X_LOG0("Shader", "ConstantBuffers: %i", shaderDesc.ConstantBuffers);
+			X_LOG0("Shader", "BoundResources: %i", shaderDesc.BoundResources);
+			X_LOG0("Shader", "InputParameters: %i", shaderDesc.InputParameters);
+			X_LOG0("Shader", "OutputParameters: %i", shaderDesc.OutputParameters);
+		}
 
 		for (uint32 n = 0; n<shaderDesc.ConstantBuffers; n++)
 		{
@@ -616,7 +624,7 @@ namespace shader
 
 			X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt);
 			// work out the format from the node.
-			X_LOG0("Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
+			X_LOG0_IF(vars_.compileDebug(), "Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
 
 			IlFmt_ = fmt;
 		}
