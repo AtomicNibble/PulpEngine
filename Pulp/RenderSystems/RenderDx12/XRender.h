@@ -345,6 +345,7 @@ private:
 	AdapterArr adapters_;
 
 #if PSO_HOT_RELOAD
+	core::CriticalSection dsCS_;
 	DeviceStateArr deviceStates_;
 #endif // !PSO_HOT_RELOAD
 

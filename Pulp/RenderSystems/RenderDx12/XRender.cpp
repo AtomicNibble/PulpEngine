@@ -470,16 +470,25 @@ void XRender::renderBegin(void)
 
 #if PSO_HOT_RELOAD
 	
-	// forgive me.
-	for (auto* pState : deviceStates_)
 	{
-		const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
+		core::CriticalSection::ScopedLock lock(dsCS_);
 
-		if (!perm.isCompiled())
+		// forgive me.
+		for (auto* pState : deviceStates_)
 		{
-			// would be nice if we only did this loop 
-			// if a shader ws recently invalidated which i think we can do.
-			updateStateState(pState);
+			const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
+
+			if (!perm.isCompiled())
+			{
+				X_LOG0("Dx12", "^6Updating state");
+
+				// would be nice if we only did this loop 
+				// if a shader ws recently invalidated which i think we can do.
+				if (!updateStateState(pState))
+				{
+					X_ERROR("Dx12", "Failed to update state");
+				}
+			}
 		}
 	}
 
@@ -1554,7 +1563,10 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 #endif // !RENDER_STATS
 
 #if PSO_HOT_RELOAD
-	deviceStates_.push_back(pState);
+	{
+		core::CriticalSection::ScopedLock lock(dsCS_);
+		deviceStates_.push_back(pState);
+	}
 #endif // !PSO_HOT_RELOAD
 
 	return reinterpret_cast<StateHandle>(pState);
@@ -1568,7 +1580,10 @@ void XRender::destoryState(StateHandle handle)
 	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
 
 #if PSO_HOT_RELOAD
-	deviceStates_.remove(pState);
+	{
+		core::CriticalSection::ScopedLock lock(dsCS_);
+		deviceStates_.remove(pState);
+	}
 #endif // !PSO_HOT_RELOAD
 
 #if RENDER_STATS
