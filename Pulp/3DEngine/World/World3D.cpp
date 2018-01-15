@@ -1988,7 +1988,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 							switch (type)
 							{
 								case shader::ParamType::PI_worldMatrix:
-									std::memcpy(&pAuxData[p.getBindPoint()], &world, sizeof(world));
+									std::memcpy(&pAuxData[p.getBindOffset()], &world, sizeof(world));
 									break;
 								case shader::ParamType::PI_objectToWorldMatrix:
 									X_ASSERT_NOT_IMPLEMENTED();
@@ -2152,7 +2152,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 							switch (type)
 							{
 								case shader::ParamType::PI_worldMatrix:
-									std::memcpy(&pAuxData[p.getBindPoint()], &world, sizeof(world));
+									std::memcpy(&pAuxData[p.getBindOffset()], &world, sizeof(world));
 									break;
 								case shader::ParamType::PI_objectToWorldMatrix:
 									X_ASSERT_NOT_IMPLEMENTED();
