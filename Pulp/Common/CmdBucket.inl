@@ -165,6 +165,9 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(CmdBase* pCommand, size_t 
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
 	// append this command to the given one
+	X_ASSERT(*CommandPacket::getNextCommandPacket(pCommand) == nullptr,
+		"Next command packet already set")(*CommandPacket::getNextCommandPacket(pCommand));
+
 	CommandPacket::storeNextCommandPacket(pCommand, pPacket);
 				   
 	CommandPacket::storeNextCommandPacket(pPacket, nullptr);
