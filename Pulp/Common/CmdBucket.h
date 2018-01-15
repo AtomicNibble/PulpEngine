@@ -122,6 +122,7 @@ class CommandBucketBase
 	X_NO_ASSIGN(CommandBucketBase);
 
 public:
+	typedef Commands::CmdBase CmdBase;
 	typedef core::Array<CommandPacket::Packet> PacketArr;
 	typedef core::Array<uint32_t> SortedIdxArr;
 	typedef core::FixedArray<IRenderTarget*, MAX_RENDER_TARGETS> RenderTargetsArr;
@@ -202,14 +203,14 @@ public:
 	template <typename CommandT>
 	X_INLINE CommandT* addCommand(Key key, size_t auxMemorySize);
 
-	template <typename CommandT, typename ParentCmdT>
-	X_INLINE CommandT* appendCommand(ParentCmdT* pCommand, size_t auxMemorySize);
+	template <typename CommandT>
+	X_INLINE CommandT* appendCommand(CmdBase* pCommand, size_t auxMemorySize);
 
 	template <typename CommandT>
 	X_INLINE std::tuple<CommandT*, char*> addCommandGetAux(Key key, size_t auxMemorySize);
 
-	template <typename CommandT, typename ParentCmdT>
-	X_INLINE std::tuple<CommandT*, char*> appendCommandGetAux(ParentCmdT* pCommand, size_t auxMemorySize);
+	template <typename CommandT>
+	X_INLINE std::tuple<CommandT*, char*> appendCommandGetAux(CmdBase* pCommand, size_t auxMemorySize);
 
 	X_INLINE DynamicBufferDesc* createDynamicBufferDesc(void);
 

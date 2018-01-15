@@ -155,8 +155,8 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 
 
 template <typename KeyT>
-template <typename CommandT, typename ParentCmdT>
-X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size_t auxMemorySize)
+template <typename CommandT>
+X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(CmdBase* pCommand, size_t auxMemorySize)
 {
 	static_assert(core::compileTime::IsPOD<CommandT>::Value, "Command packet type must be POD");
 
@@ -165,7 +165,7 @@ X_INLINE CommandT* CommandBucket<KeyT>::appendCommand(ParentCmdT* pCommand, size
 	CommandPacket::Packet pPacket = packetAlloc_.create<CommandT>(threadIdx, auxMemorySize);
 
 	// append this command to the given one
-	CommandPacket::storeNextCommandPacket<ParentCmdT>(pCommand, pPacket);
+	CommandPacket::storeNextCommandPacket(pCommand, pPacket);
 				   
 	CommandPacket::storeNextCommandPacket(pPacket, nullptr);
 	CommandPacket::storeCommandType(pPacket, CommandT::CMD);
@@ -182,10 +182,10 @@ X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::addCommandGetAux(Key 
 }
 
 template <typename KeyT>
-template <typename CommandT, typename ParentCmdT>
-X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::appendCommandGetAux(ParentCmdT* pParentCommand, size_t auxMemorySize)
+template <typename CommandT>
+X_INLINE std::tuple<CommandT*, char*> CommandBucket<KeyT>::appendCommandGetAux(CmdBase* pParentCommand, size_t auxMemorySize)
 {
-	CommandT* pCommand = appendCommand<CommandT, ParentCmdT>(pParentCommand, auxMemorySize);
+	CommandT* pCommand = appendCommand<CommandT>(pParentCommand, auxMemorySize);
 	return std::make_tuple(pCommand, CommandPacket::getAuxiliaryMemory(pCommand));
 }
 

@@ -241,13 +241,22 @@ namespace Commands
 	// I currently support them been 8 bute aligned.
 	X_PACK_PUSH(1)
 
-	struct Nop
+	struct CmdBase
+	{
+		
+	};
+
+	X_ENSURE_SIZE(CmdBase, 1);
+
+	struct Nop : public CmdBase
 	{
 		static const Command::Enum CMD = Command::NOP;
 
 	};
 
-	struct Draw
+	X_ENSURE_SIZE(Nop, 1);
+
+	struct Draw : public CmdBase
 	{
 		static const Command::Enum CMD = Command::DRAW;
 
@@ -264,7 +273,7 @@ namespace Commands
 		ResourceStateBase resourceState;
 	};
 
-	struct DrawIndexed
+	struct DrawIndexed : public CmdBase
 	{
 		static const Command::Enum CMD = Command::DRAW_INDEXED;
 
@@ -278,7 +287,7 @@ namespace Commands
 		ResourceStateBase resourceState;
 	};
 
-	struct DrawInstanced
+	struct DrawInstanced : public CmdBase
 	{
 		static const Command::Enum CMD = Command::DRAW_INSTANCED;
 
@@ -292,7 +301,7 @@ namespace Commands
 		ResourceStateBase resourceState;
 	};
 
-	struct DrawInstancedIndexed
+	struct DrawInstancedIndexed : public CmdBase
 	{
 		static const Command::Enum CMD = Command::DRAW_INSTANCED_INDEXED;
 
@@ -310,7 +319,7 @@ namespace Commands
 
 
 
-	struct CopyConstantBufferData
+	struct CopyConstantBufferData : public CmdBase
 	{
 		static const Command::Enum CMD = Command::COPY_CONST_BUF_DATA;
 
@@ -321,7 +330,7 @@ namespace Commands
 
 	// these should only be used for updating not init of buf data.
 	// the buffers must be none IMMUTABLE
-	struct CopyIndexBufferData
+	struct CopyIndexBufferData : public CmdBase
 	{
 		static const Command::Enum CMD = Command::COPY_INDEXES_BUF_DATA;
 
@@ -331,7 +340,7 @@ namespace Commands
 		uint32_t dstOffset;
 	};
 
-	struct CopyVertexBufferData
+	struct CopyVertexBufferData : public CmdBase
 	{
 		static const Command::Enum CMD = Command::COPY_VERTEX_BUF_DATA;
 
@@ -341,7 +350,7 @@ namespace Commands
 		uint32_t dstOffset;
 	};
 
-	struct CopyTextureBufferData
+	struct CopyTextureBufferData : public CmdBase
 	{
 		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_BUF_DATA;
 
@@ -350,7 +359,7 @@ namespace Commands
 		uint32_t size;
 	};
 
-	struct CopyTextureSubRegionBufferData
+	struct CopyTextureSubRegionBufferData : public CmdBase
 	{
 		static const Command::Enum CMD = Command::UPDATE_TEXTUTE_SUB_BUF_DATA;
 
@@ -360,14 +369,14 @@ namespace Commands
 		Recti rect; // the rect to update.
 	};
 
-	struct ClearDepthStencil
+	struct ClearDepthStencil : public CmdBase
 	{
 		static const Command::Enum CMD = Command::CLEAR_DEPTH_STENCIL;
 
 		IPixelBuffer* pDepthBuffer;
 	};
 
-	struct ClearColor
+	struct ClearColor : public CmdBase
 	{
 		static const Command::Enum CMD = Command::CLEAR_COLOR;
 
@@ -414,7 +423,20 @@ namespace Commands
 
 namespace CommandPacket
 {
+	/*
+		A Packet is like
+		
+		template<typename CmdT>
+		struct Packet;
+		{
+			Packet* pNext;
+			Command::Enum cmd;
+			CmdT;  <-- we return pointers to this, hence the he helpers taking Cmd that offset back.
+		};
+	*/
+
 	typedef void* Packet;
+	typedef Commands::CmdBase CmdBase;
 	typedef Commands::Command Command;
 	const size_t OFFSET_NEXT_COMMAND_PACKET = 0u;
 	const size_t OFFSET_COMMAND_TYPE = OFFSET_NEXT_COMMAND_PACKET + sizeof(Packet);
@@ -425,8 +447,7 @@ namespace CommandPacket
 
 	Packet* getNextCommandPacket(Packet pPacket);
 
-	template <typename CommandT>
-	X_INLINE Packet* getNextCommandPacket(CommandT* command);
+	X_INLINE Packet* getNextCommandPacket(CmdBase* command);
 
 	Command::Enum* getCommandType(Packet pPacket);
 
@@ -440,8 +461,7 @@ namespace CommandPacket
 
 	void storeNextCommandPacket(Packet pPacket, Packet nextPacket);
 
-	template <typename CommandT>
-	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket);
+	X_INLINE void storeNextCommandPacket(CmdBase* command, Packet nextPacket);
 
 	void storeCommandType(Packet pPacket, Command::Enum dispatchFunction);
 	const Packet loadNextCommandPacket(const Packet pPacket);
@@ -459,8 +479,7 @@ namespace CommandPacket
 		return OFFSET_COMMAND + sizeof(CommandT) + auxMemorySize;
 	}
 
-	template <typename CommandT>
-	X_INLINE Packet* getNextCommandPacket(CommandT* command)
+	X_INLINE Packet* getNextCommandPacket(CmdBase* command)
 	{
 		return union_cast<Packet*>(reinterpret_cast<char*>(command) - OFFSET_COMMAND + OFFSET_NEXT_COMMAND_PACKET);
 	}
@@ -483,10 +502,9 @@ namespace CommandPacket
 		return reinterpret_cast<const char*>(command) + sizeof(CommandT);
 	}
 
-	template <typename CommandT>
-	X_INLINE void storeNextCommandPacket(CommandT* command, Packet nextPacket)
+	X_INLINE void storeNextCommandPacket(CmdBase* command, Packet nextPacket)
 	{
-		*getNextCommandPacket<CommandT>(command) = nextPacket;
+		*getNextCommandPacket(command) = nextPacket;
 	}
 
 	X_INLINE Packet* getNextCommandPacket(Packet pPacket)
