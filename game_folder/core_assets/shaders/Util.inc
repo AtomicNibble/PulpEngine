@@ -16,3 +16,15 @@ float4x4 CreateMatrixFromCols(float4 c0, float4 c1, float4 c2, float4 c3) {
                     c0.z, c1.z, c2.z, c3.z,
                     c0.w, c1.w, c2.w, c3.w);
 }
+
+
+float4 VisualizeNormal(float3 normal)
+{
+    return float4((normal + 1) * 0.5, 1);
+}
+
+float4 VisualizeNormalWorldSpace(float3 vsNormal)
+{
+    float3 wsNormal = mul(vsNormal, (float3x3)cameraToWorldMatrix);
+    return float4((wsNormal + 1) * 0.5, 1);
+}
