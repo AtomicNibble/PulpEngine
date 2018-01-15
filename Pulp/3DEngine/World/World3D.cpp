@@ -1974,7 +1974,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 							continue;
 						case shader::UpdateFreq::FRAME:
 							// ask the cbuffer man to fill us? ;)
-							pCBufMan_->setParamValue(type, (uint8_t*)&pAuxData[p.getBindPoint()]);
+							pCBufMan_->setParamValue(p, reinterpret_cast<uint8_t*>(pAuxData), reinterpret_cast<uint8_t*>(pAuxData) + size);
 							continue;
 
 						case shader::UpdateFreq::BATCH:
@@ -2138,7 +2138,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 							continue;
 						case shader::UpdateFreq::FRAME:
 							// ask the cbuffer man to fill us? ;)
-							pCBufMan_->setParamValue(type, (uint8_t*)&pAuxData[p.getBindPoint()]);
+							pCBufMan_->setParamValue(p, reinterpret_cast<uint8_t*>(pAuxData), reinterpret_cast<uint8_t*>(pAuxData) + size);
 							continue;
 
 						case shader::UpdateFreq::BATCH:

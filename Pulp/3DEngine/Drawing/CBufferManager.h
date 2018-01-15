@@ -80,7 +80,7 @@ public:
 	render::ConstantBufferHandle createCBuffer(const render::shader::XCBuffer& cbuf);
 	void destoryConstBuffer(const render::shader::XCBuffer& cbuf, render::ConstantBufferHandle handle);
 
-	void setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst);
+	void setParamValue(const render::shader::XShaderParam& param, uint8_t* pBegin, uint8_t* pEnd);
 private:
 
 	X_INLINE void setTime(core::TimeVal time);

@@ -173,16 +173,13 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
 	{
 		const auto& p = cbuf[i];
-		const auto type = p.getType();
-
+		
 		// we can skip the copy if not changed.
 	//	if (!changed.IsSet(type)) {
 	//		continue;
 	//	}
 
-		uint8_t* pDst = &cpuData[p.getBindPoint()];
-
-		setParamValue(type, pDst);
+		setParamValue(p, cpuData.begin(), cpuData.end());
 	}
 
 	return true;
@@ -197,14 +194,13 @@ bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint
 		return false;
 	}
 
+	uint8_t* pEnd = pDataDst + dstLen;
+
 	for (int32_t i = 0; i < cbuf.getParamCount(); i++)
 	{
 		const auto& p = cbuf[i];
-		const auto type = p.getType();
-
-		uint8_t* pDst = &pDataDst[p.getBindPoint()];
-
-		setParamValue(type, pDst);
+		
+		setParamValue(p, pDataDst, pEnd);
 	}
 
 	return true;
@@ -272,13 +268,19 @@ void CBufferManager::destoryConstBuffer(const render::shader::XCBuffer& cbuf, re
 	pRender_->destoryConstBuffer(handle);
 }
 
-X_INLINE void CBufferManager::setParamValue(render::shader::ParamType::Enum type, uint8_t* pDst)
+X_INLINE void CBufferManager::setParamValue(const render::shader::XShaderParam& param, uint8_t* pBegin, uint8_t* pEnd)
 {
 	using render::shader::ParamType;
 
 	static_assert(ParamType::FLAGS_COUNT == 15, "ParamType count changed, check if this code needs updating");
 
-	switch (type)
+	uint8_t* pDst = pBegin + param.getBindOffset();
+
+	const ptrdiff_t space = pEnd - pDst;
+
+	X_ASSERT(space >= param.getNumVecs() * 16, "")(space, param.getBindOffset(), param.getNumVecs());
+
+	switch (param.getType())
 	{
 		case ParamType::PF_worldToScreenMatrix:
 			std::memcpy(pDst, &viewProj_, sizeof(viewProj_));
