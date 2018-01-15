@@ -977,8 +977,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					
 					// copy the material params value into the 
 					// always vec4? humm.
-					X_ASSERT(cpuData.size() >= (cbParam.getBindPoint() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
-					std::memcpy(&cpuData[cbParam.getBindPoint()], &matParam.value, sizeof(matParam.value));
+					X_ASSERT(cpuData.size() >= (cbParam.getBindOffset() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
+					std::memcpy(&cpuData[cbParam.getBindOffset()], &matParam.value, sizeof(matParam.value));
 				}
 
 				// optermisation:
