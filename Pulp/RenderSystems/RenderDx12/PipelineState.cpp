@@ -7,6 +7,25 @@
 
 X_NAMESPACE_BEGIN(render)
 
+namespace
+{
+
+	inline void hashShader(core::Hash::xxHash64& hasher, D3D12_SHADER_BYTECODE& s) 
+	{
+#if X_ENABLE_RENDER_SHADER_RELOAD
+
+		if (s.pShaderBytecode) {
+			hasher.update(s.pShaderBytecode, s.BytecodeLength);
+		}
+
+#else
+		// if we don't reload shaders hashing the pointer to byte code is enougth.
+		X_UNUSED(hasher, s);
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
+	};
+
+} // namespace
+
 
 PSODeviceCache::PSODeviceCache(core::MemoryArenaBase* arena, ID3D12Device* pDevice) :
 	pDevice_(pDevice),
@@ -161,6 +180,7 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
 	return true;
 }
 
+
 PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc)
 {
 	core::Hash::xxHash64 hasher;
@@ -174,6 +194,12 @@ PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DE
 	hasher.update(&gpsoDesc, 1);
 	hasher.update(ILCopy.pInputElementDescs, ILCopy.NumElements);
 
+	hashShader(hasher, gpsoDesc.VS);
+	hashShader(hasher, gpsoDesc.PS);
+	hashShader(hasher, gpsoDesc.DS);
+	hashShader(hasher, gpsoDesc.HS);
+	hashShader(hasher, gpsoDesc.GS);
+
 	gpsoDesc.InputLayout = ILCopy;
 	return hasher.finalize();
 }
@@ -185,6 +211,8 @@ PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_COMPUTE_PIPELINE_STATE_DES
 	hasher.reset(0x79371); // diffrent seed to graphics desc.
 	hasher.update(&cpsoDesc, 1);
 
+	hashShader(hasher, cpsoDesc.CS);
+	
 	return hasher.finalize();
 }
 
