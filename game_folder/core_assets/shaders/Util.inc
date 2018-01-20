@@ -28,3 +28,9 @@ float4 VisualizeNormalWorldSpace(float3 vsNormal)
     float3 wsNormal = mul(vsNormal, (float3x3)cameraToWorldMatrix);
     return float4((wsNormal + 1) * 0.5, 1);
 }
+
+float GetDistanceAttenuation(float distance, float invLightRadius)
+{
+    float l = saturate(1.0f - (distance * invLightRadius));
+    return l * l;
+}
