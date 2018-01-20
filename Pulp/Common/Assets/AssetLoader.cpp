@@ -156,7 +156,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 	open.mode = core::fileMode::READ;
 	open.path = assetDb::AssetType::ToString(pAsset->getType());
 	open.path.append('s', 1);
-	open.path.append('/', 1);
+	open.path.append(assetDb::ASSET_NAME_SLASH, 1);
 	open.path.toLower();
 	open.path.append(name.begin(), name.end());
 	open.path.setExtension(assetExt_[type]);
