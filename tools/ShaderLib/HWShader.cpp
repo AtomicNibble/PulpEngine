@@ -423,6 +423,8 @@ namespace shader
 
 				const int32_t reg = (CDesc.StartOffset >> 4);
 
+				X_ASSERT(reg << 4 == CDesc.StartOffset, "Offset not multiple of 16")(reg, CDesc.StartOffset);
+
 				XShaderParam bind;
 				bind.setName(CDesc.Name);
 				bind.setBindPoint(reg);
