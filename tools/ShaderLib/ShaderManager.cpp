@@ -488,7 +488,7 @@ namespace shader
 	{
 		X_UNUSED(jobSys);
 
-		const char* pExt = name.extension();
+		const char* pExt = name.extension(false);
 		if (pExt)
 		{
 			// this is just a cache update ignore this.
@@ -501,8 +501,55 @@ namespace shader
 				return;
 			}
 
-			// it's a source file change.
+			// need to make file have asset slashes/
+			// not sure if this should be job of DirWatcher or just asset reload handlers.
+			core::Path<char> assetPath(name);
+			assetPath.replaceAll(core::Path<char>::NATIVE_SLASH, assetDb::ASSET_NAME_SLASH);
 
+			// need to remove the folder prefix.
+			core::StackString256 prefix(assetDb::AssetType::ToString(assetDb::AssetType::SHADER));
+			prefix.append('s', 1);
+			prefix.append(assetDb::ASSET_NAME_SLASH, 1);
+			prefix.toLower();
+
+			core::string nameStr;
+
+			const char* pPrefix = assetPath.findCaseInsen(prefix.c_str());
+			if (pPrefix == assetPath.begin())
+			{
+				nameStr = core::string(assetPath.begin() + prefix.length(), assetPath.end());
+			}
+			else
+			{
+				nameStr = core::string(name.begin(), name.end());
+			}
+
+
+			// force a reload of the source.
+			const auto* pSource = sourceBin_.loadRawSourceFile(nameStr, true);
+			if (!pSource) {
+				return;
+			}
+
+			/*
+				we can have dozens of hardware shaders that use this source file.
+				each hardware shader holds a pointer to it's shader source.
+				so we could just iterate all hardware shaders and invalid any using it.
+
+				might want todo something diffrent if end up with loads of shaders
+				like storing refrence lists on the shaders.
+			*/
+
+			core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
+
+			for (const auto& shader : hwShaders_)
+			{
+				if (shader.second->getShaderSource() == pSource)
+				{
+					X_LOG0("Shader", "Reloading: %s", shader.first.c_str());
+					shader.second->markStale();
+				}
+			}
 
 		}
 	}
