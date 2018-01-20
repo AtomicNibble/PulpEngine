@@ -50,7 +50,8 @@ X_DECLARE_ENUM8(AssetType)(
 
 	VIDEO,
 	SCRIPT,
-	FONT
+	FONT,
+	SHADER
 );
 
 

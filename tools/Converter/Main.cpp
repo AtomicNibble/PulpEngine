@@ -99,7 +99,7 @@ namespace
 		{
 			core::StackString<128, char> assetTypeStr(pAssetType);
 
-			static_assert(converter::AssetType::ENUM_COUNT == 16, "More asset types :[] ? this code might need updating.");
+			static_assert(converter::AssetType::ENUM_COUNT == 17, "More asset types :[] ? this code might need updating.");
 
 			switch (core::Hash::Fnv1aHash(assetTypeStr.c_str(), assetTypeStr.length()))
 			{
