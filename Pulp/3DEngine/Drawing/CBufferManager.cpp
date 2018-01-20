@@ -62,7 +62,7 @@ bool CBufferManager::update(core::FrameData& frame, bool othro)
 	dirtyFlags_.Clear();
 
 	// time
-	setTime(frame.timeInfo.startTimeReal);
+	setTime(frame.timeInfo.startTimeRealative);
 	setFrameTime(core::ITimer::Timer::GAME, frame.timeInfo.deltas[core::ITimer::Timer::GAME]);
 	setFrameTime(core::ITimer::Timer::UI, frame.timeInfo.deltas[core::ITimer::Timer::UI]);
 
