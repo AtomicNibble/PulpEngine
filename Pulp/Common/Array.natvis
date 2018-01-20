@@ -4,7 +4,7 @@
     <Expand>
       <Item Name="[size]" ExcludeView="simple">num_</Item>
       <Item Name="[capacity]" ExcludeView="simple">size_</Item>
-      <Item Name="[growsize]" ExcludeView="simple">granularity_</Item>
+  <!--    <Item Name="[growsize]" ExcludeView="simple">granularity_</Item> -->
       <Item Name="[pData]" ExcludeView="simple">list_</Item>
       <Item Name="[pEnd]" ExcludeView="simple">list_ + num_</Item>
       <Item Name="[allocator]" ExcludeView="simple">allocator_</Item>
