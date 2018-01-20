@@ -1156,15 +1156,19 @@ X_INLINE T operator | (const Vec3<T> &v0, const Vec3<T> &v1)
 
 
 typedef Vec2<int32_t>	Vec2i;
+typedef Vec2<uint32_t>	Vec2ui;
 typedef Vec2<float32_t>	Vec2f;
 typedef Vec2<float64_t>	Vec2d;
 typedef Vec3<int32_t>	Vec3i;
+typedef Vec3<uint32_t>	Vec3ui;
 typedef Vec3<float32_t>	Vec3f;
 typedef Vec3<float64_t>	Vec3d;
 typedef Vec4<int32_t>	Vec4i;
+typedef Vec4<uint32_t>	Vec4ui;
 typedef Vec4<float32_t>	Vec4f;
 typedef Vec4<float64_t>	Vec4d;
 typedef Vec5<int32_t>	Vec5i;
+typedef Vec5<uint32_t>	Vec5ui;
 typedef Vec5<float32_t>	Vec5f;
 typedef Vec5<float64_t>	Vec5d;
 
