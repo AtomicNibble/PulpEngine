@@ -95,6 +95,13 @@ void CBufferManager::updatePerFrameCBs(render::CommandBucket<uint32_t>& bucket, 
 		
 		if (autoUpdateBuffer(cb))
 		{
+#if !X_SUPER 
+			if (cb.getCpuData().size() < cb.getBindSize()) {
+				X_ERROR("CBuf", "Cbuffer cpu data size %" PRIuS " don't match bind size %" PRIi16, cb.getCpuData().size(), cb.getBindSize());
+				continue;
+			}
+#endif // X_SUPER
+
 			// dam fucker needs updateing.
 			auto* pCBufUpdate = bucket.appendCommand<render::Commands::CopyConstantBufferData>(pCmd, cb.getBindSize());
 
