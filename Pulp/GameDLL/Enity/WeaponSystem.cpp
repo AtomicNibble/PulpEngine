@@ -66,6 +66,8 @@ namespace entity
 			con.pFont = gEnv->pFontSys->GetDefault();
 			
 
+		//	pPrim->drawQuadImage(400.f, 400.f, 256, 128, wpn.pWeaponDef->getIcon(weapon::IconSlot::AmmoCounter), Color(0.2f, 0.2f, 0.2f));
+
 			pPrim->drawText(Vec3f(10.f, 500.f, 1.f), con, ammoText.begin(), ammoText.end());
 
 			/*
@@ -158,8 +160,8 @@ namespace entity
 					// and the animation / sounds are handled here.
 					if (wpn.stateEnd + 3000_ms < curTime)
 					{
-						beginLower(curTime, wpn, animator);
-						continue;
+					//	beginLower(curTime, wpn, animator);
+					//	continue;
 					}
 
 					if (wpn.reload)
@@ -191,8 +193,8 @@ namespace entity
 		}
 
 		auto raiseTime = wpn.pWeaponDef->stateTimer(weapon::StateTimer::Raise);
-		weapon::AnimSlot::Enum anim = weapon::AnimSlot::Raise;
 
+		weapon::AnimSlot::Enum anim = weapon::AnimSlot::Raise;
 		if (!wpn.stateFlags.IsSet(weapon::StateFlag::HasRaised))
 		{
 			wpn.stateFlags.Set(weapon::StateFlag::HasRaised);
@@ -305,7 +307,7 @@ namespace entity
 	void WeaponSystem::trainsitionToState(Weapon& wpn, Animator& animator, weapon::AnimSlot::Enum animSlot, weapon::State::Enum newState,
 		core::TimeVal curTime, core::TimeVal transTime)
 	{
-		X_LOG0("Weapon", "State change %s -> %s", weapon::State::ToString(wpn.state), weapon::State::ToString(newState));
+	//	X_LOG0("Weapon", "State change %s -> %s", weapon::State::ToString(wpn.state), weapon::State::ToString(newState));
 
 		wpn.state = newState;
 		wpn.stateEnd = curTime + transTime;
