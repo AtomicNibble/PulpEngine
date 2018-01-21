@@ -8,8 +8,41 @@ namespace shader
 
 	namespace
 	{
-		core::CriticalSection cs;
-	}
+		static ILTreeNode blank;
+		static ILTreeNode pos("POSITION");
+		static ILTreeNode uv("TEXCOORD");
+		static ILTreeNode col("COLOR");
+		static ILTreeNode nor("NORMAL");
+		static ILTreeNode tan("TANGENT");
+		static ILTreeNode bin("BINORMAL");
+
+		static ILTreeNode uv2("TEXCOORD");
+		static ILTreeNode col2("COLOR");
+		static ILTreeNode nor2("NORMAL");
+
+		class ILTreeBuilder
+		{
+		public:
+			ILTreeBuilder()
+			{
+				blank.SetFormat(InputLayoutFormat::NONE);
+
+				ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
+				uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
+					AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
+					AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
+					AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
+
+				// double text coords.
+				uvBase.AddChild(uv2).
+					AddChild(col2).
+					AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
+			}
+		};
+
+		static ILTreeBuilder tree;
+
+	} // namespace
 
 
 	ILTreeNode::ILTreeNode() 
@@ -38,20 +71,8 @@ namespace shader
 
 	const ILTreeNode* ILTreeNode::getILTree(void)
 	{
-		core::CriticalSection::ScopedLock lock(cs);
-
 		// all the posible node types.
-		static ILTreeNode blank;
-		static ILTreeNode pos("POSITION");
-		static ILTreeNode uv("TEXCOORD");
-		static ILTreeNode col("COLOR");
-		static ILTreeNode nor("NORMAL");
-		static ILTreeNode tan("TANGENT");
-		static ILTreeNode bin("BINORMAL");
 
-		static ILTreeNode uv2("TEXCOORD");
-		static ILTreeNode col2("COLOR");
-		static ILTreeNode nor2("NORMAL");
 
 		// for shader input layouts the format is not given since the shader
 		// don't care what the format comes in as.
@@ -75,31 +96,7 @@ namespace shader
 		// TB3F  TB10
 		//
 
-		static bool isInit = false;
-
-		if (isInit)
-		{
-			return &blank;
-		}
-		else
-		{
-			isInit = true;
-
-			blank.SetFormat(InputLayoutFormat::NONE);
-
-			ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
-			uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).
-				AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).
-				AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).
-				AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
-
-			// double text coords.
-			uvBase.AddChild(uv2).
-				AddChild(col2).
-				AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
-
-			return &blank;
-		}
+		return &blank;
 	}
 
 	void ILTreeNode::free(void)
