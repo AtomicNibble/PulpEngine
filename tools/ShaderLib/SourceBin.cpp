@@ -288,6 +288,12 @@ namespace shader
 			pSourceFile->applyRefrences();
 		};
 
+		if (reload && *pSourceFileRef == nullptr)
+		{
+			X_WARNING("Shader", "Ignoring reload flag for \"%s\" it's not currently loaded", name.c_str());
+			reload = false;
+		}
+
 		if (reload)
 		{
 			auto* pSourceFile = *pSourceFileRef;
