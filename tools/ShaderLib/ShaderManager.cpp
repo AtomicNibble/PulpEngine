@@ -6,6 +6,7 @@
 #include <Hashing\sha1.h>
 #include <String\Lexer.h>
 #include <String\StringHash.h>
+#include <String\AssetName.h>
 
 #include <Util\UniquePointer.h>
 #include <Threading\JobSystem2.h>
@@ -523,29 +524,11 @@ namespace shader
 				return;
 			}
 
-			// need to make file have asset slashes/
-			// not sure if this should be job of DirWatcher or just asset reload handlers.
-			core::Path<char> assetPath(name);
-			assetPath.replaceAll(core::Path<char>::NATIVE_SLASH, assetDb::ASSET_NAME_SLASH);
+			core::AssetPath assetName(name);
+			assetName.replaceSeprators();
+			assetName.stripAssetFolder(assetDb::AssetType::SHADER);
 
-			// need to remove the folder prefix.
-			core::StackString256 prefix(assetDb::AssetType::ToString(assetDb::AssetType::SHADER));
-			prefix.append('s', 1);
-			prefix.append(assetDb::ASSET_NAME_SLASH, 1);
-			prefix.toLower();
-
-			core::string nameStr;
-
-			const char* pPrefix = assetPath.findCaseInsen(prefix.c_str());
-			if (pPrefix == assetPath.begin())
-			{
-				nameStr = core::string(assetPath.begin() + prefix.length(), assetPath.end());
-			}
-			else
-			{
-				nameStr = core::string(name.begin(), name.end());
-			}
-
+			core::string nameStr(assetName.begin(), assetName.end());
 			
 			if (!sourceBin_.sourceForName(nameStr)) {
 				X_WARNING("Shader", "Skipping reload of \"%s\" it's not currently used", nameStr.c_str());
