@@ -546,6 +546,11 @@ namespace shader
 				nameStr = core::string(name.begin(), name.end());
 			}
 
+			
+			if (!sourceBin_.sourceForName(nameStr)) {
+				X_WARNING("Shader", "Skipping reload of \"%s\" it's not currently used", nameStr.c_str());
+				return;
+			}
 
 			// force a reload of the source.
 			const auto* pSource = sourceBin_.loadRawSourceFile(nameStr, true);
