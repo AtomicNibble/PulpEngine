@@ -375,6 +375,10 @@ namespace strUtil
 		return FindCaseInsensitive(startInclusive, startInclusive + strlen(startInclusive), what, strlen(what));
 	}
 
+	const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd)
+	{
+		return FindCaseInsensitive(startInclusive, endExclusive, whatStart, safe_static_cast<size_t>(whatEnd - whatStart));
+	}
 
 	const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what, size_t whatLength)
 	{

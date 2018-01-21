@@ -154,6 +154,9 @@ namespace strUtil
 	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what);
 	const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* what);
 
+	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd);
+	const wchar_t* FindCaseInsensitive(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd);
+
 	/// \brief Finds a string inside a string using a case-insensitive search, and returns a pointer to it.
 	/// \remark Returns a \c nullptr if the string could not be found.
 	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength);

@@ -638,6 +638,11 @@ namespace strUtil
 		return FindCaseInsensitive(startInclusive, startInclusive + strlen(startInclusive), what, strlen(what));
 	}
 
+	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* whatStart, const char* whatEnd)
+	{
+		return FindCaseInsensitive(startInclusive, endExclusive, whatStart, safe_static_cast<size_t>(whatEnd - whatStart));
+	}
+
 	const char* FindCaseInsensitive(const char* startInclusive, const char* endExclusive, const char* what, size_t whatLength)
 	{
 		size_t len = endExclusive - startInclusive;
