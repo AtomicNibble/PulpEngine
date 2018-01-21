@@ -521,8 +521,10 @@ void StackString<N, TChar>::stripColorCodes(void)
 template <size_t N, typename TChar>
 void StackString<N, TChar>::trimLeft(const TChar* pos)
 {
-	memmove(str_, pos, len_);
-	len_ -= safe_static_cast<size_t>(pos - str_);
+	auto trimLength = safe_static_cast<size_t>(pos - str_);
+
+	memmove(str_, pos, (len_ - trimLength) + 1);
+	len_ -= trimLength;
 }
 
 
