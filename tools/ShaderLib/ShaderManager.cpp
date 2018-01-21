@@ -308,7 +308,7 @@ namespace shader
 		// dispatch jobs, to compile all da stages yo.
 		for (auto* pHWShader : stages)
 		{
-			if (!pHWShader) {
+			if (!pHWShader || pHWShader->isValid()) {
 				continue;
 			}
 
