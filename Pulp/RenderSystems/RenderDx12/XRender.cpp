@@ -1341,7 +1341,6 @@ bool XRender::updateStateState(DeviceState* pState)
 	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
 	const PassState* pPassState = pState->pPassState;
 	const StateDesc& desc = pState->cpuDesc;
-	const RootSignature& rootSig = pState->rootSig;
 
 	// shaders only for now?
 	if (perm.isCompiled()) {
@@ -1350,6 +1349,11 @@ bool XRender::updateStateState(DeviceState* pState)
 
 	// need to compile the shaders.
 	if (!pShaderMan_->compilePermatation(const_cast<shader::IShaderPermatation*>(pState->pPerm))) {
+		return false;
+	}
+
+	// the RootSig may need updating.
+	if (!buildRootSig(pState, perm)) {
 		return false;
 	}
 
