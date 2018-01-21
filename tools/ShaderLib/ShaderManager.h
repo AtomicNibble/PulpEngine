@@ -31,6 +31,7 @@ namespace shader
 	class SourceFile;
 	class XShader;
 	class XHWShader;
+	class ShaderPermatation;
 
 	class XShaderManager : public core::IXHotReload
 	{
@@ -98,6 +99,8 @@ namespace shader
 		X_INLINE ShaderBin& getBin(void);
 
 	private:
+		bool compilePermatation_Int(ShaderPermatation* pPerm); 
+
 		void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
 
 		XHWShader* hwForName(ShaderType::Enum type, const core::string& entry, const core::string& customDefines,

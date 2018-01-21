@@ -264,7 +264,7 @@ namespace shader
 		static_assert(decltype(permArena_)::IS_THREAD_SAFE, "PermArena must be thread safe");
 		core::UniquePointer<ShaderPermatation> pPerm = core::makeUnique<ShaderPermatation>(&permArena_, stagesIn, arena_);
 
-		if (!compilePermatation(pPerm.get()))
+		if (!compilePermatation_Int(pPerm.get()))
 		{
 			return nullptr;
 		}
@@ -283,6 +283,16 @@ namespace shader
 			return true;
 		}
 
+		if (!compilePermatation_Int(pPerm)) {
+			return false;
+		}
+
+		pPerm->generateMeta();
+		return true;
+	}
+		
+	bool XShaderManager::compilePermatation_Int(ShaderPermatation* pPerm)
+	{
 		CompileFlags flags;
 
 #if X_DEBUG
