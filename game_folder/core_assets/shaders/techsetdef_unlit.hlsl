@@ -1,5 +1,6 @@
 #include "Vertexbase.inc"
 #include "Util.inc"
+#include "Lighting.inc"
 
 struct VS_INPUT
 {
@@ -41,15 +42,25 @@ SamplerState        diffuseSampler;
 StructuredBuffer<float4x4> BoneMatrices;
 #endif // !X_HWSKIN
 
-
-static float4 lightPos[2] = {
-  float4(-128,136,72,1),
-  float4(392,-160,72,1)
-};
-
-static float4 lightColor[2] = {
-  float4(0.964706, 0.247059, 0.121569,1),
-  float4(0,0,1,1)
+static Light lights[2] = {
+    {
+      float4(-128,136,72,1),
+      float4(0.964706, 0.247059, 0.121569,1),
+      float4(-0.05,0.5,1,1),
+      cos(radians(20.5)),
+      cos(radians(69.5)),
+      (1.f / (cos(radians(20.5)) - cos(radians(69.5)))),
+      1.f / 1024.f
+    },
+    {
+      float4(392,-160,72,1),
+      float4(0,0,1,1),
+      float4(0,0,0,0),
+      cos(radians(20.5)),
+      cos(radians(69.5)),
+      (1.f / (cos(radians(20.5)) - cos(radians(69.5)))),
+      1.f / 1024.f
+    }
 };
 
 VS_OUTPUT vs_main( VS_INPUT IN )
@@ -90,52 +101,6 @@ VS_OUTPUT vs_main( VS_INPUT IN )
 }
 
 
-float4 Diffuse(float4 radiance, float3 n, float3 l, float4 albedo)
-{
-  float d = saturate(dot(n, l));
-  return d * albedo * radiance;
-}
-
-float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
-  float4 lightColor, float3 lightPos, float invLightRadius)
-{
-    float3 l = lightPos - viewPosition;
-    float d = length(l);
-    l = l / d;
-
-    float att = GetDistanceAttenuation(d, invLightRadius);
-
-    float4 vsLightDirection = float4(-0.25,0.3,1,1);
-    float innerCone = cos(radians(20.5));
-    float outerCone = cos(radians(69.5));
-    float epsilon   = innerCone - outerCone;
-    float invConeDifference = 1.f / (innerCone - outerCone);
-
-    float theta = dot(l, vsLightDirection.xyz);
-    float intensity = saturate((theta - outerCone) * invConeDifference);
-
-    att *= intensity;
-
-    float4 radiance = lightColor * att;
-
-    float4 col = Diffuse(radiance, vsNormal, l, albedo);
-    return col;
-}
-
-float4 ComputeSpotLight(float3 viewPosition, float3 vsNormal, float4 albedo,
-  float4 lightColor, float3 lightPos, float invLightRadius)
-{
-    float3 l = lightPos - viewPosition;
-    float d = length(l);
-    l = l / d;
-
-    float att = GetDistanceAttenuation(d, invLightRadius);
-
-    float4 radiance = lightColor * att;
-
-    return Diffuse(radiance, vsNormal, l, albedo);
-}
-
 PS_OUTPUT ps_main( VS_OUTPUT IN )
 {
     PS_OUTPUT output;
@@ -145,15 +110,17 @@ PS_OUTPUT ps_main( VS_OUTPUT IN )
     float3 vsNormal = IN.normal;
     float3 viewPosition = IN.viewPosition;
 
+    float4 ambient = albedo * float4(0.5,0.5,0.5,1);
+
     float4 lightColor1 = ComputePointLight(
-      viewPosition, vsNormal, albedo, lightColor[0], lightPos[0].xyz, 1.f / 1024.f
+      viewPosition, vsNormal, albedo, lights[0]
     );
 
     float4 lightColor2 = ComputeSpotLight(
-      viewPosition, vsNormal, albedo, lightColor[1], lightPos[1].xyz, 1.f / 128.f
+      viewPosition, vsNormal, albedo, lights[1]
     );
 
-    output.color = saturate( lightColor1 + lightColor2);
+    output.color = saturate(ambient + lightColor1 + lightColor2);
 
     return output;
 }
