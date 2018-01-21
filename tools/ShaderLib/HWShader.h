@@ -101,6 +101,8 @@ namespace shader
 		bool compileFromSource(const ByteArr& source, CompileFlags compileFlags);
 		bool reflectShader(ID3D10Blob* pShaderBlob);
 
+		static bool extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col);
+
 	protected:
 		LockType lock_;
 		

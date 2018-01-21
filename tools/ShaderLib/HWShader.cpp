@@ -14,6 +14,7 @@
 
 #include <Time\StopWatch.h>
 #include <String\StringTokenizer.h>
+#include <String\Lexer.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -347,6 +348,31 @@ namespace shader
 		return true;
 	}
 
+
+	bool XHWShader::extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col)
+	{
+		core::XLexer lex(pBegin, pEnd);
+		core::XLexToken token;
+
+		if (!lex.ExpectTokenString("(")) {
+			return false;
+		}
+
+		line = lex.ParseInt();
+
+		if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION, 
+			core::TokenSubType::UNUSET, core::PunctuationId::COMMA, token)) {
+			return false;
+		}
+
+		col = lex.ParseInt();
+
+		if (!lex.ExpectTokenString(")")) {
+			return false;
+		}
+
+		return true;
+	}
 
 	bool XHWShader::reflectShader(ID3D10Blob* pShaderBlob)
 	{
