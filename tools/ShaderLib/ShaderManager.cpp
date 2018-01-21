@@ -156,7 +156,7 @@ namespace shader
 	{
 		const auto status = pHWShader->getStatus();
 		if (status == ShaderStatus::Ready) {
-			return true;;
+			return true;
 		}
 
 		if (status == ShaderStatus::FailedToCompile) {
