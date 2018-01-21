@@ -264,6 +264,8 @@ public:
 	Stats getStats(void) const X_FINAL;
 
 private:
+	bool buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm);
+
 	bool buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 		const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm);
 	

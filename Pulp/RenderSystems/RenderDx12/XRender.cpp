@@ -1356,7 +1356,7 @@ bool XRender::updateStateState(DeviceState* pState)
 	// new PSO BOI !
 	GraphicsPSO pso;
 
-	if (!buildPSO(pso, pPassState, desc, rootSig, perm)) {
+	if (!buildPSO(pso, pPassState, desc, pState->rootSig, perm)) {
 		return false;
 	}
 
@@ -1429,6 +1429,64 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
+
+	if (!buildRootSig(pState, perm)) {
+		X_DELETE(pState, &statePool_);
+		return INVALID_STATE_HANLDE;
+	}
+
+	// we need to create a PSO.
+	GraphicsPSO pso;
+
+	if (!buildPSO(pso, pPassState, desc, pState->rootSig, perm)) {
+		X_DELETE(pState, &statePool_);
+		return INVALID_STATE_HANLDE;
+	}
+
+	pState->pPso = pso.getPipelineStateObject();
+	pState->topo = topoFromDesc(desc);
+	pState->texStates.resize(numStates);
+	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
+
+#if RENDER_STATS
+	++stats_.numStates;
+	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
+#endif // !RENDER_STATS
+
+#if PSO_HOT_RELOAD
+	{
+		core::CriticalSection::ScopedLock lock(dsCS_);
+		deviceStates_.push_back(pState);
+	}
+#endif // !PSO_HOT_RELOAD
+
+	return reinterpret_cast<StateHandle>(pState);
+}
+
+void XRender::destoryState(StateHandle handle)
+{
+	// this implies you are not checking they are valid when creating, which you should!
+	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
+
+	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
+
+#if PSO_HOT_RELOAD
+	{
+		core::CriticalSection::ScopedLock lock(dsCS_);
+		deviceStates_.remove(pState);
+	}
+#endif // !PSO_HOT_RELOAD
+
+#if RENDER_STATS
+	--stats_.numStates;
+#endif // !RENDER_STATS
+
+	X_DELETE(pState, &statePool_);
+}
+
+
+bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm)
+{
 	RootSignature& rootSig = pState->rootSig;
 
 #if 1
@@ -1489,7 +1547,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 			auto bindPoint = buffer.getBindPoint();
 
 			rootSig.getParamRef(currentParamIdx++).initAsSRV(bindPoint, D3D12_SHADER_VISIBILITY_VERTEX);
-		//	rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+			//	rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, D3D12_SHADER_VISIBILITY_VERTEX);
 		}
 	}
 
@@ -1523,9 +1581,9 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 	// so the description is part of the hwshader.
 	rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootSig.getParamRef(1).initAsCBV(0, D3D12_SHADER_VISIBILITY_VERTEX);
-//	rootSig.getParamRef(2).initAsSRV(1, D3D12_SHADER_VISIBILITY_PIXEL);
-//	rootSig.getParamRef(2).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
-//	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
+	//	rootSig.getParamRef(2).initAsSRV(1, D3D12_SHADER_VISIBILITY_PIXEL);
+	//	rootSig.getParamRef(2).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
+	//	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
 	rootSig.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
 #endif
 
@@ -1535,67 +1593,19 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 		// seams not:
 		//		"Don't simultaneously set visible and deny flags for the same shader stages on root table entries
 		//		For current drivers the deny flags only work when D3D12_SHADER_VISIBILITY_ALL is set"
-	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
-	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
-	//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
+		//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_HULL_SHADER_ROOT_ACCESS
+		//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_DOMAIN_SHADER_ROOT_ACCESS
+		//	| D3D12_ROOT_SIGNATURE_FLAG_DENY_GEOMETRY_SHADER_ROOT_ACCESS
 	)) {
-		X_DELETE(pState, &statePool_);
-		return INVALID_STATE_HANLDE;
+		return false;
 	}
 
 #if X_DEBUG == 0 || 1
 	rootSig.freeParams();
 #endif
 
-	// we need to create a PSO.
-	GraphicsPSO pso;
-
-	if (!buildPSO(pso, pPassState, desc, rootSig, perm)) {
-		X_DELETE(pState, &statePool_);
-		return INVALID_STATE_HANLDE;
-	}
-
-	pState->pPso = pso.getPipelineStateObject();
-	pState->topo = topoFromDesc(desc);
-	pState->texStates.resize(numStates);
-	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
-
-#if RENDER_STATS
-	++stats_.numStates;
-	stats_.maxStates = core::Max(stats_.maxStates, stats_.numStates);
-#endif // !RENDER_STATS
-
-#if PSO_HOT_RELOAD
-	{
-		core::CriticalSection::ScopedLock lock(dsCS_);
-		deviceStates_.push_back(pState);
-	}
-#endif // !PSO_HOT_RELOAD
-
-	return reinterpret_cast<StateHandle>(pState);
+	return true;
 }
-
-void XRender::destoryState(StateHandle handle)
-{
-	// this implies you are not checking they are valid when creating, which you should!
-	X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
-
-	DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
-
-#if PSO_HOT_RELOAD
-	{
-		core::CriticalSection::ScopedLock lock(dsCS_);
-		deviceStates_.remove(pState);
-	}
-#endif // !PSO_HOT_RELOAD
-
-#if RENDER_STATS
-	--stats_.numStates;
-#endif // !RENDER_STATS
-
-	X_DELETE(pState, &statePool_);
-}
-
 
 bool XRender::buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 	const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm)
