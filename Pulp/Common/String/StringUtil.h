@@ -250,6 +250,10 @@ namespace strUtil
 
 	size_t LineNumberForOffset(const char* pBegin, const char* pEnd, size_t offset);
 	size_t LineNumberForOffset(const wchar_t* pBegin, const wchar_t* pEnd, size_t offset);
+
+	size_t NumLines(const char* pBegin, const char* pEnd);
+	size_t NumLines(const wchar_t* pBegin, const wchar_t* pEnd);
+
 }
 
 #include "StringUtil.inl"

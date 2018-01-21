@@ -544,6 +544,21 @@ namespace strUtil
 		return line;
 	}
 
+	size_t NumLines(const wchar_t* pBegin, const wchar_t* pEnd)
+	{
+		X_ASSERT(pBegin <= pEnd, "Invalid range")(pBegin, pEnd);
+
+		size_t lines = 1; // :| !
+		size_t length = pEnd - pBegin;
+		for (size_t i = 0; i < length; i++)
+		{
+			lines += (pBegin[i] == '\n');
+		}
+
+		return lines;
+	}
+
+
 }
 
 
