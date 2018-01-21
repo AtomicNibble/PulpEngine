@@ -27,11 +27,9 @@ public:
 	AssetPath(const char* const beginInclusive, const char* const endExclusive);
 
 public:
-
-	bool stripAssetFolder(assetDb::AssetType::Enum type);
-
 	void replaceSeprators(void);
 
+	bool stripAssetFolder(assetDb::AssetType::Enum type);
 
 };
 

@@ -31,6 +31,7 @@ inline AssetPath::AssetPath(const char* const beginInclusive, const char* const 
 
 }
 
+
 inline void AssetPath::replaceSeprators(void)
 {
 	replaceAll(ASSET_NAME_INVALID_SLASH, ASSET_NAME_SLASH);
