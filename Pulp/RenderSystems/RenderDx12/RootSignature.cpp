@@ -158,8 +158,14 @@ void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DES
 bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATURE_FLAGS flags)
 {
 	if (pSignature_) {
+
+#if PSO_HOT_RELOAD
+		// I don't realse since cache owns it.
+		pSignature_ = nullptr;
+#else
 		X_WARNING("Dx12", "finalize called on a rootSig that already has a device object");
 		return false;
+#endif // !PSO_HOT_RELOAD
 	}
 
 	X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")(samplesInitCount_, samplers_.size());
