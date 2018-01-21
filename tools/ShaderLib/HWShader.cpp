@@ -237,7 +237,7 @@ namespace shader
 		ID3DBlob* pErrorBlob = nullptr;
 
 		core::StopWatch timer;
-		core::string sourcName = name_ + "." + SOURCE_MERGED_FILE_EXTENSION;
+		core::string sourceName = name_ + "." + SOURCE_MERGED_FILE_EXTENSION;
 
 		const char* pEntry = entryPoint_.c_str();
 		if (entryPoint_.isEmpty())
@@ -248,7 +248,7 @@ namespace shader
 		HRESULT hr = D3DCompile(
 			source.data(),
 			source.size(),
-			sourcName,
+			sourceName,
 			macros.data(), // pDefines
 			nullptr, // pInclude
 			pEntry,
