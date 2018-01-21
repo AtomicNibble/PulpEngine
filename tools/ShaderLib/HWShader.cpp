@@ -75,6 +75,8 @@ namespace shader
 
 	bool XHWShader::compileFromSource(const ByteArr& source, CompileFlags flags)
 	{
+		X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")(status_);
+
 		const auto id = core::Thread::GetCurrentID();
 
 		X_LOG0("Shader", "(%" PRIu32 ") Compiling shader: \"%s\"", id, name_.c_str());
