@@ -324,6 +324,7 @@
     <ClInclude Include="Sampler.h" />
     <ClInclude Include="IScriptSys.inl" />
     <ClInclude Include="Sorting\RadixSort.h" />
+    <ClInclude Include="String\AssetName.h" />
     <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\CmdArgs.h" />
     <ClInclude Include="String\FormatMacros.h" />
@@ -786,6 +787,7 @@
       <FileType>Document</FileType>
     </ClInclude>
     <None Include="Sampler.inl" />
+    <None Include="String\AssetName.inl" />
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\Lexer.inl" />
     <None Include="String\StackString.inl" />

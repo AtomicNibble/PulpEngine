@@ -1309,6 +1309,9 @@
     <ClInclude Include="Extension\EngineCreateClass.h">
       <Filter>Headers\Extension</Filter>
     </ClInclude>
+    <ClInclude Include="String\AssetName.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1649,6 +1652,9 @@
     </None>
     <None Include="Containers\FixedByteStreamRing.inl">
       <Filter>Headers\Containers</Filter>
+    </None>
+    <None Include="String\AssetName.inl">
+      <Filter>Headers\String</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
