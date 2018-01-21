@@ -134,6 +134,7 @@ public:
 
 	inline const TChar* findCaseInsen(TChar ch) const;
 	inline const TChar* findCaseInsen(const TChar* string) const;
+	inline const TChar* findCaseInsen(const TChar* pBegin, const TChar* pEnd) const;
 	
 
 

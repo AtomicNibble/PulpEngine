@@ -674,6 +674,12 @@ inline const TChar* StackString<N, TChar>::findCaseInsen(const TChar* string) co
 	return strUtil::FindCaseInsensitive(str_, str_ + len_, string);
 }
 
+template <size_t N, typename TChar>
+inline const TChar* StackString<N, TChar>::findCaseInsen(const TChar* pBegin, const TChar* pEnd) const
+{
+	return strUtil::FindCaseInsensitive(str_, str_ + len_, pBegin, pEnd);
+}
+
 
 
 template <size_t N, typename TChar>
