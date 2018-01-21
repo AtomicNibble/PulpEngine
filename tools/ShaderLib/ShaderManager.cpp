@@ -183,7 +183,19 @@ namespace shader
 
 			if (!pHWShader->compile(source, flags))
 			{
-				X_ERROR("ShadersManager", "Failed to compile shader");
+				auto errLine = pHWShader->getErrorLineNumber();
+				if (errLine >= 0)
+				{
+					auto info = sourceBin_.getSourceInfoForMergedLine(pHWShader->getShaderSource(), errLine);
+
+					X_ERROR("ShadersManager", "Failed to compile shader. Error in \"%s\" line: %" PRIi32,
+						info.name.c_str(), info.line);
+				}
+				else
+				{
+					X_ERROR("ShadersManager", "Failed to compile shader");
+				}
+
 				return false;
 			}
 
