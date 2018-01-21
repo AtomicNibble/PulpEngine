@@ -37,12 +37,22 @@ namespace shader
 		> PoolArena;
 
 	public:
+
+		struct SourceInfo
+		{
+			core::string name;
+			int32_t line;
+		};
+
+
+	public:
 		SHADERLIB_EXPORT SourceBin(core::MemoryArenaBase* arena);
 
 		SHADERLIB_EXPORT void free(void);
 
 		// returns the source of a shader with all it's includes merged.
 		SHADERLIB_EXPORT bool getMergedSource(const SourceFile* pSourceFile, ByteArr& strOut);
+		SHADERLIB_EXPORT SourceInfo getSourceInfoForMergedLine(const SourceFile* pSourceFile, size_t line);
 
 		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
 		SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);

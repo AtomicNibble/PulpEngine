@@ -176,6 +176,42 @@ namespace shader
 		return false;
 	}
 
+	SourceBin::SourceInfo SourceBin::getSourceInfoForMergedLine(const SourceFile* pSourceFile, size_t line)
+	{
+		X_ASSERT_NOT_NULL(pSourceFile);
+
+		SourceInfo info;
+		size_t currentLine = 0;
+
+		core::ScopedLockShared<SourceFile::LockType> lock(pSourceFile->lock);
+
+		for (const auto* pSf : pSourceFile->getIncludeArr())
+		{
+			core::ScopedLockShared<SourceFile::LockType> lock_inc(pSf->lock);
+
+			const auto& data = pSf->getFileData();
+
+			auto lines = core::strUtil::NumLines(
+				reinterpret_cast<const char*>(data.begin()),
+				reinterpret_cast<const char*>(data.end())
+			);
+
+			if (line < (currentLine + lines))
+			{
+				info.line = safe_static_cast<int32_t>(line - currentLine);
+				info.name = pSourceFile->getName();
+				return info;
+			}
+
+			currentLine += lines;
+		}
+
+		// assume it's in this file or out of range..
+		info.line = safe_static_cast<int32_t>(line - currentLine);
+		info.name = pSourceFile->getName();
+		return info;
+	}
+
 
 	SourceFile* SourceBin::loadRawSourceFile(const core::string& name, bool reload)
 	{
