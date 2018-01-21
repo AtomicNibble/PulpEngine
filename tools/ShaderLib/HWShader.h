@@ -72,6 +72,8 @@ namespace shader
 		X_INLINE int32_t getNumInputParams(void) const;
 		X_INLINE int32_t getNumInstructions(void) const;
 		X_INLINE CompileFlags getCompileFlags(void) const;
+		X_INLINE int32_t getErrorLineNumber(void) const;
+
 #if X_ENABLE_RENDER_SHADER_RELOAD
 		X_INLINE int32_t getCompileCount(void) const;
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
@@ -101,6 +103,8 @@ namespace shader
 		bool compileFromSource(const ByteArr& source, CompileFlags compileFlags);
 		bool reflectShader(ID3D10Blob* pShaderBlob);
 
+	private:
+		void logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, const char* pErrorStr);
 		static bool extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col);
 
 	protected:
@@ -116,6 +120,8 @@ namespace shader
 #if X_ENABLE_RENDER_SHADER_RELOAD
 		int32_t compileCount_;
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
+
+		int32_t errLineNo_;
 
 		SourceFile* pSourceFile_;
 

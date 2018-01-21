@@ -45,7 +45,8 @@ namespace shader
 		textures_(arena),
 		buffers_(arena),
 		bytecode_(arena),
-		id_(-1)
+		id_(-1),
+		errLineNo_(-1)
 	{
 #if X_ENABLE_RENDER_SHADER_RELOAD
 		compileCount_ = 0;
@@ -54,7 +55,7 @@ namespace shader
 
 	XHWShader::~XHWShader()
 	{
-
+		
 	}
 
 	bool XHWShader::compile(const ByteArr& source, CompileFlags compileFlags)
@@ -93,6 +94,7 @@ namespace shader
 			numInputParams_ = 0;
 			numRenderTargets_ = 0;
 			numInstructions_ = 0;
+			errLineNo_ = -1;
 
 			cbuffers_.clear();
 			samplers_.clear();
@@ -172,7 +174,7 @@ namespace shader
 
 		if (ILFlags_.IsAnySet())
 		{
-			core::StackString<256, char> macro;
+			core::StackString256 macro;
 
 			for (uint32_t i = 0; i < ILFlags::FLAGS_COUNT; i++)
 			{
@@ -268,19 +270,7 @@ namespace shader
 			{
 				const char* pErrStr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
 
-				core::StackString<4096> filterd(pErrStr, pErrStr + strlen(pErrStr));
-
-				// skip file path.
-				pErrStr = filterd.find(sourcName);
-
-				if (pErrStr) {
-					core::StackString512 path(filterd.begin(), pErrStr);
-					filterd.replaceAll(path.c_str(), "");
-				}
-
-				filterd.stripTrailing('\n');
-
-				X_ERROR("Shader", "(%" PRIu32 ") Failed to compile(%x): %s", id, hr, filterd.c_str());
+				logErrorStr(id, hr, sourceName, pErrStr);
 			}
 			else
 			{
@@ -348,6 +338,35 @@ namespace shader
 		return true;
 	}
 
+	void XHWShader::logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, const char* pErrorStr)
+	{
+		core::StackString<4096> filterd(pErrorStr, pErrorStr + strlen(pErrorStr));
+
+		// skip file path.
+		auto* pErrStr = filterd.find(sourcName);
+		if (!pErrStr) {
+			return;
+		}
+
+		core::StackString512 path(filterd.begin(), pErrStr);
+		filterd.replaceAll(path.c_str(), "");
+
+		// we have: name(line, col)
+		pErrStr = filterd.find(sourcName);
+		if (pErrStr)
+		{
+			int32_t line, col;
+
+			if (extractLineNumberInfo(pErrStr + sourcName.length(), filterd.end(), line, col))
+			{
+				errLineNo_ = line;
+			}
+		}
+
+		filterd.stripTrailing('\n');
+
+		X_ERROR("Shader", "(%" PRIu32 ") Failed to compile(%x): %s", id, hr, filterd.c_str());
+	}
 
 	bool XHWShader::extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col)
 	{

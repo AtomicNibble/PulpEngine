@@ -72,6 +72,11 @@ namespace shader
 		return compileFlags_;
 	}
 
+	X_INLINE int32_t XHWShader::getErrorLineNumber(void) const {
+		return errLineNo_;
+	}
+
+
 #if X_ENABLE_RENDER_SHADER_RELOAD
 
 	X_INLINE int32_t XHWShader::getCompileCount(void) const
