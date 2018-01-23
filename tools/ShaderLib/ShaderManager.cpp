@@ -524,7 +524,7 @@ namespace shader
 				return;
 			}
 
-			core::AssetPath assetName(name);
+			core::AssetName assetName(name);
 			assetName.replaceSeprators();
 			assetName.stripAssetFolder(assetDb::AssetType::SHADER);
 
