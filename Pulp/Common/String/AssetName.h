@@ -7,7 +7,7 @@
 X_NAMESPACE_BEGIN(core)
 
 
-class AssetPath : public StackString<256, char>
+class AssetName : public StackString<256, char>
 {
 	typedef StackString<256, char> BaseType;
 
@@ -18,15 +18,15 @@ public:
 	static const char ASSET_NAME_INVALID_SLASH = assetDb::ASSET_NAME_INVALID_SLASH;
 
 public:
-	AssetPath();
-	AssetPath(assetDb::AssetType::Enum type, const core::string& name);
-	AssetPath(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
-	AssetPath(const AssetPath& oth);
+	AssetName();
+	AssetName(assetDb::AssetType::Enum type, const core::string& name);
+	AssetName(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
+	AssetName(const AssetName& oth);
 	template<size_t Size>
-	explicit AssetPath(const core::StackString<Size, char>& oth);
+	explicit AssetName(const core::StackString<Size, char>& oth);
 
-	explicit AssetPath(const char* const str);
-	AssetPath(const char* const beginInclusive, const char* const endExclusive);
+	explicit AssetName(const char* const str);
+	AssetName(const char* const beginInclusive, const char* const endExclusive);
 
 public:
 	void replaceSeprators(void);
