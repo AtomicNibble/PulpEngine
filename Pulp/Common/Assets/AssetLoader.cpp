@@ -1,6 +1,7 @@
 #include "EngineCommon.h"
 #include "AssetLoader.h"
 #include "AssetBase.h"
+#include <String\AssetName.h>
 
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
@@ -149,17 +150,15 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 
 	auto& name = pLoadReq->pAsset->getName();
 
+	core::AssetName assetName(pAsset->getType(), name, assetExt_[type]);
+
 	// dispatch a read request baby!
 	core::IoRequestOpen open;
 	open.callback.Bind<AssetLoader, &AssetLoader::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = assetDb::AssetType::ToString(pAsset->getType());
-	open.path.append('s', 1);
-	open.path.append(assetDb::ASSET_NAME_SLASH, 1);
-	open.path.toLower();
-	open.path.append(name.begin(), name.end());
-	open.path.setExtension(assetExt_[type]);
+	open.path.set(assetName.begin(), assetName.end());
+
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }
