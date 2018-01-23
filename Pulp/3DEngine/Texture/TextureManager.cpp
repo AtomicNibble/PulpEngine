@@ -9,6 +9,7 @@
 #include <ICompression.h>
 
 #include <Compression\CompressorAlloc.h>
+#include <String\AssetName.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -224,13 +225,13 @@ void TextureManager::dispatchRead(Texture* pTexture)
 	core::IoCallBack del;
 	del.Bind<TextureManager, &TextureManager::IoRequestCallback>(this);
 
+	core::AssetName assetName(assetDb::AssetType::IMG, name, texture::CI_FILE_EXTENSION);
+
 	core::IoRequestOpen req;
 	req.callback = del;
 	req.pUserData = pTexture;
 	req.mode = mode;
-	req.path = "imgs/";
-	req.path.append(name.begin(), name.end());
-	req.path.setExtension(texture::CI_FILE_EXTENSION);
+	req.path.set(assetName.begin(), assetName.end());
 	
 	gEnv->pFileSys->AddIoRequestToQue(req);
 }
