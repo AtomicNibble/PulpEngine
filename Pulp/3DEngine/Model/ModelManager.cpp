@@ -9,6 +9,7 @@
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
+#include <String\AssetName.h>
 
 X_NAMESPACE_BEGIN(model)
 
@@ -322,14 +323,13 @@ void XModelManager::dispatchLoadRequest(ModelLoadRequest* pLoadReq)
 
 	auto& name = pLoadReq->pModel->getName();
 
+	core::AssetName assetName(assetDb::AssetType::MODEL, name, MODEL_FILE_EXTENSION);
+
 	core::IoRequestOpen open;
 	open.callback.Bind<XModelManager, &XModelManager::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = "models/";
-	open.path.append(name.begin(), name.end());
-	open.path.setExtension(MODEL_FILE_EXTENSION);
-
+	open.path.set(assetName.begin(), assetName.end());
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }
