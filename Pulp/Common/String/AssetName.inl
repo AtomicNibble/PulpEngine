@@ -48,7 +48,7 @@ inline void AssetName::replaceSeprators(void)
 	replaceAll(ASSET_NAME_INVALID_SLASH, ASSET_NAME_SLASH);
 }
 
-void AssetName::set(assetDb::AssetType::Enum type, const core::string& name)
+inline void AssetName::set(assetDb::AssetType::Enum type, const core::string& name)
 {
 	BaseType::set(assetDb::AssetType::ToString(type));
 	BaseType::append('s', 1);
@@ -57,7 +57,7 @@ void AssetName::set(assetDb::AssetType::Enum type, const core::string& name)
 	BaseType::append(name.begin(), name.end());
 }
 
-bool AssetName::stripAssetFolder(assetDb::AssetType::Enum type)
+inline bool AssetName::stripAssetFolder(assetDb::AssetType::Enum type)
 {
 	StackString<64, char> prefix(assetDb::AssetType::ToString(type));
 	prefix.append('s', 1);
@@ -74,7 +74,7 @@ bool AssetName::stripAssetFolder(assetDb::AssetType::Enum type)
 }
 
 
-const char* AssetName::extension(bool incDot) const
+inline const char* AssetName::extension(bool incDot) const
 {
 	const char* res = BaseType::findLast('.');
 
@@ -88,7 +88,7 @@ const char* AssetName::extension(bool incDot) const
 	return res + 1;
 }
 
-void AssetName::setExtension(const char* pExtension)
+inline void AssetName::setExtension(const char* pExtension)
 {
 	const char* remove = BaseType::findLast('.');	// need to remvoe a extension?
 	bool has_dot = (pExtension[0] == '.'); // new extension got a dot?
