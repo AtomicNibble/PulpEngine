@@ -19,6 +19,8 @@ public:
 
 public:
 	AssetPath();
+	AssetPath(assetDb::AssetType::Enum type, const core::string& name);
+	AssetPath(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
 	AssetPath(const AssetPath& oth);
 	template<size_t Size>
 	explicit AssetPath(const core::StackString<Size, char>& oth);
@@ -29,7 +31,11 @@ public:
 public:
 	void replaceSeprators(void);
 
+	void set(assetDb::AssetType::Enum type, const core::string& name);
 	bool stripAssetFolder(assetDb::AssetType::Enum type);
+
+	const char* extension(bool incDot) const;
+	void setExtension(const char* pExtension);
 
 };
 
