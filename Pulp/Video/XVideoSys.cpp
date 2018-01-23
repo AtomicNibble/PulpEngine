@@ -3,6 +3,7 @@
 #include "XVideo.h"
 
 #include <Threading\JobSystem2.h>
+#include <String\AssetName.h>
 #include <IConsole.h>
 
 
@@ -192,13 +193,13 @@ void XVideoSys::dispatchLoadRequest(VideoLoadRequest* pLoadReq)
 {
 	auto& name = pLoadReq->pVideo->getName();
 
+	core::AssetName assetName(assetDb::AssetType::VIDEO, name, VIDEO_FILE_EXTENSION);
+
 	core::IoRequestOpen open;
 	open.callback.Bind<XVideoSys, &XVideoSys::IoRequestCallback>(this);
 	open.pUserData = pLoadReq;
 	open.mode = core::fileMode::READ;
-	open.path = "videos/";
-	open.path.append(name.begin(), name.end());
-	open.path.setExtension(VIDEO_FILE_EXTENSION);
+	open.path.set(assetName.begin(), assetName.end());
 
 	gEnv->pFileSys->AddIoRequestToQue(open);
 }
