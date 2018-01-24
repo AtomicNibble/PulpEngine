@@ -29,6 +29,9 @@
     <ClInclude Include="AssetFileExtensions.h">
       <Filter>Header Files\AssetDB</Filter>
     </ClInclude>
+    <ClInclude Include="AssetDBUtil.h">
+      <Filter>Header Files\AssetDB</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -44,6 +47,9 @@
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
     <ClCompile Include="AssetFileExtensions.cpp">
+      <Filter>Source Files\AssetDB</Filter>
+    </ClCompile>
+    <ClCompile Include="AssetDBUtil.cpp">
       <Filter>Source Files\AssetDB</Filter>
     </ClCompile>
   </ItemGroup>

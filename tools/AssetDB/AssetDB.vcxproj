@@ -444,11 +444,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="AssetDB.h" />
+    <ClInclude Include="AssetDBUtil.h" />
     <ClInclude Include="AssetFileExtensions.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="AssetDB.cpp" />
+    <ClCompile Include="AssetDBUtil.cpp" />
     <ClCompile Include="AssetFileExtensions.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="dllmain.cpp" />
