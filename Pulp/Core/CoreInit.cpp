@@ -63,29 +63,21 @@
 
 X_USING_NAMESPACE;
 
-#define DLL_INPUT			"Engine_Input"
-#define DLL_FONT			"Engine_Font"
-#define DLL_SOUND			"Engine_Sound"
-#define DLL_SCRIPT			"Engine_Script"
-#define DLL_RENDER			"Engine_RenderDx12"
-#define DLL_RENDER_CLASS	"Engine_RenderDx12"
-#define DLL_RENDER_NULL		"Engine_RenderNull"
-#define DLL_3D_ENGINE		"Engine_3DEngine"
-#define DLL_GAME_DLL		"Engine_GameDLL"
-#define DLL_PHYSICS			"Engine_Physics"
-#define DLL_NET				"Engine_Network"
-#define DLL_VIDEO			"Engine_Video"
+#define DLL_INPUT			X_ENGINE_OUTPUT_PREFIX "Input"
+#define DLL_FONT			X_ENGINE_OUTPUT_PREFIX "Font"
+#define DLL_SOUND			X_ENGINE_OUTPUT_PREFIX "Sound"
+#define DLL_SCRIPT			X_ENGINE_OUTPUT_PREFIX "Script"
+#define DLL_RENDER			X_ENGINE_OUTPUT_PREFIX "RenderDx12"
+#define DLL_RENDER_NULL		X_ENGINE_OUTPUT_PREFIX "RenderNull"
+#define DLL_3D_ENGINE		X_ENGINE_OUTPUT_PREFIX "3DEngine"
+#define DLL_GAME_DLL		X_ENGINE_OUTPUT_PREFIX "GameDLL"
+#define DLL_PHYSICS			X_ENGINE_OUTPUT_PREFIX "Physics"
+#define DLL_NET				X_ENGINE_OUTPUT_PREFIX "Network"
+#define DLL_VIDEO			X_ENGINE_OUTPUT_PREFIX "Video"
 
 
-
-#if defined(WIN32)
 #define DLL_MODULE_INIT_ICORE	"LinkModule"
 #define DLL_INITFUNC_INPUT		"CreateInput"
-#else
-#error "wut.. is this below?"
-#define DLL_MODULE_INIT_ICORE (LPCSTR)2
-#define DLL_INITFUNC_INPUT     (LPCSTR)1
-#endif
 
 
 namespace
@@ -983,7 +975,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
 	}
 	else
 	{
-		if (!IntializeEngineModule(DLL_RENDER, DLL_RENDER_CLASS, initParams)) {
+		if (!IntializeEngineModule(DLL_RENDER, "Engine_RenderDx12", initParams)) {
 			return false;
 		}
 	}

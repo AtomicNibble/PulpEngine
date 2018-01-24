@@ -19,7 +19,7 @@
 #endif // !X_AS_LIB
 
 
-X_LINK_LIB("Engine_Core");
+X_LINK_ENGINE_LIB("Core");
 
 
 

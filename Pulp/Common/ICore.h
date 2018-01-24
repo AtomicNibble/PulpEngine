@@ -431,7 +431,7 @@ extern "C"
 
 	IPCORE_API ICore* CreateCoreInterface(const SCoreInitParams &initParams);
 
-	#define CORE_DLL_NAME "engine_Core.dll"
+	#define CORE_DLL_NAME X_ENGINE_OUTPUT_PREFIX "Core"
 	#define CORE_DLL_INITFUNC "CreateCoreInterface"
 
 }

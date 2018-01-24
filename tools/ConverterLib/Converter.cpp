@@ -659,7 +659,8 @@ bool Converter::EnsureLibLoaded(AssetType::Enum assType)
 
 bool Converter::IntializeConverterModule(AssetType::Enum assType)
 {
-	core::StackString<128> dllName("Engine_");
+	core::StackString<128> dllName(X_ENGINE_OUTPUT_PREFIX);
+	core::StackString<128> className("Engine_");
 
 	{
 		core::StackString<64> typeName(AssetType::ToString(assType));
@@ -669,11 +670,11 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType)
 		}
 
 		dllName.append(typeName.c_str());
+		className.append(typeName.c_str());
 	}
 
 	dllName.append("Lib");
-
-	core::StackString<128> className(dllName);
+	className.append("Lib");
 
 	return IntializeConverterModule(assType, dllName.c_str(), className.c_str());
 }
