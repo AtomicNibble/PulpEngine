@@ -43,6 +43,6 @@ PS_OUTPUT ps_main( PS_INPUT IN )
     output.color = IN.color;
     output.color.r =  IN.ssPosition.x;
     output.color.g =  IN.ssPosition.y;
-    output.color.b=  IN.ssPosition.z;
+    output.color.b =  IN.ssPosition.z;
     return output;
 }
