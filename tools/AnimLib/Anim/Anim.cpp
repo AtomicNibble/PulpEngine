@@ -403,7 +403,7 @@ bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 
 	bones_.resize(hdr.numBones);
 
-	core::MemCursor cursor(data.ptr(), hdr.dataSize);
+	core::MemCursor cursor(data.ptr() + sizeof(hdr), hdr.dataSize);
 
 	for (auto& bone : bones_)
 	{
