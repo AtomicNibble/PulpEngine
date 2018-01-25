@@ -15,8 +15,6 @@ X_NAMESPACE_DECLARE(core,
 		class JobSystem;
 	}
 
-	struct XFileAsync;
-	struct IoRequestBase;
 	struct IConsoleCmdArgs;
 )
 
