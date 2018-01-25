@@ -288,7 +288,6 @@ void X3DEngine::Update(core::FrameData& frame)
 	X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
 
 	pTextureManager_->scheduleStreaming();
-	pModelManager_->dispatchPendingLoads();
 	pAnimManager_->dispatchPendingLoads();
 	pMaterialManager_->dispatchPendingLoads();
 
