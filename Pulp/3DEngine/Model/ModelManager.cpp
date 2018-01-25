@@ -20,12 +20,9 @@ XModelManager::XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase
 	blockArena_(blockArena),
 	pAssetLoader_(nullptr),
 	pDefaultModel_(nullptr),
-	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource), "ModelPool"),
-	requestQueue_(arena),
-	pendingRequests_(arena)
+	models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource), "ModelPool")
 {
-	requestQueue_.reserve(64);
-	pendingRequests_.setGranularity(32);
+
 }
 
 XModelManager::~XModelManager()

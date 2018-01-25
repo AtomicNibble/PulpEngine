@@ -105,13 +105,6 @@ private:
 
 	RenderModel*	pDefaultModel_;
 	ModelContainer	models_;
-
-	// loading
-	core::CriticalSection loadReqLock_;
-	core::ConditionVariable loadCond_;
-
-	ModelQueue requestQueue_;
-	ModelLoadRequestArr pendingRequests_;
 };
 
 X_NAMESPACE_END
