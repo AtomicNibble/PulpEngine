@@ -428,7 +428,6 @@ bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 
 	data_ = std::move(data);
 	pHdr_ = reinterpret_cast<AnimHeader*>(data_.get());
-	status_ = core::LoadStatus::Complete;
 	return true;
 }
 
