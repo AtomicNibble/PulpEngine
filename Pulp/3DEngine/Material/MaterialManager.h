@@ -6,9 +6,6 @@
 #include <String\StrRef.h>
 
 #include <Assets\AssertContainer.h>
-#include <Util\UniquePointer.h>
-#include <Containers\Fifo.h>
-#include <Time\TimeVal.h>
 
 #include "Vars\MaterialVars.h"
 
@@ -18,8 +15,6 @@ X_NAMESPACE_DECLARE(core,
 		class JobSystem;
 	}
 
-	struct XFileAsync;
-	struct IoRequestBase;
 	struct IConsoleCmdArgs;
 )
 
@@ -36,35 +31,17 @@ class TechDefStateManager;
 class CBufferManager;
 class Material;
 
-struct MaterialLoadRequest
-{
-	MaterialLoadRequest(Material* pModel) :
-		pFile(nullptr),
-		pMaterial(pModel),
-		dataSize(0)
-	{
-	}
-	core::XFileAsync* pFile;
-	Material* pMaterial;
-	core::UniquePointer<uint8_t[]> data;
-	uint32_t dataSize;
-	core::TimeVal dispatchTime;
-	core::TimeVal ioTime;
-	core::TimeVal loadTime;
-};
-
 
 class XMaterialManager : 
 	public IMaterialManager, 
 	public ICoreEventListener, 
-	public core::IXHotReload
+	public core::IXHotReload,
+	private core::IAssetLoadSink
 {
 	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
 	typedef MaterialContainer::Resource MaterialResource;
 
 	typedef core::Array<Material*> MaterialArr;
-	typedef core::Array<MaterialLoadRequest*> MaterialLoadRequestArr;
-	typedef core::Fifo<MaterialResource*> MaterialQueue;
 
 public:
 	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
@@ -77,7 +54,6 @@ public:
 	void shutDown(void);
 
 	bool asyncInitFinalize(void);
-	void dispatchPendingLoads(void);
 
 	// IMaterialManager
 	Material* findMaterial(const char* pMtlName) const X_FINAL;
@@ -103,27 +79,14 @@ private:
 
 private:
 	bool initDefaults(void);
-	void freeDanglingMaterials(void);
+	void freeDangling(void);
 	void releaseResources(Material* pMat);
 
 	void addLoadRequest(MaterialResource* pMaterial);
-	void queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&);
-	void dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&);
-	bool dispatchPendingLoad(core::CriticalSection::ScopedLock&);
-	void dispatchLoadRequest(MaterialLoadRequest* pLoadReq);
-
-
-	// load / processing
-	void onLoadRequestFail(MaterialLoadRequest* pLoadReq);
-	void loadRequestCleanup(MaterialLoadRequest* pLoadReq);
-
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+	bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
 	bool processData(Material* pMaterial, core::XFile* pFile);
-
 
 private:
 	// ICoreEventListener
@@ -141,6 +104,9 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* blockArena_;
+
+	core::AssetLoader* pAssetLoader_;
+
 	CBufferManager& cBufMan_;
 	VariableStateManager& vsMan_;
 	TechDefStateManager* pTechDefMan_;
@@ -150,12 +116,7 @@ private:
 
 	Material* pDefaultMtl_;
 
-	// loading
-	core::CriticalSection loadReqLock_;
-	core::ConditionVariable loadCond_;
-
-	MaterialQueue requestQueue_;
-	MaterialLoadRequestArr pendingRequests_;
+	core::CriticalSection failedLoadLock_;
 	MaterialArr failedLoads_;
 };
 

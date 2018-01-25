@@ -10,6 +10,7 @@
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
+#include <Assets\AssetLoader.h>
 
 #include "TechDefStateManager.h"
 #include "Drawing\VariableStateManager.h"
@@ -30,19 +31,15 @@ using namespace render::shader;
 XMaterialManager::XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan) :
 	arena_(arena),
 	blockArena_(arena),
+	pAssetLoader_(nullptr),
 	pTechDefMan_(nullptr),
 	cBufMan_(cBufMan),
 	vsMan_(vsMan),
 	materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u,X_ALIGN_OF(MaterialResource)), "MaterialPool"),
 	pDefaultMtl_(nullptr),
-	requestQueue_(arena),
-	pendingRequests_(arena),
 	failedLoads_(arena)
 {
 	pTechDefMan_ = X_NEW(TechDefStateManager, arena, "TechDefStateManager")(arena);
-
-	requestQueue_.reserve(64);
-	pendingRequests_.setGranularity(32);
 }
 
 XMaterialManager::~XMaterialManager()
@@ -72,6 +69,9 @@ bool XMaterialManager::init(void)
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
+	pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+	pAssetLoader_->registerAssetType(assetDb::AssetType::MATERIAL, this, MTL_B_FILE_EXTENSION);
+
 	if (!initDefaults()) {
 		return false;
 	}
@@ -93,7 +93,7 @@ void XMaterialManager::shutDown(void)
 		releaseMaterial(pDefaultMtl_);
 	}
 
-	freeDanglingMaterials();
+	freeDangling();
 
 	if (pTechDefMan_) {
 		pTechDefMan_->shutDown();
@@ -102,8 +102,6 @@ void XMaterialManager::shutDown(void)
 
 bool XMaterialManager::asyncInitFinalize(void)
 {
-	dispatchPendingLoads();
-
 	if (!pDefaultMtl_) {
 		X_ERROR("Material", "Default Material is not valid");
 		return false;
@@ -118,6 +116,8 @@ bool XMaterialManager::asyncInitFinalize(void)
 
 	// anything that failed to load, while default material was loading
 	// assing default to it now.
+	core::CriticalSection::ScopedLock lock(failedLoadLock_);
+
 	for (auto* pMat : failedLoads_)
 	{
 		X_ASSERT(pMat->getStatus() == core::LoadStatus::Error, "Unexpected status")();
@@ -198,15 +198,13 @@ bool XMaterialManager::initDefaults(void)
 			X_ERROR("Material", "Failed to create default material");
 			return false;
 		}
-
-		dispatchPendingLoads();
 	}
 
 	return true;
 }
 
 
-void XMaterialManager::freeDanglingMaterials(void)
+void XMaterialManager::freeDangling(void)
 {
 	{
 		core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
@@ -266,89 +264,15 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
 
 
 
-void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
+bool XMaterialManager::waitForLoad(core::AssetBase* pAnim)
 {
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
+	X_ASSERT(pAnim->getType() == assetDb::AssetType::ANIM, "Invalid asset passed")();
 
-	pMaterial->addReference(); // prevent instance sweep
-	pMaterial->setStatus(core::LoadStatus::Loading);
-
-	// queue it if over 16 active requests.
-	int32_t maxReq = vars_.maxActiveLoadReq();
-	if (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq)
-	{
-		dispatchLoad(pMaterial, lock);
-	}
-	else
-	{
-		queueLoadRequest(pMaterial, lock);
-	}
-}
-
-
-void XMaterialManager::queueLoadRequest(MaterialResource* pMaterial, core::CriticalSection::ScopedLock&)
-{
-	X_ASSERT(pMaterial->getName().isNotEmpty(), "Material has no name")();
-
-	// can we know it's not in this queue just from status?
-	// like if it's complete it could be in this status
-	auto status = pMaterial->getStatus();
-	if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading)
-	{
-		X_WARNING("Material", "Redundant load request requested: \"%s\"", pMaterial->getName().c_str());
-		return;
-	}
-
-	X_ASSERT(!requestQueue_.contains(pMaterial), "Queue already contains asset")(pMaterial);
-
-	requestQueue_.push(pMaterial);
-}
-
-
-void XMaterialManager::dispatchLoad(Material* pMaterial, core::CriticalSection::ScopedLock&)
-{
-	X_ASSERT(pMaterial->getStatus() == core::LoadStatus::Loading || pMaterial->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
-
-	auto loadReq = core::makeUnique<MaterialLoadRequest>(arena_, pMaterial);
-
-	// dispatch IO 
-	dispatchLoadRequest(loadReq.get());
-
-	pendingRequests_.emplace_back(loadReq.release());
-}
-
-bool XMaterialManager::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
-{
-	int32_t maxReq = vars_.maxActiveLoadReq();
-
-	if (requestQueue_.isNotEmpty() && (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq))
-	{
-		X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
-		dispatchLoad(requestQueue_.peek(), lock);
-		requestQueue_.pop();
+	if (pAnim->isLoaded()) {
 		return true;
 	}
 
-	return false;
-}
-
-
-void XMaterialManager::dispatchPendingLoads(void)
-{
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
-
-	while (dispatchPendingLoad(lock));
-}
-
-bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
-{
-	X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")();
-
-	if (pMaterial->getStatus() == core::LoadStatus::Complete) {
-		return true;
-	}
-
-	return waitForLoad(static_cast<Material*>(pMaterial));
+	return waitForLoad(static_cast<Material*>(pAnim));
 }
 
 bool XMaterialManager::waitForLoad(Material* pMaterial)
@@ -357,56 +281,17 @@ bool XMaterialManager::waitForLoad(Material* pMaterial)
 		return true;
 	}
 
-	{
-		// we lock to see if loading as another thread might just be about to change state.
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		while (pMaterial->getStatus() == core::LoadStatus::Loading)
-		{
-			loadCond_.Wait(loadReqLock_);
-		}
-
-	}
-
-	// did we fail? or never sent a dispatch?
-	auto status = pMaterial->getStatus();
-	if (status == core::LoadStatus::Complete)
-	{
-		return true;
-	}
-	else if (status == core::LoadStatus::Error)
-	{
-		return false;
-	}
-	else if (status == core::LoadStatus::NotLoaded)
-	{
-		// request never sent?
-	}
-
-	X_ASSERT_UNREACHABLE();
-	return false;
+	return pAssetLoader_->waitForLoad(pMaterial);
 }
 
-void XMaterialManager::dispatchLoadRequest(MaterialLoadRequest* pLoadReq)
+void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
 {
-	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
-
-	auto& name = pLoadReq->pMaterial->getName();
-
-	// dispatch a read request baby!
-	core::IoRequestOpen open;
-	open.callback.Bind<XMaterialManager, &XMaterialManager::IoRequestCallback>(this);
-	open.pUserData = pLoadReq;
-	open.mode = core::fileMode::READ;
-	open.path = "materials/";
-	open.path.append(name.begin(), name.end());
-	open.path.setExtension(MTL_B_FILE_EXTENSION);
-
-	gEnv->pFileSys->AddIoRequestToQue(open);
+	pAssetLoader_->addLoadRequest(pMaterial);
 }
 
-void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
+void XMaterialManager::onLoadRequestFail(core::AssetBase* pAsset)
 {
-	auto* pMaterial = pLoadReq->pMaterial;
+	auto* pMaterial = static_cast<Material*>(pAsset);
 
 	if (pDefaultMtl_ != pMaterial)
 	{
@@ -415,7 +300,7 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 		{
 			// we can't wait for fucking IO load, since this is called by the IO thread.
 			// if it's not loaded it will never load.
-			core::CriticalSection::ScopedLock lock(loadReqLock_);
+			core::CriticalSection::ScopedLock lock(failedLoadLock_);
 
 			pMaterial->setStatus(core::LoadStatus::Error);
 			failedLoads_.push_back(pMaterial);
@@ -430,117 +315,15 @@ void XMaterialManager::onLoadRequestFail(MaterialLoadRequest* pLoadReq)
 		pMaterial->setStatus(core::LoadStatus::Error);
 	}
 
-
-	loadRequestCleanup(pLoadReq);
 }
 
-void XMaterialManager::loadRequestCleanup(MaterialLoadRequest* pLoadReq)
+bool XMaterialManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
+	auto* pMaterial = static_cast<Material*>(pAsset);
 
-	auto status = pLoadReq->pMaterial->getStatus();
-	X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
+	core::XFileFixedBuf file(data.ptr(), data.ptr() + dataSize);
 
-	X_LOG0("Material", "Material loaded in: ^6%fms^7 io:^6%fms",
-		(pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds(),
-		(pLoadReq->ioTime - pLoadReq->dispatchTime).GetMilliSeconds()
-	);
-	
-	{
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		pendingRequests_.remove(pLoadReq);
-
-		// dispatch another?
-		dispatchPendingLoad(lock);
-	}
-
-	if (pLoadReq->pFile) {
-		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
-	}
-
-	// release our ref.
-	releaseMaterial(pLoadReq->pMaterial);
-
-	X_DELETE(pLoadReq, arena_);
-
-	loadCond_.NotifyAll();
-}
-
-
-void XMaterialManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-	core::IoRequest::Enum requestType = pRequest->getType();
-	MaterialLoadRequest* pLoadReq = pRequest->getUserData<MaterialLoadRequest>();
-	Material* pMaterial = pLoadReq->pMaterial;
-
-	if (requestType == core::IoRequest::OPEN)
-	{
-		pLoadReq->ioTime = core::StopWatch::GetTimeNow();
-
-		if (!pFile)
-		{
-			X_ERROR("Material", "Failed to load: \"%s\"", pMaterial->getName().c_str());
-			onLoadRequestFail(pLoadReq);
-			return;
-		}
-
-		pLoadReq->pFile = pFile;
-
-		// read the whole file.
-		uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
-		X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
-		pLoadReq->data = core::makeUnique<uint8_t[]>(blockArena_, fileSize, 16);
-		pLoadReq->dataSize = fileSize;
-
-		core::IoRequestRead read;
-		read.callback.Bind<XMaterialManager, &XMaterialManager::IoRequestCallback>(this);
-		read.pUserData = pLoadReq;
-		read.pFile = pFile;
-		read.dataSize = fileSize;
-		read.offset = 0;
-		read.pBuf = pLoadReq->data.ptr();
-		fileSys.AddIoRequestToQue(read);
-	}
-	else if (requestType == core::IoRequest::READ)
-	{
-		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
-
-		X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")();
-
-		if (bytesTransferred != pReadReq->dataSize)
-		{
-			X_ERROR("Material", "Failed to read material data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);
-			onLoadRequestFail(pLoadReq);
-			return;
-		}
-
-		gEnv->pJobSys->CreateMemberJobAndRun<XMaterialManager>(this, &XMaterialManager::ProcessData_job,
-			pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));	
-	}
-}
-
-void XMaterialManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
-	X_UNUSED(pData);
-
-	MaterialLoadRequest* pLoadReq = static_cast<MaterialLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-	Material* pMaterial = pLoadReq->pMaterial;
-
-	core::XFileFixedBuf file(pLoadReq->data.ptr(), pLoadReq->data.ptr() + pLoadReq->dataSize);
-	
-
-	if (!processData(pMaterial, &file))
-	{
-		onLoadRequestFail(pLoadReq);
-	}
-	else
-	{
-		loadRequestCleanup(pLoadReq);
-	}
+	return processData(pMaterial, &file);
 }
 
 

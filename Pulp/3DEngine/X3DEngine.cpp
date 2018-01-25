@@ -288,7 +288,6 @@ void X3DEngine::Update(core::FrameData& frame)
 	X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
 
 	pTextureManager_->scheduleStreaming();
-	pMaterialManager_->dispatchPendingLoads();
 
 //	Matrix44f view = Matrix44f::identity();
 //	Matrix44f viewProj;
