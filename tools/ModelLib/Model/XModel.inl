@@ -4,29 +4,29 @@ X_NAMESPACE_BEGIN(model)
 
 X_INLINE int32_t XModel::getNumLods(void) const
 {
-	return hdr_.numLod;
+	return pHdr_->numLod;
 }
 
 X_INLINE int32_t XModel::getNumBones(void) const
 {
-	return hdr_.numBones;
+	return pHdr_->numBones;
 }
 
 X_INLINE int32_t XModel::getNumRootBones(void) const
 {
-	return hdr_.numRootBones;
+	return pHdr_->numRootBones;
 }
 
 X_INLINE int32_t XModel::getNumMeshTotal(void) const
 {
-	return hdr_.numMesh;
+	return pHdr_->numMesh;
 }
 
 X_INLINE int32_t XModel::getNumVerts(size_t lodIdx) const
 {
 	X_ASSERT(lodIdx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), lodIdx);
 
-	return hdr_.lodInfo[lodIdx].numVerts;
+	return pHdr_->lodInfo[lodIdx].numVerts;
 }
 
 X_INLINE bool XModel::hasLods(void) const
@@ -37,12 +37,14 @@ X_INLINE bool XModel::hasLods(void) const
 
 X_INLINE bool XModel::hasPhys(void) const
 {
-	return hdr_.flags.IsSet(ModelFlag::PHYS_DATA);
+	X_ASSERT_NOT_NULL(pHdr_);
+	return pHdr_->flags.IsSet(ModelFlag::PHYS_DATA);
 }
 
 X_INLINE bool XModel::isAnimated(void) const
 {
-	return hdr_.flags.IsSet(ModelFlag::ANIMATED);
+	X_ASSERT_NOT_NULL(pHdr_);
+	return pHdr_->flags.IsSet(ModelFlag::ANIMATED);
 }
 
 
@@ -51,7 +53,7 @@ X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 	// we select the lowest level lod that is visible
 	for (int32_t i = 0; i < getNumLods(); i++)
 	{
-		if (hdr_.lodInfo[i].lodDistance > distance) {
+		if (pHdr_->lodInfo[i].lodDistance > distance) {
 			return i;
 		}
 	}
@@ -62,30 +64,30 @@ X_INLINE size_t XModel::lodIdxForDistance(float distance) const
 
 X_INLINE const AABB& XModel::bounds(void) const
 {
-	return hdr_.boundingBox;
+	return pHdr_->boundingBox;
 }
 
 X_INLINE const AABB& XModel::bounds(size_t lodIdx) const
 {
-	return hdr_.lodInfo[lodIdx].boundingBox;
+	return pHdr_->lodInfo[lodIdx].boundingBox;
 }
 
 X_INLINE const Sphere& XModel::boundingSphere(size_t lodIdx) const
 {
-	return hdr_.lodInfo[lodIdx].boundingSphere;
+	return pHdr_->lodInfo[lodIdx].boundingSphere;
 }
 
 
 X_INLINE const LODHeader& XModel::getLod(size_t idx) const
 {
 	X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx);
-	return hdr_.lodInfo[idx];
+	return pHdr_->lodInfo[idx];
 }
 
 X_INLINE const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
 {
 	X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx);
-	return hdr_.lodInfo[idx];
+	return pHdr_->lodInfo[idx];
 }
 
 X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
@@ -101,7 +103,7 @@ X_INLINE const char* XModel::getBoneName(size_t idx) const
 	X_ASSERT(static_cast<int32_t>(idx) < getNumBones(), "invalid bone index")(getNumBones(), idx);
 
 	// temp hack.
-	const char* pBoneName = (char*)(data_.ptr() + pTagNames_[idx]);
+	const char* pBoneName = (char*)(data_.ptr() + sizeof(ModelHeader) + pTagNames_[idx]);
 
 	return pBoneName;
 }

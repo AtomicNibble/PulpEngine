@@ -21,7 +21,7 @@ XModel::XModel(core::string& name) :
 	pBoneAngles_ = nullptr;
 	pBonePos_ = nullptr;
 	pMeshHeads_ = nullptr;
-
+	pHdr_ = nullptr;
 }
 
 XModel::~XModel()
@@ -52,11 +52,27 @@ XModel::~XModel()
 //
 
 
-void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan)
+bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, engine::IMaterialManager* pMatMan)
 {
-	int32_t i, x;
+	if (dataSize < sizeof(ModelHeader)) {
+		return false;
+	}
+	
+	ModelHeader& hdr = *reinterpret_cast<ModelHeader*>(data.get());
 
-	core::MemCursor mat_name_cursor(data.get(), hdr.materialNameDataSize);
+	if (!hdr.isValid()) {
+		X_ERROR("Model", "\"%s\" model header is invalid", name_.c_str());
+		return false;
+	}
+
+	if (dataSize != (hdr.dataSize + sizeof(hdr))) {
+		X_ERROR("Model", "\"%s\" incompleted data", name_.c_str());
+		return false;
+	}
+
+	char* pDataBegin = (data.get() + sizeof(hdr));
+
+	core::MemCursor mat_name_cursor(pDataBegin, hdr.materialNameDataSize);
 	core::MemCursor tag_name_cursor(mat_name_cursor.end(), hdr.tagNameDataSize);
 	core::MemCursor bone_data_cursor(tag_name_cursor.end(), hdr.boneDataSize);
 	core::MemCursor phys_data_cursor(bone_data_cursor.end(), hdr.physDataSize);
@@ -73,7 +89,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	pBoneAnglesRel_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
 	pBonePosRel_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
 
-	X_ASSERT(bone_data_cursor.isEof(), "Load error")();
+	X_ASSERT(bone_data_cursor.isEof(), "Load error")(bone_data_cursor.numBytesRemaning());
 
 	if (hdr.flags.IsSet(ModelFlag::PHYS_DATA))
 	{
@@ -104,6 +120,8 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	seekCursorToPad();
 
 	pMeshHeads_ = cursor.getPtr<SubMeshHeader>();
+
+	int32_t i;
 
 	// we now have the mesh headers.
 	for (i = 0; i < hdr.numLod; i++)
@@ -152,7 +170,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 
 		// now set the sub mesh pointers.
 		{
-			for (x = 0; x < lod.numSubMeshes; x++)
+			for (uint16_t x = 0; x < lod.numSubMeshes; x++)
 			{
 				SubMeshHeader& mesh = meshHeads[x];
 				// when model is created the submesh streams have the byte offsets set.
@@ -165,7 +183,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 		}
 
 		// indexes
-		for (x = 0; x < lod.numSubMeshes; x++)
+		for (uint16_t x = 0; x < lod.numSubMeshes; x++)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
 			mesh.indexes = cursor.postSeekPtr<Index>(mesh.numIndexes);
@@ -176,7 +194,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 		{
 			lod.streams[VertexStream::HWSKIN] = cursor.getPtr<void>();
 
-			for (x = 0; x < lod.numSubMeshes; x++)
+			for (uint16_t x = 0; x < lod.numSubMeshes; x++)
 			{
 				SubMeshHeader& mesh = meshHeads[x];
 
@@ -199,7 +217,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 		X_ASSERT_ALIGNMENT(lod.indexes.as<uintptr_t>(), 16, 0);
 	}
 
-
+	X_ASSERT(cursor.isEof(), "Load error")(cursor.numBytesRemaning());
 
 	// even tho the names are stored at the top of the file we process them now.
 	// so that i can set name pointers in the MeshHeaders for convience :D !
@@ -232,7 +250,7 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 
 		for (i = 0; i < hdr.numBones; i++)
 		{
-			((uint16_t*)pTagNames_)[i] = safe_static_cast<uint16>(tag_name_cursor.getPtr<uint8_t>() - data.ptr());
+			((uint16_t*)pTagNames_)[i] = safe_static_cast<uint16>(tag_name_cursor.getPtr<char>() - pDataBegin);
 
 			while (!tag_name_cursor.isEof() && tag_name_cursor.get<char>() != '\0') {
 				name.append(tag_name_cursor.getSeek<char>(), 1);
@@ -247,9 +265,8 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 		}
 	}
 
-	X_ASSERT(cursor.isEof(), "Load error")();
-	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
-	X_ASSERT(tag_name_cursor.isEof(), "Load error")();
+	X_ASSERT(mat_name_cursor.isEof(), "Load error")(mat_name_cursor.numBytesRemaning());
+	X_ASSERT(tag_name_cursor.isEof(), "Load error")(tag_name_cursor.numBytesRemaning());
 
 
 	// load the materials.
@@ -274,17 +291,17 @@ void XModel::processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, 
 	}
 
 	data_ = std::move(data);
-	hdr_ = hdr;
-	status_ = core::LoadStatus::Complete;
+	pHdr_ = reinterpret_cast<ModelHeader*>(data_.ptr());
+	return true;
 }
 
 void XModel::addPhysToActor(physics::ActorHandle actor)
 {
-	X_ASSERT(hdr_.flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")();
+	X_ASSERT(pHdr_->flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")();
 
 	// we need the col header 
-	core::MemCursor phys_data_cursor(data_.get() + hdr_.materialNameDataSize +
-		hdr_.tagNameDataSize + hdr_.boneDataSize, hdr_.physDataSize);
+	core::MemCursor phys_data_cursor(data_.get() + sizeof(ModelHeader) + pHdr_->materialNameDataSize +
+		pHdr_->tagNameDataSize + pHdr_->boneDataSize, pHdr_->physDataSize);
 
 	const CollisionInfoHdr& hdr = *phys_data_cursor.getSeekPtr<CollisionInfoHdr>();
 
@@ -309,7 +326,7 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
 	{
 		CollisionConvexHdr* pConvexHdr = phys_data_cursor.getSeekPtr<CollisionConvexHdr>();
 
-		if (hdr_.flags.IsSet(ModelFlag::PHYS_BAKED))
+		if (pHdr_->flags.IsSet(ModelFlag::PHYS_BAKED))
 		{
 			size_t len = pConvexHdr->dataSize;
 			const uint8_t* pData = phys_data_cursor.postSeekPtr<uint8_t>(len);

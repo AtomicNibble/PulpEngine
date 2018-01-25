@@ -21,15 +21,15 @@ RenderModel::~RenderModel()
 
 bool RenderModel::createRenderBuffersForLod(size_t idx, render::IRender* pRender)
 {
-	const auto& raw = hdr_.lodInfo[idx];
+	const auto& raw = pHdr_->lodInfo[idx];
 
-	return renderMeshes_[idx].createRenderBuffers(pRender, raw, hdr_.vertexFmt);
+	return renderMeshes_[idx].createRenderBuffers(pRender, raw, pHdr_->vertexFmt);
 }
 
 
 bool RenderModel::createSkinningRenderBuffersForLod(size_t idx, render::IRender* pRender)
 {
-	const auto& raw = hdr_.lodInfo[idx];
+	const auto& raw = pHdr_->lodInfo[idx];
 
 	return renderMeshes_[idx].createSkinningRenderBuffers(pRender, raw);
 }
@@ -179,7 +179,7 @@ void RenderModel::assignDefault(RenderModel* pDefault)
 		renderMeshes_[i] = pDefault->renderMeshes_[i];
 	}
 
-	hdr_ = pDefault->hdr_;
+	pHdr_ = pDefault->pHdr_;
 }
 
 

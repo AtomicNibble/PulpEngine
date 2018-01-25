@@ -7,6 +7,8 @@
 #include <IModelManager.h>
 
 #include <Assets\AssertContainer.h>
+#include <IAsyncLoad.h>
+
 #include <Util\UniquePointer.h>
 #include <Containers\Fifo.h>
 #include <Time\TimeVal.h>
@@ -44,7 +46,8 @@ struct ModelLoadRequest
 
 class XModelManager : 
 	public IModelManager,
-	public core::IXHotReload
+	public core::IXHotReload,
+	private core::IAssetLoadSink
 {
 	typedef core::AssetContainer<RenderModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
 	typedef ModelContainer::Resource ModelResource;
@@ -63,7 +66,6 @@ public:
 	void shutDown(void);
 
 	bool asyncInitFinalize(void);
-	void dispatchPendingLoads(void);
 
 	XModel* findModel(const char* pModelName) const X_FINAL;
 	XModel* loadModel(const char* pModelName) X_FINAL;
@@ -78,22 +80,13 @@ public:
 
 private:
 	bool initDefaults(void);
-	void freeDanglingMaterials(void);
+	void freeDangling(void);
 	void releaseResources(XModel* pModel);
 
-
-	void queueLoadRequest(ModelResource* pModel);
-	void dispatchLoadRequest(ModelLoadRequest* pLoadReq);
-
-
 	// load / processing
-	void onLoadRequestFail(ModelLoadRequest* pLoadReq);
-	void loadRequestCleanup(ModelLoadRequest* pLoadReq);
-
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void addLoadRequest(ModelResource* pModel);
+	void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+	bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
 private:
 	// IXHotReload
@@ -107,6 +100,8 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* blockArena_; // for the model data buffers
+
+	core::AssetLoader* pAssetLoader_;
 
 	RenderModel*	pDefaultModel_;
 	ModelContainer	models_;

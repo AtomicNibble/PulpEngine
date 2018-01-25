@@ -60,7 +60,7 @@ public:
 	X_INLINE const Vec3f getBonePos(size_t idx) const;
 	X_INLINE const MatrixArr& getInverseBoneMatrix(void) const;
 
-	MODELLIB_EXPORT void processData(ModelHeader& hdr, core::UniquePointer<uint8_t[]> data, engine::IMaterialManager* pMatMan);
+	MODELLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize, engine::IMaterialManager* pMatMan);
 
 	MODELLIB_EXPORT void addPhysToActor(physics::ActorHandle actor);
 
@@ -79,9 +79,9 @@ protected:
 	// can probs get rid of this pointer.
 	const SubMeshHeader*	pMeshHeads_;
 
-	core::UniquePointer<uint8_t[]> data_;
+	core::UniquePointer<char[]> data_;
 	MatrixArr inverseBones_; // could skip this allocation later by just increasing size of data buffer we allocate.
-	ModelHeader hdr_;
+	ModelHeader* pHdr_;
 };
 
 
