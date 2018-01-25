@@ -1013,16 +1013,28 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		header.meshDataSize
 	);
 
-	// mesh data is 16byte aligned.
+	// mesh data is aligned.
 	uint32_t preMeshDataPadSize = 0;
-	if (((header.dataSize - header.meshDataSize) % 16) != 0) {
-		preMeshDataPadSize = (16 - ((header.dataSize - header.meshDataSize) % 16));
+
+#if 0
+	if (((header.dataSize - header.meshDataSize) % MODEL_STREAM_ALIGN) != 0) {
+		preMeshDataPadSize = (MODEL_STREAM_ALIGN - ((header.dataSize - header.meshDataSize) % MODEL_STREAM_ALIGN));
 	}
+#else
+
+	{
+		const size_t totalSize = header.dataSize + sizeof(header);
+		if (((totalSize - header.meshDataSize) % MODEL_STREAM_ALIGN) != 0) {
+			preMeshDataPadSize = (MODEL_STREAM_ALIGN - ((totalSize - header.meshDataSize) % MODEL_STREAM_ALIGN));
+		}
+	}
+
+#endif
 
 	header.dataSize += preMeshDataPadSize;
 	
 	// add space for padding.
-	const size_t maxMeshDataPadSize = ((16 * 5) * MODEL_MAX_LODS);
+	const size_t maxMeshDataPadSize = ((MODEL_STREAM_ALIGN * 5) * MODEL_MAX_LODS);
 
 	// fixed streams to make sure size calculations are correct.
 	core::FixedByteStreamOwning tagNameStream(arena_, header.tagNameDataSize);
@@ -1481,10 +1493,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 	for (size_t i = 0; i < compiledLods_.size(); i++)
 	{
-		// this pads the stream so that the end of the stream is 16byte aligned.
+		// this pads the stream so that the end of the stream is aligned.
 		auto padStream = [&meshDataStream, &meshDataNumPadBytes]()
 		{
-			const size_t paddedSize = core::bitUtil::RoundUpToMultiple(meshDataStream.size(), 16_sz);	
+			const size_t paddedSize = core::bitUtil::RoundUpToMultiple<size_t>(meshDataStream.size(), MODEL_STREAM_ALIGN);
 			const size_t padSize = paddedSize - meshDataStream.size();
 
 			meshDataNumPadBytes += padSize;
@@ -1655,19 +1667,21 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			return false;
 		}
 
-		// make sure this stream starts on a 16bit boundry relative to header.
-		char pad[16] = {};
-		if (file.write(pad, preMeshDataPadSize) != preMeshDataPadSize) {
+		// make sure this stream starts on a aligned boundry.
+		const size_t paddedSize = (MODEL_STREAM_ALIGN - file.tell() % MODEL_STREAM_ALIGN);
+
+		X_ASSERT(paddedSize == preMeshDataPadSize, "Alignment size mismatch")(paddedSize, preMeshDataPadSize);
+
+		char pad[MODEL_STREAM_ALIGN] = {};
+		if (file.write(pad, paddedSize) != paddedSize) {
 			X_ERROR("Model", "Failed to write mesh stream");
 			return false;
 		}
 
-
-#if X_ENABLE_ASSERTIONS
+#if X_ENABLE_ASSERTIONS 
 		const auto fileSize = file.tell();
-		const auto headerRel = (fileSize - sizeof(header));
 		
-		X_ASSERT((headerRel % 16) == 0, "Not aligned")(fileSize, headerRel);
+		X_ASSERT((fileSize % MODEL_STREAM_ALIGN) == 0, "Not aligned")(fileSize, fileSize);
 #endif // !X_ENABLE_ASSERTIONS
 
 		if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {

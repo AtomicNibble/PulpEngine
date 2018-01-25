@@ -136,11 +136,17 @@ X_NAMESPACE_BEGIN(model)
 //	
 //		Write relative bone positions.
 //
+//	Version 17:
+//		
+//		Streams are aligned from start of header instead of after header.
+//
+//
+
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 16;
+static const uint32_t	 MODEL_VERSION = 17;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -162,6 +168,8 @@ static const uint32_t	 MODEL_MAX_NAME_LENGTH = 60;
 static const char*		 MODEL_FILE_EXTENSION = "model";
 static const wchar_t*	 MODEL_FILE_EXTENSION_W = L"model";
 static const char*		 MODEL_DEFAULT_NAME = "default/default";
+
+static const uint32_t	 MODEL_STREAM_ALIGN = 16; // streams are aligned to this relative to start of file.
 
 // max col meshes per mesh
 
