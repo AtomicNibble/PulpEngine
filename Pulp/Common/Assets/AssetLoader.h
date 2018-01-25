@@ -50,9 +50,9 @@ public:
 	void addLoadRequest(AssetBase* pAsset);
 	bool waitForLoad(AssetBase* pAsset);
 
-private:
 	void dispatchPendingLoads(void);
 
+private:
 	void queueLoadRequest(AssetBase* pAsset, core::CriticalSection::ScopedLock&);
 	void dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedLock&);
 	bool dispatchPendingLoad(core::CriticalSection::ScopedLock&);

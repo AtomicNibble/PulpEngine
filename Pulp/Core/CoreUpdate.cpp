@@ -59,6 +59,8 @@ bool XCore::Update(void)
 	X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
 	using namespace core::V2;
 
+	assetLoader_.dispatchPendingLoads();
+
 	core::FrameData frameData;
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
 	frameData.view.viewport.set(1680, 1050);
