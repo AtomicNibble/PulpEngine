@@ -244,7 +244,10 @@ public:
 
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
 	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
+	
+#if PSO_HOT_RELOAD
 	bool updateStateState(DeviceState* pState);
+#endif // !PSO_HOT_RELOAD
 
 
 	// Release

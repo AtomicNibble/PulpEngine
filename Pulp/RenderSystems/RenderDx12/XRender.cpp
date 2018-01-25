@@ -1336,6 +1336,7 @@ D3D12_SHADER_VISIBILITY stageFlagsToStageVisibility(shader::ShaderStageFlags sta
 	}
 }
 
+#if PSO_HOT_RELOAD
 bool XRender::updateStateState(DeviceState* pState)
 {
 	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
@@ -1367,7 +1368,7 @@ bool XRender::updateStateState(DeviceState* pState)
 	pState->pPso = pso.getPipelineStateObject();
 	return true;
 }
-
+#endif // !PSO_HOT_RELOAD
 
 StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
 	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
