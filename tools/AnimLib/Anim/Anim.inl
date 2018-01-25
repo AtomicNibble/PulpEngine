@@ -3,17 +3,17 @@ X_NAMESPACE_BEGIN(anim)
 
 X_INLINE int32_t Anim::getNumBones(void) const
 {
-	return hdr_.numBones;
+	return pHdr_->numBones;
 }
 
 X_INLINE int32_t Anim::getNumFrames(void) const
 {
-	return hdr_.numFrames;
+	return pHdr_->numFrames;
 }
 
 X_INLINE int32_t Anim::getFps(void) const
 {
-	return hdr_.fps;
+	return pHdr_->fps;
 }
 
 X_INLINE int32_t Anim::getNumNotes(void) const
@@ -23,17 +23,17 @@ X_INLINE int32_t Anim::getNumNotes(void) const
 
 X_INLINE AnimType::Enum Anim::type(void) const
 {
-	return hdr_.type;
+	return pHdr_->type;
 }
 
 X_INLINE bool Anim::isLooping(void) const
 {
-	return hdr_.flags.IsSet(AnimFlag::LOOP);
+	return pHdr_->flags.IsSet(AnimFlag::LOOP);
 }
 
 X_INLINE bool Anim::hasNotes(void) const
 {
-	return hdr_.flags.IsSet(AnimFlag::NOTES);
+	return pHdr_->flags.IsSet(AnimFlag::NOTES);
 }
 
 X_INLINE core::TimeVal Anim::getDuration(void) const

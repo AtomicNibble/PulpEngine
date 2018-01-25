@@ -98,7 +98,7 @@ public:
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
 	void getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const;
 
-	ANIMLIB_EXPORT void processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data);
+	ANIMLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
 private:
 
@@ -106,9 +106,9 @@ private:
 private:
 	BoneArr bones_;
 
-	core::UniquePointer<uint8_t[]> data_;
+	core::UniquePointer<char[]> data_;
 	NoteTrackHdr noteHdr_;
-	AnimHeader hdr_;
+	AnimHeader* pHdr_;
 };
 
 

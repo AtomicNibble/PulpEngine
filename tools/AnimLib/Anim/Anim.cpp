@@ -257,7 +257,8 @@ Vec3f Bone::GetPostion(int32_t idx) const
 
 Anim::Anim(core::string& name, core::MemoryArenaBase* arena) :
 	core::AssetBase(name, assetDb::AssetType::ANIM),
-	bones_(arena)
+	bones_(arena),
+	pHdr_(nullptr)
 {
 	id_ = 0;
 	status_ = core::LoadStatus::NotLoaded;
@@ -381,9 +382,24 @@ void Anim::getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const
 	offset = Vec3f::zero();
 }
 
-void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
+bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-	X_UNUSED(hdr, data);
+	if (dataSize < sizeof(AnimHeader)) {
+		return false;
+	}
+
+	AnimHeader& hdr = *reinterpret_cast<AnimHeader*>(data.get());
+
+	if (!hdr.isValid()) {
+		X_ERROR("Anim", "\"%s\" invalid header", name_.c_str());
+		return false;
+	}
+
+	if (dataSize != (hdr.dataSize + sizeof(hdr))) {
+		X_ERROR("Anim", "\"%s\" incompleted data", name_.c_str());
+		return false;
+	}
+
 
 	bones_.resize(hdr.numBones);
 
@@ -410,9 +426,10 @@ void Anim::processData(AnimHeader& hdr, core::UniquePointer<uint8_t[]> data)
 		X_ASSERT_NOT_IMPLEMENTED();
 	}
 
-	hdr_ = hdr;
 	data_ = std::move(data);
+	pHdr_ = reinterpret_cast<AnimHeader*>(data_.get());
 	status_ = core::LoadStatus::Complete;
+	return true;
 }
 
 

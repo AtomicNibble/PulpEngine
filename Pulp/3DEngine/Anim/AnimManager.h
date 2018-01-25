@@ -46,7 +46,8 @@ struct AnimLoadRequest
 
 class AnimManager :
 	public IAnimManager,
-	public core::IXHotReload
+	public core::IXHotReload,
+	private core::IAssetLoadSink
 {
 	typedef core::AssetContainer<Anim, ANIM_MAX_LOADED, core::SingleThreadPolicy> AnimContainer;
 	typedef AnimContainer::Resource AnimResource;
@@ -65,7 +66,6 @@ public:
 	void shutDown(void);
 
 	bool asyncInitFinalize(void);
-	void dispatchPendingLoads(void);
 
 	Anim* findAnim(const char* pAnimName) const X_FINAL;
 	Anim* loadAnim(const char* pAnimName) X_FINAL;
@@ -80,20 +80,12 @@ public:
 	bool waitForLoad(Anim* pAnim) X_FINAL;
 
 private:
-	void freeDanglingAnims(void);
+	void freeDangling(void);
 	void releaseResources(Anim* pAnim);
 
-	void queueLoadRequest(AnimResource* pAnim);
-	void dispatchLoadRequest(AnimLoadRequest* pLoadReq);
-
-	// load / processing
-	void onLoadRequestFail(AnimLoadRequest* pLoadReq);
-	void loadRequestCleanup(AnimLoadRequest* pLoadReq);
-
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void addLoadRequest(AnimResource* pAnim);
+	void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+	bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
 
 private:
@@ -110,14 +102,10 @@ private:
 	core::MemoryArenaBase* arena_;
 	core::MemoryArenaBase* blockArena_; // for the anims data buffers
 
+	core::AssetLoader* pAssetLoader_;
+
 	AnimContainer	anims_;
 
-	// loading
-	core::CriticalSection loadReqLock_;
-	core::ConditionVariable loadCond_;
-
-	AnimQueue requestQueue_;
-	AnimLoadRequestArr pendingRequests_;
 };
 
 

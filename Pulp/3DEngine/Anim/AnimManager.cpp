@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "AnimManager.h"
 
+#include <Assets\AssetLoader.h>
+
 #include <IConsole.h>
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
@@ -14,9 +16,8 @@ X_NAMESPACE_BEGIN(anim)
 AnimManager::AnimManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
 	arena_(arena),
 	blockArena_(blockArena),
-	anims_(arena, sizeof(AnimResource), X_ALIGN_OF(AnimResource), "AnimPool"),
-	requestQueue_(arena),
-	pendingRequests_(arena)
+	pAssetLoader_(nullptr),
+	anims_(arena, sizeof(AnimResource), X_ALIGN_OF(AnimResource), "AnimPool")
 {
 
 }
@@ -40,6 +41,8 @@ void AnimManager::registerVars(void)
 
 bool AnimManager::init(void)
 {
+	pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+	pAssetLoader_->registerAssetType(assetDb::AssetType::ANIM, this, ANIM_FILE_EXTENSION);
 
 	gEnv->pHotReload->addfileType(this, ANIM_FILE_EXTENSION);
 
@@ -52,7 +55,7 @@ void AnimManager::shutDown(void)
 	gEnv->pHotReload->unregisterListener(this);
 
 
-	freeDanglingAnims();
+	freeDangling();
 }
 
 bool AnimManager::asyncInitFinalize(void)
@@ -60,25 +63,6 @@ bool AnimManager::asyncInitFinalize(void)
 
 
 	return true;
-}
-
-void AnimManager::dispatchPendingLoads(void)
-{
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
-
-	while (requestQueue_.isNotEmpty())
-	{
-		auto* pAnim = requestQueue_.peek();
-		X_ASSERT(pAnim->getStatus() == core::LoadStatus::Loading, "Incorrect status")(pAnim->getStatus());
-		auto loadReq = core::makeUnique<AnimLoadRequest>(arena_, pAnim);
-
-		// dispatch IO 
-		dispatchLoadRequest(loadReq.get());
-
-		pendingRequests_.emplace_back(loadReq.release());
-
-		requestQueue_.pop();
-	}
 }
 
 Anim* AnimManager::findAnim(const char* pAnimName) const
@@ -116,10 +100,7 @@ Anim* AnimManager::loadAnim(const char* pAnimName)
 	pAnimRes = anims_.createAsset(name, name, arena_);
 
 	// add to list of anims that need loading.
-	queueLoadRequest(pAnimRes);
-
-	// TEMP
-	dispatchPendingLoads();
+	addLoadRequest(pAnimRes);
 
 	return pAnimRes;
 }
@@ -192,37 +173,16 @@ bool AnimManager::waitForLoad(core::AssetBase* pAnim)
 
 bool AnimManager::waitForLoad(Anim* pAnim)
 {
-	{
-		// we lock to see if loading as the setting of loading is performed inside this lock.
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		while (pAnim->getStatus() == core::LoadStatus::Loading)
-		{
-			loadCond_.Wait(loadReqLock_);
-		}
-	}
-
-	// did we fail? or never sent a dispatch?
-	auto status = pAnim->getStatus();
-	if (status == core::LoadStatus::Complete)
-	{
+	if (pAnim->getStatus() == core::LoadStatus::Complete) {
 		return true;
 	}
-	else if (status == core::LoadStatus::Error)
-	{
-		return false;
-	}
-	else if (status == core::LoadStatus::NotLoaded)
-	{
-		// request never sent?
-	}
 
-	X_ASSERT_UNREACHABLE();
-	return false;
+	return pAssetLoader_->waitForLoad(pAnim);
 }
 
 // ------------------------------------
 
-void AnimManager::freeDanglingAnims(void)
+void AnimManager::freeDangling(void)
 {
 	{
 		core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
@@ -250,170 +210,24 @@ void AnimManager::releaseResources(Anim* pAnim)
 
 // ------------------------------------
 
-
-void AnimManager::queueLoadRequest(AnimResource* pAnim)
+void AnimManager::addLoadRequest(AnimResource* pAnim)
 {
-	X_ASSERT(pAnim->getName().isNotEmpty(), "Anim has no name")();
-
-	core::CriticalSection::ScopedLock lock(loadReqLock_);
-
-	// can we know it's not in this queue just from status?
-	// like if it's complete it could be in this status
-	auto status = pAnim->getStatus();
-	if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading)
-	{
-		X_WARNING("Anim", "Redundant load request requested: \"%s\"", pAnim->getName().c_str());
-		return;
-	}
-
-	X_ASSERT(!requestQueue_.contains(pAnim), "Queue already contains asset")(pAnim);
-
-	pAnim->addReference(); // prevent instance sweep
-	pAnim->setStatus(core::LoadStatus::Loading);
-	requestQueue_.push(pAnim);
+	pAssetLoader_->addLoadRequest(pAnim);
 }
 
-
-void AnimManager::dispatchLoadRequest(AnimLoadRequest* pLoadReq)
+void AnimManager::onLoadRequestFail(core::AssetBase* pAsset)
 {
-	pLoadReq->dispatchTime = core::StopWatch::GetTimeNow();
+	auto* pAnim = static_cast<Anim*>(pAsset);
 
-	auto& name = pLoadReq->pAnim->getName();
-
-	// dispatch a read request baby!
-	core::IoRequestOpen open;
-	open.callback.Bind<AnimManager, &AnimManager::IoRequestCallback>(this);
-	open.pUserData = pLoadReq;
-	open.mode = core::fileMode::READ;
-	open.path = "anims/";
-	open.path.append(name.begin(), name.end());
-	open.path.setExtension(anim::ANIM_FILE_EXTENSION);
-
-	gEnv->pFileSys->AddIoRequestToQue(open);
+	X_UNUSED(pAnim);
 }
 
-void AnimManager::onLoadRequestFail(AnimLoadRequest* pLoadReq)
+bool AnimManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-	auto* pAnim = pLoadReq->pAnim;
+	auto* pAnim = static_cast<Anim*>(pAsset);
 
-	pAnim->setStatus(core::LoadStatus::Error);
-
-	loadRequestCleanup(pLoadReq);
+	return pAnim->processData(std::move(data), dataSize);
 }
-
-void AnimManager::loadRequestCleanup(AnimLoadRequest* pLoadReq)
-{
-	pLoadReq->loadTime = core::StopWatch::GetTimeNow();
-
-	X_LOG0("Anim", "Anim loaded in: ^6%fms", (pLoadReq->loadTime - pLoadReq->dispatchTime).GetMilliSeconds());
-	{
-		core::CriticalSection::ScopedLock lock(loadReqLock_);
-		pendingRequests_.remove(pLoadReq);
-	}
-
-	if (pLoadReq->pFile) {
-		gEnv->pFileSys->AddCloseRequestToQue(pLoadReq->pFile);
-	}
-
-	// release our ref.
-	releaseAnim(pLoadReq->pAnim);
-
-	X_DELETE(pLoadReq, arena_);
-
-	loadCond_.NotifyAll();
-}
-
-
-void AnimManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-	core::IoRequest::Enum requestType = pRequest->getType();
-	AnimLoadRequest* pLoadReq = pRequest->getUserData<AnimLoadRequest>();
-	Anim* pAnim = pLoadReq->pAnim;
-
-	if (requestType == core::IoRequest::OPEN)
-	{
-		if (!pFile)
-		{
-			X_ERROR("Anim", "Failed to load: \"%s\"", pAnim->getName().c_str());
-			onLoadRequestFail(pLoadReq);
-			return;
-		}
-
-		pLoadReq->pFile = pFile;
-
-		// read the header.
-		core::IoRequestRead read;
-		read.callback.Bind<AnimManager, &AnimManager::IoRequestCallback>(this);
-		read.pUserData = pLoadReq;
-		read.pFile = pFile;
-		read.dataSize = sizeof(pLoadReq->hdr);
-		read.offset = 0;
-		read.pBuf = &pLoadReq->hdr;
-		fileSys.AddIoRequestToQue(read);
-	}
-	else if (requestType == core::IoRequest::READ)
-	{
-		const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
-
-		if (pReadReq->pBuf == &pLoadReq->hdr)
-		{
-			if (bytesTransferred != sizeof(pLoadReq->hdr))
-			{
-				X_ERROR("Anim", "Failed to read anim header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, sizeof(pLoadReq->hdr));
-				onLoadRequestFail(pLoadReq);
-				return;
-			}
-
-			if (!pLoadReq->hdr.isValid())
-			{
-				X_ERROR("Anim", "\"%s\" anim header is invalid", pAnim->getName().c_str());
-				onLoadRequestFail(pLoadReq);
-				return;
-			}
-
-			// we need to allocate memory and dispatch a read request for it.
-			uint32_t datasize = pLoadReq->hdr.dataSize;
-			X_ASSERT(datasize > 0, "Datasize must be positive")(datasize);
-			pLoadReq->data = core::makeUnique<uint8_t[]>(blockArena_, datasize, 16);
-
-			core::IoRequestRead read;
-			read.callback.Bind<AnimManager, &AnimManager::IoRequestCallback>(this);
-			read.pUserData = pLoadReq;
-			read.pFile = pFile;
-			read.offset = sizeof(pLoadReq->hdr);
-			read.dataSize = datasize;
-			read.pBuf = pLoadReq->data.ptr();
-			gEnv->pFileSys->AddIoRequestToQue(read);
-		}
-		else
-		{
-			if (bytesTransferred != pLoadReq->hdr.dataSize)
-			{
-				X_ERROR("Anim", "Failed to read anim data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pLoadReq->hdr.dataSize);
-				onLoadRequestFail(pLoadReq);
-				return;
-			}
-
-			gEnv->pJobSys->CreateMemberJobAndRun<AnimManager>(this, &AnimManager::ProcessData_job,
-				pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
-		}
-	}
-
-}
-
-void AnimManager::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-	X_UNUSED(jobSys, threadIdx, pJob, pData);
-
-	AnimLoadRequest* pLoadReq = static_cast<AnimLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-	Anim* pAnim = pLoadReq->pAnim;
-
-	pAnim->processData(pLoadReq->hdr, std::move(pLoadReq->data));
-
-	loadRequestCleanup(pLoadReq);
-}
-
 
 // -------------------------------------
 
