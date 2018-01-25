@@ -162,6 +162,8 @@ void XScriptSys::shutDown(void)
 	XScriptTable::s_allTables_.clear();
 #endif
 
+	scripts_.free();
+
 	if (L != nullptr) {
 		lua_close(L);
 		L = nullptr;
