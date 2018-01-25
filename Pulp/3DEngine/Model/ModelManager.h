@@ -9,10 +9,6 @@
 #include <Assets\AssertContainer.h>
 #include <IAsyncLoad.h>
 
-#include <Util\UniquePointer.h>
-#include <Containers\Fifo.h>
-#include <Time\TimeVal.h>
-
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
 		struct Job;
@@ -28,21 +24,6 @@ X_NAMESPACE_BEGIN(model)
 
 class RenderModel;
 
-struct ModelLoadRequest
-{
-	ModelLoadRequest(RenderModel* pModel) :
-		pFile(nullptr),
-		pModel(pModel)
-	{
-		core::zero_object(hdr);
-	}
-	core::XFileAsync* pFile;
-	RenderModel* pModel;
-	core::UniquePointer<uint8_t[]> data;
-	core::TimeVal dispatchTime;
-	core::TimeVal loadTime;
-	ModelHeader hdr;
-};
 
 class XModelManager : 
 	public IModelManager,
@@ -51,9 +32,6 @@ class XModelManager :
 {
 	typedef core::AssetContainer<RenderModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
 	typedef ModelContainer::Resource ModelResource;
-
-	typedef core::Array<ModelLoadRequest*> ModelLoadRequestArr;
-	typedef core::Fifo<ModelResource*> ModelQueue;
 
 public:
 	XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);

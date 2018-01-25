@@ -5,11 +5,6 @@
 #include <IAnimation.h>
 
 #include <Assets\AssertContainer.h>
-#include <Util\UniquePointer.h>
-#include <Containers\Fifo.h>
-#include <Time\TimeVal.h>
-
-
 
 X_NAMESPACE_DECLARE(core,
 	namespace V2 {
@@ -27,22 +22,6 @@ X_NAMESPACE_BEGIN(anim)
 
 class Anim;
 
-struct AnimLoadRequest
-{
-	AnimLoadRequest(Anim* pAnim) :
-		pFile(nullptr),
-		pAnim(pAnim)
-	{
-		// core::zero_object(hdr);
-	}
-	core::XFileAsync* pFile;
-	Anim* pAnim;
-	core::UniquePointer<uint8_t[]> data;
-	core::TimeVal dispatchTime;
-	core::TimeVal loadTime;
-	AnimHeader hdr;
-};
-
 
 class AnimManager :
 	public IAnimManager,
@@ -51,9 +30,6 @@ class AnimManager :
 {
 	typedef core::AssetContainer<Anim, ANIM_MAX_LOADED, core::SingleThreadPolicy> AnimContainer;
 	typedef AnimContainer::Resource AnimResource;
-
-	typedef core::Array<AnimLoadRequest*> AnimLoadRequestArr;
-	typedef core::Fifo<AnimResource*> AnimQueue;
 
 public:
 	AnimManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
