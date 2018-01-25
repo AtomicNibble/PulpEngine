@@ -59,8 +59,6 @@ namespace weapon
 		void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
 		bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
-		bool processData(WeaponDef* pWeaponDef, core::XFile* pFile);
-
 	private:
 		// IXHotReload
 		virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;

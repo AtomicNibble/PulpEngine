@@ -200,18 +200,7 @@ namespace weapon
 
 		core::XFileFixedBuf file(data.ptr(), data.ptr() + dataSize);
 		
-		return processData(pWeaponDef, &file);
-	}
-
-	bool WeaponDefManager::processData(WeaponDef* pWeaponDef, core::XFile* pFile)
-	{
-		if (!pWeaponDef->processData(pFile)) {
-			pWeaponDef->setStatus(core::LoadStatus::Error);
-			return false;
-		}
-
-		pWeaponDef->setStatus(core::LoadStatus::Complete);
-		return true;
+		return pWeaponDef->processData(&file);
 	}
 
 	void WeaponDefManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
