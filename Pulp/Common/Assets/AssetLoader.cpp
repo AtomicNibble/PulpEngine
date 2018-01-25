@@ -24,6 +24,7 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
 
 void AssetLoader::registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt)
 {
+	X_ASSERT(assetsinks_[type] == nullptr, "Asset type already had a registered handler")(assetDb::AssetType::ToString(type));
 
 	assetsinks_[type] = pSink;
 	assetExt_[type] = pExt;
