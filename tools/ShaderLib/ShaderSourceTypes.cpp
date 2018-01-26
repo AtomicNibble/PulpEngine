@@ -17,7 +17,9 @@ namespace shader
 		name_(name),
 		fileData_(arena),
 		includedFiles_(arena),
+#if X_ENABLE_RENDER_SHADER_RELOAD
 		refrences_(arena),
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 		sourceCrc32_(0)
 	{
 
