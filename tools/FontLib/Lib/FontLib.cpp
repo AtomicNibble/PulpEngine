@@ -101,6 +101,8 @@ X_NAMESPACE_BEGIN(font)
 
 		file.close();
 
+		// dump a image of the glyphs.
+#if 0
 		OutPath imagePath(destPath);
 		imagePath.append(".bmp");
 		if (!file.openFile(imagePath.c_str(), mode)) {
@@ -112,7 +114,7 @@ X_NAMESPACE_BEGIN(font)
 			X_ERROR("Font", "Failed to write baked font file");
 			return false;
 		}
-
+#endif
 
 		return true;
 	}
