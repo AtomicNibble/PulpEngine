@@ -18,9 +18,8 @@ X_NAMESPACE_BEGIN(font)
 
 static const char* FONT_FILE_EXTENSION = "fnt";
 
-static const wchar_t FONT_PRECACHE_STR[190] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
-	"^_`abcdefghijklmnopqrstuvwxyz{|}~Ά£¤¥¦§¨©ª«¬­®―°±²³΄µ¶·ΈΉΊ»Ό½ΎΏ"
-	"ΐΑΒΓΔΕΖΗΘΙΚΛΜΝΞΟΠΡÒΣΤΥΦΧΨΩΪΫάέήίΰαβγδεζηθικλμνξοπρςστυφχψωϊϋόύώÿ";
+static const wchar_t FONT_PRECACHE_STR[] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
+	"^_`abcdefghijklmnopqrstuvwxyz{|}~Ά£¤¥¦§¨©ª«¬­";
 
 
 struct IFontLib : public IConverter
