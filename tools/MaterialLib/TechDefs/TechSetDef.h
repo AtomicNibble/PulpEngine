@@ -314,7 +314,7 @@ private:
 	bool primTypeExsists(const core::string& name, render::TopoType::Enum* pTopo = nullptr);
 	bool paramExsists(const core::string& name, Param* pParam = nullptr);
 	bool textureExsists(const core::string& name, Texture* pTexture = nullptr);
-	bool samplerExsists(const core::string& name, Sampler* pSampler= nullptr);
+	bool samplerExsists(const core::string& name, Sampler* pSampler = nullptr);
 
 	render::BlendState& addBlendState(const core::string& name, const core::string& parentName);
 	StencilState& addStencilState(const core::string& name, const core::string& parentName);
