@@ -327,8 +327,12 @@ private:
 	static typename T::const_iterator findHelper(T& map, const core::string& name);
 
 	template<typename T>
-	static T& addHelper(NameArr<T>& map, const core::string& name, 
+	static T& addHelper(NameArr<T>& map, const core::string& name,
 		const core::string& parentName, const char* pNick);
+
+	template<typename T, class... Args>
+	static T& addHelper(NameArr<T>& map, const core::string& name, 
+		const core::string& parentName, const char* pNick, Args&&... args);
 
 private:
 	core::MemoryArenaBase* arena_;

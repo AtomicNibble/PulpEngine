@@ -2499,10 +2499,16 @@ X_INLINE typename T::const_iterator TechSetDef::findHelper(T& arr, const core::s
 	});
 }
 
-
 template<typename T>
 X_INLINE T& TechSetDef::addHelper(NameArr<T>& arr,
 	const core::string& name, const core::string& parentName, const char* pNick)
+{
+	return addHelper(arr, name, parentName, pNick, T());
+}
+
+template<typename T, class... Args>
+X_INLINE T& TechSetDef::addHelper(NameArr<T>& arr,
+	const core::string& name, const core::string& parentName, const char* pNick, Args&&... args)
 {
 	if (!parentName.isEmpty())
 	{
@@ -2520,7 +2526,7 @@ X_INLINE T& TechSetDef::addHelper(NameArr<T>& arr,
 	else
 	{
 	insert_default:
-		arr.emplace_back(name, T());
+		arr.emplace_back(name, std::forward<Args>(args)...);
 	}
 
 	return arr.back().second;
