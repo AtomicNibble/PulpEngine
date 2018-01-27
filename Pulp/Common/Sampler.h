@@ -22,6 +22,8 @@ namespace shader
 		X_INLINE void setName(const char* pName);
 
 		X_INLINE const core::string& getName(void) const;
+		X_INLINE int16_t getBindPoint(void) const;
+		X_INLINE int16_t getBindCount(void) const;
 
 		bool SSave(core::XFile* pFile) const;
 		bool SLoad(core::XFile* pFile);

@@ -18,6 +18,17 @@ namespace shader
 		return name_;
 	}
 
+	X_INLINE int16_t Sampler::getBindPoint(void) const
+	{
+		return bindPoint_;
+	}
+
+	X_INLINE int16_t Sampler::getBindCount(void) const
+	{
+		return bindCount_;
+	}
+
+
 } // namespace shader
 
 X_NAMESPACE_END
