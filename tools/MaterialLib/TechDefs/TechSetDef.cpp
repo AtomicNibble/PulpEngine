@@ -56,9 +56,15 @@ namespace techset
 
 //-------------------------------------------------
 
-
+	
 Shader::Shader() :
-	type(render::shader::ShaderType::UnKnown),
+	Shader(ShaderType::UnKnown)
+{
+
+}
+
+Shader::Shader(ShaderType::Enum type) :
+	type(type),
 	aliases(g_MatLibArena)
 {
 
@@ -157,6 +163,12 @@ bool AssManProps::SLoad(core::XFile* pFile)
 }
 
 //-------------------------------------------------
+
+Param::Param(ParamType::Enum type) :
+	type(type)
+{
+
+}
 
 Param::Param(const Param& oth)
 {
@@ -2440,8 +2452,7 @@ Shader& TechSetDef::addShader(const core::string& name, const core::string& pare
 	core::string mergedName(name);
 	mergedName += render::shader::ShaderType::ToString(type);
 			
-	Shader& shader = addHelper(shaders_, mergedName, parentName, "state");
-	shader.type = type;
+	Shader& shader = addHelper(shaders_, mergedName, parentName, "state", type);
 	return shader;
 }
 
@@ -2457,8 +2468,7 @@ render::TopoType::Enum& TechSetDef::addPrimType(const core::string& name, const 
 
 Param& TechSetDef::addParam(const core::string& name, const core::string& parentName, ParamType::Enum type)
 {
-	auto& p = addHelper(params_, name, parentName, ParamType::ToString(type));
-	p.type = type;
+	auto& p = addHelper(params_, name, parentName, ParamType::ToString(type), type);
 	return p;
 }
 

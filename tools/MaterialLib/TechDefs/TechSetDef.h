@@ -39,13 +39,15 @@ struct Alias
 struct Shader
 {
 	typedef core::Array<Alias> AliaseArr;
+	typedef render::shader::ShaderType ShaderType;
 
 	Shader();
+	Shader(ShaderType::Enum type);
 
 	bool SSave(core::XFile* pFile) const;
 	bool SLoad(core::XFile* pFile);
 
-	render::shader::ShaderType::Enum type;
+	ShaderType::Enum type;
 	core::string source;
 	core::string entry;
 	core::string defines;
@@ -81,6 +83,7 @@ struct AssManProps
 struct Param
 {
 	Param() = default;
+	Param(ParamType::Enum type);
 	Param(const Param& oth);
 
 	Param& operator=(const Param& oth);
