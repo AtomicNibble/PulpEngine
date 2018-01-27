@@ -265,6 +265,7 @@ BaseTechSetDef::BaseTechSetDef(core::string fileName, core::MemoryArenaBase* are
 	arena_(arena),
 	fileName_(fileName),
 	allSamplersStatic_(false),
+	anySamplersStatic_(false),
 	techs_(arena),
 	params_(arena),
 	textures_(arena),
@@ -561,11 +562,19 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		}
 	}
 
-	allSamplersStatic_ = std::all_of(samplers_.begin(), samplers_.end(),
+	anySamplersStatic_ = std::any_of(samplers_.begin(), samplers_.end(),
 		[](const SamplerArr::Type& s) -> bool {
 			return s.second.isStatic();
 		}
 	);
+
+	if (anySamplersStatic_) {
+		allSamplersStatic_ = std::all_of(samplers_.begin(), samplers_.end(),
+			[](const SamplerArr::Type& s) -> bool {
+				return s.second.isStatic();
+			}
+		);
+	}
 
 	if (!lex.isEOF()) {
 		X_ERROR("TechDefs", "Failed to fully parse file");

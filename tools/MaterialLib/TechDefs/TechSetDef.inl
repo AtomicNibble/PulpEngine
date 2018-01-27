@@ -69,6 +69,12 @@ X_INLINE bool BaseTechSetDef::allSamplersAreStatic(void) const
 	return allSamplersStatic_;
 }
 
+X_INLINE bool BaseTechSetDef::anySamplersAreStatic(void) const
+{
+	return anySamplersStatic_;
+}
+
+
 
 } // namespace techset
 

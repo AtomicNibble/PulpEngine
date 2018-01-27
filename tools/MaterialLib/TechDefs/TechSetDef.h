@@ -188,13 +188,15 @@ public:
 	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
 
 	X_INLINE bool allSamplersAreStatic(void) const;
+	X_INLINE bool anySamplersAreStatic(void) const;
 
 protected:
 	core::MemoryArenaBase* arena_;
 	core::string fileName_;
 
 	bool allSamplersStatic_;
-	bool _pad[3];
+	bool anySamplersStatic_;
+	bool _pad[2];
 
 	TechniqueArr techs_; 
 	ParamArr params_;
