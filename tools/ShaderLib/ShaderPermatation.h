@@ -4,13 +4,12 @@
 #ifndef X_SHADER_H_
 #define X_SHADER_H_
 
-#include <IShader.h>
 
 #include <Containers\Array.h>
 #include <Util\Flags.h>
 
-#include "CBuffer.h"
-
+#include <IShader.h>
+#include <CBuffer.h>
 
 X_NAMESPACE_BEGIN(render)
 
