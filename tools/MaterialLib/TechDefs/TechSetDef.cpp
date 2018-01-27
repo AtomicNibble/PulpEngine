@@ -577,6 +577,7 @@ bool TechSetDef::parseFile(core::XParser& lex)
 		}
 	}
 
+#if 0 // now sure how i want to handle this at runtime just yet.
 	// now move any samplers that are static.
 	if (samplers_.isNotEmpty())
 	{
@@ -595,7 +596,7 @@ bool TechSetDef::parseFile(core::XParser& lex)
 			}
 		}
 	}
-
+#endif
 
 	if (!lex.isEOF()) {
 		X_ERROR("TechDefs", "Failed to fully parse file");
