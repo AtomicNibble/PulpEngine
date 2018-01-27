@@ -573,34 +573,33 @@ namespace V2
 	Job* JobSystem::GetJob(ThreadQue& queue)
 	{
 		Job* pJob = queue.Pop();
-		if (IsEmptyJob(pJob))
-		{
-			// this is not a valid job because our own queue is empty, so try stealing from some other queue
-			size_t randomIndex = queue.rand() % numQueue_;
-
-			ThreadQue* stealQueue = pThreadQues_[randomIndex];
-			if (stealQueue == &queue)
-			{
-				// don't try to steal from ourselves
-				// but if we not main que try steal from that
-				return nullptr;
-			}
-
-			Job* stolenJob = stealQueue->Steal();
-			if (IsEmptyJob(stolenJob))
-			{
-				// we couldn't steal a job from the other queue either, so we just yield our time slice for now
-				return nullptr;
-			}
-
-#if X_ENABLE_JOBSYS_PROFILER
-			++stats_[currentHistoryIdx_].jobsStolen;
-#endif // !X_ENABLE_JOBSYS_PROFILER
-
-			return stolenJob;
+		if (!IsEmptyJob(pJob)) {
+			return pJob;
 		}
 
-		return pJob;
+		// this is not a valid job because our own queue is empty, so try stealing from some other queue
+		size_t randomIndex = queue.rand() % numQueue_;
+
+		ThreadQue* stealQueue = pThreadQues_[randomIndex];
+		if (stealQueue == &queue)
+		{
+			// don't try to steal from ourselves
+			// but if we not main que try steal from that
+			return nullptr;
+		}
+
+		Job* stolenJob = stealQueue->Steal();
+		if (IsEmptyJob(stolenJob))
+		{
+			// we couldn't steal a job from the other queue either, so we just yield our time slice for now
+			return nullptr;
+		}
+
+#if X_ENABLE_JOBSYS_PROFILER
+		++stats_[currentHistoryIdx_].jobsStolen;
+#endif // !X_ENABLE_JOBSYS_PROFILER
+
+		return stolenJob;
 	}
 
 	Job* JobSystem::GetJobCheckAllQues(ThreadQue& queue)
