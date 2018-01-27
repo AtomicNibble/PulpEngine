@@ -25,8 +25,8 @@ public:
 	X_INLINE void initAsUAV(uint32_t shaderRegister, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 
 	// this is just a helper for calling initAsDescriptorTable and setTableRange
-	X_INLINE void initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t Register,
-		 	uint32_t Count, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
+	X_INLINE void initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t baseShaderRegister,
+		 	uint32_t count, D3D12_SHADER_VISIBILITY visibility = D3D12_SHADER_VISIBILITY_ALL);
 
 	// You can init as a desc table with 3 ranges, then you will have to call setTableRange on index 0,1,3 setting the type register and count.
 	// This is needed if you want to create a Descriptor heap with more than one D3D12_DESCRIPTOR_RANGE_TYPE

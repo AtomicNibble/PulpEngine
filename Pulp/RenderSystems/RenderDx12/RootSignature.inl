@@ -57,11 +57,11 @@ X_INLINE void RootParameter::initAsUAV(uint32_t shaderRegister, D3D12_SHADER_VIS
 	rootParam_.Descriptor.RegisterSpace = 0;
 }
 
-X_INLINE void RootParameter::initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE Type, uint32_t Register,
-	uint32_t Count, D3D12_SHADER_VISIBILITY visibility)
+X_INLINE void RootParameter::initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE type, uint32_t baseShaderRegister,
+	uint32_t count, D3D12_SHADER_VISIBILITY visibility)
 {
 	initAsDescriptorTable(1, visibility);
-	setTableRange(0, Type, Register, Count);
+	setTableRange(0, type, baseShaderRegister, count);
 }
 
 X_INLINE void RootParameter::initAsDescriptorTable(uint32_t rangeCount, D3D12_SHADER_VISIBILITY visibility)
