@@ -97,7 +97,7 @@ void RootSignature::freeParams(void)
 }
 
 
-void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
+void RootSignature::initStaticSampler(uint32_t shaderRegister, const D3D12_SAMPLER_DESC& nonStaticSamplerDesc,
 	D3D12_SHADER_VISIBILITY visibility)
 {
 	D3D12_STATIC_SAMPLER_DESC& staticSamplerDesc = samplers_[samplesInitCount_++];
@@ -112,7 +112,7 @@ void RootSignature::initStaticSampler(uint32_t Register, const D3D12_SAMPLER_DES
 	staticSamplerDesc.BorderColor = D3D12_STATIC_BORDER_COLOR_OPAQUE_WHITE;
 	staticSamplerDesc.MinLOD = nonStaticSamplerDesc.MinLOD;
 	staticSamplerDesc.MaxLOD = nonStaticSamplerDesc.MaxLOD;
-	staticSamplerDesc.ShaderRegister = Register;
+	staticSamplerDesc.ShaderRegister = shaderRegister;
 	staticSamplerDesc.RegisterSpace = 0;
 	staticSamplerDesc.ShaderVisibility = visibility;
 
