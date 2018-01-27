@@ -1513,7 +1513,6 @@ bool TechSetDef::parseShaderStageHelper(core::XParser& lex, Shader& shader, rend
 
 bool TechSetDef::parseParamFloat1(core::XParser& lex)
 {
-	
 	return parseParamHelper(lex, ParamType::Float1, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1533,7 +1532,6 @@ bool TechSetDef::parseParamFloat1(core::XParser& lex)
 
 bool TechSetDef::parseParamFloat2(core::XParser& lex)
 {
-	
 	return parseParamHelper(lex, ParamType::Float2, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1558,7 +1556,6 @@ bool TechSetDef::parseParamFloat2(core::XParser& lex)
 
 bool TechSetDef::parseParamFloat4(core::XParser& lex)
 {
-	
 	return parseParamHelper(lex, ParamType::Float4, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1594,7 +1591,6 @@ bool TechSetDef::parseParamFloat4(core::XParser& lex)
 bool TechSetDef::parseParamColor(core::XParser& lex)
 {
 	// for color it's just single prop.
-	
 	return parseParamHelper(lex, ParamType::Color, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 		
 		bool isExplicit = false;
@@ -1618,7 +1614,6 @@ bool TechSetDef::parseParamColor(core::XParser& lex)
 
 bool TechSetDef::parseParamInt(core::XParser& lex)
 {
-	
 	return parseParamHelper(lex, ParamType::Int, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
@@ -1638,7 +1633,6 @@ bool TechSetDef::parseParamInt(core::XParser& lex)
 
 bool TechSetDef::parseParamBool(core::XParser& lex)
 {
-	
 	return parseParamHelper(lex, ParamType::Bool, [](core::XParser& lex, Param& param, const core::XLexToken& token, core::Hash::Fnv1aVal hash) -> bool {
 			switch (hash)
 			{
