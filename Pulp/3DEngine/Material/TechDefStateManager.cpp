@@ -147,7 +147,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	// make a copy of the state and alter certain states.
 	// anything that is actually defined in the techdef's should not be overriden here.
 	// only stuff like vertex format which is runtime etc..
-	decltype(stateDesc) stateDescCpy = stateDesc;
+	decltype(stateDesc_) stateDescCpy = stateDesc_;
 	stateDescCpy.vertexFmt = vertFmt;
 
 	// come up with better way to send this data to render?
@@ -201,7 +201,7 @@ TechDefState::~TechDefState()
 TechDef* TechDefState::getTech(core::StrHash hash)
 {
 	for (auto& tech : techs_) {
-		if (tech.nameHash == hash) {
+		if (tech.nameHash_ == hash) {
 			return &tech;
 		}
 	}
@@ -328,9 +328,9 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 		const auto& techDefTech = it->second;
 
 		auto& tech = pTechDefState->techs_.AddOne(arena_);
-		tech.nameHash = core::StrHash(techName.c_str(), techName.length());
-		tech.name = techName;
-		tech.stateDesc = techDefTech.state;
+		tech.nameHash_ = core::StrHash(techName.c_str(), techName.length());
+		tech.name_ = techName;
+		tech.stateDesc_ = techDefTech.state;
 
 		for (uint32_t i = 0; i < render::shader::ShaderType::ENUM_COUNT - 1; i++)
 		{

@@ -26,10 +26,10 @@ public:
 
 public:
 	core::MemoryArenaBase* permArena_;
-	core::StrHash nameHash;
-	core::string name;
+	core::StrHash nameHash_;
+	core::string name_;
 
-	render::StateDesc stateDesc;
+	render::StateDesc stateDesc_;
 
 	core::CriticalSection permLock_;
 	TechDefPermArr perms_;
