@@ -16,7 +16,7 @@ class TechDef
 	typedef core::Array<TechDefPerm*> TechDefPermArr;
 
 public:
-	TechDef(core::MemoryArenaBase* arena);
+	TechDef(const core::string& name, core::StrHash nameHash, core::MemoryArenaBase* arena);
 	~TechDef();
 
 	TechDefPerm* getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);
