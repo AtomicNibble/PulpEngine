@@ -64,20 +64,11 @@ X_INLINE BaseTechSetDef::SamplerArr::const_iterator BaseTechSetDef::samplerEnd(v
 	return samplers_.end();
 }
 
-X_INLINE BaseTechSetDef::SamplerArr::size_type BaseTechSetDef::numStaticSampler(void) const
+X_INLINE bool BaseTechSetDef::allSamplersAreStatic(void) const
 {
-	return staticSamplers_.size();
+	return allSamplersStatic_;
 }
 
-X_INLINE BaseTechSetDef::SamplerArr::const_iterator BaseTechSetDef::staticSamplerBegin(void) const
-{
-	return staticSamplers_.begin();
-}
-
-X_INLINE BaseTechSetDef::SamplerArr::const_iterator BaseTechSetDef::staticSamplerEnd(void) const
-{
-	return staticSamplers_.end();
-}
 
 } // namespace techset
 

@@ -126,6 +126,10 @@ struct Sampler
 		filter(static_cast<render::FilterType::Enum>(0xff))
 	{}
 
+	bool isStatic(void) const {
+		return isRepeateDefined() && isFilterDefined();
+	}
+
 	bool isRepeateDefined(void) const {
 		return repeat != static_cast<render::TexRepeat::Enum>(0xff);
 	}
@@ -183,19 +187,19 @@ public:
 	X_INLINE SamplerArr::const_iterator samplerBegin(void) const;
 	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
 
-	X_INLINE SamplerArr::size_type numStaticSampler(void) const;
-	X_INLINE SamplerArr::const_iterator staticSamplerBegin(void) const;
-	X_INLINE SamplerArr::const_iterator staticSamplerEnd(void) const;
+	X_INLINE bool allSamplersAreStatic(void) const;
 
 protected:
 	core::MemoryArenaBase* arena_;
 	core::string fileName_;
 
+	bool allSamplersStatic_;
+	bool _pad[3];
+
 	TechniqueArr techs_; 
 	ParamArr params_;
 	TextureArr textures_;
 	SamplerArr samplers_;
-	SamplerArr staticSamplers_;
 };
 
 class TechSetDef : public BaseTechSetDef
