@@ -269,9 +269,7 @@ BaseTechSetDef::BaseTechSetDef(core::string fileName, core::MemoryArenaBase* are
 	textures_(arena),
 	samplers_(arena)
 {
-	techs_.setGranularity(6);
-	textures_.setGranularity(6);
-	samplers_.setGranularity(6);
+
 }
 
 BaseTechSetDef::~BaseTechSetDef()
@@ -393,9 +391,6 @@ TechSetDef::TechSetDef(core::string fileName, core::MemoryArenaBase* arena) :
 	shaders_(arena),
 	prims_(arena)
 {
-	shaders_.setGranularity(6);
-	shaders_.setGranularity(6);
-	prims_.setGranularity(6);
 
 	states_.reserve(64);
 }

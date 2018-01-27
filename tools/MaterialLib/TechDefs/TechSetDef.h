@@ -149,7 +149,10 @@ struct Sampler
 class BaseTechSetDef : core::ISerialize
 {
 	template<typename T>
-	using NameArr = core::Array<std::pair<core::string, T>>;
+	using ArrType = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
+
+	template<typename T>
+	using NameArr = ArrType<std::pair<core::string, T>>;
 
 	typedef NameArr<Technique> TechniqueArr;
 	typedef NameArr<Param> ParamArr;
