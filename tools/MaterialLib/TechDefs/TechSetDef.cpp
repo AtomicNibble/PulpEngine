@@ -2501,7 +2501,7 @@ X_INLINE typename T::const_iterator TechSetDef::findHelper(T& arr, const core::s
 
 
 template<typename T>
-X_INLINE  T& TechSetDef::addHelper(NameArr<T>& arr,
+X_INLINE T& TechSetDef::addHelper(NameArr<T>& arr,
 	const core::string& name, const core::string& parentName, const char* pNick)
 {
 	if (!parentName.isEmpty())
