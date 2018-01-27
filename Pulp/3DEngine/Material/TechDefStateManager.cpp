@@ -175,6 +175,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 	pCompilingPerm->stateHandle = stateHandle;
 	pCompilingPerm->pShaderPerm = pPerm;
+	COMPILER_BARRIER_W
 	pCompilingPerm->status = TechStatus::COMPILED; // any other threads waiting on this can now return.
 	return pCompilingPerm;
 }
