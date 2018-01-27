@@ -183,6 +183,9 @@ public:
 	X_INLINE SamplerArr::const_iterator samplerBegin(void) const;
 	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
 
+	X_INLINE SamplerArr::size_type numStaticSampler(void) const;
+	X_INLINE SamplerArr::const_iterator staticSamplerBegin(void) const;
+	X_INLINE SamplerArr::const_iterator staticSamplerEnd(void) const;
 
 protected:
 	core::MemoryArenaBase* arena_;
@@ -192,6 +195,7 @@ protected:
 	ParamArr params_;
 	TextureArr textures_;
 	SamplerArr samplers_;
+	SamplerArr staticSamplers_;
 };
 
 class TechSetDef : public BaseTechSetDef

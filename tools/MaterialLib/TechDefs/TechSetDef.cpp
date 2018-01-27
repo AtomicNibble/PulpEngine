@@ -47,9 +47,11 @@ namespace techset
 			uint8_t numParams;
 			uint8_t numTextures;
 			uint8_t numSamplers;
+			uint8_t numStaticSamplers;
+			uint8_t __pad[3];
 		};
 
-		X_ENSURE_SIZE(TechSetDefBinHeader, 20);
+		X_ENSURE_SIZE(TechSetDefBinHeader, 24);
 
 
 	} // namespace 
@@ -267,7 +269,8 @@ BaseTechSetDef::BaseTechSetDef(core::string fileName, core::MemoryArenaBase* are
 	techs_(arena),
 	params_(arena),
 	textures_(arena),
-	samplers_(arena)
+	samplers_(arena),
+	staticSamplers_(arena)
 {
 
 }
@@ -294,6 +297,7 @@ bool BaseTechSetDef::SSave(core::XFile* pFile) const
 	hdr.numParams = safe_static_cast<uint8_t>(params_.size());
 	hdr.numTextures = safe_static_cast<uint8_t>(textures_.size());
 	hdr.numSamplers = safe_static_cast<uint8_t>(samplers_.size());
+	hdr.numStaticSamplers = safe_static_cast<uint8_t>(staticSamplers_.size());
 
 	pFile->writeObj(hdr);
 
@@ -309,6 +313,9 @@ bool BaseTechSetDef::SSave(core::XFile* pFile) const
 	for (const auto& s : samplers_) {
 		pFile->writeString(s.first);
 	}
+	for (const auto& s : staticSamplers_) {
+		pFile->writeString(s.first);
+	}
 
 	for (const auto& t : techs_) {
 		t.second.SSave(pFile);
@@ -322,7 +329,9 @@ bool BaseTechSetDef::SSave(core::XFile* pFile) const
 	for (const auto& s : samplers_) {
 		s.second.SSave(pFile);
 	}
-
+	for (const auto& s : staticSamplers_) {
+		s.second.SSave(pFile);
+	}
 	return true;
 }
 
@@ -346,6 +355,7 @@ bool BaseTechSetDef::SLoad(core::XFile* pFile)
 	params_.resize(hdr.numParams);
 	textures_.resize(hdr.numTextures);
 	samplers_.resize(hdr.numSamplers);
+	staticSamplers_.resize(hdr.numStaticSamplers);
 
 	for (auto& t : techs_) {
 		pFile->readString(t.first);
@@ -359,6 +369,9 @@ bool BaseTechSetDef::SLoad(core::XFile* pFile)
 	for (auto& s : samplers_) {
 		pFile->readString(s.first);
 	}
+	for (auto& s : staticSamplers_) {
+		pFile->readString(s.first);
+	}
 
 	for (auto& t : techs_) {
 		t.second.SLoad(pFile);
@@ -370,6 +383,9 @@ bool BaseTechSetDef::SLoad(core::XFile* pFile)
 		t.second.SLoad(pFile);
 	}
 	for (auto& s : samplers_) {
+		s.second.SLoad(pFile);
+	}
+	for (auto& s : staticSamplers_) {
 		s.second.SLoad(pFile);
 	}
 
@@ -560,6 +576,26 @@ bool TechSetDef::parseFile(core::XParser& lex)
 				return false;			
 		}
 	}
+
+	// now move any samplers that are static.
+	if (samplers_.isNotEmpty())
+	{
+		for (auto it = samplers_.begin(); it != samplers_.end();)
+		{
+			const auto& sampler = it->second;
+
+			if (sampler.isFilterDefined() && sampler.isRepeateDefined())
+			{
+				staticSamplers_.push_back(*it);
+				it = samplers_.erase(it);
+			}
+			else
+			{
+				++it;
+			}
+		}
+	}
+
 
 	if (!lex.isEOF()) {
 		X_ERROR("TechDefs", "Failed to fully parse file");
