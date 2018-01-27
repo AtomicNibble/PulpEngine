@@ -185,7 +185,9 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
 // -----------------------------------------------------------------------
 
-TechDefState::TechDefState(core::MemoryArenaBase* arena) :
+TechDefState::TechDefState(MaterialCat::Enum cat, const core::string& name, core::MemoryArenaBase* arena) :
+	cat_(cat),
+	name_(name),
 	techs_(arena),
 	pTechSecDef_(nullptr)
 {
@@ -317,9 +319,7 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 
 	// this don't cause any state to be created.
 	// permatations are created on demand.
-	core::UniquePointer<TechDefState> pTechDefState = core::makeUnique<TechDefState>(&techsPoolArena_, arena_);
-	pTechDefState->cat = cat;
-	pTechDefState->name = name;
+	core::UniquePointer<TechDefState> pTechDefState = core::makeUnique<TechDefState>(&techsPoolArena_, cat, name, arena_);
 	pTechDefState->techs_.reserve(pTechDef->numTechs());
 	pTechDefState->pTechSecDef_ = pTechDef;
 

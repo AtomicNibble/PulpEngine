@@ -46,14 +46,14 @@ class TechDefState
 	typedef core::Array<TechDef> TechDefArr;
 
 public:
-	TechDefState(core::MemoryArenaBase* arena);
+	TechDefState(MaterialCat::Enum cat, const core::string& name, core::MemoryArenaBase* arena);
 	~TechDefState();
 
 	TechDef* getTech(core::StrHash hash);
 
 public:
-	MaterialCat::Enum cat;
-	core::string name; // not a tech name.
+	MaterialCat::Enum cat_;
+	core::string name_; // not a tech name.
 
 	// the techs defined eg: "unlit", "depth", "flyinggoat"
 	TechDefArr techs_;
