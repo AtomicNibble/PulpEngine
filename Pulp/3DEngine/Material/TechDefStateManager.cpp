@@ -25,7 +25,6 @@ TechDef::TechDef(const core::string& name, core::StrHash nameHash, const techset
 	X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
 
 	perms_.setGranularity(8);
-	aliases_.setGranularity(2);
 	shaderSource_.fill(nullptr);
 }
 

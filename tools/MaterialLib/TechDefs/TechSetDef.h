@@ -39,7 +39,10 @@ struct Alias
 
 struct Shader
 {
-	typedef core::Array<Alias> AliaseArr;
+	template<typename T>
+	using ArrType = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
+
+	typedef ArrType<Alias> AliaseArr;
 	typedef render::shader::ShaderType ShaderType;
 
 	Shader();
