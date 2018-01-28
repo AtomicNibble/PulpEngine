@@ -47,6 +47,7 @@ static const uint32_t MAX_RENDER_TARGETS = 8;
 static const uint32_t MAX_CONST_BUFFERS_BOUND = 8;
 static const uint32_t MAX_TEXTURES_BOUND = 8;
 static const uint32_t MAX_BUFFERS_BOUND = 8;
+static const uint32_t MAX_SAMPLERS_BOUND = 12;
 
 typedef uintptr_t Handle;
 typedef Handle VertexBufferHandle;
