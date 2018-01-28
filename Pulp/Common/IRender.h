@@ -450,7 +450,8 @@ struct IRender
 	virtual shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_ABSTRACT;
 
 	virtual PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_ABSTRACT;
-	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_ABSTRACT;
+	virtual StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, 
+		const SamplerState* pStaticSamplers, size_t numStaticSamplers) X_ABSTRACT;
 
 	// Will relesse all the HWShaders in the perm for you.
 	virtual void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_ABSTRACT;

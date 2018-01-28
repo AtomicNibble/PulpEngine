@@ -1342,6 +1342,7 @@ bool XRender::updateStateState(DeviceState* pState)
 	const shader::ShaderPermatation& perm = *static_cast<const shader::ShaderPermatation*>(pState->pPerm);
 	const PassState* pPassState = pState->pPassState;
 	const StateDesc& desc = pState->cpuDesc;
+	const auto& staticSamplers = pState->staticSamplers;
 
 	// shaders only for now?
 	if (perm.isCompiled()) {
@@ -1354,7 +1355,7 @@ bool XRender::updateStateState(DeviceState* pState)
 	}
 
 	// the RootSig may need updating.
-	if (!buildRootSig(pState, perm)) {
+	if (!buildRootSig(pState, perm, staticSamplers.ptr(), staticSamplers.size())) {
 		return false;
 	}
 
@@ -1371,7 +1372,8 @@ bool XRender::updateStateState(DeviceState* pState)
 #endif // !PSO_HOT_RELOAD
 
 StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm,
-	const StateDesc& desc, const TextureState* pTextStates, size_t numStates)
+	const StateDesc& desc, 
+	const SamplerState* pStaticSamplers, size_t numStaticSamplers)
 {
 	X_ASSERT_NOT_NULL(pPerm);
 
@@ -1430,12 +1432,16 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 #if PSO_HOT_RELOAD
 	pState->pPassState = pPassState;
 	pState->pPerm = pPerm;
+
+	for (size_t i = 0; i < numStaticSamplers; i++) {
+		pState->staticSamplers.append(pStaticSamplers[i]);
+	}
 #endif // !PSO_HOT_RELOAD
 
 	// we need a root sig to compile this PSO with.
 	// but it don't have to be the rootSig we render with.
 
-	if (!buildRootSig(pState, perm)) {
+	if (!buildRootSig(pState, perm, pStaticSamplers, numStaticSamplers)) {
 		X_DELETE(pState, &statePool_);
 		return INVALID_STATE_HANLDE;
 	}
@@ -1488,7 +1494,8 @@ void XRender::destoryState(StateHandle handle)
 }
 
 
-bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm)
+bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm,
+	const SamplerState* pStaticSamplers, size_t numStaticSamplers)
 {
 	RootSignature& rootSig = pState->rootSig;
 
@@ -1516,13 +1523,22 @@ bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation&
 		if (pPixelShader->getNumTextures() > 0) {
 			numParams++; // a descriptor range
 		}
-		if (pPixelShader->getNumSamplers() > 0) {
-			numParams++; // a descriptor range
+
+		if (!numStaticSamplers)
+		{
+			if (pPixelShader->getNumSamplers() > 0) {
+				numParams++; // a descriptor range
+			}
+		}
+		else
+		{
+			// currently only allow static samplers, if you provide all the samplers.
+			X_ASSERT(pPixelShader->getNumSamplers() == numStaticSamplers, "Static samplers must match sampler count")(pPixelShader->getNumSamplers(), numStaticSamplers);
 		}
 	}
 
 
-	rootSig.reset(numParams, 0);
+	rootSig.reset(numParams, numStaticSamplers);
 
 	uint32_t currentParamIdx = 0;
 
@@ -1567,11 +1583,31 @@ bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation&
 			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV,
 				0, numTextures, D3D12_SHADER_VISIBILITY_PIXEL);
 		}
-		if (numSamplers > 0) {
-			pState->samplerRootIdxBase = currentParamIdx;
 
-			rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
-				0, numSamplers, D3D12_SHADER_VISIBILITY_PIXEL);
+		if (!numStaticSamplers)
+		{
+			if (numSamplers > 0) {
+				pState->samplerRootIdxBase = currentParamIdx;
+
+				rootSig.getParamRef(currentParamIdx++).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER,
+					0, numSamplers, D3D12_SHADER_VISIBILITY_PIXEL);
+			}
+		}
+		else
+		{
+			auto& samplers = pPixelShader->getSamplers();
+
+			for (size_t i = 0; i < numStaticSamplers; i++)
+			{
+				auto& ss = pStaticSamplers[i];
+
+				auto bindPoint = samplers[i].getBindPoint();
+
+				SamplerDesc desc;
+				samplerDescFromState(ss, desc);
+				// can we know the index?
+				rootSig.initStaticSampler(bindPoint, desc, D3D12_SHADER_VISIBILITY_PIXEL);
+			}
 		}
 	}
 

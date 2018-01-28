@@ -77,10 +77,14 @@ class XRender : public IRender
 	struct DeviceState
 	{
 		typedef core::Array<TextureState> TextureStateArray;
+		typedef core::Array<SamplerState> SamplerStateArray;
 
 		DeviceState(core::MemoryArenaBase* arena) :
 			rootSig(arena),
 			pPso(nullptr)
+#if PSO_HOT_RELOAD
+			, staticSamplers(arena)
+#endif // !PSO_HOT_RELOAD
 		{
 			texRootIdxBase = std::numeric_limits<decltype(texRootIdxBase)>::max();
 			samplerRootIdxBase = std::numeric_limits<decltype(samplerRootIdxBase)>::max();
@@ -100,6 +104,8 @@ class XRender : public IRender
 #if PSO_HOT_RELOAD
 		const PassState* pPassState;
 		const shader::IShaderPermatation* pPerm;
+
+		SamplerStateArray staticSamplers;
 #endif // !PSO_HOT_RELOAD
 
 		RootSignature rootSig; // dam rootsig is a chunky fucker.
@@ -238,7 +244,8 @@ public:
 	shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, 
+		const SamplerState* pStaticSamplers, size_t numStaticSamplers) X_FINAL;
 	
 #if PSO_HOT_RELOAD
 	bool updateStateState(DeviceState* pState);
@@ -262,7 +269,7 @@ public:
 	Stats getStats(void) const X_FINAL;
 
 private:
-	bool buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm);
+	bool buildRootSig(DeviceState* pState, const shader::ShaderPermatation& perm, const SamplerState* pStaticSamplers, size_t numStaticSamplers);
 
 	bool buildPSO(GraphicsPSO& pso, const PassState* pPassState,
 		const StateDesc& desc, const RootSignature& rootSig, const shader::ShaderPermatation& perm);
