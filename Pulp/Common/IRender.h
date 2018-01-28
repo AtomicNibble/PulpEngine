@@ -12,9 +12,6 @@
 #include <Math\VertexFormats.h>
 
 
-typedef void* WIN_HWND;
-
-
 X_NAMESPACE_DECLARE(font,
 	struct IXFont_RenderProxy;
 	struct TextDrawContext;
