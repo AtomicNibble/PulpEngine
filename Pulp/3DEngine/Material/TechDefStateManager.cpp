@@ -4,6 +4,8 @@
 #include <Hashing\Fnva1Hash.h>
 #include <Util\UniquePointer.h>
 
+#include <Sampler.h>
+
 X_NAMESPACE_BEGIN(engine)
 
 namespace
@@ -165,7 +167,68 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		stateDescCpy.stateFlags.Set(render::StateFlag::HWSKIN);
 	}
 
-	auto stateHandle = pRenderSys->createState(passHandle, pPerm, stateDescCpy, nullptr, 0);
+	core::FixedArray<render::SamplerState, render::MAX_SAMPLERS_BOUND> staticSamplers;
+
+	// can i work out if this perm is static samplers only.
+	{
+		auto& permSamplers = pPerm->getSamplers();
+		if (permSamplers.isNotEmpty() && pTechSecDef_->anySamplersAreStatic())
+		{
+			auto samplers = pTechSecDef_->getSamplers();
+		
+			bool allStatic = pTechSecDef_->allSamplersAreStatic();
+			
+			// see if all the ones we use are static.
+			if (!allStatic)
+			{
+				allStatic = true;
+
+				for (auto& ps : permSamplers)
+				{
+					auto it = std::find_if(samplers.begin(), samplers.end(),
+						[&ps](const decltype(samplers)::element_type& s) -> bool {
+							return s.second.isStatic() && s.first == ps.getName();
+						}
+					);
+					
+					allStatic &= (it != samplers.end());
+				}
+			}
+
+			if (allStatic)
+			{
+				// map them.
+				for (auto& ps : permSamplers)
+				{
+					auto it = std::find_if(samplers.begin(), samplers.end(),
+						[&ps](const decltype(samplers)::element_type& s) -> bool {
+							return s.first == ps.getName();
+						}
+					);
+
+					if (it == samplers.end()) {
+						X_ERROR("Tech", "Failed to map static samplers.");
+						staticSamplers.clear();
+						break;
+					}
+
+					X_ASSERT(it->second.isStatic(), "Should be static sampler")(it->first, it->second.isStatic());
+
+					render::SamplerState ss;
+					ss.filter = it->second.filter;
+					ss.repeat = it->second.repeat;
+					staticSamplers.push_back(ss);
+				}
+			}
+		}
+	}
+
+	auto stateHandle = pRenderSys->createState(
+		passHandle, 
+		pPerm, 
+		stateDescCpy, 
+		staticSamplers.begin(), staticSamplers.size()
+	);
 
 	if (stateHandle == render::INVALID_STATE_HANLDE) {
 		X_BREAKPOINT;
