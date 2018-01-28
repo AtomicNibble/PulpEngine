@@ -12,8 +12,9 @@ namespace
 
 } // namespace
 
-TechDef::TechDef(const core::string& name, core::StrHash nameHash, core::MemoryArenaBase* arena) :
+TechDef::TechDef(const core::string& name, core::StrHash nameHash, const techset::TechSetDef* pTechSecDef, core::MemoryArenaBase* arena) :
 	permArena_(arena),
+	pTechSecDef_(pTechSecDef),
 	perms_(arena),
 	aliases_(arena),
 	name_(name),
@@ -329,7 +330,7 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 		const auto& techName = it.first;
 		const auto& techDefTech = it.second;
 
-		auto& tech = pTechDefState->techs_.AddOne(techName, core::StrHash(techName.c_str(), techName.length()), arena_);
+		auto& tech = pTechDefState->techs_.AddOne(techName, core::StrHash(techName.c_str(), techName.length()), pTechDef, arena_);
 		tech.stateDesc_ = techDefTech.state;
 
 		for (uint32_t i = 0; i < render::shader::ShaderType::ENUM_COUNT - 1; i++)
