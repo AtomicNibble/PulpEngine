@@ -15,6 +15,14 @@ template <class ElementType, std::ptrdiff_t Extent = dynamic_extent>
 class span;
 
 
+#if _MSC_VER > 1900 // 2015
+#define CPP14_CONSTEXPR 1
+#define CPP14_CONSTEXPR(x) x
+#else
+#define CPP14_CONSTEXPR 0
+#define CPP14_CONSTEXPR_EXPR(x) 
+#endif 
+
 namespace details
 {
 	template <class T>
@@ -100,7 +108,7 @@ namespace details
 			return span_->data() + index_;
 		}
 
-		constexpr span_iterator& operator++() 
+		CPP14_CONSTEXPR_EXPR(constexpr) span_iterator& operator++()
 		{
 			X_ASSERT(0 <= index_ && index_ != span_->length(), "")(index_, span_->length());
 			++index_;
@@ -154,7 +162,9 @@ namespace details
 
 		constexpr difference_type operator-(const span_iterator& rhs) const 
 		{
+#if CPP14_CONSTEXPR
 			X_ASSERT(span_ == rhs.span_, "")();
+#endif // !CPP14_CONSTEXPR
 			return index_ - rhs.index_;
 		}
 
@@ -178,7 +188,10 @@ namespace details
 		constexpr friend bool operator<(const span_iterator& lhs,
 			const span_iterator& rhs) 
 		{
+#if CPP14_CONSTEXPR
 			X_ASSERT(lhs.span_ == rhs.span_, "")();
+#endif // !CPP14_CONSTEXPR
+
 			return lhs.index_ < rhs.index_;
 		}
 
@@ -265,7 +278,9 @@ namespace details
 		explicit constexpr extent_type(index_type size) : 
 			size_(size) 
 		{
+#if CPP14_CONSTEXPR
 			X_ASSERT(size >= 0, "Extent size can't be negative")(size); 
+#endif // !CPP14_CONSTEXPR
 		}
 
 		constexpr index_type size(void) const { 
