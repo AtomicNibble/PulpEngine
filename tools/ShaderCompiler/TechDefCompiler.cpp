@@ -108,10 +108,10 @@ namespace compiler
 		}
 
 		// for each tech.
-		for (auto it = pTechDef->techBegin(); it != pTechDef->techEnd(); ++it)
+		for (auto it : pTechDef->getTechs())
 		{
 			// get the shaders.
-			const techset::Technique& tech = it->second;
+			const techset::Technique& tech = it.second;
 
 			using namespace render::shader;
 			

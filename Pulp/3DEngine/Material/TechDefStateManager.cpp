@@ -324,10 +324,10 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 	pTechDefState->pTechSecDef_ = pTechDef;
 
 	// we process all the techs 
-	for (auto it = pTechDef->techBegin(); it != pTechDef->techEnd(); ++it)
+	for (auto it : pTechDef->getTechs())
 	{
-		const auto& techName = it->first;
-		const auto& techDefTech = it->second;
+		const auto& techName = it.first;
+		const auto& techDefTech = it.second;
 
 		auto& tech = pTechDefState->techs_.AddOne(techName, core::StrHash(techName.c_str(), techName.length()), arena_);
 		tech.stateDesc_ = techDefTech.state;

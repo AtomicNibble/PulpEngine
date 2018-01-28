@@ -9,6 +9,7 @@
 
 #include <Traits\MemberFunctionTraits.h>
 #include <Util\Delegate.h>
+#include <Util\Span.h>
 
 X_NAMESPACE_DECLARE(core,
 	class XLexer;
@@ -152,16 +153,25 @@ struct Sampler
 
 class BaseTechSetDef : core::ISerialize
 {
+public:
 	template<typename T>
 	using ArrType = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
 
 	template<typename T>
-	using NameArr = ArrType<std::pair<core::string, T>>;
+	using NamePair = std::pair<core::string, T>;
+
+	template<typename T>
+	using NameArr = ArrType<NamePair<T>>;
 
 	typedef NameArr<Technique> TechniqueArr;
 	typedef NameArr<Param> ParamArr;
 	typedef NameArr<Texture> TextureArr;
 	typedef NameArr<Sampler> SamplerArr;
+
+	typedef core::span<const TechniqueArr::Type> TechniqueSpan;
+	typedef core::span<const ParamArr::Type> ParamSpan;
+	typedef core::span<const TextureArr::Type> TextureSpan;
+	typedef core::span<const SamplerArr::Type> SamplerSpan;
 
 public:
 	BaseTechSetDef(core::string fileName, core::MemoryArenaBase* arena);
@@ -172,20 +182,14 @@ public:
 
 	// we need a api for getting the techs.
 	X_INLINE TechniqueArr::size_type numTechs(void) const;
-	X_INLINE TechniqueArr::const_iterator techBegin(void) const;
-	X_INLINE TechniqueArr::const_iterator techEnd(void) const;
-
 	X_INLINE ParamArr::size_type numParams(void) const;
-	X_INLINE ParamArr::const_iterator paramBegin(void) const;
-	X_INLINE ParamArr::const_iterator paramEnd(void) const;
-
 	X_INLINE TextureArr::size_type numTexture(void) const;
-	X_INLINE TextureArr::const_iterator textureBegin(void) const;
-	X_INLINE TextureArr::const_iterator textureEnd(void) const;
-
 	X_INLINE SamplerArr::size_type numSampler(void) const;
-	X_INLINE SamplerArr::const_iterator samplerBegin(void) const;
-	X_INLINE SamplerArr::const_iterator samplerEnd(void) const;
+
+	X_INLINE TechniqueSpan getTechs(void) const;
+	X_INLINE ParamSpan getParams(void) const;
+	X_INLINE TextureSpan getTextures(void) const;
+	X_INLINE SamplerSpan getSamplers(void) const;
 
 	X_INLINE bool allSamplersAreStatic(void) const;
 	X_INLINE bool anySamplersAreStatic(void) const;
