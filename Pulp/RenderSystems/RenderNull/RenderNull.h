@@ -64,7 +64,8 @@ public:
 	PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;
 	void destoryPassState(PassStateHandle handle) X_FINAL;
 
-	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, const TextureState* pTextStates, size_t numStates) X_FINAL;
+	StateHandle createState(PassStateHandle passHandle, const shader::IShaderPermatation* pPerm, const StateDesc& state, 
+		const SamplerState* pStaticSamplers, size_t numStaticSamplers) X_FINAL;
 	void destoryState(StateHandle handle) X_FINAL;
 
 	Stats getStats(void) const X_FINAL;

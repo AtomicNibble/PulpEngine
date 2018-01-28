@@ -268,13 +268,13 @@ void RenderNull::destoryPassState(PassStateHandle handle)
 }
 
 StateHandle RenderNull::createState(PassStateHandle passHandle, const shader::IShaderPermatation* pTech, const StateDesc& state,
-	const TextureState* pTextStates, size_t numStates)
+	const SamplerState* pStaticSamplers, size_t numStaticSamplers)
 {
 	X_UNUSED(passHandle);
 	X_UNUSED(pTech);
 	X_UNUSED(state);
-	X_UNUSED(pTextStates);
-	X_UNUSED(numStates);
+	X_UNUSED(pStaticSamplers);
+	X_UNUSED(numStaticSamplers);
 
 	return INVALID_STATE_HANLDE;
 }
