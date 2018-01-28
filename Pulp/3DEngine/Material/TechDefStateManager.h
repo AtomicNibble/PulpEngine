@@ -60,7 +60,7 @@ public:
 	TechDefArr techs_;
 
 	// the tech set def we got the techs and state from.
-	techset::TechSetDef* pTechSecDef_;
+	const techset::TechSetDef* pTechSecDef_;
 };
 
 // this is to store states for each of the techSets.
