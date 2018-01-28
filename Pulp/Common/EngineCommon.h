@@ -29,50 +29,49 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Util\BitUtil.h>
 #include <Util\PointerUtil.h>
 #include <Util\EndianUtil.h>
-
 #include <Util\SmartPointer.h>
 
 
 // preprocessor
-#include <Prepro/PreproCommaIf.h>
-#include <Prepro/PreproDecrement.h>
-#include <Prepro/PreproExpandArgs.h>
-#include <Prepro/PreproHasComma.h>
-#include <Prepro/PreproIf.h>
-#include <Prepro/PreproIncrement.h>
-#include <Prepro/PreproIsEmpty.h>
-#include <Prepro/PreproJoin.h>
-#include <Prepro/PreproList.h>
-#include <Prepro/PreproNumArgs.h>
-#include <Prepro/PreproPassArgs.h>
-#include <Prepro/PreproRepeat.h>
-#include <Prepro/PreproStringize.h>
-#include <Prepro/PreproToBool.h>
-#include <Prepro/PreproUniqueName.h>
+#include <Prepro\PreproCommaIf.h>
+#include <Prepro\PreproDecrement.h>
+#include <Prepro\PreproExpandArgs.h>
+#include <Prepro\PreproHasComma.h>
+#include <Prepro\PreproIf.h>
+#include <Prepro\PreproIncrement.h>
+#include <Prepro\PreproIsEmpty.h>
+#include <Prepro\PreproJoin.h>
+#include <Prepro\PreproList.h>
+#include <Prepro\PreproNumArgs.h>
+#include <Prepro\PreproPassArgs.h>
+#include <Prepro\PreproRepeat.h>
+#include <Prepro\PreproStringize.h>
+#include <Prepro\PreproToBool.h>
+#include <Prepro\PreproUniqueName.h>
 
 
 // compile time
-#include <CompileTime/ExtractCount.h>
-#include <CompileTime/ExtractType.h>
-#include <CompileTime/IntToType.h>
-#include <CompileTime/IsPOD.h>
-#include <CompileTime/IsPointer.h>
-#include <CompileTime/ClassInfo.h>
+#include <CompileTime\ExtractCount.h>
+#include <CompileTime\ExtractType.h>
+#include <CompileTime\IntToType.h>
+#include <CompileTime\IsPOD.h>
+#include <CompileTime\IsPointer.h>
+#include <CompileTime\ClassInfo.h>
 
 // debugging
 #include <Debugging\DebuggerConnection.h>
 #include <Debugging\DebuggerBreakpoint.h>
 #include <Debugging\DebuggerBreakpointMacros.h>
-#include <Debugging/Assert.h>
-#include <Debugging/AssertMacros.h>
+#include <Debugging\Assert.h>
+#include <Debugging\AssertMacros.h>
 
 // traits
-#include <Traits/FunctionTraits.h>
-#include <Traits/MemberFunctionTraits.h>
+#include <Traits\FunctionTraits.h>
+#include <Traits\MemberFunctionTraits.h>
 
 // casts
-#include <Casts/safe_static_cast.h>
-#include <Casts/union_cast.h>
+#include <Casts\safe_static_cast.h>
+#include <Casts\union_cast.h>
 
 
 // Common used interface 
