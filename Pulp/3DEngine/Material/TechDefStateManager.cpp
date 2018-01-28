@@ -170,6 +170,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	core::FixedArray<render::SamplerState, render::MAX_SAMPLERS_BOUND> staticSamplers;
 
 	// can i work out if this perm is static samplers only.
+	// TODO: suppport aliasing.
 	{
 		auto& permSamplers = pPerm->getSamplers();
 		if (permSamplers.isNotEmpty() && pTechSecDef_->anySamplersAreStatic())
