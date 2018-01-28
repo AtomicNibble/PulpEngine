@@ -193,7 +193,7 @@ namespace profiler
 		subSystemInfo_[profiler::SubSys::GAME].col = Col_Purple;
 		subSystemInfo_[profiler::SubSys::PHYSICS].col = Col_Magenta;
 		subSystemInfo_[profiler::SubSys::NETWORK].col = Col_Pink;
-		subSystemInfo_[profiler::SubSys::VIDEO].col = Col_Blue;
+		subSystemInfo_[profiler::SubSys::VIDEO].col = Col_Blueviolet;
 		subSystemInfo_[profiler::SubSys::UNCLASSIFIED].col = Col_Coral;
 		subSystemInfo_[profiler::SubSys::TOOL].col = Col_Teal;
 		subSystemInfo_[profiler::SubSys::UNITTEST].col = Col_Olive;
