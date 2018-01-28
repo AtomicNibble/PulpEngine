@@ -301,12 +301,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 {
 	X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
 
-//	if (level_.canRender()) {
-//		level_.render();
-//	}
-
 	auto* pRender = gEnv->pRender;
-
 
 #if 0
 	XCamera cam;
