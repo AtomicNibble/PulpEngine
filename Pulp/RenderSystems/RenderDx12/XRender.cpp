@@ -1450,8 +1450,6 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 
 	pState->pPso = pso.getPipelineStateObject();
 	pState->topo = topoFromDesc(desc);
-	pState->texStates.resize(numStates);
-	std::memcpy(pState->texStates.data(), pTextStates, sizeof(TextureState) * numStates);
 
 #if RENDER_STATS
 	++stats_.numStates;

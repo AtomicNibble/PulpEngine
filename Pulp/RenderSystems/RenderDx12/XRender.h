@@ -80,7 +80,6 @@ class XRender : public IRender
 
 		DeviceState(core::MemoryArenaBase* arena) :
 			rootSig(arena),
-			texStates(arena),
 			pPso(nullptr)
 		{
 			texRootIdxBase = std::numeric_limits<decltype(texRootIdxBase)>::max();
@@ -112,10 +111,6 @@ class XRender : public IRender
 		uint8_t samplerRootIdxBase; 
 		uint8_t cbRootIdxBase; // root index base for cbuffers
 		uint8_t bufferRootIdxBase;
-
-		// we want to store also the textures and samplers you want to use slut.
-		// this won't stay as vector, just no point doing it fast way as might refactor before done.
-		TextureStateArray texStates;
 	};
 
 	struct State
