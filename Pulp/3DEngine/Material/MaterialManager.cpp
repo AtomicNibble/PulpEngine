@@ -497,10 +497,10 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	}
 
 	// temp, should move over to using values from perm somepoint.
-	X_ASSERT(numTex == pPerm->numTextStates, "Mistatch")();
-	X_ASSERT(numSamplers == pPerm->numSamplers, "Mistatch")();
-	X_ASSERT(numCb == pPerm->numCbs, "Mistatch")();
-	X_ASSERT(numBuffers == pPerm->numBuffers, "Mistatch")();
+	X_ASSERT(numTex == (size_t)pPerm->numTextStates, "Mistatch")();
+	X_ASSERT(numSamplers == (size_t)pPerm->numSamplers, "Mistatch")();
+	X_ASSERT(numCb == (size_t)pPerm->numCbs, "Mistatch")();
+	X_ASSERT(numBuffers == (size_t)pPerm->numBuffers, "Mistatch")();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
@@ -885,7 +885,7 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
 
 			if (p.getName() == cb.resourceName)
 			{
-				X_ASSERT(i < pResourceState->getNumTextStates(), "Resouce index out of bounds")(i, pResourceState->getNumTextStates());
+				X_ASSERT(i < static_cast<size_t>(pResourceState->getNumTextStates()), "Resouce index out of bounds")(i, pResourceState->getNumTextStates());
 				pResourceState->getTexStates()[i].textureId = val;
 				break;
 			}
