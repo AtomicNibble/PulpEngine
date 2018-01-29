@@ -84,16 +84,6 @@ namespace Commands
 
 	X_ENSURE_SIZE(ResourceStateBase, 4);
 
-	X_INLINE constexpr int32_t ResourceStateBase::getMaxStateSize(void)
-	{
-		return sizeof(ResourceStateBase) +
-			(sizeof(render::TextureState) * MAX_TEX_STATES) +
-			(sizeof(render::SamplerState) * MAX_SAMPLER_STATES) +
-			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS) + 
-			(sizeof(render::BufferState) * MAX_BUFFER_STATES);
-	}
-	
-
 	X_INLINE int8_t ResourceStateBase::getNumTextStates(void) const
 	{
 		return numTextStates;
@@ -206,6 +196,14 @@ namespace Commands
 		return size;
 	}
 
+	X_INLINE constexpr int32_t ResourceStateBase::getMaxStateSize(void)
+	{
+		return sizeof(ResourceStateBase) +
+			(sizeof(render::TextureState) * MAX_TEX_STATES) +
+			(sizeof(render::SamplerState) * MAX_SAMPLER_STATES) +
+			(sizeof(render::ConstantBufferHandle) * MAX_CONST_BUFFERS) +
+			(sizeof(render::BufferState) * MAX_BUFFER_STATES);
+	}
 
 	X_INLINE constexpr int32_t ResourceStateBase::getStateSize(size_t numTex, size_t numSamp, size_t numCBs, size_t numBuf)
 	{
