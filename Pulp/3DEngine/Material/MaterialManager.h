@@ -71,14 +71,14 @@ public:
 	
 	bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_FINAL;
 	void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
-	void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
-
 
 
 	// ~IMaterialManager
 	void listMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
+	void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
+
 	Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
 		PermatationFlags permFlags);
 
