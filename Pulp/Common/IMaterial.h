@@ -51,6 +51,28 @@ struct IMaterialLib : public IConverter
 
 };
 
+X_DECLARE_ENUM(Register)(
+	CodeTexture0,
+	CodeTexture1,
+	CodeTexture2,
+	CodeTexture3,
+	Invalid
+);
+
+struct RegisterCtx
+{
+	static_assert(Register::Invalid == Register::ENUM_COUNT - 1, "");
+
+	typedef std::array<uint32_t, Register::ENUM_COUNT - 1> SlotArr;
+
+	RegisterCtx() {
+		core::zero_this(this);
+	}\
+
+	SlotArr regs;
+};
+
+
 
 X_DECLARE_FLAGS(MaterialFlag)(
 	NODRAW,			// not visable
