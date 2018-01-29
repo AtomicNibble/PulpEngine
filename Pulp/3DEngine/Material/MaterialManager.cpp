@@ -487,9 +487,20 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 	// the tech should tell us O_O
 	// him -> pTechDef
 	const size_t numTex = permTextures.size();
-	const size_t numSamplers = permSamplers.size();
 	const size_t numCb = cbLinks.size();
 	const size_t numBuffers = buffers.size();
+	size_t numSamplers = permSamplers.size();
+
+	if (pTechDef->pTechSecDef_->allSamplersAreStatic())
+	{
+		numSamplers = 0;
+	}
+
+	// temp, should move over to using values from perm somepoint.
+	X_ASSERT(numTex == pPerm->numTextStates, "Mistatch")();
+	X_ASSERT(numSamplers == pPerm->numSamplers, "Mistatch")();
+	X_ASSERT(numCb == pPerm->numCbs, "Mistatch")();
+	X_ASSERT(numBuffers == pPerm->numBuffers, "Mistatch")();
 
 	render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
 		numTex, 
@@ -551,13 +562,23 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 					// find a alias that points to the persm resource.
 					if (alias.resourceName == permTexture.getName())
 					{
+#if 0
 						if (alias.isCode)
 						{
 							// if we must assign the texture with code, make it default.
 							texState.textureId = pDefaultTex->getDeviceID();
+
+							if(pMat->getName() == "video/test")
+							{
+								auto* pVid = gEnv->pVideoSys->findVideo("movie");
+
+								texState.textureId = pVid->getTextureID();
+							}
+
 							goto texSet;
 						}
 						else
+#endif
 						{
 
 							// okay so now we know the name of the material sampler that we want.
@@ -588,7 +609,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 				texState.textureId = pDefaultTex->getDeviceID();
 			}
 
-		texSet:;
+//		texSet:;
 		}
 	}
 
@@ -816,12 +837,6 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 		const auto& alias = als[i];
 		if (alias.nameHash == texNameHash)
 		{
-			if (!alias.isCode)
-			{
-				// this was just a plain name alias not a code one! TWAT!
-				return false;
-			}
-
 			auto* pTextureStates = pTech->pVariableState->getTexStates();
 			pTextureStates[i].textureId = id;
 			return true;
@@ -830,6 +845,54 @@ bool XMaterialManager::setTextureID(Material* pMat, Material::Tech* pTech, core:
 
 	return false;
 }
+
+bool XMaterialManager::setRegisters(MaterialTech* pTech, const RegisterCtx& regs)
+{
+	setRegisters(pTech->pPerm, pTech->pVariableState, regs);
+
+	return true;
+}
+
+void XMaterialManager::initStateFromRegisters(TechDefPerm* pTech,
+	render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs)
+{
+	// set the sizes like a hoe.
+	pResourceState->setSizes(
+		pTech->numTextStates,
+		pTech->numSamplers,
+		pTech->numCbs,
+		pTech->numBuffers
+	);
+
+	setRegisters(pTech, pResourceState, regs);
+}
+
+X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
+	render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs)
+{
+	TechDef* pTechDef = pTech->pTechDef;
+
+	// set the fooking state yo!
+	const auto& permTextures = pTech->pShaderPerm->getTextures();
+
+	for (auto& cb : pTechDef->codeBinds_)
+	{
+		uint32_t val = regs.regs[cb.slot];
+
+		for (size_t i = 0; i < permTextures.size(); i++)
+		{
+			auto& p = permTextures[i];
+
+			if (p.getName() == cb.resourceName)
+			{
+				X_ASSERT(i < pResourceState->getNumTextStates(), "Resouce index out of bounds")(i, pResourceState->getNumTextStates());
+				pResourceState->getTexStates()[i].textureId = val;
+				break;
+			}
+		}
+	}
+}
+
 
 
 // ICoreEventListener

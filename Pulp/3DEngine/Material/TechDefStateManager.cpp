@@ -19,6 +19,7 @@ TechDef::TechDef(const core::string& name, core::StrHash nameHash, const techset
 	pTechSecDef_(pTechSecDef),
 	perms_(arena),
 	aliases_(arena),
+	codeBinds_(arena),
 	name_(name),
 	nameHash_(nameHash)
 {
@@ -96,6 +97,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 	{
 		while (pCompilingPerm->status == TechStatus::NOT_COMPILED)
 		{
+			// TODO: something useful.
 			core::Thread::Yield();
 		}
 
@@ -239,6 +241,36 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 		return false;
 	}
 
+	// work out variable state size.
+	{
+		const auto& cbLinks = pPerm->getCbufferLinks();
+		const auto& buffers = pPerm->getBuffers();
+		const auto& permSamplers = pPerm->getSamplers();
+		const auto& permTextures = pPerm->getTextures();
+
+		size_t numSamplers = permSamplers.size();
+
+		if (pTechSecDef_->allSamplersAreStatic())
+		{
+			numSamplers = 0;
+		}
+
+		auto size = render::Commands::ResourceStateBase::getStateSize(
+			permTextures.size(),
+			numSamplers,
+			cbLinks.size(),
+			buffers.size()
+		);
+
+		pCompilingPerm->variableStateSize = safe_static_cast<int8_t>(size);
+
+		pCompilingPerm->numTextStates = safe_static_cast<int8_t>(permTextures.size());
+		pCompilingPerm->numSamplers = safe_static_cast<int8_t>(numSamplers);
+		pCompilingPerm->numCbs = safe_static_cast<int8_t>(cbLinks.size());
+		pCompilingPerm->numBuffers = safe_static_cast<int8_t>(buffers.size());
+	}
+
+	pCompilingPerm->pTechDef = this;
 	pCompilingPerm->stateHandle = stateHandle;
 	pCompilingPerm->pShaderPerm = pPerm;
 	COMPILER_BARRIER_W
@@ -426,6 +458,11 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
 			for (const auto& al : shader.aliases)
 			{
 				tech.aliases_.emplace_back(al);
+			}
+
+			for (const auto& cb : shader.codeBinds)
+			{
+				tech.codeBinds_.emplace_back(cb);
 			}
 		}
 	}

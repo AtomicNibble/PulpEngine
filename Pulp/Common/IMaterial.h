@@ -320,6 +320,7 @@ struct IMaterialManager : public core::IAssetLoader
 	virtual MaterialTech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
 		PermatationFlags permFlags = PermatationFlags()) X_ABSTRACT;
 	virtual bool setTextureID(Material* pMat, MaterialTech* pTech, core::StrHash texNameHash, texture::TexID id) X_ABSTRACT;
+	virtual bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_ABSTRACT;
 
 
 	virtual Material* getDefaultMaterial(void) const X_ABSTRACT;

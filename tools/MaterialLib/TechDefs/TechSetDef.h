@@ -31,10 +31,15 @@ struct StencilState
 
 struct Alias
 {
-	bool isCode;
 	core::string resourceName;
 	core::string name;
 	core::StrHash nameHash;
+};
+
+struct CodeBind
+{
+	engine::Register::Enum slot;
+	core::string resourceName;
 };
 
 struct Shader
@@ -43,6 +48,7 @@ struct Shader
 	using ArrType = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
 
 	typedef ArrType<Alias> AliaseArr;
+	typedef ArrType<CodeBind> CodeBindArr;
 	typedef render::shader::ShaderType ShaderType;
 
 	Shader();
@@ -57,6 +63,7 @@ struct Shader
 	core::string defines;
 
 	AliaseArr aliases;
+	CodeBindArr codeBinds;
 };
 
 struct Technique

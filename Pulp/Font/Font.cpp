@@ -1232,8 +1232,11 @@ bool XFont::CreateDeviceTexture(void)
 		return false;
 	}
 
-	// set the texture id for the bound resource.
-	if (!pMaterialMan->setTextureID(pMaterial_, pTech, core::StrHash("codeTexture0"), pTexture_->getTexID())) {
+	// expose the font texture to tech.
+	engine::RegisterCtx con;
+	con.regs[engine::Register::CodeTexture0] = pTexture_->getTexID();
+
+	if (!pMaterialMan->setRegisters(pTech, con)) {
 		X_ERROR("Font", "Failed to bind fontcache taxture to font state");
 		return false;
 	}

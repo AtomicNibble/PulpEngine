@@ -65,7 +65,8 @@ Shader::Shader() :
 
 Shader::Shader(ShaderType::Enum type) :
 	type(type),
-	aliases(g_MatLibArena)
+	aliases(g_MatLibArena),
+	codeBinds(g_MatLibArena)
 {
 
 }
@@ -80,10 +81,16 @@ bool Shader::SSave(core::XFile* pFile) const
 	pFile->writeObj(safe_static_cast<uint8_t>(aliases.size()));
 	for (const auto& a : aliases)
 	{
-		pFile->writeObj(a.isCode);
 		pFile->writeString(a.resourceName);
 		pFile->writeString(a.name);
 		pFile->writeObj(a.nameHash);
+	}
+
+	pFile->writeObj(safe_static_cast<uint8_t>(codeBinds.size()));
+	for (const auto& cb : codeBinds)
+	{
+		pFile->writeObj(cb.slot);
+		pFile->writeString(cb.resourceName);
 	}
 	return true;
 }
@@ -101,10 +108,20 @@ bool Shader::SLoad(core::XFile* pFile)
 	aliases.resize(numAliases);
 	for (auto& a : aliases)
 	{
-		pFile->readObj(a.isCode);
 		pFile->readString(a.resourceName);
 		pFile->readString(a.name);
 		pFile->readObj(a.nameHash);
+	}
+
+	uint8_t numCodeBind;
+	pFile->readObj(numCodeBind);
+
+	codeBinds.resize(numCodeBind);
+
+	for (auto& cb : codeBinds)
+	{
+		pFile->readObj(cb.slot);
+		pFile->readString(cb.resourceName);
 	}
 	return true;
 }
@@ -1269,8 +1286,7 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 				// we support 'aliasing' which basically allows mapping values to resource names in shader.
 				// so for example if a shader has 3 samplers but you only want to expose 1 sampler to assMan
 				// but you want the value of that sampler to be used in all 3, you can just alias the other two
-				Alias al;
-				al.resourceName = core::string(token.begin(), token.end());
+				auto resourceName = core::string(token.begin(), token.end());
 
 				if (!lex.ExpectTokenString("=")) {
 					return false;
@@ -1293,28 +1309,41 @@ bool TechSetDef::parseShaderData(core::XParser& lex, Shader& shader)
 						return false;
 					}
 
+					// read the slot index.
 					if (!lex.ReadToken(token)) {
+						return false;
+					}
+
+					if (token.GetType() != core::TokenType::STRING) {
 						return false;
 					}
 
 					if (!lex.ExpectTokenString(")")) {
 						return false;
 					}
+					
+					auto slot = Util::RegisterSlotFromStr(token.begin(), token.end());
+					if (slot == Register::Invalid) {
+						return false;
+					}
 
-					al.isCode = true;
+					CodeBind bind;
+					bind.slot = slot;
+					bind.resourceName = resourceName;
+
+					shader.codeBinds.append(bind);
 				}
 				else
 				{
-					// do nothing the token contains the name.
-					al.isCode = false;
+					X_ASSERT(token.length() > 0, "alias name is empty")(token.begin(), token.end(), token.length());
+
+					Alias al;
+					al.resourceName = resourceName;
+					al.name = core::string(token.begin(), token.end());
+					al.nameHash = core::StrHash(token.begin(), token.length());
+
+					shader.aliases.append(al);
 				}
-
-				X_ASSERT(token.length() > 0, "alias name is empty")(token.begin(), token.end(), token.length());
-
-				al.name = core::string(token.begin(), token.end());
-				al.nameHash = core::StrHash(token.begin(), token.length());
-
-				shader.aliases.append(al);
 			}
 		}
 	}

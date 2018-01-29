@@ -40,6 +40,7 @@ public:
 	ShaderStageStrArr shaderEntry_;
 	ShaderSourceArr shaderSource_;
 	techset::Shader::AliaseArr aliases_;
+	techset::Shader::CodeBindArr codeBinds_;
 };
 
 class TechDefState

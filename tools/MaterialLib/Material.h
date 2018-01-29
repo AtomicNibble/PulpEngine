@@ -49,13 +49,19 @@ struct TechDefPerm
 {
 	TechStatus::Enum status;
 	PermatationFlags permFlags;
-	uint8_t _pad[1];
+
+	uint8_t variableStateSize;
+	int8_t numTextStates;
+	int8_t numSamplers;
+	int8_t numCbs;
+	int8_t numBuffers; // stuff like fluffly mittens.
+
 	render::shader::VertexFormat::Enum vertFmt;
+
 	render::StateHandle stateHandle;
 	render::shader::IShaderPermatation* pShaderPerm;
-	// +  4 more pad in 64bit
+	TechDef* pTechDef;
 };
-
 
 struct ParamLink
 {

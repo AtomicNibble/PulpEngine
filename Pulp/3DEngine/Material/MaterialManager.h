@@ -68,6 +68,11 @@ public:
 	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, 
 		PermatationFlags permFlags = PermatationFlags()) X_FINAL;
 	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
+	
+	bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_FINAL;
+	void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
+	void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
+
 
 
 	// ~IMaterialManager
