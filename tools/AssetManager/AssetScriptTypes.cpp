@@ -627,27 +627,27 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 		}
 	};
 
-	for (auto it = pTechDef->paramBegin(); it != pTechDef->paramEnd(); ++it)
+	for (auto& it : pTechDef->getParams())
 	{
-		const auto& propName = it->first;
-		const auto& param = it->second;
+		const auto& propName = it.first;
+		const auto& param = it.second;
 
 		showProps(propName, param.assProps);
 	}
 
-	for (auto it = pTechDef->textureBegin(); it != pTechDef->textureEnd(); ++it)
+	for (auto& it : pTechDef->getTextures())
 	{
 		// const auto& texName = it->first;
-		const auto& tex = it->second;
+		const auto& tex = it.second;
 
 		showProps(tex.propName, tex.assProps);
 	}
 
 
-	for (auto it = pTechDef->samplerBegin(); it != pTechDef->samplerEnd(); ++it)
+	for (auto& it : pTechDef->getSamplers())
 	{
-	//	const auto& samplerName = it->first;
-		const auto& samplerDesc = it->second;
+	//	const auto& samplerName = it.first;
+		const auto& samplerDesc = it.second;
 
 		if (!samplerDesc.isFilterDefined())
 		{
