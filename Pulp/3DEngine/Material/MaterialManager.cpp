@@ -895,6 +895,31 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
 
 
 
+
+TechDefPerm* XMaterialManager::getCodeTech(const core::string& name, core::StrHash techName, 
+	render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags)
+{
+	TechDefState* pTechDefState = pTechDefMan_->getTechDefState(MaterialCat::CODE, name);
+	if (!pTechDefState) {
+		X_ERROR("MatMan", "Failed to get techdefstate");
+		return nullptr;
+	}
+
+	TechDef* pTechDef = pTechDefState->getTech(techName);
+	if (!pTechDef) {
+		X_ERROR("MatMan", "Failed to get TechDef");
+		return nullptr;
+	}
+
+	TechDefPerm* pPerm = pTechDef->getOrCreatePerm(vertFmt, permFlags);
+	if (!pPerm) {
+		X_ERROR("MatMan", "Failed to get tech perm");
+		return nullptr;
+	}
+
+	return pPerm;
+}
+
 // ICoreEventListener
 void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {

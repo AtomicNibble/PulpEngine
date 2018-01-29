@@ -72,6 +72,8 @@ public:
 	bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_FINAL;
 	void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
 
+	TechDefPerm* getCodeTech(const core::string& name, core::StrHash techName, render::shader::VertexFormat::Enum,
+		PermatationFlags permFlags = PermatationFlags());
 
 	// ~IMaterialManager
 	void listMaterials(const char* pSearchPatten = nullptr) const;
