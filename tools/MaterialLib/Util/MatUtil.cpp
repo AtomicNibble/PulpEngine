@@ -10,6 +10,31 @@ using namespace core::Hash::Fnv1Literals;
 
 namespace Util
 {
+	Register::Enum RegisterSlotFromStr(const char* pBegin, const char* pEnd)
+	{
+		static_assert(Register::ENUM_COUNT == 5, "Added additional register slots? this code needs updating.");
+
+		core::StackString<96, char> strLower(pBegin, pEnd);
+		strLower.toLower();
+
+		switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length()))
+		{
+			case "codetexture0"_fnv1a:
+				return Register::CodeTexture0;
+			case "codetexture1"_fnv1a:
+				return Register::CodeTexture1;
+			case "codetexture2"_fnv1a:
+				return Register::CodeTexture2;
+			case "codetexture3"_fnv1a:
+				return Register::CodeTexture3;
+
+			default:
+				X_ERROR("Mtl", "Unknown register slot: '%.*s' (case-sen)", strLower.length(), pBegin);
+				return Register::Invalid;
+		}
+	}
+
+
 	MaterialMountType::Enum MatMountTypeFromStr(const char* pBegin, const char* pEnd)
 	{
 		static_assert(MaterialMountType::ENUM_COUNT == 6, "Added additional material mount types? this code needs updating.");

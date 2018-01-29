@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace Util
 {
-
+	MATLIB_EXPORT Register::Enum RegisterSlotFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT MaterialMountType::Enum MatMountTypeFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT MaterialCat::Enum MatCatFromStr(const char* pBegin, const char* pEnd);
 	MATLIB_EXPORT MaterialUsage::Enum MatUsageFromStr(const char* pBegin, const char* pEnd);
