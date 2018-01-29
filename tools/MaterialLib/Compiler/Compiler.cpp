@@ -100,7 +100,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	// or hold our heads been our legs and hope it compiles itself magically.
 
 	// so we must now iterate the params and make sure they are set.
-	for (auto it : pTechDef_->getParams())
+	for (auto& it : pTechDef_->getParams())
 	{
 		const auto& propName = it.first;
 		const auto& param = it.second;
@@ -176,7 +176,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	}
 
 	// process textures.
-	for (auto it : pTechDef_->getTextures())
+	for (auto& it : pTechDef_->getTextures())
 	{
 		const auto& texName = it.first;
 		const auto& textureDesc = it.second;
@@ -216,7 +216,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	}
 
 	// process samplers.
-	for (auto it : pTechDef_->getSamplers())
+	for (auto& it : pTechDef_->getSamplers())
 	{
 		const auto& samplerName = it.first;
 		const auto& samplerDesc = it.second;
