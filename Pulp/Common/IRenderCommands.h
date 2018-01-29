@@ -68,6 +68,8 @@ namespace Commands
 		X_INLINE const ConstantBufferHandle* getCBs(const void* pBase) const;
 		X_INLINE const BufferState* getBuffers(const void* pBase) const;
 
+		X_INLINE void setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs, int8_t numBuf);
+
 	protected:
 		union {
 			struct {
@@ -241,6 +243,14 @@ namespace Commands
 		pStart += (sizeof(SamplerState) * numSamplers);
 		pStart += (sizeof(ConstantBufferHandle) * numCbs);
 		return reinterpret_cast<const BufferState*>(pStart);
+	}
+
+	X_INLINE void ResourceStateBase::setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs, int8_t numBuf)
+	{
+		numTextStates = numTex;
+		numSamplers = numSamp;
+		numCbs = numCBs;
+		numBuffers = numBuf;
 	}
 
 	// not sure if i want to pack these down close or have each command start aligned.
