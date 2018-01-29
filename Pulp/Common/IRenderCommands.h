@@ -58,6 +58,7 @@ namespace Commands
 		X_INLINE int32_t getTotalSize(void) const;
 		X_INLINE int32_t getStateSize(void) const;
 		X_INLINE static constexpr int32_t getMaxStateSize(void);
+		X_INLINE static constexpr int32_t getStateSize(size_t numTex, size_t numSamp, size_t numCBs, size_t numBuf);
 
 		X_INLINE const uint8_t* getDataStart(void) const;
 		X_INLINE uint8_t* getDataStart(void);
@@ -203,6 +204,16 @@ namespace Commands
 		size += (sizeof(ConstantBufferHandle) * numCbs);
 		size += (sizeof(BufferState) * numBuffers);
 		return size;
+	}
+
+
+	X_INLINE constexpr int32_t ResourceStateBase::getStateSize(size_t numTex, size_t numSamp, size_t numCBs, size_t numBuf)
+	{
+		return static_cast<int32_t>(
+			(sizeof(render::TextureState) * numTex) +
+			(sizeof(render::SamplerState) * numSamp) +
+			(sizeof(render::ConstantBufferHandle) * numCBs) +
+			(sizeof(render::BufferState) * numBuf));
 	}
 
 	X_INLINE const TextureState* ResourceStateBase::getTexStates(const void* pBase) const
