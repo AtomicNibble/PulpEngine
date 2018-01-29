@@ -358,6 +358,33 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 			static_cast<World3D*>(pWorld)->renderView(frame, geoBucket);
 		}
 
+
+		if(drawVars_.drawDepth())
+		{
+			TechDefPerm* pTech = pMaterialManager_->getCodeTech(
+				core::string("fullscreen_depth"), 
+				core::StrHash("unlit"),
+				render::shader::VertexFormat::NONE,
+				PermatationFlags::Textured
+			);
+
+			auto* pDraw = geoBucket.addCommand<render::Commands::Draw>(0xffffff, pTech->variableStateSize);
+
+			pDraw->startVertex = 0;
+			pDraw->vertexCount = 3;
+			pDraw->stateHandle = pTech->stateHandle;
+			core::zero_object(pDraw->vertexBuffers);
+			core::zero_object(pDraw->resourceState);
+
+			if (pTech->variableStateSize)
+			{
+				RegisterCtx ctx;
+				ctx.regs[Register::CodeTexture0] = pDepthStencil->getTexID();
+
+				pMaterialManager_->initStateFromRegisters(pTech, &pDraw->resourceState, ctx);
+			}
+		}
+
 		geoBucket.sort();
 
 		pRender->submitCommandPackets(geoBucket);
