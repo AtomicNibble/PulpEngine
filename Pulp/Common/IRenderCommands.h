@@ -191,10 +191,7 @@ namespace Commands
 	X_INLINE int32_t ResourceStateBase::getTotalSize(void) const
 	{
 		int32_t size = sizeof(ResourceStateBase);
-		size += (sizeof(TextureState) * numTextStates);
-		size += (sizeof(SamplerState) * numSamplers);
-		size += (sizeof(ConstantBufferHandle) * numCbs);
-		size += (sizeof(BufferState) * numBuffers);
+		size += getStateSize();
 		return size;
 	}
 
