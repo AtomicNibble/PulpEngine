@@ -1022,7 +1022,7 @@ ActorHandle XPhysics::createStaticTrigger(const Transformf& myTrans, const AABB&
 
 // ------------------------------------------
 
-ActorHandle XPhysics::createActor(const Transformf& myTrans, float density, bool kinematic, const void* pUserData)
+ActorHandle XPhysics::createActor(const Transformf& myTrans, bool kinematic, const void* pUserData)
 {
 	const physx::PxTransform& trans = PxTransFromQuatTrans(myTrans);
 
@@ -1030,7 +1030,6 @@ ActorHandle XPhysics::createActor(const Transformf& myTrans, float density, bool
 	if (pActor)
 	{
 		pActor->userData = const_cast<void*>(pUserData);
-		physx::PxRigidBodyExt::updateMassAndInertia(*pActor, density);
 		setupDefaultRigidDynamic(*pActor, kinematic);
 	}
 	
@@ -1050,6 +1049,17 @@ ActorHandle XPhysics::createStaticActor(const Transformf& myTrans, const void* p
 
 	return reinterpret_cast<ActorHandle>(pActor);
 }
+
+void XPhysics::updateMassAndInertia(ActorHandle handle, float density)
+{
+	physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
+
+	auto* pDynActor = actor.isRigidDynamic();
+	X_ASSERT_NOT_NULL(pDynActor);
+
+	physx::PxRigidBodyExt::updateMassAndInertia(*pDynActor, density);
+}
+
 
 // ------------------------------------------
 

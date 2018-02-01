@@ -81,10 +81,11 @@ namespace entity
 			}
 
 			// TEMP: make all ents kinematic.
-		//	col.actor = pPhysics->createStaticActor(trans);
-			col.actor = pPhysics->createActor(trans, 1.f, true);
+			col.actor = pPhysics->createActor(trans, true);
 
 			mesh.pModel->addPhysToActor(col.actor);
+
+			pPhysics->updateMassAndInertia(col.actor, 1.f);
 
 			pPhysScene->addActorToScene(col.actor);
 		}

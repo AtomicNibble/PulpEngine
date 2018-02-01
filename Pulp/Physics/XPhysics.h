@@ -117,8 +117,11 @@ public:
 	ActorHandle createStaticTrigger(const Transformf& myTrans, const AABB& bounds) X_FINAL;
 
 	// for creating a actor without any initial shape.
-	ActorHandle createActor(const Transformf& myTrans, float density, bool kinematic, const void* pUserData) X_FINAL;
+	ActorHandle createActor(const Transformf& myTrans, bool kinematic, const void* pUserData) X_FINAL;
 	ActorHandle createStaticActor(const Transformf& myTrans, const void* pUserData) X_FINAL;
+
+	// call this after all the shapes have been added.
+	void updateMassAndInertia(ActorHandle a, float density) X_FINAL;
 
 	// adding additional shapes to a actor.
 	void addTriMesh(ActorHandle handle, TriMeshHandle mesh, const Vec3f& scale = Vec3f::one()) X_FINAL;
