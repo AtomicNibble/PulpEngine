@@ -1945,12 +1945,12 @@ bool ModelCompiler::ProcessModel(void)
 		return false;
 	}
 
-	if (!BakeCollisionMeshes()) {
+	if (!AutoCollisionGen()) {
 		X_ERROR("Model", "Failed to bake collision mesh");
 		return false;
 	}
 
-	if (!AutoCollisionGen()) {
+	if (!BakeCollisionMeshes()) {
 		X_ERROR("Model", "Failed to bake collision mesh");
 		return false;
 	}
