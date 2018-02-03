@@ -209,6 +209,9 @@ public:
 		size_t totalVerts(void) const;
 		size_t totalIndexs(void) const;
 
+		void clearColMeshes(void);
+
+
 	public:
 		float32_t distance_;
 		MeshArr meshes_;
@@ -256,6 +259,8 @@ public:
 
 	size_t totalMeshes(void) const;
 	size_t totalColMeshes(void) const;
+
+	void clearColMeshes(void);
 
 	bool compileModel(const core::Path<char>& outFile);
 	bool compileModel(const core::Path<wchar_t>& outFile);

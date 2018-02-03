@@ -737,6 +737,13 @@ size_t ModelCompiler::Lod::totalIndexs(void) const
 	return total * 3;
 }
 
+void ModelCompiler::Lod::clearColMeshes(void)
+{
+	for (auto& mesh : meshes_) {
+		mesh.colMeshes_.clear();
+	}
+}
+
 // ---------------------------------------------------------------
 
 ModelCompiler::ModelCompiler(core::V2::JobSystem* pJobSys, core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooker) :
@@ -843,6 +850,12 @@ size_t ModelCompiler::totalColMeshes(void) const
 	return num;
 }
 
+void ModelCompiler::clearColMeshes(void)
+{
+	for (auto& lod : compiledLods_) {
+		lod.clearColMeshes();
+	}
+}
 
 bool ModelCompiler::compileModel(const core::Path<char>& outFile)
 {
@@ -2465,6 +2478,7 @@ bool ModelCompiler::AutoCollisionGen(void)
 		size_t colMeshes = totalColMeshes();
 		if (colMeshes) {
 			X_WARNING("Model", "%" PRIuS " user col meshes provided when auto phys enabled, ignoring user meshes.", colMeshes);
+			clearColMeshes();
 		}
 	}
 
