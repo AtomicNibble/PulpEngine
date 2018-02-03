@@ -541,6 +541,8 @@ MStatus ModelExporter::parseArgs(const MArgList& args)
 					return MS::kFailure;
 				}
 
+				MayaUtil::MayaPrintVerbose("%s -> %s", lodName.c_str(), info.objects.asChar());
+
 				info.distance = static_cast<float>(temp);
 				lodExpoInfo_.append(info);
 
