@@ -165,8 +165,14 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 				case "perMeshSphere"_fnv1a:
 					model.setAutoColGenType(ColGenType::PER_MESH_SPHERE);
 					break;
-				case "kdop6"_fnv1a:
-					model.setAutoColGenType(ColGenType::KDOP_6);
+				case "kdop10_x"_fnv1a:
+					model.setAutoColGenType(ColGenType::KDOP_10_X);
+					break;
+				case "kdop10_y"_fnv1a:
+					model.setAutoColGenType(ColGenType::KDOP_10_Y);
+					break;
+				case "kdop10_z"_fnv1a:
+					model.setAutoColGenType(ColGenType::KDOP_10_Y);
 					break;
 				case "kdop14"_fnv1a:
 					model.setAutoColGenType(ColGenType::KDOP_14);

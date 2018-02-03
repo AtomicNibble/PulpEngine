@@ -30,7 +30,9 @@ void GenerateUI( asset& Asset )
         sphere |
         perMeshBox |
         perMeshSphere |
-        kdop6 |
+        kdop10_x |
+        kdop10_y |
+        kdop10_z |
         kdop14 |
         kdop18 |
         kdop26 |

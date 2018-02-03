@@ -1222,7 +1222,9 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 						idxMap.append(safe_static_cast<int8_t>(i));
 					}
 					break;
-				case ColGenType::KDOP_6:
+				case ColGenType::KDOP_10_X:
+				case ColGenType::KDOP_10_Y:
+				case ColGenType::KDOP_10_Z:
 				case ColGenType::KDOP_14:
 				case ColGenType::KDOP_18:
 				case ColGenType::KDOP_26:
@@ -1265,7 +1267,9 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 					}
 					break;
 				}
-				case ColGenType::KDOP_6:
+				case ColGenType::KDOP_10_X:
+				case ColGenType::KDOP_10_Y:
+				case ColGenType::KDOP_10_Z:
 				case ColGenType::KDOP_14:
 				case ColGenType::KDOP_18:
 				case ColGenType::KDOP_26:
@@ -1800,7 +1804,9 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
 				size += sizeof(Sphere) * lod0Mesh;
 				size += sizeof(uint8_t) * lod0Mesh;
 				break;
-			case ColGenType::KDOP_6:
+			case ColGenType::KDOP_10_X:
+			case ColGenType::KDOP_10_Y:
+			case ColGenType::KDOP_10_Z:
 			case ColGenType::KDOP_14:
 			case ColGenType::KDOP_18:
 			case ColGenType::KDOP_26:
@@ -2477,7 +2483,9 @@ bool ModelCompiler::AutoCollisionGen(void)
 			break;
 
 		// gen me some kdop.
-		case ColGenType::KDOP_6:
+		case ColGenType::KDOP_10_X:
+		case ColGenType::KDOP_10_Y:
+		case ColGenType::KDOP_10_Z:
 		case ColGenType::KDOP_14:
 		case ColGenType::KDOP_18:
 		case ColGenType::KDOP_26:
