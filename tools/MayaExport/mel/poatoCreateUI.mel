@@ -236,7 +236,7 @@ global proc string getOutputDirAnims() {
 global proc string getExportMode() {
   	string $exportMode = loadSettingGlobal("exportMode");
 	if(int(`size $exportMode`) < 1) {
-		return "server";
+		return "Server";
 	}
 
 	if($exportMode == "RawModel") {
