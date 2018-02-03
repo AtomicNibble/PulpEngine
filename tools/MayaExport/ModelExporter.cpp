@@ -617,6 +617,7 @@ MStatus ModelExporter::loadLODs(void)
 				return MS::kFailure;
 			}
 
+			MayaUtil::MayaPrintVerbose("MeshName: '%s'", fnmesh.fullPathName().asChar());
 			MayaUtil::MayaPrintVerbose("Material: '%s'", material.name_.c_str());
 
 
