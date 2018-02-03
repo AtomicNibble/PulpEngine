@@ -117,10 +117,10 @@ MStatus ModelExporter::getInputObjects(void)
 	{
 		MDagPathArray pathArry;
 		MSelectionList list;
-		LODExportInfo& info = lodExpoInfo_[i];
+		LODExportInfo& lodInfo = lodExpoInfo_[i];
 		
 		MStringArray nameArr;
-		info.objects.split(' ', nameArr);
+		lodInfo.objects.split(' ', nameArr);
 
 		for (uint32_t x = 0; x < safe_static_cast<uint32_t>(nameArr.length()); x++) {
 			list.add(nameArr[x]);
@@ -143,7 +143,7 @@ MStatus ModelExporter::getInputObjects(void)
 			return MS::kFailure;
 		}
 
-		info.exportObjects = pathArry;
+		lodInfo.exportObjects = pathArry;
 	}
 
 	return MS::kSuccess;
