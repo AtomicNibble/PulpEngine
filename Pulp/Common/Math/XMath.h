@@ -155,7 +155,7 @@ const float32_t PIHalff = (float32_t)3.1415926535897932384626433832 * 0.5f;
 const float64_t PIHalf = (float64_t)3.1415926535897932384626433832 * 0.5;
 
 const float32_t	Sqrt_1OVER2 = 0.70710678118654752440f;
-
+const float32_t	Sqrt_1OVER3 = 0.57735026918962576450f;
 
 const float64_t EPSILON_VALUE = 4.37114e-05;
 const float32_t EPSILON_VALUEf = 4.37114e-05f;
