@@ -172,7 +172,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 					model.setAutoColGenType(ColGenType::KDOP_10_Y);
 					break;
 				case "kdop10_z"_fnv1a:
-					model.setAutoColGenType(ColGenType::KDOP_10_Y);
+					model.setAutoColGenType(ColGenType::KDOP_10_Z);
 					break;
 				case "kdop14"_fnv1a:
 					model.setAutoColGenType(ColGenType::KDOP_14);
