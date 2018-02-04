@@ -14,6 +14,7 @@
 #include <Math\XWinding.h>
 
 #include "FaceOptermize.h"
+#include "Util\KDop.h"
 
 X_DISABLE_WARNING(4702)
 #include <algorithm>
@@ -2545,30 +2546,102 @@ bool ModelCompiler::AutoCollisionGen(void)
 		}
 	}
 
-	// okay my fat goat lets generat some shapes.
-	ColGenType::Enum genType = ColGenType::BOX;
+	KDop::Type::Enum type = KDop::Type::KDOP_10_X;
 
-	switch (genType)
+	switch (autoColGenType_)
 	{
+		case ColGenType::SPHERE:
 		case ColGenType::BOX:
-		case ColGenType::CAPSULE:
 		case ColGenType::PER_MESH_BOX:
-			break;
-
-		// we need to gen sphere for each mesh.
 		case ColGenType::PER_MESH_SPHERE:
+			return true;
+
+		case ColGenType::CAPSULE:
+			X_ASSERT_NOT_IMPLEMENTED();
+			return false;
+
+			// gen me some kdop.
+		case ColGenType::KDOP_10_X:
+			type = KDop::Type::KDOP_10_X;
+			break;
+		case ColGenType::KDOP_10_Y:
+			type = KDop::Type::KDOP_10_Y;
+			break;
+		case ColGenType::KDOP_10_Z:
+			type = KDop::Type::KDOP_10_Z;
+			break;
+		case ColGenType::KDOP_14:
+			type = KDop::Type::KDOP_14;
+			break;
+		case ColGenType::KDOP_18:
+			type = KDop::Type::KDOP_18;
+			break;
+		case ColGenType::KDOP_26:
+			type = KDop::Type::KDOP_26;
 			break;
 
-		// gen me some kdop.
-		case ColGenType::KDOP_10_X:
-		case ColGenType::KDOP_10_Y:
-		case ColGenType::KDOP_10_Z:
-		case ColGenType::KDOP_14:
-		case ColGenType::KDOP_18:
-		case ColGenType::KDOP_26:
-			X_ASSERT_NOT_IMPLEMENTED();
-			break;
+		default:
+			X_ASSERT_UNREACHABLE();
+			return false;
 	}
+
+	auto& lod0 = compiledLods_[0];
+
+	KDop kdop(type, arena_);
+
+	// add all the mesh.
+	for (auto& mesh : lod0.meshes_)
+	{
+		auto& verts = mesh.verts_;
+		KDop::TriangleInfo info;
+		info.pData = &verts[0].pos_;
+		info.count = verts.size();
+		info.stride = sizeof(Vert);
+
+		kdop.addTriangles(info);
+	}
+
+	if (!kdop.build())
+	{
+
+		return false;
+	}
+
+	auto& planes = kdop.getPlanes();
+
+	ColMesh colMesh(ColMeshType::CONVEX, arena_);
+
+	// i need to create windings for each plane and clip by all the others.
+	{
+		for (size_t i = 0; i < planes.size(); i++)
+		{
+			XWinding w(planes[i]);
+
+			for (size_t j = 0; j < planes.size(); j++)
+			{
+				if (i == j) {
+					continue;
+				}
+
+				if (!w.clip(planes[j])) {
+					int goat = 0;
+				}
+			}
+
+			if (w.isTiny()) {
+				continue;
+			}
+
+			colMesh.addWinding(w);
+		}
+	}
+
+	// not really need.
+	colMesh.calBoundingbox();
+	colMesh.calBoundingSphere();
+
+	// move the colmesh onto 1st mesh.	
+	lod0.meshes_[0].colMeshes_.emplace_back(std::move(colMesh));
 
 	return true;
 }
