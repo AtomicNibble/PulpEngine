@@ -2614,11 +2614,7 @@ bool ModelCompiler::AutoCollisionGen(void)
 		kdop.addTriangles(info);
 	}
 
-	if (!kdop.build())
-	{
-
-		return false;
-	}
+	kdop.build();
 
 	auto& planes = kdop.getPlanes();
 
@@ -2637,12 +2633,12 @@ bool ModelCompiler::AutoCollisionGen(void)
 				}
 
 				if (!w.clip(planes[j])) {
-					int goat = 0;
+					X_WARNING("Model", "Empty winding for kdop plane");
 				}
 			}
 
 			if (w.isTiny()) {
-				continue;
+				X_WARNING("Model", "Tiny winding for kdop plane");
 			}
 
 			colMesh.addWinding(w);

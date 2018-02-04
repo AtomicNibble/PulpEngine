@@ -32,7 +32,7 @@ X_NAMESPACE_BEGIN(model)
 
 		void addTriangles(const TriangleInfo& triInfo);
 
-		bool build(void);
+		void build(void);
 
 		const PlaneArr& getPlanes(void) const;
 

@@ -186,7 +186,7 @@ void KDop::addTriangles(const TriangleInfo& triInfo)
 	}
 }
 
-bool KDop::build(void)
+void KDop::build(void)
 {
 	// infate a bit.
 	for (auto& d : maxDist_)
@@ -198,9 +198,6 @@ bool KDop::build(void)
 	{
 		planes_[i] = Planef(planeNormals_[i], maxDist_[i]);
 	}
-
-
-	return true;
 }
 
 const KDop::PlaneArr& KDop::getPlanes(void) const
