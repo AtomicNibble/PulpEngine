@@ -1265,6 +1265,32 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 		CollisionInfoHdr colHdr;
 		core::zero_object(colHdr);
 
+		auto writeColMesh = [&header](core::FixedByteStreamBase& stream, const ColMesh& colMesh) 
+		{
+			const auto& data = colMesh.getCookedConvexData();
+			// maybe i should just store the 'CollisionConvexHdr' in the cooked buffer humm..
+			CollisionConvexHdr convexHdr;
+			if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
+			{
+				static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
+
+				// we enforce a 65k byte limit on cooked data, which should be more than enougth..
+				convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
+			}
+			else
+			{
+				// the limits should ensure these are below 255, but lets check that's still true.
+				static_assert(MODEL_MESH_COL_MAX_VERTS <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh verts");
+				static_assert(MODEL_MESH_COL_MAX_FACE <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh faces");
+
+				convexHdr.raw.numVerts = safe_static_cast<uint8_t>(colMesh.verts_.size());
+				convexHdr.raw.numFace = safe_static_cast<uint8_t>(colMesh.faces_.size());
+			}
+
+			stream.write(convexHdr);
+			stream.write(data.data(), data.size());
+		};
+
 		// auto shapes.
 		if (flags_.IsSet(CompileFlag::AUTO_PHYS_SHAPES))
 		{
@@ -1306,8 +1332,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				case ColGenType::KDOP_14:
 				case ColGenType::KDOP_18:
 				case ColGenType::KDOP_26:
+					// we generated one convex mesh.
+					X_ASSERT(lod0.numColMeshes() == 1, "Should have only one col mesh")(lod0.numColMeshes());
 					colHdr.shapeCounts[ColMeshType::CONVEX] = 1;
-					X_ASSERT_NOT_IMPLEMENTED();
+					idxMap.append(-1); // it's global.
 					break;
 			}
 
@@ -1351,9 +1379,18 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 				case ColGenType::KDOP_14:
 				case ColGenType::KDOP_18:
 				case ColGenType::KDOP_26:
-					colHdr.shapeCounts[ColMeshType::CONVEX] = 1;
-					X_ASSERT_NOT_IMPLEMENTED();
+				{
+					const auto& meshes = lod0.meshes_;
+
+					X_ASSERT(meshes.isNotEmpty(), "No meshes with auto phys")(meshes.size());
+					const auto& meshe = meshes[0];
+
+					X_ASSERT(meshe.colMeshes_.isNotEmpty(), "No col meshes on first mesh")(meshe.colMeshes_.size());
+					const auto& colMesh = meshe.colMeshes_[0];
+
+					writeColMesh(physDataStream, colMesh);
 					break;
+				}
 			}
 
 		}
@@ -1421,32 +1458,8 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 						physDataStream.write<const AABB>(pColMesh->getBoundingBox());
 						break;
 					case ColMeshType::CONVEX:
-					{
-						const auto& data = pColMesh->getCookedConvexData();
-
-						// maybe i should just store the 'CollisionConvexHdr' in the cooked buffer humm..
-						CollisionConvexHdr convexHdr;
-						if (header.flags.IsSet(model::ModelFlags::PHYS_BAKED))
-						{
-							static_assert(MODEL_MESH_COL_MAX_COOKED_SIZE <= std::numeric_limits<uint16_t>::max(), "Can't represent cooked convex mesh");
-
-							// we enforce a 65k byte limit on cooked data, which should be more than enougth..
-							convexHdr.dataSize = safe_static_cast<uint16_t>(data.size());
-						}
-						else
-						{
-							// the limits should ensure these are below 255, but lets check that's still true.
-							static_assert(MODEL_MESH_COL_MAX_VERTS <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh verts");
-							static_assert(MODEL_MESH_COL_MAX_FACE <= std::numeric_limits<uint8_t>::max(), "Can't represent col mesh faces");
-
-							convexHdr.raw.numVerts = safe_static_cast<uint8_t>(pColMesh->verts_.size());
-							convexHdr.raw.numFace = safe_static_cast<uint8_t>(pColMesh->faces_.size());
-						}
-
-						physDataStream.write(convexHdr);
-						physDataStream.write(data.data(), data.size());
+						writeColMesh(physDataStream, *pColMesh);
 						break;
-					}
 
 					default:
 						X_ASSERT_UNREACHABLE();
