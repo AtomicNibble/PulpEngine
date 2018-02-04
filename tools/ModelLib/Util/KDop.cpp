@@ -177,7 +177,7 @@ void KDop::addTriangles(const TriangleInfo& triInfo)
 		for (size_t j = 0; j < maxDist_.size(); j++)
 		{
 			const auto& dir = planeNormals_[j];
-			float dist = dir.distance(vert);
+			float dist = dir.dot(vert);
 
 			maxDist_[j] = core::Max(maxDist_[j], dist);
 		}
@@ -191,7 +191,7 @@ bool KDop::build(void)
 	// infate a bit.
 	for (auto& d : maxDist_)
 	{
-	//	d += 0.1f;
+		d += 0.1f;
 	}
 
 	for (size_t i = 0; i < maxDist_.size(); i++)
