@@ -1832,21 +1832,20 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
 			case ColGenType::KDOP_14:
 			case ColGenType::KDOP_18:
 			case ColGenType::KDOP_26:
-				X_ASSERT_NOT_IMPLEMENTED();
+				// the size of these are handled by colmeshSize below.
 				break;
 		}
-
-
-		return size;
 	}
-	else
-	{
-		size += sizeof(uint8_t) * totalColMeshes();
 
-		return core::accumulate(compiledLods_.begin(), compiledLods_.end(), size, [](const Lod& lod) {
-			return lod.getPhysDataSize();
-		});
-	}
+	size_t colMeshSize = sizeof(uint8_t) * totalColMeshes();
+
+	colMeshSize += core::accumulate(compiledLods_.begin(), compiledLods_.end(), 0_sz, [](const Lod& lod) {
+		return lod.getPhysDataSize();
+	});
+
+	size += colMeshSize;
+
+	return size;
 }
 
 size_t ModelCompiler::calculateHitBoxDataSize(void) const
