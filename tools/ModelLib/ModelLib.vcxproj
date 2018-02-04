@@ -276,7 +276,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>Winmm.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -289,7 +288,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>Winmm.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -313,7 +311,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>Winmm.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -326,7 +323,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
       <DelayLoadDLLs>Winmm.dll</DelayLoadDLLs>
     </Link>
   </ItemDefinitionGroup>
@@ -462,6 +458,7 @@
     <ClInclude Include="Model\XModel.h" />
     <ClInclude Include="RawModel.h" />
     <ClInclude Include="RawModelTypes.h" />
+    <ClInclude Include="Util\KDop.h" />
     <ClInclude Include="Util\ModelUtil.h" />
     <ClInclude Include="XModelLib.h" />
     <ClInclude Include="stdafx.h" />
@@ -491,6 +488,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\KDop.cpp" />
     <ClCompile Include="Util\ModelUtil.cpp" />
     <ClCompile Include="XModelLib.cpp" />
   </ItemGroup>
