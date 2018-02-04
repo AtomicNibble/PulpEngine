@@ -41,7 +41,6 @@ X_NAMESPACE_BEGIN(model)
 
 		FloatArr maxDist_;
 		PlaneArr planes_;
-
 	};
 
 X_NAMESPACE_END
