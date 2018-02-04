@@ -455,6 +455,15 @@ ModelCompiler::ColMesh::ColMesh(const Mesh& oth, ColMeshType::Enum type) :
 
 }
 
+ModelCompiler::ColMesh::ColMesh(ColMeshType::Enum type, core::MemoryArenaBase* arena) :
+	Mesh(arena),
+	type_(type),
+	cooked_(arena)
+{
+
+}
+
+
 ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 {
 	return type_;

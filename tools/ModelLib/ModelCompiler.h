@@ -152,6 +152,7 @@ public:
 	public:
 		ColMesh(const ColMesh& oth);
 		ColMesh(const Mesh& oth, ColMeshType::Enum type);
+		ColMesh(ColMeshType::Enum type, core::MemoryArenaBase* arena);
 		~ColMesh() = default;
 
 		ColMeshType::Enum getType(void) const;
