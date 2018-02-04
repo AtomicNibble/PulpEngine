@@ -11,6 +11,7 @@
 #include <IFileSys.h>
 
 #include <Math\XSphereGen.h>
+#include <Math\XWinding.h>
 
 #include "FaceOptermize.h"
 
@@ -445,8 +446,6 @@ ModelCompiler::ColMesh::ColMesh(const ColMesh& oth) :
 
 }
 
-
-
 ModelCompiler::ColMesh::ColMesh(const Mesh& oth, ColMeshType::Enum type) :
 	Mesh(oth.arena_),
 	type_(type),
@@ -598,6 +597,62 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
 
 	return true;
 }
+
+void ModelCompiler::ColMesh::addWinding(XWinding& winding)
+{
+	const size_t numPoints = winding.getNumPoints();
+
+	Planef plane;
+	winding.getPlane(plane);
+
+	for (size_t i = 2; i < numPoints; i++)
+	{
+		uint16_t facesIdx[3];
+
+		for (size_t j = 0; j < 3; j++)
+		{
+			Vec3f pos;
+
+			if (j == 0) {
+				const Vec5f vec = winding.at(0);
+				pos = vec.asVec3();
+			}
+			else if (j == 1) {
+				const Vec5f vec = winding.at(i - 1);
+				pos = vec.asVec3();
+			}
+			else
+			{
+				const Vec5f vec = winding.at(i);
+				pos = vec.asVec3();
+			}
+
+			size_t v;
+			for (v = 0; v < verts_.size(); v++)
+			{
+				if (verts_[v].pos_.compare(pos, 0.1f))
+				{
+					facesIdx[j] = safe_static_cast<model::Index>(v);
+					break;
+				}
+			}
+
+			if (v == verts_.size())
+			{
+				Vert vert;
+				vert.pos_ = pos;
+				vert.normal_ = plane.getNormal();
+				vert.col_ = Col_White;
+
+				verts_.append(vert);
+				facesIdx[j] = safe_static_cast<model::Index>(v);
+			}
+		}
+
+		faces_.emplace_back(facesIdx[0], facesIdx[1], facesIdx[2]);
+	}
+}
+
 
 // ---------------------------------------------------------------
 

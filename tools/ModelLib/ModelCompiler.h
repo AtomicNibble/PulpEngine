@@ -6,6 +6,7 @@
 #include <String\Path.h>
 #include <Containers\Array.h>
 #include <Time\TimeVal.h>
+#include <Math\XWinding.h>
 
 #include "RawModel.h"
 
@@ -162,6 +163,8 @@ public:
 		size_t getPhysDataSize(void) const;
 
 		bool processColMesh(physics::IPhysicsCooking* pCooker, bool cook);
+
+		void addWinding(XWinding& winding);
 
 	private:
 		ColMeshType::Enum type_;
