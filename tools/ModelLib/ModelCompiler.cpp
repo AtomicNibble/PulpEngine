@@ -2639,6 +2639,7 @@ bool ModelCompiler::AutoCollisionGen(void)
 
 			if (w.isTiny()) {
 				X_WARNING("Model", "Tiny winding for kdop plane");
+				continue;
 			}
 
 			colMesh.addWinding(w);
