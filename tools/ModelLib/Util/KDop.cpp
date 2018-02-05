@@ -191,7 +191,7 @@ void KDop::build(void)
 	// infate a bit.
 	for (auto& d : maxDist_)
 	{
-		d += 0.1f;
+		// d += 0.1f;
 	}
 
 	for (size_t i = 0; i < maxDist_.size(); i++)
