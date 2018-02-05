@@ -2620,6 +2620,8 @@ bool ModelCompiler::AutoCollisionGen(void)
 
 	ColMesh colMesh(ColMeshType::CONVEX, arena_);
 
+	colMesh.name_.set(KDop::Type::ToString(type));
+
 	// i need to create windings for each plane and clip by all the others.
 	{
 		for (size_t i = 0; i < planes.size(); i++)
