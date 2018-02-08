@@ -331,52 +331,25 @@ void AssetProperty::show(bool vis)
 	switch (type_)
 	{
 	case PropertyType::CHECKBOX:
-		pCheckBoxWidget_->setVisible(vis);
-		break;
 	case PropertyType::INT:
-		pSpinBoxWidget_->setVisible(vis);
-		break;
 	case PropertyType::FLOAT:
-		pDoubleSpinBoxWidget_->setVisible(vis);
-		break;
 	case PropertyType::PATH:
-		pPathWidget_->setVisible(vis);
-		break;
 	case PropertyType::TEXT:
-		pTextWidget_->setVisible(vis);
-		break;
 	case PropertyType::VIDEO:
-		pVideoWidget_->setVisible(vis);
-		break;
 	case PropertyType::FONT:
-		pFontWidget_->setVisible(vis);
-		break;
 	case PropertyType::IMAGE:
-		pTextureWidget_->setVisible(vis);
-		break;
 	case PropertyType::MODEL:
-		pModelWidget_->setVisible(vis);
-		break;
 	case PropertyType::ANIM:
-		pAnimWidget_->setVisible(vis);
-		break;
 	case PropertyType::ASSET_REF:
-		pAssetRefWidget_->setVisible(vis);
-		break;
 	case PropertyType::STRING:
-		pStringWidget_->setVisible(vis);
-		break;
 	case PropertyType::COLOR:
-		pColorWidget_->setVisible(vis);
-		break;
 	case PropertyType::COMBOBOX:
-		pComboBoxWidget_->setVisible(vis);
+	case PropertyType::LABEL:
+		pWidget_->setVisible(vis);
 		break;
+
 	case PropertyType::GROUPBOX:
 		pGroupWidget_->show(vis);
-		break;
-	case PropertyType::LABEL:
-		pLabelWidget_->setVisible(vis);
 		break;
 	default:
 		X_ASSERT_NOT_IMPLEMENTED();
@@ -394,52 +367,22 @@ void AssetProperty::enable(bool val)
 	switch (type_)
 	{
 	case PropertyType::CHECKBOX:
-		pCheckBoxWidget_->setEnabled(val);
-		break;
 	case PropertyType::INT:
-		pSpinBoxWidget_->setEnabled(val);
-		break;
 	case PropertyType::FLOAT:
-		pDoubleSpinBoxWidget_->setEnabled(val);
-		break;
 	case PropertyType::PATH:
-		pPathWidget_->setEnabled(val);
-		break;
 	case PropertyType::TEXT:
-		pTextWidget_->setEnabled(val);
-		break;
 	case PropertyType::VIDEO:
-		pVideoWidget_->setEnabled(val);
-		break;
 	case PropertyType::FONT:
-		pFontWidget_->setEnabled(val);
-		break;
 	case PropertyType::IMAGE:
-		pTextureWidget_->setEnabled(val);
-		break;
 	case PropertyType::MODEL:
-		pModelWidget_->setEnabled(val);
-		break;
 	case PropertyType::ANIM:
-		pAnimWidget_->setEnabled(val);
-		break;
 	case PropertyType::ASSET_REF:
-		pAssetRefWidget_->setEnabled(val);
-		break;
 	case PropertyType::STRING:
-		pStringWidget_->setEnabled(val);
-		break;
 	case PropertyType::COLOR:
-		pColorWidget_->setEnabled(val);
-		break;
 	case PropertyType::COMBOBOX:
-		pComboBoxWidget_->setEnabled(val);
-		break;
 	case PropertyType::GROUPBOX:
-		pGroupWidget_->setEnabled(val);
-		break;
 	case PropertyType::LABEL:
-		pLabelWidget_->setEnabled(val);
+		pWidget_->setEnabled(val);
 		break;
 	default:
 		X_ASSERT_NOT_IMPLEMENTED();
