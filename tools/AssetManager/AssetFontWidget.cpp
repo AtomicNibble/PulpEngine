@@ -160,12 +160,12 @@ bool AssetFontWidget::loadFont(const QString& path)
 	QFileInfo fi(path);
 
 	if (path.isEmpty() || !fi.exists()) {
-		X_ERROR("Font", "Failed to load image, src file missing");
+		X_ERROR("Font", "Failed to load font, src file missing");
 		return false;
 	}
 
 	if (!fileExtensionValid(path)) {
-		X_ERROR("Font", "Failed to load image, invalid extension");
+		X_ERROR("Font", "Failed to load font, invalid extension");
 		return false;
 	}
 
