@@ -1,7 +1,8 @@
 #include "RawFileLoader.h"
 
+#include <Compression\CompressorAlloc.h>
+
 #include <String\HumanSize.h>
-#include <Compression\LZ4.h>
 #include <Time\StopWatch.h>
 
 X_NAMESPACE_BEGIN(assman)
@@ -107,12 +108,18 @@ void RawFileLoader::run()
 	emit setProgressLabel("Deflating src", numChunks);
 
 	// defalte it.
-	core::Compression::Compressor<core::Compression::LZ4> comp;
-
 	{
+		auto algo = core::Compression::Algo::LZ4;
+
+		if (type_ == assetDb::AssetType::VIDEO)
+		{
+			algo = core::Compression::Algo::STORE;
+		}
+
+		core::Compression::CompressorAlloc comp(algo);
 		core::StopWatch timer;
 
-		if (!comp.deflate(g_arena, imgData, compressed_, core::Compression::CompressLevel::HIGH))
+		if (!comp->deflate(g_arena, imgData, compressed_, core::Compression::CompressLevel::HIGH))
 		{
 			X_ERROR("RawFile", "Failed to defalte src");
 			return;
