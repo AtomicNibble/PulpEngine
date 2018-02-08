@@ -13,6 +13,7 @@ namespace AK
 {
     namespace EVENTS
     {
+        static const AkUniqueID BUMP_BARREL = 2086920984U;
         static const AkUniqueID DRY_FIRE_PISTOL = 4273345739U;
         static const AkUniqueID DRY_FIRE_RIFLE = 2650650540U;
         static const AkUniqueID DRY_FIRE_SMG = 318360149U;
@@ -92,6 +93,7 @@ namespace AK
         static const AkUniqueID AMBIENT = 77978275U;
         static const AkUniqueID EVENTS = 1381315342U;
         static const AkUniqueID PLAYERSOUNDS = 1327972334U;
+        static const AkUniqueID SFX = 393239870U;
         static const AkUniqueID VIDEO = 2982943478U;
         static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BANKS
