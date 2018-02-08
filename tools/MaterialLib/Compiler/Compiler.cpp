@@ -212,6 +212,19 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			tex.value = textureDesc.defaultName;
 		}
 
+		if (tex.value.isEmpty())
+		{
+			const char* pName = textureDesc.propName.c_str();
+
+			if (textureDesc.assProps.title.isNotEmpty())
+			{
+				pName = textureDesc.assProps.title.c_str();
+			}
+
+			X_ERROR("Mat", "Required texture property is empty: \"%s\"", pName);
+			return false;
+		}
+
 		X_ASSERT(tex.value.isNotEmpty(), "Texture has a empty value")();
 	}
 
