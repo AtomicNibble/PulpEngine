@@ -5,10 +5,6 @@
 
 #include "IAssetEntry.h"
 
-#include <String\HumanSize.h>
-#include <Compression\LZ4.h>
-#include <Time\StopWatch.h>
-
 X_NAMESPACE_BEGIN(assman)
 
 
