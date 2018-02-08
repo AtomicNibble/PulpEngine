@@ -14,6 +14,7 @@
         <file>img/File_vehicle.png</file>
         <file>img/Drop_img.png</file>
         <file>img/Drop_font.png</file>
+        <file>img/Drop_video.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>img/vline.png</file>
