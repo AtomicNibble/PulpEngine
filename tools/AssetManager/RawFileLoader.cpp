@@ -123,7 +123,7 @@ void RawFileLoader::run()
 			const float percentageSize = (static_cast<float>(compressed_.size()) / static_cast<float>(imgData.size())) * 100;
 
 			core::HumanSize::Str sizeStr, sizeStr2;
-			X_LOG0("RawFile", "Defalated src %s -> %s(%.2g%%) %gms",
+			X_LOG0("RawFile", "Defalated src %s -> %s(%.2f%%) %gms",
 				core::HumanSize::toString(sizeStr, imgData.size()),
 				core::HumanSize::toString(sizeStr2, compressed_.size()),
 				percentageSize,
