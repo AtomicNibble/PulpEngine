@@ -278,6 +278,13 @@ void AssetScriptProps::release(void)
 
 }
 
+AssetScriptProperty* AssetScriptProps::AddVideo(const std::string& key, const std::string& default)
+{
+	auto pProp = getProperty(key, AssetProperty::PropertyType::VIDEO);
+	pProp->prop().SetDefaultValue(default);
+	return pProp;
+}
+
 AssetScriptProperty* AssetScriptProps::AddFont(const std::string& key, const std::string& default)
 {
 	auto pProp = getProperty(key, AssetProperty::PropertyType::FONT);

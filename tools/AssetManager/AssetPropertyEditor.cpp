@@ -11,6 +11,7 @@
 #include "AssetStringWidget.h"
 #include "AssetLineEditWidget.h"
 #include "AssetTextWidget.h"
+#include "AssetVideoWidget.h"
 #include "AssetFontWidget.h"
 #include "AssetTextureWidget.h"
 #include "AssetModelWidget.h"
@@ -97,6 +98,9 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 		break;
 	case PropertyType::LINEEDIT:
 		pLineEditWidget_ = new AssetLineEditWidget(pParent, val);
+		break;
+	case PropertyType::VIDEO:
+		pVideoWidget_ = new AssetVideoWidget(pParent, pAssEntry, val);
 		break;
 	case PropertyType::FONT:
 		pFontWidget_ = new AssetFontWidget(pParent, pAssEntry, val);
@@ -341,6 +345,9 @@ void AssetProperty::show(bool vis)
 	case PropertyType::TEXT:
 		pTextWidget_->setVisible(vis);
 		break;
+	case PropertyType::VIDEO:
+		pVideoWidget_->setVisible(vis);
+		break;
 	case PropertyType::FONT:
 		pFontWidget_->setVisible(vis);
 		break;
@@ -400,6 +407,9 @@ void AssetProperty::enable(bool val)
 		break;
 	case PropertyType::TEXT:
 		pTextWidget_->setEnabled(val);
+		break;
+	case PropertyType::VIDEO:
+		pVideoWidget_->setEnabled(val);
 		break;
 	case PropertyType::FONT:
 		pFontWidget_->setEnabled(val);
