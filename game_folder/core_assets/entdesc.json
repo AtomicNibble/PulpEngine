@@ -91,7 +91,172 @@
             },
             "MeshRenderer" : {
             }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": -64, "y": -128, "z": 1},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": 0, "y": -128, "z": 0},
+
+            "Mesh" : {
+                "name" : "test/prop/mannequin"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": -128, "y": 128, "z": 10},
+
+            "Mesh" : {
+                "name" : "test/prop/woodbarrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+
+            }
+        },
+        {
+            "name": "Pickle3",
+            "origin" : {"x": -64, "y": 150, "z": 0},
+
+            "Mesh" : {
+                "name" : "test/prop/fuel_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+
+            }
+        },
+        {
+            "origin" : {"x": -64, "y": 100, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+      {
+            "origin" : {"x": -32, "y": 100, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": 0, "y": 100, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": 32, "y": 100, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": 64, "y": 100, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -200, "y": -150, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -150, "y": -150, "z": 0},
+            "Mesh" : {
+                "name" : "test/prop/rusty_barrel"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -100, "y": -150, "z": 10},
+            "Mesh" : {
+                "name" : "test/prop/rolling_pan"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -250, "y": 100, "z": 10},
+            "Mesh" : {
+                "name" : "test/prop/wood_chair"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -90, "y": 0, "z": 8},
+            "Mesh" : {
+                "name" : "test/prop/radiator"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
+        },
+        {
+            "origin" : {"x": -90, "y": 50, "z": 8},
+            "Mesh" : {
+                "name" : "test/prop/vend_jugg"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            }
         }
+
+
+
         /*
         {
             "name": "Stu",
