@@ -2562,6 +2562,7 @@
     <ClCompile Include="IAssetEntry.cpp" />
     <ClCompile Include="IAssManCore.cpp" />
     <ClCompile Include="Id.cpp" />
+    <ClCompile Include="ImageLoader.cpp" />
     <ClCompile Include="LoggerOutputWindowWritePolicy.cpp" />
     <ClCompile Include="logging.cpp" />
     <ClCompile Include="main.cpp" />
@@ -6433,6 +6434,7 @@
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">$(ConfigurationName)\moc_%(Filename).cpp</Outputs>
       <Command Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">"$(QTDIR)\bin\moc.exe"  "%(FullPath)" -o "$(ConfigurationName)\moc_%(Filename).cpp" "-fstdafx.h" "-f../AssetVideoWidget.h"  -D_WINDOWS -DUNICODE -DWIN32 -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_CORE_LIB -DNDEBUG -DX_DLL=1 -DX_DEBUG=0 -DX_RELEASE=1 -DX_SUPER=0 -DX_64=0 -D_SCL_SECURE_NO_WARNINGS -D_UNICODE "-I." "-I.\..\.." "-I.\..\..\Pulp\Common" "-I$(QTDIR)\include" "-I$(QTDIR)\include\QtWidgets" "-I$(QTDIR)\include\QtGui" "-I$(QTDIR)\include\QtSql" "-I$(QTDIR)\include\QtCore" "-I.\release" "-I$(QTDIR)\mkspecs\win32-msvc2015" "-I.\GeneratedFiles" "-I$(ConfigurationName)\." "-I$(SolutionDir)..\3rdparty\source" "-I$(INHERIT)\." "-I$(SolutionDir)..\tools\ModelLib" "-I$(SolutionDir)..\Pulp\Common" "-I$(ProjectDir)\."</Command>
     </CustomBuild>
+    <ClInclude Include="ImageLoader.h" />
     <ClInclude Include="StrUtil.h" />
     <CustomBuild Include="SaveItemsDialog.h">
       <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">$(QTDIR)\bin\moc.exe;%(FullPath)</AdditionalInputs>

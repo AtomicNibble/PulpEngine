@@ -1644,6 +1644,9 @@
     <ClCompile Include="AssetFontWidget.cpp">
       <Filter>Source Files\Widgets\AssetScript</Filter>
     </ClCompile>
+    <ClCompile Include="ImageLoader.cpp">
+      <Filter>Source Files\Misc</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1974,6 +1977,9 @@
       <Filter>Header Files\AssetScript\modules</Filter>
     </ClInclude>
     <ClInclude Include="StrUtil.h">
+      <Filter>Header Files\Misc</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageLoader.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
   </ItemGroup>

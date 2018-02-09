@@ -102,6 +102,10 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 		return false;
 	}
 
+	if (!pICore_->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
+		return false;
+	}
+
 	return true;
 }
 

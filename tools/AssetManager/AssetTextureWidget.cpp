@@ -5,9 +5,7 @@
 
 #include "IAssetEntry.h"
 
-#include <String\HumanSize.h>
-#include <Compression\LZ4.h>
-#include <Time\StopWatch.h>
+#include "ImageLoader.h"
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -170,12 +168,7 @@ bool AssetTextureWidget::loadCurrentToPix(QPixmap& pixOut)
 
 	if (pAssEntry_->getRawFile(rawData))
 	{
-		if (pixOut.loadFromData(rawData.data(), safe_static_cast<uint32_t>(rawData.size()))) {
-			return true;
-		}
-		
-		// tga needs a helping hand.
-		if (pixOut.loadFromData(rawData.data(), safe_static_cast<uint32_t>(rawData.size()), "tga")) {
+		if (Util::loadTexture(rawData, pixOut, g_arena)) {
 			return true;
 		}
 

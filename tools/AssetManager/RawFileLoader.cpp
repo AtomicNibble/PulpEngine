@@ -5,6 +5,8 @@
 #include <String\HumanSize.h>
 #include <Time\StopWatch.h>
 
+#include "ImageLoader.h"
+
 X_NAMESPACE_BEGIN(assman)
 
 
@@ -145,24 +147,10 @@ void RawFileLoader::run()
 		// load a image.
 		QImage img;
 
-		const char* pFormat = nullptr;
-
 		// for some formats we need to help it.
 		const auto& suffix = fInfo.suffix();
-		if (suffix.compare("dds", Qt::CaseInsensitive) == 0) {
-			pFormat = "dds";
-		}
-		else if (suffix.compare("tga", Qt::CaseInsensitive) == 0) {
-			pFormat = "tga";
-		}
-		else if (suffix.compare("png", Qt::CaseInsensitive) == 0) {
-			pFormat = "png";
-		}
-		else if (suffix.compare("jpg", Qt::CaseInsensitive) == 0) {
-			pFormat = "jpg";
-		}
-
-		if (!img.loadFromData(imgData.data(), static_cast<uint32_t>(imgData.size()), pFormat)) {
+		
+		if (!Util::loadTexture(imgData, img, g_arena, suffix)) {
 			X_ERROR("Img", "Error creating pixmap for preview");
 			return;
 		}
@@ -170,7 +158,6 @@ void RawFileLoader::run()
 		srcDim_ = Vec2i(img.width(), img.height());
 
 		emit setProgressLabel("Generating thumb", numChunks + 15);
-
 
 		auto thumbImg = img.scaled(64, 64);
 
