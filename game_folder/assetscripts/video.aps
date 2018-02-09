@@ -7,7 +7,7 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("Options");
     {
-     Asset.AddCheckBox( "f_loop", false ).SetTitle( "Loop" ).SetToolTip("Video loops forver");
+        Asset.AddCheckBox( "f_loop", false ).SetTitle( "Loop" ).SetToolTip("Video loops forver");
         Asset.AddCheckBox( "f_noStream", false ).SetTitle( "No Stream" ).SetToolTip("Keeps the whole video file in memory");
 
     }
