@@ -916,7 +916,16 @@ namespace Util
 			}
 		}
 
-		img.setFormat(Texturefmt::R8G8B8A8);
+		if (img.getFormat() == Texturefmt::B8G8R8A8) {
+			img.setFormat(Texturefmt::R8G8B8A8);
+		}
+		else if (img.getFormat() == Texturefmt::B8G8R8) {
+			img.setFormat(Texturefmt::R8G8B8);
+		}
+		else {
+			X_ASSERT_UNREACHABLE();
+		}
+
 		return true;
 	}
 
