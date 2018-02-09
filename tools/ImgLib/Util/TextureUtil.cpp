@@ -740,14 +740,14 @@ namespace Util
 		if (PNG::XTexLoaderPNG::isValidData(fileData)) {
 			return PNG::XTexLoaderPNG::SRC_FMT;
 		}
-		if (TGA::XTexLoaderTGA::isValidData(fileData)) {
-			return TGA::XTexLoaderTGA::SRC_FMT;
-		}
 		if (JPG::XTexLoaderJPG::isValidData(fileData)) {
 			return JPG::XTexLoaderJPG::SRC_FMT;
 		}
 		if (PSD::XTexLoaderPSD::isValidData(fileData)) {
 			return PSD::XTexLoaderPSD::SRC_FMT;
+		}
+		if (TGA::XTexLoaderTGA::isValidData(fileData)) {
+			return TGA::XTexLoaderTGA::SRC_FMT;
 		}
 
 		X_ASSERT_UNREACHABLE();
