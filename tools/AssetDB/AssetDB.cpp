@@ -1751,7 +1751,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 		const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
 
 		core::HumanSize::Str sizeStr, sizeStr2;
-		X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2g%%) %gms",
+		X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2f%%) %gms",
 			core::HumanSize::toString(sizeStr, data.size()),
 			core::HumanSize::toString(sizeStr2, compressed.size()),
 			percentageSize,
@@ -2041,7 +2041,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 	const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
 
 	core::HumanSize::Str sizeStr, sizeStr2;
-	X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2g%%) %gms",
+	X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2f%%) %gms",
 		core::HumanSize::toString(sizeStr, data.size()),
 		core::HumanSize::toString(sizeStr2, compressed.size()),
 		percentageSize,
