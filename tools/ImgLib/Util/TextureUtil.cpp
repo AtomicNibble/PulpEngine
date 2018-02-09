@@ -187,6 +187,22 @@ namespace Util
 		return false;
 	}
 
+	bool isBRG(Texturefmt::Enum fmt)
+	{
+		static_assert(Texturefmt::ENUM_COUNT == 56, "Added additional texture fmts? this code needs updating.");
+
+		switch (fmt)
+		{
+			case Texturefmt::B8G8R8:
+			case Texturefmt::B8G8R8A8:
+			case Texturefmt::B8G8R8A8_SRGB:
+			case Texturefmt::B8G8R8A8_TYPELESS:
+				return true;
+			default: 
+				return false;
+		}
+	}
+
 	uint32_t bitsPerPixel(Texturefmt::Enum fmt)
 	{
 		static_assert(Texturefmt::ENUM_COUNT == 56, "Added additional texture fmts? this code needs updating.");

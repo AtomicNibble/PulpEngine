@@ -18,6 +18,7 @@ namespace Util
 	IMGLIB_EXPORT bool hasAlpha(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT bool isDxt(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT bool isTypeless(Texturefmt::Enum fmt);
+	IMGLIB_EXPORT bool isBRG(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT uint32_t maxMipsForSize(uint32_t Width, uint32_t Height);
 	IMGLIB_EXPORT uint32_t bitsPerPixel(Texturefmt::Enum fmt);
 	IMGLIB_EXPORT uint32_t dxtBytesPerBlock(Texturefmt::Enum fmt);
