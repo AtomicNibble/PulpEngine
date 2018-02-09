@@ -104,6 +104,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 				path.setFileName("portal_test.map");
 				path.setFileName("entity_test.map");
 				path.setFileName("physics_test.map");
+				path.setFileName("test01.map");
 				
 				level::Compiler comp(&arena, engine.GetPhysCooking());
 
