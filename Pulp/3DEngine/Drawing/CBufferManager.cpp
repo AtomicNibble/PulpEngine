@@ -133,6 +133,7 @@ void CBufferManager::setMatrixes(const Matrix44f& view, const Matrix44f& proj,
 		inView_ = view.inverted();
 
 		dirtyFlags_.Set(ParamType::PF_viewMatrix);
+		dirtyFlags_.Set(ParamType::PF_worldToCameraMatrix);
 		dirtyFlags_.Set(ParamType::PF_cameraToWorldMatrix);
 	}
 	if (proj_ != proj) {
@@ -300,6 +301,7 @@ X_INLINE void CBufferManager::setParamValue(const render::shader::XShaderParam& 
 			std::memcpy(pDst, &viewProjInv_, sizeof(viewProjInv_));
 			break;
 		case ParamType::PF_worldToCameraMatrix:
+	//	case ParamType::PF_viewMatrix:
 			std::memcpy(pDst, &view_, sizeof(view_));
 			break;
 		case ParamType::PF_cameraToWorldMatrix:
