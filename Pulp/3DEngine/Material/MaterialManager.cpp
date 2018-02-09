@@ -579,17 +579,15 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 						}
 						else
 #endif
-						{
 
-							// okay so now we know the name of the material sampler that we want.
-							for (j = 0; j < matTextures.size(); j++)
+						// okay so now we know the name of the material sampler that we want.
+						for (j = 0; j < matTextures.size(); j++)
+						{
+							auto& t = matTextures[j];
+							if (t.name == alias.name)
 							{
-								auto& t = matTextures[j];
-								if (t.name == alias.name)
-								{
-									texState.textureId = t.pTexture->getDeviceID();
-									break;
-								}
+								texState.textureId = t.pTexture->getDeviceID();
+								break;
 							}
 						}
 					}
