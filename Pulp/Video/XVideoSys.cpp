@@ -38,7 +38,7 @@ void XVideoSys::registerCmds(void)
 bool XVideoSys::init(void)
 {
 
-	auto* pVideo = loadVideo("movie");
+	auto* pVideo = loadVideo("test/rick_roll");
 
 	waitForLoad(pVideo);
 
