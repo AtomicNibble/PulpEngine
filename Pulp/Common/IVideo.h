@@ -2,6 +2,7 @@
 
 #include <IRender.h>
 #include <IAsyncLoad.h>
+#include <IConverterModule.h>
 
 
 X_NAMESPACE_DECLARE(core,
@@ -13,6 +14,12 @@ X_NAMESPACE_BEGIN(video)
 static const char* VIDEO_FILE_EXTENSION = "ivf";
 
 static const uint32_t VID_MAX_LOADED = 4;
+
+
+struct IVideoLib : public IConverter
+{
+
+};
 
 struct IVideo
 {
