@@ -45,11 +45,7 @@ struct IFontSys : public core::IEngineSysBase
 
 	virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
-	// Summary:
-	//	 Creates a named font (case sensitive)
 	virtual IFont* NewFont(const char* pFontName) X_ABSTRACT;
-	// Summary:
-	//	 Gets a named font (case sensitive)
 	virtual IFont* GetFont(const char* pFontName) const X_ABSTRACT;
 	virtual IFont* GetDefault(void) const X_ABSTRACT;
 
