@@ -53,13 +53,13 @@ static Light lights[2] = {
       1.f / 1024.f
     },
     {
-      float4(392,-160,72,1),
+      float4(30,-950,-50,1),
       float4(0,0,1,1),
       float4(0,0,0,0),
       cos(radians(20.5)),
       cos(radians(69.5)),
       (1.f / (cos(radians(20.5)) - cos(radians(69.5)))),
-      1.f / 1024.f
+      1.f / 512.f
     }
 };
 

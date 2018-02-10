@@ -55,7 +55,7 @@ float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
 
     float4 radiance = light.color * att;
 
-#if 1
+#if 0
     // Compute the normalized view direction.
     float3 v = normalize(-viewPosition);
 
@@ -78,7 +78,7 @@ float4 ComputeSpotLight(float3 viewPosition, float3 vsNormal, float4 albedo,
 
     float4 radiance = light.color * att;
 
-#if 1
+#if 0
     // Compute the normalized view direction.
     float3 v = normalize(-viewPosition);
 
