@@ -63,6 +63,7 @@ static const uint32_t	 ANIM_DEFAULT_FPS = 30;
 static const uint32_t	 ANIM_MIN_FPS = 1;
 static const uint32_t	 ANIM_MAX_FPS = 90;
 static const uint32_t	 ANIM_MAX_NOTES = 255;
+static const uint32_t	 ANIM_MAX_NOTES_PER_FRAME = 8;
 static const uint32_t	 ANIM_MAX_NOTE_NAME_LENGTH = 48; // the max lengt of each notes name
 static const uint32_t	 ANIM_MAX_NAME_LENGTH = 60;
 static const char*		 ANIM_FILE_EXTENSION = "anim";
