@@ -29,6 +29,22 @@ namespace fx
 	{
 		X_UNUSED(host, assetId, args, destPath);
 
+		EffectCompiler compiler(g_FxLibArena);
+
+
+		core::XFileScoped file;
+		core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
+
+		if (!file.openFile(destPath.c_str(), mode)) {
+			X_ERROR("Video", "Failed to open output file");
+			return false;
+		}
+
+		if (!compiler.writeToFile(file.GetFile())) {
+			X_ERROR("Video", "Failed to write video file");
+			return false;
+		}
+
 		return true;
 	}
 
