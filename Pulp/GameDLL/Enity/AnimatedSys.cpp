@@ -25,7 +25,8 @@ namespace entity
 		return true;
 	}
 
-	void AnimatedSystem::update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene)
+	void AnimatedSystem::update(core::FrameTimeData& time, EnitiyRegister& reg, 
+		engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene)
 	{
 		X_UNUSED(time, reg, p3DWorld);
 
