@@ -8,6 +8,7 @@
 #include <IVideo.h>
 #include <IWeapon.h>
 #include <IFont.h>
+#include <IEffect.h>
 
 X_NAMESPACE_BEGIN(assetDb)
 
@@ -29,9 +30,9 @@ namespace
 			extensions_[AssetType::MATERIAL] = engine::MTL_B_FILE_EXTENSION;
 			extensions_[AssetType::IMG] = texture::CI_FILE_EXTENSION;
 			extensions_[AssetType::WEAPON] = game::weapon::WEAPON_FILE_EXTENSION;
+			extensions_[AssetType::FONT] = font::FONT_FILE_EXTENSION;
 			extensions_[AssetType::VIDEO] = video::VIDEO_FILE_EXTENSION;
-			extensions_[AssetType::FONT] = font::FONT_FILE_EXTENSION;
-			extensions_[AssetType::FONT] = font::FONT_FILE_EXTENSION;
+			extensions_[AssetType::FX] = engine::fx::EFFECT_FILE_EXTENSION;
 		}
 
 		inline const char* operator[](AssetType::Enum type) const {
