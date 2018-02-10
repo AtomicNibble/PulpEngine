@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <IConverterModule.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -15,6 +16,11 @@ namespace fx
 	static const uint32_t	EFFECT_MAX_ELEMENTS = 1 << 8;
 
 
+
+	struct IFxLib : public IConverter
+	{
+
+	};
 
 
 
