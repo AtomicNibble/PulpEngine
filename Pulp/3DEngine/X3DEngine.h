@@ -25,7 +25,11 @@ X_NAMESPACE_BEGIN(engine)
 X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 class TextureManager;
-class EffectManager;
+
+namespace fx
+{
+	class EffectManager;
+} // namespace fx
 
 class X3DEngine : public I3DEngine, public core::IXHotReload
 {
@@ -67,7 +71,7 @@ private:
 	TextureManager* pTextureManager_;
 	model::XModelManager* pModelManager_;
 	anim::AnimManager* pAnimManager_;
-	EffectManager* pEffectManager_;
+	fx::EffectManager* pEffectManager_;
 
 	gui::XGuiManager* pGuiManger_;
 

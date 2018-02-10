@@ -115,7 +115,7 @@ bool X3DEngine::init(void)
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager")(g_3dEngineArena, g_3dEngineArena);
 	pAnimManager_ = X_NEW(anim::AnimManager, g_3dEngineArena, "AnimManager")(g_3dEngineArena, g_3dEngineArena);
-	pEffectManager_ = X_NEW(EffectManager, g_3dEngineArena, "EffectManager")(g_3dEngineArena, g_3dEngineArena);
+	pEffectManager_ = X_NEW(fx::EffectManager, g_3dEngineArena, "EffectManager")(g_3dEngineArena, g_3dEngineArena);
 	pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
 	
 	pTextureManager_->registerCmds();
@@ -157,7 +157,6 @@ bool X3DEngine::init(void)
 			return false;
 		}
 	}
-
 
 	if (!primResources_.init(pRender, pMaterialManager_)) {
 		X_ERROR("3DEngine", "Failed to init prim resources");
