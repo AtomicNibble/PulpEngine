@@ -161,6 +161,7 @@
     <ClInclude Include="IAssetPak.h" />
     <ClInclude Include="IAsyncLoad.h" />
     <ClInclude Include="ICi.h" />
+    <ClInclude Include="IEffect.h" />
     <ClInclude Include="IEngineSysBase.h" />
     <ClInclude Include="IEntity.h" />
     <ClInclude Include="IFileSysStats.h" />

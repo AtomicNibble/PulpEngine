@@ -19,6 +19,7 @@
 #include "Texture\TextureManager.h"
 #include "Model\ModelManager.h"
 #include "Anim\AnimManager.h"
+#include "Particles\FxManager.h"
 #include "Gui\GuiManger.h"
 
 #include "CmdBucket.h"
@@ -39,6 +40,8 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 	pMaterialManager_(nullptr),
 	pTextureManager_(nullptr),
 	pModelManager_(nullptr),
+	pAnimManager_(nullptr),
+	pEffectManager_(nullptr),
 	pGuiManger_(nullptr),
 	pCBufMan_(nullptr),
 	pVariableStateMan_(nullptr),
@@ -112,6 +115,7 @@ bool X3DEngine::init(void)
 	pMaterialManager_ = X_NEW(engine::XMaterialManager, g_3dEngineArena, "MaterialManager")(g_3dEngineArena, *pVariableStateMan_, *pCBufMan_);
 	pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager")(g_3dEngineArena, g_3dEngineArena);
 	pAnimManager_ = X_NEW(anim::AnimManager, g_3dEngineArena, "AnimManager")(g_3dEngineArena, g_3dEngineArena);
+	pEffectManager_ = X_NEW(EffectManager, g_3dEngineArena, "EffectManager")(g_3dEngineArena, g_3dEngineArena);
 	pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
 	
 	pTextureManager_->registerCmds();
@@ -122,7 +126,8 @@ bool X3DEngine::init(void)
 	pModelManager_->registerVars();
 	pAnimManager_->registerCmds();
 	pAnimManager_->registerVars();
-
+	pEffectManager_->registerCmds();
+	pEffectManager_->registerVars();
 
 	gEngEnv.pGuiMan_ = pGuiManger_;
 	gEngEnv.pMaterialMan_ = pMaterialManager_;
@@ -143,6 +148,9 @@ bool X3DEngine::init(void)
 			return false;
 		}
 		if (!pAnimManager_->init()) {
+			return false;
+		}
+		if (!pEffectManager_->init()) {
 			return false;
 		}
 		if (!pGuiManger_->init()) {
@@ -207,6 +215,13 @@ void X3DEngine::shutDown(void)
 		X_DELETE(pGuiManger_, g_3dEngineArena);
 
 		gEngEnv.pGuiMan_ = nullptr;
+	}
+
+	if (pEffectManager_) {
+		pEffectManager_->shutDown();
+		X_DELETE(pEffectManager_, g_3dEngineArena);
+
+		// ...
 	}
 
 	if (pAnimManager_) {

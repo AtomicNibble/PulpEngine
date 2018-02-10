@@ -91,6 +91,12 @@
     <ClCompile Include="Model\RenderModel.cpp">
       <Filter>Source Files\Model</Filter>
     </ClCompile>
+    <ClCompile Include="Particles\FxManager.cpp">
+      <Filter>Source Files\Particles</Filter>
+    </ClCompile>
+    <ClCompile Include="Particles\Effect.cpp">
+      <Filter>Source Files\Particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -177,6 +183,12 @@
     <ClInclude Include="Model\RenderModel.h">
       <Filter>Header Files\Model</Filter>
     </ClInclude>
+    <ClInclude Include="Particles\FxManager.h">
+      <Filter>Header Files\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="Particles\Effect.h">
+      <Filter>Header Files\Particles</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="Header Files">
@@ -244,6 +256,12 @@
     </Filter>
     <Filter Include="Source Files\Anim">
       <UniqueIdentifier>{961f0b72-6e4b-4729-a846-bfe63a4d9324}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Particles">
+      <UniqueIdentifier>{4def1e0a-9112-414e-b30d-b4e649136cfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Particles">
+      <UniqueIdentifier>{29dff7e1-aa59-4369-a38b-5c132bea788d}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

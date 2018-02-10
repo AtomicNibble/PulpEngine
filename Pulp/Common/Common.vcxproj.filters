@@ -1312,6 +1312,9 @@
     <ClInclude Include="String\AssetName.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="IEffect.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
