@@ -748,6 +748,7 @@ AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter,
 	scale_(1.f),
 	type_(AnimType::RELATIVE),
 	bones_(arena),
+	notes_(inter.getNotes()),
 	stats_(arena)
 {
 
@@ -885,10 +886,37 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
 		return false;
 	}
 	
-	auto& notes = inter_.getNotes();
-	if (notes.size() > ANIM_MAX_NOTES) {
+	if (notes_.size() > ANIM_MAX_NOTES) {
 		X_ERROR("Anim", "Exceeded max notes (%" PRIu32 ")", ANIM_MAX_NOTES);
 		return false;
+	}
+
+	if (notes_.isNotEmpty())
+	{
+		// sort them base on frame.
+		std::stable_sort(notes_.begin(), notes_.end(), [](NoteArr::ConstReference lhs, NoteArr::ConstReference rhs) {
+			return lhs.frame < rhs.frame;
+		});
+
+		// check per frame limits.
+		int32_t num = 0;
+		int32_t curFrame = notes_.front().frame;
+		for (size_t i = 0; i < notes_.size(); i++)
+		{
+			num++;
+
+			if (num >= ANIM_MAX_NOTES_PER_FRAME)
+			{
+				X_ERROR("Anim", "Exceeded max notes per frame (%" PRIu32 ") on frame: %" PRIi32, ANIM_MAX_NOTES_PER_FRAME, curFrame);
+				return false;
+			}
+
+			if (notes_[i].frame != curFrame)
+			{
+				num = 0;
+				curFrame = notes_[i].frame;
+			}
+		}
 	}
 
 	core::StopWatch timer;
@@ -972,8 +1000,7 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		hdr.flags.Set(AnimFlag::LOOP);
 	}
 
-	auto& notes = inter_.getNotes();
-	if (notes.isNotEmpty()) {
+	if (notes_.isNotEmpty()) {
 		hdr.flags.Set(AnimFlag::NOTES);
 	}
 
@@ -1019,15 +1046,15 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		bone.pos.save(stream);
 	}
 
-	if (notes.isNotEmpty()) 
+	if (notes_.isNotEmpty())
 	{
 		NoteTrackHdr noteHdr;
-		noteHdr.num = safe_static_cast<uint16_t>(notes.size());
+		noteHdr.num = safe_static_cast<uint16_t>(notes_.size());
 
 		static_assert(std::numeric_limits<decltype(noteHdr.num)>::max() >= ANIM_MAX_NOTES, "Can't represent max notes");
 
 		stream.write(noteHdr);
-		for (auto& n : notes)
+		for (auto& n : notes_)
 		{
 			if (n.name.length() > ANIM_MAX_NOTE_NAME_LENGTH) {
 				X_ERROR("Anim", "Note \"%s\" has length %" PRIuS " which exceeds limit of %" PRIu32, 

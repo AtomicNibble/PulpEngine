@@ -151,7 +151,7 @@ class AnimCompiler
 	};
 
 	typedef core::Array<Bone> BoneArr;
-
+	typedef InterAnim::NoteArr NoteArr;
 
 	X_DECLARE_FLAGS(CompileFlag)(
 		LOOPING,
@@ -195,6 +195,7 @@ private:
 	Flags<CompileFlag> flags_;
 	AnimType::Enum type_;
 	BoneArr bones_;
+	NoteArr notes_;
 
 	Stats stats_;
 };
