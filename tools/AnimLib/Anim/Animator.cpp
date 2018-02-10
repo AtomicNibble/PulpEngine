@@ -101,7 +101,7 @@ void AnimBlend::playAnim(const model::XModel& model, const Anim* pAnim, core::Ti
 	}
 }
 
-bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, float &blendWeight) const
+bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& scratchTrans, TransformArr& boneTransOut, float &blendWeight) const
 {
 	if (!pAnim_) {
 		return false;
@@ -124,14 +124,13 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& boneTransOut, flo
 
 	X_ASSERT(time >= 0_tv, "Negative time value")(time);
 
-	TransformArr tempTrans(boneTransOut.getArena());
 	TransformArr* pTransArr = &boneTransOut;
 
 	// animate into a temp buffer.
 	if (blendWeight > 0.f)
 	{
-		tempTrans.resize(boneTransOut.size());
-		pTransArr = &tempTrans;
+		scratchTrans.resize(boneTransOut.size());
+		pTransArr = &scratchTrans;
 	}
 
 	FrameBlend frame;
@@ -403,12 +402,14 @@ bool Animator::createFrame(core::TimeVal currentTime)
 	// joints for whole model.
 	TransformArr bones(g_AnimLibArena, pModel_->getNumBones());
 
+	TransformArr scratchTrans(g_AnimLibArena);
+
 	// YER BOI.
 	float weight = 0.f;
 	bool aniamted = false;
 
 	for (auto& anim : anims_) {
-		if (anim.blend(currentTime, bones, weight)) {
+		if (anim.blend(currentTime, scratchTrans, bones, weight)) {
 			aniamted = true;
 			if (weight >= 1.0f) {
 				break;

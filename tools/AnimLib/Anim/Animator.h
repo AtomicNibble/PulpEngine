@@ -38,7 +38,7 @@ public:
 
 	void playAnim(const model::XModel& model, const Anim* pAnim, core::TimeVal startTime, core::TimeVal blendTime);
 	
-	bool blend(core::TimeVal currentTime, TransformArr& boneTransOut, float &blendWeight) const;
+	bool blend(core::TimeVal currentTime, TransformArr& scratchTrans, TransformArr& boneTransOut, float &blendWeight) const;
 	void blendOrigin(core::TimeVal currentTime, Vec3f& blendPos, float& blendWeight) const;
 	void blendDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& blendDelta, float& blendWeight) const;
 
