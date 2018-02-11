@@ -18,13 +18,14 @@ namespace fx
 
 	static const uint32_t	EFFECT_GRAPH_MAX_POINTS = 8;
 
-
 	// think i will support grahphs for shit like:
 	//
 	//	color, size, verlocity, rotation?
 	//
 	//	the graph will just allow a arbitary set of points over the timeline.
 
+	typedef uint8_t IndexType;
+	typedef IndexType IndexOffset;
 
 	struct IFxLib : public IConverter
 	{
@@ -51,11 +52,23 @@ namespace fx
 		int32_t numFrames;
 	};
 
+	X_PACK_PUSH(4)
+
 	struct Range
 	{
-		int32_t start;
-		int32_t end;
+		float start;
+		float end;
 	};
+
+
+	struct Graph
+	{
+		uint8_t numPoints;
+		IndexOffset timeStart;		// 0-1 times
+		IndexOffset valueStart;		// values
+	};
+
+	static_assert(std::numeric_limits<decltype(Graph::numPoints)>::max() >= EFFECT_GRAPH_MAX_POINTS, "Can't represent max points");
 
 	struct Stage
 	{
@@ -69,26 +82,41 @@ namespace fx
 		Range life;
 		Range delay;
 
-
 		Range spawnOrgX;
 		Range spawnOrgY;
 		Range spawnOrgZ;
+
+		Graph color;
+		Graph alpha;
+		Graph size;
+		Graph scale;
+		Graph rot;
+		Graph vel0X;
+		Graph vel0Y;
+		Graph vel0Z;
 	};
 
-
+	X_PACK_POP;
 
 	// file stuff 
 	struct EffectHdr
 	{
+		X_INLINE bool isValid(void) const;
+
+
 		// 4
 		uint32_t fourCC;
 		// 4
 		uint8_t version;
 		uint8_t numStages;
-		uint8_t _pad[2];
-
+		uint8_t numIndex;
+		uint8_t numFloats;
 	};
 
+	X_INLINE bool EffectHdr::isValid(void) const
+	{
+		return fourCC == EFFECT_FOURCC && version == EFFECT_VERSION;
+	}
 
 	// X_ENSURE_SIZE(Stage, 60);
 	// X_ENSURE_SIZE(EffectHdr, 8);

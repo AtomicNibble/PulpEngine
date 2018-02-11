@@ -31,6 +31,10 @@ namespace fx
 
 		EffectCompiler compiler(g_FxLibArena);
 
+		if (!compiler.loadFromJson(args)) {
+			X_ERROR("Fx", "Error parsing effect args");
+			return false;
+		}
 
 		core::XFileScoped file;
 		core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
