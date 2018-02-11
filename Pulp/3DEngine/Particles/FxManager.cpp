@@ -179,9 +179,9 @@ namespace fx
 
 	bool EffectManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
 	{
-		X_UNUSED(pAsset, data, dataSize);
+		auto* pEffect = static_cast<Effect*>(pAsset);
 
-		return false;
+		return pEffect->processData(std::move(data), dataSize);
 	}
 
 
