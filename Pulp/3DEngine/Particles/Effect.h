@@ -6,6 +6,7 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace fx
 {
+	struct Stage;
 
 	class Effect : public core::AssetBase
 	{
@@ -16,8 +17,29 @@ namespace fx
 		Effect(core::string& name, core::MemoryArenaBase* arena);
 		~Effect();
 
+		X_INLINE int32_t getNumStages(void) const;
 
+		bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
+
+	private:
+		const Stage* getStages(void) const;
+		const uint8_t* getIndexes(void) const;
+		const float* getFloats(void) const;
+
+	private:
+		int32_t numStages_;
+		int32_t numIndex_;
+		int32_t numFloats_;
+
+		uint32_t dataSize_; // don't really need?
+		core::UniquePointer<char[]> data_;
 	};
+
+
+	int32_t Effect::getNumStages(void) const
+	{
+		return numStages_;
+	}
 
 } // namespace fx
 
