@@ -121,6 +121,12 @@ namespace
 				case "font"_fnv1a:
 					assType = converter::AssetType::FONT;
 					break;
+				case "video"_fnv1a:
+					assType = converter::AssetType::VIDEO;
+					break;
+				case "fx"_fnv1a:
+					assType = converter::AssetType::FX;
+					break;
 
 				default:
 					X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
