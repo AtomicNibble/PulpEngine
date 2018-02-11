@@ -36,12 +36,12 @@ namespace fx
 		core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
 		if (!file.openFile(destPath.c_str(), mode)) {
-			X_ERROR("Video", "Failed to open output file");
+			X_ERROR("Fx", "Failed to open output file");
 			return false;
 		}
 
 		if (!compiler.writeToFile(file.GetFile())) {
-			X_ERROR("Video", "Failed to write video file");
+			X_ERROR("Fx", "Failed to write effect file");
 			return false;
 		}
 
