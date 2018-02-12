@@ -21,10 +21,11 @@ namespace fx
 
 		bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
-	private:
+	public:
 		const Stage* getStages(void) const;
 		const uint8_t* getIndexes(void) const;
 		const float* getFloats(void) const;
+		const char* getMaterialName(int32_t strOffset) const;
 
 	private:
 		int32_t numStages_;

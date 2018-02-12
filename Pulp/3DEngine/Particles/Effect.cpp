@@ -67,6 +67,17 @@ namespace fx
 		return reinterpret_cast<float*>(data_.ptr() + offset);
 	}
 
+	const char* Effect::getMaterialName(int32_t strOffset) const
+	{
+		size_t offset = sizeof(EffectHdr);
+		offset += sizeof(Stage) * numStages_;
+		offset += sizeof(IndexType) * numIndex_;
+		offset += sizeof(float) * numFloats_;
+		offset += strOffset;
+
+		return reinterpret_cast<const char*>(data_.ptr() + offset);
+	}
+
 } // namespace fx
 
 
