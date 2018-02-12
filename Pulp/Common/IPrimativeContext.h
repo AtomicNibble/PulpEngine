@@ -68,8 +68,8 @@ public:
 	void drawQuadSS(float x, float y, float width, float height, Color8u col);
 	void drawQuadSS(const Rectf& rect, Color8u col);
 	X_INLINE void drawQuadSS(float x, float y, float width, float height, Color8u col, Color8u borderCol);
-	X_INLINE void drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, Color8u col);
-	void drawQuadImageSS(const Rectf& rect, Material* pMaterial, Color8u col);
+	X_INLINE void drawQuadSS(float x, float y, float width, float height, Material* pMaterial, Color8u col);
+	void drawQuadSS(const Rectf& rect, Material* pMaterial, Color8u col);
 	X_INLINE void drawRectSS(float x, float y, float width, float height, Color8u col);
 	void drawRectSS(const Rectf& rect, Color8u col);
 	void drawLineSS(const Vec2f& vPos1, Color8u color1,

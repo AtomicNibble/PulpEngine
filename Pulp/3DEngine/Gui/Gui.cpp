@@ -69,7 +69,7 @@ namespace gui
 		const float height = rect.y;
 
 
-		pDrawCon->drawQuadImageSS(
+		pDrawCon->drawQuadSS(
 			cursorPos_.x / width, cursorPos_.y / height,
 			0.1f, 0.1f,
 			pCursorArrow,

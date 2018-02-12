@@ -10,10 +10,10 @@ X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float
 }
 
 
-X_INLINE void IPrimativeContext::drawQuadImageSS(float x, float y, float width, float height, Material* pMaterial, Color8u col)
+X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, Material* pMaterial, Color8u col)
 {
 	const Rectf rect(x, y, x + width, y + height);
-	drawQuadImageSS(rect, pMaterial, col);
+	drawQuadSS(rect, pMaterial, col);
 }
 
 

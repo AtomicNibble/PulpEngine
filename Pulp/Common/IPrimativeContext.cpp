@@ -112,7 +112,7 @@ void IPrimativeContext::drawQuadSS(const Rectf& rect, Color8u col)
 }
 
 
-void IPrimativeContext::drawQuadImageSS(const Rectf& rect, Material* pMaterial, Color8u col)
+void IPrimativeContext::drawQuadSS(const Rectf& rect, Material* pMaterial, Color8u col)
 {
 	float x1, y1, x2, y2;
 	float z;
