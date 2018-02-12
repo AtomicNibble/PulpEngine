@@ -79,9 +79,9 @@ namespace fx
 		int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
 		int32_t loopCount;	// how many times we spawn before the end.
 
-		Range count;
-		Range life;
-		Range delay;
+		Range count;		
+		Range life;			// life for each elem.
+		Range delay;		// delay is when we start this stage.
 
 		Range spawnOrgX;
 		Range spawnOrgY;
