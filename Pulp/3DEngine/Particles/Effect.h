@@ -1,12 +1,16 @@
 #pragma once
 
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_BEGIN(engine)
 
+class IPrimativeContext;
 
 namespace fx
 {
 	struct Stage;
+	struct Range;
+	struct Graph;
 
 	class Effect : public core::AssetBase
 	{
@@ -41,6 +45,59 @@ namespace fx
 	{
 		return numStages_;
 	}
+
+	// a emmtier plays a FX.
+	class Emitter
+	{
+		struct Elem
+		{
+			Vec3f pos;
+			Vec3f dir;
+			float size;
+			Color8u col;
+			int32_t lifeMs;
+		};
+
+		typedef core::Array<Elem> ElemArr;
+
+		struct StageState
+		{
+			StageState(core::MemoryArenaBase* arena) :
+				elems(arena)
+			{
+				pMaterial = nullptr;
+				currentLoop = 0;
+			}
+
+
+			engine::Material* pMaterial;
+
+			core::TimeVal lastSpawn;
+			int32_t currentLoop;
+
+			ElemArr elems;
+		};
+
+		typedef core::Array<StageState> StageStateArr;
+
+
+	public:
+		Emitter(const Effect& efx, core::MemoryArenaBase* arena);
+
+		void update(core::TimeVal delta);
+		void draw(IPrimativeContext* pPrim);
+
+	private:
+		float fromRange(const Range& r) const;
+		float fromGraph(const Graph& r, float t) const;
+
+	private:
+		const Effect& efx_;
+		StageStateArr stages_;
+
+		core::TimeVal elapsed_;
+	};
+
 
 } // namespace fx
 
