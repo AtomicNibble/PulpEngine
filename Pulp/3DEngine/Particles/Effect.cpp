@@ -90,6 +90,10 @@ namespace fx
 	{
 	}
 
+	void Emitter::setPos(const Vec3f& pos)
+	{
+		pos_ = pos;
+	}
 
 	void Emitter::update(core::TimeVal delta)
 	{
@@ -117,58 +121,85 @@ namespace fx
 			}
 
 			// update elems?
-//			float elapsedMS = elapsed_.GetMilliSeconds();
-			for (auto& e : state.elems)
+			//float elapsedMS = elapsed_.GetMilliSeconds();
+
+			for (size_t j= 0;j<state.elems.size(); j++)
 			{
+				auto& e = state.elems[j];
+
+				auto alive = (elapsed_ - e.spawnTime).GetMilliSeconds();
+
+				if (alive >= e.lifeMs)
+				{
+					state.elems.removeIndex(j);
+					continue;
+				}
+
+				float fraction = (alive / e.lifeMs);
+
 				Vec3f vel;
-				vel.x = fromGraph(stage.vel0X, test);
-				vel.y = fromGraph(stage.vel0Y, test);
-				vel.z = fromGraph(stage.vel0Z, test);
+				vel.x = fromGraph(stage.vel0X[e.velGraph], fraction);
+				vel.y = fromGraph(stage.vel0Y[e.velGraph], fraction);
+				vel.z = fromGraph(stage.vel0Z[e.velGraph], fraction);
 
-				float size = fromGraph(stage.size, test);
-				float alpha = fromGraph(stage.alpha, test);
+				float size = fromGraph(stage.size[e.sizeGraph], fraction);
+				
+				Vec3f col = fromColorGraph(stage.color[e.colGraph], fraction);
+				float alpha = fromGraph(stage.alpha[e.alphaGraph], fraction);
 
-				e.col.a = CHANTRAIT<uint8_t>::convert(alpha);
+				e.col = Color8u(col, alpha);
 				e.size = size;
 				e.dir = vel;
 			}
 
-
-			if (stage.type == StageType::OrientedSprite)
+			// finished.
+			if (stage.loopCount && state.currentLoop >= stage.loopCount)
 			{
-				// so how todo this?
-				// we basically have to spawn elementes, for this this stage.
-				// each elem we spawn maintain it's random properies for it's life.
-				// we then need to keep track of how many elems we have spawned, and spawn more till we reach limit.
+				continue;
+			}
 
+			if (state.currentLoop > 0)
+			{
+				auto sinceSpawn = elapsed_ - state.lastSpawn;
+				auto interval = core::TimeVal::fromMS(stage.interval);
 
-				// finished.
-				if (state.currentLoop > stage.loopCount)
+				if (sinceSpawn < interval)
 				{
 					continue;
 				}
+			}
+			else if (stage.delay.start > 0)
+			{
+				// initial delay logic.
+
+			}
+
+			// 'spawn'
+			++state.currentLoop;
+
+			state.lastSpawn = elapsed_;
+
+			if (stage.type == StageType::OrientedSprite)
+			{
+				int8_t colGraph = 0;
+				int8_t alphaGraph = 0;
+				int8_t sizeGraph = 0;
+				int8_t velGraph = 0;
 				
-
-				if (state.currentLoop > 0)
-				{
-					auto sinceSpawn = elapsed_ - state.lastSpawn;
-					auto interval = core::TimeVal::fromMS(stage.interval);
-
-					if (sinceSpawn < interval)
-					{
-						continue;
-					}
+				if (stage.flags.IsSet(StageFlag::RandGraphCol)) {
+					colGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				else if(stage.delay.start > 0)
-				{
-					// initial delay logic.
-					
+				if (stage.flags.IsSet(StageFlag::RandGraphAlpha)) {
+					alphaGraph = gEnv->xorShift.rand() & 0x1;
+				}
+				if (stage.flags.IsSet(StageFlag::RandGraphSize)) {
+					sizeGraph = gEnv->xorShift.rand() & 0x1;
+				}
+				if (stage.flags.IsSet(StageFlag::RandGraphVel)) {
+					velGraph = gEnv->xorShift.rand() & 0x1;
 				}
 
-				// 'spawn'
-				++state.currentLoop;
-
-				// need to basically come up withsome values.
+				// meow.
 				Vec3f pos;
 				pos.x = fromRange(stage.spawnOrgX);
 				pos.y = fromRange(stage.spawnOrgY);
@@ -177,26 +208,27 @@ namespace fx
 				float life = fromRange(stage.life);
 
 				Vec3f vel;
-				vel.x = fromGraph(stage.vel0X, 0.f);
-				vel.y = fromGraph(stage.vel0Y, 0.f);
-				vel.z = fromGraph(stage.vel0Z, 0.f);
+				vel.x = fromGraph(stage.vel0X[velGraph], 0.f);
+				vel.y = fromGraph(stage.vel0Y[velGraph], 0.f);
+				vel.z = fromGraph(stage.vel0Z[velGraph], 0.f);
 
-				// uniform scale.
-				float size = fromGraph(stage.size, 0.f);
-				// don't use scale for most things.
-				//float scale = fromGraph(stage.scale, 0.f);
+				float size = fromGraph(stage.size[sizeGraph], 0.f);
 
-				Vec3f col(1,0,0);
-				float alpha = fromGraph(stage.alpha, 0.f);
-
+				Vec3f col = fromColorGraph(stage.color[colGraph], 0.f);
+				float alpha = fromGraph(stage.alpha[alphaGraph], 0.f);
 
 				Elem e;
+				e.colGraph = colGraph;
+				e.alphaGraph = alphaGraph;
+				e.sizeGraph = sizeGraph;
+				e.velGraph = velGraph;
+
 				e.pos = pos;
 				e.dir = vel;
 				e.size = size;
 				e.col = Colorf(col, alpha);
-				e.lifeMs = static_cast<int32_t>(life);
-
+				e.spawnTime = elapsed_;
+				e.lifeMs = life;
 				state.elems.push_back(e);
 			}
 			else
@@ -238,6 +270,7 @@ namespace fx
 				Vec3f br = Vec3f(half, half, 0);
 				
 				Vec3f pos = e.pos + e.dir;
+				pos += pos_;
 
 				tl += pos;
 				tr += pos;
@@ -263,29 +296,26 @@ namespace fx
 
 	float Emitter::fromGraph(const Graph& g, float t) const
 	{
-		auto* pIndexes = efx_.getIndexes();
-		auto* pFlts = efx_.getFloats();
-
-		float scale = pFlts[g.scaleIdx];
+		float scale = getFloat(g.scaleIdx);
 		float result = 0.f;
 
 		for (int32_t i = 0; i < g.numPoints; i++)
 		{
-			auto val0 = pFlts[pIndexes[g.timeStart + i]];
+			auto val0 = floatForIdx(g.timeStart + i);
 
 			if (val0 == t)
 			{
-				result = pFlts[pIndexes[g.valueStart + i]];
+				result = floatForIdx(g.valueStart + i);
 				break;
 			}
 			else if (val0 > t)
 			{
 				// blend.
-				val0 = pFlts[pIndexes[g.timeStart + (i - 1)]];
-				auto val1 = pFlts[pIndexes[g.timeStart + i]];
+				val0 = floatForIdx(g.timeStart + (i - 1));
+				auto val1 = floatForIdx(g.timeStart + i);
 
-				auto res0 = pFlts[pIndexes[g.valueStart + (i - 1)]];
-				auto res1 = pFlts[pIndexes[g.valueStart + i]];
+				auto res0 = floatForIdx(g.valueStart + (i - 1));
+				auto res1 = floatForIdx(g.valueStart + i);
 
 				float offset = t - val0;
 				float range = val1 - val0;
@@ -299,6 +329,66 @@ namespace fx
 		return result * scale;
 	}
 
+	Vec3f Emitter::fromColorGraph(const Graph& g, float t) const
+	{
+		float scale = getFloat(g.scaleIdx);
+		Vec3f result;
+
+		for (int32_t i = 0; i < g.numPoints; i++)
+		{
+			auto val0 = floatForIdx(g.timeStart + i);
+
+			if (val0 == t)
+			{
+				result = colorForIdx(g.valueStart, i);
+				break;
+			}
+			else if (val0 > t)
+			{
+				// blend.
+				val0 = floatForIdx(g.timeStart + (i - 1));
+				auto val1 = floatForIdx(g.timeStart + i);
+
+				auto res0 = colorForIdx(g.valueStart, i - 1);
+				auto res1 = colorForIdx(g.valueStart, i);
+
+				float offset = t - val0;
+				float range = val1 - val0;
+				float fraction = offset / range;
+
+				result = res0.lerp(fraction, res1);
+				break;
+			}
+		}
+
+		return result * scale;
+	}
+
+	X_INLINE float Emitter::getFloat(int32_t idx) const
+	{
+		auto* pFlts = efx_.getFloats();
+
+		return pFlts[idx];
+	}
+
+	X_INLINE float Emitter::floatForIdx(int32_t idx) const
+	{
+		auto* pIndexes = efx_.getIndexes();
+		auto* pFlts = efx_.getFloats();
+
+		idx = pIndexes[idx];
+		return pFlts[idx];
+	}
+
+	X_INLINE Vec3f Emitter::colorForIdx(int32_t start, int32_t idx) const
+	{
+		idx = start + (idx * 3);
+		return Vec3f(
+			floatForIdx(idx),
+			floatForIdx(idx + 1),
+			floatForIdx(idx + 2)
+		);
+	}
 
 } // namespace fx
 

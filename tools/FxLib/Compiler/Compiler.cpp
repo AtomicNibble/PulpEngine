@@ -103,8 +103,6 @@ namespace fx
 		return true;
 	}
 
-
-
 	bool EffectCompiler::loadFromJson(core::string& str)
 	{
 		auto test = R"(
@@ -113,14 +111,14 @@ namespace fx
 					{
 						"name" : "segment1",
 						"type" : "OrientedSprite",
-						"flags" : "",
+						"flags" : "RandGraphAlpha RandGraphSize RandGraphVel",
 
 						"materials" : [
 							"fx/test/raygun_ring"
 						],
 
-						"interval": 50,
-						"loopCount": 2,
+						"interval": 100,
+						"loopCount": 0,
 
 						"countStart": 0,
 						"countRange": 0,
@@ -134,7 +132,7 @@ namespace fx
 						"spawnOrgYStart" : 0,
 						"spawnOrgYRange" : 0,
 						"spawnOrgZStart" : 10,
-						"spawnOrgZRange" : 12,
+						"spawnOrgZRange" : 2,
 
 						"colorGraph" : {
 							"scale" : 1,							
@@ -161,13 +159,13 @@ namespace fx
 									{
 										"time": 0,
 										"rgb": [
-											0.752941, 0.752941, 0.752941
+											0, 1, 1
 										]
 									},
 									{
 										"time": 1,
 										"rgb": [
-											0.666667, 0.647059, 0.607843
+											1, 0, 0
 										]
 									}
 								]
@@ -197,6 +195,32 @@ namespace fx
 										"time": 1,
 										"val": 0
 									}
+								],
+								[
+									{
+										"time": 0,
+										"val": 1
+									},
+									{
+										"time": 0.078,
+										"val": 0.71
+									},
+									{
+										"time": 0.24,
+										"val": 0.39
+									},
+									{
+										"time": 0.46,
+										"val": 0.14
+									},
+									{
+										"time": 0.81,
+										"val": 0.004
+									},									
+									{
+										"time": 1,
+										"val": 0
+									}
 								]
 							]
 						},
@@ -207,6 +231,16 @@ namespace fx
 									{
 										"time": 0,
 										"val": 0.227273
+									},
+									{
+										"time": 1,
+										"val": 0.75974
+									}
+								],
+								[
+									{
+										"time": 0,
+										"val": 0.233766
 									},
 									{
 										"time": 1,
@@ -246,7 +280,7 @@ namespace fx
 							]
 						},
 						"vel0XGraph" : {
-							"scale" : 1,							
+							"scale" : 0,							
 							"graphs": [
 								[
 									{
@@ -255,28 +289,23 @@ namespace fx
 									},
 									{
 										"time": 1,
-										"val": -0.011
+										"val": -0.1
+									}
+								],
+								[
+									{
+										"time": 0,
+										"val": 0.5
+									},
+									{
+										"time": 1,
+										"val": 0.02
 									}
 								]
 							]
 						},
 						"vel0YGraph" : {
-							"scale" : 1,							
-							"graphs": [
-								[
-									{
-										"time": 0,
-										"val": 0.5
-									},
-									{
-										"time": 1,
-										"val": 0.5
-									}
-								]
-							]
-						},
-						"vel0ZGraph" : {
-							"scale" : 50,							
+							"scale" : 0,							
 							"graphs": [
 								[
 									{
@@ -285,7 +314,42 @@ namespace fx
 									},
 									{
 										"time": 1,
-										"val": 0.5
+										"val": 0
+									}
+								],
+								[
+									{
+										"time": 0,
+										"val": 0
+									},
+									{
+										"time": 1,
+										"val": 0
+									}
+								]
+							]
+						},
+						"vel0ZGraph" : {
+							"scale" : 10,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									},
+									{
+										"time": 1,
+										"val": 1
+									}
+								],
+								[
+									{
+										"time": 0,
+										"val": 0
+									},
+									{
+										"time": 1,
+										"val": 0.98
 									}
 								]
 							]
@@ -295,7 +359,7 @@ namespace fx
 			}
 		)";
 
-		str = test;
+	//	str = test;
 
 	
 		core::json::Document d;
@@ -386,7 +450,18 @@ namespace fx
 						case "Looping"_fnv1a:
 							stage.flags.Set(StageFlag::Looping);
 							break;
-
+						case "RandGraphCol"_fnv1a:
+							stage.flags.Set(StageFlag::RandGraphCol);
+							break;
+						case "RandGraphAlpha"_fnv1a:
+							stage.flags.Set(StageFlag::RandGraphAlpha);
+							break;
+						case "RandGraphSize"_fnv1a:
+							stage.flags.Set(StageFlag::RandGraphSize);
+							break;
+						case "RandGraphVel"_fnv1a:
+							stage.flags.Set(StageFlag::RandGraphVel);
+							break;
 						default:
 							X_ERROR("Fx", "Unkonw flag: \"%.*s\"", token.GetLength(), token.GetStart());
 							return false;
@@ -504,37 +579,50 @@ namespace fx
 			return fltPool.push_back(val);
 		};
 
-		auto processGraph = [&](Graph& graphOut, const FloatGraphSet& srcGraph) -> bool {
+		auto processGraph = [&](Stage::GraphArr& graphsOut, const auto& srcGraph, auto addDataFunc) -> bool {
 
-			if (srcGraph.graphs.size() > 1) {
-				return false;
-			}
-			if (srcGraph.graphs.isEmpty()) {
-				return true;
-			}
-
-			auto& graph = srcGraph.graphs.front();
-			auto& points = graph.points;
-
-			graphOut.numPoints = safe_static_cast<decltype(graphOut.numPoints)>(points.size());
-			graphOut.timeStart = safe_static_cast<IndexOffset>(indexes.size());
-			graphOut.scaleIdx = safe_static_cast<IndexType>(uniqueFloat(srcGraph.scale));
-
-			for (auto p : points)
+			for (size_t i = 0; i < graphsOut.size(); i++)
 			{
-				auto idx = uniqueFloat(p.time);
-				indexes.push_back(safe_static_cast<IndexType>(idx));
-			}
+				auto& graphOut = graphsOut[i];
 
-			graphOut.valueStart = safe_static_cast<IndexOffset>(indexes.size());
+				if (i >= srcGraph.graphs.size()) {
+					core::zero_object(graphOut);
+					continue;
+				}
 
-			for (auto p : points)
-			{
-				auto idx = uniqueFloat(p.data);
-				indexes.push_back(safe_static_cast<IndexType>(idx));
+				const auto& graph = srcGraph.graphs[i];
+				const auto& points = graph.points;
+
+				graphOut.numPoints = safe_static_cast<decltype(graphOut.numPoints)>(points.size());
+				graphOut.timeStart = safe_static_cast<IndexOffset>(indexes.size());
+				graphOut.scaleIdx = safe_static_cast<IndexType>(uniqueFloat(srcGraph.scale));
+
+				for (auto p : points)
+				{
+					auto idx = uniqueFloat(p.time);
+					indexes.push_back(safe_static_cast<IndexType>(idx));
+				}
+
+				graphOut.valueStart = safe_static_cast<IndexOffset>(indexes.size());
+
+				for (auto p : points)
+				{
+					addDataFunc(p.data);
+				}
 			}
 
 			return true;
+		};
+
+		auto addFloat = [&](float val) {
+			auto idx = uniqueFloat(val);
+			indexes.push_back(safe_static_cast<IndexType>(idx));
+		};
+		auto addColor = [&](const Vec3f& val) {
+			for (int32_t i = 0; i < 3; i++) {
+				auto idx = uniqueFloat(val[i]);
+				indexes.push_back(safe_static_cast<IndexType>(idx));
+			}
 		};
 
 		size_t matOffset = 0;
@@ -542,13 +630,14 @@ namespace fx
 		{
 			Stage compiledStage = stage; // slice in the already set fields.
 
-			processGraph(compiledStage.alpha, stage.alpha);
-			processGraph(compiledStage.size, stage.size);
-			processGraph(compiledStage.scale, stage.scale);
-			processGraph(compiledStage.rot, stage.rot);
-			processGraph(compiledStage.vel0X, stage.vel0X);
-			processGraph(compiledStage.vel0Y, stage.vel0Y);
-			processGraph(compiledStage.vel0Z, stage.vel0Z);
+			processGraph(compiledStage.alpha, stage.alpha, addFloat);
+			processGraph(compiledStage.size, stage.size, addFloat);
+			processGraph(compiledStage.scale, stage.scale, addFloat);
+			processGraph(compiledStage.rot, stage.rot, addFloat);
+			processGraph(compiledStage.vel0X, stage.vel0X, addFloat);
+			processGraph(compiledStage.vel0Y, stage.vel0Y, addFloat);
+			processGraph(compiledStage.vel0Z, stage.vel0Z, addFloat);
+			processGraph(compiledStage.color, stage.color, addColor);
 
 			compiledStage.materialStrOffset = safe_static_cast<int32_t>(matOffset);
 

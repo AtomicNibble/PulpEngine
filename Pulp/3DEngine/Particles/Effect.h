@@ -51,11 +51,18 @@ namespace fx
 	{
 		struct Elem
 		{
+			int8_t colGraph;
+			int8_t alphaGraph;
+			int8_t sizeGraph;
+			int8_t velGraph;
+
 			Vec3f pos;
 			Vec3f dir;
 			float size;
 			Color8u col;
-			int32_t lifeMs;
+
+			core::TimeVal spawnTime;
+			float lifeMs;
 		};
 
 		typedef core::Array<Elem> ElemArr;
@@ -84,17 +91,25 @@ namespace fx
 	public:
 		Emitter(const Effect& efx, core::MemoryArenaBase* arena);
 
+		void setPos(const Vec3f& pos);
+
 		void update(core::TimeVal delta);
 		void draw(IPrimativeContext* pPrim);
 
 	private:
 		float fromRange(const Range& r) const;
 		float fromGraph(const Graph& r, float t) const;
+		Vec3f fromColorGraph(const Graph& r, float t) const;
+
+		
+		float getFloat(int32_t idx) const;
+		float floatForIdx(int32_t idx) const;
+		Vec3f colorForIdx(int32_t start, int32_t idx) const;
 
 	private:
 		const Effect& efx_;
 		StageStateArr stages_;
-
+		Vec3f pos_;
 		core::TimeVal elapsed_;
 	};
 

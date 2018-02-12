@@ -42,7 +42,11 @@ namespace fx
 	);
 
 	X_DECLARE_FLAGS(StageFlag)(
-		Looping
+		Looping,
+		RandGraphCol,
+		RandGraphAlpha,
+		RandGraphSize,
+		RandGraphVel
 	);
 
 	typedef Flags<StageFlag> StageFlags;
@@ -73,6 +77,8 @@ namespace fx
 
 	struct Stage
 	{
+		typedef std::array<Graph, 2> GraphArr;
+
 		StageType::Enum type;
 		StageFlags flags;
 
@@ -88,14 +94,14 @@ namespace fx
 		Range spawnOrgY;
 		Range spawnOrgZ;
 
-		Graph color;
-		Graph alpha;
-		Graph size;
-		Graph scale;
-		Graph rot;
-		Graph vel0X;
-		Graph vel0Y;
-		Graph vel0Z;
+		GraphArr color;
+		GraphArr alpha;
+		GraphArr size;
+		GraphArr scale;
+		GraphArr rot;
+		GraphArr vel0X;
+		GraphArr vel0Y;
+		GraphArr vel0Z;
 	};
 
 	X_PACK_POP;
