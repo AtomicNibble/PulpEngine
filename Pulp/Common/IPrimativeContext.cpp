@@ -6,6 +6,16 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+namespace
+{
+
+	const core::XHalf2 uv_00(0.f, 0.f);
+	const core::XHalf2 uv_10(1.f, 0.f);
+	const core::XHalf2 uv_01(0.f, 1.f);
+	const core::XHalf2 uv_11(1.f, 1.f);
+
+} // namespace
+
 
 IPrimativeContext::IPrimativeContext()
 {
@@ -246,10 +256,10 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 	pQuad[2].pos = bl;
 	pQuad[3].pos = br;
 
-	pQuad[0].st = core::XHalf2(0.f, 0.f);
-	pQuad[1].st = core::XHalf2(1.f, 0.f);
-	pQuad[2].st = core::XHalf2(0.f, 1.f);
-	pQuad[3].st = core::XHalf2(1.f, 1.f);
+	pQuad[0].st = uv_00;
+	pQuad[1].st = uv_10;
+	pQuad[2].st = uv_01;
+	pQuad[3].st = uv_11;
 
 	for (uint32 i = 0; i < 4; ++i)
 	{
