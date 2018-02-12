@@ -72,12 +72,26 @@ X_INLINE ColorT<T>::ColorT(T r, T g, T b) :
 {
 }
 
-
 template<typename T>
-X_INLINE ColorT<T>::ColorT(const Vec4f& src) : 
-	r(src.x), g(src.y), b(src.z), a(src.w)
+template<typename FromT>
+X_INLINE ColorT<T>::ColorT(const Vec3<FromT>& src, FromT alpha) :
+	r(CHANTRAIT<T>::convert(src.x)),
+	g(CHANTRAIT<T>::convert(src.y)), 
+	b(CHANTRAIT<T>::convert(src.z)), 
+	a(CHANTRAIT<T>::convert(alpha))
 {
 }
+
+template<typename T>
+template<typename FromT>
+X_INLINE ColorT<T>::ColorT(const Vec4<FromT>& src) : 
+	r(CHANTRAIT<T>::convert(src.x)), 
+	g(CHANTRAIT<T>::convert(src.y)), 
+	b(CHANTRAIT<T>::convert(src.z)), 
+	a(CHANTRAIT<T>::convert(src.w))
+{
+}
+
 
 
 

@@ -25,7 +25,10 @@ struct ColorT
 	// Can use it like rgb
 	X_INLINE ColorT(T r, T g, T b);
 
-	X_INLINE explicit ColorT(const Vec4f& src);
+	template<typename FromT>
+	X_INLINE explicit ColorT(const Vec3<FromT>& src, FromT alpha);
+	template<typename FromT>
+	X_INLINE explicit ColorT(const Vec4<FromT>& src);
 
 	X_INLINE void set(T _r, T _g, T _b, T _a);
 	X_INLINE void set(const ColorT<T>& rhs);
