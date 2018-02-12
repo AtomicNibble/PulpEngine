@@ -75,8 +75,8 @@ public:
 	void drawLineSS(const Vec2f& vPos1, Color8u color1,
 		const Vec2f& vPos2, Color8u vColor2);
 
-	X_INLINE void drawQuadImage(float x, float y, float width, float height, Material* pMaterial, Color8u col);
-	X_INLINE void drawQuadImage(const Rectf& rect, Material* pMaterial, Color8u col);
+	X_INLINE void drawQuad(float x, float y, float width, float height, Material* pMaterial, Color8u col);
+	X_INLINE void drawQuad(const Rectf& rect, Material* pMaterial, Color8u col);
 
 	// for 2d, z is depth not position
 	void drawQuad(float x, float y, float z, float width, float height, Color8u col);

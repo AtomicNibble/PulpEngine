@@ -23,13 +23,13 @@ X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float
 	drawRectSS(rect, col);
 }
 
-X_INLINE void IPrimativeContext::drawQuadImage(float xpos, float ypos,
+X_INLINE void IPrimativeContext::drawQuad(float xpos, float ypos,
 	float w, float h, Material* pMaterial, Color8u col)
 {
 	drawImage(xpos, ypos, 0.f, w, h, pMaterial, 0, 1, 1, 0, col);
 }
 
-X_INLINE void IPrimativeContext::drawQuadImage(const Rectf& rect, Material* pMaterial,
+X_INLINE void IPrimativeContext::drawQuad(const Rectf& rect, Material* pMaterial,
 	Color8u col)
 {
 	drawImage(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(),
