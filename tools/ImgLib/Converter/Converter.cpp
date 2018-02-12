@@ -473,7 +473,7 @@ namespace Converter
 			// if we brg8 need to switch channels.
 			if (srcImg_.getFormat() == Texturefmt::B8G8R8A8)
 			{
-				if (Util::bgrToRgb(srcImg_, swapArena_)) {
+				if (!Util::bgrToRgb(srcImg_, swapArena_)) {
 					X_ERROR("Img", "Failed to convert to bgr to rgb");
 					return false;
 				}
