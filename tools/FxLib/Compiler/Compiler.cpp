@@ -143,17 +143,17 @@ namespace fx
 									{
 										"time": 0,
 										"rgb": [
-											0.1,
+											0,
 											1,
-											0
+											1
 										]
 									},
 									{
 										"time": 1,
 										"rgb": [
-											1,
 											0,
-											1
+											1,
+											0
 										]
 									}
 								],
@@ -161,17 +161,13 @@ namespace fx
 									{
 										"time": 0,
 										"rgb": [
-											1,
-											0,
-											0
+											0.752941, 0.752941, 0.752941
 										]
 									},
 									{
 										"time": 1,
 										"rgb": [
-											1,
-											1,
-											1
+											0.666667, 0.647059, 0.607843
 										]
 									}
 								]
@@ -183,22 +179,34 @@ namespace fx
 								[
 									{
 										"time": 0,
-										"val": 0.5
+										"val": 1
+									},
+									{
+										"time": 0.09,
+										"val": 0.57
+									},
+									{
+										"time": 0.41,
+										"val": 0.2
+									},
+									{
+										"time": 0.71,
+										"val": 0.028
 									},
 									{
 										"time": 1,
-										"val": 1
+										"val": 0
 									}
 								]
 							]
 						},
 						"sizeGraph" : {
-							"scale" : 1,							
+							"scale" : 15,							
 							"graphs": [
 								[
 									{
 										"time": 0,
-										"val": 0.5
+										"val": 0.227273
 									},
 									{
 										"time": 1,
@@ -208,7 +216,7 @@ namespace fx
 							]
 						},
 						"scaleGraph" : {
-							"scale" : 1,							
+							"scale" : 15,							
 							"graphs": [
 								[
 									{
@@ -223,16 +231,16 @@ namespace fx
 							]
 						},
 						"rotGraph" : {
-							"scale" : 1,							
+							"scale" : 0,							
 							"graphs": [
 								[
 									{
 										"time": 0,
-										"val": 0.5
+										"val": 0
 									},
 									{
 										"time": 1,
-										"val": 1
+										"val": 0
 									}
 								]
 							]
@@ -247,7 +255,7 @@ namespace fx
 									},
 									{
 										"time": 1,
-										"val": 1
+										"val": -0.011
 									}
 								]
 							]
@@ -262,22 +270,22 @@ namespace fx
 									},
 									{
 										"time": 1,
-										"val": 1
+										"val": 0.5
 									}
 								]
 							]
 						},
 						"vel0ZGraph" : {
-							"scale" : 1,							
+							"scale" : 50,							
 							"graphs": [
 								[
 									{
 										"time": 0,
-										"val": 0.5
+										"val": 0
 									},
 									{
 										"time": 1,
-										"val": 1
+										"val": 0.5
 									}
 								]
 							]
@@ -398,6 +406,7 @@ namespace fx
 					stage.materials.emplace_back(core::string(m.GetString(), m.GetStringLength()));
 				}
 			}
+
 
 			stage.interval = s["interval"].GetInt();
 			stage.loopCount = s["loopCount"].GetInt();
