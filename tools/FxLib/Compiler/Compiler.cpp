@@ -509,6 +509,7 @@ namespace fx
 
 			graphOut.numPoints = safe_static_cast<decltype(graphOut.numPoints)>(points.size());
 			graphOut.timeStart = safe_static_cast<IndexOffset>(indexes.size());
+			graphOut.scaleIdx = safe_static_cast<IndexType>(uniqueFloat(srcGraph.scale));
 
 			for (auto p : points)
 			{

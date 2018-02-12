@@ -66,6 +66,7 @@ namespace fx
 		uint8_t numPoints;
 		IndexOffset timeStart;		// 0-1 times
 		IndexOffset valueStart;		// values
+		IndexOffset scaleIdx;		// 
 	};
 
 	static_assert(std::numeric_limits<decltype(Graph::numPoints)>::max() >= EFFECT_GRAPH_MAX_POINTS, "Can't represent max points");
