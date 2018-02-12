@@ -33,6 +33,15 @@ namespace random
 		const uint32_t randomNumber = rand();
 		return (static_cast<float>(randomNumber) * range * MWC_ONE_BY_MAX_UINT32) + minValue;
 	}
+
+	X_INLINE float MultiplyWithCarry::randRange(float maxValue)
+	{
+		const float MWC_ONE_BY_MAX_UINT32 = 1.f / UINT32_MAX;
+
+		X_ASSERT(maxValue > 0.f, "Maximum value must be greather than zero.")(maxValue);
+		const uint32_t randomNumber = rand();
+		return (static_cast<float>(randomNumber) * maxValue * MWC_ONE_BY_MAX_UINT32);
+	}
 }
 
 X_NAMESPACE_END

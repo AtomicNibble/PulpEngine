@@ -20,6 +20,7 @@ namespace random
 		X_INLINE size_t randIndex(size_t size);
 		X_INLINE uint32_t randRange(uint32_t minValue, uint32_t maxValue);
 		X_INLINE float randRange(float minValue, float maxValue);
+		X_INLINE float randRange(float maxValue);
 
 	private:
 		uint32_t z_;

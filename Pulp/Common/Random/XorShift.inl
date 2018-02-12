@@ -37,6 +37,16 @@ namespace random
 		return (static_cast<float>(randomNumber) * range * XOR_SHIFT_ONE_BY_MAX_UINT32) + minValue;
 	}
 
+	X_INLINE float XorShift::randRange(float maxValue)
+	{
+		const float XOR_SHIFT_ONE_BY_MAX_UINT32 = 1.0f / std::numeric_limits<uint32_t>::max();
+
+		X_ASSERT(maxValue > 0.f, "Maximum value must be greather than zero.")(maxValue);
+		const uint32_t randomNumber = rand();
+		return (static_cast<float>(randomNumber) * maxValue* XOR_SHIFT_ONE_BY_MAX_UINT32);
+	}
+
+
 	// ----------------------------------------
 
 	X_INLINE uint64_t XorShift128::rand(void)
@@ -76,6 +86,15 @@ namespace random
 		const float range = (maxValue - minValue) + 1.f;
 		const uint64_t randomNumber = rand();
 		return (static_cast<float>(randomNumber) * range * XOR_SHIFT_ONE_BY_MAX) + minValue;
+	}
+
+	X_INLINE float XorShift128::randRange(float maxValue)
+	{
+		const float XOR_SHIFT_ONE_BY_MAX_UINT32 = 1.0f / std::numeric_limits<uint64_t>::max();
+
+		X_ASSERT(maxValue > 0.f, "Maximum value must be greather than zero.")(maxValue);
+		const uint64_t randomNumber = rand();
+		return (static_cast<float>(randomNumber) * maxValue* XOR_SHIFT_ONE_BY_MAX_UINT32);
 	}
 
 }

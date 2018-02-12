@@ -38,6 +38,12 @@ TEST(Random, Shift) {
 		const float32_t random = shift.randRange(-500.f, 1000.f);
 		EXPECT_TRUE(random >= -500.f && random <= 1000.f);
 	}
+
+	for (uint i = 0; i<1000; ++i)
+	{
+		const float32_t random = shift.randRange(1000.f);
+		EXPECT_TRUE(random >= 0.f && random <= 1000.f);
+	}
 }
 
 TEST(Random, Shift128) {
@@ -68,6 +74,12 @@ TEST(Random, Shift128) {
 		const float32_t random = shift.randRange(-500.f, 1000.f);
 		EXPECT_TRUE(random >= -500.f && random <= 1000.f);
 	}
+
+	for (uint i = 0; i<1000; ++i)
+	{
+		const float32_t random = shift.randRange(1000.f);
+		EXPECT_TRUE(random >= 0.f && random <= 1000.f);
+	}
 }
 
 TEST(Random, Multiply) {
@@ -97,6 +109,12 @@ TEST(Random, Multiply) {
 	{
 		const float32_t random = mwc.randRange(-500.f, 1000.f);
 		EXPECT_TRUE(random >= -500.f && random < 1000.f);
+	}
+
+	for (uint i = 0; i<1000; ++i)
+	{
+		const float32_t random = mwc.randRange(1000.f);
+		EXPECT_TRUE(random >= 0.f && random <= 1000.f);
 	}
 }
 

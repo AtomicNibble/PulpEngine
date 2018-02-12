@@ -19,6 +19,7 @@ namespace random
 		X_INLINE size_t randIndex(size_t size);
 		X_INLINE uint32_t randRange(uint32_t minValue, uint32_t maxValue);
 		X_INLINE float randRange(float minValue, float maxValue);
+		X_INLINE float randRange(float maxValue);
 
 	private:
 		Vec4i state_;
@@ -36,6 +37,7 @@ namespace random
 		X_INLINE size_t randIndex(size_t size);
 		X_INLINE uint64_t randRange(uint64_t minValue, uint64_t maxValue);
 		X_INLINE float randRange(float minValue, float maxValue);
+		X_INLINE float randRange(float maxValue);
 
 	private:
 		uint64_t state_[2];
