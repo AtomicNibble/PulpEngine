@@ -237,14 +237,14 @@ void IPrimativeContext::drawQuad(float x, float y, float z, float width, float h
 }
 
 
-void IPrimativeContext::drawQuad3d(const Vec3f& pos0, const Vec3f& pos1, const Vec3f& pos2, const Vec3f& pos3, Color8u col)
+void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col)
 {
 	PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP);
 
-	pQuad[0].pos = pos0;
-	pQuad[1].pos = pos1;
-	pQuad[2].pos = pos2;
-	pQuad[3].pos = pos3;
+	pQuad[0].pos = tl;
+	pQuad[1].pos = tr;
+	pQuad[2].pos = bl;
+	pQuad[3].pos = br;
 
 	for (uint32 i = 0; i < 4; ++i)
 	{
