@@ -57,7 +57,7 @@ namespace fx
 	struct Range
 	{
 		float start;
-		float end;
+		float range;
 	};
 
 

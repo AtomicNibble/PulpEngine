@@ -119,23 +119,22 @@ namespace fx
 							"fx/test/raygun_ring"
 						],
 
-						"interval": 0,
-						"loopCount": 0,
+						"interval": 50,
+						"loopCount": 2,
 
 						"countStart": 0,
-						"countEnd": 0,
-						"lifeStart": 0,
-						"lifeEnd": 0,
+						"countRange": 0,
+						"lifeStart": 300,
+						"lifeRange": 200,
 						"delayStart": 0,
-						"delayEnd": 0,
+						"delayRange": 0,
 					
-
 						"spawnOrgXStart" : 0,
-						"spawnOrgXEnd" : 0,
+						"spawnOrgXRange" : 0,
 						"spawnOrgYStart" : 0,
-						"spawnOrgYEnd" : 0,
-						"spawnOrgZStart" : 0,
-						"spawnOrgZEnd" : 0,
+						"spawnOrgYRange" : 0,
+						"spawnOrgZStart" : 10,
+						"spawnOrgZRange" : 12,
 
 						"colorGraph" : {
 							"scale" : 1,							
@@ -406,23 +405,23 @@ namespace fx
 			// need to basically parse a fuck ton of shit :D
 			for (auto& r : ranges)
 			{
-				core::StackString<128> start, end;
+				core::StackString<128> start, range;
 
 				start.setFmt("%sStart", r.first);
-				end.setFmt("%sEnd", r.first);
+				range.setFmt("%sRange", r.first);
 
-				if (!s.HasMember(start.c_str()) || !s.HasMember(end.c_str())) {
-					X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), end.c_str());
+				if (!s.HasMember(start.c_str()) || !s.HasMember(range.c_str())) {
+					X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
 					return false;
 				}
 
-				if (!s[start.c_str()].IsNumber() || !s[end.c_str()].IsNumber()) {
-					X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", start.c_str(), end.c_str());
+				if (!s[start.c_str()].IsNumber() || !s[range.c_str()].IsNumber()) {
+					X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
 					return false;
 				}
 				
 				r.second.start = s[start.c_str()].GetFloat();
-				r.second.end = s[end.c_str()].GetFloat();
+				r.second.range = s[range.c_str()].GetFloat();
 			}
 
 			if (!parseGraph(s, "colorGraph", stage.color, [](core::json::Document::ValueType& v, ColGraphSet::Type& col) -> bool {
