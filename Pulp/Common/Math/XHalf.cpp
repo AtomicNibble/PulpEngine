@@ -11,97 +11,97 @@ namespace
 	X_DISABLE_WARNING(4189)
 
 	// Load immediate
-	static inline uint32_t _uint32_li(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_li(uint32_t a)
 	{
 		return (a);
 	}
 
 	// Decrement
-	static inline uint32_t _uint32_dec(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_dec(uint32_t a)
 	{
 		return (a - 1);
 	}
 
 	// Increment
-	static inline uint32_t _uint32_inc(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_inc(uint32_t a)
 	{
 		return (a + 1);
 	}
 
 	// Complement
-	static inline uint32_t _uint32_not(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_not(uint32_t a)
 	{
 		return (~a);
 	}
 
 	// Negate
-	static inline uint32_t _uint32_neg(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_neg(uint32_t a)
 	{
 		return (-a);
 	}
 
 	// Extend sign
-	static inline uint32_t _uint32_ext(uint32_t a)
+	constexpr X_INLINE uint32_t _uint32_ext(uint32_t a)
 	{
 		return (((int32_t)a) >> 31);
 	}
 
 	// And
-	static inline uint32_t _uint32_and(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_and(uint32_t a, uint32_t b)
 	{
 		return (a & b);
 	}
 
 	// Exclusive Or
-	static inline uint32_t _uint32_xor(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_xor(uint32_t a, uint32_t b)
 	{
 		return (a ^ b);
 	}
 
 	// And with Complement
-	static inline uint32_t _uint32_andc(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_andc(uint32_t a, uint32_t b)
 	{
 		return (a & ~b);
 	}
 
 	// Or
-	static inline uint32_t _uint32_or(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_or(uint32_t a, uint32_t b)
 	{
 		return (a | b);
 	}
 
 	// Shift Right Logical
-	static inline uint32_t _uint32_srl(uint32_t a, int sa)
+	constexpr X_INLINE uint32_t _uint32_srl(uint32_t a, int sa)
 	{
 		return (a >> sa);
 	}
 
 	// Shift Left Logical
-	static inline uint32_t _uint32_sll(uint32_t a, int sa)
+	constexpr X_INLINE uint32_t _uint32_sll(uint32_t a, int sa)
 	{
 		return (a << sa);
 	}
 
 	// Add
-	static inline uint32_t _uint32_add(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_add(uint32_t a, uint32_t b)
 	{
 		return (a + b);
 	}
 
 	// Subtract
-	static inline uint32_t _uint32_sub(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_sub(uint32_t a, uint32_t b)
 	{
 		return (a - b);
 	}
 
 	// Multiply
-	static inline uint32_t _uint32_mul(uint32_t a, uint32_t b)
+	constexpr X_INLINE uint32_t _uint32_mul(uint32_t a, uint32_t b)
 	{
 		return (a * b);
 	}
 
 	// Select on Sign bit
-	static inline uint32_t _uint32_sels(uint32_t test, uint32_t a, uint32_t b)
+	static X_INLINE uint32_t _uint32_sels(uint32_t test, uint32_t a, uint32_t b)
 	{
 		const uint32_t mask = _uint32_ext(test);
 		const uint32_t sel_a = _uint32_and(a, mask);
@@ -112,7 +112,7 @@ namespace
 	}
 
 	// Select Bits on mask
-	static inline uint32_t _uint32_selb(uint32_t mask, uint32_t a, uint32_t b)
+	static X_INLINE uint32_t _uint32_selb(uint32_t mask, uint32_t a, uint32_t b)
 	{
 		const uint32_t sel_a = _uint32_and(a, mask);
 		const uint32_t sel_b = _uint32_andc(b, mask);
@@ -122,104 +122,104 @@ namespace
 	}
 
 	// Load Immediate
-	static inline uint16_t _uint16_li(uint16_t a)
+	constexpr X_INLINE uint16_t _uint16_li(uint16_t a)
 	{
 		return (a);
 	}
 
 	// Extend sign
-	static inline uint16_t _uint16_ext(uint16_t a)
+	constexpr X_INLINE uint16_t _uint16_ext(uint16_t a)
 	{
 		return (((int16_t)a) >> 15);
 	}
 
 	// Negate
-	static inline uint16_t _uint16_neg(uint16_t a)
+	constexpr X_INLINE uint16_t _uint16_neg(uint16_t a)
 	{
 		return (-a);
 	}
 
 	// Complement
-	static inline uint16_t _uint16_not(uint16_t a)
+	constexpr X_INLINE uint16_t _uint16_not(uint16_t a)
 	{
 		return (~a);
 	}
 
 	// Decrement
-	static inline uint16_t _uint16_dec(uint16_t a)
+	constexpr X_INLINE uint16_t _uint16_dec(uint16_t a)
 	{
 		return (a - 1);
 	}
 
 	// Shift Left Logical
-	static inline uint16_t _uint16_sll(uint16_t a, int sa)
+	constexpr X_INLINE uint16_t _uint16_sll(uint16_t a, int sa)
 	{
 		return (a << sa);
 	}
 
 	// Shift Right Logical
-	static inline uint16_t _uint16_srl(uint16_t a, int sa)
+	constexpr X_INLINE uint16_t _uint16_srl(uint16_t a, int sa)
 	{
 		return (a >> sa);
 	}
 
 	// Add
-	static inline uint16_t _uint16_add(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_add(uint16_t a, uint16_t b)
 	{
 		return (a + b);
 	}
 
 	// Subtract
-	static inline uint16_t _uint16_sub(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_sub(uint16_t a, uint16_t b)
 	{
 		return (a - b);
 	}
 
 	// And
-	static inline uint16_t _uint16_and(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_and(uint16_t a, uint16_t b)
 	{
 		return (a & b);
 	}
 
 	// Or
-	static inline uint16_t _uint16_or(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_or(uint16_t a, uint16_t b)
 	{
 		return (a | b);
 	}
 
 	// Exclusive Or
-	static inline uint16_t _uint16_xor(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_xor(uint16_t a, uint16_t b)
 	{
 		return (a ^ b);
 	}
 
 	// And with Complement
-	static inline uint16_t _uint16_andc(uint16_t a, uint16_t b)
+	constexpr X_INLINE uint16_t _uint16_andc(uint16_t a, uint16_t b)
 	{
 		return (a & ~b);
 	}
 
 	// And then Shift Right Logical
-	static inline uint16_t _uint16_andsrl(uint16_t a, uint16_t b, int sa)
+	constexpr X_INLINE uint16_t _uint16_andsrl(uint16_t a, uint16_t b, int sa)
 	{
 		return ((a & b) >> sa);
 	}
 
 	// Shift Right Logical then Mask
-	static inline uint16_t _uint16_srlm(uint16_t a, int sa, uint16_t mask)
+	constexpr X_INLINE uint16_t _uint16_srlm(uint16_t a, int sa, uint16_t mask)
 	{
 		return ((a >> sa) & mask);
 	}
 
 	// Add then Mask
-	static inline uint16_t _uint16_addm(uint16_t a, uint16_t b, uint16_t mask)
+	constexpr X_INLINE uint16_t _uint16_addm(uint16_t a, uint16_t b, uint16_t mask)
 	{
 		return ((a + b) & mask);
 	}
 
 
 	// Select on Sign bit
-	static inline uint16_t _uint16_sels(uint16_t test, uint16_t a, uint16_t b)
+	static X_INLINE uint16_t _uint16_sels(uint16_t test, uint16_t a, uint16_t b)
 	{
 		const uint16_t mask = _uint16_ext(test);
 		const uint16_t sel_a = _uint16_and(a, mask);
@@ -230,7 +230,7 @@ namespace
 	}
 
 	// Count Leading Zeros
-	static inline uint32_t _uint32_cntlz(uint32_t x)
+	static X_INLINE uint32_t _uint32_cntlz(uint32_t x)
 	{
 #ifdef __GNUC__
 		/* NOTE: __builtin_clz is undefined for x == 0 */
@@ -272,7 +272,7 @@ namespace
 	}
 
 	// Count Leading Zeros
-	static inline uint16_t _uint16_cntlz(uint16_t x)
+	static X_INLINE uint16_t _uint16_cntlz(uint16_t x)
 	{
 #ifdef __GNUC__
 		uint16_t nlz32 = (uint16_t)_uint32_cntlz((uint32_t)x);
@@ -301,8 +301,7 @@ namespace
 #endif
 	}
 
-	uint16_t
-		half_from_float(uint32_t f)
+	uint16_t half_from_float(uint32_t f)
 	{
 		const uint32_t one = _uint32_li(0x00000001);
 		const uint32_t f_s_mask = _uint32_li(0x80000000);
@@ -366,8 +365,7 @@ namespace
 		return (uint16_t)(h_result);
 	}
 
-	uint32_t
-		half_to_float(uint16_t h)
+	uint32_t half_to_float(uint16_t h)
 	{
 		const uint32_t h_e_mask = _uint32_li(0x00007c00);
 		const uint32_t h_m_mask = _uint32_li(0x000003ff);
@@ -441,8 +439,7 @@ namespace
 	//     union FLOAT_32 fz = { .f32 = fx.f32 + fy.f32    };
 	//     uint16_t       z  = float_to_half( fz );
 	//
-	uint16_t
-		half_add(uint16_t x, uint16_t y)
+	uint16_t half_add(uint16_t x, uint16_t y)
 	{
 		const uint16_t one = _uint16_li(0x0001);
 		const uint16_t msb_to_lsb_sa = _uint16_li(0x000f);
@@ -574,8 +571,7 @@ namespace
 	//     union FLOAT_32 fz = { .f32 = fx.f32 * fy.f32    };
 	//     uint16_t       z  = float_to_half( fz );
 	//
-	uint16_t
-		half_mul(uint16_t x, uint16_t y)
+	uint16_t half_mul(uint16_t x, uint16_t y)
 	{
 		const uint32_t one = _uint32_li(0x00000001);
 		const uint32_t h_s_mask = _uint32_li(0x00008000);
