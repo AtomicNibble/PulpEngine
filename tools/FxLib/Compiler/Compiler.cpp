@@ -115,6 +115,10 @@ namespace fx
 						"type" : "OrientedSprite",
 						"flags" : "",
 
+						"materials" : [
+							"fx/test/raygun_ring"
+						],
+
 						"interval": 0,
 						"loopCount": 0,
 
@@ -326,6 +330,9 @@ namespace fx
 			if (!checkMember(s, "flags", core::json::kStringType)) {
 				return false;
 			}
+			if (!checkMember(s, "materials", core::json::kArrayType)) {
+				return false;
+			}
 			if (!checkMember(s, "interval", core::json::kNumberType)) {
 				return false;
 			}
@@ -380,6 +387,18 @@ namespace fx
 				}
 			}
 
+			{
+				auto& matsJson = s["materials"];
+
+				for (auto& m : matsJson.GetArray())
+				{
+					if (!m.IsString()) {
+						return false;
+					}
+
+					stage.materials.emplace_back(core::string(m.GetString(), m.GetStringLength()));
+				}
+			}
 
 			stage.interval = s["interval"].GetInt();
 			stage.loopCount = s["loopCount"].GetInt();
@@ -509,7 +528,7 @@ namespace fx
 			return true;
 		};
 
-
+		size_t matOffset = 0;
 		for (const auto& stage : stages_)
 		{
 			Stage compiledStage = stage; // slice in the already set fields.
@@ -522,6 +541,10 @@ namespace fx
 			processGraph(compiledStage.vel0Y, stage.vel0Y);
 			processGraph(compiledStage.vel0Z, stage.vel0Z);
 
+			compiledStage.materialStrOffset = safe_static_cast<int32_t>(matOffset);
+
+			matOffset += core::strUtil::StringBytesIncNull(stage.materials.front());
+
 			bs.write(compiledStage);
 		}
 
@@ -529,6 +552,14 @@ namespace fx
 		bs.write(indexes.data(), indexes.size());
 		bs.write(fltPool.data(), fltPool.size());
 
+		// write strings at end.
+		for (const auto& stage : stages_)
+		{
+			for (auto& m : stage.materials)
+			{
+				bs.write(m.c_str(), core::strUtil::StringBytesIncNull(m));
+			}
+		}
 
 		EffectHdr hdr;
 		hdr.fourCC = EFFECT_FOURCC;

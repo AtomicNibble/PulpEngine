@@ -75,8 +75,9 @@ namespace fx
 		StageType::Enum type;
 		StageFlags flags;
 
-		int32_t interval;
-		int32_t loopCount;
+		int32_t materialStrOffset;
+		int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
+		int32_t loopCount;	// how many times we spawn before the end.
 
 		Range count;
 		Range life;

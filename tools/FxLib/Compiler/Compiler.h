@@ -52,7 +52,10 @@ namespace fx
 
 	struct StageBuilder : public Stage
 	{
+		typedef core::Array<core::string> StrArr;
+
 		StageBuilder(core::MemoryArenaBase* arena) :
+			materials(arena),
 			color(arena),
 			alpha(arena),
 			size(arena),
@@ -63,6 +66,7 @@ namespace fx
 			vel0Z(arena)
 		{}
 
+		StrArr materials;
 
 		ColGraphSet color;
 		FloatGraphSet alpha;
