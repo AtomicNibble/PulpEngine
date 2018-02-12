@@ -160,6 +160,8 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
 	// Create the D3D graphics device
 	{
+		X_PROFILE_NO_HISTORY_BEGIN("CreateDevice", core::profiler::SubSys::RENDER);
+
 		Microsoft::WRL::ComPtr<IDXGIAdapter1> adapter;
 
 		featureLvl_ = D3D_FEATURE_LEVEL_11_0;
