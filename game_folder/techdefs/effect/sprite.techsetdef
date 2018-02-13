@@ -1,31 +1,8 @@
-#include <states>
-
-Sampler( "colorSampler" )
-{
-    repeat = <tileColor>
-    filter = <filterColor>
-
-    ass = AssProps()
-    {
-        cat  = "Color"
-    }
-}
-
-Texture( "colorMap" )
-{
-    image = Image( <mapColor, "default/white"> )
-
-    ass = AssProps()
-    {
-        cat  = "Color"
-        title  = "Color Map"
-    }
-}
+#include <effect_base>
 
 
 Technique( "unlit" )
 {
-//	state = State() : "blend + depth"
 	state = State() : "blend + depth + nocull"
 	{
 		primitiveType = "tristrip"

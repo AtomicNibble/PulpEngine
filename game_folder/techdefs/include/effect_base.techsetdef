@@ -1,0 +1,45 @@
+#include <states>
+
+
+Sampler( "colorSampler" )
+{
+    repeat = <tileColor>
+    filter = <filterColor>
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+    }
+}
+
+Texture( "colorMap" )
+{
+    image = Image( <mapColor, "default/white"> )
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+        title  = "Color Map"
+    }
+}
+
+
+float1( "textureAtlasColumnCount" )
+{
+    x = <textureAtlasColumnCount>
+    ass = AssProps()
+    {
+        cat  = "Texture Atlas Settings"
+        title     = "Column Count"
+    }
+}
+
+float1( "textureAtlasRowCount" )
+{
+    x = <textureAtlasRowCount>
+    ass = AssProps()
+    {
+        cat  = "Texture Atlas Settings"
+        title     = "Row Count"
+    }
+}
