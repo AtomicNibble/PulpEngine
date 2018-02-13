@@ -27,12 +27,17 @@ namespace fx
 	auto checkMember = [](const auto& d, const char* pName, core::json::Type type) -> bool {
 
 		if (!d.HasMember(pName)) {
+			X_ERROR("Fx", "Missing param: \"%s\"", pName);
 			return false;
 		}
 
 		auto srcType = d[pName].GetType();
-
-		return srcType == type;
+		if (srcType == type) {
+			return true;
+		}
+		
+		X_ERROR("Fx", "Param \"%s\" has incorrect type", pName);
+		return false;
 	};
 
 	template<typename GraphSetT>
@@ -71,6 +76,7 @@ namespace fx
 		{
 			// each graph is a array of objects
 			if (!graph.IsArray()) {
+				X_ERROR("Fx", "Graph is not of type array");
 				return false;
 			}
 
@@ -79,6 +85,7 @@ namespace fx
 			for (auto& g : graph.GetArray())
 			{
 				if (!g.IsObject()) {
+					X_ERROR("Fx", "Graph member is not a object");
 					return false;
 				}
 
@@ -359,7 +366,7 @@ namespace fx
 			}
 		)";
 
-	//	str = test;
+		str = test;
 
 	
 		core::json::Document d;
@@ -377,7 +384,7 @@ namespace fx
 
 		auto& stages = d["stages"];
 		if (!stages.IsArray()) {
-
+			X_ERROR("Fx", "Stages is not a array. Type: %" PRIi32, stages.GetType());
 			return false;
 		}
 
@@ -475,6 +482,7 @@ namespace fx
 				for (auto& m : matsJson.GetArray())
 				{
 					if (!m.IsString()) {
+						X_ERROR("Fx", "material entry is not type string");
 						return false;
 					}
 
