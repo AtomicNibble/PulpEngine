@@ -132,9 +132,17 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 					return false;
 				}
 
-				const char* pValue = d[vecPropName.c_str()].GetString();
+				auto& val = d[vecPropName.c_str()];
 
-				p.val[i] = core::strUtil::StringToBool(pValue);
+				if (val.GetType() == core::json::kStringType)
+				{
+					const char* pValue = val.GetString();
+					p.val[i] = core::strUtil::StringToFloat<float32_t>(pValue);
+				}
+				else
+				{
+					p.val[i] = val.GetFloat();
+				}
 			}
 
 		}
