@@ -162,6 +162,11 @@ void GenerateUI( asset& Asset )
         Asset.AddAssetRef( "codeTexture" + Digit, "img" ).SetVisible(false);
     }
 
+    // Atlas
+    {
+        Asset.AddInt( "textureAtlasRowCount", 1, 1, 512 ).SetTitle( "Row Count" ).SetToolTip( "Set the number of texture atlas rows" ).SetVisible(false);
+        Asset.AddInt( "textureAtlasColumnCount", 1, 1, 512 ).SetTitle( "Col Count" ).SetToolTip( "Set the number of texture atlas colums" ).SetVisible(false);
+    }
 
     // UV shizz
     {
