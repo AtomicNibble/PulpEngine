@@ -97,6 +97,8 @@ namespace fx
 		void draw(IPrimativeContext* pPrim);
 
 	private:
+		void updateElemForFraction(const Stage& stage, Elem& e, float fraction) const;
+
 		float fromRange(const Range& r) const;
 		float fromGraph(const Graph& r, float t) const;
 		Vec3f fromColorGraph(const Graph& r, float t) const;

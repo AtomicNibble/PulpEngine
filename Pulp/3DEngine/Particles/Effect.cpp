@@ -137,19 +137,7 @@ namespace fx
 
 				float fraction = (alive / e.lifeMs);
 
-				Vec3f vel;
-				vel.x = fromGraph(stage.vel0X[e.velGraph], fraction);
-				vel.y = fromGraph(stage.vel0Y[e.velGraph], fraction);
-				vel.z = fromGraph(stage.vel0Z[e.velGraph], fraction);
-
-				float size = fromGraph(stage.size[e.sizeGraph], fraction);
-				
-				Vec3f col = fromColorGraph(stage.color[e.colGraph], fraction);
-				float alpha = fromGraph(stage.alpha[e.alphaGraph], fraction);
-
-				e.col = Color8u(col, alpha);
-				e.size = size;
-				e.dir = vel;
+				updateElemForFraction(stage, e, fraction);
 			}
 
 			// finished.
@@ -207,28 +195,17 @@ namespace fx
 
 				float life = fromRange(stage.life);
 
-				Vec3f vel;
-				vel.x = fromGraph(stage.vel0X[velGraph], 0.f);
-				vel.y = fromGraph(stage.vel0Y[velGraph], 0.f);
-				vel.z = fromGraph(stage.vel0Z[velGraph], 0.f);
-
-				float size = fromGraph(stage.size[sizeGraph], 0.f);
-
-				Vec3f col = fromColorGraph(stage.color[colGraph], 0.f);
-				float alpha = fromGraph(stage.alpha[alphaGraph], 0.f);
-
 				Elem e;
 				e.colGraph = colGraph;
 				e.alphaGraph = alphaGraph;
 				e.sizeGraph = sizeGraph;
 				e.velGraph = velGraph;
-
 				e.pos = pos;
-				e.dir = vel;
-				e.size = size;
-				e.col = Colorf(col, alpha);
 				e.spawnTime = elapsed_;
 				e.lifeMs = life;
+
+				updateElemForFraction(stage, e, 0.f);
+
 				state.elems.push_back(e);
 			}
 			else
@@ -280,6 +257,23 @@ namespace fx
 				pPrim->drawQuad(tl, tr, bl, br, s.pMaterial, e.col);
 			}
 		}
+	}
+
+	void Emitter::updateElemForFraction(const Stage& stage, Elem& e, float fraction) const
+	{
+		Vec3f vel;
+		vel.x = fromGraph(stage.vel0X[e.velGraph], fraction);
+		vel.y = fromGraph(stage.vel0Y[e.velGraph], fraction);
+		vel.z = fromGraph(stage.vel0Z[e.velGraph], fraction);
+
+		float size = fromGraph(stage.size[e.sizeGraph], fraction);
+
+		Vec3f col = fromColorGraph(stage.color[e.colGraph], fraction);
+		float alpha = fromGraph(stage.alpha[e.alphaGraph], fraction);
+
+		e.dir = vel;
+		e.size = size;
+		e.col = Color8u(col, alpha);
 	}
 
 
