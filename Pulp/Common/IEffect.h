@@ -75,12 +75,23 @@ namespace fx
 
 	static_assert(std::numeric_limits<decltype(Graph::numPoints)>::max() >= EFFECT_GRAPH_MAX_POINTS, "Can't represent max points");
 
+	// for animated sprites.
+	// the number of frames is materials atlas row * col count.
+	struct Sequence
+	{
+		int32_t startFrame; // 0 - index zero, index into atlas, negative is random
+		int32_t fps;		// 0 - never change, frame rate, negative is sync to particle lifetime.
+		int32_t loop;		// 0 - forever
+	};	
+
 	struct Stage
 	{
 		typedef std::array<Graph, 2> GraphArr;
 
 		StageType::Enum type;
 		StageFlags flags;
+
+		Sequence sequence;
 
 		int32_t materialStrOffset;
 		int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
