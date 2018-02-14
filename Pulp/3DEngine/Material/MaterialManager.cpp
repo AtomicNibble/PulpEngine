@@ -402,6 +402,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
 		tex.pTexture = pTexture;
 	}
 
+	pMaterial->assignProps(hdr);
 	pMaterial->setTechDefState(pTechDefState);
 	pMaterial->setParams(std::move(params));
 	pMaterial->setSamplers(std::move(samplers));
