@@ -169,6 +169,8 @@ public:
 	X_INLINE MaterialPolygonOffset::Enum getPolyOffsetType(void) const;
 	X_INLINE MaterialMountType::Enum getMountType(void) const;
 	X_INLINE MaterialCat::Enum getCat(void) const;
+	X_INLINE Vec2<int16_t> getTiling(void) const;
+	X_INLINE Vec2<int16_t> getAtlas(void) const;
 	X_INLINE TechDefState* getTechDefState(void) const;
 
 	X_INLINE const ParamArr& getParams(void) const;

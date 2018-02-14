@@ -204,6 +204,17 @@ X_INLINE MaterialCat::Enum Material::getCat(void) const
 	return cat_;
 }
 
+X_INLINE Vec2<int16_t> Material::getTiling(void) const 
+{
+	return tiling_;
+}
+
+X_INLINE Vec2<int16_t> Material::getAtlas(void) const
+{
+	return atlas_;
+}
+
+
 X_INLINE TechDefState* Material::getTechDefState(void) const
 {
 	return pTechDefState_;
