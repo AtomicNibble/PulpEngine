@@ -197,6 +197,7 @@ protected:
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling_;
+	Vec2<int16_t> atlas_;
 
 	TechDefState* pTechDefState_;
 

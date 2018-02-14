@@ -18,6 +18,8 @@ void Material::assignProps(const Material& oth)
 	status_ = oth.status_;
 	
 	tiling_ = oth.tiling_;
+	atlas_ = oth.atlas_;
+
 	pTechDefState_ = oth.pTechDefState_;
 	techs_ = oth.techs_;
 	textures_ = oth.textures_;
@@ -27,13 +29,15 @@ void Material::assignProps(const MaterialHeader& hdr)
 {
 	X_ASSERT(hdr.isValid(), "Header must be valid")(hdr.isValid());
 
-	cat_ = hdr.cat;
-	usage_ = hdr.usage;
+	flags_ = hdr.flags;
 	surfaceType_ = hdr.surfaceType;
 	coverage_ = hdr.coverage;
 	mountType_ = hdr.mountType;
-	flags_ = hdr.flags;
+	usage_ = hdr.usage;
+	cat_ = hdr.cat;
+	
 	tiling_ = hdr.tiling;
+	atlas_ = hdr.atlas;
 }
 
 
