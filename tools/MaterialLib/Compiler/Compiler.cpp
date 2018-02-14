@@ -77,8 +77,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	coverage_ = MaterialCoverage::OPAQUE;
 	mountType_ = Util::MatMountTypeFromStr(pMountType);
 
-#if 1
-
 	if (cat_ == MaterialCat::UNKNOWN) {
 		return false;
 	}
@@ -277,8 +275,6 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			sampler.texRepeat = Util::TexRepeatFromStr(pValue);
 		}
 	}
-
-#endif
 
 	// tilling shit.
 	// how many goats for a given N pickles
