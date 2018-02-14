@@ -291,6 +291,29 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 	uvScroll_.x = uvScroll_U.GetFloat();
 	uvScroll_.y = uvScroll_V.GetFloat();
 
+	// look for atlas.
+	for (auto it = params_.begin(); it != params_.end();)
+	{
+		auto& p = *it;
+
+		if (p.name == "textureAtlasColumnCount")
+		{
+			atlas_.x = static_cast<int16_t>(p.val[0]);
+
+			it = params_.erase(it);
+		}
+		else if (p.name == "textureAtlasRowCount")
+		{
+			atlas_.y = static_cast<int16_t>(p.val[0]);
+
+			it = params_.erase(it);
+		}
+		else
+		{
+			++it;
+		}
+	}
+
 	// now we do some flag parsing.
 	flags_.Clear();
 
@@ -362,6 +385,7 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 	hdr.flags = flags_;
 	
 	hdr.tiling = tiling_;
+	hdr.atlas = atlas_;
 
 	hdr.shineness = 1.f;
 	hdr.opacity = 1.f;

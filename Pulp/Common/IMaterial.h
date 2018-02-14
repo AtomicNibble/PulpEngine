@@ -251,6 +251,7 @@ struct MaterialHeader
 	// used for custom texture repeat.
 	// if AUTO_TILING the textures dim's are used.
 	Vec2<int16_t> tiling;
+	Vec2<int16_t> atlas;
 
 	// 12
 	Color8u diffuse;
@@ -300,7 +301,7 @@ X_ENSURE_SIZE(MaterialUsage::Enum, 1);
 X_ENSURE_SIZE(MaterialMountType::Enum, 1);
 
 
-X_ENSURE_SIZE(MaterialHeader, 44);
+X_ENSURE_SIZE(MaterialHeader, 48);
 X_ENSURE_SIZE(MaterialTextureHdr, 4);
 
 class Material;

@@ -72,6 +72,7 @@ private:
 	render::StateDesc stateDesc_;
 
 	Vec2<int16_t> tiling_;
+	Vec2<int16_t> atlas_;
 	Vec2f uvScroll_;
 
 	core::string techType_;
