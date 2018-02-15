@@ -166,11 +166,15 @@ namespace fx
 						atlasIdx = static_cast<int32_t>(fps * aliveSec); // 1 second == fps.
 					}
 
-					// offset from starting index.
-					atlasIdx += e.atlasIdx;
-					atlasIdx %= atlasCount;
+					if (e.atlasIdx == atlasIdx) {
+						continue;
+					}
 
-					uvForIndex(e.uv, atlas, atlasIdx);
+					e.atlasIdx = atlasIdx;
+
+					auto idx = e.atlasBaseIdx + (atlasIdx % atlasCount);
+
+					uvForIndex(e.uv, atlas, idx);
 				}
 			}
 
@@ -234,6 +238,7 @@ namespace fx
 
 				Elem e;
 				e.uv = Rectf(0.f, 0.f, 1.f, 1.f);
+				e.atlasIdx = 0;
 
 				if (atlas.x || atlas.y)
 				{
@@ -246,7 +251,7 @@ namespace fx
 					else
 					{
 						// user might of changed material so atlasIdx is no longer in range.
-						if (atlasIdx >= count - 1) {
+						if (atlasIdx >= count) {
 							X_WARNING("Fx", "Atlast index was out of range");
 							atlasIdx = count - 1;
 						}
@@ -254,7 +259,7 @@ namespace fx
 
 					uvForIndex(e.uv, atlas, atlasIdx);
 
-					e.atlasIdx = atlasIdx;
+					e.atlasBaseIdx = atlasIdx;
 				}
 				
 				e.colGraph = colGraph;

@@ -63,6 +63,7 @@ namespace fx
 			Color8u col;
 
 			Rectf uv;
+			int32_t atlasBaseIdx;
 			int32_t atlasIdx;
 			int32_t loop;
 
