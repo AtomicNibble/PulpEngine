@@ -313,10 +313,10 @@ struct IMaterialManager : public core::IAssetLoader
 	virtual ~IMaterialManager(){}
 
 	// returns null if not found, ref count unaffected
-	virtual Material* findMaterial(const char* MtlName) const X_ABSTRACT;
+	virtual Material* findMaterial(const char* pMtlName) const X_ABSTRACT;
 	// if material is found adds ref and returns, if not try's to load the material file.
 	// if file can't be loaded or error it return the default material.
-	virtual Material* loadMaterial(const char* MtlName) X_ABSTRACT;
+	virtual Material* loadMaterial(const char* pMtlName) X_ABSTRACT;
 
 	virtual MaterialTech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
 		PermatationFlags permFlags = PermatationFlags()) X_ABSTRACT;
