@@ -12,6 +12,8 @@
 #include <IFrameData.h>
 #include <I3DEngine.h>
 #include <IWorld3D.h>
+#include <IAnimManager.h>
+#include <IEffect.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -32,12 +34,14 @@ namespace entity
 		dtMesh_(arena),
 		dtSoundObj_(arena),
 		dtRotator_(arena),
-		dtMover_(arena)
+		dtMover_(arena),
+		dtEmitter_(arena)
 	{
 		pPhysics_ = nullptr;
 		pPhysScene_ = nullptr;
 		p3DWorld_ = nullptr;
 		pModelManager_ = nullptr;
+		pEffectManager_ = nullptr;
 	}
 
 
@@ -47,8 +51,9 @@ namespace entity
 		pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
 		p3DWorld_ = X_ASSERT_NOT_NULL(p3DWorld);
 		pModelManager_ = gEnv->p3DEngine->getModelManager();
+		pEffectManager_ = gEnv->p3DEngine->getEffectManager();
 
-		if (!pModelManager_) {
+		if (!pModelManager_ || !pEffectManager_) {
 			return false;
 		}
 
@@ -111,6 +116,10 @@ namespace entity
 		ADD_TRANS_MEMBER(dtMover_, start);
 		ADD_TRANS_MEMBER(dtMover_, end);
 		ADD_TRANS_MEMBER(dtMover_, time);
+
+		ADD_TRANS_MEMBER(dtEmitter_, effect);
+		ADD_TRANS_MEMBER(dtEmitter_, offset);
+
 		return true;
 	}
 
@@ -609,6 +618,26 @@ namespace entity
 
 					mov.fract = 0.f;
 
+					break;
+				}
+
+				case "Emitter"_fnv1a:
+				{
+					auto& emit = reg_.assign<Emitter>(ent);
+					if (!parseComponent(dtEmitter_, emit, value)) {
+						return false;
+					}
+
+					// we need to create a emmiter on the world.
+					// to play our fx.
+					auto* pEffect = pEffectManager_->loadEffect(emit.effect);
+
+					engine::EmitterDesc dsc;
+					dsc.trans = trans;
+					dsc.trans.pos += emit.offset;
+					dsc.pEffect = pEffect;
+
+					emit.pEmitter = p3DWorld_->addEmmiter(dsc);
 					break;
 				}
 

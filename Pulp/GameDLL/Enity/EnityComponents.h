@@ -15,6 +15,9 @@ X_NAMESPACE_DECLARE(anim,
 
 X_NAMESPACE_DECLARE(engine,
 	struct IRenderEnt;
+	namespace fx {
+		struct IEmitter;
+	}
 )
 
 
@@ -155,6 +158,14 @@ struct Mover // move back and forth
 };
 
 
+struct Emitter
+{
+	core::string effect;
+	Vec3f offset;
+
+	engine::fx::IEmitter* pEmitter;
+};
+
 // struct ScriptName
 // {
 // 	const char* pName;
@@ -232,6 +243,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	Attached,
 	Rotator,
 	Mover,
+	Emitter,
 
 	Animator,
 	Velocity,

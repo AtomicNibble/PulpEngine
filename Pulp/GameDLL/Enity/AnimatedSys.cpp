@@ -5,7 +5,7 @@
 #include <I3DEngine.h>
 #include <IWorld3D.h>
 #include <IAnimManager.h>
-
+#include <IEffect.h>
 
 #include <Time\TimeLiterals.h>
 
@@ -116,6 +116,12 @@ namespace entity
 			{
 				auto& rendEnt = reg.get<MeshRenderer>(entity);
 				p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+			}
+			if (reg.has<Emitter>(entity))
+			{
+				auto& emt = reg.get<Emitter>(entity);
+				
+				emt.pEmitter->setTrans(trans, emt.offset);
 			}
 			if (reg.has<MeshCollider>(entity))
 			{

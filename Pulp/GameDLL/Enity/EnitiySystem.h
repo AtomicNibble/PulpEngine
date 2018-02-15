@@ -22,6 +22,9 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_DECLARE(engine,
 	struct IWorld3D;
+	namespace fx {
+		struct IEffectManager;
+	}
 )
 
 X_NAMESPACE_BEGIN(game)
@@ -86,6 +89,7 @@ namespace entity
 		physics::IScene* pPhysScene_;
 		engine::IWorld3D* p3DWorld_;
 		model::IModelManager* pModelManager_;
+		engine::fx::IEffectManager* pEffectManager_;
 
 		PlayerSystem playerSys_;
 		CameraSystem cameraSys_;
@@ -100,6 +104,7 @@ namespace entity
 		DataTranslator<SoundObject> dtSoundObj_;
 		DataTranslator<Rotator> dtRotator_;
 		DataTranslator<Mover> dtMover_;
+		DataTranslator<Emitter> dtEmitter_;
 	};
 
 
