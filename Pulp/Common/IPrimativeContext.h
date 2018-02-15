@@ -3,6 +3,7 @@
 struct Vertex_P3F_T2F_C4B;
 
 #include <IRender.h>
+#include <Math\XRect.h>
 
 X_NAMESPACE_DECLARE(font, struct TextDrawContext);
 
@@ -87,6 +88,7 @@ public:
 	// draw a quad in 3d z is position not depth.
 	void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
 	void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col);
+	void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col, const Rectf& r);
 
 	void drawLines(const Vec3f* pPoints, uint32_t num, Color8u col);
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
