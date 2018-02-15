@@ -71,6 +71,11 @@ struct MeshRenderer
 struct MeshCollider
 {
 	physics::ActorHandle actor;
+};
+
+struct DynamicObject
+{
+	physics::ActorHandle actor;
 
 };
 
@@ -234,6 +239,7 @@ using EnitiyRegister = ecs::StandardRegistry<EntityId,
 	Mesh,
 	MeshRenderer,
 	MeshCollider,
+	DynamicObject,
 
 	SoundObject,
 	SoundEnviroment,

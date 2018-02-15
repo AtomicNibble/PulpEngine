@@ -8,6 +8,7 @@
 
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
+#include <Time\TimeLiterals.h>
 
 #include <IFrameData.h>
 #include <I3DEngine.h>
@@ -147,10 +148,11 @@ namespace entity
 
 		soundSys_.update(frame, reg_);
 
-		// physSys_.update(frame, reg_, pPhysScene_);
 		weaponSys_.update(frame.timeInfo, reg_);
 
 		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_, pPhysScene_);
+		
+		physSys_.update(frame, reg_, pPhysScene_, p3DWorld_);
 	}
 
 
@@ -566,6 +568,18 @@ namespace entity
 					// then later before we finished loading we iterate these waiting for the models to 
 					// finish loading and then create the physics.
 					reg_.assign<MeshCollider>(ent);
+
+					break;
+				}
+
+				case "DynamicObject"_fnv1a:
+				{
+					if (!reg_.has<Mesh>(ent)) {
+						X_ERROR("Ents", "MeshCollider requires a Mesh component");
+						return false;
+					}
+					
+					reg_.assign<DynamicObject>(ent);
 
 					break;
 				}

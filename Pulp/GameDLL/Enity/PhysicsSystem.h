@@ -8,6 +8,10 @@ X_NAMESPACE_DECLARE(core,
 	struct ICVar;
 )
 
+X_NAMESPACE_DECLARE(engine,
+	struct IWorld3D;
+)
+
 
 X_NAMESPACE_BEGIN(game)
 
@@ -21,7 +25,8 @@ namespace entity
 		~PhysicsSystem();
 
 		bool init(void);
-		void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
+		void update(core::FrameData& frame, EnitiyRegister& reg, 
+			physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 
 		bool createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
 
