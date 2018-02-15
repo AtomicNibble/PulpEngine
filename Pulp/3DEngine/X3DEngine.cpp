@@ -440,6 +440,10 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 	}
 #endif
 
+	for (auto* pWorld : worlds_)
+	{
+		static_cast<World3D*>(pWorld)->renderEmitters(frame, &primContexts_[PrimContext::MISC3D]);
+	}
 	// ok so lets dump out the primative context.
 	// I will need to have some sort of known time that it's 
 	// safe to start creating gpu commands for the context.
