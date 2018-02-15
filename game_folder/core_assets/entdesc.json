@@ -222,6 +222,10 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "Emitter" : {
+                "effect" : "test/simple01",
+                "offset" : {"x": 0, "y": 0, "z": 10}
             }
         },
         {
@@ -253,8 +257,28 @@
             },
             "DynamicObject" : {
             }
-        }
+        },
+        {
+            "origin" : {"x": -90, "y": 50, "z": 30},
 
+            "Emitter" : {
+                "effect" : "test/simple01",
+                "offset" : {"x": 0, "y": 0, "z": 10}
+            }
+        },
+        {
+            "origin" : {"x": -40, "y": 50, "z": 30},
+
+            "Emitter" : {
+                "effect" : "test/simple01",
+                "offset" : {"x": 0, "y": 0, "z": 10}
+            },
+            "Mover" : {
+                "start" : {"x": -40, "y": 50, "z": 30},
+                "end" : {"x": -40, "y": 50, "z": 10},
+                "time" : 2.0
+            }
+        }
 
 
         /*
