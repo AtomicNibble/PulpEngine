@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Time\TimeVal.h>
+#include <IEffect.h> // only for IEmitter
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -47,7 +48,7 @@ namespace fx
 	}
 
 	// a emmtier plays a FX.
-	class Emitter
+	class Emitter : public IEmitter
 	{
 		struct Elem
 		{
@@ -98,7 +99,8 @@ namespace fx
 	public:
 		Emitter(const Effect& efx, core::MemoryArenaBase* arena);
 
-		void setPos(const Vec3f& pos);
+		void setTrans(const Transformf& trans) X_FINAL;
+		void setTrans(const Transformf& trans, const Vec3f& offset) X_FINAL;
 
 		void update(core::TimeVal delta);
 		void draw(IPrimativeContext* pPrim);
@@ -120,7 +122,7 @@ namespace fx
 	private:
 		const Effect& efx_;
 		StageStateArr stages_;
-		Vec3f pos_;
+		Transformf trans_;
 		core::TimeVal elapsed_;
 	};
 

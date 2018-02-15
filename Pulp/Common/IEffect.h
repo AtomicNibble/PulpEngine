@@ -154,6 +154,13 @@ namespace fx
 		virtual bool waitForLoad(Effect* pMaterial) X_ABSTRACT;
 	};
 
+	struct IEmitter
+	{
+
+		virtual void setTrans(const Transformf& trans) X_ABSTRACT;
+		virtual void setTrans(const Transformf& trans, const Vec3f& offset) X_ABSTRACT;
+
+	};
 
 } // namespace fx
 

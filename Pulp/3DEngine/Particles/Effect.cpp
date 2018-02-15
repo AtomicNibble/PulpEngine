@@ -92,10 +92,17 @@ namespace fx
 	{
 	}
 
-	void Emitter::setPos(const Vec3f& pos)
+	void Emitter::setTrans(const Transformf& trans)
 	{
-		pos_ = pos;
+		trans_ = trans;
 	}
+
+	void Emitter::setTrans(const Transformf& trans, const Vec3f& offset)
+	{
+		trans_ = trans;
+		trans_.pos += offset;
+	}
+
 
 	void Emitter::update(core::TimeVal delta)
 	{
@@ -323,7 +330,7 @@ namespace fx
 				Vec3f br = Vec3f(half, half, 0);
 				
 				Vec3f pos = e.pos + e.dir;
-				pos += pos_;
+				pos += trans_.pos;
 
 				tl += pos;
 				tr += pos;
