@@ -297,10 +297,15 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 	pQuad[2].pos = bl;
 	pQuad[3].pos = br;
 
-	pQuad[0].st = core::XHalf2(r.x1,r.y1); 
-	pQuad[1].st = core::XHalf2(r.x2,r.y1); 
-	pQuad[2].st = core::XHalf2(r.x1,r.y2); 
-	pQuad[3].st = core::XHalf2(r.x2,r.y2); 
+	auto x1 = core::XHalfCompressor::compress(r.x1);
+	auto y1 = core::XHalfCompressor::compress(r.y1);
+	auto x2 = core::XHalfCompressor::compress(r.y2);
+	auto y2 = core::XHalfCompressor::compress(r.y2);
+
+	pQuad[0].st = core::XHalf2(x1,y1); 
+	pQuad[1].st = core::XHalf2(x2,y1); 
+	pQuad[2].st = core::XHalf2(x1,y2); 
+	pQuad[3].st = core::XHalf2(x2,y2); 
 
 	for (uint32 i = 0; i < 4; ++i)
 	{
