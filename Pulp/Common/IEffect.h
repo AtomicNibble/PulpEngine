@@ -2,6 +2,7 @@
 
 
 #include <IConverterModule.h>
+#include <IAsyncLoad.h>
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -139,6 +140,19 @@ namespace fx
 
 	// X_ENSURE_SIZE(Stage, 60);
 	// X_ENSURE_SIZE(EffectHdr, 8);
+
+	class Effect;
+
+
+	struct IFxManager : public core::IAssetLoader
+	{
+		virtual ~IFxManager() {}
+
+		virtual Effect* findEffect(const char* pName) const X_ABSTRACT;
+		virtual Effect* loadEffect(const char* pName) X_ABSTRACT;
+
+		virtual bool waitForLoad(Effect* pMaterial) X_ABSTRACT;
+	};
 
 
 } // namespace fx

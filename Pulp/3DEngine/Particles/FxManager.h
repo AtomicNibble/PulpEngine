@@ -13,6 +13,7 @@ namespace fx
 	class Effect;
 
 	class EffectManager :
+		public IFxManager,
 		public core::IXHotReload,
 		private core::IAssetLoadSink
 	{
@@ -30,8 +31,8 @@ namespace fx
 		void shutDown(void);
 
 
-		Effect* findEffect(const char* pEffectName) const;
-		Effect* loadEffect(const char* pEffectName);
+		Effect* findEffect(const char* pEffectName) const X_FINAL;
+		Effect* loadEffect(const char* pEffectName) X_FINAL;
 
 		void releaseEffect(Effect* pEffect);
 
@@ -39,8 +40,8 @@ namespace fx
 		void listEffects(const char* pSearchPatten = nullptr) const;
 
 		// returns true if load succeed.
-		bool waitForLoad(core::AssetBase* pAnim);
-		bool waitForLoad(Effect* pAnim);
+		bool waitForLoad(core::AssetBase* pEffect) X_FINAL;
+		bool waitForLoad(Effect* pEffect) X_FINAL;
 
 	private:
 		void freeDangling(void);
