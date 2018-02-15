@@ -46,6 +46,8 @@ namespace fx
 
 		dataSize_ = dataSize;
 		data_ = std::move(data);
+
+		
 		return true;
 	}
 
@@ -116,28 +118,53 @@ namespace fx
 			auto& state = stages_[i];
 
 			if (!state.pMaterial) {
-				auto* pStr = efx_.getMaterialName(stage.materialStrOffset);
+				auto* pStr = "fx/test/fire_anim_candle"; // efx_.getMaterialName(stage.materialStrOffset);
 				state.pMaterial = gEngEnv.pMaterialMan_->loadMaterial(pStr);
 			}
 
-			// update elems?
-			//float elapsedMS = elapsed_.GetMilliSeconds();
-
-			for (size_t j= 0;j<state.elems.size(); j++)
 			{
-				auto& e = state.elems[j];
+				const auto atlas = state.pMaterial->getAtlas();
+				const auto fps = stage.sequence.fps;
+				const int32_t atlasCount = atlas.x * atlas.y;
 
-				auto alive = (elapsed_ - e.spawnTime).GetMilliSeconds();
-
-				if (alive >= e.lifeMs)
+				for (size_t j = 0; j < state.elems.size(); j++)
 				{
-					state.elems.removeIndex(j);
-					continue;
+					auto& e = state.elems[j];
+
+					auto alive = (elapsed_ - e.spawnTime);
+					auto aliveMs = alive.GetMilliSeconds();
+
+					if (aliveMs >= e.lifeMs)
+					{
+						state.elems.removeIndex(j);
+						continue;
+					}
+
+					float fraction = (aliveMs / e.lifeMs);
+					updateElemForFraction(stage, e, fraction);
+
+					if (fps == 0) {
+						continue;
+					}
+
+					auto aliveSec = aliveMs * 0.001;
+
+					int32_t atlasIdx;
+					if (fps < 0)
+					{
+						atlasIdx = static_cast<int32_t>(atlasCount * fraction); // total frames over elem life.
+					}
+					else
+					{
+						atlasIdx = static_cast<int32_t>(fps * aliveSec); // 1 second == fps.
+					}
+
+					// offset from starting index.
+					atlasIdx += e.atlasIdx;
+					atlasIdx %= atlasCount;
+
+					uvForIndex(e.uv, atlas, atlasIdx);
 				}
-
-				float fraction = (alive / e.lifeMs);
-
-				updateElemForFraction(stage, e, fraction);
 			}
 
 			// finished.
@@ -195,7 +222,34 @@ namespace fx
 
 				float life = fromRange(stage.life);
 
+				// so i need to support atlas.		
+				auto atlas = state.pMaterial->getAtlas();
+
 				Elem e;
+				e.uv = Rectf(0.f, 0.f, 1.f, 1.f);
+
+				if (atlas.x || atlas.y)
+				{
+					int32_t atlasIdx = stage.sequence.startFrame;
+					int32_t count = atlas.x * atlas.y;
+					if (atlasIdx < 0)
+					{
+						atlasIdx = static_cast<int32_t>(gEnv->xorShift.randIndex(count));
+					}
+					else
+					{
+						// user might of changed material so atlasIdx is no longer in range.
+						if (atlasIdx >= count - 1) {
+							X_WARNING("Fx", "Atlast index was out of range");
+							atlasIdx = count - 1;
+						}
+					}
+
+					uvForIndex(e.uv, atlas, atlasIdx);
+
+					e.atlasIdx = atlasIdx;
+				}
+				
 				e.colGraph = colGraph;
 				e.alphaGraph = alphaGraph;
 				e.sizeGraph = sizeGraph;
@@ -276,7 +330,7 @@ namespace fx
 				bl += pos;
 				br += pos;
 
-				pPrim->drawQuad(tl, tr, bl, br, s.pMaterial, e.col);
+				pPrim->drawQuad(tl, tr, bl, br, s.pMaterial, e.col, e.uv);
 			}
 		}
 	}

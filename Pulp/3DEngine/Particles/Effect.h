@@ -61,9 +61,16 @@ namespace fx
 			float size;
 			Color8u col;
 
-			core::TimeVal spawnTime;
+			Rectf uv;
+			int32_t atlasIdx;
+			int32_t loop;
+
 			float lifeMs;
+			core::TimeVal spawnTime;
 		};
+
+		// ideally keep this below 64.
+		// X_ENSURE_LE(sizeof(Elem), 64, "Keep elem below single cache lane");
 
 		typedef core::Array<Elem> ElemArr;
 
