@@ -118,7 +118,7 @@ namespace fx
 			auto& state = stages_[i];
 
 			if (!state.pMaterial) {
-				auto* pStr = "fx/test/fire_anim_candle"; // efx_.getMaterialName(stage.materialStrOffset);
+				auto* pStr = efx_.getMaterialName(stage.materialStrOffset);
 				state.pMaterial = gEngEnv.pMaterialMan_->loadMaterial(pStr);
 			}
 
