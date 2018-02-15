@@ -17,11 +17,14 @@ X_NAMESPACE_DECLARE(core,
 	}
 )
 
-X_NAMESPACE_DECLARE(engine,
-	class PrimativeContext;
-)
-
 X_NAMESPACE_BEGIN(engine)
+
+namespace fx {
+	class Emitter;
+} // namespace fx
+
+class IPrimativeContext;
+class PrimativeContext;
 
 class DrawVars;
 
@@ -177,6 +180,7 @@ class World3D : public IWorld3D
 	typedef core::Array<level::StaticModel> StaticModelsArr;
 	typedef core::Array<level::Light> StaticLightssArr;
 	typedef core::Array<RenderEnt*> RenderEntPtrArr;
+	typedef core::Array<fx::Emitter*> EmitterPtrArr;
 
 
 	struct AreaRefInfo
@@ -200,6 +204,7 @@ public:
 	virtual ~World3D() X_FINAL;
 
 	void renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket);
+	void renderEmitters(core::FrameData& frame, IPrimativeContext* pContext);
 
 	bool loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData) X_FINAL;
 	IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_FINAL;
@@ -208,6 +213,7 @@ public:
 
 	IRenderLight* addRenderLight(RenderLightDesc& ent) X_FINAL;
 
+	fx::IEmitter* addEmmiter(EmitterDesc& emit) X_FINAL;
 
 	// util
 	X_INLINE size_t numAreas(void) const;
@@ -316,6 +322,7 @@ private:
 
 private:
 	RenderEntPtrArr renderEnts_;
+	EmitterPtrArr emitters_;
 };
 
 

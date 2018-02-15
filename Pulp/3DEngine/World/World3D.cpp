@@ -18,6 +18,8 @@
 
 #include <Buffer.h>
 
+#include <Particles\Effect.h>
+
 #include <queue>
 
 X_NAMESPACE_BEGIN(engine)
@@ -211,7 +213,8 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
 	visibleAreas_(arena),
 	lights_(arena),
 	staticModels_(arena),
-	renderEnts_(arena)
+	renderEnts_(arena),
+	emitters_(arena)
 {
 	viewCount_ = 0;
 	frameNumber_ = 0;
@@ -271,7 +274,23 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 }
 
 
+void World3D::renderEmitters(core::FrameData& frame, IPrimativeContext* pContext)
+{
+	auto delta = frame.timeInfo.deltas[core::Timer::GAME];
 
+	// maybe i don't actually want to do delta for emmiters but rather update for a given time.
+	// so that I can just not update invisible emitters.
+	// or we just pass delta since last update.
+	for (auto* pEitter : emitters_)
+	{
+		pEitter->update(delta);
+	}
+
+	for (auto* pEitter : emitters_)
+	{
+		pEitter->draw(pContext);
+	}
+}
 
 
 bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData)
@@ -776,6 +795,20 @@ IRenderLight* World3D::addRenderLight(RenderLightDesc& ent)
 	X_UNUSED(ent);
 
 	return nullptr;
+}
+
+
+fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
+{
+	X_ASSERT_NOT_NULL(emit.pEffect);
+	
+	auto* pEmitter = X_NEW(fx::Emitter, arena_, "Emitter")(*emit.pEffect, arena_);
+
+	pEmitter->setTrans(emit.trans);
+
+	emitters_.push_back(pEmitter);
+
+	return pEmitter;
 }
 
 

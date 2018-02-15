@@ -5,6 +5,11 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+namespace fx
+{
+	class Effect;
+	struct IEmitter;
+} // namespace fx
 
 struct RenderEntDesc
 {
@@ -23,6 +28,13 @@ struct RenderLightDesc
 };
 
 
+struct EmitterDesc
+{
+	Transformf trans;
+
+	fx::Effect* pEffect;
+};
+
 struct IRenderEnt
 {
 
@@ -33,7 +45,6 @@ struct IRenderLight
 {
 
 };
-
 
 struct IWorld3D
 {
@@ -48,8 +59,9 @@ struct IWorld3D
 
 	virtual IRenderLight* addRenderLight(RenderLightDesc& ent) X_ABSTRACT;
 
-};
+	virtual fx::IEmitter* addEmmiter(EmitterDesc& emit) X_ABSTRACT;
 
+};
 
 
 X_NAMESPACE_END
