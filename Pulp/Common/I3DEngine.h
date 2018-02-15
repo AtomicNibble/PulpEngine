@@ -32,6 +32,10 @@ class IPrimativeContext;
 struct IMaterialManager;
 struct IWorld3D;
 
+namespace fx {
+	struct IEffectManager;
+}
+
 struct I3DEngine : public core::IEngineSysBase
 {
 	virtual ~I3DEngine(){};
@@ -48,6 +52,7 @@ struct I3DEngine : public core::IEngineSysBase
 	virtual IMaterialManager* getMaterialManager(void) X_ABSTRACT;
 	virtual model::IModelManager* getModelManager(void) X_ABSTRACT;
 	virtual anim::IAnimManager* getAnimManager(void) X_ABSTRACT;
+	virtual fx::IEffectManager* getEffectManager(void) X_ABSTRACT;
 
 	virtual IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_ABSTRACT;
 	virtual void release3DWorld(IWorld3D* pWorld) X_ABSTRACT;

@@ -144,9 +144,9 @@ namespace fx
 	class Effect;
 
 
-	struct IFxManager : public core::IAssetLoader
+	struct IEffectManager : public core::IAssetLoader
 	{
-		virtual ~IFxManager() {}
+		virtual ~IEffectManager() {}
 
 		virtual Effect* findEffect(const char* pName) const X_ABSTRACT;
 		virtual Effect* loadEffect(const char* pName) X_ABSTRACT;

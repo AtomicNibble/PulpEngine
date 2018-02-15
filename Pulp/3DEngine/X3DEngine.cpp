@@ -848,6 +848,11 @@ anim::IAnimManager* X3DEngine::getAnimManager(void)
 	return pAnimManager_;
 }
 
+fx::IEffectManager* X3DEngine::getEffectManager(void)
+{
+	return pEffectManager_;
+}
+
 
 IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 {

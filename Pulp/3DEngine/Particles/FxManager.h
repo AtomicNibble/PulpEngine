@@ -13,7 +13,7 @@ namespace fx
 	class Effect;
 
 	class EffectManager :
-		public IFxManager,
+		public IEffectManager,
 		public core::IXHotReload,
 		private core::IAssetLoadSink
 	{
