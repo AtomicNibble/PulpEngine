@@ -99,11 +99,13 @@ namespace fx
 	private:
 		void updateElemForFraction(const Stage& stage, Elem& e, float fraction) const;
 
+		static void uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx);
+
+
 		float fromRange(const Range& r) const;
 		float fromGraph(const Graph& r, float t) const;
 		Vec3f fromColorGraph(const Graph& r, float t) const;
 
-		
 		float getFloat(int32_t idx) const;
 		float floatForIdx(int32_t idx) const;
 		Vec3f colorForIdx(int32_t start, int32_t idx) const;

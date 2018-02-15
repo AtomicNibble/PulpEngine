@@ -217,6 +217,28 @@ namespace fx
 
 	}
 
+	inline void Emitter::uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx)
+	{
+		int32_t col = idx % atlas.x;
+		int32_t row = idx / atlas.x;
+
+		if (atlas.x)
+		{
+			float range = 1.f / atlas.x;
+
+			uv.x1 = range * col;
+			uv.x2 = uv.x1 + range;
+		}
+		if (atlas.y)
+		{
+			float range = 1.f / atlas.y;
+
+			uv.y1 = range * row;
+			uv.y2 = uv.y1 + range;
+		}
+	}
+
+
 	void Emitter::draw(IPrimativeContext* pPrim)
 	{
 		for (auto& s : stages_)
