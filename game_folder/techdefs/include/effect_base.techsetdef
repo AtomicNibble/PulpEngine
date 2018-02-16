@@ -43,3 +43,17 @@ float1( "textureAtlasRowCount" )
         title     = "Row Count"
     }
 }
+
+
+
+VertexShader( "vs_default" )
+{
+    source = "Prim.hlsl"
+    entry = "PrimVS"
+}
+
+PixelShader( "ps_default" )
+{
+    source = "Prim.hlsl"
+    entry = "PrimPS"
+}
