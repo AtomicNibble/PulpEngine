@@ -10,6 +10,10 @@ X_NAMESPACE_DECLARE(engine,
 	namespace gui {
 		class XGuiManager;
 	}
+
+	namespace fx {
+		class EffectManager;
+	} 
 )
 
 X_NAMESPACE_DECLARE(model,
@@ -17,6 +21,7 @@ X_NAMESPACE_DECLARE(model,
 )
 
 X_NAMESPACE_BEGIN(engine)
+
 
 
 struct EngineEnv
@@ -27,6 +32,7 @@ struct EngineEnv
 	gui::XGuiManager* pGuiMan_;
 
 	engine::I3DEngine* p3DEngine_;
+	engine::fx::EffectManager* pEffectMan_;
 };
 
 extern EngineEnv gEngEnv;

@@ -133,6 +133,7 @@ bool X3DEngine::init(void)
 	gEngEnv.pMaterialMan_ = pMaterialManager_;
 	gEngEnv.pTextureMan_ = pTextureManager_;
 	gEngEnv.pModelMan_ = pModelManager_;
+	gEngEnv.pEffectMan_ = pEffectManager_;
 	gEngEnv.p3DEngine_ = this;
 
 	{
