@@ -387,34 +387,43 @@ namespace fx
 
 	float Emitter::fromGraph(const Graph& g, float t) const
 	{
+		X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
+
 		float scale = getFloat(g.scaleIdx);
 		float result = 0.f;
 
-		for (int32_t i = 0; i < g.numPoints; i++)
+		if (g.numPoints > 1) 
 		{
-			auto val0 = floatForIdx(g.timeStart + i);
-
-			if (val0 == t)
+			for (int32_t i = 0; i < g.numPoints; i++)
 			{
-				result = floatForIdx(g.valueStart + i);
-				break;
+				auto val0 = floatForIdx(g.timeStart + i);
+
+				if (val0 == t)
+				{
+					result = floatForIdx(g.valueStart + i);
+					break;
+				}
+				else if (val0 > t)
+				{
+					// blend.
+					val0 = floatForIdx(g.timeStart + (i - 1));
+					auto val1 = floatForIdx(g.timeStart + i);
+
+					auto res0 = floatForIdx(g.valueStart + (i - 1));
+					auto res1 = floatForIdx(g.valueStart + i);
+
+					float offset = t - val0;
+					float range = val1 - val0;
+					float fraction = offset / range;
+
+					result = lerp(res0, res1, fraction);
+					break;
+				}
 			}
-			else if (val0 > t)
-			{
-				// blend.
-				val0 = floatForIdx(g.timeStart + (i - 1));
-				auto val1 = floatForIdx(g.timeStart + i);
-
-				auto res0 = floatForIdx(g.valueStart + (i - 1));
-				auto res1 = floatForIdx(g.valueStart + i);
-
-				float offset = t - val0;
-				float range = val1 - val0;
-				float fraction = offset / range;
-
-				result = lerp(res0, res1, fraction);
-				break;
-			}
+		}
+		else
+		{
+			result = floatForIdx(g.valueStart);
 		}
 
 		return result * scale;
@@ -422,34 +431,43 @@ namespace fx
 
 	Vec3f Emitter::fromColorGraph(const Graph& g, float t) const
 	{
+		X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
+
 		float scale = getFloat(g.scaleIdx);
 		Vec3f result;
 
-		for (int32_t i = 0; i < g.numPoints; i++)
+		if (g.numPoints > 1)
 		{
-			auto val0 = floatForIdx(g.timeStart + i);
-
-			if (val0 == t)
+			for (int32_t i = 0; i < g.numPoints; i++)
 			{
-				result = colorForIdx(g.valueStart, i);
-				break;
+				auto val0 = floatForIdx(g.timeStart + i);
+
+				if (val0 == t)
+				{
+					result = colorForIdx(g.valueStart, i);
+					break;
+				}
+				else if (val0 > t)
+				{
+					// blend.
+					val0 = floatForIdx(g.timeStart + (i - 1));
+					auto val1 = floatForIdx(g.timeStart + i);
+
+					auto res0 = colorForIdx(g.valueStart, i - 1);
+					auto res1 = colorForIdx(g.valueStart, i);
+
+					float offset = t - val0;
+					float range = val1 - val0;
+					float fraction = offset / range;
+
+					result = res0.lerp(fraction, res1);
+					break;
+				}
 			}
-			else if (val0 > t)
-			{
-				// blend.
-				val0 = floatForIdx(g.timeStart + (i - 1));
-				auto val1 = floatForIdx(g.timeStart + i);
-
-				auto res0 = colorForIdx(g.valueStart, i - 1);
-				auto res1 = colorForIdx(g.valueStart, i);
-
-				float offset = t - val0;
-				float range = val1 - val0;
-				float fraction = offset / range;
-
-				result = res0.lerp(fraction, res1);
-				break;
-			}
+		}
+		else
+		{
+			result = colorForIdx(g.valueStart, 0);
 		}
 
 		return result * scale;
