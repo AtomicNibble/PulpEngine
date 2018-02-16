@@ -172,7 +172,7 @@ namespace fx
 
 					e.atlasIdx = atlasIdx;
 
-					auto idx = e.atlasBaseIdx + (atlasIdx % atlasCount);
+					auto idx = (e.atlasBaseIdx + atlasIdx) % atlasCount;
 
 					uvForIndex(e.uv, atlas, idx);
 				}
