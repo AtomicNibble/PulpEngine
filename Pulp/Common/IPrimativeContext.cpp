@@ -299,7 +299,7 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 
 	auto x1 = core::XHalfCompressor::compress(r.x1);
 	auto y1 = core::XHalfCompressor::compress(r.y1);
-	auto x2 = core::XHalfCompressor::compress(r.y2);
+	auto x2 = core::XHalfCompressor::compress(r.x2);
 	auto y2 = core::XHalfCompressor::compress(r.y2);
 
 	pQuad[0].st = core::XHalf2(x1,y1); 
