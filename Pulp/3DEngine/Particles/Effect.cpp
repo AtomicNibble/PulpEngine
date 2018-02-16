@@ -239,6 +239,7 @@ namespace fx
 				Elem e;
 				e.uv = Rectf(0.f, 0.f, 1.f, 1.f);
 				e.atlasIdx = 0;
+				e.atlasBaseIdx = 0;
 
 				if (atlas.x || atlas.y)
 				{
