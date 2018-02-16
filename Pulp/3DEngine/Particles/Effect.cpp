@@ -205,7 +205,7 @@ namespace fx
 
 			state.lastSpawn = elapsed_;
 
-			if (stage.type == StageType::OrientedSprite)
+			if (stage.type == StageType::OrientedSprite || stage.type == StageType::BillboardSprite)
 			{
 				int8_t colGraph = 0;
 				int8_t alphaGraph = 0;
