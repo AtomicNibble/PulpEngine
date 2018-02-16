@@ -124,6 +124,7 @@ namespace fx
 		const Effect& efx_;
 		StageStateArr stages_;
 		Transformf trans_;
+		Vec3f offset_;
 		core::TimeVal elapsed_;
 	};
 

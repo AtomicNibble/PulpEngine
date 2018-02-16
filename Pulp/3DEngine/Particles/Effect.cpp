@@ -100,7 +100,7 @@ namespace fx
 	void Emitter::setTrans(const Transformf& trans, const Vec3f& offset)
 	{
 		trans_ = trans;
-		trans_.pos += offset;
+		offset_ = offset;
 	}
 
 
@@ -339,7 +339,7 @@ namespace fx
 				bl = bl * trans_.quat;
 				br = br * trans_.quat;
 
-				Vec3f pos = e.pos + e.dir;
+				Vec3f pos = e.pos + e.dir + offset_;
 				pos = pos * trans_.quat;
 				pos += trans_.pos;
 
