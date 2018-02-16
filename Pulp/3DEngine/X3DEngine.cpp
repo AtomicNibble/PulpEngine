@@ -221,7 +221,7 @@ void X3DEngine::shutDown(void)
 		pEffectManager_->shutDown();
 		X_DELETE(pEffectManager_, g_3dEngineArena);
 
-		// ...
+		gEngEnv.pEffectMan_ = nullptr;
 	}
 
 	if (pAnimManager_) {
