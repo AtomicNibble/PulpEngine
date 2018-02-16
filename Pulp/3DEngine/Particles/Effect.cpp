@@ -333,8 +333,14 @@ namespace fx
 				Vec3f tr = Vec3f(half, -half, 0);
 				Vec3f bl = Vec3f(-half, half, 0);
 				Vec3f br = Vec3f(half, half, 0);
-				
+
+				tl = tl * trans_.quat;
+				tr = tr * trans_.quat;
+				bl = bl * trans_.quat;
+				br = br * trans_.quat;
+
 				Vec3f pos = e.pos + e.dir;
+				pos = pos * trans_.quat;
 				pos += trans_.pos;
 
 				tl += pos;
