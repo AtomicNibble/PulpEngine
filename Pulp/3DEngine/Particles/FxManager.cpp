@@ -77,7 +77,7 @@ namespace fx
 	{
 		X_ASSERT_NOT_NULL(pEffect);
 
-		if (waitForLoad(pEffect)) {
+		if (!waitForLoad(pEffect)) {
 			return nullptr;
 		}
 
