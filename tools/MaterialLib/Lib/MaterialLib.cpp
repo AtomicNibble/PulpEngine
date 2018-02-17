@@ -17,7 +17,7 @@ MaterialLib::MaterialLib() :
 
 }
 
-MaterialLib ::~MaterialLib()
+MaterialLib::~MaterialLib()
 {
 }
 
