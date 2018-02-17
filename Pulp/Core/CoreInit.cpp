@@ -156,7 +156,7 @@ bool XCore::IntializeLoadedConverterModule(const char* pDllName, const char* pMo
 
 	for (auto& c : converterInterfaces_)
 	{
-		if (c.dllName == pDllName && c.moduleClassName == pModuleClassName)
+		if (c.dllName.compareCaseInsen(pDllName) && c.moduleClassName.compareCaseInsen(pModuleClassName))
 		{
 			c.addReference();
 
