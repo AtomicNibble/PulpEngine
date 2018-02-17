@@ -34,7 +34,7 @@ namespace fx
 			PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
 			PoolArena::getMemoryOffsetRequirement()
 		),
-		poolArena_(&poolAllocator_, "PacketPool")
+		poolArena_(&poolAllocator_, "EmitterPool")
 	{
 		arena->addChildArena(&poolArena_);
 	}
