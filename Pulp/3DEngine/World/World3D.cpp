@@ -1,12 +1,16 @@
 #include "stdafx.h"
 #include "World3D.h"
 
+#include "EngineEnv.h"
+
 #include "Vars\DrawVars.h"
 #include "Material\MaterialManager.h"
 #include "Model\ModelManager.h"
 #include "Drawing\PrimativeContext.h"
 #include "Drawing\CBufferManager.h"
 #include "Model\RenderModel.h"
+#include "Particles\FxManager.h"
+#include "Particles\Emitter.h"
 
 #include <Math\XWinding.h>
 #include <IFrameData.h>
@@ -18,7 +22,6 @@
 
 #include <Buffer.h>
 
-#include <Particles\Effect.h>
 
 #include <queue>
 
@@ -800,9 +803,10 @@ IRenderLight* World3D::addRenderLight(RenderLightDesc& ent)
 
 fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
 {
-	X_ASSERT_NOT_NULL(emit.pEffect);
-	
-	auto* pEmitter = X_NEW(fx::Emitter, arena_, "Emitter")(*emit.pEffect, arena_);
+	auto* pEmitter = gEngEnv.pEffectMan_->allocEmmiter(emit.pEffect);
+	if (!pEmitter) {
+		return nullptr;
+	}
 
 	pEmitter->setTrans(emit.trans);
 
