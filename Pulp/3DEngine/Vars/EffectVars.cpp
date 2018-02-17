@@ -13,11 +13,18 @@ EffectVars::EffectVars()
 
 void EffectVars::registerVars(void)
 {
+	ADD_CVAR_REF("efx_drawDebug", drawDebug_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Enable effect debug drawing");
+	
+	ADD_CVAR_REF("efx_draw_elem_rect", drawElemRect_, 0, 0, 1,
+		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+		"Draw bounds of elems");
+
 	ADD_CVAR_REF("efx_drawAxis", axisExtent_, 0, 0, 128,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draw effect axis");
-
-
+	
 }
 
 
