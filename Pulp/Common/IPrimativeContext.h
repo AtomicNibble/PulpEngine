@@ -90,7 +90,9 @@ public:
 	void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col);
 	void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col, const Rectf& r);
 
-	void drawLines(const Vec3f* pPoints, uint32_t num, Color8u col);
+	void drawLines(core::span<const Vec3f> points, Color8u col);
+	void drawLines(core::span<const Vec3f> points, core::span<const Color8u> col);
+
 	X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2);
 	X_INLINE void drawLine(const Vec3f& pos1, Color8u color1,
 		const Vec3f& pos2, Color8u color2);

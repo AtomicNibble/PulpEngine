@@ -313,9 +313,10 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 	}
 }
 
-void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, Color8u col)
+void IPrimativeContext::drawLines(core::span<const Vec3f> points, Color8u col)
 {
-	X_ASSERT_NOT_NULL(pPoints);
+	int32_t num = safe_static_cast<int32_t>(points.length());
+
 	X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num);
 
 	if (num < 2) { // 2 points needed to make a line.
@@ -324,13 +325,38 @@ void IPrimativeContext::drawLines(const Vec3f* pPoints, uint32_t num, Color8u co
 
 	PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
 
-	for (uint32_t i = 0; i < num; i += 2)
+	for (int32_t i = 0; i < num; i += 2)
 	{
-		pLine[i].pos = pPoints[i];
+		pLine[i].pos = points[i];
 		pLine[i].color = col;
 		pLine[i].st = core::XHalf2::zero();
-		pLine[i + 1].pos = pPoints[i + 1];
+		pLine[i + 1].pos = points[i + 1];
 		pLine[i + 1].color = col;
+		pLine[i + 1].st = core::XHalf2::zero();
+	}
+}
+
+void IPrimativeContext::drawLines(core::span<const Vec3f> points, core::span<const Color8u> col)
+{
+	int32_t num = safe_static_cast<int32_t>(points.length());
+	int32_t numCol = safe_static_cast<int32_t>(col.length());
+
+	X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num);
+	X_ASSERT(num == numCol, "Span length mismatch")(num, numCol);
+
+	if (num < 2) { // 2 points needed to make a line.
+		return;
+	}
+
+	PrimVertex* pLine = addPrimative(num, PrimitiveType::LINELIST);
+
+	for (int32_t i = 0; i < num; i += 2)
+	{
+		pLine[i].pos = points[i];
+		pLine[i].color = col[i];
+		pLine[i].st = core::XHalf2::zero();
+		pLine[i + 1].pos = points[i + 1];
+		pLine[i + 1].color = col[i + 1];
 		pLine[i + 1].st = core::XHalf2::zero();
 	}
 }
@@ -360,7 +386,7 @@ void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 		tr, br
 	};
 
-	drawLines(points, X_ARRAY_SIZE(points), col);
+	drawLines(points, col);
 }
 
 void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
@@ -1280,7 +1306,7 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u 
 		posB, posB - t0 * 0.15f - t2 * 0.15f
 	};
 
-	drawLines(points, X_ARRAY_SIZE(points), color);
+	drawLines(points, color);
 }
 
 
@@ -1333,7 +1359,7 @@ void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u colo
 		Vec3f(pos.x, pos.y + size, pos.z)  // bottom
 	};
 
-	drawLines(points, X_ARRAY_SIZE(points), color);
+	drawLines(points, color);
 }
 
 
