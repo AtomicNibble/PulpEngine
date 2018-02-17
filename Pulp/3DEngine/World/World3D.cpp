@@ -291,7 +291,7 @@ void World3D::renderEmitters(core::FrameData& frame, IPrimativeContext* pContext
 
 	for (auto* pEitter : emitters_)
 	{
-		pEitter->draw(pContext);
+		pEitter->draw(frame.view, pContext);
 	}
 }
 
