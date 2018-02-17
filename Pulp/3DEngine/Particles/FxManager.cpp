@@ -4,6 +4,7 @@
 #include <Assets\AssetLoader.h>
 
 #include "Effect.h"
+#include "Emitter.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -11,13 +12,31 @@ namespace fx
 {
 
 
+	static const size_t POOL_ALLOC_MAX = EFFECT_MAX_EMITTERS;
+	static const size_t POOL_ALLOCATION_SIZE = sizeof(Emitter);
+	static const size_t POOL_ALLOCATION_ALIGN = X_ALIGN_OF(Emitter);
+
+
 	EffectManager::EffectManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
 		arena_(arena),
 		blockArena_(blockArena),
 		pAssetLoader_(nullptr),
-		effects_(arena, sizeof(EffectResource), X_ALIGN_OF(EffectResource), "EffectPool")
+		effects_(arena, sizeof(EffectResource), X_ALIGN_OF(EffectResource), "EffectPool"),
+		poolHeap_(
+			core::bitUtil::RoundUpToMultiple<size_t>(
+				PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE) * POOL_ALLOC_MAX,
+				core::VirtualMem::GetPageSize()
+			)
+		),
+		poolAllocator_(
+			poolHeap_.start(), poolHeap_.end(),
+			PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE),
+			PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
+			PoolArena::getMemoryOffsetRequirement()
+		),
+		poolArena_(&poolAllocator_, "PacketPool")
 	{
-
+		arena->addChildArena(&poolArena_);
 	}
 
 	EffectManager::~EffectManager()
@@ -53,6 +72,24 @@ namespace fx
 		freeDangling();
 	}
 
+
+	Emitter* EffectManager::allocEmmiter(Effect* pEffect)
+	{
+		X_ASSERT_NOT_NULL(pEffect);
+
+		if (waitForLoad(pEffect)) {
+			return nullptr;
+		}
+
+		auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(*pEffect, arena_);
+
+		return pEmitter;
+	}
+
+	void EffectManager::freeEmmiter(Emitter* pEmitter)
+	{
+		X_DELETE(pEmitter, &poolArena_);
+	}
 
 	Effect* EffectManager::findEffect(const char* pAnimName) const
 	{

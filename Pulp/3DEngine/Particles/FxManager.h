@@ -4,6 +4,8 @@
 
 #include <Assets\AssertContainer.h>
 
+#include <Memory\AllocationPolicies\PoolAllocator.h>
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -11,6 +13,7 @@ namespace fx
 {
 
 	class Effect;
+	class Emitter;
 
 	class EffectManager :
 		public IEffectManager,
@@ -19,6 +22,21 @@ namespace fx
 	{
 		typedef core::AssetContainer<Effect, EFFECT_MAX_LOADED, core::SingleThreadPolicy> EffectContainer;
 		typedef EffectContainer::Resource EffectResource;
+
+		typedef core::MemoryArena<
+			core::PoolAllocator,
+			core::MultiThreadPolicy<core::Spinlock>,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+			core::SimpleBoundsChecking,
+			core::SimpleMemoryTracking,
+			core::SimpleMemoryTagging
+#else
+			core::NoBoundsChecking,
+			core::NoMemoryTracking,
+			core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+		> PoolArena;
+
 
 	public:
 		EffectManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
@@ -30,6 +48,8 @@ namespace fx
 		bool init(void);
 		void shutDown(void);
 
+		Emitter* allocEmmiter(Effect* pEffect);
+		void freeEmmiter(Emitter* pEmitter);
 
 		Effect* findEffect(const char* pEffectName) const X_FINAL;
 		Effect* loadEffect(const char* pEffectName) X_FINAL;
@@ -57,6 +77,10 @@ namespace fx
 	private:
 		core::MemoryArenaBase* arena_;
 		core::MemoryArenaBase* blockArena_; // for the anims data buffers
+
+		core::HeapArea				poolHeap_;
+		PoolArena::AllocationPolicy poolAllocator_;
+		PoolArena					poolArena_;
 
 		core::AssetLoader* pAssetLoader_;
 
