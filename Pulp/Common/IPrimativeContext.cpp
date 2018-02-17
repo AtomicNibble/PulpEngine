@@ -1283,6 +1283,47 @@ void IPrimativeContext::drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u 
 	drawLines(points, X_ARRAY_SIZE(points), color);
 }
 
+
+void IPrimativeContext::drawAxis(const Vec3f& pos, const Vec3f& extends)
+{
+	Vec3f x(pos);
+	Vec3f y(pos);
+	Vec3f z(pos);
+
+	x.x += extends.x;
+	y.y += extends.y;
+	z.z += extends.z;
+
+	drawArrow(pos, x, Col_Red);
+	drawArrow(pos, y, Col_Green);
+	drawArrow(pos, z, Col_Blue);
+}
+
+void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& extends)
+{
+	auto x = trans.transform(Vec3f(extends.x, 0.f, 0.f));
+	auto y = trans.transform(Vec3f(0.f, extends.y, 0.f));
+	auto z = trans.transform(Vec3f(0.f, 0.f, extends.z));
+
+	drawArrow(trans.pos, x, Col_Red);
+	drawArrow(trans.pos, y, Col_Green);
+	drawArrow(trans.pos, z, Col_Blue);
+}
+
+void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& offset, const Vec3f& extends)
+{
+	auto x = trans.transform(Vec3f(extends.x, 0.f, 0.f));
+	auto y = trans.transform(Vec3f(0.f, extends.y, 0.f));
+	auto z = trans.transform(Vec3f(0.f, 0.f, extends.z));
+
+	auto offsetPos = trans.pos + offset;
+
+	drawArrow(offsetPos, x + offset, Col_Red);
+	drawArrow(offsetPos, y + offset, Col_Green);
+	drawArrow(offsetPos, z + offset, Col_Blue);
+}
+
+
 void IPrimativeContext::drawCrosshair(const Vec3f& pos, float size, Color8u color)
 {
 	Vec3f points[4] = {
