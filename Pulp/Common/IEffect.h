@@ -17,6 +17,9 @@ namespace fx
 	static const uint32_t	EFFECT_MAX_ELEMENTS = 1 << 8;
 	static const uint32_t	EFFECT_MAX_STAGES = 16;
 
+	static const uint32_t	EFFECT_MAX_EMITTERS = 1 << 10;
+	static const uint32_t	EFFECT_MAX_ACTIVE_ELEMS = 1 << 11;
+
 	static const uint32_t	EFFECT_GRAPH_MAX_POINTS = 8;
 
 	// think i will support grahphs for shit like:
