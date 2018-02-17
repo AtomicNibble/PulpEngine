@@ -88,21 +88,21 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 	LinkModule(pICore_, "AssetManager");
 
 	// ConverterLib
-	if (!pICore_->IntializeLoadedEngineModule("Engine_ConverterLib", "Engine_ConverterLib")) {
+	if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "ConverterLib", "Engine_ConverterLib")) {
 		return false;
 	}
 
 	// AssetDB
-	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
+	if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "AssetDB", "Engine_AssetDB")) {
 		return false;
 	}
 
 	// MatLib
-	if (!pICore_->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
+	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "MaterialLib", "Engine_MaterialLib")) {
 		return false;
 	}
 
-	if (!pICore_->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
+	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
 		return false;
 	}
 

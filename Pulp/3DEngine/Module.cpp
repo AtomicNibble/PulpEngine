@@ -57,19 +57,19 @@ class XEngineModule_3DEngine : public IEngineModule
 
 		g_3dEngineArena = X_NEW_ALIGNED(Engine3DArena, env.pArena, "3DEngineArena", 8)(&g_3dEngineAlloc, "3DEngineArena");
 
-		if (!env.pCore->IntializeLoadedConverterModule("Engine_MaterialLib", "Engine_MaterialLib")) {
+		if (!env.pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "MaterialLib", "Engine_MaterialLib")) {
 			X_ERROR("3DEngine", "Failed to init MaterialLib");
 			return false;
 		}
-		if (!env.pCore->IntializeLoadedConverterModule("Engine_ImgLib", "Engine_ImgLib")) {
+		if (!env.pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
 			X_ERROR("3DEngine", "Failed to init ImgLib");
 			return false;
 		}
-		if (!env.pCore->IntializeLoadedConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+		if (!env.pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
 			X_ERROR("3DEngine", "Failed to init ModelLib");
 			return false;
 		}
-		if (!env.pCore->IntializeLoadedConverterModule("Engine_AnimLib", "Engine_AnimLib")) {
+		if (!env.pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "AnimLib", "Engine_AnimLib")) {
 			X_ERROR("3DEngine", "Failed to init AnimLib");
 			return false;
 		}

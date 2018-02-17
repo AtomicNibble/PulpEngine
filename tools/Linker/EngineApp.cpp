@@ -87,12 +87,12 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 	LinkModule(pICore_, "Linker");
 
 	// LinkerLib
-	if (!pICore_->IntializeLoadedEngineModule("Engine_LinkerLib", "Engine_LinkerLib")) {
+	if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "LinkerLib", "Engine_LinkerLib")) {
 		return false;
 	}
 
 	// AssetDB
-	if (!pICore_->IntializeLoadedEngineModule("Engine_AssetDB", "Engine_AssetDB")) {
+	if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "AssetDB", "Engine_AssetDB")) {
 		return false;
 	}
 

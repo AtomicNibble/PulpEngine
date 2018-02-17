@@ -631,7 +631,7 @@ physics::IPhysLib* Converter::GetPhsicsLib(void)
 
 	// ideally we should be requesting the physics interface by guid directly.
 	// will need to make the core api support that.
-	bool result = gEnv->pCore->IntializeLoadedConverterModule("engine_Physics", "Engine_PhysLib", 
+	bool result = gEnv->pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib", 
 		&pPhysConverterMod_, &pConverterInstance);
 
 	if (!result) {

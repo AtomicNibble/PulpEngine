@@ -52,7 +52,7 @@ class XEngineModule_AssetDB : public IEngineModule
 
 
 		// Link the SqLite here?
-		if (!pCore->IntializeLoadedEngineModule("Engine_SqLite", "Engine_SqLite")) {
+		if (!pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
 			return false;
 		}
 

@@ -68,7 +68,7 @@ class XEngineModule_Font : public IEngineModule
 
 		pFontSys = X_NEW(font::XFontSystem, g_fontArena, "fontSys")(pCore);
 
-		if (!pCore->IntializeLoadedConverterModule("Engine_FontLib", "Engine_FontLib")) {
+		if (!pCore->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "FontLib", "Engine_FontLib")) {
 			X_ERROR("Font", "Failed to init FontLib");
 			return false;
 		}

@@ -80,7 +80,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
 	LinkModule(pICore_, "LevelBuilder");
 
 	// we can use logging now.
-	if (!pICore_->IntializeLoadedConverterModule("Engine_ModelLib", "Engine_ModelLib")) {
+	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ModelLib", "Engine_ModelLib")) {
 		X_ERROR("LvlBuilder", "Failed to init shaderLib");
 		return false;
 	}
@@ -88,7 +88,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
 	// ConvertLib
 	IConverter* pConverterInstance = nullptr;
 
-	if (!pICore_->IntializeLoadedConverterModule("engine_Physics", "Engine_PhysLib",
+	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "Physics", "Engine_PhysLib",
 		&pPhysConverterMod_, &pConverterInstance))
 	{
 		X_ERROR("LvlBuilder", "Engine Init Failed");
