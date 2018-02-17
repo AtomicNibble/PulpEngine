@@ -327,7 +327,6 @@ X_INLINE void MatrixLookAtRH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	Vec3f xaxis = (Up.cross(zaxis)).normalized();
 	Vec3f yaxis = zaxis.cross(xaxis);
 
-
 	// x col
 	pMat->m00 = xaxis.x;
 	pMat->m10 = xaxis.y;
@@ -353,6 +352,28 @@ X_INLINE void MatrixLookAtRH(Matrix44f* pMat, const Vec3f& Eye, const Vec3f& At,
 	pMat->m33 = 1;
 }
 
+X_INLINE void MatrixLookAtRH(Matrix33f* pMat, const Vec3f& Eye, const Vec3f& At, const Vec3f& Up)
+{
+	Vec3f vLightDir = (Eye - At);
+	Vec3f zaxis = vLightDir.normalized();
+	Vec3f xaxis = (Up.cross(zaxis)).normalized();
+	Vec3f yaxis = zaxis.cross(xaxis);
+
+	// x col
+	pMat->m00 = xaxis.x;
+	pMat->m10 = xaxis.y;
+	pMat->m20 = xaxis.z;
+
+	// y col
+	pMat->m01 = yaxis.x;
+	pMat->m11 = yaxis.y;
+	pMat->m21 = yaxis.z;
+
+	// z col
+	pMat->m02 = zaxis.x;
+	pMat->m12 = zaxis.y;
+	pMat->m22 = zaxis.z;
+}
 
 X_INLINE void MatrixPerspectiveFovRH(Matrix44f* pMat, float32_t fovY, float32_t aspect, 
 	float32_t zn, float32_t zf, bool reverseZ)
