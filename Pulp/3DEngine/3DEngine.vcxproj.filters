@@ -97,6 +97,9 @@
     <ClCompile Include="Particles\Effect.cpp">
       <Filter>Source Files\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\EffectVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -188,6 +191,9 @@
     </ClInclude>
     <ClInclude Include="Particles\Effect.h">
       <Filter>Header Files\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\EffectVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -303,6 +309,9 @@
     </None>
     <None Include="Model\RenderModel.inl">
       <Filter>Header Files\Model</Filter>
+    </None>
+    <None Include="Vars\EffectVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>

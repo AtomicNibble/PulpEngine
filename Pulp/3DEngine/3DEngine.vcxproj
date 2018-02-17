@@ -507,6 +507,7 @@
     <ClInclude Include="Texture\TextureManager.h" />
     <ClInclude Include="Util\Config.h" />
     <ClInclude Include="Vars\DrawVars.h" />
+    <ClInclude Include="Vars\EffectVars.h" />
     <ClInclude Include="Vars\MaterialVars.h" />
     <ClInclude Include="Vars\TextureVars.h" />
     <ClInclude Include="World\World3D.h" />
@@ -557,6 +558,7 @@
     <ClCompile Include="Texture\Texture.cpp" />
     <ClCompile Include="Texture\TextureManager.cpp" />
     <ClCompile Include="Vars\DrawVars.cpp" />
+    <ClCompile Include="Vars\EffectVars.cpp" />
     <ClCompile Include="Vars\MaterialVars.cpp" />
     <ClCompile Include="Vars\TextureVars.cpp" />
     <ClCompile Include="World\World3D.cpp" />
@@ -573,6 +575,7 @@
     <None Include="Model\RenderModel.inl" />
     <None Include="Texture\Texture.inl" />
     <None Include="Vars\DrawVars.inl" />
+    <None Include="Vars\EffectVars.inl" />
     <None Include="Vars\MaterialVars.inl" />
     <None Include="Vars\TextureVars.inl" />
     <None Include="World\World3D.inl" />
