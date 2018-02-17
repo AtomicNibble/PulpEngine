@@ -502,6 +502,7 @@
     <ClInclude Include="Model\RenderMesh.h" />
     <ClInclude Include="Model\RenderModel.h" />
     <ClInclude Include="Particles\Effect.h" />
+    <ClInclude Include="Particles\Emitter.h" />
     <ClInclude Include="Particles\FxManager.h" />
     <ClInclude Include="Texture\Texture.h" />
     <ClInclude Include="Texture\TextureManager.h" />
@@ -538,6 +539,7 @@
     <ClCompile Include="Model\RenderModel.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Particles\Effect.cpp" />
+    <ClCompile Include="Particles\Emitter.cpp" />
     <ClCompile Include="Particles\FxManager.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

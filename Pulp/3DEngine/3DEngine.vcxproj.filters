@@ -100,6 +100,9 @@
     <ClCompile Include="Vars\EffectVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
+    <ClCompile Include="Particles\Emitter.cpp">
+      <Filter>Source Files\Particles</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Gui\XWindow.h">
@@ -194,6 +197,9 @@
     </ClInclude>
     <ClInclude Include="Vars\EffectVars.h">
       <Filter>Header Files\Vars</Filter>
+    </ClInclude>
+    <ClInclude Include="Particles\Emitter.h">
+      <Filter>Header Files\Particles</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
