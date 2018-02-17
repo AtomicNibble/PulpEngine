@@ -418,6 +418,30 @@ namespace fx
 				return false;
 			}
 
+			if (!checkMember(s, "sequence", core::json::kObjectType)) {
+				return false;
+			}
+
+
+			{
+				auto& seqJson = s["sequence"];
+
+				if (!checkMember(seqJson, "startFrame", core::json::kNumberType)) {
+					return false;
+				}
+				if (!checkMember(seqJson, "fps", core::json::kNumberType)) {
+					return false;
+				}
+				if (!checkMember(seqJson, "loop", core::json::kNumberType)) {
+					return false;
+				}
+
+
+				stage.sequence.startFrame = seqJson["startFrame"].GetInt();
+				stage.sequence.fps = seqJson["fps"].GetInt();
+				stage.sequence.loop = seqJson["loop"].GetInt();
+			}
+
 			auto& typeJson = s["type"];
 			switch (core::Hash::Fnv1aHash(typeJson.GetString(), typeJson.GetStringLength()))
 			{
