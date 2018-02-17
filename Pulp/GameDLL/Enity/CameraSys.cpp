@@ -76,6 +76,7 @@ namespace entity
 		frame.view.cam = cam_;
 		frame.view.projMatrix = cam_.getProjectionMatrix();
 		frame.view.viewMatrix = cam_.getViewMatrix();
+		frame.view.viewMatrixInv = frame.view.viewMatrix.inverted();
 		frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
 		frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 

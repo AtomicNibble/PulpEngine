@@ -44,6 +44,7 @@ struct FrameView
 	XCamera cam; // camera pos for this frame.
 
 	X_ALIGN16_MATRIX44F(viewMatrix);
+	X_ALIGN16_MATRIX44F(viewMatrixInv);
 	X_ALIGN16_MATRIX44F(projMatrix);
 	X_ALIGN16_MATRIX44F(viewProjMatrix);
 	X_ALIGN16_MATRIX44F(viewProjInvMatrix);
