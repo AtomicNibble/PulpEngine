@@ -122,8 +122,6 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
 
 	font::TextDrawContext ctx;
 	ctx.col = col;
-//	ctx.flags.Set(font::DrawTextFlag::CENTER);
-//	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
 	ctx.pFont = gEnv->pFontSys->GetDefault();
 	ctx.effectId = 0;
 	ctx.size = Vec2f(textSize, textSize);
@@ -150,8 +148,6 @@ void RenderModel::RenderBoneNames(engine::PrimativeContext* pPrimContex, const M
 
 	font::TextDrawContext ctx;
 	ctx.col = col;
-//	ctx.flags.Set(font::DrawTextFlag::CENTER);
-//	ctx.flags.Set(font::DrawTextFlag::CENTER_VER);
 	ctx.pFont = gEnv->pFontSys->GetDefault();
 	ctx.effectId = 0;
 	ctx.size = Vec2f(textSize, textSize);
