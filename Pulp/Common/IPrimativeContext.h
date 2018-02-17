@@ -100,6 +100,8 @@ public:
 
 	void drawRect(float x, float y, float width, float height, Color8u col);
 	void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
+	void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, 
+		Color8u tlCol, Color8u trCol, Color8u blCol, Color8u brCol);
 
 	// ya fucking what!
 	void drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,

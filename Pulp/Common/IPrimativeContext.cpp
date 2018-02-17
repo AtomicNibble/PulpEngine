@@ -389,6 +389,26 @@ void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 	drawLines(points, col);
 }
 
+void IPrimativeContext::drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
+	Color8u tlCol, Color8u trCol, Color8u blCol, Color8u brCol)
+{
+	const Vec3f points[8] = {
+		tl, tr,
+		bl, br,
+		tl, bl,
+		tr, br
+	};
+
+	const Color8u col[8] = {
+		tlCol, trCol,
+		blCol, brCol,
+		tlCol, blCol,
+		trCol, brCol
+	};
+
+	drawLines(points, col);
+}
+
 void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
 	float padding, uint32_t max, Color8u col)
 {
