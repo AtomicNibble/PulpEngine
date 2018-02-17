@@ -183,14 +183,6 @@ bool XGame::update(core::FrameData& frame)
 //	cam_.setAngles(cameraAngle_);
 //	cam_.setPosition(cameraPos_);
 
-#if 0
-	// Pro
-	frame.view.cam = cam_;
-	frame.view.projMatrix = cam_.getProjectionMatrix();
-	frame.view.viewMatrix = cam_.getViewMatrix();
-	frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
-	frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
-#endif
 
 	// orth
 	Matrix44f orthoProj;
