@@ -33,12 +33,13 @@ public:
 	void set(const Matrix34<T>& mat);
 	void set(const Matrix44<T>& mat);
 
-
 	void setPosition(const Vec3<T>& vec);
 	Vec3<T> getPosition(void);
 	const Vec3<T>& getPosition(void) const;
 
-	static Transform<T> identity()
+	Vec3<T> transform(const Vec3<T>& p) const;
+
+	X_INLINE static Transform<T> identity(void)
 	{
 		return Transform();
 	}
