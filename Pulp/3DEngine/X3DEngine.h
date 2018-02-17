@@ -83,7 +83,6 @@ private:
 	PrimativeContextSharedResources primResources_;
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 	
-//	level::Level level_;
 	DrawVars drawVars_;
 
 	WorldArr worlds_;
