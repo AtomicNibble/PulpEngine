@@ -11,7 +11,7 @@ public:
 	EngineApp();
 	~EngineApp() X_OVERRIDE;
 
-	bool Init(const wchar_t* sInCmdLine);
+	bool Init(const wchar_t* sInCmdLine, PLATFORM_HWND hWnd);
 	bool ShutDown(void);
 
 private:

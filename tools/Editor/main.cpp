@@ -6,6 +6,8 @@
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 
+#include "RenderWidget.h"
+
 #include "logging.h"
 #include "EngineApp.h"
 
@@ -100,6 +102,12 @@ int main(int argc, char *argv[])
 #endif
 
 
+	editor::RenderWidget w;
+	w.resize(1280, 720);
+	w.show();
+	PLATFORM_HWND hWnd = reinterpret_cast<PLATFORM_HWND>(w.winId());
+
+
 	core::MallocFreeAllocator allocator;
 	AssetManagerArena arena(&allocator, "EditorArena");
 	g_arena = &arena;
@@ -108,7 +116,7 @@ int main(int argc, char *argv[])
 	{
 		EngineApp app; // needs to clear up before arena.
 
-		if (app.Init(::GetCommandLineW()))
+		if (app.Init(::GetCommandLineW(), hWnd))
 		{
 #if REDIRECT_QT_LOGGS 
 			const QtMessageHandler oldMsgHandler = qInstallMessageHandler(redirectQtMsgToEngineLog);

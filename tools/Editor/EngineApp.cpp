@@ -21,9 +21,10 @@ EngineApp::~EngineApp()
 }
 
 
-bool EngineApp::Init(const wchar_t* sInCmdLine)
+bool EngineApp::Init(const wchar_t* sInCmdLine, PLATFORM_HWND hWnd)
 {
 	SCoreInitParams params;
+	params.hWnd = hWnd;
 	params.hInstance = 0;
 	params.pCmdLine = sInCmdLine;
 	params.bSkipInput = true;
@@ -35,12 +36,12 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 #endif
 	params.bConsoleLog = false;
 	params.bTesting = false;
-	params.bCoreOnly = true;
+	params.bCoreOnly = false;
 	params.bEnableBasicConsole = false;
 	params.bEnableJobSystem = true; 
 	params.pConsoleWnd = nullptr;
 	params.pCoreArena = g_arena;
-	params.bFileSysWorkingDir = true;
+	params.bFileSysWorkingDir = false;
 
 
 #ifdef X_LIB
