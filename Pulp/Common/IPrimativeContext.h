@@ -149,7 +149,7 @@ public:
 	// Arrow
 	void drawArrow(const Vec3f& posA, const Vec3f& posB, Color8u color);
 
-	// Arrow
+	// Axis - X: red Y: Green Z: Blue
 	void drawAxis(const Vec3f& pos, const Vec3f& extends);
 	void drawAxis(const Transformf& trans, const Vec3f& extends);
 	void drawAxis(const Transformf& trans, const Vec3f& offset, const Vec3f& extends);
