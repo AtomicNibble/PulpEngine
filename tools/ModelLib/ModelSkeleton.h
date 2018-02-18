@@ -26,6 +26,8 @@ public:
 	ModelSkeleton(core::MemoryArenaBase* arena);
 	~ModelSkeleton();
 
+	void dumpToLog(void) const;
+
 	bool LoadCompiledSkelton(const core::Path<char>& path);
 	bool LoadCompiledSkelton(const core::Path<wchar_t>& path);
 

@@ -29,6 +29,40 @@ ModelSkeleton::~ModelSkeleton()
 
 }
 
+void ModelSkeleton::dumpToLog(void) const
+{
+	size_t longestName = 0;
+	for (size_t i = 0; i < numBones_; i++)
+	{
+		const char* pName = getBoneName(i);
+		longestName = core::Max(longestName, core::strUtil::strlen(pName));
+	}
+
+	++longestName; // one space
+	longestName += 2; // " "
+
+	for (size_t i = 0; i < numBones_; i++)
+	{
+		const char* pName = getBoneName(i);
+		const auto pos = getBonePos(i);
+		const auto ang = getBoneAngle(i);
+		const auto parent = getBoneParent(i);
+
+		core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH> boneName;
+		core::StackString<128> posStr, angStr;
+		
+		X_ASSERT(longestName > boneName.length(), "Incorrect longest name")(longestName, boneName.length());
+
+		boneName.appendFmt("\"%s", pName);
+		boneName.append('"', 1);
+		boneName.append(' ', longestName - boneName.length());
+		posStr.appendFmt("(^6%8.3f,%8.3f,%8.3f ^7)", pos.x, pos.y, pos.z);
+		angStr.appendFmt("(^6%6.3f,%6.3f,%6.3f - %6.3f^7)", ang.v.x, ang.v.y, ang.v.z, ang.w);
+
+		X_LOG0("Skelton", "%s pos: %s ang: %s parent: ^6%" PRIuS, boneName.c_str(), posStr.c_str(), angStr.c_str(), parent);
+	}
+}
+
 bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
 {
 	return LoadCompiledSkelton(core::Path<wchar_t>(filePath));
