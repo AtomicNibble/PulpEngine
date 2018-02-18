@@ -41,13 +41,6 @@ namespace fx
 
 		elapsed_ += delta;
 
-		static float test = 0.f;
-		test += 0.01f;
-
-		if (test > 1.f) {
-			test = 0.f;
-		}
-
 		for (int32_t i = 0; i < efx_.getNumStages(); i++)
 		{
 			auto& stage = pStages[i];
