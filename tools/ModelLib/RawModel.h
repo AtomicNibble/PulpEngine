@@ -1,11 +1,12 @@
 #pragma once
 
 
+#include <IScale.h>
+#include <IModel.h>
 #include <String\Path.h>
 
 #include "RawModelTypes.h"
 
-#include <IModel.h>
 
 
 X_NAMESPACE_DECLARE(core,
@@ -71,6 +72,7 @@ namespace RawModel
 		static bool ReadMaterial(core::XLexer& lex, Material& mat);
 		static bool ReadMaterialCol(core::XLexer& lex, const char* pName, Color& col);
 
+		static bool ReadheaderToken(core::XLexer& lex, const char* pName, core::UnitOfMeasure::Enum& units, bool optional);
 		static bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
 		static bool ReadheaderToken(core::XLexer& lex, const char* pName, uint32_t& valOut);
 
@@ -113,6 +115,7 @@ namespace RawModel
 		BoneArr bones_;
 		LodArr lods_;
 
+		core::UnitOfMeasure::Enum unitOfMeasure_;
 		bool hasColisionMeshes_;
 	};
 

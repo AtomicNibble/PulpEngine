@@ -13,8 +13,9 @@
 #include <Threading\Spinlock.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
-
 X_NAMESPACE_BEGIN(model)
+
+using namespace core::Hash::Fnv1Literals;
 
 namespace RawModel
 {
@@ -25,6 +26,7 @@ namespace RawModel
 		pJobSys_(pJobSys),
 		arena_(arena),
 		bones_(arena),
+		unitOfMeasure_(core::UnitOfMeasure::Centimeters),
 		hasColisionMeshes_(false)
 	{
 
@@ -148,13 +150,15 @@ namespace RawModel
 		if (!ReadheaderToken(lex, "VERSION", version)) {
 			return false;
 		}
+		if (!ReadheaderToken(lex, "UNITS", unitOfMeasure_, true)) {
+			return false;
+		}
 		if (!ReadheaderToken(lex, "LODS", numLods)) {
 			return false;
 		}
 		if (!ReadheaderToken(lex, "BONES", numBones)) {
 			return false;
 		}
-
 
 		if (version < model::MODEL_RAW_VERSION) {
 			X_ERROR("RawModel", "RawModel file version is too old: %" PRIi32 " required: %" PRIu32,
@@ -541,6 +545,55 @@ namespace RawModel
 			X_ERROR("RawModel", "Failed to read material '%s' col", pName);
 			return false;
 		}
+		return true;
+	}
+
+	bool Model::ReadheaderToken(core::XLexer& lex, const char* pName, core::UnitOfMeasure::Enum& units, bool optional)
+	{
+		core::XLexToken token(nullptr, nullptr);
+
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read token");
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME || !token.isEqual(pName)) {
+			if (optional) {
+				lex.UnreadToken(token);
+				return true;
+			}
+
+			X_ERROR("RawModel", "Failed to read '%s'", pName);
+			return false;
+		}
+
+		// get value
+		if (!lex.ReadToken(token)) {
+			X_ERROR("RawModel", "Failed to read '%s' value", pName);
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NAME && token.GetType() != core::TokenType::STRING) {
+			X_ERROR("RawModel", "Failed to read '%s' value, it's not of string type", pName);
+			return false;
+		}
+
+		core::StackString256 unitStr(token.begin(), token.end());
+		unitStr.toLower();
+
+		switch (core::Hash::Fnv1aHash(unitStr.begin(), unitStr.length()))
+		{
+			case "centimeters"_fnv1a:
+			case "cm"_fnv1a:
+				units = core::UnitOfMeasure::Centimeters;
+			case "in"_fnv1a:
+			case "inches"_fnv1a:
+				units = core::UnitOfMeasure::Inches;
+			default:
+				X_ERROR("RawModel", "Invalid unit of measure: \"%s\"", unitStr.c_str());
+				return false;
+		}
+
 		return true;
 	}
 
