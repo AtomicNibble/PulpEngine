@@ -9,6 +9,8 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(engine)
 
+class EffectVars;
+
 class IPrimativeContext;
 
 namespace fx
@@ -68,7 +70,7 @@ namespace fx
 
 
 	public:
-		Emitter(const Effect& efx, core::MemoryArenaBase* arena);
+		Emitter(const EffectVars& effectVars, const Effect& efx, core::MemoryArenaBase* arena);
 
 		void setTrans(const Transformf& trans) X_FINAL;
 		void setTrans(const Transformf& trans, const Vec3f& offset) X_FINAL;
@@ -91,6 +93,7 @@ namespace fx
 		Vec3f colorForIdx(int32_t start, int32_t idx) const;
 
 	private:
+		const EffectVars& vars_;
 		const Effect& efx_;
 		StageStateArr stages_;
 		Transformf trans_;

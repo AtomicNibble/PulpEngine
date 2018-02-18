@@ -3,8 +3,8 @@
 #include "Effect.h"
 
 #include "EngineEnv.h"
-
 #include "Material\MaterialManager.h"
+#include "Vars\EffectVars.h"
 
 #include <IPrimativeContext.h>
 #include <IFrameData.h>
@@ -15,7 +15,8 @@ namespace fx
 {
 
 
-	Emitter::Emitter(const Effect& efx, core::MemoryArenaBase* arena) :
+	Emitter::Emitter(const EffectVars& effectVars, const Effect& efx, core::MemoryArenaBase* arena) :
+		vars_(effectVars),
 		efx_(efx),
 		stages_(arena, efx_.getNumStages(), StageState(arena))
 	{
@@ -303,9 +304,17 @@ namespace fx
 				br += pos;
 
 				pPrim->drawQuad(tl, tr, bl, br, s.pMaterial, e.col, e.uv);
-				pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Yellow, Col_Green, Col_Blue);
 
+				if (vars_.drawDebug() && vars_.drawElemRect())
+				{
+					pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Red, Col_Blue, Col_Blue);
+				}
 			}
+		}
+
+		if (vars_.drawDebug() && vars_.axisExtent() > 0.f)
+		{
+			pPrim->drawAxis(trans_, offset_, Vec3f(vars_.axisExtent()));
 		}
 	}
 

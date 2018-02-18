@@ -81,7 +81,7 @@ namespace fx
 			return nullptr;
 		}
 
-		auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(*pEffect, arena_);
+		auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(vars_, *pEffect, arena_);
 
 		return pEmitter;
 	}
