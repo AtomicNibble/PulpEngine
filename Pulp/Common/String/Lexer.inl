@@ -76,7 +76,7 @@ double XLexToken::GetDoubleValue(void)
 	if (type_ != TokenType::NUMBER) {
 		return 0.0;
 	}
-	if (!(subtype_.IsSet(TokenSubTypeFlags::VALUESVALID))) {
+	if (!subtype_.IsSet(TokenSubTypeFlags::VALUESVALID)) {
 		NumberValue();
 	}
 	return floatvalue_;
@@ -85,23 +85,30 @@ double XLexToken::GetDoubleValue(void)
 float XLexToken::GetFloatValue(void)
 {
 	return static_cast<float>(GetDoubleValue());
-
 }
 
-unsigned long XLexToken::GetUnsignedLongValue(void)
+uint32_t XLexToken::GetUIntValue(void)
+{
+	if (type_ != TokenType::NUMBER) {
+		return 0u;
+	}
+	if (!subtype_.IsSet(TokenSubTypeFlags::VALUESVALID)) {
+		NumberValue();
+	}
+
+	return static_cast<uint32_t>(floatvalue_);
+}
+
+int32_t	XLexToken::GetIntValue(void)
 {
 	if (type_ != TokenType::NUMBER) {
 		return 0;
 	}
-	if (!(subtype_.IsSet(TokenSubTypeFlags::VALUESVALID))) {
+	if (!subtype_.IsSet(TokenSubTypeFlags::VALUESVALID)) {
 		NumberValue();
 	}
-	return intvalue_;
-}
 
-int	XLexToken::GetIntValue(void)
-{
-	return static_cast<int>(GetUnsignedLongValue());
+	return intvalue_;
 }
 
 void XLexToken::Reset(void)

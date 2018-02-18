@@ -269,6 +269,7 @@ void XLexToken::NumberValue(void)
 		}
 		floatvalue_ = intvalue_;
 	}
+
 	subtype_ |= TokenSubType::VALUESVALID;
 }
 

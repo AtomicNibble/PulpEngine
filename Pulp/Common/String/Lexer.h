@@ -176,9 +176,9 @@ public:
 	X_INLINE bool isEqual(const char* str) const;
 	X_INLINE bool isEqual(const char* pBegin, const char* pEnd) const;
 
-	X_INLINE double GetDoubleValue(void);				// double value of TT_NUMBER
-	X_INLINE float GetFloatValue(void);					// float value of TT_NUMBER
-	X_INLINE unsigned long GetUnsignedLongValue(void);	// unsigned long value of TT_NUMBER
+	X_INLINE double GetDoubleValue(void);			// double value of TokenType::NUMBER
+	X_INLINE float GetFloatValue(void);				// float value of TokenType::NUMBER
+	X_INLINE uint32_t GetUIntValue(void);			// unsigned int value of TokenType::NUMBER
 	X_INLINE int32_t GetIntValue(void);
 
 	X_INLINE void Reset(void);
@@ -199,16 +199,16 @@ protected:
 	X_INLINE const XLexToken* GetNext(void) const;
 
 private:
-	TokenType::Enum	type_;				// token type
-	TokenSubTypeFlags subtype_;			// token sub type
+	TokenType::Enum	type_;			// token type
+	TokenSubTypeFlags subtype_;		// token sub type
 	PunctuationId::Enum puncId_;	// punctiation id
 
 
 	int32_t	line_;					// line in script the token was on
 	int32_t	linesCrossed_;			// number of lines crossed in white space before token
-//	Flags<TokenFlag>	flags_;			// token flags, used for recursive defines
+//	Flags<TokenFlag>	flags_;		// token flags, used for recursive defines
 
-	long intvalue_;			// integer value
+	int32_t intvalue_;					// integer value
 	double floatvalue_;
 
 	const char* start_;
