@@ -2873,6 +2873,7 @@ void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
 		{
 			hash.clear();
 
+			X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")(arena_->isThreadSafe());
 			Mesh::VertsArr v(arena_);
 
 			v.swap(mesh.verts_);
@@ -3063,6 +3064,8 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
 	typedef core::Array<int32_t> IdxArray;
 
 	// requires thread safe allocator.
+	X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")(arena_->isThreadSafe());
+
 	IdxArray srcToDstIdx(arena_);
 	IdxArray dstToSrcIdx(arena_);
 
