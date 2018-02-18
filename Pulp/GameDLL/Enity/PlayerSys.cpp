@@ -119,6 +119,23 @@ namespace entity
 			player.deltaViewAngles = delta;
 		}
 
+		if(vars_.drawPosInfo_)
+		{
+			auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+			core::StackString256 dbgTxt;
+			dbgTxt.appendFmt("pos (%.2f,%.2f,%.2f)\nyaw %.2f pitch: %.2f roll: %.2f", 
+				trans.pos.x, trans.pos.y, trans.pos.z,
+				player.viewAngles.yaw(), player.viewAngles.pitch(), player.viewAngles.roll());
+
+			font::TextDrawContext con;
+			con.col = Col_Mintcream;
+			con.size = Vec2f(24.f, 24.f);
+			con.effectId = 0;
+			con.pFont = gEnv->pFontSys->GetDefault();
+			pPrim->drawText(Vec3f(10.f, 200.f, 0.8f), con, dbgTxt.begin(), dbgTxt.end());
+		}
+
 		if (reg.has<CharacterController>(playerId))
 		{
 			auto& con = reg.get<CharacterController>(playerId);

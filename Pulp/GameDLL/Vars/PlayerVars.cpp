@@ -11,6 +11,8 @@ PlayerVars::PlayerVars()
 {
 	gunOffset_ = Vec3f(3.f, 0.f, 0.f);
 
+	drawPosInfo_ = 0;
+
 	thirdPerson_ = 0;
 	thirdPersonRange_ = 20;
 	thirdPersonAngle_ = 0;
@@ -45,6 +47,9 @@ PlayerVars::PlayerVars()
 void PlayerVars::registerVars(void)
 {
 	ADD_CVAR_REF_VEC3("ply_gun_offset", gunOffset_, gunOffset_, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "");
+
+	ADD_CVAR_REF("ply_draw_pos", drawPosInfo_, drawPosInfo_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+		"Draw current position & angle");
 
 	ADD_CVAR_REF("ply_thirdperson", thirdPerson_, thirdPerson_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::CHEAT, 
 		"One dimension to rule them all");
