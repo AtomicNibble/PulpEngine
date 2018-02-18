@@ -3168,6 +3168,18 @@ void ModelCompiler::CreateDataJob(CreateDataJobData* pData, size_t count)
 				vert.col_ = tv.col_;
 				vert.uv_ = tv.uv_;
 				vert.binds_ = rv.binds_;
+
+				// map uv's to 0-1 range.
+				auto& uv = vert.uv_;
+				uv.x = math<float>::fmod(uv.x, 1.f);
+				uv.y = math<float>::fmod(uv.y, 1.f);
+
+				if (uv.x < 0.f) {
+					uv.x = 1.f - math<float>::abs(uv.x);
+				}
+				if (uv.y < 0.f) {
+					uv.y = 1.f - math<float>::abs(uv.y);
+				}
 			}
 
 			// make face.
