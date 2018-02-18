@@ -3,9 +3,9 @@
 #include <IEffect.h>
 
 #include <Assets\AssertContainer.h>
-
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 
+#include "Vars\EffectVars.h"
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -85,6 +85,7 @@ namespace fx
 		core::AssetLoader* pAssetLoader_;
 
 		EffectContainer	effects_;
+		EffectVars vars_;
 	};
 
 } // namespace fx

@@ -51,7 +51,7 @@ namespace fx
 
 	void EffectManager::registerVars(void)
 	{
-
+		vars_.registerVars();
 	}
 
 
