@@ -1315,6 +1315,9 @@
     <ClInclude Include="IEffect.h">
       <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
+    <ClInclude Include="IScale.h">
+      <Filter>Interfaces_h</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

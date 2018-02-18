@@ -190,6 +190,7 @@
     <ClInclude Include="IRender.h" />
     <ClInclude Include="I3DEngine.h" />
     <ClInclude Include="IRenderMesh.h" />
+    <ClInclude Include="IScale.h" />
     <ClInclude Include="IScriptSys.h" />
     <ClInclude Include="ISerialize.h" />
     <ClInclude Include="IShader.h" />
