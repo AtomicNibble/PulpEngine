@@ -233,9 +233,10 @@ namespace fx
 
 	void Emitter::draw(core::FrameView& view, IPrimativeContext* pPrim)
 	{
-		Quatf viewQ(view.viewMatrix.transposed());
-		viewQ.invert();
+		auto lookatCam(view.viewMatrix);
+		lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
 
+		Quatf lookatCamQ(lookatCam);
 
 		for (size_t i = 0; i < stages_.size(); i++)
 		{
@@ -267,14 +268,13 @@ namespace fx
 				Vec3f bl = Vec3f(-half, half, 0);
 				Vec3f br = Vec3f(half, half, 0);
 
-
 				if (stage.type == StageType::BillboardSprite)
 				{
 					// i want the sprite to always face the camera.
-					tl = tl * viewQ;
-					tr = tr * viewQ;
-					bl = bl * viewQ;
-					br = br * viewQ;
+					tl = tl * lookatCamQ;
+					tr = tr * lookatCamQ;
+					bl = bl * lookatCamQ;
+					br = br * lookatCamQ;
 				}
 				else
 				{
@@ -284,18 +284,10 @@ namespace fx
 					br = br * trans_.quat;
 				}
 
-				// i want the axis to follow the emmiter.
-				// 
-				{
-					Transformf t = trans_;
-					t.quat = viewQ;
-
-					pPrim->drawAxis(t, Vec3f(20.f));
-				}
-				//pPrim->drawAxis(trans_, offset_, Vec3f(20.f));
-
 				Vec3f pos = e.pos + e.dir + offset_;
-				//	pos = pos * trans_.quat;
+				// do the rotation including  offset.
+				// so the effects point of origin is at trans_.pos;
+				pos = pos * trans_.quat; 
 				pos += trans_.pos;
 
 				tl += pos;
