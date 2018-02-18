@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "XSound.h"
 
+#include <Math\XMatrixAlgo.h>
+
 #include "ScriptBinds\ScriptBinds_sound.h"
 
 // id's
@@ -732,30 +734,17 @@ void XSound::drawDebug(void) const
 
 		if (drawText)
 		{
-			// basic lookAt, mine seams broke as fuck.
-			Vec3f up = Vec3f::zAxis();
-			const Vec3f& eye = trans.pos; // listnerPos;
-			const Vec3f& center = listnerPos; // trans.pos;
-			Vec3f f((center - eye).normalized());
-			Vec3f s(cross(f, up).normalized());
-			Vec3f u(cross(s, f));
+			const Vec3f& eye = trans.pos; 
+			const Vec3f& center = listnerPos; 
 
-			Matrix33f Result(1);
-			Result.at(0, 0) = s.x;
-			Result.at(1, 0) = s.y;
-			Result.at(2, 0) = s.z;
-			Result.at(0, 1) = u.x;
-			Result.at(1, 1) = u.y;
-			Result.at(2, 1) = u.z;
-			Result.at(0, 2) = -f.x;
-			Result.at(1, 2) = -f.y;
-			Result.at(2, 2) = -f.z;
-			Result.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+			Matrix33f mat;
+			MatrixLookAtRH(&mat, eye, center, Vec3f::zAxis());
+			mat.rotate(Vec3f::zAxis(), ::toRadians(180.f));
 
 			core::StackString256 txt;
 			txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
 
-			pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), Result, con, txt.begin(), txt.end());
+			pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), mat, con, txt.begin(), txt.end());
 		}
 
 		pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
