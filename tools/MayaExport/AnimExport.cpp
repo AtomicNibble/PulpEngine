@@ -3,6 +3,7 @@
 #include "MayaUtil.h"
 
 #include <IAnimation.h>
+#include <IFileSys.h>
 
 #include <maya/MArgList.h>
 #include <maya\MSelectionList.h>
@@ -143,6 +144,10 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 
 		const auto filePath = getFilePath();
 		MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath.c_str());
+
+		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+			X_ERROR("Anim", "Failed to create export directory");
+		}
 
 		FILE* f;
 		errno_t err = fopen_s(&f, filePath.c_str(), "wb");
