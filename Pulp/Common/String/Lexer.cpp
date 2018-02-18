@@ -89,21 +89,16 @@ namespace
 
 void XLexToken::NumberValue(void)
 {
-	int i, pow, div, c, negative;
-	const char* p;
-	double m;
-
 	X_ASSERT(type_ == TokenType::NUMBER, "token is not a number")(type_);
 
 	// make a nullterm string
 	// lol wtf this is 10% of the function.
 	core::StackString<128> temp(begin(), end());
 
-	p = temp.c_str();
+	const char* p = temp.c_str();
 
 	floatvalue_ = 0;
 	intvalue_ = 0;
-	negative = 0;
 
 	// floating point number
 	if (subtype_.IsSet(TokenSubType::FLOAT))
@@ -136,9 +131,13 @@ void XLexToken::NumberValue(void)
 		}
 		else 
 		{
+			double m;
+			bool div;
+			bool negative = false;
+
 			if (*p == '-')
 			{
-				negative = 1;
+				negative = true;
 				p++;
 			}
 
@@ -166,7 +165,9 @@ void XLexToken::NumberValue(void)
 				else {
 					div = false;
 				}
-				pow = 0;
+
+				int pow = 0;
+				int i;
 				for (pow = 0; *p; p++) {
 					pow = pow * 10 + static_cast<int>(*p - '0');
 				}
@@ -190,9 +191,11 @@ void XLexToken::NumberValue(void)
 	}
 	else if (subtype_.IsSet(TokenSubType::DECIMAL))
 	{
+		bool negative = false;
+
 		if (*p == '-')
 		{
-			negative = 1;
+			negative = true;
 			p++;
 		}
 
@@ -209,7 +212,7 @@ void XLexToken::NumberValue(void)
 	}
 	else if (subtype_.IsSet(TokenSubType::IPADDRESS)) 
 	{
-		c = 0;
+		int c = 0;
 		while (*p && *p != ':') {
 			if (*p == '.') {
 				while (c != 3) {
