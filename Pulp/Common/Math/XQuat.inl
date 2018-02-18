@@ -578,13 +578,16 @@ X_INLINE void Quat<T>::set(const Matrix34<T> &m)
 	}
 	else
 	{
-		unsigned int i = 0;
-		if (m.at(1, 1) > m.at(0, 0))
+		uint32_t i = 0;
+		if (m.at(1, 1) > m.at(0, 0)) {
 			i = 1;
-		if (m.at(2, 2) > m.at(i, i))
+		}
+		if (m.at(2, 2) > m.at(i, i)) {
 			i = 2;
-		unsigned int j = (i + 1) % 3;
-		unsigned int k = (j + 1) % 3;
+		}
+
+		uint32_t j = (i + 1) % 3;
+		uint32_t k = (j + 1) % 3;
 		T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
 		(*this)[i] = (T)0.5 * s;
 		T recip = (T)0.5 / s;
@@ -609,13 +612,16 @@ X_INLINE void Quat<T>::set(const Matrix44<T> &m)
 	}
 	else
 	{
-		unsigned int i = 0;
-		if (m.at(1, 1) > m.at(0, 0))
+		uint32_t i = 0;
+		if (m.at(1, 1) > m.at(0, 0)) {
 			i = 1;
-		if (m.at(2, 2) > m.at(i, i))
+		}
+		if (m.at(2, 2) > m.at(i, i)) {
 			i = 2;
-		unsigned int j = (i + 1) % 3;
-		unsigned int k = (j + 1) % 3;
+		}
+
+		uint32_t j = (i + 1) % 3;
+		uint32_t k = (j + 1) % 3;
 		T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
 		(*this)[i] = (T)0.5 * s;
 		T recip = (T)0.5 / s;
