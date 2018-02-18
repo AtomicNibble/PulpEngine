@@ -138,7 +138,7 @@ namespace fx
 						"spawnOrgXRange" : 0,
 						"spawnOrgYStart" : 0,
 						"spawnOrgYRange" : 0,
-						"spawnOrgZStart" : 10,
+						"spawnOrgZStart" : 0,
 						"spawnOrgZRange" : 2,
 
 						"colorGraph" : {
@@ -366,7 +366,151 @@ namespace fx
 			}
 		)";
 
-		str = test;
+		auto testCandle  = R"(
+			{
+				"stages" : [
+					{
+						"name" : "segment1",
+						"type" : "BillboardSprite",
+						"flags" : "",
+
+						"materials" : [
+							"fx/test/fire_anim_candle"
+						],
+
+						"interval": 1700,
+						"loopCount": 0,
+
+						"countStart": 0,
+						"countRange": 0,
+						"lifeStart": 2000,
+						"lifeRange": 0,
+						"delayStart": 0,
+						"delayRange": 0,
+					
+						"spawnOrgXStart" : 0,
+						"spawnOrgXRange" : 0,
+						"spawnOrgYStart" : 0,
+						"spawnOrgYRange" : 0,
+						"spawnOrgZStart" : 2,
+						"spawnOrgZRange" : 0,
+
+						"sequence" : {
+							"startFrame": -1,
+							"fps": 30,
+							"loop": 0
+						},
+
+						"colorGraph" : {
+							"scale" : 1,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"rgb": [
+											1,
+											1,
+											1
+										]
+									}
+								]
+							]
+						},
+						"alphaGraph" : {
+							"scale" : 1,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									},
+									{
+										"time": 0.045,
+										"val": 1
+									},
+									{
+										"time": 0.956,
+										"val": 1
+									},
+									{
+										"time": 1,
+										"val": 0
+									}
+								]
+							]
+						},
+						"sizeGraph" : {
+							"scale" : 4,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 1
+									}
+								]
+							]
+						},
+						"scaleGraph" : {
+							"scale" : 15,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 1
+									}
+								]
+							]
+						},
+						"rotGraph" : {
+							"scale" : 0,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									}
+								]
+							]
+						},
+						"vel0XGraph" : {
+							"scale" : 0,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									}
+								]
+							]
+						},
+						"vel0YGraph" : {
+							"scale" : 0,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									}
+								]
+							]
+						},
+						"vel0ZGraph" : {
+							"scale" : 0,							
+							"graphs": [
+								[
+									{
+										"time": 0,
+										"val": 0
+									}
+								]
+							]
+						}
+					}
+				]
+			}
+		)";
+
+		str = testCandle;
 
 	
 		core::json::Document d;
