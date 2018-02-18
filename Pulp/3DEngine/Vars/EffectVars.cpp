@@ -21,7 +21,7 @@ void EffectVars::registerVars(void)
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draw bounds of elems");
 
-	ADD_CVAR_REF("efx_draw_axis", axisExtent_, 0, 0, 128,
+	ADD_CVAR_REF("efx_draw_axis_scale", axisExtent_, 0, 0, 128,
 		core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
 		"Draw effect axis");
 	
