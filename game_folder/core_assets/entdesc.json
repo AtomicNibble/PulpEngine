@@ -215,20 +215,6 @@
             }
         },
         {
-            "origin" : {"x": -100, "y": -150, "z": 10},
-            "Mesh" : {
-                "name" : "test/prop/rolling_pan"
-            },
-            "MeshRenderer" : {
-            },
-            "DynamicObject" : {
-            },
-            "Emitter" : {
-                "effect" : "test/simple01",
-                "offset" : {"x": 0, "y": 0, "z": 10}
-            }
-        },
-        {
             "origin" : {"x": -250, "y": 100, "z": 10},
             "Mesh" : {
                 "name" : "test/prop/wood_chair"
@@ -259,27 +245,94 @@
             }
         },
         {
+            "origin" : {"x": -100, "y": -150, "z": 10},
+            "Mesh" : {
+                "name" : "test/prop/rolling_pan"
+            },
+            "MeshRenderer" : {
+            },
+            "DynamicObject" : {
+            },
+            "Emitter" : {
+                "effect" : "test/candle",
+                "offset" : {"x": 0, "y": 0, "z": 20}
+            }
+        },
+        {
             "origin" : {"x": -90, "y": 50, "z": 30},
 
             "Emitter" : {
-                "effect" : "test/simple01",
+                "effect" : "test/candle",
                 "offset" : {"x": 0, "y": 0, "z": 10}
             }
         },
         {
-            "origin" : {"x": -40, "y": 50, "z": 30},
+            "origin" : {"x": -40, "y": 50, "z": 40},
 
-            "Emitter" : {
-                "effect" : "test/simple01",
-                "offset" : {"x": 0, "y": 0, "z": 10}
+            "Mesh" : {
+                "name" : "test/prop/rustic_candle"
             },
-            "Mover" : {
-                "start" : {"x": -40, "y": 50, "z": 30},
-                "end" : {"x": -40, "y": 50, "z": 10},
-                "time" : 2.0
+            "MeshRenderer" : {
+            },
+            "Emitter" : {
+                "effect" : "test/candle",
+                "offset" : {"x": 0, "y": 0, "z": 7}
+            },
+       //     "Mover" : {
+        //        "start" : {"x": -40, "y": 50, "z": 40},
+        //        "end" : {"x": -40, "y": 50, "z": 30},
+      //          "time" : 2.0
+        //    },
+            "Rotator" : {
+                "axis" : {"x": 0, "y": 0, "z": 0.2},
+                "speed": 5.0
+            },
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
+            }
+        },
+
+        {
+            "name": "Bob",
+            "origin" : {"x": -150, "y": 0, "z": 8},
+
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
+            },
+            "Mesh" : {
+                "name" : "test/anim/char_honorguard"
+            },
+            "MeshRenderer" : {
+            }
+        },
+
+        {
+            "origin" : {"x": 50, "y": 26, "z": 55},
+
+            "Mesh" : {
+                "name" : "test/weap/view_raygun"
+            },
+            "MeshRenderer" : {
+            },
+            "Animator" : {
+
+            }
+        },
+        {
+            "name": "Arms",
+            "origin" : {"x": 30, "y": 26, "z": 64},
+
+            "Mesh" : {
+                "name" : "test/arms/view_ger"
+            },
+            "MeshRenderer" : {
+            },
+            "Animator" : {
+
             }
         }
-
 
         /*
         {
