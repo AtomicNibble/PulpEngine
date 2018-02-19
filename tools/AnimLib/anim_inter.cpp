@@ -350,6 +350,11 @@ bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 			return false;
 		}
 
+		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("InterAnim", "Failed to read 'BONE' name");
+			return false;
+		}
+
 		Bone bone(arena_);
 		bone.name = core::string(token.begin(), token.end());
 
