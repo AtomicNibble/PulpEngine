@@ -33,9 +33,18 @@ struct Bone
 	core::Array<FrameData> data;
 };
 
+struct NoteTrack
+{
+	int32_t frame;
+	core::string value;
+};
+
 class PotatoAnimExporter
 {
 	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
+
+	typedef core::Array<Bone> BoneArr;
+	typedef core::Array<NoteTrack> NoteTrackArr;
 
 public:
 	PotatoAnimExporter(core::MemoryArenaBase* arena);
@@ -86,7 +95,8 @@ private:
 	ExpoMode::Enum exportMode_;
 	MDistance::Unit unitOfMeasurement_;
 	MDagPathArray exportObjects_;
-	core::Array<Bone> bones_;
+	BoneArr bones_;
+	NoteTrackArr notes_;
 };
 
 

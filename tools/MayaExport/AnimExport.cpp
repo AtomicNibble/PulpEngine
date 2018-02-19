@@ -46,7 +46,8 @@ PotatoAnimExporter::PotatoAnimExporter(core::MemoryArenaBase* arena) :
 	fps_(anim::ANIM_DEFAULT_FPS),
 	type_(anim::AnimType::RELATIVE),
 	unitOfMeasurement_(MDistance::Unit::kInches),
-	bones_(arena)
+	bones_(arena),
+	notes_(arena)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
 }
@@ -441,6 +442,7 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 	// I will store each tags data.
 	// for each frame there will be a position and a quat.
 	const int32_t numBones = safe_static_cast<int32_t>(bones_.size());
+	const int32_t numNotes = safe_static_cast<int32_t>(notes_.size());
 	const int32_t numFrames = getNumFrames();
 	const int32_t fps = static_cast<int32_t>(fps_);
 
@@ -470,7 +472,18 @@ MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
 	buf.appendFmt("BONES %" PRIi32 "\n", numBones);
 	buf.appendFmt("FRAMES %" PRIi32 "\n", numFrames);
 	buf.appendFmt("FPS %" PRIi32 "\n", fps);
+	buf.appendFmt("NOTES %" PRIi32 "\n", numNotes);
 	buf.appendFmt("\n");
+
+	// notes.
+	if (notes_.isNotEmpty())
+	{
+		for (const auto& note : notes_) {
+			buf.appendFmt("NOTE %" PRIi32 " \"%s\"\n", note.frame, note.value.c_str());
+		}
+
+		buf.appendFmt("\n");
+	}
 
 	// list the bones.
 	for (const auto& bone : bones_) {
