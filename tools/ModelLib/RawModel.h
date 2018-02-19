@@ -63,6 +63,8 @@ namespace RawModel
 
 		const Lod& getLod(size_t idx) const;
 
+		core::UnitOfMeasure::Enum getUnits(void) const;
+
 	private:
 
 		bool ParseRawModel(core::XLexer& lex);

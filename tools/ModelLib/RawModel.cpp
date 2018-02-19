@@ -96,6 +96,11 @@ namespace RawModel
 		X_ASSERT(idx < numLods(), "Invalid lod idx")(idx, numLods());
 		return lods_[idx];
 	}
+	
+	core::UnitOfMeasure::Enum Model::getUnits(void) const
+	{
+		return unitOfMeasure_;
+	}
 
 	bool Model::LoadRawModel(core::Path<char>& path)
 	{
