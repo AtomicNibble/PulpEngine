@@ -29,6 +29,7 @@ namespace RawModel
 	class Model
 	{
 		typedef core::StackString<0x20000, char> ModelDataStr;
+		typedef core::UniquePointer<ModelDataStr> ModelDataStrPtr;
 		typedef core::Array<ModelDataStr*> ModelDataStrArr;
 
 		typedef core::FixedArray<Lod, model::MODEL_MAX_LODS> LodArr;

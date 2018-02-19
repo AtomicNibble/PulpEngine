@@ -729,8 +729,7 @@ namespace RawModel
 
 	bool Model::SaveRawModel_Int(ModelDataStrArr& dataArr) const
 	{
-		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
-		dataArr.append(pCurBuf);
+		auto pCurBuf = core::makeUnique<ModelDataStr>(arena_, "MeshDataStr");
 
 		pCurBuf->appendFmt("// " X_ENGINE_NAME " engine RawModel.\n");
 
@@ -749,6 +748,7 @@ namespace RawModel
 		pCurBuf->appendFmt("LODS %" PRIuS "\n", lods_.size());
 		pCurBuf->appendFmt("BONES %" PRIuS "\n", bones_.size());
 		pCurBuf->append("\n");
+		dataArr.append(pCurBuf.release());
 
 		if (!WriteBones(dataArr))
 		{
@@ -767,8 +767,7 @@ namespace RawModel
 
 	bool Model::WriteBones(ModelDataStrArr& dataArr) const
 	{
-		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
-		dataArr.append(pCurBuf);
+		auto pCurBuf = core::makeUnique<ModelDataStr>(arena_, "MeshDataStr");
 
 		for (const auto& bone : bones_)
 		{
@@ -785,6 +784,8 @@ namespace RawModel
 		}
 
 		pCurBuf->append("\n");
+
+		dataArr.append(pCurBuf.release());
 		return true;
 	}
 
@@ -792,11 +793,10 @@ namespace RawModel
 	{
 		for (const auto& lod : lods_)
 		{
-			ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
-			dataArr.append(pCurBuf);
-
+			auto pCurBuf = core::makeUnique<ModelDataStr>(arena_, "MeshDataStr");
 			pCurBuf->appendFmt("LOD\n");
 			pCurBuf->appendFmt("NUMMESH %" PRIuS "\n", lod.meshes_.size());
+			dataArr.append(pCurBuf.release());
 
 			if (!WriteMeshes(dataArr, lod)) {
 				return false;
@@ -881,8 +881,7 @@ namespace RawModel
 
 	bool Model::WriteMesh(ModelDataStrArr& dataArr, const Mesh& mesh, core::MemoryArenaBase* arena)
 	{
-		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena, "MeshDataStr");
-
+		auto pCurBuf = core::makeUnique<ModelDataStr>(arena, "MeshDataStr");
 		pCurBuf->appendFmt("MESH \"%s\"\n", mesh.name_.c_str());
 		pCurBuf->appendFmt("VERTS %" PRIuS "\n", mesh.verts_.size());
 		pCurBuf->appendFmt("TRIS %" PRIuS "\n", mesh.tris_.size());
@@ -907,17 +906,16 @@ namespace RawModel
 
 			if ((pCurBuf->length() + 500) > pCurBuf->capacity())
 			{
-				dataArr.append(pCurBuf);
-				pCurBuf = X_NEW(ModelDataStr, arena, "MeshDataStr");
+				dataArr.append(pCurBuf.release());
+				pCurBuf = core::makeUnique<ModelDataStr>(arena, "MeshDataStr");
 			}
 		}
 
 		if ((pCurBuf->length() + 64) > pCurBuf->capacity())
 		{
-			dataArr.append(pCurBuf);
-			pCurBuf = X_NEW(ModelDataStr, arena, "MeshDataStr");
+			dataArr.append(pCurBuf.release());
+			pCurBuf = core::makeUnique<ModelDataStr>(arena, "MeshDataStr");
 		}
-
 
 		for (const auto& tri : mesh.tris_)
 		{
@@ -945,8 +943,8 @@ namespace RawModel
 
 				if ((pCurBuf->length() + 256) > pCurBuf->capacity())
 				{
-					dataArr.append(pCurBuf);
-					pCurBuf = X_NEW(ModelDataStr, arena, "MeshDataStr");
+					dataArr.append(pCurBuf.release());
+					pCurBuf = core::makeUnique<ModelDataStr>(arena, "MeshDataStr");
 				}
 			}
 
@@ -955,7 +953,7 @@ namespace RawModel
 
 		pCurBuf->append("\n");
 
-		dataArr.append(pCurBuf);
+		dataArr.append(pCurBuf.release());
 		return true;
 	}
 
@@ -967,8 +965,7 @@ namespace RawModel
 		const Color& specCol = mat.specCol_;
 		const Color& reflectiveCol = mat.reflectiveCol_;
 
-		ModelDataStr* pCurBuf = X_NEW(ModelDataStr, arena_, "MeshDataStr");
-		dataArr.append(pCurBuf);
+		auto pCurBuf = core::makeUnique<ModelDataStr>(arena_, "MeshDataStr");
 
 		pCurBuf->appendFmt("MATERIAL \"%s\"\n", mat.name_.c_str());
 		pCurBuf->appendFmt("COL (%f %f %f %f)\n", col.r, col.g, col.b, col.a);
@@ -977,6 +974,7 @@ namespace RawModel
 		pCurBuf->appendFmt("SPECCOL (%f %f %f %f)\n", specCol.r, specCol.g, specCol.b, specCol.a);
 		pCurBuf->appendFmt("REFLECTIVECOL (%f %f %f %f)\n", reflectiveCol.r, reflectiveCol.g, reflectiveCol.b, reflectiveCol.a);
 		pCurBuf->append("\n");
+		dataArr.append(pCurBuf.release());
 		return true;
 	}
 
