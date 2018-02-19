@@ -89,7 +89,7 @@ namespace Hash
 	} // namespace Fnv1aConst
 
 
-	namespace Fnv1Literals
+	namespace Literals
 	{
 		inline constexpr uint32_t operator"" _fnv1a(const char* const pStr, const size_t strLen)
 		{

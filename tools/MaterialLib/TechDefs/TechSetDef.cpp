@@ -13,7 +13,7 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-using namespace core::Hash::Fnv1Literals;
+using namespace core::Hash::Literals;
 
 namespace techset
 {

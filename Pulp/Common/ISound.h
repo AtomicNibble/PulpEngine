@@ -76,9 +76,8 @@ X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
 	return core::Hash::Fnv1Hash(pStr, len);
 }
 
-namespace literals
+namespace Literals
 {
-
 	template<uint32_t N>
 	constexpr X_INLINE uint32_t force_hash(void) {
 		return N;
@@ -89,7 +88,7 @@ namespace literals
 		return core::Hash::Fnv1Const::Internal::Hash(pStr, strLen, core::Hash::Fnv1Const::default_offset_basis);
 	}
 
-}
+} // namespace Literals
 	
 
 struct ISound : public core::IEngineSysBase

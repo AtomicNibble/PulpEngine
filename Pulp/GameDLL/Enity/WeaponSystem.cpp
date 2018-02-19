@@ -11,8 +11,8 @@
 #include <IPrimativeContext.h>
 #include <IFont.h>
 
-using namespace core::Hash::Fnv1Literals;
-using namespace sound::literals;
+using namespace core::Hash::Literals;
+using namespace sound::Literals;
 
 
 X_NAMESPACE_BEGIN(game)

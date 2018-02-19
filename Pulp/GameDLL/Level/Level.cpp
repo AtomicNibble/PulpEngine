@@ -12,7 +12,7 @@
 
 #include "UserCmds\UserCmdMan.h"
 
-using namespace sound::literals;
+using namespace sound::Literals;
 
 X_NAMESPACE_BEGIN(game)
 

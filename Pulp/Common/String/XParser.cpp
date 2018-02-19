@@ -375,7 +375,7 @@ bool XParser::ReadDirective(void)
 
 	if (token.GetType() == TokenType::NAME)
 	{
-		using namespace core::Hash::Fnv1Literals;
+		using namespace core::Hash::Literals;
 
 		static_assert(PreProType::ENUM_COUNT == 10, "PreProType count changed? this code needs updating.");
 		const auto tokenHash = core::Hash::Fnv1aHash(token.begin(), token.length());

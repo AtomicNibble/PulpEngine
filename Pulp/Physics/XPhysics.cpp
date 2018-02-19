@@ -205,7 +205,7 @@ bool XPhysics::init(const ToleranceScale& scale)
 		// just dpeends if i wanna include the delay load def in there.
 		if (len)
 		{
-			using namespace core::Hash::Fnv1Literals;
+			using namespace core::Hash::Literals;
 			switch (core::Hash::Fnv1aHash(pDllOverrideStr, len))
 			{
 				case "none"_fnv1a:

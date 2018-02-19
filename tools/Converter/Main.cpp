@@ -92,7 +92,7 @@ namespace
 
 	bool GetAssetType(converter::AssetType::Enum& assType, bool slient = false)
 	{
-		using namespace core::Hash::Fnv1Literals;
+		using namespace core::Hash::Literals;
 
 		const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
 		if (pAssetType)

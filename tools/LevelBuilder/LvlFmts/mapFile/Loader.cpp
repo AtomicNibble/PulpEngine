@@ -121,7 +121,7 @@ namespace mapFile
 		{
 			const core::string& classname = it->second;
 
-			using namespace core::Hash::Fnv1Literals;
+			using namespace core::Hash::Literals;
 
 			switch (core::Hash::Fnv1aHash(classname.c_str(), classname.length()))
 			{

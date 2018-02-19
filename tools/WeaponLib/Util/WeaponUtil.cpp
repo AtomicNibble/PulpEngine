@@ -9,7 +9,7 @@ namespace weapon
 {
 	namespace Util
 	{
-		using namespace core::Hash::Fnv1Literals;
+		using namespace core::Hash::Literals;
 
 		WeaponClass::Enum WeaponClassFromStr(const char* pBegin, const char* pEnd)
 		{

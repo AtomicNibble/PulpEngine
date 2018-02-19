@@ -461,7 +461,7 @@ namespace entity
 
 	bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
 	{
-		using namespace core::Hash::Fnv1Literals;
+		using namespace core::Hash::Literals;
 
 		if (entDesc.GetType() != core::json::Type::kObjectType) {
 			X_ERROR("Ents", "Ent description must be a object");

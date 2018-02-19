@@ -6,7 +6,7 @@
 
 X_NAMESPACE_BEGIN(assetDb)
 
-using namespace core::Hash::Fnv1Literals;
+using namespace core::Hash::Literals;
 
 namespace Util
 {

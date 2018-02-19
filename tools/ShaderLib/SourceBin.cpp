@@ -20,7 +20,7 @@ namespace shader
 
 		bool PreProFromStr(core::XLexToken& token, core::PreProType::Enum& typeOut)
 		{
-			using namespace core::Hash::Fnv1Literals;
+			using namespace core::Hash::Literals;
 			using namespace core;
 
 			// too long?
@@ -68,7 +68,7 @@ namespace shader
 
 		bool ILFlagFromStr(const char* pStr, ILFlag::Enum& flagOut)
 		{
-			using namespace core::Hash::Fnv1Literals;
+			using namespace core::Hash::Literals;
 
 			core::StackString<128, char> strUpper(pStr);
 			strUpper.toUpper();

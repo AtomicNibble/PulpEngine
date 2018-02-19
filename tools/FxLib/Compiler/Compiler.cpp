@@ -5,7 +5,7 @@
 #include <Hashing\Fnva1Hash.h>
 #include <String\StringTokenizer.h>
 
-using namespace core::Hash::Fnv1Literals;
+using namespace core::Hash::Literals;
 
 X_NAMESPACE_BEGIN(engine)
 
