@@ -35,7 +35,7 @@ public:
 
 struct InterNote
 {
-	core::string name;
+	core::string value;
 	int32_t frame;
 };
 

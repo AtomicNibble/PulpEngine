@@ -1056,9 +1056,9 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		stream.write(noteHdr);
 		for (auto& n : notes_)
 		{
-			if (n.name.length() > ANIM_MAX_NOTE_NAME_LENGTH) {
-				X_ERROR("Anim", "Note \"%s\" has length %" PRIuS " which exceeds limit of %" PRIu32, 
-					n.name.c_str(), n.name.length(), ANIM_MAX_NOTE_NAME_LENGTH);
+			if (n.value.length() > ANIM_MAX_NOTE_NAME_LENGTH) {
+				X_ERROR("Anim", "Note value \"%s\" has length %" PRIuS " which exceeds limit of %" PRIu32, 
+					n.value.c_str(), n.value.length(), ANIM_MAX_NOTE_NAME_LENGTH);
 				return false;
 			}
 
