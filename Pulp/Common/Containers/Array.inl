@@ -420,12 +420,7 @@ X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator,
 		}
 
 		// copy them.
-		size_t i;
-		for (i = 0; i < oth.num_; i++)
-		{
-			Mem::Construct(&list_[num_ + i], oth.list_[i]);
-		}
-
+		Mem::CopyArrayUninitialized(&list_[num_], oth.begin(), oth.end());
 		num_ += oth.num_;
 	}
 	
