@@ -62,7 +62,8 @@ public:
 
 private:
 	bool ParseData(core::XLexer& lex);
-	bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut);
+	static bool ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut, bool optional);
+	bool ReadNotes(core::XLexer& lex, int32_t numNotes);
 	bool ReadBones(core::XLexer& lex, int32_t numBones);
 	bool ReadFrameData(core::XLexer& lex, int32_t numBones);
 

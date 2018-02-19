@@ -120,7 +120,7 @@ const InterAnim::NoteArr& InterAnim::getNotes(void) const
 
 bool InterAnim::ParseData(core::XLexer& lex)
 {
-	int32_t version, numBones;
+	int32_t version, numBones, numNotes;
 
 	/*
 	Example header:
@@ -130,18 +130,22 @@ bool InterAnim::ParseData(core::XLexer& lex)
 		FPS 30
 	*/
 
-	if (!ReadheaderToken(lex, "VERSION", version)) {
+	if (!ReadheaderToken(lex, "VERSION", version, false)) {
 		return false;
 	}
-	if (!ReadheaderToken(lex, "BONES", numBones)) {
+	if (!ReadheaderToken(lex, "BONES", numBones, false)) {
 		return false;
 	}
-	if (!ReadheaderToken(lex, "FRAMES", numFrames_)) {
+	if (!ReadheaderToken(lex, "FRAMES", numFrames_, false)) {
 		return false;
 	}
-	if (!ReadheaderToken(lex, "FPS", fps_)) {
+	if (!ReadheaderToken(lex, "FPS", fps_, false)) {
 		return false;
 	}
+	if (!ReadheaderToken(lex, "NOTES", numNotes, true)) {
+		return false;
+	}
+
 
 	// check dat version number slut.
 	if (version < anim::ANIM_INTER_VERSION) {
@@ -165,6 +169,12 @@ bool InterAnim::ParseData(core::XLexer& lex)
 			numBones, anim::ANIM_MAX_BONES);
 		return false;
 	}
+	if (numNotes > anim::ANIM_MAX_NOTES) {
+		X_ERROR("InterAnim", "InterAnim file has too many notes: %" PRIi32 " max: %" PRIu32,
+			numNotes, anim::ANIM_MAX_NOTES);
+		return false;
+	}
+
 
 	// how many bones!
 	if (numBones < 1) {
@@ -179,6 +189,11 @@ bool InterAnim::ParseData(core::XLexer& lex)
 	// fluffy pig sausages
 	if (fps_ < 1) {
 		X_ERROR("InterAnim", "animation has fps lower than 1");
+		return false;
+	}
+
+	if (!ReadNotes(lex, numNotes)) {
+		X_ERROR("InterAnim", "failed to parse note data");
 		return false;
 	}
 
@@ -203,14 +218,24 @@ bool InterAnim::ParseData(core::XLexer& lex)
 }
 
 
-bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
+bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut, bool optional)
 {
 	core::XLexToken token(nullptr, nullptr);
 
 	valOut = 0;
 
-	if (!lex.SkipUntilString(pName)) {
-		X_ERROR("InterAnim", "Failed to find '%s' token", pName);
+	if (!lex.ReadToken(token)) {
+		X_ERROR("InterAnim", "Failed to read token");
+		return false;
+	}
+
+	if (token.GetType() != core::TokenType::NAME || !token.isEqual(pName)) {
+		if (optional) {
+			lex.UnreadToken(token);
+			return true;
+		}
+
+		X_ERROR("InterAnim", "Failed to read '%s'", pName);
 		return false;
 	}
 
@@ -229,6 +254,76 @@ bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& v
 	return true;
 }
 
+
+bool InterAnim::ReadNotes(core::XLexer& lex, int32_t numNotes)
+{
+	notes_.reserve(numNotes);
+
+
+	core::XLexToken token(nullptr, nullptr);
+
+	// NOTE idx "value"
+	for (int32_t i = 0; i < numNotes; i++)
+	{
+		if (!lex.ReadToken(token)) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' token");
+			return false;
+		}
+
+		if (!token.isEqual("NOTE")) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' token");
+			return false;
+		}
+
+		if (!lex.ReadTokenOnLine(token)) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' frame");
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::NUMBER) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' frame expected number");
+			return false;
+		}
+
+		int32_t frame = token.GetIntValue();
+		if (frame < 0) {
+			X_ERROR("InterAnim", "Invalid 'NOTE' frame index: %" PRIi32, frame);
+			return false;
+		}
+
+		if (!lex.ReadTokenOnLine(token)) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' value");
+			return false;
+		}
+
+		if (token.GetType() != core::TokenType::STRING) {
+			X_ERROR("InterAnim", "Failed to read 'NOTE' value");
+			return false;
+		}
+
+		InterNote note;
+		note.frame = frame;
+		note.value = core::string(token.begin(), token.end());
+
+		if (note.value.length() < 1) {
+			X_ERROR("InterAnim", "note value too short: \"%s\"", note.value.c_str());
+			return false;
+		}
+		if (note.value.length() > anim::ANIM_MAX_NOTE_NAME_LENGTH) {
+			X_ERROR("InterAnim", "note valuetoo long: \"%s\" max: %" PRIu32,
+				note.value.c_str(), anim::ANIM_MAX_NOTE_NAME_LENGTH);
+			return false;
+		}
+
+#if X_ANIM_NOTE_LOWER_CASE_VALUE 
+		note.value.toLower();
+#endif // !X_ANIM_NOTE_LOWER_CASE_VALUE 
+
+		notes_.append(note);
+	}
+
+	return true;
+}
 
 bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 {
