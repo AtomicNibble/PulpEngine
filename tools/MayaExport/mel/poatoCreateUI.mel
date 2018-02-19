@@ -1,7 +1,6 @@
 // ==========================
 // Potato - Model Exporter (UIScript)
-// Version: 1.2 (add in anim tab)
-// Version with just model stuff: 3c75e0c18985a3eea6c06e1d0b6d10fa0d07e7ef
+// Version: 1.3
 // site: tom-crowley.co.uk
 // Copyright: Tom Crowley 2014
 // ==========================
@@ -49,6 +48,21 @@ global proc string esacpeString(string $str)
 {
 	return substituteAllString($str, "\\", "\\\\");
 }
+
+// Note stuff
+global proc CreateNoteTrackNode()
+{
+	string $DefaultNotes = "Null:rechamber:drop clip:melee";
+
+    string $NoteTracks[] = `spaceLocator -p 0 0 0`;
+    $node = $NoteTracks[0];
+    $node = `rename $node "NoteTrack"`;
+
+    // I can't use string as you can't 'key' them.
+    addAttr -ln NoteValue -at enum -enumName $DefaultNotes $node;
+    setAttr -e -keyable true ($node + ".NoteValue");
+}
+
 
 global proc int assetDB_add(string $type, string $name)
 {
