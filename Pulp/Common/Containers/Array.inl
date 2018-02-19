@@ -428,6 +428,23 @@ X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator,
 }
 
 template<typename T, class Allocator, class GrowPolicy>
+X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::append(MyT&& oth)
+{
+	if (this != &oth)
+	{
+		if ((num_ + oth.num_) > size_) {
+			reserve(num_ + oth.num_);
+		}
+
+		// move them.
+		Mem::MoveArrayDestructUninitialized(&list_[num_], oth.begin(), oth.end());
+		num_ += oth.num_;
+	}
+
+	return num_ - 1;
+}
+
+template<typename T, class Allocator, class GrowPolicy>
 X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::push_back(T const& obj)
 {
 	// grow if needs be.

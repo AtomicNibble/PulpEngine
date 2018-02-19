@@ -97,6 +97,7 @@ public:
 	size_type append(T&& obj);
 	// add the list
 	size_type append(const MyT& oth);
+	size_type append(MyT&& oth);
 	// appends a item to the end, resizing if required.
 	size_type push_back(const T& obj);
 	size_type push_back(T&& obj);
