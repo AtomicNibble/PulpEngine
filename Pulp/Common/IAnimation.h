@@ -55,6 +55,8 @@ X_NAMESPACE_BEGIN(anim)
 //		they are sorted in frame order.
 //		multiple notes can occur on the same frame.
 //
+#define X_ANIM_NOTE_LOWER_CASE_VALUE 1
+
 
 static const uint32_t	 ANIM_VERSION = 2;
 static const uint32_t	 ANIM_MAX_BONES = 255;
