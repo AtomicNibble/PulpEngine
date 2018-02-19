@@ -74,6 +74,14 @@ void GenerateUI( asset& Asset )
         Asset.AddString("sndRaise", "").SetTitle("Raise");
         Asset.AddString("sndLower", "").SetTitle("Lower");
     }
+
+    Asset.BeginGroup("Effects");
+    {
+        Asset.AddAssetRef("efxFlashView", "fx").SetTitle("View Flash");
+        Asset.AddAssetRef("efxFlashWorld", "fx").SetTitle("World Flash");
+        Asset.AddAssetRef("efxShellEject", "fx").SetTitle("Shell Eject");
+    }
+
     Asset.BeginGroup("Icons");
     {
         Asset.AddString("iconHud", "").SetTitle("Hub Icon");
