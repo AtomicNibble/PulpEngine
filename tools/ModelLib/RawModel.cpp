@@ -740,10 +740,10 @@ namespace RawModel
 
 		pCurBuf->append("\n");
 		pCurBuf->appendFmt("VERSION %" PRIi32 "\n", VERSION);
+		pCurBuf->appendFmt("UNITS %s\n", core::UnitOfMeasure::ToString(unitOfMeasure_));
 		pCurBuf->appendFmt("LODS %" PRIuS "\n", lods_.size());
 		pCurBuf->appendFmt("BONES %" PRIuS "\n", bones_.size());
 		pCurBuf->append("\n");
-
 
 		if (!WriteBones(dataArr))
 		{
