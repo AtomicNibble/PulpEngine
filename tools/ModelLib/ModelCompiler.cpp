@@ -1955,6 +1955,11 @@ bool ModelCompiler::ProcessModel(void)
 	// 9. check limits
 	// 10. done
 	
+	if (unitOfMeasure_ != core::UnitOfMeasure::Centimeters) {
+		X_ERROR("Model", "Source units of type '%s' are not currently supported", core::UnitOfMeasure::ToString(unitOfMeasure_));
+		return false;
+	}
+
 	// require cooking if flag set.
 	if (flags_.IsSet(CompileFlag::COOK_PHYS_MESH) && !pPhysCooker_) {
 		X_ERROR("Model", "Can't cook meshes without a cooker instance");
