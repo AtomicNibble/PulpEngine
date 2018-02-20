@@ -118,6 +118,7 @@ namespace fx
 					{
 						"name" : "segment1",
 						"type" : "OrientedSprite",
+						"relativeTo" : "Spawn",
 						"flags" : "RandGraphAlpha RandGraphSize RandGraphVel",
 
 						"materials" : [
@@ -140,6 +141,12 @@ namespace fx
 						"spawnOrgYRange" : 0,
 						"spawnOrgZStart" : 0,
 						"spawnOrgZRange" : 2,
+
+						"sequence" : {
+							"startFrame": 0,
+							"fps": 0,
+							"loop": 0
+						},
 
 						"colorGraph" : {
 							"scale" : 1,							
@@ -372,6 +379,7 @@ namespace fx
 					{
 						"name" : "segment1",
 						"type" : "BillboardSprite",
+						"relativeTo" : "Now",
 						"flags" : "",
 
 						"materials" : [
