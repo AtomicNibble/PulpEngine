@@ -1054,6 +1054,8 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 		static_assert(std::numeric_limits<decltype(noteHdr.num)>::max() >= ANIM_MAX_NOTES, "Can't represent max notes");
 
 		stream.write(noteHdr);
+
+		size_t noteValueOffset = 0;
 		for (auto& n : notes_)
 		{
 			if (n.value.length() > ANIM_MAX_NOTE_NAME_LENGTH) {
@@ -1062,14 +1064,18 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 				return false;
 			}
 
-			// decide where to place strings.
-			X_ASSERT_NOT_IMPLEMENTED();
-
 			Note note;
-			note.name = 0;
+			note.value = safe_static_cast<uint16_t>(noteValueOffset);
 			note.frame = safe_static_cast<uint16_t>(n.frame);
 
+			noteValueOffset += n.value.size();
+
 			stream.write(note);
+		}
+
+		for (auto& n : notes_)
+		{
+			stream.write(n.value.c_str(), core::strUtil::StringBytesIncNull(n.value));
 		}
 	}
 
