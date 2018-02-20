@@ -439,6 +439,8 @@ X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator,
 		// move them.
 		Mem::MoveArrayDestructUninitialized(&list_[num_], oth.begin(), oth.end());
 		num_ += oth.num_;
+
+		oth.num_ = 0;
 	}
 
 	return num_ - 1;
