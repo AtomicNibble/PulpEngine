@@ -94,7 +94,7 @@ namespace fx
 		int32_t loop;		// 0 - forever
 	};	
 
-	struct Stage
+	struct StageDsc
 	{
 		typedef std::array<Graph, 2> GraphArr;
 
@@ -105,10 +105,11 @@ namespace fx
 		Sequence sequence;
 
 		int32_t materialStrOffset;
+							// two below used when StageFlag::Looping set
 		int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
 		int32_t loopCount;	// how many times we spawn before the end.
 
-		Range count;		
+		Range count;		// 
 		Range life;			// life for each elem.
 		Range delay;		// delay is when we start this stage.
 
@@ -166,6 +167,7 @@ namespace fx
 
 	struct IEmitter
 	{
+		virtual void play(const Effect* pEffect, bool clear = false) X_ABSTRACT;
 
 		virtual void setTrans(const Transformf& trans) X_ABSTRACT;
 		virtual void setTrans(const Transformf& trans, const Vec3f& offset) X_ABSTRACT;

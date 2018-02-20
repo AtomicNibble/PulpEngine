@@ -15,11 +15,29 @@ namespace fx
 {
 
 
-	Emitter::Emitter(const EffectVars& effectVars, const Effect& efx, core::MemoryArenaBase* arena) :
+	Emitter::Emitter(const EffectVars& effectVars, core::MemoryArenaBase* arena) :
 		vars_(effectVars),
-		efx_(efx),
-		stages_(arena, efx_.getNumStages(), StageState(arena))
+		arena_(arena),
+		pEfx_(nullptr),
+		curStage_(0),
+		activeStages_(arena)
 	{
+	}
+
+	void Emitter::play(const Effect* pEfx, bool clear)
+	{
+		pEfx_ = pEfx;
+		elapsed_.SetValue(0);
+		curStage_ = 0;
+
+		if (clear) {
+			activeStages_.clear();
+		}
+	}
+
+	bool Emitter::isPlaying(void) const
+	{
+		return pEfx_ || activeStages_.isNotEmpty();
 	}
 
 	void Emitter::setTrans(const Transformf& trans)
@@ -36,56 +54,135 @@ namespace fx
 
 	void Emitter::update(core::TimeVal delta)
 	{
-		// for now lets just start emitting everything?
-		// all stages lets go!
-		auto* pStages = efx_.getStages();
+		// so how this needs to work is.
+		// when we play a fx, we keep looping throught it's stages untill they are all 'active'.
+		// then we just clear the fx.
+		// any active stages live on, and die out as defined.
+		// this way if you change the active fx half way through any active stages will continue.
+		// TODO: potentially I want to prevent new elems been spawned also.
+		
 
 		elapsed_ += delta;
 
-		for (int32_t i = 0; i < efx_.getNumStages(); i++)
-		{
-			auto& stage = pStages[i];
-			auto& state = stages_[i];
+		auto elapsedMS = elapsed_.GetMilliSeconds();
 
-			if (!state.pMaterial) {
-				auto* pStr = efx_.getMaterialName(stage.materialStrOffset);
-				state.pMaterial = gEngEnv.pMaterialMan_->loadMaterial(pStr);
+		if (pEfx_)
+		{
+			// TODO: make start time from loaded.
+			if (!pEfx_->isLoaded()) {
+				return;
 			}
 
+			auto& efx = *pEfx_;
+			X_ASSERT(curStage_ < efx.getNumStages(), "Stage index out of bounds")(curStage_, efx.getNumStages());
+
+			auto numStages = efx.getNumStages();
+
+			// stages are sorted by delay.
+			for (; curStage_ < numStages; ++curStage_)
 			{
-				const auto atlas = state.pMaterial->getAtlas();
-				const auto fps = stage.sequence.fps;
+				auto& stageDesc = efx.getStageDsc(curStage_);
+
+				auto delay = fromRange(stageDesc.delay);
+				if (delay > elapsedMS) {
+					break;
+				}
+
+				// play this stage.
+				auto* pStr = efx.getMaterialName(stageDesc.materialStrOffset);
+				auto* pMaterial = gEngEnv.pMaterialMan_->loadMaterial(pStr);
+
+				int32_t maxElems;
+				
+				if (stageDesc.flags.IsSet(StageFlag::Looping))
+				{
+					auto maxLife = stageDesc.life.start + stageDesc.life.range;
+					auto maxAlive = static_cast<int32_t>(maxLife / stageDesc.interval);
+
+					maxAlive = core::Min(maxAlive, stageDesc.loopCount);
+					maxElems = maxAlive;
+				}
+				else
+				{
+					maxElems = static_cast<int32_t>(stageDesc.count.start + stageDesc.count.range);
+				}
+
+				if (maxElems < 1) {
+					X_WARNING("Fx", "Calculated max elems is less than one: %" PRId32, maxElems);
+				}
+
+				maxElems = core::Max(maxElems, 1);
+
+				activeStages_.emplace_back(pEfx_, &stageDesc, pMaterial, trans_, maxElems, arena_);
+			}
+
+			// finished all the stages for this efx?
+			if (curStage_ == numStages) {
+				pEfx_ = nullptr;
+			}
+		}
+
+		// so now just need to update any active stages.
+		if (activeStages_.isEmpty()) {
+			return;
+		}
+
+
+		// update elems.
+		for (size_t i = 0; i < activeStages_.size(); i++)
+		{
+			auto& stage = activeStages_[i];
+			auto& elems = stage.elems;
+
+			// update any active elems.
+			if (elems.isEmpty()) {
+				continue;
+			}
+
+			auto& desc = *stage.pDesc;
+
+			for (auto it = elems.begin(); it != elems.end();)
+			{
+				auto& e = *it;
+
+				auto alive = (elapsed_ - e.spawnTime);
+				auto aliveMs = alive.GetMilliSeconds();
+
+				if (aliveMs >= e.lifeMs)
+				{
+					it = elems.erase(it);
+					continue;
+				}
+
+				float fraction = (aliveMs / e.lifeMs);
+				updateElemForFraction(stage, e, fraction);
+
+				++it;
+			}
+
+			// handle atlas updates.
+			const auto fps = desc.sequence.fps;
+			if (fps != 0)
+			{
+				const auto atlas = stage.pMaterial->getAtlas();
 				const int32_t atlasCount = atlas.x * atlas.y;
 
-				for (size_t j = 0; j < state.elems.size(); j++)
+				for (size_t j = 0; j < elems.size(); j++)
 				{
-					auto& e = state.elems[j];
+					auto& e = elems[j];
 
 					auto alive = (elapsed_ - e.spawnTime);
 					auto aliveMs = alive.GetMilliSeconds();
 
-					if (aliveMs >= e.lifeMs)
-					{
-						state.elems.removeIndex(j);
-						continue;
-					}
-
-					float fraction = (aliveMs / e.lifeMs);
-					updateElemForFraction(stage, e, fraction);
-
-					if (fps == 0) {
-						continue;
-					}
-
-					auto aliveSec = aliveMs * 0.001;
-
 					int32_t atlasIdx;
 					if (fps < 0)
 					{
+						float fraction = (aliveMs / e.lifeMs);
 						atlasIdx = static_cast<int32_t>(atlasCount * fraction); // total frames over elem life.
 					}
 					else
 					{
+						auto aliveSec = aliveMs * 0.001;
 						atlasIdx = static_cast<int32_t>(fps * aliveSec); // 1 second == fps.
 					}
 
@@ -100,64 +197,67 @@ namespace fx
 					uvForIndex(e.uv, atlas, idx);
 				}
 			}
+		}
 
-			// finished.
-			if (stage.loopCount && state.currentLoop >= stage.loopCount)
-			{
+		// process the stages: spawn more elems, remove finsihed, etc..
+		for (auto it = activeStages_.begin(); it != activeStages_.end(); )
+		{
+			auto& stage = *it;
+			auto& desc = *stage.pDesc;
+
+			if (desc.loopCount && stage.currentLoop >= desc.loopCount) {
+				// remove the stage?
+				it = activeStages_.erase(it);
 				continue;
 			}
 
-			if (state.currentLoop > 0)
+			++it;
+
+			if (stage.currentLoop > 0)
 			{
-				auto sinceSpawn = elapsed_ - state.lastSpawn;
-				auto interval = core::TimeVal::fromMS(stage.interval);
+				auto sinceSpawn = elapsed_ - stage.lastSpawn;
+				auto interval = core::TimeVal::fromMS(desc.interval);
 
 				if (sinceSpawn < interval)
 				{
 					continue;
 				}
 			}
-			else if (stage.delay.start > 0)
-			{
-				// initial delay logic.
-
-			}
 
 			// 'spawn'
-			++state.currentLoop;
+			++stage.currentLoop;
+			stage.lastSpawn = elapsed_;
 
-			state.lastSpawn = elapsed_;
-
-			if (stage.type == StageType::OrientedSprite || stage.type == StageType::BillboardSprite)
+			if (desc.type == StageType::OrientedSprite || desc.type == StageType::BillboardSprite)
 			{
 				int8_t colGraph = 0;
 				int8_t alphaGraph = 0;
 				int8_t sizeGraph = 0;
 				int8_t velGraph = 0;
 
-				if (stage.flags.IsSet(StageFlag::RandGraphCol)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphCol)) {
 					colGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				if (stage.flags.IsSet(StageFlag::RandGraphAlpha)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphAlpha)) {
 					alphaGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				if (stage.flags.IsSet(StageFlag::RandGraphSize)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphSize)) {
 					sizeGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				if (stage.flags.IsSet(StageFlag::RandGraphVel)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphVel)) {
 					velGraph = gEnv->xorShift.rand() & 0x1;
 				}
 
 				// meow.
 				Vec3f pos;
-				pos.x = fromRange(stage.spawnOrgX);
-				pos.y = fromRange(stage.spawnOrgY);
-				pos.z = fromRange(stage.spawnOrgZ);
+				pos.x = fromRange(desc.spawnOrgX);
+				pos.y = fromRange(desc.spawnOrgY);
+				pos.z = fromRange(desc.spawnOrgZ);
 
-				float life = fromRange(stage.life);
+				float life = fromRange(desc.life);
 
 				// so i need to support atlas.		
-				auto atlas = state.pMaterial->getAtlas();
+				auto atlas = stage.pMaterial->getAtlas();
 
 				Elem e;
 				e.uv = Rectf(0.f, 0.f, 1.f, 1.f);
@@ -166,18 +266,18 @@ namespace fx
 
 				if (atlas.x || atlas.y)
 				{
-					int32_t atlasIdx = stage.sequence.startFrame;
-					int32_t count = atlas.x * atlas.y;
+					int32_t atlasIdx = desc.sequence.startFrame;
+					int32_t atlasNum = atlas.x * atlas.y;
 					if (atlasIdx < 0)
 					{
-						atlasIdx = static_cast<int32_t>(gEnv->xorShift.randIndex(count));
+						atlasIdx = static_cast<int32_t>(gEnv->xorShift.randIndex(atlasNum));
 					}
 					else
 					{
 						// user might of changed material so atlasIdx is no longer in range.
-						if (atlasIdx >= count) {
+						if (atlasIdx >= atlasNum) {
 							X_WARNING("Fx", "Atlast index was out of range");
-							atlasIdx = count - 1;
+							atlasIdx = atlasNum - 1;
 						}
 					}
 
@@ -196,7 +296,7 @@ namespace fx
 
 				updateElemForFraction(stage, e, 0.f);
 
-				state.elems.push_back(e);
+				stage.elems.push_back(e);
 			}
 			else
 			{
@@ -204,7 +304,6 @@ namespace fx
 			}
 
 		}
-
 	}
 
 	inline void Emitter::uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx)
@@ -238,18 +337,17 @@ namespace fx
 
 		Quatf lookatCamQ(lookatCam);
 
-		for (size_t i = 0; i < stages_.size(); i++)
+		for (size_t i = 0; i < activeStages_.size(); i++)
 		{
-			auto& stage = efx_.getStages()[i];
-			auto& s = stages_[i];
+			auto& stage = activeStages_[i];
 
-			if (s.elems.isEmpty()) {
+			if (stage.elems.isEmpty()) {
 				continue;
 			}
 
-			gEngEnv.pMaterialMan_->waitForLoad(s.pMaterial);
+			gEngEnv.pMaterialMan_->waitForLoad(stage.pMaterial);
 
-			for (const auto& e : s.elems)
+			for (const auto& e : stage.elems)
 			{
 				// basically need to make a quad.
 				// position is the center.
@@ -268,7 +366,7 @@ namespace fx
 				Vec3f bl = Vec3f(-half, half, 0);
 				Vec3f br = Vec3f(half, half, 0);
 
-				if (stage.type == StageType::BillboardSprite)
+				if (stage.pDesc->type == StageType::BillboardSprite)
 				{
 					// i want the sprite to always face the camera.
 					tl = tl * lookatCamQ;
@@ -295,7 +393,7 @@ namespace fx
 				bl += pos;
 				br += pos;
 
-				pPrim->drawQuad(tl, tr, bl, br, s.pMaterial, e.col, e.uv);
+				pPrim->drawQuad(tl, tr, bl, br, stage.pMaterial, e.col, e.uv);
 
 				if (vars_.drawDebug() && vars_.drawElemRect())
 				{
@@ -312,15 +410,18 @@ namespace fx
 
 	void Emitter::updateElemForFraction(const Stage& stage, Elem& e, float fraction) const
 	{
+		auto& efx = *stage.pEfx;
+		auto& desc = *stage.pDesc;
+
 		Vec3f vel;
-		vel.x = fromGraph(stage.vel0X[e.velGraph], fraction);
-		vel.y = fromGraph(stage.vel0Y[e.velGraph], fraction);
-		vel.z = fromGraph(stage.vel0Z[e.velGraph], fraction);
+		vel.x = efx.fromGraph(desc.vel0X[e.velGraph], fraction);
+		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
+		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
 
-		float size = fromGraph(stage.size[e.sizeGraph], fraction);
+		float size = efx.fromGraph(desc.size[e.sizeGraph], fraction);
 
-		Vec3f col = fromColorGraph(stage.color[e.colGraph], fraction);
-		float alpha = fromGraph(stage.alpha[e.alphaGraph], fraction);
+		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
+		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
 
 		e.dir = vel;
 		e.size = size;
@@ -337,120 +438,6 @@ namespace fx
 		auto val = gEnv->xorShift.randRange(r.range);
 
 		return r.start + val;
-	}
-
-	float Emitter::fromGraph(const Graph& g, float t) const
-	{
-		X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
-
-		float scale = getFloat(g.scaleIdx);
-		float result = 0.f;
-
-		if (g.numPoints > 1)
-		{
-			for (int32_t i = 0; i < g.numPoints; i++)
-			{
-				auto val0 = floatForIdx(g.timeStart + i);
-
-				if (val0 == t)
-				{
-					result = floatForIdx(g.valueStart + i);
-					break;
-				}
-				else if (val0 > t)
-				{
-					// blend.
-					val0 = floatForIdx(g.timeStart + (i - 1));
-					auto val1 = floatForIdx(g.timeStart + i);
-
-					auto res0 = floatForIdx(g.valueStart + (i - 1));
-					auto res1 = floatForIdx(g.valueStart + i);
-
-					float offset = t - val0;
-					float range = val1 - val0;
-					float fraction = offset / range;
-
-					result = lerp(res0, res1, fraction);
-					break;
-				}
-			}
-		}
-		else
-		{
-			result = floatForIdx(g.valueStart);
-		}
-
-		return result * scale;
-	}
-
-	Vec3f Emitter::fromColorGraph(const Graph& g, float t) const
-	{
-		X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
-
-		float scale = getFloat(g.scaleIdx);
-		Vec3f result;
-
-		if (g.numPoints > 1)
-		{
-			for (int32_t i = 0; i < g.numPoints; i++)
-			{
-				auto val0 = floatForIdx(g.timeStart + i);
-
-				if (val0 == t)
-				{
-					result = colorForIdx(g.valueStart, i);
-					break;
-				}
-				else if (val0 > t)
-				{
-					// blend.
-					val0 = floatForIdx(g.timeStart + (i - 1));
-					auto val1 = floatForIdx(g.timeStart + i);
-
-					auto res0 = colorForIdx(g.valueStart, i - 1);
-					auto res1 = colorForIdx(g.valueStart, i);
-
-					float offset = t - val0;
-					float range = val1 - val0;
-					float fraction = offset / range;
-
-					result = res0.lerp(fraction, res1);
-					break;
-				}
-			}
-		}
-		else
-		{
-			result = colorForIdx(g.valueStart, 0);
-		}
-
-		return result * scale;
-	}
-
-	X_INLINE float Emitter::getFloat(int32_t idx) const
-	{
-		auto* pFlts = efx_.getFloats();
-
-		return pFlts[idx];
-	}
-
-	X_INLINE float Emitter::floatForIdx(int32_t idx) const
-	{
-		auto* pIndexes = efx_.getIndexes();
-		auto* pFlts = efx_.getFloats();
-
-		idx = pIndexes[idx];
-		return pFlts[idx];
-	}
-
-	X_INLINE Vec3f Emitter::colorForIdx(int32_t start, int32_t idx) const
-	{
-		idx = start + (idx * 3);
-		return Vec3f(
-			floatForIdx(idx),
-			floatForIdx(idx + 1),
-			floatForIdx(idx + 2)
-		);
 	}
 
 

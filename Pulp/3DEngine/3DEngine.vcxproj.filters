@@ -319,5 +319,8 @@
     <None Include="Vars\EffectVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
+    <None Include="Particles\Effect.inl">
+      <Filter>Header Files\Particles</Filter>
+    </None>
   </ItemGroup>
 </Project>

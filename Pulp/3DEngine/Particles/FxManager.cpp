@@ -73,15 +73,9 @@ namespace fx
 	}
 
 
-	Emitter* EffectManager::allocEmmiter(Effect* pEffect)
+	Emitter* EffectManager::allocEmmiter(void)
 	{
-		X_ASSERT_NOT_NULL(pEffect);
-
-		if (!waitForLoad(pEffect)) {
-			return nullptr;
-		}
-
-		auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(vars_, *pEffect, arena_);
+		auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(vars_, arena_);
 
 		return pEmitter;
 	}

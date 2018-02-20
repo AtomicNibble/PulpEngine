@@ -803,12 +803,16 @@ IRenderLight* World3D::addRenderLight(RenderLightDesc& ent)
 
 fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
 {
-	auto* pEmitter = gEngEnv.pEffectMan_->allocEmmiter(emit.pEffect);
+	auto* pEmitter = gEngEnv.pEffectMan_->allocEmmiter();
 	if (!pEmitter) {
 		return nullptr;
 	}
 
 	pEmitter->setTrans(emit.trans);
+
+	if (emit.pEffect) {
+		pEmitter->play(emit.pEffect);
+	}
 
 	emitters_.push_back(pEmitter);
 

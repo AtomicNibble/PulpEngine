@@ -46,31 +46,47 @@ namespace fx
 		// ideally keep this below 64.
 		// X_ENSURE_LE(sizeof(Elem), 64, "Keep elem below single cache lane");
 
-		typedef core::Array<Elem> ElemArr;
+		template <typename T>
+		using ArrayType = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
 
-		struct StageState
+		typedef ArrayType<Elem> ElemArr;
+
+		struct Stage
 		{
-			StageState(core::MemoryArenaBase* arena) :
-				elems(arena)
+			Stage(const Effect* pEfx, const StageDsc* pDesc, engine::Material* pMaterial, const Transformf& spawnTrans, int32_t maxElems, core::MemoryArenaBase* arena) :
+				pEfx(X_ASSERT_NOT_NULL(pEfx)),
+				pDesc(X_ASSERT_NOT_NULL(pDesc)),
+				pMaterial(X_ASSERT_NOT_NULL(pMaterial)),
+				currentLoop(0),
+				spawnTrans(spawnTrans),
+				elems(arena, maxElems)
 			{
-				pMaterial = nullptr;
-				currentLoop = 0;
+
 			}
 
+			Stage(Stage&& oth) = default;
+			Stage& operator=(Stage&& oth) = default;
 
+			const Effect* pEfx;
+			const StageDsc* pDesc;
 			engine::Material* pMaterial;
 
-			core::TimeVal lastSpawn;
+			core::TimeVal lastSpawn; 
 			int32_t currentLoop;
+
+			Transformf spawnTrans;
 
 			ElemArr elems;
 		};
 
-		typedef core::Array<StageState> StageStateArr;
+		typedef core::Array<Stage> StageArr;
 
 
 	public:
-		Emitter(const EffectVars& effectVars, const Effect& efx, core::MemoryArenaBase* arena);
+		Emitter(const EffectVars& effectVars, core::MemoryArenaBase* arena);
+
+		void play(const Effect* pEfx, bool clear = false) X_FINAL;
+		bool isPlaying(void) const;
 
 		void setTrans(const Transformf& trans) X_FINAL;
 		void setTrans(const Transformf& trans, const Vec3f& offset) X_FINAL;
@@ -83,22 +99,19 @@ namespace fx
 
 		static void uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx);
 
-
 		float fromRange(const Range& r) const;
-		float fromGraph(const Graph& r, float t) const;
-		Vec3f fromColorGraph(const Graph& r, float t) const;
-
-		float getFloat(int32_t idx) const;
-		float floatForIdx(int32_t idx) const;
-		Vec3f colorForIdx(int32_t start, int32_t idx) const;
 
 	private:
 		const EffectVars& vars_;
-		const Effect& efx_;
-		StageStateArr stages_;
+		core::MemoryArenaBase* arena_;
+
+		const Effect* pEfx_;
+		core::TimeVal elapsed_; 
+		int32_t curStage_;
+
+		StageArr activeStages_;
 		Transformf trans_;
 		Vec3f offset_;
-		core::TimeVal elapsed_;
 	};
 
 

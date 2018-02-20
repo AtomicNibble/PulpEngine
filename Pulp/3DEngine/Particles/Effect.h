@@ -6,7 +6,7 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace fx
 {
-	struct Stage;
+	struct StageDsc;
 	struct Range;
 	struct Graph;
 
@@ -19,15 +19,24 @@ namespace fx
 		Effect(core::string& name, core::MemoryArenaBase* arena);
 		~Effect();
 
-		X_INLINE int32_t getNumStages(void) const;
-
 		bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
+
+		X_INLINE int32_t getNumStages(void) const;
+
 	public:
-		const Stage* getStages(void) const;
+		const StageDsc& getStageDsc(int32_t idx) const;
+		const StageDsc* getStageDscs(void) const;
 		const uint8_t* getIndexes(void) const;
 		const float* getFloats(void) const;
 		const char* getMaterialName(int32_t strOffset) const;
+
+		float fromGraph(const Graph& r, float t) const;
+		Vec3f fromColorGraph(const Graph& r, float t) const;
+		Vec3f colorForIdx(int32_t start, int32_t idx) const;
+
+		X_INLINE float getFloat(int32_t idx) const;
+		X_INLINE float floatForIdx(int32_t idx) const;
 
 	private:
 		int32_t numStages_;
@@ -39,12 +48,8 @@ namespace fx
 	};
 
 
-	int32_t Effect::getNumStages(void) const
-	{
-		return numStages_;
-	}
-
-
 } // namespace fx
 
 X_NAMESPACE_END
+
+#include "Effect.inl"

@@ -50,7 +50,7 @@ namespace fx
 	typedef GraphSet<Vec3f> ColGraphSet;
 	typedef GraphSet<float> FloatGraphSet;
 
-	struct StageBuilder : public Stage
+	struct StageBuilder : public StageDsc
 	{
 		typedef core::Array<core::string> StrArr;
 

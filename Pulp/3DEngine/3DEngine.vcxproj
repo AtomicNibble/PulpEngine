@@ -575,6 +575,7 @@
     <None Include="Material\TechDefStateManager.inl" />
     <None Include="Model\RenderMesh.inl" />
     <None Include="Model\RenderModel.inl" />
+    <None Include="Particles\Effect.inl" />
     <None Include="Texture\Texture.inl" />
     <None Include="Vars\DrawVars.inl" />
     <None Include="Vars\EffectVars.inl" />

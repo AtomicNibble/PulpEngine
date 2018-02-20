@@ -543,7 +543,7 @@ namespace fx
 		for (auto& s : stages.GetArray())
 		{
 			StageBuilder stage(arena_);
-			core::zero_object<Stage>(stage);
+			core::zero_object<StageDsc>(stage);
 		
 			const std::array<std::pair<const char*, Range&>, 6> ranges = { {
 				{ "count", stage.count },
@@ -779,7 +779,7 @@ namespace fx
 			return fltPool.push_back(val);
 		};
 
-		auto processGraph = [&](Stage::GraphArr& graphsOut, const auto& srcGraph, auto addDataFunc) -> bool {
+		auto processGraph = [&](StageDsc::GraphArr& graphsOut, const auto& srcGraph, auto addDataFunc) -> bool {
 
 			for (size_t i = 0; i < graphsOut.size(); i++)
 			{
@@ -828,7 +828,7 @@ namespace fx
 		size_t matOffset = 0;
 		for (const auto& stage : stages_)
 		{
-			Stage compiledStage = stage; // slice in the already set fields.
+			StageDsc compiledStage = stage; // slice in the already set fields.
 
 			processGraph(compiledStage.alpha, stage.alpha, addFloat);
 			processGraph(compiledStage.size, stage.size, addFloat);

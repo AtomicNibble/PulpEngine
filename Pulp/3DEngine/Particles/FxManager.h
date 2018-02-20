@@ -48,7 +48,7 @@ namespace fx
 		bool init(void);
 		void shutDown(void);
 
-		Emitter* allocEmmiter(Effect* pEffect);
+		Emitter* allocEmmiter(void);
 		void freeEmmiter(Emitter* pEmitter);
 
 		Effect* findEffect(const char* pEffectName) const X_FINAL;
