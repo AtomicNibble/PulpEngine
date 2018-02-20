@@ -145,7 +145,7 @@ struct NoteTrackHdr
 
 struct Note
 {
-	uint16_t name;
+	uint16_t value;
 	uint16_t frame;
 };
 
