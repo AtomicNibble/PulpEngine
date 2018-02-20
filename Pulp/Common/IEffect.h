@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
-	static const uint32_t	EFFECT_VERSION = 1;
+	static const uint32_t	EFFECT_VERSION = 2;
 	static const uint32_t	EFFECT_FOURCC = X_TAG('x', 'e', 'f', 'x');
 	static const char*		EFFECT_FILE_EXTENSION = "efx";
 
@@ -37,7 +37,7 @@ namespace fx
 	};
 
 
-	X_DECLARE_ENUM(StageType)(
+	X_DECLARE_ENUM8(StageType)(
 		BillboardSprite,
 		OrientedSprite,
 		Tail,
@@ -45,7 +45,12 @@ namespace fx
 		Sound
 	);
 
-	X_DECLARE_FLAGS(StageFlag)(
+	X_DECLARE_ENUM8(RelativeTo)(
+		Spawn,	    // the elems are relative to the spawn translation.
+		Now         // elems move with emitter.
+	);
+
+	X_DECLARE_FLAGS8(StageFlag)(
 		Looping,
 		RandGraphCol,
 		RandGraphAlpha,
@@ -53,7 +58,7 @@ namespace fx
 		RandGraphVel
 	);
 
-	typedef Flags<StageFlag> StageFlags;
+	typedef Flags8<StageFlag> StageFlags;
 
 	struct GraphHeader
 	{
@@ -68,7 +73,6 @@ namespace fx
 		float range;
 	};
 
-
 	struct Graph
 	{
 		uint8_t numPoints;
@@ -76,6 +80,8 @@ namespace fx
 		IndexOffset valueStart;		// values
 		IndexOffset scaleIdx;		// 
 	};
+
+	X_ENSURE_SIZE(Graph, 4);
 
 	static_assert(std::numeric_limits<decltype(Graph::numPoints)>::max() >= EFFECT_GRAPH_MAX_POINTS, "Can't represent max points");
 
@@ -93,6 +99,7 @@ namespace fx
 		typedef std::array<Graph, 2> GraphArr;
 
 		StageType::Enum type;
+		RelativeTo::Enum postionType;
 		StageFlags flags;
 
 		Sequence sequence;
