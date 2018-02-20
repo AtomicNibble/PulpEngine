@@ -24,6 +24,12 @@ namespace AK
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
         static const AkUniqueID PLAYER_FOOTSTEP = 2453392179U;
         static const AkUniqueID PLAYER_JUMP = 1305133589U;
+        static const AkUniqueID RAYGUN_FIRE = 218310330U;
+        static const AkUniqueID RAYGUN_FIRE_PLY = 3935617094U;
+        static const AkUniqueID RAYGUN_RELOAD_BATTERY = 1990965807U;
+        static const AkUniqueID RAYGUN_RELOAD_BATTERY_OUT = 507540718U;
+        static const AkUniqueID RAYGUN_RELOAD_CLOSE = 3398837948U;
+        static const AkUniqueID RAYGUN_RELOAD_OPEN = 437818408U;
         static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
         static const AkUniqueID VIDEO_RICKROLL = 3469944817U;
         static const AkUniqueID WEAP_LOWER = 1994352680U;
