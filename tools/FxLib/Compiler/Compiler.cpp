@@ -549,6 +549,9 @@ namespace fx
 			if (!checkMember(s, "type", core::json::kStringType)) {
 				return false;
 			}
+			if (!checkMember(s, "relativeTo", core::json::kStringType)) {
+				return false;
+			}
 			if (!checkMember(s, "flags", core::json::kStringType)) {
 				return false;
 			}
@@ -565,7 +568,6 @@ namespace fx
 			if (!checkMember(s, "sequence", core::json::kObjectType)) {
 				return false;
 			}
-
 
 			{
 				auto& seqJson = s["sequence"];
@@ -606,6 +608,20 @@ namespace fx
 					break;
 				default:
 					X_ERROR("Fx", "Unkonw type: \"%.*s\"", typeJson.GetStringLength(), typeJson.GetString());
+					return false;
+			}
+
+			auto& relativeToJson = s["relativeTo"];
+			switch (core::Hash::Fnv1aHash(relativeToJson.GetString(), relativeToJson.GetStringLength()))
+			{
+				case "Spawn"_fnv1a:
+					stage.postionType = RelativeTo::Spawn;
+					break;
+				case "Now"_fnv1a:
+					stage.postionType = RelativeTo::Now;
+					break;
+				default:
+					X_ERROR("Fx", "Unkonw RelativeTo: \"%.*s\"", relativeToJson.GetStringLength(), relativeToJson.GetString());
 					return false;
 			}
 
