@@ -652,6 +652,10 @@ namespace entity
 					dsc.pEffect = pEffect;
 
 					emit.pEmitter = p3DWorld_->addEmmiter(dsc);
+
+					if (!emit.pEmitter) {
+						reg_.remove<Emitter>(ent);
+					}
 					break;
 				}
 
