@@ -317,6 +317,110 @@ TYPED_TEST(ArrayTest, AppendArr)
 	}
 }
 
+TYPED_TEST(ArrayTest, AppendArrMove)
+{
+	Array<TypeParam> list(g_arena);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT((Array<TypeParam>::size_type)0, list.granularity()); // gran should be above 0.
+
+	EXPECT_EQ(nullptr, list.ptr());
+
+	for (size_t i = 0; i < 39; i++)
+	{
+		list.append(static_cast<TypeParam>(i * 4));
+	}
+
+	EXPECT_EQ(39, list.size());
+
+	Array<TypeParam> list2(g_arena);
+	list2.append(1337);
+
+	EXPECT_EQ(1, list2.size());
+
+	list.append(std::move(list2));
+
+	EXPECT_EQ(40, list.size());
+	EXPECT_EQ(0, list2.size());
+
+	// check the values are correct.
+	EXPECT_EQ(1337, list[39]);
+	for (int i = 0; i < 39; i++)
+	{
+		EXPECT_EQ(i * 4, list[i]);
+	}
+}
+
+TEST(ArrayTest, AppendArrMoveComplex)
+{
+	resetConConters();
+
+	Array<CustomTypeComplex> list(g_arena);
+	Array<CustomTypeComplex> list2(g_arena);
+
+	EXPECT_EQ(0, list.size());
+	EXPECT_EQ(0, list.capacity());
+	EXPECT_LT(static_cast<Array<CustomTypeComplex>::size_type>(0), list.granularity()); // gran should be above 0.
+
+	EXPECT_EQ(nullptr, list.ptr());
+
+	// prevent resize, causing additional 'moves' that should be tested seperatly.
+	list.reserve(64);
+	list2.reserve(32);
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_NE(nullptr, list.ptr());
+
+	EXPECT_EQ(0, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
+
+	for (int i = 0; i < 32; i++)
+	{
+		list.emplace_back(i * 4, "HEllo");
+	}
+
+	EXPECT_EQ(32, CONSRUCTION_COUNT);
+	EXPECT_EQ(0, MOVE_COUNT);
+	EXPECT_EQ(0, DECONSRUCTION_COUNT);
+
+	for (int i = 32; i < 64; i++)
+	{
+		list2.push_back(CustomTypeComplex(i * 4, "Meow"));
+	}
+
+	EXPECT_EQ(64, CONSRUCTION_COUNT);
+	EXPECT_EQ(32, MOVE_COUNT);
+	EXPECT_EQ(32, DECONSRUCTION_COUNT);
+
+	EXPECT_EQ(32, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_EQ(32, list2.size());
+	ASSERT_EQ(32, list2.capacity());
+
+	list.append(std::move(list2));
+
+	EXPECT_EQ(64, CONSRUCTION_COUNT);
+	EXPECT_EQ(64, MOVE_COUNT);
+	EXPECT_EQ(64, DECONSRUCTION_COUNT);
+
+	EXPECT_EQ(64, list.size());
+	ASSERT_EQ(64, list.capacity());
+	EXPECT_EQ(0, list2.size());
+	ASSERT_EQ(32, list2.capacity());
+
+	list.free();
+
+	EXPECT_EQ(64, CONSRUCTION_COUNT);
+	EXPECT_EQ(64, MOVE_COUNT);
+	EXPECT_EQ(128, DECONSRUCTION_COUNT);
+
+	EXPECT_EQ(0, list.size());
+	ASSERT_EQ(0, list.capacity());
+}
+
 
 
 TYPED_TEST(ArrayTest, Insert)
