@@ -3,7 +3,7 @@
 
 Technique( "unlit" )
 {
-	state = State() : "add + depth + nocull"
+	state = State() : "add + depth"
 	{
 		primitiveType = "tristrip"
 	}
