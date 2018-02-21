@@ -1362,11 +1362,12 @@ void IPrimativeContext::drawAxis(const Transformf& trans, const Vec3f& offset, c
 	auto y = trans.transform(Vec3f(0.f, extends.y, 0.f));
 	auto z = trans.transform(Vec3f(0.f, 0.f, extends.z));
 
-	auto offsetPos = trans.pos + offset;
+	auto rotatedOffset = offset * trans.quat;
+	auto offsetPos = trans.pos + rotatedOffset;
 
-	drawArrow(offsetPos, x + offset, Col_Red);
-	drawArrow(offsetPos, y + offset, Col_Green);
-	drawArrow(offsetPos, z + offset, Col_Blue);
+	drawArrow(offsetPos, x + rotatedOffset, Col_Red);
+	drawArrow(offsetPos, y + rotatedOffset, Col_Green);
+	drawArrow(offsetPos, z + rotatedOffset, Col_Blue);
 }
 
 
