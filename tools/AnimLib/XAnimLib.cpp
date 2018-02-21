@@ -95,7 +95,7 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
 		return false;
 	}
 
-	InterAnim inter(g_AnimLibArena);
+	Inter::Anim inter(g_AnimLibArena);
 	if (!inter.load(fileData)) {
 		X_ERROR("AnimLib", "Failed to load inter anim");
 		return false;

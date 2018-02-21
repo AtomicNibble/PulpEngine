@@ -8,6 +8,9 @@
 X_NAMESPACE_BEGIN(anim)
 
 
+namespace Inter
+{
+
 Bone::Bone(core::MemoryArenaBase* arena) :
 	data(arena)
 {
@@ -21,8 +24,10 @@ Bone::~Bone()
 
 // =================================
 
-InterAnim::InterAnim(core::MemoryArenaBase* arena) : 
+Anim::Anim(core::MemoryArenaBase* arena) : 
 	arena_(arena),
+	numFrames_(0),
+	fps_(ANIM_DEFAULT_FPS),
 	bones_(arena),
 	notes_(arena)
 {
@@ -30,20 +35,14 @@ InterAnim::InterAnim(core::MemoryArenaBase* arena) :
 }
 
 
-bool InterAnim::load(core::Path<char>& file)
-{
-	return load(core::Path<wchar_t>(file));
-}
-
-
-bool InterAnim::load(core::Path<wchar_t>& filePath)
+bool Anim::load(core::Path<wchar_t>& filePath)
 {
 	X_ASSERT_NOT_NULL(gEnv);
 	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
 	// swap a woggle watch it toggle!
 	if (filePath.isEmpty()) {
-		X_ERROR("InterAnim", "invalid path");
+		X_ERROR("Anim", "invalid path");
 		return false;
 	}
 
@@ -54,13 +53,13 @@ bool InterAnim::load(core::Path<wchar_t>& filePath)
 
 	core::XFileScoped file;
 	if (file.openFile(filePath.c_str(), mode)) {
-		X_ERROR("InterAnim", "failed to open file: %ls", filePath.c_str());
+		X_ERROR("Anim", "failed to open file: %ls", filePath.c_str());
 		return false;
 	}
 
 	const size_t fileSize = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 	if (fileSize < 1) {
-		X_ERROR("InterAnim", "file size invalid");
+		X_ERROR("Anim", "file size invalid");
 		return false;
 	}
 
@@ -69,7 +68,7 @@ bool InterAnim::load(core::Path<wchar_t>& filePath)
 
 	const size_t bytesRead = file.read(fileData.ptr(), fileSize);
 	if (bytesRead != fileSize) {
-		X_ERROR("InterAnim", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
+		X_ERROR("Anim", "failed to read file data. got: %" PRIuS " requested: %" PRIuS, bytesRead, fileSize);
 		return false;
 	}
 
@@ -78,47 +77,188 @@ bool InterAnim::load(core::Path<wchar_t>& filePath)
 	return ParseData(lex);
 }
 
-bool InterAnim::load(const core::Array<uint8_t>& fileData)
+bool Anim::load(const core::Array<uint8_t>& fileData)
 {
 	core::XLexer lex(reinterpret_cast<const char*>(fileData.begin()), reinterpret_cast<const char*>(fileData.end()));
 
 	return ParseData(lex);
 }
 
-bool InterAnim::load(const core::ByteStream& fileData)
+bool Anim::load(const core::ByteStream& fileData)
 {
 	core::XLexer lex(reinterpret_cast<const char*>(fileData.begin()), reinterpret_cast<const char*>(fileData.end()));
 
 	return ParseData(lex);
 }
 
+bool Anim::save(core::Path<wchar_t>& path) const
+{
+	X_ASSERT_NOT_NULL(gEnv);
+	X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-int32_t InterAnim::getNumFrames(void) const
+	path.setExtension(ANIM_INTER_FILE_EXTENSION_W);
+
+	{
+		core::XFileScoped file;
+		core::fileModeFlags mode;
+		mode.Set(core::fileMode::RECREATE);
+		mode.Set(core::fileMode::WRITE);
+		mode.Set(core::fileMode::SHARE);
+
+		if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
+			X_ERROR("Anim", "Failed to create export directory");
+		}
+
+		if (!file.openFile(path.c_str(), mode)) {
+			X_ERROR("Anim", "Failed to open file for inter anim");
+			return false;
+		}
+
+		core::ByteStream fileData(arena_);
+		if (!save(fileData)) {
+			return false;
+		}
+
+		if (file.write(fileData.data(), fileData.size()) != fileData.size()) {
+			return false;
+		}
+	}
+
+	return true;
+}
+
+bool Anim::save(core::ByteStream& stream) const
+{
+	// I will store each tags data.
+	// for each frame there will be a position and a quat.
+	const int32_t numBones = safe_static_cast<int32_t>(bones_.size());
+	const int32_t numNotes = safe_static_cast<int32_t>(notes_.size());
+	const int32_t numFrames = getNumFrames();
+	const int32_t fps = static_cast<int32_t>(fps_);
+
+	// work out max possible size bufffer needed.
+	const size_t maxFloatBytes = 24; // -6.4
+	const size_t numFloatsPerEntry = 3 + 3 + 4;
+	const size_t tagSizes = sizeof("POS ") + sizeof("SCALE ") + sizeof("ANG ");
+	const size_t paddingSize = 10 * 6; // more than needed 
+	const size_t maxSizePerEntry = (maxFloatBytes * numFloatsPerEntry) + tagSizes + paddingSize;
+
+	const size_t headerSize = 8096; // plenty for shiz
+	const size_t requiredSize = ((maxSizePerEntry * numFrames) * numBones) + headerSize;
+
+	stream.reset();
+	stream.reserve(requiredSize);
+
+	core::StackString<4096> buf;
+	buf.clear();
+	buf.appendFmt("// " X_ENGINE_NAME " intermidiate animation format\n");
+	buf.appendFmt("// Source: \"%s\"\n", srcInfo_.sourceFile.c_str());
+	buf.appendFmt("// TimeLine range: %" PRIi32 " <-> %" PRIi32 "\n", srcInfo_.startFrame, srcInfo_.endFrame);
+	buf.appendFmt("\n");
+	buf.appendFmt("VERSION %" PRIu32 "\n", anim::ANIM_INTER_VERSION);
+	buf.appendFmt("BONES %" PRIi32 "\n", numBones);
+	buf.appendFmt("FRAMES %" PRIi32 "\n", numFrames);
+	buf.appendFmt("FPS %" PRIi32 "\n", fps);
+	buf.appendFmt("NOTES %" PRIi32 "\n", numNotes);
+	buf.appendFmt("\n");
+
+	// notes.
+	if (notes_.isNotEmpty())
+	{
+		for (const auto& note : notes_) {
+			buf.appendFmt("NOTE %" PRIi32 " \"%s\"\n", note.frame, note.value.c_str());
+		}
+
+		buf.appendFmt("\n");
+	}
+
+	// list the bones.
+	for (const auto& bone : bones_) {
+		buf.appendFmt("BONE \"%s\"\n", bone.name.c_str());
+	}
+
+	buf.append("\n");
+
+	stream.write(buf.c_str(), buf.length());
+
+	buf.clear();
+
+	// write each bones data.
+	for (const auto& bone : bones_)
+	{
+		buf.appendFmt("BONE_DATA // \"%s\"\n", bone.name.c_str());
+		stream.write(buf.c_str(), buf.length());
+
+		X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")(bone.data.size(), numFrames);
+
+		for (int32_t i = 0; i < numFrames; i++)
+		{
+			const anim::Inter::FrameData& data = bone.data[i];
+
+			buf.clear();
+			buf.appendFmt("POS ( %.8g %.8g %.8g )\n",
+				data.position.x,
+				data.position.y,
+				data.position.z);
+
+			buf.appendFmt("SCALE ( %.4g %.4g %.4g )\n",
+				data.scale.x,
+				data.scale.y,
+				data.scale.z);
+
+			const auto& ang = data.rotation;
+			buf.appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
+				ang.m00, ang.m01, ang.m02,
+				ang.m10, ang.m11, ang.m12,
+				ang.m20, ang.m21, ang.m22);
+
+			buf.append("\n");
+
+			stream.write(buf.c_str(), buf.length());
+		}
+	}
+
+	if (stream.size() > requiredSize) {
+		X_WARNING("Anim", "Inter file size exceeded calculated size");
+	}
+
+	return true;
+}
+
+void Anim::setSourceInfo(const core::string& sourceFile, int32_t startFrame, int32_t endFrame)
+{
+	srcInfo_.sourceFile = sourceFile;
+	srcInfo_.startFrame = startFrame;
+	srcInfo_.endFrame = endFrame;
+}
+
+
+int32_t Anim::getNumFrames(void) const
 {
 	return numFrames_;
 }
 
-int32_t InterAnim::getFps(void) const
+int32_t Anim::getFps(void) const
 {
 	return fps_;
 }
 
-size_t InterAnim::getNumBones(void) const
+size_t Anim::getNumBones(void) const
 {
 	return bones_.size();
 }
 
-const Bone& InterAnim::getBone(size_t idx) const
+const Bone& Anim::getBone(size_t idx) const
 {
 	return bones_[idx];
 }
 
-const InterAnim::NoteArr& InterAnim::getNotes(void) const
+const Anim::NoteArr& Anim::getNotes(void) const
 {
 	return notes_;
 }
 
-bool InterAnim::ParseData(core::XLexer& lex)
+bool Anim::ParseData(core::XLexer& lex)
 {
 	int32_t version, numBones, numNotes;
 
@@ -149,28 +289,28 @@ bool InterAnim::ParseData(core::XLexer& lex)
 
 	// check dat version number slut.
 	if (version < anim::ANIM_INTER_VERSION) {
-		X_ERROR("InterAnim", "InterAnim file version is too old: %" PRIi32 " required: %" PRIu32,
+		X_ERROR("Anim", "Anim file version is too old: %" PRIi32 " required: %" PRIu32,
 			version, anim::ANIM_INTER_VERSION);
 		return false;
 	}
 	// limit checks
 	if (fps_ > anim::ANIM_MAX_FPS) {
-		X_ERROR("InterAnim", "InterAnim file fps is too high: %" PRIi32 " max: %" PRIu32,
+		X_ERROR("Anim", "Anim file fps is too high: %" PRIi32 " max: %" PRIu32,
 			fps_, anim::ANIM_MAX_FPS);
 		return false;
 	}
 	if (fps_ < anim::ANIM_MIN_FPS) {
-		X_ERROR("InterAnim", "InterAnim file fps is too low: %" PRIi32 " min: %" PRIu32,
+		X_ERROR("Anim", "Anim file fps is too low: %" PRIi32 " min: %" PRIu32,
 			fps_, anim::ANIM_MIN_FPS);
 		return false;
 	}
 	if (numBones > anim::ANIM_MAX_BONES) {
-		X_ERROR("InterAnim", "InterAnim file has too many bones: %" PRIi32 " max: %" PRIu32,
+		X_ERROR("Anim", "Anim file has too many bones: %" PRIi32 " max: %" PRIu32,
 			numBones, anim::ANIM_MAX_BONES);
 		return false;
 	}
 	if (numNotes > anim::ANIM_MAX_NOTES) {
-		X_ERROR("InterAnim", "InterAnim file has too many notes: %" PRIi32 " max: %" PRIu32,
+		X_ERROR("Anim", "Anim file has too many notes: %" PRIi32 " max: %" PRIu32,
 			numNotes, anim::ANIM_MAX_NOTES);
 		return false;
 	}
@@ -178,39 +318,39 @@ bool InterAnim::ParseData(core::XLexer& lex)
 
 	// how many bones!
 	if (numBones < 1) {
-		X_ERROR("InterAnim", "animation has zero bones");
+		X_ERROR("Anim", "animation has zero bones");
 		return false;
 	}
 	// we need some frames to play some games.
 	if (numFrames_ < 1) {
-		X_ERROR("InterAnim", "animation has zero frames");
+		X_ERROR("Anim", "animation has zero frames");
 		return false;
 	}
 	// fluffy pig sausages
 	if (fps_ < 1) {
-		X_ERROR("InterAnim", "animation has fps lower than 1");
+		X_ERROR("Anim", "animation has fps lower than 1");
 		return false;
 	}
 
 	if (!ReadNotes(lex, numNotes)) {
-		X_ERROR("InterAnim", "failed to parse note data");
+		X_ERROR("Anim", "failed to parse note data");
 		return false;
 	}
 
 	// fill my cofin.
 	if (!ReadBones(lex, numBones)) {
-		X_ERROR("InterAnim", "failed to parse bone data");
+		X_ERROR("Anim", "failed to parse bone data");
 		return false;
 	}
 
 	// data time.
 	if (!ReadFrameData(lex, numBones)) {
-		X_ERROR("InterAnim", "failed to parse frame data");
+		X_ERROR("Anim", "failed to parse frame data");
 		return false;
 	}
 
 	if (!lex.isEOF(true)) {
-		X_ERROR("InterAnim", "trailing data in file");
+		X_ERROR("Anim", "trailing data in file");
 		return false;
 	}
 
@@ -218,14 +358,14 @@ bool InterAnim::ParseData(core::XLexer& lex)
 }
 
 
-bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut, bool optional)
+bool Anim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut, bool optional)
 {
 	core::XLexToken token(nullptr, nullptr);
 
 	valOut = 0;
 
 	if (!lex.ReadToken(token)) {
-		X_ERROR("InterAnim", "Failed to read token");
+		X_ERROR("Anim", "Failed to read token");
 		return false;
 	}
 
@@ -235,18 +375,18 @@ bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& v
 			return true;
 		}
 
-		X_ERROR("InterAnim", "Failed to read '%s'", pName);
+		X_ERROR("Anim", "Failed to read '%s'", pName);
 		return false;
 	}
 
 	// get value
 	if (!lex.ReadToken(token)) {
-		X_ERROR("InterAnim", "Failed to read '%s' value", pName);
+		X_ERROR("Anim", "Failed to read '%s' value", pName);
 		return false;
 	}
 
 	if (token.GetType() != core::TokenType::NUMBER) {
-		X_ERROR("InterAnim", "Failed to read '%s' value, it's not of interger type", pName);
+		X_ERROR("Anim", "Failed to read '%s' value, it's not of interger type", pName);
 		return false;
 	}
 
@@ -255,7 +395,7 @@ bool InterAnim::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& v
 }
 
 
-bool InterAnim::ReadNotes(core::XLexer& lex, int32_t numNotes)
+bool Anim::ReadNotes(core::XLexer& lex, int32_t numNotes)
 {
 	notes_.reserve(numNotes);
 
@@ -266,51 +406,51 @@ bool InterAnim::ReadNotes(core::XLexer& lex, int32_t numNotes)
 	for (int32_t i = 0; i < numNotes; i++)
 	{
 		if (!lex.ReadToken(token)) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' token");
+			X_ERROR("Anim", "Failed to read 'NOTE' token");
 			return false;
 		}
 
 		if (!token.isEqual("NOTE")) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' token");
+			X_ERROR("Anim", "Failed to read 'NOTE' token");
 			return false;
 		}
 
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' frame");
+			X_ERROR("Anim", "Failed to read 'NOTE' frame");
 			return false;
 		}
 
 		if (token.GetType() != core::TokenType::NUMBER) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' frame expected number");
+			X_ERROR("Anim", "Failed to read 'NOTE' frame expected number");
 			return false;
 		}
 
 		int32_t frame = token.GetIntValue();
 		if (frame < 0) {
-			X_ERROR("InterAnim", "Invalid 'NOTE' frame index: %" PRIi32, frame);
+			X_ERROR("Anim", "Invalid 'NOTE' frame index: %" PRIi32, frame);
 			return false;
 		}
 
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' value");
+			X_ERROR("Anim", "Failed to read 'NOTE' value");
 			return false;
 		}
 
 		if (token.GetType() != core::TokenType::STRING) {
-			X_ERROR("InterAnim", "Failed to read 'NOTE' value");
+			X_ERROR("Anim", "Failed to read 'NOTE' value");
 			return false;
 		}
 
-		InterNote note;
+		Note note;
 		note.frame = frame;
 		note.value = core::string(token.begin(), token.end());
 
 		if (note.value.length() < 1) {
-			X_ERROR("InterAnim", "note value too short: \"%s\"", note.value.c_str());
+			X_ERROR("Anim", "note value too short: \"%s\"", note.value.c_str());
 			return false;
 		}
 		if (note.value.length() > anim::ANIM_MAX_NOTE_NAME_LENGTH) {
-			X_ERROR("InterAnim", "note valuetoo long: \"%s\" max: %" PRIu32,
+			X_ERROR("Anim", "note valuetoo long: \"%s\" max: %" PRIu32,
 				note.value.c_str(), anim::ANIM_MAX_NOTE_NAME_LENGTH);
 			return false;
 		}
@@ -325,7 +465,7 @@ bool InterAnim::ReadNotes(core::XLexer& lex, int32_t numNotes)
 	return true;
 }
 
-bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
+bool Anim::ReadBones(core::XLexer& lex, int32_t numBones)
 {
 	bones_.reserve(numBones);
 
@@ -335,23 +475,23 @@ bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 	for (int32_t i = 0; i < numBones; i++)
 	{
 		if (!lex.ReadToken(token)) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			X_ERROR("Anim", "Failed to read 'BONE' token");
 			return false;
 		}
 
 		if (!token.isEqual("BONE")) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			X_ERROR("Anim", "Failed to read 'BONE' token");
 			return false;
 		}
 
 		// read the string
 		if (!lex.ReadTokenOnLine(token)) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' token");
+			X_ERROR("Anim", "Failed to read 'BONE' token");
 			return false;
 		}
 
 		if (token.GetType() != core::TokenType::STRING) {
-			X_ERROR("InterAnim", "Failed to read 'BONE' name");
+			X_ERROR("Anim", "Failed to read 'BONE' name");
 			return false;
 		}
 
@@ -360,11 +500,11 @@ bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 
 		// validate the names
 		if (bone.name.length() < 1) {
-			X_ERROR("InterAnim", "bone name too short: \"%s\"", bone.name.c_str());
+			X_ERROR("Anim", "bone name too short: \"%s\"", bone.name.c_str());
 			return false;
 		}
 		if (bone.name.length() > model::MODEL_MAX_BONE_NAME_LENGTH) {
-			X_ERROR("InterAnim", "bone name too long: \"%s\" max: %" PRIu32,
+			X_ERROR("Anim", "bone name too long: \"%s\" max: %" PRIu32,
 				bone.name.c_str(), model::MODEL_MAX_BONE_NAME_LENGTH);
 			return false;
 		}
@@ -380,7 +520,7 @@ bool InterAnim::ReadBones(core::XLexer& lex, int32_t numBones)
 }
 
 
-bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
+bool Anim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 {
 	X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size());
 
@@ -390,7 +530,7 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 	{
 		// data has a start tag.
 		if (!lex.SkipUntilString("BONE_DATA")) {
-			X_ERROR("InterAnim", "missing BONE_DATA tag");
+			X_ERROR("Anim", "missing BONE_DATA tag");
 			return false;
 		}
 
@@ -441,5 +581,8 @@ bool InterAnim::ReadFrameData(core::XLexer& lex, int32_t numBones)
 
 	return true;
 }
+
+} // namespace Inter
+
 
 X_NAMESPACE_END

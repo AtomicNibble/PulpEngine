@@ -27,27 +27,13 @@
 X_NAMESPACE_BEGIN(maya)
 
 
-Bone::Bone() : 
-	data(g_arena)
-{
-
-}
-
-Bone::~Bone()
-{
-
-}
-
-
 // ================================================
 
 PotatoAnimExporter::PotatoAnimExporter(core::MemoryArenaBase* arena) :
-	arena_(arena),
-	fps_(anim::ANIM_DEFAULT_FPS),
+	anim::Inter::Anim(arena),
 	type_(anim::AnimType::RELATIVE),
 	unitOfMeasurement_(MDistance::Unit::kInches),
-	bones_(arena),
-	notes_(arena)
+	bonePaths_(arena)
 {
 	MayaUtil::MayaPrintMsg("=========== Exporting Anim ===========");
 }
@@ -60,7 +46,7 @@ PotatoAnimExporter::~PotatoAnimExporter()
 }
 
 
-MStatus PotatoAnimExporter::convert(const MArgList &args)
+MStatus PotatoAnimExporter::convert(const MArgList& args)
 {
 	MStatus status = processArgs(args);
 	if (status == MS::kFailure) {
@@ -107,7 +93,7 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 			return status;
 		}
 
-		MayaUtil::SetProgressRange(0, 4 + getNumFrames() + exportObjects_.length());
+		MayaUtil::SetProgressRange(0, 4 + getNumFrames());
 		MayaUtil::SetProgressText("Loading bones");
 
 		status = loadBones();
@@ -125,41 +111,17 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 			MayaUtil::MayaPrintError("Failed to get animation data: %s", status.errorString().asChar());
 			return status;
 		}
-
-	}
-
-	core::ByteStream interMidiateData(g_arena);
-
-	{
-		PROFILE_MAYA_NAME("Write intermidiate:");
-
-		status = writeIntermidiate_int(interMidiateData);
-		if (!status) {
-			return status;
-		}
 	}
 
 	if (exportMode_ == ExpoMode::RAW)
 	{
 		PROFILE_MAYA_NAME("Save Raw");
 
-		const auto filePath = getFilePath();
+		auto filePath = getFilePath();
 		MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath.c_str());
 
-		if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
-			X_ERROR("Anim", "Failed to create export directory");
-		}
-
-		FILE* f;
-		errno_t err = fopen_s(&f, filePath.c_str(), "wb");
-		if (f)
-		{
-			fwrite(interMidiateData.begin(), 1, interMidiateData.size(), f);
-			fclose(f);
-		}
-		else
-		{
-			MayaUtil::MayaPrintError("Failed to open file for saving(%" PRIi32 "): %s", err, filePath.c_str());
+		if (!save(filePath)) {
+			MayaUtil::MayaPrintError("Failed to save file: %s", filePath.c_str());
 			return MS::kFailure;
 		}
 	}
@@ -189,6 +151,16 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 		if (!maya::AssetDB::Get()->GetModInfo(modId, mod)) {
 			X_ERROR("Anim", "Failed to get mod info from server");
 			return status;
+		}
+
+		core::ByteStream interMidiateData(g_arena);
+
+		{
+			PROFILE_MAYA_NAME("Write intermidiate:");
+
+			if (!save(interMidiateData)) {
+				return status;
+			}
 		}
 
 		MayaUtil::SetProgressText("Deflating");
@@ -229,15 +201,6 @@ MStatus PotatoAnimExporter::convert(const MArgList &args)
 				return status;
 			}
 		}
-
-
-		{
-			MayaUtil::SetProgressText("Compiling anim");
-
-
-
-
-		}
 	}
 	else
 	{
@@ -253,25 +216,25 @@ void PotatoAnimExporter::setFileName(const MString& path)
 	// we don't replace seperators on the name as asset names 
 	// have a fixed slash, regardless of native slash of the platform.
 	// so we replace slashes only when building file paths.
-
-	fileName_.set(path.asChar());
+	fileName_.set(path.asWChar());
 	fileName_.trim();
 
-	name_ = core::string(fileName_.begin(), fileName_.end());
+	name_ = core::string(path.asChar(), path.length());
+	name_.trim();
 
-	fileName_.setExtension(anim::ANIM_FILE_EXTENSION);
+	fileName_.setExtension(anim::ANIM_FILE_EXTENSION_W);
 }
 
 void PotatoAnimExporter::setOutdir(const MString& path)
 {
-	outDir_.set(path.asChar());
+	outDir_.set(path.asWChar());
 	outDir_.trim();
 	outDir_.replaceSeprators();
 }
 
-core::Path<char> PotatoAnimExporter::getFilePath(void) const
+core::Path<wchar_t> PotatoAnimExporter::getFilePath(void) const
 {
-	core::Path<char> path(outDir_);
+	core::Path<wchar_t> path(outDir_);
 	path /= fileName_;
 	path.replaceSeprators();
 	return path;
@@ -325,7 +288,7 @@ MStatus PotatoAnimExporter::getInputObjects(void)
 
 MStatus PotatoAnimExporter::getExportObjects(void)
 {
-	PROFILE_MAYA("get objects");
+	PROFILE_MAYA();
 
 	return getInputObjects();
 }
@@ -337,6 +300,7 @@ MStatus PotatoAnimExporter::loadBones(void)
 	uint32_t num = exportObjects_.length();
 	size_t numFrames = getNumFrames();
 
+	bonePaths_.reserve(num);
 	bones_.reserve(num);
 
 	for (uint32_t i = 0; i < num; i++)
@@ -349,10 +313,11 @@ MStatus PotatoAnimExporter::loadBones(void)
 			
 			MayaUtil::MayaPrintMsg("Bone(%" PRIu32 ") name: %s", i, node.name().asChar());
 
-			Bone& bone = bones_.AddOne();
-			bone.dag = jointDag;
-			bone.name = MayaUtil::RemoveNameSpace(node.name());
+			auto& bone = bones_.AddOne(arena_);
+			bone.name = MayaUtil::RemoveNameSpace(node.name()).asChar();
 			bone.data.reserve(numFrames);
+
+			bonePaths_.push_back(jointDag);
 		}
 		else
 		{
@@ -381,14 +346,17 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 		MayaUtil::MayaPrintVerbose("Loading frame: %" PRIi32, curFrame);
 		{
+			X_ASSERT(bones_.size() == bonePaths_.size(), "Bone size mismatch")(bones_.size(), bonePaths_.size());
+
 			size_t i, num = bones_.size();
 			for (i = 0; i < num; i++)
 			{
-				Bone& bone = bones_[i];
+				anim::Inter::Bone& bone = bones_[i];
+				const auto& bonePath = bonePaths_[i];
 
-				MayaUtil::MayaPrintVerbose("Bone(%" PRIuS "): %s", i, bone.name.asChar());
+				MayaUtil::MayaPrintVerbose("Bone(%" PRIuS "): %s", i, bone.name.c_str());
 
-				MTransformationMatrix worldMatrixTrans = bone.dag.inclusiveMatrix();
+				MTransformationMatrix worldMatrixTrans = bonePath.inclusiveMatrix();
 				MMatrix m = worldMatrixTrans.asMatrix();
 				
 				Matrix33f worldMatrix = MayaUtil::XMat(m);
@@ -407,7 +375,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 				Matrix33f invScaleMatrix = scaleMatrix.inverted();
 				Matrix33f rotationMatrix = invScaleMatrix * worldMatrix;
 
-				FrameData& data = bone.data.AddOne();
+				anim::Inter::FrameData& data = bone.data.AddOne();
 				data.scale = scale;
 				data.position = pos;
 				data.rotation = rotationMatrix;
@@ -437,101 +405,12 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 	return MS::kSuccess;
 }
 
-MStatus PotatoAnimExporter::writeIntermidiate_int(core::ByteStream& stream)
+MStatus PotatoAnimExporter::loadNoteData(void)
 {
-	// I will store each tags data.
-	// for each frame there will be a position and a quat.
-	const int32_t numBones = safe_static_cast<int32_t>(bones_.size());
-	const int32_t numNotes = safe_static_cast<int32_t>(notes_.size());
-	const int32_t numFrames = getNumFrames();
-	const int32_t fps = static_cast<int32_t>(fps_);
+	// not sure how I wanna do note data.
+	// I wnat it global per animation, it would be nice if it was set on the timeline.
 
-	MString currentFile = MFileIO::currentFile();
 
-	// work out max possible size bufffer needed.
-	const size_t maxFloatBytes = 24; // -6.4
-	const size_t numFloatsPerEntry = 3 + 3 + 4;
-	const size_t tagSizes = sizeof("POS ") + sizeof("SCALE ") + sizeof("ANG ");
-	const size_t paddingSize = 10 * 6; // more than needed 
-	const size_t maxSizePerEntry = (maxFloatBytes * numFloatsPerEntry) +
-		tagSizes + paddingSize;
-
-	const size_t headerSize = 8096; // plenty for shiz
-	const size_t requiredSize = ((maxSizePerEntry * numFrames) * numBones) + headerSize;
-
-	stream.reset();
-	stream.reserve(requiredSize);
-
-	core::StackString<4096> buf;
-	buf.clear();
-	buf.appendFmt("// " X_ENGINE_NAME " intermidiate animation format\n");
-	buf.appendFmt("// Source: \"%s\"\n", currentFile.asChar());
-	buf.appendFmt("// TimeLine range: %" PRIi32 " <-> %" PRIi32 "\n", startFrame_, endFrame_);
-	buf.appendFmt("\n");
-	buf.appendFmt("VERSION %" PRIu32 "\n", anim::ANIM_INTER_VERSION);
-	buf.appendFmt("BONES %" PRIi32 "\n", numBones);
-	buf.appendFmt("FRAMES %" PRIi32 "\n", numFrames);
-	buf.appendFmt("FPS %" PRIi32 "\n", fps);
-	buf.appendFmt("NOTES %" PRIi32 "\n", numNotes);
-	buf.appendFmt("\n");
-
-	// notes.
-	if (notes_.isNotEmpty())
-	{
-		for (const auto& note : notes_) {
-			buf.appendFmt("NOTE %" PRIi32 " \"%s\"\n", note.frame, note.value.c_str());
-		}
-
-		buf.appendFmt("\n");
-	}
-
-	// list the bones.
-	for (const auto& bone : bones_) {
-		const char* pName = bone.name.asChar();
-		buf.appendFmt("BONE \"%s\"\n", pName);
-	}
-
-	buf.append("\n");
-
-	stream.write(buf.c_str(), buf.length());
-	buf.clear();
-
-	// write each bones data.
-	for (const auto& bone : bones_)
-	{
-		buf.appendFmt("BONE_DATA // \"%s\"\n", bone.name.asChar());
-		stream.write(buf.c_str(), buf.length());
-
-		X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")(bone.data.size(), numFrames);
-
-		for (int32_t i = 0; i < numFrames; i++)
-		{
-			const FrameData& data = bone.data[i];
-
-			buf.clear();
-			buf.appendFmt("POS ( %.8g %.8g %.8g )\n",
-				data.position.x,
-				data.position.y,
-				data.position.z);
-
-			buf.appendFmt("SCALE ( %.4g %.4g %.4g )\n",
-				data.scale.x,
-				data.scale.y,
-				data.scale.z);
-
-			const auto& ang = data.rotation;
-			buf.appendFmt("ANG ((%f %f %f) (%f %f %f) (%f %f %f))\n",
-				ang.m00, ang.m01, ang.m02,
-				ang.m10, ang.m11, ang.m12,
-				ang.m20, ang.m21, ang.m22);
-		
-			buf.append("\n");
-
-			stream.write(buf.c_str(), buf.length());
-		}
-
-		MayaUtil::IncProcess();
-	}
 
 	return MS::kSuccess;
 }
@@ -541,7 +420,6 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 {
 	MStatus status = MS::kFailure;
 	uint32_t idx;
-
 
 	// args:
 	// f: filename
@@ -583,7 +461,8 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		if (!args.get(++idx, modeStr)) {
 			MayaUtil::MayaPrintWarning("failed to get export mode");
 		}
-		else {
+		else 
+		{
 			if (core::strUtil::IsEqualCaseInsen(modeStr.asChar(), "Raw")) {
 				exportMode_ = ExpoMode::RAW;
 			}
@@ -607,7 +486,10 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 		if (!args.get(++idx, typeStr)) {
 			MayaUtil::MayaPrintWarning("failed to get type");
 		}
-		else {
+		else 
+		{
+			static_assert(anim::AnimType::ENUM_COUNT == 4, "More animTypes? this needs updating");
+
 			if (core::strUtil::IsEqualCaseInsen(typeStr.asChar(), "Relative")) {
 				type_ = anim::AnimType::RELATIVE;
 			}
@@ -706,6 +588,13 @@ MString PotatoAnimExporter::argsToJson(void) const
 	return MString(s.GetString());
 }
 
+
+
+X_INLINE const int32_t PotatoAnimExporter::getNumFrames(void) const
+{
+	return (endFrame_ + 1) - startFrame_;
+}
+
 X_INLINE double PotatoAnimExporter::convertUnitOfMeasure(double value) const
 {
 	MDistance d(value);
@@ -758,7 +647,7 @@ bool AnimExporter::haveWriteMethod() const
 
 MString AnimExporter::defaultExtension() const
 {
-	return "anim";
+	return anim::ANIM_INTER_FILE_EXTENSION;
 }
 
 void* AnimExporter::creator()

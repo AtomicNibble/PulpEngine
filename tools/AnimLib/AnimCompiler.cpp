@@ -741,7 +741,7 @@ void AnimCompiler::Bone::clearData(void)
 
 // ----------------------------------------------------
 
-AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton) :
+AnimCompiler::AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skelton) :
 	arena_(arena),
 	inter_(inter),
 	skelton_(skelton),
@@ -1106,7 +1106,7 @@ void AnimCompiler::loadBones(void)
 		// got anim data for this bone?
 		for (x = 0; x < inter_.getNumBones(); x++)
 		{
-			const anim::Bone& interBone = inter_.getBone(x);
+			const anim::Inter::Bone& interBone = inter_.getBone(x);
 			if (interBone.name == pBoneName)
 			{
 				size_t parentIdx = skelton_.getBoneParent(i);

@@ -151,7 +151,7 @@ class AnimCompiler
 	};
 
 	typedef core::Array<Bone> BoneArr;
-	typedef InterAnim::NoteArr NoteArr;
+	typedef Inter::Anim::NoteArr NoteArr;
 
 	X_DECLARE_FLAGS(CompileFlag)(
 		LOOPING,
@@ -164,7 +164,7 @@ public:
 	static const float NOISE_ELIPSON;
 
 public:
-	AnimCompiler(core::MemoryArenaBase* arena, const InterAnim& inter, const model::ModelSkeleton& skelton);
+	AnimCompiler(core::MemoryArenaBase* arena, const Inter::Anim& inter, const model::ModelSkeleton& skelton);
 	~AnimCompiler();
 
 	void printStats(bool verbose = false) const;
@@ -187,7 +187,7 @@ private:
 private:
 	core::MemoryArenaBase* arena_;
 
-	const InterAnim& inter_;
+	const Inter::Anim& inter_;
 	const model::ModelSkeleton& skelton_;
 
 private:

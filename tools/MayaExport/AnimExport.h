@@ -7,72 +7,41 @@
 #include <maya\MVector.h>
 #include <maya\MQuaternion.h>
 
-#include <String\Path.h>
-
-#include <Containers\Array.h>
-
 #include <IAnimation.h>
+
+#include <anim_inter.h>
 
 X_NAMESPACE_BEGIN(maya)
 
-
-struct FrameData
-{
-	Vec3f scale;
-	Vec3d position;
-	Matrix33f rotation;
-};
-
-struct Bone
-{
-	Bone();
-	~Bone();
-
-	MDagPath dag;
-	MString name;
-	core::Array<FrameData> data;
-};
-
-struct NoteTrack
-{
-	int32_t frame;
-	core::string value;
-};
-
-class PotatoAnimExporter
+class PotatoAnimExporter : public anim::Inter::Anim
 {
 	X_DECLARE_ENUM(ExpoMode)(SERVER, RAW);
 
-	typedef core::Array<Bone> BoneArr;
-	typedef core::Array<NoteTrack> NoteTrackArr;
+	typedef core::Array<MDagPath> MDagPathArr;
 
 public:
 	PotatoAnimExporter(core::MemoryArenaBase* arena);
 	~PotatoAnimExporter();
 
-	MStatus convert(const MArgList &args);
+	MStatus convert(const MArgList& args);
 
 private:
 	void setFileName(const MString& path);
 	void setOutdir(const MString& path);
 
-	core::Path<char> getFilePath(void) const;
+	core::Path<wchar_t> getFilePath(void) const;
 	core::string getName(void) const;
 
 	MStatus getInputObjects(void);
 	MStatus getExportObjects(void);
 	MStatus loadBones(void);
 	MStatus getAnimationData(void);
+	MStatus loadNoteData(void);
 
-	MStatus writeIntermidiate_int(core::ByteStream& stream);
-
-	MStatus processArgs(const MArgList &args);
+	MStatus processArgs(const MArgList& args);
 	MString argsToJson(void) const;
 
-private:
-	X_INLINE const int32_t getNumFrames(void) const {
-		return (endFrame_ + 1) - startFrame_;
-	}
+	const int32_t getNumFrames(void) const;
 
 private:
 	double convertUnitOfMeasure(double value) const;
@@ -80,26 +49,21 @@ private:
 	Vec3f convertUnitOfMeasure(const Vec3f& vec) const;
 
 private:
-	core::MemoryArenaBase* arena_;
-
 	int32_t startFrame_;
 	int32_t endFrame_;
-	uint32_t fps_;
 	anim::AnimType::Enum type_;
 	MString nodes_;
 
 	core::string name_;
-	core::Path<char> fileName_; // name + extension.
-	core::Path<char> outDir_;
+	core::Path<wchar_t> fileName_; // name + extension.
+	core::Path<wchar_t> outDir_;
 
 	ExpoMode::Enum exportMode_;
 	MDistance::Unit unitOfMeasurement_;
 	MDagPathArray exportObjects_;
-	BoneArr bones_;
-	NoteTrackArr notes_;
+
+	MDagPathArr bonePaths_;
 };
-
-
 
 class AnimExporter : public MPxFileTranslator
 {
