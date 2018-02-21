@@ -336,6 +336,7 @@ namespace fx
 		lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
 
 		Quatf lookatCamQ(lookatCam);
+		Quatf q;
 
 		for (size_t i = 0; i < activeStages_.size(); i++)
 		{
@@ -347,11 +348,14 @@ namespace fx
 
 			gEngEnv.pMaterialMan_->waitForLoad(stage.pMaterial);
 
-			Quatf q = trans_.quat;
 			if (stage.pDesc->type == StageType::BillboardSprite)
 			{
 				// i want the sprite to always face the camera.
 				q = lookatCamQ;
+			}
+			else
+			{
+				q = trans_.quat;
 			}
 
 			for (const auto& e : stage.elems)
@@ -378,7 +382,8 @@ namespace fx
 				bl = bl * q;
 				br = br * q;
 
-				Vec3f pos = e.pos + e.dir + offset_;
+				Vec3f pos = e.pos + e.dir;
+				pos += offset_;
 				// do the rotation including  offset.
 				// so the effects point of origin is at trans_.pos;
 				pos = pos * trans_.quat; 
@@ -400,7 +405,10 @@ namespace fx
 
 		if (vars_.drawDebug() && vars_.axisExtent() > 0.f)
 		{
-			pPrim->drawAxis(trans_, offset_, Vec3f(vars_.axisExtent()));
+			pPrim->drawAxis(trans_, Vec3f(vars_.axisExtent()));
+			if (offset_ != Vec3f::zero()) {
+				pPrim->drawAxis(trans_, offset_, Vec3f(vars_.axisExtent()));
+			}
 		}
 	}
 
