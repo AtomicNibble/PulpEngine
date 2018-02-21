@@ -45,11 +45,9 @@ namespace RawModel
 		void Clear(void);
 
 		bool LoadRawModel(core::Path<char>& path);
-		bool LoadRawModel(core::Path<wchar_t>& path);
 		bool LoadRawModel(const core::Array<uint8_t>& data);
 
 		bool SaveRawModel(core::Path<char>& path);
-		bool SaveRawModel(core::Path<wchar_t>& path);
 		// save to a buffer
 		bool SaveRawModel(core::Array<uint8_t>& data);
 

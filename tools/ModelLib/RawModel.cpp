@@ -39,18 +39,6 @@ namespace RawModel
 		hasColisionMeshes_ = false;
 	}
 
-	bool Model::LoadRawModel(core::Path<wchar_t>& path)
-	{
-		core::Path<char> narrowPath(path);
-		return LoadRawModel(narrowPath);
-	}
-
-	bool Model::SaveRawModel(core::Path<wchar_t>& path)
-	{
-		core::Path<char> narrowPath(path);
-		return SaveRawModel(narrowPath);
-	}
-
 	size_t Model::totalMeshes(void) const
 	{
 		size_t num = 0;
