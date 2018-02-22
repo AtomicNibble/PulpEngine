@@ -769,49 +769,68 @@ global proc potato_removeModel(string $name)
 	potato_ShowExporterWindow();
 }
 
-global proc potato_DoDeleteSelected()
+global proc potato_DoDeleteSelected(string $type)
 {
 	string $items[] = `textScrollList -q -si DeleteListCntl`;
 	int $i;
 	int $size = `size $items`;
 	for($i = 0; $i < $size; $i++) {
 		textScrollList -e -ri $items[$i] DeleteListCntl;
-		potato_removeModel($items[$i]);
+
+		if($type == "model") {
+			potato_removeModel($items[$i]);
+		} else {
+
+		}
 	}
 
 //	print_Msg("items: " + stringArrayToString($items, " "));
 }
 
-global proc potato_DeleteEntry()
+global proc potato_DeleteEntry(string $type)
 {
 	// we want to show the names of all the models.
 	// in a list
 	// and provide a delete button :)
 	string $name = "potato_DeleteEntry";
 	string $closeDialog = "deleteUI " + $name;
-	if (`window -exists $name`)
+	if (`window -exists $name`) {
 		deleteUI $name;
+	}
 
 	// build a list you goat!
-	int $numModels = `getAttr PotatoGNode.numModels`;
+	int $num;
 	int $i;
 
-	if($numModels < 1) {
+	if($type == "model") {
+		$num = `getAttr PotatoGNode.numModels`;
+	} else {
+		$num = `getAttr PotatoGNode.numAnims`;
+	}
+
+	if($num < 1) {
 		return;
 	}
 
 	window  -title "Potato - Delete Entry" -wh 300 180 -s true $name;
 		formLayout -numberOfDivisions 100 -h 40 Export;
 
-			textScrollList -numberOfRows $numModels -allowMultiSelection true -h 190 DeleteListCntl;
-			for($i = 0; $i < $numModels; $i++) {
-				string $name = `getAttr ("PotatoGNode.ModelName" + $i)`;
-				textScrollList -e -append $name DeleteListCntl;
+			textScrollList -numberOfRows $num -allowMultiSelection true -h 190 DeleteListCntl;
+
+			string $assetName;
+			for($i = 0; $i < $num; $i++) {
+				if($type == "model") {
+					$assetName = `getAttr ("PotatoGNode.ModelName" + $i)`;
+				} else {
+					$assetName = `getAttr ("PotatoGNode.AnimName" + $i)`;
+				}
+
+				textScrollList -e -append $assetName DeleteListCntl;
 			}
 
 			// Model Util Buttons
 			rowLayout -numberOfColumns 2 -height 28 -cw2 142 142  -ct2 "both" "both" -co2 1 1 -p Export deleteEntryRow;
-				button -label "Delete Selected" -align "center" -c potato_DoDeleteSelected;
+				button -label "Delete Selected" -align "center" -c potato_DoDeleteSelected($type);
 				button -label "Close" -align "center" -c $closeDialog;
 
 		formLayout -edit
@@ -1204,7 +1223,7 @@ global proc potato_CreateExportWindow( string $name )
 			rowLayout -numberOfColumns 2 -height 28 -cw2 105 105  -ct2 "both" "both" -co2 1 1 -p ModelExport ModelUtilButtons;
 
 				button -label "Add Model" -align "center" -c "potato_AddModel" -p ModelUtilButtons;
-				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p ModelUtilButtons;
+				button -label "Delete Entry" -align "center" -c "potato_DeleteEntry model" -p ModelUtilButtons;
 
 			rowLayout -numberOfColumns 1 -height 28 -cw1 130 -ct1 "both" -co1 1 -p ModelExport ModelUtilButtons2;
 				button -label "Select all mesh in scene" -align "right" -c potato_SelectAllMeshInScene -p ModelUtilButtons2;
@@ -1235,7 +1254,7 @@ global proc potato_CreateExportWindow( string $name )
 			rowLayout -numberOfColumns 2 -height 28 -cw2 105 105  -ct2 "both" "both" -co2 1 1 -p AnimExport AnimUtilButtons;
 
 				button -label "Add Anim" -align "center" -c "potato_AddAnim" -p AnimUtilButtons;
-				button -label "Delete Entry" -align "center" -c potato_DeleteEntry -p AnimUtilButtons;
+				button -label "Delete Entry" -align "center" -c "potato_DeleteEntry anim" -p AnimUtilButtons;
 
 			rowLayout -numberOfColumns 1 -height 28 -cw1 130 -ct1 "both" -co1 1 -p AnimExport AnimUtilButtons2;
 				button -label "Select all bones in scene" -align "right" -c potato_SelectAllBonesInScene -p AnimUtilButtons2;
