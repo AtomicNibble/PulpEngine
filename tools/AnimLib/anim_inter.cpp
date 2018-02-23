@@ -166,6 +166,11 @@ bool Anim::save(core::ByteStream& stream) const
 	if (notes_.isNotEmpty())
 	{
 		for (const auto& note : notes_) {
+			if (note.frame < 0 || note.frame >= numFrames) {
+				X_ERROR("Anim", "Note has invalid frame: %" PRIi32, note.frame);
+				return false;
+			}
+
 			buf.appendFmt("NOTE %" PRIi32 " \"%s\"\n", note.frame, note.value.c_str());
 		}
 
