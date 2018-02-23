@@ -66,6 +66,24 @@ namespace entity
 		const auto delta = time.deltas[core::Timer::GAME];
 		const float deltaSec = delta.GetSeconds();
 
+		auto updateVis = [&](EntityId entity, const Transformf& trans) {
+			if (reg.has<MeshRenderer>(entity))
+			{
+				auto& rendEnt = reg.get<MeshRenderer>(entity);
+				p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
+			}
+			if (reg.has<Emitter>(entity))
+			{
+				auto& emt = reg.get<Emitter>(entity);
+
+				emt.pEmitter->setTrans(trans, emt.offset);
+			}
+			if (reg.has<MeshCollider>(entity))
+			{
+				auto& col = reg.get<MeshCollider>(entity);
+				pPhysScene->setKinematicTarget(col.actor, trans);
+			}
+		};
 
 		{
 			auto view = reg.view<Attached, TransForm>();
@@ -103,32 +121,9 @@ namespace entity
 					}
 				}
 			
-				if (reg.has<MeshRenderer>(entity))
-				{
-					auto& rendEnt = reg.get<MeshRenderer>(entity);
-					p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
-				}
+				updateVis(entity, trans);
 			}
 		}
-
-		auto updateVis = [&](EntityId entity, const Transformf& trans) {
-			if (reg.has<MeshRenderer>(entity))
-			{
-				auto& rendEnt = reg.get<MeshRenderer>(entity);
-				p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
-			}
-			if (reg.has<Emitter>(entity))
-			{
-				auto& emt = reg.get<Emitter>(entity);
-				
-				emt.pEmitter->setTrans(trans, emt.offset);
-			}
-			if (reg.has<MeshCollider>(entity))
-			{
-				auto& col = reg.get<MeshCollider>(entity);
-				pPhysScene->setKinematicTarget(col.actor, trans);
-			}
-		};
 
 		{
 			auto view = reg.view<Rotator, TransForm>();
