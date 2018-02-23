@@ -93,6 +93,9 @@ public:
 	X_INLINE core::TimeVal getDuration(void) const;
 
 	X_INLINE const char* getBoneName(int32_t idx) const;
+	X_INLINE int32_t getNoteFrame(int32_t idx) const;
+	X_INLINE const char* getNoteValue(int32_t idx) const;
+
 
 	void timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) const;
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
@@ -101,13 +104,16 @@ public:
 	ANIMLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
 private:
+	X_INLINE const Note* getNote(int32_t idx) const;
+	X_INLINE const Note* getNotes(void) const;
+	X_INLINE const char* getNoteStrData(void) const;
 
 
 private:
 	BoneArr bones_;
 
 	core::UniquePointer<char[]> data_;
-	NoteTrackHdr noteHdr_;
+	NoteTrackHdr* pNoteHdr_;
 	AnimHeader* pHdr_;
 };
 

@@ -258,6 +258,7 @@ Vec3f Bone::GetPostion(int32_t idx) const
 Anim::Anim(core::string& name, core::MemoryArenaBase* arena) :
 	core::AssetBase(name, assetDb::AssetType::ANIM),
 	bones_(arena),
+	pNoteHdr_(nullptr),
 	pHdr_(nullptr)
 {
 	id_ = 0;
@@ -423,7 +424,7 @@ bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 
 	if (hdr.flags.IsSet(AnimFlag::NOTES))
 	{
-		X_ASSERT_NOT_IMPLEMENTED();
+		pNoteHdr_ = cursor.getSeekPtr<NoteTrackHdr>();
 	}
 
 	data_ = std::move(data);
