@@ -9,15 +9,20 @@
 #include <maya\MSelectionList.h>
 #include <maya\MStringArray.h>
 #include <maya\MDagPath.h>
+#include <maya\MItDag.h>
 #include <maya\MMatrix.h>
 #include <maya\MTransformationMatrix.h>
 #include <maya\MVector.h>
 #include <maya\MQuaternion.h>
 #include <maya\MAnimControl.h>
+#include <maya\MAnimUtil.h>
+#include <maya\MPlug.h>
+#include <maya\MFnEnumAttribute.h>
 #include <maya\MTime.h>
 #include <maya\MFnDagNode.h>
 #include <maya\MEulerRotation.h>
 #include <maya\MFileIO.h>
+#include <maya\MGlobal.h>
 
 #include <Compression\LZ4.h>
 
@@ -93,7 +98,7 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
 			return status;
 		}
 
-		MayaUtil::SetProgressRange(0, 4 + getNumFrames());
+		MayaUtil::SetProgressRange(0, 5 + getNumFrames());
 		MayaUtil::SetProgressText("Loading bones");
 
 		status = loadBones();
@@ -111,7 +116,19 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
 			MayaUtil::MayaPrintError("Failed to get animation data: %s", status.errorString().asChar());
 			return status;
 		}
+
+		MayaUtil::SetProgressText("Loading notetrack data");
+
+		status = loadNoteData();
+
+		if (!status) {
+			MayaUtil::MayaPrintError("Failed to get notetrack data: %s", status.errorString().asChar());
+			return status;
+		}
 	}
+
+	MString currentFile = MFileIO::currentFile();
+	setSourceInfo(core::string(currentFile.asChar()), startFrame_, endFrame_);
 
 	if (exportMode_ == ExpoMode::RAW)
 	{
@@ -300,6 +317,7 @@ MStatus PotatoAnimExporter::loadBones(void)
 	uint32_t num = exportObjects_.length();
 	size_t numFrames = getNumFrames();
 
+	numFrames_ = safe_static_cast<int32_t>(numFrames);
 	bonePaths_.reserve(num);
 	bones_.reserve(num);
 
@@ -407,10 +425,132 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
 MStatus PotatoAnimExporter::loadNoteData(void)
 {
-	// not sure how I wanna do note data.
-	// I wnat it global per animation, it would be nice if it was set on the timeline.
+	if (noteTrack_.length() == 0 || noteTrack_ == "None") {
+		return MS::kSuccess;
+	}
+
+	MayaUtil::MayaPrintMsg("Loading notes from: %s", noteTrack_.asChar());
+
+	// need to basically find a locator with the name.
+	MStatus status;
+
+	MItDag it(MItDag::kDepthFirst, MFn::kTransform, &status);
+	if (!status) {
+		return status;
+	}
+
+	if(it.isDone()) {
+		return MS::kFailure;
+	}
+
+	MDagPath path;
+	while (1)
+	{
+		status = it.getPath(path);
+		if (!status) {
+			return status;
+		}
+
+		MFnDagNode node(path);
+		const auto& name = node.name();
+		if (name == noteTrack_) {
+			break;
+		}
+		
+		status = it.next();
+		if (!status) {
+			return status;
+		}
+
+		if (it.isDone()) {
+			return MS::kFailure;
+		}
+	}
+
+	// wwe found it.
+	if (!path.isValid()) {
+		return MS::kFailure;
+	}
+
+	bool animated = MAnimUtil::isAnimated(path, false, &status);
+	if (!status) {
+		return MS::kFailure;
+	}
+
+	if (!animated) {
+		MayaUtil::MayaPrintWarning("Notetrack is not animated");
+		return MS::kSuccess;
+	}
+
+	MPlugArray plugs;
+	if (!MAnimUtil::findAnimatedPlugs(path, plugs)) {
+		return MS::kFailure;
+	}
+
+	if (plugs.length() < 0) {
+		MayaUtil::MayaPrintError("Notetrack is animated, but failed to get plugs");
+		return MS::kFailure;
+	}
 
 
+	for (uint32_t i = 0; i < plugs.length(); i++)
+	{
+		auto& plug = plugs[i];
+
+		auto fullName = plug.name();
+		auto name = plug.partialName();
+
+		if (name != "NoteValue" && name != "MainNote") {
+			continue;
+		}
+
+		// don't see a nicer way to get this currently :(
+		MString cmd = "addAttr -q -enumName ";
+		cmd += fullName;
+
+		MString result;
+		MGlobal::executeCommand(cmd, result, false, false);
+
+		MStringArray values;
+		result.split(':', values);
+		
+		MFnAnimCurve curve(plug);
+		
+		auto numKeys = curve.numKeys();
+
+		for (uint32_t k = 0; k < numKeys; k++)
+		{
+			MTime time = curve.time(k, &status);
+			double val = curve.value(k, &status);
+			
+			int32_t frame = static_cast<int32_t>(time.value());
+			uint32_t idx = static_cast<uint32_t>(val);
+
+			if (idx > values.length())
+			{
+				MayaUtil::MayaPrintError("Notetrack has a invalid value on frame: %" PRIi32, frame);
+				return MS::kFailure;
+			}
+
+			core::string value(values[idx].asChar());
+
+			if (frame < startFrame_ || frame > endFrame_)
+			{
+				MayaUtil::MayaPrintVerbose("Skipping note \"%s\" frame %" PRIi32 " out of range", value.c_str(), frame);
+				continue;
+			}
+
+			X_ASSERT(frame >= startFrame_, "Frame below start")(frame, startFrame_);
+
+			anim::Inter::Note note;
+			note.value = value;
+			note.frame = (frame - startFrame_);
+
+			MayaUtil::MayaPrintMsg("Note: \"%s\" Frame %" PRIi32, note.value.c_str(), note.frame);
+
+			notes_.emplace_back(note);
+		}
+	}
 
 	return MS::kSuccess;
 }
@@ -544,7 +684,14 @@ MStatus PotatoAnimExporter::processArgs(const MArgList &args)
 			MayaUtil::MayaPrintWarning("failed to get nodes");
 		}
 	}
-
+	
+	idx = args.flagIndex("notetrack");
+	if (idx != MArgList::kInvalidArgIndex) {
+		if (!args.get(++idx, noteTrack_)) {
+			MayaUtil::MayaPrintWarning("failed to get notetrack");
+		}
+	}
+	
 	MString progressCntl;
 	idx = args.flagIndex("progress");
 	if (idx != MArgList::kInvalidArgIndex) {

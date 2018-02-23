@@ -53,6 +53,7 @@ private:
 	int32_t endFrame_;
 	anim::AnimType::Enum type_;
 	MString nodes_;
+	MString noteTrack_;
 
 	core::string name_;
 	core::Path<wchar_t> fileName_; // name + extension.
