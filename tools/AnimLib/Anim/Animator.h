@@ -43,7 +43,7 @@ public:
 	void blendOrigin(core::TimeVal currentTime, Vec3f& blendPos, float& blendWeight) const;
 	void blendDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& blendDelta, float& blendWeight) const;
 
-	void callNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const;
+	void getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const;
 
 	bool isDone(core::TimeVal currentTime) const;
 	float getWeight(core::TimeVal currentTime) const;
@@ -117,7 +117,7 @@ public:
 
 	X_INLINE const Mat44Arr& getBoneMatrices(void) const;
 	
-	ANIMLIB_EXPORT bool callNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const;
+	ANIMLIB_EXPORT bool getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const;
 
 	ANIMLIB_EXPORT bool createFrame(core::TimeVal currentTime);
 

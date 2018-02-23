@@ -383,7 +383,7 @@ void Anim::getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const
 	offset = Vec3f::zero();
 }
 
-void Anim::pumpNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const
+void Anim::getNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const
 {
 	// PUMP ME!
 	// AGAIN!

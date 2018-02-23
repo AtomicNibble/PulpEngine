@@ -100,7 +100,7 @@ public:
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
 	void getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const;
 
-	void pumpNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const;
+	void getNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const;
 
 	ANIMLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
