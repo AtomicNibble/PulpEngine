@@ -383,6 +383,51 @@ void Anim::getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const
 	offset = Vec3f::zero();
 }
 
+void Anim::pumpNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const
+{
+	// PUMP ME!
+	// AGAIN!
+	if (!hasNotes()) {
+		return;
+	}
+
+	int32_t start = from;
+	int32_t end = to;
+
+	if (start == end) {
+		return;
+	}
+
+	X_LOG0("Anim", "from: %" PRIi32 " to: %" PRIi32, from, to);
+
+	// loop through the notes.
+	auto* pNotes = getNotes();
+	auto numNotes = getNumNotes();
+
+	for (int32_t i = 0; i < numNotes; i++)
+	{
+		auto noteFrame = pNotes[i].frame;
+		if (noteFrame > end) {
+			break;
+		}
+
+		if (noteFrame > start)
+		{
+			X_ASSERT(noteFrame <= end, "Frame out of range")(noteFrame, start, end);
+			auto* pNoteValue = getNoteValue(i);
+			values.push_back(pNoteValue);
+
+			if (values.size() == values.capacity()) {
+				X_WARNING("Anim", "Exceeded max note values");
+				return;
+			}
+		}
+	}
+
+	// blend.lastNoteFrame = end;
+}
+
+
 bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 {
 	if (dataSize < sizeof(AnimHeader)) {
@@ -430,9 +475,5 @@ bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 	pHdr_ = reinterpret_cast<AnimHeader*>(data_.get());
 	return true;
 }
-
-
-
-
 
 X_NAMESPACE_END

@@ -218,6 +218,22 @@ void AnimBlend::blendDelta(core::TimeVal fromTime, core::TimeVal toTime, Vec3f& 
 }
 
 
+void AnimBlend::callNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const
+{
+	if (!pAnim_ || !pAnim_->hasNotes()) {
+		return;
+	}
+	
+	auto fromTime = animTime(from);
+	auto toTime = animTime(to);
+
+	FrameBlend frame1, frame2;
+	pAnim_->timeToFrame(fromTime, cycles_, frame1);
+	pAnim_->timeToFrame(toTime, cycles_, frame2);
+
+
+	pAnim_->pumpNotes(frame1.frame1, frame2.frame1, values);
+}
 
 bool AnimBlend::isDone(core::TimeVal currentTime) const
 {
@@ -377,6 +393,19 @@ void Animator::setModel(const model::XModel* pModel)
 	}
 }
 
+
+bool Animator::callNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const
+{
+	if (!pModel_) {
+		return false;
+	}
+
+	for (auto& anim : anims_) {
+		anim.callNotes(from, to, values);
+	}
+
+	return true;
+}
 
 bool Animator::createFrame(core::TimeVal currentTime)
 {

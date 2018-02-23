@@ -90,6 +90,9 @@ static const wchar_t*	 ANIM_INTER_FILE_EXTENSION_W = L"anim_inter";
 #endif
 
 
+typedef core::FixedArray<const char*, ANIM_MAX_NOTES_PER_FRAME> NoteTrackValueArr;
+
+
 struct IAnimLib : public IConverter
 {
 

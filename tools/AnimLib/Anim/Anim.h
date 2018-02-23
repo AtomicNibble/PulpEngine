@@ -78,7 +78,6 @@ class Anim : public core::AssetBase
 	typedef core::Array<int32_t> IndexArr;
 	typedef core::Array<Transformf> TransformArr;
 
-
 public:
 	ANIMLIB_EXPORT Anim(core::string& name, core::MemoryArenaBase* arena);
 	ANIMLIB_EXPORT ~Anim();
@@ -100,6 +99,8 @@ public:
 	void timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) const;
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
 	void getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const;
+
+	void pumpNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const;
 
 	ANIMLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
