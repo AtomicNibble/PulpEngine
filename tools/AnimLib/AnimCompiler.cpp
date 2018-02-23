@@ -1068,7 +1068,7 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 			note.value = safe_static_cast<uint16_t>(noteValueOffset);
 			note.frame = safe_static_cast<uint16_t>(n.frame);
 
-			noteValueOffset += n.value.size();
+			noteValueOffset += core::strUtil::StringBytesIncNull(n.value);
 
 			stream.write(note);
 		}
