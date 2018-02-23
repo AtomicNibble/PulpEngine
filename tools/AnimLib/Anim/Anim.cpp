@@ -419,7 +419,6 @@ bool Anim::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 	for (auto& bone : bones_)
 	{
 		bone.load(cursor);
-
 	}
 
 	if (hdr.flags.IsSet(AnimFlag::NOTES))
