@@ -149,9 +149,9 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 
 	for (const auto* pAnim : sorted_anims)
 	{
-		X_LOG0("Anim", "^2%-32s^7 Dur: ^2%gms^7 Frames: ^2%" PRIi32 "^7 Bones: ^2%" PRIi32 "^7 Fps: ^2%" PRIi32 " ^7Refs:^2%i",
+		X_LOG0("Anim", "^2%-32s^7 Dur: ^2%gms^7 Frames: ^2%" PRIi32 "^7 Bones: ^2%" PRIi32 "^7 Fps: ^2%" PRIi32 "^7 Notes: ^2%" PRIi32 " ^7Refs:^2%i",
 			pAnim->getName().c_str(), pAnim->getDuration().GetMilliSeconds(), 
-			pAnim->getNumFrames(), pAnim->getNumBones(), pAnim->getFps(), pAnim->getRefCount());
+			pAnim->getNumFrames(), pAnim->getNumBones(), pAnim->getFps(), pAnim->getNumNotes(), pAnim->getRefCount());
 	}
 
 	X_LOG0("Anim", "------------ ^8Anims End^7 --------------");
