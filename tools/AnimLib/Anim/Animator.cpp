@@ -227,11 +227,8 @@ void AnimBlend::getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr
 	auto fromTime = animTime(from);
 	auto toTime = animTime(to);
 
-	FrameBlend frame1, frame2;
-	pAnim_->timeToFrame(fromTime, cycles_, frame1);
-	pAnim_->timeToFrame(toTime, cycles_, frame2);
 
-	pAnim_->getNotes(frame1.frame1, frame2.frame1, values);
+	pAnim_->getNotes(fromTime, toTime, values);
 }
 
 bool AnimBlend::isDone(core::TimeVal currentTime) const

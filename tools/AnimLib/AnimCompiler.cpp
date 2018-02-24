@@ -1064,9 +1064,14 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 				return false;
 			}
 
+			auto numFrames = inter_.getNumFrames();
+			auto fraction = static_cast<float>(n.frame) / numFrames;
+
+			X_ASSERT(fraction >= 0.f && fraction <= 1.f, "Fraction out of range")(fraction);
+
 			Note note;
 			note.value = safe_static_cast<uint16_t>(noteValueOffset);
-			note.frame = safe_static_cast<uint16_t>(n.frame);
+			note.frame = fraction;
 
 			noteValueOffset += core::strUtil::StringBytesIncNull(n.value);
 

@@ -53,7 +53,7 @@ X_INLINE const char* Anim::getBoneName(int32_t idx) const
 	return bones_[idx].getName();
 }
 
-X_INLINE int32_t Anim::getNoteFrame(int32_t idx) const
+X_INLINE float Anim::getNotePosition(int32_t idx) const
 {
 	auto* pNote = getNote(idx);
 

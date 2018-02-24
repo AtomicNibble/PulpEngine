@@ -92,7 +92,7 @@ public:
 	X_INLINE core::TimeVal getDuration(void) const;
 
 	X_INLINE const char* getBoneName(int32_t idx) const;
-	X_INLINE int32_t getNoteFrame(int32_t idx) const;
+	X_INLINE float getNotePosition(int32_t idx) const;
 	X_INLINE const char* getNoteValue(int32_t idx) const;
 
 
@@ -100,7 +100,7 @@ public:
 	void getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const;
 	void getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const;
 
-	void getNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const;
+	void getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const;
 
 	ANIMLIB_EXPORT bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 

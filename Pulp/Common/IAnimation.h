@@ -149,7 +149,8 @@ struct NoteTrackHdr
 struct Note
 {
 	uint16_t value;
-	uint16_t frame;
+	uint16_t _pad;
+	float frame;
 };
 
 struct AnimHeader
@@ -194,7 +195,7 @@ X_INLINE size_t AnimHeader::numTagHeaderBytes(void) const
 
 X_ENSURE_SIZE(AnimHeader, 12);
 X_ENSURE_SIZE(NoteTrackHdr, 2);
-X_ENSURE_SIZE(Note, 4);
+X_ENSURE_SIZE(Note, 8);
 
 
 X_NAMESPACE_END

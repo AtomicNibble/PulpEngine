@@ -383,37 +383,40 @@ void Anim::getOrigin(Vec3f& offset, core::TimeVal time, int32_t cycles) const
 	offset = Vec3f::zero();
 }
 
-void Anim::getNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const
+void Anim::getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const
 {
-	// PUMP ME!
-	// AGAIN!
 	if (!hasNotes()) {
 		return;
 	}
 
-	int32_t start = from;
-	int32_t end = to;
+	int32_t numFrames = getNumFrames();
+	int32_t fps = getFps();
+	float totalSec = static_cast<float>(numFrames) / fps;
 
-	if (start == end) {
+	float fromFract = from.GetSeconds() / totalSec;
+	float toFract = to.GetSeconds() / totalSec;
+
+	if (fromFract < 0.f) {
 		return;
 	}
 
-	X_LOG0("Anim", "from: %" PRIi32 " to: %" PRIi32, from, to);
+	if (fromFract == toFract) {
+		return;
+	}
 
-	// loop through the notes.
 	auto* pNotes = getNotes();
 	auto numNotes = getNumNotes();
 
 	for (int32_t i = 0; i < numNotes; i++)
 	{
 		auto noteFrame = pNotes[i].frame;
-		if (noteFrame > end) {
+		if (noteFrame >= toFract) {
 			break;
 		}
 
-		if (noteFrame > start)
+		if (noteFrame >= fromFract)
 		{
-			X_ASSERT(noteFrame <= end, "Frame out of range")(noteFrame, start, end);
+			X_ASSERT(noteFrame <= toFract, "Frame out of range")(noteFrame, fromFract, toFract);
 			auto* pNoteValue = getNoteValue(i);
 			values.push_back(pNoteValue);
 
@@ -423,8 +426,6 @@ void Anim::getNotes(int32_t from, int32_t to, NoteTrackValueArr& values) const
 			}
 		}
 	}
-
-	// blend.lastNoteFrame = end;
 }
 
 
