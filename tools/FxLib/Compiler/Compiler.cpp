@@ -781,6 +781,16 @@ namespace fx
 				}
 			}
 
+			if (!stage.flags.IsSet(StageFlag::Looping))
+			{
+				auto maxCount = stage.count.start + stage.count.range;
+				if (maxCount <= 0)
+				{
+					X_ERROR("Fx", "Stage is not looping with a max count of zero");
+					return false;
+				}
+			}
+
 			stages_.emplace_back(std::move(stage));
 		}
 
