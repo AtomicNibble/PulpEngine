@@ -14,37 +14,45 @@ X_NAMESPACE_BEGIN(sound)
 
 namespace
 {
+	inline float mapVolume(float vol)
+	{
+		return vol * 255.f;
+	}
 
 	void Var_MasterVolChanged(core::ICVar* pVar)
 	{
 		float vol = pVar->GetFloat();
-		vol *= 255.f;
 
-		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MASTERVOLUME, vol);
+		if (AK::SoundEngine::IsInitialized()) {
+			AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MASTERVOLUME, mapVolume(vol));
+		}
 	}
 
 	void Var_MusicVolChanged(core::ICVar* pVar)
 	{
 		float vol = pVar->GetFloat();
-		vol *= 255.f;
 
-		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MUSICVOLUME, vol);
+		if (AK::SoundEngine::IsInitialized()) {
+			AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MUSICVOLUME, mapVolume(vol));
+		}
 	}
 
 	void Var_SFXVolChanged(core::ICVar* pVar)
 	{
 		float vol = pVar->GetFloat();
-		vol *= 255.f;
 
-		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SFXVOLUME, vol);
+		if (AK::SoundEngine::IsInitialized()) {
+			AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SFXVOLUME, mapVolume(vol));
+		}
 	}
 
 	void Var_VoiceVolChanged(core::ICVar* pVar)
 	{
 		float vol = pVar->GetFloat();
-		vol *= 255.f;
 
-		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOICEVOLUME, vol);
+		if (AK::SoundEngine::IsInitialized()) {
+			AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOICEVOLUME, mapVolume(vol));
+		}
 	}
 
 
