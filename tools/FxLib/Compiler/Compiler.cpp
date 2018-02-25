@@ -781,7 +781,16 @@ namespace fx
 				}
 			}
 
-			if (!stage.flags.IsSet(StageFlag::Looping))
+			if (stage.flags.IsSet(StageFlag::Looping))
+			{
+				// 0 is infinate.
+				// negative values not allowed tho.
+				if (stage.loopCount < 0) {
+					X_ERROR("Fx", "Loop count is negative");
+					return false;
+				}
+			}
+			else
 			{
 				auto maxCount = stage.count.start + stage.count.range;
 				if (maxCount <= 0)
