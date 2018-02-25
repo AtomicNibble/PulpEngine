@@ -749,6 +749,38 @@ namespace fx
 				return false;
 			}
 
+
+
+			if (stage.flags.IsSet(StageFlag::RandGraphCol))
+			{
+				if (stage.color.graphs.size() < 2) {
+					stage.flags.Remove(StageFlag::RandGraphCol);
+					X_WARNING("Fx", "RandCol requires atleast two graphs");
+				}
+			}
+			if (stage.flags.IsSet(StageFlag::RandGraphAlpha))
+			{
+				if (stage.alpha.graphs.size() < 2) {
+					stage.flags.Remove(StageFlag::RandGraphAlpha);
+					X_WARNING("Fx", "RandAlpha requires atleast two graphs");
+				}
+			}
+			if (stage.flags.IsSet(StageFlag::RandGraphSize))
+			{
+				if (stage.size.graphs.size() < 2) {
+					stage.flags.Remove(StageFlag::RandGraphSize);
+					X_WARNING("Fx", "RandSize requires atleast two graphs");
+				}
+			}
+			if (stage.flags.IsSet(StageFlag::RandGraphVel))
+			{
+				if (stage.vel0X.graphs.size() < 2 || stage.vel0Y.graphs.size() < 2 || stage.vel0Z.graphs.size() < 2)
+				{
+					stage.flags.Remove(StageFlag::RandGraphVel);
+					X_WARNING("Fx", "RandVel requires atleast two graphs");
+				}
+			}
+
 			stages_.emplace_back(std::move(stage));
 		}
 
