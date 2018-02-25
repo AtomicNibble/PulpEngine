@@ -39,7 +39,8 @@ namespace fx
 
 	X_DECLARE_ENUM8(StageType)(
 		BillboardSprite,		// the elems are rotated to face the view.
-		OrientedSprite,			// the elems are orientated based on RelativeTo.
+		OrientedSprite,			// the elems are always rotated direction of emmiter.
+		RotatedSprite,			// Like oriented, but elem rotation.
 		Tail,
 		Line,
 		Sound
@@ -133,7 +134,6 @@ namespace fx
 	struct EffectHdr
 	{
 		X_INLINE bool isValid(void) const;
-
 
 		// 4
 		uint32_t fourCC;
