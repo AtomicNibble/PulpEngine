@@ -111,6 +111,7 @@ namespace weapon
 		parseEnum<AnimSlot>(d, core::json::kStringType, "anim", animSlots_, assignString);
 		parseEnum<SoundSlot>(d, core::json::kStringType, "snd", sndSlots_, assignString);
 		parseEnum<IconSlot>(d, core::json::kStringType, "icon", iconSlots_, assignString);
+		parseEnum<EffectSlot>(d, core::json::kStringType, "efx", effectSlots_, assignString);
 		parseEnum<AmmoSlot>(d, core::json::kNumberType, "ammo", ammoSlots_, assignInt16);
 
 		// timers
@@ -173,6 +174,7 @@ namespace weapon
 		writeSlots<AnimSlot>(animSlots_, hdr.animSlots, stream);
 		writeSlots<SoundSlot>(sndSlots_, hdr.sndSlots, stream);
 		writeSlots<IconSlot>(iconSlots_, hdr.iconSlots, stream);
+		writeSlots<EffectSlot>(effectSlots_, hdr.effectSlots, stream);
 
 		hdr.ammoSlots = ammoSlots_;
 		hdr.stateTimers = stateTimers_;

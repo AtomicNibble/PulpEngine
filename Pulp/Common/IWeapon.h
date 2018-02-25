@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(game)
 namespace weapon
 {
 
-	static const uint32_t	 WEAPON_VERSION = 1;
+	static const uint32_t	 WEAPON_VERSION = 2;
 	static const uint32_t	 WEAPON_FOURCC = X_TAG('w', 'p', 'n', 'b');
 
 	static const char*		 WEAPON_FILE_EXTENSION = "wpn";
@@ -130,7 +130,11 @@ namespace weapon
 		ClipSize
 	);
 
-
+	X_DECLARE_ENUM(EffectSlot) (
+		FlashView,
+		FlashWorld,
+		ShellEject
+	);
 
 	struct WeaponHdr
 	{
@@ -176,6 +180,8 @@ namespace weapon
 		SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
 		SlotArr<IconSlot::ENUM_COUNT> iconSlots;
 
+		SlotArr<EffectSlot::ENUM_COUNT> effectSlots;
+
 		Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots;
 		FloatArr<StateTimer::ENUM_COUNT> stateTimers;
 
@@ -200,7 +206,7 @@ namespace weapon
 	X_ENSURE_SIZE(FireType, 1);
 	X_ENSURE_SIZE(AmmoCounterStyle, 1);
 
-	X_ENSURE_SIZE(WeaponHdr, 116);
+	X_ENSURE_SIZE(WeaponHdr, 124);
 
 } // namespae weapon
 
