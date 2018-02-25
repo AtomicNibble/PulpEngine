@@ -506,6 +506,7 @@ bool XSound::init(void)
 	}
 #endif
 
+	vars_.applyVolume();
 
 	AKRESULT res;
 

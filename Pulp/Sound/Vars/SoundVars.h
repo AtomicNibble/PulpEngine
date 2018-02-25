@@ -18,6 +18,8 @@ public:
 
 	void RegisterVars(void);
 
+	void applyVolume(void);
+
 	void setMasterVolume(float v);
 	void setMusicVolume(float vol);
 	void setVoiceVolume(float vol);

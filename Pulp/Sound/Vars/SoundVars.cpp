@@ -170,6 +170,18 @@ void SoundVars::RegisterVars(void)
 		"Sound engine monitor queue memory pool size (KiB).");
 }
 
+void SoundVars::applyVolume(void)
+{
+	if (AK::SoundEngine::IsInitialized()) {
+		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MASTERVOLUME, mapVolume(pVarVolMaster_->GetFloat()));
+		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MUSICVOLUME, mapVolume(pVarVolMusic_->GetFloat()));
+		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SFXVOLUME, mapVolume(pVarVolSfx_->GetFloat()));
+		AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOICEVOLUME, mapVolume(pVarVolVoice_->GetFloat()));
+	}
+	else {
+		X_WARNING("Sound", "Failed to apply bus volume");
+	}
+}
 
 void SoundVars::setMasterVolume(float vol)
 {
