@@ -178,6 +178,33 @@ namespace entity
 				continue;
 			}
 
+			// so i only want to pump notes once.
+			// and i also want to pump for a range,
+
+			auto prevTime = ellapsedTime - delta;
+
+			anim::NoteTrackValueArr values;
+			an.pAnimator->getNotes(prevTime, ellapsedTime, values);
+
+			if (values.isNotEmpty())
+			{
+				// Weeeeeeee!
+				for (auto* pValue : values)
+				{
+					X_LOG0("Anim", "^8Note: \"%s\" Ent: %" PRId32, pValue, entity);
+
+					core::StringRange<char> str(pValue, pValue + core::strUtil::strlen(pValue));
+
+					if (str.GetLength() > 4 && core::strUtil::IsEqual(str.GetStart(), str.GetStart() + 4, "snd#"))
+					{
+						// it's a snd event.
+						const char* pSndEvent = str.GetStart() + 4;
+
+						gEnv->pSound->postEvent(pSndEvent, sound::GLOBAL_OBJECT_ID);
+					}
+				}
+			}
+
 			if (an.pAnimator->createFrame(ellapsedTime))
 			{
 				auto& bones = an.pAnimator->getBoneMatrices();
