@@ -26,8 +26,11 @@ namespace fx
 
 	void Emitter::play(const Effect* pEfx, bool clear)
 	{
+		// so i have a problem :D
+		// by clearing this
+		// ellapsed is not correct for decaying stages.
 		pEfx_ = pEfx;
-		elapsed_.SetValue(0);
+		efxElapsed_.SetValue(0);
 		curStage_ = 0;
 
 		if (clear) {
@@ -62,9 +65,7 @@ namespace fx
 		// TODO: potentially I want to prevent new elems been spawned also.
 		
 
-		elapsed_ += delta;
-
-		auto elapsedMS = elapsed_.GetMilliSeconds();
+		efxElapsed_ += delta;
 
 		if (pEfx_)
 		{
@@ -75,6 +76,8 @@ namespace fx
 
 			auto& efx = *pEfx_;
 			X_ASSERT(curStage_ < efx.getNumStages(), "Stage index out of bounds")(curStage_, efx.getNumStages());
+
+			auto elapsedMS = efxElapsed_.GetMilliSeconds();
 
 			auto numStages = efx.getNumStages();
 
@@ -127,87 +130,32 @@ namespace fx
 			return;
 		}
 
+		updateStages(delta);
 
-		// update elems.
-		for (size_t i = 0; i < activeStages_.size(); i++)
-		{
-			auto& stage = activeStages_[i];
-			auto& elems = stage.elems;
+		updateElems(delta);
 
-			// update any active elems.
-			if (elems.isEmpty()) {
-				continue;
-			}
+	}
 
-			auto& desc = *stage.pDesc;
-
-			for (auto it = elems.begin(); it != elems.end();)
-			{
-				auto& e = *it;
-
-				auto alive = (elapsed_ - e.spawnTime);
-				auto aliveMs = alive.GetMilliSeconds();
-
-				if (aliveMs >= e.lifeMs)
-				{
-					it = elems.erase(it);
-					continue;
-				}
-
-				float fraction = (aliveMs / e.lifeMs);
-				updateElemForFraction(stage, e, fraction);
-
-				++it;
-			}
-
-			// handle atlas updates.
-			const auto fps = desc.sequence.fps;
-			if (fps != 0)
-			{
-				const auto atlas = stage.pMaterial->getAtlas();
-				const int32_t atlasCount = atlas.x * atlas.y;
-
-				for (size_t j = 0; j < elems.size(); j++)
-				{
-					auto& e = elems[j];
-
-					auto alive = (elapsed_ - e.spawnTime);
-					auto aliveMs = alive.GetMilliSeconds();
-
-					int32_t atlasIdx;
-					if (fps < 0)
-					{
-						float fraction = (aliveMs / e.lifeMs);
-						atlasIdx = static_cast<int32_t>(atlasCount * fraction); // total frames over elem life.
-					}
-					else
-					{
-						auto aliveSec = aliveMs * 0.001;
-						atlasIdx = static_cast<int32_t>(fps * aliveSec); // 1 second == fps.
-					}
-
-					if (e.atlasIdx == atlasIdx) {
-						continue;
-					}
-
-					e.atlasIdx = atlasIdx;
-
-					auto idx = (e.atlasBaseIdx + atlasIdx) % atlasCount;
-
-					uvForIndex(e.uv, atlas, idx);
-				}
-			}
-		}
-
+	void Emitter::updateStages(core::TimeVal delta)
+	{
 		// process the stages: spawn more elems, remove finsihed, etc..
 		for (auto it = activeStages_.begin(); it != activeStages_.end(); )
 		{
 			auto& stage = *it;
 			auto& desc = *stage.pDesc;
 
+			stage.elapsed += delta;
+
 			if (desc.loopCount && stage.currentLoop >= desc.loopCount) {
 				// remove the stage?
-				it = activeStages_.erase(it);
+
+				if (stage.elems.isNotEmpty()) {
+					++it;
+				}
+				else {
+					it = activeStages_.erase(it);
+				}
+
 				continue;
 			}
 
@@ -215,7 +163,7 @@ namespace fx
 
 			if (stage.currentLoop > 0)
 			{
-				auto sinceSpawn = elapsed_ - stage.lastSpawn;
+				auto sinceSpawn = stage.elapsed - stage.lastSpawn;
 				auto interval = core::TimeVal::fromMS(desc.interval);
 
 				if (sinceSpawn < interval)
@@ -226,7 +174,7 @@ namespace fx
 
 			// 'spawn'
 			++stage.currentLoop;
-			stage.lastSpawn = elapsed_;
+			stage.lastSpawn = stage.elapsed;
 
 			if (desc.type == StageType::OrientedSprite || desc.type == StageType::BillboardSprite)
 			{
@@ -290,11 +238,11 @@ namespace fx
 				e.alphaGraph = alphaGraph;
 				e.sizeGraph = sizeGraph;
 				e.velGraph = velGraph;
+				e.spawnPos = pos;
 				e.pos = pos;
-				e.spawnTime = elapsed_;
 				e.lifeMs = life;
-
-				updateElemForFraction(stage, e, 0.f);
+				e.spawnTime = stage.elapsed;
+				e.spawnTrans = trans_;
 
 				stage.elems.push_back(e);
 			}
@@ -302,8 +250,226 @@ namespace fx
 			{
 				X_ASSERT_NOT_IMPLEMENTED();
 			}
-
 		}
+	}
+
+	void Emitter::updateElems(core::TimeVal delta)
+	{
+		for (size_t i = 0; i < activeStages_.size(); i++)
+		{
+			auto& stage = activeStages_[i];
+			auto& elems = stage.elems;
+
+			// update any active elems.
+			if (elems.isEmpty()) {
+				continue;
+			}
+
+			auto& desc = *stage.pDesc;
+
+			for (auto it = elems.begin(); it != elems.end();)
+			{
+				auto& e = *it;
+
+				auto alive = (stage.elapsed - e.spawnTime);
+				auto aliveMs = alive.GetMilliSeconds();
+
+				if (aliveMs >= e.lifeMs)
+				{
+					it = elems.erase(it);
+					continue;
+				}
+
+				float fraction = (aliveMs / e.lifeMs);
+				updateElemForFraction(stage, e, fraction, delta.GetSeconds());
+
+				++it;
+			}
+
+			// handle atlas updates.
+			const auto fps = desc.sequence.fps;
+			if (fps != 0)
+			{
+				const auto atlas = stage.pMaterial->getAtlas();
+				const int32_t atlasCount = atlas.x * atlas.y;
+
+				for (size_t j = 0; j < elems.size(); j++)
+				{
+					auto& e = elems[j];
+
+					auto alive = (stage.elapsed - e.spawnTime);
+					auto aliveMs = alive.GetMilliSeconds();
+
+					int32_t atlasIdx;
+					if (fps < 0)
+					{
+						float fraction = (aliveMs / e.lifeMs);
+						atlasIdx = static_cast<int32_t>(atlasCount * fraction); // total frames over elem life.
+					}
+					else
+					{
+						auto aliveSec = aliveMs * 0.001;
+						atlasIdx = static_cast<int32_t>(fps * aliveSec); // 1 second == fps.
+					}
+
+					if (e.atlasIdx == atlasIdx) {
+						continue;
+					}
+
+					e.atlasIdx = atlasIdx;
+
+					auto idx = (e.atlasBaseIdx + atlasIdx) % atlasCount;
+
+					uvForIndex(e.uv, atlas, idx);
+				}
+			}
+		}
+	}
+
+
+	void Emitter::draw(core::FrameView& view, IPrimativeContext* pPrim)
+	{
+		for (size_t i = 0; i < activeStages_.size(); i++)
+		{
+			auto& stage = activeStages_[i];
+
+			if (stage.elems.isEmpty()) {
+				continue;
+			}
+
+			gEngEnv.pMaterialMan_->waitForLoad(stage.pMaterial);
+
+			const auto postionType = stage.pDesc->postionType;
+
+			if (stage.pDesc->type == StageType::OrientedSprite)
+			{
+				for (const auto& e : stage.elems)
+				{
+					float size = e.size;
+					float half = size * 0.5f;
+
+					Vec3f tl = Vec3f(0, -half, -half);
+					Vec3f tr = Vec3f(0, half, -half);
+					Vec3f bl = Vec3f(0, -half, half);
+					Vec3f br = Vec3f(0, half, half);
+
+					auto q = trans_.quat;
+					tl = tl * q;
+					tr = tr * q;
+					bl = bl * q;
+					br = br * q;
+
+					Vec3f pos = (e.pos); 
+					
+					if (postionType == RelativeTo::Now)
+					{
+						pos = trans_.transform(pos);
+					}
+					else
+					{
+						pos = e.spawnTrans.transform(pos);
+					}
+
+					tl += pos;
+					tr += pos;
+					bl += pos;
+					br += pos;
+
+					pPrim->drawQuad(tl, tr, bl, br, stage.pMaterial, e.col, e.uv);
+
+					if (vars_.drawDebug() && vars_.drawElemRect())
+					{
+						pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Red, Col_Blue, Col_Blue);
+					}
+				}
+
+			}
+			else if (stage.pDesc->type == StageType::BillboardSprite)
+			{
+				auto lookatCam(view.viewMatrix);
+				lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
+
+				Quatf lookatCamQ(lookatCam);
+
+				for (const auto& e : stage.elems)
+				{
+
+					float size = e.size;
+					float half = size * 0.5f;
+
+					Vec3f tl = Vec3f(-half, -half, 0);
+					Vec3f tr = Vec3f(half, -half, 0);
+					Vec3f bl = Vec3f(-half, half, 0);
+					Vec3f br = Vec3f(half, half, 0);
+
+					tl = tl * lookatCamQ;
+					tr = tr * lookatCamQ;
+					bl = bl * lookatCamQ;
+					br = br * lookatCamQ;
+
+					Vec3f pos = e.pos;
+					pos += offset_;
+					// do the rotation including  offset.
+					// so the effects point of origin is at trans_.pos;
+					if (postionType == RelativeTo::Now)
+					{
+						pos = trans_.transform(pos);
+					}
+					else
+					{
+						pos = e.spawnTrans.transform(pos);
+					}
+
+					tl += pos;
+					tr += pos;
+					bl += pos;
+					br += pos;
+
+					pPrim->drawQuad(tl, tr, bl, br, stage.pMaterial, e.col, e.uv);
+
+					if (vars_.drawDebug() && vars_.drawElemRect())
+					{
+						pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Red, Col_Blue, Col_Blue);
+					}
+				}
+			}
+			else
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+			}
+		}
+
+		if (vars_.drawDebug() && vars_.axisExtent() > 0.f)
+		{
+			pPrim->drawAxis(trans_, Vec3f(vars_.axisExtent()));
+			if (offset_ != Vec3f::zero()) {
+				pPrim->drawAxis(trans_, offset_, Vec3f(vars_.axisExtent()));
+			}
+		}
+	}
+
+	void Emitter::updateElemForFraction(const Stage& stage, Elem& e, float fraction, float deltaSec) const
+	{
+		auto& efx = *stage.pEfx;
+		auto& desc = *stage.pDesc;
+
+		Vec3f velForDelta = e.vel * deltaSec;
+
+		Vec3f vel;
+		vel.x = efx.fromGraph(desc.vel0X[e.velGraph], fraction);
+		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
+		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
+
+		float size = efx.fromGraph(desc.size[e.sizeGraph], fraction);
+
+		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
+		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
+
+
+		e.vel = vel;
+		e.pos += velForDelta;
+		e.size = size;
+		e.col = Color8u(col, alpha);
 	}
 
 	inline void Emitter::uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx)
@@ -329,111 +495,7 @@ namespace fx
 		}
 	}
 
-
-	void Emitter::draw(core::FrameView& view, IPrimativeContext* pPrim)
-	{
-		auto lookatCam(view.viewMatrix);
-		lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
-
-		Quatf lookatCamQ(lookatCam);
-		Quatf q;
-
-		for (size_t i = 0; i < activeStages_.size(); i++)
-		{
-			auto& stage = activeStages_[i];
-
-			if (stage.elems.isEmpty()) {
-				continue;
-			}
-
-			gEngEnv.pMaterialMan_->waitForLoad(stage.pMaterial);
-
-			if (stage.pDesc->type == StageType::BillboardSprite)
-			{
-				// i want the sprite to always face the camera.
-				q = lookatCamQ;
-			}
-			else
-			{
-				q = trans_.quat;
-			}
-
-			for (const auto& e : stage.elems)
-			{
-				// basically need to make a quad.
-				// position is the center.
-				// the 4 points will just be courners.
-				// *-----*
-				// |     |
-				// |  -  |
-				// |     |
-				// *-----*
-
-				float size = e.size;
-				float half = size * 0.5f;
-
-				Vec3f tl = Vec3f(-half, -half, 0);
-				Vec3f tr = Vec3f(half, -half, 0);
-				Vec3f bl = Vec3f(-half, half, 0);
-				Vec3f br = Vec3f(half, half, 0);
-
-				tl = tl * q;
-				tr = tr * q;
-				bl = bl * q;
-				br = br * q;
-
-				Vec3f pos = e.pos + e.dir;
-				pos += offset_;
-				// do the rotation including  offset.
-				// so the effects point of origin is at trans_.pos;
-				pos = pos * trans_.quat; 
-				pos += trans_.pos;
-
-				tl += pos;
-				tr += pos;
-				bl += pos;
-				br += pos;
-
-				pPrim->drawQuad(tl, tr, bl, br, stage.pMaterial, e.col, e.uv);
-
-				if (vars_.drawDebug() && vars_.drawElemRect())
-				{
-					pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Red, Col_Blue, Col_Blue);
-				}
-			}
-		}
-
-		if (vars_.drawDebug() && vars_.axisExtent() > 0.f)
-		{
-			pPrim->drawAxis(trans_, Vec3f(vars_.axisExtent()));
-			if (offset_ != Vec3f::zero()) {
-				pPrim->drawAxis(trans_, offset_, Vec3f(vars_.axisExtent()));
-			}
-		}
-	}
-
-	void Emitter::updateElemForFraction(const Stage& stage, Elem& e, float fraction) const
-	{
-		auto& efx = *stage.pEfx;
-		auto& desc = *stage.pDesc;
-
-		Vec3f vel;
-		vel.x = efx.fromGraph(desc.vel0X[e.velGraph], fraction);
-		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
-		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
-
-		float size = efx.fromGraph(desc.size[e.sizeGraph], fraction);
-
-		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
-		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
-
-		e.dir = vel;
-		e.size = size;
-		e.col = Color8u(col, alpha);
-	}
-
-
-	inline float Emitter::fromRange(const Range& r) const
+	inline float Emitter::fromRange(const Range& r)
 	{
 		if (r.range == 0.f) {
 			return r.start;

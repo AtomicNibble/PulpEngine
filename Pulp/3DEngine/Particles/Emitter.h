@@ -29,18 +29,20 @@ namespace fx
 			int8_t sizeGraph;
 			int8_t velGraph;
 
+			Vec3f spawnPos;
 			Vec3f pos;
-			Vec3f dir;
+			Vec3f vel;
 			float size;
 			Color8u col;
 
 			Rectf uv;
 			int32_t atlasBaseIdx;
 			int32_t atlasIdx;
-			// int32_t loop;
 
 			float lifeMs;
 			core::TimeVal spawnTime;
+
+			Transformf spawnTrans; // Bigg...
 		};
 
 		// ideally keep this below 64.
@@ -71,7 +73,8 @@ namespace fx
 			const StageDsc* pDesc;
 			engine::Material* pMaterial;
 
-			core::TimeVal lastSpawn; 
+			core::TimeVal elapsed;
+			core::TimeVal lastSpawn;
 			int32_t currentLoop;
 
 			Transformf spawnTrans;
@@ -95,18 +98,19 @@ namespace fx
 		void draw(core::FrameView& view, IPrimativeContext* pPrim);
 
 	private:
-		void updateElemForFraction(const Stage& stage, Elem& e, float fraction) const;
+		void updateStages(core::TimeVal delta);
+		void updateElems(core::TimeVal delta);
+		void updateElemForFraction(const Stage& stage, Elem& e, float fraction, float deltaSec) const;
 
 		static void uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx);
-
-		float fromRange(const Range& r) const;
+		static float fromRange(const Range& r);
 
 	private:
 		const EffectVars& vars_;
 		core::MemoryArenaBase* arena_;
 
 		const Effect* pEfx_;
-		core::TimeVal elapsed_; 
+		core::TimeVal efxElapsed_; 
 		int32_t curStage_;
 
 		StageArr activeStages_;
