@@ -119,14 +119,14 @@ namespace fx
 						"name" : "segment1",
 						"type" : "OrientedSprite",
 						"relativeTo" : "Spawn",
-						"flags" : "RandGraphAlpha RandGraphSize RandGraphVel",
+						"flags" : "RandGraphAlpha RandGraphSize RandGraphVel Looping",
 
 						"materials" : [
 							"fx/test/raygun_ring"
 						],
 
-						"interval": 100,
-						"loopCount": 0,
+						"interval": 50,
+						"loopCount": 3,
 
 						"countStart": 0,
 						"countRange": 0,
@@ -136,11 +136,11 @@ namespace fx
 						"delayRange": 0,
 					
 						"spawnOrgXStart" : 0,
-						"spawnOrgXRange" : 0,
+						"spawnOrgXRange" : 2,
 						"spawnOrgYStart" : 0,
 						"spawnOrgYRange" : 0,
 						"spawnOrgZStart" : 0,
-						"spawnOrgZRange" : 2,
+						"spawnOrgZRange" : 0,
 
 						"sequence" : {
 							"startFrame": 0,
@@ -294,7 +294,7 @@ namespace fx
 							]
 						},
 						"vel0XGraph" : {
-							"scale" : 0,							
+							"scale" : 111,							
 							"graphs": [
 								[
 									{
@@ -303,17 +303,7 @@ namespace fx
 									},
 									{
 										"time": 1,
-										"val": -0.1
-									}
-								],
-								[
-									{
-										"time": 0,
-										"val": 0.5
-									},
-									{
-										"time": 1,
-										"val": 0.02
+										"val": -0.0119617
 									}
 								]
 							]
@@ -330,21 +320,11 @@ namespace fx
 										"time": 1,
 										"val": 0
 									}
-								],
-								[
-									{
-										"time": 0,
-										"val": 0
-									},
-									{
-										"time": 1,
-										"val": 0
-									}
 								]
 							]
 						},
 						"vel0ZGraph" : {
-							"scale" : 10,							
+							"scale" : 0,							
 							"graphs": [
 								[
 									{
@@ -354,16 +334,6 @@ namespace fx
 									{
 										"time": 1,
 										"val": 1
-									}
-								],
-								[
-									{
-										"time": 0,
-										"val": 0
-									},
-									{
-										"time": 1,
-										"val": 0.98
 									}
 								]
 							]
