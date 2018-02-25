@@ -148,11 +148,12 @@ namespace entity
 
 		soundSys_.update(frame, reg_);
 
-		weaponSys_.update(frame.timeInfo, reg_);
-
 		animatedSys_.update(frame.timeInfo, reg_, p3DWorld_, pPhysScene_);
 		
 		physSys_.update(frame, reg_, pPhysScene_, p3DWorld_);
+
+		weaponSys_.update(frame.timeInfo, reg_);
+
 	}
 
 
