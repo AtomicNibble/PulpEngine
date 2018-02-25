@@ -38,8 +38,8 @@ namespace fx
 
 
 	X_DECLARE_ENUM8(StageType)(
-		BillboardSprite,
-		OrientedSprite,
+		BillboardSprite,		// the elems are rotated to face the view.
+		OrientedSprite,			// the elems are orientated based on RelativeTo.
 		Tail,
 		Line,
 		Sound
