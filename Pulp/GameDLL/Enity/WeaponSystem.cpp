@@ -10,6 +10,7 @@
 
 #include <IPrimativeContext.h>
 #include <IFont.h>
+#include <IEffect.h>
 
 using namespace core::Hash::Literals;
 using namespace sound::Literals;
@@ -269,6 +270,10 @@ namespace entity
 			gEnv->pSound->postEvent(sndEvt, sound::GLOBAL_OBJECT_ID);
 		}
 
+		auto* pViewEffect = wpn.pWeaponDef->getEffect(weapon::EffectSlot::FlashView);
+		if (pViewEffect) {
+			wpn.pFlashEmt->play(pViewEffect);
+		}
 
 		trainsitionToState(wpn, animator, anim, weapon::State::Fire, curTime, fireTime);
 	}
