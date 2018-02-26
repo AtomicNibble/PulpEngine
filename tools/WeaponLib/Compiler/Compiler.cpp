@@ -84,10 +84,10 @@ namespace weapon
 		fireType_ = Util::FireTypeFromStr(pFireType);
 		ammoCounterStyle_ = Util::AmmoCounterStyleFromStr(pAmmoCounterStyle);
 
-		damageMin_ = d["damageMinRange"].GetInt();
-		damageMax_ = d["damageMaxRange"].GetInt();
-		damageMinRange_ = d["damageMin"].GetInt();
-		damageMaxRange_ = d["damageMax"].GetInt();
+		damageMin_ = d["damageMin"].GetInt();
+		damageMax_ = d["damageMax"].GetInt();
+		damageMinRange_ = d["damageMinRange"].GetInt();
+		damageMaxRange_ = d["damageMaxRange"].GetInt();
 		damageMelee_ = d["damageMelee"].GetInt();
 
 		if (core::strUtil::strlen(pAmmoName) == 0)
