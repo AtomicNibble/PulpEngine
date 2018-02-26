@@ -109,6 +109,9 @@ struct Weapon
 {
 	EntityId ownerEnt;
 
+	engine::fx::IEmitter* pFlashEmt;
+	engine::fx::IEmitter* pBrassEmt;
+
 	weapon::WeaponDef* pWeaponDef;
 	weapon::State::Enum state;
 	weapon::StateFlags stateFlags;
