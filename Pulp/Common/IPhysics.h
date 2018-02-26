@@ -837,8 +837,23 @@ struct TriggerPair
 static const HitFlags DEFAULT_HIT_FLAGS = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE;
 static const QueryFlags DEFAULT_QUERY_FLAGS = QueryFlag::STATIC | QueryFlags::DYNAMIC;
 
+struct IScene;
+
+struct ScopedLock
+{
+	ScopedLock(IScene* pScene, bool write = false);
+	~ScopedLock();
+
+private:
+	LockHandle lock_;
+	IScene* pScene_;
+};
+
+
 struct IScene
 {
+	typedef ScopedLock ScopedLock;
+
 	virtual ~IScene() {}
 
 
@@ -912,20 +927,16 @@ X_INLINE void IScene::setGlobalPose(ActorHandle handle, const Transformf& destin
 }
 
 
-struct ScopedLock
+X_INLINE ScopedLock::ScopedLock(IScene* pScene, bool write) : 
+	pScene_(pScene) 
 {
-	ScopedLock(IScene* pScene, bool write = false) : pScene_(pScene) {
-		lock_ = pScene->lock(write);
-	}
+	lock_ = pScene->lock(write);
+}
 
-	~ScopedLock() {
-		pScene_->unLock(lock_);
-	}
-
-private:
-	LockHandle lock_;
-	IScene* pScene_;
-};
+X_INLINE ScopedLock::~ScopedLock() 
+{
+	pScene_->unLock(lock_);
+}
 
 // ------------------------------------------------
 
