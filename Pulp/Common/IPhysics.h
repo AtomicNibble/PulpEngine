@@ -686,6 +686,39 @@ typedef HitBuffer<OverlapHit> OverlapBuffer;
 typedef HitBuffer<SweepHit> SweepBuffer;
 
 
+template <int N>
+struct RaycastBufferN : HitBuffer<RaycastHit>
+{
+	RaycastBufferN() : 
+		HitBuffer<RaycastHit>(hits, N)
+	{
+	}
+
+	RaycastHit hits[N];
+};
+
+template <int N>
+struct OverlapBufferN : HitBuffer<OverlapHit>
+{
+	OverlapBufferN() : 
+		HitBuffer<OverlapHit>(hits, N)
+	{
+	}
+
+	OverlapHit hits[N];
+};
+
+template <int N>
+struct SweepBufferN : HitBuffer<SweepHit>
+{
+	SweepBufferN() : 
+		HitBuffer<SweepHit>(hits, N)
+	{
+	}
+	
+	SweepHit hits[N];
+};
+
 // ------------------------------------------------
 
 // For passing geo to physics in abstract way.
