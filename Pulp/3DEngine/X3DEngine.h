@@ -68,6 +68,10 @@ public:
 	// ~IXHotReload
 
 private:
+	void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);
+
+
+private:
 	XMaterialManager* pMaterialManager_;
 	TextureManager* pTextureManager_;
 	model::XModelManager* pModelManager_;
@@ -83,8 +87,9 @@ private:
 	PrimativeContextSharedResources primResources_;
 	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 	
-	DrawVars drawVars_;
+	bool clearPersistent_;
 
+	DrawVars drawVars_;
 	WorldArr worlds_;
 };
 

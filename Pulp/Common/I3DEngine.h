@@ -20,12 +20,13 @@ X_NAMESPACE_DECLARE(anim,
 X_NAMESPACE_BEGIN(engine)
 
 X_DECLARE_ENUM(PrimContext)(
-	SOUND, // 3d
-	PHYSICS, // 3d
-	MISC3D, // 3d
-	GUI, 	// 2d
-	PROFILE,// 2d 
-	CONSOLE // 2d
+	SOUND,		// 3d
+	PHYSICS,	// 3d
+	MISC3D,		// 3d
+	PERSISTENT, // 3d
+	GUI, 		// 2d
+	PROFILE,	// 2d 
+	CONSOLE		// 2d
 );
 
 class IPrimativeContext;

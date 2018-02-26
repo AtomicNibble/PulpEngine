@@ -49,16 +49,19 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // sound
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // physics
 		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // misc3d
+		{ primResources_, IPrimativeContext::Mode::Mode3D, arena }, // persistent
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // gui
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }, // profile
 		{ primResources_, IPrimativeContext::Mode::Mode2D, arena }  // console
 	},
+	clearPersistent_(false),
 	worlds_(arena)
 {
 	// check if the enum order was changed in a way that resulted in incorrect modes.
 	X_ASSERT(primContexts_[PrimContext::SOUND].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::MISC3D].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
+	X_ASSERT(primContexts_[PrimContext::PERSISTENT].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::GUI].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::PROFILE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
 	X_ASSERT(primContexts_[PrimContext::CONSOLE].getMode() == IPrimativeContext::Mode::Mode2D, "Incorrect mode")();
@@ -78,9 +81,9 @@ void X3DEngine::registerVars(void)
 
 void X3DEngine::registerCmds(void)
 {
-//	ADD_COMMAND_MEMBER("map", this, X3DEngine, &X3DEngine::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
-//	ADD_COMMAND_MEMBER("devmap", this, X3DEngine, &X3DEngine::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
-
+	
+	ADD_COMMAND_MEMBER("r_clear_persistent", this, X3DEngine, &X3DEngine::Command_ClearPersistent,
+		core::VarFlag::SYSTEM, "Clears persistent primatives");
 
 }
 
@@ -812,8 +815,16 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 		pRender->submitCommandPackets(primBucket);
 	}
 
-	for (uint16_t i = 0; i < engine::PrimContext::ENUM_COUNT; i++)
+	for (uint16_t i = 0; i < PrimContext::ENUM_COUNT; i++)
 	{
+		if (i == PrimContext::PERSISTENT) {
+			if (!clearPersistent_) {
+				continue;
+			}
+
+			clearPersistent_ = false;
+		}
+
 		auto& context = primContexts_[i];
 		if (!context.isEmpty())
 		{
@@ -896,6 +907,13 @@ void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<c
 }
 
 // =======================================
+
+void X3DEngine::Command_ClearPersistent(core::IConsoleCmdArgs* pCmd)
+{
+	X_UNUSED(pCmd);
+	
+	clearPersistent_ = true;
+}
 
 
 X_NAMESPACE_END
