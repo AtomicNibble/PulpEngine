@@ -28,7 +28,7 @@ namespace weapon
 		X_INLINE int32_t meleeDmg(void) const;
 
 		X_INLINE int32_t minDmgRange(void) const;
-		X_INLINE int32_t maxnDmgRange(void) const;
+		X_INLINE int32_t maxDmgRange(void) const;
 
 
 		X_INLINE WeaponClass::Enum wpnClass(void) const;

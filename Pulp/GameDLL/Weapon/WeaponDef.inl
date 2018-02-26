@@ -24,7 +24,7 @@ namespace weapon
 		return hdr_.minDmgRange;
 	}
 
-	X_INLINE int32_t WeaponDef::maxnDmgRange(void) const
+	X_INLINE int32_t WeaponDef::maxDmgRange(void) const
 	{
 		return hdr_.maxDmgRange;
 	}
