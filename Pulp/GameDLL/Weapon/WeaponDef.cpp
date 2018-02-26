@@ -15,6 +15,7 @@ namespace weapon
 		soundHashes_.fill(0);
 		icons_.fill(nullptr);
 		animations_.fill(nullptr);
+		effects_.fill(nullptr);
 	}
 
 	bool WeaponDef::processData(core::XFile* pFile)
@@ -35,6 +36,7 @@ namespace weapon
 
 		auto* pAnimManager = gEnv->p3DEngine->getAnimManager();
 		auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();
+		auto* pEffectMan = gEnv->p3DEngine->getEffectManager();
 
 		for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
 			if (hdr_.animSlots[i] != 0) {
@@ -45,6 +47,13 @@ namespace weapon
 		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
 			if (hdr_.iconSlots[i] != 0) {
 				icons_[i] = pMaterialMan->loadMaterial(getIconSlot(static_cast<IconSlot::Enum>(i)));
+			}
+		}
+
+
+		for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
+			if (hdr_.effectSlots[i] != 0) {
+				effects_[i] = pEffectMan->loadEffect(getEffectlot(static_cast<EffectSlot::Enum>(i)));
 			}
 		}
 
@@ -65,6 +74,12 @@ namespace weapon
 		for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
 			if (icons_[i] != nullptr) {
 				pMaterialMan->waitForLoad(icons_[i]);
+			}
+		}
+
+		for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
+			if (hdr_.effectSlots[i] != 0) {
+				pEffectMan->waitForLoad(effects_[i]);
 			}
 		}
 

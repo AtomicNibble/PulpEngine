@@ -75,6 +75,12 @@ namespace weapon
 		return icons_[slot];
 	}
 
+	X_INLINE engine::fx::Effect* WeaponDef::getEffect(EffectSlot::Enum slot) const
+	{
+		return effects_[slot];
+	}
+
+
 	X_INLINE const char* WeaponDef::getModelSlot(ModelSlot::Enum slot) const
 	{
 		return stringForOffset(hdr_.modelSlots[slot]);
@@ -93,6 +99,11 @@ namespace weapon
 	X_INLINE const char* WeaponDef::getIconSlot(IconSlot::Enum slot) const
 	{
 		return stringForOffset(hdr_.iconSlots[slot]);
+	}
+
+	X_INLINE const char* WeaponDef::getEffectlot(EffectSlot::Enum slot) const
+	{
+		return stringForOffset(hdr_.effectSlots[slot]);
 	}
 
 	X_INLINE sound::HashVal WeaponDef::getSoundSlotHash(SoundSlot::Enum slot) const
@@ -114,6 +125,13 @@ namespace weapon
 	{
 		return hdr_.sndSlots[slot] != 0;
 	}
+
+
+	X_INLINE bool WeaponDef::hasEffectSlot(EffectSlot::Enum slot) const
+	{
+		return hdr_.effectSlots[slot] != 0;
+	}
+
 
 
 } // namespace weapon
