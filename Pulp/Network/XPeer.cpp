@@ -1336,7 +1336,13 @@ bool XPeer::isBanned(const IPStr& ip)
 		return false;
 	}
 
-	return isBanned(ip);
+	SystemAddressEx sysAdd;
+	if (sysAdd.fromIP(ip)) {
+		X_ERROR("Net", "BanCheck, failed to load address from ip");
+		return false; // say they are banned if we can't check?
+	}
+
+	return isBanned(sysAdd);
 }
 
 bool XPeer::isBanned(const SystemAddressEx& sysAdd)
