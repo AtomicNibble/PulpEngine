@@ -85,7 +85,7 @@ namespace Literals
 	 
 	X_INLINE constexpr uint32_t operator"" _soundId(const char* const pStr, const size_t strLen)
 	{
-		return core::Hash::Fnv1Const::Internal::Hash(pStr, strLen, core::Hash::Fnv1Const::default_offset_basis);
+		return core::Hash::Fnv1Const::Hash(pStr, strLen);
 	}
 
 } // namespace Literals
