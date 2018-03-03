@@ -2564,7 +2564,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 		return;
 	}
 
-	// same shit as above, my face is twitching a little due to the repeating of logic :) (OCD)
+	// same shit as above.
 	SystemAddressEx externalSysId;
 	uint8_t numInternal = 0;
 	RemoteSystem::SystemAddArr localIps;
