@@ -9,6 +9,7 @@
 #include <ITimer.h>
 #include <IConsole.h>
 #include <Threading\JobSystem2.h>
+#include <Util\Process.h>
 
 #include <Hashing\sha1.h>
 
@@ -201,6 +202,9 @@ NetGUID XNet::generateGUID(void)
 	core::Hash::SHA1 sha1;
 	sha1.update(date);
 	sha1.update(now.GetValue());
+	sha1.update(core::Thread::GetCurrentID());
+	sha1.update(core::Process::GetCurrentID());
+
 	auto digest = sha1.finalize();
 
 	uint64_t val = digest.data[0];
