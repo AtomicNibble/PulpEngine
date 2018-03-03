@@ -12,12 +12,12 @@ const char* const SimpleMemoryTagging::TYPE_NAME = "MemoryTag";
 
 void SimpleMemoryTagging::TagAllocation(void* memory, size_t size)
 {
-	 memset( memory, TAG_ALLOCATED, size) ;
+	memset(memory, TAG_ALLOCATED, size);
 }
 
 void SimpleMemoryTagging::TagDeallocation(void* memory, size_t size)
 {
-	  memset( memory, TAG_FREED, size );
+	memset(memory, TAG_FREED, size);
 }
 
 
