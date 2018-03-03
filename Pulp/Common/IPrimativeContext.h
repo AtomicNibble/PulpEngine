@@ -63,8 +63,6 @@ public:
 	virtual void reset(void) X_ABSTRACT;
 	virtual void setDepthTest(bool enabled) X_ABSTRACT;
 
-	// TODO: all these Color8u need replacing with Color8u.
-
 	// Screen Space Draw: range 0-2 width / h is also scrrenspace size not pixels
 	void drawQuadSS(float x, float y, float width, float height, Color8u col);
 	void drawQuadSS(const Rectf& rect, Color8u col);
