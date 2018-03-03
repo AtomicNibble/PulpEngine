@@ -56,6 +56,9 @@ X_DECLARE_ENUM8(PacketPriority)(
 	Low
 );
 
+
+// Sequenced - We ignore any packets that are older than last recived packet.
+// Ordered - all packets come out the other side in order for a given channel.
 X_DECLARE_ENUM8(PacketReliability)(
 	UnReliable,
 	UnReliableSequenced,
