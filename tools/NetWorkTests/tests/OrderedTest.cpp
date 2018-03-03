@@ -142,7 +142,7 @@ TEST(net, OrderedPacketsTest)
 					length = static_cast<uint32_t>(data.size());
 
 					// send the packet
-					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverHandle);
+					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverHandle, stream);
 					++packetsSent;
 				}
 			}
@@ -163,7 +163,7 @@ TEST(net, OrderedPacketsTest)
 					static_cast<uint32_t>(data.size()));
 
 				// send the packet
-				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverHandle);
+				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableOrdered, serverHandle, stream);
 				++packetsSent;
 			}
 

@@ -135,7 +135,7 @@ TEST(net, SequencedPacketsTest)
 						static_cast<uint32_t>(data.size()));
 
 					// send the packet
-					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle);
+					pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle, stream);
 				}
 			}
 
@@ -155,7 +155,7 @@ TEST(net, SequencedPacketsTest)
 					static_cast<uint32_t>(data.size()));
 
 				// send the packet
-				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle);
+				pPeer->send(data.data(), length, net::PacketPriority::High, net::PacketReliability::ReliableSequenced, serverHandle, stream);
 			}
 
 			curState = State::Reciving;
