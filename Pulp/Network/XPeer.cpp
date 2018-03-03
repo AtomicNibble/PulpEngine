@@ -505,7 +505,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 			}
 			else {
 				// if the send test failed potentially the thread won't join.
-
+				X_WARNING("Net", "Failed to sent shutdown msg to thread");
 			}
 		}
 	}
