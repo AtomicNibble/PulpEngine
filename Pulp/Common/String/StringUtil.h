@@ -211,6 +211,11 @@ namespace strUtil
 	template <typename T>
 	inline T StringToInt(const wchar_t* str, const wchar_t** pEndPtr, int32_t base);
 
+	template <typename T>
+	inline T StringToInt(const char* startInclusive, const char* endExclusive);
+	template <typename T>
+	inline T StringToInt(const wchar_t* startInclusive, const wchar_t* endExclusive);
+
 	/// \brief Converts a string into any floating-point type.
 	/// \remark Returns 0 if the string does not represent a valid floating-point value.
 	template <typename T>

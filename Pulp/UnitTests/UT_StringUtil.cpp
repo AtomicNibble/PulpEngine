@@ -449,6 +449,20 @@ TEST(StringUtil, Int) {
 	EXPECT_TRUE(strUtil::StringToInt<int>("-1.0") == -1);
 	EXPECT_TRUE(strUtil::StringToInt<int>("+-1.0") == 0);
 	EXPECT_TRUE(strUtil::StringToInt<int>("-+1.0") == 0);
+
+	// range
+	const char* testStr0 = " 17959";
+	const char* testStr1 = " +16363 ";
+	const char* testStr2 = "-1 25";
+	const char* testStr3 = "+-1 ";
+	const char* testStr4 = "-+1 ";
+
+	EXPECT_EQ(1, strUtil::StringToInt<int>(testStr0, testStr0 + 2));
+	EXPECT_EQ(1, strUtil::StringToInt<int>(testStr1, testStr1 + 3));
+	EXPECT_EQ(-1, strUtil::StringToInt<int>(testStr2, testStr2 + 2));
+	EXPECT_EQ(0, strUtil::StringToInt<int>(testStr3, testStr3 + 3));
+	EXPECT_EQ(0, strUtil::StringToInt<int>(testStr4, testStr4 + 3));
+
 }
 
 
@@ -465,6 +479,19 @@ TEST(StringUtil, IntW) {
 	EXPECT_TRUE(strUtil::StringToInt<int>(L"-1.0") == -1);
 	EXPECT_TRUE(strUtil::StringToInt<int>(L"+-1.0") == 0);
 	EXPECT_TRUE(strUtil::StringToInt<int>(L"-+1.0") == 0);
+
+	// range
+	const wchar_t* testStr0 = L" 17959";
+	const wchar_t* testStr1 = L" +16363 ";
+	const wchar_t* testStr2 = L"-1 25";
+	const wchar_t* testStr3 = L"+-1 ";
+	const wchar_t* testStr4 = L"-+1 ";
+
+	EXPECT_EQ(1, strUtil::StringToInt<int>(testStr0, testStr0 + 2));
+	EXPECT_EQ(1, strUtil::StringToInt<int>(testStr1, testStr1 + 3));
+	EXPECT_EQ(-1, strUtil::StringToInt<int>(testStr2, testStr2 + 2));
+	EXPECT_EQ(0, strUtil::StringToInt<int>(testStr3, testStr3 + 3));
+	EXPECT_EQ(0, strUtil::StringToInt<int>(testStr4, testStr4 + 3));
 }
 
 

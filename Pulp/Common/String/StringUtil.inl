@@ -169,6 +169,77 @@ namespace strUtil
 		return safe_static_cast<T>(wcstol(str, const_cast<wchar_t**>(pEndPtr), base));
 	}
 
+	template <typename T>
+	inline T StringToInt(const char* startInclusive, const char* endExclusive)
+	{
+		// skip any white space till either digit '+', '-'
+		while (startInclusive < endExclusive && IsWhitespace(*startInclusive)) {
+			++startInclusive;
+		}
+
+		if(startInclusive == endExclusive) { 
+			return 0;
+		}
+
+		char sign = *startInclusive;
+		if (sign == '-' || sign == '+') {
+			++startInclusive;
+		}
+
+		int val = 0;
+		while (startInclusive < endExclusive)
+		{
+			char ch = (*startInclusive++);
+			if (!IsDigit(ch)) {
+				break;
+			}
+
+			ch -= '0';
+			val = val * 10 - ch;
+		}
+
+		if (sign != '-') {
+			val = -val;
+		}
+
+		return safe_static_cast<T>(val);
+	}
+
+	template <typename T>
+	inline T StringToInt(const wchar_t* startInclusive, const wchar_t* endExclusive)
+	{
+		while (startInclusive < endExclusive && IsWhitespaceW(*startInclusive)) {
+			++startInclusive;
+		}
+
+		if (startInclusive == endExclusive) {
+			return 0;
+		}
+
+		wchar_t sign = *startInclusive;
+		if (sign == '-' || sign == '+') {
+			++startInclusive;
+		}
+
+		int val = 0;
+		while (startInclusive < endExclusive)
+		{
+			wchar_t ch = (*startInclusive++);
+			if (!IsDigitW(ch)) {
+				break;
+			}
+
+			ch -= '0';
+			val = val * 10 - ch;
+		}
+
+		if (sign != '-') {
+			val = -val;
+		}
+
+		return safe_static_cast<T>(val);
+	}
+
 
 	template <typename T>
 	inline T StringToFloat(const char* str)
