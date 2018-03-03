@@ -13,8 +13,6 @@ X_NAMESPACE_BEGIN(net)
 class SystemAddress;
 
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
-static const uint32_t MAX_SUPPORTED_PEERS = 1 << 10; // go nuts.
-static const uint32_t MAX_BAN_ENTRIES = 256; // max bans entries you can add, wildcards supported.
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 
@@ -333,7 +331,7 @@ struct IPeer
 	// send some data :)
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, 
-		SystemHandle systemHandle, bool broadcast, uint32_t forceReceiptNumber = 0) X_ABSTRACT;
+		SystemHandle systemHandle, bool broadcast, uint32_t forceReceiptNumber = INVALID_SEND_RECEIPT) X_ABSTRACT;
 	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, SystemHandle systemHandle) X_ABSTRACT;
 
