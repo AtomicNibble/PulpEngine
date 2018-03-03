@@ -335,7 +335,9 @@ struct IPeer
 
 	// send some data :)
 	virtual SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, SystemHandle systemHandle, uint8_t orderingChannel, bool broadcast, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_ABSTRACT;
+		PacketReliability::Enum reliability, SystemHandle systemHandle, uint8_t orderingChannel, bool broadcast = false, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_ABSTRACT;
+	X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel);
 	X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, SystemHandle systemHandle);
 
@@ -381,6 +383,12 @@ struct IPeer
 	virtual NetBandwidthStatistics getBandwidthStatistics(void) const X_ABSTRACT;
 
 };
+
+X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel)
+{
+	return send(pData, length, priority, reliability, systemHandle, safe_static_cast<uint8_t>(orderingChannel), false);
+}
 
 X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, SystemHandle systemHandle)
