@@ -58,17 +58,17 @@ namespace
 	}
 
 	// start of packet to mark offline msg.
-	static std::array<uint8_t, 8> OFFLINE_MSG_ID = {
+	const std::array<uint8_t, 8> OFFLINE_MSG_ID = {
 		0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85
 	};
 
-	static const size_t POOL2_ALLOCATION_SIZE = sizeof(ReliablePacket);
-	static const size_t POOL2_ALLOCATION_ALIGN = X_ALIGN_OF(ReliablePacket);
-	static const size_t POOL2_ALLOC_MAX = 1024 * 128;
+	const size_t POOL2_ALLOCATION_SIZE = sizeof(ReliablePacket);
+	const size_t POOL2_ALLOCATION_ALIGN = X_ALIGN_OF(ReliablePacket);
+	const size_t POOL2_ALLOC_MAX = 1024 * 128;
 
-	static const size_t POOL_ALLOC_MAX = 1024 * 128; // packets and buffered commands
-	static const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
-	static const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
+	const size_t POOL_ALLOC_MAX = 1024 * 128; // packets and buffered commands
+	const size_t POOL_ALLOCATION_SIZE = core::Max(sizeof(BufferdCommand), sizeof(Packet));
+	const size_t POOL_ALLOCATION_ALIGN =  core::Max(X_ALIGN_OF(BufferdCommand), X_ALIGN_OF(Packet));
 
 } // namespace 
 
