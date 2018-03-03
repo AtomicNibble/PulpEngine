@@ -59,6 +59,7 @@ namespace
 	}
 
 #endif
+
 	// start of packet to mark offline msg.
 	const std::array<uint8_t, 8> OFFLINE_MSG_ID = {
 		0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85
@@ -2211,7 +2212,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
 	// true		   false	 	already connected
 	// false	   false	 	allow connection
 
-	if (pSys && pSysGuid)
+	if (pSys || pSysGuid)
 	{
 		// you stupid twat.
 		bsOut.write(MessageID::AlreadyConnected);
