@@ -448,6 +448,38 @@ namespace strUtil
 		return nullptr;
 	}
 
+	bool StringToBool(const wchar_t* str)
+	{
+		if (IsNumeric(str))
+		{
+			int32_t val = StringToInt<int32_t>(str);
+			// anything not zero is true.
+			return val != 0;
+		}
+
+		if (core::strUtil::IsEqualCaseInsen(str, L"true")) {
+			return true;
+		}
+
+		return false;
+	}
+
+	bool StringToBool(const wchar_t* startInclusive, const wchar_t* endExclusive)
+	{
+		if (IsNumeric(startInclusive, endExclusive))
+		{
+			int32_t val = StringToInt<int32_t>(startInclusive, endExclusive);
+			// anything not zero is true.
+			return val != 0;
+		}
+
+		if (core::strUtil::IsEqualCaseInsen(startInclusive, endExclusive, L"true")) {
+			return true;
+		}
+
+		return false;
+	}
+
 
 	bool HasFileExtension(const wchar_t* path)
 	{

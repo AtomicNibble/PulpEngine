@@ -716,19 +716,31 @@ namespace strUtil
 		return nullptr;
 	}
 
+	// we support numeric and:'true', 'false' 
 	bool StringToBool(const char* str)
 	{
-		return StringToBool(str, str + strUtil::strlen(str));
+		if (IsNumeric(str))
+		{
+			// TODO: respect range.
+			int32_t val = StringToInt<int32_t>(str);
+			// anything not zero is true.
+			return val != 0;
+		}
+
+		if (core::strUtil::IsEqualCaseInsen(str, "true")) {
+			return true;
+		}
+
+		return false;
 	}
 
 	bool StringToBool(const char* startInclusive, const char* endExclusive)
 	{
-		// we support numeric and:'true', 'false' 
 		
 		if (IsNumeric(startInclusive, endExclusive))
 		{
 			// TODO: respect range.
-			int32_t val = StringToInt<int32_t>(startInclusive);
+			int32_t val = StringToInt<int32_t>(startInclusive, endExclusive);
 			// anything not zero is true.
 			return val != 0;
 		}
@@ -739,29 +751,6 @@ namespace strUtil
 
 		return false;
 	}
-
-	bool StringToBool(const wchar_t* str)
-	{
-		return StringToBool(str, str + strUtil::strlen(str));
-	}
-
-	bool StringToBool(const wchar_t* startInclusive, const wchar_t* endExclusive)
-	{
-		if (IsNumeric(startInclusive, endExclusive))
-		{
-			// TODO: respect range.
-			int32_t val = StringToInt<int32_t>(startInclusive);
-			// anything not zero is true.
-			return val != 0;
-		}
-
-		if (core::strUtil::IsEqualCaseInsen(startInclusive, endExclusive, L"true")) {
-			return true;
-		}
-
-		return false;
-	}
-
 
 	bool HasFileExtension(const char* path)
 	{
