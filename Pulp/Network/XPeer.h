@@ -62,7 +62,7 @@ struct BufferdCommand
 	
 	// 4
 	union {
-		uint32_t receipt;
+		SendReceipt receipt;
 		bool sendDisconnectionNotification;
 	};
 };
@@ -110,9 +110,9 @@ public:
 	void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
 	X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt = 0);
 	X_INLINE bool sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, uint32_t receipt = 0);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt = 0);
 
 private:
 	X_INLINE void onSend(PacketReliability::Enum reliability, core::TimeVal sendTime);
@@ -269,7 +269,7 @@ public:
 
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle,
-		bool broadcast, uint32_t forceReceiptNumber = 0) X_FINAL;
+		bool broadcast, SendReceipt forceReceiptNumber = 0) X_FINAL;
 	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 		PacketReliability::Enum reliability, SystemHandle systemHandle) X_FINAL;
 
@@ -327,10 +327,10 @@ public:
 
 private:
 	void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
 
 	X_INLINE void sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt);
+		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
 
 
 	void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);
@@ -370,8 +370,8 @@ private:
 	RequestConnection* allocConnectionRequest(void);
 	void freeConnectionRequest(RequestConnection* pConReq);
 
-	X_INLINE uint32_t nextSendReceipt(void);
-	X_INLINE uint32_t incrementNextSendReceipt(void);
+	X_INLINE SendReceipt nextSendReceipt(void);
+	X_INLINE SendReceipt incrementNextSendReceipt(void);
 
 	void removeConnectionRequest(const SystemAddressEx& sysAdd);
 

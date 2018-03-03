@@ -448,7 +448,6 @@ void NetSocket::setTTL(IpVersion::Enum ipVer, int32_t ttl)
 {
 	int32_t res;
 
-	// enable / disable broadcast.
 	res = platform::setsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, sizeof(ttl));
 	if (res != 0)
 	{
@@ -462,7 +461,6 @@ bool NetSocket::getTTL(IpVersion::Enum ipVer, int32_t& ttl)
 	int32_t res;
 	int32_t len = sizeof(ttl);
 
-	// enable / disable broadcast.
 	res = platform::getsockopt(socket_, getRawIpProto(ipVer), IP_TTL, (char*)&ttl, &len);
 	if (res != 0)
 	{

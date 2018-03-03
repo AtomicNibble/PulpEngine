@@ -97,7 +97,7 @@ public:
 	PacketReliability::Enum reliability;
 	PacketPriority::Enum priority;
 	uint8_t sendAttemps;
-	uint32_t sendReceipt;
+	SendReceipt sendReceipt;
 
 	uint8_t orderingChannel;
 	SplitPacketId splitPacketId;
@@ -250,7 +250,7 @@ public:
 
 	// que some data for sending, reliability is handled.
 	bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
-		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel,  uint32_t receipt, bool ownData);
+		PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, SendReceipt receipt, bool ownData);
 
 	// pass data from socket for processing
 	bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,

@@ -103,6 +103,7 @@ typedef AddressFamily SocketFamily;
 typedef uint16_t SystemHandle;
 typedef uint16_t Port;
 // typedef uint8_t MessageID;
+typedef uint32_t SendReceipt;
 typedef uint32_t BitSizeT;
 
 typedef core::StackString<512, char> HostStr;
@@ -110,8 +111,9 @@ typedef core::StackString<45 + 11, char> IPStr; // 11 for port. and ipv6 is 39 /
 typedef core::StackString<46, char> NetGuidStr;
 typedef core::StackString<MAX_PASSWORD_LEN, char> PasswordStr;
 
-static const SystemHandle INVALID_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max();
-static const SystemHandle LOOPBACK_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max() - 1;
+static constexpr SendReceipt INVALID_SEND_RECEIPT = 0;
+static constexpr SystemHandle INVALID_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max();
+static constexpr SystemHandle LOOPBACK_SYSTEM_HANDLE = std::numeric_limits<SystemHandle>::max() - 1;
 
 // ---------------------------------
 
@@ -195,12 +197,12 @@ public:
 		socketFamily_(SocketFamily::INet)
 	{
 	}
-	X_INLINE SocketDescriptor(uint16_t port) : 
+	X_INLINE SocketDescriptor(Port port) :
 		port_(port),
 		socketFamily_(SocketFamily::INet)
 	{
 	}
-	X_INLINE SocketDescriptor(uint16_t port, HostStr hostAddress) :
+	X_INLINE SocketDescriptor(Port port, HostStr hostAddress) :
 		port_(port), 
 		socketFamily_(SocketFamily::INet),
 		hostAddress_(hostAddress)
@@ -212,7 +214,7 @@ public:
 	}
 
 
-	X_INLINE uint16_t getPort(void) const {
+	X_INLINE Port getPort(void) const {
 		return port_;
 	}
 	X_INLINE SocketFamily::Enum getSocketFamiley(void) const {
@@ -224,7 +226,7 @@ public:
 
 
 private:
-	uint16_t port_;
+	Port port_;
 	SocketFamily::Enum socketFamily_;
 	HostStr hostAddress_;
 };
@@ -237,9 +239,14 @@ public:
 	typedef NetGuidStr StrBuf;
 
 public:
-	X_INLINE NetGUID() : val_(0) {}
-	X_INLINE explicit NetGUID(uint64_t d) : val_(d) {}
-
+	X_INLINE NetGUID() : 
+		val_(0) 
+	{
+	}
+	X_INLINE explicit NetGUID(uint64_t d) : 
+		val_(d) 
+	{
+	}
 
 	X_INLINE bool operator==(const NetGUID& rhs) const
 	{

@@ -2,14 +2,15 @@
 #include "XPeer.h"
 #include "XNet.h"
 
+#include <ITimer.h>
+
 #include <Hashing\sha1.h>
 #include <Memory\VirtualMem.h>
 #include <String\HumanDuration.h>
 #include <String\HumanSize.h>
 #include <Random\MultiplyWithCarry.h>
-
-#include <ITimer.h>
 #include <Threading\JobSystem2.h>
+#include <Time\TimeLiterals.h>
 
 #include "Sockets\Socket.h"
 
@@ -299,7 +300,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 
 XPeer::~XPeer()
 {
-	shutdown(core::TimeVal(0ll));
+	shutdown(0_tv);
 }
 
 StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
@@ -745,10 +746,10 @@ void XPeer::cancelConnectionAttempt(const SystemAddress& target)
 }
 
 
-uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, 
 	SystemHandle systemHandle, bool broadcast,
-	uint32_t forceReceiptNumber)
+	SendReceipt forceReceiptNumber)
 {
 	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
@@ -758,7 +759,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 	X_ASSERT_NOT_NULL(pData);
 
-	uint32_t usedSendReceipt;
+	SendReceipt usedSendReceipt;
 
 	if (forceReceiptNumber) {
 		usedSendReceipt = forceReceiptNumber;
@@ -798,7 +799,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 	return usedSendReceipt;
 }
 
-uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, SystemHandle systemHandle)
 {
 	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
@@ -809,7 +810,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 	X_ASSERT_NOT_NULL(pData);
 
-	uint32_t usedSendReceipt = incrementNextSendReceipt();
+	SendReceipt usedSendReceipt = incrementNextSendReceipt();
 
 	if (isLoopbackHandle(systemHandle))
 	{
@@ -817,11 +818,19 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 
 		if (reliability == PacketReliability::UnReliableWithAck)
 		{
-			uint8_t tmpBuf[5];
-			tmpBuf[0] = MessageID::SndReceiptAcked;
-			static_assert(sizeof(tmpBuf) - 1 >= sizeof(usedSendReceipt), "overflow");
-			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
-			sendLoopback(tmpBuf, sizeof(tmpBuf));
+			X_PACK_PUSH(1);
+			struct Msg {
+				uint8_t ID;
+				SendReceipt receipt;
+			};
+			X_PACK_POP;
+
+			Msg m;
+			m.ID = MessageID::SndReceiptAcked;
+			m.receipt = usedSendReceipt;
+			static_assert(sizeof(m) == sizeof(SendReceipt) + sizeof(uint8_t), "overflow");
+
+			sendLoopback(reinterpret_cast<const uint8_t*>(&m), sizeof(m));
 		}
 
 		return usedSendReceipt;
@@ -842,7 +851,7 @@ uint32_t XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPrior
 }
 
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, uint32_t receipt)
+	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
 {
 	X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
 	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
@@ -1303,8 +1312,8 @@ void XPeer::addToBanList(const SystemAddressEx& sysAdd, core::TimeVal timeout)
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	auto assignBanTime = [timeNow](Ban& ban, core::TimeVal timeout) {
-		if (timeout.GetValue() == 0ll) {
-			ban.timeOut.SetValue(0ll);
+		if (timeout == 0_tv) {
+			ban.timeOut = 0_tv;
 		}
 		else {
 			ban.timeOut = timeNow + timeout;

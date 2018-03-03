@@ -644,7 +644,7 @@ void ReliabilityLayer::clearPacketQueues(void)
 
 
 bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
-	PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, uint32_t receipt, bool ownData)
+	PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, SendReceipt receipt, bool ownData)
 {
 	X_ASSERT_NOT_NULL(pData);
 	X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
