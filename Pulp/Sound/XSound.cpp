@@ -1567,23 +1567,26 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 void XSound::cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
 {
 	if (pArgs->GetArgCount() < 3) {
-		X_WARNING("Console", "snd_set_rtpc <name> <state> <ObjectId>");
+		X_WARNING("Console", "snd_set_rtpc <name> <value> <ObjectId>");
 		return;
 	}
 
 	const char* pName = pArgs->GetArg(1);
-	const char* pState = pArgs->GetArg(2);
+	const char* pValue = pArgs->GetArg(2);
 
 	// optional ObjectId
-	int32_t objectId = 0;
+	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
 	if (pArgs->GetArgCount() > 3) {
-		objectId = core::strUtil::StringToInt<int32_t>(pArgs->GetArg(3));
+		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
 	}
 
-	// TODO
-	X_UNUSED(pName);
-	X_UNUSED(pState);
-	X_UNUSED(objectId);
+	float value = core::strUtil::StringToFloat<float>(pValue);
+
+	AKRESULT res = SoundEngine::SetRTPCValue(pName, value, objectId);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error setting RTPC value. %s", AkResult::ToString(res, desc));
+	}
 }
 
 // snd_set_switchstate <name> <state> <ObjectId>
@@ -1603,10 +1606,11 @@ void XSound::cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs)
 		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
 	}
 
-	// TODO
-	X_UNUSED(pName);
-	X_UNUSED(pState);
-	X_UNUSED(objectId);
+	AKRESULT res = SoundEngine::SetSwitch(pName, pState, objectId);
+	if (res != AK_Success) {
+		AkResult::Description desc;
+		X_ERROR("SoundSys", "Error setting switch state. %s", AkResult::ToString(res, desc));
+	}
 }
 
 // snd_post_event <eventName> <ObjectId>
