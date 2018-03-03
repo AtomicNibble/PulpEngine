@@ -278,6 +278,8 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 	pool2Arena_(&pool2Allocator_, "ReliablePool"),
 	blockArena_(&blockAlloc_, "BlockArena")
 {
+	X_ASSERT(arena_->isThreadSafe(), "Peer arena must be thread safe")(arena_->isThreadSafe());
+
 	arena->addChildArena(&poolArena_);
 	arena->addChildArena(&pool2Arena_);
 	arena->addChildArena(&blockArena_);

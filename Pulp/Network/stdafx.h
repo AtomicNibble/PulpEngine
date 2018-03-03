@@ -7,10 +7,11 @@
 #include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
 #include "Memory\MemoryTaggingPolicies\NoMemoryTagging.h"
 #include "Memory\MemoryTrackingPolicies\NoMemoryTracking.h"
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 typedef core::MemoryArena<
 	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+	core::MultiThreadPolicy<core::Spinlock>,
 #if X_DEBUG
 	core::SimpleBoundsChecking,
 	core::SimpleMemoryTracking,

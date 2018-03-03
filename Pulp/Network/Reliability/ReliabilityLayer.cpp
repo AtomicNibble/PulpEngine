@@ -1616,6 +1616,8 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 
 	SplitPacketId splitPacketId = splitPacketId_++;
 
+	X_ASSERT(g_NetworkArena->isThreadSafe(), "Peer arena must be thread safe")(g_NetworkArena->isThreadSafe());
+
 	DataRefrence* pRefData = X_NEW(DataRefrence, g_NetworkArena, "SplitPacketDataRef");
 	pRefData->pData = pPacket->pData;
 
@@ -1882,7 +1884,6 @@ void ReliabilityLayer::freeResendList(void)
 
 size_t ReliabilityLayer::calculateMemoryUsage(void) const
 {
-
 	// meow meow.
 	size_t size = 0;
 
