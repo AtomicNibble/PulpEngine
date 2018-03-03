@@ -398,7 +398,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
 		}
 	}
 
-	if (cryptRnd_.init()) {
+	if (!cryptRnd_.init()) {
 		X_ERROR("Net", "Failed to init rnd");
 		return StartupResult::Error;
 	}
