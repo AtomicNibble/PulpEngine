@@ -761,12 +761,9 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
 
 	X_ASSERT_NOT_NULL(pData);
 
-	SendReceipt usedSendReceipt;
+	SendReceipt usedSendReceipt = forceReceiptNumber;
 
-	if (forceReceiptNumber != INVALID_SEND_RECEIPT) {
-		usedSendReceipt = forceReceiptNumber;
-	}
-	else {
+	if (forceReceiptNumber == INVALID_SEND_RECEIPT) {
 		usedSendReceipt = incrementNextSendReceipt();
 	}
 
