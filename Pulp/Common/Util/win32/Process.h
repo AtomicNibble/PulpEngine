@@ -33,6 +33,7 @@ public:
 public:
 
 	static Process GetCurrent(void);
+	static uint32_t GetCurrentID(void);
 
 private:
 	HANDLE process_;

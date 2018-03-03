@@ -106,4 +106,9 @@ Process Process::GetCurrent(void)
 	return Process(currentHandle, currentID);
 }
 
+uint32_t Process::GetCurrentID(void)
+{
+	return safe_static_cast<uint32_t>(::GetCurrentProcessId());
+}
+
 X_NAMESPACE_END
