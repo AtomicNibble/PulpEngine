@@ -2189,7 +2189,6 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
 
 void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* pData, RecvBitStream& bs)
 {
-	// you stull here ? jesus christ.
 	SystemAddressEx bindingAdd;
 	NetGUID clientGuid;
 	uint16_t mtu;
