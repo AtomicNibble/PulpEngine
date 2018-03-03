@@ -203,6 +203,8 @@ class XPeer : public IPeer
 	// we just read directly off the recived buffer.
 	typedef core::FixedBitStreamBase RecvBitStream;
 	typedef core::FixedBitStreamBase UpdateBitStream;
+	typedef core::FixedBitStreamStack<MAX_MTU_SIZE> BitStreamMTU;
+
 
 	typedef core::MemoryArena<
 		core::GrowingPoolAllocator,
@@ -231,7 +233,6 @@ class XPeer : public IPeer
 		core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
 	> BlockAlocArena;
-
 
 	static const std::array<uint32_t, 3> MTUSizesArr;
 
