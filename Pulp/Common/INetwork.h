@@ -69,7 +69,7 @@ X_DECLARE_ENUM8(PacketReliability)(
 	ReliableOrderedWithAck
 );
 
-#if NET_IPv6_SUPPORT
+#if NET_IPv6_SUPPORT // can't if/def inside DECLARE_ENUM.
 
 X_DECLARE_ENUM8(IpVersion)(
 	Ipv4,
