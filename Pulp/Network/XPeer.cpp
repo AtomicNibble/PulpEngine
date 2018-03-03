@@ -19,7 +19,7 @@ X_NAMESPACE_BEGIN(net)
 namespace
 {
 
-
+#if 0 
 
 	// returns if ip is matched by the pattern.
 	bool ipWildMatch(const IPStr& pattern, const IPStr& ip)
@@ -58,6 +58,7 @@ namespace
 		return false;
 	}
 
+#endif
 	// start of packet to mark offline msg.
 	const std::array<uint8_t, 8> OFFLINE_MSG_ID = {
 		0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85
