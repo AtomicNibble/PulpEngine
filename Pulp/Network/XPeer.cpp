@@ -564,11 +564,11 @@ void XPeer::runUpdate(void)
 	}
 	else
 	{
-		// we can updae all the peers in diffrent threads.
+		// we can update all the peers in diffrent threads.
 		core::Delegate<void(RemoteSystem**, uint32_t)> del;
 		del.Bind<XPeer, &XPeer::Job_remoteReliabilityTick>(this);
 
-		// create a job for each remtoe.
+		// create a job for each remote.
 		auto* pJob = pJobSys_->parallel_for_member<XPeer>(del,
 			activeRemoteSystems_.data(),
 			safe_static_cast<uint32_t>(activeRemoteSystems_.size()),
