@@ -106,7 +106,6 @@ void XNet::shutDown(void)
 	}
 
 	PlatLib::deRef();
-
 }
 
 void XNet::release(void)
@@ -120,6 +119,7 @@ IPeer* XNet::createPeer(void)
 	X_ASSERT(!pInitJob_, "Async init not finalized")();
 
 	if (peers_.size() == peers_.capacity()) {
+		X_ERROR("Net", "Failed to create peer, reached max peer count: %" PRIu32, MAX_PEERS);
 		return nullptr;
 	}
 
