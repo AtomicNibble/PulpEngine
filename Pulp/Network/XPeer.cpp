@@ -451,7 +451,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 			auto startTime = timeNow;
 
 			// send out the packets.
-			core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+			BitStreamMTU updateBS;
 			remoteReliabilityTick(updateBS, timeNow);
 
 			// scale so if block is low we don't sleep much
@@ -543,7 +543,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
 
 void XPeer::runUpdate(void)
 {
-	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+	BitStreamMTU updateBS;
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	// would be nice if we could split this into jobs.
@@ -1821,7 +1821,7 @@ void XPeer::remoteReliabilityTick(UpdateBitStream& updateBS, core::TimeVal timeN
 
 void XPeer::Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t count)
 {
-	core::FixedBitStreamStack<MAX_MTU_SIZE> updateBS;
+	BitStreamMTU updateBS;
 	core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
 
 	for (uint32_t i = 0; i < count; i++)
