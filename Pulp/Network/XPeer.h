@@ -267,11 +267,9 @@ public:
 	ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
 	void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
 
-	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle,
-		bool broadcast, SendReceipt forceReceiptNumber = 0) X_FINAL;
-	uint32_t send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, SystemHandle systemHandle) X_FINAL;
+	SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, SystemHandle systemHandle, uint8_t orderingChannel,
+		bool broadcast, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_FINAL;
 
 	void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
 

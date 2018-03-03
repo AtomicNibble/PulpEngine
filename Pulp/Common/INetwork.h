@@ -278,6 +278,7 @@ private:
 struct Packet
 {
 	X_INLINE MessageID::Enum getID(void) const {
+		X_ASSERT(length > 0, "Can't read id fro m empty message")(length, bitLength);
 		return static_cast<MessageID::Enum>(pData[0]);
 	}
 	X_INLINE uint8_t* begin(void) {
@@ -295,6 +296,7 @@ struct Packet
 	uint8_t* pData; // data from sender.
 };
 
+// Muh cache lanes!
 X_ENSURE_SIZE(Packet, 32)
 
 // ---------------------------------
@@ -329,11 +331,10 @@ struct IPeer
 	virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
 
 	// send some data :)
-	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, uint8_t orderingChannel, 
-		SystemHandle systemHandle, bool broadcast, uint32_t forceReceiptNumber = INVALID_SEND_RECEIPT) X_ABSTRACT;
-	virtual uint32_t send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
-		PacketReliability::Enum reliability, SystemHandle systemHandle) X_ABSTRACT;
+	virtual SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, SystemHandle systemHandle, uint8_t orderingChannel, bool broadcast, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_ABSTRACT;
+	X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+		PacketReliability::Enum reliability, SystemHandle systemHandle);
 
 	// send to self.
 	virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
@@ -377,6 +378,12 @@ struct IPeer
 	virtual NetBandwidthStatistics getBandwidthStatistics(void) const X_ABSTRACT;
 
 };
+
+X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+	PacketReliability::Enum reliability, SystemHandle systemHandle)
+{
+	return send(pData, length, priority, reliability, systemHandle, 0, false);
+}
 
 // ---------------------------------
 

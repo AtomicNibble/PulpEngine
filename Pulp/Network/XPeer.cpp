@@ -749,14 +749,14 @@ void XPeer::cancelConnectionAttempt(const SystemAddress& target)
 
 
 SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, uint8_t orderingChannel, 
-	SystemHandle systemHandle, bool broadcast,
+	PacketReliability::Enum reliability, SystemHandle systemHandle, 
+	uint8_t orderingChannel, bool broadcast,
 	SendReceipt forceReceiptNumber)
 {
 	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
 	if (!lengthBytes) {
-		return 0;
+		return INVALID_SEND_RECEIPT;
 	}
 
 	X_ASSERT_NOT_NULL(pData);
@@ -777,49 +777,6 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
 		if (reliability == PacketReliability::UnReliableWithAck)
 		{
 			// send a fake ack to loopback
-			uint8_t tmpBuf[5];
-			tmpBuf[0] = MessageID::SndReceiptAcked;
-			static_assert(sizeof(tmpBuf) - 1 == sizeof(usedSendReceipt), "overflow");
-			std::memcpy(tmpBuf + 1, &usedSendReceipt, sizeof(usedSendReceipt));
-			sendLoopback(tmpBuf, sizeof(tmpBuf));
-		}
-
-		return usedSendReceipt;
-	}
-
-	sendBuffered(
-		pData, 
-		safe_static_cast<BitSizeT>(lengthBytes * 8),
-		priority, 
-		reliability,
-		orderingChannel,
-		systemHandle,
-		broadcast, 
-		usedSendReceipt
-	);
-
-	return usedSendReceipt;
-}
-
-SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-	PacketReliability::Enum reliability, SystemHandle systemHandle)
-{
-	X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
-
-	if (!lengthBytes) {
-		return 0;
-	}
-
-	X_ASSERT_NOT_NULL(pData);
-
-	SendReceipt usedSendReceipt = incrementNextSendReceipt();
-
-	if (isLoopbackHandle(systemHandle))
-	{
-		sendLoopback(pData, lengthBytes);
-
-		if (reliability == PacketReliability::UnReliableWithAck)
-		{
 			X_PACK_PUSH(1);
 			struct Msg {
 				uint8_t ID;
@@ -839,18 +796,19 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
 	}
 
 	sendBuffered(
-		pData,
+		pData, 
 		safe_static_cast<BitSizeT>(lengthBytes * 8),
-		priority,
+		priority, 
 		reliability,
-		0,
+		orderingChannel,
 		systemHandle,
-		false,
+		broadcast, 
 		usedSendReceipt
 	);
 
 	return usedSendReceipt;
 }
+
 
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
 	PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
