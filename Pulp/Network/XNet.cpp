@@ -246,6 +246,7 @@ void XNet::Cmd_listLocalAddress(core::IConsoleCmdArgs* pCmd)
 	X_UNUSED(pCmd);
 
 	if (peers_.empty()) {
+		X_LOG0("Net", "Not active");
 		return;
 	}
 
@@ -268,7 +269,7 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 	}
 
 
-	X_LOG0("Console", "----------- ^8Remote Systems^7 -----------");
+	X_LOG0("Net", "----------- ^8Remote Systems^7 -----------");
 
 	int32_t idx = 0;
 	for (auto* pPeer : peers_)
@@ -278,7 +279,7 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 		pPeer->listRemoteSystems(verbose);
 	}
 
-	X_LOG0("Console", "--------- ^8Remote Systems End^7 ---------");
+	X_LOG0("Net", "--------- ^8Remote Systems End^7 ---------");
 }
 
 void XNet::Cmd_clearBans(core::IConsoleCmdArgs* pCmd)
@@ -295,6 +296,8 @@ void XNet::Cmd_listBans(core::IConsoleCmdArgs* pCmd)
 {
 	X_UNUSED(pCmd);
 
+	X_LOG0("Net", "---------------- ^8Bans^7 ----------------");
+
 	int32_t idx = 0;
 	for (auto* pPeer : peers_)
 	{
@@ -302,6 +305,8 @@ void XNet::Cmd_listBans(core::IConsoleCmdArgs* pCmd)
 		X_LOG_BULLET;
 		pPeer->listBans();
 	}
+
+	X_LOG0("Net", "-------------- ^8Bans End^7 --------------");
 }
 
 void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
