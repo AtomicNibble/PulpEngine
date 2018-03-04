@@ -71,6 +71,25 @@ void CoreVars::updateWinDim(int32_t width, int32_t height)
 	pWinHeight_->Set(height);
 }
 
+int32_t CoreVars::getWinPosX(void) const
+{
+	return (X_ASSERT_NOT_NULL(pWinPosX_))->GetInteger();
+}
+
+int32_t CoreVars::getWinPosY(void) const
+{
+	return (X_ASSERT_NOT_NULL(pWinPosY_))->GetInteger();
+}
+
+int32_t CoreVars::getWinWidth(void) const
+{
+	return (X_ASSERT_NOT_NULL(pWinWidth_))->GetInteger();
+}
+
+int32_t CoreVars::getWinHeight(void) const
+{
+	return (X_ASSERT_NOT_NULL(pWinHeight_))->GetInteger();
+}
 
 
 X_NAMESPACE_END

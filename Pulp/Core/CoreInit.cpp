@@ -1080,15 +1080,15 @@ void XCore::registerVars(const SCoreInitParams& initParams)
 		core::ConsoleVarFunc del;
 
 		del.Bind<XCore, &XCore::WindowPosVarChange>(this);
-		vars_.getWinPosX()->SetOnChangeCallback(del);
-		vars_.getWinPosY()->SetOnChangeCallback(del);
+		vars_.getVarWinPosX()->SetOnChangeCallback(del);
+		vars_.getVarWinPosY()->SetOnChangeCallback(del);
 
 		del.Bind<XCore, &XCore::WindowSizeVarChange>(this);
-		vars_.getWinWidth()->SetOnChangeCallback(del);
-		vars_.getWinHeight()->SetOnChangeCallback(del);
+		vars_.getVarWinWidth()->SetOnChangeCallback(del);
+		vars_.getVarWinHeight()->SetOnChangeCallback(del);
 
 		del.Bind<XCore, &XCore::WindowCustomFrameVarChange>(this);
-		vars_.getWinCustomFrame()->SetOnChangeCallback(del);
+		vars_.getVarWinCustomFrame()->SetOnChangeCallback(del);
 	}
 }
 

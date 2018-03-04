@@ -15,12 +15,16 @@ public:
 	void updateWinPos(int32_t x, int32_t y);
 	void updateWinDim(int32_t width, int32_t height);
 
-	
-	X_INLINE core::ICVar* getWinPosX(void);
-	X_INLINE core::ICVar* getWinPosY(void);
-	X_INLINE core::ICVar* getWinWidth(void);
-	X_INLINE core::ICVar* getWinHeight(void);
-	X_INLINE core::ICVar* getWinCustomFrame(void);
+	int32_t getWinPosX(void) const;
+	int32_t getWinPosY(void) const;
+	int32_t getWinWidth(void) const;
+	int32_t getWinHeight(void) const;
+
+	X_INLINE core::ICVar* getVarWinPosX(void);
+	X_INLINE core::ICVar* getVarWinPosY(void);
+	X_INLINE core::ICVar* getVarWinWidth(void);
+	X_INLINE core::ICVar* getVarWinHeight(void);
+	X_INLINE core::ICVar* getVarWinCustomFrame(void);
 
 public:
 	int32_t schedulerNumThreads_;

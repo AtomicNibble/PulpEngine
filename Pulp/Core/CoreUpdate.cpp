@@ -61,9 +61,12 @@ bool XCore::Update(void)
 
 	assetLoader_.dispatchPendingLoads();
 
+	auto width = vars_.getWinWidth();
+	auto height = vars_.getWinHeight();
+
 	core::FrameData frameData;
 	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
-	frameData.view.viewport.set(1680, 1050);
+	frameData.view.viewport.set(width, height); 
 	frameData.view.viewport.setZ(0.f, 1.f);
 
 	// get time deltas for this frame.
