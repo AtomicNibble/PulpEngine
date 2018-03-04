@@ -264,15 +264,15 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
 
 
 
-bool XMaterialManager::waitForLoad(core::AssetBase* pAnim)
+bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
 {
-	X_ASSERT(pAnim->getType() == assetDb::AssetType::ANIM, "Invalid asset passed")();
+	X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")();
 
-	if (pAnim->isLoaded()) {
+	if (pMaterial->isLoaded()) {
 		return true;
 	}
 
-	return waitForLoad(static_cast<Material*>(pAnim));
+	return waitForLoad(static_cast<Material*>(pMaterial));
 }
 
 bool XMaterialManager::waitForLoad(Material* pMaterial)
