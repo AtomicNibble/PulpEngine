@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\tools\ModelLib;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
   <Link>
-    <AdditionalDependencies>$(QTDIR)\lib\qtmain.lib;  $(QTDIR)\lib\Qt5Widgets.lib;  $(QTDIR)\lib\Qt5Sql.lib;  $(QTDIR)\plugins/platforms\qwindows.lib;  $(QTDIR)\lib\Qt5PlatformSupport.lib;  $(QTDIR)\lib\Qt5DBus.lib;  $(QTDIR)\lib\qtfreetype.lib;  $(QTDIR)\plugins/imageformats\qdds.lib;  $(QTDIR)\plugins/imageformats\qicns.lib;  $(QTDIR)\plugins/imageformats\qico.lib;  $(QTDIR)\plugins/imageformats\qjp2.lib;  $(QTDIR)\plugins/imageformats\qmng.lib;  $(QTDIR)\plugins/imageformats\qtga.lib; $(QTDIR)\lib\Qt5Gui.lib;  $(QTDIR)\lib\qtharfbuzzng.lib;  $(QTDIR)\lib\Qt5Core.lib;  $(QTDIR)\lib\qtpcre.lib; opengl32.lib; ws2_32.lib; imm32.lib; %(AdditionalDependencies)</AdditionalDependencies>
+    <AdditionalDependencies>$(QTDIR)\lib\Qt5Charts.lib; $(QTDIR)\lib\Qt5ThemeSupport.lib; $(QTDIR)\lib\Qt5EventDispatcherSupport.lib; $(QTDIR)\lib\Qt5WinExtras.lib; $(QTDIR)\lib\Qt5AccessibilitySupport.lib; $(QTDIR)\lib\Qt5FontDatabaseSupport.lib; $(QTDIR)\lib\qtmain.lib; $(QTDIR)\lib\qtpcre2.lib; $(QTDIR)\lib\qtlibpng.lib; $(QTDIR)\lib\qtharfbuzz.lib; $(QTDIR)\lib\Qt5Widgets.lib; $(QTDIR)\lib\Qt5Sql.lib; $(QTDIR)\lib\Qt5DBus.lib; $(QTDIR)\lib\qtfreetype.lib; $(QTDIR)\lib\Qt5Gui.lib; $(QTDIR)\lib\Qt5Core.lib; $(QTDIR)\plugins/platforms\qwindows.lib; $(QTDIR)\plugins/imageformats\qicns.lib; $(QTDIR)\plugins/imageformats\qico.lib; $(QTDIR)\plugins/imageformats\qjpeg.lib; $(QTDIR)\plugins/imageformats\qtga.lib; opengl32.lib; ws2_32.lib; imm32.lib; Userenv.lib; Mincore.lib; version.lib; Netapi32.lib; dwmapi.lib; %(AdditionalDependencies)</AdditionalDependencies>
   </Link>
   </ItemDefinitionGroup>
 </Project>
