@@ -1647,6 +1647,27 @@
     <ClCompile Include="ImageLoader.cpp">
       <Filter>Source Files\Misc</Filter>
     </ClCompile>
+    <ClCompile Include="AssetFxWidget.cpp">
+      <Filter>Source Files\Widgets\AssetScript</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_AssetFxWidget.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1839,6 +1860,9 @@
       <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
     <CustomBuild Include="AssetVideoWidget.h">
+      <Filter>Header Files\Widgets\AssetScript</Filter>
+    </CustomBuild>
+    <CustomBuild Include="AssetFxWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
     </CustomBuild>
   </ItemGroup>

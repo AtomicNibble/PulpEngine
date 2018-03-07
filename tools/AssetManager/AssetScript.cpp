@@ -190,6 +190,7 @@ bool AssetPropsScriptManager::init(bool enableHotReload)
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddTexture(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddTexture), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddModel(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddModel), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddAnim(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddAnim), asCALL_THISCALL); BUG_CHECK(r >= 0);
+	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddFx(const string& in)", asMETHOD(AssetScriptProps, AddFx), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddAssetRef(const string& in, const string& in)", asMETHOD(AssetScriptProps, AddAssetRef), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddCombo(const string& in, const string, bool editiable = false)", asMETHOD(AssetScriptProps, AddCombo), asCALL_THISCALL); BUG_CHECK(r >= 0);
 	r = pEngine_->RegisterObjectMethod("asset", "assetProp@ AddCheckBox(const string& in, bool)", asMETHOD(AssetScriptProps, AddCheckBox), asCALL_THISCALL); BUG_CHECK(r >= 0);

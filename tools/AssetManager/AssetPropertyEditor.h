@@ -31,6 +31,7 @@ class AssetFontWidget;
 class AssetTextureWidget;
 class AssetModelWidget;
 class AssetAnimWidget;
+class AssetFxWidget;
 class AssetAssetRefWidget;
 class AssetStringWidget;
 class AssetColorWidget;
@@ -66,6 +67,7 @@ public:
 		IMAGE,
 		MODEL,
 		ANIM,
+		FX,
 		ASSET_REF,
 		PATH,
 		LABEL,
@@ -215,6 +217,7 @@ private:
 		AssetTextureWidget* pTextureWidget_;
 		AssetModelWidget* pModelWidget_;
 		AssetAnimWidget* pAnimWidget_;
+		AssetFxWidget* pFxWidget_;
 		AssetAssetRefWidget* pAssetRefWidget_;
 		AssetStringWidget* pStringWidget_;
 		AssetColorWidget* pColorWidget_;

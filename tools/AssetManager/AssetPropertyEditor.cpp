@@ -16,6 +16,7 @@
 #include "AssetTextureWidget.h"
 #include "AssetModelWidget.h"
 #include "AssetAnimWidget.h"
+#include "AssetFxWidget.h"
 #include "AssetAssetRefWidget.h"
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
@@ -114,6 +115,9 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::ANIM:
 		pAnimWidget_ = new AssetAnimWidget(pParent, pAssEntry, val);
 		break;
+	case PropertyType::FX:
+		pFxWidget_ = new AssetFxWidget(pParent, pAssEntry, val);
+		break;
 	case PropertyType::ASSET_REF:
 		pAssetRefWidget_ = new AssetAssetRefWidget(pParent, db, pAssEntry, defaultValue_, val);
 		break;
@@ -164,6 +168,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
+	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::LINEEDIT:
 		connect(pWidget_, SIGNAL(valueChanged(const std::string&)), this, SLOT(valueChanged(const std::string&)));
@@ -340,6 +345,7 @@ void AssetProperty::show(bool vis)
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
+	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::STRING:
 	case PropertyType::COLOR:
@@ -376,6 +382,7 @@ void AssetProperty::enable(bool val)
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
+	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::STRING:
 	case PropertyType::COLOR:
@@ -1158,6 +1165,7 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::MODEL:
 		case AssetProperty::PropertyType::ANIM:
+		case AssetProperty::PropertyType::FX:
 		case AssetProperty::PropertyType::ASSET_REF:
 		case AssetProperty::PropertyType::COMBOBOX:
 		case AssetProperty::PropertyType::COLOR:

@@ -84,6 +84,7 @@ public:
 	AssetScriptProperty* AddTexture(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddModel(const std::string& key, const std::string& default);
 	AssetScriptProperty* AddAnim(const std::string& key, const std::string& default);
+	AssetScriptProperty* AddFx(const std::string& key);
 	AssetScriptProperty* AddAssetRef(const std::string& key, const std::string& type);
 	AssetScriptProperty* AddCombo(const std::string& key, const std::string& values, bool editiable = false);
 	AssetScriptProperty* AddCheckBox(const std::string& key, bool default);
