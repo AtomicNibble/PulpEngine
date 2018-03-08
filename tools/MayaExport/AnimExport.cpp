@@ -495,7 +495,7 @@ MStatus PotatoAnimExporter::loadNoteData(void)
 
 	for (uint32_t i = 0; i < plugs.length(); i++)
 	{
-		auto& plug = plugs[i];
+		const auto& plug = plugs[i];
 
 		auto fullName = plug.name();
 		auto name = plug.partialName();
