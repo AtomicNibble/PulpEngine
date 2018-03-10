@@ -579,9 +579,11 @@ namespace RawModel
 			case "centimeters"_fnv1a:
 			case "cm"_fnv1a:
 				units = core::UnitOfMeasure::Centimeters;
+				break;
 			case "in"_fnv1a:
 			case "inches"_fnv1a:
 				units = core::UnitOfMeasure::Inches;
+				break;
 			default:
 				X_ERROR("RawModel", "Invalid unit of measure: \"%s\"", unitStr.c_str());
 				return false;
