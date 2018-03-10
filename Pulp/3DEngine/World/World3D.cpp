@@ -364,7 +364,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
+				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numFaces * 3);
 			}
 
 			// mat names
@@ -2053,7 +2053,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
 		}
 
-		pDraw->indexCount = pSubMesh->numIndexes;
+		pDraw->indexCount = pSubMesh->numFaces * 3;
 		pDraw->startIndex = pSubMesh->startIndex;
 		pDraw->baseVertex = pSubMesh->startVertex;
 		pDraw->stateHandle = stateHandle;
@@ -2217,7 +2217,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
 		}
 
-		pDraw->indexCount = pSubMesh->numIndexes;
+		pDraw->indexCount = pSubMesh->numFaces * 3;
 		pDraw->startIndex = pSubMesh->startIndex;
 		pDraw->baseVertex = pSubMesh->startVertex;
 		pDraw->stateHandle = stateHandle;

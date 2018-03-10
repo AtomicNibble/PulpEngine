@@ -186,7 +186,7 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
 		for (uint16_t x = 0; x < lod.numSubMeshes; x++)
 		{
 			SubMeshHeader& mesh = meshHeads[x];
-			mesh.indexes = cursor.postSeekPtr<Index>(mesh.numIndexes);
+			mesh.indexes = cursor.postSeekPtr<Index>(mesh.numFaces * 3);
 		}
 
 		// BindData

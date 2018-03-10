@@ -140,13 +140,17 @@ X_NAMESPACE_BEGIN(model)
 //		
 //		Streams are aligned from start of header instead of after header.
 //
+//	Version 17:
+//		
+//		Replace numIndexes with numFaces, otherwise face limit is pretty low.
+//
 //
 
 
 #define X_MODEL_BONES_LOWER_CASE_NAMES 1
 #define X_MODEL_MTL_LOWER_CASE_NAMES 1
 
-static const uint32_t	 MODEL_VERSION = 17;
+static const uint32_t	 MODEL_VERSION = 18;
 static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
@@ -519,7 +523,7 @@ struct SubMeshHeader
 {
 	SubMeshHeader() {
 		numVerts = 0;
-		numIndexes = 0;
+		numFaces = 0;
 		numBinds = 0;
 		numColMesh = 0;
 
@@ -529,7 +533,7 @@ struct SubMeshHeader
 
 	// sizes
 	uint16_t numVerts;
-	uint16_t numIndexes;
+	uint16_t numFaces;
 	uint16_t numBinds;	// used for solid binds.
 	Flags8<StreamType> streamsFlag; // this is just a dublicate of the meshheaders value, never diffrent.
 	uint8_t numColMesh; // 8

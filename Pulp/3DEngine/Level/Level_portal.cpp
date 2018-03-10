@@ -798,7 +798,7 @@ void Level::addMeshTobucket(const model::MeshHeader& mesh, const model::XRenderM
 			pDraw = pDepthBucket->addCommand<render::Commands::DrawIndexed>(sortKey, variableStateSize);
 		}
 
-		pDraw->indexCount = pSubMesh->numIndexes;
+		pDraw->indexCount = pSubMesh->numFaces * 3;
 		pDraw->startIndex = pSubMesh->startIndex;
 		pDraw->baseVertex = pSubMesh->startVertex;
 		pDraw->stateHandle = stateHandle;

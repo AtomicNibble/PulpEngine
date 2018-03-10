@@ -421,7 +421,7 @@ bool LvlArea::areaEnd(StringTableUnique& stringTable)
 		}
 
 		mesh.boundingSphere = Sphere(mesh.boundingBox);
-		mesh.numIndexes = safe_static_cast<uint16_t, size_t>(subMesh.faces_.size() * 3);
+		mesh.numFaces = safe_static_cast<uint16_t, size_t>(subMesh.faces_.size());
 		mesh.numVerts = safe_static_cast<uint16_t, size_t>(subMesh.verts_.size());
 		mesh.startIndex = safe_static_cast<uint32_t, size_t>(model.faces.size()  * 3);
 		mesh.startVertex = safe_static_cast<uint32_t, size_t>(model.verts.size());
@@ -432,8 +432,8 @@ bool LvlArea::areaEnd(StringTableUnique& stringTable)
 
 		mesh.materialName = matNameID;
 		
-		X_LOG1("SubMesh", "Mat: ^3%s^7 verts: %i indexs: %i", 
-			subMesh.matName_.c_str(), mesh.numVerts, mesh.numIndexes);
+		X_LOG1("SubMesh", "Mat: ^3%s^7 verts: %i faces: %i", 
+			subMesh.matName_.c_str(), mesh.numVerts, mesh.numFaces);
 
 		// faces
 		model.faces.append(subMesh.faces_);

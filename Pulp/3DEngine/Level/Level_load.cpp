@@ -266,7 +266,7 @@ bool Level::ProcessData(void)
 			for (x = 0; x < numSub; x++)
 			{
 				model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
-				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numIndexes);
+				pSubMesh->indexes = cursor.postSeekPtr<model::Index>(pSubMesh->numFaces * 3);
 			}
 			
 			// mat names

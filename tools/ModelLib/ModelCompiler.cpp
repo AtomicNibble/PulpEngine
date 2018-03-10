@@ -1551,7 +1551,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 			meshHdr.CompBinds.set(compiledMesh.binds_.getBindCounts());
 
 			meshHdr.numVerts = safe_static_cast<uint16_t>(compiledMesh.verts_.size());
-			meshHdr.numIndexes = safe_static_cast<uint16_t>(compiledMesh.faces_.size() * 3);
+			meshHdr.numFaces = safe_static_cast<uint16_t>(compiledMesh.faces_.size());
 			//		mesh.material = pMesh->material;
 	//		mesh.CompBinds = pMesh->CompBinds;
 			meshHdr.boundingBox = compiledMesh.boundingBox_;
@@ -1566,16 +1566,11 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 			// inc the offsets
 			vertOffset += meshHdr.numVerts;
-			indexOffset += meshHdr.numIndexes;
+			indexOffset += meshHdr.numFaces * 3;
 
 			stats_.totalMesh++;
 			stats_.totalVerts += meshHdr.numVerts;
-			stats_.totalFaces += (meshHdr.numIndexes / 3);
-
-			if ((meshHdr.numIndexes % 3) != 0) {
-				X_ERROR("Model", "Mesh index count is not a multiple of 3, count: %" PRIu16, meshHdr.numIndexes);
-				return false;
-			}
+			stats_.totalFaces += meshHdr.numFaces;
 
 			meshDataStream.write(meshHdr);
 		}
