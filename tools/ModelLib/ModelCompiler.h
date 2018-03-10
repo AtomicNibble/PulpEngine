@@ -211,6 +211,7 @@ public:
 		size_t numMeshes(void) const;
 		size_t numColMeshes(void) const;
 		size_t totalVerts(void) const;
+		size_t totalFaces(void) const;
 		size_t totalIndexs(void) const;
 
 		void clearColMeshes(void);

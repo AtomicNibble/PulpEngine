@@ -345,7 +345,7 @@ void AreaModel::endModel(void)
 	meshHeader.streamsFlag = model::StreamType::NORMALS | model::StreamType::COLOR;
 	meshHeader.numSubMeshes = safe_static_cast<uint32_t, size_t>(meshes.size());
 	meshHeader.numVerts = safe_static_cast<uint32_t, size_t>(verts.size());
-	meshHeader.numIndexes = safe_static_cast<uint32_t, size_t>(faces.size() * 3);
+	meshHeader.numFaces = safe_static_cast<uint32_t, size_t>(faces.size());
 
 	// build bounds for all the meshes.
 	// this could be done in parrell.
@@ -365,7 +365,7 @@ void AreaModel::endModel(void)
 	AABB::StrBuf buf;
 	X_LOG_BULLET;
 	X_LOG1("AreaModel", "num verts: %i", meshHeader.numVerts);
-	X_LOG1("AreaModel", "num indexes: %i", meshHeader.numIndexes);
+	X_LOG1("AreaModel", "num Faces: %i", meshHeader.numFaces);
 	X_LOG1("AreaModel", "num meshes: %i", meshHeader.numSubMeshes);
 	X_LOG1("AreaModel", "bounds: %s", bounds.toString(buf));
 }

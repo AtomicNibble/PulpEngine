@@ -155,8 +155,8 @@ static const uint32_t	 MODEL_MAX_BONES = 255;
 static const uint32_t	 MODEL_MAX_BONE_NAME_LENGTH = 64;
 static const uint32_t	 MODEL_MAX_MESH = 64;
 static const uint32_t	 MODEL_MAX_VERTS = (1 << 16) - 1;
-static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_VERTS;
-static const uint32_t	 MODEL_MAX_FACES = MODEL_MAX_INDEXS / 3;
+static const uint32_t	 MODEL_MAX_FACES = (1 << 16) - 1;
+static const uint32_t	 MODEL_MAX_INDEXS = MODEL_MAX_FACES * 3;
 static const uint32_t	 MODEL_MAX_COL_SHAPES = 255; // max shapes per model, there is a per mesh limit also MODEL_MESH_COL_MAX_MESH
 static const uint32_t	 MODEL_MAX_COL_DATA_SIZE = std::numeric_limits<uint16_t>::max(); // max size of all phys data.
 static const uint32_t	 MODEL_MAX_HITBOX_DATA_SIZE = MODEL_MAX_BONES * 64;
@@ -580,7 +580,7 @@ struct MeshHeader
 		numSubMeshes(0),
 		_blank(0),
 		numVerts(0),
-		numIndexes(0),
+		numFaces(0),
 		__blank(0)
 	{
 		core::zero_object(__pad);
@@ -595,7 +595,7 @@ struct MeshHeader
 	// sub meshes can have upto 65k verts, this is the cumlative count
 	// we allow 65k sub meshes, so 32bits is enoungth to fit 65k*65k
 	uint32_t    numVerts;
-	uint32_t	numIndexes;
+	uint32_t	numFaces;
 
 	// 4 + 4
 	MeshFlags flags;

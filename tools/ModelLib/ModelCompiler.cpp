@@ -791,7 +791,7 @@ size_t ModelCompiler::Lod::totalVerts(void) const
 	return total;
 }
 
-size_t ModelCompiler::Lod::totalIndexs(void) const
+size_t ModelCompiler::Lod::totalFaces(void) const
 {
 	size_t total = 0;
 
@@ -799,7 +799,12 @@ size_t ModelCompiler::Lod::totalIndexs(void) const
 		total += mesh.faces_.size();
 	}
 
-	return total * 3;
+	return total;
+}
+
+size_t ModelCompiler::Lod::totalIndexs(void) const
+{
+	return totalFaces() * 3;
 }
 
 void ModelCompiler::Lod::clearColMeshes(void)
@@ -1142,7 +1147,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
 		// version 5.0 info
 		lod.numVerts = safe_static_cast<uint32_t, size_t>(compiledLod.totalVerts());
-		lod.numIndexes = safe_static_cast<uint32_t, size_t>(compiledLod.totalIndexs());
+		lod.numFaces = safe_static_cast<uint32_t, size_t>(compiledLod.totalFaces());
 
 		// Version 8.0 info
 		lod.streamsFlag = streamsFlags;
