@@ -135,7 +135,7 @@ namespace fx
 						"delayStart": 0,
 						"delayRange": 0,
 					
-						"spawnOrgXStart" : 0,
+						"spawnOrgXStart" : -2,
 						"spawnOrgXRange" : 2,
 						"spawnOrgYStart" : 0,
 						"spawnOrgYRange" : 0,
