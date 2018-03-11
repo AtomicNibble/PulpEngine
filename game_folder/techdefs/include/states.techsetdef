@@ -424,7 +424,7 @@ State( "depthPrepass + nocull" ) : "depthPrepass"
 State( "wireframe" )
 {
 	blendState     = "replace"
-	depthTest      = less
+	depthTest      = greater_equal // less
 	depthWrite     = true
 	cull           = front
 	wireframe      = true
