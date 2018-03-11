@@ -245,17 +245,29 @@
             }
         },
         {
-            "origin" : {"x": -100, "y": -150, "z": 10},
+            "origin" : {"x": -40, "y": 50, "z": 40},
+
             "Mesh" : {
-                "name" : "test/prop/rolling_pan"
+                "name" : "test/prop/rustic_candle"
             },
-            "MeshRenderer" : {
-            },
-            "DynamicObject" : {
-            },
+          //  "MeshRenderer" : {
+          //  },
             "Emitter" : {
-                "effect" : "test/candle",
-                "offset" : {"x": 0, "y": 0, "z": 20}
+                "effect" : "test/weap/muzzle/raygun_view",
+                "offset" : {"x": 0, "y": 0, "z": 7}
+            },
+       //     "Mover" : {
+        //        "start" : {"x": -40, "y": 50, "z": 40},
+        //        "end" : {"x": -40, "y": 50, "z": 30},
+      //          "time" : 2.0
+        //    },
+            "Rotator" : {
+                "axis" : {"x": 0, "y": 0.2, "z": 0},
+                "speed": 1.0
+            },
+            "SoundObject" : {
+                "offset" : {"x": 0, "y": 15, "z": 50},
+                "occType": "SingleRay"
             }
         },
         {
@@ -267,31 +279,32 @@
             }
         },
         {
-            "origin" : {"x": -40, "y": 50, "z": 40},
-
+            "origin" : {"x": -100, "y": -150, "z": 10},
             "Mesh" : {
-                "name" : "test/prop/rustic_candle"
+                "name" : "test/prop/rolling_pan"
             },
             "MeshRenderer" : {
             },
+            "DynamicObject" : {
+            },
             "Emitter" : {
-                "effect" : "test/candle",
-                "offset" : {"x": 0, "y": 0, "z": 7}
-            },
-       //     "Mover" : {
-        //        "start" : {"x": -40, "y": 50, "z": 40},
-        //        "end" : {"x": -40, "y": 50, "z": 30},
-      //          "time" : 2.0
-        //    },
-            "Rotator" : {
-                "axis" : {"x": 0, "y": 0, "z": 0.2},
-                "speed": 5.0
-            },
-            "SoundObject" : {
-                "offset" : {"x": 0, "y": 15, "z": 50},
-                "occType": "SingleRay"
+                "effect" : "test/weap/muzzle/raygun_view",
+                "offset" : {"x": 0, "y": 0, "z": 20}
             }
         },
+        {
+            "origin" : {"x": -0, "y": 0, "z": 60},
+            "angles" : {"p": 0, "y": 90, "r": 0},
+
+            "Mesh" : {
+                "name" : "test/prop/3barrel_shotgun"
+            },
+            "MeshRenderer" : {
+            }
+        }
+
+
+        /*,
 
         {
             "name": "Bob",
