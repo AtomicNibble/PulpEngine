@@ -177,23 +177,28 @@ QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical {
 	background: none;
 }
 
+
+QRadioButton {
+	background-color: none;
+}
+
 QRadioButton::indicator:checked,QRadioButton::indicator:unchecked{
 	color: #b1b1b1;
-	background-color: #323232;
+	background-color: #222;
 	border: 1px solid #b1b1b1;
-	border-radius: 6px;
+	border-radius: 3px;
 }
 
 QRadioButton::indicator:checked {
-	background-color:Qradialgradient( cx: 0.5, cy: 0.5, fx: 0.5, fy: 0.5, radius: 1.0, stop: 0.25 #ffaa00, stop: 0.3 #323232 );
+	background-color: #900000;
 }
 
 QRadioButton::indicator {
-	border-radius: 6px;
+	border-radius: 3px;
 }
 
 QRadioButton::indicator:hover,QCheckBox::indicator:hover {
-	border: 1px solid #75AAFF;
+	border: 1px solid #eee;
 }
 
 QCheckBox::indicator {
@@ -434,7 +439,7 @@ QTableView::item:!selected {
 }
 
 QTableView::item:selected {
-	background-color: #2074DB;
+	background-color: #511;
 	color:#fff;
 }
 
@@ -625,11 +630,14 @@ QComboBox:hover,QPushButton:hover,QLineEdit:hover,QTextEdit:hover,QAbstractView:
 
 
 QGroupBox {
+	background-color: none;
     border: 1px solid #404040;
-    margin-top: 0.8em;
+    border-radius: 5px;
+    margin-top: 2ex
 }
 
 QGroupBox::title {
-    subcontrol-origin: margin;
-    padding: 0 2px 0 2px;
+	subcontrol-origin: margin;
+    subcontrol-position: top center; /* position at the top center */
+    padding: 0 3px;
 }
