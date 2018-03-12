@@ -231,8 +231,10 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 		pUndoAction_->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
 
 		pRedoAction_ = pUndoStack_->createRedoAction(this, tr("&Redo"));
-		pRedoAction_->setShortcutVisibleInContextMenu(true);
 		pRedoAction_->setShortcuts(QKeySequence::Redo);
+		pRedoAction_->setShortcutVisibleInContextMenu(true);
+		pUndoAction_->setShortcutContext(Qt::ShortcutContext::WidgetWithChildrenShortcut);
+
 
 		connect(pUndoStack_, &QUndoStack::canUndoChanged, pUndoAction_, &QAction::setEnabled);
 		connect(pUndoStack_, &QUndoStack::canRedoChanged, pRedoAction_, &QAction::setEnabled);
