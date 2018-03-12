@@ -21,6 +21,7 @@ namespace Constants
 	const char C_GLOBAL[] = "AssMan Context";
 	const char C_EDITORMANAGER[] = "EditorManager";
 	const char C_GENERAL_OUTPUT_PANE[] = "GeneralOutputPane";
+	const char C_GRAPH_EDITOR[] = "GraphEditor";
 
 	// Menubar
 	const char MENU_BAR[] = "MenuBar";
@@ -41,6 +42,7 @@ namespace Constants
 	const char M_WINDOW_PANES[] = "Menu.Window.Panes";
 	const char M_WINDOW_WINDOWS[] = "Menu.Window.Windows";
 	const char M_HELP[] = "Menu.Help";
+	const char M_GRAPH_EDITOR[] = "Menu.GraphEditor";
 
 
 	// Main menu bar groups
