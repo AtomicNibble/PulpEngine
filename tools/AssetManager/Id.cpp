@@ -59,13 +59,12 @@ namespace
 		}
 	};
 
-	static QHash<int32_t, StringHolder> stringFromId;
-	static IdCache idFromString;
+	QHash<int32_t, StringHolder> stringFromId;
+	IdCache idFromString;
+	int32_t firstUnusedId = 0x1000;
 
 	X_INLINE int32_t theId(const char* pStr, int32_t n = 0)
 	{
-		static int32_t firstUnusedId = 0x1000;
-
 		StringHolder sh(pStr, n);
 		int32_t res = idFromString.value(sh, 0);
 		if (res == 0) {
