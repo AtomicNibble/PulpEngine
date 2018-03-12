@@ -54,6 +54,17 @@ AssetManager::AssetManager(QWidget* pParent) :
 	pActionManager_ = new ActionManager(this);
 	pAssetEntryManager_ = new AssetEntryManager(this);
 
+	// ----------------------------------
+
+	pLayout_ = new QGridLayout();
+	pDockArea_ = new QMainWindow();
+
+	createActions();
+	createMenus();
+	createStatusBar();
+
+	// ----------------------------------
+
 	// Logging.
 	pOutputWindow_ = new OutputWindow(Context(Constants::C_GENERAL_OUTPUT_PANE));
 	pOutputWindow_->setWordWrapEnabled(false);
@@ -63,10 +74,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 	gEnv->pLog->AddLogger(pLoggerPolicy_);
 
 	OutputPaneManager::create();
-
-	pLayout_ = new QGridLayout();
-	pDockArea_ = new QMainWindow();
-
 
 	{
 		pDb_ = new assetDb::AssetDB();
@@ -83,12 +90,6 @@ AssetManager::AssetManager(QWidget* pParent) :
 		this, SLOT(fileChanged(const QString &)));
 
 	pWatcher_->addPath("style\\style.qss");
-
-	// ----------------------------------
-
-	createActions();
-	createMenus();
-	createStatusBar();
 
 	// ----------------------------------
 
@@ -359,15 +360,19 @@ void AssetManager::createActions(void)
 
 	pCutAct_ = new QAction(QIcon(":/misc/img/Redo.png"), tr("Cut"), this);
 	pCutAct_->setStatusTip("Cut");
-//	pCutAct_->setEnabled(false);
+	pCutAct_->setEnabled(false);
 
 	pCopyAct_ = new QAction(QIcon(":/misc/img/Copy.png"), tr("Copy"), this);
 	pCopyAct_->setStatusTip("Copy");
-//	pCopyAct_->setEnabled(false);
+	pCopyAct_->setEnabled(false);
 
 	pPasteAct_ = new QAction(QIcon(":/misc/img/Paste.png"), tr("Paste"), this);
 	pPasteAct_->setStatusTip("Paste");
-//	pPasteAct_->setEnabled(false);
+	pPasteAct_->setEnabled(false);
+
+	pSelectAll_ = new QAction(tr("Select All"), this);
+	pSelectAll_->setStatusTip("Paste");
+	pSelectAll_->setEnabled(false);
 
 	// View
 	pViewAssetDbExpoAct_ = new QAction(tr("AssetDB Explorer"), this);
@@ -378,7 +383,7 @@ void AssetManager::createActions(void)
 	connect(pWindowResetLayoutAct_, SIGNAL(triggered()), this, SLOT(resetLayout()));
 
 	pReloadStyleAct_ = new QAction(tr("Reload stylesheet"), this);
-	pPasteAct_->setStatusTip("Reload the stylesheet");
+	pReloadStyleAct_->setStatusTip("Reload the stylesheet");
 	connect(pReloadStyleAct_, SIGNAL(triggered()), this, SLOT(reloadStyle()));
 
 	// Help
@@ -501,6 +506,10 @@ void AssetManager::createMenus(void)
 		pCmd = ActionManager::registerAction(pPasteAct_, Constants::EDIT_PASTE, globalContext);
 		pCmd->setDefaultKeySequence(QKeySequence::Paste);
 		editmenu->addAction(pCmd, Constants::G_EDIT_COPYPASTE);
+
+		pCmd = ActionManager::registerAction(pSelectAll_, Constants::EDIT_SELECTALL, globalContext);
+		pCmd->setDefaultKeySequence(QKeySequence::SelectAll);
+		editmenu->addAction(pCmd, Constants::G_EDIT_SELECTALL);
 	}
 
 	// View

@@ -133,6 +133,7 @@ private:
 	QAction* pCutAct_;
 	QAction* pCopyAct_;
 	QAction* pPasteAct_;
+	QAction* pSelectAll_;
 
 	// View
 	QAction* pViewAssetDbExpoAct_;
