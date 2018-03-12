@@ -32,36 +32,36 @@ OutputWindow::OutputWindow(Context context, QWidget *parent) :
 	pOutputWindowContext_->setWidget(this);
 	ICore::addContextObject(pOutputWindowContext_);
 
-	QAction* undoAction = new QAction(this);
-	QAction* redoAction = new QAction(this);
-	QAction* cutAction = new QAction(this);
+//	QAction* undoAction = new QAction(this);
+//	QAction* redoAction = new QAction(this);
+//	QAction* cutAction = new QAction(this);
 	QAction* copyAction = new QAction(this);
-	QAction* pasteAction = new QAction(this);
+//	QAction* pasteAction = new QAction(this);
 	QAction* selectAllAction = new QAction(this);
 
 
-	ActionManager::registerAction(undoAction, Constants::EDIT_UNDO, context);
-	ActionManager::registerAction(redoAction, Constants::EDIT_REDO, context);
-	ActionManager::registerAction(cutAction, Constants::EDIT_CUT, context);
+//	ActionManager::registerAction(undoAction, Constants::EDIT_UNDO, context);
+//	ActionManager::registerAction(redoAction, Constants::EDIT_REDO, context);
+//	ActionManager::registerAction(cutAction, Constants::EDIT_CUT, context);
 	ActionManager::registerAction(copyAction, Constants::EDIT_COPY, context);
-	ActionManager::registerAction(pasteAction, Constants::EDIT_PASTE, context);
+//	ActionManager::registerAction(pasteAction, Constants::EDIT_PASTE, context);
 	ActionManager::registerAction(selectAllAction, Constants::EDIT_SELECTALL, context);
 
-	connect(undoAction, &QAction::triggered, this, &QPlainTextEdit::undo);
-	connect(redoAction, &QAction::triggered, this, &QPlainTextEdit::redo);
-	connect(cutAction,	&QAction::triggered, this, &QPlainTextEdit::cut);
+//	connect(undoAction, &QAction::triggered, this, &QPlainTextEdit::undo);
+//	connect(redoAction, &QAction::triggered, this, &QPlainTextEdit::redo);
+//	connect(cutAction,	&QAction::triggered, this, &QPlainTextEdit::cut);
 	connect(copyAction, &QAction::triggered, this, &QPlainTextEdit::copy);
-	connect(pasteAction, &QAction::triggered, this, &QPlainTextEdit::paste);
+//	connect(pasteAction, &QAction::triggered, this, &QPlainTextEdit::paste);
 	connect(selectAllAction, &QAction::triggered, this, &QPlainTextEdit::selectAll);
 
-	connect(this, &QPlainTextEdit::undoAvailable, undoAction, &QAction::setEnabled);
-	connect(this, &QPlainTextEdit::redoAvailable, redoAction, &QAction::setEnabled);
-	connect(this, &QPlainTextEdit::copyAvailable, cutAction,  &QAction::setEnabled);  // OutputWindow never read-only
+//	connect(this, &QPlainTextEdit::undoAvailable, undoAction, &QAction::setEnabled);
+//	connect(this, &QPlainTextEdit::redoAvailable, redoAction, &QAction::setEnabled);
+//	connect(this, &QPlainTextEdit::copyAvailable, cutAction,  &QAction::setEnabled);  // OutputWindow never read-only
 	connect(this, &QPlainTextEdit::copyAvailable, copyAction, &QAction::setEnabled);
 
-	undoAction->setEnabled(false);
-	redoAction->setEnabled(false);
-	cutAction->setEnabled(false);
+//	undoAction->setEnabled(false);
+//	redoAction->setEnabled(false);
+//	cutAction->setEnabled(false);
 	copyAction->setEnabled(false);
 }
 
@@ -106,7 +106,8 @@ void OutputWindow::appendMessage(const QString& output)
 	if (atBottom) {
 		scrollToBottom();
 	}
-	enableUndoRedo();
+
+//	enableUndoRedo();
 }
 
 void OutputWindow::appendMessage(const char* pLine, int32_t length)
