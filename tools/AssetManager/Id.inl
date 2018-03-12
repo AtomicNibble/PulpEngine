@@ -7,6 +7,12 @@ Id::Id() :
 {
 }
 
+Id::Id(const Id& oth) :
+	id_(oth.id_)
+{
+
+}
+
 Id::Id(int32_t uid) : 
 	id_(uid)
 {

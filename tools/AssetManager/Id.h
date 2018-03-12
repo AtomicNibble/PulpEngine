@@ -9,6 +9,7 @@ class Id
 {
 public:
 	X_INLINE Id();
+	X_INLINE Id(const Id& oth);
 	X_INLINE Id(int32_t uid);
 	Id(const char* pName);
 
