@@ -1,11 +1,19 @@
 #pragma once
 
-#include <QtCharts\QChartView.h>
-#include <QtCharts\Qchart.h>
-#include <QtCharts\QLineSeries.h>
-#include <QtCharts\qvalueaxis.h>
-
 #include <QObject>
+#include <QtCharts/QChartView.h>
+
+QT_BEGIN_NAMESPACE
+
+namespace QtCharts
+{
+	class QLineSeries;
+	class QChart;
+	class QValueAxis;
+
+} // namespace QtCharts
+
+QT_END_NAMESPACE
 
 X_NAMESPACE_BEGIN(assman)
 
@@ -82,36 +90,10 @@ private:
 
 
 	public:
-		ResetGraph(Graph& graph) :
-			graph_(graph)
-		{
-			graphPoints_.resize(graph.series.size());
-			for (int32_t i=0; i<graphPoints_.size(); i++)
-			{
-				graphPoints_[i] = graph.series[i]->pointsVector();
-			}
-		}
+		ResetGraph(Graph& graph);
 
-		void redo(void) X_FINAL
-		{
-			// reset all to default.
-			for (int32_t i = 0; i<graphPoints_.size(); i++)
-			{
-				auto* pSeries = graph_.series[i];
-				pSeries->clear();
-				// what is default?
-				pSeries->append(0, 0.5);
-				pSeries->append(1, 0.5);
-			}
-		}
-
-		void undo(void) X_FINAL
-		{
-			for (int32_t i = 0; i<graphPoints_.size(); i++)
-			{
-				graph_.series[i]->replace(graphPoints_[i]);
-			}
-		}
+		void redo(void) X_FINAL;
+		void undo(void) X_FINAL;
 
 	private:
 		Graph& graph_;
@@ -121,26 +103,10 @@ private:
 	class ClearPoints : public QUndoCommand
 	{
 	public:
-		ClearPoints(QtCharts::QLineSeries* pSeries) :
-			pSeries_(pSeries)
-		{
-			points_ = pSeries->pointsVector();
-		}
+		ClearPoints(QtCharts::QLineSeries* pSeries);
 
-		void redo(void) X_FINAL
-		{
-			if (points_.size() > 0) {
-				pSeries_->clear();
-				pSeries_->append(points_.front());
-				pSeries_->append(points_.back());
-			}
-		}
-
-		void undo(void) X_FINAL
-		{
-			pSeries_->replace(points_);
-		}
-
+		void redo(void) X_FINAL;
+		void undo(void) X_FINAL;
 
 	private:
 		QtCharts::QLineSeries* pSeries_;
@@ -150,29 +116,10 @@ private:
 	class AddPoint : public QUndoCommand
 	{
 	public:
-		AddPoint(Graph& graph, int32_t index, QPointF point) :
-			graph_(graph),
-			index_(index),
-			point_(point)
-		{
-			
-		}
+		AddPoint(Graph& graph, int32_t index, QPointF point);
 
-		void redo(void) X_FINAL
-		{
-			for (auto* pSeries : graph_.series)
-			{
-				pSeries->insert(index_, point_);
-			}
-		}
-
-		void undo(void) X_FINAL
-		{
-			for (auto* pSeries : graph_.series)
-			{
-				pSeries->remove(index_);
-			}
-		}
+		void redo(void) X_FINAL;
+		void undo(void) X_FINAL;
 
 	private:
 		Graph& graph_;
@@ -183,66 +130,12 @@ private:
 	class MovePoint : public QUndoCommand
 	{
 	public:
-		MovePoint(Graph& graph, int32_t activeSeries, int32_t index, QPointF delta) :
-			graph_(graph),
-			delta_(delta),
-			activeSeries_(activeSeries),
-			index_(index)
-		{
-		}
+		MovePoint(Graph& graph, int32_t activeSeries, int32_t index, QPointF delta);
 
-		void redo(void) X_FINAL
-		{
-			auto& s = graph_.series;
-			for (int32_t i = 0; i < s.size(); i++)
-			{
-				auto pos = s[i]->at(index_);
-				if (i == activeSeries_)
-				{
-					pos += delta_;
-				}
-				else
-				{
-					pos.setX(pos.x() + delta_.x());
-				}
-
-				s[i]->replace(index_, pos);
-			}
-		}
-
-		void undo(void) X_FINAL
-		{
-			auto& s = graph_.series;
-			for (int32_t i = 0; i < s.size(); i++)
-			{
-				auto pos = s[i]->at(index_);
-				if (i == activeSeries_)
-				{
-					pos -= delta_;
-				}
-				else
-				{
-					pos.setX(pos.x() - delta_.x());
-				}
-
-				s[i]->replace(index_, pos);
-			}
-		}
-
-		int id(void) const X_FINAL
-		{
-			return 1;
-		}
-
-		bool mergeWith(const QUndoCommand* pOth) X_FINAL
-		{
-			if (pOth->id() != id()) {
-				return false;
-			}
-
-			delta_ += static_cast<const MovePoint*>(pOth)->delta_;
-			return true;
-		}
+		void redo(void) X_FINAL;
+		void undo(void) X_FINAL;
+		int id(void) const X_FINAL;
+		bool mergeWith(const QUndoCommand* pOth) X_FINAL;
 
 	private:
 		Graph& graph_;

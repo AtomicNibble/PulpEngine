@@ -49,6 +49,157 @@ SpinBoxRange::SpinBoxRange(QWidget* parent) :
 
 // -----------------------------------
 
+GraphEditorView::ResetGraph::ResetGraph(Graph& graph) :
+	graph_(graph)
+{
+	graphPoints_.resize(graph.series.size());
+	for (int32_t i = 0; i<graphPoints_.size(); i++)
+	{
+		graphPoints_[i] = graph.series[i]->pointsVector();
+	}
+}
+
+void GraphEditorView::ResetGraph::redo(void)
+{
+	// reset all to default.
+	for (int32_t i = 0; i < graphPoints_.size(); i++)
+	{
+		auto* pSeries = graph_.series[i];
+		pSeries->clear();
+		// what is default?
+		pSeries->append(0, 0.5);
+		pSeries->append(1, 0.5);
+	}
+}
+
+void GraphEditorView::ResetGraph::undo(void)
+{
+	for (int32_t i = 0; i < graphPoints_.size(); i++)
+	{
+		graph_.series[i]->replace(graphPoints_[i]);
+	}
+}
+
+// -----------------------------------
+
+GraphEditorView::ClearPoints::ClearPoints(QtCharts::QLineSeries* pSeries) :
+	pSeries_(pSeries)
+{
+	points_ = pSeries->pointsVector();
+}
+
+
+void GraphEditorView::ClearPoints::redo(void)
+{
+	if (points_.size() > 0) {
+		pSeries_->clear();
+		pSeries_->append(points_.front());
+		pSeries_->append(points_.back());
+	}
+}
+
+void GraphEditorView::ClearPoints::undo(void)
+{
+	pSeries_->replace(points_);
+}
+
+
+// -----------------------------------
+
+GraphEditorView::AddPoint::AddPoint(Graph& graph, int32_t index, QPointF point) :
+	graph_(graph),
+	index_(index),
+	point_(point)
+{
+
+}
+
+
+void GraphEditorView::AddPoint::redo(void)
+{
+	for (auto* pSeries : graph_.series)
+	{
+		pSeries->insert(index_, point_);
+	}
+}
+
+void GraphEditorView::AddPoint::undo(void)
+{
+	for (auto* pSeries : graph_.series)
+	{
+		pSeries->remove(index_);
+	}
+}
+
+// -----------------------------------
+
+
+GraphEditorView::MovePoint::MovePoint(Graph& graph, int32_t activeSeries, int32_t index, QPointF delta) :
+	graph_(graph),
+	delta_(delta),
+	activeSeries_(activeSeries),
+	index_(index)
+{
+}
+
+void GraphEditorView::MovePoint::redo(void)
+{
+	auto& s = graph_.series;
+	for (int32_t i = 0; i < s.size(); i++)
+	{
+		auto pos = s[i]->at(index_);
+		if (i == activeSeries_)
+		{
+			pos += delta_;
+		}
+		else
+		{
+			pos.setX(pos.x() + delta_.x());
+		}
+
+		s[i]->replace(index_, pos);
+	}
+}
+
+void GraphEditorView::MovePoint::undo(void)
+{
+	auto& s = graph_.series;
+	for (int32_t i = 0; i < s.size(); i++)
+	{
+		auto pos = s[i]->at(index_);
+		if (i == activeSeries_)
+		{
+			pos -= delta_;
+		}
+		else
+		{
+			pos.setX(pos.x() - delta_.x());
+		}
+
+		s[i]->replace(index_, pos);
+	}
+}
+
+int GraphEditorView::MovePoint::id(void) const
+{
+	return 1;
+}
+
+bool GraphEditorView::MovePoint::mergeWith(const QUndoCommand* pOth)
+{
+	if (pOth->id() != id()) {
+		return false;
+	}
+
+	delta_ += static_cast<const MovePoint*>(pOth)->delta_;
+	return true;
+}
+
+
+
+// -----------------------------------
+
+
 
 GraphEditorView::GraphEditorView(QWidget *parent) :
 	QChartView(parent),
