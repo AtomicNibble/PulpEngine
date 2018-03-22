@@ -47,6 +47,19 @@ SpinBoxRange::SpinBoxRange(QWidget* parent) :
 	setLayout(pLayout);
 }
 
+void SpinBoxRange::setValue(const Range& r)
+{
+	pStart_->setValue(r.start);
+	pRange_->setValue(r.range);
+}
+
+void SpinBoxRange::getValue(Range& r)
+{
+	r.start = pStart_->value();
+	r.range = pRange_->value();
+}
+
+
 // -----------------------------------
 
 GraphEditorView::ResetGraph::ResetGraph(Graph& graph) :
@@ -204,6 +217,7 @@ bool GraphEditorView::MovePoint::mergeWith(const QUndoCommand* pOth)
 GraphEditorView::GraphEditorView(QWidget *parent) :
 	QChartView(parent),
 	mouseActive_(false),
+	singleActiveSeries_(false),
 	activePoint_(-1),
 	activeSeries_(-1),
 	activeGraph_(-1),
@@ -270,6 +284,59 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 	setChart(pChart_);
 }
 
+
+void GraphEditorView::setSeriesValue(int32_t idx, const GrapInfo& g)
+{
+	// take the graphs and apply them.
+	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
+
+	for (size_t i = 0; i < g.series.size(); i++)
+	{
+		auto& series = g.series[i];
+
+		if (i >= graphs_.size()) {
+			break;
+		}
+
+		auto& graphSeries = graphs_[i].series;
+		auto* pSeries = graphSeries.front();
+
+		pSeries->clear();
+
+		for (size_t p=0; p<series.points.size(); p++)
+		{
+			const GraphPoint& point = series.points[p];
+			pSeries->append(point.pos, point.val);
+		}
+	}
+}
+
+void GraphEditorView::getSeriesValue(int32_t idx, GrapInfo& g)
+{
+	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
+
+	g.series.resize(graphs_.size());
+
+	for (size_t i = 0; i < graphs_.size(); i++)
+	{
+		const auto& src = graphs_[i];
+		const auto* pSeries = src.series[idx];
+
+		auto& series = g.series[i];
+		series.points.resize(pSeries->count());
+
+		auto points = pSeries->pointsVector();
+
+		for (int32_t p = 0; p < points.count(); p++)
+		{
+			GraphPoint& point = series.points[p];
+			point.pos = points[p].rx();
+			point.val = points[p].ry();
+		}
+	}
+}
+
+
 void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 {
 	if (numGraphs < 1 || numSeries < 1) {
@@ -306,13 +373,18 @@ void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 
 		for (int32_t i = 0; i < numSeries; i++)
 		{
-			if (i == activeSeries_)
+			if (i == 0)
 			{
 				pen.setColor(colors_[i]);
 			}
 			else
 			{
 				pen.setColor(colors_[i].darker(DarkenFactor));
+			}
+
+			if (singleActiveSeries_ && i == 1)
+			{
+				pen.setStyle(DisabledPenStyle);
 			}
 
 			QLineSeries* pSeries = new QLineSeries();
@@ -377,6 +449,14 @@ void GraphEditorView::setSeriesColor(int32_t i, const QColor& col)
 	}
 }
 
+void GraphEditorView::setSingleActiveSeries(bool value)
+{
+	singleActiveSeries_ = value;
+
+
+
+}
+
 void GraphEditorView::setSeriesActive(int32_t seriesIdx)
 {
 	if (activeSeries_ == seriesIdx) {
@@ -396,6 +476,12 @@ void GraphEditorView::setSeriesActive(int32_t seriesIdx)
 	if (pCurrentSeries)
 	{
 		pen.setColor(colors_[activeSeries_].darker(DarkenFactor));
+
+		if (singleActiveSeries_)
+		{
+			pen.setStyle(DisabledPenStyle);
+		}
+
 		pCurrentSeries->setPen(pen);
 	}
 
@@ -429,8 +515,6 @@ void GraphEditorView::setGraphActive(int32_t graphIdx)
 		}
 	}
 
-	pen.setStyle(Qt::SolidLine);
-
 	// activate all series in target graph.
 	auto& g = graphs_[graphIdx];
 
@@ -455,10 +539,20 @@ void GraphEditorView::setGraphActive(int32_t graphIdx)
 		if (i == activeSeries_)
 		{
 			pen.setColor(colors_[i]);
+			pen.setStyle(Qt::SolidLine);
 		}
 		else
 		{
 			pen.setColor(colors_[i].darker(DarkenFactor));
+
+			if (singleActiveSeries_)
+			{
+				pen.setStyle(DisabledPenStyle);
+			}
+			else
+			{
+				pen.setStyle(Qt::SolidLine);
+			}
 		}
 
 		g.series[i]->setPen(pen);
@@ -506,6 +600,8 @@ void GraphEditorView::mouseMoveEvent(QMouseEvent *event)
 		QPointF delta = newVal - curVal;
 		
 		pUndoStack_->push(new MovePoint(g, activeSeries_, activePoint_, delta));
+
+		emit pointsChanged();
 		return;
 	}
 
@@ -558,6 +654,8 @@ void GraphEditorView::mousePressEvent(QMouseEvent *event)
 			}
 
 			pUndoStack_->push(new AddPoint(activeGraph(), i, value));		
+
+			emit pointsChanged();
 			return;
 		}
 	}
@@ -776,6 +874,12 @@ X_INLINE QtCharts::QLineSeries* GraphEditorView::activeSeries(void) const
 	return graphs_[activeGraph_].series[activeSeries_];
 }
 
+
+X_INLINE const GraphEditorView::Graph& GraphEditorView::activeGraph(void) const
+{
+	return graphs_[activeGraph_];
+}
+
 X_INLINE GraphEditorView::Graph& GraphEditorView::activeGraph(void)
 {
 	return graphs_[activeGraph_];
@@ -798,13 +902,21 @@ GradientWidget::GradientWidget(QWidget* parent) :
 
 }
 
+void GradientWidget::setColors(const ColorPointArr& colors)
+{
+	colors_ = colors;
+
+	update();
+}
 
 void GradientWidget::paintEvent(QPaintEvent*)
 {
 	QLinearGradient grad(0,0, width(), height());
-	grad.setColorAt(0, Qt::red);
-	grad.setColorAt(0.5, Qt::white);
-	grad.setColorAt(1, Qt::green);
+
+	for (const auto& cp : colors_)
+	{
+		grad.setColorAt(cp.pos, cp.col);
+	}
 
 	QPainter painter(this);
 	painter.fillRect(rect(), grad);
@@ -826,6 +938,8 @@ ColorGraphEditor::ColorGraphEditor(int32_t numGraph, QWidget* parent) :
 	pGraph_->setSeriesColor(1, QColor(QRgb(0x00c000)));
 	pGraph_->setSeriesColor(2, QColor(QRgb(0x0000c0)));
 
+	connect(pGraph_, &GraphEditorView::pointsChanged, this, &ColorGraphEditor::updateColor);
+
 	pGradient_ = new GradientWidget();
 	pGradient_->setMinimumHeight(10);
 
@@ -835,9 +949,64 @@ ColorGraphEditor::ColorGraphEditor(int32_t numGraph, QWidget* parent) :
 		pLayout->addWidget(pGradient_);
 	}
 
+	// i need to know when the graph changes.
+	// so i can update colors.
+
 	setLayout(pLayout);
 }
 
+void ColorGraphEditor::updateColor(void)
+{
+	// i only care for active graph.
+	const auto& graph = const_cast<const GraphEditorView*>(pGraph_)->activeGraph();
+
+	// now i want all the graphs.
+	if (graph.series.size() != 3) {
+		return;
+	}
+
+	colors_.resize(graph.series.front()->count());
+
+	auto* pSeriesR = graph.series[0];
+	auto* pSeriesG = graph.series[1];
+	auto* pSeriesB = graph.series[2];
+
+	auto pointsR = pSeriesR->pointsVector();
+	auto pointsG = pSeriesG->pointsVector();
+	auto pointsB = pSeriesB->pointsVector();
+
+	for (int32_t p = 0; p < pointsR.count(); p++)
+	{
+		auto pos = pointsR[p].x();
+
+		auto r = pointsR[p].y();
+		auto g = pointsG[p].y();
+		auto b = pointsB[p].y();
+
+		colors_[p].pos = pos;
+		colors_[p].col = QColor::fromRgbF(r,g,b);
+	}
+
+	pGradient_->setColors(colors_);
+}
+
+
+void ColorGraphEditor::setValue(const ColorInfo& col)
+{
+	// need to update graphs.
+	pGraph_->setSeriesValue(0, col.r);
+	pGraph_->setSeriesValue(1, col.g);
+	pGraph_->setSeriesValue(2, col.b);
+
+	updateColor();
+}
+
+void ColorGraphEditor::getValue(ColorInfo& col)
+{
+	pGraph_->getSeriesValue(0, col.r);
+	pGraph_->getSeriesValue(1, col.g);
+	pGraph_->getSeriesValue(2, col.b);
+}
 
 // -----------------------------------
 
@@ -847,11 +1016,12 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
-		pSizeGraph_ = new GraphEditor(2, 1);
-		pScale_ = new QSpinBox();
+		pGraph_ = new GraphEditor(2, 1);
+		pScale_ = new QDoubleSpinBox();
 		pScale_->setMaximumWidth(50);
+		pScale_->setSingleStep(0.05);
 
-		pLayout->addWidget(pSizeGraph_);
+		pLayout->addWidget(pGraph_);
 
 		QFormLayout* pFormLayout = new QFormLayout();
 		pFormLayout->addRow(tr("Scale"), pScale_);
@@ -862,10 +1032,23 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 	setLayout(pLayout);
 }
 
+
+void GraphWithScale::setValue(const GrapScaleInfo& g)
+{
+	pGraph_->setSeriesValue(0, g);
+	pScale_->setValue(g.scale);
+}
+
+void GraphWithScale::getValue(GrapScaleInfo& g)
+{
+	pGraph_->getSeriesValue(0, g);
+	g.scale = pScale_->value();
+}
+
 // -----------------------------------
 
 
-SegmentList::SegmentList(QWidget* parent) :
+SegmentListWidget::SegmentListWidget(QWidget* parent) :
 	QWidget(parent)
 {
 	QVBoxLayout* pTableLayout = new QVBoxLayout();
@@ -883,7 +1066,8 @@ SegmentList::SegmentList(QWidget* parent) :
 		pTable_->setHorizontalHeaderLabels(labels);
 		pTable_->horizontalHeader()->setStretchLastSection(true);
 
-		connect(pTable_, &QTableWidget::itemSelectionChanged, this, &SegmentList::itemSelectionChanged);
+		connect(pTable_, &QTableWidget::itemSelectionChanged, this, &SegmentListWidget::itemSelectionChanged);
+		connect(pTable_, &QTableWidget::itemSelectionChanged, this, &SegmentListWidget::selectionChanged);
 
 		pTableLayout->addWidget(pTable_);
 	}
@@ -898,8 +1082,8 @@ SegmentList::SegmentList(QWidget* parent) :
 		pDelete_->setMaximumWidth(80);
 		pDelete_->setEnabled(false);
 
-		connect(pAdd, &QPushButton::clicked, this, &SegmentList::addStageClicked);
-		connect(pDelete_, &QPushButton::clicked, this, &SegmentList::deleteSelectedStageClicked);
+		connect(pAdd, &QPushButton::clicked, this, &SegmentListWidget::addStageClicked);
+		connect(pDelete_, &QPushButton::clicked, this, &SegmentListWidget::deleteSelectedStageClicked);
 
 		pButtonLayout->addWidget(pAdd);
 		pButtonLayout->addWidget(pDelete_);
@@ -911,14 +1095,25 @@ SegmentList::SegmentList(QWidget* parent) :
 	setLayout(pTableLayout);
 }
 
-void SegmentList::itemSelectionChanged(void)
+
+int SegmentListWidget::count(void) const
+{
+	return pTable_->rowCount();
+}
+
+int SegmentListWidget::currentRow(void) const
+{
+	return pTable_->currentRow();
+}
+
+void SegmentListWidget::itemSelectionChanged(void)
 {
 	const int num = pTable_->selectedItems().size();
 
 	pDelete_->setEnabled(num != 0);
 }
 
-void SegmentList::addStageClicked(void)
+void SegmentListWidget::addStageClicked(void)
 {
 	int32_t row = pTable_->rowCount();
 	pTable_->insertRow(row);
@@ -936,14 +1131,14 @@ void SegmentList::addStageClicked(void)
 	pTable_->setItem(row, 3, pItem3);
 }
 
-void SegmentList::deleteSelectedStageClicked(void)
+void SegmentListWidget::deleteSelectedStageClicked(void)
 {
 	// TODO.
 }
 
 // -----------------------------------
 
-SpawnInfo::SpawnInfo(QWidget* parent) :
+SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 	QGroupBox("Spawn", parent)
 {
 	QFormLayout* pLayout = new QFormLayout();
@@ -986,9 +1181,31 @@ SpawnInfo::SpawnInfo(QWidget* parent) :
 	setLayout(pLayout);
 }
 
+void SpawnInfoWidget::setValue(const SpawnInfo& spawn)
+{
+	pLooping_->setChecked(spawn.looping);
+	pInterval_->setValue(spawn.interval);
+	pLoopCount_->setValue(spawn.loopCount);
+
+	pCount_->setValue(spawn.count);
+	pLife_->setValue(spawn.life);
+	pDelay_->setValue(spawn.delay);
+}
+
+void SpawnInfoWidget::getValue(SpawnInfo& spawn)
+{
+	spawn.looping = pLooping_->isChecked();
+	spawn.interval = pInterval_->value();
+	spawn.loopCount = pLoopCount_->value();
+
+	pCount_->getValue(spawn.count);
+	pLife_->getValue(spawn.life);
+	pDelay_->getValue(spawn.delay);
+}
+
 // -----------------------------------
 
-OriginInfo::OriginInfo(QWidget* parent) :
+OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 	QGroupBox("Origin", parent)
 {
 	QFormLayout* pLayout = new QFormLayout();
@@ -1005,10 +1222,24 @@ OriginInfo::OriginInfo(QWidget* parent) :
 	setLayout(pLayout);
 }
 
+void OriginInfoWidget::setValue(const OriginInfo& org)
+{
+	pForward_->setValue(org.spawnOrgX);
+	pRight_->setValue(org.spawnOrgY);
+	pUp_->setValue(org.spawnOrgZ);
+}
+
+void OriginInfoWidget::getValue(OriginInfo& org)
+{
+	pForward_->getValue(org.spawnOrgX);
+	pRight_->getValue(org.spawnOrgY);
+	pUp_->getValue(org.spawnOrgZ);
+}
+
 // -----------------------------------
 
 
-SequenceInfo::SequenceInfo(QWidget* parent) :
+SequenceInfoWidget::SequenceInfoWidget(QWidget* parent) :
 	QGroupBox("Sequence Control", parent)
 {
 	QFormLayout* pLayout = new QFormLayout();
@@ -1025,6 +1256,22 @@ SequenceInfo::SequenceInfo(QWidget* parent) :
 	setLayout(pLayout);
 }
 
+
+void SequenceInfoWidget::setValue(const SequenceInfo& sq)
+{
+	pStart_->setValue(sq.startFrame);
+	pPlayRate_->setValue(sq.fps);
+	pLoopCount_->setValue(sq.loop);
+}
+
+void SequenceInfoWidget::getValue(SequenceInfo& sq)
+{
+	sq.startFrame = pStart_->value();
+	sq.fps = pPlayRate_->value();
+	sq.loop = pLoopCount_->value();
+}
+
+
 // -----------------------------------
 
 
@@ -1033,8 +1280,13 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
-		pVelGraph_ = new GraphEditor(6, 1);
-	
+		pVelGraph_ = new GraphEditorView();
+		pVelGraph_->setSingleActiveSeries(true);
+		pVelGraph_->createGraphs(2, 3);
+		pVelGraph_->setSeriesName(0, "Forward");
+		pVelGraph_->setSeriesName(1, "Right");
+		pVelGraph_->setSeriesName(2, "Up");
+
 		pForwardScale_ = new QSpinBox();
 		pForwardScale_->setMinimumWidth(50);
 		pForwardScale_->setMaximumWidth(50);
@@ -1062,10 +1314,33 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 }
 
 
+void VelocityGraph::setValue(const VelocityInfo& vel)
+{
+	pVelGraph_->setSeriesValue(0, vel.forward);
+	pVelGraph_->setSeriesValue(1, vel.right);
+	pVelGraph_->setSeriesValue(2, vel.up);
+
+	pUpScale_->setValue(vel.up.scale);
+	pForwardScale_->setValue(vel.forward.scale);
+	pRightScale_->setValue(vel.right.scale);
+}
+
+void VelocityGraph::getValue(VelocityInfo& vel)
+{
+	pVelGraph_->getSeriesValue(0, vel.up);
+	pVelGraph_->getSeriesValue(1, vel.forward);
+	pVelGraph_->getSeriesValue(2, vel.right);
+
+	vel.up.scale = pUpScale_->value();
+	vel.forward.scale = pForwardScale_->value();
+	vel.right.scale = pRightScale_->value();
+}
+
+
 // -----------------------------------
 
 
-VelocityInfo::VelocityInfo(QWidget* parent) :
+VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
 	QGroupBox("Velocity", parent)
 {
 	QFormLayout* pLayout = new QFormLayout();
@@ -1095,19 +1370,41 @@ VelocityInfo::VelocityInfo(QWidget* parent) :
 			pMoveGroupBox->setLayout(pMoveLayout);
 		}
 
-		VelocityGraph* pGraph = new VelocityGraph();
+		pGraph_ = new VelocityGraph();
 
 		pLayout->addWidget(pMoveGroupBox);
-		pLayout->addWidget(pGraph);
+		pLayout->addWidget(pGraph_);
 	}
 
 	setLayout(pLayout);
 }
 
+void VelocityInfoWidget::setValue(const VelocityInfo& vel)
+{
+	static_assert(engine::fx::RelativeTo::ENUM_COUNT == 2, "Enum count changed? This might need updating");
+
+	if (vel.postionType == engine::fx::RelativeTo::Spawn) {
+		pSpawn_->setChecked(true);
+	}
+
+	pGraph_->setValue(vel);
+}
+
+void VelocityInfoWidget::getValue(VelocityInfo& vel)
+{
+	static_assert(engine::fx::RelativeTo::ENUM_COUNT == 2, "Enum count changed? This might need updating");
+
+	vel.postionType = engine::fx::RelativeTo::Now;
+	if (pSpawn_->isChecked()) {
+		vel.postionType = engine::fx::RelativeTo::Spawn;
+	} 
+
+	pGraph_->getValue(vel);
+}
 
 // -----------------------------------
 
-RotationGraph::RotationGraph(QWidget *parent) :
+RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 	QGroupBox("Rotation", parent)
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
@@ -1130,6 +1427,20 @@ RotationGraph::RotationGraph(QWidget *parent) :
 	setLayout(pLayout);
 }
 
+
+void RotationGraphWidget::setValue(const RotationInfo& rot)
+{
+	pInitialRotation_->setValue(rot.initial);
+
+}
+
+void RotationGraphWidget::getValue(RotationInfo& rot)
+{
+	pInitialRotation_->getValue(rot.initial);
+
+
+}
+
 // -----------------------------------
 	
 ColorGraph::ColorGraph(QWidget *parent) :
@@ -1144,6 +1455,18 @@ ColorGraph::ColorGraph(QWidget *parent) :
 
 	setLayout(pLayout);
 }
+
+
+void ColorGraph::setValue(const ColorInfo& col)
+{
+	pColorGraph_->setValue(col);
+}
+
+void ColorGraph::getValue(ColorInfo& col)
+{
+	pColorGraph_->getValue(col);
+}
+
 
 // -----------------------------------
 
@@ -1160,12 +1483,21 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 	setLayout(pLayout);
 }
 
+void AlphaGraph::setValue(const ColorInfo& col)
+{
+	pAlphaGraph_->setSeriesValue(0, col.alpha);
+}
+
+void AlphaGraph::getValue(ColorInfo& col)
+{
+	pAlphaGraph_->getSeriesValue(0, col.alpha);
+}
 
 
 // -----------------------------------
 
 
-VisualsInfo::VisualsInfo(QWidget* parent) :
+VisualsInfoWidget::VisualsInfoWidget(QWidget* parent) :
 	QGroupBox("Visuals", parent)
 {
 	QFormLayout* pLayout = new QFormLayout();
@@ -1188,6 +1520,21 @@ VisualsInfo::VisualsInfo(QWidget* parent) :
 	setLayout(pLayout);
 }
 
+void VisualsInfoWidget::setValue(const VisualsInfo& vis)
+{
+	pMaterial_->setText(vis.material);
+	pType_->setCurrentIndex(static_cast<int32_t>(vis.type));
+}
+
+void VisualsInfoWidget::getValue(VisualsInfo& vis)
+{
+	vis.material = pMaterial_->text();
+	
+	auto idx = pType_->currentIndex();
+	X_ASSERT(idx >= 0 && idx < engine::fx::StageType::ENUM_COUNT, "Invalid index for type combo")(idx, engine::fx::StageType::ENUM_COUNT);
+
+	vis.type = static_cast<engine::fx::StageType::Enum>(idx);
+}
 
 // -----------------------------------
 
@@ -1195,7 +1542,8 @@ VisualsInfo::VisualsInfo(QWidget* parent) :
 
 AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value) :
 	QWidget(parent),
-	pAssEntry_(pAssEntry)
+	pAssEntry_(pAssEntry),
+	currentSegment_(-1)
 {
 //	QHBoxLayout* pLayout = new QHBoxLayout();
 //	pLayout->setContentsMargins(0, 0, 0, 0);
@@ -1205,63 +1553,78 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 	{
 		QVBoxLayout* pTableLayout = new QVBoxLayout();
 
-		SpawnInfo* pSapwn = new SpawnInfo();
-		OriginInfo* pOrigin = new OriginInfo();
-		SegmentList* pSegments = new SegmentList();
-		SequenceInfo* pSeq = new SequenceInfo();
-		GraphWithScale* pSize = new GraphWithScale("Size");
-		GraphWithScale* pScale = new GraphWithScale("Scale");
-		VisualsInfo* pVisual = new VisualsInfo();
-		VelocityInfo* pVelocity = new VelocityInfo();
-		RotationGraph* pRot = new RotationGraph();
-		ColorGraph* pCol = new ColorGraph();
-		AlphaGraph* pAlpha = new AlphaGraph();
+		pSapwn_ = new SpawnInfoWidget();
+		pOrigin_ = new OriginInfoWidget();
+		pSegments_ = new SegmentListWidget();
+		pSequence_ = new SequenceInfoWidget();
+		pSize_ = new GraphWithScale("Size");
+		pScale_ = new GraphWithScale("Scale");
+		pVisualInfo_ = new VisualsInfoWidget();
+		pVerlocity_ = new VelocityInfoWidget();
+		pRotation_ = new RotationGraphWidget();
+		pCol_ = new ColorGraph();
+		pAlpha_ = new AlphaGraph();
 
 		const int minHeight = 300;
 		const int minWidth = 300;
 		const int maxWidth = 400;
 
-		pSize->setMinimumWidth(300);
-		pScale->setMinimumWidth(300);
-		pVelocity->setMinimumWidth(300);
-		pRot->setMinimumWidth(300);
-		pCol->setMinimumWidth(300);
-		pAlpha->setMinimumWidth(300);
+		pSize_->setMinimumWidth(300);
+		pScale_->setMinimumWidth(300);
+		pVerlocity_->setMinimumWidth(300);
+		pRotation_->setMinimumWidth(300);
+		pCol_->setMinimumWidth(300);
+		pAlpha_->setMinimumWidth(300);
 
-		pSize->setMinimumHeight(minHeight);
-		pScale->setMinimumHeight(minHeight);
-		pVelocity->setMinimumHeight(minHeight);
-		pRot->setMinimumHeight(minHeight);
-		pCol->setMinimumHeight(minHeight);
-		pAlpha->setMinimumHeight(minHeight);
+		pSize_->setMinimumHeight(minHeight);
+		pScale_->setMinimumHeight(minHeight);
+		pVerlocity_->setMinimumHeight(minHeight);
+		pRotation_->setMinimumHeight(minHeight);
+		pCol_->setMinimumHeight(minHeight);
+		pAlpha_->setMinimumHeight(minHeight);
 
-		pSize->setMaximumWidth(maxWidth);
-		pScale->setMaximumWidth(maxWidth);
-		pVelocity->setMaximumWidth(maxWidth);
-		pRot->setMaximumWidth(maxWidth);
-		pVisual->setMaximumWidth(maxWidth);
-		pSapwn->setMaximumWidth(maxWidth);
-		pOrigin->setMaximumWidth(maxWidth);
-		pSeq->setMaximumWidth(maxWidth);
-		pCol->setMaximumWidth(maxWidth);
-		pAlpha->setMaximumWidth(maxWidth);
+		pSize_->setMaximumWidth(maxWidth);
+		pScale_->setMaximumWidth(maxWidth);
+		pVerlocity_->setMaximumWidth(maxWidth);
+		pRotation_->setMaximumWidth(maxWidth);
+		pVisualInfo_->setMaximumWidth(maxWidth);
+		pSapwn_->setMaximumWidth(maxWidth);
+		pOrigin_->setMaximumWidth(maxWidth);
+		pSequence_->setMaximumWidth(maxWidth);
+		pCol_->setMaximumWidth(maxWidth);
+		pAlpha_->setMaximumWidth(maxWidth);
 
 		QHBoxLayout* pSizeLayout = new QHBoxLayout();
 		pSizeLayout->setContentsMargins(0,0,0,0);
-		pSizeLayout->addWidget(pSize);
-		pSizeLayout->addWidget(pScale);
+		pSizeLayout->addWidget(pSize_);
+		pSizeLayout->addWidget(pScale_);
 		pSizeLayout->addStretch(0);
 
-		pTableLayout->addWidget(pVisual);
-		pTableLayout->addWidget(pSapwn);
-		pTableLayout->addWidget(pOrigin);
-		pTableLayout->addWidget(pSeq);
-		pTableLayout->addWidget(pRot);
+		QHBoxLayout* pColLayout = new QHBoxLayout();
+		pColLayout->setContentsMargins(0, 0, 0, 0);
+		pColLayout->addWidget(pCol_);
+		pColLayout->addWidget(pAlpha_);
+		pColLayout->addStretch(0);
+
+		QHBoxLayout* pVelLayout = new QHBoxLayout();
+		pVelLayout->setContentsMargins(0, 0, 0, 0);
+		pVelLayout->addWidget(pVerlocity_);
+		pVelLayout->addWidget(pRotation_);
+		pVelLayout->addStretch(0);
+
+
+		pTableLayout->addWidget(pVisualInfo_);
+		pTableLayout->addWidget(pSapwn_);
+		pTableLayout->addWidget(pOrigin_);
+		pTableLayout->addWidget(pSequence_);
 		pTableLayout->addLayout(pSizeLayout);
-		pTableLayout->addWidget(pCol);
-		pTableLayout->addWidget(pAlpha);
-		pTableLayout->addWidget(pVelocity);
-		pTableLayout->addWidget(pSegments);
+		pTableLayout->addLayout(pVelLayout);
+		pTableLayout->addLayout(pColLayout);
+		pTableLayout->addWidget(pSegments_);
+
+		// HEllloo JERRRYY!!!
+		connect(pSegments_, &SegmentListWidget::selectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
+
 
 		setLayout(pTableLayout);
 	}
@@ -1286,6 +1649,62 @@ void AssetFxWidget::setValue(const std::string& value)
 	
 
 	blockSignals(false);
+}
+
+void AssetFxWidget::segmentSelectionChanged(void)
+{
+	// WHEN i sing, bitches come running.
+	// just like when the segment selection changes we need to update all the values :(
+	// i need to keep info for each segment then somehow set it :/
+
+	int32_t curRow = pSegments_->currentRow();
+
+	while(curRow >= segments_.size()) {
+		segments_.push_back(std::make_unique<Segment>());
+	}
+
+	// now I want to update all the widgets!
+	// potentially I could make all the fx data a model.
+	// each row would be a segment.
+	// then id use something like QDataWidgetMapper to map the data to the various widgets.
+	//
+	// but I think that may ed up a bit fiddly? (well more fiddly dunno)
+
+	if (currentSegment_ >= 0)
+	{
+		auto& segment = segments_[currentSegment_];
+		auto* pSeg = segment.get();
+
+		pSapwn_->getValue(pSeg->spawn);
+		pOrigin_->getValue(pSeg->origin);
+		pSequence_->getValue(pSeg->seq);
+		pVisualInfo_->getValue(pSeg->vis);
+		pRotation_->getValue(pSeg->rot);
+		pVerlocity_->getValue(pSeg->vel);
+		pCol_->getValue(pSeg->col);
+		pAlpha_->getValue(pSeg->col);
+		pSize_->getValue(pSeg->size.size);
+		pScale_->getValue(pSeg->size.scale);
+	}
+
+	{
+		auto& segment = segments_[curRow];
+		const auto* pSeg = segment.get();
+
+		pSapwn_->setValue(pSeg->spawn);
+		pOrigin_->setValue(pSeg->origin);
+		pSequence_->setValue(pSeg->seq);
+		pVisualInfo_->setValue(pSeg->vis);
+		pRotation_->setValue(pSeg->rot);
+		pVerlocity_->setValue(pSeg->vel);
+		pCol_->setValue(pSeg->col);
+		pAlpha_->setValue(pSeg->col);
+		pSize_->setValue(pSeg->size.size);
+		pScale_->setValue(pSeg->size.scale);
+	}
+
+
+	currentSegment_ = curRow;
 }
 
 

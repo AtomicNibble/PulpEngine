@@ -3,6 +3,10 @@
 #include <QObject>
 #include <QtCharts/QChartView.h>
 
+#include <IEffect.h>
+
+#include <vector>
+
 QT_BEGIN_NAMESPACE
 
 namespace QtCharts
@@ -20,29 +24,140 @@ X_NAMESPACE_BEGIN(assman)
 class IContext;
 class IAssetEntry;
 
-class AssetFxWidget : public QWidget
+
+struct Range
 {
-	Q_OBJECT
-
-public:
-	AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value);
-	~AssetFxWidget();
-
-private:
-
-private slots:
-	void setValue(const std::string& value);
-	
-signals:
-	void valueChanged(const std::string& value);
-
-private:
-	IAssetEntry* pAssEntry_;
-
-private:
-
+	int32_t start;
+	int32_t range;
 };
 
+
+#if 0
+struct ColorPoint
+{
+	qreal pos;
+	QColor col;
+};
+
+typedef std::vector<ColorPoint> ColorPointArr;
+#endif
+
+// GraphCollection:
+//	Graph0:
+//		Series0:
+//		Series1:
+//	Graph1:
+//		Series0:
+//		Series1:
+
+struct GraphPoint
+{
+	float32_t pos;
+	float32_t val;
+};
+
+typedef std::vector<GraphPoint> GraphPointArr;
+
+struct SeriesData
+{
+	GraphPointArr points;
+};
+
+typedef std::vector<SeriesData> SeriesDataArr;
+#if 0
+
+struct GraphData
+{
+	SeriesDataArr series;
+};
+
+typedef std::vector<GraphData> GraphDataArr;
+#endif
+
+struct GrapInfo
+{
+	SeriesDataArr series; // the series for each graph.
+};
+
+struct GrapScaleInfo : public GrapInfo
+{
+	float scale;
+};
+
+struct RotationInfo
+{
+	GrapInfo rot;
+	Range initial;
+};
+
+struct SizeInfo
+{
+	GrapScaleInfo size;
+	GrapScaleInfo scale;
+};
+
+struct ColorInfo
+{
+	GrapInfo alpha;
+	GrapInfo r;
+	GrapInfo g;
+	GrapInfo b;
+};
+
+struct VelocityInfo
+{
+	engine::fx::RelativeTo::Enum postionType;
+
+	GrapScaleInfo forward;
+	GrapScaleInfo right;
+	GrapScaleInfo up;
+};
+
+
+struct SpawnInfo
+{
+	bool looping;
+
+	int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
+	int32_t loopCount;	// how many times we spawn before the end.
+
+	Range count;		// 
+	Range life;			// life for each elem.
+	Range delay;		// delay is when we start this stage.
+};
+
+struct OriginInfo
+{
+	Range spawnOrgX;
+	Range spawnOrgY;
+	Range spawnOrgZ;
+};
+
+struct SequenceInfo
+{
+	int32_t startFrame; 
+	int32_t fps;		
+	int32_t loop;
+};
+
+struct VisualsInfo
+{
+	QString material;
+	engine::fx::StageType::Enum type;
+};
+
+struct Segment
+{
+	SpawnInfo spawn;
+	OriginInfo origin;
+	SequenceInfo seq;
+	VisualsInfo vis;
+	VelocityInfo vel;
+
+	RotationInfo rot;
+	SizeInfo size;
+	ColorInfo col;
+};
 
 
 class SpinBoxRange : public QWidget
@@ -51,12 +166,13 @@ class SpinBoxRange : public QWidget
 public:
 	SpinBoxRange(QWidget* parent = nullptr);
 
+	void setValue(const Range& r);
+	void getValue(Range& r);
 
 private:
-	QSpinBox * pStart_;
+	QSpinBox* pStart_;
 	QSpinBox* pRange_;
 };
-
 
 
 class GraphEditorView : public QtCharts::QChartView
@@ -148,16 +264,22 @@ private:
 public:
 	GraphEditorView(QWidget *parent = nullptr);
 
+	void setSeriesValue(int32_t idx, const GrapInfo& g);
+	void getSeriesValue(int32_t idx, GrapInfo& g);
+
 	void createGraphs(int32_t numGraphs, int32_t numSeries);
 	void setSeriesName(int32_t i, const QString& name);
 	void setSeriesColor(int32_t i, const QColor& col);
+	void setSingleActiveSeries(bool value);
 
 	void setSeriesActive(int32_t seriesIdx);
 	void setGraphActive(int32_t graphIdx);
 
+
+	const Graph& activeGraph(void) const;
+
 private:
 	void addSeriesToChart(QtCharts::QLineSeries* pSeries);
-
 
 private:
 	void mouseMoveEvent(QMouseEvent *event) X_OVERRIDE;
@@ -176,6 +298,9 @@ private slots:
 	void clearKnots(void);
 	void resetKnots(void);
 
+signals:
+	void pointsChanged(void);
+
 private:
 	bool isDraggingPoint(void) const;
 
@@ -193,7 +318,8 @@ private:
 	QtCharts::QValueAxis* pAxisY_;
 
 	bool mouseActive_;
-	bool _pad;
+	bool singleActiveSeries_;
+
 
 	int32_t activePoint_;
 	int32_t activeSeries_; // sticky acroos graphs.
@@ -220,11 +346,25 @@ class GradientWidget : public QWidget
 	Q_OBJECT
 
 public:
+	struct ColorPoint
+	{
+		qreal pos;
+		QColor col;
+	};
+
+	typedef std::vector<ColorPoint> ColorPointArr;
+
+public:
 	GradientWidget(QWidget* parent = nullptr);
+
+public slots:
+	void setColors(const ColorPointArr& colors);
 
 protected:
 	void paintEvent(QPaintEvent*) Q_DECL_OVERRIDE;
 
+private:
+	ColorPointArr colors_;
 };
 
 class ColorGraphEditor : public QWidget
@@ -234,9 +374,17 @@ class ColorGraphEditor : public QWidget
 public:
 	ColorGraphEditor(int32_t numGraph, QWidget *parent = nullptr);
 
+	void setValue(const ColorInfo& col);
+	void getValue(ColorInfo& col);
+
+private slots:
+	void updateColor(void);
+
 private:
 	GraphEditorView* pGraph_;
 	GradientWidget* pGradient_;
+
+	GradientWidget::ColorPointArr colors_;
 };
 
 class GraphWithScale : public QGroupBox
@@ -246,20 +394,28 @@ class GraphWithScale : public QGroupBox
 public:
 	GraphWithScale(const QString& label, QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const GrapScaleInfo& g);
+	void getValue(GrapScaleInfo& g);
 
 private:
-	GraphEditor * pSizeGraph_;
-	QSpinBox* pScale_;
+	GraphEditor* pGraph_;
+	QDoubleSpinBox* pScale_;
 };
 
 
-class SegmentList : public QWidget
+class SegmentListWidget : public QWidget
 {
 	Q_OBJECT
 
 public:
-	SegmentList(QWidget *parent = nullptr);
+	SegmentListWidget(QWidget *parent = nullptr);
+	
+	int count(void) const;
+	int currentRow(void) const;
+
+signals:
+	void selectionChanged(void);
+
 
 private slots:
 	void itemSelectionChanged(void);
@@ -273,14 +429,16 @@ private:
 };
 
 
-class SpawnInfo : public QGroupBox
+class SpawnInfoWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	SpawnInfo(QWidget *parent = nullptr);
+	SpawnInfoWidget(QWidget *parent = nullptr);
 
-private slots:
+	void setValue(const SpawnInfo& spawn);
+	void getValue(SpawnInfo& spawn);
+
 
 private:
 	QRadioButton* pOneShot_;
@@ -292,14 +450,15 @@ private:
 	SpinBoxRange* pDelay_;
 };
 
-class OriginInfo : public QGroupBox
+class OriginInfoWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	OriginInfo(QWidget *parent = nullptr);
+	OriginInfoWidget(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const OriginInfo& org);
+	void getValue(OriginInfo& org);
 
 private:
 	SpinBoxRange* pForward_;
@@ -308,14 +467,15 @@ private:
 };
 
 
-class SequenceInfo : public QGroupBox
+class SequenceInfoWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	SequenceInfo(QWidget *parent = nullptr);
+	SequenceInfoWidget(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const SequenceInfo& sq);
+	void getValue(SequenceInfo& sq);
 
 private:
 	QSpinBox* pStart_;
@@ -331,23 +491,25 @@ class VelocityGraph : public QGroupBox
 public:
 	VelocityGraph(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const VelocityInfo& vel);
+	void getValue(VelocityInfo& vel);
 
 private:
-	GraphEditor* pVelGraph_;
+	GraphEditorView* pVelGraph_;
 	QSpinBox* pForwardScale_;
 	QSpinBox* pRightScale_;
 	QSpinBox* pUpScale_;
 };
 
-class VelocityInfo : public QGroupBox
+class VelocityInfoWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	VelocityInfo(QWidget *parent = nullptr);
+	VelocityInfoWidget(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const VelocityInfo& vel);
+	void getValue(VelocityInfo& vel);
 
 private:
 	QRadioButton* pSpawn_;
@@ -355,14 +517,15 @@ private:
 	VelocityGraph* pGraph_;
 };
 
-class RotationGraph : public QGroupBox
+class RotationGraphWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	RotationGraph(QWidget *parent = nullptr);
-
-	private slots:
+	RotationGraphWidget(QWidget *parent = nullptr);
+	
+	void setValue(const RotationInfo& rot);
+	void getValue(RotationInfo& rot);
 
 private:
 	GraphEditor* pRotationGraph_;
@@ -376,7 +539,8 @@ class ColorGraph : public QGroupBox
 public:
 	ColorGraph(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const ColorInfo& col);
+	void getValue(ColorInfo& col);
 
 private:
 	ColorGraphEditor* pColorGraph_;
@@ -389,27 +553,69 @@ class AlphaGraph : public QGroupBox
 public:
 	AlphaGraph(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const ColorInfo& col);
+	void getValue(ColorInfo& col);
 
 private:
 	GraphEditor* pAlphaGraph_;
 };
 
 
-class VisualsInfo : public QGroupBox
+class VisualsInfoWidget : public QGroupBox
 {
 	Q_OBJECT
 
 public:
-	VisualsInfo(QWidget *parent = nullptr);
+	VisualsInfoWidget(QWidget *parent = nullptr);
 
-	private slots:
+	void setValue(const VisualsInfo& vis);
+	void getValue(VisualsInfo& vis);
 
 private:
 	QComboBox* pType_;
 	QLineEdit* pMaterial_;
 };
 
+
+class AssetFxWidget : public QWidget
+{
+	Q_OBJECT
+
+	typedef std::unique_ptr<Segment> SegmentPtr;
+	typedef std::vector<SegmentPtr> SegmentArr;
+
+public:
+	AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value);
+	~AssetFxWidget();
+
+private:
+
+private slots :
+	void setValue(const std::string& value);
+
+	void segmentSelectionChanged(void);
+
+signals:
+	void valueChanged(const std::string& value);
+
+private:
+	IAssetEntry* pAssEntry_;
+	
+	SegmentListWidget* pSegments_;
+	SpawnInfoWidget* pSapwn_;
+	OriginInfoWidget* pOrigin_;
+	SequenceInfoWidget* pSequence_;
+	VisualsInfoWidget* pVisualInfo_;
+	RotationGraphWidget* pRotation_;
+	VelocityInfoWidget* pVerlocity_;
+	ColorGraph* pCol_;
+	AlphaGraph* pAlpha_;
+	GraphWithScale* pSize_;
+	GraphWithScale* pScale_;
+
+	int32_t currentSegment_;
+	SegmentArr segments_;
+};
 
 
 X_NAMESPACE_END
