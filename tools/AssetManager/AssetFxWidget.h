@@ -93,7 +93,7 @@ typedef std::vector<GraphData> GraphDataArr;
 
 struct GraphInfo
 {
-	SeriesDataArr series; // the series for each graph.
+	SeriesDataArr graphs; // the series for each graph.
 };
 
 struct GrapScaleInfo : public GraphInfo

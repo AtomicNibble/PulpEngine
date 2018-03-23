@@ -300,22 +300,23 @@ void GraphEditorView::setSeriesValue(int32_t idx, const GraphInfo& g)
 	// take the graphs and apply them.
 	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
 
-	for (size_t i = 0; i < g.series.size(); i++)
+	// for every graph update series.
+	for (size_t i = 0; i < graphs_.size(); i++)
 	{
-		auto& series = g.series[i];
+		auto& dstG = graphs_[i];
 
-		if (i >= graphs_.size()) {
-			break;
+		if (idx >= dstG.series.size()) {
+			continue;
 		}
 
-		auto& graphSeries = graphs_[i].series;
-		auto* pSeries = graphSeries.front();
-
+		auto* pSeries = dstG.series[idx];
 		pSeries->clear();
 
-		for (size_t p=0; p<series.points.size(); p++)
+		const auto& srcSeries = g.graphs[i];
+
+		for (size_t p = 0; p<srcSeries.points.size(); p++)
 		{
-			const GraphPoint& point = series.points[p];
+			const GraphPoint& point = srcSeries.points[p];
 			pSeries->append(point.pos, point.val);
 		}
 	}
@@ -325,17 +326,17 @@ void GraphEditorView::getSeriesValue(int32_t idx, GraphInfo& g)
 {
 	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
 
-	g.series.resize(graphs_.size());
+	g.graphs.resize(graphs_.size());
 
 	for (size_t i = 0; i < graphs_.size(); i++)
 	{
 		const auto& src = graphs_[i];
 		const auto* pSeries = src.series[idx];
 
-		auto& series = g.series[i];
-		series.points.resize(pSeries->count());
-
 		auto points = pSeries->pointsVector();
+		
+		auto& series = g.graphs[i];
+		series.points.resize(pSeries->count());
 
 		for (int32_t p = 0; p < points.count(); p++)
 		{
@@ -1720,8 +1721,8 @@ void AssetFxWidget::segmentSelectionChanged(void)
 			linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
 			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
 
-			linDescend.series.push_back(linDescendSeries);
-			linDescend.series.push_back(linDescendSeries);
+			linDescend.graphs.push_back(linDescendSeries);
+			linDescend.graphs.push_back(linDescendSeries);
 		}
 
 		{
@@ -1730,25 +1731,25 @@ void AssetFxWidget::segmentSelectionChanged(void)
 			zeroSeries.points.push_back(GraphPoint(0.f, 0.f));
 			zeroSeries.points.push_back(GraphPoint(1.f, 0.f));
 
-			zero.series.push_back(zeroSeries);
-			zero.series.push_back(zeroSeries);
+			zero.graphs.push_back(zeroSeries);
+			zero.graphs.push_back(zeroSeries);
 		}
 
 
-		seg->vel.forward.series = zero.series;
-		seg->vel.right.series = zero.series;
-		seg->vel.up.series = zero.series;
+		seg->vel.forward.graphs = zero.graphs;
+		seg->vel.right.graphs = zero.graphs;
+		seg->vel.up.graphs = zero.graphs;
 
-		seg->size.size.series = linDescend.series;
-		seg->size.scale.series = linDescend.series;
+		seg->size.size.graphs = linDescend.graphs;
+		seg->size.scale.graphs = linDescend.graphs;
 
-		seg->col.r.series = linDescend.series;
-		seg->col.g.series = linDescend.series;
-		seg->col.b.series = linDescend.series;
-		seg->col.alpha.series = linDescend.series;
+		seg->col.r.graphs = linDescend.graphs;
+		seg->col.g.graphs = linDescend.graphs;
+		seg->col.b.graphs = linDescend.graphs;
+		seg->col.alpha.graphs = linDescend.graphs;
 
 		// rotation is 0.5 - -0.5
-		seg->rot.rot.series = zero.series;
+		seg->rot.rot.graphs = zero.graphs;
 
 		segments_.push_back(std::move(seg));
 	}
