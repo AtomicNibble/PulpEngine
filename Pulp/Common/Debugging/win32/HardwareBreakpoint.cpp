@@ -19,9 +19,10 @@ namespace hardwareBP
 		template<typename T>
 		T FindFreeReg( T dr7 )
 		{
-			lopi( 4 ) {
-				if ( !bitUtil::IsBitSet<T>(dr7, 2 * i) )
+			for (int32_t i = 0; i < 4; i++) {
+				if (!bitUtil::IsBitSet<T>(dr7, 2 * i)) {
 					return i;
+				}
 			}
 			return 4;
 		}

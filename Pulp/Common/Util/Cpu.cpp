@@ -194,9 +194,9 @@ CpuInfo::CpuInfo(void)
 	// Get Chace INFO
 	if (GetLogicalProcessorInformation(cpuInfo, &Len))
 	{
-		int Num = safe_static_cast<int, DWORD>(Len / sizeof(_SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
+		int num = safe_static_cast<int, DWORD>(Len / sizeof(_SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
 
-		lopi(Num)
+		for (int32_t i = 0; i < num; i++)
 		{
 			_LOGICAL_PROCESSOR_RELATIONSHIP& Rel = cpuInfo[i].Relationship;
 

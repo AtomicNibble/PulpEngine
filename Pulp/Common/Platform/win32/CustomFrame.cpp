@@ -696,7 +696,6 @@ void xFrame::PaintButtons( HWND hWnd, HDC hDC )
 		if( Buttons_[i].Draw )
 		{
 			PaintButton(i, &Buttons_[i], hDC, GetButtonPos(Drawn, width_, IsMax_));
-
 			Drawn++;
 		}
 	}
@@ -707,9 +706,10 @@ void xFrame::PaintButton( int Idx, FrameButton* but, HDC dc, Recti rec )
 {
 	Vec2i pos = rec.getUpperLeft();
 	
-	if(but->Locked)
+	if (but->Locked) {
 		but->Focus = false;
-	
+	}
+
 	int Dull = static_cast<int>(but->Focus);
 	
 	HICON Img = NULL;
@@ -759,7 +759,7 @@ LRESULT xFrame::NCHitTest( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam
 	bool Focus = true;
 	LRESULT res = HTNOWHERE;
 
-	lopi(4)
+	for (int32_t i = 0; i < 4; i++)
 	{
 		if (Buttons_[i].Focus) {
 			Buttons_[i].Focus = false;
@@ -781,17 +781,19 @@ LRESULT xFrame::NCHitTest( HWND hwnd, UINT message, WPARAM wparam, LPARAM lparam
 		res = HTTOP;
 
 	if (res != HTNOWHERE ) {
-		if (Focus)
+		if (Focus) {
 			SendMessage(hwnd, TOM_PAINT_BUTTONS, MAKEWPARAM(0, 0), 0);
+		}
 		return res;
 	}
 
 
 	int enabled = 0;
-	lopi(4)
+	for (int32_t i = 0; i < 4; i++)
 	{
-		if(!Buttons_[i].Draw)
+		if (!Buttons_[i].Draw) {
 			continue;
+		}
 
 	//	bool temp_focus = Buttons_[i].Focus;
 		if (GetButtonPos(enabled, width_, IsMax_).contains(mouse))
@@ -826,7 +828,7 @@ void xFrame::NCButtonDown( HWND hwnd, ULONG message, WPARAM wparam, LPARAM lpara
 	X_UNUSED(wparam);
 
 	int enabled = 0;
-	lopi(4)
+	for (int32_t i = 0; i < 4; i++)
 	{
 		if (!Buttons_[i].Draw || Buttons_[i].Locked) {
 			continue;
@@ -870,9 +872,6 @@ paint:
 	SendMessage(hwnd, WM_NCHITTEST, MAKEWPARAM(0, 0), 0);
 	SendMessage(hwnd, TOM_PAINT_BUTTONS, MAKEWPARAM(0, 0), 0);
 }
-
-
-
 
 
 X_NAMESPACE_END

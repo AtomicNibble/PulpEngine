@@ -136,7 +136,7 @@ void GrowingMicroAllocator::updateStatistics(void)
 	Stats[4] = poolAllocator128_.getStatistics();
 	Stats[5] = poolAllocator256_.getStatistics();
 
-	lopi( 6 )
+	for (int32_t i = 0; i < X_ARRAY_SIZE(Stats); i++)
 	{
 		statistics_.allocationCount_ += pStats->allocationCount_;
 		statistics_.virtualMemoryReserved_ += pStats->virtualMemoryReserved_;
