@@ -1129,6 +1129,9 @@ void SegmentListWidget::addStageClicked(void)
 	pTable_->setItem(row, 1, pItem1);
 	pTable_->setItem(row, 2, pItem2);
 	pTable_->setItem(row, 3, pItem3);
+
+	// switch to this segment.
+	pTable_->selectRow(row);
 }
 
 void SegmentListWidget::deleteSelectedStageClicked(void)
