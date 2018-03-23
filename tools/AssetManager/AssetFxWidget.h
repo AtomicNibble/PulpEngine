@@ -281,12 +281,13 @@ private:
 	class AddPoint : public QUndoCommand
 	{
 	public:
-		AddPoint(Graph& graph, int32_t index, QPointF point);
+		AddPoint(GraphEditorView* pView, Graph& graph, int32_t index, QPointF point);
 
 		void redo(void) X_FINAL;
 		void undo(void) X_FINAL;
 
 	private:
+		GraphEditorView* pView_;
 		Graph& graph_;
 		QPointF point_;
 		int32_t index_;
@@ -295,7 +296,7 @@ private:
 	class MovePoint : public QUndoCommand
 	{
 	public:
-		MovePoint(Graph& graph, int32_t activeSeries, int32_t index, QPointF delta);
+		MovePoint(GraphEditorView* pView, Graph& graph, int32_t activeSeries, int32_t index, QPointF delta);
 
 		void redo(void) X_FINAL;
 		void undo(void) X_FINAL;
@@ -303,6 +304,7 @@ private:
 		bool mergeWith(const QUndoCommand* pOth) X_FINAL;
 
 	private:
+		GraphEditorView* pView_;
 		Graph& graph_;
 		QPointF delta_;
 		int32_t index_;

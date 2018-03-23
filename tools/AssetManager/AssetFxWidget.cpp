@@ -119,7 +119,8 @@ void GraphEditorView::ClearPoints::undo(void)
 
 // -----------------------------------
 
-GraphEditorView::AddPoint::AddPoint(Graph& graph, int32_t index, QPointF point) :
+GraphEditorView::AddPoint::AddPoint(GraphEditorView* pView, Graph& graph, int32_t index, QPointF point) :
+	pView_(pView),
 	graph_(graph),
 	index_(index),
 	point_(point)
@@ -134,6 +135,8 @@ void GraphEditorView::AddPoint::redo(void)
 	{
 		pSeries->insert(index_, point_);
 	}
+	
+	emit pView_->pointsChanged();
 }
 
 void GraphEditorView::AddPoint::undo(void)
@@ -142,12 +145,15 @@ void GraphEditorView::AddPoint::undo(void)
 	{
 		pSeries->remove(index_);
 	}
+
+	emit pView_->pointsChanged();
 }
 
 // -----------------------------------
 
 
-GraphEditorView::MovePoint::MovePoint(Graph& graph, int32_t activeSeries, int32_t index, QPointF delta) :
+GraphEditorView::MovePoint::MovePoint(GraphEditorView* pView, Graph& graph, int32_t activeSeries, int32_t index, QPointF delta) :
+	pView_(pView),
 	graph_(graph),
 	delta_(delta),
 	activeSeries_(activeSeries),
@@ -172,6 +178,8 @@ void GraphEditorView::MovePoint::redo(void)
 
 		s[i]->replace(index_, pos);
 	}
+
+	emit pView_->pointsChanged();
 }
 
 void GraphEditorView::MovePoint::undo(void)
@@ -191,6 +199,8 @@ void GraphEditorView::MovePoint::undo(void)
 
 		s[i]->replace(index_, pos);
 	}
+
+	emit pView_->pointsChanged();
 }
 
 int GraphEditorView::MovePoint::id(void) const
@@ -609,9 +619,7 @@ void GraphEditorView::mouseMoveEvent(QMouseEvent *event)
 		auto& g = activeGraph();
 		QPointF delta = newVal - curVal;
 		
-		pUndoStack_->push(new MovePoint(g, activeSeries_, activePoint_, delta));
-
-		emit pointsChanged();
+		pUndoStack_->push(new MovePoint(this, g, activeSeries_, activePoint_, delta));
 		return;
 	}
 
@@ -663,9 +671,7 @@ void GraphEditorView::mousePressEvent(QMouseEvent *event)
 				}
 			}
 
-			pUndoStack_->push(new AddPoint(activeGraph(), i, value));		
-
-			emit pointsChanged();
+			pUndoStack_->push(new AddPoint(this, activeGraph(), i, value));		
 			return;
 		}
 	}
