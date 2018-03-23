@@ -285,7 +285,7 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 }
 
 
-void GraphEditorView::setSeriesValue(int32_t idx, const GrapInfo& g)
+void GraphEditorView::setSeriesValue(int32_t idx, const GraphInfo& g)
 {
 	// take the graphs and apply them.
 	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
@@ -311,7 +311,7 @@ void GraphEditorView::setSeriesValue(int32_t idx, const GrapInfo& g)
 	}
 }
 
-void GraphEditorView::getSeriesValue(int32_t idx, GrapInfo& g)
+void GraphEditorView::getSeriesValue(int32_t idx, GraphInfo& g)
 {
 	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
 
@@ -361,6 +361,9 @@ void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 	pen.setWidth(LineWidth);
 	pen.setStyle(Qt::SolidLine);
 
+	const auto minVal = pAxisX_->min();
+	const auto maxVal = pAxisX_->max();
+
 	for (size_t g=0; g<graphs_.size(); g++)
 	{
 		auto& graph = graphs_[g];
@@ -388,8 +391,8 @@ void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 			}
 
 			QLineSeries* pSeries = new QLineSeries();
-			pSeries->append(0, 0.5);
-			pSeries->append(1, 0.5);
+			pSeries->append(0, maxVal);
+			pSeries->append(1, minVal);
 			pSeries->setPointsVisible(true);
 			pSeries->setPen(pen);
 			pChart_->addSeries(pSeries);
@@ -452,9 +455,16 @@ void GraphEditorView::setSeriesColor(int32_t i, const QColor& col)
 void GraphEditorView::setSingleActiveSeries(bool value)
 {
 	singleActiveSeries_ = value;
+}
 
+void GraphEditorView::setXAxisRange(float min, float max)
+{
+	pAxisX_->setRange(min, max);
+}
 
-
+void GraphEditorView::setYAxisRange(float min, float max)
+{
+	pAxisY_->setRange(min, max);
 }
 
 void GraphEditorView::setSeriesActive(int32_t seriesIdx)
@@ -594,7 +604,7 @@ void GraphEditorView::mouseMoveEvent(QMouseEvent *event)
 		}
 
 		// clamp in range.
-		newVal.setY(std::clamp(newVal.y(), pAxisY_->min(), pAxisY_->max()));
+		newVal.setY(std::clamp(newVal.y(), pAxisX_->min(), pAxisX_->max()));
 
 		auto& g = activeGraph();
 		QPointF delta = newVal - curVal;
@@ -887,6 +897,11 @@ X_INLINE GraphEditorView::Graph& GraphEditorView::activeGraph(void)
 
 // -----------------------------------
 
+GraphEditor::GraphEditor(QWidget* parent) :
+	GraphEditorView(parent)
+{
+}
+
 GraphEditor::GraphEditor(int32_t numGraph, int32_t numSeries, QWidget* parent) :
 	GraphEditorView(parent)
 {
@@ -1018,6 +1033,7 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 	{
 		pGraph_ = new GraphEditor(2, 1);
 		pScale_ = new QDoubleSpinBox();
+		pScale_->setMinimumWidth(50);
 		pScale_->setMaximumWidth(50);
 		pScale_->setSingleStep(0.05);
 
@@ -1285,20 +1301,24 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 	{
 		pVelGraph_ = new GraphEditorView();
 		pVelGraph_->setSingleActiveSeries(true);
+		pVelGraph_->setXAxisRange(-0.5f, 0.5f);
 		pVelGraph_->createGraphs(2, 3);
 		pVelGraph_->setSeriesName(0, "Forward");
 		pVelGraph_->setSeriesName(1, "Right");
 		pVelGraph_->setSeriesName(2, "Up");
 
-		pForwardScale_ = new QSpinBox();
+		pForwardScale_ = new QDoubleSpinBox();
 		pForwardScale_->setMinimumWidth(50);
 		pForwardScale_->setMaximumWidth(50);
-		pRightScale_ = new QSpinBox();
+		pForwardScale_->setSingleStep(0.05);
+		pRightScale_ = new QDoubleSpinBox();
 		pRightScale_->setMinimumWidth(50);
 		pRightScale_->setMaximumWidth(50);
-		pUpScale_ = new QSpinBox();
+		pRightScale_->setSingleStep(0.05);
+		pUpScale_ = new QDoubleSpinBox();
 		pUpScale_->setMinimumWidth(50);
 		pUpScale_->setMaximumWidth(50);
+		pUpScale_->setSingleStep(0.05);
 
 		QHBoxLayout* pFormLayout = new QHBoxLayout();
 		pFormLayout->addWidget(new QLabel("Forward Scale"));
@@ -1412,7 +1432,9 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
-		pRotationGraph_ = new GraphEditor(2, 1);
+		pRotationGraph_ = new GraphEditor();
+		pRotationGraph_->setXAxisRange(-0.5f,0.5f);
+		pRotationGraph_->createGraphs(2, 1);
 
 		pInitialRotation_ = new SpinBoxRange();
 		pInitialRotation_->setMinimumWidth(80);
@@ -1435,13 +1457,14 @@ void RotationGraphWidget::setValue(const RotationInfo& rot)
 {
 	pInitialRotation_->setValue(rot.initial);
 
+	pRotationGraph_->setSeriesValue(0, rot.rot);
 }
 
 void RotationGraphWidget::getValue(RotationInfo& rot)
 {
 	pInitialRotation_->getValue(rot.initial);
 
-
+	pRotationGraph_->getSeriesValue(0, rot.rot);
 }
 
 // -----------------------------------
@@ -1625,6 +1648,8 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		pTableLayout->addLayout(pColLayout);
 		pTableLayout->addWidget(pSegments_);
 
+		enableWidgets(false);
+
 		// HEllloo JERRRYY!!!
 		connect(pSegments_, &SegmentListWidget::selectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
 
@@ -1643,6 +1668,20 @@ AssetFxWidget::~AssetFxWidget()
 
 }
 
+void AssetFxWidget::enableWidgets(bool enable)
+{
+	pSapwn_->setEnabled(enable);
+	pOrigin_->setEnabled(enable);
+	pSequence_->setEnabled(enable);
+	pVisualInfo_->setEnabled(enable);
+	pRotation_->setEnabled(enable);
+	pVerlocity_->setEnabled(enable);
+	pCol_->setEnabled(enable);
+	pAlpha_->setEnabled(enable);
+	pSize_->setEnabled(enable);
+	pScale_->setEnabled(enable);
+}
+
 
 void AssetFxWidget::setValue(const std::string& value)
 {
@@ -1656,14 +1695,56 @@ void AssetFxWidget::setValue(const std::string& value)
 
 void AssetFxWidget::segmentSelectionChanged(void)
 {
-	// WHEN i sing, bitches come running.
-	// just like when the segment selection changes we need to update all the values :(
-	// i need to keep info for each segment then somehow set it :/
-
 	int32_t curRow = pSegments_->currentRow();
 
+	// when we create a new segment we want default values for graphs.
+	// noe sure how I want to setup defaults other than just manuall setting them all :(
+
 	while(curRow >= segments_.size()) {
-		segments_.push_back(std::make_unique<Segment>());
+
+		auto seg = std::make_unique<Segment>();
+
+		// so for size i want both graphs to have some default points.
+		GraphInfo linDescend;
+		GraphInfo zero;
+
+		{
+			SeriesData linDescendSeries;
+
+			linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
+			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
+
+			linDescend.series.push_back(linDescendSeries);
+			linDescend.series.push_back(linDescendSeries);
+		}
+
+		{
+			SeriesData zeroSeries;
+
+			zeroSeries.points.push_back(GraphPoint(0.f, 0.f));
+			zeroSeries.points.push_back(GraphPoint(1.f, 0.f));
+
+			zero.series.push_back(zeroSeries);
+			zero.series.push_back(zeroSeries);
+		}
+
+
+		seg->vel.forward.series = zero.series;
+		seg->vel.right.series = zero.series;
+		seg->vel.up.series = zero.series;
+
+		seg->size.size.series = linDescend.series;
+		seg->size.scale.series = linDescend.series;
+
+		seg->col.r.series = linDescend.series;
+		seg->col.g.series = linDescend.series;
+		seg->col.b.series = linDescend.series;
+		seg->col.alpha.series = linDescend.series;
+
+		// rotation is 0.5 - -0.5
+		seg->rot.rot.series = zero.series;
+
+		segments_.push_back(std::move(seg));
 	}
 
 	// now I want to update all the widgets!
@@ -1706,6 +1787,9 @@ void AssetFxWidget::segmentSelectionChanged(void)
 		pScale_->setValue(pSeg->size.scale);
 	}
 
+	if (currentSegment_ < 0) {
+		enableWidgets(true);
+	}
 
 	currentSegment_ = curRow;
 }

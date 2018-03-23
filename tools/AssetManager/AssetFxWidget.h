@@ -27,6 +27,12 @@ class IAssetEntry;
 
 struct Range
 {
+	Range() :
+		start(0),
+		range(0)
+	{
+	}
+
 	int32_t start;
 	int32_t range;
 };
@@ -52,6 +58,17 @@ typedef std::vector<ColorPoint> ColorPointArr;
 
 struct GraphPoint
 {
+	GraphPoint() :
+		GraphPoint(0.f, 0.f)
+	{
+	}
+
+	GraphPoint(float32_t pos, float32_t val) :
+		pos(pos),
+		val(val)
+	{
+	}
+
 	float32_t pos;
 	float32_t val;
 };
@@ -74,19 +91,26 @@ struct GraphData
 typedef std::vector<GraphData> GraphDataArr;
 #endif
 
-struct GrapInfo
+struct GraphInfo
 {
 	SeriesDataArr series; // the series for each graph.
 };
 
-struct GrapScaleInfo : public GrapInfo
+struct GrapScaleInfo : public GraphInfo
 {
+	GrapScaleInfo() : 
+		GraphInfo(),
+		scale(0)
+	{
+
+	}
+
 	float scale;
 };
 
 struct RotationInfo
 {
-	GrapInfo rot;
+	GraphInfo rot;
 	Range initial;
 };
 
@@ -98,14 +122,19 @@ struct SizeInfo
 
 struct ColorInfo
 {
-	GrapInfo alpha;
-	GrapInfo r;
-	GrapInfo g;
-	GrapInfo b;
+	GraphInfo alpha;
+	GraphInfo r;
+	GraphInfo g;
+	GraphInfo b;
 };
 
 struct VelocityInfo
 {
+	VelocityInfo() :
+		postionType(engine::fx::RelativeTo::Spawn)
+	{
+	}
+
 	engine::fx::RelativeTo::Enum postionType;
 
 	GrapScaleInfo forward;
@@ -116,6 +145,14 @@ struct VelocityInfo
 
 struct SpawnInfo
 {
+	SpawnInfo() :
+		looping(false),
+		interval(200),
+		loopCount(0)
+	{
+		life.start = 1000;
+	}
+
 	bool looping;
 
 	int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
@@ -135,6 +172,13 @@ struct OriginInfo
 
 struct SequenceInfo
 {
+	SequenceInfo() :
+		startFrame(0),
+		fps(0),
+		loop(0)
+	{
+	}
+
 	int32_t startFrame; 
 	int32_t fps;		
 	int32_t loop;
@@ -142,6 +186,11 @@ struct SequenceInfo
 
 struct VisualsInfo
 {
+	VisualsInfo() :
+		type(engine::fx::StageType::BillboardSprite)
+	{
+	}
+
 	QString material;
 	engine::fx::StageType::Enum type;
 };
@@ -264,13 +313,15 @@ private:
 public:
 	GraphEditorView(QWidget *parent = nullptr);
 
-	void setSeriesValue(int32_t idx, const GrapInfo& g);
-	void getSeriesValue(int32_t idx, GrapInfo& g);
+	void setSeriesValue(int32_t idx, const GraphInfo& g);
+	void getSeriesValue(int32_t idx, GraphInfo& g);
 
 	void createGraphs(int32_t numGraphs, int32_t numSeries);
 	void setSeriesName(int32_t i, const QString& name);
 	void setSeriesColor(int32_t i, const QColor& col);
 	void setSingleActiveSeries(bool value);
+	void setXAxisRange(float min, float max);
+	void setYAxisRange(float min, float max);
 
 	void setSeriesActive(int32_t seriesIdx);
 	void setGraphActive(int32_t graphIdx);
@@ -337,6 +388,7 @@ class GraphEditor : public GraphEditorView
 	Q_OBJECT
 
 public:
+	GraphEditor(QWidget *parent = nullptr);
 	GraphEditor(int32_t numGraph, int32_t numSeries, QWidget *parent = nullptr);
 
 };
@@ -496,9 +548,9 @@ public:
 
 private:
 	GraphEditorView* pVelGraph_;
-	QSpinBox* pForwardScale_;
-	QSpinBox* pRightScale_;
-	QSpinBox* pUpScale_;
+	QDoubleSpinBox* pForwardScale_;
+	QDoubleSpinBox* pRightScale_;
+	QDoubleSpinBox* pUpScale_;
 };
 
 class VelocityInfoWidget : public QGroupBox
@@ -589,6 +641,8 @@ public:
 	~AssetFxWidget();
 
 private:
+
+	void enableWidgets(bool enable);
 
 private slots :
 	void setValue(const std::string& value);
