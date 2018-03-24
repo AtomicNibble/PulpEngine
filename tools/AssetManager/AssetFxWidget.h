@@ -218,7 +218,7 @@ class FxSegmentModel : public QAbstractTableModel
 {
 	Q_OBJECT
 
-		typedef std::unique_ptr<Segment> SegmentPtr;
+	typedef std::unique_ptr<Segment> SegmentPtr;
 	typedef std::vector<SegmentPtr> SegmentArr;
 
 public:
