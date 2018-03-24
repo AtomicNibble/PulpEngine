@@ -137,9 +137,11 @@ struct VelocityInfo
 
 	engine::fx::RelativeTo::Enum postionType;
 
-	GrapScaleInfo forward;
-	GrapScaleInfo right;
-	GrapScaleInfo up;
+	GraphInfo graph;
+
+	float upScale;
+	float forwardScale;
+	float rightScale;
 };
 
 
@@ -197,6 +199,9 @@ struct VisualsInfo
 
 struct Segment
 {
+	QString name;
+	bool enabled;
+
 	SpawnInfo spawn;
 	OriginInfo origin;
 	SequenceInfo seq;
@@ -208,6 +213,37 @@ struct Segment
 	ColorInfo col;
 };
 
+
+class FxSegmentModel : public QAbstractTableModel
+{
+	Q_OBJECT
+
+		typedef std::unique_ptr<Segment> SegmentPtr;
+	typedef std::vector<SegmentPtr> SegmentArr;
+
+public:
+	FxSegmentModel(QObject *parent = nullptr);
+
+	void AddSegment();
+
+	Segment& getSegment(int32_t idx) {
+		return *segments_[idx].get();
+	}
+
+public:
+	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
+	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
+	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
+	bool setData(const QModelIndex & index, const QVariant & value, int role) override;
+	Qt::ItemFlags flags(const QModelIndex &index) const override;
+	QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
+	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
+
+private:
+
+	int32_t currentSegment_;
+	SegmentArr segments_;
+};
 
 class SpinBoxRange : public QWidget
 {
@@ -242,6 +278,7 @@ private:
 	// but it's treated as a single graph.
 	struct Graph
 	{
+		QString name;
 		QLineSeriesArr series;
 	};
 
@@ -255,12 +292,13 @@ private:
 
 
 	public:
-		ResetGraph(Graph& graph);
+		ResetGraph(GraphEditorView* pView, Graph& graph);
 
 		void redo(void) X_FINAL;
 		void undo(void) X_FINAL;
 
 	private:
+		GraphEditorView* pView_;
 		Graph& graph_;
 		PointArrArr graphPoints_;
 	};
@@ -268,12 +306,13 @@ private:
 	class ClearPoints : public QUndoCommand
 	{
 	public:
-		ClearPoints(QtCharts::QLineSeries* pSeries);
+		ClearPoints(GraphEditorView* pView, QtCharts::QLineSeries* pSeries);
 
 		void redo(void) X_FINAL;
 		void undo(void) X_FINAL;
 
 	private:
+		GraphEditorView* pView_;
 		QtCharts::QLineSeries* pSeries_;
 		QVector<QPointF> points_;
 	};
@@ -319,6 +358,7 @@ public:
 	void getSeriesValue(int32_t idx, GraphInfo& g);
 
 	void createGraphs(int32_t numGraphs, int32_t numSeries);
+	void setGraphName(int32_t i, const QString& name);
 	void setSeriesName(int32_t i, const QString& name);
 	void setSeriesColor(int32_t i, const QColor& col);
 	void setSingleActiveSeries(bool value);
@@ -328,8 +368,10 @@ public:
 	void setSeriesActive(int32_t seriesIdx);
 	void setGraphActive(int32_t graphIdx);
 
-
 	const Graph& activeGraph(void) const;
+
+	qreal getMinY(void) const;
+	qreal getMaxY(void) const;
 
 private:
 	void addSeriesToChart(QtCharts::QLineSeries* pSeries);
@@ -462,23 +504,20 @@ class SegmentListWidget : public QWidget
 	Q_OBJECT
 
 public:
-	SegmentListWidget(QWidget *parent = nullptr);
+	SegmentListWidget(FxSegmentModel* pModel, QWidget *parent = nullptr);
 	
-	int count(void) const;
-	int currentRow(void) const;
-
 signals:
-	void selectionChanged(void);
-
+	void itemSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 private slots:
-	void itemSelectionChanged(void);
+	void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 	void addStageClicked(void);
 	void deleteSelectedStageClicked(void);
 
 private:
-	QTableWidget* pTable_;
+	FxSegmentModel* pSegmentModel_;
+	QTableView* pTable_;
 	QPushButton* pDelete_;
 };
 
@@ -649,7 +688,7 @@ private:
 private slots :
 	void setValue(const std::string& value);
 
-	void segmentSelectionChanged(void);
+	void segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 signals:
 	void valueChanged(const std::string& value);
@@ -657,6 +696,8 @@ signals:
 private:
 	IAssetEntry* pAssEntry_;
 	
+	FxSegmentModel segmentModel_;
+
 	SegmentListWidget* pSegments_;
 	SpawnInfoWidget* pSapwn_;
 	OriginInfoWidget* pOrigin_;
@@ -670,7 +711,6 @@ private:
 	GraphWithScale* pScale_;
 
 	int32_t currentSegment_;
-	SegmentArr segments_;
 };
 
 

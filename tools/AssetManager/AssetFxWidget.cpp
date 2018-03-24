@@ -62,7 +62,8 @@ void SpinBoxRange::getValue(Range& r)
 
 // -----------------------------------
 
-GraphEditorView::ResetGraph::ResetGraph(Graph& graph) :
+GraphEditorView::ResetGraph::ResetGraph(GraphEditorView* pView, Graph& graph) :
+	pView_(pView),
 	graph_(graph)
 {
 	graphPoints_.resize(graph.series.size());
@@ -74,15 +75,20 @@ GraphEditorView::ResetGraph::ResetGraph(Graph& graph) :
 
 void GraphEditorView::ResetGraph::redo(void)
 {
+	const auto minVal = pView_->getMinY();
+	const auto maxVal = pView_->getMaxY();
+
 	// reset all to default.
 	for (int32_t i = 0; i < graphPoints_.size(); i++)
 	{
 		auto* pSeries = graph_.series[i];
 		pSeries->clear();
 		// what is default?
-		pSeries->append(0, 0.5);
-		pSeries->append(1, 0.5);
+		pSeries->append(0, maxVal);
+		pSeries->append(1, minVal);
 	}
+
+	emit pView_->pointsChanged();
 }
 
 void GraphEditorView::ResetGraph::undo(void)
@@ -91,11 +97,14 @@ void GraphEditorView::ResetGraph::undo(void)
 	{
 		graph_.series[i]->replace(graphPoints_[i]);
 	}
+
+	emit pView_->pointsChanged();
 }
 
 // -----------------------------------
 
-GraphEditorView::ClearPoints::ClearPoints(QtCharts::QLineSeries* pSeries) :
+GraphEditorView::ClearPoints::ClearPoints(GraphEditorView* pView, QtCharts::QLineSeries* pSeries) :
+	pView_(pView),
 	pSeries_(pSeries)
 {
 	points_ = pSeries->pointsVector();
@@ -109,11 +118,15 @@ void GraphEditorView::ClearPoints::redo(void)
 		pSeries_->append(points_.front());
 		pSeries_->append(points_.back());
 	}
+
+	emit pView_->pointsChanged();
 }
 
 void GraphEditorView::ClearPoints::undo(void)
 {
 	pSeries_->replace(points_);
+
+	emit pView_->pointsChanged();
 }
 
 
@@ -288,8 +301,8 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 	pAxisX_->setGridLineVisible(false);
 	pAxisY_->setGridLineVisible(false);
 
-	pChart_->addAxis(pAxisX_, Qt::AlignLeft);
-	pChart_->addAxis(pAxisY_, Qt::AlignBottom);
+	pChart_->addAxis(pAxisY_, Qt::AlignLeft);
+	pChart_->addAxis(pAxisX_, Qt::AlignBottom);
 
 	setChart(pChart_);
 }
@@ -372,8 +385,8 @@ void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 	pen.setWidth(LineWidth);
 	pen.setStyle(Qt::SolidLine);
 
-	const auto minVal = pAxisX_->min();
-	const auto maxVal = pAxisX_->max();
+	const auto minVal = pAxisY_->min();
+	const auto maxVal = pAxisY_->max();
 
 	for (size_t g=0; g<graphs_.size(); g++)
 	{
@@ -417,6 +430,11 @@ void GraphEditorView::createGraphs(int32_t numGraphs, int32_t numSeries)
 			graph.series[(numSeries-1) - i] = pSeries;
 		}
 	}
+}
+
+void GraphEditorView::setGraphName(int32_t i, const QString& name)
+{
+	graphs_[i].name = name;
 }
 
 void GraphEditorView::setSeriesName(int32_t i, const QString& name)
@@ -611,11 +629,14 @@ void GraphEditorView::mouseMoveEvent(QMouseEvent *event)
 			auto prevX = pSeries->at(activePoint_ - 1).x();
 			auto nextX = pSeries->at(activePoint_ + 1).x();
 
-			newVal.setX(std::clamp(newVal.x(), prevX, nextX));
+			const qreal minDist = 0.001;
+
+			newVal.setX(std::clamp(newVal.x(), prevX + minDist, nextX - minDist));
 		}
 
 		// clamp in range.
-		newVal.setY(std::clamp(newVal.y(), pAxisX_->min(), pAxisX_->max()));
+		newVal.setY(std::clamp(newVal.y(), pAxisY_->min(), pAxisY_->max()));
+		newVal.setX(std::clamp(newVal.x(), pAxisX_->min(), pAxisX_->max()));
 
 		auto& g = activeGraph();
 		QPointF delta = newVal - curVal;
@@ -651,7 +672,10 @@ void GraphEditorView::mousePressEvent(QMouseEvent *event)
 	// click de click
 	auto value = pChart_->mapToValue(event->localPos());
 	
-	if (value.x() > 0 && value.y() > 0)
+	auto minValX = pAxisX_->min();
+	auto minValY = pAxisY_->min();
+
+	if (value.x() >= minValX && value.y() >= minValY)
 	{
 		auto* pSeries = activeSeries();
 		if (pSeries)
@@ -812,7 +836,13 @@ void GraphEditorView::showContextMenu(const QPoint &pos)
 	// now graphs.
 	for (size_t i = 0; i < graphs_.size(); i++)
 	{
-		QAction* pAction = pMenu->addAction(QString("Graph %1").arg(i));
+		QString name = graphs_[i].name;
+		if (name.isEmpty())
+		{
+			name = QString("Graph %1").arg(i);
+		}
+
+		QAction* pAction = pMenu->addAction(name);
 		pAction->setCheckable(true);
 		pAction->setChecked(i == activeGraph_);
 		pAction->setData(qVariantFromValue(i));
@@ -858,7 +888,7 @@ void GraphEditorView::clearKnots(void)
 		// remove all but first and last.
 		auto count = activeSeries()->count();
 		if (count > 2) {
-			pUndoStack_->push(new ClearPoints(activeSeries()));
+			pUndoStack_->push(new ClearPoints(this, activeSeries()));
 		}
 	}
 }
@@ -867,7 +897,7 @@ void GraphEditorView::resetKnots(void)
 {
 	if (activeSeries_ >= 0)
 	{
-		pUndoStack_->push(new ResetGraph(activeGraph()));
+		pUndoStack_->push(new ResetGraph(this, activeGraph()));
 	}
 }
 
@@ -901,6 +931,17 @@ X_INLINE GraphEditorView::Graph& GraphEditorView::activeGraph(void)
 {
 	return graphs_[activeGraph_];
 }
+
+X_INLINE qreal GraphEditorView::getMinY(void) const
+{
+	return pAxisY_->min();
+}
+
+X_INLINE qreal GraphEditorView::getMaxY(void) const
+{
+	return pAxisY_->max();
+}
+
 
 // -----------------------------------
 
@@ -1071,26 +1112,23 @@ void GraphWithScale::getValue(GrapScaleInfo& g)
 // -----------------------------------
 
 
-SegmentListWidget::SegmentListWidget(QWidget* parent) :
-	QWidget(parent)
+SegmentListWidget::SegmentListWidget(FxSegmentModel* pModel, QWidget* parent) :
+	QWidget(parent),
+	pSegmentModel_(pModel)
 {
 	QVBoxLayout* pTableLayout = new QVBoxLayout();
 	{
-		pTable_ = new QTableWidget();
-
-		QStringList labels;
-		labels << "Name" << "Type" << "Delay" << "Count";
+		pTable_ = new QTableView();
 
 		pTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 		pTable_->setSelectionMode(QAbstractItemView::SingleSelection);
-		pTable_->setColumnCount(labels.size());
 		pTable_->setMinimumHeight(100);
-		pTable_->setMaximumHeight(150);
-		pTable_->setHorizontalHeaderLabels(labels);
+		pTable_->setMaximumHeight(200);
 		pTable_->horizontalHeader()->setStretchLastSection(true);
-
-		connect(pTable_, &QTableWidget::itemSelectionChanged, this, &SegmentListWidget::itemSelectionChanged);
-		connect(pTable_, &QTableWidget::itemSelectionChanged, this, &SegmentListWidget::selectionChanged);
+		pTable_->setModel(pSegmentModel_);
+		
+		connect(pTable_->selectionModel(), &QItemSelectionModel::selectionChanged, this, &SegmentListWidget::itemSelectionChanged);
+		connect(pTable_->selectionModel(), &QItemSelectionModel::selectionChanged, this, &SegmentListWidget::selectionChanged);
 
 		pTableLayout->addWidget(pTable_);
 	}
@@ -1118,48 +1156,31 @@ SegmentListWidget::SegmentListWidget(QWidget* parent) :
 	setLayout(pTableLayout);
 }
 
-
-int SegmentListWidget::count(void) const
+void SegmentListWidget::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	return pTable_->rowCount();
-}
+	X_UNUSED(deselected);
 
-int SegmentListWidget::currentRow(void) const
-{
-	return pTable_->currentRow();
-}
-
-void SegmentListWidget::itemSelectionChanged(void)
-{
-	const int num = pTable_->selectedItems().size();
-
-	pDelete_->setEnabled(num != 0);
+	pDelete_->setEnabled(!selected.isEmpty());
 }
 
 void SegmentListWidget::addStageClicked(void)
 {
-	int32_t row = pTable_->rowCount();
-	pTable_->insertRow(row);
-
-	QTableWidgetItem* pItem0 = new QTableWidgetItem(tr("segment"));
-	QTableWidgetItem* pItem1 = new QTableWidgetItem("BillboardSprite");
-	QTableWidgetItem* pItem2 = new QTableWidgetItem("0");
-	QTableWidgetItem* pItem3 = new QTableWidgetItem("0");
-	pItem0->setCheckState(Qt::Checked);
-
-	pTable_->setRowHeight(10, row);
-	pTable_->setItem(row, 0, pItem0);
-	pTable_->setItem(row, 1, pItem1);
-	pTable_->setItem(row, 2, pItem2);
-	pTable_->setItem(row, 3, pItem3);
-
-	// switch to this segment.
-	pTable_->selectRow(row);
+	pSegmentModel_->AddSegment();
 }
 
 void SegmentListWidget::deleteSelectedStageClicked(void)
 {
-	// TODO.
+	auto* pSelectModel = pTable_->selectionModel();
+
+	if (!pSelectModel->hasSelection()) {
+		return;
+	}
+
+	QModelIndexList indexes = pSelectModel->selectedRows();
+	for (int32_t i = 0; i < indexes.count(); ++i)
+	{
+		pSelectModel->model()->removeRow(indexes[i].row(), indexes[i].parent());
+	}
 }
 
 // -----------------------------------
@@ -1307,12 +1328,14 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
 		pVelGraph_ = new GraphEditorView();
-		pVelGraph_->setSingleActiveSeries(true);
-		pVelGraph_->setXAxisRange(-0.5f, 0.5f);
-		pVelGraph_->createGraphs(2, 3);
-		pVelGraph_->setSeriesName(0, "Forward");
-		pVelGraph_->setSeriesName(1, "Right");
-		pVelGraph_->setSeriesName(2, "Up");
+		pVelGraph_->setYAxisRange(-0.5f, 0.5f);
+		pVelGraph_->createGraphs(6, 1);
+		pVelGraph_->setGraphName(0, "Graph 0: Forward");
+		pVelGraph_->setGraphName(1, "Graph 0: Right");
+		pVelGraph_->setGraphName(2, "Graph 0: Up");
+		pVelGraph_->setGraphName(3, "Graph 1: Forward");
+		pVelGraph_->setGraphName(4, "Graph 1: Right");
+		pVelGraph_->setGraphName(5, "Graph 1: Up");
 
 		pForwardScale_ = new QDoubleSpinBox();
 		pForwardScale_->setMinimumWidth(50);
@@ -1346,24 +1369,20 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 
 void VelocityGraph::setValue(const VelocityInfo& vel)
 {
-	pVelGraph_->setSeriesValue(0, vel.forward);
-	pVelGraph_->setSeriesValue(1, vel.right);
-	pVelGraph_->setSeriesValue(2, vel.up);
+	pVelGraph_->setSeriesValue(0, vel.graph);
 
-	pUpScale_->setValue(vel.up.scale);
-	pForwardScale_->setValue(vel.forward.scale);
-	pRightScale_->setValue(vel.right.scale);
+//	pUpScale_->setValue(vel.up.scale);
+//	pForwardScale_->setValue(vel.forward.scale);
+//	pRightScale_->setValue(vel.right.scale);
 }
 
 void VelocityGraph::getValue(VelocityInfo& vel)
 {
-	pVelGraph_->getSeriesValue(0, vel.up);
-	pVelGraph_->getSeriesValue(1, vel.forward);
-	pVelGraph_->getSeriesValue(2, vel.right);
+	pVelGraph_->getSeriesValue(0, vel.graph);
 
-	vel.up.scale = pUpScale_->value();
-	vel.forward.scale = pForwardScale_->value();
-	vel.right.scale = pRightScale_->value();
+//	vel.up.scale = pUpScale_->value();
+//	vel.forward.scale = pForwardScale_->value();
+//	vel.right.scale = pRightScale_->value();
 }
 
 
@@ -1440,7 +1459,7 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
 		pRotationGraph_ = new GraphEditor();
-		pRotationGraph_->setXAxisRange(-0.5f,0.5f);
+		pRotationGraph_->setYAxisRange(-0.5f,0.5f);
 		pRotationGraph_->createGraphs(2, 1);
 
 		pInitialRotation_ = new SpinBoxRange();
@@ -1571,11 +1590,201 @@ void VisualsInfoWidget::getValue(VisualsInfo& vis)
 
 // -----------------------------------
 
+FxSegmentModel::FxSegmentModel(QObject *parent) :
+	QAbstractTableModel(parent)
+{
+	AddSegment();
+}
+
+void FxSegmentModel::AddSegment()
+{
+	int currentRows = static_cast<int32_t>(segments_.size());
+
+	beginInsertRows(QModelIndex(), currentRows, currentRows);
+
+	auto seg = std::make_unique<Segment>();
+
+	seg->name = QString("Goat");
+	seg->enabled = true;
+
+	// so for size i want both graphs to have some default points.
+	GraphInfo linDescend;
+	GraphInfo zero;
+
+	SeriesData linDescendSeries;
+	SeriesData zeroSeries;
+
+	{
+		linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
+		linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
+
+		linDescend.graphs.push_back(linDescendSeries);
+		linDescend.graphs.push_back(linDescendSeries);
+	}
+
+	{
+		zeroSeries.points.push_back(GraphPoint(0.f, 0.f));
+		zeroSeries.points.push_back(GraphPoint(1.f, 0.f));
+
+		zero.graphs.push_back(zeroSeries);
+		zero.graphs.push_back(zeroSeries);
+	}
+
+	seg->vel.graph.graphs.reserve(6);
+	for (int32_t i = 0; i < 6; i++)
+	{
+		seg->vel.graph.graphs.push_back(zeroSeries);
+	}
+
+	seg->size.size.graphs = linDescend.graphs;
+	seg->size.scale.graphs = linDescend.graphs;
+
+	seg->col.r.graphs = linDescend.graphs;
+	seg->col.g.graphs = linDescend.graphs;
+	seg->col.b.graphs = linDescend.graphs;
+	seg->col.alpha.graphs = linDescend.graphs;
+
+	// rotation is 0.5 - -0.5
+	seg->rot.rot.graphs = zero.graphs;
+
+	segments_.push_back(std::move(seg));
+
+	endInsertRows();
+}
+
+
+int FxSegmentModel::rowCount(const QModelIndex & /*parent*/) const
+{
+	return static_cast<int32_t>(segments_.size());
+}
+
+int FxSegmentModel::columnCount(const QModelIndex & /*parent*/) const
+{
+	return 4;
+}
+
+QVariant FxSegmentModel::data(const QModelIndex &index, int role) const
+{
+	int row = index.row();
+	int col = index.column();
+
+	auto& segment = segments_[row];
+
+	switch (role)
+	{
+		case Qt::DisplayRole:
+			if (col == 0)
+			{
+				return segment->name;
+			}
+			if (col == 1)
+			{
+				return engine::fx::StageType::ToString(segment->vis.type);
+			}
+			if (col == 2)
+			{
+				return 0;
+			}
+			if (col == 3)
+			{
+				return 0;
+			}
+			break;
+		case Qt::CheckStateRole:
+			if (col == 0)
+			{
+				if (segment->enabled) {
+					return Qt::Checked;
+				}
+
+				return Qt::Unchecked;
+			}
+	}
+	return QVariant();
+}
+
+bool FxSegmentModel::setData(const QModelIndex & index, const QVariant & value, int role)
+{
+	auto& segment = segments_[index.row()];
+
+	if (role == Qt::CheckStateRole && index.column() == 0)
+	{
+		if (value == Qt::Checked)
+		{
+			segment->enabled = true;
+		}
+		else
+		{
+			segment->enabled = false;
+		}
+	}
+	else if (role == Qt::EditRole && index.column() == 0)
+	{
+
+		segment->name = value.toString();
+	}
+
+	return true;
+}
+
+Qt::ItemFlags FxSegmentModel::flags(const QModelIndex &index) const
+{
+	auto flags = QAbstractTableModel::flags(index);
+
+	if (index.column() == 0) {
+		flags |= Qt::ItemIsUserCheckable | Qt::ItemIsEditable;
+	}
+
+	return flags; 
+}
+
+QVariant FxSegmentModel::headerData(int section, Qt::Orientation orientation, int role) const
+{
+	if (role == Qt::DisplayRole)
+	{
+		if (orientation == Qt::Horizontal) 
+		{
+			switch (section)
+			{
+				case 0:
+					return QString("Name");
+				case 1:
+					return QString("Type");
+				case 2:
+					return QString("Delay");
+				case 3:
+					return QString("Count");
+			}
+		}
+	}
+	return QVariant();
+}
+
+bool FxSegmentModel::removeRows(int row, int count, const QModelIndex &parent)
+{
+	if (row > segments_.size())
+	{
+		return false;
+	}
+
+	if (count != 1) 
+	{
+		return false;
+	}
+
+	beginRemoveRows(parent, row, row);
+	segments_.erase(segments_.begin() + row);
+	endRemoveRows();
+	return true;
+}
+// -----------------------------------
+
 
 
 AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value) :
 	QWidget(parent),
 	pAssEntry_(pAssEntry),
+	segmentModel_(),
 	currentSegment_(-1)
 {
 //	QHBoxLayout* pLayout = new QHBoxLayout();
@@ -1588,7 +1797,7 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 
 		pSapwn_ = new SpawnInfoWidget();
 		pOrigin_ = new OriginInfoWidget();
-		pSegments_ = new SegmentListWidget();
+		pSegments_ = new SegmentListWidget(&segmentModel_);
 		pSequence_ = new SequenceInfoWidget();
 		pSize_ = new GraphWithScale("Size");
 		pScale_ = new GraphWithScale("Scale");
@@ -1658,7 +1867,7 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		enableWidgets(false);
 
 		// HEllloo JERRRYY!!!
-		connect(pSegments_, &SegmentListWidget::selectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
+		connect(pSegments_, &SegmentListWidget::itemSelectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
 
 
 		setLayout(pTableLayout);
@@ -1700,98 +1909,47 @@ void AssetFxWidget::setValue(const std::string& value)
 	blockSignals(false);
 }
 
-void AssetFxWidget::segmentSelectionChanged(void)
+void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	int32_t curRow = pSegments_->currentRow();
+	X_UNUSED(selected, deselected);
 
-	// when we create a new segment we want default values for graphs.
-	// noe sure how I want to setup defaults other than just manuall setting them all :(
-
-	while(curRow >= segments_.size()) {
-
-		auto seg = std::make_unique<Segment>();
-
-		// so for size i want both graphs to have some default points.
-		GraphInfo linDescend;
-		GraphInfo zero;
-
-		{
-			SeriesData linDescendSeries;
-
-			linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
-			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
-
-			linDescend.graphs.push_back(linDescendSeries);
-			linDescend.graphs.push_back(linDescendSeries);
-		}
-
-		{
-			SeriesData zeroSeries;
-
-			zeroSeries.points.push_back(GraphPoint(0.f, 0.f));
-			zeroSeries.points.push_back(GraphPoint(1.f, 0.f));
-
-			zero.graphs.push_back(zeroSeries);
-			zero.graphs.push_back(zeroSeries);
-		}
-
-
-		seg->vel.forward.graphs = zero.graphs;
-		seg->vel.right.graphs = zero.graphs;
-		seg->vel.up.graphs = zero.graphs;
-
-		seg->size.size.graphs = linDescend.graphs;
-		seg->size.scale.graphs = linDescend.graphs;
-
-		seg->col.r.graphs = linDescend.graphs;
-		seg->col.g.graphs = linDescend.graphs;
-		seg->col.b.graphs = linDescend.graphs;
-		seg->col.alpha.graphs = linDescend.graphs;
-
-		// rotation is 0.5 - -0.5
-		seg->rot.rot.graphs = zero.graphs;
-
-		segments_.push_back(std::move(seg));
+	if (selected.count() != 1) {
+		return;
 	}
 
-	// now I want to update all the widgets!
-	// potentially I could make all the fx data a model.
-	// each row would be a segment.
-	// then id use something like QDataWidgetMapper to map the data to the various widgets.
-	//
-	// but I think that may ed up a bit fiddly? (well more fiddly dunno)
+	auto indexes = selected.first().indexes();
+
+	int32_t curRow = indexes.first().row(); 
 
 	if (currentSegment_ >= 0)
 	{
-		auto& segment = segments_[currentSegment_];
-		auto* pSeg = segment.get();
+		auto& segment = segmentModel_.getSegment(currentSegment_);
 
-		pSapwn_->getValue(pSeg->spawn);
-		pOrigin_->getValue(pSeg->origin);
-		pSequence_->getValue(pSeg->seq);
-		pVisualInfo_->getValue(pSeg->vis);
-		pRotation_->getValue(pSeg->rot);
-		pVerlocity_->getValue(pSeg->vel);
-		pCol_->getValue(pSeg->col);
-		pAlpha_->getValue(pSeg->col);
-		pSize_->getValue(pSeg->size.size);
-		pScale_->getValue(pSeg->size.scale);
+		pSapwn_->getValue(segment.spawn);
+		pOrigin_->getValue(segment.origin);
+		pSequence_->getValue(segment.seq);
+		pVisualInfo_->getValue(segment.vis);
+		pRotation_->getValue(segment.rot);
+		pVerlocity_->getValue(segment.vel);
+		pCol_->getValue(segment.col);
+		pAlpha_->getValue(segment.col);
+		pSize_->getValue(segment.size.size);
+		pScale_->getValue(segment.size.scale);
 	}
-
+	
 	{
-		auto& segment = segments_[curRow];
-		const auto* pSeg = segment.get();
+		auto& segment = segmentModel_.getSegment(curRow);
 
-		pSapwn_->setValue(pSeg->spawn);
-		pOrigin_->setValue(pSeg->origin);
-		pSequence_->setValue(pSeg->seq);
-		pVisualInfo_->setValue(pSeg->vis);
-		pRotation_->setValue(pSeg->rot);
-		pVerlocity_->setValue(pSeg->vel);
-		pCol_->setValue(pSeg->col);
-		pAlpha_->setValue(pSeg->col);
-		pSize_->setValue(pSeg->size.size);
-		pScale_->setValue(pSeg->size.scale);
+		pSapwn_->setValue(segment.spawn);
+		pOrigin_->setValue(segment.origin);
+		pSequence_->setValue(segment.seq);
+		pVisualInfo_->setValue(segment.vis);
+		pRotation_->setValue(segment.rot);
+		pVerlocity_->setValue(segment.vel);
+		pCol_->setValue(segment.col);
+		pAlpha_->setValue(segment.col);
+		pSize_->setValue(segment.size.size);
+		pScale_->setValue(segment.size.scale);
 	}
 
 	if (currentSegment_ < 0) {
