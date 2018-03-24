@@ -81,7 +81,6 @@ struct SeriesData
 };
 
 typedef std::vector<SeriesData> SeriesDataArr;
-#if 0
 
 struct GraphData
 {
@@ -89,16 +88,17 @@ struct GraphData
 };
 
 typedef std::vector<GraphData> GraphDataArr;
-#endif
 
+
+// Graph info contains N graphs each with M series.
 struct GraphInfo
 {
-	SeriesDataArr graphs; // the series for each graph.
+	GraphDataArr graphs;
 };
 
-struct GrapScaleInfo : public GraphInfo
+struct GraphScaleInfo : public GraphInfo
 {
-	GrapScaleInfo() : 
+	GraphScaleInfo() :
 		GraphInfo(),
 		scale(0)
 	{
@@ -110,22 +110,20 @@ struct GrapScaleInfo : public GraphInfo
 
 struct RotationInfo
 {
-	GraphInfo rot;
+	GraphScaleInfo rot;
 	Range initial;
 };
 
 struct SizeInfo
 {
-	GrapScaleInfo size;
-	GrapScaleInfo scale;
+	GraphScaleInfo size;
+	GraphScaleInfo scale;
 };
 
 struct ColorInfo
 {
 	GraphInfo alpha;
-	GraphInfo r;
-	GraphInfo g;
-	GraphInfo b;
+	GraphInfo col;
 };
 
 struct VelocityInfo
@@ -139,9 +137,9 @@ struct VelocityInfo
 
 	GraphInfo graph;
 
-	float upScale;
 	float forwardScale;
 	float rightScale;
+	float upScale;
 };
 
 
@@ -202,6 +200,8 @@ struct Segment
 	QString name;
 	bool enabled;
 
+	engine::fx::StageFlags flags;
+
 	SpawnInfo spawn;
 	OriginInfo origin;
 	SequenceInfo seq;
@@ -223,6 +223,8 @@ class FxSegmentModel : public QAbstractTableModel
 
 public:
 	FxSegmentModel(QObject *parent = nullptr);
+
+	void getJson(core::string& json);
 
 	void AddSegment();
 
@@ -354,8 +356,8 @@ private:
 public:
 	GraphEditorView(QWidget *parent = nullptr);
 
-	void setSeriesValue(int32_t idx, const GraphInfo& g);
-	void getSeriesValue(int32_t idx, GraphInfo& g);
+	void setValue(const GraphInfo& g);
+	void getValue(GraphInfo& g);
 
 	void createGraphs(int32_t numGraphs, int32_t numSeries);
 	void setGraphName(int32_t i, const QString& name);
@@ -490,8 +492,8 @@ class GraphWithScale : public QGroupBox
 public:
 	GraphWithScale(const QString& label, QWidget *parent = nullptr);
 
-	void setValue(const GrapScaleInfo& g);
-	void getValue(GrapScaleInfo& g);
+	void setValue(const GraphScaleInfo& g);
+	void getValue(GraphScaleInfo& g);
 
 private:
 	GraphEditor* pGraph_;
@@ -664,6 +666,14 @@ public:
 	void setValue(const VisualsInfo& vis);
 	void getValue(VisualsInfo& vis);
 
+
+signals:
+	void typeChanged(engine::fx::StageType::Enum type);
+
+private slots:
+	void currentIndexChanged(int32_t idx);
+
+
 private:
 	QComboBox* pType_;
 	QLineEdit* pMaterial_;
@@ -689,6 +699,7 @@ private slots :
 	void setValue(const std::string& value);
 
 	void segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
+	void typeChanged(engine::fx::StageType::Enum type);
 
 signals:
 	void valueChanged(const std::string& value);

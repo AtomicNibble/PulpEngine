@@ -1,7 +1,10 @@
 #include "AssetFxWidget.h"
 
+#include <String\Json.h>
+
 #include <IAnimation.h>
 #include <IEffect.h>
+
 #include "IAssetEntry.h"
 
 #include "ActionManager.h"
@@ -10,7 +13,6 @@
 
 #include "Context.h"
 #include "session.h"
-
 
 #include <QtCharts\QChartView.h>
 #include <QtCharts\Qchart.h>
@@ -308,54 +310,52 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 }
 
 
-void GraphEditorView::setSeriesValue(int32_t idx, const GraphInfo& g)
+void GraphEditorView::setValue(const GraphInfo& g)
 {
-	// take the graphs and apply them.
-	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
-
 	// for every graph update series.
 	for (size_t i = 0; i < graphs_.size(); i++)
 	{
+		auto& srcG = g.graphs[i];
 		auto& dstG = graphs_[i];
 
-		if (idx >= dstG.series.size()) {
-			continue;
-		}
-
-		auto* pSeries = dstG.series[idx];
-		pSeries->clear();
-
-		const auto& srcSeries = g.graphs[i];
-
-		for (size_t p = 0; p<srcSeries.points.size(); p++)
+		for (size_t j = 0; j < srcG.series.size(); j++)
 		{
-			const GraphPoint& point = srcSeries.points[p];
-			pSeries->append(point.pos, point.val);
+			auto* pSeries = dstG.series[j];
+			pSeries->clear();
+
+			const auto& srcSeries = srcG.series[i];
+			for (size_t p = 0; p < srcSeries.points.size(); p++)
+			{
+				const GraphPoint& point = srcSeries.points[p];
+				pSeries->append(point.pos, point.val);
+			}
 		}
 	}
 }
 
-void GraphEditorView::getSeriesValue(int32_t idx, GraphInfo& g)
+void GraphEditorView::getValue(GraphInfo& g)
 {
-	X_ASSERT(idx < names_.size(), "Series index out of range")(idx);
-
 	g.graphs.resize(graphs_.size());
 
 	for (size_t i = 0; i < graphs_.size(); i++)
 	{
-		const auto& src = graphs_[i];
-		const auto* pSeries = src.series[idx];
+		const auto& srcG = graphs_[i];
+		auto& dstG = g.graphs[i];
 
-		auto points = pSeries->pointsVector();
-		
-		auto& series = g.graphs[i];
-		series.points.resize(pSeries->count());
-
-		for (int32_t p = 0; p < points.count(); p++)
+		for (size_t j = 0; j < srcG.series.size(); j++)
 		{
-			GraphPoint& point = series.points[p];
-			point.pos = points[p].rx();
-			point.val = points[p].ry();
+			const auto* pSeries = srcG.series[j];
+			auto points = pSeries->pointsVector();
+
+			auto& dstSeries = dstG.series[j];
+			dstSeries.points.resize(pSeries->count());
+
+			for (int32_t p = 0; p < points.count(); p++)
+			{
+				GraphPoint& point = dstSeries.points[p];
+				point.pos = points[p].rx();
+				point.val = points[p].ry();
+			}
 		}
 	}
 }
@@ -1057,18 +1057,14 @@ void ColorGraphEditor::updateColor(void)
 void ColorGraphEditor::setValue(const ColorInfo& col)
 {
 	// need to update graphs.
-	pGraph_->setSeriesValue(0, col.r);
-	pGraph_->setSeriesValue(1, col.g);
-	pGraph_->setSeriesValue(2, col.b);
+	pGraph_->setValue(col.col);
 
 	updateColor();
 }
 
 void ColorGraphEditor::getValue(ColorInfo& col)
 {
-	pGraph_->getSeriesValue(0, col.r);
-	pGraph_->getSeriesValue(1, col.g);
-	pGraph_->getSeriesValue(2, col.b);
+	pGraph_->getValue(col.col);
 }
 
 // -----------------------------------
@@ -1097,15 +1093,15 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 }
 
 
-void GraphWithScale::setValue(const GrapScaleInfo& g)
+void GraphWithScale::setValue(const GraphScaleInfo& g)
 {
-	pGraph_->setSeriesValue(0, g);
+	pGraph_->setValue(g);
 	pScale_->setValue(g.scale);
 }
 
-void GraphWithScale::getValue(GrapScaleInfo& g)
+void GraphWithScale::getValue(GraphScaleInfo& g)
 {
-	pGraph_->getSeriesValue(0, g);
+	pGraph_->getValue(g);
 	g.scale = pScale_->value();
 }
 
@@ -1369,7 +1365,7 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 
 void VelocityGraph::setValue(const VelocityInfo& vel)
 {
-	pVelGraph_->setSeriesValue(0, vel.graph);
+	pVelGraph_->setValue(vel.graph);
 
 //	pUpScale_->setValue(vel.up.scale);
 //	pForwardScale_->setValue(vel.forward.scale);
@@ -1378,7 +1374,7 @@ void VelocityGraph::setValue(const VelocityInfo& vel)
 
 void VelocityGraph::getValue(VelocityInfo& vel)
 {
-	pVelGraph_->getSeriesValue(0, vel.graph);
+	pVelGraph_->getValue(vel.graph);
 
 //	vel.up.scale = pUpScale_->value();
 //	vel.forward.scale = pForwardScale_->value();
@@ -1483,14 +1479,14 @@ void RotationGraphWidget::setValue(const RotationInfo& rot)
 {
 	pInitialRotation_->setValue(rot.initial);
 
-	pRotationGraph_->setSeriesValue(0, rot.rot);
+	pRotationGraph_->setValue(rot.rot);
 }
 
 void RotationGraphWidget::getValue(RotationInfo& rot)
 {
 	pInitialRotation_->getValue(rot.initial);
 
-	pRotationGraph_->getSeriesValue(0, rot.rot);
+	pRotationGraph_->getValue(rot.rot);
 }
 
 // -----------------------------------
@@ -1537,12 +1533,12 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 
 void AlphaGraph::setValue(const ColorInfo& col)
 {
-	pAlphaGraph_->setSeriesValue(0, col.alpha);
+	pAlphaGraph_->setValue(col.alpha);
 }
 
 void AlphaGraph::getValue(ColorInfo& col)
 {
-	pAlphaGraph_->getSeriesValue(0, col.alpha);
+	pAlphaGraph_->getValue(col.alpha);
 }
 
 
@@ -1562,6 +1558,7 @@ VisualsInfoWidget::VisualsInfoWidget(QWidget* parent) :
 			pType_->addItem(name);
 		}
 
+		connect(pType_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VisualsInfoWidget::currentIndexChanged);
 
 		pMaterial_ = new QLineEdit();
 
@@ -1588,12 +1585,291 @@ void VisualsInfoWidget::getValue(VisualsInfo& vis)
 	vis.type = static_cast<engine::fx::StageType::Enum>(idx);
 }
 
+void VisualsInfoWidget::currentIndexChanged(int32_t idx)
+{
+	auto type = static_cast<engine::fx::StageType::Enum>(idx);
+
+	emit typeChanged(type);
+}
+
 // -----------------------------------
 
 FxSegmentModel::FxSegmentModel(QObject *parent) :
 	QAbstractTableModel(parent)
 {
 	AddSegment();
+
+	core::string test;
+	getJson(test);
+}
+
+void FxSegmentModel::getJson(core::string& jsonStrOut)
+{
+	// build me some json.
+	core::json::StringBuffer s;
+	core::json::Writer<core::json::StringBuffer> writer(s);
+
+	writer.SetMaxDecimalPlaces(5);
+
+	writer.StartObject();
+	writer.Key("stages");
+	writer.StartArray();
+
+	auto writeRange = [&](const char* pPrefix, const Range& range) {
+
+		core::StackString<64> startStr(pPrefix);
+		core::StackString<64> rangeStr(pPrefix);
+
+		startStr.append("Start");
+		rangeStr.append("Range");
+
+		writer.Key(startStr.c_str());
+		writer.Int(range.start);
+		writer.Key(rangeStr.c_str());
+		writer.Int(range.range);
+	};
+
+
+	auto writeGraph = [&](const char* pName, const GraphInfo& g, float scale) {
+
+		writer.Key(pName);
+		writer.StartObject();
+		writer.Key("scale");
+		writer.Double(scale);
+
+		writer.Key("graphs");
+		writer.StartArray();
+
+		for (size_t i = 0; i < g.graphs.size(); i++)
+		{
+			const auto& graph = g.graphs[i];
+
+			writer.StartArray();
+
+			X_ASSERT(graph.series.size() == 1, "Unexpected series size")(graph.series.size());
+
+			auto& series = graph.series.front();
+
+			for (size_t p = 0; p < series.points.size(); p++)
+			{
+				auto& point = series.points[p];
+
+				writer.StartObject();
+				writer.Key("time");
+				writer.Double(point.pos);
+				writer.Key("val");
+				writer.Double(point.val);
+				writer.EndObject();
+			}
+
+			writer.EndArray();
+		}
+
+		writer.EndArray();
+		writer.EndObject();
+	};
+
+	auto writeSubGraph = [&](const char* pName, const GraphInfo& g, float scale, std::initializer_list<size_t> indexes) {
+
+		writer.Key(pName);
+		writer.StartObject();
+		writer.Key("scale");
+		writer.Double(scale);
+
+		writer.Key("graphs");
+		writer.StartArray();
+
+		for (size_t i = 0; i < g.graphs.size(); i++)
+		{
+			if (std::find(indexes.begin(), indexes.end(), i) == indexes.end()) {
+				continue;
+			}
+
+			const auto& graph = g.graphs[i];
+
+			writer.StartArray();
+
+			X_ASSERT(graph.series.size() == 1, "Unexpected series size")(graph.series.size());
+
+			auto& series = graph.series.front();
+
+			for (size_t p = 0; p < series.points.size(); p++)
+			{
+				auto& point = series.points[p];
+
+				writer.StartObject();
+				writer.Key("time");
+				writer.Double(point.pos);
+				writer.Key("val");
+				writer.Double(point.val);
+				writer.EndObject();
+			}
+
+			writer.EndArray();
+		}
+
+		writer.EndArray();
+		writer.EndObject();
+	};
+
+
+	auto writeColGraph = [&](const char* pName, const GraphInfo& g) {
+
+		writer.Key(pName);
+		writer.StartObject();
+		writer.Key("scale");
+		writer.Double(1.0);
+
+		writer.Key("graphs");
+		writer.StartArray();
+
+		for (size_t i = 0; i < g.graphs.size(); i++)
+		{
+			const auto& graph = g.graphs[i];
+
+			writer.StartArray();
+
+			X_ASSERT(graph.series.size() == 3, "Unexpected series size")(graph.series.size());
+
+			// all series should be same size.
+			auto& seriesR = graph.series[0];
+			auto& seriesG = graph.series[1];
+			auto& seriesB = graph.series[2];
+
+			bool sizeMatch = (std::adjacent_find(graph.series.begin(), graph.series.end(),
+				[](const SeriesData& a, const SeriesData& b) -> bool {
+					return a.points.size() != b.points.size();
+				}
+			) == graph.series.end());
+
+			X_ASSERT(sizeMatch, "Series size don't math")(seriesR.points.size(), seriesG.points.size(), seriesB.points.size());
+
+			for (size_t p = 0; p < seriesR.points.size(); p++)
+			{
+				// all points sshuld have same pos.
+				auto& point = seriesR.points[p];
+
+				auto r = seriesR.points[p].val;
+				auto g = seriesG.points[p].val;
+				auto b = seriesB.points[p].val;
+
+				writer.StartObject();
+				writer.Key("time");
+				writer.Double(point.pos);
+				writer.Key("rgb");
+				writer.StartArray();
+					writer.Double(r);
+					writer.Double(g);
+					writer.Double(b);
+				writer.EndArray();
+				writer.EndObject();
+			}
+
+			writer.EndArray();
+		}
+
+		writer.EndArray();
+		writer.EndObject();
+	};
+
+	for (auto& segment : segments_)
+	{
+		writer.StartObject();
+
+		auto name = segment->name.toStdString();
+
+		if (segment->spawn.looping)
+		{
+			segment->flags.Set(engine::fx::StageFlag::Looping);
+		}
+		else
+		{
+			segment->flags.Remove(engine::fx::StageFlag::Looping);
+		}
+
+		// manually build flag string instead of using Flag::ToString, as the format of the flags is important.
+		core::StackString<512> flagsStr;
+		for (int32_t i = 0; i < engine::fx::StageFlags::FLAGS_COUNT; i++)
+		{
+			auto flag = static_cast<engine::fx::StageFlag::Enum>(1 << i);
+			if (segment->flags.IsSet(flag))
+			{
+				if (flagsStr.isNotEmpty()) {
+					flagsStr.append(" ");
+				}
+				flagsStr.append(engine::fx::StageFlag::ToString(flag));
+			}
+		}
+
+
+		writer.Key("name");
+		writer.String(name.c_str());
+		
+		writer.Key("enabled");
+		writer.Bool(segment->enabled);
+
+		writer.Key("type");
+		writer.String(engine::fx::StageType::ToString(segment->vis.type));
+
+		writer.Key("relativeTo");
+		writer.String(engine::fx::RelativeTo::ToString(segment->vel.postionType));
+
+		writer.Key("flags");
+		writer.String(flagsStr.c_str());
+
+		writer.Key("materials");
+		writer.StartArray();
+			writer.String("Goat");
+		writer.EndArray();
+
+		writer.Key("interval");
+		writer.Int(segment->spawn.interval);
+		writer.Key("loopCount");
+		writer.Int(segment->spawn.loopCount);
+		
+		writeRange("count", segment->spawn.count);
+		writeRange("life", segment->spawn.life);
+		writeRange("delay", segment->spawn.delay);
+
+		writeRange("spawnOrgX", segment->origin.spawnOrgX);
+		writeRange("spawnOrgY", segment->origin.spawnOrgY);
+		writeRange("spawnOrgZ", segment->origin.spawnOrgZ);
+
+		writer.Key("sequence");
+		writer.StartObject();
+
+			writer.Key("startFrame");
+			writer.Int(segment->seq.startFrame);
+			writer.Key("fps");
+			writer.Int(segment->seq.fps);
+			writer.Key("loop");
+			writer.Int(segment->seq.loop);
+
+		writer.EndObject();
+
+
+		// GRAPH ME BABY!
+		writeColGraph("colorGraph", segment->col.col);
+		writeGraph("alphaGraph", segment->col.alpha, 1.f);
+		writeGraph("sizeGraph", segment->size.size, segment->size.size.scale);
+		writeGraph("scaleGraph", segment->size.scale, segment->size.scale.scale);
+		writeGraph("rotGraph", segment->rot.rot, segment->rot.rot.scale);
+
+		// need to wrtie a verlocity graph.
+		// it's a little special since we allow seperate scales.
+		// vel0XGraph, vel0XGraph, vel0XGraph is the first graph.
+		writeSubGraph("vel0XGraph", segment->vel.graph, segment->vel.forwardScale, { 0,3 } );
+		writeSubGraph("vel0YGraph", segment->vel.graph, segment->vel.rightScale, { 1,4 } );
+		writeSubGraph("vel0ZGraph", segment->vel.graph, segment->vel.upScale, { 2,5 } );
+
+
+		writer.EndObject();
+	}
+
+	writer.EndArray();
+	writer.EndObject();
+
+	jsonStrOut = core::string(s.GetString(), s.GetSize());
 }
 
 void FxSegmentModel::AddSegment()
@@ -1611,6 +1887,9 @@ void FxSegmentModel::AddSegment()
 	GraphInfo linDescend;
 	GraphInfo zero;
 
+	GraphData linGraph;
+	GraphData zeroGraph;
+
 	SeriesData linDescendSeries;
 	SeriesData zeroSeries;
 
@@ -1618,30 +1897,44 @@ void FxSegmentModel::AddSegment()
 		linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
 		linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
 
-		linDescend.graphs.push_back(linDescendSeries);
-		linDescend.graphs.push_back(linDescendSeries);
+		linGraph.series.push_back(linDescendSeries);
+
+		// each graph have one series.
+		linDescend.graphs.push_back(linGraph);
+		linDescend.graphs.push_back(linGraph);
 	}
 
 	{
 		zeroSeries.points.push_back(GraphPoint(0.f, 0.f));
 		zeroSeries.points.push_back(GraphPoint(1.f, 0.f));
 
-		zero.graphs.push_back(zeroSeries);
-		zero.graphs.push_back(zeroSeries);
+		zeroGraph.series.push_back(zeroSeries);
+
+		zero.graphs.push_back(zeroGraph);
+		zero.graphs.push_back(zeroGraph);
 	}
 
+	// verlocity has 6 graphs with one seriex.
 	seg->vel.graph.graphs.reserve(6);
 	for (int32_t i = 0; i < 6; i++)
 	{
-		seg->vel.graph.graphs.push_back(zeroSeries);
+		seg->vel.graph.graphs.push_back(zeroGraph);
 	}
 
 	seg->size.size.graphs = linDescend.graphs;
 	seg->size.scale.graphs = linDescend.graphs;
 
-	seg->col.r.graphs = linDescend.graphs;
-	seg->col.g.graphs = linDescend.graphs;
-	seg->col.b.graphs = linDescend.graphs;
+	// so i want 2 graphs with 3 series each.
+	{
+		GraphData colGraph;
+		colGraph.series.push_back(linDescendSeries);
+		colGraph.series.push_back(linDescendSeries);
+		colGraph.series.push_back(linDescendSeries);
+
+		seg->col.col.graphs.push_back(colGraph);
+		seg->col.col.graphs.push_back(std::move(colGraph));
+	}
+
 	seg->col.alpha.graphs = linDescend.graphs;
 
 	// rotation is 0.5 - -0.5
@@ -1868,6 +2161,7 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 
 		// HEllloo JERRRYY!!!
 		connect(pSegments_, &SegmentListWidget::itemSelectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
+		connect(pVisualInfo_, &VisualsInfoWidget::typeChanged, this, &AssetFxWidget::typeChanged);
 
 
 		setLayout(pTableLayout);
@@ -1957,6 +2251,13 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 	}
 
 	currentSegment_ = curRow;
+}
+
+void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
+{
+	X_UNUSED(type);
+
+	// TODO: enable / disable widgets based on type.
 }
 
 
