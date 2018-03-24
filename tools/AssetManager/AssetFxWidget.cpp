@@ -323,7 +323,7 @@ void GraphEditorView::setValue(const GraphInfo& g)
 			auto* pSeries = dstG.series[j];
 			pSeries->clear();
 
-			const auto& srcSeries = srcG.series[i];
+			const auto& srcSeries = srcG.series[j];
 			for (size_t p = 0; p < srcSeries.points.size(); p++)
 			{
 				const GraphPoint& point = srcSeries.points[p];
@@ -961,8 +961,14 @@ GraphEditor::GraphEditor(int32_t numGraph, int32_t numSeries, QWidget* parent) :
 GradientWidget::GradientWidget(QWidget* parent) :
 	QWidget(parent)
 {
+	ColorPoint cp;
+	cp.col = QColor(255,255,255);
+	cp.pos = 0.0;
+	colors_.push_back(cp);
 
-
+	cp.col = QColor(0, 0, 0);
+	cp.pos = 1.0;
+	colors_.push_back(cp);
 }
 
 void GradientWidget::setColors(const ColorPointArr& colors)
@@ -1161,7 +1167,7 @@ void SegmentListWidget::selectionChanged(const QItemSelection &selected, const Q
 
 void SegmentListWidget::addStageClicked(void)
 {
-	pSegmentModel_->AddSegment();
+	pSegmentModel_->addSegment();
 }
 
 void SegmentListWidget::deleteSelectedStageClicked(void)
@@ -1571,8 +1577,12 @@ VisualsInfoWidget::VisualsInfoWidget(QWidget* parent) :
 
 void VisualsInfoWidget::setValue(const VisualsInfo& vis)
 {
+	blockSignals(true);
+
 	pMaterial_->setText(vis.material);
 	pType_->setCurrentIndex(static_cast<int32_t>(vis.type));
+
+	blockSignals(false);
 }
 
 void VisualsInfoWidget::getValue(VisualsInfo& vis)
@@ -1597,7 +1607,7 @@ void VisualsInfoWidget::currentIndexChanged(int32_t idx)
 FxSegmentModel::FxSegmentModel(QObject *parent) :
 	QAbstractTableModel(parent)
 {
-	AddSegment();
+	addSegment();
 
 	core::string test;
 	getJson(test);
@@ -1872,7 +1882,7 @@ void FxSegmentModel::getJson(core::string& jsonStrOut)
 	jsonStrOut = core::string(s.GetString(), s.GetSize());
 }
 
-void FxSegmentModel::AddSegment()
+void FxSegmentModel::addSegment()
 {
 	int currentRows = static_cast<int32_t>(segments_.size());
 
@@ -1945,6 +1955,14 @@ void FxSegmentModel::AddSegment()
 	endInsertRows();
 }
 
+void FxSegmentModel::setSegmentType(int32_t idx, engine::fx::StageType::Enum type)
+{
+	segments_[idx]->vis.type = type;
+	
+	auto modelIndex = index(idx, 1);
+
+	emit dataChanged(modelIndex, modelIndex);
+}
 
 int FxSegmentModel::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -2002,19 +2020,21 @@ bool FxSegmentModel::setData(const QModelIndex & index, const QVariant & value, 
 
 	if (role == Qt::CheckStateRole && index.column() == 0)
 	{
-		if (value == Qt::Checked)
+		bool enabled = (value == Qt::Checked);
+		
+		if(enabled != segment->enabled)
 		{
-			segment->enabled = true;
-		}
-		else
-		{
-			segment->enabled = false;
+			segment->enabled = enabled;
+			emit dataChanged(index, index);
 		}
 	}
 	else if (role == Qt::EditRole && index.column() == 0)
 	{
-
-		segment->name = value.toString();
+		if (segment->name != value.toString())
+		{
+			segment->name = value.toString();
+			emit dataChanged(index, index);
+		}
 	}
 
 	return true;
@@ -2255,7 +2275,8 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 
 void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
 {
-	X_UNUSED(type);
+
+	segmentModel_.setSegmentType(currentSegment_, type);
 
 	// TODO: enable / disable widgets based on type.
 }

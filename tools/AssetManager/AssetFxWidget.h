@@ -226,11 +226,13 @@ public:
 
 	void getJson(core::string& json);
 
-	void AddSegment();
+	void addSegment();
 
 	Segment& getSegment(int32_t idx) {
 		return *segments_[idx].get();
 	}
+
+	void setSegmentType(int32_t idx, engine::fx::StageType::Enum type);
 
 public:
 	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
