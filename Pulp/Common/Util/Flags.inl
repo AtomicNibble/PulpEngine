@@ -2,28 +2,28 @@
 
 
 template <class T>
-inline Flags<T>::Flags(void)
-	: flags_(0)
+inline Flags<T>::Flags(void) :
+	flags_(0)
 {
 }
 
 
 template <class T>
-inline Flags<T>::Flags(Enum flag)
-	: flags_(flag)
+inline Flags<T>::Flags(Enum flag) :
+	flags_(flag)
 {
 }
 
 template <class T>
-inline Flags<T>::Flags(const Flags& oth)
-	: flags_(oth.flags_)
+inline Flags<T>::Flags(const Flags& oth) :
+	flags_(oth.flags_)
 {
 }
 
 
 template <class T>
-inline Flags<T>::Flags(uint32_t flags)
-	: flags_(flags)
+inline Flags<T>::Flags(uint32_t flags) :
+	flags_(flags)
 {
 }
 
@@ -195,10 +195,12 @@ const char* Flags<T>::ToString(Description& description) const
 	}
 
 	// remove the trailing comma, if any
-	if (offset > 1)
+	if (offset > 1) {
 		description[offset - 2] = 0;
-	else
+	}
+	else {
 		description[0] = '\0';
+	}
 
 	return description;
 }
@@ -220,29 +222,29 @@ inline bool Flags<T>::operator!=(const Flags& other) const
 
 
 template <class T>
-inline Flags8<T>::Flags8(void)
-: flags_(0)
+inline Flags8<T>::Flags8(void) :
+	flags_(0)
 {
 }
 
 
 template <class T>
-inline Flags8<T>::Flags8(Enum flag)
-: flags_(flag)
+inline Flags8<T>::Flags8(Enum flag) :
+	flags_(flag)
 {
 }
 
 
 template <class T>
-inline Flags8<T>::Flags8(const Flags8& oth)
-	: flags_(oth.flags_)
+inline Flags8<T>::Flags8(const Flags8& oth) :
+	flags_(oth.flags_)
 {
 }
 
 
 template <class T>
-inline Flags8<T>::Flags8(uint8_t flags)
-: flags_(flags)
+inline Flags8<T>::Flags8(uint8_t flags) :
+	flags_(flags)
 {
 }
 
@@ -418,10 +420,12 @@ const char* Flags8<T>::ToString(Description& description) const
 	}
 
 	// remove the trailing comma, if any
-	if (offset > 1)
+	if (offset > 1) {
 		description[offset - 2] = 0;
-	else
+	}
+	else {
 		description[0] = '\0';
+	}
 
 	return description;
 }
