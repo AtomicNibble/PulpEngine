@@ -61,6 +61,42 @@ void SpinBoxRange::getValue(Range& r)
 	r.range = pRange_->value();
 }
 
+// -----------------------------------
+
+
+SpinBoxRangeDouble::SpinBoxRangeDouble(QWidget* parent) :
+	QWidget(parent)
+{
+	QHBoxLayout* pLayout = new QHBoxLayout();
+	pStart_ = new QDoubleSpinBox();
+	pRange_ = new QDoubleSpinBox();
+	pStart_->setSingleStep(0.05);
+	pRange_->setSingleStep(0.05);
+
+	pStart_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	pRange_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+
+	QLabel* pLabel = new QLabel("+");
+
+	pLayout->setContentsMargins(0, 0, 0, 0);
+	pLayout->addWidget(pStart_, 1);
+	pLayout->addWidget(pLabel, 0);
+	pLayout->addWidget(pRange_, 1);
+	setLayout(pLayout);
+}
+
+void SpinBoxRangeDouble::setValue(const RangeDouble& r)
+{
+	pStart_->setValue(r.start);
+	pRange_->setValue(r.range);
+}
+
+void SpinBoxRangeDouble::getValue(RangeDouble& r)
+{
+	r.start = pStart_->value();
+	r.range = pRange_->value();
+}
+
 
 // -----------------------------------
 
@@ -1083,16 +1119,21 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 	{
 		pGraph_ = new GraphEditor(2, 1);
 		pScale_ = new QDoubleSpinBox();
-		pScale_->setMinimumWidth(50);
-		pScale_->setMaximumWidth(50);
 		pScale_->setSingleStep(0.05);
+
+		pRandomGraph_ = new QCheckBox();
+		pRandomGraph_->setText("Random Graph");
 
 		pLayout->addWidget(pGraph_);
 
-		QFormLayout* pFormLayout = new QFormLayout();
-		pFormLayout->addRow(tr("Scale"), pScale_);
+		QHBoxLayout* pHLayout = new QHBoxLayout();
+		pHLayout->setContentsMargins(0, 0, 0, 0);
+		pHLayout->addWidget(new QLabel("Scale"));
+		pHLayout->addWidget(pScale_);
+		pHLayout->addStretch(1);
+		pHLayout->addWidget(pRandomGraph_);
 
-		pLayout->addLayout(pFormLayout);
+		pLayout->addLayout(pHLayout);
 	}
 
 	setLayout(pLayout);
@@ -1352,17 +1393,27 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pUpScale_->setMaximumWidth(50);
 		pUpScale_->setSingleStep(0.05);
 
+		pRandomGraph_ = new QCheckBox();
+		pRandomGraph_->setText("Random Graph");
+
+//		QHBoxLayout* pHLayout = new QHBoxLayout();
+	//	pHLayout ->addStretch(1);
+	//	pHLayout ->addWidget(pRandomGraph_);
+
 		QHBoxLayout* pFormLayout = new QHBoxLayout();
-		pFormLayout->addWidget(new QLabel("Forward Scale"));
+		pFormLayout->addWidget(new QLabel("Forward"));
 		pFormLayout->addWidget(pForwardScale_);
-		pFormLayout->addWidget(new QLabel("Right Scale"));
+		pFormLayout->addWidget(new QLabel("Right"));
 		pFormLayout->addWidget(pRightScale_);
-		pFormLayout->addWidget(new QLabel("Up Scale"));
+		pFormLayout->addWidget(new QLabel("Up"));
 		pFormLayout->addWidget(pUpScale_);
+		pFormLayout->addWidget(pRandomGraph_);
 		pFormLayout->addStretch(1);
 
 		pLayout->addWidget(pVelGraph_);
+	//	pLayout->addLayout(pHLayout);
 		pLayout->addLayout(pFormLayout);
+
 	}
 
 	setLayout(pLayout);
@@ -1372,19 +1423,11 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 void VelocityGraph::setValue(const VelocityInfo& vel)
 {
 	pVelGraph_->setValue(vel.graph);
-
-//	pUpScale_->setValue(vel.up.scale);
-//	pForwardScale_->setValue(vel.forward.scale);
-//	pRightScale_->setValue(vel.right.scale);
 }
 
 void VelocityGraph::getValue(VelocityInfo& vel)
 {
 	pVelGraph_->getValue(vel.graph);
-
-//	vel.up.scale = pUpScale_->value();
-//	vel.forward.scale = pForwardScale_->value();
-//	vel.right.scale = pRightScale_->value();
 }
 
 
@@ -1394,12 +1437,11 @@ void VelocityGraph::getValue(VelocityInfo& vel)
 VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
 	QGroupBox("Velocity", parent)
 {
-	QFormLayout* pLayout = new QFormLayout();
+	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
 		QGroupBox* pMoveGroupBox = new QGroupBox("Relative to");
 		{
-			QFormLayout* pMoveLayout = new QFormLayout();
-
+			QHBoxLayout* pMoveLayout = new QHBoxLayout();
 			QButtonGroup* pGroup = new QButtonGroup();
 
 			pSpawn_ = new QRadioButton();
@@ -1416,8 +1458,7 @@ VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
 			pMoveLayout->addWidget(pSpawn_);
 			pMoveLayout->addWidget(pNow_);
 			
-
-			pMoveGroupBox->setMaximumWidth(100);
+			pMoveGroupBox->setMaximumWidth(140);
 			pMoveGroupBox->setLayout(pMoveLayout);
 		}
 
@@ -1464,8 +1505,14 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 		pRotationGraph_->setYAxisRange(-0.5f,0.5f);
 		pRotationGraph_->createGraphs(2, 1);
 
-		pInitialRotation_ = new SpinBoxRange();
+		pInitialRotation_ = new SpinBoxRangeDouble();
 		pInitialRotation_->setMinimumWidth(80);
+
+		pScale_ = new QDoubleSpinBox();
+		pScale_->setSingleStep(0.05);
+
+		pRandomGraph_ = new QCheckBox();
+		pRandomGraph_->setText("Random Graph");
 
 
 		QHBoxLayout* pFormLayout = new QHBoxLayout();
@@ -1473,8 +1520,17 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 		pFormLayout->addWidget(pInitialRotation_);
 		pFormLayout->addStretch(1);
 
+		QHBoxLayout* pHLayout = new QHBoxLayout();
+		pHLayout->setContentsMargins(0, 0, 0, 0);
+		pHLayout->addWidget(new QLabel("Scale"));
+		pHLayout->addWidget(pScale_);
+		pHLayout->addStretch(1);
+		pHLayout->addWidget(pRandomGraph_);
+
+
 		pLayout->addLayout(pFormLayout);
 		pLayout->addWidget(pRotationGraph_);
+		pLayout->addLayout(pHLayout);
 	}
 
 	setLayout(pLayout);
@@ -1484,14 +1540,12 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 void RotationGraphWidget::setValue(const RotationInfo& rot)
 {
 	pInitialRotation_->setValue(rot.initial);
-
 	pRotationGraph_->setValue(rot.rot);
 }
 
 void RotationGraphWidget::getValue(RotationInfo& rot)
 {
 	pInitialRotation_->getValue(rot.initial);
-
 	pRotationGraph_->getValue(rot.rot);
 }
 
@@ -2133,7 +2187,7 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 
 		pSize_->setMinimumHeight(minHeight);
 		pScale_->setMinimumHeight(minHeight);
-		pVerlocity_->setMinimumHeight(minHeight);
+		pVerlocity_->setMinimumHeight(minHeight + 50);
 		pRotation_->setMinimumHeight(minHeight);
 		pCol_->setMinimumHeight(minHeight);
 		pAlpha_->setMinimumHeight(minHeight);
@@ -2148,6 +2202,12 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		pSequence_->setMaximumWidth(maxWidth);
 		pCol_->setMaximumWidth(maxWidth);
 		pAlpha_->setMaximumWidth(maxWidth);
+
+		QHBoxLayout* pShizLayout = new QHBoxLayout();
+		pShizLayout->setContentsMargins(0, 0, 0, 0);
+		pShizLayout->addWidget(pSize_);
+		pShizLayout->addWidget(pScale_);
+		pShizLayout->addStretch(0);
 
 		QHBoxLayout* pSizeLayout = new QHBoxLayout();
 		pSizeLayout->setContentsMargins(0,0,0,0);
@@ -2228,6 +2288,7 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 	X_UNUSED(selected, deselected);
 
 	if (selected.count() != 1) {
+		enableWidgets(false);
 		return;
 	}
 

@@ -38,6 +38,19 @@ struct Range
 };
 
 
+struct RangeDouble
+{
+	RangeDouble() :
+		start(0),
+		range(0)
+	{
+	}
+
+	float64_t start;
+	float64_t range;
+};
+
+
 #if 0
 struct ColorPoint
 {
@@ -111,7 +124,7 @@ struct GraphScaleInfo : public GraphInfo
 struct RotationInfo
 {
 	GraphScaleInfo rot;
-	Range initial;
+	RangeDouble initial;
 };
 
 struct SizeInfo
@@ -262,6 +275,21 @@ private:
 	QSpinBox* pStart_;
 	QSpinBox* pRange_;
 };
+
+class SpinBoxRangeDouble : public QWidget
+{
+	Q_OBJECT
+public:
+	SpinBoxRangeDouble(QWidget* parent = nullptr);
+
+	void setValue(const RangeDouble& r);
+	void getValue(RangeDouble& r);
+
+private:
+	QDoubleSpinBox* pStart_;
+	QDoubleSpinBox* pRange_;
+};
+
 
 
 class GraphEditorView : public QtCharts::QChartView
@@ -500,6 +528,7 @@ public:
 private:
 	GraphEditor* pGraph_;
 	QDoubleSpinBox* pScale_;
+	QCheckBox* pRandomGraph_;
 };
 
 
@@ -596,6 +625,7 @@ private:
 	QDoubleSpinBox* pForwardScale_;
 	QDoubleSpinBox* pRightScale_;
 	QDoubleSpinBox* pUpScale_;
+	QCheckBox* pRandomGraph_;
 };
 
 class VelocityInfoWidget : public QGroupBox
@@ -626,7 +656,9 @@ public:
 
 private:
 	GraphEditor* pRotationGraph_;
-	SpinBoxRange* pInitialRotation_;
+	SpinBoxRangeDouble* pInitialRotation_;
+	QDoubleSpinBox* pScale_;
+	QCheckBox* pRandomGraph_;
 };
 
 class ColorGraph : public QGroupBox
