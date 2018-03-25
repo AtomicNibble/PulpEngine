@@ -5,6 +5,8 @@
 #include <Hashing\Fnva1Hash.h>
 #include <String\StringTokenizer.h>
 
+#include "Util\FxUtil.h"
+
 using namespace core::Hash::Literals;
 
 X_NAMESPACE_BEGIN(engine)
@@ -567,41 +569,10 @@ namespace fx
 			}
 
 			auto& typeJson = s["type"];
-			switch (core::Hash::Fnv1aHash(typeJson.GetString(), typeJson.GetStringLength()))
-			{
-				case "BillboardSprite"_fnv1a:
-					stage.type = StageType::BillboardSprite;
-					break;
-				case "OrientedSprite"_fnv1a:
-					stage.type = StageType::OrientedSprite;
-					break;
-				case "Tail"_fnv1a:
-					stage.type = StageType::Tail;
-					break;
-				case "Line"_fnv1a:
-					stage.type = StageType::Line;
-					break;
-				case "Sound"_fnv1a:
-					stage.type = StageType::Sound;
-					break;
-				default:
-					X_ERROR("Fx", "Unkonw type: \"%.*s\"", typeJson.GetStringLength(), typeJson.GetString());
-					return false;
-			}
-
 			auto& relativeToJson = s["relativeTo"];
-			switch (core::Hash::Fnv1aHash(relativeToJson.GetString(), relativeToJson.GetStringLength()))
-			{
-				case "Spawn"_fnv1a:
-					stage.postionType = RelativeTo::Spawn;
-					break;
-				case "Now"_fnv1a:
-					stage.postionType = RelativeTo::Now;
-					break;
-				default:
-					X_ERROR("Fx", "Unkonw RelativeTo: \"%.*s\"", relativeToJson.GetStringLength(), relativeToJson.GetString());
-					return false;
-			}
+
+			stage.type = Util::TypeFromStr(typeJson.GetString(), typeJson.GetString() + typeJson.GetStringLength());
+			stage.postionType = Util::RelativeToFromStr(relativeToJson.GetString(), relativeToJson.GetString() + relativeToJson.GetStringLength());
 
 			// space seperated flags.
 			// basically need to check all the strings and see if it's a flag.

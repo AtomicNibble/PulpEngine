@@ -403,6 +403,7 @@
     <ClInclude Include="FxLib.h" />
     <ClInclude Include="Lib\FxLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Util\FxUtil.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Compiler\Compiler.cpp" />
@@ -422,6 +423,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Util\FxUtil.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

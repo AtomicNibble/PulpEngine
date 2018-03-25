@@ -3,16 +3,17 @@
 
 #include <Core\Compiler.h>
 
-#ifndef FxLib_EXPORT
+#ifndef FXLIB_EXPORT
 #ifdef X_LIB
-#define FxLib_EXPORT
+#define FXLIB_EXPORT
 #else
-#ifdef VIDEO_LIB_EXPORT
-#define FxLib_EXPORT X_EXPORT
+#ifdef FX_LIB_EXPORT
+#define FXLIB_EXPORT X_EXPORT
 #else
-#define FxLib_EXPORT X_IMPORT
-#endif // !VIDEO_LIB_EXPORT
+#define FXLIB_EXPORT X_IMPORT
+#endif // !FX_LIB_EXPORT
 #endif // X_LIB
-#endif // !FxLib_EXPORT
+#endif // !FXLIB_EXPORT
 
 
+#include "Util\FxUtil.h"
