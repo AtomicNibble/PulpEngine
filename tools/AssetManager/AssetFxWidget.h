@@ -106,31 +106,26 @@ typedef std::vector<GraphData> GraphDataArr;
 // Graph info contains N graphs each with M series.
 struct GraphInfo
 {
-	GraphDataArr graphs;
-};
-
-struct GraphScaleInfo : public GraphInfo
-{
-	GraphScaleInfo() :
-		GraphInfo(),
+	GraphInfo() :
 		scale(0)
 	{
 
 	}
 
 	float scale;
+	GraphDataArr graphs;
 };
 
 struct RotationInfo
 {
-	GraphScaleInfo rot;
+	GraphInfo rot;
 	RangeDouble initial;
 };
 
 struct SizeInfo
 {
-	GraphScaleInfo size;
-	GraphScaleInfo scale;
+	GraphInfo size;
+	GraphInfo scale;
 };
 
 struct ColorInfo
@@ -199,12 +194,14 @@ struct SequenceInfo
 
 struct VisualsInfo
 {
+	typedef std::vector<QString> QStringArr;
+
 	VisualsInfo() :
 		type(engine::fx::StageType::BillboardSprite)
 	{
 	}
 
-	QString material;
+	QStringArr materials;
 	engine::fx::StageType::Enum type;
 };
 
@@ -238,12 +235,11 @@ public:
 	FxSegmentModel(QObject *parent = nullptr);
 
 	void getJson(core::string& json);
+	bool fromJson(const core::string& json);
 
-	void addSegment();
+	void addSegment(void);
 
-	Segment& getSegment(int32_t idx) {
-		return *segments_[idx].get();
-	}
+	Segment& getSegment(int32_t idx);
 
 	void setSegmentType(int32_t idx, engine::fx::StageType::Enum type);
 
@@ -522,8 +518,8 @@ class GraphWithScale : public QGroupBox
 public:
 	GraphWithScale(const QString& label, QWidget *parent = nullptr);
 
-	void setValue(const GraphScaleInfo& g);
-	void getValue(GraphScaleInfo& g);
+	void setValue(const GraphInfo& g);
+	void getValue(GraphInfo& g);
 
 private:
 	GraphEditor* pGraph_;

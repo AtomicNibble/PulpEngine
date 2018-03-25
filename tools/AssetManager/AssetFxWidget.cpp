@@ -1,6 +1,9 @@
 #include "AssetFxWidget.h"
 
 #include <String\Json.h>
+#include <String\StringRange.h>
+#include <String\StringTokenizer.h>
+#include <Hashing\Fnva1Hash.h>
 
 #include <IAnimation.h>
 #include <IEffect.h>
@@ -1140,13 +1143,13 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 }
 
 
-void GraphWithScale::setValue(const GraphScaleInfo& g)
+void GraphWithScale::setValue(const GraphInfo& g)
 {
 	pGraph_->setValue(g);
 	pScale_->setValue(g.scale);
 }
 
-void GraphWithScale::getValue(GraphScaleInfo& g)
+void GraphWithScale::getValue(GraphInfo& g)
 {
 	pGraph_->getValue(g);
 	g.scale = pScale_->value();
@@ -1633,7 +1636,13 @@ void VisualsInfoWidget::setValue(const VisualsInfo& vis)
 {
 	blockSignals(true);
 
-	pMaterial_->setText(vis.material);
+	QString mat;
+	
+	if (!vis.materials.empty()) {
+		mat = vis.materials.front();
+	}
+
+	pMaterial_->setText(mat);
 	pType_->setCurrentIndex(static_cast<int32_t>(vis.type));
 
 	blockSignals(false);
@@ -1641,7 +1650,8 @@ void VisualsInfoWidget::setValue(const VisualsInfo& vis)
 
 void VisualsInfoWidget::getValue(VisualsInfo& vis)
 {
-	vis.material = pMaterial_->text();
+	vis.materials.clear();
+	vis.materials.push_back(pMaterial_->text());
 	
 	auto idx = pType_->currentIndex();
 	X_ASSERT(idx >= 0 && idx < engine::fx::StageType::ENUM_COUNT, "Invalid index for type combo")(idx, engine::fx::StageType::ENUM_COUNT);
@@ -1665,6 +1675,7 @@ FxSegmentModel::FxSegmentModel(QObject *parent) :
 
 	core::string test;
 	getJson(test);
+	fromJson(test);
 }
 
 void FxSegmentModel::getJson(core::string& jsonStrOut)
@@ -1936,7 +1947,396 @@ void FxSegmentModel::getJson(core::string& jsonStrOut)
 	jsonStrOut = core::string(s.GetString(), s.GetSize());
 }
 
-void FxSegmentModel::addSegment()
+
+auto checkMember = [](const auto& d, const char* pName, core::json::Type type) -> bool {
+
+	if (!d.HasMember(pName)) {
+		X_ERROR("Fx", "Missing param: \"%s\"", pName);
+		return false;
+	}
+
+	auto srcType = d[pName].GetType();
+	if (srcType == type) {
+		return true;
+	}
+
+	X_ERROR("Fx", "Param \"%s\" has incorrect type", pName);
+	return false;
+};
+
+
+bool FxSegmentModel::fromJson(const core::string& jsonStr)
+{
+
+	using namespace engine::fx;
+	using namespace core::Hash::Literals;
+
+
+	core::json::Document d;
+	if (d.Parse(jsonStr.c_str(), jsonStr.length()).HasParseError()) {
+		core::json::Description dsc;
+		X_ERROR("Fx", "Failed to parse fx: %s", core::json::ErrorToString(d, jsonStr.begin(), jsonStr.end(), dsc));
+		return false;
+	}
+
+	// oh my days, this is going to be fun!
+	segments_.clear();
+
+	// basically want a array of stages.
+	if (!d.HasMember("stages")) {
+		X_ERROR("Fx", "Missing required stages value");
+		return false;
+	}
+
+	auto& stages = d["stages"];
+	if (!stages.IsArray()) {
+		X_ERROR("Fx", "Stages is not a array. Type: %" PRIi32, stages.GetType());
+		return false;
+	}
+
+	for (auto& s : stages.GetArray())
+	{
+		auto seg = std::make_unique<Segment>();
+
+		if (!checkMember(s, "type", core::json::kStringType)) {
+			return false;
+		}
+		if (!checkMember(s, "relativeTo", core::json::kStringType)) {
+			return false;
+		}
+		if (!checkMember(s, "flags", core::json::kStringType)) {
+			return false;
+		}
+		if (!checkMember(s, "materials", core::json::kArrayType)) {
+			return false;
+		}
+		if (!checkMember(s, "interval", core::json::kNumberType)) {
+			return false;
+		}
+		if (!checkMember(s, "loopCount", core::json::kNumberType)) {
+			return false;
+		}
+		if (!checkMember(s, "sequence", core::json::kObjectType)) {
+			return false;
+		}
+
+		if (d.HasMember("name") && d["name"].IsString())
+		{
+			auto& name = d["name"];
+			
+			QLatin1String str(name.GetString(), name.GetStringLength());
+			seg->name = str;
+		}
+		else
+		{
+			seg->name = QString("segment %1").arg(segments_.size());
+		}
+
+		if (d.HasMember("enabled") && d["enabled"].IsBool())
+		{
+			seg->enabled = d["enabled"].GetBool();
+		}
+		else
+		{
+			seg->enabled = true;
+		}
+
+		{
+			auto& seqJson = s["sequence"];
+
+			seg->seq.startFrame = seqJson["startFrame"].GetInt();
+			seg->seq.fps = seqJson["fps"].GetInt();
+			seg->seq.loop = seqJson["loop"].GetInt();
+		}
+
+		auto& typeJson = s["type"];
+		switch (core::Hash::Fnv1aHash(typeJson.GetString(), typeJson.GetStringLength()))
+		{
+			case "BillboardSprite"_fnv1a:
+				seg->vis.type = StageType::BillboardSprite;
+				break;
+			case "OrientedSprite"_fnv1a:
+				seg->vis.type = StageType::OrientedSprite;
+				break;
+			case "Tail"_fnv1a:
+				seg->vis.type = StageType::Tail;
+				break;
+			case "Line"_fnv1a:
+				seg->vis.type = StageType::Line;
+				break;
+			case "Sound"_fnv1a:
+				seg->vis.type = StageType::Sound;
+				break;
+			default:
+				X_ERROR("Fx", "Unkonw type: \"%.*s\"", typeJson.GetStringLength(), typeJson.GetString());
+				return false;
+		}
+
+		auto& relativeToJson = s["relativeTo"];
+		switch (core::Hash::Fnv1aHash(relativeToJson.GetString(), relativeToJson.GetStringLength()))
+		{
+			case "Spawn"_fnv1a:
+				seg->vel.postionType = RelativeTo::Spawn;
+				break;
+			case "Now"_fnv1a:
+				seg->vel.postionType = RelativeTo::Now;
+				break;
+			default:
+				X_ERROR("Fx", "Unkonw RelativeTo: \"%.*s\"", relativeToJson.GetStringLength(), relativeToJson.GetString());
+				return false;
+		}
+
+
+		{
+			auto& flagsJson = s["flags"];
+
+			core::StringRange<char> token(nullptr, nullptr);
+			core::StringTokenizer<char> tokens(flagsJson.GetString(),
+				flagsJson.GetString() + flagsJson.GetStringLength(), ' ');
+
+			while (tokens.ExtractToken(token))
+			{
+				switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
+				{
+					case "Looping"_fnv1a:
+						seg->flags.Set(StageFlag::Looping);
+						break;
+					case "RandGraphCol"_fnv1a:
+						seg->flags.Set(StageFlag::RandGraphCol);
+						break;
+					case "RandGraphAlpha"_fnv1a:
+						seg->flags.Set(StageFlag::RandGraphAlpha);
+						break;
+					case "RandGraphSize"_fnv1a:
+						seg->flags.Set(StageFlag::RandGraphSize);
+						break;
+					case "RandGraphVel"_fnv1a:
+						seg->flags.Set(StageFlag::RandGraphVel);
+						break;
+					default:
+						X_ERROR("Fx", "Unkonw flag: \"%.*s\"", token.GetLength(), token.GetStart());
+						return false;
+				}
+			}
+		}
+
+		{
+			auto& matsJson = s["materials"];
+
+			for (auto& m : matsJson.GetArray())
+			{
+				if (!m.IsString()) {
+					X_ERROR("Fx", "material entry is not type string");
+					return false;
+				}
+
+				QLatin1String str(m.GetString(), m.GetStringLength());
+				seg->vis.materials.emplace_back(QString(str));
+			}
+		}
+
+		seg->spawn.interval = s["interval"].GetInt();
+		seg->spawn.loopCount = s["loopCount"].GetInt();
+
+		const std::array<std::pair<const char*, Range&>, 6> ranges = { {
+			{ "count", seg->spawn.count },
+			{ "life", seg->spawn.life },
+			{ "delay", seg->spawn.delay },
+			{ "spawnOrgX", seg->origin.spawnOrgX },
+			{ "spawnOrgY", seg->origin.spawnOrgY },
+			{ "spawnOrgZ", seg->origin.spawnOrgZ },
+		} };
+
+		for (auto& r : ranges)
+		{
+			core::StackString<128> start, range;
+
+			start.setFmt("%sStart", r.first);
+			range.setFmt("%sRange", r.first);
+
+			if (!s.HasMember(start.c_str()) || !s.HasMember(range.c_str())) {
+				X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				return false;
+			}
+
+			if (!s[start.c_str()].IsNumber() || !s[range.c_str()].IsNumber()) {
+				X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				return false;
+			}
+
+			r.second.start = s[start.c_str()].GetFloat();
+			r.second.range = s[range.c_str()].GetFloat();
+		}
+
+		auto readGraph = [](core::json::Document::ValueType& d, const char* pName, GraphInfo& graphInfo) -> bool {
+
+			if (!checkMember(d, pName, core::json::kObjectType)) {
+				return false;
+			}
+
+			auto& graph = d[pName];
+
+			// you silly gost!
+			// have scale and graphs.
+			if (!checkMember(graph, "scale", core::json::kNumberType)) {
+				return false;
+			}
+			if (!checkMember(graph, "graphs", core::json::kArrayType)) {
+				return false;
+			}
+
+			graphInfo.scale = graph["scale"].GetFloat();
+
+			for (auto& graph : graph["graphs"].GetArray())
+			{
+				// each graph is a array of objects
+				if (!graph.IsArray()) {
+					X_ERROR("Fx", "Graph is not of type array");
+					return false;
+				}
+
+				GraphData data;
+				SeriesData series;
+
+				for (auto& g : graph.GetArray())
+				{
+					if (!g.IsObject()) {
+						X_ERROR("Fx", "Graph member is not a object");
+						return false;
+					}
+
+					if (!checkMember(g, "time", core::json::kNumberType)) {
+						return false;
+					}
+					if (!checkMember(g, "val", core::json::kNumberType)) {
+						return false;
+					}
+
+					auto time = g["time"].GetFloat();
+					auto val = g["val"].GetFloat();
+
+					series.points.emplace_back(time, val);
+				}
+
+				data.series.push_back(std::move(series));
+				graphInfo.graphs.push_back(std::move(data));
+			}
+
+			return true;
+		};
+
+		auto readColGraph = [](core::json::Document::ValueType& d, const char* pName, GraphInfo& graphInfo) -> bool {
+
+			if (!checkMember(d, pName, core::json::kObjectType)) {
+				return false;
+			}
+
+			auto& graph = d[pName];
+
+			if (!checkMember(graph, "scale", core::json::kNumberType)) {
+				return false;
+			}
+			if (!checkMember(graph, "graphs", core::json::kArrayType)) {
+				return false;
+			}
+
+			graphInfo.scale = graph["scale"].GetFloat();
+
+			for (auto& graph : graph["graphs"].GetArray())
+			{
+				// each graph is a array of objects
+				if (!graph.IsArray()) {
+					X_ERROR("Fx", "Graph is not of type array");
+					return false;
+				}
+
+				GraphData data;
+				data.series.resize(3);
+
+				for (auto& g : graph.GetArray())
+				{
+					if (!g.IsObject()) {
+						X_ERROR("Fx", "Graph member is not a object");
+						return false;
+					}
+
+					if (!checkMember(g, "time", core::json::kNumberType)) {
+						return false;
+					}
+					if (!checkMember(g, "rgb", core::json::kArrayType)) {
+						return false;
+					}
+
+					auto time = g["time"].GetFloat();
+
+					auto rgb = g["rgb"].GetArray();
+					if (rgb.Size() != 3) {
+						return false;
+					}
+
+					float col[3];
+					col[0] = rgb[0].GetFloat();
+					col[1] = rgb[1].GetFloat();
+					col[2] = rgb[2].GetFloat();
+
+
+					data.series[0].points.emplace_back(time, col[0]);
+					data.series[1].points.emplace_back(time, col[1]);
+					data.series[2].points.emplace_back(time, col[2]);
+				}
+
+				graphInfo.graphs.push_back(std::move(data));
+			}
+
+			return true;
+		};
+
+
+		bool ok = true;
+
+		// parse me the colors me fat camel of doom!
+		ok &= readColGraph(s, "colorGraph", seg->col.col);
+
+		// need to parse graphs.
+		ok &= readGraph(s, "alphaGraph", seg->col.alpha);
+		ok &= readGraph(s, "sizeGraph", seg->size.size);
+		ok &= readGraph(s, "scaleGraph", seg->size.scale);
+		ok &= readGraph(s, "rotGraph", seg->rot.rot);
+
+		GraphInfo vel0XGraph;
+		GraphInfo vel0YGraph;
+		GraphInfo vel0ZGraph;
+		
+		auto& vel = seg->vel;
+
+		ok &= readGraph(s, "vel0XGraph", vel0XGraph);
+		ok &= readGraph(s, "vel0YGraph", vel0YGraph);
+		ok &= readGraph(s, "vel0ZGraph", vel0ZGraph);
+
+		if (!ok) {
+			X_ERROR("Fx", "Failed to read graphs");
+			return false;
+		}
+
+		vel.forwardScale = vel0XGraph.scale;
+		vel.rightScale = vel0YGraph.scale;
+		vel.upScale = vel0ZGraph.scale;
+		vel.graph.graphs.resize(6);
+		vel.graph.graphs[0] = std::move(vel0XGraph.graphs[0]);
+		vel.graph.graphs[3] = std::move(vel0XGraph.graphs[1]);
+		vel.graph.graphs[1] = std::move(vel0YGraph.graphs[0]);
+		vel.graph.graphs[4] = std::move(vel0YGraph.graphs[1]);
+		vel.graph.graphs[2] = std::move(vel0ZGraph.graphs[0]);
+		vel.graph.graphs[5] = std::move(vel0ZGraph.graphs[1]);
+
+
+		segments_.push_back(std::move(seg));
+	}
+
+	return true;
+}
+
+void FxSegmentModel::addSegment(void)
 {
 	int currentRows = static_cast<int32_t>(segments_.size());
 
@@ -1944,7 +2344,7 @@ void FxSegmentModel::addSegment()
 
 	auto seg = std::make_unique<Segment>();
 
-	seg->name = QString("Goat");
+	seg->name = QString("segment %1").arg(segments_.size());
 	seg->enabled = true;
 
 	// so for size i want both graphs to have some default points.
@@ -2007,6 +2407,11 @@ void FxSegmentModel::addSegment()
 	segments_.push_back(std::move(seg));
 
 	endInsertRows();
+}
+
+Segment& FxSegmentModel::getSegment(int32_t idx)
+{
+	return *segments_[idx].get();
 }
 
 void FxSegmentModel::setSegmentType(int32_t idx, engine::fx::StageType::Enum type)
@@ -2178,6 +2583,10 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		const int minWidth = 300;
 		const int maxWidth = 400;
 
+		pVisualInfo_->setMinimumWidth(300);
+		pSapwn_->setMinimumWidth(300);
+		pOrigin_->setMinimumWidth(300);
+		pSequence_->setMinimumWidth(300);
 		pSize_->setMinimumWidth(300);
 		pScale_->setMinimumWidth(300);
 		pVerlocity_->setMinimumWidth(300);
@@ -2203,6 +2612,23 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		pCol_->setMaximumWidth(maxWidth);
 		pAlpha_->setMaximumWidth(maxWidth);
 
+		QVBoxLayout* pSettingsLeftLayout = new QVBoxLayout();
+		pSettingsLeftLayout->setContentsMargins(0, 0, 0, 0);
+		pSettingsLeftLayout->addWidget(pVisualInfo_);
+		pSettingsLeftLayout->addWidget(pSapwn_);
+
+		QVBoxLayout* pSettingsRightLayout = new QVBoxLayout();
+		pSettingsRightLayout->setContentsMargins(0, 0, 0, 0);
+		pSettingsRightLayout->addWidget(pOrigin_);
+		pSettingsRightLayout->addWidget(pSequence_);
+
+		QHBoxLayout* pSettingsLayout = new QHBoxLayout();
+		pSettingsLayout->setContentsMargins(0, 0, 0, 0);
+		pSettingsLayout->addLayout(pSettingsLeftLayout);
+		pSettingsLayout->addLayout(pSettingsRightLayout);
+		pSettingsLayout->addStretch(0);
+
+
 		QHBoxLayout* pShizLayout = new QHBoxLayout();
 		pShizLayout->setContentsMargins(0, 0, 0, 0);
 		pShizLayout->addWidget(pSize_);
@@ -2227,11 +2653,13 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		pVelLayout->addWidget(pRotation_);
 		pVelLayout->addStretch(0);
 
+		pTableLayout->setContentsMargins(0, 0, 0, 0);
 
-		pTableLayout->addWidget(pVisualInfo_);
-		pTableLayout->addWidget(pSapwn_);
-		pTableLayout->addWidget(pOrigin_);
-		pTableLayout->addWidget(pSequence_);
+	//	pTableLayout->addWidget(pVisualInfo_);
+	//	pTableLayout->addWidget(pSapwn_);
+	//	pTableLayout->addWidget(pOrigin_);
+	//	pTableLayout->addWidget(pSequence_);
+		pTableLayout->addLayout(pSettingsLayout);
 		pTableLayout->addLayout(pSizeLayout);
 		pTableLayout->addLayout(pVelLayout);
 		pTableLayout->addLayout(pColLayout);
