@@ -273,6 +273,9 @@ public:
 	void setValue(const ColorInfo& col);
 	void getValue(ColorInfo& col);
 
+signals:
+	void valueChanged(void);
+
 private slots:
 	void updateColor(void);
 
@@ -292,6 +295,9 @@ public:
 
 	void setValue(const GraphInfo& g);
 	void getValue(GraphInfo& g);
+
+signals:
+	void valueChanged(void);
 
 private:
 	GraphEditor* pGraph_;
@@ -398,6 +404,9 @@ public:
 	void setValue(const VelocityInfo& vel);
 	void getValue(VelocityInfo& vel);
 
+signals:
+	void valueChanged(void);
+
 private:
 	GraphEditorView* pVelGraph_;
 	QDoubleSpinBox* pForwardScale_;
@@ -416,6 +425,9 @@ public:
 	void setValue(const VelocityInfo& vel);
 	void getValue(VelocityInfo& vel);
 
+signals:
+	void valueChanged(void);
+
 private:
 	QRadioButton* pSpawn_;
 	QRadioButton* pNow_;
@@ -431,6 +443,9 @@ public:
 	
 	void setValue(const RotationInfo& rot);
 	void getValue(RotationInfo& rot);
+
+signals:
+	void valueChanged(void);
 
 private:
 	GraphEditor* pRotationGraph_;
@@ -449,6 +464,9 @@ public:
 	void setValue(const ColorInfo& col);
 	void getValue(ColorInfo& col);
 
+signals:
+	void valueChanged(void);
+
 private:
 	ColorGraphEditor* pColorGraph_;
 };
@@ -462,6 +480,9 @@ public:
 
 	void setValue(const ColorInfo& col);
 	void getValue(ColorInfo& col);
+
+signals:
+	void valueChanged(void);
 
 private:
 	GraphEditor* pAlphaGraph_;

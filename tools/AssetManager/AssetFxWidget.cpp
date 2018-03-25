@@ -273,6 +273,9 @@ bool GraphEditorView::MovePoint::mergeWith(const QUndoCommand* pOth)
 	return true;
 }
 
+// -----------------------------------
+
+
 
 
 // -----------------------------------
@@ -1050,6 +1053,7 @@ ColorGraphEditor::ColorGraphEditor(int32_t numGraph, QWidget* parent) :
 	pGraph_->setSeriesColor(2, QColor(QRgb(0x0000c0)));
 
 	connect(pGraph_, &GraphEditorView::pointsChanged, this, &ColorGraphEditor::updateColor);
+	connect(pGraph_, &GraphEditorView::pointsChanged, this, &ColorGraphEditor::valueChanged);
 
 	pGradient_ = new GradientWidget();
 	pGradient_->setMinimumHeight(10);
@@ -1129,6 +1133,7 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 
 		pRandomGraph_ = new QCheckBox();
 		pRandomGraph_->setText("Random Graph");
+		pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
 
 		pLayout->addWidget(pGraph_);
 
@@ -1140,6 +1145,10 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 		pHLayout->addWidget(pRandomGraph_);
 
 		pLayout->addLayout(pHLayout);
+
+		connect(pGraph_, &GraphEditor::pointsChanged, this, &GraphWithScale::valueChanged);
+		connect(pScale_, &QDoubleSpinBox::editingFinished, this, &GraphWithScale::valueChanged);
+		connect(pRandomGraph_, &QCheckBox::stateChanged, this, &GraphWithScale::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1426,6 +1435,7 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 
 		pRandomGraph_ = new QCheckBox();
 		pRandomGraph_->setText("Random Graph");
+		pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
 
 //		QHBoxLayout* pHLayout = new QHBoxLayout();
 	//	pHLayout ->addStretch(1);
@@ -1445,6 +1455,11 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 	//	pLayout->addLayout(pHLayout);
 		pLayout->addLayout(pFormLayout);
 
+		connect(pVelGraph_, &GraphEditorView::pointsChanged, this, &VelocityGraph::valueChanged);
+		connect(pForwardScale_, &QDoubleSpinBox::editingFinished, this, &VelocityGraph::valueChanged);
+		connect(pRightScale_, &QDoubleSpinBox::editingFinished, this, &VelocityGraph::valueChanged);
+		connect(pUpScale_, &QDoubleSpinBox::editingFinished, this, &VelocityGraph::valueChanged);
+		connect(pRandomGraph_, &QCheckBox::stateChanged, this, &VelocityGraph::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1491,12 +1506,16 @@ VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
 			
 			pMoveGroupBox->setMaximumWidth(140);
 			pMoveGroupBox->setLayout(pMoveLayout);
+		
+			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &VelocityInfoWidget::valueChanged);
 		}
 
 		pGraph_ = new VelocityGraph();
 
 		pLayout->addWidget(pMoveGroupBox);
 		pLayout->addWidget(pGraph_);
+
+		connect(pGraph_, &VelocityGraph::valueChanged, this, &VelocityInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1544,7 +1563,7 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 
 		pRandomGraph_ = new QCheckBox();
 		pRandomGraph_->setText("Random Graph");
-
+		pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
 
 		QHBoxLayout* pFormLayout = new QHBoxLayout();
 		pFormLayout->addWidget(new QLabel("Initial Rotation"));
@@ -1558,10 +1577,15 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 		pHLayout->addStretch(1);
 		pHLayout->addWidget(pRandomGraph_);
 
-
 		pLayout->addLayout(pFormLayout);
 		pLayout->addWidget(pRotationGraph_);
 		pLayout->addLayout(pHLayout);
+
+		connect(pRotationGraph_, &GraphEditor::pointsChanged, this, &RotationGraphWidget::valueChanged);
+		connect(pInitialRotation_, &SpinBoxRangeDouble::valueChanged, this, &RotationGraphWidget::valueChanged);
+		connect(pScale_, &QDoubleSpinBox::editingFinished, this, &RotationGraphWidget::valueChanged);
+		connect(pScale_, &QDoubleSpinBox::editingFinished, this, &RotationGraphWidget::valueChanged);
+		connect(pRandomGraph_, &QCheckBox::stateChanged, this, &RotationGraphWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1590,6 +1614,8 @@ ColorGraph::ColorGraph(QWidget *parent) :
 		pColorGraph_ = new ColorGraphEditor(2);
 
 		pLayout->addWidget(pColorGraph_);
+
+		connect(pColorGraph_, &ColorGraphEditor::valueChanged, this, &ColorGraph::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1617,6 +1643,8 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 		pAlphaGraph_ = new GraphEditor(2, 1);
 
 		pLayout->addWidget(pAlphaGraph_);
+
+		connect(pAlphaGraph_, &GraphEditor::pointsChanged, this, &AlphaGraph::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1824,6 +1852,12 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		connect(pOrigin_, &OriginInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pSequence_, &SequenceInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pVisualInfo_, &VisualsInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pRotation_, &RotationGraphWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pVerlocity_, &VelocityInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pCol_, &ColorGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pAlpha_, &AlphaGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pSize_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pScale_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 
 
 
@@ -1933,7 +1967,57 @@ void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
 
 void AssetFxWidget::onValueChanged(void)
 {
+	if (currentSegment_ < 0) {
+		return;
+	}
+
+	auto& segment = segmentModel_.getSegment(currentSegment_);
+
 	// the value has changed :O
+	QObject* pSender = sender();
+
+	// so don't know if neater way todo this?
+	// each function takes diffrent data :/
+	if (pSender == pSapwn_)
+	{
+		pSapwn_->getValue(segment.spawn);
+	}
+	else if (pSender == pOrigin_)
+	{
+		pOrigin_->getValue(segment.origin);
+	}
+	else if (pSender == pSequence_)
+	{
+		pSequence_->getValue(segment.seq);
+	}
+	else if (pSender == pVisualInfo_)
+	{
+		pVisualInfo_->getValue(segment.vis);
+	}
+	else if (pSender == pRotation_)
+	{
+		pRotation_->getValue(segment.rot);
+	}
+	else if (pSender == pVerlocity_)
+	{
+		pVerlocity_->getValue(segment.vel);
+	}
+	else if (pSender == pCol_)
+	{
+		pCol_->getValue(segment.col);
+	}
+	else if (pSender == pAlpha_)
+	{
+		pAlpha_->getValue(segment.col);
+	}
+	else if (pSender == pSize_)
+	{
+		pSize_->getValue(segment.size.size);
+	}
+	else if (pSender == pScale_)
+	{
+		pScale_->getValue(segment.size.scale);
+	}
 
 	std::string str;
 
