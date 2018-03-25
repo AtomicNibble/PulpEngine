@@ -4,8 +4,9 @@
 #include <QtCharts/QChartView.h>
 
 #include <IEffect.h>
-
 #include <vector>
+
+#include "FxSegmentModel.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -24,239 +25,6 @@ X_NAMESPACE_BEGIN(assman)
 class IContext;
 class IAssetEntry;
 
-
-struct Range
-{
-	Range() :
-		start(0),
-		range(0)
-	{
-	}
-
-	int32_t start;
-	int32_t range;
-};
-
-
-struct RangeDouble
-{
-	RangeDouble() :
-		start(0),
-		range(0)
-	{
-	}
-
-	float64_t start;
-	float64_t range;
-};
-
-
-#if 0
-struct ColorPoint
-{
-	qreal pos;
-	QColor col;
-};
-
-typedef std::vector<ColorPoint> ColorPointArr;
-#endif
-
-// GraphCollection:
-//	Graph0:
-//		Series0:
-//		Series1:
-//	Graph1:
-//		Series0:
-//		Series1:
-
-struct GraphPoint
-{
-	GraphPoint() :
-		GraphPoint(0.f, 0.f)
-	{
-	}
-
-	GraphPoint(float32_t pos, float32_t val) :
-		pos(pos),
-		val(val)
-	{
-	}
-
-	float32_t pos;
-	float32_t val;
-};
-
-typedef std::vector<GraphPoint> GraphPointArr;
-
-struct SeriesData
-{
-	GraphPointArr points;
-};
-
-typedef std::vector<SeriesData> SeriesDataArr;
-
-struct GraphData
-{
-	SeriesDataArr series;
-};
-
-typedef std::vector<GraphData> GraphDataArr;
-
-
-// Graph info contains N graphs each with M series.
-struct GraphInfo
-{
-	GraphInfo() :
-		scale(0)
-	{
-
-	}
-
-	float scale;
-	GraphDataArr graphs;
-};
-
-struct RotationInfo
-{
-	GraphInfo rot;
-	RangeDouble initial;
-};
-
-struct SizeInfo
-{
-	GraphInfo size;
-	GraphInfo scale;
-};
-
-struct ColorInfo
-{
-	GraphInfo alpha;
-	GraphInfo col;
-};
-
-struct VelocityInfo
-{
-	VelocityInfo() :
-		postionType(engine::fx::RelativeTo::Spawn)
-	{
-	}
-
-	engine::fx::RelativeTo::Enum postionType;
-
-	GraphInfo graph;
-
-	float forwardScale;
-	float rightScale;
-	float upScale;
-};
-
-
-struct SpawnInfo
-{
-	SpawnInfo() :
-		looping(false),
-		interval(200),
-		loopCount(0)
-	{
-		life.start = 1000;
-	}
-
-	bool looping;
-
-	int32_t interval;	// how often we run, if loopcount > 1 we wait this time before next.
-	int32_t loopCount;	// how many times we spawn before the end.
-
-	Range count;		// 
-	Range life;			// life for each elem.
-	Range delay;		// delay is when we start this stage.
-};
-
-struct OriginInfo
-{
-	Range spawnOrgX;
-	Range spawnOrgY;
-	Range spawnOrgZ;
-};
-
-struct SequenceInfo
-{
-	SequenceInfo() :
-		startFrame(0),
-		fps(0),
-		loop(0)
-	{
-	}
-
-	int32_t startFrame; 
-	int32_t fps;		
-	int32_t loop;
-};
-
-struct VisualsInfo
-{
-	typedef std::vector<QString> QStringArr;
-
-	VisualsInfo() :
-		type(engine::fx::StageType::BillboardSprite)
-	{
-	}
-
-	QStringArr materials;
-	engine::fx::StageType::Enum type;
-};
-
-struct Segment
-{
-	QString name;
-	bool enabled;
-
-	engine::fx::StageFlags flags;
-
-	SpawnInfo spawn;
-	OriginInfo origin;
-	SequenceInfo seq;
-	VisualsInfo vis;
-	VelocityInfo vel;
-
-	RotationInfo rot;
-	SizeInfo size;
-	ColorInfo col;
-};
-
-
-class FxSegmentModel : public QAbstractTableModel
-{
-	Q_OBJECT
-
-	typedef std::unique_ptr<Segment> SegmentPtr;
-	typedef std::vector<SegmentPtr> SegmentArr;
-
-public:
-	FxSegmentModel(QObject *parent = nullptr);
-
-	void getJson(core::string& json);
-	bool fromJson(const core::string& json);
-
-	void addSegment(void);
-
-	Segment& getSegment(int32_t idx);
-
-	void setSegmentType(int32_t idx, engine::fx::StageType::Enum type);
-
-public:
-	int rowCount(const QModelIndex &parent = QModelIndex()) const override;
-	int columnCount(const QModelIndex &parent = QModelIndex()) const override;
-	QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
-	bool setData(const QModelIndex & index, const QVariant & value, int role) override;
-	Qt::ItemFlags flags(const QModelIndex &index) const override;
-	QVariant headerData(int section, Qt::Orientation orientation, int role) const override;
-	bool removeRows(int row, int count, const QModelIndex &parent = QModelIndex()) override;
-
-private:
-
-	int32_t currentSegment_;
-	SegmentArr segments_;
-};
 
 class SpinBoxRange : public QWidget
 {
@@ -724,6 +492,9 @@ public:
 private:
 
 	void enableWidgets(bool enable);
+
+	void setActiveSegment(size_t idx);
+
 
 private slots :
 	void setValue(const std::string& value);

@@ -1668,6 +1668,27 @@
     <ClCompile Include="Release Dynamic\moc_AssetFxWidget.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="FxSegmentModel.cpp">
+      <Filter>Source Files\Widgets</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_FxSegmentModel.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1864,6 +1885,9 @@
     </CustomBuild>
     <CustomBuild Include="AssetFxWidget.h">
       <Filter>Header Files\Widgets\AssetScript</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FxSegmentModel.h">
+      <Filter>Header Files\Widgets</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>
