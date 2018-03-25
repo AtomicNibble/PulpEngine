@@ -102,6 +102,10 @@ bool EngineApp::Init(const wchar_t* sInCmdLine)
 		return false;
 	}
 
+	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "FxLib", "Engine_FxLib")) {
+		return false;
+	}
+
 	if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
 		return false;
 	}

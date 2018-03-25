@@ -30,6 +30,7 @@ X_FORCE_LINK_FACTORY("XEngineModule_AssetDB");
 X_LINK_LIB("engine_AssetDb")
 X_LINK_LIB("engine_ConverterLib")
 X_LINK_LIB("engine_MaterialLib")
+X_LINK_LIB("engine_FxLib")
 
 
 typedef core::MemoryArena<

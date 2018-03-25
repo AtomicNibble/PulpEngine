@@ -6,6 +6,7 @@
 #include <String\StringTokenizer.h>
 #include <Hashing\Fnva1Hash.h>
 
+#include <../FxLib/FxLib.h>
 
 using namespace engine::fx;
 using namespace core::Hash::Literals;
@@ -397,42 +398,10 @@ bool FxSegmentModel::fromJson(const std::string& jsonStr)
 		}
 
 		auto& typeJson = s["type"];
-		switch (core::Hash::Fnv1aHash(typeJson.GetString(), typeJson.GetStringLength()))
-		{
-			case "BillboardSprite"_fnv1a:
-				seg->vis.type = StageType::BillboardSprite;
-				break;
-			case "OrientedSprite"_fnv1a:
-				seg->vis.type = StageType::OrientedSprite;
-				break;
-			case "Tail"_fnv1a:
-				seg->vis.type = StageType::Tail;
-				break;
-			case "Line"_fnv1a:
-				seg->vis.type = StageType::Line;
-				break;
-			case "Sound"_fnv1a:
-				seg->vis.type = StageType::Sound;
-				break;
-			default:
-				X_ERROR("Fx", "Unkonw type: \"%.*s\"", typeJson.GetStringLength(), typeJson.GetString());
-				return false;
-		}
-
 		auto& relativeToJson = s["relativeTo"];
-		switch (core::Hash::Fnv1aHash(relativeToJson.GetString(), relativeToJson.GetStringLength()))
-		{
-			case "Spawn"_fnv1a:
-				seg->vel.postionType = RelativeTo::Spawn;
-				break;
-			case "Now"_fnv1a:
-				seg->vel.postionType = RelativeTo::Now;
-				break;
-			default:
-				X_ERROR("Fx", "Unkonw RelativeTo: \"%.*s\"", relativeToJson.GetStringLength(), relativeToJson.GetString());
-				return false;
-		}
 
+		seg->vis.type = Util::TypeFromStr(typeJson.GetString(), typeJson.GetString() + typeJson.GetStringLength());
+		seg->vel.postionType = Util::RelativeToFromStr(relativeToJson.GetString(), relativeToJson.GetString() + relativeToJson.GetStringLength());
 
 		{
 			auto& flagsJson = s["flags"];
