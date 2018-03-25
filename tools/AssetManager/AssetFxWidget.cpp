@@ -45,6 +45,9 @@ SpinBoxRange::SpinBoxRange(QWidget* parent) :
 	pLayout->addWidget(pLabel, 0);
 	pLayout->addWidget(pRange_, 1);
 	setLayout(pLayout);
+
+	connect(pStart_, &QSpinBox::editingFinished, this, &SpinBoxRange::valueChanged);
+	connect(pRange_, &QSpinBox::editingFinished, this, &SpinBoxRange::valueChanged);
 }
 
 void SpinBoxRange::setValue(const Range& r)
@@ -81,6 +84,9 @@ SpinBoxRangeDouble::SpinBoxRangeDouble(QWidget* parent) :
 	pLayout->addWidget(pLabel, 0);
 	pLayout->addWidget(pRange_, 1);
 	setLayout(pLayout);
+
+	connect(pStart_, &QSpinBox::editingFinished, this, &SpinBoxRangeDouble::valueChanged);
+	connect(pRange_, &QSpinBox::editingFinished, this, &SpinBoxRangeDouble::valueChanged);
 }
 
 void SpinBoxRangeDouble::setValue(const RangeDouble& r)
@@ -1199,6 +1205,14 @@ SegmentListWidget::SegmentListWidget(FxSegmentModel* pModel, QWidget* parent) :
 	setLayout(pTableLayout);
 }
 
+void SegmentListWidget::setActiveIndex(int32_t idx)
+{
+	auto modelIndex = pTable_->model()->index(idx, 0);
+
+	pTable_->selectionModel()->setCurrentIndex(modelIndex, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+}
+
+
 void SegmentListWidget::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
 	X_UNUSED(deselected);
@@ -1246,6 +1260,8 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 			QButtonGroup* pGroup = new QButtonGroup();
 			pOneShot_ = new QRadioButton();
 			pLooping_ = new QRadioButton();
+			
+			connect(pGroup, QOverload<int,bool>::of(&QButtonGroup::buttonToggled), this, &SpawnInfoWidget::valueChanged);
 
 			pOneShot_->setText("One-shot");
 			pOneShot_->setChecked(true);
@@ -1267,6 +1283,13 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 		pLayout->addRow(tr("Life"), pLife_);
 		pLayout->addRow(tr("Delay"), pDelay_);
 	}
+
+	
+	connect(pCount_, &SpinBoxRange::valueChanged, this, &SpawnInfoWidget::valueChanged);
+	connect(pInterval_, &QSpinBox::editingFinished, this, &SpawnInfoWidget::valueChanged);
+	connect(pLoopCount_, &QSpinBox::editingFinished, this, &SpawnInfoWidget::valueChanged);
+	connect(pLife_, &SpinBoxRange::valueChanged, this, &SpawnInfoWidget::valueChanged);
+	connect(pDelay_, &SpinBoxRange::valueChanged, this, &SpawnInfoWidget::valueChanged);
 
 	setLayout(pLayout);
 }
@@ -1307,6 +1330,10 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 		pLayout->addRow(tr("Forward"), pForward_);
 		pLayout->addRow(tr("Right"), pRight_);
 		pLayout->addRow(tr("Up"), pUp_);
+
+		connect(pForward_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pRight_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pUp_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1341,6 +1368,10 @@ SequenceInfoWidget::SequenceInfoWidget(QWidget* parent) :
 		pLayout->addRow(tr("Start"), pStart_);
 		pLayout->addRow(tr("PlayRate"), pPlayRate_);
 		pLayout->addRow(tr("Loop"), pLoopCount_);
+
+		connect(pStart_, &QSpinBox::editingFinished, this, &SequenceInfoWidget::valueChanged);
+		connect(pPlayRate_, &QSpinBox::editingFinished, this, &SequenceInfoWidget::valueChanged);
+		connect(pLoopCount_, &QSpinBox::editingFinished, this, &SequenceInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1624,6 +1655,9 @@ VisualsInfoWidget::VisualsInfoWidget(QWidget* parent) :
 
 		pLayout->addRow(tr("Type"), pType_);
 		pLayout->addRow(tr("Material"), pMaterial_);
+
+		connect(pType_, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &VisualsInfoWidget::valueChanged);
+		connect(pMaterial_, &QLineEdit::editingFinished, this, &VisualsInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1786,6 +1820,12 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		connect(pSegments_, &SegmentListWidget::itemSelectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
 		connect(pVisualInfo_, &VisualsInfoWidget::typeChanged, this, &AssetFxWidget::typeChanged);
 
+		connect(pSapwn_, &SpawnInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pOrigin_, &OriginInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pSequence_, &SequenceInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pVisualInfo_, &VisualsInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+
+
 
 		setLayout(pTableLayout);
 	}
@@ -1825,18 +1865,25 @@ void AssetFxWidget::setValue(const std::string& value)
 
 	if (segmentModel_.numSegments() > 0)
 	{
-		setActiveSegment(0);
+		pSegments_->setActiveIndex(0);
 	}
 
 	blockSignals(false);
 }
 
-void AssetFxWidget::setActiveSegment(size_t idx)
+void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
 {
-	if (idx >= segmentModel_.numSegments()) {
+	X_UNUSED(deselected);
+
+	if (selected.count() != 1) {
+		enableWidgets(false);
 		return;
 	}
 
+	auto indexes = selected.first().indexes();
+
+	int32_t curRow = indexes.first().row(); 
+	
 	if (currentSegment_ >= 0)
 	{
 		auto& segment = segmentModel_.getSegment(currentSegment_);
@@ -1854,7 +1901,7 @@ void AssetFxWidget::setActiveSegment(size_t idx)
 	}
 
 	{
-		auto& segment = segmentModel_.getSegment(idx);
+		auto& segment = segmentModel_.getSegment(curRow);
 
 		pSapwn_->setValue(segment.spawn);
 		pOrigin_->setValue(segment.origin);
@@ -1872,23 +1919,7 @@ void AssetFxWidget::setActiveSegment(size_t idx)
 		enableWidgets(true);
 	}
 
-	currentSegment_ = static_cast<int32_t>(idx);
-}
-
-void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
-{
-	X_UNUSED(deselected);
-
-	if (selected.count() != 1) {
-		enableWidgets(false);
-		return;
-	}
-
-	auto indexes = selected.first().indexes();
-
-	int32_t curRow = indexes.first().row(); 
-
-	setActiveSegment(curRow);
+	currentSegment_ = static_cast<int32_t>(curRow);
 }
 
 void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
@@ -1897,12 +1928,18 @@ void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
 
 	// TODO: enable / disable widgets based on type.
 
+}
+
+
+void AssetFxWidget::onValueChanged(void)
+{
+	// the value has changed :O
+
 	std::string str;
 
 	segmentModel_.getJson(str);
 
 	emit valueChanged(str);
 }
-
 
 X_NAMESPACE_END

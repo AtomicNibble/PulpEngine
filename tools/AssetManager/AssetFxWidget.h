@@ -35,6 +35,9 @@ public:
 	void setValue(const Range& r);
 	void getValue(Range& r);
 
+signals:
+	void valueChanged(void);
+
 private:
 	QSpinBox* pStart_;
 	QSpinBox* pRange_;
@@ -49,17 +52,18 @@ public:
 	void setValue(const RangeDouble& r);
 	void getValue(RangeDouble& r);
 
+signals:
+	void valueChanged(void);
+
 private:
 	QDoubleSpinBox* pStart_;
 	QDoubleSpinBox* pRange_;
 };
 
 
-
 class GraphEditorView : public QtCharts::QChartView
 {
 	Q_OBJECT
-
 
 private:
 	static constexpr Qt::PenStyle DisabledPenStyle = Qt::PenStyle::DotLine;
@@ -303,6 +307,8 @@ class SegmentListWidget : public QWidget
 public:
 	SegmentListWidget(FxSegmentModel* pModel, QWidget *parent = nullptr);
 	
+	void setActiveIndex(int32_t idx);
+
 signals:
 	void itemSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
@@ -329,6 +335,8 @@ public:
 	void setValue(const SpawnInfo& spawn);
 	void getValue(SpawnInfo& spawn);
 
+signals:
+	void valueChanged(void);
 
 private:
 	QRadioButton* pOneShot_;
@@ -350,6 +358,9 @@ public:
 	void setValue(const OriginInfo& org);
 	void getValue(OriginInfo& org);
 
+signals:
+	void valueChanged(void);
+
 private:
 	SpinBoxRange* pForward_;
 	SpinBoxRange* pRight_;
@@ -366,6 +377,9 @@ public:
 
 	void setValue(const SequenceInfo& sq);
 	void getValue(SequenceInfo& sq);
+
+signals:
+	void valueChanged(void);
 
 private:
 	QSpinBox* pStart_;
@@ -464,13 +478,12 @@ public:
 	void setValue(const VisualsInfo& vis);
 	void getValue(VisualsInfo& vis);
 
-
 signals:
+	void valueChanged(void);
 	void typeChanged(engine::fx::StageType::Enum type);
 
 private slots:
 	void currentIndexChanged(int32_t idx);
-
 
 private:
 	QComboBox* pType_;
@@ -490,17 +503,15 @@ public:
 	~AssetFxWidget();
 
 private:
-
 	void enableWidgets(bool enable);
-
-	void setActiveSegment(size_t idx);
-
 
 private slots :
 	void setValue(const std::string& value);
 
 	void segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void typeChanged(engine::fx::StageType::Enum type);
+
+	void onValueChanged(void);
 
 signals:
 	void valueChanged(const std::string& value);
