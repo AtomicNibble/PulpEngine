@@ -279,7 +279,11 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 
 		writer.Key("materials");
 		writer.StartArray();
-		writer.String("Goat");
+		for (auto mat : segment->vis.materials)
+		{
+			auto matStd = mat.toStdString();
+			writer.String(matStd.c_str());
+		}
 		writer.EndArray();
 
 		writer.Key("interval");
