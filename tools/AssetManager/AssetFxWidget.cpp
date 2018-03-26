@@ -340,6 +340,9 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 	QBrush axisBrush(Qt::darkGray);
 	pAxisX_->setLabelsBrush(axisBrush);
 	pAxisY_->setLabelsBrush(axisBrush);
+
+	pAxisX_->setLinePenColor(Qt::darkGray);
+	pAxisY_->setLinePenColor(Qt::darkGray);
 	
 	pAxisX_->setTickCount(3);
 	pAxisY_->setTickCount(2);
