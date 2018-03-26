@@ -1069,6 +1069,7 @@ ColorGraphEditor::ColorGraphEditor(int32_t numGraph, QWidget* parent) :
 	pHLayout->addStretch(0);
 	pHLayout->addWidget(pRandomGraph_);
 
+	connect(pRandomGraph_, &QCheckBox::stateChanged, this, &ColorGraphEditor::valueChanged);
 
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
@@ -1694,6 +1695,7 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 		pLayout->addLayout(pHLayout);
 
 		connect(pAlphaGraph_, &GraphEditor::pointsChanged, this, &AlphaGraph::valueChanged);
+		connect(pRandomGraph_, &QCheckBox::stateChanged, this, &AlphaGraph::valueChanged);
 	}
 
 	setLayout(pLayout);
