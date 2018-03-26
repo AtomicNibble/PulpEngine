@@ -224,13 +224,28 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 
 		auto name = segment->name.toStdString();
 
+		engine::fx::StageFlags flags;
+
 		if (segment->spawn.looping)
 		{
-			segment->flags.Set(StageFlag::Looping);
+			flags.Set(StageFlag::Looping);
 		}
-		else
+
+		if (segment->col.alpha.random)
 		{
-			segment->flags.Remove(StageFlag::Looping);
+			flags.Set(StageFlag::RandGraphAlpha);
+		}
+		if (segment->col.col.random)
+		{
+			flags.Set(StageFlag::RandGraphCol);
+		}
+		if (segment->size.size.random)
+		{
+			flags.Set(StageFlag::RandGraphSize);
+		}
+		if (segment->vel.graph.random)
+		{
+			flags.Set(StageFlag::RandGraphVel);
 		}
 
 		// manually build flag string instead of using Flag::ToString, as the format of the flags is important.
@@ -238,7 +253,7 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 		for (int32_t i = 0; i < StageFlags::FLAGS_COUNT; i++)
 		{
 			auto flag = static_cast<StageFlag::Enum>(1 << i);
-			if (segment->flags.IsSet(flag))
+			if (flags.IsSet(flag))
 			{
 				if (flagsStr.isNotEmpty()) {
 					flagsStr.append(" ");
@@ -410,29 +425,52 @@ bool FxSegmentModel::fromJson(const std::string& jsonStr)
 			core::StringTokenizer<char> tokens(flagsJson.GetString(),
 				flagsJson.GetString() + flagsJson.GetStringLength(), ' ');
 
+			engine::fx::StageFlags flags;
+
 			while (tokens.ExtractToken(token))
 			{
 				switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 				{
 					case "Looping"_fnv1a:
-						seg->flags.Set(StageFlag::Looping);
+						flags.Set(StageFlag::Looping);
 						break;
 					case "RandGraphCol"_fnv1a:
-						seg->flags.Set(StageFlag::RandGraphCol);
+						flags.Set(StageFlag::RandGraphCol);
 						break;
 					case "RandGraphAlpha"_fnv1a:
-						seg->flags.Set(StageFlag::RandGraphAlpha);
+						flags.Set(StageFlag::RandGraphAlpha);
 						break;
 					case "RandGraphSize"_fnv1a:
-						seg->flags.Set(StageFlag::RandGraphSize);
+						flags.Set(StageFlag::RandGraphSize);
 						break;
 					case "RandGraphVel"_fnv1a:
-						seg->flags.Set(StageFlag::RandGraphVel);
+						flags.Set(StageFlag::RandGraphVel);
 						break;
 					default:
 						X_ERROR("Fx", "Unkonw flag: \"%.*s\"", token.GetLength(), token.GetStart());
 						return false;
 				}
+			}
+
+			if (flags.IsSet(StageFlag::Looping))
+			{
+				seg->spawn.looping = true;
+			}
+			if (flags.IsSet(StageFlag::RandGraphCol))
+			{
+				seg->col.col.random = true;
+			}
+			if (flags.IsSet(StageFlag::RandGraphAlpha))
+			{
+				seg->col.alpha.random = true;
+			}
+			if (flags.IsSet(StageFlag::RandGraphSize))
+			{
+				seg->size.size.random = true;
+			}
+			if (flags.IsSet(StageFlag::RandGraphVel))
+			{
+				seg->vel.graph.random = true;
 			}
 		}
 

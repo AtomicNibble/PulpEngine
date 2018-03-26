@@ -174,8 +174,6 @@ struct Segment
 	QString name;
 	bool enabled;
 
-	engine::fx::StageFlags flags;
-
 	SpawnInfo spawn;
 	OriginInfo origin;
 	SequenceInfo seq;
