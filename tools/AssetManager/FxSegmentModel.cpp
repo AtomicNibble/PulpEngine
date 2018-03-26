@@ -335,15 +335,19 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 
 bool FxSegmentModel::fromJson(const std::string& jsonStr)
 {
+	// oh my days, this is going to be fun!
+	segments_.clear();
+
+	if (jsonStr.empty()) {
+		return true;
+	}
+
 	core::json::Document d;
 	if (d.Parse(jsonStr.c_str(), jsonStr.length()).HasParseError()) {
 		core::json::Description dsc;
 		X_ERROR("Fx", "Failed to parse fx: %s", core::json::ErrorToString(d, jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), dsc));
 		return false;
 	}
-
-	// oh my days, this is going to be fun!
-	segments_.clear();
 
 	// basically want a array of stages.
 	if (!d.HasMember("stages")) {
