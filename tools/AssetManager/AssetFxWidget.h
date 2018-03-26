@@ -345,6 +345,9 @@ public:
 signals:
 	void valueChanged(void);
 
+private slots:
+	void buttonToggled(int id, bool checked);
+
 private:
 	QRadioButton* pOneShot_;
 	QRadioButton* pLooping_;

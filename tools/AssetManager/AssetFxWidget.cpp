@@ -1289,12 +1289,16 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 		pLife_ = new SpinBoxRange();
 		pDelay_ = new SpinBoxRange();
 
+		pInterval_->setEnabled(false);
+		pLoopCount_->setEnabled(false);
+
 		QHBoxLayout* pRadioLayout = new QHBoxLayout();
 		{
 			QButtonGroup* pGroup = new QButtonGroup();
 			pOneShot_ = new QRadioButton();
 			pLooping_ = new QRadioButton();
 			
+			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &SpawnInfoWidget::buttonToggled);
 			connect(pGroup, QOverload<int,bool>::of(&QButtonGroup::buttonToggled), this, &SpawnInfoWidget::valueChanged);
 
 			pOneShot_->setText("One-shot");
@@ -1303,6 +1307,8 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 
 			pGroup->addButton(pOneShot_);
 			pGroup->addButton(pLooping_);
+			pGroup->setId(pOneShot_, 0);
+			pGroup->setId(pLooping_, 1);
 			pGroup->setExclusive(true);
 
 			pRadioLayout->addWidget(pOneShot_);
@@ -1348,6 +1354,22 @@ void SpawnInfoWidget::getValue(SpawnInfo& spawn)
 	pCount_->getValue(spawn.count);
 	pLife_->getValue(spawn.life);
 	pDelay_->getValue(spawn.delay);
+}
+
+void SpawnInfoWidget::buttonToggled(int id, bool checked)
+{
+	if (id == 0)
+	{
+		pInterval_->setEnabled(!checked);
+		pLoopCount_->setEnabled(!checked);
+		pCount_->setEnabled(checked);
+	}
+	else
+	{
+		pInterval_->setEnabled(checked);
+		pLoopCount_->setEnabled(checked);
+		pCount_->setEnabled(!checked);
+	}
 }
 
 // -----------------------------------
