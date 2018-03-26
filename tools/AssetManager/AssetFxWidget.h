@@ -282,6 +282,7 @@ private slots:
 private:
 	GraphEditorView* pGraph_;
 	GradientWidget* pGradient_;
+	QCheckBox* pRandomGraph_;
 
 	GradientWidget::ColorPointArr colors_;
 };
@@ -486,6 +487,7 @@ signals:
 
 private:
 	GraphEditor* pAlphaGraph_;
+	QCheckBox* pRandomGraph_;
 };
 
 

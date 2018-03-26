@@ -1061,10 +1061,21 @@ ColorGraphEditor::ColorGraphEditor(int32_t numGraph, QWidget* parent) :
 	pGradient_ = new GradientWidget();
 	pGradient_->setMinimumHeight(10);
 
+	pRandomGraph_ = new QCheckBox();
+	pRandomGraph_->setText("Random Graph");
+	pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
+
+	QHBoxLayout* pHLayout = new QHBoxLayout();
+	pHLayout->addStretch(0);
+	pHLayout->addWidget(pRandomGraph_);
+
+
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
+		pLayout->setContentsMargins(0,0,0,0);
 		pLayout->addWidget(pGraph_);
 		pLayout->addWidget(pGradient_);
+		pLayout->addLayout(pHLayout);
 	}
 
 	// i need to know when the graph changes.
@@ -1114,12 +1125,16 @@ void ColorGraphEditor::setValue(const ColorInfo& col)
 	// need to update graphs.
 	pGraph_->setValue(col.col);
 
+	pRandomGraph_->setChecked(col.col.random);
+
 	updateColor();
 }
 
 void ColorGraphEditor::getValue(ColorInfo& col)
 {
 	pGraph_->getValue(col.col);
+
+	col.col.random = pRandomGraph_->isChecked();
 }
 
 // -----------------------------------
@@ -1164,12 +1179,16 @@ void GraphWithScale::setValue(const GraphInfo& g)
 {
 	pGraph_->setValue(g);
 	pScale_->setValue(g.scale);
+
+	pRandomGraph_->setChecked(g.random);
 }
 
 void GraphWithScale::getValue(GraphInfo& g)
 {
 	pGraph_->getValue(g);
 	g.scale = pScale_->value();
+
+	g.random = pRandomGraph_->isChecked();
 }
 
 // -----------------------------------
@@ -1477,11 +1496,23 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 void VelocityGraph::setValue(const VelocityInfo& vel)
 {
 	pVelGraph_->setValue(vel.graph);
+
+	pForwardScale_->setValue(vel.forwardScale);
+	pRightScale_->setValue(vel.rightScale);
+	pUpScale_->setValue(vel.upScale);
+
+	pRandomGraph_->setChecked(vel.graph.random);
 }
 
 void VelocityGraph::getValue(VelocityInfo& vel)
 {
 	pVelGraph_->getValue(vel.graph);
+
+	vel.forwardScale = pForwardScale_->value();
+	vel.rightScale = pRightScale_->value();
+	vel.upScale = pUpScale_->value();
+
+	vel.graph.random = pRandomGraph_->isChecked();
 }
 
 
@@ -1651,7 +1682,16 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 	{
 		pAlphaGraph_ = new GraphEditor(2, 1);
 
+		pRandomGraph_ = new QCheckBox();
+		pRandomGraph_->setText("Random Graph");
+		pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
+
+		QHBoxLayout* pHLayout = new QHBoxLayout();
+		pHLayout->addStretch(0);
+		pHLayout->addWidget(pRandomGraph_);
+
 		pLayout->addWidget(pAlphaGraph_);
+		pLayout->addLayout(pHLayout);
 
 		connect(pAlphaGraph_, &GraphEditor::pointsChanged, this, &AlphaGraph::valueChanged);
 	}
@@ -1662,11 +1702,15 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 void AlphaGraph::setValue(const ColorInfo& col)
 {
 	pAlphaGraph_->setValue(col.alpha);
+
+	pRandomGraph_->setChecked(col.alpha.random);
 }
 
 void AlphaGraph::getValue(ColorInfo& col)
 {
 	pAlphaGraph_->getValue(col.alpha);
+
+	col.alpha.random = pRandomGraph_->isChecked();
 }
 
 

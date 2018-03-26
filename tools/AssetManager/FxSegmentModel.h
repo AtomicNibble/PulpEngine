@@ -69,11 +69,14 @@ typedef std::vector<GraphData> GraphDataArr;
 struct GraphInfo
 {
 	GraphInfo() :
-		scale(0)
+		scale(0),
+		random(false)
 	{
 	}
 
 	float scale;
+	bool random;
+	bool _pad[3];
 	GraphDataArr graphs;
 };
 
