@@ -1133,6 +1133,8 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 		pGraph_ = new GraphEditor(2, 1);
 		pScale_ = new QDoubleSpinBox();
 		pScale_->setSingleStep(0.05);
+		pScale_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
+
 
 		pRandomGraph_ = new QCheckBox();
 		pRandomGraph_->setText("Random Graph");
@@ -1424,14 +1426,17 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pVelGraph_->setGraphName(5, "Graph 1: Up");
 
 		pForwardScale_ = new QDoubleSpinBox();
+		pForwardScale_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
 		pForwardScale_->setMinimumWidth(50);
 		pForwardScale_->setMaximumWidth(50);
 		pForwardScale_->setSingleStep(0.05);
 		pRightScale_ = new QDoubleSpinBox();
+		pRightScale_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
 		pRightScale_->setMinimumWidth(50);
 		pRightScale_->setMaximumWidth(50);
 		pRightScale_->setSingleStep(0.05);
 		pUpScale_ = new QDoubleSpinBox();
+		pUpScale_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
 		pUpScale_->setMinimumWidth(50);
 		pUpScale_->setMaximumWidth(50);
 		pUpScale_->setSingleStep(0.05);
@@ -1563,6 +1568,7 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 
 		pScale_ = new QDoubleSpinBox();
 		pScale_->setSingleStep(0.05);
+		pScale_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
 
 		pRandomGraph_ = new QCheckBox();
 		pRandomGraph_->setText("Random Graph");
