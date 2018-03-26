@@ -1914,6 +1914,7 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 
 	if (selected.count() != 1) {
 		enableWidgets(false);
+		currentSegment_ = -1;
 		return;
 	}
 
