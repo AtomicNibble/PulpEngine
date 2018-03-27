@@ -2,6 +2,7 @@
 #include "FxManager.h"
 
 #include <Assets\AssetLoader.h>
+#include <IConsole.h>
 
 #include "Effect.h"
 #include "Emitter.h"
@@ -46,7 +47,8 @@ namespace fx
 
 	void EffectManager::registerCmds(void)
 	{
-
+		ADD_COMMAND_MEMBER("listEfx", this, EffectManager, &EffectManager::Cmd_ListAssets, core::VarFlag::SYSTEM,
+			"List all the effects");
 	}
 
 	void EffectManager::registerVars(void)
@@ -224,6 +226,55 @@ namespace fx
 
 
 	}
+
+	// -----------------------------------
+
+	void EffectManager::listAssets(const char* pSearchPattern)
+	{
+		core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
+
+		core::Array<EffectContainer::Resource*> sorted_efxs(arena_);
+		sorted_efxs.reserve(effects_.size());
+
+		for (const auto& mat : effects_)
+		{
+			if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.first))
+			{
+				sorted_efxs.push_back(mat.second);
+			}
+		}
+
+		std::sort(sorted_efxs.begin(), sorted_efxs.end(), [](EffectContainer::Resource* a, EffectContainer::Resource* b) {
+			const auto& nameA = a->getName();
+			const auto& nameB = b->getName();
+			return nameA.compareInt(nameB) < 0;
+		}
+		);
+
+		X_LOG0("Effect", "------------- ^8Effects(%" PRIuS ")^7 -------------", sorted_efxs.size());
+
+		for (const auto* pEfx : sorted_efxs)
+		{
+			X_LOG0("Effect", "^2%-32s^7 ^7Stages: ^2%" PRIi32 " ^7Refs: ^2%" PRIi32,
+				pEfx->getName(), pEfx->getNumStages(), pEfx->getRefCount());
+		}
+
+		X_LOG0("Effect", "------------ ^8Effects End^7 -------------");
+	}
+
+	// -----------------------------------
+
+	void EffectManager::Cmd_ListAssets(core::IConsoleCmdArgs* pCmd)
+	{
+		const char* pSearchPattern = nullptr;
+
+		if (pCmd->GetArgCount() >= 2) {
+			pSearchPattern = pCmd->GetArg(1);
+		}
+
+		listAssets(pSearchPattern);
+	}
+
 
 } // namespace fx
 

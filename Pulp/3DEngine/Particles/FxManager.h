@@ -7,6 +7,11 @@
 
 #include "Vars\EffectVars.h"
 
+X_NAMESPACE_DECLARE(core,
+	struct IConsoleCmdArgs;
+)
+
+
 X_NAMESPACE_BEGIN(engine)
 
 namespace fx
@@ -73,6 +78,11 @@ namespace fx
 
 	private:
 		void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+
+		void listAssets(const char* pSearchPattern);
+
+	private:
+		void Cmd_ListAssets(core::IConsoleCmdArgs* pCmd);
 
 	private:
 		core::MemoryArenaBase* arena_;
