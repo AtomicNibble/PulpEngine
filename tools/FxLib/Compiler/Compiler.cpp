@@ -526,6 +526,23 @@ namespace fx
 				{ "spawnOrgZ", stage.spawnOrgZ },
 			} };
 
+			core::StackString<128> name;
+
+			if (s.HasMember("name") && s["name"].IsString())
+			{
+				auto& val = s["name"];
+				name.set(val.GetString(), val.GetString() + val.GetStringLength());
+			}
+
+			if (!s.HasMember("enabled") && s["enabled"].IsBool()) 
+			{
+				if (!s["enabled"].GetBool())
+				{
+					X_LOG1("Fx", "Skipping segment \"%s\" it's disabled", name.c_str());
+					continue;
+				}
+			}
+
 			if (!checkMember(s, "type", core::json::kStringType)) {
 				return false;
 			}
