@@ -534,7 +534,7 @@ namespace fx
 				name.set(val.GetString(), val.GetString() + val.GetStringLength());
 			}
 
-			if (!s.HasMember("enabled") && s["enabled"].IsBool()) 
+			if (s.HasMember("enabled") && s["enabled"].IsBool()) 
 			{
 				if (!s["enabled"].GetBool())
 				{
