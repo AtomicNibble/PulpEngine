@@ -1110,9 +1110,19 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 			}
 			break;
 
+		case core::json::Type::kArrayType:
+		{
+			core::json::StringBuffer s;
+			core::json::Writer<core::json::StringBuffer> writer(s);
+
+			val.Accept(writer);
+
+			strVal.assign(s.GetString(), s.GetSize());
+			break;
+		}
+
 			// ye fooking wut
 		case core::json::Type::kObjectType:
-		case core::json::Type::kArrayType:
 			X_ERROR("AssetProps", "Unsupported value type for arg: %i", val.GetType());
 			break;
 
@@ -1121,7 +1131,7 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 			break;
 		}
 
-		item.SetSavedValue(strVal);
+		item.SetSavedValue(std::move(strVal));
 	}
 
 	return true;
