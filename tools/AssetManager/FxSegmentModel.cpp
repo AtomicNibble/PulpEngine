@@ -351,17 +351,12 @@ bool FxSegmentModel::fromJson(const std::string& jsonStr)
 		return false;
 	}
 
-	// basically want a array of stages.
-	if (!d.HasMember("stages")) {
-		X_ERROR("Fx", "Missing required stages value");
+	if (!d.IsArray()) {
+		X_ERROR("Fx", "Stages is not a array. Type: %" PRIi32, d.GetType());
 		return false;
 	}
-
-	auto& stages = d["stages"];
-	if (!stages.IsArray()) {
-		X_ERROR("Fx", "Stages is not a array. Type: %" PRIi32, stages.GetType());
-		return false;
-	}
+	
+	auto& stages = d;
 
 	for (auto& s : stages.GetArray())
 	{
