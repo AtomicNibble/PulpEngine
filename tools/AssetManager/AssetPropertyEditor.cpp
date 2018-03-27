@@ -1158,6 +1158,12 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 			writer.Bool(item.GetValueBool());
 			break;
 
+		case AssetProperty::PropertyType::FX:
+		{
+			auto json = item.GetValue();
+			writer.RawValue(json.c_str(), json.length(), core::json::Type::kArrayType);
+			break;
+		}
 		case AssetProperty::PropertyType::TEXT:
 		case AssetProperty::PropertyType::PATH:
 		case AssetProperty::PropertyType::LINEEDIT:
@@ -1165,7 +1171,6 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::IMAGE:
 		case AssetProperty::PropertyType::MODEL:
 		case AssetProperty::PropertyType::ANIM:
-		case AssetProperty::PropertyType::FX:
 		case AssetProperty::PropertyType::ASSET_REF:
 		case AssetProperty::PropertyType::COMBOBOX:
 		case AssetProperty::PropertyType::COLOR:
