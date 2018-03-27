@@ -1173,7 +1173,8 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 		case AssetProperty::PropertyType::VEC3:
 		case AssetProperty::PropertyType::VEC4:
 		default:
-			writer.String(item.GetValue().c_str());
+			auto& str = item.GetValue();
+			writer.String(str.c_str(), safe_static_cast<core::json::SizeType>(str.length()));
 			break;
 		}
 
