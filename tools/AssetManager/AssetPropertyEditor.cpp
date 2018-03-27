@@ -635,6 +635,12 @@ void AssetProperty::SetSavedValue(const std::string& val)
 	strSavedValue_ = val;
 }
 
+void AssetProperty::SetSavedValue(std::string&& val)
+{
+	strValue_ = std::move(val);
+	strSavedValue_ = strValue_;
+}
+
 void AssetProperty::SetDefaultValue(const std::string& val)
 {
 	defaultValue_ = val;

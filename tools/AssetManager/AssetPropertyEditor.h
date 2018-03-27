@@ -139,6 +139,7 @@ public:
 	void SetInitData(const std::string& val);
 	void SetValue(const std::string& val);
 	void SetSavedValue(const std::string& val);
+	void SetSavedValue(std::string&& val);
 	void SetDefaultValue(const std::string& val);
 
 	void SetMinMax(int32_t min, int32_t max);
