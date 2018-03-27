@@ -215,8 +215,6 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 		writer.EndObject();
 	};
 
-	writer.StartObject();
-	writer.Key("stages");
 	writer.StartArray();
 
 	for (auto& segment : segments_)
@@ -332,7 +330,6 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 	}
 
 	writer.EndArray();
-	writer.EndObject();
 
 	jsonStrOut = std::string(s.GetString(), s.GetSize());
 }
