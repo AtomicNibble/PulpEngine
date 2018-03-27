@@ -3,11 +3,8 @@
 
 void GenerateUI( asset& Asset )
 {
-    Asset.BeginGroup("Options");
-    {
-        Asset.AddInt( "interval", 0, 0, 10000 ).SetTitle( "Interval" );
-        Asset.AddInt( "loopCount", 0, 0, 10000 ).SetTitle( "LoopCount" );
 
-    }
+    Asset.AddFx( "stages");
+
 }
 
