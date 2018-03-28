@@ -1944,6 +1944,7 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 		connect(pSize_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pScale_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 
+		connect(&segmentModel_, &FxSegmentModel::dataChanged, this, &AssetFxWidget::onValueChanged);
 
 
 		setLayout(pTableLayout);
@@ -2103,6 +2104,14 @@ void AssetFxWidget::onValueChanged(void)
 	else if (pSender == pScale_)
 	{
 		pScale_->getValue(segment.size.scale);
+	}
+	else if (pSender == &segmentModel_)
+	{
+		// models already updated.
+	}
+	else
+	{
+		X_ASSERT_UNREACHABLE();
 	}
 
 	std::string str;
