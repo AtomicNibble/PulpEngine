@@ -149,7 +149,7 @@ namespace
 			const wchar_t* pAlgo = gEnv->pCore->GetCommandLineArgForVarW(L"a");
 			if (pAlgo) {
 				int32_t iAlgo = core::strUtil::StringToInt<int32_t>(pAlgo);
-				iAlgo = constrain<int32_t>(iAlgo, 1, 3);
+				iAlgo = constrain<int32_t>(iAlgo, 1, Algo::ENUM_COUNT);
 
 				static_assert(core::Compression::Algo::ENUM_COUNT == 7, "Added additional compression algos? this code needs updating.");
 
