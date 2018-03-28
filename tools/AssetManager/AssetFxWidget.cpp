@@ -344,12 +344,15 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 	pAxisX_->setLinePenColor(Qt::darkGray);
 	pAxisY_->setLinePenColor(Qt::darkGray);
 	
-	pAxisX_->setTickCount(3);
-	pAxisY_->setTickCount(2);
+	pAxisX_->setTickCount(5);
+	pAxisY_->setTickCount(5);
 	pAxisX_->setRange(0, 1);
 	pAxisY_->setRange(0, 1);
-	pAxisX_->setGridLineVisible(false);
-	pAxisY_->setGridLineVisible(false);
+	pAxisX_->setGridLineVisible(true);
+	pAxisY_->setGridLineVisible(true);
+	
+	pAxisX_->setGridLineColor(QColor(QRgb(0x404040)));
+	pAxisY_->setGridLineColor(QColor(QRgb(0x404040)));
 
 	pChart_->addAxis(pAxisY_, Qt::AlignLeft);
 	pChart_->addAxis(pAxisX_, Qt::AlignBottom);
