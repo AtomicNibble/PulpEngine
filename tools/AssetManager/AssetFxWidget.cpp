@@ -1221,15 +1221,22 @@ SegmentListWidget::SegmentListWidget(FxSegmentModel* pModel, QWidget* parent) :
 		pAdd->setText(tr("Add"));
 		pAdd->setMaximumWidth(80);
 
+		pDuplicate_ = new QPushButton();
+		pDuplicate_->setText(tr("Duplicate"));
+		pDuplicate_->setMaximumWidth(80);
+		pDuplicate_->setEnabled(false);
+
 		pDelete_ = new QPushButton();
 		pDelete_->setText(tr("Delete"));
 		pDelete_->setMaximumWidth(80);
 		pDelete_->setEnabled(false);
 
 		connect(pAdd, &QPushButton::clicked, this, &SegmentListWidget::addStageClicked);
+		connect(pDuplicate_, &QPushButton::clicked, this, &SegmentListWidget::duplicateSelectedClicked);
 		connect(pDelete_, &QPushButton::clicked, this, &SegmentListWidget::deleteSelectedStageClicked);
 
 		pButtonLayout->addWidget(pAdd);
+		pButtonLayout->addWidget(pDuplicate_);
 		pButtonLayout->addWidget(pDelete_);
 		pButtonLayout->addStretch();
 	}
@@ -1251,12 +1258,26 @@ void SegmentListWidget::selectionChanged(const QItemSelection &selected, const Q
 {
 	X_UNUSED(deselected);
 
+	pDuplicate_->setEnabled(!selected.isEmpty());
 	pDelete_->setEnabled(!selected.isEmpty());
 }
 
 void SegmentListWidget::addStageClicked(void)
 {
 	pSegmentModel_->addSegment();
+}
+
+void SegmentListWidget::duplicateSelectedClicked(void)
+{
+	auto* pSelectModel = pTable_->selectionModel();
+
+	if (!pSelectModel->hasSelection()) {
+		return;
+	}
+
+	auto selected = pSelectModel->selectedRows().first();
+
+	pSegmentModel_->duplicateSegment(selected.row());
 }
 
 void SegmentListWidget::deleteSelectedStageClicked(void)

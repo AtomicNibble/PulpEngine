@@ -323,11 +323,13 @@ private slots:
 	void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 
 	void addStageClicked(void);
+	void duplicateSelectedClicked(void);
 	void deleteSelectedStageClicked(void);
 
 private:
 	FxSegmentModel* pSegmentModel_;
 	QTableView* pTable_;
+	QPushButton* pDuplicate_;
 	QPushButton* pDelete_;
 };
 

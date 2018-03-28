@@ -201,6 +201,7 @@ public:
 	bool fromJson(const std::string& json);
 
 	void addSegment(void);
+	void duplicateSegment(size_t idx);
 
 	size_t numSegments(void) const;
 	Segment& getSegment(size_t idx);

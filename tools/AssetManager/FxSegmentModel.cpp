@@ -764,6 +764,21 @@ void FxSegmentModel::addSegment(void)
 	endInsertRows();
 }
 
+void FxSegmentModel::duplicateSegment(size_t idx)
+{
+	X_ASSERT(idx < segments_.size(), "Index out of range")(idx, segments_.size());
+
+	int currentRows = static_cast<int32_t>(segments_.size());
+
+	auto seg = std::make_unique<Segment>(*segments_[idx].get());
+	
+	beginInsertRows(QModelIndex(), currentRows, currentRows);
+
+	segments_.push_back(std::move(seg));
+
+	endInsertRows();
+}
+
 size_t FxSegmentModel::numSegments(void) const
 {
 	return segments_.size();
