@@ -490,7 +490,7 @@ namespace fx
 			}
 		)";
 
-		str = testCandle;
+	//	str = test;
 
 	
 		core::json::Document d;
