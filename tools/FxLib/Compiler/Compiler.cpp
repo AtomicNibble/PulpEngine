@@ -647,23 +647,30 @@ namespace fx
 			// need to basically parse a fuck ton of shit :D
 			for (auto& r : ranges)
 			{
-				core::StackString<128> start, range;
+				core::StackString<128> startStr, rangeStr;
 
-				start.setFmt("%sStart", r.first);
-				range.setFmt("%sRange", r.first);
+				startStr.setFmt("%sStart", r.first);
+				rangeStr.setFmt("%sRange", r.first);
 
-				if (!s.HasMember(start.c_str()) || !s.HasMember(range.c_str())) {
-					X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				if (!s.HasMember(startStr.c_str()) || !s.HasMember(rangeStr.c_str())) {
+					X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", startStr.c_str(), rangeStr.c_str());
 					return false;
 				}
 
-				if (!s[start.c_str()].IsNumber() || !s[range.c_str()].IsNumber()) {
-					X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				if (!s[startStr.c_str()].IsNumber() || !s[rangeStr.c_str()].IsNumber()) {
+					X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", startStr.c_str(), rangeStr.c_str());
 					return false;
 				}
-				
-				r.second.start = s[start.c_str()].GetFloat();
-				r.second.range = s[range.c_str()].GetFloat();
+
+				auto& range = r.second;
+				range.start = s[startStr.c_str()].GetFloat();
+				range.range = s[rangeStr.c_str()].GetFloat();
+
+				if (range.range < 0)
+				{
+					X_ERROR("Fx", "Negative range for: \"%s\" \"%s\"", startStr.c_str(), rangeStr.c_str());
+					return false;
+				}
 			}
 
 			if (!parseGraph(s, "colorGraph", stage.color, [](core::json::Document::ValueType& v, ColGraphSet::Type& col) -> bool {
