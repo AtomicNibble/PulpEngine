@@ -209,6 +209,12 @@ namespace
 
 		// if infalting get algo from buf.
 		if (!defalte) {
+
+			if (!ICompressor::validBuffer(inFileData)) {
+				X_ERROR("Compress", "Input file is not a compressed buffer");
+				return -1;
+			}
+
 			algo = ICompressor::getAlgo(inFileData);
 		}
 		else {
