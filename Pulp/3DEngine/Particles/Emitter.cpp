@@ -22,6 +22,7 @@ namespace fx
 		curStage_(0),
 		activeStages_(arena)
 	{
+		activeStages_.setGranularity(4);
 	}
 
 	void Emitter::play(const Effect* pEfx, bool clear)
