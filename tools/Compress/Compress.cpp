@@ -211,6 +211,9 @@ namespace
 		if (!defalte) {
 			algo = ICompressor::getAlgo(inFileData);
 		}
+		else {
+			X_LOG1("Compress", "Deflating Algo: %s lvl: %s", Algo::ToString(algo), CompressLevel::ToString(lvl));
+		}
 
 		core::Compression::CompressorAlloc compressor(algo);
 
