@@ -1292,6 +1292,10 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 		pInterval_->setEnabled(false);
 		pLoopCount_->setEnabled(false);
 
+		pInterval_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
+		pLoopCount_->setRange(std::numeric_limits<int16_t>::min(), std::numeric_limits<int16_t>::max());
+
+
 		QHBoxLayout* pRadioLayout = new QHBoxLayout();
 		{
 			QButtonGroup* pGroup = new QButtonGroup();
@@ -1420,6 +1424,10 @@ SequenceInfoWidget::SequenceInfoWidget(QWidget* parent) :
 		pStart_ = new QSpinBox();
 		pPlayRate_ = new QSpinBox();
 		pLoopCount_ = new QSpinBox();
+
+		pStart_->setRange(-1, std::numeric_limits<int16_t>::max());
+		pPlayRate_->setRange(-1, std::numeric_limits<int16_t>::max());
+		pLoopCount_->setRange(-1, std::numeric_limits<int16_t>::max());
 
 		pLayout->addRow(tr("Start"), pStart_);
 		pLayout->addRow(tr("PlayRate"), pPlayRate_);
