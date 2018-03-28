@@ -229,10 +229,10 @@ namespace
 					outFile = inFile + L".lz4";
 					break;
 				case Algo::LZ5:
-					outFile = inFile + L".lz4";
+					outFile = inFile + L".lz5";
 					break;
 				case Algo::LZ5HC:
-					outFile = inFile + L".lz4";
+					outFile = inFile + L".lz5";
 					break;
 				case Algo::LZMA:
 					outFile = inFile + L".lzma";
