@@ -774,6 +774,11 @@ namespace fx
 
 	bool EffectCompiler::writeToFile(core::XFile* pFile) const
 	{
+		if (stages_.isEmpty()) {
+			X_ERROR("Fx", "Effect has no acitive segments, skipping compile");
+			return false; 
+		}
+
 		core::ByteStream bs(arena_);
 		bs.reserve(2048);
 
