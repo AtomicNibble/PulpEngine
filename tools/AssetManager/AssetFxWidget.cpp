@@ -1123,12 +1123,16 @@ void ColorGraphEditor::updateColor(void)
 
 void ColorGraphEditor::setValue(const ColorInfo& col)
 {
+	blockSignals(true);
+
 	// need to update graphs.
 	pGraph_->setValue(col.col);
 
 	pRandomGraph_->setChecked(col.col.random);
 
 	updateColor();
+
+	blockSignals(false);
 }
 
 void ColorGraphEditor::getValue(ColorInfo& col)
@@ -1178,10 +1182,14 @@ GraphWithScale::GraphWithScale(const QString& label, QWidget* parent) :
 
 void GraphWithScale::setValue(const GraphInfo& g)
 {
+	blockSignals(true);
+
 	pGraph_->setValue(g);
 	pScale_->setValue(g.scale);
 
 	pRandomGraph_->setChecked(g.random);
+
+	blockSignals(false);
 }
 
 void GraphWithScale::getValue(GraphInfo& g)
@@ -1361,6 +1369,8 @@ SpawnInfoWidget::SpawnInfoWidget(QWidget* parent) :
 
 void SpawnInfoWidget::setValue(const SpawnInfo& spawn)
 {
+	blockSignals(true);
+
 	pLooping_->setChecked(spawn.looping);
 	pInterval_->setValue(spawn.interval);
 	pLoopCount_->setValue(spawn.loopCount);
@@ -1368,6 +1378,8 @@ void SpawnInfoWidget::setValue(const SpawnInfo& spawn)
 	pCount_->setValue(spawn.count);
 	pLife_->setValue(spawn.life);
 	pDelay_->setValue(spawn.delay);
+
+	blockSignals(false);
 }
 
 void SpawnInfoWidget::getValue(SpawnInfo& spawn)
@@ -1422,9 +1434,13 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 
 void OriginInfoWidget::setValue(const OriginInfo& org)
 {
+	blockSignals(true);
+
 	pForward_->setValue(org.spawnOrgX);
 	pRight_->setValue(org.spawnOrgY);
 	pUp_->setValue(org.spawnOrgZ);
+
+	blockSignals(false);
 }
 
 void OriginInfoWidget::getValue(OriginInfo& org)
@@ -1465,9 +1481,13 @@ SequenceInfoWidget::SequenceInfoWidget(QWidget* parent) :
 
 void SequenceInfoWidget::setValue(const SequenceInfo& sq)
 {
+	blockSignals(true);
+
 	pStart_->setValue(sq.startFrame);
 	pPlayRate_->setValue(sq.fps);
 	pLoopCount_->setValue(sq.loop);
+
+	blockSignals(false);
 }
 
 void SequenceInfoWidget::getValue(SequenceInfo& sq)
@@ -1547,6 +1567,8 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 
 void VelocityGraph::setValue(const VelocityInfo& vel)
 {
+	blockSignals(true);
+
 	pVelGraph_->setValue(vel.graph);
 
 	pForwardScale_->setValue(vel.forwardScale);
@@ -1554,6 +1576,8 @@ void VelocityGraph::setValue(const VelocityInfo& vel)
 	pUpScale_->setValue(vel.upScale);
 
 	pRandomGraph_->setChecked(vel.graph.random);
+
+	blockSignals(false);
 }
 
 void VelocityGraph::getValue(VelocityInfo& vel)
@@ -1616,11 +1640,15 @@ void VelocityInfoWidget::setValue(const VelocityInfo& vel)
 {
 	static_assert(engine::fx::RelativeTo::ENUM_COUNT == 2, "Enum count changed? This might need updating");
 
+	blockSignals(true);
+
 	if (vel.postionType == engine::fx::RelativeTo::Spawn) {
 		pSpawn_->setChecked(true);
 	}
 
 	pGraph_->setValue(vel);
+
+	blockSignals(false);
 }
 
 void VelocityInfoWidget::getValue(VelocityInfo& vel)
@@ -1686,8 +1714,12 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 
 void RotationGraphWidget::setValue(const RotationInfo& rot)
 {
+	blockSignals(true);
+
 	pInitialRotation_->setValue(rot.initial);
 	pRotationGraph_->setValue(rot.rot);
+
+	blockSignals(false);
 }
 
 void RotationGraphWidget::getValue(RotationInfo& rot)
@@ -1716,7 +1748,11 @@ ColorGraph::ColorGraph(QWidget *parent) :
 
 void ColorGraph::setValue(const ColorInfo& col)
 {
+	blockSignals(true);
+
 	pColorGraph_->setValue(col);
+
+	blockSignals(false);
 }
 
 void ColorGraph::getValue(ColorInfo& col)
@@ -1754,9 +1790,13 @@ AlphaGraph::AlphaGraph(QWidget *parent) :
 
 void AlphaGraph::setValue(const ColorInfo& col)
 {
+	blockSignals(true);
+
 	pAlphaGraph_->setValue(col.alpha);
 
 	pRandomGraph_->setChecked(col.alpha.random);
+	
+	blockSignals(false);
 }
 
 void AlphaGraph::getValue(ColorInfo& col)
