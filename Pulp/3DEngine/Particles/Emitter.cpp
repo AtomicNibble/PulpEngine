@@ -111,7 +111,8 @@ namespace fx
 				}
 
 				if (maxElems < 1) {
-					X_WARNING("Fx", "Calculated max elems is less than one: %" PRId32, maxElems);
+					X_WARNING("Fx", "Calculated max elems '%" PRId32 "' is less than one for efx: \"%s\" segment: %" PRIi32,
+						maxElems, pEfx_->getName().c_str(), curStage_);
 				}
 
 				maxElems = core::Max(maxElems, 1);
