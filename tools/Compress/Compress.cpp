@@ -258,7 +258,9 @@ namespace
 		}
 
 		const float compressTime = timer.GetMilliSeconds();
-		X_LOG0("Compress", "%s: ^2%fms", defalte ? "deflateTime" : "inflateTime", compressTime);
+		
+		core::HumanDuration::Str durStr;
+		X_LOG0("Compress", "%s: ^2%s", defalte ? "deflateTime" : "inflateTime", core::HumanDuration::toString(durStr, compressTime));
 
 		if (!res) {
 			X_ERROR("Compress", "%s failed.", defalte ? "deflation" : "inflation");
