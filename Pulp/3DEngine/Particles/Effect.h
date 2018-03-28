@@ -1,14 +1,15 @@
 #pragma once
 
 #include <Time\TimeVal.h>
+#include <IEffect.h>
 
 X_NAMESPACE_BEGIN(engine)
 
 namespace fx
 {
-	struct StageDsc;
-	struct Range;
-	struct Graph;
+//	struct StageDsc;
+//	struct Range;
+//	struct Graph;
 
 	class Effect : public core::AssetBase
 	{
@@ -27,7 +28,7 @@ namespace fx
 	public:
 		const StageDsc& getStageDsc(int32_t idx) const;
 		const StageDsc* getStageDscs(void) const;
-		const uint8_t* getIndexes(void) const;
+		const IndexType* getIndexes(void) const;
 		const float* getFloats(void) const;
 		const char* getMaterialName(int32_t strOffset) const;
 

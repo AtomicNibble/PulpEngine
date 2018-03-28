@@ -871,9 +871,9 @@ namespace fx
 		EffectHdr hdr;
 		hdr.fourCC = EFFECT_FOURCC;
 		hdr.version = EFFECT_VERSION;
-		hdr.numStages = safe_static_cast<uint8_t>(stages_.size());
-		hdr.numIndex = safe_static_cast<uint8_t>(indexes.size());
-		hdr.numFloats = safe_static_cast<uint8_t>(fltPool.size());
+		hdr.numStages = safe_static_cast<decltype(hdr.numStages)>(stages_.size());
+		hdr.numIndex = safe_static_cast<decltype(hdr.numIndex)>(indexes.size());
+		hdr.numFloats = safe_static_cast<decltype(hdr.numFloats)>(fltPool.size());
 		
 		if (pFile->writeObj(hdr) != sizeof(hdr)) {
 			X_ERROR("Fx", "Failed to write header");

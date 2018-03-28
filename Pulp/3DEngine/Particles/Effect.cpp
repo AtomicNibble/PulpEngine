@@ -58,12 +58,12 @@ namespace fx
 		return reinterpret_cast<StageDsc*>(data_.ptr() + sizeof(EffectHdr));
 	}
 
-	const uint8_t* Effect::getIndexes(void) const
+	const IndexType* Effect::getIndexes(void) const
 	{
 		size_t offset = sizeof(EffectHdr);
 		offset += sizeof(StageDsc) * numStages_;
 
-		return reinterpret_cast<uint8_t*>(data_.ptr() + offset);
+		return reinterpret_cast<IndexType*>(data_.ptr() + offset);
 	}
 
 	const float* Effect::getFloats(void) const

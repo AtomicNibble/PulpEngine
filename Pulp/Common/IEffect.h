@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
-	static const uint32_t	EFFECT_VERSION = 2;
+	static const uint32_t	EFFECT_VERSION = 3;
 	static const uint32_t	EFFECT_FOURCC = X_TAG('x', 'e', 'f', 'x');
 	static const char*		EFFECT_FILE_EXTENSION = "efx";
 
@@ -28,7 +28,7 @@ namespace fx
 	//
 	//	the graph will just allow a arbitary set of points over the timeline.
 
-	typedef uint8_t IndexType;
+	typedef uint16_t IndexType;
 	typedef IndexType IndexOffset;
 
 	struct IFxLib : public IConverter
@@ -76,13 +76,13 @@ namespace fx
 
 	struct Graph
 	{
-		uint8_t numPoints;
+		uint16_t numPoints;
 		IndexOffset timeStart;		// 0-1 times
 		IndexOffset valueStart;		// values
 		IndexOffset scaleIdx;		// 
 	};
 
-	X_ENSURE_SIZE(Graph, 4);
+	X_ENSURE_SIZE(Graph, 4 * 2);
 
 	static_assert(std::numeric_limits<decltype(Graph::numPoints)>::max() >= EFFECT_GRAPH_MAX_POINTS, "Can't represent max points");
 
@@ -139,9 +139,10 @@ namespace fx
 		uint32_t fourCC;
 		// 4
 		uint8_t version;
-		uint8_t numStages;
-		uint8_t numIndex;
-		uint8_t numFloats;
+		uint8_t _pad;
+		uint16_t numStages;
+		uint16_t numIndex;
+		uint16_t numFloats;
 	};
 
 	X_INLINE bool EffectHdr::isValid(void) const
@@ -150,7 +151,7 @@ namespace fx
 	}
 
 	// X_ENSURE_SIZE(Stage, 60);
-	// X_ENSURE_SIZE(EffectHdr, 8);
+	X_ENSURE_SIZE(EffectHdr, 12);
 
 	class Effect;
 
