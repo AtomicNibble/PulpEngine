@@ -2059,16 +2059,8 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 {
 	X_UNUSED(deselected);
 
-	if (selected.count() != 1) {
-		enableWidgets(false);
-		currentSegment_ = -1;
-		return;
-	}
+	qDebug() << "Current: " << currentSegment_;
 
-	auto indexes = selected.first().indexes();
-
-	int32_t curRow = indexes.first().row(); 
-	
 	if (currentSegment_ >= 0)
 	{
 		auto& segment = segmentModel_.getSegment(currentSegment_);
@@ -2084,6 +2076,21 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pSize_->getValue(segment.size.size);
 		pScale_->getValue(segment.size.scale);
 	}
+
+	if (selected.count() != 1) {
+		enableWidgets(false);
+		currentSegment_ = -1;
+		return;
+	}
+
+	auto indexes = selected.first().indexes();
+	int32_t curRow = indexes.first().row();
+
+	if (curRow == currentSegment_) {
+		return;
+	}
+
+	qDebug() << "New: " << curRow;
 
 	{
 		auto& segment = segmentModel_.getSegment(curRow);
@@ -2121,6 +2128,8 @@ void AssetFxWidget::onValueChanged(void)
 	if (currentSegment_ < 0) {
 		return;
 	}
+
+	qDebug() << "SegmentIdx: " << currentSegment_;
 
 	auto& segment = segmentModel_.getSegment(currentSegment_);
 
