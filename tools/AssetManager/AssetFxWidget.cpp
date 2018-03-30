@@ -731,24 +731,28 @@ void GraphEditorView::mousePressEvent(QMouseEvent *event)
 		auto* pSeries = activeSeries();
 		if (pSeries)
 		{
+			float lowestLength = std::numeric_limits<float>::max();
+			int32_t lowestIdx = -1;
 			int32_t i = 0;
 			for (; i < pSeries->count(); i++)
 			{
 				const auto& p = pSeries->at(i);
 				if (value.x() < p.x())
 				{
-					// check if we are really close
-					if ((value - p).manhattanLength() < 0.1)
-					{
-						return;
-					}
+					auto length = (value - p).manhattanLength();
 
-					break;
+					if (length < lowestLength) {
+						lowestLength = length;
+						lowestIdx = i;
+					}
 				}
 			}
 
-			pUndoStack_->push(new AddPoint(this, activeGraph(), i, value));		
-			return;
+			if (lowestIdx >= 0 && lowestLength < 0.05)
+			{
+				pUndoStack_->push(new AddPoint(this, activeGraph(), i, value));		
+				return;
+			}
 		}
 	}
 
