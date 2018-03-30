@@ -69,6 +69,7 @@ namespace fx
 			Stage(Stage&& oth) = default;
 			Stage& operator=(Stage&& oth) = default;
 
+			bool stageIdxValid(void) const;
 			const StageDsc& getStageDesc(void) const;
 
 			const Effect* pEfx;

@@ -14,6 +14,11 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
+	bool Emitter::Stage::stageIdxValid(void) const
+	{
+		return stageIdx < pEfx->getNumStages();
+	}
+
 	inline const StageDsc& Emitter::Stage::getStageDesc(void) const 
 	{
 		return pEfx->getStageDsc(stageIdx);
@@ -150,6 +155,13 @@ namespace fx
 		for (auto it = activeStages_.begin(); it != activeStages_.end(); )
 		{
 			auto& stage = *it;
+
+			// stage removed during reload.
+			if (!stage.stageIdxValid())
+			{
+				it = activeStages_.erase(it);
+				continue;
+			}
 
 			auto& desc = stage.getStageDesc();
 
