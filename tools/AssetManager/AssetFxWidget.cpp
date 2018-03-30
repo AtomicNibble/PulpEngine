@@ -790,18 +790,25 @@ void GraphEditorView::seriesHover(const QPointF &point, bool state)
 		// if you select one of diffrent series you switch to that.
 		auto findhoveringPoint = [&point](QtCharts::QLineSeries* pSeries) -> int32_t {
 			auto count = pSeries->count();
+			
+			qreal lowestLength = 0.1;
+			int32_t idx = -1;
+
 			for (int32_t i = 0; i < count; i++)
 			{
 				const auto& p = pSeries->at(i);
 				auto rel = point - p;
 
-				if (rel.manhattanLength() < 0.1)
+				auto length = rel.manhattanLength();
+
+				if (length < lowestLength)
 				{
-					return i;
+					lowestLength = length;
+					idx = i;
 				}
 			}
 
-			return -1;
+			return idx;
 		};
 
 		const auto numPoints = activeSeries()->count();
