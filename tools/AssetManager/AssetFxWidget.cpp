@@ -130,7 +130,7 @@ void GraphEditorView::ResetGraph::redo(void)
 		pSeries->append(1, minVal);
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 void GraphEditorView::ResetGraph::undo(void)
@@ -140,7 +140,7 @@ void GraphEditorView::ResetGraph::undo(void)
 		graph_.series[i]->replace(graphPoints_[i]);
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 // -----------------------------------
@@ -161,14 +161,14 @@ void GraphEditorView::ClearPoints::redo(void)
 		pSeries_->append(points_.back());
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 void GraphEditorView::ClearPoints::undo(void)
 {
 	pSeries_->replace(points_);
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 
@@ -191,7 +191,7 @@ void GraphEditorView::AddPoint::redo(void)
 		pSeries->insert(index_, point_);
 	}
 	
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 void GraphEditorView::AddPoint::undo(void)
@@ -201,7 +201,7 @@ void GraphEditorView::AddPoint::undo(void)
 		pSeries->remove(index_);
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 // -----------------------------------
@@ -234,7 +234,7 @@ void GraphEditorView::MovePoint::redo(void)
 		s[i]->replace(index_, pos);
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 void GraphEditorView::MovePoint::undo(void)
@@ -255,7 +255,7 @@ void GraphEditorView::MovePoint::undo(void)
 		s[i]->replace(index_, pos);
 	}
 
-	emit pView_->pointsChanged();
+	pView_->onPointsChanged();
 }
 
 int GraphEditorView::MovePoint::id(void) const
@@ -286,6 +286,7 @@ GraphEditorView::GraphEditorView(QWidget *parent) :
 	QChartView(parent),
 	mouseActive_(false),
 	singleActiveSeries_(false),
+	dirty_(false),
 	activePoint_(-1),
 	activeSeries_(-1),
 	activeGraph_(-1),
@@ -956,6 +957,57 @@ void GraphEditorView::resetKnots(void)
 	}
 }
 
+void GraphEditorView::signalPointsChanged(void)
+{
+	time_.restart();
+
+	if (dirty_)
+	{
+		emit pointsChanged();
+		dirty_ = false;
+	}
+	else
+	{
+		timer_.stop();
+	}
+}
+
+void GraphEditorView::onPointsChanged(void)
+{
+	// i want to rate limit.
+	// so if more time has passed than min wait, just signal now.
+	// we only need 
+	qint64 msecsPeriod{ 200 };
+
+	dirty_ = true;
+
+	if (!time_.isValid())
+	{
+		signalPointsChanged();
+		return;
+	}
+
+	auto elapsed = time_.elapsed();
+
+	if (elapsed >= msecsPeriod)
+	{
+		signalPointsChanged();
+		return;
+	}
+
+	if (!timer_.isActive())
+	{
+		timer_.start(msecsPeriod - elapsed, this);
+	}
+}
+
+void GraphEditorView::timerEvent(QTimerEvent *event)
+{
+	if (timer_.timerId() == event->timerId())
+	{
+		signalPointsChanged();
+	}
+}
 
 X_INLINE bool GraphEditorView::isDraggingPoint(void) const
 {

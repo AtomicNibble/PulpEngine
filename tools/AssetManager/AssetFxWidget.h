@@ -197,6 +197,12 @@ signals:
 	void pointsChanged(void);
 
 private:
+	void signalPointsChanged(void);
+	void onPointsChanged(void);
+
+	void timerEvent(QTimerEvent *event) override;
+
+private:
 	bool isDraggingPoint(void) const;
 
 	QtCharts::QLineSeries* getSeries(int32_t graphIdx, int32_t seriesIdx) const;
@@ -204,6 +210,9 @@ private:
 	Graph& activeGraph(void);
 
 private:
+	QBasicTimer timer_;
+	QElapsedTimer time_;
+
 	IContext* pContext_;
 	QUndoStack* pUndoStack_;
 	QAction* pUndoAction_;
@@ -214,6 +223,7 @@ private:
 
 	bool mouseActive_;
 	bool singleActiveSeries_;
+	bool dirty_;
 
 
 	int32_t activePoint_;
