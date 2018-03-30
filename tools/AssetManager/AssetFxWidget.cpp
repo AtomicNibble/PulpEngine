@@ -2063,8 +2063,6 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 {
 	X_UNUSED(deselected);
 
-	qDebug() << "Current: " << currentSegment_;
-
 	if (currentSegment_ >= 0)
 	{
 		auto& segment = segmentModel_.getSegment(currentSegment_);
@@ -2093,8 +2091,6 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 	if (curRow == currentSegment_) {
 		return;
 	}
-
-	qDebug() << "New: " << curRow;
 
 	{
 		auto& segment = segmentModel_.getSegment(curRow);
@@ -2132,8 +2128,6 @@ void AssetFxWidget::onValueChanged(void)
 	if (currentSegment_ < 0) {
 		return;
 	}
-
-	qDebug() << "SegmentIdx: " << currentSegment_;
 
 	auto& segment = segmentModel_.getSegment(currentSegment_);
 
