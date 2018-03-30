@@ -30,13 +30,13 @@ void AssetLoader::update(void)
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-		X_LOG1("", "Processing %" PRIuS " reload requests", pendingReloads_.size());
+		X_LOG1("AssetLoader", "Processing %" PRIuS " reload requests", pendingReloads_.size());
 
 		// process them all.
 		for (auto* pLoadRequest : pendingReloads_)
 		{
-			X_ASSERT(!pLoadRequest->reloadFlags.IsSet(ReloadFlag::Beginframe), "Invalid reload flags")();
-			X_ASSERT(pLoadRequest->reloadFlags.IsSet(ReloadFlag::AnyTime), "Invalid reload flags")();
+			X_ASSERT(pLoadRequest->reloadFlags.IsSet(ReloadFlag::Beginframe), "Invalid reload flags")();
+			X_ASSERT(!pLoadRequest->reloadFlags.IsSet(ReloadFlag::AnyTime), "Invalid reload flags")();
 
 			processData(pLoadRequest);
 		}
