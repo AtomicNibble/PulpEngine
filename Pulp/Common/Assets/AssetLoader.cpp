@@ -30,7 +30,18 @@ void AssetLoader::update(void)
 	{
 		core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-		X_ASSERT_NOT_IMPLEMENTED();
+		X_LOG1("", "Processing %" PRIuS " reload requests", pendingReloads_.size());
+
+		// process them all.
+		for (auto* pLoadRequest : pendingReloads_)
+		{
+			X_ASSERT(!pLoadRequest->reloadFlags.IsSet(ReloadFlag::Beginframe), "Invalid reload flags")();
+			X_ASSERT(pLoadRequest->reloadFlags.IsSet(ReloadFlag::AnyTime), "Invalid reload flags")();
+
+			processData(pLoadRequest);
+		}
+
+		pendingReloads_.clear();
 	}
 }
 
@@ -277,8 +288,9 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 		{
 			if (!pLoadReq->reloadFlags.IsSet(ReloadFlag::AnyTime))
 			{
-
-				pendingRequests_.push_back(pLoadReq);
+				core::CriticalSection::ScopedLock lock(loadReqLock_);
+				pendingReloads_.push_back(pLoadReq);
+				return;
 			}
 		}
 
@@ -292,21 +304,25 @@ void AssetLoader::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx,
 	X_UNUSED(jobSys, threadIdx, pJob, pData);
 
 	auto* pLoadReq = static_cast<AssetLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-	auto* pAsset = pLoadReq->pAsset;
+
+	processData(pLoadReq);
+}
+
+void AssetLoader::processData(AssetLoadRequest* pRequest)
+{
+	auto* pAsset = pRequest->pAsset;
 	auto type = pAsset->getType();
-	
-	if(!assetsinks_[type]->processData(pAsset, std::move(pLoadReq->data), pLoadReq->dataSize))
+
+	if (!assetsinks_[type]->processData(pAsset, std::move(pRequest->data), pRequest->dataSize))
 	{
-		onLoadRequestFail(pLoadReq);
+		onLoadRequestFail(pRequest);
 		return;
 	}
 
 	pAsset->setStatus(core::LoadStatus::Complete);
 
-	loadRequestCleanup(pLoadReq);
+	loadRequestCleanup(pRequest);
 }
-
-
 
 
 

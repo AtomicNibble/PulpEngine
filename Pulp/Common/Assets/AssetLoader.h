@@ -85,6 +85,7 @@ private:
 	void IoRequestCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
 
 	void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+	void processData(AssetLoadRequest* pRequest);
 
 
 private:
