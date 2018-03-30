@@ -13,13 +13,25 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
 	arena_(arena),
 	blockArena_(blockArena),
 	requestQueue_(arena),
-	pendingRequests_(arena)
+	pendingRequests_(arena),
+	pendingReloads_(arena)
 {
 	requestQueue_.reserve(64);
 	pendingRequests_.setGranularity(32);
 
 	assetsinks_.fill(nullptr);
 	assetExt_.fill("");
+}
+
+
+void AssetLoader::update(void)
+{
+	if (pendingReloads_.isNotEmpty())
+	{
+		core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+		X_ASSERT_NOT_IMPLEMENTED();
+	}
 }
 
 void AssetLoader::registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt)
@@ -30,6 +42,20 @@ void AssetLoader::registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSin
 	assetExt_[type] = pExt;
 }
 
+void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
+{
+	core::CriticalSection::ScopedLock lock(loadReqLock_);
+
+	auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
+
+	loadReq->flags.Set(LoadFlag::Reload);
+	loadReq->reloadFlags = flags;
+
+	// dispatch IO 
+	dispatchLoadRequest(loadReq.get());
+
+	pendingRequests_.emplace_back(loadReq.release());
+}
 
 void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
@@ -244,6 +270,16 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 			X_ERROR("AssetLoader", "Failed to read asset data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);
 			onLoadRequestFail(pLoadReq);
 			return;
+		}
+
+		// hello my sexy reload!
+		if (pLoadReq->flags.IsSet(LoadFlag::Reload))
+		{
+			if (!pLoadReq->reloadFlags.IsSet(ReloadFlag::AnyTime))
+			{
+
+				pendingRequests_.push_back(pLoadReq);
+			}
 		}
 
 		gEnv->pJobSys->CreateMemberJobAndRun<AssetLoader>(this, &AssetLoader::processData_job,

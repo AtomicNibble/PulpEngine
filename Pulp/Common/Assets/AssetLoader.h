@@ -19,6 +19,19 @@ struct IoRequestBase;
 struct IAssetLoadSink;
 class AssetBase;
 
+X_DECLARE_FLAGS8(LoadFlag)(
+	Reload	
+);
+
+typedef Flags8<LoadFlag> LoadFlags;
+
+X_DECLARE_FLAGS8(ReloadFlag)(
+	AnyTime,
+	Beginframe
+);
+
+typedef Flags8<ReloadFlag> ReloadFlags;
+
 class AssetLoader
 {
 	typedef std::array<IAssetLoadSink*, assetDb::AssetType::ENUM_COUNT> AssetLoadSinksArr;
@@ -37,6 +50,9 @@ class AssetLoader
 		AssetBase* pAsset;
 		core::UniquePointer<char[]> data;
 		uint32_t dataSize;
+		LoadFlags flags;
+		ReloadFlags reloadFlags;
+		uint16_t _pad;
 	};
 
 	typedef core::Array<AssetLoadRequest*> AssetLoadRequestArr;
@@ -47,6 +63,9 @@ public:
 
 	void registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt);
 
+	void update(void);
+
+	void reload(AssetBase* pAsset, ReloadFlags flags);
 	void addLoadRequest(AssetBase* pAsset);
 	bool waitForLoad(AssetBase* pAsset);
 
@@ -77,6 +96,7 @@ private:
 
 	AssetQueue					requestQueue_; // requests not yet currenty dispatched
 	AssetLoadRequestArr			pendingRequests_; // active requests.
+	AssetLoadRequestArr			pendingReloads_;
 
 	AssetLoadSinksArr			assetsinks_;
 	AssetExtArr					assetExt_;
