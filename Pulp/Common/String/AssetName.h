@@ -36,6 +36,7 @@ public:
 
 	const char* extension(bool incDot) const;
 	void setExtension(const char* pExtension);
+	void removeExtension(void);
 
 };
 

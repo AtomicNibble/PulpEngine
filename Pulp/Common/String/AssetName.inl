@@ -108,4 +108,12 @@ inline void AssetName::setExtension(const char* pExtension)
 	}
 }
 
+
+inline void AssetName::removeExtension(void)
+{
+	if (isNotEmpty()) {
+		setExtension("");
+	}
+}
+
 X_NAMESPACE_END
