@@ -245,7 +245,7 @@ namespace fx
 
 		X_LOG0("Effect", "Reloading: %s", nameStr.c_str());
 
-		pAssetLoader_->reload(pEffectRes, core::ReloadFlag::AnyTime);
+		pAssetLoader_->reload(pEffectRes, core::ReloadFlag::Beginframe);
 	}
 
 	// -----------------------------------
