@@ -55,9 +55,9 @@ namespace fx
 
 		struct Stage
 		{
-			Stage(const Effect* pEfx, const StageDsc* pDesc, engine::Material* pMaterial, const Transformf& spawnTrans, int32_t maxElems, core::MemoryArenaBase* arena) :
+			Stage(const Effect* pEfx, int32_t stageIdx, engine::Material* pMaterial, const Transformf& spawnTrans, int32_t maxElems, core::MemoryArenaBase* arena) :
 				pEfx(X_ASSERT_NOT_NULL(pEfx)),
-				pDesc(X_ASSERT_NOT_NULL(pDesc)),
+				stageIdx(stageIdx),
 				pMaterial(X_ASSERT_NOT_NULL(pMaterial)),
 				currentLoop(0),
 				spawnTrans(spawnTrans),
@@ -69,12 +69,14 @@ namespace fx
 			Stage(Stage&& oth) = default;
 			Stage& operator=(Stage&& oth) = default;
 
+			const StageDsc& getStageDesc(void) const;
+
 			const Effect* pEfx;
-			const StageDsc* pDesc;
 			engine::Material* pMaterial;
 
 			core::TimeVal elapsed;
 			core::TimeVal lastSpawn;
+			int32_t stageIdx;
 			int32_t currentLoop;
 
 			Transformf spawnTrans;

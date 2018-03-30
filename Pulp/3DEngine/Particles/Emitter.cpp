@@ -14,6 +14,12 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
+	inline const StageDsc& Emitter::Stage::getStageDesc(void) const 
+	{
+		return pEfx->getStageDsc(stageIdx);
+	}
+
+	// ----------------------------------------
 
 	Emitter::Emitter(const EffectVars& effectVars, core::MemoryArenaBase* arena) :
 		vars_(effectVars),
@@ -118,7 +124,7 @@ namespace fx
 
 				maxElems = core::Max(maxElems, 1);
 
-				activeStages_.emplace_back(pEfx_, &stageDesc, pMaterial, trans_, maxElems, arena_);
+				activeStages_.emplace_back(pEfx_, curStage_, pMaterial, trans_, maxElems, arena_);
 			}
 
 			// finished all the stages for this efx?
@@ -144,7 +150,8 @@ namespace fx
 		for (auto it = activeStages_.begin(); it != activeStages_.end(); )
 		{
 			auto& stage = *it;
-			auto& desc = *stage.pDesc;
+
+			auto& desc = stage.getStageDesc();
 
 			stage.elapsed += delta;
 
@@ -267,7 +274,8 @@ namespace fx
 				continue;
 			}
 
-			auto& desc = *stage.pDesc;
+
+			auto& desc = stage.getStageDesc();
 
 			for (auto it = elems.begin(); it != elems.end();)
 			{
@@ -341,9 +349,11 @@ namespace fx
 
 			gEngEnv.pMaterialMan_->waitForLoad(stage.pMaterial);
 
-			const auto postionType = stage.pDesc->postionType;
+			auto& desc = stage.getStageDesc();
 
-			if (stage.pDesc->type == StageType::OrientedSprite)
+			const auto postionType = desc.postionType;
+
+			if (desc.type == StageType::OrientedSprite)
 			{
 				for (const auto& e : stage.elems)
 				{
@@ -386,7 +396,7 @@ namespace fx
 				}
 
 			}
-			else if (stage.pDesc->type == StageType::BillboardSprite)
+			else if (desc.type == StageType::BillboardSprite)
 			{
 				auto lookatCam(view.viewMatrix);
 				lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
@@ -453,7 +463,7 @@ namespace fx
 	void Emitter::updateElemForFraction(const Stage& stage, Elem& e, float fraction, float deltaSec) const
 	{
 		auto& efx = *stage.pEfx;
-		auto& desc = *stage.pDesc;
+		auto& desc = stage.getStageDesc();
 
 		Vec3f velForDelta = e.vel * deltaSec;
 
