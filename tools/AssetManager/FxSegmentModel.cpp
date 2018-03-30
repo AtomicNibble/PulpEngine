@@ -57,6 +57,11 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 
 	writer.SetMaxDecimalPlaces(5);
 
+	if (segments_.empty())
+	{
+		jsonStrOut = "[]";
+		return;
+	}
 
 	auto writeRange = [](JsonWriter& writer, const char* pPrefix, const Range& range) {
 
