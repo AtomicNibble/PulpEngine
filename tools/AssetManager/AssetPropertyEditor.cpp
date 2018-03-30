@@ -1069,7 +1069,12 @@ bool AssetProperties::parseArgs(const core::string& jsonStr)
 	X_ASSERT(jsonStr.isNotEmpty(), "Args string should not be empty")(jsonStr.isNotEmpty());
 
 	core::json::Document d;
-	d.Parse(jsonStr.c_str());
+	if (d.Parse(jsonStr.c_str()).HasParseError())
+	{
+		core::json::Description dsc;
+		X_ERROR("AssetProps", "Error parsing asset args: %s", core::json::ErrorToString(d, jsonStr.begin(), jsonStr.end(), dsc));
+		return false;
+	}
 
 	std::string name;
 
