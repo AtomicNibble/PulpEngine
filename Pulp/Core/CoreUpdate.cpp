@@ -60,6 +60,7 @@ bool XCore::Update(void)
 	using namespace core::V2;
 
 	assetLoader_.dispatchPendingLoads();
+	assetLoader_.update();
 
 	auto width = vars_.getWinWidth();
 	auto height = vars_.getWinHeight();
