@@ -2,6 +2,7 @@
 #include "FxManager.h"
 
 #include <Assets\AssetLoader.h>
+#include <String\AssetName.h>
 #include <IConsole.h>
 
 #include "Effect.h"
@@ -223,8 +224,28 @@ namespace fx
 	void EffectManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 	{
 		X_UNUSED(jobSys, name);
+		
+		core::AssetName assetName(name);
+		assetName.replaceSeprators();
+		assetName.stripAssetFolder(assetDb::AssetType::FX);
+		assetName.removeExtension();
 
+		core::string nameStr(assetName.begin(), assetName.end());
 
+		core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
+
+		EffectResource* pEffectRes = effects_.findAsset(nameStr);
+
+		// so i wnat to reload the fx :D
+		if (!pEffectRes)
+		{
+			X_LOG1("Effect", "Not reloading \"%s\" it's not currently used", nameStr.c_str());
+			return;
+		}
+
+		X_LOG0("Effect", "Reloading: %s", nameStr.c_str());
+
+		pAssetLoader_->reload(pEffectRes, core::ReloadFlag::AnyTime);
 	}
 
 	// -----------------------------------
