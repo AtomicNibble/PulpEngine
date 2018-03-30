@@ -1266,8 +1266,8 @@ SegmentListWidget::SegmentListWidget(FxSegmentModel* pModel, QWidget* parent) :
 
 		pTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 		pTable_->setSelectionMode(QAbstractItemView::SingleSelection);
-		pTable_->setMinimumHeight(100);
-		pTable_->setMaximumHeight(200);
+		pTable_->setMinimumHeight(200);
+		pTable_->setMaximumHeight(300);
 		pTable_->horizontalHeader()->setStretchLastSection(true);
 		pTable_->setModel(pSegmentModel_);
 		
