@@ -974,10 +974,7 @@ void GraphEditorView::signalPointsChanged(void)
 
 void GraphEditorView::onPointsChanged(void)
 {
-	// i want to rate limit.
-	// so if more time has passed than min wait, just signal now.
-	// we only need 
-	qint64 msecsPeriod{ 200 };
+	constexpr qint64 msecsPeriod{ 200 };
 
 	dirty_ = true;
 
