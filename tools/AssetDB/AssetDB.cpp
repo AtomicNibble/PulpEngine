@@ -2942,8 +2942,25 @@ bool AssetDB::MergeArgs(AssetId assetId, core::string& argsInOut)
 
 	core::json::Document dDb, dArgs(&dDb.GetAllocator());
 
-	dDb.Parse(pArgs, argsLen);
-	dArgs.Parse(argsInOut.c_str(), argsInOut.length());
+	if (dDb.Parse(pArgs, argsLen).HasParseError())
+	{
+		core::json::Description dsc;
+		X_ERROR("AssetDB", "Error parsing asset args: %s", core::json::ErrorToString(dDb, pArgs, pArgs + argsLen, dsc));
+		return false;
+	}
+
+	if (dArgs.Parse(argsInOut.c_str(), argsInOut.length()).HasParseError())
+	{
+		core::json::Description dsc;
+		X_ERROR("AssetDB", "Error parsing asset args for merge: %s", core::json::ErrorToString(dArgs, argsInOut.begin(), argsInOut.end(), dsc));
+		return false;
+	}
+
+	if (!dDb.IsObject())
+	{
+		X_ERROR("AssetDB", "Asset args is not a object");
+		return false;
+	}
 
 	// we want to use the ones from args, and add in any from db.
 	for (auto it = dDb.MemberBegin(); it != dDb.MemberEnd(); ++it)
