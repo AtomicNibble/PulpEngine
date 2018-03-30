@@ -25,6 +25,10 @@ void LoggerOutputWindowWritePolicy::Init()
 	warningFmt_.setForeground(QBrush(QColor("yellow")));
 	errorFmt_.setForeground(QBrush(QColor("red")));
 
+	X_ASSERT(msgFmt_.isValid(), "Not valid")();
+	X_ASSERT(warningFmt_.isValid(), "Not valid")();
+	X_ASSERT(errorFmt_.isValid(), "Not valid")();
+
 	uiThreadId_ = core::Thread::GetCurrentID();
 }
 
