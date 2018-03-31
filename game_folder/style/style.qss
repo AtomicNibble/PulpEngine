@@ -429,13 +429,13 @@ QTableWidget {
 	background-color: #1a1a1a;
 }
 
-QTableView:item:hover {
+QTableView {
 	background-color: #1a1a1a;
-	color:#909090;
 }
 
+
 QTableView::item:!selected {
-	background-color: #1a1a1a;
+	background-color: #2a2a2a;
 }
 
 QTableView::item:selected {
