@@ -51,7 +51,7 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 	core::json::StringBuffer s;
 	JsonWriter writer(s);
 
-	writer.SetMaxDecimalPlaces(5);
+	writer.SetMaxDecimalPlaces(8);
 
 	auto writeRange = [](JsonWriter& writer, const char* pPrefix, const Range& range) {
 
