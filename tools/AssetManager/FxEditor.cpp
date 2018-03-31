@@ -163,6 +163,8 @@ void FxProperties::setNotModifiedModified(void)
 	if (wasModified) {
 		current_ = saved_;
 		emit modificationChanged(false);
+
+		X_ASSERT(!isModified(), "Should not be modified")(isModified());
 	}
 }
 
