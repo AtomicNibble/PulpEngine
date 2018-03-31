@@ -788,10 +788,11 @@ void GraphEditorView::seriesHover(const QPointF &point, bool state)
 	{
 		// can select any point from active graph.
 		// if you select one of diffrent series you switch to that.
-		auto findhoveringPoint = [&point](QtCharts::QLineSeries* pSeries) -> int32_t {
+		qreal lowestLength = 0.1;
+
+		auto findhoveringPoint = [&](QtCharts::QLineSeries* pSeries) -> int32_t {
 			auto count = pSeries->count();
 			
-			qreal lowestLength = 0.1;
 			int32_t idx = -1;
 
 			for (int32_t i = 0; i < count; i++)
@@ -813,24 +814,18 @@ void GraphEditorView::seriesHover(const QPointF &point, bool state)
 
 		const auto numPoints = activeSeries()->count();
 
-		// look in active series first.
-		auto index = findhoveringPoint(activeSeries());
-		if (index == -1)
+		// check all series for closest point.
+		int32_t index = -1;
 		{
 			auto& g = activeGraph();
-
 			for (int32_t s = 0; s < g.series.size(); s++)
 			{
-				if (s == activeSeries_) {
-					continue;
-				}
-
-				index = findhoveringPoint(g.series[s]);
-				if (index != -1)
+				auto idx = findhoveringPoint(g.series[s]);
+				if (idx != -1)
 				{
 					// change series.
 					hoverSeries_ = s;
-					break;
+					index = idx;
 				}
 			}
 		}
