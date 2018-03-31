@@ -1268,8 +1268,6 @@ SegmentListWidget::SegmentListWidget(FxSegmentModel* pModel, QWidget* parent) :
 
 		pTable_->setSelectionBehavior(QAbstractItemView::SelectRows);
 		pTable_->setSelectionMode(QAbstractItemView::SingleSelection);
-		pTable_->setMinimumHeight(200);
-		pTable_->setMaximumHeight(300);
 		pTable_->horizontalHeader()->setStretchLastSection(true);
 		pTable_->setModel(pSegmentModel_);
 		
@@ -1943,105 +1941,140 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 	// gonna get crazy up in here!
 	// need something to manage stages.
 	{
-		QVBoxLayout* pTableLayout = new QVBoxLayout();
-
 		pSapwn_ = new SpawnInfoWidget();
 		pOrigin_ = new OriginInfoWidget();
 		pSegments_ = new SegmentListWidget(&segmentModel_);
 		pSequence_ = new SequenceInfoWidget();
-		pSize_ = new GraphWithScale("Size");
+		pSize_ = new GraphWithScale("Width/Diamenter");
+		pSize2_ = new GraphWithScale("Height/Length");
 		pScale_ = new GraphWithScale("Scale");
 		pVisualInfo_ = new VisualsInfoWidget();
 		pVerlocity_ = new VelocityInfoWidget();
+		pVerlocity2_ = new VelocityInfoWidget();
 		pRotation_ = new RotationGraphWidget();
 		pCol_ = new ColorGraph();
 		pAlpha_ = new AlphaGraph();
 
 		const int minHeight = 300;
 		const int minWidth = 300;
-		const int maxWidth = 400;
+		const int maxWidth = 600;
+		const int maxHeight = 400;
 
-		pVisualInfo_->setMinimumWidth(300);
-		pSapwn_->setMinimumWidth(300);
-		pOrigin_->setMinimumWidth(300);
-		pSequence_->setMinimumWidth(300);
 		pSize_->setMinimumWidth(300);
+		pSize2_->setMinimumWidth(300);
 		pScale_->setMinimumWidth(300);
 		pVerlocity_->setMinimumWidth(300);
+		pVerlocity2_->setMinimumWidth(300);
 		pRotation_->setMinimumWidth(300);
 		pCol_->setMinimumWidth(300);
 		pAlpha_->setMinimumWidth(300);
 
-		pSize_->setMinimumHeight(minHeight);
-		pScale_->setMinimumHeight(minHeight);
-		pVerlocity_->setMinimumHeight(minHeight + 50);
-		pRotation_->setMinimumHeight(minHeight);
-		pCol_->setMinimumHeight(minHeight);
-		pAlpha_->setMinimumHeight(minHeight);
 
 		pSize_->setMaximumWidth(maxWidth);
+		pSize2_->setMaximumWidth(maxWidth);
 		pScale_->setMaximumWidth(maxWidth);
 		pVerlocity_->setMaximumWidth(maxWidth);
+		pVerlocity2_->setMaximumWidth(maxWidth);
 		pRotation_->setMaximumWidth(maxWidth);
-		pVisualInfo_->setMaximumWidth(maxWidth);
-		pSapwn_->setMaximumWidth(maxWidth);
-		pOrigin_->setMaximumWidth(maxWidth);
-		pSequence_->setMaximumWidth(maxWidth);
 		pCol_->setMaximumWidth(maxWidth);
 		pAlpha_->setMaximumWidth(maxWidth);
 
-		QVBoxLayout* pSettingsLeftLayout = new QVBoxLayout();
-		pSettingsLeftLayout->setContentsMargins(0, 0, 0, 0);
-		pSettingsLeftLayout->addWidget(pVisualInfo_);
-		pSettingsLeftLayout->addWidget(pSapwn_);
+		pSize_->setMaximumHeight(maxHeight);
+		pSize2_->setMaximumHeight(maxHeight);
+		pScale_->setMaximumHeight(maxHeight);
+		pVerlocity_->setMaximumHeight(maxHeight + 50);
+		pVerlocity2_->setMaximumHeight(maxHeight + 50);
+		pRotation_->setMaximumHeight(maxHeight);
+		pCol_->setMaximumHeight(maxHeight);
+		pAlpha_->setMaximumHeight(maxHeight);
 
-		QVBoxLayout* pSettingsRightLayout = new QVBoxLayout();
-		pSettingsRightLayout->setContentsMargins(0, 0, 0, 0);
-		pSettingsRightLayout->addWidget(pOrigin_);
-		pSettingsRightLayout->addWidget(pSequence_);
+		// Spawn stuff
+		pVisualInfo_->setMinimumWidth(300);
+		pSapwn_->setMinimumWidth(300);
+		pOrigin_->setMinimumWidth(300);
+		pSequence_->setMinimumWidth(300);
+		pVisualInfo_->setMaximumWidth(400);
+		pSapwn_->setMaximumWidth(400);
+		pOrigin_->setMaximumWidth(400);
+		pSequence_->setMaximumWidth(400);
 
-		QHBoxLayout* pSettingsLayout = new QHBoxLayout();
-		pSettingsLayout->setContentsMargins(0, 0, 0, 0);
-		pSettingsLayout->addLayout(pSettingsLeftLayout);
-		pSettingsLayout->addLayout(pSettingsRightLayout);
-		pSettingsLayout->addStretch(0);
 
+		QVBoxLayout* pSpawnLayout = new QVBoxLayout();
+		pSpawnLayout->addWidget(pVisualInfo_);
+		pSpawnLayout->addWidget(pSapwn_);
+		pSpawnLayout->addWidget(pOrigin_);
+		pSpawnLayout->addWidget(pSequence_);
+		pSpawnLayout->addStretch(0);
 
-		QHBoxLayout* pShizLayout = new QHBoxLayout();
-		pShizLayout->setContentsMargins(0, 0, 0, 0);
-		pShizLayout->addWidget(pSize_);
-		pShizLayout->addWidget(pScale_);
-		pShizLayout->addStretch(0);
-
-		QHBoxLayout* pSizeLayout = new QHBoxLayout();
-		pSizeLayout->setContentsMargins(0,0,0,0);
+		QVBoxLayout* pSizeLayout = new QVBoxLayout();
 		pSizeLayout->addWidget(pSize_);
+		pSizeLayout->addWidget(pSize2_);
 		pSizeLayout->addWidget(pScale_);
 		pSizeLayout->addStretch(0);
 
-		QHBoxLayout* pColLayout = new QHBoxLayout();
-		pColLayout->setContentsMargins(0, 0, 0, 0);
+		QVBoxLayout* pVelLayout = new QVBoxLayout();
+		pVelLayout->addWidget(pVerlocity_);
+		pVelLayout->addWidget(pVerlocity2_);
+		pVelLayout->addStretch(0);
+
+		QVBoxLayout* pRotLayout = new QVBoxLayout();
+		pRotLayout->addWidget(pRotation_);
+		pRotLayout->addStretch(0);
+
+		QVBoxLayout* pColLayout = new QVBoxLayout();
 		pColLayout->addWidget(pCol_);
 		pColLayout->addWidget(pAlpha_);
 		pColLayout->addStretch(0);
 
-		QHBoxLayout* pVelLayout = new QHBoxLayout();
-		pVelLayout->setContentsMargins(0, 0, 0, 0);
-		pVelLayout->addWidget(pVerlocity_);
-		pVelLayout->addWidget(pRotation_);
-		pVelLayout->addStretch(0);
+		QWidget* pSpawnTab = new QWidget();
+		pSpawnTab->setLayout(pSpawnLayout);
 
-		pTableLayout->setContentsMargins(0, 0, 0, 0);
+		QWidget* pSizeTab = new QWidget();
+		pSizeTab->setLayout(pSizeLayout);
 
-	//	pTableLayout->addWidget(pVisualInfo_);
-	//	pTableLayout->addWidget(pSapwn_);
-	//	pTableLayout->addWidget(pOrigin_);
-	//	pTableLayout->addWidget(pSequence_);
-		pTableLayout->addLayout(pSettingsLayout);
-		pTableLayout->addLayout(pSizeLayout);
-		pTableLayout->addLayout(pVelLayout);
-		pTableLayout->addLayout(pColLayout);
-		pTableLayout->addWidget(pSegments_);
+		QWidget* pVelTab = new QWidget();
+		pVelTab->setLayout(pVelLayout);
+
+		QWidget* pRotTab = new QWidget();
+		pRotTab->setLayout(pRotLayout);
+
+		QWidget* pColorTab = new QWidget();
+		pColorTab->setLayout(pColLayout);
+
+
+		QTabWidget* pTabs = new QTabWidget();
+		pTabs->addTab(pSpawnTab, "Spawn");
+		pTabs->addTab(pSizeTab, "Size");
+		pTabs->addTab(pVelTab, "Velocity");
+		pTabs->addTab(pRotTab, "Rotation");
+		pTabs->addTab(pColorTab, "Color");
+
+
+		QScrollArea* pScrollArea = new QScrollArea();
+		pScrollArea->setObjectName("FxEditor");
+		pScrollArea->setWidget(pTabs);
+		pScrollArea->setWidgetResizable(true);
+
+#if 0
+		pVisualInfo_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+		pSapwn_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+		pOrigin_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+		pSequence_->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Fixed);
+#endif
+
+
+		QSplitter* pSplitter = new QSplitter(Qt::Orientation::Vertical);
+		pSplitter->setObjectName("FxEditor");
+		pSplitter->addWidget(pScrollArea);
+		pSplitter->addWidget(pSegments_);
+		pSplitter->setStretchFactor(0, 2);
+
+		QVBoxLayout* pLayout = new QVBoxLayout();
+		pLayout->addWidget(pSplitter);
+
+
+		setLayout(pLayout);
+
 
 		enableWidgets(false);
 
@@ -2061,9 +2094,6 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		connect(pScale_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 
 		connect(&segmentModel_, &FxSegmentModel::dataChanged, this, &AssetFxWidget::onValueChanged);
-
-
-		setLayout(pTableLayout);
 	}
 }
 

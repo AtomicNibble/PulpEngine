@@ -21,17 +21,25 @@ FxProperties::FxProperties(assetDb::AssetDB& db, FxEditorWidget* widget) :
 {
 	pEditorWidget_ = new AssetFxWidget(this);
 
+	connect(pEditorWidget_, &AssetFxWidget::valueChanged, this, &FxProperties::valueChanged);
+
 	pLayout_ = new QVBoxLayout();
+	pLayout_->setContentsMargins(0, 0, 0, 0);
 	pLayout_->addWidget(pEditorWidget_);
 
-	pCon_ = new QWidget(widget);
+	// I put the editor widget inside this container.
+	// which still has margins enabled so we get a margin around the editor with the desired color.
+	// if got rid of this container and left margins on editors layout, would have the backround of 
+	// the tab around edges.
+	pCon_ = new QWidget();
 	pCon_->setObjectName("FxEditor");
 	pCon_->setLayout(pLayout_);
 
-	connect(pEditorWidget_, &AssetFxWidget::valueChanged, this, &FxProperties::valueChanged);
+	QVBoxLayout* pLayout = new QVBoxLayout();
+	pLayout->setContentsMargins(0, 0, 0, 0);
+	pLayout->addWidget(pCon_);
 
-	pWidget_->setWidget(pCon_);
-	pWidget_->setWidgetResizable(true);
+	pWidget_->setLayout(pLayout);
 }
 
 FxProperties::~FxProperties()
@@ -189,7 +197,7 @@ void FxProperties::valueChanged(void)
 
 
 FxEditorWidget::FxEditorWidget(assetDb::AssetDB& db, QWidget *parent) :
-	QScrollArea(parent),
+	QWidget(parent),
 	db_(db),
 	pEditor_(nullptr)
 {
@@ -197,7 +205,7 @@ FxEditorWidget::FxEditorWidget(assetDb::AssetDB& db, QWidget *parent) :
 }
 
 FxEditorWidget::FxEditorWidget(assetDb::AssetDB& db, FxProperties* pAssetEntry, QWidget *parent) :
-	QScrollArea(parent),
+	QWidget(parent),
 	db_(db),
 	pEditor_(nullptr)
 {

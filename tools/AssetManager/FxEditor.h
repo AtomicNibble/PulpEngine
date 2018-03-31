@@ -65,7 +65,7 @@ private:
 };
 
 
-class FxEditorWidget : public QScrollArea
+class FxEditorWidget : public QWidget
 {
 	Q_OBJECT
 public:

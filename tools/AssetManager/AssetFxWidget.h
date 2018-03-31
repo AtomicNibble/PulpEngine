@@ -567,9 +567,11 @@ private:
 	VisualsInfoWidget* pVisualInfo_;
 	RotationGraphWidget* pRotation_;
 	VelocityInfoWidget* pVerlocity_;
+	VelocityInfoWidget* pVerlocity2_;
 	ColorGraph* pCol_;
 	AlphaGraph* pAlpha_;
 	GraphWithScale* pSize_;
+	GraphWithScale* pSize2_;
 	GraphWithScale* pScale_;
 
 	int32_t currentSegment_;
