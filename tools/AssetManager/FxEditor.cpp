@@ -391,7 +391,7 @@ IAssetEntry* FxEditor::assetEntry(void)
 
 Id FxEditor::id(void) const
 {
-	return Id(Constants::ASSETPROP_EDITOR_ID);
+	return Id(Constants::FX_EDITOR_ID);
 }
 
 bool FxEditor::duplicateSupported(void) const
