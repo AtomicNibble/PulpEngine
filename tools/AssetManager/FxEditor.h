@@ -57,6 +57,8 @@ private:
 	FxEditorWidget* pWidget_;
 	AssetFxWidget* pEditorWidget_;
 
+	QWidget* pCon_;
+	QVBoxLayout* pLayout_;
 private:
 	core::string saved_;
 	core::string current_;

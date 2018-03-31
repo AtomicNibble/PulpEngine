@@ -19,18 +19,18 @@ FxProperties::FxProperties(assetDb::AssetDB& db, FxEditorWidget* widget) :
 	db_(db),
 	pWidget_(widget)
 {
-//	pLayout_ = new QVBoxLayout();
-//	pLayout_->addWidget(pEditorWidget_);
-//	pCon_ = new QWidget(widget);
-//	pCon_->setObjectName("FxEditor");
-//	pCon_->setLayout(pLayout_);
-
 	pEditorWidget_ = new AssetFxWidget(this);
+
+	pLayout_ = new QVBoxLayout();
+	pLayout_->addWidget(pEditorWidget_);
+
+	pCon_ = new QWidget(widget);
+	pCon_->setObjectName("FxEditor");
+	pCon_->setLayout(pLayout_);
 
 	connect(pEditorWidget_, &AssetFxWidget::valueChanged, this, &FxProperties::valueChanged);
 
-
-	pWidget_->setWidget(pEditorWidget_);
+	pWidget_->setWidget(pCon_);
 	pWidget_->setWidgetResizable(true);
 }
 
