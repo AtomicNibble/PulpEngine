@@ -636,7 +636,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 	const Id &editorId, OpenEditorFlags flags, bool* pNewEditor)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << assetName << editorId.name();
+		qDebug() << Q_FUNC_INFO << assetName << assetDb::AssetType::ToString(type) << editorId.name();
 	}
 
 	if (assetName.isEmpty()) {
@@ -655,8 +655,7 @@ IEditor *EditorManager::openEditor(EditorView* pView, const QString& assetName, 
 		return pEditor;
 	}
 
-
-	IEditor* pEditor = createEditor(editorId, assetName);
+	IEditor* pEditor = createEditor(editorId, assetName, type);
 	if (!pEditor)
 	{
 		X_ERROR("Editor", "Failed to createEditor for: \"%s\"", qPrintable(assetName));
@@ -844,17 +843,29 @@ void EditorManager::setCurrentView(EditorView *view)
 }
 
 
-IEditor* EditorManager::createEditor(const Id& editorId, const QString& assetName)
+IEditor* EditorManager::createEditor(Id editorId, const QString& assetName, assetDb::AssetType::Enum type)
 {
 	if (debugLogging) {
-		qDebug() << Q_FUNC_INFO << editorId.name() << assetName;
+		qDebug() << Q_FUNC_INFO << editorId.name() << assetName << assetDb::AssetType::ToString(type);
 	}
 
 	EditorFactoryList factories;
 
-	if (!editorId.isValid()) {
+	if (!editorId.isValid()) 
+	{
+#if 1
+		if (type == assetDb::AssetType::FX)
+		{
+			editorId = Constants::FX_EDITOR_ID;
+		}
+		else
+		{
+			editorId = Constants::ASSETPROP_EDITOR_ID;
+		}
+#else
 		X_ERROR("Editor", "Can't create editor for invalid editorId");
 		return nullptr;
+#endif
 	}
 
 	if (IEditorFactory* factory = findById<IEditorFactory>(editorId)) {

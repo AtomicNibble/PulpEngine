@@ -55,7 +55,6 @@ protected:
 	QString assetName_;
 	assetDb::AssetType::Enum type_;
 	bool temporary_;
-
 };
 
 X_NAMESPACE_END

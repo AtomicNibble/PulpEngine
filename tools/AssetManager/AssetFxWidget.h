@@ -537,22 +537,23 @@ class AssetFxWidget : public QWidget
 	typedef std::vector<SegmentPtr> SegmentArr;
 
 public:
-	AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value);
+	AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent = nullptr);
 	~AssetFxWidget();
+
+	bool setValue(const core::string& value);
+	void getValue(core::string& value) const;
 
 private:
 	void enableWidgets(bool enable);
 
-private slots :
-	void setValue(const std::string& value);
-
+private slots:
 	void segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
 	void typeChanged(engine::fx::StageType::Enum type);
 
 	void onValueChanged(void);
 
 signals:
-	void valueChanged(const std::string& value);
+	void valueChanged(void);
 
 private:
 	IAssetEntry* pAssEntry_;

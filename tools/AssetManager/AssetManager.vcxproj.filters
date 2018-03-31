@@ -1689,6 +1689,69 @@
     <ClCompile Include="Release Dynamic\moc_FxSegmentModel.cpp">
       <Filter>Generated Files\Release Dynamic</Filter>
     </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_FxEditorFactory.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="FxEditorFactory.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_FxEditor.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_FxEditor.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_FxEditor.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_FxEditor.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_FxEditor.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_FxEditor.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug Dynamic\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Debug Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Super\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Super</Filter>
+    </ClCompile>
+    <ClCompile Include="Debug\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Debug</Filter>
+    </ClCompile>
+    <ClCompile Include="Super Dynamic\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Super Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="Release\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Release</Filter>
+    </ClCompile>
+    <ClCompile Include="Release Dynamic\moc_FxEditorActionHandler.cpp">
+      <Filter>Generated Files\Release Dynamic</Filter>
+    </ClCompile>
+    <ClCompile Include="FxEditor.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
+    <ClCompile Include="FxEditorActionHandler.cpp">
+      <Filter>Source Files\Editor\Types</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="assetmanager.h">
@@ -1888,6 +1951,15 @@
     </CustomBuild>
     <CustomBuild Include="FxSegmentModel.h">
       <Filter>Header Files\Widgets</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FxEditorFactory.h">
+      <Filter>Header Files\Editor\Types</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FxEditor.h">
+      <Filter>Header Files\Editor\Types</Filter>
+    </CustomBuild>
+    <CustomBuild Include="FxEditorActionHandler.h">
+      <Filter>Header Files\Editor\Types</Filter>
     </CustomBuild>
   </ItemGroup>
   <ItemGroup>

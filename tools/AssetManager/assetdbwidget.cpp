@@ -452,7 +452,7 @@ void AssetDbViewWidget::openItem(const QModelIndex &mainIndex)
     }
 
 	if (FileNode* pFileNode = qobject_cast<FileNode*>(pNode)) {
-		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType(), assman::Constants::ASSETPROP_EDITOR_ID);
+		EditorManager::openEditor(pFileNode->name(), pFileNode->assetType());
 	}
 }
 

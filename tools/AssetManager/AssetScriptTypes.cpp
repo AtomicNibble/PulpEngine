@@ -313,12 +313,6 @@ AssetScriptProperty* AssetScriptProps::AddAnim(const std::string& key, const std
 	return pProp;
 }
 
-AssetScriptProperty* AssetScriptProps::AddFx(const std::string& key)
-{
-	auto pProp = getProperty(key, AssetProperty::PropertyType::FX);
-	return pProp;
-}
-
 AssetScriptProperty* AssetScriptProps::AddAssetRef(const std::string& key, const std::string& type)
 {
 	auto pProp = getProperty(key, AssetProperty::PropertyType::ASSET_REF);

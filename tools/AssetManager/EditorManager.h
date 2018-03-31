@@ -43,7 +43,7 @@ public:
 	static QList<IEditor*> openEditorsList(void);
 	static QList<EditorView*> visibleViews(void);
 
-	static IEditor* openEditor(const QString& assetName, assetDb::AssetType::Enum type, const Id& editorId,
+	static IEditor* openEditor(const QString& assetName, assetDb::AssetType::Enum type, const Id& editorId = Id(),
 		OpenEditorFlags flags = 0, bool* pNewEditor = nullptr);
 
 
@@ -155,7 +155,7 @@ private:
 
 	static void init(void);
 
-	static IEditor* createEditor(const Id& id = Id(), const QString& fileName = QString());
+	static IEditor* createEditor(Id id, const QString& fileName, assetDb::AssetType::Enum type);
 	static void addEditor(IEditor* pEditor);
 	static void removeEditor(IEditor* pEditor);
 

@@ -147,7 +147,10 @@ namespace Constants
 	const char C_ASSETPROP_EDITOR[] = "AssetPropEditor";
 	const char C_ASSETPROP_EDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "AssetProp Editor");
 
-
+	const char FX_EDITOR_ID[] = "Fx.Editor";
+	const char FX_EDITOR_CONTEXT[] = "Fx.ContextMenu";
+	const char C_FX_EDITOR[] = "FxEditor";
+	const char C_FX_EDITOR_DISPLAY_NAME[] = QT_TRANSLATE_NOOP("OpenWith::Editors", "Fx Editor");
 
 
 } // namespace 

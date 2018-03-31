@@ -1931,7 +1931,7 @@ void VisualsInfoWidget::currentIndexChanged(int32_t idx)
 
 
 
-AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std::string& value) :
+AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 	QWidget(parent),
 	pAssEntry_(pAssEntry),
 	segmentModel_(),
@@ -2065,8 +2065,6 @@ AssetFxWidget::AssetFxWidget(QWidget *parent, IAssetEntry* pAssEntry, const std:
 
 		setLayout(pTableLayout);
 	}
-
-	setValue(value);
 }
 
 
@@ -2090,13 +2088,13 @@ void AssetFxWidget::enableWidgets(bool enable)
 }
 
 
-void AssetFxWidget::setValue(const std::string& value)
+bool AssetFxWidget::setValue(const core::string & value)
 {
 	blockSignals(true);
 	
 	if (!segmentModel_.fromJson(value))
 	{
-
+		return false;
 	}
 
 	if (segmentModel_.numSegments() > 0)
@@ -2105,6 +2103,12 @@ void AssetFxWidget::setValue(const std::string& value)
 	}
 
 	blockSignals(false);
+	return true;
+}
+
+void AssetFxWidget::getValue(core::string& value) const
+{
+	segmentModel_.getJson(value);
 }
 
 void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected)
@@ -2233,11 +2237,7 @@ void AssetFxWidget::onValueChanged(void)
 		X_ASSERT_UNREACHABLE();
 	}
 
-	std::string str;
-
-	segmentModel_.getJson(str);
-
-	emit valueChanged(str);
+	emit valueChanged();
 }
 
 X_NAMESPACE_END

@@ -40,14 +40,10 @@ namespace
 FxSegmentModel::FxSegmentModel(QObject *parent) :
 	QAbstractTableModel(parent)
 {
-	addSegment();
 
-	std::string test;
-	// getJson(test);
-	// fromJson(test);
 }
 
-void FxSegmentModel::getJson(std::string& jsonStrOut)
+void FxSegmentModel::getJson(core::string& jsonStrOut) const
 {
 	// build me some json.
 	typedef core::json::Writer<core::json::StringBuffer> JsonWriter;
@@ -56,12 +52,6 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 	JsonWriter writer(s);
 
 	writer.SetMaxDecimalPlaces(5);
-
-	if (segments_.empty())
-	{
-		jsonStrOut = "[]";
-		return;
-	}
 
 	auto writeRange = [](JsonWriter& writer, const char* pPrefix, const Range& range) {
 
@@ -220,6 +210,8 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 		writer.EndObject();
 	};
 
+	writer.StartObject();
+	writer.Key("stages");
 	writer.StartArray();
 
 	for (auto& segment : segments_)
@@ -335,17 +327,18 @@ void FxSegmentModel::getJson(std::string& jsonStrOut)
 	}
 
 	writer.EndArray();
+	writer.EndObject();
 
-	jsonStrOut = std::string(s.GetString(), s.GetSize());
+	jsonStrOut.assign(s.GetString(), s.GetSize());
 }
 
 
-bool FxSegmentModel::fromJson(const std::string& jsonStr)
+bool FxSegmentModel::fromJson(const core::string& jsonStr)
 {
 	// oh my days, this is going to be fun!
 	segments_.clear();
 
-	if (jsonStr.empty()) {
+	if (jsonStr.isEmpty()) {
 		return true;
 	}
 
@@ -356,12 +349,16 @@ bool FxSegmentModel::fromJson(const std::string& jsonStr)
 		return false;
 	}
 
-	if (!d.IsArray()) {
-		X_ERROR("Fx", "Stages is not a array. Type: %" PRIi32, d.GetType());
+	if (!d.IsObject()) {
+		X_ERROR("Fx", "Stages is not a object. Type: %" PRIi32, d.GetType());
+		return false;
+	}
+
+	if (!checkMember(d, "stages", core::json::kArrayType)) {
 		return false;
 	}
 	
-	auto& stages = d;
+	auto& stages = d["stages"];
 
 	for (auto& s : stages.GetArray())
 	{

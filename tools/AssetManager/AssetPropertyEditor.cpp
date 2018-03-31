@@ -16,7 +16,6 @@
 #include "AssetTextureWidget.h"
 #include "AssetModelWidget.h"
 #include "AssetAnimWidget.h"
-#include "AssetFxWidget.h"
 #include "AssetAssetRefWidget.h"
 #include "AssetGroupWidget.h"
 #include "AssetPathWidget.h"
@@ -115,9 +114,6 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::ANIM:
 		pAnimWidget_ = new AssetAnimWidget(pParent, pAssEntry, val);
 		break;
-	case PropertyType::FX:
-		pFxWidget_ = new AssetFxWidget(pParent, pAssEntry, val);
-		break;
 	case PropertyType::ASSET_REF:
 		pAssetRefWidget_ = new AssetAssetRefWidget(pParent, db, pAssEntry, defaultValue_, val);
 		break;
@@ -168,7 +164,6 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
-	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::LINEEDIT:
 		connect(pWidget_, SIGNAL(valueChanged(const std::string&)), this, SLOT(valueChanged(const std::string&)));
@@ -262,7 +257,7 @@ void AssetProperty::appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWid
 
 void AssetProperty::valueChanged(const std::string& value)
 {
-	X_LOG0("AssetProperty", "newVal: %s", value.c_str());
+	// X_LOG0("AssetProperty", "newVal: %s", value.c_str());
 
 	// so this prop was changed :D
 	bool isModified = strSavedValue_ != value;
@@ -345,7 +340,6 @@ void AssetProperty::show(bool vis)
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
-	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::STRING:
 	case PropertyType::COLOR:
@@ -382,7 +376,6 @@ void AssetProperty::enable(bool val)
 	case PropertyType::IMAGE:
 	case PropertyType::MODEL:
 	case PropertyType::ANIM:
-	case PropertyType::FX:
 	case PropertyType::ASSET_REF:
 	case PropertyType::STRING:
 	case PropertyType::COLOR:
@@ -1179,12 +1172,6 @@ bool AssetProperties::extractArgs(core::string& jsonStrOut) const
 			writer.Bool(item.GetValueBool());
 			break;
 
-		case AssetProperty::PropertyType::FX:
-		{
-			auto json = item.GetValue();
-			writer.RawValue(json.c_str(), json.length(), core::json::Type::kArrayType);
-			break;
-		}
 		case AssetProperty::PropertyType::TEXT:
 		case AssetProperty::PropertyType::PATH:
 		case AssetProperty::PropertyType::LINEEDIT:
@@ -1443,7 +1430,8 @@ AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, Asset
 	ctor(QSharedPointer<AssetProperties>(new AssetProperties(db, pPropScriptMan, this)));
 }
 
-AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, AssetProperties* pAssetEntry, QWidget *parent) :
+AssetPropertyEditorWidget::AssetPropertyEditorWidget(assetDb::AssetDB& db, AssetPropsScriptManager* pPropScriptMan, 
+	AssetProperties* pAssetEntry, QWidget *parent) :
 	QScrollArea(parent),
 	db_(db),
 	pPropScriptMan_(pPropScriptMan),

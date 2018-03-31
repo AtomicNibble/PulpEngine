@@ -31,7 +31,6 @@ class AssetFontWidget;
 class AssetTextureWidget;
 class AssetModelWidget;
 class AssetAnimWidget;
-class AssetFxWidget;
 class AssetAssetRefWidget;
 class AssetStringWidget;
 class AssetColorWidget;
@@ -67,7 +66,6 @@ public:
 		IMAGE,
 		MODEL,
 		ANIM,
-		FX,
 		ASSET_REF,
 		PATH,
 		LABEL,
@@ -98,7 +96,6 @@ public:
 public:
 	AssetProperty();
 	~AssetProperty();
-
 
 	void appendGui(assetDb::AssetDB& db, IAssetEntry* pAssEntry, QWidget* pParent, QGridLayout* pLayout, int32_t& row, int32_t depth);
 
@@ -171,7 +168,6 @@ private slots:
 signals:
 	void modified(void);
 
-
 private:
 	static int32_t colSpanForCol(int32_t startCol);
 
@@ -218,7 +214,6 @@ private:
 		AssetTextureWidget* pTextureWidget_;
 		AssetModelWidget* pModelWidget_;
 		AssetAnimWidget* pAnimWidget_;
-		AssetFxWidget* pFxWidget_;
 		AssetAssetRefWidget* pAssetRefWidget_;
 		AssetStringWidget* pStringWidget_;
 		AssetColorWidget* pColorWidget_;

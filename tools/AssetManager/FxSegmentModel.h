@@ -197,8 +197,8 @@ public:
 public:
 	FxSegmentModel(QObject *parent = nullptr);
 
-	void getJson(std::string& json);
-	bool fromJson(const std::string& json);
+	void getJson(core::string& json) const;
+	bool fromJson(const core::string & json);
 
 	void addSegment(void);
 	void duplicateSegment(size_t idx);

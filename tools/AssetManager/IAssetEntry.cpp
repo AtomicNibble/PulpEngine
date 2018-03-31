@@ -8,7 +8,7 @@ IAssetEntry::IAssetEntry(QObject *parent) :
 	QObject(parent),
 	temporary_(false)
 {
-
+	type_ = static_cast<assetDb::AssetType::Enum>(-1);
 }
 
 IAssetEntry::~IAssetEntry()
@@ -26,7 +26,7 @@ QString IAssetEntry::name(void) const
 core::string IAssetEntry::nameNarrow(void) const
 {
 	const auto narrowName = assetName_.toLocal8Bit();
-	return core::string(narrowName.data());
+	return core::string(narrowName.data(), narrowName.length());
 }
 
 QString IAssetEntry::displayName(void) const
