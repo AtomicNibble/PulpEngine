@@ -253,14 +253,18 @@ namespace fx
 							stage.flags.Set(StageFlag::RandGraphAlpha);
 							break;
 						case "RandGraphSize"_fnv1a:
+						case "RandGraphSize0"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphSize0);
 							break;
+						case "RandGraphSize1"_fnv1a:
 						case "RandGraphSize2"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphSize1);
 							break;
 						case "RandGraphVel"_fnv1a:
+						case "RandGraphVel0"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel0);
 							break;
+						case "RandGraphVel1"_fnv1a:
 						case "RandGraphVel2"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel1);
 							break;
@@ -349,10 +353,10 @@ namespace fx
 			if (!parseGraphFloat(s, "alphaGraph", stage.alpha)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "size0Graph", stage.size)) {
+			if (!parseGraphFloat(s, "size0Graph", stage.size0)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "size1Graph", stage.size2)) {
+			if (!parseGraphFloat(s, "size1Graph", stage.size1)) {
 				return false;
 			}
 			if (!parseGraphFloat(s, "scaleGraph", stage.scale)) {
@@ -370,7 +374,15 @@ namespace fx
 			if (!parseGraphFloat(s, "vel0ZGraph", stage.vel0Z)) {
 				return false;
 			}
-
+			if (!parseGraphFloat(s, "vel1XGraph", stage.vel0X)) {
+				return false;
+			}
+			if (!parseGraphFloat(s, "vel1YGraph", stage.vel0Y)) {
+				return false;
+			}
+			if (!parseGraphFloat(s, "vel1ZGraph", stage.vel0Z)) {
+				return false;
+			}
 
 			if (stage.flags.IsSet(StageFlag::RandGraphCol))
 			{
@@ -417,27 +429,91 @@ namespace fx
 				}
 			}
 
-			if (stage.flags.IsSet(StageFlag::Looping))
+			// processing.
 			{
-				// 0 is infinate.
-				// negative values not allowed tho.
-				if (stage.loopCount < 0) {
-					X_ERROR("Fx", "Loop count is negative");
-					return false;
-				}
-			}
-			else
-			{
-				auto maxCount = stage.count.start + stage.count.range;
-				if (maxCount <= 0)
+				if (stage.materials.isEmpty())
 				{
-					X_ERROR("Fx", "Stage is none looping with a max count of zero");
-					return false;
+					X_LOG0("Fx", "Skipping segment \"%s\" no materials specified", name.c_str());
+					continue;
 				}
+
+				if (stage.flags.IsSet(StageFlag::Looping))
+				{
+					// 0 is infinate, negative values not allowed tho.
+					if (stage.loopCount < 0) {
+						X_ERROR("Fx", "Segment \"%s\" Loop count is negative", name.c_str());
+						return false;
+					}
+				}
+				else
+				{
+					if (stage.count.range < 0)
+					{
+						X_ERROR("Fx", "Segment \"%s\" count range can't be negative", name.c_str());
+						return false;
+					}
+
+					// make sure we will spawn something.
+					auto maxCount = stage.count.start + stage.count.range;
+					if (stage.count.start <= 0)
+					{
+						X_LOG0("Fx", "Skipping none looping segment \"%s\" with a max count of zero", name.c_str());
+						continue;
+					}
+				}
+
+				// check things that would result in all elements been invisible
+				if (stage.size0.scale == 0.f)
+				{
+					X_WARNING("Fx", "Skipping segment \"%s\" elem scale is zero", name.c_str());
+					continue;
+				}
+
+				if (stage.flags.IsSet(StageFlag::NonUniformScale))
+				{
+					if (stage.size1.scale == 0.f)
+					{
+						X_WARNING("Fx", "Skipping segment \"%s\" elem scale1 is zero, with none uniform scale enabled", name.c_str());
+						continue;
+					}
+				}
+				else
+				{
+					// house keeping
+					stage.flags.Remove(StageFlag::RandGraphSize1);
+					stage.size1.graphs.clear();
+				}
+
+				auto clearIfZeroScale = [](FloatGraphSet& g) {
+					if (g.scale == 0.f) {
+						g.graphs.clear();
+					}
+				};
+				
+				clearIfZeroScale(stage.rot);
+
+				clearIfZeroScale(stage.vel0X);
+				clearIfZeroScale(stage.vel0Y);
+				clearIfZeroScale(stage.vel0Z);
+
+				clearIfZeroScale(stage.vel1X);
+				clearIfZeroScale(stage.vel1Y);
+				clearIfZeroScale(stage.vel1Z);
+
+				// currently scale graph is unused.
+				stage.scale.graphs.clear();
+
+				//vel1 not used.
+				stage.flags.Remove(StageFlag::RandGraphVel1);
+				stage.vel1X.graphs.clear();
+				stage.vel1Y.graphs.clear();
+				stage.vel1Z.graphs.clear();
+
 			}
 
 			stages_.emplace_back(std::move(stage));
 		}
+
 
 		return true;
 	}
@@ -523,9 +599,10 @@ namespace fx
 			StageDsc compiledStage = stage; // slice in the already set fields.
 
 			processGraph(compiledStage.alpha, stage.alpha, addFloat);
-			processGraph(compiledStage.size, stage.size, addFloat);
+			processGraph(compiledStage.size0, stage.size0, addFloat);
+			processGraph(compiledStage.size1, stage.size1, addFloat);
 			processGraph(compiledStage.scale, stage.scale, addFloat);
-			processGraph(compiledStage.rot, stage.rot, addFloat);
+			processGraph(compiledStage.rot,   stage.rot,   addFloat);
 			processGraph(compiledStage.vel0X, stage.vel0X, addFloat);
 			processGraph(compiledStage.vel0Y, stage.vel0Y, addFloat);
 			processGraph(compiledStage.vel0Z, stage.vel0Z, addFloat);
