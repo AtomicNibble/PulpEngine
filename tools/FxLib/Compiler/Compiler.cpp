@@ -431,7 +431,7 @@ namespace fx
 				auto maxCount = stage.count.start + stage.count.range;
 				if (maxCount <= 0)
 				{
-					X_ERROR("Fx", "Stage is not looping with a max count of zero");
+					X_ERROR("Fx", "Stage is none looping with a max count of zero");
 					return false;
 				}
 			}
