@@ -780,12 +780,18 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		GraphInfo vel0XGraph;
 		GraphInfo vel0YGraph;
 		GraphInfo vel0ZGraph;
+		GraphInfo vel1XGraph;
+		GraphInfo vel1YGraph;
+		GraphInfo vel1ZGraph;
 
 		auto& vel = seg->vel;
 
 		ok &= readGraph(s, "vel0XGraph", vel0XGraph);
 		ok &= readGraph(s, "vel0YGraph", vel0YGraph);
 		ok &= readGraph(s, "vel0ZGraph", vel0ZGraph);
+		ok &= readGraph(s, "vel1XGraph", vel1XGraph);
+		ok &= readGraph(s, "vel1YGraph", vel1YGraph);
+		ok &= readGraph(s, "vel1ZGraph", vel1ZGraph);
 
 		if (!ok) {
 			X_ERROR("Fx", "Failed to read graphs");
@@ -803,7 +809,16 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		vel.vel0.graph.graphs[2] = std::move(vel0ZGraph.graphs[0]);
 		vel.vel0.graph.graphs[5] = std::move(vel0ZGraph.graphs[1]);
 
-		vel.vel1 = vel.vel0;
+		vel.vel1.forwardScale = vel1XGraph.scale;
+		vel.vel1.rightScale = vel1YGraph.scale;
+		vel.vel1.upScale = vel1ZGraph.scale;
+		vel.vel1.graph.graphs.resize(6);
+		vel.vel1.graph.graphs[0] = std::move(vel1XGraph.graphs[0]);
+		vel.vel1.graph.graphs[3] = std::move(vel1XGraph.graphs[1]);
+		vel.vel1.graph.graphs[1] = std::move(vel1YGraph.graphs[0]);
+		vel.vel1.graph.graphs[4] = std::move(vel1YGraph.graphs[1]);
+		vel.vel1.graph.graphs[2] = std::move(vel1ZGraph.graphs[0]);
+		vel.vel1.graph.graphs[5] = std::move(vel1ZGraph.graphs[1]);
 
 		segments_.push_back(std::move(seg));
 	}
