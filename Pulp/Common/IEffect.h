@@ -56,7 +56,10 @@ namespace fx
 		RandGraphCol,
 		RandGraphAlpha,
 		RandGraphSize,
-		RandGraphVel
+		RandGraphSize2,
+		RandGraphVel,
+		RandGraphVel2,
+		NonUniformScale
 	);
 
 	typedef Flags8<StageFlag> StageFlags;

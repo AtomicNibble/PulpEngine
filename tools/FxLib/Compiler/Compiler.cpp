@@ -602,6 +602,8 @@ namespace fx
 
 				while (tokens.ExtractToken(token))
 				{
+					static_assert(StageFlag::FLAGS_COUNT == 8, "Added more flags? this needs updating");
+
 					switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 					{	
 						case "Looping"_fnv1a:
@@ -616,11 +618,20 @@ namespace fx
 						case "RandGraphSize"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphSize);
 							break;
+						case "RandGraphSize2"_fnv1a:
+							flags.Set(StageFlag::RandGraphSize2);
+							break;
 						case "RandGraphVel"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel);
 							break;
+						case "RandGraphVel2"_fnv1a:
+							flags.Set(StageFlag::RandGraphVel2);
+							break;
+						case "NonUniformScale"_fnv1a:
+							flags.Set(StageFlag::NonUniformScale);
+							break;
 						default:
-							X_ERROR("Fx", "Unkonw flag: \"%.*s\"", token.GetLength(), token.GetStart());
+							X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
 							return false;
 					}
 				}
