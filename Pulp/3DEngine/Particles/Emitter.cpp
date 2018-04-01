@@ -210,10 +210,10 @@ namespace fx
 				if (desc.flags.IsSet(StageFlag::RandGraphAlpha)) {
 					alphaGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				if (desc.flags.IsSet(StageFlag::RandGraphSize)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphSize0)) {
 					sizeGraph = gEnv->xorShift.rand() & 0x1;
 				}
-				if (desc.flags.IsSet(StageFlag::RandGraphVel)) {
+				if (desc.flags.IsSet(StageFlag::RandGraphVel0)) {
 					velGraph = gEnv->xorShift.rand() & 0x1;
 				}
 
