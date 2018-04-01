@@ -84,6 +84,9 @@ struct RotationInfo
 {
 	GraphInfo rot;
 	RangeDouble initial;
+	RangeDouble pitch;
+	RangeDouble yaw;
+	RangeDouble roll;
 };
 
 struct SizeInfo
@@ -137,9 +140,9 @@ struct SpawnInfo
 
 struct OriginInfo
 {
-	Range spawnOrgX;
-	Range spawnOrgY;
-	Range spawnOrgZ;
+	RangeDouble spawnOrgX;
+	RangeDouble spawnOrgY;
+	RangeDouble spawnOrgZ;
 };
 
 struct SequenceInfo

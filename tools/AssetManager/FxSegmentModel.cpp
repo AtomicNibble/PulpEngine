@@ -67,6 +67,19 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		writer.Int(range.range);
 	};
 
+	auto writeRangeDouble = [](JsonWriter& writer, const char* pPrefix, const RangeDouble& range) {
+
+		core::StackString<64> startStr(pPrefix);
+		core::StackString<64> rangeStr(pPrefix);
+
+		startStr.append("Start");
+		rangeStr.append("Range");
+
+		writer.Key(startStr.c_str());
+		writer.Double(range.start);
+		writer.Key(rangeStr.c_str());
+		writer.Double(range.range);
+	};
 
 	auto writeGraph = [](JsonWriter& writer, const char* pName, const GraphInfo& g, float scale) {
 
@@ -291,9 +304,14 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		writeRange(writer, "life", segment->spawn.life);
 		writeRange(writer, "delay", segment->spawn.delay);
 
-		writeRange(writer, "spawnOrgX", segment->origin.spawnOrgX);
-		writeRange(writer, "spawnOrgY", segment->origin.spawnOrgY);
-		writeRange(writer, "spawnOrgZ", segment->origin.spawnOrgZ);
+		writeRangeDouble(writer, "initialRot", segment->rot.initial);
+		writeRangeDouble(writer, "anglePitch", segment->rot.pitch);
+		writeRangeDouble(writer, "angleYaw", segment->rot.yaw);
+		writeRangeDouble(writer, "angleRoll", segment->rot.roll);
+
+		writeRangeDouble(writer, "spawnOrgX", segment->origin.spawnOrgX);
+		writeRangeDouble(writer, "spawnOrgY", segment->origin.spawnOrgY);
+		writeRangeDouble(writer, "spawnOrgZ", segment->origin.spawnOrgZ);
 
 		writer.Key("sequence");
 		writer.StartObject();
@@ -495,14 +513,21 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		seg->spawn.interval = s["interval"].GetInt();
 		seg->spawn.loopCount = s["loopCount"].GetInt();
 
-		const std::array<std::pair<const char*, Range&>, 6> ranges = { {
+		const std::array<std::pair<const char*, Range&>, 3> ranges = { {
 			{ "count", seg->spawn.count },
-		{ "life", seg->spawn.life },
-		{ "delay", seg->spawn.delay },
-		{ "spawnOrgX", seg->origin.spawnOrgX },
-		{ "spawnOrgY", seg->origin.spawnOrgY },
-		{ "spawnOrgZ", seg->origin.spawnOrgZ },
-			} };
+			{ "life", seg->spawn.life },
+			{ "delay", seg->spawn.delay },
+		} };
+
+		const std::array<std::pair<const char*, RangeDouble&>, 7> rangesDouble = { {
+			{ "initialRot", seg->rot.initial },
+			{ "anglePitch", seg->rot.pitch },
+			{ "angleYaw", seg->rot.yaw },
+			{ "angleRoll", seg->rot.roll},
+			{ "spawnOrgX", seg->origin.spawnOrgX },
+			{ "spawnOrgY", seg->origin.spawnOrgY },
+			{ "spawnOrgZ", seg->origin.spawnOrgZ },
+		} };
 
 		for (auto& r : ranges)
 		{
@@ -512,8 +537,8 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			range.setFmt("%sRange", r.first);
 
 			if (!s.HasMember(start.c_str()) || !s.HasMember(range.c_str())) {
-				X_ERROR("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
-				return false;
+				X_WARNING("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				continue;
 			}
 
 			if (!s[start.c_str()].IsNumber() || !s[range.c_str()].IsNumber()) {
@@ -521,8 +546,29 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 				return false;
 			}
 
-			r.second.start = s[start.c_str()].GetFloat();
-			r.second.range = s[range.c_str()].GetFloat();
+			r.second.start = s[start.c_str()].GetInt();
+			r.second.range = s[range.c_str()].GetInt();
+		}
+
+		for (auto& r : rangesDouble)
+		{
+			core::StackString<128> start, range;
+
+			start.setFmt("%sStart", r.first);
+			range.setFmt("%sRange", r.first);
+
+			if (!s.HasMember(start.c_str()) || !s.HasMember(range.c_str())) {
+				X_WARNING("Fx", "Missing required range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				continue;
+			}
+
+			if (!s[start.c_str()].IsNumber() || !s[range.c_str()].IsNumber()) {
+				X_ERROR("Fx", "Incorrect type for range values: \"%s\" \"%s\"", start.c_str(), range.c_str());
+				return false;
+			}
+
+			r.second.start = s[start.c_str()].GetDouble();
+			r.second.range = s[range.c_str()].GetDouble();
 		}
 
 		auto readGraph = [](core::json::Document::ValueType& d, const char* pName, GraphInfo& graphInfo) -> bool {
