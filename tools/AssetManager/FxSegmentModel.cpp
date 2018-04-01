@@ -354,8 +354,8 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		// GRAPH ME BABY!
 		writeColGraph(writer, "colorGraph", segment->col.col);
 		writeGraph(writer, "alphaGraph", segment->col.alpha, 1.f);
-		writeGraph(writer, "sizeGraph", segment->size.size0, segment->size.size0.scale);
-		writeGraph(writer, "size2Graph", segment->size.size1, segment->size.size1.scale);
+		writeGraph(writer, "size0Graph", segment->size.size0, segment->size.size0.scale);
+		writeGraph(writer, "size1Graph", segment->size.size1, segment->size.size1.scale);
 		writeGraph(writer, "scaleGraph", segment->size.scale, segment->size.scale.scale);
 		writeGraph(writer, "rotGraph", segment->rot.rot, segment->rot.rot.scale);
 
@@ -773,23 +773,9 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		// need to parse graphs.
 		ok &= readGraph(s, "alphaGraph", seg->col.alpha);
 		ok &= readGraph(s, "size0Graph", seg->size.size0);
-		ok &= readGraph(s, "size1Graph", seg->size.size1, true);
+		ok &= readGraph(s, "size1Graph", seg->size.size1);
 		ok &= readGraph(s, "scaleGraph", seg->size.scale);
 		ok &= readGraph(s, "rotGraph", seg->rot.rot);
-
-		// need a better way to add default values.
-		if (seg->size.size1.graphs.empty())
-		{
-			GraphData linGraph;
-			SeriesData linDescendSeries;
-
-			linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
-			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
-			linGraph.series.push_back(linDescendSeries);
-
-			seg->size.size1.graphs.push_back(linGraph);
-			seg->size.size1.graphs.push_back(linGraph);
-		}
 
 		GraphInfo vel0XGraph;
 		GraphInfo vel0YGraph;
