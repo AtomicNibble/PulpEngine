@@ -517,13 +517,16 @@ namespace fx
 			StageBuilder stage(arena_);
 			core::zero_object<StageDsc>(stage);
 		
-			const std::array<std::pair<const char*, Range&>, 6> ranges = { {
+			const std::array<std::pair<const char*, Range&>, 9> ranges = { {
 				{ "count", stage.count },
 				{ "life", stage.life },
 				{ "delay", stage.delay },
 				{ "spawnOrgX", stage.spawnOrgX },
 				{ "spawnOrgY", stage.spawnOrgY },
 				{ "spawnOrgZ", stage.spawnOrgZ },
+				{ "anglePitch", stage.anglePitch },
+				{ "angleYaw", stage.angleYaw },
+				{ "angleRoll", stage.angleRoll },
 			} };
 
 			core::StackString<128> name;
@@ -709,6 +712,9 @@ namespace fx
 			if (!parseGraphFloat(s, "sizeGraph", stage.size)) {
 				return false;
 			}
+			if (!parseGraphFloat(s, "size2Graph", stage.size2)) {
+				return false;
+			}
 			if (!parseGraphFloat(s, "scaleGraph", stage.scale)) {
 				return false;
 			}
@@ -724,7 +730,6 @@ namespace fx
 			if (!parseGraphFloat(s, "vel0ZGraph", stage.vel0Z)) {
 				return false;
 			}
-
 
 
 			if (stage.flags.IsSet(StageFlag::RandGraphCol))
@@ -745,6 +750,13 @@ namespace fx
 			{
 				if (stage.size.graphs.size() < 2) {
 					stage.flags.Remove(StageFlag::RandGraphSize);
+					X_WARNING("Fx", "RandSize requires atleast two graphs");
+				}
+			}
+			if (stage.flags.IsSet(StageFlag::RandGraphSize2))
+			{
+				if (stage.size2.graphs.size() < 2) {
+					stage.flags.Remove(StageFlag::RandGraphSize2);
 					X_WARNING("Fx", "RandSize requires atleast two graphs");
 				}
 			}

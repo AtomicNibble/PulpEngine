@@ -59,6 +59,7 @@ namespace fx
 			color(arena),
 			alpha(arena),
 			size(arena),
+			size2(arena),
 			scale(arena),
 			rot(arena),
 			vel0X(arena),
@@ -71,6 +72,7 @@ namespace fx
 		ColGraphSet color;
 		FloatGraphSet alpha;
 		FloatGraphSet size;
+		FloatGraphSet size2;
 		FloatGraphSet scale;
 		FloatGraphSet rot;
 
