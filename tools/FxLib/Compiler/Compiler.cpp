@@ -388,14 +388,14 @@ namespace fx
 			}
 			if (stage.flags.IsSet(StageFlag::RandGraphSize0))
 			{
-				if (stage.size.graphs.size() < 2) {
+				if (stage.size0.graphs.size() < 2) {
 					stage.flags.Remove(StageFlag::RandGraphSize0);
 					X_WARNING("Fx", "RandSize requires atleast two graphs");
 				}
 			}
 			if (stage.flags.IsSet(StageFlag::RandGraphSize1))
 			{
-				if (stage.size2.graphs.size() < 2) {
+				if (stage.size1.graphs.size() < 2) {
 					stage.flags.Remove(StageFlag::RandGraphSize1);
 					X_WARNING("Fx", "RandSize requires atleast two graphs");
 				}
