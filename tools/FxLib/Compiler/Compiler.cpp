@@ -586,6 +586,19 @@ namespace fx
 				stage.sequence.startFrame = seqJson["startFrame"].GetInt();
 				stage.sequence.fps = seqJson["fps"].GetInt();
 				stage.sequence.loop = seqJson["loop"].GetInt();
+
+				if (stage.sequence.startFrame < -1) {
+					X_ERROR("Fx", "Invalid sequence startFrame value: %" PRIi32, stage.sequence.startFrame);
+					return false;
+				}
+				if (stage.sequence.fps < -1) {
+					X_ERROR("Fx", "Invalid sequence fps value: %" PRIi32, stage.sequence.fps);
+					return false;
+				}
+				if (stage.sequence.loop < -1) {
+					X_ERROR("Fx", "Invalid sequence loop value: %" PRIi32, stage.sequence.loop);
+					return false;
+				}
 			}
 
 			auto& typeJson = s["type"];
