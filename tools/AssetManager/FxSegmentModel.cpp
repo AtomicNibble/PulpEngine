@@ -878,6 +878,7 @@ void FxSegmentModel::addSegment(void)
 	seg->size.size0.graphs = linDescend.graphs;
 	seg->size.size1.graphs = linDescend.graphs;
 	seg->size.scale.graphs = linDescend.graphs;
+	seg->size.scale.scale = 1.f;
 
 	// so i want 2 graphs with 3 series each.
 	{
