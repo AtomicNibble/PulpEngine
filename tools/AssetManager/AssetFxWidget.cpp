@@ -1607,8 +1607,8 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pFormLayout->addWidget(pRightScale_);
 		pFormLayout->addWidget(new QLabel("Up"));
 		pFormLayout->addWidget(pUpScale_);
-		pFormLayout->addWidget(pRandomGraph_);
 		pFormLayout->addStretch(1);
+		pFormLayout->addWidget(pRandomGraph_);
 
 		pLayout->addWidget(pVelGraph_);
 	//	pLayout->addLayout(pHLayout);
@@ -1995,6 +1995,7 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pSequence_ = new SequenceInfoWidget();
 		pSize_ = new GraphWithScale("Width/Diamenter");
 		pSize2_ = new GraphWithScale("Height/Length");
+		pSize2_->setCheckable(true);
 		pScale_ = new GraphWithScale("Scale");
 		pVisualInfo_ = new VisualsInfoWidget();
 		pVerlocity_ = new VelocityInfoWidget();
@@ -2148,7 +2149,11 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		connect(pCol_, &ColorGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pAlpha_, &AlphaGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pSize_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pSize2_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pScale_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
+
+		// groupbox checkbox.
+		connect(pSize2_, &GraphWithScale::toggled, this, &AssetFxWidget::onValueChanged);
 
 		connect(&segmentModel_, &FxSegmentModel::dataChanged, this, &AssetFxWidget::onValueChanged);
 	}
@@ -2249,11 +2254,15 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pSequence_->getValue(segment.seq);
 		pVisualInfo_->getValue(segment.vis);
 		pRotation_->getValue(segment.rot);
+		pAngles_->getValue(segment.rot);
 		pVerlocity_->getValue(segment.vel);
 		pCol_->getValue(segment.col);
 		pAlpha_->getValue(segment.col);
 		pSize_->getValue(segment.size.size);
+		pSize2_->getValue(segment.size.size2);
 		pScale_->getValue(segment.size.scale);
+
+		segment.size.size2Enabled = pSize2_->isChecked();
 	}
 
 	if (selected.count() != 1) {
@@ -2277,11 +2286,15 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pSequence_->setValue(segment.seq);
 		pVisualInfo_->setValue(segment.vis);
 		pRotation_->setValue(segment.rot);
+		pAngles_->setValue(segment.rot);
 		pVerlocity_->setValue(segment.vel);
 		pCol_->setValue(segment.col);
 		pAlpha_->setValue(segment.col);
 		pSize_->setValue(segment.size.size);
+		pSize2_->setValue(segment.size.size2);
 		pScale_->setValue(segment.size.scale);
+
+		pSize2_->setChecked(segment.size.size2Enabled);
 
 		enableWidgets(segment.vis.type);
 	}
@@ -2345,9 +2358,18 @@ void AssetFxWidget::onValueChanged(void)
 	{
 		pSize_->getValue(segment.size.size);
 	}
+	else if (pSender == pSize2_)
+	{
+		pSize2_->getValue(segment.size.size2);
+		segment.size.size2Enabled = pSize2_->isChecked();
+	}
 	else if (pSender == pScale_)
 	{
 		pScale_->getValue(segment.size.scale);
+	}
+	else if (pSender == pAngles_)
+	{
+		pAngles_->getValue(segment.rot);
 	}
 	else if (pSender == &segmentModel_)
 	{

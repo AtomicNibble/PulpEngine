@@ -252,6 +252,14 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		{
 			flags.Set(StageFlag::RandGraphSize);
 		}
+		if (segment->size.size2.random)
+		{
+			flags.Set(StageFlag::RandGraphSize2);
+		}
+		if (segment->size.size2Enabled)
+		{
+			flags.Set(StageFlag::NonUniformScale);
+		}
 		if (segment->vel.graph.random)
 		{
 			flags.Set(StageFlag::RandGraphVel);
@@ -330,6 +338,7 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		writeColGraph(writer, "colorGraph", segment->col.col);
 		writeGraph(writer, "alphaGraph", segment->col.alpha, 1.f);
 		writeGraph(writer, "sizeGraph", segment->size.size, segment->size.size.scale);
+		writeGraph(writer, "size2Graph", segment->size.size2, segment->size.size2.scale);
 		writeGraph(writer, "scaleGraph", segment->size.scale, segment->size.scale.scale);
 		writeGraph(writer, "rotGraph", segment->rot.rot, segment->rot.rot.scale);
 
@@ -500,6 +509,14 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			{
 				seg->size.size.random = true;
 			}
+			if (flags.IsSet(StageFlag::RandGraphSize2))
+			{
+				seg->size.size2.random = true;
+			}
+			if (flags.IsSet(StageFlag::NonUniformScale))
+			{
+				seg->size.size2Enabled = true;
+			}
 			if (flags.IsSet(StageFlag::RandGraphVel))
 			{
 				seg->vel.graph.random = true;
@@ -582,10 +599,10 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			r.second.range = s[range.c_str()].GetDouble();
 		}
 
-		auto readGraph = [](core::json::Document::ValueType& d, const char* pName, GraphInfo& graphInfo) -> bool {
+		auto readGraph = [](core::json::Document::ValueType& d, const char* pName, GraphInfo& graphInfo, bool optional = false) -> bool {
 
 			if (!checkMember(d, pName, core::json::kObjectType)) {
-				return false;
+				return optional;
 			}
 
 			auto& graph = d[pName];
@@ -714,8 +731,23 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		// need to parse graphs.
 		ok &= readGraph(s, "alphaGraph", seg->col.alpha);
 		ok &= readGraph(s, "sizeGraph", seg->size.size);
+		ok &= readGraph(s, "size2Graph", seg->size.size2, true);
 		ok &= readGraph(s, "scaleGraph", seg->size.scale);
 		ok &= readGraph(s, "rotGraph", seg->rot.rot);
+
+		// need a better way to add default values.
+		if (seg->size.size2.graphs.empty())
+		{
+			GraphData linGraph;
+			SeriesData linDescendSeries;
+
+			linDescendSeries.points.push_back(GraphPoint(0.f, 1.f));
+			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
+			linGraph.series.push_back(linDescendSeries);
+
+			seg->size.size2.graphs.push_back(linGraph);
+			seg->size.size2.graphs.push_back(linGraph);
+		}
 
 		GraphInfo vel0XGraph;
 		GraphInfo vel0YGraph;
@@ -742,7 +774,6 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		vel.graph.graphs[4] = std::move(vel0YGraph.graphs[1]);
 		vel.graph.graphs[2] = std::move(vel0ZGraph.graphs[0]);
 		vel.graph.graphs[5] = std::move(vel0ZGraph.graphs[1]);
-
 
 		segments_.push_back(std::move(seg));
 	}
@@ -800,6 +831,7 @@ void FxSegmentModel::addSegment(void)
 	}
 
 	seg->size.size.graphs = linDescend.graphs;
+	seg->size.size2.graphs = linDescend.graphs;
 	seg->size.scale.graphs = linDescend.graphs;
 
 	// so i want 2 graphs with 3 series each.

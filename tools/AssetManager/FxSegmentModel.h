@@ -91,8 +91,16 @@ struct RotationInfo
 
 struct SizeInfo
 {
+	SizeInfo() :
+		size2Enabled(false)
+	{
+	}
+
 	GraphInfo size;
+	GraphInfo size2;
 	GraphInfo scale;
+
+	bool size2Enabled;
 };
 
 struct ColorInfo
