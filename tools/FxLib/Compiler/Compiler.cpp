@@ -619,16 +619,16 @@ namespace fx
 							stage.flags.Set(StageFlag::RandGraphSize);
 							break;
 						case "RandGraphSize2"_fnv1a:
-							flags.Set(StageFlag::RandGraphSize2);
+							stage.flags.Set(StageFlag::RandGraphSize2);
 							break;
 						case "RandGraphVel"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel);
 							break;
 						case "RandGraphVel2"_fnv1a:
-							flags.Set(StageFlag::RandGraphVel2);
+							stage.flags.Set(StageFlag::RandGraphVel2);
 							break;
 						case "NonUniformScale"_fnv1a:
-							flags.Set(StageFlag::NonUniformScale);
+							stage.flags.Set(StageFlag::NonUniformScale);
 							break;
 						default:
 							X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
