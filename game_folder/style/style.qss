@@ -53,6 +53,38 @@ QWidget:item:selected {
 
 }
 
+#FxEditor {
+	background-color:#232326;
+}
+
+#FxEditor QScrollArea {
+	border:0;
+}
+
+#FxEditor QTabWidget   {
+    border:0;
+}
+
+#FxEditor QSplitter::handle {
+	margin-top: 2px;
+	margin-bottom: 2px;
+}
+
+#FxEditor QSplitter {
+	border:0px;
+}
+
+#FxEditor QLabel{
+	background-color:#232326;
+}
+#FxEditor QCheckBox{
+	background-color:#232326;
+}
+
+#FxEditorTabWidget {
+	background-color:#232326;
+}
+
 #AssetProperyEditor
 {
 	border: 1px solid #111;
@@ -66,6 +98,27 @@ QWidget:item:selected {
 #AssetProperyEditor QCheckBox{
 	background-color:#232326;
 }
+
+QTabBar::tab {
+	background-color:#444;
+	color: #999;
+	padding: 5px 5px 5px 5px;
+	border-top-left-radius: 0px;
+	border-top-right-radius: 0px;
+	margin-left: 0px;
+	border: 1px solid;
+}
+
+QTabBar::tab:selected {
+	background-color:#911523;
+	color: #eee;
+}
+
+QTabBar::tab:!selected:hover {
+	background-color:#91323C;
+	color: #eee;
+}
+
 
 
 #assEntryBar::tab {
