@@ -36,7 +36,7 @@ SpinBoxRange::SpinBoxRange(QWidget* parent) :
 	pRange_ = new QSpinBox();
 
 	pStart_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-	pRange_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	pRange_->setRange(0, std::numeric_limits<int>::max());
 
 	QLabel* pLabel = new QLabel("+");
 
@@ -65,8 +65,9 @@ void SpinBoxRange::getValue(Range& r)
 // -----------------------------------
 
 
-SpinBoxRangeDouble::SpinBoxRangeDouble(QWidget* parent) :
-	QWidget(parent)
+SpinBoxRangeDouble::SpinBoxRangeDouble(bool addative, QWidget* parent) :
+	QWidget(parent),
+	addative_(addative)
 {
 	QHBoxLayout* pLayout = new QHBoxLayout();
 	pStart_ = new QDoubleSpinBox();
@@ -75,9 +76,15 @@ SpinBoxRangeDouble::SpinBoxRangeDouble(QWidget* parent) :
 	pRange_->setSingleStep(0.05);
 
 	pStart_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
-	pRange_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	
+	if (addative_) {
+		pRange_->setRange(0, std::numeric_limits<int>::max());
+	}
+	else {
+		pRange_->setRange(std::numeric_limits<int>::min(), std::numeric_limits<int>::max());
+	}
 
-	QLabel* pLabel = new QLabel("+");
+	QLabel* pLabel = new QLabel(addative_ ? "+" : "to");
 
 	pLayout->setContentsMargins(0, 0, 0, 0);
 	pLayout->addWidget(pStart_, 1);
@@ -1469,17 +1476,17 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 {
 	QFormLayout* pLayout = new QFormLayout();
 	{
-		pForward_ = new SpinBoxRange();
-		pRight_ = new SpinBoxRange();
-		pUp_ = new SpinBoxRange();
+		pForward_ = new SpinBoxRangeDouble(false);
+		pRight_ = new SpinBoxRangeDouble(false);
+		pUp_ = new SpinBoxRangeDouble(false);
 
 		pLayout->addRow(tr("Forward"), pForward_);
 		pLayout->addRow(tr("Right"), pRight_);
 		pLayout->addRow(tr("Up"), pUp_);
 
-		connect(pForward_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
-		connect(pRight_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
-		connect(pUp_, &SpinBoxRange::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pForward_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pRight_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pUp_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1555,7 +1562,7 @@ void SequenceInfoWidget::getValue(SequenceInfo& sq)
 
 
 VelocityGraph::VelocityGraph(QWidget* parent) :
-	QGroupBox(parent)
+	QWidget(parent)
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
@@ -1727,7 +1734,7 @@ RotationGraphWidget::RotationGraphWidget(QWidget *parent) :
 		pRotationGraph_->setYAxisRange(-0.5f,0.5f);
 		pRotationGraph_->createGraphs(2, 1);
 
-		pInitialRotation_ = new SpinBoxRangeDouble();
+		pInitialRotation_ = new SpinBoxRangeDouble(false);
 		pInitialRotation_->setMinimumWidth(80);
 
 		pScale_ = new QDoubleSpinBox();
@@ -1927,6 +1934,47 @@ void VisualsInfoWidget::currentIndexChanged(int32_t idx)
 
 // -----------------------------------
 
+AngleWidget::AngleWidget(QWidget* parent) :
+	QGroupBox("Angle", parent)
+{
+	QFormLayout* pLayout = new QFormLayout();
+	{
+		pPitch_ = new SpinBoxRangeDouble(false);
+		pYaw_ = new SpinBoxRangeDouble(false);
+		pRoll_ = new SpinBoxRangeDouble(false);
+
+		pLayout->addRow(tr("Pitch"), pPitch_);
+		pLayout->addRow(tr("Yaw"), pYaw_);
+		pLayout->addRow(tr("Roll"), pRoll_);
+
+		connect(pPitch_, &SpinBoxRangeDouble::valueChanged, this, &AngleWidget::valueChanged);
+		connect(pYaw_, &SpinBoxRangeDouble::valueChanged, this, &AngleWidget::valueChanged);
+		connect(pRoll_, &SpinBoxRangeDouble::valueChanged, this, &AngleWidget::valueChanged);
+	}
+
+	setLayout(pLayout);
+}
+
+void AngleWidget::setValue(const RotationInfo& rot)
+{
+	blockSignals(true);
+
+	pPitch_->setValue(rot.pitch);
+	pYaw_->setValue(rot.yaw);
+	pRoll_->setValue(rot.roll);
+
+	blockSignals(false);
+}
+
+void AngleWidget::getValue(RotationInfo& rot)
+{
+	pPitch_->getValue(rot.pitch);
+	pYaw_->getValue(rot.yaw);
+	pRoll_->getValue(rot.roll);
+}
+
+// -----------------------------------
+
 
 
 AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
@@ -1952,6 +2000,7 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pVerlocity_ = new VelocityInfoWidget();
 		pVerlocity2_ = new VelocityInfoWidget();
 		pRotation_ = new RotationGraphWidget();
+		pAngles_ = new AngleWidget();
 		pCol_ = new ColorGraph();
 		pAlpha_ = new AlphaGraph();
 
@@ -1969,7 +2018,6 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pCol_->setMinimumWidth(300);
 		pAlpha_->setMinimumWidth(300);
 
-
 		pSize_->setMaximumWidth(maxWidth);
 		pSize2_->setMaximumWidth(maxWidth);
 		pScale_->setMaximumWidth(maxWidth);
@@ -1978,6 +2026,7 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pRotation_->setMaximumWidth(maxWidth);
 		pCol_->setMaximumWidth(maxWidth);
 		pAlpha_->setMaximumWidth(maxWidth);
+		
 
 		pSize_->setMaximumHeight(maxHeight);
 		pSize2_->setMaximumHeight(maxHeight);
@@ -1987,6 +2036,9 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pRotation_->setMaximumHeight(maxHeight);
 		pCol_->setMaximumHeight(maxHeight);
 		pAlpha_->setMaximumHeight(maxHeight);
+
+		pAngles_->setMinimumWidth(300);
+		pAngles_->setMaximumWidth(300);
 
 		// Spawn stuff
 		pVisualInfo_->setMinimumWidth(300);
@@ -2019,6 +2071,7 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 
 		QVBoxLayout* pRotLayout = new QVBoxLayout();
 		pRotLayout->addWidget(pRotation_);
+		pRotLayout->addWidget(pAngles_);
 		pRotLayout->addStretch(0);
 
 		QVBoxLayout* pColLayout = new QVBoxLayout();
@@ -2027,18 +2080,23 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pColLayout->addStretch(0);
 
 		QWidget* pSpawnTab = new QWidget();
+		pSpawnTab->setObjectName("FxEditorTabWidget");
 		pSpawnTab->setLayout(pSpawnLayout);
 
 		QWidget* pSizeTab = new QWidget();
+		pSizeTab->setObjectName("FxEditorTabWidget");
 		pSizeTab->setLayout(pSizeLayout);
 
 		QWidget* pVelTab = new QWidget();
+		pVelTab->setObjectName("FxEditorTabWidget");
 		pVelTab->setLayout(pVelLayout);
 
 		QWidget* pRotTab = new QWidget();
+		pRotTab->setObjectName("FxEditorTabWidget");
 		pRotTab->setLayout(pRotLayout);
 
 		QWidget* pColorTab = new QWidget();
+		pColorTab->setObjectName("FxEditorTabWidget");
 		pColorTab->setLayout(pColLayout);
 
 
@@ -2075,8 +2133,7 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 
 		setLayout(pLayout);
 
-
-		enableWidgets(false);
+		disableWidgets();
 
 		// HEllloo JERRRYY!!!
 		connect(pSegments_, &SegmentListWidget::itemSelectionChanged, this, &AssetFxWidget::segmentSelectionChanged);
@@ -2103,19 +2160,57 @@ AssetFxWidget::~AssetFxWidget()
 
 }
 
-void AssetFxWidget::enableWidgets(bool enable)
+void AssetFxWidget::disableWidgets(void)
 {
-	pSapwn_->setEnabled(enable);
-	pOrigin_->setEnabled(enable);
-	pSequence_->setEnabled(enable);
-	pVisualInfo_->setEnabled(enable);
-	pRotation_->setEnabled(enable);
-	pVerlocity_->setEnabled(enable);
-	pCol_->setEnabled(enable);
-	pAlpha_->setEnabled(enable);
-	pSize_->setEnabled(enable);
-	pScale_->setEnabled(enable);
+	pSapwn_->setEnabled(false);
+	pOrigin_->setEnabled(false);
+	pSequence_->setEnabled(false);
+	pVisualInfo_->setEnabled(false);
+	pRotation_->setEnabled(false);
+	pAngles_->setEnabled(false);
+	pVerlocity_->setEnabled(false);
+	pCol_->setEnabled(false);
+	pAlpha_->setEnabled(false);
+	pSize_->setEnabled(false);
+	pSize2_->setEnabled(false);
+	pScale_->setEnabled(false);
 }
+
+void AssetFxWidget::enableWidgets(engine::fx::StageType::Enum type)
+{
+	pSapwn_->setEnabled(true);
+	pOrigin_->setEnabled(true);
+	pSequence_->setEnabled(true);
+	pVisualInfo_->setEnabled(true);
+
+	// graphs for all.
+	pRotation_->setEnabled(true);
+	pVerlocity_->setEnabled(true);
+	pCol_->setEnabled(true);
+	pAlpha_->setEnabled(true);
+	pSize_->setEnabled(true);
+	pSize2_->setEnabled(true);
+
+	// disaabled for most things currently?
+	pScale_->setEnabled(false);
+
+	if (type == engine::fx::StageType::Sound)
+	{
+		pSize_->setEnabled(false);
+		pSize2_->setEnabled(false);
+		pSequence_->setEnabled(false);
+	}
+
+	if (type == engine::fx::StageType::RotatedSprite)
+	{
+		pAngles_->setEnabled(true);
+	}
+	else
+	{
+		pAngles_->setEnabled(false);
+	}
+}
+
 
 
 bool AssetFxWidget::setValue(const core::string & value)
@@ -2162,7 +2257,7 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 	}
 
 	if (selected.count() != 1) {
-		enableWidgets(false);
+		disableWidgets();
 		currentSegment_ = -1;
 		return;
 	}
@@ -2187,12 +2282,9 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pAlpha_->setValue(segment.col);
 		pSize_->setValue(segment.size.size);
 		pScale_->setValue(segment.size.scale);
-	}
 
-	if (currentSegment_ < 0) {
-		enableWidgets(true);
+		enableWidgets(segment.vis.type);
 	}
-
 	currentSegment_ = static_cast<int32_t>(curRow);
 }
 
@@ -2200,8 +2292,7 @@ void AssetFxWidget::typeChanged(engine::fx::StageType::Enum type)
 {
 	segmentModel_.setSegmentType(currentSegment_, type);
 
-	// TODO: enable / disable widgets based on type.
-
+	enableWidgets(type);
 }
 
 

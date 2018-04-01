@@ -47,7 +47,7 @@ class SpinBoxRangeDouble : public QWidget
 {
 	Q_OBJECT
 public:
-	SpinBoxRangeDouble(QWidget* parent = nullptr);
+	SpinBoxRangeDouble(bool addative, QWidget* parent = nullptr);
 
 	void setValue(const RangeDouble& r);
 	void getValue(RangeDouble& r);
@@ -58,8 +58,8 @@ signals:
 private:
 	QDoubleSpinBox* pStart_;
 	QDoubleSpinBox* pRange_;
+	bool addative_;
 };
-
 
 class GraphEditorView : public QtCharts::QChartView
 {
@@ -384,9 +384,9 @@ signals:
 	void valueChanged(void);
 
 private:
-	SpinBoxRange* pForward_;
-	SpinBoxRange* pRight_;
-	SpinBoxRange* pUp_;
+	SpinBoxRangeDouble* pForward_;
+	SpinBoxRangeDouble* pRight_;
+	SpinBoxRangeDouble* pUp_;
 };
 
 
@@ -410,7 +410,7 @@ private:
 };
 
 
-class VelocityGraph : public QGroupBox
+class VelocityGraph : public QWidget
 {
 	Q_OBJECT
 
@@ -528,6 +528,25 @@ private:
 	QLineEdit* pMaterial_;
 };
 
+class AngleWidget : public QGroupBox
+{
+	Q_OBJECT
+
+public:
+	AngleWidget(QWidget *parent = nullptr);
+
+	void setValue(const RotationInfo& rot);
+	void getValue(RotationInfo& rot);
+
+signals:
+	void valueChanged(void);
+
+private:
+	SpinBoxRangeDouble* pPitch_;
+	SpinBoxRangeDouble* pYaw_;
+	SpinBoxRangeDouble* pRoll_;
+};
+
 
 class AssetFxWidget : public QWidget
 {
@@ -544,7 +563,8 @@ public:
 	void getValue(core::string& value) const;
 
 private:
-	void enableWidgets(bool enable);
+	void enableWidgets(engine::fx::StageType::Enum type);
+	void disableWidgets(void);
 
 private slots:
 	void segmentSelectionChanged(const QItemSelection &selected, const QItemSelection &deselected);
@@ -566,6 +586,7 @@ private:
 	SequenceInfoWidget* pSequence_;
 	VisualsInfoWidget* pVisualInfo_;
 	RotationGraphWidget* pRotation_;
+	AngleWidget* pAngles_;
 	VelocityInfoWidget* pVerlocity_;
 	VelocityInfoWidget* pVerlocity2_;
 	ColorGraph* pCol_;
