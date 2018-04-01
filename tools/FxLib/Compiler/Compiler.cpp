@@ -500,6 +500,23 @@ namespace fx
 				clearIfZeroScale(stage.vel1Y);
 				clearIfZeroScale(stage.vel1Z);
 
+				// handle negative ranges.
+				auto shiftRange = [](Range& r) {
+					if (r.range < 0.f) {
+						auto range = r.start - r.range;
+
+						r.start -= range;
+						r.range = range;
+
+						X_ASSERT(range > 0, "Ragne is negative")(range, r.start, r.range);
+					}
+				};
+
+				shiftRange(stage.spawnOrgX);
+				shiftRange(stage.spawnOrgY);
+				shiftRange(stage.spawnOrgZ);
+
+
 				// currently scale graph is unused.
 				stage.scale.graphs.clear();
 
