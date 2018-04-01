@@ -64,7 +64,10 @@ namespace fx
 			rot(arena),
 			vel0X(arena),
 			vel0Y(arena),
-			vel0Z(arena)
+			vel0Z(arena),
+			vel1X(arena),
+			vel1Y(arena),
+			vel1Z(arena)
 		{}
 
 		StrArr materials;
@@ -79,6 +82,10 @@ namespace fx
 		FloatGraphSet vel0X;
 		FloatGraphSet vel0Y;
 		FloatGraphSet vel0Z;
+
+		FloatGraphSet vel1X;
+		FloatGraphSet vel1Y;
+		FloatGraphSet vel1Z;
 	};
 
 	class EffectCompiler

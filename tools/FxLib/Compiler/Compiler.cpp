@@ -632,16 +632,16 @@ namespace fx
 							stage.flags.Set(StageFlag::RandGraphAlpha);
 							break;
 						case "RandGraphSize"_fnv1a:
-							stage.flags.Set(StageFlag::RandGraphSize);
+							stage.flags.Set(StageFlag::RandGraphSize0);
 							break;
 						case "RandGraphSize2"_fnv1a:
-							stage.flags.Set(StageFlag::RandGraphSize2);
+							stage.flags.Set(StageFlag::RandGraphSize1);
 							break;
 						case "RandGraphVel"_fnv1a:
-							stage.flags.Set(StageFlag::RandGraphVel);
+							stage.flags.Set(StageFlag::RandGraphVel0);
 							break;
 						case "RandGraphVel2"_fnv1a:
-							stage.flags.Set(StageFlag::RandGraphVel2);
+							stage.flags.Set(StageFlag::RandGraphVel1);
 							break;
 						case "NonUniformScale"_fnv1a:
 							stage.flags.Set(StageFlag::NonUniformScale);
@@ -728,10 +728,10 @@ namespace fx
 			if (!parseGraphFloat(s, "alphaGraph", stage.alpha)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "sizeGraph", stage.size)) {
+			if (!parseGraphFloat(s, "size0Graph", stage.size)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "size2Graph", stage.size2)) {
+			if (!parseGraphFloat(s, "size1Graph", stage.size2)) {
 				return false;
 			}
 			if (!parseGraphFloat(s, "scaleGraph", stage.scale)) {
@@ -765,32 +765,35 @@ namespace fx
 					X_WARNING("Fx", "RandAlpha requires atleast two graphs");
 				}
 			}
-			if (stage.flags.IsSet(StageFlag::RandGraphSize))
+			if (stage.flags.IsSet(StageFlag::RandGraphSize0))
 			{
 				if (stage.size.graphs.size() < 2) {
-					stage.flags.Remove(StageFlag::RandGraphSize);
+					stage.flags.Remove(StageFlag::RandGraphSize0);
 					X_WARNING("Fx", "RandSize requires atleast two graphs");
 				}
 			}
-			if (stage.flags.IsSet(StageFlag::RandGraphSize2))
+			if (stage.flags.IsSet(StageFlag::RandGraphSize1))
 			{
 				if (stage.size2.graphs.size() < 2) {
-					stage.flags.Remove(StageFlag::RandGraphSize2);
+					stage.flags.Remove(StageFlag::RandGraphSize1);
 					X_WARNING("Fx", "RandSize requires atleast two graphs");
 				}
 			}
-			if (stage.flags.IsSet(StageFlag::RandGraphVel))
+			if (stage.flags.IsSet(StageFlag::RandGraphVel0))
 			{
 				if (stage.vel0X.graphs.size() < 2 || stage.vel0Y.graphs.size() < 2 || stage.vel0Z.graphs.size() < 2)
 				{
-					stage.flags.Remove(StageFlag::RandGraphVel);
+					stage.flags.Remove(StageFlag::RandGraphVel0);
 					X_WARNING("Fx", "RandVel requires atleast two graphs");
 				}
 			}
-			if (stage.flags.IsSet(StageFlag::RandGraphVel2))
+			if (stage.flags.IsSet(StageFlag::RandGraphVel1))
 			{
-				X_ASSERT_NOT_IMPLEMENTED();
-				return false;
+				if (stage.vel1X.graphs.size() < 2 || stage.vel1Y.graphs.size() < 2 || stage.vel1Z.graphs.size() < 2)
+				{
+					stage.flags.Remove(StageFlag::RandGraphVel1);
+					X_WARNING("Fx", "RandVel requires atleast two graphs");
+				}
 			}
 
 			if (stage.flags.IsSet(StageFlag::Looping))
