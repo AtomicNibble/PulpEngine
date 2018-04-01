@@ -1562,7 +1562,7 @@ void SequenceInfoWidget::getValue(SequenceInfo& sq)
 
 
 VelocityGraph::VelocityGraph(QWidget* parent) :
-	QWidget(parent)
+	QGroupBox(parent)
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
@@ -1625,7 +1625,7 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 }
 
 
-void VelocityGraph::setValue(const VelocityInfo& vel)
+void VelocityGraph::setValue(const VelocityGraphInfo& vel)
 {
 	blockSignals(true);
 
@@ -1640,7 +1640,7 @@ void VelocityGraph::setValue(const VelocityInfo& vel)
 	blockSignals(false);
 }
 
-void VelocityGraph::getValue(VelocityInfo& vel)
+void VelocityGraph::getValue(VelocityGraphInfo& vel)
 {
 	pVelGraph_->getValue(vel.graph);
 
@@ -1656,7 +1656,7 @@ void VelocityGraph::getValue(VelocityInfo& vel)
 
 
 VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
-	QGroupBox("Velocity", parent)
+	QWidget(parent)
 {
 	QVBoxLayout* pLayout = new QVBoxLayout();
 	{
@@ -1685,12 +1685,7 @@ VelocityInfoWidget::VelocityInfoWidget(QWidget* parent) :
 			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &VelocityInfoWidget::valueChanged);
 		}
 
-		pGraph_ = new VelocityGraph();
-
 		pLayout->addWidget(pMoveGroupBox);
-		pLayout->addWidget(pGraph_);
-
-		connect(pGraph_, &VelocityGraph::valueChanged, this, &VelocityInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1706,8 +1701,6 @@ void VelocityInfoWidget::setValue(const VelocityInfo& vel)
 		pSpawn_->setChecked(true);
 	}
 
-	pGraph_->setValue(vel);
-
 	blockSignals(false);
 }
 
@@ -1719,8 +1712,6 @@ void VelocityInfoWidget::getValue(VelocityInfo& vel)
 	if (pSpawn_->isChecked()) {
 		vel.postionType = engine::fx::RelativeTo::Spawn;
 	} 
-
-	pGraph_->getValue(vel);
 }
 
 // -----------------------------------
@@ -1993,13 +1984,14 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pOrigin_ = new OriginInfoWidget();
 		pSegments_ = new SegmentListWidget(&segmentModel_);
 		pSequence_ = new SequenceInfoWidget();
-		pSize_ = new GraphWithScale("Width/Diamenter");
-		pSize2_ = new GraphWithScale("Height/Length");
-		pSize2_->setCheckable(true);
+		pSize0_ = new GraphWithScale("Width/Diamenter");
+		pSize1_ = new GraphWithScale("Height/Length");
+		pSize1_->setCheckable(true);
 		pScale_ = new GraphWithScale("Scale");
 		pVisualInfo_ = new VisualsInfoWidget();
-		pVerlocity_ = new VelocityInfoWidget();
-		pVerlocity2_ = new VelocityInfoWidget();
+		pVerlocityInfo_ = new VelocityInfoWidget();
+		pVerlocity0_ = new VelocityGraph();
+		pVerlocity1_ = new VelocityGraph();
 		pRotation_ = new RotationGraphWidget();
 		pAngles_ = new AngleWidget();
 		pCol_ = new ColorGraph();
@@ -2010,30 +2002,30 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		const int maxWidth = 600;
 		const int maxHeight = 400;
 
-		pSize_->setMinimumWidth(300);
-		pSize2_->setMinimumWidth(300);
+		pSize0_->setMinimumWidth(300);
+		pSize1_->setMinimumWidth(300);
 		pScale_->setMinimumWidth(300);
-		pVerlocity_->setMinimumWidth(300);
-		pVerlocity2_->setMinimumWidth(300);
+		pVerlocity0_->setMinimumWidth(300);
+		pVerlocity1_->setMinimumWidth(300);
 		pRotation_->setMinimumWidth(300);
 		pCol_->setMinimumWidth(300);
 		pAlpha_->setMinimumWidth(300);
 
-		pSize_->setMaximumWidth(maxWidth);
-		pSize2_->setMaximumWidth(maxWidth);
+		pSize0_->setMaximumWidth(maxWidth);
+		pSize1_->setMaximumWidth(maxWidth);
 		pScale_->setMaximumWidth(maxWidth);
-		pVerlocity_->setMaximumWidth(maxWidth);
-		pVerlocity2_->setMaximumWidth(maxWidth);
+		pVerlocity0_->setMaximumWidth(maxWidth);
+		pVerlocity1_->setMaximumWidth(maxWidth);
 		pRotation_->setMaximumWidth(maxWidth);
 		pCol_->setMaximumWidth(maxWidth);
 		pAlpha_->setMaximumWidth(maxWidth);
 		
 
-		pSize_->setMaximumHeight(maxHeight);
-		pSize2_->setMaximumHeight(maxHeight);
+		pSize0_->setMaximumHeight(maxHeight);
+		pSize1_->setMaximumHeight(maxHeight);
 		pScale_->setMaximumHeight(maxHeight);
-		pVerlocity_->setMaximumHeight(maxHeight + 50);
-		pVerlocity2_->setMaximumHeight(maxHeight + 50);
+		pVerlocity0_->setMaximumHeight(maxHeight + 50);
+		pVerlocity1_->setMaximumHeight(maxHeight + 50);
 		pRotation_->setMaximumHeight(maxHeight);
 		pCol_->setMaximumHeight(maxHeight);
 		pAlpha_->setMaximumHeight(maxHeight);
@@ -2060,14 +2052,15 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		pSpawnLayout->addStretch(0);
 
 		QVBoxLayout* pSizeLayout = new QVBoxLayout();
-		pSizeLayout->addWidget(pSize_);
-		pSizeLayout->addWidget(pSize2_);
+		pSizeLayout->addWidget(pSize0_);
+		pSizeLayout->addWidget(pSize1_);
 		pSizeLayout->addWidget(pScale_);
 		pSizeLayout->addStretch(0);
 
 		QVBoxLayout* pVelLayout = new QVBoxLayout();
-		pVelLayout->addWidget(pVerlocity_);
-		pVelLayout->addWidget(pVerlocity2_);
+		pVelLayout->addWidget(pVerlocityInfo_);
+		pVelLayout->addWidget(pVerlocity0_);
+		pVelLayout->addWidget(pVerlocity1_);
 		pVelLayout->addStretch(0);
 
 		QVBoxLayout* pRotLayout = new QVBoxLayout();
@@ -2145,15 +2138,17 @@ AssetFxWidget::AssetFxWidget(IAssetEntry* pAssEntry, QWidget *parent) :
 		connect(pSequence_, &SequenceInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pVisualInfo_, &VisualsInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pRotation_, &RotationGraphWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
-		connect(pVerlocity_, &VelocityInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pVerlocityInfo_, &VelocityInfoWidget::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pVerlocity0_, &VelocityGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pVerlocity1_, &VelocityGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pCol_, &ColorGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pAlpha_, &AlphaGraph::valueChanged, this, &AssetFxWidget::onValueChanged);
-		connect(pSize_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
-		connect(pSize2_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pSize0_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
+		connect(pSize1_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 		connect(pScale_, &GraphWithScale::valueChanged, this, &AssetFxWidget::onValueChanged);
 
 		// groupbox checkbox.
-		connect(pSize2_, &GraphWithScale::toggled, this, &AssetFxWidget::onValueChanged);
+		connect(pSize1_, &GraphWithScale::toggled, this, &AssetFxWidget::onValueChanged);
 
 		connect(&segmentModel_, &FxSegmentModel::dataChanged, this, &AssetFxWidget::onValueChanged);
 	}
@@ -2173,11 +2168,13 @@ void AssetFxWidget::disableWidgets(void)
 	pVisualInfo_->setEnabled(false);
 	pRotation_->setEnabled(false);
 	pAngles_->setEnabled(false);
-	pVerlocity_->setEnabled(false);
+	pVerlocityInfo_->setEnabled(false);
+	pVerlocity0_->setEnabled(false);
+	pVerlocity1_->setEnabled(false);
 	pCol_->setEnabled(false);
 	pAlpha_->setEnabled(false);
-	pSize_->setEnabled(false);
-	pSize2_->setEnabled(false);
+	pSize0_->setEnabled(false);
+	pSize1_->setEnabled(false);
 	pScale_->setEnabled(false);
 }
 
@@ -2190,19 +2187,21 @@ void AssetFxWidget::enableWidgets(engine::fx::StageType::Enum type)
 
 	// graphs for all.
 	pRotation_->setEnabled(true);
-	pVerlocity_->setEnabled(true);
+	pVerlocityInfo_->setEnabled(true);
+	pVerlocity0_->setEnabled(true);
+	pVerlocity1_->setEnabled(true);
 	pCol_->setEnabled(true);
 	pAlpha_->setEnabled(true);
-	pSize_->setEnabled(true);
-	pSize2_->setEnabled(true);
+	pSize0_->setEnabled(true);
+	pSize1_->setEnabled(true);
 
 	// disaabled for most things currently?
 	pScale_->setEnabled(false);
 
 	if (type == engine::fx::StageType::Sound)
 	{
-		pSize_->setEnabled(false);
-		pSize2_->setEnabled(false);
+		pSize0_->setEnabled(false);
+		pSize1_->setEnabled(false);
 		pSequence_->setEnabled(false);
 	}
 
@@ -2255,14 +2254,16 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pVisualInfo_->getValue(segment.vis);
 		pRotation_->getValue(segment.rot);
 		pAngles_->getValue(segment.rot);
-		pVerlocity_->getValue(segment.vel);
+		pVerlocityInfo_->getValue(segment.vel);
+		pVerlocity0_->getValue(segment.vel.vel0);
+		pVerlocity1_->getValue(segment.vel.vel1);
 		pCol_->getValue(segment.col);
 		pAlpha_->getValue(segment.col);
-		pSize_->getValue(segment.size.size);
-		pSize2_->getValue(segment.size.size2);
+		pSize0_->getValue(segment.size.size0);
+		pSize1_->getValue(segment.size.size1);
 		pScale_->getValue(segment.size.scale);
 
-		segment.size.size2Enabled = pSize2_->isChecked();
+		segment.size.size2Enabled = pSize1_->isChecked();
 	}
 
 	if (selected.count() != 1) {
@@ -2287,14 +2288,16 @@ void AssetFxWidget::segmentSelectionChanged(const QItemSelection &selected, cons
 		pVisualInfo_->setValue(segment.vis);
 		pRotation_->setValue(segment.rot);
 		pAngles_->setValue(segment.rot);
-		pVerlocity_->setValue(segment.vel);
+		pVerlocityInfo_->setValue(segment.vel);
+		pVerlocity0_->setValue(segment.vel.vel0);
+		pVerlocity1_->setValue(segment.vel.vel1);
 		pCol_->setValue(segment.col);
 		pAlpha_->setValue(segment.col);
-		pSize_->setValue(segment.size.size);
-		pSize2_->setValue(segment.size.size2);
+		pSize0_->setValue(segment.size.size0);
+		pSize1_->setValue(segment.size.size1);
 		pScale_->setValue(segment.size.scale);
 
-		pSize2_->setChecked(segment.size.size2Enabled);
+		pSize1_->setChecked(segment.size.size2Enabled);
 
 		enableWidgets(segment.vis.type);
 	}
@@ -2342,9 +2345,17 @@ void AssetFxWidget::onValueChanged(void)
 	{
 		pRotation_->getValue(segment.rot);
 	}
-	else if (pSender == pVerlocity_)
+	else if (pSender == pVerlocityInfo_)
 	{
-		pVerlocity_->getValue(segment.vel);
+		pVerlocityInfo_->getValue(segment.vel);
+	}
+	else if (pSender == pVerlocity0_)
+	{
+		pVerlocity0_->getValue(segment.vel.vel0);
+	}
+	else if (pSender == pVerlocity1_)
+	{
+		pVerlocity1_->getValue(segment.vel.vel1);
 	}
 	else if (pSender == pCol_)
 	{
@@ -2354,14 +2365,14 @@ void AssetFxWidget::onValueChanged(void)
 	{
 		pAlpha_->getValue(segment.col);
 	}
-	else if (pSender == pSize_)
+	else if (pSender == pSize0_)
 	{
-		pSize_->getValue(segment.size.size);
+		pSize0_->getValue(segment.size.size0);
 	}
-	else if (pSender == pSize2_)
+	else if (pSender == pSize1_)
 	{
-		pSize2_->getValue(segment.size.size2);
-		segment.size.size2Enabled = pSize2_->isChecked();
+		pSize1_->getValue(segment.size.size1);
+		segment.size.size2Enabled = pSize1_->isChecked();
 	}
 	else if (pSender == pScale_)
 	{

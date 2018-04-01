@@ -96,8 +96,8 @@ struct SizeInfo
 	{
 	}
 
-	GraphInfo size;
-	GraphInfo size2;
+	GraphInfo size0;
+	GraphInfo size1;
 	GraphInfo scale;
 
 	bool size2Enabled;
@@ -109,6 +109,23 @@ struct ColorInfo
 	GraphInfo col;
 };
 
+struct VelocityGraphInfo
+{
+	VelocityGraphInfo() :
+		relative(false)
+	{
+	}
+
+	GraphInfo graph;
+
+	float forwardScale;
+	float rightScale;
+	float upScale;
+
+	bool relative;
+};
+
+
 struct VelocityInfo
 {
 	VelocityInfo() :
@@ -118,11 +135,8 @@ struct VelocityInfo
 
 	engine::fx::RelativeTo::Enum postionType;
 
-	GraphInfo graph;
-
-	float forwardScale;
-	float rightScale;
-	float upScale;
+	VelocityGraphInfo vel0;
+	VelocityGraphInfo vel1;
 };
 
 

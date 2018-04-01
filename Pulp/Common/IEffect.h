@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
-	static const uint32_t	EFFECT_VERSION = 3;
+	static const uint32_t	EFFECT_VERSION = 4;
 	static const uint32_t	EFFECT_FOURCC = X_TAG('x', 'e', 'f', 'x');
 	static const char*		EFFECT_FILE_EXTENSION = "efx";
 
@@ -51,18 +51,20 @@ namespace fx
 		Now         // elems move with emitter.
 	);
 
-	X_DECLARE_FLAGS8(StageFlag)(
+	X_DECLARE_FLAGS(StageFlag)(
 		Looping,
 		RandGraphCol,
 		RandGraphAlpha,
-		RandGraphSize,
-		RandGraphSize2,
-		RandGraphVel,
-		RandGraphVel2,
-		NonUniformScale
+		RandGraphSize0,
+		RandGraphSize1,
+		RandGraphVel0,
+		RandGraphVel1,
+		NonUniformScale,
+		RelativeVel0,
+		RelativeVel1
 	);
 
-	typedef Flags8<StageFlag> StageFlags;
+	typedef Flags<StageFlag> StageFlags;
 
 	struct GraphHeader
 	{
@@ -104,6 +106,7 @@ namespace fx
 
 		StageType::Enum type;
 		RelativeTo::Enum postionType;
+		uint8_t _pad[2];
 		StageFlags flags;
 
 		Sequence sequence;
@@ -121,9 +124,14 @@ namespace fx
 		Range spawnOrgY;
 		Range spawnOrgZ;
 
+		Range anglePitch;
+		Range angleYaw;
+		Range angleRoll;
+
 		GraphArr color;
 		GraphArr alpha;
 		GraphArr size;
+		GraphArr size2;
 		GraphArr scale;
 		GraphArr rot;
 		GraphArr vel0X;

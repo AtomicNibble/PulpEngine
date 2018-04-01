@@ -240,29 +240,46 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 			flags.Set(StageFlag::Looping);
 		}
 
-		if (segment->col.alpha.random)
-		{
-			flags.Set(StageFlag::RandGraphAlpha);
-		}
+		// Color
 		if (segment->col.col.random)
 		{
 			flags.Set(StageFlag::RandGraphCol);
 		}
-		if (segment->size.size.random)
+		if (segment->col.alpha.random)
 		{
-			flags.Set(StageFlag::RandGraphSize);
+			flags.Set(StageFlag::RandGraphAlpha);
 		}
-		if (segment->size.size2.random)
+
+		// size
+		if (segment->size.size0.random)
 		{
-			flags.Set(StageFlag::RandGraphSize2);
+			flags.Set(StageFlag::RandGraphSize0);
+		}
+		if (segment->size.size1.random)
+		{
+			flags.Set(StageFlag::RandGraphSize1);
 		}
 		if (segment->size.size2Enabled)
 		{
 			flags.Set(StageFlag::NonUniformScale);
 		}
-		if (segment->vel.graph.random)
+		
+		// Vel
+		if (segment->vel.vel0.graph.random)
 		{
-			flags.Set(StageFlag::RandGraphVel);
+			flags.Set(StageFlag::RandGraphVel0);
+		}
+		if (segment->vel.vel1.graph.random)
+		{
+			flags.Set(StageFlag::RandGraphVel1);
+		}
+		if (segment->vel.vel0.relative)
+		{
+			flags.Set(StageFlag::RelativeVel0);
+		}
+		if (segment->vel.vel1.relative)
+		{
+			flags.Set(StageFlag::RelativeVel1);
 		}
 
 		// manually build flag string instead of using Flag::ToString, as the format of the flags is important.
@@ -337,17 +354,20 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		// GRAPH ME BABY!
 		writeColGraph(writer, "colorGraph", segment->col.col);
 		writeGraph(writer, "alphaGraph", segment->col.alpha, 1.f);
-		writeGraph(writer, "sizeGraph", segment->size.size, segment->size.size.scale);
-		writeGraph(writer, "size2Graph", segment->size.size2, segment->size.size2.scale);
+		writeGraph(writer, "sizeGraph", segment->size.size0, segment->size.size0.scale);
+		writeGraph(writer, "size2Graph", segment->size.size1, segment->size.size1.scale);
 		writeGraph(writer, "scaleGraph", segment->size.scale, segment->size.scale.scale);
 		writeGraph(writer, "rotGraph", segment->rot.rot, segment->rot.rot.scale);
 
 		// need to wrtie a verlocity graph.
 		// it's a little special since we allow seperate scales.
 		// vel0XGraph, vel0XGraph, vel0XGraph is the first graph.
-		writeSubGraph(writer, "vel0XGraph", segment->vel.graph, segment->vel.forwardScale, { 0,3 });
-		writeSubGraph(writer, "vel0YGraph", segment->vel.graph, segment->vel.rightScale, { 1,4 });
-		writeSubGraph(writer, "vel0ZGraph", segment->vel.graph, segment->vel.upScale, { 2,5 });
+		writeSubGraph(writer, "vel0XGraph", segment->vel.vel0.graph, segment->vel.vel0.forwardScale, { 0,3 });
+		writeSubGraph(writer, "vel0YGraph", segment->vel.vel0.graph, segment->vel.vel0.rightScale, { 1,4 });
+		writeSubGraph(writer, "vel0ZGraph", segment->vel.vel0.graph, segment->vel.vel0.upScale, { 2,5 });
+		writeSubGraph(writer, "vel1XGraph", segment->vel.vel1.graph, segment->vel.vel1.forwardScale, { 0,3 });
+		writeSubGraph(writer, "vel1YGraph", segment->vel.vel1.graph, segment->vel.vel1.rightScale, { 1,4 });
+		writeSubGraph(writer, "vel1ZGraph", segment->vel.vel1.graph, segment->vel.vel1.upScale, { 2,5 });
 
 
 		writer.EndObject();
@@ -459,7 +479,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 
 			while (tokens.ExtractToken(token))
 			{
-				static_assert(StageFlag::FLAGS_COUNT == 8, "Added more flags? this needs updating");
+				static_assert(StageFlag::FLAGS_COUNT == 10, "Added more flags? this needs updating");
 
 				switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 				{
@@ -473,19 +493,29 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 						flags.Set(StageFlag::RandGraphAlpha);
 						break;
 					case "RandGraphSize"_fnv1a:
-						flags.Set(StageFlag::RandGraphSize);
+					case "RandGraphSize0"_fnv1a:
+						flags.Set(StageFlag::RandGraphSize0);
 						break;
+					case "RandGraphSize1"_fnv1a:
 					case "RandGraphSize2"_fnv1a:
-						flags.Set(StageFlag::RandGraphSize2);
+						flags.Set(StageFlag::RandGraphSize1);
 						break;
 					case "RandGraphVel"_fnv1a:
-						flags.Set(StageFlag::RandGraphVel);
+					case "RandGraphVel0"_fnv1a:
+						flags.Set(StageFlag::RandGraphVel0);
 						break;
+					case "RandGraphVel1"_fnv1a:
 					case "RandGraphVel2"_fnv1a:
-						flags.Set(StageFlag::RandGraphVel2);
+						flags.Set(StageFlag::RandGraphVel1);
 						break;
 					case "NonUniformScale"_fnv1a:
 						flags.Set(StageFlag::NonUniformScale);
+						break;
+					case "RelativeVel0"_fnv1a:
+						flags.Set(StageFlag::RelativeVel0);
+						break;
+					case "RelativeVel1"_fnv1a:
+						flags.Set(StageFlag::RelativeVel1);
 						break;
 					default:
 						X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
@@ -505,21 +535,33 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			{
 				seg->col.alpha.random = true;
 			}
-			if (flags.IsSet(StageFlag::RandGraphSize))
+			if (flags.IsSet(StageFlag::RandGraphSize0))
 			{
-				seg->size.size.random = true;
+				seg->size.size0.random = true;
 			}
-			if (flags.IsSet(StageFlag::RandGraphSize2))
+			if (flags.IsSet(StageFlag::RandGraphSize1))
 			{
-				seg->size.size2.random = true;
+				seg->size.size1.random = true;
 			}
 			if (flags.IsSet(StageFlag::NonUniformScale))
 			{
 				seg->size.size2Enabled = true;
 			}
-			if (flags.IsSet(StageFlag::RandGraphVel))
+			if (flags.IsSet(StageFlag::RandGraphVel0))
 			{
-				seg->vel.graph.random = true;
+				seg->vel.vel0.graph.random = true;
+			}
+			if (flags.IsSet(StageFlag::RandGraphVel1))
+			{
+				seg->vel.vel1.graph.random = true;
+			}
+			if (flags.IsSet(StageFlag::RelativeVel0))
+			{
+				seg->vel.vel0.relative = true;
+			}
+			if (flags.IsSet(StageFlag::RelativeVel1))
+			{
+				seg->vel.vel1.relative = true;
 			}
 		}
 
@@ -730,13 +772,13 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 
 		// need to parse graphs.
 		ok &= readGraph(s, "alphaGraph", seg->col.alpha);
-		ok &= readGraph(s, "sizeGraph", seg->size.size);
-		ok &= readGraph(s, "size2Graph", seg->size.size2, true);
+		ok &= readGraph(s, "size0Graph", seg->size.size0);
+		ok &= readGraph(s, "size1Graph", seg->size.size1, true);
 		ok &= readGraph(s, "scaleGraph", seg->size.scale);
 		ok &= readGraph(s, "rotGraph", seg->rot.rot);
 
 		// need a better way to add default values.
-		if (seg->size.size2.graphs.empty())
+		if (seg->size.size1.graphs.empty())
 		{
 			GraphData linGraph;
 			SeriesData linDescendSeries;
@@ -745,8 +787,8 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			linDescendSeries.points.push_back(GraphPoint(1.f, 0.f));
 			linGraph.series.push_back(linDescendSeries);
 
-			seg->size.size2.graphs.push_back(linGraph);
-			seg->size.size2.graphs.push_back(linGraph);
+			seg->size.size1.graphs.push_back(linGraph);
+			seg->size.size1.graphs.push_back(linGraph);
 		}
 
 		GraphInfo vel0XGraph;
@@ -764,16 +806,18 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			return false;
 		}
 
-		vel.forwardScale = vel0XGraph.scale;
-		vel.rightScale = vel0YGraph.scale;
-		vel.upScale = vel0ZGraph.scale;
-		vel.graph.graphs.resize(6);
-		vel.graph.graphs[0] = std::move(vel0XGraph.graphs[0]);
-		vel.graph.graphs[3] = std::move(vel0XGraph.graphs[1]);
-		vel.graph.graphs[1] = std::move(vel0YGraph.graphs[0]);
-		vel.graph.graphs[4] = std::move(vel0YGraph.graphs[1]);
-		vel.graph.graphs[2] = std::move(vel0ZGraph.graphs[0]);
-		vel.graph.graphs[5] = std::move(vel0ZGraph.graphs[1]);
+		vel.vel0.forwardScale = vel0XGraph.scale;
+		vel.vel0.rightScale = vel0YGraph.scale;
+		vel.vel0.upScale = vel0ZGraph.scale;
+		vel.vel0.graph.graphs.resize(6);
+		vel.vel0.graph.graphs[0] = std::move(vel0XGraph.graphs[0]);
+		vel.vel0.graph.graphs[3] = std::move(vel0XGraph.graphs[1]);
+		vel.vel0.graph.graphs[1] = std::move(vel0YGraph.graphs[0]);
+		vel.vel0.graph.graphs[4] = std::move(vel0YGraph.graphs[1]);
+		vel.vel0.graph.graphs[2] = std::move(vel0ZGraph.graphs[0]);
+		vel.vel0.graph.graphs[5] = std::move(vel0ZGraph.graphs[1]);
+
+		vel.vel1 = vel.vel0;
 
 		segments_.push_back(std::move(seg));
 	}
@@ -824,14 +868,14 @@ void FxSegmentModel::addSegment(void)
 	}
 
 	// verlocity has 6 graphs with one seriex.
-	seg->vel.graph.graphs.reserve(6);
+	seg->vel.vel0.graph.graphs.reserve(6);
 	for (int32_t i = 0; i < 6; i++)
 	{
-		seg->vel.graph.graphs.push_back(zeroGraph);
+		seg->vel.vel0.graph.graphs.push_back(zeroGraph);
 	}
 
-	seg->size.size.graphs = linDescend.graphs;
-	seg->size.size2.graphs = linDescend.graphs;
+	seg->size.size0.graphs = linDescend.graphs;
+	seg->size.size1.graphs = linDescend.graphs;
 	seg->size.scale.graphs = linDescend.graphs;
 
 	// so i want 2 graphs with 3 series each.

@@ -618,7 +618,7 @@ namespace fx
 
 				while (tokens.ExtractToken(token))
 				{
-					static_assert(StageFlag::FLAGS_COUNT == 8, "Added more flags? this needs updating");
+					static_assert(StageFlag::FLAGS_COUNT == 10, "Added more flags? this needs updating");
 
 					switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 					{	
@@ -645,6 +645,12 @@ namespace fx
 							break;
 						case "NonUniformScale"_fnv1a:
 							stage.flags.Set(StageFlag::NonUniformScale);
+							break;
+						case "RelativeVel0"_fnv1a:
+							stage.flags.Set(StageFlag::RelativeVel0);
+							break;
+						case "RelativeVel1"_fnv1a:
+							stage.flags.Set(StageFlag::RelativeVel1);
 							break;
 						default:
 							X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
@@ -780,6 +786,11 @@ namespace fx
 					stage.flags.Remove(StageFlag::RandGraphVel);
 					X_WARNING("Fx", "RandVel requires atleast two graphs");
 				}
+			}
+			if (stage.flags.IsSet(StageFlag::RandGraphVel2))
+			{
+				X_ASSERT_NOT_IMPLEMENTED();
+				return false;
 			}
 
 			if (stage.flags.IsSet(StageFlag::Looping))

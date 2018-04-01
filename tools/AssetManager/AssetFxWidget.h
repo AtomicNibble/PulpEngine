@@ -410,15 +410,15 @@ private:
 };
 
 
-class VelocityGraph : public QWidget
+class VelocityGraph : public QGroupBox
 {
 	Q_OBJECT
 
 public:
 	VelocityGraph(QWidget *parent = nullptr);
 
-	void setValue(const VelocityInfo& vel);
-	void getValue(VelocityInfo& vel);
+	void setValue(const VelocityGraphInfo& vel);
+	void getValue(VelocityGraphInfo& vel);
 
 signals:
 	void valueChanged(void);
@@ -431,7 +431,7 @@ private:
 	QCheckBox* pRandomGraph_;
 };
 
-class VelocityInfoWidget : public QGroupBox
+class VelocityInfoWidget : public QWidget
 {
 	Q_OBJECT
 
@@ -447,7 +447,6 @@ signals:
 private:
 	QRadioButton* pSpawn_;
 	QRadioButton* pNow_;
-	VelocityGraph* pGraph_;
 };
 
 class RotationGraphWidget : public QGroupBox
@@ -587,12 +586,13 @@ private:
 	VisualsInfoWidget* pVisualInfo_;
 	RotationGraphWidget* pRotation_;
 	AngleWidget* pAngles_;
-	VelocityInfoWidget* pVerlocity_;
-	VelocityInfoWidget* pVerlocity2_;
+	VelocityInfoWidget* pVerlocityInfo_;
+	VelocityGraph* pVerlocity0_;
+	VelocityGraph* pVerlocity1_;
 	ColorGraph* pCol_;
 	AlphaGraph* pAlpha_;
-	GraphWithScale* pSize_;
-	GraphWithScale* pSize2_;
+	GraphWithScale* pSize0_;
+	GraphWithScale* pSize1_;
 	GraphWithScale* pScale_;
 
 	int32_t currentSegment_;
