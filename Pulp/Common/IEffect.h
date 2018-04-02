@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
-	static const uint32_t	EFFECT_VERSION = 4;
+	static const uint32_t	EFFECT_VERSION = 5;
 	static const uint32_t	EFFECT_FOURCC = X_TAG('x', 'e', 'f', 'x');
 	static const char*		EFFECT_FILE_EXTENSION = "efx";
 
@@ -59,9 +59,9 @@ namespace fx
 		RandGraphSize1,
 		RandGraphVel0,
 		RandGraphVel1,
-		NonUniformScale,
 		RelativeVel0,
-		RelativeVel1
+		RelativeVel1,
+		NonUniformScale
 	);
 
 	typedef Flags<StageFlag> StageFlags;
@@ -130,8 +130,8 @@ namespace fx
 
 		GraphArr color;
 		GraphArr alpha;
-		GraphArr size;
-		GraphArr size2;
+		GraphArr size0;
+		GraphArr size1;
 		GraphArr scale;
 		GraphArr rot;
 		GraphArr vel0X;
