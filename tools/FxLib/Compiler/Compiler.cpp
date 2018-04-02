@@ -484,6 +484,27 @@ namespace fx
 					stage.size1.graphs.clear();
 				}
 
+				auto removeUnusedGraphs = [](FloatGraphSet& g, bool remove) {
+					if (remove && g.graphs.size() > 1) {
+						g.graphs.erase(g.graphs.begin() + 1, g.graphs.end());
+					}
+				};
+
+				// if we are not going to belnd with 2nd graph remove it.
+				if (!stage.flags.IsSet(StageFlag::RandGraphCol) && stage.color.graphs.size() > 1) {
+					stage.color.graphs.erase(stage.color.graphs.begin() + 1, stage.color.graphs.end());
+				}
+
+				removeUnusedGraphs(stage.size0, !stage.flags.IsSet(StageFlag::RandGraphSize0));
+				removeUnusedGraphs(stage.size1, !stage.flags.IsSet(StageFlag::RandGraphSize1));
+				removeUnusedGraphs(stage.alpha, !stage.flags.IsSet(StageFlag::RandGraphAlpha));
+				removeUnusedGraphs(stage.vel0X, !stage.flags.IsSet(StageFlag::RandGraphVel0));
+				removeUnusedGraphs(stage.vel0Y, !stage.flags.IsSet(StageFlag::RandGraphVel0));
+				removeUnusedGraphs(stage.vel0Z, !stage.flags.IsSet(StageFlag::RandGraphVel0));
+				removeUnusedGraphs(stage.vel1X, !stage.flags.IsSet(StageFlag::RandGraphVel1));
+				removeUnusedGraphs(stage.vel1Y, !stage.flags.IsSet(StageFlag::RandGraphVel1));
+				removeUnusedGraphs(stage.vel1Z, !stage.flags.IsSet(StageFlag::RandGraphVel1));
+
 				auto clearIfZeroScale = [](FloatGraphSet& g) {
 					if (g.scale == 0.f) {
 						g.graphs.clear();
