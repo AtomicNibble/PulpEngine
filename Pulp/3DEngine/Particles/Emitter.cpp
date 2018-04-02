@@ -204,6 +204,7 @@ namespace fx
 				float alphaBlend = 0.f;
 				float sizeBlend0 = 0.f;
 				float sizeBlend1 = 0.f;
+				float rotationBlend = 0.f;
 				float velBlend = 0.f;
 
 				if (desc.flags.IsSet(StageFlag::RandGraphCol)) {
@@ -218,6 +219,9 @@ namespace fx
 				if (desc.flags.IsSet(StageFlag::RandGraphSize1)) {
 					sizeBlend1 = gEnv->xorShift.randRange(1.f);
 				}
+				if (desc.flags.IsSet(StageFlag::RandGraphRot)) {
+					rotationBlend = gEnv->xorShift.randRange(1.f);
+				}
 				if (desc.flags.IsSet(StageFlag::RandGraphVel0)) {
 					velBlend = gEnv->xorShift.randRange(1.f);
 				}
@@ -228,7 +232,13 @@ namespace fx
 				pos.y = fromRange(desc.spawnOrgY);
 				pos.z = fromRange(desc.spawnOrgZ);
 
+				if (desc.flags.IsSet(StageFlag::RelativeOrigin)) 
+				{
+					pos = pos * trans_.quat;
+				}
+
 				float life = fromRange(desc.life);
+				float rotation = fromRange(desc.initialRotation);
 
 				// so i need to support atlas.		
 				auto atlas = stage.pMaterial->getAtlas();
@@ -264,12 +274,15 @@ namespace fx
 				e.alphaBlend = alphaBlend;
 				e.sizeBlend0 = sizeBlend0;
 				e.sizeBlend1 = sizeBlend1;
+				e.rotationBlend = rotationBlend;
 				e.velBlend = velBlend;
+				e.spawnPosEmitter = trans_.pos;
 				e.spawnPos = pos;
-				e.pos = pos;
+				e.curPos = pos;
+				e.rotation = rotation;
 				e.lifeMs = life;
 				e.spawnTime = stage.elapsed;
-				e.spawnTrans = trans_;
+				// e.spawnTrans = trans_;
 
 				stage.elems.push_back(e);
 			}
@@ -382,24 +395,26 @@ namespace fx
 					Vec3f tr = Vec3f(0, halfWidth, -halfHeight);
 					Vec3f bl = Vec3f(0, -halfWidth, halfHeight);
 					Vec3f br = Vec3f(0, halfWidth, halfHeight);
+				
+					if (e.rotation > 0.f)
+					{
+						auto rot = Quatf(0.f, 0.f, ::toRadians(e.rotation));
+
+						tl = tl * rot;
+						tr = tr * rot;
+						bl = bl * rot;
+						br = br * rot;
+					}
 
 					auto q = trans_.quat;
+
 					tl = tl * q;
 					tr = tr * q;
 					bl = bl * q;
 					br = br * q;
 
-					Vec3f pos = (e.pos); 
+					Vec3f pos = e.transPos; 
 					
-					if (postionType == RelativeTo::Now)
-					{
-						pos = trans_.transform(pos);
-					}
-					else
-					{
-						pos = e.spawnTrans.transform(pos);
-					}
-
 					tl += pos;
 					tr += pos;
 					bl += pos;
@@ -436,18 +451,7 @@ namespace fx
 					bl = bl * lookatCamQ;
 					br = br * lookatCamQ;
 
-					Vec3f pos = e.pos;
-					pos += offset_;
-					// do the rotation including  offset.
-					// so the effects point of origin is at trans_.pos;
-					if (postionType == RelativeTo::Now)
-					{
-						pos = trans_.transform(pos);
-					}
-					else
-					{
-						pos = e.spawnTrans.transform(pos);
-					}
+					Vec3f pos = e.transPos;
 
 					tl += pos;
 					tr += pos;
@@ -482,18 +486,12 @@ namespace fx
 		auto& efx = *stage.pEfx;
 		auto& desc = stage.getStageDesc();
 
-		Vec3f velForDelta = e.vel * deltaSec;
-
 		Vec3f vel;
 		vel.x = efx.fromGraph(desc.vel0X[0], fraction);
 		vel.y = efx.fromGraph(desc.vel0Y[0], fraction);
 		vel.z = efx.fromGraph(desc.vel0Z[0], fraction);
 
-		if (desc.flags.IsSet(StageFlag::RelativeVel0))
-		{
-			// the velocity is relative to current rotation.
-			
-		}
+		Vec3f velForDelta = vel * deltaSec;
 
 		float width = efx.fromGraph(desc.size0[0], fraction);
 		
@@ -518,6 +516,7 @@ namespace fx
 
 		Vec3f col = efx.fromColorGraph(desc.color[0], fraction);
 		float alpha = efx.fromGraph(desc.alpha[0], fraction);
+		float rotation = efx.fromGraph(desc.rot[0], fraction) * deltaSec;
 
 		if (desc.flags.IsSet(StageFlag::RandGraphCol))
 		{
@@ -529,11 +528,34 @@ namespace fx
 			float alpha2 = efx.fromGraph(desc.alpha[1], fraction);
 			alpha = lerp(alpha, alpha2, e.alphaBlend);
 		}
+		if (desc.flags.IsSet(StageFlag::RandGraphRot))
+		{
+			float rotation2 = efx.fromGraph(desc.rot[1], fraction);
+			rotation = lerp(rotation, rotation2, e.rotationBlend);
+		}
 
-		e.vel = vel;
-		e.pos += velForDelta;
+		// the verlocity is rotated by the effects axis.
+		if (desc.flags.IsSet(StageFlag::RelativeVel0))
+		{
+			velForDelta = velForDelta * trans_.quat;
+		}
+
+		e.curPos += velForDelta;
+		e.transPos = e.curPos + offset_;
+
+		// only position?
+		if (desc.postionType == RelativeTo::Now)
+		{
+			e.transPos += trans_.pos;
+		}
+		else
+		{
+			e.transPos += e.spawnPosEmitter;
+		}
+
 		e.width = width;
 		e.height = height;
+		e.rotation += rotation;
 		e.col = Color8u(col, alpha);
 	}
 

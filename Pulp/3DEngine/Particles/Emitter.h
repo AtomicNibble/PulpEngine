@@ -24,17 +24,22 @@ namespace fx
 	{
 		struct Elem
 		{
+			// blend factors.
 			float colBlend;
 			float alphaBlend;
 			float sizeBlend0;
 			float sizeBlend1;
+			float rotationBlend;
 			float velBlend;
 
-			Vec3f spawnPos;
-			Vec3f pos;
-			Vec3f vel;
+			Vec3f spawnPosEmitter;	// the pos the emmiter was at spawn time.
+			Vec3f spawnPos;			// the pos the elemd spawned (local space).
+			Vec3f curPos;			// the current local position transform, identical to spawnPos at spawn time. (local space)
+			Vec3f transPos;	
+
 			float width;
 			float height;
+			float rotation;
 			Color8u col;
 
 			Rectf uv;
@@ -44,7 +49,7 @@ namespace fx
 			float lifeMs;
 			core::TimeVal spawnTime;
 
-			Transformf spawnTrans; // Bigg...
+		//	Transformf spawnTrans; // Bigg...
 		};
 
 		// ideally keep this below 64.
