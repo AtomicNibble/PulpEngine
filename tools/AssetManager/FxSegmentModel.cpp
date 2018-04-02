@@ -412,6 +412,11 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		return false;
 	}
 
+	// empty.
+	if (d.ObjectEmpty()) {
+		return true;
+	}
+
 	if (!checkMember(d, "stages", core::json::kArrayType)) {
 		return false;
 	}
