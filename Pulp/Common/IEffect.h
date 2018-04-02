@@ -187,7 +187,7 @@ namespace fx
 
 	struct IEmitter
 	{
-		virtual void play(const Effect* pEffect, bool clear = false) X_ABSTRACT;
+		virtual void play(const Effect* pEffect, bool looping, bool clear) X_ABSTRACT;
 
 		virtual void setTrans(const Transformf& trans) X_ABSTRACT;
 		virtual void setTrans(const Transformf& trans, const Vec3f& offset) X_ABSTRACT;

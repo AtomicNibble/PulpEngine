@@ -93,7 +93,7 @@ namespace fx
 	public:
 		Emitter(const EffectVars& effectVars, core::MemoryArenaBase* arena);
 
-		void play(const Effect* pEfx, bool clear = false) X_FINAL;
+		void play(const Effect* pEfx, bool looping, bool clear) X_FINAL;
 		bool isPlaying(void) const;
 
 		void setTrans(const Transformf& trans) X_FINAL;

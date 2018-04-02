@@ -811,7 +811,7 @@ fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
 	pEmitter->setTrans(emit.trans);
 
 	if (emit.pEffect) {
-		pEmitter->play(emit.pEffect);
+		pEmitter->play(emit.pEffect, false, false);
 	}
 
 	emitters_.push_back(pEmitter);

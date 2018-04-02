@@ -36,8 +36,9 @@ namespace fx
 		activeStages_.setGranularity(4);
 	}
 
-	void Emitter::play(const Effect* pEfx, bool clear)
+	void Emitter::play(const Effect* pEfx, bool looping, bool clear)
 	{
+		X_UNUSED(looping);
 		// so i have a problem :D
 		// by clearing this
 		// ellapsed is not correct for decaying stages.
