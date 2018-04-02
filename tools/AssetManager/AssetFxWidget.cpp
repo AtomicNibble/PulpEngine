@@ -1769,6 +1769,7 @@ void RotationGraphWidget::setValue(const RotationInfo& rot)
 
 	pInitialRotation_->setValue(rot.initial);
 	pRotationGraph_->setValue(rot.rot);
+	pScale_->setValue(rot.rot.scale);
 
 	blockSignals(false);
 }
@@ -1777,6 +1778,7 @@ void RotationGraphWidget::getValue(RotationInfo& rot)
 {
 	pInitialRotation_->getValue(rot.initial);
 	pRotationGraph_->getValue(rot.rot);
+	rot.rot.scale = pScale_->value();
 }
 
 // -----------------------------------
