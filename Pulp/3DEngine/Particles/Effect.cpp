@@ -88,7 +88,9 @@ namespace fx
 
 	float Effect::fromGraph(const Graph& g, float t) const
 	{
-		X_ASSERT(g.numPoints > 0, "Graph is empty")(g.numPoints);
+		if (g.numPoints == 0) {
+			return 0.f;
+		}
 
 		float scale = getFloat(g.scaleIdx);
 		float result = 0.f;
