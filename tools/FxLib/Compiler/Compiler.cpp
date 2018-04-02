@@ -138,13 +138,14 @@ namespace fx
 			StageBuilder stage(arena_);
 			core::zero_object<StageDsc>(stage);
 		
-			const std::array<std::pair<const char*, Range&>, 9> ranges = { {
+			const std::array<std::pair<const char*, Range&>, 10> ranges = { {
 				{ "count", stage.count },
 				{ "life", stage.life },
 				{ "delay", stage.delay },
 				{ "spawnOrgX", stage.spawnOrgX },
 				{ "spawnOrgY", stage.spawnOrgY },
 				{ "spawnOrgZ", stage.spawnOrgZ },
+				{ "initialRot", stage.initialRotation },
 				{ "anglePitch", stage.anglePitch },
 				{ "angleYaw", stage.angleYaw },
 				{ "angleRoll", stage.angleRoll },

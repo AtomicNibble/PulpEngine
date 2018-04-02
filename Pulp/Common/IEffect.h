@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace fx
 {
 
-	static const uint32_t	EFFECT_VERSION = 5;
+	static const uint32_t	EFFECT_VERSION = 6;
 	static const uint32_t	EFFECT_FOURCC = X_TAG('x', 'e', 'f', 'x');
 	static const char*		EFFECT_FILE_EXTENSION = "efx";
 
@@ -123,6 +123,8 @@ namespace fx
 		Range spawnOrgX;
 		Range spawnOrgY;
 		Range spawnOrgZ;
+
+		Range initialRotation;
 
 		Range anglePitch;
 		Range angleYaw;
