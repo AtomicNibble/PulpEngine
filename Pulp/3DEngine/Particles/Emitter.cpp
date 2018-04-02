@@ -484,7 +484,7 @@ namespace fx
 		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
 		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
 
-		float size = efx.fromGraph(desc.size[e.sizeGraph], fraction);
+		float size = efx.fromGraph(desc.size0[e.sizeGraph], fraction);
 
 		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
 		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
