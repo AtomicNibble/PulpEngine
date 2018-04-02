@@ -369,13 +369,13 @@ namespace fx
 			{
 				for (const auto& e : stage.elems)
 				{
-					float size = e.size;
-					float half = size * 0.5f;
+					float halfWidth = e.width * 0.5f;
+					float halfHeight = e.height * 0.5f;
 
-					Vec3f tl = Vec3f(0, -half, -half);
-					Vec3f tr = Vec3f(0, half, -half);
-					Vec3f bl = Vec3f(0, -half, half);
-					Vec3f br = Vec3f(0, half, half);
+					Vec3f tl = Vec3f(0, -halfWidth, -halfHeight);
+					Vec3f tr = Vec3f(0, halfWidth, -halfHeight);
+					Vec3f bl = Vec3f(0, -halfWidth, halfHeight);
+					Vec3f br = Vec3f(0, halfWidth, halfHeight);
 
 					auto q = trans_.quat;
 					tl = tl * q;
@@ -417,14 +417,13 @@ namespace fx
 
 				for (const auto& e : stage.elems)
 				{
+					float halfWidth = e.width * 0.5f;
+					float halfHeight = e.height * 0.5f;
 
-					float size = e.size;
-					float half = size * 0.5f;
-
-					Vec3f tl = Vec3f(-half, -half, 0);
-					Vec3f tr = Vec3f(half, -half, 0);
-					Vec3f bl = Vec3f(-half, half, 0);
-					Vec3f br = Vec3f(half, half, 0);
+					Vec3f tl = Vec3f(-halfWidth, -halfHeight, 0);
+					Vec3f tr = Vec3f(halfWidth, -halfHeight, 0);
+					Vec3f bl = Vec3f(-halfWidth, halfHeight, 0);
+					Vec3f br = Vec3f(halfWidth, halfHeight, 0);
 
 					tl = tl * lookatCamQ;
 					tr = tr * lookatCamQ;
@@ -484,7 +483,13 @@ namespace fx
 		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
 		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
 
-		float size = efx.fromGraph(desc.size0[e.sizeGraph], fraction);
+		float width = efx.fromGraph(desc.size0[e.sizeGraph], fraction);
+		float height = width;
+
+		if (desc.flags.IsSet(StageFlag::NonUniformScale))
+		{
+			height = efx.fromGraph(desc.size1[e.sizeGraph], fraction);
+		}
 
 		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
 		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
@@ -492,7 +497,8 @@ namespace fx
 
 		e.vel = vel;
 		e.pos += velForDelta;
-		e.size = size;
+		e.width = width;
+		e.height = height;
 		e.col = Color8u(col, alpha);
 	}
 

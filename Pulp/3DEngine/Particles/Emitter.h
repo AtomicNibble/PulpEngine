@@ -32,7 +32,8 @@ namespace fx
 			Vec3f spawnPos;
 			Vec3f pos;
 			Vec3f vel;
-			float size;
+			float width;
+			float height;
 			Color8u col;
 
 			Rectf uv;
