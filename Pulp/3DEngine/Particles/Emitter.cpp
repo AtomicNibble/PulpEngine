@@ -199,22 +199,26 @@ namespace fx
 
 			if (desc.type == StageType::OrientedSprite || desc.type == StageType::BillboardSprite)
 			{
-				int8_t colGraph = 0;
-				int8_t alphaGraph = 0;
-				int8_t sizeGraph = 0;
-				int8_t velGraph = 0;
+				float colBlend = 0.f;
+				float alphaBlend = 0.f;
+				float sizeBlend0 = 0.f;
+				float sizeBlend1 = 0.f;
+				float velBlend = 0.f;
 
 				if (desc.flags.IsSet(StageFlag::RandGraphCol)) {
-					colGraph = gEnv->xorShift.rand() & 0x1;
+					colBlend = gEnv->xorShift.randRange(1.f);
 				}
 				if (desc.flags.IsSet(StageFlag::RandGraphAlpha)) {
-					alphaGraph = gEnv->xorShift.rand() & 0x1;
+					alphaBlend = gEnv->xorShift.randRange(1.f);
 				}
 				if (desc.flags.IsSet(StageFlag::RandGraphSize0)) {
-					sizeGraph = gEnv->xorShift.rand() & 0x1;
+					sizeBlend0 = gEnv->xorShift.randRange(1.f);
+				}
+				if (desc.flags.IsSet(StageFlag::RandGraphSize1)) {
+					sizeBlend1 = gEnv->xorShift.randRange(1.f);
 				}
 				if (desc.flags.IsSet(StageFlag::RandGraphVel0)) {
-					velGraph = gEnv->xorShift.rand() & 0x1;
+					velBlend = gEnv->xorShift.randRange(1.f);
 				}
 
 				// meow.
@@ -255,10 +259,11 @@ namespace fx
 					e.atlasBaseIdx = atlasIdx;
 				}
 
-				e.colGraph = colGraph;
-				e.alphaGraph = alphaGraph;
-				e.sizeGraph = sizeGraph;
-				e.velGraph = velGraph;
+				e.colBlend = colBlend;
+				e.alphaBlend = alphaBlend;
+				e.sizeBlend0 = sizeBlend0;
+				e.sizeBlend1 = sizeBlend1;
+				e.velBlend = velBlend;
 				e.spawnPos = pos;
 				e.pos = pos;
 				e.lifeMs = life;
@@ -479,21 +484,50 @@ namespace fx
 		Vec3f velForDelta = e.vel * deltaSec;
 
 		Vec3f vel;
-		vel.x = efx.fromGraph(desc.vel0X[e.velGraph], fraction);
-		vel.y = efx.fromGraph(desc.vel0Y[e.velGraph], fraction);
-		vel.z = efx.fromGraph(desc.vel0Z[e.velGraph], fraction);
+		vel.x = efx.fromGraph(desc.vel0X[0], fraction);
+		vel.y = efx.fromGraph(desc.vel0Y[0], fraction);
+		vel.z = efx.fromGraph(desc.vel0Z[0], fraction);
 
-		float width = efx.fromGraph(desc.size0[e.sizeGraph], fraction);
+		if (desc.flags.IsSet(StageFlag::RelativeVel0))
+		{
+			// the velocity is relative to current rotation.
+			
+		}
+
+		float width = efx.fromGraph(desc.size0[0], fraction);
+		
+		if (desc.flags.IsSet(StageFlag::RandGraphSize0))
+		{
+			float width2 = efx.fromGraph(desc.size0[1], fraction);
+			width = lerp(width, width2, e.sizeBlend0);
+		}
+		
 		float height = width;
 
 		if (desc.flags.IsSet(StageFlag::NonUniformScale))
 		{
-			height = efx.fromGraph(desc.size1[e.sizeGraph], fraction);
+			height = efx.fromGraph(desc.size1[0], fraction);
+
+			if (desc.flags.IsSet(StageFlag::RandGraphSize1))
+			{
+				float height2 = efx.fromGraph(desc.size1[1], fraction);
+				height = lerp(height, height2, e.sizeBlend1);
+			}
 		}
 
-		Vec3f col = efx.fromColorGraph(desc.color[e.colGraph], fraction);
-		float alpha = efx.fromGraph(desc.alpha[e.alphaGraph], fraction);
+		Vec3f col = efx.fromColorGraph(desc.color[0], fraction);
+		float alpha = efx.fromGraph(desc.alpha[0], fraction);
 
+		if (desc.flags.IsSet(StageFlag::RandGraphCol))
+		{
+			Vec3f col2 = efx.fromColorGraph(desc.color[1], fraction);
+			col = col.lerp(e.colBlend, col2);
+		}
+		if (desc.flags.IsSet(StageFlag::RandGraphAlpha))
+		{
+			float alpha2 = efx.fromGraph(desc.alpha[1], fraction);
+			alpha = lerp(alpha, alpha2, e.alphaBlend);
+		}
 
 		e.vel = vel;
 		e.pos += velForDelta;

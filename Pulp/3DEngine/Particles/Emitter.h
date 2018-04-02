@@ -24,10 +24,11 @@ namespace fx
 	{
 		struct Elem
 		{
-			int8_t colGraph;
-			int8_t alphaGraph;
-			int8_t sizeGraph;
-			int8_t velGraph;
+			float colBlend;
+			float alphaBlend;
+			float sizeBlend0;
+			float sizeBlend1;
+			float velBlend;
 
 			Vec3f spawnPos;
 			Vec3f pos;
