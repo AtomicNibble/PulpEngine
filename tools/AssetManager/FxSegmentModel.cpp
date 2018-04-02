@@ -263,6 +263,12 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		{
 			flags.Set(StageFlag::NonUniformScale);
 		}
+
+		// Rot
+		if (segment->rot.rot.random)
+		{
+			flags.Set(StageFlag::RandGraphRot);
+		}
 		
 		// Vel
 		if (segment->vel.vel0.graph.random)
@@ -479,7 +485,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 
 			while (tokens.ExtractToken(token))
 			{
-				static_assert(StageFlag::FLAGS_COUNT == 10, "Added more flags? this needs updating");
+				static_assert(StageFlag::FLAGS_COUNT == 11, "Added more flags? this needs updating");
 
 				switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 				{
@@ -492,24 +498,20 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 					case "RandGraphAlpha"_fnv1a:
 						flags.Set(StageFlag::RandGraphAlpha);
 						break;
-					case "RandGraphSize"_fnv1a:
 					case "RandGraphSize0"_fnv1a:
 						flags.Set(StageFlag::RandGraphSize0);
 						break;
 					case "RandGraphSize1"_fnv1a:
-					case "RandGraphSize2"_fnv1a:
 						flags.Set(StageFlag::RandGraphSize1);
 						break;
-					case "RandGraphVel"_fnv1a:
 					case "RandGraphVel0"_fnv1a:
 						flags.Set(StageFlag::RandGraphVel0);
 						break;
 					case "RandGraphVel1"_fnv1a:
-					case "RandGraphVel2"_fnv1a:
 						flags.Set(StageFlag::RandGraphVel1);
 						break;
-					case "NonUniformScale"_fnv1a:
-						flags.Set(StageFlag::NonUniformScale);
+					case "RandGraphRot"_fnv1a:
+						flags.Set(StageFlag::RandGraphRot);
 						break;
 					case "RelativeVel0"_fnv1a:
 						flags.Set(StageFlag::RelativeVel0);
@@ -517,52 +519,28 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 					case "RelativeVel1"_fnv1a:
 						flags.Set(StageFlag::RelativeVel1);
 						break;
+					case "NonUniformScale"_fnv1a:
+						flags.Set(StageFlag::NonUniformScale);
+						break;
 					default:
 						X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
 						return false;
 				}
 			}
 
-			if (flags.IsSet(StageFlag::Looping))
-			{
-				seg->spawn.looping = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphCol))
-			{
-				seg->col.col.random = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphAlpha))
-			{
-				seg->col.alpha.random = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphSize0))
-			{
-				seg->size.size0.random = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphSize1))
-			{
-				seg->size.size1.random = true;
-			}
-			if (flags.IsSet(StageFlag::NonUniformScale))
-			{
-				seg->size.size2Enabled = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphVel0))
-			{
-				seg->vel.vel0.graph.random = true;
-			}
-			if (flags.IsSet(StageFlag::RandGraphVel1))
-			{
-				seg->vel.vel1.graph.random = true;
-			}
-			if (flags.IsSet(StageFlag::RelativeVel0))
-			{
-				seg->vel.vel0.relative = true;
-			}
-			if (flags.IsSet(StageFlag::RelativeVel1))
-			{
-				seg->vel.vel1.relative = true;
-			}
+			seg->spawn.looping = flags.IsSet(StageFlag::Looping);
+			seg->col.col.random = flags.IsSet(StageFlag::RandGraphCol);
+			seg->col.alpha.random = flags.IsSet(StageFlag::RandGraphAlpha);
+			seg->size.size0.random = flags.IsSet(StageFlag::RandGraphSize0);
+			seg->size.size1.random = flags.IsSet(StageFlag::RandGraphSize1);
+			seg->rot.rot.random = flags.IsSet(StageFlag::RandGraphRot);
+			seg->vel.vel0.graph.random = flags.IsSet(StageFlag::RandGraphVel0);
+			seg->vel.vel1.graph.random = flags.IsSet(StageFlag::RandGraphVel1);
+
+			seg->vel.vel0.relative = flags.IsSet(StageFlag::RelativeVel0);
+			seg->vel.vel1.relative = flags.IsSet(StageFlag::RelativeVel1);
+
+			seg->size.size2Enabled = flags.IsSet(StageFlag::NonUniformScale);
 		}
 
 		{

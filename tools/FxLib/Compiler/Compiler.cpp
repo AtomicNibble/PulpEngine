@@ -240,7 +240,7 @@ namespace fx
 
 				while (tokens.ExtractToken(token))
 				{
-					static_assert(StageFlag::FLAGS_COUNT == 10, "Added more flags? this needs updating");
+					static_assert(StageFlag::FLAGS_COUNT == 11, "Added more flags? this needs updating");
 
 					switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 					{	
@@ -253,30 +253,29 @@ namespace fx
 						case "RandGraphAlpha"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphAlpha);
 							break;
-						case "RandGraphSize"_fnv1a:
 						case "RandGraphSize0"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphSize0);
 							break;
 						case "RandGraphSize1"_fnv1a:
-						case "RandGraphSize2"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphSize1);
 							break;
-						case "RandGraphVel"_fnv1a:
 						case "RandGraphVel0"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel0);
 							break;
 						case "RandGraphVel1"_fnv1a:
-						case "RandGraphVel2"_fnv1a:
 							stage.flags.Set(StageFlag::RandGraphVel1);
 							break;
-						case "NonUniformScale"_fnv1a:
-							stage.flags.Set(StageFlag::NonUniformScale);
+						case "RandGraphRot"_fnv1a:
+							stage.flags.Set(StageFlag::RandGraphRot);
 							break;
 						case "RelativeVel0"_fnv1a:
 							stage.flags.Set(StageFlag::RelativeVel0);
 							break;
 						case "RelativeVel1"_fnv1a:
 							stage.flags.Set(StageFlag::RelativeVel1);
+							break;
+						case "NonUniformScale"_fnv1a:
+							stage.flags.Set(StageFlag::NonUniformScale);
 							break;
 						default:
 							X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
