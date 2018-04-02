@@ -20,13 +20,18 @@ namespace fx
 	static const uint32_t	EFFECT_MAX_EMITTERS = 1 << 10;
 	static const uint32_t	EFFECT_MAX_ACTIVE_ELEMS = 1 << 11;
 
-	static const uint32_t	EFFECT_GRAPH_MAX_POINTS = 8;
+	static const uint32_t	EFFECT_GRAPH_MAX_POINTS = 16;
 
-	// think i will support grahphs for shit like:
+	// InitialRotation:
+	//		The starting rotation, rotation is added to this.
 	//
-	//	color, size, verlocity, rotation?
+	// Rotation:
+	//		This is a persecond rotation ammount, so it's addative to current rotation.
+	//		it has no effect on position of quad.
+	//		this rotation must be appylied to the quad before any other.
 	//
-	//	the graph will just allow a arbitary set of points over the timeline.
+	//
+	//
 
 	typedef uint16_t IndexType;
 	typedef IndexType IndexOffset;
@@ -40,28 +45,29 @@ namespace fx
 	X_DECLARE_ENUM8(StageType)(
 		BillboardSprite,		// the elems are rotated to face the view.
 		OrientedSprite,			// the elems are always rotated direction of emmiter.
-		RotatedSprite,			// Like oriented, but elem rotation.
-		Tail,
+		RotatedSprite,			// like Oriented, but 3axis elem rotation.
+		Tail,					// like Billboard but rotates on longest axis. (Eg a long vertical quad will stay vertical)
 		Line,
-		Sound
+		Sound					// Emmits a sound event.
 	);
 
 	X_DECLARE_ENUM8(RelativeTo)(
-		Spawn,	    // the elems are relative to the spawn translation.
-		Now         // elems move with emitter.
+		Spawn,					// the elems position is: relative to emitters translation at elem spawn time.
+		Now						// the elems position is: relative to emitters current translation.
 	);
 
 	X_DECLARE_FLAGS(StageFlag)(
-		Looping,
-		RandGraphCol,
-		RandGraphAlpha,
-		RandGraphSize0,
-		RandGraphSize1,
-		RandGraphVel0,
-		RandGraphVel1,
-		RelativeVel0,
-		RelativeVel1,
-		NonUniformScale
+		Looping,				// The stage is looping. either unlimited or between a range.
+		RandGraphCol,			// Blend between two graphs with a per elem random fraction.
+		RandGraphAlpha,			// Blend between two graphs with a per elem random fraction.
+		RandGraphSize0,			// Blend between two graphs with a per elem random fraction.
+		RandGraphSize1,			// Blend between two graphs with a per elem random fraction.
+		RandGraphVel0,			// Blend between two graphs with a per elem random fraction.
+		RandGraphVel1,			// Blend between two graphs with a per elem random fraction.
+		RandGraphRot,			// Blend between two graphs with a per elem random fraction.
+		RelativeVel0,			// The verloticy is relative to the effect axis, instead of world.
+		RelativeVel1,			// The verloticy is relative to the effect axis, instead of world.
+		NonUniformScale			// The height of the quad is sampled from a second size graph.
 	);
 
 	typedef Flags<StageFlag> StageFlags;
