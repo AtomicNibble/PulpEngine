@@ -387,6 +387,7 @@ private:
 	SpinBoxRangeDouble* pForward_;
 	SpinBoxRangeDouble* pRight_;
 	SpinBoxRangeDouble* pUp_;
+	QCheckBox* pRelative_;
 };
 
 
@@ -429,6 +430,7 @@ private:
 	QDoubleSpinBox* pRightScale_;
 	QDoubleSpinBox* pUpScale_;
 	QCheckBox* pRandomGraph_;
+	QCheckBox* pRelative_;
 };
 
 class VelocityInfoWidget : public QWidget

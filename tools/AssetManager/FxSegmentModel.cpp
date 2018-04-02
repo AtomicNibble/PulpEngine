@@ -240,6 +240,11 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 			flags.Set(StageFlag::Looping);
 		}
 
+		if (segment->origin.relative)
+		{
+			flags.Set(StageFlag::RelativeOrigin);
+		}
+
 		// Color
 		if (segment->col.col.random)
 		{
@@ -485,7 +490,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 
 			while (tokens.ExtractToken(token))
 			{
-				static_assert(StageFlag::FLAGS_COUNT == 11, "Added more flags? this needs updating");
+				static_assert(StageFlag::FLAGS_COUNT == 12, "Added more flags? this needs updating");
 
 				switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 				{
@@ -519,6 +524,9 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 					case "RelativeVel1"_fnv1a:
 						flags.Set(StageFlag::RelativeVel1);
 						break;
+					case "RelativeOrigin"_fnv1a:
+						flags.Set(StageFlag::RelativeOrigin);
+						break;
 					case "NonUniformScale"_fnv1a:
 						flags.Set(StageFlag::NonUniformScale);
 						break;
@@ -529,6 +537,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			}
 
 			seg->spawn.looping = flags.IsSet(StageFlag::Looping);
+			seg->origin.relative = flags.IsSet(StageFlag::RelativeOrigin);
 			seg->col.col.random = flags.IsSet(StageFlag::RandGraphCol);
 			seg->col.alpha.random = flags.IsSet(StageFlag::RandGraphAlpha);
 			seg->size.size0.random = flags.IsSet(StageFlag::RandGraphSize0);

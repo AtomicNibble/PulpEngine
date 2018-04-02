@@ -1480,13 +1480,19 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 		pRight_ = new SpinBoxRangeDouble(false);
 		pUp_ = new SpinBoxRangeDouble(false);
 
+		pRelative_ = new QCheckBox();
+		pRelative_->setText("Relative");
+		pRelative_->setToolTip(QStringLiteral("Origin is relative to effect axis instead of world"));
+
 		pLayout->addRow(tr("Forward"), pForward_);
 		pLayout->addRow(tr("Right"), pRight_);
 		pLayout->addRow(tr("Up"), pUp_);
+		pLayout->addRow(pRelative_);
 
 		connect(pForward_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
 		connect(pRight_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
 		connect(pUp_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
+		connect(pRelative_, &QCheckBox::stateChanged, this, &OriginInfoWidget::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1499,6 +1505,7 @@ void OriginInfoWidget::setValue(const OriginInfo& org)
 	pForward_->setValue(org.spawnOrgX);
 	pRight_->setValue(org.spawnOrgY);
 	pUp_->setValue(org.spawnOrgZ);
+	pRelative_->setChecked(org.relative);
 
 	blockSignals(false);
 }
@@ -1508,6 +1515,7 @@ void OriginInfoWidget::getValue(OriginInfo& org)
 	pForward_->getValue(org.spawnOrgX);
 	pRight_->getValue(org.spawnOrgY);
 	pUp_->getValue(org.spawnOrgZ);
+	org.relative = pRelative_->isChecked();
 }
 
 // -----------------------------------
@@ -1596,9 +1604,15 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pRandomGraph_->setText("Random Graph");
 		pRandomGraph_->setToolTip(QStringLiteral("Randomize between graphs"));
 
-//		QHBoxLayout* pHLayout = new QHBoxLayout();
-	//	pHLayout ->addStretch(1);
-	//	pHLayout ->addWidget(pRandomGraph_);
+		pRelative_ = new QCheckBox();
+		pRelative_->setText("Relative");
+		pRelative_->setToolTip(QStringLiteral("Verlocity is relative to effect axis instead of world"));
+
+
+		QHBoxLayout* pHLayout = new QHBoxLayout();
+		pHLayout->setContentsMargins(0, 0, 0, 0);
+		pHLayout->addStretch(1);
+		pHLayout->addWidget(pRelative_);
 
 		QHBoxLayout* pFormLayout = new QHBoxLayout();
 		pFormLayout->addWidget(new QLabel("Forward"));
@@ -1610,8 +1624,8 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pFormLayout->addStretch(1);
 		pFormLayout->addWidget(pRandomGraph_);
 
+		pLayout->addLayout(pHLayout);
 		pLayout->addWidget(pVelGraph_);
-	//	pLayout->addLayout(pHLayout);
 		pLayout->addLayout(pFormLayout);
 
 		connect(pVelGraph_, &GraphEditorView::pointsChanged, this, &VelocityGraph::valueChanged);
@@ -1619,6 +1633,7 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		connect(pRightScale_, &QDoubleSpinBox::editingFinished, this, &VelocityGraph::valueChanged);
 		connect(pUpScale_, &QDoubleSpinBox::editingFinished, this, &VelocityGraph::valueChanged);
 		connect(pRandomGraph_, &QCheckBox::stateChanged, this, &VelocityGraph::valueChanged);
+		connect(pRelative_, &QCheckBox::stateChanged, this, &VelocityGraph::valueChanged);
 	}
 
 	setLayout(pLayout);
@@ -1636,6 +1651,7 @@ void VelocityGraph::setValue(const VelocityGraphInfo& vel)
 	pUpScale_->setValue(vel.upScale);
 
 	pRandomGraph_->setChecked(vel.graph.random);
+	pRelative_->setChecked(vel.relative);
 
 	blockSignals(false);
 }
@@ -1649,6 +1665,7 @@ void VelocityGraph::getValue(VelocityGraphInfo& vel)
 	vel.upScale = pUpScale_->value();
 
 	vel.graph.random = pRandomGraph_->isChecked();
+	vel.relative = pRelative_->isChecked();
 }
 
 

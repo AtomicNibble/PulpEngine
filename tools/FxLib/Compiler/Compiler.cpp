@@ -240,7 +240,7 @@ namespace fx
 
 				while (tokens.ExtractToken(token))
 				{
-					static_assert(StageFlag::FLAGS_COUNT == 11, "Added more flags? this needs updating");
+					static_assert(StageFlag::FLAGS_COUNT == 12, "Added more flags? this needs updating");
 
 					switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength()))
 					{	
@@ -273,6 +273,9 @@ namespace fx
 							break;
 						case "RelativeVel1"_fnv1a:
 							stage.flags.Set(StageFlag::RelativeVel1);
+							break;
+						case "RelativeOrigin"_fnv1a:
+							stage.flags.Set(StageFlag::RelativeOrigin);
 							break;
 						case "NonUniformScale"_fnv1a:
 							stage.flags.Set(StageFlag::NonUniformScale);
@@ -323,12 +326,6 @@ namespace fx
 				auto& range = r.second;
 				range.start = s[startStr.c_str()].GetFloat();
 				range.range = s[rangeStr.c_str()].GetFloat();
-
-				if (range.range < 0)
-				{
-					X_ERROR("Fx", "Negative range for: \"%s\" \"%s\"", startStr.c_str(), rangeStr.c_str());
-					return false;
-				}
 			}
 
 			if (!parseGraph(s, "colorGraph", stage.color, [](core::json::Document::ValueType& v, ColGraphSet::Type& col) -> bool {
@@ -374,13 +371,13 @@ namespace fx
 			if (!parseGraphFloat(s, "vel0ZGraph", stage.vel0Z)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "vel1XGraph", stage.vel0X)) {
+			if (!parseGraphFloat(s, "vel1XGraph", stage.vel1X)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "vel1YGraph", stage.vel0Y)) {
+			if (!parseGraphFloat(s, "vel1YGraph", stage.vel1Y)) {
 				return false;
 			}
-			if (!parseGraphFloat(s, "vel1ZGraph", stage.vel0Z)) {
+			if (!parseGraphFloat(s, "vel1ZGraph", stage.vel1Z)) {
 				return false;
 			}
 
@@ -417,7 +414,7 @@ namespace fx
 				if (stage.vel0X.graphs.size() < 2 || stage.vel0Y.graphs.size() < 2 || stage.vel0Z.graphs.size() < 2)
 				{
 					stage.flags.Remove(StageFlag::RandGraphVel0);
-					X_WARNING("Fx", "RandVel requires atleast two graphs");
+					X_WARNING("Fx", "RandVel0 requires atleast two graphs");
 				}
 			}
 			if (stage.flags.IsSet(StageFlag::RandGraphVel1))
@@ -425,7 +422,7 @@ namespace fx
 				if (stage.vel1X.graphs.size() < 2 || stage.vel1Y.graphs.size() < 2 || stage.vel1Z.graphs.size() < 2)
 				{
 					stage.flags.Remove(StageFlag::RandGraphVel1);
-					X_WARNING("Fx", "RandVel requires atleast two graphs");
+					X_WARNING("Fx", "RandVel1 requires atleast two graphs");
 				}
 			}
 
@@ -529,14 +526,25 @@ namespace fx
 						r.start -= range;
 						r.range = range;
 
-						X_ASSERT(range > 0, "Ragne is negative")(range, r.start, r.range);
+						X_ASSERT(range > 0, "Range is negative")(range, r.start, r.range);
 					}
+				};
+
+				auto absToRelativeRange = [](Range& r) {
+					auto diff = r.range - r.start;
+					r.range = diff;
 				};
 
 				shiftRange(stage.spawnOrgX);
 				shiftRange(stage.spawnOrgY);
 				shiftRange(stage.spawnOrgZ);
 
+				// some ranges we want to actually be start and end.
+				// the are both same thing no?
+				// one is a absolute range the other relative.
+				// but if i have rotations of 90 and -90.
+				// how todo :/
+				absToRelativeRange(stage.initialRotation);
 
 				// currently scale graph is unused.
 				stage.scale.graphs.clear();
@@ -547,6 +555,15 @@ namespace fx
 				stage.vel1Y.graphs.clear();
 				stage.vel1Z.graphs.clear();
 
+				for (const auto& r : ranges)
+				{
+					auto& range = r.second;
+					if (range.range < 0)
+					{
+						X_ERROR("Fx", "Negative range for: \"%s\"", r.first);
+						return false;
+					}
+				}
 			}
 
 			stages_.emplace_back(std::move(stage));

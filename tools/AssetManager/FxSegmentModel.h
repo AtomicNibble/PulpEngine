@@ -162,9 +162,16 @@ struct SpawnInfo
 
 struct OriginInfo
 {
+	OriginInfo() :
+		relative(false)
+	{
+	}
+
 	RangeDouble spawnOrgX;
 	RangeDouble spawnOrgY;
 	RangeDouble spawnOrgZ;
+
+	bool relative;
 };
 
 struct SequenceInfo
