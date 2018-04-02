@@ -406,7 +406,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 		X_ERROR("Fx", "Failed to parse fx: %s", core::json::ErrorToString(d, jsonStr.c_str(), jsonStr.c_str() + jsonStr.length(), dsc));
 		return false;
 	}
-
+	
 	if (!d.IsObject()) {
 		X_ERROR("Fx", "Stages is not a object. Type: %" PRIi32, d.GetType());
 		return false;
@@ -862,9 +862,11 @@ void FxSegmentModel::addSegment(void)
 
 	// verlocity has 6 graphs with one seriex.
 	seg->vel.vel0.graph.graphs.reserve(6);
+	seg->vel.vel1.graph.graphs.reserve(6);
 	for (int32_t i = 0; i < 6; i++)
 	{
 		seg->vel.vel0.graph.graphs.push_back(zeroGraph);
+		seg->vel.vel1.graph.graphs.push_back(zeroGraph);
 	}
 
 	seg->size.size0.graphs = linDescend.graphs;
