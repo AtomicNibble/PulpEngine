@@ -48,7 +48,8 @@ namespace fx
 		RotatedSprite,			// like Oriented, but 3axis elem rotation.
 		Tail,					// like Billboard but rotates on longest axis. (Eg a long vertical quad will stay vertical)
 		Line,
-		Sound					// Emmits a sound event.
+		Sound,					// Emmits a sound event.
+		PlayFX					// Plays a Effect.
 	);
 
 	X_DECLARE_ENUM8(RelativeTo)(
