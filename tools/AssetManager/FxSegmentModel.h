@@ -171,6 +171,9 @@ struct OriginInfo
 	RangeDouble spawnOrgY;
 	RangeDouble spawnOrgZ;
 
+	RangeDouble spawnRadius;
+	RangeDouble spawnHeight;
+
 	bool relative;
 };
 

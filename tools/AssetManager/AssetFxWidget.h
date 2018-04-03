@@ -383,11 +383,21 @@ public:
 signals:
 	void valueChanged(void);
 
+private slots:
+	void buttonToggled(int id, bool checked);
+
 private:
 	SpinBoxRangeDouble* pForward_;
 	SpinBoxRangeDouble* pRight_;
 	SpinBoxRangeDouble* pUp_;
 	QCheckBox* pRelative_;
+
+	QRadioButton* pOffsetNone_;
+	QRadioButton* pSphere_;
+	QRadioButton* pCylinder_;
+	SpinBoxRangeDouble* pRadius_;
+	SpinBoxRangeDouble* pHeight_;
+
 };
 
 

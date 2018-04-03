@@ -1484,10 +1484,48 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 		pRelative_->setText("Relative");
 		pRelative_->setToolTip(QStringLiteral("Origin is relative to effect axis instead of world"));
 
+		QHBoxLayout* pRadioLayout = new QHBoxLayout();
+		{
+			QButtonGroup* pGroup = new QButtonGroup();
+			pOffsetNone_ = new QRadioButton();
+			pSphere_ = new QRadioButton();
+			pCylinder_ = new QRadioButton();
+
+			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::buttonToggled);
+			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::valueChanged);
+
+			pOffsetNone_->setText("None");
+			pOffsetNone_->setChecked(true);
+			pSphere_->setText("Spherical");
+			pCylinder_->setText("Cylindrical");
+
+			pGroup->addButton(pOffsetNone_);
+			pGroup->addButton(pSphere_);
+			pGroup->addButton(pCylinder_);
+			pGroup->setId(pOffsetNone_, 0);
+			pGroup->setId(pSphere_, 1);
+			pGroup->setId(pCylinder_, 2);
+			pGroup->setExclusive(true);
+
+			pRadioLayout->addWidget(pOffsetNone_);
+			pRadioLayout->addWidget(pSphere_);
+			pRadioLayout->addWidget(pCylinder_);
+			pRadioLayout->addStretch(1);
+		}
+
+		pRadius_ = new SpinBoxRangeDouble(true);
+		pHeight_ = new SpinBoxRangeDouble(true);
+		pRadius_->setEnabled(false);
+		pHeight_->setEnabled(false);
+
 		pLayout->addRow(tr("Forward"), pForward_);
 		pLayout->addRow(tr("Right"), pRight_);
 		pLayout->addRow(tr("Up"), pUp_);
 		pLayout->addRow(pRelative_);
+		pLayout->addItem(new QSpacerItem(0, 10, QSizePolicy::Expanding, QSizePolicy::Minimum));
+		pLayout->addRow(tr("Offset"), pRadioLayout);
+		pLayout->addRow(tr("Radius"), pRadius_);
+		pLayout->addRow(tr("Height"), pHeight_);
 
 		connect(pForward_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
 		connect(pRight_, &SpinBoxRangeDouble::valueChanged, this, &OriginInfoWidget::valueChanged);
@@ -1507,6 +1545,9 @@ void OriginInfoWidget::setValue(const OriginInfo& org)
 	pUp_->setValue(org.spawnOrgZ);
 	pRelative_->setChecked(org.relative);
 
+	pRadius_->setValue(org.spawnRadius);
+	pHeight_->setValue(org.spawnHeight);
+
 	blockSignals(false);
 }
 
@@ -1516,6 +1557,18 @@ void OriginInfoWidget::getValue(OriginInfo& org)
 	pRight_->getValue(org.spawnOrgY);
 	pUp_->getValue(org.spawnOrgZ);
 	org.relative = pRelative_->isChecked();
+
+	pRadius_->getValue(org.spawnRadius);
+	pHeight_->getValue(org.spawnHeight);
+}
+
+void OriginInfoWidget::buttonToggled(int id, bool checked)
+{
+	if (id == 0)
+	{
+		pRadius_->setEnabled(!checked);
+		pHeight_->setEnabled(!checked);
+	}
 }
 
 // -----------------------------------
@@ -1607,7 +1660,6 @@ VelocityGraph::VelocityGraph(QWidget* parent) :
 		pRelative_ = new QCheckBox();
 		pRelative_->setText("Relative");
 		pRelative_->setToolTip(QStringLiteral("Verlocity is relative to effect axis instead of world"));
-
 
 		QHBoxLayout* pHLayout = new QHBoxLayout();
 		pHLayout->setContentsMargins(0, 0, 0, 0);

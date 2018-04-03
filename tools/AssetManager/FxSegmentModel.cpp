@@ -336,6 +336,8 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		writeRangeDouble(writer, "spawnOrgX", segment->origin.spawnOrgX);
 		writeRangeDouble(writer, "spawnOrgY", segment->origin.spawnOrgY);
 		writeRangeDouble(writer, "spawnOrgZ", segment->origin.spawnOrgZ);
+		writeRangeDouble(writer, "spawnRadius", segment->origin.spawnRadius);
+		writeRangeDouble(writer, "spawnHeight", segment->origin.spawnHeight);
 
 		writer.Key("sequence");
 		writer.StartObject();
@@ -517,7 +519,7 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			{ "delay", seg->spawn.delay },
 		} };
 
-		const std::array<std::pair<const char*, RangeDouble&>, 7> rangesDouble = { {
+		const std::array<std::pair<const char*, RangeDouble&>, 9> rangesDouble = { {
 			{ "initialRot", seg->rot.initial },
 			{ "anglePitch", seg->rot.pitch },
 			{ "angleYaw", seg->rot.yaw },
@@ -525,6 +527,8 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			{ "spawnOrgX", seg->origin.spawnOrgX },
 			{ "spawnOrgY", seg->origin.spawnOrgY },
 			{ "spawnOrgZ", seg->origin.spawnOrgZ },
+			{ "spawnRadius", seg->origin.spawnRadius },
+			{ "spawnHeight", seg->origin.spawnHeight },
 		} };
 
 		for (auto& r : ranges)
