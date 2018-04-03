@@ -1486,26 +1486,26 @@ OriginInfoWidget::OriginInfoWidget(QWidget* parent) :
 
 		QHBoxLayout* pRadioLayout = new QHBoxLayout();
 		{
-			QButtonGroup* pGroup = new QButtonGroup();
+			pGroup_ = new QButtonGroup();
 			pOffsetNone_ = new QRadioButton();
 			pSphere_ = new QRadioButton();
 			pCylinder_ = new QRadioButton();
 
-			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::buttonToggled);
-			connect(pGroup, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::valueChanged);
+			connect(pGroup_, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::buttonToggled);
+			connect(pGroup_, QOverload<int, bool>::of(&QButtonGroup::buttonToggled), this, &OriginInfoWidget::valueChanged);
 
 			pOffsetNone_->setText("None");
 			pOffsetNone_->setChecked(true);
 			pSphere_->setText("Spherical");
 			pCylinder_->setText("Cylindrical");
 
-			pGroup->addButton(pOffsetNone_);
-			pGroup->addButton(pSphere_);
-			pGroup->addButton(pCylinder_);
-			pGroup->setId(pOffsetNone_, 0);
-			pGroup->setId(pSphere_, 1);
-			pGroup->setId(pCylinder_, 2);
-			pGroup->setExclusive(true);
+			pGroup_->addButton(pOffsetNone_);
+			pGroup_->addButton(pSphere_);
+			pGroup_->addButton(pCylinder_);
+			pGroup_->setId(pOffsetNone_, 0);
+			pGroup_->setId(pSphere_, 1);
+			pGroup_->setId(pCylinder_, 2);
+			pGroup_->setExclusive(true);
 
 			pRadioLayout->addWidget(pOffsetNone_);
 			pRadioLayout->addWidget(pSphere_);
@@ -1547,6 +1547,21 @@ void OriginInfoWidget::setValue(const OriginInfo& org)
 
 	pRadius_->setValue(org.spawnRadius);
 	pHeight_->setValue(org.spawnHeight);
+	
+	switch (org.offsetType)
+	{
+		case OriginInfo::OffsetType::None:
+			pOffsetNone_->setChecked(true);
+			break;
+		case OriginInfo::OffsetType::Spherical:
+			pSphere_->setChecked(true);
+			break;
+		case OriginInfo::OffsetType::Cylindrical:
+			pSphere_->setChecked(true);
+			break;
+
+		X_NO_SWITCH_DEFAULT_ASSERT
+	}
 
 	blockSignals(false);
 }
@@ -1560,6 +1575,24 @@ void OriginInfoWidget::getValue(OriginInfo& org)
 
 	pRadius_->getValue(org.spawnRadius);
 	pHeight_->getValue(org.spawnHeight);
+
+	switch (pGroup_->checkedId())
+	{
+		case 0:
+			X_ASSERT(pOffsetNone_->isChecked(), "Incorrrect index")();
+			org.offsetType = OriginInfo::OffsetType::None;
+			break;
+		case 1:
+			X_ASSERT(pSphere_->isChecked(), "Incorrrect index")();
+			org.offsetType = OriginInfo::OffsetType::Spherical;
+			break;
+		case 2:
+			X_ASSERT(pCylinder_->isChecked(), "Incorrrect index")();
+			org.offsetType = OriginInfo::OffsetType::Cylindrical;
+			break;
+
+		X_NO_SWITCH_DEFAULT_ASSERT
+	}
 }
 
 void OriginInfoWidget::buttonToggled(int id, bool checked)

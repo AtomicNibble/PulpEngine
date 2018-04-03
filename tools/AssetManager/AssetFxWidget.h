@@ -392,6 +392,7 @@ private:
 	SpinBoxRangeDouble* pUp_;
 	QCheckBox* pRelative_;
 
+	QButtonGroup* pGroup_;
 	QRadioButton* pOffsetNone_;
 	QRadioButton* pSphere_;
 	QRadioButton* pCylinder_;

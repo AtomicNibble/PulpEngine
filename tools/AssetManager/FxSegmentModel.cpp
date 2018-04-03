@@ -233,6 +233,18 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 
 		engine::fx::StageFlags flags;
 
+		switch (segment->origin.offsetType)
+		{
+			case OriginInfo::OffsetType::Cylindrical:
+				flags.Set(StageFlag::SpawnCylindrical);
+				break;
+			case OriginInfo::OffsetType::Spherical:
+				flags.Set(StageFlag::SpawnSphere);
+				break;
+			default:
+				break;
+		}
+
 		if (segment->spawn.looping)
 		{
 			flags.Set(StageFlag::Looping);
@@ -478,6 +490,19 @@ bool FxSegmentModel::fromJson(const core::string& jsonStr)
 			auto& flagsJson = s["flags"];
 
 			auto flags = engine::fx::Util::FlagsFromStr(flagsJson.GetString(), flagsJson.GetString() + flagsJson.GetStringLength());
+
+			if (flags.IsSet(StageFlag::SpawnCylindrical))
+			{
+				seg->origin.offsetType = OriginInfo::OffsetType::Cylindrical;
+			}
+			else if (flags.IsSet(StageFlag::SpawnSphere))
+			{
+				seg->origin.offsetType = OriginInfo::OffsetType::Spherical;
+			}
+			else
+			{
+				seg->origin.offsetType = OriginInfo::OffsetType::None;
+			}
 
 			seg->spawn.looping = flags.IsSet(StageFlag::Looping);
 			seg->origin.relative = flags.IsSet(StageFlag::RelativeOrigin);

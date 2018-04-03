@@ -162,8 +162,16 @@ struct SpawnInfo
 
 struct OriginInfo
 {
+	enum class OffsetType : uint8_t
+	{
+		None,
+		Spherical,
+		Cylindrical
+	};
+
 	OriginInfo() :
-		relative(false)
+		relative(false),
+		offsetType(OffsetType::None)
 	{
 	}
 
@@ -175,6 +183,7 @@ struct OriginInfo
 	RangeDouble spawnHeight;
 
 	bool relative;
+	OffsetType offsetType;
 };
 
 struct SequenceInfo
