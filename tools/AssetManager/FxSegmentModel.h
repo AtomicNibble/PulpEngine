@@ -209,7 +209,13 @@ struct VisualsInfo
 	{
 	}
 
+	// we keep all the diffrent data sets seperate.
+	// so that if you switch type the info is not 'lost'
 	QStringArr materials;
+	QStringArr effects;
+	QStringArr models;
+	QStringArr sounds;
+
 	engine::fx::StageType::Enum type;
 };
 

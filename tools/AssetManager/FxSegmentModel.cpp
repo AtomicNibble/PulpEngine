@@ -322,14 +322,22 @@ void FxSegmentModel::getJson(core::string& jsonStrOut) const
 		writer.Key("flags");
 		writer.String(flagsStr.c_str());
 
-		writer.Key("materials");
-		writer.StartArray();
-		for (auto mat : segment->vis.materials)
-		{
-			auto matStd = mat.toStdString();
-			writer.String(matStd.c_str());
-		}
-		writer.EndArray();
+		auto writeStringArr = [&writer](const char* pKey, const std::vector<QString>& strArr) {
+			writer.Key(pKey);
+			writer.StartArray();
+			for (auto mat : strArr)
+			{
+				auto matStd = mat.toStdString();
+				writer.String(matStd.c_str());
+			}
+			writer.EndArray();
+		};
+
+		writeStringArr("materials", segment->vis.materials);
+		writeStringArr("effects", segment->vis.effects);
+		writeStringArr("models", segment->vis.models);
+		writeStringArr("sounds", segment->vis.sounds);
+		
 
 		writer.Key("interval");
 		writer.Int(segment->spawn.interval);
