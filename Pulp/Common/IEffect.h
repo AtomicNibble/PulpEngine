@@ -68,7 +68,9 @@ namespace fx
 		RelativeVel0,			// The verloticy is relative to the effect axis, instead of world.
 		RelativeVel1,			// The verloticy is relative to the effect axis, instead of world.
 		RelativeOrigin,			// The origin is relative to the effect axis, instead of world.
-		NonUniformScale			// The height of the quad is sampled from a second size graph.
+		NonUniformScale,			// The height of the quad is sampled from a second size graph.
+		SpawnSphere,
+		SpawnCylindrical
 	);
 
 	typedef Flags<StageFlag> StageFlags;
@@ -130,6 +132,9 @@ namespace fx
 		Range spawnOrgX;
 		Range spawnOrgY;
 		Range spawnOrgZ;
+
+		Range spawnRadius;  // used for: Sphere/Cylindrical
+		Range spawnHeight;	// used for Cylindrical
 
 		Range initialRotation;
 
