@@ -16,7 +16,7 @@ namespace fx
 	{
 		StageType::Enum TypeFromStr(const char* pBegin, const char* pEnd)
 		{
-			static_assert(StageType::ENUM_COUNT == 6, "Added additional types? this code needs updating.");
+			static_assert(StageType::ENUM_COUNT == 7, "Added additional types? this code needs updating.");
 
 			const size_t len = (pEnd - pBegin);
 
@@ -34,6 +34,8 @@ namespace fx
 					return StageType::Line;
 				case "Sound"_fnv1a:
 					return StageType::Sound;
+				case "PlayFX"_fnv1a:
+					return StageType::PlayFX;
 				default:
 					X_ERROR("Fx", "Unknown type: '%.*s' (case-sen)", len, pBegin);
 					return StageType::BillboardSprite;
