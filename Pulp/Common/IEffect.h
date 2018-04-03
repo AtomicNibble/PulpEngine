@@ -69,7 +69,7 @@ namespace fx
 		RelativeVel0,			// The verloticy is relative to the effect axis, instead of world.
 		RelativeVel1,			// The verloticy is relative to the effect axis, instead of world.
 		RelativeOrigin,			// The origin is relative to the effect axis, instead of world.
-		NonUniformScale,			// The height of the quad is sampled from a second size graph.
+		NonUniformScale,		// The height of the quad is sampled from a second size graph.
 		SpawnSphere,
 		SpawnCylindrical
 	);
