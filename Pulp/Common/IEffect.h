@@ -49,6 +49,7 @@ namespace fx
 		Tail,					// like Billboard but rotates on longest axis. (Eg a long vertical quad will stay vertical)
 		Line,
 		Sound,					// Emmits a sound event.
+		Model,					// Spawns a model.
 		PlayFX					// Plays a Effect.
 	);
 
