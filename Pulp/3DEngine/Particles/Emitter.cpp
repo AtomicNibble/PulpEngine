@@ -198,7 +198,9 @@ namespace fx
 			++stage.currentLoop;
 			stage.lastSpawn = stage.elapsed;
 
-			if (desc.type == StageType::OrientedSprite || desc.type == StageType::BillboardSprite)
+			if (desc.type == StageType::OrientedSprite || 
+				desc.type == StageType::BillboardSprite || 
+				desc.type == StageType::Tail)
 			{
 				float colBlend = 0.f;
 				float alphaBlend = 0.f;
@@ -384,8 +386,22 @@ namespace fx
 
 			const auto postionType = desc.postionType;
 
-			if (desc.type == StageType::OrientedSprite)
+			if (desc.type == StageType::OrientedSprite || 
+				desc.type == StageType::BillboardSprite || 
+				desc.type == StageType::Tail)
 			{
+				Quatf q = trans_.quat;
+
+				if (desc.type == StageType::BillboardSprite)
+				{
+					auto lookatCam(view.viewMatrix);
+					lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
+
+					Quatf lookatCamQ(lookatCam);
+
+					q = lookatCamQ;
+				}
+
 				for (const auto& e : stage.elems)
 				{
 					float halfWidth = e.width * 0.5f;
@@ -406,8 +422,6 @@ namespace fx
 						br = br * rot;
 					}
 
-					auto q = trans_.quat;
-
 					tl = tl * q;
 					tr = tr * q;
 					bl = bl * q;
@@ -415,44 +429,6 @@ namespace fx
 
 					Vec3f pos = e.transPos; 
 					
-					tl += pos;
-					tr += pos;
-					bl += pos;
-					br += pos;
-
-					pPrim->drawQuad(tl, tr, bl, br, stage.pMaterial, e.col, e.uv);
-
-					if (vars_.drawDebug() && vars_.drawElemRect())
-					{
-						pPrim->drawRect(tl, tr, bl, br, Col_Red, Col_Red, Col_Blue, Col_Blue);
-					}
-				}
-
-			}
-			else if (desc.type == StageType::BillboardSprite)
-			{
-				auto lookatCam(view.viewMatrix);
-				lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
-
-				Quatf lookatCamQ(lookatCam);
-
-				for (const auto& e : stage.elems)
-				{
-					float halfWidth = e.width * 0.5f;
-					float halfHeight = e.height * 0.5f;
-
-					Vec3f tl = Vec3f(-halfWidth, -halfHeight, 0);
-					Vec3f tr = Vec3f(halfWidth, -halfHeight, 0);
-					Vec3f bl = Vec3f(-halfWidth, halfHeight, 0);
-					Vec3f br = Vec3f(halfWidth, halfHeight, 0);
-
-					tl = tl * lookatCamQ;
-					tr = tr * lookatCamQ;
-					bl = bl * lookatCamQ;
-					br = br * lookatCamQ;
-
-					Vec3f pos = e.transPos;
-
 					tl += pos;
 					tr += pos;
 					bl += pos;
