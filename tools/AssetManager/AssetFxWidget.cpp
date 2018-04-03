@@ -675,6 +675,13 @@ void GraphEditorView::mouseMoveEvent(QMouseEvent *event)
 		auto newVal = pChart_->mapToValue(event->localPos());
 
 		auto* pSeries = activeSeries();
+
+		// can happen if you undo add point.
+		if (activePoint_ >= pSeries->count()) {
+			X_WARNING("Fx", "Ative point is no longer valid", activePoint_);
+			return;
+		}
+
 		const auto curVal = pSeries->at(activePoint_);
 
 		// can't move begin / end.
