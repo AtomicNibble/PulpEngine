@@ -104,9 +104,9 @@ X_ENABLE_WARNING(4127)
 #if X_ENABLE_MEMORY_SOURCE_INFO
 				const SourceInfo& sourceInfo = info.sourceInfo_;
 
-				X_LOG0("ExMemTracking", "Filename(line): \"%s(%d)\"", sourceInfo.file_, sourceInfo.line_);
-				X_LOG0("ExMemTracking", "Function: \"%s\"", sourceInfo.function_);
-				X_LOG0("ExMemTracking", "Function signature: \"%s\"", sourceInfo.functionSignature_);
+				X_LOG0("ExMemTracking", "Filename(line): \"%s(%d)\"", sourceInfo.pFile_, sourceInfo.line_);
+				X_LOG0("ExMemTracking", "Function: \"%s\"", sourceInfo.pFunction_);
+				X_LOG0("ExMemTracking", "Function signature: \"%s\"", sourceInfo.pFunctionSignature_);
 #endif // !X_ENABLE_MEMORY_SOURCE_INFO
 
 				// call stack

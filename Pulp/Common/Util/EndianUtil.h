@@ -7,8 +7,8 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Endian
 {
-	template<typename T>
-	X_INLINE T swap(const T v);
+    template<typename T>
+    X_INLINE T swap(T v);
 }
 
 #include "EndianUtil.inl"
