@@ -15,10 +15,10 @@ public:
 	~XMatrixStack();
 
 	void SetDepth(uint32_t maxDepth);
-	void SetArena(core::MemoryArenaBase* arena);
 	void Clear(void);
 
 	X_INLINE Matrix44f* GetTop(void);
+	X_INLINE uint32_t GetDepth(void) const;
 
 	bool LoadIdentity(void);
 	bool LoadMatrix(const Matrix44f* pMat);
@@ -38,10 +38,6 @@ public:
 	bool Translate(float x, float y, float z);
 	bool TranslateLocal(float x, float y, float z);
 
-	X_INLINE uint32_t getDepth(void) const {
-		return curDpeth_;
-	}
-
 private:
 	Matrix44f* pTop_;
 	Matrix44f* pStack_;
@@ -55,6 +51,12 @@ private:
 X_INLINE Matrix44f* XMatrixStack::GetTop(void)
 {
 	return pTop_;
+}
+
+
+X_INLINE uint32_t XMatrixStack::GetDepth(void) const 
+{
+	return curDpeth_;
 }
 
 
