@@ -26,14 +26,6 @@ void XMatrixStack::SetDepth(uint32_t maxDepth)
 	maxDpeth_ = maxDepth;
 }
 
-void XMatrixStack::SetArena(core::MemoryArenaBase* arena)
-{
-	X_ASSERT(pTop_ == nullptr, "Can't set matrix stack arena that has a depth call clear()")(maxDpeth_);
-	X_ASSERT(pStack_ == nullptr, "Can't set matrix stack arena that has a depth call clear()")(maxDpeth_);
-
-	arena_ = arena;
-}
-
 void XMatrixStack::Clear(void)
 {
 	X_DELETE_ARRAY(pStack_, arena_);
