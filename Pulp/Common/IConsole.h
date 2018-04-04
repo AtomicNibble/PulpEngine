@@ -60,7 +60,7 @@ struct ICVar;
 // console commands.
 struct IConsoleCmdArgs
 {
-	virtual ~IConsoleCmdArgs() {}
+	virtual ~IConsoleCmdArgs() = default;
 	// Gets number of arguments supplied to the command (including the command itself)
 	virtual size_t GetArgCount(void) const X_ABSTRACT;
 	// Gets argument by index, idx must be in 0 <= idx < GetArgCount()
@@ -69,7 +69,7 @@ struct IConsoleCmdArgs
 
 struct IKeyBindDumpSink
 {
-	virtual ~IKeyBindDumpSink(){}
+	virtual ~IKeyBindDumpSink() = default;
 	virtual void OnKeyBindFound(const char* Bind, const char* Command) X_ABSTRACT;
 };
 
@@ -83,8 +83,7 @@ typedef core::Delegate<void(IConsoleCmdArgs*)> ConsoleCmdFunc;
 // The console interface
 struct IConsole
 {
-	virtual ~IConsole(){}
-
+	virtual ~IConsole() = default;
 
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;
@@ -146,7 +145,7 @@ struct ICVar
 	typedef VarFlags FlagType;
 	typedef char StrBuf[128];
 
-	virtual ~ICVar() {}
+	virtual ~ICVar() = default;
 
 	virtual const char* GetName(void) const X_ABSTRACT;
 	virtual const char* GetDesc(void) const X_ABSTRACT;
