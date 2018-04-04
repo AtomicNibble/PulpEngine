@@ -17,7 +17,7 @@ class IOhook : public AK::StreamMgr::IAkFileLocationResolver,
 
 public:
 	IOhook();
-	virtual ~IOhook() X_OVERRIDE;
+	~IOhook() X_OVERRIDE;
 
 	AKRESULT Init(const AkDeviceSettings& deviceSettings, bool AsyncOpen = false);
 	void Term(void);
@@ -25,11 +25,11 @@ public:
 	// IAkFileLocationAware
 
 	// Returns a file descriptor for a given file name (string).
-	virtual AKRESULT Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,		
+	AKRESULT Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,		
 		AkFileSystemFlags* pFlags, bool& SyncOpen,	AkFileDesc&	outFileDesc) X_OVERRIDE;
 
 	// Returns a file descriptor for a given file ID.
-	virtual AKRESULT Open(AkFileID fileID, AkOpenMode eOpenMode,    
+	AKRESULT Open(AkFileID fileID, AkOpenMode eOpenMode,    
 		AkFileSystemFlags* pFlags, bool& SyncOpen, AkFileDesc&	outFileDesc) X_OVERRIDE;
 
 	// ~IAkFileLocationAware
@@ -38,28 +38,28 @@ public:
 	// IAkIOHookDeferred
 
 	/// Reads data from a file (asynchronous).
-	virtual AKRESULT Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,	// Heuristics for this data transfer.
+	AKRESULT Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,	// Heuristics for this data transfer.
 		AkAsyncIOTransferInfo& transferInfo	// Asynchronous data transfer info.
 		) X_OVERRIDE;
 
 	// Writes data to a file (asynchronous).
-	virtual AKRESULT Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics, // Heuristics for this data transfer.
+	AKRESULT Write(AkFileDesc&fileDesc, const AkIoHeuristics& heuristics, // Heuristics for this data transfer.
 		AkAsyncIOTransferInfo& io_transferInfo	// Platform-specific asynchronous IO operation info.
 		) X_OVERRIDE;
 
 	// Notifies that a transfer request is cancelled. It will be flushed by the streaming device when completed.
-	virtual void Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,	// Transfer info to cancel.
+	void Cancel(AkFileDesc&	fileDesc, AkAsyncIOTransferInfo& transferInfo,	// Transfer info to cancel.
 		bool& io_bCancelAllTransfersForThisFile	// Flag indicating whether all transfers should be cancelled for this file (see notes in function description).
 		) X_OVERRIDE;
 
 	// Cleans up a file.
-	virtual AKRESULT Close(AkFileDesc& fileDesc) X_OVERRIDE;
+	AKRESULT Close(AkFileDesc& fileDesc) X_OVERRIDE;
 	// Returns the block size for the file or its storage device. 
-	virtual AkUInt32 GetBlockSize(AkFileDesc& fileDesc) X_OVERRIDE;
+	AkUInt32 GetBlockSize(AkFileDesc& fileDesc) X_OVERRIDE;
 	// Returns a description for the streaming device above this low-level hook.
-	virtual void GetDeviceDesc(AkDeviceDesc& outDeviceDesc) X_OVERRIDE;
+	void GetDeviceDesc(AkDeviceDesc& outDeviceDesc) X_OVERRIDE;
 	// Returns custom profiling data: 1 if file opens are asynchronous, 0 otherwise.
-	virtual AkUInt32 GetDeviceData(void) X_OVERRIDE;
+	AkUInt32 GetDeviceData(void) X_OVERRIDE;
 
 	// ~IAkIOHookDeferred
 private:

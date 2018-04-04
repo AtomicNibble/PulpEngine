@@ -95,7 +95,7 @@ class XSound : public ISound, public ICoreEventListener
 
 public:
 	XSound(core::MemoryArenaBase* arena);
-	virtual ~XSound() X_OVERRIDE;
+	~XSound() X_OVERRIDE;
 
 	void registerVars(void) X_FINAL;
 	void registerCmds(void) X_FINAL;
@@ -116,7 +116,7 @@ public:
 	void setListenPos(const Transformf& trans) X_FINAL;
 
 	// Volume
-	void setMasterVolume(float v) X_FINAL;
+	void setMasterVolume(float vol) X_FINAL;
 	void setMusicVolume(float vol) X_FINAL;
 	void setVoiceVolume(float vol) X_FINAL;
 	void setSFXVolume(float vol) X_FINAL;
