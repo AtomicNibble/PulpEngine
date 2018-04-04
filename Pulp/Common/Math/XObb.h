@@ -21,13 +21,13 @@ public:
 
 
 	X_INLINE OBB() = default;
-	X_INLINE OBB(Matrix33f m33, const Vec3f& center, const Vec3f& hlv);
-	X_INLINE OBB(Matrix33f m33, const AABB& aabb);
-	X_INLINE OBB(Quatf quat, const AABB& aabb);
+	X_INLINE OBB(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
+	X_INLINE OBB(const Matrix33f& m33, const AABB& aabb);
+	X_INLINE OBB(const Quatf& quat, const AABB& aabb);
 
-	X_INLINE void set(Matrix33f m33, const Vec3f& center, const Vec3f& hlv);
-	X_INLINE void set(Matrix33f m33, const AABB& aabb);
-	X_INLINE void set(Quatf quat, const AABB& aabb);
+	X_INLINE void set(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
+	X_INLINE void set(const Matrix33f& m33, const AABB& aabb);
+	X_INLINE void set(const Quatf& quat, const AABB& aabb);
 
 
 	X_INLINE const Vec3f& center(void) const;	// the center point of the box

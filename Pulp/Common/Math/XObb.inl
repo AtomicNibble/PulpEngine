@@ -1,37 +1,37 @@
 
 // constructors are not unit tested, only the set.
 // if you change the constructors consider adding to the unit test.
-X_INLINE OBB::OBB(Matrix33f m33, const Vec3f& center, const Vec3f& hlv)
+X_INLINE OBB::OBB(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv)
 {
 	set(m33,center,hlv);
 }
 
-X_INLINE OBB::OBB(Matrix33f m33, const AABB& aabb)
+X_INLINE OBB::OBB(const Matrix33f& m33, const AABB& aabb)
 {
 	set(m33, aabb);
 }
 
-X_INLINE OBB::OBB(Quatf quat, const AABB& aabb)
+X_INLINE OBB::OBB(const Quatf& quat, const AABB& aabb)
 {
 	set(quat, aabb);
 }
 
 
-X_INLINE void OBB::set(Matrix33f m33, const Vec3f& center, const Vec3f& hlv)
+X_INLINE void OBB::set(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv)
 {
 	orientation_ = Quatf(m33);
 	center_ = center * orientation_;
 	halfLVec_ = hlv;
 }
 
-X_INLINE void OBB::set(Matrix33f m33, const AABB& aabb)
+X_INLINE void OBB::set(const Matrix33f& m33, const AABB& aabb)
 {
 	orientation_ = Quatf(m33);
 	center_ =  aabb.center() * orientation_;
 	halfLVec_ = aabb.halfVec();
 }
 
-X_INLINE void OBB::set(Quatf quat, const AABB& aabb)
+X_INLINE void OBB::set(const Quatf& quat, const AABB& aabb)
 {
 	orientation_ = quat;
 	center_ =  aabb.center() * orientation_;
