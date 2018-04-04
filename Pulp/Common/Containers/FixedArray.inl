@@ -10,10 +10,10 @@ FixedArray<T, N>::FixedArray() :
 
 
 template<typename T, size_t N>
-FixedArray<T, N>::FixedArray(const T& initial) :
+FixedArray<T, N>::FixedArray(const T& initalval) :
 	size_(N)
 {
-	Mem::ConstructArray(begin(), N, initial);
+	Mem::ConstructArray(begin(), N, initalval);
 }
 
 
