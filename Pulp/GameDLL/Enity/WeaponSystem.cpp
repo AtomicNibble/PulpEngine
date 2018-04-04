@@ -274,7 +274,6 @@ namespace entity
 		if (pViewEffect) {
 			wpn.pFlashEmt->play(pViewEffect, false, false);
 		}
-		}
 
 		trainsitionToState(wpn, animator, anim, weapon::State::Fire, curTime, fireTime);
 	}
