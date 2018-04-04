@@ -1,4 +1,7 @@
 
+X_NAMESPACE_BEGIN(core)
+
+
 template<typename T, size_t N>
 FixedRingBuffer<T,N>::FixedRingBuffer() :
 	num_(0),
@@ -161,6 +164,9 @@ void FixedRingBuffer<T, N>::increment_head()
 {
 	++head_;
 	--num_;
-	if (head_ == N)
+	if (head_ == N) {
 		head_ = 0;
+	}
 }
+
+X_NAMESPACE_END

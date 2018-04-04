@@ -220,8 +220,9 @@ protected:
 };
 
 
+X_NAMESPACE_END
+
 #include "FixedRingBuffer.inl"
 
-X_NAMESPACE_END
 
 #endif // !X_CONTAINER_FIXED_RING_BUFFER_H_
