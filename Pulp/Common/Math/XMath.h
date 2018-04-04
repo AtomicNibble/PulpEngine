@@ -224,9 +224,14 @@ T bezierInterpRef(const T &a, const T &b, const T &c, const T &d, L t)
 template<typename T>
 T constrain(T val, T minVal, T maxVal)
 {
-	if (val < minVal) return minVal;
-	else if (val > maxVal) return maxVal;
-	else return val;
+	if (val < minVal) {
+		return minVal;
+	}
+	else if (val > maxVal) {
+		return maxVal;
+	}
+	
+	return val;
 }
 
 // Don Hatch's version of sin(x)/x, which is accurate for very small x.
