@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(sound)
 
 namespace AkResult
 {
-	using core::StackString<128, char> Description;
+	using Description = core::StackString<128, char>;
 
 	const char* ToString(AKRESULT res, Description& desc);
 }
