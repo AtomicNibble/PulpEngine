@@ -158,12 +158,12 @@ private:
 	int32_t	allocedSize_;
 };
 
+typedef XWindingT<WindingGlobalAlloc> XWinding;
 #define alloca16(numBytes) ((void *)((((uintptr_t)_alloca( (numBytes)+15 )) + 15) & ~15))
 
 #include "XWinding.inl"
 
 #undef alloca16
 
-typedef XWindingT<WindingGlobalAlloc> XWinding;
 
 #endif // !X_WINDING_H_

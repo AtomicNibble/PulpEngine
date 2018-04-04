@@ -106,11 +106,12 @@ public:
 };
 
 
-#include "XRect.inl"
-
 typedef RectT<int32_t>		Recti;
 typedef RectT<float32_t>	Rectf;
 typedef RectT<float64_t>	Rectd;
+
+
+#include "XRect.inl"
 
 
 #endif // !_X_MATH_RECT_H_

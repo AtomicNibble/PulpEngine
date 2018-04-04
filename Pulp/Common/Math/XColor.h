@@ -132,8 +132,6 @@ struct ColorT
 
 };
 
-#include "XColor.inl"
-
 // Operators
 template <typename T, typename Y> 
 inline ColorT<T> operator*(Y s, const ColorT<T>& c) { 
@@ -308,6 +306,9 @@ typedef ColorT<uint16_t>		Color16u;
 #define Col_Whitesmoke   Colorf( 0.961f, 0.961f, 0.961f )
 #define Col_Yellow   Colorf( 1.000f, 1.000f, 0.000f )
 #define Col_Yellowgreen   Colorf( 0.604f, 0.804f, 0.196f )
+
+
+#include "XColor.inl"
 
 
 #endif // !_X_MATH_COLOR_H_

@@ -14,10 +14,6 @@
 #include "XMatrixAffine2.h"
 
 
-#include <iomanip>
-
-
-
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Matrix44
 template< typename T >
@@ -265,11 +261,10 @@ public:
 
 };
 
-#include "XMatrix44.inl"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// Typedefs
 typedef Matrix44<float32_t>	 Matrix44f;
 typedef Matrix44<float64_t> Matrix44d;
+
+#include "XMatrix44.inl"
 
 #endif // _X_MATH_MATRIX44_H_

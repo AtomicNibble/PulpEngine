@@ -9,7 +9,6 @@
 #include "XMath.h"
 #include "XVector.h"
 
-#include <iomanip>
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Matrix22
@@ -174,12 +173,10 @@ public:
 
 };
 
-#include "XMatrix22.inl"
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// Typedefs
 typedef Matrix22<float32_t>	 Matrix22f;
 typedef Matrix22<float64_t> Matrix22d;
 
+
+#include "XMatrix22.inl"
 
 #endif // _X_MATH_MATRIX22_H_

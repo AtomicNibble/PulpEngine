@@ -47,10 +47,6 @@
 
 #include "XMath.h"
 
-static const float  DEFAULT_NEAR	= 0.25f;
-static const float  DEFAULT_FAR		= 1024.0f;
-static const float  DEFAULT_FOV		= toRadians(75.0f);
-
 //////////////////////////////////////////////////////////////////////
 
 #ifdef NEAR
@@ -66,6 +62,12 @@ static const float  DEFAULT_FOV		= toRadians(75.0f);
 #include "XPlane.h"
 #include "XMatrix.h"
 #include "XFrustum.h"
+
+
+static const float  DEFAULT_NEAR = 0.25f;
+static const float  DEFAULT_FAR = 1024.0f;
+static const float  DEFAULT_FOV = toRadians(75.0f);
+
 
 class XCamera : public XFrustum
 {

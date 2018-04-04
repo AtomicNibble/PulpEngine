@@ -199,10 +199,11 @@ public:
 
 };
 
-#include "XMatrix34.inl"
 
 typedef Matrix34<float32_t> Matrix34f;
 typedef Matrix34<float64_t> Matrix34d;
 
+
+#include "XMatrix34.inl"
 
 #endif // !_X_MATH_MATRIX_34_H_

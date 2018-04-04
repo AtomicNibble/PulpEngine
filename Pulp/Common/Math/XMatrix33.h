@@ -8,8 +8,6 @@
 #include "XMath.h"
 #include "XVector.h"
 
-#include <iomanip>
-
 #include "XMatrix34.h"
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -202,12 +200,12 @@ public:
 
 };
 
-#include "XMatrix33.inl"
 
-//////////////////////////////////////////////////////////////////////////////////////////////////////
-// Typedefs
 typedef Matrix33<float32_t>	 Matrix33f;
 typedef Matrix33<float64_t>  Matrix33d;
+
+
+#include "XMatrix33.inl"
 
 
 #endif // _X_MATH_MATRIX33_H_

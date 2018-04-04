@@ -6,7 +6,8 @@
 #include "XVector.h"
 
 
-class Ray {
+class Ray 
+{
 public:
 	Ray() {}
 	Ray(const Vec3f &aOrigin, const Vec3f &aDirection) : Origin_(aOrigin) { setDirection(aDirection); }

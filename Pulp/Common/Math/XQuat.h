@@ -147,7 +147,6 @@ private:
 	}
 };
 
-#include "XQuat.inl"
 
 template<typename T>
 inline Vec3<T> operator*(const Vec3<T> &vec, const Quat<T> &q)
@@ -163,5 +162,7 @@ inline Vec3<T> operator*(const Vec3<T> &vec, const Quat<T> &q)
 
 typedef Quat<float>		Quatf;
 typedef Quat<double>	Quatd;
+
+#include "XQuat.inl"
 
 #endif // !_X_MATH_QUAT_H_
