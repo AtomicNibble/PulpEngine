@@ -18,7 +18,7 @@ BinPackArguments: true
 BinPackParameters: true
 BraceWrapping:
   AfterClass:      true
-  AfterControlStatement: true
+  AfterControlStatement: false
   AfterEnum:       true
   AfterFunction:   true
   AfterNamespace:  true
@@ -68,6 +68,7 @@ MacroBlockBegin: ''
 MacroBlockEnd: ''
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: All
+# ObjCBinPackProtocolList: Never
 ObjCSpaceBeforeProtocolList: true
 ObjCBlockIndentWidth: 4
 ObjCSpaceAfterProperty: true
