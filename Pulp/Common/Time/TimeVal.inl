@@ -54,35 +54,35 @@ X_INLINE void TimeVal::SetSeconds(const TimeType indwSec)
 
 X_INLINE void TimeVal::SetMilliSeconds(const int32_t iniMilliSec)
 {
-	const float scale = (PRECISION / 1000.f);
+	constexpr const float scale = (PRECISION / 1000.f);
 
 	time_ = static_cast<TimeType>(iniMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const double indMilliSec)
 {
-	const double scale = (PRECISION / 1000.0);
+	constexpr const double scale = (PRECISION / 1000.0);
 
 	time_ = static_cast<TimeType>(indMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const TimeType indwMilliSec)
 {
-	const double scale = (PRECISION / 1000.0);
+	constexpr const double scale = (PRECISION / 1000.0);
 
 	time_ = static_cast<TimeType>(indwMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMicroSeconds(const TimeType indwMicroSec)
 {
-	const double scale = (PRECISION / (1000.0 * 1000.0));
+	constexpr const double scale = (PRECISION / (1000.0 * 1000.0));
 
 	time_ = static_cast<TimeType>(indwMicroSec * scale);
 }
 
 X_INLINE void TimeVal::SetNanoSeconds(const TimeType indwNanoSec)
 {
-	const double scale = (PRECISION / (1000.0 * 1000.0 * 1000.0));
+	constexpr const double scale = (PRECISION / (1000.0 * 1000.0 * 1000.0));
 
 	time_ = static_cast<TimeType>(indwNanoSec * scale);
 }
