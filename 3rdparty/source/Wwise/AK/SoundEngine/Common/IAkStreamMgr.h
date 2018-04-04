@@ -199,7 +199,7 @@ namespace AK
     {
     protected:
         /// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkStreamProfile(){}
+		virtual ~IAkStreamProfile()= default;
 
 	public:
 		/// Returns the stream's record (once).
@@ -235,7 +235,7 @@ namespace AK
     {
     protected:
     	/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkDeviceProfile(){}
+		virtual ~IAkDeviceProfile()= default;
 
 	public:
 
@@ -291,7 +291,7 @@ namespace AK
     {
     protected:
     	/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkStreamMgrProfile(){}
+		virtual ~IAkStreamMgrProfile()= default;
 		
 	public:
         /// Start profile monitoring.
@@ -332,7 +332,7 @@ namespace AK
     {
     protected:
        	/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkStdStream(){}
+		virtual ~IAkStdStream()= default;
 
 	public:
         /// \name Stream management and settings.
@@ -463,7 +463,7 @@ namespace AK
     {
     protected:
     	/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkAutoStream(){}
+		virtual ~IAkAutoStream()= default;
 
 	public:
         /// \name Stream management, settings access, and run-time change.
@@ -629,7 +629,7 @@ namespace AK
     {
     protected:
     	/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkStreamMgr(){}
+		virtual ~IAkStreamMgr()= default;
 		
 	public:
         /// Global access to singleton.

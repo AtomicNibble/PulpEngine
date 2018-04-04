@@ -22,7 +22,7 @@ struct ITimer
 {
 	typedef Timer Timer;
 
-	virtual ~ITimer() {};
+	virtual ~ITimer() = default;
 
 	virtual bool init(ICore* pCore) X_ABSTRACT;
 	virtual void reset(void) X_ABSTRACT;

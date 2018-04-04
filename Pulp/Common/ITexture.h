@@ -236,7 +236,7 @@ struct ITextureFmt
 {
 	typedef core::Array<uint8_t> DataVec;
 
-	virtual ~ITextureFmt() {}
+	virtual ~ITextureFmt() = default;
 
 	virtual const char* getExtension(void) const X_ABSTRACT;
 	virtual ImgFileFormat::Enum getSrcFmt(void) const X_ABSTRACT;

@@ -103,7 +103,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkGameObjectPluginInfo(){}
+		virtual ~IAkGameObjectPluginInfo()= default;
 
 	public:
 
@@ -208,7 +208,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkVoicePluginInfo(){}
+		virtual ~IAkVoicePluginInfo()= default;
 
 	public:
 
@@ -231,7 +231,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkPluginContextBase(){}
+		virtual ~IAkPluginContextBase()= default;
 
 	public:
 
@@ -315,7 +315,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkEffectPluginContext(){}
+		virtual ~IAkEffectPluginContext()= default;
 
 	public:
 
@@ -336,7 +336,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkSourcePluginContext(){}
+		virtual ~IAkSourcePluginContext()= default;
 
 	public:
 
@@ -359,7 +359,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkMixerPluginContext(){}
+		virtual ~IAkMixerPluginContext()= default;
 
 	public:
 
@@ -512,7 +512,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkPluginParam(){}
+		virtual ~IAkPluginParam()= default;
 
 	public:
 		/// Create a duplicate of the parameter node instance in its current state.
@@ -583,7 +583,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkPlugin(){}
+		virtual ~IAkPlugin()= default;
 
 	public:
 		/// Release the resources upon termination of the plug-in.
@@ -650,7 +650,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkEffectPlugin(){}
+		virtual ~IAkEffectPlugin()= default;
 
 	public:
 		/// Software effect plug-in initialization. Prepares the effect for data processing, allocates memory and sets up the initial conditions. 
@@ -759,7 +759,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkMixerInputContext(){}
+		virtual ~IAkMixerInputContext()= default;
 
 	public:
 
@@ -896,7 +896,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkSinkPluginContext(){}
+		virtual ~IAkSinkPluginContext()= default;
 
 	public:
 		
@@ -983,7 +983,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkSourcePlugin(){}
+		virtual ~IAkSourcePlugin()= default;
 
 	public:
 		/// Source plug-in initialization. Gets the plug-in ready for data processing, allocates memory and sets up the initial conditions. 

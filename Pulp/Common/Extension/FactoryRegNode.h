@@ -10,8 +10,7 @@ extern XRegFactoryNode* g_pHeadToRegFactories;
 struct XRegFactoryNode
 {
 	XRegFactoryNode()
-	{
-	}
+	= default;
 
 	XRegFactoryNode(IEngineFactory* pFactory) :
 		pFactory(pFactory),

@@ -93,7 +93,7 @@ namespace Literals
 
 struct ISound : public core::IEngineSysBase
 {
-	virtual ~ISound(){};
+	virtual ~ISound()= default;
 
 	virtual bool asyncInitFinalize(void) X_ABSTRACT;
 

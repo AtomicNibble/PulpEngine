@@ -310,7 +310,7 @@ struct MaterialTech;
 
 struct IMaterialManager : public core::IAssetLoader
 {
-	virtual ~IMaterialManager(){}
+	virtual ~IMaterialManager()= default;
 
 	// returns null if not found, ref count unaffected
 	virtual Material* findMaterial(const char* pMtlName) const X_ABSTRACT;

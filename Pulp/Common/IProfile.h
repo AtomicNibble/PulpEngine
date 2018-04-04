@@ -15,7 +15,7 @@ namespace profiler
 
 	struct IProfiler
 	{
-		virtual ~IProfiler(){};
+		virtual ~IProfiler()= default;
 
 		virtual void AddProfileData(XProfileData* pData) X_ABSTRACT;
 

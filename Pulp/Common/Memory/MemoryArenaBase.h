@@ -26,7 +26,7 @@ public:
 #endif // !X_COMPILER_CLANG
 
 public:
-	virtual ~MemoryArenaBase(void) {}
+	virtual ~MemoryArenaBase(void) = default;
 
 	/// The ID of an allocation is a human-readable string that is used to identify an allocation.
 	/// typeName is a human-readable string that denotes the type of an allocation.

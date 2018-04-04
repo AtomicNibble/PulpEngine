@@ -150,7 +150,7 @@ namespace AK
 		{
 		protected:
 			/// Virtual destructor on interface to avoid warnings.
-			virtual ~IAkLowLevelIOHook(){}
+			virtual ~IAkLowLevelIOHook()= default;
 
 		public:
 			/// Cleans up a file.
@@ -210,7 +210,7 @@ namespace AK
 		{
 		protected:
 			/// Virtual destructor on interface to avoid warnings.
-			virtual ~IAkIOHookBlocking(){}
+			virtual ~IAkIOHookBlocking()= default;
 
 		public:
 
@@ -270,7 +270,7 @@ namespace AK
 		{
 		protected:
 			/// Virtual destructor on interface to avoid warnings.
-			virtual ~IAkIOHookDeferred(){}
+			virtual ~IAkIOHookDeferred()= default;
 
 		public:
 
@@ -379,7 +379,7 @@ namespace AK
 		{
 		protected:
 			/// Virtual destructor on interface to avoid warnings.
-			virtual ~IAkFileLocationResolver(){}
+			virtual ~IAkFileLocationResolver()= default;
 
 		public:
 

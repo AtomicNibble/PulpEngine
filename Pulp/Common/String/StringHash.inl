@@ -63,11 +63,9 @@ X_INLINE StrHash::StrHash() :
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-X_INLINE StrHash::StrHash(const StrHash& oth) :
-	hash_(oth.hash_)
-{
-
-}
+X_INLINE StrHash::StrHash(const StrHash& oth) 
+	
+= default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 template <typename T>

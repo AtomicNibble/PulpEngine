@@ -50,7 +50,7 @@ public:
 
 struct XHalf2
 {
-	XHalf2() {}
+	XHalf2() = default;
 	XHalf2(XHalf x, XHalf y) :
 		x(x), y(y)
 	{
@@ -68,11 +68,7 @@ struct XHalf2
 	}
 
 	XHalf2& operator=(const XHalf2& rhs)
-	{
-		x = rhs.x;
-		y = rhs.y;
-		return *this;
-	}
+	= default;
 
 
 	static XHalf2 compress(float x, float y)
@@ -94,7 +90,7 @@ struct XHalf2
 
 struct XHalf4
 {
-	XHalf4() {}
+	XHalf4() = default;
 	XHalf4(XHalf x, XHalf y, XHalf z, XHalf w) :
 		x(x), y(y), z(z), w(w) 
 	{
@@ -116,13 +112,7 @@ struct XHalf4
 	}
 
 	XHalf4& operator=(const XHalf4& rhs)
-	{
-		x = rhs.x;
-		y = rhs.y;
-		z = rhs.z;
-		w = rhs.w;
-		return *this;
-	}
+	= default;
 
 	Vec4f decompress(void) {
 		return Vec4f(

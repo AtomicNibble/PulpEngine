@@ -308,7 +308,7 @@ typedef int32_t TexID;
 
 struct IDeviceTexture
 {
-	virtual ~IDeviceTexture() {};
+	virtual ~IDeviceTexture() = default;
 
 	// the resource id.
 	virtual const TexID getTexID(void) const X_ABSTRACT;
@@ -333,7 +333,7 @@ struct IDeviceTexture
 
 struct IPixelBuffer : public IDeviceTexture
 {
-	virtual ~IPixelBuffer() {};
+	virtual ~IPixelBuffer() = default;
 
 	virtual PixelBufferType::Enum getBufferType(void) const X_ABSTRACT;
 };
@@ -396,7 +396,7 @@ typedef Flags<CpuAccess> CpuAccessFlags;
 
 struct IRender
 {
-	virtual ~IRender() {};
+	virtual ~IRender() = default;
 
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;

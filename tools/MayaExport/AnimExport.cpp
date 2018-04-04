@@ -75,7 +75,7 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
 	{
 		MayaUtil::MayaPrintError("Anim name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
 			anim::ANIM_MAX_NAME_LENGTH, name_.length());
-		return MS::kFailure;;
+		return MS::kFailure;
 	}
 
 

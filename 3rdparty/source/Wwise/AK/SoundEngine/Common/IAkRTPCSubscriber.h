@@ -26,7 +26,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkRTPCSubscriber(){}
+		virtual ~IAkRTPCSubscriber()= default;
 
 	public:
 		/// This function will be called to notify the subscriber every time a selected value is entered or modified

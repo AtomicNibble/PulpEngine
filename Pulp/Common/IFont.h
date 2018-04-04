@@ -38,7 +38,7 @@ struct IFont;
 
 struct IFontSys : public core::IEngineSysBase
 {
-	virtual ~IFontSys(){}
+	virtual ~IFontSys()= default;
 	
 	// finish any async init tasks for all fonts.
 	virtual bool asyncInitFinalize(void) X_ABSTRACT;
@@ -133,7 +133,7 @@ typedef Flags<FontFlag> FontFlags;
 //  binary can still be multi-byte also.
 struct IFont
 {
-	virtual ~IFont(){};
+	virtual ~IFont()= default;
 	virtual void Release(void) X_ABSTRACT;	// release the object
 	virtual void Free(void) X_ABSTRACT;		// free internal memory
 	virtual void FreeBuffers(void) X_ABSTRACT;		// free texture buffers

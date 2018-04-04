@@ -405,7 +405,7 @@ struct InputSymbol
 // inherit from this if you want to register from input events.
 struct IInputEventListner
 {
-	virtual ~IInputEventListner(){}
+	virtual ~IInputEventListner()= default;
 
 	virtual bool OnInputEvent(const InputEvent& event) X_ABSTRACT;
 	virtual bool OnInputEventChar(const InputEvent& event) { X_UNUSED(event); return false; };
@@ -419,7 +419,7 @@ struct IInputDevice
 	typedef core::Array<InputEvent>	InputEventArr;
 
 public:
-	virtual ~IInputDevice() {}
+	virtual ~IInputDevice() = default;
 
 	virtual bool Init(void) X_ABSTRACT;
 	virtual void PostInit(void) X_ABSTRACT;
@@ -445,7 +445,7 @@ struct IInput
 {
 	typedef Flags<ModifiersMasks> ModifierFlags;
 
-	virtual ~IInput(){}
+	virtual ~IInput()= default;
 
 
 	// Registers new input events listener.

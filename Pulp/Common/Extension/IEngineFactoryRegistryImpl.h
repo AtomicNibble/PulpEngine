@@ -16,5 +16,5 @@ struct IEngineFactoryRegistryImpl : public IEngineFactoryRegistry
 
 protected:
 	// prevent explicit destruction from client side (delete, shared_ptr, etc)
-	virtual ~IEngineFactoryRegistryImpl() {}
+	virtual ~IEngineFactoryRegistryImpl() = default;
 };

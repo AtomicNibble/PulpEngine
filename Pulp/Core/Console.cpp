@@ -2074,7 +2074,7 @@ void XConsole::draw(core::FrameTimeData& time)
 	if (cursor_.curTime > cursor_.displayTime)
 	{
 		cursor_.draw = !cursor_.draw; // toggle it
-		cursor_.curTime = TimeVal(0ll);; // reset
+		cursor_.curTime = TimeVal(0ll); // reset
 	}
 
 	DrawBuffer();

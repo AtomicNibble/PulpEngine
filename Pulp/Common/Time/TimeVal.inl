@@ -25,10 +25,7 @@ X_INLINE TimeVal::TimeVal(const TimeVal &inValue)
 }
 
 X_INLINE TimeVal& TimeVal::operator=(const TimeVal &inRhs)
-{
-	time_ = inRhs.time_;
-	return *this;
-};
+= default;
 
 X_INLINE float TimeVal::GetSeconds(void) const
 {

@@ -14,7 +14,7 @@ struct ISerialize
 	virtual bool SLoad(XFile* pFile) X_ABSTRACT;
 
 protected:
-	virtual ~ISerialize() {}
+	virtual ~ISerialize() = default;
 };
 
 X_NAMESPACE_END

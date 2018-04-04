@@ -37,7 +37,7 @@ struct IConverterHost
 	typedef core::Array<uint8_t> DataArr;
 	typedef core::string ConvertArgs;
 
-	virtual ~IConverterHost() {}
+	virtual ~IConverterHost() = default;
 	
 	virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_ABSTRACT;
 	virtual bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_ABSTRACT;
@@ -63,7 +63,7 @@ struct IConverter
 	typedef core::string ConvertArgs;
 	typedef core::Path<char> OutPath;
 
-	virtual ~IConverter() {}
+	virtual ~IConverter() = default;
 
 	// gets the file extension this converter outputs with.
 	virtual const char* getOutExtension(void) const X_ABSTRACT;

@@ -315,7 +315,7 @@ struct IShaderPermatation
 	typedef LineraArray<Sampler> SamplerArr;
 	typedef LineraArray<Texture> TexutreArr;
 
-	virtual ~IShaderPermatation() {}
+	virtual ~IShaderPermatation() = default;
 
 	virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
 	virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
@@ -327,7 +327,7 @@ struct IShaderPermatation
 
 struct IShaderTech
 {
-	virtual ~IShaderTech() {}
+	virtual ~IShaderTech() = default;
 
 	virtual IShaderPermatation* getPermatation(VertexFormat::Enum vertexFmt) X_ABSTRACT;
 
@@ -335,7 +335,7 @@ struct IShaderTech
 
 struct IShader
 {
-	virtual ~IShader() {}
+	virtual ~IShader() = default;
 
 	virtual const core::string& getName(void) const X_ABSTRACT;
 
@@ -380,7 +380,7 @@ X_DECLARE_FLAG_OPERATORS(CompileFlags);
 
 struct IHWShader
 {
-	virtual ~IHWShader() {}
+	virtual ~IHWShader() = default;
 
 
 };
@@ -389,7 +389,7 @@ struct IHWShader
 
 struct IShaderSource
 {
-	virtual ~IShaderSource() {}
+	virtual ~IShaderSource() = default;
 
 	virtual ILFlags getILFlags(void) const X_ABSTRACT;
 

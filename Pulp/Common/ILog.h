@@ -34,7 +34,7 @@ class LoggerBase;
 
 struct ILog
 {
-	virtual ~ILog(){};
+	virtual ~ILog()= default;
 
 	virtual void Init(void) X_ABSTRACT;
 	virtual void ShutDown(void) X_ABSTRACT;

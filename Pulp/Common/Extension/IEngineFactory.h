@@ -7,7 +7,7 @@ struct IEngineUnknown;
 struct IEngineFactory
 {
 protected:
-	virtual ~IEngineFactory() {};
+	virtual ~IEngineFactory() = default;
 public:
 	virtual const char* GetName(void) const X_ABSTRACT;
 	virtual const EngineGUID& GetGUID(void) const X_ABSTRACT;

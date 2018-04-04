@@ -406,7 +406,7 @@ X_INLINE Quat<T> Quat<T>::slerpShortestUnenforced(T t, const Quat<T> &end) const
 	Quat<T> st = *this + end;
 	T lengthS = math<T>::sqrt(st.dot(st));
 
-	T a = 2 * math<T>::atan2(lengthD, lengthS);;
+	T a = 2 * math<T>::atan2(lengthD, lengthS);
 	T s = 1 - t;
 
 	Quat<T> q(*this * (sinx_over_x(s * a) / sinx_over_x(a) * s) +

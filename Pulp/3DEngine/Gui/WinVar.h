@@ -185,7 +185,7 @@ namespace gui
 			XWinVar::Init(_name, win);
 		}
 		virtual void Set(const char* val) X_OVERRIDE {
-			value = ::atoi(val);;
+			value = ::atoi(val);
 		}
 		virtual void Update(void) X_OVERRIDE {
 			//		const char* s = getName();

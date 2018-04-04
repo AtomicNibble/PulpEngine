@@ -331,7 +331,7 @@ public:
 		phi = 0;
 	}
 	/// Destructor.
-	~AkEmitterListenerPair() {}
+	~AkEmitterListenerPair() = default;
 
 	/// Get distance.
 	inline AkReal32 Distance() const { return r; }

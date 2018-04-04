@@ -188,7 +188,7 @@ X_ENSURE_SIZE(ScriptValue, 24);
 
 struct IScript
 {
-	virtual ~IScript() {}
+	virtual ~IScript() = default;
 
 
 
@@ -198,7 +198,7 @@ struct IScriptSys :
 	public core::IEngineSysBase,
 	public core::IAssetLoader
 {
-	virtual ~IScriptSys() {};
+	virtual ~IScriptSys() = default;
 
 	virtual void Update(void) X_ABSTRACT;
 
@@ -258,7 +258,7 @@ struct IScriptSys :
 
 struct IFunctionHandler
 {
-	virtual ~IFunctionHandler() {}
+	virtual ~IFunctionHandler() = default;
 
 	virtual IScriptSys* getIScriptSystem(void) X_ABSTRACT;
 
@@ -306,7 +306,7 @@ struct IFunctionHandler
 
 struct IScriptTableDumpSink
 {
-	virtual ~IScriptTableDumpSink(){}
+	virtual ~IScriptTableDumpSink() = default;
 	virtual void onElementFound(const char* pName, Type::Enum type) X_ABSTRACT;
 	virtual void onElementFound(int idx, Type::Enum type) X_ABSTRACT;
 };
@@ -343,7 +343,7 @@ struct IScriptTable
 
 public:
 
-	virtual ~IScriptTable(){}
+	virtual ~IScriptTable() = default;
 
 	virtual IScriptSys* getIScriptSystem(void) const X_ABSTRACT;
 
@@ -430,7 +430,7 @@ struct IScriptBinds
 {
 	typedef IScriptTable::ScriptFunction ScriptFunction;
 
-	virtual ~IScriptBinds() {}
+	virtual ~IScriptBinds() = default;
 
 	virtual void setGlobalName(const char* pGlobalName) X_ABSTRACT;
 	virtual void setParamOffset(int paramIdOffset) X_ABSTRACT;

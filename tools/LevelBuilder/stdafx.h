@@ -64,7 +64,7 @@ class WindingAlloc
 public:
 	X_INLINE Vec5f* alloc(size_t num)
 	{
-		return X_NEW_ARRAY(Vec5f, num, g_windingPointsArena, "WindingRealoc");;
+		return X_NEW_ARRAY(Vec5f, num, g_windingPointsArena, "WindingRealoc");
 	}
 
 	X_INLINE void free(Vec5f* pPoints)

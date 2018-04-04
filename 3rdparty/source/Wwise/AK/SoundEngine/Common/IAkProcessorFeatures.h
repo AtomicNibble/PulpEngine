@@ -29,7 +29,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkProcessorFeatures(){}
+		virtual ~IAkProcessorFeatures()= default;
 
 	public:
 		/// Query for specific SIMD instruction set support. See AkSIMDProcessorSupport for options.

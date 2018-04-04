@@ -107,7 +107,7 @@ X_DECLARE_ENUM(CoreEvent)(
 //	 Interface used for getting notified when a system event occurs.
 struct ICoreEventListener
 {
-	virtual ~ICoreEventListener(){}
+	virtual ~ICoreEventListener()= default;
 	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_ABSTRACT;
 };
 
@@ -115,7 +115,7 @@ struct ICoreEventListener
 //	 Structure used for getting notified when a system event occurs.
 struct ICoreEventDispatcher
 {
-	virtual ~ICoreEventDispatcher(){}
+	virtual ~ICoreEventDispatcher()= default;
 	virtual bool RegisterListener(ICoreEventListener* pListener) X_ABSTRACT;
 	virtual bool RemoveListener(ICoreEventListener* pListener) X_ABSTRACT;
 
@@ -124,7 +124,7 @@ struct ICoreEventDispatcher
 
 struct IAssertHandler
 {
-	virtual ~IAssertHandler() {}
+	virtual ~IAssertHandler() = default;
 	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_ABSTRACT;
 	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_ABSTRACT;
 };
@@ -321,7 +321,7 @@ protected:
 
 struct ICore
 {
-	virtual ~ICore(){}
+	virtual ~ICore()= default;
 
 	virtual bool Init(const SCoreInitParams &startupParams) X_ABSTRACT;
 	virtual bool InitAsyncWait(void) X_ABSTRACT; // call this if init fails, before shutting down.

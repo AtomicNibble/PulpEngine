@@ -39,7 +39,7 @@ namespace fx {
 
 struct I3DEngine : public core::IEngineSysBase
 {
-	virtual ~I3DEngine(){};
+	virtual ~I3DEngine()= default;
 
 	// finish any async init tasks for all fonts.
 	virtual bool asyncInitFinalize(void) X_ABSTRACT;

@@ -25,7 +25,7 @@ namespace AK
 	{
 	protected:
 		/// Virtual destructor on interface to avoid warnings.
-		virtual ~IAkPluginMemAlloc(){}
+		virtual ~IAkPluginMemAlloc()= default;
 
 	public:
 		

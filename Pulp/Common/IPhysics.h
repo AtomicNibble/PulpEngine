@@ -198,7 +198,7 @@ struct IJoint
 		Actor1
 	};
 
-	virtual ~IJoint() {}
+	virtual ~IJoint() = default;
 
 	virtual void setBreakForce(float32_t force, float32_t torque) X_ABSTRACT;
 	virtual void getBreakForce(float32_t& force, float32_t& torque) const X_ABSTRACT;
@@ -375,7 +375,7 @@ struct ICharacterController
 	typedef CharacterColFlag ColFlag;
 	typedef CharacterColFlags ColFlags;
 
-	virtual ~ICharacterController() {}
+	virtual ~ICharacterController() = default;
 
 	virtual ControllerDesc::ShapeType getType(void) const X_ABSTRACT;
 
@@ -432,7 +432,7 @@ public:
 	typedef Flags<CookFlag> CookFlags;
 	typedef core::Array<uint8_t> DataArr;
 
-	virtual ~IPhysicsCooking() {}
+	virtual ~IPhysicsCooking() = default;
 
 	virtual bool cookingSupported(void) const X_ABSTRACT;
 	virtual bool setCookingMode(CookingMode::Enum mode) X_ABSTRACT;
@@ -447,7 +447,7 @@ public:
 
 struct IPhysLib : public IConverter
 {
-	virtual ~IPhysLib() {}
+	virtual ~IPhysLib() = default;
 
 	virtual IPhysicsCooking* getCooking(void) X_ABSTRACT;
 };
@@ -602,7 +602,7 @@ struct OverlapHit : public QueryHit
 
 struct SweepHit : public LocationHit
 {
-	X_INLINE SweepHit() {}
+	X_INLINE SweepHit() = default;
 
 	uint32_t padTo16Bytes;
 };
@@ -835,7 +835,7 @@ struct QueryMemory
 
 struct IBatchedQuery
 {
-	virtual ~IBatchedQuery() {}
+	virtual ~IBatchedQuery() = default;
 
 	virtual	void execute(void) X_ABSTRACT;
 	virtual	void release(void) X_ABSTRACT;
@@ -887,7 +887,7 @@ struct IScene
 {
 	typedef ScopedLock ScopedLock;
 
-	virtual ~IScene() {}
+	virtual ~IScene() = default;
 
 
 	// some runtime tweaks.
@@ -977,7 +977,7 @@ struct IPhysics
 {
 	typedef core::Array<uint8_t> DataArr;
 
-	virtual ~IPhysics() {}
+	virtual ~IPhysics() = default;
 
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;

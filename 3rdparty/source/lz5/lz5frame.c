@@ -445,7 +445,7 @@ size_t LZ5F_compressBound(size_t srcSize, const LZ5F_preferences_t* preferencesP
         size_t blockInfo = 4;   /* default, without block CRC option */
         size_t frameEnd = 4 + (prefsPtr->frameInfo.contentChecksumFlag*4);
 
-        return (blockInfo * nbBlocks) + (blockSize * (nbBlocks-1)) + lastBlockSize + frameEnd;;
+        return (blockInfo * nbBlocks) + (blockSize * (nbBlocks-1)) + lastBlockSize + frameEnd;
     }
 }
 

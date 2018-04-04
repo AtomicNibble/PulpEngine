@@ -33,7 +33,7 @@ public:
 	X_INLINE Recti getRect(void);
 	X_INLINE const Recti& getRect(void) const;
 	X_INLINE float getZNear(void) const;
-	X_INLINE float getZFar(void) const;;
+	X_INLINE float getZFar(void) const;
 
 private:
 	Recti view_;

@@ -16,7 +16,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <array>
 
 // Util
-#include <util\UserLiterals.h>
+#include <Util\UserLiterals.h>
 #include <Util\ClassMacros.h>
 #include <Util\NamespaceMacros.h>
 #include <Util\GenericUtil.h>

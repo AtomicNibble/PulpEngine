@@ -78,7 +78,7 @@ namespace Compression
 
 	struct ICompressor
 	{
-		virtual ~ICompressor() {}
+		virtual ~ICompressor() = default;
 		
 		static Algo::Enum getAlgo(core::span<const uint8_t> data) {
 			X_ASSERT(data.length() >= sizeof(BufferHdr), "Buffer is too small to contain BufferHdr")(sizeof(BufferHdr), data.length());

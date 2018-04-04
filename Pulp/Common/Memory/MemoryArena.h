@@ -84,19 +84,19 @@ public:
 		X_MEM_HUMAN_IDS_CB(const char* typeName) 
 		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo)) X_FINAL;
 
-	virtual void free(void* ptr) X_FINAL;
-	virtual void free(void* ptr, size_t size) X_FINAL;
+	void free(void* ptr) X_FINAL;
+	void free(void* ptr, size_t size) X_FINAL;
 
-	virtual size_t getSize(void* ptr) X_FINAL;
+	size_t getSize(void* ptr) X_FINAL;
 
-	virtual size_t usableSize(void* ptr) const X_FINAL;
+	size_t usableSize(void* ptr) const X_FINAL;
 
 	/// Returns statistics regarding the allocations made by the memory arena.
-	virtual MemoryArenaStatistics getStatistics(void) const X_FINAL;
+	MemoryArenaStatistics getStatistics(void) const X_FINAL;
 
-	virtual MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_FINAL;
+	MemoryAllocatorStatistics getAllocatorStatistics(bool children = false) const X_FINAL;
 
-	virtual bool isThreadSafe(void) const X_FINAL;
+	bool isThreadSafe(void) const X_FINAL;
 
 	/// Returns the memory requirement for an allocation of \a size, taking into account bounds checking and other potential overhead.
 	static constexpr inline size_t getMemoryRequirement(size_t size);

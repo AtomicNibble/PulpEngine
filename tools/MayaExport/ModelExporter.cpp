@@ -181,7 +181,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 	{
 		MayaUtil::MayaPrintError("Model name is too long. MAX: %" PRIu32 ", provided: %" PRIuS,
 			model::MODEL_MAX_NAME_LENGTH, name_.length());
-		return MS::kFailure;;
+		return MS::kFailure;
 	}
 
 	{

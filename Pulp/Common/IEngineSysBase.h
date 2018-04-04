@@ -5,7 +5,7 @@ X_NAMESPACE_BEGIN(core)
 
 struct IEngineSysBase
 {
-	virtual ~IEngineSysBase() {};
+	virtual ~IEngineSysBase() = default;
 
 	virtual void registerVars(void) X_ABSTRACT;
 	virtual void registerCmds(void) X_ABSTRACT;
