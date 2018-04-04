@@ -58,6 +58,7 @@ X_INLINE void TimeVal::SetMilliSeconds(const int32_t iniMilliSec)
 
 	time_ = static_cast<TimeType>(iniMilliSec * scale);
 }
+
 X_INLINE void TimeVal::SetMilliSeconds(const double indMilliSec)
 {
 	const double scale = (PRECISION / 1000);
