@@ -695,19 +695,19 @@ void IPrimativeContext::drawAABB(const AABB& aabb, bool solid, Color8u col)
 
 void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
 {
-	const auto& or = obb.orientation();
+	const auto& orien = obb.orientation();
 	const auto& pos = obb.center();
 	const auto& max = obb.halfVec();
 	auto min = -obb.halfVec();
 
-	Vec3f xyz((or *Vec3f(min.x, min.y, min.z)) + pos);
-	Vec3f xyZ((or *Vec3f(min.x, min.y, max.z)) + pos);
-	Vec3f xYz((or *Vec3f(min.x, max.y, min.z)) + pos);
-	Vec3f xYZ((or *Vec3f(min.x, max.y, max.z)) + pos);
-	Vec3f Xyz((or *Vec3f(max.x, min.y, min.z)) + pos);
-	Vec3f XyZ((or *Vec3f(max.x, min.y, max.z)) + pos);
-	Vec3f XYz((or *Vec3f(max.x, max.y, min.z)) + pos);
-	Vec3f XYZ((or *Vec3f(max.x, max.y, max.z)) + pos);
+	Vec3f xyz((orien *Vec3f(min.x, min.y, min.z)) + pos);
+	Vec3f xyZ((orien *Vec3f(min.x, min.y, max.z)) + pos);
+	Vec3f xYz((orien *Vec3f(min.x, max.y, min.z)) + pos);
+	Vec3f xYZ((orien *Vec3f(min.x, max.y, max.z)) + pos);
+	Vec3f Xyz((orien *Vec3f(max.x, min.y, min.z)) + pos);
+	Vec3f XyZ((orien *Vec3f(max.x, min.y, max.z)) + pos);
+	Vec3f XYz((orien *Vec3f(max.x, max.y, min.z)) + pos);
+	Vec3f XYZ((orien *Vec3f(max.x, max.y, max.z)) + pos);
 
 	if (!solid)
 	{
@@ -866,19 +866,19 @@ void IPrimativeContext::drawOBB(const OBB& obb, bool solid, Color8u col)
 
 void IPrimativeContext::drawOBB(const OBB& obb, const Vec3f& offset, bool solid, Color8u col)
 {
-	const auto& or = obb.orientation();
+	const auto& orien = obb.orientation();
 	const auto& max = obb.halfVec();
 	auto min = -obb.halfVec();
 	auto pos = obb.center() + offset;
 
-	Vec3f xyz((or *Vec3f(min.x, min.y, min.z)) + pos);
-	Vec3f xyZ((or *Vec3f(min.x, min.y, max.z)) + pos);
-	Vec3f xYz((or *Vec3f(min.x, max.y, min.z)) + pos);
-	Vec3f xYZ((or *Vec3f(min.x, max.y, max.z)) + pos);
-	Vec3f Xyz((or *Vec3f(max.x, min.y, min.z)) + pos);
-	Vec3f XyZ((or *Vec3f(max.x, min.y, max.z)) + pos);
-	Vec3f XYz((or *Vec3f(max.x, max.y, min.z)) + pos);
-	Vec3f XYZ((or *Vec3f(max.x, max.y, max.z)) + pos);
+	Vec3f xyz((orien *Vec3f(min.x, min.y, min.z)) + pos);
+	Vec3f xyZ((orien *Vec3f(min.x, min.y, max.z)) + pos);
+	Vec3f xYz((orien *Vec3f(min.x, max.y, min.z)) + pos);
+	Vec3f xYZ((orien *Vec3f(min.x, max.y, max.z)) + pos);
+	Vec3f Xyz((orien *Vec3f(max.x, min.y, min.z)) + pos);
+	Vec3f XyZ((orien *Vec3f(max.x, min.y, max.z)) + pos);
+	Vec3f XYz((orien *Vec3f(max.x, max.y, min.z)) + pos);
+	Vec3f XYZ((orien *Vec3f(max.x, max.y, max.z)) + pos);
 
 	if (!solid)
 	{
