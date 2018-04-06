@@ -342,6 +342,8 @@ char XKeyboard::Event2Char(const InputEvent& event)
                 return '8';
             case KeyId::NUMPAD_9:
                 return '9';
+            default:
+                break;
         }
     }
 
