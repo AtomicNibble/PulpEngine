@@ -8,6 +8,8 @@ class Anim;
 
 struct IAnimManager : public core::IAssetLoader
 {
+    using core::IAssetLoader::waitForLoad;
+
     virtual ~IAnimManager() = default;
 
     // returns null if not found, ref count unaffected

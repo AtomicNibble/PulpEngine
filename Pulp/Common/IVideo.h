@@ -27,6 +27,8 @@ struct IVideo
 struct IVideoSys : public core::IEngineSysBase
     , public core::IAssetLoader
 {
+    using core::IAssetLoader::waitForLoad;
+
     virtual ~IVideoSys() = default;
 
     virtual void update(const core::FrameTimeData& frameTimeInfo) X_ABSTRACT;

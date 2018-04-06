@@ -182,6 +182,8 @@ namespace fx
 
     struct IEffectManager : public core::IAssetLoader
     {
+        using core::IAssetLoader::waitForLoad;
+
         virtual ~IEffectManager() = default;
 
         virtual Effect* findEffect(const char* pName) const X_ABSTRACT;

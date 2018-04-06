@@ -8,6 +8,8 @@ class XModel;
 
 struct IModelManager : public core::IAssetLoader
 {
+    using core::IAssetLoader::waitForLoad;
+
     virtual ~IModelManager() = default;
 
     // returns null if not found, ref count unaffected

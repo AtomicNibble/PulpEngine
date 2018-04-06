@@ -225,6 +225,8 @@ struct IScript
 struct IScriptSys : public core::IEngineSysBase
     , public core::IAssetLoader
 {
+    using core::IAssetLoader::waitForLoad;
+
     virtual ~IScriptSys() = default;
 
     virtual void Update(void) X_ABSTRACT;

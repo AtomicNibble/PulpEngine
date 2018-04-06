@@ -291,6 +291,8 @@ struct MaterialTech;
 
 struct IMaterialManager : public core::IAssetLoader
 {
+    using core::IAssetLoader::waitForLoad;
+
     virtual ~IMaterialManager() = default;
 
     // returns null if not found, ref count unaffected
