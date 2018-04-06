@@ -11,141 +11,119 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
+    PhysicsSystem::PhysicsSystem()
+    {
+    }
 
+    PhysicsSystem::~PhysicsSystem()
+    {
+    }
 
-	PhysicsSystem::PhysicsSystem()
-	{
+    bool PhysicsSystem::init(void)
+    {
+        return true;
+    }
 
-	}
+    void PhysicsSystem::update(core::FrameData& frame, EnitiyRegister& reg,
+        physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
+    {
+        X_UNUSED(frame, reg, pPhysScene);
 
-	PhysicsSystem::~PhysicsSystem()
-	{
+        size_t numTransForms;
+        auto* pTransforms = pPhysScene->getActiveTransforms(numTransForms);
+        size_t numTriggerPairs;
+        auto* pTriggerPairs = pPhysScene->getTriggerPairs(numTriggerPairs);
 
-	}
+        for (size_t i = 0; i < numTransForms; i++) {
+            auto& trans = pTransforms[i];
 
-	bool PhysicsSystem::init(void)
-	{
-	
+            if (!trans.userData) {
+                continue;
+            }
 
-		return true;
-	}
+            EntityId ent = static_cast<EntityId>(union_cast<uintptr_t>(trans.userData) & 0xFFFF);
 
-	void PhysicsSystem::update(core::FrameData& frame, EnitiyRegister& reg, 
-		physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
-	{
-		X_UNUSED(frame, reg, pPhysScene);
+            auto& entTrans = reg.get<TransForm>(ent);
 
-		size_t numTransForms;
-		auto* pTransforms = pPhysScene->getActiveTransforms(numTransForms);
-		size_t numTriggerPairs;
-		auto* pTriggerPairs = pPhysScene->getTriggerPairs(numTriggerPairs);
+            entTrans.pos = trans.actor2World.pos;
+            entTrans.quat = trans.actor2World.quat;
 
+            if (reg.has<MeshRenderer>(ent)) {
+                auto& rendEnt = reg.get<MeshRenderer>(ent);
 
-		for (size_t i = 0; i < numTransForms; i++)
-		{
-			auto& trans = pTransforms[i];
+                p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, entTrans);
+            }
+            if (reg.has<Emitter>(ent)) {
+                auto& emt = reg.get<Emitter>(ent);
 
-			if (!trans.userData) {
-				continue;
-			}
+                emt.pEmitter->setTrans(entTrans, emt.offset);
+            }
+        }
 
-			EntityId ent = static_cast<EntityId>(union_cast<uintptr_t>(trans.userData) & 0xFFFF);
+        for (size_t i = 0; i < numTriggerPairs; i++) {
+            auto& trigPair = pTriggerPairs[i];
+            X_UNUSED(trigPair);
+        }
+    }
 
-			auto& entTrans = reg.get<TransForm>(ent);
+    bool PhysicsSystem::createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
+    {
+        auto* pModelManager = gEnv->p3DEngine->getModelManager();
 
-			entTrans.pos = trans.actor2World.pos;
-			entTrans.quat = trans.actor2World.quat;
+        {
+            auto view = reg.view<TransForm, Mesh, MeshCollider>();
+            for (auto entity : view) {
+                auto& trans = reg.get<TransForm>(entity);
+                auto& mesh = reg.get<Mesh>(entity);
+                auto& col = reg.get<MeshCollider>(entity);
 
-			if(reg.has<MeshRenderer>(ent))
-			{
-				auto& rendEnt = reg.get<MeshRenderer>(ent);
-				
-				p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, entTrans);
-			}
-			if (reg.has<Emitter>(ent))
-			{
-				auto& emt = reg.get<Emitter>(ent);
-				
-				emt.pEmitter->setTrans(entTrans, emt.offset);
-			}
-		}
+                mesh.pModel->waitForLoad(pModelManager);
 
-		for (size_t i = 0; i < numTriggerPairs; i++)
-		{
-			auto& trigPair = pTriggerPairs[i];
-			X_UNUSED(trigPair);
+                if (!mesh.pModel->hasPhys()) {
+                    X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
+                    reg.remove<MeshCollider>(entity);
+                    continue;
+                }
 
-		}
+                // TEMP: make all ents kinematic.
+                col.actor = pPhysics->createActor(trans, true);
 
-	}
+                mesh.pModel->addPhysToActor(col.actor);
 
-	bool PhysicsSystem::createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
-	{
-		auto* pModelManager = gEnv->p3DEngine->getModelManager();
+                pPhysics->updateMassAndInertia(col.actor, 1.f);
 
-		{
-			auto view = reg.view<TransForm, Mesh, MeshCollider>();
-			for (auto entity : view)
-			{
-				auto& trans = reg.get<TransForm>(entity);
-				auto& mesh = reg.get<Mesh>(entity);
-				auto& col = reg.get<MeshCollider>(entity);
+                pPhysScene->addActorToScene(col.actor);
+            }
+        }
 
-				mesh.pModel->waitForLoad(pModelManager);
+        {
+            auto view = reg.view<TransForm, Mesh, DynamicObject>();
 
-				if (!mesh.pModel->hasPhys())
-				{
-					X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
-					reg.remove<MeshCollider>(entity);
-					continue;
-				}
+            for (auto entity : view) {
+                auto& trans = reg.get<TransForm>(entity);
+                auto& mesh = reg.get<Mesh>(entity);
+                auto& col = reg.get<DynamicObject>(entity);
 
-				// TEMP: make all ents kinematic.
-				col.actor = pPhysics->createActor(trans, true);
+                mesh.pModel->waitForLoad(pModelManager);
 
-				mesh.pModel->addPhysToActor(col.actor);
+                col.actor = pPhysics->createActor(trans, false, (void*)entity);
 
-				pPhysics->updateMassAndInertia(col.actor, 1.f);
+                if (!mesh.pModel->hasPhys()) {
+                    X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
+                    //	reg.remove<DynamicObject>(entity);
+                    //	continue;
 
-				pPhysScene->addActorToScene(col.actor);
-			}
+                    auto& bounds = mesh.pModel->bounds();
+                    pPhysics->addBox(col.actor, bounds, bounds.center());
+                }
+                else {
+                    mesh.pModel->addPhysToActor(col.actor);
+                }
 
-		}
+                pPhysics->updateMassAndInertia(col.actor, 5.f);
 
-		{
-			auto view = reg.view<TransForm, Mesh, DynamicObject>();
-
-			for (auto entity : view)
-			{
-				auto& trans = reg.get<TransForm>(entity);
-				auto& mesh = reg.get<Mesh>(entity);
-				auto& col = reg.get<DynamicObject>(entity);
-
-				mesh.pModel->waitForLoad(pModelManager);
-
-				col.actor = pPhysics->createActor(trans, false, (void*)entity);
-
-
-				if (!mesh.pModel->hasPhys())
-				{
-					X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
-				//	reg.remove<DynamicObject>(entity);
-				//	continue;
-
-					auto& bounds = mesh.pModel->bounds();
-					pPhysics->addBox(col.actor, bounds, bounds.center());
-
-				}
-				else
-				{
-					mesh.pModel->addPhysToActor(col.actor);
-				}
-
-				pPhysics->updateMassAndInertia(col.actor, 5.f);
-
-				pPhysScene->addActorToScene(col.actor);
-			}
-
+                pPhysScene->addActorToScene(col.actor);
+            }
 
 #if 0
 			for (size_t i = 0; i < 10; i++)
@@ -158,7 +136,7 @@ namespace entity
 #if 0
 				auto a  = pPhysics->createActor(trans, 50.0f, false);
 				pPhysics->addBox(a, AABB(Vec3f(0,0,0), 15.f));
-	
+
 #else
 				//pPhysics->addSphere(a, 15.f);
 				// auto a = pPhysics->createSphere(trans, 15.f, 15.5f);
@@ -167,10 +145,10 @@ namespace entity
 				pPhysScene->addActorToScene(a);
 			}
 #endif
-		}
+        }
 
-		return true;
-	}
+        return true;
+    }
 
 } // namespace entity
 

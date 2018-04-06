@@ -28,13 +28,11 @@ namespace weapon
         Lowering,
 
         PreFire,
-        Fire
-     );
+        Fire);
 
     X_DECLARE_FLAGS(StateFlag)
     (
-        HasRaised
-    );
+        HasRaised);
 
     typedef Flags<StateFlag> StateFlags;
 
@@ -201,6 +199,6 @@ namespace weapon
 
     X_ENSURE_SIZE(WeaponHdr, 124);
 
-} // namespae weapon
+} // namespace weapon
 
 X_NAMESPACE_END

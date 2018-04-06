@@ -29,11 +29,11 @@ struct JobDecl
     TimeVal execTime;
 };
 
-X_DECLARE_ENUM(JobPriority)(
-    HIGH, 
-    NORMAL, 
-    NONE
-);
+X_DECLARE_ENUM(JobPriority)
+(
+    HIGH,
+    NORMAL,
+    NONE);
 
 struct IJobSystem
 {

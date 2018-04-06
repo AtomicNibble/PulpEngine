@@ -1,16 +1,13 @@
 #pragma once
 
-
 #include <EngineCommon.h>
-
 
 #define IPFONT_EXPORTS
 
 // we don't need font rendering for server.
 #if defined(X_DEDICATED_SERVER) && !defined(X_USE_NULLFONT)
- #define X_USE_NULLFONT
+#define X_USE_NULLFONT
 #endif // X_DEDICATED_SERVER
-
 
 #include <Core\Platform.h>
 
@@ -35,23 +32,22 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::MultiThreadPolicy<core::CriticalSection>,
+    core::MallocFreeAllocator,
+    core::MultiThreadPolicy<core::CriticalSection>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-> FontArena;
-
+    >
+    FontArena;
 
 extern FontArena* g_fontArena;
 
 #include <../../tools/FontLib/FontLib.h>
-
 
 X_LINK_ENGINE_LIB("FontLib");

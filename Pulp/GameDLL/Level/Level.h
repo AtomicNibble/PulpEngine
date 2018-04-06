@@ -7,22 +7,18 @@
 
 #include "Enity\EnitiySystem.h"
 
-
 X_NAMESPACE_DECLARE(core,
-	namespace V2 {
-		struct Job;
-		class JobSystem;
-	}
-	
-	struct XFileAsync;
+                    namespace V2 {
+                        struct Job;
+                        class JobSystem;
+                    }
 
-	struct FrameData;
-)
+                    struct XFileAsync;
+
+                    struct FrameData;)
 
 X_NAMESPACE_DECLARE(engine,
-	struct IWorld3D;
-)
-
+                    struct IWorld3D;)
 
 X_NAMESPACE_BEGIN(game)
 
@@ -31,87 +27,82 @@ class UserCmdMan;
 
 namespace entity
 {
-	class EnititySystem;
+    class EnititySystem;
 
 } // namespace entity
-
 
 class Level
 {
 public:
-	Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys, core::MemoryArenaBase* arena);
-	~Level();
+    Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys, core::MemoryArenaBase* arena);
+    ~Level();
 
-	void update(core::FrameData& frame);
+    void update(core::FrameData& frame);
 
-	void load(const char* pMapName);
-	void clear(void);
+    void load(const char* pMapName);
+    void clear(void);
 
-	X_INLINE bool isLoaded(void) const;
-
-private:
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void processHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	bool processHeader(void);
-	bool processData(void);
-	bool processEnts(void);
-
+    X_INLINE bool isLoaded(void) const;
 
 private:
-	core::MemoryArenaBase* arena_;
-	core::V2::JobSystem* pJobSys_;
-	core::IFileSys* pFileSys_;
-	entity::EnititySystem& entSys_;
+    void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+        core::XFileAsync* pFile, uint32_t bytesTransferred);
 
-	bool loaded_;
-	bool _pad[3];
+    void processHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    bool processHeader(void);
+    bool processData(void);
+    bool processEnts(void);
 
-	core::Path<char> path_;
-	level::FileHeader fileHdr_;
-	core::UniquePointer<uint8_t[]> levelData_;
+private:
+    core::MemoryArenaBase* arena_;
+    core::V2::JobSystem* pJobSys_;
+    core::IFileSys* pFileSys_;
+    entity::EnititySystem& entSys_;
 
-	engine::IWorld3D* p3DWorld_;
-	physics::IScene* pScene_;
+    bool loaded_;
+    bool _pad[3];
 
-	level::StringTable stringTable_;
+    core::Path<char> path_;
+    level::FileHeader fileHdr_;
+    core::UniquePointer<uint8_t[]> levelData_;
+
+    engine::IWorld3D* p3DWorld_;
+    physics::IScene* pScene_;
+
+    level::StringTable stringTable_;
 };
 
 X_INLINE bool Level::isLoaded(void) const
 {
-	return loaded_;
+    return loaded_;
 }
-
 
 class World
 {
 public:
-	World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan, 
-		game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
-	~World();
+    World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan,
+        game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
+    ~World();
 
-	bool loadMap(const char* pMapName);
+    bool loadMap(const char* pMapName);
 
-	void update(core::FrameData& frame, UserCmdMan& userCmdMan);
+    void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
-
-	void spawnPlayer(entity::EntityId id);
-
-private:
-	bool createPhysicsScene(physics::IPhysics* pPhys);
+    void spawnPlayer(entity::EntityId id);
 
 private:
-	core::MemoryArenaBase* arena_;
-	physics::IPhysics* pPhys_;
-	physics::IScene* pScene_;
+    bool createPhysicsScene(physics::IPhysics* pPhys);
 
-	entity::EnititySystem ents_;
-	core::UniquePointer<Level> level_;
+private:
+    core::MemoryArenaBase* arena_;
+    physics::IPhysics* pPhys_;
+    physics::IScene* pScene_;
 
-	UserCmdMan& userCmdMan_;
+    entity::EnititySystem ents_;
+    core::UniquePointer<Level> level_;
+
+    UserCmdMan& userCmdMan_;
 };
-
 
 X_NAMESPACE_END

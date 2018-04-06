@@ -31,7 +31,6 @@ X_DISABLE_WARNING(4505)
 
 X_ENABLE_WARNING(4505)
 
-
 // link all plugins
 #define PLUGIN_All 0
 
@@ -61,7 +60,6 @@ X_LINK_LIB("AkMusicEngine");
 // managers
 X_LINK_LIB("AkMemoryMgr");
 X_LINK_LIB("AkStreamMgr");
-
 
 // decoeer / source?
 #if PLUGIN_Codec
@@ -129,19 +127,16 @@ X_LINK_LIB("IOSONOProximityMixer");
 X_LINK_LIB("AkRumble");
 #endif // !PLUGIN_Rumble
 
-
 // devices
 #if PLUGIN_Source_mp3
 X_LINK_LIB("msacm32");
 #endif // !PLUGIN_Source_mp3
 X_LINK_LIB("dxguid");
 
-
 #if X_SUPER == 0
 X_LINK_LIB("ws2_32"); // used for winsock
 X_LINK_LIB("CommunicationCentral");
 #endif // !X_SUPER
-
 
 using namespace AK;
 
@@ -149,55 +144,51 @@ X_NAMESPACE_BEGIN(sound)
 
 namespace
 {
-
-	void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
-	{
+    void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
+    {
 #if X_ENABLE_ASSERTIONS
-		core::SourceInfo sourceInfo("SoundSys", pszFileName, lineNumber, "", "");
-		core::Assert(sourceInfo, "Assertion \"%s\" failed.", pszExpression)
-			.Variable("FileName", pszFileName)
-			.Variable("LineNumber", lineNumber);
+        core::SourceInfo sourceInfo("SoundSys", pszFileName, lineNumber, "", "");
+        core::Assert(sourceInfo, "Assertion \"%s\" failed.", pszExpression)
+            .Variable("FileName", pszFileName)
+            .Variable("LineNumber", lineNumber);
 
 #else
-		X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"",
-			pszExpression, pszFileName, lineNumber);
+        X_ERROR("SoundSys", "Sound system threw a assert: Exp: \"%s\" file: \"%s\" line: \"%s\"",
+            pszExpression, pszFileName, lineNumber);
 #endif
 
-		X_BREAKPOINT;
-	}
+        X_BREAKPOINT;
+    }
 
+    X_INLINE AkGameObjectID GameObjHandleToAKObject(SndObjectHandle object)
+    {
+        static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "can't represent type");
+        return reinterpret_cast<AkGameObjectID>(&object);
+    }
 
+    X_INLINE AkGameObjectID SoundObjToAKObject(SoundObject* pObject)
+    {
+        static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+        return reinterpret_cast<AkGameObjectID>(pObject);
+    }
 
-	X_INLINE AkGameObjectID GameObjHandleToAKObject(SndObjectHandle object)
-	{
-		static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "can't represent type");
-		return reinterpret_cast<AkGameObjectID>(&object);
-	}
+    X_INLINE SndObjectHandle SoundObjToObjHandle(SoundObject* pObject)
+    {
+        static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+        return reinterpret_cast<SndObjectHandle>(pObject);
+    }
 
-	X_INLINE AkGameObjectID SoundObjToAKObject(SoundObject* pObject)
-	{
-		static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
-		return reinterpret_cast<AkGameObjectID>(pObject);
-	}
+    X_INLINE SoundObject* SoundHandleToObject(SndObjectHandle object)
+    {
+        static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+        return reinterpret_cast<SoundObject*>(object);
+    }
 
-	X_INLINE SndObjectHandle SoundObjToObjHandle(SoundObject* pObject)
-	{
-		static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
-		return reinterpret_cast<SndObjectHandle>(pObject);
-	}
-
-	X_INLINE SoundObject* SoundHandleToObject(SndObjectHandle object)
-	{
-		static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
-		return reinterpret_cast<SoundObject*>(object);
-	}
-
-	X_INLINE SoundObject* AKObjectToObject(AkGameObjectID object)
-	{
-		static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
-		return reinterpret_cast<SoundObject*>(object);
-	}
-
+    X_INLINE SoundObject* AKObjectToObject(AkGameObjectID object)
+    {
+        static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+        return reinterpret_cast<SoundObject*>(object);
+    }
 
 } // namespace
 
@@ -205,1508 +196,1415 @@ static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(-2), "Should be n
 static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
 
 XSound::XSound(core::MemoryArenaBase* arena) :
-	arena_(arena),
-	pPrimCon_(nullptr),
-	pScene_(nullptr),
-	banks_(arena_),
-	objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject), "SoundObjPool"),
-	objects_(arena_),
-	culledObjects_(arena_),
-	occlusion_(arena_),
-	comsSysInit_(false),
-	outputCaptureEnabled_(false),
-	bankSignal_(true),
-	pScriptBinds_(nullptr)
+    arena_(arena),
+    pPrimCon_(nullptr),
+    pScene_(nullptr),
+    banks_(arena_),
+    objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject), "SoundObjPool"),
+    objects_(arena_),
+    culledObjects_(arena_),
+    occlusion_(arena_),
+    comsSysInit_(false),
+    outputCaptureEnabled_(false),
+    bankSignal_(true),
+    pScriptBinds_(nullptr)
 {
-	objects_.reserve(128);
-
+    objects_.reserve(128);
 }
 
 XSound::~XSound()
 {
-
 }
-
-
 
 void XSound::registerVars(void)
 {
-	vars_.RegisterVars();
+    vars_.RegisterVars();
 }
 
 void XSound::registerCmds(void)
 {
-	X_ASSERT_NOT_NULL(gEnv);
-	X_ASSERT_NOT_NULL(gEnv->pConsole);
+    X_ASSERT_NOT_NULL(gEnv);
+    X_ASSERT_NOT_NULL(gEnv->pConsole);
 
+    ADD_COMMAND_MEMBER("snd_set_rtpc", this, XSound, &XSound::cmd_SetRtpc, core::VarFlag::SYSTEM,
+        "Set a audio RTPC value. <name> <state> <ObjectId>");
+    ADD_COMMAND_MEMBER("snd_set_switchstate", this, XSound, &XSound::cmd_SetSwitchState, core::VarFlag::SYSTEM,
+        "Set a audio Switch State. <name> <state> <ObjectId>");
 
-	ADD_COMMAND_MEMBER("snd_set_rtpc", this, XSound, &XSound::cmd_SetRtpc, core::VarFlag::SYSTEM,
-		"Set a audio RTPC value. <name> <state> <ObjectId>");
-	ADD_COMMAND_MEMBER("snd_set_switchstate", this, XSound, &XSound::cmd_SetSwitchState, core::VarFlag::SYSTEM,
-		"Set a audio Switch State. <name> <state> <ObjectId>");
+    ADD_COMMAND_MEMBER("snd_post_event", this, XSound, &XSound::cmd_PostEvent, core::VarFlag::SYSTEM,
+        "Post a audio event. <eventName> <ObjectId>");
+    ADD_COMMAND_MEMBER("snd_stop_event", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
+        "Stop a audio event on a object. <eventName> <ObjectId>");
 
-	ADD_COMMAND_MEMBER("snd_post_event", this, XSound, &XSound::cmd_PostEvent, core::VarFlag::SYSTEM,
-		"Post a audio event. <eventName> <ObjectId>");
-	ADD_COMMAND_MEMBER("snd_stop_event", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
-		"Stop a audio event on a object. <eventName> <ObjectId>");
+    ADD_COMMAND_MEMBER("snd_stop_event_all", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
+        "Stop all audio events for a object. <ObjectId>");
 
-	ADD_COMMAND_MEMBER("snd_stop_event_all", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
-		"Stop all audio events for a object. <ObjectId>");
-
-	ADD_COMMAND_MEMBER("listSndBanks", this, XSound, &XSound::cmd_ListBanks, core::VarFlag::SYSTEM,
-		"List all the loaded sound banks");
-
+    ADD_COMMAND_MEMBER("listSndBanks", this, XSound, &XSound::cmd_ListBanks, core::VarFlag::SYSTEM,
+        "List all the loaded sound banks");
 }
 
 void XSound::registerScriptBinds(void)
 {
-	auto* pScriptSys = gEnv->pScriptSys;
+    auto* pScriptSys = gEnv->pScriptSys;
 
-	pScriptBinds_ = X_NEW(ScriptBinds_Sound, arena_, "SoundScriptBinds")(pScriptSys, this);
+    pScriptBinds_ = X_NEW(ScriptBinds_Sound, arena_, "SoundScriptBinds")(pScriptSys, this);
 
-	pScriptBinds_->bind();
+    pScriptBinds_->bind();
 }
 
 bool XSound::init(void)
 {
-	X_LOG0("SoundSys", "Starting");
-	X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
+    X_LOG0("SoundSys", "Starting");
+    X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
 
-	// TODO: call from somewhere.
-	registerScriptBinds();
+    // TODO: call from somewhere.
+    registerScriptBinds();
 
-	AkMemSettings memSettings;
+    AkMemSettings memSettings;
 
-	memSettings.uMaxNumPools = 20;
+    memSettings.uMaxNumPools = 20;
 
-	// Streaming.
-	AkStreamMgrSettings stmSettings;
-	StreamMgr::GetDefaultSettings(stmSettings);
+    // Streaming.
+    AkStreamMgrSettings stmSettings;
+    StreamMgr::GetDefaultSettings(stmSettings);
 
-	AkDeviceSettings deviceSettings;
-	StreamMgr::GetDefaultDeviceSettings(deviceSettings);
+    AkDeviceSettings deviceSettings;
+    StreamMgr::GetDefaultDeviceSettings(deviceSettings);
 
-	AkInitSettings l_InitSettings;
-	AkPlatformInitSettings l_platInitSetings;
-	SoundEngine::GetDefaultInitSettings(l_InitSettings);
-	SoundEngine::GetDefaultPlatformInitSettings(l_platInitSetings);
+    AkInitSettings l_InitSettings;
+    AkPlatformInitSettings l_platInitSetings;
+    SoundEngine::GetDefaultInitSettings(l_InitSettings);
+    SoundEngine::GetDefaultPlatformInitSettings(l_platInitSetings);
 
-	AkMusicSettings musicInit;
-	MusicEngine::GetDefaultInitSettings(musicInit);
+    AkMusicSettings musicInit;
+    MusicEngine::GetDefaultInitSettings(musicInit);
 
-	// Create and initialise an instance of our memory manager.
-	if (MemoryMgr::Init(&memSettings) != AK_Success)
-	{
-		X_ERROR("SoundSys", "Could not create the memory manager.");
-		return false;
-	}
+    // Create and initialise an instance of our memory manager.
+    if (MemoryMgr::Init(&memSettings) != AK_Success) {
+        X_ERROR("SoundSys", "Could not create the memory manager.");
+        return false;
+    }
 
-	// Create and initialise an instance of the default stream manager.
-	stmSettings.uMemorySize = vars_.StreamManagerMemoryPoolBytes();
-	if (!StreamMgr::Create(stmSettings))
-	{
-		X_ERROR("SoundSys", "Could not create the Stream Manager");
-		return false;
-	}
+    // Create and initialise an instance of the default stream manager.
+    stmSettings.uMemorySize = vars_.StreamManagerMemoryPoolBytes();
+    if (!StreamMgr::Create(stmSettings)) {
+        X_ERROR("SoundSys", "Could not create the Stream Manager");
+        return false;
+    }
 
-	// Create an IO device.
-	deviceSettings.uSchedulerTypeFlags = AK_SCHEDULER_DEFERRED_LINED_UP;
-	deviceSettings.uIOMemorySize = vars_.StreamDeviceMemoryPoolBytes();
-	if (ioHook_.Init(deviceSettings, true) != AK_Success)
-	{
-		X_ERROR("SoundSys", "Cannot create streaming I/O device");
-		return false;
-	}
+    // Create an IO device.
+    deviceSettings.uSchedulerTypeFlags = AK_SCHEDULER_DEFERRED_LINED_UP;
+    deviceSettings.uIOMemorySize = vars_.StreamDeviceMemoryPoolBytes();
+    if (ioHook_.Init(deviceSettings, true) != AK_Success) {
+        X_ERROR("SoundSys", "Cannot create streaming I/O device");
+        return false;
+    }
 
-	// Initialize sound engine.
-	l_InitSettings.pfnAssertHook = akAssertHook;
-	l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Default;
-	{
-		const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
-		if (pOutputDevice)
-		{
-			if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
-				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_XAudio2;
-				X_LOG1("SoundSys", "using output device: XAudio2");
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
-				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_DirectSound;
-				X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
-				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Wasapi;
-				X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
-				l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Dummy;
-				X_LOG1("SoundSys", "using output device: none (no sound)");
-			}
-			else {
-				X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
-					"xaudio2, directsound, wasapi, none",
-					pOutputDevice);
-			}
-		}
-	}
+    // Initialize sound engine.
+    l_InitSettings.pfnAssertHook = akAssertHook;
+    l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Default;
+    {
+        const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
+        if (pOutputDevice) {
+            if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
+                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_XAudio2;
+                X_LOG1("SoundSys", "using output device: XAudio2");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
+                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_DirectSound;
+                X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
+                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Wasapi;
+                X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
+                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Dummy;
+                X_LOG1("SoundSys", "using output device: none (no sound)");
+            }
+            else {
+                X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
+                                    "xaudio2, directsound, wasapi, none",
+                    pOutputDevice);
+            }
+        }
+    }
 
+    l_InitSettings.uDefaultPoolSize = vars_.SoundEngineDefaultMemoryPoolBytes();
+    l_InitSettings.uCommandQueueSize = vars_.CommandQueueMemoryPoolBytes();
+    l_InitSettings.uMonitorPoolSize = vars_.MonitorMemoryPoolBytes();
+    l_InitSettings.uMonitorQueuePoolSize = vars_.MonitorQueueMemoryPoolBytes();
 
-	l_InitSettings.uDefaultPoolSize = vars_.SoundEngineDefaultMemoryPoolBytes();
-	l_InitSettings.uCommandQueueSize = vars_.CommandQueueMemoryPoolBytes();
-	l_InitSettings.uMonitorPoolSize = vars_.MonitorMemoryPoolBytes();
-	l_InitSettings.uMonitorQueuePoolSize = vars_.MonitorQueueMemoryPoolBytes();
+    l_platInitSetings.uLEngineDefaultPoolSize = vars_.SoundEngineLowerDefaultMemoryPoolBytes();
 
-	l_platInitSetings.uLEngineDefaultPoolSize = vars_.SoundEngineLowerDefaultMemoryPoolBytes();
+    if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success) {
+        X_ERROR("SoundSys", "Cannot initialize sound engine");
+        return false;
+    }
 
-	if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success)
-	{
-		X_ERROR("SoundSys", "Cannot initialize sound engine");
-		return false;
-	}
+    // set the seed.
+    {
+        auto& sv = gEnv->seed;
+        auto seed = sv[0] ^ sv[1] ^ sv[2] ^ sv[3];
+        SoundEngine::SetRandomSeed(seed);
+    }
 
-	// set the seed.
-	{
-		auto& sv = gEnv->seed;
-		auto seed = sv[0] ^ sv[1] ^ sv[2] ^ sv[3];
-		SoundEngine::SetRandomSeed(seed);
-	}
-
-	// Initialize music engine.
-	if (MusicEngine::Init(&musicInit) != AK_Success)
-	{
-		X_ERROR("SoundSys", "Cannot initialize music engine");
-		return false;
-	}
+    // Initialize music engine.
+    if (MusicEngine::Init(&musicInit) != AK_Success) {
+        X_ERROR("SoundSys", "Cannot initialize music engine");
+        return false;
+    }
 
 #if X_SUPER == 0
 
-	if (vars_.EnableComs())
-	{
-		// Initialize communication.
-		AkCommSettings settingsComm;
-		AK::Comm::GetDefaultInitSettings(settingsComm);
-		AKPLATFORM::SafeStrCpy(settingsComm.szAppNetworkName, X_ENGINE_NAME, AK_COMM_SETTINGS_MAX_STRING_SIZE);
-		if (AK::Comm::Init(settingsComm) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Cannot initialize Wwise communication");
-			return false;
-		}
+    if (vars_.EnableComs()) {
+        // Initialize communication.
+        AkCommSettings settingsComm;
+        AK::Comm::GetDefaultInitSettings(settingsComm);
+        AKPLATFORM::SafeStrCpy(settingsComm.szAppNetworkName, X_ENGINE_NAME, AK_COMM_SETTINGS_MAX_STRING_SIZE);
+        if (AK::Comm::Init(settingsComm) != AK_Success) {
+            X_ERROR("SoundSys", "Cannot initialize Wwise communication");
+            return false;
+        }
 
-		comsSysInit_ = true;
-	}
+        comsSysInit_ = true;
+    }
 #endif // !X_SUPER
 
-
-	// Register plugins
+    // Register plugins
 #if !PLUGIN_All
 
-	// what ones do i even want o.o
+    // what ones do i even want o.o
 
 #if PLUGIN_Codec
-	if (AK::SoundEngine::RegisterAllCodecPlugins() != AK_Success)
-	{
-		X_ERROR("SoundSys", "Error while registering codec plug-ins");
-		return false;
-	}
+    if (AK::SoundEngine::RegisterAllCodecPlugins() != AK_Success) {
+        X_ERROR("SoundSys", "Error while registering codec plug-ins");
+        return false;
+    }
 #endif // !PLUGIN_Codec
 
 #if PLUGIN_Effect
-	if (AK::SoundEngine::RegisterAllEffectPlugins() != AK_Success)
-	{
-		X_ERROR("SoundSys", "Error while registering effect plug-ins");
-		return false;
-	}
+    if (AK::SoundEngine::RegisterAllEffectPlugins() != AK_Success) {
+        X_ERROR("SoundSys", "Error while registering effect plug-ins");
+        return false;
+    }
 #endif // !PLUGIN_Effect
 
 #if PLUGIN_Rumble
-	if (AK::SoundEngine::RegisterAllRumblePlugins() != AK_Success)
-	{
-		X_ERROR("SoundSys", "Error while registering rumble plug-ins");
-		return false;
-	}
+    if (AK::SoundEngine::RegisterAllRumblePlugins() != AK_Success) {
+        X_ERROR("SoundSys", "Error while registering rumble plug-ins");
+        return false;
+    }
 #endif // !PLUGIN_Rumble
 
 #if PLUGIN_Source
-	{
-		if(AK::SoundEngine::RegisterPlugin(
-			AkPluginTypeSource,
-			AKCOMPANYID_AUDIOKINETIC,
-			AKSOURCEID_SILENCE,
-			CreateSilenceSource,
-			CreateSilenceSourceParams) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Error while registering silence souce plug-in");
-			return false;
-		}
+    {
+        if (AK::SoundEngine::RegisterPlugin(
+                AkPluginTypeSource,
+                AKCOMPANYID_AUDIOKINETIC,
+                AKSOURCEID_SILENCE,
+                CreateSilenceSource,
+                CreateSilenceSourceParams)
+            != AK_Success) {
+            X_ERROR("SoundSys", "Error while registering silence souce plug-in");
+            return false;
+        }
 
-		if(AK::SoundEngine::RegisterPlugin(
-			AkPluginTypeSource,
-			AKCOMPANYID_AUDIOKINETIC,
-			AKSOURCEID_SINE,
-			CreateSineSource,
-			CreateSineSourceParams) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Error while registering sine souce plug-in");
-			return false;
-		}
+        if (AK::SoundEngine::RegisterPlugin(
+                AkPluginTypeSource,
+                AKCOMPANYID_AUDIOKINETIC,
+                AKSOURCEID_SINE,
+                CreateSineSource,
+                CreateSineSourceParams)
+            != AK_Success) {
+            X_ERROR("SoundSys", "Error while registering sine souce plug-in");
+            return false;
+        }
 
-		if(AK::SoundEngine::RegisterPlugin(
-			AkPluginTypeSource,
-			AKCOMPANYID_AUDIOKINETIC,
-			AKSOURCEID_TONE,
-			CreateToneSource,
-			CreateToneSourceParams) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Error while registering tone souce plug-in");
-			return false;
-		}
+        if (AK::SoundEngine::RegisterPlugin(
+                AkPluginTypeSource,
+                AKCOMPANYID_AUDIOKINETIC,
+                AKSOURCEID_TONE,
+                CreateToneSource,
+                CreateToneSourceParams)
+            != AK_Success) {
+            X_ERROR("SoundSys", "Error while registering tone souce plug-in");
+            return false;
+        }
 
-#if defined( AK_WIN ) && !defined( AK_USE_METRO_API ) && PLUGIN_Source_mp3 
-		if(AK::SoundEngine::RegisterPlugin(
-			AkPluginTypeSource,
-			AKCOMPANYID_AUDIOKINETIC,
-			AKSOURCEID_MP3,
-			CreateMP3Source,
-			CreateMP3SourceParams) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Error while registering mp3 souce plug-in");
-			return false;
-		}
+#if defined(AK_WIN) && !defined(AK_USE_METRO_API) && PLUGIN_Source_mp3
+        if (AK::SoundEngine::RegisterPlugin(
+                AkPluginTypeSource,
+                AKCOMPANYID_AUDIOKINETIC,
+                AKSOURCEID_MP3,
+                CreateMP3Source,
+                CreateMP3SourceParams)
+            != AK_Success) {
+            X_ERROR("SoundSys", "Error while registering mp3 souce plug-in");
+            return false;
+        }
 #endif
 
-		if(AK::SoundEngine::RegisterPlugin(
-			AkPluginTypeSource,
-			AKCOMPANYID_AUDIOKINETIC,
-			AKSOURCEID_SYNTHONE,
-			CreateSynthOne,
-			CreateSynthOneParams) != AK_Success)
-		{
-			X_ERROR("SoundSys", "Error while registering synthone souce plug-in");
-			return false;
-		}
-	}
-
+        if (AK::SoundEngine::RegisterPlugin(
+                AkPluginTypeSource,
+                AKCOMPANYID_AUDIOKINETIC,
+                AKSOURCEID_SYNTHONE,
+                CreateSynthOne,
+                CreateSynthOneParams)
+            != AK_Success) {
+            X_ERROR("SoundSys", "Error while registering synthone souce plug-in");
+            return false;
+        }
+    }
 
 #endif // !PLUGIN_Source
 
 #if PLUGIN_Auro
-	if (AK::SoundEngine::RegisterAuroPlugins() != AK_Success)
-	{
-		X_ERROR("SoundSys", "Error while registering auro plug-ins");
-		return false;
-	}
+    if (AK::SoundEngine::RegisterAuroPlugins() != AK_Success) {
+        X_ERROR("SoundSys", "Error while registering auro plug-ins");
+        return false;
+    }
 #endif // !PLUGIN_Auro
 
 #else
-	/// Note: This a convenience method for rapid prototyping. 
-	/// To reduce executable code size register/link only the plug-ins required by your game 
-	if (AK::SoundEngine::RegisterAllPlugins() != AK_Success)
-	{
-		X_ERROR("SoundSys", "Error while registering plug-ins");
-		return false;
-	}
+    /// Note: This a convenience method for rapid prototyping.
+    /// To reduce executable code size register/link only the plug-ins required by your game
+    if (AK::SoundEngine::RegisterAllPlugins() != AK_Success) {
+        X_ERROR("SoundSys", "Error while registering plug-ins");
+        return false;
+    }
 #endif
 
-	vars_.applyVolume();
+    vars_.applyVolume();
 
-	AKRESULT res;
+    AKRESULT res;
 
-	// register a object for stuff with no position.
-	res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
-		return false;
-	}
+    // register a object for stuff with no position.
+    res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
+        return false;
+    }
 
-	// dispatch async loads for base banks.
-	loadBank("Init.bnk");
-	loadBank("Events.bnk");
+    // dispatch async loads for base banks.
+    loadBank("Init.bnk");
+    loadBank("Events.bnk");
 
-	// temp
-	loadBank("PlayerSounds.bnk");
-	loadBank("Ambient.bnk");
-	loadBank("Weapons.bnk");
-	loadBank("Video.bnk");
-	loadBank("SFX.bnk");
+    // temp
+    loadBank("PlayerSounds.bnk");
+    loadBank("Ambient.bnk");
+    loadBank("Weapons.bnk");
+    loadBank("Video.bnk");
+    loadBank("SFX.bnk");
 
-
-	return true;
+    return true;
 }
 
 bool XSound::asyncInitFinalize(void)
 {
-	bool loaded = true;
+    bool loaded = true;
 
-	for (auto& bank : banks_)
-	{
-		loaded &= waitForBankLoad(bank);
-	}
+    for (auto& bank : banks_) {
+        loaded &= waitForBankLoad(bank);
+    }
 
-	pPrimCon_ = gEnv->p3DEngine->getPrimContext(engine::PrimContext::SOUND);
-	if (!pPrimCon_) {
-		X_ERROR("SoundSys", "Failed to get prim context");
-		return false;
-	}
+    pPrimCon_ = gEnv->p3DEngine->getPrimContext(engine::PrimContext::SOUND);
+    if (!pPrimCon_) {
+        X_ERROR("SoundSys", "Failed to get prim context");
+        return false;
+    }
 
-	return loaded;
+    return loaded;
 }
-
 
 void XSound::shutDown(void)
 {
-	X_LOG0("SoundSys", "Shutting Down");
+    X_LOG0("SoundSys", "Shutting Down");
 
-	if (pScriptBinds_) {
-		X_DELETE(pScriptBinds_, arena_);
-	}
+    if (pScriptBinds_) {
+        X_DELETE(pScriptBinds_, arena_);
+    }
 
 #if X_SUPER == 0
-	if (comsSysInit_) {
-		Comm::Term();
-		comsSysInit_ = false;
-	}
+    if (comsSysInit_) {
+        Comm::Term();
+        comsSysInit_ = false;
+    }
 #endif // !X_SUPER
 
-	MusicEngine::Term();
+    MusicEngine::Term();
 
-	if (AK::SoundEngine::IsInitialized())
-	{
-		AKRESULT res;
+    if (AK::SoundEngine::IsInitialized()) {
+        AKRESULT res;
 
-		res = AK::SoundEngine::UnregisterGameObj(GLOBAL_OBJECT_ID);
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
-		}
+        res = AK::SoundEngine::UnregisterGameObj(GLOBAL_OBJECT_ID);
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error unregistering global objects. %s", AkResult::ToString(res, desc));
+        }
 
-		res = AK::SoundEngine::ClearBanks();
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error clearing banks. %s", AkResult::ToString(res, desc));
-		}
+        res = AK::SoundEngine::ClearBanks();
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error clearing banks. %s", AkResult::ToString(res, desc));
+        }
 
+        SoundEngine::Term();
+    }
 
-		SoundEngine::Term();
-	}
+    ioHook_.Term();
 
-	ioHook_.Term();
+    if (IAkStreamMgr::Get()) {
+        IAkStreamMgr::Get()->Destroy();
+    }
 
-	if (IAkStreamMgr::Get()) {
-		IAkStreamMgr::Get()->Destroy();
-	}
-
-	if (AK::MemoryMgr::IsInitialized())
-	{
-		MemoryMgr::Term();
-	}
+    if (AK::MemoryMgr::IsInitialized()) {
+        MemoryMgr::Term();
+    }
 }
 
 void XSound::release(void)
 {
-	X_DELETE(this, g_SoundArena);
+    X_DELETE(this, g_SoundArena);
 }
 
 void XSound::Update(core::FrameData& frame)
 {
-	X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
+    X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
 
-	if (AK::SoundEngine::IsInitialized())
-	{
-		if (vars_.EnableCulling()) {
-			cullObjects();
-		}
+    if (AK::SoundEngine::IsInitialized()) {
+        if (vars_.EnableCulling()) {
+            cullObjects();
+        }
 
-		core::TimeVal sinceLastOcclude = frame.timeInfo.startTimeReal - lastOcclusionUpdate_;
-		core::TimeVal refreshInterval(vars_.OcclusionRefreshRate());
-		if (sinceLastOcclude > refreshInterval)
-		{
-			lastOcclusionUpdate_ = frame.timeInfo.startTimeReal;
+        core::TimeVal sinceLastOcclude = frame.timeInfo.startTimeReal - lastOcclusionUpdate_;
+        core::TimeVal refreshInterval(vars_.OcclusionRefreshRate());
+        if (sinceLastOcclude > refreshInterval) {
+            lastOcclusionUpdate_ = frame.timeInfo.startTimeReal;
 
-			performOcclusionChecks();
-		}
+            performOcclusionChecks();
+        }
 
-		AkListenerPosition listener;
-		listener.OrientationFront.X = 0;
-		listener.OrientationFront.Y = 0;
-		listener.OrientationFront.Z = 0;
-		listener.OrientationTop.X = 0;
-		listener.OrientationTop.Y = 0;
-		listener.OrientationTop.Z = 1.0f;
-		listener.Position = Vec3ToAkVector(listenerTrans_.pos);
+        AkListenerPosition listener;
+        listener.OrientationFront.X = 0;
+        listener.OrientationFront.Y = 0;
+        listener.OrientationFront.Z = 0;
+        listener.OrientationTop.X = 0;
+        listener.OrientationTop.Y = 0;
+        listener.OrientationTop.Z = 1.0f;
+        listener.Position = Vec3ToAkVector(listenerTrans_.pos);
 
-		AKRESULT res = SoundEngine::SetListenerPosition(listener);
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
-		}
+        AKRESULT res = SoundEngine::SetListenerPosition(listener);
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
+        }
 
-		if (vars_.EnableOutputCapture() && !outputCaptureEnabled_)
-		{
-			AkOSChar const* pFileName = L"audio_capture.wav";
+        if (vars_.EnableOutputCapture() && !outputCaptureEnabled_) {
+            AkOSChar const* pFileName = L"audio_capture.wav";
 
-			res = AK::SoundEngine::StartOutputCapture(pFileName);
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error starting output capture. %s", AkResult::ToString(res, desc));
-			}
+            res = AK::SoundEngine::StartOutputCapture(pFileName);
+            if (res != AK_Success) {
+                AkResult::Description desc;
+                X_ERROR("SoundSys", "Error starting output capture. %s", AkResult::ToString(res, desc));
+            }
 
-			outputCaptureEnabled_ = true;
-		}
-		else if (!vars_.EnableOutputCapture() && outputCaptureEnabled_)
-		{
-			res = AK::SoundEngine::StopOutputCapture();
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error stopping output capture. %s", AkResult::ToString(res, desc));
-			}
+            outputCaptureEnabled_ = true;
+        }
+        else if (!vars_.EnableOutputCapture() && outputCaptureEnabled_) {
+            res = AK::SoundEngine::StopOutputCapture();
+            if (res != AK_Success) {
+                AkResult::Description desc;
+                X_ERROR("SoundSys", "Error stopping output capture. %s", AkResult::ToString(res, desc));
+            }
 
-			outputCaptureEnabled_ = false;
-		}
+            outputCaptureEnabled_ = false;
+        }
 
+        SoundEngine::RenderAudio();
+    }
 
-		SoundEngine::RenderAudio();
-	}
-
-	if (vars_.EnableDebugRender() > 0) {
-		drawDebug();
-	}
+    if (vars_.EnableDebugRender() > 0) {
+        drawDebug();
+    }
 }
 
 void XSound::setPhysicsScene(physics::IScene* pScene)
 {
-	pScene_ = pScene;
+    pScene_ = pScene;
 }
-
 
 void XSound::drawDebug(void) const
 {
-	if (!pPrimCon_) {
-		return;
-	}
+    if (!pPrimCon_) {
+        return;
+    }
 
-	if (vars_.debugObjectScale() < 0.01f) {
-		return;
-	}
+    if (vars_.debugObjectScale() < 0.01f) {
+        return;
+    }
 
-	Sphere sphere;
-	sphere.setRadius(vars_.debugObjectScale());
+    Sphere sphere;
+    sphere.setRadius(vars_.debugObjectScale());
 
-	Color8u sphereCol = Col_Blue;
-	Color8u lineCol = Col_Darksalmon;
-	Color8u lineColOcc = Col_Red;
-	Color8u lineColOccVis = Col_Green;
+    Color8u sphereCol = Col_Blue;
+    Color8u lineCol = Col_Darksalmon;
+    Color8u lineColOcc = Col_Red;
+    Color8u lineColOccVis = Col_Green;
 
-	pPrimCon_->setDepthTest(true);
+    pPrimCon_->setDepthTest(true);
 
-	auto listnerPos = listenerTrans_.pos;
-	listnerPos.z -= 1.f; // make the line not point directly at us.
+    auto listnerPos = listenerTrans_.pos;
+    listnerPos.z -= 1.f; // make the line not point directly at us.
 
-	const float cullDistance = vars_.RegisteredCullDistance();
+    const float cullDistance = vars_.RegisteredCullDistance();
 
-	// prevent using really high quality lods.
-	const int32_t minLod = 3;
+    // prevent using really high quality lods.
+    const int32_t minLod = 3;
 
-	const bool drawText = vars_.EnableDebugRender() > 1;
-	const float textSize = vars_.debugTextSize();
-	font::TextDrawContext con;
-	con.effectId = 0;
-	con.col = Col_White;
-	con.flags.Set(font::DrawTextFlag::CENTER);
-	con.flags.Set(font::DrawTextFlag::CENTER_VER);
-	con.pFont = gEnv->pFontSys->GetDefault();
-	con.size = Vec2f(textSize, textSize);
+    const bool drawText = vars_.EnableDebugRender() > 1;
+    const float textSize = vars_.debugTextSize();
+    font::TextDrawContext con;
+    con.effectId = 0;
+    con.col = Col_White;
+    con.flags.Set(font::DrawTextFlag::CENTER);
+    con.flags.Set(font::DrawTextFlag::CENTER_VER);
+    con.pFont = gEnv->pFontSys->GetDefault();
+    con.size = Vec2f(textSize, textSize);
 
+    core::CriticalSection::ScopedLock lock(cs_);
+    for (auto* pObject : objects_) {
+        const auto& trans = pObject->trans;
+        sphere.setCenter(trans.pos);
 
-	core::CriticalSection::ScopedLock lock(cs_);
-	for (auto* pObject : objects_)
-	{
-		const auto& trans = pObject->trans;
-		sphere.setCenter(trans.pos);
+        float distance = listnerPos.distance(trans.pos);
+        if (distance > cullDistance) {
+            continue;
+        }
 
-		float distance = listnerPos.distance(trans.pos);
-		if (distance > cullDistance) {
-			continue;
-		}
+        int32_t lodIdx = static_cast<int32_t>(distance / 500.f);
+        lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
 
-		int32_t lodIdx = static_cast<int32_t>(distance / 500.f);
-		lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
+        X_ASSERT(lodIdx >= 0, "invalid index")
+        (lodIdx);
 
-		X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
+        if (drawText) {
+            const Vec3f& eye = trans.pos;
+            const Vec3f& center = listnerPos;
 
-		if (drawText)
-		{
-			const Vec3f& eye = trans.pos; 
-			const Vec3f& center = listnerPos; 
+            Matrix33f mat;
+            MatrixLookAtRH(&mat, eye, center, Vec3f::zAxis());
+            mat.rotate(Vec3f::zAxis(), ::toRadians(180.f));
 
-			Matrix33f mat;
-			MatrixLookAtRH(&mat, eye, center, Vec3f::zAxis());
-			mat.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+            core::StackString256 txt;
+            txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
 
-			core::StackString256 txt;
-			txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);
+            pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), mat, con, txt.begin(), txt.end());
+        }
 
-			pPrimCon_->drawText(trans.pos + Vec3f(0, 0, sphere.radius() + 6.f), mat, con, txt.begin(), txt.end());
-		}
+        pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
 
-		pPrimCon_->drawSphere(sphere, sphereCol, true, lodIdx);
-
-		if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
-			pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineColOccVis);
-		}
-		else {
-			pPrimCon_->drawLine(trans.pos, listnerPos, lineCol);
-		}
-	}
-
+        if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
+            pPrimCon_->drawLine(trans.pos, listnerPos, pObject->flags.IsSet(SoundFlag::Occluded) ? lineColOcc : lineColOccVis);
+        }
+        else {
+            pPrimCon_->drawLine(trans.pos, listnerPos, lineCol);
+        }
+    }
 }
 
 void XSound::cullObjects(void)
 {
-	// so we can only cull objects that are not playing anything.
-	// and as soon as we want to play something on it we need to re-register it.
+    // so we can only cull objects that are not playing anything.
+    // and as soon as we want to play something on it we need to re-register it.
 
+    // work out what objects we can register.
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	// work out what objects we can register.
-	core::CriticalSection::ScopedLock lock(cs_);
+    const size_t culledNum = culledObjects_.size();
+    const float cullDistance = vars_.RegisteredCullDistance();
+    const auto listenerPos = listenerTrans_.pos;
 
-	const size_t culledNum = culledObjects_.size();
-	const float cullDistance = vars_.RegisteredCullDistance();
-	const auto listenerPos = listenerTrans_.pos;
+    for (size_t i = 0; i < objects_.size(); i++) {
+        auto* pObject = objects_[i];
+        if (pObject->activeEvents) {
+            continue;
+        }
 
-	for (size_t i = 0; i< objects_.size(); i++)
-	{
-		auto* pObject = objects_[i];
-		if (pObject->activeEvents) {
-			continue;
-		}
+        float distance = pObject->trans.pos.distance(listenerPos);
+        if (distance > cullDistance) {
+            unregisterObjectSndEngine(pObject);
+        }
+    }
 
-		float distance = pObject->trans.pos.distance(listenerPos);
-		if (distance > cullDistance) {
-			unregisterObjectSndEngine(pObject);
-		}
-	}
-
-	if (culledNum < culledObjects_.size())
-	{
-		X_LOG0("SoundSys", "Un-Registered %" PRIuS " object(s)", culledObjects_.size() - culledNum);
-	}
+    if (culledNum < culledObjects_.size()) {
+        X_LOG0("SoundSys", "Un-Registered %" PRIuS " object(s)", culledObjects_.size() - culledNum);
+    }
 }
 
 void XSound::performOcclusionChecks(void)
 {
-	physics::IScene* pScene = pScene_;
+    physics::IScene* pScene = pScene_;
 
-	// TODO: sort these so can do in batches.
+    // TODO: sort these so can do in batches.
 
-	for (auto* pObject : occlusion_)
-	{
-		X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")();
+    for (auto* pObject : occlusion_) {
+        X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")
+        ();
 
-		if (pObject->occType == OcclusionType::SingleRay)
-		{
-			physics::RaycastBuffer hit;
+        if (pObject->occType == OcclusionType::SingleRay) {
+            physics::RaycastBuffer hit;
 
-			const auto& listenerPos = listenerTrans_.pos;
+            const auto& listenerPos = listenerTrans_.pos;
 
-			const Vec3f target = pObject->trans.pos;
-			const Vec3f& start = listenerPos;
+            const Vec3f target = pObject->trans.pos;
+            const Vec3f& start = listenerPos;
 
-			Vec3f dir = target - start;
-			dir.normalize();
+            Vec3f dir = target - start;
+            dir.normalize();
 
-			float distance = start.distance(target);
+            float distance = start.distance(target);
 
-			if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC))
-			{
-				pObject->flags.Set(SoundFlag::Occluded);
+            if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC)) {
+                pObject->flags.Set(SoundFlag::Occluded);
 
-				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.5f);
-			}
-			else
-			{
-				pObject->flags.Remove(SoundFlag::Occluded);
+                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.5f);
+            }
+            else {
+                pObject->flags.Remove(SoundFlag::Occluded);
 
-				AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
-			}
-		}
-		else
-		{
-			X_ASSERT_NOT_IMPLEMENTED();
-		}
-	}
+                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+            }
+        }
+        else {
+            X_ASSERT_NOT_IMPLEMENTED();
+        }
+    }
 }
-
-
 
 void XSound::registerObjectSndEngine(SoundObject* pObject)
 {
-	X_ASSERT(!pObject->flags.IsSet(SoundFlag::Registered), "Double register")();
+    X_ASSERT(!pObject->flags.IsSet(SoundFlag::Registered), "Double register")
+    ();
 
-	pObject->flags.Set(SoundFlag::Registered);
+    pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
+    AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
 #else
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+    AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
 #endif
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-	}
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+    }
 
-	if (pObject->flags.IsSet(SoundFlag::Position))
-	{
-		res = AK::SoundEngine::SetPosition(SoundObjToAKObject(pObject), TransToAkPos(pObject->trans));
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
-		}
-	}
+    if (pObject->flags.IsSet(SoundFlag::Position)) {
+        res = AK::SoundEngine::SetPosition(SoundObjToAKObject(pObject), TransToAkPos(pObject->trans));
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+        }
+    }
 
-	culledObjects_.remove(pObject);
-	objects_.push_back(pObject);
-	if (pObject->flags.IsSet(SoundFlag::Occlusion))
-	{
-		AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+    culledObjects_.remove(pObject);
+    objects_.push_back(pObject);
+    if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
+        AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
 
-		occlusion_.push_back(pObject);
-	}
+        occlusion_.push_back(pObject);
+    }
 }
 
 void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 {
-	X_ASSERT(pObject->flags.IsSet(SoundFlag::Registered), "Double un-register")();
+    X_ASSERT(pObject->flags.IsSet(SoundFlag::Registered), "Double un-register")
+    ();
 
-	pObject->flags.Remove(SoundFlag::Registered);
+    pObject->flags.Remove(SoundFlag::Registered);
 
-	AKRESULT res = AK::SoundEngine::UnregisterGameObj(SoundObjToAKObject(pObject));
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
-	}
+    AKRESULT res = AK::SoundEngine::UnregisterGameObj(SoundObjToAKObject(pObject));
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
+    }
 
-	objects_.remove(pObject);
-	culledObjects_.push_back(pObject);
-	if (pObject->flags.IsSet(SoundFlag::Occlusion))
-	{
-		occlusion_.remove(pObject);
-	}
+    objects_.remove(pObject);
+    culledObjects_.push_back(pObject);
+    if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
+        occlusion_.remove(pObject);
+    }
 }
 
 // ---------------------------------------------
 
-
 // Shut up!
 void XSound::mute(bool mute)
 {
-	X_UNUSED(mute);
+    X_UNUSED(mute);
 }
 
 void XSound::setListenPos(const Transformf& trans)
 {
-	listenerTrans_ = trans;
+    listenerTrans_ = trans;
 }
 
 // Volume - these change SoundEngine, just done this way so vars reflect actual values.
 void XSound::setMasterVolume(float vol)
 {
-	vars_.setMasterVolume(vol);
+    vars_.setMasterVolume(vol);
 }
 
 void XSound::setMusicVolume(float vol)
 {
-	vars_.setMusicVolume(vol);
+    vars_.setMusicVolume(vol);
 }
 
 void XSound::setVoiceVolume(float vol)
 {
-	vars_.setVoiceVolume(vol);
+    vars_.setVoiceVolume(vol);
 }
 
 void XSound::setSFXVolume(float vol)
 {
-	vars_.setSFXVolume(vol);
+    vars_.setSFXVolume(vol);
 }
 
 // ----------------------------------------------
 
 uint32_t XSound::getIDFromStr(const char* pStr) const
 {
-	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
-	return SoundEngine::GetIDFromString(pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")
+    (pStr);
+    return SoundEngine::GetIDFromString(pStr);
 }
 
 uint32_t XSound::getIDFromStr(const wchar_t* pStr) const
 {
-	X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
-	return SoundEngine::GetIDFromString(pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")
+    (pStr);
+    return SoundEngine::GetIDFromString(pStr);
 }
-
 
 // ----------------------------------------------
 
 // the id is passed in, so could just pass pointer value in then use that as id.
 SndObjectHandle XSound::registerObject(X_SOUND_DEBUG_NAME(const char* pNick))
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	SoundObject* pObject = allocObject();
-	pObject->flags.Set(SoundFlag::Registered);
+    SoundObject* pObject = allocObject();
+    pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-	if (pNick) {
-		pObject->debugName = pNick;
-	}
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
+    if (pNick) {
+        pObject->debugName = pNick;
+    }
+    AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
 #else
-	AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+    AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
 #endif
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-		freeObject(pObject);
-		return INVALID_OBJECT_ID;
-	}
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+        freeObject(pObject);
+        return INVALID_OBJECT_ID;
+    }
 
-	objects_.push_back(pObject);
-	return SoundObjToObjHandle(pObject);
+    objects_.push_back(pObject);
+    return SoundObjToObjHandle(pObject);
 }
-
 
 SndObjectHandle XSound::registerObject(const Transformf& trans X_SOUND_DEBUG_NAME_COM(const char* pNick))
 {
-	SoundObject* pObject = allocObject();
+    SoundObject* pObject = allocObject();
 #if X_SOUND_ENABLE_DEBUG_NAMES
-	if (pNick) {
-		pObject->debugName = pNick;
-	}
+    if (pNick) {
+        pObject->debugName = pNick;
+    }
 #endif
 
-	// we don't make objects very far away active by default.
-	// if you play something on these distant objects, they will get registered automatically.
-	float distance = listenerTrans_.pos.distance(trans.pos);
-	if (distance > vars_.RegisteredCullDistance())
-	{
-		culledObjects_.push_back(pObject);
-	}
-	else
-	{
-		pObject->flags.Set(SoundFlag::Registered);
+    // we don't make objects very far away active by default.
+    // if you play something on these distant objects, they will get registered automatically.
+    float distance = listenerTrans_.pos.distance(trans.pos);
+    if (distance > vars_.RegisteredCullDistance()) {
+        culledObjects_.push_back(pObject);
+    }
+    else {
+        pObject->flags.Set(SoundFlag::Registered);
 
 #if X_SOUND_ENABLE_DEBUG_NAMES
-		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
+        AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject), pObject->debugName.c_str());
 #else
-		AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
+        AKRESULT res = AK::SoundEngine::RegisterGameObj(SoundObjToAKObject(pObject));
 #endif
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
-			freeObject(pObject);
-			return INVALID_OBJECT_ID;
-		}
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error registering object. %s", AkResult::ToString(res, desc));
+            freeObject(pObject);
+            return INVALID_OBJECT_ID;
+        }
 
-		setPosition(SoundObjToObjHandle(pObject), trans);
+        setPosition(SoundObjToObjHandle(pObject), trans);
 
-		objects_.push_back(pObject);
-	}
+        objects_.push_back(pObject);
+    }
 
-	return SoundObjToObjHandle(pObject);
+    return SoundObjToObjHandle(pObject);
 }
-
 
 bool XSound::unRegisterObject(SndObjectHandle object)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	SoundObject* pSound = SoundHandleToObject(object);
-	if (pSound->activeEvents) {
-		AK::SoundEngine::StopAll(object);
-	}
+    SoundObject* pSound = SoundHandleToObject(object);
+    if (pSound->activeEvents) {
+        AK::SoundEngine::StopAll(object);
+    }
 
-	AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
-		return false;
-	}
+    AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error un-registering object. %s", AkResult::ToString(res, desc));
+        return false;
+    }
 
+    if (pSound->flags.IsSet(SoundFlag::Registered)) {
+        objects_.remove(pSound);
+        if (pSound->flags.IsSet(SoundFlag::Occlusion)) {
+            occlusion_.remove(pSound);
+        }
+    }
+    else {
+        culledObjects_.remove(pSound);
+    }
 
-	if (pSound->flags.IsSet(SoundFlag::Registered)) 
-	{
-		objects_.remove(pSound);
-		if (pSound->flags.IsSet(SoundFlag::Occlusion)) 
-		{
-			occlusion_.remove(pSound);
-		}
-	}
-	else 
-	{
-		culledObjects_.remove(pSound);
-	}
-
-	freeObject(pSound);
-	return true;
+    freeObject(pSound);
+    return true;
 }
 
 void XSound::unRegisterAll(void)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	AKRESULT res = AK::SoundEngine::UnregisterAllGameObj();
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error un-registering all object. %s", AkResult::ToString(res, desc));
-	}
+    AKRESULT res = AK::SoundEngine::UnregisterAllGameObj();
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error un-registering all object. %s", AkResult::ToString(res, desc));
+    }
 
-	for (auto* pObject : objects_) {
-		objectPool_.free(pObject);
-	}
+    for (auto* pObject : objects_) {
+        objectPool_.free(pObject);
+    }
 
-	objects_.clear();
+    objects_.clear();
 }
 
 SoundObject* XSound::allocObject(void)
 {
-	return objectPool_.allocate();
+    return objectPool_.allocate();
 }
 
 void XSound::freeObject(SoundObject* pObject)
 {
-	objectPool_.free(pObject);
+    objectPool_.free(pObject);
 }
 
 SoundObject* XSound::findObjectForNick(const char* pNick)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	for (auto* pObject : objects_) 
-	{
-		if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick))
-		{
-			return pObject;
-		}
-	}
+    for (auto* pObject : objects_) {
+        if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick)) {
+            return pObject;
+        }
+    }
 
-	for (auto* pObject : culledObjects_)
-	{
-		if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick))
-		{
-			return pObject;
-		}
-	}
+    for (auto* pObject : culledObjects_) {
+        if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick)) {
+            return pObject;
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 // ----------------------------------------------
 
 void XSound::setPosition(SndObjectHandle object, const Transformf& trans)
 {
-	SoundObject* pSound = SoundHandleToObject(object);
-	pSound->trans = trans;
-	pSound->flags.Set(SoundFlag::Position);
+    SoundObject* pSound = SoundHandleToObject(object);
+    pSound->trans = trans;
+    pSound->flags.Set(SoundFlag::Position);
 
-	if (pSound->flags.IsSet(SoundFlag::Registered)) 
-	{
-		AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
-		}
-	}
+    if (pSound->flags.IsSet(SoundFlag::Registered)) {
+        AKRESULT res = AK::SoundEngine::SetPosition(object, TransToAkPos(trans));
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+        }
+    }
 }
 
 void XSound::setPosition(SndObjectHandle* pObjects, const Transformf* pTrans, size_t num)
 {
-	for (size_t i = 0; i < num; i++)
-	{
-		SoundObject* pSound = SoundHandleToObject(pObjects[i]);
-		pSound->trans = pTrans[i];
-		pSound->flags.Set(SoundFlag::Position);
+    for (size_t i = 0; i < num; i++) {
+        SoundObject* pSound = SoundHandleToObject(pObjects[i]);
+        pSound->trans = pTrans[i];
+        pSound->flags.Set(SoundFlag::Position);
 
-		if (!pSound->flags.IsSet(SoundFlag::Registered)) {
-			continue;
-		}
+        if (!pSound->flags.IsSet(SoundFlag::Registered)) {
+            continue;
+        }
 
-		AKRESULT res = AK::SoundEngine::SetPosition(pObjects[i], TransToAkPos(pTrans[i]));
-		if (res != AK_Success) {
-			AkResult::Description desc;
-			X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
-		}
-	}
+        AKRESULT res = AK::SoundEngine::SetPosition(pObjects[i], TransToAkPos(pTrans[i]));
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error setting position of object. %s", AkResult::ToString(res, desc));
+        }
+    }
 }
-
 
 // ----------------------------------------------
 
 void XSound::stopAll(SndObjectHandle object)
 {
-	// we don't have todo anything for none global objects currently.
-	// the active counts will get updated correctly.
+    // we don't have todo anything for none global objects currently.
+    // the active counts will get updated correctly.
 
-	SoundEngine::StopAll(object);
+    SoundEngine::StopAll(object);
 }
 
 void XSound::postEvent(EventID event, SndObjectHandle object)
 {
-	if (object != GLOBAL_OBJECT_ID)
-	{
-		SoundObject* pObject = SoundHandleToObject(object);
-		if (!pObject->flags.IsSet(SoundFlag::Registered))
-		{
-			registerObjectSndEngine(pObject);
+    if (object != GLOBAL_OBJECT_ID) {
+        SoundObject* pObject = SoundHandleToObject(object);
+        if (!pObject->flags.IsSet(SoundFlag::Registered)) {
+            registerObjectSndEngine(pObject);
 
-			X_ASSERT(pObject->activeEvents == 0, "Unexpected active event count")(pObject->activeEvents);
-		}
+            X_ASSERT(pObject->activeEvents == 0, "Unexpected active event count")
+            (pObject->activeEvents);
+        }
 
-		++pObject->activeEvents;
-	}
+        ++pObject->activeEvents;
+    }
 
-	auto playingId = SoundEngine::PostEvent(event, object, AkCallbackType::AK_EndOfEvent, postEventCallback_s, this);
-	if (playingId == AK_INVALID_PLAYING_ID)
-	{
-		X_ERROR("Sound", "Failed to post event %" PRIu32 " object: %" PRIu32, event, object);
-	}
-	else
-	{
-		// goaty
-		X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
-	}
+    auto playingId = SoundEngine::PostEvent(event, object, AkCallbackType::AK_EndOfEvent, postEventCallback_s, this);
+    if (playingId == AK_INVALID_PLAYING_ID) {
+        X_ERROR("Sound", "Failed to post event %" PRIu32 " object: %" PRIu32, event, object);
+    }
+    else {
+        // goaty
+        X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
+    }
 }
 
 void XSound::postEvent(const char* pEventStr, SndObjectHandle object)
 {
-	postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
+    postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
-
 
 void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)
 {
-	X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")(object);
+    X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")
+    (object);
 
-	SoundObject* pSound = SoundHandleToObject(object);
+    SoundObject* pSound = SoundHandleToObject(object);
 
-	if (type == OcclusionType::None)
-	{
-		if (pSound->occType == OcclusionType::None) {
-			return;
-		}
+    if (type == OcclusionType::None) {
+        if (pSound->occType == OcclusionType::None) {
+            return;
+        }
 
-		// remove.
-		occlusion_.remove(pSound);
-		pSound->flags.Remove(SoundFlag::Occlusion);
-	}
-	else
-	{
-		occlusion_.push_back(pSound);
-		pSound->flags.Set(SoundFlag::Occlusion);
-	}
+        // remove.
+        occlusion_.remove(pSound);
+        pSound->flags.Remove(SoundFlag::Occlusion);
+    }
+    else {
+        occlusion_.push_back(pSound);
+        pSound->flags.Set(SoundFlag::Occlusion);
+    }
 
-
-	pSound->occType = type;
+    pSound->occType = type;
 }
 
 void XSound::setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType)
 {
-	AkSwitchStateID state;
+    AkSwitchStateID state;
 
-	static_assert(engine::MaterialSurType::ENUM_COUNT == 26, "More surface types? this needs updating");
+    static_assert(engine::MaterialSurType::ENUM_COUNT == 26, "More surface types? this needs updating");
 
-	switch (surfaceType)
-	{
-		case engine::MaterialSurType::BRICK:
-			state = AK::SWITCHES::MATERIAL::SWITCH::BRICK;
-			break;
-		case engine::MaterialSurType::CONCRETE:
-			state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
-			break;
-		case engine::MaterialSurType::CLOTH:
-			state = AK::SWITCHES::MATERIAL::SWITCH::CLOTH;
-			break;
-		case engine::MaterialSurType::CARPET:
-			state = AK::SWITCHES::MATERIAL::SWITCH::CARPET;
-			break;
-		case engine::MaterialSurType::CERAMIC:
-			state = AK::SWITCHES::MATERIAL::SWITCH::CERAMIC;
-			break;
+    switch (surfaceType) {
+        case engine::MaterialSurType::BRICK:
+            state = AK::SWITCHES::MATERIAL::SWITCH::BRICK;
+            break;
+        case engine::MaterialSurType::CONCRETE:
+            state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
+            break;
+        case engine::MaterialSurType::CLOTH:
+            state = AK::SWITCHES::MATERIAL::SWITCH::CLOTH;
+            break;
+        case engine::MaterialSurType::CARPET:
+            state = AK::SWITCHES::MATERIAL::SWITCH::CARPET;
+            break;
+        case engine::MaterialSurType::CERAMIC:
+            state = AK::SWITCHES::MATERIAL::SWITCH::CERAMIC;
+            break;
 
-		case engine::MaterialSurType::DIRT:
-			state = AK::SWITCHES::MATERIAL::SWITCH::DIRT;
-			break;
+        case engine::MaterialSurType::DIRT:
+            state = AK::SWITCHES::MATERIAL::SWITCH::DIRT;
+            break;
 
-		case engine::MaterialSurType::FLESH:
-			state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
-			break;
-		case engine::MaterialSurType::FOLIAGE:
-			state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
-			break;
+        case engine::MaterialSurType::FLESH:
+            state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
+            break;
+        case engine::MaterialSurType::FOLIAGE:
+            state = AK::SWITCHES::MATERIAL::SWITCH::FOLIAGE;
+            break;
 
-		case engine::MaterialSurType::GLASS:
-			state = AK::SWITCHES::MATERIAL::SWITCH::GLASS;
-			break;
-		case engine::MaterialSurType::GRASS:
-			state = AK::SWITCHES::MATERIAL::SWITCH::GRASS;
-			break;
-		case engine::MaterialSurType::GRAVEL:
-			state = AK::SWITCHES::MATERIAL::SWITCH::GRAVEL;
-			break;
+        case engine::MaterialSurType::GLASS:
+            state = AK::SWITCHES::MATERIAL::SWITCH::GLASS;
+            break;
+        case engine::MaterialSurType::GRASS:
+            state = AK::SWITCHES::MATERIAL::SWITCH::GRASS;
+            break;
+        case engine::MaterialSurType::GRAVEL:
+            state = AK::SWITCHES::MATERIAL::SWITCH::GRAVEL;
+            break;
 
-		case engine::MaterialSurType::ICE:
-			state = AK::SWITCHES::MATERIAL::SWITCH::ICE;
-			break;
+        case engine::MaterialSurType::ICE:
+            state = AK::SWITCHES::MATERIAL::SWITCH::ICE;
+            break;
 
-		case engine::MaterialSurType::METAL:
-			state = AK::SWITCHES::MATERIAL::SWITCH::METAL;
-			break;
-		case engine::MaterialSurType::METAL_THIN:
-			state = AK::SWITCHES::MATERIAL::SWITCH::METAL_THIN;
-			break;
-		case engine::MaterialSurType::METAL_HOLLOW:
-			state = AK::SWITCHES::MATERIAL::SWITCH::METAL_HOLLOW;
-			break;
-		case engine::MaterialSurType::MUD:
-			state = AK::SWITCHES::MATERIAL::SWITCH::MUD;
-			break;
+        case engine::MaterialSurType::METAL:
+            state = AK::SWITCHES::MATERIAL::SWITCH::METAL;
+            break;
+        case engine::MaterialSurType::METAL_THIN:
+            state = AK::SWITCHES::MATERIAL::SWITCH::METAL_THIN;
+            break;
+        case engine::MaterialSurType::METAL_HOLLOW:
+            state = AK::SWITCHES::MATERIAL::SWITCH::METAL_HOLLOW;
+            break;
+        case engine::MaterialSurType::MUD:
+            state = AK::SWITCHES::MATERIAL::SWITCH::MUD;
+            break;
 
-		case engine::MaterialSurType::PLASTIC:
-			state = AK::SWITCHES::MATERIAL::SWITCH::PLASTIC;
-			break;
-		case engine::MaterialSurType::PAPER:
-			state = AK::SWITCHES::MATERIAL::SWITCH::PAPER;
-			break;
-		case engine::MaterialSurType::PLASTER:
-			state = AK::SWITCHES::MATERIAL::SWITCH::PLASTER;
-			break;
-		case engine::MaterialSurType::ROCK:
-			state = AK::SWITCHES::MATERIAL::SWITCH::ROCK;
-			break;
-		case engine::MaterialSurType::RUBBER:
-			state = AK::SWITCHES::MATERIAL::SWITCH::RUBBER;
-			break;
+        case engine::MaterialSurType::PLASTIC:
+            state = AK::SWITCHES::MATERIAL::SWITCH::PLASTIC;
+            break;
+        case engine::MaterialSurType::PAPER:
+            state = AK::SWITCHES::MATERIAL::SWITCH::PAPER;
+            break;
+        case engine::MaterialSurType::PLASTER:
+            state = AK::SWITCHES::MATERIAL::SWITCH::PLASTER;
+            break;
+        case engine::MaterialSurType::ROCK:
+            state = AK::SWITCHES::MATERIAL::SWITCH::ROCK;
+            break;
+        case engine::MaterialSurType::RUBBER:
+            state = AK::SWITCHES::MATERIAL::SWITCH::RUBBER;
+            break;
 
-		case engine::MaterialSurType::SNOW:
-			state = AK::SWITCHES::MATERIAL::SWITCH::SNOW;
-			break;
-		case engine::MaterialSurType::SAND:
-			state = AK::SWITCHES::MATERIAL::SWITCH::SAND;
-			break;
+        case engine::MaterialSurType::SNOW:
+            state = AK::SWITCHES::MATERIAL::SWITCH::SNOW;
+            break;
+        case engine::MaterialSurType::SAND:
+            state = AK::SWITCHES::MATERIAL::SWITCH::SAND;
+            break;
 
-		case engine::MaterialSurType::WOOD:
-			state = AK::SWITCHES::MATERIAL::SWITCH::WOOD;
-			break;
-		case engine::MaterialSurType::WATER:
-			state = AK::SWITCHES::MATERIAL::SWITCH::WATER;
-			break;
+        case engine::MaterialSurType::WOOD:
+            state = AK::SWITCHES::MATERIAL::SWITCH::WOOD;
+            break;
+        case engine::MaterialSurType::WATER:
+            state = AK::SWITCHES::MATERIAL::SWITCH::WATER;
+            break;
 
-		default:
-			X_ERROR("SoundSys", "Error unhandled material type: \"%s\"", engine::MaterialSurType::ToString(surfaceType));
-			state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
-			break;
-	}
+        default:
+            X_ERROR("SoundSys", "Error unhandled material type: \"%s\"", engine::MaterialSurType::ToString(surfaceType));
+            state = AK::SWITCHES::MATERIAL::SWITCH::CONCRETE;
+            break;
+    }
 
-	AKRESULT res = AK::SoundEngine::SetSwitch(AK::SWITCHES::MATERIAL::GROUP, state, object);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error when setting material type: \"%s\". %s", engine::MaterialSurType::ToString(surfaceType), AkResult::ToString(res, desc));
-	}
+    AKRESULT res = AK::SoundEngine::SetSwitch(AK::SWITCHES::MATERIAL::GROUP, state, object);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error when setting material type: \"%s\". %s", engine::MaterialSurType::ToString(surfaceType), AkResult::ToString(res, desc));
+    }
 }
 
 void XSound::setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object)
 {
-	AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error when setting switch. group: %" PRIu32 " state: %" PRIu32 " %s", state, group, AkResult::ToString(res, desc));
-	}
+    AKRESULT res = AK::SoundEngine::SetSwitch(group, state, object);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error when setting switch. group: %" PRIu32 " state: %" PRIu32 " %s", state, group, AkResult::ToString(res, desc));
+    }
 }
 
 void XSound::setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object,
-	core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve)
+    core::TimeVal changeDuration, CurveInterpolation::Enum fadeCurve)
 {
-	AKRESULT res = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error set RTPC failed. %s", AkResult::ToString(res, desc));
-	}
+    AKRESULT res = AK::SoundEngine::SetRTPCValue(id, val, object, ToAkTime(changeDuration), ToAkCurveInterpolation(fadeCurve));
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error set RTPC failed. %s", AkResult::ToString(res, desc));
+    }
 }
 
 // ------------------ Banks ----------------------------
 
-
 void XSound::loadBank(const char* pName)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	auto bankID = getBankId(pName);
+    auto bankID = getBankId(pName);
 
-	Bank* pBank = getBankForID(bankID);
-	if (pBank && pBank->status != Bank::Status::Error) {
-		X_ERROR("SoundSys", "bank \"%s\" it's already loaded", pName);
-		return;
-	}
-	else {
-		pBank = &banks_.AddOne();
-		pBank->name = pName;
-		pBank->bankID = bankID;
-	}
+    Bank* pBank = getBankForID(bankID);
+    if (pBank && pBank->status != Bank::Status::Error) {
+        X_ERROR("SoundSys", "bank \"%s\" it's already loaded", pName);
+        return;
+    }
+    else {
+        pBank = &banks_.AddOne();
+        pBank->name = pName;
+        pBank->bankID = bankID;
+    }
 
-	pBank->status = Bank::Status::Loading;
+    pBank->status = Bank::Status::Loading;
 
-	AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
-	}
+    AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
+    }
 
-	X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);
+    X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")
+    (pBank->bankID, bankID);
 }
 
 void XSound::unLoadBank(const char* pName)
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	auto bankID = getBankId(pName);
-	Bank* pBank = getBankForID(bankID);
-	if (!pBank) {
-		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not loaded", pName);
-		return;
-	}
+    auto bankID = getBankId(pName);
+    Bank* pBank = getBankForID(bankID);
+    if (!pBank) {
+        X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not loaded", pName);
+        return;
+    }
 
-	if (pBank->status != Bank::Status::Loaded) {
-		X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not fully loaded", pName);
-		return;
-	}
+    if (pBank->status != Bank::Status::Loaded) {
+        X_ERROR("SoundSys", "Can't unload bank \"%s\" it's not fully loaded", pName);
+        return;
+    }
 
-	AKRESULT res = SoundEngine::UnloadBank(bankID, nullptr, bankUnloadCallbackFunc_s, this);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Failed to un-load bank \"\" %s", pName, AkResult::ToString(res, desc));
-	}
+    AKRESULT res = SoundEngine::UnloadBank(bankID, nullptr, bankUnloadCallbackFunc_s, this);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Failed to un-load bank \"\" %s", pName, AkResult::ToString(res, desc));
+    }
 }
 
 AkBankID XSound::getBankId(const char* pName) const
 {
-	core::Path<char> name(pName);
-	name.toLower();
-	name.removeExtension();
+    core::Path<char> name(pName);
+    name.toLower();
+    name.removeExtension();
 
-	return getIDFromStr(name.c_str());
+    return getIDFromStr(name.c_str());
 }
 
 XSound::Bank* XSound::getBankForID(AkBankID id)
 {
-	for (auto& bank : banks_)
-	{
-		if (bank.bankID == id) {
-			return &bank;
-		}
-	}
+    for (auto& bank : banks_) {
+        if (bank.bankID == id) {
+            return &bank;
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 bool XSound::waitForBankLoad(Bank& bank)
 {
-	while (bank.status == Bank::Status::Loading) {
-		bankSignal_.wait();
-	}
+    while (bank.status == Bank::Status::Loading) {
+        bankSignal_.wait();
+    }
 
-	return bank.status == Bank::Status::Loaded;
+    return bank.status == Bank::Status::Loaded;
 }
 
 void XSound::listBanks(const char* pSearchPatten) const
 {
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	core::Array<const Bank*> sorted_banks(g_SoundArena);
+    core::Array<const Bank*> sorted_banks(g_SoundArena);
 
-	for (const auto& bank : banks_)
-	{
-		if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name))
-		{
-			sorted_banks.push_back(&bank);
-		}
-	}
+    for (const auto& bank : banks_) {
+        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name)) {
+            sorted_banks.push_back(&bank);
+        }
+    }
 
-	std::sort(sorted_banks.begin(), sorted_banks.end(), [](const Bank* a, const Bank* b) {
-		return a->name.compareInt(b->name) < 0;
-	}
-	);
+    std::sort(sorted_banks.begin(), sorted_banks.end(), [](const Bank* a, const Bank* b) {
+        return a->name.compareInt(b->name) < 0;
+    });
 
-	X_LOG0("SoundSys", "------------ ^8Banks(%" PRIuS ")^7 ---------------", sorted_banks.size());
+    X_LOG0("SoundSys", "------------ ^8Banks(%" PRIuS ")^7 ---------------", sorted_banks.size());
 
-	for (const auto* pBank : sorted_banks)
-	{
-		X_LOG0("SoundSys", "^2%-32s^7 ID: ^20x%08" PRIx32 "^7 Status: ^2%s",
-			pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
-	}
+    for (const auto* pBank : sorted_banks) {
+        X_LOG0("SoundSys", "^2%-32s^7 ID: ^20x%08" PRIx32 "^7 Status: ^2%s",
+            pBank->name.c_str(), pBank->bankID, Bank::Status::ToString(pBank->status));
+    }
 
-	X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
+    X_LOG0("SoundSys", "------------ ^8Banks End^7 --------------");
 }
 
 // ------------------ CallBacks Helpers ----------------------------
 
-
 void XSound::postEventCallback_s(AkCallbackType eType, AkCallbackInfo* pCallbackInfo)
 {
-	reinterpret_cast<XSound*>(pCallbackInfo->pCookie)->postEventCallback(eType, pCallbackInfo);
+    reinterpret_cast<XSound*>(pCallbackInfo->pCookie)->postEventCallback(eType, pCallbackInfo);
 }
-
 
 void XSound::bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId, void* pCookie)
+    AkMemPoolId memPoolId, void* pCookie)
 {
-	reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+    reinterpret_cast<XSound*>(pCookie)->bankCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
 }
-
 
 void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId, void* pCookie)
+    AkMemPoolId memPoolId, void* pCookie)
 {
-	reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
+    reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
 }
-
 
 // ------------------ CallBacks ----------------------------
 
 void XSound::postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackInfo)
 {
-	if (pCallbackInfo->gameObjID == GLOBAL_OBJECT_ID) {
-		return;
-	}
+    if (pCallbackInfo->gameObjID == GLOBAL_OBJECT_ID) {
+        return;
+    }
 
-	SoundObject* pObject = AKObjectToObject(pCallbackInfo->gameObjID);
-	X_ASSERT_NOT_NULL(pObject);
+    SoundObject* pObject = AKObjectToObject(pCallbackInfo->gameObjID);
+    X_ASSERT_NOT_NULL(pObject);
 
-	if (eType == AkCallbackType::AK_EndOfEvent)
-	{
-		--pObject->activeEvents;
+    if (eType == AkCallbackType::AK_EndOfEvent) {
+        --pObject->activeEvents;
 
-		X_LOG0("SoundSys", "EndOfEvent: object %p debugName: %s", pObject, pObject->debugName.c_str());
-	}
-	else
-	{
-		X_ASSERT_UNREACHABLE();
-	}
+        X_LOG0("SoundSys", "EndOfEvent: object %p debugName: %s", pObject, pObject->debugName.c_str());
+    }
+    else {
+        X_ASSERT_UNREACHABLE();
+    }
 }
 
 void XSound::bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId)
+    AkMemPoolId memPoolId)
 {
-	X_UNUSED(pInMemoryBankPtr, memPoolId);
-	Bank* pBank = X_ASSERT_NOT_NULL(getBankForID(bankID));
+    X_UNUSED(pInMemoryBankPtr, memPoolId);
+    Bank* pBank = X_ASSERT_NOT_NULL(getBankForID(bankID));
 
-	if (eLoadResult == AK_Success)
-	{
-		pBank->status = Bank::Status::Loaded;
-		X_LOG0("SoundSys", "bank \"%s\" loaded", pBank->name.c_str());
-	}
-	else
-	{
-		pBank->status = Bank::Status::Error;
+    if (eLoadResult == AK_Success) {
+        pBank->status = Bank::Status::Loaded;
+        X_LOG0("SoundSys", "bank \"%s\" loaded", pBank->name.c_str());
+    }
+    else {
+        pBank->status = Bank::Status::Error;
 
-		AkResult::Description desc;
-		X_LOG0("SoundSys", "bank \"%s\" failed to load. %s", pBank->name.c_str(), AkResult::ToString(eLoadResult, desc));
-	}
+        AkResult::Description desc;
+        X_LOG0("SoundSys", "bank \"%s\" failed to load. %s", pBank->name.c_str(), AkResult::ToString(eLoadResult, desc));
+    }
 
-	bankSignal_.raise();
+    bankSignal_.raise();
 }
 
 void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult,
-	AkMemPoolId	memPoolId)
+    AkMemPoolId memPoolId)
 {
-	X_UNUSED(pInMemoryBankPtr, memPoolId, eLoadResult);
+    X_UNUSED(pInMemoryBankPtr, memPoolId, eLoadResult);
 
-	core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(cs_);
 
-	auto it = std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank&b) {
-		return b.bankID == bankID;
-	});
+    auto it = std::remove_if(banks_.begin(), banks_.end(), [bankID](const Bank& b) {
+        return b.bankID == bankID;
+    });
 
-	banks_.erase(it, banks_.end());
+    banks_.erase(it, banks_.end());
 }
-
 
 // ------------------ CoreEvnt ----------------------------
 
-
 void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-	X_UNUSED(lparam);
+    X_UNUSED(lparam);
 
-	if (event == CoreEvent::CHANGE_FOCUS)
-	{
-		if (wparam == 1) // activated
-		{
-			X_LOG2("SoundSys", "Suspending sound system");
-			AKRESULT res = AK::SoundEngine::Suspend(false);
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
-			}
-		}
-		else
-		{
-			X_LOG2("SoundSys", "Waking sound system from syspend");
+    if (event == CoreEvent::CHANGE_FOCUS) {
+        if (wparam == 1) // activated
+        {
+            X_LOG2("SoundSys", "Suspending sound system");
+            AKRESULT res = AK::SoundEngine::Suspend(false);
+            if (res != AK_Success) {
+                AkResult::Description desc;
+                X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
+            }
+        }
+        else {
+            X_LOG2("SoundSys", "Waking sound system from syspend");
 
-			AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
-			if (res != AK_Success) {
-				AkResult::Description desc;
-				X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
-			}
-			// might need to be called here not sure.
-			// SoundEngine::RenderAudio();
-		}
-	}
+            AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
+            if (res != AK_Success) {
+                AkResult::Description desc;
+                X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
+            }
+            // might need to be called here not sure.
+            // SoundEngine::RenderAudio();
+        }
+    }
 }
-
 
 // ------------------ Commands ----------------------------
 
 // snd_set_rtpc <name> <state> <ObjectId>
 void XSound::cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
 {
-	if (pArgs->GetArgCount() < 3) {
-		X_WARNING("Console", "snd_set_rtpc <name> <value> <ObjectId>");
-		return;
-	}
+    if (pArgs->GetArgCount() < 3) {
+        X_WARNING("Console", "snd_set_rtpc <name> <value> <ObjectId>");
+        return;
+    }
 
-	const char* pName = pArgs->GetArg(1);
-	const char* pValue = pArgs->GetArg(2);
+    const char* pName = pArgs->GetArg(1);
+    const char* pValue = pArgs->GetArg(2);
 
-	// optional ObjectId
-	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
-	if (pArgs->GetArgCount() > 3) {
-		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
-	}
+    // optional ObjectId
+    AkGameObjectID objectId = GLOBAL_OBJECT_ID;
+    if (pArgs->GetArgCount() > 3) {
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
+    }
 
-	float value = core::strUtil::StringToFloat<float>(pValue);
+    float value = core::strUtil::StringToFloat<float>(pValue);
 
-	AKRESULT res = SoundEngine::SetRTPCValue(pName, value, objectId);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error setting RTPC value. %s", AkResult::ToString(res, desc));
-	}
+    AKRESULT res = SoundEngine::SetRTPCValue(pName, value, objectId);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error setting RTPC value. %s", AkResult::ToString(res, desc));
+    }
 }
 
 // snd_set_switchstate <name> <state> <ObjectId>
 void XSound::cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs)
 {
-	if (pArgs->GetArgCount() < 3) {
-		X_WARNING("Console", "snd_set_switchstate <name> <state> <ObjectId>");
-		return;
-	}
+    if (pArgs->GetArgCount() < 3) {
+        X_WARNING("Console", "snd_set_switchstate <name> <state> <ObjectId>");
+        return;
+    }
 
-	const char* pName = pArgs->GetArg(1);
-	const char* pState = pArgs->GetArg(2);
+    const char* pName = pArgs->GetArg(1);
+    const char* pState = pArgs->GetArg(2);
 
-	// optional ObjectId
-	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
-	if (pArgs->GetArgCount() > 3) {
-		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
-	}
+    // optional ObjectId
+    AkGameObjectID objectId = GLOBAL_OBJECT_ID;
+    if (pArgs->GetArgCount() > 3) {
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
+    }
 
-	AKRESULT res = SoundEngine::SetSwitch(pName, pState, objectId);
-	if (res != AK_Success) {
-		AkResult::Description desc;
-		X_ERROR("SoundSys", "Error setting switch state. %s", AkResult::ToString(res, desc));
-	}
+    AKRESULT res = SoundEngine::SetSwitch(pName, pState, objectId);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error setting switch state. %s", AkResult::ToString(res, desc));
+    }
 }
 
 // snd_post_event <eventName> <ObjectId>
 void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
 {
-	if (pArgs->GetArgCount() < 2) {
-		X_WARNING("Console", "snd_post_event <eventName> <ObjectId>");
-		return;
-	}
+    if (pArgs->GetArgCount() < 2) {
+        X_WARNING("Console", "snd_post_event <eventName> <ObjectId>");
+        return;
+    }
 
-	const char* pEventName = pArgs->GetArg(1);
-	auto eventId = SoundEngine::GetIDFromString(pEventName);
+    const char* pEventName = pArgs->GetArg(1);
+    auto eventId = SoundEngine::GetIDFromString(pEventName);
 
+    // optional ObjectId
+    if (pArgs->GetArgCount() < 3) {
+        X_LOG0("Sound", "snd_post_event(Global): id: %" PRIu32, eventId);
+        postEvent(eventId, GLOBAL_OBJECT_ID);
+        return;
+    }
 
-	// optional ObjectId
-	if (pArgs->GetArgCount() < 3)
-	{
-		X_LOG0("Sound", "snd_post_event(Global): id: %" PRIu32, eventId);
-		postEvent(eventId, GLOBAL_OBJECT_ID);
-		return;
-	}
+    // we want a specific object.
+    const char* pObjectStr = pArgs->GetArg(2);
 
-	// we want a specific object.
-	const char* pObjectStr = pArgs->GetArg(2);
+    SoundObject* pObject = findObjectForNick(pObjectStr);
+    if (!pObject) {
+        X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+        return;
+    }
 
-	SoundObject* pObject = findObjectForNick(pObjectStr);
-	if (!pObject) {
-		X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
-		return;
-	}
+    const auto& pos = pObject->trans.pos;
+    X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %s object-pos: (%g,%g,%g)", eventId, pObjectStr, pos.x, pos.y, pos.z);
 
-	const auto& pos = pObject->trans.pos;
-	X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %s object-pos: (%g,%g,%g)", eventId, pObjectStr, pos.x, pos.y, pos.z);
-
-	postEvent(eventId, SoundObjToObjHandle(pObject));
+    postEvent(eventId, SoundObjToObjHandle(pObject));
 }
-
 
 // snd_stop_event <eventName> <ObjectId>
 void XSound::cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
 {
-	if (pArgs->GetArgCount() < 2) {
-		X_WARNING("Console", "snd_stop_event <eventName> <ObjectId>");
-		return;
-	}
+    if (pArgs->GetArgCount() < 2) {
+        X_WARNING("Console", "snd_stop_event <eventName> <ObjectId>");
+        return;
+    }
 
-	const char* pEventName = pArgs->GetArg(1);
-//	auto eventId = SoundEngine::GetIDFromString(pEventName);
+    const char* pEventName = pArgs->GetArg(1);
+    //	auto eventId = SoundEngine::GetIDFromString(pEventName);
 
-	// optional ObjectId
-	AkGameObjectID objectId = GLOBAL_OBJECT_ID;
-	if (pArgs->GetArgCount() > 2) {
-		objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(2));
-	}
+    // optional ObjectId
+    AkGameObjectID objectId = GLOBAL_OBJECT_ID;
+    if (pArgs->GetArgCount() > 2) {
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(2));
+    }
 
-	// TODO
-	X_UNUSED(pEventName);
-	X_UNUSED(objectId);
+    // TODO
+    X_UNUSED(pEventName);
+    X_UNUSED(objectId);
 }
-
 
 // snd_stop_all_event <ObjectId>
 void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
 {
-	// optional ObjectId
-	if (pArgs->GetArgCount() < 2)
-	{
-		X_LOG0("Sound", "snd_stop_all(Global)");
-		stopAll(GLOBAL_OBJECT_ID);
-		return;
-	}
+    // optional ObjectId
+    if (pArgs->GetArgCount() < 2) {
+        X_LOG0("Sound", "snd_stop_all(Global)");
+        stopAll(GLOBAL_OBJECT_ID);
+        return;
+    }
 
-	// we want a specific object.
-	const char* pObjectStr = pArgs->GetArg(1);
-	SoundObject* pObject = findObjectForNick(pObjectStr);
+    // we want a specific object.
+    const char* pObjectStr = pArgs->GetArg(1);
+    SoundObject* pObject = findObjectForNick(pObjectStr);
 
-	if (!pObject) {
-		X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
-		return;
-	}
+    if (!pObject) {
+        X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+        return;
+    }
 
-	const auto& pos = pObject->trans.pos;
-	X_LOG0("Sound", "snd_stop_all: object: %s object-pos: (%g,%g,%g)", pObjectStr, pos.x, pos.y, pos.z);
+    const auto& pos = pObject->trans.pos;
+    X_LOG0("Sound", "snd_stop_all: object: %s object-pos: (%g,%g,%g)", pObjectStr, pos.x, pos.y, pos.z);
 
-	stopAll(SoundObjToObjHandle(pObject));
+    stopAll(SoundObjToObjHandle(pObject));
 }
 
 void XSound::cmd_ListBanks(core::IConsoleCmdArgs* pArgs)
 {
-	const char* pSearchString = nullptr;
-	if (pArgs->GetArgCount() > 1) {
-		pSearchString = pArgs->GetArg(1);
-	}
+    const char* pSearchString = nullptr;
+    if (pArgs->GetArgCount() > 1) {
+        pSearchString = pArgs->GetArg(1);
+    }
 
-	listBanks(pSearchString);
+    listBanks(pSearchString);
 }
-
 
 X_NAMESPACE_END

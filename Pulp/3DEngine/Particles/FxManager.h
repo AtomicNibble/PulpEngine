@@ -8,95 +8,91 @@
 #include "Vars\EffectVars.h"
 
 X_NAMESPACE_DECLARE(core,
-	struct IConsoleCmdArgs;
-)
-
+                    struct IConsoleCmdArgs;)
 
 X_NAMESPACE_BEGIN(engine)
 
 namespace fx
 {
+    class Effect;
+    class Emitter;
 
-	class Effect;
-	class Emitter;
+    class EffectManager : public IEffectManager
+        , public core::IXHotReload
+        , private core::IAssetLoadSink
+    {
+        typedef core::AssetContainer<Effect, EFFECT_MAX_LOADED, core::SingleThreadPolicy> EffectContainer;
+        typedef EffectContainer::Resource EffectResource;
 
-	class EffectManager :
-		public IEffectManager,
-		public core::IXHotReload,
-		private core::IAssetLoadSink
-	{
-		typedef core::AssetContainer<Effect, EFFECT_MAX_LOADED, core::SingleThreadPolicy> EffectContainer;
-		typedef EffectContainer::Resource EffectResource;
-
-		typedef core::MemoryArena<
-			core::PoolAllocator,
-			core::MultiThreadPolicy<core::Spinlock>,
+        typedef core::MemoryArena<
+            core::PoolAllocator,
+            core::MultiThreadPolicy<core::Spinlock>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-			core::SimpleBoundsChecking,
-			core::SimpleMemoryTracking,
-			core::SimpleMemoryTagging
+            core::SimpleBoundsChecking,
+            core::SimpleMemoryTracking,
+            core::SimpleMemoryTagging
 #else
-			core::NoBoundsChecking,
-			core::NoMemoryTracking,
-			core::NoMemoryTagging
+            core::NoBoundsChecking,
+            core::NoMemoryTracking,
+            core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-		> PoolArena;
+            >
+            PoolArena;
 
+    public:
+        EffectManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
+        ~EffectManager();
 
-	public:
-		EffectManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
-		~EffectManager();
+        void registerCmds(void);
+        void registerVars(void);
 
-		void registerCmds(void);
-		void registerVars(void);
+        bool init(void);
+        void shutDown(void);
 
-		bool init(void);
-		void shutDown(void);
+        Emitter* allocEmmiter(void);
+        void freeEmmiter(Emitter* pEmitter);
 
-		Emitter* allocEmmiter(void);
-		void freeEmmiter(Emitter* pEmitter);
+        Effect* findEffect(const char* pEffectName) const X_FINAL;
+        Effect* loadEffect(const char* pEffectName) X_FINAL;
 
-		Effect* findEffect(const char* pEffectName) const X_FINAL;
-		Effect* loadEffect(const char* pEffectName) X_FINAL;
+        void releaseEffect(Effect* pEffect);
 
-		void releaseEffect(Effect* pEffect);
+        void reloadEffect(const char* pName);
+        void listEffects(const char* pSearchPatten = nullptr) const;
 
-		void reloadEffect(const char* pName);
-		void listEffects(const char* pSearchPatten = nullptr) const;
+        // returns true if load succeed.
+        bool waitForLoad(core::AssetBase* pEffect) X_FINAL;
+        bool waitForLoad(Effect* pEffect) X_FINAL;
 
-		// returns true if load succeed.
-		bool waitForLoad(core::AssetBase* pEffect) X_FINAL;
-		bool waitForLoad(Effect* pEffect) X_FINAL;
+    private:
+        void freeDangling(void);
+        void releaseResources(Effect* pEffect);
 
-	private:
-		void freeDangling(void);
-		void releaseResources(Effect* pEffect);
+        void addLoadRequest(EffectResource* pEffect);
+        void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+        bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
-		void addLoadRequest(EffectResource* pEffect);
-		void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
-		bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+    private:
+        void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
 
-	private:
-		void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+        void listAssets(const char* pSearchPattern);
 
-		void listAssets(const char* pSearchPattern);
+    private:
+        void Cmd_ListAssets(core::IConsoleCmdArgs* pCmd);
 
-	private:
-		void Cmd_ListAssets(core::IConsoleCmdArgs* pCmd);
+    private:
+        core::MemoryArenaBase* arena_;
+        core::MemoryArenaBase* blockArena_; // for the anims data buffers
 
-	private:
-		core::MemoryArenaBase* arena_;
-		core::MemoryArenaBase* blockArena_; // for the anims data buffers
+        core::HeapArea poolHeap_;
+        PoolArena::AllocationPolicy poolAllocator_;
+        PoolArena poolArena_;
 
-		core::HeapArea				poolHeap_;
-		PoolArena::AllocationPolicy poolAllocator_;
-		PoolArena					poolArena_;
+        core::AssetLoader* pAssetLoader_;
 
-		core::AssetLoader* pAssetLoader_;
-
-		EffectContainer	effects_;
-		EffectVars vars_;
-	};
+        EffectContainer effects_;
+        EffectVars vars_;
+    };
 
 } // namespace fx
 

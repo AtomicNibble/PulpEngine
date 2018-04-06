@@ -3,7 +3,6 @@
 #ifndef _X_ENGINE_MOUDLE_EXPORTS_H_
 #define _X_ENGINE_MOUDLE_EXPORTS_H_
 
-
 #include <Core\Platform.h>
 #include <icore.h>
 
@@ -20,15 +19,12 @@ extern SCoreGlobals* gEnv;
 extern core::MallocFreeAllocator* gMalloc;
 #else // !X_LIB
 
-
 SCoreGlobals* gEnv = nullptr;
 core::MallocFreeAllocator* gMalloc = nullptr;
 
-
-#if  !defined(X_LIB)
+#if !defined(X_LIB)
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 #endif
-
 
 #if defined(_LAUNCHER)
 extern "C" void LinkModule(ICore* pCore, const char* moduleName)
@@ -36,35 +32,31 @@ extern "C" void LinkModule(ICore* pCore, const char* moduleName)
 extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName)
 #endif
 {
-	X_UNUSED(moduleName);
+    X_UNUSED(moduleName);
 
 //	core::symbolResolution::Startup();
 #ifndef X_NO_DEBUG_HANDLERS
-	core::invalidParameterHandler::Startup();
-	core::pureVirtualFunctionCallHandler::Startup();
-	core::abortHandler::Startup();
+    core::invalidParameterHandler::Startup();
+    core::pureVirtualFunctionCallHandler::Startup();
+    core::abortHandler::Startup();
 #endif // !X_NO_DEBUG_HANDLERS
 
-	if (gEnv) { // Already registered.
-		return;
-	}
+    if (gEnv) { // Already registered.
+        return;
+    }
 
-	if (pCore) {
-		gEnv = pCore->GetGlobalEnv();
-		gMalloc = pCore->GetGlobalMalloc();
-	}
+    if (pCore) {
+        gEnv = pCore->GetGlobalEnv();
+        gMalloc = pCore->GetGlobalMalloc();
+    }
 
-#if  !defined(X_LIB)
-	if (pCore)
-	{
-		IEngineFactoryRegistryImpl* pGoatFactoryImpl = 
-			static_cast<IEngineFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
-		pGoatFactoryImpl->RegisterFactories(g_pHeadToRegFactories);
-	}
+#if !defined(X_LIB)
+    if (pCore) {
+        IEngineFactoryRegistryImpl* pGoatFactoryImpl = static_cast<IEngineFactoryRegistryImpl*>(pCore->GetFactoryRegistry());
+        pGoatFactoryImpl->RegisterFactories(g_pHeadToRegFactories);
+    }
 #endif
-
 }
-
 
 #endif // !X_LIB
 

@@ -25,8 +25,7 @@ TEST(Model, Load)
 
 TEST(Model, Load)
 {
-	X_WARNING("Model", "skipping model load test in dynamic link build.");
-
+    X_WARNING("Model", "skipping model load test in dynamic link build.");
 }
 
 #endif // X_LIB

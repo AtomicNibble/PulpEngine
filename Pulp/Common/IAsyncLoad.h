@@ -11,8 +11,7 @@ X_DECLARE_ENUM8(LoadStatus)
     NotLoaded,
     Loading,
     Complete,
-    Error
-);
+    Error);
 
 class AssetBase;
 

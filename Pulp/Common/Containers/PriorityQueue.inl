@@ -2,7 +2,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
 template<typename T, class ContainerT, class Pr>
 PriorityQueue<T, ContainerT, Pr>::PriorityQueue(core::MemoryArenaBase* arena) :
     container_(arena),
@@ -15,7 +14,6 @@ PriorityQueue<T, ContainerT, Pr>::PriorityQueue(const MyType& oth) :
     container_(oth.container_),
     comp_(oth.comp_)
 {
-
 }
 
 template<typename T, class ContainerT, class Pr>
@@ -23,7 +21,6 @@ PriorityQueue<T, ContainerT, Pr>::PriorityQueue(MyType&& oth) :
     container_(std::move(oth.container_)),
     comp_(std::move(oth.comp_))
 {
-
 }
 
 template<typename T, class ContainerT, class Pr>
@@ -45,15 +42,14 @@ typename PriorityQueue<T, ContainerT, Pr>::MyType& PriorityQueue<T, ContainerT, 
 template<typename T, class ContainerT, class Pr>
 void PriorityQueue<T, ContainerT, Pr>::clear(void)
 {
-	container_.clear();
+    container_.clear();
 }
 
 template<typename T, class ContainerT, class Pr>
 void PriorityQueue<T, ContainerT, Pr>::free(void)
 {
-	container_.free();
+    container_.free();
 }
-
 
 template<typename T, class ContainerT, class Pr>
 void PriorityQueue<T, ContainerT, Pr>::push(const value_type& val)
@@ -61,7 +57,6 @@ void PriorityQueue<T, ContainerT, Pr>::push(const value_type& val)
     container_.push_back(val);
     std::push_heap(container_.begin(), container_.end(), comp_);
 }
-
 
 template<typename T, class ContainerT, class Pr>
 void PriorityQueue<T, ContainerT, Pr>::push(value_type&& val)
@@ -88,7 +83,7 @@ void PriorityQueue<T, ContainerT, Pr>::pop(void)
 template<typename T, class ContainerT, class Pr>
 typename PriorityQueue<T, ContainerT, Pr>::const_reference PriorityQueue<T, ContainerT, Pr>::peek(void) const
 {
-	return container_.front();
+    return container_.front();
 }
 
 template<typename T, class ContainerT, class Pr>
@@ -112,8 +107,7 @@ typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT
 template<typename T, class ContainerT, class Pr>
 typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT, Pr>::capacity(void) const
 {
-	return container_.capacity();
+    return container_.capacity();
 }
-
 
 X_NAMESPACE_END

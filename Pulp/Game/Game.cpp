@@ -14,7 +14,6 @@
 // #undef X_LIB
 #include <ModuleExports.h>
 
-
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
 
@@ -54,96 +53,91 @@ X_FORCE_LINK_FACTORY("XConverterLib_Shader")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Anim")
 
-
 #endif // !X_LIB
 
 void InitRootDir(void)
 {
 #ifdef WIN32
-	WCHAR szExeFileName[_MAX_PATH] = { 0 };
-	GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));
+    WCHAR szExeFileName[_MAX_PATH] = {0};
+    GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));
 
-	core::Path<wchar_t> path(szExeFileName);
+    core::Path<wchar_t> path(szExeFileName);
 
-	path.removeFileName();
-	path.removeTrailingSlash();
+    path.removeFileName();
+    path.removeTrailingSlash();
 
-	if (!SetCurrentDirectoryW(path.c_str())) {
-		core::msgbox::show("Failed to set current directory",
-			X_ENGINE_NAME " Fatal Error",
-			core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
-			core::msgbox::Buttons::OK);
+    if (!SetCurrentDirectoryW(path.c_str())) {
+        core::msgbox::show("Failed to set current directory",
+            X_ENGINE_NAME " Fatal Error",
+            core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+            core::msgbox::Buttons::OK);
 
-		ExitProcess(static_cast<uint32_t>(-1));
-	}
+        ExitProcess(static_cast<uint32_t>(-1));
+    }
 #endif
 }
 
-namespace 
+namespace
 {
-	core::MallocFreeAllocator gAlloc;
+    core::MallocFreeAllocator gAlloc;
 
 } // namespace
 
 void* operator new(size_t sz)
 {
-	return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
+    return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
 void* operator new[](size_t sz)
 {
-	return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
+    return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
 void operator delete(void* m)
 {
-	if (m) {
-		gAlloc.free(m);
-	}
+    if (m) {
+        gAlloc.free(m);
+    }
 }
 
 void operator delete[](void* m)
 {
-	if (m) {
-		gAlloc.free(m);
-	}
+    if (m) {
+        gAlloc.free(m);
+    }
 }
 
 void operator delete(void* m, size_t sz)
 {
-	if (m) {
-		gAlloc.free(m, sz);
-	}
+    if (m) {
+        gAlloc.free(m, sz);
+    }
 }
 
 void operator delete[](void* m, size_t sz)
 {
-	if (m) {
-		gAlloc.free(m, sz);
-	}
+    if (m) {
+        gAlloc.free(m, sz);
+    }
 }
 
-
-
-
-
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
-	LPTSTR lpCmdLine, int nCmdShow)
+    LPTSTR lpCmdLine, int nCmdShow)
 {
-	X_UNUSED(hPrevInstance);
-	X_UNUSED(lpCmdLine);
-	X_UNUSED(nCmdShow);
-	InitRootDir();
+    X_UNUSED(hPrevInstance);
+    X_UNUSED(lpCmdLine);
+    X_UNUSED(nCmdShow);
+    InitRootDir();
 
-	int nRes = 0;
+    int nRes = 0;
 
-	{ // scope it for leak tests.
-		EngineApp engine;
+    { // scope it for leak tests.
+        EngineApp engine;
 
-		if (engine.Init(hInstance, lpCmdLine)) {
-			nRes = engine.MainLoop();
-		}
-	}
+        if (engine.Init(hInstance, lpCmdLine)) {
+            nRes = engine.MainLoop();
+        }
+    }
 
-	return nRes;
+    return nRes;
 }

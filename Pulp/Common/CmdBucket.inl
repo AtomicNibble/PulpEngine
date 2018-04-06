@@ -123,7 +123,8 @@ X_INLINE CommandT* CommandBucket<KeyT>::addCommand(Key key, size_t auxMemorySize
 
         if (remaining == 0) {
             // check if we have space.
-            X_ASSERT(current_ < safe_static_cast<int32_t>(keys_.capacity()), "CmdBucket is full")(current_, keys_.capacity());
+            X_ASSERT(current_ < safe_static_cast<int32_t>(keys_.capacity()), "CmdBucket is full")
+            (current_, keys_.capacity());
 
             // no more storage in this block remaining, get new one
             offset = current_ += FETCH_SIZE;

@@ -6,10 +6,7 @@
 #include <IModel.h>
 #include <IShader.h>
 
-
 X_NAMESPACE_BEGIN(model)
-
-
 
 X_NAMESPACE_END
 

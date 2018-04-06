@@ -13,34 +13,34 @@ X_NAMESPACE_BEGIN(core)
 class OsFileAsync
 {
 public:
-	OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena);
-	~OsFileAsync(void);
+    OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena);
+    ~OsFileAsync(void);
 
-	XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position);
-	XOsFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position);
+    XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position);
+    XOsFileAsyncOperation writeAsync(const void* pBuffer, size_t length, uint64_t position);
 
-	XOsFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
-	XOsFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
+    XOsFileAsyncOperationCompiltion readAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
+    XOsFileAsyncOperationCompiltion writeAsync(void* pBuffer, size_t length, uint64_t position, XOsFileAsyncOperation::ComplitionRotinue callBack);
 
-	void cancelAll(void) const;
+    void cancelAll(void) const;
 
-	uint64_t tell(void) const;
-	uint64_t fileSize(void) const;
-	void setSize(int64_t numBytes);
+    uint64_t tell(void) const;
+    uint64_t fileSize(void) const;
+    void setSize(int64_t numBytes);
 
-	bool valid(void) const;
+    bool valid(void) const;
 
 #if X_ENABLE_FILE_STATS
-	static XFileStats& fileStats(void);
+    static XFileStats& fileStats(void);
 #endif // !X_ENABLE_FILE_STATS
 
 private:
-	void seek(int64_t position, IFileSys::SeekMode::Enum origin);
+    void seek(int64_t position, IFileSys::SeekMode::Enum origin);
 
 private:
-	core::MemoryArenaBase* overlappedArena_;
-	IFileSys::fileModeFlags mode_;
-	HANDLE hFile_;
+    core::MemoryArenaBase* overlappedArena_;
+    IFileSys::fileModeFlags mode_;
+    HANDLE hFile_;
 };
 
 X_NAMESPACE_END

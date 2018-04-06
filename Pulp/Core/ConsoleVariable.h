@@ -16,67 +16,64 @@ class XConsole;
 class CVarBase : public ICVar
 {
 public:
-	CVarBase(XConsole* pConsole, VarFlags flags, const char* pDesc);
+    CVarBase(XConsole* pConsole, VarFlags flags, const char* pDesc);
 
-	virtual ~CVarBase();
+    virtual ~CVarBase();
 
-	// interface ICvar 
-	virtual const char* GetDesc(void) const X_OVERRIDE;
-	virtual void SetDesc(const char* pDesc) X_OVERRIDE;
+    // interface ICvar
+    virtual const char* GetDesc(void) const X_OVERRIDE;
+    virtual void SetDesc(const char* pDesc) X_OVERRIDE;
 
-	virtual FlagType GetFlags(void) const X_OVERRIDE;
-	virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
-	virtual void SetModified(void) X_FINAL;
+    virtual FlagType GetFlags(void) const X_OVERRIDE;
+    virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
+    virtual void SetModified(void) X_FINAL;
 
-	virtual void Release(void) X_OVERRIDE;
+    virtual void Release(void) X_OVERRIDE;
 
-	virtual void ForceSet(const char* s) X_OVERRIDE;
-	virtual void SetDefault(const char* s) X_OVERRIDE;
+    virtual void ForceSet(const char* s) X_OVERRIDE;
+    virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
-	virtual ConsoleVarFunc GetOnChangeCallback(void) const X_OVERRIDE;
+    virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
+    virtual ConsoleVarFunc GetOnChangeCallback(void) const X_OVERRIDE;
 
-	virtual void OnModified(void);
+    virtual void OnModified(void);
 
-	virtual void Reset(void) X_OVERRIDE;
-	// interface ~ICvar 
-
+    virtual void Reset(void) X_OVERRIDE;
+    // interface ~ICvar
 
 protected:
-	const char*				pDesc_;
+    const char* pDesc_;
 
-	FlagType				flags_;
+    FlagType flags_;
 
-	ConsoleVarFunc			changeFunc_;
-	XConsole*				pConsole_;
+    ConsoleVarFunc changeFunc_;
+    XConsole* pConsole_;
 };
-
 
 class CVarBaseConst : public CVarBase
 {
 public:
-	X_INLINE CVarBaseConst(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseConst(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
 
-	X_INLINE ~CVarBaseConst() X_OVERRIDE;
+    X_INLINE ~CVarBaseConst() X_OVERRIDE;
 
-	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
 
 protected:
-	const char*	pName_;
+    const char* pName_;
 };
-
 
 class CVarBaseHeap : public CVarBase
 {
 public:
-	X_INLINE CVarBaseHeap(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseHeap(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
 
-	X_INLINE ~CVarBaseHeap() X_OVERRIDE;
+    X_INLINE ~CVarBaseHeap() X_OVERRIDE;
 
-	X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
 
 protected:
-	string name_;
+    string name_;
 };
 
 /////////////////////////////////////////////////////////////////////////
@@ -85,31 +82,31 @@ template<class T>
 class CVarString : public T
 {
 public:
-	X_INLINE CVarString(XConsole* pConsole, const char* pName, const char* Default,
-		VarFlags flags, const char* pDesc);
+    X_INLINE CVarString(XConsole* pConsole, const char* pName, const char* Default,
+        VarFlags flags, const char* pDesc);
 
-	X_INLINE ~CVarString() X_OVERRIDE;
+    X_INLINE ~CVarString() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
 private:
-	string String_;
+    string String_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -117,35 +114,35 @@ template<class T>
 class CVarInt : public T
 {
 public:
-	// constructor
-	X_INLINE CVarInt(XConsole* pConsole, const char* pName, const int iDefault,
-		int Min, int Max, VarFlags Flags, const char* pDesc);
+    // constructor
+    X_INLINE CVarInt(XConsole* pConsole, const char* pName, const int iDefault,
+        int Min, int Max, VarFlags Flags, const char* pDesc);
 
-	X_INLINE ~CVarInt() X_OVERRIDE;
+    X_INLINE ~CVarInt() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
 protected:
-	int 		IntValue_;
-	int			IntMin_;
-	int			IntMax_;
-	int			IntDefault_;
+    int IntValue_;
+    int IntMin_;
+    int IntMax_;
+    int IntDefault_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -153,188 +150,186 @@ template<class T>
 class CVarFloat : public T
 {
 public:
-	// constructor
-	CVarFloat(XConsole* pConsole, const char* pName, const float fDefault,
-		float Min, float Max, VarFlags nFlags, const char* pDesc);
+    // constructor
+    CVarFloat(XConsole* pConsole, const char* pName, const float fDefault,
+        float Min, float Max, VarFlags nFlags, const char* pDesc);
 
-	X_INLINE ~CVarFloat() X_OVERRIDE;
+    X_INLINE ~CVarFloat() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual void SetDefault(const char* s) X_OVERRIDE;
 
-	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
 private:
-	float 		fValue_;
-	float		fMin_;
-	float		fMax_;
-	float		fDefault_;
+    float fValue_;
+    float fMin_;
+    float fMax_;
+    float fDefault_;
 };
 
 //////////////////////////////////////////////////////////////////////////
 class CVarIntRef : public CVarBaseConst
 {
 public:
-	// constructor
-	X_INLINE CVarIntRef(XConsole* pConsole, const char* pName, int* pVar,
-		int Min, int Max, VarFlags nFlags, const char* pDesc);
+    // constructor
+    X_INLINE CVarIntRef(XConsole* pConsole, const char* pName, int* pVar,
+        int Min, int Max, VarFlags nFlags, const char* pDesc);
 
-	X_INLINE ~CVarIntRef() X_OVERRIDE;
+    X_INLINE ~CVarIntRef() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
 protected:
-	X_NO_ASSIGN(CVarIntRef);
+    X_NO_ASSIGN(CVarIntRef);
 
-	int& 		IntValue_;
-	int			IntMin_;
-	int			IntMax_;
-	int			DefaultVal_;
+    int& IntValue_;
+    int IntMin_;
+    int IntMax_;
+    int DefaultVal_;
 };
 
 //////////////////////////////////////////////////////////////////////////
 class CVarFloatRef : public CVarBaseConst
 {
 public:
-	// constructor
-	X_INLINE CVarFloatRef(XConsole* pConsole, const char* pName, float* pVal,
-		float Min, float Max, VarFlags nFlags, const char* pDesc);
+    // constructor
+    X_INLINE CVarFloatRef(XConsole* pConsole, const char* pName, float* pVal,
+        float Min, float Max, VarFlags nFlags, const char* pDesc);
 
-	X_INLINE ~CVarFloatRef() X_OVERRIDE;
+    X_INLINE ~CVarFloatRef() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	X_INLINE virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    X_INLINE virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
 private:
-	X_NO_ASSIGN(CVarFloatRef);
+    X_NO_ASSIGN(CVarFloatRef);
 
-	float& 		fValue_;
-	float		fMin_;
-	float		fMax_;
-	float		fDefault_;
+    float& fValue_;
+    float fMin_;
+    float fMax_;
+    float fDefault_;
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 class CVarColRef : public CVarBaseConst
 {
 public:
-	// constructor
-	X_INLINE CVarColRef(XConsole* pConsole, 
-		const char* pName, Color* pVal, VarFlags nFlags, const char* pDesc);
+    // constructor
+    X_INLINE CVarColRef(XConsole* pConsole,
+        const char* pName, Color* pVal, VarFlags nFlags, const char* pDesc);
 
-	X_INLINE ~CVarColRef() X_OVERRIDE;
+    X_INLINE ~CVarColRef() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
-	X_INLINE const Color& GetColor(void) const;
-	X_INLINE const Color& GetDefaultColor(void) const;
+    X_INLINE const Color& GetColor(void) const;
+    X_INLINE const Color& GetDefaultColor(void) const;
 
-	static bool ColorFromString(const char* pStr, Color& out, bool Slient = true);
+    static bool ColorFromString(const char* pStr, Color& out, bool Slient = true);
 
 private:
-	X_NO_ASSIGN(CVarColRef);
+    X_NO_ASSIGN(CVarColRef);
 
-	Color&	ColValue_;
-	Color	ColDefault_;
+    Color& ColValue_;
+    Color ColDefault_;
 };
-
 
 //////////////////////////////////////////////////////////////////////////
 class CVarVec3Ref : public CVarBaseConst
 {
 public:
-	// constructor
-	X_INLINE CVarVec3Ref(XConsole* pConsole, const char* pName, Vec3f* pVal,
-		VarFlags nFlags, const char* pDesc);
+    // constructor
+    X_INLINE CVarVec3Ref(XConsole* pConsole, const char* pName, Vec3f* pVal,
+        VarFlags nFlags, const char* pDesc);
 
-	X_INLINE ~CVarVec3Ref() X_OVERRIDE;
+    X_INLINE ~CVarVec3Ref() X_OVERRIDE;
 
-	X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
-	X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
-	X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
-	X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual int GetInteger(void) const X_OVERRIDE;
+    X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
+    X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
+    X_INLINE virtual const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
-	virtual void Set(const char* s) X_OVERRIDE;
-	X_INLINE virtual void Set(const float f) X_OVERRIDE;
-	X_INLINE virtual void Set(const int i) X_OVERRIDE;
+    virtual void Set(const char* s) X_OVERRIDE;
+    X_INLINE virtual void Set(const float f) X_OVERRIDE;
+    X_INLINE virtual void Set(const int i) X_OVERRIDE;
 
-	X_INLINE virtual void Reset(void) X_OVERRIDE;
+    X_INLINE virtual void Reset(void) X_OVERRIDE;
 
-	X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMin(void) const X_OVERRIDE;
-	X_INLINE virtual float GetMax(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
-	X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
+    X_INLINE virtual VarFlag::Enum GetType(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMin(void) const X_OVERRIDE;
+    X_INLINE virtual float GetMax(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMinInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetMaxInt(void) const X_OVERRIDE;
+    X_INLINE virtual int32_t GetDefaultInt(void) const X_OVERRIDE;
 
-	X_INLINE const Vec3f& GetVal(void) const;
-	X_INLINE const Vec3f& GetDefaultVal(void) const;
+    X_INLINE const Vec3f& GetVal(void) const;
+    X_INLINE const Vec3f& GetDefaultVal(void) const;
 
-	static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
+    static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
 
 private:
-	X_NO_ASSIGN(CVarVec3Ref);
+    X_NO_ASSIGN(CVarVec3Ref);
 
-	Vec3f&	Value_;
-	Vec3f	Default_;
+    Vec3f& Value_;
+    Vec3f Default_;
 };
 
 X_NAMESPACE_END

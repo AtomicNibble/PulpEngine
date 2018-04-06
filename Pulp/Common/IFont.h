@@ -134,14 +134,12 @@ X_DECLARE_ENUM(FontEncoding)
     Unicode,
     // Corresponds to the Microsoft Symbol encoding, used to encode mathematical symbols in the 32..255 character code range.
     // For more information, see `http://www.ceviz.net/symbol.htm'.
-    MSSymbol
-);
+    MSSymbol);
 
 X_DECLARE_FLAGS(FontFlag)
 (
     // The font is proportional, aka not monospace.
-    PROPORTIONAL
-);
+    PROPORTIONAL);
 
 typedef Flags<FontFlag> FontFlags;
 

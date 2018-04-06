@@ -3,7 +3,6 @@
 #ifndef X_PUREVIRTUALFUNCTIONCALLHANDLER_H_
 #define X_PUREVIRTUALFUNCTIONCALLHANDLER_H_
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Debugging
@@ -23,15 +22,15 @@ X_NAMESPACE_BEGIN(core)
 ///         // triggers a pure virtual function call
 ///         Call();
 ///       }
-///   
+///
 ///       void Call(void)
 ///       {
 ///           Do();
 ///       }
-///   
+///
 ///       virtual void Do(void) = 0;
 ///   };
-///   
+///
 ///   struct Derived : public Base
 ///   {
 ///       virtual void Do(void)
@@ -46,19 +45,18 @@ X_NAMESPACE_BEGIN(core)
 /// \sa abortHandler exceptionHandler invalidParameterHandler
 namespace pureVirtualFunctionCallHandler
 {
-	/// A custom exception code recognized by the exception handler.
-	static const DWORD EXCEPTION_CODE = 0xE000000E;
+    /// A custom exception code recognized by the exception handler.
+    static const DWORD EXCEPTION_CODE = 0xE000000E;
 
-	/// \brief Starts the pure virtual function call handler.
-	/// \remark This is called automatically when starting the Core module.
-	void Startup(void);
+    /// \brief Starts the pure virtual function call handler.
+    /// \remark This is called automatically when starting the Core module.
+    void Startup(void);
 
-	/// \brief Shuts down the pure virtual function call handler.
-	/// \remark This is called automatically when shutting down the Core module.
-	void Shutdown(void);
-}
+    /// \brief Shuts down the pure virtual function call handler.
+    /// \remark This is called automatically when shutting down the Core module.
+    void Shutdown(void);
+} // namespace pureVirtualFunctionCallHandler
 
 X_NAMESPACE_END
-
 
 #endif

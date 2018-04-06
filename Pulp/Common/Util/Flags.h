@@ -51,7 +51,7 @@ public:
     inline Flags& operator=(Enum e);
     inline Flags& operator=(const Flags& oth);
 
-    inline Flags operator~(void)const;
+    inline Flags operator~(void) const;
 
     // Returns the flags' value as integer.
     inline uint32_t ToInt(void) const;

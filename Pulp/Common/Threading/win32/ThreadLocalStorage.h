@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef _X_THREADING_LOCAL_STORAGE_H_
 #define _X_THREADING_LOCAL_STORAGE_H_
 
@@ -36,31 +35,29 @@ X_NAMESPACE_BEGIN(core)
 ///   }
 /// \endcode
 
-
 class ThreadLocalStorage
 {
 public:
-	/// Allocate a thread local storage slot from the OS.
-	inline ThreadLocalStorage(void);
-	inline ~ThreadLocalStorage(void);
+    /// Allocate a thread local storage slot from the OS.
+    inline ThreadLocalStorage(void);
+    inline ~ThreadLocalStorage(void);
 
-	/// Associate data with the calling thread.
-	inline void SetValue(void* value);
+    /// Associate data with the calling thread.
+    inline void SetValue(void* value);
 
-	/// Retrieve data from thread local storage for the calling thread.
-	template <typename T>
-	inline T* GetValue(void) const;
+    /// Retrieve data from thread local storage for the calling thread.
+    template<typename T>
+    inline T* GetValue(void) const;
 
 private:
-	X_NO_COPY(ThreadLocalStorage);
-	X_NO_ASSIGN(ThreadLocalStorage);
+    X_NO_COPY(ThreadLocalStorage);
+    X_NO_ASSIGN(ThreadLocalStorage);
 
-	DWORD index_;
+    DWORD index_;
 };
 
 #include "ThreadLocalStorage.inl"
 
 X_NAMESPACE_END
-
 
 #endif // !_X_THREADING_LOCAL_STORAGE_H_

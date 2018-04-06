@@ -4,7 +4,6 @@
 
 X_NAMESPACE_BEGIN(physics)
 
-
 #if PHYSX_SCENE_REQUIRES_LOCK
 
 #define PHYS_SCENE_READ_LOCK(pScene) physx::PxSceneReadLock scopedLock(*pScene, __FILE__, __LINE__);
@@ -16,6 +15,5 @@ X_NAMESPACE_BEGIN(physics)
 #define PHYS_SCENE_WRITE_LOCK(pScene) X_UNUSED(pScene);
 
 #endif // !PHYSX_SCENE_REQUIRES_LOCK
-
 
 X_NAMESPACE_END

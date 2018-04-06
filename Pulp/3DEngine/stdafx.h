@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <EngineCommon.h>
 #include <IAsyncLoad.h>
 
@@ -21,7 +19,6 @@
 #include <IMaterial.h>
 #include <IDirectoryWatcher.h>
 
-
 // Img Lib
 #include <../../tools/ImgLib/ImgLib.h>
 // Mat Lib
@@ -34,10 +31,8 @@ X_LINK_ENGINE_LIB("MaterialLib");
 X_LINK_ENGINE_LIB("ModelLib");
 X_LINK_ENGINE_LIB("AnimLib");
 
-
 extern core::MemoryArenaBase* g_3dEngineArena;
 
 #include "Util\Config.h"
-
 
 #include "EngineEnv.h"

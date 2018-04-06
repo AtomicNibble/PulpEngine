@@ -5,16 +5,13 @@
 #include <../../3rdparty/source/lz5/lz5_compress.h>
 #include <../../3rdparty/source/lz5/lz5_decompress.h>
 
-
-
-
 X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-	namespace
-	{
-		/*
+    namespace
+    {
+        /*
 			lvl				Compression		Decompress.		Compr. size		Ratio
 	(10-19) fastLZ4: 
 			lz5 2.0 -10		346 MB/s		2610 MB/s		103402971		48.79
@@ -72,259 +69,252 @@ namespace Compression
 
 		*/
 
-		int compressLevelToAcceleration(CompressLevel::Enum lvl)
-		{
-			if (lvl == CompressLevel::LOW) {
-				return LZ5_MIN_CLEVEL;
-			}
-			if (lvl == CompressLevel::NORMAL) {
-				return 12;
-			}
-			if (lvl == CompressLevel::HIGH) {
-				return 19;
-			}
+        int compressLevelToAcceleration(CompressLevel::Enum lvl)
+        {
+            if (lvl == CompressLevel::LOW) {
+                return LZ5_MIN_CLEVEL;
+            }
+            if (lvl == CompressLevel::NORMAL) {
+                return 12;
+            }
+            if (lvl == CompressLevel::HIGH) {
+                return 19;
+            }
 
-			X_ASSERT_UNREACHABLE();
-			return LZ5_MIN_CLEVEL;
-		}
+            X_ASSERT_UNREACHABLE();
+            return LZ5_MIN_CLEVEL;
+        }
 
-		int compressLevelToAccelerationHC(CompressLevel::Enum lvl)
-		{
-			if (lvl == CompressLevel::LOW) {
-				return 30;
-			}
-			if (lvl == CompressLevel::NORMAL) {
-				return 35;
-			}
-			if (lvl == CompressLevel::HIGH) {
-				return 39;
-			}
+        int compressLevelToAccelerationHC(CompressLevel::Enum lvl)
+        {
+            if (lvl == CompressLevel::LOW) {
+                return 30;
+            }
+            if (lvl == CompressLevel::NORMAL) {
+                return 35;
+            }
+            if (lvl == CompressLevel::HIGH) {
+                return 39;
+            }
 
-			X_ASSERT_UNREACHABLE();
-			return LZ5_MIN_CLEVEL;
-		}
+            X_ASSERT_UNREACHABLE();
+            return LZ5_MIN_CLEVEL;
+        }
 
-	} // namespace
+    } // namespace
 
-	Algo::Enum LZ5::getAlgo(void)
-	{
-		return Algo::LZ5;
-	}
+    Algo::Enum LZ5::getAlgo(void)
+    {
+        return Algo::LZ5;
+    }
 
-	size_t LZ5::maxSourceSize(void)
-	{
-		return static_cast<size_t>(LZ5_MAX_INPUT_SIZE);
-	}
+    size_t LZ5::maxSourceSize(void)
+    {
+        return static_cast<size_t>(LZ5_MAX_INPUT_SIZE);
+    }
 
-	size_t LZ5::requiredDeflateDestBuf(size_t sourceLen)
-	{
-		return static_cast<size_t>(LZ5_compressBound(safe_static_cast<int, size_t>(sourceLen)));
-	}
+    size_t LZ5::requiredDeflateDestBuf(size_t sourceLen)
+    {
+        return static_cast<size_t>(LZ5_compressBound(safe_static_cast<int, size_t>(sourceLen)));
+    }
 
-	bool LZ5::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-		void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
-	{
-		X_UNUSED(arena);
+    bool LZ5::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
 
-		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
-		char* pDst = reinterpret_cast<char*>(pDstBuf);
+        const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+        char* pDst = reinterpret_cast<char*>(pDstBuf);
 
-		const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
+        const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
+        const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		const int32_t res = LZ5_compress(pSrc, pDst, srcSize, detSize,
-			compressLevelToAcceleration(lvl));
+        const int32_t res = LZ5_compress(pSrc, pDst, srcSize, detSize,
+            compressLevelToAcceleration(lvl));
 
-		if (res <= 0) {
-			X_ERROR("LZ5", "Failed to compress buffer: %" PRIi32, res);
-			destLenOut = 0;
-			return false;
-		}
+        if (res <= 0) {
+            X_ERROR("LZ5", "Failed to compress buffer: %" PRIi32, res);
+            destLenOut = 0;
+            return false;
+        }
 
-		destLenOut = res;
-		return true;
-	}
+        destLenOut = res;
+        return true;
+    }
 
-	bool LZ5::inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-		void* pDstBuf, size_t destBufLen)
-	{
-		X_UNUSED(arena);
+    bool LZ5::inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen)
+    {
+        X_UNUSED(arena);
 
-		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
-		char* pDst = reinterpret_cast<char*>(pDstBuf);
-		const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
+        const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+        char* pDst = reinterpret_cast<char*>(pDstBuf);
+        const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
+        const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		const int32_t res = LZ5_decompress_safe(pSrc, pDst, srcSize, detSize);
+        const int32_t res = LZ5_decompress_safe(pSrc, pDst, srcSize, detSize);
 
-		if (res <= 0) {
-			X_ERROR("LZ5", "Failed to decompress buffer: %" PRIi32, res);
-			return false;
-		}
-		return true;
-	}
+        if (res <= 0) {
+            X_ERROR("LZ5", "Failed to decompress buffer: %" PRIi32, res);
+            return false;
+        }
+        return true;
+    }
 
-	// ---------------------------------------
+    // ---------------------------------------
 
+    bool LZ5HC::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
 
-	bool LZ5HC::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-		void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
-	{
-		X_UNUSED(arena);
+        const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+        char* pDst = reinterpret_cast<char*>(pDstBuf);
 
-		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
-		char* pDst = reinterpret_cast<char*>(pDstBuf);
+        const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
+        const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
 
-		const int32_t srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		const int32_t detSize = safe_static_cast<int, size_t>(destBufLen);
+        const int32_t res = LZ5_compress(pSrc, pDst, srcSize, detSize, compressLevelToAccelerationHC(lvl));
 
-		const int32_t res = LZ5_compress(pSrc, pDst, srcSize, detSize, compressLevelToAccelerationHC(lvl));
+        if (res <= 0) {
+            X_ERROR("LZ5", "Failed to compress buffer: %" PRIi32, res);
+            destLenOut = 0;
+            return false;
+        }
 
-		if (res <= 0) {
-			X_ERROR("LZ5", "Failed to compress buffer: %" PRIi32, res);
-			destLenOut = 0;
-			return false;
-		}
+        destLenOut = res;
+        return true;
+    }
 
-		destLenOut = res;
-		return true;
-	}
+    // ---------------------------------------
 
+    // check the helpers are correct.
 
-	// ---------------------------------------
+    static_assert(LZ5Stream::maxSourceSize() == LZ5_MAX_INPUT_SIZE, "LZ5 max source size helper don't match lib value");
+    static_assert(LZ5Stream::requiredDeflateDestBuf(0x1223345) == LZ5_COMPRESSBOUND(0x1223345), "LZ5 compressbound helper don't match lib result");
 
-	// check the helpers are correct.
+    LZ5Stream::LZ5Stream(core::MemoryArenaBase* arena, CompressLevel::Enum lvl) :
+        stream_(nullptr)
+    {
+        X_UNUSED(arena);
 
-	static_assert(LZ5Stream::maxSourceSize() == LZ5_MAX_INPUT_SIZE, "LZ5 max source size helper don't match lib value");
-	static_assert(LZ5Stream::requiredDeflateDestBuf(0x1223345) == LZ5_COMPRESSBOUND(0x1223345), "LZ5 compressbound helper don't match lib result");
+        LZ5_stream_t* pStream = LZ5_createStream(compressLevelToAcceleration(lvl));
 
+        stream_ = pStream;
+    }
 
-	LZ5Stream::LZ5Stream(core::MemoryArenaBase* arena, CompressLevel::Enum lvl) :
-		stream_(nullptr)
-	{
-		X_UNUSED(arena);
+    LZ5Stream::~LZ5Stream()
+    {
+        if (stream_) {
+            LZ5_freeStream(static_cast<LZ5_stream_t*>(stream_));
+        }
+    }
 
-		LZ5_stream_t* pStream = LZ5_createStream(compressLevelToAcceleration(lvl));
+    bool LZ5Stream::loadDict(const uint8_t* pDict, size_t size)
+    {
+        if (size < sizeof(SharedDictHdr)) {
+            X_ERROR("LZ4", "Dictionary is too small to be valid");
+            return false;
+        }
 
-		stream_ = pStream;
-	}
+        const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+        if (!pDictHdr->IsMagicValid()) {
+            X_ERROR("LZ4", "Dictionary header is not valid");
+            return false;
+        }
 
-	LZ5Stream::~LZ5Stream()
-	{
-		if (stream_) {
-			LZ5_freeStream(static_cast<LZ5_stream_t*>(stream_));
-		}
-	}
+        const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
 
-	bool LZ5Stream::loadDict(const uint8_t* pDict, size_t size)
-	{
-		if (size < sizeof(SharedDictHdr)) {
-			X_ERROR("LZ4", "Dictionary is too small to be valid");
-			return false;
-		}
+        int32_t dictSize = LZ5_loadDict(
+            reinterpret_cast<LZ5_stream_t*>(stream_),
+            reinterpret_cast<const char*>(pDict),
+            cappedSize);
 
-		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
-		if (!pDictHdr->IsMagicValid()) {
-			X_ERROR("LZ4", "Dictionary header is not valid");
-			return false;
-		}
+        if (dictSize == 0 || dictSize < cappedSize) {
+            X_ERROR("LZ4", "Failed to set dictionary");
+            return false;
+        }
 
-		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+        return true;
+    }
 
-		int32_t dictSize = LZ5_loadDict(
-			reinterpret_cast<LZ5_stream_t*>(stream_),
-			reinterpret_cast<const char*>(pDict),
-			cappedSize
-		);
+    size_t LZ5Stream::compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen)
+    {
+        X_ASSERT_NOT_NULL(stream_);
+        LZ5_stream_t* pStream = reinterpret_cast<LZ5_stream_t*>(stream_);
 
-		if (dictSize == 0 || dictSize < cappedSize) {
-			X_ERROR("LZ4", "Failed to set dictionary");
-			return false;
-		}
+        const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+        char* pDst = reinterpret_cast<char*>(pDstBuf);
+        int srcSize = safe_static_cast<int, size_t>(srcBufLen);
+        int dstSize = safe_static_cast<int, size_t>(destBufLen);
 
-		return true;
-	}
+        int res = LZ5_compress_continue(pStream, pSrc, pDst, srcSize, dstSize);
 
-	size_t LZ5Stream::compressContinue(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen)
-	{
-		X_ASSERT_NOT_NULL(stream_);
-		LZ5_stream_t* pStream = reinterpret_cast<LZ5_stream_t*>(stream_);
+        if (res == 0) {
+            X_ERROR("LZ5", "Failed to compress buffer");
+        }
 
-		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
-		char* pDst = reinterpret_cast<char*>(pDstBuf);
-		int srcSize = safe_static_cast<int, size_t>(srcBufLen);
-		int dstSize = safe_static_cast<int, size_t>(destBufLen);
+        return res;
+    }
 
-		int res = LZ5_compress_continue(pStream, pSrc, pDst, srcSize, dstSize);
+    // ---------------------------------------
 
-		if (res == 0) {
-			X_ERROR("LZ5", "Failed to compress buffer");
-		}
+    LZ5StreamDecode::LZ5StreamDecode()
+    {
+        static_assert(sizeof(decodeStream_) == sizeof(LZ5_streamDecode_t), "");
+        LZ5_streamDecode_t* pStream = reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_);
 
-		return res;
-	}
+        LZ5_setStreamDecode(pStream, nullptr, 0);
+    }
 
-	// ---------------------------------------
-
-
-	LZ5StreamDecode::LZ5StreamDecode()
-	{
-		static_assert(sizeof(decodeStream_) == sizeof(LZ5_streamDecode_t), "");
-		LZ5_streamDecode_t* pStream = reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_);
-
-		LZ5_setStreamDecode(pStream, nullptr, 0);
-	}
-
-	LZ5StreamDecode::~LZ5StreamDecode()
-	{
+    LZ5StreamDecode::~LZ5StreamDecode()
+    {
 #if X_DEBUG
-		core::zero_object(decodeStream_);
+        core::zero_object(decodeStream_);
 #endif // !X_DEBUG
-	}
+    }
 
-	bool LZ5StreamDecode::loadDict(const uint8_t* pDict, size_t size)
-	{
-		if (size < sizeof(SharedDictHdr)) {
-			X_ERROR("LZ4", "Dictionary is too small to be valid");
-			return false;
-		}
+    bool LZ5StreamDecode::loadDict(const uint8_t* pDict, size_t size)
+    {
+        if (size < sizeof(SharedDictHdr)) {
+            X_ERROR("LZ4", "Dictionary is too small to be valid");
+            return false;
+        }
 
-		const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
-		if (!pDictHdr->IsMagicValid()) {
-			X_ERROR("LZ4", "Dictionary header is not valid");
-			return false;
-		}
+        const SharedDictHdr* pDictHdr = reinterpret_cast<const SharedDictHdr*>(pDict);
+        if (!pDictHdr->IsMagicValid()) {
+            X_ERROR("LZ4", "Dictionary header is not valid");
+            return false;
+        }
 
-		const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
+        const int32_t cappedSize = core::Min(safe_static_cast<int32_t>(size), 64 * 1024);
 
-		int32_t res = LZ5_setStreamDecode(
-			reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_),
-			reinterpret_cast<const char*>(pDict),
-			cappedSize
-		);
+        int32_t res = LZ5_setStreamDecode(
+            reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_),
+            reinterpret_cast<const char*>(pDict),
+            cappedSize);
 
-		return res == 1;
-	}
+        return res == 1;
+    }
 
-	size_t LZ5StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize)
-	{
-		LZ5_streamDecode_t* pStream = reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_);
+    size_t LZ5StreamDecode::decompressContinue(const void* pSrcBuf, void* pDstBuf, size_t compressedSize, size_t maxDecompressedSize)
+    {
+        LZ5_streamDecode_t* pStream = reinterpret_cast<LZ5_streamDecode_t*>(decodeStream_);
 
-		const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
-		char* pDst = reinterpret_cast<char*>(pDstBuf);
-		int cmpSize = safe_static_cast<int, size_t>(compressedSize);
-		int maxDecSize = safe_static_cast<int, size_t>(maxDecompressedSize);
+        const char* pSrc = reinterpret_cast<const char*>(pSrcBuf);
+        char* pDst = reinterpret_cast<char*>(pDstBuf);
+        int cmpSize = safe_static_cast<int, size_t>(compressedSize);
+        int maxDecSize = safe_static_cast<int, size_t>(maxDecompressedSize);
 
-		int res = LZ5_decompress_safe_continue(pStream, pSrc, pDst, cmpSize, maxDecSize);
+        int res = LZ5_decompress_safe_continue(pStream, pSrc, pDst, cmpSize, maxDecSize);
 
-		if (res < 0) {
-			X_ERROR("LZ5", "Error decompressing stream");
-			return 0;
-		}
+        if (res < 0) {
+            X_ERROR("LZ5", "Error decompressing stream");
+            return 0;
+        }
 
-		return res;
-	}
-
+        return res;
+    }
 
 } // namespace Compression
 

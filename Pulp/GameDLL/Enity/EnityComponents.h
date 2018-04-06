@@ -6,265 +6,246 @@
 #include "UserCmds\UserCmd.h"
 
 X_NAMESPACE_DECLARE(model,
-	class XModel;
-)
+                    class XModel;)
 
 X_NAMESPACE_DECLARE(anim,
-	class Animator;
-)
+                    class Animator;)
 
 X_NAMESPACE_DECLARE(engine,
-	struct IRenderEnt;
-	namespace fx {
-		struct IEmitter;
-	}
-)
-
+                    struct IRenderEnt;
+                    namespace fx {
+                        struct IEmitter;
+                    })
 
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-	class WeaponDef;
+    class WeaponDef;
 }
 
 namespace entity
 {
+    typedef uint16_t EntityId;
 
-typedef uint16_t EntityId;
+    struct TransForm : public Transformf
+    {
+    };
 
-struct TransForm : public Transformf
-{
+    struct Health
+    {
+        int32_t hp;
+        int32_t max;
+    };
 
-};
+    struct SoundObject
+    {
+        Vec3f offset; // offset of sound object relative to ent's transform.
+        core::string occType;
+        sound::SndObjectHandle handle;
+    };
 
-struct Health
-{
-	int32_t hp;
-	int32_t max;
-};
+    struct SoundEnviroment
+    {
+        // sound::SndObjectHandle handle;
+    };
 
-struct SoundObject
-{
-	Vec3f offset; // offset of sound object relative to ent's transform.
-	core::string occType;
-	sound::SndObjectHandle handle;
-};
+    struct Mesh
+    {
+        core::string name;
+        model::XModel* pModel;
+    };
 
-struct SoundEnviroment
-{
-	// sound::SndObjectHandle handle;
-};
+    struct MeshRenderer
+    {
+        engine::IRenderEnt* pRenderEnt;
+    };
 
+    struct MeshCollider
+    {
+        physics::ActorHandle actor;
+    };
 
-struct Mesh
-{
-	core::string name;
-	model::XModel* pModel;
-};
+    struct DynamicObject
+    {
+        physics::ActorHandle actor;
+    };
 
-struct MeshRenderer
-{
-	engine::IRenderEnt* pRenderEnt;
-};
+    struct Animator
+    {
+        anim::Animator* pAnimator;
+    };
 
-struct MeshCollider
-{
-	physics::ActorHandle actor;
-};
+    struct EntName
+    {
+        core::string name;
+    };
 
-struct DynamicObject
-{
-	physics::ActorHandle actor;
+    // -----------------------------------
 
-};
+    struct Inventory
+    {
+        // i will want per ammo type stores at somepoint
+        // but the types are data driven.
+        // need some sort of type to index shit maybe.
+        int32_t ammo;
+    };
 
+    struct Weapon
+    {
+        EntityId ownerEnt;
 
-struct Animator
-{
-	anim::Animator* pAnimator;
+        engine::fx::IEmitter* pFlashEmt;
+        engine::fx::IEmitter* pBrassEmt;
 
-};
+        weapon::WeaponDef* pWeaponDef;
+        weapon::State::Enum state;
+        weapon::StateFlags stateFlags;
 
-struct EntName
-{
-	core::string name;
-};
+        core::TimeVal stateEnd;
 
+        int32_t ammoInClip;
+        int32_t ammoType;
 
-// -----------------------------------
+        bool attack;
+        bool reload;
+    };
 
-struct Inventory
-{
+    struct Velocity
+    {
+        Vec3f dir;
+    };
 
-	// i will want per ammo type stores at somepoint
-	// but the types are data driven.
-	// need some sort of type to index shit maybe.
-	int32_t ammo; 
+    struct PhysicsComponent
+    {
+        physics::ActorHandle actor;
+    };
 
+    struct PhysicsTrigger
+    {
+        physics::ActorHandle actor;
+    };
 
-};
+    struct CharacterController
+    {
+        physics::ICharacterController* pController;
+    };
 
-struct Weapon
-{
-	EntityId ownerEnt;
+    struct RenderComponent
+    {
+        engine::IRenderEnt* pRenderEnt;
+        model::XModel* pModel;
+    };
 
-	engine::fx::IEmitter* pFlashEmt;
-	engine::fx::IEmitter* pBrassEmt;
+    struct Rotator
+    {
+        Vec3f axis;
+        float speed;
+    };
 
-	weapon::WeaponDef* pWeaponDef;
-	weapon::State::Enum state;
-	weapon::StateFlags stateFlags;
+    struct Mover // move back and forth
+    {
+        Vec3f start;
+        Vec3f end;
+        float time;
+        float fract;
+    };
 
-	core::TimeVal stateEnd;
+    struct Emitter
+    {
+        core::string effect;
+        Vec3f offset;
 
-	int32_t ammoInClip;
-	int32_t ammoType;
+        engine::fx::IEmitter* pEmitter;
+    };
 
-	bool attack;
-	bool reload;
-};
+    // struct ScriptName
+    // {
+    // 	const char* pName;
+    // };
 
-struct Velocity 
-{
-	Vec3f dir;
-};
+    struct RenderView
+    {
+        Vec2f fov;
 
-struct PhysicsComponent
-{
-	physics::ActorHandle actor;
-};
+        Vec3f viewOrg;
+        Matrix33f viewAxis;
+    };
 
-struct PhysicsTrigger
-{
-	physics::ActorHandle actor;
-};
+    struct Player
+    {
+        X_DECLARE_FLAGS(State)
+        (
+            Jump,
+            Crouch,
+            OnGround);
 
-struct CharacterController
-{
-	physics::ICharacterController* pController;
-};
+        typedef Flags<State> StateFlags;
 
-struct RenderComponent
-{
-	engine::IRenderEnt* pRenderEnt;
-	model::XModel* pModel;
-};
+        StateFlags state;
 
-struct Rotator
-{
-	Vec3f axis;
-	float speed;
-};
+        core::TimeVal jumpTime;
 
-struct Mover // move back and forth
-{
-	Vec3f start;
-	Vec3f end;
-	float time;
-	float fract;
-};
+        Vec3f eyeOffset;
 
+        Anglesf viewAngles;
+        Anglesf cmdAngles;
+        Anglesf deltaViewAngles;
 
-struct Emitter
-{
-	core::string effect;
-	Vec3f offset;
+        Anglesf viewBobAngles;
+        Vec3f viewBob;
 
-	engine::fx::IEmitter* pEmitter;
-};
+        float bobFrac;
+        float bobfracsin;
+        int32_t bobCycle;
 
-// struct ScriptName
-// {
-// 	const char* pName;
-// };
+        Vec3f firstPersonViewOrigin;
+        Matrix33f firstPersonViewAxis;
 
-struct RenderView
-{
-	Vec2f fov;
+        UserCmd oldUserCmd;
+        UserCmd userCmd;
 
-	Vec3f viewOrg;
-	Matrix33f viewAxis;
-};
+        EntityId weaponEnt;
+        EntityId armsEnt;
+    };
 
+    struct Attached
+    {
+        EntityId parentEnt;
+        model::BoneHandle parentBone; // not always set
 
+        Vec3f offset;
+    };
 
-struct Player
-{
-	X_DECLARE_FLAGS(State) (
-		Jump,
-		Crouch,
-		OnGround
-	);
+    using EnitiyRegister = ecs::StandardRegistry<EntityId,
+        TransForm,
+        Health,
 
-	typedef Flags<State> StateFlags;
+        Mesh,
+        MeshRenderer,
+        MeshCollider,
+        DynamicObject,
 
-	StateFlags state;
+        SoundObject,
+        SoundEnviroment,
 
-	core::TimeVal jumpTime;
+        Inventory,
+        Weapon,
+        Attached,
+        Rotator,
+        Mover,
+        Emitter,
 
-	Vec3f eyeOffset;
+        Animator,
+        Velocity,
+        RenderComponent,
+        PhysicsComponent,
+        PhysicsTrigger,
+        CharacterController,
+        EntName,
+        Player>;
 
-	Anglesf viewAngles;
-	Anglesf cmdAngles;
-	Anglesf deltaViewAngles;
-
-	Anglesf viewBobAngles;
-	Vec3f	viewBob;
-
-	float bobFrac;
-	float bobfracsin;
-	int32_t	bobCycle;
-
-	Vec3f		firstPersonViewOrigin;
-	Matrix33f	firstPersonViewAxis;
-
-	UserCmd oldUserCmd;
-	UserCmd userCmd;
-
-	EntityId weaponEnt;
-	EntityId armsEnt;
-};
-
-struct Attached
-{
-	EntityId parentEnt;
-	model::BoneHandle parentBone; // not always set
-
-	Vec3f offset;
-
-};
-
-using EnitiyRegister = ecs::StandardRegistry<EntityId,
-	TransForm,
-	Health,
-
-	Mesh,
-	MeshRenderer,
-	MeshCollider,
-	DynamicObject,
-
-	SoundObject,
-	SoundEnviroment,
-
-	Inventory,
-	Weapon,
-	Attached,
-	Rotator,
-	Mover,
-	Emitter,
-
-	Animator,
-	Velocity,
-	RenderComponent,
-	PhysicsComponent,
-	PhysicsTrigger,
-	CharacterController,
-	EntName,
-	Player
->;
-
-constexpr EnitiyRegister::entity_type INVALID_ENT_ID = EnitiyRegister::INVALID_ID;
+    constexpr EnitiyRegister::entity_type INVALID_ENT_ID = EnitiyRegister::INVALID_ID;
 
 } // namespace entity
 

@@ -15,320 +15,290 @@
 
 #include "XWindow.h"
 
-
 X_NAMESPACE_BEGIN(engine)
 
 using namespace input;
 
 namespace gui
 {
+    XGui::XGui(XGuiManager& guiMan) :
+        guiMan_(guiMan),
+        pDesktop_(nullptr),
+        sourceCrc32_(0)
+    {
+    }
 
-	XGui::XGui(XGuiManager& guiMan) :
-		guiMan_(guiMan),
-		pDesktop_(nullptr),
-		sourceCrc32_(0)
-	{
+    XGui::~XGui()
+    {
+    }
 
-	}
+    void XGui::Redraw(engine::IPrimativeContext* pDrawCon)
+    {
+        if (isDeskTopValid()) {
+            pDesktop_->reDraw(pDrawCon);
+        }
+    }
 
-	XGui::~XGui()
-	{
+    void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
+    {
+        // windows call this function when they want the cursor draw.
+        // the position of the mouse is: cursorPos_
+        // GuiManger has the texture object.
+        // so that multiple gui's can share the same pointer.
+        // or maybe Gui should own it and it's just ref counted.
 
-	}
+        auto* pCursorArrow = guiMan_.GetCursor();
+        auto* pRender = gEnv->pRender;
 
-	void XGui::Redraw(engine::IPrimativeContext* pDrawCon)
-	{
-		if (isDeskTopValid()) {
-			pDesktop_->reDraw(pDrawCon);
-		}
-	}
+        core::StackString<64> posStr;
+        posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);
 
-	void XGui::DrawCursor(engine::IPrimativeContext* pDrawCon)
-	{
-		// windows call this function when they want the cursor draw.
-		// the position of the mouse is: cursorPos_
-		// GuiManger has the texture object.
-		// so that multiple gui's can share the same pointer.
-		// or maybe Gui should own it and it's just ref counted.
+        font::TextDrawContext ctx;
+        ctx.col = Col_Red;
 
-		auto* pCursorArrow = guiMan_.GetCursor();
-		auto* pRender = gEnv->pRender;
+        pDrawCon->drawText(Vec3f(300, 10, 1), ctx, posStr.begin(), posStr.end());
 
-		core::StackString<64> posStr;
-		posStr.appendFmt("Pos: %g x %g", cursorPos_.x, cursorPos_.y);
+        Vec2f rect;
+        rect = pRender->getDisplayRes();
 
-		font::TextDrawContext ctx;
-		ctx.col = Col_Red;
+        const float width = rect.x;
+        const float height = rect.y;
 
-		pDrawCon->drawText(Vec3f(300, 10, 1), ctx, posStr.begin(), posStr.end());
+        pDrawCon->drawQuadSS(
+            cursorPos_.x / width, cursorPos_.y / height,
+            0.1f, 0.1f,
+            pCursorArrow,
+            Col_White);
+    }
 
-		Vec2f rect;
-		rect = pRender->getDisplayRes();
+    const char* XGui::Activate(bool activate, int time)
+    {
+        X_UNUSED(activate);
+        X_UNUSED(time);
 
-		const float width = rect.x;
-		const float height = rect.y;
+        return nullptr;
+    }
 
+    bool XGui::OnInputEvent(const input::InputEvent& event)
+    {
+        if (event.deviceType == InputDeviceType::MOUSE) {
+            if (event.action == InputState::CHANGED) {
+                if (event.keyId == KeyId::MOUSE_X) {
+                    cursorPos_.x += event.value;
+                }
+                else if (event.keyId == KeyId::MOUSE_Y) {
+                    cursorPos_.y += event.value;
+                }
+            }
+        }
 
-		pDrawCon->drawQuadSS(
-			cursorPos_.x / width, cursorPos_.y / height,
-			0.1f, 0.1f,
-			pCursorArrow,
-			Col_White
-		);
-	}
+        if (isDeskTopValid()) {
+            pDesktop_->OnInputEvent(event);
+        }
 
-	const char* XGui::Activate(bool activate, int time)
-	{
-		X_UNUSED(activate);
-		X_UNUSED(time);
+        return false;
+    }
 
+    bool XGui::OnInputEventChar(const input::InputEvent& event)
+    {
+        if (isDeskTopValid()) {
+            pDesktop_->OnInputEventChar(event);
+        }
 
-		return nullptr;
-	}
+        return false;
+    }
 
-	bool XGui::OnInputEvent(const input::InputEvent& event)
-	{
-		if (event.deviceType == InputDeviceType::MOUSE)
-		{
-			if (event.action == InputState::CHANGED)
-			{
-				if (event.keyId == KeyId::MOUSE_X) {
-					cursorPos_.x += event.value;
-				}
-				else if (event.keyId == KeyId::MOUSE_Y) {
-					cursorPos_.y += event.value;
-				}
-			}
-		}
+    // -------------------------------------------
 
-		if (isDeskTopValid()) {
-			pDesktop_->OnInputEvent(event);
-		}
+    bool XGui::InitFromFile(const char* name)
+    {
+        core::Path<char> path, pathBinary;
+        core::XFileMemScoped file;
+        core::XFileScoped fileBinary;
+        core::fileModeFlags mode;
+        FileHdr hdr;
 
-		return false;
-	}
+        // TODO remove extension.?
+        this->name_ = name;
 
-	bool XGui::OnInputEventChar(const input::InputEvent& event)
-	{
-		if (isDeskTopValid()) {
-			pDesktop_->OnInputEventChar(event);
-		}
+        mode.Set(core::fileMode::READ);
 
-		return false;
-	}
+        core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
-	// -------------------------------------------
+        // already init?
+        if (isDeskTopValid()) {
+            // we are reloading most likley, warn if diffrent.
+            if (name_ != name) {
+                X_WARNING("Gui", "gui item is already init for menu: \"%s\"",
+                    name_.c_str());
+            }
 
-	bool XGui::InitFromFile(const char* name)
-	{
-		core::Path<char> path, pathBinary;
-		core::XFileMemScoped file;
-		core::XFileScoped fileBinary;
-		core::fileModeFlags mode;
-		FileHdr hdr;
+            // just delete the last one?
+            // would be cool if like state was preserved across a reload.
+            // so colors and sizes could be changed, and moving items still
+            // be on same path.
+            X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
 
-		// TODO remove extension.?
-		this->name_ = name;
+            pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
+            pDesktop_->setFlag(WindowFlag::DESKTOP);
+            // for reloading do we want to ignore compiled ones?
+            // i think so.
+            goto SourceLoad;
+        }
 
-		mode.Set(core::fileMode::READ);
+        pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
+        pDesktop_->setFlag(WindowFlag::DESKTOP);
 
-		core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
+        pathBinary = "gui\\compiled\\";
+        pathBinary.setFileName(name);
+        pathBinary.setExtension(GUI_BINARY_FILE_EXTENSION);
 
-		// already init?
-		if (isDeskTopValid())
-		{
-			// we are reloading most likley, warn if diffrent.
-			if (name_ != name)
-			{
-				X_WARNING("Gui", "gui item is already init for menu: \"%s\"",
-					name_.c_str());
-			}
+        // none binary
+        path = "gui\\";
+        path.setFileName(name);
+        path.setExtension(GUI_FILE_EXTENSION);
 
-			// just delete the last one?
-			// would be cool if like state was preserved across a reload.
-			// so colors and sizes could be changed, and moving items still
-			// be on same path.
-			X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
+        // first we check if a binary file exsists.
+        if (gEnv->pFileSys->fileExists(pathBinary.c_str())) {
+            // does a source version even exist?
+            if (gEnv->pFileSys->fileExists(path.c_str())) {
+                // TODO: check last modified.
 
-			pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
-			pDesktop_->setFlag(WindowFlag::DESKTOP);
-			// for reloading do we want to ignore compiled ones?
-			// i think so.
-			goto SourceLoad;
-		}
+                // read the binary header.
+                if (!fileBinary.openFile(pathBinary.c_str(), mode)) {
+                    X_ERROR("Gui", "Failed to open the compiled gui file, trying source.");
+                    goto SourceLoad;
+                }
 
-		pDesktop_ = X_NEW(XWindow, g_3dEngineArena, "MenuWindow")(this);
-		pDesktop_->setFlag(WindowFlag::DESKTOP);
+                if (!fileBinary.readObj(hdr)) {
+                    X_ERROR("Gui", "failed to read compiled gui header, trying source.");
+                    goto SourceLoad;
+                }
 
-		pathBinary = "gui\\compiled\\";
-		pathBinary.setFileName(name);
-		pathBinary.setExtension(GUI_BINARY_FILE_EXTENSION);
+                if (!hdr.IsValid()) {
+                    X_ERROR("Gui", "compiled gui file header is corrupt, trying source");
+                    goto SourceLoad;
+                }
 
-		// none binary
-		path = "gui\\";
-		path.setFileName(name);
-		path.setExtension(GUI_FILE_EXTENSION);
+                // check the crc32 of the source.
+                if (file.openFile(path.c_str(), mode)) {
+                    sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(),
+                        safe_static_cast<size_t, uint64_t>(file->getSize()));
 
-		// first we check if a binary file exsists.
-		if (gEnv->pFileSys->fileExists(pathBinary.c_str()))
-		{
-			// does a source version even exist?
-			if (gEnv->pFileSys->fileExists(path.c_str()))
-			{
-				// TODO: check last modified.
+                    if (hdr.crc32 != sourceCrc32_) {
+                        goto SourceLoad;
+                    }
+                }
+                else {
+                    X_ERROR("Gui", "Failed to read source version, trying binary.");
+                    // try load binary?
+                }
 
+                // we load the binary version if we are here.
+                return ParseBinaryFile(hdr, fileBinary.GetFile());
+            }
+        }
 
-				// read the binary header.
-				if (!fileBinary.openFile(pathBinary.c_str(), mode))
-				{
-					X_ERROR("Gui", "Failed to open the compiled gui file, trying source.");
-					goto SourceLoad;
-				}
+    SourceLoad:
+        fileBinary.close();
 
-				if (!fileBinary.readObj(hdr))
-				{
-					X_ERROR("Gui", "failed to read compiled gui header, trying source.");
-					goto SourceLoad;
-				}
+        if (!file.IsOpen()) {
+            if (!file.openFile(path.c_str(), mode)) {
+                X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
+                X_ERROR("Gui", "failed to open gui file: \"%s\"", path.c_str());
+                return false;
+            }
+        }
 
-				if (!hdr.IsValid())
-				{
-					X_ERROR("Gui", "compiled gui file header is corrupt, trying source");
-					goto SourceLoad;
-				}
+        // make sure we have a crc
+        if (sourceCrc32_ == 0) {
+            sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(),
+                safe_static_cast<size_t, uint64_t>(file->getSize()));
+        }
 
-				// check the crc32 of the source.
-				if (file.openFile(path.c_str(), mode))
-				{
-					sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(),
-						safe_static_cast<size_t, uint64_t>(file->getSize()));
+        X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
+        return ParseTextFile(file->getBufferStart(), file->getBufferEnd());
+    }
 
-					if (hdr.crc32 != sourceCrc32_)
-					{
-						goto SourceLoad;
-					}
-				}
-				else
-				{
-					X_ERROR("Gui", "Failed to read source version, trying binary.");
-					// try load binary?
-				}
+    bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile)
+    {
+        // should i just load the whole file and provides a meory cursor?
+        // i think i should just make it a memory file so that i can read form
+        // that and it's provided th\t same functionatlity.
+        X_UNUSED(hdr);
 
-				// we load the binary version if we are here.
-				return ParseBinaryFile(hdr, fileBinary.GetFile());
-			}
+        return pDesktop_->Parse(pFile);
+    }
 
-		}
+    bool XGui::ParseTextFile(const char* begin, const char* end)
+    {
+        core::XLexer::LexFlags flags;
+        flags.Set(core::LexFlag::NOFATALERRORS);
+        flags.Set(core::LexFlag::NOSTRINGCONCAT);
+        flags.Set(core::LexFlag::ALLOWMULTICHARLITERALS);
+        flags.Set(core::LexFlag::ALLOWBACKSLASHSTRINGCONCAT);
 
-	SourceLoad:
-		fileBinary.close();
+        core::XParser lex(begin, end, "", flags, g_3dEngineArena);
 
-		if (!file.IsOpen())
-		{
-			if (!file.openFile(path.c_str(), mode))
-			{
-				X_DELETE_AND_NULL(pDesktop_, g_3dEngineArena);
-				X_ERROR("Gui", "failed to open gui file: \"%s\"", path.c_str());
-				return false;
-			}
-		}
+        lex.setFlags(flags);
 
-		// make sure we have a crc
-		if (sourceCrc32_ == 0)
-		{
-			sourceCrc32_ = pCrc32->GetCRC32(file->getBufferStart(),
-				safe_static_cast<size_t, uint64_t>(file->getSize()));
-		}
+        // we have a window def first.
+        if (lex.ExpectTokenString("windowDef")) {
+            if (pDesktop_->Parse(lex)) {
+                pDesktop_->FixUpParms();
+                //		SaveBinaryVersion();
+                return true;
+            }
+        }
 
-		X_LOG0("Gui", "parsing: \"%s\"", path.c_str());
-		return ParseTextFile(file->getBufferStart(), file->getBufferEnd());
-	}
+        return false;
+    }
 
+    bool XGui::SaveBinaryVersion(void)
+    {
+        core::Path<char> path;
+        core::XFileScoped file;
+        core::fileModeFlags mode;
+        FileHdr hdr;
 
-	bool XGui::ParseBinaryFile(const FileHdr& hdr, core::XFile* pFile)
-	{
-		// should i just load the whole file and provides a meory cursor?
-		// i think i should just make it a memory file so that i can read form 
-		// that and it's provided th\t same functionatlity.
-		X_UNUSED(hdr);
+        mode.Set(core::fileMode::WRITE);
+        mode.Set(core::fileMode::RECREATE);
+        mode.Set(core::fileMode::RANDOM_ACCESS);
 
-		return pDesktop_->Parse(pFile);
-	}
-
-	bool XGui::ParseTextFile(const char* begin, const char* end)
-	{
-		core::XLexer::LexFlags flags;
-		flags.Set(core::LexFlag::NOFATALERRORS);
-		flags.Set(core::LexFlag::NOSTRINGCONCAT);
-		flags.Set(core::LexFlag::ALLOWMULTICHARLITERALS);
-		flags.Set(core::LexFlag::ALLOWBACKSLASHSTRINGCONCAT);
-
-		core::XParser lex(begin, end, "", flags, g_3dEngineArena);
-
-		lex.setFlags(flags);
-
-		// we have a window def first.
-		if (lex.ExpectTokenString("windowDef"))
-		{
-			if (pDesktop_->Parse(lex))
-			{
-				pDesktop_->FixUpParms();
-				//		SaveBinaryVersion();
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	bool XGui::SaveBinaryVersion(void)
-	{
-		core::Path<char> path;
-		core::XFileScoped file;
-		core::fileModeFlags mode;
-		FileHdr hdr;
-
-		mode.Set(core::fileMode::WRITE);
-		mode.Set(core::fileMode::RECREATE);
-		mode.Set(core::fileMode::RANDOM_ACCESS);
-
-		path = "gui\\compiled\\";
-		path.setFileName(getName());
-		path.setExtension(GUI_BINARY_FILE_EXTENSION);
+        path = "gui\\compiled\\";
+        path.setFileName(getName());
+        path.setExtension(GUI_BINARY_FILE_EXTENSION);
 
 #if 1
-		if (!gEnv->pFileSys->createDirectoryTree(path.c_str()))
-		{
-			X_ERROR("Gui", "failed to create directory for saving binary version: %s", path.c_str());
-			return false;
-		}
+        if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
+            X_ERROR("Gui", "failed to create directory for saving binary version: %s", path.c_str());
+            return false;
+        }
 #endif
 
-		if (file.openFile(path.c_str(), mode))
-		{
-			hdr.Magic = GUI_BINARY_MAGIC;
-			hdr.version = GUI_BINARY_VERSION;
-			hdr.crc32 = sourceCrc32_;
-			hdr.fileSize = 0; // set after
+        if (file.openFile(path.c_str(), mode)) {
+            hdr.Magic = GUI_BINARY_MAGIC;
+            hdr.version = GUI_BINARY_VERSION;
+            hdr.crc32 = sourceCrc32_;
+            hdr.fileSize = 0; // set after
 
-			file.writeObj(hdr);
+            file.writeObj(hdr);
 
-			// seralise all the chickens.
-			if (!pDesktop_->WriteToFile(file.GetFile()))
-			{
-				X_ERROR("Gui", "failed to save binary vesion of the following gui: %s", getName());
-				return false;
-			}
+            // seralise all the chickens.
+            if (!pDesktop_->WriteToFile(file.GetFile())) {
+                X_ERROR("Gui", "failed to save binary vesion of the following gui: %s", getName());
+                return false;
+            }
 
-			hdr.fileSize = safe_static_cast<uint32_t, uint64_t>(file.tell());
+            hdr.fileSize = safe_static_cast<uint32_t, uint64_t>(file.tell());
 
-			file.seek(0, core::SeekMode::SET);
+            file.seek(0, core::SeekMode::SET);
 
-			return file.writeObj(hdr) > 0;
-		}
-		return false;
-	}
+            return file.writeObj(hdr) > 0;
+        }
+        return false;
+    }
 
-} // namespace
+} // namespace gui
 
 X_NAMESPACE_END

@@ -42,228 +42,216 @@ struct IEngineFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
-class xWindow;
-class Console;
-)
-
-
+                    class xWindow;
+                    class Console;)
 
 typedef core::Logger<
-core::LoggerNoFilterPolicy,
-core::LoggerFullFormatPolicy,
-core::LoggerDebuggerWritePolicy> VisualStudioLogger;
+    core::LoggerNoFilterPolicy,
+    core::LoggerFullFormatPolicy,
+    core::LoggerDebuggerWritePolicy>
+    VisualStudioLogger;
 
 typedef core::Logger<
-	core::LoggerVerbosityFilterPolicy,
-	core::LoggerSimpleFormatPolicy,
-	core::LoggerConsoleWritePolicy> ConsoleLogger;
+    core::LoggerVerbosityFilterPolicy,
+    core::LoggerSimpleFormatPolicy,
+    core::LoggerConsoleWritePolicy>
+    ConsoleLogger;
 
-
-class XCore :
-	public ICore, 
-	public core::IXHotReloadManager, 
-	public core::XDirectoryWatcherListener,
-	public ICoreEventListener
+class XCore : public ICore
+    , public core::IXHotReloadManager
+    , public core::XDirectoryWatcherListener
+    , public ICoreEventListener
 {
-	static const size_t MAX_CMD_ARS = 16;
+    static const size_t MAX_CMD_ARS = 16;
 
-	struct ConverterModule : public core::ReferenceCounted<int32_t>
-	{
-		core::string dllName;
-		core::string moduleClassName;
-		IConverter* pConverter;
-		std::shared_ptr<IConverterModule> pConModule;
-	};
+    struct ConverterModule : public core::ReferenceCounted<int32_t>
+    {
+        core::string dllName;
+        core::string moduleClassName;
+        IConverter* pConverter;
+        std::shared_ptr<IConverterModule> pConModule;
+    };
 
-	typedef core::Array<core::Module::Handle> ModuleHandlesArr;
-	typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
-	typedef core::Array<ConverterModule> ConverterModulesArr;
-	typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
-	// I think i can just use stack strings, since all handlers are hard coded.
-	typedef core::HashMap<const char* const, core::IXHotReload*> HotReloadMap;
-	typedef core::Array<core::string> HotRelodIgnoreArr;
-	typedef core::CmdArgs<1024, wchar_t> CmdArg;
-	typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
-
-
-public:
-	XCore();
-	~XCore() X_FINAL;
-
-	virtual bool Init(const SCoreInitParams& startupParams) X_FINAL;
-	virtual bool InitAsyncWait(void) X_FINAL;
-	virtual void ShutDown(void); // not part of ICore currently
-	virtual void Release(void) X_FINAL;
-
-	virtual bool RunGameLoop(void) X_FINAL;
-	virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
-	virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
-	virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
-		IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
-	virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
-
-
-	X_INLINE core::ITimer* GetITimer(void) X_FINAL;
-	X_INLINE input::IInput* GetIInput(void) X_FINAL;
-	X_INLINE core::IConsole* GetIConsole(void) X_FINAL;
-	X_INLINE core::IFileSys* GetIFileSys(void) X_FINAL;
-	X_INLINE sound::ISound* GetISound(void) X_FINAL;
-	X_INLINE engine::I3DEngine* Get3DEngine(void) X_FINAL;
-	X_INLINE script::IScriptSys* GetISscriptSys(void) X_FINAL;
-	X_INLINE render::IRender* GetIRender(void) X_FINAL;
-	X_INLINE font::IFontSys* GetIFontSys(void) X_FINAL;
-	X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
-	X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
-
-
-	X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
-	X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
-	X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
-	
-	X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
-	X_INLINE core::ILog* GetILog(void) X_FINAL;
-	X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
-	X_INLINE const core::CpuInfo* GetCPUInfo(void) X_FINAL;
-	
-	X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
-	X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
-
-	X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
-	X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
-
-	IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
-
-private:
-	static SCoreGlobals env_;
-	static core::MallocFreeAllocator malloc_;
+    typedef core::Array<core::Module::Handle> ModuleHandlesArr;
+    typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
+    typedef core::Array<ConverterModule> ConverterModulesArr;
+    typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
+    // I think i can just use stack strings, since all handlers are hard coded.
+    typedef core::HashMap<const char* const, core::IXHotReload*> HotReloadMap;
+    typedef core::Array<core::string> HotRelodIgnoreArr;
+    typedef core::CmdArgs<1024, wchar_t> CmdArg;
+    typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
 
 public:
-	virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
-	virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
-	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
-	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
+    XCore();
+    ~XCore() X_FINAL;
 
-	virtual void OnFatalError(const char* format, va_list args) X_FINAL;
+    virtual bool Init(const SCoreInitParams& startupParams) X_FINAL;
+    virtual bool InitAsyncWait(void) X_FINAL;
+    virtual void ShutDown(void); // not part of ICore currently
+    virtual void Release(void) X_FINAL;
 
-private:
-	bool PumpMessages(void);
-	bool Update(void);
-	void RenderBegin(core::FrameData& frameData);
-	void RenderEnd(core::FrameData& frameData);
+    virtual bool RunGameLoop(void) X_FINAL;
+    virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
+    virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
+    virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+        IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
+    virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
 
-	core::Module::Handle LoadDLL(const char* pDllName);
+    X_INLINE core::ITimer* GetITimer(void) X_FINAL;
+    X_INLINE input::IInput* GetIInput(void) X_FINAL;
+    X_INLINE core::IConsole* GetIConsole(void) X_FINAL;
+    X_INLINE core::IFileSys* GetIFileSys(void) X_FINAL;
+    X_INLINE sound::ISound* GetISound(void) X_FINAL;
+    X_INLINE engine::I3DEngine* Get3DEngine(void) X_FINAL;
+    X_INLINE script::IScriptSys* GetISscriptSys(void) X_FINAL;
+    X_INLINE render::IRender* GetIRender(void) X_FINAL;
+    X_INLINE font::IFontSys* GetIFontSys(void) X_FINAL;
+    X_INLINE core::V2::JobSystem* GetJobSystem(void) X_FINAL;
+    X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
-	bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName,
-		const SCoreInitParams& initParams);
-	
-	bool ParseCmdArgs(const wchar_t* pArgs);
-	bool parseSeed(Vec4i seed);
+    X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
+    X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
+    X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 
-	bool InitConsole(const SCoreInitParams& initParams);
-	bool InitFileSys(const SCoreInitParams& startupParams);
-	bool InitLogging(const SCoreInitParams& startupParams);
-	bool InitInput(const SCoreInitParams& startupParams);
-	bool InitFont(const SCoreInitParams& startupParams);
-	bool InitSound(const SCoreInitParams& startupParams);
-	bool InitScriptSys(const SCoreInitParams& startupParams);
-	bool InitRenderSys(const SCoreInitParams& startupParams);
-	bool Init3DEngine(const SCoreInitParams& startupParams);
-	bool InitGameDll(const SCoreInitParams& startupParams);
-	bool InitPhysics(const SCoreInitParams& startupParams);
-	bool InitNet(const SCoreInitParams& startupParams);
-	bool InitVideo(const SCoreInitParams& startupParams);
-	
-	
-	void registerVars(const SCoreInitParams& initParams);
-	void registerCmds(void);
+    X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
+    X_INLINE core::ILog* GetILog(void) X_FINAL;
+    X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
+    X_INLINE const core::CpuInfo* GetCPUInfo(void) X_FINAL;
 
-	void AddIgnoredHotReloadExtensions(void);
+    X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
+    X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
 
-	void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
-	void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
+    X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
+    X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
-	void HotReloadListExts(void);
-	void ListProgramArgs(void);
-	void LogSystemInfo(void) const;
-
-	void Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-	void Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 
 private:
+    static SCoreGlobals env_;
+    static core::MallocFreeAllocator malloc_;
 
-	// IXHotReloadManager
-	bool addfileType(core::IXHotReload* pHotReload, const char* extension) X_FINAL;
-	void unregisterListener(core::IXHotReload* pHotReload) X_FINAL;
+public:
+    virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+    virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+    virtual void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
+    virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
 
-	// ~IXHotReloadManager
-
-	// XDirectoryWatcherListener
-	bool OnFileChange(core::XDirectoryWatcher::Action::Enum action,
-		const char* name, const char* oldName, bool isDirectory) X_OVERRIDE;
-	// ~XDirectoryWatcherListener
-	
-	// ICoreEventListener
-	void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
-	// ~ICoreEventListener
+    virtual void OnFatalError(const char* format, va_list args) X_FINAL;
 
 private:
-	// var callbacks.
-	void WindowPosVarChange(core::ICVar* pVar);
-	void WindowSizeVarChange(core::ICVar* pVar);
-	void WindowCustomFrameVarChange(core::ICVar* pVar);
+    bool PumpMessages(void);
+    bool Update(void);
+    void RenderBegin(core::FrameData& frameData);
+    void RenderEnd(core::FrameData& frameData);
+
+    core::Module::Handle LoadDLL(const char* pDllName);
+
+    bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName,
+        const SCoreInitParams& initParams);
+
+    bool ParseCmdArgs(const wchar_t* pArgs);
+    bool parseSeed(Vec4i seed);
+
+    bool InitConsole(const SCoreInitParams& initParams);
+    bool InitFileSys(const SCoreInitParams& startupParams);
+    bool InitLogging(const SCoreInitParams& startupParams);
+    bool InitInput(const SCoreInitParams& startupParams);
+    bool InitFont(const SCoreInitParams& startupParams);
+    bool InitSound(const SCoreInitParams& startupParams);
+    bool InitScriptSys(const SCoreInitParams& startupParams);
+    bool InitRenderSys(const SCoreInitParams& startupParams);
+    bool Init3DEngine(const SCoreInitParams& startupParams);
+    bool InitGameDll(const SCoreInitParams& startupParams);
+    bool InitPhysics(const SCoreInitParams& startupParams);
+    bool InitNet(const SCoreInitParams& startupParams);
+    bool InitVideo(const SCoreInitParams& startupParams);
+
+    void registerVars(const SCoreInitParams& initParams);
+    void registerCmds(void);
+
+    void AddIgnoredHotReloadExtensions(void);
+
+    void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
+    void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
+
+    void HotReloadListExts(void);
+    void ListProgramArgs(void);
+    void LogSystemInfo(void) const;
+
+    void Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
-	core::CoreVars					vars_;
-	core::xWindow*				    pWindow_;
-	core::Console*					pConsole_;
+    // IXHotReloadManager
+    bool addfileType(core::IXHotReload* pHotReload, const char* extension) X_FINAL;
+    void unregisterListener(core::IXHotReload* pHotReload) X_FINAL;
 
-	VisualStudioLogger*				pVsLogger_;
-	ConsoleLogger*					pConsoleLogger_;
+    // ~IXHotReloadManager
 
+    // XDirectoryWatcherListener
+    bool OnFileChange(core::XDirectoryWatcher::Action::Enum action,
+        const char* name, const char* oldName, bool isDirectory) X_OVERRIDE;
+    // ~XDirectoryWatcherListener
 
-	core::XTimer					time_;
-	core::CpuInfo*					pCpuInfo_;
-	core::Crc32*					pCrc32_;
+    // ICoreEventListener
+    void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
+    // ~ICoreEventListener
 
-	ModuleHandlesArr				moduleDLLHandles_;
-	ModuleInterfacesArr				moduleInterfaces_;
-	ConverterModulesArr				converterInterfaces_;
-	ArrsetHandlersArr				assertHandlers_;
+private:
+    // var callbacks.
+    void WindowPosVarChange(core::ICVar* pVar);
+    void WindowSizeVarChange(core::ICVar* pVar);
+    void WindowCustomFrameVarChange(core::ICVar* pVar);
+
+private:
+    core::CoreVars vars_;
+    core::xWindow* pWindow_;
+    core::Console* pConsole_;
+
+    VisualStudioLogger* pVsLogger_;
+    ConsoleLogger* pConsoleLogger_;
+
+    core::XTimer time_;
+    core::CpuInfo* pCpuInfo_;
+    core::Crc32* pCrc32_;
+
+    ModuleHandlesArr moduleDLLHandles_;
+    ModuleInterfacesArr moduleInterfaces_;
+    ConverterModulesArr converterInterfaces_;
+    ArrsetHandlersArr assertHandlers_;
 
 #if X_ENABLE_PROFILER
-	core::profiler::XProfileSys*	pProfiler_;
+    core::profiler::XProfileSys* pProfiler_;
 #endif // !X_ENABLE_PROFILER
 
-	// Hot reload stuff
-	core::XDirectoryWatcher			dirWatcher_;
+    // Hot reload stuff
+    core::XDirectoryWatcher dirWatcher_;
 
-	ICoreEventDispatcher*			pEventDispatcher_;
+    ICoreEventDispatcher* pEventDispatcher_;
 
-	HotReloadMap					hotReloadExtMap_;
+    HotReloadMap hotReloadExtMap_;
 
 #if X_DEBUG
-	HotRelodIgnoreArr hotReloadIgnores_;
-#endif // !X_DEBUG
-	// ~Hotreload
+    HotRelodIgnoreArr hotReloadIgnores_;
+#endif // !X_DEBUG \
+    // ~Hotreload
 
-	SCoreInitParams initParams_;
+    SCoreInitParams initParams_;
 
-	core::GrowingGenericAllocator strAlloc_;
+    core::GrowingGenericAllocator strAlloc_;
 
-	// args
-	CmdArgs args_;
+    // args
+    CmdArgs args_;
 
-	core::AssetLoader assetLoader_;
+    core::AssetLoader assetLoader_;
 };
 
 X_NAMESPACE_BEGIN(core)
 
-
-
 X_NAMESPACE_END
-
 
 #include "Core.inl"
 

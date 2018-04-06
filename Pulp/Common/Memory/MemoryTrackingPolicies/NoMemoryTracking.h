@@ -3,7 +3,6 @@
 #ifndef X_NOMEMORYTRACKING__H
 #define X_NOMEMORYTRACKING__H
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Memory
@@ -14,27 +13,23 @@ X_NAMESPACE_BEGIN(core)
 class NoMemoryTracking
 {
 public:
-	/// A human-readable string literal containing the policy's type.
-	static const char* const TYPE_NAME;
+    /// A human-readable string literal containing the policy's type.
+    static const char* const TYPE_NAME;
 
-	/// Defines the amount of overhead that each allocation causes.
-	static const size_t PER_ALLOCATION_OVERHEAD = 0;
+    /// Defines the amount of overhead that each allocation causes.
+    static const size_t PER_ALLOCATION_OVERHEAD = 0;
 
-	/// Empty implementation.
-	inline void OnAllocation(void*, size_t, size_t, size_t, size_t
-		X_MEM_HUMAN_IDS_CB(const char*)
-		X_MEM_HUMAN_IDS_CB(const char*)
-		X_SOURCE_INFO_MEM_CB(const SourceInfo&), const char*) const {}
+    /// Empty implementation.
+    inline void OnAllocation(void*, size_t, size_t, size_t, size_t X_MEM_HUMAN_IDS_CB(const char*) X_MEM_HUMAN_IDS_CB(const char*) X_SOURCE_INFO_MEM_CB(const SourceInfo&), const char*) const
+    {
+    }
 
-	/// Empty implementation.
-	inline void OnDeallocation(void*) const {}
+    /// Empty implementation.
+    inline void OnDeallocation(void*) const
+    {
+    }
 };
 
-
-
-
-
 X_NAMESPACE_END
-
 
 #endif // X_NOMEMORYTRACKING__H

@@ -7,7 +7,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace compileTime
 {
-
     template<typename T>
     struct IsStringLiteral
     {

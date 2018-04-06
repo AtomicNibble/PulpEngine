@@ -17,8 +17,6 @@
 
 X_USING_NAMESPACE;
 
-
-
 // we have a load of things todo.
 /*
 Get input. (input events)
@@ -38,265 +36,244 @@ Do we want to be fancy and depending on how much spare frame tiem we have for th
 Also instead of sleeping we could be running physcis steps...
 */
 
-
-
-
 bool XCore::RunGameLoop(void)
 {
-	env_.state_ = SCoreGlobals::State::RUNNING;
+    env_.state_ = SCoreGlobals::State::RUNNING;
 
-	while (PumpMessages())
-	{
-		X_PROFILE_BEGIN("GameLoop", core::profiler::SubSys::GAME);
+    while (PumpMessages()) {
+        X_PROFILE_BEGIN("GameLoop", core::profiler::SubSys::GAME);
 
-		Update();
-	}
-	return true;
+        Update();
+    }
+    return true;
 }
 
 bool XCore::Update(void)
 {
-	X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
-	using namespace core::V2;
+    X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
+    using namespace core::V2;
 
-	assetLoader_.dispatchPendingLoads();
-	assetLoader_.update();
+    assetLoader_.dispatchPendingLoads();
+    assetLoader_.update();
 
-	auto width = vars_.getWinWidth();
-	auto height = vars_.getWinHeight();
+    auto width = vars_.getWinWidth();
+    auto height = vars_.getWinHeight();
 
-	core::FrameData frameData;
-	frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
-	frameData.view.viewport.set(width, height); 
-	frameData.view.viewport.setZ(0.f, 1.f);
+    core::FrameData frameData;
+    frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
+    frameData.view.viewport.set(width, height);
+    frameData.view.viewport.setZ(0.f, 1.f);
 
-	// get time deltas for this frame.
-	time_.OnFrameBegin(frameData.timeInfo);
-
-#if X_ENABLE_PROFILER
-	if (pProfiler_) {
-		pProfiler_->OnFrameBegin(frameData.timeInfo);
-	}
-#endif // !X_ENABLE_PROFILER
-
-	JobSystem& jobSys = *env_.pJobSys;
-
-	{
-		bool paused = false;
+    // get time deltas for this frame.
+    time_.OnFrameBegin(frameData.timeInfo);
 
 #if X_ENABLE_PROFILER
-		if (pProfiler_) {
-			paused = pProfiler_->getVars().isPaused();
-		}
+    if (pProfiler_) {
+        pProfiler_->OnFrameBegin(frameData.timeInfo);
+    }
 #endif // !X_ENABLE_PROFILER
 
-		jobSys.OnFrameBegin(paused);
-	}
+    JobSystem& jobSys = *env_.pJobSys;
+
+    {
+        bool paused = false;
+
+#if X_ENABLE_PROFILER
+        if (pProfiler_) {
+            paused = pProfiler_->getVars().isPaused();
+        }
+#endif // !X_ENABLE_PROFILER
+
+        jobSys.OnFrameBegin(paused);
+    }
 
 #if 1
 
-	// Core events like windows move or resize & focus will have been dispatched during PumpMessages
-	// so the happen at a defined time before a frame starts.
+    // Core events like windows move or resize & focus will have been dispatched during PumpMessages
+    // so the happen at a defined time before a frame starts.
 
+    // we must call this on same thread as window.
+    if (env_.pInput) {
+        env_.pInput->Update(frameData);
+    }
 
-	// we must call this on same thread as window.
-	if (env_.pInput) {
-		env_.pInput->Update(frameData);
-	}
+    if (env_.pInput) {
+        env_.pVideoSys->update(frameData.timeInfo);
+    }
 
-	if (env_.pInput) {
-		env_.pVideoSys->update(frameData.timeInfo);
-	}
+    // top job that we can use to wait for the chain of jobs to complete.
+    Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
+    {
+        // start a job to handler any file chnages and create relaod child jobs.
+        Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+        jobSys.Run(pDirectoryWatchProcess);
 
-	// top job that we can use to wait for the chain of jobs to complete.
-	Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
-	{
-		// start a job to handler any file chnages and create relaod child jobs.
-		Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-		jobSys.Run(pDirectoryWatchProcess);
+        // create a job for syncing all input related jobs.
+        Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+        {
+            Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+            Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 
-		// create a job for syncing all input related jobs.
-		Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-		{
+            // we run console updates after input events have been posted.
+            jobSys.AddContinuation(pPostInputFrame, pConsoleUpdates);
 
-			Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-			Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+            jobSys.Run(pPostInputFrame);
+        }
 
-			// we run console updates after input events have been posted.
-			jobSys.AddContinuation(pPostInputFrame, pConsoleUpdates);
+        jobSys.Run(pInputSync);
+    }
 
-			jobSys.Run(pPostInputFrame);
-		}
+    jobSys.Run(pSyncJob);
+    jobSys.Wait(pSyncJob);
 
-		jobSys.Run(pInputSync);
-	}
+    if (env_.pGame) {
+        env_.pGame->update(frameData);
+    }
 
-	jobSys.Run(pSyncJob);
-	jobSys.Wait(pSyncJob);
+    if (env_.p3DEngine) {
+        env_.p3DEngine->Update(frameData);
+    }
 
+    if (env_.pPhysics) {
+        env_.pPhysics->onTickPreRender(
+            frameData.timeInfo.deltas[core::ITimer::Timer::GAME],
+            AABB(Vec3f::zero(), 2000.f));
+    }
 
-	if (env_.pGame) {
-		env_.pGame->update(frameData);
-	}
+    // we could update the sound system while rendering on gpu.
+    if (env_.pSound) {
+        env_.pSound->Update(frameData);
+    }
 
-	if (env_.p3DEngine) {
-		env_.p3DEngine->Update(frameData);
-	}
+    if (env_.pScriptSys) {
+        env_.pScriptSys->Update();
+    }
 
-	if (env_.pPhysics) {
-		env_.pPhysics->onTickPreRender(
-			frameData.timeInfo.deltas[core::ITimer::Timer::GAME],
-			AABB(Vec3f::zero(), 2000.f)
-		);
-	}
-
-	// we could update the sound system while rendering on gpu.
-	if (env_.pSound) {
-		env_.pSound->Update(frameData);
-	}
-
-	if (env_.pScriptSys){
-		env_.pScriptSys->Update();
-	}
-
-	RenderBegin(frameData);
-	RenderEnd(frameData);
+    RenderBegin(frameData);
+    RenderEnd(frameData);
 
 #if 1
-	static core::TimeVal start = time_.GetTimeNowNoScale();
-	core::TimeVal time = time_.GetTimeNowNoScale();
+    static core::TimeVal start = time_.GetTimeNowNoScale();
+    core::TimeVal time = time_.GetTimeNowNoScale();
 
-	float val = time.GetDifferenceInSeconds(start);
-	if (val >= 0.95f)
-	{
-		start = time;
+    float val = time.GetDifferenceInSeconds(start);
+    if (val >= 0.95f) {
+        start = time;
 
-		float fps = time_.GetAvgFrameRate();
-		core::TimeVal frametime = time_.GetAvgFrameTime();
+        float fps = time_.GetAvgFrameRate();
+        core::TimeVal frametime = time_.GetAvgFrameTime();
 
-		core::StackString<128> title;
-		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %gms) Game: %" PRId64 "(x%g) UI: %" PRId64 "(x%g)",
-			static_cast<int>(fps),
-			frametime.GetMilliSeconds(),
-			frameData.timeInfo.deltas[core::Timer::GAME].GetMilliSecondsAsInt64(),
-			time_.GetScale(core::Timer::GAME),
-			frameData.timeInfo.deltas[core::Timer::UI].GetMilliSecondsAsInt64(),
-			time_.GetScale(core::Timer::UI)
-		);
+        core::StackString<128> title;
+        title.clear();
+        title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %gms) Game: %" PRId64 "(x%g) UI: %" PRId64 "(x%g)",
+            static_cast<int>(fps),
+            frametime.GetMilliSeconds(),
+            frameData.timeInfo.deltas[core::Timer::GAME].GetMilliSecondsAsInt64(),
+            time_.GetScale(core::Timer::GAME),
+            frameData.timeInfo.deltas[core::Timer::UI].GetMilliSecondsAsInt64(),
+            time_.GetScale(core::Timer::UI));
 
-		pWindow_->SetTitle(title.c_str());
-	}
+        pWindow_->SetTitle(title.c_str());
+    }
 
-	int goat = 0;
-	goat = 2;
+    int goat = 0;
+    goat = 2;
 #endif
 
 #else
 
-	if (env_.pGame)
-	{
-		env_.pGame->Update();
-	}
+    if (env_.pGame) {
+        env_.pGame->Update();
+    }
 
-	if (env_.p3DEngine)
-		env_.p3DEngine->Update();
+    if (env_.p3DEngine)
+        env_.p3DEngine->Update();
 
-	if (env_.pInput)
-	{
-		env_.pInput->Update(true);
-	}
+    if (env_.pInput) {
+        env_.pInput->Update(true);
+    }
 
-	if (env_.pConsole)
-	{
-		// runs commands that have been deffered.
-		env_.pConsole->OnFrameBegin();
-	}
+    if (env_.pConsole) {
+        // runs commands that have been deffered.
+        env_.pConsole->OnFrameBegin();
+    }
 
-	if (env_.pSound)
-	{
-		// bum tis bum tis!
-		env_.pSound->Update();
-	}
+    if (env_.pSound) {
+        // bum tis bum tis!
+        env_.pSound->Update();
+    }
 
-	if (env_.pScriptSys)
-	{
-		env_.pScriptSys->Update();
-	}
-
+    if (env_.pScriptSys) {
+        env_.pScriptSys->Update();
+    }
 
 #if X_SUPER == 0 && 1
-	static core::TimeVal start = time_.GetAsyncTime();
-	core::TimeVal time = time_.GetAsyncTime();
+    static core::TimeVal start = time_.GetAsyncTime();
+    core::TimeVal time = time_.GetAsyncTime();
 
-	float val = time.GetDifferenceInSeconds(start);
-	if (val >= 0.95f)
-	{
-		start = time;
+    float val = time.GetDifferenceInSeconds(start);
+    if (val >= 0.95f) {
+        start = time;
 
-		float fps = time_.GetFrameRate();
-		float frametime = time_.GetFrameTime();
+        float fps = time_.GetFrameRate();
+        float frametime = time_.GetFrameTime();
 
-		core::StackString<128> title;
-		title.clear();
-		title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %ims) Time: %I64u(x%g) UI: %I64u",
-			static_cast<int>(fps),
-			static_cast<int>(frametime * 1000.f),
-			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
-			time_.GetTimeScale(),
-			static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds())
-		);
+        core::StackString<128> title;
+        title.clear();
+        title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %ims) Time: %I64u(x%g) UI: %I64u",
+            static_cast<int>(fps),
+            static_cast<int>(frametime * 1000.f),
+            static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
+            time_.GetTimeScale(),
+            static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds()));
 
-		pWindow_->SetTitle(title.c_str());
-	}
+        pWindow_->SetTitle(title.c_str());
+    }
 #endif
 #endif
-	return true;
+    return true;
 }
-
-
 
 void XCore::RenderBegin(core::FrameData& frameData)
 {
-	X_PROFILE_BEGIN("CoreRenderBegin", core::profiler::SubSys::CORE);
-	X_UNUSED(frameData);
+    X_PROFILE_BEGIN("CoreRenderBegin", core::profiler::SubSys::CORE);
+    X_UNUSED(frameData);
 
-	env_.pRender->renderBegin();
-	env_.p3DEngine->OnFrameBegin(frameData);
+    env_.pRender->renderBegin();
+    env_.p3DEngine->OnFrameBegin(frameData);
 }
-
 
 void XCore::RenderEnd(core::FrameData& frameData)
 {
-	{
-		X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
+    {
+        X_PROFILE_BEGIN("CoreRenderEnd", core::profiler::SubSys::CORE);
 
-		if (env_.pPhysics) {
-			env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME]);
-		}
+        if (env_.pPhysics) {
+            env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME]);
+        }
 
 #if X_ENABLE_PROFILER
 
-		// draw me all the profile wins!
-		if (pProfiler_) {
-			pProfiler_->Render(frameData.timeInfo, env_.pJobSys);
-		}
+        // draw me all the profile wins!
+        if (pProfiler_) {
+            pProfiler_->Render(frameData.timeInfo, env_.pJobSys);
+        }
 
 #endif // !X_ENABLE_PROFILER
 
-		if (core::IConsole* pConsole = GetIConsole()) {
-			pConsole->draw(frameData.timeInfo);
-		}
-		
-		env_.pRender->renderEnd();
-	}
+        if (core::IConsole* pConsole = GetIConsole()) {
+            pConsole->draw(frameData.timeInfo);
+        }
+
+        env_.pRender->renderEnd();
+    }
 
 #if X_ENABLE_PROFILER
-	
-	// End
-	if (pProfiler_) {
-		pProfiler_->OnFrameEnd();
-	}
+
+    // End
+    if (pProfiler_) {
+        pProfiler_->OnFrameEnd();
+    }
 
 #endif // !X_ENABLE_PROFILER
 }

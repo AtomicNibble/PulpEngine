@@ -13,71 +13,69 @@ X_NAMESPACE_BEGIN(core)
 
 namespace V2
 {
-	struct Job;
+    struct Job;
 } // namespace V2
 
 class XOsFileAsyncOperationBase
 {
 public:
-	struct MyOVERLAPPED;
-	
-	typedef core::Delegate<void(MyOVERLAPPED*, uint32_t)> ComplitionRotinue;
+    struct MyOVERLAPPED;
 
-	struct MyOVERLAPPED : public OVERLAPPED, public ReferenceCounted<>
-	{
-		// we need callback to call.
-		ComplitionRotinue callback;
-	};
+    typedef core::Delegate<void(MyOVERLAPPED*, uint32_t)> ComplitionRotinue;
 
-public:
-	typedef MyOVERLAPPED AsyncOp;
+    struct MyOVERLAPPED : public OVERLAPPED
+        , public ReferenceCounted<>
+    {
+        // we need callback to call.
+        ComplitionRotinue callback;
+    };
 
 public:
-	XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes, core::V2::Job* pJob);
-	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes);
-	X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
-	XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
-	X_INLINE XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth);
+    typedef MyOVERLAPPED AsyncOp;
 
-	XOsFileAsyncOperationBase& operator=(const XOsFileAsyncOperationBase& oth) = default;
-	X_INLINE XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth);
+public:
+    XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes, core::V2::Job* pJob);
+    X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, uint32_t numBytes);
+    X_INLINE XOsFileAsyncOperationBase(MemoryArenaBase* arena, HANDLE hFile, uint64_t position);
+    XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
+    X_INLINE XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth);
 
-	X_INLINE bool operator==(const XOsFileAsyncOperationBase& oth) const;
-	X_INLINE bool ownsAsyncOp(const AsyncOp* pOp) const;
+    XOsFileAsyncOperationBase& operator=(const XOsFileAsyncOperationBase& oth) = default;
+    X_INLINE XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth);
 
-	void cancel(void);
+    X_INLINE bool operator==(const XOsFileAsyncOperationBase& oth) const;
+    X_INLINE bool ownsAsyncOp(const AsyncOp* pOp) const;
 
-	bool hasFinished(uint32_t* pNumBytes = nullptr) const;
+    void cancel(void);
 
-	X_INLINE AsyncOp* getOverlapped(void);
-	X_INLINE const AsyncOp* getOverlapped(void) const;
+    bool hasFinished(uint32_t* pNumBytes = nullptr) const;
+
+    X_INLINE AsyncOp* getOverlapped(void);
+    X_INLINE const AsyncOp* getOverlapped(void) const;
 
 protected:
-	X_INLINE bool isFakeHandle(void) const;
+    X_INLINE bool isFakeHandle(void) const;
 
 protected:
-	HANDLE hFile_;
-	mutable ReferenceCountedOwner<AsyncOp> overlapped_;
+    HANDLE hFile_;
+    mutable ReferenceCountedOwner<AsyncOp> overlapped_;
 };
 
 class XOsFileAsyncOperationCompiltion : public XOsFileAsyncOperationBase
 {
 public:
-	X_INLINE XOsFileAsyncOperationCompiltion(MemoryArenaBase* arena, HANDLE hFile, uint64_t position, ComplitionRotinue callBack);
-
+    X_INLINE XOsFileAsyncOperationCompiltion(MemoryArenaBase* arena, HANDLE hFile, uint64_t position, ComplitionRotinue callBack);
 };
 
 class XOsFileAsyncOperation : public XOsFileAsyncOperationBase
 {
 public:
-	using XOsFileAsyncOperationBase::XOsFileAsyncOperationBase;
+    using XOsFileAsyncOperationBase::XOsFileAsyncOperationBase;
 
-	// Waits until the asynchronous operation has finished
-	// returns the number of transferred bytes.
-	X_INLINE uint32_t waitUntilFinished(void) const;
+    // Waits until the asynchronous operation has finished
+    // returns the number of transferred bytes.
+    X_INLINE uint32_t waitUntilFinished(void) const;
 };
-
-
 
 X_NAMESPACE_END
 

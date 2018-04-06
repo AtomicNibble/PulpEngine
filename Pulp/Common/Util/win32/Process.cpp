@@ -3,112 +3,100 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
 Process::Process(HANDLE process, uint32_t processID) :
-	process_(process),
-	processID_(processID)
+    process_(process),
+    processID_(processID)
 {
-
 }
 
-
 Process::Process() :
-	process_(INVALID_HANDLE_VALUE),
-	processID_(0)
+    process_(INVALID_HANDLE_VALUE),
+    processID_(0)
 {
-
 }
 
 Process::~Process()
 {
-
 }
-
 
 Process::Priority::Enum Process::GetPriorityClass(void) const
 {
-	DWORD priorityClass = ::GetPriorityClass(process_);
-	if (priorityClass == 0)
-	{
-		lastError::Description Dsc;
-		X_ERROR("Process", "Failed to get process priority for id: % " PRIu32 ". Error: %s", processID_, lastError::ToString(Dsc));
-		return Priority::NORMAL;
-	}
+    DWORD priorityClass = ::GetPriorityClass(process_);
+    if (priorityClass == 0) {
+        lastError::Description Dsc;
+        X_ERROR("Process", "Failed to get process priority for id: % " PRIu32 ". Error: %s", processID_, lastError::ToString(Dsc));
+        return Priority::NORMAL;
+    }
 
-	switch (priorityClass)
-	{
-		case IDLE_PRIORITY_CLASS:
-			return Priority::IDLE;
-		case BELOW_NORMAL_PRIORITY_CLASS:
-			return Priority::BELOW_NORMAL;
-		case NORMAL_PRIORITY_CLASS:
-			return Priority::NORMAL;
-		case ABOVE_NORMAL_PRIORITY_CLASS:
-			return Priority::ABOVE_NORMAL;
-		case HIGH_PRIORITY_CLASS:
-			return Priority::HIGH;
-		case REALTIME_PRIORITY_CLASS:
-			return Priority::REALTIME;
+    switch (priorityClass) {
+        case IDLE_PRIORITY_CLASS:
+            return Priority::IDLE;
+        case BELOW_NORMAL_PRIORITY_CLASS:
+            return Priority::BELOW_NORMAL;
+        case NORMAL_PRIORITY_CLASS:
+            return Priority::NORMAL;
+        case ABOVE_NORMAL_PRIORITY_CLASS:
+            return Priority::ABOVE_NORMAL;
+        case HIGH_PRIORITY_CLASS:
+            return Priority::HIGH;
+        case REALTIME_PRIORITY_CLASS:
+            return Priority::REALTIME;
 
-		default:
-			X_ASSERT_UNREACHABLE();
-			return Priority::NORMAL;
-	}
+        default:
+            X_ASSERT_UNREACHABLE();
+            return Priority::NORMAL;
+    }
 }
 
 bool Process::SetPriorityClass(Priority::Enum priority)
-{	
-	int32_t pri = NORMAL_PRIORITY_CLASS;
+{
+    int32_t pri = NORMAL_PRIORITY_CLASS;
 
-	switch (priority)
-	{
-		case Priority::IDLE:
-			pri = IDLE_PRIORITY_CLASS;
-			break;
-		case Priority::BELOW_NORMAL:
-			pri = BELOW_NORMAL_PRIORITY_CLASS;
-			break;
-		case Priority::NORMAL:
-			pri = NORMAL_PRIORITY_CLASS;
-			break;
-		case Priority::ABOVE_NORMAL:
-			pri = ABOVE_NORMAL_PRIORITY_CLASS;
-			break;
-		case Priority::HIGH:
-			pri = HIGH_PRIORITY_CLASS;
-			break;
-		case Priority::REALTIME:
-			pri = REALTIME_PRIORITY_CLASS;
-			break;
+    switch (priority) {
+        case Priority::IDLE:
+            pri = IDLE_PRIORITY_CLASS;
+            break;
+        case Priority::BELOW_NORMAL:
+            pri = BELOW_NORMAL_PRIORITY_CLASS;
+            break;
+        case Priority::NORMAL:
+            pri = NORMAL_PRIORITY_CLASS;
+            break;
+        case Priority::ABOVE_NORMAL:
+            pri = ABOVE_NORMAL_PRIORITY_CLASS;
+            break;
+        case Priority::HIGH:
+            pri = HIGH_PRIORITY_CLASS;
+            break;
+        case Priority::REALTIME:
+            pri = REALTIME_PRIORITY_CLASS;
+            break;
 
-		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-	}
+        default:
+            X_ASSERT_UNREACHABLE();
+            break;
+    }
 
+    if (!::SetPriorityClass(process_, pri)) {
+        lastError::Description Dsc;
+        X_ERROR("Process", "Failed to set process priority for id: % " PRIu32 ". Error: %s", processID_, lastError::ToString(Dsc));
+        return false;
+    }
 
-	if (!::SetPriorityClass(process_, pri))
-	{
-		lastError::Description Dsc;
-		X_ERROR("Process", "Failed to set process priority for id: % " PRIu32 ". Error: %s", processID_, lastError::ToString(Dsc));
-		return false;
-	}
-
-	return true;
+    return true;
 }
-
 
 Process Process::GetCurrent(void)
 {
-	auto currentHandle = ::GetCurrentProcess();
-	auto currentID = ::GetCurrentProcessId();
+    auto currentHandle = ::GetCurrentProcess();
+    auto currentID = ::GetCurrentProcessId();
 
-	return Process(currentHandle, currentID);
+    return Process(currentHandle, currentID);
 }
 
 uint32_t Process::GetCurrentID(void)
 {
-	return safe_static_cast<uint32_t>(::GetCurrentProcessId());
+    return safe_static_cast<uint32_t>(::GetCurrentProcessId());
 }
 
 X_NAMESPACE_END

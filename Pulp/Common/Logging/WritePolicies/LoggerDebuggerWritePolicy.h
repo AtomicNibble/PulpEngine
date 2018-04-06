@@ -15,32 +15,31 @@ X_NAMESPACE_BEGIN(core)
 class LoggerDebuggerWritePolicy
 {
 public:
-	/// Empty implementation.
-	void Init(void);
+    /// Empty implementation.
+    void Init(void);
 
-	/// Empty implementation.
-	void Exit(void);
+    /// Empty implementation.
+    void Exit(void);
 
-	/// Writes a log message to the debugger.
-	void WriteLog(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a log message to the debugger.
+    void WriteLog(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes a warning message to the debugger.
-	void WriteWarning(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a warning message to the debugger.
+    void WriteWarning(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an error message to the debugger.
-	void WriteError(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an error message to the debugger.
+    void WriteError(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes a fatal error message to the debugger.
-	void WriteFatal(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a fatal error message to the debugger.
+    void WriteFatal(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an assert message to the debugger.
-	void WriteAssert(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an assert message to the debugger.
+    void WriteAssert(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an assert variable message to the debugger.
-	void WriteAssertVariable(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an assert variable message to the debugger.
+    void WriteAssertVariable(const LoggerBase::Line& line, uint32_t length);
 };
 
 X_NAMESPACE_END
-
 
 #endif // X_LOGGERDEBUGGERWRITEPOLICY_H_

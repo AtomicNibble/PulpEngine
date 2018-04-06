@@ -3,7 +3,6 @@
 #ifndef X_NOMEMORYTAGGING_H
 #define X_NOMEMORYTAGGING_H
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Memory
@@ -14,17 +13,20 @@ X_NAMESPACE_BEGIN(core)
 class NoMemoryTagging
 {
 public:
-	/// A human-readable string literal containing the policy's type.
-	static const char* const TYPE_NAME;
+    /// A human-readable string literal containing the policy's type.
+    static const char* const TYPE_NAME;
 
-	/// Empty implementation.
-	inline void TagAllocation(void*, size_t) const {}
+    /// Empty implementation.
+    inline void TagAllocation(void*, size_t) const
+    {
+    }
 
-	/// Empty implementation.
-	inline void TagDeallocation(void*, size_t) const {}
+    /// Empty implementation.
+    inline void TagDeallocation(void*, size_t) const
+    {
+    }
 };
 
 X_NAMESPACE_END
-
 
 #endif

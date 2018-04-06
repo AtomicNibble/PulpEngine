@@ -10,575 +10,553 @@ X_NAMESPACE_BEGIN(font)
 
 namespace
 {
-	struct JobData
-	{
-		uint8_t* pData;
-		uint32_t dataSize;
-	};
+    struct JobData
+    {
+        uint8_t* pData;
+        uint32_t dataSize;
+    };
 
-} // naemspace
+} // namespace
 
 XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core::MemoryArenaBase* arena) :
-	vars_(vars),
-	name_(name),
-	glyphCache_(vars, arena),
-	textureSlotArea_(arena),
+    vars_(vars),
+    name_(name),
+    glyphCache_(vars, arena),
+    textureSlotArea_(arena),
 
-	width_(0),
-	height_(0),
-	textureBuffer_(arena),
+    width_(0),
+    height_(0),
+    textureBuffer_(arena),
 
-	invWidth_(0),
-	invHeight_(0),
+    invWidth_(0),
+    invHeight_(0),
 
-	cellWidth_(0),
-	cellHeight_(0),
+    cellWidth_(0),
+    cellHeight_(0),
 
-	textureCellWidth_(0),
-	textureCellHeight_(0),
+    textureCellWidth_(0),
+    textureCellHeight_(0),
 
-	widthCellCount_(0),
-	heightCellCount_(0),
+    widthCellCount_(0),
+    heightCellCount_(0),
 
-	slotUsage_(1), // space for gradiant.
-	cacheMisses_(0),
+    slotUsage_(1), // space for gradiant.
+    cacheMisses_(0),
 
-	slotList_(arena),
-	slotTable_(arena, 8),
+    slotList_(arena),
+    slotTable_(arena, 8),
 
-	signal_(false),
-	loadStatus_(core::LoadStatus::NotLoaded)
+    signal_(false),
+    loadStatus_(core::LoadStatus::NotLoaded)
 {
-
 }
 
 XFontTexture::~XFontTexture()
 {
 }
 
-
 void XFontTexture::Clear(void)
 {
-	textureBuffer_.clear();
+    textureBuffer_.clear();
 
-	width_ = 0;
-	height_ = 0;
-	invWidth_ = 0;
-	invHeight_ = 0;
-	cellWidth_ = 0;
-	cellHeight_ = 0;
-	textureCellWidth_ = 0;
-	textureCellHeight_ = 0;
-	widthCellCount_ = 0;
-	heightCellCount_ = 0;
+    width_ = 0;
+    height_ = 0;
+    invWidth_ = 0;
+    invHeight_ = 0;
+    cellWidth_ = 0;
+    cellHeight_ = 0;
+    textureCellWidth_ = 0;
+    textureCellHeight_ = 0;
+    widthCellCount_ = 0;
+    heightCellCount_ = 0;
 
-	slotUsage_ = 1;
-	cacheMisses_ = 0;
+    slotUsage_ = 1;
+    cacheMisses_ = 0;
 
-	ReleaseSlotList();
+    ReleaseSlotList();
 }
 
 bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount, int32_t heightCellCount)
 {
-	if (!core::bitUtil::IsPowerOfTwo(width) || !core::bitUtil::IsPowerOfTwo(height)) {
-		X_ERROR("Font", "Font texture must be pow2. width: %" PRIi32 " height: %" PRIi32, width, height);
-		return false;
-	}
+    if (!core::bitUtil::IsPowerOfTwo(width) || !core::bitUtil::IsPowerOfTwo(height)) {
+        X_ERROR("Font", "Font texture must be pow2. width: %" PRIi32 " height: %" PRIi32, width, height);
+        return false;
+    }
 
-	textureBuffer_.resize(width * height);
-	std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
-	
-	width_ = width;
-	height_ = height;
-	invWidth_ = 1.0f / static_cast<float>(width);
-	invHeight_ = 1.0f / static_cast<float>(height);
+    textureBuffer_.resize(width * height);
+    std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
 
-	widthCellCount_ = widthCellCount;
-	heightCellCount_ = heightCellCount;
+    width_ = width;
+    height_ = height;
+    invWidth_ = 1.0f / static_cast<float>(width);
+    invHeight_ = 1.0f / static_cast<float>(height);
 
-	cellWidth_ = width / widthCellCount;
-	cellHeight_ = height / heightCellCount;
+    widthCellCount_ = widthCellCount;
+    heightCellCount_ = heightCellCount;
 
-	textureCellWidth_ = cellWidth_ * invWidth_;
-	textureCellHeight_ = cellHeight_ * invHeight_;
+    cellWidth_ = width / widthCellCount;
+    cellHeight_ = height / heightCellCount;
 
-	if (!glyphCache_.Create(cellWidth_, cellHeight_))
-	{
-		Clear();
-		return false;
-	}
+    textureCellWidth_ = cellWidth_ * invWidth_;
+    textureCellHeight_ = cellHeight_ * invHeight_;
 
-	int32_t textureSlotCount = widthCellCount * heightCellCount;
-	if (!CreateSlotList(textureSlotCount))
-	{
-		Clear();
-		return false;
-	}
+    if (!glyphCache_.Create(cellWidth_, cellHeight_)) {
+        Clear();
+        return false;
+    }
 
-	CreateGradientSlot();
-	return true;
+    int32_t textureSlotCount = widthCellCount * heightCellCount;
+    if (!CreateSlotList(textureSlotCount)) {
+        Clear();
+        return false;
+    }
+
+    CreateGradientSlot();
+    return true;
 }
 
 bool XFontTexture::WaitTillReady(void)
 {
-	if (IsReady()) {
-		return true;
-	}
+    if (IsReady()) {
+        return true;
+    }
 
-	while (loadStatus_ == core::LoadStatus::Loading)
-	{
-		// if we have job system try help with work.
-		// if no work wait...
-		if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork())
-		{
-			signal_.wait();
-		}
-	}
+    while (loadStatus_ == core::LoadStatus::Loading) {
+        // if we have job system try help with work.
+        // if no work wait...
+        if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork()) {
+            signal_.wait();
+        }
+    }
 
-	signal_.clear();
+    signal_.clear();
 
-	if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
-		return false;
-	}
+    if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
+        return false;
+    }
 
-	return true;
+    return true;
 }
 
 bool XFontTexture::LoadGlyphSource(bool async)
 {
-	if (IsReady()) {
-		return true;
-	}
+    if (IsReady()) {
+        return true;
+    }
 
-	// are we loading already?
-	if (loadStatus_ == core::LoadStatus::Loading) {
-		return true;
-	}
+    // are we loading already?
+    if (loadStatus_ == core::LoadStatus::Loading) {
+        return true;
+    }
 
-	core::Path<char> path;
-	path /= "Fonts/";
-	path.setFileName(name_.begin(), name_.end());
+    core::Path<char> path;
+    path /= "Fonts/";
+    path.setFileName(name_.begin(), name_.end());
 
-	core::fileModeFlags mode;
-	mode.Set(core::fileMode::READ);
-	mode.Set(core::fileMode::SHARE);
+    core::fileModeFlags mode;
+    mode.Set(core::fileMode::READ);
+    mode.Set(core::fileMode::SHARE);
 
-	if (async)
-	{
-		signal_.clear();
-		loadStatus_ = core::LoadStatus::Loading;
+    if (async) {
+        signal_.clear();
+        loadStatus_ = core::LoadStatus::Loading;
 
-		// load the file async
-		core::IoRequestOpenRead open;
-		open.callback.Bind<XFontTexture, &XFontTexture::IoRequestCallback>(this);
-		open.mode = mode;
-		open.path = path;
-		open.arena = g_fontArena;
+        // load the file async
+        core::IoRequestOpenRead open;
+        open.callback.Bind<XFontTexture, &XFontTexture::IoRequestCallback>(this);
+        open.mode = mode;
+        open.path = path;
+        open.arena = g_fontArena;
 
-		gEnv->pFileSys->AddIoRequestToQue(open);
-	}
-	else
-	{
-		core::XFileScoped file;
+        gEnv->pFileSys->AddIoRequestToQue(open);
+    }
+    else {
+        core::XFileScoped file;
 
-		if (!file.openFile(path.c_str(), core::fileModeFlags::READ)) {
-			return false;
-		}
+        if (!file.openFile(path.c_str(), core::fileModeFlags::READ)) {
+            return false;
+        }
 
-		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
-		if (!fileSize) {
-			X_ERROR("Font", "Font file is zero bytes in size");
-			return false;
-		}
+        const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
+        if (!fileSize) {
+            X_ERROR("Font", "Font file is zero bytes in size");
+            return false;
+        }
 
-		core::UniquePointer<uint8_t[]> buf = core::makeUnique<uint8_t[]>(g_fontArena, fileSize);
-		if (file.read(buf.ptr(), fileSize) != fileSize) {
-			X_ERROR("Font", "Error reading font data");
-			return false;
-		}
+        core::UniquePointer<uint8_t[]> buf = core::makeUnique<uint8_t[]>(g_fontArena, fileSize);
+        if (file.read(buf.ptr(), fileSize) != fileSize) {
+            X_ERROR("Font", "Error reading font data");
+            return false;
+        }
 
-		if (!glyphCache_.SetRawFontBuffer(std::move(buf), safe_static_cast<int32_t>(fileSize), FontEncoding::Unicode)) {
-			X_ERROR("Font", "Error setting up font renderer");
-			return false;
-		}
+        if (!glyphCache_.SetRawFontBuffer(std::move(buf), safe_static_cast<int32_t>(fileSize), FontEncoding::Unicode)) {
+            X_ERROR("Font", "Error setting up font renderer");
+            return false;
+        }
 
-		if (vars_.glyphCachePreWarm()) {
-			PreWarmCache();
-		}
+        if (vars_.glyphCachePreWarm()) {
+            PreWarmCache();
+        }
 
-		loadStatus_ = core::LoadStatus::Complete;
-	}
+        loadStatus_ = core::LoadStatus::Complete;
+    }
 
-	return true;
+    return true;
 }
-
 
 CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut)
 {
-	uint16 slotUsage = slotUsage_++;
-	size_t length = union_cast<size_t>(pEnd - pBegin);
-	int32_t updated = 0;
+    uint16 slotUsage = slotUsage_++;
+    size_t length = union_cast<size_t>(pEnd - pBegin);
+    int32_t updated = 0;
 
-	X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")(pBegin, pEnd);
+    X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")
+    (pBegin, pEnd);
 
-	for (size_t i = 0; i < length; i++)
-	{
-		const wchar_t cChar = pBegin[i];
+    for (size_t i = 0; i < length; i++) {
+        const wchar_t cChar = pBegin[i];
 
-		XTextureSlot* pSlot = GetCharSlot(cChar);
-		if (!pSlot)
-		{
-			++cacheMisses_;
+        XTextureSlot* pSlot = GetCharSlot(cChar);
+        if (!pSlot) {
+            ++cacheMisses_;
 
-			// get a free slot.
-			pSlot = GetLRUSlot();
-			if (!pSlot) {
-				X_ERROR("Font", "Failed to get free slot for char");
-				return CacheResult::ERROR;
-			}
+            // get a free slot.
+            pSlot = GetLRUSlot();
+            if (!pSlot) {
+                X_ERROR("Font", "Failed to get free slot for char");
+                return CacheResult::ERROR;
+            }
 
-			if (!UpdateSlot(pSlot, slotUsage, cChar)) {
-				return CacheResult::ERROR;
-			}
+            if (!UpdateSlot(pSlot, slotUsage, cChar)) {
+                return CacheResult::ERROR;
+            }
 
-			++updated;
-		}
-		else
-		{
-			// update the LRU vale
-			pSlot->slotUsage = slotUsage;
-		}
-	}
+            ++updated;
+        }
+        else {
+            // update the LRU vale
+            pSlot->slotUsage = slotUsage;
+        }
+    }
 
-	if (pUpdatedOut) {
-		*pUpdatedOut = updated;
-	}
+    if (pUpdatedOut) {
+        *pUpdatedOut = updated;
+    }
 
-	if (updated > 0) {
-		return CacheResult::UPDATED;
-	}
+    if (updated > 0) {
+        return CacheResult::UPDATED;
+    }
 
-	return CacheResult::UNCHANGED;
+    return CacheResult::UNCHANGED;
 }
 
 //-------------------------------------------------------------------------------------------------
 wchar_t XFontTexture::GetSlotChar(int32_t slot) const
 {
-	return slotList_[slot].currentChar;
+    return slotList_[slot].currentChar;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 {
-	XTextureSlotTableItor pItor = slotTable_.find(cChar);
+    XTextureSlotTableItor pItor = slotTable_.find(cChar);
 
-	if (pItor != slotTable_.end()) {
-		return pItor->second;
-	}
+    if (pItor != slotTable_.end()) {
+        return pItor->second;
+    }
 
-	return nullptr;
+    return nullptr;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetGradientSlot(void)
 {
-	X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")();
-	return &slotList_[0];
+    X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")
+    ();
+    return &slotList_[0];
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetLRUSlot(void)
 {
-	const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
-		return s1.slotUsage < s2.slotUsage;
-	});
+    const auto it = std::min_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
+        return s1.slotUsage < s2.slotUsage;
+    });
 
-	auto& slot = *it;
-	return &slot;
+    auto& slot = *it;
+    return &slot;
 }
 
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetMRUSlot(void)
 {
-	const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
-		return s1.slotUsage < s2.slotUsage;
-	});
+    const auto it = std::max_element(slotList_.begin(), slotList_.end(), [](const XTextureSlot& s1, const XTextureSlot& s2) {
+        return s1.slotUsage < s2.slotUsage;
+    });
 
-	auto& slot = *it;
-	return &slot;
+    auto& slot = *it;
+    return &slot;
 }
-
 
 bool XFontTexture::CreateSlotList(int32_t listSize)
 {
-	int32_t y, x;
+    int32_t y, x;
 
-	slotList_.resize(listSize);
+    slotList_.resize(listSize);
 
-	const float xbias = (0.5f / static_cast<float>(width_));
-	const float ybias = (0.5f / static_cast<float>(height_));
+    const float xbias = (0.5f / static_cast<float>(width_));
+    const float ybias = (0.5f / static_cast<float>(height_));
 
-	for (int32_t i = 0; i < listSize; i++)
-	{
-		XTextureSlot& slot = slotList_[i];
+    for (int32_t i = 0; i < listSize; i++) {
+        XTextureSlot& slot = slotList_[i];
 
-		slot.textureSlot = i;
-		slot.reset();
+        slot.textureSlot = i;
+        slot.reset();
 
-		y = i / widthCellCount_;
-		x = i % widthCellCount_;
+        y = i / widthCellCount_;
+        x = i % widthCellCount_;
 
-		float u = static_cast<float>(x) * textureCellWidth_;
-		float v = static_cast<float>(y) * textureCellHeight_;
+        float u = static_cast<float>(x) * textureCellWidth_;
+        float v = static_cast<float>(y) * textureCellHeight_;
 
-		slot.texCoord[0] = u;
-		slot.texCoord[1] = v;
-	}
+        slot.texCoord[0] = u;
+        slot.texCoord[1] = v;
+    }
 
-	return true;
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
 bool XFontTexture::ReleaseSlotList(void)
 {
-	slotList_.free();
-	return true;
+    slotList_.free();
+    return true;
 }
 
 //-------------------------------------------------------------------------------------------------
 bool XFontTexture::UpdateSlot(XTextureSlot* pSlot, uint16 slotUsage, wchar_t cChar)
 {
-	X_ASSERT_NOT_NULL(pSlot);
+    X_ASSERT_NOT_NULL(pSlot);
 
-	// remove and replace.
-	XTextureSlotTableItor pItor = slotTable_.find(pSlot->currentChar);
-	if (pItor != slotTable_.end()) {
-		slotTable_.erase(pItor);
-	}
+    // remove and replace.
+    XTextureSlotTableItor pItor = slotTable_.find(pSlot->currentChar);
+    if (pItor != slotTable_.end()) {
+        slotTable_.erase(pItor);
+    }
 
-	slotTable_.insert(std::make_pair(cChar, pSlot));
+    slotTable_.insert(std::make_pair(cChar, pSlot));
 
-	pSlot->slotUsage = slotUsage;
-	pSlot->currentChar = cChar;
+    pSlot->slotUsage = slotUsage;
+    pSlot->currentChar = cChar;
 
-	auto* pGlyph = glyphCache_.GetGlyph(cChar);
+    auto* pGlyph = glyphCache_.GetGlyph(cChar);
 
-	if(!pGlyph)
-	{
-		X_ERROR("Font", "Failed to get glyph for char: '%lc'", cChar);
-		return false;
-	}
+    if (!pGlyph) {
+        X_ERROR("Font", "Failed to get glyph for char: '%lc'", cChar);
+        return false;
+    }
 
-	pSlot->charWidth = pGlyph->charWidth;
-	pSlot->charHeight = pGlyph->charHeight;
-	pSlot->charOffsetX = safe_static_cast<decltype(pSlot->charOffsetX)>(pGlyph->charOffsetX);
-	pSlot->charOffsetY = safe_static_cast<decltype(pSlot->charOffsetY)>(pGlyph->charOffsetY);
-	pSlot->paddingX = pGlyph->bitmapOffsetX;
-	pSlot->paddingY = pGlyph->bitmapOffsetY;
-	pSlot->advanceX = pGlyph->advanceX;
-//	pSlot->advanceY = 0;
+    pSlot->charWidth = pGlyph->charWidth;
+    pSlot->charHeight = pGlyph->charHeight;
+    pSlot->charOffsetX = safe_static_cast<decltype(pSlot->charOffsetX)>(pGlyph->charOffsetX);
+    pSlot->charOffsetY = safe_static_cast<decltype(pSlot->charOffsetY)>(pGlyph->charOffsetY);
+    pSlot->paddingX = pGlyph->bitmapOffsetX;
+    pSlot->paddingY = pGlyph->bitmapOffsetY;
+    pSlot->advanceX = pGlyph->advanceX;
+    //	pSlot->advanceY = 0;
 
-	const int32_t slotBufferX = pSlot->textureSlot % widthCellCount_;
-	const int32_t slotBufferY = pSlot->textureSlot / widthCellCount_;
+    const int32_t slotBufferX = pSlot->textureSlot % widthCellCount_;
+    const int32_t slotBufferY = pSlot->textureSlot / widthCellCount_;
 
-	// blit the glyp to my buffer
-	// always copy the whole buffer, we may of blended.
-	pGlyph->glyphBitmap.BlitTo8(
-		textureBuffer_.ptr(),
-		0,								// srcX
-		0,								// srcY
-		cellWidth_,						// srcWidth
-		cellHeight_,					// srcHeight
-		slotBufferX * cellWidth_,		// destx
-		slotBufferY * cellHeight_,		// desy
-		width_							// destWidth / stride
-	);
+    // blit the glyp to my buffer
+    // always copy the whole buffer, we may of blended.
+    pGlyph->glyphBitmap.BlitTo8(
+        textureBuffer_.ptr(),
+        0,                         // srcX
+        0,                         // srcY
+        cellWidth_,                // srcWidth
+        cellHeight_,               // srcHeight
+        slotBufferX * cellWidth_,  // destx
+        slotBufferY * cellHeight_, // desy
+        width_                     // destWidth / stride
+    );
 
-	return true;
+    return true;
 }
 
 void XFontTexture::CreateGradientSlot(void)
 {
-	XTextureSlot* pSlot = GetGradientSlot();				
-	
-	// 0 needs to be unused spot
-	X_ASSERT(pSlot->currentChar == static_cast<wchar_t>(~0), "slot idx zero needs to be empty")(pSlot->currentChar);
+    XTextureSlot* pSlot = GetGradientSlot();
 
-	pSlot->reset();
-	pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(cellWidth_ - 2);
-	pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(cellHeight_ - 2);
-	pSlot->setNotReusable();
+    // 0 needs to be unused spot
+    X_ASSERT(pSlot->currentChar == static_cast<wchar_t>(~0), "slot idx zero needs to be empty")
+    (pSlot->currentChar);
 
-	const int32_t x = pSlot->textureSlot % widthCellCount_;
-	const int32_t y = pSlot->textureSlot / widthCellCount_;
+    pSlot->reset();
+    pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(cellWidth_ - 2);
+    pSlot->charHeight = safe_static_cast<uint8_t, int32_t>(cellHeight_ - 2);
+    pSlot->setNotReusable();
 
-	uint8* pBuffer = &textureBuffer_[x*cellWidth_ + y*cellHeight_*height_];
+    const int32_t x = pSlot->textureSlot % widthCellCount_;
+    const int32_t y = pSlot->textureSlot / widthCellCount_;
 
-	for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
-		for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
-			pBuffer[dwX + dwY*width_] = safe_static_cast<uint8_t, uint32_t>(
-				dwY * 255 / (pSlot->charHeight - 1));
-		}
-	}
+    uint8* pBuffer = &textureBuffer_[x * cellWidth_ + y * cellHeight_ * height_];
+
+    for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
+        for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
+            pBuffer[dwX + dwY * width_] = safe_static_cast<uint8_t, uint32_t>(
+                dwY * 255 / (pSlot->charHeight - 1));
+        }
+    }
 }
-
 
 void XFontTexture::PreWarmCache(void)
 {
-	size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
-	len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
+    size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
+    len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
 
-	X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
+    X_ASSERT(len > 0, "Cache must not be zero in size")
+    (slotList_.size());
 
-	PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
+    PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
 }
-
 
 void XFontTexture::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-	core::XFileAsync* pFile, uint32_t bytesTransferred)
+    core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-	X_UNUSED(fileSys);
-	X_UNUSED(bytesTransferred);
+    X_UNUSED(fileSys);
+    X_UNUSED(bytesTransferred);
 
-	X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
-	const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")
+    (pRequest->getType());
+    const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
-	if (!pFile) {
-		loadStatus_ = core::LoadStatus::Error;
-		X_ERROR("Font", "Error reading font data");
-		return;
-	}
+    if (!pFile) {
+        loadStatus_ = core::LoadStatus::Error;
+        X_ERROR("Font", "Error reading font data");
+        return;
+    }
 
+    JobData data;
+    data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
+    data.dataSize = pOpenRead->dataSize;
 
-	JobData data;
-	data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
-	data.dataSize = pOpenRead->dataSize;
-
-	// dispatch a job to parse it?
-	gEnv->pJobSys->CreateMemberJobAndRun<XFontTexture>(this, &XFontTexture::ProcessFontFile_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::FONT));
+    // dispatch a job to parse it?
+    gEnv->pJobSys->CreateMemberJobAndRun<XFontTexture>(this, &XFontTexture::ProcessFontFile_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::FONT));
 }
-
 
 void XFontTexture::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
-	X_UNUSED(jobSys);
-	X_UNUSED(threadIdx);
-	X_UNUSED(pJob);
+    X_UNUSED(jobSys);
+    X_UNUSED(threadIdx);
+    X_UNUSED(pJob);
 
-	// we have the font data now we just need to setup the font render.
-	JobData* pJobData = static_cast<JobData*>(pData);
+    // we have the font data now we just need to setup the font render.
+    JobData* pJobData = static_cast<JobData*>(pData);
 
-	//	core::Thread::Sleep(2000);
+    //	core::Thread::Sleep(2000);
 
-	if (!glyphCache_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData),
-		pJobData->dataSize,
-		FontEncoding::Unicode))
-	{
-		loadStatus_ = core::LoadStatus::Error;
-		signal_.raise();
-		X_ERROR("Font", "Error setting up font renderer");
-		return;
-	}
+    if (!glyphCache_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData),
+            pJobData->dataSize,
+            FontEncoding::Unicode)) {
+        loadStatus_ = core::LoadStatus::Error;
+        signal_.raise();
+        X_ERROR("Font", "Error setting up font renderer");
+        return;
+    }
 
-	// preform the precache in this job.
-	if (vars_.glyphCachePreWarm()) {
-		PreWarmCache();
-	}
+    // preform the precache in this job.
+    if (vars_.glyphCachePreWarm()) {
+        PreWarmCache();
+    }
 
-	// now we are ready.
-	loadStatus_ = core::LoadStatus::Complete;
-	signal_.raise();
+    // now we are ready.
+    loadStatus_ = core::LoadStatus::Complete;
+    signal_.raise();
 }
-
-
 
 bool XFontTexture::WriteToFile(const char* filename)
 {
-	core::XFileScoped file;
-	core::Path<char> path;
-	BITMAPFILEHEADER pHeader;
-	BITMAPINFOHEADER pInfoHeader;
+    core::XFileScoped file;
+    core::Path<char> path;
+    BITMAPFILEHEADER pHeader;
+    BITMAPINFOHEADER pInfoHeader;
 
-	path = "Fonts/";
-	path.setFileName(filename);
-	path.setExtension(".bmp");
+    path = "Fonts/";
+    path.setFileName(filename);
+    path.setExtension(".bmp");
 
-	if (textureBuffer_.isEmpty()) {
-		X_WARNING("Font", "Failed to write font texture, buffer is invalid.");
-		return false;
-	}
+    if (textureBuffer_.isEmpty()) {
+        X_WARNING("Font", "Failed to write font texture, buffer is invalid.");
+        return false;
+    }
 
-	if (file.openFile(path.c_str(), core::fileMode::RECREATE | core::fileMode::WRITE))
-	{
-		core::zero_object(pHeader);
-		core::zero_object(pInfoHeader);
+    if (file.openFile(path.c_str(), core::fileMode::RECREATE | core::fileMode::WRITE)) {
+        core::zero_object(pHeader);
+        core::zero_object(pInfoHeader);
 
-		pHeader.bfType = 0x4D42;
-		pHeader.bfSize = sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+width_ * height_ * 3;
-		pHeader.bfOffBits = sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+        pHeader.bfType = 0x4D42;
+        pHeader.bfSize = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER) + width_ * height_ * 3;
+        pHeader.bfOffBits = sizeof(BITMAPFILEHEADER) + sizeof(BITMAPINFOHEADER);
 
-		pInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
-		pInfoHeader.biWidth = width_;
-		pInfoHeader.biHeight = height_;
-		pInfoHeader.biPlanes = 1;
-		pInfoHeader.biBitCount = 24;
-		pInfoHeader.biCompression = 0;
-		pInfoHeader.biSizeImage = width_ * height_ * 3;
+        pInfoHeader.biSize = sizeof(BITMAPINFOHEADER);
+        pInfoHeader.biWidth = width_;
+        pInfoHeader.biHeight = height_;
+        pInfoHeader.biPlanes = 1;
+        pInfoHeader.biBitCount = 24;
+        pInfoHeader.biCompression = 0;
+        pInfoHeader.biSizeImage = width_ * height_ * 3;
 
-		file.write(pHeader); 
-		file.write(pInfoHeader);
+        file.write(pHeader);
+        file.write(pInfoHeader);
 
-		unsigned char cRGB[3];
+        unsigned char cRGB[3];
 
-		core::ByteStream stream(g_fontArena);
+        core::ByteStream stream(g_fontArena);
 
-		stream.reserve(height_ * width_* 3);
+        stream.reserve(height_ * width_ * 3);
 
-		for (int32_t i = height_ - 1; i >= 0; i--)
-		{
-			for (int32_t j = 0; j < width_; j++)
-			{
-				cRGB[0] = textureBuffer_[(i * width_) + j];
-				cRGB[1] = *cRGB;
-				cRGB[2] = *cRGB;
+        for (int32_t i = height_ - 1; i >= 0; i--) {
+            for (int32_t j = 0; j < width_; j++) {
+                cRGB[0] = textureBuffer_[(i * width_) + j];
+                cRGB[1] = *cRGB;
+                cRGB[2] = *cRGB;
 
-				stream.write(cRGB, sizeof(cRGB));
-			}
-		}
+                stream.write(cRGB, sizeof(cRGB));
+            }
+        }
 
-		file.write(stream.begin(), stream.size());
-		return true;
-	}
-	
-	return false;
+        file.write(stream.begin(), stream.size());
+        return true;
+    }
+
+    return false;
 }
 
 //-------------------------------------------------------------------------------------------------
 
-
 void XFontTexture::GetTextureCoord(const XTextureSlot* pSlot, XCharCords& cords) const
 {
-	X_ASSERT_NOT_NULL(pSlot);
+    X_ASSERT_NOT_NULL(pSlot);
 
-	const int32_t chWidth = pSlot->charWidth;
-	const int32_t chHeight = pSlot->charHeight;
-	float slotCoord0 = pSlot->texCoord[0];
-	float slotCoord1 = pSlot->texCoord[1];
+    const int32_t chWidth = pSlot->charWidth;
+    const int32_t chHeight = pSlot->charHeight;
+    float slotCoord0 = pSlot->texCoord[0];
+    float slotCoord1 = pSlot->texCoord[1];
 
-	slotCoord0 += static_cast<float>(pSlot->paddingX * invWidth_);
-	slotCoord1 += static_cast<float>(pSlot->paddingY * invHeight_);
+    slotCoord0 += static_cast<float>(pSlot->paddingX * invWidth_);
+    slotCoord1 += static_cast<float>(pSlot->paddingY * invHeight_);
 
-	// i need to offset corrds by padding.
-	cords.texCoords[0] = slotCoord0;
-	cords.texCoords[1] = slotCoord1;
-	cords.texCoords[2] = slotCoord0 + static_cast<float>(chWidth * invWidth_);
-	cords.texCoords[3] = slotCoord1 + static_cast<float>(chHeight * invHeight_);
+    // i need to offset corrds by padding.
+    cords.texCoords[0] = slotCoord0;
+    cords.texCoords[1] = slotCoord1;
+    cords.texCoords[2] = slotCoord0 + static_cast<float>(chWidth * invWidth_);
+    cords.texCoords[3] = slotCoord1 + static_cast<float>(chHeight * invHeight_);
 
-	cords.size[0] = chWidth;		
-	cords.size[1] = chHeight;		
-	cords.offset[0] = pSlot->charOffsetX;
-	cords.offset[1] = pSlot->charOffsetY;
+    cords.size[0] = chWidth;
+    cords.size[1] = chHeight;
+    cords.offset[0] = pSlot->charOffsetX;
+    cords.offset[1] = pSlot->charOffsetY;
 }
-
 
 X_NAMESPACE_END

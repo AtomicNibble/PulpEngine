@@ -1,6 +1,5 @@
 #include "stdafx.h"
 
-
 X_USING_NAMESPACE;
 
 #if 0

@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <IInput.h>
 #include <IModelManager.h>
 
@@ -17,15 +16,13 @@
 #include "DataTranslator.h"
 
 X_NAMESPACE_DECLARE(core,
-	struct FrameTimeData;
-)
+                    struct FrameTimeData;)
 
 X_NAMESPACE_DECLARE(engine,
-	struct IWorld3D;
-	namespace fx {
-		struct IEffectManager;
-	}
-)
+                    struct IWorld3D;
+                    namespace fx {
+                        struct IEffectManager;
+                    })
 
 X_NAMESPACE_BEGIN(game)
 
@@ -34,91 +31,87 @@ class UserCmdMan;
 
 namespace weapon
 {
-	class WeaponDefManager;
+    class WeaponDefManager;
 }
 
 namespace entity
 {
-	static const EnitiyRegister::entity_type INVALID_ID = EnitiyRegister::INVALID_ID;
+    static const EnitiyRegister::entity_type INVALID_ID = EnitiyRegister::INVALID_ID;
 
-	class EnititySystem 
-	{
-	public:
-		typedef EnitiyRegister::entity_type EntityId;
-		
-	public:
-		EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
+    class EnititySystem
+    {
+    public:
+        typedef EnitiyRegister::entity_type EntityId;
 
-		bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
-		void update(core::FrameData& frame, UserCmdMan& userCmdMan);
+    public:
+        EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
 
-		EntityId createEnt(void);
+        bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
+        void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
-		void makePlayer(EntityId id);
-		bool addController(EntityId id);
+        EntityId createEnt(void);
 
-		bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
-		bool loadEntites2(const char* pJsonBegin, const char* pJsonEnd);
+        void makePlayer(EntityId id);
+        bool addController(EntityId id);
 
-		bool postLoad(void);
+        bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
+        bool loadEntites2(const char* pJsonBegin, const char* pJsonEnd);
 
+        bool postLoad(void);
 
-		X_INLINE const EnitiyRegister& getRegister(void) const;
-		X_INLINE EnitiyRegister& getRegister(void);
+        X_INLINE const EnitiyRegister& getRegister(void) const;
+        X_INLINE EnitiyRegister& getRegister(void);
 
-	private:
-		bool createTranslatours(void);
+    private:
+        bool createTranslatours(void);
 
-		// Temp
-		bool parseMiscModels(core::json::Value::Array val);
-		bool parseScriptOrigins(core::json::Value::Array val);
+        // Temp
+        bool parseMiscModels(core::json::Value::Array val);
+        bool parseScriptOrigins(core::json::Value::Array val);
 
+        template<typename CompnentT>
+        static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
 
-		template<typename CompnentT>
-		static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
+        bool parseEntDesc(core::json::Value& val);
 
-		bool parseEntDesc(core::json::Value& val);
+    private:
+        core::MemoryArenaBase* arena_;
+        EnitiyRegister reg_;
+        GameVars& vars_;
+        game::weapon::WeaponDefManager& weaponDefs_;
 
-	private:
-		core::MemoryArenaBase* arena_;
-		EnitiyRegister reg_;
-		GameVars& vars_;
-		game::weapon::WeaponDefManager& weaponDefs_;
+        physics::IPhysics* pPhysics_;
+        physics::IScene* pPhysScene_;
+        engine::IWorld3D* p3DWorld_;
+        model::IModelManager* pModelManager_;
+        engine::fx::IEffectManager* pEffectManager_;
 
-		physics::IPhysics* pPhysics_;
-		physics::IScene* pPhysScene_;
-		engine::IWorld3D* p3DWorld_;
-		model::IModelManager* pModelManager_;
-		engine::fx::IEffectManager* pEffectManager_;
+        PlayerSystem playerSys_;
+        CameraSystem cameraSys_;
+        SoundSystem soundSys_;
+        PhysicsSystem physSys_;
+        AnimatedSystem animatedSys_;
+        WeaponSystem weaponSys_;
 
-		PlayerSystem playerSys_;
-		CameraSystem cameraSys_;
-		SoundSystem soundSys_;
-		PhysicsSystem physSys_;
-		AnimatedSystem animatedSys_;
-		WeaponSystem weaponSys_;
+    private:
+        DataTranslator<Health> dtHealth_;
+        DataTranslator<Mesh> dtMesh_;
+        DataTranslator<SoundObject> dtSoundObj_;
+        DataTranslator<Rotator> dtRotator_;
+        DataTranslator<Mover> dtMover_;
+        DataTranslator<Emitter> dtEmitter_;
+    };
 
-	private:
-		DataTranslator<Health> dtHealth_;
-		DataTranslator<Mesh> dtMesh_;
-		DataTranslator<SoundObject> dtSoundObj_;
-		DataTranslator<Rotator> dtRotator_;
-		DataTranslator<Mover> dtMover_;
-		DataTranslator<Emitter> dtEmitter_;
-	};
+    X_INLINE const EnitiyRegister& EnititySystem::getRegister(void) const
+    {
+        return reg_;
+    }
 
-
-	X_INLINE const EnitiyRegister& EnititySystem::getRegister(void) const 
-	{
-		return reg_;
-	}
-
-	X_INLINE EnitiyRegister& EnititySystem::getRegister(void) 
-	{
-		return reg_;
-	}
+    X_INLINE EnitiyRegister& EnititySystem::getRegister(void)
+    {
+        return reg_;
+    }
 
 } // namespace entity
-
 
 X_NAMESPACE_END

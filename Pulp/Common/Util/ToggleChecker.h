@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_UTIL_TOGGLE_CHECKER_H_
 #define X_UTIL_TOGGLE_CHECKER_H_
 
@@ -12,29 +11,31 @@ X_PACK_PUSH(1)
 class ToggleChecker
 {
 public:
-	ToggleChecker(bool inital_state) : 
-		current_(inital_state) 
-	{
-	}
+    ToggleChecker(bool inital_state) :
+        current_(inital_state)
+    {
+    }
 
-	X_INLINE bool operator=(bool value) {
+    X_INLINE bool operator=(bool value)
+    {
+        X_ASSERT(value != current_, "toggle check failed")
+        (value, current_);
+        current_ = value;
+        return current_;
+    }
 
-		X_ASSERT(value != current_, "toggle check failed")(value, current_);
-		current_ = value;
-		return current_;
-	}
-
-	X_INLINE operator bool(void) const {
-		return current_;
-	}
-
-private:
-	bool operator+=(bool value);
-	bool operator++(void);
-	bool operator--(void);
+    X_INLINE operator bool(void) const
+    {
+        return current_;
+    }
 
 private:
-	bool current_;
+    bool operator+=(bool value);
+    bool operator++(void);
+    bool operator--(void);
+
+private:
+    bool current_;
 };
 X_PACK_POP
 

@@ -1,9 +1,6 @@
 #pragma once
 
-
 X_NAMESPACE_BEGIN(net)
-
-
 
 // build config specific values
 #if X_DEBUG
@@ -21,6 +18,5 @@ X_NAMESPACE_BEGIN(net)
 #else
 #error "unkonw config"
 #endif
-
 
 X_NAMESPACE_END

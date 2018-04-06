@@ -4,12 +4,10 @@
 #include <IDirectoryWatcher.h>
 #include <IScriptSys.h>
 
-
 #include <String\Path.h>
 #include <Util\UniquePointer.h>
 
 #include <lua.hpp>
-
 
 #include "Util\Config.h"
 
@@ -22,9 +20,8 @@
 
 extern core::MemoryArenaBase* g_ScriptArena;
 
-
 #if X_DEBUG
 X_LINK_LIB("luajitd")
 #else
 X_LINK_LIB("luajitr")
-#endif 
+#endif

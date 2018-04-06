@@ -22,7 +22,7 @@ namespace profiler
         virtual void ScopeEnd(XProfileScope* pScope) X_ABSTRACT;
     };
 
-} // namespace profielr
+} // namespace profiler
 
 X_NAMESPACE_END
 

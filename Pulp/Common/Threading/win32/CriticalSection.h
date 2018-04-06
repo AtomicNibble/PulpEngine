@@ -3,7 +3,6 @@
 #ifndef X_CRITICALSECTION_H_
 #define X_CRITICALSECTION_H_
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Threading
@@ -41,63 +40,62 @@ X_NAMESPACE_BEGIN(core)
 class CriticalSection
 {
 public:
-	/// Initializes the critical section.
-	CriticalSection(void);
+    /// Initializes the critical section.
+    CriticalSection(void);
 
-	/// \brief Initializes the critical section with a certain spin count.
-	/// \remark Entering the critical section will first try spinning the given number of times before finally acquiring
-	/// the critical section if spinning was unsuccessful.
-	explicit CriticalSection(uint32_t spinCount);
+    /// \brief Initializes the critical section with a certain spin count.
+    /// \remark Entering the critical section will first try spinning the given number of times before finally acquiring
+    /// the critical section if spinning was unsuccessful.
+    explicit CriticalSection(uint32_t spinCount);
 
-	/// Releases OS resources of the critical section.
-	~CriticalSection(void);
+    /// Releases OS resources of the critical section.
+    ~CriticalSection(void);
 
-	/// Enters the critical section.
-	void Enter(void);
+    /// Enters the critical section.
+    void Enter(void);
 
-	/// Tries to enter the critical section, and returns whether the operation was successful.
-	bool TryEnter(void);
+    /// Tries to enter the critical section, and returns whether the operation was successful.
+    bool TryEnter(void);
 
-	/// Leaves the critical section.
-	void Leave(void);
+    /// Leaves the critical section.
+    void Leave(void);
 
-	/// set number of sinds before acquirung critical section.
-	void SetSpinCount(uint32_t count);
+    /// set number of sinds before acquirung critical section.
+    void SetSpinCount(uint32_t count);
 
-	/// \brief Returns a pointer to the native object.
-	/// \remark For internal use only.
-	inline CRITICAL_SECTION* GetNativeObject(void);
+    /// \brief Returns a pointer to the native object.
+    /// \remark For internal use only.
+    inline CRITICAL_SECTION* GetNativeObject(void);
 
-	/// \class ScopedLock
-	/// \brief A RAII-style scoped lock.
-	/// \details If used as an automatic variable on the stack, the ScopedLock will Enter() the critical section in
-	/// the constructor, and Leave() it in the destructor. This eliminates the risk of forgetting to leave a critical
-	/// section in code having multiple exit paths.
-	///
-	/// See http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization for an explanation of the RAII idiom.
-	class ScopedLock
-	{
-	public:
-		/// Enters the given critical section.
-		inline explicit ScopedLock(CriticalSection& criticalSection);
+    /// \class ScopedLock
+    /// \brief A RAII-style scoped lock.
+    /// \details If used as an automatic variable on the stack, the ScopedLock will Enter() the critical section in
+    /// the constructor, and Leave() it in the destructor. This eliminates the risk of forgetting to leave a critical
+    /// section in code having multiple exit paths.
+    ///
+    /// See http://en.wikipedia.org/wiki/Resource_Acquisition_Is_Initialization for an explanation of the RAII idiom.
+    class ScopedLock
+    {
+    public:
+        /// Enters the given critical section.
+        inline explicit ScopedLock(CriticalSection& criticalSection);
 
-		/// Leaves the critical section.
-		inline ~ScopedLock(void);
+        /// Leaves the critical section.
+        inline ~ScopedLock(void);
 
-	private:
-		X_NO_COPY(ScopedLock);
-		X_NO_ASSIGN(ScopedLock);
+    private:
+        X_NO_COPY(ScopedLock);
+        X_NO_ASSIGN(ScopedLock);
 
-		CriticalSection& cs_;
-	};
+        CriticalSection& cs_;
+    };
 
 private:
-	CRITICAL_SECTION cs_;
+    CRITICAL_SECTION cs_;
 };
 
 #include "CriticalSection.inl"
 
 X_NAMESPACE_END
-
 
 #endif // X_CRITICALSECTION_H_

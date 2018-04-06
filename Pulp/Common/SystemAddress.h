@@ -3,7 +3,7 @@
 #include <INetwork.h>
 
 X_NAMESPACE_DECLARE(core,
-                    class FixedBitStreamBase)
+    class FixedBitStreamBase)
 
 X_NAMESPACE_BEGIN(net)
 

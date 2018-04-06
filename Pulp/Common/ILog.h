@@ -26,8 +26,7 @@ X_DECLARE_ENUM(LogType)
     WARNING,
     ERROR,
     FATAL,
-    ASSERT
-);
+    ASSERT);
 
 class LoggerBase;
 

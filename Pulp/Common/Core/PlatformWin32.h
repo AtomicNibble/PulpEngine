@@ -14,15 +14,13 @@
 #endif
 #endif
 
-
 #ifndef _WIN32_WINNT
-# define _WIN32_WINNT 0x0601
+#define _WIN32_WINNT 0x0601
 #endif
-
 
 // enable strict type checking for Windows headers
 #ifndef STRICT
-#	define STRICT
+#define STRICT
 #endif
 
 // exclude rarely used Windows stuff
@@ -52,12 +50,10 @@
 #define NODEFERWINDOWPOS
 #define NOMCX
 
-
 // suck my d(nipples)
 #ifndef _CRT_SECURE_NO_WARNINGS
 #define _CRT_SECURE_NO_WARNINGS
 #endif
-
 
 X_PUSH_WARNING_LEVEL(0)
 #include <Windows.h>
@@ -65,30 +61,29 @@ X_PUSH_WARNING_LEVEL(0)
 #include <malloc.h>
 X_POP_WARNING_LEVEL
 
-
 // undefine global namespace pollution
 #ifdef CopyFile
-#	undef CopyFile
+#undef CopyFile
 #endif
 
 #ifdef FindText
-#	undef FindText
+#undef FindText
 #endif
 
 #ifdef min
-#	undef min
+#undef min
 #endif
 
 #ifdef max
-#	undef max
+#undef max
 #endif
 
 #ifdef MAX_PRIORITY
-#	undef MAX_PRIORITY
+#undef MAX_PRIORITY
 #endif
 
 #ifdef DELETE
-#	undef DELETE
+#undef DELETE
 #endif
 
 #if defined(ERROR)
@@ -107,7 +102,6 @@ X_POP_WARNING_LEVEL
 #undef GetCurrentDirectory
 #endif
 
-
 #ifdef X_LIB
 #define DLL_EXPORT
 #define DLL_IMPORT
@@ -115,6 +109,5 @@ X_POP_WARNING_LEVEL
 #define DLL_EXPORT X_EXPORT
 #define DLL_IMPORT X_IMPORT
 #endif // !X_LIB
-
 
 #endif // !_X_PLATFORM_WIN32_H_

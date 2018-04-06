@@ -8,11 +8,11 @@ typedef void(__cdecl *_PVFV)();
 extern _PVFV __xc_a[], __xc_z[];    // C++ initializers
 
 #pragma section(".CRT$XCA", read, write)
-#pragma data_seg(".CRT$XCA")		// start of ctor section
+#pragma data_seg(".CRT$XCA") // start of ctor section
 _PVFV __xc_a[] = { 0 };
 
 #pragma section(".CRT$XCZ", read, write)
-#pragma data_seg(".CRT$XCZ")		// end of ctor section
+#pragma data_seg(".CRT$XCZ") // end of ctor section
 _PVFV __xc_z[] = { 0 };
 
 

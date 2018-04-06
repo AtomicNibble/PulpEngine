@@ -25,8 +25,7 @@ X_DECLARE_ENUM(Moudles)
     Physics,
     Network,
     Video,
-    Io
-);
+    Io);
 
 X_DECLARE_ENUM(Type)
 (
@@ -40,8 +39,7 @@ X_DECLARE_ENUM(Type)
     Userdata,
     Handle,
     Vector,
-    None
-);
+    None);
 
 class SmartScriptTable;
 
@@ -474,33 +472,30 @@ protected:
 };
 
 #define X_SCRIPT_BIND(classname, func)                    \
-    \
-{                                                    \
+                                                          \
+    {                                                     \
         script::IScriptBinds::ScriptFunction Delegate;    \
         Delegate.Bind<classname, &classname::func>(this); \
         pBindTable_->registerFunction(#func, Delegate);   \
-    \
-}
+    }
 
 #define SCRIPT_CHECK_PARAMETERS(_n)                                                                                              \
-    \
-if(pH->getParamCount() != _n)                                                                                                    \
-    \
-{                                                                                                                           \
+                                                                                                                                 \
+    if (pH->getParamCount() != _n)                                                                                               \
+                                                                                                                                 \
+    {                                                                                                                            \
         pH->getIScriptSystem()->onScriptError("[%s] %d arguments passed, " #_n " expected)", __FUNCTION__, pH->getParamCount()); \
         return pH->endFunction();                                                                                                \
-    \
-}
+    }
 
 #define SCRIPT_CHECK_PARAMETERS_MIN(_n)                                                                                                   \
-    \
-if(pH->getParamCount() < _n)                                                                                                              \
-    \
-{                                                                                                                                    \
+                                                                                                                                          \
+    if (pH->getParamCount() < _n)                                                                                                         \
+                                                                                                                                          \
+    {                                                                                                                                     \
         pH->getIScriptSystem()->onScriptError("[%s] %d arguments passed, at least " #_n " expected)", __FUNCTION__, pH->getParamCount()); \
         return pH->endFunction();                                                                                                         \
-    \
-}
+    }
 
 // ===========================================================
 class SmartScriptTable

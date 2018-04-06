@@ -19,21 +19,20 @@ struct SourceInfo;
 class DefaultAssertionHandler : public IAssertHandler
 {
 public:
-	// Default constructor.
-	DefaultAssertionHandler(void);
+    // Default constructor.
+    DefaultAssertionHandler(void);
 
-	// Destructor.
-	virtual ~DefaultAssertionHandler(void);
+    // Destructor.
+    virtual ~DefaultAssertionHandler(void);
 
 private:
-	/// Empty implementation.
-	virtual void DoAssert(const SourceInfo& sourceInfo) X_OVERRIDE;
+    /// Empty implementation.
+    virtual void DoAssert(const SourceInfo& sourceInfo) X_OVERRIDE;
 
-	/// Empty implementation.
-	virtual void DoAssertVariable(const SourceInfo& sourceInfo) X_OVERRIDE;
+    /// Empty implementation.
+    virtual void DoAssertVariable(const SourceInfo& sourceInfo) X_OVERRIDE;
 };
 
 X_NAMESPACE_END
-
 
 #endif

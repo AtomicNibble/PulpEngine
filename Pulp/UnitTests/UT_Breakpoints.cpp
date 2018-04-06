@@ -11,26 +11,27 @@
 X_USING_NAMESPACE;
 using namespace core;
 
-#define BREAKPOINT_TEST(bits,type, flag) \
-TEST(BreakPoint, Read##bits) { \
-	type var = 0; \
-	type* varAddress = &var; \
-	\
-	hardwareBP::Install(varAddress,hardwareBP::Condition::READ_OR_WRITE, \
-	hardwareBP::Size::flag); \
-	\
-	EXPECT_DEATH({ type test = *varAddress; }, "");  \
-	 \
-	hardwareBP::Uninstall(varAddress); \
-} \
-TEST(BreakPoint, Write##bits) { \
-	type var[2] = {}; \
-	hardwareBP::Install(var, hardwareBP::Condition::WRITE, \
-	hardwareBP::Size::flag); \
-	EXPECT_DEATH({ var[0] = 0; }, "");  \
-	hardwareBP::Uninstall(var); \
-}
-
+#define BREAKPOINT_TEST(bits, type, flag)                                     \
+    TEST(BreakPoint, Read##bits)                                              \
+    {                                                                         \
+        type var = 0;                                                         \
+        type* varAddress = &var;                                              \
+                                                                              \
+        hardwareBP::Install(varAddress, hardwareBP::Condition::READ_OR_WRITE, \
+            hardwareBP::Size::flag);                                          \
+                                                                              \
+        EXPECT_DEATH({ type test = *varAddress; }, "");                       \
+                                                                              \
+        hardwareBP::Uninstall(varAddress);                                    \
+    }                                                                         \
+    TEST(BreakPoint, Write##bits)                                             \
+    {                                                                         \
+        type var[2] = {};                                                     \
+        hardwareBP::Install(var, hardwareBP::Condition::WRITE,                \
+            hardwareBP::Size::flag);                                          \
+        EXPECT_DEATH({ var[0] = 0; }, "");                                    \
+        hardwareBP::Uninstall(var);                                           \
+    }
 
 #if ENABLE_BREAKPOINT_TESTS
 
@@ -40,4 +41,3 @@ BREAKPOINT_TEST(32, uint32_t, BYTE_4)
 BREAKPOINT_TEST(64, uint64_t, BYTE_8)
 
 #endif
-

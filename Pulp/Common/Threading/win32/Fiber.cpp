@@ -1,72 +1,64 @@
 #include <EngineCommon.h>
 #include "Fiber.h"
 
-
 X_NAMESPACE_BEGIN(core)
-
 
 namespace Fiber
 {
+    FiberHandle ConvertThreadToFiber(void* pArg)
+    {
+        FiberHandle fiber = ::ConvertThreadToFiberEx(pArg, FIBER_FLAG_FLOAT_SWITCH);
 
-	FiberHandle ConvertThreadToFiber(void* pArg)
-	{
-		FiberHandle fiber = ::ConvertThreadToFiberEx(pArg, FIBER_FLAG_FLOAT_SWITCH);
+        if (!fiber) {
+            lastError::Description Dsc;
+            X_ERROR("Fiber", "Failed to create fiber. Err: %s", lastError::ToString(Dsc));
+        }
 
-		if (!fiber)
-		{
-			lastError::Description Dsc;
-			X_ERROR("Fiber", "Failed to create fiber. Err: %s", lastError::ToString(Dsc));
-		}
+        return fiber;
+    }
 
-		return fiber;
+    void ConvertFiberToThread(void)
+    {
+        if (!::ConvertFiberToThread()) {
+            lastError::Description Dsc;
+            X_ERROR("Fiber", "Failed to convert fiber to thread. Err: %s", lastError::ToString(Dsc));
+        }
+    }
 
-	}
+    FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize,
+        FiberStartRoutine startRoutine, void* pArg)
+    {
+        FiberHandle fiber = ::CreateFiberEx(stackCommitSize, stackReserveSize,
+            FIBER_FLAG_FLOAT_SWITCH, startRoutine, pArg);
 
-	void ConvertFiberToThread(void)
-	{
-		if (!::ConvertFiberToThread())
-		{
-			lastError::Description Dsc;
-			X_ERROR("Fiber", "Failed to convert fiber to thread. Err: %s", lastError::ToString(Dsc));
-		}
-	}
+        if (!fiber) {
+            lastError::Description Dsc;
+            X_ERROR("Fiber", "Failed to create fiber. Err: %s", lastError::ToString(Dsc));
+        }
 
-	FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize, 
-		FiberStartRoutine startRoutine, void* pArg)
-	{
-		FiberHandle fiber = ::CreateFiberEx(stackCommitSize, stackReserveSize,
-			FIBER_FLAG_FLOAT_SWITCH, startRoutine, pArg);
+        return fiber;
+    }
 
-		if (!fiber)
-		{
-			lastError::Description Dsc;
-			X_ERROR("Fiber", "Failed to create fiber. Err: %s", lastError::ToString(Dsc));
-		}
+    void DeleteFiber(FiberHandle fiber)
+    {
+        ::DeleteFiber(fiber);
+    }
 
-		return fiber;
-	}
+    void SwitchToFiber(FiberHandle destFiber)
+    {
+        ::SwitchToFiber(destFiber);
+    }
 
-	void DeleteFiber(FiberHandle fiber)
-	{
-		::DeleteFiber(fiber);
-	}
+    FiberHandle GetCurrentFiber(void)
+    {
+        return ::GetCurrentFiber();
+    }
 
-	void SwitchToFiber(FiberHandle destFiber)
-	{
-		::SwitchToFiber(destFiber);
-	}
+    void* GetFiberData(void)
+    {
+        return ::GetFiberData();
+    }
 
-	FiberHandle GetCurrentFiber(void)
-	{
-		return ::GetCurrentFiber();
-	}
-
-	void* GetFiberData(void)
-	{
-		return ::GetFiberData();
-	}
-
-} // namespadce Fiber
-
+} // namespace Fiber
 
 X_NAMESPACE_END

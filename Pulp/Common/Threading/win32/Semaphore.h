@@ -51,25 +51,24 @@ X_NAMESPACE_BEGIN(core)
 class Semaphore
 {
 public:
-	Semaphore(int initialValue, int maximumValue);
-	X_INLINE ~Semaphore(void);
+    Semaphore(int initialValue, int maximumValue);
+    X_INLINE ~Semaphore(void);
 
-	// release a slot, allowing other threads that call wait to take a slot.
-	X_INLINE void ReleaseSlot(void);
+    // release a slot, allowing other threads that call wait to take a slot.
+    X_INLINE void ReleaseSlot(void);
 
-	// wait untill we have a free slot.
-	X_INLINE void AcquireSlot(void);
+    // wait untill we have a free slot.
+    X_INLINE void AcquireSlot(void);
 
-	// see if we can
-	X_INLINE bool TryAcquireSlot(void);
+    // see if we can
+    X_INLINE bool TryAcquireSlot(void);
 
 private:
-	HANDLE sema_;
+    HANDLE sema_;
 };
 
 #include "Semaphore.inl"
 
 X_NAMESPACE_END
-
 
 #endif // !_X_THREADING_SEMAPHORE_H_

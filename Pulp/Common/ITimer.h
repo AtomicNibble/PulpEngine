@@ -7,15 +7,14 @@
 #include <Util\FlagsMacros.h>
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameTimeData);
+    struct FrameTimeData);
 
 X_NAMESPACE_BEGIN(core)
 
 X_DECLARE_ENUM(Timer)
 (
     GAME,
-    UI
-);
+    UI);
 
 struct ITimer
 {

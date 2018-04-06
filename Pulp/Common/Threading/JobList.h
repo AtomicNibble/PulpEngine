@@ -13,235 +13,236 @@
 #include "Threading\AtomicInt.h"
 #include "Threading\CriticalSection.h"
 
-
 X_NAMESPACE_BEGIN(core)
 
 namespace JobList
 {
-
 #define SCHEDULER_LOGS 0
 
-typedef void(*Job)(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx);
+    typedef void (*Job)(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx);
 
-X_DECLARE_ENUM(JobListPriority)(NONE,LOW,NORMAL,HIGH);
+    X_DECLARE_ENUM(JobListPriority)
+    (NONE, LOW, NORMAL, HIGH);
 
-static const uint32_t HW_THREAD_MAX = 6; // max even if hardware supports more.
-static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
-static const uint32_t MAX_JOB_LISTS = 64;
+    static const uint32_t HW_THREAD_MAX = 6;       // max even if hardware supports more.
+    static const uint32_t HW_THREAD_NUM_DELTA = 1; // num = Min(max,hw_num-delta);
+    static const uint32_t MAX_JOB_LISTS = 64;
 
-class JobList;
-class jobListRunner;
+    class JobList;
+    class jobListRunner;
 
-struct ThreadStats
-{
-	ThreadStats() : numExecLists(0) {}
+    struct ThreadStats
+    {
+        ThreadStats() :
+            numExecLists(0)
+        {
+        }
 
-	TimeVal waitforJobTime;
-	uint64_t numExecLists;	// jobs lists execuced
-};
+        TimeVal waitforJobTime;
+        uint64_t numExecLists; // jobs lists execuced
+    };
 
+    struct JobListStats
+    {
+        TimeVal submitTime; // time lists was submitted
+        TimeVal startTime;  // time lists was first picked
+        TimeVal waitTime;   // time list spent waiting
+        TimeVal endTime;    // time at which all the jobs are done.
+        // stats for each thread, since the jobs will run in multipl threads
+        // this just gives a break down of how much time each thread spent.
+        TimeVal threadExecTime[HW_THREAD_MAX];  // time exec job code
+        TimeVal threadTotalTime[HW_THREAD_MAX]; // total time.
+    };
 
-struct JobListStats
-{
-	TimeVal submitTime;					// time lists was submitted
-	TimeVal startTime;					// time lists was first picked
-	TimeVal waitTime;					// time list spent waiting
-	TimeVal endTime;					// time at which all the jobs are done.
-	// stats for each thread, since the jobs will run in multipl threads
-	// this just gives a break down of how much time each thread spent.
-	TimeVal threadExecTime[HW_THREAD_MAX];		// time exec job code
-	TimeVal threadTotalTime[HW_THREAD_MAX];		// total time.
-};
+    struct JobData
+    {
+        Job pJobRun;
+        void* pData;
 
+        // done
+        bool done;
+        bool _pad[3];
 
+        // batch offset and index.
+        uint32_t batchOffset;
+        uint32_t batchNum;
 
-struct JobData
-{
-	Job pJobRun;
-	void *pData;
+        TimeVal execTime;
+    };
 
-	// done
-	bool done;
-	bool _pad[3];
+    static const size_t temp = sizeof(JobData);
 
-	// batch offset and index.
-	uint32_t batchOffset;
-	uint32_t batchNum;
+    struct JobListThreadState
+    {
+        JobListThreadState() :
+            jobList(nullptr),
+            lastJobIndex(0),
+            nextJobIndex(-1),
+            version(0xFFFFFFFF)
+        {
+        }
 
-	TimeVal execTime;
-};
+        ~JobListThreadState()
+        {
+            jobList = nullptr;
+        }
 
-static const size_t temp = sizeof(JobData);
+        JobList* jobList;
+        int lastJobIndex;
+        int nextJobIndex;
+        int version;
+    };
 
-struct JobListThreadState
-{
-	JobListThreadState() :
-	jobList(nullptr),
-	lastJobIndex(0),
-	nextJobIndex(-1),
-	version(0xFFFFFFFF) {}
+    class JobList
+    {
+    public:
+        X_DECLARE_FLAGS(RunFlag)
+        (OK, PROGRESS, DONE, STALLED);
+        typedef Flags<RunFlag> RunFlags;
 
-	~JobListThreadState() {
-		jobList = nullptr;
-	}
+        friend class jobListRunner;
+        friend class JobThread;
 
-	JobList* jobList;
-	int	lastJobIndex;
-	int	nextJobIndex;
-	int version;
-};
+    public:
+        explicit JobList(core::MemoryArenaBase* arena);
 
+        void AddJob(Job job, void* pData);
 
-class JobList
-{
-public:
-	X_DECLARE_FLAGS(RunFlag)(OK,PROGRESS,DONE,STALLED);
-	typedef Flags<RunFlag> RunFlags;
+        void Wait(void);
+        bool TryWait(void);
+        bool IsSubmitted(void) const;
+        bool IsDone(void) const;
 
-	friend class jobListRunner;
-	friend class JobThread;
-public:
-	explicit JobList(core::MemoryArenaBase* arena);
+        void SetPriority(JobListPriority::Enum priority);
+        JobListPriority::Enum getPriority(void) const;
 
-	void AddJob(Job job, void* pData);
+        RunFlags RunJobs(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
 
-	void Wait(void);
-	bool TryWait(void);
-	bool IsSubmitted(void) const;
-	bool IsDone(void) const;
+        const JobListStats& getStats(void) const
+        {
+            return stats_;
+        }
 
-	void SetPriority(JobListPriority::Enum priority);
-	JobListPriority::Enum getPriority(void) const;
+        X_INLINE bool CanRun(void) const
+        {
+            if (waitForList_) {
+                if (waitForList_ > 0)
+                    return false;
+            }
+            return true;
+        }
 
-	RunFlags RunJobs(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
+    private:
+        RunFlags RunJobsInternal(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
 
-	const JobListStats& getStats(void) const {
-		return stats_;
-	}
+    protected:
+        void PreSubmit(JobList* pWaitFor);
 
-	X_INLINE bool CanRun(void) const {
-		if(waitForList_) {
-			if(waitForList_ > 0 )
-				return false;
-		}
-		return true;
-	}
+        TimeVal GetTimeReal(void) const;
 
-private:
-	RunFlags RunJobsInternal(uint32_t threadIdx, JobListThreadState& state, bool singleJob);
+    private:
+        static void NopJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx);
+        static int32_t JOB_LIST_DONE;
 
-protected:
-	void PreSubmit(JobList* pWaitFor);
+    private:
+        bool isDone_;
+        bool isSubmit_;
+        bool _pad[2];
 
-	TimeVal GetTimeReal(void) const;
+        JobListPriority::Enum priority_;
 
-private:
-	static void NopJob(void* pParam, uint32_t batchOffset, uint32_t batchNum, uint32_t workerIdx);
-	static int32_t JOB_LIST_DONE;
+        core::Array<JobData> jobs_;
 
-private:
-	bool isDone_;
-	bool isSubmit_;
-	bool _pad[2];
+        core::AtomicInt syncCount_;
+        core::AtomicInt currentJob_;
+        core::AtomicInt fetchLock_;
+        core::AtomicInt numThreadsExecuting_;
+        core::AtomicInt version_;
 
-	JobListPriority::Enum priority_;
+        core::AtomicInt doneGuard_;
 
-	core::Array<JobData> jobs_;
+        // points to a jobs done guard.
+        core::AtomicInt* waitForList_;
 
-	core::AtomicInt syncCount_;
-	core::AtomicInt currentJob_;
-	core::AtomicInt fetchLock_;
-	core::AtomicInt numThreadsExecuting_;
-	core::AtomicInt version_;
+        // keep a copy of the timer interface.
+        core::ITimer* pTimer_;
+        JobListStats stats_;
 
-	core::AtomicInt doneGuard_;
+    public:
+        size_t listId_;
+    };
 
-	// points to a jobs done guard.
-	core::AtomicInt* waitForList_;
+    class JobThread : public ThreadAbstract
+    {
+        typedef core::FixedArray<JobListThreadState, MAX_JOB_LISTS> JobStateList;
 
-	// keep a copy of the timer interface.
-	core::ITimer* pTimer_;
-	JobListStats stats_;
+        struct threadJobList
+        {
+            threadJobList();
 
-public:
+            JobList* jobList;
+            int32_t version;
+        };
 
-	size_t listId_;
-};
+    public:
+        JobThread();
+        ~JobThread();
 
+        void setThreadIdx(uint32_t idx);
+        void AddJobList(JobList* pJobList);
 
-class JobThread : public ThreadAbstract
-{
-	typedef core::FixedArray<JobListThreadState, MAX_JOB_LISTS> JobStateList;
+        void SignalWork(void);
+        void Stop(void);
+        void WaitForThread(void);
 
-	struct threadJobList
-	{
-		threadJobList();
+    protected:
+        virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
+        Thread::ReturnValue ThreadRunInternal(const Thread& thread);
 
-		JobList* jobList;
-		int32_t	version;
-	};
+        TimeVal GetTimeReal(void) const;
 
+    private:
+        core::Signal signalWorkerDone_;
+        core::Signal signalMoreWorkToDo_;
+        core::CriticalSection signalCritical_;
+        volatile bool moreWorkToDo_;
 
-public:
-	JobThread();
-	~JobThread();
+        ThreadStats stats_;
 
-	void setThreadIdx(uint32_t idx);
-	void AddJobList(JobList* pJobList);
+        //	core::FixedFifo<JobList*, MAX_JOB_LISTS> jobLists_;
+        threadJobList jobLists_[MAX_JOB_LISTS];
+        uint32_t firstJobList_;
+        uint32_t lastJobList_;
 
-	void SignalWork(void);
-	void Stop(void);
-	void WaitForThread(void);
+        uint32_t threadIdx_;
+    };
 
-protected:
-	virtual Thread::ReturnValue ThreadRun(const Thread& thread) X_FINAL;
-	Thread::ReturnValue ThreadRunInternal(const Thread& thread);
+    class jobListRunner
+    {
+    public:
+        jobListRunner();
+        ~jobListRunner();
 
-	TimeVal GetTimeReal(void) const;
+        void StartUp(void);
+        void ShutDown(void);
 
-private:
-	core::Signal signalWorkerDone_;
-	core::Signal signalMoreWorkToDo_;
-	core::CriticalSection signalCritical_;
-	volatile bool moreWorkToDo_;
+        void SubmitJobList(JobList* pList, JobList* pWaitFor = nullptr);
+        void WaitForThreads(void);
 
-	ThreadStats stats_;
+        int32_t numThreads(void) const;
 
-//	core::FixedFifo<JobList*, MAX_JOB_LISTS> jobLists_;
-	threadJobList jobLists_[MAX_JOB_LISTS];
-	uint32_t firstJobList_;	
-	uint32_t lastJobList_;
+    private:
+        void StartThreads(void);
 
-	uint32_t threadIdx_;
-};
+    private:
+        int32_t numThreads_; // num created.
+        JobThread threads_[HW_THREAD_MAX];
 
+        core::CriticalSection addJobListCrit_;
 
-class jobListRunner
-{
-public:
-	jobListRunner();
-	~jobListRunner();
-
-	void StartUp(void);
-	void ShutDown(void);
-
-	void SubmitJobList(JobList* pList, JobList* pWaitFor = nullptr);
-	void WaitForThreads(void);
-
-	int32_t numThreads(void) const;
-
-private:
-	void StartThreads(void);
-
-private:
-	int32_t numThreads_; // num created.
-	JobThread threads_[HW_THREAD_MAX];
-
-	core::CriticalSection addJobListCrit_;
-
-public:
-	static int32_t var_LongJobMs;
-};
+    public:
+        static int32_t var_LongJobMs;
+    };
 
 } // namespace JobList
 

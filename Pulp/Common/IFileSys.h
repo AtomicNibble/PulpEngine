@@ -29,21 +29,18 @@ X_DECLARE_FLAGS(fileMode)
     RECREATE,
     SHARE,
     RANDOM_ACCESS,
-    NOBUFFER
-);
+    NOBUFFER);
 
 X_DECLARE_FLAGS(SeekMode)
 (
     CUR,
     END,
-    SET
-);
+    SET);
 
 X_DECLARE_ENUM(VirtualDirectory)
 (
     GAME,
-    MOD
-);
+    MOD);
 
 typedef Flags<fileMode> fileModeFlags;
 
@@ -189,7 +186,8 @@ struct XFileMem : public XFile
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
         X_ASSERT_NOT_NULL(arena);
-        X_ASSERT(end >= begin, "invalid buffer")(begin, end); 
+        X_ASSERT(end >= begin, "invalid buffer")
+        (begin, end);
     }
     ~XFileMem() X_OVERRIDE
     {
@@ -300,7 +298,8 @@ struct XFileFixedBuf : public XFile
     {
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
-        X_ASSERT(end >= begin, "invalid buffer")(begin, end); 
+        X_ASSERT(end >= begin, "invalid buffer")
+        (begin, end);
     }
 
     XFileFixedBuf(const char* begin, const char* end) :
@@ -533,8 +532,7 @@ X_DECLARE_ENUM(IoRequest)
     OPEN_WRITE_ALL,
     OPEN_READ_ALL,
     WRITE,
-    READ
-);
+    READ);
 
 typedef uint32_t RequestHandle;
 static const RequestHandle INVALID_IO_REQ_HANDLE = 0;
@@ -971,13 +969,15 @@ public:
 
     inline bool openFile(const char* path, IFileSys::fileModeFlags mode)
     {
-        X_ASSERT(pFile_ == nullptr, "File already open")();
+        X_ASSERT(pFile_ == nullptr, "File already open")
+        ();
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
     inline bool openFile(const wchar_t* path, IFileSys::fileModeFlags mode)
     {
-        X_ASSERT(pFile_ == nullptr, "File already open")();
+        X_ASSERT(pFile_ == nullptr, "File already open")
+        ();
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
@@ -1162,7 +1162,8 @@ public:
 
     X_INLINE bool findNext(void)
     {
-        X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")();
+        X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")
+        ();
         return pFileSys_->findnext2(handle_, fd_);
     }
 

@@ -7,187 +7,173 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace fx
 {
+    Effect::Effect(core::string& name, core::MemoryArenaBase* arena) :
+        core::AssetBase(name, assetDb::AssetType::FX),
+        numStages_(0),
+        numIndex_(0),
+        numFloats_(0),
+        dataSize_(0)
+    {
+        X_UNUSED(arena);
+    }
 
-	Effect::Effect(core::string& name, core::MemoryArenaBase* arena) :
-		core::AssetBase(name, assetDb::AssetType::FX),
-		numStages_(0),
-		numIndex_(0),
-		numFloats_(0),
-		dataSize_(0)
-	{
-		X_UNUSED(arena);
-	}
+    Effect::~Effect()
+    {
+    }
 
-	Effect::~Effect()
-	{
+    bool Effect::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
+    {
+        if (dataSize < sizeof(EffectHdr)) {
+            return false;
+        }
 
-	}
+        EffectHdr& hdr = *reinterpret_cast<EffectHdr*>(data.get());
 
-	bool Effect::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
-	{
-		if (dataSize < sizeof(EffectHdr)) {
-			return false;
-		}
+        if (!hdr.isValid()) {
+            X_ERROR("Fx", "\"%s\" invalid header", name_.c_str());
+            return false;
+        }
 
-		EffectHdr& hdr = *reinterpret_cast<EffectHdr*>(data.get());
+        numStages_ = hdr.numStages;
+        numIndex_ = hdr.numIndex;
+        numFloats_ = hdr.numFloats;
 
-		if (!hdr.isValid()) {
-			X_ERROR("Fx", "\"%s\" invalid header", name_.c_str());
-			return false;
-		}
+        dataSize_ = dataSize;
+        data_ = std::move(data);
 
-		numStages_ = hdr.numStages;
-		numIndex_ = hdr.numIndex;
-		numFloats_ = hdr.numFloats;
+        return true;
+    }
 
-		dataSize_ = dataSize;
-		data_ = std::move(data);
+    const StageDsc& Effect::getStageDsc(int32_t idx) const
+    {
+        X_ASSERT(idx >= 0 && idx < getNumStages(), "Out of bouds")
+        (idx, getNumStages());
+        return getStageDscs()[idx];
+    }
 
-		
-		return true;
-	}
+    const StageDsc* Effect::getStageDscs(void) const
+    {
+        return reinterpret_cast<StageDsc*>(data_.ptr() + sizeof(EffectHdr));
+    }
 
-	const StageDsc& Effect::getStageDsc(int32_t idx) const
-	{
-		X_ASSERT(idx >= 0 && idx < getNumStages(), "Out of bouds")(idx, getNumStages());
-		return getStageDscs()[idx];
-	}
+    const IndexType* Effect::getIndexes(void) const
+    {
+        size_t offset = sizeof(EffectHdr);
+        offset += sizeof(StageDsc) * numStages_;
 
-	const StageDsc* Effect::getStageDscs(void) const
-	{
-		return reinterpret_cast<StageDsc*>(data_.ptr() + sizeof(EffectHdr));
-	}
+        return reinterpret_cast<IndexType*>(data_.ptr() + offset);
+    }
 
-	const IndexType* Effect::getIndexes(void) const
-	{
-		size_t offset = sizeof(EffectHdr);
-		offset += sizeof(StageDsc) * numStages_;
+    const float* Effect::getFloats(void) const
+    {
+        size_t offset = sizeof(EffectHdr);
+        offset += sizeof(StageDsc) * numStages_;
+        offset += sizeof(IndexType) * numIndex_;
 
-		return reinterpret_cast<IndexType*>(data_.ptr() + offset);
-	}
+        return reinterpret_cast<float*>(data_.ptr() + offset);
+    }
 
-	const float* Effect::getFloats(void) const
-	{
-		size_t offset = sizeof(EffectHdr);
-		offset += sizeof(StageDsc) * numStages_;
-		offset += sizeof(IndexType) * numIndex_;
+    const char* Effect::getMaterialName(int32_t strOffset) const
+    {
+        size_t offset = sizeof(EffectHdr);
+        offset += sizeof(StageDsc) * numStages_;
+        offset += sizeof(IndexType) * numIndex_;
+        offset += sizeof(float) * numFloats_;
+        offset += strOffset;
 
-		return reinterpret_cast<float*>(data_.ptr() + offset);
-	}
+        return reinterpret_cast<const char*>(data_.ptr() + offset);
+    }
 
-	const char* Effect::getMaterialName(int32_t strOffset) const
-	{
-		size_t offset = sizeof(EffectHdr);
-		offset += sizeof(StageDsc) * numStages_;
-		offset += sizeof(IndexType) * numIndex_;
-		offset += sizeof(float) * numFloats_;
-		offset += strOffset;
+    float Effect::fromGraph(const Graph& g, float t) const
+    {
+        if (g.numPoints == 0) {
+            return 0.f;
+        }
 
-		return reinterpret_cast<const char*>(data_.ptr() + offset);
-	}
+        float scale = getFloat(g.scaleIdx);
+        float result = 0.f;
 
-	float Effect::fromGraph(const Graph& g, float t) const
-	{
-		if (g.numPoints == 0) {
-			return 0.f;
-		}
+        if (g.numPoints > 1) {
+            for (int32_t i = 0; i < g.numPoints; i++) {
+                auto val0 = floatForIdx(g.timeStart + i);
 
-		float scale = getFloat(g.scaleIdx);
-		float result = 0.f;
+                if (val0 == t) {
+                    result = floatForIdx(g.valueStart + i);
+                    break;
+                }
+                else if (val0 > t) {
+                    // blend.
+                    val0 = floatForIdx(g.timeStart + (i - 1));
+                    auto val1 = floatForIdx(g.timeStart + i);
 
-		if (g.numPoints > 1)
-		{
-			for (int32_t i = 0; i < g.numPoints; i++)
-			{
-				auto val0 = floatForIdx(g.timeStart + i);
+                    auto res0 = floatForIdx(g.valueStart + (i - 1));
+                    auto res1 = floatForIdx(g.valueStart + i);
 
-				if (val0 == t)
-				{
-					result = floatForIdx(g.valueStart + i);
-					break;
-				}
-				else if (val0 > t)
-				{
-					// blend.
-					val0 = floatForIdx(g.timeStart + (i - 1));
-					auto val1 = floatForIdx(g.timeStart + i);
+                    float offset = t - val0;
+                    float range = val1 - val0;
+                    float fraction = offset / range;
 
-					auto res0 = floatForIdx(g.valueStart + (i - 1));
-					auto res1 = floatForIdx(g.valueStart + i);
+                    result = lerp(res0, res1, fraction);
+                    break;
+                }
+            }
+        }
+        else {
+            result = floatForIdx(g.valueStart);
+        }
 
-					float offset = t - val0;
-					float range = val1 - val0;
-					float fraction = offset / range;
+        return result * scale;
+    }
 
-					result = lerp(res0, res1, fraction);
-					break;
-				}
-			}
-		}
-		else
-		{
-			result = floatForIdx(g.valueStart);
-		}
+    Vec3f Effect::fromColorGraph(const Graph& g, float t) const
+    {
+        X_ASSERT(g.numPoints > 0, "Hraph is empty")
+        (g.numPoints);
 
-		return result * scale;
-	}
+        float scale = getFloat(g.scaleIdx);
+        Vec3f result;
 
-	Vec3f Effect::fromColorGraph(const Graph& g, float t) const
-	{
-		X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
+        if (g.numPoints > 1) {
+            for (int32_t i = 0; i < g.numPoints; i++) {
+                auto val0 = floatForIdx(g.timeStart + i);
 
-		float scale = getFloat(g.scaleIdx);
-		Vec3f result;
+                if (val0 == t) {
+                    result = colorForIdx(g.valueStart, i);
+                    break;
+                }
+                else if (val0 > t) {
+                    // blend.
+                    val0 = floatForIdx(g.timeStart + (i - 1));
+                    auto val1 = floatForIdx(g.timeStart + i);
 
-		if (g.numPoints > 1)
-		{
-			for (int32_t i = 0; i < g.numPoints; i++)
-			{
-				auto val0 = floatForIdx(g.timeStart + i);
+                    auto res0 = colorForIdx(g.valueStart, i - 1);
+                    auto res1 = colorForIdx(g.valueStart, i);
 
-				if (val0 == t)
-				{
-					result = colorForIdx(g.valueStart, i);
-					break;
-				}
-				else if (val0 > t)
-				{
-					// blend.
-					val0 = floatForIdx(g.timeStart + (i - 1));
-					auto val1 = floatForIdx(g.timeStart + i);
+                    float offset = t - val0;
+                    float range = val1 - val0;
+                    float fraction = offset / range;
 
-					auto res0 = colorForIdx(g.valueStart, i - 1);
-					auto res1 = colorForIdx(g.valueStart, i);
+                    result = res0.lerp(fraction, res1);
+                    break;
+                }
+            }
+        }
+        else {
+            result = colorForIdx(g.valueStart, 0);
+        }
 
-					float offset = t - val0;
-					float range = val1 - val0;
-					float fraction = offset / range;
+        return result * scale;
+    }
 
-					result = res0.lerp(fraction, res1);
-					break;
-				}
-			}
-		}
-		else
-		{
-			result = colorForIdx(g.valueStart, 0);
-		}
+    X_INLINE Vec3f Effect::colorForIdx(int32_t start, int32_t idx) const
+    {
+        idx = start + (idx * 3);
+        return Vec3f(
+            floatForIdx(idx),
+            floatForIdx(idx + 1),
+            floatForIdx(idx + 2));
+    }
 
-		return result * scale;
-	}
-
-	X_INLINE Vec3f Effect::colorForIdx(int32_t start, int32_t idx) const
-	{
-		idx = start + (idx * 3);
-		return Vec3f(
-			floatForIdx(idx),
-			floatForIdx(idx + 1),
-			floatForIdx(idx + 2)
-		);
-	}
-
-	
 } // namespace fx
-
 
 X_NAMESPACE_END

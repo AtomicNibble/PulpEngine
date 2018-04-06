@@ -31,7 +31,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Util\EndianUtil.h>
 #include <Util\SmartPointer.h>
 
-
 // preprocessor
 #include <Prepro\PreproCommaIf.h>
 #include <Prepro\PreproDecrement.h>
@@ -48,7 +47,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Prepro\PreproStringize.h>
 #include <Prepro\PreproToBool.h>
 #include <Prepro\PreproUniqueName.h>
-
 
 // compile time
 #include <CompileTime\ExtractCount.h>
@@ -73,12 +71,10 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Casts\safe_static_cast.h>
 #include <Casts\union_cast.h>
 
-
-// Common used interface 
+// Common used interface
 #include <IProfile.h>
 #include <IEngineSysBase.h>
 #include <ICore.h>
-
 
 // threading
 #include <Threading\Atomic.h>
@@ -106,7 +102,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <Memory\MemoryTrackingPolicies\SimpleMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\ThreadPolicies\SingleThreadPolicy.h>
-
 
 // Conatiners
 #include <Containers\BitStream.h>
@@ -152,8 +147,5 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 
 #define _STDINT // fuck standard types!
 #include <memory>
-
-
-
 
 #endif // _X_ENGINE_COMMON_INCLUDES_H

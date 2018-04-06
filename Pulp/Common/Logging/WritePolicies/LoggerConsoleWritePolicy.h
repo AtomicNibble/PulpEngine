@@ -3,7 +3,6 @@
 #ifndef X_LOGGERCONSOLEWRITEPOLICY_H_
 #define X_LOGGERCONSOLEWRITEPOLICY_H_
 
-
 #include "Threading/CriticalSection.h"
 
 #include "Logging\LoggerBase.h"
@@ -20,41 +19,40 @@ class Console;
 class LoggerConsoleWritePolicy
 {
 public:
-	/// \brief Constructs a policy instance.
-	/// \remark The policy stores a pointer to the console internally, but does not take ownership. Users must ensure
-	/// that the console is not freed before the policy is.
-	explicit LoggerConsoleWritePolicy(const Console& console);
+    /// \brief Constructs a policy instance.
+    /// \remark The policy stores a pointer to the console internally, but does not take ownership. Users must ensure
+    /// that the console is not freed before the policy is.
+    explicit LoggerConsoleWritePolicy(const Console& console);
 
-	/// Initializes a custom color table for the console.
-	void Init(void);
+    /// Initializes a custom color table for the console.
+    void Init(void);
 
-	/// Empty implementation.
-	void Exit(void);
+    /// Empty implementation.
+    void Exit(void);
 
-	/// Writes a log message to the console.
-	void WriteLog(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a log message to the console.
+    void WriteLog(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes a warning message to the console.
-	void WriteWarning(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a warning message to the console.
+    void WriteWarning(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an error message to the console.
-	void WriteError(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an error message to the console.
+    void WriteError(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes a fatal error message to the console.
-	void WriteFatal(const LoggerBase::Line& line, uint32_t length);
+    /// Writes a fatal error message to the console.
+    void WriteFatal(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an assert message to the console.
-	void WriteAssert(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an assert message to the console.
+    void WriteAssert(const LoggerBase::Line& line, uint32_t length);
 
-	/// Writes an assert variable message to the console.
-	void WriteAssertVariable(const LoggerBase::Line& line, uint32_t length);
+    /// Writes an assert variable message to the console.
+    void WriteAssertVariable(const LoggerBase::Line& line, uint32_t length);
 
 private:
-	HANDLE console_;
-	CriticalSection cs_;
+    HANDLE console_;
+    CriticalSection cs_;
 };
 
 X_NAMESPACE_END
-
 
 #endif // X_LOGGERCONSOLEWRITEPOLICY_H_

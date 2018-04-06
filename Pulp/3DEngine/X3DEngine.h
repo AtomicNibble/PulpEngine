@@ -12,13 +12,10 @@
 #include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_DECLARE(core,
-	struct IConsoleCmdArgs;
-)
+                    struct IConsoleCmdArgs;)
 
 X_NAMESPACE_DECLARE(anim,
-	class AnimManager;
-)
-
+                    class AnimManager;)
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -28,75 +25,72 @@ class TextureManager;
 
 namespace fx
 {
-	class EffectManager;
+    class EffectManager;
 } // namespace fx
 
-class X3DEngine : public I3DEngine, public core::IXHotReload
+class X3DEngine : public I3DEngine
+    , public core::IXHotReload
 {
-	typedef core::Array<IWorld3D*> WorldArr;
+    typedef core::Array<IWorld3D*> WorldArr;
 
 public:
-	X3DEngine(core::MemoryArenaBase* arena);
-	virtual ~X3DEngine() X_FINAL;
+    X3DEngine(core::MemoryArenaBase* arena);
+    virtual ~X3DEngine() X_FINAL;
 
-	void registerVars(void) X_FINAL;
-	void registerCmds(void) X_FINAL;
+    void registerVars(void) X_FINAL;
+    void registerCmds(void) X_FINAL;
 
-	bool init(void) X_FINAL;
-	void shutDown(void) X_FINAL;
-	void release(void) X_FINAL;
+    bool init(void) X_FINAL;
+    void shutDown(void) X_FINAL;
+    void release(void) X_FINAL;
 
-	bool asyncInitFinalize(void) X_FINAL;
+    bool asyncInitFinalize(void) X_FINAL;
 
+    void Update(core::FrameData& frame) X_FINAL;
+    void OnFrameBegin(core::FrameData& frame) X_FINAL;
 
-	void Update(core::FrameData& frame) X_FINAL;
-	void OnFrameBegin(core::FrameData& frame) X_FINAL;
+    IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
+    IMaterialManager* getMaterialManager(void) X_FINAL;
+    model::IModelManager* getModelManager(void) X_FINAL;
+    anim::IAnimManager* getAnimManager(void) X_FINAL;
+    fx::IEffectManager* getEffectManager(void) X_FINAL;
 
-	IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
-	IMaterialManager* getMaterialManager(void) X_FINAL;
-	model::IModelManager* getModelManager(void) X_FINAL;
-	anim::IAnimManager* getAnimManager(void) X_FINAL;
-	fx::IEffectManager* getEffectManager(void) X_FINAL;
+    IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
+    void release3DWorld(IWorld3D* pWorld) X_FINAL;
+    void addWorldToActiveList(IWorld3D* pWorld) X_FINAL;
+    void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
 
-	IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
-	void release3DWorld(IWorld3D* pWorld) X_FINAL;
-	void addWorldToActiveList(IWorld3D* pWorld) X_FINAL;
-	void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
-
-	// IXHotReload
-	void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-	// ~IXHotReload
-
-private:
-	void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);
-
+    // IXHotReload
+    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+    // ~IXHotReload
 
 private:
-	XMaterialManager* pMaterialManager_;
-	TextureManager* pTextureManager_;
-	model::XModelManager* pModelManager_;
-	anim::AnimManager* pAnimManager_;
-	fx::EffectManager* pEffectManager_;
+    void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);
 
-	gui::XGuiManager* pGuiManger_;
+private:
+    XMaterialManager* pMaterialManager_;
+    TextureManager* pTextureManager_;
+    model::XModelManager* pModelManager_;
+    anim::AnimManager* pAnimManager_;
+    fx::EffectManager* pEffectManager_;
 
-	CBufferManager* pCBufMan_;
-	VariableStateManager* pVariableStateMan_;
+    gui::XGuiManager* pGuiManger_;
 
-	// ---
-	PrimativeContextSharedResources primResources_;
-	PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
-	
-	bool clearPersistent_;
+    CBufferManager* pCBufMan_;
+    VariableStateManager* pVariableStateMan_;
 
-	DrawVars drawVars_;
-	WorldArr worlds_;
+    // ---
+    PrimativeContextSharedResources primResources_;
+    PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
+
+    bool clearPersistent_;
+
+    DrawVars drawVars_;
+    WorldArr worlds_;
 };
-
 
 X_ENABLE_WARNING(4324) //  structure was padded due to alignment specifier
 
 X_NAMESPACE_END
-
 
 #endif // !_X_RENDER_SYS_H_

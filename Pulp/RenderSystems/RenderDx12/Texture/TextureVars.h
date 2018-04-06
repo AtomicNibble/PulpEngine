@@ -1,28 +1,21 @@
 #pragma once
 
 X_NAMESPACE_DECLARE(core,
-	struct ICVar;
-)
-
+                    struct ICVar;)
 
 X_NAMESPACE_BEGIN(texture)
 
+class TextureVars
+{
+public:
+    TextureVars();
+    ~TextureVars() = default;
 
-	class TextureVars
-	{
-	public:
-		TextureVars();
-		~TextureVars() = default;
+    void registerVars(void);
 
-		void registerVars(void);
-
-
-	private:
-
-	};
-
+private:
+};
 
 X_NAMESPACE_END
-
 
 #include "TextureVars.inl"

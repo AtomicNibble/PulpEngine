@@ -9,41 +9,34 @@ X_NAMESPACE_BEGIN(core)
 
 namespace abortHandler
 {
+    namespace
+    {
+        void (*g_oldAbortHandler)(int);
 
-	namespace {
+        void _AbortHandler(int __formal)
+        {
+            X_FATAL("AbortHandler", "abort() has been called.");
+            X_UNUSED(__formal);
 
-		void (*g_oldAbortHandler)(int);
+            RaiseException(EXCEPTION_CODE, 0, 0, 0);
+        }
 
-		void _AbortHandler(int __formal)
-		{
-			X_FATAL( "AbortHandler", "abort() has been called." );
-			X_UNUSED(__formal);
+    } // namespace
 
-			RaiseException(EXCEPTION_CODE, 0, 0, 0);
-		}
+    void Startup(void)
+    {
+        //	X_LOG0( "AbortHandler", "Registering abort handler." );
 
+        g_oldAbortHandler = signal(SIGABRT, _AbortHandler);
+    }
 
-	}
+    void Shutdown(void)
+    {
+        //	X_LOG0( "AbortHandler", "Unregistering abort handler." );
 
-	void Startup(void)
-	{
-	//	X_LOG0( "AbortHandler", "Registering abort handler." );
+        signal(SIGABRT, g_oldAbortHandler);
+    }
 
-		g_oldAbortHandler = signal( SIGABRT, _AbortHandler );
-	}
-
-
-	void Shutdown(void)
-	{
-	//	X_LOG0( "AbortHandler", "Unregistering abort handler." );
-
-		signal( SIGABRT, g_oldAbortHandler );
-	}
-
-
-}
-
-
-
+} // namespace abortHandler
 
 X_NAMESPACE_END

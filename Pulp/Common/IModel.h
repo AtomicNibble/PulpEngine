@@ -263,8 +263,7 @@ X_DECLARE_FLAGS8(StreamType)
 (
     COLOR,
     NORMALS,
-    TANGENT_BI
-);
+    TANGENT_BI);
 
 X_DECLARE_ENUM8(StreamFmt)
 (
@@ -273,8 +272,7 @@ X_DECLARE_ENUM8(StreamFmt)
     VEC2,
     VEC216,
     VEC3,
-    VEC3COMP
-);
+    VEC3COMP);
 
 typedef Flags8<ModelFlag> ModelFlags;
 typedef Flags<MeshFlag> MeshFlags;

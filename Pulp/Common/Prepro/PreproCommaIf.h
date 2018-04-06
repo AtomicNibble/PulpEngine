@@ -3,18 +3,15 @@
 #ifndef X_PREPROCESSORCOMMAIF_H_
 #define X_PREPROCESSORCOMMAIF_H_
 
-
 /// \def X_PP_COMMA
 /// \brief Internal macro used by \ref X_PP_COMMA_IF.
 /// \sa X_PP_COMMA_IF
-#define X_PP_COMMA					,
-
+#define X_PP_COMMA ,
 
 /// \def X_PP_COMMA_EMPTY
 /// \brief Internal macro used by \ref X_PP_COMMA_IF.
 /// \sa X_PP_COMMA_IF
 #define X_PP_COMMA_EMPTY
-
 
 /// \def X_PP_COMMA_IF
 /// \ingroup Preprocessor
@@ -35,7 +32,6 @@
 ///   // this will only output a comma if COUNT != 0, solving the problem.
 ///   template <typename R X_PP_COMMA_IF(COUNT) ARG_TYPENAMES>
 /// \endcode
-#define X_PP_COMMA_IF(cond)		X_PP_IF(cond, X_PP_COMMA, X_PP_COMMA_EMPTY)
-
+#define X_PP_COMMA_IF(cond) X_PP_IF(cond, X_PP_COMMA, X_PP_COMMA_EMPTY)
 
 #endif // X_PREPROCESSORCOMMAIF_H_

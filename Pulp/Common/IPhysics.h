@@ -347,8 +347,7 @@ X_DECLARE_FLAGS8(CharacterColFlag)
 (
     SIDES,
     UP,
-    DOWN
-);
+    DOWN);
 
 typedef Flags8<CharacterColFlag> CharacterColFlags;
 
@@ -424,8 +423,7 @@ public:
     X_DECLARE_FLAGS(CookFlag)
     (
         INDICES_16BIT,
-        COMPUTE_CONVEX
-    );
+        COMPUTE_CONVEX);
 
     typedef Flags<CookFlag> CookFlags;
     typedef core::Array<uint8_t> DataArr;
@@ -515,8 +513,7 @@ X_DECLARE_FLAGS(QueryFlag)
     PREFILTER,
     POSTFILTER,
     ANY_HIT,
-    NO_BLOCK
-);
+    NO_BLOCK);
 
 typedef Flags<QueryFlag> QueryFlags;
 
@@ -682,7 +679,8 @@ struct HitBuffer : public HitCallback<HitType>
     }
     X_INLINE const HitType& getAnyHit(const uint32_t index) const
     {
-        X_ASSERT(index < getNbTouches() + uint32_t(this->hasBlock), "")();
+        X_ASSERT(index < getNbTouches() + uint32_t(this->hasBlock), "")
+        ();
         return index < getNbTouches() ? getTouches()[index] : this->block;
     }
 
@@ -696,7 +694,8 @@ struct HitBuffer : public HitCallback<HitType>
     }
     X_INLINE const HitType& getTouch(const uint32_t index) const
     {
-        X_ASSERT(index < getNbTouches(), "")();
+        X_ASSERT(index < getNbTouches(), "")
+        ();
         return getTouches()[index];
     }
     X_INLINE uint32_t getMaxNbTouches(void) const
@@ -876,7 +875,8 @@ struct BatchQueryResult
 
     X_INLINE const HitType& getAnyHit(const uint32_t index) const
     {
-        X_ASSERT(index < nbTouches + (hasBlock ? 1 : 0), "")();
+        X_ASSERT(index < nbTouches + (hasBlock ? 1 : 0), "")
+        ();
         return index < nbTouches ? touches[index] : block;
     }
 };

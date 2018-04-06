@@ -6,7 +6,6 @@
 #include "String/StackString.h"
 #include "String\Path.h"
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Debugging
@@ -18,30 +17,29 @@ X_NAMESPACE_BEGIN(core)
 class SymbolInfo
 {
 public:
-	/// \brief Constructs a symbol info instance, copying the given arguments.
-	/// \remark Ownership of the provided arguments stays at the calling site.
-	SymbolInfo(const char* const function, const char* const filename, unsigned int line);
+    /// \brief Constructs a symbol info instance, copying the given arguments.
+    /// \remark Ownership of the provided arguments stays at the calling site.
+    SymbolInfo(const char* const function, const char* const filename, unsigned int line);
 
-	/// Returns the symbol's function name.
-	X_INLINE const char* GetFunction(void) const;
+    /// Returns the symbol's function name.
+    X_INLINE const char* GetFunction(void) const;
 
-	/// Returns the symbol's file name.
-	X_INLINE const char* GetFilename(void) const;
+    /// Returns the symbol's file name.
+    X_INLINE const char* GetFilename(void) const;
 
-	/// Returns the symbol's line number.
-	X_INLINE unsigned int GetLine(void) const;
+    /// Returns the symbol's line number.
+    X_INLINE unsigned int GetLine(void) const;
 
 private:
-	X_NO_ASSIGN(SymbolInfo);
+    X_NO_ASSIGN(SymbolInfo);
 
-	StackString512 function_;
-	Path<char> filename_;
-	uint32_t line_;
+    StackString512 function_;
+    Path<char> filename_;
+    uint32_t line_;
 };
 
 #include "SymbolInfo.inl"
 
 X_NAMESPACE_END
-
 
 #endif

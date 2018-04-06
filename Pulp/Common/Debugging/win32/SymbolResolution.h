@@ -23,25 +23,23 @@ X_NAMESPACE_BEGIN(core)
 /// \sa X_ENABLE_SYMBOL_RESOLUTION SymbolInfo
 namespace symbolResolution
 {
-	/// \brief Starts the symbol resolution mechanism.
-	/// \remark This is called automatically when starting the Core module.
-	void Startup(void);
+    /// \brief Starts the symbol resolution mechanism.
+    /// \remark This is called automatically when starting the Core module.
+    void Startup(void);
 
-	/// \brief Refreshes the modules
-	/// \remark This must be called after startup.
-	void Refresh(void);
+    /// \brief Refreshes the modules
+    /// \remark This must be called after startup.
+    void Refresh(void);
 
-	/// \brief Shuts down the symbol resolution mechanism.
-	/// \remark This is called automatically when shutting down the Core module.
-	void Shutdown(void);
+    /// \brief Shuts down the symbol resolution mechanism.
+    /// \remark This is called automatically when shutting down the Core module.
+    void Shutdown(void);
 
-
-	/// \brief Resolves the symbol information for a given address.
-	/// \sa SymbolInfo
-	SymbolInfo ResolveSymbolsForAddress(const void* const address);
-}
+    /// \brief Resolves the symbol information for a given address.
+    /// \sa SymbolInfo
+    SymbolInfo ResolveSymbolsForAddress(const void* const address);
+} // namespace symbolResolution
 
 X_NAMESPACE_END
-
 
 #endif

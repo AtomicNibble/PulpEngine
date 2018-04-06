@@ -6,29 +6,25 @@
 
 X_NAMESPACE_BEGIN(input)
 
-
 XInputCVars::XInputCVars()
 {
-	inputDebug_ = 0;
-	inputMousePosDebug_ = 0;
-	scrollLines_ = 1;
+    inputDebug_ = 0;
+    inputMousePosDebug_ = 0;
+    scrollLines_ = 1;
 }
 
 XInputCVars::~XInputCVars()
 {
-	gEnv->pConsole->UnregisterVariable("input_debug");
-
+    gEnv->pConsole->UnregisterVariable("input_debug");
 }
-
 
 void XInputCVars::registerVars(void)
 {
-	ADD_CVAR_REF("input_debug", inputDebug_, 0, 0, 3, core::VarFlags::SYSTEM,
-		"Input debugging");
+    ADD_CVAR_REF("input_debug", inputDebug_, 0, 0, 3, core::VarFlags::SYSTEM,
+        "Input debugging");
 
-	ADD_CVAR_REF("input_mouse_pos_debug", inputMousePosDebug_, 0, 0, 1, core::VarFlags::SYSTEM,
-		"Input mouse position debugging");
-
+    ADD_CVAR_REF("input_mouse_pos_debug", inputMousePosDebug_, 0, 0, 1, core::VarFlags::SYSTEM,
+        "Input mouse position debugging");
 }
 
 X_NAMESPACE_END

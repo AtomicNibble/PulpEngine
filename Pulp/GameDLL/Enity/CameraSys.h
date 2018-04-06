@@ -3,41 +3,36 @@
 #include "EnityComponents.h"
 
 X_NAMESPACE_DECLARE(core,
-	struct FrameTimeData;
-	struct ICVar;
-)
-
+                    struct FrameTimeData;
+                    struct ICVar;)
 
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
+    class CameraSystem
+    {
+    public:
+        CameraSystem();
+        ~CameraSystem();
 
-	class CameraSystem
-	{
-	public:
-		CameraSystem();
-		~CameraSystem();
+        bool init(void);
+        void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
 
-		bool init(void);
-		void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
+        void setActiveEnt(EntityId entId);
 
-		void setActiveEnt(EntityId entId);
+    private:
+        EntityId activeEnt_;
 
-	private:
-		EntityId activeEnt_;
+        bool setCamPos_;
+        bool setCamAngle_;
 
-		bool setCamPos_;
-		bool setCamAngle_;
+        Vec3f cameraPos_;
+        Vec3f cameraAngle_;
+        Vec3f cameraAngleDeg_;
 
-		Vec3f cameraPos_;
-		Vec3f cameraAngle_;
-		Vec3f cameraAngleDeg_;
-
-		XCamera cam_;
-	};
-
-
+        XCamera cam_;
+    };
 
 } // namespace entity
 

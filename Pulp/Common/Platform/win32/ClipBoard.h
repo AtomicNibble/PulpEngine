@@ -1,20 +1,17 @@
 #pragma once
 
-
 #ifndef X_PLATFORM_CLIPBOARD_H_
 #define X_PLATFORM_CLIPBOARD_H_
 
 X_NAMESPACE_BEGIN(core)
 
-
 namespace clipboard
 {
-	typedef char ClipBoardBuffer[4096];
+    typedef char ClipBoardBuffer[4096];
 
+    bool setText(const char* pBegin, const char* pEnd);
 
-	bool setText(const char* pBegin, const char* pEnd);
-
-	const char* getText(ClipBoardBuffer& bufOut);
+    const char* getText(ClipBoardBuffer& bufOut);
 
 } // namespace clipboard
 

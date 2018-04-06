@@ -9,70 +9,66 @@
 #include "WeaponDef.h"
 
 X_NAMESPACE_DECLARE(core,
-namespace V2 {
-	struct Job;
-	class JobSystem;
-}
+                    namespace V2 {
+                        struct Job;
+                        class JobSystem;
+                    }
 
-class AssetLoader;
-)
+                    class AssetLoader;)
 
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-	class WeaponDef;
+    class WeaponDef;
 
-	class WeaponDefManager :
-		public core::IAssetLoader,
-		public core::IXHotReload,
-		private core::IAssetLoadSink
-	{
-		typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
-		typedef WeaponDefContainer::Resource WeaponDefResource;
+    class WeaponDefManager : public core::IAssetLoader
+        , public core::IXHotReload
+        , private core::IAssetLoadSink
+    {
+        typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
+        typedef WeaponDefContainer::Resource WeaponDefResource;
 
-	public:
-		WeaponDefManager(core::MemoryArenaBase* arena);
+    public:
+        WeaponDefManager(core::MemoryArenaBase* arena);
 
-		void registerCmds(void);
-		void registerVars(void);
+        void registerCmds(void);
+        void registerVars(void);
 
-		bool init(void);
-		void shutDown(void);
+        bool init(void);
+        void shutDown(void);
 
-		bool asyncInitFinalize(void);
+        bool asyncInitFinalize(void);
 
+        WeaponDef* findWeaponDef(const char* pName) const;
+        WeaponDef* loadWeaponDef(const char* pName);
+        WeaponDef* getDefaultDef(void) const;
 
-		WeaponDef* findWeaponDef(const char* pName) const;
-		WeaponDef* loadWeaponDef(const char* pName);
-		WeaponDef* getDefaultDef(void) const;
+        bool waitForLoad(core::AssetBase* pWeaponDef) X_FINAL;
+        bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
+        void releaseWeaponDef(WeaponDef* pWeaponDef);
 
-		bool waitForLoad(core::AssetBase* pWeaponDef) X_FINAL;
-		bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
-		void releaseWeaponDef(WeaponDef* pWeaponDef);
+    private:
+        bool initDefaults(void);
+        void freeDangling(void);
 
-	private:
-		bool initDefaults(void);
-		void freeDangling(void);
+        void addLoadRequest(WeaponDefResource* pWeaponDef);
+        void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+        bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
-		void addLoadRequest(WeaponDefResource* pWeaponDef);
-		void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
-		bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+    private:
+        // IXHotReload
+        virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+        // ~IXHotReload
 
-	private:
-		// IXHotReload
-		virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-		// ~IXHotReload
+    private:
+        core::MemoryArenaBase* arena_;
+        core::AssetLoader* pAssetLoader_;
 
-	private:
-		core::MemoryArenaBase* arena_;
-		core::AssetLoader* pAssetLoader_;
+        WeaponDef* pDefaultWeaponDef_;
 
-		WeaponDef* pDefaultWeaponDef_;
-
-		WeaponDefContainer weaponDefs_;
-	};
-
+        WeaponDefContainer weaponDefs_;
+    };
 
 } // namespace weapon
 

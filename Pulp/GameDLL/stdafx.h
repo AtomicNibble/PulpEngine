@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <EngineCommon.h>
-
 
 #define IPGAMEDLL_EXPORTS
 
@@ -10,19 +8,19 @@
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
 
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+    core::MallocFreeAllocator,
+    core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-> GameArena;
-
+    >
+    GameArena;
 
 extern GameArena* g_gameArena;
 
@@ -31,7 +29,6 @@ extern GameArena* g_gameArena;
 
 X_LINK_ENGINE_LIB("ModelLib");
 X_LINK_ENGINE_LIB("AnimLib");
-
 
 #include <Math\XAngles.h>
 
@@ -47,5 +44,3 @@ X_LINK_ENGINE_LIB("AnimLib");
 #include "ECS\Registry.h"
 
 #include "Enity\EnityComponents.h"
-
-

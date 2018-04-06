@@ -12,61 +12,59 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    class XWindow;
+    class XGuiScriptList;
 
+    struct XGSWinVar
+    {
+        XGSWinVar()
+        {
+            var = nullptr;
+            own = false;
+        }
+        XWinVar* var;
+        bool own;
+    };
 
-	class XWindow;
-	class XGuiScriptList;
+    class XGuiScript
+    {
+        friend class XGuiScriptList;
+        friend class XWindow;
 
-	struct XGSWinVar
-	{
-		XGSWinVar() {
-			var = nullptr;
-			own = false;
-		}
-		XWinVar* var;
-		bool own;
-	};
+    public:
+        XGuiScript();
+        ~XGuiScript();
 
+        bool Parse(core::XParser& lex);
+        void Execute(XWindow* win);
+        void FixUpParms(XWindow* win);
 
-	class XGuiScript
-	{
-		friend class XGuiScriptList;
-		friend class XWindow;
+    protected:
+        typedef core::Array<XGSWinVar> ParamsArr;
 
-	public:
-		XGuiScript();
-		~XGuiScript();
+        int conditionReg;
+        XGuiScriptList* ifList;
+        XGuiScriptList* elseList;
+        ParamsArr parms;
+        void (*handler)(XWindow* window, core::Array<XGSWinVar>& src);
+    };
 
-		bool Parse(core::XParser& lex);
-		void Execute(XWindow* win);
-		void FixUpParms(XWindow* win);
+    class XGuiScriptList
+    {
+    public:
+        XGuiScriptList();
+        ~XGuiScriptList();
 
-	protected:
-		typedef core::Array<XGSWinVar> ParamsArr;
+        void Execute(XWindow* win);
+        void append(XGuiScript* gs)
+        {
+            list.append(gs);
+        }
+        void FixUpParms(XWindow* win);
 
-		int conditionReg;
-		XGuiScriptList* ifList;
-		XGuiScriptList* elseList;
-		ParamsArr parms;
-		void(*handler) (XWindow *window, core::Array<XGSWinVar>& src);
-	};
-
-
-	class XGuiScriptList
-	{
-	public:
-		XGuiScriptList();
-		~XGuiScriptList();
-
-		void Execute(XWindow* win);
-		void append(XGuiScript* gs) {
-			list.append(gs);
-		}
-		void FixUpParms(XWindow* win);
-
-	private:
-		core::Array<XGuiScript*> list;
-	};
+    private:
+        core::Array<XGuiScript*> list;
+    };
 
 } // namespace gui
 

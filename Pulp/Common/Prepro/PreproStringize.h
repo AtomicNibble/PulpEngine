@@ -3,12 +3,10 @@
 #ifndef X_PREPROCESSORSTRINGIZE_H
 #define X_PREPROCESSORSTRINGIZE_H
 
-
 /// \def X_PP_STRINGIZE_HELPER
 /// \brief Internal macro used by \ref X_PP_STRINGIZE.
 /// \sa X_PP_STRINGIZE
-#define X_PP_STRINGIZE_HELPER(token)					#token
-
+#define X_PP_STRINGIZE_HELPER(token) #token
 
 /// \def X_PP_STRINGIZE
 /// \ingroup Preprocessor
@@ -28,7 +26,6 @@
 ///   X_PP_STRINGIZE(hello);			// outputs "hello"
 ///   X_PP_STRINGIZE(WORLD_NAME);		// outputs "world"
 /// \endcode
-#define X_PP_STRINGIZE(str)							X_PP_STRINGIZE_HELPER(str)
-
+#define X_PP_STRINGIZE(str) X_PP_STRINGIZE_HELPER(str)
 
 #endif

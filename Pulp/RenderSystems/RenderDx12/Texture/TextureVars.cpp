@@ -5,17 +5,12 @@
 
 X_NAMESPACE_BEGIN(texture)
 
+TextureVars::TextureVars()
+{
+}
 
-	TextureVars::TextureVars()
-	{
-
-
-	}
-
-	void TextureVars::registerVars(void)
-	{
-
-	}
-
+void TextureVars::registerVars(void)
+{
+}
 
 X_NAMESPACE_END

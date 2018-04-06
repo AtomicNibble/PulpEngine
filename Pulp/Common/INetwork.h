@@ -24,8 +24,7 @@ X_DECLARE_ENUM8(ConnectionState)
     Disconnecting,
     DisconnectingSilently,
     Disconnected,
-    NotConnected
-);
+    NotConnected);
 
 X_DECLARE_ENUM(ConnectionAttemptResult)
 (
@@ -34,8 +33,7 @@ X_DECLARE_ENUM(ConnectionAttemptResult)
     FailedToResolve,
     AlreadyConnected,
     AlreadyInProgress,
-    SecurityInitalizationFailed
-);
+    SecurityInitalizationFailed);
 
 X_DECLARE_ENUM(StartupResult)
 (
@@ -48,16 +46,14 @@ X_DECLARE_ENUM(StartupResult)
     SocketPortInUse,
     SocketFailedToBind,
     SocketFailedToTestSend,
-    Error
-);
+    Error);
 
 X_DECLARE_ENUM8(PacketPriority)
 (
     Immediate, // send immediate, no buffering  or aggregating with other packets.
     High,
     Medium,
-    Low
-);
+    Low);
 
 // Sequenced - We ignore any packets that are older than last recived packet.
 // Ordered - all packets come out the other side in order for a given channel.
@@ -70,8 +66,7 @@ X_DECLARE_ENUM8(PacketReliability)
     ReliableSequenced,
     UnReliableWithAck,
     ReliableWithAck,
-    ReliableOrderedWithAck
-);
+    ReliableOrderedWithAck);
 
 #if NET_IPv6_SUPPORT // can't if/def inside DECLARE_ENUM.
 
@@ -79,8 +74,7 @@ X_DECLARE_ENUM8(IpVersion)
 (
     Ipv4,
     Ipv6,
-    Any
-);
+    Any);
 
 #else
 
@@ -148,8 +142,7 @@ struct NetStatistics
         BytesRecivedIgnored,
         // includes any overhead
         ActualBytesSent,
-        ActualBytesReceived
-     );
+        ActualBytesReceived);
 
     typedef std::array<uint32_t, PacketPriority::ENUM_COUNT> PriorityMsgCountsArr;
     typedef std::array<uint64_t, PacketPriority::ENUM_COUNT> PriorityByteCountsArr;
@@ -287,7 +280,8 @@ struct Packet
 {
     X_INLINE MessageID::Enum getID(void) const
     {
-        X_ASSERT(length > 0, "Can't read id fro m empty message")(length, bitLength);
+        X_ASSERT(length > 0, "Can't read id fro m empty message")
+        (length, bitLength);
         return static_cast<MessageID::Enum>(pData[0]);
     }
     X_INLINE uint8_t* begin(void)

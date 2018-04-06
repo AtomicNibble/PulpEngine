@@ -1,308 +1,274 @@
 
 
 template<class T>
-X_INLINE XLinkIntrusive<T>::~XLinkIntrusive() 
+X_INLINE XLinkIntrusive<T>::~XLinkIntrusive()
 {
-	removeFromList();
+    removeFromList();
 }
-
 
 template<class T>
 X_INLINE XLinkIntrusive<T>::XLinkIntrusive()
 {
-	// Mark this node as the end of the list, with no link offset
-	nextNode_ = (T *)((size_t) this + 1 - 0);
-	prevLink_ = this;
+    // Mark this node as the end of the list, with no link offset
+    nextNode_ = (T*)((size_t)this + 1 - 0);
+    prevLink_ = this;
 }
-
 
 template<class T>
-X_INLINE XLinkIntrusive<T>::XLinkIntrusive(size_t offset) 
+X_INLINE XLinkIntrusive<T>::XLinkIntrusive(size_t offset)
 {
-	// Mark this node as the end of the list, with the link offset set
-	nextNode_ = (T *)((size_t) this + 1 - offset);
-	prevLink_ = this;
+    // Mark this node as the end of the list, with the link offset set
+    nextNode_ = (T*)((size_t)this + 1 - offset);
+    prevLink_ = this;
 }
-
 
 template<class T>
-X_INLINE void XLinkIntrusive<T>::setOffset(size_t offset) 
+X_INLINE void XLinkIntrusive<T>::setOffset(size_t offset)
 {
-	// Mark this node as the end of the list, with the link offset set
-	nextNode_ = (T*)((size_t) this + 1 - offset);
-	prevLink_ = this;
+    // Mark this node as the end of the list, with the link offset set
+    nextNode_ = (T*)((size_t)this + 1 - offset);
+    prevLink_ = this;
 }
-
 
 template<class T>
 X_INLINE XLinkIntrusive<T>* XLinkIntrusive<T>::nextLink()
 {
-	// Calculate the offset from a node pointer to a link structure
-	size_t offset = (size_t) this - ((size_t)prevLink_->nextNode_ & ~1);
+    // Calculate the offset from a node pointer to a link structure
+    size_t offset = (size_t)this - ((size_t)prevLink_->nextNode_ & ~1);
 
-	// Get the link field for the next node
-	return (XLinkIntrusive<T> *) (((size_t)nextNode_ & ~1) + offset);
+    // Get the link field for the next node
+    return (XLinkIntrusive<T>*)(((size_t)nextNode_ & ~1) + offset);
 }
-
 
 template<class T>
-X_INLINE void XLinkIntrusive<T>::removeFromList() 
+X_INLINE void XLinkIntrusive<T>::removeFromList()
 {
-	nextLink()->prevLink_ = prevLink_;
+    nextLink()->prevLink_ = prevLink_;
 
-	prevLink_->nextNode_ = nextNode_;
+    prevLink_->nextNode_ = nextNode_;
 }
-
 
 template<class T>
 X_INLINE void XLinkIntrusive<T>::insertBefore(T* node, selfT* nextLink)
 {
-	removeFromList();
+    removeFromList();
 
-	prevLink_ = nextLink->prevLink_;
-	nextNode_ = prevLink_->nextNode_;
+    prevLink_ = nextLink->prevLink_;
+    nextNode_ = prevLink_->nextNode_;
 
-	nextLink->prevLink_->nextNode_ = node;
-	nextLink->prevLink_ = this;
+    nextLink->prevLink_->nextNode_ = node;
+    nextLink->prevLink_ = this;
 }
-
 
 template<class T>
 X_INLINE void XLinkIntrusive<T>::insertAfter(T* node, selfT* prevLink)
 {
-	removeFromList();
+    removeFromList();
 
-	prevLink_ = prevLink;
-	nextNode_ = prevLink->nextNode_;
+    prevLink_ = prevLink;
+    nextNode_ = prevLink->nextNode_;
 
-	prevLink->nextLink()->prevLink_ = this;
-	prevLink->nextNode_ = node;
+    prevLink->nextLink()->prevLink_ = this;
+    prevLink->nextNode_ = node;
 }
-
 
 template<class T>
 X_INLINE bool XLinkIntrusive<T>::isLinked() const
 {
-	return prevLink_ != this;
+    return prevLink_ != this;
 }
-
 
 template<class T>
 X_INLINE void XLinkIntrusive<T>::unlink()
 {
-	removeFromList();
+    removeFromList();
 
-	// Mark this node as the end of the list with no link offset
-	nextNode_ = (T *)((size_t) this + 1);
-	prevLink_ = this;
+    // Mark this node as the end of the list with no link offset
+    nextNode_ = (T*)((size_t)this + 1);
+    prevLink_ = this;
 }
-
 
 template<class T>
-X_INLINE XLinkIntrusive<T>* XLinkIntrusive<T>::prevLink() 
+X_INLINE XLinkIntrusive<T>* XLinkIntrusive<T>::prevLink()
 {
-	return prevLink_;
+    return prevLink_;
 }
-
 
 template<class T>
-X_INLINE T* XLinkIntrusive<T>::prev() 
+X_INLINE T* XLinkIntrusive<T>::prev()
 {
-	T* prevNode = prevLink_->prevLink_->nextNode_;
-	if ((size_t)prevNode & 1)
-		return nullptr;
+    T* prevNode = prevLink_->prevLink_->nextNode_;
+    if ((size_t)prevNode & 1)
+        return nullptr;
 
-	return prevNode;
+    return prevNode;
 }
-
 
 template<class T>
-X_INLINE const T* XLinkIntrusive<T>::prev() const 
+X_INLINE const T* XLinkIntrusive<T>::prev() const
 {
-	const T* prevNode = prevLink_->prevLink_->nextNode_;
+    const T* prevNode = prevLink_->prevLink_->nextNode_;
 
-	if ((size_t)prevNode & 1)
-		return nullptr;
+    if ((size_t)prevNode & 1)
+        return nullptr;
 
-	return prevNode;
+    return prevNode;
 }
-
 
 template<class T>
-X_INLINE T* XLinkIntrusive<T>::next() 
+X_INLINE T* XLinkIntrusive<T>::next()
 {
-	if ((size_t)nextNode_ & 1)
-		return nullptr;
+    if ((size_t)nextNode_ & 1)
+        return nullptr;
 
-	return nextNode_;
+    return nextNode_;
 }
-
 
 template<class T>
-X_INLINE const T* XLinkIntrusive<T>::next() const 
+X_INLINE const T* XLinkIntrusive<T>::next() const
 {
-	if ((size_t)nextNode_ & 1)
-		return nullptr;
+    if ((size_t)nextNode_ & 1)
+        return nullptr;
 
-	return nextNode_;
+    return nextNode_;
 }
-
-
 
 // ----------------------------------------------------------------
 
-
-
 template<class T>
 XListIntrusive<T>::XListIntrusive() :
-	link_(),
-	offset_((size_t)-1)
+    link_(),
+    offset_((size_t)-1)
 {
 }
-
-
 
 template<class T>
 XListIntrusive<T>::XListIntrusive(size_t offset) :
-	link_(offset),
-	offset_(offset)
+    link_(offset),
+    offset_(offset)
 {
 }
-
 
 template<class T>
 XListIntrusive<T>::~XListIntrusive()
 {
-	unlinkAll();
+    unlinkAll();
 }
 
 template<class T>
 bool XListIntrusive<T>::isEmpty() const
 {
-	return link_.next() == nullptr;
+    return link_.next() == nullptr;
 }
-
 
 template<class T>
-void XListIntrusive<T>::unlinkAll() 
+void XListIntrusive<T>::unlinkAll()
 {
-	for (;;) {
-		XLinkIntrusive<T>* link = link_.prevLink();
-		if (link == &link_) {
-			break;
-		}
-		link->unlink();
-	}
+    for (;;) {
+        XLinkIntrusive<T>* link = link_.prevLink();
+        if (link == &link_) {
+            break;
+        }
+        link->unlink();
+    }
 }
-
 
 template<class T>
 void XListIntrusive<T>::deleteAll(core::MemoryArenaBase* arena)
 {
-	X_ASSERT_NOT_NULL(arena);
-	while (T* node = link_.next()) {
-		X_DELETE(node, arena);
-	}
+    X_ASSERT_NOT_NULL(arena);
+    while (T* node = link_.next()) {
+        X_DELETE(node, arena);
+    }
 }
 
-
 template<class T>
-T* XListIntrusive<T>::head() {
-	return link_.next();
-}
-
-
-template<class T>
-T* XListIntrusive<T>::tail() 
+T* XListIntrusive<T>::head()
 {
-	return link_.prev();
+    return link_.next();
 }
-
 
 template<class T>
-const T* XListIntrusive<T>::head() const 
+T* XListIntrusive<T>::tail()
 {
-	return link_.next();
+    return link_.prev();
 }
-
 
 template<class T>
-const T* XListIntrusive<T>::tail() const 
+const T* XListIntrusive<T>::head() const
 {
-	return link_.prev();
+    return link_.next();
 }
-
 
 template<class T>
-T* XListIntrusive<T>::prev(T* node) 
+const T* XListIntrusive<T>::tail() const
 {
-	return getLinkFromNode(node)->prev();
+    return link_.prev();
 }
-
 
 template<class T>
-const T* XListIntrusive<T>::prev(const T* node) const 
+T* XListIntrusive<T>::prev(T* node)
 {
-	return getLinkFromNode(node)->prev();
+    return getLinkFromNode(node)->prev();
 }
-
 
 template<class T>
-T* XListIntrusive<T>::next(T* node) 
+const T* XListIntrusive<T>::prev(const T* node) const
 {
-	return getLinkFromNode(node)->next();
+    return getLinkFromNode(node)->prev();
 }
-
 
 template<class T>
-const T* XListIntrusive<T>::next(const T* node) const 
+T* XListIntrusive<T>::next(T* node)
 {
-	return getLinkFromNode(node)->next();
+    return getLinkFromNode(node)->next();
 }
-
 
 template<class T>
-void XListIntrusive<T>::insertHead(T* node) 
+const T* XListIntrusive<T>::next(const T* node) const
 {
-	insertAfter(node, nullptr);
+    return getLinkFromNode(node)->next();
 }
-
 
 template<class T>
-void XListIntrusive<T>::insertTail(T* node) 
+void XListIntrusive<T>::insertHead(T* node)
 {
-	insertBefore(node, nullptr);
+    insertAfter(node, nullptr);
 }
 
+template<class T>
+void XListIntrusive<T>::insertTail(T* node)
+{
+    insertBefore(node, nullptr);
+}
 
 template<class T>
 void XListIntrusive<T>::insertBefore(T* node, T* before)
 {
-	X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")(node);
+    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")
+    (node);
 
-	getLinkFromNode(node)->insertBefore(
-		node,
-		before ? getLinkFromNode(before) : &link_
-	);
+    getLinkFromNode(node)->insertBefore(
+        node,
+        before ? getLinkFromNode(before) : &link_);
 }
-
 
 template<class T>
-void XListIntrusive<T>::insertAfter(T* node, T* after) 
+void XListIntrusive<T>::insertAfter(T* node, T* after)
 {
-	X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")(node);
+    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")
+    (node);
 
-	getLinkFromNode(node)->insertAfter(
-		node,
-		after ? getLinkFromNode(after) : &link_
-	);
+    getLinkFromNode(node)->insertAfter(
+        node,
+        after ? getLinkFromNode(after) : &link_);
 }
-
 
 template<class T>
 XLinkIntrusive<T>* XListIntrusive<T>::getLinkFromNode(const T* node) const
 {
-	X_ASSERT(offset_ != (size_t)-1, "offset is not valid")(offset_);
+    X_ASSERT(offset_ != (size_t)-1, "offset is not valid")
+    (offset_);
 
-	return (XLinkIntrusive<T> *) ((size_t)node + offset_);
+    return (XLinkIntrusive<T>*)((size_t)node + offset_);
 }

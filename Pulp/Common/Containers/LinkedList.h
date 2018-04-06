@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_LINKED_LIST_H_
 #define X_LINKED_LIST_H_
 
@@ -10,7 +9,7 @@ X_NAMESPACE_BEGIN(core)
 //	this is intrusive also.
 //	works a bit diffrent tho.
 //
-//	
+//
 //	struct MyData
 //	{
 //		int value;
@@ -32,43 +31,42 @@ template<typename T>
 class XLinkedList // 32 bytes in size.
 {
 public:
-	typedef T type;
+    typedef T type;
 
 public:
-	XLinkedList();
-	~XLinkedList();
+    XLinkedList();
+    ~XLinkedList();
 
-	bool isListEmpty(void) const;
-	bool inList(void) const;
-	// O(n) - (not cache friendly tho. aka a list ^^)
-	int num(void) const;
-	void clear(void);
+    bool isListEmpty(void) const;
+    bool inList(void) const;
+    // O(n) - (not cache friendly tho. aka a list ^^)
+    int num(void) const;
+    void clear(void);
 
-	void insertBefore(XLinkedList& node);
-	void insertAfter(XLinkedList& node);
-	void addToEnd(XLinkedList& node);
-	void addToFront(XLinkedList& node);
+    void insertBefore(XLinkedList& node);
+    void insertAfter(XLinkedList& node);
+    void addToEnd(XLinkedList& node);
+    void addToFront(XLinkedList& node);
 
-	void remove(void);
+    void remove(void);
 
-	type* next(void) const;
-	type* prev(void) const;
+    type* next(void) const;
+    type* prev(void) const;
 
-	type* owner(void) const;
-	void setOwner(type* pObject);
+    type* owner(void) const;
+    void setOwner(type* pObject);
 
-	XLinkedList* listHead(void) const;
-	XLinkedList* nextNode(void) const;
-	XLinkedList* prevNode(void) const;
+    XLinkedList* listHead(void) const;
+    XLinkedList* nextNode(void) const;
+    XLinkedList* prevNode(void) const;
 
 private:
-	XLinkedList* pHead_;
-	XLinkedList* pNext_;
-	XLinkedList* pPrev_;
+    XLinkedList* pHead_;
+    XLinkedList* pNext_;
+    XLinkedList* pPrev_;
 
-	type* pOwner_;
+    type* pOwner_;
 };
-
 
 #include "LinkedList.inl"
 

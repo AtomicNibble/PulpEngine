@@ -415,7 +415,7 @@ namespace Commands
             uint32_t textureId : 20; // 0 - layers
                                      // rest unused.
         };
-    }
+    } // namespace Key
 
     static_assert(core::compileTime::IsPOD<Draw>::Value, "Draw command must be POD");
     static_assert(core::compileTime::IsPOD<DrawIndexed>::Value, "DrawIndexed command must be POD");

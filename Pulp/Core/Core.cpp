@@ -39,634 +39,560 @@
 
 namespace
 {
-
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
 
-	typedef core::MemoryArena<
-		core::GrowingGenericAllocator,
-		core::MultiThreadPolicy<core::Spinlock>,
-		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging
-	> StrArena;
+    typedef core::MemoryArena<
+        core::GrowingGenericAllocator,
+        core::MultiThreadPolicy<core::Spinlock>,
+        core::SimpleBoundsChecking,
+        core::SimpleMemoryTracking,
+        core::SimpleMemoryTagging>
+        StrArena;
 
 #else
 
-	typedef core::MemoryArena<
-		core::GrowingGenericAllocator,
-		core::MultiThreadPolicy<core::Spinlock>,
-		core::NoBoundsChecking,
+    typedef core::MemoryArena<
+        core::GrowingGenericAllocator,
+        core::MultiThreadPolicy<core::Spinlock>,
+        core::NoBoundsChecking,
 #if X_ENABLE_MEMORY_SIMPLE_TRACKING
-		core::SimpleMemoryTracking,
+        core::SimpleMemoryTracking,
 #else
-		core::NoMemoryTracking,
+        core::NoMemoryTracking,
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-		core::NoMemoryTagging
-	> StrArena;
-
+        core::NoMemoryTagging>
+        StrArena;
 
 #endif // !X_ENABLE_MEMORY_DEBUG_POLICIES
 
-	typedef core::MemoryArena<
-		StrArena::AllocationPolicy,
-		core::SingleThreadPolicy,
-		StrArena::BoundsCheckingPolicy,
-		StrArena::MemoryTrackingPolicy,
-		StrArena::MemoryTaggingPolicy
-	> StrArenaST;
-
+    typedef core::MemoryArena<
+        StrArena::AllocationPolicy,
+        core::SingleThreadPolicy,
+        StrArena::BoundsCheckingPolicy,
+        StrArena::MemoryTrackingPolicy,
+        StrArena::MemoryTaggingPolicy>
+        StrArenaST;
 
 } // namespace
-
 
 SCoreGlobals XCore::env_;
 core::MallocFreeAllocator XCore::malloc_;
 
 XCore::XCore() :
-	pWindow_(nullptr),
-	pConsole_(nullptr),
-	
-	pVsLogger_(nullptr),
-	pConsoleLogger_(nullptr),
+    pWindow_(nullptr),
+    pConsole_(nullptr),
 
-	pCpuInfo_(nullptr),
-	pCrc32_(nullptr),
+    pVsLogger_(nullptr),
+    pConsoleLogger_(nullptr),
 
-	moduleDLLHandles_(g_coreArena),
-	moduleInterfaces_(g_coreArena),
-	converterInterfaces_(g_coreArena),
-	assertHandlers_(g_coreArena),
+    pCpuInfo_(nullptr),
+    pCrc32_(nullptr),
+
+    moduleDLLHandles_(g_coreArena),
+    moduleInterfaces_(g_coreArena),
+    converterInterfaces_(g_coreArena),
+    assertHandlers_(g_coreArena),
 
 #if X_ENABLE_PROFILER
-	pProfiler_(nullptr),
+    pProfiler_(nullptr),
 #endif //!X_ENABLE_PROFILER
 
-	dirWatcher_(g_coreArena),
-	
-	pEventDispatcher_(nullptr),
-	hotReloadExtMap_(g_coreArena),
+    dirWatcher_(g_coreArena),
+
+    pEventDispatcher_(nullptr),
+    hotReloadExtMap_(g_coreArena),
 
 #if X_DEBUG
-	hotReloadIgnores_(g_coreArena),
+    hotReloadIgnores_(g_coreArena),
 #endif // !X_DEBUG
 
-	strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2, 
-	StrArena::getMemoryAlignmentRequirement(8), 
-	StrArena::getMemoryOffsetRequirement() + 12),
+    strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
+        StrArena::getMemoryAlignmentRequirement(8),
+        StrArena::getMemoryOffsetRequirement() + 12),
 
-	assetLoader_(g_coreArena, g_coreArena)
+    assetLoader_(g_coreArena, g_coreArena)
 {
-	X_ASSERT_NOT_NULL(g_coreArena);
+    X_ASSERT_NOT_NULL(g_coreArena);
 
-	hotReloadExtMap_.reserve(32);
+    hotReloadExtMap_.reserve(32);
 
-	pEventDispatcher_ = X_NEW( core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
-	pEventDispatcher_->RegisterListener(this);
+    pEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
+    pEventDispatcher_->RegisterListener(this);
 
-	env_.state_ = SCoreGlobals::State::STARTING;
-	env_.pCore = this;
-	env_.pTimer = &time_;
-	env_.pDirWatcher = &dirWatcher_;
-	env_.pHotReload = this;
-//	env_.pMalloc = &g_coreArena;
-	env_.pArena = g_coreArena;
+    env_.state_ = SCoreGlobals::State::STARTING;
+    env_.pCore = this;
+    env_.pTimer = &time_;
+    env_.pDirWatcher = &dirWatcher_;
+    env_.pHotReload = this;
+    //	env_.pMalloc = &g_coreArena;
+    env_.pArena = g_coreArena;
 
-	if (initParams_.bThreadSafeStringAlloc)
-	{
-		env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
-	}
-	else
-	{
-		env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
-	}
+    if (initParams_.bThreadSafeStringAlloc) {
+        env_.pStrArena = X_NEW(StrArena, g_coreArena, "StrArena")(&strAlloc_, "StrArena");
+    }
+    else {
+        env_.pStrArena = X_NEW(StrArenaST, g_coreArena, "StrArena")(&strAlloc_, "StrArenaST");
+    }
 
+    static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
+    static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
 
-	static_assert(StrArena::IS_THREAD_SAFE, "Str arena must be thread safe");
-	static_assert(!StrArenaST::IS_THREAD_SAFE, "Single thread StrArean don't need to be thread safe");
+    env_.client_ = true;
+    env_.dedicated_ = false;
 
-	env_.client_ = true;
-	env_.dedicated_ = false;
+    // created in coreInit.
+    //	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
+    //env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
 
-	// created in coreInit.
-	//	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
-	//env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
-
-	dirWatcher_.registerListener(this);
+    dirWatcher_.registerListener(this);
 }
-
 
 XCore::~XCore()
 {
-	ShutDown();
+    ShutDown();
 
-
-	env_.pCore = nullptr;
-	env_.pTimer = nullptr;
-	env_.pDirWatcher = nullptr;
-	env_.pHotReload = nullptr;
-	env_.pArena = nullptr;
+    env_.pCore = nullptr;
+    env_.pTimer = nullptr;
+    env_.pDirWatcher = nullptr;
+    env_.pHotReload = nullptr;
+    env_.pArena = nullptr;
 }
 
 void XCore::Release()
 {
-
-	X_DELETE(this, g_coreArena);
-
+    X_DELETE(this, g_coreArena);
 }
-
 
 void XCore::ShutDown()
 {
-	X_LOG0("Core", "Shutting Down");
-	env_.state_ = SCoreGlobals::State::CLOSING;
+    X_LOG0("Core", "Shutting Down");
+    env_.state_ = SCoreGlobals::State::CLOSING;
 
 #if X_DEBUG
-	hotReloadIgnores_.free();
+    hotReloadIgnores_.free();
 #endif // !X_DEBUG
 
-	if (vars_.coreFastShutdown_) {
-		X_LOG0("Core", "Fast shutdown, skipping cleanup");
+    if (vars_.coreFastShutdown_) {
+        X_LOG0("Core", "Fast shutdown, skipping cleanup");
 
-		// still save modified vars.
-		if (env_.pConsole && !initParams_.basicConsole())
-		{
-			env_.pConsole->saveChangedVars();
-		}
+        // still save modified vars.
+        if (env_.pConsole && !initParams_.basicConsole()) {
+            env_.pConsole->saveChangedVars();
+        }
 
-		moduleInterfaces_.free();
-		converterInterfaces_.free();
-		return;
-	}
+        moduleInterfaces_.free();
+        converterInterfaces_.free();
+        return;
+    }
 
-	core::StopWatch timer;
+    core::StopWatch timer;
 
-	dirWatcher_.ShutDown();
+    dirWatcher_.ShutDown();
 
-	// save the vars before we start deleting things.
-	if (env_.pConsole && !initParams_.basicConsole())
-	{
-		env_.pConsole->saveChangedVars();
-	}
+    // save the vars before we start deleting things.
+    if (env_.pConsole && !initParams_.basicConsole()) {
+        env_.pConsole->saveChangedVars();
+    }
 
-	if (env_.pJobSys)
-	{
-		env_.pJobSys->ShutDown();
-		core::Mem::DeleteAndNull(env_.pJobSys, g_coreArena);
-	}
+    if (env_.pJobSys) {
+        env_.pJobSys->ShutDown();
+        core::Mem::DeleteAndNull(env_.pJobSys, g_coreArena);
+    }
 
-	if (env_.pGame)
-	{
-		env_.pGame->shutDown();
-		core::SafeRelease(env_.pGame);
-	}
+    if (env_.pGame) {
+        env_.pGame->shutDown();
+        core::SafeRelease(env_.pGame);
+    }
 
-	if (env_.pConsole)
-	{
-		env_.pConsole->freeRenderResources();
-	}
+    if (env_.pConsole) {
+        env_.pConsole->freeRenderResources();
+    }
 
-	if (env_.p3DEngine)
-	{
-		env_.p3DEngine->shutDown();
-		core::SafeRelease(env_.p3DEngine);
-	}
+    if (env_.p3DEngine) {
+        env_.p3DEngine->shutDown();
+        core::SafeRelease(env_.p3DEngine);
+    }
 
-	if (env_.pRender) {
-	//	env_.pRender->ShutDown();
-	}
+    if (env_.pRender) {
+        //	env_.pRender->ShutDown();
+    }
 
-	if (env_.pPhysics)
-	{
-		env_.pPhysics->shutDown();
-		core::SafeRelease(env_.pPhysics);
-	}
+    if (env_.pPhysics) {
+        env_.pPhysics->shutDown();
+        core::SafeRelease(env_.pPhysics);
+    }
 
-	if (env_.pSound)
-	{
-		env_.pSound->shutDown();
-		core::SafeRelease(env_.pSound);
-	}
+    if (env_.pSound) {
+        env_.pSound->shutDown();
+        core::SafeRelease(env_.pSound);
+    }
 
-	if (env_.pFontSys)
-	{
-		env_.pFontSys->shutDown();
-		core::SafeRelease(env_.pFontSys);
-	}
+    if (env_.pFontSys) {
+        env_.pFontSys->shutDown();
+        core::SafeRelease(env_.pFontSys);
+    }
 
-	if (env_.pScriptSys)
-	{
-		env_.pScriptSys->shutDown();
-		core::SafeRelease(env_.pScriptSys);
-	}
+    if (env_.pScriptSys) {
+        env_.pScriptSys->shutDown();
+        core::SafeRelease(env_.pScriptSys);
+    }
 
-	if (env_.pNet)
-	{
-		env_.pNet->shutDown();
-		core::SafeRelease(env_.pNet);
-	}
+    if (env_.pNet) {
+        env_.pNet->shutDown();
+        core::SafeRelease(env_.pNet);
+    }
 
-	if (pWindow_)
-	{
-		pWindow_->Destroy();
-		core::Mem::DeleteAndNull(pWindow_, g_coreArena);
-	}
+    if (pWindow_) {
+        pWindow_->Destroy();
+        core::Mem::DeleteAndNull(pWindow_, g_coreArena);
+    }
 
-	if (pCpuInfo_)
-	{
-		core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
-	}
+    if (pCpuInfo_) {
+        core::Mem::DeleteAndNull(pCpuInfo_, g_coreArena);
+    }
 
-	if (pCrc32_)
-	{
-		core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
-	}
+    if (pCrc32_) {
+        core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
+    }
 
 #if X_ENABLE_PROFILER
-	if (pProfiler_)
-	{
-		pProfiler_->shutDown();
-		core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
-	}
+    if (pProfiler_) {
+        pProfiler_->shutDown();
+        core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
+    }
 #endif // !X_ENABLE_PROFILER
 
-	if (env_.pFileSys)
-	{
-		env_.pFileSys->shutDown();
-		core::Mem::DeleteAndNull(env_.pFileSys, g_coreArena);
+    if (env_.pFileSys) {
+        env_.pFileSys->shutDown();
+        core::Mem::DeleteAndNull(env_.pFileSys, g_coreArena);
+    }
 
-	}
+    // free any listners here.
+    if (env_.pConsole) {
+        env_.pConsole->unregisterInputListener();
+    }
 
+    // needs to be done after engine, since it has input listners.
+    if (env_.pInput) {
+        env_.pInput->ShutDown();
+        core::SafeRelease(env_.pInput);
+    }
 
-	// free any listners here.
-	if (env_.pConsole)
-	{
-		env_.pConsole->unregisterInputListener();
-	}
+    if (env_.pRender) {
+        env_.pRender->shutDown();
 
-	// needs to be done after engine, since it has input listners.
-	if (env_.pInput)
-	{
-		env_.pInput->ShutDown();
-		core::SafeRelease(env_.pInput);
-	}
+        core::SafeRelease(env_.pRender);
+    }
 
+    // shut down interfaces before logging is removed.
+    for (auto& it : moduleInterfaces_) {
+        if (!it->ShutDown()) {
+            X_ERROR("Core", "error shuting down engine module");
+        }
+    }
+    for (const auto& it : converterInterfaces_) {
+        auto* conModule = it.pConModule.get();
+        const auto& instance = it.pConverter;
+        if (!conModule->ShutDown(instance)) {
+            X_ERROR("Core", "error shuting down converter module");
+        }
+    }
 
-	if (env_.pRender)
-	{
-		env_.pRender->shutDown();
+    moduleInterfaces_.free();
+    converterInterfaces_.free();
 
-		core::SafeRelease(env_.pRender);
-	}
-
-
-	// shut down interfaces before logging is removed.
-	for (auto& it : moduleInterfaces_) {
-		if (!it->ShutDown()) {
-			X_ERROR("Core", "error shuting down engine module");
-		}
-	}
-	for (const auto& it : converterInterfaces_) {
-		auto* conModule = it.pConModule.get();
-		const auto& instance = it.pConverter;
-		if (!conModule->ShutDown(instance)) {
-			X_ERROR("Core", "error shuting down converter module");
-		}
-	}
-
-	moduleInterfaces_.free();
-	converterInterfaces_.free();
-
-	X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
+    X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
 
 #if X_ENABLE_LOGGING
-	if (!initParams_.bTesting && pConsole_) { // don't pause when testing.
-		pConsole_->PressToContinue();
-	}
+    if (!initParams_.bTesting && pConsole_) { // don't pause when testing.
+        pConsole_->PressToContinue();
+    }
 #endif // !X_ENABLE_LOGGING
 
-	if (env_.pConsole)
-	{
-		env_.pConsole->shutDown();
-		core::Mem::DeleteAndNull(env_.pConsole, g_coreArena);
-	}
+    if (env_.pConsole) {
+        env_.pConsole->shutDown();
+        core::Mem::DeleteAndNull(env_.pConsole, g_coreArena);
+    }
 
-	if (env_.pStrArena)
-	{
-		core::Mem::DeleteAndNull(env_.pStrArena, g_coreArena);
-	}
+    if (env_.pStrArena) {
+        core::Mem::DeleteAndNull(env_.pStrArena, g_coreArena);
+    }
 
+    // Loggers last.
+    if (env_.pLog) {
+        //  No need to remove them, if log system is closing.
+        //	if (pVsLogger_)
+        //		env_.pLog->RemoveLogger(pVsLogger_);
+        //	if (pConsoleLogger_)
+        //		env_.pLog->RemoveLogger(pConsoleLogger_);
 
-	// Loggers last.
-	if (env_.pLog)
-	{
-	//  No need to remove them, if log system is closing.
-	//	if (pVsLogger_)
-	//		env_.pLog->RemoveLogger(pVsLogger_);
-	//	if (pConsoleLogger_)
-	//		env_.pLog->RemoveLogger(pConsoleLogger_);
+        env_.pLog->ShutDown();
 
-		env_.pLog->ShutDown();
+        //if (pConsole)
+        //	pConsole->Show(false);
 
-		//if (pConsole)
-		//	pConsole->Show(false);
+        //	system("PAUSE");
 
-	//	system("PAUSE");
+        X_DELETE(pVsLogger_, g_coreArena);
+        X_DELETE(pConsoleLogger_, g_coreArena);
+        if (initParams_.pConsoleWnd == nullptr)
+            X_DELETE(pConsole_, g_coreArena);
 
-		X_DELETE(pVsLogger_, g_coreArena);
-		X_DELETE(pConsoleLogger_, g_coreArena);
-		if (initParams_.pConsoleWnd == nullptr)
-			X_DELETE(pConsole_, g_coreArena);
+        core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
+    }
 
-		core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
-	}
+    if (pEventDispatcher_) {
+        pEventDispatcher_->RemoveListener(this);
+        core::Mem::DeleteAndNull(pEventDispatcher_, g_coreArena);
+    }
 
-	if (pEventDispatcher_) {
-		pEventDispatcher_->RemoveListener(this);
-		core::Mem::DeleteAndNull(pEventDispatcher_, g_coreArena);
-	}
+    for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
+        core::Module::UnLoad(moduleDLLHandles_[i]);
+    }
 
+    moduleDLLHandles_.free();
 
-	for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
-		core::Module::UnLoad(moduleDLLHandles_[i]);
-	}
-
-	moduleDLLHandles_.free();
-
-
-//	core::invalidParameterHandler::Shutdown();
+    //	core::invalidParameterHandler::Shutdown();
 }
-
 
 bool XCore::PumpMessages()
 {
-	if (pWindow_) {
-		return pWindow_->PumpMessages() != core::xWindow::Notification::CLOSE;
-	}
+    if (pWindow_) {
+        return pWindow_->PumpMessages() != core::xWindow::Notification::CLOSE;
+    }
 
-	// we have no main window
-	X_ERROR("PumpMessages", "no main window present");
-	return false; 
+    // we have no main window
+    X_ERROR("PumpMessages", "no main window present");
+    return false;
 }
 
 void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-	X_UNUSED(wparam);
-	X_UNUSED(lparam);
+    X_UNUSED(wparam);
+    X_UNUSED(lparam);
 
-	switch (event)
-	{
-		case CoreEvent::MOVE:
-		{
-			core::xWindow::Rect rect = pWindow_->GetRect();
-			vars_.updateWinPos(rect.getX1(), rect.getY1());
-		}
-		break;
-		case CoreEvent::RESIZE:
-		{
-			core::xWindow::Rect rect = pWindow_->GetClientRect();
-			vars_.updateWinDim(rect.getWidth(), rect.getHeight());
-		}
-		break;
-		case CoreEvent::ACTIVATE:
-			if (pWindow_) {
-				pWindow_->ClipCursorToWindow();
-			}
-		break;
+    switch (event) {
+        case CoreEvent::MOVE: {
+            core::xWindow::Rect rect = pWindow_->GetRect();
+            vars_.updateWinPos(rect.getX1(), rect.getY1());
+        } break;
+        case CoreEvent::RESIZE: {
+            core::xWindow::Rect rect = pWindow_->GetClientRect();
+            vars_.updateWinDim(rect.getWidth(), rect.getHeight());
+        } break;
+        case CoreEvent::ACTIVATE:
+            if (pWindow_) {
+                pWindow_->ClipCursorToWindow();
+            }
+            break;
 
-		default:
-			break;
-	}
+        default:
+            break;
+    }
 }
-
-
 
 const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 {
-	X_ASSERT_NOT_NULL(pVarName);
+    X_ASSERT_NOT_NULL(pVarName);
 
-	if (args_.isEmpty()) {
-		return nullptr;
-	}
+    if (args_.isEmpty()) {
+        return nullptr;
+    }
 
-	size_t i;
-	for (i = 0; i < args_.size(); i++)
-	{
-		const CmdArg& arg = args_[i];
+    size_t i;
+    for (i = 0; i < args_.size(); i++) {
+        const CmdArg& arg = args_[i];
 
-		if (arg.getArgc() >= 3)
-		{
-			const wchar_t* pCmd = arg.getArgv(0);
-			if (core::strUtil::IsEqualCaseInsen(pCmd, L"set"))
-			{
-				const wchar_t* pName = arg.getArgv(1);
-				if (core::strUtil::IsEqual(pName, pVarName))
-				{
-					const wchar_t* pValue = arg.getArgv(2);
-					return pValue;
-				}
-			}
-		}
-		else if (arg.getArgc() == 2)
-		{
-			const wchar_t* pName = arg.getArgv(0);
-			if (core::strUtil::IsEqualCaseInsen(pName, pVarName))
-			{
-				const wchar_t* pValue = arg.getArgv(1);
-				return pValue;
-			}
-		}
-	}
+        if (arg.getArgc() >= 3) {
+            const wchar_t* pCmd = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(pCmd, L"set")) {
+                const wchar_t* pName = arg.getArgv(1);
+                if (core::strUtil::IsEqual(pName, pVarName)) {
+                    const wchar_t* pValue = arg.getArgv(2);
+                    return pValue;
+                }
+            }
+        }
+        else if (arg.getArgc() == 2) {
+            const wchar_t* pName = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
+                const wchar_t* pValue = arg.getArgv(1);
+                return pValue;
+            }
+        }
+    }
 
-	return nullptr;
+    return nullptr;
 }
-
-
 
 // IXHotReloadManager
 bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 {
-	X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")(pHotReload, env_.isRunning());
+    X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")
+    (pHotReload, env_.isRunning());
 
-	X_ASSERT_NOT_NULL(extension);
-	
-	if (core::strUtil::Find(extension, '.')) {
-		X_ERROR("HotReload", "extension can't contain dots");
-		return false;
-	}
+    X_ASSERT_NOT_NULL(extension);
 
-	// note: hotReloadExtMap_ stores char* pointer.
-	if (pHotReload == nullptr) {
-		hotReloadExtMap_.erase(extension);
-		return true;
-	}
+    if (core::strUtil::Find(extension, '.')) {
+        X_ERROR("HotReload", "extension can't contain dots");
+        return false;
+    }
 
-	if (hotReloadExtMap_.find(extension) != hotReloadExtMap_.end()) {
-		X_ERROR("HotReload", "failed to register file type, it already has a handler");
-		return false;
-	}
+    // note: hotReloadExtMap_ stores char* pointer.
+    if (pHotReload == nullptr) {
+        hotReloadExtMap_.erase(extension);
+        return true;
+    }
 
-	hotReloadExtMap_.insert(HotReloadMap::value_type(extension, pHotReload));
-	return true;
+    if (hotReloadExtMap_.find(extension) != hotReloadExtMap_.end()) {
+        X_ERROR("HotReload", "failed to register file type, it already has a handler");
+        return false;
+    }
+
+    hotReloadExtMap_.insert(HotReloadMap::value_type(extension, pHotReload));
+    return true;
 }
 
 void XCore::unregisterListener(core::IXHotReload* pHotReload)
 {
-	for (auto it = hotReloadExtMap_.begin(); it != hotReloadExtMap_.end(); ++it)
-	{
-		if (it->second == pHotReload)
-		{
-			hotReloadExtMap_.erase(it);
-			it = hotReloadExtMap_.begin();
-		}
-	}
+    for (auto it = hotReloadExtMap_.begin(); it != hotReloadExtMap_.end(); ++it) {
+        if (it->second == pHotReload) {
+            hotReloadExtMap_.erase(it);
+            it = hotReloadExtMap_.begin();
+        }
+    }
 }
 
 // ~IXHotReloadManager
 
-
-
 void XCore::OnFatalError(const char* format, va_list args)
 {
-	core::CallStack::Description Dsc;
-	core::CallStack stack(1);
-	
-	stack.ToDescription(Dsc);
-	
-	X_LOG0("FatalError", "CallStack:\n%s", Dsc);
+    core::CallStack::Description Dsc;
+    core::CallStack stack(1);
 
-	core::LoggerBase::Line Line;
-	vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
+    stack.ToDescription(Dsc);
 
-	core::msgbox::show(Line,
-		X_ENGINE_NAME " Fatal Error",
-		core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
-		core::msgbox::Buttons::OK);
+    X_LOG0("FatalError", "CallStack:\n%s", Dsc);
 
-	X_BREAKPOINT;
+    core::LoggerBase::Line Line;
+    vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
 
-	_exit(1);
+    core::msgbox::show(Line,
+        X_ENGINE_NAME " Fatal Error",
+        core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
+        core::msgbox::Buttons::OK);
+
+    X_BREAKPOINT;
+
+    _exit(1);
 }
-
 
 void XCore::WindowPosVarChange(core::ICVar* pVar)
 {
-	X_UNUSED(pVar);
+    X_UNUSED(pVar);
 
-	int x_pos = vars_.winXPos_;
-	int y_pos = vars_.winYPos_;
+    int x_pos = vars_.winXPos_;
+    int y_pos = vars_.winYPos_;
 
-	core::xWindow* pWin = GetGameWindow();
-	if (pWin) {
-		pWin->MoveTo(x_pos, y_pos);
-	}
+    core::xWindow* pWin = GetGameWindow();
+    if (pWin) {
+        pWin->MoveTo(x_pos, y_pos);
+    }
 }
 
 void XCore::WindowSizeVarChange(core::ICVar* pVar)
 {
-	X_UNUSED(pVar);
-
+    X_UNUSED(pVar);
 }
 
 void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
 {
-	bool enabled = (pVar->GetInteger() == 1);
+    bool enabled = (pVar->GetInteger() == 1);
 
-	if (pWindow_) {
-		pWindow_->CustomFrame(enabled);
-	}
+    if (pWindow_) {
+        pWindow_->CustomFrame(enabled);
+    }
 }
-
 
 void XCore::Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
 {
-	X_UNUSED(Cmd);
+    X_UNUSED(Cmd);
 
-	HotReloadListExts();
+    HotReloadListExts();
 }
 
 void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
 {
-	X_UNUSED(Cmd);
+    X_UNUSED(Cmd);
 
-	ListProgramArgs();
+    ListProgramArgs();
 }
 
 void XCore::HotReloadListExts(void)
 {
-	X_LOG0("HotReload", "-------- ^8Registerd Extensions^7 --------");
+    X_LOG0("HotReload", "-------- ^8Registerd Extensions^7 --------");
 
-	for (const auto& hr : hotReloadExtMap_)
-	{
-		X_LOG0("HotReload", "^2%s", hr.first);
-	}
+    for (const auto& hr : hotReloadExtMap_) {
+        X_LOG0("HotReload", "^2%s", hr.first);
+    }
 
-	X_LOG0("HotReload", "------ ^8Registerd Extensions End^7 ------");
-
+    X_LOG0("HotReload", "------ ^8Registerd Extensions End^7 ------");
 }
 
 void XCore::ListProgramArgs(void)
 {
-	size_t i, num = args_.size();
+    size_t i, num = args_.size();
 
-	X_LOG0("AppArgs", "----------- ^8Program Args(%" PRIuS ")^7 ----------", num);
+    X_LOG0("AppArgs", "----------- ^8Program Args(%" PRIuS ")^7 ----------", num);
 
-	core::StackString<1024 + 128> merged;
+    core::StackString<1024 + 128> merged;
 
-	for (i = 0; i < num; i++)
-	{
-		const auto& arg = args_[i];
-		size_t j, argsNum = arg.getArgc();
+    for (i = 0; i < num; i++) {
+        const auto& arg = args_[i];
+        size_t j, argsNum = arg.getArgc();
 
-		merged.appendFmt("(%" PRIuS ") ", i);
+        merged.appendFmt("(%" PRIuS ") ", i);
 
-		for (j = 0; j < argsNum; j++)
-		{
-			merged.appendFmt("^2%ls^7", arg.getArgv(j));
-			if ((j+1) < argsNum) {
-				merged.append(" -> ");
-			}
-		}
+        for (j = 0; j < argsNum; j++) {
+            merged.appendFmt("^2%ls^7", arg.getArgv(j));
+            if ((j + 1) < argsNum) {
+                merged.append(" -> ");
+            }
+        }
 
-		X_LOG0("AppArgs", "%s", merged.c_str());
-	}
+        X_LOG0("AppArgs", "%s", merged.c_str());
+    }
 
-	X_LOG0("AppArgs", "---------- ^8Program Args End^7 ----------");
+    X_LOG0("AppArgs", "---------- ^8Program Args End^7 ----------");
 }
-
 
 void XCore::LogSystemInfo(void) const
 {
-	core::SysInfo::UserNameStr userName;
-	core::SysInfo::LanguageStr lang;
-	core::SysInfo::MemInfo memInfo;
-	core::SysInfo::DisplayInfo displayInfo;
+    core::SysInfo::UserNameStr userName;
+    core::SysInfo::LanguageStr lang;
+    core::SysInfo::MemInfo memInfo;
+    core::SysInfo::DisplayInfo displayInfo;
 
-	core::SysInfo::GetUserName(userName);
-	core::SysInfo::GetLanguage(lang);
-	core::SysInfo::GetSystemMemInfo(memInfo);
-	core::SysInfo::GetDisplayInfo(displayInfo);
+    core::SysInfo::GetUserName(userName);
+    core::SysInfo::GetLanguage(lang);
+    core::SysInfo::GetSystemMemInfo(memInfo);
+    core::SysInfo::GetDisplayInfo(displayInfo);
 
-	core::HumanSize::Str s1, s2, s3;
+    core::HumanSize::Str s1, s2, s3;
 
-	X_LOG0("SysInfo", "UserName: \"%ls\"", userName);
-	X_LOG0("SysInfo", "Language: \"%ls\"", lang);
-	X_LOG0("SysInfo", "PhysicalMem ^6%s^7 available ^6%s^7 virtual ^6%s^7 used ^6%" PRIu32 "%%",
-		core::HumanSize::toString(s1, memInfo.TotalPhys),
-		core::HumanSize::toString(s2, memInfo.AvailPhys),
-		core::HumanSize::toString(s3, memInfo.TotalVirtual),
-		memInfo.dwMemoryLoad
-	);
-	X_LOG0("SysInfo", "Display: ^6%d^7x^6%d^7x^6%d",
-		displayInfo.pelsWidth,
-		displayInfo.pelsHeight,
-		displayInfo.bitsPerPel
-	);
-
+    X_LOG0("SysInfo", "UserName: \"%ls\"", userName);
+    X_LOG0("SysInfo", "Language: \"%ls\"", lang);
+    X_LOG0("SysInfo", "PhysicalMem ^6%s^7 available ^6%s^7 virtual ^6%s^7 used ^6%" PRIu32 "%%",
+        core::HumanSize::toString(s1, memInfo.TotalPhys),
+        core::HumanSize::toString(s2, memInfo.AvailPhys),
+        core::HumanSize::toString(s3, memInfo.TotalVirtual),
+        memInfo.dwMemoryLoad);
+    X_LOG0("SysInfo", "Display: ^6%d^7x^6%d^7x^6%d",
+        displayInfo.pelsWidth,
+        displayInfo.pelsHeight,
+        displayInfo.bitsPerPel);
 }
 
 X_NAMESPACE_BEGIN(core)
-
-
-
 
 X_NAMESPACE_END

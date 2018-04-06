@@ -114,8 +114,7 @@ X_DECLARE_ENUM(InputDeviceType)
 (
     KEYBOARD,
     MOUSE,
-    UNKNOWN
-);
+    UNKNOWN);
 
 // both keyboard and mouse map to this data
 struct KeyId

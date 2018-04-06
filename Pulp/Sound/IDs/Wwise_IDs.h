@@ -70,7 +70,7 @@ namespace AK
                 static const AkUniqueID WATER = 2654748154U;
                 static const AkUniqueID WOOD = 2058049674U;
             } // namespace SWITCH
-        } // namespace MATERIAL
+        }     // namespace MATERIAL
 
         namespace PLAYERFOOT
         {
@@ -81,7 +81,7 @@ namespace AK
                 static const AkUniqueID LEFT = 4109362U;
                 static const AkUniqueID RIGHT = 3893817417U;
             } // namespace SWITCH
-        } // namespace PLAYERFOOT
+        }     // namespace PLAYERFOOT
 
     } // namespace SWITCHES
 
@@ -115,6 +115,6 @@ namespace AK
         static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BUSSES
 
-}// namespace AK
+} // namespace AK
 
 #endif // __WWISE_IDS_H__

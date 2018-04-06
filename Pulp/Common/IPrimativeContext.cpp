@@ -305,7 +305,8 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, Color8u col)
 {
     int32_t num = safe_static_cast<int32_t>(points.length());
 
-    X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num); 
+    X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")
+    (num);
 
     if (num < 2) { // 2 points needed to make a line.
         return;
@@ -328,8 +329,10 @@ void IPrimativeContext::drawLines(core::span<const Vec3f> points, core::span<con
     int32_t num = safe_static_cast<int32_t>(points.length());
     int32_t numCol = safe_static_cast<int32_t>(col.length());
 
-    X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")(num); 
-    X_ASSERT(num == numCol, "Span length mismatch")(num, numCol); 
+    X_ASSERT((num % 2) == 0, "num points must be a multiple of 2")
+    (num);
+    X_ASSERT(num == numCol, "Span length mismatch")
+    (num, numCol);
 
     if (num < 2) { // 2 points needed to make a line.
         return;
@@ -395,7 +398,8 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
     float padding, uint32_t max, Color8u col)
 {
     X_ASSERT_NOT_NULL(pHeights);
-    X_ASSERT(num <= max, "Darw Chart has more items than max")(num, max); 
+    X_ASSERT(num <= max, "Darw Chart has more items than max")
+    (num, max);
 
     if (num < 1) {
         return;
@@ -463,7 +467,8 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Col
         return;
     }
 
-    X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints); 
+    X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")
+    (numPoints);
 
     // we do the case to uint32_t here just to make the interface nicer to use.
     PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
@@ -480,7 +485,8 @@ void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, con
         return;
     }
 
-    X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")(numPoints); 
+    X_ASSERT(numPoints % 3 == 0, "Num points must be a multiple of 3")
+    (numPoints);
 
     PrimVertex* pTri = addPrimative(static_cast<uint32_t>(numPoints), PrimitiveType::TRIANGLELIST);
 

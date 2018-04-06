@@ -4,7 +4,7 @@
 #define X_GAME_I_H_
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameData);
+    struct FrameData);
 
 X_NAMESPACE_BEGIN(game)
 

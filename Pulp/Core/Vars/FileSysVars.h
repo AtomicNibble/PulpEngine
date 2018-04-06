@@ -12,25 +12,25 @@ struct ICVar;
 class XFileSysVars
 {
 public:
-	XFileSysVars();
+    XFileSysVars();
 
-	void registerVars(void);
+    void registerVars(void);
 
 public:
-	int32_t debug_;
-	int32_t queueDebug_;
-	int32_t numVirtualDir_;
+    int32_t debug_;
+    int32_t queueDebug_;
+    int32_t numVirtualDir_;
 
-	int32_t pakMemorySizeLimitMB_;
+    int32_t pakMemorySizeLimitMB_;
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
-	// artificial delays
-	int32_t artOpenDelay_;
-	int32_t artReadDelay_;
-	int32_t artWriteDelay_;
+    // artificial delays
+    int32_t artOpenDelay_;
+    int32_t artReadDelay_;
+    int32_t artWriteDelay_;
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
-	core::ICVar* pVirtualDirs_[core::FS_MAX_VIRTUAL_DIR];
+    core::ICVar* pVirtualDirs_[core::FS_MAX_VIRTUAL_DIR];
 };
 
 X_NAMESPACE_END

@@ -1,6 +1,4 @@
 
 X_NAMESPACE_BEGIN(texture)
 
-
-
 X_NAMESPACE_END

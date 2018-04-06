@@ -41,7 +41,7 @@
 //  meaning the near plane can be behind the projection
 //  so that objects won't be clipped when hitting projection.
 //
-// 
+//
 //
 //
 
@@ -63,52 +63,46 @@
 #include "XMatrix.h"
 #include "XFrustum.h"
 
-
-static const float  DEFAULT_NEAR = 0.25f;
-static const float  DEFAULT_FAR = 1024.0f;
-static const float  DEFAULT_FOV = toRadians(75.0f);
-
+static const float DEFAULT_NEAR = 0.25f;
+static const float DEFAULT_FAR = 1024.0f;
+static const float DEFAULT_FOV = toRadians(75.0f);
 
 class XCamera : public XFrustum
 {
 public:
-	XCamera() = default;
-	~XCamera() = default;
+    XCamera() = default;
+    ~XCamera() = default;
 
-	X_INLINE void setFrustum(uint32_t width, uint32_t height,
-		float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR, 
-		float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
+    X_INLINE void setFrustum(uint32_t width, uint32_t height,
+        float32_t fov = DEFAULT_FOV, float32_t nearplane = DEFAULT_NEAR,
+        float32_t farpane = DEFAULT_FAR, float32_t pixelAspectRatio = 1.0f);
 
-	X_INLINE const Matrix44f& getProjectionMatrix(void) const;
-	X_INLINE const Matrix44f& getViewMatrix(void) const;
-
-private:
-	void UpdateFrustum(void) X_OVERRIDE;
+    X_INLINE const Matrix44f& getProjectionMatrix(void) const;
+    X_INLINE const Matrix44f& getViewMatrix(void) const;
 
 private:
-	Matrix44f projectionMatrix_;
-	Matrix44f viewMatrix_;
+    void UpdateFrustum(void) X_OVERRIDE;
+
+private:
+    Matrix44f projectionMatrix_;
+    Matrix44f viewMatrix_;
 };
 
-
 X_INLINE void XCamera::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV,
-	float32_t nearplane, float32_t farpane, float32_t fPixelAspectRatio)
+    float32_t nearplane, float32_t farpane, float32_t fPixelAspectRatio)
 {
-	XFrustum::setFrustum(nWidth, nHeight, FOV,
-		nearplane, farpane, fPixelAspectRatio);
+    XFrustum::setFrustum(nWidth, nHeight, FOV,
+        nearplane, farpane, fPixelAspectRatio);
 }
-
 
 X_INLINE const Matrix44f& XCamera::getProjectionMatrix(void) const
 {
-	return projectionMatrix_;
+    return projectionMatrix_;
 }
 
 X_INLINE const Matrix44f& XCamera::getViewMatrix(void) const
 {
-	return viewMatrix_;
+    return viewMatrix_;
 }
-
-
 
 #endif // !_X_MATH_CAMERA_H_

@@ -2,8 +2,6 @@
 
 X_NAMESPACE_BEGIN(script)
 
-
-
 // build config specific values
 #if X_DEBUG
 
@@ -20,6 +18,5 @@ X_NAMESPACE_BEGIN(script)
 #else
 #error "unkonw config"
 #endif
-
 
 X_NAMESPACE_END

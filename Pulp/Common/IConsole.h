@@ -11,7 +11,7 @@
 struct ICore;
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameTimeData);
+    struct FrameTimeData);
 
 X_NAMESPACE_BEGIN(core)
 

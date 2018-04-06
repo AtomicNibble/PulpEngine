@@ -1,16 +1,16 @@
 
 
-template <typename TO, typename FROM>
+template<typename TO, typename FROM>
 inline TO union_cast(FROM from)
 {
-	static_assert(sizeof(TO) == sizeof(FROM), "Size mismatch. Cannot use a union_cast for types of different sizes.");
+    static_assert(sizeof(TO) == sizeof(FROM), "Size mismatch. Cannot use a union_cast for types of different sizes.");
 
-	union
-	{
-		FROM castFrom;
-		TO castTo;
-	};
+    union
+    {
+        FROM castFrom;
+        TO castTo;
+    };
 
-	castFrom = from;
-	return castTo;
+    castFrom = from;
+    return castTo;
 }

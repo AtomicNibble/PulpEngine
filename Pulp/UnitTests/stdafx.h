@@ -1,7 +1,6 @@
 
 #pragma once
 
-
 #include <EngineCommon.h>
 
 #define GTEST_HAS_TR1_TUPLE 0
@@ -11,9 +10,6 @@
 
 #include "UT_AssertChecker.h"
 
-
 extern core::UtAssetCheckerHandler g_AssetChecker;
 
 extern core::MemoryArenaBase* g_arena;
-
-

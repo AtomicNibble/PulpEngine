@@ -5,45 +5,41 @@
 
 #include "Memory/MemoryAllocatorStatistics.h"
 
-
 X_NAMESPACE_BEGIN(core)
-
 
 class MallocFreeAllocator
 {
-	struct BlockHeader
-	{
-		void* originalAllocation_;
-		size_t AllocationSize_;
-		size_t originalSize_;
-	};
-
-
-public:
-	static const size_t SIZE_OF_HEADER = sizeof(BlockHeader);
+    struct BlockHeader
+    {
+        void* originalAllocation_;
+        size_t AllocationSize_;
+        size_t originalSize_;
+    };
 
 public:
-	MallocFreeAllocator(void);
+    static const size_t SIZE_OF_HEADER = sizeof(BlockHeader);
 
-	void* allocate(size_t size, size_t alignment, size_t offset);
+public:
+    MallocFreeAllocator(void);
 
-	void free(void* ptr);
-	void free(void* ptr, size_t size);
+    void* allocate(size_t size, size_t alignment, size_t offset);
 
-	inline size_t getSize(void* allocation) const;
-	inline size_t usableSize(void* ptr) const;
+    void free(void* ptr);
+    void free(void* ptr, size_t size);
 
-	MemoryAllocatorStatistics getStatistics(void) const;
+    inline size_t getSize(void* allocation) const;
+    inline size_t usableSize(void* ptr) const;
+
+    MemoryAllocatorStatistics getStatistics(void) const;
 
 private:
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-	MemoryAllocatorStatistics statistics_;
+    MemoryAllocatorStatistics statistics_;
 #endif
 };
 
 #include "MallocFreeAllocator.inl"
 
 X_NAMESPACE_END
-
 
 #endif

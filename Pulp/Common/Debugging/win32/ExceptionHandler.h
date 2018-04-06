@@ -3,7 +3,6 @@
 #ifndef X_EXCEPTIONHANDLER_H_
 #define X_EXCEPTIONHANDLER_H_
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Debugging
@@ -21,14 +20,13 @@ X_NAMESPACE_BEGIN(core)
 /// \sa X_ENABLE_UNHANDLED_EXCEPTION_HANDLER abortHandler pureVirtualFunctionCallHandler invalidParameterHandler debugging::WriteMiniDump
 namespace exceptionHandler
 {
-	/// \brief Starts the exception handler.
-	void Startup(void);
+    /// \brief Starts the exception handler.
+    void Startup(void);
 
-	/// \brief Shuts down the exception handler.
-	void Shutdown(void);
-}
+    /// \brief Shuts down the exception handler.
+    void Shutdown(void);
+} // namespace exceptionHandler
 
 X_NAMESPACE_END
-
 
 #endif // X_EXCEPTIONHANDLER_H_

@@ -1,13 +1,11 @@
 
 
-
 inline HANDLE Console::GetNativeConsole(void) const
 {
-	return console_;
+    return console_;
 }
-
 
 inline HWND Console::GetNativeConsoleWindow(void) const
 {
-	return window_;
+    return window_;
 }

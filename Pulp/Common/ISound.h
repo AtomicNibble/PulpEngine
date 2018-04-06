@@ -9,7 +9,7 @@
 #include <IMaterial.h>
 
 X_NAMESPACE_DECLARE(physics,
-                    struct IScene);
+    struct IScene);
 
 X_NAMESPACE_BEGIN(sound)
 
@@ -57,18 +57,19 @@ X_DECLARE_ENUM8(OcclusionType)
 (
     None,
     SingleRay,
-    MultiRay
-);
+    MultiRay);
 
 X_INLINE uint32_t getIDFromStr(const char* pStr)
 {
-    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")
+    (pStr);
     return core::Hash::Fnv1Hash(pStr, std::strlen(pStr));
 }
 
 X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
 {
-    X_ASSERT(core::strUtil::IsLower(pStr, pStr + len), "must be lower case")(pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr, pStr + len), "must be lower case")
+    (pStr);
     return core::Hash::Fnv1Hash(pStr, len);
 }
 

@@ -82,8 +82,7 @@ namespace gui
         FULLSCREEN,
         NO_CLIP,
         NO_CURSOR,
-        IN_TRANSITION
-    );
+        IN_TRANSITION);
 
     X_DECLARE_ENUM(WindowStyle)
     (

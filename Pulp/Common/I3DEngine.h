@@ -4,13 +4,13 @@
 #define _X_RENDER_SYS_I_H_
 
 X_NAMESPACE_DECLARE(physics,
-                    struct IScene)
+    struct IScene)
 
 X_NAMESPACE_DECLARE(model,
-                    struct IModelManager)
+    struct IModelManager)
 
 X_NAMESPACE_DECLARE(anim,
-                    struct IAnimManager)
+    struct IAnimManager)
 
 X_NAMESPACE_BEGIN(engine)
 

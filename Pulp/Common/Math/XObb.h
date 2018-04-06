@@ -16,32 +16,30 @@
 class OBB
 {
 public:
-	typedef float32_t type;
-	typedef float32_t value_type;
+    typedef float32_t type;
+    typedef float32_t value_type;
 
+    X_INLINE OBB() = default;
+    X_INLINE OBB(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
+    X_INLINE OBB(const Matrix33f& m33, const AABB& aabb);
+    X_INLINE OBB(const Quatf& quat, const AABB& aabb);
 
-	X_INLINE OBB() = default;
-	X_INLINE OBB(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
-	X_INLINE OBB(const Matrix33f& m33, const AABB& aabb);
-	X_INLINE OBB(const Quatf& quat, const AABB& aabb);
+    X_INLINE void set(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
+    X_INLINE void set(const Matrix33f& m33, const AABB& aabb);
+    X_INLINE void set(const Quatf& quat, const AABB& aabb);
 
-	X_INLINE void set(const Matrix33f& m33, const Vec3f& center, const Vec3f& hlv);
-	X_INLINE void set(const Matrix33f& m33, const AABB& aabb);
-	X_INLINE void set(const Quatf& quat, const AABB& aabb);
-
-
-	X_INLINE const Vec3f& center(void) const;	// the center point of the box
-	X_INLINE Vec3f center(void);	// the center point of the box
-	X_INLINE Vec3f size(void) const;	// the size of the box.
-	X_INLINE const Vec3f& halfVec(void) const;	// 
-	X_INLINE Vec3f halfVec(void);	// 
-	X_INLINE const Quatf& orientation(void) const;
-	X_INLINE Quatf orientation(void);
+    X_INLINE const Vec3f& center(void) const;  // the center point of the box
+    X_INLINE Vec3f center(void);               // the center point of the box
+    X_INLINE Vec3f size(void) const;           // the size of the box.
+    X_INLINE const Vec3f& halfVec(void) const; //
+    X_INLINE Vec3f halfVec(void);              //
+    X_INLINE const Quatf& orientation(void) const;
+    X_INLINE Quatf orientation(void);
 
 private:
-	Quatf orientation_;
-	Vec3f center_;			// center location
-	Vec3f halfLVec_;		// half of the box vec.
+    Quatf orientation_;
+    Vec3f center_;   // center location
+    Vec3f halfLVec_; // half of the box vec.
 };
 
 #include "XObb.inl"

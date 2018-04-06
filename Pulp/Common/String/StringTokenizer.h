@@ -5,7 +5,6 @@
 
 #include "String/StringRange.h"
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup String
@@ -37,21 +36,20 @@ template<typename TChar = char>
 class StringTokenizer
 {
 public:
-	/// \brief Constructs a string tokenizer for the given range of characters.
-	/// \remark Ownership of the provided arguments stays at the calling site.
-	StringTokenizer(const TChar* startInclusive, const TChar* endExclusive, TChar delimiter);
+    /// \brief Constructs a string tokenizer for the given range of characters.
+    /// \remark Ownership of the provided arguments stays at the calling site.
+    StringTokenizer(const TChar* startInclusive, const TChar* endExclusive, TChar delimiter);
 
-	/// \brief Tries to extract the next token, and returns whether a token could be found or not.
-	/// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
-	bool ExtractToken(StringRange<TChar>& range);
+    /// \brief Tries to extract the next token, and returns whether a token could be found or not.
+    /// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
+    bool ExtractToken(StringRange<TChar>& range);
 
 private:
-	const TChar* start_;
-	const TChar* end_;
-	TChar delimiter_;
+    const TChar* start_;
+    const TChar* end_;
+    TChar delimiter_;
 };
 
 X_NAMESPACE_END
-
 
 #endif

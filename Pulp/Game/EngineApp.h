@@ -3,7 +3,6 @@
 #include <ICore.h>
 #include <Platform\Module.h>
 
-
 X_USING_NAMESPACE;
 
 #include "Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h"
@@ -11,57 +10,53 @@ X_USING_NAMESPACE;
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::MultiThreadPolicy<core::Spinlock>,
+    core::MallocFreeAllocator,
+    core::MultiThreadPolicy<core::Spinlock>,
 
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-> CoreArena;
-
+    >
+    CoreArena;
 
 class AssetHandler : public IAssertHandler
 {
 public:
-	AssetHandler(void);
-	virtual ~AssetHandler(void);
+    AssetHandler(void);
+    virtual ~AssetHandler(void);
 
 private:
-
-	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
-	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+    virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+    virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 };
-
-
 
 class EngineApp
 {
 public:
-	EngineApp();
-	~EngineApp();
+    EngineApp();
+    ~EngineApp();
 
-	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
-	int	MainLoop();
+    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
+    int MainLoop();
 
 private:
+    static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    static void Error(const char* pErrorText);
 
-	static LRESULT CALLBACK	WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-	static void Error(const char* pErrorText);
+    // Main Engine loop.
+    bool PumpMessages();
 
-	// Main Engine loop.
-	bool PumpMessages();
 private:
-	AssetHandler assertCallback_;
-	core::Module::Handle hSystemHandle_;
-	ICore* pICore_;
+    AssetHandler assertCallback_;
+    core::Module::Handle hSystemHandle_;
+    ICore* pICore_;
 
-	core::MallocFreeAllocator allocator_;
-	CoreArena* pArena_; 
+    core::MallocFreeAllocator allocator_;
+    CoreArena* pArena_;
 };
-

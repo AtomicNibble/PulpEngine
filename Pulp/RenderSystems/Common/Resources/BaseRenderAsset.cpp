@@ -4,15 +4,13 @@
 
 X_NAMESPACE_BEGIN(render)
 
-
 bool XRenderResourceContainer::removeAsset(core::XBaseAsset* pAsset)
 {
-	X_ASSERT_NOT_NULL(pAsset);
+    X_ASSERT_NOT_NULL(pAsset);
 
-	if (XResourceContainer::removeAsset(pAsset))
-	{
-		X_ASSERT_NOT_IMPLEMENTED();
-		/*
+    if (XResourceContainer::removeAsset(pAsset)) {
+        X_ASSERT_NOT_IMPLEMENTED();
+        /*
 		if (gRenDev && gRenDev->rThread())
 			gRenDev->rThread()->RC_ReleaseBaseResource(pAsset);
 		else
@@ -21,10 +19,9 @@ bool XRenderResourceContainer::removeAsset(core::XBaseAsset* pAsset)
 				pAsset->resourceName());
 		}
 		*/
-		return true;
-	}
-	return false;
+        return true;
+    }
+    return false;
 }
-
 
 X_NAMESPACE_END

@@ -16,268 +16,243 @@ template class CVarInt<CVarBaseHeap>;
 
 namespace
 {
+    inline int32_t TextToInt(const char* pStr, int32_t current, bool bitField)
+    {
+        if (!pStr) {
+            return current;
+        }
 
-	inline int32_t TextToInt(const char* pStr, int32_t current, bool bitField)
-	{
-		if (!pStr) {
-			return current;
-		}
+        const size_t strLen = core::strUtil::strlen(pStr);
+        if (!strLen) {
+            return current;
+        }
 
-		const size_t strLen = core::strUtil::strlen(pStr);
-		if (!strLen) {
-			return current;
-		}
+        if (!bitField) {
+            return core::strUtil::StringToInt<int32_t>(pStr, 10);
+        }
 
-		if (!bitField) {
-			return core::strUtil::StringToInt<int32_t>(pStr, 10);
-		}
+        int32_t val = 0;
+        const char* pEnd = nullptr;
 
-		int32_t val = 0;
-		const char* pEnd = nullptr;
+        // Full number
+        val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
 
-		// Full number
-		val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
+        // Check letter codes.
+        if (pEnd) {
+            for (; *pEnd >= 'a' && *pEnd <= 'z'; pEnd++) {
+                val |= core::bitUtil::AlphaBit(*pEnd);
+            }
 
-		// Check letter codes.
-		if (pEnd)
-		{
-			for (; *pEnd >= 'a'&& *pEnd <= 'z'; pEnd++)
-			{
-				val |= core::bitUtil::AlphaBit(*pEnd);
-			}
+            if (*pEnd == '+') {
+                val = current | val;
+            }
+            else if (*pEnd == '-') {
+                val = current & ~val;
+            }
+            else if (*pEnd == '^') {
+                val = current ^ val;
+            }
+        }
 
-			if (*pEnd == '+')
-			{
-				val = current | val;
-			}
-			else if (*pEnd == '-')
-			{
-				val = current & ~val;
-			}
-			else if (*pEnd == '^')
-			{
-				val = current ^ val;
-			}
-		}
+        return val;
+    }
 
-		return val;
-	}
-
-
-} // namespace 
+} // namespace
 
 CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
-	pDesc_(desc),
-	flags_(nFlags),
-	pConsole_(pConsole)
+    pDesc_(desc),
+    flags_(nFlags),
+    pConsole_(pConsole)
 {
-
 }
 
 CVarBase::~CVarBase()
 {
-
 }
 
 void CVarBase::ForceSet(const char* pStr)
 {
-	X_UNUSED(pStr);
+    X_UNUSED(pStr);
 }
 
 void CVarBase::SetDefault(const char* pStr)
 {
-	X_UNUSED(pStr);
+    X_UNUSED(pStr);
 }
 
 ICVar::FlagType CVarBase::GetFlags(void) const
 {
-	return flags_;
+    return flags_;
 }
 
 ICVar::FlagType CVarBase::SetFlags(FlagType flags)
 {
-	flags_ = flags;
-	return flags_;
+    flags_ = flags;
+    return flags_;
 }
 
 void CVarBase::SetModified(void)
 {
-	flags_.Set(VarFlag::MODIFIED);
+    flags_.Set(VarFlag::MODIFIED);
 }
-
 
 const char* CVarBase::GetDesc(void) const
 {
-	return pDesc_;
+    return pDesc_;
 }
 
 void CVarBase::SetDesc(const char* pDesc)
 {
-	pDesc_ = pDesc;
+    pDesc_ = pDesc;
 }
-
 
 void CVarBase::Release(void)
 {
-	this->pConsole_->UnregisterVariable(GetName());
+    this->pConsole_->UnregisterVariable(GetName());
 }
 
 ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 {
-	const bool wasSet = changeFunc_;
+    const bool wasSet = changeFunc_;
 
-	changeFunc_ = changeFunc;
+    changeFunc_ = changeFunc;
 
-	if (!wasSet && flags_.IsSet(VarFlag::MODIFIED)) {
-		changeFunc_.Invoke(this);
-	}
+    if (!wasSet && flags_.IsSet(VarFlag::MODIFIED)) {
+        changeFunc_.Invoke(this);
+    }
 
-	return this;
+    return this;
 }
 
 ConsoleVarFunc CVarBase::GetOnChangeCallback(void) const
 {
-	return changeFunc_;
+    return changeFunc_;
 }
 
 void CVarBase::OnModified(void)
 {
-	flags_.Set(VarFlag::MODIFIED);
+    flags_.Set(VarFlag::MODIFIED);
 
-	if (changeFunc_) {
-		changeFunc_.Invoke(this); // change callback.	
-	}
+    if (changeFunc_) {
+        changeFunc_.Invoke(this); // change callback.
+    }
 }
-
 
 void CVarBase::Reset(void)
 {
-	// nothing to set here :D
+    // nothing to set here :D
 }
 
-
 // ========================================================
-
 
 template<class T>
 void CVarInt<T>::Set(const char* pStr)
 {
-	int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
-	Set(val);
+    Set(val);
 }
-
 
 // ========================================================
 
 void CVarIntRef::Set(const char* pStr)
 {
-	int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
-	Set(val);
+    Set(val);
 }
 
 // ========================================================
 
-
 bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool silent)
 {
-	return Color::fromString(pStr, pStr + strlen(pStr), out, silent);
+    return Color::fromString(pStr, pStr + strlen(pStr), out, silent);
 }
 
 void CVarColRef::Set(const char* pStr)
 {
-	X_ASSERT_NOT_NULL(pStr);
+    X_ASSERT_NOT_NULL(pStr);
 
-	if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
-		return;
-	}
+    if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
+        return;
+    }
 
-	Color col;
-	if (!ColorFromString(pStr, col, false)) {
-		return;
-	}
+    Color col;
+    if (!ColorFromString(pStr, col, false)) {
+        return;
+    }
 
-	// any diffrent?
-	if (ColValue_.compare(col, 0.001f)) {
-		return;
-	}
+    // any diffrent?
+    if (ColValue_.compare(col, 0.001f)) {
+        return;
+    }
 
-	// assign
-	ColValue_ = col;
-	OnModified();
+    // assign
+    ColValue_ = col;
+    OnModified();
 }
-
 
 // ========================================================
 
 bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
 {
-	Vec3f vec;
-	int i;
+    Vec3f vec;
+    int i;
 
-	core::XLexer lex(pStr, pStr + strlen(pStr));
-	core::XLexToken token;
+    core::XLexer lex(pStr, pStr + strlen(pStr));
+    core::XLexToken token;
 
-	for (i = 0; i < 3; i++)
-	{
-		if (lex.ReadToken(token))
-		{
-			if (token.GetType() == TokenType::NUMBER)// && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
-			{
-				vec[i] = token.GetFloatValue();
-			}
-			else
-			{
-				X_ERROR_IF(!Slient, "CVar", "failed to set vec3, invalid input");
-				return false;
-			}
-		}
-		else
-		{
-			if (i == 1)
-			{
-				// we allow all 3 values to be set with 1 val.
-				vec.y = vec.x;
-				vec.z = vec.x;
-				break;
-			}
-			else
-			{
-				X_ERROR_IF(!Slient, "CVar", "failed to set vec3, require either 1 or 3 real numbers");
-				return false;
-			}
-		}
-	}
+    for (i = 0; i < 3; i++) {
+        if (lex.ReadToken(token)) {
+            if (token.GetType() == TokenType::NUMBER) // && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
+            {
+                vec[i] = token.GetFloatValue();
+            }
+            else {
+                X_ERROR_IF(!Slient, "CVar", "failed to set vec3, invalid input");
+                return false;
+            }
+        }
+        else {
+            if (i == 1) {
+                // we allow all 3 values to be set with 1 val.
+                vec.y = vec.x;
+                vec.z = vec.x;
+                break;
+            }
+            else {
+                X_ERROR_IF(!Slient, "CVar", "failed to set vec3, require either 1 or 3 real numbers");
+                return false;
+            }
+        }
+    }
 
-
-	out = vec;
-	return true;
+    out = vec;
+    return true;
 }
 
 void CVarVec3Ref::Set(const char* pStr)
 {
-	X_ASSERT_NOT_NULL(pStr);
+    X_ASSERT_NOT_NULL(pStr);
 
-	if (flags_.IsSet(VarFlag::READONLY)) {
-		return;
-	}
+    if (flags_.IsSet(VarFlag::READONLY)) {
+        return;
+    }
 
-	Vec3f vec;
+    Vec3f vec;
 
-	if (!Vec3FromString(pStr, vec, false)) {
-		return;
-	}
+    if (!Vec3FromString(pStr, vec, false)) {
+        return;
+    }
 
-	// any diffrent?
-	if (Value_.compare(vec, 0.001f)) {
-		return;
-	}
+    // any diffrent?
+    if (Value_.compare(vec, 0.001f)) {
+        return;
+    }
 
-	// assign
-	Value_ = vec;
-	OnModified();
+    // assign
+    Value_ = vec;
+    OnModified();
 }
-
 
 X_NAMESPACE_END

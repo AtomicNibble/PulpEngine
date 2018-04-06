@@ -1,112 +1,99 @@
 #include "EngineCommon.h"
 #include "../MessageBox.h"
 
-
 X_NAMESPACE_BEGIN(core)
-
 
 namespace msgbox
 {
+    namespace
+    {
+        UINT getFlags(StyleFlags style)
+        {
+            UINT flags = 0;
 
-	namespace 
-	{
-		UINT getFlags(StyleFlags style)
-		{
-			UINT flags = 0;
+            if (style.IsSet(Style::Topmost)) {
+                flags |= MB_TOPMOST;
+            }
+            if (style.IsSet(Style::DefaultDesktop)) {
+                flags |= MB_DEFAULT_DESKTOP_ONLY;
+            }
 
-			if (style.IsSet(Style::Topmost))
-			{
-				flags |= MB_TOPMOST;
-			}
-			if (style.IsSet(Style::DefaultDesktop))
-			{
-				flags |= MB_DEFAULT_DESKTOP_ONLY;
-			}
-			
-			return flags;
-		}
+            return flags;
+        }
 
-		UINT getIcon(StyleFlags style)
-		{
-			if (style.IsSet(Style::Info))
-			{
-				return MB_ICONINFORMATION;
-			}
-			if (style.IsSet(Style::Warning))
-			{
-				return MB_ICONWARNING;
-			}
-			if (style.IsSet(Style::Error))
-			{
-				return MB_ICONERROR;
-			}
-			if (style.IsSet(Style::Question))
-			{
-				return MB_ICONQUESTION;
-			}
+        UINT getIcon(StyleFlags style)
+        {
+            if (style.IsSet(Style::Info)) {
+                return MB_ICONINFORMATION;
+            }
+            if (style.IsSet(Style::Warning)) {
+                return MB_ICONWARNING;
+            }
+            if (style.IsSet(Style::Error)) {
+                return MB_ICONERROR;
+            }
+            if (style.IsSet(Style::Question)) {
+                return MB_ICONQUESTION;
+            }
 
-			return MB_ICONINFORMATION;
-		}
+            return MB_ICONINFORMATION;
+        }
 
-		UINT getButtons(Buttons buttons) 
-		{
-			switch (buttons) {
-				case Buttons::OK:
-				case Buttons::Quit: // There is no 'Quit' button on windows :(
-					return MB_OK;
-				case Buttons::OKCancel:
-					return MB_OKCANCEL;
-				case Buttons::YesNo:
-					return MB_YESNO;
-				default:
-					return MB_OK;
-			}
-		}
+        UINT getButtons(Buttons buttons)
+        {
+            switch (buttons) {
+                case Buttons::OK:
+                case Buttons::Quit: // There is no 'Quit' button on windows :(
+                    return MB_OK;
+                case Buttons::OKCancel:
+                    return MB_OKCANCEL;
+                case Buttons::YesNo:
+                    return MB_YESNO;
+                default:
+                    return MB_OK;
+            }
+        }
 
-		Selection getSelection(int32_t response)
-		{
-			switch (response) {
-				case IDOK:
-					return Selection::OK;
-				case IDCANCEL:
-					return Selection::Cancel;
-				case IDYES:
-					return Selection::Yes;
-				case IDNO:
-					return Selection::No;
-				default:
-					return Selection::None;
-			}
-		}
+        Selection getSelection(int32_t response)
+        {
+            switch (response) {
+                case IDOK:
+                    return Selection::OK;
+                case IDCANCEL:
+                    return Selection::Cancel;
+                case IDYES:
+                    return Selection::Yes;
+                case IDNO:
+                    return Selection::No;
+                default:
+                    return Selection::None;
+            }
+        }
 
-	} // namespace
+    } // namespace
 
+    Selection show(const char* pMessage, const char* pTitle, StyleFlags style, Buttons buttons)
+    {
+        UINT flags = MB_TASKMODAL;
 
+        flags |= getIcon(style);
+        flags |= getFlags(style);
+        flags |= getButtons(buttons);
 
-	Selection show(const char* pMessage, const char* pTitle, StyleFlags style, Buttons buttons)
-	{
-		UINT flags = MB_TASKMODAL;
+        return getSelection(MessageBoxA(nullptr, pMessage, pTitle, flags));
+    }
 
-		flags |= getIcon(style);
-		flags |= getFlags(style);
-		flags |= getButtons(buttons);
+    Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons)
+    {
+        UINT flags = MB_TASKMODAL;
 
-		return getSelection(MessageBoxA(nullptr, pMessage, pTitle, flags));
-	}
+        flags |= getIcon(style);
+        flags |= getFlags(style);
+        flags |= getButtons(buttons);
 
-	Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons)
-	{
-		UINT flags = MB_TASKMODAL;
-
-		flags |= getIcon(style);
-		flags |= getFlags(style);
-		flags |= getButtons(buttons);
-
-		return getSelection(MessageBoxW(nullptr, pMessage, pTitle, flags));
-	}
-
+        return getSelection(MessageBoxW(nullptr, pMessage, pTitle, flags));
+    }
 
 } // namespace msgbox
-
 
 X_NAMESPACE_END

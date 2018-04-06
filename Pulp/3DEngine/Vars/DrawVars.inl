@@ -4,107 +4,97 @@ X_NAMESPACE_BEGIN(engine)
 
 X_INLINE int32_t DrawVars::drawFontDebug(void) const
 {
-	return drawFontDebug_;
+    return drawFontDebug_;
 }
 
 X_INLINE int32_t DrawVars::usePortals(void) const
 {
-	return usePortals_;
+    return usePortals_;
 }
-
 
 X_INLINE int32_t DrawVars::drawAreaBounds(void) const
 {
-	return drawAreaBounds_;
+    return drawAreaBounds_;
 }
-
 
 X_INLINE int32_t DrawVars::drawPortals(void) const
 {
-	return drawPortals_;
+    return drawPortals_;
 }
-
 
 X_INLINE int32_t DrawVars::drawArea(void) const
 {
-	return drawArea_;
+    return drawArea_;
 }
-
 
 X_INLINE int32_t DrawVars::drawCurrentAreaOnly(void) const
 {
-	return drawCurrentAreaOnly_;
+    return drawCurrentAreaOnly_;
 }
-
 
 X_INLINE int32_t DrawVars::drawStats(void) const
 {
-	return drawStats_;
+    return drawStats_;
 }
 
 X_INLINE int32_t DrawVars::drawLightDebug(void) const
 {
-	return drawLightDebug_;
+    return drawLightDebug_;
 }
 
 X_INLINE int32_t DrawVars::drawModelBounds(void) const
 {
-	return drawModelBounds_;
+    return drawModelBounds_;
 }
-
 
 X_INLINE int32_t DrawVars::drawModelBones(void) const
 {
-	return drawModelBones_;
+    return drawModelBones_;
 }
 
 X_INLINE int32_t DrawVars::drawModelBoneNames(void) const
 {
-	return drawModelBoneNames_;
+    return drawModelBoneNames_;
 }
 
 X_INLINE int32_t DrawVars::drawPortalStacks(void) const
 {
-	return drawPortalStacks_;
+    return drawPortalStacks_;
 }
 
 X_INLINE int32_t DrawVars::drawDepth(void) const
 {
-	return drawDepth_;
+    return drawDepth_;
 }
 
 X_INLINE int32_t DrawVars::detachCam(void) const
 {
-	return detachCam_;
+    return detachCam_;
 }
 
 X_INLINE float DrawVars::boneNameSize(void) const
 {
-	return boneNameSize_;
+    return boneNameSize_;
 }
-
-
 
 X_INLINE int32_t DrawVars::cullEnts(void) const
 {
-	return cullEnts_;
+    return cullEnts_;
 }
 
 X_INLINE Colorf DrawVars::boneColor(void) const
 {
-	return boneCol_;
+    return boneCol_;
 }
 
 X_INLINE Colorf DrawVars::boneNameColor(void) const
 {
-	return boneNameCol_;
+    return boneNameCol_;
 }
 
 X_INLINE Vec3f DrawVars::boneNameOffset(void) const
 {
-	return boneNameOffset_;
+    return boneNameOffset_;
 }
-
-
 
 X_NAMESPACE_END

@@ -4,19 +4,17 @@ X_NAMESPACE_BEGIN(render)
 
 X_INLINE ID3D12CommandQueue* CommandQue::getCommandQueue(void)
 {
-	return pCommandQueue_;
+    return pCommandQueue_;
 }
 
 X_INLINE uint64_t CommandQue::getNextFenceValue(void) const
 {
-	return nextFenceValue_;
+    return nextFenceValue_;
 }
 
 X_INLINE void CommandQue::waitForIdle(void)
 {
-	waitForFence(incrementFence());
+    waitForFence(incrementFence());
 }
-
-
 
 X_NAMESPACE_END

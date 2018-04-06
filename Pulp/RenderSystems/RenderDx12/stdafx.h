@@ -5,7 +5,6 @@
 #include <Containers\Fifo.h>
 #include <Containers\Array.h>
 
-
 #define IPRENDER_EXPORTS
 
 #include <IRender.h>
@@ -28,16 +27,13 @@ X_ENABLE_WARNING(4005)
 #include "Util/DxTypeHelpers.h"
 #include "Util/DebugNameUtil.h"
 
-
 X_LINK_LIB("D3D12.lib")
 X_LINK_LIB("dxgi.lib")
 X_LINK_LIB("dxguid")
 X_LINK_LIB("d3dcompiler.lib")
 
-
 // pickle lib.
 #include <../../tools/ShaderLib/ShaderLib.h>
-
 
 X_LINK_ENGINE_LIB("ImgLib");
 X_LINK_ENGINE_LIB("ShaderLib");
@@ -48,7 +44,6 @@ extern core::MemoryArenaBase* g_rendererArena;
 extern core::MemoryArenaBase* g_textureDataArena;
 
 X_NAMESPACE_END
-
 
 /*
 

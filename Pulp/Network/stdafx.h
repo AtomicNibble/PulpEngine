@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include <EngineCommon.h>
-
 
 #include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
 #include "Memory\MemoryTaggingPolicies\NoMemoryTagging.h"
@@ -10,18 +8,19 @@
 #include "Memory\ThreadPolicies\MultiThreadPolicy.h"
 
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::MultiThreadPolicy<core::Spinlock>,
+    core::MallocFreeAllocator,
+    core::MultiThreadPolicy<core::Spinlock>,
 #if X_DEBUG
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_DEBUG
-> NetworkArena;
+    >
+    NetworkArena;
 
 extern NetworkArena* g_NetworkArena;
 
@@ -32,7 +31,6 @@ X_NAMESPACE_BEGIN(net)
 
 namespace platform
 {
-
 #if X_PLATFORM_WIN32
 
 #ifndef NEAR
@@ -43,13 +41,10 @@ namespace platform
 #define FAR
 #endif
 
-
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 
-
-X_LINK_LIB("Ws2_32.lib");
-
+    X_LINK_LIB("Ws2_32.lib");
 
 #endif // X_PLATFORM_WIN32
 
@@ -61,10 +56,7 @@ X_NAMESPACE_END
 
 #include <Containers\FixedBitStream.h>
 
-
 #include "Util\Config.h"
 #include "Util\SystemAddressEx.h"
 #include "Util\Constants.h"
 #include "Util\LastError.h"
-
-

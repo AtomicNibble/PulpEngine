@@ -97,8 +97,7 @@ X_DECLARE_ENUM8(AnimType)
     RELATIVE,
     ABSOLUTE,
     ADDITIVE,
-    DELTA
-);
+    DELTA);
 
 X_DECLARE_FLAGS8(AnimFlag)
 (
@@ -115,8 +114,7 @@ X_DECLARE_FLAGS8(BoneFlag)
     AngFullFrame,
     // if frame numbers are 16bit
     PosLargeFrames,
-    AngLargeFrames
-);
+    AngLargeFrames);
 
 typedef Flags8<BoneFlag> BoneFlags;
 

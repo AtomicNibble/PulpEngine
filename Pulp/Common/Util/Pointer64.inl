@@ -1,65 +1,66 @@
 
 template<typename T>
-Pointer64<T>::Pointer64() : raw_(0) 
+Pointer64<T>::Pointer64() :
+    raw_(0)
 {
-	static_assert(!std::is_pointer<T>::value, "Pointer64: type must not be a pointer");
-
+    static_assert(!std::is_pointer<T>::value, "Pointer64: type must not be a pointer");
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator=(size_t val) 
+Pointer64<T>& Pointer64<T>::operator=(size_t val)
 {
-	raw_ = static_cast<uint64_t>(val);
-	return *this;
+    raw_ = static_cast<uint64_t>(val);
+    return *this;
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator = (T* p)
+Pointer64<T>& Pointer64<T>::operator=(T* p)
 {
-	raw_ = reinterpret_cast<uint64_t>(p);
-	return *this;
+    raw_ = reinterpret_cast<uint64_t>(p);
+    return *this;
 }
 
 template<typename T>
 Pointer64<T>::operator T*() const
 {
-	return (T*)raw_;
+    return (T*)raw_;
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator +=(const Pointer64<T>& oth)
+Pointer64<T>& Pointer64<T>::operator+=(const Pointer64<T>& oth)
 {
-	raw_ = (uint64_t)(((T*)raw_) + ((T*)oth.raw_));
-	return *this;
+    raw_ = (uint64_t)(((T*)raw_) + ((T*)oth.raw_));
+    return *this;
 }
 
 template<>
-Pointer64<void>& Pointer64<void>::operator +=(const Pointer64<void>& oth)
+Pointer64<void>& Pointer64<void>::operator+=(const Pointer64<void>& oth)
 {
-	raw_ = raw_ + oth.raw_;
-	return *this;
+    raw_ = raw_ + oth.raw_;
+    return *this;
 }
 
 template<typename T>
 template<typename Type>
 Type* Pointer64<T>::as(void) const
 {
-	return reinterpret_cast<Type*>(raw_);
+    return reinterpret_cast<Type*>(raw_);
 }
 
 template<typename T>
 void* Pointer64<T>::asVoid(void) const
 {
-	return as<void>();
-}
-
-
-template<typename T>
-const T* Pointer64<T>::operator[](size_t i) const {
-	return (as<T>() + i);
+    return as<void>();
 }
 
 template<typename T>
-T* Pointer64<T>::operator[](size_t i) {
-	return (as<T>() + i);
+const T* Pointer64<T>::operator[](size_t i) const
+{
+    return (as<T>() + i);
+}
+
+template<typename T>
+T* Pointer64<T>::operator[](size_t i)
+{
+    return (as<T>() + i);
 }

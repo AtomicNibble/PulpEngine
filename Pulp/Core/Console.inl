@@ -1,44 +1,42 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
-X_INLINE void XConsole::ShowConsole(consoleState::Enum state) 
+X_INLINE void XConsole::ShowConsole(consoleState::Enum state)
 {
-	if (state == consoleState::CLOSED) {
-		ResetHistoryPos();
-	}
+    if (state == consoleState::CLOSED) {
+        ResetHistoryPos();
+    }
 
-	consoleState_ = state;
+    consoleState_ = state;
 }
 
-X_INLINE bool XConsole::isVisable(void) const 
+X_INLINE bool XConsole::isVisable(void) const
 {
-	return consoleState_ != consoleState::CLOSED;
+    return consoleState_ != consoleState::CLOSED;
 }
 
-X_INLINE bool XConsole::isExpanded(void) const 
+X_INLINE bool XConsole::isExpanded(void) const
 {
-	return consoleState_ == consoleState::EXPANDED;
+    return consoleState_ == consoleState::EXPANDED;
 }
 
-X_INLINE void XConsole::ToggleConsole(bool expand) 
+X_INLINE void XConsole::ToggleConsole(bool expand)
 {
-	if (isVisable()) {
-		consoleState_ = consoleState::CLOSED;
-		ResetHistoryPos();
-	}
-	else {
-		if (expand)
-			consoleState_ = consoleState::EXPANDED;
-		else
-			consoleState_ = consoleState::OPEN;
-	}
+    if (isVisable()) {
+        consoleState_ = consoleState::CLOSED;
+        ResetHistoryPos();
+    }
+    else {
+        if (expand)
+            consoleState_ = consoleState::EXPANDED;
+        else
+            consoleState_ = consoleState::OPEN;
+    }
 }
 
 X_INLINE bool XConsole::isAutocompleteVis(void)
 {
-	return autoCompleteNum_ > 0;
+    return autoCompleteNum_ > 0;
 }
-
 
 X_NAMESPACE_END

@@ -19,38 +19,33 @@ X_NAMESPACE_BEGIN(core)
 class SimpleMemoryTracking
 {
 public:
-	/// A human-readable string literal containing the policy's type.
-	static const char* const TYPE_NAME;
+    /// A human-readable string literal containing the policy's type.
+    static const char* const TYPE_NAME;
 
-	/// Defines the amount of overhead that each allocation causes.
-	static const size_t PER_ALLOCATION_OVERHEAD = 0;
+    /// Defines the amount of overhead that each allocation causes.
+    static const size_t PER_ALLOCATION_OVERHEAD = 0;
 
-	/// Default constructor.
-	SimpleMemoryTracking(void);
+    /// Default constructor.
+    SimpleMemoryTracking(void);
 
-	/// Default destructor, reporting the number of detected leaks.
-	~SimpleMemoryTracking(void);
+    /// Default destructor, reporting the number of detected leaks.
+    ~SimpleMemoryTracking(void);
 
-	/// Increases the internal counter.
-	inline void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset
-		X_MEM_HUMAN_IDS_CB(const char* ID)
-		X_MEM_HUMAN_IDS_CB(const char* typeName)
-		X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
-		const char* memoryArenaName);
+    /// Increases the internal counter.
+    inline void OnAllocation(void* memory, size_t originalSize, size_t internalSize, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo),
+        const char* memoryArenaName);
 
-	/// Decreases the internal counter.
-	inline void OnDeallocation(void* memory);
+    /// Decreases the internal counter.
+    inline void OnDeallocation(void* memory);
 
 private:
-	unsigned int numAllocations_;
+    unsigned int numAllocations_;
 };
 
 #include "SimpleMemoryTracking.inl"
 
 X_NAMESPACE_END
 
-
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-
 
 #endif // !X_SIMPLEMEMORYTRACKING_H_

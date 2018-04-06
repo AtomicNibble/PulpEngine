@@ -3,7 +3,6 @@
 #ifndef X_MULTITHREADPOLICY_H
 #define X_MULTITHREADPOLICY_H
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Memory
@@ -24,28 +23,26 @@ X_NAMESPACE_BEGIN(core)
 ///   typedef core::MemoryArena<core::PoolAllocator, ThreadSafePolicy, core::SimpleBoundsChecking, core::SimpleMemoryTracking, core::SimpleMemoryTagging> PoolArena;
 /// \endcode
 /// \sa SingleThreadPolicy
-template <class SynchronizationPrimitive>
+template<class SynchronizationPrimitive>
 class MultiThreadPolicy
 {
 public:
-	/// A human-readable string literal containing the policy's type.
-	static const char* const TYPE_NAME;
-	static const bool IS_THREAD_SAFE = true;
+    /// A human-readable string literal containing the policy's type.
+    static const char* const TYPE_NAME;
+    static const bool IS_THREAD_SAFE = true;
 
+    /// Enters the synchronization primitive.
+    inline void Enter(void);
 
-	/// Enters the synchronization primitive.
-	inline void Enter(void);
-
-	/// Leaves the synchronization primitive.
-	inline void Leave(void);
+    /// Leaves the synchronization primitive.
+    inline void Leave(void);
 
 private:
-	SynchronizationPrimitive primitive_;
+    SynchronizationPrimitive primitive_;
 };
 
 #include "MultiThreadPolicy.inl"
 
 X_NAMESPACE_END
-
 
 #endif

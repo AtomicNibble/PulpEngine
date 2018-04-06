@@ -2,22 +2,19 @@
 #include "StringRange.h"
 #include "StringTokenizer.h"
 
-
 X_NAMESPACE_BEGIN(core)
-
-
 
 /// \brief Constructs a string tokenizer for the given range of characters.
 /// \remark Ownership of the provided arguments stays at the calling site.
 template<typename TChar>
 StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar* endExclusive,
-	TChar delimiter) :
-	start_(startInclusive), 
-	end_(endExclusive), 
-	delimiter_(delimiter)
+    TChar delimiter) :
+    start_(startInclusive),
+    end_(endExclusive),
+    delimiter_(delimiter)
 {
-  while ( *start_ == delimiter && start_ < end_ )
-    ++start_;
+    while (*start_ == delimiter && start_ < end_)
+        ++start_;
 }
 
 /// \brief Tries to extract the next token, and returns whether a token could be found or not.
@@ -25,50 +22,46 @@ StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar
 template<typename TChar>
 bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
 {
-	 bool result = false;
+    bool result = false;
 
-	 const TChar *lastNonWhitespace;
-	 const TChar *nonWhitespace;
-	 const TChar *tokenEnd;
-	 const TChar *tokenBegin;
-	 const TChar* lastnon;
+    const TChar* lastNonWhitespace;
+    const TChar* nonWhitespace;
+    const TChar* tokenEnd;
+    const TChar* tokenBegin;
+    const TChar* lastnon;
 
-	 if ( start_ < end_ )
-	 {
-		 tokenBegin = this->start_;
+    if (start_ < end_) {
+        tokenBegin = this->start_;
 
-		 while (*this->start_ != this->delimiter_ && this->start_ < this->end_)
-			 ++this->start_;
+        while (*this->start_ != this->delimiter_ && this->start_ < this->end_)
+            ++this->start_;
 
-		 tokenEnd = this->start_;
+        tokenEnd = this->start_;
 
-		 while (*this->start_ == this->delimiter_ && this->start_ < this->end_)
-			 ++this->start_;
+        while (*this->start_ == this->delimiter_ && this->start_ < this->end_)
+            ++this->start_;
 
-		 nonWhitespace = strUtil::FindNonWhitespace(tokenBegin, tokenEnd);
+        nonWhitespace = strUtil::FindNonWhitespace(tokenBegin, tokenEnd);
 
-		 if ( nonWhitespace )
-			 tokenBegin = nonWhitespace;
+        if (nonWhitespace)
+            tokenBegin = nonWhitespace;
 
-		 lastnon = strUtil::FindLastNonWhitespace(tokenBegin, tokenEnd);
+        lastnon = strUtil::FindLastNonWhitespace(tokenBegin, tokenEnd);
 
-		 lastNonWhitespace = lastnon + 1;
+        lastNonWhitespace = lastnon + 1;
 
-		 if ( lastnon != nullptr )
-			 tokenEnd = lastNonWhitespace;
-	
-		 range = StringRange<TChar>(tokenBegin, tokenEnd);
+        if (lastnon != nullptr)
+            tokenEnd = lastNonWhitespace;
 
-		 result = true;
-	 }
+        range = StringRange<TChar>(tokenBegin, tokenEnd);
 
-	 return result;
+        result = true;
+    }
+
+    return result;
 }
-
 
 template class StringTokenizer<char>;
 template class StringTokenizer<wchar_t>;
-
-
 
 X_NAMESPACE_END

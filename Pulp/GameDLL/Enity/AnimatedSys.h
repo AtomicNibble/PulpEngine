@@ -1,33 +1,26 @@
 #pragma once
 
-
 X_NAMESPACE_DECLARE(core,
-	struct FrameTimeData;
-)
+                    struct FrameTimeData;)
 
 X_NAMESPACE_DECLARE(engine,
-	struct IWorld3D;
-)
-
+                    struct IWorld3D;)
 
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
+    class AnimatedSystem
+    {
+    public:
+        AnimatedSystem();
 
-	class AnimatedSystem
-	{
-	public:
-		AnimatedSystem();
+        bool init(void);
+        void update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene);
 
-		bool init(void);
-		void update(core::FrameTimeData& time, EnitiyRegister& reg, engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene);
+    private:
+    };
 
-
-	private:
-
-	};
-
-}
+} // namespace entity
 
 X_NAMESPACE_END

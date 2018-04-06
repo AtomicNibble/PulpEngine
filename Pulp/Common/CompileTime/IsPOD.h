@@ -9,14 +9,13 @@ X_NAMESPACE_BEGIN(core)
 
 namespace compileTime
 {
-	template <typename T>
-	struct IsPOD
-	{
-		static const bool Value = std::is_pod<T>::value;
-	}; 
-}
+    template<typename T>
+    struct IsPOD
+    {
+        static const bool Value = std::is_pod<T>::value;
+    };
+} // namespace compileTime
 
 X_NAMESPACE_END
-
 
 #endif // !X_ISPOD_H_

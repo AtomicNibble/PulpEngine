@@ -7,24 +7,24 @@ X_NAMESPACE_BEGIN(core)
 
 struct XProcessMemInfo
 {
-	uint64 PageFaultCount;
-	uint64 PeakWorkingSetSize;
-	uint64 WorkingSetSize;
-	uint64 QuotaPeakPagedPoolUsage;
-	uint64 QuotaPagedPoolUsage;
-	uint64 QuotaPeakNonPagedPoolUsage;
-	uint64 QuotaNonPagedPoolUsage;
-	uint64 PagefileUsage;
-	uint64 PeakPagefileUsage;
+    uint64 PageFaultCount;
+    uint64 PeakWorkingSetSize;
+    uint64 WorkingSetSize;
+    uint64 QuotaPeakPagedPoolUsage;
+    uint64 QuotaPagedPoolUsage;
+    uint64 QuotaPeakNonPagedPoolUsage;
+    uint64 QuotaNonPagedPoolUsage;
+    uint64 PagefileUsage;
+    uint64 PeakPagefileUsage;
 
-	uint64 TotalPhysicalMemory;
-	int64  FreePhysicalMemory;
+    uint64 TotalPhysicalMemory;
+    int64 FreePhysicalMemory;
 
-	uint64 TotalVideoMemory;
-	int64  FreeVideoMemory;
+    uint64 TotalVideoMemory;
+    int64 FreeVideoMemory;
 };
 
-bool GetProcessMemInfo(XProcessMemInfo &minfo);
+bool GetProcessMemInfo(XProcessMemInfo& minfo);
 
 X_NAMESPACE_END
 

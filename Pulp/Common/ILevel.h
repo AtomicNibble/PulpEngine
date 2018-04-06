@@ -328,14 +328,12 @@ X_DECLARE_FLAGS(MatContentFlags)
     NO_FALL_DMG,
     DETAIL,
     STRUCTURAL,
-    ORIGIN
-);
+    ORIGIN);
 
 X_DECLARE_FLAGS(MatSurfaceFlags)
 (
     NO_DRAW,
-    LADDER
-);
+    LADDER);
 
 // this is the flags for the file header, which tells you what option stuff is inside the file.
 X_DECLARE_FLAGS(LevelFileFlag)
@@ -346,22 +344,19 @@ X_DECLARE_FLAGS(LevelFileFlag)
     OCT_TREE,
     DEBUG_PORTAL_DATA,
     COLLISION,
-    COMPRESSED
-);
+    COMPRESSED);
 
 typedef Flags<LevelFileFlag> LevelFileFlags;
 
 X_DECLARE_ENUM(SurfaceType)
 (
-    Invalid, 
-    Plane, 
-    Patch
-);
+    Invalid,
+    Plane,
+    Patch);
 X_DECLARE_ENUM(Side)
 (
-    FRONT, 
-    BACK
-);
+    FRONT,
+    BACK);
 
 typedef Flags<MatContentFlags> MatContentFlag;
 typedef Flags<MatSurfaceFlags> MatSurfaceFlag;
@@ -446,8 +441,7 @@ X_DECLARE_ENUM(FileNodes)
     BSP_TREE,
     ENTITIES,
     LIGHTS_STATIC,
-    LIGHTS_DYNAMIC
-);
+    LIGHTS_DYNAMIC);
 
 struct EnityInfoHdr
 {
@@ -491,8 +485,7 @@ X_DECLARE_ENUM8(CollisionDataType)
     TriMesh,
     ConvexMesh,
     HeightField,
-    Aabb
-);
+    Aabb);
 
 X_PACK_PUSH(1)
 
@@ -530,8 +523,7 @@ X_ENSURE_SIZE(AreaCollisionDataHdr, 2);
 X_DECLARE_ENUM8(LightType)
 (
     Point,
-    Spot
-);
+    Spot);
 
 struct Light
 {

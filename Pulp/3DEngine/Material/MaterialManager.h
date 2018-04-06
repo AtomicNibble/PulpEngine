@@ -9,20 +9,19 @@
 
 #include "Vars\MaterialVars.h"
 
-X_NAMESPACE_DECLARE(core, 
-	namespace V2 {
-		struct Job;
-		class JobSystem;
-	}
+X_NAMESPACE_DECLARE(core,
+                    namespace V2 {
+                        struct Job;
+                        class JobSystem;
+                    }
 
-	struct IConsoleCmdArgs;
-)
+                    struct IConsoleCmdArgs;)
 
 X_NAMESPACE_BEGIN(engine)
 
 namespace techset
 {
-	class TechSetDefs;
+    class TechSetDefs;
 
 } // namespace techset
 
@@ -31,102 +30,98 @@ class TechDefStateManager;
 class CBufferManager;
 class Material;
 
-
-class XMaterialManager : 
-	public IMaterialManager, 
-	public ICoreEventListener, 
-	public core::IXHotReload,
-	private core::IAssetLoadSink
+class XMaterialManager : public IMaterialManager
+    , public ICoreEventListener
+    , public core::IXHotReload
+    , private core::IAssetLoadSink
 {
-	typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
-	typedef MaterialContainer::Resource MaterialResource;
+    typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
+    typedef MaterialContainer::Resource MaterialResource;
 
-	typedef core::Array<Material*> MaterialArr;
+    typedef core::Array<Material*> MaterialArr;
 
 public:
-	XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
-	virtual ~XMaterialManager();
+    XMaterialManager(core::MemoryArenaBase* arena, VariableStateManager& vsMan, CBufferManager& cBufMan);
+    virtual ~XMaterialManager();
 
-	void registerCmds(void);
-	void registerVars(void);
+    void registerCmds(void);
+    void registerVars(void);
 
-	bool init(void);
-	void shutDown(void);
+    bool init(void);
+    void shutDown(void);
 
-	bool asyncInitFinalize(void);
+    bool asyncInitFinalize(void);
 
-	// IMaterialManager
-	Material* findMaterial(const char* pMtlName) const X_FINAL;
-	Material* loadMaterial(const char* pMtlName) X_FINAL;
-	Material* getDefaultMaterial(void) const X_FINAL;
-	
-	// returns true if load succeed.
-	bool waitForLoad(core::AssetBase* pMaterial) X_FINAL; 
-	bool waitForLoad(Material* pMaterial) X_FINAL; 
-	void releaseMaterial(Material* pMat);
+    // IMaterialManager
+    Material* findMaterial(const char* pMtlName) const X_FINAL;
+    Material* loadMaterial(const char* pMtlName) X_FINAL;
+    Material* getDefaultMaterial(void) const X_FINAL;
 
-	Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt, 
-		PermatationFlags permFlags = PermatationFlags()) X_FINAL;
-	bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
-	
-	bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_FINAL;
-	void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
+    // returns true if load succeed.
+    bool waitForLoad(core::AssetBase* pMaterial) X_FINAL;
+    bool waitForLoad(Material* pMaterial) X_FINAL;
+    void releaseMaterial(Material* pMat);
 
-	TechDefPerm* getCodeTech(const core::string& name, core::StrHash techName, render::shader::VertexFormat::Enum,
-		PermatationFlags permFlags = PermatationFlags());
+    Material::Tech* getTechForMaterial(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
+        PermatationFlags permFlags = PermatationFlags()) X_FINAL;
+    bool setTextureID(Material* pMat, Material::Tech* pTech, core::StrHash texNameHash, texture::TexID id) X_FINAL;
 
-	// ~IMaterialManager
-	void listMaterials(const char* pSearchPatten = nullptr) const;
+    bool setRegisters(MaterialTech* pTech, const RegisterCtx& regs) X_FINAL;
+    void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
 
-private:
-	void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
+    TechDefPerm* getCodeTech(const core::string& name, core::StrHash techName, render::shader::VertexFormat::Enum,
+        PermatationFlags permFlags = PermatationFlags());
 
-	Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
-		PermatationFlags permFlags);
+    // ~IMaterialManager
+    void listMaterials(const char* pSearchPatten = nullptr) const;
 
 private:
-	bool initDefaults(void);
-	void freeDangling(void);
-	void releaseResources(Material* pMat);
+    void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
 
-	void addLoadRequest(MaterialResource* pMaterial);
-	void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
-	bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
-
-	bool processData(Material* pMaterial, core::XFile* pFile);
+    Material::Tech* getTechForMaterial_int(Material* pMat, core::StrHash hash, render::shader::VertexFormat::Enum vrtFmt,
+        PermatationFlags permFlags);
 
 private:
-	// ICoreEventListener
-	virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
-	// ~ICoreEventListener
+    bool initDefaults(void);
+    void freeDangling(void);
+    void releaseResources(Material* pMat);
 
-	// IXHotReload
-	virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-	// ~IXHotReload
+    void addLoadRequest(MaterialResource* pMaterial);
+    void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+    bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
-private:
-	void Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd);
-
+    bool processData(Material* pMaterial, core::XFile* pFile);
 
 private:
-	core::MemoryArenaBase* arena_;
-	core::MemoryArenaBase* blockArena_;
+    // ICoreEventListener
+    virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
+    // ~ICoreEventListener
 
-	core::AssetLoader* pAssetLoader_;
+    // IXHotReload
+    virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+    // ~IXHotReload
 
-	CBufferManager& cBufMan_;
-	VariableStateManager& vsMan_;
-	TechDefStateManager* pTechDefMan_;
+private:
+    void Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd);
 
-	MaterialVars vars_;
-	MaterialContainer materials_;
+private:
+    core::MemoryArenaBase* arena_;
+    core::MemoryArenaBase* blockArena_;
 
-	Material* pDefaultMtl_;
+    core::AssetLoader* pAssetLoader_;
 
-	core::CriticalSection failedLoadLock_;
-	MaterialArr failedLoads_;
+    CBufferManager& cBufMan_;
+    VariableStateManager& vsMan_;
+    TechDefStateManager* pTechDefMan_;
+
+    MaterialVars vars_;
+    MaterialContainer materials_;
+
+    Material* pDefaultMtl_;
+
+    core::CriticalSection failedLoadLock_;
+    MaterialArr failedLoads_;
 };
-
 
 X_NAMESPACE_END
 

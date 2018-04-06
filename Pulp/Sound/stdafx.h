@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <EngineCommon.h>
 
 #define IPSOUND_EXPORTS
@@ -10,7 +9,6 @@
 #include "IPSound.h"
 
 extern core::MemoryArenaBase* g_SoundArena;
-
 
 X_DISABLE_WARNING(4505)
 
@@ -22,10 +20,7 @@ X_DISABLE_WARNING(4505)
 // Music engine
 #include <AK/MusicEngine/Common/AkMusicEngine.h>
 
-
-
 X_ENABLE_WARNING(4505)
-
 
 #include "Util\Constants.h"
 #include "Util\TypeHelpers.h"

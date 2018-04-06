@@ -3,7 +3,6 @@
 #ifndef X_PREPROCESSORTOBOOL_H
 #define X_PREPROCESSORTOBOOL_H
 
-
 #define X_PP_TO_BOOL_false 0
 #define X_PP_TO_BOOL_true 1
 #define X_PP_TO_BOOL_0 0
@@ -24,7 +23,6 @@
 #define X_PP_TO_BOOL_15 1
 #define X_PP_TO_BOOL_16 1
 
-
 /// \def X_PP_TO_BOOL
 /// \ingroup Preprocessor
 /// \brief Converts a condition into either 1 if the condition is true, or 0 otherwise.
@@ -40,7 +38,6 @@
 ///   X_PP_TO_BOOL(2)				outputs 1
 ///   X_PP_TO_BOOL(3)				outputs 1
 /// \endcode
-#define X_PP_TO_BOOL(x)		X_PP_JOIN_2(X_PP_TO_BOOL_, x)
-
+#define X_PP_TO_BOOL(x) X_PP_JOIN_2(X_PP_TO_BOOL_, x)
 
 #endif

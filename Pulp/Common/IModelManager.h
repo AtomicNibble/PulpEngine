@@ -25,7 +25,8 @@ struct IModelManager : public core::IAssetLoader
 
 X_INLINE bool IModelManager::waitForLoad(core::AssetBase* pModel)
 {
-    X_ASSERT(pModel->getType() == assetDb::AssetType::MODEL, "Invalid asset passed")();
+    X_ASSERT(pModel->getType() == assetDb::AssetType::MODEL, "Invalid asset passed")
+    ();
 
     if (pModel->isLoaded()) {
         return true;

@@ -3,7 +3,6 @@
 #ifndef X_INVALIDPARAMETERHANDLER_H_
 #define X_INVALIDPARAMETERHANDLER_H_
 
-
 X_NAMESPACE_BEGIN(core)
 
 /// \ingroup Debugging
@@ -24,19 +23,18 @@ X_NAMESPACE_BEGIN(core)
 /// \sa abortHandler exceptionHandler pureVirtualFunctionCallHandler
 namespace invalidParameterHandler
 {
-	/// A custom exception code recognized by the exception handler.
-	static const DWORD EXCEPTION_CODE = 0xE000000D;
+    /// A custom exception code recognized by the exception handler.
+    static const DWORD EXCEPTION_CODE = 0xE000000D;
 
-	/// \brief Starts the abort handler.
-	/// \remark This is called automatically when starting the Core module.
-	void Startup(void);
+    /// \brief Starts the abort handler.
+    /// \remark This is called automatically when starting the Core module.
+    void Startup(void);
 
-	/// \brief Shuts down the abort handler.
-	/// \remark This is called automatically when shutting down the Core module.
-	void Shutdown(void);
-}
+    /// \brief Shuts down the abort handler.
+    /// \remark This is called automatically when shutting down the Core module.
+    void Shutdown(void);
+} // namespace invalidParameterHandler
 
 X_NAMESPACE_END
-
 
 #endif // X_INVALIDPARAMETERHANDLER_H_

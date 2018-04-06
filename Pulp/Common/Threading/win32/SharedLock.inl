@@ -1,53 +1,48 @@
 
 X_NAMESPACE_BEGIN(core)
 
-
 SharedLock::SharedLock()
 {
-	InitializeSRWLock(&smtx_);
+    InitializeSRWLock(&smtx_);
 }
 
 SharedLock::~SharedLock()
 {
-
 }
 
 void SharedLock::Enter(void)
 {
-	AcquireSRWLockExclusive(&smtx_);
+    AcquireSRWLockExclusive(&smtx_);
 }
 
 bool SharedLock::TryEnter(void)
 {
-	return TryAcquireSRWLockExclusive(&smtx_) != 0;
+    return TryAcquireSRWLockExclusive(&smtx_) != 0;
 }
 
 void SharedLock::Leave(void)
 {
-	ReleaseSRWLockExclusive(&smtx_);
+    ReleaseSRWLockExclusive(&smtx_);
 }
-
 
 void SharedLock::EnterShared(void)
 {
-	AcquireSRWLockShared(&smtx_);
+    AcquireSRWLockShared(&smtx_);
 }
 
 bool SharedLock::TryEnterShared(void)
 {
-	return TryAcquireSRWLockShared(&smtx_) != 0;
+    return TryAcquireSRWLockShared(&smtx_) != 0;
 }
 
 void SharedLock::LeaveShared(void)
 {
-	ReleaseSRWLockShared(&smtx_);
+    ReleaseSRWLockShared(&smtx_);
 }
-
 
 SRWLOCK* SharedLock::GetNativeObject(void)
 {
-	return &smtx_;
+    return &smtx_;
 }
-
 
 X_NAMESPACE_END
