@@ -283,7 +283,7 @@ bool GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::SLoad(X
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::
     GrowingStringTableUnique(core::MemoryArenaBase* arena) :
-    GrowingStringTable(arena)
+    BaseT(arena)
 {
     LongestStr_ = 0;
     NumNodes_ = 0;
@@ -298,9 +298,9 @@ GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::~Growi
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::free(void)
 {
-    GrowingStringTable::free();
+    BaseT::free();
 
-    searchTree_.free(arena_);
+    searchTree_.free(BaseT::arena_);
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
@@ -336,7 +336,7 @@ void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::A
     int c;
     while ((c = *Txt++)) {
         if (node->chars[c] == nullptr) {
-            node->chars[c] = X_NEW(Node, arena_, "GSTNode");
+            node->chars[c] = X_NEW(Node, BaseT::arena_, "GSTNode");
             NumNodes_++;
         }
         node = node->chars[c];
