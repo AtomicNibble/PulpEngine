@@ -314,8 +314,9 @@ template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename I
 IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::addStringUnqiue(const char* Str, size_t Len)
 {
     IdType id;
-    if (FindString(Str, Len, id))
+    if (FindString(Str, Len, id)) {
         return id;
+    }
 
     // Update longest string
     LongestStr_ = core::Max(LongestStr_, Len);
@@ -347,8 +348,9 @@ void GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::A
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 bool GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>::FindString(const char* Str, size_t Len, IdType& id)
 {
-    if (Len > LongestStr_) // we can skip checking for strings longer then any in the table.
+    if (Len > LongestStr_) { // we can skip checking for strings longer then any in the table.
         return false;
+    }
 
     Node* node = &searchTree_;
     const char* Txt = Str;
