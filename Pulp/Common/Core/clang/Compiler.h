@@ -27,11 +27,7 @@
 
 #define X_INTRINSIC(func)
 
-#define X_DISABLE_EMPTY_FILE_WARNING     \
-    namespace                            \
-    {                                    \
-        char NoEmptyFileDummy##__LINE__; \
-    }
+#define X_DISABLE_EMPTY_FILE_WARNING        
 
 #define X_RESTRICT                          __restrict
 #define X_RESTRICT_RV                       __declspec(restrict)
