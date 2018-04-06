@@ -70,7 +70,7 @@ public:
 
     void Update(void) X_FINAL;
 
-    IScript* findScript(const char* pFileName);
+    IScript* findScript(const char* pFileName) X_FINAL;
     IScript* loadScript(const char* pFileName) X_FINAL;
 
     bool waitForLoad(core::AssetBase* pScript) X_FINAL;
