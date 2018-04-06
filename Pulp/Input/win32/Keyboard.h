@@ -42,7 +42,7 @@ public:
     X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
     // ~IInputDevice
 
-    void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame);
+    void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_OVERRIDE;
 
 private:
     void initAsciiCache(void);
