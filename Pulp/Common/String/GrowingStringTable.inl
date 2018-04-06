@@ -30,7 +30,7 @@ template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename I
 void GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::reserve(size_t numBlocks)
 {
     if (numBlocks > currentBlockSpace_) {
-        ensureFreeBlocks(numblocks - currentBlockSpace_);
+        ensureFreeBlocks(numBlocks - currentBlockSpace_);
     }
 }
 
