@@ -4,12 +4,10 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-
-
-	X_INLINE void ShaderBin::setCompressionLvl(core::Compression::CompressLevel::Enum lvl)
-	{
-		compLvl_ = lvl;
-	}
+    X_INLINE void ShaderBin::setCompressionLvl(core::Compression::CompressLevel::Enum lvl)
+    {
+        compLvl_ = lvl;
+    }
 
 } // namespace shader
 
