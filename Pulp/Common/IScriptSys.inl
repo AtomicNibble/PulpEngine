@@ -401,7 +401,7 @@ X_INLINE void IScriptTable::setValue(int idx, const T& value)
 template<class T>
 X_INLINE void IScriptTable::setValueChain(const char* pKey, const T& value)
 {
-    return setValueAny(idx, value, true);
+    return setValueAny(pKey, value, true);
 }
 
 //	 Gets value of a table member.
@@ -423,7 +423,7 @@ template<class T>
 X_INLINE bool IScriptTable::getValueChain(const char* pKey, T& value)
 {
     ScriptValue any(ValueType<T>::Type);
-    return getValueAny(idx, any, true) && any.copyTo(value);
+    return getValueAny(pKey, any, true) && any.copyTo(value);
 }
 
 X_INLINE bool IScriptTable::haveValue(const char* pKey)
