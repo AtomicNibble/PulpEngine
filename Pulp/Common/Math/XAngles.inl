@@ -340,8 +340,8 @@ Vec3<T> Angles<T>::toAngularVelocity(void) const
 template<typename T>
 const char* Angles<T>::toString(StrBuf& buf) const
 {
-    desc.setFmt("<%g,%g,%g>", pitch_, yaw_, roll_);
-    return desc.c_str();
+    buf.setFmt("<%g,%g,%g>", pitch_, yaw_, roll_);
+    return buf.c_str();
 }
 
 template<typename T>
