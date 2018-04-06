@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <Util\UniquePointer.h>
 #include <Threading\Signal.h>
 
@@ -9,19 +8,16 @@
 #include "IVFTypes.h"
 
 X_NAMESPACE_DECLARE(core,
-	namespace V2 {
-	struct Job;
-	class JobSystem;
-}
+                    namespace V2 {
+                        struct Job;
+                        class JobSystem;
+                    }
 
-struct XFileAsync;
-struct IoRequestBase;
-struct IConsoleCmdArgs;
-)
-
+                    struct XFileAsync;
+                    struct IoRequestBase;
+                    struct IConsoleCmdArgs;)
 
 X_NAMESPACE_BEGIN(video)
-
 
 /*
 	I basically want to be able to load videos, stream them and decode into textures.
@@ -58,8 +54,6 @@ X_NAMESPACE_BEGIN(video)
 	we will need to dispatch frame decodes at start of frame?
 
 */
-
-
 
 typedef core::Array<uint8_t> DataVec;
 
@@ -110,81 +104,77 @@ class Video;
 
 struct VideoLoadRequest
 {
-	VideoLoadRequest(Video* pVideo) :
-		pFile(nullptr),
-		pVideo(pVideo)
-	{
-		core::zero_object(hdr);
-	}
+    VideoLoadRequest(Video* pVideo) :
+        pFile(nullptr),
+        pVideo(pVideo)
+    {
+        core::zero_object(hdr);
+    }
 
-	core::XFileAsync* pFile;
-	Video* pVideo;
-	IVFHdr hdr;
+    core::XFileAsync* pFile;
+    Video* pVideo;
+    IVFHdr hdr;
 };
 
 class XVideoSys : public IVideoSys
 {
-	typedef core::AssetContainer<Video, VID_MAX_LOADED, core::SingleThreadPolicy> VideoContainer;
-	typedef VideoContainer::Resource VideoResource;
+    typedef core::AssetContainer<Video, VID_MAX_LOADED, core::SingleThreadPolicy> VideoContainer;
+    typedef VideoContainer::Resource VideoResource;
 
-	typedef core::Array<VideoLoadRequest*> VideoLoadRequestArr;
+    typedef core::Array<VideoLoadRequest*> VideoLoadRequestArr;
 
 public:
-	XVideoSys(core::MemoryArenaBase* arena);
-	~XVideoSys() X_FINAL = default;
+    XVideoSys(core::MemoryArenaBase* arena);
+    ~XVideoSys() X_FINAL = default;
 
-	void registerVars(void) X_FINAL;
-	void registerCmds(void) X_FINAL;
+    void registerVars(void) X_FINAL;
+    void registerCmds(void) X_FINAL;
 
-	bool init(void) X_FINAL;
-	void shutDown(void) X_FINAL;
-	void release(void) X_FINAL;
+    bool init(void) X_FINAL;
+    void shutDown(void) X_FINAL;
+    void release(void) X_FINAL;
 
-	void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
+    void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
 
-	bool asyncInitFinalize(void);
-	void dispatchPendingLoads(void);
+    bool asyncInitFinalize(void);
+    void dispatchPendingLoads(void);
 
-	void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
+    void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
+    IVideo* findVideo(const char* pVideoName) const X_FINAL;
+    IVideo* loadVideo(const char* pVideoName) X_FINAL;
 
-	IVideo* findVideo(const char* pVideoName) const X_FINAL;
-	IVideo* loadVideo(const char* pVideoName) X_FINAL;
+    void releaseVideo(IVideo* pVid) X_FINAL;
+    bool waitForLoad(core::AssetBase* pVideo) X_FINAL; // returns true if load succeed.
+    bool waitForLoad(IVideo* pVideo) X_FINAL;          // returns true if load succeed.
 
-	void releaseVideo(IVideo* pVid) X_FINAL;
-	bool waitForLoad(core::AssetBase* pVideo) X_FINAL; // returns true if load succeed.
-	bool waitForLoad(IVideo* pVideo) X_FINAL; // returns true if load succeed.
-
-	void listVideos(const char* pSearchPatten = nullptr) const;
-
-private:
-	void queueLoadRequest(VideoResource* pVideoRes);
-	void dispatchLoadRequest(VideoLoadRequest* pLoadReq);
-
-	void onLoadRequestFail(VideoLoadRequest* pLoadReq);
-	void loadRequestCleanup(VideoLoadRequest* pLoadReq);
-
-	void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-		core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-	void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
+    void listVideos(const char* pSearchPatten = nullptr) const;
 
 private:
-	void Cmd_ListVideo(core::IConsoleCmdArgs* pCmd);
+    void queueLoadRequest(VideoResource* pVideoRes);
+    void dispatchLoadRequest(VideoLoadRequest* pLoadReq);
+
+    void onLoadRequestFail(VideoLoadRequest* pLoadReq);
+    void loadRequestCleanup(VideoLoadRequest* pLoadReq);
+
+    void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+        core::XFileAsync* pFile, uint32_t bytesTransferred);
+
+    void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
-	core::MemoryArenaBase* arena_;
-	core::MemoryArenaBase* blockArena_; // for video buffers
+    void Cmd_ListVideo(core::IConsoleCmdArgs* pCmd);
 
-	// loading
-	core::CriticalSection loadReqLock_;
-	core::ConditionVariable loadCond_;
+private:
+    core::MemoryArenaBase* arena_;
+    core::MemoryArenaBase* blockArena_; // for video buffers
 
-	VideoContainer videos_;
-	VideoLoadRequestArr pendingRequests_;
+    // loading
+    core::CriticalSection loadReqLock_;
+    core::ConditionVariable loadCond_;
 
+    VideoContainer videos_;
+    VideoLoadRequestArr pendingRequests_;
 };
-
 
 X_NAMESPACE_END
