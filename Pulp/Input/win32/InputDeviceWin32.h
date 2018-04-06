@@ -18,8 +18,8 @@ public:
     virtual ~XInputDeviceWin32() X_OVERRIDE;
 
     virtual void Update(core::FrameData& frameData) X_OVERRIDE;
-    virtual void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_OVERRIDE;
     virtual void ShutDown(void) X_OVERRIDE;
+    virtual void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_ABSTRACT;
 
     // ~IInputDevice
 
