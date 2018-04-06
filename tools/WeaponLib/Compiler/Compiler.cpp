@@ -219,7 +219,7 @@ namespace weapon
         for (uint32_t i = 0; i < SlotEnum::ENUM_COUNT; i++) {
             auto& name = values[i];
             if (name.isNotEmpty()) {
-                slotsOut[i] = safe_static_cast<WeaponHdr::SlotArr<Num>::value_type>(stream.size());
+                slotsOut[i] = safe_static_cast<typename WeaponHdr::SlotArr<Num>::value_type>(stream.size());
                 stream.write(name.c_str(), core::strUtil::StringBytesIncNull(name));
             }
         }
