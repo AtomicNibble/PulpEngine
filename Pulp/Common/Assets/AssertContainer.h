@@ -201,7 +201,7 @@ public:
 
         Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
-        hash_.insert(ResourceMap::value_type(name, pRes));
+        hash_.insert(typename ResourceMap::value_type(name, pRes));
 
         int32_t id;
 
