@@ -196,8 +196,7 @@ size_t ConsoleCommandArgs::GetArgCount(void) const
 
 const char* ConsoleCommandArgs::GetArg(size_t Idx) const
 {
-    X_ASSERT(Idx < argNum_, "Argument index out of range")
-    (argNum_, Idx);
+    X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
     return argv_[Idx];
 }
 
@@ -1125,8 +1124,7 @@ void XConsole::HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoR
     X_UNUSED(bytesTransferred);
 
     // history file loaded.
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")
-    (pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
     const core::IoRequestOpenRead* pOpenRead = static_cast<const IoRequestOpenRead*>(pRequest);
 
     {

@@ -118,8 +118,7 @@ X_INLINE RootSignature::~RootSignature()
 X_INLINE void RootSignature::reset(size_t numRootParams, size_t numStaticSamplers)
 {
     // since param is a min of 1 dword it's not possible to haver more than 64.
-    X_ASSERT(numRootParams <= MAX_DWORDS, "num root params exceedes max")
-    (numRootParams, MAX_DWORDS);
+    X_ASSERT(numRootParams <= MAX_DWORDS, "num root params exceedes max")(numRootParams, MAX_DWORDS);
 
     params_.resize(numRootParams);
     samplers_.resize(numStaticSamplers);

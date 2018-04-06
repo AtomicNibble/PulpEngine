@@ -101,16 +101,14 @@ Fifo<T>& Fifo<T>::operator=(Fifo<T>&& oth)
 template<typename T>
 void Fifo<T>::setArena(MemoryArenaBase* arena)
 {
-    X_ASSERT(arena_ == nullptr || size() == 0, "can't set arena on a Fifo that has items")
-    (size());
+    X_ASSERT(arena_ == nullptr || size() == 0, "can't set arena on a Fifo that has items")(size());
     arena_ = arena;
 }
 
 template<typename T>
 X_INLINE T& Fifo<T>::operator[](size_type idx)
 {
-    X_ASSERT(idx < size(), "Index out of range.")
-    (idx, size());
+    X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
     if (read_ + idx >= end_) {
         size_type left = end_ - read_;
@@ -123,8 +121,7 @@ X_INLINE T& Fifo<T>::operator[](size_type idx)
 template<typename T>
 X_INLINE const T& Fifo<T>::operator[](size_type idx) const
 {
-    X_ASSERT(idx < size(), "Index out of range.")
-    (idx, size());
+    X_ASSERT(idx < size(), "Index out of range.")(idx, size());
 
     if (read_ + idx >= end_) {
         size_type left = end_ - read_;
@@ -198,8 +195,7 @@ void Fifo<T>::emplace(ArgsT&&... args)
 template<typename T>
 void Fifo<T>::pop(void)
 {
-    X_ASSERT(!isEmpty(), "Cannot pop value of an empty FIFO.")
-    (size(), capacity());
+    X_ASSERT(!isEmpty(), "Cannot pop value of an empty FIFO.")(size(), capacity());
 
     Mem::Destruct<T>(read_);
 
@@ -213,16 +209,14 @@ void Fifo<T>::pop(void)
 template<typename T>
 T& Fifo<T>::peek(void)
 {
-    X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")
-    (size(), capacity());
+    X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
     return *read_;
 }
 
 template<typename T>
 const T& Fifo<T>::peek(void) const
 {
-    X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")
-    (size(), capacity());
+    X_ASSERT(!isEmpty(), "Cannot access the frontmost value of an empty FIFO.")(size(), capacity());
     return *read_;
 }
 
@@ -300,8 +294,7 @@ void Fifo<T>::shrinkToFit(void)
         // move to new memory.
         if (!isWrapped()) {
             // no wrap.
-            X_ASSERT(newSize > union_cast<size_type>(write_ - read_), "Out of range")
-            (newSize, union_cast<size_type>(write_ - read_));
+            X_ASSERT(newSize > union_cast<size_type>(write_ - read_), "Out of range")(newSize, union_cast<size_type>(write_ - read_));
             Mem::MoveArrayDestructUninitialized(pData, read_, write_);
         }
         else {
@@ -318,8 +311,7 @@ void Fifo<T>::shrinkToFit(void)
         read_ = start_;
         write_ = read_ + curSize;
 
-        X_ASSERT(size() == curSize, "Size has changed")
-        (size(), curSize);
+        X_ASSERT(size() == curSize, "Size has changed")(size(), curSize);
     }
 }
 
@@ -327,13 +319,11 @@ template<typename T>
 typename Fifo<T>::size_type Fifo<T>::size(void) const
 {
     if (read_ <= write_) {
-        X_ASSERT(!isWrapped(), "Should not be wrapped")
-        (isWrapped(), read_, write_, start_, end_);
+        X_ASSERT(!isWrapped(), "Should not be wrapped")(isWrapped(), read_, write_, start_, end_);
         return write_ - read_;
     }
 
-    X_ASSERT(isWrapped(), "Should be wrapped")
-    (isWrapped(), read_, write_, start_, end_);
+    X_ASSERT(isWrapped(), "Should be wrapped")(isWrapped(), read_, write_, start_, end_);
 
     // looped back. so write is lower than read
     return capacity() - (read_ - write_);
@@ -403,8 +393,7 @@ typename Fifo<T>::const_iterator Fifo<T>::end(void) const
 template<typename T>
 typename Fifo<T>::Reference Fifo<T>::front(void)
 {
-    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
 
     return *read_;
 }
@@ -412,8 +401,7 @@ typename Fifo<T>::Reference Fifo<T>::front(void)
 template<typename T>
 typename Fifo<T>::ConstReference Fifo<T>::front(void) const
 {
-    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling front")(isNotEmpty());
 
     return *read_;
 }
@@ -421,32 +409,28 @@ typename Fifo<T>::ConstReference Fifo<T>::front(void) const
 template<typename T>
 typename Fifo<T>::Reference Fifo<T>::back(void)
 {
-    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
     TypePtr pTr = write_ - 1;
     if (write_ == start_) {
         pTr = end_ - 1;
     }
 
-    X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")
-    (pTr, start_, end_, size(), capacity());
+    X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")(pTr, start_, end_, size(), capacity());
     return *pTr;
 }
 
 template<typename T>
 typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 {
-    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "FiFo can't be empty when calling back")(isNotEmpty());
 
     ConstTypePtr pTr = write_ - 1;
     if (write_ == start_) {
         pTr = end_ - 1;
     }
 
-    X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")
-    (pTr, start_, end_, size(), capacity());
+    X_ASSERT(pTr >= start_ && pTr < end_, "Out of range")(pTr, start_, end_, size(), capacity());
     return *pTr;
 }
 
@@ -455,8 +439,7 @@ typename Fifo<T>::ConstReference Fifo<T>::back(void) const
 template<typename T>
 void Fifo<T>::expand(void)
 {
-    X_ASSERT(write_ == read_, "This should only be called when we are full.")
-    (write_, read_);
+    X_ASSERT(write_ == read_, "This should only be called when we are full.")(write_, read_);
 
     // we want to allocate a new aaray like a slut.
     // if first time jump to 16.

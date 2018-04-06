@@ -46,8 +46,7 @@ namespace fx
 
     const StageDsc& Effect::getStageDsc(int32_t idx) const
     {
-        X_ASSERT(idx >= 0 && idx < getNumStages(), "Out of bouds")
-        (idx, getNumStages());
+        X_ASSERT(idx >= 0 && idx < getNumStages(), "Out of bouds")(idx, getNumStages());
         return getStageDscs()[idx];
     }
 
@@ -127,8 +126,7 @@ namespace fx
 
     Vec3f Effect::fromColorGraph(const Graph& g, float t) const
     {
-        X_ASSERT(g.numPoints > 0, "Hraph is empty")
-        (g.numPoints);
+        X_ASSERT(g.numPoints > 0, "Hraph is empty")(g.numPoints);
 
         float scale = getFloat(g.scaleIdx);
         Vec3f result;

@@ -140,8 +140,7 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     X_UNUSED(pJob);
     X_UNUSED(pData);
 
-    X_ASSERT(levelData_, "Level data pointer is not valid")
-    (levelData_);
+    X_ASSERT(levelData_, "Level data pointer is not valid")(levelData_);
 
     core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
 
@@ -315,8 +314,7 @@ void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 
 void World::spawnPlayer(entity::EntityId id)
 {
-    X_ASSERT(id < MAX_PLAYERS, "Invalide player id")
-    (id);
+    X_ASSERT(id < MAX_PLAYERS, "Invalide player id")(id);
     X_ASSERT_NOT_NULL(pScene_);
 
     // we want to take the give ent and set it up as a player.

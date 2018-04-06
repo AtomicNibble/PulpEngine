@@ -16,8 +16,7 @@ X_INLINE size_t GrowingMicroAllocator::getSize(void* ptr) const
     else if (poolAllocator256_.containsAllocation(ptr))
         return poolAllocator256_.getSize(ptr);
 
-    X_ASSERT(false, "Cannot determine size of allocation. Allocation does not belong to this allocator.")
-    (ptr);
+    X_ASSERT(false, "Cannot determine size of allocation. Allocation does not belong to this allocator.")(ptr);
     return 0;
 }
 
@@ -38,8 +37,7 @@ X_INLINE size_t GrowingMicroAllocator::usableSize(void* ptr) const
     else if (poolAllocator256_.containsAllocation(ptr))
         return poolAllocator256_.usableSize(ptr);
 
-    X_ASSERT(false, "Cannot determine usableSize of allocation. Allocation does not belong to this allocator.")
-    (ptr);
+    X_ASSERT(false, "Cannot determine usableSize of allocation. Allocation does not belong to this allocator.")(ptr);
     return 0;
 }
 
@@ -58,8 +56,7 @@ X_INLINE bool GrowingMicroAllocator::containsAllocation(void* ptr, size_t size) 
 
 #if X_ENABLE_ASSERTIONS
     if (size <= MAX_ALLOCATION_SIZE) {
-        X_ASSERT(containsAllocation(ptr), "Allocation that fits in pool did not come from pool")
-        (ptr, size);
+        X_ASSERT(containsAllocation(ptr), "Allocation that fits in pool did not come from pool")(ptr, size);
     }
 #endif
 

@@ -1191,32 +1191,28 @@ bool XWindingT<Allocator>::SLoad(core::XFile* pFile)
 template<class Allocator>
 X_INLINE const Vec5f& XWindingT<Allocator>::operator[](const size_t idx) const
 {
-    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")
-    (idx, getNumPoints());
+    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
     return pPoints_[idx];
 }
 
 template<class Allocator>
 X_INLINE Vec5f& XWindingT<Allocator>::operator[](const size_t idx)
 {
-    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")
-    (idx, getNumPoints());
+    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
     return pPoints_[idx];
 }
 
 template<class Allocator>
 X_INLINE const Vec5f& XWindingT<Allocator>::at(size_t idx) const
 {
-    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")
-    (idx, getNumPoints());
+    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
     return pPoints_[idx];
 }
 
 template<class Allocator>
 X_INLINE Vec5f& XWindingT<Allocator>::at(size_t idx)
 {
-    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")
-    (idx, getNumPoints());
+    X_ASSERT(static_cast<int32_t>(idx) < numPoints_, "index out of range")(idx, getNumPoints());
     return pPoints_[idx];
 }
 

@@ -291,8 +291,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
             model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();
             numSub = pMesh->numSubMeshes;
 
-            X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")
-            (numSub);
+            X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")(numSub);
 
             // set meshHeads verts and faces.
             pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);
@@ -719,8 +718,7 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
 
     // go from model space to bone space, as we copy.
     const auto& inverseMatrix = pModel->getInverseBoneMatrix();
-    X_ASSERT(inverseMatrix.size() == pRenderEnt->bones.size(), "Size mismatch")
-    ();
+    X_ASSERT(inverseMatrix.size() == pRenderEnt->bones.size(), "Size mismatch")();
     for (size_t i = 0; i < num; i++) {
         pRenderEnt->bones[i] = pMats[i] * inverseMatrix[i];
     }
@@ -1287,8 +1285,7 @@ void World3D::setAreaVisible(int32_t areaNum, int32_t areaFrom, const PortalStac
     if (area.maxVisPortals) {
         visPortalIdx = core::atomic::Increment(&area.curVisPortalIdx);
 
-        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")
-        (areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
+        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
 
         area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
@@ -1319,8 +1316,7 @@ void World3D::setAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, 
     if (area.maxVisPortals) {
         visPortalIdx = core::atomic::Increment(&area.curVisPortalIdx);
 
-        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")
-        (areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
+        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
 
         area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
@@ -1466,14 +1462,12 @@ void World3D::mergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t thread
             for (int32_t i = 0; i < pArea->curVisPortalIdx + 1; i++) {
                 const auto& visEnts = pArea->visPortals[i].visibleEnts;
 #if X_DEBUG
-                X_ASSERT(std::is_sorted(visEnts.begin(), visEnts.end()), "Not sorted")
-                ();
+                X_ASSERT(std::is_sorted(visEnts.begin(), visEnts.end()), "Not sorted")();
 #endif // X_DEBUG
                 que.push(&visEnts);
             }
 
-            X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")
-            (que.size());
+            X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")(que.size());
 
             auto& destArr = pArea->areaVisibleEnts;
 
@@ -1805,8 +1799,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
             auto* pCBHandles = pVariableState->getCBs();
 
             const auto& cbs = pTech->cbs;
-            X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")
-            (numCbs, cbs.size());
+            X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")(numCbs, cbs.size());
 
             for (int32_t i = 0; i < numCbs; i++) {
                 auto& cb = *cbs[i];
@@ -1950,8 +1943,7 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
             auto* pCBHandles = pVariableState->getCBs();
 
             const auto& cbs = pTech->cbs;
-            X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")
-            (numCbs, cbs.size());
+            X_ASSERT(numCbs == static_cast<int32_t>(cbs.size()), "Size mismatch")(numCbs, cbs.size());
 
             for (int32_t i = 0; i < numCbs; i++) {
                 auto& cb = *cbs[i];

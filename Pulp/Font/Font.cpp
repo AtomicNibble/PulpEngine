@@ -556,8 +556,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     }
                     else if (core::strUtil::IsDigitW(*pChar)) {
                         const int32_t colorIndex = (*pChar) - L'0';
-                        X_ASSERT(colorIndex >= 0 && colorIndex < X_ARRAY_SIZE(g_ColorTable), "ColorIndex out of range")
-                        (colorIndex);
+                        X_ASSERT(colorIndex >= 0 && colorIndex < X_ARRAY_SIZE(g_ColorTable), "ColorIndex out of range")(colorIndex);
                         Color8u newColor = g_ColorTable[colorIndex];
                         col.r = newColor.r;
                         col.g = newColor.g;
@@ -1096,8 +1095,7 @@ bool XFont::CreateDeviceTexture(void)
 
     const auto& buf = pFontTexture_->GetBuffer();
 
-    X_ASSERT(pTexture_ == nullptr, "double init of font texture")
-    (pTexture_);
+    X_ASSERT(pTexture_ == nullptr, "double init of font texture")(pTexture_);
 
     pTexture_ = gEnv->pRender->createTexture(
         name.c_str(),

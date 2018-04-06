@@ -45,8 +45,7 @@ FullMemoryTracking::~FullMemoryTracking(void)
         AllocationTable::const_iterator end = table_.end();
         size_t Num = 1;
 
-        X_ASSERT(numAllocations_ == 0, "Memory leaks detected.")
-        (numAllocations_);
+        X_ASSERT(numAllocations_ == 0, "Memory leaks detected.")(numAllocations_);
 
         if (!gEnv || !gEnv->pLog) {
             // allow stepping over.

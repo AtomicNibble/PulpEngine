@@ -224,8 +224,7 @@ public:
     /// Signals the sink.
     void Signal(ARGS) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);

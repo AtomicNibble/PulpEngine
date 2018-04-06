@@ -242,8 +242,7 @@ inline void FixedBitStreamBase::zeroPadToLength(size_type numBytes)
         std::memset(pBegin_ + byteIndex(), 0, bytesToAdd);
         bitIdx_ += numBitsForBytes(bytesToAdd);
 
-        X_ASSERT(sizeInBytes() == numBytes, "Failed to pad correct")
-        (sizeInBytes(), numBytes);
+        X_ASSERT(sizeInBytes() == numBytes, "Failed to pad correct")(sizeInBytes(), numBytes);
     }
 }
 

@@ -102,8 +102,7 @@ XModel* XModelManager::findModel(const char* pModelName) const
 XModel* XModelManager::loadModel(const char* pModelName)
 {
     X_ASSERT_NOT_NULL(pModelName);
-    X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")
-    (pModelName);
+    X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
 
     core::string name(pModelName);
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());

@@ -809,8 +809,7 @@ namespace strUtil
 
     size_t LineNumberForOffset(const char* pBegin, const char* pEnd, size_t offset)
     {
-        X_ASSERT(pBegin <= pEnd, "Invalid range")
-        (pBegin, pEnd);
+        X_ASSERT(pBegin <= pEnd, "Invalid range")(pBegin, pEnd);
 
         size_t size = (pEnd - pBegin);
         if (offset > size) {
@@ -828,8 +827,7 @@ namespace strUtil
 
     size_t NumLines(const char* pBegin, const char* pEnd)
     {
-        X_ASSERT(pBegin <= pEnd, "Invalid range")
-        (pBegin, pEnd);
+        X_ASSERT(pBegin <= pEnd, "Invalid range")(pBegin, pEnd);
 
         size_t lines = 1; // :| !
         size_t length = pEnd - pBegin;

@@ -245,8 +245,7 @@ void XListIntrusive<T>::insertTail(T* node)
 template<class T>
 void XListIntrusive<T>::insertBefore(T* node, T* before)
 {
-    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")
-    (node);
+    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")(node);
 
     getLinkFromNode(node)->insertBefore(
         node,
@@ -256,8 +255,7 @@ void XListIntrusive<T>::insertBefore(T* node, T* before)
 template<class T>
 void XListIntrusive<T>::insertAfter(T* node, T* after)
 {
-    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")
-    (node);
+    X_ASSERT(!((size_t)node & 1), "pointer is not 2 byte aligned")(node);
 
     getLinkFromNode(node)->insertAfter(
         node,
@@ -267,8 +265,7 @@ void XListIntrusive<T>::insertAfter(T* node, T* after)
 template<class T>
 XLinkIntrusive<T>* XListIntrusive<T>::getLinkFromNode(const T* node) const
 {
-    X_ASSERT(offset_ != (size_t)-1, "offset is not valid")
-    (offset_);
+    X_ASSERT(offset_ != (size_t)-1, "offset is not valid")(offset_);
 
     return (XLinkIntrusive<T>*)((size_t)node + offset_);
 }

@@ -31,10 +31,8 @@ void AssetLoader::update(void)
 
         // process them all.
         for (auto* pLoadRequest : pendingReloads_) {
-            X_ASSERT(pLoadRequest->reloadFlags.IsSet(ReloadFlag::Beginframe), "Invalid reload flags")
-            ();
-            X_ASSERT(!pLoadRequest->reloadFlags.IsSet(ReloadFlag::AnyTime), "Invalid reload flags")
-            ();
+            X_ASSERT(pLoadRequest->reloadFlags.IsSet(ReloadFlag::Beginframe), "Invalid reload flags")();
+            X_ASSERT(!pLoadRequest->reloadFlags.IsSet(ReloadFlag::AnyTime), "Invalid reload flags")();
 
             processData(pLoadRequest);
         }
@@ -45,8 +43,7 @@ void AssetLoader::update(void)
 
 void AssetLoader::registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt)
 {
-    X_ASSERT(assetsinks_[type] == nullptr, "Asset type already had a registered handler")
-    (assetDb::AssetType::ToString(type));
+    X_ASSERT(assetsinks_[type] == nullptr, "Asset type already had a registered handler")(assetDb::AssetType::ToString(type));
 
     assetsinks_[type] = pSink;
     assetExt_[type] = pExt;
@@ -69,8 +66,7 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
 
 void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
-    X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")
-    (assetDb::AssetType::ToString(pAsset->getType()));
+    X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
 
@@ -130,8 +126,7 @@ void AssetLoader::dispatchPendingLoads(void)
 
 void AssetLoader::queueLoadRequest(AssetBase* pAsset, core::CriticalSection::ScopedLock&)
 {
-    X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")
-    ();
+    X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")();
 
     // can we know it's not in this queue just from status?
     // like if it's complete it could be in this status
@@ -141,16 +136,14 @@ void AssetLoader::queueLoadRequest(AssetBase* pAsset, core::CriticalSection::Sco
         return;
     }
 
-    X_ASSERT(!requestQueue_.contains(pAsset), "Queue already contains asset")
-    (pAsset);
+    X_ASSERT(!requestQueue_.contains(pAsset), "Queue already contains asset")(pAsset);
 
     requestQueue_.push(pAsset);
 }
 
 void AssetLoader::dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedLock&)
 {
-    X_ASSERT(pAsset->getStatus() == core::LoadStatus::Loading || pAsset->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")
-    ();
+    X_ASSERT(pAsset->getStatus() == core::LoadStatus::Loading || pAsset->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
 
     auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
 
@@ -165,8 +158,7 @@ bool AssetLoader::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
     int32_t maxReq = 16;
 
     if (requestQueue_.isNotEmpty() && (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq)) {
-        X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")
-        ();
+        X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
         dispatchLoad(requestQueue_.peek(), lock);
         requestQueue_.pop();
         return true;
@@ -209,8 +201,7 @@ void AssetLoader::onLoadRequestFail(AssetLoadRequest* pLoadReq)
 void AssetLoader::loadRequestCleanup(AssetLoadRequest* pLoadReq)
 {
     auto status = pLoadReq->pAsset->getStatus();
-    X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")
-    (status);
+    X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
 
     {
         core::CriticalSection::ScopedLock lock(loadReqLock_);
@@ -248,8 +239,7 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
 
         // read the whole file.
         uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
-        X_ASSERT(fileSize > 0, "Datasize must be positive")
-        (fileSize);
+        X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
         pLoadReq->data = core::makeUnique<char[]>(blockArena_, fileSize, 16);
         pLoadReq->dataSize = fileSize;
 
@@ -265,8 +255,7 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
     else if (requestType == core::IoRequest::READ) {
         const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
 
-        X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")
-        ();
+        X_ASSERT(pLoadReq->data.ptr() == pReadReq->pBuf, "Buffers don't match")();
 
         if (bytesTransferred != pReadReq->dataSize) {
             X_ERROR("AssetLoader", "Failed to read asset data. Got: 0x%" PRIx32 " need: 0x%" PRIx32, bytesTransferred, pReadReq->dataSize);

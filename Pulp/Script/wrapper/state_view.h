@@ -330,8 +330,7 @@ namespace lua
 
         X_INLINE CallResult::Enum pcall(lua_State* L, int32_t numArgs, int32_t numResults, RefId errorHandle, RefId chunk)
         {
-            X_ASSERT(errorHandle != lua::Ref::Nil && chunk != lua::Ref::Nil, "Nil ref")
-            (errorHandle, chunk);
+            X_ASSERT(errorHandle != lua::Ref::Nil && chunk != lua::Ref::Nil, "Nil ref")(errorHandle, chunk);
 
             const int base = stack::top(L) + 1;
             push_ref(L, errorHandle);

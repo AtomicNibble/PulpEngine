@@ -55,8 +55,7 @@ namespace entity
     template<typename T>
     DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, BoolMember member)
     {
-        X_ASSERT(!ContainsHash(bools_, nameHash), "Hash collision")
-        (nameHash);
+        X_ASSERT(!ContainsHash(bools_, nameHash), "Hash collision")(nameHash);
 
         bools_.emplace_back(nameHash, member);
         return *this;
@@ -65,8 +64,7 @@ namespace entity
     template<typename T>
     DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, IntMember member)
     {
-        X_ASSERT(!ContainsHash(ints_, nameHash), "Hash collision")
-        (nameHash);
+        X_ASSERT(!ContainsHash(ints_, nameHash), "Hash collision")(nameHash);
 
         ints_.emplace_back(nameHash, member);
         return *this;
@@ -75,8 +73,7 @@ namespace entity
     template<typename T>
     DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, FloatMember member)
     {
-        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")
-        (nameHash);
+        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
 
         floats_.emplace_back(nameHash, member);
         return *this;
@@ -85,8 +82,7 @@ namespace entity
     template<typename T>
     DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, Vec3Member member)
     {
-        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")
-        (nameHash);
+        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
 
         vecs_.emplace_back(nameHash, member);
         return *this;
@@ -95,8 +91,7 @@ namespace entity
     template<typename T>
     DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, StringMember member)
     {
-        X_ASSERT(!ContainsHash(strings_, nameHash), "Hash collision")
-        (nameHash);
+        X_ASSERT(!ContainsHash(strings_, nameHash), "Hash collision")(nameHash);
 
         strings_.emplace_back(nameHash, member);
         return *this;

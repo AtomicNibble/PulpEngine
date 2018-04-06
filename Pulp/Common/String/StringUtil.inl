@@ -81,8 +81,7 @@ namespace strUtil
     template<typename CharT>
     inline bool IsNumeric(const CharT* startInclusive, const CharT* endExclusive)
     {
-        X_ASSERT(endExclusive > startInclusive, "string can't be empty")
-        (startInclusive, endExclusive);
+        X_ASSERT(endExclusive > startInclusive, "string can't be empty")(startInclusive, endExclusive);
 
         if (*startInclusive == '-') {
             startInclusive++;

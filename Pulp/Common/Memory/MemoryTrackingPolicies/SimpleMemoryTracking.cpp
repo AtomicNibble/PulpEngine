@@ -15,8 +15,7 @@ SimpleMemoryTracking::SimpleMemoryTracking(void) :
 SimpleMemoryTracking::~SimpleMemoryTracking(void)
 {
     // o dear o.o
-    X_ASSERT(numAllocations_ == 0, "Memory leaks detected. Num: %d", numAllocations_)
-    ();
+    X_ASSERT(numAllocations_ == 0, "Memory leaks detected. Num: %d", numAllocations_)();
 }
 
 X_NAMESPACE_END

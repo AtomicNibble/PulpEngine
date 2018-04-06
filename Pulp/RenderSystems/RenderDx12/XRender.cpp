@@ -59,8 +59,7 @@ XRender::XRender(core::MemoryArenaBase* arena) :
 {
     core::zero_object(pDisplayPlanes_);
 
-    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")
-    ();
+    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
 
     pTexVars_ = X_NEW(texture::TextureVars, arena_, "TextVars");
     pShaderMan_ = X_NEW(shader::XShaderManager, arena_, "ShaderMan")(arena_);
@@ -113,8 +112,7 @@ void XRender::registerCmds(void)
 
 bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
-    X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")
-    (vars_.varsRegisterd());
+    X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
     X_PROFILE_NO_HISTORY_BEGIN("RenderInit", core::profiler::SubSys::RENDER);
 
     if (hWnd == static_cast<HWND>(0)) {
@@ -207,8 +205,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
                 Microsoft::WRL::ComPtr<IDXGIAdapter3> adapter3;
                 adapter.As(&adapter3);
 
-                X_ASSERT(pAdapter_ == nullptr, "pAdapter already valid")
-                (pAdapter_);
+                X_ASSERT(pAdapter_ == nullptr, "pAdapter already valid")(pAdapter_);
                 pAdapter_ = adapter3.Detach();
             }
 
@@ -623,11 +620,9 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
         // this meants the sort logic and merge logic of command bucket is not quite correct / corrupt.
 
 #if X_64
-        X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDBDBDBDBDB), "Invalid packet")
-        (pPacket);
+        X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDBDBDBDBDB), "Invalid packet")(pPacket);
 #else
-        X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDB), "Invalid packet")
-        (pPacket);
+        X_ASSERT(union_cast<uintptr_t>(pPacket) != static_cast<uintptr_t>(0xDBDBDBDB), "Invalid packet")(pPacket);
 #endif // !X_64
 
 #endif
@@ -667,8 +662,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
                         pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
-                    X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")
-                    ();
+                    X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
 
                     applyIndexBuffer(context, curState, pDraw->indexBuffer);
 
@@ -705,8 +699,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     applyState(context, curState, pDraw->stateHandle, pDraw->vertexBuffers,
                         pDraw->resourceState, CommandPacket::getAuxiliaryMemory(pDraw));
 
-                    X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")
-                    ();
+                    X_ASSERT(pDraw->indexBuffer != INVALID_BUF_HANLDE, "Index buffer must be valid")();
 
                     applyIndexBuffer(context, curState, pDraw->indexBuffer);
 
@@ -723,8 +716,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     const Commands::CopyConstantBufferData& updateCB = *reinterpret_cast<const Commands::CopyConstantBufferData*>(pCmd);
                     auto pCBuf = pBuffMan_->CBFromHandle(updateCB.constantBuffer);
 
-                    X_ASSERT(pCBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")
-                    (pCBuf->getUsage());
+                    X_ASSERT(pCBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pCBuf->getUsage());
 
                     if (core::pointerUtil::IsAligned(updateCB.pData, 16, 0)) {
                         context.writeBuffer(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
@@ -737,8 +729,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
                     auto pIBuf = pBuffMan_->IBFromHandle(updateIB.indexBuffer);
 
-                    X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")
-                    (pIBuf->getUsage());
+                    X_ASSERT(pIBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pIBuf->getUsage());
 
                     context.writeBuffer(pIBuf->getBuf(), updateIB.dstOffset, updateIB.pData, updateIB.size);
                 } break;
@@ -746,8 +737,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
                     auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
 
-                    X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")
-                    (pVBuf->getUsage());
+                    X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
 
                     context.writeBuffer(pVBuf->getBuf(), updateVB.dstOffset, updateVB.pData, updateVB.size);
                 } break;
@@ -778,8 +768,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     const Commands::ClearDepthStencil& clearDepth = *reinterpret_cast<const Commands::ClearDepthStencil*>(pCmd);
                     texture::Texture* pTexture = static_cast<texture::Texture*>(clearDepth.pDepthBuffer);
 
-                    X_ASSERT(pTexture->getBufferType() == PixelBufferType::DEPTH, "Invalid buffer passed to clear depth")
-                    ();
+                    X_ASSERT(pTexture->getBufferType() == PixelBufferType::DEPTH, "Invalid buffer passed to clear depth")();
 
                     DepthBuffer& depthBuf = pTexture->getDepthBuf();
 
@@ -790,8 +779,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     const Commands::ClearColor& clearColor = *reinterpret_cast<const Commands::ClearColor*>(pCmd);
                     texture::Texture* pTexture = static_cast<texture::Texture*>(clearColor.pColorBuffer);
 
-                    X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")
-                    ();
+                    X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")();
 
                     ColorBuffer& colBuf = pTexture->getColorBuf();
 
@@ -865,8 +853,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
         // the render system should not have to check ever state is valid, the 3dengine should check at creation time.
         // so it's a one off cost not a cost we pay for every fucking state change.
-        X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")
-        (handle, INVALID_STATE_HANLDE);
+        X_ASSERT(handle != INVALID_STATE_HANLDE, "Don't pass me invalid states you cunt")(handle, INVALID_STATE_HANLDE);
 
         curState.handle = handle;
 
@@ -922,8 +909,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
         if (resourceState.anySet()) {
             if (resourceState.getNumTextStates()) {
-                X_ASSERT(newState.texRootIdxBase != std::numeric_limits<decltype(newState.texRootIdxBase)>::max(), "Texture rootIdx base is invalid")
-                ();
+                X_ASSERT(newState.texRootIdxBase != std::numeric_limits<decltype(newState.texRootIdxBase)>::max(), "Texture rootIdx base is invalid")();
 
                 D3D12_CPU_DESCRIPTOR_HANDLE textureSRVS[render::TextureSlot::ENUM_COUNT] = {};
                 const TextureState* pTexStates = resourceState.getTexStates(pStateData);
@@ -939,8 +925,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
                     textureSRVS[t] = pTex->getSRV();
 
-                    X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")
-                    ();
+                    X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
                 }
 
                 // for now assume all slots are linera and no gaps.
@@ -952,8 +937,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
             }
 
             if (resourceState.getNumBuffers()) {
-                X_ASSERT(newState.bufferRootIdxBase != std::numeric_limits<decltype(newState.bufferRootIdxBase)>::max(), "Buffer rootIdx base is invalid")
-                ();
+                X_ASSERT(newState.bufferRootIdxBase != std::numeric_limits<decltype(newState.bufferRootIdxBase)>::max(), "Buffer rootIdx base is invalid")();
 
                 const BufferState* pBuffers = resourceState.getBuffers(pStateData);
                 const int32_t count = resourceState.getNumBuffers();
@@ -962,8 +946,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
                 for (int32_t t = 0; t < count; t++) {
                     auto& bufState = pBuffers[t];
-                    X_ASSERT(bufState.buf != INVALID_BUF_HANLDE, "Buffer handle is invalid")
-                    (bufState.buf);
+                    X_ASSERT(bufState.buf != INVALID_BUF_HANLDE, "Buffer handle is invalid")(bufState.buf);
 
                     uint32_t rootIdx = newState.bufferRootIdxBase + t;
 
@@ -977,10 +960,8 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
                     }
                     else {
                         auto* pDynamicDesc = reinterpret_cast<const DynamicBufferDesc*>(bufState.buf);
-                        X_ASSERT(pDynamicDesc->magic == DynamicBufferDesc::MAGIC, "Expected dynamic buffer desc")
-                        ();
-                        X_ASSERT(pDynamicDesc->size > 0, "Empty buffer")
-                        ();
+                        X_ASSERT(pDynamicDesc->magic == DynamicBufferDesc::MAGIC, "Expected dynamic buffer desc")();
+                        X_ASSERT(pDynamicDesc->size > 0, "Empty buffer")();
                         X_ASSERT_NOT_NULL(pDynamicDesc->pData);
 
                         context.setDynamicSRV(rootIdx, pDynamicDesc->size, pDynamicDesc->pData);
@@ -992,8 +973,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
             // this may be zero even if we have samplers, if they are all static.
             if (resourceState.getNumSamplers()) {
-                X_ASSERT(newState.samplerRootIdxBase != std::numeric_limits<decltype(newState.samplerRootIdxBase)>::max(), "Sampler rootIdx base is invalid")
-                ();
+                X_ASSERT(newState.samplerRootIdxBase != std::numeric_limits<decltype(newState.samplerRootIdxBase)>::max(), "Sampler rootIdx base is invalid")();
 
                 D3D12_CPU_DESCRIPTOR_HANDLE samplerSRVS[render::TextureSlot::ENUM_COUNT] = {};
                 const SamplerState* pSamplers = resourceState.getSamplers(pStateData);
@@ -1015,8 +995,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
             if (resourceState.getNumCBs()) {
                 const ConstantBufferHandle* pCBVs = resourceState.getCBs(pStateData);
 
-                X_ASSERT(newState.cbRootIdxBase != std::numeric_limits<decltype(newState.cbRootIdxBase)>::max(), "CB rootIdx base is invalid")
-                ();
+                X_ASSERT(newState.cbRootIdxBase != std::numeric_limits<decltype(newState.cbRootIdxBase)>::max(), "CB rootIdx base is invalid")();
 
                 for (int32_t t = 0; t < resourceState.getNumCBs(); t++) {
                     ConstantBufferHandle cbh = pCBVs[t];
@@ -1111,32 +1090,28 @@ IndexBufferHandle XRender::createIndexBuffer(uint32_t elementSize, uint32_t numE
 
 void XRender::destoryVertexBuffer(VertexBufferHandle handle)
 {
-    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")
-    ();
+    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
 
     pBuffMan_->freeVB(handle);
 }
 
 void XRender::destoryIndexBuffer(IndexBufferHandle handle)
 {
-    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")
-    ();
+    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
 
     pBuffMan_->freeIB(handle);
 }
 
 void XRender::getVertexBufferSize(VertexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
 {
-    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")
-    ();
+    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
 
     pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
 
 void XRender::getIndexBufferSize(IndexBufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize)
 {
-    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")
-    ();
+    X_ASSERT(handle != INVALID_BUF_HANLDE, "Can't pass invalid handles")();
 
     pBuffMan_->getBufSize(handle, pOriginal, pDeviceSize);
 }
@@ -1405,8 +1380,7 @@ StateHandle XRender::createState(PassStateHandle passHandle, const shader::IShad
 void XRender::destoryState(StateHandle handle)
 {
     // this implies you are not checking they are valid when creating, which you should!
-    X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")
-    (handle, INVALID_STATE_HANLDE);
+    X_ASSERT(handle != INVALID_STATE_HANLDE, "Destoring invalid states is not allowed")(handle, INVALID_STATE_HANLDE);
 
     DeviceState* pState = reinterpret_cast<DeviceState*>(handle);
 
@@ -1460,8 +1434,7 @@ bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation&
         }
         else {
             // currently only allow static samplers, if you provide all the samplers.
-            X_ASSERT(pPixelShader->getNumSamplers() == numStaticSamplers, "Static samplers must match sampler count")
-            (pPixelShader->getNumSamplers(), numStaticSamplers);
+            X_ASSERT(pPixelShader->getNumSamplers() == numStaticSamplers, "Static samplers must match sampler count")(pPixelShader->getNumSamplers(), numStaticSamplers);
         }
     }
 
@@ -2115,8 +2088,7 @@ void XRender::populateFeatureInfo(void)
 
 bool XRender::deviceIsSupported(void) const
 {
-    X_ASSERT(features_.init, "Feature info must be init before checking if device meets requirements")
-    ();
+    X_ASSERT(features_.init, "Feature info must be init before checking if device meets requirements")();
 
     // check the device supports like max dimensions we support.
     // if this is ever a problem the engine just needs to support dropping higer dimensions at runtime.

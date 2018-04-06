@@ -167,8 +167,7 @@ XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
     }
 
     if (!async) {
-        X_ASSERT(pFontTexture->IsReady(), "Should be ready if loaded none async")
-        (async, pFontTexture->IsReady());
+        X_ASSERT(pFontTexture->IsReady(), "Should be ready if loaded none async")(async, pFontTexture->IsReady());
     }
 
     fontTextures_.insert(std::make_pair(name, pFontTexture));

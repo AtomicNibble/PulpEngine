@@ -142,12 +142,9 @@ XScene::~XScene()
 
 bool XScene::createPxScene(physx::PxSceneDesc& pxDesc)
 {
-    X_ASSERT(pScene_ == nullptr, "Scenen alread created")
-    ();
-    X_ASSERT(pControllerManager_ == nullptr, "Scenen alread created")
-    ();
-    X_ASSERT(pxDesc.simulationEventCallback == nullptr, "SimEventCallback must be null")
-    ();
+    X_ASSERT(pScene_ == nullptr, "Scenen alread created")();
+    X_ASSERT(pControllerManager_ == nullptr, "Scenen alread created")();
+    X_ASSERT(pxDesc.simulationEventCallback == nullptr, "SimEventCallback must be null")();
 
     if (!pxDesc.isValid()) {
         X_ERROR("PhysScene", "Scene description is invalid");

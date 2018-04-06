@@ -53,8 +53,7 @@ X_INLINE const uint32_t PrimativeContext::VertexPage::getVertBufBytes(void) cons
 {
     uint32_t numVerts = safe_static_cast<uint32_t>(verts.size());
 
-    X_ASSERT(numVerts <= NUMVERTS_PER_PAGE, "Vert page exceeded it's limits")
-    (numVerts, NUMVERTS_PER_PAGE);
+    X_ASSERT(numVerts <= NUMVERTS_PER_PAGE, "Vert page exceeded it's limits")(numVerts, NUMVERTS_PER_PAGE);
 
     // we need to give the render system a 16byte aligned buffer that is a multiple of 16 bytes.
     // i think i might support not requiring the buffer size to be a multiple of 16 as that means we always need padding if vert not multiple of 16.

@@ -42,16 +42,13 @@ GrowingPoolAllocator::GrowingPoolAllocator(size_t maxSizeInBytes, size_t growSiz
     X_UNUSED(offset);
 #endif
 
-    X_ASSERT(bitUtil::IsPowerOfTwo(growSize), "Pool Grow size must be a power-of-two.")
-    (growSize);
+    X_ASSERT(bitUtil::IsPowerOfTwo(growSize), "Pool Grow size must be a power-of-two.")(growSize);
 
     if (maxSizeInBytes % growSize) {
-        X_ASSERT(false, "Maximum amount of virtual address space to reserve must be a multiple of the grow size.")
-        (growSize);
+        X_ASSERT(false, "Maximum amount of virtual address space to reserve must be a multiple of the grow size.")(growSize);
     }
     if (growSize % VirtualMem::GetPageSize()) {
-        X_ASSERT(false, "Pool grow size must be a multiple of virtual page size.")
-        (growSize);
+        X_ASSERT(false, "Pool grow size must be a multiple of virtual page size.")(growSize);
     }
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -76,19 +73,16 @@ void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offse
     const void* chunkHeaderData, size_t chunkHeaderSize)
 {
     if (size > maxSize_) {
-        X_ASSERT(false, "Pool allocator can't satsify a request bigger than max size only equal or less")
-        (size, maxSize_);
+        X_ASSERT(false, "Pool allocator can't satsify a request bigger than max size only equal or less")(size, maxSize_);
     }
 
     if (alignment > maxAlignment_) {
-        X_ASSERT(false, "Pool allocaotr alignment must be equal or less")
-        (alignment, maxAlignment_);
+        X_ASSERT(false, "Pool allocaotr alignment must be equal or less")(alignment, maxAlignment_);
     }
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
     if (offset != offset_) {
-        X_ASSERT(false, "A pool allocator can only allocate instances with the same offset.")
-        (offset, offset_);
+        X_ASSERT(false, "A pool allocator can only allocate instances with the same offset.")(offset, offset_);
     }
 #endif
 

@@ -29,8 +29,7 @@ Stack<T>::~Stack()
 template<typename T>
 inline void Stack<T>::SetArena(MemoryArenaBase* arena)
 {
-    X_ASSERT(arena_ == nullptr || (capacity() == 0 && size() == 0), "can't set arena on a Fifo that has items")
-    (size(), capacity());
+    X_ASSERT(arena_ == nullptr || (capacity() == 0 && size() == 0), "can't set arena on a Fifo that has items")(size(), capacity());
     arena_ = arena;
 }
 
@@ -38,8 +37,7 @@ inline void Stack<T>::SetArena(MemoryArenaBase* arena)
 template<typename T>
 inline void Stack<T>::push(const T& val)
 {
-    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
 
     Mem::Construct<T>(current_, val);
     ++current_;
@@ -48,8 +46,7 @@ inline void Stack<T>::push(const T& val)
 template<typename T>
 inline void Stack<T>::push(T&& val)
 {
-    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
 
     Mem::Construct<T>(current_, std::forward<T>(val));
     ++current_;
@@ -60,8 +57,7 @@ template<typename T>
 template<class... ArgsT>
 inline void Stack<T>::emplace(ArgsT&&... args)
 {
-    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value onto stack, no room.")(size(), capacity());
 
     Mem::Construct<T>(current_, std::forward<ArgsT>(args)...);
     ++current_;
@@ -71,8 +67,7 @@ inline void Stack<T>::emplace(ArgsT&&... args)
 template<typename T>
 inline void Stack<T>::pop(void)
 {
-    X_ASSERT(size() > 0, "can't pop from a empty stack")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't pop from a empty stack")(size(), capacity());
 
     --current_;
     Mem::Destruct<T>(current_);
@@ -82,8 +77,7 @@ inline void Stack<T>::pop(void)
 template<typename T>
 inline T& Stack<T>::top(void)
 {
-    X_ASSERT(size() > 0, "can't get top from a empty stack")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't get top from a empty stack")(size(), capacity());
     return *(current_ - 1);
 }
 
@@ -91,8 +85,7 @@ inline T& Stack<T>::top(void)
 template<typename T>
 inline const T& Stack<T>::top(void) const
 {
-    X_ASSERT(size() > 0, "can't get top from a empty stack")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't get top from a empty stack")(size(), capacity());
     return *(current_ - 1);
 }
 

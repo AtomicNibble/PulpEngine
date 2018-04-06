@@ -82,8 +82,7 @@ ExtendedMemoryTracking::~ExtendedMemoryTracking(void)
     }
 
     // o dear o.o
-    X_ASSERT(numAllocations_ == 0, "Memory leaks detected. Num: %d", numAllocations_)
-    ();
+    X_ASSERT(numAllocations_ == 0, "Memory leaks detected. Num: %d", numAllocations_)();
 }
 
 /// Stores the allocation along with additional data in a hash map.

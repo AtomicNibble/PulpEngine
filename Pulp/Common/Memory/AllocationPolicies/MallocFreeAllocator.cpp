@@ -31,8 +31,7 @@ MallocFreeAllocator::MallocFreeAllocator(void)
 /// \remark The returned pointer will always adhere to the following alignment requirements: <tt>((ptr + offset) % alignment) == 0</tt>.
 void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t offset)
 {
-    X_ASSERT(alignment > 0, "Alignmnet must be greater than zero")
-    (alignment);
+    X_ASSERT(alignment > 0, "Alignmnet must be greater than zero")(alignment);
 
     size_t size = Origsize + alignment + (SIZE_OF_HEADER);
 

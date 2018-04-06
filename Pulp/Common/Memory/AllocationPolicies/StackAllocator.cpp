@@ -46,8 +46,7 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
 
     // Do we even have room slut?
     if ((current_ + size) > end_) {
-        X_ASSERT((current_ + size) <= end_, "Stack overflow!, a stack allocator can't satisfy the request.")
-        ();
+        X_ASSERT((current_ + size) <= end_, "Stack overflow!, a stack allocator can't satisfy the request.")();
         return nullptr;
     }
 
@@ -102,8 +101,7 @@ void StackAllocator::free(void* ptr)
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     if (as_header->AllocationID_ != (allocationID_ - 1)) {
         uint32_t AllocationID = as_header->AllocationID_;
-        X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")
-        (allocationID_, AllocationID);
+        X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")(allocationID_, AllocationID);
     }
 
     allocationID_--;

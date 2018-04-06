@@ -23,8 +23,7 @@ TechDef::TechDef(const core::string& name, core::StrHash nameHash, const techset
     name_(name),
     nameHash_(nameHash)
 {
-    X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")
-    ();
+    X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
 
     perms_.setGranularity(8);
     shaderSource_.fill(nullptr);
@@ -82,8 +81,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
             perms_.append(pCompilingPerm);
         }
         else {
-            X_ASSERT(notCompiled == false, "Perm is already compiling")
-            (notCompiled);
+            X_ASSERT(notCompiled == false, "Perm is already compiling")(notCompiled);
         }
     }
 
@@ -199,8 +197,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
                         break;
                     }
 
-                    X_ASSERT(it->second.isStatic(), "Should be static sampler")
-                    (it->first, it->second.isStatic());
+                    X_ASSERT(it->second.isStatic(), "Should be static sampler")(it->first, it->second.isStatic());
 
                     render::SamplerState ss;
                     ss.filter = it->second.filter;
@@ -269,8 +266,7 @@ TechDefState::TechDefState(MaterialCat::Enum cat, const core::string& name, core
     techs_(arena),
     pTechSecDef_(nullptr)
 {
-    X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")
-    ();
+    X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
 
     techs_.setGranularity(1);
 }
@@ -377,8 +373,7 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 
 TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat, const core::string& name)
 {
-    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")
-    ();
+    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")();
     static_assert(decltype(techsPoolArena_)::IS_THREAD_SAFE, "Arena must be thread safe");
 
     auto* pTechDef = pTechDefs_->getTechDef(cat, name);
@@ -412,8 +407,7 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
             const auto& shader = techDefTech.shaders[type];
 
             //  make sure the shader in the vertex slot is a vertex shader etc..
-            X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")
-            (shader.type, type);
+            X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")(shader.type, type);
 
             // we ask for the source now, so we know we are able to atleast attempt to compile permatations later on.
             // and don't have to ask for them each time we make a perm.

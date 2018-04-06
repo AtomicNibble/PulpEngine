@@ -208,8 +208,7 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
     }
     else if (token.GetType() == TokenType::PUNCTUATION && puncId != PunctuationId::UNUSET) {
         if (token.GetPuncId() != puncId) {
-            X_ASSERT(scriptStack_.isNotEmpty(), "Script stack should not be empty")
-            ();
+            X_ASSERT(scriptStack_.isNotEmpty(), "Script stack should not be empty")();
 
             Error("expected '%s' but found '%.*s'",
                 scriptStack_.top()->GetPunctuationFromId(puncId), token.length(), token.begin());
@@ -1266,8 +1265,7 @@ bool XParser::ExpandDefineIntoSource(XLexToken& token, MacroDefine* pDefine)
 
 MacroDefine* XParser::FindDefine(XLexToken& token) const
 {
-    X_ASSERT(token.length() > 0, "invalid token passed, must have a length")
-    (token.length());
+    X_ASSERT(token.length() > 0, "invalid token passed, must have a length")(token.length());
     // little optermisation, which will work very well if all macro's
     // are upper case, since anything else in the file not starting with uppercase.
     // will fail this test.

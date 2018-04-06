@@ -25,8 +25,7 @@ namespace random
     {
         static_assert(sizeof(hProvider_) == sizeof(HCRYPTPROV), "invalid size");
 
-        X_ASSERT(hProvider_ == 0, "Provider already created")
-        (hProvider_);
+        X_ASSERT(hProvider_ == 0, "Provider already created")(hProvider_);
 
         if (!CryptAcquireContextW(
                 (HCRYPTPROV*)&hProvider_,
@@ -44,8 +43,7 @@ namespace random
 
     void CryptRand::genBytes(uint8_t* pBuf, size_t numBytes)
     {
-        X_ASSERT(hProvider_ != 0, "Invalid provider")
-        (hProvider_);
+        X_ASSERT(hProvider_ != 0, "Invalid provider")(hProvider_);
 
         if (!::CryptGenRandom(hProvider_, safe_static_cast<DWORD>(numBytes), pBuf)) {
             lastError::Description Dsc;

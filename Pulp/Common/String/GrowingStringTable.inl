@@ -9,20 +9,15 @@ GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::GrowingStrin
     buffer_(arena),
     arena_(arena)
 {
-    X_ASSERT(blockGranularity >= 1, "blockGranularity must be atleast 1")
-    (blockGranularity);
+    X_ASSERT(blockGranularity >= 1, "blockGranularity must be atleast 1")(blockGranularity);
     // 4 is silly but i'll allow it, 8 is the sensible min.
-    X_ASSERT(BlockSize >= 4, "Block size must be atleast 4 bytes")
-    (BlockSize);
+    X_ASSERT(BlockSize >= 4, "Block size must be atleast 4 bytes")(BlockSize);
     // the block size must be atleast the alignment
-    X_ASSERT(BlockSize >= Alignment, "Block size must be equal or greater than Alignment")
-    (BlockSize, Alignment);
+    X_ASSERT(BlockSize >= Alignment, "Block size must be equal or greater than Alignment")(BlockSize, Alignment);
     // lets also make it a multiple of the alignment.
-    X_ASSERT((BlockSize % Alignment) == 0, "Block size must be multiple of Alignment")
-    (BlockSize, Alignment);
+    X_ASSERT((BlockSize % Alignment) == 0, "Block size must be multiple of Alignment")(BlockSize, Alignment);
     // Not stupid alignment.
-    X_ASSERT(Alignment <= 64, "Alignment must be 64 or lower")
-    (Alignment);
+    X_ASSERT(Alignment <= 64, "Alignment must be 64 or lower")(Alignment);
 }
 
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
@@ -61,8 +56,7 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addString(const char* str, size_t Len)
 {
-    X_ASSERT(Len < 255, "string is longer than the 255 max")
-    (Len);
+    X_ASSERT(Len < 255, "string is longer than the 255 max")(Len);
 
     IdType Block = CurrentBlock_;
 
@@ -101,8 +95,7 @@ IdType GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::addSt
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 const char* GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>::getString(IdType ID) const
 {
-    X_ASSERT(ID < CurrentBlock_, "String out of range")
-    (ID, CurrentBlock_);
+    X_ASSERT(ID < CurrentBlock_, "String out of range")(ID, CurrentBlock_);
 
     // get alligned buffer.
     const uint8_t* pStart = core::pointerUtil::AlignTop(buffer_.ptr() + sizeof(Header_t),

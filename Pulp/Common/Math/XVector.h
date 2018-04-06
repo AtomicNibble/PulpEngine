@@ -90,15 +90,13 @@ public:
 
     X_INLINE const T& operator[](size_t i) const
     {
-        X_ASSERT(i >= 0 && i < 2, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 2, "out of range")(i);
         return (&x)[i];
     }
 
     X_INLINE T& operator[](size_t i)
     {
-        X_ASSERT(i >= 0 && i < 2, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 2, "out of range")(i);
         return (&x)[i];
     }
 
@@ -454,15 +452,13 @@ public:
 
     X_INLINE const T& operator[](size_t i) const
     {
-        X_ASSERT(i >= 0 && i < 3, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 3, "out of range")(i);
         return (&x)[i];
     }
 
     X_INLINE T& operator[](size_t i)
     {
-        X_ASSERT(i >= 0 && i < 3, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 3, "out of range")(i);
         return (&x)[i];
     }
 
@@ -941,15 +937,13 @@ public:
 
     X_INLINE const T& operator[](size_t i) const
     {
-        X_ASSERT(i >= 0 && i < 4, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 4, "out of range")(i);
         return (&x)[i];
     }
 
     X_INLINE T& operator[](size_t i)
     {
-        X_ASSERT(i >= 0 && i < 4, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 4, "out of range")(i);
         return (&x)[i];
     }
 
@@ -1385,15 +1379,13 @@ public:
 
     X_INLINE const T& operator[](size_t i) const
     {
-        X_ASSERT(i >= 0 && i < 5, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 5, "out of range")(i);
         return (&x)[i];
     }
 
     X_INLINE T& operator[](size_t i)
     {
-        X_ASSERT(i >= 0 && i < 5, "out of range")
-        (i);
+        X_ASSERT(i >= 0 && i < 5, "out of range")(i);
         return (&x)[i];
     }
 

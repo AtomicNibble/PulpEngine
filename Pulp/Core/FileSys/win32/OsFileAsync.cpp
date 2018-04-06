@@ -25,8 +25,7 @@ namespace
         // okay so we are sexy and kinky.
         // we need to run the callback.
         XOsFileAsyncOperation::AsyncOp* pOverlap = static_cast<XOsFileAsyncOperation::AsyncOp*>(lpOverlap);
-        X_ASSERT(pOverlap->callback, "Callback not valid")
-        ();
+        X_ASSERT(pOverlap->callback, "Callback not valid")();
 
         pOverlap->callback.Invoke(pOverlap, static_cast<uint32_t>(dwNumberOfBytesTransfered));
     }
@@ -265,8 +264,7 @@ uint64_t OsFileAsync::fileSize(void) const
 
     uint64_t fileSize = (static_cast<uint64_t>(info.nFileSizeHigh) << 32) | static_cast<uint64_t>(info.nFileSizeLow);
     uint64_t offset = tell();
-    X_ASSERT(fileSize >= offset, "File offset is larger than file size")
-    (fileSize, offset);
+    X_ASSERT(fileSize >= offset, "File offset is larger than file size")(fileSize, offset);
     return fileSize - offset;
 }
 

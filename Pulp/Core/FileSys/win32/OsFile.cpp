@@ -201,8 +201,7 @@ uint64_t OsFile::remainingBytes(void) const
 
     uint64_t size = fileSize();
     uint64_t offset = tell();
-    X_ASSERT(size >= offset, "File offset is larger than file size")
-    (size, offset);
+    X_ASSERT(size >= offset, "File offset is larger than file size")(size, offset);
     return size - offset;
 }
 

@@ -10,8 +10,7 @@ StringRef<CharT>::StringRef()
 template<typename CharT>
 StringRef<CharT>::StringRef(const StrT& str)
 {
-    X_ASSERT(str.header()->refCount != 0, "can't constuct a string from one that has a ref count of 0")
-    ();
+    X_ASSERT(str.header()->refCount != 0, "can't constuct a string from one that has a ref count of 0")();
 
     if (str.header()->refCount >= 0) {
         str_ = str.str_;
@@ -44,8 +43,7 @@ template<typename CharT>
 StringRef<CharT>::StringRef(value_type ch, size_type numRepeat)
 {
     SetEmpty(); // if for some reason repeat is 0 (maybe assert on it?)
-    X_ASSERT(numRepeat > 0, "string constructed with a char repeat value of 0.")
-    (ch, numRepeat);
+    X_ASSERT(numRepeat > 0, "string constructed with a char repeat value of 0.")(ch, numRepeat);
 
     if (numRepeat > 0) {
         Allocate(numRepeat);
@@ -189,10 +187,8 @@ void StringRef<CharT>::clear(void)
     if (header()->refCount >= 0) // check for the -1 ref.
         free();
 
-    X_ASSERT(length() == 0, "Failed to clear string")
-    (length());
-    X_ASSERT(header()->refCount < 0 || capacity() == 0, "string is not pointing to empty data")
-    ();
+    X_ASSERT(length() == 0, "Failed to clear string")(length());
+    X_ASSERT(header()->refCount < 0 || capacity() == 0, "string is not pointing to empty data")();
 }
 
 // Sets the capacity of the string to a number at least as great as a specified number.
@@ -981,8 +977,7 @@ typename StringRef<CharT>::XStrHeader* StringRef<CharT>::header(void) const
 template<class CharT>
 void StringRef<CharT>::Allocate(size_type length)
 {
-    X_ASSERT(length >= 0 && length <= (INT_MAX - 1), "length is invalid")
-    (length);
+    X_ASSERT(length >= 0 && length <= (INT_MAX - 1), "length is invalid")(length);
 
     if (length == 0) {
         SetEmpty();
@@ -1101,8 +1096,7 @@ void StringRef<CharT>::freeData(XStrHeader* pData)
 {
     if (pData->refCount >= 0) // Not empty string.
     {
-        X_ASSERT(pData->refCount != 0, "invalid ref count")
-        (pData->refCount);
+        X_ASSERT(pData->refCount != 0, "invalid ref count")(pData->refCount);
         if (pData->release() <= 0) {
             X_ASSERT_NOT_NULL(gEnv);
             X_ASSERT_NOT_NULL(gEnv->pStrArena);

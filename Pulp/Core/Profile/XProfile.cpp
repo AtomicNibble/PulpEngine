@@ -266,14 +266,12 @@ namespace profiler
     void XProfileSys::AddProfileData(XProfileData* pData)
     {
         if (pData->getType() == XProfileData::Type::SingleShot) {
-            X_ASSERT(profilerData_.find(pData) == decltype(profilerData_)::invalid_index, "Data node already added")
-            ();
+            X_ASSERT(profilerData_.find(pData) == decltype(profilerData_)::invalid_index, "Data node already added")();
             profilerData_.emplace_back(pData);
         }
         else {
             auto* pDataHistory = static_cast<decltype(profilerHistoryData_)::Type>(pData);
-            X_ASSERT(profilerHistoryData_.find(pDataHistory) == decltype(profilerHistoryData_)::invalid_index, "Data node already added")
-            ();
+            X_ASSERT(profilerHistoryData_.find(pDataHistory) == decltype(profilerHistoryData_)::invalid_index, "Data node already added")();
             profilerHistoryData_.emplace_back(pDataHistory);
         }
     }

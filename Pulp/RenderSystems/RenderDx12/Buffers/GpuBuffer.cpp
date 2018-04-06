@@ -87,8 +87,7 @@ void GpuBuffer::createPlaced(ID3D12Device* pDevice, ContextManager& contexMan,
 D3D12_CPU_DESCRIPTOR_HANDLE GpuBuffer::createConstantBufferView(ID3D12Device* pDevice, DescriptorAllocator& allocator,
     uint32_t offset, uint32_t size) const
 {
-    X_ASSERT(offset + size <= bufferSize_, "Range out of range")
-    (offset, size, offset + size, bufferSize_);
+    X_ASSERT(offset + size <= bufferSize_, "Range out of range")(offset, size, offset + size, bufferSize_);
 
     size = core::bitUtil::RoundUpToMultiple(size, 16u);
 
@@ -121,8 +120,7 @@ D3D12_INDEX_BUFFER_VIEW GpuBuffer::indexBufferView(size_t offset, uint32_t size,
 
 D3D12_RESOURCE_DESC GpuBuffer::describeBuffer(void)
 {
-    X_ASSERT(bufferSize_ > 0, "buffer size not set")
-    (bufferSize_);
+    X_ASSERT(bufferSize_ > 0, "buffer size not set")(bufferSize_);
 
     D3D12_RESOURCE_DESC desc;
     core::zero_object(desc);

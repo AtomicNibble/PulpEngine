@@ -80,8 +80,7 @@ void XScriptTable::setValueAny(const char* pKey, const ScriptValue& any, bool bC
     }
     else {
 #if X_DEBUG
-        X_ASSERT(setChainActive_, "begin chain not called")
-        ();
+        X_ASSERT(setChainActive_, "begin chain not called")();
 #endif // !X_DEBUG
     }
 
@@ -132,8 +131,7 @@ bool XScriptTable::getValueAny(const char* pKey, ScriptValue& any, bool bChain)
     }
     else {
 #if X_DEBUG
-        X_ASSERT(setChainActive_, "begin chain not called")
-        ();
+        X_ASSERT(setChainActive_, "begin chain not called")();
 #endif // !X_DEBUG
     }
 
@@ -216,8 +214,7 @@ void XScriptTable::endChain(void)
         stack::pop(L);
     }
     else {
-        X_ASSERT(false, "Mismatch in Set/Get Chain")
-        ();
+        X_ASSERT(false, "Mismatch in Set/Get Chain")();
     }
 }
 
@@ -237,8 +234,7 @@ void XScriptTable::clear(void)
         lua_rawset(L, trgTable);
     }
 
-    X_ASSERT(stack::istable(L), "should be a table")
-    (stack::get_type(L));
+    X_ASSERT(stack::istable(L), "should be a table")(stack::get_type(L));
     stack::pop(L);
 }
 
@@ -498,8 +494,7 @@ void XScriptTable::attach(IScriptTable* pSO)
 
 X_INLINE void XScriptTable::pushRef(void)
 {
-    X_ASSERT(luaRef_ != lua::Ref::Deleted && luaRef_ != lua::Ref::Nil, "Invalid table ref")
-    (luaRef_);
+    X_ASSERT(luaRef_ != lua::Ref::Deleted && luaRef_ != lua::Ref::Nil, "Invalid table ref")(luaRef_);
 
 #if X_DEBUG
     // extra logic in debug only, otherwise bloat all the functions.
@@ -524,8 +519,7 @@ X_INLINE void XScriptTable::pushRef(void)
 void XScriptTable::pushRef(IScriptTable* pObj)
 {
     int32_t ref = static_cast<XScriptTable*>(pObj)->luaRef_;
-    X_ASSERT(ref != lua::Ref::Deleted, "Access to deleted script object")
-    (ref);
+    X_ASSERT(ref != lua::Ref::Deleted, "Access to deleted script object")(ref);
 
     stack::push_ref(L, ref);
 }

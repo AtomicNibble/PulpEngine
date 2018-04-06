@@ -183,8 +183,7 @@ bool CBufferManager::autoUpdateBuffer(render::shader::XCBuffer& cbuf)
 
 bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint8_t* pDataDst, size_t dstLen)
 {
-    X_ASSERT(dstLen >= static_cast<size_t>(cbuf.getBindSize()), "Dest buffer is too small")
-    (dstLen, cbuf.getBindSize());
+    X_ASSERT(dstLen >= static_cast<size_t>(cbuf.getBindSize()), "Dest buffer is too small")(dstLen, cbuf.getBindSize());
 
     // skip if this cbuffer don't have any per frame param
     if (!cbuf.containsUpdateFreqs(render::shader::UpdateFreq::FRAME)) {
@@ -204,8 +203,7 @@ bool CBufferManager::autoUpdateBuffer(const render::shader::XCBuffer& cbuf, uint
 
 render::ConstantBufferHandle CBufferManager::createCBuffer(const render::shader::XCBuffer& cbuf)
 {
-    X_ASSERT(cbuf.getHash() != 0, "Hash is not calculated")
-    ();
+    X_ASSERT(cbuf.getHash() != 0, "Hash is not calculated")();
 
     // we only share cb's that are composed of just per frame params.
     if (cbuf.containsOnlyFreq(render::shader::UpdateFreq::FRAME)) {
@@ -246,8 +244,7 @@ void CBufferManager::destoryConstBuffer(const render::shader::XCBuffer& cbuf, re
             X_ASSERT_UNREACHABLE();
         }
 
-        X_ASSERT(it->handle == handle, "Destory CB called with a handle that was not created from the provided CB")
-        ();
+        X_ASSERT(it->handle == handle, "Destory CB called with a handle that was not created from the provided CB")();
 
         if (it->removeReference() == 0) {
             pRender_->destoryConstBuffer(it->handle);
@@ -270,8 +267,7 @@ X_INLINE void CBufferManager::setParamValue(const render::shader::XShaderParam& 
 
     const ptrdiff_t space = pEnd - pDst;
 
-    X_ASSERT(space >= param.getNumVecs() * 16, "")
-    (space, param.getBindOffset(), param.getNumVecs());
+    X_ASSERT(space >= param.getNumVecs() * 16, "")(space, param.getBindOffset(), param.getNumVecs());
 
     switch (param.getType()) {
         case ParamType::PF_worldToScreenMatrix:

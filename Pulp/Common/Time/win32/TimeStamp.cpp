@@ -56,8 +56,7 @@ int TimeStamp::GetHour(void) const
 {
     REPASTIME(*this);
     int Hour = GETCOMPONENT(Time_, BITOFFSETHOUR, BITSIZEHOUR);
-    X_ASSERT(Hour >= 0 && Hour < 24, "Hour value is not valid")
-    (Hour);
+    X_ASSERT(Hour >= 0 && Hour < 24, "Hour value is not valid")(Hour);
     return Hour;
 }
 
@@ -65,8 +64,7 @@ int TimeStamp::GetMinute(void) const
 {
     REPASTIME(*this);
     int Minute = GETCOMPONENT(Time_, BITOFFSETMINUTE, BITSIZEMINUTE);
-    X_ASSERT(Minute >= 0 && Minute < 60, "Minute value is not valid")
-    (Minute);
+    X_ASSERT(Minute >= 0 && Minute < 60, "Minute value is not valid")(Minute);
     return Minute;
 }
 
@@ -74,8 +72,7 @@ int TimeStamp::GetSecond(void) const
 {
     REPASTIME(*this);
     int Second = GETCOMPONENT(Time_, BITOFFSETSECOND, BITSIZESECOND);
-    X_ASSERT(Second >= 0 && Second < 60, "Seconds value is not valid")
-    (Second);
+    X_ASSERT(Second >= 0 && Second < 60, "Seconds value is not valid")(Second);
     return Second;
 }
 
@@ -83,8 +80,7 @@ int TimeStamp::GetMilliSecond(void) const
 {
     REPASTIME(*this);
     int MilliSecond = GETCOMPONENT(Time_, BITOFFSETMILLISECOND, BITSIZEMILLISECOND);
-    X_ASSERT(MilliSecond >= 0 && MilliSecond < 1000, "Milliseconds value is not valid")
-    (MilliSecond);
+    X_ASSERT(MilliSecond >= 0 && MilliSecond < 1000, "Milliseconds value is not valid")(MilliSecond);
     return MilliSecond;
 }
 
@@ -110,8 +106,7 @@ const char* TimeStamp::ToString(FileDescription& desc) const
 
 void TimeStamp::InternalToMSPM(void) const
 {
-    X_ASSERT(Time_ >= 0, "Time is negative")
-    (Time_);
+    X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
     int Hour = GETCOMPONENT(Time_, BITOFFSETHOUR, BITSIZEHOUR);
     int Minute = GETCOMPONENT(Time_, BITOFFSETMINUTE, BITSIZEMINUTE);
@@ -122,8 +117,7 @@ void TimeStamp::InternalToMSPM(void) const
 
 void TimeStamp::InternalToTime(void) const
 {
-    X_ASSERT(Time_ >= 0, "Time is negative")
-    (Time_);
+    X_ASSERT(Time_ >= 0, "Time is negative")(Time_);
 
     // Convert to time parts
     int MilliSecond = Time_ % 1000;

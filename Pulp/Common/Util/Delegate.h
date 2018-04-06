@@ -280,8 +280,7 @@ public:
     /// Invokes the delegate.
     R Invoke() const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance);
     }
 
@@ -426,8 +425,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0);
     }
 
@@ -572,8 +570,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1);
     }
 
@@ -718,8 +715,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2);
     }
 
@@ -864,8 +860,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2, arg3);
     }
 
@@ -1010,8 +1005,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4);
     }
 
@@ -1156,8 +1150,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
@@ -1302,8 +1295,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
@@ -1448,8 +1440,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
 

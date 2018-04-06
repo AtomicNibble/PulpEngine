@@ -24,8 +24,7 @@ FixedArray<T, N>::~FixedArray(void)
 template<typename T, size_t N>
 const T& FixedArray<T, N>::operator[](size_type idx) const
 {
-    X_ASSERT(idx < size_, "Array index out of bounds")
-    (idx, size_, N);
+    X_ASSERT(idx < size_, "Array index out of bounds")(idx, size_, N);
     const T* pArr = begin();
 
     return pArr[idx];
@@ -34,8 +33,7 @@ const T& FixedArray<T, N>::operator[](size_type idx) const
 template<typename T, size_t N>
 T& FixedArray<T, N>::operator[](size_type idx)
 {
-    X_ASSERT(idx < size_, "Array index out of bounds")
-    (idx, size_, N);
+    X_ASSERT(idx < size_, "Array index out of bounds")(idx, size_, N);
     T* pArr = begin();
 
     return pArr[idx];
@@ -80,8 +78,7 @@ template<typename T, size_t N>
 template<class... Args>
 X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(Args&&... args)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct<T>(&pArr[size_], std::forward<Args>(args)...);
@@ -93,8 +90,7 @@ X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(Args&&... arg
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct(&pArr[size_], obj);
@@ -106,8 +102,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::append(T&& obj)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct(&pArr[size_], std::forward<T>(obj));
@@ -120,8 +115,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::append(T&& obj)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct(&pArr[size_], obj);
@@ -133,8 +127,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)
 template<typename T, size_t N>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(T&& obj)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct(&pArr[size_], std::forward<T>(obj));
@@ -147,8 +140,7 @@ template<typename T, size_t N>
 template<class... ArgsT>
 typename FixedArray<T, N>::size_type FixedArray<T, N>::emplace_back(ArgsT&&... args)
 {
-    X_ASSERT(size_ < N, "Fixed size array is full")
-    (N, size_);
+    X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
     Mem::Construct<T>(&pArr[size_], std::forward<ArgsT>(args)...);
@@ -171,10 +163,8 @@ typename FixedArray<T, N>::iterator FixedArray<T, N>::insert(iterator position, 
 {
     size_type off = position - begin();
 
-    X_ASSERT(size() < capacity(), "No space")
-    (size(), capacity());
-    X_ASSERT(off < N, "invalid position for FixedArray: out of bounds")
-    (N, off);
+    X_ASSERT(size() < capacity(), "No space")(size(), capacity());
+    X_ASSERT(off < N, "invalid position for FixedArray: out of bounds")(N, off);
 
     T* pArr = begin();
 
@@ -232,10 +222,8 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::find(const Type& val) con
 template<typename T, size_t N>
 void FixedArray<T, N>::resize(size_type newNum)
 {
-    X_ASSERT(newNum >= 0, "array size must be positive")
-    (newNum);
-    X_ASSERT(newNum <= N, "array size must be less or equal to capacity")
-    (newNum, N);
+    X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+    X_ASSERT(newNum <= N, "array size must be less or equal to capacity")(newNum, N);
 
     if (newNum == size_) {
         return;
@@ -260,10 +248,8 @@ void FixedArray<T, N>::resize(size_type newNum)
 template<typename T, size_t N>
 void FixedArray<T, N>::resize(size_type newNum, const T& t)
 {
-    X_ASSERT(newNum >= 0, "array size must be positive")
-    (newNum);
-    X_ASSERT(newNum <= N, "array size must be less or equal to capacity")
-    (newNum, N);
+    X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
+    X_ASSERT(newNum <= N, "array size must be less or equal to capacity")(newNum, N);
 
     if (newNum == size_) {
         return;
@@ -346,32 +332,28 @@ inline typename FixedArray<T, N>::const_iterator FixedArray<T, N>::end(void) con
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::Reference FixedArray<T, N>::front(void)
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
     return *begin();
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::ConstReference FixedArray<T, N>::front(void) const
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
     return *begin();
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::Reference FixedArray<T, N>::back(void)
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
     return (*(end() - 1));
 }
 
 template<typename T, size_t N>
 inline typename FixedArray<T, N>::ConstReference FixedArray<T, N>::back(void) const
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
     return (*(end() - 1));
 }
 

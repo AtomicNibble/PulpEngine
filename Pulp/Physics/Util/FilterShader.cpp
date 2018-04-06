@@ -46,27 +46,22 @@ namespace filter
         X_INLINE uint32_t convertFlagToIdx(const GroupFlag::Enum group)
         {
             uint32_t idx = core::bitUtil::ScanBits(group);
-            X_ASSERT(idx != core::bitUtil::NO_BIT_SET, "Flag is invalid")
-            (group, idx);
+            X_ASSERT(idx != core::bitUtil::NO_BIT_SET, "Flag is invalid")(group, idx);
             return idx;
         }
 
         static void SetGroupCollisionFlag(const uint32_t group1, const uint32_t group2, const bool enable)
         {
-            X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")
-            (group1);
-            X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")
-            (group2);
+            X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")(group1);
+            X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")(group2);
             gCollisionTable[group1][group2] = enable;
             gCollisionTable[group2][group1] = enable;
         }
 
         static bool GetGroupCollisionFlag(const uint32_t group1, const uint32_t group2)
         {
-            X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")
-            (group1);
-            X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")
-            (group2);
+            X_ASSERT(group1 < GroupFlag::FLAGS_COUNT, "Index out of range")(group1);
+            X_ASSERT(group2 < GroupFlag::FLAGS_COUNT, "Index out of range")(group2);
             return gCollisionTable[group1][group2]();
         }
 

@@ -104,15 +104,13 @@ X_INLINE bool NetVars::ignorePasswordFromClientIfNotRequired(void) const
 
 X_INLINE core::Compression::Algo::Enum NetVars::ackCompAlgo(void) const
 {
-    X_ASSERT(ackCompAlgo_ >= 0 && ackCompAlgo_ < core::Compression::Algo::ENUM_COUNT, "Algo enum out of range")
-    ();
+    X_ASSERT(ackCompAlgo_ >= 0 && ackCompAlgo_ < core::Compression::Algo::ENUM_COUNT, "Algo enum out of range")();
     return static_cast<core::Compression::Algo::Enum>(ackCompAlgo_);
 }
 
 X_INLINE core::Compression::Algo::Enum NetVars::compAlgo(void) const
 {
-    X_ASSERT(ackCompAlgo_ >= 0 && ackCompAlgo_ < core::Compression::Algo::ENUM_COUNT, "Algo enum out of range")
-    ();
+    X_ASSERT(ackCompAlgo_ >= 0 && ackCompAlgo_ < core::Compression::Algo::ENUM_COUNT, "Algo enum out of range")();
     return static_cast<core::Compression::Algo::Enum>(compAlgo_);
 }
 

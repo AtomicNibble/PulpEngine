@@ -62,8 +62,7 @@ GrowingMicroAllocator::GrowingMicroAllocator(uint32_t maxSizeInBytesPerPool, uin
 void* GrowingMicroAllocator::allocate(size_t size, size_t alignment, size_t offset)
 {
     if (size > MAX_ALLOCATION_SIZE) {
-        X_ASSERT(false, "Micro Can't allocate more than %d bytes", MAX_ALLOCATION_SIZE)
-        (size);
+        X_ASSERT(false, "Micro Can't allocate more than %d bytes", MAX_ALLOCATION_SIZE)(size);
     }
 
 #if X_USE_FULL_LOOKUP_TABLE

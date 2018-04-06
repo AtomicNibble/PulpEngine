@@ -241,16 +241,14 @@ public:
 
     void setArena(MemoryArenaBase* arena)
     {
-        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")
-        (numElements_);
+        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")(numElements_);
         arena_ = arena;
         buckets_.setArena(arena);
     }
 
     void setArena(MemoryArenaBase* arena, size_type size)
     {
-        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")
-        (numElements_);
+        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")(numElements_);
         arena_ = arena;
         buckets_.setArena(arena);
 
@@ -581,8 +579,7 @@ _HashBase_iterator<Key, Value, HashFn, EqualKey>&
                 pTemp = pTemp->next_;
             }
 
-            X_ASSERT(pTemp != nullptr, "Index lookup error")
-            ();
+            X_ASSERT(pTemp != nullptr, "Index lookup error")();
         }
 #endif // !X_ENABLE_ASSERTIONS
 
@@ -625,8 +622,7 @@ _HashBase_const_iterator<Key, Value, HashFn, EqualKey>&
                 pTemp = pTemp->next_;
             }
 
-            X_ASSERT(pTemp != nullptr, "Index lookup error")
-            ();
+            X_ASSERT(pTemp != nullptr, "Index lookup error")();
         }
 #endif // !X_ENABLE_ASSERTIONS
 

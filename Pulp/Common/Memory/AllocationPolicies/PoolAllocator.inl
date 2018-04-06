@@ -3,14 +3,11 @@
 // ---------------------------------------------------------------------------------------------------------------------
 X_INLINE void* PoolAllocator::allocate(size_t size, size_t alignment, size_t offset)
 {
-    X_ASSERT(size <= maxSize_, "A pool allocator can only allocate instances of the same or smaller size.")
-    (maxSize_, size, alignment, offset);
+    X_ASSERT(size <= maxSize_, "A pool allocator can only allocate instances of the same or smaller size.")(maxSize_, size, alignment, offset);
 
 #if X_ENABLE_POOL_ALLOCATOR_CHECK
-    X_ASSERT(alignment <= maxAlignment_, "A pool allocator can only allocate instances with the same or smaller alignment.")
-    (maxSize_, size, maxAlignment_, alignment, offset_, offset);
-    X_ASSERT(offset == offset_, "A pool allocator can only allocate instances with the same offset.")
-    (maxSize_, size, maxAlignment_, alignment, offset_, offset);
+    X_ASSERT(alignment <= maxAlignment_, "A pool allocator can only allocate instances with the same or smaller alignment.")(maxSize_, size, maxAlignment_, alignment, offset_, offset);
+    X_ASSERT(offset == offset_, "A pool allocator can only allocate instances with the same offset.")(maxSize_, size, maxAlignment_, alignment, offset_, offset);
 #else
     X_UNUSED(alignment);
     X_UNUSED(offset);
@@ -18,8 +15,7 @@ X_INLINE void* PoolAllocator::allocate(size_t size, size_t alignment, size_t off
 
     void* memory = freelist_.Obtain();
 
-    X_ASSERT(memory != nullptr, "failed to allocate from pool")
-    ();
+    X_ASSERT(memory != nullptr, "failed to allocate from pool")();
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     if (memory != nullptr) {

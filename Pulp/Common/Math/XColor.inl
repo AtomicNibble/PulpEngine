@@ -127,16 +127,14 @@ X_INLINE ColorT<T> ColorT<T>::operator=(const ColorT<T>& rhs)
 template<typename T>
 X_INLINE const T& ColorT<T>::operator[](int i) const
 {
-    X_ASSERT(i >= 0 && i < 4, "out of range")
-    (i);
+    X_ASSERT(i >= 0 && i < 4, "out of range")(i);
     return (&r)[i];
 }
 
 template<typename T>
 X_INLINE T& ColorT<T>::operator[](int i)
 {
-    X_ASSERT(i >= 0 && i < 4, "out of range")
-    (i);
+    X_ASSERT(i >= 0 && i < 4, "out of range")(i);
     return (&r)[i];
 }
 

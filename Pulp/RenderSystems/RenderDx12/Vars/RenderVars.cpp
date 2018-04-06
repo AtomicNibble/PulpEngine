@@ -19,8 +19,7 @@ RenderVars::RenderVars() :
 
 void RenderVars::registerVars(void)
 {
-    X_ASSERT(!varsRegisterd_, "Vars already init")
-    (varsRegisterd_);
+    X_ASSERT(!varsRegisterd_, "Vars already init")(varsRegisterd_);
 
     ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Enable d3d debug layer");

@@ -18,10 +18,8 @@ ColorBuffer::ColorBuffer(::texture::Texture& textInst, Colorf clearCol) :
 void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator& allocator,
     DXGI_FORMAT format, uint32_t arraySize, uint32_t numMips)
 {
-    X_ASSERT(arraySize == 1 || numMips == 1, "auto-mips on texture arrays not supported")
-    (arraySize, numMips);
-    X_ASSERT(numMips < texture::TEX_MAX_MIPS, "numMips exceeds max")
-    (numMips, texture::TEX_MAX_MIPS);
+    X_ASSERT(arraySize == 1 || numMips == 1, "auto-mips on texture arrays not supported")(arraySize, numMips);
+    X_ASSERT(numMips < texture::TEX_MAX_MIPS, "numMips exceeds max")(numMips, texture::TEX_MAX_MIPS);
 
     auto& tex = getTex();
     tex.setNumMips(numMips - 1);
@@ -80,8 +78,7 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
     UAVHandles_.resize(numMips);
     std::fill(UAVHandles_.begin(), UAVHandles_.end(), CD3DX12_CPU_DESCRIPTOR_HANDLE());
 
-    X_ASSERT(UAVHandles_[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN, "Incorrect initial value")
-    ();
+    X_ASSERT(UAVHandles_[0].ptr == D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN, "Incorrect initial value")();
 
     // Create the UAVs for each mip level (RWTexture2D)
     D3D12_CPU_DESCRIPTOR_HANDLE* pUAVHandles = getUAVs();

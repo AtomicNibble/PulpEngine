@@ -63,15 +63,13 @@ SplitPacketChannel::SplitPacketChannel(core::MemoryArenaBase* arena) :
 
 bool SplitPacketChannel::hasFirstPacket(void) const
 {
-    X_ASSERT(packets.isNotEmpty(), "Should not be empty")
-    (packets.size(), packets.capacity());
+    X_ASSERT(packets.isNotEmpty(), "Should not be empty")(packets.size(), packets.capacity());
     return packets[0] != nullptr;
 }
 
 bool SplitPacketChannel::haveAllPackets(void) const
 {
-    X_ASSERT(packets.isNotEmpty(), "Should not be empty")
-    (packets.size(), packets.capacity());
+    X_ASSERT(packets.isNotEmpty(), "Should not be empty")(packets.size(), packets.capacity());
     return hasFirstPacket() && packets[0]->splitPacketCount == packetsRecived;
 }
 
@@ -101,8 +99,7 @@ ReliablePacket::ReliablePacket(core::MemoryArenaBase* dataArena)
 
 ReliablePacket::~ReliablePacket()
 {
-    X_ASSERT(pData == nullptr, "Data was not free before packet decon")
-    (pData);
+    X_ASSERT(pData == nullptr, "Data was not free before packet decon")(pData);
 }
 
 void ReliablePacket::freeData(void)
@@ -115,8 +112,7 @@ void ReliablePacket::freeData(void)
             dataBitLength = 0;
         }
         else {
-            X_ASSERT(dataBitLength == 0, "No data buffer, when length is none zero")
-            (dataBitLength, pData);
+            X_ASSERT(dataBitLength == 0, "No data buffer, when length is none zero")(dataBitLength, pData);
         }
     }
     else if (dataType == DataType::Ref) {
@@ -141,10 +137,8 @@ void ReliablePacket::freeData(void)
 void ReliablePacket::allocData(size_t numBits)
 {
     // do i just want to set dataType in here? or just assume it's always normal and check with assert :/
-    X_ASSERT(dataType == DataType::Normal, "Expected data type to by normal")
-    (DataType::ToString(dataType));
-    X_ASSERT(pData == nullptr, "Packet already has data")
-    (pData, dataBitLength);
+    X_ASSERT(dataType == DataType::Normal, "Expected data type to by normal")(DataType::ToString(dataType));
+    X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
     X_ASSERT_NOT_NULL(arena);
 
     dataBitLength = safe_static_cast<BitSizeT>(numBits);
@@ -158,8 +152,7 @@ core::MemoryArenaBase* ReliablePacket::getArena(void) const
 
 void ReliablePacket::setArena(core::MemoryArenaBase* arena)
 {
-    X_ASSERT(pData == nullptr, "Packet already has data")
-    (pData, dataBitLength);
+    X_ASSERT(pData == nullptr, "Packet already has data")(pData, dataBitLength);
 
     this->arena = arena;
 }
@@ -256,8 +249,7 @@ size_t ReliablePacket::getHeaderLengthBits(void) const
 
     bits = core::bitUtil::RoundUpToMultiple(bits, 8_sz);
 
-    X_ASSERT(bits <= getMaxHeaderLengthBits(), "bit count exceeded calculated max")
-    (bits, getMaxHeaderLengthBits());
+    X_ASSERT(bits <= getMaxHeaderLengthBits(), "bit count exceeded calculated max")(bits, getMaxHeaderLengthBits());
     return bits;
 }
 
@@ -377,8 +369,7 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
     allocData(bits);
 
-    X_ASSERT(dataBitLength == bits, "bit count not set correct")
-    (dataBitLength, bits);
+    X_ASSERT(dataBitLength == bits, "bit count not set correct")(dataBitLength, bits);
 
     pData[core::bitUtil::bitsToBytes(bits) - 1] = 0; // zero last bit, as we may not have full byte.
 
@@ -580,8 +571,7 @@ bool ReliabilityLayer::send(const uint8_t* pData, const BitSizeT lengthBits, cor
     PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, SendReceipt receipt, bool ownData)
 {
     X_ASSERT_NOT_NULL(pData);
-    X_ASSERT(lengthBits > 0, "Must call with alreast some bits")
-    ();
+    X_ASSERT(lengthBits > 0, "Must call with alreast some bits")();
 
     auto lengthBytes = core::bitUtil::bitsToBytes(lengthBits);
 
@@ -804,8 +794,7 @@ bool ReliabilityLayer::recv(uint8_t* pData, const size_t length, NetSocket& sock
             pPacket = packetFromBS(bs, time);
         }
 
-        X_ASSERT(bs.isEos(), "Unprocessed bytes")
-        (bs.isEos(), bs.size(), bs.capacity());
+        X_ASSERT(bs.isEos(), "Unprocessed bytes")(bs.isEos(), bs.size(), bs.capacity());
     }
 
     return true;
@@ -815,8 +804,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
 {
     ReliablePacket* pPacket = pPacketInOut;
 
-    X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")
-    (pPacket->reliability);
+    X_ASSERT(!pPacket->isAckRequired(), "Ack should be dropped from reliability type before sending")(pPacket->reliability);
 
     // if ordered range check channel to prevent a crash.
     if (pPacket->isOrderedOrSequenced()) {
@@ -872,8 +860,7 @@ ReliabilityLayer::ProcessResult::Enum ReliabilityLayer::prcoessIncomingPacket(Re
             // mark last one as got aka this packet.
             recivedPacketQueue_.push(true);
 
-            X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")
-            ();
+            X_ASSERT(recivedPacketQueue_.size() < std::numeric_limits<decltype(holeSize)>::max(), "Que is bigger than type range")();
         }
 
         // pop any complete ones from base, moving base index up.
@@ -1058,10 +1045,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
         sendNAKs(socket, bs, systemAddress, time);
     }
 
-    X_ASSERT(packetsThisFrame_.isEmpty(), "Should of been previously cleared")
-    ();
-    X_ASSERT(packetsThisFrameBoundaries_.isEmpty(), "Should of been previously cleared")
-    ();
+    X_ASSERT(packetsThisFrame_.isEmpty(), "Should of been previously cleared")();
+    X_ASSERT(packetsThisFrameBoundaries_.isEmpty(), "Should of been previously cleared")();
 
     // resend packets.
     if (!isResendListEmpty()) {
@@ -1133,16 +1118,14 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
 
                 // meow.
                 X_ASSERT_NOT_NULL(pPacket->pData);
-                X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")
-                ();
+                X_ASSERT(pPacket->dataBitLength > 0, "Invalid data length")();
 
                 const size_t byteLength = core::bitUtil::bitsToBytes(pPacket->dataBitLength);
                 const size_t totalBitSize = pPacket->getHeaderLengthBits() + pPacket->dataBitLength;
 
                 if ((currentDataGramSizeBits + totalBitSize) > maxDataGramSizeBits) {
                     // check this is not first packet. otherwise it will never fit. ;)
-                    X_ASSERT(currentDataGramSizeBits > 0, "Packet is too big to fit in single datagram")
-                    (currentDataGramSizeBits, totalBitSize);
+                    X_ASSERT(currentDataGramSizeBits > 0, "Packet is too big to fit in single datagram")(currentDataGramSizeBits, totalBitSize);
                     break;
                 }
 
@@ -1167,8 +1150,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
                     pPacket->nextActionTime = time + pPacket->retransmissionTime;
 
                     const auto resendBufIdx = resendBufferIdxForMsgNum(pPacket->reliableMessageNumber);
-                    X_ASSERT(resendBuf_[resendBufIdx] == nullptr, "Resent buffer has valid data already in it")
-                    ();
+                    X_ASSERT(resendBuf_[resendBufIdx] == nullptr, "Resent buffer has valid data already in it")();
                     resendBuf_[resendBufIdx] = pPacket;
 
                     ++reliableMessageNumberIdx_;
@@ -1220,10 +1202,8 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
             end = packetsThisFrameBoundaries_[i];
         }
 
-        X_ASSERT(end >= begin, "Invalid range")
-        (begin, end);
-        X_ASSERT(bs.capacity() >= maxDataGramSize(), "Provided Bs can't fit max dataGram")
-        (bs.capacity(), maxDataGramSize());
+        X_ASSERT(end >= begin, "Invalid range")(begin, end);
+        X_ASSERT(bs.capacity() >= maxDataGramSize(), "Provided Bs can't fit max dataGram")(bs.capacity(), maxDataGramSize());
 
         const size_t numPackets = static_cast<size_t>(end - begin);
 
@@ -1235,8 +1215,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
         dgh.flags.Clear();
         dgh.writeToBitStream(bs);
 
-        X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")
-        (bs.size(), dataGramHdrSizeBits());
+        X_ASSERT(bs.size() == dataGramHdrSizeBits(), "Invalid size logic")(bs.size(), dataGramHdrSizeBits());
         X_LOG0_IF(vars_.debugDatagramEnabled(), "NetRel", "Sending DataGram number: ^5%" PRIu16 "^7 numPackets: ^5%" PRIuS, dgh.number, numPackets);
 
         // we create dataGram history even for dataGrams not containing reliable packets.
@@ -1287,8 +1266,7 @@ bool ReliabilityLayer::recive(PacketData& dataOut)
     // release ownership...
     pPacket->pData = nullptr;
     pPacket->dataBitLength = 0;
-    X_ASSERT(pPacket->dataType != ReliablePacket::DataType::Ref, "Should not have refrenced data for recived packets")
-    ();
+    X_ASSERT(pPacket->dataType != ReliablePacket::DataType::Ref, "Should not have refrenced data for recived packets")();
 
     freePacket(pPacket);
     return true;
@@ -1444,8 +1422,7 @@ void ReliabilityLayer::freeSplitPacketChannel(SplitPacketChannel* pSPC)
             freePacket(pPacket);
         }
         else {
-            X_ASSERT(!pSPC->haveAllPackets(), "We think we have all packets but one is null")
-            (pSPC, pSPC->haveAllPackets());
+            X_ASSERT(!pSPC->haveAllPackets(), "We think we have all packets but one is null")(pSPC, pSPC->haveAllPackets());
         }
     }
 
@@ -1458,15 +1435,12 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
     const size_t maxDataSizeBytes = maxDataGramSizeExcHdr() - ReliablePacket::getMaxHeaderLength();
     const bool splitRequired = lengthBytes > maxDataSizeBytes;
 
-    X_ASSERT(splitRequired, "Called split when no split required")
-    (splitRequired, lengthBytes, maxDataSizeBytes);
+    X_ASSERT(splitRequired, "Called split when no split required")(splitRequired, lengthBytes, maxDataSizeBytes);
 
     pPacket->splitPacketCount = safe_static_cast<SplitPacketIndex>((lengthBytes - 1) / (maxDataSizeBytes) + 1);
 
-    X_ASSERT(pPacket->splitPacketCount > 1, "Packet was not split")
-    (pPacket->splitPacketCount, lengthBytes, maxDataSizeBytes);
-    X_ASSERT((pPacket->splitPacketCount * maxDataSizeBytes) >= lengthBytes, "Split count can't represent packet data")
-    (pPacket->splitPacketCount, maxDataSizeBytes, lengthBytes);
+    X_ASSERT(pPacket->splitPacketCount > 1, "Packet was not split")(pPacket->splitPacketCount, lengthBytes, maxDataSizeBytes);
+    X_ASSERT((pPacket->splitPacketCount * maxDataSizeBytes) >= lengthBytes, "Split count can't represent packet data")(pPacket->splitPacketCount, maxDataSizeBytes, lengthBytes);
 
     core::HumanSize::Str sizeBuf;
     X_LOG0_IF(vars_.debugEnabled(), "NetRel", "Splitting packet of size %s into ^5%" PRIu16 "^7 packets",
@@ -1480,8 +1454,7 @@ bool ReliabilityLayer::splitPacket(ReliablePacket* pPacket)
 
     SplitPacketId splitPacketId = splitPacketId_++;
 
-    X_ASSERT(g_NetworkArena->isThreadSafe(), "Peer arena must be thread safe")
-    (g_NetworkArena->isThreadSafe());
+    X_ASSERT(g_NetworkArena->isThreadSafe(), "Peer arena must be thread safe")(g_NetworkArena->isThreadSafe());
 
     DataRefrence* pRefData = X_NEW(DataRefrence, g_NetworkArena, "SplitPacketDataRef");
     pRefData->pData = pPacket->pData;
@@ -1567,10 +1540,8 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
     }
 
     X_ASSERT_NOT_NULL(pChannel);
-    X_ASSERT(pChannel->splitId == splitId, "Got incorrect channel.")
-    (splitId);
-    X_ASSERT(pChannel->packets[pPacket->splitPacketIndex] == nullptr, "Index is already occupied.")
-    (pPacket->splitPacketIndex);
+    X_ASSERT(pChannel->splitId == splitId, "Got incorrect channel.")(splitId);
+    X_ASSERT(pChannel->packets[pPacket->splitPacketIndex] == nullptr, "Index is already occupied.")(pPacket->splitPacketIndex);
 
     // meow.
     ++pChannel->packetsRecived;
@@ -1606,8 +1577,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
 
         freeSplitPacketChannel(pChannel);
 
-        X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on frist packet")
-        (channelIt);
+        X_ASSERT(channelIt != splitPacketChannels_.end(), "Should not be merging split packs on frist packet")(channelIt);
         splitPacketChannels_.erase(channelIt);
         return pRebuiltPacket;
     }
@@ -1658,8 +1628,7 @@ DataGramHistory* ReliabilityLayer::getDataGramHistory(DataGramSequenceNumber num
 
     DataGramHistory* pHistory = &dataGramHistory_[offset];
 #if X_DEBUG
-    X_ASSERT(pHistory->magic == 0x12345678, "MAgic not match, corrupt item?")
-    ();
+    X_ASSERT(pHistory->magic == 0x12345678, "MAgic not match, corrupt item?")();
 #endif // X_DEBUG
     return pHistory;
 }

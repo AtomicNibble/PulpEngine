@@ -219,13 +219,11 @@ CpuInfo::CpuInfo(void)
                         }
                         else {
                             Count++; // inc before assert
-                            X_ASSERT(false, "Unexpected number of caches at level %d.", Cache.Level)
-                            (Count);
+                            X_ASSERT(false, "Unexpected number of caches at level %d.", Cache.Level)(Count);
                         }
                     }
                     else {
-                        X_ASSERT(false, "Unexpected cache level.")
-                        (Cache.Level);
+                        X_ASSERT(false, "Unexpected cache level.")(Cache.Level);
                     }
 
                 } break;

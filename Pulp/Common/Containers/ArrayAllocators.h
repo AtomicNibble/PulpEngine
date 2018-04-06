@@ -140,8 +140,7 @@ public:
 
     X_INLINE T* allocate(size_t num)
     {
-        X_ASSERT((alignment_ % X_ALIGN_OF(T)) == 0, "custom base alignment must be a multiple of type alignment")
-        (alignment_, X_ALIGN_OF(T));
+        X_ASSERT((alignment_ % X_ALIGN_OF(T)) == 0, "custom base alignment must be a multiple of type alignment")(alignment_, X_ALIGN_OF(T));
         return static_cast<T*>(arena_->allocate(sizeof(T) * num, alignment_, 0 X_MEM_IDS("Array", "T[]") X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO)));
     }
 

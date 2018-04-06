@@ -80,8 +80,7 @@ CommandContext* ContextManager::allocateContext(D3D12_COMMAND_LIST_TYPE type)
     }
 
     X_ASSERT_NOT_NULL(pRet);
-    X_ASSERT(pRet->getType() == type, "contex tpye mismatch")
-    (pRet->getType(), type);
+    X_ASSERT(pRet->getType() == type, "contex tpye mismatch")(pRet->getType(), type);
 
     return pRet;
 }
@@ -138,8 +137,7 @@ CommandContext::~CommandContext(void)
     // can't just go out of scope, must manually call finishAndFree()
     // not sure i Like this..
     // might make a commandContext scope helper.
-    X_ASSERT(contexFreed_ == 1, "COmmandContext was not freed correct.")
-    (contexFreed_);
+    X_ASSERT(contexFreed_ == 1, "COmmandContext was not freed correct.")(contexFreed_);
 #endif // !X_DEBUG
 }
 
@@ -161,19 +159,15 @@ uint64_t CommandContext::flush(bool waitForCompletion)
     pCommandList_->Reset(pCurrentAllocator_, nullptr);
 
     if (pCurGraphicsRootSignature_) {
-        X_ASSERT(pCurComputeRootSignature_ == nullptr, "Both graphics and compute root sig set")
-        ();
-        X_ASSERT(pCurComputePipelineState_ == nullptr, "Both graphics and compute PSO set")
-        ();
+        X_ASSERT(pCurComputeRootSignature_ == nullptr, "Both graphics and compute root sig set")();
+        X_ASSERT(pCurComputePipelineState_ == nullptr, "Both graphics and compute PSO set")();
 
         pCommandList_->SetGraphicsRootSignature(pCurGraphicsRootSignature_);
         pCommandList_->SetPipelineState(pCurGraphicsPipelineState_);
     }
     if (pCurComputeRootSignature_) {
-        X_ASSERT(pCurGraphicsRootSignature_ == nullptr, "Both graphics and compute root sig set")
-        ();
-        X_ASSERT(pCurGraphicsPipelineState_ == nullptr, "Both graphics and compute PSO set")
-        ();
+        X_ASSERT(pCurGraphicsRootSignature_ == nullptr, "Both graphics and compute root sig set")();
+        X_ASSERT(pCurGraphicsPipelineState_ == nullptr, "Both graphics and compute PSO set")();
 
         pCommandList_->SetComputeRootSignature(pCurComputeRootSignature_);
         pCommandList_->SetPipelineState(pCurComputePipelineState_);
@@ -186,8 +180,7 @@ uint64_t CommandContext::flush(bool waitForCompletion)
 
 uint64_t CommandContext::finishAndFree(bool waitForCompletion)
 {
-    X_ASSERT(type_ == D3D12_COMMAND_LIST_TYPE_DIRECT || type_ == D3D12_COMMAND_LIST_TYPE_COMPUTE, "Invalid type")
-    (type_);
+    X_ASSERT(type_ == D3D12_COMMAND_LIST_TYPE_DIRECT || type_ == D3D12_COMMAND_LIST_TYPE_COMPUTE, "Invalid type")(type_);
     X_ASSERT_NOT_NULL(pCurrentAllocator_);
 
     flushResourceBarriers();
@@ -219,10 +212,8 @@ uint64_t CommandContext::finishAndFree(bool waitForCompletion)
 
 void CommandContext::initialize(void)
 {
-    X_ASSERT(pCommandList_ == nullptr, "Command list already set")
-    ();
-    X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator already set")
-    ();
+    X_ASSERT(pCommandList_ == nullptr, "Command list already set")();
+    X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator already set")();
 
     auto& cmdListMan = contextManager_.getCmdListMan();
 
@@ -238,8 +229,7 @@ void CommandContext::reset(void)
     // We only call Reset() on previously freed contexts. The command list persists, but we must
     // request a new allocator.
     X_ASSERT_NOT_NULL(pCommandList_);
-    X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator should be null")
-    (pCurrentAllocator_);
+    X_ASSERT(pCurrentAllocator_ == nullptr, "Command allocator should be null")(pCurrentAllocator_);
 
     auto& cmdListMan = contextManager_.getCmdListMan();
 
@@ -346,15 +336,12 @@ void CommandContext::transitionResource(GpuResource& resource, D3D12_RESOURCE_ST
     const D3D12_RESOURCE_STATES oldState = resource.getUsageState();
 
     if (type_ == D3D12_COMMAND_LIST_TYPE_COMPUTE) {
-        X_ASSERT((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState, "No valid compute states set")
-        (oldState);
-        X_ASSERT((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState, "No valid compute states set")
-        (newState);
+        X_ASSERT((oldState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == oldState, "No valid compute states set")(oldState);
+        X_ASSERT((newState & VALID_COMPUTE_QUEUE_RESOURCE_STATES) == newState, "No valid compute states set")(newState);
     }
 
     if (oldState != newState) {
-        X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")
-        (numBarriersToFlush_);
+        X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")(numBarriersToFlush_);
         D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarrierBuffer[numBarriersToFlush_++];
 
         barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -393,8 +380,7 @@ void CommandContext::beginResourceTransition(GpuResource& resource, D3D12_RESOUR
     const D3D12_RESOURCE_STATES oldState = resource.getUsageState();
 
     if (oldState != newState) {
-        X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")
-        (numBarriersToFlush_);
+        X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")(numBarriersToFlush_);
         D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarrierBuffer[numBarriersToFlush_++];
 
         barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
@@ -415,8 +401,7 @@ void CommandContext::beginResourceTransition(GpuResource& resource, D3D12_RESOUR
 
 void CommandContext::insertUAVBarrier(GpuResource& resource, bool flushImmediate)
 {
-    X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")
-    (numBarriersToFlush_);
+    X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")(numBarriersToFlush_);
 
     D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarrierBuffer[numBarriersToFlush_++];
     barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_UAV;
@@ -430,8 +415,7 @@ void CommandContext::insertUAVBarrier(GpuResource& resource, bool flushImmediate
 
 void CommandContext::insertAliasBarrier(GpuResource& before, GpuResource& after, bool flushImmediate)
 {
-    X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")
-    (numBarriersToFlush_);
+    X_ASSERT(numBarriersToFlush_ < 16, "Exceeded arbitrary limit on buffered barriers")(numBarriersToFlush_);
 
     D3D12_RESOURCE_BARRIER& barrierDesc = resourceBarrierBuffer[numBarriersToFlush_++];
     barrierDesc.Type = D3D12_RESOURCE_BARRIER_TYPE_ALIASING;
@@ -474,14 +458,11 @@ void CommandContext::setDescriptorHeaps(uint32_t heapCount, D3D12_DESCRIPTOR_HEA
 {
     bool anyChanged = false;
 
-    X_ASSERT(heapCount <= 2, "Can't set more than 2 descriptor heaps")
-    (heapCount);
+    X_ASSERT(heapCount <= 2, "Can't set more than 2 descriptor heaps")(heapCount);
 
     for (uint32_t i = 0; i < heapCount; ++i) {
-        X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")
-        (pTypes[i]);
-        X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")
-        (pTypes[i]);
+        X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")(pTypes[i]);
+        X_ASSERT(pTypes[i] != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")(pTypes[i]);
 
         if (pCurrentDescriptorHeaps_[pTypes[i]] != pHeapPtrs[i]) {
             pCurrentDescriptorHeaps_[pTypes[i]] = pHeapPtrs[i];
@@ -698,16 +679,14 @@ void GraphicsContext::setDynamicCBV(uint32_t rootIndex, size_t bufferSize,
 
 void GraphicsContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
 {
-    X_ASSERT(((SRV.getUsageState() & (D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)) != 0), "Missing one of required usage states.")
-    (SRV.getUsageState());
+    X_ASSERT(((SRV.getUsageState() & (D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE | D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE)) != 0), "Missing one of required usage states.")(SRV.getUsageState());
 
     pCommandList_->SetGraphicsRootShaderResourceView(rootIndex, SRV.getGpuVirtualAddress() + offset);
 }
 
 void GraphicsContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset)
 {
-    X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")
-    (UAV.getUsageState());
+    X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")(UAV.getUsageState());
 
     if (offset != 0) {
         X_ASSERT_NOT_IMPLEMENTED();
@@ -845,16 +824,14 @@ void ComputeContext::setDynamicSRV(uint32_t rootIndex, size_t bufferSize, const 
 
 void ComputeContext::setBufferSRV(uint32_t rootIndex, const GpuBuffer& SRV, uint64_t offset)
 {
-    X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")
-    (SRV.getUsageState());
+    X_ASSERT(core::bitUtil::IsBitFlagSet(SRV.getUsageState(), D3D12_RESOURCE_STATE_NON_PIXEL_SHADER_RESOURCE), "NON_PIXEL_SHADER_RESOURCE flag missing")(SRV.getUsageState());
 
     pCommandList_->SetComputeRootShaderResourceView(rootIndex, SRV.getGpuVirtualAddress() + offset);
 }
 
 void ComputeContext::setBufferUAV(uint32_t rootIndex, const GpuBuffer& UAV, uint64_t offset)
 {
-    X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")
-    (UAV.getUsageState());
+    X_ASSERT(core::bitUtil::IsBitFlagSet(UAV.getUsageState(), D3D12_RESOURCE_STATE_UNORDERED_ACCESS), "UNORDERED_ACCESS flag missing")(UAV.getUsageState());
 
     pCommandList_->SetComputeRootUnorderedAccessView(rootIndex, UAV.getGpuVirtualAddress());
 }

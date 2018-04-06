@@ -57,8 +57,7 @@ namespace Compression
     size_t LZ4::requiredDeflateDestBuf(size_t sourceLen)
     {
         size_t destLen = static_cast<size_t>(LZ4_compressBound(safe_static_cast<int32_t>(sourceLen)));
-        X_ASSERT(destLen >= sourceLen, "Potential wrap around, dest is smaller than source")
-        (sourceLen, destLen);
+        X_ASSERT(destLen >= sourceLen, "Potential wrap around, dest is smaller than source")(sourceLen, destLen);
         return destLen;
     }
 

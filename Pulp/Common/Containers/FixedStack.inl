@@ -15,16 +15,14 @@ inline FixedStack<T, N>::~FixedStack(void)
 template<typename T, size_t N>
 void FixedStack<T, N>::push(const T& value)
 {
-    X_ASSERT(size() < capacity(), "can't push value on to full stack.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
     Mem::Construct<T>(current_++, value);
 }
 
 template<typename T, size_t N>
 inline void FixedStack<T, N>::push(T&& value)
 {
-    X_ASSERT(size() < capacity(), "can't push value on to full stack.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
 
     Mem::Construct<T>(current_++, std::forward<T>(value));
 }
@@ -33,8 +31,7 @@ template<typename T, size_t N>
 template<class... ArgsT>
 inline void FixedStack<T, N>::emplace(ArgsT&&... args)
 {
-    X_ASSERT(size() < capacity(), "can't push value on to full stack.")
-    (size(), capacity());
+    X_ASSERT(size() < capacity(), "can't push value on to full stack.")(size(), capacity());
 
     Mem::Construct<T>(current_++, std::forward<ArgsT>(args)...);
 }
@@ -42,8 +39,7 @@ inline void FixedStack<T, N>::emplace(ArgsT&&... args)
 template<typename T, size_t N>
 inline void FixedStack<T, N>::pop(void)
 {
-    X_ASSERT(size() > 0, "can't pop value from a empty stack.")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't pop value from a empty stack.")(size(), capacity());
 
     --current_;
     Mem::Destruct<T>(current_);
@@ -52,16 +48,14 @@ inline void FixedStack<T, N>::pop(void)
 template<typename T, size_t N>
 inline T& FixedStack<T, N>::top(void)
 {
-    X_ASSERT(size() > 0, "can't get the topmost value of an empty stack.")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't get the topmost value of an empty stack.")(size(), capacity());
     return *(current_ - 1);
 }
 
 template<typename T, size_t N>
 inline const T& FixedStack<T, N>::top(void) const
 {
-    X_ASSERT(size() > 0, "can't get the topmost value of an empty stack.")
-    (size(), capacity());
+    X_ASSERT(size() > 0, "can't get the topmost value of an empty stack.")(size(), capacity());
     return *(current_ - 1);
 }
 

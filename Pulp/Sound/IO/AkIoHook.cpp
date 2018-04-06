@@ -202,8 +202,7 @@ void IOhook::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBas
     X_UNUSED(fileSys);
     X_UNUSED(pFile);
 
-    X_ASSERT(pRequest->getType() == core::IoRequest::READ || pRequest->getType() == core::IoRequest::WRITE, "Invalid request type")
-    (pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::READ || pRequest->getType() == core::IoRequest::WRITE, "Invalid request type")(pRequest->getType());
 
     const core::IoRequestRead* pReq = static_cast<const core::IoRequestRead*>(pRequest);
     AkAsyncIOTransferInfo* transferInfo = reinterpret_cast<AkAsyncIOTransferInfo*>(pReq->pUserData);
@@ -222,10 +221,8 @@ AKRESULT IOhook::Read(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,
 {
     X_UNUSED(heuristics);
     X_ASSERT_NOT_NULL(fileDesc.hFile);
-    X_ASSERT(transferInfo.uRequestedSize > 0, "")
-    (transferInfo.uRequestedSize);
-    X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize, "")
-    (transferInfo.uBufferSize, transferInfo.uRequestedSize);
+    X_ASSERT(transferInfo.uRequestedSize > 0, "")(transferInfo.uRequestedSize);
+    X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize, "")(transferInfo.uBufferSize, transferInfo.uRequestedSize);
 
     core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
@@ -248,10 +245,8 @@ AKRESULT IOhook::Write(AkFileDesc& fileDesc, const AkIoHeuristics& heuristics,
 {
     X_UNUSED(heuristics);
     X_ASSERT_NOT_NULL(fileDesc.hFile);
-    X_ASSERT(transferInfo.uRequestedSize > 0, "")
-    (transferInfo.uRequestedSize);
-    X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize, "")
-    (transferInfo.uBufferSize, transferInfo.uRequestedSize);
+    X_ASSERT(transferInfo.uRequestedSize > 0, "")(transferInfo.uRequestedSize);
+    X_ASSERT(transferInfo.uBufferSize >= transferInfo.uRequestedSize, "")(transferInfo.uBufferSize, transferInfo.uRequestedSize);
 
     core::XFileAsync* pFile = reinterpret_cast<core::XFileAsync*>(fileDesc.hFile);
 
@@ -310,8 +305,7 @@ AkUInt32 IOhook::GetBlockSize(AkFileDesc& fileDesc)
 // Returns a description for the streaming device above this low-level hook.
 void IOhook::GetDeviceDesc(AkDeviceDesc& outDeviceDesc)
 {
-    X_ASSERT(deviceID_ != AK_INVALID_DEVICE_ID, "Low-Level device was not initialized")
-    (deviceID_);
+    X_ASSERT(deviceID_ != AK_INVALID_DEVICE_ID, "Low-Level device was not initialized")(deviceID_);
 
     // Deferred scheduler.
     outDeviceDesc.deviceID = deviceID_;

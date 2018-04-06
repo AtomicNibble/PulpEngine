@@ -148,8 +148,7 @@ bool RootSignature::finalize(RootSignatureDeviceCache& cache, D3D12_ROOT_SIGNATU
 #endif // !PSO_HOT_RELOAD
     }
 
-    X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")
-    (samplesInitCount_, samplers_.size());
+    X_ASSERT(samplesInitCount_ == static_cast<uint32_t>(samplers_.size()), "Not all samplers are init")(samplesInitCount_, samplers_.size());
 
     D3D12_ROOT_SIGNATURE_DESC rootDesc;
     rootDesc.NumParameters = safe_static_cast<uint32_t, size_t>(params_.size());

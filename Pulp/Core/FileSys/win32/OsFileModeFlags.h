@@ -37,8 +37,7 @@ namespace mode
             val |= FILE_APPEND_DATA;
         }
 
-        X_ASSERT(val != 0, "File must have one of the following modes, READ, WRITE, APPEND")
-        (mode.ToInt());
+        X_ASSERT(val != 0, "File must have one of the following modes, READ, WRITE, APPEND")(mode.ToInt());
         return val;
     }
 
@@ -75,8 +74,7 @@ namespace mode
             return CREATE_NEW;
         }
 
-        X_ASSERT(false, "Creation mode unkown one of the following must be set: READ, WRITE, RECREATE, APPEND")
-        (mode.ToInt());
+        X_ASSERT(false, "Creation mode unkown one of the following must be set: READ, WRITE, RECREATE, APPEND")(mode.ToInt());
         return 0;
     }
 

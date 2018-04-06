@@ -85,8 +85,7 @@ namespace weapon
 
     WeaponDef* WeaponDefManager::loadWeaponDef(const char* pName)
     {
-        X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")
-        (pName);
+        X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
 
         core::string name(pName);
         WeaponDefResource* pWeaponDefRes = nullptr;
@@ -117,8 +116,7 @@ namespace weapon
 
     bool WeaponDefManager::waitForLoad(core::AssetBase* pWeaponDef)
     {
-        X_ASSERT(pWeaponDef->getType() == assetDb::AssetType::WEAPON, "Invalid asset passed")
-        ();
+        X_ASSERT(pWeaponDef->getType() == assetDb::AssetType::WEAPON, "Invalid asset passed")();
 
         if (pWeaponDef->isLoaded()) {
             return true;

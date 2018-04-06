@@ -96,8 +96,7 @@ namespace fx
     Effect* EffectManager::loadEffect(const char* pAnimName)
     {
         X_ASSERT_NOT_NULL(pAnimName);
-        X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")
-        (pAnimName);
+        X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
 
         core::string name(pAnimName);
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
@@ -136,8 +135,7 @@ namespace fx
 
     bool EffectManager::waitForLoad(core::AssetBase* pEffect)
     {
-        X_ASSERT(pEffect->getType() == assetDb::AssetType::FX, "Invalid asset passed")
-        ();
+        X_ASSERT(pEffect->getType() == assetDb::AssetType::FX, "Invalid asset passed")();
 
         if (pEffect->isLoaded()) {
             return true;

@@ -1272,8 +1272,7 @@ void XPhysics::createPvdConnection(void)
         return;
     }
 
-    X_ASSERT(!pPVD->isConnected(), "Already connected")
-    ();
+    X_ASSERT(!pPVD->isConnected(), "Already connected")();
 
     //The connection flags state overall what data is to be sent to PVD.  Currently
     //the Debug connection flag requires support from the implementation (don't send
@@ -1374,8 +1373,7 @@ bool XPhysics::initDebugRenderer(void)
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->p3DEngine);
 
-    X_ASSERT(!pDebugRender_, "Debug render already init")
-    (pDebugRender_);
+    X_ASSERT(!pDebugRender_, "Debug render already init")(pDebugRender_);
 
     auto* pPrimCon = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PHYSICS);
     if (!pPrimCon) {

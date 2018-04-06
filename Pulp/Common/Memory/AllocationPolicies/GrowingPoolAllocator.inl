@@ -12,8 +12,7 @@ template<class T>
 inline void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offset,
     typename std::enable_if<!core::compileTime::IsPointer<T>::Value, T>::type& chunkHeader)
 {
-    X_ASSERT(chunkHeaderSize_ == sizeof(chunkHeader), "Given chunk header does not match the size given upon initialization.")
-    (chunkHeaderSize_, sizeof(chunkHeader));
+    X_ASSERT(chunkHeaderSize_ == sizeof(chunkHeader), "Given chunk header does not match the size given upon initialization.")(chunkHeaderSize_, sizeof(chunkHeader));
     return allocate(size, alignment, offset, &chunkHeader, sizeof(chunkHeader));
 }
 

@@ -363,8 +363,7 @@ public:
     /// Signals the sink.
     void Signal() const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -599,8 +598,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -835,8 +833,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -1071,8 +1068,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -1307,8 +1303,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -1543,8 +1538,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -1779,8 +1773,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -2015,8 +2008,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);
@@ -2251,8 +2243,7 @@ public:
     /// Signals the sink.
     void Signal(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")
-        ();
+        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
         for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
             const Stub& stub = sink_->GetListener(i);

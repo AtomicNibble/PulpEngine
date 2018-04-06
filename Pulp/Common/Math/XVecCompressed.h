@@ -20,8 +20,7 @@ struct compressedVec3
 
     const float operator[](int idx) const
     {
-        X_ASSERT(idx > 0 && idx < 3, "index out of bounds")
-        (idx);
+        X_ASSERT(idx > 0 && idx < 3, "index out of bounds")(idx);
         float Ret = ((float)((compValue >> 10 * idx) & 0x3FF)) / 511.0f;
         //	if (Ret > 1.0f)
         //		Ret = -2 + Ret;

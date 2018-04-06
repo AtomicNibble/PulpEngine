@@ -81,10 +81,8 @@ void BufferManager::shutDown(void)
 BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData,
     BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
-    X_ASSERT(numElements > 0, "NumElements size must be none zero")
-    (numElements);
-    X_ASSERT(elementSize > 0, "Element size must be none zero")
-    (elementSize);
+    X_ASSERT(numElements > 0, "NumElements size must be none zero")(numElements);
+    X_ASSERT(elementSize > 0, "Element size must be none zero")(elementSize);
 
     const uint32_t size = numElements * elementSize;
 

@@ -19,16 +19,13 @@ GrowingStackAllocator::GrowingStackAllocator(size_t maxSizeInBytes, size_t granu
 #endif
 
     if (!bitUtil::IsPowerOfTwo(granularity)) {
-        X_ASSERT("GrowingStackAlloc", "Granularity size must be a power of 2")
-        (granularity);
+        X_ASSERT("GrowingStackAlloc", "Granularity size must be a power of 2")(granularity);
     }
     if (maxSizeInBytes % granularity) {
-        X_ASSERT("GrowingStackAlloc", "max size is not a multiple of growsize")
-        (maxSizeInBytes, granularity);
+        X_ASSERT("GrowingStackAlloc", "max size is not a multiple of growsize")(maxSizeInBytes, granularity);
     }
     if (granularity % VirtualMem::GetPageSize()) {
-        X_ASSERT("GrowingStackAlloc", "Granularity size must be a multiple of virtual page size")
-        (granularity, VirtualMem::GetPageSize());
+        X_ASSERT("GrowingStackAlloc", "Granularity size must be a multiple of virtual page size")(granularity, VirtualMem::GetPageSize());
     }
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
@@ -120,8 +117,7 @@ void GrowingStackAllocator::free(void* ptr)
 #if X_ENABLE_STACK_ALLOCATOR_CHECK
     if (as_header->AllocationID_ != (allocationID_ - 1)) {
         uint32_t AllocationID = as_header->AllocationID_;
-        X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")
-        (allocationID_, AllocationID, ptr);
+        X_ASSERT(false, "Cannot free memory from stack(LIFO). invalid order.")(allocationID_, AllocationID, ptr);
     }
 
     allocationID_--;

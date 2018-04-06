@@ -54,8 +54,7 @@ inline Pak::Pak(core::MemoryArenaBase* arena) :
 
 inline Pak::~Pak()
 {
-    X_ASSERT(pFile != nullptr, "")
-    (pFile);
+    X_ASSERT(pFile != nullptr, "")(pFile);
 }
 
 inline int32_t Pak::find(core::StrHash nameHash, const char* pName) const

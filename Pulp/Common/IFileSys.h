@@ -186,8 +186,7 @@ struct XFileMem : public XFile
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
         X_ASSERT_NOT_NULL(arena);
-        X_ASSERT(end >= begin, "invalid buffer")
-        (begin, end);
+        X_ASSERT(end >= begin, "invalid buffer")(begin, end);
     }
     ~XFileMem() X_OVERRIDE
     {
@@ -298,8 +297,7 @@ struct XFileFixedBuf : public XFile
     {
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
-        X_ASSERT(end >= begin, "invalid buffer")
-        (begin, end);
+        X_ASSERT(end >= begin, "invalid buffer")(begin, end);
     }
 
     XFileFixedBuf(const char* begin, const char* end) :
@@ -969,15 +967,13 @@ public:
 
     inline bool openFile(const char* path, IFileSys::fileModeFlags mode)
     {
-        X_ASSERT(pFile_ == nullptr, "File already open")
-        ();
+        X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
     inline bool openFile(const wchar_t* path, IFileSys::fileModeFlags mode)
     {
-        X_ASSERT(pFile_ == nullptr, "File already open")
-        ();
+        X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
@@ -1162,8 +1158,7 @@ public:
 
     X_INLINE bool findNext(void)
     {
-        X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")
-        ();
+        X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")();
         return pFileSys_->findnext2(handle_, fd_);
     }
 

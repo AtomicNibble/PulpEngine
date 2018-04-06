@@ -77,8 +77,7 @@ namespace ecs
 
         X_INLINE const component_type& get(entity_type entity) const
         {
-            X_ASSERT(valid(entity), "Entity not valid")
-            ();
+            X_ASSERT(valid(entity), "Entity not valid")();
             return data_[reverse_[entity]];
         }
 
@@ -90,8 +89,7 @@ namespace ecs
         template<typename... Args>
         component_type& construct(entity_type entity, Args... args)
         {
-            X_ASSERT(!valid(entity), "Entity already valid")
-            ();
+            X_ASSERT(!valid(entity), "Entity already valid")();
 
             if (!(entity < reverse_.size())) {
                 reverse_.resize(entity + 1);
@@ -106,8 +104,7 @@ namespace ecs
 
         void destroy(entity_type entity)
         {
-            X_ASSERT(valid(entity), "Entity not valid")
-            ();
+            X_ASSERT(valid(entity), "Entity not valid")();
 
             auto last = direct_.size() - 1;
 

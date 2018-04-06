@@ -53,8 +53,7 @@ namespace IPC
                 val |= FILE_APPEND_DATA;
             }
 
-            X_ASSERT(val != 0, "Pipe must have one of the following modes, READ, WRITE, APPEND")
-            (mode.ToInt());
+            X_ASSERT(val != 0, "Pipe must have one of the following modes, READ, WRITE, APPEND")(mode.ToInt());
             return val;
         }
 
@@ -156,8 +155,7 @@ namespace IPC
 
     bool Pipe::connect(void)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to cionnect")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to cionnect")(isOpen());
 
         if (!ConnectNamedPipe(hPipe_, nullptr)) {
             core::lastError::Description Dsc;
@@ -170,8 +168,7 @@ namespace IPC
 
     bool Pipe::disconnect(void)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to disconnect")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to disconnect")(isOpen());
 
         if (!DisconnectNamedPipe(hPipe_)) {
             core::lastError::Description Dsc;
@@ -184,8 +181,7 @@ namespace IPC
 
     bool Pipe::flush(void)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to flush")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to flush")(isOpen());
 
         if (!FlushFileBuffers(hPipe_)) {
             core::lastError::Description Dsc;
@@ -215,8 +211,7 @@ namespace IPC
 
     bool Pipe::write(const void* pBuffer, size_t numBytesToWrite, size_t* pNumberBytesWritten)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to write")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to write")(isOpen());
         X_ASSERT_NOT_NULL(pBuffer);
 
         DWORD bytesWritten = 0;
@@ -257,8 +252,7 @@ namespace IPC
 
     bool Pipe::read(void* pBuffer, size_t numBytesToRead, size_t* pNumberBytesRead)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to read")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to read")(isOpen());
         X_ASSERT_NOT_NULL(pBuffer);
 
         DWORD bytesRead = 0;
@@ -300,8 +294,7 @@ namespace IPC
     bool Pipe::peek(void* pBuffer, size_t bufferSizeBytes, size_t* pNumberBytesRead,
         size_t* pTotalBytesAvail, size_t* pBytesLeftThisMsg)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to peek")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to peek")(isOpen());
         X_ASSERT_NOT_NULL(pBuffer);
 
         DWORD bytesRead = 0;
@@ -335,8 +328,7 @@ namespace IPC
 
     bool Pipe::getClientComputerName(core::StackString512& nameOut)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe client computer name")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe client computer name")(isOpen());
 
         nameOut.clear();
 
@@ -353,8 +345,7 @@ namespace IPC
 
     bool Pipe::getClientComputerName(core::StackStringW512& nameOut)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe client computer name")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe client computer name")(isOpen());
 
         nameOut.clear();
 
@@ -371,8 +362,7 @@ namespace IPC
 
     bool Pipe::getClientProcessId(PULONG clientProcessId)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe client process id")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe client process id")(isOpen());
         X_ASSERT_NOT_NULL(clientProcessId);
 
         if (!GetNamedPipeClientProcessId(hPipe_, clientProcessId)) {
@@ -386,8 +376,7 @@ namespace IPC
 
     bool Pipe::getClientSessionId(PULONG clientSessionId)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe client session id")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe client session id")(isOpen());
         X_ASSERT_NOT_NULL(clientSessionId);
 
         if (!GetNamedPipeClientSessionId(hPipe_, clientSessionId)) {
@@ -401,8 +390,7 @@ namespace IPC
 
     bool Pipe::getServerProcessId(PULONG serverProcessId)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe server process id")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe server process id")(isOpen());
         X_ASSERT_NOT_NULL(serverProcessId);
 
         if (!GetNamedPipeServerProcessId(hPipe_, serverProcessId)) {
@@ -416,8 +404,7 @@ namespace IPC
 
     bool Pipe::getServerSessionId(PULONG serverSessionId)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to get pipe server session id")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to get pipe server session id")(isOpen());
         X_ASSERT_NOT_NULL(serverSessionId);
 
         if (!GetNamedPipeServerSessionId(hPipe_, serverSessionId)) {
@@ -431,8 +418,7 @@ namespace IPC
 
     bool Pipe::impersonateClient(void)
     {
-        X_ASSERT(isOpen(), "Pipe must be open to impersonate")
-        (isOpen());
+        X_ASSERT(isOpen(), "Pipe must be open to impersonate")(isOpen());
 
         if (!ImpersonateNamedPipeClient(hPipe_)) {
             core::lastError::Description Dsc;

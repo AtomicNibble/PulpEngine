@@ -77,10 +77,8 @@ X_INLINE void CommandContext::setPredication(ID3D12Resource* pBuffer, uint64_t b
 
 X_INLINE void CommandContext::setDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE type, ID3D12DescriptorHeap* pHeapPtr)
 {
-    X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")
-    (type);
-    X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")
-    (type);
+    X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_RTV, "Heap type RTV not allowed on command list")(type);
+    X_ASSERT(type != D3D12_DESCRIPTOR_HEAP_TYPE_DSV, "Heap type DSV not allowed on command list")(type);
 
     if (pCurrentDescriptorHeaps_[type] != pHeapPtr) {
         pCurrentDescriptorHeaps_[type] = pHeapPtr;
@@ -107,8 +105,7 @@ X_INLINE D3D12_COMMAND_LIST_TYPE CommandContext::getType(void) const
 
 X_INLINE GraphicsContext& CommandContext::getGraphicsContext(void)
 {
-    X_ASSERT(type_ != D3D12_COMMAND_LIST_TYPE_COMPUTE, "Cannot convert async compute context to graphics")
-    (type_);
+    X_ASSERT(type_ != D3D12_COMMAND_LIST_TYPE_COMPUTE, "Cannot convert async compute context to graphics")(type_);
     return reinterpret_cast<GraphicsContext&>(*this);
 }
 
@@ -203,8 +200,7 @@ X_INLINE void GraphicsContext::setViewport(float32_t x, float32_t y, float32_t w
 
 X_INLINE void GraphicsContext::setScissor(const D3D12_RECT& rect)
 {
-    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")
-    ();
+    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
     pCommandList_->RSSetScissorRects(1, &rect);
 }
 
@@ -233,16 +229,14 @@ X_INLINE void GraphicsContext::setViewportAndScissor(const XViewPort& vp)
 
 X_INLINE void GraphicsContext::setViewportAndScissor(const XViewPort& vp, const D3D12_RECT& rect)
 {
-    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")
-    ();
+    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
     setViewport(vp);
     setScissor(rect);
 }
 
 X_INLINE void GraphicsContext::setViewportAndScissor(const D3D12_VIEWPORT& vp, const D3D12_RECT& rect)
 {
-    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")
-    ();
+    X_ASSERT(rect.left < rect.right && rect.top < rect.bottom, "Invalid rect")();
     setViewport(vp);
     setScissor(rect);
 }
@@ -328,8 +322,7 @@ X_INLINE void GraphicsContext::setDynamicDescriptors(uint32_t rootIndex, uint32_
 {
 #if X_ENABLE_ASSERTIONS
     for (uint32_t i = 0; i < count; i++) {
-        X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")
-        ();
+        X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
     }
 #endif // !X_ENABLE_ASSERTIONS
 
@@ -347,8 +340,7 @@ X_INLINE void GraphicsContext::setDynamicSamplerDescriptors(uint32_t rootIndex, 
 {
 #if X_ENABLE_ASSERTIONS
     for (uint32_t i = 0; i < count; i++) {
-        X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")
-        ();
+        X_ASSERT(pHandles[i].ptr != 0 && pHandles[i].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
     }
 #endif // !X_ENABLE_ASSERTIONS
 

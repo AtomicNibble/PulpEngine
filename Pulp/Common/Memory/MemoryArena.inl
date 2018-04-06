@@ -32,10 +32,8 @@ template<class AllocationPolicy, class ThreadPolicy, class BoundsCheckingPolicy,
 void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTrackingPolicy, MemoryTaggingPolicy>::
     allocate(size_t size, size_t alignment, size_t offset X_MEM_HUMAN_IDS_CB(const char* ID) X_MEM_HUMAN_IDS_CB(const char* typeName) X_SOURCE_INFO_MEM_CB(const SourceInfo& sourceInfo))
 {
-    X_ASSERT(bitUtil::IsPowerOfTwo(alignment), "Alignment is not a power-of-two.")
-    (size, alignment, offset);
-    X_ASSERT((offset % 4) == 0, "Offset is not a multiple of 4.")
-    (size, alignment, offset);
+    X_ASSERT(bitUtil::IsPowerOfTwo(alignment), "Alignment is not a power-of-two.")(size, alignment, offset);
+    X_ASSERT((offset % 4) == 0, "Offset is not a multiple of 4.")(size, alignment, offset);
 
     threadGuard_.Enter();
 
@@ -55,8 +53,7 @@ void* MemoryArena<AllocationPolicy, ThreadPolicy, BoundsCheckingPolicy, MemoryTr
     // allocate raw memory
     as_void = allocator_->allocate(newSize, alignment, offset + overheadFront);
 
-    X_ASSERT(as_void != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", newSize, name_)
-    (size, newSize, alignment, offset, overheadFront, overheadBack);
+    X_ASSERT(as_void != nullptr, "Out of memory. Cannot allocate %d bytes from arena \"%s\".", newSize, name_)(size, newSize, alignment, offset, overheadFront, overheadBack);
 
     const size_t RealAllocSize = allocator_->getSize(as_void);
 

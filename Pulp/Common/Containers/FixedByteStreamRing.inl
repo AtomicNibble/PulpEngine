@@ -50,8 +50,7 @@ inline FixedByteStreamRingBase::FixedByteStreamRingBase(TypePtr pBegin, size_typ
     byteIdx_(0),
     pBegin_(pBegin)
 {
-    X_ASSERT(core::bitUtil::IsPowerOfTwo(numBytes), "Size must be pow2")
-    (numBytes);
+    X_ASSERT(core::bitUtil::IsPowerOfTwo(numBytes), "Size must be pow2")(numBytes);
 
     mask_ = numBytes - 1;
 }
@@ -75,8 +74,7 @@ inline void FixedByteStreamRingBase::write(const T* pVal, size_type num)
 
 inline void FixedByteStreamRingBase::write(const Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than avalible space")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than avalible space")(numBytes, size(), freeSpace(), isEos());
 
     // so we need to handle wrap around :Z
     // which basically means we might need two copy.
@@ -118,8 +116,7 @@ inline void FixedByteStreamRingBase::read(T* pVal, size_type num)
 
 inline void FixedByteStreamRingBase::read(Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to read more bytes than avalible")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to read more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
 
     size_type readIdx = readByteIdx_ & mask_;
     size_type bytesToCopy = core::Min(numBytes, numBytes_ - readIdx);
@@ -140,8 +137,7 @@ template<typename T>
 inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
     FixedByteStreamRingBase::peek(void) const
 {
-    X_ASSERT(sizeof(T) <= size(), "Tried to peek a type bigger than avalible bytes")
-    (sizeof(T), size(), freeSpace(), isEos());
+    X_ASSERT(sizeof(T) <= size(), "Tried to peek a type bigger than avalible bytes")(sizeof(T), size(), freeSpace(), isEos());
 
     size_type readIdx = readByteIdx_ & mask_;
     size_type bytesToCopy = core::Min(sizeof(T), numBytes_ - readIdx);
@@ -166,8 +162,7 @@ inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_
 
 inline void FixedByteStreamRingBase::skip(size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
 
     readByteIdx_ += numBytes;
 }
@@ -175,8 +170,7 @@ inline void FixedByteStreamRingBase::skip(size_type numBytes)
 inline void FixedByteStreamRingBase::zeroPadToLength(size_type numBytes)
 {
     if (size() < numBytes) {
-        X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")
-        (numBytes, size(), freeSpace(), capacity());
+        X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")(numBytes, size(), freeSpace(), capacity());
 
         const size_t diff = numBytes - size();
 
@@ -192,8 +186,7 @@ inline void FixedByteStreamRingBase::zeroPadToLength(size_type numBytes)
 
         byteIdx_ += numBytes;
 
-        X_ASSERT(size() == numBytes, "Failed to pad corect")
-        (size(), numBytes);
+        X_ASSERT(size() == numBytes, "Failed to pad corect")(size(), numBytes);
     }
 }
 

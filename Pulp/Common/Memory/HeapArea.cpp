@@ -12,8 +12,7 @@ HeapArea::HeapArea(size_t size)
     this->start_ = pMem;
     this->end_ = pMem + size;
 
-    X_ASSERT((size % VirtualMem::GetPageSize()) == 0, "Size must be multiple of the virtual page")
-    (size, VirtualMem::GetPageSize());
+    X_ASSERT((size % VirtualMem::GetPageSize()) == 0, "Size must be multiple of the virtual page")(size, VirtualMem::GetPageSize());
 
     VirtualMem::AllocatePhysicalMemory(pMem, size);
 }

@@ -83,8 +83,7 @@ namespace details
             span_(span),
             index_(index)
         {
-            X_ASSERT(span == nullptr || (0 <= index_ && index <= span_->length()), "")
-            (span, index_, span_->length());
+            X_ASSERT(span == nullptr || (0 <= index_ && index <= span_->length()), "")(span, index_, span_->length());
         }
 
         friend span_iterator<Span, true>;
@@ -96,23 +95,20 @@ namespace details
 
         constexpr reference operator*() const
         {
-            X_ASSERT(index_ != span_->length(), "Out of bounds")
-            (index_, span_->length());
+            X_ASSERT(index_ != span_->length(), "Out of bounds")(index_, span_->length());
             return *(span_->data() + index_);
         }
 
         constexpr pointer operator->() const
         {
-            X_ASSERT(index_ != span_->length(), "Out of bounds")
-            (index_, span_->length());
+            X_ASSERT(index_ != span_->length(), "Out of bounds")(index_, span_->length());
             return span_->data() + index_;
         }
 
         CPP14_CONSTEXPR_EXPR(constexpr)
         span_iterator& operator++()
         {
-            X_ASSERT(0 <= index_ && index_ != span_->length(), "")
-            (index_, span_->length());
+            X_ASSERT(0 <= index_ && index_ != span_->length(), "")(index_, span_->length());
             ++index_;
             return *this;
         }
@@ -126,8 +122,7 @@ namespace details
 
         constexpr span_iterator& operator--()
         {
-            X_ASSERT(index_ != 0 && index_ <= span_->length(), "")
-            (index_, span_->length());
+            X_ASSERT(index_ != 0 && index_ <= span_->length(), "")(index_, span_->length());
             --index_;
             return *this;
         }
@@ -147,8 +142,7 @@ namespace details
 
         constexpr span_iterator& operator+=(difference_type n)
         {
-            X_ASSERT((index_ + n) >= 0 && (index_ + n) <= span_->length(), "")
-            ();
+            X_ASSERT((index_ + n) >= 0 && (index_ + n) <= span_->length(), "")();
             index_ += n;
             return *this;
         }
@@ -167,8 +161,7 @@ namespace details
         constexpr difference_type operator-(const span_iterator& rhs) const
         {
 #if CPP14_CONSTEXPR
-            X_ASSERT(span_ == rhs.span_, "")
-            ();
+            X_ASSERT(span_ == rhs.span_, "")();
 #endif // !CPP14_CONSTEXPR
             return index_ - rhs.index_;
         }
@@ -194,8 +187,7 @@ namespace details
             const span_iterator& rhs)
         {
 #if CPP14_CONSTEXPR
-            X_ASSERT(lhs.span_ == rhs.span_, "")
-            ();
+            X_ASSERT(lhs.span_ == rhs.span_, "")();
 #endif // !CPP14_CONSTEXPR
 
             return lhs.index_ < rhs.index_;
@@ -257,14 +249,12 @@ namespace details
         {
             static_assert(Other == Ext || Other == dynamic_extent,
                 "Mismatch between fixed-size extent and size of initializing data.");
-            X_ASSERT(ext.size() == Ext, "")
-            (ext.size(), Ext);
+            X_ASSERT(ext.size() == Ext, "")(ext.size(), Ext);
         }
 
         constexpr extent_type(index_type size)
         {
-            X_ASSERT(size == Ext, "Mismatch between fixed-size extent and size of initializing data.")
-            (size, Ext);
+            X_ASSERT(size == Ext, "Mismatch between fixed-size extent and size of initializing data.")(size, Ext);
         }
 
         constexpr index_type size(void) const
@@ -289,8 +279,7 @@ namespace details
             size_(size)
         {
 #if CPP14_CONSTEXPR
-            X_ASSERT(size >= 0, "Extent size can't be negative")
-            (size);
+            X_ASSERT(size >= 0, "Extent size can't be negative")(size);
 #endif // !CPP14_CONSTEXPR
         }
 
@@ -336,8 +325,7 @@ private:
             ExtentType(ext),
             data_(data)
         {
-            X_ASSERT(((checked || !data) && ExtentType::size() == 0) || ((checked || data) && ExtentType::size() >= 0), "")
-            (checked, ext, data);
+            X_ASSERT(((checked || !data) && ExtentType::size() == 0) || ((checked || data) && ExtentType::size() >= 0), "")(checked, ext, data);
         }
 
         constexpr pointer data(void) const
@@ -446,32 +434,28 @@ public:
     template<std::ptrdiff_t Count>
     constexpr span<element_type, Count> first() const
     {
-        X_ASSERT(Count >= 0 && Count <= size(), "Count out of bounds")
-        (Count, size());
+        X_ASSERT(Count >= 0 && Count <= size(), "Count out of bounds")(Count, size());
         return {data(), Count};
     }
 
     template<std::ptrdiff_t Count>
     constexpr span<element_type, Count> last() const
     {
-        X_ASSERT(Count >= 0 && size() - Count >= 0, "Count out of bounds")
-        (Count, size(), size() - Count);
+        X_ASSERT(Count >= 0 && size() - Count >= 0, "Count out of bounds")(Count, size(), size() - Count);
         return {data() + (size() - Count), Count};
     }
 
     template<std::ptrdiff_t Offset, std::ptrdiff_t Count = dynamic_extent>
     constexpr span<element_type, Count> subspan() const
     {
-        X_ASSERT((Offset >= 0 && size() - Offset >= 0) && (Count == dynamic_extent || (Count >= 0 && Offset + Count <= size())), "Invalid range")
-        (Count, Offset, size());
+        X_ASSERT((Offset >= 0 && size() - Offset >= 0) && (Count == dynamic_extent || (Count >= 0 && Offset + Count <= size())), "Invalid range")(Count, Offset, size());
 
         return {data() + Offset, Count == dynamic_extent ? size() - Offset : Count};
     }
 
     constexpr span<element_type, dynamic_extent> first(index_type count) const
     {
-        X_ASSERT(count >= 0 && count <= size(), "Out of bounds")
-        (count, size());
+        X_ASSERT(count >= 0 && count <= size(), "Out of bounds")(count, size());
         return {data(), count};
     }
 
@@ -511,8 +495,7 @@ public:
     // [span.elem], span element access
     constexpr reference operator[](index_type idx) const
     {
-        X_ASSERT(idx >= 0 && idx < storage_.size(), "Out of bounds")
-        (idx, storage_.size());
+        X_ASSERT(idx >= 0 && idx < storage_.size(), "Out of bounds")(idx, storage_.size());
         return data()[idx];
     }
 
@@ -582,14 +565,12 @@ private:
     span<element_type, dynamic_extent> make_subspan(index_type offset, index_type count,
         subspan_selector<dynamic_extent>) const
     {
-        X_ASSERT(offset >= 0 && size() - offset >= 0, "")
-        (offset, size());
+        X_ASSERT(offset >= 0 && size() - offset >= 0, "")(offset, size());
         if (count == dynamic_extent) {
             return {data() + offset, size() - offset, true};
         }
 
-        X_ASSERT(count >= 0 && size() - offset >= count, "")
-        (count, size());
+        X_ASSERT(count >= 0 && size() - offset >= count, "")(count, size());
         return {data() + offset, count, true};
     }
 

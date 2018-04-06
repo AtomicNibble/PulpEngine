@@ -193,8 +193,7 @@ bool NetSocket::sendSendTest(void)
 
 SendResult NetSocket::send(SendParameters& sendParameters)
 {
-    X_ASSERT(sendParameters.length > 0, "Can't send empty buffer")
-    ();
+    X_ASSERT(sendParameters.length > 0, "Can't send empty buffer")();
 
     // eat it you slag!
     int32_t oldTtl = -1;
@@ -396,8 +395,7 @@ void NetSocket::setBroadcastSocket(bool broadcast)
 
 void NetSocket::setIPHdrIncl(bool ipHdrIncl)
 {
-    X_ASSERT(socketType_ == SocketType::Raw, "Must be a raw socket")
-    (socketType_);
+    X_ASSERT(socketType_ == SocketType::Raw, "Must be a raw socket")(socketType_);
 
     int32_t res;
     int32_t val = ipHdrIncl ? 1 : 0;

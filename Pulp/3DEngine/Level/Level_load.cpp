@@ -88,8 +88,7 @@ void Level::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     X_UNUSED(pJob);
     X_UNUSED(pData);
 
-    X_ASSERT(headerLoaded_, "Header must be loaded in order to process data")
-    (headerLoaded_);
+    X_ASSERT(headerLoaded_, "Header must be loaded in order to process data")(headerLoaded_);
     X_ASSERT_NOT_NULL(pFileData_);
 
     core::XFileAsync* pFile = static_cast<core::XFileAsync*>(pData);
@@ -199,8 +198,7 @@ bool Level::ProcessData(void)
             model::MeshHeader* pMesh = cursor.getSeekPtr<model::MeshHeader>();
             numSub = pMesh->numSubMeshes;
 
-            X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")
-            (numSub);
+            X_ASSERT(numSub > 0, "a areamodel can't have zero meshes")(numSub);
 
             // set meshHeads verts and faces.
             pMesh->subMeshHeads = cursor.postSeekPtr<model::SubMeshHeader>(numSub);

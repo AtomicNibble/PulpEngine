@@ -86,8 +86,7 @@ IVideo* XVideoSys::findVideo(const char* pVideoName) const
 IVideo* XVideoSys::loadVideo(const char* pVideoName)
 {
     X_ASSERT_NOT_NULL(pVideoName);
-    X_ASSERT(core::strUtil::FileExtension(pVideoName) == nullptr, "Extension not allowed")
-    (pVideoName);
+    X_ASSERT(core::strUtil::FileExtension(pVideoName) == nullptr, "Extension not allowed")(pVideoName);
 
     core::string name(pVideoName);
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
@@ -115,8 +114,7 @@ void XVideoSys::releaseVideo(IVideo* pVideo)
 
 bool XVideoSys::waitForLoad(core::AssetBase* pVideo)
 {
-    X_ASSERT(pVideo->getType() == assetDb::AssetType::VIDEO, "Invalid asset passed")
-    ();
+    X_ASSERT(pVideo->getType() == assetDb::AssetType::VIDEO, "Invalid asset passed")();
 
     if (pVideo->isLoaded()) {
         return true;

@@ -86,11 +86,9 @@ namespace Compression
 
         static Algo::Enum getAlgo(core::span<const uint8_t> data)
         {
-            X_ASSERT(data.length() >= sizeof(BufferHdr), "Buffer is too small to contain BufferHdr")
-            (sizeof(BufferHdr), data.length());
+            X_ASSERT(data.length() >= sizeof(BufferHdr), "Buffer is too small to contain BufferHdr")(sizeof(BufferHdr), data.length());
             const BufferHdr* pHdr = union_cast<const BufferHdr*, const uint8_t*>(data.data());
-            X_ASSERT(pHdr->IsMagicValid(), "Compressed buffer header is not valid")
-            ();
+            X_ASSERT(pHdr->IsMagicValid(), "Compressed buffer header is not valid")();
             return pHdr->algo;
         }
 
@@ -230,8 +228,7 @@ namespace Compression
 
         BufferHdr* pHdr = union_cast<BufferHdr*, const uint8_t*>(pBegin);
 
-        X_ASSERT(dstDataSize == pHdr->inflatedSize, "Dest buffer incorrect size")
-        (dstDataSize, pHdr->inflatedSize);
+        X_ASSERT(dstDataSize == pHdr->inflatedSize, "Dest buffer incorrect size")(dstDataSize, pHdr->inflatedSize);
 
         return inflate_int(arena, pHdr + 1, dataSize - sizeof(BufferHdr), pInflatedBegin, dstDataSize);
     }
@@ -250,8 +247,7 @@ namespace Compression
         // buffer than source is garanted to fit into.
         virtual size_t requiredDeflateDestBuf(size_t sourceLen) const X_FINAL
         {
-            X_ASSERT(sourceLen <= T::maxSourceSize(), "Source len exceeds max source size")
-            (sourceLen, T::maxSourceSize());
+            X_ASSERT(sourceLen <= T::maxSourceSize(), "Source len exceeds max source size")(sourceLen, T::maxSourceSize());
             return T::requiredDeflateDestBuf(sourceLen) + sizeof(BufferHdr);
         }
 

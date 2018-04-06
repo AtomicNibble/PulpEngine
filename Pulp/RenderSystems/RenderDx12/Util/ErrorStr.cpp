@@ -11,8 +11,7 @@ namespace Error
         const size_t prefixLen = sizeof("(0x00000000) ") - 1;
 
         const auto len = sprintf_s(desc, prefixLen + 1, "(0x%8" PRIx32 ") ", error);
-        X_ASSERT(len == prefixLen, "Prefix size mismtach")
-        (len, prefixLen);
+        X_ASSERT(len == prefixLen, "Prefix size mismtach")(len, prefixLen);
 
         DWORD size = ::FormatMessageA(
             FORMAT_MESSAGE_FROM_SYSTEM,

@@ -76,14 +76,10 @@ namespace Frustum
 void XFrustum::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, float32_t nearplane,
     float32_t farpane, float32_t fPixelAspectRatio)
 {
-    X_ASSERT(nearplane > 0.001f, "near plane not valid")
-    (nearplane); //check if near-plane is valid
-    X_ASSERT(farpane > 0.1f, "far plane not valid")
-    (farpane); //check if far-plane is valid
-    X_ASSERT(farpane > nearplane, "farplane must be greater than nearplane")
-    (farpane, nearplane); //check if far-plane bigger then near-plane
-    X_ASSERT(FOV >= 0.000001f && FOV < X_PI, "invalid FOV")
-    (FOV); //check if specified FOV is valid
+    X_ASSERT(nearplane > 0.001f, "near plane not valid")(nearplane); //check if near-plane is valid
+    X_ASSERT(farpane > 0.1f, "far plane not valid")(farpane); //check if far-plane is valid
+    X_ASSERT(farpane > nearplane, "farplane must be greater than nearplane")(farpane, nearplane); //check if far-plane bigger then near-plane
+    X_ASSERT(FOV >= 0.000001f && FOV < X_PI, "invalid FOV")(FOV); //check if specified FOV is valid
 
     fov_ = FOV;
     width_ = nWidth;   //surface x-resolution
@@ -105,8 +101,7 @@ void XFrustum::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, floa
     edge_plt_.x = projLeftTopX;
     edge_plt_.y = projLeftTopY;
     edge_plt_.z = projLeftTopZ;
-    X_ASSERT(math<float>::abs(math<float>::acos(Vec3f(0, edge_plt_.y, edge_plt_.z).normalized().y) * 2 - fov_) < 0.001, "")
-    ();
+    X_ASSERT(math<float>::abs(math<float>::acos(Vec3f(0, edge_plt_.y, edge_plt_.z).normalized().y) * 2 - fov_) < 0.001, "")();
 
     // this is the left/upper vertex of the projection-plane (local-space)
     float invProjLeftTopY = 1.0f / projLeftTopY;
@@ -124,8 +119,7 @@ void XFrustum::setFrustum(uint32_t nWidth, uint32_t nHeight, float32_t FOV, floa
 
 void XFrustum::setFov(float32_t fov)
 {
-    X_ASSERT(fov >= 0.000001f && fov < X_PI, "invalid fov")
-    (fov); //check if specified FOV is valid
+    X_ASSERT(fov >= 0.000001f && fov < X_PI, "invalid fov")(fov); //check if specified FOV is valid
 
     fov_ = fov;
 
@@ -140,8 +134,7 @@ void XFrustum::setFov(float32_t fov)
     edge_plt_.x = projLeftTopX;
     edge_plt_.y = projLeftTopY;
     edge_plt_.z = projLeftTopZ;
-    X_ASSERT(math<float>::abs(math<float>::acos(Vec3f(0, edge_plt_.y, edge_plt_.z).normalized().y) * 2 - fov_) < 0.001, "")
-    ();
+    X_ASSERT(math<float>::abs(math<float>::acos(Vec3f(0, edge_plt_.y, edge_plt_.z).normalized().y) * 2 - fov_) < 0.001, "")();
 
     // this is the left/upper vertex of the projection-plane (local-space)
     float invProjLeftTopY = 1.0f / projLeftTopY;

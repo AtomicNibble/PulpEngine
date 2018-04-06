@@ -200,22 +200,17 @@ LinearAllocator::LinearAllocator(core::MemoryArenaBase* arena, LinearAllocatorMa
 
 LinearAllocator::~LinearAllocator()
 {
-    X_ASSERT(pCurPage_ == nullptr, "Current page was not cleaned up")
-    (pCurPage_);
-    X_ASSERT(retiredPages_.isEmpty(), "Retired pages where not discarded")
-    (retiredPages_.size());
-    X_ASSERT(largePages_.isEmpty(), "Large pages where not discarded")
-    (largePages_.size());
+    X_ASSERT(pCurPage_ == nullptr, "Current page was not cleaned up")(pCurPage_);
+    X_ASSERT(retiredPages_.isEmpty(), "Retired pages where not discarded")(retiredPages_.size());
+    X_ASSERT(largePages_.isEmpty(), "Large pages where not discarded")(largePages_.size());
 }
 
 DynAlloc LinearAllocator::allocate(size_t sizeInBytes, size_t alignment)
 {
-    X_ASSERT(sizeInBytes <= pageSize_, "Exceeded max linear allocator page size with single allocation")
-    (sizeInBytes, pageSize_);
+    X_ASSERT(sizeInBytes <= pageSize_, "Exceeded max linear allocator page size with single allocation")(sizeInBytes, pageSize_);
 
     // Assert that it's a power of two.
-    X_ASSERT(core::bitUtil::IsPowerOfTwo(alignment), "alignment must be power of two")
-    (alignment);
+    X_ASSERT(core::bitUtil::IsPowerOfTwo(alignment), "alignment must be power of two")(alignment);
 
     const size_t alignedSize = core::bitUtil::RoundUpToMultiple(sizeInBytes, alignment);
 

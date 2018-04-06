@@ -289,8 +289,7 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
         }
     }
 
-    X_ASSERT(servinfo != 0, "ServerInfo not valid")
-    (servinfo);
+    X_ASSERT(servinfo != 0, "ServerInfo not valid")(servinfo);
 
     uint16_t oldPort = address_.addr4.port;
 
@@ -307,10 +306,8 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
     }
 #if NET_IPv6_SUPPORT
     else {
-        X_ASSERT(servinfo->ai_family == AF_INET6, "Unexpected familey")
-        (servinfo->ai_family);
-        X_ASSERT(servinfo->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")
-        (servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
+        X_ASSERT(servinfo->ai_family == AF_INET6, "Unexpected familey")(servinfo->ai_family);
+        X_ASSERT(servinfo->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
         static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
 

@@ -52,10 +52,8 @@ namespace entity
     void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
         engine::IWorld3D* p3DWorld, const UserCmd& userCmd, EntityId playerId)
     {
-        X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")
-        (playerId, MAX_PLAYERS);
-        X_ASSERT(reg.has<Player>(playerId), "Not a valid player")
-        (playerId);
+        X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")(playerId, MAX_PLAYERS);
+        X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
 
         X_UNUSED(timeInfo, reg, playerId, p3DWorld);
 

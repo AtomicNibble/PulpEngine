@@ -160,8 +160,7 @@ namespace entity
 
     void WeaponSystem::beginRaise(core::TimeVal curTime, Weapon& wpn, Animator& animator)
     {
-        X_ASSERT(wpn.state == weapon::State::Holstered, "Invalid state")
-        (wpn.state);
+        X_ASSERT(wpn.state == weapon::State::Holstered, "Invalid state")(wpn.state);
 
         auto raiseEvt = wpn.pWeaponDef->getSoundSlotHash(weapon::SoundSlot::Raise);
         if (raiseEvt) {

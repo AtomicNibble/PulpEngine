@@ -117,8 +117,7 @@ bool XRenderMesh::createRenderBuffers(render::IRender* pRend, const MeshHeader& 
     // since if we are not going to use them it's wasted vram.
 
     // we always carry vert?
-    X_ASSERT(baseVertStride > 0, "Vertex stride of zero")
-    (baseVertStride);
+    X_ASSERT(baseVertStride > 0, "Vertex stride of zero")(baseVertStride);
     vertexStreams_[VertexStream::VERT] = pRend->createVertexBuffer(baseVertStride, numVerts,
         mesh.streams[VertexStream::VERT], render::BufUsage::IMMUTABLE);
 

@@ -156,8 +156,7 @@ bool XLexer::isEOF(void) const
 {
     // check if we have gone past the end for some strange reason.
     // still returns true for EOF if past tho.
-    X_ASSERT(current_ <= end_, "current is past the end of the file")
-    (current_, end_);
+    X_ASSERT(current_ <= end_, "current is past the end of the file")(current_, end_);
     return current_ >= end_;
 }
 
@@ -165,8 +164,7 @@ bool XLexer::isEOF(bool skipWhiteSpace)
 {
     // check if we have gone past the end for some strange reason.
     // still returns true for EOF if past tho.
-    X_ASSERT(current_ <= end_, "current is past the end of the file")
-    (current_, end_);
+    X_ASSERT(current_ <= end_, "current is past the end of the file")(current_, end_);
 
     if (skipWhiteSpace) {
         ReadWhiteSpace();

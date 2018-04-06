@@ -62,8 +62,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
             const uint32_t lineBatchVertSize = core::Min(maxVertsPerBatch, numLines * 2);
             const uint32_t lineBatchSize = lineBatchVertSize >> 1;
 
-            X_ASSERT(lineBatchSize * 2 == lineBatchVertSize, "")
-            ();
+            X_ASSERT(lineBatchSize * 2 == lineBatchVertSize, "")();
 
             engine::IPrimativeContext::PrimVertex* X_RESTRICT pLines = pPrimCon_->addPrimative(lineBatchVertSize,
                 engine::IPrimativeContext::PrimitiveType::LINELIST);
@@ -92,8 +91,7 @@ void DebugRender::update(const physx::PxRenderBuffer& debugRenderable)
             const uint32_t triBatchVertSize = core::Min(maxVertsPerBatch, numTriangles * 3);
             const uint32_t triBatchSize = triBatchVertSize / 3;
 
-            X_ASSERT(triBatchSize * 3 == triBatchVertSize, "")
-            ();
+            X_ASSERT(triBatchSize * 3 == triBatchVertSize, "")();
 
             engine::IPrimativeContext::PrimVertex* X_RESTRICT pVerts = pPrimCon_->addPrimative(triBatchVertSize,
                 engine::IPrimativeContext::PrimitiveType::TRIANGLELIST);

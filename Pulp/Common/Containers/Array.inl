@@ -81,16 +81,14 @@ X_INLINE Array<T, Allocator, GrowPolicy>::~Array(void)
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena)
 {
-    X_ASSERT(num_ == 0, "can't set arena on a array that has items")
-    (num_);
+    X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
     allocator_.setArena(arena);
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena, size_type capacity)
 {
-    X_ASSERT(num_ == 0, "can't set arena on a array that has items")
-    (num_);
+    X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
     allocator_.setArena(arena);
 
     reserve(capacity);
@@ -175,16 +173,14 @@ Array<T, Allocator, GrowPolicy>& Array<T, Allocator, GrowPolicy>::operator=(MyT&
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE const T& Array<T, Allocator, GrowPolicy>::operator[](size_type idx) const
 {
-    X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")
-    (idx, num_);
+    X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
     return list_[idx];
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE T& Array<T, Allocator, GrowPolicy>::operator[](size_type idx)
 {
-    X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")
-    (idx, num_);
+    X_ASSERT(idx >= 0 && idx < num_, "Array index out of bounds")(idx, num_);
     return list_[idx];
 }
 
@@ -300,8 +296,7 @@ X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator,
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum)
 {
-    X_ASSERT(newNum >= 0, "array size must be positive")
-    (newNum);
+    X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
     // same amount of items?
     if (newNum == num_) {
@@ -330,8 +325,7 @@ X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum)
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum, const T& t)
 {
-    X_ASSERT(newNum >= 0, "array size must be positive")
-    (newNum);
+    X_ASSERT(newNum >= 0, "array size must be positive")(newNum);
 
     if (newNum == num_) {
         return;
@@ -354,8 +348,7 @@ X_INLINE void Array<T, Allocator, GrowPolicy>::resize(size_type newNum, const T&
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE void Array<T, Allocator, GrowPolicy>::reserve(size_type __size)
 {
-    X_ASSERT(__size >= 0, "array size must be positive")
-    (__size);
+    X_ASSERT(__size >= 0, "array size must be positive")(__size);
     ensureSize(__size);
 }
 
@@ -493,10 +486,8 @@ X_INLINE void Array<T, Allocator, GrowPolicy>::pop_back()
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::insertAtIndex(size_type index, const Type& obj)
 {
-    X_ASSERT(index >= 0, "index is invalid")
-    (index);
-    X_ASSERT(index <= num_, "index is out of bounds")
-    (index, num_);
+    X_ASSERT(index >= 0, "index is invalid")(index);
+    X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
 
     if (num_ == size_) {
         ensureSize(size_ + 1);
@@ -515,10 +506,8 @@ X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator,
 template<typename T, class Allocator, class GrowPolicy>
 X_INLINE typename Array<T, Allocator, GrowPolicy>::size_type Array<T, Allocator, GrowPolicy>::insertAtIndex(size_type index, Type&& obj)
 {
-    X_ASSERT(index >= 0, "index is invalid")
-    (index);
-    X_ASSERT(index <= num_, "index is out of bounds")
-    (index, num_);
+    X_ASSERT(index >= 0, "index is invalid")(index);
+    X_ASSERT(index <= num_, "index is out of bounds")(index, num_);
 
     if (num_ == size_) {
         ensureSize(size_ + 1);
@@ -610,8 +599,7 @@ bool Array<T, Allocator, GrowPolicy>::removeIndex(size_type idx)
     }
 
     X_ASSERT_NOT_NULL(list_);
-    X_ASSERT(idx < num_, "index is out of bounds")
-    (idx, num_);
+    X_ASSERT(idx < num_, "index is out of bounds")(idx, num_);
 
     T* pItem = &list_[idx];
 
@@ -634,8 +622,7 @@ bool Array<T, Allocator, GrowPolicy>::removeIndex(size_type idx)
 template<typename T, class Allocator, class GrowPolicy>
 void Array<T, Allocator, GrowPolicy>::remove(ConstIterator it)
 {
-    X_ASSERT(it >= begin() && it < end(), "Invalid iterator")
-    (it, begin(), end());
+    X_ASSERT(it >= begin() && it < end(), "Invalid iterator")(it, begin(), end());
 
     removeIndex(it - list_);
 }
@@ -644,8 +631,7 @@ template<typename T, class Allocator, class GrowPolicy>
 void Array<T, Allocator, GrowPolicy>::remove(const T& item)
 {
     size_type idx = find(item);
-    X_ASSERT(idx != invalid_index, "Item to remove could not be found.")
-    (item, idx);
+    X_ASSERT(idx != invalid_index, "Item to remove could not be found.")(item, idx);
 
     removeIndex(idx);
 }
@@ -654,8 +640,7 @@ template<typename T, class Allocator, class GrowPolicy>
 void Array<T, Allocator, GrowPolicy>::removeIndexStable(size_type idx)
 {
     X_ASSERT_NOT_NULL(list_);
-    X_ASSERT(idx < num_, "index is out of bounds")
-    (idx, num_);
+    X_ASSERT(idx < num_, "index is out of bounds")(idx, num_);
 
     T* pItem = &list_[idx];
 
@@ -676,8 +661,7 @@ void Array<T, Allocator, GrowPolicy>::removeIndexStable(size_type idx)
 template<typename T, class Allocator, class GrowPolicy>
 typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::erase(ConstIterator _first)
 {
-    X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")
-    (_first, begin(), end());
+    X_ASSERT(_first >= begin() && _first < end(), "Invalid iterator")(_first, begin(), end());
 
     Iterator first = const_cast<Iterator>(_first);
 
@@ -826,32 +810,28 @@ inline typename Array<T, Allocator, GrowPolicy>::ConstIterator Array<T, Allocato
 template<typename T, class Allocator, class GrowPolicy>
 inline typename Array<T, Allocator, GrowPolicy>::Reference Array<T, Allocator, GrowPolicy>::front(void)
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
     return *list_;
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 inline typename Array<T, Allocator, GrowPolicy>::ConstReference Array<T, Allocator, GrowPolicy>::front(void) const
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling front")(isNotEmpty());
     return *list_;
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 inline typename Array<T, Allocator, GrowPolicy>::Reference Array<T, Allocator, GrowPolicy>::back(void)
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
     return (*(end() - 1));
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 inline typename Array<T, Allocator, GrowPolicy>::ConstReference Array<T, Allocator, GrowPolicy>::back(void) const
 {
-    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")
-    (isNotEmpty());
+    X_ASSERT(isNotEmpty(), "Array can't be empty when calling back")(isNotEmpty());
     return (*(end() - 1));
 }
 

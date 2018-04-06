@@ -86,8 +86,7 @@ namespace
 
 void XLexToken::NumberValue(void)
 {
-    X_ASSERT(type_ == TokenType::NUMBER, "token is not a number")
-    (type_);
+    X_ASSERT(type_ == TokenType::NUMBER, "token is not a number")(type_);
 
     // make a nullterm string
     // lol wtf this is 10% of the function.
@@ -290,8 +289,7 @@ XLexer::XLexer(const char* startInclusive, const char* endExclusive, core::strin
 
 bool XLexer::SetMemory(const char* startInclusive, const char* endExclusive, core::string name)
 {
-    X_ASSERT(start_ == nullptr, "Can't set memory on a Lex that is already init.")
-    (start_, end_, current_);
+    X_ASSERT(start_ == nullptr, "Can't set memory on a Lex that is already init.")(start_, end_, current_);
 
     if (start_) {
         return false;
@@ -405,8 +403,7 @@ bool XLexer::ReadToken(XLexToken& token)
         return false;
     }
 
-    X_ASSERT(current_ < end_, "Trying to read from end of buffer")
-    (current_, end_);
+    X_ASSERT(current_ < end_, "Trying to read from end of buffer")(current_, end_);
 
     // save script pointer
     lastp_ = current_;

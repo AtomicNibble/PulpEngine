@@ -62,8 +62,7 @@ bool XMatrixStack::MultMatrixLocal(const Matrix44f* pMat)
 bool XMatrixStack::Pop(void)
 {
     if (curDpeth_ == 0) {
-        X_ASSERT(curDpeth_ > 0, "can't pop matrix off stack, none left")
-        (curDpeth_);
+        X_ASSERT(curDpeth_ > 0, "can't pop matrix off stack, none left")(curDpeth_);
         return false;
     }
 
@@ -76,8 +75,7 @@ bool XMatrixStack::Pop(void)
 bool XMatrixStack::Push(void)
 {
     if ((curDpeth_ + 1) >= maxDpeth_) {
-        X_ASSERT((curDpeth_ + 1) < maxDpeth_, "can't push matrix onto stack, at max depth")
-        (curDpeth_, maxDpeth_);
+        X_ASSERT((curDpeth_ + 1) < maxDpeth_, "can't push matrix onto stack, at max depth")(curDpeth_, maxDpeth_);
         return false;
     }
 

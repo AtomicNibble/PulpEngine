@@ -427,20 +427,16 @@ X_INLINE const Matrix34<T> Matrix34<T>::operator-(T rhs) const
 template<typename T>
 X_INLINE T& Matrix34<T>::at(int row, int col)
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM + 1, "col out of range")
-    (DIM + 1, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM + 1, "col out of range")(DIM + 1, col);
     return m[col * DIM + row];
 }
 
 template<typename T>
 X_INLINE const T& Matrix34<T>::at(int row, int col) const
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM + 1, "col out of range")
-    (DIM + 1, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM + 1, "col out of range")(DIM + 1, col);
     return m[col * DIM + row];
 }
 

@@ -36,8 +36,7 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
     current_ = pointerUtil::AlignTop(current_ + align_offset, alignment) - align_offset;
 
     if ((current_ + size) > end_) { // check for overflow.
-        X_ASSERT(false, "Stack overflow!, a linear allocator can't satisfy the request.")
-        (size, end_ - start_, end_ - current_);
+        X_ASSERT(false, "Stack overflow!, a linear allocator can't satisfy the request.")(size, end_ - start_, end_ - current_);
         return nullptr;
     }
 

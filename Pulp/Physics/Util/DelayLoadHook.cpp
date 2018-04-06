@@ -87,8 +87,7 @@ const char* DelayLoadHook::getPhysxName(const char* pRequestedName)
 
 const char* DelayLoadHook::createNameForConfig(const char* pPrefix, core::Path<char>& buffer)
 {
-    X_ASSERT(config_ != Config::Normal, "Create config name should only be called when overiding")
-    ();
+    X_ASSERT(config_ != Config::Normal, "Create config name should only be called when overiding")();
 
     buffer.clear();
     buffer.append(pPrefix);

@@ -95,8 +95,7 @@ void SystemAddress::setToLoopback(IpVersion::Enum ipVersion)
     }
 #endif // !NET_IPv6_SUPPORT
 
-    X_ASSERT(IsLoopBack(), "Failed to set to loopback")
-    ();
+    X_ASSERT(IsLoopBack(), "Failed to set to loopback")();
 }
 
 bool SystemAddress::operator==(const SystemAddress& rhs) const

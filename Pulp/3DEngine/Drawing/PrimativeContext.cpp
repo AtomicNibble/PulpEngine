@@ -288,8 +288,7 @@ PrimativeContextSharedResources::InstancedPage::InstancedPage() :
 
 void PrimativeContextSharedResources::InstancedPage::createVB(render::IRender* pRender)
 {
-    X_ASSERT(instBufHandle == render::INVALID_BUF_HANLDE, "Instanced buffer already valid")
-    ();
+    X_ASSERT(instBufHandle == render::INVALID_BUF_HANLDE, "Instanced buffer already valid")();
 
     instBufHandle = pRender->createVertexBuffer(
         sizeof(IPrimativeContext::ShapeInstanceData),
@@ -493,8 +492,7 @@ PrimativeContext::VertexPage::VertexPage(core::MemoryArenaBase* arena) :
 
 void PrimativeContext::VertexPage::createVB(render::IRender* pRender)
 {
-    X_ASSERT(vertexBufHandle == render::INVALID_BUF_HANLDE, "Vertex buffer already valid")
-    ();
+    X_ASSERT(vertexBufHandle == render::INVALID_BUF_HANLDE, "Vertex buffer already valid")();
 
     vertexBufHandle = pRender->createVertexBuffer(
         sizeof(IPrimativeContext::PrimVertex),
@@ -546,8 +544,7 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
     pushBufferArr_.reserve(64);
     pushBufferArr_.setGranularity(512);
 
-    X_ASSERT(vertexPages_.isNotEmpty(), "Must have atleast one vertex page")
-    ();
+    X_ASSERT(vertexPages_.isNotEmpty(), "Must have atleast one vertex page")();
     // for the fist page we reverse something small
     // before setting the large granularity.
     // that way we grow fast but if not rendering much we stay small.
@@ -574,8 +571,7 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
             break;
         }
 
-        X_ASSERT(vp.vertexBufHandle != render::INVALID_BUF_HANLDE, "Vertex buffer handle should be valid")
-        ();
+        X_ASSERT(vp.vertexBufHandle != render::INVALID_BUF_HANLDE, "Vertex buffer handle should be valid")();
 
         auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
         pUpdateVb->vertexBuffer = vp.vertexBufHandle;
@@ -588,8 +584,7 @@ void PrimativeContext::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucke
     bool expectNull = false;
     for (size_t i = 0; i < vertexPages_.size(); i++) {
         if (expectNull) {
-            X_ASSERT(vertexPages_[i].verts.isEmpty(), "A vertex page had data after a page that was empty")
-            ();
+            X_ASSERT(vertexPages_[i].verts.isEmpty(), "A vertex page had data after a page that was empty")();
         }
         else {
             if (vertexPages_[i].verts.isEmpty()) {

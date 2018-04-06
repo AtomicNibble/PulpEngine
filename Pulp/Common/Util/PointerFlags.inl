@@ -10,18 +10,15 @@ template<class T, size_t BIT_COUNT>
 X_INLINE PointerFlags<T, BIT_COUNT>::PointerFlags(T* ptr) :
     pointer_(ptr)
 {
-    X_ASSERT((union_cast<uintptr_t>(ptr) & BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")
-    (ptr, BIT_COUNT, BIT_MASK);
+    X_ASSERT((union_cast<uintptr_t>(ptr) & BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")(ptr, BIT_COUNT, BIT_MASK);
 }
 
 template<class T, uintptr_t BIT_COUNT>
 X_INLINE PointerFlags<T, BIT_COUNT>::PointerFlags(T* ptr, uintptr_t bits) :
     pointer_(union_cast<T*>(union_cast<uintptr_t>(ptr) | bits))
 {
-    X_ASSERT((union_cast<uintptr_t>(ptr) & BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")
-    (ptr, BIT_COUNT, BIT_MASK);
-    X_ASSERT((bits & ~BIT_MASK) == 0, "Inncorrect bits provided for pointer flags")
-    (bits, BIT_COUNT, BIT_MASK);
+    X_ASSERT((union_cast<uintptr_t>(ptr) & BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")(ptr, BIT_COUNT, BIT_MASK);
+    X_ASSERT((bits & ~BIT_MASK) == 0, "Inncorrect bits provided for pointer flags")(bits, BIT_COUNT, BIT_MASK);
 }
 
 template<class T, uintptr_t BIT_COUNT>
@@ -58,8 +55,7 @@ X_INLINE uintptr_t PointerFlags<T, BIT_COUNT>::GetBits(void) const
 template<class T, uintptr_t BIT_COUNT>
 X_INLINE void PointerFlags<T, BIT_COUNT>::SetBits(uintptr_t bits)
 {
-    X_ASSERT((bits & ~BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")
-    (bits, BIT_COUNT, BIT_MASK);
+    X_ASSERT((bits & ~BIT_MASK) == 0, "Unable to store requesed bits in pointer flags")(bits, BIT_COUNT, BIT_MASK);
     pointer_ = union_cast<T*>((union_cast<uintptr_t>(pointer_) & ~BIT_MASK) | bits);
 }
 

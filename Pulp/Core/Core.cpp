@@ -428,8 +428,7 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 // IXHotReloadManager
 bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
 {
-    X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")
-    (pHotReload, env_.isRunning());
+    X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")(pHotReload, env_.isRunning());
 
     X_ASSERT_NOT_NULL(extension);
 

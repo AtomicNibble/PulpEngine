@@ -25,8 +25,7 @@ XPhysLib::~XPhysLib()
 
 bool XPhysLib::init(void)
 {
-    X_ASSERT(pFoundation_ == nullptr, "Init called twice")
-    (pFoundation_);
+    X_ASSERT(pFoundation_ == nullptr, "Init called twice")(pFoundation_);
 
     physx::PxSetPhysXDelayLoadHook(&gDelayLoadHook);
     physx::PxSetPhysXCookingDelayLoadHook(&gDelayLoadHook);

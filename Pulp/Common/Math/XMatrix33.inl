@@ -297,20 +297,16 @@ const Matrix33<T> Matrix33<T>::operator-(T rhs) const
 template<typename T>
 T& Matrix33<T>::at(int row, int col)
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM, "col out of range")
-    (DIM, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
 }
 
 template<typename T>
 const T& Matrix33<T>::at(int row, int col) const
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM, "col out of range")
-    (DIM, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
 }
 
@@ -715,10 +711,8 @@ template<typename T>
 Matrix33<T> Matrix33<T>::createRotationV01(const Vec3<T>& v0, const Vec3<T>& v1)
 {
     //check if unit-vector
-    X_ASSERT((math<T>::abs(1 - (v0.dot(v0)))) < 0.01, "unit-vector")
-    (v0, v1);
-    X_ASSERT((math<T>::abs(1 - (v1.dot(v1)))) < 0.01, "uint-vector")
-    (v0, v1);
+    X_ASSERT((math<T>::abs(1 - (v0.dot(v0)))) < 0.01, "unit-vector")(v0, v1);
+    X_ASSERT((math<T>::abs(1 - (v1.dot(v1)))) < 0.01, "uint-vector")(v0, v1);
 
     Matrix33<T> ret;
 

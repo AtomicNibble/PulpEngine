@@ -579,8 +579,7 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 bool xFileSys::setGameDir(pathTypeW path)
 {
-    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")
-    (path, gameDir_);
+    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path, gameDir_);
 
     // check if the irectory is even valid.
     if (!this->directoryExistsOS(path)) {
@@ -722,8 +721,7 @@ uintptr_t xFileSys::findFirst2(pathType path, findData& findinfo)
 
 bool xFileSys::findnext2(uintptr_t handle, findData& findinfo)
 {
-    X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")
-    (handle);
+    X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
 
     return PathUtil::findNext(handle, findinfo);
 }
@@ -1239,8 +1237,7 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase* pRequest)
         }
     }
     else {
-        X_ASSERT(pRequest->callback, "Callback can't be null")
-        (IoRequest::ToString(pRequest->getType()), pRequest->callback);
+        X_ASSERT(pRequest->callback, "Callback can't be null")(IoRequest::ToString(pRequest->getType()), pRequest->callback);
     }
 
     if (vars_.queueDebug_) {
@@ -1440,8 +1437,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
 
 void xFileSys::AsyncIoCompletetionRoutine(XOsFileAsyncOperation::AsyncOp* pOperation, uint32_t bytesTransferd)
 {
-    X_ASSERT(pendingCompOps_.isNotEmpty(), "Recived a unexpected Async complition")
-    (pOperation, bytesTransferd);
+    X_ASSERT(pendingCompOps_.isNotEmpty(), "Recived a unexpected Async complition")(pOperation, bytesTransferd);
 
     for (size_t i = 0; i < pendingCompOps_.size(); i++) {
         PendingCompiltionOp& asyncOp = pendingCompOps_[i];
@@ -1522,8 +1518,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
                 auto& delayedOp = delayedOps_.peek().op;
 
                 uint32_t bytesTrans;
-                X_ASSERT(delayedOp.op.hasFinished(&bytesTrans), "Delayed op should be always be finished")
-                ();
+                X_ASSERT(delayedOp.op.hasFinished(&bytesTrans), "Delayed op should be always be finished")();
 
                 onOpFinsihed(delayedOp, bytesTrans);
 
@@ -1589,8 +1584,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
             // make sure it's safe to allocate the buffer in this thread.
             X_ASSERT_NOT_NULL(pOpenRead->arena);
-            X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")
-            (pOpenRead->arena->isThreadSafe());
+            X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")(pOpenRead->arena->isThreadSafe());
 
             if (!pFile) {
                 pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
@@ -1635,10 +1629,8 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
             XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE));
 
-            X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")
-            ();
-            X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")
-            (pOpenWrite->data.size());
+            X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
+            X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());
 
             if (!pFile) {
                 pOpenWrite->callback.Invoke(fileSys, pOpenWrite, pFile, 0);
@@ -1722,8 +1714,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             IoRequestWrite* pWrite = static_cast<IoRequestWrite*>(pRequest);
             XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pWrite->pFile);
 
-            X_ASSERT(pWrite->pFile->getType() != XFileAsync::Type::VIRTUAL, "Tried to write to virtual file")
-            (pWrite->pFile->getType());
+            X_ASSERT(pWrite->pFile->getType() != XFileAsync::Type::VIRTUAL, "Tried to write to virtual file")(pWrite->pFile->getType());
 
 #if X_ENABLE_FILE_STATS
             stats_.NumBytesWrite += pWrite->dataSize;

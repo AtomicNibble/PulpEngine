@@ -20,10 +20,8 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const char* Str, size_t Len)
 {
-    X_ASSERT(Len < 255, "string is longer than the 255 max")
-    (Len);
-    X_ASSERT(CurrentBlock_ < MaxBlocks_, "string table is full")
-    (CurrentBlock_, MaxBlocks_);
+    X_ASSERT(Len < 255, "string is longer than the 255 max")(Len);
+    X_ASSERT(CurrentBlock_ < MaxBlocks_, "string table is full")(CurrentBlock_, MaxBlocks_);
 
     IdType Block = CurrentBlock_;
 
@@ -51,8 +49,7 @@ IdType StringTable<NumBlocks, BlockSize, Alignment, IdType>::addString(const cha
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 const char* StringTable<NumBlocks, BlockSize, Alignment, IdType>::getString(IdType ID) const
 {
-    X_ASSERT(ID < MaxBlocks_, "String out of range")
-    (ID);
+    X_ASSERT(ID < MaxBlocks_, "String out of range")(ID);
     return reinterpret_cast<const char*>(&Buffer_[4 + (BlockSize * ID) + sizeof(Header_t)]);
 }
 

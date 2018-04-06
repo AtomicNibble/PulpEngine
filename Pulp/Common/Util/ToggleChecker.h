@@ -18,8 +18,7 @@ public:
 
     X_INLINE bool operator=(bool value)
     {
-        X_ASSERT(value != current_, "toggle check failed")
-        (value, current_);
+        X_ASSERT(value != current_, "toggle check failed")(value, current_);
         current_ = value;
         return current_;
     }

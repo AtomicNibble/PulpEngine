@@ -142,8 +142,7 @@ public:
     /// Invokes the delegate.
     R Invoke(ARGS) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")
-        ();
+        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
         return stub_.function(stub_.instance X_PP_COMMA_IF(COUNT) PASS_ARGS);
     }
 

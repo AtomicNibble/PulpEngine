@@ -7,8 +7,7 @@ X_INLINE size_t XHashIndex::allocated(void) const
 
 X_INLINE void XHashIndex::add(const uint32_t key, const index_type index)
 {
-    X_ASSERT(index >= 0, "invalid index")
-    (index);
+    X_ASSERT(index >= 0, "invalid index")(index);
 
     if (hash_ == INVALID_INDEX) {
         allocate(hashSize_, index >= indexSize_ ? index + 1 : indexSize_);
@@ -49,8 +48,7 @@ X_INLINE int XHashIndex::first(const uint32_t key) const
 
 X_INLINE int XHashIndex::next(const index_type index) const
 {
-    X_ASSERT(index >= 0 && index < indexSize_, "invalid index")
-    (index, indexSize_);
+    X_ASSERT(index >= 0 && index < indexSize_, "invalid index")(index, indexSize_);
     return indexChain_[index & lookupMask_];
 }
 
@@ -66,8 +64,7 @@ X_INLINE XHashIndex::size_type XHashIndex::getIndexSize(void) const
 
 X_INLINE void XHashIndex::setGranularity(const size_type newGranularity)
 {
-    X_ASSERT(newGranularity > 0, "granularity must be positive")
-    (newGranularity);
+    X_ASSERT(newGranularity > 0, "granularity must be positive")(newGranularity);
     granularity_ = newGranularity;
 }
 

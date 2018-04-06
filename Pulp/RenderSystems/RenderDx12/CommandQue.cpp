@@ -101,8 +101,7 @@ bool CommandQue::isFenceComplete(uint64_t fenceValue)
 
 void CommandQue::stallForProducer(CommandQue& producer)
 {
-    X_ASSERT(producer.nextFenceValue_ > 0, "Invalid next fence value")
-    (producer.nextFenceValue_);
+    X_ASSERT(producer.nextFenceValue_ > 0, "Invalid next fence value")(producer.nextFenceValue_);
     pCommandQueue_->Wait(producer.pFence_, producer.nextFenceValue_ - 1);
 }
 

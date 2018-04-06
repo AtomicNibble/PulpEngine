@@ -14,8 +14,7 @@ XHashIndex::XHashIndex(core::MemoryArenaBase* arena, const size_type initialHash
 {
     arena_ = X_ASSERT_NOT_NULL(arena);
 
-    X_ASSERT(core::bitUtil::IsPowerOfTwo(initialHashSize), "size must be power of 2")
-    (initialHashSize);
+    X_ASSERT(core::bitUtil::IsPowerOfTwo(initialHashSize), "size must be power of 2")(initialHashSize);
 
     hashSize_ = initialHashSize;
     hash_ = INVALID_INDEX;
@@ -265,8 +264,7 @@ int XHashIndex::getSpread(void) const
 void XHashIndex::allocate(const size_type newHashSize, const size_type newIndexSize)
 {
     X_ASSERT_NOT_NULL(arena_);
-    X_ASSERT(core::bitUtil::IsPowerOfTwo(newHashSize), "size must be power of 2")
-    (newHashSize);
+    X_ASSERT(core::bitUtil::IsPowerOfTwo(newHashSize), "size must be power of 2")(newHashSize);
 
     free();
     hashSize_ = newHashSize;

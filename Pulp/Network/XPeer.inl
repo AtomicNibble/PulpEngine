@@ -76,8 +76,7 @@ X_INLINE void RemoteSystem::onSend(PacketReliability::Enum reliability, core::Ti
 X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
 {
-    X_ASSERT(bs.isStartOfStream(), "Stream has been read from, potential bug?")
-    ();
+    X_ASSERT(bs.isStartOfStream(), "Stream has been read from, potential bug?")();
 
     sendBuffered(
         bs.data(),
@@ -116,8 +115,7 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const SystemAddressEx& sy
     packetBs.write(msgId);
     sysAdd.writeToBitStream(packetBs);
 
-    X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")
-    (packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
+    X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")(packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
 
     packetQue_.push(pPacket); // fucking shove it right in!
 }
@@ -132,8 +130,7 @@ X_INLINE void XPeer::pushPacket(MessageID::Enum msgId, const RemoteSystem& rs)
     packetBs.write(msgId);
     rs.systemAddress.writeToBitStream(packetBs);
 
-    X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")
-    (packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
+    X_ASSERT(packetBs.freeSpace() == 0, "Unused spawce")(packetBs.size(), packetBs.sizeInBytes(), packetBs.capacity());
 
     packetQue_.push(pPacket); // right in the pickle!
 }

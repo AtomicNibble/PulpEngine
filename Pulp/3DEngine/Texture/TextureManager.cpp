@@ -240,8 +240,7 @@ void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRe
         // hellllo..
         // read the whole file.
         uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
-        X_ASSERT(fileSize > 0, "Datasize must be positive")
-        (fileSize);
+        X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
         uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, fileSize, &blockArena_, "TextureFileData", 16);
 
         core::IoRequestRead read;

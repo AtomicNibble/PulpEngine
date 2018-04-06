@@ -80,8 +80,7 @@ void XPakFileAsync::Job_InflateData(core::V2::JobSystem&, size_t, core::V2::Job*
 XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position)
 {
     if (entry_.isCompressed()) {
-        X_ASSERT(length == fileSize() && position == 0, "Partial reads not supported for compressed files.")
-        (length, position, fileSize());
+        X_ASSERT(length == fileSize() && position == 0, "Partial reads not supported for compressed files.")(length, position, fileSize());
     }
 
     uint64_t pakPos = getPosition(position);
@@ -141,8 +140,7 @@ XFileAsyncOperation XPakFileAsync::writeAsync(const void* pBuffer, size_t length
 
 XFileAsyncOperationCompiltion XPakFileAsync::readAsync(void* pBuffer, size_t length, uint64_t position, ComplitionRotinue callBack)
 {
-    X_ASSERT(supportsComplitionRoutine(), "Competition routine not supported")
-    (supportsComplitionRoutine());
+    X_ASSERT(supportsComplitionRoutine(), "Competition routine not supported")(supportsComplitionRoutine());
 
     uint64_t pakPos = getPosition(position);
     size_t pakLength = getLength(length, position);

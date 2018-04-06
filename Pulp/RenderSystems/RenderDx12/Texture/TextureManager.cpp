@@ -194,8 +194,7 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
 
         // check we have a pixel buf.
         X_ASSERT_NOT_NULL(pTexRes->pPixelBuffer_);
-        X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")
-        ();
+        X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")();
     }
 
     return pTexRes;
@@ -220,8 +219,7 @@ void TextureManager::releaseTexture(Texture* pTex)
     TexRes* pTexRes = static_cast<TexRes*>(pTex);
 
     if (pTexRes->removeReference() == 0) {
-        X_ASSERT(pTex->getBufferType() == render::PixelBufferType::NONE, "PixelBuffers should not be released here")
-        ();
+        X_ASSERT(pTex->getBufferType() == render::PixelBufferType::NONE, "PixelBuffers should not be released here")();
 
         textures_.releaseAsset(pTexRes);
     }
@@ -311,8 +309,7 @@ bool TextureManager::updateTextureData(render::CommandContext& contex, TexID tex
     // TODO: better handle PER_FRAME usage, by directly copying to GPU and skip swizzle.
     // Maybe also have 1-2 device textures just for PER_FRAME texture that we flip between.
     // removing the need to stall eachframe, before we can upload new cpu data.
-    X_ASSERT(pTex->getUsage() != render::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE texture")
-    (pTex->getUsage());
+    X_ASSERT(pTex->getUsage() != render::BufUsage::IMMUTABLE, "Can't update a IMMUTABLE texture")(pTex->getUsage());
 
     auto& dest = pTex->getGpuResource();
 

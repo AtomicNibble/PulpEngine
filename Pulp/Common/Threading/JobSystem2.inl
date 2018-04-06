@@ -271,19 +271,16 @@ namespace V2
     X_INLINE void JobSystem::AddContinuation(Job* ancestor, Job* continuation, bool runInline)
     {
         const int32_t count = (atomic::Increment(&ancestor->continuationCount) - 1);
-        X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")
-        (Job::MAX_CONTINUATIONS, count);
+        X_ASSERT(count < Job::MAX_CONTINUATIONS, "Can't add conitnation, list is full")(Job::MAX_CONTINUATIONS, count);
 
-        X_ASSERT(continuation->pParent != ancestor, "Contination can't have ancestor as parent")
-        ();
+        X_ASSERT(continuation->pParent != ancestor, "Contination can't have ancestor as parent")();
 
 #if X_ENABLE_JOBSYS_PARENT_CHECK
         // lets check all the way up to see if continuation is a child.
         {
             auto* pParent = continuation->pParent;
             while (pParent) {
-                X_ASSERT(pParent != ancestor, "Contination can't have ancestor as parent")
-                ();
+                X_ASSERT(pParent != ancestor, "Contination can't have ancestor as parent")();
                 pParent = pParent->pParent;
             }
         }
@@ -294,8 +291,7 @@ namespace V2
 
         ptrdiff_t jobIdx = continuation - pThreadAlloc->jobs;
 
-        X_ASSERT(jobIdx >= 0 && jobIdx < ThreadQue::MAX_NUMBER_OF_JOBS, "Job index is invalid")
-        (jobIdx, ThreadQue::MAX_NUMBER_OF_JOBS);
+        X_ASSERT(jobIdx >= 0 && jobIdx < ThreadQue::MAX_NUMBER_OF_JOBS, "Job index is invalid")(jobIdx, ThreadQue::MAX_NUMBER_OF_JOBS);
 
         Job::JobId id;
         id.threadIdx = threadIdx;

@@ -99,8 +99,7 @@ inline void ByteStream::write(const Type* pBuf, size_type numBytes)
 {
     ensureSpace(numBytes);
 
-    X_ASSERT(numBytes <= freeSpace(), "Not enougth space")
-    (numBytes, freeSpace());
+    X_ASSERT(numBytes <= freeSpace(), "Not enougth space")(numBytes, freeSpace());
 
     ::memcpy(write_, pBuf, numBytes);
     write_ += numBytes;
@@ -136,8 +135,7 @@ inline void ByteStream::read(T* pVal, size_type num)
 
 inline void ByteStream::read(Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(read_ + numBytes <= write_, "can't read buffer of size: %" PRIuS, numBytes)
-    (numBytes, read_, write_);
+    X_ASSERT(read_ + numBytes <= write_, "can't read buffer of size: %" PRIuS, numBytes)(numBytes, read_, write_);
 
     ::memcpy(pBuf, read_, numBytes);
     read_ += numBytes;
@@ -146,8 +144,7 @@ inline void ByteStream::read(Type* pBuf, size_type numBytes)
 template<typename T>
 inline T ByteStream::peek(void) const
 {
-    X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %" PRIuS, sizeof(T))
-    (sizeof(T), size());
+    X_ASSERT(sizeof(T) <= size(), "can't peek a object of size: %" PRIuS, sizeof(T))(sizeof(T), size());
 
     return *union_cast<T*, Type*>(read_);
 }
@@ -167,8 +164,7 @@ inline void ByteStream::alignWrite(size_t alignment)
 
 inline void ByteStream::seek(size_type pos)
 {
-    X_ASSERT(pos < size(), "can't seek that far")
-    (pos, size());
+    X_ASSERT(pos < size(), "can't seek that far")(pos, size());
     read_ = (start_ + pos);
 }
 

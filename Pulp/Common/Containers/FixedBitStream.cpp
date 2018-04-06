@@ -9,8 +9,7 @@ void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(numBits <= freeSpace(), "Tried to write more bits than avalible space")
-    (numBits, size(), freeSpace(), isEos());
+    X_ASSERT(numBits <= freeSpace(), "Tried to write more bits than avalible space")(numBits, size(), freeSpace(), isEos());
 
     size_type bitsMod8 = bitIdx_ & 7;
     size_type srcTrailingBits = numBits & 7;
@@ -33,8 +32,7 @@ void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
         }
 
         // any trailing bits.
-        X_ASSERT(numBits > 0, "SHould early out before if no bits")
-        (numBits);
+        X_ASSERT(numBits > 0, "SHould early out before if no bits")(numBits);
 
         // okay so just one byte left and we on a boundary.
         // just flip the byte to be left aligned.
@@ -49,8 +47,7 @@ void FixedBitStreamBase::writeBits(const Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")
-    (bitsMod8);
+    X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")(bitsMod8);
 
     // okay now we are left with data we can't do simple byte copy on.
     // shift away!
@@ -95,8 +92,7 @@ void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(numBits <= size(), "Tried to read more bits than avalible")
-    (numBits, size(), freeSpace(), isEos());
+    X_ASSERT(numBits <= size(), "Tried to read more bits than avalible")(numBits, size(), freeSpace(), isEos());
 
     size_type bitsMod8 = readBitIdx_ & 7;
     size_type srcTrailingBits = numBits & 7;
@@ -119,8 +115,7 @@ void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
             pBuf += bytesToCopy;
         }
 
-        X_ASSERT(numBits > 0, "SHould early out before if no bits")
-        (numBits);
+        X_ASSERT(numBits > 0, "SHould early out before if no bits")(numBits);
 
         Type srcByte = *(pBegin_ + readByteIndex());
 
@@ -132,8 +127,7 @@ void FixedBitStreamBase::readBits(Type* pBuf, size_type numBits)
         return;
     }
 
-    X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")
-    (bitsMod8);
+    X_ASSERT(bitsMod8 != 0, "Logic here is for none byte aligned writes")(bitsMod8);
 
     while (numBits >= 8) {
         Type* pSrc = (pBegin_ + readByteIndex());

@@ -353,8 +353,7 @@ void Level::SetAreaVisibleAndCull(core::V2::Job* pParentJob, int32_t areaNum, in
     if (area.maxVisPortals) {
         visPortalIdx = core::atomic::Increment(&area.cusVisPortalIdx);
 
-        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")
-        (areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
+        X_ASSERT(visPortalIdx < area.maxVisPortals, "Area entered from more portals than expected")(areaNum, areaFrom, visPortalIdx, area.maxVisPortals, ps);
 
         area.visPortals[visPortalIdx].areaFrom = areaFrom;
 
@@ -500,14 +499,12 @@ void Level::MergeVisibilityArrs_job(core::V2::JobSystem& jobSys, size_t threadId
             for (int32_t i = 0; i < pArea->cusVisPortalIdx + 1; i++) {
                 const auto& visEnts = pArea->visPortals[i].visibleEnts;
 #if X_DEBUG
-                X_ASSERT(std::is_sorted(visEnts.begin(), visEnts.end()), "Not sorted")
-                ();
+                X_ASSERT(std::is_sorted(visEnts.begin(), visEnts.end()), "Not sorted")();
 #endif // X_DEBUG
                 que.push(&visEnts);
             }
 
-            X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")
-            (que.size());
+            X_ASSERT(que.size() >= 2, "source code error should be atleast 2 in que")(que.size());
 
             auto& destArr = pArea->areaVisibleEnts;
 

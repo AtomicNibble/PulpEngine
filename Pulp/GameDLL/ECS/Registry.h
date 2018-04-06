@@ -386,8 +386,7 @@ namespace ecs
 
         void destroy(entity_type entity)
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             using accumulator_type = int[];
             accumulator_type accumulator = {0, (reset<Components>(entity), 0)...};
@@ -399,8 +398,7 @@ namespace ecs
         template<typename Comp, typename... Args>
         Comp& assign(entity_type entity, Args... args)
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             entities_[entity].set(ident<Components...>.template get<Comp>());
             return pool_.template construct<Comp>(entity, args...);
@@ -409,8 +407,7 @@ namespace ecs
         template<typename Comp>
         void remove(entity_type entity)
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             entities_[entity].reset(ident<Components...>.template get<Comp>());
             pool_.template destroy<Comp>(entity);
@@ -419,8 +416,7 @@ namespace ecs
         template<typename... Comp>
         bool has(entity_type entity) const
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             using accumulator_type = bool[];
             bool all = true;
@@ -451,8 +447,7 @@ namespace ecs
         template<typename Comp, typename... Args>
         Comp& accomodate(entity_type entity, Args... args)
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             return (entities_[entity].test(ident<Components...>.template get<Comp>())
                         ? this->template replace<Comp>(entity, std::forward<Args>(args)...)
@@ -461,8 +456,7 @@ namespace ecs
 
         entity_type clone(entity_type from)
         {
-            X_ASSERT(isValid(from), "Not valid entity")
-            ();
+            X_ASSERT(isValid(from), "Not valid entity")();
 
             using accumulator_type = int[];
             auto to = create();
@@ -487,8 +481,7 @@ namespace ecs
         template<typename Comp>
         void reset(entity_type entity)
         {
-            X_ASSERT(isValid(entity), "Not valid entity")
-            ();
+            X_ASSERT(isValid(entity), "Not valid entity")();
 
             if (entities_[entity].test(ident<Components...>.template get<Comp>())) {
                 remove<Comp>(entity);

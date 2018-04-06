@@ -290,8 +290,7 @@ int XBinds_Io_File::readBytes(IFunctionHandler* pH, core::XFile* pFile, uint32_t
 
 int XBinds_Io_File::garbageCollect(IFunctionHandler* pH, void* pBuffer, int size)
 {
-    X_ASSERT(size == sizeof(core::XFile*), "invalid buffer size")
-    (pBuffer, size);
+    X_ASSERT(size == sizeof(core::XFile*), "invalid buffer size")(pBuffer, size);
 
     if (pBuffer) {
         core::XFile* pfile = *static_cast<core::XFile**>(pBuffer);

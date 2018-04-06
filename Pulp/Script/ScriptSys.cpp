@@ -75,8 +75,7 @@ void XScriptSys::registerCmds(void)
 bool XScriptSys::init(void)
 {
     X_LOG0("Script", "Starting script system");
-    X_ASSERT(initialised_ == false, "Already init")
-    (initialised_);
+    X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
     initialised_ = true;
 
@@ -204,14 +203,11 @@ void XScriptSys::Update(void)
 // return true if not 'error'
 bool XScriptSys::processLoadedScript(Script* pScript)
 {
-    X_ASSERT(pScript->getStatus() == core::LoadStatus::Complete, "Script was not loaded")
-    (pScript->getStatus());
-    X_ASSERT(pScript->getLastCallResult() == lua::CallResult::None || pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")
-    (pScript->getLastCallResult());
+    X_ASSERT(pScript->getStatus() == core::LoadStatus::Complete, "Script was not loaded")(pScript->getStatus());
+    X_ASSERT(pScript->getLastCallResult() == lua::CallResult::None || pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")(pScript->getLastCallResult());
 
     if (pScript->hasPendingInclude()) {
-        X_ASSERT(pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")
-        (pScript->getLastCallResult());
+        X_ASSERT(pScript->getLastCallResult() == lua::CallResult::TryAgain, "Unexpected call result")(pScript->getLastCallResult());
 
         auto* pInclude = X_ASSERT_NOT_NULL(pScript->getPendingInclude());
         if (pInclude->getStatus() == core::LoadStatus::Error) {
@@ -235,17 +231,13 @@ bool XScriptSys::processLoadedScript(Script* pScript)
         }
 
         // sanity check the dependancy
-        X_ASSERT(pInclude->getStatus() == core::LoadStatus::Complete, "Script is not loaded")
-        (pInclude->getStatus());
-        X_ASSERT(pInclude->getLastCallResult() == lua::CallResult::Ok, "Script did not run ok")
-        (pInclude->getLastCallResult());
-        X_ASSERT(!pInclude->hasPendingInclude(), "Script has pending include")
-        (pInclude->hasPendingInclude());
+        X_ASSERT(pInclude->getStatus() == core::LoadStatus::Complete, "Script is not loaded")(pInclude->getStatus());
+        X_ASSERT(pInclude->getLastCallResult() == lua::CallResult::Ok, "Script did not run ok")(pInclude->getLastCallResult());
+        X_ASSERT(!pInclude->hasPendingInclude(), "Script has pending include")(pInclude->hasPendingInclude());
         pScript->setPendingInclude(nullptr);
     }
 
-    X_ASSERT(!pScript->hasPendingInclude(), "Script has pending include")
-    (pScript->hasPendingInclude());
+    X_ASSERT(!pScript->hasPendingInclude(), "Script has pending include")(pScript->hasPendingInclude());
     X_LUA_CHECK_STACK(L);
 
     auto chunk = pScript->getChunk(L);
@@ -318,8 +310,7 @@ IScript* XScriptSys::loadScript(const char* pFileName)
 
 bool XScriptSys::waitForLoad(core::AssetBase* pScript)
 {
-    X_ASSERT(pScript->getType() == assetDb::AssetType::SCRIPT, "Invalid asset passed")
-    ();
+    X_ASSERT(pScript->getType() == assetDb::AssetType::SCRIPT, "Invalid asset passed")();
 
     if (pScript->isLoaded()) {
         return true;
@@ -457,14 +448,12 @@ bool XScriptSys::compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2
 
     // load the pointer values and compare.
     stack::push_ref(L, f1);
-    X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")
-    (stack::get_type(L));
+    X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
     const void* f1p = stack::as_pointer(L);
     stack::pop(L);
 
     stack::push_ref(L, f1);
-    X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")
-    (stack::get_type(L));
+    X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
     const void* f2p = stack::as_pointer(L);
     stack::pop(L);
 
@@ -478,8 +467,7 @@ void XScriptSys::releaseFunc(ScriptFunctionHandle f)
     if (f != INVALID_HANLDE) {
 #ifdef _DEBUG
         stack::push_ref(L, f);
-        X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")
-        (stack::get_type(L));
+        X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
         stack::pop(L);
 #endif
 
@@ -551,8 +539,7 @@ bool XScriptSys::call(ScriptFunctionHandle f)
 
 bool XScriptSys::beginCall(ScriptFunctionHandle f)
 {
-    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
 
     if (f == INVALID_HANLDE) {
         return false;
@@ -560,15 +547,13 @@ bool XScriptSys::beginCall(ScriptFunctionHandle f)
 
     stack::push_ref(L, f);
 
-    X_ASSERT(stack::isfunction(L), "Invalid function handle")
-    (f);
+    X_ASSERT(stack::isfunction(L), "Invalid function handle")(f);
     return true;
 }
 
 bool XScriptSys::beginCall(const char* pFunName)
 {
-    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
 
     stack::push_global(L, pFunName);
 
@@ -583,8 +568,7 @@ bool XScriptSys::beginCall(const char* pFunName)
 
 bool XScriptSys::beginCall(const char* pTableName, const char* pFunName)
 {
-    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
 
     stack::push_global(L, pTableName);
 
@@ -607,8 +591,7 @@ bool XScriptSys::beginCall(const char* pTableName, const char* pFunName)
 
 bool XScriptSys::beginCall(IScriptTable* pTable, const char* pFunName)
 {
-    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);
 
     pushTable(pTable);
 
@@ -626,8 +609,7 @@ bool XScriptSys::beginCall(IScriptTable* pTable, const char* pFunName)
 
 void XScriptSys::pushCallArg(const ScriptValue& any)
 {
-    X_ASSERT(numCallParams_ >= 0, "PushFuncArg called without a valid begin call")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ >= 0, "PushFuncArg called without a valid begin call")(numCallParams_);
 
     pushAny(any);
     ++numCallParams_;
@@ -635,8 +617,7 @@ void XScriptSys::pushCallArg(const ScriptValue& any)
 
 bool XScriptSys::endCall(int32_t numReturnValues)
 {
-    X_ASSERT(numCallParams_ >= 0, "endCall called without a valid begin call")
-    (numCallParams_);
+    X_ASSERT(numCallParams_ >= 0, "endCall called without a valid begin call")(numCallParams_);
 
     int32_t fucIndex = stack::top(L) - numCallParams_;
 
@@ -774,8 +755,7 @@ void XScriptSys::pushAny(const ScriptValue& var)
             break;
         case Type::Function:
             stack::push_ref(L, var.pFunction_);
-            X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")
-            (stack::get_type(L));
+            X_ASSERT(stack::get_type(L) == Type::Function, "type should be function")(stack::get_type(L));
             break;
         case Type::Vector:
             pushVec3(Vec3f(var.vec3_.x, var.vec3_.y, var.vec3_.z));

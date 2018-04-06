@@ -26,8 +26,7 @@ namespace lua
 
 #if X_64
             if (reinterpret_cast<uintptr_t>(pNew) != static_cast<uint32_t>(reinterpret_cast<uintptr_t>(pNew) & 0xFFFFFFFF)) {
-                X_ASSERT(false, "Must be in first 32 bits")
-                (pNew);
+                X_ASSERT(false, "Must be in first 32 bits")(pNew);
             }
 #endif // X_64
 

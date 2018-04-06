@@ -69,10 +69,8 @@ bool XGame::init(void)
 
     auto deimension = gEnv->pRender->getDisplayRes();
 
-    X_ASSERT(deimension.x > 0, "height is not valid")
-    (deimension.x);
-    X_ASSERT(deimension.y > 0, "height is not valid")
-    (deimension.y);
+    X_ASSERT(deimension.x > 0, "height is not valid")(deimension.x);
+    X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
     cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 

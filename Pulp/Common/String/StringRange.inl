@@ -48,8 +48,7 @@ inline const TChar* StringRange<TChar>::FindNonWhitespace(void) const
 template<typename TChar>
 inline TChar StringRange<TChar>::operator[](size_t i) const
 {
-    X_ASSERT(start_ + i < end_, "Character %d cannot be accessed. Subscript out of range.", i)
-    (GetLength(), start_, static_cast<const void*>(end_));
+    X_ASSERT(start_ + i < end_, "Character %d cannot be accessed. Subscript out of range.", i)(GetLength(), start_, static_cast<const void*>(end_));
     return start_[i];
 }
 

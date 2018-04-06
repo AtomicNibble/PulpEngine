@@ -29,8 +29,7 @@ void SimpleBoundsChecking::CheckFront(const void* memory)
     as_void = memory;
 
     for (int32_t i = 0; i < 4; i++) {
-        X_ASSERT(as_char[i] == TOKEN_FRONT, "Memory has been overwritten at address 0x%08p", memory)
-        (i, TOKEN_FRONT);
+        X_ASSERT(as_char[i] == TOKEN_FRONT, "Memory has been overwritten at address 0x%08p", memory)(i, TOKEN_FRONT);
     }
 }
 
@@ -45,8 +44,7 @@ void SimpleBoundsChecking::CheckBack(const void* memory)
     as_void = memory;
 
     for (int32_t i = 0; i < 4; i++) {
-        X_ASSERT(as_char[i] == TOKEN_BACK, "Memory has been overwritten at address 0x%08p", memory)
-        (i, TOKEN_FRONT);
+        X_ASSERT(as_char[i] == TOKEN_BACK, "Memory has been overwritten at address 0x%08p", memory)(i, TOKEN_FRONT);
     }
 }
 

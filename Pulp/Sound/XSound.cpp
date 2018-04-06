@@ -686,8 +686,7 @@ void XSound::drawDebug(void) const
         int32_t lodIdx = static_cast<int32_t>(distance / 500.f);
         lodIdx = math<int32_t>::clamp(lodIdx, minLod, engine::IPrimativeContext::SHAPE_NUM_LOD - 1);
 
-        X_ASSERT(lodIdx >= 0, "invalid index")
-        (lodIdx);
+        X_ASSERT(lodIdx >= 0, "invalid index")(lodIdx);
 
         if (drawText) {
             const Vec3f& eye = trans.pos;
@@ -750,8 +749,7 @@ void XSound::performOcclusionChecks(void)
     // TODO: sort these so can do in batches.
 
     for (auto* pObject : occlusion_) {
-        X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")
-        ();
+        X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")();
 
         if (pObject->occType == OcclusionType::SingleRay) {
             physics::RaycastBuffer hit;
@@ -785,8 +783,7 @@ void XSound::performOcclusionChecks(void)
 
 void XSound::registerObjectSndEngine(SoundObject* pObject)
 {
-    X_ASSERT(!pObject->flags.IsSet(SoundFlag::Registered), "Double register")
-    ();
+    X_ASSERT(!pObject->flags.IsSet(SoundFlag::Registered), "Double register")();
 
     pObject->flags.Set(SoundFlag::Registered);
 
@@ -819,8 +816,7 @@ void XSound::registerObjectSndEngine(SoundObject* pObject)
 
 void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 {
-    X_ASSERT(pObject->flags.IsSet(SoundFlag::Registered), "Double un-register")
-    ();
+    X_ASSERT(pObject->flags.IsSet(SoundFlag::Registered), "Double un-register")();
 
     pObject->flags.Remove(SoundFlag::Registered);
 
@@ -875,15 +871,13 @@ void XSound::setSFXVolume(float vol)
 
 uint32_t XSound::getIDFromStr(const char* pStr) const
 {
-    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")
-    (pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
     return SoundEngine::GetIDFromString(pStr);
 }
 
 uint32_t XSound::getIDFromStr(const wchar_t* pStr) const
 {
-    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")
-    (pStr);
+    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
     return SoundEngine::GetIDFromString(pStr);
 }
 
@@ -1083,8 +1077,7 @@ void XSound::postEvent(EventID event, SndObjectHandle object)
         if (!pObject->flags.IsSet(SoundFlag::Registered)) {
             registerObjectSndEngine(pObject);
 
-            X_ASSERT(pObject->activeEvents == 0, "Unexpected active event count")
-            (pObject->activeEvents);
+            X_ASSERT(pObject->activeEvents == 0, "Unexpected active event count")(pObject->activeEvents);
         }
 
         ++pObject->activeEvents;
@@ -1107,8 +1100,7 @@ void XSound::postEvent(const char* pEventStr, SndObjectHandle object)
 
 void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)
 {
-    X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")
-    (object);
+    X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")(object);
 
     SoundObject* pSound = SoundHandleToObject(object);
 
@@ -1279,8 +1271,7 @@ void XSound::loadBank(const char* pName)
         X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
     }
 
-    X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")
-    (pBank->bankID, bankID);
+    X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);
 }
 
 void XSound::unLoadBank(const char* pName)

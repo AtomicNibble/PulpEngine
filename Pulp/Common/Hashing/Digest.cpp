@@ -7,8 +7,7 @@ namespace Hash
 {
     const char* DigestBase::ToString(char* pBuf, size_t bufSize, const uint8_t* pDigest, size_t numBytes)
     {
-        X_ASSERT(bufSize >= ((numBytes * 2) + 1), "Buffer too small")
-        (bufSize, numBytes);
+        X_ASSERT(bufSize >= ((numBytes * 2) + 1), "Buffer too small")(bufSize, numBytes);
 
         const char hexDigits[] = {"0123456789abcdef"};
 

@@ -243,8 +243,7 @@ char Console::ReadKey(void) const
                 DWORD NumEventsRead;
 
                 if (ReadConsoleInputW(consoleInput_, &InputInfo, 1, &NumEventsRead)) {
-                    X_ASSERT(NumEventsRead == 1, "Should only get one event")
-                    (NumEventsRead);
+                    X_ASSERT(NumEventsRead == 1, "Should only get one event")(NumEventsRead);
 
                     if (NumEventsRead >= 1 && InputInfo.EventType == KEY_EVENT) {
                         return safe_static_cast<char, WORD>(InputInfo.Event.KeyEvent.wVirtualKeyCode);
@@ -269,8 +268,7 @@ char Console::ReadKeyBlocking(void) const
     DWORD NumEventsRead;
 
     while (ReadConsoleInputW(consoleInput_, &InputInfo, 1, &NumEventsRead)) {
-        X_ASSERT(NumEventsRead == 1, "Should only get one event")
-        (NumEventsRead);
+        X_ASSERT(NumEventsRead == 1, "Should only get one event")(NumEventsRead);
 
         if (NumEventsRead >= 1 && InputInfo.EventType == KEY_EVENT) {
             return safe_static_cast<char, WORD>(InputInfo.Event.KeyEvent.wVirtualKeyCode);

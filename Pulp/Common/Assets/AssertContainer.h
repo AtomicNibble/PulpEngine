@@ -228,20 +228,17 @@ public:
     {
         core::ScopedLock<ThreadPolicy> lock(threadPolicy_);
 
-        X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")
-        (pRes->getRefCount());
+        X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
 
         auto numErase = hash_.erase(pRes->getName());
 
         // we should earse only one asset
-        X_ASSERT(numErase == 1, "Failed to erase asset correct")
-        ();
+        X_ASSERT(numErase == 1, "Failed to erase asset correct")();
 
         // get id before free.
         const auto id = pRes->getID();
 
-        X_ASSERT(id >= 0 && id < static_cast<decltype(id)>(list_.capacity()), "Id out of range")
-        (id, list_.capacity());
+        X_ASSERT(id >= 0 && id < static_cast<decltype(id)>(list_.capacity()), "Id out of range")(id, list_.capacity());
 
 #if X_DEBUG
         list_[id] = nullptr;

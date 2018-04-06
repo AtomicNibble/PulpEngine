@@ -113,8 +113,7 @@ bool XMaterialManager::asyncInitFinalize(void)
     core::CriticalSection::ScopedLock lock(failedLoadLock_);
 
     for (auto* pMat : failedLoads_) {
-        X_ASSERT(pMat->getStatus() == core::LoadStatus::Error, "Unexpected status")
-        ();
+        X_ASSERT(pMat->getStatus() == core::LoadStatus::Error, "Unexpected status")();
         pMat->assignProps(*pDefaultMtl_);
     }
 
@@ -142,8 +141,7 @@ Material* XMaterialManager::findMaterial(const char* pMtlName) const
 Material* XMaterialManager::loadMaterial(const char* pMtlName)
 {
     X_ASSERT_NOT_NULL(pMtlName);
-    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")
-    (pMtlName);
+    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
     core::string name(pMtlName);
 
@@ -246,8 +244,7 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
 
 bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
 {
-    X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")
-    ();
+    X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")();
 
     if (pMaterial->isLoaded()) {
         return true;
@@ -461,14 +458,10 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
     }
 
     // temp, should move over to using values from perm somepoint.
-    X_ASSERT(numTex == (size_t)pPerm->numTextStates, "Mistatch")
-    ();
-    X_ASSERT(numSamplers == (size_t)pPerm->numSamplers, "Mistatch")
-    ();
-    X_ASSERT(numCb == (size_t)pPerm->numCbs, "Mistatch")
-    ();
-    X_ASSERT(numBuffers == (size_t)pPerm->numBuffers, "Mistatch")
-    ();
+    X_ASSERT(numTex == (size_t)pPerm->numTextStates, "Mistatch")();
+    X_ASSERT(numSamplers == (size_t)pPerm->numSamplers, "Mistatch")();
+    X_ASSERT(numCb == (size_t)pPerm->numCbs, "Mistatch")();
+    X_ASSERT(numBuffers == (size_t)pPerm->numBuffers, "Mistatch")();
 
     render::Commands::ResourceStateBase* pVariableState = vsMan_.createVariableState(
         numTex,
@@ -667,8 +660,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
             }
 
             if (paramLinks.isNotEmpty()) {
-                X_ASSERT(materialCBIdxs.isNotEmpty(), "Must have atleast one material cb idx, if we have param links")
-                ();
+                X_ASSERT(materialCBIdxs.isNotEmpty(), "Must have atleast one material cb idx, if we have param links")();
 
                 // sort them so in cb order then param order.
                 std::sort(paramLinks.begin(), paramLinks.end(), [](const ParamLink& lhs, const ParamLink& rhs) -> bool {
@@ -687,8 +679,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
                 auto addCBToMatTech = [&](int32_t cbIdx, render::shader::XCBuffer& matCb) {
                     matCb.postParamModify();
-                    X_ASSERT(matCb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL), "Should contain per material params")
-                    ();
+                    X_ASSERT(matCb.containsUpdateFreqs(render::shader::UpdateFreq::MATERIAL), "Should contain per material params")();
                     matTech.materialCbs.append(std::move(matCb));
 
                     // change the pointer to mat instance, instead of the instance from the shader perm which is shared.
@@ -719,8 +710,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
                     // copy the material params value into the
                     // always vec4? humm.
-                    X_ASSERT(cpuData.size() >= (cbParam.getBindOffset() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")
-                    ();
+                    X_ASSERT(cpuData.size() >= (cbParam.getBindOffset() + sizeof(matParam.value)), "Overflow when writing mat param value to cbuffer")();
                     std::memcpy(&cpuData[cbParam.getBindOffset()], &matParam.value, sizeof(matParam.value));
                 }
 
@@ -733,8 +723,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
         }
 
         // the 'cbuffers' arr can contain a mix of cbuffer's pointers that can point at material instances or ones from the shader perm.
-        X_ASSERT(cbLinks.size() == matTech.cbs.size(), "Links and cbuffer list should be same size")
-        (cbLinks.size(), matTech.cbs.size());
+        X_ASSERT(cbLinks.size() == matTech.cbs.size(), "Links and cbuffer list should be same size")(cbLinks.size(), matTech.cbs.size());
         for (size_t i = 0; i < matTech.cbs.size(); i++) {
             auto* pCB = matTech.cbs[i];
             X_ASSERT_NOT_NULL(pCB);
@@ -747,8 +736,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
         auto* pCBHandles = pVariableState->getCBs();
 
         for (size_t i = 0; i < numCb; i++) {
-            X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")
-            ();
+            X_ASSERT(pCBHandles[i] != render::INVALID_BUF_HANLDE, "Cbuffer handle is invalid")();
         }
     }
 #endif // !X_ENABLE_ASSERTIONS
@@ -819,8 +807,7 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
             auto& p = permTextures[i];
 
             if (p.getName() == cb.resourceName) {
-                X_ASSERT(i < static_cast<size_t>(pResourceState->getNumTextStates()), "Resouce index out of bounds")
-                (i, pResourceState->getNumTextStates());
+                X_ASSERT(i < static_cast<size_t>(pResourceState->getNumTextStates()), "Resouce index out of bounds")(i, pResourceState->getNumTextStates());
                 pResourceState->getTexStates()[i].textureId = val;
                 break;
             }

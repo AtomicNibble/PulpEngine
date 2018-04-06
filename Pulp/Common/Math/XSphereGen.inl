@@ -59,8 +59,7 @@ void BoundingSphereGen<NumDim, CoordAccessor>::create_arrays(void)
         pV_[i] = &pStart[offset + NumDim];
         pA_[i] = &pStart[offset + (NumDim * 2)];
 
-        X_ASSERT(pA_[i] + NumDim <= buffer_.end(), "Out of bounds")
-        (pA_[i] + NumDim, buffer_.end());
+        X_ASSERT(pA_[i] + NumDim <= buffer_.end(), "Out of bounds")(pA_[i] + NumDim, buffer_.end());
     }
 }
 

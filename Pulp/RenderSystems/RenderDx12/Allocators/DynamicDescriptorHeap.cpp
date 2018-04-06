@@ -78,8 +78,7 @@ void DescriptorTypeAllocatorPool::discardDescriptorHeaps(uint64_t fenceValue, co
     core::CriticalSection::ScopedLock lock(cs_);
 
     for (auto iter = usedHeaps.begin(); iter != usedHeaps.end(); ++iter) {
-        X_ASSERT(retiredDescriptorHeaps_.size() < retiredDescriptorHeaps_.capacity(), "fifo is full")
-        ();
+        X_ASSERT(retiredDescriptorHeaps_.size() < retiredDescriptorHeaps_.capacity(), "fifo is full")();
         retiredDescriptorHeaps_.push(std::make_pair(fenceValue, *iter));
     }
 }
@@ -100,10 +99,8 @@ DescriptorAllocatorPool::DescriptorAllocatorPool(core::MemoryArenaBase* arena, I
     static_assert(D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER == 1, "Heap enum value has changed");
 
     // do a runtime check also.
-    X_ASSERT(allocators_[DescriptorHeapType::CBV_SRV_UAV].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, "Index error")
-    ();
-    X_ASSERT(allocators_[DescriptorHeapType::SAMPLER].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, "Index error")
-    ();
+    X_ASSERT(allocators_[DescriptorHeapType::CBV_SRV_UAV].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, "Index error")();
+    X_ASSERT(allocators_[DescriptorHeapType::SAMPLER].getType() == D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER, "Index error")();
 }
 
 void DescriptorAllocatorPool::destoryAll(void)
@@ -159,8 +156,7 @@ uint32_t DynamicDescriptorHeap::DescriptorHandleCache::computeStagedSize(void)
         staleParams ^= (1 << rootIndex);
 
         const uint32_t maxSetHandle = core::bitUtil::ScanBits(rootDescriptorTable_[rootIndex].assignedHandlesBitMap);
-        X_ASSERT(maxSetHandle != core::bitUtil::NO_BIT_SET, "Root entry masked as stable but has no stable descriptors")
-        (maxSetHandle);
+        X_ASSERT(maxSetHandle != core::bitUtil::NO_BIT_SET, "Root entry masked as stable but has no stable descriptors")(maxSetHandle);
 
         neededSpace += maxSetHandle + 1;
     }
@@ -190,8 +186,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_
         staleParams ^= (1 << rootIndex);
 
         const uint32_t maxSetHandle = core::bitUtil::ScanBits(rootDescriptorTable_[rootIndex].assignedHandlesBitMap);
-        X_ASSERT(maxSetHandle != core::bitUtil::NO_BIT_SET, "Root entry masked as stable but has no stable descriptors")
-        (maxSetHandle);
+        X_ASSERT(maxSetHandle != core::bitUtil::NO_BIT_SET, "Root entry masked as stable but has no stable descriptors")(maxSetHandle);
 
         neededSpace += maxSetHandle + 1;
         tableSize[staleParamCount] = maxSetHandle + 1;
@@ -203,8 +198,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_
         "We're only equipped to handle so many descriptor tables")
     (staleParamCount);
     // you should not be calling this function if nothing is stale!
-    X_ASSERT(staleParamCount > 0, "No params are stale")
-    (staleParamCount);
+    X_ASSERT(staleParamCount > 0, "No params are stale")(staleParamCount);
 
     staleRootParamsBitMap_ = 0;
 
@@ -242,8 +236,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::copyAndBindStaleTables(D3D12_
             curDest.ptr += skipCount * descriptorSize;
 
             const uint32_t descriptorCount = core::bitUtil::ScanBitsForward(~setHandles);
-            X_ASSERT(descriptorCount != core::bitUtil::NO_BIT_SET, "bit not set")
-            (descriptorCount);
+            X_ASSERT(descriptorCount != core::bitUtil::NO_BIT_SET, "bit not set")(descriptorCount);
             setHandles >>= descriptorCount;
 
             // If we run out of temp room, copy what we've got so far
@@ -302,11 +295,9 @@ void DynamicDescriptorHeap::DescriptorHandleCache::unbindAllValid(void)
 void DynamicDescriptorHeap::DescriptorHandleCache::stageDescriptorHandles(uint32_t rootIndex, uint32_t offset,
     uint32_t numHandles, const D3D12_CPU_DESCRIPTOR_HANDLE* pHandles)
 {
-    X_ASSERT(((1 << rootIndex) & rootDescriptorTablesBitMap_) != 0, "Root parameter is not a CBV_SRV_UAV descriptor table")
-    (rootIndex);
+    X_ASSERT(((1 << rootIndex) & rootDescriptorTablesBitMap_) != 0, "Root parameter is not a CBV_SRV_UAV descriptor table")(rootIndex);
     // you basically called me with a invalid range for this rootIndex.
-    X_ASSERT(offset + numHandles <= rootDescriptorTable_[rootIndex].tableSize, "Cache overrun for root index: %" PRIi32, rootIndex)
-    (rootIndex);
+    X_ASSERT(offset + numHandles <= rootDescriptorTable_[rootIndex].tableSize, "Cache overrun for root index: %" PRIi32, rootIndex)(rootIndex);
 
     DescriptorTableCache& tableCache = rootDescriptorTable_[rootIndex];
     D3D12_CPU_DESCRIPTOR_HANDLE* pCopyDest = tableCache.pTableStart + offset;
@@ -322,8 +313,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(D3D12_DESC
 {
     uint32_t CurrentOffset = 0;
 
-    X_ASSERT(rootSig.numParams() <= MAXNUM_DESCRIPTOR_TABLES, "Maybe we need to support something greater")
-    (rootSig.numParams());
+    X_ASSERT(rootSig.numParams() <= MAXNUM_DESCRIPTOR_TABLES, "Maybe we need to support something greater")(rootSig.numParams());
 
     staleRootParamsBitMap_ = 0;
     rootDescriptorTablesBitMap_ = rootSig.descriptorTableBitMap(type);
@@ -334,8 +324,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(D3D12_DESC
         tableParams ^= (1 << rootIndex);
 
         uint32_t tableSize = rootSig.descriptorTableSize(rootIndex);
-        X_ASSERT(tableSize > 0, "Table size must be none zero")
-        (tableSize);
+        X_ASSERT(tableSize > 0, "Table size must be none zero")(tableSize);
 
         DescriptorTableCache& RootDescriptorTable = rootDescriptorTable_[rootIndex];
         RootDescriptorTable.assignedHandlesBitMap = 0;
@@ -347,8 +336,7 @@ void DynamicDescriptorHeap::DescriptorHandleCache::parseRootSignature(D3D12_DESC
 
     maxCachedDescriptors_ = CurrentOffset;
 
-    X_ASSERT(maxCachedDescriptors_ <= MAXNUM_DESCRIPTORS, "Exceeded user-supplied maximum cache size")
-    (maxCachedDescriptors_, MAXNUM_DESCRIPTORS);
+    X_ASSERT(maxCachedDescriptors_ <= MAXNUM_DESCRIPTORS, "Exceeded user-supplied maximum cache size")(maxCachedDescriptors_, MAXNUM_DESCRIPTORS);
 }
 
 // ---------------------------------------------------------------------
@@ -429,8 +417,7 @@ void DynamicDescriptorHeap::retireCurrentHeap(void)
     if (currentOffset_ == 0) {
         // we should not of allocated a heap if we never used it.
         // currently this will leak.
-        X_ASSERT(pCurrentHeapPtr_ == nullptr, "Heap was allocated but never used")
-        (pCurrentHeapPtr_);
+        X_ASSERT(pCurrentHeapPtr_ == nullptr, "Heap was allocated but never used")(pCurrentHeapPtr_);
         return;
     }
 
@@ -449,8 +436,7 @@ void DynamicDescriptorHeap::retireUsedHeaps(uint64_t fenceValue)
 ID3D12DescriptorHeap* DynamicDescriptorHeap::getHeapPointer(void)
 {
     if (pCurrentHeapPtr_ == nullptr) {
-        X_ASSERT(currentOffset_ == 0, "Current heap should of been retired before requesting a new one")
-        (currentOffset_);
+        X_ASSERT(currentOffset_ == 0, "Current heap should of been retired before requesting a new one")(currentOffset_);
         pCurrentHeapPtr_ = pool_.requestDescriptorHeap(type_);
 
         firstDescriptor_ = DescriptorHandle(

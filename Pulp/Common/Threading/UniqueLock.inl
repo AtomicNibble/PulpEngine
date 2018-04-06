@@ -83,8 +83,7 @@ template<class LockT>
 X_INLINE void UniqueLock<LockT>::Leave(void)
 {
     X_ASSERT_NOT_NULL(pLock_);
-    X_ASSERT(owns_, "Lock not owned")
-    (pLock_, owns_);
+    X_ASSERT(owns_, "Lock not owned")(pLock_, owns_);
 
     pLock_->Leave();
     owns_ = true;
@@ -113,8 +112,7 @@ template<class LockT>
 void UniqueLock<LockT>::validate(void) const
 {
     X_ASSERT_NOT_NULL(pLock_);
-    X_ASSERT(!owns_, "Already own lock")
-    (pLock_, owns_);
+    X_ASSERT(!owns_, "Already own lock")(pLock_, owns_);
 }
 
 X_NAMESPACE_END

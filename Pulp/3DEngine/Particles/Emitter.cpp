@@ -84,8 +84,7 @@ namespace fx
             }
 
             auto& efx = *pEfx_;
-            X_ASSERT(curStage_ < efx.getNumStages(), "Stage index out of bounds")
-            (curStage_, efx.getNumStages());
+            X_ASSERT(curStage_ < efx.getNumStages(), "Stage index out of bounds")(curStage_, efx.getNumStages());
 
             auto elapsedMS = efxElapsed_.GetMilliSeconds();
 
@@ -490,8 +489,7 @@ namespace fx
 
     inline void Emitter::uvForIndex(Rectf& uv, const Vec2<int16_t> atlas, int32_t idx)
     {
-        X_ASSERT(idx < atlas.x * atlas.y, "Index out of range")
-        (idx, atlas.x, atlas.y, atlas.x * atlas.y);
+        X_ASSERT(idx < atlas.x * atlas.y, "Index out of range")(idx, atlas.x, atlas.y, atlas.x * atlas.y);
 
         int32_t col = idx % atlas.x;
         int32_t row = idx / atlas.x;

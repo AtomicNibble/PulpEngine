@@ -70,8 +70,7 @@ Anim* AnimManager::findAnim(const char* pAnimName) const
 Anim* AnimManager::loadAnim(const char* pAnimName)
 {
     X_ASSERT_NOT_NULL(pAnimName);
-    X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")
-    (pAnimName);
+    X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
 
     core::string name(pAnimName);
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
@@ -142,8 +141,7 @@ void AnimManager::listAnims(const char* pSearchPatten) const
 
 bool AnimManager::waitForLoad(core::AssetBase* pAnim)
 {
-    X_ASSERT(pAnim->getType() == assetDb::AssetType::ANIM, "Invalid asset passed")
-    ();
+    X_ASSERT(pAnim->getType() == assetDb::AssetType::ANIM, "Invalid asset passed")();
 
     if (pAnim->isLoaded()) {
         return true;

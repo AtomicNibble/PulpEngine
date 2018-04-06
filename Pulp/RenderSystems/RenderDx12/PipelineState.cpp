@@ -218,8 +218,7 @@ bool GraphicsPSO::finalize(PSODeviceCache& cache)
     // Make sure the root signature is finalized first
     PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
-    X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")
-    ();
+    X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
     return cache.compile(PSODesc_, &pPSO_);
 }
@@ -255,8 +254,7 @@ bool ComputePSO::finalize(PSODeviceCache& cache)
     // Make sure the root signature is finalized first
     PSODesc_.pRootSignature = pRootSignature_->getSignature();
 
-    X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")
-    ();
+    X_ASSERT(PSODesc_.pRootSignature != nullptr, "root signature must be finalized before finalize PSO")();
 
     return cache.compile(PSODesc_, &pPSO_);
 }

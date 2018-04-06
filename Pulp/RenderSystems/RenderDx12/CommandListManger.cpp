@@ -52,8 +52,7 @@ void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, PSO& 
 void CommandListManger::createNewCommandList(D3D12_COMMAND_LIST_TYPE type, ID3D12PipelineState* pInitialPso,
     ID3D12GraphicsCommandList** pListOut, ID3D12CommandAllocator** pAllocatorOut)
 {
-    X_ASSERT(type != D3D12_COMMAND_LIST_TYPE_BUNDLE, "Bundles are not yet supported")
-    (type);
+    X_ASSERT(type != D3D12_COMMAND_LIST_TYPE_BUNDLE, "Bundles are not yet supported")(type);
 
     switch (type) {
         case D3D12_COMMAND_LIST_TYPE_DIRECT:

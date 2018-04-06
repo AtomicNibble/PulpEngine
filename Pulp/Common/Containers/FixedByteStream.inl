@@ -71,8 +71,7 @@ inline void FixedByteStreamBase::write(const T* pVal, size_type num)
 
 inline void FixedByteStreamBase::write(const Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than avalible space")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= freeSpace(), "Tried to write more bytes than avalible space")(numBytes, size(), freeSpace(), isEos());
 
     std::memcpy(pBegin_ + byteIdx_, pBuf, numBytes);
     byteIdx_ += numBytes;
@@ -103,8 +102,7 @@ inline void FixedByteStreamBase::read(T* pVal, size_type num)
 
 inline void FixedByteStreamBase::read(Type* pBuf, size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to read more bytes than avalible")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to read more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
 
     std::memcpy(pBuf, pBegin_ + readByteIdx_, numBytes);
     readByteIdx_ += numBytes;
@@ -114,8 +112,7 @@ inline void FixedByteStreamBase::read(Type* pBuf, size_type numBytes)
 
 inline void FixedByteStreamBase::skip(size_type numBytes)
 {
-    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")
-    (numBytes, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
 
     readByteIdx_ += numBytes;
 }
@@ -123,15 +120,13 @@ inline void FixedByteStreamBase::skip(size_type numBytes)
 inline void FixedByteStreamBase::zeroPadToLength(size_type numBytes)
 {
     if (size() < numBytes) {
-        X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")
-        (numBytes, size(), freeSpace(), capacity());
+        X_ASSERT(numBytes <= capacity(), "Tried to pad more than avalible space")(numBytes, size(), freeSpace(), capacity());
         const size_t diff = numBytes - size();
 
         std::memset(pBegin_ + byteIdx_, 0, diff);
         byteIdx_ += diff;
 
-        X_ASSERT(size() == numBytes, "Failed to pad corect")
-        (size(), numBytes);
+        X_ASSERT(size() == numBytes, "Failed to pad corect")(size(), numBytes);
     }
 }
 

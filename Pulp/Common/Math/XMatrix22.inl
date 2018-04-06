@@ -244,20 +244,16 @@ const Matrix22<T> Matrix22<T>::operator-(T rhs) const
 template<typename T>
 T& Matrix22<T>::at(int row, int col)
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM, "col out of range")
-    (DIM, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
 }
 
 template<typename T>
 const T& Matrix22<T>::at(int row, int col) const
 {
-    X_ASSERT(row >= 0 && row < DIM, "row out of range")
-    (DIM, row);
-    X_ASSERT(col >= 0 && col < DIM, "col out of range")
-    (DIM, col);
+    X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
+    X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
 }
 

@@ -183,8 +183,7 @@ void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
     X_UNUSED(fileSys);
     X_UNUSED(bytesTransferred);
 
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")
-    (pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
     const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
     if (!pFile) {
@@ -284,10 +283,8 @@ bool XFont::loadFontDef(bool async)
             return false;
         }
 
-        X_ASSERT(sourceName_.isNotEmpty(), "Source name is empty")
-        (sourceName_.isEmpty());
-        X_ASSERT(pFontTexture_ == nullptr, "Fonttexture already set")
-        (pFontTexture_);
+        X_ASSERT(sourceName_.isNotEmpty(), "Source name is empty")(sourceName_.isEmpty());
+        X_ASSERT(pFontTexture_ == nullptr, "Fonttexture already set")(pFontTexture_);
 
         // now we need a glyph cache.
         pFontTexture_ = fontSys_.getFontTexture(sourceName_, async);

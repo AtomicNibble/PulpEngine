@@ -91,16 +91,14 @@ T Angles<T>::yaw(void) const
 template<typename T>
 T Angles<T>::operator[](size_t index) const
 {
-    X_ASSERT(index < 3, "out of range")
-    (index);
+    X_ASSERT(index < 3, "out of range")(index);
     return (&pitch_)[index];
 }
 
 template<typename T>
 T& Angles<T>::operator[](size_t index)
 {
-    X_ASSERT(index < 3, "out of range")
-    (index);
+    X_ASSERT(index < 3, "out of range")(index);
     return (&pitch_)[index];
 }
 

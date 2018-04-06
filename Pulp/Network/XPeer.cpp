@@ -268,8 +268,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     pool2Arena_(&pool2Allocator_, "ReliablePool"),
     blockArena_(&blockAlloc_, "BlockArena")
 {
-    X_ASSERT(arena_->isThreadSafe(), "Peer arena must be thread safe")
-    (arena_->isThreadSafe());
+    X_ASSERT(arena_->isThreadSafe(), "Peer arena must be thread safe")(arena_->isThreadSafe());
 
     arena->addChildArena(&poolArena_);
     arena->addChildArena(&pool2Arena_);
@@ -649,8 +648,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const SystemAddress& sysAdd, const 
 void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
     uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
     pCmd->priority = notificationPriority;
@@ -664,8 +662,7 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 // connection util
 ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle)
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
@@ -717,8 +714,7 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
     uint8_t orderingChannel, bool broadcast,
     SendReceipt forceReceiptNumber)
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     if (!lengthBytes) {
         return INVALID_SEND_RECEIPT;
@@ -772,10 +768,8 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
 {
-    X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")
-    (numberOfBitsToSend);
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::Send, numberOfBitsToSend);
     std::memcpy(pCmd->pData, pData, core::bitUtil::bitsToBytes(numberOfBitsToSend));
@@ -986,8 +980,7 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
     // currently we only allow data to de returned that was allocated from the blockArena.
     // this is so i don't need to pass arena back.
     // and we know which arena to delete the data with when we get the packet back.
-    X_ASSERT(up.getArena() == &blockArena_, "Should be block arena")
-    (up.getArena());
+    X_ASSERT(up.getArena() == &blockArena_, "Should be block arena")(up.getArena());
 
     // want to take ownership of the data.
     Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
@@ -1110,8 +1103,7 @@ uint16_t XPeer::numberOfConnections(void) const
 // Ping
 void XPeer::ping(const SystemHandle handle)
 {
-    X_ASSERT(handle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (handle);
+    X_ASSERT(handle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(handle);
 
     core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
 
@@ -1132,8 +1124,7 @@ void XPeer::ping(const SystemHandle handle)
 bool XPeer::ping(const HostStr& host, Port remotePort, bool onlyReplyOnAcceptingConnections,
     uint32_t connectionSocketIndex)
 {
-    X_ASSERT(connectionSocketIndex < sockets_.size(), "Socket index out of range")
-    (connectionSocketIndex, sockets_.size());
+    X_ASSERT(connectionSocketIndex < sockets_.size(), "Socket index out of range")(connectionSocketIndex, sockets_.size());
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
@@ -1337,8 +1328,7 @@ void XPeer::listLocalAddress(void) const
 
 int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
@@ -1350,8 +1340,7 @@ int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
 
 int32_t XPeer::getLastPing(SystemHandle systemHandle) const
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
@@ -1363,8 +1352,7 @@ int32_t XPeer::getLastPing(SystemHandle systemHandle) const
 
 int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
@@ -1377,8 +1365,7 @@ int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
 // MTU for a given system
 int32_t XPeer::getMTUSize(SystemHandle systemHandle) const
 {
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")
-    (systemHandle);
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
     if (systemHandle == INVALID_SYSTEM_HANDLE) {
         return defaultMTU_;
@@ -1572,8 +1559,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
         auto& cmd = *pBufCmd;
 
         if (cmd.cmd == BufferdCommand::Cmd::Send) {
-            X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")
-            (cmd.orderingChannel);
+            X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
 
             if (cmd.broadcast) {
                 X_ASSERT_NOT_IMPLEMENTED();
@@ -1658,8 +1644,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             }
 
             if (cmd.sendDisconnectionNotification) {
-                X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")
-                (cmd.orderingChannel);
+                X_ASSERT(cmd.orderingChannel < MAX_ORDERED_STREAMS, "Invalid channel")(cmd.orderingChannel);
 
                 // don't disconnect yet.
                 // send notfitication and close after.
@@ -1704,8 +1689,7 @@ void XPeer::Job_remoteReliabilityTick(RemoteSystem** pRemoteSystems, uint32_t co
 
 void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
-    X_ASSERT(rs.isActive, "System not ative")
-    ();
+    X_ASSERT(rs.isActive, "System not ative")();
 
     rs.relLayer.update(updateBS, *rs.pNetSocket, rs.systemAddress, rs.MTUSize, timeNow);
 
@@ -1838,8 +1822,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 {
     X_ASSERT_NOT_NULL(pData);
     X_ASSERT_NOT_NULL(pData->pSrcSocket);
-    X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")
-    (pData, pData->bytesRead);
+    X_ASSERT(pData->bytesRead > 0, "RecvData with no data should not reach here")(pData, pData->bytesRead);
 
     if (isBanned(pData->systemAddress)) {
         // you fucking twat!
@@ -1856,8 +1839,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
 
     uint8_t* pBegin = (pData->data + byteOffset);
     uint8_t* pEnd = (pData->data + pData->bytesRead);
-    X_ASSERT(pBegin < pEnd, "Stream is empty")
-    (pBegin, pEnd);
+    X_ASSERT(pBegin < pEnd, "Stream is empty")(pBegin, pEnd);
 
     size_t dataLength = union_cast<size_t>(pEnd - pBegin);
 
@@ -1902,13 +1884,11 @@ void XPeer::processOfflineMsg(UpdateBitStream& updateBS, RecvData* pData,
     uint8_t* pBegin, uint8_t* pEnd)
 {
     core::FixedBitStreamNoneOwning stream(pBegin, pEnd, true);
-    X_ASSERT(stream.sizeInBytes() > OFFLINE_MSG_ID.size(), "Called with too small buffer")
-    (stream.sizeInBytes());
+    X_ASSERT(stream.sizeInBytes() > OFFLINE_MSG_ID.size(), "Called with too small buffer")(stream.sizeInBytes());
 
     MessageID::Enum msgId = stream.read<MessageID::Enum>();
     stream.skipBytes(OFFLINE_MSG_ID.size());
-    X_ASSERT(msgId < MessageID::ENUM_COUNT, "Invalid msg id")
-    (msgId);
+    X_ASSERT(msgId < MessageID::ENUM_COUNT, "Invalid msg id")(msgId);
 
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived offline messageId: \"%s\"", MessageID::ToString(msgId));
 
@@ -2369,8 +2349,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
 
     externalSysId.fromBitStream(bs);
     bs.read(numInternal);
-    X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")
-    (numInternal, localIps.capacity());
+    X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
 
     localIps.resize(numInternal);
     for (size_t i = 0; i < numInternal; i++) {
@@ -2424,8 +2403,7 @@ void XPeer::handleConnectionRequestHandShake(UpdateBitStream& bsOut, RecvBitStre
 
     externalSysId.fromBitStream(bs);
     bs.read(numInternal);
-    X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")
-    (numInternal, localIps.capacity());
+    X_ASSERT(numInternal < localIps.capacity(), "Peer sent too many internal addresses")(numInternal, localIps.capacity());
     localIps.resize(numInternal);
 
     for (size_t i = 0; i < numInternal; i++) {
@@ -2561,14 +2539,12 @@ void XPeer::disconnectRemote(RemoteSystem& rs)
 
     {
         auto it = std::find(activeRemoteSystems_.begin(), activeRemoteSystems_.end(), &rs);
-        X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")
-        ();
+        X_ASSERT(it != activeRemoteSystems_.end(), "Tried to remove resmote system that is not active")();
         activeRemoteSystems_.erase(it);
     }
     {
         auto it = std::find_if(remoteSystemLookup_.begin(), remoteSystemLookup_.end(), [&rs](const RemoteSystemLookup& lu) { return lu.systemAddress == rs.systemAddress; });
-        X_ASSERT(it != remoteSystemLookup_.end(), "Tried to remove resmote system that is not active")
-        ();
+        X_ASSERT(it != remoteSystemLookup_.end(), "Tried to remove resmote system that is not active")();
         remoteSystemLookup_.erase(it);
     }
 }

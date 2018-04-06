@@ -153,14 +153,12 @@ void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
 void XGlyphCache::PreWarmCache(void)
 {
-    X_ASSERT(cacheTable_.empty(), "Can only be run when the cache is empty")
-    (cacheTable_.size());
+    X_ASSERT(cacheTable_.empty(), "Can only be run when the cache is empty")(cacheTable_.size());
 
     size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
     len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
 
-    X_ASSERT(len > 0, "Cache must not be zero in size")
-    (slotList_.size());
+    X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
 
     ++usage_; // give them fake usage.
 
@@ -171,8 +169,7 @@ void XGlyphCache::PreWarmCache(void)
 
 bool XGlyphCache::PreCacheGlyph(wchar_t cChar)
 {
-    X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache caleed when already in cache")
-    ();
+    X_ASSERT(cacheTable_.find(cChar) == cacheTable_.end(), "Precache caleed when already in cache")();
 
     // get the Least recently used Slot
     XGlyph* pSlot = GetLRUSlot();

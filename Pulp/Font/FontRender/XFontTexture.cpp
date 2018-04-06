@@ -210,8 +210,7 @@ CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wcha
     size_t length = union_cast<size_t>(pEnd - pBegin);
     int32_t updated = 0;
 
-    X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")
-    (pBegin, pEnd);
+    X_ASSERT(pEnd >= pBegin, "Invalid begin end pair")(pBegin, pEnd);
 
     for (size_t i = 0; i < length; i++) {
         const wchar_t cChar = pBegin[i];
@@ -271,8 +270,7 @@ XTextureSlot* XFontTexture::GetCharSlot(wchar_t cChar)
 //-------------------------------------------------------------------------------------------------
 XTextureSlot* XFontTexture::GetGradientSlot(void)
 {
-    X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")
-    ();
+    X_ASSERT(slotList_.isNotEmpty(), "slot list should be valid")();
     return &slotList_[0];
 }
 
@@ -389,8 +387,7 @@ void XFontTexture::CreateGradientSlot(void)
     XTextureSlot* pSlot = GetGradientSlot();
 
     // 0 needs to be unused spot
-    X_ASSERT(pSlot->currentChar == static_cast<wchar_t>(~0), "slot idx zero needs to be empty")
-    (pSlot->currentChar);
+    X_ASSERT(pSlot->currentChar == static_cast<wchar_t>(~0), "slot idx zero needs to be empty")(pSlot->currentChar);
 
     pSlot->reset();
     pSlot->charWidth = safe_static_cast<uint8_t, int32_t>(cellWidth_ - 2);
@@ -415,8 +412,7 @@ void XFontTexture::PreWarmCache(void)
     size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
     len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
 
-    X_ASSERT(len > 0, "Cache must not be zero in size")
-    (slotList_.size());
+    X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
 
     PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
 }
@@ -427,8 +423,7 @@ void XFontTexture::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequ
     X_UNUSED(fileSys);
     X_UNUSED(bytesTransferred);
 
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")
-    (pRequest->getType());
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
     const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
 
     if (!pFile) {
