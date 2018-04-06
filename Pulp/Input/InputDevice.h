@@ -19,7 +19,7 @@ public:
     virtual ~XInputDevice() X_OVERRIDE;
 
     // IInputDevice
-    X_INLINE const char* GetDeviceName(void) const;
+    X_INLINE const char* GetDeviceName(void) const X_OVERRIDE;
     X_INLINE bool Init(void) X_OVERRIDE;
     X_INLINE void PostInit(void) X_OVERRIDE;
     X_INLINE void ShutDown(void) X_OVERRIDE;
