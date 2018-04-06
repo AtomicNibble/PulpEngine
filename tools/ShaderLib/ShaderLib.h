@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_SHADERLIB_H_
 #define X_SHADERLIB_H_
 
@@ -17,7 +16,6 @@
 #endif // !SHADER_LIB_EXPORT
 #endif // X_LIB
 #endif // !SHADERLIB_EXPORT
-
 
 #include "ShaderBin.h"
 #include "SourceBin.h"

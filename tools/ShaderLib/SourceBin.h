@@ -12,73 +12,68 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+    class SourceFile;
 
-	class SourceFile;
+    class SourceBin
+    {
+        typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
+        typedef core::Array<SourceFile*> SourceRefArr;
+        typedef core::Array<uint8_t> ByteArr;
 
-	class SourceBin
-	{
-		typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
-		typedef core::Array<SourceFile*> SourceRefArr;
-		typedef core::Array<uint8_t> ByteArr;
-
-		// Shader Source
-		typedef core::MemoryArena<
-			core::PoolAllocator,
-			core::MultiThreadPolicy<core::Spinlock>,
+        // Shader Source
+        typedef core::MemoryArena<
+            core::PoolAllocator,
+            core::MultiThreadPolicy<core::Spinlock>,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-			core::SimpleBoundsChecking,
-			core::SimpleMemoryTracking,
-			core::SimpleMemoryTagging
+            core::SimpleBoundsChecking,
+            core::SimpleMemoryTracking,
+            core::SimpleMemoryTagging
 #else
-			core::NoBoundsChecking,
-			core::NoMemoryTracking,
-			core::NoMemoryTagging
+            core::NoBoundsChecking,
+            core::NoMemoryTracking,
+            core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-		> PoolArena;
+            >
+            PoolArena;
 
-	public:
+    public:
+        struct SourceInfo
+        {
+            core::string name;
+            int32_t line;
+        };
 
-		struct SourceInfo
-		{
-			core::string name;
-			int32_t line;
-		};
+    public:
+        SHADERLIB_EXPORT SourceBin(core::MemoryArenaBase* arena);
 
+        SHADERLIB_EXPORT void free(void);
 
-	public:
-		SHADERLIB_EXPORT SourceBin(core::MemoryArenaBase* arena);
+        // returns the source of a shader with all it's includes merged.
+        SHADERLIB_EXPORT bool getMergedSource(const SourceFile* pSourceFile, ByteArr& strOut);
+        SHADERLIB_EXPORT SourceInfo getSourceInfoForMergedLine(const SourceFile* pSourceFile, size_t line);
 
-		SHADERLIB_EXPORT void free(void);
+        SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
+        SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
 
-		// returns the source of a shader with all it's includes merged.
-		SHADERLIB_EXPORT bool getMergedSource(const SourceFile* pSourceFile, ByteArr& strOut);
-		SHADERLIB_EXPORT SourceInfo getSourceInfoForMergedLine(const SourceFile* pSourceFile, size_t line);
+        SHADERLIB_EXPORT void listShaderSources(const char* pSearchPatten);
 
-		SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
-		SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
+    private:
+        void parseIncludesAndPrePro_r(SourceFile* file, SourceRefArr& includedFiles,
+            bool reload = false);
 
-		SHADERLIB_EXPORT void listShaderSources(const char* pSearchPatten);
+    private:
+        core::MemoryArenaBase* arena_;
+        core::Crc32* pCrc32_;
 
-	private:
-		void parseIncludesAndPrePro_r(SourceFile* file, SourceRefArr& includedFiles,
-			bool reload = false);
+        // allocator for source objects.
+        core::HeapArea sourcePoolHeap_;
+        core::PoolAllocator sourcePoolAllocator_;
+        PoolArena sourcePoolArena_;
 
-
-	private:
-		core::MemoryArenaBase* arena_;
-		core::Crc32* pCrc32_;
-
-		// allocator for source objects.
-		core::HeapArea      sourcePoolHeap_;
-		core::PoolAllocator sourcePoolAllocator_;
-		PoolArena			sourcePoolArena_;
-
-		core::CriticalSection cs_;
-		ShaderSourceMap source_;
-	};
-
+        core::CriticalSection cs_;
+        ShaderSourceMap source_;
+    };
 
 } // namespace shader
 
 X_NAMESPACE_END
-

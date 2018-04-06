@@ -1,26 +1,24 @@
 
 #pragma once
 
-
 #include <EngineCommon.h>
 
-
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+    core::MallocFreeAllocator,
+    core::SingleThreadPolicy,
 #if X_DEBUG
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_DEBUG
-> ShaderLibArena;
+    >
+    ShaderLibArena;
 
 extern ShaderLibArena* g_ShaderLibArena;
-
 
 #ifdef X_LIB
 #define SHADERLIB_EXPORT
@@ -31,8 +29,6 @@ extern ShaderLibArena* g_ShaderLibArena;
 #define SHADERLIB_EXPORT X_IMPORT
 #endif // !SHADER_LIB_EXPORT
 #endif // X_LIB
-
-
 
 // this shader lib is dx12 specific for now.
 // but even so very little of the logic is actuall dx12 specific.

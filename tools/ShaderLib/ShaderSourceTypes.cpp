@@ -11,46 +11,44 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
-	// -------------------------------------------------------------
+    // -------------------------------------------------------------
 
-	SourceFile::SourceFile(const core::string& name, core::MemoryArenaBase* arena) :
-		name_(name),
-		fileData_(arena),
-		includedFiles_(arena),
+    SourceFile::SourceFile(const core::string& name, core::MemoryArenaBase* arena) :
+        name_(name),
+        fileData_(arena),
+        includedFiles_(arena),
 #if X_ENABLE_RENDER_SHADER_RELOAD
-		refrences_(arena),
+        refrences_(arena),
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
-		sourceCrc32_(0)
-	{
+        sourceCrc32_(0)
+    {
+    }
 
-	}
+    void SourceFile::writeSourceToFile(core::XFile* pFile) const
+    {
+        LockType::ScopedLockShared readLock(lock);
 
-	void SourceFile::writeSourceToFile(core::XFile* pFile) const
-	{
-		LockType::ScopedLockShared readLock(lock);
+        pFile->printf("\n// ======== %s ========\n\n", getName().c_str());
+        pFile->write(fileData_.begin(), fileData_.size());
+    }
 
-		pFile->printf("\n// ======== %s ========\n\n", getName().c_str());
-		pFile->write(fileData_.begin(), fileData_.size());
-	}
-
-
-	void SourceFile::applyRefrences(void) const
-	{
+    void SourceFile::applyRefrences(void) const
+    {
 #if X_ENABLE_RENDER_SHADER_RELOAD
-		for (const auto& pIncSource : includedFiles_) {
-			pIncSource->addRefrence(name_);
-		}
+        for (const auto& pIncSource : includedFiles_) {
+            pIncSource->addRefrence(name_);
+        }
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
-	}
+    }
 
-	void SourceFile::removeRefrences(void) const
-	{
+    void SourceFile::removeRefrences(void) const
+    {
 #if X_ENABLE_RENDER_SHADER_RELOAD
-		for (const auto& pIncSource : includedFiles_) {
-			pIncSource->removeRefrence(name_);
-		}
+        for (const auto& pIncSource : includedFiles_) {
+            pIncSource->removeRefrence(name_);
+        }
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
-	}
+    }
 
 } // namespace shader
 

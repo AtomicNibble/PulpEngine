@@ -7,38 +7,34 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+    // input layout tree nodes.
+    class ILTreeNode
+    {
+        static const size_t MAX_IL_NODE_CHILDREN = 4;
+        typedef core::FixedArray<ILTreeNode*, MAX_IL_NODE_CHILDREN> childVec;
 
+    public:
+        ILTreeNode();
+        explicit ILTreeNode(const char* Sematic);
+        explicit ILTreeNode(const ILTreeNode& oth);
+        ~ILTreeNode();
 
-	// input layout tree nodes.
-	class ILTreeNode
-	{
-		static const size_t MAX_IL_NODE_CHILDREN = 4;
-		typedef core::FixedArray<ILTreeNode*, MAX_IL_NODE_CHILDREN> childVec;
+        static const ILTreeNode* getILTree(void);
 
-	public:
-		ILTreeNode();
-		explicit ILTreeNode(const char* Sematic);
-		explicit ILTreeNode(const ILTreeNode& oth);
-		~ILTreeNode();
+        void free(void);
 
-		static const ILTreeNode* getILTree(void);
+        ILTreeNode& AddChild(ILTreeNode& node, InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid);
+        const ILTreeNode* GetChildWithSemtaic(const char* sematic) const;
 
-		void free(void);
+        X_INLINE void SetFormat(InputLayoutFormat::Enum fmt);
+        X_INLINE bool IsEnd(void) const;
+        X_INLINE InputLayoutFormat::Enum GetILFmt(void) const;
 
-		ILTreeNode& AddChild(ILTreeNode& node, InputLayoutFormat::Enum fmt = InputLayoutFormat::Invalid);
-		const ILTreeNode* GetChildWithSemtaic(const char* sematic) const;
-
-		X_INLINE void SetFormat(InputLayoutFormat::Enum fmt);
-		X_INLINE bool IsEnd(void) const;
-		X_INLINE InputLayoutFormat::Enum GetILFmt(void) const;
-
-	private:
-		core::StackString<64> sematicName_;
-		InputLayoutFormat::Enum fmt_;
-		childVec children_; // never gonna be that many children.
-	};
-
-
+    private:
+        core::StackString<64> sematicName_;
+        InputLayoutFormat::Enum fmt_;
+        childVec children_; // never gonna be that many children.
+    };
 
 } // namespace shader
 
