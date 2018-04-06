@@ -83,6 +83,8 @@ protected:
 template<size_t blockGranularity, size_t BlockSize, size_t Alignment, typename IdType>
 class GrowingStringTableUnique : public GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType>
 {
+    typedef GrowingStringTable<blockGranularity, BlockSize, Alignment, IdType> BaseT;
+
 public:
     GrowingStringTableUnique(core::MemoryArenaBase* arena);
     ~GrowingStringTableUnique();
@@ -129,6 +131,7 @@ private:
     X_INLINE void AddStringToTrie(const char* Str, IdType id);
     X_INLINE bool FindString(const char* Str, size_t Len, IdType& id);
 
+private:
     size_t LongestStr_;
     size_t NumNodes_;
     Node searchTree_;

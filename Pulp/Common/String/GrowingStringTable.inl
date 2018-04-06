@@ -320,7 +320,7 @@ IdType GrowingStringTableUnique<blockGranularity, BlockSize, Alignment, IdType>:
     // Update longest string
     LongestStr_ = core::Max(LongestStr_, Len);
 
-    id = addString(Str, Len);
+    id = BaseT::addString(Str, Len);
 
     AddStringToTrie(Str, id); // add to search Trie
 
