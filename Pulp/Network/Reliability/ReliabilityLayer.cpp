@@ -356,8 +356,12 @@ bool ReliablePacket::fromBitStream(core::FixedBitStreamBase& bs)
 
     // check for corruption.
 
+    // clang-format off
+
     X_WARNING_DIAG_PUSH
-    X_DISABLE_WARNING_DIAG(tautological - constant - out - of - range - compare)
+    X_DISABLE_WARNING_DIAG(tautological-constant-out-of-range-compare)
+
+    // clang-format on
 
     if (bits == 0 || reliability > PacketReliability::ENUM_COUNT || orderingChannel >= MAX_ORDERED_STREAMS) {
         return false;
