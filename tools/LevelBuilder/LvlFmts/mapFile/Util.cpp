@@ -79,8 +79,7 @@ namespace mapFile
             axis = 5; // negative Y
         }
 
-        X_ASSERT(((3 * axis + 1) < 18), "axis out of range")
-        (axis);
+        X_ASSERT(((3 * axis + 1) < 18), "axis out of range")(axis); 
         a2 = baseaxis[3 * axis];
         a3 = baseaxis[3 * axis + 1];
     }

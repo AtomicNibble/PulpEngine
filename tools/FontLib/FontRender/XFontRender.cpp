@@ -79,8 +79,7 @@ bool XFontRender::Release(void)
 
 bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf)
 {
-    X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")
-    ();
+    X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")(); 
 
     int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
     if (err) {
@@ -212,10 +211,8 @@ bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio)
 {
-    X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")
-    (width, height);
-    X_ASSERT(sizeRatio > 0.f && sizeRatio <= 1.f, "Size ratio invalid")
-    (sizeRatio);
+    X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height); 
+    X_ASSERT(sizeRatio > 0.f && sizeRatio <= 1.f, "Size ratio invalid")(sizeRatio); 
 
     sizeRatio_ = sizeRatio;
     glyphBitmapWidth_ = width;

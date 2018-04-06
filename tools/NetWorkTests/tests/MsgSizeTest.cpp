@@ -137,12 +137,10 @@ TEST(net, msgSizeTest)
                     // we got the packet data, check it's correct.
                     X_LOG2("ServerTest", "Recived packet. length: %" PRIu32, pPacket->bitLength);
 
-                    X_ASSERT(pPacket->bitLength == core::bitUtil::bytesToBits(testSize), "Recived incorrect packet size")
-                    (pPacket->bitLength, testSize);
+                    X_ASSERT(pPacket->bitLength == core::bitUtil::bytesToBits(testSize), "Recived incorrect packet size")(pPacket->bitLength, testSize); 
 
                     for (size_t i = 1; i < testSize; i++) {
-                        X_ASSERT(pPacket->pData[i] == i % 255, "Data invalid")
-                        ();
+                        X_ASSERT(pPacket->pData[i] == i % 255, "Data invalid")(); 
                     }
 
                     bytesRecived += testSize;

@@ -85,8 +85,7 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
     pBoneAnglesRel_ = bone_data_cursor.postSeekPtr<XQuatCompressedf>(numBone);
     pBonePosRel_ = bone_data_cursor.postSeekPtr<Vec3f>(numBone);
 
-    X_ASSERT(bone_data_cursor.isEof(), "Load error")
-    (bone_data_cursor.numBytesRemaning());
+    X_ASSERT(bone_data_cursor.isEof(), "Load error")(bone_data_cursor.numBytesRemaning()); 
 
     if (hdr.flags.IsSet(ModelFlag::PHYS_DATA)) {
         // nothing todo.
@@ -204,8 +203,7 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
         X_ASSERT_ALIGNMENT(lod.indexes.as<uintptr_t>(), 16, 0);
     }
 
-    X_ASSERT(cursor.isEof(), "Load error")
-    (cursor.numBytesRemaning());
+    X_ASSERT(cursor.isEof(), "Load error")(cursor.numBytesRemaning()); 
 
     // even tho the names are stored at the top of the file we process them now.
     // so that i can set name pointers in the MeshHeaders for convience :D !
@@ -250,10 +248,8 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
         }
     }
 
-    X_ASSERT(mat_name_cursor.isEof(), "Load error")
-    (mat_name_cursor.numBytesRemaning());
-    X_ASSERT(tag_name_cursor.isEof(), "Load error")
-    (tag_name_cursor.numBytesRemaning());
+    X_ASSERT(mat_name_cursor.isEof(), "Load error")(mat_name_cursor.numBytesRemaning()); 
+    X_ASSERT(tag_name_cursor.isEof(), "Load error")(tag_name_cursor.numBytesRemaning()); 
 
     // load the materials.
     for (i = 0; i < hdr.numMesh; i++) {
@@ -281,8 +277,7 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
 
 void XModel::addPhysToActor(physics::ActorHandle actor)
 {
-    X_ASSERT(pHdr_->flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")
-    ();
+    X_ASSERT(pHdr_->flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")(); 
 
     // we need the col header
     core::MemCursor phys_data_cursor(data_.get() + sizeof(ModelHeader) + pHdr_->materialNameDataSize + pHdr_->tagNameDataSize + pHdr_->boneDataSize, pHdr_->physDataSize);

@@ -411,8 +411,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
     // this is a private member which should have this stuff validated
     // before calling this.
     X_ASSERT_NOT_NULL(pCon);
-    X_ASSERT(pCon->thumbGenerationSupported(), "thumb generatino not supported")
-    ();
+    X_ASSERT(pCon->thumbGenerationSupported(), "thumb generatino not supported")(); 
 
     core::StopWatch timer;
 
@@ -561,8 +560,7 @@ bool Converter::loadConversionProfiles(const core::string& profileName)
             return false;
         }
 
-        X_ASSERT(type >= 0 && static_cast<uint32_t>(type) < assetDb::AssetType::ENUM_COUNT, "Invalid type")
-        (type);
+        X_ASSERT(type >= 0 && static_cast<uint32_t>(type) < assetDb::AssetType::ENUM_COUNT, "Invalid type")(type); 
 
         // now we want to split this into a seperate doc.
         core::json::StringBuffer s;
@@ -651,8 +649,7 @@ bool Converter::IntializeConverterModule(AssetType::Enum assType)
 
 bool Converter::IntializeConverterModule(AssetType::Enum assType, const char* pDllName, const char* pModuleClassName)
 {
-    X_ASSERT(converters_[assType] == nullptr, "converter already init")
-    (pDllName, pModuleClassName);
+    X_ASSERT(converters_[assType] == nullptr, "converter already init")(pDllName, pModuleClassName); 
 
     IConverterModule* pConvertModuleOut = nullptr;
     IConverter* pConverterInstance = nullptr;
@@ -673,8 +670,7 @@ void Converter::UnloadConverters(void)
 {
     for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++) {
         if (converters_[i]) {
-            X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corrisponding moduleInterface")
-            ();
+            X_ASSERT(converterModules_[i] != nullptr, "Have a converter interface without a corrisponding moduleInterface")(); 
 
             // con modules are ref counted so we can't free ourself.
             gEnv->pCore->FreeConverterModule(converterModules_[i]);

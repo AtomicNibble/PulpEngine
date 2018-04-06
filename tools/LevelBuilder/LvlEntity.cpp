@@ -151,8 +151,7 @@ bool LvlEntity::FindInterAreaPortals_r(bspNode* node)
 bool LvlEntity::MakeStructuralFaceList(void)
 {
     X_LOG0("LvlEnt", "MakeStructuralFaceList");
-    X_ASSERT(pBspFaces == nullptr, "bspFace already allocated")
-    (pBspFaces);
+    X_ASSERT(pBspFaces == nullptr, "bspFace already allocated")(pBspFaces); 
 
 #if 1 // reverse toggle.
     size_t i;
@@ -380,8 +379,7 @@ bool LvlEntity::FloodAreas(void)
     bspTree_.pHeadnode->FindAreas_r(numAreas);
     X_LOG0("LvlEntity", "^8%" PRIuS "^7 areas", numAreas);
 
-    X_ASSERT(numAreas > 0, "Have no areas")
-    ();
+    X_ASSERT(numAreas > 0, "Have no areas")(); 
 
     // check we not missed.
     if (!bspTree_.pHeadnode->CheckAreas_r()) {
@@ -420,8 +418,7 @@ bool LvlEntity::PruneNodes(void)
     int32_t numNodes = bspNode::NumberNodes_r(bspTree_.pHeadnode, 0);
 
 #if X_DEBUG
-    X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")
-    (numNodes, postPrune);
+    X_ASSERT(numNodes == postPrune, "Invalid node couts. prunt and num don't match")(numNodes, postPrune); 
 #endif
 
     X_LOG0("LvlEntity", "prePrune: ^8%" PRIi32, prePrune);

@@ -160,8 +160,7 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
 
     stream.write(sourceFontData_.data(), sourceFontData_.size());
 
-    X_ASSERT(stream.size() == dataSize, "Datasize mismatch")
-    (stream.size(), dataSize);
+    X_ASSERT(stream.size() == dataSize, "Datasize mismatch")(stream.size(), dataSize); 
 
     if (pFile->write(stream.data(), stream.size()) != stream.size()) {
         X_ERROR("Font", "Failed to write data");

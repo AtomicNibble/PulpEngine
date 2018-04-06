@@ -189,8 +189,7 @@ struct XFileMem : public XFile
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
         X_ASSERT_NOT_NULL(arena);
-        X_ASSERT(end >= begin, "invalid buffer")
-        (begin, end);
+        X_ASSERT(end >= begin, "invalid buffer")(begin, end); 
     }
     ~XFileMem() X_OVERRIDE
     {
@@ -301,8 +300,7 @@ struct XFileFixedBuf : public XFile
     {
         X_ASSERT_NOT_NULL(begin);
         X_ASSERT_NOT_NULL(end);
-        X_ASSERT(end >= begin, "invalid buffer")
-        (begin, end);
+        X_ASSERT(end >= begin, "invalid buffer")(begin, end); 
     }
 
     XFileFixedBuf(const char* begin, const char* end) :

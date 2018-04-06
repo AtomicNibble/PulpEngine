@@ -1271,8 +1271,7 @@ namespace techset
                         shader.codeBinds.append(bind);
                     }
                     else {
-                        X_ASSERT(token.length() > 0, "alias name is empty")
-                        (token.begin(), token.end(), token.length());
+                        X_ASSERT(token.length() > 0, "alias name is empty")(token.begin(), token.end(), token.length()); 
 
                         Alias al;
                         al.resourceName = resourceName;
@@ -1431,8 +1430,7 @@ namespace techset
                 lex.GetFileName(), lex.GetLineNumber());
         }
         else {
-            X_ASSERT(name.isEmpty(), "Inline define can't have a name")
-            (name.c_str());
+            X_ASSERT(name.isEmpty(), "Inline define can't have a name")(name.c_str()); 
 
             if (parentName.isNotEmpty()) {
                 // inline define can have a parent.
@@ -1445,8 +1443,7 @@ namespace techset
 
                 // if we selected a parent it should be impossible for it to have a diffrent stage.
                 // even if the user wanted to. this is source code logic fail.
-                X_ASSERT(shader.type == type, "Parent not from same stage")
-                (shader.type, type);
+                X_ASSERT(shader.type == type, "Parent not from same stage")(shader.type, type); 
             }
 
             if (!lex.ExpectTokenString("{")) {
@@ -2162,8 +2159,7 @@ namespace techset
                 lex.GetFileName(), lex.GetLineNumber());
         }
         else {
-            X_ASSERT(name.isEmpty(), "Inline define can't have a name")
-            (name.c_str());
+            X_ASSERT(name.isEmpty(), "Inline define can't have a name")(name.c_str()); 
 
             if (parentName.isNotEmpty()) {
                 // inline define can have a parent.

@@ -355,8 +355,7 @@ namespace
                 } while (find.findNext());
             }
 
-            X_ASSERT(sampleSizes.size() == fileNames.size(), "Array sizes should match")
-            ();
+            X_ASSERT(sampleSizes.size() == fileNames.size(), "Array sizes should match")(); 
 
             if (fileNames.size() < core::Compression::DICT_SAMPLER_MIN_SAMPLES) {
                 X_ERROR("Train", "Only %" PRIuS " samples provided, atleast %" PRIuS " required",
@@ -386,8 +385,7 @@ namespace
                 currentOffset += sampleSizes[i];
             }
 
-            X_ASSERT(currentOffset == sampleData.size(), "Error reading sample data")
-            (currentOffset, sampleData.size());
+            X_ASSERT(currentOffset == sampleData.size(), "Error reading sample data")(currentOffset, sampleData.size()); 
         }
 
         // train.

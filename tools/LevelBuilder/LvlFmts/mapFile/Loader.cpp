@@ -268,8 +268,7 @@ namespace mapFile
         X_ASSERT_NOT_NULL(pMaterial);
         // this code seams to expect material to always load?
         // maybe thats just incorrect logic.
-        X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")
-        ();
+        X_ASSERT(pMaterial->isLoaded(), "Material should be loaded?")(); 
 
         // create a Primative
         for (int32_t i = 0; i < patch.GetNumIndexes(); i += 3) {

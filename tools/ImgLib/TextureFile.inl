@@ -24,8 +24,7 @@ X_INLINE XTextureFile::~XTextureFile()
 
 X_INLINE void XTextureFile::resize(void)
 {
-    X_ASSERT(format_ != Texturefmt::UNKNOWN, "format must be set")
-    (format_);
+    X_ASSERT(format_ != Texturefmt::UNKNOWN, "format must be set")(format_); 
 
     // work out the size needed.
     const uint32_t faceSize = Util::dataSize(size_.x, size_.y, numMips_, format_);
@@ -52,8 +51,7 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
     }
 
     // not gonna support growing a mip count of say 3 to correct count of 9, can be added if needed.
-    X_ASSERT(numMips_ == 1, "Mips greater than one")
-    (numMips_);
+    X_ASSERT(numMips_ == 1, "Mips greater than one")(numMips_); 
 
     const uint32_t faceSize = Util::dataSize(size_.x, size_.y, mipCnt, format_);
     const uint32_t requiredBytes = faceSize * numFaces_;
@@ -269,8 +267,7 @@ X_INLINE size_t XTextureFile::getFaceSize(void) const
     }
 
     // devide by zero.
-    X_ASSERT(numFaces_ > 0, "Face count must be greater than 1")
-    (numFaces_);
+    X_ASSERT(numFaces_ > 0, "Face count must be greater than 1")(numFaces_); 
     return data_.size() / numFaces_;
 }
 
@@ -329,22 +326,19 @@ X_INLINE void XTextureFile::setFormat(Texturefmt::Enum format)
 
 X_INLINE void XTextureFile::setNumFaces(const int32_t faces)
 {
-    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid face count")
-    (faces);
+    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid face count")(faces); 
     numFaces_ = safe_static_cast<uint8_t, int32_t>(faces);
 }
 
 X_INLINE void XTextureFile::setDepth(const int32_t depth)
 {
-    X_ASSERT(depth < std::numeric_limits<uint8_t>::max(), "invalid depth")
-    (depth);
+    X_ASSERT(depth < std::numeric_limits<uint8_t>::max(), "invalid depth")(depth); 
     depth_ = safe_static_cast<uint8_t, int32_t>(depth);
 }
 
 X_INLINE void XTextureFile::setNumMips(const int32_t numMips)
 {
-    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid mipcount")
-    (numMips);
+    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid mipcount")(numMips); 
     numMips_ = safe_static_cast<uint8_t, int32_t>(numMips);
 }
 

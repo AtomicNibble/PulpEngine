@@ -341,8 +341,7 @@ MStatus PotatoAnimExporter::getAnimationData(void)
 
         MayaUtil::MayaPrintVerbose("Loading frame: %" PRIi32, curFrame);
         {
-            X_ASSERT(bones_.size() == bonePaths_.size(), "Bone size mismatch")
-            (bones_.size(), bonePaths_.size());
+            X_ASSERT(bones_.size() == bonePaths_.size(), "Bone size mismatch")(bones_.size(), bonePaths_.size()); 
 
             size_t i, num = bones_.size();
             for (i = 0; i < num; i++) {
@@ -508,8 +507,7 @@ MStatus PotatoAnimExporter::loadNoteData(void)
                 continue;
             }
 
-            X_ASSERT(frame >= startFrame_, "Frame below start")
-            (frame, startFrame_);
+            X_ASSERT(frame >= startFrame_, "Frame below start")(frame, startFrame_); 
 
             anim::Inter::Note note;
             note.value = value;

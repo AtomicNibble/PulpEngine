@@ -66,8 +66,7 @@ engine::Material* MatManager::getDefaultMaterial(void) const
 engine::Material* MatManager::loadMaterial(const char* pMtlName)
 {
     X_ASSERT_NOT_NULL(pMtlName);
-    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")
-    (pMtlName);
+    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName); 
 
     core::string name(pMtlName);
 
@@ -138,8 +137,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 MatManager::MaterialResource* MatManager::createMaterial_Internal(core::string& name)
 {
     // internal create expects you to know no duplicates
-    X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")
-    ();
+    X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")(); 
 
     auto pMatRes = materials_.createAsset(name, name, arena_);
 

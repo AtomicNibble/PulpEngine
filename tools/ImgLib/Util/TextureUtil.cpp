@@ -356,10 +356,8 @@ namespace Util
     uint32_t dataSize(uint32_t width, uint32_t height,
         uint32_t mips, Texturefmt::Enum fmt)
     {
-        X_ASSERT(width > 0, "zero width")
-        (width);
-        X_ASSERT(height > 0, "zero height")
-        (height);
+        X_ASSERT(width > 0, "zero width")(width); 
+        X_ASSERT(height > 0, "zero height")(height); 
 
         uint32_t size = 0;
         uint32_t i;
@@ -868,8 +866,7 @@ namespace Util
 
                 if (img.getFormat() == Texturefmt::B8G8R8) {
                     const size_t numPixel = img.getLevelSize(mip) / 3;
-                    X_ASSERT(numPixel * 3 == img.getLevelSize(mip), "Pixel num calculation errro")
-                    (img.getLevelSize(mip), numPixel);
+                    X_ASSERT(numPixel * 3 == img.getLevelSize(mip), "Pixel num calculation errro")(img.getLevelSize(mip), numPixel); 
 
                     for (size_t i = 0; i < numPixel; i++) {
                         std::swap(pSrc[0], pSrc[2]);
@@ -878,8 +875,7 @@ namespace Util
                 }
                 else if (img.getFormat() == Texturefmt::B8G8R8A8) {
                     const size_t numPixel = img.getLevelSize(mip) / 4;
-                    X_ASSERT(numPixel * 4 == img.getLevelSize(mip), "Pixel num calculation errro")
-                    (img.getLevelSize(mip), numPixel);
+                    X_ASSERT(numPixel * 4 == img.getLevelSize(mip), "Pixel num calculation errro")(img.getLevelSize(mip), numPixel); 
 
                     for (size_t i = 0; i < numPixel; i++) {
                         std::swap(pSrc[0], pSrc[2]);
@@ -939,8 +935,7 @@ namespace Util
 
                 if (img.getFormat() == Texturefmt::B8G8R8) {
                     const size_t numPixel = img.getLevelSize(mip) / 3;
-                    X_ASSERT(numPixel * 3 == img.getLevelSize(mip), "Pixel num calculation errro")
-                    (img.getLevelSize(mip), numPixel);
+                    X_ASSERT(numPixel * 3 == img.getLevelSize(mip), "Pixel num calculation errro")(img.getLevelSize(mip), numPixel); 
 
                     for (size_t i = 0; i < numPixel; i++) {
                         pDst[0] = pSrc[2];
@@ -953,8 +948,7 @@ namespace Util
                 }
                 else if (img.getFormat() == Texturefmt::B8G8R8A8) {
                     const size_t numPixel = img.getLevelSize(mip) / 4;
-                    X_ASSERT(numPixel * 4 == img.getLevelSize(mip), "Pixel num calculation errro")
-                    (img.getLevelSize(mip), numPixel);
+                    X_ASSERT(numPixel * 4 == img.getLevelSize(mip), "Pixel num calculation errro")(img.getLevelSize(mip), numPixel); 
 
                     for (size_t i = 0; i < numPixel; i++) {
                         pDst[0] = pSrc[2];

@@ -214,8 +214,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     }
 
     // check we only got here with valid shit!
-    X_ASSERT(outputFileFmt != ImgFileFormat::UNKNOWN, "OutputFile Fmt is invalid")
-    (outputFileFmt);
+    X_ASSERT(outputFileFmt != ImgFileFormat::UNKNOWN, "OutputFile Fmt is invalid")(outputFileFmt); 
 
     ImgConveter::Profile::Enum qualityProfile = ImgConveter::Profile::VeryFast;
     ImgConveter con(g_ImgLibArena, g_ImgLibArena);
@@ -333,8 +332,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     {
         const auto& src = con.getTextFile();
 
-        X_ASSERT(src.isValid(), "Src img not valid after successful loading")
-        (src.isValid());
+        X_ASSERT(src.isValid(), "Src img not valid after successful loading")(src.isValid()); 
 
         if (!core::bitUtil::IsPowerOfTwo(src.getWidth()) || !core::bitUtil::IsPowerOfTwo(src.getHeight())) {
             // none pow 2 img :| https://winpic.co/MAbde113843b.gif

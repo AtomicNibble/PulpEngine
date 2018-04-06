@@ -73,8 +73,7 @@ Asset::Asset(AssetId id, const core::string& name, core::string&& relativePath,
     infaltedSize(data.size()),
     data(std::move(data))
 {
-    X_ASSERT(infaltedSize > 0, "size is zero")
-    (infaltedSize, data.size(), this->data.size());
+    X_ASSERT(infaltedSize > 0, "size is zero")(infaltedSize, data.size(), this->data.size()); 
     X_UNUSED(arena);
 }
 
@@ -171,8 +170,7 @@ bool AssetPakBuilder::bake(void)
                 currentOffset += sampleSize;
             }
 
-            X_ASSERT(currentOffset == sampleDataSize, "Failed to write all sample data")
-            (currentOffset, sampleDataSize);
+            X_ASSERT(currentOffset == sampleDataSize, "Failed to write all sample data")(currentOffset, sampleDataSize); 
 
             // train.
             X_LOG0("AssetPak", "Training for assetType \"%s\" with ^6%s^7 sample data, ^6%" PRIuS "^7 files, avg size: ^6%s",
@@ -368,8 +366,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
             }
         }
 
-        X_ASSERT(offset == sharedDictsData.size(), "Size calculation errro")
-        (offset, sharedDictsData.size());
+        X_ASSERT(offset == sharedDictsData.size(), "Size calculation errro")(offset, sharedDictsData.size()); 
 
         sharedDictsData.alignWrite(PAK_ASSET_PADDING);
     }
@@ -480,12 +477,9 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 
 void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data)
 {
-    X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")
-    ();
-    X_ASSERT(name.isNotEmpty(), "Empty name")
-    (name.length());
-    X_ASSERT(data.isNotEmpty(), "Empty data")
-    (data.size());
+    X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")(); 
+    X_ASSERT(name.isNotEmpty(), "Empty name")(name.length()); 
+    X_ASSERT(data.isNotEmpty(), "Empty data")(data.size()); 
 
     assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
 }

@@ -365,8 +365,7 @@ namespace TGA
 
     bool XTexLoaderTGA::isColorMap(uint32_t type)
     {
-        X_ASSERT(isValidImageType(type), "Invalid format passed")
-        ();
+        X_ASSERT(isValidImageType(type), "Invalid format passed")(); 
 
         switch (type) {
             case ImageType::COLORMAP:
@@ -381,8 +380,7 @@ namespace TGA
 
     bool XTexLoaderTGA::isBGR(uint32_t type)
     {
-        X_ASSERT(isValidImageType(type), "Invalid format passed")
-        ();
+        X_ASSERT(isValidImageType(type), "Invalid format passed")(); 
 
         switch (type) {
             case ImageType::BGR:
@@ -397,8 +395,7 @@ namespace TGA
 
     bool XTexLoaderTGA::isMono(uint32_t type)
     {
-        X_ASSERT(isValidImageType(type), "Invalid format passed")
-        ();
+        X_ASSERT(isValidImageType(type), "Invalid format passed")(); 
 
         switch (type) {
             case ImageType::MONO:
@@ -413,8 +410,7 @@ namespace TGA
 
     bool XTexLoaderTGA::isRle(uint32_t type)
     {
-        X_ASSERT(isValidImageType(type), "Invalid format passed")
-        ();
+        X_ASSERT(isValidImageType(type), "Invalid format passed")(); 
 
         switch (type) {
             case ImageType::COLORMAP_RLE:

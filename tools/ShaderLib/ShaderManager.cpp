@@ -157,8 +157,7 @@ namespace shader
 
             // try load it from cache.
             if (vars_.useCache() && shaderBin_.loadShader(pHWShader)) {
-                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")
-                ();
+                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")(); 
                 return true;
             }
 
@@ -184,8 +183,7 @@ namespace shader
             }
 
             if (vars_.writeMergedSource()) {
-                X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe, to dispatch background write")
-                ();
+                X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe, to dispatch background write")(); 
 
                 // just dispatch a async write request.
                 // the source memory will get cleaned up for us once complete.

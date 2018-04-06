@@ -42,8 +42,7 @@ namespace shader
         IlFmt_(InputLayoutFormat::Invalid),
         cbLinks_(arena)
     {
-        X_ASSERT(stages_.size() == stages_.size(), "Stage aray sizes don't match")
-        ();
+        X_ASSERT(stages_.size() == stages_.size(), "Stage aray sizes don't match")(); 
 
         for (size_t i = 0; i < stages.size(); i++) {
             stages_[i] = static_cast<XHWShader*>(stages[i]);
@@ -56,8 +55,7 @@ namespace shader
             IlFmt_ = getStage(ShaderType::Vertex)->getILFormat();
         }
         else {
-            X_ASSERT(IlFmt_ == InputLayoutFormat::Invalid, "Il should be invalid")
-            ();
+            X_ASSERT(IlFmt_ == InputLayoutFormat::Invalid, "Il should be invalid")(); 
         }
 
         createCBLinks();
@@ -110,8 +108,7 @@ namespace shader
 
         for (auto* pShader : stages_) {
             if (pShader) {
-                X_ASSERT(pShader->getStatus() == ShaderStatus::Ready, "All shaders should be compiled when creating CB links")
-                ();
+                X_ASSERT(pShader->getStatus() == ShaderStatus::Ready, "All shaders should be compiled when creating CB links")(); 
                 addCBufsToLink(pShader);
 
                 totalCBs += pShader->getNumConstantBuffers();

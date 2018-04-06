@@ -348,8 +348,7 @@ namespace PNG
         const uint32_t bpp = png_get_bpp(ihdr.bitDepth, ihdr.colType);
         const uint32_t inflated_size = (ihdr.width * ihdr.height * bpp);
 
-        X_ASSERT(inflated_size == imgFile.getFaceSize(), "Calculated size don't match face size")
-        (inflated_size, imgFile.getFaceSize());
+        X_ASSERT(inflated_size == imgFile.getFaceSize(), "Calculated size don't match face size")(inflated_size, imgFile.getFaceSize()); 
 
         if (!LoadChucksIDAT(swapArena, pCrc, file, length, imgFile)) {
             X_ERROR("TexturePNG", "failed to load PNG chunks");
@@ -372,15 +371,13 @@ namespace PNG
 
         ZlibInflate inflater(swapArea, [&](const uint8_t* pData, size_t len, size_t inflatedOffset) {
             X_UNUSED(inflatedOffset);
-            X_ASSERT(rowBytes == len, "deflated buffer not match row size")
-            (rowBytes, len);
+            X_ASSERT(rowBytes == len, "deflated buffer not match row size")(rowBytes, len); 
 
             // ignore filter byte.
             ++pData;
             --len;
 
-            X_ASSERT(bytesLeft >= len, "Recived too much data")
-            (bytesLeft, len);
+            X_ASSERT(bytesLeft >= len, "Recived too much data")(bytesLeft, len); 
             bytesLeft -= len;
 
             std::memcpy(pDst, pData, len);
@@ -615,8 +612,7 @@ namespace PNG
 
             pSrcCur += rowBytes;
 
-            X_ASSERT(pSrcCur <= (pSrc + srcSize), "Out of range")
-            (pSrcCur, pSrc, srcSize);
+            X_ASSERT(pSrcCur <= (pSrc + srcSize), "Out of range")(pSrcCur, pSrc, srcSize); 
         }
 
         file->writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));

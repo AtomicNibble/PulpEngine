@@ -293,8 +293,7 @@ namespace shader
             return pSourceFile;
         }
 
-        X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")
-        ();
+        X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")(); 
 
         auto* pSourceFile = X_NEW(SourceFile, &sourcePoolArena_, "SourceFile")(namelc, arena_);
 

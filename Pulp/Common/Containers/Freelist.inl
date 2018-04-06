@@ -23,8 +23,7 @@ inline Freelist::Freelist(void* start, void* end, size_t originalElementSize, si
     next_ = as_self;
 
     if (end <= as_void) {
-        X_ASSERT(false, "Memory provided for free lists dose not satisfy even one element")
-        (originalElementSize, elementSize, alignment, offset);
+        X_ASSERT(false, "Memory provided for free lists dose not satisfy even one element")(originalElementSize, elementSize, alignment, offset); 
     }
 
     // initialize the free list - make every m_next of each element point to the next element in the list

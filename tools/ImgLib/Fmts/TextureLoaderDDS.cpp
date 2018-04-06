@@ -1007,8 +1007,7 @@ namespace DDS
         uint32_t i, bytes_read;
         uint32_t total_bytes_per_face = pixel_util::get_data_size(hdr.dwWidth, hdr.dwHeight, num_mip_maps, format, dxt_fmt);
 
-        X_ASSERT(imgFile.getFaceSize() == total_bytes_per_face, "Face size mismatch")
-        (imgFile.getFaceSize(), total_bytes_per_face);
+        X_ASSERT(imgFile.getFaceSize() == total_bytes_per_face, "Face size mismatch")(imgFile.getFaceSize(), total_bytes_per_face); 
 
         // allocate memory / read.
         // no idear if allocating then reading has any benfits for cube maps.

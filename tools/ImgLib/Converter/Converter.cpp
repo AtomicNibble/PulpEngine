@@ -147,8 +147,7 @@ namespace Converter
             }
             if (flags.IsSet(CompileFlag::HI_MIP_STREAMING)) {
                 CompileFlags::Description flagDsc;
-                X_ASSERT(imgFlags.IsSet(TexFlag::STREAMABLE), "HimipStreaming set without streamable flag")
-                (flags.ToString(flagDsc));
+                X_ASSERT(imgFlags.IsSet(TexFlag::STREAMABLE), "HimipStreaming set without streamable flag")(flags.ToString(flagDsc)); 
                 imgFlags.Set(TexFlag::HI_MIP_STREAMING);
             }
             if (flags.IsSet(CompileFlag::FORCE_STREAM)) {
@@ -286,8 +285,7 @@ namespace Converter
         // create mips.
         // we might be ignoring srcmips OR making new.
         srcImg_.allocMipBuffers();
-        X_ASSERT(srcImg_.getNumMips() == requiredMips, "Mip count mismatch")
-        (srcImg_.getNumMips(), requiredMips);
+        X_ASSERT(srcImg_.getNumMips() == requiredMips, "Mip count mismatch")(srcImg_.getNumMips(), requiredMips); 
 
         core::V2::JobSystem& jobSys = *gEnv->pJobSys;
         core::V2::Job* pRootJob = nullptr;
@@ -504,8 +502,7 @@ namespace Converter
                 uint8_t* pOut = dstImg_.getLevel(faceIdx, i);
 
                 auto subBlockConvert = [&]() {
-                    X_ASSERT(inputImg.height < 4, "Height should be below 4")
-                    (inputImg.height);
+                    X_ASSERT(inputImg.height < 4, "Height should be below 4")(inputImg.height); 
 
                     // we need to pad this up into a 4x4 block for converting.
                     // we should fill that pixels we don't plan to use with real pixels
@@ -538,8 +535,7 @@ namespace Converter
                     const int32_t bytesPerBlock = Util::dxtBytesPerBlock(targetFmt);
                     //	const int32_t numJobs = core::Min(targetJobCount, inputImg.height);
 
-                    X_ASSERT((rowsPerJob % 4) == 0, "Rows to process should be multiple of 4")
-                    (rowsPerJob);
+                    X_ASSERT((rowsPerJob % 4) == 0, "Rows to process should be multiple of 4")(rowsPerJob); 
 
                     if (!core::bitUtil::IsPowerOfTwo(inputImg.height) || !core::bitUtil::IsPowerOfTwo(inputImg.width)) {
                         X_ASSERT_NOT_IMPLEMENTED();
@@ -562,14 +558,10 @@ namespace Converter
 
                             const int32_t numRowsToProcess = y_end - y_start;
 
-                            X_ASSERT(numRowsToProcess > 0, "Invalid range")
-                            (y_end, y_start, numRowsToProcess);
-                            X_ASSERT((numRowsToProcess % 4) == 0, "Rows to process should be multiple of 4")
-                            (numRowsToProcess);
-                            X_ASSERT((y_start % 4) == 0, "Start row should be a multiple of 4")
-                            (y_start);
-                            X_ASSERT((y_end % 4) == 0, "End row should be a multiple of 4")
-                            (y_end);
+                            X_ASSERT(numRowsToProcess > 0, "Invalid range")(y_end, y_start, numRowsToProcess); 
+                            X_ASSERT((numRowsToProcess % 4) == 0, "Rows to process should be multiple of 4")(numRowsToProcess); 
+                            X_ASSERT((y_start % 4) == 0, "Start row should be a multiple of 4")(y_start); 
+                            X_ASSERT((y_end % 4) == 0, "End row should be a multiple of 4")(y_end); 
 
                             JobData data;
                             data.pCompressFunc = pFunc;
@@ -617,10 +609,8 @@ namespace Converter
 
         JobData* pJobData = reinterpret_cast<JobData*>(pData);
 
-        X_ASSERT(pJobData->surface.height >= 1, "Invalid height")
-        (pJobData->surface.height);
-        X_ASSERT(pJobData->surface.width >= 1, "Invalid width")
-        (pJobData->surface.width);
+        X_ASSERT(pJobData->surface.height >= 1, "Invalid height")(pJobData->surface.height); 
+        X_ASSERT(pJobData->surface.width >= 1, "Invalid width")(pJobData->surface.width); 
 
         pJobData->pCompressFunc(&pJobData->surface, pJobData->pOut);
     }

@@ -79,8 +79,7 @@ namespace RawModel
 
     const Lod& Model::getLod(size_t idx) const
     {
-        X_ASSERT(idx < numLods(), "Invalid lod idx")
-        (idx, numLods());
+        X_ASSERT(idx < numLods(), "Invalid lod idx")(idx, numLods()); 
         return lods_[idx];
     }
 

@@ -112,10 +112,8 @@ void Bone::decodePos(Vec3f& pos, int32_t frame) const
                     int32_t firstIdx = posFrameIdx - 1;
                     int32_t lastIdx = posFrameIdx;
 
-                    X_ASSERT(firstIdx >= 0 && firstIdx < numPos_, "invalid index")
-                    (firstIdx, numPos_);
-                    X_ASSERT(lastIdx >= 0 && lastIdx < numPos_, "invalid index")
-                    (lastIdx, numPos_);
+                    X_ASSERT(firstIdx >= 0 && firstIdx < numPos_, "invalid index")(firstIdx, numPos_); 
+                    X_ASSERT(lastIdx >= 0 && lastIdx < numPos_, "invalid index")(lastIdx, numPos_); 
 
                     int32_t first = pPosFrames_[firstIdx];
                     int32_t last = pPosFrames_[lastIdx];
@@ -172,10 +170,8 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
                     int32_t firstIdx = angFrameIdx - 1;
                     int32_t lastIdx = angFrameIdx;
 
-                    X_ASSERT(firstIdx >= 0 && firstIdx < numAngles_, "invalid index")
-                    (firstIdx, numAngles_);
-                    X_ASSERT(lastIdx >= 0 && lastIdx < numAngles_, "invalid index")
-                    (lastIdx, numAngles_);
+                    X_ASSERT(firstIdx >= 0 && firstIdx < numAngles_, "invalid index")(firstIdx, numAngles_); 
+                    X_ASSERT(lastIdx >= 0 && lastIdx < numAngles_, "invalid index")(lastIdx, numAngles_); 
 
                     int32_t first = pAngleFrames_[firstIdx];
                     int32_t last = pAngleFrames_[lastIdx];
@@ -197,16 +193,14 @@ void Bone::decodeAngle(Quatf& ang, int32_t frame) const
 
 Quatf Bone::GetAngle(int32_t idx) const
 {
-    X_ASSERT(idx < numAngles_, "Invalid idx")
-    (idx, numAngles_);
+    X_ASSERT(idx < numAngles_, "Invalid idx")(idx, numAngles_); 
 
     return pAngleData_[idx].asQuat();
 }
 
 Vec3f Bone::GetPostion(int32_t idx) const
 {
-    X_ASSERT(idx < numPos_, "Invalid idx")
-    (idx, numPos_);
+    X_ASSERT(idx < numPos_, "Invalid idx")(idx, numPos_); 
 
     Vec3f pos;
     if (flags_.IsSet(BoneFlag::LargePosScalers)) {
@@ -307,8 +301,7 @@ void Anim::timeToFrame(core::TimeVal time, int32_t cycles, FrameBlend& frame) co
     frame.backlerp = offset.GetMilliSeconds() / oneSecond.GetMilliSeconds();
     frame.frontlerp = 1.0f - frame.backlerp;
 
-    X_ASSERT(frame.backlerp >= 0 && frame.backlerp <= 1.f && ((frame.backlerp + frame.frontlerp) == 1.f), "Invalid lerp values")
-    (frame.backlerp, frame.frontlerp, (frame.backlerp + frame.frontlerp));
+    X_ASSERT(frame.backlerp >= 0 && frame.backlerp <= 1.f && ((frame.backlerp + frame.frontlerp) == 1.f), "Invalid lerp values")(frame.backlerp, frame.frontlerp, (frame.backlerp + frame.frontlerp)); 
 }
 
 void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const IndexArr& indexes) const
@@ -317,12 +310,9 @@ void Anim::getFrame(const FrameBlend& frame, TransformArr& boneTransOut, const I
 
     // we need to animate each bone in the model that we affect
     // the index map is same size as bones, and the index is the index of the bone in animation.
-    X_ASSERT(boneTransOut.size() == indexes.size(), "Size mismatch")
-    ();
-    X_ASSERT(frame.frame1 >= 0 && frame.frame1 < getNumFrames(), "Frame1 out of range")
-    (frame.frame1, getNumFrames());
-    X_ASSERT(frame.frame2 >= 0 && frame.frame2 < getNumFrames(), "Frame2 out of range")
-    (frame.frame2, getNumFrames());
+    X_ASSERT(boneTransOut.size() == indexes.size(), "Size mismatch")(); 
+    X_ASSERT(frame.frame1 >= 0 && frame.frame1 < getNumFrames(), "Frame1 out of range")(frame.frame1, getNumFrames()); 
+    X_ASSERT(frame.frame2 >= 0 && frame.frame2 < getNumFrames(), "Frame2 out of range")(frame.frame2, getNumFrames()); 
 
     TransformArr blendTrans(boneTransOut.getArena(), boneTransOut.size());
     IndexArr lerpIndex(boneTransOut.getArena());
@@ -387,8 +377,7 @@ void Anim::getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& val
         }
 
         if (noteFrame >= fromFract) {
-            X_ASSERT(noteFrame <= toFract, "Frame out of range")
-            (noteFrame, fromFract, toFract);
+            X_ASSERT(noteFrame <= toFract, "Frame out of range")(noteFrame, fromFract, toFract); 
             auto* pNoteValue = getNoteValue(i);
             values.push_back(pNoteValue);
 

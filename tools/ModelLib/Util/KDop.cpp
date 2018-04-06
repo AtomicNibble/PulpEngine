@@ -148,10 +148,8 @@ KDop::KDop(Type::Enum type, core::MemoryArenaBase* arena) :
 
 void KDop::addTriangles(const TriangleInfo& triInfo)
 {
-    X_ASSERT(!planeNormals_.empty(), "No plane directions")
-    ();
-    X_ASSERT(maxDist_.size() == planeNormals_.size(), "Size mismatch")
-    ();
+    X_ASSERT(!planeNormals_.empty(), "No plane directions")(); 
+    X_ASSERT(maxDist_.size() == planeNormals_.size(), "Size mismatch")(); 
 
     const Vec3f* pVert = triInfo.pData;
     const auto stride = triInfo.stride;

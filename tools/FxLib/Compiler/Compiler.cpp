@@ -444,8 +444,7 @@ namespace fx
                         r.start -= range;
                         r.range = range;
 
-                        X_ASSERT(range > 0, "Range is negative")
-                        (range, r.start, r.range);
+                        X_ASSERT(range > 0, "Range is negative")(range, r.start, r.range); 
                     }
                 };
 

@@ -104,8 +104,7 @@ namespace mapFile
 
     void XMapPatch::PutOnCurve(void)
     {
-        X_ASSERT(expanded_, "needs to be exapanded")
-        (expanded_);
+        X_ASSERT(expanded_, "needs to be exapanded")(expanded_); 
         LvlVert prev, next;
 
         // put all the approximating points on the curve
@@ -148,8 +147,7 @@ namespace mapFile
         float len, maxLength;
         Vec3f proj, dir;
 
-        X_ASSERT(expanded_, "needs to be exapanded")
-        (expanded_);
+        X_ASSERT(expanded_, "needs to be exapanded")(expanded_); 
 
         for (j = 1; j < width_ - 1; j++) {
             maxLength = 0;
@@ -199,8 +197,7 @@ namespace mapFile
     {
         int32_t i, j; // must be signed
 
-        X_ASSERT(expanded_, "needs to be exapanded")
-        (expanded_);
+        X_ASSERT(expanded_, "needs to be exapanded")(expanded_); 
         if (newHeight <= maxHeight_ && newWidth <= maxWidth_) {
             return;
         }
@@ -282,8 +279,7 @@ namespace mapFile
             {0, 1}, {1, 1}, {1, 0}, {1, -1},
             {0, -1}, {-1, -1}, {-1, 0}, {-1, 1}};
 
-        X_ASSERT(!expanded_, "Patch must not be expanded before generating normals.")
-        (expanded_);
+        X_ASSERT(!expanded_, "Patch must not be expanded before generating normals.")(expanded_); 
 
         // if all points are coplanar, set all normals to that plane
         Vec3f extent[3];

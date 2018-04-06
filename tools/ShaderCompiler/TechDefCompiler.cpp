@@ -119,8 +119,7 @@ namespace compiler
                 const auto& shader = tech.shaders[type];
 
                 //  make sure the shader in the vertex slot is a vertex shader etc..
-                X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")
-                (shader.type, type);
+                X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")(shader.type, type); 
 
                 IShaderSource* pShaderSource = shaderMan_.sourceforName(shader.source);
                 if (!pShaderSource) {

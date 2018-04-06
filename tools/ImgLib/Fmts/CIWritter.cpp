@@ -52,8 +52,7 @@ namespace CI
         hdr.DataSize = hdr.FaceSize * imgFile.getNumFaces();
         hdr.crc32 = pCrc->Begin();
 
-        X_ASSERT(hdr.FaceSize == imgFile.getFaceSize(), "Face size mismatch")
-        (hdr.FaceSize, imgFile.getFaceSize());
+        X_ASSERT(hdr.FaceSize == imgFile.getFaceSize(), "Face size mismatch")(hdr.FaceSize, imgFile.getFaceSize()); 
 
         pCrc->Update(&hdr.Flags, sizeof(hdr.Flags), hdr.crc32);
 

@@ -121,8 +121,7 @@ namespace Converter
             }
             else // forceAlphaChannel
             {
-                X_ASSERT(forceAlphaChannel, "Invalid logic")
-                (forceAlphaChannel);
+                X_ASSERT(forceAlphaChannel, "Invalid logic")(forceAlphaChannel); 
 
                 for (uint32_t i = 0; i < count; i++) {
                     pAlpha_channel[i] = 1.f;
@@ -169,8 +168,7 @@ namespace Converter
 
         if (fmt == Texturefmt::R8G8B8A8 || fmt == Texturefmt::B8G8R8A8) {
             const size_t expectedSize = (numPixels * 4);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")
-            (mipSize, expectedSize);
+            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
 
             if (componentCount() >= 4) {
                 for (uint32_t i = 0; i < numPixels; i++) {
@@ -193,8 +191,7 @@ namespace Converter
         }
         else if (fmt == Texturefmt::R8G8B8 || fmt == Texturefmt::B8G8R8) {
             const size_t expectedSize = (numPixels * 3);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")
-            (mipSize, expectedSize);
+            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
 
             for (uint32_t i = 0; i < numPixels; i++) {
                 uint8_t* pPixel = &pMipDst[i * 3];
@@ -206,8 +203,7 @@ namespace Converter
         else if (fmt == Texturefmt::R16G16B16A16_FLOAT) {
             // are we on the same page? (mentally)
             const size_t expectedSize = (numPixels * 8);
-            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")
-            (mipSize, expectedSize);
+            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize); 
 
             if (componentCount() >= 4) {
                 for (uint32_t i = 0; i < numPixels; i++) {
@@ -326,10 +322,8 @@ namespace Converter
         }
         // Polyphase filters.
         else if (width_ & 1 && height_ & 1) {
-            X_ASSERT(width_ == 2 * newWidth + 1, "")
-            (width_, newWidth);
-            X_ASSERT(height_ == 2 * newHeight + 1, "")
-            (height_, newHeight);
+            X_ASSERT(width_ == 2 * newWidth + 1, "")(width_, newWidth); 
+            X_ASSERT(height_ == 2 * newHeight + 1, "")(height_, newHeight); 
 
             const float scale = 1.0f / (width_ * height_);
 
@@ -361,8 +355,7 @@ namespace Converter
             }
         }
         else if (width_ & 1) {
-            X_ASSERT(width_ == 2 * newWidth + 1, "")
-            (width_, newWidth);
+            X_ASSERT(width_ == 2 * newWidth + 1, "")(width_, newWidth); 
             const float scale = 1.0f / (2 * width_);
 
             for (uint32_t c = 0; c < componentCount_; c++) {
@@ -389,8 +382,7 @@ namespace Converter
             }
         }
         else if (height_ & 1) {
-            X_ASSERT(height_ == 2 * newHeight + 1, "")
-            (height_, newHeight);
+            X_ASSERT(height_ == 2 * newHeight + 1, "")(height_, newHeight); 
 
             const float scale = 1.0f / (2 * height_);
 
@@ -540,8 +532,7 @@ namespace Converter
 
     void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter, uint32_t w, uint32_t h, WrapMode::Enum wm, uint32_t alphaChannel) const
     {
-        X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")
-        (alphaChannel, componentCount_);
+        X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")(alphaChannel, componentCount_); 
 
         FloatImage tmpImage(arena);
 
@@ -593,8 +584,7 @@ namespace Converter
     void FloatImage::resize(FloatImage& dst, core::MemoryArenaBase* arena, const Filter& filter,
         uint32_t w, uint32_t h, uint32_t d, WrapMode::Enum wm, uint32_t alphaChannel) const
     {
-        X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")
-        (alphaChannel, componentCount_);
+        X_ASSERT(alphaChannel < componentCount_, "Invalid alpha channel index")(alphaChannel, componentCount_); 
 
         // use the existing 2d version if we are a 2d image:
         if (depth_ == d) {
@@ -761,8 +751,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float sum = 0;
             for (int32_t j = 0; j < windowSize; ++j) {
@@ -791,8 +780,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float sum = 0;
             for (int32_t j = 0; j < windowSize; ++j) {
@@ -820,8 +808,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float sum = 0;
             for (int32_t j = 0; j < windowSize; ++j) {
@@ -850,8 +837,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float norm = 0.0f;
             float sum = 0;
@@ -884,8 +870,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float norm = 0;
             float sum = 0;
@@ -918,8 +903,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width));
-            X_ASSERT(right - left <= windowSize, "")
-            (right, left, right - left, windowSize);
+            X_ASSERT(right - left <= windowSize, "")(right, left, right - left, windowSize); 
 
             float norm = 0.0f;
             float sum = 0;

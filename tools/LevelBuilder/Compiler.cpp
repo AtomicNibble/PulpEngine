@@ -424,8 +424,7 @@ void Compiler::putWindingIntoAreas_r(Winding* pWinding, LvlBrushSide& side, bspN
         return;
     }
 
-    X_ASSERT(pNode->area != -1 && pNode->area < safe_static_cast<int32_t>(areas_.size()), "Leaf node has invalid area")
-    (pNode->area);
+    X_ASSERT(pNode->area != -1 && pNode->area < safe_static_cast<int32_t>(areas_.size()), "Leaf node has invalid area")(pNode->area); 
 
     LvlArea& area = areas_[pNode->area];
     area.addWindingForSide(planes_, side, pWinding);
@@ -899,8 +898,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
                 // write all the meshess.
                 for (const auto& triMesh : triDataArr) {
                     const auto& cooked = triMesh.cookedData();
-                    X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")
-                    ();
+                    X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")(); 
 
                     AreaCollisionDataHdr dataHdr;
                     dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());
@@ -910,8 +908,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 
                 for (const auto& convexMesh : conDataArr) {
                     const auto& cooked = convexMesh.cookedData();
-                    X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")
-                    ();
+                    X_ASSERT(cooked.isNotEmpty(), "Collision data is empty")(); 
 
                     AreaCollisionDataHdr dataHdr;
                     dataHdr.dataSize = safe_static_cast<uint16_t>(cooked.size());

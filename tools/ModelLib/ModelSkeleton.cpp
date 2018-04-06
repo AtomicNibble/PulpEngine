@@ -46,8 +46,7 @@ void ModelSkeleton::dumpToLog(void) const
         core::StackString<model::MODEL_MAX_BONE_NAME_LENGTH> boneName;
         core::StackString<128> posStr, angStr;
 
-        X_ASSERT(longestName > boneName.length(), "Incorrect longest name")
-        (longestName, boneName.length());
+        X_ASSERT(longestName > boneName.length(), "Incorrect longest name")(longestName, boneName.length()); 
 
         boneName.appendFmt("\"%s", pName);
         boneName.append('"', 1);

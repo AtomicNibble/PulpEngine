@@ -237,8 +237,7 @@ namespace shader
                     return false;
                 }
 
-                X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")
-                (pShader->status_);
+                X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_); 
 
                 auto& cbufs = pShader->getCBuffers();
                 auto& bufs = pShader->getBuffers();
@@ -296,8 +295,7 @@ namespace shader
                 pShader->numInputParams_ = hdr.numInputParams;
                 pShader->numInstructions_ = hdr.numInstructions;
                 pShader->numRenderTargets_ = hdr.numRenderTargets;
-                X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")
-                ();
+                X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")(); 
 
                 pShader->permFlags_ = hdr.permFlags;
                 pShader->IlFmt_ = hdr.ILFmt;

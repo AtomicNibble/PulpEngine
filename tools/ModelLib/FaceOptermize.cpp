@@ -155,8 +155,7 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t i
             vertexData.activeFaceListSize = 0;
         }
 
-        X_ASSERT(curActiveFaceListPos == indexCount, "face list pos error")
-        (curActiveFaceListPos, indexCount);
+        X_ASSERT(curActiveFaceListPos == indexCount, "face list pos error")(curActiveFaceListPos, indexCount); 
     }
 
     // sort unprocessed faces by highest score
@@ -211,8 +210,7 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t i
                     break; // we're searching a pre-sorted list, first one we find will be the best
                 }
             }
-            X_ASSERT(bestScore >= 0.f, "Best score must be greater than zero")
-            (bestScore);
+            X_ASSERT(bestScore >= 0.f, "Best score must be greater than zero")(bestScore); 
         }
 
         processedFaceList[bestFace / 3] = 1;
@@ -235,13 +233,11 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t i
                 }
             }
 
-            X_ASSERT(vertexData.activeFaceListSize > 0, "vertexData.activeFaceListSize must be greater than zero")
-            (vertexData.activeFaceListSize);
+            X_ASSERT(vertexData.activeFaceListSize > 0, "vertexData.activeFaceListSize must be greater than zero")(vertexData.activeFaceListSize); 
             uint32_t* begin = &activeFaceList[vertexData.activeFaceListStart];
             uint32_t* end = &activeFaceList[vertexData.activeFaceListStart + vertexData.activeFaceListSize];
             uint32_t* it = std::find(begin, end, bestFace);
-            X_ASSERT(it != end, "")
-            (it, end);
+            X_ASSERT(it != end, "")(it, end); 
 
             core::Swap(*it, *(end - 1));
             --vertexData.activeFaceListSize;
@@ -252,8 +248,7 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t i
                 uint32_t faceIndex = *fi / 3;
                 uint32_t n = faceReverseLookup[faceIndex];
 
-                X_ASSERT(faceSorted[n] == faceIndex, "")
-                (faceSorted[n], faceIndex);
+                X_ASSERT(faceSorted[n] == faceIndex, "")(faceSorted[n], faceIndex); 
 
                 // found it, now move it up
                 while (n > 0) {
@@ -377,8 +372,7 @@ float32_t FaceOptimize<IndexType>::ComputeVertexCacheScore(int cachePosition, ui
             score = FindVertexScore_LastTriScore;
         }
         else {
-            X_ASSERT(cachePosition < static_cast<int32_t>(vertexCacheSize), "")
-            (cachePosition, vertexCacheSize);
+            X_ASSERT(cachePosition < static_cast<int32_t>(vertexCacheSize), "")(cachePosition, vertexCacheSize); 
             // Points for being high in the cache.
             const float32_t scaler = 1.0f / (vertexCacheSize - 3);
             score = 1.0f - (cachePosition - 3) * scaler;

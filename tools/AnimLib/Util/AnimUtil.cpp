@@ -8,19 +8,15 @@ namespace Util
     void transformBones(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats,
         core::span<const uint8_t> parents, const int32_t firstJoint, const int32_t lastJoint)
     {
-        X_ASSERT(lastJoint < safe_static_cast<int32_t>(mats.size()), "out of range")
-        (lastJoint, mats.size());
-        X_ASSERT(firstJoint <= lastJoint, "out of range")
-        (firstJoint, lastJoint);
+        X_ASSERT(lastJoint < safe_static_cast<int32_t>(mats.size()), "out of range")(lastJoint, mats.size()); 
+        X_ASSERT(firstJoint <= lastJoint, "out of range")(firstJoint, lastJoint); 
 
         for (int32_t i = firstJoint; i <= lastJoint; i++) {
             auto parentIdx = parents[i];
-            X_ASSERT(parentIdx < mats.size(), "Parent out of range")
-            (parentIdx);
+            X_ASSERT(parentIdx < mats.size(), "Parent out of range")(parentIdx); 
 
             // make sure our parent has been transformed.
-            X_ASSERT(parentIdx < i, "Parent is not yet transformed")
-            (parentIdx, i);
+            X_ASSERT(parentIdx < i, "Parent is not yet transformed")(parentIdx, i); 
             auto& parent = mats[parentIdx];
 
             mats[i] = parent * mats[i];
@@ -30,8 +26,7 @@ namespace Util
     void blendBones(core::Array<Transformf>& bones, const core::Array<Transformf>& blendTrans,
         const core::Array<int32_t>& indexes, float lerp)
     {
-        X_ASSERT(bones.size() == blendTrans.size(), "size mismatch")
-        ();
+        X_ASSERT(bones.size() == blendTrans.size(), "size mismatch")(); 
 
         int32_t num = safe_static_cast<int32_t>(indexes.size());
         for (int32_t i = 0; i < num; i++) {
@@ -47,8 +42,7 @@ namespace Util
     void convertBoneTransToMatrix(core::Array<Matrix44f, core::ArrayAlignedAllocatorFixed<Matrix44f, 16>>& mats,
         const core::Array<Transformf>& trans)
     {
-        X_ASSERT(mats.size() == trans.size(), "size mismatch")
-        ();
+        X_ASSERT(mats.size() == trans.size(), "size mismatch")(); 
 
         int32_t num = safe_static_cast<int32_t>(mats.size());
         for (int32_t i = 0; i < num; i++) {

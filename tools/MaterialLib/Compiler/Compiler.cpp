@@ -206,8 +206,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
             return false;
         }
 
-        X_ASSERT(tex.value.isNotEmpty(), "Texture has a empty value")
-        ();
+        X_ASSERT(tex.value.isNotEmpty(), "Texture has a empty value")(); 
     }
 
     // process samplers.
@@ -326,10 +325,8 @@ bool MaterialCompiler::writeToFile(core::XFile* pFile) const
     static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<decltype(MaterialTextureHdr::nameLen)>::max(),
         "Material only supports 255 max name len");
 
-    X_ASSERT(cat_ != MaterialCat::UNKNOWN, "MatCat can't be unknown")
-    ();
-    X_ASSERT(techType_.isNotEmpty(), "TechType can't be empty")
-    ();
+    X_ASSERT(cat_ != MaterialCat::UNKNOWN, "MatCat can't be unknown")(); 
+    X_ASSERT(techType_.isNotEmpty(), "TechType can't be empty")(); 
 
     MaterialHeader hdr;
     hdr.fourCC = MTL_B_FOURCC;

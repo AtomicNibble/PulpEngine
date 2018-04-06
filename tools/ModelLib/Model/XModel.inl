@@ -23,8 +23,7 @@ X_INLINE int32_t XModel::getNumMeshTotal(void) const
 
 X_INLINE int32_t XModel::getNumVerts(size_t lodIdx) const
 {
-    X_ASSERT(lodIdx < static_cast<size_t>(getNumLods()), "invalid lod index")
-    (getNumLods(), lodIdx);
+    X_ASSERT(lodIdx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), lodIdx); 
 
     return pHdr_->lodInfo[lodIdx].numVerts;
 }
@@ -76,30 +75,26 @@ X_INLINE const Sphere& XModel::boundingSphere(size_t lodIdx) const
 
 X_INLINE const LODHeader& XModel::getLod(size_t idx) const
 {
-    X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")
-    (getNumLods(), idx);
+    X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx); 
     return pHdr_->lodInfo[idx];
 }
 
 X_INLINE const MeshHeader& XModel::getLodMeshHdr(size_t idx) const
 {
-    X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")
-    (getNumLods(), idx);
+    X_ASSERT(idx < static_cast<size_t>(getNumLods()), "invalid lod index")(getNumLods(), idx); 
     return pHdr_->lodInfo[idx];
 }
 
 X_INLINE const SubMeshHeader& XModel::getMeshHead(size_t idx) const
 {
-    X_ASSERT(idx < static_cast<size_t>(getNumMeshTotal()), "invalid mesh index")
-    (getNumMeshTotal(), idx);
+    X_ASSERT(idx < static_cast<size_t>(getNumMeshTotal()), "invalid mesh index")(getNumMeshTotal(), idx); 
     X_ASSERT_NOT_NULL(pMeshHeads_);
     return pMeshHeads_[idx];
 }
 
 X_INLINE const char* XModel::getBoneName(size_t idx) const
 {
-    X_ASSERT(static_cast<int32_t>(idx) < getNumBones(), "invalid bone index")
-    (getNumBones(), idx);
+    X_ASSERT(static_cast<int32_t>(idx) < getNumBones(), "invalid bone index")(getNumBones(), idx); 
 
     // temp hack.
     const char* pBoneName = (char*)(data_.ptr() + sizeof(ModelHeader) + pTagNames_[idx]);

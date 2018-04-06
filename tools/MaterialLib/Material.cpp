@@ -27,8 +27,7 @@ void Material::assignProps(const Material& oth)
 
 void Material::assignProps(const MaterialHeader& hdr)
 {
-    X_ASSERT(hdr.isValid(), "Header must be valid")
-    (hdr.isValid());
+    X_ASSERT(hdr.isValid(), "Header must be valid")(hdr.isValid()); 
 
     flags_ = hdr.flags;
     surfaceType_ = hdr.surfaceType;

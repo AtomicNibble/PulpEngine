@@ -300,10 +300,8 @@ namespace Converter
     Kernel1::Kernel1(core::MemoryArenaBase* arena, const Filter& f, int32_t iscale, int32_t samples /*= 32*/) :
         data_(arena)
     {
-        X_ASSERT(iscale > 1, "Scale must be positive")
-        (iscale);
-        X_ASSERT(samples > 0, "Samples must be greater than zero")
-        (samples);
+        X_ASSERT(iscale > 1, "Scale must be positive")(iscale); 
+        X_ASSERT(samples > 0, "Samples must be greater than zero")(samples); 
 
         const float scale = 1.0f / iscale;
 
@@ -390,8 +388,7 @@ namespace Converter
     // Init laplacian filter, usually used for sharpening.
     void Kernel2::initLaplacian(void)
     {
-        X_ASSERT(windowSize_ == 3, "Window size must be 3")
-        (windowSize_);
+        X_ASSERT(windowSize_ == 3, "Window size must be 3")(windowSize_); 
 
         //	data_[0] = -1; data_[1] = -1; data_[2] = -1;
         //	data_[3] = -1; data_[4] = +8; data_[5] = -1;
@@ -415,8 +412,7 @@ namespace Converter
     // Init simple edge detection filter.
     void Kernel2::initEdgeDetection(void)
     {
-        X_ASSERT(windowSize_ == 3, "Window size must be 3")
-        (windowSize_);
+        X_ASSERT(windowSize_ == 3, "Window size must be 3")(windowSize_); 
 
         data_[0] = 0;
         data_[1] = 0;
@@ -519,8 +515,7 @@ namespace Converter
     // Init blended sobel filter.
     void Kernel2::initBlendedSobel(const Vec4f& scale)
     {
-        X_ASSERT(windowSize_ == 9, "Window size must be 9")
-        (windowSize_);
+        X_ASSERT(windowSize_ == 9, "Window size must be 9")(windowSize_); 
 
         {
             const float elements[] = {
@@ -638,8 +633,7 @@ namespace Converter
         uint32_t srcLength, uint32_t dstLength, int32_t samples /*= 32*/) :
         data_(arena)
     {
-        X_ASSERT(samples > 0, "Samples must be greater than zero")
-        (samples);
+        X_ASSERT(samples > 0, "Samples must be greater than zero")(samples); 
 
         float scale = float(dstLength) / float(srcLength);
         const float iscale = 1.0f / scale;
@@ -661,8 +655,7 @@ namespace Converter
 
             const int32_t left = static_cast<int32_t>(math<float>::floor(center - width_));
             const int32_t right = static_cast<int32_t>(math<float>::ceil(center + width_));
-            X_ASSERT(right - left <= windowSize_, "Range is bigger than window size")
-            (right, left, right - left, windowSize_);
+            X_ASSERT(right - left <= windowSize_, "Range is bigger than window size")(right, left, right - left, windowSize_); 
 
             float total = 0.0f;
             for (int32_t j = 0; j < windowSize_; j++) {

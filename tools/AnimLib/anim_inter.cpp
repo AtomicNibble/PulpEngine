@@ -186,8 +186,7 @@ namespace Inter
             buf.appendFmt("BONE_DATA // \"%s\"\n", bone.name.c_str());
             stream.write(buf.c_str(), buf.length());
 
-            X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")
-            (bone.data.size(), numFrames);
+            X_ASSERT(static_cast<int32_t>(bone.data.size()) == numFrames, "Don't have bone data for all frames")(bone.data.size(), numFrames); 
 
             for (int32_t i = 0; i < numFrames; i++) {
                 const anim::Inter::FrameData& data = bone.data[i];
@@ -510,8 +509,7 @@ namespace Inter
 
     bool Anim::ReadFrameData(core::XLexer& lex, int32_t numBones)
     {
-        X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")
-        (numBones, bones_.size());
+        X_ASSERT(numBones == bones_.size(), "bones size should alread equal numbones")(numBones, bones_.size()); 
 
         // for each bone there is numFrames worth of data.
         // in bone order.

@@ -73,8 +73,7 @@ X_INLINE const char* Anim::getNoteValue(int32_t idx) const
 
 X_INLINE const Note* Anim::getNote(int32_t idx) const
 {
-    X_ASSERT(idx < pNoteHdr_->num, "Note idx out of range")
-    (idx, pNoteHdr_->num);
+    X_ASSERT(idx < pNoteHdr_->num, "Note idx out of range")(idx, pNoteHdr_->num); 
     return getNotes() + idx;
 }
 

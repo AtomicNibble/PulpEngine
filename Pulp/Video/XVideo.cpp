@@ -71,8 +71,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
     // do we need a new encoded frame?
     if (encodedFrame_.isEmpty()) {
-        X_ASSERT(pDecodeJob_ == nullptr, "Deocde job not null")
-        (pDecodeJob_);
+        X_ASSERT(pDecodeJob_ == nullptr, "Deocde job not null")(pDecodeJob_); 
 
         if (ringBuffer_.size() > sizeof(IVFFrameHdr)) {
             auto& hdr = ringBuffer_.peek<IVFFrameHdr>();
@@ -203,8 +202,7 @@ bool Video::processHdr(core::XFileAsync* pFile, const IVFHdr& hdr)
 void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
     core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-    X_ASSERT(pRequest->getType() == core::IoRequest::READ, "Unexpected request type")
-    ();
+    X_ASSERT(pRequest->getType() == core::IoRequest::READ, "Unexpected request type")(); 
 
     auto* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
     uint8_t* pBuf = static_cast<uint8_t*>(pReadReq->pBuf);
@@ -213,8 +211,7 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
         core::CriticalSection::ScopedLock lock(cs_);
 
         // the io buffer has loaded, copy into ring buffer.
-        X_ASSERT(ringBuffer_.freeSpace() >= pReadReq->dataSize, "No space to put IO data")
-        (ringBuffer_.freeSpace(), pReadReq->dataSize);
+        X_ASSERT(ringBuffer_.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(ringBuffer_.freeSpace(), pReadReq->dataSize); 
 
         ringBuffer_.write(pBuf, bytesTransferred);
 
@@ -265,8 +262,7 @@ bool Video::decodeFrame(void)
 {
     core::CriticalSection::ScopedLock lock(cs_);
 
-    X_ASSERT(encodedFrame_.isNotEmpty(), "Encoded frame is empty")
-    (encodedFrame_.size());
+    X_ASSERT(encodedFrame_.isNotEmpty(), "Encoded frame is empty")(encodedFrame_.size()); 
 
     if (vpx_codec_decode(&codec_, encodedFrame_.data(), static_cast<uint32_t>(encodedFrame_.size()), nullptr, 0)) {
         X_ERROR("Vid", "Failed to decode frame: \"%s\"", vpx_codec_error_detail(&codec_));

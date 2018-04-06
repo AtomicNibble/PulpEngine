@@ -212,8 +212,7 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
 
         if (d.HasMember(buf.c_str())) {
             auto& val = d[buf.c_str()];
-            X_ASSERT(val.GetType() == core::json::Type::kNumberType, "invalid lod distance type")
-            (val.GetType());
+            X_ASSERT(val.GetType() == core::json::Type::kNumberType, "invalid lod distance type")(val.GetType()); 
             model.setLodDistance(d[buf.c_str()].GetFloat(), i);
         }
     }

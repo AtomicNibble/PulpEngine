@@ -288,8 +288,7 @@ void AnimCompiler::Position::calculateFullFrames(void)
 
 void AnimCompiler::Position::calculateDeltaFrames(const float posError)
 {
-    X_ASSERT(relPos_.size() == fullPos_.size(), "Rel pos data size mistmatch")
-    ();
+    X_ASSERT(relPos_.size() == fullPos_.size(), "Rel pos data size mistmatch")(); 
 
     posFrames_.clear();
     posFrames_.reserve(relPos_.size());
@@ -386,10 +385,8 @@ void AnimCompiler::Position::calculateDeltaFrames(const float posError)
         return;
     }
     else {
-        X_ASSERT(min_ != Vec3f::max(), "Infinate range")
-        ();
-        X_ASSERT(max_ != Vec3f::min(), "Infinate range")
-        ();
+        X_ASSERT(min_ != Vec3f::max(), "Infinate range")(); 
+        X_ASSERT(max_ != Vec3f::min(), "Infinate range")(); 
     }
 }
 
@@ -434,8 +431,7 @@ void AnimCompiler::Position::buildScalers(const float posError)
         // i know what the max is, i just think numeric_limits makes code intention more clear
         auto max = std::numeric_limits<uint8_t>::max();
         for (auto& scaler : scalers_) {
-            X_ASSERT(scaler.x <= max && scaler.x <= max && scaler.x <= max, "Invalid scaler")
-            (scaler.x, scaler.y, scaler.z);
+            X_ASSERT(scaler.x <= max && scaler.x <= max && scaler.x <= max, "Invalid scaler")(scaler.x, scaler.y, scaler.z); 
         }
     }
 #endif
@@ -983,8 +979,7 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
             auto numFrames = inter_.getNumFrames();
             auto fraction = static_cast<float>(n.frame) / numFrames;
 
-            X_ASSERT(fraction >= 0.f && fraction <= 1.f, "Fraction out of range")
-            (fraction);
+            X_ASSERT(fraction >= 0.f && fraction <= 1.f, "Fraction out of range")(fraction); 
 
             Note note;
             note.value = safe_static_cast<uint16_t>(noteValueOffset);

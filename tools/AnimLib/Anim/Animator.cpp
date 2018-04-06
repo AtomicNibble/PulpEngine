@@ -115,8 +115,7 @@ bool AnimBlend::blend(core::TimeVal currentTime, TransformArr& scratchTrans, Tra
 
     auto time = animTime(currentTime);
 
-    X_ASSERT(time >= 0_tv, "Negative time value")
-    (time);
+    X_ASSERT(time >= 0_tv, "Negative time value")(time); 
 
     TransformArr* pTransArr = &boneTransOut;
 
@@ -257,8 +256,7 @@ core::TimeVal AnimBlend::animTime(core::TimeVal currentTime) const
         return currentTime - startTime_;
     }
 
-    X_ASSERT(rate_ >= 0.f, "Invalid rate")
-    (rate_);
+    X_ASSERT(rate_ >= 0.f, "Invalid rate")(rate_); 
 
     auto elapsed = (currentTime - startTime_).GetValue();
     auto scaled = static_cast<core::TimeVal::TimeType>(static_cast<float>(elapsed) * rate_);
@@ -303,8 +301,7 @@ void AnimBlend::setCycleCount(int32_t numCycles)
 
 void AnimBlend::setRate(float rate)
 {
-    X_ASSERT(rate >= 0.f, "Invalid rate")
-    (rate);
+    X_ASSERT(rate >= 0.f, "Invalid rate")(rate); 
 
     if (rate_ == rate) {
         return;
@@ -493,8 +490,7 @@ void Animator::playAnim(const Anim* pAnim, core::TimeVal startTime, core::TimeVa
         float playMs = playTime.GetMilliSeconds();
 
         // maybe allow this and just don't play the anim.
-        X_ASSERT(playMs > 0.f, "invalid play duration")
-        (playMs);
+        X_ASSERT(playMs > 0.f, "invalid play duration")(playMs); 
 
         float rate = durMs / playMs;
 
@@ -569,8 +565,7 @@ bool Animator::getBoneTransform(model::BoneHandle handle, core::TimeVal currentT
         return false;
     }
 
-    X_ASSERT(handle < pModel_->getNumBones(), "Out of range")
-    (handle, pModel_->getNumBones());
+    X_ASSERT(handle < pModel_->getNumBones(), "Out of range")(handle, pModel_->getNumBones()); 
 
     // create a frame if needed,
     createFrame(currentTime);

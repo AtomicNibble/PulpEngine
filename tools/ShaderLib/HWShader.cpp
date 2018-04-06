@@ -72,8 +72,7 @@ namespace shader
 
     bool XHWShader::compileFromSource(const ByteArr& source, CompileFlags flags)
     {
-        X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")
-        (status_);
+        X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")(status_); 
 
         const auto id = core::Thread::GetCurrentID();
 
@@ -100,8 +99,7 @@ namespace shader
         }
 #endif
 
-        X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")
-        ();
+        X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")(); 
 
         compileFlags_ = flags;
 
@@ -437,8 +435,7 @@ namespace shader
 
                 const int32_t reg = (CDesc.StartOffset >> 4);
 
-                X_ASSERT(reg << 4 == CDesc.StartOffset, "Offset not multiple of 16")
-                (reg, CDesc.StartOffset);
+                X_ASSERT(reg << 4 == CDesc.StartOffset, "Offset not multiple of 16")(reg, CDesc.StartOffset); 
 
                 XShaderParam bind;
                 bind.setName(CDesc.Name);
@@ -613,8 +610,7 @@ namespace shader
 
             InputLayoutFormat::Enum fmt = pILnode->GetILFmt();
 
-            X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")
-            (fmt);
+            X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt); 
             // work out the format from the node.
             X_LOG0_IF(vars_.compileDebug(), "Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
 

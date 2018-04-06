@@ -1372,8 +1372,7 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
         return Result::ERROR;
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")
-    ();
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
     // do we have any refs ?
     uint32_t numRefs;
@@ -1469,8 +1468,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
         return Result::NAME_TAKEN;
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")
-    ();
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
     // check for raw assets that need renaming to keep things neat.
     {
@@ -1551,8 +1549,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
         X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")
-    ();
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
     core::string args(argsOpt);
 
@@ -1691,8 +1688,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
         X_WARNING("AssetDB", "Added asset to db as it didnt exists when trying to update the asset");
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")
-    ();
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
     core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
     const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
@@ -1725,10 +1721,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
     AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
 {
     X_UNUSED(trans); // not used, just ensures you have taken one.
-    X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")
-    (assetId);
-    X_ASSERT(name.isNotEmpty(), "Name can't be empty")
-    (name.length());
+    X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId); 
+    X_ASSERT(name.isNotEmpty(), "Name can't be empty")(name.length()); 
 
     // lets not allow this to be called wiht no data.
     if (compressedData.isEmpty()) {
@@ -1860,8 +1854,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
         return Result::NOT_FOUND;
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")
-    (assetId, name);
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name); 
 
     core::string args(argsOpt);
 
@@ -1903,8 +1896,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
         return Result::NOT_FOUND;
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")
-    (assetId, name);
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name); 
 
     return UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
 }
@@ -1943,8 +1935,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
         return Result::NOT_FOUND;
     }
 
-    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")
-    (assetId, name);
+    X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId not valid")(assetId, name); 
 
     return UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
 }
@@ -2194,8 +2185,7 @@ bool AssetDB::GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut)
 
 #if X_ENABLE_ASSERTIONS
     const auto bytesLeft = file.remainingBytes();
-    X_ASSERT(bytesLeft == 0, "Failed to read whole rawAsset")
-    (bytesLeft);
+    X_ASSERT(bytesLeft == 0, "Failed to read whole rawAsset")(bytesLeft); 
 #endif // X_ENABLE_ASSERTIONS
 
     // decompress it.

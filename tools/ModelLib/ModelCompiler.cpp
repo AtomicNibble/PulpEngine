@@ -180,8 +180,7 @@ ModelCompiler::Binds::Binds(core::MemoryArenaBase* arena) :
 bool ModelCompiler::Binds::write(core::FixedByteStreamBase& stream)
 {
     if (simple_.isNotEmpty()) {
-        X_ASSERT(stream_.size() == 0, "Complex binds not empty")
-        (stream_.size());
+        X_ASSERT(stream_.size() == 0, "Complex binds not empty")(stream_.size()); 
         stream.write(simple_.ptr(), simple_.size());
     }
     else if (stream_.size() > 0) {
@@ -294,10 +293,8 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
             auto& vert = verts[i];
 
 #if X_DEBUG
-            X_ASSERT(vert.binds_.isNotEmpty(), "No binds")
-            ();
-            X_ASSERT(lastBindCount <= vert.binds_.size(), "Verts should be sorted by bind counts")
-            (lastBindCount, vert.binds_.size());
+            X_ASSERT(vert.binds_.isNotEmpty(), "No binds")(); 
+            X_ASSERT(lastBindCount <= vert.binds_.size(), "Verts should be sorted by bind counts")(lastBindCount, vert.binds_.size()); 
             lastBindCount = vert.binds_.size();
 #endif
 
@@ -442,22 +439,19 @@ ColMeshType::Enum ModelCompiler::ColMesh::getType(void) const
 
 const AABB& ModelCompiler::ColMesh::getBoundingBox(void) const
 {
-    X_ASSERT(getType() == ColMeshType::BOX, "Invalid call on non AABB mesh")
-    ();
+    X_ASSERT(getType() == ColMeshType::BOX, "Invalid call on non AABB mesh")(); 
     return boundingBox_;
 }
 
 const Sphere& ModelCompiler::ColMesh::getBoundingSphere(void) const
 {
-    X_ASSERT(getType() == ColMeshType::SPHERE, "Invalid call on non sphere mesh")
-    ();
+    X_ASSERT(getType() == ColMeshType::SPHERE, "Invalid call on non sphere mesh")(); 
     return boundingSphere_;
 }
 
 const ModelCompiler::ColMesh::CookedData& ModelCompiler::ColMesh::getCookedConvexData(void) const
 {
-    X_ASSERT(getType() == ColMeshType::CONVEX, "Invalid call on non convext mesh")
-    ();
+    X_ASSERT(getType() == ColMeshType::CONVEX, "Invalid call on non convext mesh")(); 
     return cooked_;
 }
 
@@ -544,10 +538,8 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
             }
 
             // stream should be full.
-            X_ASSERT(stream.isEos(), "Logic error")
-            ();
-            X_ASSERT(stream.size() == requiredBytes, "Logic error")
-            ();
+            X_ASSERT(stream.isEos(), "Logic error")(); 
+            X_ASSERT(stream.size() == requiredBytes, "Logic error")(); 
 
             cooked_.resize(requiredBytes);
             std::memcpy(cooked_.data(), stream.begin(), stream.size());
@@ -806,8 +798,7 @@ void ModelCompiler::setFlags(CompileFlags flags)
 
 void ModelCompiler::setLodDistance(float32_t dis, size_t lodIdx)
 {
-    X_ASSERT(lodIdx < model::MODEL_MAX_LODS, "Invalid lod index")
-    (lodIdx, model::MODEL_MAX_LODS);
+    X_ASSERT(lodIdx < model::MODEL_MAX_LODS, "Invalid lod index")(lodIdx, model::MODEL_MAX_LODS); 
     lodDistances_[lodIdx] = dis;
 }
 
@@ -979,13 +970,11 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
     size_t numRootBones = calculateRootBoneCount();
     header.numRootBones = safe_static_cast<uint8_t>(numRootBones);
 
-    X_ASSERT(header.numRootBones > 0, "Must have atleast one root bone")
-    (header.numRootBones, bones_.size());
+    X_ASSERT(header.numRootBones > 0, "Must have atleast one root bone")(header.numRootBones, bones_.size()); 
 
     // check all the root bones comes first.
     for (size_t i = 0; i < numRootBones; i++) {
-        X_ASSERT(bones_[i].parIndx_ < 0, "Expected root bone")
-        (i, bones_[i].parIndx_);
+        X_ASSERT(bones_[i].parIndx_ < 0, "Expected root bone")(i, bones_[i].parIndx_); 
     }
 
     header.numBones = safe_static_cast<uint8_t, size_t>(bones_.size());
@@ -1171,8 +1160,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
         }
 
         // relative data.
-        X_ASSERT(bones_.size() == relativeBoneInfo_.size(), "Size mismatch")
-        ();
+        X_ASSERT(bones_.size() == relativeBoneInfo_.size(), "Size mismatch")(); 
         for (size_t i = 0; i < bones_.size(); i++) {
             XQuatCompressedf quat(relativeBoneInfo_[i].rotation);
             boneDataStream.write(quat);
@@ -1253,8 +1241,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
                 case ColGenType::KDOP_18:
                 case ColGenType::KDOP_26:
                     // we generated one convex mesh.
-                    X_ASSERT(lod0.numColMeshes() == 1, "Should have only one col mesh")
-                    (lod0.numColMeshes());
+                    X_ASSERT(lod0.numColMeshes() == 1, "Should have only one col mesh")(lod0.numColMeshes()); 
                     colHdr.shapeCounts[ColMeshType::CONVEX] = 1;
                     idxMap.append(-1); // it's global.
                     break;
@@ -1296,12 +1283,10 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
                 case ColGenType::KDOP_26: {
                     const auto& meshes = lod0.meshes_;
 
-                    X_ASSERT(meshes.isNotEmpty(), "No meshes with auto phys")
-                    (meshes.size());
+                    X_ASSERT(meshes.isNotEmpty(), "No meshes with auto phys")(meshes.size()); 
                     const auto& meshe = meshes[0];
 
-                    X_ASSERT(meshe.colMeshes_.isNotEmpty(), "No col meshes on first mesh")
-                    (meshe.colMeshes_.size());
+                    X_ASSERT(meshe.colMeshes_.isNotEmpty(), "No col meshes on first mesh")(meshe.colMeshes_.size()); 
                     const auto& colMesh = meshe.colMeshes_[0];
 
                     writeColMesh(physDataStream, colMesh);
@@ -1399,8 +1384,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
             boneIdxMap.push_back(pShape->getBoneIdx());
         }
 
-        X_ASSERT(sortedHitShapes.size() == boneIdxMap.size(), "Sizes should match")
-        (sortedHitShapes.size(), boneIdxMap.size());
+        X_ASSERT(sortedHitShapes.size() == boneIdxMap.size(), "Sizes should match")(sortedHitShapes.size(), boneIdxMap.size()); 
 
         hitboxDataStream.write(hitBoxHdr);
         hitboxDataStream.write(boneIdxMap.data(), boneIdxMap.size());
@@ -1590,33 +1574,20 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
     // write everything to file.
     {
         // sanity checks.
-        X_ASSERT(matNameStream.size() == header.materialNameDataSize, "Incorrect size")
-        ();
-        X_ASSERT(tagNameStream.size() == header.tagNameDataSize, "Incorrect size")
-        ();
-        X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")
-        (boneDataStream.size(), header.boneDataSize);
-        X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")
-        ();
-        X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")
-        ();
-        X_ASSERT(meshDataStream.size() == (header.meshDataSize + meshDataNumPadBytes), "Incorrect size")
-        (meshDataStream.size(), header.meshDataSize, meshDataNumPadBytes);
+        X_ASSERT(matNameStream.size() == header.materialNameDataSize, "Incorrect size")(); 
+        X_ASSERT(tagNameStream.size() == header.tagNameDataSize, "Incorrect size")(); 
+        X_ASSERT(boneDataStream.size() == header.boneDataSize, "Incorrect size")(boneDataStream.size(), header.boneDataSize); 
+        X_ASSERT(physDataStream.size() == header.physDataSize, "Incorrect size")(); 
+        X_ASSERT(hitboxDataStream.size() == header.hitboxDataBlocks * 64, "Incorrect size")(); 
+        X_ASSERT(meshDataStream.size() == (header.meshDataSize + meshDataNumPadBytes), "Incorrect size")(meshDataStream.size(), header.meshDataSize, meshDataNumPadBytes); 
 
-        X_ASSERT(matNameStream.freeSpace() == 0, "Stream incomplete")
-        ();
-        X_ASSERT(tagNameStream.freeSpace() == 0, "Stream incomplete")
-        ();
-        X_ASSERT(boneDataStream.freeSpace() == 0, "Stream incomplete")
-        ();
-        X_ASSERT(physDataStream.freeSpace() == 0, "Stream incomplete")
-        ();
-        X_ASSERT(hitboxDataStream.freeSpace() == 0, "Stream incomplete")
-        ();
-        X_ASSERT(meshDataNumPadBytes <= maxMeshDataPadSize, "Padding error")
-        ();
-        X_ASSERT(meshDataStream.freeSpace() == (maxMeshDataPadSize - meshDataNumPadBytes), "Stream incomplete")
-        (meshDataStream.freeSpace(), maxMeshDataPadSize, meshDataNumPadBytes);
+        X_ASSERT(matNameStream.freeSpace() == 0, "Stream incomplete")(); 
+        X_ASSERT(tagNameStream.freeSpace() == 0, "Stream incomplete")(); 
+        X_ASSERT(boneDataStream.freeSpace() == 0, "Stream incomplete")(); 
+        X_ASSERT(physDataStream.freeSpace() == 0, "Stream incomplete")(); 
+        X_ASSERT(hitboxDataStream.freeSpace() == 0, "Stream incomplete")(); 
+        X_ASSERT(meshDataNumPadBytes <= maxMeshDataPadSize, "Padding error")(); 
+        X_ASSERT(meshDataStream.freeSpace() == (maxMeshDataPadSize - meshDataNumPadBytes), "Stream incomplete")(meshDataStream.freeSpace(), maxMeshDataPadSize, meshDataNumPadBytes); 
 
         header.meshDataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
         header.dataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
@@ -1649,8 +1620,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
         // make sure this stream starts on a aligned boundry.
         const size_t paddedSize = (MODEL_STREAM_ALIGN - file.tell() % MODEL_STREAM_ALIGN);
 
-        X_ASSERT(paddedSize == preMeshDataPadSize, "Alignment size mismatch")
-        (paddedSize, preMeshDataPadSize);
+        X_ASSERT(paddedSize == preMeshDataPadSize, "Alignment size mismatch")(paddedSize, preMeshDataPadSize); 
 
         char pad[MODEL_STREAM_ALIGN] = {};
         if (file.write(pad, paddedSize) != paddedSize) {
@@ -1661,8 +1631,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 #if X_ENABLE_ASSERTIONS
         const auto fileSize = file.tell();
 
-        X_ASSERT((fileSize % MODEL_STREAM_ALIGN) == 0, "Not aligned")
-        (fileSize, fileSize);
+        X_ASSERT((fileSize % MODEL_STREAM_ALIGN) == 0, "Not aligned")(fileSize, fileSize); 
 #endif // !X_ENABLE_ASSERTIONS
 
         if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
@@ -1671,8 +1640,7 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
         }
     }
 
-    X_ASSERT(file.tell() == (header.dataSize + sizeof(header)), "Incorrect header size")
-    (file.tell(), header.dataSize + sizeof(header));
+    X_ASSERT(file.tell() == (header.dataSize + sizeof(header)), "Incorrect header size")(file.tell(), header.dataSize + sizeof(header)); 
     return true;
 }
 
@@ -2692,8 +2660,7 @@ void ModelCompiler::MergeVertsJob(Mesh* pMesh, uint32_t count)
         {
             hash.clear();
 
-            X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")
-            (arena_->isThreadSafe());
+            X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")(arena_->isThreadSafe()); 
             Mesh::VertsArr v(arena_);
 
             v.swap(mesh.verts_);
@@ -2866,8 +2833,7 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
     typedef core::Array<int32_t> IdxArray;
 
     // requires thread safe allocator.
-    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")
-    (arena_->isThreadSafe());
+    X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe")(arena_->isThreadSafe()); 
 
     IdxArray srcToDstIdx(arena_);
     IdxArray dstToSrcIdx(arena_);
@@ -2924,8 +2890,7 @@ void ModelCompiler::SortVertsJob(Mesh* pMesh, uint32_t count)
                 return v1.binds_.size() < v2.binds_.size();
             });
 
-        X_ASSERT(sorted, "Not sorted")
-        (sorted);
+        X_ASSERT(sorted, "Not sorted")(sorted); 
 #endif // !X_ENABLE_ASSERTIONS
     }
 }

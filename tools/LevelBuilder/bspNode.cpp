@@ -225,8 +225,7 @@ void bspNode::SplitPortals(XPlaneSet& planes)
         }
     }
 
-    X_ASSERT(portals == nullptr, "Portals should be null post split")
-    (portals);
+    X_ASSERT(portals == nullptr, "Portals should be null post split")(portals); 
 }
 
 void bspNode::FillOutside_r(FillStats& stats)
