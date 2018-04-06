@@ -179,9 +179,7 @@ public:
 
     X_INLINE Resource* findAsset(const core::string& name) const
     {
-        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
-            "asset name has invalid slash")
-        (name.c_str());
+        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,"asset name has invalid slash")(name.c_str());
 
         auto it = hash_.find(name);
         if (it != hash_.end()) {
@@ -199,9 +197,7 @@ public:
     template<class... Args>
     Resource* createAsset(const core::string& name, Args&&... args)
     {
-        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,
-            "asset name has invalid slash")
-        (name.c_str());
+        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr,"asset name has invalid slash")(name.c_str());
 
         Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
