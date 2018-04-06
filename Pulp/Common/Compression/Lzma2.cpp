@@ -92,12 +92,12 @@ namespace Compression
             }
 
         private:
-            static void* __fastcall allocLam(void* p, size_t size)
+            static void* allocLam(void* p, size_t size)
             {
                 ArenaAlloc* pThis = reinterpret_cast<ArenaAlloc*>(p);
                 return X_NEW_ARRAY(uint8_t, size, pThis->arena_, "LzmaData");
             }
-            static void __fastcall freeLam(void* p, void* address)
+            static void freeLam(void* p, void* address)
             {
                 ArenaAlloc* pThis = reinterpret_cast<ArenaAlloc*>(p);
                 uint8_t* pData = reinterpret_cast<uint8_t*>(address);
