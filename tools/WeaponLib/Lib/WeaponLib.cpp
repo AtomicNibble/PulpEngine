@@ -8,48 +8,45 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
+    WeaponLib::WeaponLib()
+    {
+    }
 
-	WeaponLib::WeaponLib()
-	{
-	}
+    WeaponLib::~WeaponLib()
+    {
+    }
 
-	WeaponLib::~WeaponLib()
-	{
+    const char* WeaponLib::getOutExtension(void) const
+    {
+        return WEAPON_FILE_EXTENSION;
+    }
 
-	}
+    bool WeaponLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
+    {
+        X_UNUSED(host, assetId, args, destPath);
 
-	const char* WeaponLib::getOutExtension(void) const
-	{
-		return WEAPON_FILE_EXTENSION;
-	}
+        WeaponCompiler compiler;
 
-	bool WeaponLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
-	{
-		X_UNUSED(host, assetId, args, destPath);
+        if (!compiler.loadFromJson(args)) {
+            X_ERROR("Weapon", "Error parsing weapon args");
+            return false;
+        }
 
+        core::XFileScoped file;
+        core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
-		WeaponCompiler compiler;
+        if (!file.openFile(destPath.c_str(), mode)) {
+            X_ERROR("Weapon", "Failed to open output file");
+            return false;
+        }
 
-		if (!compiler.loadFromJson(args)) {
-			X_ERROR("Weapon", "Error parsing weapon args");
-			return false;
-		}
+        if (!compiler.writeToFile(file.GetFile())) {
+            X_ERROR("Weapon", "Failed to write weapon file");
+            return false;
+        }
 
-		core::XFileScoped file;
-		core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
-
-		if (!file.openFile(destPath.c_str(), mode)) {
-			X_ERROR("Weapon", "Failed to open output file");
-			return false;
-		}
-
-		if (!compiler.writeToFile(file.GetFile())) {
-			X_ERROR("Weapon", "Failed to write weapon file");
-			return false;
-		}
-
-		return true;
-	}
+        return true;
+    }
 
 } // namespace weapon
 
