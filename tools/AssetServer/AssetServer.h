@@ -16,7 +16,6 @@ X_NAMESPACE_DECLARE(ProtoBuf,
         class DeleteAsset;
         class RenameAsset;
         class UpdateAsset;
-        enum Result;
     });
 
 X_NAMESPACE_BEGIN(assetServer)
