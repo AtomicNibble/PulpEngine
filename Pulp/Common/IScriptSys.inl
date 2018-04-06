@@ -245,6 +245,7 @@ X_INLINE bool ScriptValue::copyTo(ScriptFunctionHandle& value) const
 {
     X_UNUSED(value);
     X_ASSERT_NOT_IMPLEMENTED();
+    return false;
 }
 
 X_INLINE bool ScriptValue::copyTo(Vec3f& value) const
