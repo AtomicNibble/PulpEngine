@@ -874,7 +874,7 @@ struct BatchQueryResult
     X_INLINE const HitType& getAnyHit(const uint32_t index) const
     {
         X_ASSERT(index < nbTouches + (hasBlock ? 1 : 0), "")();
-        return index < nbTouches ? touches[index] : block;
+        return index < nbTouches ? pTouches[index] : block;
     }
 };
 
