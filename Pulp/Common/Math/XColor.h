@@ -129,6 +129,14 @@ struct ColorT
     static bool fromString(const char* pBegin, const char* pEnd, ColorT<T>& out, bool slient = true);
 };
 
+
+#include "XColor.inl" // needs to be included before the operators below.
+
+typedef ColorT<float32_t> Color;
+typedef ColorT<float32_t> Colorf;
+typedef ColorT<uint8_t> Color8u;
+typedef ColorT<uint16_t> Color16u;
+
 // Operators
 template<typename T, typename Y>
 inline ColorT<T> operator*(Y s, const ColorT<T>& c)
@@ -137,19 +145,14 @@ inline ColorT<T> operator*(Y s, const ColorT<T>& c)
 }
 
 template<>
-inline ColorT<uint8_t> operator*(float s, const ColorT<uint8_t>& c)
+inline Color8u operator*(float s, const Color8u& c)
 {
-    return ColorT<uint8_t>(
+    return Color8u(
         static_cast<uint8_t>((float)c.r * s),
         static_cast<uint8_t>((float)c.g * s),
         static_cast<uint8_t>((float)c.b * s),
         static_cast<uint8_t>((float)c.a * s));
 }
-
-typedef ColorT<float32_t> Color;
-typedef ColorT<float32_t> Colorf;
-typedef ColorT<uint8_t> Color8u;
-typedef ColorT<uint16_t> Color16u;
 
 // define some colors?
 // got them from: http://prideout.net/archive/colors.php
@@ -301,6 +304,5 @@ typedef ColorT<uint16_t> Color16u;
 #define Col_Yellow Colorf(1.000f, 1.000f, 0.000f)
 #define Col_Yellowgreen Colorf(0.604f, 0.804f, 0.196f)
 
-#include "XColor.inl"
 
 #endif // !_X_MATH_COLOR_H_
