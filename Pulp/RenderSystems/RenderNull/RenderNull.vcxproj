@@ -227,7 +227,7 @@
     <Import Project="..\..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'" Label="PropertySheets">
-    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_clang.props" />
     <Import Project="..\..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\..\solutions\_engine_win32_debug.props" />
     <Import Project="..\..\..\solutions\_engine_dll.props" />
@@ -239,7 +239,7 @@
     <Import Project="..\..\..\solutions\_engine_dll.props" />
   </ImportGroup>
   <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'" Label="PropertySheets">
-    <Import Project="..\..\..\solutions\_engine.props" />
+    <Import Project="..\..\..\solutions\_engine_clang.props" />
     <Import Project="..\..\..\solutions\_engine_link_common.props" />
     <Import Project="..\..\..\solutions\_engine_win64_debug.props" />
     <Import Project="..\..\..\solutions\_engine_dll.props" />
@@ -420,33 +420,21 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
     <Link>
 
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
     <Link>
 
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
     <Link>
 
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
-    <ClCompile>
-      <WarningLevel>Level4</WarningLevel>
-    </ClCompile>
     <Link>
 
     </Link>
