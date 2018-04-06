@@ -98,7 +98,7 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t char
     auto& buffer = destBitMap.GetBuffer();
     const uint32 dstGlyphWidth = destBitMap.GetWidth();
     const uint32 dstGlyphHeight = destBitMap.GetHeight();
-    const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
+  //  const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
 
     // make sure we not relying on zero initialize.
     // this is needed for SDF.
