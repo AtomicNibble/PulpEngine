@@ -42,7 +42,11 @@
 /// \remark The macro relies on \ref X_PP_VA_NUM_ARGS to count the number of arguments for 1 to N arguments. Using
 /// \ref X_PP_IF and \ref X_PP_IS_EMPTY it also handles the edge case of zero arguments, which cannot be done in a
 /// generic way.
-#define X_PP_NUM_ARGS(...)								X_PP_IF(X_PP_IS_EMPTY(__VA_ARGS__), 0, X_PP_VA_NUM_ARGS(__VA_ARGS__))
 
+#if X_COMPILER_CLANG
+#define X_PP_NUM_ARGS(...)								X_PP_VA_NUM_ARGS(__VA_ARGS__)
+#else
+#define X_PP_NUM_ARGS(...)								X_PP_IF(X_PP_IS_EMPTY(__VA_ARGS__), 0, X_PP_VA_NUM_ARGS(__VA_ARGS__))
+#endif
 
 #endif
