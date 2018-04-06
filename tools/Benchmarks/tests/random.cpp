@@ -5,36 +5,36 @@
 
 void BM_rnd_rand(benchmark::State& state)
 {
-	while (state.KeepRunning()) {
-		benchmark::DoNotOptimize(rand());
-	}
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(rand());
+    }
 }
 
 void BM_rnd_multiplycarry(benchmark::State& state)
 {
-	core::random::MultiplyWithCarry mwc;
+    core::random::MultiplyWithCarry mwc;
 
-	while (state.KeepRunning()) {
-		benchmark::DoNotOptimize(mwc.rand());
-	}
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(mwc.rand());
+    }
 }
 
 void BM_rnd_xorshift(benchmark::State& state)
 {
-	core::random::XorShift mwc;
+    core::random::XorShift mwc;
 
-	while (state.KeepRunning()) {
-		benchmark::DoNotOptimize(mwc.rand());
-	}
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(mwc.rand());
+    }
 }
 
 void BM_rnd_xorshift128(benchmark::State& state)
 {
-	core::random::XorShift128 mwc;
+    core::random::XorShift128 mwc;
 
-	while (state.KeepRunning()) {
-		benchmark::DoNotOptimize(mwc.rand());
-	}
+    while (state.KeepRunning()) {
+        benchmark::DoNotOptimize(mwc.rand());
+    }
 }
 
 BENCHMARK(BM_rnd_rand);

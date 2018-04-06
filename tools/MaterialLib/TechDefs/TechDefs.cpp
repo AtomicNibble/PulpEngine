@@ -16,254 +16,241 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace techset
 {
-	// ------------------------------------------------------------------------------
+    // ------------------------------------------------------------------------------
 
-	namespace
-	{
-		TechSetDef* const INVALID_TECH_SET_DEF = reinterpret_cast<TechSetDef*>(std::numeric_limits<uintptr_t>::max());
+    namespace
+    {
+        TechSetDef* const INVALID_TECH_SET_DEF = reinterpret_cast<TechSetDef*>(std::numeric_limits<uintptr_t>::max());
 
-	} // namespace
+    } // namespace
 
-	const char* TechSetDefs::INCLUDE_DIR = "include";
-	const wchar_t* TechSetDefs::INCLUDE_DIR_W = L"include";
+    const char* TechSetDefs::INCLUDE_DIR = "include";
+    const wchar_t* TechSetDefs::INCLUDE_DIR_W = L"include";
 
+    TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
+        arena_(arena),
+        techDefs_(arena, 128),
+        incSourceMap_(arena, 64)
+    {
+    }
 
-	TechSetDefs::TechSetDefs(core::MemoryArenaBase* arena) :
-		arena_(arena),
-		techDefs_(arena, 128),
-		incSourceMap_(arena, 64)
-	{
+    TechSetDefs::~TechSetDefs()
+    {
+        for (const auto& t : techDefs_) {
+            X_DELETE(t.second, arena_);
+        }
+    }
 
-	}
+    bool TechSetDefs::techCatPresent(MaterialCat::Enum cat)
+    {
+        X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-	TechSetDefs::~TechSetDefs()
-	{
-		for (const auto& t : techDefs_)
-		{
-			X_DELETE(t.second, arena_);
-		}
-	}
+        core::Path<char> path(TECH_DEFS_DIR);
+        path /= MaterialCat::ToString(cat);
+        path.toLower();
 
-	bool TechSetDefs::techCatPresent(MaterialCat::Enum cat)
-	{
-		X_ASSERT_NOT_NULL(gEnv->pFileSys);
+        return gEnv->pFileSys->directoryExists(path.c_str());
+    }
 
-		core::Path<char> path(TECH_DEFS_DIR);
-		path /= MaterialCat::ToString(cat);
-		path.toLower();
+    // bool TechSetDefs::getTechCats(TechCatArr& techsOut)
+    bool TechSetDefs::getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut)
+    {
+        X_ASSERT_NOT_NULL(gEnv);
+        X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-		return gEnv->pFileSys->directoryExists(path.c_str());
-	}
+        core::Path<char> path(TECH_DEFS_DIR);
+        path /= MaterialCat::ToString(cat);
+        path.toLower();
 
-	// bool TechSetDefs::getTechCats(TechCatArr& techsOut)
-	bool TechSetDefs::getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut)
-	{
-		X_ASSERT_NOT_NULL(gEnv);
-		X_ASSERT_NOT_NULL(gEnv->pFileSys);
+        if (gEnv->pFileSys->directoryExists(path.c_str())) {
+            if (loadTechCat(cat, typesOut)) {
+                return true;
+            }
 
-		core::Path<char> path(TECH_DEFS_DIR);
-		path /= MaterialCat::ToString(cat);
-		path.toLower();
+            X_WARNING("TechSetDefs", "Failed to load tech types for cat: \"%s\"", MaterialCat::ToString(cat));
+            return false;
+        }
 
-		if (gEnv->pFileSys->directoryExists(path.c_str()))
-		{
-			if (loadTechCat(cat, typesOut)) {
-				return true;
-			}
+        X_WARNING("TechSetDefs", "Directory for material cat missing: \"%s\"", MaterialCat::ToString(cat));
+        return false;
+    }
 
-			X_WARNING("TechSetDefs", "Failed to load tech types for cat: \"%s\"", MaterialCat::ToString(cat));
-			return false;
-		}
+    TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name)
+    {
+        core::Path<char> path;
+        path /= MaterialCat::ToString(cat);
+        path /= name;
+        path.toLower();
+        path.replaceSeprators();
+        path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
-		X_WARNING("TechSetDefs", "Directory for material cat missing: \"%s\"", MaterialCat::ToString(cat));
-		return false;
-	}
+        TechSetDef** pTechDefRef = nullptr;
+        bool loaded = true;
 
-	TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name)
-	{
-		core::Path<char> path;
-		path /= MaterialCat::ToString(cat);
-		path /= name;
-		path.toLower();
-		path.replaceSeprators();
-		path.setExtension(TECH_DEFS_FILE_EXTENSION);
+        {
+            core::CriticalSection::ScopedLock lock(cacheLock_);
 
-		TechSetDef** pTechDefRef = nullptr;
-		bool loaded = true;
+            auto it = techDefs_.find(path);
+            if (it != techDefs_.end()) {
+                pTechDefRef = &it->second;
+            }
+            else {
+                loaded = false;
+                auto insertIt = techDefs_.insert(std::make_pair(path, nullptr));
+                pTechDefRef = &insertIt.first->second;
+            }
+        }
 
-		{
-			core::CriticalSection::ScopedLock lock(cacheLock_);
+        if (loaded) {
+            while (*pTechDefRef == nullptr) {
+                core::Thread::Sleep(1);
+            }
 
-			auto it = techDefs_.find(path);
-			if (it != techDefs_.end())
-			{
-				pTechDefRef = &it->second;
-			}
-			else
-			{
-				loaded = false;
-				auto insertIt = techDefs_.insert(std::make_pair(path, nullptr));
-				pTechDefRef = &insertIt.first->second;
-			}
-		}
+            if (*pTechDefRef == INVALID_TECH_SET_DEF) {
+                return nullptr;
+            }
 
-		if (loaded)
-		{
-			while (*pTechDefRef == nullptr)
-			{
-				core::Thread::Sleep(1);
-			}
+            return *pTechDefRef;
+        }
 
-			if (*pTechDefRef == INVALID_TECH_SET_DEF) {
-				return nullptr;
-			}
+        auto* pTechDef = loadTechDef(path, cat, name);
+        if (!pTechDef) {
+            *pTechDefRef = INVALID_TECH_SET_DEF;
+            return nullptr;
+        }
 
-			return *pTechDefRef;
-		}
+        *pTechDefRef = pTechDef;
+        return pTechDef;
+    }
 
-		auto* pTechDef = loadTechDef(path, cat, name);
-		if (!pTechDef) {
-			*pTechDefRef = INVALID_TECH_SET_DEF;
-			return nullptr;
-		}
+    bool TechSetDefs::loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut)
+    {
+        core::Path<char> path(TECH_DEFS_DIR);
+        path /= MaterialCat::ToString(cat);
+        path.ensureSlash();
+        path.appendFmt("*.%s", TECH_DEFS_FILE_EXTENSION);
+        path.toLower();
 
-		*pTechDefRef = pTechDef;
-		return pTechDef;
-	}
+        core::FindFirstScoped find;
 
-	bool TechSetDefs::loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut)
-	{
-		core::Path<char> path(TECH_DEFS_DIR);
-		path /= MaterialCat::ToString(cat);
-		path.ensureSlash();
-		path.appendFmt("*.%s", TECH_DEFS_FILE_EXTENSION);
-		path.toLower();
+        if (find.findfirst(path.c_str())) {
+            char buf[512];
 
-		core::FindFirstScoped find;
+            core::Path<char> name;
 
-		if (find.findfirst(path.c_str()))
-		{
-			char buf[512];
+            do {
+                const auto& fd = find.fileData();
 
-			core::Path<char> name;
+                if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
+                    continue;
+                }
 
-			do
-			{
-				const auto& fd = find.fileData();
+                // remove the extension.
+                name.set(core::strUtil::Convert(fd.name, buf));
+                name.removeExtension();
 
-				if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
-					continue;
-				}
+                typesOut.emplace_back(name.c_str());
+            } while (find.findNext());
+        }
 
-				// remove the extension.
-				name.set(core::strUtil::Convert(fd.name, buf));
-				name.removeExtension();
+        return true;
+    }
 
-				typesOut.emplace_back(name.c_str());
-			} while (find.findNext());
-		}
+    bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
+    {
+        core::XFileScoped file;
+        core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
 
-		return true;
-	}
+        core::Path<char> fullPath(TECH_DEFS_DIR);
+        fullPath /= path;
 
-	bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
-	{
-		core::XFileScoped file;
-		core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
+        if (!file.openFile(fullPath.c_str(), mode)) {
+            X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", path.c_str());
+            return false;
+        }
 
-		core::Path<char> fullPath(TECH_DEFS_DIR);
-		fullPath /= path;
+        const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
 
-		if (!file.openFile(fullPath.c_str(), mode)) {
-			X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", path.c_str());
-			return false;
-		}
+        bufOut.resize(fileSize);
 
-		const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
+        if (file.read(bufOut.data(), fileSize) != fileSize) {
+            X_ERROR("TechSetDefs", "Failed to read file data");
+            return false;
+        }
 
-		bufOut.resize(fileSize);
+        return true;
+    }
 
-		if (file.read(bufOut.data(), fileSize) != fileSize) {
-			X_ERROR("TechSetDefs", "Failed to read file data");
-			return false;
-		}
+    TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
+    {
+        FileBuf fileData(arena_);
 
-		return true;
-	}
+        if (!loadFile(path, fileData)) {
+            return nullptr;
+        }
 
-	TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
-	{
-		FileBuf fileData(arena_);
+        core::UniquePointer<TechSetDef> techDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
 
-		if (!loadFile(path, fileData)) {
-			return nullptr;
-		}
+        TechSetDef::OpenIncludeDel incDel;
+        incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
 
-		core::UniquePointer<TechSetDef> techDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
+        if (!techDef->parseFile(fileData, incDel)) {
+            X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
+            return nullptr;
+        }
 
-		TechSetDef::OpenIncludeDel incDel;
-		incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
+        return techDef.release();
+    }
 
-		if (!techDef->parseFile(fileData, incDel)) {
-			X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
-			return nullptr;
-		}
+    void TechSetDefs::clearIncSrcCache(void)
+    {
+        core::CriticalSection::ScopedLock lock(sourceCacheLock_);
 
-		return techDef.release();
-	}
+        incSourceMap_.clear();
+    }
 
-	void TechSetDefs::clearIncSrcCache(void)
-	{
-		core::CriticalSection::ScopedLock lock(sourceCacheLock_);
+    bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
+    {
+        core::Path<char> path;
 
-		incSourceMap_.clear();
-	}
+        if (useIncludePath) {
+            path = INCLUDE_DIR;
+            path /= name;
+        }
+        else {
+            path = name;
+        }
 
+        path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
+        SourceMap::iterator it;
+        {
+            core::CriticalSection::ScopedLock lock(sourceCacheLock_);
 
-	bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
-	{
-		core::Path<char> path;
+            it = incSourceMap_.find(path);
+            if (it != incSourceMap_.end()) {
+                FileBuf& buf = it->second;
+                return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
+            }
+        }
 
-		if (useIncludePath) {
-			path = INCLUDE_DIR;
-			path /= name;
-		}
-		else {
-			path = name;
-		}
+        // load it.
+        // we allow duplicate loads currently.
+        FileBuf fileData(arena_);
+        if (!loadFile(path, fileData)) {
+            return false;
+        }
 
-		path.setExtension(TECH_DEFS_FILE_EXTENSION);
+        {
+            core::CriticalSection::ScopedLock lock(sourceCacheLock_);
 
-		SourceMap::iterator it;
-		{
-			core::CriticalSection::ScopedLock lock(sourceCacheLock_);
+            auto insertedIt = incSourceMap_.insert(SourceMap::value_type(path, std::move(fileData)));
+            it = insertedIt.first;
+        }
 
-			it = incSourceMap_.find(path);
-			if (it != incSourceMap_.end())
-			{
-				FileBuf& buf = it->second;
-				return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
-			}
-		}
-
-		// load it.
-		// we allow duplicate loads currently.
-		FileBuf fileData(arena_);
-		if (!loadFile(path, fileData)) {
-			return false;
-		}
-
-		{
-			core::CriticalSection::ScopedLock lock(sourceCacheLock_);
-
-			auto insertedIt = incSourceMap_.insert(SourceMap::value_type(path, std::move(fileData)));
-			it = insertedIt.first;
-		}
-
-		FileBuf& buf = it->second;
-		return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
-	}
+        FileBuf& buf = it->second;
+        return lex.SetMemory(buf.begin(), buf.end(), core::string(path.c_str()));
+    }
 
 } // namespace techset
 

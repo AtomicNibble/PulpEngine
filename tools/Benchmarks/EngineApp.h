@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <ICore.h>
 #include <Platform\Console.h>
 #include <Platform\Module.h>
@@ -10,39 +9,35 @@
 class AssetHandler : public IAssertHandler
 {
 public:
-	AssetHandler(void);
-	virtual ~AssetHandler(void);
+    AssetHandler(void);
+    virtual ~AssetHandler(void);
 
 private:
-
-	virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
-	virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+    virtual void OnAssert(const core::SourceInfo& sourceInfo) X_OVERRIDE;
+    virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 };
-
-
 
 class EngineApp
 {
-	typedef core::SimpleMemoryArena<
-		core::MallocFreeAllocator
-	> Arena;
+    typedef core::SimpleMemoryArena<
+        core::MallocFreeAllocator>
+        Arena;
 
 public:
-	EngineApp();
-	~EngineApp();
+    EngineApp();
+    ~EngineApp();
 
-	bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
-	bool ShutDown(void);
-
-private:
-	static void Error(const char* pErrorText);
+    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
+    bool ShutDown(void);
 
 private:
-	core::MallocFreeAllocator allocator_;
-	Arena arena_;
+    static void Error(const char* pErrorText);
 
-	AssetHandler assertCallback_;
-	core::Module::Handle hSystemHandle_;
-	ICore* pICore_;
+private:
+    core::MallocFreeAllocator allocator_;
+    Arena arena_;
+
+    AssetHandler assertCallback_;
+    core::Module::Handle hSystemHandle_;
+    ICore* pICore_;
 };
-

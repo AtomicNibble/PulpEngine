@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #ifndef X_MATLIB_H_
 #define X_MATLIB_H_
 
@@ -18,7 +16,6 @@
 #endif // !MAT_LIB_EXPORT
 #endif // X_LIB
 #endif // !MATLIB_EXPORT
-
 
 #include "Material.h"
 #include "Util\MatUtil.h"

@@ -1,98 +1,90 @@
 #pragma once
 
-
 #include <ITexture.h>
 #include "TextureFile.h"
 #include "Util\Types.h"
 
 X_NAMESPACE_DECLARE(core,
-	class LinearAllocator;
-)
+                    class LinearAllocator;)
 
 X_NAMESPACE_BEGIN(texture)
 
 namespace Converter
 {
-	
-	class ImgConveter
-	{
-		typedef core::traits::Function<void(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)> CompressionFunc;
+    class ImgConveter
+    {
+        typedef core::traits::Function<void(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)> CompressionFunc;
 
-		struct JobData
-		{
-			ImgConveter::CompressionFunc::Pointer pCompressFunc;
+        struct JobData
+        {
+            ImgConveter::CompressionFunc::Pointer pCompressFunc;
 
-			ispc::rgba_surface surface;
-			uint8_t* pOut;
-		};
+            ispc::rgba_surface surface;
+            uint8_t* pOut;
+        };
 
-		struct MipFaceJobData
-		{
-			core::MemoryArenaBase* swapArena;
+        struct MipFaceJobData
+        {
+            core::MemoryArenaBase* swapArena;
 
-			XTextureFile& srcImg;
+            XTextureFile& srcImg;
 
-			const MipMapFilterParams& params;
-			//  makes these enums 8bit if need smaller struct.
-			MipFilter::Enum filter;
-			WrapMode::Enum wrap;
-			bool alpha;
-			bool& result;
+            const MipMapFilterParams& params;
+            //  makes these enums 8bit if need smaller struct.
+            MipFilter::Enum filter;
+            WrapMode::Enum wrap;
+            bool alpha;
+            bool& result;
 
-			int32_t faceIdx;
-		};
+            int32_t faceIdx;
+        };
 
-	public:
-		X_DECLARE_ENUM(Profile)(
-			UltraFast,
-			VeryFast,
-			Fast,
-			Basic,
-			Slow
-		);
+    public:
+        X_DECLARE_ENUM(Profile)
+        (
+            UltraFast,
+            VeryFast,
+            Fast,
+            Basic,
+            Slow);
 
-	public:
-		ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena);
-		~ImgConveter();
+    public:
+        ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena);
+        ~ImgConveter();
 
-		void scale(ScaleFactor::Enum scale);
-		void enableMultiThreaded(bool enable);
+        void scale(ScaleFactor::Enum scale);
+        void enableMultiThreaded(bool enable);
 
-		bool LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
-		bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
-		bool SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
-		bool SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+        bool LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
+        bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
+        bool SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+        bool SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
 
-		bool addAlphachannel(bool keepMips = false);
-		bool CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
-		bool Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
+        bool addAlphachannel(bool keepMips = false);
+        bool CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
+        bool Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
 
-		const XTextureFile& getTextFile(void) const;
+        const XTextureFile& getTextFile(void) const;
 
-		static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
+        static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
 
-	private:
-		static void generateMipsForFace(MipFaceJobData& jobdata);
-		static void generateMipsJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-		static void compressJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    private:
+        static void generateMipsForFace(MipFaceJobData& jobdata);
+        static void generateMipsJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+        static void compressJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
-		static CompressionFunc::Pointer getCompressionFunc(Texturefmt::Enum fmt, Profile::Enum profile, bool keepAlpha);
+        static CompressionFunc::Pointer getCompressionFunc(Texturefmt::Enum fmt, Profile::Enum profile, bool keepAlpha);
 
-	private:
-		core::MemoryArenaBase* swapArena_;
-		XTextureFile srcImg_;
-		XTextureFile dstImg_;
+    private:
+        core::MemoryArenaBase* swapArena_;
+        XTextureFile srcImg_;
+        XTextureFile dstImg_;
 
-		// save out src.
-		bool useSrc_;
-		bool multiThread_;
-	};
-
-
-
-
+        // save out src.
+        bool useSrc_;
+        bool multiThread_;
+    };
 
 } // namespace Converter
-
 
 X_NAMESPACE_END

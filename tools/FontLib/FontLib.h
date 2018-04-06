@@ -1,7 +1,5 @@
 #pragma once
 
-
-
 #include <Core\Compiler.h>
 
 #ifndef FONTLIB_EXPORT
@@ -15,7 +13,6 @@
 #endif // !FONT_LIB_EXPORT
 #endif // X_LIB
 #endif // !FONTLIB_EXPORT
-
 
 #include "FontRender\XFontGlyph.h"
 #include "FontRender\XGlyphBitmap.h"

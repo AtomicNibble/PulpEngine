@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_IMGLIB_H_
 #define X_IMGLIB_H_
 
@@ -8,16 +7,15 @@
 
 #ifndef IMGLIB_EXPORT
 #ifdef X_LIB
-	#define IMGLIB_EXPORT
+#define IMGLIB_EXPORT
 #else
-	#ifdef IMG_LIB_EXPORT
-		#define IMGLIB_EXPORT X_EXPORT
-	#else
-		#define IMGLIB_EXPORT X_IMPORT
-	#endif // !IMG_LIB_EXPORT
+#ifdef IMG_LIB_EXPORT
+#define IMGLIB_EXPORT X_EXPORT
+#else
+#define IMGLIB_EXPORT X_IMPORT
+#endif // !IMG_LIB_EXPORT
 #endif // X_LIB
 #endif // !IMGLIB_EXPORT
-
 
 #include "Fmts\TextureLoaderCI.h"
 #include "Fmts\TextureLoaderDDS.h"

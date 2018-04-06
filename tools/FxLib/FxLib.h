@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <Core\Compiler.h>
 
 #ifndef FXLIB_EXPORT
@@ -14,6 +13,5 @@
 #endif // !FX_LIB_EXPORT
 #endif // X_LIB
 #endif // !FXLIB_EXPORT
-
 
 #include "Util\FxUtil.h"

@@ -1,8 +1,5 @@
 
 
-
-
-
 #ifdef NEAR
 #undef NEAR
 #endif
@@ -19,7 +16,6 @@
 #undef far
 #endif
 
-
 #include <windows.h>
 #include <Shlobj.h> // SHGetKnownFolderPath
 
@@ -27,22 +23,20 @@
 
 X_NAMESPACE_BEGIN(misc)
 
-
 bool GetAppDataPath(AppDataPath& pathOut)
 {
-	PWSTR patchPointer;
-	if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &patchPointer)))
-	{
-		size_t len = ::wcslen(patchPointer);
+    PWSTR patchPointer;
+    if (SUCCEEDED(SHGetKnownFolderPath(FOLDERID_RoamingAppData, KF_FLAG_CREATE, NULL, &patchPointer))) {
+        size_t len = ::wcslen(patchPointer);
 
-		::memset(pathOut, 0, sizeof(pathOut));
-		::memcpy_s(pathOut, sizeof(pathOut), patchPointer, len * sizeof(wchar_t));
+        ::memset(pathOut, 0, sizeof(pathOut));
+        ::memcpy_s(pathOut, sizeof(pathOut), patchPointer, len * sizeof(wchar_t));
 
-		CoTaskMemFree(patchPointer);
-		return true;
-	}
+        CoTaskMemFree(patchPointer);
+        return true;
+    }
 
-	return false;
+    return false;
 }
 
 X_NAMESPACE_END

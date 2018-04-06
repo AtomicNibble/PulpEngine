@@ -4,23 +4,21 @@
 #define X_LVL_BUILDER_H_
 
 X_NAMESPACE_DECLARE(physics,
-	struct IPhysicsCooking;
-);
-
+                    struct IPhysicsCooking;);
 
 #include "Material/MaterialManager.h"
 #include "LvlEntity.h"
 #include "LvlArea.h"
 
-
 X_NAMESPACE_BEGIN(level)
 
-namespace mapFile {
-	class XMapFile;
-	class XMapEntity;
-	class XMapBrush;
-	class XMapPatch;
-}
+namespace mapFile
+{
+    class XMapFile;
+    class XMapEntity;
+    class XMapBrush;
+    class XMapPatch;
+} // namespace mapFile
 
 #if 0 
 class ModelCache;

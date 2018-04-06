@@ -11,12 +11,10 @@
 
 #define _BOOL
 
-#define MODELEX_EXPORT __declspec(dllexport) 
-
+#define MODELEX_EXPORT __declspec(dllexport)
 
 #include <maya/MStatus.h>
 #include <maya/MObject.h>
 #include <maya\MDistance.h>
-
 
 extern core::MemoryArenaBase* g_arena;

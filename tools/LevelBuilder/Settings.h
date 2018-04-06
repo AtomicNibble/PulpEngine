@@ -7,15 +7,13 @@ X_NAMESPACE_BEGIN(level)
 
 struct Settings
 {
-	Settings();
+    Settings();
 
-	bool noPatches;
+    bool noPatches;
 };
 
 extern Settings gSettings;
 
 X_NAMESPACE_END
-
-
 
 #endif // !X_LVL_SETTINGS_H_

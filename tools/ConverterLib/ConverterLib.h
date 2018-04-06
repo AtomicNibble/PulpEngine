@@ -17,7 +17,6 @@
 #endif // X_LIB
 #endif // !CONVERTERLIB_EXPORT
 
-
 #include "Converter.h"
 
 #endif // !X_CONVERTER_LIB_H_

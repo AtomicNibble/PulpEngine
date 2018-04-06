@@ -4,22 +4,21 @@
 #include "MayaUtil.h"
 
 MayaProfiler::MayaProfiler(const char* name) :
-	name_(name)
+    name_(name)
 {
-
 }
 
 MayaProfiler::~MayaProfiler()
 {
-	float ms = timer_.GetMilliSeconds();
+    float ms = timer_.GetMilliSeconds();
 
-	core::StackString512 msg;
+    core::StackString512 msg;
 
-	if (name_ != nullptr) {
-		msg.append(name_);
-	}
+    if (name_ != nullptr) {
+        msg.append(name_);
+    }
 
-	msg.appendFmt(" (%gms)", ms);
+    msg.appendFmt(" (%gms)", ms);
 
-	MayaUtil::MayaPrintMsg(msg.c_str());
+    MayaUtil::MayaPrintMsg(msg.c_str());
 }

@@ -17,8 +17,6 @@
 #endif // X_LIB
 #endif // !MODELLIB_EXPORT
 
-
-
 #include "Util\ModelUtil.h"
 
 #include "Model\XModel.h"

@@ -7,50 +7,47 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-
 namespace fx
 {
+    FxLib::FxLib()
+    {
+    }
 
-	FxLib::FxLib()
-	{
-	}
+    FxLib::~FxLib()
+    {
+    }
 
-	FxLib::~FxLib()
-	{
+    const char* FxLib::getOutExtension(void) const
+    {
+        return EFFECT_FILE_EXTENSION;
+    }
 
-	}
+    bool FxLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
+    {
+        X_UNUSED(host, assetId, args, destPath);
 
-	const char* FxLib::getOutExtension(void) const
-	{
-		return EFFECT_FILE_EXTENSION;
-	}
+        EffectCompiler compiler(g_FxLibArena);
 
-	bool FxLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
-	{
-		X_UNUSED(host, assetId, args, destPath);
+        if (!compiler.loadFromJson(args)) {
+            X_ERROR("Fx", "Error parsing effect args");
+            return false;
+        }
 
-		EffectCompiler compiler(g_FxLibArena);
+        core::XFileScoped file;
+        core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
-		if (!compiler.loadFromJson(args)) {
-			X_ERROR("Fx", "Error parsing effect args");
-			return false;
-		}
+        if (!file.openFile(destPath.c_str(), mode)) {
+            X_ERROR("Fx", "Failed to open output file");
+            return false;
+        }
 
-		core::XFileScoped file;
-		core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
+        if (!compiler.writeToFile(file.GetFile())) {
+            X_ERROR("Fx", "Failed to write effect file");
+            return false;
+        }
 
-		if (!file.openFile(destPath.c_str(), mode)) {
-			X_ERROR("Fx", "Failed to open output file");
-			return false;
-		}
-
-		if (!compiler.writeToFile(file.GetFile())) {
-			X_ERROR("Fx", "Failed to write effect file");
-			return false;
-		}
-
-		return true;
-	}
+        return true;
+    }
 
 } // namespace fx
 

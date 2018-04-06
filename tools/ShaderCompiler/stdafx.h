@@ -3,9 +3,7 @@
 #define _LAUNCHER
 #include <EngineCommon.h>
 
-
 #include <IMaterial.h>
-
 
 #include <../MaterialLib/MatLib.h>
 #include <../ShaderLib/ShaderLib.h>

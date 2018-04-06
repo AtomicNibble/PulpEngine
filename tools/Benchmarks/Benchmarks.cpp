@@ -2,7 +2,6 @@
 #include "Benchmarks.h"
 #include "EngineApp.h"
 
-
 #include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
 #include <Memory\MemoryTrackingPolicies\ExtendedMemoryTracking.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
@@ -27,63 +26,60 @@ X_LINK_LIB("benchmark")
 
 #if 1
 typedef core::SimpleMemoryArena<
-	core::GrowingBlockAllocator
-> BenchmarkArena;
+    core::GrowingBlockAllocator>
+    BenchmarkArena;
 #else
 typedef core::MemoryArena<
-	// core::MallocFreeAllocator,
-	core::GrowingBlockAllocator,
+    // core::MallocFreeAllocator,
+    core::GrowingBlockAllocator,
 
-	// core::MultiThreadPolicy<core::CriticalSection>,
-	core::SingleThreadPolicy,
+    // core::MultiThreadPolicy<core::CriticalSection>,
+    core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-> BenchmarkArena;
+    >
+    BenchmarkArena;
 #endif
 
 core::MemoryArenaBase* g_arena = nullptr;
 
-
 int APIENTRY WinMain(_In_ HINSTANCE hInstance,
-                     _In_opt_ HINSTANCE hPrevInstance,
-                     _In_ LPSTR    lpCmdLine,
-                     _In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPSTR lpCmdLine,
+    _In_ int nCmdShow)
 {
-	core::Console console(L"Engine Benchmark Log");
-	console.RedirectSTD();
-	console.SetSize(150, 60, 8000);
-	console.MoveTo(10, 10);
+    core::Console console(L"Engine Benchmark Log");
+    console.RedirectSTD();
+    console.SetSize(150, 60, 8000);
+    console.MoveTo(10, 10);
 
+    BenchmarkArena::AllocationPolicy allocator;
+    BenchmarkArena arena(&allocator, "BenchmarkArena");
 
-	BenchmarkArena::AllocationPolicy allocator;
-	BenchmarkArena arena(&allocator, "BenchmarkArena");
+    g_arena = &arena;
 
-	g_arena = &arena;
+    {
+        EngineApp engine;
 
-	{
-		EngineApp engine;
+        if (engine.Init(hInstance, ::GetCommandLineW(), console)) {
+            X_ASSERT_NOT_NULL(gEnv);
+            X_ASSERT_NOT_NULL(gEnv->pCore);
 
-		if (engine.Init(hInstance, ::GetCommandLineW(), console))
-		{		
-			X_ASSERT_NOT_NULL(gEnv);
-			X_ASSERT_NOT_NULL(gEnv->pCore);
-			
-			::benchmark::Initialize(&__argc, __argv);
-			::benchmark::RunSpecifiedBenchmarks();
+            ::benchmark::Initialize(&__argc, __argv);
+            ::benchmark::RunSpecifiedBenchmarks();
 
-			if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, "-CI")) {
-				console.PressToContinue();
-			}
-		}
-	}
+            if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, "-CI")) {
+                console.PressToContinue();
+            }
+        }
+    }
 
-	return 0;
+    return 0;
 }
-

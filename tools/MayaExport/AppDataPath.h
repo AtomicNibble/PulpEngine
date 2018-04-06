@@ -1,8 +1,6 @@
 #pragma once
 
-
 #include "Util\NamespaceMacros.h"
-
 
 X_NAMESPACE_BEGIN(misc)
 

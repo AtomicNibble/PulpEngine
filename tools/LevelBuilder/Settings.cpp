@@ -5,9 +5,8 @@ X_NAMESPACE_BEGIN(level)
 
 Settings::Settings()
 {
-	noPatches = false;
+    noPatches = false;
 }
-
 
 Settings gSettings;
 

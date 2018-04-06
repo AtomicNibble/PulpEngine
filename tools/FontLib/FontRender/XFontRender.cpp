@@ -2,124 +2,113 @@
 #include "XFontRender.h"
 #include "XFontGlyph.h"
 
-
 extern "C" {
 
-	void computegradient(double *img, int w, int h, double *gx, double *gy);
-	void edtaa3(double *img, double *gx, double *gy, int w, int h, short *distx, short *disty, double *dist);
+void computegradient(double* img, int w, int h, double* gx, double* gy);
+void edtaa3(double* img, double* gx, double* gy, int w, int h, short* distx, short* disty, double* dist);
 }
-
-
 
 X_NAMESPACE_BEGIN(font)
 
 XFontRender::XFontRender(core::MemoryArenaBase* arena) :
-	arena_(arena),
-	pLibrary_(nullptr),
-	pFace_(nullptr),
-	encoding_(FontEncoding::Unicode),
-	debugRender_(false),
-	sizeRatio_(0.8f),
-	glyphBitmapWidth_(0),
-	glyphBitmapHeight_(0),
-	data_(arena),
-	xdist_(arena),
-	ydist_(arena),
-	gx_(arena),
-	gy_(arena),
-	outside_(arena),
-	inside_(arena),
-	tmpData_(arena)
+    arena_(arena),
+    pLibrary_(nullptr),
+    pFace_(nullptr),
+    encoding_(FontEncoding::Unicode),
+    debugRender_(false),
+    sizeRatio_(0.8f),
+    glyphBitmapWidth_(0),
+    glyphBitmapHeight_(0),
+    data_(arena),
+    xdist_(arena),
+    ydist_(arena),
+    gx_(arena),
+    gy_(arena),
+    outside_(arena),
+    inside_(arena),
+    tmpData_(arena)
 {
-
 }
 
 XFontRender::~XFontRender()
 {
-	Release();
+    Release();
 }
-
 
 bool XFontRender::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding)
 {
-	data_ = std::move(data);
+    data_ = std::move(data);
 
-	int32_t err = FT_Init_FreeType(&pLibrary_);
-	if (err)
-	{
-		X_ERROR("Font", "failed to init freetype. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
-		return false;
-	}
+    int32_t err = FT_Init_FreeType(&pLibrary_);
+    if (err) {
+        X_ERROR("Font", "failed to init freetype. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
+        return false;
+    }
 
-	if (pFace_)
-	{
-		FT_Done_Face(pFace_);
-		pFace_ = nullptr;
-	}
+    if (pFace_) {
+        FT_Done_Face(pFace_);
+        pFace_ = nullptr;
+    }
 
-	err = FT_New_Memory_Face(
-		pLibrary_, 
-		data_.ptr(),
-		length,
-		0, 
-		&pFace_
-	);
+    err = FT_New_Memory_Face(
+        pLibrary_,
+        data_.ptr(),
+        length,
+        0,
+        &pFace_);
 
-	if (err)
-	{
-		X_ERROR("Font", "failed to create new freetype face. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
-		return false;
-	}
+    if (err) {
+        X_ERROR("Font", "failed to create new freetype face. Error(%" PRIi32 "): \"%s\"", err, errToStr(err));
+        return false;
+    }
 
-	SetEncoding(encoding);
-	return true;
+    SetEncoding(encoding);
+    return true;
 }
-
 
 bool XFontRender::Release(void)
 {
-	FT_Done_Face(pFace_);
-	FT_Done_FreeType(pLibrary_);
-	pFace_ = nullptr;
-	pLibrary_ = nullptr;
+    FT_Done_Face(pFace_);
+    FT_Done_FreeType(pLibrary_);
+    pFace_ = nullptr;
+    pLibrary_ = nullptr;
 
-	data_.reset();
-	return true;
+    data_.reset();
+    return true;
 }
 
-
 bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf)
-{ 
-	X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")();
+{
+    X_ASSERT(glyphBitmapWidth_ > 0 && glyphBitmapHeight_ > 0, "Invalid bitmapsize set")
+    ();
 
-	int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
-	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char: '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
-		return false;
-	}
+    int32_t err = FT_Load_Char(pFace_, static_cast<FT_ULong>(charCode), FT_LOAD_DEFAULT);
+    if (err) {
+        X_ERROR("Font", "Failed to render glyp for char: '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
+        return false;
+    }
 
-	FT_GlyphSlot pGlyph = pFace_->glyph;
+    FT_GlyphSlot pGlyph = pFace_->glyph;
 
-	err = FT_Render_Glyph(pGlyph, FT_RENDER_MODE_NORMAL);
-	if (err) {
-		X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
-		return false;
-	}
+    err = FT_Render_Glyph(pGlyph, FT_RENDER_MODE_NORMAL);
+    if (err) {
+        X_ERROR("Font", "Failed to render glyp for char(%" PRIi32 "): '%lc'. Error(%" PRIi32 "): \"%s\"", charCode, err, errToStr(err));
+        return false;
+    }
 
+    auto& buffer = destBitMap.GetBuffer();
+    const uint32 dstGlyphWidth = destBitMap.GetWidth();
+    const uint32 dstGlyphHeight = destBitMap.GetHeight();
+    const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
 
-	auto& buffer = destBitMap.GetBuffer();
-	const uint32 dstGlyphWidth = destBitMap.GetWidth();
-	const uint32 dstGlyphHeight = destBitMap.GetHeight();
-	const uint32 maxIndex = dstGlyphWidth * dstGlyphHeight;
-
-	// make sure we not relying on zero initialize.
-	// this is needed for SDF.
-	std::memset(buffer.data(), 0x00, buffer.size());
+    // make sure we not relying on zero initialize.
+    // this is needed for SDF.
+    std::memset(buffer.data(), 0x00, buffer.size());
 
 #if X_DEBUG
 
-	// some sanity checks for my understanding of FreeType.
-	// they are not very accurate out by few pixels in some cases so keep disabled when not testing.
+    // some sanity checks for my understanding of FreeType.
+    // they are not very accurate out by few pixels in some cases so keep disabled when not testing.
 #if 0
 	{
 		const auto& sizeInfo = pFace_->size->metrics;
@@ -141,252 +130,242 @@ bool XFontRender::GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t char
 
 #endif // !X_DEBUG
 
-	// does the bitmap fit into the dest are the requested offset?
-	if (dstGlyphWidth < pGlyph->bitmap.width || dstGlyphHeight < pGlyph->bitmap.rows)
-	{
-		X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.",charCode);
-	}
+    // does the bitmap fit into the dest are the requested offset?
+    if (dstGlyphWidth < pGlyph->bitmap.width || dstGlyphHeight < pGlyph->bitmap.rows) {
+        X_WARNING("Font", "Glyph for char '%lc' does not fit in dest bimap clipping.", charCode);
+    }
 
-	// i want to center the bitmap.
-	// so that if we perform SDF it's got good spacing around edges.
+    // i want to center the bitmap.
+    // so that if we perform SDF it's got good spacing around edges.
 
-	const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph->bitmap.width);
-	const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph->bitmap.rows);
-	const uint32_t paddingX = (dstGlyphWidth - colsToCopy) / 2;
-	const uint32_t paddingY = (dstGlyphHeight - rowsToCopy) / 2;
+    const uint32_t colsToCopy = core::Min(dstGlyphWidth, pGlyph->bitmap.width);
+    const uint32_t rowsToCopy = core::Min(dstGlyphHeight, pGlyph->bitmap.rows);
+    const uint32_t paddingX = (dstGlyphWidth - colsToCopy) / 2;
+    const uint32_t paddingY = (dstGlyphHeight - rowsToCopy) / 2;
 
-	for (uint32_t row = 0; row < rowsToCopy; row++)
-	{
-		const int32_t dstX = paddingX;
-		const int32_t dstY = row + paddingY;
-		const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
+    for (uint32_t row = 0; row < rowsToCopy; row++) {
+        const int32_t dstX = paddingX;
+        const int32_t dstY = row + paddingY;
+        const int32_t dstOffset = (dstY * dstGlyphWidth) + dstX;
 
-		const int32_t srcOffset = (row * pGlyph->bitmap.pitch);
+        const int32_t srcOffset = (row * pGlyph->bitmap.pitch);
 
-		uint8_t* pDstRow = &buffer[dstOffset];
-		const uint8_t* pSrcRow = &pGlyph->bitmap.buffer[srcOffset];
+        uint8_t* pDstRow = &buffer[dstOffset];
+        const uint8_t* pSrcRow = &pGlyph->bitmap.buffer[srcOffset];
 
-		std::memcpy(pDstRow, pSrcRow, colsToCopy);
-	}
+        std::memcpy(pDstRow, pSrcRow, colsToCopy);
+    }
 
-	if (debugRender_) {
-		for (auto& p : buffer) {
-			p = p / 2 + 64;
-		}
-	}
+    if (debugRender_) {
+        for (auto& p : buffer) {
+            p = p / 2 + 64;
+        }
+    }
 
+    // the top is like from the pen.
+    // so in order to make this a Y offset it's the size minus top.
+    const auto offsetY = static_cast<uint32_t>(glyphBitmapHeight_ - pGlyph->bitmap_top);
 
-	// the top is like from the pen.
-	// so in order to make this a Y offset it's the size minus top.
-	const auto offsetY = static_cast<uint32_t>(glyphBitmapHeight_ - pGlyph->bitmap_top);
+    glphy.currentChar = charCode;
+    glphy.advanceX = safe_static_cast<decltype(glphy.advanceX)>(pGlyph->advance.x / 64);
+    glphy.charOffsetX = safe_static_cast<decltype(glphy.charOffsetX)>(pGlyph->bitmap_left);
+    glphy.charOffsetY = safe_static_cast<decltype(glphy.charOffsetX)>(offsetY);
+    glphy.charWidth = safe_static_cast<decltype(glphy.charWidth)>(colsToCopy);
+    glphy.charHeight = safe_static_cast<decltype(glphy.charHeight)>(rowsToCopy);
+    glphy.bitmapOffsetX = safe_static_cast<decltype(glphy.bitmapOffsetX)>(paddingX);
+    glphy.bitmapOffsetY = safe_static_cast<decltype(glphy.bitmapOffsetY)>(paddingY);
 
-	glphy.currentChar = charCode;
-	glphy.advanceX = safe_static_cast<decltype(glphy.advanceX)>(pGlyph->advance.x / 64);
-	glphy.charOffsetX = safe_static_cast<decltype(glphy.charOffsetX)>(pGlyph->bitmap_left);
-	glphy.charOffsetY = safe_static_cast<decltype(glphy.charOffsetX)>(offsetY);
-	glphy.charWidth = safe_static_cast<decltype(glphy.charWidth)>(colsToCopy);
-	glphy.charHeight = safe_static_cast<decltype(glphy.charHeight)>(rowsToCopy);
-	glphy.bitmapOffsetX = safe_static_cast<decltype(glphy.bitmapOffsetX)>(paddingX);
-	glphy.bitmapOffsetY = safe_static_cast<decltype(glphy.bitmapOffsetY)>(paddingY);
+    if (sdf) {
+        GenerateSDF(destBitMap);
+    }
 
-	if (sdf) {
-		GenerateSDF(destBitMap);
-	}
-
-	return true;
+    return true;
 }
-
-
 
 bool XFontRender::SetEncoding(FontEncoding::Enum encoding)
 {
-	FT_Encoding ftEncoding = FT_ENCODING_UNICODE;
+    FT_Encoding ftEncoding = FT_ENCODING_UNICODE;
 
-	static_assert(FontEncoding::ENUM_COUNT == 2, "More encoding types? this logic needs updating");
+    static_assert(FontEncoding::ENUM_COUNT == 2, "More encoding types? this logic needs updating");
 
-	encoding_ = encoding;
-	switch (encoding) 
-	{
-		case FontEncoding::Unicode:
-			ftEncoding = FT_ENCODING_UNICODE;
-			break;
-		case FontEncoding::MSSymbol:
-			ftEncoding = FT_ENCODING_MS_SYMBOL;
-			break;
-		default:
-			X_ASSERT_UNREACHABLE();
-			break;
-	}
+    encoding_ = encoding;
+    switch (encoding) {
+        case FontEncoding::Unicode:
+            ftEncoding = FT_ENCODING_UNICODE;
+            break;
+        case FontEncoding::MSSymbol:
+            ftEncoding = FT_ENCODING_MS_SYMBOL;
+            break;
+        default:
+            X_ASSERT_UNREACHABLE();
+            break;
+    }
 
-	const int32_t err = FT_Select_Charmap(pFace_, ftEncoding);
-	if (err) {
-		X_ERROR("Font", "Failed to set encode to: %s. Error(%" PRIi32 "): \"%s\"", FontEncoding::ToString(encoding), err, errToStr(err));
-		return false;
-	}
+    const int32_t err = FT_Select_Charmap(pFace_, ftEncoding);
+    if (err) {
+        X_ERROR("Font", "Failed to set encode to: %s. Error(%" PRIi32 "): \"%s\"", FontEncoding::ToString(encoding), err, errToStr(err));
+        return false;
+    }
 
-	return true;
+    return true;
 }
-
 
 void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRatio)
 {
-	X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")(width, height);
-	X_ASSERT(sizeRatio > 0.f && sizeRatio <= 1.f, "Size ratio invalid")(sizeRatio);
+    X_ASSERT(width > 0 && height > 0, "Width and height must be none zero")
+    (width, height);
+    X_ASSERT(sizeRatio > 0.f && sizeRatio <= 1.f, "Size ratio invalid")
+    (sizeRatio);
 
-	sizeRatio_ = sizeRatio;
-	glyphBitmapWidth_ = width;
-	glyphBitmapHeight_ = height;
+    sizeRatio_ = sizeRatio;
+    glyphBitmapWidth_ = width;
+    glyphBitmapHeight_ = height;
 
-	const auto scaledWidth = static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_); 
-	const auto scaledHeight = static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_);
+    const auto scaledWidth = static_cast<int32_t>(glyphBitmapWidth_ * sizeRatio_);
+    const auto scaledHeight = static_cast<int32_t>(glyphBitmapHeight_ * sizeRatio_);
 
-	const int32_t err = FT_Set_Pixel_Sizes(
-		pFace_,
-		scaledWidth,
-		scaledHeight
-	);
+    const int32_t err = FT_Set_Pixel_Sizes(
+        pFace_,
+        scaledWidth,
+        scaledHeight);
 
-	metrics_.ascender = pFace_->size->metrics.ascender / 64;
-	metrics_.descender = pFace_->size->metrics.descender / 64;
-	metrics_.max_advance = pFace_->size->metrics.max_advance / 64;
+    metrics_.ascender = pFace_->size->metrics.ascender / 64;
+    metrics_.descender = pFace_->size->metrics.descender / 64;
+    metrics_.max_advance = pFace_->size->metrics.max_advance / 64;
 
-	if (err)
-	{
-		X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
-	}
+    if (err) {
+        X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));
+    }
 }
 
 void XFontRender::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
-	if (pWidth) {
-		*pWidth = glyphBitmapWidth_;
-	}
-	if (pHeight) {
-		*pHeight = glyphBitmapHeight_;
-	}
+    if (pWidth) {
+        *pWidth = glyphBitmapWidth_;
+    }
+    if (pHeight) {
+        *pHeight = glyphBitmapHeight_;
+    }
 }
 
 void XFontRender::GenerateSDF(XGlyphBitmap& bitMap)
 {
-	auto& buffer = bitMap.GetBuffer();
-	const uint32 glyphWidth = bitMap.GetWidth();
-	const uint32 glyphHeight = bitMap.GetHeight();
-	const uint32_t numPixel = glyphWidth * glyphHeight;
+    auto& buffer = bitMap.GetBuffer();
+    const uint32 glyphWidth = bitMap.GetWidth();
+    const uint32 glyphHeight = bitMap.GetHeight();
+    const uint32_t numPixel = glyphWidth * glyphHeight;
 
-	// find minimimum and maximum values
-	double imgMin = std::numeric_limits<double>::max();
-	double imgMax = std::numeric_limits<double>::min();
+    // find minimimum and maximum values
+    double imgMin = std::numeric_limits<double>::max();
+    double imgMax = std::numeric_limits<double>::min();
 
-	tmpData_.resize(numPixel);
+    tmpData_.resize(numPixel);
 
-	for (uint32_t i = 0; i < numPixel; ++i)
-	{
-		double v = buffer[i];
+    for (uint32_t i = 0; i < numPixel; ++i) {
+        double v = buffer[i];
 
-		tmpData_[i] = v;
-		if (v > imgMax) {
-			imgMax = v;
-		}
-		if (v < imgMin) {
-			imgMin = v;
-		}
-	}
+        tmpData_[i] = v;
+        if (v > imgMax) {
+            imgMax = v;
+        }
+        if (v < imgMin) {
+            imgMin = v;
+        }
+    }
 
-	// Map values from 0 - 255 to 0.0 - 1.0
-	for (uint32_t i = 0; i < numPixel; ++i) {
-		tmpData_[i] = (buffer[i] - imgMin) / imgMax;
-	}
+    // Map values from 0 - 255 to 0.0 - 1.0
+    for (uint32_t i = 0; i < numPixel; ++i) {
+        tmpData_[i] = (buffer[i] - imgMin) / imgMax;
+    }
 
-	makeDistanceMapd(tmpData_, glyphWidth, glyphHeight);
+    makeDistanceMapd(tmpData_, glyphWidth, glyphHeight);
 
-	// map values from 0.0 - 1.0 to 0 - 255
-	for (uint32_t i = 0; i < numPixel; ++i) {
-		buffer[i] = safe_static_cast<uint8_t>(static_cast<int32_t>(255 * (1 - tmpData_[i])));
-	}
+    // map values from 0.0 - 1.0 to 0 - 255
+    for (uint32_t i = 0; i < numPixel; ++i) {
+        buffer[i] = safe_static_cast<uint8_t>(static_cast<int32_t>(255 * (1 - tmpData_[i])));
+    }
 
-	tmpData_.clear();
+    tmpData_.clear();
 }
 
 void XFontRender::makeDistanceMapd(DoubleArr& data, uint32_t width, uint32_t height)
 {
-	const uint32_t totalPixel = width * height;
+    const uint32_t totalPixel = width * height;
 
-	xdist_.resize(totalPixel);
-	ydist_.resize(totalPixel);
-	gx_.resize(totalPixel);
-	gy_.resize(totalPixel);
-	outside_.resize(totalPixel);
-	inside_.resize(totalPixel);
+    xdist_.resize(totalPixel);
+    ydist_.resize(totalPixel);
+    gx_.resize(totalPixel);
+    gy_.resize(totalPixel);
+    outside_.resize(totalPixel);
+    inside_.resize(totalPixel);
 
-	double vmin = std::numeric_limits<double>::max();
-	
-	// Compute outside = edtaa3(bitmap); % Transform background (0's)
-	computegradient(data.data(), width, height, gx_.data(), gy_.data());
-	edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), outside_.data());
-	for (uint32_t i = 0; i < totalPixel; ++i) {
-		if (outside_[i] < 0.0) {
-			outside_[i] = 0.0;
-		}
-	}
+    double vmin = std::numeric_limits<double>::max();
 
-	// Compute inside = edtaa3(1-bitmap); % Transform foreground (1's)
-	std::memset(gx_.data(), 0, sizeof(double) * gx_.size());
-	std::memset(gy_.data(), 0, sizeof(double) * gy_.size());
-	for (uint32_t i = 0; i < totalPixel; ++i) {
-		data[i] = 1 - data[i];
-	}
+    // Compute outside = edtaa3(bitmap); % Transform background (0's)
+    computegradient(data.data(), width, height, gx_.data(), gy_.data());
+    edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), outside_.data());
+    for (uint32_t i = 0; i < totalPixel; ++i) {
+        if (outside_[i] < 0.0) {
+            outside_[i] = 0.0;
+        }
+    }
 
-	computegradient(data.data(), width, height, gx_.data(), gy_.data());
-	edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), inside_.data());
-	for (uint32_t i = 0; i < totalPixel; ++i) {
-		if (inside_[i] < 0) {
-			inside_[i] = 0.0;
-		}
-	}
+    // Compute inside = edtaa3(1-bitmap); % Transform foreground (1's)
+    std::memset(gx_.data(), 0, sizeof(double) * gx_.size());
+    std::memset(gy_.data(), 0, sizeof(double) * gy_.size());
+    for (uint32_t i = 0; i < totalPixel; ++i) {
+        data[i] = 1 - data[i];
+    }
 
-	// distmap = outside - inside; % Bipolar distance field
-	for (uint32_t i = 0; i<totalPixel; ++i)
-	{
-		outside_[i] -= inside_[i];
-		if (outside_[i] < vmin) {
-			vmin = outside_[i];
-		}
-	}
+    computegradient(data.data(), width, height, gx_.data(), gy_.data());
+    edtaa3(data.data(), gx_.data(), gy_.data(), width, height, xdist_.data(), ydist_.data(), inside_.data());
+    for (uint32_t i = 0; i < totalPixel; ++i) {
+        if (inside_[i] < 0) {
+            inside_[i] = 0.0;
+        }
+    }
 
-	vmin = math<double>::abs(vmin);
+    // distmap = outside - inside; % Bipolar distance field
+    for (uint32_t i = 0; i < totalPixel; ++i) {
+        outside_[i] -= inside_[i];
+        if (outside_[i] < vmin) {
+            vmin = outside_[i];
+        }
+    }
 
-	for (uint32_t i = 0; i<totalPixel; ++i)
-	{
-		double v = outside_[i];
-		if (v < -vmin) {
-			outside_[i] = -vmin;
-		}
-		else if (v > +vmin) {
-			outside_[i] = +vmin;
-		}
-		data[i] = (outside_[i] + vmin) / (2 * vmin);
-	}
+    vmin = math<double>::abs(vmin);
 
-	xdist_.clear();
-	ydist_.clear();
-	gx_.clear();
-	gy_.clear();
-	outside_.clear();
-	inside_.clear();
+    for (uint32_t i = 0; i < totalPixel; ++i) {
+        double v = outside_[i];
+        if (v < -vmin) {
+            outside_[i] = -vmin;
+        }
+        else if (v > +vmin) {
+            outside_[i] = +vmin;
+        }
+        data[i] = (outside_[i] + vmin) / (2 * vmin);
+    }
+
+    xdist_.clear();
+    ydist_.clear();
+    gx_.clear();
+    gy_.clear();
+    outside_.clear();
+    inside_.clear();
 }
 
-
-//------------------------------------------------------------------------------------------------- 
+//-------------------------------------------------------------------------------------------------
 
 const char* XFontRender::errToStr(FT_Error err)
 {
-	#undef FTERRORS_H_
-    #define FT_ERRORDEF( e, v, s )  case e: return s;
-    #define FT_ERROR_START_LIST     switch (err) {
-    #define FT_ERROR_END_LIST       }
-    #include FT_ERRORS_H
+#undef FTERRORS_H_
+#define FT_ERRORDEF(e, v, s) \
+    case e:                  \
+        return s;
+#define FT_ERROR_START_LIST switch (err) {
+#define FT_ERROR_END_LIST }
+#include FT_ERRORS_H
     return "<ukn>";
 }
-
 
 X_NAMESPACE_END

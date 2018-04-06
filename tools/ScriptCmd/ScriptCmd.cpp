@@ -20,143 +20,127 @@ X_LINK_ENGINE_LIB("Core")
 
 namespace
 {
-
-	typedef core::MemoryArena<
-		core::MallocFreeAllocator,
-		core::SingleThreadPolicy,
+    typedef core::MemoryArena<
+        core::MallocFreeAllocator,
+        core::SingleThreadPolicy,
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
-		core::SimpleBoundsChecking,
-		core::SimpleMemoryTracking,
-		core::SimpleMemoryTagging
+        core::SimpleBoundsChecking,
+        core::SimpleMemoryTracking,
+        core::SimpleMemoryTagging
 #else
-		core::NoBoundsChecking,
-		core::NoMemoryTracking,
-		core::NoMemoryTagging
+        core::NoBoundsChecking,
+        core::NoMemoryTracking,
+        core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-	> ScriptCmdArena;
+        >
+        ScriptCmdArena;
 
-	X_DECLARE_ENUM(ScriptMode)(
-		CHECK,
-		RUN,
-		BAKE
-	);
+    X_DECLARE_ENUM(ScriptMode)
+    (
+        CHECK,
+        RUN,
+        BAKE);
 
-	bool GetMode(ScriptMode::Enum& mode)
-	{
-		const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
-		if (pMode)
-		{
-			if (core::strUtil::IsEqualCaseInsen(pMode, L"check"))
-			{
-				mode = ScriptMode::CHECK;
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pMode, L"run"))
-			{
-				mode = ScriptMode::RUN;
-			}
-			else if (core::strUtil::IsEqualCaseInsen(pMode, L"bake"))
-			{
-				mode = ScriptMode::BAKE;
-			}
-			else
-			{
-				X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
-				return false;
-			}
+    bool GetMode(ScriptMode::Enum& mode)
+    {
+        const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+        if (pMode) {
+            if (core::strUtil::IsEqualCaseInsen(pMode, L"check")) {
+                mode = ScriptMode::CHECK;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"run")) {
+                mode = ScriptMode::RUN;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"bake")) {
+                mode = ScriptMode::BAKE;
+            }
+            else {
+                X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+                return false;
+            }
 
-			return true;
-		}
+            return true;
+        }
 
-		return false;
-	}
+        return false;
+    }
 
-	bool GetInputFile(core::Path<char>& inputFile)
-	{
-		const wchar_t* pInputFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-		if (pInputFile)
-		{
-			core::StackString512 narrowName(pInputFile);
+    bool GetInputFile(core::Path<char>& inputFile)
+    {
+        const wchar_t* pInputFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
+        if (pInputFile) {
+            core::StackString512 narrowName(pInputFile);
 
-			inputFile.set(narrowName.begin(), narrowName.end());
-			return true;
-		}
+            inputFile.set(narrowName.begin(), narrowName.end());
+            return true;
+        }
 
-		X_ERROR("Converter", "missing input file");
-		return false;
-	}
+        X_ERROR("Converter", "missing input file");
+        return false;
+    }
 
-
-
-} // namespace 
+} // namespace
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
-	_In_opt_ HINSTANCE hPrevInstance,
-	_In_ LPWSTR    lpCmdLine,
-	_In_ int       nCmdShow)
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR lpCmdLine,
+    _In_ int nCmdShow)
 {
-	core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - ScriptCmd");
-	Console.RedirectSTD();
-	Console.SetSize(100, 40, 2000);
-	Console.MoveTo(10, 10);
+    core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - ScriptCmd");
+    Console.RedirectSTD();
+    Console.SetSize(100, 40, 2000);
+    Console.MoveTo(10, 10);
 
-	core::MallocFreeAllocator allocator;
-	ScriptCmdArena arena(&allocator, "ScriptCmdArena");
+    core::MallocFreeAllocator allocator;
+    ScriptCmdArena arena(&allocator, "ScriptCmdArena");
 
-	int res = -1;
-	
-	{
-		EngineApp app;
+    int res = -1;
 
-		if (app.Init(hInstance, &arena, lpCmdLine, Console))
-		{
-			script::IScriptSys* pScriptSys = gEnv->pScriptSys;
+    {
+        EngineApp app;
 
-			core::Path<char> inputFile;
-			ScriptMode::Enum mode;
+        if (app.Init(hInstance, &arena, lpCmdLine, Console)) {
+            script::IScriptSys* pScriptSys = gEnv->pScriptSys;
 
-			if (!GetMode(mode)) {
-				mode = ScriptMode::RUN;
-			}
+            core::Path<char> inputFile;
+            ScriptMode::Enum mode;
 
-			if (!GetInputFile(inputFile)) {
-				return -1;
-			}
+            if (!GetMode(mode)) {
+                mode = ScriptMode::RUN;
+            }
 
-			core::Path<char> inputPath;
+            if (!GetInputFile(inputFile)) {
+                return -1;
+            }
 
-			inputPath = "scripts";
-			inputPath /= inputFile;
+            core::Path<char> inputPath;
 
-			if (mode == ScriptMode::RUN)
-			{
-				core::XFileMemScoped file;
+            inputPath = "scripts";
+            inputPath /= inputFile;
 
-				if (!file.openFile(inputPath.c_str(), core::fileMode::READ | core::fileMode::SHARE))
-				{
-					X_ERROR("Script", "Failed to open file: \"%s\"", inputFile.c_str());
-					return -1;
-				}
+            if (mode == ScriptMode::RUN) {
+                core::XFileMemScoped file;
 
-				if (!pScriptSys->runScriptInSandbox(file->getBufferStart(), file->getBufferEnd()))
-				{
-					X_ERROR("Script", "Error running script: \"%s\"", inputFile.c_str());
-					return -1;
-				}
+                if (!file.openFile(inputPath.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+                    X_ERROR("Script", "Failed to open file: \"%s\"", inputFile.c_str());
+                    return -1;
+                }
 
-				return 0;
-			}
-			else if (mode == ScriptMode::CHECK)
-			{
-				X_ASSERT_NOT_IMPLEMENTED();
+                if (!pScriptSys->runScriptInSandbox(file->getBufferStart(), file->getBufferEnd())) {
+                    X_ERROR("Script", "Error running script: \"%s\"", inputFile.c_str());
+                    return -1;
+                }
 
-			}
-			else if (mode == ScriptMode::BAKE)
-			{
-				X_ASSERT_NOT_IMPLEMENTED();
+                return 0;
+            }
+            else if (mode == ScriptMode::CHECK) {
+                X_ASSERT_NOT_IMPLEMENTED();
+            }
+            else if (mode == ScriptMode::BAKE) {
+                X_ASSERT_NOT_IMPLEMENTED();
+            }
+        }
+    }
 
-			}
-		}
-	}
-
-	return res;
+    return res;
 }

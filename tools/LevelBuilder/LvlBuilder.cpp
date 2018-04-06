@@ -389,7 +389,6 @@ bool LvlBuilder::removeDuplicateBrushPlanes(LvlBrush& brush)
 	return true;
 }
 
-
 #endif
 
 X_NAMESPACE_END

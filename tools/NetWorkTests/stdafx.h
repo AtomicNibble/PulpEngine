@@ -1,8 +1,6 @@
 
 
-
 #include <EngineCommon.h>
-
 
 #include <INetwork.h>
 #include <NetMsgIds.h>
@@ -18,9 +16,7 @@
 #define GTEST_HAS_TR1_TUPLE 0
 #include <gtest\gtest.h>
 
-
 extern core::MemoryArenaBase* g_arena;
-
 
 // Google Test
 #if X_DEBUG == 1

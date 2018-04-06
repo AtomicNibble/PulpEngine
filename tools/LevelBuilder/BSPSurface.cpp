@@ -7,10 +7,8 @@
 
 #include "TriTools.h"
 
-#define	 TEXTURE_OFFSET_EQUAL_EPSILON	0.005
-#define	 TEXTURE_VECTOR_EQUAL_EPSILON	0.001
-
-
+#define TEXTURE_OFFSET_EQUAL_EPSILON 0.005
+#define TEXTURE_VECTOR_EQUAL_EPSILON 0.001
 
 /*
 DrawSurfaceForSide()
@@ -18,43 +16,41 @@ creates a SURF_FACE drawsurface from a given brush side and winding
 */
 namespace
 {
+    static const float SNAP_FLOAT_TO_INT = 8;
+    static const float SNAP_INT_TO_FLOAT = (1.0f / SNAP_FLOAT_TO_INT);
 
-	static const float SNAP_FLOAT_TO_INT = 8;
-	static const float SNAP_INT_TO_FLOAT = (1.0f / SNAP_FLOAT_TO_INT);
+} // namespace
 
-}
-
-bspDrawSurface* BSPBuilder::DrawSurfaceForSide(const BspEntity& ent, bspBrush *b, BspSide *s, XWinding *w)
+bspDrawSurface* BSPBuilder::DrawSurfaceForSide(const BspEntity& ent, bspBrush* b, BspSide* s, XWinding* w)
 {
-	int i, j;
-	bspDrawSurface    *ds;
-//	shaderInfo_t        *si, *parent;
-	bsp::Vertex       *dv;
-	Vec3f texX, texY;
-	Vec3f vTranslated;
-//	float x, y;
+    int i, j;
+    bspDrawSurface* ds;
+    //	shaderInfo_t        *si, *parent;
+    bsp::Vertex* dv;
+    Vec3f texX, texY;
+    Vec3f vTranslated;
+    //	float x, y;
 
-	bool indexed;
-//	uint8_t shaderIndexes[256];
-	float offsets[256];
-//	char tempShader[MAX_PATH];
+    bool indexed;
+    //	uint8_t shaderIndexes[256];
+    float offsets[256];
+    //	char tempShader[MAX_PATH];
 
+    //ydnar: don't make a drawsurf for culled sides
+    if (s->culled) {
+        return nullptr;
+    }
 
-	//ydnar: don't make a drawsurf for culled sides 
-	if (s->culled) {
-		return nullptr;
-	}
+    //range check
+    if (w->GetNumPoints() > MAX_POINTS_ON_WINDING) {
+        X_ERROR("DrawSurfaceForSide", "w->numpoints = %d (> %d)", w->GetNumPoints(), MAX_POINTS_ON_WINDING);
+    }
 
-	//range check 
-	if (w->GetNumPoints() > MAX_POINTS_ON_WINDING) {
-		X_ERROR("DrawSurfaceForSide","w->numpoints = %d (> %d)", w->GetNumPoints(), MAX_POINTS_ON_WINDING);
-	}
+    //get shader
+    //	si = s->shaderInfo;
 
-	//get shader 
-//	si = s->shaderInfo;
-
-	//ydnar: gs mods: check for indexed shader 
-/*	if (si->indexed && b->im != nullptr) 
+    //ydnar: gs mods: check for indexed shader
+    /*	if (si->indexed && b->im != nullptr) 
 	{
 		//indexed 
 		indexed = true;
@@ -73,56 +69,51 @@ bspDrawSurface* BSPBuilder::DrawSurfaceForSide(const BspEntity& ent, bspBrush *b
 		
 	}
 	else*/
-	{
-		indexed = false;
-	}
+    {
+        indexed = false;
+    }
 
+    //ydnar: gs mods
+    ds = AllocDrawSurface(DrawSurfaceType::FACE);
+    ds->entityNum = b->entityNum;
 
+    ds->planar = true;
+    ds->planeNum = s->planenum;
+    //	ds->lightmapVecs[2] = planes[s->planenum].getNormal();
 
-	//ydnar: gs mods 
-	ds = AllocDrawSurface(DrawSurfaceType::FACE);
-	ds->entityNum = b->entityNum;
+    //	ds->shaderInfo = si;
+    ds->mapBrush = b;
+    //	ds->sideRef = AllocSideRef(s, NULL);
+    //	ds->fogNum = -1;
+    //	ds->lightmapScale = b->lightmapScale;
+    ds->numVerts = w->GetNumPoints();
+    ds->pVerts = X_NEW_ARRAY(bsp::Vertex, ds->numVerts, g_arena, "SurfaceVerts");
 
-	ds->planar = true;
-	ds->planeNum = s->planenum;
-//	ds->lightmapVecs[2] = planes[s->planenum].getNormal();
+    //compute s/t coordinates from brush primitive texture matrix (compute axis base)
+    //	ComputeAxisBase(mapplanes[s->planenum].normal, texX, texY);
 
-//	ds->shaderInfo = si;
-	ds->mapBrush = b;
-//	ds->sideRef = AllocSideRef(s, NULL);
-//	ds->fogNum = -1;
-//	ds->lightmapScale = b->lightmapScale;
-	ds->numVerts = w->GetNumPoints();
-	ds->pVerts = X_NEW_ARRAY(bsp::Vertex,ds->numVerts,g_arena,"SurfaceVerts");
-	
+    //create the vertexes
+    for (j = 0; j < w->GetNumPoints(); j++) {
+        //get the drawvert
+        dv = ds->pVerts + j;
 
-	//compute s/t coordinates from brush primitive texture matrix (compute axis base) 
-//	ComputeAxisBase(mapplanes[s->planenum].normal, texX, texY);
+        //copy xyz and do potential z offset
+        dv->pos = (*w)[j];
 
+        if (indexed) {
+            dv->pos[2] += offsets[j];
+        }
 
-	//create the vertexes 
-	for (j = 0; j < w->GetNumPoints(); j++)
-	{
-		//get the drawvert 
-		dv = ds->pVerts + j;
+        //round the xyz to a given precision and translate by origin
+        for (i = 0; i < 3; i++)
+            dv->pos[i] = SNAP_INT_TO_FLOAT * math<float>::floor(dv->pos[i] * SNAP_FLOAT_TO_INT + 0.5f);
 
-		//copy xyz and do potential z offset 
-		dv->pos = (*w)[j];
+        dv->pos += ent.origin;
 
-		if (indexed) {
-			dv->pos[2] += offsets[j];
-		}
+        //	VectorAdd(dv->pos, e->origin, vTranslated);
 
-		//round the xyz to a given precision and translate by origin 
-		for (i = 0; i < 3; i++)
-			dv->pos[i] = SNAP_INT_TO_FLOAT * math<float>::floor(dv->pos[i] * SNAP_FLOAT_TO_INT + 0.5f);
-
-		dv->pos += ent.origin;
-
-	//	VectorAdd(dv->pos, e->origin, vTranslated);
-
-		//ydnar: tek-fu celshading support for flat shaded shit 
-/*		if (flat) 
+        //ydnar: tek-fu celshading support for flat shaded shit
+        /*		if (flat) 
 		{
 			dv->st[0] = si->stFlat[0];
 			dv->st[1] = si->stFlat[1];
@@ -133,78 +124,71 @@ bspDrawSurface* BSPBuilder::DrawSurfaceForSide(const BspEntity& ent, bspBrush *b
 			dv->st[1] = DotProduct(si->vecs[1], vTranslated);
 		}
 		else //brush primitive texturing */
-		{
-			//calculate texture s/t from brush primitive texture matrix 
-		//	x = DotProduct(vTranslated, texX);
-		//	y = DotProduct(vTranslated, texY);
-		//	dv->st[0] = s->texMat[0][0] * x + s->texMat[0][1] * y + s->texMat[0][2];
-		//	dv->st[1] = s->texMat[1][0] * x + s->texMat[1][1] * y + s->texMat[1][2];
-		}
+        {
+            //calculate texture s/t from brush primitive texture matrix
+            //	x = DotProduct(vTranslated, texX);
+            //	y = DotProduct(vTranslated, texY);
+            //	dv->st[0] = s->texMat[0][0] * x + s->texMat[0][1] * y + s->texMat[0][2];
+            //	dv->st[1] = s->texMat[1][0] * x + s->texMat[1][1] * y + s->texMat[1][2];
+        }
 
-		// copy normal 
-		dv->normal = planes[s->planenum].getNormal();
+        // copy normal
+        dv->normal = planes[s->planenum].getNormal();
 
-		// set color 
-		dv->color[0] = 255;
-		dv->color[1] = 255;
-		dv->color[2] = 255;
-		dv->color[3] = 255;
-		
-	}
+        // set color
+        dv->color[0] = 255;
+        dv->color[1] = 255;
+        dv->color[2] = 255;
+        dv->color[3] = 255;
+    }
 
-	//set cel shader 
-//	ds->celShader = b->celShader;
+    //set cel shader
+    //	ds->celShader = b->celShader;
 
-	return ds;
+    return ds;
 }
 
-
-
-
 // Adds non-opaque leaf fragments to the convex hull
-void BSPBuilder::ClipSideIntoTree_r(XWinding* w, BspSide *side, bspNode *node)
+void BSPBuilder::ClipSideIntoTree_r(XWinding* w, BspSide* side, bspNode* node)
 {
-	XWinding       *front, *back;
+    XWinding *front, *back;
 
-	if (!w) {
-		return;
-	}
+    if (!w) {
+        return;
+    }
 
-	if (node->planenum != PLANENUM_LEAF)
-	{
-		if (side->planenum == node->planenum) {
-			ClipSideIntoTree_r(w, side, node->children[0]);
-			return;
-		}
-		if (side->planenum == (node->planenum ^ 1)) {
-			ClipSideIntoTree_r(w, side, node->children[1]);
-			return;
-		}
+    if (node->planenum != PLANENUM_LEAF) {
+        if (side->planenum == node->planenum) {
+            ClipSideIntoTree_r(w, side, node->children[0]);
+            return;
+        }
+        if (side->planenum == (node->planenum ^ 1)) {
+            ClipSideIntoTree_r(w, side, node->children[1]);
+            return;
+        }
 
-		w->Split(planes[node->planenum], ON_EPSILON, &front, &back);
+        w->Split(planes[node->planenum], ON_EPSILON, &front, &back);
 
-		delete w;
+        delete w;
 
-		ClipSideIntoTree_r(front, side, node->children[0]);
-		ClipSideIntoTree_r(back, side, node->children[1]);
+        ClipSideIntoTree_r(front, side, node->children[0]);
+        ClipSideIntoTree_r(back, side, node->children[1]);
 
-		return;
-	}
+        return;
+    }
 
+    // if opaque leaf, don't add
+    if (!node->opaque) {
+        if (!side->pVisibleHull) {
+            side->pVisibleHull = w->Copy();
+        }
+        else {
+            side->pVisibleHull->AddToConvexHull(w, planes[side->planenum].getNormal());
+        }
+    }
 
-	// if opaque leaf, don't add
-	if (!node->opaque) 
-	{
-		if (!side->pVisibleHull) {
-			side->pVisibleHull = w->Copy();
-		}
-		else {
-			side->pVisibleHull->AddToConvexHull(w, planes[side->planenum].getNormal());
-		}
-	}
-
-	delete w;
-	return;
+    delete w;
+    return;
 }
 
 /*
@@ -219,85 +203,76 @@ to be trimmed off automatically.
 
 void BSPBuilder::ClipSidesIntoTree(const BspEntity& ent, bspTree* pTree)
 {
-	bspBrush     *b;
-	int i;
-	XWinding       *w;
-	BspSide          *side, *newSide;
-//	shaderInfo_t    *si;
+    bspBrush* b;
+    int i;
+    XWinding* w;
+    BspSide *side, *newSide;
+    //	shaderInfo_t    *si;
 
+    // ydnar: cull brush sides
+    //	CullSides(ent);
 
-	// ydnar: cull brush sides 
-//	CullSides(ent);
+    X_LOG0("Bsp", "--- ClipSidesIntoTree ---");
 
-	X_LOG0("Bsp", "--- ClipSidesIntoTree ---" );
+    // walk the brush list
+    for (b = ent.pBrushes; b; b = b->next) {
+        // walk the brush sides
+        for (i = 0; i < b->numsides; i++) {
+            // get side
+            side = &b->sides[i];
+            if (side->pWinding == nullptr) {
+                continue;
+            }
 
-	// walk the brush list 
-	for (b = ent.pBrushes; b; b = b->next)
-	{
-		// walk the brush sides 
-		for ( i = 0; i < b->numsides; i++ )
-		{
-			// get side 
-			side = &b->sides[ i ];
-			if ( side->pWinding == nullptr ) {
-				continue;
-			}
+            // copy the winding
+            w = side->pWinding->Copy();
+            side->pVisibleHull = nullptr;
 
-			// copy the winding 
-			w = side->pWinding->Copy();
-			side->pVisibleHull = nullptr;
+            ClipSideIntoTree_r(w, side, pTree->headnode);
 
-			ClipSideIntoTree_r(w, side, pTree->headnode);
+            // anything left?
+            w = side->pVisibleHull;
+            if (w == nullptr) {
+                continue;
+            }
 
-			// anything left? 
-			w = side->pVisibleHull;
-			if (w == nullptr) {
-				continue;
-			}
+            // shader?
+            //		si = side->shaderInfo;
+            //		if (si == nullptr) {
+            //			continue;
+            //		}
 
-			// shader? 
-	//		si = side->shaderInfo;
-	//		if (si == nullptr) {
-	//			continue;
-	//		}
+            // don't create faces for non-visible sides
+            // ydnar: except indexed shaders, like common/terrain and nodraw fog surfaces
+            //		if ( ( si->compileFlags & C_NODRAW ) && si->indexed == false && !( si->compileFlags & C_FOG ) ) {
+            //			continue;
+            //		}
 
-			// don't create faces for non-visible sides 
-			// ydnar: except indexed shaders, like common/terrain and nodraw fog surfaces 
-	//		if ( ( si->compileFlags & C_NODRAW ) && si->indexed == false && !( si->compileFlags & C_FOG ) ) {
-	//			continue;
-	//		}
+            // always use the original winding for autosprites and noclip faces
+            //		if ( si->autosprite || si->noClip ) {
+            //			w = side->pWinding;
+            //		}
 
-			// always use the original winding for autosprites and noclip faces 
-	//		if ( si->autosprite || si->noClip ) {
-	//			w = side->pWinding;
-	//		}
+            // save this winding as a visible surface
+            DrawSurfaceForSide(ent, b, side, w);
 
-			// save this winding as a visible surface 
-			DrawSurfaceForSide( ent, b, side, w );
+            // make a back side for fog
+            //		if ( !( si->compileFlags & C_FOG ) ) {
+            //			continue;
+            //		}
 
-			// make a back side for fog 
-	//		if ( !( si->compileFlags & C_FOG ) ) {
-	//			continue;
-	//		}
+            // duplicate the up-facing side
+            w = w->ReverseWinding();
+            newSide = X_NEW(BspSide, g_arena, "BspSide");
+            *newSide = *side;
+            newSide->pVisibleHull = w;
+            newSide->planenum ^= 1;
 
-			// duplicate the up-facing side 
-			w = w->ReverseWinding();
-			newSide = X_NEW(BspSide,g_arena,"BspSide");
-			*newSide = *side;
-			newSide->pVisibleHull = w;
-			newSide->planenum ^= 1;
-
-			// save this winding as a visible surface 
-			DrawSurfaceForSide( ent, b, newSide, w );
-
-			
-		}
-	}
+            // save this winding as a visible surface
+            DrawSurfaceForSide(ent, b, newSide, w);
+        }
+    }
 }
-
-
-
-
 
 #if 0
 
@@ -486,8 +461,8 @@ TriListForSide
 =================
 */
 //#define	SNAP_FLOAT_TO_INT	8
-#define	SNAP_FLOAT_TO_INT	256
-#define	SNAP_INT_TO_FLOAT	(1.0/SNAP_FLOAT_TO_INT)
+#define SNAP_FLOAT_TO_INT 256
+#define SNAP_INT_TO_FLOAT (1.0 / SNAP_FLOAT_TO_INT)
 
 mapTri_t* BSPData::TriListForSide(const side_t *s, const XWinding *w)
 {
@@ -1316,6 +1291,5 @@ void BSPData::Prelight(uEntity_t *e)
 #endif
 
 }
-
 
 #endif

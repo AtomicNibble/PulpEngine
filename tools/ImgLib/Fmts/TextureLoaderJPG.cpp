@@ -8,14 +8,11 @@
 
 #include "TextureFile.h"
 
-
-
 #if X_DEBUG
 X_LINK_LIB("jpegd");
 #else
 X_LINK_LIB("jpeg");
 #endif // !X_DEBUG
-
 
 X_NAMESPACE_BEGIN(texture)
 X_DISABLE_WARNING(4611)
@@ -23,268 +20,254 @@ X_DISABLE_WARNING(4324)
 
 namespace JPG
 {
-	namespace
-	{
-		static const char* JPG_FILE_EXTENSION = ".jpg";
-		static const size_t JPEG_MGR_BUFFER_SIZE = (1 << 10);
+    namespace
+    {
+        static const char* JPG_FILE_EXTENSION = ".jpg";
+        static const size_t JPEG_MGR_BUFFER_SIZE = (1 << 10);
 
-		struct jpeg_xfile_src_mgr
-		{
-			jpeg_source_mgr mgr;
-			uint32_t bytes_read;
-			core::XFile* file;
-			unsigned char buffer[JPEG_MGR_BUFFER_SIZE];
-		};
+        struct jpeg_xfile_src_mgr
+        {
+            jpeg_source_mgr mgr;
+            uint32_t bytes_read;
+            core::XFile* file;
+            unsigned char buffer[JPEG_MGR_BUFFER_SIZE];
+        };
 
-		static void xfile_init_source(j_decompress_ptr cinfo)
-		{
-			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
-			X_UNUSED(src);
-			// files already open since engine filesystem 
-			// will only give back a file object when it's valid and open.
+        static void xfile_init_source(j_decompress_ptr cinfo)
+        {
+            jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
+            X_UNUSED(src);
+            // files already open since engine filesystem
+            // will only give back a file object when it's valid and open.
+        }
 
-		}
+        static boolean xfile_fill_input_buffer(j_decompress_ptr cinfo)
+        {
+            jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
-		static boolean xfile_fill_input_buffer(j_decompress_ptr cinfo)
-		{
-			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
+            size_t bytes_read;
+            bytes_read = src->file->read(src->buffer, JPEG_MGR_BUFFER_SIZE);
 
-			size_t bytes_read;
-			bytes_read = src->file->read(src->buffer, JPEG_MGR_BUFFER_SIZE);
+            src->mgr.next_input_byte = src->buffer;
+            src->mgr.bytes_in_buffer = bytes_read;
+            if (0 == src->mgr.bytes_in_buffer) {
+                /* The image file is truncated. We insert EOI marker to tell the library to stop processing. */
+                src->buffer[0] = (JOCTET)0xFF;
+                src->buffer[1] = (JOCTET)JPEG_EOI;
+                src->mgr.bytes_in_buffer = 2;
+            }
+            return TRUE;
+        }
 
-			src->mgr.next_input_byte = src->buffer;
-			src->mgr.bytes_in_buffer = bytes_read;
-			if (0 == src->mgr.bytes_in_buffer)
-			{
-				/* The image file is truncated. We insert EOI marker to tell the library to stop processing. */
-				src->buffer[0] = (JOCTET)0xFF;
-				src->buffer[1] = (JOCTET)JPEG_EOI;
-				src->mgr.bytes_in_buffer = 2;
-			}
-			return TRUE;
-		}
+        static void xfile_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
+        {
+            jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
 
-		static void xfile_skip_input_data(j_decompress_ptr cinfo, long num_bytes)
-		{
-			jpeg_xfile_src_mgr* src = reinterpret_cast<jpeg_xfile_src_mgr*>(cinfo->src);
+            if (num_bytes <= 0) {
+                return;
+            }
 
-			if (num_bytes <= 0) {
-				return;
-			}
+            if (num_bytes <= safe_static_cast<long, size_t>(src->mgr.bytes_in_buffer)) {
+                src->mgr.next_input_byte += static_cast<uintptr_t>(num_bytes);
+                src->mgr.bytes_in_buffer -= static_cast<size_t>(num_bytes);
+            }
+            else {
+                size_t skip = num_bytes - src->mgr.bytes_in_buffer;
 
-			if (num_bytes <= safe_static_cast<long,size_t>(src->mgr.bytes_in_buffer))
-			{
-				src->mgr.next_input_byte += static_cast<uintptr_t>(num_bytes);
-				src->mgr.bytes_in_buffer -= static_cast<size_t>(num_bytes);
-			}
-			else
-			{
-				size_t skip = num_bytes - src->mgr.bytes_in_buffer;
+                cinfo->src->bytes_in_buffer = 0;
+                src->file->seek(skip, core::SeekMode::CUR);
+            }
+        }
 
-				cinfo->src->bytes_in_buffer = 0;
-				src->file->seek(skip, core::SeekMode::CUR);
-			}
-		}
+        static void xfile_term_source(j_decompress_ptr cinfo)
+        {
+            X_UNUSED(cinfo);
+            // we don't close the file handle.
+            // since this reader is called with the open file.
+            // code that calls it is responsible for closing the file.
+        }
 
-		static void xfile_term_source(j_decompress_ptr cinfo)
-		{
-			X_UNUSED(cinfo);
-			// we don't close the file handle.
-			// since this reader is called with the open file.
-			// code that calls it is responsible for closing the file.
-		}
+        static void init_file_stream(j_decompress_ptr cinfo, jpeg_xfile_src_mgr* src, core::XFile* file)
+        {
+            src->file = file;
+            src->bytes_read = 0;
+            src->mgr.init_source = xfile_init_source;
+            src->mgr.fill_input_buffer = xfile_fill_input_buffer;
+            src->mgr.skip_input_data = xfile_skip_input_data;
+            src->mgr.resync_to_restart = jpeg_resync_to_restart;
+            src->mgr.term_source = xfile_term_source;
+            src->mgr.bytes_in_buffer = 0;
+            src->mgr.next_input_byte = nullptr;
+            cinfo->src = reinterpret_cast<jpeg_source_mgr*>(src);
+        }
 
-		static void init_file_stream(j_decompress_ptr cinfo, jpeg_xfile_src_mgr* src, core::XFile* file)
-		{
-			src->file = file;
-			src->bytes_read = 0;
-			src->mgr.init_source = xfile_init_source;
-			src->mgr.fill_input_buffer = xfile_fill_input_buffer;
-			src->mgr.skip_input_data = xfile_skip_input_data;
-			src->mgr.resync_to_restart = jpeg_resync_to_restart;
-			src->mgr.term_source = xfile_term_source;
-			src->mgr.bytes_in_buffer = 0;
-			src->mgr.next_input_byte = nullptr;
-			cinfo->src = reinterpret_cast<jpeg_source_mgr*>(src);
-		}
+        struct my_error_mgr
+        {
+            struct jpeg_error_mgr pub; /* "public" fields */
 
-		struct my_error_mgr {
-			struct jpeg_error_mgr pub;	/* "public" fields */
+            jmp_buf setjmp_buffer; /* for return to caller */
+        };
 
-			jmp_buf setjmp_buffer;	/* for return to caller */
-		};
+        typedef struct my_error_mgr* my_error_ptr;
 
-		typedef struct my_error_mgr * my_error_ptr;
+        static void my_error_exit(j_common_ptr cinfo)
+        {
+            my_error_ptr myerr = (my_error_ptr)cinfo->err;
 
-		static void my_error_exit(j_common_ptr cinfo)
-		{
-			my_error_ptr myerr = (my_error_ptr)cinfo->err;
+            char jpeg_last_error[JMSG_LENGTH_MAX];
+            (*cinfo->err->format_message)(cinfo, jpeg_last_error);
 
-			char jpeg_last_error[JMSG_LENGTH_MAX];
-			(*cinfo->err->format_message) (cinfo, jpeg_last_error);
+            X_ERROR("TextureJPG", jpeg_last_error);
 
-			X_ERROR("TextureJPG", jpeg_last_error);
+            /* Return control to the setjmp point */
+            longjmp(myerr->setjmp_buffer, 1);
+        }
 
-			/* Return control to the setjmp point */
-			longjmp(myerr->setjmp_buffer, 1);
-		}
+        static void output_message(j_common_ptr cinfo)
+        {
+            char jpeg_msg[JMSG_LENGTH_MAX];
 
-		static void output_message(j_common_ptr cinfo)
-		{
-			char jpeg_msg[JMSG_LENGTH_MAX];
+            (*cinfo->err->format_message)(cinfo, jpeg_msg);
 
-			(*cinfo->err->format_message)(cinfo, jpeg_msg);
-			
-			X_ERROR("TextureJPG", jpeg_msg);
-		}
-	}
+            X_ERROR("TextureJPG", jpeg_msg);
+        }
+    } // namespace
 
+    const char* XTexLoaderJPG::EXTENSION = JPG_FILE_EXTENSION;
 
-	const char* XTexLoaderJPG::EXTENSION = JPG_FILE_EXTENSION;
+    XTexLoaderJPG::XTexLoaderJPG()
+    {
+    }
 
+    XTexLoaderJPG::~XTexLoaderJPG()
+    {
+    }
 
-	XTexLoaderJPG::XTexLoaderJPG()
-	{
+    bool XTexLoaderJPG::isValidData(const DataVec& fileData)
+    {
+        if (fileData.size() < 4) {
+            return false;
+        }
 
-	}
+        const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
 
-	XTexLoaderJPG::~XTexLoaderJPG()
-	{
-		
-	}
+        return pData[0] == 0xd8ff && pData[1] == 0x0eff;
+    }
 
-	bool XTexLoaderJPG::isValidData(const DataVec& fileData)
-	{
-		if (fileData.size() < 4) {
-			return false;
-		}
+    // ITextureFmt
+    const char* XTexLoaderJPG::getExtension(void) const
+    {
+        return JPG_FILE_EXTENSION;
+    }
 
-		const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
+    ImgFileFormat::Enum XTexLoaderJPG::getSrcFmt(void) const
+    {
+        return ImgFileFormat::JPG;
+    }
 
-		return pData[0] == 0xd8ff && pData[1] == 0x0eff;
-	}
+    bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
+    {
+        return core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
+    }
 
-	// ITextureFmt
-	const char* XTexLoaderJPG::getExtension(void) const
-	{
-		return JPG_FILE_EXTENSION;
-	}
+    bool XTexLoaderJPG::canLoadFile(const DataVec& fileData) const
+    {
+        return isValidData(fileData);
+    }
 
-	ImgFileFormat::Enum XTexLoaderJPG::getSrcFmt(void) const
-	{
-		return ImgFileFormat::JPG;
-	}
+    bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
+    {
+        X_ASSERT_NOT_NULL(file);
+        X_UNUSED(swapArena);
 
-	bool XTexLoaderJPG::canLoadFile(const core::Path<char>& path) const
-	{
-		return core::strUtil::IsEqual(JPG_FILE_EXTENSION, path.extension());
-	}
+        struct jpeg_decompress_struct cinfo;
+        struct my_error_mgr jerr;
+        struct jpeg_xfile_src_mgr file_reader;
 
-	bool XTexLoaderJPG::canLoadFile(const DataVec& fileData) const
-	{
-		return isValidData(fileData);
-	}
+        core::zero_object(cinfo);
 
-	bool XTexLoaderJPG::loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
-	{
-		X_ASSERT_NOT_NULL(file);
-		X_UNUSED(swapArena);
+        cinfo.err = jpeg_std_error(&jerr.pub);
+        jerr.pub.error_exit = my_error_exit;
+        jerr.pub.output_message = output_message;
 
-		struct jpeg_decompress_struct cinfo;
-		struct my_error_mgr jerr;
-		struct jpeg_xfile_src_mgr file_reader;
+        if (setjmp(jerr.setjmp_buffer)) {
+            jpeg_finish_decompress(&cinfo);
+            jpeg_destroy_decompress(&cinfo);
+            return false;
+        }
 
-		core::zero_object(cinfo);
+        jpeg_create_decompress(&cinfo);
 
-		cinfo.err = jpeg_std_error(&jerr.pub);
-		jerr.pub.error_exit = my_error_exit;
-		jerr.pub.output_message = output_message;
+        init_file_stream(&cinfo, &file_reader, file);
+        jpeg_read_header(&cinfo, TRUE);
+        jpeg_start_decompress(&cinfo);
 
-		if (setjmp(jerr.setjmp_buffer)) {
-			jpeg_finish_decompress(&cinfo);
-			jpeg_destroy_decompress(&cinfo);
-			return false;
-		}
+        // check we can load this.
+        if (cinfo.output_height < 1 || cinfo.output_height > TEX_MAX_DIMENSIONS || cinfo.output_width < 1 || cinfo.output_width > TEX_MAX_DIMENSIONS) {
+            X_ERROR("TextureJPG", "invalid image dimensions. provided: %ix%i max: %ix%i",
+                cinfo.output_height, cinfo.output_width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
 
-		jpeg_create_decompress(&cinfo);
-	
-		init_file_stream(&cinfo, &file_reader, file);
-		jpeg_read_header(&cinfo, TRUE);
-		jpeg_start_decompress(&cinfo);
+            longjmp(jerr.setjmp_buffer, 1);
+        }
 
-		// check we can load this.
-		if (cinfo.output_height < 1 || cinfo.output_height > TEX_MAX_DIMENSIONS ||
-			cinfo.output_width < 1 || cinfo.output_width > TEX_MAX_DIMENSIONS)
-		{
-			X_ERROR("TextureJPG", "invalid image dimensions. provided: %ix%i max: %ix%i", 
-				cinfo.output_height, cinfo.output_width, TEX_MAX_DIMENSIONS, TEX_MAX_DIMENSIONS);
+        if (!core::bitUtil::IsPowerOfTwo(cinfo.output_height) || !core::bitUtil::IsPowerOfTwo(cinfo.output_width)) {
+            X_ERROR("TextureJPG", "invalid image dimensions, must be power of two. provided: %ix%i",
+                cinfo.output_height, cinfo.output_width);
 
-			longjmp(jerr.setjmp_buffer, 1);
-		}
+            longjmp(jerr.setjmp_buffer, 1);
+        }
 
-		if (!core::bitUtil::IsPowerOfTwo(cinfo.output_height) || !core::bitUtil::IsPowerOfTwo(cinfo.output_width))
-		{
-			X_ERROR("TextureJPG", "invalid image dimensions, must be power of two. provided: %ix%i",
-				cinfo.output_height, cinfo.output_width);
+        uint32_t inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
+        uint32_t row_stride = cinfo.output_width * cinfo.output_components;
+        JSAMPROW* row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
-			longjmp(jerr.setjmp_buffer, 1);
-		}
+        X_UNUSED(inflated_size);
 
-		uint32_t inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
-		uint32_t row_stride = cinfo.output_width * cinfo.output_components;
-		JSAMPROW* row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
+        if (cinfo.out_color_space != JCS_RGB) {
+            X_ERROR("TextureJPG", "invalid colorspace, must be RGB");
+            longjmp(jerr.setjmp_buffer, 1);
+        }
 
-		X_UNUSED(inflated_size);
+        // just check incase.
+        if (cinfo.output_components != 3) {
+            X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 3", cinfo.output_components);
+            longjmp(jerr.setjmp_buffer, 1);
+        }
 
-		if (cinfo.out_color_space != JCS_RGB)
-		{
-			X_ERROR("TextureJPG", "invalid colorspace, must be RGB");
-			longjmp(jerr.setjmp_buffer, 1);
-		}
+        // create the img obj.
+        TextureFlags flags;
+        flags.Set(TextureFlags::NOMIPS);
 
-		// just check incase.
-		if (cinfo.output_components != 3)
-		{
-			X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 3", cinfo.output_components);
-			longjmp(jerr.setjmp_buffer, 1);
-		}
+        imgFile.setNumFaces(1);
+        imgFile.setNumMips(1);
+        imgFile.setDepth(1);
+        imgFile.setFlags(flags);
+        imgFile.setFormat(Texturefmt::R8G8B8);
+        imgFile.setType(TextureType::T2D);
+        imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
+        imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
+        imgFile.resize();
 
-		// create the img obj.
-		TextureFlags flags;
-		flags.Set(TextureFlags::NOMIPS);
+        uint8_t* pBuffer = imgFile.getFace(0);
+        while (cinfo.output_scanline < cinfo.output_height) {
+            jpeg_read_scanlines(&cinfo, row_pointer, 1);
 
-		imgFile.setNumFaces(1);
-		imgFile.setNumMips(1);
-		imgFile.setDepth(1);
-		imgFile.setFlags(flags);
-		imgFile.setFormat(Texturefmt::R8G8B8);
-		imgFile.setType(TextureType::T2D);
-		imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
-		imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
-		imgFile.resize();
+            // copy into final buffer.
+            memcpy(pBuffer, row_pointer, row_stride);
+            pBuffer += row_stride;
+        }
 
-		uint8_t* pBuffer = imgFile.getFace(0);
-		while (cinfo.output_scanline < cinfo.output_height)
-		{
-			jpeg_read_scanlines(&cinfo, row_pointer, 1);
-
-			// copy into final buffer.
-			memcpy(pBuffer, row_pointer, row_stride);
-			pBuffer += row_stride;
-		}
-
-
-		jpeg_finish_decompress(&cinfo);
-		jpeg_destroy_decompress(&cinfo);
+        jpeg_finish_decompress(&cinfo);
+        jpeg_destroy_decompress(&cinfo);
 
 #if X_DEBUG == 1
-		uint64_t left = file->remainingBytes();
-		X_WARNING_IF(left > 0, "TextureJPG", "potential read fail, bytes left in file: %i", left);
+        uint64_t left = file->remainingBytes();
+        X_WARNING_IF(left > 0, "TextureJPG", "potential read fail, bytes left in file: %i", left);
 #endif
 
-		return true;
-	}
-	// ~ITextureFmt
+        return true;
+    }
+    // ~ITextureFmt
 
 } // namespace JPG
 

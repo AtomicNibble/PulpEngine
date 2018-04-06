@@ -1,5 +1,4 @@
-#pragma once 
-
+#pragma once
 
 X_NAMESPACE_BEGIN(level)
 
@@ -8,7 +7,6 @@ static const int PLANENUM_AREA_DIFF = -2;
 
 static const size_t BSP_TREE_BLOCK_SIZE = 1024;
 static const size_t MAX_PRIMATIVES = 1 << 17;
-
 
 // Epsilon's
 static const float ON_EPSILON = 0.1f;

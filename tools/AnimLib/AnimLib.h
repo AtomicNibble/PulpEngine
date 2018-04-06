@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_ANIM_LIB_H_
 #define X_ANIM_LIB_H_
 
@@ -18,9 +17,7 @@
 #endif // X_LIB
 #endif // !ANIMLIB_EXPORT
 
-
 #include "Anim\Anim.h"
 #include "Anim\Animator.h"
-
 
 #endif // !X_ANIM_LIB_H_
