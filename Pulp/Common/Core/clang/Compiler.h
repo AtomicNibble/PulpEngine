@@ -6,11 +6,13 @@
 #include <cstddef>
 #include <type_traits>
 
-#define X_ABSTRACT = 0
-#define X_OVERRIDE override
-#define X_FINAL override final
+// clang-format off
 
-#define X_PRAGMA(pragma) __pragma(pragma)
+#define X_ABSTRACT                          = 0
+#define X_OVERRIDE                          override
+#define X_FINAL                             override final
+
+#define X_PRAGMA(pragma)                    __pragma(pragma)
 
 // nop
 #define X_PUSH_WARNING_LEVEL(level)
@@ -87,5 +89,7 @@ struct check_size_static : std::true_type
 #else
 #define X_ENSURE_SIZE(type, size) static_assert(sizeof(type) == size, #type " is not " #size " bytes in size")
 #endif
+
+// clang-format on
 
 #endif // ! X_COMPILER_H
