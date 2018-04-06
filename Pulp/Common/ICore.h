@@ -226,7 +226,11 @@ struct SCoreInitParams
 
 struct SCoreGlobals // obbject is zerod on start.
 {
-	X_DECLARE_ENUM8(State)(STARTING, RUNNING, CLOSING);
+	X_DECLARE_ENUM8(State)(
+        STARTING, 
+        RUNNING, 
+        CLOSING
+        );
 
 	ICore*						pCore;
 	input::IInput*				pInput;

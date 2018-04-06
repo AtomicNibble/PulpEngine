@@ -2,213 +2,205 @@
 
 #include <IConverterModule.h>
 
-
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
+    static const uint32_t WEAPON_VERSION = 2;
+    static const uint32_t WEAPON_FOURCC = X_TAG('w', 'p', 'n', 'b');
 
-	static const uint32_t	 WEAPON_VERSION = 2;
-	static const uint32_t	 WEAPON_FOURCC = X_TAG('w', 'p', 'n', 'b');
+    static const char* WEAPON_FILE_EXTENSION = "wpn";
+    static const char* WEAPON_DEFAULT_NAME = "default";
 
-	static const char*		 WEAPON_FILE_EXTENSION = "wpn";
-	static const char*		 WEAPON_DEFAULT_NAME = "default";
+    static const uint32_t WEAPON_MAX_LOADED = 128;
 
-	static const uint32_t    WEAPON_MAX_LOADED = 128;
+    struct IWeaponLib : public IConverter
+    {
+    };
 
+    X_DECLARE_ENUM(State)
+    (
+        Holstered,
+        Idle,
+        Reloading,
+        OutOfAmmo,
+        Raising,
+        Lowering,
 
-	struct IWeaponLib : public IConverter
-	{
+        PreFire,
+        Fire
+     );
 
-	};
+    X_DECLARE_FLAGS(StateFlag)
+    (
+        HasRaised
+    );
 
+    typedef Flags<StateFlag> StateFlags;
 
-	X_DECLARE_ENUM(State)(
-		Holstered,
-		Idle,
-		Reloading,
-		OutOfAmmo,
-		Raising,
-		Lowering,
+    X_DECLARE_ENUM8(WeaponClass)
+    (
+        Pistol,
+        Rifle,
+        Smg,
+        Mg);
 
-		PreFire,
-		Fire
-	);
+    X_DECLARE_ENUM8(InventoryType)
+    (
+        Primary);
 
-	X_DECLARE_FLAGS(StateFlag)(
-		HasRaised	
-	);
+    X_DECLARE_ENUM8(FireType)
+    (
+        FullAuto,
+        Single,
+        Burst2,
+        Burst3);
 
-	typedef Flags<StateFlag> StateFlags;
+    X_DECLARE_ENUM8(AmmoCounterStyle)
+    (
+        Magazine,
+        ShortMagazine,
+        ShotGun,
+        Rocket,
+        BeltFed);
 
+    X_DECLARE_FLAGS(WeaponFlag)
+    (
+        Ads,
+        AdsFire,
+        AdsRechamber,
+        AdsNoAutoReload,
+        NoPartialReload,
+        NoProne,
+        SegmentedReload,
+        ArmorPiercing);
 
-	X_DECLARE_ENUM8(WeaponClass)(
-		Pistol,
-		Rifle,
-		Smg,
-		Mg
-	);
+    typedef Flags<WeaponFlag> WeaponFlags;
 
-	X_DECLARE_ENUM8(InventoryType)(
-		Primary
-	);
+    X_DECLARE_ENUM(ModelSlot)
+    (
+        Gun,
+        World);
 
-	X_DECLARE_ENUM8(FireType)(
-		FullAuto,
-		Single,
-		Burst2,
-		Burst3
-	);
+    X_DECLARE_ENUM(AnimSlot)
+    (
+        Idle,
+        Fire,
+        LastShot,
+        Raise,
+        FirstRaise,
+        Lower,
+        Reload,
+        ReloadEmpty);
 
-	X_DECLARE_ENUM8(AmmoCounterStyle)(
-		Magazine,
-		ShortMagazine,
-		ShotGun,
-		Rocket,
-		BeltFed
-	);
+    X_DECLARE_ENUM(SoundSlot)
+    (
+        Pickup,
+        AmmoPickup,
+        Fire,
+        LastShot,
+        EmptyFire,
+        Raise,
+        Lower);
 
-	X_DECLARE_FLAGS(WeaponFlag)(
-		Ads,
-		AdsFire,
-		AdsRechamber,
-		AdsNoAutoReload,
-		NoPartialReload,
-		NoProne,
-		SegmentedReload,
-		ArmorPiercing
-	);
+    X_DECLARE_ENUM(IconSlot)
+    (
+        Hud,
+        AmmoCounter);
 
-	typedef Flags<WeaponFlag> WeaponFlags;
+    X_DECLARE_ENUM(StateTimer)
+    (
+        Fire,
+        FireDelay,
+        Melee,
+        MeleeDelay,
+        Reload,
+        ReloadEmpty,
+        Lower,
+        Raise,
+        FirstRaise);
 
-	X_DECLARE_ENUM(ModelSlot)(
-		Gun,
-		World
-	);
+    X_DECLARE_ENUM(AmmoSlot)
+    (
+        Max,
+        Start,
+        ClipSize);
 
-	X_DECLARE_ENUM(AnimSlot)(
-		Idle,
-		Fire,
-		LastShot,
-		Raise,
-		FirstRaise,
-		Lower,
-		Reload,
-		ReloadEmpty
-	);
+    X_DECLARE_ENUM(EffectSlot)
+    (
+        FlashView,
+        FlashWorld,
+        ShellEject);
 
-	X_DECLARE_ENUM(SoundSlot)(
-		Pickup,
-		AmmoPickup,
-		Fire,
-		LastShot,
-		EmptyFire,
-		Raise,
-		Lower
-	);
+    struct WeaponHdr
+    {
+        template<size_t N>
+        using SlotArr = std::array<uint16_t, N>;
 
-	X_DECLARE_ENUM(IconSlot)(
-		Hud,
-		AmmoCounter
-	);
+        template<size_t N>
+        using FloatArr = std::array<float, N>;
 
-	X_DECLARE_ENUM(StateTimer)(
-		Fire,
-		FireDelay,
-		Melee,
-		MeleeDelay,
-		Reload,
-		ReloadEmpty,
-		Lower,
-		Raise,
-		FirstRaise
-	);
+        template<size_t N>
+        using Int16Arr = std::array<uint16_t, N>;
 
-	X_DECLARE_ENUM(AmmoSlot) (
-		Max,
-		Start,
-		ClipSize
-	);
+        // 4
+        uint32_t fourCC;
+        // 4
+        uint8_t version;
+        uint8_t _pad[1];
+        uint16_t dataSize;
 
-	X_DECLARE_ENUM(EffectSlot) (
-		FlashView,
-		FlashWorld,
-		ShellEject
-	);
+        // 4
+        WeaponClass::Enum wpnClass;
+        InventoryType::Enum invType;
+        FireType::Enum fireType;
+        AmmoCounterStyle::Enum ammoCounterStyle;
 
-	struct WeaponHdr
-	{
-		template<size_t N>
-		using SlotArr = std::array<uint16_t, N>;
-		
-		template<size_t N>
-		using FloatArr = std::array<float, N>;
+        // 4
+        WeaponFlags flags;
 
-		template<size_t N>
-		using Int16Arr = std::array<uint16_t, N>;
+        // 8
+        uint16_t minDmg;
+        uint16_t maxDmg;
+        uint16_t meleeDmg;
+        uint16_t _pad2;
 
-		// 4
-		uint32_t fourCC;
-		// 4
-		uint8_t version;
-		uint8_t _pad[1];
-		uint16_t dataSize;
+        // 8
+        uint32_t minDmgRange;
+        uint32_t maxDmgRange;
 
-		// 4
-		WeaponClass::Enum wpnClass;
-		InventoryType::Enum invType;
-		FireType::Enum fireType;
-		AmmoCounterStyle::Enum ammoCounterStyle;
+        // these are all relative pointers to strings.
+        // if zero it's not set.
+        SlotArr<ModelSlot::ENUM_COUNT> modelSlots;
+        SlotArr<AnimSlot::ENUM_COUNT> animSlots;
+        SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
+        SlotArr<IconSlot::ENUM_COUNT> iconSlots;
 
-		// 4
-		WeaponFlags flags;
+        SlotArr<EffectSlot::ENUM_COUNT> effectSlots;
 
-		// 8
-		uint16_t minDmg;
-		uint16_t maxDmg;
-		uint16_t meleeDmg;
-		uint16_t _pad2;
+        Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots;
+        FloatArr<StateTimer::ENUM_COUNT> stateTimers;
 
-		// 8
-		uint32_t minDmgRange;
-		uint32_t maxDmgRange;
+        uint16_t ammoName;
 
-		// these are all relative pointers to strings.
-		// if zero it's not set.
-		SlotArr<ModelSlot::ENUM_COUNT> modelSlots;
-		SlotArr<AnimSlot::ENUM_COUNT> animSlots;
-		SlotArr<SoundSlot::ENUM_COUNT> sndSlots;
-		SlotArr<IconSlot::ENUM_COUNT> iconSlots;
+        X_INLINE bool isValid(void) const
+        {
+            if (version != WEAPON_VERSION) {
+                X_ERROR("Weapon", "weapon version is invalid. FileVer: %i RequiredVer: %i",
+                    version, WEAPON_VERSION);
+            }
 
-		SlotArr<EffectSlot::ENUM_COUNT> effectSlots;
+            return version == WEAPON_VERSION && fourCC == WEAPON_FOURCC;
+        }
+    };
 
-		Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots;
-		FloatArr<StateTimer::ENUM_COUNT> stateTimers;
+    X_ENSURE_SIZE(WeaponClass, 1);
+    X_ENSURE_SIZE(InventoryType, 1);
+    X_ENSURE_SIZE(FireType, 1);
+    X_ENSURE_SIZE(AmmoCounterStyle, 1);
 
-		uint16_t ammoName;
-
-		X_INLINE bool isValid(void) const
-		{
-			if (version != WEAPON_VERSION) {
-				X_ERROR("Weapon", "weapon version is invalid. FileVer: %i RequiredVer: %i",
-					version, WEAPON_VERSION);
-			}
-
-			return version == WEAPON_VERSION && fourCC == WEAPON_FOURCC;
-		}
-
-	};
-
-
-
-	X_ENSURE_SIZE(WeaponClass, 1);
-	X_ENSURE_SIZE(InventoryType, 1);
-	X_ENSURE_SIZE(FireType, 1);
-	X_ENSURE_SIZE(AmmoCounterStyle, 1);
-
-	X_ENSURE_SIZE(WeaponHdr, 124);
+    X_ENSURE_SIZE(WeaponHdr, 124);
 
 } // namespae weapon
 
 X_NAMESPACE_END
-

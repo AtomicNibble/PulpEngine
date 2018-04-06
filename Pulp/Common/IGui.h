@@ -1,6 +1,5 @@
 #pragma once
 
-
 #ifndef X_GUI_H_I_
 #define X_GUI_H_I_
 
@@ -32,7 +31,7 @@
 //
 //	will work it out later :Z
 //
-//	What about using swf? it means i only have to render and not do goaty things like 
+//	What about using swf? it means i only have to render and not do goaty things like
 //	manage the layout of shit.
 //
 //
@@ -44,179 +43,174 @@
 //
 
 X_NAMESPACE_DECLARE(engine,
-	class IPrimativeContext;
-);
+                    class IPrimativeContext;);
 
 X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    static const char* GUI_FILE_EXTENSION = "gui";
+    static const char* GUI_BINARY_FILE_EXTENSION = "guib";
 
-	static const char*	GUI_FILE_EXTENSION = "gui";
-	static const char*  GUI_BINARY_FILE_EXTENSION = "guib";
+    static const uint32_t GUI_BINARY_MAGIC = X_TAG('g', 'u', 'i', 'b');
+    static const uint8_t GUI_BINARY_VERSION = 1;
 
-	static const uint32_t GUI_BINARY_MAGIC = X_TAG('g', 'u', 'i', 'b');
-	static const uint8_t  GUI_BINARY_VERSION = 1;
+    // some limits
+    static const uint32_t GUI_MAX_MENUS = 64;
+    static const uint32_t GUI_MENU_MAX_ITEMS = 512; // max per a menu
 
-	// some limits
-	static const uint32_t GUI_MAX_MENUS = 64;
-	static const uint32_t GUI_MENU_MAX_ITEMS = 512; // max per a menu
+    static const uint32_t GUI_CAPTION_HEIGHT = 16;
+    static const uint32_t GUI_SCROLLER_SIZE = 16;
+    static const uint32_t GUI_SCROLLBAR_SIZE = 16;
 
-	static const uint32_t GUI_CAPTION_HEIGHT = 16;
-	static const uint32_t GUI_SCROLLER_SIZE = 16;
-	static const uint32_t GUI_SCROLLBAR_SIZE = 16;
+    static const uint32_t GUI_MAX_WINDOW_NAME_LEN = 28; // error on longer, instead of just clipping.
+    static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
 
-	static const uint32_t GUI_MAX_WINDOW_NAME_LEN = 28; // error on longer, instead of just clipping.
-	static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
+    X_DECLARE_FLAGS(WindowFlag)
+    (
+        CAPTION,
+        DESKTOP, // base window.
+        CHILD,
+        BORDER, // has a border, cyptic var name i know. (insert camel ascii here)
+        SIZABLE,
+        MOVEABLE,
+        FOCUS,
+        SELECTED,
+        NOCURSOR,
+        ACTIVE,
+        MODAL, // eats events, instead of passing to children.
+        FULLSCREEN,
+        NO_CLIP,
+        NO_CURSOR,
+        IN_TRANSITION
+    );
 
+    X_DECLARE_ENUM(WindowStyle)
+    (
+        EMPTY,      // no background
+        FILLED,     // filled with background color
+        GRADIENT,   // gradient bar based on background color
+        SHADER,     // material mixed with background color
+        DVAR_SHADER // draws the material specified by the dvar
+    );
 
-	X_DECLARE_FLAGS(WindowFlag) (
-		CAPTION,
-		DESKTOP,		// base window.
-		CHILD,
-		BORDER,			// has a border, cyptic var name i know. (insert camel ascii here)
-		SIZABLE,
-		MOVEABLE,
-		FOCUS,
-		SELECTED,
-		NOCURSOR,
-		ACTIVE,
-		MODAL,			// eats events, instead of passing to children.
-		FULLSCREEN,
-		NO_CLIP,
-		NO_CURSOR,
-		IN_TRANSITION
-		);
+    X_DECLARE_ENUM(WindowBorderStyle)
+    (
+        NONE,
+        FULL,     // full border based on border color ( single pixel )
+        HORZ,     // horizontal borders only
+        VERT,     // vertical borders only
+        GRADIENT, // horizontal border using the gradient bars
+        RAISED,   // darken the bottom and right sides of the border
+        SUNKEN    // darken the top and left sides of the border
+    );
 
-	X_DECLARE_ENUM(WindowStyle)(
-		EMPTY,			// no background
-		FILLED,			// filled with background color
-		GRADIENT,		// gradient bar based on background color
-		SHADER,			// material mixed with background color
-		DVAR_SHADER		// draws the material specified by the dvar
-		);
+    // adds some type saftey.
+    // int values must be cast.
+    struct TextAlign
+    {
+        // 2|2
+        enum Enum : unsigned char
+        {
+            LEFT = 0x0,
+            CENTER = 0x1,
+            RIGHT = 0x2,
 
-	X_DECLARE_ENUM(WindowBorderStyle)(
-		NONE,
-		FULL,		// full border based on border color ( single pixel )
-		HORZ,		// horizontal borders only
-		VERT,		// vertical borders only
-		GRADIENT,	// horizontal border using the gradient bars
-		RAISED,		// darken the bottom and right sides of the border
-		SUNKEN		// darken the top and left sides of the border
-		);
+            // bits 2&3
+            TOP = 0x4,
+            MIDDLE = 0x8,
+            BOTTOM = 0xc,
 
-	// adds some type saftey.
-	// int values must be cast.
-	struct TextAlign
-	{
-		// 2|2
-		enum Enum : unsigned char
-		{
-			LEFT = 0x0,
-			CENTER = 0x1,
-			RIGHT = 0x2,
+            // masks
+            HOZ_MASK = 0x2,
+            VERT_MASK = 0x0c,
+        };
 
-			// bits 2&3
-			TOP = 0x4,
-			MIDDLE = 0x8,
-			BOTTOM = 0xc,
+        struct Bits
+        {
+            uint32_t BIT_hozalign : 2;
+            uint32_t BIT_vertAlign : 2;
+        };
 
-			// masks
-			HOZ_MASK = 0x2,
-			VERT_MASK = 0x0c,
-		};
+        typedef uint32_t Value;
 
-		struct Bits
-		{
-			uint32_t BIT_hozalign : 2;
-			uint32_t BIT_vertAlign : 2;
-		};
+        // defaults to left align since left is 0x0.
+        static const Enum TOP_LEFT = (Enum)(TOP | LEFT);
+        static const Enum TOP_CENTER = (Enum)(TOP | CENTER);
+        static const Enum TOP_RIGHT = (Enum)(TOP | RIGHT);
 
-		typedef uint32_t Value;
+        static const Enum MIDDLE_LEFT = (Enum)(MIDDLE | LEFT);
+        static const Enum MIDDLE_CENTER = (Enum)(MIDDLE | CENTER);
+        static const Enum MIDDLE_RIGHT = (Enum)(MIDDLE | RIGHT);
 
-		// defaults to left align since left is 0x0.
-		static const Enum TOP_LEFT = (Enum)(TOP | LEFT);
-		static const Enum TOP_CENTER = (Enum)(TOP | CENTER);
-		static const Enum TOP_RIGHT = (Enum)(TOP | RIGHT);
+        static const Enum BOTTOM_LEFT = (Enum)(BOTTOM | LEFT);
+        static const Enum BOTTOM_CENTER = (Enum)(BOTTOM | CENTER);
+        static const Enum BOTTOM_RIGHT = (Enum)(BOTTOM | RIGHT);
 
-		static const Enum MIDDLE_LEFT = (Enum)(MIDDLE | LEFT);
-		static const Enum MIDDLE_CENTER = (Enum)(MIDDLE | CENTER);
-		static const Enum MIDDLE_RIGHT = (Enum)(MIDDLE | RIGHT);
+        // max the value can be.
+        static const uint32_t MAX_VALUE = BOTTOM_RIGHT;
+    };
 
-		static const Enum BOTTOM_LEFT = (Enum)(BOTTOM | LEFT);
-		static const Enum BOTTOM_CENTER = (Enum)(BOTTOM | CENTER);
-		static const Enum BOTTOM_RIGHT = (Enum)(BOTTOM | RIGHT);
+    struct FileHdr
+    {
+        FileHdr()
+        {
+            core::zero_this(this);
+        }
 
-		// max the value can be.
-		static const uint32_t MAX_VALUE = BOTTOM_RIGHT;
-	};
+        uint32_t Magic;
+        uint8_t version;
+        uint8_t pad[3];
+        uint32_t crc32;
+        uint32_t fileSize;
 
+        X_INLINE bool IsValid(void) const
+        {
+            return Magic == GUI_BINARY_MAGIC;
+        }
 
-	struct FileHdr
-	{
-		FileHdr() {
-			core::zero_this(this);
-		}
+        X_INLINE bool IsCurrentVersion(void) const
+        {
+            return version == GUI_BINARY_VERSION;
+        }
+    };
 
-		uint32_t Magic;
-		uint8_t version;
-		uint8_t pad[3];
-		uint32_t crc32;
-		uint32_t fileSize;
+    X_ENSURE_SIZE(FileHdr, 16)
+    // i won't have a seprate gui flag.
+    // i'll just implment a seralise methord in the window class.
 
-		X_INLINE bool IsValid(void) const {
-			return Magic == GUI_BINARY_MAGIC;
-		}
+    struct IGui
+    {
+        virtual ~IGui(){};
 
-		X_INLINE bool IsCurrentVersion(void) const {
-			return version == GUI_BINARY_VERSION;
-		}
-	};
+        virtual const char* getName(void) const X_ABSTRACT;
 
+        virtual void setCursorPos(float x, float y) X_ABSTRACT;
+        virtual void setCursorPos(const Vec2f& pos) X_ABSTRACT;
+        virtual Vec2f getCursorPos(void) X_ABSTRACT;
+        virtual float getCursorPosX(void) X_ABSTRACT;
+        virtual float getCursorPosY(void) X_ABSTRACT;
 
-	X_ENSURE_SIZE(FileHdr, 16)
-		// i won't have a seprate gui flag.
-		// i'll just implment a seralise methord in the window class.
+        // repaints the ui
+        virtual void Redraw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
+        virtual void DrawCursor(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
 
+        // dose shit.
+        virtual const char* Activate(bool activate, int time) X_ABSTRACT;
+    };
 
+    struct IGuiManger
+    {
+        virtual ~IGuiManger(){};
 
-	struct IGui
-	{
-		virtual ~IGui() {};
+        virtual bool init(void) X_ABSTRACT;
+        virtual void shutdown(void) X_ABSTRACT;
 
-		virtual const char*	getName(void) const X_ABSTRACT;
+        virtual IGui* loadGui(const char* name) X_ABSTRACT;
+        virtual IGui* findGui(const char* name) X_ABSTRACT;
 
-		virtual void setCursorPos(float x, float y) X_ABSTRACT;
-		virtual	void setCursorPos(const Vec2f& pos) X_ABSTRACT;
-		virtual Vec2f getCursorPos(void) X_ABSTRACT;
-		virtual float getCursorPosX(void) X_ABSTRACT;
-		virtual float getCursorPosY(void) X_ABSTRACT;
-
-		// repaints the ui
-		virtual void Redraw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
-		virtual void DrawCursor(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
-
-		// dose shit.
-		virtual const char* Activate(bool activate, int time) X_ABSTRACT;
-	};
-
-
-	struct IGuiManger
-	{
-		virtual ~IGuiManger() {};
-
-		virtual bool init(void) X_ABSTRACT;
-		virtual void shutdown(void) X_ABSTRACT;
-
-		virtual IGui* loadGui(const char* name) X_ABSTRACT;
-		virtual IGui* findGui(const char* name) X_ABSTRACT;
-
-
-
-		virtual void listGuis(const char* wildcardSearch = nullptr) const X_ABSTRACT;
-
-	};
+        virtual void listGuis(const char* wildcardSearch = nullptr) const X_ABSTRACT;
+    };
 
 } // namespace gui
 
