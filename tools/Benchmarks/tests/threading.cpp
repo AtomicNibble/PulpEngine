@@ -6,10 +6,13 @@ namespace
 {
     void EmptyJob(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* job, void* pParam)
     {
+        X_UNUSED(jobSys, threadIdx, job, pParam);
     }
 
     void EmptyJob(char*, size_t count)
     {
+        X_UNUSED(count);
+
     }
 
 } // namespace
