@@ -41,7 +41,7 @@ namespace fx
     bool EffectCompiler::parseGraphFloat(core::json::Document::ValueType& p,
         const char* pName, GraphSetT& graphSet)
     {
-        return parseGraph(p, pName, graphSet, [](core::json::Document::ValueType& v, GraphSetT::Type& size) -> bool {
+        return parseGraph(p, pName, graphSet, [](core::json::Document::ValueType& v, typename GraphSetT::Type& size) -> bool {
             if (!checkMember(v, "val", core::json::kNumberType)) {
                 return false;
             }
@@ -76,7 +76,7 @@ namespace fx
                 return false;
             }
 
-            GraphSetT::GraphT efxGraph(arena_);
+            typename GraphSetT::GraphT efxGraph(arena_);
 
             for (auto& g : graph.GetArray()) {
                 if (!g.IsObject()) {
@@ -91,7 +91,7 @@ namespace fx
 
                 auto time = g["time"].GetFloat();
 
-                GraphSetT::Type data;
+                typename GraphSetT::Type data;
                 if (!objectParseFunc(g, data)) {
                     return false;
                 }
@@ -375,7 +375,7 @@ namespace fx
 
                     // make sure we will spawn something.
                     auto maxCount = stage.count.start + stage.count.range;
-                    if (stage.count.start <= 0) {
+                    if (maxCount <= 0) {
                         X_LOG0("Fx", "Skipping none looping segment \"%s\" with a max count of zero", name.c_str());
                         continue;
                     }
