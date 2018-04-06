@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include <Core\Compiler.h>
 
 #ifndef VIDEOLIB_EXPORT
@@ -14,5 +13,3 @@
 #endif // !VIDEO_LIB_EXPORT
 #endif // X_LIB
 #endif // !VIDEOLIB_EXPORT
-
-

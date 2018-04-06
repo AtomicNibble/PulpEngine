@@ -3,28 +3,26 @@
 #include <EngineCommon.h>
 #include <IVideo.h>
 
-
 #include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
 #include "Memory\MemoryTaggingPolicies\NoMemoryTagging.h"
 #include "Memory\MemoryTrackingPolicies\NoMemoryTracking.h"
 
 typedef core::MemoryArena<
-	core::MallocFreeAllocator,
-	core::SingleThreadPolicy,
+    core::MallocFreeAllocator,
+    core::SingleThreadPolicy,
 #if X_DEBUG
-	core::SimpleBoundsChecking,
-	core::SimpleMemoryTracking,
-	core::SimpleMemoryTagging
+    core::SimpleBoundsChecking,
+    core::SimpleMemoryTracking,
+    core::SimpleMemoryTagging
 #else
-	core::NoBoundsChecking,
-	core::NoMemoryTracking,
-	core::NoMemoryTagging
+    core::NoBoundsChecking,
+    core::NoMemoryTracking,
+    core::NoMemoryTagging
 #endif // !X_DEBUG
-> VideoLibArena;
+    >
+    VideoLibArena;
 
 extern VideoLibArena* g_VideoLibArena;
-
-
 
 #ifdef X_LIB
 #define VIDEOLIB_EXPORT
@@ -35,4 +33,3 @@ extern VideoLibArena* g_VideoLibArena;
 #define VIDEOLIB_EXPORT X_IMPORT
 #endif // !VIDEO_LIB_EXPORT
 #endif // X_LIB
-
