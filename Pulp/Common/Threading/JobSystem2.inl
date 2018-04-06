@@ -10,7 +10,7 @@ namespace V2
         const JobData* data = static_cast<const JobData*>(jobData);
         const typename JobData::SplitterType& splitter = data->splitter_;
 
-        if (splitter.Split<JobData::DataType>(data->count_)) {
+        if (splitter.Split<typename JobData::DataType>(data->count_)) {
             // split in two
             const size_t leftCount = data->count_ / 2u;
             const JobData leftData(data->data_, leftCount, data->pFunction_, splitter);
