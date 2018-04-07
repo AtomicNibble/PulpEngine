@@ -1234,6 +1234,9 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
                         idxMap.append(safe_static_cast<int8_t>(i));
                     }
                     break;
+                case ColGenType::CAPSULE:
+                    X_ASSERT_NOT_IMPLEMENTED();
+                    break;
                 case ColGenType::KDOP_10_X:
                 case ColGenType::KDOP_10_Y:
                 case ColGenType::KDOP_10_Z:
@@ -1275,6 +1278,9 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
                     }
                     break;
                 }
+                case ColGenType::CAPSULE:
+                    X_ASSERT_NOT_IMPLEMENTED();
+                    break;
                 case ColGenType::KDOP_10_X:
                 case ColGenType::KDOP_10_Y:
                 case ColGenType::KDOP_10_Z:
@@ -1747,6 +1753,9 @@ size_t ModelCompiler::calculatePhysDataSize(void) const
             case ColGenType::PER_MESH_SPHERE:
                 size += sizeof(Sphere) * lod0Mesh;
                 size += sizeof(uint8_t) * lod0Mesh;
+                break;
+            case ColGenType::CAPSULE:
+                X_ASSERT_NOT_IMPLEMENTED();
                 break;
             case ColGenType::KDOP_10_X:
             case ColGenType::KDOP_10_Y:
