@@ -424,7 +424,7 @@ struct IRender
     // cb's
     virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 
-    virtual IDeviceTexture* getDeviceTexture(int32_t id) X_ABSTRACT;
+    virtual IDeviceTexture* getDeviceTexture(int32_t id, const char* pNickName) X_ABSTRACT;
     virtual bool initDeviceTexture(IDeviceTexture* pTex) X_ABSTRACT;
     virtual bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
 

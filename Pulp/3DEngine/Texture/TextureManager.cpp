@@ -163,7 +163,7 @@ Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
         pTexRes->addReference();
     }
     else {
-        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++);
+        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, name.c_str());
         if (!pDevicTex) {
             return nullptr;
         }

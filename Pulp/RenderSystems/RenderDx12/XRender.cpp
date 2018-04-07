@@ -925,7 +925,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
                     textureSRVS[t] = pTex->getSRV();
 
-                    X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")();
+                    X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")(pTex->getName().c_str());
                 }
 
                 // for now assume all slots are linera and no gaps.
@@ -1140,9 +1140,9 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
     pBuffMan_->freeCB(handle);
 }
 
-IDeviceTexture* XRender::getDeviceTexture(int32_t id)
+IDeviceTexture* XRender::getDeviceTexture(int32_t id, const char* pNickName)
 {
-    texture::Texture* pText = pTextureMan_->getDeviceTexture(id);
+    texture::Texture* pText = pTextureMan_->getDeviceTexture(id, pNickName);
 
     return pText;
 }

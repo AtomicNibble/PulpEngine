@@ -39,7 +39,7 @@ public:
 
     DXGI_FORMAT getDepthFmt(void) const;
 
-    Texture* getDeviceTexture(int32_t id);
+    Texture* getDeviceTexture(int32_t id, const char* pNickName);
 
     Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt,
         render::BufUsage::Enum usage, const uint8_t* pInitialData = nullptr);

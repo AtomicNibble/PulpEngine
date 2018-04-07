@@ -69,7 +69,7 @@ DXGI_FORMAT TextureManager::getDepthFmt(void) const
     return depthFmt_;
 }
 
-Texture* TextureManager::getDeviceTexture(int32_t id)
+Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
 {
     core::StackString<32, char> idStr(id);
     core::string name("id_");
@@ -86,7 +86,7 @@ Texture* TextureManager::getDeviceTexture(int32_t id)
             return pTexRes;
         }
 
-        pTexRes = textures_.createAsset(name, name, TextureFlags());
+        pTexRes = textures_.createAsset(name, core::string(pNickName), TextureFlags());
     }
 
     return pTexRes;
