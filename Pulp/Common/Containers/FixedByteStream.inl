@@ -30,7 +30,7 @@ inline FixedByteStreamOwningPolicy::~FixedByteStreamOwningPolicy()
 
 template<size_t N>
 inline FixedByteStreamStackPolicy<N>::FixedByteStreamStackPolicy() :
-    FixedByteStreamBase(buf_, core::ByteUtil::bytesToBytes(N))
+    FixedByteStreamBase(buf_, core::bitUtil::bytesToBits(N))
 {
 }
 
