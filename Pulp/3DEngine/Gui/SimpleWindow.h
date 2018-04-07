@@ -7,6 +7,8 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    class XWindow;
+
     class XWindowSimple
     {
         friend class XWindow;
@@ -36,10 +38,11 @@ namespace gui
         XWindow* pParent_;
     };
 
-#include "SimpleWindow.inl"
 
 } // namespace gui
 
 X_NAMESPACE_END
+
+#include "SimpleWindow.inl"
 
 #endif // !X_GUI_SIMPLE_WINDOW_H_
