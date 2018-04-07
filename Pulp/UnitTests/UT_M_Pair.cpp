@@ -25,7 +25,7 @@ TYPED_TEST(Pairs, Genral)
     EXPECT_EQ(12, p.x);
     EXPECT_EQ(16, p.y);
 
-    p.Set(25, 20);
+    p.set(25, 20);
 
     EXPECT_EQ(25, p.x);
     EXPECT_EQ(20, p.y);
