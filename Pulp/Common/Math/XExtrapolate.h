@@ -193,11 +193,11 @@ X_INLINE type XExtrapolate<type>::GetCurrentSpeed(int time) const
             return baseSpeed_ + s * speed_;
         }
         case ExtrapolationType::ACCELSINE: {
-            const float s = idMath::Sin(deltaTime * idMath::HALF_PI);
+            const float s = math<float>::sin(deltaTime * PIHalff);
             return baseSpeed_ + s * speed_;
         }
         case ExtrapolationType::DECELSINE: {
-            const float s = idMath::Cos(deltaTime * idMath::HALF_PI);
+            const float s = math<float>::cos(deltaTime * PIHalff);
             return baseSpeed_ + s * speed_;
         }
 
