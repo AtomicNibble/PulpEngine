@@ -55,6 +55,8 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
     _In_ LPSTR lpCmdLine,
     _In_ int nCmdShow)
 {
+    X_UNUSED(hPrevInstance, nCmdShow);
+
     core::Console console(L"Engine Benchmark Log");
     console.RedirectSTD();
     console.SetSize(150, 60, 8000);
