@@ -28,7 +28,7 @@ FaceOptimize<IndexType>::OptimizeVertexData::OptimizeVertexData() :
 template<typename IndexType>
 template<typename T>
 FaceOptimize<IndexType>::IndexSortCompareIndexed<T>::IndexSortCompareIndexed(const IndexType* pIndexData) :
-    pIndexData_(pIndexData_)
+    pIndexData_(pIndexData)
 {
 }
 
