@@ -11,7 +11,7 @@
 
 X_NAMESPACE_DECLARE(core,
 
-                    class LinearAllocator;);
+                    class LinearAllocator);
 
 X_NAMESPACE_BEGIN(assetDb)
 

@@ -8,7 +8,7 @@
 
 X_NAMESPACE_DECLARE(core,
                     struct IoRequestBase;
-                    struct XFileAsync;);
+                    struct XFileAsync);
 
 X_NAMESPACE_BEGIN(video)
 

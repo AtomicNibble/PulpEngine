@@ -4,7 +4,7 @@
 #include <Platform\Module.h>
 
 X_NAMESPACE_DECLARE(core,
-                    class Console;);
+                    class Console);
 
 class EngineApp : public IAssertHandler
 {

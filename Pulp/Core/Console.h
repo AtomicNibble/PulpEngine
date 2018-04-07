@@ -28,7 +28,7 @@ X_ENABLE_WARNING(4702)
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext;);
+                    class IPrimativeContext);
 
 X_NAMESPACE_BEGIN(core)
 

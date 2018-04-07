@@ -7,7 +7,7 @@
 #include <IModel.h>
 
 X_NAMESPACE_DECLARE(core,
-                    class XLexer;);
+                    class XLexer);
 
 X_NAMESPACE_BEGIN(model)
 

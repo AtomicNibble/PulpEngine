@@ -19,7 +19,7 @@
 struct ICore;
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameInput;);
+                    struct FrameInput);
 
 X_NAMESPACE_BEGIN(input)
 

@@ -6,7 +6,7 @@
 #include "Gui.h"
 
 X_NAMESPACE_DECLARE(core,
-                    struct IConsoleCmdArgs;);
+                    struct IConsoleCmdArgs);
 
 X_NAMESPACE_BEGIN(engine)
 

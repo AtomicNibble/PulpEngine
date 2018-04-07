@@ -15,10 +15,10 @@
 struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_DECLARE(engine,
-                    class Material;);
+                    class Material);
 X_NAMESPACE_DECLARE(core,
                     struct IoRequestBase;
-                    struct XFileAsync;);
+                    struct XFileAsync);
 
 X_NAMESPACE_BEGIN(font)
 

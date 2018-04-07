@@ -4,7 +4,7 @@
 #define X_LVL_BUILDER_H_
 
 X_NAMESPACE_DECLARE(physics,
-                    struct IPhysicsCooking;);
+                    struct IPhysicsCooking);
 
 #include "Material/MaterialManager.h"
 #include "LvlEntity.h"

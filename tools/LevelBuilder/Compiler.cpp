@@ -70,7 +70,7 @@ namespace
     class JsonByteBuffer
     {
     public:
-        typedef typename char Ch;
+        typedef char Ch;
 
     public:
         JsonByteBuffer(core::ByteStream& stream) :
@@ -1009,6 +1009,8 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
     // lights dynamic
     {
         auto& stream = nodeStreams[FileNodes::LIGHTS_DYNAMIC];
+
+        X_UNUSED(stream);
     }
 
     // update FourcCC to mark this bsp as valid.

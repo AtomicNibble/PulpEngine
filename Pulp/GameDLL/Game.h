@@ -19,7 +19,7 @@ X_NAMESPACE_DECLARE(render,
     struct IRender);
 X_NAMESPACE_DECLARE(core,
                     struct ICVar;
-                    struct IConsoleCmdArgs;);
+                    struct IConsoleCmdArgs);
 
 X_NAMESPACE_BEGIN(game)
 

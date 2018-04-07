@@ -7,7 +7,7 @@
 #include "InputDevice.h"
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameInput;);
+                    struct FrameInput);
 
 X_NAMESPACE_BEGIN(input)
 
@@ -18,7 +18,7 @@ public:
     virtual ~XInputDeviceWin32() X_OVERRIDE;
 
     virtual void Update(core::FrameData& frameData) X_OVERRIDE;
-    virtual void ShutDown(void) X_OVERRIDE;
+    virtual void ShutDown(void) X_ABSTRACT;
     virtual void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_ABSTRACT;
 
     // ~IInputDevice

@@ -4,7 +4,7 @@
 #include <IRender.h>
 
 X_NAMESPACE_DECLARE(core,
-                    struct XFile;);
+                    struct XFile);
 
 X_NAMESPACE_BEGIN(engine)
 

@@ -14,7 +14,7 @@ X_NAMESPACE_DECLARE(render,
                     class CommandContext;
                     class CommandListManger;
                     class DescriptorAllocator;
-                    class GpuResource;);
+                    class GpuResource);
 
 X_NAMESPACE_BEGIN(texture)
 

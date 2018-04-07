@@ -9,7 +9,7 @@ X_NAMESPACE_DECLARE(render,
                     class PixelBuffer;
                     class ColorBuffer;
                     class DepthBuffer;
-                    class ShadowBuffer;);
+                    class ShadowBuffer);
 
 X_NAMESPACE_BEGIN(texture)
 

@@ -6,7 +6,7 @@
 #include <ITimer.h>
 
 X_NAMESPACE_DECLARE(core,
-                    struct ICVar;);
+                    struct ICVar);
 
 X_NAMESPACE_BEGIN(core)
 

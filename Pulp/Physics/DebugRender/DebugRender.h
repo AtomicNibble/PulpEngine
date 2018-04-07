@@ -1,7 +1,7 @@
 #pragma once
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext;);
+                    class IPrimativeContext);
 
 X_NAMESPACE_BEGIN(physics)
 

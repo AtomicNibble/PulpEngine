@@ -22,7 +22,7 @@ X_NAMESPACE_DECLARE(core,
 
                     struct IConsoleCmdArgs;
 
-                    class AssetLoader;);
+                    class AssetLoader);
 
 X_NAMESPACE_BEGIN(script)
 

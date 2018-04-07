@@ -20,10 +20,10 @@ X_NAMESPACE_DECLARE(core,
                     struct FrameView;)
 
 X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext;);
+                    class IPrimativeContext);
 
 X_NAMESPACE_DECLARE(physics,
-                    struct IScene;);
+                    struct IScene);
 
 X_NAMESPACE_BEGIN(sound)
 
