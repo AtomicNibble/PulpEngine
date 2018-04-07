@@ -268,6 +268,7 @@ void ModelCompiler::Binds::populate(const VertsArr& verts)
     }
     else {
         const bool unBindedVerts = counts[0] != 0;
+        X_UNUSED(unBindedVerts);
 
         // turn all the none binded in to root binds.
         bindCounts[0] += counts[0];
@@ -2337,8 +2338,6 @@ bool ModelCompiler::BakeCollisionMeshes(void)
     if (compiledLods_.isEmpty()) {
         return true;
     }
-
-    auto& lod = compiledLods_[0];
 
     // look for any collision meshes in LOD0
     for (auto& lod : compiledLods_) {
