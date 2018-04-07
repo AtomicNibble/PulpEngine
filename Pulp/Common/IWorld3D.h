@@ -27,6 +27,7 @@ struct RenderLightDesc
 struct EmitterDesc
 {
     Transformf trans;
+    bool looping;
 
     fx::Effect* pEffect;
 };

@@ -278,7 +278,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
     auto* pPhys = gEnv->pPhysics;
 
     areas_.resize(fileHdr.numAreas);
-
+    
     // area data.
     {
         core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> meshName;
@@ -743,7 +743,7 @@ fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
     pEmitter->setTrans(emit.trans);
 
     if (emit.pEffect) {
-        pEmitter->play(emit.pEffect, false, false);
+        pEmitter->play(emit.pEffect, emit.looping, false);
     }
 
     emitters_.push_back(pEmitter);

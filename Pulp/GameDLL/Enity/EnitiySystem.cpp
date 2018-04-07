@@ -599,6 +599,7 @@ namespace entity
                     dsc.trans = trans;
                     dsc.trans.pos += emit.offset;
                     dsc.pEffect = pEffect;
+                    dsc.looping = true;
 
                     emit.pEmitter = p3DWorld_->addEmmiter(dsc);
                     break;
