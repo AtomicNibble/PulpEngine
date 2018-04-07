@@ -1053,8 +1053,6 @@ void AnimCompiler::loadBones(void)
                     angleRel = angleWorld * angleParWorld.inverse();
                 }
 
-                auto goats = angleRel.getEulerDegrees();
-
                 Bone bone(arena_);
                 bone.name = interBone.name;
                 bone.parentIdx = localParentIdx;
