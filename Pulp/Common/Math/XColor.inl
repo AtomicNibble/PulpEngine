@@ -448,3 +448,47 @@ X_INLINE void ColorT<T>::shade(const float percent)
     g = static_cast<T>(static_cast<float>(g) * (100.f + percent) / 100.f);
     b = static_cast<T>(static_cast<float>(b) * (100.f + percent) / 100.f);
 }
+
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::zero(void)
+{
+    return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(0));
+}
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::black(void)
+{
+    return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), CHANTRAIT<T>::max());
+}
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::white(void)
+{
+    return ColorT<T>(CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max());
+}
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::gray(T value, T alpha = CHANTRAIT<T>::max())
+{
+    return ColorT<T>(value, value, value, alpha);
+}
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::hex(uint32_t hexValue)
+{
+    uint8_t red = (hexValue >> 16) & 255;
+    uint8_t green = (hexValue >> 8) & 255;
+    uint8_t blue = hexValue & 255;
+    return ColorT<T>(CHANTRAIT<T>::convert(red), CHANTRAIT<T>::convert(green), CHANTRAIT<T>::convert(blue), CHANTRAIT<T>::max());
+}
+
+template<typename T>
+X_INLINE ColorT<T> ColorT<T>::hexA(uint32_t hexValue)
+{
+    uint8_t alpha = (hexValue >> 24) & 255;
+    uint8_t red = (hexValue >> 16) & 255;
+    uint8_t green = (hexValue >> 8) & 255;
+    uint8_t blue = hexValue & 255;
+    return ColorT<T>(CHANTRAIT<T>::convert(red), CHANTRAIT<T>::convert(green), CHANTRAIT<T>::convert(blue), CHANTRAIT<T>::convert(alpha));
+}

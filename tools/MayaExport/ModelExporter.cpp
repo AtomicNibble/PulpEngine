@@ -850,7 +850,7 @@ MStatus ModelExporter::loadLODs(void)
                             for (uint32_t x = 0; x < infCount; x++) {
                                 float w = static_cast<float>(wts[x]);
 
-                                if (w > EPSILON_VALUEf) {
+                                if (w > math<float>::EPSILON) {
                                     MayaBone* pBone = joints[x];
 
                                     // full?

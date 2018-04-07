@@ -16,6 +16,9 @@ X_DISABLE_WARNING(4244)
 template<typename T>
 struct math
 {
+    static constexpr T EPSILON = T(0);
+
+
     X_INLINE static constexpr T square(T x)
     {
         return x * x;

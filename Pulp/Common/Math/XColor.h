@@ -71,7 +71,7 @@ struct ColorT
     X_INLINE typename CHANTRAIT<T>::Accum lengthSquared() const;
     X_INLINE ColorT<T> lerp(float fact, const ColorT<T>& d) const;
 
-    X_INLINE bool compare(const ColorT<T>& oth, const T epsilon = EPSILON_VALUEf);
+    X_INLINE bool compare(const ColorT<T>& oth, const T epsilon = math<T>::EPSILON);
 
     // expose packing util.
     X_INLINE uint8_t asRGB332(void) const;
@@ -87,44 +87,16 @@ struct ColorT
     X_INLINE void shade(const float percent);
 
     // ><><><><><<><><><><><><><><<><><><><><><><><<><><><><><><
-    static ColorT<T> zero(void)
-    {
-        return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), static_cast<T>(0));
-    }
-
-    static ColorT<T> black(void)
-    {
-        return ColorT<T>(static_cast<T>(0), static_cast<T>(0), static_cast<T>(0), CHANTRAIT<T>::max());
-    }
-
-    static ColorT<T> white(void)
-    {
-        return ColorT<T>(CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max(), CHANTRAIT<T>::max());
-    }
-
-    static ColorT<T> gray(T value, T alpha = CHANTRAIT<T>::max())
-    {
-        return ColorT<T>(value, value, value, alpha);
-    }
+    static ColorT<T> zero(void);
+    static ColorT<T> black(void);
+    static ColorT<T> white(void);
+    static ColorT<T> gray(T value, T alpha = CHANTRAIT<T>::max());
 
     //! Returns a ColorA from a hexadecimal-encoded RGB triple. For example, red is 0xFF0000
-    static ColorT<T> hex(uint32_t hexValue)
-    {
-        uint8_t red = (hexValue >> 16) & 255;
-        uint8_t green = (hexValue >> 8) & 255;
-        uint8_t blue = hexValue & 255;
-        return ColorT<T>(CHANTRAIT<T>::convert(red), CHANTRAIT<T>::convert(green), CHANTRAIT<T>::convert(blue), CHANTRAIT<T>::max());
-    }
+    static ColorT<T> hex(uint32_t hexValue);
 
     //! Returns a ColorA from a hexadecimal-encoded ARGB ordering. For example, 50% transparent red is 0x80FF0000
-    static ColorT<T> hexA(uint32_t hexValue)
-    {
-        uint8_t alpha = (hexValue >> 24) & 255;
-        uint8_t red = (hexValue >> 16) & 255;
-        uint8_t green = (hexValue >> 8) & 255;
-        uint8_t blue = hexValue & 255;
-        return ColorT<T>(CHANTRAIT<T>::convert(red), CHANTRAIT<T>::convert(green), CHANTRAIT<T>::convert(blue), CHANTRAIT<T>::convert(alpha));
-    }
+    static ColorT<T> hexA(uint32_t hexValue);
 
     static bool fromString(const char* pBegin, const char* pEnd, ColorT<T>& out, bool slient = true);
 };
