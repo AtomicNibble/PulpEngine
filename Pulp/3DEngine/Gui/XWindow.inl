@@ -36,8 +36,9 @@ void XWindow::removeChild(XWindow* pChild)
 {
     core::Array<XWindow*>::size_type idx = children_.find(pChild);
 
-    if (idx >= 0)
+    if (idx != core::Array<XWindow*>::invalid_index) {
         children_.removeIndex(idx);
+    }
 }
 
 XWindow* XWindow::getChild(int idx)
