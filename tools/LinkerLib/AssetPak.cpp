@@ -34,6 +34,7 @@ namespace
 
     void compression_job(core::V2::JobSystem&, size_t threadIdx, core::V2::Job* job, void* jobData)
     {
+        X_UNUSED(threadIdx, job);
         const JobData* pData = reinterpret_cast<const JobData*>(jobData);
         auto& asset = *pData->pAsset;
         auto& compOpt = *pData->pCompOpt;
