@@ -8,41 +8,21 @@
 class Ray
 {
 public:
-    Ray()
-    {
-    }
-    Ray(const Vec3f& aOrigin, const Vec3f& aDirection) :
-        Origin_(aOrigin)
-    {
-        setDirection(aDirection);
-    }
+    Ray() = default;
 
-    X_INLINE void setOrigin(const Vec3f& aOrigin)
-    {
-        Origin_ = aOrigin;
-    }
-    X_INLINE const Vec3f& getOrigin() const
-    {
-        return Origin_;
-    }
+    X_INLINE Ray(const Vec3f& aOrigin, const Vec3f& aDirection);
 
-    X_INLINE void setDirection(const Vec3f& aDirection)
-    {
-        Direction_ = aDirection;
-    }
-    X_INLINE const Vec3f& getDirection() const
-    {
-        return Direction_;
-    }
-
-    X_INLINE Vec3f calcPosition(float t) const
-    {
-        return Origin_ + Direction_ * t;
-    }
+    X_INLINE void setOrigin(const Vec3f& aOrigin);
+    X_INLINE const Vec3f& getOrigin(void) const;
+    X_INLINE void setDirection(const Vec3f& aDirection);
+    X_INLINE const Vec3f& getDirection(void) const;
+    X_INLINE Vec3f calcPosition(float t) const;
 
 protected:
     Vec3f Origin_;
     Vec3f Direction_;
 };
+
+#include "XRay.inl"
 
 #endif // !_X_MATH_RAY_H_

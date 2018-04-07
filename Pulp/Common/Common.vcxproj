@@ -748,6 +748,7 @@
     <None Include="Math\XAngles.inl" />
     <None Include="Math\XInterpolate.inl" />
     <None Include="Math\XFrustum.inl" />
+    <None Include="Math\XRay.inl" />
     <None Include="Math\XTransform.inl" />
     <None Include="Math\XAabb.inl" />
     <None Include="Math\XColor.inl" />

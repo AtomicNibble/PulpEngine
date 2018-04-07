@@ -1662,6 +1662,9 @@
     <None Include="String\AssetName.inl">
       <Filter>Headers\String</Filter>
     </None>
+    <None Include="Math\XRay.inl">
+      <Filter>Headers\Math</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
