@@ -24,6 +24,7 @@ public:
     X_INLINE explicit StrHash(Type hash);
 
     X_INLINE operator Type(void) const; /// Cast operator, returning the string's hash.
+    X_INLINE Type hash(void) const;
 
 private:
     Type hash_;

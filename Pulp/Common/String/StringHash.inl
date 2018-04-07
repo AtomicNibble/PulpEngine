@@ -92,3 +92,9 @@ X_INLINE StrHash::operator Type(void) const
 {
     return hash_;
 }
+
+
+X_INLINE StrHash::Type StrHash::hash(void) const
+{
+    return hash_;
+}
