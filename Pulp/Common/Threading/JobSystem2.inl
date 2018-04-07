@@ -7,6 +7,8 @@ namespace V2
     template<typename JobData>
     static inline void parallel_for_job(JobSystem& jobSys, size_t threadIdx, Job* job, void* jobData)
     {
+        X_UNUSED(threadIdx);
+
         const JobData* data = static_cast<const JobData*>(jobData);
         const typename JobData::SplitterType& splitter = data->splitter_;
 
