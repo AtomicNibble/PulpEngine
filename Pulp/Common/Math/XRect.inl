@@ -36,23 +36,31 @@ RectT<T> RectT<T>::canonicalized() const
 template<typename T>
 void RectT<T>::clipBy(const RectT& clip)
 {
-    if (x1 < clip.x1)
+    if (x1 < clip.x1) {
         x1 = clip.x1;
-    if (x2 < clip.x1)
+    }
+    if (x2 < clip.x1) {
         x2 = clip.x1;
-    if (x1 > clip.x2)
+    }
+    if (x1 > clip.x2) {
         x1 = clip.x2;
-    if (x2 > clip.x2)
+    }
+    if (x2 > clip.x2) {
         x2 = clip.x2;
+    }
 
-    if (y1 < clip.y1)
+    if (y1 < clip.y1) {
         y1 = clip.y1;
-    if (y2 < clip.y1)
+    }
+    if (y2 < clip.y1) {
         y2 = clip.y1;
-    if (y1 > clip.y2)
+    }
+    if (y1 > clip.y2) {
         y1 = clip.y2;
-    if (y2 > clip.y2)
+    }
+    if (y2 > clip.y2) {
         y2 = clip.y2;
+    }
 }
 
 template<typename T>
@@ -161,43 +169,54 @@ bool RectT<T>::contains(const RectT<T>& rect) const
 template<typename T>
 bool RectT<T>::intersects(const RectT<T>& rect) const
 {
-    if ((x1 > rect.x2) || (x2 < rect.x1) || (y1 > rect.y2) || (y2 < rect.y1))
+    if ((x1 > rect.x2) || (x2 < rect.x1) || (y1 > rect.y2) || (y2 < rect.y1)) {
         return false;
-    else
-        return true;
+    }
+    
+    return true;
 }
 
 template<typename T>
 T RectT<T>::distance(const Vec2<T>& pt) const
 {
     T squaredDistance = 0;
-    if (pt.x < x1)
+    if (pt.x < x1) {
         squaredDistance += (x1 - pt.x) * (x1 - pt.x);
-    else if (pt.x > x2)
+    }
+    else if (pt.x > x2) {
         squaredDistance += (pt.x - x2) * (pt.x - x2);
-    if (pt.y < y1)
+    }
+    if (pt.y < y1) {
         squaredDistance += (y1 - pt.y) * (y1 - pt.y);
-    else if (pt.y > y2)
+    }
+    else if (pt.y > y2) {
         squaredDistance += (pt.y - y2) * (pt.y - y2);
+    }
 
-    if (squaredDistance > 0)
+    if (squaredDistance > 0) {
         return math<T>::sqrt(squaredDistance);
-    else
+    }
+    else {
         return 0;
+    }
 }
 
 template<typename T>
 T RectT<T>::distanceSquared(const Vec2<T>& pt) const
 {
     T squaredDistance = 0;
-    if (pt.x < x1)
+    if (pt.x < x1) {
         squaredDistance += (x1 - pt.x) * (x1 - pt.x);
-    else if (pt.x > x2)
+    }
+    else if (pt.x > x2) {
         squaredDistance += (pt.x - x2) * (pt.x - x2);
-    if (pt.y < y1)
+    }
+    if (pt.y < y1) {
         squaredDistance += (y1 - pt.y) * (y1 - pt.y);
-    else if (pt.y > y2)
+    }
+    else if (pt.y > y2) {
         squaredDistance += (pt.y - y2) * (pt.y - y2);
+    }
 
     return squaredDistance;
 }
@@ -206,28 +225,36 @@ template<typename T>
 Vec2<T> RectT<T>::closestPoint(const Vec2<T>& pt) const
 {
     Vec2<T> result = pt;
-    if (pt.x < x1)
+    if (pt.x < x1) {
         result.x = x1;
-    else if (pt.x > x2)
+    }
+    else if (pt.x > x2) {
         result.x = x2;
-    if (pt.y < y1)
+    }
+    if (pt.y < y1) {
         result.y = y1;
-    else if (pt.y > y2)
+    }
+    else if (pt.y > y2) {
         result.y = y2;
+    }
     return result;
 }
 
 template<typename T>
 void RectT<T>::include(const Vec2<T>& point)
 {
-    if (x1 > point.x)
+    if (x1 > point.x) {
         x1 = point.x;
-    if (x2 < point.x)
+    }
+    if (x2 < point.x) {
         x2 = point.x;
-    if (y1 > point.y)
+    }
+    if (y1 > point.y) {
         y1 = point.y;
-    if (y2 < point.y)
+    }
+    if (y2 < point.y) {
         y2 = point.y;
+    }
 }
 
 template<typename T>
@@ -243,23 +270,31 @@ RectT<T>& RectT<T>::Align(const RectT& other, AlignmentFlags alignment)
     Vec2<T> pos = getUpperLeft();
     Vec2<T> posOth = other.getUpperLeft();
 
-    if (alignment.IsSet(Alignment::LEFT_ALIGN))
+    if (alignment.IsSet(Alignment::LEFT_ALIGN)) {
         pos.x = posOth.x;
-    else if (alignment.IsSet(Alignment::LEFT_DOCK))
+    }
+    else if (alignment.IsSet(Alignment::LEFT_DOCK)) {
         pos.x = posOth.x - getWidth();
-    else if (alignment.IsSet(Alignment::RIGHT_ALIGN))
+    }
+    else if (alignment.IsSet(Alignment::RIGHT_ALIGN)) {
         pos.x = posOth.x + other.getWidth() - getWidth();
-    else if (alignment.IsSet(Alignment::RIGHT_DOCK))
+    }
+    else if (alignment.IsSet(Alignment::RIGHT_DOCK)) {
         pos.x = posOth.x + other.getWidth();
+    }
 
-    if (alignment.IsSet(Alignment::TOP_ALIGN))
+    if (alignment.IsSet(Alignment::TOP_ALIGN)) {
         pos.y = posOth.y;
-    else if (alignment.IsSet(Alignment::TOP_DOCK))
+    }
+    else if (alignment.IsSet(Alignment::TOP_DOCK)) {
         pos.y = posOth.y - getHeight();
-    else if (alignment.IsSet(Alignment::BOTTOM_ALIGN))
+    }
+    else if (alignment.IsSet(Alignment::BOTTOM_ALIGN)) {
         pos.y = posOth.y + other.getHeight() - getHeight();
-    else if (alignment.IsSet(Alignment::BOTTOM_DOCK))
+    }
+    else if (alignment.IsSet(Alignment::BOTTOM_DOCK)) {
         pos.y = posOth.y + other.getHeight();
+    }
 
     x1 = pos.x;
     y1 = pos.y;
