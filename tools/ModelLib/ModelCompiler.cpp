@@ -481,10 +481,10 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
         // we can do just reuse the normal mesh aabb logic.
         calBoundingbox();
     }
-    else if (type_ = ColMeshType::SPHERE) {
+    else if (type_ == ColMeshType::SPHERE) {
         calBoundingSphere(true);
     }
-    else if (type_ = ColMeshType::CONVEX) {
+    else if (type_ == ColMeshType::CONVEX) {
         // i'm gonna cook you good.
         if (cook) {
             X_ASSERT_NOT_NULL(pCooker);
