@@ -2,12 +2,12 @@
 
 X_INLINE const char* CpuInfo::GetCpuName(void) const
 {
-    return cpuName_;
+    return cpuName_.c_str();
 }
 
 X_INLINE const char* CpuInfo::GetCpuVendor(void) const
 {
-    return cpuVendor_;
+    return cpuVendor_.c_str();
 }
 
 X_INLINE uint32_t CpuInfo::GetCoreCount(void) const

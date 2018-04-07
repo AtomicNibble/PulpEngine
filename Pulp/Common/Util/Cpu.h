@@ -299,8 +299,8 @@ private:
     X_NO_ASSIGN(CpuInfo);
     X_NO_COPY(CpuInfo);
 
-    char cpuVendor_[16];
-    char cpuName_[64];
+    core::StackString<16> cpuVendor_;
+    core::StackString<64> cpuName_;
 
     CpuID::Info0 info0_;
     CpuID::Info1 info1_;

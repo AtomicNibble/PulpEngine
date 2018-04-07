@@ -13,109 +13,72 @@ X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-    void cpuid(void* pCPUInfo, int infoType)
+    using CpuIDData = std::array<char, 16>;
+   
+    void cpuid(CpuIDData& data, int infoType)
     {
+        int* pInts = reinterpret_cast<int*>(data.data());
 #if X_COMPILER_CLANG
-        int* pInts = reinterpret_cast<int*>(pCPUInfo);
         __cpuid(infoType, pInts[0], pInts[1], pInts[2], pInts[3]);
 #else
-#ifdef _WIN64
-        __cpuid(reinterpret_cast<int*>(pCPUInfo), infoType);
-#else
-        __asm
-        {
-			mov    esi, pCPUInfo
-			mov    eax, infoType
-			xor    ecx, ecx
-			cpuid
-			mov    dword ptr[esi], eax
-			mov    dword ptr[esi + 4], ebx
-			mov    dword ptr[esi + 8], ecx
-			mov    dword ptr[esi + 0Ch], edx
-        }
-#endif
+        __cpuid(pInts, infoType);
 #endif // !X_COMPILER_CLANG
     }
 
-    DWORD NumExtended()
+    template<typename T>
+    void cpuid(T* pCPUInfo, int infoType)
     {
-#ifdef _WIN64
-        return 0;
+        static_assert(sizeof(T) == 16, "Invalid size");
+
+        int* pInts = reinterpret_cast<int*>(pCPUInfo);
+#if X_COMPILER_CLANG
+        __cpuid(infoType, pInts[0], pInts[1], pInts[2], pInts[3]);
 #else
-        __asm
-        {
-			mov    eax, 0x80000000
-			cpuid
-			xor	   eax, 0x80000000
-        }
-#endif
+        __cpuid(pInts, infoType);
+#endif // !X_COMPILER_CLANG
     }
 
-    void ProcessVendor(CpuInfo::CpuID::Info0& Info, char* Name)
+    int32_t NumExtended(void)
     {
+        std::array<int32_t, 4> cpui;
+        cpuid(&cpui, 0x80000000);
+        return cpui[0] ^ 0x80000000;
+    }
+
+    void ProcessVendor(CpuInfo::CpuID::Info0& Info, core::StackString<16>& cpuName)
+    {
+        auto goat = NumExtended();
+        goat = 0;
         // GO !
         cpuid(&Info, 0);
 
-#if _WIN64
-        *((int*)Name) = Info.ebx.name_;
-        *((int*)(Name + 4)) = Info.edx.name_;
-        *((int*)(Name + 8)) = Info.ecx.name_;
-#else
-        __asm {
-			mov esi, Name
-				mov edi, Info // 4 ints
+        std::array<char, 32> name;
+        name.fill('\0');
 
-				mov         ecx, dword ptr[edi + 4]
-				mov         dword ptr[esi], ecx
+        memcpy(name.data(), &Info.ebx.name_, sizeof(Info.ebx.name_));
+        memcpy(name.data() + 4, &Info.edx.name_, sizeof(Info.edx.name_));
+        memcpy(name.data() + 8, &Info.ecx.name_, sizeof(Info.ecx.name_));
 
-				mov         edx, dword ptr[edi + 0Ch]
-				mov         dword ptr[esi + 4], edx
-
-				mov         eax, dword ptr[edi + 8]
-				mov         dword ptr[esi + 8], eax
-        }
-#endif
+        cpuName.set(name.data());
     }
 
-    void ProcessCPUName(char* Name)
+    void ProcessCPUName(core::StackString<64>& cpuName)
     {
-#ifdef _WIN64
-        int NameInfo[4] = {0};
+        CpuIDData data;
+        
+        std::array<char,64> name;
+        name.fill('\0');
+        
+        cpuid(data, 0x80000002);
+        memcpy(name.data(), data.data(), sizeof(data));
 
-        cpuid(NameInfo, 0x80000002);
-        memcpy(Name, NameInfo, sizeof(NameInfo));
+        cpuid(data, 0x80000003);
+        memcpy(name.data() + sizeof(data), data.data(), sizeof(data));
 
-        cpuid(NameInfo, 0x80000003);
-        memcpy(Name + 16, NameInfo, sizeof(NameInfo));
+        cpuid(data, 0x80000004);
+        memcpy(name.data() + (2 * sizeof(data)), data.data(), sizeof(data));
 
-        cpuid(NameInfo, 0x80000004);
-        memcpy(Name + 32, NameInfo, sizeof(NameInfo));
-#else
-        __asm {
-			mov esi, Name
-
-				mov     eax, 0x80000002
-				cpuid
-				mov     DWORD PTR[esi + 0], eax
-				mov     DWORD PTR[esi + 4], ebx
-				mov     DWORD PTR[esi + 8], ecx
-				mov     DWORD PTR[esi + 12], edx
-
-				mov     eax, 0x80000003
-				cpuid
-				mov     DWORD PTR[esi + 16], eax
-				mov     DWORD PTR[esi + 20], ebx
-				mov     DWORD PTR[esi + 24], ecx
-				mov     DWORD PTR[esi + 28], edx
-
-				mov     eax, 0x80000004
-				cpuid
-				mov     DWORD PTR[esi + 32], eax
-				mov     DWORD PTR[esi + 36], ebx
-				mov     DWORD PTR[esi + 40], ecx
-				mov     DWORD PTR[esi + 44], edx
-        }
-#endif
+        cpuName.set(name.data());
     }
 
     bool HasCPUID(void)
@@ -186,7 +149,7 @@ CpuInfo::CpuInfo(void)
 
     // Get Chace INFO
     if (GetLogicalProcessorInformation(cpuInfo, &Len)) {
-        int num = safe_static_cast<int, DWORD>(Len / sizeof(_SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
+        int32_t num = safe_static_cast<int32_t>(Len / sizeof(_SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
 
         for (int32_t i = 0; i < num; i++) {
             _LOGICAL_PROCESSOR_RELATIONSHIP& Rel = cpuInfo[i].Relationship;
