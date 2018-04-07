@@ -1155,9 +1155,7 @@ void World3D::floodThroughPortal_job(core::V2::JobSystem& jobSys, size_t threadI
 void World3D::floodViewThroughArea_r(core::V2::Job* pParentJob, const Vec3f origin, int32_t areaNum, int32_t areaFrom,
     const Planef& farPlane, const PortalStack* ps)
 {
-    X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t>(numAreas())),
-        "areaNum out of range")
-    (areaNum, numAreas());
+    X_ASSERT((areaNum >= 0 && areaNum < safe_static_cast<int32_t>(numAreas())),"areaNum out of range")(areaNum, numAreas());
 
     PortalStack newStack;
     const PortalStack* check;
