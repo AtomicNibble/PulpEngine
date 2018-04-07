@@ -1,40 +1,40 @@
 
 template<typename T>
-Pointer64<T>::Pointer64() :
+X_INLINE  Pointer64<T>::Pointer64() :
     raw_(0)
 {
     static_assert(!std::is_pointer<T>::value, "Pointer64: type must not be a pointer");
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator=(size_t val)
+X_INLINE Pointer64<T>& Pointer64<T>::operator=(size_t val)
 {
     raw_ = static_cast<uint64_t>(val);
     return *this;
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator=(T* p)
+X_INLINE Pointer64<T>& Pointer64<T>::operator=(T* p)
 {
     raw_ = reinterpret_cast<uint64_t>(p);
     return *this;
 }
 
 template<typename T>
-Pointer64<T>::operator T*() const
+X_INLINE Pointer64<T>::operator T*() const
 {
     return (T*)raw_;
 }
 
 template<typename T>
-Pointer64<T>& Pointer64<T>::operator+=(const Pointer64<T>& oth)
+X_INLINE Pointer64<T>& Pointer64<T>::operator+=(const Pointer64<T>& oth)
 {
     raw_ = (uint64_t)(((T*)raw_) + ((T*)oth.raw_));
     return *this;
 }
 
 template<>
-Pointer64<void>& Pointer64<void>::operator+=(const Pointer64<void>& oth)
+X_INLINE Pointer64<void>& Pointer64<void>::operator+=(const Pointer64<void>& oth)
 {
     raw_ = raw_ + oth.raw_;
     return *this;
@@ -42,25 +42,25 @@ Pointer64<void>& Pointer64<void>::operator+=(const Pointer64<void>& oth)
 
 template<typename T>
 template<typename Type>
-Type* Pointer64<T>::as(void) const
+X_INLINE Type* Pointer64<T>::as(void) const
 {
     return reinterpret_cast<Type*>(raw_);
 }
 
 template<typename T>
-void* Pointer64<T>::asVoid(void) const
+X_INLINE void* Pointer64<T>::asVoid(void) const
 {
     return as<void>();
 }
 
 template<typename T>
-const T* Pointer64<T>::operator[](size_t i) const
+X_INLINE const T* Pointer64<T>::operator[](size_t i) const
 {
     return (as<T>() + i);
 }
 
 template<typename T>
-T* Pointer64<T>::operator[](size_t i)
+X_INLINE T* Pointer64<T>::operator[](size_t i)
 {
     return (as<T>() + i);
 }
