@@ -482,12 +482,14 @@ inline int solveLinear(T a, T b, T result[1])
 template<typename T>
 inline int solveQuadratic(T a, T b, T c, T result[2])
 {
-    if (a == 0)
+    if (a == 0) {
         return solveLinear(b, c, result);
+    }
 
     T radical = b * b - 4 * a * c;
-    if (radical < 0)
+    if (radical < 0) {
         return 0;
+    }
 
     if (radical == 0) {
         result[0] = -b / (2 * a);
