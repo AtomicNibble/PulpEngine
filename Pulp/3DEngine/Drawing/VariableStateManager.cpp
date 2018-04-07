@@ -16,9 +16,11 @@ namespace
     // thought id try somthing diffrent than making the manager a friend :|
     struct ResourceStateInit : public render::Commands::ResourceStateBase
     {
+#if !X_COMPILER_CLANG
         static const size_t lastMemberEnd = X_OFFSETOF(ResourceStateBase, numBuffers) + sizeof(ResourceStateBase::numBuffers);
         // make sure that the compiler did not add in padding after last member.
         static_assert(sizeof(ResourceStateBase) == lastMemberEnd, "Compiler added paddin at end");
+#endif // !X_COMPILER_CLANG
 
         void setSizes(int8_t numTex, int8_t numSamp, int8_t numCBs, int8_t numBuf)
         {
