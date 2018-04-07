@@ -92,7 +92,13 @@ X_INLINE const Vec3<T>& Transform<T>::getPosition(void) const
 }
 
 template<typename T>
-Vec3<T> Transform<T>::transform(const Vec3<T>& p) const
+X_INLINE Vec3<T> Transform<T>::transform(const Vec3<T>& p) const
 {
     return (p * quat) + pos;
+}
+
+template<typename T>
+X_INLINE static Transform<T> Transform<T>::identity(void)
+{
+    return Transform();
 }

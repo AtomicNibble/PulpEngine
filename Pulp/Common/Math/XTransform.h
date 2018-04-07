@@ -37,10 +37,7 @@ public:
 
     Vec3<T> transform(const Vec3<T>& p) const;
 
-    X_INLINE static Transform<T> identity(void)
-    {
-        return Transform();
-    }
+    static Transform<T> identity(void);
 };
 
 typedef Transform<float> Transformf;
