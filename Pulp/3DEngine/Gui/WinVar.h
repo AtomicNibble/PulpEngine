@@ -334,10 +334,12 @@ namespace gui
         virtual void Set(const char* val) X_OVERRIDE
         {
             // make comma optional.
-            if (strchr(val, ','))
-                sscanf(val, "%f,%f", &value.x, &value.y);
-            else
-                sscanf(val, "%f %f", &value.x, &value.y);
+            if (strchr(val, ',')) {
+                sscanf_s(val, "%f,%f", &value.x, &value.y);
+            }
+            else {
+                sscanf_s(val, "%f %f", &value.x, &value.y);
+            }
         }
         virtual void Update(void) X_OVERRIDE
         {
@@ -407,10 +409,12 @@ namespace gui
         virtual void Set(const char* val) X_OVERRIDE
         {
             // make comma optional.
-            if (strchr(val, ','))
-                sscanf(val, "%f,%f,%f", &value.x, &value.y, &value.z);
-            else
-                sscanf(val, "%f %f %f", &value.x, &value.y, &value.z);
+            if (strchr(val, ',')) {
+                sscanf_s(val, "%f,%f,%f", &value.x, &value.y, &value.z);
+            }
+            else {
+                sscanf_s(val, "%f %f %f", &value.x, &value.y, &value.z);
+            }
         }
         virtual void Update(void) X_OVERRIDE
         {
@@ -485,10 +489,12 @@ namespace gui
         virtual void Set(const char* val) X_OVERRIDE
         {
             // make comma optional.
-            if (strchr(val, ','))
-                sscanf(val, "%f,%f,%f,%f", &value.x, &value.y, &value.z, &value.w);
-            else
-                sscanf(val, "%f %f %f %f", &value.x, &value.y, &value.z, &value.w);
+            if (strchr(val, ',')) {
+                sscanf_s(val, "%f,%f,%f,%f", &value.x, &value.y, &value.z, &value.w);
+            }
+            else {
+                sscanf_s(val, "%f %f %f %f", &value.x, &value.y, &value.z, &value.w);
+            }
         }
         virtual void Update(void) X_OVERRIDE
         {
@@ -571,10 +577,12 @@ namespace gui
         virtual void Set(const char* val) X_OVERRIDE
         {
             // make comma optional.
-            if (strchr(val, ','))
-                sscanf(val, "%f,%f,%f,%f", &value.x1, &value.y1, &value.x2, &value.y2);
-            else
-                sscanf(val, "%f %f %f %f", &value.x1, &value.y1, &value.x2, &value.y2);
+            if (strchr(val, ',')) {
+                sscanf_s(val, "%f,%f,%f,%f", &value.x1, &value.y1, &value.x2, &value.y2);
+            }
+            else {
+                sscanf_s(val, "%f %f %f %f", &value.x1, &value.y1, &value.x2, &value.y2);
+            }
 
             // turn from width / height into positions.
             value.x2 = value.x1 + value.x2;
@@ -679,10 +687,10 @@ namespace gui
             Color col;
             // make comma optional.
             if (strchr(val, ',')) {
-                sscanf(val, "%f,%f,%f,%f", &col.r, &col.g, &col.b, &col.a);
+                sscanf_s(val, "%f,%f,%f,%f", &col.r, &col.g, &col.b, &col.a);
             }
             else {
-                sscanf(val, "%f %f %f %f", &col.r, &col.g, &col.b, &col.a);
+                sscanf_s(val, "%f %f %f %f", &col.r, &col.g, &col.b, &col.a);
             }
 
             value = col;
