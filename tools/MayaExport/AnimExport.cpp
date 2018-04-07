@@ -459,7 +459,7 @@ MStatus PotatoAnimExporter::loadNoteData(void)
         return MS::kFailure;
     }
 
-    if (plugs.length() < 0) {
+    if (plugs.length() == 0) {
         MayaUtil::MayaPrintError("Notetrack is animated, but failed to get plugs");
         return MS::kFailure;
     }
