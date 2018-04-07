@@ -83,38 +83,38 @@ namespace
 
 } // namespace
 
-void* operator new(size_t sz)
+void* operator new(size_t sz) throw()
 {
     return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
-void* operator new[](size_t sz)
+void* operator new[](size_t sz) throw()
 {
     return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
-void operator delete(void* m)
+void operator delete(void* m) throw()
 {
     if (m) {
         gAlloc.free(m);
     }
 }
 
-void operator delete[](void* m)
+void operator delete[](void* m) throw()
 {
     if (m) {
         gAlloc.free(m);
     }
 }
 
-void operator delete(void* m, size_t sz)
+void operator delete(void* m, size_t sz) throw()
 {
     if (m) {
         gAlloc.free(m, sz);
     }
 }
 
-void operator delete[](void* m, size_t sz)
+void operator delete[](void* m, size_t sz) throw()
 {
     if (m) {
         gAlloc.free(m, sz);
