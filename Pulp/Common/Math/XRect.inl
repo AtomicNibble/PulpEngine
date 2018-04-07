@@ -1,6 +1,28 @@
 
 
 template<typename T>
+RectT<T>::RectT() :
+    x1(0),
+    y1(0),
+    x2(0),
+    y2(0)
+{
+}
+
+template<typename T>
+RectT<T>::RectT(T aX1, T aY1, T aX2, T aY2)
+{
+    set(aX1, aY1, aX2, aY2);
+}
+
+template<typename T>
+RectT<T>::RectT(const Vec2<T>& v1, const Vec2<T>& v2)
+{
+    set(v1.x, v1.y, v2.x, v2.y);
+}
+
+
+template<typename T>
 void RectT<T>::set(T aX1, T aY1, T aX2, T aY2)
 {
     x1 = aX1;
@@ -10,7 +32,31 @@ void RectT<T>::set(T aX1, T aY1, T aX2, T aY2)
 }
 
 template<typename T>
-void RectT<T>::canonicalize()
+T RectT<T>::getWidth(void) const
+{
+    return x2 - x1;
+}
+
+template<typename T>
+T RectT<T>::getHeight(void) const
+{
+    return y2 - y1;
+}
+
+template<typename T>
+T RectT<T>::getAspectRatio(void) const
+{
+    return getWidth() / getHeight();
+}
+
+template<typename T>
+T RectT<T>::calcArea(void) const
+{
+    return getWidth() * getHeight();
+}
+
+template<typename T>
+void RectT<T>::canonicalize(void)
 {
     if (x1 > x2) {
         T temp = x1;
@@ -26,7 +72,7 @@ void RectT<T>::canonicalize()
 }
 
 template<typename T>
-RectT<T> RectT<T>::canonicalized() const
+RectT<T> RectT<T>::canonicalized(void) const
 {
     RectT<T> result(*this);
     result.canonicalize();
@@ -81,6 +127,14 @@ void RectT<T>::offset(const Vec2<T>& offset)
 }
 
 template<typename T>
+RectT<T> RectT<T>::getOffset(const Vec2<T>& off) const
+{
+    RectT<T> result(*this);
+    result.offset(off);
+    return result;
+}
+
+template<typename T>
 void RectT<T>::inflate(const Vec2<T>& amount)
 {
     x1 -= amount.x;
@@ -95,6 +149,12 @@ RectT<T> RectT<T>::inflated(const Vec2<T>& amount) const
     RectT<T> result(*this);
     result.inflate(amount);
     return result;
+}
+
+template<typename T>
+void RectT<T>::offsetCenterTo(const Vec2<T>& center)
+{
+    offset(center - getCenter());
 }
 
 template<typename T>
@@ -158,6 +218,13 @@ template<typename T>
 RectT<T> RectT<T>::scaled(const Vec2<T>& scale) const
 {
     return RectT<T>(x1 * scale.x, y1 * scale.y, x2 * scale.x, y2 * scale.y);
+}
+
+template<typename T>
+template<typename Y>
+bool RectT<T>::contains(const Vec2<Y>& pt) const
+{
+    return (pt.x >= x1) && (pt.x <= x2) && (pt.y >= y1) && (pt.y <= y2);
 }
 
 template<typename T>
@@ -241,6 +308,89 @@ Vec2<T> RectT<T>::closestPoint(const Vec2<T>& pt) const
 }
 
 template<typename T>
+T RectT<T>::getX1(void) const
+{
+    return x1;
+}
+
+template<typename T>
+T RectT<T>::getY1(void) const
+{
+    return y1;
+}
+
+template<typename T>
+T RectT<T>::getX2(void) const
+{
+    return x2;
+}
+
+template<typename T>
+T RectT<T>::getY2(void) const
+{
+    return y2;
+}
+
+template<typename T>
+Vec2<T> RectT<T>::getUpperLeft(void) const
+{
+    return Vec2<T>(x1, y1);
+};
+
+template<typename T>
+Vec2<T> RectT<T>::getUpperRight(void) const
+{
+    return Vec2<T>(x2, y1);
+};
+
+template<typename T>
+Vec2<T> RectT<T>::getLowerRight(void) const
+{
+    return Vec2<T>(x2, y2);
+};
+
+template<typename T>
+Vec2<T> RectT<T>::getLowerLeft(void) const
+{
+    return Vec2<T>(x1, y2);
+};
+
+template<typename T>
+Vec2<T> RectT<T>::getCenter(void) const
+{
+    return Vec2<T>((x1 + x2) / 2, (y1 + y2) / 2);
+}
+
+template<typename T>
+Vec2<T> RectT<T>::getSize(void) const
+{
+    return Vec2<T>(x2 - x1, y2 - y1);
+}
+
+template<typename T>
+RectT<T> RectT<T>::getCenteredFit(const RectT<T>& other, bool expand) const
+{
+    RectT<T> result = *this;
+    result.offset(other.getCenter() - result.getCenter());
+
+    bool isInside = ((result.getWidth() < other.getWidth()) && (result.getHeight() < other.getHeight()));
+    if (expand || (!isInside)) { // need to do some scaling
+        T aspectAspect = result.getAspectRatio() / other.getAspectRatio();
+        if (aspectAspect >= 1.0f) { // result is proportionally wider so we need to fit its x-axis
+            T scaleBy = other.getWidth() / result.getWidth();
+            result.scaleCentered(scaleBy);
+        }
+        else { // result is proportionally wider so we need to fit its y-axis
+            T scaleBy = other.getHeight() / result.getHeight();
+            result.scaleCentered(scaleBy);
+        }
+    }
+
+    return result;
+}
+
+
+template<typename T>
 void RectT<T>::include(const Vec2<T>& point)
 {
     if (x1 > point.x) {
@@ -302,23 +452,65 @@ RectT<T>& RectT<T>::Align(const RectT& other, AlignmentFlags alignment)
 }
 
 template<typename T>
-RectT<T> RectT<T>::getCenteredFit(const RectT<T>& other, bool expand) const
+const RectT<T> RectT<T>::operator+(const Vec2<T>& o) const
 {
-    RectT<T> result = *this;
-    result.offset(other.getCenter() - result.getCenter());
+    return this->getOffset(o);
+}
 
-    bool isInside = ((result.getWidth() < other.getWidth()) && (result.getHeight() < other.getHeight()));
-    if (expand || (!isInside)) { // need to do some scaling
-        T aspectAspect = result.getAspectRatio() / other.getAspectRatio();
-        if (aspectAspect >= 1.0f) { // result is proportionally wider so we need to fit its x-axis
-            T scaleBy = other.getWidth() / result.getWidth();
-            result.scaleCentered(scaleBy);
-        }
-        else { // result is proportionally wider so we need to fit its y-axis
-            T scaleBy = other.getHeight() / result.getHeight();
-            result.scaleCentered(scaleBy);
-        }
-    }
+template<typename T>
+const RectT<T> RectT<T>::operator-(const Vec2<T>& o) const
+{
+    return this->getOffset(-o);
+}
 
-    return result;
+template<typename T>
+const RectT<T> RectT<T>::operator*(T s) const
+{
+    return this->scaled(s);
+}
+
+template<typename T>
+const RectT<T> RectT<T>::operator/(T s) const
+{
+    return this->scaled(((T)1) / s);
+}
+
+template<typename T>
+const RectT<T> RectT<T>::operator+(const RectT<T>& rhs) const
+{
+    return RectT<T>(x1 + rhs.x1, y1 + rhs.y1, x2 + rhs.x2, y2 + rhs.y2);
+}
+
+template<typename T>
+const RectT<T> RectT<T>::operator-(const RectT<T>& rhs) const
+{
+    return RectT<T>(x1 - rhs.x1, y1 - rhs.y1, x2 - rhs.x2, y2 - rhs.y2);
+}
+
+template<typename T>
+RectT<T>& RectT<T>::operator+=(const Vec2<T>& o)
+{
+    offset(o);
+    return *this;
+}
+
+template<typename T>
+RectT<T>& RectT<T>::operator-=(const Vec2<T>& o)
+{
+    offset(-o);
+    return *this;
+}
+
+template<typename T>
+RectT<T>& RectT<T>::operator*=(T s)
+{
+    scale(s);
+    return *this;
+}
+
+template<typename T>
+RectT<T>& RectT<T>::operator/=(T s)
+{
+    scale(((T)1) / s);
+    return *this;
 }

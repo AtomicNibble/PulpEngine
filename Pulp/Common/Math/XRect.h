@@ -12,76 +12,46 @@ class RectT
 public:
     T x1, y1, x2, y2;
 
-    RectT() :
-        x1(0),
-        y1(0),
-        x2(0),
-        y2(0)
-    {
-    }
-
-    RectT(T aX1, T aY1, T aX2, T aY2)
-    {
-        set(aX1, aY1, aX2, aY2);
-    }
-    RectT(const Vec2<T>& v1, const Vec2<T>& v2)
-    {
-        set(v1.x, v1.y, v2.x, v2.y);
-    }
+    RectT();
+    RectT(T aX1, T aY1, T aX2, T aY2);
+    RectT(const Vec2<T>& v1, const Vec2<T>& v2);
 
     void set(T aX1, T aY1, T aX2, T aY2);
 
-    T getWidth() const
-    {
-        return x2 - x1;
-    }
-    T getHeight() const
-    {
-        return y2 - y1;
-    }
-    T getAspectRatio() const
-    {
-        return getWidth() / getHeight();
-    }
-    T calcArea() const
-    {
-        return getWidth() * getHeight();
-    }
+    T getWidth(void) const;
+    T getHeight(void) const;
+    T getAspectRatio(void) const;
+    T calcArea(void) const;
 
-    void canonicalize();         // return rect w/ properly ordered coordinates
-    RectT canonicalized() const; // return rect w/ properly ordered coordinates
+    void canonicalize(void);         // return rect w/ properly ordered coordinates
+    RectT canonicalized(void) const; // return rect w/ properly ordered coordinates
 
     void clipBy(const RectT& clip);
     RectT getClipBy(const RectT& clip) const;
-    //	Area		getInteriorArea() const;
+    
     void offset(const Vec2<T>& offset);
-    RectT getOffset(const Vec2<T>& off) const
-    {
-        RectT result(*this);
-        result.offset(off);
-        return result;
-    }
+    RectT getOffset(const Vec2<T>& off) const;
+
     void inflate(const Vec2<T>& amount);
     RectT inflated(const Vec2<T>& amount) const;
+
     //! Translates the rectangle so that its center is at \a center
-    void offsetCenterTo(const Vec2<T>& center)
-    {
-        offset(center - getCenter());
-    }
+    void offsetCenterTo(const Vec2<T>& center);
+    
     void scaleCentered(const Vec2<T>& scale);
     void scaleCentered(T scale);
     RectT scaledCentered(T scale) const;
+    
     void scale(T scale);
     void scale(const Vec2<T>& scale);
+    
     RectT scaled(T scale) const;
     RectT scaled(const Vec2<T>& scale) const;
 
     /** \brief Is a point \a pt inside the rectangle **/
     template<typename Y>
-    bool contains(const Vec2<Y>& pt) const
-    {
-        return (pt.x >= x1) && (pt.x <= x2) && (pt.y >= y1) && (pt.y <= y2);
-    }
+    bool contains(const Vec2<Y>& pt) const;
+
     /** \brief Is a point \a pt inside the rectangle **/
     bool contains(const RectT& rect) const;
 
@@ -96,47 +66,17 @@ public:
     //! Returns the nearest point on the Rect \a rect. Points inside the rectangle return \a pt.
     Vec2<T> closestPoint(const Vec2<T>& pt) const;
 
-    T getX1() const
-    {
-        return x1;
-    }
-    T getY1() const
-    {
-        return y1;
-    }
-    T getX2() const
-    {
-        return x2;
-    }
-    T getY2() const
-    {
-        return y2;
-    }
+    T getX1(void) const;
+    T getY1(void) const;
+    T getX2(void) const;
+    T getY2(void) const;
 
-    Vec2<T> getUpperLeft() const
-    {
-        return Vec2<T>(x1, y1);
-    };
-    Vec2<T> getUpperRight() const
-    {
-        return Vec2<T>(x2, y1);
-    };
-    Vec2<T> getLowerRight() const
-    {
-        return Vec2<T>(x2, y2);
-    };
-    Vec2<T> getLowerLeft() const
-    {
-        return Vec2<T>(x1, y2);
-    };
-    Vec2<T> getCenter() const
-    {
-        return Vec2<T>((x1 + x2) / 2, (y1 + y2) / 2);
-    }
-    Vec2<T> getSize() const
-    {
-        return Vec2<T>(x2 - x1, y2 - y1);
-    }
+    Vec2<T> getUpperLeft(void) const;
+    Vec2<T> getUpperRight(void) const;
+    Vec2<T> getLowerRight(void) const;
+    Vec2<T> getLowerLeft(void) const;
+    Vec2<T> getCenter(void) const;
+    Vec2<T> getSize(void) const;
 
     /** \return Scaled copy with the same aspect ratio centered relative to and scaled to fit inside \a other. If \a expand then the rectangle is expanded if it is smaller than \a other */
     RectT getCenteredFit(const RectT& other, bool expand) const;
@@ -149,52 +89,18 @@ public:
     // align
     RectT& Align(const RectT& other, AlignmentFlags alignment);
 
-    const RectT<T> operator+(const Vec2<T>& o) const
-    {
-        return this->getOffset(o);
-    }
-    const RectT<T> operator-(const Vec2<T>& o) const
-    {
-        return this->getOffset(-o);
-    }
-    const RectT<T> operator*(T s) const
-    {
-        return this->scaled(s);
-    }
-    const RectT<T> operator/(T s) const
-    {
-        return this->scaled(((T)1) / s);
-    }
+    const RectT<T> operator+(const Vec2<T>& o) const;
+    const RectT<T> operator-(const Vec2<T>& o) const;
+    const RectT<T> operator*(T s) const;
+    const RectT<T> operator/(T s) const;
 
-    const RectT<T> operator+(const RectT<T>& rhs) const
-    {
-        return RectT<T>(x1 + rhs.x1, y1 + rhs.y1, x2 + rhs.x2, y2 + rhs.y2);
-    }
-    const RectT<T> operator-(const RectT<T>& rhs) const
-    {
-        return RectT<T>(x1 - rhs.x1, y1 - rhs.y1, x2 - rhs.x2, y2 - rhs.y2);
-    }
+    const RectT<T> operator+(const RectT<T>& rhs) const;
+    const RectT<T> operator-(const RectT<T>& rhs) const;
 
-    RectT<T>& operator+=(const Vec2<T>& o)
-    {
-        offset(o);
-        return *this;
-    }
-    RectT<T>& operator-=(const Vec2<T>& o)
-    {
-        offset(-o);
-        return *this;
-    }
-    RectT<T>& operator*=(T s)
-    {
-        scale(s);
-        return *this;
-    }
-    RectT<T>& operator/=(T s)
-    {
-        scale(((T)1) / s);
-        return *this;
-    }
+    RectT<T>& operator+=(const Vec2<T>& o);
+    RectT<T>& operator-=(const Vec2<T>& o);
+    RectT<T>& operator*=(T s);
+    RectT<T>& operator/=(T s);
 };
 
 typedef RectT<int32_t> Recti;
