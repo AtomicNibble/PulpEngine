@@ -113,7 +113,7 @@ X_INLINE void CBufferManager::setTime(core::TimeVal time)
 {
     const float newTime = time.GetMilliSeconds();
 
-    if (math<float>::abs(newTime - time_) >= EPSILON_VALUEf) {
+    if (math<float>::abs(newTime - time_) >= math<float>::EPSILON) {
         time_ = newTime;
 
         dirtyFlags_.Set(render::shader::ParamType::PF_Time);
@@ -124,7 +124,7 @@ X_INLINE void CBufferManager::setFrameTime(core::ITimer::Timer::Enum timer, core
 {
     const float newTime = frameTime.GetMilliSeconds();
 
-    if (math<float>::abs(newTime - frameTime_[timer]) >= EPSILON_VALUEf) {
+    if (math<float>::abs(newTime - frameTime_[timer]) >= math<float>::EPSILON) {
         frameTime_[timer] = newTime;
 
         static_assert(core::ITimer::Timer::ENUM_COUNT == 2, "Timer count changed? check this code");

@@ -203,7 +203,7 @@ TYPED_TEST(Mat44, Operator)
         bool isOk = true;
         for (int i = 0; i < MatT::DIM_SQ; ++i) {
             T diff = fabs(data[i] - cdata[i]);
-            if (diff >= EPSILON) {
+            if (diff >= math<T>::EPSILON) {
                 isOk = false;
                 break;
             }
@@ -508,9 +508,9 @@ TYPED_TEST(Mat44, Operator)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // const Vec4<T> operator*( const Vec4<T> &rhs ) const;
     {
@@ -524,10 +524,10 @@ TYPED_TEST(Mat44, Operator)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
         diff.z = fabs(diff.w);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
-        EXPECT_LE(diff.w, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
+        EXPECT_LE(diff.w, math<T>::EPSILON);
     }
     // const Matrix44<T> operator*( T rhs ) const;
     {
@@ -821,7 +821,7 @@ TYPED_TEST(Mat44, Util)
             (T)1.002352, (T)0.875840, (T)0.133293, (T)1.200000);
         T det = m0.determinant();
         T diff = fabs((T)-5.036502 - det);
-        EXPECT_LE(diff, EPSILON);
+        EXPECT_LE(diff, math<T>::EPSILON);
     }
     // T trace() const;
     {
@@ -838,8 +838,8 @@ TYPED_TEST(Mat44, Util)
         T v1 = (T)0.009505 + (T)0.022748 + (T)0.848048 + (T)1.200000;
         T diff0 = fabs((T)v0 - trace0);
         T diff1 = fabs((T)v1 - trace1);
-        EXPECT_LE(diff0, EPSILON);
-        EXPECT_LE(diff1, EPSILON);
+        EXPECT_LE(diff0, math<T>::EPSILON);
+        EXPECT_LE(diff1, math<T>::EPSILON);
     }
     // Matrix44<T> diagonal() const;
     {
@@ -903,7 +903,7 @@ TYPED_TEST(Mat44, Util)
             13, 14, 15, 16);
         EXPECT_EQ(c0, m0.transposed());
     }
-    // void invert (T epsilon = EPSILON );
+    // void invert (T epsilon = math<T>::EPSILON );
     {
         MatT c0(
             (T)-0.573283, (T)-0.162312, (T)-0.488816, (T)0.854753,
@@ -918,7 +918,7 @@ TYPED_TEST(Mat44, Util)
         m0.invert();
         EXPECT_EQ(c0, m0);
     }
-    // Matrix44<T> inverted( T epsilon = EPSILON ) const;
+    // Matrix44<T> inverted( T epsilon = math<T>::EPSILON ) const;
     {
         MatT c0(
             (T)-0.573283, (T)-0.162312, (T)-0.488816, (T)0.854753,
@@ -958,7 +958,7 @@ TYPED_TEST(Mat44, Util)
             align_mat.setTranslate(Vec3f(1, 2, 3));
             Matrix44f inv_mat = mat.inverted();
             X_ALIGN16_MATRIX44F(inv_align_mat) = SseInvert(align_mat);
-            if (!inv_mat.equalCompare(inv_align_mat, (float)EPSILON)) {
+            if (!inv_mat.equalCompare(inv_align_mat, (float)math<T>::EPSILON)) {
                 ++notWithinEpison;
             }
         }
@@ -994,9 +994,9 @@ TYPED_TEST(Mat44, Util)
         diff.x = fabs(diff.x);
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec4<T> preMultiply( const Vec4<T> &v ) const;
     {
@@ -1010,10 +1010,10 @@ TYPED_TEST(Mat44, Util)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
         diff.w = fabs(diff.w);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
-        EXPECT_LE(diff.w, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
+        EXPECT_LE(diff.w, math<T>::EPSILON);
     }
     // Vec3<T> postMultiply( const Vec3<T> &v ) const;
     {
@@ -1026,9 +1026,9 @@ TYPED_TEST(Mat44, Util)
         diff.x = fabs(diff.x);
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec4<T> postMultiply( const Vec4<T> &v ) const;
     {
@@ -1042,10 +1042,10 @@ TYPED_TEST(Mat44, Util)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
         diff.w = fabs(diff.w);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
-        EXPECT_LE(diff.w, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
+        EXPECT_LE(diff.w, math<T>::EPSILON);
     }
     // void affineInvert(){ *this = affineInverted(); }
     {
@@ -1068,9 +1068,9 @@ TYPED_TEST(Mat44, Util)
             (T)0.00000, (T)0.00000, (T)0.00000, (T)1.0000, true);
         Vec3<T> p0((T)1.25, (T)-4.312, (T)5.2112);
         Vec3<T> diff = (cv0 - c0.transformPoint(p0));
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec3<T> transformPointAffine( const Vec3<T> &rhs ) const;
     {}
@@ -1103,10 +1103,10 @@ TYPED_TEST(Mat44, Util)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
         diff.w = fabs(diff.w);
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
-        EXPECT_LE(diff.w, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
+        EXPECT_LE(diff.w, math<T>::EPSILON);
     }
     // void translate( const Vec3/4<T> &tr );
     {

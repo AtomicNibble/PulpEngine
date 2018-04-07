@@ -785,13 +785,13 @@ template<typename T>
 Matrix33<T> Matrix33<T>::alignZAxisWithTarget(Vec3<T> targetDir, Vec3<T> upDir)
 {
     // Ensure that the target direction is non-zero.
-    if (targetDir.lengthSquared() < EPSILON) {
+    if (targetDir.lengthSquared() < math<T>::EPSILON) {
         // We want to look down the negative z-axis since to match OpenGL.
         targetDir = -Vec3<T>::zAxis();
     }
 
     // Ensure that the up direction is non-zero.
-    if (upDir.lengthSquared() < EPSILON) {
+    if (upDir.lengthSquared() < math<T>::EPSILON) {
         upDir = Vec3<T>::yAxis();
     }
 

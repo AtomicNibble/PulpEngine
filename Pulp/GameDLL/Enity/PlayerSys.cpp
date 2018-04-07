@@ -287,7 +287,7 @@ namespace entity
             auto delta = timeInfo.deltas[core::Timer::GAME].GetMilliSeconds();
             auto old = player.bobCycle;
             player.bobCycle = (int32_t)(old + bobmove * delta) & 255;
-            player.bobfracsin = math<float>::abs(math<float>::sin((player.bobCycle & 127) / 127.f * PIf));
+            player.bobfracsin = math<float>::abs(math<float>::sin((player.bobCycle & 127) / 127.f * math<float>::PI));
         }
 
         player.viewBobAngles = Anglesf::zero();

@@ -152,8 +152,134 @@ struct math
 };
 
 template<>
+struct math<double>
+{
+    // clang-format off
+
+    static constexpr float64_t EPSILON = 2.2204460492503131e-016;
+    static constexpr float64_t INFINITY = std::numeric_limits<double>::infinity();
+
+    static constexpr float64_t PI = 3.1415926535897932384626433832;
+    static constexpr float64_t TWO_PI = 2.0 * PI;
+    static constexpr float64_t HALF_PI = 0.5 * PI;
+    static constexpr float64_t ONE_FOURTH_PI = 0.25 * PI;
+    static constexpr float64_t ONE_OVER_PI = 1 / PI;
+    static constexpr float64_t ONE_OVER_TWO_PI = 1 / TWO_PI;
+    static constexpr float64_t SQRT_TWO = 1.41421356237309504880;
+    static constexpr float64_t SQRT_THREE = 1.73205080756887729352;
+    static constexpr float64_t SQRT_1OVER2 = 0.70710678118654752440;
+    static constexpr float64_t SQRT_1OVER3 = 0.57735026918962576450;
+    static constexpr float64_t MUL_DEG2RAD = PI / 180;
+    static constexpr float64_t MUL_RAD2DEG = 180 / PI;
+
+    // clang-format on
+    X_INLINE static double square(double x)
+    {
+        return x * x;
+    }
+
+    X_INLINE static double acos(double x)
+    {
+        return ::acos(x);
+    }
+    X_INLINE static double asin(double x)
+    {
+        return ::asin(x);
+    }
+    X_INLINE static double atan(double x)
+    {
+        return ::atan(x);
+    }
+    X_INLINE static double atan2(double y, double x)
+    {
+        return ::atan2(y, x);
+    }
+    X_INLINE static double cos(double x)
+    {
+        return ::cos(x);
+    }
+    X_INLINE static double sin(double x)
+    {
+        return ::sin(x);
+    }
+    X_INLINE static double tan(double x)
+    {
+        return ::tan(x);
+    }
+    X_INLINE static double cosh(double x)
+    {
+        return ::cosh(x);
+    }
+    X_INLINE static double sinh(double x)
+    {
+        return ::sinh(x);
+    }
+    X_INLINE static double tanh(double x)
+    {
+        return ::tanh(x);
+    }
+    X_INLINE static double exp(double x)
+    {
+        return ::exp(x);
+    }
+    X_INLINE static double log(double x)
+    {
+        return ::log(x);
+    }
+    X_INLINE static double log10(double x)
+    {
+        return ::log10(x);
+    }
+    X_INLINE static double modf(double x, double* y)
+    {
+        return ::modf(x, y);
+    }
+    X_INLINE static double pow(double x, double y)
+    {
+        return ::pow(x, y);
+    }
+    X_DISABLE_WARNING(4756)
+    X_INLINE static double sqrt(double x)
+    {
+        return ::sqrt(x);
+    }
+    X_ENABLE_WARNING(4756)
+    X_INLINE static double ceil(double x)
+    {
+        return ::ceil(x);
+    }
+    X_INLINE static double abs(double x)
+    {
+        return ::abs(x);
+    }
+    X_INLINE static double floor(double x)
+    {
+        return ::floor(x);
+    }
+};
+
+template<>
 struct math<float>
 {
+    // clang-format off
+    static constexpr float32_t EPSILON = 1.192092896e-07f;
+    static constexpr float32_t INFINITY = 1e30f;
+
+    static constexpr float32_t PI = 3.1415926535897932384626433832f;
+    static constexpr float32_t TWO_PI = 2.0f * PI;
+    static constexpr float32_t HALF_PI = 0.5f * PI;
+    static constexpr float32_t ONE_FOURTH_PI = 0.25f * PI;
+    static constexpr float32_t ONE_OVER_PI = 1.f / PI;
+    static constexpr float32_t ONE_OVER_TWO_PI = 1.f / TWO_PI;
+    static constexpr float32_t SQRT_TWO = 1.41421356237309504880f;
+    static constexpr float32_t SQRT_THREE = 1.73205080756887729352f;
+    static constexpr float32_t SQRT_1OVER2 = 0.70710678118654752440f;
+    static constexpr float32_t SQRT_1OVER3 = 0.57735026918962576450f;
+    static constexpr float32_t MUL_DEG2RAD = PI / 180.f;
+    static constexpr float32_t MUL_RAD2DEG = 180.f / PI;
+
+    // clang-format on
+
     X_INLINE static float square(float x)
     {
         return x * x;
@@ -344,22 +470,6 @@ X_ENABLE_WARNING(4244)
 #define X_PI 3.14159265358979323846
 #endif
 
-const float64_t PI = 3.1415926535897932384626433832;
-const float64_t PI2 = 3.1415926535897932384626433832 * 2.0;
-const float32_t PIf = (float32_t)3.1415926535897932384626433832f;
-const float32_t PI2f = (float32_t)3.1415926535897932384626433832 * 2.0;
-const float32_t PIHalff = (float32_t)3.1415926535897932384626433832 * 0.5f;
-const float64_t PIHalf = (float64_t)3.1415926535897932384626433832 * 0.5;
-
-const float32_t Sqrt_1OVER2 = 0.70710678118654752440f;
-const float32_t Sqrt_1OVER3 = 0.57735026918962576450f;
-
-const float64_t EPSILON_VALUE = 4.37114e-05;
-const float32_t EPSILON_VALUEf = 4.37114e-05f;
-#define EPSILON EPSILON_VALUE
-
-static const float INFINITY = 1e30f;
-
 inline constexpr float fsel(float a, float b, float c)
 {
     return a >= 0 ? b : c;
@@ -367,22 +477,22 @@ inline constexpr float fsel(float a, float b, float c)
 
 inline constexpr float toRadians(float x)
 {
-    return x * 0.017453292519943295769f; // ( x * PI / 180 )
+    return x * math<float>::MUL_DEG2RAD;
 }
 
 inline constexpr double toRadians(double x)
 {
-    return x * 0.017453292519943295769; // ( x * PI / 180 )
+    return x * math<double>::MUL_DEG2RAD;
 }
 
 inline constexpr float toDegrees(float x)
 {
-    return x * 57.295779513082321f; // ( x * 180 / PI )
+    return x * math<float>::MUL_RAD2DEG;
 }
 
 inline constexpr double toDegrees(double x)
 {
-    return x * 57.295779513082321; // ( x * 180 / PI )
+    return x * math<double>::MUL_RAD2DEG;
 }
 
 template<typename T>

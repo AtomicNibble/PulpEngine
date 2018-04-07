@@ -161,7 +161,7 @@ X_INLINE void XInterpolateAccelDecelSine<type>::Init(const int startTime,
         this->decelTime_ = duration - this->accelTime_;
     }
     this->linearTime_ = duration - this->accelTime_ - this->decelTime_;
-    const type speed = (endValue_ - startValue_) * (1000.0f / ((float)this->linearTime_ + (this->accelTime_ + this->decelTime_) * Sqrt_1OVER2));
+    const type speed = (endValue_ - startValue_) * (1000.0f / ((float)this->linearTime_ + (this->accelTime_ + this->decelTime_) * math<float>::SQRT_1OVER2));
 
     if (this->accelTime_) {
         extrapolate_.Init(startTime_, this->accelTime_, startValue_, (startValue_ - startValue_), speed, ExtrapolationType::ACCELSINE); //-V501
@@ -191,12 +191,12 @@ X_INLINE void XInterpolateAccelDecelSine<type>::SetPhase(int time) const
     }
     else if (deltaTime < accelTime_ + linearTime_) {
         if (extrapolate_.GetExtrapolationType() != ExtrapolationType::LINEAR) {
-            extrapolate_.Init(startTime_ + accelTime_, linearTime_, startValue_ + extrapolate_.GetSpeed() * (accelTime_ * 0.001f * Sqrt_1OVER2), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::LINEAR);
+            extrapolate_.Init(startTime_ + accelTime_, linearTime_, startValue_ + extrapolate_.GetSpeed() * (accelTime_ * 0.001f * math<float>::SQRT_1OVER2), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::LINEAR);
         }
     }
     else {
         if (extrapolate_.GetExtrapolationType() != ExtrapolationType::DECELSINE) {
-            extrapolate_.Init(startTime_ + accelTime_ + linearTime_, decelTime_, endValue_ - (extrapolate_.GetSpeed() * (decelTime_ * 0.001f * Sqrt_1OVER2)), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::DECELSINE);
+            extrapolate_.Init(startTime_ + accelTime_ + linearTime_, decelTime_, endValue_ - (extrapolate_.GetSpeed() * (decelTime_ * 0.001f * math<float>::SQRT_1OVER2)), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::DECELSINE);
         }
     }
 }

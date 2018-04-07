@@ -96,7 +96,7 @@ bool XGlyphBitmap::Scale(float scaleX, float scaleY)
     // Scale changed?
     Vec2f scale(scaleX, scaleY);
     Vec2f sameScale(1.f, 1.f);
-    if (sameScale.compare(scale, EPSILON_VALUEf)) {
+    if (sameScale.compare(scale, math<float>::EPSILON)) {
         return true;
     }
 

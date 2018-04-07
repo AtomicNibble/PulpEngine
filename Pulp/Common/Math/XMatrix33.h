@@ -93,7 +93,7 @@ public:
     bool equalCompare(const Matrix33<T>& rhs, T epsilon) const;
     bool operator==(const Matrix33<T>& rhs) const
     {
-        return equalCompare(rhs, (T)EPSILON);
+        return equalCompare(rhs, math<T>::EPSILON);
     }
     bool operator!=(const Matrix33<T>& rhs) const
     {
@@ -159,15 +159,15 @@ public:
     void transpose();
     Matrix33<T> transposed() const;
 
-    void invert(T epsilon = EPSILON)
+    void invert(T epsilon = math<T>::EPSILON)
     {
         *this = inverted(epsilon);
     }
-    Matrix33<T> inverse(T epsilon = EPSILON) const
+    Matrix33<T> inverse(T epsilon = math<T>::EPSILON) const
     {
         return inverted(epsilon);
     }
-    Matrix33<T> inverted(T epsilon = EPSILON) const;
+    Matrix33<T> inverted(T epsilon = math<T>::EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
     Vec3<T> preMultiply(const Vec3<T>& v) const;

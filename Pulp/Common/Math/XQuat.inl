@@ -192,7 +192,7 @@ X_INLINE void Quat<T>::set(const Vec3<T>& from, const Vec3<T>& to)
 
     w += static_cast<T>(1.0);
 
-    if (w <= EPSILON) {
+    if (w <= math<T>::EPSILON) {
         if (from.z * from.z > from.x * from.x) {
             set(static_cast<T>(0.0), static_cast<T>(0.0), from.z, -from.y);
         }
@@ -371,7 +371,7 @@ X_INLINE Quat<T> Quat<T>::lerp(T t, const Quat<T>& end) const
     Quat<T> result = end * t;
 
     // if "angle" between Quats is less than 90 degrees
-    if (cosTheta >= EPSILON) {
+    if (cosTheta >= math<T>::EPSILON) {
         // use standard interpolation
         result += *this * (static_cast<T>(1.0) - t);
     }
@@ -416,9 +416,9 @@ X_INLINE Quat<T> Quat<T>::slerp(T t, const Quat<T>& end) const
     T startInterp, endInterp;
 
     // if "angle" between Quats is less than 90 degrees
-    if (cosTheta >= EPSILON) {
+    if (cosTheta >= math<T>::EPSILON) {
         // if angle is greater than zero
-        if ((static_cast<T>(1.0) - cosTheta) > EPSILON) {
+        if ((static_cast<T>(1.0) - cosTheta) > math<T>::EPSILON) {
             // use standard slerp
             T theta = math<T>::acos(cosTheta);
             T recipSinTheta = static_cast<T>(1.0) / math<T>::sin(theta);
@@ -436,7 +436,7 @@ X_INLINE Quat<T> Quat<T>::slerp(T t, const Quat<T>& end) const
     // otherwise, take the shorter route
     else {
         // if angle is less than 180 degrees
-        if ((static_cast<T>(1.0) + cosTheta) > EPSILON) {
+        if ((static_cast<T>(1.0) + cosTheta) > math<T>::EPSILON) {
             // use slerp w/negation of start Quat
             T theta = math<T>::acos(-cosTheta);
             T recipSinTheta = static_cast<T>(1.0) / math<T>::sin(theta);
@@ -736,7 +736,7 @@ template<typename T>
 X_INLINE bool Quat<T>::operator==(const Quat<T>& rhs) const
 {
     const Quat<T>& lhs = *this;
-    return (math<float>::abs(lhs.w - rhs.w) < EPSILON) && lhs.v == rhs.v;
+    return (math<float>::abs(lhs.w - rhs.w) < math<T>::EPSILON) && lhs.v == rhs.v;
 }
 
 template<typename T>

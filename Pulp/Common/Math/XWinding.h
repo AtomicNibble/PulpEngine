@@ -101,14 +101,14 @@ public:
     void GetAABB(AABB& box) const;
 
     float planeDistance(const Planef& plane) const;
-    PlaneSide::Enum planeSide(const Planef& plane, const float epsilon = EPSILON) const;
+    PlaneSide::Enum planeSide(const Planef& plane, const float epsilon = math<float>::EPSILON) const;
 
     // cuts off the part at the back side of the plane, returns true if some part was at the front
     // if there is nothing at the front the number of points is set to zero
     bool clipInPlace(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
 
     // returns false if invalid.
-    bool clip(const Planef& plane, const float epsilon = EPSILON, const bool keepOn = false);
+    bool clip(const Planef& plane, const float epsilon = math<float>::EPSILON, const bool keepOn = false);
     MyType* Copy(core::MemoryArenaBase* arena) const;
     MyType* Move(core::MemoryArenaBase* arena);
     MyType* ReverseWinding(core::MemoryArenaBase* arena) const;
@@ -118,8 +118,8 @@ public:
     PlaneSide::Enum SplitMove(const Planef& plane, const float epsilon,
         MyType** pFront, MyType** pBack, core::MemoryArenaBase* arena);
 
-    void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = EPSILON);
-    void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = EPSILON);
+    void AddToConvexHull(const MyType* pWinding, const Vec3f& normal, const float epsilon = math<float>::EPSILON);
+    void AddToConvexHull(const Vec3f& point, const Vec3f& normal, const float epsilon = math<float>::EPSILON);
 
     bool SSave(core::XFile* pFile) const;
     bool SLoad(core::XFile* pFile);

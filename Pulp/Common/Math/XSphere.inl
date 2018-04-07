@@ -42,12 +42,12 @@ X_INLINE bool Sphere::intersects(const Ray& ray)
         float denom = 2.0f * a;
         t = (-b - e) / denom; // smaller root
 
-        if (t > EPSILON_VALUE) {
+        if (t > math<float>::EPSILON) {
             return true;
         }
 
         t = (-b + e) / denom; // larger root
-        if (t > EPSILON_VALUE) {
+        if (t > math<float>::EPSILON) {
             return true;
         }
     }
@@ -72,13 +72,13 @@ X_INLINE bool Sphere::intersect(const Ray& ray, float* intersection)
         float denom = 2.0f * a;
         t = (-b - e) / denom; // smaller root
 
-        if (t > EPSILON_VALUE) {
+        if (t > math<float>::EPSILON) {
             *intersection = t;
             return true;
         }
 
         t = (-b + e) / denom; // larger root
-        if (t > EPSILON_VALUE) {
+        if (t > math<float>::EPSILON) {
             *intersection = t;
             return true;
         }

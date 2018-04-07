@@ -10,7 +10,7 @@ namespace Converter
         // Sinc function.
         X_INLINE static float sincf(const float x)
         {
-            if (math<float>::abs(x) < EPSILON_VALUEf) {
+            if (math<float>::abs(x) < math<float>::EPSILON) {
                 //return 1.0;
                 return 1.0f + x * x * (-1.0f / 6.0f + x * x * 1.0f / 120.0f);
             }
@@ -234,7 +234,7 @@ namespace Converter
     {
         x = math<float>::abs(x);
         if (x < 3.0f) {
-            return sincf(PIf * x) * sincf(PIf * x / 3.0f);
+            return sincf(math<float>::PI * x) * sincf(math<float>::PI * x / 3.0f);
         }
         return 0.0f;
     }
@@ -247,7 +247,7 @@ namespace Converter
 
     float SincFilter::evaluate(float x) const
     {
-        return sincf(PIf * x);
+        return sincf(math<float>::PI * x);
     }
 
     // -------------------------------------------------------------------
@@ -260,7 +260,7 @@ namespace Converter
 
     float KaiserFilter::evaluate(float x) const
     {
-        const float sinc_value = sincf(PIf * x * stretch_);
+        const float sinc_value = sincf(math<float>::PI * x * stretch_);
         const float t = x / width_;
 
         if ((1.f - t * t) >= 0) {
@@ -287,7 +287,7 @@ namespace Converter
     float GaussianFilter::evaluate(float x) const
     {
         // variance = sigma^2
-        return (1.0f / sqrtf(2.f * PIf * variance_)) * expf(-x * x / (2.f * variance_));
+        return (1.0f / sqrtf(2.f * math<float>::PI * variance_)) * expf(-x * x / (2.f * variance_));
     }
 
     void GaussianFilter::setParameters(float variance)

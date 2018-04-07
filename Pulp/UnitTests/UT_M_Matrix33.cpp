@@ -165,7 +165,7 @@ TYPED_TEST(Mat33, Contruction)
         bool isOk = true;
         for (int i = 0; i < MatT::DIM_SQ; ++i) {
             T diff = fabs(data[i] - cdata[i]);
-            if (diff >= EPSILON) {
+            if (diff >= math<T>::EPSILON) {
                 isOk = false;
                 break;
             }
@@ -463,9 +463,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // const Vec3<T> operator*( const Vec3<T> &rhs ) const;
     {
@@ -480,9 +480,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // const Matrix33<T> operator*( T rhs ) const;
     {
@@ -736,7 +736,7 @@ TYPED_TEST(Mat33, Contruction)
 
         T diff = fabs((T)0.999999 - det);
 
-        EXPECT_LE(diff, EPSILON);
+        EXPECT_LE(diff, math<T>::EPSILON);
     }
     // T trace() const;
     {
@@ -749,7 +749,7 @@ TYPED_TEST(Mat33, Contruction)
 
         T diff = fabs((T)0.880301 - trace);
 
-        EXPECT_LE(diff, EPSILON);
+        EXPECT_LE(diff, math<T>::EPSILON);
     }
     // Matrix33<T> diagonal() const;
     {
@@ -813,7 +813,7 @@ TYPED_TEST(Mat33, Contruction)
 
         EXPECT_EQ(c0, m0.transposed());
     }
-    // void invert (T epsilon = EPSILON );
+    // void invert (T epsilon = math<T>::EPSILON );
     {
         MatT c0(
             (T)0.009505, (T)-0.999570, (T)0.027734,
@@ -829,7 +829,7 @@ TYPED_TEST(Mat33, Contruction)
 
         EXPECT_EQ(c0, m0);
     }
-    // Matrix33<T> inverted( T epsilon = EPSILON ) const;
+    // Matrix33<T> inverted( T epsilon = math<T>::EPSILON ) const;
     {
         MatT c0(
             (T)0.009505, (T)-0.999570, (T)0.027734,
@@ -876,9 +876,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec3<T> preMultiply( const Vec3<T> &v ) const;
     {
@@ -894,9 +894,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec3<T> postMultiply( const Vec3<T> &v ) const;
     {
@@ -911,9 +911,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // Vec3<T> postMultiply( const Vec3<T> &v ) const;
     {
@@ -928,9 +928,9 @@ TYPED_TEST(Mat33, Contruction)
         diff.y = fabs(diff.y);
         diff.z = fabs(diff.z);
 
-        EXPECT_LE(diff.x, EPSILON);
-        EXPECT_LE(diff.y, EPSILON);
-        EXPECT_LE(diff.z, EPSILON);
+        EXPECT_LE(diff.x, math<T>::EPSILON);
+        EXPECT_LE(diff.y, math<T>::EPSILON);
+        EXPECT_LE(diff.z, math<T>::EPSILON);
     }
     // void affineInvert(){ *this = affineInverted(); }
     {

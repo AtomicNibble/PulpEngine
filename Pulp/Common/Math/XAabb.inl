@@ -60,16 +60,16 @@ X_INLINE void AABB::set(const AABB& oth)
 
 X_INLINE void AABB::clear(void)
 {
-    max[0] = max[1] = max[2] = -INFINITY;
-    min[0] = min[1] = min[2] = INFINITY;
+    max[0] = max[1] = max[2] = -math<float>::INFINITY;
+    min[0] = min[1] = min[2] = math<float>::INFINITY;
 }
 
 X_INLINE bool AABB::IsInfinate(void) const
 {
-    if (max[0] == -INFINITY && max[1] == -INFINITY && max[2] == -INFINITY) {
+    if (max[0] == -math<float>::INFINITY && max[1] == -math<float>::INFINITY && max[2] == -math<float>::INFINITY) {
         return true;
     }
-    if (min[0] == INFINITY && min[1] == INFINITY && min[2] == INFINITY) {
+    if (min[0] == math<float>::INFINITY && min[1] == math<float>::INFINITY && min[2] == math<float>::INFINITY) {
         return true;
     }
 

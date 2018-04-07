@@ -145,8 +145,8 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
             }
             else {
                 const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
-                const float s = (1.0f - math<float>::cos(deltaTime * PIHalff))
-                                * static_cast<float>(duration_) * 0.001f * Sqrt_1OVER2;
+                const float s = (1.0f - math<float>::cos(deltaTime * math<float>::HALF_PI))
+                                * static_cast<float>(duration_) * 0.001f * math<float>::SQRT_1OVER2;
                 return startValue_ + deltaTime * baseSpeed_ + s * speed_;
             }
 
@@ -156,7 +156,7 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
             }
             else {
                 const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
-                const float s = math<float>::sin(deltaTime * PIHalff) * static_cast<float>(duration_) * 0.001f * Sqrt_1OVER2;
+                const float s = math<float>::sin(deltaTime * math<float>::HALF_PI) * static_cast<float>(duration_) * 0.001f * math<float>::SQRT_1OVER2;
                 return startValue_ + deltaTime * baseSpeed_ + s * speed_;
             }
     }
@@ -193,11 +193,11 @@ X_INLINE type XExtrapolate<type>::GetCurrentSpeed(int time) const
             return baseSpeed_ + s * speed_;
         }
         case ExtrapolationType::ACCELSINE: {
-            const float s = math<float>::sin(deltaTime * PIHalff);
+            const float s = math<float>::sin(deltaTime * math<float>::HALF_PI);
             return baseSpeed_ + s * speed_;
         }
         case ExtrapolationType::DECELSINE: {
-            const float s = math<float>::cos(deltaTime * PIHalff);
+            const float s = math<float>::cos(deltaTime * math<float>::HALF_PI);
             return baseSpeed_ + s * speed_;
         }
 

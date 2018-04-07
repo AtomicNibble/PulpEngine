@@ -204,8 +204,8 @@ TYPED_TEST(Mat22, Contruction)
         MatT m0(1, 2, 3, 4);
         Vec2<T> v0((T)1.23456, (T)-9.87654);
         Vec2<T> diff = (cv0 - (m0 * v0));
-        EXPECT_LT(fabs(diff.x), EPSILON);
-        EXPECT_LT(fabs(diff.y), EPSILON);
+        EXPECT_LT(fabs(diff.x), math<T>::EPSILON);
+        EXPECT_LT(fabs(diff.y), math<T>::EPSILON);
     }
     // const Matrix22<T> operator*( T rhs ) const;
     {
@@ -244,10 +244,10 @@ TYPED_TEST(Mat22, Contruction)
     // const T& at( int row, int col ) const;
     {
         MatT c0(1, 2, 3, 4);
-        EXPECT_LT(fabs(1 - c0.at(0, 0)), EPSILON);
-        EXPECT_LT(fabs(2 - c0.at(1, 0)), EPSILON);
-        EXPECT_LT(fabs(3 - c0.at(0, 1)), EPSILON);
-        EXPECT_LT(fabs(4 - c0.at(1, 1)), EPSILON);
+        EXPECT_LT(fabs(1 - c0.at(0, 0)), math<T>::EPSILON);
+        EXPECT_LT(fabs(2 - c0.at(1, 0)), math<T>::EPSILON);
+        EXPECT_LT(fabs(3 - c0.at(0, 1)), math<T>::EPSILON);
+        EXPECT_LT(fabs(4 - c0.at(1, 1)), math<T>::EPSILON);
     }
     // Vec2<T> getColumn( int col ) const;
     {
@@ -330,13 +330,13 @@ TYPED_TEST(Mat22, Contruction)
     {
         MatT m0(1, 2, 3, 4);
         T det = m0.determinant();
-        EXPECT_LT(fabs(det - (T)-2.0), EPSILON);
+        EXPECT_LT(fabs(det - (T)-2.0), math<T>::EPSILON);
     }
     // T trace() const;
     {
         MatT m0(1, 2, 3, 4);
         T trace = m0.trace();
-        EXPECT_LT(fabs(trace - (T)5.0), EPSILON);
+        EXPECT_LT(fabs(trace - (T)5.0), math<T>::EPSILON);
     }
     // Matrix22<T> diagonal() const;
     {
@@ -369,14 +369,14 @@ TYPED_TEST(Mat22, Contruction)
         MatT m0(1, 2, 3, 4);
         EXPECT_EQ(c0, m0.transposed());
     }
-    // void invert (T epsilon = EPSILON );
+    // void invert (T epsilon = math<T>::EPSILON );
     {
         MatT c0(-2, 1, (T)1.5, (T)-0.5);
         MatT m0(1, 2, 3, 4);
         m0.invert();
         EXPECT_EQ(c0, m0);
     }
-    // Matrix22<T> inverted( T epsilon = EPSILON ) const;
+    // Matrix22<T> inverted( T epsilon = math<T>::EPSILON ) const;
     {
         MatT c0(-2, 1, (T)1.5, (T)-0.5);
         MatT m0(1, 2, 3, 4);
@@ -408,8 +408,8 @@ TYPED_TEST(Mat22, Contruction)
         MatT m0(1, 2, 3, 4);
         Vec2<T> v0((T)1.23456, (T)-9.87654);
         Vec2<T> diff = (cv0 - m0.preMultiply(v0));
-        EXPECT_LE(fabs(diff.x), EPSILON);
-        EXPECT_LE(fabs(diff.y), EPSILON);
+        EXPECT_LE(fabs(diff.x), math<T>::EPSILON);
+        EXPECT_LE(fabs(diff.y), math<T>::EPSILON);
     }
     // Vec2<T> postMultiply( const Vec2<T> &v ) const;
     {
@@ -417,8 +417,8 @@ TYPED_TEST(Mat22, Contruction)
         MatT m0(1, 2, 3, 4);
         Vec2<T> v0((T)1.23456, (T)-9.87654);
         Vec2<T> diff = (cv0 - m0.postMultiply(v0));
-        EXPECT_LE(fabs(diff.x), EPSILON);
-        EXPECT_LE(fabs(diff.y), EPSILON);
+        EXPECT_LE(fabs(diff.x), math<T>::EPSILON);
+        EXPECT_LE(fabs(diff.y), math<T>::EPSILON);
     }
     // Vec2<T> transformVec( const Vec2<T> &rhs );
     {
@@ -426,8 +426,8 @@ TYPED_TEST(Mat22, Contruction)
         MatT m0(1, 2, 3, 4);
         Vec2<T> v0((T)1.23456, (T)-9.87654);
         Vec2<T> diff = (cv0 - m0.transformVec(v0));
-        EXPECT_LE(fabs(diff.x), EPSILON);
-        EXPECT_LE(fabs(diff.y), EPSILON);
+        EXPECT_LE(fabs(diff.x), math<T>::EPSILON);
+        EXPECT_LE(fabs(diff.y), math<T>::EPSILON);
     }
     // void rotate( T radians );
     {

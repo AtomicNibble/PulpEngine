@@ -379,7 +379,7 @@ namespace Converter
             }
             else {
                 if (filter == MipFilter::Box) {
-                    if (math<float>::abs(params.filterWidth - 0.5f) < EPSILON && srcImg.getNumFaces() == 1) {
+                    if (math<float>::abs(params.filterWidth - 0.5f) < math<float>::EPSILON && srcImg.getNumFaces() == 1) {
                         fltImg.fastDownSample(halfImg);
                     }
                     else {

@@ -62,7 +62,7 @@ public:
     X_INLINE bool equalCompare(const Matrix34<T>& rhs, T epsilon) const;
     X_INLINE bool operator==(const Matrix34<T>& rhs) const
     {
-        return equalCompare(rhs, (T)EPSILON);
+        return equalCompare(rhs, math<T>::EPSILON);
     }
     X_INLINE bool operator!=(const Matrix34<T>& rhs) const
     {
@@ -132,11 +132,11 @@ public:
     void transpose();
     Matrix34<T> transposed() const;
 
-    void invert(T epsilon = EPSILON)
+    void invert(T epsilon = math<T>::EPSILON)
     {
         *this = inverted(epsilon);
     }
-    Matrix34<T> inverted(T epsilon = EPSILON) const;
+    Matrix34<T> inverted(T epsilon = math<T>::EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
     Vec3<T> preMultiply(const Vec3<T>& v) const;

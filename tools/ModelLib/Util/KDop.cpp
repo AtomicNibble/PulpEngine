@@ -12,10 +12,10 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(0.f, Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, Sqrt_1OVER2)};
+        Vec3f(0.f, math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2)};
 
     const Vec3f KDopDir10Y[10] = {
         Vec3f(1.f, 0.f, 0.f),
@@ -24,10 +24,10 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, Sqrt_1OVER2)};
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2)};
 
     const Vec3f KDopDir10Z[10] = {
         Vec3f(1.f, 0.f, 0.f),
@@ -36,10 +36,10 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(Sqrt_1OVER2, Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, Sqrt_1OVER2, 0.f)};
+        Vec3f(math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f)};
 
     // shiiet.
     const Vec3f KDopDir14[18] = {
@@ -49,18 +49,18 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(0.f, Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, Sqrt_1OVER2, 0.f)};
+        Vec3f(0.f, math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f)};
 
     const Vec3f KDopDir18[18] = {
         Vec3f(1.f, 0.f, 0.f),
@@ -69,18 +69,18 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(0.f, Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, Sqrt_1OVER2, 0.f)};
+        Vec3f(0.f, math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f)};
 
     const Vec3f KDopDir26[26] = {
         Vec3f(1.f, 0.f, 0.f),
@@ -89,26 +89,26 @@ namespace
         Vec3f(0.f, -1.f, 0.f),
         Vec3f(0.f, 0.f, 1.f),
         Vec3f(0.f, 0.f, -1.f),
-        Vec3f(0.f, Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, Sqrt_1OVER2, -Sqrt_1OVER2),
-        Vec3f(0.f, -Sqrt_1OVER2, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, 0.f, -Sqrt_1OVER2),
-        Vec3f(-Sqrt_1OVER2, 0.f, Sqrt_1OVER2),
-        Vec3f(Sqrt_1OVER2, Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(Sqrt_1OVER2, -Sqrt_1OVER2, 0.f),
-        Vec3f(-Sqrt_1OVER2, Sqrt_1OVER2, 0.f),
-        Vec3f(Sqrt_1OVER3, Sqrt_1OVER3, Sqrt_1OVER3),
-        Vec3f(Sqrt_1OVER3, Sqrt_1OVER3, -Sqrt_1OVER3),
-        Vec3f(Sqrt_1OVER3, -Sqrt_1OVER3, Sqrt_1OVER3),
-        Vec3f(Sqrt_1OVER3, -Sqrt_1OVER3, -Sqrt_1OVER3),
-        Vec3f(-Sqrt_1OVER3, Sqrt_1OVER3, Sqrt_1OVER3),
-        Vec3f(-Sqrt_1OVER3, Sqrt_1OVER3, -Sqrt_1OVER3),
-        Vec3f(-Sqrt_1OVER3, -Sqrt_1OVER3, Sqrt_1OVER3),
-        Vec3f(-Sqrt_1OVER3, -Sqrt_1OVER3, -Sqrt_1OVER3),
+        Vec3f(0.f, math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2),
+        Vec3f(0.f, -math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, 0.f, -math<float>::SQRT_1OVER2),
+        Vec3f(-math<float>::SQRT_1OVER2, 0.f, math<float>::SQRT_1OVER2),
+        Vec3f(math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(math<float>::SQRT_1OVER2, -math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(-math<float>::SQRT_1OVER2, math<float>::SQRT_1OVER2, 0.f),
+        Vec3f(math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3),
+        Vec3f(math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3),
+        Vec3f(math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3),
+        Vec3f(math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3),
+        Vec3f(-math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3),
+        Vec3f(-math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3),
+        Vec3f(-math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3, math<float>::SQRT_1OVER3),
+        Vec3f(-math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3, -math<float>::SQRT_1OVER3),
     };
 
 } // namespace

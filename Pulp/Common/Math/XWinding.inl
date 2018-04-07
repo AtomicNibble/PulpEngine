@@ -332,7 +332,7 @@ float XWindingT<Allocator>::planeDistance(const Planef& plane) const
 {
     using namespace core::FloatUtil;
 
-    float min = INFINITY;
+    float min = math<float>::INFINITY;
     float max = -min;
     for (int32_t i = 0; i < numPoints_; i++) {
         float d = plane.distance(pPoints_[i].asVec3());
@@ -1124,7 +1124,7 @@ void XWindingT<Allocator>::NormalVectors(const Vec3f& vec, Vec3f& left, Vec3f& d
     float d;
 
     auto InvSqrt = [](float x) -> float {
-        return (x > core::FloatUtil::FLT_SMALLEST_NON_DENORMAL) ? math<float>::square(1.0f / x) : INFINITY;
+        return (x > core::FloatUtil::FLT_SMALLEST_NON_DENORMAL) ? math<float>::square(1.0f / x) : math<float>::INFINITY;
     };
 
     d = vec.x * vec.x + vec.y * vec.y;

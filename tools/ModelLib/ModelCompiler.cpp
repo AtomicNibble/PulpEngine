@@ -2178,7 +2178,7 @@ bool ModelCompiler::MergVerts(void)
 bool ModelCompiler::ScaleModel(void)
 {
     // skip if no change.
-    if (math<float>::abs(scale_ - 1.f) < EPSILON_VALUEf) {
+    if (math<float>::abs(scale_ - 1.f) < math<float>::EPSILON) {
         X_LOG2("Model", "Skipping model scaling, scale is 1: %f", scale_);
         return true;
     }
