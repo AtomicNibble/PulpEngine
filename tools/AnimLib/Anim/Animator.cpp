@@ -602,7 +602,7 @@ void Animator::renderInfo(core::TimeVal currentTime, const Vec3f& pos, const Mat
         auto endSec = end.GetSeconds();
         auto playSec = play.GetSeconds();
 
-        txt.appendFmt("Name: %s\n", pAnim->getName());
+        txt.appendFmt("Name: %s\n", pAnim->getName().c_str());
         txt.appendFmt("Frames: %" PRIi32 " Fps: %" PRIi32 " rate: %.2f\n", pAnim->getNumFrames(), pAnim->getFps(), anim.getRate());
         txt.appendFmt("Dur: %.2fs Dur(r): %.2fs AnimTime: %.2fs\n", durSec, durScaledSec, animTimeSec);
         txt.appendFmt("Start: %.2fs End: %.2fs Play: %.2fs\n", startSec, endSec, playSec);
