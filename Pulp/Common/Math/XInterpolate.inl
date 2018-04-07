@@ -73,22 +73,22 @@ X_INLINE void XInterpolateAccelDecelLinear<type>::Init(const int startTime,
 
     if (this->accelTime_) {
         extrapolate_.Init(startTime_, this->accelTime_, startValue_,
-            (startValue_ - startValue_), speed, extrapolationType::ACCELLINEAR);
+            (startValue_ - startValue_), speed, ExtrapolationType::ACCELLINEAR);
     }
     else if (this->linearTime_) {
         extrapolate_.Init(startTime_, this->linearTime_, startValue_,
-            (startValue_ - startValue_), speed, extrapolationType::LINEAR);
+            (startValue_ - startValue_), speed, ExtrapolationType::LINEAR);
     }
     else {
         extrapolate_.Init(startTime_, this->decelTime_, startValue_,
-            (startValue_ - startValue_), speed, extrapolationType::DECELLINEAR);
+            (startValue_ - startValue_), speed, ExtrapolationType::DECELLINEAR);
     }
 }
 
 template<class type>
 X_INLINE void XInterpolateAccelDecelLinear<type>::Invalidate()
 {
-    extrapolate_.Init(0, 0, extrapolate_.GetStartValue(), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), EXTRAPOLATION_NONE);
+    extrapolate_.Init(0, 0, extrapolate_.GetStartValue(), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::NONE);
 }
 
 template<class type>
@@ -97,23 +97,23 @@ X_INLINE void XInterpolateAccelDecelLinear<type>::SetPhase(int time) const
     const float deltaTime = static_cast<float>(time - startTime_);
 
     if (deltaTime < accelTime_) {
-        if (extrapolate_.GetExtrapolationType() != extrapolationType::ACCELLINEAR) {
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::ACCELLINEAR) {
             extrapolate_.Init(startTime_, accelTime_, startValue_,
-                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), extrapolationType::ACCELLINEAR);
+                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::ACCELLINEAR);
         }
     }
     else if (deltaTime < accelTime_ + linearTime_) {
-        if (extrapolate_.GetExtrapolationType() != extrapolationType::LINEAR) {
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::LINEAR) {
             extrapolate_.Init(startTime_ + accelTime_, linearTime_,
                 startValue_ + extrapolate_.GetSpeed() * (accelTime_ * 0.001f * 0.5f),
-                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), extrapolationType::LINEAR);
+                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::LINEAR);
         }
     }
     else {
-        if (extrapolate_.GetExtrapolationType() != extrapolationType::DECELLINEAR) {
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::DECELLINEAR) {
             extrapolate_.Init(startTime_ + accelTime_ + linearTime_, decelTime_,
                 endValue_ - (extrapolate_.GetSpeed() * (decelTime_ * 0.001f * 0.5f)),
-                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), extrapolationType::DECELLINEAR);
+                extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::DECELLINEAR);
         }
     }
 }
@@ -152,32 +152,32 @@ X_INLINE void XInterpolateAccelDecelSine<type>::Init(const int startTime,
     this->startValue_ = startValue;
     this->endValue_ = endValue;
 
-    if (duration_ <= 0) {
+    if (duration <= 0) {
         return;
     }
 
-    if (this->accelTime_ + this->decelTime_ > duration_) {
-        this->accelTime_ = this->accelTime_ * duration_ / (this->accelTime_ + this->decelTime_);
-        this->decelTime_ = duration_ - this->accelTime_;
+    if (this->accelTime_ + this->decelTime_ > duration) {
+        this->accelTime_ = this->accelTime_ * duration / (this->accelTime_ + this->decelTime_);
+        this->decelTime_ = duration - this->accelTime_;
     }
-    this->linearTime_ = duration_ - this->accelTime_ - this->decelTime_;
-    const type speed = (endValue_ - startValue_) * (1000.0f / ((float)this->linearTime_ + (this->accelTime_ + this->decelTime_) * idMath::SQRT_1OVER2));
+    this->linearTime_ = duration - this->accelTime_ - this->decelTime_;
+    const type speed = (endValue_ - startValue_) * (1000.0f / ((float)this->linearTime_ + (this->accelTime_ + this->decelTime_) * Sqrt_1OVER2));
 
     if (this->accelTime_) {
-        extrapolate_.Init(startTime_, this->accelTime_, startValue_, (startValue_ - startValue_), speed, EXTRAPOLATION_ACCELSINE); //-V501
+        extrapolate_.Init(startTime_, this->accelTime_, startValue_, (startValue_ - startValue_), speed, ExtrapolationType::ACCELSINE); //-V501
     }
     else if (this->linearTime_) {
-        extrapolate_.Init(startTime_, this->linearTime_, startValue_, (startValue_ - startValue_), speed, EXTRAPOLATION_LINEAR); //-V501
+        extrapolate_.Init(startTime_, this->linearTime_, startValue_, (startValue_ - startValue_), speed, ExtrapolationType::LINEAR); //-V501
     }
     else {
-        extrapolate_.Init(startTime_, this->decelTime_, startValue_, (startValue_ - startValue_), speed, EXTRAPOLATION_DECELSINE); //-V501
+        extrapolate_.Init(startTime_, this->decelTime_, startValue_, (startValue_ - startValue_), speed, ExtrapolationType::DECELSINE); //-V501
     }
 }
 
 template<class type>
 X_INLINE void XInterpolateAccelDecelSine<type>::Invalidate()
 {
-    extrapolate_.Init(0, 0, extrapolate_.GetStartValue(), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), EXTRAPOLATION_NONE);
+    extrapolate_.Init(0, 0, extrapolate_.GetStartValue(), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::NONE);
 }
 
 template<class type>
@@ -185,18 +185,18 @@ X_INLINE void XInterpolateAccelDecelSine<type>::SetPhase(int time) const
 {
     const float deltaTime = time - startTime_;
     if (deltaTime < accelTime_) {
-        if (extrapolate_.GetExtrapolationType() != EXTRAPOLATION_ACCELSINE) {
-            extrapolate_.Init(startTime_, accelTime_, startValue_, extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), EXTRAPOLATION_ACCELSINE);
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::ACCELSINE) {
+            extrapolate_.Init(startTime_, accelTime_, startValue_, extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::ACCELSINE);
         }
     }
     else if (deltaTime < accelTime_ + linearTime_) {
-        if (extrapolate_.GetExtrapolationType() != EXTRAPOLATION_LINEAR) {
-            extrapolate_.Init(startTime_ + accelTime_, linearTime_, startValue_ + extrapolate_.GetSpeed() * (accelTime_ * 0.001f * idMath::SQRT_1OVER2), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), EXTRAPOLATION_LINEAR);
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::LINEAR) {
+            extrapolate_.Init(startTime_ + accelTime_, linearTime_, startValue_ + extrapolate_.GetSpeed() * (accelTime_ * 0.001f * Sqrt_1OVER2), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::LINEAR);
         }
     }
     else {
-        if (extrapolate_.GetExtrapolationType() != EXTRAPOLATION_DECELSINE) {
-            extrapolate_.Init(startTime_ + accelTime_ + linearTime_, decelTime_, endValue_ - (extrapolate_.GetSpeed() * (decelTime_ * 0.001f * idMath::SQRT_1OVER2)), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), EXTRAPOLATION_DECELSINE);
+        if (extrapolate_.GetExtrapolationType() != ExtrapolationType::DECELSINE) {
+            extrapolate_.Init(startTime_ + accelTime_ + linearTime_, decelTime_, endValue_ - (extrapolate_.GetSpeed() * (decelTime_ * 0.001f * Sqrt_1OVER2)), extrapolate_.GetBaseSpeed(), extrapolate_.GetSpeed(), ExtrapolationType::DECELSINE);
         }
     }
 }

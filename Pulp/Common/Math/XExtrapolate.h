@@ -5,7 +5,7 @@
 
 #include <Util\EnumMacros.h>
 
-X_DECLARE_ENUM(extrapolationType)
+X_DECLARE_ENUM(ExtrapolationType)
 (
     NONE,        // no extrapolation, covered distance = duration * 0.001 * ( baseSpeed )
     LINEAR,      // linear extrapolation, covered distance = duration * 0.001 * ( baseSpeed + speed )
@@ -22,7 +22,7 @@ public:
     XExtrapolate();
 
     void Init(const int startTime, const int duration, const type& startValue,
-        const type& baseSpeed, const type& speed, const extrapolationType::Enum extrapolationType);
+        const type& baseSpeed, const type& speed, const ExtrapolationType::Enum ExtrapolationType);
     type GetCurrentValue(int time) const;
     type GetCurrentSpeed(int time) const;
     bool IsDone(int time) const
@@ -61,13 +61,13 @@ public:
     {
         return speed_;
     }
-    extrapolationType::Enum GetExtrapolationType() const
+    ExtrapolationType::Enum GetExtrapolationType() const
     {
         return extrapolationType_;
     }
 
 private:
-    extrapolationType::Enum extrapolationType_;
+    ExtrapolationType::Enum extrapolationType_;
     int startTime_;
     int duration_;
     type startValue_;
@@ -78,7 +78,7 @@ private:
 template<class type>
 X_INLINE XExtrapolate<type>::XExtrapolate()
 {
-    extrapolationType_ = extrapolationType::NONE;
+    extrapolationType_ = ExtrapolationType::NONE;
     startTime_ = duration_ = 0;
 
     core::zero_object(startValue_);
@@ -89,9 +89,9 @@ X_INLINE XExtrapolate<type>::XExtrapolate()
 template<class type>
 X_INLINE void XExtrapolate<type>::Init(const int startTime, const int duration,
     const type& startValue, const type& baseSpeed,
-    const type& speed, const extrapolationType::Enum extrapolationType)
+    const type& speed, const ExtrapolationType::Enum ExtrapolationType)
 {
-    this->extrapolationType_ = extrapolationType;
+    this->extrapolationType_ = ExtrapolationType;
     this->startTime_ = startTime;
     this->duration_ = duration;
     this->startValue_ = startValue;
@@ -111,15 +111,15 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
     }
 
     switch (extrapolationType_) {
-        case extrapolationType::NONE: {
+        case ExtrapolationType::NONE: {
             const float deltaTime = (time - startTime_) * 0.001f;
             return startValue_ + deltaTime * baseSpeed_;
         }
-        case extrapolationType::LINEAR: {
+        case ExtrapolationType::LINEAR: {
             const float deltaTime = (time - startTime_) * 0.001f;
             return startValue_ + deltaTime * (baseSpeed_ + speed_);
         }
-        case extrapolationType::ACCELLINEAR: {
+        case ExtrapolationType::ACCELLINEAR: {
             if (duration_ == 0) {
                 return startValue_;
             }
@@ -129,7 +129,7 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
                 return startValue_ + deltaTime * baseSpeed_ + s * speed_;
             }
         }
-        case extrapolationType::DECELLINEAR: {
+        case ExtrapolationType::DECELLINEAR: {
             if (duration_ == 0) {
                 return startValue_;
             }
@@ -139,7 +139,7 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
                 return startValue_ + deltaTime * baseSpeed_ + s * speed_;
             }
         }
-        case extrapolationType::ACCELSINE:
+        case ExtrapolationType::ACCELSINE:
             if (duration_ == 0) {
                 return startValue_;
             }
@@ -150,7 +150,7 @@ X_INLINE type XExtrapolate<type>::GetCurrentValue(int time) const
                 return startValue_ + deltaTime * baseSpeed_ + s * speed_;
             }
 
-        case extrapolationType::DECELSINE:
+        case ExtrapolationType::DECELSINE:
             if (duration_ == 0) {
                 return startValue_;
             }
@@ -175,32 +175,31 @@ X_INLINE type XExtrapolate<type>::GetCurrentSpeed(int time) const
         return (startValue_ - startValue_);
     }
 
+    const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
+
     switch (extrapolationType_) {
-        case extrapolationType::NONE:
+        case ExtrapolationType::NONE:
             return baseSpeed_;
 
-        case extrapolationType::LINEAR:
+        case ExtrapolationType::LINEAR:
             return baseSpeed_ + speed_;
 
-        case extrapolationType::ACCELLINEAR:
-            const float deltaTime = (time - startTime_) / static_cast<float>(duration_);
+        case ExtrapolationType::ACCELLINEAR: {
             const float s = deltaTime;
             return baseSpeed_ + s * speed_;
-
-        case extrapolationType::DECELLINEAR:
-            const float deltaTime = (time - startTime_) / static_cast<> float(duration_);
+        }
+        case ExtrapolationType::DECELLINEAR: {
             const float s = 1.0f - deltaTime;
             return baseSpeed_ + s * speed_;
-
-        case extrapolationType::ACCELSINE:
-            const float deltaTime = (time - startTime_) / static_cast<> float(duration_);
+        }
+        case ExtrapolationType::ACCELSINE: {
             const float s = idMath::Sin(deltaTime * idMath::HALF_PI);
             return baseSpeed_ + s * speed_;
-
-        case extrapolationType::DECELSINE:
-            const float deltaTime = (time - startTime_) / static_cast<> float(duration_);
+        }
+        case ExtrapolationType::DECELSINE: {
             const float s = idMath::Cos(deltaTime * idMath::HALF_PI);
             return baseSpeed_ + s * speed_;
+        }
 
         default:
             return baseSpeed_;

@@ -3,6 +3,8 @@
 #ifndef X_MATH_INTERPOLATE_H_
 #define X_MATH_INTERPOLATE_H_
 
+#include "XExtrapolate.h"
+
 template<class type>
 class XInterpolate
 {
