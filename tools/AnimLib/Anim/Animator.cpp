@@ -152,9 +152,7 @@ void AnimBlend::blendOrigin(core::TimeVal currentTime, Vec3f& blendPos, float& b
         return;
     }
 
-    auto time = animTime(currentTime);
     Vec3f pos;
-
     pAnim_->getOrigin(pos, currentTime, cycles_);
 
     pos = pos * weight;
