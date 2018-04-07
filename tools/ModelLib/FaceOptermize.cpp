@@ -186,7 +186,8 @@ bool FaceOptimize<IndexType>::OptimizeFaces(const IndexType* indexList, size_t i
     uint32_t bestFace = 0;
     float32_t bestScore = -1.f;
 
-    const float32_t maxValenceScore = FindVertexScore(1, kEvictedCacheIndex, lruCacheSize) * 3.f;
+    // should be unused?
+    // const float32_t maxValenceScore = FindVertexScore(1, kEvictedCacheIndex, lruCacheSize) * 3.f;
 
     uint32_t nextBestFace = 0;
     for (uint32_t i = 0; i < indexCount; i += 3) {
