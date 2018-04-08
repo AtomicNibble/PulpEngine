@@ -626,6 +626,20 @@ Matrix33<T> Matrix33<T>::invertTransform() const
 }
 
 template<typename T>
+const char* Matrix33<T>::toString(Description& desc) const
+{
+    desc.setFmt("<%g,%g,%g> - <%g,%g,%g> - <%g,%g,%g>",
+        m00, m01, m02,
+        m10, m11, m12
+        m20, m21, m22
+    );
+    return desc.c_str();
+}
+
+// -------------------------------------------------------
+
+
+template<typename T>
 Matrix33<T> Matrix33<T>::createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
 {
     // The goal is to obtain a rotation matrix that takes

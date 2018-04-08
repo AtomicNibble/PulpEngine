@@ -996,6 +996,18 @@ Matrix44<T> Matrix44<T>::createTranslation(const Vec3<T>& v, T w)
     return ret;
 }
 
+template<typename T>
+const char* Matrix44<T>::toString(Description& desc) const
+{
+    desc.setFmt("<%g,%g,%g,%g> - <%g,%g,%g,%g> - <%g,%g,%g,%g> - <%g,%g,%g,%g>",
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23,
+        m30, m31, m32, m33
+    );
+    return desc.c_str();
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Matrix44
 template<typename T>

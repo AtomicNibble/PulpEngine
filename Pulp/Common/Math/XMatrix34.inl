@@ -838,6 +838,21 @@ Matrix34<T> Matrix34<T>::invertTransform() const
 }
 
 template<typename T>
+const char* Matrix34<T>::toString(Description& desc) const
+{
+    desc.setFmt("<%g,%g,%g,%g> - <%g,%g,%g,%g> - <%g,%g,%g,%g>",
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23
+    );
+    return desc.c_str();
+}
+
+// -------------------------------------------------------
+
+
+
+template<typename T>
 void Matrix34<T>::setRotation(const Matrix33<T>& rotation)
 {
     m00 = rotation.m00;

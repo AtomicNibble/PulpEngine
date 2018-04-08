@@ -53,7 +53,7 @@ Matrix22<T>::Matrix22(const Matrix22<T>& src)
 template<typename T>
 Matrix22<T>& Matrix22<T>::operator=(const Matrix22<T>& rhs)
 {
-    memcpy(m, rhs.m, MEM_LEN);
+    std::memcpy(m, rhs.m, MEM_LEN);
     return *this;
 }
 
