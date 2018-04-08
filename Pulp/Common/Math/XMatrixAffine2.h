@@ -142,12 +142,12 @@ public:
     bool isSingular() const;
 
     //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
-    void invert(T epsilon = EPSILON)
+    void invert(T epsilon = math<T>::EPSILON)
     {
         *this = invertCopy(epsilon);
     }
     //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
-    MatrixAffine2<T> invertCopy(T epsilon = EPSILON) const;
+    MatrixAffine2<T> invertCopy(T epsilon = math<T>::EPSILON) const;
 
     //! concatenate translation by \a v (conceptually, translate is before 'this')
     void translate(const Vec2<T>& v);
