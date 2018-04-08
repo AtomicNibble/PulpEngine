@@ -116,7 +116,7 @@ namespace Hash
     void MD5::update(const uint8_t* pInput, size_t length)
     {
         // compute number of bytes mod 64
-        size_t index = count_[0] / 8 % blocksize;
+        size_t index = count_[0] / 8 % BLOCK_BYTES;
 
         // Update number of bits
         if ((count_[0] += static_cast<uint32_t>(length << 3)) < (length << 3)) {
@@ -136,7 +136,7 @@ namespace Hash
             transform(buffer_);
 
             // transform chunks of blocksize (64 bytes)
-            for (i = firstpart; i + blocksize <= length; i += blocksize) {
+            for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
                 transform(&pInput[i]);
             }
 
@@ -183,10 +183,10 @@ namespace Hash
         return digest_;
     }
 
-    void MD5::transform(const uint8_t block[blocksize])
+    void MD5::transform(const uint8_t block[BLOCK_BYTES])
     {
         uint32_t a = state_[0], b = state_[1], c = state_[2], d = state_[3], x[16];
-        decode(x, block, blocksize);
+        decode(x, block, BLOCK_BYTES);
 
         /* Round 1 */
         FF(a, b, c, d, x[0], S11, 0xd76aa478);  /* 1 */

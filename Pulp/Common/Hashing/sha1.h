@@ -14,11 +14,14 @@ namespace Hash
     class SHA1
     {
         static const uint32_t DIGEST_INTS = 5;
+        static const uint32_t DIGEST_BYTES = DIGEST_INTS * 4;
         static const uint32_t BLOCK_INTS = 16;
         static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
 
     public:
         typedef SHA1Digest Digest;
+
+        static_assert(Digest::NUM_BYTES == DIGEST_INTS * sizeof(int32_t), "Size mismatch");
 
     public:
         SHA1();

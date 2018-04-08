@@ -13,8 +13,15 @@ namespace Hash
 
     class SHA512
     {
+        static const uint32_t DIGEST_INTS = 16;
+        static const uint32_t DIGEST_BYTES = DIGEST_INTS * 4;
+        static const uint32_t BLOCK_INTS = 32;
+        static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
+
     public:
         typedef SHA512Digest Digest;
+
+        static_assert(Digest::NUM_BYTES == DIGEST_INTS * sizeof(int32_t), "Size mismatch");
 
     public:
         SHA512();
@@ -34,12 +41,6 @@ namespace Hash
 
         // performs init, update and finalize.
         static void calc(const void* src, const size_t bytelength, SHA512Digest& hash);
-
-    private:
-        static const uint32_t DIGEST_INTS = 16;
-        static const uint32_t DIGEST_BYTES = DIGEST_INTS * 4;
-        static const uint32_t BLOCK_INTS = 32;
-        static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
 
     private:
         void transform(const uint8_t* pBuffer);

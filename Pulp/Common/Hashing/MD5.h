@@ -13,10 +13,15 @@ namespace Hash
 
     class MD5
     {
-        static const int blocksize = 64;
+        static const uint32_t DIGEST_INTS = 4;
+        static const uint32_t DIGEST_BYTES = DIGEST_INTS * 4;
+        static const uint32_t BLOCK_INTS = 16;
+        static const uint32_t BLOCK_BYTES = BLOCK_INTS * 4;
 
     public:
         typedef MD5Digest Digest;
+
+        static_assert(Digest::NUM_BYTES == DIGEST_INTS * sizeof(int32_t), "Size mismatch");
 
     public:
         MD5();
@@ -30,14 +35,14 @@ namespace Hash
         MD5Digest& finalize(void);
 
     private:
-        void transform(const uint8_t block[blocksize]);
+        void transform(const uint8_t block[BLOCK_BYTES]);
         static void decode(uint32_t* pOutput, const uint8_t* pInput, size_t len);
         static void encode(uint8_t* pOutput, const uint32_t* pInput, size_t len);
 
     private:
         uint32_t state_[4];
         uint32_t count_[2]; // bits
-        uint8_t buffer_[blocksize];
+        uint8_t buffer_[BLOCK_BYTES];
 
         bool finalized_;
 
