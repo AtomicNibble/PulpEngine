@@ -681,8 +681,8 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
             // final cords
             const core::XHalf2 tc_tl(cords.texCoords[0], cords.texCoords[1]);
             const core::XHalf2 tc_br(cords.texCoords[2], cords.texCoords[3]);
-            const core::XHalf2 tc_tr(tc_br.x, tc_tl.y);
-            const core::XHalf2 tc_bl(tc_tl.x, tc_br.y);
+            const core::XHalf2 tc_tr(tc_br.v.x, tc_tl.v.y);
+            const core::XHalf2 tc_bl(tc_tl.v.x, tc_br.v.y);
 
             const Color8u finalCol = pass.col * col;
 
