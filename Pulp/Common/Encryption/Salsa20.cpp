@@ -17,7 +17,6 @@ namespace Encryption
 #define U32TO8_LITTLE(c, v) *((uint32_t*)((void*)(c))) = (v)
     } // namespace
 
-#if SALSA20_SSE
     __m128i Salsa20::s_maskLo32;
     __m128i Salsa20::s_maskHi32;
     Spinlock Salsa20::s_checkLock;
@@ -29,7 +28,6 @@ namespace Encryption
     Salsa20::SSECheckState::Enum Salsa20::s_SSEState_ = SSECheckState::NOT_CHECKED;
 #endif // !SWISS_64
 
-#endif // SALSA20_SSE
 
     Salsa20::Salsa20(void)
     {
@@ -43,13 +41,9 @@ namespace Encryption
         setKey(pKey);
     }
 
-    Salsa20::Salsa20(const Salsa20& oth)
-    {
-        ::memcpy(vector_, oth.vector_, sizeof(vector_));
-    }
-
     Salsa20::~Salsa20()
     {
+        core::zero_this(this);
     }
 
     //----------------------------------------------------------------------------------
@@ -57,8 +51,9 @@ namespace Encryption
     {
         static const char constant_str[] = "expand 32-byte k";
 
-        if (key == nullptr)
+        if (key == nullptr) {
             return;
+        }
 
         if (SSEnabled()) {
             const uint32_t* key32 = reinterpret_cast<const uint32_t*>(key);
@@ -107,8 +102,9 @@ namespace Encryption
     //----------------------------------------------------------------------------------
     void Salsa20::setIv(const uint8_t* iv)
     {
-        if (iv == nullptr)
+        if (iv == nullptr) {
             return;
+        }
 
         if (SSEnabled()) {
             const uint32_t* iv32 = reinterpret_cast<const uint32_t*>(iv);
@@ -132,7 +128,7 @@ namespace Encryption
         uint32_t x[VECTOR_SIZE];
         memcpy(x, vector_, sizeof(vector_));
 
-        for (int32_t i = 20; i > 0; i -= 2) {
+        for (int32_t i = NUM_ROUNDS; i > 0; i -= 2) {
             x[4] ^= rotate(static_cast<uint32_t>(x[0] + x[12]), 7);
             x[8] ^= rotate(static_cast<uint32_t>(x[4] + x[0]), 9);
             x[12] ^= rotate(static_cast<uint32_t>(x[8] + x[4]), 13);
@@ -179,7 +175,6 @@ namespace Encryption
         vector_[9] += vector_[8] == 0 ? 1 : 0;
     }
 
-#if SALSA20_SSE
 
     // This is not very efficent but not important as it's only used to gernerate one keystream
     // only if the byte offset of the incomming buffer is not a multiple of block size.
@@ -286,7 +281,6 @@ namespace Encryption
         ++vector_[8];
         vector_[5] += vector_[8] == 0 ? 1 : 0;
     }
-#endif // SALSA20_SSE
 
     //----------------------------------------------------------------------------------
     void Salsa20::processBlocks(const uint8_t* pInput, uint8_t* pOutput, size_t numBlocks)
@@ -294,14 +288,12 @@ namespace Encryption
         X_ASSERT_NOT_NULL(pInput);
         X_ASSERT_NOT_NULL(pOutput);
 
-#if SALSA20_SSE
         if (SSEnabled()) {
             const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
 
             processBytesSSE(pInput, pOutput, numBlocks * BLOCK_SIZE, byteOffset);
             return;
         }
-#endif // !SALSA20_SSE
 
         uint8_t keyStream[BLOCK_SIZE];
 
@@ -315,12 +307,14 @@ namespace Encryption
     }
 
     //----------------------------------------------------------------------------------
-    void Salsa20::processBytes(const uint8_t* pInput, uint8_t* pOutput, size_t numBytes)
+    void Salsa20::processBytes(span<const uint8_t> input, span<uint8_t> output)
     {
-        X_ASSERT_NOT_NULL(pInput);
-        X_ASSERT_NOT_NULL(pOutput);
+        X_ASSERT(input.length() == output.length(), "Input and output size must match")(input.length(), output.length());
+        
+        size_t numBytes = input.size();
+        auto* pInput = input.data();
+        auto* pOutput = output.data();
 
-#if SALSA20_SSE
         if (SSEnabled()) {
             // work out current byte offset to pass to sse version.
             const int64_t byteOffset = ((vector_[5] * 0xFFFFFFFF) + vector_[8]) * BLOCK_SIZE;
@@ -328,7 +322,6 @@ namespace Encryption
             processBytesSSE(pInput, pOutput, numBytes, byteOffset);
             return;
         }
-#endif // !SALSA20_SSE
 
         uint8_t keyStream[BLOCK_SIZE];
         size_t numBytesToProcess;
@@ -344,14 +337,18 @@ namespace Encryption
     }
 
     //----------------------------------------------------------------------------------
-    void Salsa20::processBytes(const uint8_t* pInput, uint8_t* pOutput,
-        size_t numBytes, int64_t byteOffset)
+    void Salsa20::processBytes(span<const uint8_t> input, span<uint8_t> output, int64_t byteOffset)
     {
+        X_ASSERT(input.length() == output.length(), "Input and output size must match")(input.length(), output.length());
+
         uint8_t keyStream[BLOCK_SIZE];
         size_t streamOffset = byteOffset % BLOCK_SIZE;
         size_t numBytesToProcess;
 
-#if SALSA20_SSE
+        size_t numBytes = input.size();
+        auto* pInput = input.data();
+        auto* pOutput = output.data();
+
         if (SSEnabled()) {
             if (streamOffset > 0) {
                 // update iv for this stream offset block.
@@ -362,18 +359,18 @@ namespace Encryption
                 generateKeyStreamSSEOrdering(keyStream);
                 numBytesToProcess = core::Min(numBytes, BLOCK_SIZE - streamOffset);
 
-                for (size_t i = streamOffset; i < streamOffset + numBytesToProcess; ++i, --numBytes) {
+                for (size_t i = streamOffset; i < streamOffset + numBytesToProcess; ++i) {
                     *(pOutput++) = keyStream[i] ^ *(pInput++);
                 }
 
                 // patch vars since we reset iv coutns in processBytesSSE
                 byteOffset += numBytesToProcess;
+                numBytes -= numBytesToProcess;
             }
 
             processBytesSSE(pInput, pOutput, numBytes, byteOffset);
             return;
         }
-#endif // !SALSA20_SSE
 
         // supports decrypting from any offset.
         // we will need to update the IV to the block offset.
@@ -405,7 +402,6 @@ namespace Encryption
     //----------------------------------------------------------------------------------
     bool Salsa20::SSEnabled(void)
     {
-#if SALSA20_SSE
         if (s_SSEState_ == SSECheckState::SUPPORTED) {
             return true;
         }
@@ -430,12 +426,7 @@ namespace Encryption
         }
 
         return s_SSEState_ == SSECheckState::SUPPORTED;
-#else
-        return false;
-#endif // ! SALSA20_SSE
     }
-
-#if SALSA20_SSE
 
     //----------------------------------------------------------------------------------
     bool Salsa20::SSESupported(void)
@@ -567,7 +558,6 @@ namespace Encryption
             m += BLOCK_SIZE;
         }
     }
-#endif // SALSA20_SSE
 
     //----------------------------------------------------------------------------------
     uint32_t Salsa20::rotate(uint32_t value, uint32_t numBits)

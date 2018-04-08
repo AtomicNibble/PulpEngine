@@ -3,15 +3,16 @@
 #ifndef X_ENCRYPTION_SALSA20_H_
 #define X_ENCRYPTION_SALSA20_H_
 
+#include <Util\Span.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Encryption
 {
-#define SALSA20_SSE 1
 
     class Salsa20
     {
-        static const int32_t NUM_ROUNDS = 12;
+        static const int32_t NUM_ROUNDS = 12; // 20 is normal but 12 is fine.
 
     public:
         enum : size_t
@@ -25,31 +26,35 @@ namespace Encryption
         typedef uint8_t Key[KEY_SIZE];
         typedef uint8_t Iv[IV_SIZE];
 
+    public:
         Salsa20();
         explicit Salsa20(const uint8_t* key);
-        Salsa20(const Salsa20& oth);
+        Salsa20(const Salsa20& oth) = default;
         ~Salsa20();
-        Salsa20& operator=(const Salsa20&);
+
+        Salsa20& operator=(const Salsa20&) = default;
 
         void setKey(const uint8_t* key);
         void setIv(const uint8_t* iv);
-        void generateKeyStream(uint8_t output[BLOCK_SIZE]);
-#if SALSA20_SSE
-        void generateKeyStreamSSEOrdering(uint8_t output[BLOCK_SIZE]);
-#endif // SALSA20_SSE
 
         void processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks);
-        void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes);
-        void processBytes(const uint8_t* input, uint8_t* output, size_t numBytes, int64_t byteOffset);
+        void processBytes(span<const uint8_t> input, span<uint8_t> output);
+        void processBytes(span<const uint8_t> input, span<uint8_t> output, int64_t byteOffset);
+
+        template<typename T>
+        X_INLINE void processBytes(span<const T> input, span<T> output);
+        template<typename T>
+        X_INLINE void processBytes(span<const T> input, span<T> output, int64_t byteOffset);
 
     private:
+        void generateKeyStream(uint8_t output[BLOCK_SIZE]);
+        void generateKeyStreamSSEOrdering(uint8_t output[BLOCK_SIZE]);
+
         static bool SSEnabled(void);
-#if SALSA20_SSE
         static bool SSESupported(void);
 
         void processBytesSSE(const uint8_t* input, uint8_t* output,
             size_t numBytes, int64_t byteOffset);
-#endif // SALSA20_SSE
 
     private:
         inline uint32_t rotate(uint32_t value, uint32_t numBits);
@@ -58,13 +63,10 @@ namespace Encryption
 
         union
         {
-#if SALSA20_SSE
             __m128i vectorSSE_[4];
-#endif // SALSA20_SSE
             uint32_t vector_[VECTOR_SIZE];
         };
 
-#if SALSA20_SSE
         static __m128i s_maskLo32;
         static __m128i s_maskHi32;
 
@@ -80,8 +82,26 @@ namespace Encryption
 
         static SSECheckState::Enum s_SSEState_;
         static Spinlock s_checkLock;
-#endif // SALSA20_SSE
     };
+
+    template<typename T>
+    X_INLINE void Salsa20::processBytes(span<const T> input, span<T> output)
+    {
+        static_assert(compileTime::IsPOD<T>::Value, "Encrypt of none POD type");
+
+        processBytes(span<const uint8_t>(reinterpret_cast<const uint8_t*>(input.data()), input.size_bytes()), 
+            span<uint8_t>(reinterpret_cast<uint8_t*>(output.data()), output.size_bytes()));
+    }
+
+    template<typename T>
+    X_INLINE void Salsa20::processBytes(span<const T> input, span<T> output, int64_t byteOffset)
+    {
+        static_assert(compileTime::IsPOD<T>::Value, "Encrypt of none POD type");
+
+        processBytes(span<const uint8_t>(reinterpret_cast<const uint8_t*>(input.data()), input.size_bytes()),
+            span<uint8_t>(reinterpret_cast<uint8_t*>(output.data()), output.size_bytes()), byteOffset);
+    }
+
 
 } // namespace Encryption
 

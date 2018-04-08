@@ -40,14 +40,11 @@ TEST(Encryption, Salsa20)
     char textCpy[1024] = {0};
     strcpy_s(textCpy, sizeof(sampleText), sampleText);
 
-    salsa20.processBytes(reinterpret_cast<uint8_t*>(textCpy),
-        reinterpret_cast<uint8_t*>(textCpy), sizeof(textCpy));
+    salsa20.processBytes(core::span<const char>(textCpy), core::span<char>(textCpy));
 
     // reset iv.
     salsa20.setIv(Iv);
-
-    salsa20.processBytes(reinterpret_cast<uint8_t*>(textCpy),
-        reinterpret_cast<uint8_t*>(textCpy), sizeof(textCpy));
+    salsa20.processBytes(core::span<const char>(textCpy), core::span<char>(textCpy));
 
     EXPECT_STREQ(textCpy, sampleText);
 }
@@ -87,7 +84,7 @@ TEST(Encrypt, Salsa20_multiBuf)
 
 TEST(Encrypt, Salsa20_offset)
 {
-    unsigned char hexData_enc[448] = {
+    const unsigned char hexData_enc[448] = {
         0xCD, 0xE5, 0x7D, 0x75, 0xE5, 0xB4, 0x93, 0xEA, 0x97, 0xC6, 0xD6, 0x3C, 0xE6, 0x0D, 0xD2, 0xBB,
         0x62, 0x82, 0x1E, 0x11, 0x1D, 0x2B, 0x4C, 0xC3, 0xBE, 0xA1, 0x59, 0x68, 0xC6, 0xF7, 0xE0, 0x60,
         0x1C, 0x07, 0xB1, 0x27, 0x81, 0xD2, 0x39, 0x9A, 0xC6, 0x3F, 0x12, 0xD3, 0x4F, 0x3C, 0xBC, 0x16,
@@ -159,7 +156,7 @@ TEST(Encrypt, Salsa20_offset)
 
     uint8_t out[sizeof(hexData_enc)] = {0};
 
-    salsa20.processBytes(hexData_enc, out, sizeof(hexData_enc), 0x110);
+    salsa20.processBytes(core::span<const uint8_t>(hexData_enc), core::span<uint8_t>(out), 0x110);
 
     EXPECT_EQ(0, std::memcmp(out, hexData_dec, sizeof(hexData_enc)));
 }
