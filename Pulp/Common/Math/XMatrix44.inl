@@ -234,8 +234,9 @@ template<typename T>
 bool Matrix44<T>::equalCompare(const Matrix44<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
-        if (math<T>::abs(m[i] - rhs.m[i]) >= epsilon)
+        if (math<T>::abs(m[i] - rhs.m[i]) >= epsilon) {
             return false;
+        }
     }
     return true;
 }

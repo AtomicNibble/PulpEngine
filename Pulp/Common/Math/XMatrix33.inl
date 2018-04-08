@@ -83,7 +83,7 @@ Matrix33<T>::Matrix33(const Matrix34<T>& src)
 template<typename T>
 Matrix33<T>& Matrix33<T>::operator=(const Matrix33<T>& rhs)
 {
-    memcpy(m, rhs.m, MEM_LEN);
+    std::memcpy(m, rhs.m, MEM_LEN);
     return *this;
 }
 
@@ -121,8 +121,9 @@ template<typename T>
 bool Matrix33<T>::equalCompare(const Matrix33<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
-        if (math<T>::abs(m[i] - rhs.m[i]) >= epsilon)
+        if (math<T>::abs(m[i] - rhs.m[i]) >= epsilon) {
             return false;
+        }
     }
     return true;
 }
