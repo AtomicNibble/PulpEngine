@@ -1,4 +1,6 @@
 
+X_NAMESPACE_BEGIN(core)
+
 
 namespace atomic
 {
@@ -244,3 +246,5 @@ namespace atomic
         return internal::Implementation<sizeof(T)>::CompareExchange(memory, exchange, comperand);
     }
 } // namespace atomic
+
+X_NAMESPACE_END

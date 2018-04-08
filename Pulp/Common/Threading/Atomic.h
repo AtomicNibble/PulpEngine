@@ -44,8 +44,9 @@ namespace atomic
     X_INLINE T CompareExchange(volatile T* memory, T exchange, T comperand);
 } // namespace atomic
 
-#include "Atomic.inl"
 
 X_NAMESPACE_END
+
+#include "Atomic.inl"
 
 #endif // !_X_THREADING_ATOMIC_H_
