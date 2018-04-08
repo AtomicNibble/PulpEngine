@@ -77,14 +77,39 @@ Matrix22<T>& Matrix22<T>::operator=(const Matrix22<FromT>& rhs)
 }
 
 template<typename T>
+Matrix22<T>::operator T*()
+{
+    return (T*)m;
+}
+
+template<typename T>
+Matrix22<T>::operator const T*() const
+{
+    return (const T*)m;
+}
+
+template<typename T>
 bool Matrix22<T>::equalCompare(const Matrix22<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
         T diff = fabs(m[i] - rhs.m[i]);
-        if (diff >= epsilon)
+        if (diff >= epsilon) {
             return false;
+        }
     }
     return true;
+}
+
+template<typename T>
+bool Matrix22<T>::operator==(const Matrix22<T>& rhs) const
+{
+    return equalCompare(rhs, math<T>::EPSILON);
+}
+
+template<typename T>
+bool Matrix22<T>::operator!=(const Matrix22<T>& rhs) const
+{
+    return !(*this == rhs);
 }
 
 template<typename T>
@@ -427,6 +452,12 @@ Matrix22<T> Matrix22<T>::transposed() const
 }
 
 template<typename T>
+void Matrix22<T>::invert(T epsilon)
+{
+    *this = inverted(epsilon);
+}
+
+template<typename T>
 Matrix22<T> Matrix22<T>::inverted(T epsilon) const
 {
     Matrix22<T> inv((T)0);
@@ -461,6 +492,38 @@ Vec2<T> Matrix22<T>::postMultiply(const Vec2<T>& v) const
 }
 
 template<typename T>
+Vec2<T> Matrix22<T>::transformVec(const Vec2<T>& v) const
+{
+    return postMultiply(v);
+}
+
+// rotate by radians (conceptually, rotate is before 'this')
+template<typename T>
+void Matrix22<T>::rotate(T radians)
+{
+    Matrix22 rot = createRotation(radians);
+    Matrix22 mat = *this;
+    *this = rot * mat;
+}
+
+// concatenate scale (conceptually, scale is before 'this')
+template<typename T>
+void Matrix22<T>::scale(T s)
+{
+    Matrix22 sc = createScale(s);
+    Matrix22 mat = *this;
+    *this = sc * mat;
+}
+
+template<typename T>
+void Matrix22<T>::scale(const Vec2<T>& v)
+{
+    Matrix22 sc = createScale(v);
+    Matrix22 mat = *this;
+    *this = sc * mat;
+}
+
+
 Matrix22<T> Matrix22<T>::invertTransform() const
 {
     Matrix22<T> ret;
@@ -473,6 +536,27 @@ Matrix22<T> Matrix22<T>::invertTransform() const
     }
 
     return ret;
+}
+
+template<typename T>
+// -------------------------------------------------------
+
+template<typename T>
+Matrix22<T> Matrix22<T>::identity()
+{
+    return Matrix22(1, 0, 0, 1);
+}
+
+template<typename T>
+Matrix22<T> Matrix22<T>::one()
+{
+    return Matrix22((T)1);
+}
+
+template<typename T>
+Matrix22<T> Matrix22<T>::zero()
+{
+    return Matrix22((T)0);
 }
 
 template<typename T>

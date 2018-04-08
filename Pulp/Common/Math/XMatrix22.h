@@ -32,15 +32,20 @@ public:
     X_PUSH_WARNING_LEVEL(3)
     union
     {
-        T m[4];
+        T m[4]; // block of cols.
         struct
         {
             // This looks like it's transposed from the above, but it's really not.
             // It just has to be written this way so it follows the right ordering
             // in the memory layout as well as being mathematically correct.
+
+            // The motation is m[row][col]
+            // m10 - row 1 col 0 
+            // m01 - row 0 col 1
             T m00, m10;
             T m01, m11;
         };
+
         // [Cols][Rows]
         T mcols[2][2];
     };
@@ -64,30 +69,18 @@ public:
 
     Matrix22(const Matrix22<T>& src);
 
-    operator T*()
-    {
-        return (T*)m;
-    }
-    operator const T*() const
-    {
-        return (const T*)m;
-    }
-
     Matrix22<T>& operator=(const Matrix22<T>& rhs);
     Matrix22<T>& operator=(const T& rhs);
 
     template<typename FromT>
     Matrix22<T>& operator=(const Matrix22<FromT>& rhs);
 
+    operator T*();
+    operator const T*() const;
+
     bool equalCompare(const Matrix22<T>& rhs, T epsilon) const;
-    bool operator==(const Matrix22<T>& rhs) const
-    {
-        return equalCompare(rhs, math<T>::EPSILON);
-    }
-    bool operator!=(const Matrix22<T>& rhs) const
-    {
-        return !(*this == rhs);
-    }
+    bool operator==(const Matrix22<T>& rhs) const;
+    bool operator!=(const Matrix22<T>& rhs) const;
 
     Matrix22<T>& operator*=(const Matrix22<T>& rhs);
     Matrix22<T>& operator+=(const Matrix22<T>& rhs);
@@ -145,10 +138,7 @@ public:
     void transpose();
     Matrix22<T> transposed() const;
 
-    void invert(T epsilon = math<T>::EPSILON)
-    {
-        *this = inverted(epsilon);
-    }
+    void invert(T epsilon = math<T>::EPSILON);   
     Matrix22<T> inverted(T epsilon = math<T>::EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
@@ -158,51 +148,24 @@ public:
     Vec2<T> postMultiply(const Vec2<T>& v) const;
 
     // post-multiplies column vector [rhs.x rhs.y]
-    Vec2<T> transformVec(const Vec2<T>& v) const
-    {
-        return postMultiply(v);
-    }
+    Vec2<T> transformVec(const Vec2<T>& v) const;
 
     // rotate by radians (conceptually, rotate is before 'this')
-    void rotate(T radians)
-    {
-        Matrix22 rot = createRotation(radians);
-        Matrix22 mat = *this;
-        *this = rot * mat;
-    }
+    void rotate(T radians);
 
     // concatenate scale (conceptually, scale is before 'this')
-    void scale(T s)
-    {
-        Matrix22 sc = createScale(s);
-        Matrix22 mat = *this;
-        *this = sc * mat;
-    }
-    void scale(const Vec2<T>& v)
-    {
-        Matrix22 sc = createScale(v);
-        Matrix22 mat = *this;
-        *this = sc * mat;
-    }
+    void scale(T s);
+    void scale(const Vec2<T>& v);
 
     // transposes rotation sub-matrix and inverts translation
     Matrix22<T> invertTransform() const;
 
     // returns an identity matrix
-    static Matrix22<T> identity()
-    {
-        return Matrix22(1, 0, 0, 1);
-    }
+    static Matrix22<T> identity();
     // returns 1 filled matrix
-    static Matrix22<T> one()
-    {
-        return Matrix22((T)1);
-    }
+    static Matrix22<T> one();
     // returns 0 filled matrix
-    static Matrix22<T> zero()
-    {
-        return Matrix22((T)0);
-    }
+    static Matrix22<T> zero();
 
     // creates rotation matrix
     static Matrix22<T> createRotation(T radians);
@@ -214,6 +177,8 @@ public:
 
 typedef Matrix22<float32_t> Matrix22f;
 typedef Matrix22<float64_t> Matrix22d;
+
+
 
 #include "XMatrix22.inl"
 
