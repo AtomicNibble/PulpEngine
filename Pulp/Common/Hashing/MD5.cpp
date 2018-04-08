@@ -105,16 +105,13 @@ namespace Hash
     void MD5::update(const char* pStr)
     {
         size_t length = core::strUtil::strlen(pStr);
-        update(reinterpret_cast<const unsigned char*>(pStr), length);
+        update(reinterpret_cast<const void*>(pStr), length);
     }
 
-    void MD5::update(const char* pBuf, size_t length)
+    void MD5::update(const void* pBuf, size_t length)
     {
-        update(reinterpret_cast<const unsigned char*>(pBuf), length);
-    }
+        const uint8_t* pInput = reinterpret_cast<const uint8_t*>(pBuf);
 
-    void MD5::update(const uint8_t* pInput, size_t length)
-    {
         // compute number of bytes mod 64
         size_t index = count_[0] / 8 % BLOCK_BYTES;
 
@@ -286,6 +283,14 @@ namespace Hash
             pOutput[j + 3] = (pInput[i] >> 24) & 0xff;
         }
     }
+
+    MD5::Digest MD5::calc(const void* src, size_t bytelength)
+    {
+        MD5 hasher;
+        hasher.update(src, bytelength);
+        return hasher.finalize();
+    }
+
 
 } // namespace Hash
 

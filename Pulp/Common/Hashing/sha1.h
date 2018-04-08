@@ -32,12 +32,15 @@ namespace Hash
         void update(const char* pStr);
 
         template<typename T>
-        void update(const T& obj)
-        {
-            update(reinterpret_cast<const void*>(&obj), sizeof(T));
-        }
+        X_INLINE void update(const T& obj);
+        X_INLINE void update(const core::string& str);
+        X_INLINE void update(const std::string& str);
+        X_INLINE void update(const std::wstring& str);
 
-        SHA1Digest finalize(void);
+        Digest finalize(void);
+
+        // performs init, update and finalize.
+        static Digest calc(const void* src, size_t bytelength);
 
     private:
         void transform(const uint8_t* pBuffer);
@@ -58,5 +61,7 @@ namespace Hash
 } // namespace Hash
 
 X_NAMESPACE_END
+
+#include "sha1.inl"
 
 #endif // X_HASH_SHA1_H_

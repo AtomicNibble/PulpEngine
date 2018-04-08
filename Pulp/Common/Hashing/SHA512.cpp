@@ -306,11 +306,11 @@ namespace Hash
         memset(W, 0, 80 * sizeof(uint64_t));
     }
 
-    void SHA512::calc(const void* src, const size_t bytelength, SHA512Digest& hash)
+    SHA512::Digest SHA512::calc(const void* src, size_t bytelength)
     {
         SHA512 hasher;
         hasher.update(src, bytelength);
-        hash = hasher.finalize();
+        return hasher.finalize();
     }
 
 } //  namespace Hash

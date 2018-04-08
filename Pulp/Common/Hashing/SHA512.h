@@ -37,10 +37,10 @@ namespace Hash
         X_INLINE void update(const std::string& str);
         X_INLINE void update(const std::wstring& str);
 
-        SHA512Digest finalize(void);
+        Digest finalize(void);
 
         // performs init, update and finalize.
-        static void calc(const void* src, const size_t bytelength, SHA512Digest& hash);
+        static Digest calc(const void* src, size_t bytelength);
 
     private:
         void transform(const uint8_t* pBuffer);

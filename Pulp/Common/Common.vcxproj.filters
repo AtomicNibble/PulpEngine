@@ -1665,6 +1665,12 @@
     <None Include="Math\XRay.inl">
       <Filter>Headers\Math</Filter>
     </None>
+    <None Include="Hashing\sha1.inl">
+      <Filter>Headers\Hashing</Filter>
+    </None>
+    <None Include="Hashing\MD5.inl">
+      <Filter>Headers\Hashing</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

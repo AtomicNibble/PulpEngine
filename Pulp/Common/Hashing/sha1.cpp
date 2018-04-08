@@ -74,6 +74,11 @@ namespace Hash
         numBytes_ = 0;
     }
 
+    void SHA1::update(const char* pStr)
+    {
+        update(reinterpret_cast<const void*>(pStr), core::strUtil::strlen(pStr));
+    }
+
     void SHA1::update(const void* pBuf, size_t length)
     {
         size_t index = numBytes_ % BLOCK_BYTES;
@@ -99,11 +104,6 @@ namespace Hash
         numBytes_ += length;
 
         memcpy(&buffer_[index], &pInput[i], length - i);
-    }
-
-    void SHA1::update(const char* pStr)
-    {
-        update(reinterpret_cast<const void*>(pStr), core::strUtil::strlen(pStr));
     }
 
     SHA1Digest SHA1::finalize(void)
@@ -232,6 +232,13 @@ namespace Hash
 
         // Wipe variables
         a = b = c = d = e = 0;
+    }
+
+    SHA1::Digest SHA1::calc(const void* src, size_t bytelength)
+    {
+        SHA1 hasher;
+        hasher.update(src, bytelength);
+        return hasher.finalize();
     }
 
 } // namespace Hash

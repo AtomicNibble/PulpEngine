@@ -28,11 +28,19 @@ namespace Hash
         ~MD5();
 
         void reset(void);
-        void update(const uint8_t* pBuf, size_t length);
-        void update(const char* pBuf, size_t length);
+        void update(const void* pBuf, size_t length);
         void update(const char* pStr);
 
-        MD5Digest& finalize(void);
+        template<typename T>
+        X_INLINE void update(const T& obj);
+        X_INLINE void update(const core::string& str);
+        X_INLINE void update(const std::string& str);
+        X_INLINE void update(const std::wstring& str);
+
+        Digest& finalize(void);
+
+        // performs init, update and finalize.
+        static Digest calc(const void* src, size_t bytelength);
 
     private:
         void transform(const uint8_t block[BLOCK_BYTES]);
@@ -52,5 +60,7 @@ namespace Hash
 } // namespace Hash
 
 X_NAMESPACE_END
+
+#include "MD5.inl"
 
 #endif // !X_HASH_MD5_H_
