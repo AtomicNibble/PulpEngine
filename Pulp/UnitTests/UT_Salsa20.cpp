@@ -67,7 +67,7 @@ TEST(Encrypt, Salsa20_multiBuf)
 
     enc.setKey(key);
     enc.setIv(iv);
-    enc.processBytes(TextIn, EncryptedBuf, 62);
+    enc.processBytes(TextIn, EncryptedBuf);
 
     // expected.
     const uint8_t Expected[62] = {
