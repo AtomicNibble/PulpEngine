@@ -103,7 +103,7 @@ bool Matrix22<T>::equalCompare(const Matrix22<T>& rhs, T epsilon) const
 template<typename T>
 bool Matrix22<T>::operator==(const Matrix22<T>& rhs) const
 {
-    return equalCompare(rhs, math<T>::EPSILON);
+    return equalCompare(rhs, EPSILON);
 }
 
 template<typename T>
@@ -524,6 +524,7 @@ void Matrix22<T>::scale(const Vec2<T>& v)
 }
 
 
+template<typename T>
 Matrix22<T> Matrix22<T>::invertTransform() const
 {
     Matrix22<T> ret;
@@ -539,6 +540,14 @@ Matrix22<T> Matrix22<T>::invertTransform() const
 }
 
 template<typename T>
+const char* Matrix22<T>::toString(Description& desc) const
+{
+    desc.setFmt("<%g,%g> - <%g,%g>", 
+        m00, m01, 
+        m10, m11);
+    return desc.c_str();
+}
+
 // -------------------------------------------------------
 
 template<typename T>

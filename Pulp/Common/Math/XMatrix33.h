@@ -14,12 +14,15 @@ template<typename T>
 class Matrix33
 {
 public:
+    typedef core::StackString<192, char> Description;
+
     typedef T TYPE;
     typedef T value_type;
     //
     static const size_t DIM = 3;
     static const size_t DIM_SQ = DIM * DIM;
     static const size_t MEM_LEN = sizeof(T) * DIM_SQ;
+    static const T EPSILON;
 
     //
     // This class is OpenGL friendly and stores the m as how OpenGL would expect it.
@@ -93,7 +96,7 @@ public:
     bool equalCompare(const Matrix33<T>& rhs, T epsilon) const;
     bool operator==(const Matrix33<T>& rhs) const
     {
-        return equalCompare(rhs, math<T>::EPSILON);
+        return equalCompare(rhs, EPSILON);
     }
     bool operator!=(const Matrix33<T>& rhs) const
     {
@@ -159,15 +162,15 @@ public:
     void transpose();
     Matrix33<T> transposed() const;
 
-    void invert(T epsilon = math<T>::EPSILON)
+    void invert(T epsilon = EPSILON)
     {
         *this = inverted(epsilon);
     }
-    Matrix33<T> inverse(T epsilon = math<T>::EPSILON) const
+    Matrix33<T> inverse(T epsilon = EPSILON) const
     {
         return inverted(epsilon);
     }
-    Matrix33<T> inverted(T epsilon = math<T>::EPSILON) const;
+    Matrix33<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
     Vec3<T> preMultiply(const Vec3<T>& v) const;
@@ -202,6 +205,9 @@ public:
 
     // transposes rotation sub-matrix and inverts translation
     Matrix33<T> invertTransform() const;
+
+    const char* toString(Description& desc) const;
+
 
     // returns an identity matrix
     static Matrix33<T> identity()
@@ -239,6 +245,9 @@ public:
 
 typedef Matrix33<float32_t> Matrix33f;
 typedef Matrix33<float64_t> Matrix33d;
+
+template<typename T>
+const T Matrix33<T>::EPSILON = math<T>::CMP_EPSILON;
 
 #include "XMatrix33.inl"
 

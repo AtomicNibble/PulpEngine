@@ -12,12 +12,15 @@ template<typename T>
 class Matrix22
 {
 public:
+    typedef core::StackString<128, char> Description;
+
     typedef T TYPE;
     typedef T value_type;
     //
     static const size_t DIM = 2;
     static const size_t DIM_SQ = DIM * DIM;
     static const size_t MEM_LEN = sizeof(T) * DIM_SQ;
+    static const T EPSILON;
 
     //
     // This class is OpenGL friendly and stores the m as how OpenGL would expect it.
@@ -138,8 +141,8 @@ public:
     void transpose();
     Matrix22<T> transposed() const;
 
-    void invert(T epsilon = math<T>::EPSILON);   
-    Matrix22<T> inverted(T epsilon = math<T>::EPSILON) const;
+    void invert(T epsilon = EPSILON);
+    Matrix22<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
     Vec2<T> preMultiply(const Vec2<T>& v) const;
@@ -160,6 +163,8 @@ public:
     // transposes rotation sub-matrix and inverts translation
     Matrix22<T> invertTransform() const;
 
+    const char* toString(Description& desc) const;
+
     // returns an identity matrix
     static Matrix22<T> identity();
     // returns 1 filled matrix
@@ -178,6 +183,9 @@ public:
 typedef Matrix22<float32_t> Matrix22f;
 typedef Matrix22<float64_t> Matrix22d;
 
+
+template<typename T>
+const T Matrix22<T>::EPSILON = math<T>::CMP_EPSILON;
 
 
 #include "XMatrix22.inl"

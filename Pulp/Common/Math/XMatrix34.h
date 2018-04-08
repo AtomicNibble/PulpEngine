@@ -10,12 +10,15 @@ template<typename T>
 class Matrix34
 {
 public:
+    typedef core::StackString<192, char> Description;
+
     typedef T TYPE;
     typedef T value_type;
     //
     static const size_t DIM = 3;
     static const size_t DIM_SQ = DIM * (DIM + 1);
     static const size_t MEM_LEN = sizeof(T) * DIM_SQ;
+    static const T EPSILON;
 
     X_PUSH_WARNING_LEVEL(3)
     union
@@ -62,7 +65,7 @@ public:
     X_INLINE bool equalCompare(const Matrix34<T>& rhs, T epsilon) const;
     X_INLINE bool operator==(const Matrix34<T>& rhs) const
     {
-        return equalCompare(rhs, math<T>::EPSILON);
+        return equalCompare(rhs, EPSILON);
     }
     X_INLINE bool operator!=(const Matrix34<T>& rhs) const
     {
@@ -132,11 +135,11 @@ public:
     void transpose();
     Matrix34<T> transposed() const;
 
-    void invert(T epsilon = math<T>::EPSILON)
+    void invert(T epsilon = EPSILON)
     {
         *this = inverted(epsilon);
     }
-    Matrix34<T> inverted(T epsilon = math<T>::EPSILON) const;
+    Matrix34<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
     Vec3<T> preMultiply(const Vec3<T>& v) const;
@@ -211,6 +214,9 @@ public:
         *this *= createScale(v);
     }
 
+    const char* toString(Description& desc) const;
+
+
     // creates rotation matrix
     static Matrix34<T> createRotation(const Vec3<T>& axis, T radians);
     static Matrix34<T> createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp);
@@ -255,6 +261,10 @@ public:
 
 typedef Matrix34<float32_t> Matrix34f;
 typedef Matrix34<float64_t> Matrix34d;
+
+
+template<typename T>
+const T Matrix34<T>::EPSILON = math<T>::CMP_EPSILON;
 
 #include "XMatrix34.inl"
 

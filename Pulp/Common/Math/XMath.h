@@ -158,7 +158,7 @@ template<>
 struct math<double>
 {
     // clang-format off
-
+    static constexpr float64_t CMP_EPSILON = 4.37114e-05; // used for comparisions, not reliable but faster than dynamic.
     static constexpr float64_t EPSILON = 2.2204460492503131e-016;
     static constexpr float64_t INFINITY = std::numeric_limits<double>::infinity();
 
@@ -265,6 +265,7 @@ template<>
 struct math<float>
 {
     // clang-format off
+    static constexpr float32_t CMP_EPSILON = 4.37114e-05f; // used for comparisions, not reliable but faster than dynamic.
     static constexpr float32_t EPSILON = 1.192092896e-07f;
     static constexpr float32_t INFINITY = 1e30f;
 
