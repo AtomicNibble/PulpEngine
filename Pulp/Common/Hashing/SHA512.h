@@ -50,9 +50,10 @@ namespace Hash
         uint32_t count_[4];
     };
 
-#include "SHA512.inl"
 } // namespace Hash
 
 X_NAMESPACE_END
+
+#include "SHA512.inl"
 
 #endif // X_HASH_SHA512_H_

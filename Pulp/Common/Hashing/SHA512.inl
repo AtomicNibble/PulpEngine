@@ -1,5 +1,10 @@
 
 
+X_NAMESPACE_BEGIN(core)
+
+namespace Hash
+{
+
 template<typename T>
 void SHA512::update(const T& obj)
 {
@@ -20,3 +25,7 @@ void SHA512::update(const std::wstring& str)
 {
     update(reinterpret_cast<const void*>(str.data()), core::strUtil::StringBytes(str));
 }
+
+} // namespace Hash
+
+X_NAMESPACE_END
