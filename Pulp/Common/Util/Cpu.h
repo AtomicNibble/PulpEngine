@@ -318,8 +318,9 @@ private:
     CacheInfo caches_[3][MAX_CACHE_COUNT];
 };
 
-#include "Cpu.inl"
 
 X_NAMESPACE_END
+
+#include "Cpu.inl"
 
 #endif // _X_CPUINFO_H_

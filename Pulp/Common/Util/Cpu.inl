@@ -1,3 +1,4 @@
+X_NAMESPACE_BEGIN(core)
 
 
 X_INLINE const char* CpuInfo::GetCpuName(void) const
@@ -69,3 +70,5 @@ X_INLINE const CpuInfo::CacheInfo& CpuInfo::GetL3CacheInfo(unsigned int i) const
 {
     return caches_[2][i];
 }
+
+X_NAMESPACE_END
