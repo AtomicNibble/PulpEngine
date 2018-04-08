@@ -10,15 +10,15 @@ namespace Fiber
     constexpr FiberHandle InvalidFiberHandle = nullptr;
 
     FiberHandle ConvertThreadToFiber(void* pArg);
-
     void ConvertFiberToThread(void);
-    FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize,
-        FiberStartRoutine startRoutine, void* pArg);
+    
+    FiberHandle CreateFiber(size_t stackCommitSize, size_t stackReserveSize, FiberStartRoutine startRoutine, void* pArg);
     void DeleteFiber(FiberHandle fiber);
 
     void SwitchToFiber(FiberHandle destFiber);
     FiberHandle GetCurrentFiber(void);
 
+    // The fiber data is the value passed to the CreateFiber or ConvertThreadToFiber function
     void* GetFiberData(void);
 
 } // namespace Fiber
