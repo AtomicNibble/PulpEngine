@@ -38,7 +38,7 @@ X_DECLARE_ENUM(JobPriority)
 struct IJobSystem
 {
 public:
-    virtual ~IJobSystem(){};
+    virtual ~IJobSystem() = default;
 
     virtual bool StartUp(void) X_ABSTRACT;
     virtual void ShutDown(void) X_ABSTRACT;
