@@ -13,6 +13,15 @@ class Mat22 : public ::testing::Test
 public:
 };
 
+template<typename T>
+::std::ostream& operator<<(::std::ostream& os, const Matrix22<T>& m)
+{
+    os << "\n[" << m.m00 << ", " << m.m01 << "]";
+    os << "\n[" << m.m10 << ", " << m.m11 << "]";
+    return os;
+}
+
+
 TYPED_TEST(Mat22, Contruction)
 {
     typedef Matrix22<TypeParam> MatT;

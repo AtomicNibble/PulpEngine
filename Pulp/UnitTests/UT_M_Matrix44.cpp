@@ -18,6 +18,16 @@ class Mat44 : public ::testing::Test
 public:
 };
 
+template<typename T>
+::std::ostream& operator<<(::std::ostream& os, const Matrix44<T>& m)
+{
+    os << "\n[" << m.m00 << ", " << m.m01 << ", " << m.m02 << ", " << m.m03 << "]";
+    os << "\n[" << m.m10 << ", " << m.m11 << ", " << m.m12 << ", " << m.m13 << "]";
+    os << "\n[" << m.m20 << ", " << m.m21 << ", " << m.m22 << ", " << m.m23 << "]";
+    os << "\n[" << m.m30 << ", " << m.m31 << ", " << m.m32 << ", " << m.m33 << "]";
+    return os;
+}
+
 TYPED_TEST(Mat44, Contruction)
 {
     typedef Matrix44<TypeParam> MatT;
