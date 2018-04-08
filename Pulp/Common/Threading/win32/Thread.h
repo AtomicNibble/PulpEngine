@@ -15,41 +15,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \code
-///   core::Thread::ReturnValue ThreadFunction(const core::Thread& thread)
-///   {
-///     while (thread.ShouldRun())
-///     {
-///       // do something over and over again
-///       // ...
-///
-///       // either grant resources to other CPUs explicitly
-///       core::Thread::Yield();
-///       or
-///       core::Thread::Sleep();
-///
-///       // or grant resources implicitly by waiting for e.g. condition variables
-///   	}
-///
-///   	return core::Thread::ReturnValue(0);
-///   }
-///
-///   // the thread is created and started somewhere else, probably from the main thread
-///   core::Thread thread;
-///   thread.Create(65536, "Test thread");
-///   thread.Start(&ThreadFunction);
-///   // ThreadFunction is now run in a different thread, continuing to work until Stop() is called
-///
-///   // do other work
-///   ...
-///
-///   // some time later
-///   // calling Stop() results in making ShouldRun() returning false
-///   thread.Stop();
-///
-///   // wait until the thread has finished
-///   thread.Join();
-/// \endcode
 
 X_DISABLE_WARNING(4324)
 
@@ -71,7 +36,9 @@ public:
     X_DECLARE_FLAGS(CpuCore)
     (
         CORE0, CORE1, CORE2, CORE3,
-        CORE4, CORE5, CORE6, CORE7);
+        CORE4, CORE5, CORE6, CORE7,
+        CORE8, CORE9, CORE10, CORE11,
+        CORE12, CORE13, CORE14, CORE15);
 
     X_DECLARE_ENUM(FPE)
     (
