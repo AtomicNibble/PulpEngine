@@ -88,7 +88,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
                 X_ASSERT_NOT_NULL(gEnv->pCore);
                 gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
-             //   ::testing::GTEST_FLAG(filter) = "-*Fiber*";
+                ::testing::GTEST_FLAG(filter) = "-*Fiber*";
                 //::testing::GTEST_FLAG(filter) = "*JobSystem2Empty_parallel_data:-*Fiber*";
                 //::testing::GTEST_FLAG(filter) = "*ECS*";
                 X_LOG0("TESTS", "Running unit tests...");
