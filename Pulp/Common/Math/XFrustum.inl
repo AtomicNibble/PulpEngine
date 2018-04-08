@@ -174,48 +174,54 @@ X_INLINE CullResult::Enum XFrustum::cullAABB_FastT(const AABB& box) const
     z = idz_[FrustumPlane::NEAR];
 
     d = planes_[FrustumPlane::NEAR].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     x = idx_[FrustumPlane::FAR];
     y = idy_[FrustumPlane::FAR];
     z = idz_[FrustumPlane::FAR];
 
     d = planes_[FrustumPlane::FAR].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     x = idx_[FrustumPlane::RIGHT];
     y = idy_[FrustumPlane::RIGHT];
     z = idz_[FrustumPlane::RIGHT];
 
     d = planes_[FrustumPlane::RIGHT].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     x = idx_[FrustumPlane::LEFT];
     y = idy_[FrustumPlane::LEFT];
     z = idz_[FrustumPlane::LEFT];
 
     d = planes_[FrustumPlane::LEFT].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     x = idx_[FrustumPlane::TOP];
     y = idy_[FrustumPlane::TOP];
     z = idz_[FrustumPlane::TOP];
 
     d = planes_[FrustumPlane::TOP].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     x = idx_[FrustumPlane::BOTTOM];
     y = idy_[FrustumPlane::BOTTOM];
     z = idz_[FrustumPlane::BOTTOM];
 
     d = planes_[FrustumPlane::BOTTOM].distance(Vec3f(p[x], p[y], p[z]));
-    if (d < 0)
+    if (d < 0) {
         return CullResult::EXCLUSION;
+    }
 
     return CullResult::OVERLAP;
 }
@@ -380,23 +386,24 @@ X_INLINE CullResult::Enum XFrustum::cullSphere_FastT(const Sphere& s) const
 {
     float32_t r = -s.radius();
 
-    if ((planes_[FrustumPlane::NEAR].distance(s.center())) < r)
+    if ((planes_[FrustumPlane::NEAR].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
-
-    if ((planes_[FrustumPlane::FAR].distance(s.center())) < r)
+    }
+    if ((planes_[FrustumPlane::FAR].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
-
-    if ((planes_[FrustumPlane::RIGHT].distance(s.center())) < r)
+    }
+    if ((planes_[FrustumPlane::RIGHT].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
-
-    if ((planes_[FrustumPlane::LEFT].distance(s.center())) < r)
+    }
+    if ((planes_[FrustumPlane::LEFT].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
-
-    if ((planes_[FrustumPlane::TOP].distance(s.center())) < r)
+    }
+    if ((planes_[FrustumPlane::TOP].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
-
-    if ((planes_[FrustumPlane::BOTTOM].distance(s.center())) < r)
+    }
+    if ((planes_[FrustumPlane::BOTTOM].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
     return CullResult::OVERLAP;
 }
@@ -406,38 +413,50 @@ X_INLINE CullResult::Enum XFrustum::cullSphere_ExactT(const Sphere& s) const
     float32_t nc, rc, lc, tc, bc, cc;
     float32_t r = -s.radius();
 
-    if ((nc = planes_[FrustumPlane::NEAR].distance(s.center())) < r)
+    if ((nc = planes_[FrustumPlane::NEAR].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
-    if ((rc = planes_[FrustumPlane::FAR].distance(s.center())) < r)
+    if ((rc = planes_[FrustumPlane::FAR].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
-    if ((lc = planes_[FrustumPlane::RIGHT].distance(s.center())) < r)
+    if ((lc = planes_[FrustumPlane::RIGHT].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
-    if ((tc = planes_[FrustumPlane::LEFT].distance(s.center())) < r)
+    if ((tc = planes_[FrustumPlane::LEFT].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
-    if ((bc = planes_[FrustumPlane::TOP].distance(s.center())) < r)
+    if ((bc = planes_[FrustumPlane::TOP].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
-    if ((cc = planes_[FrustumPlane::BOTTOM].distance(s.center())) < r)
+    if ((cc = planes_[FrustumPlane::BOTTOM].distance(s.center())) < r) {
         return CullResult::EXCLUSION;
+    }
 
     //now we have to check if it is completely in frustum
     r = -r;
-    if (nc < r)
+    if (nc < r) {
         return CullResult::OVERLAP;
-    if (lc < r)
+    }
+    if (lc < r) {
         return CullResult::OVERLAP;
-    if (rc < r)
+    }
+    if (rc < r) {
         return CullResult::OVERLAP;
-    if (tc < r)
+    }
+    if (tc < r) {
         return CullResult::OVERLAP;
-    if (bc < r)
+    }
+    if (bc < r) {
         return CullResult::OVERLAP;
-    if (cc < r)
+    }
+    if (cc < r) {
         return CullResult::OVERLAP;
+    }
 
     return CullResult::INCLUSION;
 }
@@ -526,48 +545,50 @@ X_INLINE CullResult::Enum XFrustum::additionalCheck(const AABB& aabb) const
         // we take the 4 vertices of projection-plane in cam-space,
         // and clip them against the 4 side-frustum-planes of the AABB
         Vec3f s0 = v[p0].cross(v[p1]);
-        if ((s0 | cltp) > 0 && (s0 | crtp) > 0 && (s0 | crbp) > 0 && (s0 | clbp) > 0)
+        if ((s0 | cltp) > 0 && (s0 | crtp) > 0 && (s0 | crbp) > 0 && (s0 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s1 = v[p1].cross(v[p2]);
-        if ((s1 | cltp) > 0 && (s1 | crtp) > 0 && (s1 | crbp) > 0 && (s1 | clbp) > 0)
+        if ((s1 | cltp) > 0 && (s1 | crtp) > 0 && (s1 | crbp) > 0 && (s1 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s2 = v[p2].cross(v[p3]);
-        if ((s2 | cltp) > 0 && (s2 | crtp) > 0 && (s2 | crbp) > 0 && (s2 | clbp) > 0)
+        if ((s2 | cltp) > 0 && (s2 | crtp) > 0 && (s2 | crbp) > 0 && (s2 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s3 = v[p3].cross(v[p0]);
-        if ((s3 | cltp) > 0 && (s3 | crtp) > 0 && (s3 | crbp) > 0 && (s3 | clbp) > 0)
+        if ((s3 | cltp) > 0 && (s3 | crtp) > 0 && (s3 | crbp) > 0 && (s3 | clbp) > 0) {
             return CullResult::EXCLUSION;
+        }
     }
 
     if (sideamount == 6) {
         // we take the 4 vertices of projection-plane in cam-space,
         // and clip them against the 6 side-frustum-planes of the AABB
         Vec3f s0 = v[p0].cross(v[p1]);
-        if ((s0 | cltp) > 0 && (s0 | crtp) > 0 && (s0 | crbp) > 0 && (s0 | clbp) > 0)
+        if ((s0 | cltp) > 0 && (s0 | crtp) > 0 && (s0 | crbp) > 0 && (s0 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s1 = v[p1].cross(v[p2]);
-        if ((s1 | cltp) > 0 && (s1 | crtp) > 0 && (s1 | crbp) > 0 && (s1 | clbp) > 0)
+        if ((s1 | cltp) > 0 && (s1 | crtp) > 0 && (s1 | crbp) > 0 && (s1 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s2 = v[p2].cross(v[p3]);
-        if ((s2 | cltp) > 0 && (s2 | crtp) > 0 && (s2 | crbp) > 0 && (s2 | clbp) > 0)
+        if ((s2 | cltp) > 0 && (s2 | crtp) > 0 && (s2 | crbp) > 0 && (s2 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s3 = v[p3].cross(v[p4]);
-        if ((s3 | cltp) > 0 && (s3 | crtp) > 0 && (s3 | crbp) > 0 && (s3 | clbp) > 0)
+        if ((s3 | cltp) > 0 && (s3 | crtp) > 0 && (s3 | crbp) > 0 && (s3 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s4 = v[p4].cross(v[p5]);
-        if ((s4 | cltp) > 0 && (s4 | crtp) > 0 && (s4 | crbp) > 0 && (s4 | clbp) > 0)
+        if ((s4 | cltp) > 0 && (s4 | crtp) > 0 && (s4 | crbp) > 0 && (s4 | clbp) > 0) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s5 = v[p5].cross(v[p0]);
-        if ((s5 | cltp) > 0 && (s5 | crtp) > 0 && (s5 | crbp) > 0 && (s5 | clbp) > 0)
+        if ((s5 | cltp) > 0 && (s5 | crtp) > 0 && (s5 | crbp) > 0 && (s5 | clbp) > 0) {
             return CullResult::EXCLUSION;
+        }
     }
 
     return CullResult::OVERLAP; //AABB is patially visible
@@ -581,18 +602,24 @@ X_INLINE CullResult::Enum XFrustum::additionalCheck(const OBB& obb, float32_t sc
     uint32 front8 = 0;
     AABB aabb = AABB((obb.center() - obb.halfVec()) * scale, (obb.center() + obb.halfVec()) * scale);
 
-    if (iCamPos.x < aabb.min.x)
+    if (iCamPos.x < aabb.min.x) {
         front8 |= 0x008;
-    if (iCamPos.x > aabb.max.x)
+    }
+    if (iCamPos.x > aabb.max.x) {
         front8 |= 0x010;
-    if (iCamPos.y < aabb.min.y)
+    }
+    if (iCamPos.y < aabb.min.y) {
         front8 |= 0x020;
-    if (iCamPos.y > aabb.max.y)
+    }
+    if (iCamPos.y > aabb.max.y) {
         front8 |= 0x040;
-    if (iCamPos.z < aabb.min.z)
+    }
+    if (iCamPos.z < aabb.min.z) {
         front8 |= 0x080;
-    if (iCamPos.z > aabb.max.z)
+    }
+    if (iCamPos.z > aabb.max.z) {
         front8 |= 0x100;
+    }
 
     if (front8 == 0) {
         return CullResult::OVERLAP;
@@ -627,48 +654,50 @@ X_INLINE CullResult::Enum XFrustum::additionalCheck(const OBB& obb, float32_t sc
         // we take the 4 vertices of projection-plane in cam-space,
         // and clip them against the 4 side-frustum-planes of the OBB
         Vec3f s0 = v[p0].cross(v[p1]);
-        if (((s0 | cltp) >= 0) && ((s0 | crtp) >= 0) && ((s0 | crbp) >= 0) && ((s0 | clbp) >= 0))
+        if (((s0 | cltp) >= 0) && ((s0 | crtp) >= 0) && ((s0 | crbp) >= 0) && ((s0 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s1 = v[p1].cross(v[p2]);
-        if (((s1 | cltp) >= 0) && ((s1 | crtp) >= 0) && ((s1 | crbp) >= 0) && ((s1 | clbp) >= 0))
+        if (((s1 | cltp) >= 0) && ((s1 | crtp) >= 0) && ((s1 | crbp) >= 0) && ((s1 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s2 = v[p2].cross(v[p3]);
-        if (((s2 | cltp) >= 0) && ((s2 | crtp) >= 0) && ((s2 | crbp) >= 0) && ((s2 | clbp) >= 0))
+        if (((s2 | cltp) >= 0) && ((s2 | crtp) >= 0) && ((s2 | crbp) >= 0) && ((s2 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s3 = v[p3].cross(v[p0]);
-        if (((s3 | cltp) >= 0) && ((s3 | crtp) >= 0) && ((s3 | crbp) >= 0) && ((s3 | clbp) >= 0))
+        if (((s3 | cltp) >= 0) && ((s3 | crtp) >= 0) && ((s3 | crbp) >= 0) && ((s3 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
+        }
     }
 
     if (sideamount == 6) {
         // we take the 4 vertices of projection-plane in cam-space,
         // and clip them against the 6 side-frustum-planes of the OBB
         Vec3f s0 = v[p0].cross(v[p1]);
-        if (((s0 | cltp) >= 0) && ((s0 | crtp) >= 0) && ((s0 | crbp) >= 0) && ((s0 | clbp) >= 0))
+        if (((s0 | cltp) >= 0) && ((s0 | crtp) >= 0) && ((s0 | crbp) >= 0) && ((s0 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s1 = v[p1].cross(v[p2]);
-        if (((s1 | cltp) >= 0) && ((s1 | crtp) >= 0) && ((s1 | crbp) >= 0) && ((s1 | clbp) >= 0))
+        if (((s1 | cltp) >= 0) && ((s1 | crtp) >= 0) && ((s1 | crbp) >= 0) && ((s1 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s2 = v[p2].cross(v[p3]);
-        if (((s2 | cltp) >= 0) && ((s2 | crtp) >= 0) && ((s2 | crbp) >= 0) && ((s2 | clbp) >= 0))
+        if (((s2 | cltp) >= 0) && ((s2 | crtp) >= 0) && ((s2 | crbp) >= 0) && ((s2 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s3 = v[p3].cross(v[p4]);
-        if (((s3 | cltp) >= 0) && ((s3 | crtp) >= 0) && ((s3 | crbp) >= 0) && ((s3 | clbp) >= 0))
+        if (((s3 | cltp) >= 0) && ((s3 | crtp) >= 0) && ((s3 | crbp) >= 0) && ((s3 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s4 = v[p4].cross(v[p5]);
-        if (((s4 | cltp) >= 0) && ((s4 | crtp) >= 0) && ((s4 | crbp) >= 0) && ((s4 | clbp) >= 0))
+        if (((s4 | cltp) >= 0) && ((s4 | crtp) >= 0) && ((s4 | crbp) >= 0) && ((s4 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
-
+        }
         Vec3f s5 = v[p5].cross(v[p0]);
-        if (((s5 | cltp) >= 0) && ((s5 | crtp) >= 0) && ((s5 | crbp) >= 0) && ((s5 | clbp) >= 0))
+        if (((s5 | cltp) >= 0) && ((s5 | crtp) >= 0) && ((s5 | crbp) >= 0) && ((s5 | clbp) >= 0)) {
             return CullResult::EXCLUSION;
+        }
     }
 
     //now we are 100% sure that the OBB is visible on the screen
