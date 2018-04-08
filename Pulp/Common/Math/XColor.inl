@@ -469,7 +469,7 @@ X_INLINE ColorT<T> ColorT<T>::white(void)
 }
 
 template<typename T>
-X_INLINE ColorT<T> ColorT<T>::gray(T value, T alpha = CHANTRAIT<T>::max())
+X_INLINE ColorT<T> ColorT<T>::gray(T value, T alpha)
 {
     return ColorT<T>(value, value, value, alpha);
 }
