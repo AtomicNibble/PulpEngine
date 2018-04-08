@@ -10,8 +10,15 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Compression
 {
-    X_DECLARE_ENUM8(Algo)
-    (STORE, LZ4, LZ4HC, LZMA, ZLIB, LZ5, LZ5HC);
+    X_DECLARE_ENUM8(Algo)(
+        STORE, 
+        LZ4, 
+        LZ4HC, 
+        LZMA, 
+        ZLIB, 
+        LZ5, 
+        LZ5HC);
+
     X_DECLARE_ENUM(CompressLevel)
     (
         LOW,    // speed
@@ -50,7 +57,7 @@ namespace Compression
         uint8_t _pad;
         SharedDictId sharedDictId;
 
-        // we don't allow hugh single deflated blocks.
+        // we don't allow huge single deflated blocks.
         // i see no use case.
         uint32_t deflatedSize;
         uint32_t inflatedSize;
