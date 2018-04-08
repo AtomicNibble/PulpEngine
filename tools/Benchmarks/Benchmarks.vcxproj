@@ -523,6 +523,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tests\allocators.cpp" />
+    <ClCompile Include="tests\half.cpp" />
     <ClCompile Include="tests\memcpy.cpp" />
     <ClCompile Include="tests\random.cpp" />
     <ClCompile Include="tests\string.cpp" />
