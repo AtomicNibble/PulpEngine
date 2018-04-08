@@ -98,7 +98,7 @@ X_INLINE Vec3<T> Transform<T>::transform(const Vec3<T>& p) const
 }
 
 template<typename T>
-X_INLINE static Transform<T> Transform<T>::identity(void)
+X_INLINE Transform<T> Transform<T>::identity(void)
 {
     return Transform();
 }
