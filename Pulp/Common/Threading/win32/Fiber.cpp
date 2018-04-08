@@ -7,6 +7,8 @@ namespace Fiber
 {
     FiberHandle ConvertThreadToFiber(void* pArg)
     {
+        X_LOG2("Fiber", "Converting thread ^6%" PRIx32 "^7 to fiber", Thread::GetCurrentID());
+
         FiberHandle fiber = ::ConvertThreadToFiberEx(pArg, FIBER_FLAG_FLOAT_SWITCH);
 
         if (!fiber) {
@@ -19,6 +21,8 @@ namespace Fiber
 
     void ConvertFiberToThread(void)
     {
+        X_LOG2("Fiber", "Converting fiber ^6%" PRIx32 "^7 to thread", Thread::GetCurrentID());
+
         if (!::ConvertFiberToThread()) {
             lastError::Description Dsc;
             X_ERROR("Fiber", "Failed to convert fiber to thread. Err: %s", lastError::ToString(Dsc));

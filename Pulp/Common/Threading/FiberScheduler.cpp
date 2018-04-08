@@ -142,9 +142,9 @@ namespace Fiber
 
         ++stop_;
 
-        Fiber::ConvertFiberToThread();
-
         uint32_t curThreadId = core::Thread::GetCurrentID();
+
+        Fiber::ConvertFiberToThread();
 
         uint32_t i;
         for (i = 0; i < numThreads_; i++) {
