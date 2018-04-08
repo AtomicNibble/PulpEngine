@@ -36,6 +36,7 @@ private:
 private:
     bool current_;
 };
+
 X_PACK_POP
 
 X_NAMESPACE_END
