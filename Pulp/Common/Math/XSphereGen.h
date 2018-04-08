@@ -60,7 +60,7 @@ public:
 
     NT relativeError(NT& subopt) const;
 
-    bool is_valid(NT tol = NT(10) * std::numeric_limits<NT>::epsilon()) const;
+    bool isValid(NT tol = NT(10) * std::numeric_limits<NT>::epsilon()) const;
 
 private:
     void mtf_mb(Sit n);

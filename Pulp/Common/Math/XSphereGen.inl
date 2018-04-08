@@ -136,7 +136,7 @@ typename BoundingSphereGen<NumDim, CoordAccessor>::NT BoundingSphereGen<NumDim, 
 }
 
 template<size_t NumDim, typename CoordAccessor>
-bool BoundingSphereGen<NumDim, CoordAccessor>::is_valid(NT tol) const
+bool BoundingSphereGen<NumDim, CoordAccessor>::isValid(NT tol) const
 {
     NT suboptimality;
     return ((relativeError(suboptimality) <= tol) && (suboptimality == 0));
