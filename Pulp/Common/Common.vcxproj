@@ -744,6 +744,7 @@
     <None Include="Hashing\MD5.inl" />
     <None Include="Hashing\sha1.inl" />
     <None Include="Hashing\SHA512.inl" />
+    <None Include="Hashing\xxHash.inl" />
     <None Include="Logging\FilterPolicies\LoggerNoFilterPolicy.inl" />
     <None Include="Logging\Logger.inl" />
     <None Include="Logging\LoggerBase.inl" />

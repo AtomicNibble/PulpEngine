@@ -639,7 +639,7 @@ namespace Hash
         }
     }
 
-    uint32_t xxHash32::getHash(const void* pInput, size_t length, uint32_t seed)
+    uint32_t xxHash32::calc(const void* pInput, size_t length, uint32_t seed)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
@@ -704,7 +704,7 @@ namespace Hash
         }
     }
 
-    uint64_t xxHash64::getHash(const void* pInput, size_t length, uint64_t seed)
+    uint64_t xxHash64::calc(const void* pInput, size_t length, uint64_t seed)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 

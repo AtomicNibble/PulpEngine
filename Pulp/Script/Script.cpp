@@ -18,7 +18,7 @@ Script::Script(core::MemoryArenaBase* arena, core::string& name) :
 
 bool Script::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-    auto hash = core::Hash::xxHash64::getHash(data.ptr(), dataSize);
+    auto hash = core::Hash::xxHash64::calc(data.ptr(), dataSize);
 
     data_ = std::move(data);
     dataSize_ = dataSize;

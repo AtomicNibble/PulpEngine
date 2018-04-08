@@ -381,12 +381,12 @@ TEST(Hash, xxhash64)
 
 TEST(Hash, xxhash32_simple)
 {
-    EXPECT_EQ(3834992036, Hash::xxHash32::getHash("test", 4, 12345));
-    EXPECT_EQ(2758658570, Hash::xxHash32::getHash("test", 4, 123));
+    EXPECT_EQ(3834992036, Hash::xxHash32::calc("test", 4, 12345));
+    EXPECT_EQ(2758658570, Hash::xxHash32::calc("test", 4, 123));
 }
 
 TEST(Hash, xxhash64_simple)
 {
-    EXPECT_EQ(3134990500624303823, Hash::xxHash64::getHash("test", 4, 123));
-    EXPECT_EQ(5754696928334414137, Hash::xxHash64::getHash("test", 4, 0));
+    EXPECT_EQ(3134990500624303823, Hash::xxHash64::calc("test", 4, 123));
+    EXPECT_EQ(5754696928334414137, Hash::xxHash64::calc("test", 4, 0));
 }

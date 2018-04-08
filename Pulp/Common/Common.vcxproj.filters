@@ -1671,6 +1671,9 @@
     <None Include="Hashing\MD5.inl">
       <Filter>Headers\Hashing</Filter>
     </None>
+    <None Include="Hashing\xxHash.inl">
+      <Filter>Headers\Hashing</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">
