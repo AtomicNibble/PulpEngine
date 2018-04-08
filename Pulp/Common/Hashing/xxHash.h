@@ -8,6 +8,9 @@ namespace Hash
     // XXH64	13.8 GB / s			1.9 GB / s
     // XXH32	6.8 GB / s			6.0 GB / s
 
+    typedef uint32_t xxHash32Val;
+    typedef uint64_t xxHash64Val;
+
     class xxHash32
     {
     public:
