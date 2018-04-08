@@ -34,11 +34,10 @@ namespace Encryption
         core::zero_object(vector_);
     }
 
-    Salsa20::Salsa20(const uint8_t* pKey)
+    Salsa20::Salsa20(const Key& key)
     {
-        X_ASSERT_NOT_NULL(pKey);
         core::zero_object(vector_);
-        setKey(pKey);
+        setKey(key);
     }
 
     Salsa20::~Salsa20()
@@ -47,16 +46,12 @@ namespace Encryption
     }
 
     //----------------------------------------------------------------------------------
-    void Salsa20::setKey(const uint8_t* key)
+    void Salsa20::setKey(const Key& key)
     {
         static const char constant_str[] = "expand 32-byte k";
 
-        if (key == nullptr) {
-            return;
-        }
-
         if (SSEnabled()) {
-            const uint32_t* key32 = reinterpret_cast<const uint32_t*>(key);
+            const uint32_t* key32 = reinterpret_cast<const uint32_t*>(key.data());
 
             vector_[0] = convert(reinterpret_cast<const uint8_t*>(&constant_str[0]));
             ; // 0
@@ -100,14 +95,10 @@ namespace Encryption
     }
 
     //----------------------------------------------------------------------------------
-    void Salsa20::setIv(const uint8_t* iv)
+    void Salsa20::setIv(const Iv& iv)
     {
-        if (iv == nullptr) {
-            return;
-        }
-
         if (SSEnabled()) {
-            const uint32_t* iv32 = reinterpret_cast<const uint32_t*>(iv);
+            const uint32_t* iv32 = reinterpret_cast<const uint32_t*>(iv.data());
 
             vector_[14] = iv32[0];
             vector_[11] = iv32[1];

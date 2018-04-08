@@ -23,19 +23,19 @@ namespace Encryption
             IV_SIZE = 8
         };
 
-        typedef uint8_t Key[KEY_SIZE];
-        typedef uint8_t Iv[IV_SIZE];
+        typedef std::array<uint8_t, KEY_SIZE> Key;
+        typedef std::array<uint8_t, IV_SIZE> Iv;
 
     public:
         Salsa20();
-        explicit Salsa20(const uint8_t* key);
+        explicit Salsa20(const Key& key);
         Salsa20(const Salsa20& oth) = default;
         ~Salsa20();
 
         Salsa20& operator=(const Salsa20&) = default;
 
-        void setKey(const uint8_t* key);
-        void setIv(const uint8_t* iv);
+        void setKey(const Key& key);
+        void setIv(const Iv& iv);
 
         void processBlocks(const uint8_t* input, uint8_t* output, size_t numBlocks);
         void processBytes(span<const uint8_t> input, span<uint8_t> output);
