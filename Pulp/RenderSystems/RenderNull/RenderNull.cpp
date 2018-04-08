@@ -166,9 +166,9 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
     X_UNUSED(handle);
 }
 
-IDeviceTexture* RenderNull::getDeviceTexture(int32_t id)
+IDeviceTexture* RenderNull::getDeviceTexture(int32_t id, const char* pNickName)
 {
-    X_UNUSED(id);
+    X_UNUSED(id, pNickName);
 
     return nullptr;
 }

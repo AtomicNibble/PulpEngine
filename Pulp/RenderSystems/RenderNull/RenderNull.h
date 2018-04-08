@@ -45,7 +45,7 @@ public:
     ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
     void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
-    IDeviceTexture* getDeviceTexture(int32_t id) X_FINAL;
+    IDeviceTexture* getDeviceTexture(int32_t id, const char* pNickName) X_FINAL;
     IDeviceTexture* createTexture(const char* pNickName, Vec2i dim,
         texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData = nullptr) X_FINAL;
 
