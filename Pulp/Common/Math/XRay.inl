@@ -25,7 +25,7 @@ X_INLINE const Vec3f& Ray::getDirection(void) const
     return Direction_;
 }
 
-X_INLINE Vec3f Ray::calcPosition(float t) const
+X_INLINE Vec3f Ray::calcPosition(float distance) const
 {
-    return Origin_ + Direction_ * t;
+    return Origin_ + Direction_ * distance;
 }

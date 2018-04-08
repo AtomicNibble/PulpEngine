@@ -16,7 +16,9 @@ public:
     X_INLINE const Vec3f& getOrigin(void) const;
     X_INLINE void setDirection(const Vec3f& aDirection);
     X_INLINE const Vec3f& getDirection(void) const;
-    X_INLINE Vec3f calcPosition(float t) const;
+
+    // Retruns the point along the ray for a given distance.
+    X_INLINE Vec3f calcPosition(float distance) const;
 
 protected:
     Vec3f Origin_;
