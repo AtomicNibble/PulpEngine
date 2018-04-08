@@ -7,16 +7,9 @@ struct ILog;
 class LoggerBase
 {
 public:
-#if X_DEBUG
-    typedef char Line[4096];
-#else
-    typedef char Line[1024];
-#endif // !X_DEBUG
+    typedef char Line[X_LOG_BUFFER_SIZE];
 
-    /// Default constructor, initializing the linked-list pointers.
-    LoggerBase(void);
-
-    /// Destructor.
+    LoggerBase(void); 
     virtual ~LoggerBase(void);
 
     void Log(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* foramt, va_list args);
@@ -26,7 +19,6 @@ public:
     void Assert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args);
     void AssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args);
 
-    /// \brief intrusive linked-list.
     inline void SetPrevious(LoggerBase* logger);
     inline void SetNext(LoggerBase* logger);
 
