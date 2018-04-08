@@ -105,7 +105,7 @@ public:
     static void SetFPE(uint32_t threadId, FPE::Enum fpe);
 
 protected:
-    HANDLE createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
+    bool createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
 
 private:
     static uint32_t __stdcall ThreadFunction_(void* threadInstance);

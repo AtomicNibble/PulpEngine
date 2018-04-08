@@ -54,11 +54,9 @@ Thread::~Thread(void)
 
 void Thread::Create(const char* pName, uint32_t stackSize)
 {
-    handle_ = createThreadInternal(stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_);
-
     name_.set(pName);
 
-    if (handle_ == NULL) {
+    if (!createThreadInternal(stackSize, (LPTHREAD_START_ROUTINE)ThreadFunction_)) {
         lastError::Description Dsc;
         X_ERROR("Thread", "failed to create thread. Erorr: %s", lastError::ToString(Dsc));
     }
@@ -375,9 +373,13 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
     CloseHandle(hThread);
 }
 
-HANDLE Thread::createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func)
+bool Thread::createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func)
 {
-    return ::CreateThread(NULL, stackSize, func, this, CREATE_SUSPENDED, (LPDWORD)&id_);
+    X_ASSERT(handle_ == NULL, "Thread has already been created")(handle_, id_);
+
+    handle_ = ::CreateThread(NULL, stackSize, func, this, CREATE_SUSPENDED, (LPDWORD)&id_);
+
+    return handle_ != NULL;
 }
 
 uint32_t __stdcall Thread::ThreadFunction_(void* threadInstance)
