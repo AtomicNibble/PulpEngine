@@ -32,60 +32,64 @@ namespace Hash
 
     Adler32Val Adler32(const char* str)
     {
-        size_t length = strlen(str);
-        return Adler32(str, length);
+        size_t length = strUtil::strlen(str);
+        return Adler32(span<const char>( str, length ));
     }
 
-    Adler32Val Adler32(const char* str, size_t length)
+    Adler32Val Adler32(span<const char> buf)
     {
-        return Adler32(reinterpret_cast<const void*>(str), length);
+        return Adler32(span<const uint8_t>(reinterpret_cast<const uint8_t*>(buf.data()), buf.length()));
     }
 
-    Adler32Val Adler32(const void* buf, size_t length)
+    Adler32Val Adler32(span<const uint8_t> buf)
     {
         Adler32Val val = 1u;
-        return Adler32(val, buf, length);
+        return Adler32(val, buf);
     }
 
-    Adler32Val Adler32(Adler32Val& adler, const void* bufV, size_t len)
+    Adler32Val Adler32(Adler32Val& adler, span<const uint8_t> buf)
     {
-        const uint8_t* buf = reinterpret_cast<const uint8_t*>(bufV);
-        Adler32Val sum2;
-        Adler32Val n;
+        const uint8_t* pBuf = buf.data();
+        auto len = buf.length();
 
-        sum2 = (adler >> 16) & 0xffff;
+        Adler32Val sum2 = (adler >> 16) & 0xffff;
         adler &= 0xffff;
 
-        if (len == 1) {
-            adler += buf[0];
-            if (adler >= BASE)
+        if (buf.empty()) {
+            adler += 1L;
+        }
+        else if (len == 1) {
+            adler += pBuf[0];
+            if (adler >= BASE) {
                 adler -= BASE;
+            }
             sum2 += adler;
-            if (sum2 >= BASE)
+            if (sum2 >= BASE) {
                 sum2 -= BASE;
+            }
             return adler | (sum2 << 16);
         }
-
-        if (buf == nullptr)
-            return 1L;
 
         if (len < 16) {
             while (len--) {
-                adler += *buf++;
+                adler += *pBuf++;
                 sum2 += adler;
             }
-            if (adler >= BASE)
+            if (adler >= BASE) {
                 adler -= BASE;
+            }
             MOD28(sum2);
             return adler | (sum2 << 16);
         }
+
+        Adler32Val n;
 
         while (len >= NMAX) {
             len -= NMAX;
             n = NMAX / 16;
             do {
-                DO16(buf);
-                buf += 16;
+                DO16(pBuf);
+                pBuf += 16;
             } while (--n);
             MOD(adler);
             MOD(sum2);
@@ -94,11 +98,11 @@ namespace Hash
         if (len) {
             while (len >= 16) {
                 len -= 16;
-                DO16(buf);
-                buf += 16;
+                DO16(pBuf);
+                pBuf += 16;
             }
             while (len--) {
-                adler += *buf++;
+                adler += *pBuf++;
                 sum2 += adler;
             }
             MOD(adler);
