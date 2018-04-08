@@ -74,11 +74,9 @@ X_INLINE uint32_t Thread::GetCurrentID(void)
 template<class T>
 X_INLINE void ThreadMember<T>::Create(const char* pName, uint32_t stackSize)
 {
-    handle_ = createThreadInternal(stackSize, (LPTHREAD_START_ROUTINE)ThreadFunctionDel_);
-
     name_.set(pName);
 
-    if (handle_ == NULL) {
+    if (!createThreadInternal(stackSize, (LPTHREAD_START_ROUTINE)ThreadFunctionDel_)) {
         lastError::Description Dsc;
         X_ERROR("Thread", "failed to create thread. Erorr: %s", lastError::ToString(Dsc));
     }
