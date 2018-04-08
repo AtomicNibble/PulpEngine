@@ -8,6 +8,8 @@
 X_NAMESPACE_BEGIN(core)
 
 typedef uint16_t XHalf;
+typedef Vec2<XHalf> Vec2Half;
+typedef Vec4<XHalf> Vec4Half;
 
 class XHalfCompressor
 {
@@ -42,32 +44,34 @@ class XHalfCompressor
     static int32_t const minD = minC - subC - 1;
 
 public:
-    static uint16_t compress(float value);
-    static float decompress(uint16_t value);
+    static XHalf compress(float v);
+    static Vec4Half compress(float x, float y, float z, float w);
+    static Vec4Half compress(Vec4f v);
+
+    static float decompress(XHalf v);
+    static Vec4f decompress(Vec4Half v);
 };
 
 struct XHalf2
 {
     XHalf2() = default;
     XHalf2(XHalf x, XHalf y) :
-        x(x),
-        y(y)
+        v(x, y)
     {
     }
 
-    XHalf2(float _x, float _y)
+    XHalf2(float x, float y)
     {
-        x = XHalfCompressor::compress(_x);
-        y = XHalfCompressor::compress(_y);
+        v.x = XHalfCompressor::compress(x);
+        v.y = XHalfCompressor::compress(y);
     }
     explicit XHalf2(const float* const __restrict pArray)
     {
-        x = XHalfCompressor::compress(pArray[0]);
-        y = XHalfCompressor::compress(pArray[1]);
+        v.x = XHalfCompressor::compress(pArray[0]);
+        v.y = XHalfCompressor::compress(pArray[1]);
     }
 
-    XHalf2& operator=(const XHalf2& rhs)
-        = default;
+    XHalf2& operator=(const XHalf2& rhs) = default;
 
     static XHalf2 compress(float x, float y)
     {
@@ -81,46 +85,35 @@ struct XHalf2
         return XHalf2(0_ui16, 0_ui16);
     }
 
-    XHalf x;
-    XHalf y;
+    Vec2Half v;
 };
 
 struct XHalf4
 {
     XHalf4() = default;
     XHalf4(XHalf x, XHalf y, XHalf z, XHalf w) :
-        x(x),
-        y(y),
-        z(z),
-        w(w)
+        v(x,y,z,w)
     {
     }
 
-    XHalf4(float _x, float _y, float _z, float _w)
+    XHalf4(float x, float y, float z, float w)
     {
-        x = XHalfCompressor::compress(_x);
-        y = XHalfCompressor::compress(_y);
-        z = XHalfCompressor::compress(_z);
-        w = XHalfCompressor::compress(_w);
+        v = XHalfCompressor::compress(x, y, z, w);
     }
     explicit XHalf4(const float* const __restrict pArray)
     {
-        x = XHalfCompressor::compress(pArray[0]);
-        y = XHalfCompressor::compress(pArray[1]);
-        z = XHalfCompressor::compress(pArray[2]);
-        w = XHalfCompressor::compress(pArray[3]);
+        v = XHalfCompressor::compress(pArray[0], pArray[1], pArray[2], pArray[3]);
     }
 
-    XHalf4& operator=(const XHalf4& rhs)
-        = default;
+    XHalf4& operator=(const XHalf4& rhs)  = default;
 
     Vec4f decompress(void)
     {
         return Vec4f(
-            XHalfCompressor::decompress(x),
-            XHalfCompressor::decompress(y),
-            XHalfCompressor::decompress(z),
-            XHalfCompressor::decompress(w));
+            XHalfCompressor::decompress(v.x),
+            XHalfCompressor::decompress(v.y),
+            XHalfCompressor::decompress(v.z),
+            XHalfCompressor::decompress(v.w));
     }
 
     static XHalf4 zero(void)
@@ -128,10 +121,7 @@ struct XHalf4
         return XHalf4(0_ui16, 0_ui16, 0_ui16, 0_ui16);
     }
 
-    XHalf x;
-    XHalf y;
-    XHalf z;
-    XHalf w;
+    Vec4Half v;
 };
 
 X_NAMESPACE_END

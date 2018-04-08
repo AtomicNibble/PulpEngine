@@ -683,10 +683,10 @@ namespace
 
 X_DISABLE_WARNING(4244) // ival = fval;
 
-uint16_t XHalfCompressor::compress(float val)
+XHalf XHalfCompressor::compress(float v)
 {
 #if 1
-    return half_from_float(union_cast<uint32_t, float>(val));
+    return half_from_float(union_cast<uint32_t, float>(v));
 #else
     Bits v, s;
     v.f = value;
@@ -705,10 +705,29 @@ uint16_t XHalfCompressor::compress(float val)
 #endif
 }
 
-float XHalfCompressor::decompress(uint16_t value)
+Vec4Half XHalfCompressor::compress(Vec4f v)
+{
+    return Vec4Half(
+        compress(v.x),
+        compress(v.y),
+        compress(v.z),
+        compress(v.w));
+}
+
+Vec4Half XHalfCompressor::compress(float x, float y, float z, float w)
+{
+    return Vec4Half(
+        compress(x),
+        compress(y),
+        compress(z),
+        compress(w));
+}
+
+
+float XHalfCompressor::decompress(XHalf v)
 {
 #if 1
-    return union_cast<float, uint32_t>(half_to_float(value));
+    return union_cast<float, uint32_t>(half_to_float(v));
 #else
     Bits v;
     v.ui = value;
@@ -726,6 +745,15 @@ float XHalfCompressor::decompress(uint16_t value)
     v.si |= sign;
     return v.f;
 #endif
+}
+
+Vec4f XHalfCompressor::decompress(Vec4Half v)
+{
+    return Vec4f(
+        decompress(v.x),
+        decompress(v.y),
+        decompress(v.z),
+        decompress(v.w));
 }
 
 X_ENABLE_WARNING(4244)
