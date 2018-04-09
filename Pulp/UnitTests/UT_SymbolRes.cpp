@@ -9,8 +9,11 @@ using namespace core;
 
 namespace
 {
+    int32_t line = -1;
+
     X_NO_INLINE CallStack Foo1(void)
     {
+        line = __LINE__ + 1;
         return CallStack(0);
     }
 } // namespace
@@ -18,11 +21,10 @@ namespace
 TEST(Debug, SymbolRes)
 {
 #if X_ENABLE_SYMBOL_RESOLUTION
-
     const CallStack& stack = Foo1();
     const SymbolInfo info = symbolResolution::ResolveSymbolsForAddress(stack.GetFrame(0));
 
-    EXPECT_EQ(18, info.GetLine());
+    EXPECT_EQ(line, info.GetLine());
 
 #endif
 }
