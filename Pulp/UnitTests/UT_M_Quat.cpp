@@ -17,6 +17,22 @@ X_USING_NAMESPACE;
 
 using namespace core;
 
+TEST(XQuat, AxisAngle)
+{
+    const Vec3f axis(-0.0381526f, -0.9628002f, 0.2675074f);
+    const float radians = 4.4348185f;
+
+    Quatf q(axis, radians);
+
+    EXPECT_NEAR_QUAT(Quatf(-0.6024865f, -0.0304507f, -0.7684388f, 0.2135054f), q, 0.00001f);
+
+    Vec3f axisOut;
+    float radiansOut;
+    q.getAxisAngle(&axisOut, &radiansOut);
+
+    EXPECT_NEAR_VEC3(axisOut, axis, 0.00001f);
+    EXPECT_NEAR(radians, radiansOut, 0.00001f);
+}
 TEST(XQuat, Equality)
 {
     Quatf a4(1.f, 2.f, 3.f, 4.f);
