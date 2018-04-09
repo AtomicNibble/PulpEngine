@@ -278,8 +278,8 @@ X_INLINE void Quat<T>::set(const Vec3<T>& from, const Vec3<T>& to)
 template<typename T>
 X_INLINE void Quat<T>::set(const Vec3<T>& axis, T radians)
 {
-    w = math<T>::cos(radians / 2);
-    v = axis.normalized() * math<T>::sin(radians / 2);
+    w = math<T>::cos(radians * static_cast<T>(0.5));
+    v = axis.normalized() * math<T>::sin(radians * static_cast<T>(0.5));
 }
 
 // assumes ZYX rotation order and radians
