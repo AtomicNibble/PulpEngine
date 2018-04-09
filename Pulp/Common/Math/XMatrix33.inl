@@ -561,16 +561,12 @@ Matrix33<T> Matrix33<T>::upperTriangular() const
 template<typename T>
 void Matrix33<T>::transpose()
 {
-    T t;
-    t = m01;
-    m01 = m10;
-    m10 = t;
-    t = m02;
-    m02 = m20;
-    m20 = t;
-    t = m12;
-    m12 = m21;
-    m21 = t;
+    // 0 1 1
+    // 1 0 1
+    // 1 1 0
+    core::Swap(m01, m10);
+    core::Swap(m02, m20);
+    core::Swap(m12, m21);
 }
 
 template<typename T>

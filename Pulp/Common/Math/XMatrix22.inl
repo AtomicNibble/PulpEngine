@@ -437,10 +437,9 @@ Matrix22<T> Matrix22<T>::upperTriangular() const
 template<typename T>
 void Matrix22<T>::transpose()
 {
-    T t;
-    t = m01;
-    m01 = m10;
-    m10 = t;
+    // 0 1
+    // 1 0
+    core::Swap(m01, m10);
 }
 
 template<typename T>
