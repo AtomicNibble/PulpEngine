@@ -8,13 +8,6 @@ template<typename T>
 X_INLINE Matrix34<T>::Matrix34()
 {
     setToIdentity();
-
-    // I think when using the class I would assume defualt construction is
-    // identity.
-    // I also set to identity for Mat22,33,44
-#if X_DEBUG == 1 && 0
-    memset(m, 0xff, MEM_LEN);
-#endif
 }
 
 template<typename T>
@@ -181,7 +174,7 @@ X_INLINE Matrix34<T>::Matrix34(const Quat<T>& q)
     *this = q.toMatrix33();
 }
 
-// asign me you melon
+
 template<typename T>
 X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix34<T>& rhs)
 {
@@ -217,6 +210,19 @@ X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix22<T>& rhs)
 }
 
 template<typename T>
+Matrix34<T>::operator T*()
+{
+    return (T*)m;
+}
+
+template<typename T>
+Matrix34<T>::operator const T*() const
+{
+    return (const T*)m;
+}
+
+
+template<typename T>
 X_INLINE bool Matrix34<T>::equalCompare(const Matrix34<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
@@ -225,6 +231,18 @@ X_INLINE bool Matrix34<T>::equalCompare(const Matrix34<T>& rhs, T epsilon) const
         }
     }
     return true;
+}
+
+template<typename T>
+X_INLINE bool Matrix34<T>::operator==(const Matrix34<T>& rhs) const
+{
+    return equalCompare(rhs, EPSILON);
+}
+
+template<typename T>
+X_INLINE bool Matrix34<T>::operator!=(const Matrix34<T>& rhs) const
+{
+    return !(*this == rhs);
 }
 
 template<typename T>
@@ -626,7 +644,7 @@ X_INLINE Matrix33<T> Matrix34<T>::subMatrix33(int row, int col) const
 template<typename T>
 X_INLINE void Matrix34<T>::setToNull()
 {
-    memset(m, 0, MEM_LEN);
+    std::memset(m, 0, MEM_LEN);
 }
 
 template<typename T>
@@ -731,17 +749,13 @@ X_INLINE Matrix34<T> Matrix34<T>::upperTriangular() const
 template<typename T>
 X_INLINE void Matrix34<T>::transpose()
 {
-    T t;
-    //	Vec3<T> v = getTranslate();
-    t = m01;
-    m01 = m10;
-    m10 = t; // m03 = -v.x*m00 - v.y*m01 - v.z*m20;
-    t = m02;
-    m02 = m20;
-    m20 = t; // m13 = -v.x*m10 - v.y*m11 - v.z*m21;
-    t = m12;
-    m12 = m21;
-    m21 = t; // m23 = -v.x*m20 - v.y*m21 - v.z*m22;
+    // 0 1 1
+    // 1 0 1
+    // 1 1 0
+    // 0 0 0
+    core::Swap(m01, m10);
+    core::Swap(m02, m20);
+    core::Swap(m12, m21);
 }
 
 template<typename T>
@@ -752,6 +766,12 @@ X_INLINE Matrix34<T> Matrix34<T>::transposed() const
         m[1], m[4], m[7],
         m[2], m[5], m[8],
         m[9], m[10], m[11]);
+}
+
+template<typename T>
+void Matrix34<T>::invert(T epsilon)
+{
+    *this = inverted(epsilon);
 }
 
 template<typename T>
@@ -811,6 +831,36 @@ X_INLINE Vec3<T> Matrix34<T>::postMultiply(const Vec3<T>& v) const
 }
 
 template<typename T>
+Vec3<T> Matrix34<T>::transformVec(const Vec3<T>& v) const
+{
+    return postMultiply(v);
+}
+
+// rotate by radians on axis (conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix34<T>::rotate(const VecT<T>& axis, T radians)
+{
+    *this *= Matrix34<T>::createRotation(axis, radians);
+}
+
+// rotate by eulerRadians - Euler angles in radians (conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix34<T>::rotate(const VecT<T>& eulerRadians)
+{
+    *this *= Matrix34<T>::createRotation(eulerRadians);
+}
+
+// rotate by matrix derives rotation matrix using from, to, worldUp	(conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix34<T>::rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp)
+{
+    *this *= Matrix34<T>::createRotation(from, to, worldUp);
+}
+
+template<typename T>
 Matrix34<T> Matrix34<T>::invertTransform() const
 {
     Matrix34<T> ret;
@@ -838,18 +888,25 @@ Matrix34<T> Matrix34<T>::invertTransform() const
 }
 
 template<typename T>
-const char* Matrix34<T>::toString(Description& desc) const
+Vec3<T> Matrix34<T>::getTranslate() const
 {
-    desc.setFmt("<%g,%g,%g,%g> - <%g,%g,%g,%g> - <%g,%g,%g,%g>",
-        m00, m01, m02, m03,
-        m10, m11, m12, m13,
-        m20, m21, m22, m23
-    );
-    return desc.c_str();
+    return Vec3<T>(m03, m13, m23);
 }
 
-// -------------------------------------------------------
+// sets the translation values in the last column
+template<typename T>
+void Matrix34<T>::setTranslate(const Vec3<T>& v)
+{
+    m03 = v.x;
+    m13 = v.y;
+    m23 = v.z;
+}
 
+template<typename T>
+void Matrix34<T>::setTranslate(const Vec4<T>& v)
+{
+    setTranslate(v.xyz());
+}
 
 
 template<typename T>
@@ -867,25 +924,69 @@ void Matrix34<T>::setRotation(const Matrix33<T>& rotation)
 }
 
 template<typename T>
-Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
+void Matrix34<T>::scale(T s)
 {
-    // The goal is to obtain a rotation matrix that takes
-    // "fromDir" to "toDir".  We do this in two steps and
-    // compose the resulting rotation matrices;
-    //    (a) rotate "fromDir" into the z-axis
-    //    (b) rotate the z-axis into "toDir"
-
-    // The from direction must be non-zero; but we allow zero to and up dirs.
-    if (from.lengthSquared() == 0) {
-        return Matrix34<T>();
-    }
-    else {
-        Matrix34<T> zAxis2FromDir = alignZAxisWithTarget(from, Vec3<T>::yAxis());
-        Matrix34<T> fromDir2zAxis = zAxis2FromDir.transposed();
-        Matrix34<T> zAxis2ToDir = alignZAxisWithTarget(to, worldUp);
-        return fromDir2zAxis * zAxis2ToDir;
-    }
+    Matrix44<T> op = createScale(s);
+    Matrix44<T> mat = *this;
+    *this = op * mat;
 }
+
+template<typename T>
+void Matrix34<T>::scale(const Vec2<T>& v)
+{
+    *this *= createScale(v);
+}
+
+template<typename T>
+void Matrix34<T>::scale(const Vec3<T>& v)
+{
+    *this *= createScale(v);
+}
+
+template<typename T>
+void Matrix34<T>::scale(const Vec4<T>& v)
+{
+    *this *= createScale(v);
+}
+
+template<typename T>
+const char* Matrix34<T>::toString(Description& desc) const
+{
+    desc.setFmt("<%g,%g,%g,%g> - <%g,%g,%g,%g> - <%g,%g,%g,%g>",
+        m00, m01, m02, m03,
+        m10, m11, m12, m13,
+        m20, m21, m22, m23
+    );
+    return desc.c_str();
+}
+
+
+// -------------------------------------------------------
+
+template<typename T>
+Matrix34<T> Matrix34<T>::identity()
+{
+    return Matrix34(
+        1, 0, 0,
+        0, 1, 0,
+        0, 0, 1,
+        0, 0, 0);
+}
+
+// returns 1 filled matrix
+template<typename T>
+Matrix34<T> Matrix34<T>::one()
+{
+    return Matrix34((T)1);
+}
+
+// returns 0 filled matrix
+template<typename T>
+Matrix34<T> Matrix34<T>::zero()
+{
+    return Matrix34((T)0);
+}
+
 
 template<typename T>
 Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& axis, T angle)
@@ -914,6 +1015,28 @@ Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& axis, T angle)
 
     return ret;
 }
+
+template<typename T>
+Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
+{
+    // The goal is to obtain a rotation matrix that takes
+    // "fromDir" to "toDir".  We do this in two steps and
+    // compose the resulting rotation matrices;
+    //    (a) rotate "fromDir" into the z-axis
+    //    (b) rotate the z-axis into "toDir"
+
+    // The from direction must be non-zero; but we allow zero to and up dirs.
+    if (from.lengthSquared() == 0) {
+        return Matrix34<T>();
+    }
+    else {
+        Matrix34<T> zAxis2FromDir = alignZAxisWithTarget(from, Vec3<T>::yAxis());
+        Matrix34<T> fromDir2zAxis = zAxis2FromDir.transposed();
+        Matrix34<T> zAxis2ToDir = alignZAxisWithTarget(to, worldUp);
+        return fromDir2zAxis * zAxis2ToDir;
+    }
+}
+
 
 template<typename T>
 Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& eulerRadians)
@@ -1023,6 +1146,12 @@ X_INLINE Matrix34<T> Matrix34<T>::createTranslation(const Vec3<T>& v)
 
     ret.setTranslate(v);
     return ret;
+}
+
+template<typename T>
+Matrix34<T> Matrix34<T>::createTranslation(const Vec4<T>& v)
+{
+    return createTranslation(v.xyz());
 }
 
 template<typename T>

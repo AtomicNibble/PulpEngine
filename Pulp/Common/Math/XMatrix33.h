@@ -40,15 +40,17 @@ public:
 
     union
     {
-        T m[9];
+        T m[DIM_SQ]; // block of cols.
         struct
         {
             // This looks like it's transposed from the above, but it's really not.
             // It just has to be written this way so it follows the right ordering
             // in the memory layout as well as being mathematically correct.
-            T m00, m10, m20;
-            T m01, m11, m21;
-            T m02, m12, m22;
+
+            // m[row][col]
+            T m00, m10, m20; // Col 0
+            T m01, m11, m21; // Col 1
+            T m02, m12, m22; // Col 2
         };
         // [Cols][Rows]
         T mcols[3][3];
@@ -75,15 +77,6 @@ public:
     Matrix33(const Matrix33<T>& src);
     explicit Matrix33(const Matrix34<T>& src);
 
-    operator T*()
-    {
-        return (T*)m;
-    }
-    operator const T*() const
-    {
-        return (const T*)m;
-    }
-
     Matrix33<T>& operator=(const Matrix33<T>& rhs);
     Matrix33<T>& operator=(T rhs);
 
@@ -93,15 +86,12 @@ public:
     // remaining columns and rows will be filled with identity values
     Matrix33<T>& operator=(const Matrix22<T>& rhs);
 
+    operator T*();
+    operator const T*() const;
+
     bool equalCompare(const Matrix33<T>& rhs, T epsilon) const;
-    bool operator==(const Matrix33<T>& rhs) const
-    {
-        return equalCompare(rhs, EPSILON);
-    }
-    bool operator!=(const Matrix33<T>& rhs) const
-    {
-        return !(*this == rhs);
-    }
+    bool operator==(const Matrix33<T>& rhs) const;
+    bool operator!=(const Matrix33<T>& rhs) const;
 
     Matrix33<T>& operator*=(const Matrix33<T>& rhs);
     Matrix33<T>& operator+=(const Matrix33<T>& rhs);
@@ -162,14 +152,8 @@ public:
     void transpose();
     Matrix33<T> transposed() const;
 
-    void invert(T epsilon = EPSILON)
-    {
-        *this = inverted(epsilon);
-    }
-    Matrix33<T> inverse(T epsilon = EPSILON) const
-    {
-        return inverted(epsilon);
-    }
+    void invert(T epsilon = EPSILON);
+    Matrix33<T> inverse(T epsilon = EPSILON) const;
     Matrix33<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
@@ -179,29 +163,17 @@ public:
     Vec3<T> postMultiply(const Vec3<T>& v) const;
 
     // post-multiplies column vector [rhs.x rhs.y rhs.z]
-    Vec3<T> transformVec(const Vec3<T>& v) const
-    {
-        return postMultiply(v);
-    }
+    Vec3<T> transformVec(const Vec3<T>& v) const;
 
     // rotate by radians on axis (conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& axis, T radians)
-    {
-        *this *= Matrix33<T>::createRotation(axis, radians);
-    }
+    void rotate(const VecT<T>& axis, T radians);
     // rotate by eulerRadians - Euler angles in radians (conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& eulerRadians)
-    {
-        *this *= Matrix33<T>::createRotation(eulerRadians);
-    }
+    void rotate(const VecT<T>& eulerRadians);
     // rotate by matrix derives rotation matrix using from, to, worldUp	(conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp)
-    {
-        *this *= Matrix33<T>::createRotation(from, to, worldUp);
-    }
+    void rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp);
 
     // transposes rotation sub-matrix and inverts translation
     Matrix33<T> invertTransform() const;
@@ -210,20 +182,11 @@ public:
 
 
     // returns an identity matrix
-    static Matrix33<T> identity()
-    {
-        return Matrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
-    }
+    static Matrix33<T> identity();
     // returns 1 filled matrix
-    static Matrix33<T> one()
-    {
-        return Matrix33((T)1);
-    }
+    static Matrix33<T> one();
     // returns 0 filled matrix
-    static Matrix33<T> zero()
-    {
-        return Matrix33((T)0);
-    }
+    static Matrix33<T> zero();
 
     // creates rotation matrix
     static Matrix33<T> createRotation(const Vec3<T>& axis, T radians);

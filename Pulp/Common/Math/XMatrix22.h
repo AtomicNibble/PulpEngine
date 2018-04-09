@@ -35,18 +35,16 @@ public:
     X_PUSH_WARNING_LEVEL(3)
     union
     {
-        T m[4]; // block of cols.
+        T m[DIM_SQ]; // block of cols.
         struct
         {
             // This looks like it's transposed from the above, but it's really not.
             // It just has to be written this way so it follows the right ordering
             // in the memory layout as well as being mathematically correct.
 
-            // The motation is m[row][col]
-            // m10 - row 1 col 0 
-            // m01 - row 0 col 1
-            T m00, m10;
-            T m01, m11;
+            // The notation is m[row][col]
+            T m00, m10; // col 0
+            T m01, m11; // col 1
         };
 
         // [Cols][Rows]

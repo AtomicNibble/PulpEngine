@@ -49,12 +49,14 @@ public:
 
     union
     {
-        T m[16];
+        T m[DIM_SQ]; // block of cols.
         struct
         {
             // This looks like it's transposed from the above, but it's really not.
             // It just has to be written this way so it follows the right ordering
             // in the memory layout as well as being mathematically correct.
+
+            // m[row][col]
             T m00, m10, m20, m30; // col 0
             T m01, m11, m21, m31; // col 1
             T m02, m12, m22, m32; // col 2
@@ -88,14 +90,6 @@ public:
     explicit Matrix44(const Matrix34<T>& src);
     Matrix44(const Matrix44<T>& src);
 
-    operator T*()
-    {
-        return (T*)m;
-    }
-    operator const T*() const
-    {
-        return (const T*)m;
-    }
 
     Matrix44<T>& operator=(const Matrix44<T>& rhs);
     Matrix44<T>& operator=(T rhs);
@@ -108,15 +102,12 @@ public:
     Matrix44<T>& operator=(const MatrixAffine2<T>& rhs);
     Matrix44<T>& operator=(const Matrix33<T>& rhs);
 
+    operator T*();
+    operator const T*() const;
+
     bool equalCompare(const Matrix44<T>& rhs, T epsilon) const;
-    bool operator==(const Matrix44<T>& rhs) const
-    {
-        return equalCompare(rhs, EPSILON);
-    }
-    bool operator!=(const Matrix44<T>& rhs) const
-    {
-        return !(*this == rhs);
-    }
+    bool operator==(const Matrix44<T>& rhs) const;
+    bool operator!=(const Matrix44<T>& rhs) const;
 
     Matrix44<T>& operator*=(const Matrix44<T>& rhs);
     Matrix44<T>& operator+=(const Matrix44<T>& rhs);
@@ -182,10 +173,7 @@ public:
     void transpose();
     Matrix44<T> transposed() const;
 
-    void invert(T epsilon = EPSILON)
-    {
-        *this = inverted(epsilon);
-    }
+    void invert(T epsilon = EPSILON);
     Matrix44<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
@@ -197,20 +185,12 @@ public:
     Vec4<T> postMultiply(const Vec4<T>& v) const;
 
     //! Computes inverse; assumes the matrix is affine, i.e. the bottom row is [0 0 0 1]
-    void affineInvert()
-    {
-        *this = affineInverted();
-    }
+    void affineInvert();
     Matrix44<T> affineInverted() const;
 
     //! Computes inverse; assumes the matrix is orthonormal
     void orthonormalInvert();
-    Matrix44<T> orthonormalInverted() const
-    {
-        Matrix44<T> result(*this);
-        result.orthonormalInvert();
-        return result;
-    }
+    Matrix44<T> orthonormalInverted() const;
 
     // post-multiplies column vector [rhs.x rhs.y rhs.z 1] and divides by w - same as operator*( const Vec3<T>& )
     Vec3<T> transformPoint(const Vec3<T>& rhs) const;
@@ -220,137 +200,69 @@ public:
 
     // post-multiplies column vector [rhs.x rhs.y rhs.z 0]
     Vec3<T> transformVec(const Vec3<T>& rhs) const;
-    Vec4<T> transformVec(const Vec4<T>& rhs) const
-    {
-        return transformVec(rhs.xyz());
-    }
+    Vec4<T> transformVec(const Vec4<T>& rhs) const;
 
     // returns the translation values from the last column
-    Vec4<T> getTranslate() const
-    {
-        return Vec4<T>(m03, m13, m23, m33);
-    }
+    Vec4<T> getTranslate() const;
+
     // sets the translation values in the last column
-    void setTranslate(const Vec3<T>& v)
-    {
-        m03 = v.x;
-        m13 = v.y;
-        m23 = v.z;
-    }
-    void setTranslate(const Vec4<T>& v)
-    {
-        setTranslate(v.xyz());
-    }
+    void setTranslate(const Vec3<T>& v);
+    void setTranslate(const Vec4<T>& v);
 
     // multiplies the current matrix by a translation matrix derived from tr
-    void translate(const Vec3<T>& tr)
-    {
-        *this *= createTranslation(tr);
-    }
-    void translate(const Vec4<T>& tr)
-    {
-        *this *= createTranslation(tr);
-    }
+    void translate(const Vec3<T>& tr);
+    void translate(const Vec4<T>& tr);
 
     // multiplies the current matrix by the rotation matrix derived using axis and radians
-    void rotate(const Vec3<T>& axis, T radians)
-    {
-        *this *= createRotation(axis, radians);
-    }
-    void rotate(const Vec4<T>& axis, T radians)
-    {
-        *this *= createRotation(axis, radians);
-    }
+    void rotate(const Vec3<T>& axis, T radians);
+    void rotate(const Vec4<T>& axis, T radians);
+
     // multiplies the current matrix by the rotation matrix derived using eulerRadians
-    void rotate(const Vec3<T>& eulerRadians)
-    {
-        *this *= createRotation(eulerRadians);
-    }
-    void rotate(const Vec4<T>& eulerRadians)
-    {
-        *this *= createRotation(eulerRadians);
-    }
+    void rotate(const Vec3<T>& eulerRadians);
+    void rotate(const Vec4<T>& eulerRadians);
+
     // multiplies the current matrix by the rotation matrix derived using from, to, worldUp
-    void rotate(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
-    {
-        *this *= createRotation(from, to, worldUp);
-    }
-    void rotate(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp)
-    {
-        *this *= createRotation(from, to, worldUp);
-    }
+    void rotate(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp);
+    void rotate(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp);
 
     // multiplies the current matrix by the scale matrix derived from supplies parameters
-    void scale(T s)
-    {
-        Matrix44 op = createScale(s);
-        Matrix44 mat = *this;
-        *this = op * mat;
-    }
-    void scale(const Vec2<T>& v)
-    {
-        *this *= createScale(v);
-    }
-    void scale(const Vec3<T>& v)
-    {
-        *this *= createScale(v);
-    }
-    void scale(const Vec4<T>& v)
-    {
-        *this *= createScale(v);
-    }
+    void scale(T s);
+    void scale(const Vec2<T>& v);
+    void scale(const Vec3<T>& v);
+    void scale(const Vec4<T>& v);
 
     // transposes rotation sub-matrix and inverts translation
     Matrix44<T> invertTransform() const;
 
     const char* toString(Description& desc) const;
 
+    // -----------------------------------------------------
+
     // returns an identity matrix
-    static Matrix44<T> identity()
-    {
-        return Matrix44(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
-    }
+    static Matrix44<T> identity();
     // returns 1 filled matrix
-    static Matrix44<T> one()
-    {
-        return Matrix44((T)1);
-    }
+    static Matrix44<T> one();
     // returns 0 filled matrix
-    static Matrix44<T> zero()
-    {
-        return Matrix44((T)0);
-    }
+    static Matrix44<T> zero();
 
     // creates translation matrix
     static Matrix44<T> createTranslation(const Vec3<T>& v, T w = 1);
-    static Matrix44<T> createTranslation(const Vec4<T>& v)
-    {
-        return createTranslation(v.xyz(), v.w);
-    }
+    static Matrix44<T> createTranslation(const Vec4<T>& v);
 
     // creates rotation matrix
     static Matrix44<T> createRotation(const Vec3<T>& axis, T radians);
-    static Matrix44<T> createRotation(const Vec4<T>& axis, T radians)
-    {
-        return createRotation(axis.xyz(), radians);
-    }
+    static Matrix44<T> createRotation(const Vec4<T>& axis, T radians);
+    
     static Matrix44<T> createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp);
-    static Matrix44<T> createRotation(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp)
-    {
-        return createRotation(from.xyz(), to.xyz(), worldUp.xyz());
-    }
+    static Matrix44<T> createRotation(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp);
+    
     // equivalent to rotate( zAxis, z ), then rotate( yAxis, y ) then rotate( xAxis, x )
     static Matrix44<T> createRotation(const Vec3<T>& eulerRadians);
-    static Matrix44<T> createRotation(const Vec4<T>& eulerRadians)
-    {
-        return createRotation(eulerRadians.xyz());
-    }
+    static Matrix44<T> createRotation(const Vec4<T>& eulerRadians);
+    
     // creates rotation matrix from ortho normal basis (u, v, n)
     static Matrix44<T> createRotationOnb(const Vec3<T>& u, const Vec3<T>& v, const Vec3<T>& w);
-    static Matrix44<T> createRotationOnb(const Vec4<T>& u, const Vec4<T>& v, const Vec4<T>& w)
-    {
-        return createRotationOnb(u.xyz(), v.xyz(), w.xyz());
-    }
+    static Matrix44<T> createRotationOnb(const Vec4<T>& u, const Vec4<T>& v, const Vec4<T>& w);
 
     // creates scale matrix
     static Matrix44<T> createScale(T s);
@@ -360,10 +272,7 @@ public:
 
     // creates a rotation matrix with z-axis aligned to targetDir
     static Matrix44<T> alignZAxisWithTarget(Vec3<T> targetDir, Vec3<T> upDir);
-    static Matrix44<T> alignZAxisWithTarget(Vec4<T> targetDir, Vec4<T> upDir)
-    {
-        return alignZAxisWithTarget(targetDir.xyz(), upDir.xyz());
-    }
+    static Matrix44<T> alignZAxisWithTarget(Vec4<T> targetDir, Vec4<T> upDir);
 };
 
 typedef Matrix44<float32_t> Matrix44f;

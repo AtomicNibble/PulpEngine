@@ -231,6 +231,18 @@ Matrix44<T>& Matrix44<T>::operator=(const Matrix33<T>& rhs)
 }
 
 template<typename T>
+Matrix44<T>::operator T*()
+{
+    return (T*)m;
+}
+
+template<typename T>
+Matrix44<T>::operator const T*() const
+{
+    return (const T*)m;
+}
+
+template<typename T>
 bool Matrix44<T>::equalCompare(const Matrix44<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
@@ -239,6 +251,18 @@ bool Matrix44<T>::equalCompare(const Matrix44<T>& rhs, T epsilon) const
         }
     }
     return true;
+}
+
+template<typename T>
+bool Matrix44<T>::operator==(const Matrix44<T>& rhs) const
+{
+    return equalCompare(rhs, EPSILON);
+}
+
+template<typename T>
+bool Matrix44<T>::operator!=(const Matrix44<T>& rhs) const
+{
+    return !(*this == rhs);
 }
 
 template<typename T>
@@ -773,25 +797,22 @@ Matrix44<T> Matrix44<T>::upperTriangular() const
 template<typename T>
 void Matrix44<T>::transpose()
 {
-    T t;
-    t = m01;
-    m01 = m10;
-    m10 = t;
-    t = m02;
-    m02 = m20;
-    m20 = t;
-    t = m03;
-    m03 = m30;
-    m30 = t;
-    t = m12;
-    m12 = m21;
-    m21 = t;
-    t = m13;
-    m13 = m31;
-    m31 = t;
-    t = m23;
-    m23 = m32;
-    m32 = t;
+    // 0 1 1 0
+    // 1 0 1 0
+    // 1 1 0 0
+    // 0 0 0 0
+    core::Swap(m01, m10);
+    core::Swap(m02, m20);
+    core::Swap(m12, m21);
+
+    // trans
+    // 0 0 0 x
+    // 0 0 0 x
+    // 0 0 0 x
+    // x x x 0
+    core::Swap(m03, m30);
+    core::Swap(m13, m31);
+    core::Swap(m23, m32);
 }
 
 template<typename T>
@@ -802,6 +823,12 @@ Matrix44<T> Matrix44<T>::transposed() const
         m[1], m[5], m[9], m[13],
         m[2], m[6], m[10], m[14],
         m[3], m[7], m[11], m[15]);
+}
+
+template<typename T>
+void Matrix44<T>::invert(T epsilon)
+{
+    *this = inverted(epsilon);
 }
 
 template<typename T>
@@ -903,6 +930,12 @@ Vec4<T> Matrix44<T>::postMultiply(const Vec4<T>& v) const
 }
 
 template<typename T>
+void Matrix44<T>::affineInvert()
+{
+    *this = affineInverted();
+}
+
+template<typename T>
 Matrix44<T> Matrix44<T>::affineInverted() const
 {
     Matrix44<T> ret;
@@ -938,6 +971,31 @@ Matrix44<T> Matrix44<T>::affineInverted() const
     return ret;
 }
 
+
+template<typename T> 
+void Matrix44<T>::orthonormalInvert()
+{
+    // transpose upper 3x3 (R->R^t)
+    core::Swap(at(0, 1), at(1, 0));
+    core::Swap(at(0, 2), at(2, 0));
+    core::Swap(at(1, 2), at(2, 1));
+
+    // replace translation (T) with R^t(-T).
+    Vec3<T> newT(transformVec(Vec3<T>(-at(0, 3), -at(1, 3), -at(2, 3))));
+    at(0, 3) = newT.x;
+    at(1, 3) = newT.y;
+    at(2, 3) = newT.z;
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::orthonormalInverted() const
+{
+    Matrix44<T> result(*this);
+    result.orthonormalInvert();
+    return result;
+}
+
+
 template<typename T>
 Vec3<T> Matrix44<T>::transformPoint(const Vec3<T>& rhs) const
 {
@@ -969,32 +1027,111 @@ Vec3<T> Matrix44<T>::transformVec(const Vec3<T>& rhs) const
     return Vec3<T>(x, y, z);
 }
 
-template<typename T> // thanks to @juj/MathGeoLib for fix
-void Matrix44<T>::orthonormalInvert()
+template<typename T>
+Vec4<T> Matrix44<T>::transformVec(const Vec4<T>& rhs) const
 {
-    // transpose upper 3x3 (R->R^t)
-    core::Swap(at(0, 1), at(1, 0));
-    core::Swap(at(0, 2), at(2, 0));
-    core::Swap(at(1, 2), at(2, 1));
-
-    // replace translation (T) with R^t(-T).
-    Vec3<T> newT(transformVec(Vec3<T>(-at(0, 3), -at(1, 3), -at(2, 3))));
-    at(0, 3) = newT.x;
-    at(1, 3) = newT.y;
-    at(2, 3) = newT.z;
+    return transformVec(rhs.xyz());
 }
 
 template<typename T>
-Matrix44<T> Matrix44<T>::createTranslation(const Vec3<T>& v, T w)
+Vec4<T> Matrix44<T>::getTranslate() const
 {
-    Matrix44 ret;
-    ret.m[12] = v.x;
-    ret.m[13] = v.y;
-    ret.m[14] = v.z;
-    ret.m[15] = w;
-
-    return ret;
+    return Vec4<T>(m03, m13, m23, m33);
 }
+
+template<typename T>
+void Matrix44<T>::setTranslate(const Vec3<T>& v)
+{
+    m03 = v.x;
+    m13 = v.y;
+    m23 = v.z;
+}
+
+template<typename T>
+void Matrix44<T>::setTranslate(const Vec4<T>& v)
+{
+    setTranslate(v.xyz());
+}
+
+// multiplies the current matrix by a translation matrix derived from tr
+template<typename T>
+void Matrix44<T>::translate(const Vec3<T>& tr)
+{
+    *this *= createTranslation(tr);
+}
+
+template<typename T>
+void Matrix44<T>::translate(const Vec4<T>& tr)
+{
+    *this *= createTranslation(tr);
+}
+
+// multiplies the current matrix by the rotation matrix derived using axis and radians
+template<typename T>
+void Matrix44<T>::rotate(const Vec3<T>& axis, T radians)
+{
+    *this *= createRotation(axis, radians);
+}
+
+template<typename T>
+void Matrix44<T>::rotate(const Vec4<T>& axis, T radians)
+{
+    *this *= createRotation(axis, radians);
+}
+
+// multiplies the current matrix by the rotation matrix derived using eulerRadians
+template<typename T>
+void Matrix44<T>::rotate(const Vec3<T>& eulerRadians)
+{
+    *this *= createRotation(eulerRadians);
+}
+
+template<typename T>
+void Matrix44<T>::rotate(const Vec4<T>& eulerRadians)
+{
+    *this *= createRotation(eulerRadians);
+}
+
+// multiplies the current matrix by the rotation matrix derived using from, to, worldUp
+template<typename T>
+void Matrix44<T>::rotate(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
+{
+    *this *= createRotation(from, to, worldUp);
+}
+
+template<typename T>
+void Matrix44<T>::rotate(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp)
+{
+    *this *= createRotation(from, to, worldUp);
+}
+
+// multiplies the current matrix by the scale matrix derived from supplies parameters
+template<typename T>
+void Matrix44<T>::scale(T s)
+{
+    Matrix44 op = createScale(s);
+    Matrix44 mat = *this;
+    *this = op * mat;
+}
+
+template<typename T>
+void Matrix44<T>::scale(const Vec2<T>& v)
+{
+    *this *= createScale(v);
+}
+
+template<typename T>
+void Matrix44<T>::scale(const Vec3<T>& v)
+{
+    *this *= createScale(v);
+}
+
+template<typename T>
+void Matrix44<T>::scale(const Vec4<T>& v)
+{
+    *this *= createScale(v);
+}
+
 
 template<typename T>
 const char* Matrix44<T>::toString(Description& desc) const
@@ -1010,6 +1147,46 @@ const char* Matrix44<T>::toString(Description& desc) const
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 // Matrix44
+
+// returns an identity matrix
+template<typename T>
+Matrix44<T> Matrix44<T>::identity()
+{
+    return Matrix44(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+}
+
+// returns 1 filled matrix
+template<typename T>
+Matrix44<T> Matrix44<T>::one()
+{
+    return Matrix44((T)1);
+}
+
+// returns 0 filled matrix
+template<typename T>
+Matrix44<T> Matrix44<T>::zero()
+{
+    return Matrix44((T)0);
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::createTranslation(const Vec3<T>& v, T w)
+{
+    Matrix44 ret;
+    ret.m[12] = v.x;
+    ret.m[13] = v.y;
+    ret.m[14] = v.z;
+    ret.m[15] = w;
+
+    return ret;
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::createTranslation(const Vec4<T>& v)
+{
+    return createTranslation(v.xyz(), v.w);
+}
+
 template<typename T>
 Matrix44<T> Matrix44<T>::createRotation(const Vec3<T>& from, const Vec3<T>& to, const Vec3<T>& worldUp)
 {
@@ -1029,6 +1206,18 @@ Matrix44<T> Matrix44<T>::createRotation(const Vec3<T>& from, const Vec3<T>& to, 
         Matrix44<T> zAxis2ToDir = alignZAxisWithTarget(to, worldUp);
         return fromDir2zAxis * zAxis2ToDir;
     }
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::createRotation(const Vec4<T>& from, const Vec4<T>& to, const Vec4<T>& worldUp)
+{
+    return createRotation(from.xyz(), to.xyz(), worldUp.xyz());
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::createRotation(const Vec4<T>& axis, T radians)
+{
+    return createRotation(axis.xyz(), radians);
 }
 
 template<typename T>
@@ -1110,6 +1299,13 @@ Matrix44<T> Matrix44<T>::createRotation(const Vec3<T>& eulerRadians)
 }
 
 template<typename T>
+Matrix44<T> Matrix44<T>::createRotation(const Vec4<T>& eulerRadians)
+{
+    return createRotation(eulerRadians.xyz());
+}
+
+
+template<typename T>
 Matrix44<T> Matrix44<T>::createRotationOnb(const Vec3<T>& u, const Vec3<T>& v, const Vec3<T>& w)
 {
     return Matrix44<T>(
@@ -1118,6 +1314,13 @@ Matrix44<T> Matrix44<T>::createRotationOnb(const Vec3<T>& u, const Vec3<T>& v, c
         w.x, w.y, w.z, 0,
         0, 0, 0, 1);
 }
+
+template<typename T>
+Matrix44<T> Matrix44<T>::createRotationOnb(const Vec4<T>& u, const Vec4<T>& v, const Vec4<T>& w)
+{
+    return createRotationOnb(u.xyz(), v.xyz(), w.xyz());
+}
+
 
 template<typename T>
 Matrix44<T> Matrix44<T>::createScale(T s)
@@ -1171,20 +1374,23 @@ template<typename T>
 Matrix44<T> Matrix44<T>::alignZAxisWithTarget(Vec3<T> targetDir, Vec3<T> upDir)
 {
     // Ensure that the target direction is non-zero.
-    if (targetDir.lengthSquared() == 0)
+    if (targetDir.lengthSquared() == 0) {
         targetDir = Vec3<T>::zAxis();
+    }
 
     // Ensure that the up direction is non-zero.
-    if (upDir.lengthSquared() == 0)
+    if (upDir.lengthSquared() == 0) {
         upDir = Vec3<T>::yAxis();
+    }
 
     // Check for degeneracies.  If the upDir and targetDir are parallel
     // or opposite, then compute a new, arbitrary up direction that is
     // not parallel or opposite to the targetDir.
     if (upDir.cross(targetDir).lengthSquared() == 0) {
         upDir = targetDir.cross(Vec3<T>::xAxis());
-        if (upDir.lengthSquared() == 0)
+        if (upDir.lengthSquared() == 0) {
             upDir = targetDir.cross(Vec3<T>::zAxis());
+        }
     }
 
     // Compute the x-, y-, and z-axis vectors of the new coordinate system.
@@ -1205,4 +1411,10 @@ Matrix44<T> Matrix44<T>::alignZAxisWithTarget(Vec3<T> targetDir, Vec3<T> upDir)
         0, 0, 0, 1);
 
     return mat;
+}
+
+template<typename T>
+Matrix44<T> Matrix44<T>::alignZAxisWithTarget(Vec4<T> targetDir, Vec4<T> upDir)
+{
+    return alignZAxisWithTarget(targetDir.xyz(), upDir.xyz());
 }

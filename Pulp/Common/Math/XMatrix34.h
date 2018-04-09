@@ -23,22 +23,20 @@ public:
     X_PUSH_WARNING_LEVEL(3)
     union
     {
-        T m[12];
+        T m[12]; // block of cols.
         struct
         {
-            // needs changing since we are 4 wide.
-            T m00, m10, m20;
-            T m01, m11, m21;
-            T m02, m12, m22;
-            T m03, m13, m23;
+            // m[row][col]
+            T m00, m10, m20; // col 0
+            T m01, m11, m21; // col 1
+            T m02, m12, m22; // col 2
+            T m03, m13, m23; // col 3
         };
         // [Cols][Rows]
         T mcols[4][3];
     };
     X_POP_WARNING_LEVEL
 
-    // i think i must hate myself.
-    // having to write UT for all these is fun fun xD
     Matrix34();
     explicit Matrix34(T s);
     Matrix34(const T* dt, bool srcIsRowMajor = false);
@@ -57,20 +55,16 @@ public:
     Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor = false);
     explicit Matrix34(const Quat<T>& q);
 
-    // asign me you melon
     X_INLINE Matrix34& operator=(const Matrix34& rhs);
     X_INLINE Matrix34<T>& operator=(const Matrix33<T>& rhs);
     X_INLINE Matrix34<T>& operator=(const Matrix22<T>& rhs);
 
+    operator T*();
+    operator const T*() const;
+
     X_INLINE bool equalCompare(const Matrix34<T>& rhs, T epsilon) const;
-    X_INLINE bool operator==(const Matrix34<T>& rhs) const
-    {
-        return equalCompare(rhs, EPSILON);
-    }
-    X_INLINE bool operator!=(const Matrix34<T>& rhs) const
-    {
-        return !(*this == rhs);
-    }
+    X_INLINE bool operator==(const Matrix34<T>& rhs) const;
+    X_INLINE bool operator!=(const Matrix34<T>& rhs) const;
 
     X_INLINE Matrix34<T>& operator*=(const Matrix34<T>& rhs);
     X_INLINE Matrix34<T>& operator+=(const Matrix34<T>& rhs);
@@ -135,10 +129,7 @@ public:
     void transpose();
     Matrix34<T> transposed() const;
 
-    void invert(T epsilon = EPSILON)
-    {
-        *this = inverted(epsilon);
-    }
+    void invert(T epsilon = EPSILON);
     Matrix34<T> inverted(T epsilon = EPSILON) const;
 
     // pre-multiplies row vector v - no divide by w
@@ -148,74 +139,46 @@ public:
     Vec3<T> postMultiply(const Vec3<T>& v) const;
 
     // post-multiplies column vector [rhs.x rhs.y rhs.z]
-    Vec3<T> transformVec(const Vec3<T>& v) const
-    {
-        return postMultiply(v);
-    }
+    Vec3<T> transformVec(const Vec3<T>& v) const;
 
     // rotate by radians on axis (conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& axis, T radians)
-    {
-        *this *= Matrix34<T>::createRotation(axis, radians);
-    }
+    void rotate(const VecT<T>& axis, T radians);
     // rotate by eulerRadians - Euler angles in radians (conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& eulerRadians)
-    {
-        *this *= Matrix34<T>::createRotation(eulerRadians);
-    }
+    void rotate(const VecT<T>& eulerRadians);
     // rotate by matrix derives rotation matrix using from, to, worldUp	(conceptually, rotate is before 'this')
     template<template<typename> class VecT>
-    void rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp)
-    {
-        *this *= Matrix34<T>::createRotation(from, to, worldUp);
-    }
+    void rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp);
 
     // transposes rotation sub-matrix and inverts translation
     Matrix34<T> invertTransform() const;
 
     // returns the translation values from the last column
-    Vec3<T> getTranslate() const
-    {
-        return Vec3<T>(m03, m13, m23);
-    }
+    Vec3<T> getTranslate() const;
+
     // sets the translation values in the last column
-    void setTranslate(const Vec3<T>& v)
-    {
-        m03 = v.x;
-        m13 = v.y;
-        m23 = v.z;
-    }
-    void setTranslate(const Vec4<T>& v)
-    {
-        setTranslate(v.xyz());
-    }
+    void setTranslate(const Vec3<T>& v);
+    void setTranslate(const Vec4<T>& v);
 
     void setRotation(const Matrix33<T>& rotation);
 
     // multiplies the current matrix by the scale matrix derived from supplies parameters
-    void scale(T s)
-    {
-        Matrix44<T> op = createScale(s);
-        Matrix44<T> mat = *this;
-        *this = op * mat;
-    }
-    void scale(const Vec2<T>& v)
-    {
-        *this *= createScale(v);
-    }
-    void scale(const Vec3<T>& v)
-    {
-        *this *= createScale(v);
-    }
-    void scale(const Vec4<T>& v)
-    {
-        *this *= createScale(v);
-    }
+    void scale(T s);
+    void scale(const Vec2<T>& v);
+    void scale(const Vec3<T>& v);
+    void scale(const Vec4<T>& v);
 
     const char* toString(Description& desc) const;
 
+    // -------------------------------------------------------
+
+    // returns an identity matrix
+    static Matrix34<T> identity();
+    // returns 1 filled matrix
+    static Matrix34<T> one();
+    // returns 0 filled matrix
+    static Matrix34<T> zero();
 
     // creates rotation matrix
     static Matrix34<T> createRotation(const Vec3<T>& axis, T radians);
@@ -231,32 +194,10 @@ public:
 
     // creates translation matrix
     static Matrix34<T> createTranslation(const Vec3<T>& v);
-    static Matrix34<T> createTranslation(const Vec4<T>& v)
-    {
-        return createTranslation(v.xyz());
-    }
+    static Matrix34<T> createTranslation(const Vec4<T>& v);
 
     // creates a rotation matrix with z-axis aligned to targetDir
     static Matrix34<T> alignZAxisWithTarget(Vec3<T> targetDir, Vec3<T> upDir);
-
-    // returns an identity matrix
-    static Matrix34<T> identity()
-    {
-        return Matrix34(1, 0, 0,
-            0, 1, 0,
-            0, 0, 1,
-            0, 0, 0);
-    }
-    // returns 1 filled matrix
-    static Matrix34<T> one()
-    {
-        return Matrix34((T)1);
-    }
-    // returns 0 filled matrix
-    static Matrix34<T> zero()
-    {
-        return Matrix34((T)0);
-    }
 };
 
 typedef Matrix34<float32_t> Matrix34f;

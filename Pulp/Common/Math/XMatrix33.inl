@@ -118,6 +118,18 @@ Matrix33<T>& Matrix33<T>::operator=(const Matrix22<T>& rhs)
 }
 
 template<typename T>
+Matrix33<T>::operator T*()
+{
+    return (T*)m;
+}
+
+template<typename T>
+Matrix33<T>::operator const T*() const
+{
+    return (const T*)m;
+}
+
+template<typename T>
 bool Matrix33<T>::equalCompare(const Matrix33<T>& rhs, T epsilon) const
 {
     for (int i = 0; i < DIM_SQ; ++i) {
@@ -126,6 +138,18 @@ bool Matrix33<T>::equalCompare(const Matrix33<T>& rhs, T epsilon) const
         }
     }
     return true;
+}
+
+template<typename T>
+bool Matrix33<T>::operator==(const Matrix33<T>& rhs) const
+{
+    return equalCompare(rhs, EPSILON);
+}
+
+template<typename T>
+bool Matrix33<T>::operator!=(const Matrix33<T>& rhs) const
+{
+    return !(*this == rhs);
 }
 
 template<typename T>
@@ -559,6 +583,18 @@ Matrix33<T> Matrix33<T>::transposed() const
 }
 
 template<typename T>
+void Matrix33<T>::invert(T epsilon)
+{
+    *this = inverted(epsilon);
+}
+
+template<typename T>
+Matrix33<T> Matrix33<T>::inverse(T epsilon) const
+{
+    return inverted(epsilon);
+}
+
+template<typename T>
 Matrix33<T> Matrix33<T>::inverted(T epsilon) const
 {
     Matrix33<T> inv((T)0);
@@ -611,6 +647,36 @@ Vec3<T> Matrix33<T>::postMultiply(const Vec3<T>& v) const
 }
 
 template<typename T>
+Vec3<T> Matrix33<T>::transformVec(const Vec3<T>& v) const
+{
+    return postMultiply(v);
+}
+
+// rotate by radians on axis (conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix33<T>::rotate(const VecT<T>& axis, T radians)
+{
+    *this *= Matrix33<T>::createRotation(axis, radians);
+}
+
+// rotate by eulerRadians - Euler angles in radians (conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix33<T>::rotate(const VecT<T>& eulerRadians)
+{
+    *this *= Matrix33<T>::createRotation(eulerRadians);
+}
+
+// rotate by matrix derives rotation matrix using from, to, worldUp	(conceptually, rotate is before 'this')
+template<typename T>
+template<template<typename> class VecT>
+void Matrix33<T>::rotate(const VecT<T>& from, const VecT<T>& to, const VecT<T>& worldUp)
+{
+    *this *= Matrix33<T>::createRotation(from, to, worldUp);
+}
+
+template<typename T>
 Matrix33<T> Matrix33<T>::invertTransform() const
 {
     Matrix33<T> ret;
@@ -637,6 +703,24 @@ const char* Matrix33<T>::toString(Description& desc) const
 }
 
 // -------------------------------------------------------
+
+template<typename T>
+Matrix33<T> Matrix33<T>::identity()
+{
+    return Matrix33(1, 0, 0, 0, 1, 0, 0, 0, 1);
+}
+
+template<typename T>
+Matrix33<T> Matrix33<T>::one()
+{
+    return Matrix33((T)1);
+}
+
+template<typename T>
+Matrix33<T> Matrix33<T>::zero()
+{
+    return Matrix33((T)0);
+}
 
 
 template<typename T>
