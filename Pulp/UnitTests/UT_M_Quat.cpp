@@ -33,6 +33,43 @@ TEST(XQuat, AxisAngle)
     EXPECT_NEAR_VEC3(axisOut, axis, 0.00001f);
     EXPECT_NEAR(radians, radiansOut, 0.00001f);
 }
+
+TEST(XQuat, Matrix)
+{
+    const Quatf ident = Quatf::identity();
+    EXPECT_EQ(ident.toMatrix33(), Matrix33f::identity());
+
+    const Matrix33f m0(
+        1.0000000f, 0.0000000f, 0.0000000f,
+        0.0000000f, -0.4480736f, -0.8939967f,
+        0.0000000f, 0.8939967f, -0.4480736f, true
+    );
+
+    Quatf q0(m0);
+    EXPECT_NEAR_QUAT(Quatf(0.525321960f, 0.8509035f, 0.f, 0.f), q0, 0.00001f);
+    EXPECT_EQ(m0, q0.toMatrix33());
+
+    const Matrix33f m1(
+        -0.4480736f, -0.0000000f, 0.8939967f,
+        0.7992300f, -0.4480736f, 0.4005763f,
+        0.4005763f, 0.8939967f, 0.2007700f, true
+    );
+    
+    Quatf q1(m1);
+    EXPECT_NEAR_QUAT(Quatf(0.2759632f, 0.4469983f, 0.4469983f, 0.7240368f), q1, 0.00001f);
+    EXPECT_EQ(m1, q1.toMatrix33());
+
+    const Matrix33f m2(
+        -0.2353829f, 0.3812674f, 0.8939967f,
+        0.0385857f, -0.9154506f, 0.4005763f,
+        0.9711365f, 0.1287843f, 0.2007700f, true
+    );
+
+    Quatf q2(m2);
+    EXPECT_NEAR_QUAT(-Quatf(0.1117323f, -0.6081319f, -0.1725995f, -0.7667469f), q2, 0.00001f);
+    EXPECT_EQ(m2, q2.toMatrix33());
+
+}
 TEST(XQuat, Equality)
 {
     Quatf a4(1.f, 2.f, 3.f, 4.f);
