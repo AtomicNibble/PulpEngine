@@ -10,27 +10,6 @@
 #include "XMatrix34.h"
 #include "XMatrix44.h"
 
-template<typename T, typename Y>
-struct QUATCONV
-{
-    typedef typename T::TYPE F;
-    static F getW(const Y& v)
-    {
-        return static_cast<F>(v.w);
-    }
-    static F getX(const Y& v)
-    {
-        return static_cast<F>(v.x);
-    }
-    static F getY(const Y& v)
-    {
-        return static_cast<F>(v.y);
-    }
-    static F getZ(const Y& v)
-    {
-        return static_cast<F>(v.z);
-    }
-};
 
 template<typename T>
 class Quat
@@ -39,64 +18,26 @@ public:
     typedef T TYPE;
     typedef T value_type;
 
+    static const size_t DIM = 4;
+    static const size_t MEM_LEN = sizeof(T) * DIM;
+
     Vec3<T> v; // axisOfRotation.normalized() * sin( angleOfRotation / 2 )
     T w;       // cos( angleOfRotation / 2 )
 
-    Quat() :
-        v(0, 0, 0),
-        w(1)
-    {
-    } // default constructor is identity quat
+    Quat();
+    
     template<typename FromT>
-    explicit Quat(const Quat<FromT>& q) :
-        w(static_cast<T>(q.w)),
-        v(q.v)
-    {
-    }
+    explicit Quat(const Quat<FromT>& q);
 
-    Quat(T aW, T x, T y, T z) :
-        w(aW),
-        v(x, y, z)
-    {
-    }
-    // construct from axis-angle
-    Quat(T _w, const Vec3<T>& vec) :
-        w(_w),
-        v(vec)
-    {
-    }
-    Quat(const Vec3<T>& axis, T radians)
-    {
-        set(axis, radians);
-    }
-    Quat(const Vec3<T>& from, const Vec3<T>& to)
-    {
-        set(from, to);
-    }
-    // create from Euler angles in radians expressed in ZYX rotation order
-    Quat(T pitch, T yaw, T roll)
-    {
-        set(pitch, yaw, roll);
-    }
-    explicit Quat(const Matrix33<T>& m)
-    {
-        set(m);
-    }
-    explicit Quat(const Matrix44<T>& m)
-    {
-        set(m);
-    }
-    explicit Quat(const Matrix34<T>& m)
-    {
-        set(m);
-    }
-
-    template<typename Y>
-    explicit Quat(const Y& v) :
-        w(QUATCONV<Quat<typename Quat::TYPE>, Y>::getW(v)),
-        v(QUATCONV<typename Quat::TYPE, Y>::getX(v), QUATCONV<typename Quat::TYPE, Y>::getY(v), QUATCONV<typename Quat::TYPE, Y>::getZ(v))
-    {
-    }
+    Quat(T aW, T x, T y, T z);
+    
+    Quat(T _w, const Vec3<T>& vec);                 // construct from axis-angle
+    Quat(const Vec3<T>& axis, T radians);
+    Quat(const Vec3<T>& from, const Vec3<T>& to);
+    Quat(T pitch, T yaw, T roll);                   // create from Euler angles in radians expressed in ZYX rotation order
+    explicit Quat(const Matrix33<T>& m);
+    explicit Quat(const Matrix44<T>& m);
+    explicit Quat(const Matrix34<T>& m);
 
     // get axis-angle representation's axis
     Vec3<T> getAxis() const;
@@ -127,11 +68,6 @@ public:
     void getAxisAngle(Vec3<T>* axis, T* radians) const;
     Matrix33<T> toMatrix33() const;
     Matrix44<T> toMatrix44() const;
-
-    X_INLINE operator Matrix44<T>() const
-    {
-        return toMatrix44();
-    }
 
     Quat<T> lerp(T t, const Quat<T>& end) const;
     Quat<T> slerpShortestUnenforced(T t, const Quat<T>& end) const;
@@ -173,36 +109,20 @@ public:
     bool operator==(const Quat<T>& rhs) const;
     bool operator!=(const Quat<T>& rhs) const;
 
-    X_INLINE T& operator[](unsigned int i)
-    {
-        return (&v.x)[i];
-    }
-    X_INLINE const T& operator[](unsigned int i) const
-    {
-        return (&v.x)[i];
-    }
+    T& operator[](uint32_t i);
+    const T& operator[](uint32_t i) const;
 
-    static Quat<T> identity()
-    {
-        return Quat();
-    }
+    static Quat<T> identity();
 
 private:
-    // From advanced Animation and Rendering
-    // Techniques by Watt and Watt, Page 366:
-    // computing the inner quadrangle
-    // points (qa and qb) to guarantee tangent
-    // continuity.
-    static Quat<T> splineIntermediate(const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2)
-    {
-        Quat<T> q1inv = q1.inverted();
-        Quat<T> c1 = q1inv * q2;
-        Quat<T> c2 = q1inv * q0;
-        Quat<T> c3 = (c2.log() + c1.log()) * (T)-0.25;
-        Quat<T> qa = q1 * c3.exp();
-        return qa.normalized();
-    }
+    static Quat<T> splineIntermediate(const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2);
 };
+
+typedef Quat<float> Quatf;
+typedef Quat<double> Quatd;
+
+#include "XQuat.inl"
+
 
 template<typename T>
 inline Vec3<T> operator*(const Vec3<T>& vec, const Quat<T>& q)
@@ -216,9 +136,5 @@ inline Vec3<T> operator*(const Vec3<T>& vec, const Quat<T>& q)
         pMult * vec.z + vMult * q.v.z + crossMult * (q.v.x * vec.y - q.v.y * vec.x));
 }
 
-typedef Quat<float> Quatf;
-typedef Quat<double> Quatd;
-
-#include "XQuat.inl"
 
 #endif // !_X_MATH_QUAT_H_

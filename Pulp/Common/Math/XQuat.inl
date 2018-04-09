@@ -1,4 +1,70 @@
 
+template<typename T>
+X_INLINE Quat<T>::Quat() :
+    v(0, 0, 0),
+    w(1)
+{
+} 
+
+template<typename T>
+template<typename FromT>
+X_INLINE Quat<T>::Quat(const Quat<FromT>& q) :
+    w(static_cast<T>(q.w)),
+    v(q.v)
+{
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(T aW, T x, T y, T z) :
+    w(aW),
+    v(x, y, z)
+{
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(T _w, const Vec3<T>& vec) :
+    w(_w),
+    v(vec)
+{
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(const Vec3<T>& axis, T radians)
+{
+    set(axis, radians);
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(const Vec3<T>& from, const Vec3<T>& to)
+{
+    set(from, to);
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(T pitch, T yaw, T roll)
+{
+    set(pitch, yaw, roll);
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(const Matrix33<T>& m)
+{
+    set(m);
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(const Matrix44<T>& m)
+{
+    set(m);
+}
+
+template<typename T>
+X_INLINE Quat<T>::Quat(const Matrix34<T>& m)
+{
+    set(m);
+}
+
+
 // get axis-angle representation's axis
 template<typename T>
 X_INLINE Vec3<T> Quat<T>::getAxis() const
@@ -113,16 +179,19 @@ X_INLINE Quat<T> Quat<T>::log() const
 {
     T theta = math<T>::acos(core::Min(w, (T)1.0));
 
-    if (theta == 0)
+    if (theta == 0) {
         return Quat<T>(v, 0);
+    }
 
     T sintheta = math<T>::sin(theta);
 
     T k;
-    if (abs(sintheta) < 1 && abs(theta) >= 3.402823466e+38F * abs(sintheta))
+    if (abs(sintheta) < 1 && abs(theta) >= 3.402823466e+38F * abs(sintheta)) {
         k = 1;
-    else
+    }
+    else {
         k = theta / sintheta;
+    }
 
     return Quat<T>((T)0, v.x * k, v.y * k, v.z * k);
 }
@@ -137,10 +206,12 @@ X_INLINE Quat<T> Quat<T>::exp() const
     T sintheta = math<T>::sin(theta);
 
     T k;
-    if (abs(theta) < 1 && abs(sintheta) >= 3.402823466e+38F * abs(theta))
+    if (abs(theta) < 1 && abs(sintheta) >= 3.402823466e+38F * abs(theta)) {
         k = 1;
-    else
+    }
+    else {
         k = sintheta / theta;
+    }
 
     T costheta = math<T>::cos(theta);
 
@@ -465,21 +536,26 @@ template<typename T>
 X_INLINE Quat<T> Quat<T>::squadShortestEnforced(T t, const Quat<T>& qa, const Quat<T>& qb, const Quat<T>& q2) const
 {
     Quat<T> r1;
-    if (this->dot(q2) >= 0)
+    if (this->dot(q2) >= 0) {
         r1 = this->slerpShortestUnenforced(t, q2);
-    else
+    }
+    else {
         r1 = this->slerpShortestUnenforced(t, q2.inverted());
+    }
 
     Quat<T> r2;
-    if (qa.dot(qb) >= 0)
+    if (qa.dot(qb) >= 0) {
         r2 = qa.slerpShortestUnenforced(t, qb);
-    else
+    }
+    else {
         r2 = qa.slerpShortestUnenforced(t, qb.inverted());
+    }
 
-    if (r1.dot(r2) >= 0)
+    if (r1.dot(r2) >= 0) {
         return r1.slerpShortestUnenforced(2 * t * (1 - t), r2);
-    else
-        return r1.slerpShortestUnenforced(2 * t * (1 - t), r2.inverted());
+    }
+    
+    return r1.slerpShortestUnenforced(2 * t * (1 - t), r2.inverted());
 }
 
 template<typename T>
@@ -743,4 +819,45 @@ template<typename T>
 X_INLINE bool Quat<T>::operator!=(const Quat<T>& rhs) const
 {
     return !(*this == rhs);
+}
+
+template<typename T>
+X_INLINE T& Quat<T>::operator[](uint32_t i)
+{
+    static_assert(X_OFFSETOF(Quat,w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
+
+    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
+    return (&v.x)[i];
+}
+
+template<typename T>
+X_INLINE const T& Quat<T>::operator[](uint32_t i) const
+{
+    static_assert(X_OFFSETOF(Quat, w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
+
+    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
+    return (&v.x)[i];
+}
+
+template<typename T>
+X_INLINE Quat<T> Quat<T>::identity()
+{
+    return Quat();
+}
+
+
+// From advanced Animation and Rendering
+// Techniques by Watt and Watt, Page 366:
+// computing the inner quadrangle
+// points (qa and qb) to guarantee tangent
+// continuity.
+template<typename T>
+X_INLINE Quat<T> Quat<T>::splineIntermediate(const Quat<T>& q0, const Quat<T>& q1, const Quat<T>& q2)
+{
+    Quat<T> q1inv = q1.inverted();
+    Quat<T> c1 = q1inv * q2;
+    Quat<T> c2 = q1inv * q0;
+    Quat<T> c3 = (c2.log() + c1.log()) * (T)-0.25;
+    Quat<T> qa = q1 * c3.exp();
+    return qa.normalized();
 }
