@@ -70,21 +70,20 @@ public:
     // Creates matrix with column vectors vx, vy and z
     Matrix33(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz);
 
-    template<typename FromT>
-    explicit Matrix33(const Matrix33<FromT>& src);
-
     explicit Matrix33(const Matrix22<T>& src);
     Matrix33(const Matrix33<T>& src);
-    explicit Matrix33(const Matrix34<T>& src);
-
-    Matrix33<T>& operator=(const Matrix33<T>& rhs);
-    Matrix33<T>& operator=(T rhs);
-
     template<typename FromT>
-    Matrix33<T>& operator=(const Matrix33<FromT>& rhs);
+    explicit Matrix33(const Matrix33<FromT>& src);
+    explicit Matrix33(const Matrix34<T>& src);
+    explicit Matrix33(const Matrix44<T>& src);
+
+    Matrix33<T>& operator=(T rhs);
 
     // remaining columns and rows will be filled with identity values
     Matrix33<T>& operator=(const Matrix22<T>& rhs);
+    Matrix33<T>& operator=(const Matrix33<T>& rhs);
+    template<typename FromT>
+    Matrix33<T>& operator=(const Matrix33<FromT>& rhs);
 
     operator T*();
     operator const T*() const;

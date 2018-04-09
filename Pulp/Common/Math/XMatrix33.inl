@@ -41,14 +41,6 @@ Matrix33<T>::Matrix33(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz)
     m22 = vz.z;
 }
 
-template<typename T>
-template<typename FromT>
-Matrix33<T>::Matrix33(const Matrix33<FromT>& src)
-{
-    for (int i = 0; i < DIM_SQ; ++i) {
-        m[i] = static_cast<T>(src.m[i]);
-    }
-}
 
 template<typename T>
 Matrix33<T>::Matrix33(const Matrix22<T>& src)
@@ -66,8 +58,32 @@ Matrix33<T>::Matrix33(const Matrix33<T>& src)
     std::memcpy(m, src.m, MEM_LEN);
 }
 
+
+template<typename T>
+template<typename FromT>
+Matrix33<T>::Matrix33(const Matrix33<FromT>& src)
+{
+    for (int i = 0; i < DIM_SQ; ++i) {
+        m[i] = static_cast<T>(src.m[i]);
+    }
+}
+
 template<typename T>
 Matrix33<T>::Matrix33(const Matrix34<T>& src)
+{
+    m00 = src.m00;
+    m10 = src.m10;
+    m20 = src.m20;
+    m01 = src.m01;
+    m11 = src.m11;
+    m21 = src.m21;
+    m02 = src.m02;
+    m12 = src.m12;
+    m22 = src.m22;
+}
+
+template<typename T>
+Matrix33<T>::Matrix33(const Matrix44<T>& src)
 {
     m00 = src.m00;
     m10 = src.m10;

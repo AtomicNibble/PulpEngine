@@ -81,26 +81,25 @@ public:
     Matrix44(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz);
     Matrix44(const Vec4<T>& vx, const Vec4<T>& vy, const Vec4<T>& vz, const Vec4<T>& vw = Vec4<T>(0, 0, 0, 1));
 
-    template<typename FromT>
-    explicit Matrix44(const Matrix44<FromT>& src);
-
     explicit Matrix44(const Matrix22<T>& src);
     explicit Matrix44(const MatrixAffine2<T>& src);
     explicit Matrix44(const Matrix33<T>& src);
     explicit Matrix44(const Matrix34<T>& src);
     Matrix44(const Matrix44<T>& src);
-
-
-    Matrix44<T>& operator=(const Matrix44<T>& rhs);
-    Matrix44<T>& operator=(T rhs);
-
     template<typename FromT>
-    Matrix44<T>& operator=(const Matrix44<FromT>& rhs);
+    explicit Matrix44(const Matrix44<FromT>& src);
+
+
+    Matrix44<T>& operator=(T rhs);
 
     // remaining columns and rows will be filled with identity values
     Matrix44<T>& operator=(const Matrix22<T>& rhs);
     Matrix44<T>& operator=(const MatrixAffine2<T>& rhs);
     Matrix44<T>& operator=(const Matrix33<T>& rhs);
+    Matrix44<T>& operator=(const Matrix44<T>& rhs);
+    template<typename FromT>
+    Matrix44<T>& operator=(const Matrix44<FromT>& rhs);
+
 
     operator T*();
     operator const T*() const;

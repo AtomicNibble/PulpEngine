@@ -71,15 +71,6 @@ Matrix44<T>::Matrix44(const Vec4<T>& vx, const Vec4<T>& vy, const Vec4<T>& vz, c
 }
 
 template<typename T>
-template<typename FromT>
-Matrix44<T>::Matrix44(const Matrix44<FromT>& src)
-{
-    for (int i = 0; i < DIM_SQ; ++i) {
-        m[i] = static_cast<T>(src.m[i]);
-    }
-}
-
-template<typename T>
 Matrix44<T>::Matrix44(const Matrix22<T>& src)
 {
     setToIdentity();
@@ -156,27 +147,20 @@ Matrix44<T>::Matrix44(const Matrix44<T>& src)
 }
 
 template<typename T>
-Matrix44<T>& Matrix44<T>::operator=(const Matrix44<T>& rhs)
+template<typename FromT>
+Matrix44<T>::Matrix44(const Matrix44<FromT>& src)
 {
-    std::memcpy(m, rhs.m, MEM_LEN);
-    return *this;
+    for (int i = 0; i < DIM_SQ; ++i) {
+        m[i] = static_cast<T>(src.m[i]);
+    }
 }
+
 
 template<typename T>
 Matrix44<T>& Matrix44<T>::operator=(T rhs)
 {
     for (int i = 0; i < DIM_SQ; i++) {
         m[i] = rhs;
-    }
-    return *this;
-}
-
-template<typename T>
-template<typename FromT>
-Matrix44<T>& Matrix44<T>::operator=(const Matrix44<FromT>& rhs)
-{
-    for (int i = 0; i < DIM_SQ; i++) {
-        m[i] = static_cast<T>(rhs.m[i]);
     }
     return *this;
 }
@@ -229,6 +213,24 @@ Matrix44<T>& Matrix44<T>::operator=(const Matrix33<T>& rhs)
     m22 = rhs.m22;
     return *this;
 }
+
+template<typename T>
+Matrix44<T>& Matrix44<T>::operator=(const Matrix44<T>& rhs)
+{
+    std::memcpy(m, rhs.m, MEM_LEN);
+    return *this;
+}
+
+template<typename T>
+template<typename FromT>
+Matrix44<T>& Matrix44<T>::operator=(const Matrix44<FromT>& rhs)
+{
+    for (int i = 0; i < DIM_SQ; i++) {
+        m[i] = static_cast<T>(rhs.m[i]);
+    }
+    return *this;
+}
+
 
 template<typename T>
 Matrix44<T>::operator T*()

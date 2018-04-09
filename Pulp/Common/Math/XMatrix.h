@@ -4,6 +4,9 @@
 #define _X_MATH_MATRIX_H_
 
 template<class T>
+class Matrix22;
+
+template<class T>
 class Matrix33;
 
 template<class T>
