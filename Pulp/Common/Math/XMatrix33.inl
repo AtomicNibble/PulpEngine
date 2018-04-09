@@ -338,7 +338,10 @@ const T& Matrix33<T>::at(int row, int col) const
 template<typename T>
 void Matrix33<T>::set(const T* dt, bool srcIsRowMajor)
 {
-    if (srcIsRowMajor) {
+    if (!srcIsRowMajor) {
+        std::memcpy(m, dt, MEM_LEN);
+    }
+    else {
         m[0] = dt[0];
         m[3] = dt[1];
         m[6] = dt[2];
@@ -349,26 +352,12 @@ void Matrix33<T>::set(const T* dt, bool srcIsRowMajor)
         m[5] = dt[7];
         m[8] = dt[8];
     }
-    else {
-        std::memcpy(m, dt, MEM_LEN);
-    }
 }
 
 template<typename T>
 void Matrix33<T>::set(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, bool srcIsRowMajor)
 {
-    if (srcIsRowMajor) {
-        m[0] = d0;
-        m[3] = d1;
-        m[6] = d2;
-        m[1] = d3;
-        m[4] = d4;
-        m[7] = d5;
-        m[2] = d6;
-        m[5] = d7;
-        m[8] = d8;
-    }
-    else {
+    if (!srcIsRowMajor) {
         m[0] = d0;
         m[3] = d3;
         m[6] = d6;
@@ -377,6 +366,17 @@ void Matrix33<T>::set(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, bool
         m[7] = d7;
         m[2] = d2;
         m[5] = d5;
+        m[8] = d8;
+    }
+    else {
+        m[0] = d0;
+        m[3] = d1;
+        m[6] = d2;
+        m[1] = d3;
+        m[4] = d4;
+        m[7] = d5;
+        m[2] = d6;
+        m[5] = d7;
         m[8] = d8;
     }
 }
