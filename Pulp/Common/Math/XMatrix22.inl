@@ -35,6 +35,13 @@ Matrix22<T>::Matrix22(const Vec2<T>& vx, const Vec2<T>& vy)
     m11 = vy.y;
 }
 
+
+template<typename T>
+Matrix22<T>::Matrix22(const Matrix22<T>& src)
+{
+    std::memcpy(m, src.m, MEM_LEN);
+}
+
 template<typename T>
 template<typename FromT>
 Matrix22<T>::Matrix22(const Matrix22<FromT>& src)
@@ -44,18 +51,6 @@ Matrix22<T>::Matrix22(const Matrix22<FromT>& src)
     }
 }
 
-template<typename T>
-Matrix22<T>::Matrix22(const Matrix22<T>& src)
-{
-    std::memcpy(m, src.m, MEM_LEN);
-}
-
-template<typename T>
-Matrix22<T>& Matrix22<T>::operator=(const Matrix22<T>& rhs)
-{
-    std::memcpy(m, rhs.m, MEM_LEN);
-    return *this;
-}
 
 template<typename T>
 Matrix22<T>& Matrix22<T>::operator=(const T& rhs)
@@ -63,6 +58,13 @@ Matrix22<T>& Matrix22<T>::operator=(const T& rhs)
     for (int i = 0; i < DIM_SQ; ++i) {
         m[i] = rhs;
     }
+    return *this;
+}
+
+template<typename T>
+Matrix22<T>& Matrix22<T>::operator=(const Matrix22<T>& rhs)
+{
+    std::memcpy(m, rhs.m, MEM_LEN);
     return *this;
 }
 

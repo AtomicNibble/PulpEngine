@@ -40,24 +40,26 @@ public:
     Matrix34();
     explicit Matrix34(T s);
     Matrix34(const T* dt, bool srcIsRowMajor = false);
-    Matrix34(const Matrix22<T>& src);
-    Matrix34(const Matrix33<T>& m);
-    Matrix34(const Matrix33<T>& m, const Vec3<T>& t);
-    Matrix34(const Matrix34<T>& m);
+   
+    Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor = false);
 
     Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz);
     Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz, const Vec3<T>& t);
 
+    explicit Matrix34(const Matrix22<T>& src);
+    explicit Matrix34(const Matrix33<T>& m);
+    explicit Matrix34(const Matrix33<T>& m, const Vec3<T>& t);
+    Matrix34(const Matrix34<T>& m);    
     template<typename FromT>
     Matrix34(const Matrix34<FromT>& m);
-
-    Matrix34(const Matrix44<T>& m);
-    Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor = false);
+    explicit Matrix34(const Matrix44<T>& m);
     explicit Matrix34(const Quat<T>& q);
 
-    X_INLINE Matrix34& operator=(const Matrix34& rhs);
-    X_INLINE Matrix34<T>& operator=(const Matrix33<T>& rhs);
     X_INLINE Matrix34<T>& operator=(const Matrix22<T>& rhs);
+    X_INLINE Matrix34<T>& operator=(const Matrix33<T>& rhs);
+    X_INLINE Matrix34& operator=(const Matrix34& rhs);
+    template<typename FromT>
+    X_INLINE Matrix34& operator=(const Matrix34<FromT>& rhs);
 
     operator T*();
     operator const T*() const;
@@ -179,6 +181,7 @@ public:
     static Matrix34<T> one();
     // returns 0 filled matrix
     static Matrix34<T> zero();
+
 
     // creates rotation matrix
     static Matrix34<T> createRotation(const Vec3<T>& axis, T radians);

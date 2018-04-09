@@ -25,6 +25,48 @@ X_INLINE Matrix34<T>::Matrix34(const T* dt, bool srcIsRowMajor)
 }
 
 template<typename T>
+X_INLINE Matrix34<T>::Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6,
+    T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor)
+{
+    set(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, srcIsRowMajor);
+}
+
+template<typename T>
+X_INLINE Matrix34<T>::Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz)
+{
+    m00 = vx.x;
+    m01 = vy.x;
+    m02 = vz.x;
+    m10 = vx.y;
+    m11 = vy.y;
+    m12 = vz.y;
+    m20 = vx.z;
+    m21 = vy.z;
+    m22 = vz.z;
+
+    m03 = m13 = m23 = (T)0;
+}
+
+template<typename T>
+X_INLINE Matrix34<T>::Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz,
+    const Vec3<T>& t)
+{
+    m00 = vx.x;
+    m01 = vy.x;
+    m02 = vz.x;
+    m10 = vx.y;
+    m11 = vy.y;
+    m12 = vz.y;
+    m20 = vx.z;
+    m21 = vy.z;
+    m22 = vz.z;
+
+    m03 = t.x;
+    m13 = t.y;
+    m23 = t.z;
+}
+
+template<typename T>
 X_INLINE Matrix34<T>::Matrix34(const Matrix22<T>& src)
 {
     setToIdentity();
@@ -89,40 +131,6 @@ X_INLINE Matrix34<T>::Matrix34(const Matrix34<T>& m)
     m23 = T(m.m23);
 }
 
-template<typename T>
-X_INLINE Matrix34<T>::Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz)
-{
-    m00 = vx.x;
-    m01 = vy.x;
-    m02 = vz.x;
-    m10 = vx.y;
-    m11 = vy.y;
-    m12 = vz.y;
-    m20 = vx.z;
-    m21 = vy.z;
-    m22 = vz.z;
-
-    m03 = m13 = m23 = (T)0;
-}
-
-template<typename T>
-X_INLINE Matrix34<T>::Matrix34(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz,
-    const Vec3<T>& t)
-{
-    m00 = vx.x;
-    m01 = vy.x;
-    m02 = vz.x;
-    m10 = vx.y;
-    m11 = vy.y;
-    m12 = vz.y;
-    m20 = vx.z;
-    m21 = vy.z;
-    m22 = vz.z;
-
-    m03 = t.x;
-    m13 = t.y;
-    m23 = t.z;
-}
 
 template<typename T>
 template<typename FromT>
@@ -162,25 +170,24 @@ X_INLINE Matrix34<T>::Matrix34(const Matrix44<T>& m)
 }
 
 template<typename T>
-X_INLINE Matrix34<T>::Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6,
-    T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor)
-{
-    set(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, d11, srcIsRowMajor);
-}
-
-template<typename T>
 X_INLINE Matrix34<T>::Matrix34(const Quat<T>& q)
 {
     *this = q.toMatrix33();
 }
 
 
+
 template<typename T>
-X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix34<T>& rhs)
+X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix22<T>& rhs)
 {
-    std::memcpy(m, rhs.m, MEM_LEN);
+    setToIdentity();
+    m00 = rhs.m00;
+    m01 = rhs.m01;
+    m10 = rhs.m10;
+    m11 = rhs.m11;
     return *this;
 }
+
 
 template<typename T>
 X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix33<T>& rhs)
@@ -199,13 +206,19 @@ X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix33<T>& rhs)
 }
 
 template<typename T>
-X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix22<T>& rhs)
+X_INLINE Matrix34<T>& Matrix34<T>::operator=(const Matrix34<T>& rhs)
 {
-    setToIdentity();
-    m00 = rhs.m00;
-    m01 = rhs.m01;
-    m10 = rhs.m10;
-    m11 = rhs.m11;
+    std::memcpy(m, rhs.m, MEM_LEN);
+    return *this;
+}
+
+template<typename T>
+template<typename FromT>
+Matrix34<T>& Matrix34<T>::operator=(const Matrix34<FromT>& rhs)
+{
+    for (int i = 0; i < DIM_SQ; i++) {
+        m[i] = static_cast<T>(rhs.m[i]);
+    }
     return *this;
 }
 

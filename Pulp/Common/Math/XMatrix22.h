@@ -65,14 +65,12 @@ public:
     // Creates matrix with column vectors vx and vy
     Matrix22(const Vec2<T>& vx, const Vec2<T>& vy);
 
+    Matrix22(const Matrix22<T>& src);
     template<typename FromT>
     explicit Matrix22(const Matrix22<FromT>& src);
 
-    Matrix22(const Matrix22<T>& src);
-
-    Matrix22<T>& operator=(const Matrix22<T>& rhs);
     Matrix22<T>& operator=(const T& rhs);
-
+    Matrix22<T>& operator=(const Matrix22<T>& rhs);
     template<typename FromT>
     Matrix22<T>& operator=(const Matrix22<FromT>& rhs);
 
