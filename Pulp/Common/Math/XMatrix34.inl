@@ -1097,7 +1097,7 @@ Matrix34<T> Matrix34<T>::createRotation(const Vec3<T>& eulerRadians)
 template<typename T>
 X_INLINE Matrix34<T> Matrix34<T>::createScale(T s)
 {
-    Matrix44<T> ret;
+    Matrix34<T> ret;
     ret.setToIdentity();
     ret.at(0, 0) = s;
     ret.at(1, 1) = s;
@@ -1109,7 +1109,7 @@ X_INLINE Matrix34<T> Matrix34<T>::createScale(T s)
 template<typename T>
 X_INLINE Matrix34<T> Matrix34<T>::createScale(const Vec2<T>& v)
 {
-    Matrix44<T> ret;
+    Matrix34<T> ret;
     ret.setToIdentity();
     ret.at(0, 0) = v.x;
     ret.at(1, 1) = v.y;
@@ -1121,7 +1121,7 @@ X_INLINE Matrix34<T> Matrix34<T>::createScale(const Vec2<T>& v)
 template<typename T>
 X_INLINE Matrix34<T> Matrix34<T>::createScale(const Vec3<T>& v)
 {
-    Matrix44<T> ret;
+    Matrix34<T> ret;
     ret.setToIdentity();
     ret.at(0, 0) = v.x;
     ret.at(1, 1) = v.y;
@@ -1133,7 +1133,7 @@ X_INLINE Matrix34<T> Matrix34<T>::createScale(const Vec3<T>& v)
 template<typename T>
 X_INLINE Matrix34<T> Matrix34<T>::createScale(const Vec4<T>& v)
 {
-    Matrix44<T> ret;
+    Matrix34<T> ret;
     ret.setToIdentity();
     ret.at(0, 0) = v.x;
     ret.at(1, 1) = v.y;
