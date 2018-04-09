@@ -41,6 +41,12 @@ X_INLINE Quat<T>::Quat(const Vec3<T>& from, const Vec3<T>& to)
 }
 
 template<typename T>
+X_INLINE Quat<T>::Quat(const Vec3<T>& eulerRadians)
+{
+    set(eulerRadians);
+}
+
+template<typename T>
 X_INLINE Quat<T>::Quat(T pitch, T yaw, T roll)
 {
     set(pitch, yaw, roll);
@@ -63,6 +69,358 @@ X_INLINE Quat<T>::Quat(const Matrix34<T>& m)
 {
     set(m);
 }
+
+
+
+// Operators
+template<typename T>
+X_INLINE Quat<T>& Quat<T>::operator=(const Quat<T>& rhs)
+{
+    v = rhs.v;
+    w = rhs.w;
+    return *this;
+}
+
+template<typename T>
+template<typename FromT>
+X_INLINE Quat<T>& Quat<T>::operator=(const Quat<FromT>& rhs)
+{
+    v = rhs.v;
+    w = static_cast<T>(rhs.w);
+    return *this;
+}
+
+// post-multiply operator, similar to matrices, but different from Shoemake
+// Concatenates 'rhs' onto 'this'
+template<typename T>
+X_INLINE const Quat<T> Quat<T>::operator*(const Quat<T>& rhs) const
+{
+    return Quat<T>(rhs.w * w - rhs.v.x * v.x - rhs.v.y * v.y - rhs.v.z * v.z,
+        rhs.w * v.x + rhs.v.x * w + rhs.v.y * v.z - rhs.v.z * v.y,
+        rhs.w * v.y + rhs.v.y * w + rhs.v.z * v.x - rhs.v.x * v.z,
+        rhs.w * v.z + rhs.v.z * w + rhs.v.x * v.y - rhs.v.y * v.x);
+}
+
+template<typename T>
+X_INLINE const Quat<T> Quat<T>::operator*(T rhs) const
+{
+    return Quat<T>(w * rhs, v.x * rhs, v.y * rhs, v.z * rhs);
+}
+
+// transform a vector by the Quat
+template<typename T>
+X_INLINE const Vec3<T> Quat<T>::operator*(const Vec3<T>& vec) const
+{
+    T vMult = T(2) * (v.x * vec.x + v.y * vec.y + v.z * vec.z);
+    T crossMult = T(2) * w;
+    T pMult = crossMult * w - T(1);
+
+    return Vec3<T>(pMult * vec.x + vMult * v.x + crossMult * (v.y * vec.z - v.z * vec.y),
+        pMult * vec.y + vMult * v.y + crossMult * (v.z * vec.x - v.x * vec.z),
+        pMult * vec.z + vMult * v.z + crossMult * (v.x * vec.y - v.y * vec.x));
+}
+
+template<typename T>
+X_INLINE const Quat<T> Quat<T>::operator+(const Quat<T>& rhs) const
+{
+    const Quat<T>& lhs = *this;
+    return Quat<T>(lhs.w + rhs.w, lhs.v.x + rhs.v.x, lhs.v.y + rhs.v.y, lhs.v.z + rhs.v.z);
+}
+
+template<typename T>
+X_INLINE const Quat<T> Quat<T>::operator-(const Quat<T>& rhs) const
+{
+    const Quat<T>& lhs = *this;
+    return Quat<T>(lhs.w - rhs.w, lhs.v.x - rhs.v.x, lhs.v.y - rhs.v.y, lhs.v.z - rhs.v.z);
+}
+
+template<typename T>
+X_INLINE Quat<T>& Quat<T>::operator+=(const Quat<T>& rhs)
+{
+    w += rhs.w;
+    v += rhs.v;
+    return *this;
+}
+
+template<typename T>
+X_INLINE Quat<T>& Quat<T>::operator-=(const Quat<T>& rhs)
+{
+    w -= rhs.w;
+    v -= rhs.v;
+    return *this;
+}
+
+template<typename T>
+X_INLINE Quat<T>& Quat<T>::operator*=(const Quat<T>& rhs)
+{
+    Quat q = (*this) * rhs;
+    v = q.v;
+    w = q.w;
+    return *this;
+}
+
+template<typename T>
+X_INLINE Quat<T>& Quat<T>::operator*=(T rhs)
+{
+    w *= rhs;
+    v *= rhs;
+    return *this;
+}
+
+template<typename T>
+X_INLINE Quat<T> Quat<T>::operator~() const
+{
+    return Quat<T>(w, -v.x, -v.y, -v.z);
+}
+
+template<typename T>
+X_INLINE Quat<T> Quat<T>::operator-() const
+{
+    return Quat<T>(-w, -v.x, -v.y, -v.z);
+}
+
+template<typename T>
+X_INLINE bool Quat<T>::operator==(const Quat<T>& rhs) const
+{
+    const Quat<T>& lhs = *this;
+    return (math<float>::abs(lhs.w - rhs.w) < math<T>::EPSILON) && lhs.v == rhs.v;
+}
+
+template<typename T>
+X_INLINE bool Quat<T>::operator!=(const Quat<T>& rhs) const
+{
+    return !(*this == rhs);
+}
+
+template<typename T>
+X_INLINE bool Quat<T>::compare(const Quat<T>& rhs, const T elipson) const
+{
+    const Quat<T>& lhs = *this;
+    return (math<float>::abs(lhs.w - rhs.w) < elipson) && lhs.v.compare(rhs.v, elipson);
+}
+
+template<typename T>
+X_INLINE T& Quat<T>::operator[](uint32_t i)
+{
+    static_assert(X_OFFSETOF(Quat, w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
+
+    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
+    return (&v.x)[i];
+}
+
+template<typename T>
+X_INLINE const T& Quat<T>::operator[](uint32_t i) const
+{
+    static_assert(X_OFFSETOF(Quat, w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
+
+    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
+    return (&v.x)[i];
+}
+
+
+template<typename T>
+X_INLINE void Quat<T>::set(T aW, T x, T y, T z)
+{
+    w = aW;
+    v = Vec3<T>(x, y, z);
+}
+
+template<typename T>
+X_INLINE void Quat<T>::set(const Vec3<T>& from, const Vec3<T>& to)
+{
+    Vec3<T> axis = from.cross(to);
+
+    set(from.dot(to), axis.x, axis.y, axis.z);
+    normalize();
+
+    w += static_cast<T>(1.0);
+
+    if (w <= math<T>::EPSILON) {
+        if (from.z * from.z > from.x * from.x) {
+            set(static_cast<T>(0.0), static_cast<T>(0.0), from.z, -from.y);
+        }
+        else {
+            set(static_cast<T>(0.0), from.y, -from.x, static_cast<T>(0.0));
+        }
+    }
+
+    normalize();
+}
+
+template<typename T>
+X_INLINE void Quat<T>::set(const Vec3<T>& axis, T radians)
+{
+    w = math<T>::cos(radians * static_cast<T>(0.5));
+    v = axis.normalized() * math<T>::sin(radians * static_cast<T>(0.5));
+}
+
+// assumes ZYX rotation order and radians
+template<typename T>
+X_INLINE void Quat<T>::set(const Vec3<T>& eulerRadians)
+{
+    set(eulerRadians.x, eulerRadians.y, eulerRadians.z);
+}
+
+// assumes ZYX rotation order and radians
+template<typename T>
+X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
+{
+#if 1
+    pitch *= T(0.5);
+    yaw *= T(0.5);
+    roll *= T(0.5);
+
+    const T sinPitch(math<T>::sin(pitch));
+    const T cosPitch(math<T>::cos(pitch));
+    const T sinYaw(math<T>::sin(yaw));
+    const T cosYaw(math<T>::cos(yaw));
+    const T sinRoll(math<T>::sin(roll));
+    const T cosRoll(math<T>::cos(roll));
+    const T cosPitchCosYaw(cosPitch * cosYaw);
+    const T sinPitchSinYaw(sinPitch * sinYaw);
+
+    v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
+    v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+    v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+    w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
+
+#else
+#if 0
+    T sinPitch, cosPitch;
+    T sinYaw, cosYaw;
+    T sinRoll, cosRoll;
+
+    math<T>::sincos(::toRadians(pitch) * T(0.5f), sinPitch, cosPitch);
+    math<T>::sincos(::toRadians(yaw)   * T(0.5f), sinYaw, cosYaw);
+    math<T>::sincos(::toRadians(roll)  * T(0.5f), sinRoll, cosRoll);
+
+    const T cosPitchCosYaw(cosPitch*cosYaw);
+    const T sinPitchSinYaw(sinPitch*sinYaw);
+
+    v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
+    v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
+    v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
+    w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
+#else
+    T Cx, Sx, Cy, Sy, Cz, Sz;
+    T sxcy, cxcy, sxsy, cxsy;
+
+    math<T>::sincos(::toRadians(pitch) * T(0.5f), Cx, Sx);
+    math<T>::sincos(::toRadians(yaw) * T(0.5f), Cy, Sy);
+    math<T>::sincos(::toRadians(roll) * T(0.5f), Cz, Sz);
+
+    // multiply it out
+    sxcy = Sx * Cy;
+    cxcy = Cx * Cy;
+    sxsy = Sx * Sy;
+    cxsy = Cx * Sy;
+
+    v.x = Sx * Cy * Cz + Cx * Sy * Sz;
+    v.y = Cx * Sy * Cz - Sx * Cy * Sz;
+    v.z = Cx * Cy * Sz + Sx * Sy * Cx;
+    w = Cx * Cy * Cz - Sx * Sy * Sz;
+#endif
+#endif
+}
+
+template<typename T>
+X_INLINE void Quat<T>::set(const Matrix33<T>& m)
+{
+    //T trace = m.m[0] + m.m[4] + m.m[8];
+    const T trace = m.trace();
+    if (trace > (T)0.0) {
+        const T s = math<T>::sqrt(trace + (T)1.0);
+        const T recip = (T)0.5 / s;
+        w = s * (T)0.5;
+        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
+        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
+        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
+    }
+    else {
+        uint32_t i = 0;
+        if (m.at(1, 1) > m.at(0, 0)) {
+            i = 1;
+        }
+        if (m.at(2, 2) > m.at(i, i)) {
+            i = 2;
+        }
+
+        uint32_t j = (i + 1) % 3;
+        uint32_t k = (j + 1) % 3;
+        const T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
+        const T recip = (T)0.5 / s;
+        w = (m.at(k, j) - m.at(j, k)) * recip;
+        (*this)[i] = (T)0.5 * s;
+        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
+        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
+    }
+}
+
+template<typename T>
+X_INLINE void Quat<T>::set(const Matrix34<T>& m)
+{
+    /// same as above
+    T trace = m.trace();
+    if (trace > (T)0.0) {
+        T s = math<T>::sqrt(trace + (T)1.0);
+        w = s * (T)0.5;
+        T recip = (T)0.5 / s;
+        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
+        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
+        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
+    }
+    else {
+        uint32_t i = 0;
+        if (m.at(1, 1) > m.at(0, 0)) {
+            i = 1;
+        }
+        if (m.at(2, 2) > m.at(i, i)) {
+            i = 2;
+        }
+
+        uint32_t j = (i + 1) % 3;
+        uint32_t k = (j + 1) % 3;
+        T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
+        (*this)[i] = (T)0.5 * s;
+        T recip = (T)0.5 / s;
+        w = (m.at(k, j) - m.at(j, k)) * recip;
+        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
+        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
+    }
+}
+
+template<typename T>
+X_INLINE void Quat<T>::set(const Matrix44<T>& m)
+{
+    T trace = m.trace();
+    if (trace > (T)0.0) {
+        T s = math<T>::sqrt(trace + (T)1.0);
+        w = s * (T)0.5;
+        T recip = (T)0.5 / s;
+        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
+        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
+        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
+    }
+    else {
+        uint32_t i = 0;
+        if (m.at(1, 1) > m.at(0, 0)) {
+            i = 1;
+        }
+        if (m.at(2, 2) > m.at(i, i)) {
+            i = 2;
+        }
+
+        uint32_t j = (i + 1) % 3;
+        uint32_t k = (j + 1) % 3;
+        T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
+        (*this)[i] = (T)0.5 * s;
+        T recip = (T)0.5 / s;
+        w = (m.at(k, j) - m.at(j, k)) * recip;
+        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
+        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
+    }
+}
+
 
 
 // get axis-angle representation's axis
@@ -246,115 +604,6 @@ X_INLINE Quat<T> Quat<T>::diff(const Quat<T>& oth) const
     return in * oth;
 }
 
-template<typename T>
-X_INLINE void Quat<T>::set(T aW, T x, T y, T z)
-{
-    w = aW;
-    v = Vec3<T>(x, y, z);
-}
-
-template<typename T>
-X_INLINE void Quat<T>::set(const Vec3<T>& from, const Vec3<T>& to)
-{
-    Vec3<T> axis = from.cross(to);
-
-    set(from.dot(to), axis.x, axis.y, axis.z);
-    normalize();
-
-    w += static_cast<T>(1.0);
-
-    if (w <= math<T>::EPSILON) {
-        if (from.z * from.z > from.x * from.x) {
-            set(static_cast<T>(0.0), static_cast<T>(0.0), from.z, -from.y);
-        }
-        else {
-            set(static_cast<T>(0.0), from.y, -from.x, static_cast<T>(0.0));
-        }
-    }
-
-    normalize();
-}
-
-template<typename T>
-X_INLINE void Quat<T>::set(const Vec3<T>& axis, T radians)
-{
-    w = math<T>::cos(radians * static_cast<T>(0.5));
-    v = axis.normalized() * math<T>::sin(radians * static_cast<T>(0.5));
-}
-
-// assumes ZYX rotation order and radians
-template<typename T>
-X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
-{
-#if 1
-    pitch *= T(0.5);
-    yaw *= T(0.5);
-    roll *= T(0.5);
-
-    const T sinPitch(math<T>::sin(pitch));
-    const T cosPitch(math<T>::cos(pitch));
-    const T sinYaw(math<T>::sin(yaw));
-    const T cosYaw(math<T>::cos(yaw));
-    const T sinRoll(math<T>::sin(roll));
-    const T cosRoll(math<T>::cos(roll));
-    const T cosPitchCosYaw(cosPitch * cosYaw);
-    const T sinPitchSinYaw(sinPitch * sinYaw);
-
-    v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
-    v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-    v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
-    w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
-
-#else
-#if 0
-	T sinPitch, cosPitch;
-	T sinYaw, cosYaw;
-	T sinRoll, cosRoll;
-
-	math<T>::sincos(::toRadians(pitch) * T(0.5f), sinPitch, cosPitch);
-	math<T>::sincos(::toRadians(yaw)   * T(0.5f), sinYaw, cosYaw);
-	math<T>::sincos(::toRadians(roll)  * T(0.5f), sinRoll, cosRoll);
-
-	const T cosPitchCosYaw(cosPitch*cosYaw);
-	const T sinPitchSinYaw(sinPitch*sinYaw);
-
-	v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
-	v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-	v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
-	w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
-#else
-    T Cx, Sx, Cy, Sy, Cz, Sz;
-    T sxcy, cxcy, sxsy, cxsy;
-
-    math<T>::sincos(::toRadians(pitch) * T(0.5f), Cx, Sx);
-    math<T>::sincos(::toRadians(yaw) * T(0.5f), Cy, Sy);
-    math<T>::sincos(::toRadians(roll) * T(0.5f), Cz, Sz);
-
-    // multiply it out
-    sxcy = Sx * Cy;
-    cxcy = Cx * Cy;
-    sxsy = Sx * Sy;
-    cxsy = Cx * Sy;
-
-    v.x = Sx * Cy * Cz + Cx * Sy * Sz;
-    v.y = Cx * Sy * Cz - Sx * Cy * Sz;
-    v.z = Cx * Cy * Sz + Sx * Sy * Cx;
-    w = Cx * Cy * Cz - Sx * Sy * Sz;
-#endif
-#endif
-}
-
-template<typename T>
-X_INLINE void Quat<T>::getAxisAngle(Vec3<T>* axis, T* radians) const
-{
-    T cos_angle = w;
-    *radians = math<T>::acos(cos_angle) * 2;
-    T invLen = static_cast<T>(1.0) / math<T>::sqrt(static_cast<T>(1.0) - cos_angle * cos_angle);
-
-    axis->x = v.x * invLen;
-    axis->y = v.y * invLen;
-    axis->z = v.z * invLen;
-}
 
 template<typename T>
 X_INLINE Matrix33<T> Quat<T>::toMatrix33() const
@@ -433,8 +682,24 @@ X_INLINE Matrix44<T> Quat<T>::toMatrix44() const
 }
 
 template<typename T>
+X_INLINE void Quat<T>::getAxisAngle(Vec3<T>* axis, T* radians) const
+{
+    T cos_angle = w;
+    *radians = math<T>::acos(cos_angle) * 2;
+    T invLen = static_cast<T>(1.0) / math<T>::sqrt(static_cast<T>(1.0) - cos_angle * cos_angle);
+
+    axis->x = v.x * invLen;
+    axis->y = v.y * invLen;
+    axis->z = v.z * invLen;
+}
+
+// ---------------------------------------
+
+template<typename T>
 X_INLINE Quat<T> Quat<T>::lerp(T t, const Quat<T>& end) const
 {
+    X_ASSERT(t >= 0.f && t <= 1.f, "T out of range for lerp")(t);
+
     // get cos of "angle" between Quats
     float cosTheta = dot(end);
 
@@ -596,248 +861,7 @@ X_INLINE Quat<T> Quat<T>::spline(T t, const Quat<T>& q1,
     return result;
 }
 
-template<typename T>
-X_INLINE void Quat<T>::set(const Matrix33<T>& m)
-{
-    //T trace = m.m[0] + m.m[4] + m.m[8];
-    const T trace = m.trace();
-    if (trace > (T)0.0) {
-        const T s = math<T>::sqrt(trace + (T)1.0);
-        const T recip = (T)0.5 / s;
-        w = s * (T)0.5;
-        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
-        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
-        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
-    }
-    else {
-        uint32_t i = 0;
-        if (m.at(1, 1) > m.at(0, 0)) {
-            i = 1;
-        }
-        if (m.at(2, 2) > m.at(i, i)) {
-            i = 2;
-        }
 
-        uint32_t j = (i + 1) % 3;
-        uint32_t k = (j + 1) % 3;
-        const T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
-        const T recip = (T)0.5 / s;
-        w = (m.at(k, j) - m.at(j, k)) * recip;
-        (*this)[i] = (T)0.5 * s;
-        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
-        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
-    }
-}
-
-template<typename T>
-X_INLINE void Quat<T>::set(const Matrix34<T>& m)
-{
-    /// same as above
-    T trace = m.trace();
-    if (trace > (T)0.0) {
-        T s = math<T>::sqrt(trace + (T)1.0);
-        w = s * (T)0.5;
-        T recip = (T)0.5 / s;
-        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
-        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
-        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
-    }
-    else {
-        uint32_t i = 0;
-        if (m.at(1, 1) > m.at(0, 0)) {
-            i = 1;
-        }
-        if (m.at(2, 2) > m.at(i, i)) {
-            i = 2;
-        }
-
-        uint32_t j = (i + 1) % 3;
-        uint32_t k = (j + 1) % 3;
-        T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
-        (*this)[i] = (T)0.5 * s;
-        T recip = (T)0.5 / s;
-        w = (m.at(k, j) - m.at(j, k)) * recip;
-        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
-        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
-    }
-}
-
-template<typename T>
-X_INLINE void Quat<T>::set(const Matrix44<T>& m)
-{
-    T trace = m.trace();
-    if (trace > (T)0.0) {
-        T s = math<T>::sqrt(trace + (T)1.0);
-        w = s * (T)0.5;
-        T recip = (T)0.5 / s;
-        v.x = (m.at(2, 1) - m.at(1, 2)) * recip;
-        v.y = (m.at(0, 2) - m.at(2, 0)) * recip;
-        v.z = (m.at(1, 0) - m.at(0, 1)) * recip;
-    }
-    else {
-        uint32_t i = 0;
-        if (m.at(1, 1) > m.at(0, 0)) {
-            i = 1;
-        }
-        if (m.at(2, 2) > m.at(i, i)) {
-            i = 2;
-        }
-
-        uint32_t j = (i + 1) % 3;
-        uint32_t k = (j + 1) % 3;
-        T s = math<T>::sqrt(m.at(i, i) - m.at(j, j) - m.at(k, k) + (T)1.0);
-        (*this)[i] = (T)0.5 * s;
-        T recip = (T)0.5 / s;
-        w = (m.at(k, j) - m.at(j, k)) * recip;
-        (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
-        (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
-    }
-}
-
-// Operators
-template<typename T>
-X_INLINE Quat<T>& Quat<T>::operator=(const Quat<T>& rhs)
-{
-    v = rhs.v;
-    w = rhs.w;
-    return *this;
-}
-
-template<typename T>
-template<typename FromT>
-X_INLINE Quat<T>& Quat<T>::operator=(const Quat<FromT>& rhs)
-{
-    v = rhs.v;
-    w = static_cast<T>(rhs.w);
-    return *this;
-}
-
-template<typename T>
-X_INLINE const Quat<T> Quat<T>::operator+(const Quat<T>& rhs) const
-{
-    const Quat<T>& lhs = *this;
-    return Quat<T>(lhs.w + rhs.w, lhs.v.x + rhs.v.x, lhs.v.y + rhs.v.y, lhs.v.z + rhs.v.z);
-}
-
-// post-multiply operator, similar to matrices, but different from Shoemake
-// Concatenates 'rhs' onto 'this'
-template<typename T>
-X_INLINE const Quat<T> Quat<T>::operator*(const Quat<T>& rhs) const
-{
-    return Quat<T>(rhs.w * w - rhs.v.x * v.x - rhs.v.y * v.y - rhs.v.z * v.z,
-        rhs.w * v.x + rhs.v.x * w + rhs.v.y * v.z - rhs.v.z * v.y,
-        rhs.w * v.y + rhs.v.y * w + rhs.v.z * v.x - rhs.v.x * v.z,
-        rhs.w * v.z + rhs.v.z * w + rhs.v.x * v.y - rhs.v.y * v.x);
-}
-
-template<typename T>
-X_INLINE const Quat<T> Quat<T>::operator*(T rhs) const
-{
-    return Quat<T>(w * rhs, v.x * rhs, v.y * rhs, v.z * rhs);
-}
-
-// transform a vector by the Quat
-template<typename T>
-X_INLINE const Vec3<T> Quat<T>::operator*(const Vec3<T>& vec) const
-{
-    T vMult = T(2) * (v.x * vec.x + v.y * vec.y + v.z * vec.z);
-    T crossMult = T(2) * w;
-    T pMult = crossMult * w - T(1);
-
-    return Vec3<T>(pMult * vec.x + vMult * v.x + crossMult * (v.y * vec.z - v.z * vec.y),
-        pMult * vec.y + vMult * v.y + crossMult * (v.z * vec.x - v.x * vec.z),
-        pMult * vec.z + vMult * v.z + crossMult * (v.x * vec.y - v.y * vec.x));
-}
-
-template<typename T>
-X_INLINE const Quat<T> Quat<T>::operator-(const Quat<T>& rhs) const
-{
-    const Quat<T>& lhs = *this;
-    return Quat<T>(lhs.w - rhs.w, lhs.v.x - rhs.v.x, lhs.v.y - rhs.v.y, lhs.v.z - rhs.v.z);
-}
-
-template<typename T>
-X_INLINE Quat<T>& Quat<T>::operator+=(const Quat<T>& rhs)
-{
-    w += rhs.w;
-    v += rhs.v;
-    return *this;
-}
-
-template<typename T>
-X_INLINE Quat<T>& Quat<T>::operator-=(const Quat<T>& rhs)
-{
-    w -= rhs.w;
-    v -= rhs.v;
-    return *this;
-}
-
-template<typename T>
-X_INLINE Quat<T>& Quat<T>::operator*=(const Quat<T>& rhs)
-{
-    Quat q = (*this) * rhs;
-    v = q.v;
-    w = q.w;
-    return *this;
-}
-
-template<typename T>
-X_INLINE Quat<T>& Quat<T>::operator*=(T rhs)
-{
-    w *= rhs;
-    v *= rhs;
-    return *this;
-}
-
-template<typename T>
-X_INLINE Quat<T> Quat<T>::operator~() const
-{
-    return Quat<T>(w, -v.x, -v.y, -v.z);
-}
-
-template<typename T>
-X_INLINE Quat<T> Quat<T>::operator-() const
-{
-    return Quat<T>(-w, -v.x, -v.y, -v.z);
-}
-
-template<typename T>
-X_INLINE bool Quat<T>::compare(const Quat<T>& rhs, const T elipson) const
-{
-    const Quat<T>& lhs = *this;
-    return (math<float>::abs(lhs.w - rhs.w) < elipson) && lhs.v.compare(rhs.v, elipson);
-}
-
-template<typename T>
-X_INLINE bool Quat<T>::operator==(const Quat<T>& rhs) const
-{
-    const Quat<T>& lhs = *this;
-    return (math<float>::abs(lhs.w - rhs.w) < math<T>::EPSILON) && lhs.v == rhs.v;
-}
-
-template<typename T>
-X_INLINE bool Quat<T>::operator!=(const Quat<T>& rhs) const
-{
-    return !(*this == rhs);
-}
-
-template<typename T>
-X_INLINE T& Quat<T>::operator[](uint32_t i)
-{
-    static_assert(X_OFFSETOF(Quat,w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
-
-    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
-    return (&v.x)[i];
-}
-
-template<typename T>
-X_INLINE const T& Quat<T>::operator[](uint32_t i) const
-{
-    static_assert(X_OFFSETOF(Quat, w) == (X_OFFSETOF(Quat, v.z) + sizeof(T)), "Padding between v and w");
-
-    X_ASSERT(i < DIM, "Index out of range")(i, DIM);
-    return (&v.x)[i];
-}
 
 template<typename T>
 X_INLINE Quat<T> Quat<T>::identity()
