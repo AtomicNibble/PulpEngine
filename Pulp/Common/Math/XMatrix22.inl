@@ -14,12 +14,6 @@ Matrix22<T>::Matrix22(T s)
 }
 
 template<typename T>
-Matrix22<T>::Matrix22(const T* dt, bool srcIsRowMajor)
-{
-    set(dt, srcIsRowMajor);
-}
-
-template<typename T>
 Matrix22<T>::Matrix22(T d0, T d1, T d2, T d3, bool srcIsRowMajor)
 {
     set(d0, d1,
@@ -282,20 +276,6 @@ const T& Matrix22<T>::at(int row, int col) const
     X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
     X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
-}
-
-template<typename T>
-void Matrix22<T>::set(const T* dt, bool srcIsRowMajor)
-{
-    if (srcIsRowMajor) {
-        m00 = dt[0];
-        m01 = dt[2];
-        m10 = dt[1];
-        m11 = dt[3];
-    }
-    else {
-        std::memcpy(m, dt, MEM_LEN);
-    }
 }
 
 template<typename T>

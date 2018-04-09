@@ -14,12 +14,6 @@ Matrix44<T>::Matrix44(T s)
 }
 
 template<typename T>
-Matrix44<T>::Matrix44(const T* dt, bool srcIsRowMajor)
-{
-    set(dt, srcIsRowMajor);
-}
-
-template<typename T>
 Matrix44<T>::Matrix44(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, T d12, T d13, T d14, T d15, bool srcIsRowMajor)
 {
     set(d0, d1, d2, d3,
@@ -478,32 +472,6 @@ const T& Matrix44<T>::at(int row, int col) const
     X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
     X_ASSERT(col >= 0 && col < DIM, "col out of range")(DIM, col);
     return m[col * DIM + row];
-}
-
-template<typename T>
-void Matrix44<T>::set(const T* dt, bool srcIsRowMajor)
-{
-    if (!srcIsRowMajor) {
-        std::memcpy(m, dt, MEM_LEN);
-    }
-    else {
-        m[0] = dt[0];
-        m[4] = dt[1];
-        m[8] = dt[2];
-        m[12] = dt[3];
-        m[1] = dt[4];
-        m[5] = dt[5];
-        m[9] = dt[6];
-        m[13] = dt[7];
-        m[2] = dt[8];
-        m[6] = dt[9];
-        m[10] = dt[10];
-        m[14] = dt[11];
-        m[3] = dt[12];
-        m[7] = dt[13];
-        m[11] = dt[14];
-        m[15] = dt[15];
-    }
 }
 
 template<typename T>

@@ -37,12 +37,6 @@ TYPED_TEST(Mat22, Contruction)
         MatT c0(3, 3, 3, 3);
         EXPECT_EQ(c0, MatT(3));
     }
-    // Matrix22( const T *dt );
-    {
-        T data[4] = {1, 2, 3, 4};
-        MatT c0(1, 2, 3, 4);
-        EXPECT_EQ(c0, MatT(data));
-    }
     // Matrix22( T d0, T d1, T d2, T d3 );
     {
         T data[4] = {1, 2, 3, 4};

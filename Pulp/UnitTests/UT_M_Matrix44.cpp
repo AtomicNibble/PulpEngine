@@ -45,23 +45,6 @@ TYPED_TEST(Mat44, Contruction)
         MatT m0(3);
         EXPECT_EQ(c0, m0);
     }
-    // Matrix44( const T *dt );
-    {
-        MatT c0(
-            1, 2, 3, 4,
-            5, 6, 7, 8,
-            9, 10, 11, 12,
-            13, 14, 15, 16);
-
-        TypeParam data[16] = {
-            (T)1, (T)2, (T)3, (T)4,
-            (T)5, (T)6, (T)7, (T)8,
-            (T)9, (T)10, (T)11, (T)12,
-            (T)13, (T)14, (T)15, (T)16};
-        MatT m0(data);
-
-        EXPECT_EQ(c0, m0);
-    }
     // Matrix44(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, T d12, T d13, T d14, T d15);
     {
         MatT c0;

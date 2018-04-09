@@ -39,7 +39,6 @@ public:
 
     Matrix34();
     explicit Matrix34(T s);
-    Matrix34(const T* dt, bool srcIsRowMajor = false);
    
     Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor = false);
 
@@ -97,7 +96,6 @@ public:
     X_INLINE const T& at(int row, int col) const;
 
     // set
-    X_INLINE void set(const T* dt, bool srcIsRowMajor = false);
     X_INLINE void set(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor = false);
 
     // shizz

@@ -19,12 +19,6 @@ Matrix34<T>::Matrix34(T s)
 }
 
 template<typename T>
-X_INLINE Matrix34<T>::Matrix34(const T* dt, bool srcIsRowMajor)
-{
-    set(dt, srcIsRowMajor);
-}
-
-template<typename T>
 X_INLINE Matrix34<T>::Matrix34(T d0, T d1, T d2, T d3, T d4, T d5, T d6,
     T d7, T d8, T d9, T d10, T d11, bool srcIsRowMajor)
 {
@@ -470,29 +464,6 @@ X_INLINE const T& Matrix34<T>::at(int row, int col) const
     X_ASSERT(row >= 0 && row < DIM, "row out of range")(DIM, row);
     X_ASSERT(col >= 0 && col < DIM + 1, "col out of range")(DIM + 1, col);
     return m[col * DIM + row];
-}
-
-template<typename T>
-X_INLINE void Matrix34<T>::set(const T* dt, bool srcIsRowMajor)
-{
-    if (srcIsRowMajor) {
-        m[0] = dt[0];
-        m[3] = dt[1];
-        m[6] = dt[2];
-        m[1] = dt[3];
-        m[4] = dt[4];
-        m[7] = dt[5];
-        m[2] = dt[6];
-        m[5] = dt[7];
-        m[8] = dt[8];
-
-        m[9] = dt[9];
-        m[10] = dt[10];
-        m[11] = dt[11];
-    }
-    else {
-        std::memcpy(m, dt, MEM_LEN);
-    }
 }
 
 template<typename T>

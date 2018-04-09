@@ -50,25 +50,6 @@ TYPED_TEST(Mat34, Contruction)
 
         EXPECT_EQ(c0, m0);
     }
-    // Matrix34( const T *dt );
-    {
-        MatT c0(
-            1, 2, 3,
-            4, 5, 6,
-            7, 8, 9,
-            10, 11, 12);
-
-        T data[12] = {
-            (T)1, (T)2, (T)3,
-            (T)4, (T)5, (T)6,
-            (T)7, (T)8, (T)9,
-            (T)10, (T)11, (T)12};
-
-        MatT m0(data);
-
-        EXPECT_EQ(c0, m0);
-    }
-
     // Matrix34( T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, T d9, T d10, T d12 );
     {
         MatT c0;
@@ -224,7 +205,7 @@ TYPED_TEST(Mat34, Contruction)
 
         Quat<T> q(mat33);
 
-        MatT m0 = q.toMatrix33();
+        MatT m0 = MatT(q.toMatrix33());
         MatT m1(q);
 
         EXPECT_EQ(m0, m1);

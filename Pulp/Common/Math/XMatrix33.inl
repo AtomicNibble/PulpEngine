@@ -14,12 +14,6 @@ Matrix33<T>::Matrix33(T s)
 }
 
 template<typename T>
-Matrix33<T>::Matrix33(const T* dt, bool srcIsRowMajor)
-{
-    set(dt, srcIsRowMajor);
-}
-
-template<typename T>
 Matrix33<T>::Matrix33(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, bool srcIsRowMajor)
 {
     set(d0, d1, d2,
@@ -351,24 +345,6 @@ const T& Matrix33<T>::at(int row, int col) const
     return m[col * DIM + row];
 }
 
-template<typename T>
-void Matrix33<T>::set(const T* dt, bool srcIsRowMajor)
-{
-    if (!srcIsRowMajor) {
-        std::memcpy(m, dt, MEM_LEN);
-    }
-    else {
-        m[0] = dt[0];
-        m[3] = dt[1];
-        m[6] = dt[2];
-        m[1] = dt[3];
-        m[4] = dt[4];
-        m[7] = dt[5];
-        m[2] = dt[6];
-        m[5] = dt[7];
-        m[8] = dt[8];
-    }
-}
 
 template<typename T>
 void Matrix33<T>::set(T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8, bool srcIsRowMajor)

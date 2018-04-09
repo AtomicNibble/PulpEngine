@@ -56,9 +56,6 @@ public:
 
     explicit Matrix22(T s);
 
-    // OpenGL layout - unless srcIsRowMajor is true
-    explicit Matrix22(const T* dt, bool srcIsRowMajor = false);
-
     // OpenGL layout: m[0]=d0, m[1]=d1, m[2]=d2, m[3]=d3 - unless srcIsRowMajor is true
     Matrix22(T d0, T d1, T d2, T d3, bool srcIsRowMajor = false);
 
@@ -106,8 +103,6 @@ public:
     T& at(int row, int col);
     const T& at(int row, int col) const;
 
-    // OpenGL layout - unless srcIsRowMajor is true
-    void set(const T* dt, bool srcIsRowMajor = false);
     // OpenGL layout: m[0]=d0, m[1]=d1, m[2]=d2, m[3]=d3 - unless srcIsRowMajor is true
     void set(T d0, T d1, T d2, T d3, bool srcIsRowMajor = false);
 

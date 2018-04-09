@@ -49,21 +49,6 @@ TYPED_TEST(Mat33, Contruction)
 
         EXPECT_EQ(c0, m0);
     }
-    // Matrix33( const T *dt );
-    {
-        MatT c0(1, 2, 3,
-            4, 5, 6,
-            7, 8, 9);
-
-        T data[9] = {
-            (T)1, (T)2, (T)3,
-            (T)4, (T)5, (T)6,
-            (T)7, (T)8, (T)9};
-
-        MatT m0(data);
-
-        EXPECT_EQ(c0, m0);
-    }
     // Matrix33( T d0, T d1, T d2, T d3, T d4, T d5, T d6, T d7, T d8 );
     {
         MatT c0;
