@@ -77,6 +77,7 @@ public:
     void set(const Matrix34<T>& m);
     void set(const Matrix44<T>& m);
 
+    void getAxisAngle(Vec3<T>* axis, T* radians) const;
 
     Vec3<T> getAxis() const;    // get axis-angle representation's axis
     T getAngle() const;         // get axis-angle representation's angle in radians
@@ -100,8 +101,6 @@ public:
 
     Matrix33<T> toMatrix33() const;
     Matrix44<T> toMatrix44() const;
-    void getAxisAngle(Vec3<T>* axis, T* radians) const;
-
 
     // fancy things.
     Quat<T> lerp(T t, const Quat<T>& end) const;

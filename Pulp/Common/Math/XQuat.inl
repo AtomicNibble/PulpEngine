@@ -422,6 +422,12 @@ X_INLINE void Quat<T>::set(const Matrix44<T>& m)
 }
 
 
+template<typename T>
+X_INLINE void Quat<T>::getAxisAngle(Vec3<T>* axis, T* radians) const
+{
+    *axis = getAxis();
+    *radians = getAngle();
+}
 
 // get axis-angle representation's axis
 template<typename T>
@@ -681,17 +687,6 @@ X_INLINE Matrix44<T> Quat<T>::toMatrix44() const
     return mV;
 }
 
-template<typename T>
-X_INLINE void Quat<T>::getAxisAngle(Vec3<T>* axis, T* radians) const
-{
-    T cos_angle = w;
-    *radians = math<T>::acos(cos_angle) * 2;
-    T invLen = static_cast<T>(1.0) / math<T>::sqrt(static_cast<T>(1.0) - cos_angle * cos_angle);
-
-    axis->x = v.x * invLen;
-    axis->y = v.y * invLen;
-    axis->z = v.z * invLen;
-}
 
 // ---------------------------------------
 
