@@ -34,6 +34,26 @@ TEST(XQuat, AxisAngle)
     EXPECT_NEAR(radians, radiansOut, 0.00001f);
 }
 
+TEST(XQuat, Axis)
+{
+    Quatf a(0.49879f, 0.232f, 0.463f, 0.695f);
+
+    EXPECT_NEAR(1.f, a.length(), 0.00001f);
+
+    float32_t pitch = a.getPitch();
+    float32_t yaw = a.getYaw();
+    float32_t roll = a.getRoll();
+
+    EXPECT_FLOAT_EQ(1.08355474f, pitch);
+    EXPECT_FLOAT_EQ(0.139854997f, yaw);
+    EXPECT_FLOAT_EQ(1.98085940f, roll);
+
+    Vec3f vec = a.getAxis();
+    float angle = a.getAngle();
+    EXPECT_NEAR_VEC3(Vec3f(0.267674923f, 0.534196079f, 0.801871061f), vec, 0.00001f);
+    EXPECT_NEAR(2.0971938, angle, 0.00001f);
+}
+
 TEST(XQuat, Matrix)
 {
     const Quatf ident = Quatf::identity();
@@ -186,24 +206,6 @@ TEST(XQuat, Slerp)
     EXPECT_NEAR_VEC3(Quatf(0.218870267f, 0.683969557f, 0.437740535f, 0.519816875f).v, a.slerp(0.5f, b).v, 0.00001f);
 }
 
-TEST(XQuat, Axis)
-{
-    Quatf a(0.49879f, 0.232f, 0.463f, 0.695f);
-
-    EXPECT_NEAR(1.f, a.length(), 0.00001f);
-
-    float32_t pitch = a.getPitch();
-    float32_t yaw = a.getYaw();
-    float32_t roll = a.getRoll();
-
-    EXPECT_FLOAT_EQ(1.08355474f, pitch);
-    EXPECT_FLOAT_EQ(0.139854997f, yaw);
-    EXPECT_FLOAT_EQ(1.98085940f, roll);
-
-    Vec3f vec = a.getAxis();
-
-    EXPECT_NEAR_VEC3(Vec3f(0.267674923f, 0.534196079f, 0.801871061f), vec, 0.00001f);
-}
 TEST(XQuat, Operators)
 {
     Quatf a(0.2f, 0.450f, 0.200f, 0.750f);
