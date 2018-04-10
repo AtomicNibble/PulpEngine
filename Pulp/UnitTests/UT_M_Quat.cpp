@@ -69,6 +69,17 @@ TEST(XQuat, Matrix)
     EXPECT_NEAR_QUAT(-Quatf(0.1117323f, -0.6081319f, -0.1725995f, -0.7667469f), q2, 0.00001f);
     EXPECT_EQ(m2, q2.toMatrix33());
 
+
+    const Matrix33f m3(
+        -0.2353829f, 0.3812674f, 0.8939967f,
+        -0.9463119f, -0.2995987f, -0.1213857f,
+        0.2215598f, -0.8745718f, 0.4313183f, true
+    );
+
+    Quatf q3(m3);
+    EXPECT_NEAR_QUAT(Quatf(-0.4733753f, 0.3977743f, -0.3551288f, 0.7011241f), q3, 0.00001f);
+    EXPECT_EQ(m3, q3.toMatrix33());
+}
 }
 TEST(XQuat, Equality)
 {
@@ -193,16 +204,6 @@ TEST(XQuat, Axis)
 
     EXPECT_NEAR_VEC3(Vec3f(0.267674923f, 0.534196079f, 0.801871061f), vec, 0.00001f);
 }
-
-TEST(XQuat, Matrix)
-{
-    Quatf ident = Quatf::identity();
-
-    Matrix33f mat33 = ident.toMatrix33();
-
-    EXPECT_EQ(mat33, Matrix33f::identity());
-}
-
 TEST(XQuat, Operators)
 {
     Quatf a(0.2f, 0.450f, 0.200f, 0.750f);
