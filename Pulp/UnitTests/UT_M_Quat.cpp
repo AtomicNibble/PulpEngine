@@ -24,8 +24,10 @@ TEST(XQuat, AxisAngle)
 
     Quatf q(axis, radians);
 
+    // Check the Quat
     EXPECT_NEAR_QUAT(Quatf(-0.6024865f, -0.0304507f, -0.7684388f, 0.2135054f), q, 0.00001f);
 
+    // Check Axis angles comes back the same.
     Vec3f axisOut;
     float radiansOut;
     q.getAxisAngle(&axisOut, &radiansOut);
@@ -36,22 +38,36 @@ TEST(XQuat, AxisAngle)
 
 TEST(XQuat, Axis)
 {
-    Quatf a(0.49879f, 0.232f, 0.463f, 0.695f);
+    Quatf a0(0.49879f, 0.232f, 0.463f, 0.695f);
 
-    EXPECT_NEAR(1.f, a.length(), 0.00001f);
+    EXPECT_NEAR(1.f, a0.length(), 0.00001f);
 
-    float32_t pitch = a.getPitch();
-    float32_t yaw = a.getYaw();
-    float32_t roll = a.getRoll();
+    float32_t pitch = a0.getPitch();
+    float32_t yaw = a0.getYaw();
+    float32_t roll = a0.getRoll();
 
     EXPECT_FLOAT_EQ(1.08355474f, pitch);
     EXPECT_FLOAT_EQ(0.139854997f, yaw);
     EXPECT_FLOAT_EQ(1.98085940f, roll);
 
-    Vec3f vec = a.getAxis();
-    float angle = a.getAngle();
+    Vec3f vec = a0.getAxis();
+    float angle = a0.getAngle();
     EXPECT_NEAR_VEC3(Vec3f(0.267674923f, 0.534196079f, 0.801871061f), vec, 0.00001f);
     EXPECT_NEAR(2.0971938, angle, 0.00001f);
+
+    {
+        Quatf q1(Vec3f(0.7571761f, 0.0101299f, 0.6531323f), ::toRadians(240.2215912f));
+        EXPECT_NEAR(1.f, q1.length(), 0.00001f);
+        EXPECT_NEAR_QUAT(Quatf(-0.5016737f, 0.6550004f, 0.008763f, 0.5649966f), q1, 0.00001f);
+
+        Vec3f vec = q1.getAxis();
+        float angle = q1.getAngle();
+        Vec3f vecMangitude = vec * ::toDegrees(angle);
+     
+        EXPECT_NEAR_VEC3(Vec3f(0.7571761f, 0.0101299f, 0.6531323f), vec, 0.00001f);
+        EXPECT_NEAR(4.1926577f, angle, 0.00001f);
+        EXPECT_NEAR_VEC3(Vec3f(181.8900362f, 2.4334257f, 156.8964819f), vecMangitude, 0.0001f);
+    }
 }
 
 TEST(XQuat, Matrix)
