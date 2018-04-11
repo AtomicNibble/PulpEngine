@@ -1715,6 +1715,19 @@ X_INLINE T operator|(const Vec3<T>& v0, const Vec3<T>& v1)
     return v0.dot(v1);
 }
 
+template<typename T>
+X_INLINE Vec3<T> toDegrees(const Vec3<T>& v0)
+{
+    return Vec3<T>(::toDegrees(v0.x), ::toDegrees(v0.y), ::toDegrees(v0.z));
+}
+
+template<typename T>
+X_INLINE Vec3<T> toRadians(const Vec3<T>& v0)
+{
+    return Vec3<T>(::toRadians(v0.x), ::toRadians(v0.y), ::toRadians(v0.z));
+}
+
+
 typedef Vec2<int32_t> Vec2i;
 typedef Vec2<uint32_t> Vec2ui;
 typedef Vec2<float32_t> Vec2f;
