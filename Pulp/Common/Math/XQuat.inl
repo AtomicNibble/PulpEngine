@@ -265,61 +265,40 @@ X_INLINE void Quat<T>::set(const Vec3<T>& eulerRadians)
 template<typename T>
 X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 {
-#if 1
-    pitch *= T(0.5);
-    yaw *= T(0.5);
-    roll *= T(0.5);
-
-    const T sinPitch(math<T>::sin(pitch));
-    const T cosPitch(math<T>::cos(pitch));
-    const T sinYaw(math<T>::sin(yaw));
-    const T cosYaw(math<T>::cos(yaw));
-    const T sinRoll(math<T>::sin(roll));
-    const T cosRoll(math<T>::cos(roll));
-    const T cosPitchCosYaw(cosPitch * cosYaw);
-    const T sinPitchSinYaw(sinPitch * sinYaw);
-
-    v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
-    v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-    v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
-    w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
-
-#else
 #if 0
-    T sinPitch, cosPitch;
-    T sinYaw, cosYaw;
-    T sinRoll, cosRoll;
+    T cx, sx, cy, sy, cz, sz;
+    math<T>::sincos(pitch * T(0.5f), sx, cx);
+    math<T>::sincos(yaw * T(0.5f), sy, cy);
+    math<T>::sincos(roll * T(0.5f), sz, cz);
 
-    math<T>::sincos(::toRadians(pitch) * T(0.5f), sinPitch, cosPitch);
-    math<T>::sincos(::toRadians(yaw)   * T(0.5f), sinYaw, cosYaw);
-    math<T>::sincos(::toRadians(roll)  * T(0.5f), sinRoll, cosRoll);
-
-    const T cosPitchCosYaw(cosPitch*cosYaw);
-    const T sinPitchSinYaw(sinPitch*sinYaw);
-
-    v.x = sinRoll * cosPitchCosYaw - cosRoll * sinPitchSinYaw;
-    v.y = cosRoll * sinPitch * cosYaw + sinRoll * cosPitch * sinYaw;
-    v.z = cosRoll * cosPitch * sinYaw - sinRoll * sinPitch * cosYaw;
-    w = cosRoll * cosPitchCosYaw + sinRoll * sinPitchSinYaw;
+    w = cx * cy * cz + sx * sy * sz;
+    v.x = sx * cy * cz - cx * sy * sz;
+    v.y = cx * sy * cz + sx * cy * sz;
+    v.z = cx * cy * sz - sx * sy * cz;
 #else
-    T Cx, Sx, Cy, Sy, Cz, Sz;
-    T sxcy, cxcy, sxsy, cxsy;
+    float zRotation = pitch;
+    float yRotation = yaw;
+    float xRotation = roll;
 
-    math<T>::sincos(::toRadians(pitch) * T(0.5f), Cx, Sx);
-    math<T>::sincos(::toRadians(yaw) * T(0.5f), Cy, Sy);
-    math<T>::sincos(::toRadians(roll) * T(0.5f), Cz, Sz);
+    zRotation *= T(0.5);
+    yRotation *= T(0.5);
+    xRotation *= T(0.5);
+
+    // get sines and cosines of half angles
+    T Cx = math<T>::cos(xRotation);
+    T Sx = math<T>::sin(xRotation);
+
+    T Cy = math<T>::cos(yRotation);
+    T Sy = math<T>::sin(yRotation);
+
+    T Cz = math<T>::cos(zRotation);
+    T Sz = math<T>::sin(zRotation);
 
     // multiply it out
-    sxcy = Sx * Cy;
-    cxcy = Cx * Cy;
-    sxsy = Sx * Sy;
-    cxsy = Cx * Sy;
-
-    v.x = Sx * Cy * Cz + Cx * Sy * Sz;
-    v.y = Cx * Sy * Cz - Sx * Cy * Sz;
-    v.z = Cx * Cy * Sz + Sx * Sy * Cx;
-    w = Cx * Cy * Cz - Sx * Sy * Sz;
-#endif
+    w = Cx*Cy*Cz - Sx*Sy*Sz;
+    v.x = Sx*Cy*Cz + Cx*Sy*Sz;
+    v.y = Cx*Sy*Cz - Sx*Cy*Sz;
+    v.z = Cx*Cy*Sz + Sx*Sy*Cx;
 #endif
 }
 
