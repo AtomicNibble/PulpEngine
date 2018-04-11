@@ -265,7 +265,6 @@ X_INLINE void Quat<T>::set(const Vec3<T>& eulerRadians)
 template<typename T>
 X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 {
-#if 0
     T cx, sx, cy, sy, cz, sz;
     math<T>::sincos(pitch * T(0.5f), sx, cx);
     math<T>::sincos(yaw * T(0.5f), sy, cy);
@@ -275,31 +274,6 @@ X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
     v.x = sx * cy * cz - cx * sy * sz;
     v.y = cx * sy * cz + sx * cy * sz;
     v.z = cx * cy * sz - sx * sy * cz;
-#else
-    float zRotation = pitch;
-    float yRotation = yaw;
-    float xRotation = roll;
-
-    zRotation *= T(0.5);
-    yRotation *= T(0.5);
-    xRotation *= T(0.5);
-
-    // get sines and cosines of half angles
-    T Cx = math<T>::cos(xRotation);
-    T Sx = math<T>::sin(xRotation);
-
-    T Cy = math<T>::cos(yRotation);
-    T Sy = math<T>::sin(yRotation);
-
-    T Cz = math<T>::cos(zRotation);
-    T Sz = math<T>::sin(zRotation);
-
-    // multiply it out
-    w = Cx*Cy*Cz - Sx*Sy*Sz;
-    v.x = Sx*Cy*Cz + Cx*Sy*Sz;
-    v.y = Cx*Sy*Cz - Sx*Cy*Sz;
-    v.z = Cx*Cy*Sz + Sx*Sy*Cx;
-#endif
 }
 
 template<typename T>
