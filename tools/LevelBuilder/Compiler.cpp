@@ -519,7 +519,7 @@ bool Compiler::createLightList(LvlEntsArr& ents)
 
         level::Light l;
         l.pos = ent.origin;
-        l.angle = Quatf(toRadians(ent.angle.x), toRadians(ent.angle.y), toRadians(ent.angle.z));
+        l.angle = Quatf(toRadians(ent.angle));
         l.type = level::LightType::Point;
 
         {
@@ -568,7 +568,7 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
         level::FileStaticModel& sm = staticModels_.AddOne();
 
         sm.pos = ent.origin;
-        sm.angle = Quatf(toRadians(ent.angle.x), toRadians(ent.angle.y), toRadians(ent.angle.z));
+        sm.angle = Quatf(toRadians(ent.angle));
         // lvl ent bounds are the model bounds when type is MISC_MODEL
         sm.boundingBox = ent.bounds;
 
