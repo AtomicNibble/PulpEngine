@@ -22,7 +22,7 @@ public:
         EXPECT_NEAR(_exp.z, _act.z, angle_error);       \
     }
 
-TYPED_TEST(Planes, Genral)
+TYPED_TEST(Planes, General)
 {
     Vec3<TypeParam> v1(20, 10, 10);
     Vec3<TypeParam> v2(20, 10, 20);
