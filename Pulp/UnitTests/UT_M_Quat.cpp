@@ -70,6 +70,7 @@ TEST(XQuat, Axis)
     }
 }
 
+
 TEST(XQuat, Matrix)
 {
     const Quatf ident = Quatf::identity();
@@ -132,7 +133,46 @@ TEST(XQuat, Matrix)
     EXPECT_EQ(m4, q4.toMatrix33());
 }
 
+TEST(XQuat, Euler)
+{
+    const Vec3f vecRadians0(
+        ::toRadians(10.f), ::toRadians(44.f), ::toRadians(10.f)
+    );
+
+    Quatf q0(vecRadians0);
+    EXPECT_NEAR(1.f, q0.length(), 0.00001f);
+    EXPECT_NEAR_QUAT(Quatf(0.9229864f, 0.047977f, 0.378804f, 0.047977f), q0, 0.00001f);
+
+    auto axis0 = q0.getAxis();
+    auto angle0 = q0.getAngle();
+    EXPECT_NEAR_VEC3(Vec3f(0.1246699f, 0.9843347f, 0.1246699f), axis0, 0.00001f);
+    EXPECT_NEAR(0.7900528f, angle0, 0.00001f);
+
+    auto euler0 = q0.getEuler();
+    auto eulerDeg0 = q0.getEulerDegrees();
+    EXPECT_NEAR_VEC3(vecRadians0, euler0, 0.00001f);
+    EXPECT_NEAR_VEC3(::toDegrees(vecRadians0), eulerDeg0, 0.0001f);
+
+    const Vec3f vecRadians1(
+        ::toRadians(-78.f), ::toRadians(201.f), ::toRadians(62.5f)
+    );
+
+    Quatf q1(vecRadians1);
+
+    EXPECT_NEAR(1.f, q1.length(), 0.00001f);
+    EXPECT_NEAR_QUAT(Quatf(-0.442083f, -0.2983664f, 0.7127613f, 0.4555338f), q1, 0.00001f);
+
+    auto axis1 = q1.getAxis();
+    auto angle1 = q1.getAngle();
+    EXPECT_NEAR_VEC3(Vec3f(-0.3326366f, 0.7946288f, 0.5078563f), axis1, 0.1f);
+    EXPECT_NEAR(4.0574328f, angle1, 0.1f);
+
+    auto euler1 = q1.getEuler();
+    auto eulerDeg1 = q1.getEulerDegrees();
+    EXPECT_NEAR_VEC3(Vec3f(1.7802358f, -0.3665191f, -2.0507619f), euler1, 0.001f);
+    EXPECT_NEAR_VEC3(Vec3f(102.0000001f, -21.f, -117.4999999f), eulerDeg1, 0.001f);
 }
+
 TEST(XQuat, Equality)
 {
     Quatf a4(1.f, 2.f, 3.f, 4.f);
