@@ -66,6 +66,7 @@ TEST(XQuat, Matrix)
     );
 
     Quatf q0(m0);
+    EXPECT_NEAR(1.f, q0.length(), 0.00001f);
     EXPECT_NEAR_QUAT(Quatf(0.525321960f, 0.8509035f, 0.f, 0.f), q0, 0.00001f);
     EXPECT_EQ(m0, q0.toMatrix33());
 
@@ -76,6 +77,7 @@ TEST(XQuat, Matrix)
     );
     
     Quatf q1(m1);
+    EXPECT_NEAR(1.f, q1.length(), 0.00001f);
     EXPECT_NEAR_QUAT(Quatf(0.2759632f, 0.4469983f, 0.4469983f, 0.7240368f), q1, 0.00001f);
     EXPECT_EQ(m1, q1.toMatrix33());
 
@@ -86,6 +88,7 @@ TEST(XQuat, Matrix)
     );
 
     Quatf q2(m2);
+    EXPECT_NEAR(1.f, q2.length(), 0.00001f);
     EXPECT_NEAR_QUAT(-Quatf(0.1117323f, -0.6081319f, -0.1725995f, -0.7667469f), q2, 0.00001f);
     EXPECT_EQ(m2, q2.toMatrix33());
 
@@ -97,6 +100,7 @@ TEST(XQuat, Matrix)
     );
 
     Quatf q3(m3);
+    EXPECT_NEAR(1.f, q3.length(), 0.00001f);
     EXPECT_NEAR_QUAT(Quatf(-0.4733753f, 0.3977743f, -0.3551288f, 0.7011241f), q3, 0.00001f);
     EXPECT_EQ(m3, q3.toMatrix33());
 
@@ -107,6 +111,7 @@ TEST(XQuat, Matrix)
     );
 
     Quatf q4(m4);
+    EXPECT_NEAR(1.f, q4.length(), 0.00001f);
     EXPECT_NEAR_QUAT(Quatf(0.688439f, 0.1180259f, 0.7081505f, 0.1031722f), q4, 0.00001f);
     EXPECT_EQ(m4, q4.toMatrix33());
 }
