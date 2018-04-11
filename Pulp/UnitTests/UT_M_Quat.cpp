@@ -99,7 +99,18 @@ TEST(XQuat, Matrix)
     Quatf q3(m3);
     EXPECT_NEAR_QUAT(Quatf(-0.4733753f, 0.3977743f, -0.3551288f, 0.7011241f), q3, 0.00001f);
     EXPECT_EQ(m3, q3.toMatrix33());
+
+    const Matrix33f m4(
+        -0.0242432f, 0.0251046f, 0.9993908f,
+        0.3092157f, 0.9508508f, -0.0163843f, 
+        -0.9506829f, 0.3086301f, -0.0308144f, true 
+    );
+
+    Quatf q4(m4);
+    EXPECT_NEAR_QUAT(Quatf(0.688439f, 0.1180259f, 0.7081505f, 0.1031722f), q4, 0.00001f);
+    EXPECT_EQ(m4, q4.toMatrix33());
 }
+
 }
 TEST(XQuat, Equality)
 {
