@@ -254,6 +254,7 @@ X_INLINE void Quat<T>::set(const Vec3<T>& axis, T radians)
     v = axis.normalized() * math<T>::sin(radians * static_cast<T>(0.5));
 }
 
+
 // assumes ZYX rotation order and radians
 template<typename T>
 X_INLINE void Quat<T>::set(const Vec3<T>& eulerRadians)
@@ -279,6 +280,53 @@ X_INLINE void Quat<T>::set(T pitch, T yaw, T roll)
 template<typename T>
 X_INLINE void Quat<T>::set(const Matrix33<T>& m)
 {
+#if 1 // this version seams a lot faster, oddly.
+
+    T fourXSquaredMinus1 = m.mcols[0][0] - m.mcols[1][1] - m.mcols[2][2];
+    T fourYSquaredMinus1 = m.mcols[1][1] - m.mcols[0][0] - m.mcols[2][2];
+    T fourZSquaredMinus1 = m.mcols[2][2] - m.mcols[0][0] - m.mcols[1][1];
+    T fourWSquaredMinus1 = m.mcols[0][0] + m.mcols[1][1] + m.mcols[2][2];
+
+    int biggestIndex = 0;
+    T fourBiggestSquaredMinus1 = fourWSquaredMinus1;
+    if (fourXSquaredMinus1 > fourBiggestSquaredMinus1)
+    {
+        fourBiggestSquaredMinus1 = fourXSquaredMinus1;
+        biggestIndex = 1;
+    }
+    if (fourYSquaredMinus1 > fourBiggestSquaredMinus1)
+    {
+        fourBiggestSquaredMinus1 = fourYSquaredMinus1;
+        biggestIndex = 2;
+    }
+    if (fourZSquaredMinus1 > fourBiggestSquaredMinus1)
+    {
+        fourBiggestSquaredMinus1 = fourZSquaredMinus1;
+        biggestIndex = 3;
+    }
+
+    T biggestVal = math<T>::sqrt(fourBiggestSquaredMinus1 + static_cast<T>(1)) * static_cast<T>(0.5);
+    T mult = static_cast<T>(0.25) / biggestVal;
+
+    switch (biggestIndex)
+    {
+        case 0:
+            set(biggestVal, (m.mcols[1][2] - m.mcols[2][1]) * mult, (m.mcols[2][0] - m.mcols[0][2]) * mult, (m.mcols[0][1] - m.mcols[1][0]) * mult);
+            break;
+        case 1:
+            set((m.mcols[1][2] - m.mcols[2][1]) * mult, biggestVal, (m.mcols[0][1] + m.mcols[1][0]) * mult, (m.mcols[2][0] + m.mcols[0][2]) * mult);
+            break;
+        case 2:
+            set((m.mcols[2][0] - m.mcols[0][2]) * mult, (m.mcols[0][1] + m.mcols[1][0]) * mult, biggestVal, (m.mcols[1][2] + m.mcols[2][1]) * mult);
+            break;
+        case 3:
+            set((m.mcols[0][1] - m.mcols[1][0]) * mult, (m.mcols[2][0] + m.mcols[0][2]) * mult, (m.mcols[1][2] + m.mcols[2][1]) * mult, biggestVal);
+            break;
+        default: 
+            X_NO_SWITCH_DEFAULT_ASSERT;
+    }
+
+#else
     //T trace = m.m[0] + m.m[4] + m.m[8];
     const T trace = m.trace();
     if (trace > (T)0.0) {
@@ -307,6 +355,7 @@ X_INLINE void Quat<T>::set(const Matrix33<T>& m)
         (*this)[j] = (m.at(j, i) + m.at(i, j)) * recip;
         (*this)[k] = (m.at(k, i) + m.at(i, k)) * recip;
     }
+#endif
 }
 
 template<typename T>
