@@ -183,7 +183,7 @@ template<typename T>
 X_INLINE bool Quat<T>::operator==(const Quat<T>& rhs) const
 {
     const Quat<T>& lhs = *this;
-    return (math<float>::abs(lhs.w - rhs.w) < math<T>::EPSILON) && lhs.v == rhs.v;
+    return (math<T>::abs(lhs.w - rhs.w) < math<T>::EPSILON) && lhs.v == rhs.v;
 }
 
 template<typename T>
@@ -698,7 +698,7 @@ X_INLINE Quat<T> Quat<T>::lerp(T t, const Quat<T>& end) const
     X_ASSERT(t >= 0.f && t <= 1.f, "T out of range for lerp")(t);
 
     // get cos of "angle" between Quats
-    float cosTheta = dot(end);
+    T cosTheta = dot(end);
 
     // initialize result
     Quat<T> result = end * t;
