@@ -259,6 +259,41 @@ struct math<double>
     {
         return ::floor(x);
     }
+    X_INLINE static double round(double x)
+    {
+        return ::floor(double(x) + 0.5);
+    }
+    X_INLINE static double fmod(double x, double y)
+    {
+        return ::fmod(x, y);
+    }
+    X_INLINE static double hypot(double x, double y)
+    {
+        return ::sqrt(x * x + y * y);
+    }
+    X_INLINE static double signum(double x)
+    {
+        return (x > 0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0);
+    }
+    X_INLINE static constexpr double max(double x, double y)
+    {
+        return (x > y) ? x : y;
+    }
+    X_INLINE static constexpr double min(double x, double y)
+    {
+        return (x < y) ? x : y;
+    }
+    X_INLINE static constexpr double clamp(double x, double min = 0, double max = 1)
+    {
+        return (x < min) ? min : ((x > max) ? max : x);
+    }
+
+    X_INLINE static void sincos(double x, double& s, double& c)
+    {
+        s = ::sin(x);
+        c = ::cos(x);
+    }
+
 };
 
 template<>
