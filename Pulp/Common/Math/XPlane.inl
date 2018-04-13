@@ -20,9 +20,9 @@ X_INLINE Plane<T>::Plane(const Vec3<T>& point, const Vec3<T>& normal)
 }
 
 template<typename T>
-X_INLINE Plane<T>::Plane(const Vec3<T>& normal, const T disatnace)
+X_INLINE Plane<T>::Plane(const Vec3<T>& normal, const T distance)
 {
-    set(normal, disatnace);
+    set(normal, distance);
 }
 
 template<typename T>
@@ -47,10 +47,10 @@ X_INLINE void Plane<T>::set(const Vec3<T>& point, const Vec3<T>& normal)
 }
 
 template<typename T>
-X_INLINE void Plane<T>::set(const Vec3<T>& normal, const T disatnace)
+X_INLINE void Plane<T>::set(const Vec3<T>& normal, const T distance)
 {
     normal_ = normal.normalized();
-    distance_ = disatnace;
+    distance_ = -distance;
 }
 
 template<typename T>
