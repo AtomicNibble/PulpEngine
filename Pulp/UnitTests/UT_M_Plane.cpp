@@ -40,3 +40,47 @@ TYPED_TEST(MathPlane, FromPoints)
     EXPECT_NEAR(20, distance, 0.0000001f);
 }
 
+TYPED_TEST(MathPlane, FromPointNormal)
+{
+    Vec3<TypeParam> p0(20, 10, 10);
+    Vec3<TypeParam> n(0, 1, 0);
+
+    Plane<TypeParam> p(p0, n);
+
+    Vec3<TypeParam> point = p.getPoint();
+    Vec3<TypeParam> normal = p.getNormal();
+    TypeParam distance = p.getDistance();
+
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(0, 10, 0), point, 0.0000001f);
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(0, 1, 0), normal, 0.0000001f);
+    EXPECT_NEAR(10, distance, 0.0000001f);
+}
+
+TYPED_TEST(MathPlane, FromNormalDistance)
+{
+    Vec3<TypeParam> n(0, 0, 1);
+
+    Plane<TypeParam> p(n, static_cast<TypeParam>(235));
+
+    Vec3<TypeParam> point = p.getPoint();
+    Vec3<TypeParam> normal = p.getNormal();
+    TypeParam distance = p.getDistance();
+
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(0, 0, 235), point, 0.0000001f);
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(0, 0, 1), normal, 0.0000001f);
+    EXPECT_NEAR(235, distance, 0.0000001f);
+}
+
+TYPED_TEST(MathPlane, FromCoefficient)
+{
+    Plane<TypeParam> p(100, 0, 0, static_cast<TypeParam>(500));
+
+    Vec3<TypeParam> point = p.getPoint();
+    Vec3<TypeParam> normal = p.getNormal();
+    TypeParam distance = p.getDistance();
+
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(5, 0, 0), point, 0.0000001f);
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(1, 0, 0), normal, 0.0000001f);
+    EXPECT_NEAR(5, distance, 0.0000001f);
+}
+
