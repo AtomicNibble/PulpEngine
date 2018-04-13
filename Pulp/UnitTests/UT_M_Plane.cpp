@@ -5,10 +5,10 @@ X_USING_NAMESPACE;
 using namespace core;
 
 typedef ::testing::Types<float, double> MyTypes;
-TYPED_TEST_CASE(Planes, MyTypes);
+TYPED_TEST_CASE(MathPlane, MyTypes);
 
 template<typename T>
-class Planes : public ::testing::Test
+class MathPlane : public ::testing::Test
 {
 public:
 };
@@ -22,7 +22,7 @@ public:
         EXPECT_NEAR(_exp.z, _act.z, angle_error);       \
     }
 
-TYPED_TEST(Planes, General)
+TYPED_TEST(MathPlane, FromPoints)
 {
     Vec3<TypeParam> v1(20, 10, 10);
     Vec3<TypeParam> v2(20, 10, 20);
@@ -39,3 +39,4 @@ TYPED_TEST(Planes, General)
 
     EXPECT_NEAR(20, distance, 0.0000001f);
 }
+
