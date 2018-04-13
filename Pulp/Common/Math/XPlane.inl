@@ -60,7 +60,7 @@ X_INLINE void Plane<T>::set(T a, T b, T c, T d)
     T length = normal.length();
 
     normal_ = normal.normalized();
-    distance_ = d / length;
+    distance_ = -(d / length);
 }
 
 template<typename T>
@@ -106,7 +106,7 @@ X_INLINE T Plane<T>::getDistance(void) const
 }
 
 template<typename T>
-X_INLINE void Plane<T>::setDistance(const float distance)
+X_INLINE void Plane<T>::setDistance(const T distance)
 {
     distance_ = -distance;
 }
@@ -132,22 +132,29 @@ X_INLINE Vec3<T> Plane<T>::reflectVector(const Vec3<T>& v) const
 template<typename T>
 X_INLINE bool Plane<T>::rayIntersection(const Ray& ray, Vec3f& out)
 {
-    float cosine = normal_.dot(ray.getDirection());
+    T cosine = normal_.dot(ray.getDirection());
 
-    if (cosine == 0.f) // parallel.
+    if (cosine == 0.f) { // parallel.
         return false;
+    }
 
-    float dis = distance(ray.getOrigin());
-    float scale = -(dis / cosine);
+    T dis = distance(ray.getOrigin());
+    T scale = -(dis / cosine);
 
     out = ray.getOrigin() + (ray.getDirection() * scale);
     return true;
 }
 
 template<typename T>
-X_INLINE bool Plane<T>::compare(const Plane& p, const float normalEps, const float distEps) const
+X_INLINE bool Plane<T>::compare(const Plane& p, const T epsilon) const
 {
-    if (math<float>::abs(distance_ - p.distance_) > distEps) {
+    return compare(p, epsilon);
+}
+
+template<typename T>
+X_INLINE bool Plane<T>::compare(const Plane& p, const T normalEps, const T distEps) const
+{
+    if (math<T>::abs(distance_ - p.distance_) > distEps) {
         return false;
     }
     if (!normal_.compare(p.getNormal(), normalEps)) {
@@ -163,9 +170,9 @@ X_INLINE T Plane<T>::dot(Plane<T>& oth) const
 }
 
 template<typename T>
-X_INLINE PlaneSide::Enum Plane<T>::side(const Vec3<T>& v, const float epsilon) const
+X_INLINE PlaneSide::Enum Plane<T>::side(const Vec3<T>& v, const T epsilon) const
 {
-    float dist = distance(v);
+    T dist = distance(v);
     if (dist > epsilon) {
         return PlaneSide::FRONT;
     }

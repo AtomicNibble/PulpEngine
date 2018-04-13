@@ -81,18 +81,19 @@ public:
     X_INLINE const Vec3<T>& getNormal(void) const;
     X_INLINE void setNormal(const Vec3<T>& normal);
     X_INLINE T getDistance(void) const;
-    X_INLINE void setDistance(const float distance);
+    X_INLINE void setDistance(const T distance);
     X_INLINE T distance(const Vec3<T>& p) const;
 
     X_INLINE Vec3<T> reflectVector(const Vec3<T>& v) const;
     X_INLINE Vec3<T> reflectPoint(const Vec3<T>& p) const;
 
     X_INLINE bool rayIntersection(const Ray& ray, Vec3f& out);
-    X_INLINE bool compare(const Plane& p, const float normalEps, const float distEps) const;
+    X_INLINE bool compare(const Plane& p, const T epsilon) const;
+    X_INLINE bool compare(const Plane& p, const T normalEps, const T distEps) const;
 
     X_INLINE T dot(Plane<T>& oth) const;
 
-    X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const float epsilon) const;
+    X_INLINE PlaneSide::Enum side(const Vec3<T>& v, const T epsilon) const;
     X_INLINE PlaneType::Enum getType(void) const;
     X_INLINE bool isTrueAxial(void) const;
 
