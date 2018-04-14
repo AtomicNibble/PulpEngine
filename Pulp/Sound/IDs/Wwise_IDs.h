@@ -17,8 +17,13 @@ namespace AK
         static const AkUniqueID DRY_FIRE_PISTOL = 4273345739U;
         static const AkUniqueID DRY_FIRE_RIFLE = 2650650540U;
         static const AkUniqueID DRY_FIRE_SMG = 318360149U;
-        static const AkUniqueID FIRE_MG42 = 643229082U;
         static const AkUniqueID FIRE_PPSH = 1281059477U;
+        static const AkUniqueID MG42_FIRE = 2198712070U;
+        static const AkUniqueID MG42_RELOAD_CHARGE = 1585916928U;
+        static const AkUniqueID MG42_RELOAD_JIMMY = 3382211850U;
+        static const AkUniqueID MG42_RELOAD_MAG_IN = 1826446817U;
+        static const AkUniqueID MG42_RELOAD_MAG_OUT = 1450498656U;
+        static const AkUniqueID MG42_RELOAD_PULL = 120902617U;
         static const AkUniqueID PAIN = 1996139369U;
         static const AkUniqueID PLAY_AMBIENT = 1562304622U;
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
@@ -30,6 +35,12 @@ namespace AK
         static const AkUniqueID RAYGUN_RELOAD_BATTERY_OUT = 507540718U;
         static const AkUniqueID RAYGUN_RELOAD_CLOSE = 3398837948U;
         static const AkUniqueID RAYGUN_RELOAD_OPEN = 437818408U;
+        static const AkUniqueID SW357_FIRE = 3074947313U;
+        static const AkUniqueID SW357_FIRE_PLR = 2570826514U;
+        static const AkUniqueID SW357_RELOAD_CLOSE = 3103140339U;
+        static const AkUniqueID SW357_RELOAD_EMPTY = 2309849632U;
+        static const AkUniqueID SW357_RELOAD_LOAD = 111510273U;
+        static const AkUniqueID SW357_RELOAD_OPEN = 3332910853U;
         static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
         static const AkUniqueID VIDEO_RICKROLL = 3469944817U;
         static const AkUniqueID WEAP_LOWER = 1994352680U;
@@ -70,7 +81,7 @@ namespace AK
                 static const AkUniqueID WATER = 2654748154U;
                 static const AkUniqueID WOOD = 2058049674U;
             } // namespace SWITCH
-        }     // namespace MATERIAL
+        } // namespace MATERIAL
 
         namespace PLAYERFOOT
         {
@@ -81,7 +92,7 @@ namespace AK
                 static const AkUniqueID LEFT = 4109362U;
                 static const AkUniqueID RIGHT = 3893817417U;
             } // namespace SWITCH
-        }     // namespace PLAYERFOOT
+        } // namespace PLAYERFOOT
 
     } // namespace SWITCHES
 
@@ -115,6 +126,6 @@ namespace AK
         static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BUSSES
 
-} // namespace AK
+}// namespace AK
 
 #endif // __WWISE_IDS_H__
