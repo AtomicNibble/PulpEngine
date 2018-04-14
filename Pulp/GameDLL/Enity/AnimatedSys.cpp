@@ -177,7 +177,7 @@ namespace entity
             if (values.isNotEmpty()) {
                 // Weeeeeeee!
                 for (auto* pValue : values) {
-                    X_LOG0("Anim", "^8Note: \"%s\" Ent: %" PRId32, pValue, entity);
+                    X_LOG0("Anim", "Note: \"%s\" Ent: %" PRId32, pValue, entity);
 
                     core::StringRange<char> str(pValue, pValue + core::strUtil::strlen(pValue));
 
