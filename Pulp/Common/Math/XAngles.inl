@@ -293,9 +293,9 @@ Quat<T> Angles<T>::toQuat(void) const
     T sx, cx, sy, cy, sz, cz;
     T sxcy, cxcy, sxsy, cxsy;
 
-    math<T>::sincos(::toRadians(roll_) * T(0.5f), sx, cx);
-    math<T>::sincos(::toRadians(pitch_) * T(0.5f), sy, cy);
     math<T>::sincos(::toRadians(yaw_) * T(0.5f), sz, cz);
+    math<T>::sincos(::toRadians(pitch_) * T(0.5f), sy, cy);
+    math<T>::sincos(::toRadians(roll_) * T(0.5f), sx, cx);
 
     sxcy = sx * cy;
     cxcy = cx * cy;
