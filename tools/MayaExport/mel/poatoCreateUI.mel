@@ -1489,7 +1489,7 @@ global proc potato_PerformNodeMigrations()
 	if($nodeVersion < 1)
 	{
 		print_Msg("Migrating node to version 1 attr");
-		lockPotatoNode();
+		unlockPotatoNode();
 
 		$num = `getAttr PotatoGNode.numAnims`;
 		for($i =0; $i < $num; $i++)
@@ -1499,8 +1499,7 @@ global proc potato_PerformNodeMigrations()
 		}
 
 		setAttr PotatoGNode.version 1;
-
-		unlockPotatoNode();
+		lockPotatoNode();
 	}
 
 }
