@@ -2,6 +2,7 @@
 #include "WeaponManager.h"
 
 #include <Assets\AssetLoader.h>
+#include <String\AssetName.h>
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
@@ -191,6 +192,25 @@ namespace weapon
     void WeaponDefManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
     {
         X_UNUSED(jobSys, name);
+
+        core::AssetName assetName(name);
+        assetName.replaceSeprators();
+        assetName.stripAssetFolder(assetDb::AssetType::FX);
+        assetName.removeExtension();
+
+        core::string nameStr(assetName.begin(), assetName.end());
+
+        core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
+
+        auto* pWeaponRes = weaponDefs_.findAsset(nameStr);
+        if (!pWeaponRes) {
+            X_LOG1("WeaponDef", "Not reloading \"%s\" it's not currently used", nameStr.c_str());
+            return;
+        }
+
+        X_LOG0("WeaponDef", "Reloading: %s", nameStr.c_str());
+
+        pAssetLoader_->reload(pWeaponRes, core::ReloadFlag::Beginframe);
     }
 
 } // namespace weapon
