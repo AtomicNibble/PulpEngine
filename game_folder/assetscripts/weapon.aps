@@ -84,7 +84,7 @@ void GenerateUI( asset& Asset )
 
     Asset.BeginGroup("Icons");
     {
-        Asset.AddString("iconHud", "").SetTitle("Hub Icon");
+        Asset.AddString("iconHud", "").SetTitle("Hud Icon");
         Asset.AddAssetRef("iconAmmoCounter", "material").SetTitle("Ammo Counter Icon");
     }
     Asset.BeginGroup("Recticle");
