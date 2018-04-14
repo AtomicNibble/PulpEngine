@@ -9,6 +9,12 @@ X_LINK_LIB("LzmaLibd");
 X_LINK_LIB("LzmaLib");
 #endif // !X_DEBUG
 
+#if X_COMPILER_CLANG
+#define X_FASTCALL
+#else
+#define X_FASTCALL __fastcall
+#endif // !X_COMPILER_CLANG
+
 X_NAMESPACE_BEGIN(core)
 
 namespace Compression
@@ -92,12 +98,12 @@ namespace Compression
             }
 
         private:
-            static void* allocLam(void* p, size_t size)
+            static void* X_FASTCALL allocLam(void* p, size_t size)
             {
                 ArenaAlloc* pThis = reinterpret_cast<ArenaAlloc*>(p);
                 return X_NEW_ARRAY(uint8_t, size, pThis->arena_, "LzmaData");
             }
-            static void freeLam(void* p, void* address)
+            static void X_FASTCALL freeLam(void* p, void* address)
             {
                 ArenaAlloc* pThis = reinterpret_cast<ArenaAlloc*>(p);
                 uint8_t* pData = reinterpret_cast<uint8_t*>(address);
