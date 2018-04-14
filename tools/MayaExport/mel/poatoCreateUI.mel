@@ -1232,6 +1232,9 @@ global proc potato_AddNoteTrack()
     // I can't use string as you can't 'key' them.
     addAttr -ln NoteValue -at enum -enumName $DefaultNotes $node;
     setAttr -e -keyable true ($node + ".NoteValue");
+
+    // Remake the window so the node shows up in animation drop down.
+    potato_ShowExporterWindow();
 }
 
 
