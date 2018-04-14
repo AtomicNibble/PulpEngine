@@ -9,10 +9,10 @@ void GenerateUI( asset& Asset )
     string invType = "primary";
 
     Asset.AddString("displayName", "").SetTitle("Display Name");
-    Asset.AddCombo( "class", wpnClass ).SetTitle( "Class:" ).SetToolTip("The weapon class");
-    Asset.AddCombo( "invType", invType ).SetTitle( "Inventory Type:" ).SetToolTip("The Inventory type");
-    Asset.AddCombo( "fireType", fireType ).SetTitle( "Fire Type:" ).SetToolTip("Fite Type");
-    Asset.AddCombo( "ammoCounterStyle", ammoCounter ).SetTitle( "Ammo Counter:" ).SetToolTip("The ammo counter style");
+    Asset.AddCombo( "class", wpnClass ).SetTitle( "Class" ).SetToolTip("The weapon class");
+    Asset.AddCombo( "invType", invType ).SetTitle( "Inventory Type" ).SetToolTip("The Inventory type");
+    Asset.AddCombo( "fireType", fireType ).SetTitle( "Fire Type" ).SetToolTip("Fite Type");
+    Asset.AddCombo( "ammoCounterStyle", ammoCounter ).SetTitle( "Ammo Counter" ).SetToolTip("The ammo counter style");
 
     Asset.BeginGroup("Flags");
     {
