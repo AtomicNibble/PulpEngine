@@ -11,6 +11,7 @@
 #include <IPrimativeContext.h>
 #include <IFont.h>
 #include <IEffect.h>
+#include <IPhysics.h>
 
 using namespace core::Hash::Literals;
 using namespace sound::Literals;
@@ -32,19 +33,17 @@ namespace entity
         return true;
     }
 
-    void WeaponSystem::update(core::FrameTimeData& time, EnitiyRegister& reg)
+    void WeaponSystem::update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)
     {
-        X_UNUSED(time, reg);
         pReg_ = &reg;
 
-        auto curTime = time.ellapsed[core::Timer::GAME];
+        auto curTime = frame.timeInfo.ellapsed[core::Timer::GAME];
 
         auto view = reg.view<Weapon>();
         for (auto entity : view) {
+            auto& wpnTrans = reg.get<TransForm>(entity);
             auto& wpn = reg.get<Weapon>(entity);
             auto& animator = reg.get<Animator>(entity);
-
-            X_UNUSED(wpn);
 
             auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
@@ -59,6 +58,32 @@ namespace entity
             con.size = Vec2f(24.f, 24.f);
             con.effectId = 0;
             con.pFont = gEnv->pFontSys->GetDefault();
+
+            // update the emitter positions.
+            {
+                // gimmy the bone positions!
+                Vec3f bonePos;
+                Matrix33f boneAxis;
+
+                auto flashBone = animator.pAnimator->getBoneHandle("tag_flash");
+                if (flashBone != model::INVALID_BONE_HANDLE) {
+                    if (animator.pAnimator->getBoneTransform(flashBone, curTime, bonePos, boneAxis)) {
+                        //		boneAxis.rotate(Vec3f::xAxis(), ::toRadians(180.f));
+
+                        Transformf trans;
+                        trans.pos = wpnTrans.pos + bonePos * wpnTrans.quat;
+                        trans.quat = wpnTrans.quat * Quatf(boneAxis);
+
+#if 0
+						core::StackString256 test;
+						test.setFmt("(%f, %f, %f) %f", trans.quat.v.x, trans.quat.v.y, trans.quat.v.z, trans.quat.w);
+						pPrim->drawText(Vec3f(5.f, 900.f, 1.f), con, test.begin(), test.end());
+#endif
+
+                        wpn.pFlashEmt->setTrans(trans);
+                    }
+                }
+            }
 
             //	pPrim->drawQuadImage(400.f, 400.f, 256, 128, wpn.pWeaponDef->getIcon(weapon::IconSlot::AmmoCounter), Color(0.2f, 0.2f, 0.2f));
 
@@ -101,7 +126,7 @@ namespace entity
                 case weapon::State::Fire:
                     if (curTime >= wpn.stateEnd) {
                         if (wpn.attack) {
-                            beginAttack(curTime, wpn, animator);
+                            beginAttack(curTime, wpn, animator, frame, pPhysScene);
                         }
                         else {
                             beginIdle(curTime, wpn, animator);
@@ -150,7 +175,7 @@ namespace entity
                         beginReload(curTime, wpn, animator);
                     }
                     else if (wpn.attack) {
-                        beginAttack(curTime, wpn, animator);
+                        beginAttack(curTime, wpn, animator, frame, pPhysScene);
                     }
 
                 } break;
@@ -201,7 +226,8 @@ namespace entity
         trainsitionToState(wpn, animator, weapon::AnimSlot::Idle, weapon::State::Idle, curTime, 0_ms);
     }
 
-    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator)
+    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator,
+        core::FrameData& frame, physics::IScene* pPhysScene)
     {
         // need to check ammo.
         if (wpn.ammoInClip == 0) {
@@ -243,6 +269,54 @@ namespace entity
         auto* pViewEffect = wpn.pWeaponDef->getEffect(weapon::EffectSlot::FlashView);
         if (pViewEffect) {
             wpn.pFlashEmt->play(pViewEffect, false, false);
+        }
+
+        // lets do a ray cast here.
+        // no idea where is best to do this currently.
+        {
+            float maxRange = static_cast<float>(wpn.pWeaponDef->maxDmgRange());
+
+            physics::ScopedLock lock(pPhysScene);
+
+            auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
+
+            // where do i want to fire from?
+            // the end of the gun?
+            // or just my view.
+            auto& trans = pReg_->get<TransForm>(wpn.ownerEnt);
+
+            auto forward = -frame.view.viewMatrix.getColumn(2);
+
+            Vec3f origin = trans.pos + Vec3f(0.f, 0.f, 50.f);
+            Vec3f uintDir = Vec3f(forward.xyz()).normalize();
+            float distance = maxRange;
+
+            physics::RaycastBuffer hit;
+
+            if (pPhysScene->raycast(
+                    origin + (uintDir * 30.f),
+                    uintDir,
+                    distance,
+                    hit,
+                    physics::DEFAULT_HIT_FLAGS,
+                    physics::QueryFlag::DYNAMIC | physics::QueryFlag::STATIC)) { // TODO: support dynamic without hitting players own collion
+                auto b = hit.block;
+
+                float minRange = static_cast<float>(wpn.pWeaponDef->minDmgRange());
+                int32_t dmg = 0;
+
+                if (b.distance <= minRange) {
+                    dmg = wpn.pWeaponDef->maxDmg();
+                }
+                else {
+                    dmg = wpn.pWeaponDef->minDmg();
+                }
+
+                X_LOG0("Weapon", "Hit %f (%f,%f, %f) dmg: %i", b.distance, b.position.x, b.position.y, b.position.z, dmg);
+
+                pPrim->drawLine(origin, b.position, Col_Red);
+                pPrim->drawAxis(b.position, Vec3f(15.f));
+            }
         }
 
         trainsitionToState(wpn, animator, anim, weapon::State::Fire, curTime, fireTime);

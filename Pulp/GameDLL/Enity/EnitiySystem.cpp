@@ -143,7 +143,7 @@ namespace entity
 
         physSys_.update(frame, reg_, pPhysScene_, p3DWorld_);
 
-        weaponSys_.update(frame.timeInfo, reg_);
+        weaponSys_.update(frame, reg_, pPhysScene_);
     }
 
     EntityId EnititySystem::createEnt(void)
