@@ -67,6 +67,7 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
 void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
     X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
+    X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")(assetDb::AssetType::ToString(pAsset->getType()));
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
 
