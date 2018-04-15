@@ -104,11 +104,11 @@ TEST(Hash, FnvaConst)
 
 TEST(Hash, Murmur)
 {
-    uint32 val = 0x131;
-    uint32 val2 = 0x132;
+    MurmurHash2Val val = 0x131;
+    MurmurHash2Val val2 = 0x132;
 
-    uint32 hash = Hash::MurmurHash2(&val, sizeof(val), 0);
-    uint32 hash2 = Hash::MurmurHash2(&val2, sizeof(val2), 0);
+    auto hash = Hash::MurmurHash2(&val, sizeof(val), 0);
+    auto hash2 = Hash::MurmurHash2(&val2, sizeof(val2), 0);
 
     EXPECT_EQ(hash, 0xe6e00531);
     EXPECT_EQ(hash2, 0x87c86240);

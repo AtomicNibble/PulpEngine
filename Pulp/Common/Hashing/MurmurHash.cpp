@@ -5,21 +5,23 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
-    unsigned int MurmurHash2(const void* key, int len, unsigned int seed)
+    MurmurHash2Val MurmurHash2(const void* pKey, size_t numBytes, uint32_t seed)
     {
+        uint32_t len = safe_static_cast<uint32_t>(numBytes);
+
         // 'm' and 'r' are mixing constants generated off line.
         // They're not really 'magic', they just happen to work well.
-        const unsigned int m = 0x5bd1e995;
-        const int r = 24;
+        const uint32_t m = 0x5bd1e995;
+        const int32_t r = 24;
 
         // Initialize the hash to a 'random' value
-        unsigned int h = seed ^ len;
+        uint32_t h = seed ^ len;
 
         // Mix 4 bytes at a time into the hash
-        const unsigned char* data = (const unsigned char*)key;
+        const uint8_t* data = static_cast<const uint8_t*>(pKey);
 
         while (len >= 4) {
-            unsigned int k = *(unsigned int*)data;
+            uint32_t k = *(uint32_t*)data;
 
             k *= m;
             k ^= k >> r;
