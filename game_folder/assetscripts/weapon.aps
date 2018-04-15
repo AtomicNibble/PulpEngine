@@ -36,6 +36,18 @@ void GenerateUI( asset& Asset )
 
     }
 
+    Asset.BeginGroup("Projectile");
+    {
+        Asset.AddInt( "projectileSpeed", 400, 0, 100000 ).SetTitle("Speed in inches/sec");
+        Asset.AddInt( "projectileActiveDistance", 400, 0, 100000 ).SetTitle("Activate Distance");
+        Asset.AddInt( "projectileLifeTime", 400, 0, 100000 ).SetTitle("LifeTime").SetToolTip("Time in seconds projecticle will explode in the air");
+
+        Asset.AddAssetRef( "projectileModel", "model" ).SetTitle("Model");
+        Asset.AddAssetRef( "projectileExplosionFx", "fx" ).SetTitle("Explosiion Effect");
+        Asset.AddString( "projectileExplosionSnd", "" ).SetTitle("Explosiion Sound");
+        Asset.AddAssetRef( "projectileTrailFx", "fx" ).SetTitle("Trail Effect");
+    }
+
     Asset.BeginGroup("Ammo");
     {
         Asset.AddString( "ammoName", "" ).SetTitle("Ammo Name").SetToolTip("The Name of the ammo, weapons with same ammo name share");
