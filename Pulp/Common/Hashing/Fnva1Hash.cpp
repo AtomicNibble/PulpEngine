@@ -39,39 +39,36 @@ namespace Hash
         return hash;
     }
 
-    namespace Int64
+    static const uint64_t FNV_64_PRIME = 0x100000001B3;
+    static const uint64_t FNV1_64_INIT = 0x14650FB0739D0383;
+
+    Fnv1a64Val Fnv1a64Hash(const void* key, size_t length)
     {
-        static const uint64_t FNV_64_PRIME = 0x100000001B3;
-        static const uint64_t FNV1_64_INIT = 0x14650FB0739D0383;
+        size_t i;
+        uint64_t hash = FNV1_64_INIT;
+        unsigned char* s = (unsigned char*)key;
 
-        Fnv1aVal Fnv1aHash(const void* key, size_t length)
-        {
-            size_t i;
-            uint64_t hash = FNV1_64_INIT;
-            unsigned char* s = (unsigned char*)key;
-
-            for (i = 0; i < length; ++i) {
-                hash ^= (uint64_t)*s++;
-                hash *= FNV_64_PRIME;
-            }
-
-            return hash;
+        for (i = 0; i < length; ++i) {
+            hash ^= (uint64_t)*s++;
+            hash *= FNV_64_PRIME;
         }
 
-        Fnv1Val Fnv1Hash(const void* key, size_t length)
-        {
-            size_t i;
-            uint64_t hash = FNV1_64_INIT;
-            unsigned char* s = (unsigned char*)key;
+        return hash;
+    }
 
-            for (i = 0; i < length; ++i) {
-                hash *= FNV_64_PRIME;
-                hash ^= (uint64_t)*s++;
-            }
+    Fnv164Val Fnv164Hash(const void* key, size_t length)
+    {
+        size_t i;
+        uint64_t hash = FNV1_64_INIT;
+        unsigned char* s = (unsigned char*)key;
 
-            return hash;
+        for (i = 0; i < length; ++i) {
+            hash *= FNV_64_PRIME;
+            hash ^= (uint64_t)*s++;
         }
-    } // namespace Int64
+
+        return hash;
+    }
 } // namespace Hash
 
 X_NAMESPACE_END

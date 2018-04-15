@@ -30,10 +30,10 @@ TEST(Hash, crc32)
     EXPECT_TRUE(crc.GetCRC32("hello") == crc.GetCRC32Lowercase("HELLO"));
 }
 
-TEST(Hash, Fnva1)
+TEST(Hash, Fnv1a)
 {
-    uint32 hash = Fnv1aHash("readme.txt", 10);
-    uint64 hash64 = Int64::Fnv1aHash("readme.txt", 10);
+    Fnv1aVal hash = Fnv1aHash("readme.txt", 10);
+    Fnv1a64Val hash64 = Fnv1a64Hash("readme.txt", 10);
 
     EXPECT_TRUE(hash == 0x966dcb41);
     EXPECT_TRUE(hash64 == 0xdaca8649b3b4bd97);
@@ -41,7 +41,7 @@ TEST(Hash, Fnva1)
     EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 11));
 }
 
-TEST(Hash, Fnva1Const)
+TEST(Hash, Fnv1aConst)
 {
     const uint32 hash = Fnv1aConst::Hash("readme.txt", 10);
     const uint32 hash1 = Fnv1aConst::Hash("fat goat", 8);
@@ -68,8 +68,8 @@ TEST(Hash, Fnva1Const)
 
 TEST(Hash, Fnva)
 {
-    uint32 hash = Fnv1Hash("readme.txt", 10);
-    uint64 hash64 = Int64::Fnv1Hash("readme.txt", 10);
+    Fnv1aVal hash = Fnv1Hash("readme.txt", 10);
+    Fnv1a64Val hash64 = Fnv164Hash("readme.txt", 10);
 
     EXPECT_TRUE(hash == 0x7b0fccd9);
     EXPECT_TRUE(hash64 == 0xb0713f900802e0af);
