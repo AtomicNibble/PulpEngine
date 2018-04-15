@@ -79,7 +79,7 @@ namespace Hash
         update(reinterpret_cast<const void*>(pStr), core::strUtil::strlen(pStr));
     }
 
-    void SHA1::update(const void* pBuf, size_t length)
+    void SHA1::update(const void* pBuf, size_t bytelength)
     {
         size_t index = numBytes_ % BLOCK_BYTES;
         size_t firstpart = BLOCK_BYTES - index;
@@ -87,11 +87,11 @@ namespace Hash
 
         const uint8_t* pInput = reinterpret_cast<const uint8_t*>(pBuf);
 
-        if (length >= firstpart) {
+        if (bytelength >= firstpart) {
             memcpy(&buffer_[index], pInput, firstpart);
             transform(buffer_);
 
-            for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
+            for (i = firstpart; i + BLOCK_BYTES <= bytelength; i += BLOCK_BYTES) {
                 transform(&pInput[i]);
             }
 
@@ -101,9 +101,9 @@ namespace Hash
             i = 0;
         }
 
-        numBytes_ += length;
+        numBytes_ += bytelength;
 
-        memcpy(&buffer_[index], &pInput[i], length - i);
+        memcpy(&buffer_[index], &pInput[i], bytelength - i);
     }
 
     SHA1Digest SHA1::finalize(void)

@@ -159,7 +159,7 @@ namespace Hash
         digest_[7] = 0x5be0cd19137e2179ULL;
     }
 
-    void SHA512::update(const void* buf, size_t length)
+    void SHA512::update(const void* buf, size_t bytelength)
     {
         size_t index = static_cast<size_t>((count_[0] >> 3) & 0x7F);
         size_t firstpart = BLOCK_BYTES - index;
@@ -167,11 +167,11 @@ namespace Hash
 
         const uint8_t* input = reinterpret_cast<const uint8_t*>(buf);
 
-        if (length >= firstpart) {
+        if (bytelength >= firstpart) {
             memcpy(&buffer_[index], input, firstpart);
             transform(buffer_);
 
-            for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
+            for (i = firstpart; i + BLOCK_BYTES <= bytelength; i += BLOCK_BYTES) {
                 transform(&input[i]);
             }
 
@@ -182,16 +182,16 @@ namespace Hash
         }
 
         // Update number of bits
-        if ((count_[0] += static_cast<uint32_t>(length << 3)) < (length << 3)) {
+        if ((count_[0] += static_cast<uint32_t>(bytelength << 3)) < (bytelength << 3)) {
             if ((count_[1] += 1) < 1) {
                 if ((count_[2] += 1) < 1) {
                     count_[3]++;
                 }
             }
-            count_[1] += static_cast<uint32_t>(length >> 29);
+            count_[1] += static_cast<uint32_t>(bytelength >> 29);
         }
 
-        memcpy(&buffer_[index], &input[i], length - i);
+        memcpy(&buffer_[index], &input[i], bytelength - i);
     }
 
     void SHA512::update(const char* str)

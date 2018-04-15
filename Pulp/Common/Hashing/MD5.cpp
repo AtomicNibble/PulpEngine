@@ -108,7 +108,7 @@ namespace Hash
         update(reinterpret_cast<const void*>(pStr), length);
     }
 
-    void MD5::update(const void* pBuf, size_t length)
+    void MD5::update(const void* pBuf, size_t bytelength)
     {
         const uint8_t* pInput = reinterpret_cast<const uint8_t*>(pBuf);
 
@@ -116,24 +116,24 @@ namespace Hash
         size_t index = count_[0] / 8 % BLOCK_BYTES;
 
         // Update number of bits
-        if ((count_[0] += static_cast<uint32_t>(length << 3)) < (length << 3)) {
+        if ((count_[0] += static_cast<uint32_t>(bytelength << 3)) < (bytelength << 3)) {
             count_[1]++;
         }
 
-        count_[1] += static_cast<uint32_t>(length >> 29);
+        count_[1] += static_cast<uint32_t>(bytelength >> 29);
 
         // number of bytes we need to fill in buffer_
         size_t firstpart = 64 - index;
         size_t i;
 
         // transform as many times as possible.
-        if (length >= firstpart) {
+        if (bytelength >= firstpart) {
             // fill buffer_ first, transform
             memcpy(&buffer_[index], pInput, firstpart);
             transform(buffer_);
 
             // transform chunks of blocksize (64 bytes)
-            for (i = firstpart; i + BLOCK_BYTES <= length; i += BLOCK_BYTES) {
+            for (i = firstpart; i + BLOCK_BYTES <= bytelength; i += BLOCK_BYTES) {
                 transform(&pInput[i]);
             }
 
@@ -144,7 +144,7 @@ namespace Hash
         }
 
         // buffer_ remaining input
-        memcpy(&buffer_[index], &pInput[i], length - i);
+        memcpy(&buffer_[index], &pInput[i], bytelength - i);
     }
 
     MD5Digest& MD5::finalize(void)

@@ -28,7 +28,7 @@ namespace Hash
         ~MD5();
 
         void reset(void);
-        void update(const void* pBuf, size_t length);
+        void update(const void* pBuf, size_t bytelength);
         void update(const char* pStr);
 
         template<typename T>

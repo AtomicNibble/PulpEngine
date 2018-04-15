@@ -615,15 +615,15 @@ namespace Hash
         state->memsize = 0;
     }
 
-    bool xxHash32::updateBytes(const void* pBuf, size_t numBytes)
+    bool xxHash32::updateBytes(const void* pBuf, size_t bytelength)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, numBytes, Endianes::LITTLE);
+            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, bytelength, Endianes::LITTLE);
         }
         else {
-            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, numBytes, Endianes::BIG);
+            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, bytelength, Endianes::BIG);
         }
     }
 
@@ -639,25 +639,25 @@ namespace Hash
         }
     }
 
-    uint32_t xxHash32::calc(const void* pInput, size_t length, uint32_t seed)
+    uint32_t xxHash32::calc(const void* pInput, size_t bytelength, uint32_t seed)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((((size_t)pInput) & 3) == 0) /* Input is 4-bytes aligned, leverage the speed benefit */
         {
             if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-                return XXH32_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::ALIGNED);
+                return XXH32_endian_align(pInput, bytelength, seed, Endianes::LITTLE, Alignment::ALIGNED);
             }
             else {
-                return XXH32_endian_align(pInput, length, seed, Endianes::BIG, Alignment::ALIGNED);
+                return XXH32_endian_align(pInput, bytelength, seed, Endianes::BIG, Alignment::ALIGNED);
             }
         }
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH32_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::UNALIGNED);
+            return XXH32_endian_align(pInput, bytelength, seed, Endianes::LITTLE, Alignment::UNALIGNED);
         }
         else {
-            return XXH32_endian_align(pInput, length, seed, Endianes::BIG, Alignment::UNALIGNED);
+            return XXH32_endian_align(pInput, bytelength, seed, Endianes::BIG, Alignment::UNALIGNED);
         }
     }
 
@@ -680,15 +680,15 @@ namespace Hash
         state->memsize = 0;
     }
 
-    bool xxHash64::updateBytes(const void* pBuf, size_t numBytes)
+    bool xxHash64::updateBytes(const void* pBuf, size_t bytelength)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, numBytes, Endianes::LITTLE);
+            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, bytelength, Endianes::LITTLE);
         }
         else {
-            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, numBytes, Endianes::BIG);
+            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, bytelength, Endianes::BIG);
         }
     }
 
@@ -704,25 +704,25 @@ namespace Hash
         }
     }
 
-    uint64_t xxHash64::calc(const void* pInput, size_t length, uint64_t seed)
+    uint64_t xxHash64::calc(const void* pInput, size_t bytelength, uint64_t seed)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((((size_t)pInput) & 7) == 0) /* Input is aligned, let's leverage the speed advantage */
         {
             if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-                return XXH64_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::ALIGNED);
+                return XXH64_endian_align(pInput, bytelength, seed, Endianes::LITTLE, Alignment::ALIGNED);
             }
             else {
-                return XXH64_endian_align(pInput, length, seed, Endianes::BIG, Alignment::ALIGNED);
+                return XXH64_endian_align(pInput, bytelength, seed, Endianes::BIG, Alignment::ALIGNED);
             }
         }
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH64_endian_align(pInput, length, seed, Endianes::LITTLE, Alignment::UNALIGNED);
+            return XXH64_endian_align(pInput, bytelength, seed, Endianes::LITTLE, Alignment::UNALIGNED);
         }
         else {
-            return XXH64_endian_align(pInput, length, seed, Endianes::BIG, Alignment::UNALIGNED);
+            return XXH64_endian_align(pInput, bytelength, seed, Endianes::BIG, Alignment::UNALIGNED);
         }
     }
 

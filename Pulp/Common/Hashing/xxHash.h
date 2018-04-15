@@ -23,7 +23,7 @@ namespace Hash
         ~xxHash32() = default;
 
         void reset(uint32_t seed = 0);
-        bool updateBytes(const void* pBuf, size_t numBytes);
+        bool updateBytes(const void* pBuf, size_t bytelength);
 
         template<typename T>
         X_INLINE bool update(span<T> data);
@@ -32,7 +32,7 @@ namespace Hash
 
         HashVal finalize(void);
 
-        static HashVal calc(const void* pInput, size_t length, uint32_t seed = 0);
+        static HashVal calc(const void* pInput, size_t bytelength, uint32_t seed = 0);
 
     private:
         struct
@@ -51,7 +51,7 @@ namespace Hash
         ~xxHash64() = default;
 
         void reset(uint64_t seed = 0);    
-        bool updateBytes(const void* pBuf, size_t numBytes);
+        bool updateBytes(const void* pBuf, size_t bytelength);
 
         template<typename T>
         X_INLINE bool update(span<T> data);
@@ -60,7 +60,7 @@ namespace Hash
 
         HashVal finalize(void);
 
-        static HashVal calc(const void* pInput, size_t length, uint64_t seed = 0);
+        static HashVal calc(const void* pInput, size_t bytelength, uint64_t seed = 0);
 
     private:
         struct

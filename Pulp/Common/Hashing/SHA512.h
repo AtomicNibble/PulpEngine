@@ -28,7 +28,7 @@ namespace Hash
         ~SHA512();
 
         void reset(void);
-        void update(const void* buf, size_t length);
+        void update(const void* buf, size_t bytelength);
         void update(const char* str);
 
         template<typename T>
