@@ -615,15 +615,15 @@ namespace Hash
         state->memsize = 0;
     }
 
-    bool xxHash32::update(const void* pBuf, size_t length)
+    bool xxHash32::updateBytes(const void* pBuf, size_t numBytes)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, length, Endianes::LITTLE);
+            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, numBytes, Endianes::LITTLE);
         }
         else {
-            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, length, Endianes::BIG);
+            return XXH32_update_endian(reinterpret_cast<XXH_istate32_t*>(&state_), pBuf, numBytes, Endianes::BIG);
         }
     }
 
@@ -680,15 +680,15 @@ namespace Hash
         state->memsize = 0;
     }
 
-    bool xxHash64::update(const void* pBuf, size_t length)
+    bool xxHash64::updateBytes(const void* pBuf, size_t numBytes)
     {
         Endianes endian_detected = (Endianes)XXH_CPU_LITTLE_ENDIAN;
 
         if ((endian_detected == Endianes::LITTLE) || XXH_FORCE_NATIVE_FORMAT) {
-            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, length, Endianes::LITTLE);
+            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, numBytes, Endianes::LITTLE);
         }
         else {
-            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, length, Endianes::BIG);
+            return XXH64_update_endian(reinterpret_cast<XXH_istate64_t*>(&state_), pBuf, numBytes, Endianes::BIG);
         }
     }
 

@@ -23,7 +23,8 @@ namespace Hash
         ~xxHash32() = default;
 
         void reset(uint32_t seed = 0);
-        bool update(const void* pBuf, size_t length);
+        bool updateBytes(const void* pBuf, size_t numBytes);
+
         template<typename T>
         X_INLINE bool update(span<T> data);
         template<typename T>
@@ -49,8 +50,8 @@ namespace Hash
         xxHash64();
         ~xxHash64() = default;
 
-        void reset(uint64_t seed = 0);
-        bool update(const void* pBuf, size_t length);
+        void reset(uint64_t seed = 0);    
+        bool updateBytes(const void* pBuf, size_t numBytes);
 
         template<typename T>
         X_INLINE bool update(span<T> data);

@@ -13,7 +13,7 @@ namespace
 #if X_ENABLE_RENDER_SHADER_RELOAD
 
         if (s.pShaderBytecode) {
-            hasher.update(s.pShaderBytecode, s.BytecodeLength);
+            hasher.updateBytes(s.pShaderBytecode, s.BytecodeLength);
         }
 
 #else
@@ -179,8 +179,8 @@ PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_GRAPHICS_PIPELINE_STATE_DE
     gpsoDesc.InputLayout.pInputElementDescs = nullptr;
 
     hasher.reset(0x52652);
-    hasher.update(&gpsoDesc, 1);
-    hasher.update(ILCopy.pInputElementDescs, ILCopy.NumElements);
+    hasher.update(gpsoDesc);
+    hasher.update(core::make_span(ILCopy.pInputElementDescs, ILCopy.NumElements));
 
     hashShader(hasher, gpsoDesc.VS);
     hashShader(hasher, gpsoDesc.PS);
@@ -197,7 +197,7 @@ PSODeviceCache::HashVal PSODeviceCache::getHash(D3D12_COMPUTE_PIPELINE_STATE_DES
     core::Hash::xxHash64 hasher;
 
     hasher.reset(0x79371); // diffrent seed to graphics desc.
-    hasher.update(&cpsoDesc, 1);
+    hasher.update(cpsoDesc);
 
     hashShader(hasher, cpsoDesc.CS);
 

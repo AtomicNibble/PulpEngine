@@ -279,7 +279,7 @@ namespace shader
         Hasher hasher;
 
         hasher.reset(0);
-        hasher.update(name_.c_str(), name_.length());
+        hasher.updateBytes(name_.c_str(), name_.length());
         hasher.update(updateFeqFlags_.ToInt());
         hasher.update(updateRate_);
         hasher.update(size_);

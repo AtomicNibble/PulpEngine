@@ -354,12 +354,12 @@ TEST(Hash, xxhash32)
     Hash::xxHash32 hasher;
 
     hasher.reset(12345);
-    hasher.update("test", 4);
+    hasher.updateBytes("test", 4);
 
     EXPECT_EQ(3834992036, hasher.finalize());
 
     hasher.reset(123);
-    hasher.update("test", 4);
+    hasher.updateBytes("test", 4);
 
     EXPECT_EQ(2758658570, hasher.finalize());
 }
@@ -369,12 +369,12 @@ TEST(Hash, xxhash64)
     Hash::xxHash64 hasher;
 
     hasher.reset(123);
-    hasher.update("test", 4);
+    hasher.updateBytes("test", 4);
 
     EXPECT_EQ(3134990500624303823, hasher.finalize());
 
     hasher.reset(0);
-    hasher.update("test", 4);
+    hasher.updateBytes("test", 4);
 
     EXPECT_EQ(5754696928334414137, hasher.finalize());
 }

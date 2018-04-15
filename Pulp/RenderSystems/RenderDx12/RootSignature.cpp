@@ -204,7 +204,7 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
     core::Hash::xxHash64 hasher;
 
     hasher.reset(0);
-    hasher.update(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers);
+    hasher.update(core::make_span(rootDesc.pStaticSamplers, rootDesc.NumStaticSamplers));
 
     for (uint32_t param = 0; param < rootDesc.NumParameters; ++param) {
         const auto& rootParam = rootDesc.pParameters[param];
@@ -212,7 +212,7 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
         if (rootParam.ParameterType == D3D12_ROOT_PARAMETER_TYPE_DESCRIPTOR_TABLE) {
             X_ASSERT_NOT_NULL(rootParam.DescriptorTable.pDescriptorRanges);
 
-            hasher.update(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges);
+            hasher.update(core::make_span(rootParam.DescriptorTable.pDescriptorRanges, rootParam.DescriptorTable.NumDescriptorRanges));
 
             // We don't care about sampler descriptor tables.  We don't cache them
             if (rootParam.DescriptorTable.pDescriptorRanges->RangeType == D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER) {
@@ -235,12 +235,12 @@ RootSignatureDeviceCache::HashVal RootSignature::gethashAndPopulateDescriptorTab
             maxDescriptorCacheHandleCount_ += descriptorTableSize_[param];
         }
         else {
-            hasher.update(&rootParam, 1);
+            hasher.update(rootParam);
         }
     }
 
     // include flags?
-    hasher.update(&flags, 1);
+    hasher.update(flags);
 
     return hasher.finalize();
 }
