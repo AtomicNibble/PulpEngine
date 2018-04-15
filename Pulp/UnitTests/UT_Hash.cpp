@@ -43,8 +43,8 @@ TEST(Hash, Fnv1a)
 
 TEST(Hash, Fnv1aConst)
 {
-    const uint32 hash = Fnv1aConst::Hash("readme.txt", 10);
-    const uint32 hash1 = Fnv1aConst::Hash("fat goat", 8);
+    const Fnv1aVal hash = Fnv1aConst::Hash("readme.txt", 10);
+    const Fnv1aVal hash1 = Fnv1aConst::Hash("fat goat", 8);
 
     EXPECT_TRUE(hash == 0x966dcb41);
     EXPECT_TRUE(hash == Fnv1aHash("readme.txt", 10)); // check againstt runtime version.
@@ -66,7 +66,7 @@ TEST(Hash, Fnv1aConst)
     EXPECT_TRUE(Fnv1aHash("fat goat", 8) == "fat goat"_fnv1a);
 }
 
-TEST(Hash, Fnva)
+TEST(Hash, Fnv1)
 {
     Fnv1aVal hash = Fnv1Hash("readme.txt", 10);
     Fnv1a64Val hash64 = Fnv164Hash("readme.txt", 10);
@@ -77,10 +77,10 @@ TEST(Hash, Fnva)
     EXPECT_FALSE(hash == Fnv1aHash("readme.txt.", 10));
 }
 
-TEST(Hash, FnvaConst)
+TEST(Hash, Fnv1Const)
 {
-    const uint32 hash = Fnv1Const::Hash("readme.txt", 10);
-    const uint32 hash1 = Fnv1Const::Hash("fat goat", 8);
+    const Fnv1Val hash = Fnv1Const::Hash("readme.txt", 10);
+    const Fnv1Val hash1 = Fnv1Const::Hash("fat goat", 8);
 
     EXPECT_TRUE(hash == 0x7b0fccd9);
     EXPECT_TRUE(hash == Fnv1Hash("readme.txt", 10)); // check againstt runtime version.
