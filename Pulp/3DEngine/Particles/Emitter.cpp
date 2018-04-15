@@ -391,7 +391,7 @@ namespace fx
                     bl = bl * q;
                     br = br * q;
 
-                    Vec3f pos = e.transPos;
+                    const Vec3f& pos = e.transPos;
 
                     tl += pos;
                     tr += pos;
