@@ -399,22 +399,13 @@ const Matrix44<T> Matrix44<T>::operator-(const Matrix44<T>& rhs) const
 template<typename T>
 const Vec3<T> Matrix44<T>::operator*(const Vec3<T>& rhs) const
 {
-    T x = m[0] * rhs.x + m[4] * rhs.y + m[8] * rhs.z + m[12];
-    T y = m[1] * rhs.x + m[5] * rhs.y + m[9] * rhs.z + m[13];
-    T z = m[2] * rhs.x + m[6] * rhs.y + m[10] * rhs.z + m[14];
-    T w = m[3] * rhs.x + m[7] * rhs.y + m[11] * rhs.z + m[15];
-
-    return Vec3<T>(x / w, y / w, z / w);
+    return postMultiply(rhs);
 }
 
 template<typename T>
 const Vec4<T> Matrix44<T>::operator*(const Vec4<T>& rhs) const
 {
-    return Vec4<T>(
-        m[0] * rhs.x + m[4] * rhs.y + m[8] * rhs.z + m[12] * rhs.w,
-        m[1] * rhs.x + m[5] * rhs.y + m[9] * rhs.z + m[13] * rhs.w,
-        m[2] * rhs.x + m[6] * rhs.y + m[10] * rhs.z + m[14] * rhs.w,
-        m[3] * rhs.x + m[7] * rhs.y + m[11] * rhs.z + m[15] * rhs.w);
+    return postMultiply(rhs);
 }
 
 template<typename T>
