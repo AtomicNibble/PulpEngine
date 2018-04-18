@@ -925,7 +925,9 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
                     textureSRVS[t] = pTex->getSRV();
 
-                    X_ASSERT(textureSRVS[t].ptr != 0 && textureSRVS[t].ptr != std::numeric_limits<size_t>::max(), "Invalid handle")(pTex->getName().c_str());
+                    X_ASSERT(textureSRVS[t].ptr != render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN &&
+                            textureSRVS[t].ptr != render::D3D12_GPU_VIRTUAL_ADDRESS_NULL,
+                        "Invalid handle")(pTex->getName().c_str(), textureSRVS[t].ptr, pTex->getSRV());
                 }
 
                 // for now assume all slots are linera and no gaps.
