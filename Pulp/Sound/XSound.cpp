@@ -694,7 +694,8 @@ void XSound::drawDebug(void) const
 
             Matrix33f mat;
             MatrixLookAtRH(&mat, eye, center, Vec3f::zAxis());
-            mat.rotate(Vec3f::zAxis(), ::toRadians(180.f));
+			mat.transpose();
+            mat.rotate(Vec3f::xAxis(), ::toRadians(180.f)); // flip text.
 
             core::StackString256 txt;
             txt.setFmt("\"%s\" Occ: %s Evt: %i", pObject->debugName.c_str(), OcclusionType::ToString(pObject->occType), pObject->activeEvents);

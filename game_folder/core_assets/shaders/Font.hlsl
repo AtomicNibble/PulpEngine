@@ -36,7 +36,7 @@ SamplerState        fontCacheSampler;
 VS_OUTPUT BasicVS(VS_INPUT input)
 {
     VS_OUTPUT output;
-    output.ssPosition        	= mul( float4(input.osPosition, 1.0), worldToScreenMatrix );
+    output.ssPosition        	= mul( worldToScreenMatrix, float4(input.osPosition, 1.0));
     output.texCoord          	= input.texCoord;
     output.color             	= input.color;
     return output;

@@ -1721,13 +1721,10 @@ void World3D::drawRenderEnts()
             pBoneDataDes->pData = pRendEnt->bones.data();
             pBoneDataDes->size = safe_static_cast<uint32_t>(pRendEnt->bones.size() * sizeof(Matrix44f));
 
-            world.transpose();
-
             addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
                 world, distanceFromCam, pBoneDataDes->asBufferHandle());
         }
         else {
-            world.transpose();
 
             addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
                 world, distanceFromCam);

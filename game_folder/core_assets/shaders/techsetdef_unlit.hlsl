@@ -78,23 +78,23 @@ VS_OUTPUT vs_main( VS_INPUT IN )
       pos +=  (mul(BoneMatrices[IN.boneIndexes[i]], src).xyz * IN.weights[i]);
     }
 
-  float4 worldPosition = mul( float4(pos, 1.0), worldMatrix );
+  float4 worldPosition = mul( worldMatrix, float4(pos, 1.0) );
 
 #else
-  float4 worldPosition = mul( src, worldMatrix );
+  float4 worldPosition = mul( worldMatrix, src );
 #endif // !X_HWSKIN
 
 
   // Calculate the normal vector against the world matrix only.
-  OUT.normal = mul(IN.normal.xyz, (float3x3)worldMatrix);
- // OUT.normal = mul(OUT.normal, (float3x3)worldToCameraMatrix);
+  OUT.normal = mul((float3x3)worldMatrix, IN.normal.xyz);
+ // OUT.normal = mul((float3x3)worldToCameraMatrix, OUT.normal);
   OUT.normal = normalize(OUT.normal);
 
   // vert in view space.
-  OUT.viewPosition = mul(worldPosition, worldToCameraMatrix).xyz;
+  OUT.viewPosition = mul(worldToCameraMatrix, worldPosition).xyz;
   OUT.viewPosition = worldPosition.xyz;
 
-  OUT.ssPosition = mul( worldPosition, worldToScreenMatrix );
+  OUT.ssPosition = mul(worldToScreenMatrix,  worldPosition);
   OUT.texCoord = IN.tex;
   OUT.color = IN.color;
   return OUT;

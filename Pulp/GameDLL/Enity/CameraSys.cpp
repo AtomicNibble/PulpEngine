@@ -67,7 +67,8 @@ namespace entity
         frame.view.projMatrix = cam_.getProjectionMatrix();
         frame.view.viewMatrix = cam_.getViewMatrix();
         frame.view.viewMatrixInv = frame.view.viewMatrix.inverted();
-        frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
+        // frame.view.viewProjMatrix = frame.view.viewMatrix * frame.view.projMatrix;
+        frame.view.viewProjMatrix = frame.view.projMatrix * frame.view.viewMatrix;
         frame.view.viewProjInvMatrix = frame.view.viewProjMatrix.inverted();
 
         // for now sound listner follows camera.

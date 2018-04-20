@@ -53,12 +53,12 @@ VS_OUTPUT PrimVS( VS_INPUT IN )
   VS_OUTPUT OUT;
 
 #if X_INSTANCED
-    float4x4 instPos = CreateMatrixFromRows(IN.instPos1, IN.instPos2, IN.instPos3, IN.instPos4);
-    float4x4 mat = mul(instPos, worldToScreenMatrix);
-    OUT.ssPosition = mul( float4(IN.osPosition, 1.0), mat );
-    OUT.color =  IN.color  * IN.instColor;
+    float4x4 instPos = CreateMatrixFromCols(IN.instPos1, IN.instPos2, IN.instPos3, IN.instPos4);
+    float4x4 mat = mul(worldToScreenMatrix, instPos);
+    OUT.ssPosition = mul(mat, float4(IN.osPosition, 1.0));
+    OUT.color =  IN.color * IN.instColor;
 #else
-    OUT.ssPosition = mul( float4(IN.osPosition, 1.0), worldToScreenMatrix );
+    OUT.ssPosition = mul(worldToScreenMatrix, float4(IN.osPosition, 1.0));
     OUT.color =  IN.color;
 #endif // !X_INSTANCED
 
