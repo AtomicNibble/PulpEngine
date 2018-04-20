@@ -360,8 +360,9 @@ namespace fx
                 Quatf q = trans_.quat;
 
                 if (desc.type == StageType::BillboardSprite) {
-                    auto lookatCam(view.viewMatrix);
-                    lookatCam.rotate(Vec3f::xAxis(), ::toRadians(180.f));
+                    auto lookatCam(view.viewMatrixInv);
+					lookatCam.rotate(Vec3f::zAxis(), ::toRadians(90.f));
+					lookatCam.rotate(Vec3f::yAxis(), ::toRadians(90.f));
 
                     Quatf lookatCamQ(lookatCam);
 
