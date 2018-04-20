@@ -35,6 +35,7 @@ XGame::~XGame()
 
 void XGame::registerVars(void)
 {
+	weaponDefs_.registerVars();
     vars_.registerVars();
 
     // register some vars
@@ -53,6 +54,8 @@ void XGame::registerVars(void)
 
 void XGame::registerCmds(void)
 {
+	weaponDefs_.registerCmds();
+
     ADD_COMMAND_MEMBER("map", this, XGame, &XGame::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
     //	ADD_COMMAND_MEMBER("devmap", this, XGame, &XGame::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
 }
