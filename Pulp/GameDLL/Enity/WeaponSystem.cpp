@@ -285,7 +285,7 @@ namespace entity
             // or just my view.
             auto& trans = pReg_->get<TransForm>(wpn.ownerEnt);
 
-            auto forward = -frame.view.viewMatrix.getColumn(2);
+            auto forward = -frame.view.viewMatrix.getRow(2);
 
             Vec3f origin = trans.pos + Vec3f(0.f, 0.f, 50.f);
             Vec3f uintDir = Vec3f(forward.xyz()).normalize();
