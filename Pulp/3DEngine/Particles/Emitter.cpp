@@ -372,10 +372,10 @@ namespace fx
                     float halfWidth = e.width * 0.5f;
                     float halfHeight = e.height * 0.5f;
 
-                    Vec3f tl = Vec3f(0, -halfWidth, -halfHeight);
-                    Vec3f tr = Vec3f(0, halfWidth, -halfHeight);
-                    Vec3f bl = Vec3f(0, -halfWidth, halfHeight);
-                    Vec3f br = Vec3f(0, halfWidth, halfHeight);
+                    Vec3f tl = Vec3f(0, halfWidth, halfHeight);
+                    Vec3f tr = Vec3f(0, -halfWidth, halfHeight);
+                    Vec3f bl = Vec3f(0, halfWidth, -halfHeight);
+                    Vec3f br = Vec3f(0, -halfWidth, -halfHeight);
 
                     if (e.rotation > 0.f) {
                         auto rot = Quatf(Vec3f(0.f, 0.f, 1.f), ::toRadians(e.rotation));
