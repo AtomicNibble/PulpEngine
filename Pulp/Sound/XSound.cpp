@@ -693,7 +693,7 @@ void XSound::drawDebug(void) const
             const Vec3f& center = listnerPos;
 
             Matrix33f mat;
-            MatrixLookAtRH(&mat, eye, center, Vec3f::zAxis());
+            MatrixLookAtRH(&mat, center, eye, Vec3f::zAxis());
 			mat.transpose();
             mat.rotate(Vec3f::xAxis(), ::toRadians(180.f)); // flip text.
 
