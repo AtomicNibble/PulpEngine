@@ -57,10 +57,23 @@ public:
             // in the memory layout as well as being mathematically correct.
 
             // m[row][col]
-            T m00, m10, m20, m30; // col 0
-            T m01, m11, m21, m31; // col 1
-            T m02, m12, m22, m32; // col 2
-            T m03, m13, m23, m33; // col 3
+            T 
+                m00, 
+                m10, 
+                m20, 
+                m30; // col 0
+            T       m01, 
+                    m11, 
+                    m21, 
+                    m31; // col 1
+            T           m02, 
+                        m12, 
+                        m22, 
+                        m32; // col 2
+            T               m03, 
+                            m13, 
+                            m23, 
+                            m33; // col 3 (Trans)
         };
         // [Cols][Rows]
         T mcols[4][4];
