@@ -13,8 +13,9 @@ X_NAMESPACE_DECLARE(core,
                         struct Job;
                         class JobSystem;
                     }
-
+                    struct IConsoleCmdArgs;
                     class AssetLoader;)
+
 
 X_NAMESPACE_BEGIN(game)
 
@@ -48,6 +49,8 @@ namespace weapon
         bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
         void releaseWeaponDef(WeaponDef* pWeaponDef);
 
+        void listWeapons(const char* pSearchPatten = nullptr) const;
+
     private:
         bool initDefaults(void);
         void freeDangling(void);
@@ -60,6 +63,8 @@ namespace weapon
         // IXHotReload
         virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
         // ~IXHotReload
+
+        void Cmd_List(core::IConsoleCmdArgs* pCmd);
 
     private:
         core::MemoryArenaBase* arena_;

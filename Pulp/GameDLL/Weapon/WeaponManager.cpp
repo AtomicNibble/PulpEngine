@@ -6,6 +6,8 @@
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
+#include <IConsole.h>
+
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
@@ -20,6 +22,9 @@ namespace weapon
 
     void WeaponDefManager::registerCmds(void)
     {
+        ADD_COMMAND_MEMBER("listWeapons", this, WeaponDefManager, &WeaponDefManager::Cmd_List,
+            core::VarFlag::SYSTEM, "List all the loaded Weapons");
+
     }
 
     void WeaponDefManager::registerVars(void)
@@ -195,7 +200,7 @@ namespace weapon
 
         core::AssetName assetName(name);
         assetName.replaceSeprators();
-        assetName.stripAssetFolder(assetDb::AssetType::FX);
+        assetName.stripAssetFolder(assetDb::AssetType::WEAPON);
         assetName.removeExtension();
 
         core::string nameStr(assetName.begin(), assetName.end());
@@ -211,6 +216,50 @@ namespace weapon
         X_LOG0("WeaponDef", "Reloading: %s", nameStr.c_str());
 
         pAssetLoader_->reload(pWeaponRes, core::ReloadFlag::Beginframe);
+    }
+
+
+    void WeaponDefManager::listWeapons(const char* pSearchPatten) const
+    {
+        core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
+
+        core::Array<WeaponDefResource*> sorted(arena_);
+        sorted.setGranularity(weaponDefs_.size());
+
+        for (const auto& wpn : weaponDefs_) {
+            auto* pWpnRes = wpn.second;
+
+            if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pWpnRes->getName())) {
+                sorted.push_back(pWpnRes);
+            }
+        }
+
+        std::sort(sorted.begin(), sorted.end(), [](WeaponDefResource* a, WeaponDefResource* b) {
+            const auto& nameA = a->getName();
+            const auto& nameB = b->getName();
+            return nameA.compareInt(nameB) < 0;
+        });
+
+        X_LOG0("WeaponDef", "------------ ^8Weapons(%" PRIuS ")^7 ---------------", sorted.size());
+
+        for (const auto* pWpn : sorted) {
+            X_LOG0("WeaponDef", "^2%-32s^7 Refs: ^2%i",
+                pWpn->getName(), pWpn->getRefCount());
+        }
+
+        X_LOG0("WeaponDef", "------------ ^8Weapnos End^7 --------------");
+    }
+
+
+    void WeaponDefManager::Cmd_List(core::IConsoleCmdArgs* pCmd)
+    {
+        const char* pSearchPatten = nullptr;
+
+        if (pCmd->GetArgCount() >= 2) {
+            pSearchPatten = pCmd->GetArg(1);
+        }
+
+        listWeapons(pSearchPatten);
     }
 
 } // namespace weapon
