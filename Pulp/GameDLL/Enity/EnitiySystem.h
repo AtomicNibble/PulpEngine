@@ -50,6 +50,7 @@ namespace entity
         void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
         EntityId createEnt(void);
+        EntityId createWeapon(EntityId playerId);
 
         void makePlayer(EntityId id);
         bool addController(EntityId id);

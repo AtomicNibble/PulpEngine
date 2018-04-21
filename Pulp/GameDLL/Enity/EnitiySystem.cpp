@@ -153,6 +153,95 @@ namespace entity
         return ent;
     }
 
+    EntityId EnititySystem::createWeapon(EntityId playerId)
+    {
+        Player& ply = reg_.get<Player>(playerId);
+
+        model::BoneHandle tagWeapon = model::INVALID_BONE_HANDLE;
+
+        auto armsEnt = reg_.create<TransForm, Mesh, MeshRenderer, Animator>();
+
+        ply.armsEnt = armsEnt;
+        {
+            auto& trans = reg_.get<TransForm>(armsEnt);
+            auto& mesh = reg_.get<Mesh>(armsEnt);
+            auto& meshRend = reg_.get<MeshRenderer>(armsEnt);
+            auto& an = reg_.get<Animator>(armsEnt);
+
+            trans.pos = Vec3f(-110.f, 16.f, 74.f);
+
+            mesh.pModel = pModelManager_->loadModel("test/arms/view_jap");
+            pModelManager_->waitForLoad(mesh.pModel);
+
+            tagWeapon = mesh.pModel->getBoneHandle("tag_weapon");
+
+            an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
+
+            engine::RenderEntDesc entDsc;
+            entDsc.pModel = mesh.pModel;
+            entDsc.trans = trans;
+            meshRend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+        }
+
+        auto ent = reg_.create<TransForm, Mesh, MeshRenderer, Weapon, Animator, Attached>();
+        auto& trans = reg_.get<TransForm>(ent);
+        auto& mesh = reg_.get<Mesh>(ent);
+        auto& meshRend = reg_.get<MeshRenderer>(ent);
+        auto& wpn = reg_.get<Weapon>(ent);
+        auto& an = reg_.get<Animator>(ent);
+        auto& att = reg_.get<Attached>(ent);
+        //		auto& emit = reg_.assign<Emitter>(ent);
+
+        // so in order to make a weapon we need:
+        // - weapon def - for info about weapon
+        // - viewmodel - to render
+        // - animator - to animate model
+        // - weapon - to store state
+
+        auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357");
+        weaponDefs_.waitForLoad(pWeaponDef);
+
+        const char* pViewModel = pWeaponDef->getModelSlot(weapon::ModelSlot::Gun);
+
+        trans.pos = Vec3f(-110.f, 16.f, 30.f);
+
+        // get model.
+        mesh.pModel = pModelManager_->loadModel(pViewModel);
+        pModelManager_->waitForLoad(mesh.pModel);
+
+        // setup render ent
+        engine::RenderEntDesc entDsc;
+        entDsc.pModel = mesh.pModel;
+        entDsc.trans = trans;
+        meshRend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+
+        // add a animator.
+        an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
+
+        // setup the weapon state.
+        wpn.ammoInClip = 10;
+        wpn.ammoType = 0;
+        wpn.pWeaponDef = pWeaponDef;
+        wpn.state = weapon::State::Holstered;
+        wpn.ownerEnt = playerId;
+        wpn.stateEnd = core::TimeVal(0.f);
+
+        {
+            engine::EmitterDesc dsc;
+            dsc.trans = trans;
+            dsc.pEffect = nullptr;
+            dsc.looping = false;
+
+            wpn.pFlashEmt = p3DWorld_->addEmmiter(dsc);
+            wpn.pBrassEmt = p3DWorld_->addEmmiter(dsc);
+        }
+
+        att.parentEnt = armsEnt;
+        att.parentBone = tagWeapon;
+
+        return ent;
+    }
+
     void EnititySystem::makePlayer(EntityId id)
     {
         // auto trans = reg_.assign<TransForm>(id);
@@ -185,6 +274,9 @@ namespace entity
 
 		X_ASSERT_NOT_NULL(rend.pRenderEnt);
 #endif
+
+        // temp, give player a weapon
+        player.weaponEnt = createWeapon(id);
 
         // temp.
         cameraSys_.setActiveEnt(id);
