@@ -25,13 +25,15 @@ template<typename T>
 Matrix33<T>::Matrix33(const Vec3<T>& vx, const Vec3<T>& vy, const Vec3<T>& vz)
 {
     m00 = vx.x;
-    m01 = vy.x;
-    m02 = vz.x;
     m10 = vx.y;
-    m11 = vy.y;
-    m12 = vz.y;
     m20 = vx.z;
+
+    m01 = vy.x;
+    m11 = vy.y;
     m21 = vy.z;
+    
+    m02 = vz.x;
+    m12 = vz.y;
     m22 = vz.z;
 }
 
