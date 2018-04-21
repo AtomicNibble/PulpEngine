@@ -1,5 +1,7 @@
 #include "stdafx.h"
 
+#include <Math\QuatAlgo.h>
+
 X_USING_NAMESPACE;
 
 using namespace core;
@@ -15,8 +17,8 @@ public:
 
 #define EXPECT_NEAR_VEC3(expected, actual, angle_error) \
     {                                                   \
-        Vec3<TypeParam> _exp = expected;                \
-        Vec3<TypeParam> _act = actual;                  \
+        auto _exp = expected;                \
+        auto _act = actual;                  \
         EXPECT_NEAR(_exp.x, _act.x, angle_error);       \
         EXPECT_NEAR(_exp.y, _act.y, angle_error);       \
         EXPECT_NEAR(_exp.z, _act.z, angle_error);       \
@@ -292,4 +294,30 @@ TYPED_TEST(MathQuat, Operators)
     EXPECT_NEAR_QUAT(Quat<TypeParam>(0.4f, 1.25f, 0.8f, 0.95f), (Quat<TypeParam>(0.2f, 0.45f, 0.2f, 0.75f) += Quat<TypeParam>(0.2f, 0.8f, 0.6f, 0.2f)), 0.00001f);
     EXPECT_NEAR_QUAT(Quat<TypeParam>(-0.590000033f, 0.660000026f, -0.350000024f, 0.0800000131f), (Quat<TypeParam>(0.2f, 0.450f, 0.200f, 0.750f) *= Quat<TypeParam>(0.2f, 0.800f, 0.600f, 0.200f)), 0.00001f);
     EXPECT_NEAR_QUAT(Quat<TypeParam>(0.f, -0.35f, -0.4f, 0.55f), (Quat<TypeParam>(0.2f, 0.45f, 0.2f, 0.75f) -= Quat<TypeParam>(0.2f, 0.8f, 0.6f, 0.2f)), 0.00001f);
+}
+
+TEST(MathQuat, Algo)
+{
+
+    Quatf q0 = QuatLookAt(Vec3f(1, 0, 0), Vec3f::xAxis());
+    Quatf q1 = QuatLookAt(Vec3f(1, 0, 0), Vec3f::yAxis());
+    Quatf q2 = QuatLookAt(Vec3f(1, 0, 0), Vec3f::zAxis());
+    Quatf q3 = QuatLookAt(Vec3f(1245, 12, 5250), Vec3f::zAxis());
+    Quatf q4 = QuatLookAt(Vec3f(500, 0, -90), Vec3f::zAxis());
+
+    EXPECT_TRUE(isnan(q0.v.x));
+    EXPECT_TRUE(isnan(q0.v.y));
+    EXPECT_TRUE(isnan(q0.v.z));
+    EXPECT_TRUE(isnan(q0.w));
+
+    EXPECT_NEAR(1.f, q1.length(), 0.0001f);
+    EXPECT_NEAR(1.f, q2.length(), 0.0001f);
+    EXPECT_NEAR(1.f, q3.length(), 0.0001f);
+    EXPECT_NEAR(1.f, q4.length(), 0.0001f);
+
+    EXPECT_NEAR_QUAT(Quatf(0.707106769f, 0.f, -0.707106769f, 0.f), q1, 0.00001f);
+    EXPECT_NEAR_QUAT(Quatf(0.500000000f, 0.500000000f, -0.500000000f, -0.500000000f), q2, 0.00001f);
+    EXPECT_NEAR_QUAT(Quatf(0.0825347006f, 0.705696166f, -0.698927164f, -0.0817430094f), q3, 0.00001f);
+    EXPECT_NEAR_QUAT(Quatf(0.542483389f, 0.453554541f, -0.453554541f, -0.542483389f), q4, 0.00001f);
+
 }
