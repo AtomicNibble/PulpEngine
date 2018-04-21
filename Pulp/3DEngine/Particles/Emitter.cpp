@@ -379,7 +379,7 @@ namespace fx
                     Vec3f br = Vec3f(0, -halfWidth, -halfHeight);
 
                     if (e.rotation > 0.f) {
-                        auto rot = Quatf(Vec3f(0.f, 0.f, 1.f), ::toRadians(e.rotation));
+                        auto rot = Quatf(Vec3f(1.f, 0.f, 0.f), ::toRadians(e.rotation));
 
                         tl = tl * rot;
                         tr = tr * rot;
