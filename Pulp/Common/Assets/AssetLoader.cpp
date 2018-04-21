@@ -71,6 +71,13 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
 
+    // if you are already loaded, return.
+    auto status = pAsset->getStatus();
+    if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading) {
+        X_WARNING("AssetLoader", "Redundant load request requested: \"%s\"", pAsset->getName().c_str());
+        return;
+    }
+
     //	pAsset->addReference(); // prevent instance sweep
     pAsset->setStatus(core::LoadStatus::Loading);
 
@@ -127,16 +134,6 @@ void AssetLoader::dispatchPendingLoads(void)
 
 void AssetLoader::queueLoadRequest(AssetBase* pAsset, core::CriticalSection::ScopedLock&)
 {
-    X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")();
-
-    // can we know it's not in this queue just from status?
-    // like if it's complete it could be in this status
-    auto status = pAsset->getStatus();
-    if (status == core::LoadStatus::Complete || status == core::LoadStatus::Loading) {
-        X_WARNING("AssetLoader", "Redundant load request requested: \"%s\"", pAsset->getName().c_str());
-        return;
-    }
-
     X_ASSERT(!requestQueue_.contains(pAsset), "Queue already contains asset")(pAsset);
 
     requestQueue_.push(pAsset);
