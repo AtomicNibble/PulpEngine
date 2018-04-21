@@ -26,11 +26,11 @@
     <AlternativeType Name="Matrix22" />
     <DisplayString>~ Matrix2x2</DisplayString>
     <Expand>
-      <Synthetic Name="Row: 0">
-        <DisplayString>[{m00}, {m01}]</DisplayString>
+      <Synthetic Name="Col: 0">
+        <DisplayString>[{m00}, {m10}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 1">
-        <DisplayString>[{m10}, {m11}]</DisplayString>
+      <Synthetic Name="Col: 1">
+        <DisplayString>[{m01}, {m11}]</DisplayString>
       </Synthetic>
     </Expand>
   </Type>
@@ -38,14 +38,14 @@
     <AlternativeType Name="Matrix33" />
     <DisplayString>~ Matrix3x3</DisplayString>
     <Expand>
-      <Synthetic Name="Row: 0">
-        <DisplayString>[{m00}, {m01}, {m02}]</DisplayString>
+      <Synthetic Name="Col: 0">
+        <DisplayString>[{m00}, {m10}, {m20}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 1">
-        <DisplayString>[{m10}, {m11}, {m12}]</DisplayString>
+      <Synthetic Name="Col: 1">
+        <DisplayString>[{m01}, {m11}, {m21}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 2">
-        <DisplayString>[{m20}, {m21}, {m22}]</DisplayString>
+      <Synthetic Name="Col: 2">
+        <DisplayString>[{m02}, {m12}, {m22}]</DisplayString>
       </Synthetic>
     </Expand>
   </Type>
@@ -53,14 +53,17 @@
     <AlternativeType Name="Matrix34" />
     <DisplayString>~ Matrix3x4</DisplayString>
     <Expand>
-      <Synthetic Name="Row: 0">
-        <DisplayString>[{m00}, {m01}, {m02}, {m03}]</DisplayString>
+      <Synthetic Name="Col: 0">
+        <DisplayString>[{m00}, {m10}, {m20}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 1">
-        <DisplayString>[{m10}, {m11}, {m12}, {m13}]</DisplayString>
+      <Synthetic Name="Col: 1">
+        <DisplayString>[{m01}, {m11}, {m21}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 2">
-        <DisplayString>[{m20}, {m21}, {m22}, {m23}]</DisplayString>
+      <Synthetic Name="Col: 2">
+        <DisplayString>[{m02}, {m12}, {m22}]</DisplayString>
+      </Synthetic>
+      <Synthetic Name="Col: 3 (Trans)">
+        <DisplayString>[{m03}, {m13}, {m23}]</DisplayString>
       </Synthetic>
     </Expand>
   </Type> 
@@ -68,16 +71,16 @@
     <AlternativeType Name="Matrix44" />
     <DisplayString>~ Matrix4x4</DisplayString>
     <Expand>
-      <Synthetic Name="Row: 0">
+      <Synthetic Name="Col: 0">
         <DisplayString>[{m00}, {m10}, {m20}, {m30}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 1">
+      <Synthetic Name="Col: 1">
         <DisplayString>[{m01}, {m11}, {m21}, {m31}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 2">
+      <Synthetic Name="Col: 2">
         <DisplayString>[{m02}, {m12}, {m22}, {m32}]</DisplayString>
       </Synthetic>
-      <Synthetic Name="Row: 3">
+      <Synthetic Name="Col: 3 (Trans)">
         <DisplayString>[{m03}, {m13}, {m23}, {m33}]</DisplayString>
       </Synthetic>
     </Expand>
