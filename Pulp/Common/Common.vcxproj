@@ -213,6 +213,7 @@
     <ClInclude Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h" />
     <ClInclude Include="Math\MatrixStack.h" />
+    <ClInclude Include="Math\QuatAlgo.h" />
     <ClInclude Include="Math\VertexFormats.h" />
     <ClInclude Include="Math\XAabb.h" />
     <ClInclude Include="Math\XAlignment.h" />

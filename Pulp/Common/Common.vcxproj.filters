@@ -1318,6 +1318,9 @@
     <ClInclude Include="IScale.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
+    <ClInclude Include="Math\QuatAlgo.h">
+      <Filter>Headers\Math</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
