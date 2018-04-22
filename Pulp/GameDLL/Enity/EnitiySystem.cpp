@@ -262,6 +262,12 @@ namespace entity
         inv.giveAmmo(1, 50);
         inv.giveAmmo(2, 50);
 
+
+        inv.weapons.set(weaponDefs_.loadWeaponDef("test/sw_357")->getID());
+        inv.weapons.set(weaponDefs_.loadWeaponDef("test/mg42")->getID());
+        inv.weapons.set(weaponDefs_.loadWeaponDef("test/raygun")->getID());
+
+
 #if 0
 		engine::RenderEntDesc entDsc;
 		entDsc.pModel = pModelManager_->loadModel("test/anim/smooth_bind_02");
