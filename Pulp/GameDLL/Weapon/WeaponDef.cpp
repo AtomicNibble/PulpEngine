@@ -52,7 +52,7 @@ namespace weapon
 
         for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
             if (hdr_.effectSlots[i] != 0) {
-                effects_[i] = pEffectMan->loadEffect(getEffectlot(static_cast<EffectSlot::Enum>(i)));
+                effects_[i] = pEffectMan->loadEffect(getEffectSlot(static_cast<EffectSlot::Enum>(i)));
             }
         }
 

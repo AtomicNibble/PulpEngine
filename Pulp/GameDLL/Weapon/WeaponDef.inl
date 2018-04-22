@@ -98,7 +98,7 @@ namespace weapon
         return stringForOffset(hdr_.iconSlots[slot]);
     }
 
-    X_INLINE const char* WeaponDef::getEffectlot(EffectSlot::Enum slot) const
+    X_INLINE const char* WeaponDef::getEffectSlot(EffectSlot::Enum slot) const
     {
         return stringForOffset(hdr_.effectSlots[slot]);
     }

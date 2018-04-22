@@ -45,7 +45,7 @@ namespace weapon
         X_INLINE const char* getAnimSlot(AnimSlot::Enum slot) const;
         X_INLINE const char* getSoundSlot(SoundSlot::Enum slot) const;
         X_INLINE const char* getIconSlot(IconSlot::Enum slot) const;
-        X_INLINE const char* getEffectlot(EffectSlot::Enum slot) const;
+        X_INLINE const char* getEffectSlot(EffectSlot::Enum slot) const;
 
         X_INLINE sound::HashVal getSoundSlotHash(SoundSlot::Enum slot) const;
         X_INLINE bool hasAnimSlot(AnimSlot::Enum slot) const;
