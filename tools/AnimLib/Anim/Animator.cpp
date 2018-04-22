@@ -359,6 +359,10 @@ void Animator::setModel(const model::XModel* pModel)
     else {
         boneMat_.clear();
     }
+
+    for (auto& anim : anims_) {
+        anim.clear();
+    }
 }
 
 bool Animator::getNotes(core::TimeVal from, core::TimeVal to, NoteTrackValueArr& values) const
