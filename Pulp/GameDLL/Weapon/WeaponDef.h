@@ -46,11 +46,15 @@ namespace weapon
         X_INLINE const char* getSoundSlot(SoundSlot::Enum slot) const;
         X_INLINE const char* getIconSlot(IconSlot::Enum slot) const;
         X_INLINE const char* getEffectSlot(EffectSlot::Enum slot) const;
+        X_INLINE const char* getStrSlot(StringSlot::Enum slot) const;
 
         X_INLINE sound::HashVal getSoundSlotHash(SoundSlot::Enum slot) const;
         X_INLINE bool hasAnimSlot(AnimSlot::Enum slot) const;
         X_INLINE bool hasSoundSlot(SoundSlot::Enum slot) const;
         X_INLINE bool hasEffectSlot(EffectSlot::Enum slot) const;
+
+        X_INLINE void setAmmoTypeId(AmmoTypeId id);
+        X_INLINE AmmoTypeId getAmmoTypeId(void) const;
 
     private:
         X_INLINE const char* stringForOffset(int32_t offset) const;
@@ -62,6 +66,8 @@ namespace weapon
         IconMaterialsArr icons_;
         AnimArr animations_;
         EffectArr effects_;
+
+        AmmoTypeId ammoTypeId_;
 
         WeaponHdr hdr_;
     };

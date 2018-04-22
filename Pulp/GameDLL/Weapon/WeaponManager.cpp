@@ -213,7 +213,17 @@ namespace weapon
 
         core::XFileFixedBuf file(data.ptr(), data.ptr() + dataSize);
 
-        return pWeaponDef->processData(&file);
+        if (!pWeaponDef->processData(&file)) {
+            return false;
+        }
+
+        // work out the ammoType id.
+        auto* pAmmoName = pWeaponDef->getStrSlot(StringSlot::AmmoName);
+        auto id = getAmmoTypeId(pAmmoName);
+
+        pWeaponDef->setAmmoTypeId(id);
+
+        return true;
     }
 
     void WeaponDefManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)

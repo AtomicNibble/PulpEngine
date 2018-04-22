@@ -103,6 +103,12 @@ namespace weapon
         return stringForOffset(hdr_.effectSlots[slot]);
     }
 
+    X_INLINE const char* WeaponDef::getStrSlot(StringSlot::Enum slot) const
+    {
+        return stringForOffset(hdr_.strSlots[slot]);
+    }
+
+
     X_INLINE sound::HashVal WeaponDef::getSoundSlotHash(SoundSlot::Enum slot) const
     {
         return soundHashes_[slot];
@@ -126,6 +132,16 @@ namespace weapon
     X_INLINE bool WeaponDef::hasEffectSlot(EffectSlot::Enum slot) const
     {
         return hdr_.effectSlots[slot] != 0;
+    }
+
+    X_INLINE void WeaponDef::setAmmoTypeId(AmmoTypeId id)
+    {
+        ammoTypeId_ = id;
+    }
+
+    X_INLINE AmmoTypeId WeaponDef::getAmmoTypeId(void) const
+    {
+        return ammoTypeId_;
     }
 
 } // namespace weapon

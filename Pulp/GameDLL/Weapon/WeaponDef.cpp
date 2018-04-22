@@ -10,7 +10,8 @@ X_NAMESPACE_BEGIN(game)
 namespace weapon
 {
     WeaponDef::WeaponDef(core::string& name) :
-        AssetBase(name, assetDb::AssetType::WEAPON)
+        AssetBase(name, assetDb::AssetType::WEAPON),
+        ammoTypeId_(weapon::INVALID_AMMO_TYPE)
     {
         soundHashes_.fill(0);
         icons_.fill(nullptr);
