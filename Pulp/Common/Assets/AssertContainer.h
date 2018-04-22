@@ -189,7 +189,7 @@ public:
         return nullptr;
     }
 
-    X_INLINE Resource* findAsset(uint32_t id) const
+    X_INLINE Resource* findAsset(int32_t id) const
     {
         return list_[id];
     }
