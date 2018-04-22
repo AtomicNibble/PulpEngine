@@ -132,7 +132,7 @@ namespace entity
 
         X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
 
-        playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, p3DWorld_, userCmd, id);
+        playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, userCmd, id);
 
         // update the cameras.
         cameraSys_.update(frame, reg_, pPhysScene_);
@@ -223,6 +223,7 @@ namespace entity
         wpn.ammoType = 0;
         wpn.pWeaponDef = pWeaponDef;
         wpn.state = weapon::State::Holstered;
+        wpn.raise();
         wpn.ownerEnt = playerId;
         wpn.stateEnd = core::TimeVal(0.f);
 
@@ -261,12 +262,16 @@ namespace entity
         inv.giveAmmo(0, 50);
         inv.giveAmmo(1, 50);
         inv.giveAmmo(2, 50);
+        inv.giveAmmo(3, 50);
+        inv.giveAmmo(4, 50);
 
 
         inv.weapons.set(weaponDefs_.loadWeaponDef("test/sw_357")->getID());
         inv.weapons.set(weaponDefs_.loadWeaponDef("test/mg42")->getID());
         inv.weapons.set(weaponDefs_.loadWeaponDef("test/raygun")->getID());
 
+        player.currentWpn = 1;
+        player.targetWpn = 1;
 
 #if 0
 		engine::RenderEntDesc entDsc;

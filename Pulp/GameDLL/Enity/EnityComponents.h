@@ -261,6 +261,9 @@ namespace entity
 
         EntityId weaponEnt;
         EntityId armsEnt;
+
+        int32_t currentWpn;
+        int32_t targetWpn;
     };
 
     struct Attached

@@ -3,12 +3,20 @@
 #include "Vars\PlayerVars.h"
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameTimeData;)
+    struct FrameTimeData)
 
 X_NAMESPACE_DECLARE(engine,
-                    struct IWorld3D;)
+    struct IWorld3D)
+
+X_NAMESPACE_DECLARE(model,
+    struct IModelManager)
 
 X_NAMESPACE_BEGIN(game)
+
+namespace weapon
+{
+    class WeaponDefManager;
+} // namespace weapon
 
 namespace entity
 {
@@ -19,7 +27,8 @@ namespace entity
 
         bool init(physics::IScene* pPhysScene);
 
-        void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg, engine::IWorld3D* p3DWorld,
+        void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
+            game::weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
             const UserCmd& userCmd, EntityId playerId);
 
     private:

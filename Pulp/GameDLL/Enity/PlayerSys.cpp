@@ -5,8 +5,11 @@
 #include <ITimer.h>
 #include <IWorld3D.h>
 #include <I3DEngine.h>
+#include <IModelManager.h>
 
 #include <Hashing\Fnva1Hash.h>
+
+#include "Weapon\WeaponManager.h"
 
 using namespace core::Hash::Literals;
 using namespace sound::Literals;
@@ -50,6 +53,7 @@ namespace entity
     }
 
     void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
+        weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
         engine::IWorld3D* p3DWorld, const UserCmd& userCmd, EntityId playerId)
     {
         X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")(playerId, MAX_PLAYERS);
@@ -223,6 +227,56 @@ namespace entity
         if (player.weaponEnt != entity::INVALID_ENT_ID) {
             auto& wpn = reg.get<Weapon>(player.weaponEnt);
 
+            // oh shit son.
+            // this be like, some crazy weapon switching shit.
+            if (userCmd.impulse == Impulse::WEAP_NEXT) {
+                X_LOG0("Goat", "Change the fucking weapon!");
+
+                // how is this going to work o_o
+                // need to holster the weapon, then switch to new one.
+                // ugh.
+                
+                // first find a weapon we can swith to.
+                auto& inv = reg.get<Inventory>(playerId);
+                auto wpnIdx = player.targetWpn;
+
+                while (1)
+                {
+                    ++wpnIdx;
+
+                    if (wpnIdx >= weapon::WEAPON_MAX_LOADED) {
+                        wpnIdx = 0;
+                    }
+
+                    if (wpnIdx == player.targetWpn) {
+                        break;
+                    }
+
+                    if (!inv.weapons.test(wpnIdx)) {
+                        continue;
+                    }
+
+                    // gimmy the fooking weapon!
+                    auto* pWpnDef = weaponDefs.findWeaponDef(wpnIdx);
+                    if (!pWpnDef) {
+                        continue;
+                    }
+
+                    auto ammoType = pWpnDef->getAmmoTypeId();
+
+                    if (inv.numAmmo(ammoType) > 0 || inv.getClipAmmo(wpnIdx) > 0) {
+                        break;
+                    }
+                }
+
+                if (wpnIdx != player.currentWpn && wpnIdx != player.targetWpn) {
+                    player.targetWpn = wpnIdx;
+
+                    auto* pWpnDef = weaponDefs.findWeaponDef(wpnIdx);
+                    X_LOG0("goat", "switch to: %s", pWpnDef->getStrSlot(weapon::StringSlot::DisplayName));
+                }
+            }
+
             if (userCmd.buttons.IsSet(Button::ATTACK)) {
                 wpn.attack = true;
             }
@@ -233,6 +287,49 @@ namespace entity
             if (player.oldUserCmd.buttons.IsSet(Button::RELOAD)) {
                 wpn.reload = true;
             }
+
+            if (player.currentWpn != player.targetWpn)
+            {
+                if (wpn.isReady()) {
+                    wpn.holster = true;
+                }
+
+                if (wpn.isHolstered())
+                {
+                    auto& mesh = reg.get<Mesh>(player.weaponEnt);
+                    auto& meshRend = reg.get<MeshRenderer>(player.weaponEnt);
+                    auto& an = reg.get<Animator>(player.weaponEnt);
+
+                    // now switch and raise.
+                    // how do we switch 0_0
+                    auto* pWpnDef = weaponDefs.findWeaponDef(player.targetWpn);
+
+                    // things that need to happen:
+                    // change the model
+                    const char* pViewModel = pWpnDef->getModelSlot(weapon::ModelSlot::Gun);
+
+                    mesh.pModel = pModelManager->loadModel(pViewModel);
+                    pModelManager->waitForLoad(mesh.pModel);
+
+                    if (meshRend.pRenderEnt) {
+                        p3DWorld->removeRenderEnt(meshRend.pRenderEnt);
+                    }
+
+                    engine::RenderEntDesc entDsc;
+                    entDsc.pModel = mesh.pModel;
+                    entDsc.trans = trans;
+                    meshRend.pRenderEnt = p3DWorld->addRenderEnt(entDsc);
+
+                    
+                    an.pAnimator->setModel(mesh.pModel);
+
+                    wpn.pWeaponDef = pWpnDef;
+                    wpn.raise();
+
+                    player.currentWpn = player.targetWpn;
+                }
+            }
+            
         }
 
         // if we have arms, shove them where we want the gun pos, as gun animations
