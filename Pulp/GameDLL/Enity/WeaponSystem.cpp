@@ -54,7 +54,8 @@ namespace entity
             {
                 auto& inv = pReg_->get<Inventory>(wpn.ownerEnt);
 
-                ammoText.appendFmt("AmmoInClip: %i\nAmmoStore: %i", wpn.ammoInClip, inv.numAmmo(ammoType));
+                ammoText.appendFmt("Name: %s\nAmmoInClip: %i\nAmmoStore: %i", wpn.pWeaponDef->getStrSlot(weapon::StringSlot::DisplayName),
+                    wpn.ammoInClip, inv.numAmmo(ammoType));
             }
 
             font::TextDrawContext con;
@@ -91,7 +92,7 @@ namespace entity
 
             //	pPrim->drawQuadImage(400.f, 400.f, 256, 128, wpn.pWeaponDef->getIcon(weapon::IconSlot::AmmoCounter), Color(0.2f, 0.2f, 0.2f));
 
-            pPrim->drawText(Vec3f(5.f, 1000.f, 1.f), con, ammoText.begin(), ammoText.end());
+            pPrim->drawText(Vec3f(5.f, 1000.f - 30.f, 1.f), con, ammoText.begin(), ammoText.end());
 
             /*
 				so everything kinda works nice anim wise if we play the same animation on both arms and weapon.
