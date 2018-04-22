@@ -258,7 +258,10 @@ namespace entity
 
         hp.hp = 100;
 
-        inv.ammo = 20;
+        inv.giveAmmo(0, 50);
+        inv.giveAmmo(1, 50);
+        inv.giveAmmo(2, 50);
+
 #if 0
 		engine::RenderEntDesc entDsc;
 		entDsc.pModel = pModelManager_->loadModel("test/anim/smooth_bind_02");

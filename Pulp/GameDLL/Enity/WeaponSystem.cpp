@@ -49,10 +49,14 @@ namespace entity
 
             core::StackString256 ammoText;
 
+            auto ammoType = wpn.pWeaponDef->getAmmoTypeId();
+
             {
                 auto& inv = pReg_->get<Inventory>(wpn.ownerEnt);
-                ammoText.appendFmt("AmmoInClip: %i\nAmmoStore: %i", wpn.ammoInClip, inv.ammo);
+
+                ammoText.appendFmt("AmmoInClip: %i\nAmmoStore: %i", wpn.ammoInClip, inv.numAmmo(ammoType));
             }
+
             font::TextDrawContext con;
             con.col = Col_Mintcream;
             con.size = Vec2f(24.f, 24.f);
@@ -144,14 +148,14 @@ namespace entity
                         if (wpn.ownerEnt != INVALID_ENT_ID && pReg_->has<Inventory>(wpn.ownerEnt)) {
                             auto& inv = pReg_->get<Inventory>(wpn.ownerEnt);
 
-                            int32_t avaliableAmmo = inv.ammo; // TODO: use ammo types
+                            int32_t avaliableAmmo = inv.numAmmo(ammoType); 
                             int32_t clipSize = wpn.pWeaponDef->getAmmoSlot(weapon::AmmoSlot::ClipSize);
                             int32_t clipSpace = clipSize - wpn.ammoInClip;
                             int32_t ammoToAdd = core::Min(clipSpace, core::Min(clipSize, avaliableAmmo));
 
                             if (ammoToAdd != 0) {
                                 wpn.ammoInClip += ammoToAdd;
-                                inv.ammo -= ammoToAdd;
+                                inv.useAmmo(ammoType, ammoToAdd);
                             }
                         }
 
@@ -331,8 +335,10 @@ namespace entity
                 return false;
             }
 
+            auto ammoType = wpn.pWeaponDef->getAmmoTypeId();
+
             auto& inv = pReg_->get<Inventory>(wpn.ownerEnt);
-            int32_t avaliableAmmo = inv.ammo; // TODO: use ammo types
+            int32_t avaliableAmmo = inv.numAmmo(ammoType); 
 
             if (avaliableAmmo == 0) {
                 return false;

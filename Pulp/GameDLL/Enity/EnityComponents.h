@@ -85,10 +85,53 @@ namespace entity
 
     struct Inventory
     {
+
+
         // i will want per ammo type stores at somepoint
         // but the types are data driven.
         // need some sort of type to index shit maybe.
-        int32_t ammo;
+   //     int32_t ammo;
+
+        // you can have multiple weapons in invetory.
+        // what do i store these as?
+        // well when we switch weapons we need to basically play the putaway anim then switch weapon def.
+        // so i guess we just want a list of weapon defs.
+        // ideally I want to map weapons to id's
+        // lets says the order weapons are loaded don't matter. and we deal with networking later.
+        // we get int id's for each loaded asset, can we use that how we want?
+        // well i think so.
+        void giveAmmo(weapon::AmmoTypeId type, int32_t num) {
+            ammo[type] += num;
+        }
+
+        int32_t numAmmo(weapon::AmmoTypeId type) const {
+            return ammo[type];
+        }
+
+        bool hasAmmo(weapon::AmmoTypeId type, int32_t num) const {
+            return ammo[type] >= num;
+        }
+
+        bool useAmmo(weapon::AmmoTypeId type, int32_t num) {
+            if (hasAmmo(type, num)) {
+                ammo[type] -= num;
+                return true;
+            }
+            return false;
+        }
+
+        int32_t getClipAmmo(int32_t weaponId) const {
+            return clip[weaponId];
+        }
+        void setClipAmmo(int32_t weaponId, int32_t num) {
+            clip[weaponId] = num;
+        }
+
+        std::bitset<weapon::WEAPON_MAX_LOADED> weapons;
+        
+    private:
+        std::array<int32_t, weapon::WEAPON_MAX_LOADED> clip; // only sync'd when you switch weapon.
+        std::array<int32_t, weapon::WEAPON_MAX_AMMO_TYPES> ammo; 
     };
 
     struct Weapon
