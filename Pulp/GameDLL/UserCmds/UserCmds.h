@@ -20,7 +20,21 @@ X_DECLARE_ENUM(UserButton)
     MOVE_LEFT,
     MOVE_RIGHT,
     MOVE_UP,
-    MOVE_DOWN);
+    MOVE_DOWN,
+    
+    WEAP0,
+    WEAP1,
+    WEAP2,
+    WEAP3,
+    WEAP4,
+    WEAP5,
+    WEAP6,
+    WEAP7,
+    WEAP8,
+    WEAP9,
+    WEAP_NEXT,
+    WEAP_PREV
+);
 
 class UserCmdGen : public input::IInputEventListner
 {

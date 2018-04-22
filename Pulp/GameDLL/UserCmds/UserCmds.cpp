@@ -177,6 +177,34 @@ UserButton::Enum getUserButton(input::KeyId::Enum key)
         case input::KeyId::LEFT_SHIFT:
             return UserButton::SPEED;
 
+        case input::KeyId::DIGIT_0:
+            return UserButton::WEAP0;
+        case input::KeyId::DIGIT_1:
+            return UserButton::WEAP1;
+        case input::KeyId::DIGIT_2:
+            return UserButton::WEAP2;
+        case input::KeyId::DIGIT_3:
+            return UserButton::WEAP3;
+        case input::KeyId::DIGIT_4:
+            return UserButton::WEAP4;
+        case input::KeyId::DIGIT_5:
+            return UserButton::WEAP5;
+        case input::KeyId::DIGIT_6:
+            return UserButton::WEAP6;
+        case input::KeyId::DIGIT_7:
+            return UserButton::WEAP7;
+        case input::KeyId::DIGIT_8:
+            return UserButton::WEAP8;
+        case input::KeyId::DIGIT_9:
+            return UserButton::WEAP9;
+
+        case input::KeyId::Q:
+        case input::KeyId::MOUSE_WHEELDOWN:
+            return UserButton::WEAP_NEXT;
+        case input::KeyId::E:
+        case input::KeyId::MOUSE_WHEELUP:
+            return UserButton::WEAP_PREV;
+
         default:
             return UserButton::NONE;
     }
@@ -192,6 +220,15 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
     auto ub = getUserButton(key);
     if (down) {
         ++buttonStates_[ub];
+
+        // so want to seperate out impulses.
+        if (ub >= UserButton::WEAP0) {
+            int32_t val = static_cast<int32_t>(ub - UserButton::WEAP0);
+            X_ASSERT(val >= 0 && val < Impulse::ENUM_COUNT, "Out of range")(val);
+
+            cmd_.impulse = static_cast<Impulse::Enum>(val);
+            cmd_.impulseSeq++;
+        }
     }
     else {
         --buttonStates_[ub];
