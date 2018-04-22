@@ -43,6 +43,7 @@ namespace weapon
 
         bool asyncInitFinalize(void);
 
+        WeaponDef* findWeaponDef(core::AssetID id) const;
         WeaponDef* findWeaponDef(const char* pName) const;
         WeaponDef* loadWeaponDef(const char* pName);
         WeaponDef* getDefaultDef(void) const;

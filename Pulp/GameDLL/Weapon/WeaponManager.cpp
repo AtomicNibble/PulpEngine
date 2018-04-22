@@ -75,6 +75,18 @@ namespace weapon
         return true;
     }
 
+    WeaponDef* WeaponDefManager::findWeaponDef(core::AssetID id) const
+    {
+        core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
+
+        WeaponDef* pDef = weaponDefs_.findAsset(id);
+        if (pDef) {
+            return pDef;
+        }
+
+        return nullptr;
+    }
+
     WeaponDef* WeaponDefManager::findWeaponDef(const char* pName) const
     {
         core::string name(pName);
