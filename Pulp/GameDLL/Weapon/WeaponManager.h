@@ -30,6 +30,8 @@ namespace weapon
         typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
         typedef WeaponDefContainer::Resource WeaponDefResource;
 
+        typedef core::Array<core::StrHash> StrHashArr;
+
     public:
         WeaponDefManager(core::MemoryArenaBase* arena);
 
@@ -50,6 +52,9 @@ namespace weapon
         void releaseWeaponDef(WeaponDef* pWeaponDef);
 
         void listWeapons(const char* pSearchPatten = nullptr) const;
+
+        AmmoTypeId getAmmoTypeId(const char* pName);
+
 
     private:
         bool initDefaults(void);
@@ -73,6 +78,9 @@ namespace weapon
         WeaponDef* pDefaultWeaponDef_;
 
         WeaponDefContainer weaponDefs_;
+
+        StrHashArr ammoTypeList_;
+        core::CriticalSection cs_;
     };
 
 } // namespace weapon

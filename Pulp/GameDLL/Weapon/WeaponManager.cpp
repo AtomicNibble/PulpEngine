@@ -16,7 +16,8 @@ namespace weapon
         arena_(arena),
         pAssetLoader_(nullptr),
         pDefaultWeaponDef_(nullptr),
-        weaponDefs_(arena, sizeof(WeaponDefResource), X_ALIGN_OF(WeaponDefResource), "WeaponDefs")
+        weaponDefs_(arena, sizeof(WeaponDefResource), X_ALIGN_OF(WeaponDefResource), "WeaponDefs"),
+        ammoTypeList_(arena)
     {
     }
 
@@ -146,6 +147,27 @@ namespace weapon
         if (pWeaponDefRes->removeReference() == 0) {
             weaponDefs_.releaseAsset(pWeaponDefRes);
         }
+    }
+
+    AmmoTypeId WeaponDefManager::getAmmoTypeId(const char* pName)
+    {
+        core::StrHash hash(pName);
+
+        core::CriticalSection::ScopedLock lock(cs_);
+
+        for (size_t i = 0; i < ammoTypeList_.size(); i++) {
+            if (ammoTypeList_[i] == hash) {
+                return safe_static_cast<AmmoTypeId>(i);
+            }
+        }
+
+        if (ammoTypeList_.size() < weapon::WEAPON_MAX_AMMO_TYPES) {
+            return safe_static_cast<AmmoTypeId>(ammoTypeList_.push_back(hash));
+        }
+
+        // tut tut.
+        X_ERROR("WeaponDef", "Exceeded max(%" PRIu32 ") AmmoTypes", weapon::WEAPON_MAX_AMMO_TYPES);
+        return INVALID_AMMO_TYPE;
     }
 
     bool WeaponDefManager::initDefaults(void)

@@ -15,6 +15,9 @@ namespace weapon
     static const uint32_t WEAPON_MAX_LOADED = 128;
     static const uint32_t WEAPON_MAX_AMMO_TYPES = 32;
 
+    typedef int32_t AmmoTypeId;
+
+    static const AmmoTypeId INVALID_AMMO_TYPE = static_cast<AmmoTypeId>(-1);
 
     struct IWeaponLib : public IConverter
     {
