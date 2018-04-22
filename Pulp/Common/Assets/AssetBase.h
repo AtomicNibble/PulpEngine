@@ -5,13 +5,15 @@
 
 X_NAMESPACE_BEGIN(core)
 
+typedef int32_t AssetID;
+
 class AssetBase
 {
 public:
     AssetBase(core::string& name, assetDb::AssetType::Enum type);
 
-    X_INLINE const int32_t getID(void) const;
-    X_INLINE void setID(int32_t id);
+    X_INLINE const AssetID getID(void) const;
+    X_INLINE void setID(AssetID id);
 
     X_INLINE core::LoadStatus::Enum getStatus(void) const;
     X_INLINE bool isLoading(void) const;
@@ -25,7 +27,7 @@ public:
 
 protected:
     core::string name_;
-    int32_t id_;
+    AssetID id_;
     core::LoadStatus::Enum status_;
     assetDb::AssetType::Enum type_;
 };
@@ -38,12 +40,12 @@ X_INLINE AssetBase::AssetBase(core::string& name, assetDb::AssetType::Enum type)
 {
 }
 
-X_INLINE const int32_t AssetBase::getID(void) const
+X_INLINE const AssetID AssetBase::getID(void) const
 {
     return id_;
 }
 
-X_INLINE void AssetBase::setID(int32_t id)
+X_INLINE void AssetBase::setID(AssetID id)
 {
     id_ = id;
 }
