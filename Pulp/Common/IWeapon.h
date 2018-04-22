@@ -13,6 +13,8 @@ namespace weapon
     static const char* WEAPON_DEFAULT_NAME = "default";
 
     static const uint32_t WEAPON_MAX_LOADED = 128;
+    static const uint32_t WEAPON_MAX_AMMO_TYPES = 32;
+
 
     struct IWeaponLib : public IConverter
     {
