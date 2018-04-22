@@ -119,7 +119,7 @@ namespace entity
                     }
                     break;
                 case weapon::State::Holstered:
-                    if (curTime >= wpn.stateEnd) {
+                    if (!wpn.holster) { // curTime >= wpn.stateEnd) {
                         beginRaise(curTime, wpn, animator);
                     }
                     break;
@@ -175,7 +175,12 @@ namespace entity
                         //	continue;
                     }
 
-                    if (wpn.reload) {
+
+                    if (wpn.holster) {
+                        wpn.holster = false;
+                        beginLower(curTime, wpn, animator);
+                    }
+                    else if (wpn.reload) {
                         wpn.reload = false;
                         beginReload(curTime, wpn, animator);
                     }

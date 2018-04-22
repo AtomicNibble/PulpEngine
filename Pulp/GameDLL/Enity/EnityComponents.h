@@ -136,6 +136,16 @@ namespace entity
 
     struct Weapon
     {
+        X_INLINE bool isReady(void) const {
+            return state == weapon::State::Idle;
+        }
+        X_INLINE bool isHolstered(void) const {
+            return state == weapon::State::Holstered;
+        }
+        X_INLINE void raise(void) {
+            holster = false;
+        }
+
         EntityId ownerEnt;
 
         engine::fx::IEmitter* pFlashEmt;
@@ -152,6 +162,7 @@ namespace entity
 
         bool attack;
         bool reload;
+        bool holster;
     };
 
     struct Velocity
