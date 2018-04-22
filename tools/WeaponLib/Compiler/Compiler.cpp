@@ -72,6 +72,7 @@ namespace weapon
         const char* pInvType = d["invType"].GetString();
         const char* pFireType = d["fireType"].GetString();
         const char* pAmmoCounterStyle = d["ammoCounterStyle"].GetString();
+        const char* pDisplayName = d["displayName"].GetString();
         const char* pAmmoName = d["ammoName"].GetString();
 
         wpnClass_ = Util::WeaponClassFromStr(pClass);
@@ -107,9 +108,11 @@ namespace weapon
         parseEnum<IconSlot>(d, core::json::kStringType, "icon", iconSlots_, assignString);
         parseEnum<EffectSlot>(d, core::json::kStringType, "efx", effectSlots_, assignString);
         parseEnum<AmmoSlot>(d, core::json::kNumberType, "ammo", ammoSlots_, assignInt16);
-
-        // timers
         parseEnum<StateTimer>(d, core::json::kNumberType, "time", stateTimers_, assignFloat);
+
+
+        strSlots_[StringSlot::DisplayName] = pDisplayName;
+        strSlots_[StringSlot::AmmoName] = pAmmoName;
 
         static_assert(WeaponFlag::FLAGS_COUNT == 8, "Added additional weapon flags? this code might need updating.");
 
@@ -167,6 +170,7 @@ namespace weapon
         writeSlots<SoundSlot>(sndSlots_, hdr.sndSlots, stream);
         writeSlots<IconSlot>(iconSlots_, hdr.iconSlots, stream);
         writeSlots<EffectSlot>(effectSlots_, hdr.effectSlots, stream);
+        writeSlots<StringSlot>(strSlots_, hdr.strSlots, stream);
 
         hdr.ammoSlots = ammoSlots_;
         hdr.stateTimers = stateTimers_;

@@ -56,6 +56,8 @@ namespace weapon
 
         WeaponHdr::Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots_;
         WeaponHdr::FloatArr<StateTimer::ENUM_COUNT> stateTimers_;
+
+        StringArr<StringSlot::ENUM_COUNT> strSlots_;
     };
 
 } // namespace weapon

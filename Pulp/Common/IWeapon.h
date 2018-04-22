@@ -6,13 +6,13 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-    static const uint32_t WEAPON_VERSION = 2;
+    static const uint32_t WEAPON_VERSION = 3;
     static const uint32_t WEAPON_FOURCC = X_TAG('w', 'p', 'n', 'b');
 
     static const char* WEAPON_FILE_EXTENSION = "wpn";
     static const char* WEAPON_DEFAULT_NAME = "default";
 
-    static const uint32_t WEAPON_MAX_LOADED = 128;
+    static const uint32_t WEAPON_MAX_LOADED = 64;
     static const uint32_t WEAPON_MAX_AMMO_TYPES = 32;
 
     typedef int32_t AmmoTypeId;
@@ -79,6 +79,11 @@ namespace weapon
         ArmorPiercing);
 
     typedef Flags<WeaponFlag> WeaponFlags;
+
+    X_DECLARE_ENUM(StringSlot)
+        (
+            DisplayName,
+            AmmoName);
 
     X_DECLARE_ENUM(ModelSlot)
     (
@@ -184,7 +189,8 @@ namespace weapon
         Int16Arr<AmmoSlot::ENUM_COUNT> ammoSlots;
         FloatArr<StateTimer::ENUM_COUNT> stateTimers;
 
-        uint16_t ammoName;
+        SlotArr<StringSlot::ENUM_COUNT> strSlots;
+
 
         X_INLINE bool isValid(void) const
         {
