@@ -270,6 +270,8 @@ void TextureManager::releaseDefaultTextures(void)
 
 void TextureManager::addLoadRequest(TextureResource* pTexture)
 {
+    // TODO: use the streamQueue_, and dispatch load requests based on priority.
+
     pAssetLoader_->addLoadRequest(pTexture);
 }
 
