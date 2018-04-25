@@ -7,6 +7,7 @@
 #include <ICi.h>
 #include <IFileSys.h>
 #include <ICompression.h>
+#include <Assets\AssetLoader.h>
 
 #include <Compression\CompressorAlloc.h>
 #include <String\AssetName.h>
@@ -26,13 +27,13 @@ namespace
 
 TextureManager::TextureManager(core::MemoryArenaBase* arena) :
     arena_(arena),
+    pAssetLoader_(nullptr),
     textures_(arena, sizeof(TextureResource), core::Max(64_sz, X_ALIGN_OF(TextureResource)), "TexturePool"),
     pCILoader_(nullptr),
 
     blockAlloc_(),
     blockArena_(&blockAlloc_, "TextureBlockAlloc"),
     streamQueue_(arena),
-    loadComplete_(true),
     currentDeviceTexId_(0),
     pTexDefault_(nullptr),
     pTexDefaultBump_(nullptr)
@@ -76,6 +77,10 @@ bool TextureManager::init(void)
 
     textureLoaders_.append(pCILoader_);
 
+    pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+    pAssetLoader_->registerAssetType(assetDb::AssetType::IMG, this, texture::CI_FILE_EXTENSION);
+
+    // pointless?
     if (vars_.allowRawImgLoading()) {
         if (vars_.allowFmtDDS()) {
             textureLoaders_.append(X_NEW(texture::DDS::XTexLoaderDDS, arena_, "DDSLoader"));
@@ -125,10 +130,16 @@ void TextureManager::shutDown(void)
 bool TextureManager::asyncInitFinalize(void)
 {
     // we need to know that the default textures have finished loading and are ready.
-    while (std::any_of(defaultLookup_.begin(), defaultLookup_.end(), [](Texture* pTex) { return pTex->isLoading(); })) {
-        loadComplete_.wait();
+    for (auto* pTex : defaultLookup_)
+    {
+        if (!waitForLoad(pTex))
+        {
+            X_ERROR("Texture", "failed to load default texture: %s", pTex->getName().c_str());
+            return false;
+        }
     }
 
+    // not needed anymore?
     if (pTexDefault_->loadFailed()) {
         X_ERROR("Texture", "failed to load default texture: %s", texture::TEX_DEFAULT_DIFFUSE);
         return false;
@@ -149,7 +160,22 @@ void TextureManager::scheduleStreaming(void)
     }
 }
 
-Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
+Texture* TextureManager::findTexture(const char* pName) const
+{
+    core::string name(pName);
+
+    core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
+    auto* pTex = textures_.findAsset(name);
+    if (pTex) {
+        return pTex;
+    }
+
+    X_WARNING("Texture", "Failed to find Texture: \"%s\"", pName);
+    return nullptr;
+}
+
+Texture* TextureManager::loadTexture(const char* pName, texture::TextureFlags flags)
 {
     core::string name(pName);
 
@@ -171,7 +197,7 @@ Texture* TextureManager::forName(const char* pName, texture::TextureFlags flags)
         pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
         threadPolicy.Leave();
 
-        dispatchRead(pTexRes);
+        addLoadRequest(pTexRes);
     }
 
     return pTexRes;
@@ -193,143 +219,25 @@ void TextureManager::releaseTexture(Texture* pTex)
     }
 }
 
-void TextureManager::dispatchRead(Texture* pTexture)
+bool TextureManager::waitForLoad(core::AssetBase* pTexture)
 {
-    X_UNUSED(pTexture);
+    X_ASSERT(pTexture->getType() == assetDb::AssetType::IMG, "Invalid asset passed")
+    ();
 
-    pTexture->setStatus(core::LoadStatus::Loading);
+    if (pTexture->isLoaded()) {
+        return true;
+    }
 
-    // lets dispatch a IO request to read the image data.
-    // where to we store the data?
-    // we want fixed buffers for streaming.
-    auto& name = pTexture->getName();
-
-    core::IFileSys::fileModeFlags mode;
-    mode.Set(core::IFileSys::fileMode::READ);
-    mode.Set(core::IFileSys::fileMode::SHARE);
-
-    core::IoCallBack del;
-    del.Bind<TextureManager, &TextureManager::IoRequestCallback>(this);
-
-    core::AssetName assetName(assetDb::AssetType::IMG, name, texture::CI_FILE_EXTENSION);
-
-    core::IoRequestOpen req;
-    req.callback = del;
-    req.pUserData = pTexture;
-    req.mode = mode;
-    req.path.set(assetName.begin(), assetName.end());
-
-    gEnv->pFileSys->AddIoRequestToQue(req);
+    return waitForLoad(static_cast<Texture*>(pTexture));
 }
 
-void TextureManager::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pReqBase, core::XFileAsync* pFile, uint32_t bytesRead)
+bool TextureManager::waitForLoad(Texture* pTexture)
 {
-    // who is this?
-    auto type = pReqBase->getType();
-    Texture* pTexture = pReqBase->getUserData<Texture>();
-
-    if (type == core::IoRequest::OPEN) {
-        auto* pOpen = static_cast<const core::IoRequestOpen*>(pReqBase);
-
-        if (!pFile) {
-            pTexture->setStatus(core::LoadStatus::Error);
-            loadComplete_.raise();
-            return;
-        }
-
-        // hellllo..
-        // read the whole file.
-        uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
-        X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
-        uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, fileSize, &blockArena_, "TextureFileData", 16);
-
-        core::IoRequestRead read;
-        read.callback.Bind<TextureManager, &TextureManager::IoRequestCallback>(this);
-        read.pUserData = pOpen->pUserData;
-        read.pFile = pFile;
-        read.dataSize = fileSize;
-        read.offset = 0;
-        read.pBuf = pData;
-        fileSys.AddIoRequestToQue(read);
-    }
-    else if (type == core::IoRequest::READ) {
-        auto* pReadReq = static_cast<const core::IoRequestRead*>(pReqBase);
-
-        fileSys.AddCloseRequestToQue(pFile);
-
-        // if we have loaded the data, we now need to process it.
-        if (bytesRead != pReadReq->dataSize) {
-            X_ERROR("Texture", "Failed to read full buffer got: %" PRIu32 " want: %" PRIu32, bytesRead, pReadReq->dataSize);
-            pTexture->setStatus(core::LoadStatus::Error);
-            loadComplete_.raise();
-            return;
-        }
-
-        // YOU WANT A JOB?
-        // 3 fiddy a hour.
-        CIFileJobData data{pTexture, static_cast<uint8_t*>(pReadReq->pBuf), pReadReq->dataSize};
-
-        gEnv->pJobSys->CreateMemberJobAndRun<TextureManager>(this, &TextureManager::processCIFile_job,
-            data JOB_SYS_SUB_ARG(core::profiler::SubSys::ENGINE3D));
-    }
-}
-
-void TextureManager::processCIFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-    X_UNUSED(jobSys, threadIdx, pJob);
-    CIFileJobData* pJobData = static_cast<CIFileJobData*>(pData);
-
-#if 1
-    // support the textures been compressed, stil not fully happy on this logic.
-    // ideally want something more generic for compressed asset loading.
-    {
-        const uint8_t* pBuffer = pJobData->pData;
-        size_t length = pJobData->length;
-
-        auto* pCompHdr = core::Compression::ICompressor::getBufferHdr(core::make_span(pBuffer, length));
-        if (pCompHdr) {
-            uint8_t* pInflatedBuffer = X_NEW_ARRAY_ALIGNED(uint8_t, pCompHdr->inflatedSize, &blockArena_, "TextureFileData", 16);
-
-            core::Compression::CompressorAlloc comp(pCompHdr->algo);
-
-            if (!comp->inflate(arena_, pBuffer, pBuffer + length, pInflatedBuffer, pInflatedBuffer + pCompHdr->inflatedSize)) {
-                // shiieeet.
-                X_LOG0("Texture", "failed to inflate");
-            }
-
-            auto* pOldBuf = pJobData->pData;
-
-            pJobData->length = pCompHdr->inflatedSize;
-            pJobData->pData = pInflatedBuffer;
-
-            X_DELETE_ARRAY(pOldBuf, &blockArena_);
-        }
-    }
-#endif
-
-    processCIFile(pJobData->pTexture, pJobData->pData, pJobData->length);
-
-    X_DELETE_ARRAY(pJobData->pData, &blockArena_);
-
-    loadComplete_.raise();
-}
-
-void TextureManager::processCIFile(Texture* pTexture, const uint8_t* pData, size_t length)
-{
-    core::XFileFixedBuf file(pData, pData + length);
-    texture::XTextureFile imgFile(&blockArena_);
-
-    if (!pCILoader_->loadTexture(&file, imgFile)) {
-        pTexture->setStatus(core::LoadStatus::Error);
-        return;
+    if (pTexture->getStatus() == core::LoadStatus::Complete) {
+        return true;
     }
 
-    pTexture->setProperties(imgFile);
-
-    // we need to upload the texture data.
-    gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
-
-    pTexture->setStatus(core::LoadStatus::Complete);
+    return pAssetLoader_->waitForLoad(pTexture);
 }
 
 bool TextureManager::loadDefaultTextures(void)
@@ -338,15 +246,11 @@ bool TextureManager::loadDefaultTextures(void)
 
     TextureFlags default_flags = TextureFlags::DONT_RESIZE | TextureFlags::DONT_STREAM;
 
-    pTexDefault_ = forName(TEX_DEFAULT_DIFFUSE, default_flags);
-    pTexDefaultBump_ = forName(TEX_DEFAULT_BUMP, default_flags);
+    pTexDefault_ = loadTexture(TEX_DEFAULT_DIFFUSE, default_flags);
+    pTexDefaultBump_ = loadTexture(TEX_DEFAULT_BUMP, default_flags);
 
     defaultLookup_.fill(pTexDefault_);
     defaultLookup_[render::TextureSlot::NORMAL] = pTexDefaultBump_;
-
-    // start reading the texture data.
-    //	dispatchRead(pTexDefault_);
-    //	dispatchRead(pTexDefaultBump_);
 
     return true;
 }
@@ -362,6 +266,70 @@ void TextureManager::releaseDefaultTextures(void)
 
     pTexDefault_ = nullptr;
     pTexDefaultBump_ = nullptr;
+}
+
+void TextureManager::addLoadRequest(TextureResource* pTexture)
+{
+    pAssetLoader_->addLoadRequest(pTexture);
+}
+
+void TextureManager::onLoadRequestFail(core::AssetBase* pAsset)
+{
+    auto* pTexture = static_cast<Texture*>(pAsset);
+
+    pTexture->setStatus(core::LoadStatus::Error);
+}
+
+bool TextureManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
+{
+    auto* pTexture = static_cast<Texture*>(pAsset);
+
+#if 1
+    // support the textures been compressed, stil not fully happy on this logic.
+    // ideally want something more generic for compressed asset loading.
+    {
+        const uint8_t* pBegin = reinterpret_cast<const uint8_t*>(data.ptr());
+        const uint8_t* pEnd = pBegin + dataSize;
+
+        auto* pCompHdr = core::Compression::ICompressor::getBufferHdr(core::make_span(pBegin, dataSize));
+
+        if (pCompHdr) {
+
+            auto inflatedBuf = core::makeUnique<char[]>(&blockArena_, pCompHdr->inflatedSize);
+
+            core::Compression::CompressorAlloc comp(pCompHdr->algo);
+
+            uint8_t* pInfBegin = reinterpret_cast<uint8_t*>(inflatedBuf.ptr());
+            uint8_t* pInfEnd = pInfBegin + pCompHdr->inflatedSize;
+
+            if (!comp->inflate(arena_, pBegin, pEnd, pInfBegin, pInfEnd)) {
+                X_LOG0("Texture", "failed to inflate: \"%S\"", pTexture->getName().c_str());
+                pTexture->setStatus(core::LoadStatus::Error);
+                return false;
+            }
+
+            dataSize = pCompHdr->inflatedSize;
+            data.swap(inflatedBuf);
+        }
+    }
+#endif
+
+    core::XFileFixedBuf file(data.ptr(), data.ptr() + dataSize);
+    texture::XTextureFile imgFile(&blockArena_);
+
+    if (!pCILoader_->loadTexture(&file, imgFile)) {
+        pTexture->setStatus(core::LoadStatus::Error);
+        return false;
+    }
+
+    pTexture->setProperties(imgFile);
+
+    // we need to upload the texture data.
+    gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
+
+    pTexture->setStatus(core::LoadStatus::Complete);
+
+    return true;
 }
 
 void TextureManager::releaseDanglingTextures(void)

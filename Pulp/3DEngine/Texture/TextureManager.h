@@ -30,6 +30,7 @@ X_NAMESPACE_BEGIN(engine)
 class Texture;
 
 class TextureManager : public core::IXHotReload
+    , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<Texture, texture::TEX_MAX_LOADED_IMAGES, core::MultiThreadPolicy<core::Spinlock>> TextureContainer;
     typedef TextureContainer::Resource TextureResource;
@@ -81,16 +82,20 @@ public:
     void shutDown(void);
 
     bool asyncInitFinalize(void);
-
     void scheduleStreaming(void);
 
-    Texture* forName(const char* pName, texture::TextureFlags flags);
+
+    Texture* findTexture(const char* pTexName) const;
+    Texture* loadTexture(const char* pTexName, texture::TextureFlags flags);
     Texture* getDefault(render::TextureSlot::Enum slot) const;
 
     void releaseTexture(Texture* pTex);
 
+    // returns true if load succeed.
+    bool waitForLoad(core::AssetBase* pTexture);
+    bool waitForLoad(Texture* pTexture);
+
 private:
-    void dispatchRead(Texture* pTexture);
 
     bool loadDefaultTextures(void);
     void releaseDefaultTextures(void);
@@ -98,10 +103,9 @@ private:
     void releaseResources(Texture* pTex);
 
 private:
-    void IoRequestCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
-
-    void processCIFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-    void processCIFile(Texture* pTexture, const uint8_t* pData, size_t length);
+    void addLoadRequest(TextureResource* pTexture);
+    void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+    bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
 
     // IXHotReload
     void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
@@ -114,6 +118,9 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
+
+    core::AssetLoader* pAssetLoader_;
+
     TextureVars vars_;
     TextureContainer textures_;
 
@@ -126,8 +133,6 @@ private:
     BlockArena blockArena_;
 
     StreamReqQueue streamQueue_;
-
-    core::Signal loadComplete_;
 
 private:
     int32_t currentDeviceTexId_;
