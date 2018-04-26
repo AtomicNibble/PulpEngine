@@ -107,6 +107,8 @@ namespace
 
         bool resize = false;
 
+        ImgFileFormat::Enum outputFileFmt = ImgFileFormat::TGA;
+
         // args
         {
             const wchar_t* pInFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
@@ -126,13 +128,21 @@ namespace
             if (pDim) {
          
                 // wXH
-                ::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y);
+                if (::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y) != 2) {
+                    X_ERROR("ImgTool", "Failed to parse dim: %S", pDim);
+                    return false;
+                }
 
                 resize = true;
             }
-        }
 
-        ImgFileFormat::Enum outputFileFmt = ImgFileFormat::TGA;
+            const wchar_t* pOutFmt = gEnv->pCore->GetCommandLineArgForVarW(L"fmt");
+            if (pOutFmt) {
+
+                char buf[64];
+                outputFileFmt = texture::Util::ImgFileFmtFromStr(core::strUtil::Convert(pOutFmt, buf));
+            }
+        }
 
         if (outFile.isEmpty())
         {
@@ -148,7 +158,6 @@ namespace
         if (!ReadFileToBuf(inFile, srcImgData)) {
             return false; 
         }
-
 
         ImgFileFormat::Enum inputFileFmt = Util::resolveSrcfmt(srcImgData);
         if (inputFileFmt == ImgFileFormat::UNKNOWN) {
