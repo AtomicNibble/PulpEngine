@@ -392,14 +392,12 @@ private:
 
 struct XFileStream : public XFile
 {
-    typedef core::Array<uint8_t> DataVec;
+    typedef core::Array<uint8_t, core::ArrayAllocator<uint8_t>, core::growStrat::Multiply> DataVec;
 
     XFileStream(core::MemoryArenaBase* arena) :
         buf_(arena)
     {
         X_ASSERT_NOT_NULL(arena);
-
-        buf_.setGranularity(1024 * 16);
     }
     ~XFileStream() X_OVERRIDE
     {
