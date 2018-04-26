@@ -4,6 +4,7 @@
 #include <IFileSys.h>
 
 #include "TextureFile.h"
+#include "Util\TextureUtil.h"
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -317,6 +318,104 @@ namespace TGA
 
         return true;
     }
+
+    bool XTexLoaderTGA::canWrite(void) const
+    {
+        return true;
+    }
+
+    bool XTexLoaderTGA::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
+    {
+        X_UNUSED(file, imgFile, swapArena);
+
+        Tga_Header hdr;
+        core::zero_object(hdr);
+
+        hdr.IDLength = 0;    
+        hdr.ColorMapType = 0;
+
+        switch (imgFile.getFormat())
+        {
+            // case Texturefmt::A8:
+            case Texturefmt::B8G8R8:
+            case Texturefmt::R8G8B8:
+                hdr.ImageType = ImageType::BGR;
+                hdr.PixelDepth = 24;
+                break;
+            case Texturefmt::B8G8R8A8:
+                hdr.ImageType = ImageType::BGR;
+                hdr.PixelDepth = 32;
+                break;
+
+            default:
+                X_ERROR("Tga", "Unsupported texture format: %s", Texturefmt::ToString(imgFile.getFormat()));
+                return false;
+        }
+
+        hdr.CMapStart = 0;
+        hdr.CMapLength = 0;
+        hdr.CMapDepth = 0;
+        hdr.XOffset = 0;
+        hdr.YOffset = 0;
+        hdr.Width = imgFile.getWidth();
+        hdr.Height = imgFile.getHeight();
+        hdr.ImageDescriptor = 0x20;
+
+        if (file->writeObj(hdr) != sizeof(hdr)) {
+            X_ERROR("Tga", "Failed to write header");
+            return false;
+        }
+
+        uint32_t dataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
+        X_ASSERT(dataSize == imgFile.getFaceSize(), "Size missmatch")(dataSize, imgFile.getFaceSize());
+
+        if (Util::isBGR(imgFile.getFormat()))
+        {
+            size_t bytesWrite = file->write(imgFile.getFace(0), dataSize);
+            if (bytesWrite != dataSize) {
+                X_ERROR("TextureTGA", "Failed to write image data. %i of %i bytes written", dataSize, bytesWrite);
+                return false;
+            }
+        }
+        else
+        {
+            auto rowBytes = Util::rowBytes(imgFile.getWidth(), imgFile.getHeight(), imgFile.getFormat());
+
+            X_ASSERT(rowBytes * imgFile.getHeight() == dataSize, "Size missmatch")(rowBytes * imgFile.getHeight(), dataSize);
+
+            core::Array<uint8_t> row(swapArena, rowBytes);
+
+            const auto* pFace = imgFile.getFace(0);
+            const auto* pFaceEnd = pFace + imgFile.getFaceSize();
+
+            for (int32_t i = 0; i < imgFile.getHeight(); i++)
+            {
+                // build the row.
+                auto* pSrcRow = pFace + (i * rowBytes);
+
+                // need to basically flip every 3rd byte.
+                // copy the row then flip.
+                std::memcpy(row.data(), pSrcRow, rowBytes);
+
+                int32_t rowPixels = imgFile.getWidth();
+                X_ASSERT(rowPixels * 3 == row.size(), "Unexpected row size")(rowPixels * 3 == row.size());
+
+                for (int32_t p = 0; p < rowPixels; p++)
+                {
+                    std::swap(row[(p * 3)], row[(p * 3) + 2]);
+                }
+
+                size_t bytesWrite = file->write(row.data(), row.size());
+                if (bytesWrite != rowBytes) {
+                    X_ERROR("TextureTGA", "Failed to write image row. %i of %i bytes written", dataSize, bytesWrite);
+                    return false;
+                }
+            }
+        }
+      
+        return false;
+    }
+
 
     // ~ITextureFmt
 

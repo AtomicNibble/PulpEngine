@@ -22,12 +22,14 @@ namespace TGA
         IMGLIB_EXPORT static bool isValidData(const DataVec& fileData);
 
         // ITextureFmt
-        IMGLIB_EXPORT virtual const char* getExtension(void) const X_FINAL;
-        IMGLIB_EXPORT virtual ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
-        IMGLIB_EXPORT virtual bool canLoadFile(const core::Path<char>& path) const X_FINAL;
-        IMGLIB_EXPORT virtual bool canLoadFile(const DataVec& fileData) const X_FINAL;
-        IMGLIB_EXPORT virtual bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
+        IMGLIB_EXPORT const char* getExtension(void) const X_FINAL;
+        IMGLIB_EXPORT ImgFileFormat::Enum getSrcFmt(void) const X_FINAL;
+        IMGLIB_EXPORT bool canLoadFile(const core::Path<char>& path) const X_FINAL;
+        IMGLIB_EXPORT bool canLoadFile(const DataVec& fileData) const X_FINAL;
+        IMGLIB_EXPORT bool loadTexture(core::XFile* file, XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
 
+        IMGLIB_EXPORT bool canWrite(void) const X_FINAL;
+        IMGLIB_EXPORT bool saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena) X_FINAL;
         // ~ITextureFmt
 
     private:
