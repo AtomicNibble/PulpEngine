@@ -151,7 +151,7 @@ namespace JPG
 
         const uint16_t* pData = reinterpret_cast<const uint16_t*>(fileData.data());
 
-        return pData[0] == 0xd8ff && pData[1] == 0x0eff;
+        return pData[0] == 0xd8ff && pData[1] == 0xe0ff;
     }
 
     // ITextureFmt
