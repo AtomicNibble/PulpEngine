@@ -51,7 +51,8 @@ X_INLINE void XTextureFile::allocMipBuffers(void)
     }
 
     // not gonna support growing a mip count of say 3 to correct count of 9, can be added if needed.
-    X_ASSERT(numMips_ == 1, "Mips greater than one")(numMips_); 
+    X_ASSERT(numMips_ == 1, "Mips greater than one")(numMips_);
+    X_ASSERT(mipCnt <= TEX_MAX_MIPS, "Mips greater than limit")(mipCnt, TEX_MAX_MIPS);
 
     const uint32_t faceSize = Util::dataSize(size_.x, size_.y, mipCnt, format_);
     const uint32_t requiredBytes = faceSize * numFaces_;
@@ -326,7 +327,9 @@ X_INLINE void XTextureFile::setFormat(Texturefmt::Enum format)
 
 X_INLINE void XTextureFile::setNumFaces(const int32_t faces)
 {
-    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid face count")(faces); 
+    X_ASSERT(faces < std::numeric_limits<uint8_t>::max(), "invalid face count")(faces);
+    X_ASSERT(faces <= TEX_MAX_FACES, "invalid mipcount")(faces, TEX_MAX_FACES);
+
     numFaces_ = safe_static_cast<uint8_t, int32_t>(faces);
 }
 
@@ -338,7 +341,8 @@ X_INLINE void XTextureFile::setDepth(const int32_t depth)
 
 X_INLINE void XTextureFile::setNumMips(const int32_t numMips)
 {
-    X_ASSERT(depth_ < std::numeric_limits<uint8_t>::max(), "invalid mipcount")(numMips); 
+    X_ASSERT(numMips < std::numeric_limits<uint8_t>::max(), "invalid mipcount")(numMips);
+    X_ASSERT(numMips <= TEX_MAX_MIPS, "invalid mipcount")(numMips, TEX_MAX_MIPS);
     numMips_ = safe_static_cast<uint8_t, int32_t>(numMips);
 }
 
