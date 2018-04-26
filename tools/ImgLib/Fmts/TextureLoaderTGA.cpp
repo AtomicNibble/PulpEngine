@@ -339,7 +339,10 @@ namespace TGA
 
         switch (imgFile.getFormat())
         {
-            // case Texturefmt::A8:
+            case Texturefmt::A8:
+                hdr.ImageType = ImageType::MONO;
+                hdr.PixelDepth = 8;
+                break;
             case Texturefmt::B8G8R8:
             case Texturefmt::R8G8B8:
                 hdr.ImageType = ImageType::BGR;
@@ -372,7 +375,7 @@ namespace TGA
         uint32_t dataSize = hdr.Width * hdr.Height * (hdr.PixelDepth / 8);
         X_ASSERT(dataSize == imgFile.getFaceSize(), "Size missmatch")(dataSize, imgFile.getFaceSize());
 
-        if (Util::isBGR(imgFile.getFormat()))
+        if (Util::isBGR(imgFile.getFormat()) || imgFile.getFormat() == Texturefmt::A8)
         {
             size_t bytesWrite = file->write(imgFile.getFace(0), dataSize);
             if (bytesWrite != dataSize) {
@@ -384,6 +387,7 @@ namespace TGA
         {
             auto rowBytes = Util::rowBytes(imgFile.getWidth(), imgFile.getHeight(), imgFile.getFormat());
 
+            X_ASSERT(hdr.PixelDepth >= 24, "Pixel depth less than 24")(hdr.PixelDepth);
             X_ASSERT(rowBytes * imgFile.getHeight() == dataSize, "Size missmatch")(rowBytes * imgFile.getHeight(), dataSize);
 
             core::Array<uint8_t> row(swapArena, rowBytes);
