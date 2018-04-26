@@ -289,6 +289,11 @@ namespace PNG
             return false;
         }
 
+        if (ihdr.bitDepth == 16) {
+            X_ERROR("TexturePNG", "16 bit channels not currently supported");
+            return false;
+        }
+
         if (ihdr.interLace != InterlaceMethod::None) {
             X_ERROR("TexturePNG", "interlace not supported");
             return false;
