@@ -17,7 +17,7 @@ AssetLoaderVars::AssetLoaderVars()
 
 void AssetLoaderVars::registerVars(void)
 {
-    ADD_CVAR_REF("ldr_debug", debug_, debug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("ldr_debug", debug_, debug_, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Enable AssetLoader debug");
 
     ADD_CVAR_REF("ldr_max_active_requests", maxActiveRequests_, maxActiveRequests_, 0, 1 << 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
@@ -25,9 +25,9 @@ void AssetLoaderVars::registerVars(void)
 
 }
 
-X_INLINE bool AssetLoaderVars::debugEnabled(void) const
+X_INLINE int32_t AssetLoaderVars::debugLvl(void) const
 {
-    return debug_ != 0;
+    return debug_;
 }
 
 X_INLINE int32_t AssetLoaderVars::maxActiveRequests(void) const
@@ -93,7 +93,7 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
     loadReq->flags.Set(LoadFlag::Reload);
     loadReq->reloadFlags = flags;
 
-    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Reloading: %s -> \"%s\"", 
+    X_LOG0_IF(vars_.debugLvl(), "AssetLoader", "Reloading: %s -> \"%s\"",
         assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
 
     // dispatch IO
@@ -107,7 +107,7 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
     X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
     X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")(assetDb::AssetType::ToString(pAsset->getType()));
 
-    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Adding load request: %s -> \"%s\"",
+    X_LOG0_IF(vars_.debugLvl() > 1, "AssetLoader", "Adding load request: %s -> \"%s\"",
         assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
@@ -212,7 +212,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
     auto type = pAsset->getType();
     auto& name = pLoadReq->pAsset->getName();
 
-    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Dispatching load: %s -> \"%s\"",
+    X_LOG0_IF(vars_.debugLvl(), "AssetLoader", "Dispatching load: %s -> \"%s\"",
         assetDb::AssetType::ToString(type), name.c_str());
 
 
