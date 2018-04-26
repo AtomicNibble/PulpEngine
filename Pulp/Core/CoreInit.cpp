@@ -1001,6 +1001,8 @@ void XCore::registerVars(const SCoreInitParams& initParams)
 {
     vars_.registerVars();
 
+    assetLoader_.registerVars();
+
     if (!initParams.isCoreOnly() || initParams.basicConsole()) {
         core::ConsoleVarFunc del;
 
