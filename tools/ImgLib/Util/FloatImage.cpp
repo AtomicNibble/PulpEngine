@@ -60,7 +60,11 @@ namespace Converter
         const auto fmt = img.getFormat();
 
         // init from rgb8 for now.
-        if (fmt != Texturefmt::R8G8B8A8 && fmt != Texturefmt::B8G8R8A8 && fmt != Texturefmt::R8G8B8 && fmt != Texturefmt::B8G8R8) {
+        if (fmt != Texturefmt::R8G8B8A8 && 
+            fmt != Texturefmt::B8G8R8A8 && 
+            fmt != Texturefmt::R8G8B8 && 
+            fmt != Texturefmt::B8G8R8 &&
+            fmt != Texturefmt::A8) {
             X_ERROR("FloatImg", "Contruction from fromat \"%s\" not currently supported", Texturefmt::ToString(fmt));
             return false;
         }
@@ -69,62 +73,80 @@ namespace Converter
 
         // need to get width of the mip.
         {
-            const uint32_t channels = (hasAlpha || forceAlphaChannel) ? 4 : 3;
+            uint32_t channels = (hasAlpha || forceAlphaChannel) ? 4 : 3;
+            if (fmt == Texturefmt::A8) {
+                channels = 1;
+            }
 
             const uint32_t mipWidth = core::Max<uint32_t>(1u, img.getWidth() >> mip);
             const uint32_t mipHeight = core::Max<uint32_t>(1u, img.getHeight() >> mip);
             allocate(channels, mipWidth, mipHeight, 1);
         }
 
-        float* pRed_channel = channel(0);
-        float* pGreen_channel = channel(1);
-        float* pBlue_channel = channel(2);
-        float* pAlpha_channel = nullptr;
+        if (fmt == Texturefmt::A8) 
+        {
+            float* pRed_channel = channel(0);
 
-        uint32_t pixelStride = 3;
+            const uint8_t* pData = img.getLevel(face, mip);
 
-        if (hasAlpha) {
-            // don't set this if only forceAlphaChannel, as this is input stride.
-            pixelStride = 4;
+            const uint32_t count = pixelCount_;
+            for (uint32_t i = 0; i < count; i++) {
+                uint8_t red = pData[i];
+                pRed_channel[i] = static_cast<float>(red) / 255.f;
+            }
         }
+        else
+        {
+            float* pRed_channel = channel(0);
+            float* pGreen_channel = channel(1);
+            float* pBlue_channel = channel(2);
+            float* pAlpha_channel = nullptr;
 
-        // just swap the channel pointers.
-        if (fmt == Texturefmt::B8G8R8A8 || fmt == Texturefmt::B8G8R8) {
-            core::Swap(pRed_channel, pBlue_channel);
-        }
-
-        // lets do each channel one by one.
-        const uint8_t* pData = img.getLevel(face, mip);
-
-        const uint32_t count = pixelCount_;
-        for (uint32_t i = 0; i < count; i++) {
-            uint8_t red = pData[i * pixelStride];
-            pRed_channel[i] = static_cast<float>(red) / 255.f;
-        }
-        for (uint32_t i = 0; i < count; i++) {
-            uint8_t green = pData[(i * pixelStride) + 1];
-            pGreen_channel[i] = static_cast<float>(green) / 255.f;
-        }
-        for (uint32_t i = 0; i < count; i++) {
-            uint8_t blue = pData[(i * pixelStride) + 2];
-            pBlue_channel[i] = static_cast<float>(blue) / 255.f;
-        }
-
-        if (hasAlpha || forceAlphaChannel) {
-            pAlpha_channel = channel(3);
+            uint32_t pixelStride = 3;
 
             if (hasAlpha) {
-                for (uint32_t i = 0; i < count; i++) {
-                    uint8_t alpha = pData[(i * pixelStride) + 3];
-                    pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
-                }
+                // don't set this if only forceAlphaChannel, as this is input stride.
+                pixelStride = 4;
             }
-            else // forceAlphaChannel
-            {
-                X_ASSERT(forceAlphaChannel, "Invalid logic")(forceAlphaChannel); 
 
-                for (uint32_t i = 0; i < count; i++) {
-                    pAlpha_channel[i] = 1.f;
+            // just swap the channel pointers.
+            if (fmt == Texturefmt::B8G8R8A8 || fmt == Texturefmt::B8G8R8) {
+                core::Swap(pRed_channel, pBlue_channel);
+            }
+
+            // lets do each channel one by one.
+            const uint8_t* pData = img.getLevel(face, mip);
+
+            const uint32_t count = pixelCount_;
+            for (uint32_t i = 0; i < count; i++) {
+                uint8_t red = pData[i * pixelStride];
+                pRed_channel[i] = static_cast<float>(red) / 255.f;
+            }
+            for (uint32_t i = 0; i < count; i++) {
+                uint8_t green = pData[(i * pixelStride) + 1];
+                pGreen_channel[i] = static_cast<float>(green) / 255.f;
+            }
+            for (uint32_t i = 0; i < count; i++) {
+                uint8_t blue = pData[(i * pixelStride) + 2];
+                pBlue_channel[i] = static_cast<float>(blue) / 255.f;
+            }
+
+            if (hasAlpha || forceAlphaChannel) {
+                pAlpha_channel = channel(3);
+
+                if (hasAlpha) {
+                    for (uint32_t i = 0; i < count; i++) {
+                        uint8_t alpha = pData[(i * pixelStride) + 3];
+                        pAlpha_channel[i] = static_cast<float>(alpha) / 255.f;
+                    }
+                }
+                else // forceAlphaChannel
+                {
+                    X_ASSERT(forceAlphaChannel, "Invalid logic")(forceAlphaChannel);
+
+                    for (uint32_t i = 0; i < count; i++) {
+                        pAlpha_channel[i] = 1.f;
+                    }
                 }
             }
         }
@@ -139,23 +161,38 @@ namespace Converter
         uint8_t* pMipDst = img.getLevel(face, mip);
         const auto fmt = img.getFormat();
 
-        if (componentCount() < 3) {
-            X_ERROR("FloatImg", "Saving of images with less than 3 components is not currently supported");
+        if (componentCount() == 2) {
+            X_ERROR("FloatImg", "Saving of images with 2 components is not currently supported");
             return false;
         }
 
         // this img
         const uint32_t numPixels = width() * height();
-        const float* pRedChannel = channel(0);
-        const float* pGreenChannel = channel(1);
-        const float* pBlueChannel = channel(2);
-        const float* pAlphaChannel = nullptr;
-
         const auto mipDim = img.getMipDim(mip);
         if (mipDim.x != width() || mipDim.y != height()) {
             X_ERROR("FloatImg", "Failed to save img to target mip, dimension mismatch");
             return false;
         }
+
+        if (fmt == Texturefmt::A8) 
+        {
+            const float* pRedChannel = channel(0);
+
+            const size_t expectedSize = numPixels;
+            X_ASSERT(mipSize == expectedSize, "Size missmatch for expected vs provided size")(mipSize, expectedSize);
+
+            for (uint32_t i = 0; i < numPixels; i++) {
+                uint8_t* pPixel = &pMipDst[i];
+                pPixel[0] = static_cast<uint8_t>(std::numeric_limits<uint8_t>::max() * math<float>::clamp(pRedChannel[i], 0.f, 1.f));
+            }
+
+            return true;
+        }
+
+        const float* pRedChannel = channel(0);
+        const float* pGreenChannel = channel(1);
+        const float* pBlueChannel = channel(2);
+        const float* pAlphaChannel = nullptr;
 
         if (componentCount() >= 4) {
             pAlphaChannel = channel(3);
