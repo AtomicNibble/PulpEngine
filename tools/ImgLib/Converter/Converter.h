@@ -4,8 +4,13 @@
 #include "TextureFile.h"
 #include "Util\Types.h"
 
+namespace ispc
+{
+    struct rgba_surface;
+} // namespace ispc
+
 X_NAMESPACE_DECLARE(core,
-                    class LinearAllocator;)
+                    class LinearAllocator)
 
 X_NAMESPACE_BEGIN(texture)
 
@@ -13,16 +18,10 @@ namespace Converter
 {
     class ImgConveter
     {
+    public:
         typedef core::traits::Function<void(const ispc::rgba_surface* pSrcSurface, uint8_t* pOut)> CompressionFunc;
 
-        struct JobData
-        {
-            ImgConveter::CompressionFunc::Pointer pCompressFunc;
-
-            ispc::rgba_surface surface;
-            uint8_t* pOut;
-        };
-
+    private:
         struct MipFaceJobData
         {
             core::MemoryArenaBase* swapArena;

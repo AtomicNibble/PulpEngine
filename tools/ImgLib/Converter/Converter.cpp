@@ -63,6 +63,15 @@ namespace Converter
             ispc::CompressBlocksBC1(pSrcSurface, pOut);
         }
 
+
+        struct JobData
+        {
+            ImgConveter::CompressionFunc::Pointer pCompressFunc;
+
+            ispc::rgba_surface surface;
+            uint8_t* pOut;
+        };
+
     } // namespace
 
     ImgConveter::ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena) :
