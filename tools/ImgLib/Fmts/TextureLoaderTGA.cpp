@@ -150,10 +150,13 @@ namespace TGA
             return false;
         }
 
+   // We support loading this..
+#if 0
         if (isTopToBottom(hdr.ImageDescriptor)) {
             X_ERROR("TextureTGA", "top to bottom images are not supported", hdr.ImageType);
             return false;
         }
+#endif
 
         if (!(hdr.PixelDepth == 8 || hdr.PixelDepth == 24 || hdr.PixelDepth == 32)) {
             X_ERROR("TextureTGA", "invalid pixeldepth. provided: %i expected: 8 | 24 | 32", hdr.PixelDepth);
