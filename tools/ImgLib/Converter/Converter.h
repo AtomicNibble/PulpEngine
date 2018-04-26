@@ -48,24 +48,24 @@ namespace Converter
             Slow);
 
     public:
-        ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena);
-        ~ImgConveter();
+            IMGLIB_EXPORT ImgConveter(core::MemoryArenaBase* imgArena, core::MemoryArenaBase* swapArena);
+            IMGLIB_EXPORT ~ImgConveter();
 
-        void scale(ScaleFactor::Enum scale);
-        void enableMultiThreaded(bool enable);
+            IMGLIB_EXPORT void scale(ScaleFactor::Enum scale);
+            IMGLIB_EXPORT void enableMultiThreaded(bool enable);
 
-        bool loadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
-        bool loadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
-        bool saveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
-        bool saveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+            IMGLIB_EXPORT bool loadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
+            IMGLIB_EXPORT bool loadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
+            IMGLIB_EXPORT bool saveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+            IMGLIB_EXPORT bool saveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
 
-        bool addAlphachannel(bool keepMips = false);
-        bool createMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
-        bool convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
+            IMGLIB_EXPORT bool addAlphachannel(bool keepMips = false);
+            IMGLIB_EXPORT bool createMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
+            IMGLIB_EXPORT bool convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
 
-        const XTextureFile& getTextFile(void) const;
+            IMGLIB_EXPORT const XTextureFile& getTextFile(void) const;
 
-        static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
+            IMGLIB_EXPORT static void getDefaultFilterWidthAndParams(MipFilter::Enum filter, MipMapFilterParams& params);
 
     private:
         static void generateMipsForFace(MipFaceJobData& jobdata);

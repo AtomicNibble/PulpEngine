@@ -27,4 +27,6 @@
 #include "Util\TextureUtil.h"
 #include "TextureFile.h"
 
+#include "Converter\Converter.h"
+
 #endif // !X_IMGLIB_H_
