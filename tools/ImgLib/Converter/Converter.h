@@ -54,14 +54,14 @@ namespace Converter
         void scale(ScaleFactor::Enum scale);
         void enableMultiThreaded(bool enable);
 
-        bool LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
-        bool LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
-        bool SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
-        bool SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+        bool loadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);
+        bool loadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt);
+        bool saveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
+        bool saveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt);
 
         bool addAlphachannel(bool keepMips = false);
-        bool CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
-        bool Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
+        bool createMips(MipFilter::Enum filter, const MipMapFilterParams& params, WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips = false);
+        bool convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha = true);
 
         const XTextureFile& getTextFile(void) const;
 

@@ -92,7 +92,7 @@ namespace Converter
         multiThread_ = enable;
     }
 
-    bool ImgConveter::LoadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt)
+    bool ImgConveter::loadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt)
     {
         // check in here also even thos it's checked again, logic might change later to not use function below.
         if (inputFileFmt == ImgFileFormat::UNKNOWN) {
@@ -103,7 +103,7 @@ namespace Converter
         return Util::loadImage(swapArena_, fileData, inputFileFmt, srcImg_);
     }
 
-    bool ImgConveter::LoadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
+    bool ImgConveter::loadImg(core::XFile* pFile, ImgFileFormat::Enum inputFileFmt)
     {
         if (inputFileFmt == ImgFileFormat::UNKNOWN) {
             X_ERROR("Img", "Failed to load img srcFmt unkNown");
@@ -115,7 +115,7 @@ namespace Converter
         return Util::loadImage(swapArena_, pFile, inputFileFmt, srcImg_);
     }
 
-    bool ImgConveter::SaveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
+    bool ImgConveter::saveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
     {
         core::fileModeFlags mode;
         mode.Set(core::fileMode::WRITE);
@@ -126,10 +126,10 @@ namespace Converter
             return false;
         }
 
-        return SaveImg(file.GetFile(), flags, dstFileFmt);
+        return saveImg(file.GetFile(), flags, dstFileFmt);
     }
 
-    bool ImgConveter::SaveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
+    bool ImgConveter::saveImg(core::XFile* pFile, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
     {
         if (!Util::writeSupported(dstFileFmt)) {
             X_ERROR("Img", "Writing to fmt: %s is not supported", ImgFileFormat::ToString(dstFileFmt));
@@ -270,7 +270,7 @@ namespace Converter
         return true;
     }
 
-    bool ImgConveter::CreateMips(MipFilter::Enum filter, const MipMapFilterParams& params,
+    bool ImgConveter::createMips(MipFilter::Enum filter, const MipMapFilterParams& params,
         WrapMode::Enum wrap, bool alpha, bool ignoreSrcMips)
     {
         const uint32_t curMips = srcImg_.getNumMips();
@@ -423,7 +423,7 @@ namespace Converter
         jobdata.result = true;
     }
 
-    bool ImgConveter::Convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha)
+    bool ImgConveter::convert(Texturefmt::Enum targetFmt, Profile::Enum profile, bool keepAlpha)
     {
         if (targetFmt == srcImg_.getFormat()) {
             X_LOG1("Img", "Skipping texture conversion, src format matches target fmt of: %s",

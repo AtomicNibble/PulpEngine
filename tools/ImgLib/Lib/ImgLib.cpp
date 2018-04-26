@@ -324,7 +324,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     }
 
     // load it :D
-    if (!con.LoadImg(fileData, inputFileFmt)) {
+    if (!con.loadImg(fileData, inputFileFmt)) {
         X_ERROR("Img", "Failed to load source image");
         return false;
     }
@@ -426,7 +426,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
         core::StopWatch timer;
 
-        if (!con.CreateMips(mipFilter, filterParams, wrapMode, flags.IsSet(CompileFlag::ALPHA), flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
+        if (!con.createMips(mipFilter, filterParams, wrapMode, flags.IsSet(CompileFlag::ALPHA), flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
             X_ERROR("Img", "Failed to create mips for image");
             return false;
         }
@@ -449,7 +449,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     {
         core::StopWatch timer;
 
-        if (!con.Convert(dstImgFmt, qualityProfile, flags.IsSet(CompileFlag::ALPHA))) {
+        if (!con.convert(dstImgFmt, qualityProfile, flags.IsSet(CompileFlag::ALPHA))) {
             X_ERROR("Img", "Failed to convert image");
             return false;
         }
@@ -463,7 +463,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     auto path(destPath);
     path.setExtension(Util::getExtension(outputFileFmt));
 
-    if (!con.SaveImg(path, flags, outputFileFmt)) {
+    if (!con.saveImg(path, flags, outputFileFmt)) {
         X_ERROR("Img", "Failed to save converterd image");
         return false;
     }
