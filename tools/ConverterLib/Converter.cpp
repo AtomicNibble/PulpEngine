@@ -482,7 +482,7 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
     return true;
 }
 
-bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
+bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data,
     core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
     auto res = db_.UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
@@ -493,7 +493,7 @@ bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i
     return true;
 }
 
-bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
+bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData)
 {
     auto res = db_.UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
     if (res != assetDb::AssetDB::Result::OK) {

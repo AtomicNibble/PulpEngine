@@ -197,10 +197,10 @@ public:
     Result::Enum UpdateAssetRawFile(AssetId assetId, const DataArr& compressedData);
     Result::Enum UpdateAssetArgs(AssetType::Enum type, const core::string& name, const core::string& argsOpt);
 
-    Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
-    Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
-    Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData);
-    Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData);
+    Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
+    Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
+    Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData);
+    Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData);
 
     // if you want to get a assets id use this.
     bool AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);
@@ -264,8 +264,8 @@ private:
     static void ThumbPathForThumb(const ThumbInfo& info, core::Path<char>& pathOut);
     static bool ValidName(const core::string& name);
 
-    static bool InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated);
-    static bool DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated,
+    static bool InflateBuffer(core::MemoryArenaBase* scratchArena, core::span<const uint8_t> deflated, DataArr& inflated);
+    static bool DeflateBuffer(core::MemoryArenaBase* scratchArena, core::span<const uint8_t> data, DataArr& deflated,
         core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl);
 
 private:

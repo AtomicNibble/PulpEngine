@@ -1888,7 +1888,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim,
-    const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
+    core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
     AssetId assetId;
 
@@ -1901,10 +1901,10 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
     return UpdateAssetThumb(assetId, thumbDim, srcDim, data, algo, lvl);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& data,
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data,
     core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
-    DataArr compressed(data.getArena());
+    DataArr compressed(g_AssetDBArena);
 
     core::StopWatch timer;
 
@@ -1927,7 +1927,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim,
-    const DataArr& compressedData)
+    core::span<const uint8_t> compressedData)
 {
     AssetId assetId;
 
@@ -1940,7 +1940,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
     return UpdateAssetThumb(assetId, thumbDim, srcDim, compressedData);
 }
 
-AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, const DataArr& compressedData)
+AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim,
+    core::span<const uint8_t> compressedData)
 {
     // so my little floating goat, we gonna store the thumbs with hash names.
     // that way i don't need to rename the fuckers if i rename the asset.
@@ -1956,7 +1957,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     const auto hash = hasher.finalize();
 
     int32_t thumbId = INVALID_THUMB_ID;
-    if (compressedData.isNotEmpty()) {
+    if (!compressedData.empty()) {
         ThumbInfo thumb;
 
         if (GetThumbInfoForId(assetId, thumb, &thumbId)) {
@@ -1997,7 +1998,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
                 return Result::ERROR;
             }
 
-            if (file.write(compressedData.ptr(), compressedData.size()) != compressedData.size()) {
+            if (file.write(compressedData.data(), compressedData.size()) != compressedData.size()) {
                 X_ERROR("AssetDB", "Failed to write thumb data");
                 return Result::ERROR;
             }
@@ -2993,7 +2994,7 @@ bool AssetDB::ValidName(const core::string& name)
     return true;
 }
 
-bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& deflated, DataArr& inflated)
+bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, core::span<const uint8_t> deflated, DataArr& inflated)
 {
     if (!core::Compression::ICompressor::validBuffer(deflated)) {
         X_ERROR("AssetDB", "Tried to inflate a invalid buffer");
@@ -3008,7 +3009,7 @@ bool AssetDB::InflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& 
     return result;
 }
 
-bool AssetDB::DeflateBuffer(core::MemoryArenaBase* scratchArena, const DataArr& data, DataArr& deflated,
+bool AssetDB::DeflateBuffer(core::MemoryArenaBase* scratchArena, core::span<const uint8_t> data, DataArr& deflated,
     core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
     core::Compression::CompressorAlloc compressor(algo);
