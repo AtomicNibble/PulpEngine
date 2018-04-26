@@ -182,7 +182,7 @@ namespace Util
         return false;
     }
 
-    bool isBRG(Texturefmt::Enum fmt)
+    bool isBGR(Texturefmt::Enum fmt)
     {
         static_assert(Texturefmt::ENUM_COUNT == 56, "Added additional texture fmts? this code needs updating.");
 
