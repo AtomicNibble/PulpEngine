@@ -46,7 +46,7 @@ namespace Util
 		}
 
 		// swap bgr.
-		if (texture::Util::isBRG(imgFile.getFormat())) {
+		if (texture::Util::isBGR(imgFile.getFormat())) {
 			if (!texture::Util::bgrToRgb(imgFile, swap)) {
 				return false;
 			}
