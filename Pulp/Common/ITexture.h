@@ -22,8 +22,8 @@ static const char* TEX_DEFAULT_BUMP = "default/$identitynormal";
 static const char* TEX_DEFAULT_WHITE = "default/$white";
 
 static const uint32_t TEX_MIN_DIMENSIONS = 4;
-static const uint32_t TEX_MAX_DIMENSIONS = 4096;
-static const uint32_t TEX_MAX_MIPS = 13;
+static const uint32_t TEX_MAX_DIMENSIONS = 4096 * 2;
+static const uint32_t TEX_MAX_MIPS = 14;
 static const uint32_t TEX_MAX_FACES = 6; // cubes (vol's not supported yet)
 static const uint32_t TEX_MAX_DEPTH = 1;
 static const uint32_t TEX_MAX_LOADED_IMAGES = 1 << 13; // max images that can be loaded.
