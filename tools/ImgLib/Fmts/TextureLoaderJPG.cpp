@@ -225,15 +225,29 @@ namespace JPG
 
         X_UNUSED(inflated_size);
 
-        if (cinfo.out_color_space != JCS_RGB) {
-            X_ERROR("TextureJPG", "invalid colorspace, must be RGB");
+        if (cinfo.out_color_space != JCS_RGB && cinfo.out_color_space != JCS_GRAYSCALE) {
+            X_ERROR("TextureJPG", "invalid colorspace, must be RGB or GRAYSCALE");
             longjmp(jerr.setjmp_buffer, 1);
         }
 
         // just check incase.
-        if (cinfo.output_components != 3) {
-            X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 3", cinfo.output_components);
-            longjmp(jerr.setjmp_buffer, 1);
+        if (cinfo.out_color_space == JCS_RGB)
+        {
+            if (cinfo.output_components != 3) {
+                X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 3", cinfo.output_components);
+                longjmp(jerr.setjmp_buffer, 1);
+            }
+        }
+        else if (cinfo.out_color_space == JCS_GRAYSCALE)
+        {
+            if (cinfo.output_components != 1) {
+                X_ERROR("TextureJPG", "invalid output_components. provided: %i expected: 1", cinfo.output_components);
+                longjmp(jerr.setjmp_buffer, 1);
+            }
+        }
+        else
+        {
+            X_ASSERT_UNREACHABLE();
         }
 
         // create the img obj.
@@ -244,10 +258,19 @@ namespace JPG
         imgFile.setNumMips(1);
         imgFile.setDepth(1);
         imgFile.setFlags(flags);
-        imgFile.setFormat(Texturefmt::R8G8B8);
         imgFile.setType(TextureType::T2D);
         imgFile.setHeigth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_height));
         imgFile.setWidth(safe_static_cast<uint16_t, uint32_t>(cinfo.output_width));
+        
+        if (cinfo.out_color_space == JCS_RGB)
+        {
+            imgFile.setFormat(Texturefmt::R8G8B8);
+        }
+        else
+        {
+            imgFile.setFormat(Texturefmt::A8);
+        }
+
         imgFile.resize();
 
         uint8_t* pBuffer = imgFile.getFace(0);
