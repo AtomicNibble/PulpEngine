@@ -101,11 +101,11 @@ namespace JPG
             cinfo->src = reinterpret_cast<jpeg_source_mgr*>(src);
         }
 
-        struct my_error_mgr
+        X_ALIGNED_SYMBOL(struct my_error_mgr, 16)
         {
-            struct jpeg_error_mgr pub; /* "public" fields */
+            struct jpeg_error_mgr pub; 
 
-            jmp_buf setjmp_buffer; /* for return to caller */
+           X_ALIGNED_SYMBOL(jmp_buf setjmp_buffer, 16); 
         };
 
         typedef struct my_error_mgr* my_error_ptr;
@@ -190,8 +190,11 @@ namespace JPG
         jerr.pub.error_exit = my_error_exit;
         jerr.pub.output_message = output_message;
 
+        X_ASSERT_ALIGNMENT(jerr.setjmp_buffer, 16, 0);
+
         if (setjmp(jerr.setjmp_buffer)) {
-            jpeg_finish_decompress(&cinfo);
+            X_ERROR("TextureJPG", "Failed to process jpg");
+
             jpeg_destroy_decompress(&cinfo);
             return false;
         }
