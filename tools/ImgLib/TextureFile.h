@@ -29,7 +29,7 @@ public:
     X_INLINE void free(void);
     X_INLINE const bool isValid(void) const;
 
-    X_INLINE const Vec2<uint16_t>& getSize(void) const;
+    X_INLINE Vec2<uint16_t> getSize(void) const;
     X_INLINE Vec2<uint16_t> getMipDim(size_t mipIdx) const;
     X_INLINE int32_t getWidth(void) const;
     X_INLINE int32_t getHeight(void) const;

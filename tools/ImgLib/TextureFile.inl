@@ -180,7 +180,7 @@ X_INLINE const bool XTextureFile::isValid(void) const
     return size_.x > 0 && size_.y > 0 && depth_ > 0 && numMips_ > 0 && data_.isNotEmpty() && numFaces_ > 0 && format_ != Texturefmt::UNKNOWN && type_ != TextureType::UNKNOWN;
 }
 
-X_INLINE const Vec2<uint16_t>& XTextureFile::getSize(void) const
+X_INLINE Vec2<uint16_t> XTextureFile::getSize(void) const
 {
     return size_;
 }
