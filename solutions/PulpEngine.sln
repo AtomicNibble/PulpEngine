@@ -274,6 +274,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FxLib", "..\tools\FxLib\FxL
 		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
 	EndProjectSection
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ImgTool", "..\tools\ImgTool\ImgTool.vcxproj", "{8B0DF5F1-422C-4272-A94D-51F9E799456B}"
+	ProjectSection(ProjectDependencies) = postProject
+		{07328CCB-F9CC-4967-861E-272BCA0CAB04} = {07328CCB-F9CC-4967-861E-272BCA0CAB04}
+		{81DDBFCE-ED72-413D-9A37-7AC108039CE2} = {81DDBFCE-ED72-413D-9A37-7AC108039CE2}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug Dynamic - Clang|Win32 = Debug Dynamic - Clang|Win32
@@ -1374,6 +1380,34 @@ Global
 		{3DAB5C81-CA0C-43BE-9696-D2A2F255A40E}.Super|Win32.Build.0 = Super|Win32
 		{3DAB5C81-CA0C-43BE-9696-D2A2F255A40E}.Super|x64.ActiveCfg = Super|x64
 		{3DAB5C81-CA0C-43BE-9696-D2A2F255A40E}.Super|x64.Build.0 = Super|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic - Clang|Win32.ActiveCfg = Debug Dynamic - Clang|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic - Clang|Win32.Build.0 = Debug Dynamic - Clang|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic - Clang|x64.ActiveCfg = Debug Dynamic - Clang|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic - Clang|x64.Build.0 = Debug Dynamic - Clang|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug|Win32.ActiveCfg = Debug|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug|Win32.Build.0 = Debug|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug|x64.ActiveCfg = Debug|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Debug|x64.Build.0 = Debug|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release Dynamic|Win32.ActiveCfg = Release Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release Dynamic|Win32.Build.0 = Release Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release Dynamic|x64.ActiveCfg = Release Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release Dynamic|x64.Build.0 = Release Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release|Win32.ActiveCfg = Release|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release|Win32.Build.0 = Release|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release|x64.ActiveCfg = Release|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Release|x64.Build.0 = Release|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super Dynamic|Win32.ActiveCfg = Super Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super Dynamic|Win32.Build.0 = Super Dynamic|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super Dynamic|x64.ActiveCfg = Super Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super Dynamic|x64.Build.0 = Super Dynamic|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super|Win32.ActiveCfg = Super|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super|Win32.Build.0 = Super|Win32
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super|x64.ActiveCfg = Super|x64
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B}.Super|x64.Build.0 = Super|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -1419,6 +1453,7 @@ Global
 		{8C678E94-7C93-4FA5-B806-77CE41F0B523} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{13A08CBA-8AC2-4CB4-8893-A4C6DFD612E6} = {82394A53-778F-4F3C-845C-BA3940464D74}
 		{3DAB5C81-CA0C-43BE-9696-D2A2F255A40E} = {82394A53-778F-4F3C-845C-BA3940464D74}
+		{8B0DF5F1-422C-4272-A94D-51F9E799456B} = {24E6CBB2-B9F1-4F1D-8C4F-3C5CBA4459C1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {C210B0E9-1C7C-4621-93AE-D9FE065678CB}
