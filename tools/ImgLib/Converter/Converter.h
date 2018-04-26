@@ -52,6 +52,7 @@ namespace Converter
             IMGLIB_EXPORT ~ImgConveter();
 
             IMGLIB_EXPORT void scale(ScaleFactor::Enum scale);
+            IMGLIB_EXPORT bool resize(Vec2<uint16_t> dim, MipFilter::Enum mipFilter, WrapMode::Enum wrapMode);
             IMGLIB_EXPORT void enableMultiThreaded(bool enable);
 
             IMGLIB_EXPORT bool loadImg(const core::Array<uint8_t>& fileData, ImgFileFormat::Enum inputFileFmt);

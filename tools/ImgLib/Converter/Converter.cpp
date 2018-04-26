@@ -199,6 +199,44 @@ namespace Converter
         }
     }
 
+    bool ImgConveter::resize(Vec2<uint16_t> dim, MipFilter::Enum mipFilter, WrapMode::Enum wrapMode)
+    {
+        auto curDim = srcImg_.getSize();
+        if (dim == curDim) {
+            return true;
+        }
+
+        X_LOG0("Img", "Resizing image (^6%" PRIu16 "^7,^6 %" PRIu16 "^7) -> (^6%" PRIu16 "^7,^6 %" PRIu16 "^7)", curDim.x, curDim.y, dim.x, dim.y);
+
+        FloatImage fltImg(swapArena_);
+        FloatImage outImg(swapArena_);
+
+        // create from first mip and level
+        if (!fltImg.initFrom(srcImg_, 0, 0)) {
+            X_ERROR("Img", "Error loading src for resize");
+            return false;
+        }
+
+        MipMapFilterParams filterParams;
+        ImgConveter::getDefaultFilterWidthAndParams(mipFilter, filterParams);
+
+        KaiserFilter filter(filterParams.filterWidth);
+        filter.setParameters(filterParams.params[0], filterParams.params[1]);
+
+        fltImg.resize(outImg, swapArena_, filter, dim.x, dim.y, wrapMode);
+
+        srcImg_.setWidth(dim.x);
+        srcImg_.setHeigth(dim.y);
+        srcImg_.resize();
+
+        if (!outImg.saveToImg(srcImg_, 0, 0)) {
+            X_ERROR("Img", "Error Saving resized image");
+            return false;
+        }
+
+        return true;
+    }
+
     bool ImgConveter::addAlphachannel(bool keepMips)
     {
         // expand the src img to have a alpha channel.
