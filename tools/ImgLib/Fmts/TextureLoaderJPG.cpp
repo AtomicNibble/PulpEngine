@@ -23,7 +23,7 @@ namespace JPG
     namespace
     {
         static const char* JPG_FILE_EXTENSION = ".jpg";
-        static const size_t JPEG_MGR_BUFFER_SIZE = (1 << 10);
+        static const size_t JPEG_MGR_BUFFER_SIZE = (1 << 11);
 
         struct jpeg_xfile_src_mgr
         {
@@ -219,7 +219,6 @@ namespace JPG
 
         uint32_t inflated_size = cinfo.output_width * cinfo.output_height * cinfo.num_components;
         uint32_t row_stride = cinfo.output_width * cinfo.output_components;
-        JSAMPROW* row_pointer = (*cinfo.mem->alloc_sarray)((j_common_ptr)&cinfo, JPOOL_IMAGE, row_stride, 1);
 
         X_UNUSED(inflated_size);
 
@@ -249,13 +248,19 @@ namespace JPG
         imgFile.resize();
 
         uint8_t* pBuffer = imgFile.getFace(0);
-        while (cinfo.output_scanline < cinfo.output_height) {
-            jpeg_read_scanlines(&cinfo, row_pointer, 1);
+        uint8_t* pEnd = pBuffer + imgFile.getFaceSize();
 
-            // copy into final buffer.
-            memcpy(pBuffer, row_pointer, row_stride);
+        while (cinfo.output_scanline < cinfo.output_height) {
+
+            uint8_t* rowpointer[1];
+            rowpointer[0] = pBuffer;
+
+            jpeg_read_scanlines(&cinfo, rowpointer, 1);
+
             pBuffer += row_stride;
         }
+
+        X_ASSERT((pEnd - pBuffer) == 0, "Faield to decode jpg")(pEnd, pBuffer, (pEnd - pBuffer));
 
         jpeg_finish_decompress(&cinfo);
         jpeg_destroy_decompress(&cinfo);
