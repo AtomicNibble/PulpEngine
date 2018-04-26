@@ -141,7 +141,7 @@ namespace Compression
             core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
         template<typename T>
-        bool deflate(core::MemoryArenaBase* arena, const T* pBegin, const T* pEnd,
+        bool deflate(core::MemoryArenaBase* arena, core::span<const T> data,
             core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
         template<typename T>
@@ -149,8 +149,7 @@ namespace Compression
             core::Array<T>& inflated);
 
         template<typename T>
-        bool inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd,
-            core::Array<T>& inflated);
+        bool inflate(core::MemoryArenaBase* arena, core::span<const uint8_t> data, core::Array<T>& inflated);
 
         bool inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd,
             uint8_t* pInflatedBegin, uint8_t* pInflatedEnd);
@@ -183,18 +182,18 @@ namespace Compression
     }
 
     template<typename T>
-    X_INLINE bool ICompressor::deflate(core::MemoryArenaBase* arena, const T* pBegin, const T* pEnd,
+    X_INLINE bool ICompressor::deflate(core::MemoryArenaBase* arena, core::span<const T> data,
         core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
     {
         static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
 
         size_t compressedSize = 0;
-        size_t numElems = union_cast<size_t>(pEnd - pBegin);
+        size_t numElems = data.size();
         size_t bufSize = requiredDeflateDestBuf(numElems * sizeof(T));
 
         compressed.resize(bufSize);
 
-        bool res = deflate_int(arena, pBegin, numElems * sizeof(T),
+        bool res = deflate_int(arena, data.data(), numElems * sizeof(T),
             compressed.ptr(), compressed.size(), compressedSize, lvl);
 
         compressed.resize(compressedSize);
@@ -214,13 +213,13 @@ namespace Compression
     }
 
     template<typename T>
-    X_INLINE bool ICompressor::inflate(core::MemoryArenaBase* arena, const uint8_t* pBegin, const uint8_t* pEnd, core::Array<T>& inflated)
+    X_INLINE bool ICompressor::inflate(core::MemoryArenaBase* arena, core::span<const uint8_t> data, core::Array<T>& inflated)
     {
         static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
 
-        size_t dataSize = union_cast<size_t>(pEnd - pBegin);
+        size_t dataSize = data.size();
 
-        BufferHdr* pHdr = union_cast<BufferHdr*, const uint8_t*>(pBegin);
+        BufferHdr* pHdr = union_cast<BufferHdr*, const uint8_t*>(data.data());
         inflated.resize(pHdr->inflatedSize);
 
         return inflate_int(arena, pHdr + 1, dataSize - sizeof(BufferHdr),
