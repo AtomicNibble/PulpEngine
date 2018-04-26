@@ -13,21 +13,21 @@ namespace TGA
     {
         static const char* TGA_FILE_EXTENSION = ".tga";
 
-        X_PRAGMA(pack(push, 1))
+        X_PACK_PUSH(1)
         struct Tga_Header
         {
-            uint32_t IDLength;        /* 00h  Size of Image ID field */
-            uint32_t ColorMapType;    /* 01h  Color map type */
-            uint32_t ImageType;       /* 02h  Image type code */
-            uint32_t CMapStart;       /* 03h  Color map origin */
-            uint32_t CMapLength;      /* 05h  Color map length */
-            uint32_t CMapDepth;       /* 07h  Depth of color map entries */
-            uint32_t XOffset;         /* 08h  X origin of image */
-            uint32_t YOffset;         /* 0Ah  Y origin of image */
-            uint32_t Width;           /* 0Ch  Width of image */
-            uint32_t Height;          /* 0Eh  Height of image */
-            uint32_t PixelDepth;      /* 10h  Image pixel size */
-            uint32_t ImageDescriptor; /* 11h  Image descriptor byte */
+            uint8_t IDLength;        /* 00h  Size of Image ID field */
+            uint8_t ColorMapType;    /* 01h  Color map type */
+            uint8_t ImageType;       /* 02h  Image type code */
+            uint16_t CMapStart;       /* 03h  Color map origin */
+            uint16_t CMapLength;      /* 05h  Color map length */
+            uint8_t CMapDepth;       /* 07h  Depth of color map entries */
+            uint16_t XOffset;         /* 08h  X origin of image */
+            uint16_t YOffset;         /* 0Ah  Y origin of image */
+            uint16_t Width;           /* 0Ch  Width of image */
+            uint16_t Height;          /* 0Eh  Height of image */
+            uint8_t PixelDepth;      /* 10h  Image pixel size */
+            uint8_t ImageDescriptor; /* 11h  Image descriptor byte */
         };
 
         struct Tga_Footer
@@ -44,9 +44,10 @@ namespace TGA
             uint8_t null;
         };
 
+        X_ENSURE_SIZE(Tga_Header, 18)
         X_ENSURE_SIZE(Tga_Footer, 26)
 
-        X_PRAGMA(pack(pop))
+        X_PACK_POP
 
         struct ImageType
         {
@@ -76,23 +77,11 @@ namespace TGA
 
     bool XTexLoaderTGA::isValidData(const DataVec& fileData)
     {
-        if (fileData.size() < 18) {
+        if (fileData.size() < sizeof(Tga_Header)) {
             return false;
         }
 
-        Tga_Header hdr;
-        hdr.IDLength = static_cast<uint32_t>(fileData[0]);
-        hdr.ColorMapType = static_cast<uint32_t>(fileData[1]);
-        hdr.ImageType = static_cast<uint32_t>(fileData[2]);
-        hdr.CMapStart = static_cast<uint32_t>(fileData[3]) | static_cast<uint32_t>((fileData[4]) << 8);
-        hdr.CMapLength = static_cast<uint32_t>(fileData[5]) | static_cast<uint32_t>((fileData[6]) << 8);
-        hdr.CMapDepth = static_cast<uint32_t>(fileData[7]);
-        hdr.XOffset = static_cast<uint32_t>(fileData[8]) | static_cast<uint32_t>((fileData[9]) << 8);
-        hdr.YOffset = static_cast<uint32_t>(fileData[10]) | static_cast<uint32_t>((fileData[11]) << 8);
-        hdr.Width = static_cast<uint32_t>(fileData[12]) | static_cast<uint32_t>((fileData[13]) << 8);
-        hdr.Height = static_cast<uint32_t>(fileData[14]) | static_cast<uint32_t>((fileData[15]) << 8);
-        hdr.PixelDepth = static_cast<uint32_t>(fileData[16]);
-        hdr.ImageDescriptor = static_cast<uint32_t>(fileData[17]);
+        Tga_Header hdr = *reinterpret_cast<const Tga_Header*>(fileData.data());
 
         if (hdr.ColorMapType != 0 && hdr.ColorMapType != 1) {
             return false;
@@ -134,26 +123,11 @@ namespace TGA
         X_UNUSED(swapArena);
 
         Tga_Header hdr;
-        uint8_t buf[18];
-
-        if (file->readObj(buf) != sizeof(buf)) {
+        if (file->readObj(hdr) != sizeof(hdr)) {
             X_ERROR("Tga", "Failed to read header");
             return false;
         }
-
-        hdr.IDLength = static_cast<uint32_t>(buf[0]);
-        hdr.ColorMapType = static_cast<uint32_t>(buf[1]);
-        hdr.ImageType = static_cast<uint32_t>(buf[2]);
-        hdr.CMapStart = static_cast<uint32_t>(buf[3]) | static_cast<uint32_t>((buf[4]) << 8);
-        hdr.CMapLength = static_cast<uint32_t>(buf[5]) | static_cast<uint32_t>((buf[6]) << 8);
-        hdr.CMapDepth = static_cast<uint32_t>(buf[7]);
-        hdr.XOffset = static_cast<uint32_t>(buf[8]) | static_cast<uint32_t>((buf[9]) << 8);
-        hdr.YOffset = static_cast<uint32_t>(buf[10]) | static_cast<uint32_t>((buf[11]) << 8);
-        hdr.Width = static_cast<uint32_t>(buf[12]) | static_cast<uint32_t>((buf[13]) << 8);
-        hdr.Height = static_cast<uint32_t>(buf[14]) | static_cast<uint32_t>((buf[15]) << 8);
-        hdr.PixelDepth = static_cast<uint32_t>(buf[16]);
-        hdr.ImageDescriptor = static_cast<uint32_t>(buf[17]);
-
+    
         // Validate TGA header (is this a TGA file?)
         if (hdr.ColorMapType != 0 && hdr.ColorMapType != 1) {
             X_ERROR("TextureTGA", "invalid color map type. provided: %i expected: 0 | 1", hdr.ColorMapType);
