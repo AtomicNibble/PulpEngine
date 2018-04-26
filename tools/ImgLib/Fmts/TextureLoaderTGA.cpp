@@ -276,12 +276,10 @@ namespace TGA
             }
         }
         else {
-            size_t bytes_read = file->read(imgFile.getFace(0), DataSize);
+            size_t bytesRead = file->read(imgFile.getFace(0), DataSize);
 
-            if (bytes_read != DataSize) {
-                X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes",
-                    DataSize, bytes_read);
-
+            if (bytesRead != DataSize) {
+                X_ERROR("TextureTGA", "failed to read image data from. requested: %i bytes recivied: %i bytes", DataSize, bytesRead);
                 return false;
             }
         }
