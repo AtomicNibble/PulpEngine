@@ -328,6 +328,11 @@ namespace TGA
     {
         X_UNUSED(file, imgFile, swapArena);
 
+        if (imgFile.getNumMips() > 1 || imgFile.getNumFaces() > 1) {
+            X_ERROR("Tga", "Can't save image with mips or faces");
+            return false;
+        }
+
         Tga_Header hdr;
         core::zero_object(hdr);
 
