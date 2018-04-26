@@ -76,6 +76,10 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 
     LinkModule(pICore_, "ImgToolor");
 
+    if (!pICore_->IntializeLoadedConverterModule(X_ENGINE_OUTPUT_PREFIX "ImgLib", "Engine_ImgLib")) {
+        return false;
+    }
+
     return true;
 }
 

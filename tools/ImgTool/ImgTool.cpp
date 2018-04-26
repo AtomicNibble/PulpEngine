@@ -13,11 +13,16 @@
 #include <Time\StopWatch.h>
 #include <Util\UniquePointer.h>
 
+#include <../ImgLib/ImgLib.h>
+
 #include <istream>
 #include <iostream>
 #include <fstream>
 
 #include <IFileSys.h>
+
+X_LINK_ENGINE_LIB("ImgLib")
+
 
 #ifdef X_LIB
 
