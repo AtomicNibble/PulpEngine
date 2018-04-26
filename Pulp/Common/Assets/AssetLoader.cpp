@@ -85,6 +85,9 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
     loadReq->flags.Set(LoadFlag::Reload);
     loadReq->reloadFlags = flags;
 
+    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Reloading: %s -> \"%s\"", 
+        assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
+
     // dispatch IO
     dispatchLoadRequest(loadReq.get());
 
@@ -95,6 +98,9 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
     X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
     X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")(assetDb::AssetType::ToString(pAsset->getType()));
+
+    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Adding load request: %s -> \"%s\"",
+        assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
 
@@ -196,8 +202,10 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 {
     auto* pAsset = pLoadReq->pAsset;
     auto type = pAsset->getType();
-
     auto& name = pLoadReq->pAsset->getName();
+
+    X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Dispatching load: %s -> \"%s\"",
+        assetDb::AssetType::ToString(type), name.c_str());
 
     core::AssetName assetName(pAsset->getType(), name, assetExt_[type]);
 
