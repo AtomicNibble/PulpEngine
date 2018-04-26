@@ -46,15 +46,15 @@ namespace
         core::NoMemoryTracking,
         core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-        >
+    >
         ImgToolArena;
 
 
-    bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
+    bool ReadFileToBuf(const core::Path<char>& filePath, core::Array<uint8_t>& bufOut)
     {
-        std::ifstream file(filePath, std::ios::binary | std::ios::ate);
+        std::ifstream file(filePath.c_str(), std::ios::binary | std::ios::ate);
         if (!file.is_open()) {
-            X_ERROR("ImgTool", "Failed to open input file: \"%ls\"", filePath.c_str());
+            X_ERROR("ImgTool", "Failed to open input file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -69,11 +69,11 @@ namespace
         return false;
     }
 
-    bool WriteFileFromBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
+    bool WriteFileFromBuf(const core::Path<char>& filePath, const core::Array<uint8_t>& buf)
     {
-        std::ofstream file(filePath, std::ios::binary | std::ios::out);
+        std::ofstream file(filePath.c_str(), std::ios::binary | std::ios::out);
         if (!file.is_open()) {
-            X_ERROR("ImgTool", "Failed to open output file: \"%ls\"", filePath.c_str());
+            X_ERROR("ImgTool", "Failed to open output file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -86,18 +86,123 @@ namespace
     void PrintArgs(void)
     {
         X_LOG0("ImgTool", "Args:");
-      
+
         // TODO
     }
+} // namespace
 
-    bool Process()
+X_NAMESPACE_BEGIN(texture)
+
+namespace
+{
+   
+
+    bool Process(ImgToolArena& arena)
     {
+        // currently i want a tool that will take N input images and resize and save as tga.
+        // so need input file, output shit, desired size and format.
 
+        core::Path<char> inFile, outFile;
+        Vec2<uint16_t> dim;
+
+        bool resize = false;
+
+        // args
+        {
+            const wchar_t* pInFile = gEnv->pCore->GetCommandLineArgForVarW(L"if");
+            if (!pInFile) {
+                X_ERROR("ImgTool", "Missing required arg -if");
+                return false;
+            }
+
+            inFile = core::Path<char>(core::Path<wchar_t>(pInFile));
+
+            const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"of");
+            if (pOutFile) {
+                outFile = core::Path<char>(core::Path<wchar_t>(pOutFile));
+            }
+
+            const wchar_t* pDim = gEnv->pCore->GetCommandLineArgForVarW(L"dim");
+            if (pDim) {
+         
+                // wXH
+                ::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y);
+
+                resize = true;
+            }
+        }
+
+        ImgFileFormat::Enum outputFileFmt = ImgFileFormat::TGA;
+
+        if (outFile.isEmpty())
+        {
+            const char* pExt = texture::Util::getExtension(outputFileFmt);
+
+            outFile = inFile;
+            outFile.setExtension(pExt);
+        }
+
+        X_LOG0("ImgTool", "Loading: \"%s\"", inFile.c_str());
+
+        core::Array<uint8_t> srcImgData(&arena);
+        if (!ReadFileToBuf(inFile, srcImgData)) {
+            return false; 
+        }
+
+
+        ImgFileFormat::Enum inputFileFmt = Util::resolveSrcfmt(srcImgData);
+        if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+            X_ERROR("ImgTool", "Unknown img src format");
+            return false;
+        }
+
+        Converter::ImgConveter con(&arena, &arena);
+
+        if (!con.loadImg(srcImgData, inputFileFmt)) {
+            return false;
+        }
+
+        {
+            const auto& src = con.getTextFile();
+            auto srcDim = src.getSize();
+
+            X_LOG0("ImgTool", "Fmt: %s", Texturefmt::ToString(src.getFormat()));
+            X_LOG0("ImgTool", "Dim: (^6%" PRIu16 "^7,^6 %" PRIu16 "^7)", srcDim.x, srcDim.y);
+
+        }
+
+        // scale me down baby!
+        if(resize)
+        {
+            const auto& src = con.getTextFile();
+            auto srcDim = src.getSize();
+
+            if (srcDim.x > dim.x || srcDim.y > dim.y)
+            {
+                Converter::MipFilter::Enum mipFilter = Converter::MipFilter::Kaiser;
+                Converter::WrapMode::Enum wrapMode = Converter::WrapMode::Clamp;
+
+                if (!con.resize(dim, mipFilter, wrapMode)) {
+                    X_ERROR("ImgTool", "Failed to create mips for image");
+                    return false;
+                }
+            }
+        }
+
+        Converter::CompileFlags flags;
+
+        X_LOG0("ImgTool", "Saving: \"%s\"", outFile.c_str());
+
+        if (!con.saveImg(outFile, flags, outputFileFmt)) {
+            return false;
+        }
 
         return true;
     }
 
 } // namespace
+
+X_NAMESPACE_END
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -121,9 +226,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     PrintArgs();
 
-    if (!Process()) {
+    core::StopWatch timer;
+
+    if (!texture::Process(arena)) {
         return -1;
     }
    
+    const float trainTime = timer.GetMilliSeconds();
+    core::HumanDuration::Str timeStr;
+    X_LOG0("Imgtool", "Processing took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
+
     return 0;
 }
