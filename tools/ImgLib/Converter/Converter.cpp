@@ -296,10 +296,10 @@ namespace Converter
         srcImg_.allocMipBuffers();
         X_ASSERT(srcImg_.getNumMips() == requiredMips, "Mip count mismatch")(srcImg_.getNumMips(), requiredMips); 
 
-        core::V2::JobSystem& jobSys = *gEnv->pJobSys;
-        core::V2::Job* pRootJob = nullptr;
+        if (multiThread_ && gEnv->pJobSys) {
+            core::V2::JobSystem& jobSys = *gEnv->pJobSys;
+            core::V2::Job* pRootJob = nullptr;
 
-        if (multiThread_) {
             pRootJob = jobSys.CreateJob(core::V2::JobSystem::EmptyJob JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
 
             bool results[TEX_MAX_FACES] = {false};
