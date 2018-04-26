@@ -32,6 +32,23 @@ X_DECLARE_FLAGS8(ReloadFlag)
 
 typedef Flags8<ReloadFlag> ReloadFlags;
 
+
+class AssetLoaderVars
+{
+public:
+    AssetLoaderVars();
+    ~AssetLoaderVars() = default;
+
+    void registerVars(void);
+
+
+    bool debugEnabled(void) const;
+
+private:
+    int32_t debug_;
+};
+
+
 class AssetLoader
 {
     typedef std::array<IAssetLoadSink*, assetDb::AssetType::ENUM_COUNT> AssetLoadSinksArr;
@@ -60,6 +77,8 @@ class AssetLoader
 
 public:
     AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
+
+    void registerVars(void);
 
     void registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt);
 
@@ -90,6 +109,8 @@ private:
 private:
     core::MemoryArenaBase* arena_;
     core::MemoryArenaBase* blockArena_;
+
+    AssetLoaderVars vars_;
 
     core::CriticalSection loadReqLock_;
     core::ConditionVariable loadCond_;

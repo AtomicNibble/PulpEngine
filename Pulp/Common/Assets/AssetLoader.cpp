@@ -3,10 +3,31 @@
 #include "AssetBase.h"
 #include <String\AssetName.h>
 
+#include <IConsole.h>
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(core)
+
+AssetLoaderVars::AssetLoaderVars()
+{
+    debug_ = 0;
+}
+
+void AssetLoaderVars::registerVars(void)
+{
+    ADD_CVAR_REF("ldr_debug", debug_, debug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Enable AssetLoader debug");
+
+
+}
+
+X_INLINE bool AssetLoaderVars::debugEnabled(void) const
+{
+    return debug_ != 0;
+}
+
+// ------------------------------------------------------
 
 AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena) :
     arena_(arena),
@@ -21,6 +42,12 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
     assetsinks_.fill(nullptr);
     assetExt_.fill("");
 }
+
+void AssetLoader::registerVars(void)
+{
+    vars_.registerVars();
+}
+
 
 void AssetLoader::update(void)
 {
