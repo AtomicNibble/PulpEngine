@@ -712,6 +712,38 @@ namespace Util
         }
     }
 
+    ImgFileFormat::Enum ImgFileFmtFromStr(const char* pStr)
+    {
+        X_ASSERT_NOT_NULL(pStr);
+
+        // force input to upper case.
+        core::StackString<64, char> strUpper(pStr);
+        strUpper.toUpper();
+
+        using namespace core::Hash::Literals;
+
+        static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional texture file fmts? this code needs updating.");
+
+        switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+            case "CI"_fnv1a:
+                return ImgFileFormat::CI;
+            case "DDS"_fnv1a:
+                return ImgFileFormat::DDS;
+            case "PNG"_fnv1a:
+                return ImgFileFormat::PNG;
+            case "JPG"_fnv1a:
+                return ImgFileFormat::JPG;
+            case "PSD"_fnv1a:
+                return ImgFileFormat::PSD;
+            case "TGA"_fnv1a:
+                return ImgFileFormat::TGA;
+
+            default:
+                X_ERROR("Img", "Unknown img file format: \"%s\"", pStr);
+                return ImgFileFormat::UNKNOWN;
+        }
+    }
+
     ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData)
     {
         static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");

@@ -27,6 +27,7 @@ namespace Util
         size_t* pOutNumBytes, size_t* pOutRowBytes, size_t* pOutNumRows);
 
     IMGLIB_EXPORT Texturefmt::Enum TexFmtFromStr(const char* pStr);
+    IMGLIB_EXPORT ImgFileFormat::Enum ImgFileFmtFromStr(const char* pStr);
     IMGLIB_EXPORT ImgFileFormat::Enum resolveSrcfmt(const core::Array<uint8_t>& fileData);
     IMGLIB_EXPORT bool writeSupported(ImgFileFormat::Enum fmt);
     IMGLIB_EXPORT const char* getExtension(ImgFileFormat::Enum fmt);
