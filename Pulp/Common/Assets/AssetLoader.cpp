@@ -12,6 +12,7 @@ X_NAMESPACE_BEGIN(core)
 AssetLoaderVars::AssetLoaderVars()
 {
     debug_ = 0;
+    maxActiveRequests_ = 16;
 }
 
 void AssetLoaderVars::registerVars(void)
@@ -19,12 +20,19 @@ void AssetLoaderVars::registerVars(void)
     ADD_CVAR_REF("ldr_debug", debug_, debug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Enable AssetLoader debug");
 
+    ADD_CVAR_REF("ldr_max_active_requests", maxActiveRequests_, maxActiveRequests_, 0, 1 << 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Max active load requests");
 
 }
 
 X_INLINE bool AssetLoaderVars::debugEnabled(void) const
 {
     return debug_ != 0;
+}
+
+X_INLINE int32_t AssetLoaderVars::maxActiveRequests(void) const
+{
+    return maxActiveRequests_;
 }
 
 // ------------------------------------------------------
@@ -115,7 +123,7 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
     pAsset->setStatus(core::LoadStatus::Loading);
 
     // queue it if over 16 active requests.
-    const int32_t maxReq = 16;
+    const int32_t maxReq = vars_.maxActiveRequests();
     if (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq) {
         dispatchLoad(pAsset, lock);
     }
@@ -186,7 +194,7 @@ void AssetLoader::dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedL
 
 bool AssetLoader::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
 {
-    int32_t maxReq = 16;
+    const int32_t maxReq = vars_.maxActiveRequests();
 
     if (requestQueue_.isNotEmpty() && (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq)) {
         X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
@@ -206,6 +214,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 
     X_LOG0_IF(vars_.debugEnabled(), "AssetLoader", "Dispatching load: %s -> \"%s\"",
         assetDb::AssetType::ToString(type), name.c_str());
+
 
     core::AssetName assetName(pAsset->getType(), name, assetExt_[type]);
 

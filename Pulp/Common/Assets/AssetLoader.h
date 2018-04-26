@@ -41,11 +41,12 @@ public:
 
     void registerVars(void);
 
-
     bool debugEnabled(void) const;
+    int32_t maxActiveRequests(void) const;
 
 private:
     int32_t debug_;
+    int32_t maxActiveRequests_;
 };
 
 
