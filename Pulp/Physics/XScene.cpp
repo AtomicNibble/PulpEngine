@@ -193,34 +193,36 @@ void XScene::setVisualizationCullingBox(const AABB& box)
 
 // ------------------------------------------
 
-LockHandle XScene::lock(bool write)
+LockHandle XScene::lock(LockAccess::Enum access)
 {
 #if PHYSX_SCENE_REQUIRES_LOCK
 
-    if (write) {
-        pScene_->lockWrite(__FILE__, __LINE__);
+    static_assert(LockAccess::ENUM_COUNT == 2, "More lock modes?");
+
+    if (access == LockAccess::Read) {
+        pScene_->lockRead(__FILE__, __LINE__);
     }
     else {
-        pScene_->lockRead(__FILE__, __LINE__);
+        pScene_->lockWrite(__FILE__, __LINE__);
     }
 
 #else
     X_UNUSED(write);
 #endif // !PHYSX_SCENE_REQUIRES_LOCK
 
-    return static_cast<LockHandle>(write);
+    return static_cast<LockHandle>(access);
 }
 
 void XScene::unLock(LockHandle lock)
 {
 #if PHYSX_SCENE_REQUIRES_LOCK
-    const bool writeLock = lock != 0;
+    auto access = static_cast<LockAccess::Enum>(lock);
 
-    if (writeLock) {
-        pScene_->unlockWrite();
+    if (access == LockAccess::Read) {
+        pScene_->unlockRead();
     }
     else {
-        pScene_->unlockRead();
+        pScene_->unlockWrite();
     }
 #else
     X_UNUSED(lock);

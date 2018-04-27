@@ -113,7 +113,7 @@ namespace entity
             displacement += upDisp;
 
             if (displacement != Vec3f::zero()) {
-                physics::ScopedLock lock(pPhysScene, true);
+                physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
 
                 auto flags = con.pController->move(displacement, 0.f, timeDelta);
                 if (flags.IsAnySet()) {

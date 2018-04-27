@@ -286,7 +286,7 @@ namespace entity
         {
             float maxRange = static_cast<float>(wpn.pWeaponDef->maxDmgRange());
 
-            physics::ScopedLock lock(pPhysScene);
+            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
 
             auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
 

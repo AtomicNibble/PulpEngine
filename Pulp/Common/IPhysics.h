@@ -935,9 +935,14 @@ static const QueryFlags DEFAULT_QUERY_FLAGS = QueryFlag::STATIC | QueryFlags::DY
 
 struct IScene;
 
+X_DECLARE_ENUM(LockAccess)(
+    Read,
+    Write
+);
+
 struct ScopedLock
 {
-    ScopedLock(IScene* pScene, bool write = false);
+    ScopedLock(IScene* pScene, LockAccess::Enum access);
     ~ScopedLock();
 
 private:
@@ -957,7 +962,7 @@ struct IScene
     // ~
 
     // locking
-    virtual LockHandle lock(bool write = false) X_ABSTRACT;
+    virtual LockHandle lock(LockAccess::Enum access) X_ABSTRACT;
     virtual void unLock(LockHandle lock) X_ABSTRACT;
 
     // you must add a region before adding actors that reside in the region.
@@ -1018,10 +1023,20 @@ X_INLINE void IScene::setGlobalPose(ActorHandle handle, const Transformf& destin
     setGlobalPose(&handle, &destination, 1);
 }
 
-X_INLINE ScopedLock::ScopedLock(IScene* pScene, bool write) :
+X_INLINE void IScene::addForce(ActorHandle handle, const Vec3f& force)
+{
+    addForce(&handle, &force, 1);
+}
+
+X_INLINE void IScene::addTorque(ActorHandle handle, const Vec3f& torque)
+{
+    addTorque(&handle, &torque, 1);
+}
+
+X_INLINE ScopedLock::ScopedLock(IScene* pScene, LockAccess::Enum access) :
     pScene_(pScene)
 {
-    lock_ = pScene->lock(write);
+    lock_ = pScene->lock(access);
 }
 
 X_INLINE ScopedLock::~ScopedLock()

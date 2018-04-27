@@ -191,7 +191,7 @@ namespace entity
 
             // move the controller.
             {
-                physics::ScopedLock lock(pPhysScene_, true);
+                physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
 
                 if (enterCrouch) {
                     con.pController->resize(vars_.crouchHeight_);

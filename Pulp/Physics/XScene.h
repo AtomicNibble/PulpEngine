@@ -26,7 +26,7 @@ public:
     void setVisualizationCullingBox(const AABB& box);
 
     // locking
-    LockHandle lock(bool write = false) X_FINAL;
+    LockHandle lock(LockAccess::Enum access) X_FINAL;
     void unLock(LockHandle lock) X_FINAL;
 
     // some runtime tweaks.

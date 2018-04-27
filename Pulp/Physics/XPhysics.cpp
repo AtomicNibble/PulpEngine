@@ -380,7 +380,7 @@ void XPhysics::onTickPreRender(core::TimeVal dtime, const AABB& debugVisCullBoun
             core::ScopedLock<decltype(outofBoundsCS_)> lock(outofBoundsCS_);
 
 #endif // !PHYSX_SCENE_REQUIRES_LOCK
-            auto handle = pScene->lock(true);
+            auto handle = pScene->lock(physics::LockAccess::Write);
 
             for (auto* pActor : outOfBoundsObjects_) {
                 pActor->release();
