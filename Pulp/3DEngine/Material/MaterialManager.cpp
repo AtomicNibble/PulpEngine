@@ -365,7 +365,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
             return false;
         }
 
-        auto* pTexture = gEngEnv.pTextureMan_->forName(tex.val.c_str(), texFlags);
+        auto* pTexture = gEngEnv.pTextureMan_->loadTexture(tex.val.c_str(), texFlags);
         tex.pTexture = pTexture;
     }
 
