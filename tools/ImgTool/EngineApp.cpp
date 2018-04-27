@@ -41,6 +41,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.pConsoleWnd = &Console;
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
+    params.bPauseShutdown = false;
 
 #ifdef X_LIB
 
