@@ -56,11 +56,10 @@ X_INLINE void Plane<T>::set(const Vec3<T>& normal, const T distance)
 template<typename T>
 X_INLINE void Plane<T>::set(T a, T b, T c, T d)
 {
-    Vec3<T> normal(a, b, c);
-    T length = normal.length();
-
-    normal_ = normal.normalized();
-    distance_ = -(d / length);
+    normal_.x = a;
+    normal_.y = b;
+    normal_.z = c;
+    distance_ = d;
 }
 
 template<typename T>
@@ -78,7 +77,7 @@ X_INLINE T& Plane<T>::operator[](size_t idx)
 template<typename T>
 X_INLINE Plane<T> Plane<T>::operator-() const
 {
-    return Plane(-normal_, -distance_);
+    return Plane(-normal_.x, -normal_.y, -normal_.z, -distance_);
 }
 
 template<typename T>
