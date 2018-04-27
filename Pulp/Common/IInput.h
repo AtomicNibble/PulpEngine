@@ -274,6 +274,7 @@ struct KeyId
         MOUSE_AUX_4,
         MOUSE_AUX_5,
 
+        // These two are one shot events, use MOUSE_Z for repeating.
         MOUSE_WHEELUP,
         MOUSE_WHEELDOWN,
 
