@@ -122,7 +122,6 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
     //	pAsset->addReference(); // prevent instance sweep
     pAsset->setStatus(core::LoadStatus::Loading);
 
-    // queue it if over 16 active requests.
     const int32_t maxReq = vars_.maxActiveRequests();
     if (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq) {
         dispatchLoad(pAsset, lock);
