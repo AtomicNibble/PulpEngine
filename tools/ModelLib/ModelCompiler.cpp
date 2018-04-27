@@ -490,6 +490,11 @@ bool ModelCompiler::ColMesh::processColMesh(physics::IPhysicsCooking* pCooker, b
         if (cook) {
             X_ASSERT_NOT_NULL(pCooker);
 
+            if (verts_.isEmpty()) {
+                X_ERROR("Model", "Can't cook convex mesh, no verts");
+                return false;
+            }
+
             static_assert(std::is_same<Vec3f, decltype(VertsArr::Type::pos_)>::value, "Cooking requires vec3f points");
 
             physics::TriangleMeshDesc desc;
