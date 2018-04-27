@@ -329,8 +329,6 @@ bool TextureManager::processData(core::AssetBase* pAsset, core::UniquePointer<ch
     // we need to upload the texture data.
     gEnv->pRender->initDeviceTexture(pTexture->getDeviceTexture(), imgFile);
 
-    pTexture->setStatus(core::LoadStatus::Complete);
-
     return true;
 }
 
