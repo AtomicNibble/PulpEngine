@@ -141,6 +141,7 @@ struct SCoreInitParams
     bool bScriptSystem;
     bool bVsLog;
     bool bConsoleLog;
+    bool bPauseShutdown;
 
     Vec4i seed;
 
@@ -200,6 +201,7 @@ struct SCoreInitParams
         bThreadSafeStringAlloc(true),
         bProfileSysEnabled(false),
         bScriptSystem(false),
+        bPauseShutdown(true),
 
 #if X_DEBUG
         bVsLog(true),

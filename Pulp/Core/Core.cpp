@@ -304,7 +304,7 @@ void XCore::ShutDown()
     X_LOG0("Core", "primary shutdown took: 6%gms", timer.GetMilliSeconds());
 
 #if X_ENABLE_LOGGING
-    if (!initParams_.bTesting && pConsole_) { // don't pause when testing.
+    if (!initParams_.bTesting && initParams_.bPauseShutdown && pConsole_) { // don't pause when testing.
         pConsole_->PressToContinue();
     }
 #endif // !X_ENABLE_LOGGING
