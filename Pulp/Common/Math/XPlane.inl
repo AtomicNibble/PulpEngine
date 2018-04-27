@@ -147,7 +147,7 @@ X_INLINE bool Plane<T>::rayIntersection(const Ray& ray, Vec3f& out)
 template<typename T>
 X_INLINE bool Plane<T>::compare(const Plane& p, const T epsilon) const
 {
-    return compare(p, epsilon);
+    return compare(p, epsilon, epsilon);
 }
 
 template<typename T>
