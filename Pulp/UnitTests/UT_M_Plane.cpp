@@ -71,16 +71,33 @@ TYPED_TEST(MathPlane, FromNormalDistance)
     EXPECT_NEAR(235, distance, 0.0000001f);
 }
 
-TYPED_TEST(MathPlane, FromCoefficient)
+TYPED_TEST(MathPlane, FromDirect)
 {
-    Plane<TypeParam> p(100, 0, 0, static_cast<TypeParam>(500));
+    Plane<TypeParam> p(static_cast<TypeParam>(0.5), 0, static_cast<TypeParam>(0.5), static_cast<TypeParam>(125));
 
-    Vec3<TypeParam> point = p.getPoint();
     Vec3<TypeParam> normal = p.getNormal();
     TypeParam distance = p.getDistance();
 
-    EXPECT_NEAR_VEC3(Vec3<TypeParam>(5, 0, 0), point, 0.0000001f);
-    EXPECT_NEAR_VEC3(Vec3<TypeParam>(1, 0, 0), normal, 0.0000001f);
-    EXPECT_NEAR(5, distance, 0.0000001f);
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(0.5, 0, 0.5), normal, 0.0000001f);
+    // this is negative, maybe this should be positive humm.
+    // would have to change how operator-() functions tho.
+    EXPECT_NEAR(static_cast<TypeParam>(-125), distance, 0.0000001f); 
+}
+
+
+TYPED_TEST(MathPlane, Flip)
+{
+    Plane<TypeParam> p(static_cast<TypeParam>(0.5), static_cast<TypeParam>(-0.5), static_cast<TypeParam>(0), 
+        static_cast<TypeParam>(500));
+
+    auto inverted = -p;
+
+    Vec3<TypeParam> normal = inverted.getNormal();
+    TypeParam distance = inverted.getDistance();
+
+    EXPECT_NEAR_VEC3(Vec3<TypeParam>(static_cast<TypeParam>(-0.5), static_cast<TypeParam>(0.5), 0), normal, 0.0000001f);
+    EXPECT_NEAR(static_cast<TypeParam>(500), distance, 0.0000001f);
+
+    EXPECT_TRUE(p.compare(-inverted, 0.0001f));
 }
 
