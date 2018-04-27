@@ -138,6 +138,13 @@ void UserCmdGen::processInput(void)
                     mouseDelta_.y += (e.value * 0.02f);
                     break;
 
+                case input::KeyId::MOUSE_Z:
+                {
+                    auto key = e.value < 0.f ? input::KeyId::MOUSE_WHEELDOWN : input::KeyId::MOUSE_WHEELUP;
+                    setButtonState(key, true);
+                    setButtonState(key, false);
+                    break;
+                }
                 default:
                     setButtonState(e.keyId, (e.action == input::InputState::PRESSED));
                     break;
@@ -148,7 +155,7 @@ void UserCmdGen::processInput(void)
     inputEvents_.clear();
 }
 
-UserButton::Enum getUserButton(input::KeyId::Enum key)
+UserButton::Enum UserCmdGen::getUserButton(input::KeyId::Enum key)
 {
     // TODO: map these to key bindings.
     switch (key) {

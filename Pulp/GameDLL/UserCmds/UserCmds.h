@@ -63,6 +63,8 @@ private:
     // ~IInputEventListner
 
 private:
+    static UserButton::Enum getUserButton(input::KeyId::Enum key);
+
     void setButtonState(input::KeyId::Enum key, bool down);
     int32_t buttonState(UserButton::Enum but) const;
 
