@@ -229,7 +229,7 @@ namespace entity
 
             // oh shit son.
             // this be like, some crazy weapon switching shit.
-            if (userCmd.impulse == Impulse::WEAP_NEXT) {
+            if (userCmd.impulse == Impulse::WEAP_NEXT || userCmd.impulse == Impulse::WEAP_PREV) {
                 X_LOG0("Goat", "Change the fucking weapon!");
 
                 // how is this going to work o_o
@@ -242,12 +242,28 @@ namespace entity
 
                 while (1)
                 {
-                    ++wpnIdx;
+                    if (userCmd.impulse == Impulse::WEAP_NEXT)
+                    {
+                        ++wpnIdx;
 
-                    if (wpnIdx >= weapon::WEAPON_MAX_LOADED) {
-                        wpnIdx = 0;
+                        if (wpnIdx >= weapon::WEAPON_MAX_LOADED) {
+                            wpnIdx = 0;
+                        }
+                    }
+                    else if (userCmd.impulse == Impulse::WEAP_PREV)
+                    {
+                        --wpnIdx;
+
+                        if (wpnIdx < 0) {
+                            wpnIdx = weapon::WEAPON_MAX_LOADED - 1;
+                        }
+                    }
+                    else
+                    {
+                        X_ASSERT_UNREACHABLE();
                     }
 
+                    // looped?
                     if (wpnIdx == player.targetWpn) {
                         break;
                     }
