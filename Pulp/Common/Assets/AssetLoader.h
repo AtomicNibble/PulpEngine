@@ -74,6 +74,7 @@ class AssetLoader
         ReloadFlags reloadFlags;
         uint16_t _pad;
         core::TimeVal dispatchTime;
+        core::TimeVal processBegin;
     };
 
     X_ENSURE_LE(sizeof(AssetLoadRequest), 64, "AssetLoadRequest should be less than 64 bytes")
@@ -104,6 +105,7 @@ private:
 
     // load / processing
     void onLoadRequestFail(AssetLoadRequest* pLoadReq);
+    void onLoadRequestSuccess(AssetLoadRequest* pLoadReq);
     void loadRequestCleanup(AssetLoadRequest* pLoadReq);
 
 private:

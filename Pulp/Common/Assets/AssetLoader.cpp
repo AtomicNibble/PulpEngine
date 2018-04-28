@@ -248,22 +248,35 @@ void AssetLoader::onLoadRequestFail(AssetLoadRequest* pLoadReq)
     loadRequestCleanup(pLoadReq);
 }
 
+void AssetLoader::onLoadRequestSuccess(AssetLoadRequest* pLoadReq)
+{
+    auto* pAsset = pLoadReq->pAsset;
+
+    pAsset->setStatus(core::LoadStatus::Complete);
+
+    if (vars_.debugLvl() > 1)
+    {
+        auto now = gEnv->pTimer->GetTimeNowReal();
+        auto loadTime = pLoadReq->processBegin - pLoadReq->dispatchTime;
+        auto processTime = now - pLoadReq->processBegin;
+        auto totalTime = now - pLoadReq->dispatchTime;
+
+        X_UNUSED(totalTime);
+
+        core::HumanDuration::Str durStr0, durStr1;
+
+        X_LOG0("assetLoader", "^4%s^7 -> \"%s\" loaded IO ^6%s^7 Process ^6%s", assetDb::AssetType::ToString(pAsset->getType()),
+            pAsset->getName().c_str(), core::HumanDuration::toString(durStr0, loadTime.GetMilliSeconds()),
+            core::HumanDuration::toString(durStr1, processTime.GetMilliSeconds()));
+    }
+
+    loadRequestCleanup(pLoadReq);
+}
+
 void AssetLoader::loadRequestCleanup(AssetLoadRequest* pLoadReq)
 {
     auto status = pLoadReq->pAsset->getStatus();
     X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
-
-    if(vars_.debugLvl() > 1)
-    {
-        auto now = gEnv->pTimer->GetTimeNowReal();
-        auto ellapsed = now - pLoadReq->dispatchTime;
-        auto* pAsset = pLoadReq->pAsset;
-
-        core::HumanDuration::Str durStr;
-
-        X_LOG0("assetLoader", "^4%s^7 -> \"%s\" loaded in ^6%s", assetDb::AssetType::ToString(pAsset->getType()), 
-            pAsset->getName().c_str(), core::HumanDuration::toString(durStr, ellapsed.GetMilliSeconds()));
-    }
 
     {
         core::CriticalSection::ScopedLock lock(loadReqLock_);
@@ -344,6 +357,7 @@ void AssetLoader::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx,
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
     auto* pLoadReq = static_cast<AssetLoadRequest*>(X_ASSERT_NOT_NULL(pData));
+    pLoadReq->processBegin = gEnv->pTimer->GetTimeNowReal();
 
     processData(pLoadReq);
 }
@@ -368,9 +382,7 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
         return;
     }
 
-    pAsset->setStatus(core::LoadStatus::Complete);
-
-    loadRequestCleanup(pRequest);
+    onLoadRequestSuccess(pRequest);
 }
 
 X_NAMESPACE_END
