@@ -169,7 +169,18 @@ namespace fx
                 }
 
                 continue;
-            }
+			}
+			else if(!desc.flags.IsSet(StageFlag::Looping) && stage.currentLoop > 0) {
+
+				if (stage.elems.isEmpty()) {
+					it = activeStages_.erase(it);
+				}
+				else {
+					++it;
+				}
+
+				continue;
+			}
 
             ++it;
 
