@@ -282,13 +282,6 @@ bool XScene::removeRegion(RegionHandle handle_)
 
 // ------------------------------------------
 
-void XScene::addActorToScene(ActorHandle handle)
-{
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
-
-    pScene_->addActor(actor);
-}
-
 void XScene::addActorToScene(ActorHandle handle, const char* pDebugNamePointer)
 {
     physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
@@ -301,21 +294,22 @@ void XScene::addActorsToScene(ActorHandle* pHandles, size_t num)
 {
     physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
 
+    if (num == 1) {
+        pScene_->addActor(*pActors);
+        return;
+    }
 
     pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
-}
-
-void XScene::removeActor(ActorHandle handle)
-{
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
-
-    pScene_->removeActor(actor, true);
 }
 
 void XScene::removeActors(ActorHandle* pHandles, size_t num)
 {
     physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
 
+    if (num == 1) {
+        pScene_->removeActor(*pActors, true);
+        return;
+    } 
 
     pScene_->removeActors(&pActors, safe_static_cast<physx::PxU32>(num), true);
 }

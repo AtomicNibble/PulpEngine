@@ -973,11 +973,12 @@ struct IScene
     // will be reported as out of bounds.
     virtual bool removeRegion(RegionHandle handles) X_ABSTRACT;
 
-    virtual void addActorToScene(ActorHandle handle) X_ABSTRACT;
     virtual void addActorToScene(ActorHandle handle, const char* pDebugNamePointer) X_ABSTRACT;
     virtual void addActorsToScene(ActorHandle* pHandles, size_t num) X_ABSTRACT;
-    virtual void removeActor(ActorHandle handle) X_ABSTRACT;
     virtual void removeActors(ActorHandle* pHandles, size_t num) X_ABSTRACT;
+
+    X_INLINE void addActorToScene(ActorHandle handle);
+    X_INLINE void removeActor(ActorHandle handle);
 
     // Aggregate
     virtual void addAggregate(AggregateHandle handle) X_ABSTRACT;
@@ -1012,6 +1013,16 @@ struct IScene
     virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
     virtual const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_ABSTRACT;
 };
+
+X_INLINE void IScene::addActorToScene(ActorHandle handle)
+{
+    addActorsToScene(&handle, 1);
+}
+
+X_INLINE void IScene::removeActor(ActorHandle handle)
+{
+    removeActors(&handle, 1);
+}
 
 X_INLINE void IScene::setKinematicTarget(ActorHandle handle, const Transformf& destination)
 {
