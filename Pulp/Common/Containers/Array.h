@@ -184,6 +184,10 @@ protected:
 
 #include "Array.inl"
 
+template<typename T>
+using ArrayGrowMultiply = Array<T, ArrayAllocator<T>, growStrat::Multiply>;
+
+
 X_NAMESPACE_END
 
 #endif // X_CON_ARRAY_H
