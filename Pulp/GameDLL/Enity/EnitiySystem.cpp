@@ -310,7 +310,10 @@ namespace entity
         desc.upDirection = Vec3f::zAxis();
         desc.maxJumpHeight = vars_.player.jumpHeight_;
 
-        con.pController = pPhysScene_->createCharacterController(desc);
+        {
+            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+            con.pController = pPhysScene_->createCharacterController(desc);
+        }
 
         if (con.pController == nullptr) {
             reg_.remove<CharacterController>(id);

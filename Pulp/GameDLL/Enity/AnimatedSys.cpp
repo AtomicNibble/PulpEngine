@@ -75,6 +75,9 @@ namespace entity
             }
             if (reg.has<MeshCollider>(entity)) {
                 auto& col = reg.get<MeshCollider>(entity);
+
+                physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
+
                 pPhysScene->setKinematicTarget(col.actor, trans);
             }
         };
