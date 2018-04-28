@@ -520,11 +520,18 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
         core::XFileFixedBuf file = fileHdr.FileBufForNode(pData, level::FileNodes::AREA_COLLISION);
 
         // add all the area bounds
-        for (const auto& a : areas_) {
-            pPhysScene_->addRegion(a.getBounds());
+        {
+            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+            for (const auto& a : areas_) {
+                pPhysScene_->addRegion(a.getBounds());
+            }
         }
 
         physics::IPhysics::DataArr data(g_3dEngineArena);
+
+        core::ArrayGrowMultiply<physics::ActorHandle> actors(g_3dEngineArena);
+        actors.reserve(areas_.size() * 32);
 
         for (auto& a : areas_) {
             level::AreaCollisionHdr colHdr;
@@ -581,11 +588,15 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
                     gEnv->pPhysics->addBox(actor, aabb, localPose);
                 }
 
-                pPhysScene_->addActorToScene(actor);
+                actors.push_back(actor);
 
                 a.physicsActor = actor;
             }
         }
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+        pPhysScene_->addActorsToScene(actors.data(), actors.size());
     }
 
     {

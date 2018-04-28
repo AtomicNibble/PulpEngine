@@ -419,11 +419,20 @@ bool Level::ProcessData(void)
         core::XFileFixedBuf file = fileHdr_.FileBufForNode(pFileData_, FileNodes::AREA_COLLISION);
 
         // add all the area bounds
-        for (const auto& a : areas_) {
-            pScene_->addRegion(a.getBounds());
+        {
+            physics::ScopedLock lock(pScene_, physics::LockAccess::Write);
+
+            for (const auto& a : areas_) {
+                pScene_->addRegion(a.getBounds());
+            }
         }
 
         physics::IPhysics::DataArr data(g_3dEngineArena);
+
+        core::Array<physics::ActorHandle, core::ArrayAllocator<physics::ActorHandle>,
+            core::growStrat::Multiply> actorArr(g_3dEngineArena);
+
+        actorArr.reserve(areas_.size() * 32);
 
         for (auto& a : areas_) {
             AreaCollisionHdr colHdr;
@@ -480,11 +489,15 @@ bool Level::ProcessData(void)
                     gEnv->pPhysics->addBox(actor, aabb, localPose);
                 }
 
-                pScene_->addActorToScene(actor);
+                actorArr.push_back(actor);
 
                 a.physicsActor = actor;
             }
         }
+
+        physics::ScopedLock lock(pScene_, physics::LockAccess::Write);
+
+        pScene_->addActorsToScene(actorArr.data(), actorArr.size());
     }
 
     {
@@ -558,45 +571,50 @@ bool Level::ProcessData(void)
         path_.fileName(),
         loadStats_.elapse.GetMilliSeconds());
 
-#if 1
-    Transformf trans;
+#if 0
+    {
+        physics::ScopedLock lock(pScene_, physics::LockAccess::Write);
 
-    for (size_t i = 0; i < 30; i++) {
-        trans.pos.x = gEnv->xorShift.randRange(-200.f, 200.f);
-        trans.pos.y = gEnv->xorShift.randRange(-200.f, 200.f);
-        trans.pos.z = gEnv->xorShift.randRange(20.f, 100.f);
+        Transformf trans;
 
-        float size = gEnv->xorShift.randRange(5.f, 20.f);
+        for (size_t i = 0; i < 30; i++) {
+            trans.pos.x = gEnv->xorShift.randRange(-200.f, 200.f);
+            trans.pos.y = gEnv->xorShift.randRange(-200.f, 200.f);
+            trans.pos.z = gEnv->xorShift.randRange(20.f, 100.f);
 
-        auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
-        pScene_->addActorToScene(box);
-    }
+            float size = gEnv->xorShift.randRange(5.f, 20.f);
 
-    for (size_t i = 0; i < 20; i++) {
-        trans.pos.x = -248;
-        trans.pos.y = 180;
-        trans.pos.z = 80;
+            auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
+            pScene_->addActorToScene(box);
+        }
 
-        trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
-        trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
+        for (size_t i = 0; i < 20; i++) {
+            trans.pos.x = -248;
+            trans.pos.y = 180;
+            trans.pos.z = 80;
 
-        float size = gEnv->xorShift.randRange(1.f, 10.f);
+            trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
+            trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
 
-        auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
-        pScene_->addActorToScene(box);
-    }
+            float size = gEnv->xorShift.randRange(1.f, 10.f);
 
-    trans.pos.y = 120;
-
-    for (size_t i = 0; i < 10; i++) {
-        float size = gEnv->xorShift.randRange(1.f, 10.f);
+            auto box = gEnv->pPhysics->createBox(trans, AABB(Vec3f::zero(), size), 0.5f);
+            pScene_->addActorToScene(box);
+        }
 
         trans.pos.y = 120;
-        trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
-        trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
 
-        auto box = gEnv->pPhysics->createSphere(trans, size, 0.6f);
-        pScene_->addActorToScene(box);
+        for (size_t i = 0; i < 10; i++) {
+            float size = gEnv->xorShift.randRange(1.f, 10.f);
+
+            trans.pos.y = 120;
+            trans.pos.x += gEnv->xorShift.randRange(-20.f, 20.f);
+            trans.pos.y += gEnv->xorShift.randRange(-20.f, 20.f);
+
+            auto box = gEnv->pPhysics->createSphere(trans, size, 0.6f);
+            pScene_->addActorToScene(box);
+        }
+
     }
 #endif
 
