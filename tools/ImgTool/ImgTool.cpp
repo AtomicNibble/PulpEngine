@@ -193,10 +193,21 @@ namespace
 
             if (srcDim.x > dim.x || srcDim.y > dim.y)
             {
+                // keep ratio
+                auto targetDim = srcDim;
+                while (targetDim.x > dim.x || targetDim.y > dim.y)
+                {
+                    targetDim.x >>= 1;
+                    targetDim.y >>= 1;
+
+                    targetDim.x = core::Max(targetDim.x, 1_ui16);
+                    targetDim.y = core::Max(targetDim.y, 1_ui16);
+                }
+
                 Converter::MipFilter::Enum mipFilter = Converter::MipFilter::Kaiser;
                 Converter::WrapMode::Enum wrapMode = Converter::WrapMode::Clamp;
 
-                if (!con.resize(dim, mipFilter, wrapMode)) {
+                if (!con.resize(targetDim, mipFilter, wrapMode)) {
                     X_ERROR("ImgTool", "Failed to create mips for image");
                     return false;
                 }
