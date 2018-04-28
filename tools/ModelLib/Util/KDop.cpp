@@ -176,7 +176,7 @@ void KDop::build(void)
     //}
 
     for (size_t i = 0; i < maxDist_.size(); i++) {
-        planes_[i] = Planef(planeNormals_[i], maxDist_[i]);
+        planes_[i] = -Planef(planeNormals_[i], maxDist_[i]);
     }
 }
 
