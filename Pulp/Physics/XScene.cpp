@@ -131,7 +131,6 @@ XScene::~XScene()
         pScene_->fetchResults(true);
     }
 
-    // we need a read, maybe write lock here.
     if (pScene_) {
         PHYS_SCENE_WRITE_LOCK(pScene_);
         core::SafeRelease(pControllerManager_);
@@ -235,13 +234,11 @@ void XScene::setGravity(const Vec3f& gravity)
 {
     vars_.SetGravityVecValue(gravity);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
     pScene_->setGravity(Px3FromVec3(gravity));
 }
 
 void XScene::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
     pScene_->setBounceThresholdVelocity(bounceThresholdVelocity);
 }
 
@@ -249,8 +246,6 @@ void XScene::setBounceThresholdVelocity(float32_t bounceThresholdVelocity)
 
 RegionHandle XScene::addRegion(const AABB& bounds)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
         return 0;
     }
@@ -271,8 +266,6 @@ RegionHandle XScene::addRegion(const AABB& bounds)
 
 bool XScene::removeRegion(RegionHandle handle_)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     if (pScene_->getBroadPhaseType() != physx::PxBroadPhaseType::eMBP) {
         return true;
     }
@@ -293,8 +286,6 @@ void XScene::addActorToScene(ActorHandle handle)
 {
     physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     pScene_->addActor(actor);
 }
 
@@ -303,8 +294,6 @@ void XScene::addActorToScene(ActorHandle handle, const char* pDebugNamePointer)
     physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
     actor.setName(pDebugNamePointer);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     pScene_->addActor(actor);
 }
 
@@ -312,7 +301,6 @@ void XScene::addActorsToScene(ActorHandle* pHandles, size_t num)
 {
     physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
 
     pScene_->addActors(&pActors, safe_static_cast<physx::PxU32>(num));
 }
@@ -321,8 +309,6 @@ void XScene::removeActor(ActorHandle handle)
 {
     physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     pScene_->removeActor(actor, true);
 }
 
@@ -330,7 +316,6 @@ void XScene::removeActors(ActorHandle* pHandles, size_t num)
 {
     physx::PxActor* const pActors = reinterpret_cast<physx::PxActor* const>(pHandles);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
 
     pScene_->removeActors(&pActors, safe_static_cast<physx::PxU32>(num), true);
 }
@@ -341,16 +326,12 @@ void XScene::addAggregate(AggregateHandle handle)
 {
     physx::PxAggregate& agg = *reinterpret_cast<physx::PxAggregate*>(handle);
 
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     pScene_->addAggregate(agg);
 }
 
 void XScene::removeAggregate(AggregateHandle handle)
 {
     physx::PxAggregate& agg = *reinterpret_cast<physx::PxAggregate*>(handle);
-
-    PHYS_SCENE_WRITE_LOCK(pScene_);
 
     pScene_->removeAggregate(agg, true);
 }
@@ -382,7 +363,6 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
         physx::PxController* pController = nullptr;
         {
-            PHYS_SCENE_WRITE_LOCK(pScene_);
 
             pController = pControllerManager_->createController(pxDesc);
         }
@@ -417,7 +397,6 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
         physx::PxController* pController = nullptr;
         {
-            PHYS_SCENE_WRITE_LOCK(pScene_);
 
             pController = pControllerManager_->createController(pxDesc);
         }
@@ -433,16 +412,12 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
 void XScene::releaseCharacterController(ICharacterController* pController)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     X_DELETE(pController, arena_);
 }
 
 // set transforms
 void XScene::setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     for (size_t i = 0; i < num; i++) {
         const physx::PxTransform& trans = PxTransFromQuatTrans(pDestination[i]);
         physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
@@ -464,8 +439,6 @@ void XScene::setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestina
 
 void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination, size_t num)
 {
-    PHYS_SCENE_WRITE_LOCK(pScene_);
-
     for (size_t i = 0; i < num; i++) {
         const physx::PxTransform& trans = PxTransFromQuatTrans(pDestination[i]);
         physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
@@ -479,8 +452,6 @@ void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination,
 bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
     RaycastCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags) const
 {
-    PHYS_SCENE_READ_LOCK(pScene_);
-
     // static assets check this stuff maps.
     return pScene_->raycast(
         Px3FromVec3(origin),
@@ -494,8 +465,6 @@ bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t 
 bool XScene::sweep(const GeometryBase& geometry, const Transformf& pose, const Vec3f& unitDir, const float32_t distance,
     SweepCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags, const float32_t inflation) const
 {
-    PHYS_SCENE_READ_LOCK(pScene_);
-
     return pScene_->sweep(
         PxGeoFromGeo(geometry),
         PxTransFromQuatTrans(pose),
@@ -508,8 +477,6 @@ bool XScene::sweep(const GeometryBase& geometry, const Transformf& pose, const V
 
 bool XScene::overlap(const GeometryBase& geometry, const Transformf& pose, OverlapCallback& hitCall) const
 {
-    PHYS_SCENE_READ_LOCK(pScene_);
-
     return pScene_->overlap(
         PxGeoFromGeo(geometry),
         PxTransFromQuatTrans(pose),
@@ -539,8 +506,6 @@ IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
     // since it's not editing the scene objects :/
     physx::PxBatchQuery* pBatched = nullptr;
     {
-        PHYS_SCENE_WRITE_LOCK(pScene_);
-
         pBatched = pScene_->createBatchQuery(pxDesc);
         if (!pBatched) {
             return nullptr;
@@ -554,8 +519,6 @@ IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
 
 const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
 {
-    PHYS_SCENE_READ_LOCK(pScene_);
-
     physx::PxU32 num = 0;
     const physx::PxActiveTransform* pTrans = pScene_->getActiveTransforms(num);
 
