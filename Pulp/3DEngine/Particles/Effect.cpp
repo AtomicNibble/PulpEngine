@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "Effect.h"
 
+#include "EngineEnv.h"
+#include "Material\MaterialManager.h"
+
 #include <IEffect.h>
 
 X_NAMESPACE_BEGIN(engine)
@@ -40,6 +43,15 @@ namespace fx
 
         dataSize_ = dataSize;
         data_ = std::move(data);
+
+        for (int32_t i = 0; i < getNumStages(); i++)
+        {
+            auto& stage = getStageDsc(i);
+
+            const char* pMtlName = getMaterialName(stage.materialStrOffset);
+
+            gEngEnv.pMaterialMan_->loadMaterial(pMtlName);
+        }
 
         return true;
     }
