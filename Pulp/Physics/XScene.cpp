@@ -441,6 +441,31 @@ void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination,
     }
 }
 
+
+void XScene::addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num)
+{
+    for (size_t i = 0; i < num; i++) {
+        const auto& force = Px3FromVec3(pForce[i]);
+        physx::PxRigidBody* pActor = reinterpret_cast<physx::PxRigidBody*>(pHandle[i]);
+
+        if (pActor->getType() != physx::PxActorType::eRIGID_DYNAMIC) {
+            continue;
+        }
+
+        pActor->addForce(force, physx::PxForceMode::eIMPULSE, true);
+    }
+}
+
+void XScene::addTorque(ActorHandle* pHandle, const Vec3f* pTorque, size_t num)
+{
+    for (size_t i = 0; i < num; i++) {
+        const auto& torque = Px3FromVec3(pTorque[i]);
+        physx::PxRigidBody* pActor = reinterpret_cast<physx::PxRigidBody*>(pHandle[i]);
+
+        pActor->addTorque(torque, physx::PxForceMode::eFORCE, true);
+    }
+}
+
 // ------------------------------------------
 
 bool XScene::raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,

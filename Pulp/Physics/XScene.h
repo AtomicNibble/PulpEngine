@@ -54,6 +54,9 @@ public:
     void setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_FINAL;
     void setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_FINAL;
 
+    void addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num) X_FINAL;
+    void addTorque(ActorHandle* pHandle, const Vec3f* pTorque, size_t num) X_FINAL;
+
     // Query stuff
     bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
         RaycastCallback& hitCall, HitFlags hitFlags, QueryFlags queryFlags) const X_FINAL;

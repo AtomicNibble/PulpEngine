@@ -995,6 +995,13 @@ struct IScene
     X_INLINE void setKinematicTarget(ActorHandle handle, const Transformf& destination);
     X_INLINE void setGlobalPose(ActorHandle handle, const Transformf& destination);
 
+    virtual void addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num) X_ABSTRACT;
+    virtual void addTorque(ActorHandle* pHandle, const Vec3f* pTorque, size_t num) X_ABSTRACT;
+
+    X_INLINE void addForce(ActorHandle handle, const Vec3f& force);
+    X_INLINE void addTorque(ActorHandle handle, const Vec3f& torque);
+
+
     // some query api.
     virtual bool raycast(const Vec3f& origin, const Vec3f& unitDir, const float32_t distance,
         RaycastCallback& hitCall, HitFlags hitFlags = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE,
