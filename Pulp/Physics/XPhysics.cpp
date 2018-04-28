@@ -410,10 +410,12 @@ void XPhysics::onTickPostRender(core::TimeVal dtime)
 
         core::TimeVal simTime = pStepper->getSimulationTime();
 
-        size_t numTransforms = 0;
-        pScene->getActiveTransforms(numTransforms);
+#if 0
+		size_t numTransforms = 0;
+		pScene->getActiveTransforms(numTransforms);
 
-        X_LOG0_EVERY_N(30, "Phys", "Sim time: %gms transforms: %" PRIuS, simTime.GetMilliSeconds(), numTransforms);
+		X_LOG0_EVERY_N(30, "Phys", "Sim time: %gms transforms: %" PRIuS, simTime.GetMilliSeconds(), numTransforms);
+#endif
 
         if (stepperType_ == StepperType::INVERTED_FIXED_STEPPER) {
             pStepper->postRender(dtime.GetSeconds());
