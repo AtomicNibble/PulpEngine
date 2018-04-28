@@ -75,6 +75,9 @@ namespace entity
     {
         auto* pModelManager = gEnv->p3DEngine->getModelManager();
 
+        core::ArrayGrowMultiply<physics::ActorHandle> actors(g_gameArena);
+        actors.reserve(128);
+
         {
             auto view = reg.view<TransForm, Mesh, MeshCollider>();
             for (auto entity : view) {
@@ -97,7 +100,7 @@ namespace entity
 
                 pPhysics->updateMassAndInertia(col.actor, 1.f);
 
-                pPhysScene->addActorToScene(col.actor);
+                actors.push_back(col.actor);
             }
         }
 
@@ -127,7 +130,7 @@ namespace entity
 
                 pPhysics->updateMassAndInertia(col.actor, 5.f);
 
-                pPhysScene->addActorToScene(col.actor);
+                actors.push_back(col.actor);
             }
 
 #if 0
@@ -147,10 +150,17 @@ namespace entity
 				// auto a = pPhysics->createSphere(trans, 15.f, 15.5f);
 				auto a = pPhysics->createBox(trans, AABB(Vec3f(0, 0, 0), 15.f), 15.f);
 #endif
-				pPhysScene->addActorToScene(a);
+                actors.push_back(a);
 			}
 #endif
         }
+
+        if (actors.isNotEmpty()) {
+            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
+
+            pPhysScene->addActorsToScene(actors.data(), actors.size());
+        }
+
 
         return true;
     }
