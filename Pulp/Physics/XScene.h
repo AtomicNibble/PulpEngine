@@ -71,8 +71,8 @@ public:
     IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_FINAL;
 
     // get shit that's moved.
-    const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_FINAL;
-    const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_FINAL;
+    core::span<const ActiveTransform> getActiveTransforms(void) X_FINAL;
+    core::span<const TriggerPair> getTriggerPairs(void) X_FINAL;
 
     // PxSimulationEventCallback
     virtual void onConstraintBreak(physx::PxConstraintInfo* constraints, physx::PxU32 count) X_FINAL;

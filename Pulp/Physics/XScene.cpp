@@ -536,19 +536,17 @@ IBatchedQuery* XScene::createBatchQuery(const QueryMemory& desc)
 
 // ------------------------------------------
 
-const ActiveTransform* XScene::getActiveTransforms(size_t& numTransformsOut)
+core::span<const ActiveTransform> XScene::getActiveTransforms(void)
 {
     physx::PxU32 num = 0;
     const physx::PxActiveTransform* pTrans = pScene_->getActiveTransforms(num);
 
-    numTransformsOut = num;
-    return reinterpret_cast<const ActiveTransform*>(pTrans);
+    return core::make_span(reinterpret_cast<const ActiveTransform*>(pTrans), num);
 }
 
-const TriggerPair* XScene::getTriggerPairs(size_t& numTriggerPairs)
+core::span<const TriggerPair> XScene::getTriggerPairs(void)
 {
-    numTriggerPairs = triggerPairs_.size();
-    return triggerPairs_.data();
+    return core::make_span(triggerPairs_);
 }
 
 // ------------------------------------------

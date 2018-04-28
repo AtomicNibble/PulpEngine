@@ -1017,8 +1017,8 @@ struct IScene
     virtual IBatchedQuery* createBatchQuery(const QueryMemory& desc) X_ABSTRACT;
 
     // post simulation results.
-    virtual const ActiveTransform* getActiveTransforms(size_t& numTransformsOut) X_ABSTRACT;
-    virtual const TriggerPair* getTriggerPairs(size_t& numTriggerPairs) X_ABSTRACT;
+    virtual core::span<const ActiveTransform> getActiveTransforms(void) X_ABSTRACT;
+    virtual core::span<const TriggerPair> getTriggerPairs(void) X_ABSTRACT;
 };
 
 X_INLINE void IScene::addActorToScene(ActorHandle handle)

@@ -29,13 +29,18 @@ namespace entity
     {
         X_UNUSED(frame, reg, pPhysScene);
 
-        size_t numTransForms;
-        auto* pTransforms = pPhysScene->getActiveTransforms(numTransForms);
-        size_t numTriggerPairs;
-        auto* pTriggerPairs = pPhysScene->getTriggerPairs(numTriggerPairs);
+        core::span<const physics::ActiveTransform> transforms;
+        core::span<const physics::TriggerPair> triggers;
 
-        for (size_t i = 0; i < numTransForms; i++) {
-            auto& trans = pTransforms[i];
+        {
+            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Read);
+            
+            transforms = pPhysScene->getActiveTransforms();
+            triggers = pPhysScene->getTriggerPairs();
+        }
+
+        for (int32_t i = 0; i < transforms.size(); i++) {
+            auto& trans = transforms[i];
 
             if (!trans.userData) {
                 continue;
@@ -60,8 +65,8 @@ namespace entity
             }
         }
 
-        for (size_t i = 0; i < numTriggerPairs; i++) {
-            auto& trigPair = pTriggerPairs[i];
+        for (int32_t i = 0; i < triggers.size(); i++) {
+            auto& trigPair = triggers[i];
             X_UNUSED(trigPair);
         }
     }
