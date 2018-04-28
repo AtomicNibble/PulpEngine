@@ -77,6 +77,7 @@ class AssetLoader
     };
 
     X_ENSURE_LE(sizeof(AssetLoadRequest), 64, "AssetLoadRequest should be less than 64 bytes")
+
     typedef core::Array<AssetLoadRequest*> AssetLoadRequestArr;
     typedef core::Fifo<AssetBase*> AssetQueue;
 
