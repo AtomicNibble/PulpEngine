@@ -64,25 +64,6 @@ namespace weapon
             }
         }
 
-        // wait for them to load.
-        for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
-            if (animations_[i] != nullptr) {
-                pAnimManager->waitForLoad(animations_[i]);
-            }
-        }
-
-        for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
-            if (icons_[i] != nullptr) {
-                pMaterialMan->waitForLoad(icons_[i]);
-            }
-        }
-
-        for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
-            if (hdr_.effectSlots[i] != 0) {
-                pEffectMan->waitForLoad(effects_[i]);
-            }
-        }
-
         return true;
     }
 
@@ -90,6 +71,40 @@ namespace weapon
     {
         X_UNUSED(oth);
         X_ASSERT_NOT_IMPLEMENTED();
+    }
+
+    bool WeaponDef::waitForLoadDep(void) const
+    {
+        auto* p3DEngine = gEnv->p3DEngine;
+        auto* pAnimManager = p3DEngine->getAnimManager();
+        auto* pMaterialMan = p3DEngine->getMaterialManager();
+        auto* pEffectMan = p3DEngine->getEffectManager();
+
+        for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
+            if (animations_[i] != nullptr) {
+                if (!pAnimManager->waitForLoad(animations_[i])) {
+                    return false;
+                }
+            }
+        }
+
+        for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
+            if (icons_[i] != nullptr) {
+                if (!pMaterialMan->waitForLoad(icons_[i])) {
+                    return false;
+                }
+            }
+        }
+
+        for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
+            if (hdr_.effectSlots[i] != 0) {
+                if (!pEffectMan->waitForLoad(effects_[i])) {
+                    return false;
+                }
+            }
+        }
+
+        return true;
     }
 
 } // namespace weapon
