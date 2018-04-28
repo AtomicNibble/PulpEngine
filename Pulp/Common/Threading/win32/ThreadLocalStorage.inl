@@ -29,6 +29,12 @@ inline void ThreadLocalStorage::SetValue(void* value)
     }
 }
 
+inline void ThreadLocalStorage::SetValueInt(intptr_t value)
+{
+    SetValue(reinterpret_cast<void*>(value));
+}
+
+
 template<typename T>
 inline T* ThreadLocalStorage::GetValue(void) const
 {
@@ -42,4 +48,11 @@ inline T* ThreadLocalStorage::GetValue(void) const
     }
 
     return static_cast<T*>(data);
+}
+
+inline intptr_t ThreadLocalStorage::GetValueInt(void) const
+{
+    void* pData = GetValue<void>();
+
+    return reinterpret_cast<intptr_t>(pData);
 }

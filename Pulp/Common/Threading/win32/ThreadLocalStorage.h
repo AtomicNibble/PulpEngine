@@ -44,10 +44,13 @@ public:
 
     /// Associate data with the calling thread.
     inline void SetValue(void* value);
+    inline void SetValueInt(intptr_t value);
 
     /// Retrieve data from thread local storage for the calling thread.
     template<typename T>
     inline T* GetValue(void) const;
+    inline intptr_t GetValueInt(void) const;
+
 
 private:
     X_NO_COPY(ThreadLocalStorage);
