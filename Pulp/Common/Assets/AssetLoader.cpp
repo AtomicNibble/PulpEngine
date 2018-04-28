@@ -2,8 +2,10 @@
 #include "AssetLoader.h"
 #include "AssetBase.h"
 #include <String\AssetName.h>
+#include <String\HumanDuration.h>
 #include <Threading\ThreadLocalStorage.h>
 
+#include <ITimer.h>
 #include <IConsole.h>
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
@@ -190,6 +192,8 @@ void AssetLoader::dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedL
 
     auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
 
+    loadReq->dispatchTime = gEnv->pTimer->GetTimeNowReal();
+
     // dispatch IO
     dispatchLoadRequest(loadReq.get());
 
@@ -248,6 +252,18 @@ void AssetLoader::loadRequestCleanup(AssetLoadRequest* pLoadReq)
 {
     auto status = pLoadReq->pAsset->getStatus();
     X_ASSERT(status == core::LoadStatus::Complete || status == core::LoadStatus::Error, "Unexpected load status")(status);
+
+    if(vars_.debugLvl() > 1)
+    {
+        auto now = gEnv->pTimer->GetTimeNowReal();
+        auto ellapsed = now - pLoadReq->dispatchTime;
+        auto* pAsset = pLoadReq->pAsset;
+
+        core::HumanDuration::Str durStr;
+
+        X_LOG0("assetLoader", "^4%s^7 -> \"%s\" loaded in ^6%s", assetDb::AssetType::ToString(pAsset->getType()), 
+            pAsset->getName().c_str(), core::HumanDuration::toString(durStr, ellapsed.GetMilliSeconds()));
+    }
 
     {
         core::CriticalSection::ScopedLock lock(loadReqLock_);

@@ -6,6 +6,8 @@
 #include <Containers\Array.h>
 #include <Containers\Fifo.h>
 
+#include <Time\TimeVal.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace V2
@@ -71,8 +73,10 @@ class AssetLoader
         LoadFlags flags;
         ReloadFlags reloadFlags;
         uint16_t _pad;
+        core::TimeVal dispatchTime;
     };
 
+    X_ENSURE_LE(sizeof(AssetLoadRequest), 64, "AssetLoadRequest should be less than 64 bytes")
     typedef core::Array<AssetLoadRequest*> AssetLoadRequestArr;
     typedef core::Fifo<AssetBase*> AssetQueue;
 
