@@ -152,6 +152,11 @@ namespace
             outFile.setExtension(pExt);
         }
 
+        // output exists?
+        if (gEnv->pFileSys->fileExists(outFile.c_str())) {
+            return 1;
+        }
+
         X_LOG0("ImgTool", "Loading: \"%s\"", inFile.c_str());
 
         core::Array<uint8_t> srcImgData(&arena);
