@@ -122,6 +122,10 @@ private:
 
     AssetLoadSinksArr assetsinks_;
     AssetExtArr assetExt_;
+
+#if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+    ThreadLocalStorage processingThreads_;
+#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
 };
 
 X_NAMESPACE_END

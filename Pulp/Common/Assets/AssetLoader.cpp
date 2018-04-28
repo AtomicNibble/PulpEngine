@@ -2,6 +2,7 @@
 #include "AssetLoader.h"
 #include "AssetBase.h"
 #include <String\AssetName.h>
+#include <Threading\ThreadLocalStorage.h>
 
 #include <IConsole.h>
 #include <IFileSys.h>
@@ -133,6 +134,10 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
 
 bool AssetLoader::waitForLoad(AssetBase* pAsset)
 {
+#if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+    X_ASSERT(processingThreads_.GetValueInt() == 0, "Can't waitForLoad inside a asset data job, can deadlock")(processingThreads_.GetValueInt());
+#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+
     if (pAsset->getStatus() == core::LoadStatus::Complete) {
         return true;
     }
@@ -332,7 +337,17 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
     auto* pAsset = pRequest->pAsset;
     auto type = pAsset->getType();
 
-    if (!assetsinks_[type]->processData(pAsset, std::move(pRequest->data), pRequest->dataSize)) {
+#if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+    processingThreads_.SetValueInt(1);
+#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+
+    auto ok = assetsinks_[type]->processData(pAsset, std::move(pRequest->data), pRequest->dataSize);
+
+#if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+    processingThreads_.SetValueInt(0);
+#endif // !X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
+
+    if (!ok) {
         onLoadRequestFail(pRequest);
         return;
     }
