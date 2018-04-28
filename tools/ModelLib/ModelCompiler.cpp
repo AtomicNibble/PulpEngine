@@ -2470,6 +2470,11 @@ bool ModelCompiler::AutoCollisionGen(void)
     colMesh.calBoundingbox();
     colMesh.calBoundingSphere();
 
+    if (colMesh.boundingBox_.isEmpty() || colMesh.boundingBox_.IsInfinate()) {
+        X_ERROR("Model", "Bounding box is not valid for kdop");
+        return false;
+    }
+
     // move the colmesh onto 1st mesh.
     lod0.meshes_[0].colMeshes_.emplace_back(std::move(colMesh));
 
