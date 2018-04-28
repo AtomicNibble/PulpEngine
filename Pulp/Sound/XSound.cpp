@@ -765,6 +765,8 @@ void XSound::performOcclusionChecks(void)
 
             float distance = start.distance(target);
 
+            physics::ScopedLock lock(pScene, physics::LockAccess::Read);
+
             if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC)) {
                 pObject->flags.Set(SoundFlag::Occluded);
 
