@@ -983,10 +983,11 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
 
     // want to take ownership of the data.
     Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
-    pPacket->pData = up.release();
-    pPacket->bitLength = data.getNumbBits();
-    pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(data.getNumbBits()));
+    pPacket->systemHandle = rs.systemHandle;
     pPacket->guid = rs.guid;
+    pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(data.getNumbBits()));
+    pPacket->bitLength = data.getNumbBits();
+    pPacket->pData = up.release();
 
     packetQue_.push(pPacket);
 }
