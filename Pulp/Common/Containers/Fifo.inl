@@ -250,9 +250,7 @@ bool Fifo<T>::contains_if(UnaryPredicate p) const
 template<typename T>
 void Fifo<T>::reserve(size_type num)
 {
-    X_ASSERT(start_ == nullptr, "Cannot reserve additional memory. free() the FIFO first.")
-    (
-        size(), capacity(), start_, end_, num);
+    X_ASSERT(start_ == nullptr, "Cannot reserve additional memory. free() the FIFO first.")(size(), capacity(), start_, end_, num);
 
     start_ = Allocate(num);
     end_ = start_ + num;
