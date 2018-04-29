@@ -280,7 +280,7 @@ struct Packet
 {
     X_INLINE MessageID::Enum getID(void) const
     {
-        X_ASSERT(length > 0, "Can't read id fro m empty message")(length, bitLength);
+        X_ASSERT(length > 0, "Can't read id from empty message")(length, bitLength);
         return static_cast<MessageID::Enum>(pData[0]);
     }
     X_INLINE uint8_t* begin(void)
