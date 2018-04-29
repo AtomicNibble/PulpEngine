@@ -48,7 +48,7 @@ namespace
             X_LOG0("ServerTest", "Starting as server");
 
             net::SocketDescriptor sd(SERVER_PORT);
-            auto res = pPeer->init(16, &sd, 1);
+            auto res = pPeer->init(16, sd);
             if (res != net::StartupResult::Started) {
                 return;
             }
@@ -60,7 +60,7 @@ namespace
             X_LOG0("ServerTest", "Starting as client");
 
             net::SocketDescriptor sd;
-            auto res = pPeer->init(1, &sd, 1);
+            auto res = pPeer->init(1, sd);
 
             if (res != net::StartupResult::Started) {
                 return;

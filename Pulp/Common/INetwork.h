@@ -3,6 +3,7 @@
 #include <Time\TimeVal.h>
 #include <Time\DateStamp.h>
 #include <Util\EndianUtil.h>
+#include <Util\Span.h>
 
 #include <NetMsgIds.h>
 
@@ -319,8 +320,9 @@ struct IPeer
 {
     virtual ~IPeer() = default;
 
-    virtual StartupResult::Enum init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
-        size_t socketDescriptorCount) X_ABSTRACT;
+    virtual StartupResult::Enum init(int32_t maxConnections, core::span<SocketDescriptor> socketDescriptors) X_ABSTRACT;
+    X_INLINE StartupResult::Enum init(int32_t maxConnections, SocketDescriptor& socketDescriptors);
+
     virtual void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
         PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_ABSTRACT;
 
@@ -390,6 +392,11 @@ struct IPeer
 
     virtual NetBandwidthStatistics getBandwidthStatistics(void) const X_ABSTRACT;
 };
+
+X_INLINE StartupResult::Enum IPeer::init(int32_t maxConnections, SocketDescriptor& socketDescriptors)
+{
+    return init(maxConnections, core::make_span(&socketDescriptors, 1));
+}
 
 X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel)

@@ -295,8 +295,7 @@ XPeer::~XPeer()
     shutdown(0_tv);
 }
 
-StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocketDescriptors,
-    size_t socketDescriptorCount)
+StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<SocketDescriptor> socketDescriptors)
 {
     bufferdCmds_.reserve(256);
     packetQue_.reserve(256);
@@ -307,7 +306,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
     if (maxConnections < 1) {
         return StartupResult::InvalidMaxCon;
     }
-    if (!pSocketDescriptors || socketDescriptorCount < 1) {
+    if (socketDescriptors.size() < 1) {
         return StartupResult::InvalidSocketDescriptors;
     }
 
@@ -335,8 +334,8 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, SocketDescriptor* pSocke
     bindParam.IPHdrIncl = false;
     bindParam.broadCast = true;
 
-    for (size_t i = 0; i < socketDescriptorCount; i++) {
-        SocketDescriptor& socketDiscriptor = pSocketDescriptors[i];
+    for (int32_t i = 0; i < socketDescriptors.size(); i++) {
+        SocketDescriptor& socketDiscriptor = socketDescriptors[i];
 
         NetSocket socket(vars_);
         bindParam.hostAdd = socketDiscriptor.getHostAdd();

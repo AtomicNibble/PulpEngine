@@ -14,14 +14,14 @@ TEST(net, msgSizeTest)
     net::SocketDescriptor sd(SERVER_PORT_BASE);
     net::SocketDescriptor sd2(SERVER_PORT_BASE + 1);
 
-    auto res = pServer->init(16, &sd, 1);
+    auto res = pServer->init(16, sd);
     if (res != net::StartupResult::Started) {
         return;
     }
 
     pServer->setMaximumIncomingConnections(8);
 
-    res = pPeer->init(1, &sd2, 1);
+    res = pPeer->init(1, sd2);
     if (res != net::StartupResult::Started) {
         return;
     }
