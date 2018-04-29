@@ -277,7 +277,7 @@ public:
 
     X_INLINE const char* toString(StrBuf& buf)
     {
-        buf.appendFmt("%" PRIu64, val_);
+        buf.appendFmt("0x%" PRIx64, val_);
         return buf.c_str();
     }
 
