@@ -293,39 +293,61 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 
     uint16_t oldPort = address_.addr4.port;
 
-    if (servinfo->ai_family == AF_INET) {
-        static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potentiall buffer overrun.");
+    // support picking a random ip.
+    core::FixedArray<platform::addrinfo*, 8> address;
+    {
+        auto* pCurAddr = servinfo;
 
-        // offset lignup checks,
-        static_assert(X_OFFSETOF(addr4_in, family) == X_OFFSETOF(platform::sockaddr_in, sin_family), "offset mismatch");
-        static_assert(X_OFFSETOF(addr4_in, port) == X_OFFSETOF(platform::sockaddr_in, sin_port), "offset mismatch");
-        static_assert(X_OFFSETOF(addr4_in, addr) == X_OFFSETOF(platform::sockaddr_in, sin_addr), "offset mismatch");
-
-        address_.addr4.family = AddressFamily::INet;
-        std::memcpy(&address_.addr4, (struct platform::sockaddr_in*)servinfo->ai_addr, sizeof(struct platform::sockaddr_in));
+        do
+        {
+            address.push_back(pCurAddr);
+            pCurAddr = pCurAddr->ai_next;
+        } while (pCurAddr && address.size() < address.capacity());
     }
+
+    size_t addrIdx = 0;
+    if (address.size() > 1) {
+        addrIdx = gEnv->xorShift.randIndex(address.size());
+    }
+
+    {
+        auto* pAddress = address[addrIdx];
+
+        if (pAddress->ai_family == AF_INET) {
+            static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potentiall buffer overrun.");
+
+            // offset lignup checks,
+            static_assert(X_OFFSETOF(addr4_in, family) == X_OFFSETOF(platform::sockaddr_in, sin_family), "offset mismatch");
+            static_assert(X_OFFSETOF(addr4_in, port) == X_OFFSETOF(platform::sockaddr_in, sin_port), "offset mismatch");
+            static_assert(X_OFFSETOF(addr4_in, addr) == X_OFFSETOF(platform::sockaddr_in, sin_addr), "offset mismatch");
+
+            address_.addr4.family = AddressFamily::INet;
+            std::memcpy(&address_.addr4, (struct platform::sockaddr_in*)pAddress->ai_addr, sizeof(struct platform::sockaddr_in));
+        }
 #if NET_IPv6_SUPPORT
-    else {
-        X_ASSERT(servinfo->ai_family == AF_INET6, "Unexpected familey")(servinfo->ai_family);
-        X_ASSERT(servinfo->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
+        else {
+            X_ASSERT(pAddress->ai_family == AF_INET6, "Unexpected familey")(pAddress->ai_family);
+            X_ASSERT(pAddress->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
-        static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
+            static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
 
-        // offset lignup checks,
-        static_assert(X_OFFSETOF(addr6_in, family) == X_OFFSETOF(platform::sockaddr_in6, sin6_family), "offset mismatch");
-        static_assert(X_OFFSETOF(addr6_in, port) == X_OFFSETOF(platform::sockaddr_in6, sin6_port), "offset mismatch");
-        static_assert(X_OFFSETOF(addr6_in, flowInfo) == X_OFFSETOF(platform::sockaddr_in6, sin6_flowinfo), "offset mismatch");
-        static_assert(X_OFFSETOF(addr6_in, addr) == X_OFFSETOF(platform::sockaddr_in6, sin6_addr), "offset mismatch");
-        static_assert(X_OFFSETOF(addr6_in, scope_id) == X_OFFSETOF(platform::sockaddr_in6, sin6_scope_id), "offset mismatch");
+            // offset lignup checks,
+            static_assert(X_OFFSETOF(addr6_in, family) == X_OFFSETOF(platform::sockaddr_in6, sin6_family), "offset mismatch");
+            static_assert(X_OFFSETOF(addr6_in, port) == X_OFFSETOF(platform::sockaddr_in6, sin6_port), "offset mismatch");
+            static_assert(X_OFFSETOF(addr6_in, flowInfo) == X_OFFSETOF(platform::sockaddr_in6, sin6_flowinfo), "offset mismatch");
+            static_assert(X_OFFSETOF(addr6_in, addr) == X_OFFSETOF(platform::sockaddr_in6, sin6_addr), "offset mismatch");
+            static_assert(X_OFFSETOF(addr6_in, scope_id) == X_OFFSETOF(platform::sockaddr_in6, sin6_scope_id), "offset mismatch");
 
-        address_.addr4.family = AddressFamily::INet6;
-        std::memcpy(&address_.addr6, (struct platform::sockaddr_in6*)servinfo->ai_addr, sizeof(struct platform::sockaddr_in6));
-    }
+            address_.addr4.family = AddressFamily::INet6;
+            std::memcpy(&address_.addr6, (struct platform::sockaddr_in6*)pAddress->ai_addr, sizeof(struct platform::sockaddr_in6));
+        }
 #else
-    else {
-        X_ASSERT_UNREACHABLE();
-    }
+        else {
+            X_ASSERT_UNREACHABLE();
+        }
 #endif // !NET_IPv6_SUPPORT
+
+    }
 
     platform::freeaddrinfo(servinfo); // free the linked list
 
