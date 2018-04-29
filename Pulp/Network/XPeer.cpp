@@ -295,7 +295,7 @@ XPeer::~XPeer()
     shutdown(0_tv);
 }
 
-StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<SocketDescriptor> socketDescriptors)
+StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors)
 {
     bufferdCmds_.reserve(256);
     packetQue_.reserve(256);
@@ -335,7 +335,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<SocketDescrip
     bindParam.broadCast = true;
 
     for (int32_t i = 0; i < socketDescriptors.size(); i++) {
-        SocketDescriptor& socketDiscriptor = socketDescriptors[i];
+        const SocketDescriptor& socketDiscriptor = socketDescriptors[i];
 
         NetSocket socket(vars_);
         bindParam.hostAdd = socketDiscriptor.getHostAdd();

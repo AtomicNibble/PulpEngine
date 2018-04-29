@@ -320,8 +320,8 @@ struct IPeer
 {
     virtual ~IPeer() = default;
 
-    virtual StartupResult::Enum init(int32_t maxConnections, core::span<SocketDescriptor> socketDescriptors) X_ABSTRACT;
-    X_INLINE StartupResult::Enum init(int32_t maxConnections, SocketDescriptor& socketDescriptors);
+    virtual StartupResult::Enum init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors) X_ABSTRACT;
+    X_INLINE StartupResult::Enum init(int32_t maxConnections, const  SocketDescriptor& socketDescriptors);
 
     virtual void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
         PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_ABSTRACT;
@@ -393,7 +393,7 @@ struct IPeer
     virtual NetBandwidthStatistics getBandwidthStatistics(void) const X_ABSTRACT;
 };
 
-X_INLINE StartupResult::Enum IPeer::init(int32_t maxConnections, SocketDescriptor& socketDescriptors)
+X_INLINE StartupResult::Enum IPeer::init(int32_t maxConnections, const SocketDescriptor& socketDescriptors)
 {
     return init(maxConnections, core::make_span(&socketDescriptors, 1));
 }
