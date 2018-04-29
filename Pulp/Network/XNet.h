@@ -2,6 +2,8 @@
 
 #include "Vars\NetVars.h"
 
+#include <Util\UniquePointer.h>
+
 X_NAMESPACE_DECLARE(core,
                     struct ICVar;
                     struct IConsoleCmdArgs;)
@@ -84,7 +86,7 @@ private:
     PeerArr peers_;
     NetVars vars_;
 
-    Session* pSession_;
+    core::UniquePointer<Session> pSession_;
 };
 
 X_NAMESPACE_END

@@ -19,8 +19,7 @@ X_NAMESPACE_BEGIN(net)
 
 XNet::XNet(core::MemoryArenaBase* arena) :
     arena_(arena),
-    pInitJob_(nullptr),
-    pSession_(nullptr)
+    pInitJob_(nullptr)
 {
 }
 
@@ -152,13 +151,13 @@ bool XNet::createSession(IPeer* pPeer)
         return false;
     }
 
-    pSession_ = X_NEW(Session, arena_, "NetSession")(pPeer, arena_);
+    pSession_ = core::makeUnique<Session>(arena_, pPeer, arena_);
     return true;
 }
 
 ISession* XNet::getSession(void)
 {
-    return pSession_;
+    return pSession_.get();
 }
 
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
