@@ -82,7 +82,7 @@ struct TextDrawContext
     X_INLINE TextDrawContext() :
         size(16.f, 16.f),
         widthScale(1.f),
-        effectId(-1),
+        effectId(0),
         flags(0),
         pFont(nullptr)
     {
