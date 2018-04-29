@@ -5,6 +5,8 @@
 #include <String\HumanSize.h>
 #include <Time\StopWatch.h>
 
+#include <Hashing\Fnva1Hash.h>
+
 #define _LAUNCHER
 #include <ModuleExports.h>
 
@@ -124,6 +126,71 @@ namespace
 
         pNet->deletePeer(pPeer);
     }
+
+    void RunEchoServer(core::Console& Console)
+    {
+        net::INet* pNet = gEnv->pNet;
+        net::IPeer* pPeer = pNet->createPeer();
+
+        Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - EchoServer");
+        Console.MoveTo(3000, 10);
+
+        X_LOG0("EchoServer", "Starting...");
+
+        net::SocketDescriptor sd(SERVER_PORT);
+        auto res = pPeer->init(16, sd);
+        if (res != net::StartupResult::Started) {
+            return;
+        }
+        
+        pPeer->setMaximumIncomingConnections(16);
+
+        X_LOG0("EchoServer", "Waiting for packets..");
+
+        while (1) {
+            pPeer->runUpdate();
+
+            net::Packet* pPacket = nullptr;
+            for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive()) {
+                X_LOG0("EchoServer", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+
+                core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+                if (pPacket->getID() == net::MessageID::ChatMsg) {
+                    char buf[256] = { '\0' };
+
+                    auto len = bs.read<int16_t>();
+                    bs.read(buf, len);
+
+                    X_LOG0("Char", "Msg: %s", buf);
+
+                    // send it back lol?
+                    core::FixedBitStreamStack<256> bsOut;
+
+                    bsOut.write(net::MessageID::ChatMsg);
+                    bsOut.write(len);
+                    bsOut.write(buf, len);
+
+                    pPeer->send(bsOut.data(), bsOut.sizeInBytes(), net::PacketPriority::High,
+                        net::PacketReliability::Reliable, pPacket->systemHandle);
+                }
+
+            }
+
+            // sleep, as other thread will handle incoming requests and buffer then for us.
+            core::Thread::Sleep(10);
+
+            char key = Console.ReadKey();
+            if (key == 'X') {
+                break;
+            }
+        }
+
+        pPeer->shutdown(core::TimeVal::fromMS(500));
+        pNet->deletePeer(pPeer);
+    }
+
+
 } // namespace
 
 const char* googleTestResTostr(int nRes)
@@ -134,6 +201,12 @@ const char* googleTestResTostr(int nRes)
     return "ERROR";
 }
 
+X_DECLARE_ENUM(Mode)(
+    UnitTests,
+    ClientTest,
+    EchoServer
+);
+
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
@@ -141,6 +214,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 {
     X_UNUSED(hPrevInstance);
     X_UNUSED(nCmdShow);
+
+    using namespace core::Hash::Literals;
 
     {
         core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Network Tests");
@@ -155,8 +230,34 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         EngineApp engine;
 
         if (engine.Init(hInstance, lpCmdLine, Console)) {
-            if (1) // gtest
-            {
+
+            const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
+
+            Mode::Enum mode = Mode::UnitTests;
+
+            if (pMode) {
+                core::StackString<96, char> strLower(pMode);
+                strLower.toLower();
+
+                switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length()))
+                {
+                    case "unit"_fnv1a:
+                    case "unittests"_fnv1a:
+                        mode = Mode::UnitTests;
+                        break;
+                    case "client"_fnv1a:
+                        mode = Mode::ClientTest;
+                        break;
+                    case "echo"_fnv1a:
+                        mode = Mode::EchoServer;
+                        break;
+                    default:
+                        X_ERROR("Network", "Unknown mode: \"%s\"", strLower.c_str());
+                        return -1;
+                }
+            }
+
+            if (mode == Mode::UnitTests) {
                 ::testing::GTEST_FLAG(filter) = "*OrderedPacketsTest*";
 
                 X_LOG0("TESTS", "Running unit tests...");
@@ -166,10 +267,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                 X_LOG0("TESTS", "Tests Complete result: %s", googleTestResTostr(nRes));
             }
-            else {
+            else if (mode == Mode::ClientTest) {
                 // start instance as server or client.
                 // please talk to me... :X
                 ClientServerSelector(Console);
+            }
+            else if (mode == Mode::EchoServer) {
+                RunEchoServer(Console);
+            }
+            else {
+                X_ASSERT_UNREACHABLE();
             }
         }
 
