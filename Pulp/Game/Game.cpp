@@ -47,11 +47,13 @@ X_LINK_ENGINE_LIB("ImgLib")
 X_LINK_ENGINE_LIB("ShaderLib")
 X_LINK_ENGINE_LIB("ModelLib")
 X_LINK_ENGINE_LIB("AnimLib")
+X_LINK_ENGINE_LIB("FontLib")
 
 X_FORCE_LINK_FACTORY("XConverterLib_Img")
 X_FORCE_LINK_FACTORY("XConverterLib_Shader")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Anim")
+X_FORCE_LINK_FACTORY("XConverterLib_Font")
 
 #endif // !X_LIB
 
