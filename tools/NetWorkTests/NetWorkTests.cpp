@@ -128,8 +128,9 @@ namespace
 
 const char* googleTestResTostr(int nRes)
 {
-    if (nRes == 0)
+    if (nRes == 0) {
         return "SUCCESS";
+    }
     return "ERROR";
 }
 
