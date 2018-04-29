@@ -235,12 +235,51 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
     const char* pPort = core::strUtil::Find(pBegin, pEnd, portDelineator);
     if (pPort) {
         hostStr.set(pBegin, pPort);
-        portStr.set(pPort, pEnd);
+        portStr.set(pPort + 1, pEnd);
     }
     else {
         hostStr.set(pBegin, pEnd);
     }
 
+    const uint16_t oldPort = address_.addr4.port;
+
+    AddressArr address;
+    if (!resolve(hostStr, isHost, address, ipVersion)) {
+        return false;
+    }
+
+    X_ASSERT(address.isNotEmpty(), "Empty address list")();
+
+    // pick a random one.
+    size_t idx = 0;
+    if (address.size() > 1) {
+        idx = gEnv->xorShift.randIndex(address.size());
+    }
+
+    const auto& newAddress = address[idx];
+
+    address_ = newAddress.address_;
+
+    // port?
+    if (portStr.isNotEmpty()) {
+        X_ASSERT(core::strUtil::IsNumeric(portStr.begin(), portStr.end()), "PortStr is not numeric")(portStr.c_str());
+
+        uint16_t port = core::strUtil::StringToInt<uint16_t>(portStr.c_str());
+        address_.addr4.port = platform::htons(port);
+
+#if X_DEBUG
+        portPeekVal_ = platform::ntohs(address_.addr4.port);
+#endif // !X_DEBUG
+    }
+    else {
+        address_.addr4.port = oldPort;
+    }
+
+    return true;
+}
+
+bool SystemAddressEx::resolve(const HostStr& hostStr, bool isHost, AddressArr& address, IpVersion::Enum ipVersion)
+{
     // resolve
     platform::addrinfo hints, *servinfo = nullptr;
     memset(&hints, 0, sizeof hints);
@@ -291,29 +330,13 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
 
     X_ASSERT(servinfo != 0, "ServerInfo not valid")(servinfo);
 
-    uint16_t oldPort = address_.addr4.port;
+    auto* pCurAddr = servinfo;
 
-    // support picking a random ip.
-    core::FixedArray<platform::addrinfo*, 8> address;
+    do
     {
-        auto* pCurAddr = servinfo;
+        SystemAddressEx addr;
 
-        do
-        {
-            address.push_back(pCurAddr);
-            pCurAddr = pCurAddr->ai_next;
-        } while (pCurAddr && address.size() < address.capacity());
-    }
-
-    size_t addrIdx = 0;
-    if (address.size() > 1) {
-        addrIdx = gEnv->xorShift.randIndex(address.size());
-    }
-
-    {
-        auto* pAddress = address[addrIdx];
-
-        if (pAddress->ai_family == AF_INET) {
+        if (pCurAddr->ai_family == AF_INET) {
             static_assert(sizeof(address_.addr4) == sizeof(struct platform::sockaddr_in), "Potentiall buffer overrun.");
 
             // offset lignup checks,
@@ -321,13 +344,13 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
             static_assert(X_OFFSETOF(addr4_in, port) == X_OFFSETOF(platform::sockaddr_in, sin_port), "offset mismatch");
             static_assert(X_OFFSETOF(addr4_in, addr) == X_OFFSETOF(platform::sockaddr_in, sin_addr), "offset mismatch");
 
-            address_.addr4.family = AddressFamily::INet;
-            std::memcpy(&address_.addr4, (struct platform::sockaddr_in*)pAddress->ai_addr, sizeof(struct platform::sockaddr_in));
+            addr.address_.addr4.family = AddressFamily::INet;
+            std::memcpy(&addr.address_.addr4, (struct platform::sockaddr_in*)pCurAddr->ai_addr, sizeof(struct platform::sockaddr_in));
         }
 #if NET_IPv6_SUPPORT
         else {
-            X_ASSERT(pAddress->ai_family == AF_INET6, "Unexpected familey")(pAddress->ai_family);
-            X_ASSERT(pAddress->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
+            X_ASSERT(pCurAddr->ai_family == AF_INET6, "Unexpected familey")(pCurAddr->ai_family);
+            X_ASSERT(pCurAddr->ai_addrlen == sizeof(struct platform::sockaddr_in6), "Address length is diffrent than expected")(servinfo->ai_addrlen, sizeof(struct platform::sockaddr_in6));
 
             static_assert(sizeof(address_.addr6) == sizeof(struct platform::sockaddr_in6), "Potentiall buffer overrun.");
 
@@ -338,8 +361,8 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
             static_assert(X_OFFSETOF(addr6_in, addr) == X_OFFSETOF(platform::sockaddr_in6, sin6_addr), "offset mismatch");
             static_assert(X_OFFSETOF(addr6_in, scope_id) == X_OFFSETOF(platform::sockaddr_in6, sin6_scope_id), "offset mismatch");
 
-            address_.addr4.family = AddressFamily::INet6;
-            std::memcpy(&address_.addr6, (struct platform::sockaddr_in6*)pAddress->ai_addr, sizeof(struct platform::sockaddr_in6));
+            addr.address_.addr4.family = AddressFamily::INet6;
+            std::memcpy(&addr.address_.addr6, (struct platform::sockaddr_in6*)pCurAddr->ai_addr, sizeof(struct platform::sockaddr_in6));
         }
 #else
         else {
@@ -347,23 +370,13 @@ bool SystemAddressEx::fromString(const char* pBegin, const char* pEnd, bool isHo
         }
 #endif // !NET_IPv6_SUPPORT
 
-    }
+        address.emplace_back(std::move(addr));
+
+        pCurAddr = pCurAddr->ai_next;
+
+    } while (pCurAddr && address.size() < address.capacity());
 
     platform::freeaddrinfo(servinfo); // free the linked list
-
-    // port?
-    if (portStr.isNotEmpty()) {
-        uint16_t port = core::strUtil::StringToInt<uint16_t>(portStr.c_str());
-        address_.addr4.port = platform::htons(port);
-
-#if X_DEBUG
-        portPeekVal_ = platform::ntohs(address_.addr4.port);
-#endif // !X_DEBUG
-    }
-    else {
-        address_.addr4.port = oldPort;
-    }
-
     return true;
 }
 

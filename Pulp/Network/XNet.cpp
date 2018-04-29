@@ -175,6 +175,21 @@ bool XNet::systemAddressFromHost(const HostStr& host, Port port, SystemAddress& 
     return true;
 }
 
+bool XNet::systemAddressFromHost(const HostStr& host, SystemAddressResolveArr& out, IpVersion::Enum ipVersion) const
+{
+    SystemAddressEx::AddressArr address;
+    if (!SystemAddressEx::resolve(host, true, address, ipVersion)) {
+        return false;
+    }
+
+    for (auto& a : address) {
+        out.emplace_back(a);
+    }
+
+    return true;
+}
+
+
 const char* XNet::systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const
 {
     const SystemAddressEx& sa = static_cast<const SystemAddressEx&>(systemAddress);
@@ -379,20 +394,31 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
         }
     }
 
-    HostStr hostStr(pHost);
-    SystemAddressEx address;
-
     core::StopWatch timer;
 
-    if (!systemAddressFromHost(hostStr, address, ipVersion)) {
+    HostStr hostStr(pHost);
+    SystemAddressEx::AddressArr address;
+
+    if (!SystemAddressEx::resolve(hostStr, true, address, ipVersion)) {
         X_WARNING("Net", "Failed to resolve");
         return;
     }
 
     IPStr ipStr;
-    address.toString(ipStr);
+    
+    if (address.size() == 1) {
+        X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", hostStr.c_str(), address.front().toString(ipStr), timer.GetMilliSeconds());
+    }
+    else {
 
-    X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", hostStr.c_str(), ipStr.c_str(), timer.GetMilliSeconds());
+        X_LOG0("Net", "Host: \"%s\" ^6%gms", hostStr.c_str(), timer.GetMilliSeconds());
+        X_LOG_BULLET;
+
+        for (auto& a : address) {
+            X_LOG0("Net", "Address: \"%s\"", a.toString(ipStr));
+        }
+    }
+
 }
 
 X_NAMESPACE_END

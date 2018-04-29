@@ -4,8 +4,12 @@
 
 X_NAMESPACE_BEGIN(net)
 
+
 class SystemAddressEx : public SystemAddress
 {
+public:
+    typedef core::FixedArray<SystemAddressEx, MAX_RESOLVE_ADDR> AddressArr;
+
 public:
     SystemAddressEx();
 
@@ -27,7 +31,9 @@ public:
     bool fromHost(const HostStr& host, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
     bool fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
 
-    static bool isValidIP(const IPStr& ip, IpVersion::Enum ipVersion = IpVersion::Any);
+    static bool resolve(const HostStr& hostStr, bool isHost, AddressArr& address, IpVersion::Enum ipVersion);
+
+    static bool isValidIP(const IPStr& ip, IpVersion::Enum ipVersion);
 
 private:
     bool fromString(const char* pBegin, const char* pEnd, bool isHost, char portDelineator, IpVersion::Enum ipVersion);

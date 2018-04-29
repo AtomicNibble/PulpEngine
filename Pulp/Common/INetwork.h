@@ -16,6 +16,11 @@ static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increase
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 
+static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will return.
+
+typedef core::FixedArray<SystemAddress, MAX_RESOLVE_ADDR> SystemAddressResolveArr;
+
+
 X_DECLARE_ENUM8(ConnectionState)
 (
     Pending,
@@ -414,6 +419,9 @@ struct INet : public core::IEngineSysBase
     // this can be used to pre-resolve a host before trying to connect to it, since resolving may take a while.
     virtual bool systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
     virtual bool systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
+
+    // Get all address
+    virtual bool systemAddressFromHost(const HostStr& host, SystemAddressResolveArr& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
 
     // the two string logic is passed to platform abstract logic, so you do it via this interface.
     // since the platform lib is only loaded if you have created a instanced of something deriving this interface.
