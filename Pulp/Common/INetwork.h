@@ -16,6 +16,11 @@ static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increase
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 
+
+static const uint32_t MAX_REPLICATION_WORLDS = 4;
+static const uint32_t MAX_ENTS = 1 << 10; // the max of networked ents.
+static const uint32_t MAX_ENTS_FIELDS = 128; // the max fields a ent can sync
+
 static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will return.
 
 typedef core::FixedArray<SystemAddress, MAX_RESOLVE_ADDR> SystemAddressResolveArr;

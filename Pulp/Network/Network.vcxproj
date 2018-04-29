@@ -282,7 +282,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|Win32'">
@@ -294,7 +293,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -317,7 +315,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic - Clang|x64'">
@@ -329,7 +326,6 @@
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -454,6 +450,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Reliability\ReliabilityLayer.h" />
+    <ClInclude Include="Replication\SnapShot.h" />
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
@@ -472,6 +469,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
+    <ClCompile Include="Replication\SnapShot.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
@@ -501,6 +499,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Reliability\ReliabilityLayer.inl" />
+    <None Include="Replication\SnapShot.inl" />
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\BPSTracker.inl" />
     <None Include="Util\RangeList.inl" />

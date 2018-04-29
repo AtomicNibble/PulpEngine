@@ -48,6 +48,12 @@
     <Filter Include="Source Files\Reliability">
       <UniqueIdentifier>{1bbdd2bc-a6ae-43f8-9d23-bb58def7f615}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Replication">
+      <UniqueIdentifier>{e970a551-1c00-4b3c-9d5f-8c6b1e70bd1f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Replication">
+      <UniqueIdentifier>{650a1794-3140-47d0-9821-949200b7c1c8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -98,6 +104,9 @@
     <ClInclude Include="Util\LastErrorWSA.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Replication\SnapShot.h">
+      <Filter>Header Files\Replication</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -136,6 +145,9 @@
     <ClCompile Include="Util\win32\LastErrorWSA.cpp">
       <Filter>Source Files\Util\win32</Filter>
     </ClCompile>
+    <ClCompile Include="Replication\SnapShot.cpp">
+      <Filter>Source Files\Replication</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -158,6 +170,9 @@
     </None>
     <None Include="Util\SystemAddressEx.inl">
       <Filter>Header Files\Util</Filter>
+    </None>
+    <None Include="Replication\SnapShot.inl">
+      <Filter>Header Files\Replication</Filter>
     </None>
   </ItemGroup>
 </Project>
