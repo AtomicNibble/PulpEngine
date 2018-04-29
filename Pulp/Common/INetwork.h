@@ -412,6 +412,19 @@ X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, Pack
 
 // ---------------------------------
 
+// A session is like a server state, that uses a IPeer for connections and transport.
+// It's split up like this so that IPeer can be used as like a TCP replacement for misc tasks. (also makes it easy to UnitTest)
+// A session is what's used for game state and snapshots.
+struct ISession
+{
+    virtual ~ISession() = default;
+
+    virtual void runUpdate(void) X_ABSTRACT;
+
+};
+
+// ---------------------------------
+
 struct INet : public core::IEngineSysBase
 {
     virtual ~INet() = default;
@@ -420,6 +433,10 @@ struct INet : public core::IEngineSysBase
 
     virtual IPeer* createPeer(void) X_ABSTRACT;
     virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;
+
+    // Creates the session, with the given peer for transport.
+    virtual bool createSession(IPeer* pPeer) X_ABSTRACT;
+    virtual ISession* getSession(void) X_ABSTRACT;
 
     // ipv4/6 address with optional trailing |port, or explicit port.
     // specify what ip version you want the returned address to be. aka asking for a ipv6 address of '127.0.0.1'
@@ -439,5 +456,6 @@ struct INet : public core::IEngineSysBase
     // since the platform lib is only loaded if you have created a instanced of something deriving this interface.
     virtual const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort = true) const X_ABSTRACT;
 };
+
 
 X_NAMESPACE_END

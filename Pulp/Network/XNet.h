@@ -15,6 +15,8 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(net)
 
 class XPeer;
+class Session;
+
 class XNet : public INet
 {
     typedef core::FixedArray<XPeer*, MAX_PEERS> PeerArr;
@@ -38,6 +40,10 @@ public:
 
     IPeer* createPeer(void) X_FINAL;
     void deletePeer(IPeer* pPeer) X_FINAL;
+
+    bool createSession(IPeer* pPeer) X_FINAL;
+    ISession* getSession(void) X_FINAL;
+
 
     bool systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
     bool systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
@@ -66,6 +72,8 @@ private:
     void Cmd_addBan(core::IConsoleCmdArgs* pCmd);
     void Cmd_removeBan(core::IConsoleCmdArgs* pCmd);
     void Cmd_resolveHost(core::IConsoleCmdArgs* pCmd);
+    void Cmd_connect(core::IConsoleCmdArgs* pCmd);
+    void Cmd_chat(core::IConsoleCmdArgs* pCmd);
 
 private:
     core::MemoryArenaBase* arena_;
@@ -75,6 +83,8 @@ private:
 
     PeerArr peers_;
     NetVars vars_;
+
+    Session* pSession_;
 };
 
 X_NAMESPACE_END

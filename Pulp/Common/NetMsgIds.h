@@ -174,7 +174,11 @@ X_DECLARE_ENUM8(MessageID)
     NatPunchthroughFailed,
     NatPunchthroughSucceeded,
     NatTypeDetectionRequest,
-    NatTypeDetectionResult
+    NatTypeDetectionResult,
+
+    // --- Chat ---
+
+    ChatMsg,
 
 );
 

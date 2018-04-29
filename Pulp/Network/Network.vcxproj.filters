@@ -54,6 +54,12 @@
     <Filter Include="Source Files\Replication">
       <UniqueIdentifier>{650a1794-3140-47d0-9821-949200b7c1c8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Session">
+      <UniqueIdentifier>{683b22c2-350d-47b7-9296-cb2a39d0c61a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Session">
+      <UniqueIdentifier>{706f4401-a0f3-4409-8568-7348653dd346}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -107,6 +113,9 @@
     <ClInclude Include="Replication\SnapShot.h">
       <Filter>Header Files\Replication</Filter>
     </ClInclude>
+    <ClInclude Include="Session\Session.h">
+      <Filter>Header Files\Session</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -147,6 +156,9 @@
     </ClCompile>
     <ClCompile Include="Replication\SnapShot.cpp">
       <Filter>Source Files\Replication</Filter>
+    </ClCompile>
+    <ClCompile Include="Session\Session.cpp">
+      <Filter>Source Files\Session</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

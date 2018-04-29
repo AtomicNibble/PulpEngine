@@ -3,6 +3,8 @@
 #include "XPeer.h"
 
 #include "Util\LibaryStartup.h"
+#include "Session\Session.h"
+
 #include <Time\StopWatch.h>
 
 #include <Time\DateStamp.h>
@@ -17,7 +19,8 @@ X_NAMESPACE_BEGIN(net)
 
 XNet::XNet(core::MemoryArenaBase* arena) :
     arena_(arena),
-    pInitJob_(nullptr)
+    pInitJob_(nullptr),
+    pSession_(nullptr)
 {
 }
 
@@ -48,6 +51,13 @@ void XNet::registerCmds(void)
 
     ADD_COMMAND_MEMBER("net_resolve", this, XNet, &XNet::Cmd_resolveHost, core::VarFlag::SYSTEM,
         "Resolves a given host, result is logged. <host>, <forceIpVersion(ipv4|ipv6)>");
+
+    // Breaking the naming convention ! tut tut ;(
+    ADD_COMMAND_MEMBER("connect", this, XNet, &XNet::Cmd_connect, core::VarFlag::SYSTEM,
+        "Connect to server <address>");
+
+    ADD_COMMAND_MEMBER("net_chat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM,
+        "Send a chat message");
 }
 
 bool XNet::init(void)
@@ -135,6 +145,22 @@ void XNet::deletePeer(IPeer* pIPeer)
     X_DELETE(pPeer, arena_);
 }
 
+bool XNet::createSession(IPeer* pPeer)
+{
+    if (pSession_) {
+        X_ERROR("Net", "Can't create session, session already active");
+        return false;
+    }
+
+    pSession_ = X_NEW(Session, arena_, "NetSession")(pPeer, arena_);
+    return true;
+}
+
+ISession* XNet::getSession(void)
+{
+    return pSession_;
+}
+
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
     SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
@@ -188,7 +214,6 @@ bool XNet::systemAddressFromHost(const HostStr& host, SystemAddressResolveArr& o
 
     return true;
 }
-
 
 const char* XNet::systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const
 {
@@ -405,12 +430,11 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
     }
 
     IPStr ipStr;
-    
+
     if (address.size() == 1) {
         X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", hostStr.c_str(), address.front().toString(ipStr), timer.GetMilliSeconds());
     }
     else {
-
         X_LOG0("Net", "Host: \"%s\" ^6%gms", hostStr.c_str(), timer.GetMilliSeconds());
         X_LOG_BULLET;
 
@@ -418,7 +442,54 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
             X_LOG0("Net", "Address: \"%s\"", a.toString(ipStr));
         }
     }
+}
 
+void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
+{
+    if (!pSession_) {
+        X_ERROR("Net", "Can't connect no active session");
+        return;
+    }
+
+    if (pCmd->GetArgCount() < 2) {
+        X_WARNING("Net", "connect <host>");
+        return;
+    }
+
+    const char* pHost = pCmd->GetArg(1);
+    HostStr host(pHost);
+
+    SystemAddressEx sa;
+    if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, IpVersion::Any)) {
+        return;
+    }
+
+    IPStr strBuf;
+    X_LOG0("Net", "Connecting to: \"%s\"", sa.toString(strBuf, true));
+
+    // so how todo this?
+    // just use the peer?
+    auto res = pSession_->getPeer()->connect(sa);
+    if (res != ConnectionAttemptResult::Started) {
+        X_ERROR("Net", "Connection request failed: \"%s\"", ConnectionAttemptResult::ToString(res));
+    }
+}
+
+void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
+{
+    if (!pSession_) {
+        X_ERROR("Net", "Can't chat no active session");
+        return;
+    }
+
+    if (pCmd->GetArgCount() < 2) {
+        X_WARNING("Net", "net_chat <msg>");
+        return;
+    }
+
+    const char* pMsg = pCmd->GetArg(1);
+
+    pSession_->sendChatMsg(pMsg);
 }
 
 X_NAMESPACE_END

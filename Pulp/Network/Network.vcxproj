@@ -451,6 +451,7 @@
   <ItemGroup>
     <ClInclude Include="Reliability\ReliabilityLayer.h" />
     <ClInclude Include="Replication\SnapShot.h" />
+    <ClInclude Include="Session\Session.h" />
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
@@ -470,6 +471,7 @@
   <ItemGroup>
     <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
     <ClCompile Include="Replication\SnapShot.cpp" />
+    <ClCompile Include="Session\Session.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
