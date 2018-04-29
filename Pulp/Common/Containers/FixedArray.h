@@ -87,7 +87,7 @@ public:
 
     inline size_type size(void) const;
     // returns number of elements allocated for
-    inline size_type capacity(void) const;
+    inline constexpr size_type capacity(void) const;
 
     // for STL use
     inline iterator begin(void);
