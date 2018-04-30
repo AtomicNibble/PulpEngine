@@ -674,7 +674,7 @@ void XPhysics::releaseJoint(IJoint* pJoint)
 
 void XPhysics::setActorDebugNamePointer(ActorHandle handle, const char* pNamePointer)
 {
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
 
     // should we lock here?
     actor.setName(pNamePointer);
@@ -682,7 +682,7 @@ void XPhysics::setActorDebugNamePointer(ActorHandle handle, const char* pNamePoi
 
 void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
 {
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
 
     // should we lock here?
     actor.setDominanceGroup(group);
@@ -692,14 +692,14 @@ void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
 
 void XPhysics::setGroup(ActorHandle handle, const GroupFlag::Enum group)
 {
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
 
     filter::SetGroup(actor, group);
 }
 
 void XPhysics::setGroupFlags(ActorHandle handle, const GroupFlags groupFlags)
 {
-    physx::PxRigidActor& actor = *reinterpret_cast<physx::PxRigidActor*>(handle);
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
 
     filter::SetGroupMask(actor, groupFlags);
 }
