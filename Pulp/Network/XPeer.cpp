@@ -815,6 +815,7 @@ void XPeer::sendLoopback(const uint8_t* pData, size_t lengthBytes)
     Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(lengthBytes));
     std::memcpy(pPacket->pData, pData, lengthBytes);
     pPacket->guid = getMyGUID();
+    pPacket->systemHandle = LOOPBACK_SYSTEM_HANDLE;
 
     pushBackPacket(pPacket);
 }
