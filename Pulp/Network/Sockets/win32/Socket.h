@@ -33,7 +33,7 @@ struct BindParameters
 {
     BindParameters();
 
-    HostStr hostAdd;
+    HostStr hostAddr;
     Port port;
     SocketFamily::Enum socketFamily;
     SocketType::Enum socketType;

@@ -170,7 +170,7 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 
             if (!pPtr->ai_next && err == WSAEADDRINUSE)
             {
-                X_WARNING("Net", "Failed to bind socket. Addr \"%s\" Port %" PRIu16 " is in use", bindParameters.hostAdd, bindParameters.port);
+                X_WARNING("Net", "Failed to bind socket. Addr \"%s\" Port %" PRIu16 " is in use", bindParameters.hostAddr, bindParameters.port);
                 return BindResult::AddrInUse;
             }
             

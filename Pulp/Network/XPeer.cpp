@@ -338,7 +338,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         const SocketDescriptor& socketDiscriptor = socketDescriptors[i];
 
         NetSocket socket(vars_);
-        bindParam.hostAdd = socketDiscriptor.getHostAdd();
+        bindParam.hostAddr = socketDiscriptor.getHostAdd();
         bindParam.port = socketDiscriptor.getPort();
         bindParam.socketFamily = socketDiscriptor.getSocketFamiley();
         bindParam.socketType = SocketType::Dgram;
