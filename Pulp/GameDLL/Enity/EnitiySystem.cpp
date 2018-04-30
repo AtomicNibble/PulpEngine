@@ -201,6 +201,8 @@ namespace entity
         auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357");
         weaponDefs_.waitForLoad(pWeaponDef);
 
+        pWeaponDef->waitForLoadDep();
+
         const char* pViewModel = pWeaponDef->getModelSlot(weapon::ModelSlot::Gun);
 
         trans.pos = Vec3f(-110.f, 16.f, 30.f);
