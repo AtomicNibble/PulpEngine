@@ -39,6 +39,8 @@ void Session::runUpdate(void)
                 // it's a chat msg.
                 static char buf[256] = { '\0' };
 
+                core::zero_object(buf);
+
                 auto len = bs.read<int16_t>();
                 bs.read(buf, len);
 
@@ -50,8 +52,12 @@ void Session::runUpdate(void)
                 con.pFont = gEnv->pFontSys->GetDefault();
 
                 Matrix33f ang = Matrix33f::createRotation(Vec3f(1.f,0.f,0.f), ::toRadians(-90.f));
+                
+                static int32_t num = 0;
 
-                pPRim->drawText(Vec3f(0.f,0.f,30.f), ang, con, buf);
+                pPRim->drawText(Vec3f(0.f,0.f,80.f - (num * 18.f)), ang, con, buf);
+
+                num++;
                 break;
             }
 
