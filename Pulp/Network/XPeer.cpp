@@ -1002,9 +1002,9 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
 Packet* XPeer::allocPacket(size_t lengthBits)
 {
     Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
-    pPacket->pData = allocPacketData(core::bitUtil::bitsToBytes(lengthBits));
     pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(lengthBits));
     pPacket->bitLength = safe_static_cast<uint32_t>(lengthBits);
+    pPacket->pData = allocPacketData(core::bitUtil::bitsToBytes(lengthBits));
     return pPacket;
 }
 
