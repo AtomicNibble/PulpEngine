@@ -137,13 +137,12 @@ namespace
 
         X_LOG0("EchoServer", "Starting...");
 
+        pPeer->setMaximumIncomingConnections(16);
         net::SocketDescriptor sd(SERVER_PORT);
         auto res = pPeer->init(16, sd);
         if (res != net::StartupResult::Started) {
             return;
         }
-        
-        pPeer->setMaximumIncomingConnections(16);
 
         X_LOG0("EchoServer", "Waiting for packets..");
 
