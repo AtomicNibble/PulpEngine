@@ -379,6 +379,23 @@ namespace fx
 
                     q = lookatCamQ;
                 }
+                else if (desc.type == StageType::Tail)
+                {
+                    // we don't need todo this per elem.
+                    // all elems are rotated the same.
+                    // and they are rotated forward.
+                    q = Quatf(Vec3f(0.f, 1.f, 0.f), ::toRadians(90.f));
+
+                    // then we need to look at the player
+                    // but just one axis.
+
+
+                }
+
+
+                // for a tail type.
+                // i want to rotate along the longest axis.
+                // 
 
                 for (const auto& e : stage.elems) {
                     float halfWidth = e.width * 0.5f;
