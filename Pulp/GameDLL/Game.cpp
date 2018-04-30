@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Game.h"
 
+#include <INetwork.h>
 #include <IRender.h>
 #include <IConsole.h>
 #include <IFrameData.h>
@@ -20,6 +21,7 @@ XGame::XGame(ICore* pCore) :
     arena_(g_gameArena),
     pCore_(pCore),
     pTimer_(nullptr),
+    pNetSession_(nullptr),
     pRender_(nullptr),
     pFovVar_(nullptr),
     world_(arena_),
@@ -66,9 +68,43 @@ bool XGame::init(void)
     X_ASSERT_NOT_NULL(gEnv->pInput);
     X_ASSERT_NOT_NULL(gEnv->pTimer);
     X_ASSERT_NOT_NULL(gEnv->pRender);
+    X_ASSERT_NOT_NULL(gEnv->pNet);
 
     pTimer_ = gEnv->pTimer;
     pRender_ = gEnv->pRender;
+
+    // networking.
+    {
+        auto* pNet = gEnv->pNet;
+        auto* pPeer = pNet->createPeer();
+
+        pPeer->setMaximumIncomingConnections(4);
+
+        net::Port basePort = 1337;
+        net::Port maxPort = basePort + 10;
+
+        net::SocketDescriptor sd(basePort);
+        auto res = pPeer->init(2, sd);
+
+        while (res == net::StartupResult::SocketPortInUse && sd.getPort() <= maxPort) {
+            sd.setPort(sd.getPort() + 1);
+            res = pPeer->init(2, sd);
+        }
+
+        if (res != net::StartupResult::Started) {
+            X_ERROR("Game", "Failed to setup networking: \"%s\"", net::StartupResult::ToString(res));
+            return false;
+        }
+
+        X_LOG0("Game", "Listening on port ^6%" PRIu16, sd.getPort());
+
+        if (!pNet->createSession(pPeer)) {
+            X_ERROR("Game", "Failed to create net session");
+            return false;
+        }
+
+        pNetSession_ = X_ASSERT_NOT_NULL(pNet->getSession());
+    }
 
     auto deimension = gEnv->pRender->getDisplayRes();
 
@@ -82,6 +118,7 @@ bool XGame::init(void)
 
     userCmdGen_.init();
     weaponDefs_.init();
+
 
     return true;
 }
@@ -131,6 +168,8 @@ bool XGame::update(core::FrameData& frame)
     // and each devices gets input events it's allowed to use.
     // the problem is this data not linked to framedata
     // so
+
+    pNetSession_->runUpdate();
 
     Angles<float> goat;
 

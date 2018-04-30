@@ -15,8 +15,12 @@
 
 #include "Weapon\WeaponManager.h"
 
+X_NAMESPACE_DECLARE(net,
+    struct ISession);
+
 X_NAMESPACE_DECLARE(render,
     struct IRender);
+
 X_NAMESPACE_DECLARE(core,
                     struct ICVar;
                     struct IConsoleCmdArgs);
@@ -53,6 +57,7 @@ private:
     core::MemoryArenaBase* arena_;
 
     ICore* pCore_;
+    net::ISession* pNetSession_;
     render::IRender* pRender_;
     core::ITimer* pTimer_;
     core::ICVar* pFovVar_;
