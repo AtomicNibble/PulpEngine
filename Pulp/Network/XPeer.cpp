@@ -345,10 +345,16 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
 
         BindResult::Enum res = socket.bind(bindParam);
         if (res != BindResult::Success) {
-            if (res != BindResult::FailedToBind) {
-                return StartupResult::SocketFailedToBind;
+            static_assert(BindResult::ENUM_COUNT == 4, "More bind results?");
+
+            // map to startup result.
+            if (res == BindResult::AddrInUse) {
+                return StartupResult::SocketPortInUse;
             }
-            if (res != BindResult::SendTestFailed) {
+            if (res == BindResult::SendTestFailed) {
+                return StartupResult::SocketFailedToTestSend;
+            }
+            if (res == BindResult::SendTestFailed) {
                 return StartupResult::SocketFailedToTestSend;
             }
 
