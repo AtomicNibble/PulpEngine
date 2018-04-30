@@ -688,7 +688,6 @@ void XPhysics::setActorDominanceGroup(ActorHandle handle, int8_t group)
     actor.setDominanceGroup(group);
 }
 
-// ------------------------------------------
 
 void XPhysics::setGroup(ActorHandle handle, const GroupFlag::Enum group)
 {
@@ -703,6 +702,64 @@ void XPhysics::setGroupFlags(ActorHandle handle, const GroupFlags groupFlags)
 
     filter::SetGroupMask(actor, groupFlags);
 }
+
+X_INLINE ActorFlags XPhysics::getFlags(ActorHandle handle)
+{
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
+    auto pxFlags = actor.getActorFlags();
+
+    static_assert(ActorFlag::FLAGS_COUNT == 8, "More ActorTypes?");
+    static_assert(ActorFlag::Visualization == physx::PxActorFlag::eVISUALIZATION, "Value mismatch");
+    static_assert(ActorFlag::DisableGravity == physx::PxActorFlag::eDISABLE_GRAVITY, "Value mismatch");
+    static_assert(ActorFlag::SendSleepNotifies == physx::PxActorFlag::eSEND_SLEEP_NOTIFIES, "Value mismatch");
+    static_assert(ActorFlag::DisableSimulation == physx::PxActorFlag::eDISABLE_SIMULATION, "Value mismatch");
+
+    // shift up PxRigidBodyFlag
+    constexpr int32_t rigidtShift = 4;
+    static_assert((1 << rigidtShift) == ActorFlag::Kinematic, "Value mismatch");
+
+    static_assert(ActorFlag::Kinematic == (physx::PxRigidBodyFlag::eKINEMATIC << rigidtShift), "Value mismatch");
+    static_assert(ActorFlag::UseKinematicTargetForSceneQueries == (physx::PxRigidBodyFlag::eUSE_KINEMATIC_TARGET_FOR_SCENE_QUERIES << rigidtShift), "Value mismatch");
+    static_assert(ActorFlag::EnableCcd == (physx::PxRigidBodyFlag::eENABLE_CCD << rigidtShift), "Value mismatch");
+    static_assert(ActorFlag::EnableCcdFriction == (physx::PxRigidBodyFlag::eENABLE_CCD_FRICTION << rigidtShift), "Value mismatch");
+
+    uint32_t flags = pxFlags;
+
+    if(actor.getType() != physx::PxActorType::eRIGID_STATIC)
+    {
+        physx::PxRigidBody& rigidActor = *reinterpret_cast<physx::PxRigidBody*>(handle);
+        auto pxRigidFlags = rigidActor.getRigidBodyFlags();
+
+        flags |= (pxRigidFlags.operator physx::PxU32() << rigidtShift);
+    }
+    
+    return ActorFlags(flags);
+}
+
+X_INLINE ActorType::Enum XPhysics::getType(ActorHandle handle)
+{
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
+
+    auto type = actor.getType();
+
+    static_assert(ActorType::ENUM_COUNT == 5, "More ActorTypes?");
+    static_assert(ActorType::Static == physx::PxActorType::eRIGID_STATIC, "Value mismatch");
+    static_assert(ActorType::Dynamic == physx::PxActorType::eRIGID_DYNAMIC, "Value mismatch");
+    static_assert(ActorType::ParticleSystem == physx::PxActorType::ePARTICLE_SYSTEM, "Value mismatch");
+    static_assert(ActorType::ParticleFluid == physx::PxActorType::ePARTICLE_FLUID, "Value mismatch");
+    static_assert(ActorType::ArticulationLink == physx::PxActorType::eARTICULATION_LINK, "Value mismatch");
+
+    X_ASSERT(static_cast<uint32_t>(type) < ActorType::ENUM_COUNT, "Type out of range")(type, ActorType::ENUM_COUNT);
+
+    return static_cast<ActorType::Enum>(actor.getType());
+}
+
+ActorTypeAndFlags XPhysics::getTypeAndFlags(ActorHandle handle)
+{
+    return { getType(handle), getFlags(handle) };
+}
+
+// ------------------------------------------
 
 // group collision
 bool XPhysics::GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)

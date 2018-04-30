@@ -88,6 +88,9 @@ public:
     void setActorDominanceGroup(ActorHandle handle, int8_t group) X_FINAL;
     void setGroup(ActorHandle handle, const GroupFlag::Enum group) X_FINAL;
     void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_FINAL;
+    ActorFlags getFlags(ActorHandle handle) X_FINAL;
+    ActorType::Enum getType(ActorHandle handle) X_FINAL;
+    ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_FINAL;
 
     // group collision
     bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_FINAL;

@@ -31,6 +31,35 @@ typedef Flags<GroupFlag> GroupFlags;
 
 X_DECLARE_FLAG_OPERATORS(GroupFlags);
 
+X_DECLARE_ENUM(ActorType)(
+    Static,
+    Dynamic,
+    ParticleSystem,
+    ParticleFluid,
+    ArticulationLink
+);
+
+X_DECLARE_FLAGS(ActorFlag)(
+    Visualization,
+    DisableGravity,
+    SendSleepNotifies,
+    DisableSimulation,
+    // ..
+    Kinematic,
+    UseKinematicTargetForSceneQueries,
+    EnableCcd,
+    EnableCcdFriction
+);
+
+typedef Flags<ActorFlag> ActorFlags;
+
+struct ActorTypeAndFlags
+{
+    ActorType::Enum type;
+    ActorFlags flags;
+};
+
+
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
 typedef Handle RegionHandle;
@@ -1064,6 +1093,7 @@ X_INLINE ScopedLock::~ScopedLock()
 
 // ------------------------------------------------
 
+
 struct IPhysics
 {
     typedef core::Array<uint8_t> DataArr;
@@ -1118,6 +1148,10 @@ struct IPhysics
     virtual void setGroup(ActorHandle handle, const GroupFlag::Enum group) X_ABSTRACT;
     // for setting multiple groups on a actor, this does not override the group, set with function above.
     virtual void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_ABSTRACT;
+
+    virtual ActorFlags getFlags(ActorHandle handle) X_ABSTRACT;
+    virtual ActorType::Enum getType(ActorHandle handle) X_ABSTRACT;
+    virtual ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_ABSTRACT;
 
     // for setting what collides with what, by default everything collides.
     virtual bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_ABSTRACT;
