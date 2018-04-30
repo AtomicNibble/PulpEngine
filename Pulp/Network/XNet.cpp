@@ -486,9 +486,24 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pMsg = pCmd->GetArg(1);
+    core::StackString<1024> msg;
 
-    pSession_->sendChatMsg(pMsg);
+    for (int32_t i = 1; i < pCmd->GetArgCount(); i++)
+    {
+        const char* pMsg = pCmd->GetArg(i);
+        auto len = core::strUtil::strlen(pMsg);
+
+        if (len + msg.length() >= msg.capacity()) {
+            break;
+        }
+
+        msg.append(pMsg, len);
+        msg.append(' ', 1);
+    }
+
+    msg.trimRight();
+
+    pSession_->sendChatMsg(msg.c_str());
 }
 
 X_NAMESPACE_END
