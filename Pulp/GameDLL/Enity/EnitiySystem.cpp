@@ -702,9 +702,15 @@ namespace entity
                         return false;
                     }
 
+
                     // we need to create a emmiter on the world.
                     // to play our fx.
-                    auto* pEffect = pEffectManager_->loadEffect(emit.effect);
+                    engine::fx::Effect* pEffect = nullptr;
+                    
+                    if (emit.effect.isNotEmpty())
+                    {
+                        pEffect = pEffectManager_->loadEffect(emit.effect);
+                    }
 
                     engine::EmitterDesc dsc;
                     dsc.trans = trans;
