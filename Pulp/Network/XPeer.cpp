@@ -1002,6 +1002,7 @@ void XPeer::pushBackPacket(const RemoteSystem& rs, ReliabilityLayer::PacketData&
 Packet* XPeer::allocPacket(size_t lengthBits)
 {
     Packet* pPacket = X_NEW(Packet, &poolArena_, "Packet");
+    pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
     pPacket->length = safe_static_cast<uint32_t>(core::bitUtil::bitsToBytes(lengthBits));
     pPacket->bitLength = safe_static_cast<uint32_t>(lengthBits);
     pPacket->pData = allocPacketData(core::bitUtil::bitsToBytes(lengthBits));
@@ -1972,7 +1973,6 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
     removeConnectionRequest(pData->systemAddress);
 
     pPacket->pData[0] = failureType;
-    pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
     pPacket->guid = guid;
     pushBackPacket(pPacket);
 }
@@ -2249,7 +2249,6 @@ void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvB
 
     // tell the game.
     Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(int64_t) + SystemAddress::serializedSize()));
-    pPacket->systemHandle = INVALID_SYSTEM_HANDLE;
     pPacket->guid = clientGuid;
 
     core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
