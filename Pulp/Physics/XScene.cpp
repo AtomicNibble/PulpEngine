@@ -448,10 +448,6 @@ void XScene::addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num)
         const auto& force = Px3FromVec3(pForce[i]);
         physx::PxRigidBody* pActor = reinterpret_cast<physx::PxRigidBody*>(pHandle[i]);
 
-        if (pActor->getType() != physx::PxActorType::eRIGID_DYNAMIC) {
-            continue;
-        }
-
         pActor->addForce(force, physx::PxForceMode::eIMPULSE, true);
     }
 }
