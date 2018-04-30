@@ -288,6 +288,12 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     maxPeers_ = 0;
 
     pJobSys_ = gEnv->pJobSys;
+
+    bufferdCmds_.reserve(256);
+    packetQue_.reserve(256);
+    recvDataQue_.reserve(256);
+
+    connectionReqs_.setGranularity(8);
 }
 
 XPeer::~XPeer()
@@ -297,12 +303,6 @@ XPeer::~XPeer()
 
 StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors)
 {
-    bufferdCmds_.reserve(256);
-    packetQue_.reserve(256);
-    recvDataQue_.reserve(256);
-
-    connectionReqs_.setGranularity(8);
-
     if (maxConnections < 1) {
         return StartupResult::InvalidMaxCon;
     }
