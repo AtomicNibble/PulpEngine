@@ -217,6 +217,10 @@ public:
     {
     }
 
+    X_INLINE void setPort(Port port)
+    {
+        port_ = port;
+    }
     X_INLINE void setSocketFamiley(SocketFamily::Enum socketFamily)
     {
         socketFamily_ = socketFamily;
