@@ -156,7 +156,7 @@ namespace
                 core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
                 if (pPacket->getID() == net::MessageID::ChatMsg) {
-                    char buf[256] = { '\0' };
+                    char buf[256] = {'\0'};
 
                     auto len = bs.read<int16_t>();
                     bs.read(buf, len);
@@ -173,7 +173,6 @@ namespace
                     pPeer->send(bsOut.data(), bsOut.sizeInBytes(), net::PacketPriority::High,
                         net::PacketReliability::Reliable, pPacket->systemHandle);
                 }
-
             }
 
             // sleep, as other thread will handle incoming requests and buffer then for us.
@@ -189,7 +188,6 @@ namespace
         pNet->deletePeer(pPeer);
     }
 
-
 } // namespace
 
 const char* googleTestResTostr(int nRes)
@@ -200,11 +198,11 @@ const char* googleTestResTostr(int nRes)
     return "ERROR";
 }
 
-X_DECLARE_ENUM(Mode)(
+X_DECLARE_ENUM(Mode)
+(
     UnitTests,
     ClientTest,
-    EchoServer
-);
+    EchoServer);
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
@@ -229,7 +227,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         EngineApp engine;
 
         if (engine.Init(hInstance, lpCmdLine, Console)) {
-
             const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
 
             Mode::Enum mode = Mode::UnitTests;
@@ -238,8 +235,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 core::StackString<96, char> strLower(pMode);
                 strLower.toLower();
 
-                switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length()))
-                {
+                switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length())) {
                     case "unit"_fnv1a:
                     case "unittests"_fnv1a:
                         mode = Mode::UnitTests;
