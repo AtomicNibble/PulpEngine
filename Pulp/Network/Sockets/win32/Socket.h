@@ -8,7 +8,8 @@ X_DECLARE_ENUM(BindResult)
 (
     Success,
     FailedToBind,
-    SendTestFailed);
+    SendTestFailed,
+    AddrInUse);
 
 X_DECLARE_ENUM(SocketType)
 (

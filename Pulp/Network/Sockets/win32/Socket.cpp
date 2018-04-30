@@ -164,10 +164,19 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 
             return BindResult::Success;
         }
-        else {
+        else 
+        {
+            auto err = lastErrorWSA::Get();
+
+            if (!pPtr->ai_next && err == WSAEADDRINUSE)
+            {
+                X_WARNING("Net", "Failed to bind socket. Addr \"%s\" Port %" PRIu16 " is in use", bindParameters.hostAdd, bindParameters.port);
+                return BindResult::AddrInUse;
+            }
+            
             // we failed to bind.
             // try next one.
-            X_WARNING("Net", "Failed to bind socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
+            X_WARNING("Net", "Failed to bind socket. Error: \"%s\"", lastErrorWSA::ToString(err, Dsc));
             platform::closesocket(socket_);
         }
     }
