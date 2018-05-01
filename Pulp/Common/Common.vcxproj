@@ -280,6 +280,8 @@
     <ClInclude Include="Memory\ThreadPolicies\MultiThreadPolicy.h" />
     <ClInclude Include="Memory\ThreadPolicies\SingleThreadPolicy.h" />
     <ClInclude Include="Memory\VirtualMem.h" />
+    <ClInclude Include="MetaTable.h" />
+    <ClInclude Include="MetaTableMacros.h" />
     <ClInclude Include="NetMsgIds.h" />
     <ClInclude Include="Platform\ClipBoard.h" />
     <ClInclude Include="Platform\Console.h" />
@@ -713,6 +715,7 @@
     <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Hashing\Digest.cpp" />
     <ClCompile Include="Math\XColor.cpp" />
+    <ClCompile Include="MetaTable.cpp" />
     <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />

@@ -1321,6 +1321,12 @@
     <ClInclude Include="Math\QuatAlgo.h">
       <Filter>Headers\Math</Filter>
     </ClInclude>
+    <ClInclude Include="MetaTable.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
+    <ClInclude Include="MetaTableMacros.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2075,6 +2081,9 @@
     </ClCompile>
     <ClCompile Include="Math\XColor.cpp">
       <Filter>SourceFiles\Math</Filter>
+    </ClCompile>
+    <ClCompile Include="MetaTable.cpp">
+      <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
