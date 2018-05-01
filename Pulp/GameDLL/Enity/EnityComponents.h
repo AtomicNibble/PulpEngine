@@ -5,6 +5,9 @@
 
 #include "UserCmds\UserCmd.h"
 
+#include <MetaTableMacros.h>
+
+
 X_NAMESPACE_DECLARE(model,
                     class XModel;)
 
@@ -19,6 +22,8 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(game)
 
+class CompTable;
+
 namespace weapon
 {
     class WeaponDef;
@@ -26,20 +31,34 @@ namespace weapon
 
 namespace entity
 {
+
+
     typedef uint16_t EntityId;
+
+    struct NetworkedBase
+    {
+
+    };
+
 
     struct TransForm : public Transformf
     {
+        ADD_META()
+
     };
 
     struct Health
     {
+        ADD_META()
+
         int32_t hp;
         int32_t max;
     };
 
     struct SoundObject
     {
+        ADD_META()
+
         Vec3f offset; // offset of sound object relative to ent's transform.
         core::string occType;
         sound::SndObjectHandle handle;

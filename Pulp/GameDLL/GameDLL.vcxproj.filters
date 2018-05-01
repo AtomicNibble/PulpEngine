@@ -179,6 +179,9 @@
     <ClCompile Include="Enity\WeaponSystem.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
+    <ClCompile Include="Enity\ComponentMeta.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Vars\PlayerVars.inl">

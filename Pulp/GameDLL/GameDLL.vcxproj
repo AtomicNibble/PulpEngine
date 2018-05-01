@@ -423,6 +423,7 @@
   <ItemGroup>
     <ClCompile Include="Enity\AnimatedSys.cpp" />
     <ClCompile Include="Enity\CameraSys.cpp" />
+    <ClCompile Include="Enity\ComponentMeta.cpp" />
     <ClCompile Include="Enity\EnitiySystem.cpp" />
     <ClCompile Include="Enity\InputSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
