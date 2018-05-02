@@ -47,8 +47,8 @@ public:
 
     void buildUserCmd(void);
 
-    UserCmd& getCurrentUsercmd(void);
-    const UserCmd& getCurrentUsercmd(void) const;
+    net::UserCmd& getCurrentUsercmd(void);
+    const net::UserCmd& getCurrentUsercmd(void) const;
 
 private:
     void resetCmd(void);
@@ -69,7 +69,7 @@ private:
     int32_t buttonState(UserButton::Enum but) const;
 
 private:
-    UserCmd cmd_;
+    net::UserCmd cmd_;
 
     Vec2f mouseDelta_;
     Vec3f viewAngles_;

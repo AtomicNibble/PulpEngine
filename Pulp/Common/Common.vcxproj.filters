@@ -1327,6 +1327,9 @@
     <ClInclude Include="MetaTableMacros.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="UserCmd.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

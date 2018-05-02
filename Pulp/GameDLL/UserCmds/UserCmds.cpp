@@ -43,12 +43,12 @@ void UserCmdGen::buildUserCmd(void)
     cmd_.angles = Anglesf(viewAngles_);
 }
 
-UserCmd& UserCmdGen::getCurrentUsercmd(void)
+net::UserCmd& UserCmdGen::getCurrentUsercmd(void)
 {
     return cmd_;
 }
 
-const UserCmd& UserCmdGen::getCurrentUsercmd(void) const
+const net::UserCmd& UserCmdGen::getCurrentUsercmd(void) const
 {
     return cmd_;
 }
@@ -63,19 +63,19 @@ void UserCmdGen::mouseMove(void)
     // do things like scaling or inverting pitch etc..
     // ..
 
-    viewAngles_[Rotation::YAW] -= mouseDelta_.x;
-    viewAngles_[Rotation::PITCH] -= mouseDelta_.y;
+    viewAngles_[net::Rotation::YAW] -= mouseDelta_.x;
+    viewAngles_[net::Rotation::PITCH] -= mouseDelta_.y;
 
     mouseDelta_ = Vec2f::zero();
 
     Vec3f oldAngles = viewAngles_;
 
     // check to make sure the angles haven't wrapped
-    if (viewAngles_[Rotation::PITCH] - oldAngles[Rotation::PITCH] > 90) {
-        viewAngles_[Rotation::PITCH] = oldAngles[Rotation::PITCH] + 90;
+    if (viewAngles_[net::Rotation::PITCH] - oldAngles[net::Rotation::PITCH] > 90) {
+        viewAngles_[net::Rotation::PITCH] = oldAngles[net::Rotation::PITCH] + 90;
     }
-    else if (oldAngles[Rotation::PITCH] - viewAngles_[Rotation::PITCH] > 90) {
-        viewAngles_[Rotation::PITCH] = oldAngles[Rotation::PITCH] - 90;
+    else if (oldAngles[net::Rotation::PITCH] - viewAngles_[net::Rotation::PITCH] > 90) {
+        viewAngles_[net::Rotation::PITCH] = oldAngles[net::Rotation::PITCH] - 90;
     }
 }
 
@@ -99,25 +99,25 @@ void UserCmdGen::setButtonFlags(void)
     cmd_.buttons.Clear();
 
     if (buttonState(UserButton::ATTACK)) {
-        cmd_.buttons.Set(Button::ATTACK);
+        cmd_.buttons.Set(net::Button::ATTACK);
     }
     if (buttonState(UserButton::USE)) {
-        cmd_.buttons.Set(Button::USE);
+        cmd_.buttons.Set(net::Button::USE);
     }
 
     if (buttonState(UserButton::MOVE_UP)) {
-        cmd_.buttons.Set(Button::JUMP);
+        cmd_.buttons.Set(net::Button::JUMP);
     }
     if (buttonState(UserButton::MOVE_DOWN)) {
-        cmd_.buttons.Set(Button::CROUCH);
+        cmd_.buttons.Set(net::Button::CROUCH);
     }
 
     if (buttonState(UserButton::SPEED)) {
-        cmd_.buttons.Set(Button::RUN);
+        cmd_.buttons.Set(net::Button::RUN);
     }
 
     if (buttonState(UserButton::RELOAD)) {
-        cmd_.buttons.Set(Button::RELOAD);
+        cmd_.buttons.Set(net::Button::RELOAD);
     }
 }
 
@@ -231,9 +231,9 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
         // so want to seperate out impulses.
         if (ub >= UserButton::WEAP0) {
             int32_t val = static_cast<int32_t>(ub - UserButton::WEAP0);
-            X_ASSERT(val >= 0 && val < Impulse::ENUM_COUNT, "Out of range")(val);
+            X_ASSERT(val >= 0 && val < net::Impulse::ENUM_COUNT, "Out of range")(val);
 
-            cmd_.impulse = static_cast<Impulse::Enum>(val);
+            cmd_.impulse = static_cast<net::Impulse::Enum>(val);
             cmd_.impulseSeq++;
         }
     }

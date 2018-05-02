@@ -87,9 +87,6 @@
     <ClInclude Include="UserCmds\UserCmdMan.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
-    <ClInclude Include="UserCmds\UserCmd.h">
-      <Filter>Header Files\UserCmds</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\PlayerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>

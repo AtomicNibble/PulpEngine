@@ -29,7 +29,7 @@ namespace entity
 
         void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
             game::weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
-            const UserCmd& userCmd, EntityId playerId);
+            const net::UserCmd& userCmd, EntityId playerId);
 
     private:
         void updateViewBob(core::FrameTimeData& timeInfo, Player& player);

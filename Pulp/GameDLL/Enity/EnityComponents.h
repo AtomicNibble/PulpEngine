@@ -3,8 +3,7 @@
 #include <IPhysics.h>
 #include <Time\TimeVal.h>
 
-#include "UserCmds\UserCmd.h"
-
+#include <UserCmd.h>
 #include <MetaTableMacros.h>
 
 
@@ -275,8 +274,8 @@ namespace entity
         Vec3f firstPersonViewOrigin;
         Matrix33f firstPersonViewAxis;
 
-        UserCmd oldUserCmd;
-        UserCmd userCmd;
+        net::UserCmd oldUserCmd;
+        net::UserCmd userCmd;
 
         EntityId weaponEnt;
         EntityId armsEnt;

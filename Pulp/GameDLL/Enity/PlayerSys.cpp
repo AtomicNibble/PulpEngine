@@ -54,7 +54,7 @@ namespace entity
 
     void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
         weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
-        engine::IWorld3D* p3DWorld, const UserCmd& userCmd, EntityId playerId)
+        engine::IWorld3D* p3DWorld, const net::UserCmd& userCmd, EntityId playerId)
     {
         X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")(playerId, MAX_PLAYERS);
         X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
@@ -69,8 +69,8 @@ namespace entity
         player.userCmd = userCmd;
 
         bool crouched = state.IsSet(Player::State::Crouch);
-        bool enterCrouch = userCmd.buttons.IsSet(Button::CROUCH) && !crouched;
-        bool leaveCrouch = !userCmd.buttons.IsSet(Button::CROUCH) && crouched;
+        bool enterCrouch = userCmd.buttons.IsSet(net::Button::CROUCH) && !crouched;
+        bool leaveCrouch = !userCmd.buttons.IsSet(net::Button::CROUCH) && crouched;
 
         if (enterCrouch) {
             state.Set(Player::State::Crouch);
@@ -84,7 +84,7 @@ namespace entity
         }
 
         // jump
-        if (userCmd.buttons.IsSet(Button::JUMP) && !state.IsSet(Player::State::Jump)) {
+        if (userCmd.buttons.IsSet(net::Button::JUMP) && !state.IsSet(Player::State::Jump)) {
             state.Set(Player::State::Jump);
             player.jumpTime = core::TimeVal(0ll);
 
@@ -138,7 +138,7 @@ namespace entity
             if (state.IsSet(Player::State::Crouch)) {
                 speed = vars_.crouchSpeed_;
             }
-            else if (userCmd.buttons.IsSet(Button::RUN)) {
+            else if (userCmd.buttons.IsSet(net::Button::RUN)) {
                 // TODO: blend in stamina here.
                 speed = vars_.runSpeed_;
             }
@@ -229,7 +229,7 @@ namespace entity
 
             // oh shit son.
             // this be like, some crazy weapon switching shit.
-            if (userCmd.impulse == Impulse::WEAP_NEXT || userCmd.impulse == Impulse::WEAP_PREV) {
+            if (userCmd.impulse == net::Impulse::WEAP_NEXT || userCmd.impulse == net::Impulse::WEAP_PREV) {
                 X_LOG0("Goat", "Change the fucking weapon!");
 
                 // how is this going to work o_o
@@ -242,7 +242,7 @@ namespace entity
 
                 while (1)
                 {
-                    if (userCmd.impulse == Impulse::WEAP_NEXT)
+                    if (userCmd.impulse == net::Impulse::WEAP_NEXT)
                     {
                         ++wpnIdx;
 
@@ -250,7 +250,7 @@ namespace entity
                             wpnIdx = 0;
                         }
                     }
-                    else if (userCmd.impulse == Impulse::WEAP_PREV)
+                    else if (userCmd.impulse == net::Impulse::WEAP_PREV)
                     {
                         --wpnIdx;
 
@@ -293,14 +293,14 @@ namespace entity
                 }
             }
 
-            if (userCmd.buttons.IsSet(Button::ATTACK)) {
+            if (userCmd.buttons.IsSet(net::Button::ATTACK)) {
                 wpn.attack = true;
             }
-            else if (player.oldUserCmd.buttons.IsSet(Button::ATTACK)) {
+            else if (player.oldUserCmd.buttons.IsSet(net::Button::ATTACK)) {
                 wpn.attack = false;
             }
 
-            if (player.oldUserCmd.buttons.IsSet(Button::RELOAD)) {
+            if (player.oldUserCmd.buttons.IsSet(net::Button::RELOAD)) {
                 wpn.reload = true;
             }
 

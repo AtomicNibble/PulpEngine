@@ -1,6 +1,7 @@
 #pragma once
 
-X_NAMESPACE_BEGIN(game)
+
+X_NAMESPACE_BEGIN(net)
 
 X_DECLARE_ENUM(Rotation)
 (
@@ -32,7 +33,7 @@ X_DECLARE_ENUM8(Impulse)
     WEAP9,
     WEAP_NEXT,
     WEAP_PREV
-);
+    );
 
 typedef Flags8<Button> Buttons;
 

@@ -9,7 +9,7 @@ UserCmdMan::UserCmdMan()
     readFrame_.fill(-1);
 }
 
-void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd)
+void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const net::UserCmd& cmd)
 {
     userCmds_[writeFrame_[playerIndex] % BUFFER_SIZE][playerIndex] = cmd;
     writeFrame_[playerIndex]++;
@@ -25,13 +25,13 @@ void UserCmdMan::resetPlayer(int32_t playerIndex)
     readFrame_[playerIndex] = -1;
 }
 
-const UserCmd& UserCmdMan::newestUserCmdForPlayer(int32_t playerIndex)
+const net::UserCmd& UserCmdMan::newestUserCmdForPlayer(int32_t playerIndex)
 {
     int32_t index = core::Max(writeFrame_[playerIndex] - 1, 0);
     return userCmds_[index % BUFFER_SIZE][playerIndex];
 }
 
-const UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
+const net::UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
 {
     if (readFrame_[playerIndex] < writeFrame_[playerIndex] - 1) {
         readFrame_[playerIndex]++;

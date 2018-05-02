@@ -389,6 +389,7 @@
     <ClInclude Include="Traits\MemberFunctionTraits.h" />
     <ClInclude Include="Traits\SignedTypes.h" />
     <ClInclude Include="Traits\UnsignedTypes.h" />
+    <ClInclude Include="UserCmd.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
     <ClInclude Include="Util\Cpu.h" />

@@ -1,6 +1,6 @@
 #pragma once
 
-#include "UserCmd.h"
+#include <UserCmd.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -12,18 +12,18 @@ class UserCmdMan
     static const size_t BUFFER_SIZE = 64;
     // we create sets of UserCmds for each player at each read index.
     // just so if all clients are currenton same write index, near in memory.
-    typedef std::array<UserCmd, MAX_PLAYERS> UserCmdAPlayerArr;
+    typedef std::array<net::UserCmd, MAX_PLAYERS> UserCmdAPlayerArr;
     typedef std::array<UserCmdAPlayerArr, BUFFER_SIZE> UserCmdBuf;
     typedef std::array<int32_t, MAX_PLAYERS> IndexArr;
 
 public:
     UserCmdMan();
 
-    void addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd);
+    void addUserCmdForPlayer(int32_t playerIndex, const net::UserCmd& cmd);
     void resetPlayer(int32_t playerIndex);
 
-    const UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
-    const UserCmd& getUserCmdForPlayer(int32_t playerIndex);
+    const net::UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
+    const net::UserCmd& getUserCmdForPlayer(int32_t playerIndex);
 
     X_INLINE size_t getNumUnreadFrames(int32_t playerIndex);
 
