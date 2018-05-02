@@ -2,6 +2,7 @@
 
 
 #include <Containers\Array.h>
+#include <Time\TimeVal.h>
 
 struct UserCmd;
 class SnapShot;
@@ -78,12 +79,30 @@ struct LobbyUser
 
 };
 
+struct LobbyPeer
+{
+    bool loaded;
+    bool inGame;
+
+    core::TimeVal lastSnap;
+
+    float snapHz;
+
+    SystemAddress address;
+};
+
 class Lobby
 {
     typedef core::Array<LobbyUser> LobbyUserArr;
+    typedef core::Array<LobbyPeer> LobbyPeerArr;
 
 public:
     Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
+
+    // if we are a peer, we send user cmds.
+    void sendUserCmd(const UserCmd& snap);
+    // if we are a host and have peers we send snaps.
+    void sendSnapShot(const SnapShot& snap);
 
     bool handleState(void);
 
@@ -95,6 +114,7 @@ public:
 
     X_INLINE LobbyState::Enum getState(void) const;
     X_INLINE bool isHost(void) const;
+    X_INLINE bool isPeer(void) const;
     X_INLINE bool hasFinishedLoading(void) const;
     X_INLINE MatchFlags getMatchFlags(void) const;
 
@@ -126,6 +146,7 @@ private:
     SystemAddress hostAddress_;
 
     LobbyUserArr users_;
+    LobbyPeerArr peers_;
 };
 
 class Session : public ISession

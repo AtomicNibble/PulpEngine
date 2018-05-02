@@ -11,6 +11,11 @@ X_INLINE bool Lobby::isHost(void) const
     return isHost_;
 }
 
+X_INLINE bool Lobby::isPeer(void) const
+{
+    return !isHost();
+}
+
 X_INLINE bool Lobby::hasFinishedLoading(void) const
 {
     return finishedLoading_;

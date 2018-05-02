@@ -10,7 +10,8 @@ X_NAMESPACE_BEGIN(net)
 
 Lobby::Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
     pPeer_(pPeer),
-    users_(arena)
+    users_(arena),
+    peers_(arena)
 {
     type_ = type;
     state_ = LobbyState::Idle;
@@ -18,6 +19,27 @@ Lobby::Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
     isHost_ = false;
     finishedLoading_ = false;
 
+}
+
+void Lobby::sendUserCmd(const UserCmd& snap)
+{
+    X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
+
+    // send it to the host!
+    X_ASSERT_NOT_IMPLEMENTED();
+
+}
+
+void Lobby::sendSnapShot(const SnapShot& snap)
+{
+    X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
+
+    for (auto& peer : peers_)
+    {
+        // send!
+        X_UNUSED(peer);
+        X_ASSERT_NOT_IMPLEMENTED();
+    }
 }
 
 
@@ -191,6 +213,16 @@ void Session::runUpdate(void)
     handleState();
 }
 
+void Session::sendUserCmd(const UserCmd& snap)
+{
+    gameLobby_.sendUserCmd(snap);
+}
+
+void Session::sendSnapShot(const SnapShot& snap)
+{
+    // too all peers.
+    gameLobby_.sendSnapShot(snap);
+}
 
 bool Session::handleState(void)
 {
