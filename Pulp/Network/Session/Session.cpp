@@ -261,6 +261,11 @@ bool Session::handleState(void)
 }
 
 
+void Session::setState(SessionState::Enum state)
+{
+    state_ = state;
+}
+
 bool Session::stateIdle(void)
 {
 
