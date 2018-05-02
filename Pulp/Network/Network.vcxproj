@@ -502,6 +502,7 @@
   <ItemGroup>
     <None Include="Reliability\ReliabilityLayer.inl" />
     <None Include="Replication\SnapShot.inl" />
+    <None Include="Session\Session.inl" />
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\BPSTracker.inl" />
     <None Include="Util\RangeList.inl" />

@@ -186,5 +186,8 @@
     <None Include="Replication\SnapShot.inl">
       <Filter>Header Files\Replication</Filter>
     </None>
+    <None Include="Session\Session.inl">
+      <Filter>Header Files\Session</Filter>
+    </None>
   </ItemGroup>
 </Project>

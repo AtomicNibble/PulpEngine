@@ -3,6 +3,9 @@
 
 #include <Containers\Array.h>
 
+struct UserCmd;
+class SnapShot;
+
 X_NAMESPACE_BEGIN(net)
 
 /*
@@ -95,6 +98,11 @@ public:
     X_INLINE bool hasFinishedLoading(void) const;
     X_INLINE MatchFlags getMatchFlags(void) const;
 
+    X_INLINE int32_t numUsers(void) const;
+    X_INLINE int32_t numFreeSlots(void) const;
+    X_INLINE bool isFull(void) const;
+
+
 private:
     void setState(LobbyState::Enum state);
 
@@ -120,27 +128,6 @@ private:
     LobbyUserArr users_;
 };
 
-X_INLINE LobbyState::Enum Lobby::getState(void) const
-{
-    return state_;
-}
-
-X_INLINE bool Lobby::isHost(void) const
-{
-    return isHost_;
-}
-
-X_INLINE bool Lobby::hasFinishedLoading(void) const
-{
-    return finishedLoading_;
-}
-
-X_INLINE MatchFlags Lobby::getMatchFlags(void) const
-{
-    return params_.flags;
-}
-
-
 class Session : public ISession
 {
 public:
@@ -149,7 +136,6 @@ public:
 
     void finishedLoading(void); // tell the session we finished loading the map.
 
-
     void quitToMenu(void);
     void createPartyLobby(const MatchParameters& parms);
     void createMatch(const MatchParameters& parms);
@@ -157,6 +143,11 @@ public:
 
 
     void runUpdate(void) X_FINAL;
+
+    // if we are a peer, we send user cmds.
+    void sendUserCmd(const UserCmd& snap);
+    // if we are a host and have peers we send snaps.
+    void sendSnapShot(const SnapShot& snap);
 
     bool handleState(void);
 
@@ -204,14 +195,6 @@ private:
 };
 
 
-X_INLINE IPeer* Session::getPeer(void) const
-{
-    return pPeer_;
-}
-
-X_INLINE SessionState::Enum Session::getState(void) const
-{
-    return state_;
-}
-
 X_NAMESPACE_END
+
+#include "Session.inl"
