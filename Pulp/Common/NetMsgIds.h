@@ -180,6 +180,16 @@ X_DECLARE_ENUM8(MessageID)
 
     ChatMsg,
 
+    // --- Session ---
+
+    LoadingStart,
+    LoadingDone,
+    InGame,
+
+    SnapShotAck,
+
+    UserConnected,
+    UserDiconnected
 );
 
 X_NAMESPACE_END
