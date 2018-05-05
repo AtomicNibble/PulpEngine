@@ -132,6 +132,7 @@ public:
     static bool toAny(lua_State* L, ScriptValue& var, int index);
 
 private:
+    void freeDangling(void);
     void releaseScript(Script* pScript);
 
     void addLoadRequest(ScriptResource* pScript);
@@ -160,6 +161,9 @@ private:
 
     PoolArena::AllocationPolicy poolAllocator_;
     PoolArena poolArena_;
+
+    ScriptTableArr scriptTables_;
+    core::CriticalSection cs_;
 
     lua::RefId errrorHandler_;
     int32_t numCallParams_;

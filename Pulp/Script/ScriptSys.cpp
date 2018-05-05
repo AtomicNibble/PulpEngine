@@ -42,6 +42,7 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
         PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
         PoolArena::getMemoryOffsetRequirement()),
     poolArena_(&poolAllocator_, "TablePool"),
+    scriptTables_(arena),
     numCallParams_(-1),
     scriptBinds_(arena),
     baseBinds_(arena),
@@ -56,6 +57,7 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 
 XScriptSys::~XScriptSys()
 {
+   
 }
 
 void XScriptSys::registerVars(void)
@@ -129,23 +131,7 @@ void XScriptSys::shutDown(void)
 
     baseBinds_.clear();
 
-#if 0
-	for (std::set<XScriptTable*>::iterator it = XScriptTable::s_allTables_.begin();
-		it != XScriptTable::s_allTables_.end(); )
-	{
-		XScriptTable* pTable = *it;
-
-		++it;
-
-		if (pTable) {
-			pTable->release();
-		}
-	}
-
-	XScriptTable::s_allTables_.clear();
-#endif
-
-    scripts_.free();
+    freeDangling();
 
     if (L != nullptr) {
         lua_close(L);
@@ -682,11 +668,20 @@ void XScriptSys::logCallStack(void)
 
 XScriptTable* XScriptSys::allocTable(void)
 {
-    return X_NEW(XScriptTable, &poolArena_, "ScriptTable");
+    auto* pTable = X_NEW(XScriptTable, &poolArena_, "ScriptTable");
+
+    core::CriticalSection::ScopedLock lock(cs_);
+    scriptTables_.push_back(pTable);
+
+    return pTable;
 }
 
 void XScriptSys::freeTable(XScriptTable* pTable)
 {
+    {
+        core::CriticalSection::ScopedLock lock(cs_);
+        scriptTables_.remove(pTable);
+    }
     X_DELETE(pTable, &poolArena_);
 }
 
@@ -930,6 +925,34 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
 // ~IScriptSys
 
 // -----------------------------------------------------------------
+
+void XScriptSys::freeDangling(void)
+{
+    {
+        core::ScopedLock<AssetContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
+
+        for (const auto& m : scripts_) {
+            auto* pScriptRes = m.second;
+            const auto& name = pScriptRes->getName();
+
+            X_WARNING("Script", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pScriptRes->getRefCount());
+        }
+    }
+
+    scripts_.free();
+
+    {
+        core::CriticalSection::ScopedLock lock(cs_);
+        if (scriptTables_.isNotEmpty())
+        {
+            X_WARNING("Script", "Cleaning up % dangaling script tables", scriptTables_.size());
+
+            for (auto* pTable : scriptTables_) {
+                X_DELETE(pTable, &poolArena_);
+            }
+        }
+    }
+}
 
 void XScriptSys::releaseScript(Script* pScript)
 {
