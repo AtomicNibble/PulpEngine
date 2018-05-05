@@ -63,7 +63,8 @@ void XGame::registerCmds(void)
 	weaponDefs_.registerCmds();
 
     ADD_COMMAND_MEMBER("map", this, XGame, &XGame::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
-    //	ADD_COMMAND_MEMBER("devmap", this, XGame, &XGame::Command_DevMap, core::VarFlag::SYSTEM, "Loads a map in developer mode");
+    ADD_COMMAND_MEMBER("mainMenu", this, XGame, &XGame::Command_MainMenu, core::VarFlag::SYSTEM, "Return to main menu");
+    
 }
 
 bool XGame::init(void)
@@ -430,5 +431,13 @@ void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
     pSession_->startMatch();
 
 }
+
+void XGame::Command_MainMenu(core::IConsoleCmdArgs* pCmd)
+{
+    X_UNUSED(pCmd);
+
+    pSession_->quitToMenu();
+}
+
 
 X_NAMESPACE_END
