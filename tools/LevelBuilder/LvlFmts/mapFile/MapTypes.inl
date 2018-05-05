@@ -173,7 +173,7 @@ namespace mapFile
 
     void IgnoreList::add(const core::string& layerName)
     {
-        ignoreList_.insert_sorted(layerName);
+        ignoreList_.insertSorted(layerName);
     }
 
     bool IgnoreList::isIgnored(const core::string& layerName) const

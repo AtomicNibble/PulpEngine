@@ -578,14 +578,14 @@ typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolic
 }
 
 template<typename T, class Allocator, class GrowPolicy>
-X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert_sorted(const Type& obj)
+X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insertSorted(const Type& obj)
 {
-    return insert_sorted(obj, std::less<Type>());
+    return insertSorted(obj, std::less<Type>());
 }
 
 template<typename T, class Allocator, class GrowPolicy>
 template<class Compare>
-X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insert_sorted(const Type& obj, Compare comp)
+X_INLINE typename Array<T, Allocator, GrowPolicy>::Iterator Array<T, Allocator, GrowPolicy>::insertSorted(const Type& obj, Compare comp)
 {
     auto it = std::upper_bound(begin(), end(), obj, comp);
     return insert(it, obj);

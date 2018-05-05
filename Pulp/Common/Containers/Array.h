@@ -126,9 +126,9 @@ public:
     Iterator emplace(ConstIterator pos, Args&&... args);
 
     // inserts keep array sorted.
-    Iterator insert_sorted(const Type& obj);
+    Iterator insertSorted(const Type& obj);
     template<class Compare>
-    Iterator insert_sorted(const Type& obj, Compare comp);
+    Iterator insertSorted(const Type& obj, Compare comp);
 
     // remove the element at the given index, none-stable
     bool removeIndex(size_type idx);

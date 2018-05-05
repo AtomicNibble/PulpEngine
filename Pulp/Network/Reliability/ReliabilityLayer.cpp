@@ -1535,7 +1535,7 @@ ReliablePacket* ReliabilityLayer::addIncomingSplitPacket(ReliablePacket* pPacket
         pChannel->splitId = splitId;
         pChannel->packets.resize(pPacket->splitPacketCount); // we know how many we gonna get.
 
-        splitPacketChannels_.insert_sorted(pChannel, [](const SplitPacketChannel* pA, const SplitPacketChannel* pB) -> bool {
+        splitPacketChannels_.insertSorted(pChannel, [](const SplitPacketChannel* pA, const SplitPacketChannel* pB) -> bool {
             return pA->splitId < pB->splitId;
         });
     }
