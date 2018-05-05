@@ -22,20 +22,31 @@ You submit useCmd's to the session and get snapshots back will all the ent info.
 The session has no idea what's in a snap shot, it's just a blob of data, it's unto the gameDll to interperate the data.
 
 
+The flow:
+    PartyLobby -> GameLobby -> Loading -> InGame
+
+Basically all players join a PartyLobby which may be hosted by the player.
+Or a 3rd party service, once we want to start the game we need to move into a GameLobby.
+
+the game lobby is hosted on the machine hosting the game.
+Once the users have connected to that we can move to in game.
+The players in the game lobby are the players in the game.
+
+
 */
 
 X_DECLARE_ENUM(SessionState)(
-    Idle,
-    CreateAndMoveToPartyLobby,
-    CreateAndMoveToGameLobby,
-    PartyLobbyHost,
-    PartyLobbyPeer, // pleb
-    GameLobbyHost,
-    GameLobbyPeer, // pleb
-    ConnectAndMoveToParty,
-    ConnectAndMoveToGame,
-    Loading,
-    InGame
+    Idle,                           // menu
+    CreateAndMoveToPartyLobby,      //  
+    CreateAndMoveToGameLobby,       //
+    PartyLobbyHost,                 //
+    PartyLobbyPeer,                 // pleb
+    GameLobbyHost,                  //
+    GameLobbyPeer,                  // pleb
+    ConnectAndMoveToParty,          //
+    ConnectAndMoveToGame,           //
+    Loading,                        //
+    InGame                          //
 );
 
 struct UserCmd;

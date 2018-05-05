@@ -115,11 +115,15 @@ void Session::startMatch(void)
 
 void Session::sendUserCmd(const UserCmd& snap)
 {
+    X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
+
     gameLobby_.sendUserCmd(snap);
 }
 
 void Session::sendSnapShot(const SnapShot& snap)
 {
+    X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
+
     // too all peers.
     gameLobby_.sendSnapShot(snap);
 }
@@ -304,16 +308,12 @@ bool Session::handleConnectAndMoveToLobby(Lobby& lobby)
             X_NO_SWITCH_DEFAULT_ASSERT;
     }
 
-
     return true;
 }
 
 void Session::handleConnectionFailed(Lobby& lobby)
 {
-    X_ASSERT(
-        state_ == SessionState::ConnectAndMoveToGame || 
-        state_ == SessionState::ConnectAndMoveToParty,
-        "Unexpected state")();
+    X_ASSERT(state_ == SessionState::ConnectAndMoveToGame || state_ == SessionState::ConnectAndMoveToParty, "Unexpected state")();
 
     quitToMenu();
 }
