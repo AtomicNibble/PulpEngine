@@ -39,7 +39,7 @@ public:
 
     void update(core::FrameData& frame);
 
-    void load(const char* pMapName);
+    void beginLoad(const core::string& name);
     void clear(void);
 
     X_INLINE bool isLoaded(void) const;
@@ -85,7 +85,8 @@ public:
         game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
     ~World();
 
-    bool loadMap(const char* pMapName);
+    bool loadMap(const core::string& name);
+    bool hasLoaded(void) const;
 
     void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 

@@ -37,14 +37,14 @@ void Level::update(core::FrameData& frame)
     X_UNUSED(frame);
 }
 
-void Level::load(const char* mapName)
+void Level::beginLoad(const core::string& name)
 {
-    path_.set(mapName);
+    path_.set(name);
     path_.setExtension(level::LVL_FILE_EXTENSION);
 
     clear();
 
-    X_LOG0("Level", "Loading level: %s", mapName);
+    X_LOG0("Level", "Loading level: %s", name.c_str());
 
     core::IoRequestOpen open;
     open.callback.Bind<Level, &Level::IoRequestCallback>(this);
@@ -268,9 +268,9 @@ World::~World()
 {
 }
 
-bool World::loadMap(const char* pMapName)
+bool World::loadMap(const core::string& name)
 {
-    X_LOG0("Game", "Loading map: \"%s\"", pMapName);
+    X_LOG0("Game", "Loading map: \"%s\"", name.c_str());
 
     if (!createPhysicsScene(pPhys_)) {
         return false;
@@ -285,31 +285,38 @@ bool World::loadMap(const char* pMapName)
     }
 
     level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
-    level_->load(pMapName);
+    level_->beginLoad(name);
 
     // TEMP
-    gEnv->pSound->postEvent(force_hash<"play_ambient"_soundId>(), sound::GLOBAL_OBJECT_ID);
+    // gEnv->pSound->postEvent(force_hash<"play_ambient"_soundId>(), sound::GLOBAL_OBJECT_ID);
     // gEnv->pSound->postEvent(force_hash<"video_rickroll"_soundId>(), sound::GLOBAL_OBJECT_ID);
 
     return true;
+}
+
+bool World::hasLoaded(void) const
+{
+    X_ASSERT(level_, "Level not valid")();
+
+    return level_->isLoaded();
 }
 
 void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 {
     X_UNUSED(userCmdMan);
 
-    if (level_ && level_->isLoaded()) {
-        static bool spawn = false;
+    X_ASSERT(level_ && level_->isLoaded(), "Level not valid")();
 
-        if (!spawn) {
-            spawn = true;
-            spawnPlayer(0);
-        }
+    static bool spawn = false;
 
-        ents_.update(frame, userCmdMan);
-
-        level_->update(frame);
+    if (!spawn) {
+        spawn = true;
+        spawnPlayer(0);
     }
+
+    ents_.update(frame, userCmdMan);
+
+    level_->update(frame);
 }
 
 void World::spawnPlayer(entity::EntityId id)
