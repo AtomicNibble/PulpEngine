@@ -186,10 +186,7 @@ X_DECLARE_ENUM8(MessageID)
     LoadingDone,
     InGame,
 
-    SnapShotAck,
-
-    UserConnected,
-    UserDiconnected
+    SnapShotAck
 );
 
 X_NAMESPACE_END
