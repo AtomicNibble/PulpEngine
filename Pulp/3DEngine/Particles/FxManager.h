@@ -23,6 +23,7 @@ namespace fx
     {
         typedef core::AssetContainer<Effect, EFFECT_MAX_LOADED, core::SingleThreadPolicy> EffectContainer;
         typedef EffectContainer::Resource EffectResource;
+        typedef EffectContainer AssetContainer;
 
         typedef core::MemoryArena<
             core::PoolAllocator,

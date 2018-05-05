@@ -37,6 +37,7 @@ class XMaterialManager : public IMaterialManager
 {
     typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
     typedef MaterialContainer::Resource MaterialResource;
+    typedef MaterialContainer AssetContainer;
 
     typedef core::Array<Material*> MaterialArr;
 

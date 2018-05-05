@@ -34,6 +34,7 @@ class XScriptSys : public IScriptSys
 {
     typedef core::AssetContainer<Script, SCRIPT_MAX_LOADED, core::SingleThreadPolicy> ScriptContainer;
     typedef ScriptContainer::Resource ScriptResource;
+    typedef ScriptContainer AssetContainer;
 
     typedef core::Fifo<Script*> ScriptQueue;
 
