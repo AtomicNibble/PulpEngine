@@ -316,6 +316,12 @@ void TechDefStateManager::shutDown(void)
     core::CriticalSection::ScopedLock lock(cacheLock_);
 
     for (auto& it : techs_) {
+
+        if (it.second == INVALID_TECH_DEF_STATE) {
+            X_WARNING("TechDefState", "Skipping delete of invalid tech state: \"%s\"", it.first.second.c_str());
+            continue;
+        }
+
         X_DELETE(it.second, &techsPoolArena_);
     }
 

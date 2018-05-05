@@ -37,6 +37,12 @@ namespace techset
     TechSetDefs::~TechSetDefs()
     {
         for (const auto& t : techDefs_) {
+
+            if (t.second == INVALID_TECH_SET_DEF) {
+                X_WARNING("TechSetDefs", "Skipping delete of invalid techset: \"%s\"", t.first.c_str());
+                continue;
+            }
+
             X_DELETE(t.second, arena_);
         }
     }
