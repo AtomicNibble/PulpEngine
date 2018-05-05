@@ -36,7 +36,7 @@ void XNet::registerVars(void)
 
 void XNet::registerCmds(void)
 {
-    ADD_COMMAND_MEMBER("net_left_local_add", this, XNet, &XNet::Cmd_listLocalAddress, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("net_list_local_add", this, XNet, &XNet::Cmd_listLocalAddress, core::VarFlag::SYSTEM,
         "Lists local addresses");
     ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::Cmd_listRemoteSystems, core::VarFlag::SYSTEM,
         "List all the connected systems for each peer. <verbose>");
