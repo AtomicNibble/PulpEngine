@@ -30,6 +30,7 @@ Level::Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld,
 
 Level::~Level()
 {
+    clear();
 }
 
 void Level::update(core::FrameData& frame)
