@@ -426,12 +426,22 @@ X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes,
 // A session is like a server state, that uses a IPeer for connections and transport.
 // It's split up like this so that IPeer can be used as like a TCP replacement for misc tasks. (also makes it easy to UnitTest)
 // A session is what's used for game state and snapshots.
+X_DECLARE_ENUM(SessionStatus)(
+    Idle,
+    PartyLobby,
+    GameLobby,
+    Connecting,
+    Loading,
+    InGame
+);
+
 struct ISession
 {
     virtual ~ISession() = default;
 
-    virtual void runUpdate(void) X_ABSTRACT;
+    virtual void update(void) X_ABSTRACT;
 
+    virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
 };
 
 // ---------------------------------

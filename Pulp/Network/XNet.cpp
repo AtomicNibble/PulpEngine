@@ -467,12 +467,7 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
     IPStr strBuf;
     X_LOG0("Net", "Connecting to: \"%s\"", sa.toString(strBuf, true));
 
-    // so how todo this?
-    // just use the peer?
-    auto res = pSession_->getPeer()->connect(sa);
-    if (res != ConnectionAttemptResult::Started) {
-        X_ERROR("Net", "Connection request failed: \"%s\"", ConnectionAttemptResult::ToString(res));
-    }
+    pSession_->connect(sa);
 }
 
 void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)

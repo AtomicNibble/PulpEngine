@@ -4,10 +4,11 @@
 #include <Containers\Array.h>
 #include <Time\TimeVal.h>
 
-struct UserCmd;
-class SnapShot;
+#include "Lobby.h"
+
 
 X_NAMESPACE_BEGIN(net)
+
 
 /*
 
@@ -23,17 +24,6 @@ The session has no idea what's in a snap shot, it's just a blob of data, it's un
 
 */
 
-
-// Status is merged state.
-X_DECLARE_ENUM(SessionStatus)(
-    Idle,
-    PartyLobby,
-    GameLobby,
-    Connecting,
-    Loading,
-    InGame
-);
-
 X_DECLARE_ENUM(SessionState)(
     Idle,
     CreateAndMoveToPartyLobby,
@@ -42,118 +32,25 @@ X_DECLARE_ENUM(SessionState)(
     PartyLobbyPeer, // pleb
     GameLobbyHost,
     GameLobbyPeer, // pleb
-    Connecting,
+    ConnectAndMoveToParty,
+    ConnectAndMoveToGame,
     Loading,
     InGame
 );
 
-X_DECLARE_ENUM(LobbyType)(
-    Party,
-    Game
-);
+struct UserCmd;
+class SnapShot;
 
-X_DECLARE_ENUM(LobbyState)(
-    Idle,
-    Creating
-);
-
-X_DECLARE_FLAGS(MatchFlag)(
-    Online    
-);
-
-typedef Flags<MatchFlag> MatchFlags;
-
-struct MatchParameters
-{
-    int32_t numSlots;
-    MatchFlags flags;
-
-    core::string mapName;
-};
-
-
-struct LobbyUser
-{
-    NetGUID guid;
-    SystemAddress address;
-
-};
-
-struct LobbyPeer
-{
-    bool loaded;
-    bool inGame;
-
-    core::TimeVal lastSnap;
-
-    float snapHz;
-
-    SystemAddress address;
-};
-
-class Lobby
-{
-    typedef core::Array<LobbyUser> LobbyUserArr;
-    typedef core::Array<LobbyPeer> LobbyPeerArr;
-
-public:
-    Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
-
-    // if we are a peer, we send user cmds.
-    void sendUserCmd(const UserCmd& snap);
-    // if we are a host and have peers we send snaps.
-    void sendSnapShot(const SnapShot& snap);
-
-    bool handleState(void);
-
-    void startHosting(const MatchParameters& parms);
-  //  void sendMembersToLobby(Lobby& destLobby);
-    void finishedLoading(void);
-
-    void shutdown(void);
-
-    X_INLINE LobbyState::Enum getState(void) const;
-    X_INLINE bool isHost(void) const;
-    X_INLINE bool isPeer(void) const;
-    X_INLINE bool hasFinishedLoading(void) const;
-    X_INLINE MatchFlags getMatchFlags(void) const;
-
-    X_INLINE int32_t numUsers(void) const;
-    X_INLINE int32_t numFreeSlots(void) const;
-    X_INLINE bool isFull(void) const;
-
-
-private:
-    void setState(LobbyState::Enum state);
-
-private:
-    bool stateIdle(void);
-    bool stateCreating(void);
-
-private:
-    void initStateLobbyHost(void);
-    void clearUsers(void);
-
-private:
-    IPeer* pPeer_;
-    LobbyType::Enum type_;
-    LobbyState::Enum state_;
-
-    MatchParameters params_;
-
-    bool isHost_;
-    bool finishedLoading_; // loaded the map yet slut?
-    SystemAddress hostAddress_;
-
-    LobbyUserArr users_;
-    LobbyPeerArr peers_;
-};
+struct MatchParameters;
 
 class Session : public ISession
 {
 public:
     Session(IPeer* pPeer, core::MemoryArenaBase* arena);
 
+    void update(void) X_FINAL;
+
+    void connect(SystemAddress address);
 
     void finishedLoading(void); // tell the session we finished loading the map.
 
@@ -163,7 +60,6 @@ public:
     void startMatch(void);
 
 
-    void runUpdate(void) X_FINAL;
 
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap);
@@ -177,7 +73,12 @@ public:
     X_INLINE IPeer* getPeer(void) const;
 
     X_INLINE SessionState::Enum getState(void) const;
-    SessionStatus::Enum getStatus(void) const;
+    SessionStatus::Enum getStatus(void) const X_FINAL;
+
+private:
+    void sendPacketToLobby(Packet* pPacket);
+    void onConnectionFailure(Packet* pPacket);
+    void onConnectionFinalize(Packet* pPacket);
 
 private:
     void setState(SessionState::Enum state);
@@ -185,17 +86,20 @@ private:
 private:
 
     bool stateIdle(void);
-    bool stateConnecting(void);
     bool stateCreateAndMoveToPartyLobby(void);
     bool stateCreateAndMoveToGameLobby(void);
     bool statePartyLobbyHost(void);
     bool statePartyLobbyPeer(void);
     bool stateGameLobbyHost(void);
     bool stateGameLobbyPeer(void);
+    bool stateConnectAndMoveToParty(void);
+    bool stateConnectAndMoveToGame(void);
     bool stateLoading(void);
     bool stateInGame(void);
 
     bool hasLobbyCreateCompleted(Lobby& lobby);
+    bool handleConnectAndMoveToLobby(Lobby& lobby);
+    void handleConnectionFailed(Lobby& lobby);
 
     void startLoading(void);
 
@@ -207,9 +111,6 @@ private:
     core::MemoryArenaBase* arena_;
 
     SessionState::Enum state_;
-
-    SystemHandle pleb_;
-
 
     Lobby partyLobby_;
     Lobby gameLobby_;

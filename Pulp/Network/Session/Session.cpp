@@ -1,141 +1,13 @@
 #include "stdafx.h"
 #include "Session.h"
 
+#include "Lobby.h"
 
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IFont.h>
 
 X_NAMESPACE_BEGIN(net)
-
-Lobby::Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
-    pPeer_(pPeer),
-    users_(arena),
-    peers_(arena)
-{
-    type_ = type;
-    state_ = LobbyState::Idle;
-
-    isHost_ = false;
-    finishedLoading_ = false;
-
-}
-
-void Lobby::sendUserCmd(const UserCmd& snap)
-{
-    X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
-
-    // send it to the host!
-    X_ASSERT_NOT_IMPLEMENTED();
-
-}
-
-void Lobby::sendSnapShot(const SnapShot& snap)
-{
-    X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
-
-    for (auto& peer : peers_)
-    {
-        // send!
-        X_UNUSED(peer);
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-}
-
-
-bool Lobby::handleState(void)
-{
-
-    switch (state_) {
-        case LobbyState::Idle:
-            return stateIdle();
-        case LobbyState::Creating:
-            return stateCreating();
-
-        default:
-            X_NO_SWITCH_DEFAULT_ASSERT;
-    }
-
-    return false;
-}
-
-void Lobby::setState(LobbyState::Enum state)
-{
-    state_ = state;
-}
-
-void Lobby::startHosting(const MatchParameters& parms)
-{
-    params_ = params_;
-
-    shutdown();
-
-    {
-        // if we have a remote lobby, like on a server.
-        // would need to dispatch request and wait.
-        // for now just instant readdy.
-
-    }
-
-    setState(LobbyState::Creating);
-}
-
-void Lobby::finishedLoading(void)
-{
-    finishedLoading_ = true;
-}
-
-void Lobby::shutdown(void)
-{
-
-
-}
-
-bool Lobby::stateIdle(void)
-{
-    // anything..?
-
-    return true;
-}
-
-bool Lobby::stateCreating(void)
-{
-    // here we check if lobby has failed to create / finished.
-    // for now it's instantly ready.
-
-    // setup state of the new lobby.
-    initStateLobbyHost();
-
-    setState(LobbyState::Idle);
-    return true;
-}
-
-void Lobby::initStateLobbyHost(void)
-{
-    // we are hosting
-    isHost_ = true;
-
-
-    // need to add myself to peer list.
-    clearUsers();
-
-    auto localGuid = pPeer_->getMyGUID();
-    SystemAddress address;
-
-    LobbyUser user;
-    user.guid = localGuid;
-    user.address = address;
-    users_.emplace_back(user);
-
-    hostAddress_ = address;
-
-    // done?
-}
-
-void Lobby::clearUsers(void)
-{
-    users_.clear();
-}
 
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
@@ -147,7 +19,43 @@ Session::Session(IPeer* pPeer, core::MemoryArenaBase* arena) :
     gameLobby_(pPeer_, LobbyType::Game, arena)
 {
 
+    state_ = SessionState::Idle;
+
 }
+
+void Session::update(void)
+{
+    X_PROFILE_BEGIN("Session", core::profiler::SubSys::NETWORK);
+
+    // do a network tick.
+    pPeer_->runUpdate();
+
+    // potentially we have now recived packets.
+    readPackets();
+
+    partyLobby_.handleState();
+    gameLobby_.handleState();
+
+    handleState();
+}
+
+
+void Session::connect(SystemAddress address)
+{
+    // biiiiitcooooonnneeeecttt!!!!
+
+    // need to exit current state and begin connecting.
+    {
+        // todo..
+    }
+
+
+    // connect
+    partyLobby_.connectTo(address);
+
+    setState(SessionState::ConnectAndMoveToParty);
+}
+
 
 void Session::finishedLoading(void)
 {
@@ -165,9 +73,7 @@ void Session::finishedLoading(void)
         }
         else
         {
-            // TODO: send a packet to the host telling them we loaded.
-            // also eat a pickle, while we wait. yum.
-            X_ASSERT_NOT_IMPLEMENTED();
+            gameLobby_.sendToHost(MessageID::LoadingDone);
         }
     }
     else
@@ -207,12 +113,6 @@ void Session::startMatch(void)
     startLoading();
 }
 
-void Session::runUpdate(void)
-{
-
-    handleState();
-}
-
 void Session::sendUserCmd(const UserCmd& snap)
 {
     gameLobby_.sendUserCmd(snap);
@@ -226,10 +126,6 @@ void Session::sendSnapShot(const SnapShot& snap)
 
 bool Session::handleState(void)
 {
-    // so this is like the state machine for the game.
-    // we have diffrent logic depending on your current state.
-    pPeer_->runUpdate();
-
     switch (state_)
     {
         case SessionState::Idle:
@@ -246,8 +142,10 @@ bool Session::handleState(void)
             return stateGameLobbyHost();
         case SessionState::GameLobbyPeer:
             return stateGameLobbyPeer();
-        case SessionState::Connecting:
-            return stateConnecting();
+        case SessionState::ConnectAndMoveToParty:
+            return stateConnectAndMoveToParty();
+        case SessionState::ConnectAndMoveToGame:
+            return stateConnectAndMoveToGame();
         case SessionState::Loading:
             return stateLoading();
         case SessionState::InGame:
@@ -256,7 +154,6 @@ bool Session::handleState(void)
         default:
             X_NO_SWITCH_DEFAULT_ASSERT;
     }
-
     return false;
 }
 
@@ -267,12 +164,6 @@ void Session::setState(SessionState::Enum state)
 }
 
 bool Session::stateIdle(void)
-{
-
-    return true;
-}
-
-bool Session::stateConnecting(void)
 {
 
     return true;
@@ -289,7 +180,7 @@ bool Session::stateCreateAndMoveToPartyLobby(void)
         return true;
     }
 
-    return readPackets();
+    return true;
 }
 
 bool Session::stateCreateAndMoveToGameLobby(void)
@@ -308,22 +199,32 @@ bool Session::stateCreateAndMoveToGameLobby(void)
 
 bool Session::statePartyLobbyHost(void)
 {
-    return readPackets();
+    return true;
 }
 
 bool Session::statePartyLobbyPeer(void)
 {
-    return readPackets();
+    return true;
 }
 
 bool Session::stateGameLobbyHost(void)
 {
-    return readPackets();
+    return true;
 }
 
 bool Session::stateGameLobbyPeer(void)
 {
-    return readPackets();
+    return true;
+}
+
+bool Session::stateConnectAndMoveToParty(void)
+{
+    return handleConnectAndMoveToLobby(partyLobby_);
+}
+
+bool Session::stateConnectAndMoveToGame(void)
+{
+    return handleConnectAndMoveToLobby(gameLobby_);
 }
 
 bool Session::stateLoading(void)
@@ -340,9 +241,9 @@ bool Session::stateLoading(void)
 
     if (gameLobby_.isHost())
     {
-        // TODO: wait for the plebs to finish loading.
-        X_ASSERT_NOT_IMPLEMENTED();
-        return false;
+        if (!gameLobby_.allPeersLoaded()) {
+            return false;
+        }
     }
     else
     {
@@ -360,7 +261,7 @@ bool Session::stateLoading(void)
 bool Session::stateInGame(void)
 {
     // packets, packets, packets!
-    return readPackets();
+    return true;
 }
 
 
@@ -375,12 +276,56 @@ bool Session::hasLobbyCreateCompleted(Lobby& lobby)
     return false;
 }
 
+bool Session::handleConnectAndMoveToLobby(Lobby& lobby)
+{
+    if (lobby.getState() == LobbyState::Error) {
+        X_ERROR("Session", "Failed to connect to lobby");
+        handleConnectionFailed(lobby);
+        return true;
+    }
+
+    // busy.
+    if (lobby.getState() != LobbyState::Idle) {
+        return true;
+    }
+
+    X_LOG0("Session", "Connected to \"%s\" lobby", LobbyType::ToString(lobby.getType()));
+
+    // we connected!
+    switch (lobby.getType())
+    {
+        case LobbyType::Game:
+            setState(SessionState::GameLobbyPeer);
+            break;
+        case LobbyType::Party:
+            setState(SessionState::PartyLobbyPeer);
+            break;
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT;
+    }
+
+
+    return true;
+}
+
+void Session::handleConnectionFailed(Lobby& lobby)
+{
+    X_ASSERT(
+        state_ == SessionState::ConnectAndMoveToGame || 
+        state_ == SessionState::ConnectAndMoveToParty,
+        "Unexpected state")();
+
+    quitToMenu();
+}
+
 void Session::startLoading(void)
 {
     // should only be called if we are the host.
+    if(gameLobby_.getMatchFlags().IsSet(MatchFlag::Online))
     {
-        // TODO: tell the connected plebs to start loading.
-
+        X_ASSERT(gameLobby_.isHost(), "Cant start loading if we are not the host")(gameLobby_.isHost());
+        
+        gameLobby_.sendToPeers(MessageID::LoadingStart);
     }
 
     // Weeeeeeeeeeee!!
@@ -396,12 +341,36 @@ bool Session::readPackets(void)
 
         core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
-        switch (pPacket->getID())
+        // so we have party and game lobby.
+        // need to know what todo.
+        // kinda don't gethte point of seperate lobbies currently.
+        // other than platform abstraction.
+        // rip.
+
+        auto msg = pPacket->getID();
+
+        switch (msg)
         {
+            case MessageID::AlreadyConnected:
+            case MessageID::ConnectionLost:
+            case MessageID::DisconnectNotification:
+                sendPacketToLobby(pPacket);
+                break; 
+
+            case MessageID::ConnectionRequestFailed:
+            case MessageID::ConnectionBanned:
+            case MessageID::ConnectionNoFreeSlots:
+            case MessageID::ConnectionRateLimited:
+            case MessageID::InvalidPassword:
+            {
+                onConnectionFailure(pPacket);
+                break;
+            }
+
+            case MessageID::ConnectionRequestHandShake:
             case MessageID::ConnectionRequestAccepted:
             {
-                X_LOG0("Session", "Connected to server");
-                pleb_ = pPacket->systemHandle;
+                onConnectionFinalize(pPacket);
                 break;
             }
             case MessageID::ChatMsg:
@@ -440,6 +409,60 @@ bool Session::readPackets(void)
     return true;
 }
 
+void Session::sendPacketToLobby(Packet* pPacket)
+{
+    // so the server accepted us.
+    switch (state_)
+    {
+        case Potato::net::SessionState::PartyLobbyHost:
+        case Potato::net::SessionState::PartyLobbyPeer:
+           partyLobby_.handlePacket(pPacket);
+            break;
+        case Potato::net::SessionState::GameLobbyHost:
+        case Potato::net::SessionState::GameLobbyPeer:
+            break;
+            gameLobby_.handlePacket(pPacket);
+        default:
+            X_ASSERT_UNREACHABLE();
+            break;
+    }
+}
+
+
+void Session::onConnectionFailure(Packet* pPacket)
+{
+    // so the server accepted us.
+    if (state_ == SessionState::ConnectAndMoveToParty)
+    {
+        partyLobby_.handlePacket(pPacket);
+    }
+    else if (state_ == SessionState::ConnectAndMoveToGame)
+    {
+        gameLobby_.handlePacket(pPacket);
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+}
+
+
+void Session::onConnectionFinalize(Packet* pPacket)
+{
+    // so the server accepted us.
+    if (state_ == SessionState::ConnectAndMoveToParty)
+    {
+        partyLobby_.handlePacket(pPacket);
+    }
+    else if (state_ == SessionState::ConnectAndMoveToGame)
+    {
+        gameLobby_.handlePacket(pPacket);
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+}
 
 void Session::sendChatMsg(const char* pMsg)
 {
@@ -452,13 +475,13 @@ void Session::sendChatMsg(const char* pMsg)
     bs.write(len16);
     bs.write(pMsg, len);
 
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pleb_);
+ //   pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pleb_);
 
 }
 
 SessionStatus::Enum Session::getStatus(void) const
 {
-    static_assert(SessionState::ENUM_COUNT == 10, "Enums changed?");
+    static_assert(SessionState::ENUM_COUNT == 11, "Enums changed?");
     static_assert(SessionStatus::ENUM_COUNT == 6, "Enums changed?");
 
     switch(state_)
@@ -477,7 +500,9 @@ SessionStatus::Enum Session::getStatus(void) const
             return SessionStatus::GameLobby;
         case SessionState::GameLobbyPeer:
             return SessionStatus::GameLobby;
-        case SessionState::Connecting:
+        case SessionState::ConnectAndMoveToParty:
+            return SessionStatus::Connecting;
+        case SessionState::ConnectAndMoveToGame:
             return SessionStatus::Connecting;
         case SessionState::Loading:
             return SessionStatus::Loading;

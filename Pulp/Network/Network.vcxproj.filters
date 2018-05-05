@@ -116,6 +116,9 @@
     <ClInclude Include="Session\Session.h">
       <Filter>Header Files\Session</Filter>
     </ClInclude>
+    <ClInclude Include="Session\Lobby.h">
+      <Filter>Header Files\Session</Filter>
+    </ClInclude>
     <ClInclude Include="Vars\SessionVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
@@ -163,6 +166,9 @@
     <ClCompile Include="Session\Session.cpp">
       <Filter>Source Files\Session</Filter>
     </ClCompile>
+    <ClCompile Include="Session\Lobby.cpp">
+      <Filter>Source Files\Session</Filter>
+    </ClCompile>
     <ClCompile Include="Vars\SessionVars.cpp">
       <Filter>Source Files\Vars</Filter>
     </ClCompile>
@@ -193,6 +199,9 @@
       <Filter>Header Files\Replication</Filter>
     </None>
     <None Include="Session\Session.inl">
+      <Filter>Header Files\Session</Filter>
+    </None>
+    <None Include="Session\Lobby.inl">
       <Filter>Header Files\Session</Filter>
     </None>
     <None Include="Vars\SessionVars.inl">

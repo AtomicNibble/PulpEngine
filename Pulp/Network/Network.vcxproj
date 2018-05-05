@@ -451,6 +451,7 @@
   <ItemGroup>
     <ClInclude Include="Reliability\ReliabilityLayer.h" />
     <ClInclude Include="Replication\SnapShot.h" />
+    <ClInclude Include="Session\Lobby.h" />
     <ClInclude Include="Session\Session.h" />
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
@@ -472,6 +473,7 @@
   <ItemGroup>
     <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
     <ClCompile Include="Replication\SnapShot.cpp" />
+    <ClCompile Include="Session\Lobby.cpp" />
     <ClCompile Include="Session\Session.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
@@ -504,6 +506,7 @@
   <ItemGroup>
     <None Include="Reliability\ReliabilityLayer.inl" />
     <None Include="Replication\SnapShot.inl" />
+    <None Include="Session\Lobby.inl" />
     <None Include="Session\Session.inl" />
     <None Include="Sockets\win32\Socket.inl" />
     <None Include="Util\BPSTracker.inl" />

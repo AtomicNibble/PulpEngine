@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SnapShot.h"
 
+#include <Containers\FixedBitStream.h>
+
 X_NAMESPACE_BEGIN(net)
 
 
@@ -11,6 +13,16 @@ SnapShot::SnapShot(core::MemoryArenaBase* arena) :
 
 }
 
+
+void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
+{
+    X_UNUSED(bs);
+}
+
+void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
+{
+    X_UNUSED(bs);
+}
 
 void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)
 {
