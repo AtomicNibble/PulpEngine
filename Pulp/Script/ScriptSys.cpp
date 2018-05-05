@@ -949,7 +949,7 @@ void XScriptSys::freeDangling(void)
         core::CriticalSection::ScopedLock lock(cs_);
         if (scriptTables_.isNotEmpty())
         {
-            X_WARNING("Script", "Cleaning up % dangaling script tables", scriptTables_.size());
+            X_WARNING("Script", "Cleaning up %" PRIuS " dangaling script tables", scriptTables_.size());
 
             for (auto* pTable : scriptTables_) {
                 X_DELETE(pTable, &poolArena_);

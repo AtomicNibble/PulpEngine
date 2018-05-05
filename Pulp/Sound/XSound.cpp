@@ -1006,7 +1006,7 @@ void XSound::freeDangling(void)
         core::CriticalSection::ScopedLock lock(cs_);
 
         if (objects_.isNotEmpty()) {
-            X_WARNING("Sound", "Cleaning up % dangaling sound objects", objects_.size());
+            X_WARNING("Sound", "Cleaning up %" PRIuS " dangaling sound objects", objects_.size());
         }
     }
 
