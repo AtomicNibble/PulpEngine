@@ -196,6 +196,9 @@ bool XGame::update(core::FrameData& frame)
     if (status == net::SessionStatus::Idle)
     {
         // main menu :D
+        if (world_) {
+            world_.reset();
+        }
 
     }
     else if (status == net::SessionStatus::Loading)
