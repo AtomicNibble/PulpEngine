@@ -125,10 +125,14 @@ void XScriptSys::shutDown(void)
 
     gEnv->pHotReload->addfileType(nullptr, SCRIPT_FILE_EXTENSION);
 
+    for (auto* pBind : scriptBinds_) {
+        X_DELETE(pBind, arena_);
+    }
     for (auto* pBind : baseBinds_) {
         X_DELETE(pBind, arena_);
     }
 
+    scriptBinds_.clear();
     baseBinds_.clear();
 
     freeDangling();
