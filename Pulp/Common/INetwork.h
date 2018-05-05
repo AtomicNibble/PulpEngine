@@ -353,10 +353,10 @@ struct IPeer
     virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
 
     // send some data :)
-    virtual SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel, bool broadcast, SendReceipt forceReceiptNumber) X_ABSTRACT;
-    X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel);
-    X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel);
-    X_INLINE SendReceipt send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle);
+    virtual SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel, bool broadcast, SendReceipt forceReceiptNumber) X_ABSTRACT;
+    X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel);
+    X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel);
+    X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle);
 
     // send to self.
     virtual void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_ABSTRACT;
@@ -403,22 +403,22 @@ X_INLINE StartupResult::Enum IPeer::init(int32_t maxConnections, const SocketDes
     return init(maxConnections, core::make_span(&socketDescriptors, 1));
 }
 
-X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel)
 {
-    return send(pData, length, priority, reliability, systemHandle, orderingChannel, false, INVALID_SEND_RECEIPT);
+    return send(pData, lengthBytes, priority, reliability, systemHandle, orderingChannel, false, INVALID_SEND_RECEIPT);
 }
 
-X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel)
 {
-    return send(pData, length, priority, reliability, systemHandle, safe_static_cast<OrderingChannelIdx>(orderingChannel), false, INVALID_SEND_RECEIPT);
+    return send(pData, lengthBytes, priority, reliability, systemHandle, safe_static_cast<OrderingChannelIdx>(orderingChannel), false, INVALID_SEND_RECEIPT);
 }
 
-X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t length, PacketPriority::Enum priority,
+X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle)
 {
-    return send(pData, length, priority, reliability, systemHandle, 0, false, INVALID_SEND_RECEIPT);
+    return send(pData, lengthBytes, priority, reliability, systemHandle, 0, false, INVALID_SEND_RECEIPT);
 }
 
 // ---------------------------------
