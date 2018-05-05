@@ -391,6 +391,7 @@ struct IPeer
 
     // MTU for a given system
     virtual int getMTUSize(SystemHandle systemHandle = INVALID_SYSTEM_HANDLE) const X_ABSTRACT;
+    virtual SystemAddress getAddressForHandle(SystemHandle systemHandle) const X_ABSTRACT;
 
     virtual bool getStatistics(const NetGUID guid, NetStatistics& stats) X_ABSTRACT;
 

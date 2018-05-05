@@ -1388,6 +1388,24 @@ int32_t XPeer::getMTUSize(SystemHandle systemHandle) const
     return defaultMTU_;
 }
 
+SystemAddress XPeer::getAddressForHandle(SystemHandle systemHandle) const
+{
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
+    if (systemHandle == INVALID_SYSTEM_HANDLE) {
+        return ipList_.front();
+    }
+
+    auto* pRemoteSys = getRemoteSystem(systemHandle, false);
+    if (pRemoteSys) {
+        return pRemoteSys->systemAddress;
+    }
+
+    X_ERROR("Net", "Failed to find remote system for MTU size returning default");
+    return SystemAddress();
+}
+
+
 bool XPeer::getStatistics(const NetGUID guid, NetStatistics& stats)
 {
     auto* pRemoteSys = getRemoteSystem(guid, false);

@@ -305,6 +305,7 @@ public:
 
     // MTU for a given system
     int32_t getMTUSize(SystemHandle systemHandle = INVALID_SYSTEM_HANDLE) const X_FINAL;
+    SystemAddress getAddressForHandle(SystemHandle systemHandle) const X_FINAL;
 
     bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 
