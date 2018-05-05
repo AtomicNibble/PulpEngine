@@ -4,11 +4,10 @@
 #include <Containers\Array.h>
 #include <Time\TimeVal.h>
 
+#include "SessionCallbacks.h"
 #include "Lobby.h"
 
-
 X_NAMESPACE_BEGIN(net)
-
 
 /*
 
@@ -54,7 +53,7 @@ class SnapShot;
 
 struct MatchParameters;
 
-class Session : public ISession
+class Session : public ISession, ISessionCallbacks
 {
 public:
     Session(IPeer* pPeer, core::MemoryArenaBase* arena);
@@ -85,6 +84,11 @@ public:
 
     X_INLINE SessionState::Enum getState(void) const;
     SessionStatus::Enum getStatus(void) const X_FINAL;
+
+
+private:
+    void onLostConnectionToHost(void) X_FINAL;
+
 
 private:
     void sendPacketToLobby(Packet* pPacket);

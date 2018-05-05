@@ -12,16 +12,20 @@ X_NAMESPACE_BEGIN(net)
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
 
+X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
+
 Session::Session(IPeer* pPeer, core::MemoryArenaBase* arena) :
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     arena_(X_ASSERT_NOT_NULL(arena)),
-    partyLobby_(pPeer_, LobbyType::Party, arena),
-    gameLobby_(pPeer_, LobbyType::Game, arena)
+    partyLobby_(this, pPeer_, LobbyType::Party, arena),
+    gameLobby_(this, pPeer_, LobbyType::Game, arena)
 {
 
     state_ = SessionState::Idle;
 
 }
+
+X_ENABLE_WARNING(4355)
 
 void Session::update(void)
 {
@@ -86,6 +90,8 @@ void Session::finishedLoading(void)
 void Session::quitToMenu(void)
 {
     // TODO: leave any lobby.
+    partyLobby_.shutdown();
+    gameLobby_.shutdown();
 
     setState(SessionState::Idle);
 }
@@ -164,7 +170,17 @@ bool Session::handleState(void)
 
 void Session::setState(SessionState::Enum state)
 {
+    X_LOG0("Session", "State changed: \"%s\"", SessionState::ToString(state));
+
     state_ = state;
+}
+
+void Session::onLostConnectionToHost(void)
+{
+    // rip
+    X_LOG0("Session", "Lost connection to host");
+
+    quitToMenu();
 }
 
 bool Session::stateIdle(void)

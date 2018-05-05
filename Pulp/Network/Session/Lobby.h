@@ -5,6 +5,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+struct ISessionCallbacks;
+
 struct UserCmd;
 class SnapShot;
 
@@ -80,7 +82,7 @@ class Lobby
     typedef core::Array<LobbyPeer> LobbyPeerArr;
 
 public:
-    Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
+    Lobby(ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
 
     void connectTo(SystemAddress address);
 
@@ -141,6 +143,7 @@ private:
     void clearUsers(void);
 
 private:
+    ISessionCallbacks* pCallbacks_;
     IPeer* pPeer_;
     const LobbyType::Enum type_;
     LobbyState::Enum state_;

@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Lobby.h"
+#include "SessionCallbacks.h"
 
 #include "UserCmd.h"
 #include "Replication\SnapShot.h"
@@ -9,7 +10,8 @@
 X_NAMESPACE_BEGIN(net)
 
 
-Lobby::Lobby(IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
+Lobby::Lobby(ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
+    pCallbacks_(X_ASSERT_NOT_NULL(pCallbacks)),
     pPeer_(pPeer),
     type_(type),
     users_(arena),
@@ -152,7 +154,7 @@ void Lobby::handleConnectionLost(Packet* pPacket)
         // we lost connection to server :(
         X_ERROR("Lobby", "Lost connection to host");
 
-        shutdown();
+        pCallbacks_->onLostConnectionToHost();
     }
 }
 
@@ -271,6 +273,8 @@ LobbyPeer& Lobby::addPeer(SystemHandle handle, NetGUID guid)
 
 void Lobby::setState(LobbyState::Enum state)
 {
+    X_LOG0("Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
+
     state_ = state;
 }
 
