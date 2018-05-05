@@ -71,8 +71,12 @@ class XEngineModule_Physics : public IEngineModule
 
 X_ENGINE_REGISTER_CLASS(XEngineModule_Physics);
 
-XEngineModule_Physics::XEngineModule_Physics(){};
+XEngineModule_Physics::XEngineModule_Physics() 
+{
 
-XEngineModule_Physics::~XEngineModule_Physics(){
+}
 
-};
+XEngineModule_Physics::~XEngineModule_Physics() 
+{
+
+}
