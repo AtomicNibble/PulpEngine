@@ -375,10 +375,10 @@ struct IPeer
     // Ping
     virtual void ping(SystemHandle systemHandle) X_ABSTRACT;
     virtual bool ping(const HostStr& host, Port remotePort, bool onlyReplyOnAcceptingConnections,
-        uint32_t connectionSocketIndex = 0) X_ABSTRACT;
+        uint32_t connectionSocketIndex) X_ABSTRACT;
 
     // bans at connection level.
-    virtual void addToBanList(const IPStr& ip, core::TimeVal timeout = core::TimeVal()) X_ABSTRACT;
+    virtual void addToBanList(const IPStr& ip, core::TimeVal timeout) X_ABSTRACT;
     virtual void removeFromBanList(const IPStr& ip) X_ABSTRACT;
     virtual bool isBanned(const IPStr& ip) X_ABSTRACT;
     virtual void clearBanList(void) X_ABSTRACT;
