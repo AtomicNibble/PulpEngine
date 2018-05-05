@@ -1,5 +1,10 @@
 #pragma once
 
+#include <Math\XAngles.h>
+
+X_NAMESPACE_DECLARE(core,
+    class FixedBitStreamBase)
+
 X_NAMESPACE_BEGIN(net)
 
 X_DECLARE_ENUM(Rotation)
@@ -39,6 +44,9 @@ typedef Flags8<Button> Buttons;
 // so things like movement and fire.
 struct UserCmd
 {
+    void writeToBitStream(core::FixedBitStreamBase& bs) const;
+    void fromBitStream(core::FixedBitStreamBase& bs);
+
     int16_t moveForwrd;
     int16_t moveRight;
 

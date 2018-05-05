@@ -720,6 +720,7 @@
     <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="UserCmd.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />

@@ -2088,6 +2088,9 @@
     <ClCompile Include="MetaTable.cpp">
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
+    <ClCompile Include="UserCmd.cpp">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">
