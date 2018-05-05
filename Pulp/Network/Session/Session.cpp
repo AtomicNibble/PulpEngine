@@ -48,11 +48,7 @@ void Session::connect(SystemAddress address)
 {
     // biiiiitcooooonnneeeecttt!!!!
 
-    // need to exit current state and begin connecting.
-    {
-        // todo..
-    }
-
+    quitToMenu();
 
     // connect
     partyLobby_.connectTo(address);
