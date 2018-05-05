@@ -194,14 +194,14 @@ bool XMaterialManager::initDefaults(void)
 void XMaterialManager::freeDangling(void)
 {
     {
-        core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+        core::ScopedLock<AssetContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
         for (const auto& m : materials_) {
             auto* pMatRes = m.second;
             const auto& name = pMatRes->getName();
 
-            releaseResources(pMatRes);
             X_WARNING("Material", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMatRes->getRefCount());
+            releaseResources(pMatRes);
         }
     }
 
