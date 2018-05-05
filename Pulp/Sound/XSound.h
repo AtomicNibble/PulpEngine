@@ -155,6 +155,7 @@ private:
     void unregisterObjectSndEngine(SoundObject* pObject);
 
 private:
+    void freeDangling(void);
     SoundObject* allocObject(void);
     void freeObject(SoundObject* pObject);
 

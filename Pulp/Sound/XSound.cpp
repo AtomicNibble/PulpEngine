@@ -533,6 +533,8 @@ void XSound::shutDown(void)
     }
 #endif // !X_SUPER
 
+    freeDangling();
+
     MusicEngine::Term();
 
     if (AK::SoundEngine::IsInitialized()) {
@@ -996,6 +998,19 @@ void XSound::unRegisterAll(void)
     }
 
     objects_.clear();
+}
+
+void XSound::freeDangling(void)
+{
+    {
+        core::CriticalSection::ScopedLock lock(cs_);
+
+        if (objects_.isNotEmpty()) {
+            X_WARNING("Sound", "Cleaning up % dangaling sound objects", objects_.size());
+        }
+    }
+
+    unRegisterAll();
 }
 
 SoundObject* XSound::allocObject(void)
