@@ -4,13 +4,13 @@ inline Freelist::Freelist(void) :
 {
 }
 
-inline Freelist::Freelist(void* start, void* end, size_t originalElementSize, size_t alignment, size_t offset) :
+inline Freelist::Freelist(void* pStart, void* pEnd, size_t originalElementSize, size_t alignment, size_t offset) :
     next_(nullptr)
 {
     size_t minimumSize = Max<size_t>(sizeof(next_), originalElementSize);
     size_t elementSize = bitUtil::RoundUpToMultiple(minimumSize, alignment);
 
-    char* pAligned = pointerUtil::AlignTop<char>((char*)start + offset, alignment) - offset;
+    char* pAligned = pointerUtil::AlignTop<char>((char*)pStart + offset, alignment) - offset;
 
     union
     {
@@ -22,14 +22,14 @@ inline Freelist::Freelist(void* start, void* end, size_t originalElementSize, si
     as_void = pAligned;
     next_ = as_self;
 
-    if (end <= as_void) {
+    if (pEnd <= as_void) {
         X_ASSERT(false, "Memory provided for free lists dose not satisfy even one element")(originalElementSize, elementSize, alignment, offset);
     }
 
     // initialize the free list - make every m_next of each element point to the next element in the list
-    size_t numElements = ((char*)end - as_char) / elementSize;
+    size_t numElements = ((char*)pEnd - as_char) / elementSize;
 
-    // next_ points to start of memory given.
+    // next_ points to pStart of memory given.
     Freelist* runner = next_;
 
     as_char += elementSize;
@@ -57,12 +57,12 @@ inline void* Freelist::Obtain(void)
     return head;
 }
 
-inline void Freelist::Return(void* ptr)
+inline void Freelist::Return(void* pPtr)
 {
-    X_ASSERT_NOT_NULL(ptr);
+    X_ASSERT_NOT_NULL(pPtr);
 
     // put the returned element at the head of the free list
-    Freelist* head = static_cast<Freelist*>(ptr);
+    Freelist* head = static_cast<Freelist*>(pPtr);
     head->next_ = next_;
     next_ = head;
 }
