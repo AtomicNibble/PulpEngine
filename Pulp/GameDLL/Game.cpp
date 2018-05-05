@@ -8,6 +8,10 @@
 
 #include <Math\XMatrixAlgo.h>
 
+// TMP
+#include <I3DEngine.h>
+#include <IPrimativeContext.h>
+
 X_NAMESPACE_BEGIN(game)
 
 namespace
@@ -21,7 +25,7 @@ XGame::XGame(ICore* pCore) :
     arena_(g_gameArena),
     pCore_(pCore),
     pTimer_(nullptr),
-    pNetSession_(nullptr),
+    pSession_(nullptr),
     pRender_(nullptr),
     pFovVar_(nullptr),
     world_(arena_),
@@ -103,7 +107,7 @@ bool XGame::init(void)
             return false;
         }
 
-        pNetSession_ = X_ASSERT_NOT_NULL(pNet->getSession());
+        pSession_ = X_ASSERT_NOT_NULL(pNet->getSession());
     }
 
     auto deimension = gEnv->pRender->getDisplayRes();
@@ -169,7 +173,93 @@ bool XGame::update(core::FrameData& frame)
     // the problem is this data not linked to framedata
     // so
 
-    pNetSession_->runUpdate();
+    pSession_->update();
+
+    auto status = pSession_->getStatus();
+
+    {
+        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+        font::TextDrawContext con;
+        con.col = Col_Darkorchid;
+        con.size = Vec2f(24.f, 24.f);
+        con.effectId = 0;
+        con.pFont = gEnv->pFontSys->GetDefault();
+
+        core::StackString256 txt;
+        txt.appendFmt("Session: %s", net::SessionStatus::ToString(status));
+
+        pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
+    }
+
+    if (status == net::SessionStatus::Idle)
+    {
+        // main menu :D
+
+    }
+    else if (status == net::SessionStatus::Loading)
+    {
+        // loading the map :(
+        if (!world_)
+        {
+            auto matchParams = pSession_->getMatchParams();
+
+            if (matchParams.mapName.isEmpty()) {
+                X_ERROR("Game", "Match map name is empty");
+                pSession_->quitToMenu();
+            }
+            else 
+            {
+                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, weaponDefs_, arena_);
+
+                if (!world_->loadMap(matchParams.mapName)) {
+                    X_ERROR("Game", "Failed to load map");
+                }
+            }
+        }
+
+        if (world_->hasLoaded())
+        {
+           pSession_->finishedLoading();
+        }
+
+        // draw some shitty load screen?
+        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+        auto width = frame.view.viewport.getWidthf();
+        auto height = frame.view.viewport.getHeightf();
+
+        Vec2f center(width * 0.5f, height * 0.5f);
+
+        pPrim->drawQuad(0.f, 0.f, width, height, Col_Black);
+
+        font::TextDrawContext con;
+        con.col = Col_Whitesmoke;
+        con.size = Vec2f(36.f, 36.f);
+        con.effectId = 0;
+        con.pFont = gEnv->pFontSys->GetDefault();
+        con.flags.Set(font::DrawTextFlag::CENTER);
+        con.flags.Set(font::DrawTextFlag::CENTER_VER);
+
+        pPrim->drawText(Vec3f(center.x, center.y, 1.f), con, L"loading");
+
+        const float barWidth = 400.f;
+        const float barHeight = 10.f;
+        float progress = 0.3f;
+
+        Vec2f barPos(center);
+        barPos.x -= barWidth * 0.5f;
+        barPos.y += 30.f;
+
+        pPrim->drawQuad(barPos.x, barPos.y, barWidth * progress, barHeight, Col_Red);
+        pPrim->drawRect(barPos.x, barPos.y, barWidth, barHeight, Col_Red);
+    }
+    else if (status == net::SessionStatus::InGame)
+    {
+        // pew pew!
+
+        world_->update(frame, userCmdMan_);
+    }
 
     Angles<float> goat;
 
@@ -194,16 +284,16 @@ bool XGame::update(core::FrameData& frame)
     // aka is a level loaded shut like that.
     // if not nothing todo.
     if (world_) {
-        world_->update(frame, userCmdMan_);
+    //    world_->update(frame, userCmdMan_);
     }
     else {
         // orth
-        Matrix44f orthoProj;
-        MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
-
-        frame.view.viewMatrixOrtho = Matrix44f::identity();
-        frame.view.projMatrixOrtho = orthoProj;
-        frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
+    //    Matrix44f orthoProj;
+    //    MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
+    //
+    //    frame.view.viewMatrixOrtho = Matrix44f::identity();
+    //    frame.view.projMatrixOrtho = orthoProj;
+    //    frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
     }
 
     //	ProcessInput(frame.timeInfo);
@@ -312,13 +402,33 @@ void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
 
     const char* pMapName = Cmd->GetArg(1);
 
-    world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, weaponDefs_, arena_);
+    // holly moly!!!!
+    net::MatchParameters match;
+    match.numSlots = 1;
+    match.mode = net::GameMode::SinglePlayer;
+    match.mapName = pMapName;
 
-    if (world_) {
-        if (!world_->loadMap(pMapName)) {
-            X_ERROR("Game", "Failed to load map");
-        }
-    }
+    // i need to wait for state changes, but don't really want to stall.
+    // so i basically need to track state?
+    // really this needs to just be a single operation.
+    // this is basically automating UI clicks for if you wanted to host a game.
+    // basically i just neet to flag that i'm joining a game and track the state.
+    // but single player games should be instant.
+
+    auto waitForState = [&](net::SessionStatus::Enum status) {
+        while (pSession_->getStatus() != status) {
+            pSession_->update();
+      }
+    };
+
+    pSession_->quitToMenu();
+    waitForState(net::SessionStatus::Idle);
+    pSession_->createPartyLobby(match);
+    waitForState(net::SessionStatus::PartyLobby);
+    pSession_->createMatch(match);
+    waitForState(net::SessionStatus::GameLobby);
+    pSession_->startMatch();
+
 }
 
 X_NAMESPACE_END

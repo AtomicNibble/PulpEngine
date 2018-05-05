@@ -57,7 +57,7 @@ private:
     core::MemoryArenaBase* arena_;
 
     ICore* pCore_;
-    net::ISession* pNetSession_;
+    net::ISession* pSession_;
     render::IRender* pRender_;
     core::ITimer* pTimer_;
     core::ICVar* pFovVar_;
