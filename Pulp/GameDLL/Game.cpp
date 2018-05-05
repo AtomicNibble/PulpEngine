@@ -394,14 +394,14 @@ void XGame::OnFovChanged(core::ICVar* pVar)
     cam_.setFov(fov);
 }
 
-void XGame::Command_Map(core::IConsoleCmdArgs* Cmd)
+void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
 {
-    if (Cmd->GetArgCount() != 2) {
+    if (pCmd->GetArgCount() != 2) {
         X_WARNING("Game", "map <mapname>");
         return;
     }
 
-    const char* pMapName = Cmd->GetArg(1);
+    const char* pMapName = pCmd->GetArg(1);
 
     // holly moly!!!!
     net::MatchParameters match;
