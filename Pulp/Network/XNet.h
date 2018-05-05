@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Vars\NetVars.h"
+#include "Vars\SessionVars.h"
 
 #include <Util\UniquePointer.h>
 
@@ -85,6 +86,7 @@ private:
 
     PeerArr peers_;
     NetVars vars_;
+    SessionVars sessionVars_;
 
     core::UniquePointer<Session> pSession_;
 };

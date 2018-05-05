@@ -116,6 +116,9 @@
     <ClInclude Include="Session\Session.h">
       <Filter>Header Files\Session</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\SessionVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -160,6 +163,9 @@
     <ClCompile Include="Session\Session.cpp">
       <Filter>Source Files\Session</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\SessionVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Sockets\win32\Socket.inl">
@@ -188,6 +194,9 @@
     </None>
     <None Include="Session\Session.inl">
       <Filter>Header Files\Session</Filter>
+    </None>
+    <None Include="Vars\SessionVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>

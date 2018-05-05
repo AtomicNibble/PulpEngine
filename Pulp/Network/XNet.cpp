@@ -31,6 +31,7 @@ XNet::~XNet()
 void XNet::registerVars(void)
 {
     vars_.registerVars();
+    sessionVars_.registerVars();
 }
 
 void XNet::registerCmds(void)

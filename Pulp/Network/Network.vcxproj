@@ -465,6 +465,7 @@
     <ClInclude Include="Util\win32\LastErrorWSA.h" />
     <ClInclude Include="Util\win32\LibaryStartup.h" />
     <ClInclude Include="Vars\NetVars.h" />
+    <ClInclude Include="Vars\SessionVars.h" />
     <ClInclude Include="XNet.h" />
     <ClInclude Include="XPeer.h" />
   </ItemGroup>
@@ -496,6 +497,7 @@
     <ClCompile Include="Util\win32\LastErrorWSA.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
     <ClCompile Include="Vars\NetVars.cpp" />
+    <ClCompile Include="Vars\SessionVars.cpp" />
     <ClCompile Include="XNet.cpp" />
     <ClCompile Include="XPeer.cpp" />
   </ItemGroup>
@@ -508,6 +510,7 @@
     <None Include="Util\RangeList.inl" />
     <None Include="Util\SystemAddressEx.inl" />
     <None Include="Vars\NetVars.inl" />
+    <None Include="Vars\SessionVars.inl" />
     <None Include="XPeer.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
