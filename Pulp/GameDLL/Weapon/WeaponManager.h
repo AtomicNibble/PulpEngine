@@ -30,6 +30,8 @@ namespace weapon
         typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
         typedef WeaponDefContainer::Resource WeaponDefResource;
 
+        typedef WeaponDefContainer AssetContainer;
+
         typedef core::Array<core::StrHash> StrHashArr;
 
     public:
@@ -60,6 +62,7 @@ namespace weapon
     private:
         bool initDefaults(void);
         void freeDangling(void);
+        void releaseResources(WeaponDef* pWeaponDef);
 
         void addLoadRequest(WeaponDefResource* pWeaponDef);
         void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;

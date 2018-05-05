@@ -195,9 +195,32 @@ namespace weapon
         return true;
     }
 
+    // ------------------------------------
+
     void WeaponDefManager::freeDangling(void)
     {
+        {
+            core::ScopedLock<AssetContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
+
+            for (const auto& w : weaponDefs_) {
+                auto* pWpnRes = w.second;
+                const auto& name = pWpnRes->getName();
+
+                X_WARNING("WeaponDef", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pWpnRes->getRefCount());
+                releaseResources(pWpnRes);
+            }
+        }
+
+        weaponDefs_.free();
     }
+
+    void WeaponDefManager::releaseResources(WeaponDef* pWeaponDef)
+    {
+        X_UNUSED(pWeaponDef);
+    }
+
+    // ------------------------------------
+
 
     void WeaponDefManager::addLoadRequest(WeaponDefResource* pWeaponDef)
     {
