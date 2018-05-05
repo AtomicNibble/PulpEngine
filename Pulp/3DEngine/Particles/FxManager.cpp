@@ -30,7 +30,8 @@ namespace fx
             PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE),
             PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
             PoolArena::getMemoryOffsetRequirement()),
-        poolArena_(&poolAllocator_, "EmitterPool")
+        poolArena_(&poolAllocator_, "EmitterPool"),
+        emmiters_(arena)
     {
         arena->addChildArena(&poolArena_);
     }
@@ -71,11 +72,23 @@ namespace fx
     {
         auto* pEmitter = X_NEW(Emitter, &poolArena_, "Emitter")(vars_, arena_);
 
+        // fucking emmiters.
+        // how to i keep track of them for deleting.
+        // can just shove in array, but free requires linera searhc, meh.
+        core::CriticalSection::ScopedLock lock(cs_);
+
+        emmiters_.push_back(pEmitter);
+
         return pEmitter;
     }
 
     void EffectManager::freeEmmiter(Emitter* pEmitter)
     {
+        {
+            core::CriticalSection::ScopedLock lock(cs_);
+            emmiters_.remove(pEmitter);
+        }
+
         X_DELETE(pEmitter, &poolArena_);
     }
 
@@ -171,6 +184,20 @@ namespace fx
         }
 
         effects_.free();
+
+        {
+            core::CriticalSection::ScopedLock lock(cs_);
+
+            if (emmiters_.isNotEmpty())
+            {
+                X_WARNING("Effect", "%" PRIuS " dangling emitters", emmiters_.size());
+
+                for (auto* pEmitter : emmiters_)
+                {
+                    X_DELETE(pEmitter, &poolArena_);
+                }
+            }
+        }
     }
 
     void EffectManager::releaseResources(Effect* pEffect)

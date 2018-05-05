@@ -39,6 +39,8 @@ namespace fx
             >
             PoolArena;
 
+        typedef core::ArrayGrowMultiply<Emitter*> EmitterPtrArr;
+
     public:
         EffectManager(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
         ~EffectManager();
@@ -90,7 +92,10 @@ namespace fx
 
         core::AssetLoader* pAssetLoader_;
 
+        core::CriticalSection cs_;
+
         EffectContainer effects_;
+        EmitterPtrArr emmiters_;
         EffectVars vars_;
     };
 
