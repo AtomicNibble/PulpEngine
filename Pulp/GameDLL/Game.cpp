@@ -221,6 +221,9 @@ bool XGame::update(core::FrameData& frame)
 
         if (world_->hasLoaded())
         {
+            world_->spawnPlayer(0);
+
+
            pSession_->finishedLoading();
         }
 

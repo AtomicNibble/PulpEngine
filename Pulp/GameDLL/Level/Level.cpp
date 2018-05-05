@@ -308,13 +308,6 @@ void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
 
     X_ASSERT(level_ && level_->isLoaded(), "Level not valid")();
 
-    static bool spawn = false;
-
-    if (!spawn) {
-        spawn = true;
-        spawnPlayer(0);
-    }
-
     ents_.update(frame, userCmdMan);
 
     level_->update(frame);
