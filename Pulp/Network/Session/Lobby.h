@@ -22,24 +22,6 @@ X_DECLARE_ENUM(LobbyState)(
     Error
 );
 
-X_DECLARE_FLAGS(MatchFlag)(
-    Online,
-    Private,
-    InviteOnly,
-    JoinInProgress
-);
-
-typedef Flags<MatchFlag> MatchFlags;
-
-struct MatchParameters
-{
-    int32_t numSlots;
-    MatchFlags flags;
-
-    core::string mapName;
-};
-
-
 struct LobbyUser
 {
     NetGUID guid;
@@ -101,7 +83,7 @@ public:
 
     bool handleState(void);
 
-    void startHosting(const MatchParameters& parms);
+    void startHosting(const MatchParameters& params);
     //  void sendMembersToLobby(Lobby& destLobby);
     void finishedLoading(void);
 
@@ -115,6 +97,7 @@ public:
     X_INLINE bool isPeer(void) const;
     X_INLINE bool hasFinishedLoading(void) const;
     X_INLINE MatchFlags getMatchFlags(void) const;
+    X_INLINE const MatchParameters& getMatchParams(void) const;
 
     X_INLINE int32_t numUsers(void) const;
     X_INLINE int32_t numFreeSlots(void) const;

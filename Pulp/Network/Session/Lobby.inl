@@ -31,6 +31,11 @@ X_INLINE MatchFlags Lobby::getMatchFlags(void) const
     return params_.flags;
 }
 
+X_INLINE const MatchParameters& Lobby::getMatchParams(void) const
+{
+    return params_;
+}
+
 X_INLINE int32_t Lobby::numUsers(void) const
 {
     return static_cast<int32_t>(users_.size());

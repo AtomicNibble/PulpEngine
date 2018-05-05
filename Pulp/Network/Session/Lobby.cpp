@@ -278,9 +278,9 @@ void Lobby::setState(LobbyState::Enum state)
     state_ = state;
 }
 
-void Lobby::startHosting(const MatchParameters& parms)
+void Lobby::startHosting(const MatchParameters& params)
 {
-    params_ = params_;
+    params_ = params;
 
     shutdown();
 

@@ -423,6 +423,35 @@ X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes,
 
 // ---------------------------------
 
+
+X_DECLARE_FLAGS(MatchFlag)(
+    Online,
+    Private,
+    InviteOnly,
+    JoinInProgress
+);
+
+X_DECLARE_ENUM(GameMode)(
+    SinglePlayer    
+);
+
+typedef Flags<MatchFlag> MatchFlags;
+
+struct MatchParameters
+{
+    MatchParameters() {
+        numSlots = 0;
+        mode = GameMode::SinglePlayer;
+    }
+
+    int32_t numSlots;
+    MatchFlags flags;
+    GameMode::Enum mode;
+
+    core::string mapName;
+};
+
+
 // A session is like a server state, that uses a IPeer for connections and transport.
 // It's split up like this so that IPeer can be used as like a TCP replacement for misc tasks. (also makes it easy to UnitTest)
 // A session is what's used for game state and snapshots.
@@ -440,8 +469,15 @@ struct ISession
     virtual ~ISession() = default;
 
     virtual void update(void) X_ABSTRACT;
+    virtual void finishedLoading(void) X_ABSTRACT;
 
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
+    virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
+ 
+    virtual void quitToMenu(void) X_ABSTRACT;
+    virtual void createPartyLobby(const MatchParameters& parms) X_ABSTRACT;
+    virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
+    virtual void startMatch(void) X_ABSTRACT;
 };
 
 // ---------------------------------

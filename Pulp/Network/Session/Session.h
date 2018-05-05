@@ -62,12 +62,12 @@ public:
 
     void connect(SystemAddress address);
 
-    void finishedLoading(void); // tell the session we finished loading the map.
+    void finishedLoading(void) X_FINAL; // tell the session we finished loading the map.
 
-    void quitToMenu(void);
-    void createPartyLobby(const MatchParameters& parms);
-    void createMatch(const MatchParameters& parms);
-    void startMatch(void);
+    void quitToMenu(void) X_FINAL;
+    void createPartyLobby(const MatchParameters& parms) X_FINAL;
+    void createMatch(const MatchParameters& parms) X_FINAL;
+    void startMatch(void) X_FINAL;
 
 
 
@@ -85,6 +85,7 @@ public:
     X_INLINE SessionState::Enum getState(void) const;
     SessionStatus::Enum getStatus(void) const X_FINAL;
 
+    const MatchParameters& getMatchParams(void) const X_FINAL;
 
 private:
     void onLostConnectionToHost(void) X_FINAL;

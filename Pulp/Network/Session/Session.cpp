@@ -89,6 +89,10 @@ void Session::finishedLoading(void)
 
 void Session::quitToMenu(void)
 {
+    if (state_ == SessionState::Idle) {
+        return;
+    }
+
     // TODO: leave any lobby.
     partyLobby_.shutdown();
     gameLobby_.shutdown();
@@ -96,18 +100,20 @@ void Session::quitToMenu(void)
     setState(SessionState::Idle);
 }
 
-void Session::createPartyLobby(const MatchParameters& parms)
+void Session::createPartyLobby(const MatchParameters& params)
 {
+    X_ASSERT(state_ == SessionState::Idle, "Must be idle")(state_);
+
     // host a new 'party' lobby.
-    partyLobby_.startHosting(parms);
+    partyLobby_.startHosting(params);
 
     setState(SessionState::CreateAndMoveToPartyLobby);
 }
 
-void Session::createMatch(const MatchParameters& parms)
+void Session::createMatch(const MatchParameters& params)
 {
     // host a new 'game'
-    gameLobby_.startHosting(parms);
+    gameLobby_.startHosting(params);
 
     setState(SessionState::CreateAndMoveToGameLobby);
 }
@@ -170,7 +176,12 @@ bool Session::handleState(void)
 
 void Session::setState(SessionState::Enum state)
 {
-    X_LOG0("Session", "State changed: \"%s\"", SessionState::ToString(state));
+    if (state_ == state) {
+        X_WARNING("Session", "redundant state change: \"%s\"", SessionState::ToString(state));
+        return;
+    }
+
+    X_LOG0("Session", "State changed: \"%s\" -> \"%s\"", SessionState::ToString(state_), SessionState::ToString(state));
 
     state_ = state;
 }
@@ -494,6 +505,12 @@ void Session::sendChatMsg(const char* pMsg)
  //   pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pleb_);
 
 }
+
+const MatchParameters& Session::getMatchParams(void) const
+{
+    return gameLobby_.getMatchParams();
+}
+
 
 SessionStatus::Enum Session::getStatus(void) const
 {
