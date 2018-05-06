@@ -267,6 +267,15 @@ World::World(GameVars& vars, physics::IPhysics* pPhys,
 
 World::~World()
 {
+    level_.reset();
+
+    if (pScene_) {
+        gEnv->pSound->unRegisterAll();
+        gEnv->pSound->setPhysicsScene(nullptr);
+
+        pPhys_->releaseScene(pScene_);
+    }
+
 }
 
 bool World::loadMap(const core::string& name)
