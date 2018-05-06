@@ -120,6 +120,9 @@
     <ClInclude Include="Enity\WeaponSystem.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\NetworkSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -178,6 +181,9 @@
     </ClCompile>
     <ClCompile Include="Enity\ComponentMeta.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\NetworkSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

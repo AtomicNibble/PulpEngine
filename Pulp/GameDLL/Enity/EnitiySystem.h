@@ -12,11 +12,12 @@
 #include "PhysicsSystem.h"
 #include "AnimatedSys.h"
 #include "WeaponSystem.h"
+#include "NetworkSys.h"
 
 #include "DataTranslator.h"
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameTimeData;)
+                    struct FrameTimeData)
 
 X_NAMESPACE_DECLARE(engine,
                     struct IWorld3D;
@@ -93,6 +94,7 @@ namespace entity
         PhysicsSystem physSys_;
         AnimatedSystem animatedSys_;
         WeaponSystem weaponSys_;
+        NetworkSystem networkSys_;
 
     private:
         DataTranslator<Health> dtHealth_;

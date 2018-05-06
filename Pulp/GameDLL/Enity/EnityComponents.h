@@ -34,7 +34,7 @@ namespace entity
 
     typedef uint16_t EntityId;
 
-    struct NetworkedBase
+    struct NetworkSync
     {
 
     };
@@ -310,6 +310,8 @@ namespace entity
         Rotator,
         Mover,
         Emitter,
+
+        NetworkSync,
 
         Animator,
         Velocity,
