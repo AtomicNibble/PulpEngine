@@ -747,7 +747,14 @@ void XSound::cullObjects(void)
 
 void XSound::performOcclusionChecks(void)
 {
+    if (occlusion_.isEmpty()) {
+        return;
+    }
+
     physics::IScene* pScene = pScene_;
+    if (!pScene) {
+        return;
+    }
 
     // TODO: sort these so can do in batches.
 
