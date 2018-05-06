@@ -59,9 +59,11 @@
             "MeshCollider" : {
             },
             "Mover" : {
-                "start" : {"x": -280, "y": 128, "z": 8},
-                "end" : {"x": -500, "y": 128, "z": 8},
+                "start" : {"x": -128, "y": 256, "z": 32},
+                "end" : {"x": 192, "y": 256, "z": 32},
                 "time" : 3.0
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -77,9 +79,11 @@
             "MeshCollider" : {
             },
             "Mover" : {
-                "start" : {"x": -80, "y": -270, "z": 8},
-                "end" : {"x": -80, "y": -270, "z": -256},
+                "start" : {"x": -80, "y": -660, "z": 0},
+                "end" : {"x": -80, "y": -660, "z": -248},
                 "time" : 4.0
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -205,7 +209,7 @@
             }
         },
         {
-            "origin" : {"x": -150, "y": -150, "z": 0},
+            "origin" : {"x": -150, "y": -150, "z": 50},
             "Mesh" : {
                 "name" : "test/prop/rusty_barrel"
             },
@@ -288,7 +292,7 @@
             "DynamicObject" : {
             },
             "Emitter" : {
-                "effect" : "test/weap/muzzle/raygun_view",
+      //          "effect" : "test/env/smk_test",
                 "offset" : {"x": 0, "y": 0, "z": 20}
             }
         },
@@ -301,7 +305,62 @@
             },
             "MeshRenderer" : {
             }
+        },
+        {
+            "origin" : {"x": -0, "y": 0, "z": 20},
+         //   "angles" : {"p": 0, "y": 90, "r": 0},
+
+            "Emitter" : {
+          //      "effect" : "test/env/fire_barrel_med",
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            }
+        },
+        {
+            "origin" : {"x": 0, "y": -929, "z": -80},
+         //   "angles" : {"p": 0, "y": 90, "r": 0},
+
+            "Emitter" : {
+            //    "effect" : "test/env/fire_barrel_med",
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            }
+        },
+        {
+            "origin" : {"x": 0, "y": -100, "z": 20},
+         //   "angles" : {"p": 0, "y": 90, "r": 0},
+
+            "Emitter" : {
+         //       "effect" : "test/env/smk_test",
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            }
+        },
+        {
+            "origin" : {"x": -100, "y": -100, "z": 2},
+            "angles" : {"p": 270, "y": 0, "r": 0},
+
+            "Emitter" : {
+                "effect" : "test/bio/maggots",
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            }
+        },
+        {
+            "origin" : {"x": -110, "y": -40, "z": 50},
+            "angles" : {"p": 270, "y": 0, "r": 0},
+
+            "Emitter" : {
+                "effect" : "fx/test/bio_fly",
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            }
+        },
+        {
+            "origin" : {"x": -110, "y": -40, "z": 50},
+
+            "Emitter" : {
+                "effect" : "test/env/water_pee_stream"
+            }
         }
+
+
+
 
 
         /*,
