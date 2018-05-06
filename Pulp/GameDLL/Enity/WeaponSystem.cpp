@@ -326,6 +326,28 @@ namespace entity
 
                 pPrim->drawLine(origin, b.position, Col_Red);
                 pPrim->drawAxis(b.position, Vec3f(15.f));
+
+
+                // so i would like to apply forces to dynamic objects.
+                // would nice to be able to check if actor is dynamic. :/
+                // actually i need to know if dynamic and not kinemetic, other wise physicx bitch.
+                // so basically need acess to flags.
+
+                auto atf = gEnv->pPhysics->getTypeAndFlags(b.actor);
+                if (atf.type == physics::ActorType::Dynamic)
+                {
+                    auto flags = atf.flags;
+                    if (!flags.IsSet(physics::ActorFlags::Kinematic))
+                    {
+                        auto dir = b.position - origin;
+                        dir.normalize();
+
+                        dir *= 9999000.f;
+
+                        pPhysScene->addForce(b.actor, dir);
+                        //       pPhysScene->addTorque(actor, Vec3f(9000000.f, 10.f, 0.f));
+                    }
+                }
             }
         }
 

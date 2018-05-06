@@ -299,7 +299,7 @@ bool XPhysics::init(const ToleranceScale& scale)
 
     pPhysics_->registerDeletionListener(*this, physx::PxDeletionEventFlag::eUSER_RELEASE);
 
-    pMaterial_ = pPhysics_->createMaterial(0.5f, 0.5f, 0.90f);
+    pMaterial_ = pPhysics_->createMaterial(0.2f, 0.2f, 0.9f);
     if (!pMaterial_) {
         X_ERROR("Physics", "Failed to create material");
         return false;
@@ -503,6 +503,8 @@ IScene* XPhysics::createScene(const SceneDesc& desc)
 
     // enables populating of getActiveTransforms()
     sceneDesc.flags |= physx::PxSceneFlag::eENABLE_ACTIVETRANSFORMS;
+
+    // sceneDesc.flags |= physx::PxSceneFlag::eENABLE_CCD;
 
 #if PHYSX_SCENE_REQUIRES_LOCK
     sceneDesc.flags |= physx::PxSceneFlag::eREQUIRE_RW_LOCK;
@@ -1239,9 +1241,9 @@ void XPhysics::onObjectOutOfBounds(physx::PxShape& shape, physx::PxActor& actor)
 #endif // !PHYSX_SCENE_REQUIRES_LOCK
 
     // que it for removal;
-    if (outOfBoundsObjects_.find(&actor) == ActorsArr::invalid_index) {
-        outOfBoundsObjects_.append(&actor);
-    }
+    //	if (outOfBoundsObjects_.find(&actor) == ActorsArr::invalid_index) {
+    //		outOfBoundsObjects_.append(&actor);
+    //	}
 }
 
 void XPhysics::onObjectOutOfBounds(physx::PxAggregate& aggregate)

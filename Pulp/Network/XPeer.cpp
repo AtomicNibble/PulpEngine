@@ -567,6 +567,8 @@ void XPeer::setPassword(const PasswordStr& pass)
 ConnectionAttemptResult::Enum XPeer::connect(const HostStr& host, Port remotePort, const PasswordStr& password, uint32_t retryCount,
     core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
+    X_ASSERT(retryDelay > 0_tv, "Delay can't be zero")(retryDelay);
+
     // resolve the address.
     SystemAddressEx systemAddress;
     if (!systemAddress.fromHost(host, remotePort)) {
@@ -582,6 +584,8 @@ ConnectionAttemptResult::Enum XPeer::connect(const HostStr& host, Port remotePor
 ConnectionAttemptResult::Enum XPeer::connect(const IPStr& ip, Port remotePort, const PasswordStr& password, uint32_t retryCount,
     core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
+    X_ASSERT(retryDelay > 0_tv, "Delay can't be zero")(retryDelay);
+
     // need to work out the address.
     SystemAddressEx systemAddress;
     if (!systemAddress.fromIP(ip, remotePort)) {
@@ -594,6 +598,8 @@ ConnectionAttemptResult::Enum XPeer::connect(const IPStr& ip, Port remotePort, c
 ConnectionAttemptResult::Enum XPeer::connect(const SystemAddress& sysAdd, const PasswordStr& password, uint32_t retryCount,
     core::TimeVal retryDelay, core::TimeVal timeoutTime)
 {
+    X_ASSERT(retryDelay > 0_tv, "Delay can't be zero")(retryDelay);
+
     const SystemAddressEx& systemAddress = static_cast<const SystemAddressEx&>(sysAdd);
 
     uint8_t socketIdx = 0; // hard coded socket idx for now

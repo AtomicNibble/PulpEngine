@@ -7,6 +7,7 @@
 #include <IRender.h>
 #include <IConsole.h>
 #include <ITexture.h>
+#include <IVideo.h>
 
 #include <Threading\JobSystem2.h>
 #include <Time\StopWatch.h>
@@ -145,7 +146,28 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 
     core::string name(pMtlName);
 
+    if (name == "caulk") {
+        name = "floor/tiles/tiles02";
+    }
+    if (name == "berlin_floors_marble_tiles_bank_dry") {
+        name = "floor/tiles/tiles07";
+    }
+    if (name == "berlin_wall_plaster_two_tone_blue") {
+        name = "wall/brick/brick05";
+    }
+
+
+    if (name == "berlin_floors_concrete_tile4" || name == "berlin_ceilings_metal2") //|| name == "floor/concrete/sidewalk")
     {
+        //	name = "floor/concrete/sidewalk";
+        // name = "door/door_with_windows";
+    }
+
+    if (name == "berlin_decals_posters_russian") {
+        name = "video/test";
+    }
+    if (name == "mtl_berlin_mannequin") {
+        name = "video/test";
     }
 
     MaterialResource* pMatRes = nullptr;
@@ -261,6 +283,7 @@ bool XMaterialManager::waitForLoad(Material* pMaterial)
 
     return pAssetLoader_->waitForLoad(pMaterial);
 }
+
 
 void XMaterialManager::addLoadRequest(MaterialResource* pMaterial)
 {
@@ -507,6 +530,8 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
                     // create the texture instance.
                     // might get default back, etc..
                     texState.textureId = t.pTexture->getDeviceID();
+
+                    X_LOG0("Test", "pVariable: %p texId: %i", pVariableState, texState.textureId);
                     break;
                 }
             }

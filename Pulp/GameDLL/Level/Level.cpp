@@ -354,7 +354,7 @@ bool World::createPhysicsScene(physics::IPhysics* pPhys)
     // lets make a scene.
     physics::SceneDesc sceneDesc;
     core::zero_object(sceneDesc.sceneLimitHint); // zero = no limit
-    sceneDesc.gravity = Vec3f(0.f, 0.f, -9.8f);
+    sceneDesc.gravity = Vec3f(0.f, 0.f, -98.0f);
     sceneDesc.frictionType = physics::FrictionType::Patch;
     sceneDesc.frictionOffsetThreshold = 0.04f;
     sceneDesc.contractCorrelationDis = 0.025f;
