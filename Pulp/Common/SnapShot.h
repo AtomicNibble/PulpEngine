@@ -4,11 +4,12 @@
 #include <Util\Span.h>
 
 X_NAMESPACE_DECLARE(core,
-    class FixedBitStreamBase)
+    class FixedBitStreamBase
+)
 
-    X_NAMESPACE_BEGIN(net)
+X_NAMESPACE_BEGIN(net)
 
-    typedef int32_t ObjectID;
+typedef int32_t ObjectID;
 
 
 class SnapShot
