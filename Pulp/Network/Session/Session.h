@@ -72,9 +72,9 @@ public:
 
 
     // if we are a peer, we send user cmds.
-    void sendUserCmd(const UserCmd& snap);
+    void sendUserCmd(const UserCmd& snap) X_FINAL;
     // if we are a host and have peers we send snaps.
-    void sendSnapShot(const SnapShot& snap);
+    void sendSnapShot(const SnapShot& snap) X_FINAL;
 
     bool handleState(void);
 

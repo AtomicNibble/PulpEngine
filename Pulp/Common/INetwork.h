@@ -464,6 +464,9 @@ X_DECLARE_ENUM(SessionStatus)(
     InGame
 );
 
+struct UserCmd;
+class SnapShot;
+
 struct ISession
 {
     virtual ~ISession() = default;
@@ -478,6 +481,9 @@ struct ISession
     virtual void createPartyLobby(const MatchParameters& parms) X_ABSTRACT;
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
+
+    virtual void sendUserCmd(const UserCmd& snap) X_ABSTRACT;
+    virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
 };
 
 // ---------------------------------
