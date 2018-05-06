@@ -1695,6 +1695,9 @@
     <None Include="SnapShot.inl">
       <Filter>Interfaces_h\Network</Filter>
     </None>
+    <None Include="MetaTable.inl">
+      <Filter>Interfaces_h\Network</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Logging\LoggerBase.cpp">

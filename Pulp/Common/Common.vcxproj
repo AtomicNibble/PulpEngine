@@ -793,6 +793,7 @@
     <None Include="Memory\NewAndDelete.inl" />
     <None Include="Memory\SimpleMemoryArena.inl" />
     <None Include="Memory\ThreadPolicies\MultiThreadPolicy.inl" />
+    <None Include="MetaTable.inl" />
     <None Include="Platform\win32\Console.inl" />
     <None Include="Platform\win32\Window.inl" />
     <None Include="IPrimativeContext.inl" />
