@@ -219,8 +219,7 @@ bool XGame::update(core::FrameData& frame)
         {
             world_->spawnPlayer(0);
 
-
-           pSession_->finishedLoading();
+            pSession_->finishedLoading();
         }
 
         // draw some shitty load screen?
