@@ -21,6 +21,11 @@ void SessionVars::registerVars(void)
     ADD_CVAR_REF("net_connect_rety_delay", connectionRetyDelayMs_, connectionRetyDelayMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Time to wait in MS before retrying");
 
+    // snip snap.
+    ADD_CVAR_REF("net_snap_force_drop_next", snapFroceDrop_, 0, 0, 1, core::VarFlag::SYSTEM,
+        "Drops the next outgoing snap");
+
+
 }
 
 

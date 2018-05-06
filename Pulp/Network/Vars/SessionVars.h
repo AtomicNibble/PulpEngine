@@ -17,10 +17,12 @@ public:
 
     X_INLINE int32_t connectionAttemps(void) const;
     X_INLINE int32_t connectionRetryDelayMs(void) const;
+    X_INLINE bool snapFroceDrop(void);
 
 private:
     int32_t connectionAttemps_;
     int32_t connectionRetyDelayMs_;
+    int32_t snapFroceDrop_;
 
 };
 
