@@ -23,6 +23,11 @@ X_INLINE int32_t CompProp::getNumBits(void) const
     return numBits_;
 }
 
+X_INLINE int32_t CompProp::getSizeOfVar(void) const
+{
+    return sizeOfVar_;
+}
+
 // --------------------------------------------------------------------
 
 X_INLINE size_t CompTable::numProps(void) const

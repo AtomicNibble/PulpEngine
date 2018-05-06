@@ -3,11 +3,12 @@
 
 X_NAMESPACE_BEGIN(net)
 
-CompProp::CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffset, int32_t numBits, CompPropFlags flags) :
+CompProp::CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffset, int32_t sizeOfVar, int32_t numBits, CompPropFlags flags) :
     pName_(pName),
     type_(type),
     fieldOffset_(fieldOffset),
     numBits_(numBits),
+    sizeOfVar_(sizeOfVar),
     flags_(flags),
     fltLowValue_(0.f),
     fltHighValue_(0.f)
@@ -58,7 +59,7 @@ CompProp CompPropInt(const char* pName, int32_t offset, int32_t sizeOfVar, int32
         numBits = sizeOfVar * 8;
     }
 
-    return{ pName, type, offset, numBits, flags };
+    return{ pName, type, offset, sizeOfVar, numBits, flags };
 }
 
 CompProp CompPropQuat(const char* pName, int32_t offset, int32_t sizeOfVar, int32_t numBits, CompPropFlags flags)
@@ -66,7 +67,7 @@ CompProp CompPropQuat(const char* pName, int32_t offset, int32_t sizeOfVar, int3
     X_ASSERT(sizeOfVar == sizeof(Quatf), "Size not match")
         (sizeOfVar, sizeof(Quatf));
 
-    return{ pName, CompPropType::Quaternion, offset, numBits, flags };
+    return{ pName, CompPropType::Quaternion, offset, sizeOfVar, numBits, flags };
 }
 
 CompProp CompPropVec(const char* pName, int32_t offset, int32_t sizeOfVar, int32_t numBits, CompPropFlags flags)
@@ -74,7 +75,7 @@ CompProp CompPropVec(const char* pName, int32_t offset, int32_t sizeOfVar, int32
     X_ASSERT(sizeOfVar == sizeof(Vec3f), "Size not match")
         (sizeOfVar, sizeof(Vec3f));
 
-    return{ pName, CompPropType::Vector, offset, numBits, flags };
+    return{ pName, CompPropType::Vector, offset, sizeOfVar, numBits, flags };
 }
 
 

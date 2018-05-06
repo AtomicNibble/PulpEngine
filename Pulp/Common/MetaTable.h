@@ -26,13 +26,14 @@ typedef Flags<CompPropFlag> CompPropFlags;
 class CompProp
 {
 public:
-    CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffset, int32_t numBits,
+    CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffset, int32_t sizeOfVar, int32_t numBits,
         CompPropFlags flags);
 
     X_INLINE CompPropType::Enum getType(void) const;
     X_INLINE CompPropFlags getFlags(void) const;
     X_INLINE int32_t getFieldOffset(void) const;
     X_INLINE int32_t getNumBits(void) const;
+    X_INLINE int32_t getSizeOfVar(void) const;
 
 private:
     const char* pName_;
@@ -40,6 +41,7 @@ private:
     CompPropFlags flags_;
     int32_t fieldOffset_;
     int32_t numBits_;
+    int32_t sizeOfVar_;
     float fltLowValue_;
     float fltHighValue_;
 };
