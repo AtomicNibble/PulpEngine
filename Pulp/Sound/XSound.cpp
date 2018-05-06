@@ -753,6 +753,7 @@ void XSound::performOcclusionChecks(void)
 
     physics::IScene* pScene = pScene_;
     if (!pScene) {
+        X_WARNING("SoundSys", "Can't occlude %" PRIuS " emmiters, no physical world", occlusion_.size());
         return;
     }
 
