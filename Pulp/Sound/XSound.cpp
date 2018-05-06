@@ -1006,6 +1006,8 @@ void XSound::unRegisterAll(void)
     }
 
     objects_.clear();
+    culledObjects_.clear();
+    occlusion_.clear();
 }
 
 void XSound::freeDangling(void)
