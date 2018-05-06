@@ -44,7 +44,7 @@ namespace platform
 #include <WinSock2.h>
 #include <Ws2tcpip.h>
 
-    X_LINK_LIB("Ws2_32.lib");
+X_LINK_LIB("Ws2_32.lib");
 
 #endif // X_PLATFORM_WIN32
 
