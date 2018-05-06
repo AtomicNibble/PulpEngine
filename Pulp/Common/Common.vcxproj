@@ -328,6 +328,7 @@
     <ClInclude Include="resource.h" />
     <ClInclude Include="Sampler.h" />
     <ClInclude Include="IScriptSys.inl" />
+    <ClInclude Include="SnapShot.h" />
     <ClInclude Include="Sorting\RadixSort.h" />
     <ClInclude Include="String\AssetName.h" />
     <ClInclude Include="String\Base64.h" />
@@ -719,6 +720,7 @@
     <ClCompile Include="MetaTable.cpp" />
     <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
+    <ClCompile Include="SnapShot.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="UserCmd.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
@@ -800,6 +802,7 @@
       <FileType>Document</FileType>
     </ClInclude>
     <None Include="Sampler.inl" />
+    <None Include="SnapShot.inl" />
     <None Include="String\AssetName.inl" />
     <None Include="String\GrowingStringTable.inl" />
     <None Include="String\Lexer.inl" />

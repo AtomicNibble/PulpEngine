@@ -2,8 +2,8 @@
 #include "Lobby.h"
 #include "SessionCallbacks.h"
 
-#include "UserCmd.h"
-#include "Replication\SnapShot.h"
+#include <UserCmd.h>
+#include <SnapShot.h>
 
 #include <INetwork.h>
 

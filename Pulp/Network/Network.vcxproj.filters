@@ -48,12 +48,6 @@
     <Filter Include="Source Files\Reliability">
       <UniqueIdentifier>{1bbdd2bc-a6ae-43f8-9d23-bb58def7f615}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Replication">
-      <UniqueIdentifier>{e970a551-1c00-4b3c-9d5f-8c6b1e70bd1f}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Replication">
-      <UniqueIdentifier>{650a1794-3140-47d0-9821-949200b7c1c8}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Session">
       <UniqueIdentifier>{683b22c2-350d-47b7-9296-cb2a39d0c61a}</UniqueIdentifier>
     </Filter>
@@ -110,9 +104,6 @@
     <ClInclude Include="Util\LastErrorWSA.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
-    <ClInclude Include="Replication\SnapShot.h">
-      <Filter>Header Files\Replication</Filter>
-    </ClInclude>
     <ClInclude Include="Session\Session.h">
       <Filter>Header Files\Session</Filter>
     </ClInclude>
@@ -163,9 +154,6 @@
     <ClCompile Include="Util\win32\LastErrorWSA.cpp">
       <Filter>Source Files\Util\win32</Filter>
     </ClCompile>
-    <ClCompile Include="Replication\SnapShot.cpp">
-      <Filter>Source Files\Replication</Filter>
-    </ClCompile>
     <ClCompile Include="Session\Session.cpp">
       <Filter>Source Files\Session</Filter>
     </ClCompile>
@@ -197,9 +185,6 @@
     </None>
     <None Include="Util\SystemAddressEx.inl">
       <Filter>Header Files\Util</Filter>
-    </None>
-    <None Include="Replication\SnapShot.inl">
-      <Filter>Header Files\Replication</Filter>
     </None>
     <None Include="Session\Session.inl">
       <Filter>Header Files\Session</Filter>

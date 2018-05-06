@@ -450,7 +450,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Reliability\ReliabilityLayer.h" />
-    <ClInclude Include="Replication\SnapShot.h" />
     <ClInclude Include="Session\Lobby.h" />
     <ClInclude Include="Session\Session.h" />
     <ClInclude Include="Session\SessionCallbacks.h" />
@@ -473,7 +472,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
-    <ClCompile Include="Replication\SnapShot.cpp" />
     <ClCompile Include="Session\Lobby.cpp" />
     <ClCompile Include="Session\Session.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
@@ -506,7 +504,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Reliability\ReliabilityLayer.inl" />
-    <None Include="Replication\SnapShot.inl" />
     <None Include="Session\Lobby.inl" />
     <None Include="Session\Session.inl" />
     <None Include="Sockets\win32\Socket.inl" />

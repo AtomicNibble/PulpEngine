@@ -1330,6 +1330,9 @@
     <ClInclude Include="UserCmd.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="SnapShot.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1688,6 +1691,9 @@
     </None>
     <None Include="Math\XPlane.inl">
       <Filter>Headers\Math</Filter>
+    </None>
+    <None Include="SnapShot.inl">
+      <Filter>Interfaces_h\Network</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
@@ -2089,6 +2095,9 @@
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
     <ClCompile Include="UserCmd.cpp">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="SnapShot.cpp">
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
   </ItemGroup>

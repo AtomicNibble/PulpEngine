@@ -1,7 +1,7 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 #include "SnapShot.h"
 
-#include <Containers\FixedBitStream.h>
+#include "Containers\FixedBitStream.h"
 
 X_NAMESPACE_BEGIN(net)
 
@@ -28,7 +28,7 @@ void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)
 {
     ObjectState& state = findOrMakeStateForId(id);
 
-    if (state.buffer.size() != bs.sizeInBytes())
+    if (safe_static_cast<size_t>(state.buffer.size()) != bs.sizeInBytes())
     {
         // leaning towards making this allocated from a linera arena.
 
