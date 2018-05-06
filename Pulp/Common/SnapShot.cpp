@@ -13,6 +13,14 @@ SnapShot::SnapShot(core::MemoryArenaBase* arena) :
 
 }
 
+SnapShot::~SnapShot()
+{
+    for (auto& obj : objs_)
+    {
+        X_DELETE_ARRAY(obj.buffer.data(), arena_);
+    }
+}
+
 
 void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
@@ -46,7 +54,7 @@ bool SnapShot::getMessageByIndex(size_t idx, core::FixedBitStreamBase& bs) const
 {
     X_ASSERT(idx < objs_.size(), "Index out of range")(objs_.size(), idx);
 
-    auto& state = *objs_[idx];
+    auto& state = objs_[idx];
 
 
     // can't see a nice way to remove this cast.
