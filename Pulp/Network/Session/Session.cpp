@@ -14,11 +14,12 @@ X_NAMESPACE_BEGIN(net)
 
 X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
 
-Session::Session(IPeer* pPeer, core::MemoryArenaBase* arena) :
+Session::Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena) :
+    vars_(vars),
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     arena_(X_ASSERT_NOT_NULL(arena)),
-    partyLobby_(this, pPeer_, LobbyType::Party, arena),
-    gameLobby_(this, pPeer_, LobbyType::Game, arena)
+    partyLobby_(vars_, this, pPeer_, LobbyType::Party, arena),
+    gameLobby_(vars_, this, pPeer_, LobbyType::Game, arena)
 {
 
     state_ = SessionState::Idle;

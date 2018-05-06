@@ -10,6 +10,8 @@ struct ISessionCallbacks;
 struct UserCmd;
 class SnapShot;
 
+class SessionVars;
+
 X_DECLARE_ENUM(LobbyType)(
     Party,
     Game
@@ -64,7 +66,7 @@ class Lobby
     typedef core::Array<LobbyPeer> LobbyPeerArr;
 
 public:
-    Lobby(ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
+    Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
 
     void connectTo(SystemAddress address);
 
@@ -126,6 +128,7 @@ private:
     void clearUsers(void);
 
 private:
+    SessionVars& vars_;
     ISessionCallbacks* pCallbacks_;
     IPeer* pPeer_;
     const LobbyType::Enum type_;

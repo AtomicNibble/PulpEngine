@@ -15,10 +15,12 @@ public:
 
     void registerVars(void);
 
-    X_INLINE int32_t debugEnabled(void) const;
+    X_INLINE int32_t connectionAttemps(void) const;
+    X_INLINE int32_t connectionRetryDelayMs(void) const;
 
 private:
-    int32_t debug_;
+    int32_t connectionAttemps_;
+    int32_t connectionRetyDelayMs_;
 
 };
 

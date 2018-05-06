@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "Lobby.h"
 #include "SessionCallbacks.h"
+#include "Vars\SessionVars.h"
 
 #include <UserCmd.h>
 #include <SnapShot.h>
@@ -10,7 +11,8 @@
 X_NAMESPACE_BEGIN(net)
 
 
-Lobby::Lobby(ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
+Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
+    vars_(vars),
     pCallbacks_(X_ASSERT_NOT_NULL(pCallbacks)),
     pPeer_(pPeer),
     type_(type),
@@ -31,7 +33,9 @@ void Lobby::connectTo(SystemAddress address)
     shutdown();
 
     // Bittttttcoooonnneeeeeeeeectt!!!!
-    auto res = pPeer_->connect(address, PasswordStr(), 3, core::TimeVal(0.5f));
+    auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
+
+    auto res = pPeer_->connect(address, PasswordStr(), vars_.connectionAttemps(), delay);
     if (res != ConnectionAttemptResult::Started)
     {
         X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));

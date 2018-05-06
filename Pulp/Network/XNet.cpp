@@ -152,7 +152,7 @@ bool XNet::createSession(IPeer* pPeer)
         return false;
     }
 
-    pSession_ = core::makeUnique<Session>(arena_, pPeer, arena_);
+    pSession_ = core::makeUnique<Session>(arena_, sessionVars_, pPeer, arena_);
     return true;
 }
 

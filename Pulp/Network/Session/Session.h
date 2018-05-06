@@ -53,10 +53,12 @@ class SnapShot;
 
 struct MatchParameters;
 
+class SessionVars;
+
 class Session : public ISession, ISessionCallbacks
 {
 public:
-    Session(IPeer* pPeer, core::MemoryArenaBase* arena);
+    Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena);
 
     void update(void) X_FINAL;
 
@@ -123,6 +125,7 @@ private:
 
 
 private:
+    SessionVars& vars_;
     IPeer* pPeer_;
     core::MemoryArenaBase* arena_;
 
