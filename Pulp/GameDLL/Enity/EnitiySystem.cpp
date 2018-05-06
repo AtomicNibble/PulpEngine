@@ -727,6 +727,11 @@ namespace entity
                     break;
                 }
 
+                case "NetworkSync"_fnv1a: {
+                    reg_.assign<NetworkSync>(ent);
+                    break;
+                }
+
                 // loosy goosy
                 case "origin"_fnv1a: {
                     // x,y,z
