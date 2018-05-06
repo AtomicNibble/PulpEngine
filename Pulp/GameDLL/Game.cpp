@@ -174,24 +174,17 @@ bool XGame::update(core::FrameData& frame)
     // the problem is this data not linked to framedata
     // so
 
+    font::TextDrawContext con;
+    con.col = Col_Whitesmoke;
+    con.size = Vec2f(36.f, 36.f);
+    con.effectId = 0;
+    con.pFont = gEnv->pFontSys->GetDefault();
+    con.flags.Set(font::DrawTextFlag::CENTER);
+    con.flags.Set(font::DrawTextFlag::CENTER_VER);
+
     pSession_->update();
 
     auto status = pSession_->getStatus();
-
-    {
-        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
-
-        font::TextDrawContext con;
-        con.col = Col_Darkorchid;
-        con.size = Vec2f(24.f, 24.f);
-        con.effectId = 0;
-        con.pFont = gEnv->pFontSys->GetDefault();
-
-        core::StackString256 txt;
-        txt.appendFmt("Session: %s", net::SessionStatus::ToString(status));
-
-        pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
-    }
 
     if (status == net::SessionStatus::Idle)
     {
@@ -240,14 +233,7 @@ bool XGame::update(core::FrameData& frame)
 
         pPrim->drawQuad(0.f, 0.f, width, height, Col_Black);
 
-        font::TextDrawContext con;
         con.col = Col_Whitesmoke;
-        con.size = Vec2f(36.f, 36.f);
-        con.effectId = 0;
-        con.pFont = gEnv->pFontSys->GetDefault();
-        con.flags.Set(font::DrawTextFlag::CENTER);
-        con.flags.Set(font::DrawTextFlag::CENTER_VER);
-
         pPrim->drawText(Vec3f(center.x, center.y, 1.f), con, L"loading");
 
         const float barWidth = 400.f;
@@ -267,6 +253,20 @@ bool XGame::update(core::FrameData& frame)
 
         world_->update(frame, userCmdMan_);
     }
+
+    {
+        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+        con.col = Col_Crimson;
+        con.size = Vec2f(24.f, 24.f);
+        con.flags.Clear();
+
+        core::StackString256 txt;
+        txt.appendFmt("Session: %s", net::SessionStatus::ToString(status));
+
+        pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
+    }
+
 
     Angles<float> goat;
 
