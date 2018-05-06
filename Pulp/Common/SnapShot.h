@@ -16,14 +16,20 @@ class SnapShot
 {
     struct ObjectState
     {
+        ObjectState(ObjectID id_) :
+            id(id_)
+        {}
+
         ObjectID id;
         core::span<uint8_t> buffer; // pointer to slice
     };
 
-    typedef core::Array<ObjectState*> ObjectStatePtrArr;
+    typedef core::ArrayGrowMultiply<ObjectState> ObjectStateArr;
+    typedef core::ArrayGrowMultiply<ObjectState*> ObjectStatePtrArr;
 
 public:
     SnapShot(core::MemoryArenaBase* arena);
+    ~SnapShot();
 
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
@@ -40,7 +46,7 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
-    ObjectStatePtrArr objs_;
+    ObjectStateArr objs_;
 };
 
 

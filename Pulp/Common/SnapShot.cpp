@@ -62,13 +62,13 @@ SnapShot::ObjectState& SnapShot::findOrMakeStateForId(ObjectID id)
 {
     for (size_t i = 0; i < objs_.size(); i++)
     {
-        if (objs_[i]->id == id) {
-            return *objs_[i];
+        if (objs_[i].id == id) {
+            return objs_[i];
         }
     }
 
-    objs_.push_back(X_NEW(ObjectState, arena_, "ObjectStat"));
-    return *objs_.back();
+    objs_.emplace_back(id);
+    return objs_.back();
 }
 
 
