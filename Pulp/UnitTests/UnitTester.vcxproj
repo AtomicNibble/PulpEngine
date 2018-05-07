@@ -553,6 +553,7 @@
     <ClCompile Include="UT_Base64.cpp" />
     <ClCompile Include="UT_C_AlignedArray.cpp" />
     <ClCompile Include="UT_C_FixedBitStream.cpp" />
+    <ClCompile Include="UT_C_FixedRingBuffer.cpp" />
     <ClCompile Include="UT_C_LinkedList.cpp" />
     <ClCompile Include="UT_Delegate.cpp" />
     <ClCompile Include="UT_EntityComponentSys.cpp" />
