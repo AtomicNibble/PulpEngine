@@ -186,7 +186,10 @@ X_DECLARE_ENUM8(MessageID)
     LoadingDone,
     InGame,
 
-    SnapShotAck
+    SnapShot,
+    SnapShotAck,
+
+    UserCmd
 );
 
 X_NAMESPACE_END
