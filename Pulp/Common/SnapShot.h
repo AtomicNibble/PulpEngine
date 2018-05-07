@@ -36,6 +36,8 @@ class SnapShot
     typedef core::ArrayGrowMultiply<ObjectState> ObjectStateArr;
     typedef core::ArrayGrowMultiply<ObjectState*> ObjectStatePtrArr;
 
+    typedef core::FixedBitStreamNoneOwning MsgBitStream;
+
 public:
     SnapShot(core::MemoryArenaBase* arena);
     ~SnapShot();
@@ -50,7 +52,7 @@ public:
 
     X_INLINE void setTime(core::TimeVal time);
 
-    bool getMessageByIndex(size_t idx, core::FixedBitStreamBase& bs) const;
+    MsgBitStream getMessageByIndex(size_t idx) const;
 
 private:
     ObjectState& findOrMakeStateForId(ObjectID id);

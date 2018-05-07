@@ -74,7 +74,7 @@ void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)
 
 
 
-bool SnapShot::getMessageByIndex(size_t idx, core::FixedBitStreamBase& bs) const
+SnapShot::MsgBitStream SnapShot::getMessageByIndex(size_t idx) const
 {
     X_ASSERT(idx < objs_.size(), "Index out of range")(objs_.size(), idx);
 
@@ -86,8 +86,7 @@ bool SnapShot::getMessageByIndex(size_t idx, core::FixedBitStreamBase& bs) const
     // if the user did actually write it would not break anything, but kinda breaks the 'const'
     auto* pBegin = const_cast<uint8_t*>(state.buffer.data());
 
-    bs = core::FixedBitStreamNoneOwning(pBegin, pBegin + state.buffer.size(), true);
-    return true;
+    return MsgBitStream(pBegin, pBegin + state.buffer.size(), true);
 }
 
 SnapShot::ObjectState& SnapShot::findOrMakeStateForId(ObjectID id)
