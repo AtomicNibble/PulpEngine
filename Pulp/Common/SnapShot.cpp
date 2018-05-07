@@ -1,7 +1,6 @@
 #include "EngineCommon.h"
 #include "SnapShot.h"
 
-#include "Containers\FixedBitStream.h"
 
 X_NAMESPACE_BEGIN(net)
 
@@ -24,12 +23,37 @@ SnapShot::~SnapShot()
 
 void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
-    X_UNUSED(bs);
+    auto num = objs_.size();
+    bs.write(safe_static_cast<uint16_t>(num));
+
+    for (auto& obj : objs_)
+    {
+        auto size = obj.buffer.size_bytes();
+
+        bs.write(obj.id);
+        bs.write(safe_static_cast<uint16_t>(size));
+        bs.write(obj.buffer.data(), obj.buffer.size_bytes());
+    }
 }
 
 void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
 {
-    X_UNUSED(bs);
+    objs_.clear();
+
+    auto num = bs.read<uint16_t>();
+    objs_.reserve(num);
+
+    for (size_t i=0; i<num; i++)
+    {
+        auto id = bs.read<ObjectID>();
+        auto sizeInBytes = bs.read<uint16_t>();
+
+        auto* pData = X_NEW_ARRAY(uint8_t, sizeInBytes, arena_, "SnapObjectData");
+
+        bs.read(pData, sizeInBytes);
+
+        objs_.emplace_back(id, core::make_span(pData, bs.sizeInBytes()));
+    }
 }
 
 void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)

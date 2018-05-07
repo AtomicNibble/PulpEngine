@@ -4,6 +4,9 @@
 #include <Util\Span.h>
 #include <Time\TimeVal.h>
 
+#include <Containers\FixedBitStream.h>
+
+
 X_NAMESPACE_DECLARE(core,
     class FixedBitStreamBase
 )
@@ -19,6 +22,11 @@ class SnapShot
     {
         ObjectState(ObjectID id_) :
             id(id_)
+        {}
+
+        ObjectState(ObjectID id_, core::span<uint8_t> buffer_) :
+            id(id_),
+            buffer(buffer_)
         {}
 
         ObjectID id;
