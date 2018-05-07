@@ -474,6 +474,7 @@ struct ISession
     virtual void update(void) X_ABSTRACT;
     virtual void finishedLoading(void) X_ABSTRACT;
 
+    virtual bool isHost(void) const X_ABSTRACT;
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
  

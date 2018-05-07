@@ -503,11 +503,13 @@ void Session::sendChatMsg(const char* pMsg)
 
 }
 
-const MatchParameters& Session::getMatchParams(void) const
+bool Session::isHost(void) const
 {
-    return gameLobby_.getMatchParams();
-}
+    // not sure what states I will allowthis to be caleld form yet.
+    X_ASSERT(getStatus() == SessionStatus::InGame, "Unexpected status")(getStatus());
 
+    return gameLobby_.isHost();
+}
 
 SessionStatus::Enum Session::getStatus(void) const
 {
@@ -544,5 +546,11 @@ SessionStatus::Enum Session::getStatus(void) const
 
     return SessionStatus::Idle;
 }
+
+const MatchParameters& Session::getMatchParams(void) const
+{
+    return gameLobby_.getMatchParams();
+}
+
 
 X_NAMESPACE_END

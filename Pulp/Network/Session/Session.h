@@ -85,8 +85,9 @@ public:
     X_INLINE IPeer* getPeer(void) const;
 
     X_INLINE SessionState::Enum getState(void) const;
+    
+    bool isHost(void) const X_FINAL;
     SessionStatus::Enum getStatus(void) const X_FINAL;
-
     const MatchParameters& getMatchParams(void) const X_FINAL;
 
 private:
