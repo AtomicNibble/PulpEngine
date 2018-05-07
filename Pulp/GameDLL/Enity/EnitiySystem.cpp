@@ -16,8 +16,6 @@
 #include <IAnimManager.h>
 #include <IEffect.h>
 
-#include <SnapShot.h>
-
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
@@ -146,9 +144,16 @@ namespace entity
         physSys_.update(frame, reg_, pPhysScene_, p3DWorld_);
 
         weaponSys_.update(frame, reg_, pPhysScene_);
+    }
 
-        net::SnapShot snap(arena_);
+    void EnititySystem::createSnapShot(core::FrameData& frame, net::SnapShot& snap)
+    {
         networkSys_.buildSnapShot(frame.timeInfo, reg_, snap);
+    }
+
+    void EnititySystem::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
+    {
+        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap);
     }
 
     EntityId EnititySystem::createEnt(void)

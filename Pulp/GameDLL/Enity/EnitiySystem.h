@@ -16,6 +16,10 @@
 
 #include "DataTranslator.h"
 
+
+X_NAMESPACE_DECLARE(net,
+                    struct ISession);
+
 X_NAMESPACE_DECLARE(core,
                     struct FrameTimeData)
 
@@ -49,6 +53,10 @@ namespace entity
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
         void update(core::FrameData& frame, UserCmdMan& userCmdMan);
+
+        void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
+        void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
+
 
         EntityId createEnt(void);
         EntityId createWeapon(EntityId playerId);
