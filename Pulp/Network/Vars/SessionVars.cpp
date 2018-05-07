@@ -9,6 +9,10 @@ SessionVars::SessionVars()
 {
     connectionAttemps_ = 3;
     connectionRetyDelayMs_ = 500;
+
+    snapMaxbufferedMs_ = 100;
+    snapRateMs_ = 100;
+    userCmdRateMs_ = 40;
 }
 
 
@@ -25,6 +29,12 @@ void SessionVars::registerVars(void)
     ADD_CVAR_REF("net_snap_force_drop_next", snapFroceDrop_, 0, 0, 1, core::VarFlag::SYSTEM,
         "Drops the next outgoing snap");
 
+    ADD_CVAR_REF("net_snap_force_drop_next", snapMaxbufferedMs_, snapMaxbufferedMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Drops the next outgoing snap");
+    ADD_CVAR_REF("net_snap_force_drop_next", snapRateMs_, snapRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Drops the next outgoing snap");
+    ADD_CVAR_REF("net_snap_force_drop_next", userCmdRateMs_, userCmdRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Drops the next outgoing snap");
 
 }
 

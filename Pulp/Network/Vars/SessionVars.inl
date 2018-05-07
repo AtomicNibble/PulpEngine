@@ -22,4 +22,19 @@ X_INLINE bool SessionVars::snapFroceDrop(void)
     return true;
 }
 
+X_INLINE int32_t SessionVars::snapMaxbufferedMs(void) const
+{
+    return snapMaxbufferedMs_;
+}
+
+X_INLINE int32_t SessionVars::snapRateMs(void) const
+{
+    return snapRateMs_;
+}
+
+X_INLINE int32_t SessionVars::userCmdRateMs(void) const
+{
+    return userCmdRateMs_;
+}
+
 X_NAMESPACE_END
