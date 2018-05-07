@@ -52,7 +52,7 @@ void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
 
         bs.read(pData, sizeInBytes);
 
-        objs_.emplace_back(id, core::make_span(pData, bs.sizeInBytes()));
+        objs_.emplace_back(id, core::make_span(pData, sizeInBytes));
     }
 }
 

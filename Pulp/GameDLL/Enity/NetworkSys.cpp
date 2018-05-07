@@ -136,12 +136,14 @@ namespace entity
         }
     }
 
-    void NetworkSystem::applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const net::SnapShot* pSnap)
+    void NetworkSystem::applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const net::SnapShot* pSnap, physics::IScene* pScene)
     {
         X_UNUSED(timeInfo, reg, pSnap);
 
         X_ASSERT_NOT_NULL(pSnap);
         auto& snap = *pSnap;
+
+        physics::ScopedLock lock(pScene, physics::LockAccess::Write);
 
         for (size_t i = 0; i < snap.getNumObjects(); i++)
         {
@@ -154,6 +156,12 @@ namespace entity
 
             readData(bs, TransForm::pMetaTable_, reinterpret_cast<uint8_t*>(&trans));
 
+            if (reg.has<DynamicObject>(entityId))
+            {
+                auto& col = reg.get<DynamicObject>(entityId);
+
+                pScene->setGlobalPose(col.actor, trans);
+            }
         }
     }
 

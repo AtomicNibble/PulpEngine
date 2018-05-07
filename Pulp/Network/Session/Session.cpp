@@ -6,6 +6,7 @@
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IFont.h>
+#include <ITimer.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -23,7 +24,6 @@ Session::Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena) 
 {
 
     state_ = SessionState::Idle;
-
 }
 
 X_ENABLE_WARNING(4355)
@@ -52,9 +52,13 @@ void Session::connect(SystemAddress address)
     quitToMenu();
 
     // connect
+#if 1
+    gameLobby_.connectTo(address);
+    setState(SessionState::ConnectAndMoveToGame);
+#else
     partyLobby_.connectTo(address);
-
     setState(SessionState::ConnectAndMoveToParty);
+#endif
 }
 
 
@@ -129,12 +133,23 @@ void Session::sendUserCmd(const UserCmd& snap)
     gameLobby_.sendUserCmd(snap);
 }
 
-void Session::sendSnapShot(const SnapShot& snap)
+void Session::sendSnapShot(SnapShot&& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 
     // too all peers.
     gameLobby_.sendSnapShot(snap);
+}
+
+const SnapShot* Session::getSnapShot(void)
+{
+    if (recivedSnaps_.size() == 0) {
+        return nullptr;
+    }
+
+    auto num = recivedSnaps_.size();
+
+    return &recivedSnaps_[num - 1];
 }
 
 bool Session::handleState(void)
@@ -191,6 +206,24 @@ void Session::onLostConnectionToHost(void)
     quitToMenu();
 }
 
+void Session::onReciveSnapShot(SnapShot&& snap)
+{
+    X_UNUSED(snap);
+
+    auto time = gEnv->pTimer->GetTimeNowReal();
+
+    snap.setTime(time);
+
+    recivedSnaps_.emplace_back(std::move(snap));
+
+    // process the snap shot.
+    // not sure where i want to put this logic.
+    // i think it been in the network session is fine.
+    // rather than core, since snapshots are 'network' related.
+    // core should not care if you have a networked game or not.
+}
+
+
 bool Session::stateIdle(void)
 {
 
@@ -242,6 +275,10 @@ bool Session::stateGameLobbyHost(void)
 
 bool Session::stateGameLobbyPeer(void)
 {
+    if (gameLobby_.isPeer())
+    {
+        setState(SessionState::InGame);
+    }
     return true;
 }
 
@@ -375,6 +412,10 @@ bool Session::readPackets(void)
 
         switch (msg)
         {
+            case MessageID::SnapShot:
+                onReciveSnapShot(pPacket);
+                break;
+
             case MessageID::AlreadyConnected:
             case MessageID::ConnectionLost:
             case MessageID::DisconnectNotification:
@@ -433,20 +474,29 @@ bool Session::readPackets(void)
     return true;
 }
 
+void Session::onReciveSnapShot(Packet* pPacket)
+{
+    X_ASSERT(state_ == SessionState::InGame, "Recived snap shot when not in game")(state_);
+
+    gameLobby_.onReciveSnapShot(pPacket);
+}
+
 void Session::sendPacketToLobby(Packet* pPacket)
 {
     // so the server accepted us.
     switch (state_)
     {
-        case Potato::net::SessionState::PartyLobbyHost:
-        case Potato::net::SessionState::PartyLobbyPeer:
+        case SessionState::PartyLobbyHost:
+        case SessionState::PartyLobbyPeer:
            partyLobby_.handlePacket(pPacket);
             break;
-        case Potato::net::SessionState::GameLobbyHost:
-        case Potato::net::SessionState::GameLobbyPeer:
-            break;
+        case SessionState::GameLobbyHost:
+        case SessionState::GameLobbyPeer:
+        case SessionState::InGame:
             gameLobby_.handlePacket(pPacket);
+            break;
         default:
+            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
             X_ASSERT_UNREACHABLE();
             break;
     }
@@ -455,36 +505,48 @@ void Session::sendPacketToLobby(Packet* pPacket)
 
 void Session::onConnectionFailure(Packet* pPacket)
 {
-    // so the server accepted us.
-    if (state_ == SessionState::ConnectAndMoveToParty)
+    switch (state_)
     {
-        partyLobby_.handlePacket(pPacket);
-    }
-    else if (state_ == SessionState::ConnectAndMoveToGame)
-    {
-        gameLobby_.handlePacket(pPacket);
-    }
-    else
-    {
-        X_ASSERT_UNREACHABLE();
+        case SessionState::ConnectAndMoveToParty:
+        case SessionState::PartyLobbyHost:
+        case SessionState::PartyLobbyPeer:
+            partyLobby_.handlePacket(pPacket);
+            break;
+
+        case SessionState::ConnectAndMoveToGame:
+        case SessionState::GameLobbyHost:
+        case SessionState::GameLobbyPeer:
+        case SessionState::InGame:
+            gameLobby_.handlePacket(pPacket);
+            break;
+
+        default:
+            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
+            X_ASSERT_UNREACHABLE();
     }
 }
 
 
 void Session::onConnectionFinalize(Packet* pPacket)
 {
-    // so the server accepted us.
-    if (state_ == SessionState::ConnectAndMoveToParty)
+    switch (state_)
     {
-        partyLobby_.handlePacket(pPacket);
-    }
-    else if (state_ == SessionState::ConnectAndMoveToGame)
-    {
-        gameLobby_.handlePacket(pPacket);
-    }
-    else
-    {
-        X_ASSERT_UNREACHABLE();
+        case SessionState::ConnectAndMoveToParty:
+        case SessionState::PartyLobbyHost:
+        case SessionState::PartyLobbyPeer:
+            partyLobby_.handlePacket(pPacket);
+            break;
+
+        case SessionState::ConnectAndMoveToGame:
+        case SessionState::GameLobbyHost:
+        case SessionState::GameLobbyPeer:
+        case SessionState::InGame:
+            gameLobby_.handlePacket(pPacket);
+            break;
+
+        default:
+            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
+            X_ASSERT_UNREACHABLE();
     }
 }
 
@@ -506,7 +568,7 @@ void Session::sendChatMsg(const char* pMsg)
 bool Session::isHost(void) const
 {
     // not sure what states I will allowthis to be caleld form yet.
-    X_ASSERT(getStatus() == SessionStatus::InGame, "Unexpected status")(getStatus());
+    //X_ASSERT(getStatus() == SessionStatus::InGame, "Unexpected status")(getStatus());
 
     return gameLobby_.isHost();
 }

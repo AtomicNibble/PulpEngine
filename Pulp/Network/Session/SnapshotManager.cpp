@@ -12,9 +12,9 @@ SnapshotManager::SnapshotManager(core::MemoryArenaBase* arena) :
 }
 
 
-void SnapshotManager::setStateSnap(const SnapShot& snap)
+void SnapshotManager::setStateSnap(SnapShot&& snap)
 {
-    snap_ = snap;
+    snap_ = std::move(snap);
     hasSnap_ = true;
 }
 

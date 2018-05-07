@@ -484,7 +484,9 @@ struct ISession
     virtual void startMatch(void) X_ABSTRACT;
 
     virtual void sendUserCmd(const UserCmd& snap) X_ABSTRACT;
-    virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
+    virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
+    
+    virtual const SnapShot* getSnapShot(void) X_ABSTRACT;
 };
 
 // ---------------------------------

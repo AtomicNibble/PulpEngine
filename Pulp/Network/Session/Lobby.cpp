@@ -159,10 +159,14 @@ void Lobby::onReciveSnapShot(Packet* pPacket)
     SnapShot snap(arena_);
     snap.fromBitStream(bs);
 
+    if (!bs.isEos()) {
+        X_ERROR("Lobby", "Failed to read all of snapshot");
+    }
+
     // now we need to just give this snapshot to someone o.o
     // i'm in the lobby :(
     // need a way back to session?
-    pCallbacks_->onRecivedSnapShot(std::move(snap));
+    pCallbacks_->onReciveSnapShot(std::move(snap));
 }
 
 void Lobby::handleConnectionAccepted(Packet* pPacket)
@@ -282,8 +286,11 @@ void Lobby::sendSnapShot(const SnapShot& snap)
         }
 
         if (!peer.loaded) {
-            continue;
+      //      continue;
         }
+
+        NetGuidStr str;
+        X_LOG0("Lobby", "Sending snap to ", peer.guid.toString(str));
 
       // for now just send whole snap, later will need to build deltas and shit.
     // how do i know it's a snapshot tho?

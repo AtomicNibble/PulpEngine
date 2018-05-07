@@ -13,7 +13,7 @@ class SnapshotManager
 public:
     SnapshotManager(core::MemoryArenaBase* arena);
     
-    void setStateSnap(const SnapShot& snap);
+    void setStateSnap(SnapShot&& snap);
     
     bool hasPendingSnap(void) const;
 

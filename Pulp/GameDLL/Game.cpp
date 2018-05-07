@@ -11,6 +11,7 @@
 // TMP
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
+#include <SnapShot.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -248,9 +249,32 @@ bool XGame::update(core::FrameData& frame)
     }
     else if (status == net::SessionStatus::InGame)
     {
-        // pew pew!
-
         world_->update(frame, userCmdMan_);
+
+        // if we are host we make snapshot.
+        if (pSession_->isHost())
+        {
+            net::SnapShot snap(arena_);
+            world_->createSnapShot(frame, snap);
+
+            pSession_->sendSnapShot(std::move(snap));
+        }
+        else
+        {
+            // send userCmd?
+            auto usrCmd = userCmdMan_.getUserCmdForPlayer(0);
+            pSession_->sendUserCmd(usrCmd);
+
+            auto* pSnap = pSession_->getSnapShot();
+            if (pSnap)
+            {
+                world_->applySnapShot(frame, pSnap);
+            }
+        }
+    }
+    else
+    {
+        X_ERROR("Game", "Unhandle session status: %s", net::SessionStatus::ToString(status));
     }
 
     {
@@ -261,7 +285,8 @@ bool XGame::update(core::FrameData& frame)
         con.flags.Clear();
 
         core::StackString256 txt;
-        txt.appendFmt("Session: %s", net::SessionStatus::ToString(status));
+        txt.appendFmt("Session: %s\n", net::SessionStatus::ToString(status));
+        txt.appendFmt("Host: %" PRIi8, pSession_->isHost());
 
         pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
     }

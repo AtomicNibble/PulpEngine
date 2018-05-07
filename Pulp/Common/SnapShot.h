@@ -40,7 +40,12 @@ class SnapShot
 
 public:
     SnapShot(core::MemoryArenaBase* arena);
+    SnapShot(const SnapShot& oth) = delete;
+    SnapShot(SnapShot&& oth) = default;
     ~SnapShot();
+
+    SnapShot& operator=(SnapShot&& oth) = default;
+
 
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);

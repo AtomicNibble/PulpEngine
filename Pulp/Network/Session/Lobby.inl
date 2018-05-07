@@ -18,6 +18,8 @@ X_INLINE bool Lobby::isHost(void) const
 
 X_INLINE bool Lobby::isPeer(void) const
 {
+    // you are only a peer if connected to a host.
+
     return !isHost();
 }
 

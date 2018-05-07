@@ -153,7 +153,7 @@ namespace entity
 
     void EnititySystem::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
     {
-        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap);
+        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap, pPhysScene_);
     }
 
     EntityId EnititySystem::createEnt(void)

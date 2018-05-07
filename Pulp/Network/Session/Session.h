@@ -76,7 +76,9 @@ public:
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap) X_FINAL;
     // if we are a host and have peers we send snaps.
-    void sendSnapShot(const SnapShot& snap) X_FINAL;
+    void sendSnapShot(SnapShot&& snap) X_FINAL;
+
+    const SnapShot* getSnapShot(void) X_FINAL;
 
     bool handleState(void);
 
@@ -92,9 +94,11 @@ public:
 
 private:
     void onLostConnectionToHost(void) X_FINAL;
+    void onReciveSnapShot(SnapShot&& snap) X_FINAL;
 
 
 private:
+    void onReciveSnapShot(Packet* pPacket);
     void sendPacketToLobby(Packet* pPacket);
     void onConnectionFailure(Packet* pPacket);
     void onConnectionFinalize(Packet* pPacket);
