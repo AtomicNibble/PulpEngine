@@ -2,6 +2,7 @@
 
 #include <Containers\Array.h>
 #include <Util\Span.h>
+#include <Time\TimeVal.h>
 
 X_NAMESPACE_DECLARE(core,
     class FixedBitStreamBase
@@ -37,6 +38,9 @@ public:
     void addObject(ObjectID id, core::FixedBitStreamBase& bs);
 
     X_INLINE size_t getNumObjects(void) const;
+    X_INLINE core::TimeVal getTime(void) const;
+
+    X_INLINE void setTime(core::TimeVal time);
 
     bool getMessageByIndex(size_t idx, core::FixedBitStreamBase& bs) const;
 
@@ -46,6 +50,8 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
+    core::TimeVal time_; // the creation or recival time;
+
     ObjectStateArr objs_;
 };
 
