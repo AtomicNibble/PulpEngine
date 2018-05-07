@@ -453,6 +453,7 @@
     <ClInclude Include="Session\Lobby.h" />
     <ClInclude Include="Session\Session.h" />
     <ClInclude Include="Session\SessionCallbacks.h" />
+    <ClInclude Include="Session\SnapshotManager.h" />
     <ClInclude Include="Sockets\Socket.h" />
     <ClInclude Include="Sockets\win32\Socket.h" />
     <ClInclude Include="stdafx.h" />
@@ -474,6 +475,7 @@
     <ClCompile Include="Reliability\ReliabilityLayer.cpp" />
     <ClCompile Include="Session\Lobby.cpp" />
     <ClCompile Include="Session\Session.cpp" />
+    <ClCompile Include="Session\SnapshotManager.cpp" />
     <ClCompile Include="Sockets\win32\Socket.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

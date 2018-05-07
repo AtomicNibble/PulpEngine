@@ -116,6 +116,9 @@
     <ClInclude Include="Session\SessionCallbacks.h">
       <Filter>Header Files\Session</Filter>
     </ClInclude>
+    <ClInclude Include="Session\SnapshotManager.h">
+      <Filter>Header Files\Session</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -162,6 +165,9 @@
     </ClCompile>
     <ClCompile Include="Vars\SessionVars.cpp">
       <Filter>Source Files\Vars</Filter>
+    </ClCompile>
+    <ClCompile Include="Session\SnapshotManager.cpp">
+      <Filter>Source Files\Session</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
