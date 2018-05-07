@@ -177,7 +177,8 @@ public:
     void clear(void);
 
     size_type size(void) const;
-    size_type capacity(void) const;
+    constexpr size_type capacity(void) const;
+    size_type freeSpace(void) const;
 
     void append(const T& val);
     void push_back(const T& val);

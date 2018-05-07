@@ -134,6 +134,8 @@ private:
 
     Lobby partyLobby_;
     Lobby gameLobby_;
+
+    core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
 };
 
 

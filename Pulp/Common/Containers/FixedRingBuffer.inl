@@ -34,10 +34,17 @@ typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::size(void) cons
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::capacity(void) const
+constexpr typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::capacity(void) const
 {
     return N;
 }
+
+template<typename T, size_t N>
+typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::freeSpace(void) const
+{
+    return capacity() - size();
+}
+
 
 template<typename T, size_t N>
 void FixedRingBuffer<T, N>::append(const T& val)

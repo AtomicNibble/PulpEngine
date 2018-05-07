@@ -26,18 +26,22 @@ TYPED_TEST(FixedRingBufferTest, Types)
 
     EXPECT_EQ(0, ring.size());
     ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(3, ring.freeSpace());
 
     ring.append(16);
     EXPECT_EQ(1, ring.size());
     ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(2, ring.freeSpace());
 
     ring.append(32);
     EXPECT_EQ(2, ring.size());
     ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(1, ring.freeSpace());
 
     ring.append(48);
     EXPECT_EQ(3, ring.size());
     ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(0, ring.freeSpace());
 
     EXPECT_EQ(16, ring[0]);
     EXPECT_EQ(32, ring[1]);
@@ -46,11 +50,41 @@ TYPED_TEST(FixedRingBufferTest, Types)
     ring.append(96);
     EXPECT_EQ(3, ring.size());
     ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(0, ring.freeSpace());
 
     EXPECT_EQ(32, ring[0]);
     EXPECT_EQ(48, ring[1]);
     EXPECT_EQ(96, ring[2]);
 }
+
+
+TYPED_TEST(FixedRingBufferTest, Index)
+{
+    testTypes::resetConConters();
+
+    FixedRingBuffer<TypeParam, 3> ring;
+
+    ring.append(16);
+    ring.append(32);
+    ring.append(48);
+    EXPECT_EQ(3, ring.size());
+    ASSERT_EQ(3, ring.capacity());
+    ASSERT_EQ(0, ring.freeSpace());
+
+    EXPECT_EQ(16, ring[0]);
+    EXPECT_EQ(32, ring[1]);
+    EXPECT_EQ(48, ring[2]);
+
+    ring.append(96);
+    EXPECT_EQ(96, ring[2]);
+
+    ring.append(112);
+    EXPECT_EQ(112, ring[2]);
+
+    ring.append(128);
+    EXPECT_EQ(128, ring[2]);
+}
+
 
 TEST(FixedRingBufferTest, ComplexConstruction)
 {
