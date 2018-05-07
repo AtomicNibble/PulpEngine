@@ -2,6 +2,9 @@
 
 #include <Containers\Array.h>
 #include <Time\TimeVal.h>
+#include <Util\UniquePointer.h>
+
+#include "SnapshotManager.h"
 
 X_NAMESPACE_BEGIN(net)
 
@@ -11,6 +14,8 @@ struct UserCmd;
 class SnapShot;
 
 class SessionVars;
+class SnapshotManager;
+
 
 X_DECLARE_ENUM(LobbyType)(
     Party,
@@ -34,16 +39,20 @@ struct LobbyUser
 struct LobbyPeer
 {
     X_DECLARE_ENUM8(ConnectionState)(
+        Free,
         Pending,
         Established    
     );
 
     LobbyPeer() {
-        connectionState = ConnectionState::Pending;
+        connectionState = ConnectionState::Free;
 
         loaded = false;
         inGame = false;
+
         snapHz = 0.f;
+        numSnapsSent = 0;
+
         systemHandle = INVALID_SYSTEM_HANDLE;
     }
 
@@ -58,8 +67,9 @@ public:
     bool inGame;
 
     core::TimeVal lastSnap;
-
     float snapHz;
+    int32_t numSnapsSent;
+    core::UniquePointer<SnapshotManager> pSnapMan;
 
     SystemHandle systemHandle;
     SystemAddress systemAddr;
@@ -80,6 +90,7 @@ public:
     void connectTo(SystemAddress address);
 
     bool handlePacket(Packet* pPacket);
+    void onReciveSnapShot(Packet* pPacket);
 
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap);
@@ -116,12 +127,12 @@ public:
 
 private:
     const LobbyPeer* findPeer(SystemHandle handle) const;
-    LobbyPeer& addPeer(SystemHandle handle, NetGUID guid);
+    int32_t addPeer(SystemAddress address);
 
 private:
     void setState(LobbyState::Enum state);
 
-    void handleConnectionAccepted(SystemHandle handle);
+    void handleConnectionAccepted(Packet* pPacket);
     void handleConnectionHandShake(Packet* pPacket);
     void handleConnectionAttemptFailed(MessageID::Enum id);
     void handleConnectionLost(Packet* pPacket);

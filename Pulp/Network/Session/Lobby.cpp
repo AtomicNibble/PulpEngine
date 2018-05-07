@@ -67,6 +67,9 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, Lob
     users_(arena),
     peers_(arena)
 {
+    peers_.setGranularity(8);
+    peers_.resize(8);
+
     state_ = LobbyState::Idle;
 
     isHost_ = false;
@@ -92,12 +95,9 @@ void Lobby::connectTo(SystemAddress address)
     }
 
     // add the address as a peer and mark as host.
-    LobbyPeer peer;
-    peer.systemAddr = address;
+    hostIdx_ = addPeer(address);
+    X_ASSERT(peers_[hostIdx_].getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peers_[hostIdx_].getConnectionState());
 
-    auto idx = peers_.emplace_back(std::move(peer));
-
-    hostIdx_ = safe_static_cast<decltype(hostIdx_)>(idx);
 
     setState(LobbyState::Connecting);
 }
@@ -110,7 +110,7 @@ bool Lobby::handlePacket(Packet* pPacket)
     switch (id)
     {
         case MessageID::ConnectionRequestAccepted:
-            handleConnectionAccepted(pPacket->systemHandle);
+            handleConnectionAccepted(pPacket);
             break;
 
         case MessageID::ConnectionRequestHandShake:
@@ -138,10 +138,37 @@ bool Lobby::handlePacket(Packet* pPacket)
     return false;
 }
 
-void Lobby::handleConnectionAccepted(SystemHandle handle)
+void Lobby::onReciveSnapShot(Packet* pPacket)
+{
+    // okay so this is a snap shot :O
+    X_ASSERT(isPeer(), "Recived snapshot when not a peer")(isPeer());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived snapshot")(type_);
+
+    auto& hostPerr = peers_[hostIdx_];
+
+    if (pPacket->guid != hostPerr.guid) {
+        NetGuidStr str0, str1;
+        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPerr.guid.toString(str1));
+        return;
+    }
+
+    // TODO pass the snapshot in to the snapshot manager which will handle deltas from the host.
+    // which we will then ACK.
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    SnapShot snap(arena_);
+    snap.fromBitStream(bs);
+
+    // now we need to just give this snapshot to someone o.o
+    // i'm in the lobby :(
+    // need a way back to session?
+    pCallbacks_->onRecivedSnapShot(std::move(snap));
+}
+
+void Lobby::handleConnectionAccepted(Packet* pPacket)
 {
     X_ASSERT(isPeer(), "We should only be connecting to a server if a peer")(isPeer());
-    X_ASSERT(handle != INVALID_SYSTEM_HANDLE, "invalid handle")(handle);
+    X_ASSERT(pPacket->systemHandle != INVALID_SYSTEM_HANDLE, "invalid handle")(pPacket->systemHandle);
 
     if (state_ != LobbyState::Connecting)
     {
@@ -152,9 +179,11 @@ void Lobby::handleConnectionAccepted(SystemHandle handle)
     // kinda need to know the fucking peer index here SLUT!
     // TODO not assume it's host
     auto& peer = peers_[hostIdx_];
+    X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peer.getConnectionState());
 
     peer.setConnectionState(LobbyPeer::ConnectionState::Established, arena_);
-    peer.systemHandle = handle;
+    peer.systemHandle = pPacket->systemHandle;
+    peer.guid = pPacket->guid;
 
     setState(LobbyState::Idle);
 }
@@ -170,8 +199,15 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     // bitch plz.
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
 
-    auto& peer = addPeer(pPacket->systemHandle, pPacket->guid);
+    auto address = pPeer_->getAddressForHandle(pPacket->systemHandle);
+    auto peerIdx = addPeer(address);
+    
+    IPStr strBuf;
+    X_LOG0("Lobby", "Peer connected to \"%s\" lobby address \"%s\"", LobbyType::ToString(type_), gEnv->pNet->systemAddressToString(address, strBuf, true));
 
+    auto& peer = peers_[peerIdx];
+    peer.systemHandle = pPacket->systemHandle;
+    peer.guid = pPacket->guid;
     peer.setConnectionState(LobbyPeer::ConnectionState::Established, arena_); // they have just confirmed connection.
 
     X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Established, "Unexpected connection state")(peer.getConnectionState());
@@ -182,6 +218,12 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
 
 void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
 {
+    if (state_ != LobbyState::Connecting)
+    {
+        X_ERROR("Lobby", "Recived connection failed when not trying to connect. State: \"%s\"", LobbyState::ToString(state_));
+        return;
+    }
+
     X_ERROR("Net", "Connection attempt failed: \"%s\"", MessageID::ToString(id));
         
 
@@ -228,19 +270,25 @@ void Lobby::sendSnapShot(const SnapShot& snap)
     X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
 
     core::FixedBitStreamStack<1500> bs;
-    //  bs.write(snap); // TODO: actually seralize.
+    bs.write(MessageID::SnapShot);
+    snap.writeToBitStream(bs);
 
-    X_ASSERT_NOT_IMPLEMENTED();
+  //  X_ASSERT_NOT_IMPLEMENTED();
 
     for (auto& peer : peers_)
     {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
         if (!peer.loaded) {
             continue;
         }
 
-        // can i just broadcast this?
-        // no, since we will have per user delta.s
+      // for now just send whole snap, later will need to build deltas and shit.
+    // how do i know it's a snapshot tho?
         pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
+      //  peer.pSnapMan->setStateSnap(snap);
     }
 }
 
@@ -274,6 +322,10 @@ void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
     
     for (auto& peer : peers_)
     {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
         pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
     }
 }
@@ -309,20 +361,34 @@ const LobbyPeer* Lobby::findPeer(SystemHandle handle) const
     return it;
 }
 
-LobbyPeer& Lobby::addPeer(SystemHandle handle, NetGUID guid)
+int32_t Lobby::addPeer(SystemAddress address)
 {
-    X_ASSERT(findPeer(handle) == nullptr, "Peer already exsists")(handle);
+    // X_ASSERT(findPeer(handle) == nullptr, "Peer already exsists")(handle);
 
-    LobbyPeer peer;
-    peer.systemHandle = handle;
-    peer.systemAddr = pPeer_->getAddressForHandle(handle);
-    peer.guid = guid;
+    // find free idx.
+    int32_t idx = -1;
+    for(size_t i=0; i<peers_.size(); i++)
+    {
+        if (peers_[i].getConnectionState() == LobbyPeer::ConnectionState::Free)
+        {
+            idx = static_cast<int32_t>(i);
+            break;
+        }
+    }
 
-    auto idx = peers_.emplace_back(std::move(peer));
+    // you not be trying to add a peer if no free slots.
+    if (idx < 0) {
+        X_ASSERT_UNREACHABLE();
+        return idx;
+    }
 
-    return peers_[idx];
+    auto& peer = peers_[idx];
+    peer.systemHandle = INVALID_SYSTEM_HANDLE;
+    peer.systemAddr = address;
+    peer.guid = NetGUID();
     peer.setConnectionState(LobbyPeer::ConnectionState::Pending, arena_);
 
+    return idx;
 }
 
 void Lobby::setState(LobbyState::Enum state)
@@ -361,7 +427,13 @@ void Lobby::shutdown(void)
     hostIdx_ = -1;
 
     users_.clear();
-    peers_.clear();
+    
+    for (auto& peer : peers_)
+    {
+        if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
+            peer.setConnectionState(LobbyPeer::ConnectionState::Free, arena_);
+        }
+    }
 
     setState(LobbyState::Idle);
 }
@@ -426,6 +498,10 @@ bool Lobby::allPeersLoaded(void) const
 
     for (auto& peer : peers_)
     {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
         loaded &= peer.loaded;
     }
 
