@@ -10,9 +10,57 @@
 
 X_NAMESPACE_BEGIN(net)
 
+void LobbyPeer::setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena)
+{
+    if (state == connectionState) {
+        X_ERROR("Lobby", "Peer already in stat: \"%s\"", ConnectionState::ToString(state));
+        return;
+    }
+
+    if (state == ConnectionState::Free)
+    {
+        if (state == ConnectionState::Established)
+        {
+            // bye bye..
+        }
+
+        pSnapMan.reset();
+    }
+    else if (state == ConnectionState::Pending)
+    {
+        X_ASSERT(connectionState == ConnectionState::Free, "Invalid peer state")(connectionState);
+
+        pSnapMan = core::makeUnique<SnapshotManager>(arena, arena);
+
+    }
+    else if (state == ConnectionState::Established)
+    {
+        X_ASSERT(connectionState == ConnectionState::Pending, "Invalid peer state")(connectionState);
+
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    connectionState = state;
+}
+
+X_INLINE LobbyPeer::ConnectionState::Enum LobbyPeer::getConnectionState(void) const
+{
+    return connectionState;
+}
+
+X_INLINE bool LobbyPeer::isConnected(void) const
+{
+    return connectionState == ConnectionState::Established;
+}
+
+// ------------------------------------------------------
 
 Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
     vars_(vars),
+    arena_(arena),
     pCallbacks_(X_ASSERT_NOT_NULL(pCallbacks)),
     pPeer_(pPeer),
     type_(type),
@@ -105,7 +153,7 @@ void Lobby::handleConnectionAccepted(SystemHandle handle)
     // TODO not assume it's host
     auto& peer = peers_[hostIdx_];
 
-    peer.connectionState = LobbyPeer::ConnectionState::Established;
+    peer.setConnectionState(LobbyPeer::ConnectionState::Established, arena_);
     peer.systemHandle = handle;
 
     setState(LobbyState::Idle);
@@ -124,8 +172,9 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
 
     auto& peer = addPeer(pPacket->systemHandle, pPacket->guid);
 
-    X_ASSERT(peer.connectionState == LobbyPeer::ConnectionState::Established, "Unexpected connection state")(peer.connectionState);
+    peer.setConnectionState(LobbyPeer::ConnectionState::Established, arena_); // they have just confirmed connection.
 
+    X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Established, "Unexpected connection state")(peer.getConnectionState());
 
     // sent a state msg?
 
@@ -268,11 +317,12 @@ LobbyPeer& Lobby::addPeer(SystemHandle handle, NetGUID guid)
     peer.systemHandle = handle;
     peer.systemAddr = pPeer_->getAddressForHandle(handle);
     peer.guid = guid;
-    peer.connectionState = LobbyPeer::ConnectionState::Established;
 
     auto idx = peers_.emplace_back(std::move(peer));
 
     return peers_[idx];
+    peer.setConnectionState(LobbyPeer::ConnectionState::Pending, arena_);
+
 }
 
 void Lobby::setState(LobbyState::Enum state)

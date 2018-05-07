@@ -47,9 +47,15 @@ struct LobbyPeer
         systemHandle = INVALID_SYSTEM_HANDLE;
     }
 
+
+    void setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena);
+
+    ConnectionState::Enum getConnectionState(void) const;
+    bool isConnected(void) const;
+
+public:
     bool loaded;
     bool inGame;
-    ConnectionState::Enum connectionState;
 
     core::TimeVal lastSnap;
 
@@ -58,6 +64,9 @@ struct LobbyPeer
     SystemHandle systemHandle;
     SystemAddress systemAddr;
     NetGUID guid;
+
+private:
+    ConnectionState::Enum connectionState;
 };
 
 class Lobby
@@ -129,6 +138,7 @@ private:
 
 private:
     SessionVars& vars_;
+    core::MemoryArenaBase* arena_;
     ISessionCallbacks* pCallbacks_;
     IPeer* pPeer_;
     const LobbyType::Enum type_;
