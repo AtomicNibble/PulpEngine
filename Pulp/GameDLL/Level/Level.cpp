@@ -322,6 +322,17 @@ void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
     level_->update(frame);
 }
 
+void World::createSnapShot(core::FrameData& frame, net::SnapShot& snap)
+{
+    ents_.createSnapShot(frame, snap);
+}
+
+void World::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
+{
+    ents_.applySnapShot(frame, pSnap);
+}
+
+
 void World::spawnPlayer(entity::EntityId id)
 {
     X_ASSERT(id < MAX_PLAYERS, "Invalide player id")(id);

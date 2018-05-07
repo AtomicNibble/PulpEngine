@@ -90,6 +90,9 @@ public:
 
     void update(core::FrameData& frame, UserCmdMan& userCmdMan);
 
+    void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
+    void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
+
     void spawnPlayer(entity::EntityId id);
 
 private:
