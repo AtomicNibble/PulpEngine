@@ -29,6 +29,7 @@ namespace
         return cord;
     }
 
+#if 0 // not working in Win10
     BOOL _SetConsoleIcon(HICON hIcon)
     {
         typedef BOOL(WINAPI * SetConsoleIcon_t)(HICON handle);
@@ -38,8 +39,9 @@ namespace
         core::Module::Handle hDll = core::Module::Load("kernel32");
         if (hDll) {
             pSetConsoleIcon = (SetConsoleIcon_t)core::Module::GetProc(hDll, "SetConsoleIcon");
-            if (pSetConsoleIcon)
+            if (pSetConsoleIcon) {
                 return pSetConsoleIcon(hIcon);
+            }
         }
         return false;
     }
@@ -61,6 +63,7 @@ namespace
             X_ERROR("Console", "Failed to seticon on console. Error: %s", lastError::ToString(Dsc));
         }
     }
+#endif
 
 }; // namespace
 
@@ -84,7 +87,7 @@ Console::Console(const wchar_t* title) :
         return;
     }
 
-    SetConsoleIcon(Dsc, IDI_ENGINE_LOGO);
+//    SetConsoleIcon(Dsc, IDI_ENGINE_LOGO);
 
     console_ = GetStdHandle(STD_OUTPUT_HANDLE);
     consoleInput_ = GetStdHandle(STD_INPUT_HANDLE);
