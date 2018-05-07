@@ -517,7 +517,7 @@ struct INet : public core::IEngineSysBase
 
     // the two string logic is passed to platform abstract logic, so you do it via this interface.
     // since the platform lib is only loaded if you have created a instanced of something deriving this interface.
-    virtual const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort = true) const X_ABSTRACT;
+    virtual const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const X_ABSTRACT;
 };
 
 
