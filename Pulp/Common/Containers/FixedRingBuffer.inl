@@ -21,7 +21,7 @@ void FixedRingBuffer<T, N>::clear(void)
     size_type i;
 
     for (i = 0; i < num_; i++) {
-        Mem::Destruct(&array_ + index_to_subscript(i));
+        Mem::Destruct<T>(data() + indexToSubscript(i));
     }
 
     num_ = 0;
@@ -42,16 +42,16 @@ typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::capacity(void) 
 template<typename T, size_t N>
 void FixedRingBuffer<T, N>::append(const T& val)
 {
-    size_type next = next_tail();
+    size_type next = nextTail();
     if (num_ == N) {
-        array_[next] = val;
-        increment_head();
+        data()[next] = val;
+        incrementHead();
     }
     else {
-        Mem::Construct(array_ + next, val);
+        Mem::Construct<T>(data() + next, val);
     }
 
-    increment_tail();
+    incrementTail();
 }
 
 template<typename T, size_t N>
@@ -60,28 +60,46 @@ void FixedRingBuffer<T, N>::push_back(const T& val)
     append(val);
 }
 
+template<typename T, size_t N>
+template<class... ArgsT>
+void FixedRingBuffer<T, N>::emplace_back(ArgsT&&... args)
+{
+    size_type next = nextTail();
+    if (num_ == N) {
+        Mem::Destruct<T>(data() + next);
+        Mem::Construct<T>(data() + next, std::forward<ArgsT>(args)...);
+
+        incrementHead();
+    }
+    else {
+        Mem::Construct<T>(data() + next, std::forward<ArgsT>(args)...);
+    }
+
+    incrementTail();
+}
+
 // -----------------------------------
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::iterator FixedRingBuffer<T, N>::begin()
+typename FixedRingBuffer<T, N>::iterator FixedRingBuffer<T, N>::begin(void)
 {
     return iterator(this, 0);
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::iterator FixedRingBuffer<T, N>::end()
+typename FixedRingBuffer<T, N>::iterator FixedRingBuffer<T, N>::end(void)
 {
     return iterator(this, size());
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::const_iterator FixedRingBuffer<T, N>::begin() const
+typename FixedRingBuffer<T, N>::const_iterator FixedRingBuffer<T, N>::begin(void) const
 {
     return const_iterator(this, 0);
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::const_iterator FixedRingBuffer<T, N>::end() const
+typename FixedRingBuffer<T, N>::const_iterator FixedRingBuffer<T, N>::end(void) const
 {
     return const_iterator(this, size());
 }
@@ -89,25 +107,25 @@ typename FixedRingBuffer<T, N>::const_iterator FixedRingBuffer<T, N>::end() cons
 // -----------------------------------
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::reverse_iterator FixedRingBuffer<T, N>::rbegin()
+typename FixedRingBuffer<T, N>::reverse_iterator FixedRingBuffer<T, N>::rbegin(void)
 {
     return reverse_iterator(end());
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::reverse_iterator FixedRingBuffer<T, N>::rend()
+typename FixedRingBuffer<T, N>::reverse_iterator FixedRingBuffer<T, N>::rend(void)
 {
     return reverse_iterator(begin());
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::const_reverse_iterator FixedRingBuffer<T, N>::rbegin() const
+typename FixedRingBuffer<T, N>::const_reverse_iterator FixedRingBuffer<T, N>::rbegin(void) const
 {
     return const_reverse_iterator(end());
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::const_reverse_iterator FixedRingBuffer<T, N>::rend() const
+typename FixedRingBuffer<T, N>::const_reverse_iterator FixedRingBuffer<T, N>::rend(void) const
 {
     return const_reverse_iterator(begin());
 }
@@ -117,13 +135,13 @@ typename FixedRingBuffer<T, N>::const_reverse_iterator FixedRingBuffer<T, N>::re
 template<typename T, size_t N>
 typename FixedRingBuffer<T, N>::reference FixedRingBuffer<T, N>::operator[](size_type idx)
 {
-    return array_[index_to_subscript(idx)];
+    return data()[indexToSubscript(idx)];
 }
 
 template<typename T, size_t N>
 typename FixedRingBuffer<T, N>::const_reference FixedRingBuffer<T, N>::operator[](size_type idx) const
 {
-    return array_[index_to_subscript(idx)];
+    return data()[indexToSubscript(idx)];
 }
 
 // -----------------------------------
@@ -134,32 +152,38 @@ typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::normalise(size_
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::index_to_subscript(size_type idx) const
+typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::indexToSubscript(size_type idx) const
 {
     return normalise(idx + head_);
 }
 
 template<typename T, size_t N>
-typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::next_tail()
+typename FixedRingBuffer<T, N>::size_type FixedRingBuffer<T, N>::nextTail(void)
 {
     return (tail_ + 1 == N) ? 0 : tail_ + 1;
 }
 
 template<typename T, size_t N>
-void FixedRingBuffer<T, N>::increment_tail()
+void FixedRingBuffer<T, N>::incrementTail(void)
 {
     ++num_;
-    tail_ = next_tail();
+    tail_ = nextTail();
 }
 
 template<typename T, size_t N>
-void FixedRingBuffer<T, N>::increment_head()
+void FixedRingBuffer<T, N>::incrementHead(void)
 {
     ++head_;
     --num_;
     if (head_ == N) {
         head_ = 0;
     }
+}
+
+template<typename T, size_t N>
+T* FixedRingBuffer<T, N>::data(void)
+{
+    return reinterpret_cast<T*>(array_);
 }
 
 X_NAMESPACE_END

@@ -182,36 +182,41 @@ public:
     void append(const T& val);
     void push_back(const T& val);
 
-    iterator begin();
-    iterator end();
+    template<class... ArgsT>
+    void emplace_back(ArgsT&&... args);
 
-    const_iterator begin() const;
-    const_iterator end() const;
+    iterator begin(void);
+    iterator end(void);
 
-    reverse_iterator rbegin();
-    reverse_iterator rend();
+    const_iterator begin(void) const;
+    const_iterator end(void) const;
 
-    const_reverse_iterator rbegin() const;
-    const_reverse_iterator rend() const;
+    reverse_iterator rbegin(void);
+    reverse_iterator rend(void);
+
+    const_reverse_iterator rbegin(void) const;
+    const_reverse_iterator rend(void) const;
 
     reference operator[](size_type idx);
     const_reference operator[](size_type idx) const;
 
 protected:
     size_type normalise(size_type idx) const;
-    size_type index_to_subscript(size_type idx) const;
+    size_type indexToSubscript(size_type idx) const;
 
-    size_type next_tail();
+    size_type nextTail(void);
 
-    void increment_tail();
-    void increment_head();
+    void incrementTail(void);
+    void incrementHead(void);
+
+    T* data(void);
 
 protected:
     size_type num_;
     size_type head_;
     size_type tail_;
 
-    T array_[N];
+    uint8_t X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
 };
 
 X_NAMESPACE_END
