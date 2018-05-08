@@ -52,9 +52,17 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("net_resolve", this, XNet, &XNet::Cmd_resolveHost, core::VarFlag::SYSTEM,
         "Resolves a given host, result is logged. <host>, <forceIpVersion(ipv4|ipv6)>");
 
-    // Breaking the naming convention ! tut tut ;(
     ADD_COMMAND_MEMBER("connect", this, XNet, &XNet::Cmd_connect, core::VarFlag::SYSTEM,
         "Connect to server <address>");
+
+    ADD_COMMAND_MEMBER("createParty", this, XNet, &XNet::Cmd_createParty, core::VarFlag::SYSTEM,
+        "Create and join a party");
+
+    ADD_COMMAND_MEMBER("createMatch", this, XNet, &XNet::Cmd_createMatch, core::VarFlag::SYSTEM,
+        "Create and join a game lobby");
+
+    ADD_COMMAND_MEMBER("startMatch", this, XNet, &XNet::Cmd_startMatch, core::VarFlag::SYSTEM,
+        "Guess what? yep it starts that match, magic.");
 
     ADD_COMMAND_MEMBER("net_chat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM,
         "Send a chat message");
@@ -469,6 +477,51 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
 
     pSession_->connect(sa);
 }
+
+void XNet::Cmd_createParty(core::IConsoleCmdArgs* pCmd)
+{
+    if (!pSession_) {
+        X_ERROR("Net", "Can't createParty no active session");
+        return;
+    }
+
+    MatchParameters params;
+    params.flags.Set(MatchFlag::Online);
+    pSession_->createPartyLobby(params);
+}
+
+void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
+{
+    if (!pSession_) {
+        X_ERROR("Net", "Can't createMatch no active session");
+        return;
+    }
+
+    const char* pMap = "test01";
+
+    if (pCmd->GetArgCount() > 1) {
+        pMap = pCmd->GetArg(1);
+    }
+
+    MatchParameters params;
+    params.numSlots = 8;
+    params.mapName = pMap;
+    params.mode = GameMode::SinglePlayer;
+    params.flags.Set(MatchFlag::Online);
+
+    pSession_->createMatch(params);
+}
+
+void XNet::Cmd_startMatch(core::IConsoleCmdArgs* pCmd)
+{
+    if (!pSession_) {
+        X_ERROR("Net", "Can't startMatch no active session");
+        return;
+    }
+
+    pSession_->startMatch();
+}
+
 
 void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 {

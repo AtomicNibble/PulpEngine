@@ -7,6 +7,9 @@
 
 #include <NetMsgIds.h>
 
+X_NAMESPACE_DECLARE(engine,
+    class IPrimativeContext);
+
 X_NAMESPACE_BEGIN(net)
 
 #define NET_IPv6_SUPPORT 1
@@ -16,6 +19,7 @@ class SystemAddress;
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
+static const uint32_t MAX_USERNAME_LEN = 64;
 
 
 static const uint32_t MAX_REPLICATION_WORLDS = 4;
@@ -464,8 +468,42 @@ X_DECLARE_ENUM(SessionStatus)(
     InGame
 );
 
+X_DECLARE_ENUM(LobbyType)(
+    Party, //  your not invited
+    Game
+);
+
 struct UserCmd;
 class SnapShot;
+
+typedef uintptr_t LobbyUserHandle;
+
+struct ILobby
+{
+    virtual ~ILobby() = default;
+
+    virtual bool allPeersLoaded(void) const X_ABSTRACT;
+    virtual int32_t getNumConnectedPeers(void) const X_ABSTRACT;
+    virtual int32_t getNumConnectedPeersInGame(void) const X_ABSTRACT;
+
+    virtual int32_t getNumUsers(void) const X_ABSTRACT;
+    virtual int32_t getNumFreeSlots(void) const X_ABSTRACT;
+    virtual LobbyUserHandle getUserHandleForIdx(size_t idx) const X_ABSTRACT;
+
+    virtual const char* getUserName(LobbyUserHandle handle) const X_ABSTRACT;
+
+    virtual bool isHost(void) const X_ABSTRACT;
+    virtual bool isPeer(void) const X_ABSTRACT;
+
+    virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
+
+    X_INLINE bool isFull(void) const;
+};
+
+X_INLINE bool ILobby::isFull(void) const
+{
+    return getNumFreeSlots() == 0;
+}
 
 struct ISession
 {
@@ -487,6 +525,9 @@ struct ISession
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;
+    virtual const ILobby* getLobby(LobbyType::Enum type) const X_ABSTRACT;
+
+    virtual void drawDebug(engine::IPrimativeContext* pPrim) const X_ABSTRACT;
 };
 
 // ---------------------------------

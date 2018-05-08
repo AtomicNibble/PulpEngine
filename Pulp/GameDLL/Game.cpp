@@ -187,6 +187,10 @@ bool XGame::update(core::FrameData& frame)
 
     auto status = pSession_->getStatus();
 
+    auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+    pSession_->drawDebug(pPrim);
+
     if (status == net::SessionStatus::Idle)
     {
         // main menu :D
@@ -224,8 +228,6 @@ bool XGame::update(core::FrameData& frame)
         }
 
         // draw some shitty load screen?
-        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
-
         auto width = frame.view.viewport.getWidthf();
         auto height = frame.view.viewport.getHeightf();
 
@@ -272,13 +274,43 @@ bool XGame::update(core::FrameData& frame)
             }
         }
     }
+    else if (status == net::SessionStatus::PartyLobby)
+    {
+        // party!! at stu's house.
+
+
+    }
+    else if (status == net::SessionStatus::GameLobby)
+    {
+        auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+        auto numUsers = pLobby->getNumUsers();
+
+        con.col = Col_Floralwhite;
+        con.size = Vec2f(24.f, 24.f);
+        con.flags.Clear();
+
+        // who#s in my lobbyyyyy!!
+        core::StackString256 txt;
+        txt.setFmt("---- GameLobby(%" PRIuS ") ----\n", numUsers);
+        
+        for (size_t i = 0; i < numUsers; i++)
+        {
+            auto handle = pLobby->getUserHandleForIdx(i);
+            auto* pName = pLobby->getUserName(handle);
+
+            txt.appendFmt("\nPlayer%" PRIuS " ^8%s", i, pName);
+        }
+
+        pPrim->drawQuad(800.f, 200.f, 320.f, 200.f, Color8u(40,40,40,100));
+        pPrim->drawText(Vec3f(802.f, 202.f, 1.f), con, txt.begin(), txt.end());
+
+    }
     else
     {
         X_ERROR("Game", "Unhandle session status: %s", net::SessionStatus::ToString(status));
     }
 
     {
-        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
         con.col = Col_Crimson;
         con.size = Vec2f(24.f, 24.f);

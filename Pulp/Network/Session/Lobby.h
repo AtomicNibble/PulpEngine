@@ -17,11 +17,6 @@ class SessionVars;
 class SnapshotManager;
 
 
-X_DECLARE_ENUM(LobbyType)(
-    Party,
-    Game
-);
-
 X_DECLARE_ENUM(LobbyState)(
     Idle,
     Creating,
@@ -29,11 +24,24 @@ X_DECLARE_ENUM(LobbyState)(
     Error
 );
 
+// So we have 'users' and 'peers'
+// everyone should have a copy of the user list, it's basically the meta for each player.
+// you only have a peer for a user if you need to talk to it.
+// so a server will have peers for all users.
+// while everyone else will just have peer for host.
+
 struct LobbyUser
 {
+    LobbyUser() {
+        peerIdx = -1;
+        username.set("Stu");
+    }
+
     NetGUID guid;
     SystemAddress address;
+    int32_t peerIdx;
 
+    core::StackString<MAX_USERNAME_LEN> username;
 };
 
 struct LobbyPeer
@@ -79,7 +87,7 @@ private:
     ConnectionState::Enum connectionState;
 };
 
-class Lobby
+class Lobby : public ILobby
 {
     typedef core::Array<LobbyUser> LobbyUserArr;
     typedef core::Array<LobbyPeer> LobbyPeerArr;
@@ -111,18 +119,26 @@ public:
 
     void shutdown(void);
 
+    bool allPeersLoaded(void) const X_FINAL;
+    int32_t getNumConnectedPeers(void) const X_FINAL;
+    int32_t getNumConnectedPeersInGame(void) const X_FINAL;
 
-    bool allPeersLoaded(void) const;
+    int32_t getNumUsers(void) const X_FINAL;
+    LobbyUserHandle getUserHandleForIdx(size_t idx) const X_FINAL;
+
+    const char* getUserName(LobbyUserHandle handle) const X_FINAL;
+
+    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
+
     X_INLINE LobbyState::Enum getState(void) const;
     X_INLINE LobbyType::Enum getType(void) const;
-    X_INLINE bool isHost(void) const;
-    X_INLINE bool isPeer(void) const;
+    X_INLINE bool isHost(void) const X_FINAL;
+    X_INLINE bool isPeer(void) const X_FINAL;
     X_INLINE bool hasFinishedLoading(void) const;
     X_INLINE MatchFlags getMatchFlags(void) const;
-    X_INLINE const MatchParameters& getMatchParams(void) const;
+    X_INLINE const MatchParameters& getMatchParams(void) const X_FINAL;
 
-    X_INLINE int32_t numUsers(void) const;
-    X_INLINE int32_t numFreeSlots(void) const;
+    X_INLINE int32_t getNumFreeSlots(void) const X_FINAL;
     X_INLINE bool isFull(void) const;
 
 private:

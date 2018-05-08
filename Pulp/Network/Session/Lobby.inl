@@ -38,19 +38,14 @@ X_INLINE const MatchParameters& Lobby::getMatchParams(void) const
     return params_;
 }
 
-X_INLINE int32_t Lobby::numUsers(void) const
+X_INLINE int32_t Lobby::getNumFreeSlots(void) const
 {
-    return static_cast<int32_t>(users_.size());
-}
-
-X_INLINE int32_t Lobby::numFreeSlots(void) const
-{
-    return params_.numSlots - numUsers();
+    return params_.numSlots - getNumUsers();
 }
 
 X_INLINE bool Lobby::isFull(void) const
 {
-    return numFreeSlots() == 0;
+    return getNumFreeSlots() == 0;
 }
 
 

@@ -19,9 +19,13 @@ Session::Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena) 
     vars_(vars),
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     arena_(X_ASSERT_NOT_NULL(arena)),
-    partyLobby_(vars_, this, pPeer_, LobbyType::Party, arena),
-    gameLobby_(vars_, this, pPeer_, LobbyType::Game, arena)
+    lobbys_{
+        {vars_, this, pPeer_, LobbyType::Party, arena},
+        {vars_, this, pPeer_, LobbyType::Game, arena}
+    }
 {
+    X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();
+    X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
 
     state_ = SessionState::Idle;
 }
@@ -38,8 +42,8 @@ void Session::update(void)
     // potentially we have now recived packets.
     readPackets();
 
-    partyLobby_.handleState();
-    gameLobby_.handleState();
+    lobbys_[LobbyType::Party].handleState();
+    lobbys_[LobbyType::Game].handleState();
 
     handleState();
 }
@@ -53,10 +57,10 @@ void Session::connect(SystemAddress address)
 
     // connect
 #if 1
-    gameLobby_.connectTo(address);
+    lobbys_[LobbyType::Game].connectTo(address);
     setState(SessionState::ConnectAndMoveToGame);
 #else
-    partyLobby_.connectTo(address);
+    lobbys_[LobbyType::Party].connectTo(address);
     setState(SessionState::ConnectAndMoveToParty);
 #endif
 }
@@ -67,18 +71,18 @@ void Session::finishedLoading(void)
     // we finished loading.
     // noice.
 
-    gameLobby_.finishedLoading();
+    lobbys_[LobbyType::Game].finishedLoading();
 
-    auto flags = gameLobby_.getMatchFlags();
+    auto flags = lobbys_[LobbyType::Game].getMatchFlags();
     if (flags.IsSet(MatchFlag::Online))
     {
-        if (gameLobby_.isHost())
+        if (lobbys_[LobbyType::Game].isHost())
         {
             setState(SessionState::InGame);
         }
         else
         {
-            gameLobby_.sendToHost(MessageID::LoadingDone);
+            lobbys_[LobbyType::Game].sendToHost(MessageID::LoadingDone);
         }
     }
     else
@@ -95,8 +99,8 @@ void Session::quitToMenu(void)
     }
 
     // TODO: leave any lobby.
-    partyLobby_.shutdown();
-    gameLobby_.shutdown();
+    lobbys_[LobbyType::Party].shutdown();
+    lobbys_[LobbyType::Game].shutdown();
 
     setState(SessionState::Idle);
 }
@@ -106,15 +110,17 @@ void Session::createPartyLobby(const MatchParameters& params)
     X_ASSERT(state_ == SessionState::Idle, "Must be idle")(state_);
 
     // host a new 'party' lobby.
-    partyLobby_.startHosting(params);
+    lobbys_[LobbyType::Party].startHosting(params);
 
     setState(SessionState::CreateAndMoveToPartyLobby);
 }
 
 void Session::createMatch(const MatchParameters& params)
 {
+
+
     // host a new 'game'
-    gameLobby_.startHosting(params);
+    lobbys_[LobbyType::Game].startHosting(params);
 
     setState(SessionState::CreateAndMoveToGameLobby);
 }
@@ -130,7 +136,7 @@ void Session::sendUserCmd(const UserCmd& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
 
-    gameLobby_.sendUserCmd(snap);
+    lobbys_[LobbyType::Game].sendUserCmd(snap);
 }
 
 void Session::sendSnapShot(SnapShot&& snap)
@@ -138,7 +144,7 @@ void Session::sendSnapShot(SnapShot&& snap)
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 
     // too all peers.
-    gameLobby_.sendSnapShot(snap);
+    lobbys_[LobbyType::Game].sendSnapShot(snap);
 }
 
 const SnapShot* Session::getSnapShot(void)
@@ -151,6 +157,12 @@ const SnapShot* Session::getSnapShot(void)
 
     return &recivedSnaps_[num - 1];
 }
+
+const ILobby* Session::getLobby(LobbyType::Enum type) const
+{
+    return &lobbys_[type];
+}
+
 
 bool Session::handleState(void)
 {
@@ -233,7 +245,7 @@ bool Session::stateIdle(void)
 bool Session::stateCreateAndMoveToPartyLobby(void)
 {
     // wait for the lobby to create.
-    if (hasLobbyCreateCompleted(partyLobby_))
+    if (hasLobbyCreateCompleted(lobbys_[LobbyType::Party]))
     {
         // Success
         setState(SessionState::PartyLobbyHost);
@@ -246,9 +258,9 @@ bool Session::stateCreateAndMoveToPartyLobby(void)
 
 bool Session::stateCreateAndMoveToGameLobby(void)
 {
-    if (hasLobbyCreateCompleted(gameLobby_))
+    if (hasLobbyCreateCompleted(lobbys_[LobbyType::Game]))
     {
-     //   partyLobby_.sendMembersToLobby(gameLobby_);
+     //   lobbys_[LobbyType::Party].sendMembersToLobby(lobbys_[LobbyType::Game]);
 
         // Success
         setState(SessionState::GameLobbyHost);
@@ -275,7 +287,7 @@ bool Session::stateGameLobbyHost(void)
 
 bool Session::stateGameLobbyPeer(void)
 {
-    if (gameLobby_.isPeer())
+    if (lobbys_[LobbyType::Game].isPeer())
     {
         setState(SessionState::InGame);
     }
@@ -284,29 +296,29 @@ bool Session::stateGameLobbyPeer(void)
 
 bool Session::stateConnectAndMoveToParty(void)
 {
-    return handleConnectAndMoveToLobby(partyLobby_);
+    return handleConnectAndMoveToLobby(lobbys_[LobbyType::Party]);
 }
 
 bool Session::stateConnectAndMoveToGame(void)
 {
-    return handleConnectAndMoveToLobby(gameLobby_);
+    return handleConnectAndMoveToLobby(lobbys_[LobbyType::Game]);
 }
 
 bool Session::stateLoading(void)
 {
     // hurry the fuck up!
-    if (!gameLobby_.hasFinishedLoading()) {
+    if (!lobbys_[LobbyType::Game].hasFinishedLoading()) {
         return false;
     }
 
     // if not online, we should of switched out of this state if hasFinishedLoading().
-    if (gameLobby_.getMatchFlags().IsSet(MatchFlag::Online)) {
+    if (lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online)) {
         X_ASSERT_UNREACHABLE();
     }
 
-    if (gameLobby_.isHost())
+    if (lobbys_[LobbyType::Game].isHost())
     {
-        if (!gameLobby_.allPeersLoaded()) {
+        if (!lobbys_[LobbyType::Game].allPeersLoaded()) {
             return false;
         }
     }
@@ -382,11 +394,11 @@ void Session::handleConnectionFailed(Lobby& lobby)
 void Session::startLoading(void)
 {
     // should only be called if we are the host.
-    if(gameLobby_.getMatchFlags().IsSet(MatchFlag::Online))
+    if(lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online))
     {
-        X_ASSERT(gameLobby_.isHost(), "Cant start loading if we are not the host")(gameLobby_.isHost());
+        X_ASSERT(lobbys_[LobbyType::Game].isHost(), "Cant start loading if we are not the host")(lobbys_[LobbyType::Game].isHost());
         
-        gameLobby_.sendToPeers(MessageID::LoadingStart);
+        lobbys_[LobbyType::Game].sendToPeers(MessageID::LoadingStart);
     }
 
     // Weeeeeeeeeeee!!
@@ -478,7 +490,7 @@ void Session::onReciveSnapShot(Packet* pPacket)
 {
     X_ASSERT(state_ == SessionState::InGame, "Recived snap shot when not in game")(state_);
 
-    gameLobby_.onReciveSnapShot(pPacket);
+    lobbys_[LobbyType::Game].onReciveSnapShot(pPacket);
 }
 
 void Session::sendPacketToLobby(Packet* pPacket)
@@ -488,12 +500,12 @@ void Session::sendPacketToLobby(Packet* pPacket)
     {
         case SessionState::PartyLobbyHost:
         case SessionState::PartyLobbyPeer:
-           partyLobby_.handlePacket(pPacket);
+           lobbys_[LobbyType::Party].handlePacket(pPacket);
             break;
         case SessionState::GameLobbyHost:
         case SessionState::GameLobbyPeer:
         case SessionState::InGame:
-            gameLobby_.handlePacket(pPacket);
+            lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;
         default:
             X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
@@ -510,14 +522,14 @@ void Session::onConnectionFailure(Packet* pPacket)
         case SessionState::ConnectAndMoveToParty:
         case SessionState::PartyLobbyHost:
         case SessionState::PartyLobbyPeer:
-            partyLobby_.handlePacket(pPacket);
+            lobbys_[LobbyType::Party].handlePacket(pPacket);
             break;
 
         case SessionState::ConnectAndMoveToGame:
         case SessionState::GameLobbyHost:
         case SessionState::GameLobbyPeer:
         case SessionState::InGame:
-            gameLobby_.handlePacket(pPacket);
+            lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;
 
         default:
@@ -534,14 +546,14 @@ void Session::onConnectionFinalize(Packet* pPacket)
         case SessionState::ConnectAndMoveToParty:
         case SessionState::PartyLobbyHost:
         case SessionState::PartyLobbyPeer:
-            partyLobby_.handlePacket(pPacket);
+            lobbys_[LobbyType::Party].handlePacket(pPacket);
             break;
 
         case SessionState::ConnectAndMoveToGame:
         case SessionState::GameLobbyHost:
         case SessionState::GameLobbyPeer:
         case SessionState::InGame:
-            gameLobby_.handlePacket(pPacket);
+            lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;
 
         default:
@@ -570,7 +582,7 @@ bool Session::isHost(void) const
     // not sure what states I will allowthis to be caleld form yet.
     //X_ASSERT(getStatus() == SessionStatus::InGame, "Unexpected status")(getStatus());
 
-    return gameLobby_.isHost();
+    return lobbys_[LobbyType::Game].isHost();
 }
 
 SessionStatus::Enum Session::getStatus(void) const
@@ -611,7 +623,19 @@ SessionStatus::Enum Session::getStatus(void) const
 
 const MatchParameters& Session::getMatchParams(void) const
 {
-    return gameLobby_.getMatchParams();
+    return lobbys_[LobbyType::Game].getMatchParams();
+}
+
+void Session::drawDebug(engine::IPrimativeContext* pPrim) const
+{
+    X_UNUSED(pPrim);
+
+    // draw me some shit.
+    Vec2f base0(5.f, 120.f);
+
+    base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
+    base0.y += 20.f;
+    lobbys_[LobbyType::Game].drawDebug(base0, pPrim);
 }
 
 

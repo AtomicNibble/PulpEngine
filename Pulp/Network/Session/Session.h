@@ -71,14 +71,13 @@ public:
     void createMatch(const MatchParameters& parms) X_FINAL;
     void startMatch(void) X_FINAL;
 
-
-
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap) X_FINAL;
     // if we are a host and have peers we send snaps.
     void sendSnapShot(SnapShot&& snap) X_FINAL;
 
     const SnapShot* getSnapShot(void) X_FINAL;
+    const ILobby* getLobby(LobbyType::Enum type) const X_FINAL;
 
     bool handleState(void);
 
@@ -91,6 +90,8 @@ public:
     bool isHost(void) const X_FINAL;
     SessionStatus::Enum getStatus(void) const X_FINAL;
     const MatchParameters& getMatchParams(void) const X_FINAL;
+
+    void drawDebug(engine::IPrimativeContext* pPrim) const X_FINAL;
 
 private:
     void onLostConnectionToHost(void) X_FINAL;
@@ -136,8 +137,7 @@ private:
 
     SessionState::Enum state_;
 
-    Lobby partyLobby_;
-    Lobby gameLobby_;
+    Lobby lobbys_[LobbyType::ENUM_COUNT];
 
     core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
 };

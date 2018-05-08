@@ -76,6 +76,9 @@ private:
     void Cmd_removeBan(core::IConsoleCmdArgs* pCmd);
     void Cmd_resolveHost(core::IConsoleCmdArgs* pCmd);
     void Cmd_connect(core::IConsoleCmdArgs* pCmd);
+    void Cmd_createParty(core::IConsoleCmdArgs* pCmd);
+    void Cmd_createMatch(core::IConsoleCmdArgs* pCmd);
+    void Cmd_startMatch(core::IConsoleCmdArgs* pCmd);
     void Cmd_chat(core::IConsoleCmdArgs* pCmd);
 
 private:

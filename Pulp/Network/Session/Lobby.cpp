@@ -8,6 +8,12 @@
 
 #include <INetwork.h>
 
+#include <Platform\SystemInfo.h>
+
+// debug drawing
+#include <IPrimativeContext.h>
+#include <IFont.h>
+
 X_NAMESPACE_BEGIN(net)
 
 void LobbyPeer::setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena)
@@ -69,6 +75,8 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, Lob
 {
     peers_.setGranularity(8);
     peers_.resize(8);
+    users_.setGranularity(8);
+    users_.reserve(8);
 
     state_ = LobbyState::Idle;
 
@@ -477,9 +485,13 @@ void Lobby::initStateLobbyHost(void)
     // we are hosting
     isHost_ = true;
 
-
-    // need to add myself to peer list.
     clearUsers();
+
+    core::SysInfo::UserNameStr nameStr;
+    core::SysInfo::GetUserName(nameStr);
+
+    // Lerrooooooooooooy JENKINS!!! (is a twat? O_O)
+    char buffer[128];
 
     auto localGuid = pPeer_->getMyGUID();
     SystemAddress address;
@@ -487,6 +499,7 @@ void Lobby::initStateLobbyHost(void)
     LobbyUser user;
     user.guid = localGuid;
     user.address = address;
+    user.username.set(core::strUtil::Convert(nameStr, buffer));
     users_.emplace_back(user);
 
     hostAddress_ = address;
@@ -513,6 +526,100 @@ bool Lobby::allPeersLoaded(void) const
     }
 
     return loaded;
+}
+
+int32_t Lobby::getNumConnectedPeers(void) const
+{
+    int32_t num = 0;
+    for (auto& peer : peers_)
+    {
+        num += static_cast<int32_t>(peer.isConnected());
+    }
+
+    return num;
+}
+
+int32_t Lobby::getNumConnectedPeersInGame(void) const
+{
+    int32_t num = 0;
+    for (auto& peer : peers_)
+    {
+        num += static_cast<int32_t>(peer.isConnected() && peer.inGame);
+    }
+
+    return num;
+}
+
+int32_t Lobby::getNumUsers(void) const
+{
+    return safe_static_cast<int32_t>(users_.size());
+}
+
+LobbyUserHandle Lobby::getUserHandleForIdx(size_t idx) const
+{
+    return static_cast<LobbyUserHandle>(idx);
+}
+
+const char* Lobby::getUserName(LobbyUserHandle handle) const
+{
+    size_t idx = static_cast<size_t>(handle);
+
+    return users_[idx].username.c_str();
+}
+
+Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
+{
+    X_UNUSED(pPrim);
+
+    font::TextDrawContext con;
+    con.col = Col_Whitesmoke;
+    con.size = Vec2f(16.f, 16.f);
+    con.effectId = 0;
+    con.pFont = gEnv->pFontSys->GetDefault();
+
+    float width = 700.f;
+    float height = 300.f;
+
+    const auto numConnected = getNumConnectedPeers();
+    const auto numInGame = getNumConnectedPeersInGame();
+
+    pPrim->drawQuad(base, width, height, Color8u(20, 20, 20, 60));
+
+    auto* pNet = gEnv->pNet;
+    IPStr ipStr;
+
+    core::StackString<2048> txt;
+    txt.setFmt("Lobby - Type: ^1%s^7 State: ^1%s^7 HostIdx: ^1%" PRIi32 "^7 isHost: ^1%" PRIu8 "^7\n",
+        LobbyType::ToString(type_), LobbyState::ToString(state_), hostIdx_, isHost_);
+
+    txt.appendFmt("HostAddr: \"%s\" Connected: ^1%" PRIi32 "^7 inGame: ^1%" PRIi32 "^7\n",
+        pNet->systemAddressToString(hostAddress_, ipStr, true), numConnected, numInGame);
+
+    for (size_t i = 0; i < peers_.size(); i++)
+    {
+        auto& peer = peers_[i];
+
+        static_assert(std::is_same<uint16_t, SystemHandle>::value, "SystemHandle format specifier needs updating");
+
+        txt.appendFmt("\n^5Peer%" PRIuS "^7 State: ^1%s^7 loaded: ^1%" PRIu8 "^7 inGame: ^1%" PRIu8 "^7 SysHandle: ^1%" PRIu16 "^7 numSnaps: ^1%" PRIi32 "^7", 
+            i, LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), peer.loaded, peer.inGame, peer.systemHandle, peer.numSnapsSent);
+    }
+
+    txt.append("\n\nUsers:");
+
+
+    for (size_t i = 0; i < users_.size(); i++)
+    {
+        auto& user = users_[i];
+
+        txt.appendFmt("\n^5User%" PRIuS "^7 Name: \"%s\" PeerIdx: ^1%" PRIi32 "^7 Address: \"%s\"",
+            i,  user.username.c_str(), user.peerIdx, pNet->systemAddressToString(user.address, ipStr, true));
+    }
+
+
+    pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
+
+    return Vec2f(width, height);
 }
 
 X_NAMESPACE_END
