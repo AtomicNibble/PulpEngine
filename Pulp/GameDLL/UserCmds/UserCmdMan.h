@@ -11,7 +11,7 @@ class UserCmdMan
 {
     static const size_t BUFFER_SIZE = 64;
     // we create sets of UserCmds for each player at each read index.
-    // just so if all clients are currenton same write index, near in memory.
+    // just so if all clients are currently on same write index, near in memory.
     typedef std::array<net::UserCmd, MAX_PLAYERS> UserCmdAPlayerArr;
     typedef std::array<UserCmdAPlayerArr, BUFFER_SIZE> UserCmdBuf;
     typedef std::array<int32_t, MAX_PLAYERS> IndexArr;
