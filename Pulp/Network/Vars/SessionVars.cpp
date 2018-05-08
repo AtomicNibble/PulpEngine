@@ -29,12 +29,12 @@ void SessionVars::registerVars(void)
     ADD_CVAR_REF("net_snap_force_drop_next", snapFroceDrop_, 0, 0, 1, core::VarFlag::SYSTEM,
         "Drops the next outgoing snap");
 
-    ADD_CVAR_REF("net_snap_force_drop_next", snapMaxbufferedMs_, snapMaxbufferedMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Drops the next outgoing snap");
-    ADD_CVAR_REF("net_snap_force_drop_next", snapRateMs_, snapRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Drops the next outgoing snap");
-    ADD_CVAR_REF("net_snap_force_drop_next", userCmdRateMs_, userCmdRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Drops the next outgoing snap");
+    ADD_CVAR_REF("net_snap_max_buffered_ms", snapMaxbufferedMs_, snapMaxbufferedMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Max ammount of buffered snaps shots in ms");
+    ADD_CVAR_REF("net_snap_rate_ms", snapRateMs_, snapRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "How many ms between sending snaps");
+    ADD_CVAR_REF("net_ucmd_rate_ms", userCmdRateMs_, userCmdRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "How many ms between sending usercmds");
 
 }
 
