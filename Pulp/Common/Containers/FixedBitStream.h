@@ -32,6 +32,9 @@ public:
     template<typename T>
     void write(const T* pVal, size_type num);
 
+    template<size_t N, typename TChar>
+    void write(const StackString<N, TChar>& val);
+
     // writes bytes to stream, will stich in if not currently on byte boundary, unlike writeAligned.
     void write(const Type* pBuf, size_type numBytes);
     // write bits to stream
@@ -56,6 +59,9 @@ public:
     // read the type * num from the stream.
     template<typename T>
     void read(T* pVal, size_type num);
+
+    template<size_t N, typename TChar>
+    void read(StackString<N, TChar>& val);
 
     void read(Type* pBuf, size_type numBytes);
     // read bits from stream

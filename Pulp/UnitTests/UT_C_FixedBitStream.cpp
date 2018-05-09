@@ -163,3 +163,38 @@ TEST(FixBitStreamBuf, VariaingBitSizes)
         EXPECT_EQ(totalBitsLeft, stream.size());
     }
 }
+
+
+TEST(FixBitStreamBuf, StackString)
+{
+    uint8_t buf[0x200];
+    FixedBitStream stream(buf, buf + sizeof(buf), false);
+
+    EXPECT_EQ(core::bitUtil::bytesToBits(sizeof(buf)), stream.capacity());
+    EXPECT_EQ(0, stream.size());
+    EXPECT_EQ(stream.capacity(), stream.freeSpace());
+
+    const core::StackString<128, char> narrowStr("Do you like green eggs and ham?");
+    const core::StackString<128, wchar_t> wideStr("Fuck you and your green food!");
+
+    stream.write(narrowStr);
+    stream.write(wideStr);
+    stream.write(narrowStr);
+    stream.write(wideStr);
+
+    core::StackString<128, char> narrowOut0, narrowOut1;
+    core::StackString<128, wchar_t> wideOut0, wideOut1;
+
+    stream.read(narrowOut0);
+    stream.read(wideOut0);
+    stream.read(narrowOut1);
+    stream.read(wideOut1);
+
+    EXPECT_TRUE(stream.isEos());
+
+    EXPECT_EQ(narrowStr, narrowOut0);
+    EXPECT_EQ(narrowStr, narrowOut1);
+    EXPECT_EQ(wideStr, wideOut0);
+    EXPECT_EQ(wideStr, wideOut1);
+
+}

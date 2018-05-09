@@ -94,6 +94,13 @@ inline void FixedBitStreamBase::write(const bool& val)
     write(val);
 }
 
+template<size_t N, typename TChar>
+inline void FixedBitStreamBase::write(const StackString<N,TChar>& val)
+{
+    write(safe_static_cast<uint32_t>(val.length()));
+    write(val.c_str(), val.length());
+}
+
 // read the type * num from the stream.
 template<typename T>
 inline void FixedBitStreamBase::write(const T* pVal, size_type num)
@@ -166,6 +173,20 @@ template<>
 inline void FixedBitStreamBase::read(bool& val)
 {
     val = readBool();
+}
+
+template<size_t N, typename TChar>
+inline void FixedBitStreamBase::read(StackString<N, TChar>& val)
+{
+    val.clear();
+
+    auto len = read<uint32_t>();
+    if (len > 0)
+    {
+        TChar tmp[N];
+        read(tmp, len);
+        val.set(tmp, tmp + len);
+    }
 }
 
 // read the type * num from the stream.
