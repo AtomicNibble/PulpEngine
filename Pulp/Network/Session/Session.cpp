@@ -287,10 +287,7 @@ bool Session::stateGameLobbyHost(void)
 
 bool Session::stateGameLobbyPeer(void)
 {
-    if (lobbys_[LobbyType::Game].isPeer())
-    {
-        setState(SessionState::InGame);
-    }
+
     return true;
 }
 
@@ -312,7 +309,7 @@ bool Session::stateLoading(void)
     }
 
     // if not online, we should of switched out of this state if hasFinishedLoading().
-    if (lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online)) {
+    if (!lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online)) {
         X_ASSERT_UNREACHABLE();
     }
 
@@ -431,25 +428,27 @@ bool Session::readPackets(void)
             case MessageID::AlreadyConnected:
             case MessageID::ConnectionLost:
             case MessageID::DisconnectNotification:
-                sendPacketToLobby(pPacket);
-                break; 
 
             case MessageID::ConnectionRequestFailed:
             case MessageID::ConnectionBanned:
             case MessageID::ConnectionNoFreeSlots:
             case MessageID::ConnectionRateLimited:
             case MessageID::InvalidPassword:
-            {
-                onConnectionFailure(pPacket);
-                break;
-            }
 
             case MessageID::ConnectionRequestHandShake:
             case MessageID::ConnectionRequestAccepted:
-            {
-                onConnectionFinalize(pPacket);
-                break;
-            }
+
+            case MessageID::LobbyJoinRequest:
+            case MessageID::LobbyJoinAccepted:
+            case MessageID::LobbyJoinNoFreeSlots:
+            case MessageID::LobbyUsersConnected:
+            case MessageID::LobbyUsersDiconnected:
+            case MessageID::LobbyGameParams:
+
+                sendPacketToLobby(pPacket);
+                break; 
+
+          
             case MessageID::ChatMsg:
             {
                 // it's a chat msg.
@@ -478,6 +477,7 @@ bool Session::readPackets(void)
             }
 
             default:
+                X_ERROR("Session", "Unhandled message: %s", MessageID::ToString(msg));
                 break;
         }
 
@@ -498,32 +498,11 @@ void Session::sendPacketToLobby(Packet* pPacket)
     // so the server accepted us.
     switch (state_)
     {
+        case SessionState::ConnectAndMoveToParty:
         case SessionState::PartyLobbyHost:
         case SessionState::PartyLobbyPeer:
            lobbys_[LobbyType::Party].handlePacket(pPacket);
             break;
-        case SessionState::GameLobbyHost:
-        case SessionState::GameLobbyPeer:
-        case SessionState::InGame:
-            lobbys_[LobbyType::Game].handlePacket(pPacket);
-            break;
-        default:
-            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
-            X_ASSERT_UNREACHABLE();
-            break;
-    }
-}
-
-
-void Session::onConnectionFailure(Packet* pPacket)
-{
-    switch (state_)
-    {
-        case SessionState::ConnectAndMoveToParty:
-        case SessionState::PartyLobbyHost:
-        case SessionState::PartyLobbyPeer:
-            lobbys_[LobbyType::Party].handlePacket(pPacket);
-            break;
 
         case SessionState::ConnectAndMoveToGame:
         case SessionState::GameLobbyHost:
@@ -531,34 +510,10 @@ void Session::onConnectionFailure(Packet* pPacket)
         case SessionState::InGame:
             lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;
-
         default:
             X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
             X_ASSERT_UNREACHABLE();
-    }
-}
-
-
-void Session::onConnectionFinalize(Packet* pPacket)
-{
-    switch (state_)
-    {
-        case SessionState::ConnectAndMoveToParty:
-        case SessionState::PartyLobbyHost:
-        case SessionState::PartyLobbyPeer:
-            lobbys_[LobbyType::Party].handlePacket(pPacket);
             break;
-
-        case SessionState::ConnectAndMoveToGame:
-        case SessionState::GameLobbyHost:
-        case SessionState::GameLobbyPeer:
-        case SessionState::InGame:
-            lobbys_[LobbyType::Game].handlePacket(pPacket);
-            break;
-
-        default:
-            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
-            X_ASSERT_UNREACHABLE();
     }
 }
 

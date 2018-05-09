@@ -6,9 +6,13 @@
 #include <Util\Span.h>
 
 #include <NetMsgIds.h>
+#include <IAssetDb.h>
 
 X_NAMESPACE_DECLARE(engine,
     class IPrimativeContext);
+
+X_NAMESPACE_DECLARE(core,
+    class FixedBitStreamBase);
 
 X_NAMESPACE_BEGIN(net)
 
@@ -21,6 +25,7 @@ static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 static const uint32_t MAX_USERNAME_LEN = 64;
 
+static const uint32_t MAX_PLAYERS = 8;
 
 static const uint32_t MAX_REPLICATION_WORLDS = 4;
 static const uint32_t MAX_ENTS = 1 << 10; // the max of networked ents.
@@ -441,6 +446,8 @@ X_DECLARE_ENUM(GameMode)(
 
 typedef Flags<MatchFlag> MatchFlags;
 
+typedef core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> MapNameStr;
+
 struct MatchParameters
 {
     MatchParameters() {
@@ -448,11 +455,14 @@ struct MatchParameters
         mode = GameMode::SinglePlayer;
     }
 
+    void writeToBitStream(core::FixedBitStreamBase& bs) const;
+    void fromBitStream(core::FixedBitStreamBase& bs);
+
     int32_t numSlots;
     MatchFlags flags;
     GameMode::Enum mode;
 
-    core::string mapName;
+    MapNameStr mapName;
 };
 
 
@@ -478,6 +488,12 @@ class SnapShot;
 
 typedef uintptr_t LobbyUserHandle;
 
+struct UserInfo
+{
+    const char* pName;
+    int32_t peerIdx;
+};
+
 struct ILobby
 {
     virtual ~ILobby() = default;
@@ -485,12 +501,14 @@ struct ILobby
     virtual bool allPeersLoaded(void) const X_ABSTRACT;
     virtual int32_t getNumConnectedPeers(void) const X_ABSTRACT;
     virtual int32_t getNumConnectedPeersInGame(void) const X_ABSTRACT;
+    virtual int32_t getHostPeerIdx(void) const X_ABSTRACT;
 
     virtual int32_t getNumUsers(void) const X_ABSTRACT;
     virtual int32_t getNumFreeSlots(void) const X_ABSTRACT;
     virtual LobbyUserHandle getUserHandleForIdx(size_t idx) const X_ABSTRACT;
 
     virtual const char* getUserName(LobbyUserHandle handle) const X_ABSTRACT;
+    virtual bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_ABSTRACT;
 
     virtual bool isHost(void) const X_ABSTRACT;
     virtual bool isPeer(void) const X_ABSTRACT;

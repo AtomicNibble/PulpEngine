@@ -34,12 +34,15 @@ namespace entity
 class Level
 {
 public:
+    typedef core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> MapNameStr;
+
+public:
     Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld, entity::EnititySystem& entSys, core::MemoryArenaBase* arena);
     ~Level();
 
     void update(core::FrameData& frame);
 
-    void beginLoad(const core::string& name);
+    void beginLoad(const MapNameStr& name);
     void clear(void);
 
     X_INLINE bool isLoaded(void) const;
@@ -81,11 +84,14 @@ X_INLINE bool Level::isLoaded(void) const
 class World
 {
 public:
+    typedef Level::MapNameStr MapNameStr;
+
+public:
     World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan,
         game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
     ~World();
 
-    bool loadMap(const core::string& name);
+    bool loadMap(const MapNameStr& name);
     bool hasLoaded(void) const;
 
     void update(core::FrameData& frame, UserCmdMan& userCmdMan);

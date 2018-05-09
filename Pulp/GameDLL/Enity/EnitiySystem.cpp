@@ -78,7 +78,7 @@ namespace entity
             return false;
         }
 
-        for (uint32_t i = 0; i < MAX_PLAYERS; i++) {
+        for (uint32_t i = 0; i < net::MAX_PLAYERS; i++) {
             auto id = createEnt();
             if (id != i) {
                 X_ASSERT_UNREACHABLE();

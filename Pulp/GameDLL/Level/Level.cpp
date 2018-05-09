@@ -38,9 +38,9 @@ void Level::update(core::FrameData& frame)
     X_UNUSED(frame);
 }
 
-void Level::beginLoad(const core::string& name)
+void Level::beginLoad(const MapNameStr& name)
 {
-    path_.set(name);
+    path_.set(name.begin(), name.end());
     path_.setExtension(level::LVL_FILE_EXTENSION);
 
     clear();
@@ -278,7 +278,7 @@ World::~World()
 
 }
 
-bool World::loadMap(const core::string& name)
+bool World::loadMap(const MapNameStr& name)
 {
     X_LOG0("Game", "Loading map: \"%s\"", name.c_str());
 
@@ -335,7 +335,7 @@ void World::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
 
 void World::spawnPlayer(entity::EntityId id)
 {
-    X_ASSERT(id < MAX_PLAYERS, "Invalide player id")(id);
+    X_ASSERT(id < net::MAX_PLAYERS, "Invalide player id")(id);
     X_ASSERT_NOT_NULL(pScene_);
 
     // we want to take the give ent and set it up as a player.

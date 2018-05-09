@@ -505,7 +505,7 @@ void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
 
     MatchParameters params;
     params.numSlots = 8;
-    params.mapName = pMap;
+    params.mapName.set(pMap);
     params.mode = GameMode::SinglePlayer;
     params.flags.Set(MatchFlag::Online);
 

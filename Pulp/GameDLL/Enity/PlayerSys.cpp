@@ -6,6 +6,7 @@
 #include <IWorld3D.h>
 #include <I3DEngine.h>
 #include <IModelManager.h>
+#include <INetwork.h>
 
 #include <Hashing\Fnva1Hash.h>
 
@@ -56,7 +57,7 @@ namespace entity
         weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
         engine::IWorld3D* p3DWorld, const net::UserCmd& userCmd, EntityId playerId)
     {
-        X_ASSERT(playerId < MAX_PLAYERS, "Invalid player id")(playerId, MAX_PLAYERS);
+        X_ASSERT(playerId < net::MAX_PLAYERS, "Invalid player id")(playerId, net::MAX_PLAYERS);
         X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
 
         X_UNUSED(timeInfo, reg, playerId, p3DWorld);

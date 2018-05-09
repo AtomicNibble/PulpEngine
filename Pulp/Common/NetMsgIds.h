@@ -180,6 +180,17 @@ X_DECLARE_ENUM8(MessageID)
 
     ChatMsg,
 
+    // --- Lobby ---
+
+    LobbyJoinRequest,       
+    LobbyJoinAccepted,      // your reuqest to join the lobby was accepted.
+    LobbyJoinNoFreeSlots,   // get fooked.
+
+    LobbyUsersConnected,
+    LobbyUsersDiconnected,
+
+    LobbyGameParams,        // Game meta.
+
     // --- Session ---
 
     LoadingStart,

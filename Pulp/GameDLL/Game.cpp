@@ -251,6 +251,8 @@ bool XGame::update(core::FrameData& frame)
     }
     else if (status == net::SessionStatus::InGame)
     {
+        X_ASSERT_NOT_NULL(world_.ptr());
+
         world_->update(frame, userCmdMan_);
 
         // if we are host we make snapshot.
@@ -284,6 +286,8 @@ bool XGame::update(core::FrameData& frame)
     {
         auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
         auto numUsers = pLobby->getNumUsers();
+        auto hostIdx = pLobby->getHostPeerIdx();
+        auto& params = pLobby->getMatchParams();
 
         con.col = Col_Floralwhite;
         con.size = Vec2f(24.f, 24.f);
@@ -296,14 +300,26 @@ bool XGame::update(core::FrameData& frame)
         for (size_t i = 0; i < numUsers; i++)
         {
             auto handle = pLobby->getUserHandleForIdx(i);
-            auto* pName = pLobby->getUserName(handle);
+            
+            net::UserInfo info;
+            pLobby->getUserInfo(handle, info);
 
-            txt.appendFmt("\nPlayer%" PRIuS " ^8%s", i, pName);
+            bool isHost = (hostIdx == info.peerIdx);
+
+            txt.appendFmt("\n%s ^8%s ^7peerIdx: ^8%" PRIi32 "^7", isHost ? "H" : "P", info.pName, info.peerIdx);
         }
 
-        pPrim->drawQuad(800.f, 200.f, 320.f, 200.f, Color8u(40,40,40,100));
+        pPrim->drawQuad(800.f, 200.f, 320.f + 320.f, 200.f, Color8u(40,40,40,100));
         pPrim->drawText(Vec3f(802.f, 202.f, 1.f), con, txt.begin(), txt.end());
 
+        txt.setFmt("Options:\nSlots: %" PRIi32 "\nMap: \"%s\"", params.numSlots, params.mapName.c_str());
+
+        pPrim->drawText(Vec3f(1240.f, 202.f, 1.f), con, txt.begin(), txt.end());
+
+    }
+    else if (status == net::SessionStatus::Connecting)
+    {
+        // ...
     }
     else
     {
@@ -469,7 +485,7 @@ void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
     net::MatchParameters match;
     match.numSlots = 1;
     match.mode = net::GameMode::SinglePlayer;
-    match.mapName = pMapName;
+    match.mapName.set(pMapName);
 
     // i need to wait for state changes, but don't really want to stall.
     // so i basically need to track state?

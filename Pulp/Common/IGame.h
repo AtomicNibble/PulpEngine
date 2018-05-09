@@ -8,9 +8,6 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
-// Hooooly shieeet.
-static const uint32_t MAX_PLAYERS = 8;
-
 struct IGame
 {
     virtual ~IGame() = default;

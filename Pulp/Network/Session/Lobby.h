@@ -21,6 +21,7 @@ X_DECLARE_ENUM(LobbyState)(
     Idle,
     Creating,
     Connecting,
+    Joining,
     Error
 );
 
@@ -32,10 +33,10 @@ X_DECLARE_ENUM(LobbyState)(
 
 struct LobbyUser
 {
-    LobbyUser() {
-        peerIdx = -1;
-        username.set("Stu");
-    }
+    LobbyUser();
+
+    void writeToBitStream(core::FixedBitStreamBase& bs) const;
+    void fromBitStream(core::FixedBitStreamBase& bs);
 
     NetGUID guid;
     SystemAddress address;
@@ -53,28 +54,23 @@ struct LobbyPeer
     );
 
     LobbyPeer() {
-        connectionState = ConnectionState::Free;
-
-        loaded = false;
-        inGame = false;
-
-        snapHz = 0.f;
-        numSnapsSent = 0;
-
-        systemHandle = INVALID_SYSTEM_HANDLE;
+        reset();
     }
-
 
     void setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena);
 
     ConnectionState::Enum getConnectionState(void) const;
     bool isConnected(void) const;
 
+private:
+    void reset(void);
+
 public:
     bool loaded;
     bool inGame;
 
     core::TimeVal lastSnap;
+    core::TimeVal stateChangeTime;
     float snapHz;
     int32_t numSnapsSent;
     core::UniquePointer<SnapshotManager> pSnapMan;
@@ -122,11 +118,13 @@ public:
     bool allPeersLoaded(void) const X_FINAL;
     int32_t getNumConnectedPeers(void) const X_FINAL;
     int32_t getNumConnectedPeersInGame(void) const X_FINAL;
+    int32_t getHostPeerIdx(void) const X_FINAL;
 
     int32_t getNumUsers(void) const X_FINAL;
     LobbyUserHandle getUserHandleForIdx(size_t idx) const X_FINAL;
 
     const char* getUserName(LobbyUserHandle handle) const X_FINAL;
+    bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_FINAL;
 
     Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
 
@@ -143,7 +141,15 @@ public:
 
 private:
     const LobbyPeer* findPeer(SystemHandle handle) const;
+    int32_t findPeerIdx(SystemHandle handle) const;
     int32_t addPeer(SystemAddress address);
+
+    void disconnectPeer(int32_t peerIdx);
+
+    void addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx);
+    void addUsersToBs(core::FixedBitStreamBase& bs) const;
+
+    void sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num) const;
 
 private:
     void setState(LobbyState::Enum state);
@@ -152,15 +158,22 @@ private:
     void handleConnectionHandShake(Packet* pPacket);
     void handleConnectionAttemptFailed(MessageID::Enum id);
     void handleConnectionLost(Packet* pPacket);
+    void handleLobbyJoinRequest(Packet* pPacket);
+    void handleLobbyJoinAccepted(Packet* pPacket);
+    void handleLobbyUsersConnected(Packet* pPacket);
+    void handleLobbyUsersDiconnected(Packet* pPacket);
+    void handleLobbyGameParams(Packet* pPacket);
 
 
 private:
     bool stateIdle(void);
     bool stateCreating(void);
     bool stateConnecting(void);
+    bool stateJoining(void);
 
 private:
     void initStateLobbyHost(void);
+    void addLocalUsers(void);
     void clearUsers(void);
 
 private:

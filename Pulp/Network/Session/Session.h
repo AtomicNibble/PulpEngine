@@ -101,8 +101,6 @@ private:
 private:
     void onReciveSnapShot(Packet* pPacket);
     void sendPacketToLobby(Packet* pPacket);
-    void onConnectionFailure(Packet* pPacket);
-    void onConnectionFinalize(Packet* pPacket);
 
 private:
     void setState(SessionState::Enum state);
