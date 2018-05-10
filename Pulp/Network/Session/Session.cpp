@@ -327,18 +327,20 @@ bool Session::stateConnectAndMoveToGame(void)
 bool Session::stateLoading(void)
 {
     // hurry the fuck up!
-    if (!lobbys_[LobbyType::Game].hasFinishedLoading()) {
+    auto& gameLobby = lobbys_[LobbyType::Game];
+
+    if (!gameLobby.hasFinishedLoading()) {
         return false;
     }
 
     // if not online, we should of switched out of this state if hasFinishedLoading().
-    if (!lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online)) {
+    if (!gameLobby.getMatchFlags().IsSet(MatchFlag::Online)) {
         X_ASSERT_UNREACHABLE();
     }
 
-    if (lobbys_[LobbyType::Game].isHost())
+    if (gameLobby.isHost())
     {
-        if (!lobbys_[LobbyType::Game].allPeersLoaded()) {
+        if (!gameLobby.allPeersLoaded()) {
             X_LOG0("Session", "Waiting for peers to load..");
             return false;
         }
@@ -349,9 +351,14 @@ bool Session::stateLoading(void)
     {
         // we are a dirty pleb.
         // check the host is still around?
-        // if not exit to menu with error.
-        X_ASSERT_NOT_IMPLEMENTED();
-        return false;
+        if (gameLobby.getNumConnectedPeers() < 1)
+        {
+            X_ERROR("Session", "No peers");
+            quitToMenu();
+            return false;
+        }
+
+     //   return false;
     }
 
     setState(SessionState::InGame);
