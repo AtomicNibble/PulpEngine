@@ -286,6 +286,7 @@ bool XGame::update(core::FrameData& frame)
     {
         auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
         auto numUsers = pLobby->getNumUsers();
+        auto freeSlots = pLobby->getNumFreeUserSlots();
         auto hostIdx = pLobby->getHostPeerIdx();
         auto& params = pLobby->getMatchParams();
 
@@ -294,8 +295,8 @@ bool XGame::update(core::FrameData& frame)
         con.flags.Clear();
 
         // who#s in my lobbyyyyy!!
-        core::StackString256 txt;
-        txt.setFmt("---- GameLobby(%" PRIuS ") ----\n", numUsers);
+        core::StackString512 txt;
+        txt.setFmt("---- GameLobby(%" PRIuS "/%" PRIuS ") ----\n", numUsers, numUsers + freeSlots);
         
         for (size_t i = 0; i < numUsers; i++)
         {
