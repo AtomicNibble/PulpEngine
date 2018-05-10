@@ -519,6 +519,11 @@ void XNet::Cmd_startMatch(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
+    if (pSession_->getState() != SessionState::GameLobbyHost) {
+        X_ERROR("Net", "Can't startMatch unless game lobby host");
+        return;
+   }
+
     pSession_->startMatch();
 }
 
@@ -533,6 +538,19 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
     if (pCmd->GetArgCount() < 2) {
         X_WARNING("Net", "net_chat <msg>");
         return;
+    }
+
+    
+    switch(pSession_->getStatus())
+    {
+        case SessionStatus::GameLobby:
+        case SessionStatus::PartyLobby:
+        case SessionStatus::InGame:
+            break;
+        
+        default:
+            X_ERROR("Net", "Can't send chat msg no lobby");
+            return;
     }
 
     core::StackString<1024> msg;
