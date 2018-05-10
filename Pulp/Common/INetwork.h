@@ -27,7 +27,6 @@ static const uint32_t MAX_USERNAME_LEN = 64;
 
 static const uint32_t MAX_PLAYERS = 8;
 
-static const uint32_t MAX_REPLICATION_WORLDS = 4;
 static const uint32_t MAX_ENTS = 1 << 10; // the max of networked ents.
 static const uint32_t MAX_ENTS_FIELDS = 128; // the max fields a ent can sync
 
@@ -112,7 +111,7 @@ struct AddressFamily
     {
         INet = 2,
 #if NET_IPv6_SUPPORT
-        INet6 = 23
+        INet6 = 23 // best be a static asset for this magic number :|
 #endif // !NET_IPv6_SUPPORT
     };
 };
@@ -527,6 +526,7 @@ struct ISession
 
     virtual void update(void) X_ABSTRACT;
     virtual void finishedLoading(void) X_ABSTRACT;
+    virtual bool hasFinishedLoading(void) const X_ABSTRACT;
 
     virtual bool isHost(void) const X_ABSTRACT;
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;

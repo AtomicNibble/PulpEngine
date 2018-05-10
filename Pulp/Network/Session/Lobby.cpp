@@ -124,6 +124,7 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, Lob
 void Lobby::reset(void)
 {
     isHost_ = false;
+    startLoading_ = false;
     finishedLoading_ = false;
 
     hostIdx_ = -1;
@@ -204,6 +205,16 @@ bool Lobby::handlePacket(Packet* pPacket)
             break;
         case MessageID::LobbyGameParams:
             handleLobbyGameParams(pPacket);
+            break;
+
+        case MessageID::LoadingStart:
+            handleLoadingStart(pPacket);
+            break;
+        case MessageID::LoadingDone:
+            handleLoadingDone(pPacket);
+            break;
+        case MessageID::InGame:
+            handleInGame(pPacket);
             break;
 
         default:
@@ -371,8 +382,6 @@ void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
         pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
     }
 }
-
-
 
 
 void Lobby::setState(LobbyState::Enum state)
@@ -885,6 +894,8 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 
 void Lobby::handleLobbyUsersConnected(Packet* pPacket)
 {
+    X_ASSERT(isPeer(), "Recived user-con list when not peer")(isPeer(), isHost());
+
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
@@ -897,6 +908,8 @@ void Lobby::handleLobbyUsersConnected(Packet* pPacket)
 
 void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 {
+    X_ASSERT(isPeer(), "Recived user-decon list when not peer")(isPeer(), isHost());
+
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     // users have left ;(
@@ -922,11 +935,61 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 
 void Lobby::handleLobbyGameParams(Packet* pPacket)
 {
+    X_ASSERT(isPeer(), "Recived GameParams when not peer")(isPeer(), isHost());
+
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
     params_.fromBitStream(bs);
 }
 
+void Lobby::handleLoadingStart(Packet* pPacket)
+{
+    X_ASSERT(isPeer(), "Recived LoadingStart when not peer")(isPeer(), isHost());
+
+    // stu will take all your loads.
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Recived loading start from a unknown peer");
+        return;
+    }
+
+    if (peerIdx != hostIdx_) {
+        NetGuidStr buf;
+        X_ERROR("Lobby", "Recived loading start from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
+        return;
+    }
+
+    // start loading..
+    // need to tell the peer to start loading!
+    startLoading_ = true;
+}
+
+void Lobby::handleLoadingDone(Packet* pPacket)
+{
+    X_ASSERT(isHost(), "Recived LoadingDone when not host")(isPeer(), isHost());
+
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Recived loading done from a unknown peer");
+        return;
+    }
+
+    auto& peer = peers_[peerIdx];
+    if (peer.loaded) {
+        X_WARNING("Lobby", "Peer %" PRIi32 " was already marked as loaded", peerIdx);
+    }
+    
+    if (vars_.lobbyDebug()) {
+        X_LOG0("Lobby", "Peer %" PRIi32 " loaded", peerIdx);
+    }
+
+    peer.loaded = true;
+}
+
+void Lobby::handleInGame(Packet* pPacket)
+{
+
+}
 
 // -----------------------------------------------------------
 

@@ -62,6 +62,17 @@ X_INLINE LobbyState::Enum Lobby::getState(void) const
     return state_;
 }
 
+X_INLINE bool Lobby::shouldStartLoading(void) const
+{
+    return startLoading_;
+}
+
+X_INLINE void Lobby::beganLoading(void)
+{
+    X_ASSERT(startLoading_, "beganLoading called when startLoading_ is false")(startLoading_);
+    startLoading_ = false;
+}
+
 X_INLINE bool Lobby::hasFinishedLoading(void) const
 {
     return finishedLoading_;

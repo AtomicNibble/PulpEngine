@@ -78,7 +78,8 @@ void Session::finishedLoading(void)
     {
         if (lobbys_[LobbyType::Game].isHost())
         {
-            setState(SessionState::InGame);
+        //    wait for players?
+        //    setState(SessionState::InGame);
         }
         else
         {
@@ -91,6 +92,10 @@ void Session::finishedLoading(void)
     }
 }
 
+bool Session::hasFinishedLoading(void) const
+{
+    return lobbys_[LobbyType::Game].hasFinishedLoading();
+}
 
 void Session::quitToMenu(void)
 {
@@ -118,8 +123,6 @@ void Session::createPartyLobby(const MatchParameters& params)
 
 void Session::createMatch(const MatchParameters& params)
 {
-
-
     // host a new 'game'
     lobbys_[LobbyType::Game].startHosting(params);
 
@@ -165,39 +168,6 @@ const ILobby* Session::getLobby(LobbyType::Enum type) const
 }
 
 
-bool Session::handleState(void)
-{
-    switch (state_)
-    {
-        case SessionState::Idle:
-            return stateIdle();
-        case SessionState::CreateAndMoveToPartyLobby:
-            return stateCreateAndMoveToPartyLobby();
-        case SessionState::CreateAndMoveToGameLobby:
-            return stateCreateAndMoveToGameLobby();
-        case SessionState::PartyLobbyHost:
-            return statePartyLobbyHost();
-        case SessionState::PartyLobbyPeer:
-            return statePartyLobbyPeer();
-        case SessionState::GameLobbyHost:
-            return stateGameLobbyHost();
-        case SessionState::GameLobbyPeer:
-            return stateGameLobbyPeer();
-        case SessionState::ConnectAndMoveToParty:
-            return stateConnectAndMoveToParty();
-        case SessionState::ConnectAndMoveToGame:
-            return stateConnectAndMoveToGame();
-        case SessionState::Loading:
-            return stateLoading();
-        case SessionState::InGame:
-            return stateInGame();
-
-        default:
-            X_NO_SWITCH_DEFAULT_ASSERT;
-    }
-    return false;
-}
-
 
 void Session::setState(SessionState::Enum state)
 {
@@ -236,6 +206,43 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     // core should not care if you have a networked game or not.
 }
 
+
+// --------------------------------------
+
+bool Session::handleState(void)
+{
+    switch (state_)
+    {
+        case SessionState::Idle:
+            return stateIdle();
+        case SessionState::CreateAndMoveToPartyLobby:
+            return stateCreateAndMoveToPartyLobby();
+        case SessionState::CreateAndMoveToGameLobby:
+            return stateCreateAndMoveToGameLobby();
+        case SessionState::PartyLobbyHost:
+            return statePartyLobbyHost();
+        case SessionState::PartyLobbyPeer:
+            return statePartyLobbyPeer();
+        case SessionState::GameLobbyHost:
+            return stateGameLobbyHost();
+        case SessionState::GameLobbyPeer:
+            return stateGameLobbyPeer();
+        case SessionState::ConnectAndMoveToParty:
+            return stateConnectAndMoveToParty();
+        case SessionState::ConnectAndMoveToGame:
+            return stateConnectAndMoveToGame();
+        case SessionState::Loading:
+            return stateLoading();
+        case SessionState::InGame:
+            return stateInGame();
+
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT;
+    }
+    return false;
+}
+
+// --------------------------------------
 
 bool Session::stateIdle(void)
 {
@@ -283,11 +290,26 @@ bool Session::statePartyLobbyPeer(void)
 
 bool Session::stateGameLobbyHost(void)
 {
+    // click start plz.
+
     return true;
 }
 
 bool Session::stateGameLobbyPeer(void)
 {
+    // start the game already!
+    // need a way for the lobby to tell me to start loading.
+    // the lobby needs to handle the packet, to check it actually came from the host, no bad peers plz!
+    auto& lobby = lobbys_[LobbyType::Game];
+
+    X_ASSERT(lobby.isPeer(), "Should be game lobby peer")(lobby.isPeer(), lobby.isHost());
+
+    if (lobby.shouldStartLoading())
+    {
+        lobby.beganLoading();
+
+        setState(SessionState::Loading);
+    }
 
     return true;
 }
@@ -317,8 +339,11 @@ bool Session::stateLoading(void)
     if (lobbys_[LobbyType::Game].isHost())
     {
         if (!lobbys_[LobbyType::Game].allPeersLoaded()) {
+            X_LOG0("Session", "Waiting for peers to load..");
             return false;
         }
+
+        X_LOG0("Session", "All peers loaded...");
     }
     else
     {
@@ -339,6 +364,8 @@ bool Session::stateInGame(void)
     return true;
 }
 
+
+// --------------------------------------
 
 bool Session::hasLobbyCreateCompleted(Lobby& lobby)
 {
@@ -408,7 +435,7 @@ bool Session::readPackets(void)
     Packet* pPacket = nullptr;
     for (pPacket = pPeer_->receive(); pPacket; pPeer_->freePacket(pPacket), pPacket = pPeer_->receive())
     {
-        X_LOG0("Session", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
+      //  X_LOG0("Session", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
 
         core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
@@ -446,9 +473,11 @@ bool Session::readPackets(void)
             case MessageID::LobbyUsersDiconnected:
             case MessageID::LobbyGameParams:
 
+            case MessageID::LoadingStart:
+            case MessageID::LoadingDone:
+            case MessageID::InGame:
                 sendPacketToLobby(pPacket);
                 break; 
-
           
             case MessageID::ChatMsg:
             {
@@ -489,7 +518,9 @@ bool Session::readPackets(void)
 
 void Session::onReciveSnapShot(Packet* pPacket)
 {
+#if 0 // TODO
     X_ASSERT(state_ == SessionState::InGame, "Recived snap shot when not in game")(state_);
+#endif
 
     lobbys_[LobbyType::Game].onReciveSnapShot(pPacket);
 }
@@ -508,6 +539,7 @@ void Session::sendPacketToLobby(Packet* pPacket)
         case SessionState::ConnectAndMoveToGame:
         case SessionState::GameLobbyHost:
         case SessionState::GameLobbyPeer:
+        case SessionState::Loading:
         case SessionState::InGame:
             lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;

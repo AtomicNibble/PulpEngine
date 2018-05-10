@@ -141,6 +141,8 @@ public:
     X_INLINE MatchFlags getMatchFlags(void) const;
 
     X_INLINE LobbyState::Enum getState(void) const;
+    X_INLINE bool shouldStartLoading(void) const;
+    X_INLINE void beganLoading(void);
     X_INLINE bool hasFinishedLoading(void) const;
 
     Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
@@ -175,6 +177,9 @@ private:
     void handleLobbyUsersConnected(Packet* pPacket);
     void handleLobbyUsersDiconnected(Packet* pPacket);
     void handleLobbyGameParams(Packet* pPacket);
+    void handleLoadingStart(Packet* pPacket);
+    void handleLoadingDone(Packet* pPacket);
+    void handleInGame(Packet* pPacket);
 
 private:
     bool stateIdle(void);
@@ -197,6 +202,7 @@ private:
     MatchParameters params_;
 
     bool isHost_;
+    bool startLoading_;
     bool finishedLoading_; // loaded the map yet slut?
     SystemAddress hostAddress_;
 

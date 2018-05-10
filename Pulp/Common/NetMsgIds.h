@@ -157,7 +157,7 @@ X_DECLARE_ENUM8(MessageID)
 
     // ----- Misc -----
 
-    // a remote system reposts stu as still missing
+    // a remote system reports stu as still missing
     /// action: keep searching.
     StuNotFnd,
 
@@ -176,10 +176,6 @@ X_DECLARE_ENUM8(MessageID)
     NatTypeDetectionRequest,
     NatTypeDetectionResult,
 
-    // --- Chat ---
-
-    ChatMsg,
-
     // --- Lobby ---
 
     LobbyJoinRequest,       
@@ -193,14 +189,21 @@ X_DECLARE_ENUM8(MessageID)
 
     // --- Session ---
 
-    LoadingStart,
-    LoadingDone,
-    InGame,
+    LoadingStart,   // tell peer to start loading
+    LoadingDone,    // peer finished loading assets
+    InGame,         // peer is in game (aka synced world state)
 
     SnapShot,
     SnapShotAck,
 
-    UserCmd
+    UserCmd,
+
+    // ------
+    
+    ChatMsg,
+    
+    PingValues // from host has all the users pings.
+    
 );
 
 X_NAMESPACE_END

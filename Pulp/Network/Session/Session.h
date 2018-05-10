@@ -69,6 +69,7 @@ public:
     void connect(SystemAddress address);
 
     void finishedLoading(void) X_FINAL; // tell the session we finished loading the map.
+    bool hasFinishedLoading(void) const X_FINAL;
 
     void quitToMenu(void) X_FINAL;
     void createPartyLobby(const MatchParameters& parms) X_FINAL;
