@@ -15,6 +15,7 @@ public:
 
     void registerVars(void);
 
+    X_INLINE bool lobbyDebug(void);
     X_INLINE int32_t connectionAttemps(void) const;
     X_INLINE int32_t connectionRetryDelayMs(void) const;
     X_INLINE bool snapFroceDrop(void);
@@ -24,6 +25,7 @@ public:
 
 
 private:
+    int32_t lobbyDebug_;
     int32_t connectionAttemps_;
     int32_t connectionRetyDelayMs_;
     int32_t snapFroceDrop_;

@@ -2,6 +2,11 @@
 
 X_NAMESPACE_BEGIN(net)
 
+X_INLINE bool SessionVars::lobbyDebug(void)
+{
+    return lobbyDebug_ != 0;
+}
+
 X_INLINE int32_t SessionVars::connectionAttemps(void) const
 {
     return connectionAttemps_;
