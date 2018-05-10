@@ -49,7 +49,7 @@ void Level::beginLoad(const MapNameStr& name)
 
     core::IoRequestOpen open;
     open.callback.Bind<Level, &Level::IoRequestCallback>(this);
-    open.mode = core::fileMode::READ;
+    open.mode = core::fileMode::READ | core::fileMode::SHARE;
     open.path = path_;
 
     pFileSys_->AddIoRequestToQue(open);

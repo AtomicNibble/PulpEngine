@@ -230,7 +230,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
     core::IoRequestOpen open;
     open.callback.Bind<AssetLoader, &AssetLoader::IoRequestCallback>(this);
     open.pUserData = pLoadReq;
-    open.mode = core::fileMode::READ;
+    open.mode = core::fileMode::READ | core::fileMode::SHARE;
     open.path.set(assetName.begin(), assetName.end());
 
     gEnv->pFileSys->AddIoRequestToQue(open);
