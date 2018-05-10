@@ -290,7 +290,7 @@ public:
         return val_ < rhs.val_;
     }
 
-    X_INLINE const char* toString(StrBuf& buf)
+    X_INLINE const char* toString(StrBuf& buf) const
     {
         buf.appendFmt("0x%" PRIx64, val_);
         return buf.c_str();
