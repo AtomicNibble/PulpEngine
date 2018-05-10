@@ -170,6 +170,7 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     gEnv->p3DEngine->addWorldToActiveList(p3DWorld_);
     gEnv->pPhysics->addSceneToSim(pScene_);
 
+    X_LOG0("Level", "Finished loading");
     loaded_ = true;
 }
 
