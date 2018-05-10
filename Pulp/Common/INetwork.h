@@ -492,36 +492,34 @@ struct UserInfo
 {
     const char* pName;
     int32_t peerIdx;
+    NetGUID guid;
 };
 
 struct ILobby
 {
     virtual ~ILobby() = default;
 
+    // Peers
     virtual bool allPeersLoaded(void) const X_ABSTRACT;
     virtual int32_t getNumConnectedPeers(void) const X_ABSTRACT;
     virtual int32_t getNumConnectedPeersInGame(void) const X_ABSTRACT;
     virtual int32_t getHostPeerIdx(void) const X_ABSTRACT;
 
+    // Users
     virtual int32_t getNumUsers(void) const X_ABSTRACT;
-    virtual int32_t getNumFreeSlots(void) const X_ABSTRACT;
+    virtual int32_t getNumFreeUserSlots(void) const X_ABSTRACT;
     virtual LobbyUserHandle getUserHandleForIdx(size_t idx) const X_ABSTRACT;
 
     virtual const char* getUserName(LobbyUserHandle handle) const X_ABSTRACT;
     virtual bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_ABSTRACT;
 
+    // Misc
     virtual bool isHost(void) const X_ABSTRACT;
     virtual bool isPeer(void) const X_ABSTRACT;
+    virtual LobbyType::Enum getType(void) const X_ABSTRACT;
 
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
-
-    X_INLINE bool isFull(void) const;
 };
-
-X_INLINE bool ILobby::isFull(void) const
-{
-    return getNumFreeSlots() == 0;
-}
 
 struct ISession
 {

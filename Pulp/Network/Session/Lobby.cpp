@@ -42,6 +42,11 @@ LobbyUser::LobbyUser()
     username.set("Stu");
 }
 
+X_INLINE bool LobbyUser::hasPeer(void) const
+{
+    return peerIdx >= 0;
+}
+
 void LobbyUser::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
     bs.write(guid);
@@ -60,6 +65,11 @@ void LobbyUser::fromBitStream(core::FixedBitStreamBase& bs)
 
 // ------------------------------------------------------------
 
+LobbyPeer::LobbyPeer()
+{
+    reset();
+}
+
 void LobbyPeer::reset(void)
 {
     connectionState = ConnectionState::Free;
@@ -76,41 +86,9 @@ void LobbyPeer::reset(void)
     guid = NetGUID();
 }
 
-void LobbyPeer::setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena)
+X_INLINE bool LobbyPeer::isConnected(void) const
 {
-    if (state == connectionState) {
-        X_ERROR("Lobby", "Peer already in stat: \"%s\"", ConnectionState::ToString(state));
-        return;
-    }
-
-    if (state == ConnectionState::Free)
-    {
-        if (state == ConnectionState::Established)
-        {
-            // bye bye..
-        }
-
-        reset();
-    }
-    else if (state == ConnectionState::Pending)
-    {
-        X_ASSERT(connectionState == ConnectionState::Free, "Invalid peer state")(connectionState);
-
-        pSnapMan = core::makeUnique<SnapshotManager>(arena, arena);
-
-    }
-    else if (state == ConnectionState::Established)
-    {
-        X_ASSERT(connectionState == ConnectionState::Pending, "Invalid peer state")(connectionState);
-
-    }
-    else
-    {
-        X_ASSERT_UNREACHABLE();
-    }
-
-    stateChangeTime = gEnv->pTimer->GetTimeNowReal();
-    connectionState = state;
+    return connectionState == ConnectionState::Established;
 }
 
 X_INLINE LobbyPeer::ConnectionState::Enum LobbyPeer::getConnectionState(void) const
@@ -118,10 +96,11 @@ X_INLINE LobbyPeer::ConnectionState::Enum LobbyPeer::getConnectionState(void) co
     return connectionState;
 }
 
-X_INLINE bool LobbyPeer::isConnected(void) const
+X_INLINE void LobbyPeer::setConnectionState(ConnectionState::Enum state)
 {
-    return connectionState == ConnectionState::Established;
+    connectionState = state;
 }
+
 
 // ------------------------------------------------------
 
@@ -139,38 +118,48 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, Lob
     users_.setGranularity(MAX_PLAYERS);
     users_.reserve(MAX_PLAYERS);
 
-    state_ = LobbyState::Idle;
+    reset();
+}
 
+void Lobby::reset(void)
+{
     isHost_ = false;
     finishedLoading_ = false;
 
     hostIdx_ = -1;
-}
 
-void Lobby::connectTo(SystemAddress address)
-{
-    // i would like to connect plz.
-    shutdown();
+    clearUsers();
 
-    // Bittttttcoooonnneeeeeeeeectt!!!!
-    auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
-
-    auto res = pPeer_->connect(address, PasswordStr(), vars_.connectionAttemps(), delay);
-    if (res != ConnectionAttemptResult::Started)
+    for (auto& peer : peers_)
     {
-        X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));
-        setState(LobbyState::Error);
-        return;
+        if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
+            setPeerConnectionState(peer, LobbyPeer::ConnectionState::Free);
+        }
     }
 
-    // add the address as a peer and mark as host.
-    hostIdx_ = addPeer(address);
-    X_ASSERT(peers_[hostIdx_].getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peers_[hostIdx_].getConnectionState());
-
-
-    setState(LobbyState::Connecting);
+    setState(LobbyState::Idle);
 }
 
+bool Lobby::handleState(void)
+{
+    switch (state_) {
+        case LobbyState::Idle:
+            return stateIdle();
+        case LobbyState::Creating:
+            return stateCreating();
+        case LobbyState::Connecting:
+            return stateConnecting();
+        case LobbyState::Joining:
+            return stateJoining();
+        case LobbyState::Error:
+            return false;
+
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT;
+    }
+
+    return false;
+}
 
 bool Lobby::handlePacket(Packet* pPacket)
 {
@@ -217,7 +206,6 @@ bool Lobby::handlePacket(Packet* pPacket)
             handleLobbyGameParams(pPacket);
             break;
 
-
         default:
             break;
     }
@@ -256,6 +244,472 @@ void Lobby::onReciveSnapShot(Packet* pPacket)
     pCallbacks_->onReciveSnapShot(std::move(snap));
 }
 
+// -------------------------------------------
+
+void Lobby::connectTo(SystemAddress address)
+{
+    // i would like to connect plz.
+    reset();
+
+    // Bittttttcoooonnneeeeeeeeectt!!!!
+    auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
+
+    auto res = pPeer_->connect(address, PasswordStr(), vars_.connectionAttemps(), delay);
+    if (res != ConnectionAttemptResult::Started)
+    {
+        X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));
+        setState(LobbyState::Error);
+        return;
+    }
+
+    // add the address as a peer and mark as host.
+    hostIdx_ = addPeer(address);
+    X_ASSERT(peers_[hostIdx_].getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peers_[hostIdx_].getConnectionState());
+
+    setState(LobbyState::Connecting);
+}
+
+
+void Lobby::startHosting(const MatchParameters& params)
+{
+    params_ = params;
+
+    reset();
+
+    {
+        // if we have a remote lobby, like on a server.
+        // would need to dispatch request and wait.
+        // for now just instant readdy.
+
+    }
+
+    setState(LobbyState::Creating);
+}
+
+void Lobby::finishedLoading(void)
+{
+    finishedLoading_ = true;
+}
+
+// -------------------------------------------
+
+void Lobby::sendUserCmd(const UserCmd& cmd)
+{
+    X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
+    const auto& peer = peers_[hostIdx_];
+
+    // do i want to compress this or something?
+    core::FixedBitStreamStack<1500> bs;
+    bs.write(MessageID::UserCmd);
+    cmd.writeToBitStream(bs);
+
+    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
+}
+
+void Lobby::sendSnapShot(const SnapShot& snap)
+{
+    X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
+
+    core::FixedBitStreamStack<1500> bs;
+    bs.write(MessageID::SnapShot);
+    snap.writeToBitStream(bs);
+
+    for (auto& peer : peers_)
+    {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
+        if (!peer.loaded) {
+            //      continue;
+        }
+
+        NetGuidStr str;
+        X_LOG0("Lobby", "Sending snap to ", peer.guid.toString(str));
+
+        // for now just send whole snap, later will need to build deltas and shit.
+        // how do i know it's a snapshot tho?
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
+        //  peer.pSnapMan->setStateSnap(snap);
+    }
+}
+
+void Lobby::sendToHost(MessageID::Enum id)
+{
+    MsgIdBs bs;
+    bs.write(id);
+
+    sendToHost(bs.data(), bs.sizeInBytes());
+}
+
+void Lobby::sendToHost(const uint8_t* pData, size_t lengthInBytes)
+{
+    X_ASSERT(isPeer() && !isHost(), "Invalid operation")(isPeer(), isHost());
+    const auto& peer = peers_[hostIdx_];
+
+    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+}
+
+void Lobby::sendToPeers(MessageID::Enum id)
+{
+    MsgIdBs bs;
+    bs.write(id);
+
+    sendToPeers(bs.data(), bs.sizeInBytes());
+}
+
+void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
+{
+    X_ASSERT(!isPeer() && isHost(), "Invalid operation")(isPeer(), isHost());
+
+    for (auto& peer : peers_)
+    {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
+        pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+    }
+}
+
+
+
+
+void Lobby::setState(LobbyState::Enum state)
+{
+    X_LOG0("Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
+
+    if (state == state_) {
+        X_WARNING("Lobby", "Redundant State changed");
+    }
+
+    state_ = state;
+}
+
+// ----------------------------------------------------
+
+const LobbyPeer* Lobby::findPeer(SystemHandle handle) const
+{
+    auto it = std::find_if(peers_.begin(), peers_.end(), [handle](const LobbyPeer& p) { return p.systemHandle == handle; });
+    if (it == peers_.end()) {
+        return nullptr;
+    }
+
+    return it;
+}
+
+int32_t Lobby::findPeerIdx(SystemHandle handle) const
+{
+    auto it = std::find_if(peers_.begin(), peers_.end(), [handle](const LobbyPeer& p) { return p.systemHandle == handle; });
+    if (it == peers_.end()) {
+        return -1;
+    }
+
+    return safe_static_cast<int32_t>(std::distance(peers_.begin(), it));
+}
+
+int32_t Lobby::addPeer(SystemAddress address)
+{
+    // X_ASSERT(findPeer(handle) == nullptr, "Peer already exsists")(handle);
+
+    // find free idx.
+    int32_t idx = -1;
+    for (size_t i = 0; i<peers_.size(); i++)
+    {
+        if (peers_[i].getConnectionState() == LobbyPeer::ConnectionState::Free)
+        {
+            idx = static_cast<int32_t>(i);
+            break;
+        }
+    }
+
+    // you not be trying to add a peer if no free slots.
+    if (idx < 0) {
+        X_ASSERT_UNREACHABLE();
+        return idx;
+    }
+
+    auto& peer = peers_[idx];
+    peer.systemHandle = INVALID_SYSTEM_HANDLE;
+    peer.systemAddr = address;
+    peer.guid = NetGUID();
+    setPeerConnectionState(peer, LobbyPeer::ConnectionState::Pending);
+
+    return idx;
+}
+
+
+void Lobby::disconnectPeer(int32_t peerIdx)
+{
+    X_ASSERT(peerIdx >= 0 && peerIdx < safe_static_cast<int32_t>(peers_.size()), "Invalid peerIdx")(peerIdx, peers_.size());
+    X_ASSERT(isHost(), "Should not be trying to diconnectPeer if not host")(isHost(), isPeer());
+
+    X_LOG0("Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
+
+    auto& peer = peers_[peerIdx];
+
+    if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
+        setPeerConnectionState(peer, LobbyPeer::ConnectionState::Free);
+    }
+}
+
+X_INLINE void Lobby::setPeerConnectionState(int32_t peerIdx, LobbyPeer::ConnectionState::Enum state)
+{
+    auto& peer = peers_[peerIdx];
+
+    setPeerConnectionState(peer, state);
+}
+
+void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::Enum newState)
+{
+    const auto curState = peer.getConnectionState();
+
+    if (newState == curState) {
+        X_ERROR("Lobby", "Peer already in stat: \"%s\"", ConnectionState::ToString(newState));
+        return;
+    }
+
+    if (newState == LobbyPeer::ConnectionState::Free)
+    {
+        if (newState == LobbyPeer::ConnectionState::Established)
+        {
+            // tell the user to get fucked?
+            
+        }
+
+        // this won't break removing the user below.
+        peer.reset();
+    }
+    else if (newState == LobbyPeer::ConnectionState::Pending)
+    {
+        X_ASSERT(curState == LobbyPeer::ConnectionState::Free, "Invalid peer state")(curState);
+
+        peer.pSnapMan = core::makeUnique<SnapshotManager>(arena_, arena_);
+    }
+    else if (newState == LobbyPeer::ConnectionState::Established)
+    {
+        X_ASSERT(curState == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(curState);
+
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    peer.stateChangeTime = gEnv->pTimer->GetTimeNowReal();
+    peer.setConnectionState(newState);
+
+    if (isHost() && newState == LobbyPeer::ConnectionState::Free) 
+    {
+        size_t numRemoved = removeUsersWithDisconnectedPeers();
+        if (numRemoved == 0)
+        {
+            X_WARNING("Lobby", "No users where removed after disconnecting peer");
+        }
+    }
+}
+
+// ---------------------------------------------------------------
+
+void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
+{
+    const auto numUsersStart = getNumUsers();
+    int32_t numUsers = bs.read<int32_t>();
+
+    X_ASSERT(numUsers < MAX_PLAYERS, "Recived more users than max players")(numUsers, MAX_PLAYERS);
+
+    for (int32_t i = 0; i < numUsers; i++)
+    {
+        LobbyUser user;
+        user.fromBitStream(bs);
+
+        X_LOG0("Lobby", "Adding user: \"%s\"", user.username.c_str());
+
+        if (isHost())
+        {
+            // user list is from this peer, so set index.
+            if (peerIdx != -1)
+            {
+                user.address = peers_[peerIdx].systemAddr;
+                user.peerIdx = peerIdx;
+            }
+            else
+            {
+                // currently no use case.
+                X_ASSERT_NOT_IMPLEMENTED();
+            }
+        }
+        else
+        {
+            X_ASSERT(peerIdx == hostIdx_, "Should only recive user list from host")(peerIdx, hostIdx_);
+
+            // only the host's user address need patching.
+            // since the host will have set the address for all other users.
+            if (user.peerIdx == -1)
+            {
+                user.address = peers_[peerIdx].systemAddr;
+                user.peerIdx = peerIdx; // mark this as host.
+            }
+            else
+            {
+                user.peerIdx = -1; // peer indexes aree not valid on clients.
+            }
+        }
+
+        users_.emplace_back(std::move(user));
+    }
+
+    if (isHost())
+    {
+        sendNewUsersToPeers(peerIdx, numUsersStart, numUsers);
+    }
+}
+
+void Lobby::addUsersToBs(core::FixedBitStreamBase& bs) const
+{
+    bs.write(safe_static_cast<int32_t>(users_.size()));
+    for (const auto& user : users_)
+    {
+        user.writeToBitStream(bs);
+    }
+}
+
+void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num) const
+{
+    auto numUsers = getNumUsers();
+
+    if (startIdx >= numUsers) {
+        X_WARNING("Lobby", "Skipping sending user diff to peers, no new users");
+        return;
+    }
+
+    const int32_t diff = numUsers - startIdx;
+    if (diff != num) {
+        X_WARNING("Lobby", "Sending less users than added. num %" PRIi32 " diff %" PRIi32, num, diff);
+    }
+
+    X_LOG0("Lobby", "Sending %" PRId32 " new users to peers", diff);
+
+    UserInfoBs bs;
+    bs.write(MessageID::LobbyUsersConnected);
+    bs.write<int32_t>(num);
+
+    for (int32_t i = startIdx; i < numUsers; i++)
+    {
+        users_[i].writeToBitStream(bs);
+    }
+
+    // send the msg to all peers except skip peer.
+    for (size_t i = 0; i < peers_.size(); i++)
+    {
+        if (i == skipPeer) {
+            continue;
+        }
+
+        auto& peer = peers_[i];
+        if (!peer.isConnected()) {
+            continue;
+        }
+
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+    }
+}
+
+void Lobby::addLocalUsers(void)
+{
+    clearUsers();
+
+    core::SysInfo::UserNameStr nameStr;
+    core::SysInfo::GetUserName(nameStr);
+
+    // Lerrooooooooooooy JENKINS!!! (is a twat? O_O)
+    char buffer[128];
+
+    auto localGuid = pPeer_->getMyGUID();
+    SystemAddress address;
+
+    LobbyUser user;
+    user.guid = localGuid;
+    user.address = address;
+    user.username.set(core::strUtil::Convert(nameStr, buffer));
+    user.username.appendFmt("_%" PRIx32, core::Process::GetCurrentID());
+    users_.emplace_back(user);
+
+    X_ASSERT(users_.isNotEmpty(), "User list empty")(users_.size());
+}
+
+void Lobby::clearUsers(void)
+{
+    users_.clear();
+}
+
+size_t Lobby::removeUsersWithDisconnectedPeers(void)
+{
+    X_ASSERT(isHost(), "Host only logic")(isHost());
+
+    NetGUIDArr guids;
+
+    // find any users that peers are no longer connected.
+    for (auto& user : users_)
+    {
+        // us?
+        if (!user.hasPeer()) {
+            continue;
+        }
+
+        auto& peer = peers_[user.peerIdx];
+        if (!peer.isConnected()) {
+            // gone :(
+            guids.push_back(user.guid);
+        }
+    }
+ 
+    removeUsersByGuid(guids);
+
+    return guids.size();
+}
+
+void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
+{
+    if (ids.isEmpty()) {
+        return;
+    }
+
+    for (auto id : ids)
+    {
+        bool removed = false;
+
+        for (size_t i = 0; i < users_.size(); i++)
+        {
+            auto& user = users_[i];
+            if (user.guid == id)
+            {
+                removed = users_.removeIndex(i);
+                break;
+            }
+        }
+    
+        if (!removed)
+        {
+            NetGuidStr buf;
+            X_WARNING("Lobby", "Failed to find user with guid: %s for removal", id.toString(buf));
+        }
+    }
+
+    // tell the bitchez?
+    if (isHost())
+    {
+        NetGUIDBs bs;
+        bs.write(MessageID::LobbyUsersDiconnected);
+        bs.write(safe_static_cast<int32_t>(ids.size()));
+        bs.write(ids.data(), ids.size());
+        sendToPeers(bs.data(), bs.sizeInBytes());
+    }
+}
+
+// ----------------------------------------------------
+
+
 void Lobby::handleConnectionAccepted(Packet* pPacket)
 {
     X_ASSERT(isPeer(), "We should only be connecting to a server if a peer")(isPeer());
@@ -279,7 +733,7 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
     addLocalUsers();
 
     // ask to join the lobby.
-    core::FixedBitStreamStack<0x200> bs;
+    UserInfoBs bs;
     bs.write(MessageID::LobbyJoinRequest);
 
     addUsersToBs(bs);
@@ -296,10 +750,10 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     // what a nice little slut.
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
 
-    if (isFull()) {
-       X_WARNING("Lobby", "Rejected peer, looby is full");
+    if (getNumFreeUserSlots() == 0) {
+       X_WARNING("Lobby", "Rejected peer, looby is full"); // owned.
         
-        core::FixedBitStreamStack<32> bs;
+        MsgIdBs bs;
         bs.write(MessageID::LobbyJoinNoFreeSlots);
         pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
         return;
@@ -345,19 +799,7 @@ void Lobby::handleConnectionLost(Packet* pPacket)
 
         X_ERROR("Lobby", "Peer lost connection");
 
-        // need to remove users for this peer also.
-        // basically any time we disconnect a peer we need to tell the other peers, rip
-        for (auto it = users_.begin(); it != users_.end();)
-        {
-            if (it->peerIdx == peerIdx) {
-                it = users_.erase(it);
-            }
-            else {
-                ++it;
-            }
-        }
-
-        peers_[peerIdx].setConnectionState(LobbyPeer::ConnectionState::Free, arena_);
+        setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
     }
     else
     {
@@ -402,11 +844,11 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         }
 
         // This peer is now connected.
-        peer.setConnectionState(LobbyPeer::ConnectionState::Established, arena_);
+        setPeerConnectionState(peer, LobbyPeer::ConnectionState::Established);
     }
 
     // send match params and full user list.
-    core::FixedBitStreamStack<0x400> bs;
+    UserInfoBs bs;
     bs.write(MessageID::LobbyJoinAccepted);
 
     params_.writeToBitStream(bs);
@@ -431,7 +873,7 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 
     auto& host = peers_[peerIdx];
     X_ASSERT(host.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Unexpected connection state")(host.getConnectionState());
-    host.setConnectionState(LobbyPeer::ConnectionState::Established, arena_);
+    setPeerConnectionState(host, LobbyPeer::ConnectionState::Established);
 
     clearUsers();
 
@@ -457,7 +899,25 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 {
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
+    // users have left ;(
+    // WEAK!
+    const auto num = bs.read<int32_t>();
+    if (num < 0 || num > MAX_PLAYERS) {
+        X_ERROR("Lobby", "Recived invalud user diconnect msg, num users: %" PRIi32, num);
+        return;
+    }
 
+    NetGUIDArr guids;
+    guids.resize(num);
+    bs.read(guids.data(), guids.size());
+
+    for (auto& id : guids)
+    {
+        NetGuidStr buf;
+        X_LOG0("Lobby", "User Diconnected: %s", id.toString(buf));
+    }
+
+    removeUsersByGuid(guids);
 }
 
 void Lobby::handleLobbyGameParams(Packet* pPacket)
@@ -468,316 +928,8 @@ void Lobby::handleLobbyGameParams(Packet* pPacket)
 }
 
 
-void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
-{
-    const auto numUsersStart = getNumUsers();
-    int32_t numUsers = bs.read<int32_t>();
+// -----------------------------------------------------------
 
-    X_ASSERT(numUsers < MAX_PLAYERS, "Recived more users than max players")(numUsers, MAX_PLAYERS);
-
-    for (int32_t i = 0; i < numUsers; i++)
-    {
-        LobbyUser user;
-        user.fromBitStream(bs);
-
-        X_LOG0("Lobby", "Adding user: \"%s\"", user.username.c_str());
-
-        if (isHost())
-        {
-            // user list is from this peer, so set index.
-            if (peerIdx != -1)
-            {
-                user.address = peers_[peerIdx].systemAddr;
-                user.peerIdx = peerIdx;
-            }
-        }
-        else
-        {
-            X_ASSERT(peerIdx == hostIdx_, "Should only recive user list from host")(peerIdx, hostIdx_);
-
-            // only the host's user address need patching.
-            // since the host will have set the address for all other users.
-            if (user.peerIdx == -1)
-            {
-                user.address = peers_[peerIdx].systemAddr;
-            }
-        }
-
-        users_.emplace_back(std::move(user));
-    }
-
-    if (isHost())
-    {
-        sendNewUsersToPeers(peerIdx, numUsersStart, numUsers);
-    }
-}
-
-void Lobby::addUsersToBs(core::FixedBitStreamBase& bs) const
-{
-    bs.write(safe_static_cast<int32_t>(users_.size()));
-    for (const auto& user : users_)
-    {
-        user.writeToBitStream(bs);
-    }
-}
-
-void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num) const
-{
-    auto numUsers = getNumUsers();
-
-    if (startIdx >= numUsers) {
-        X_WARNING("Lobby", "Skipping sending user diff to peers, no new users");
-        return;
-    }
-
-    const int32_t diff = numUsers - startIdx;
-    if (diff != num) {
-        X_WARNING("Lobby", "Sending less users than added. num %" PRIi32 " diff %" PRIi32, num, diff);
-    }
-
-    X_LOG0("Lobby", "Sending %" PRId32 " new users to peers", diff);
-
-    core::FixedBitStreamStack<1500> bs;
-    bs.write(MessageID::LobbyUsersConnected);
-    bs.write<int32_t>(num);
-
-    for (int32_t i = startIdx; i < numUsers; i++)
-    {
-        users_[i].writeToBitStream(bs);
-    }
-
-    // send the msg to all peers except skip peer.
-    for (size_t i = 0; i < peers_.size(); i++)
-    {
-        if (i == skipPeer) {
-            continue;
-        }
-
-        auto& peer = peers_[i];
-        if(!peer.isConnected()) {
-            continue;
-        }
-
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
-    }
-}
-
-void Lobby::sendUserCmd(const UserCmd& cmd)
-{
-    X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
-    const auto& peer = peers_[hostIdx_];
-
-    // do i want to compress this or something?
-    core::FixedBitStreamStack<1500> bs;
-    bs.write(MessageID::UserCmd);
-    cmd.writeToBitStream(bs);
-
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
-}
-
-void Lobby::sendSnapShot(const SnapShot& snap)
-{
-    X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
-
-    core::FixedBitStreamStack<1500> bs;
-    bs.write(MessageID::SnapShot);
-    snap.writeToBitStream(bs);
-
-  //  X_ASSERT_NOT_IMPLEMENTED();
-
-    for (auto& peer : peers_)
-    {
-        if (!peer.isConnected()) {
-            continue;
-        }
-
-        if (!peer.loaded) {
-      //      continue;
-        }
-
-        NetGuidStr str;
-        X_LOG0("Lobby", "Sending snap to ", peer.guid.toString(str));
-
-      // for now just send whole snap, later will need to build deltas and shit.
-    // how do i know it's a snapshot tho?
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
-      //  peer.pSnapMan->setStateSnap(snap);
-    }
-}
-
-void Lobby::sendToHost(MessageID::Enum id)
-{
-    core::FixedBitStreamStack<32> bs;
-    bs.write(id);
-
-    sendToHost(bs.data(), bs.sizeInBytes());
-}
-
-void Lobby::sendToHost(const uint8_t* pData, size_t lengthInBytes)
-{
-    X_ASSERT(isPeer() && !isHost(), "Invalid operation")(isPeer(), isHost());
-    const auto& peer = peers_[hostIdx_];
-
-    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
-}
-
-void Lobby::sendToPeers(MessageID::Enum id)
-{
-    core::FixedBitStreamStack<32> bs;
-    bs.write(id);
-
-    sendToPeers(bs.data(), bs.sizeInBytes());
-}
-
-void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
-{
-    X_ASSERT(!isPeer() && isHost(), "Invalid operation")(isPeer(), isHost());
-    
-    for (auto& peer : peers_)
-    {
-        if (!peer.isConnected()) {
-            continue;
-        }
-
-        pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
-    }
-}
-
-
-bool Lobby::handleState(void)
-{
-    switch (state_) {
-        case LobbyState::Idle:
-            return stateIdle();
-        case LobbyState::Creating:
-            return stateCreating();
-        case LobbyState::Connecting:
-            return stateConnecting();
-        case LobbyState::Joining:
-            return stateJoining();
-        case LobbyState::Error:
-            return false;
-
-        default:
-            X_NO_SWITCH_DEFAULT_ASSERT;
-    }
-
-    return false;
-}
-
-
-const LobbyPeer* Lobby::findPeer(SystemHandle handle) const
-{
-    auto it = std::find_if(peers_.begin(), peers_.end(), [handle](const LobbyPeer& p) { return p.systemHandle == handle; });
-    if (it == peers_.end()) {
-        return nullptr;
-    }
-
-    return it;
-}
-
-int32_t Lobby::findPeerIdx(SystemHandle handle) const
-{
-    auto it = std::find_if(peers_.begin(), peers_.end(), [handle](const LobbyPeer& p) { return p.systemHandle == handle; });
-    if (it == peers_.end()) {
-        return -1;
-    }
-
-    return safe_static_cast<int32_t>(std::distance(peers_.begin(), it));
-}
-
-int32_t Lobby::addPeer(SystemAddress address)
-{
-    // X_ASSERT(findPeer(handle) == nullptr, "Peer already exsists")(handle);
-
-    // find free idx.
-    int32_t idx = -1;
-    for(size_t i=0; i<peers_.size(); i++)
-    {
-        if (peers_[i].getConnectionState() == LobbyPeer::ConnectionState::Free)
-        {
-            idx = static_cast<int32_t>(i);
-            break;
-        }
-    }
-
-    // you not be trying to add a peer if no free slots.
-    if (idx < 0) {
-        X_ASSERT_UNREACHABLE();
-        return idx;
-    }
-
-    auto& peer = peers_[idx];
-    peer.systemHandle = INVALID_SYSTEM_HANDLE;
-    peer.systemAddr = address;
-    peer.guid = NetGUID();
-    peer.setConnectionState(LobbyPeer::ConnectionState::Pending, arena_);
-
-    return idx;
-}
-
-
-void Lobby::disconnectPeer(int32_t peerIdx)
-{
-    X_ASSERT(peerIdx >= 0 && peerIdx < safe_static_cast<int32_t>(peers_.size()), "Invalid peerIdx")(peerIdx, peers_.size());
-    X_ASSERT(isHost(), "Should not be trying to diconnectPeer if not host")(isHost(), isPeer());
-
-    X_LOG0("Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
-
-    auto& peer = peers_[peerIdx];
-
-    if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
-        peer.setConnectionState(LobbyPeer::ConnectionState::Free, arena_);
-    }
-}
-
-
-void Lobby::setState(LobbyState::Enum state)
-{
-    X_LOG0("Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
-
-    state_ = state;
-}
-
-void Lobby::startHosting(const MatchParameters& params)
-{
-    params_ = params;
-
-    shutdown();
-
-    {
-        // if we have a remote lobby, like on a server.
-        // would need to dispatch request and wait.
-        // for now just instant readdy.
-
-    }
-
-    setState(LobbyState::Creating);
-}
-
-void Lobby::finishedLoading(void)
-{
-    finishedLoading_ = true;
-}
-
-void Lobby::shutdown(void)
-{
-    isHost_ = false;
-    finishedLoading_ = false;
-
-    hostIdx_ = -1;
-
-    clearUsers();
-    
-    for (auto& peer : peers_)
-    {
-        if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
-            peer.setConnectionState(LobbyPeer::ConnectionState::Free, arena_);
-        }
-    }
-
-    setState(LobbyState::Idle);
-}
 
 bool Lobby::stateIdle(void)
 {
@@ -814,6 +966,8 @@ bool Lobby::stateJoining(void)
     return true;
 }
 
+// -----------------------------------------------------------
+
 void Lobby::initStateLobbyHost(void)
 {
     // we are hosting
@@ -826,33 +980,8 @@ void Lobby::initStateLobbyHost(void)
     // done?
 }
 
-void Lobby::addLocalUsers(void)
-{
-    clearUsers();
+// -----------------------------------------------------------
 
-    core::SysInfo::UserNameStr nameStr;
-    core::SysInfo::GetUserName(nameStr);
-
-    // Lerrooooooooooooy JENKINS!!! (is a twat? O_O)
-    char buffer[128];
-
-    auto localGuid = pPeer_->getMyGUID();
-    SystemAddress address;
-
-    LobbyUser user;
-    user.guid = localGuid;
-    user.address = address;
-    user.username.set(core::strUtil::Convert(nameStr, buffer));
-    user.username.appendFmt("_%" PRIx32, core::Process::GetCurrentID());
-    users_.emplace_back(user);
-
-    X_ASSERT(users_.isNotEmpty(), "User list empty")(users_.size());
-}
-
-void Lobby::clearUsers(void)
-{
-    users_.clear();
-}
 
 bool Lobby::allPeersLoaded(void) const
 {
@@ -892,25 +1021,11 @@ int32_t Lobby::getNumConnectedPeersInGame(void) const
     return num;
 }
 
-int32_t Lobby::getHostPeerIdx(void) const
-{
-    return hostIdx_;
-}
-
-int32_t Lobby::getNumUsers(void) const
-{
-    return safe_static_cast<int32_t>(users_.size());
-}
-
-LobbyUserHandle Lobby::getUserHandleForIdx(size_t idx) const
-{
-    return static_cast<LobbyUserHandle>(idx);
-}
-
 const char* Lobby::getUserName(LobbyUserHandle handle) const
 {
     size_t idx = static_cast<size_t>(handle);
 
+    // Stu? is that you?
     return users_[idx].username.c_str();
 }
 
@@ -921,8 +1036,7 @@ bool Lobby::getUserInfo(LobbyUserHandle handle, UserInfo& info) const
 
     info.pName = user.username.c_str();
     info.peerIdx = user.peerIdx;
-
-
+    info.guid = user.guid;
     return true;
 }
 
@@ -936,7 +1050,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     con.effectId = 0;
     con.pFont = gEnv->pFontSys->GetDefault();
 
-    float width = 700.f;
+    float width = 750.f;
     float height = 300.f;
 
     const auto numConnected = getNumConnectedPeers();
@@ -958,25 +1072,29 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     {
         auto& peer = peers_[i];
 
-        static_assert(std::is_same<uint16_t, SystemHandle>::value, "SystemHandle format specifier needs updating");
+        static_assert(std::is_same<uint16_t, decltype(peer.systemHandle)>::value, "format specifier needs updating");
 
         txt.appendFmt("\n^5Peer%" PRIuS "^7 State: ^1%s^7 loaded: ^1%" PRIu8 "^7 inGame: ^1%" PRIu8 "^7 SysHandle: ^1%" PRIu16 "^7 numSnaps: ^1%" PRIi32 "^7", 
             i, LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), peer.loaded, peer.inGame, peer.systemHandle, peer.numSnapsSent);
     }
 
+    pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
+    txt.clear();
     txt.append("\n\nUsers:");
-
 
     for (size_t i = 0; i < users_.size(); i++)
     {
         auto& user = users_[i];
 
-        txt.appendFmt("\n^5User%" PRIuS "^7 Name: \"%s\" PeerIdx: ^1%" PRIi32 "^7 Address: \"%s\"",
-            i,  user.username.c_str(), user.peerIdx, pNet->systemAddressToString(user.address, ipStr, true));
+        static_assert(std::is_same<int32_t, decltype(user.peerIdx)>::value, "format specifier needs updating");
+        NetGuidStr buf;
+
+        txt.appendFmt("\n^5User%" PRIuS "^7 \"%s\" PeerIdx: ^1%" PRIi32 "^7 guid: ^1%s^7 Addr: \"%s\"",
+            i,  user.username.c_str(), user.peerIdx, user.guid.toString(buf), pNet->systemAddressToString(user.address, ipStr, true));
     }
 
 
-    pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
+    pPrim->drawText(base.x + 2.f, base.y + 30.f + (peers_.size() * 16.f), con, txt.begin(), txt.end());
 
     return Vec2f(width, height);
 }

@@ -57,6 +57,10 @@ class SessionVars;
 
 class Session : public ISession, ISessionCallbacks
 {
+    X_NO_COPY_MOVE_ALL(Session);
+
+    using LobbyArr = std::array<Lobby,LobbyType::ENUM_COUNT>;
+
 public:
     Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena);
 
@@ -135,7 +139,7 @@ private:
 
     SessionState::Enum state_;
 
-    Lobby lobbys_[LobbyType::ENUM_COUNT];
+    LobbyArr lobbys_;
 
     core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
 };

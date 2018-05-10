@@ -19,10 +19,10 @@ Session::Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena) 
     vars_(vars),
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     arena_(X_ASSERT_NOT_NULL(arena)),
-    lobbys_{
+    lobbys_{ {
         {vars_, this, pPeer_, LobbyType::Party, arena},
         {vars_, this, pPeer_, LobbyType::Game, arena}
-    }
+    }}
 {
     X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();
     X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
@@ -98,9 +98,10 @@ void Session::quitToMenu(void)
         return;
     }
 
-    // TODO: leave any lobby.
-    lobbys_[LobbyType::Party].shutdown();
-    lobbys_[LobbyType::Game].shutdown();
+    for (int32_t i = 0; i < lobbys_.size(); i++)
+    {
+        lobbys_[i].reset();
+    }
 
     setState(SessionState::Idle);
 }

@@ -31,13 +31,17 @@ X_DECLARE_ENUM(LobbyState)(
 // so a server will have peers for all users.
 // while everyone else will just have peer for host.
 
+
 struct LobbyUser
 {
     LobbyUser();
 
+    X_INLINE bool hasPeer(void) const;
+
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
 
+public:
     NetGUID guid;
     SystemAddress address;
     int32_t peerIdx;
@@ -52,23 +56,21 @@ struct LobbyPeer
         Pending,
         Established    
     );
+    
+    LobbyPeer();
 
-    LobbyPeer() {
-        reset();
-    }
-
-    void setConnectionState(ConnectionState::Enum state, core::MemoryArenaBase* arena);
-
-    ConnectionState::Enum getConnectionState(void) const;
-    bool isConnected(void) const;
-
-private:
     void reset(void);
+    bool isConnected(void) const;
+    ConnectionState::Enum getConnectionState(void) const;
+    void setConnectionState(ConnectionState::Enum state);
 
 public:
     bool loaded;
     bool inGame;
-
+    bool _pad;
+private:
+    ConnectionState::Enum connectionState;
+public:
     core::TimeVal lastSnap;
     core::TimeVal stateChangeTime;
     float snapHz;
@@ -78,9 +80,6 @@ public:
     SystemHandle systemHandle;
     SystemAddress systemAddr;
     NetGUID guid;
-
-private:
-    ConnectionState::Enum connectionState;
 };
 
 class Lobby : public ILobby
@@ -88,13 +87,26 @@ class Lobby : public ILobby
     typedef core::Array<LobbyUser> LobbyUserArr;
     typedef core::Array<LobbyPeer> LobbyPeerArr;
 
+    typedef core::FixedBitStreamStack<0x8> MsgIdBs;
+    typedef core::FixedBitStreamStack<0x400> UserInfoBs;
+    typedef core::FixedBitStreamStack<0x20 + (sizeof(NetGUID) * MAX_PLAYERS)> NetGUIDBs;
+
+    using NetGUIDArr = core::FixedArray<NetGUID, MAX_PLAYERS>;
+
+    X_NO_COPY_MOVE_ALL(Lobby);
+
 public:
     Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
 
-    void connectTo(SystemAddress address);
+    void reset(void);
 
+    bool handleState(void);
     bool handlePacket(Packet* pPacket);
     void onReciveSnapShot(Packet* pPacket);
+
+    void connectTo(SystemAddress address);
+    void startHosting(const MatchParameters& params);
+    void finishedLoading(void);
 
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap);
@@ -107,53 +119,53 @@ public:
     void sendToPeers(MessageID::Enum id);
     void sendToPeers(const uint8_t* pData, size_t lengthInBytes);
 
-    bool handleState(void);
-
-    void startHosting(const MatchParameters& params);
-    //  void sendMembersToLobby(Lobby& destLobby);
-    void finishedLoading(void);
-
-    void shutdown(void);
-
+    // Peers
     bool allPeersLoaded(void) const X_FINAL;
     int32_t getNumConnectedPeers(void) const X_FINAL;
     int32_t getNumConnectedPeersInGame(void) const X_FINAL;
-    int32_t getHostPeerIdx(void) const X_FINAL;
+    X_INLINE int32_t getHostPeerIdx(void) const X_FINAL;
 
-    int32_t getNumUsers(void) const X_FINAL;
-    LobbyUserHandle getUserHandleForIdx(size_t idx) const X_FINAL;
+    // Users
+    X_INLINE int32_t getNumUsers(void) const X_FINAL;
+    X_INLINE int32_t getNumFreeUserSlots(void) const X_FINAL;
+    X_INLINE LobbyUserHandle getUserHandleForIdx(size_t idx) const X_FINAL;
 
     const char* getUserName(LobbyUserHandle handle) const X_FINAL;
     bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_FINAL;
 
-    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
-
-    X_INLINE LobbyState::Enum getState(void) const;
-    X_INLINE LobbyType::Enum getType(void) const;
+    // Misc
     X_INLINE bool isHost(void) const X_FINAL;
     X_INLINE bool isPeer(void) const X_FINAL;
-    X_INLINE bool hasFinishedLoading(void) const;
-    X_INLINE MatchFlags getMatchFlags(void) const;
+    X_INLINE LobbyType::Enum getType(void) const X_FINAL;
     X_INLINE const MatchParameters& getMatchParams(void) const X_FINAL;
+    X_INLINE MatchFlags getMatchFlags(void) const;
 
-    X_INLINE int32_t getNumFreeSlots(void) const X_FINAL;
-    X_INLINE bool isFull(void) const;
+    X_INLINE LobbyState::Enum getState(void) const;
+    X_INLINE bool hasFinishedLoading(void) const;
 
-private:
-    const LobbyPeer* findPeer(SystemHandle handle) const;
-    int32_t findPeerIdx(SystemHandle handle) const;
-    int32_t addPeer(SystemAddress address);
-
-    void disconnectPeer(int32_t peerIdx);
-
-    void addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx);
-    void addUsersToBs(core::FixedBitStreamBase& bs) const;
-
-    void sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num) const;
+    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
 
 private:
     void setState(LobbyState::Enum state);
 
+    // Peers
+    const LobbyPeer* findPeer(SystemHandle handle) const;
+    int32_t findPeerIdx(SystemHandle handle) const;
+    int32_t addPeer(SystemAddress address);
+    void disconnectPeer(int32_t peerIdx);
+    void setPeerConnectionState(int32_t peerIdx, LobbyPeer::ConnectionState::Enum state);
+    void setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::Enum state);
+
+    // Users
+    void addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx);
+    void addUsersToBs(core::FixedBitStreamBase& bs) const;
+    void sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num) const;
+    void addLocalUsers(void);
+    void clearUsers(void);
+    size_t removeUsersWithDisconnectedPeers(void);
+    void removeUsersByGuid(const NetGUIDArr& ids);
+
+private:
     void handleConnectionAccepted(Packet* pPacket);
     void handleConnectionHandShake(Packet* pPacket);
     void handleConnectionAttemptFailed(MessageID::Enum id);
@@ -164,7 +176,6 @@ private:
     void handleLobbyUsersDiconnected(Packet* pPacket);
     void handleLobbyGameParams(Packet* pPacket);
 
-
 private:
     bool stateIdle(void);
     bool stateCreating(void);
@@ -173,8 +184,7 @@ private:
 
 private:
     void initStateLobbyHost(void);
-    void addLocalUsers(void);
-    void clearUsers(void);
+
 
 private:
     SessionVars& vars_;
