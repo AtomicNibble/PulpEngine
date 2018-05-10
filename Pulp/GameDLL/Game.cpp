@@ -220,7 +220,10 @@ bool XGame::update(core::FrameData& frame)
             }
         }
 
-        if (world_->hasLoaded())
+        // so i need to support been loaded, yet sillt in the loading state, while we wait for shity peers.
+        // to finish loading, this is so the loading screen is still showing and can show pleb progress.
+        // where to store this state?
+        if (world_->hasLoaded() && !pSession_->hasFinishedLoading())
         {
             world_->spawnPlayer(0);
 
