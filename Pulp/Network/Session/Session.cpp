@@ -2,6 +2,7 @@
 #include "Session.h"
 
 #include "Lobby.h"
+#include "Vars\SessionVars.h"
 
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
@@ -78,8 +79,14 @@ void Session::finishedLoading(void)
     {
         if (lobbys_[LobbyType::Game].isHost())
         {
-        //    wait for players?
-        //    setState(SessionState::InGame);
+            if (vars_.waitForPlayers())
+            {
+                X_LOG0("Session", "Not waiting for players to load");
+            }
+            else
+            {
+                setState(SessionState::InGame);
+            }
         }
         else
         {
