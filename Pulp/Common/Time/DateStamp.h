@@ -5,37 +5,36 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Util
-/// \class Date
-/// \brief A class that provides date manipulation functions.
-/// \sa Time
 class DateStamp
 {
 public:
-    /// A type representing the date format: ISO (ISO 8601) YYYY-MM-DD plus a null terminator.
     typedef char Description[11];
 
-    DateStamp(unsigned short year, unsigned char month, unsigned char day);
+public:
+    DateStamp();
+    DateStamp(uint16_t year, uint8_t month, uint8_t day);
 
-    int GetYear() const;
-    int GetQuarter() const;
-    int GetMonth() const;
-    int GetDay() const;
-    int GetDayOfYear() const;
+    bool operator>(const DateStamp& rhs) const;
+    bool operator<(const DateStamp& rhs) const;
 
-    int IsLeapYear() const;
+    int getYear(void) const;
+    int getQuarter(void) const;
+    int getMonth(void) const;
+    int getDay(void) const;
+    int getDayOfYear(void) const;
 
-    int DaysInMonth(int month) const;
+    int isLeapYear(void) const;
 
-    /// Returns the current date system data.
-    static DateStamp GetSystemDate(void);
+    int daysInMonth(int month) const;
 
-    const char* ToString(Description& desc) const;
+    static DateStamp getSystemDate(void);
+
+    const char* toString(Description& desc) const;
 
 private:
-    unsigned short year_;
-    unsigned char month_;
-    unsigned char day_;
+    uint16_t year_;
+    uint8_t month_;
+    uint8_t day_;
 };
 
 X_NAMESPACE_END

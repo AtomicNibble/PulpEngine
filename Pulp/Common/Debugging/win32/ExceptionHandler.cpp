@@ -432,14 +432,14 @@ namespace exceptionHandler
                 }
 
                 {
-                    TimeStamp time = TimeStamp::GetSystemTime();
-                    DateStamp date = DateStamp::GetSystemDate();
+                    TimeStamp time = TimeStamp::getSystemTime();
+                    DateStamp date = DateStamp::getSystemDate();
 
                     TimeStamp::FileDescription time_txt;
                     DateStamp::Description date_txt;
 
                     Path<char> filename;
-                    filename.appendFmt("MiniDump_%s_%s.dmp", date.ToString(date_txt), time.ToString(time_txt));
+                    filename.appendFmt("MiniDump_%s_%s.dmp", date.toString(date_txt), time.toString(time_txt));
 
                     X_LOG_BULLET;
                     X_LOG0("ExceptionHandler", "Writing crash dump to file: \"%s\"", filename.c_str());

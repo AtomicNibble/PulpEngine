@@ -5,38 +5,38 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \class TimeStamp
-/// \brief A class that provides time manipulation functions.
 class TimeStamp
 {
 public:
-    /// A type representing the time format: extended ISO (ISO 8601) hh:mm:ss,mmmm plus a null terminator.
     typedef char Description[14];
-    /// A type representing the time format suitable to be used as a filename: hh-mm-ss plus a null terminator.
     typedef char FileDescription[9];
 
-    /// Constructs a time.
+public:
+    TimeStamp();
     TimeStamp(int hour, int minute, int second, int millisecond = 0);
 
 public:
-    int GetHour(void) const;
-    int GetMinute(void) const;
-    int GetSecond(void) const;
-    int GetMilliSecond(void) const;
 
-    // Total Milliseconds past midnight :D
-    int GetMilliSecondsPastMidnight(void) const;
+    bool operator>(const TimeStamp& rhs) const;
+    bool operator<(const TimeStamp& rhs) const;
 
-    const char* ToString(Description& desc) const;
-    const char* ToString(FileDescription& desc) const;
+    int getHour(void) const;
+    int getMinute(void) const;
+    int getSecond(void) const;
+    int getMilliSecond(void) const;
 
-    static TimeStamp GetSystemTime(void);
+    int getMilliSecondsPastMidnight(void) const;
+
+    const char* toString(Description& desc) const;
+    const char* toString(FileDescription& desc) const;
+
+    static TimeStamp getSystemTime(void);
 
 private:
-    void InternalToMSPM(void) const;
-    void InternalToTime(void) const;
+    void internalToMSPM(void) const;
+    void internalToTime(void) const;
 
-    mutable int Time_;
+    mutable int time_;
 };
 
 X_NAMESPACE_END

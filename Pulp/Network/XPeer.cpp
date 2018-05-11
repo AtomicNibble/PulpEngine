@@ -2148,7 +2148,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
                 NonceHash hash;
                 hash.update(timeNow);
                 hash.update(randBytes.data(), randBytes.size());
-                hash.update(core::TimeStamp::GetSystemTime());
+                hash.update(core::TimeStamp::getSystemTime());
                 hash.update(core::Thread::GetCurrentID());
 
                 pRemoteSys->nonce = hash.finalize();

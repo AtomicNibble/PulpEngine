@@ -8,65 +8,84 @@ X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-    const static int g_YearDayFromMonth[] = {0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
-    const static int g_DaysPerMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
+    const int g_YearDayFromMonth[] = {0, 1, 32, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366};
+    const int g_DaysPerMonth[] = {0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
 
-    const static int g_MinYear = 1500;
+    const int g_MinYear = 1500;
 } // namespace
 
-DateStamp::DateStamp(unsigned short year, unsigned char month, unsigned char day) :
+DateStamp::DateStamp()
+{
+    year_ = 0;
+    month_ = 0;
+    day_ = 0;
+}
+
+
+DateStamp::DateStamp(uint16_t year, uint8_t month, uint8_t day) :
     year_(year),
     month_(month),
     day_(day)
 {
     // validate it.
 
-    X_ASSERT(day >= 1 && day <= DaysInMonth(month), "Day is not valid for month: %i, max is: ", month, DaysInMonth(month))(day);
+    X_ASSERT(day >= 1 && day <= daysInMonth(month), "Day is not valid for month: %i, max is: ", month, daysInMonth(month))(day);
     X_ASSERT(month >= 1 && month <= 12, "Month is not valid")(month);
     X_ASSERT(year >= g_MinYear && year <= g_MinYear + 1000, "Year is not valid")(year);
 }
 
-int DateStamp::GetYear() const
+bool DateStamp::operator>(const DateStamp& rhs) const
+{
+    return year_ > rhs.year_ || month_ > rhs.year_ || day_ > rhs.day_;
+}
+
+bool DateStamp::operator<(const DateStamp& rhs) const
+{
+    return year_ < rhs.year_ || month_ < rhs.year_ || day_ < rhs.day_;
+}
+
+
+int DateStamp::getYear() const
 {
     return year_;
 }
 
-int DateStamp::GetQuarter() const
+int DateStamp::getQuarter() const
 {
     int Quarter = ((month_ - 1) / 3) + 1;
     X_ASSERT(Quarter >= 1 && Quarter <= 4, "Quarter is not valid")(Quarter);
     return Quarter;
 }
 
-int DateStamp::GetMonth() const
+int DateStamp::getMonth() const
 {
     return month_;
 }
 
-int DateStamp::GetDay() const
+int DateStamp::getDay() const
 {
     return day_;
 }
 
-int DateStamp::GetDayOfYear() const
+int DateStamp::getDayOfYear() const
 {
-    int DayOfYear = g_YearDayFromMonth[month_] + day_ + (IsLeapYear() & (month_ > 2)) - 1;
+    int DayOfYear = g_YearDayFromMonth[month_] + day_ + (isLeapYear() & (month_ > 2)) - 1;
 
-    X_ASSERT(DayOfYear >= 1 && DayOfYear <= 365 + IsLeapYear(), "Not a valid Day")(DayOfYear);
+    X_ASSERT(DayOfYear >= 1 && DayOfYear <= 365 + isLeapYear(), "Not a valid Day")(DayOfYear);
     return DayOfYear;
 }
 
-int DateStamp::IsLeapYear() const
+int DateStamp::isLeapYear() const
 {
     return (year_ % 4 == 0) & ((year_ % 100 != 0) | (year_ % 400 == 0));
 }
 
-int DateStamp::DaysInMonth(int month) const
+int DateStamp::daysInMonth(int month) const
 {
-    return (g_DaysPerMonth[month] + ((month) == 2 && (IsLeapYear())));
+    return (g_DaysPerMonth[month] + ((month) == 2 && (isLeapYear())));
 }
 
-DateStamp DateStamp::GetSystemDate(void)
+DateStamp DateStamp::getSystemDate(void)
 {
     _SYSTEMTIME Time;
     GetLocalTime(&Time);
@@ -74,7 +93,7 @@ DateStamp DateStamp::GetSystemDate(void)
     return DateStamp(Time.wYear, safe_static_cast<BYTE, WORD>(Time.wMonth), safe_static_cast<BYTE, WORD>(Time.wDay));
 }
 
-const char* DateStamp::ToString(Description& desc) const
+const char* DateStamp::toString(Description& desc) const
 {
     sprintf_s(desc, "%d-%02d-%02d", year_, month_, day_);
     return desc;

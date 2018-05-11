@@ -26,12 +26,12 @@ uint32_t LoggerFullFormatPolicy::Format(LoggerBase::Line& line, const char* inde
     X_UNUSED(type, verbosity);
 
     DateStamp::Description DateStr;
-    DateStamp date = DateStamp::GetSystemDate();
-    date.ToString(DateStr);
+    DateStamp date = DateStamp::getSystemDate();
+    date.toString(DateStr);
 
     TimeStamp::Description TimeStr;
-    TimeStamp time = TimeStamp::GetSystemTime();
-    time.ToString(TimeStr);
+    TimeStamp time = TimeStamp::getSystemTime();
+    time.toString(TimeStr);
 
 #if X_ENABLE_LOGGING_SOURCE_INFO
     int32_t bytesWritten = _snprintf_s(line, _TRUNCATE, "[%s %s] %s(%d): [%s:%s] | %s",
