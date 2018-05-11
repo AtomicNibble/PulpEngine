@@ -42,4 +42,9 @@ X_INLINE int32_t SessionVars::userCmdRateMs(void) const
     return userCmdRateMs_;
 }
 
+X_INLINE int32_t SessionVars::waitForPlayers(void) const
+{
+    return waitForPlayers_;
+}
+
 X_NAMESPACE_END

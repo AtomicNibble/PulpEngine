@@ -14,6 +14,8 @@ SessionVars::SessionVars()
     snapMaxbufferedMs_ = 100;
     snapRateMs_ = 100;
     userCmdRateMs_ = 40;
+
+    waitForPlayers_ = 1;
 }
 
 
@@ -38,6 +40,9 @@ void SessionVars::registerVars(void)
         "How many ms between sending snaps");
     ADD_CVAR_REF("net_ucmd_rate_ms", userCmdRateMs_, userCmdRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "How many ms between sending usercmds");
+
+    ADD_CVAR_REF("net_wait_for_players", waitForPlayers_, waitForPlayers_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "If the host will wait for players to finish loading");
 
 }
 
