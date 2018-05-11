@@ -49,7 +49,7 @@ namespace entity
                     break;
                 
                 default:
-                    X_NO_SWITCH_DEFAULT_ASSERT
+                    X_NO_SWITCH_DEFAULT_ASSERT;
                     break;
             }
 
@@ -89,7 +89,7 @@ namespace entity
                     break;
 
                 default:
-                    X_NO_SWITCH_DEFAULT_ASSERT
+                    X_NO_SWITCH_DEFAULT_ASSERT;
                         break;
             }
 
