@@ -2,7 +2,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template<typename T, class ContainerT = Array<T>, class Pr = std::less<typename ContainerT::value_type>>
+template<typename T, class ContainerT = ArrayGrowMultiply<T>, class Pr = std::less<typename ContainerT::value_type>>
 class PriorityQueue
 {
 public:
