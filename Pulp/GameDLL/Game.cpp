@@ -183,6 +183,11 @@ bool XGame::update(core::FrameData& frame)
     con.flags.Set(font::DrawTextFlag::CENTER);
     con.flags.Set(font::DrawTextFlag::CENTER_VER);
 
+    auto width = frame.view.viewport.getWidthf();
+    auto height = frame.view.viewport.getHeightf();
+
+    Vec2f center(width * 0.5f, height * 0.5f);
+
     pSession_->update();
 
     auto status = pSession_->getStatus();
@@ -198,6 +203,16 @@ bool XGame::update(core::FrameData& frame)
             world_.reset();
         }
 
+        static float val = 0.f;
+
+        val += frame.timeInfo.deltas[core::ITimer::Timer::UI].GetSeconds() * 0.5f;
+
+        float t = (math<float>::sin(val) + 1.f) * 0.5f;
+
+        Color col = Col_White;
+
+        con.col = col.lerp(t, Col_Red);
+        pPrim->drawText(Vec3f(center.x, 75, 1.f), con, "Insert fancy main menu here");
     }
     else if (status == net::SessionStatus::Loading)
     {
@@ -231,10 +246,7 @@ bool XGame::update(core::FrameData& frame)
         }
 
         // draw some shitty load screen?
-        auto width = frame.view.viewport.getWidthf();
-        auto height = frame.view.viewport.getHeightf();
-
-        Vec2f center(width * 0.5f, height * 0.5f);
+       
 
         pPrim->drawQuad(0.f, 0.f, width, height, Col_Black);
 
