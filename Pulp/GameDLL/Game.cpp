@@ -203,9 +203,7 @@ bool XGame::update(core::FrameData& frame)
             world_.reset();
         }
 
-        static float val = 0.f;
-
-        val += frame.timeInfo.deltas[core::ITimer::Timer::UI].GetSeconds() * 0.5f;
+        auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds() * 0.5f;
 
         float t = (math<float>::sin(val) + 1.f) * 0.5f;
 
