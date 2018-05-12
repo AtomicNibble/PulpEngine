@@ -34,6 +34,33 @@ void MatchParameters::fromBitStream(core::FixedBitStreamBase& bs)
     bs.read(mapName);
 }
 
+
+// ------------------------------------------------------------
+
+void ChatMsg::writeToBitStream(core::FixedBitStreamBase& bs) const
+{
+    bs.write(userGuid);
+    bs.write(dateTimeStamp);
+    bs.write(safe_static_cast<int16_t>(msg.length()));
+    bs.write(msg.data(), msg.length());
+}
+
+void ChatMsg::fromBitStream(core::FixedBitStreamBase& bs)
+{
+    bs.read(userGuid);
+    bs.read(dateTimeStamp);
+
+    int32_t len = bs.read<int16_t>();
+    if (len > MAX_CHAT_MSG_LENGTH) {
+        len = MAX_CHAT_MSG_LENGTH;
+    }
+
+    char buf[MAX_CHAT_MSG_LENGTH];
+
+    bs.read(buf, len);
+    msg.assign(buf, len);
+}
+
 // ------------------------------------------------------------
 
 LobbyUser::LobbyUser()
@@ -111,7 +138,9 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, Lob
     pPeer_(pPeer),
     type_(type),
     users_(arena),
-    peers_(arena)
+    peers_(arena),
+    chatMsgs_(arena_),
+    chatHistory_(arena_)
 {
     peers_.setGranularity(MAX_PLAYERS);
     peers_.resize(MAX_PLAYERS);
@@ -137,6 +166,9 @@ void Lobby::reset(void)
             setPeerConnectionState(peer, LobbyPeer::ConnectionState::Free);
         }
     }
+
+    chatMsgs_.clear();
+    chatHistory_.clear();
 
     setState(LobbyState::Idle);
 }
@@ -217,6 +249,9 @@ bool Lobby::handlePacket(Packet* pPacket)
             handleInGame(pPacket);
             break;
 
+        case MessageID::ChatMsg:
+            handleChatMsg(pPacket);
+            break;
         default:
             break;
     }
@@ -304,6 +339,40 @@ void Lobby::finishedLoading(void)
 
 // -------------------------------------------
 
+void Lobby::sendChatMsg(core::span<const char> msg)
+{
+    if (msg.length() > MAX_CHAT_MSG_LENGTH) {
+        X_ERROR("Lobby", "Failed to send chat msg it exceeds max length");
+        return;
+    }
+
+    ChatMsg cm;
+    cm.userGuid = pPeer_->getMyGUID();
+    cm.dateTimeStamp = core::DateTimeStamp::getSystemDateTime();
+    cm.msg.assign(msg.data(), msg.size_bytes());
+
+    // build a BS.
+    ChatMsgBs bs;
+    bs.write(MessageID::ChatMsg);
+    bs.write<int32_t>(1);
+    cm.writeToBitStream(bs);
+
+    if (isPeer())
+    {
+        sendToHost(bs.data(), bs.sizeInBytes()); // we will display the msg when it comes back.
+    }
+    else if (isHost())
+    {
+        // just send via loopback, so all the same logic for incoming chat msg's gets used.
+        pPeer_->sendLoopback(bs.data(), bs.sizeInBytes());
+    }
+    else
+    {
+        // should you be allowed to talk to yourself? YES!
+        X_ERROR("Lobby", "Can't send chat msg neither peer or host");
+    }
+}
+
 void Lobby::sendUserCmd(const UserCmd& cmd)
 {
     X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
@@ -332,7 +401,7 @@ void Lobby::sendSnapShot(const SnapShot& snap)
         }
 
         if (!peer.loaded) {
-            //      continue;
+            continue;
         }
 
         NetGuidStr str;
@@ -383,6 +452,13 @@ void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
     }
 }
 
+void Lobby::sendToAll(const uint8_t* pData, size_t lengthInBytes)
+{
+    X_ASSERT(!isPeer() && isHost(), "Invalid operation")(isPeer(), isHost());
+
+    sendToPeers(pData, lengthInBytes);
+    pPeer_->sendLoopback(pData, lengthInBytes);
+}
 
 void Lobby::setState(LobbyState::Enum state)
 {
@@ -718,10 +794,71 @@ void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
 
 // ----------------------------------------------------
 
+void Lobby::pushChatMsg(ChatMsg&& msg)
+{
+    if (isHost()) 
+    {
+        if (chatHistory_.size() >= MAX_CHAT_MSGS) {
+            chatHistory_.pop();
+        }
+
+        chatHistory_.push(msg);
+    }
+
+    if (chatMsgs_.size() >= MAX_CHAT_MSGS) {
+        chatMsgs_.pop();
+    }
+
+    chatMsgs_.emplace(std::move(msg));
+}
+
+void Lobby::sendChatMsgToPeers(const ChatMsg& msg)
+{
+    X_ASSERT(isHost(), "Trying to broadcast chat msg when not host")(isPeer(), isHost());
+
+    ChatMsgBs bs;
+    bs.write(MessageID::ChatMsg);
+    bs.write(1_i32);
+    msg.writeToBitStream(bs);
+
+    sendToPeers(bs.data(), bs.sizeInBytes());
+}
+
+void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
+{
+    X_ASSERT(isHost(), "Trying to send chat history when not host")(isPeer(), isHost());
+    if (!chatHistory_.isNotEmpty()) {
+        return;
+    }
+
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Can't send chat history invalid peer index");
+        return;
+    }
+
+    X_LOG0("Lobby", "Sending chat log to new peer, num: %" PRIuS, chatHistory_.size());
+
+    auto& peer = peers_[peerIdx];
+    
+    for (size_t i = 0; i < chatHistory_.size(); i++)
+    {
+        ChatMsgBs bs;
+        bs.write(MessageID::ChatMsg);
+        bs.write(1_i32);
+
+        auto& msg = chatHistory_[i];
+        msg.writeToBitStream(bs);
+
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::ReliableOrdered, peer.systemHandle);
+    }
+}
+
+// ----------------------------------------------------
+
 
 void Lobby::handleConnectionAccepted(Packet* pPacket)
 {
-    X_ASSERT(isPeer(), "We should only be connecting to a server if a peer")(isPeer());
+    X_ASSERT(isPeer(), "We should only be connecting to a server if a peer")(isPeer(), isHost());
 
     if (state_ != LobbyState::Connecting)
     {
@@ -857,13 +994,19 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
     }
 
     // send match params and full user list.
-    UserInfoBs bs;
-    bs.write(MessageID::LobbyJoinAccepted);
+    {
+        UserInfoBs bs;
+        bs.write(MessageID::LobbyJoinAccepted);
 
-    params_.writeToBitStream(bs);
-    addUsersToBs(bs);
+        params_.writeToBitStream(bs);
+        addUsersToBs(bs);
 
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+    }
+
+    
+    // send some recent chat history.
+    sendChatHistoryToPeer(peerIdx);
 }
 
 void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
@@ -991,6 +1134,43 @@ void Lobby::handleInGame(Packet* pPacket)
 
 }
 
+void Lobby::handleChatMsg(Packet* pPacket)
+{
+    X_ASSERT(isHost() || isPeer(), "Recived chat msg when not peer or host")(isPeer(), isHost());
+
+    // meow, meow meow
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    int32_t num = bs.read<int32_t>();
+    if (num <= 0) {
+        X_ERROR("Lobby", "Recived chat packet with zero msg's");
+        return;
+    }
+ 
+    X_LOG0("Lobby", "Recived %" PRIi32 " chat msg(s)", num);
+
+    for (int32_t i = 0; i < num; i++)
+    {
+        ChatMsg cm;
+        cm.fromBitStream(bs);
+        if (cm.msg.length() > MAX_CHAT_MSG_LENGTH) {
+            X_ERROR("Lobby", "Recived oversized chat msg");
+            return;
+        }
+
+        // re stamp it based on time recived.
+        if (isHost())
+        {
+            cm.dateTimeStamp = core::DateTimeStamp::getSystemDateTime();
+
+            sendChatMsgToPeers(cm);
+        }
+
+        pushChatMsg(std::move(cm));
+    }
+}
+
+
 // -----------------------------------------------------------
 
 
@@ -1100,6 +1280,17 @@ bool Lobby::getUserInfo(LobbyUserHandle handle, UserInfo& info) const
     info.pName = user.username.c_str();
     info.peerIdx = user.peerIdx;
     info.guid = user.guid;
+    return true;
+}
+
+bool Lobby::tryPopChatMsg(ChatMsg& msg)
+{
+    if (chatMsgs_.isEmpty()) {
+        return false;
+    }
+
+    msg = chatMsgs_.peek();
+    chatMsgs_.pop();
     return true;
 }
 

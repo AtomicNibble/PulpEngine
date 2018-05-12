@@ -143,6 +143,29 @@ void Session::startMatch(void)
     startLoading();
 }
 
+void Session::sendChatMsg(core::span<const char> msg)
+{
+    switch (state_)
+    {
+        case SessionState::ConnectAndMoveToParty:
+        case SessionState::PartyLobbyHost:
+        case SessionState::PartyLobbyPeer:
+            lobbys_[LobbyType::Game].sendChatMsg(msg);
+            break;
+
+        case SessionState::ConnectAndMoveToGame:
+        case SessionState::GameLobbyHost:
+        case SessionState::GameLobbyPeer:
+        case SessionState::Loading:
+        case SessionState::InGame:
+            lobbys_[LobbyType::Game].sendChatMsg(msg);
+            break;
+        default:
+            X_ERROR("Session", "Can't send chat msg in current state: %s", SessionState::ToString(state_));
+            break;
+    }
+}
+
 void Session::sendUserCmd(const UserCmd& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
@@ -169,7 +192,7 @@ const SnapShot* Session::getSnapShot(void)
     return &recivedSnaps_[num - 1];
 }
 
-const ILobby* Session::getLobby(LobbyType::Enum type) const
+ILobby* Session::getLobby(LobbyType::Enum type)
 {
     return &lobbys_[type];
 }
@@ -490,36 +513,11 @@ bool Session::readPackets(void)
             case MessageID::LoadingStart:
             case MessageID::LoadingDone:
             case MessageID::InGame:
+
+            case MessageID::ChatMsg:
                 sendPacketToLobby(pPacket);
                 break; 
           
-            case MessageID::ChatMsg:
-            {
-                // it's a chat msg.
-                static char buf[256] = { '\0' };
-
-                core::zero_object(buf);
-
-                auto len = bs.read<int16_t>();
-                bs.read(buf, len);
-
-                X_LOG0("Char", "Msg: %s", buf);
-
-                auto* pPRim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
-                font::TextDrawContext con;
-                con.col = Col_Red;
-                con.pFont = gEnv->pFontSys->GetDefault();
-
-                Matrix33f ang = Matrix33f::createRotation(Vec3f(1.f, 0.f, 0.f), ::toRadians(-90.f));
-
-                static int32_t num = 0;
-
-                pPRim->drawText(Vec3f(0.f, 0.f, 80.f - (num * 18.f)), ang, con, buf);
-
-                num++;
-                break;
-            }
-
             default:
                 X_ERROR("Session", "Unhandled message: %s", MessageID::ToString(msg));
                 break;
@@ -562,21 +560,6 @@ void Session::sendPacketToLobby(Packet* pPacket)
             X_ASSERT_UNREACHABLE();
             break;
     }
-}
-
-void Session::sendChatMsg(const char* pMsg)
-{
-    core::FixedBitStreamStack<256> bs;
-
-    auto len = core::strUtil::strlen(pMsg);
-    auto len16 = safe_static_cast<uint16_t>(len);
-
-    bs.write(MessageID::ChatMsg);
-    bs.write(len16);
-    bs.write(pMsg, len);
-
- //   pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pleb_);
-
 }
 
 bool Session::isHost(void) const

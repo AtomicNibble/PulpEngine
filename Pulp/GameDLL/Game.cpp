@@ -293,6 +293,14 @@ bool XGame::update(core::FrameData& frame)
         auto hostIdx = pLobby->getHostPeerIdx();
         auto& params = pLobby->getMatchParams();
 
+        net::ChatMsg msg;
+        if (pLobby->tryPopChatMsg(msg))
+        {
+            core::DateTimeStamp::Description timeStr;
+            
+            X_LOG0("Chat", "%s: \"%s\"", msg.dateTimeStamp.toString(timeStr), msg.msg.c_str());
+        }
+
         con.col = Col_Floralwhite;
         con.size = Vec2f(24.f, 24.f);
         con.flags.Clear();

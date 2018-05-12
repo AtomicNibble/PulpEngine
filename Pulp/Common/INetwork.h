@@ -1,7 +1,7 @@
 #pragma once
 
 #include <Time\TimeVal.h>
-#include <Time\DateStamp.h>
+#include <Time\DateTimeStamp.h>
 #include <Util\EndianUtil.h>
 #include <Util\Span.h>
 
@@ -31,6 +31,13 @@ static const uint32_t MAX_ENTS = 1 << 10; // the max of networked ents.
 static const uint32_t MAX_ENTS_FIELDS = 128; // the max fields a ent can sync
 
 static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will return.
+
+
+static const uint32_t MAX_CHAT_MSG_LENGTH = 256; // plz no life stories
+static const uint32_t MAX_CHAT_MSGS = 16;
+
+static const uint32_t MAX_CHAT_BUFFER_SIZE = 1024;
+
 
 typedef core::FixedArray<SystemAddress, MAX_RESOLVE_ADDR> SystemAddressResolveArr;
 
@@ -494,6 +501,25 @@ struct UserInfo
     NetGUID guid;
 };
 
+struct ChatMsg
+{
+    bool operator<(const ChatMsg& rhs) const {
+        return dateTimeStamp < rhs.dateTimeStamp;
+    }
+    bool operator>(const ChatMsg& rhs) const {
+        return dateTimeStamp > rhs.dateTimeStamp;
+    }
+
+
+    void writeToBitStream(core::FixedBitStreamBase& bs) const;
+    void fromBitStream(core::FixedBitStreamBase& bs);
+
+
+    NetGUID userGuid;
+    core::DateTimeStamp dateTimeStamp;
+    core::string msg;
+};
+
 struct ILobby
 {
     virtual ~ILobby() = default;
@@ -518,6 +544,10 @@ struct ILobby
     virtual LobbyType::Enum getType(void) const X_ABSTRACT;
 
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
+
+    // Chat
+    virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
+
 };
 
 struct ISession
@@ -541,7 +571,7 @@ struct ISession
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;
-    virtual const ILobby* getLobby(LobbyType::Enum type) const X_ABSTRACT;
+    virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
 
     virtual void drawDebug(engine::IPrimativeContext* pPrim) const X_ABSTRACT;
 };

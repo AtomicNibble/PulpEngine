@@ -570,7 +570,7 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     msg.trimRight();
 
-    pSession_->sendChatMsg(msg.c_str());
+    pSession_->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
 }
 
 X_NAMESPACE_END

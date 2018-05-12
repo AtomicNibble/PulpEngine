@@ -1,6 +1,9 @@
 #pragma once
 
 #include <Containers\Array.h>
+#include <Containers\PriorityQueue.h>
+#include <Containers\Fifo.h>
+
 #include <Time\TimeVal.h>
 #include <Util\UniquePointer.h>
 
@@ -86,12 +89,18 @@ class Lobby : public ILobby
 {
     typedef core::Array<LobbyUser> LobbyUserArr;
     typedef core::Array<LobbyPeer> LobbyPeerArr;
+    typedef core::PriorityQueue<ChatMsg, core::ArrayGrowMultiply<ChatMsg>, core::greater<ChatMsg>> ChatMsgPriortyQueue;
+    typedef core::Fifo<ChatMsg> ChatMsgFifo;
 
     typedef core::FixedBitStreamStack<0x8> MsgIdBs;
     typedef core::FixedBitStreamStack<0x400> UserInfoBs;
     typedef core::FixedBitStreamStack<0x20 + (sizeof(NetGUID) * MAX_PLAYERS)> NetGUIDBs;
+    typedef core::FixedBitStreamStack<MAX_CHAT_MSG_LENGTH + sizeof(ChatMsg) + 0x20> ChatMsgBs;
 
     using NetGUIDArr = core::FixedArray<NetGUID, MAX_PLAYERS>;
+
+    // TODO: use..
+    // static const OrderingChannelIdx CHAT_CHANNEL = 1;
 
     X_NO_COPY_MOVE_ALL(Lobby);
 
@@ -108,6 +117,7 @@ public:
     void startHosting(const MatchParameters& params);
     void finishedLoading(void);
 
+    void sendChatMsg(core::span<const char> msg);
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmd& snap);
     // if we are a host and have peers we send snaps.
@@ -118,6 +128,7 @@ public:
 
     void sendToPeers(MessageID::Enum id);
     void sendToPeers(const uint8_t* pData, size_t lengthInBytes);
+    void sendToAll(const uint8_t* pData, size_t lengthInBytes);
 
     // Peers
     bool allPeersLoaded(void) const X_FINAL;
@@ -145,6 +156,8 @@ public:
     X_INLINE void beganLoading(void);
     X_INLINE bool hasFinishedLoading(void) const;
 
+    bool tryPopChatMsg(ChatMsg& msg) X_FINAL;
+
     Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const;
 
 private:
@@ -167,6 +180,11 @@ private:
     size_t removeUsersWithDisconnectedPeers(void);
     void removeUsersByGuid(const NetGUIDArr& ids);
 
+    // Chat
+    void pushChatMsg(ChatMsg&& msg);
+    void sendChatMsgToPeers(const ChatMsg& msg);
+    void sendChatHistoryToPeer(int32_t peerIdx);
+
 private:
     void handleConnectionAccepted(Packet* pPacket);
     void handleConnectionHandShake(Packet* pPacket);
@@ -180,6 +198,7 @@ private:
     void handleLoadingStart(Packet* pPacket);
     void handleLoadingDone(Packet* pPacket);
     void handleInGame(Packet* pPacket);
+    void handleChatMsg(Packet* pPacket);
 
 private:
     bool stateIdle(void);
@@ -210,6 +229,9 @@ private:
 
     LobbyUserArr users_;
     LobbyPeerArr peers_;
+
+    ChatMsgPriortyQueue chatMsgs_;
+    ChatMsgFifo chatHistory_;
 };
 
 
