@@ -142,6 +142,34 @@ inline T accumulate(InputIt first, InputIt last, T init, BinaryOperation op)
     return init;
 }
 
+template<class T = void>
+struct greater
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+
+    constexpr bool operator()(const T& lhs, const T& rhs) const
+    {
+        return (lhs > rhs);
+    }
+};
+
+
+template<class T = void>
+struct less
+{
+    typedef T first_argument_type;
+    typedef T second_argument_type;
+    typedef bool result_type;
+
+    constexpr bool operator()(const T& lhs, const T& rhs) const
+    {
+        return (lhs < rhs);
+    }
+};
+
+
 X_NAMESPACE_END
 
 #endif // _X_GEBERICUTIL_H_
