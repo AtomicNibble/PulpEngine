@@ -21,12 +21,12 @@ DateTimeStamp::DateTimeStamp(const DateStamp& date_, const TimeStamp& time_) :
 
 bool DateTimeStamp::operator>(const DateTimeStamp& rhs) const
 {
-    return date > rhs.date && time > rhs.time;
+    return date > rhs.date || time > rhs.time;
 }
 
 bool DateTimeStamp::operator<(const DateTimeStamp& rhs) const
 {
-    return date < rhs.date && time < rhs.time;
+    return date < rhs.date || time < rhs.time;
 }
 
 const char* DateTimeStamp::toString(Description& desc) const

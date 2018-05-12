@@ -36,12 +36,12 @@ DateStamp::DateStamp(int year, int month, int day) :
 
 bool DateStamp::operator>(const DateStamp& rhs) const
 {
-    return year_ > rhs.year_ || month_ > rhs.year_ || day_ > rhs.day_;
+    return year_ > rhs.year_ || month_ > rhs.month_ || day_ > rhs.day_;
 }
 
 bool DateStamp::operator<(const DateStamp& rhs) const
 {
-    return year_ < rhs.year_ || month_ < rhs.year_ || day_ < rhs.day_;
+    return year_ < rhs.year_ || month_ < rhs.month_ || day_ < rhs.day_;
 }
 
 
