@@ -33,10 +33,10 @@ public:
     static TimeStamp getSystemTime(void);
 
 private:
-    void internalToMSPM(void) const;
-    void internalToTime(void) const;
+    int32_t internalToMSPM(void) const;
+    int32_t toTime(int hour, int minute, int second, int millisecond) const;
 
-    mutable int time_;
+    int32_t time_;
 };
 
 X_NAMESPACE_END
