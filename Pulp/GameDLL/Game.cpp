@@ -294,7 +294,7 @@ bool XGame::update(core::FrameData& frame)
         auto& params = pLobby->getMatchParams();
 
         net::ChatMsg msg;
-        if (pLobby->tryPopChatMsg(msg))
+        while (pLobby->tryPopChatMsg(msg))
         {
             core::DateTimeStamp::Description timeStr;
             
