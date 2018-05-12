@@ -380,6 +380,7 @@
     <ClInclude Include="Threading\win32\ThreadLocalStorage.h" />
     <ClInclude Include="Time\CompressedStamps.h" />
     <ClInclude Include="Time\DateStamp.h" />
+    <ClInclude Include="Time\DateTimeStamp.h" />
     <ClInclude Include="Time\StopWatch.h" />
     <ClInclude Include="Time\TimeLiterals.h" />
     <ClInclude Include="Time\TimeStamp.h" />
@@ -722,6 +723,7 @@
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="SnapShot.cpp" />
     <ClCompile Include="Texture.cpp" />
+    <ClCompile Include="Time\DateTimeStamp.cpp" />
     <ClCompile Include="UserCmd.cpp" />
     <ClCompile Include="Util\win32\Process.cpp" />
     <None Include="Casts\safe_static_cast.inl" />

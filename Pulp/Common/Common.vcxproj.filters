@@ -1333,6 +1333,9 @@
     <ClInclude Include="SnapShot.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="Time\DateTimeStamp.h">
+      <Filter>Headers\Time</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2102,6 +2105,9 @@
     </ClCompile>
     <ClCompile Include="SnapShot.cpp">
       <Filter>Interfaces_h\Network</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\DateTimeStamp.cpp">
+      <Filter>SourceFiles\Time</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
