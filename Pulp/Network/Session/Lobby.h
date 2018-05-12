@@ -111,7 +111,6 @@ public:
 
     bool handleState(void);
     bool handlePacket(Packet* pPacket);
-    void onReciveSnapShot(Packet* pPacket);
 
     void connectTo(SystemAddress address);
     void startHosting(const MatchParameters& params);
@@ -186,6 +185,8 @@ private:
     void sendChatHistoryToPeer(int32_t peerIdx);
 
 private:
+    void handleSnapShot(Packet* pPacket);
+    void handleUserCmd(Packet* pPacket);
     void handleConnectionAccepted(Packet* pPacket);
     void handleConnectionHandShake(Packet* pPacket);
     void handleConnectionAttemptFailed(MessageID::Enum id);

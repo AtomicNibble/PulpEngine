@@ -103,7 +103,6 @@ private:
 
 
 private:
-    void onReciveSnapShot(Packet* pPacket);
     void sendPacketToLobby(Packet* pPacket);
 
 private:

@@ -487,8 +487,7 @@ bool Session::readPackets(void)
         switch (msg)
         {
             case MessageID::SnapShot:
-                onReciveSnapShot(pPacket);
-                break;
+            case MessageID::UserCmd:
 
             case MessageID::AlreadyConnected:
             case MessageID::ConnectionLost:
@@ -526,15 +525,6 @@ bool Session::readPackets(void)
     }
 
     return true;
-}
-
-void Session::onReciveSnapShot(Packet* pPacket)
-{
-#if 0 // TODO
-    X_ASSERT(state_ == SessionState::InGame, "Recived snap shot when not in game")(state_);
-#endif
-
-    lobbys_[LobbyType::Game].onReciveSnapShot(pPacket);
 }
 
 void Session::sendPacketToLobby(Packet* pPacket)

@@ -200,6 +200,13 @@ bool Lobby::handlePacket(Packet* pPacket)
 
     switch (id)
     {
+        case MessageID::SnapShot:
+            handleSnapShot(pPacket);
+            break;
+        case MessageID::UserCmd:
+            handleUserCmd(pPacket);
+            break;
+
         case MessageID::ConnectionRequestAccepted:
             handleConnectionAccepted(pPacket);
             break;
@@ -257,37 +264,6 @@ bool Lobby::handlePacket(Packet* pPacket)
     }
 
     return false;
-}
-
-void Lobby::onReciveSnapShot(Packet* pPacket)
-{
-    // okay so this is a snap shot :O
-    X_ASSERT(isPeer(), "Recived snapshot when not a peer")(isPeer());
-    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived snapshot")(type_);
-
-    auto& hostPerr = peers_[hostIdx_];
-
-    if (pPacket->guid != hostPerr.guid) {
-        NetGuidStr str0, str1;
-        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPerr.guid.toString(str1));
-        return;
-    }
-
-    // TODO pass the snapshot in to the snapshot manager which will handle deltas from the host.
-    // which we will then ACK.
-    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
-
-    SnapShot snap(arena_);
-    snap.fromBitStream(bs);
-
-    if (!bs.isEos()) {
-        X_ERROR("Lobby", "Failed to read all of snapshot");
-    }
-
-    // now we need to just give this snapshot to someone o.o
-    // i'm in the lobby :(
-    // need a way back to session?
-    pCallbacks_->onReciveSnapShot(std::move(snap));
 }
 
 // -------------------------------------------
@@ -854,6 +830,53 @@ void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
 }
 
 // ----------------------------------------------------
+
+void Lobby::handleSnapShot(Packet* pPacket)
+{
+    X_ASSERT(isPeer(), "Recived snapshot when not a peer")(isPeer());
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived snapshot")(type_);
+
+    auto& hostPerr = peers_[hostIdx_];
+    if (pPacket->guid != hostPerr.guid) {
+        NetGuidStr str0, str1;
+        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPerr.guid.toString(str1));
+        return;
+    }
+
+    // TODO pass the snapshot in to the snapshot manager which will handle deltas from the host.
+    // which we will then ACK.
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    SnapShot snap(arena_);
+    snap.fromBitStream(bs);
+
+    if (!bs.isEos()) {
+        X_ERROR("Lobby", "Failed to read all of snapshot");
+    }
+
+    // now we need to just give this snapshot to someone o.o
+    // i'm in the lobby :(
+    // need a way back to session?
+    pCallbacks_->onReciveSnapShot(std::move(snap));
+}
+
+void Lobby::handleUserCmd(Packet* pPacket)
+{
+    X_ASSERT(isHost(), "Recived usercmd when not host")(isPeer(), isHost());
+
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Failed to find peer for incomming userCmd");
+        return;
+    }
+
+
+    // Helllo my smelly pickle.
+    // you want to move? my head says NO!
+    // BUt my bodyyyy is telling me YES!!
+
+
+}
 
 
 void Lobby::handleConnectionAccepted(Packet* pPacket)
