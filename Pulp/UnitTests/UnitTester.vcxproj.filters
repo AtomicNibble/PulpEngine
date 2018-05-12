@@ -343,6 +343,9 @@
     <ClCompile Include="UT_C_FixedRingBuffer.cpp">
       <Filter>Source Files\tests\Containers</Filter>
     </ClCompile>
+    <ClCompile Include="UT_DateTime.cpp">
+      <Filter>Source Files\tests</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
