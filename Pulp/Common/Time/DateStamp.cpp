@@ -22,10 +22,10 @@ DateStamp::DateStamp()
 }
 
 
-DateStamp::DateStamp(uint16_t year, uint8_t month, uint8_t day) :
-    year_(year),
-    month_(month),
-    day_(day)
+DateStamp::DateStamp(int year, int month, int day) :
+    year_(safe_static_cast<decltype(year_)>(year)),
+    month_(safe_static_cast<decltype(month_)>(month)),
+    day_(safe_static_cast<decltype(day_)>(day))
 {
     // validate it.
 
@@ -45,29 +45,29 @@ bool DateStamp::operator<(const DateStamp& rhs) const
 }
 
 
-int DateStamp::getYear() const
+int DateStamp::getYear(void) const
 {
     return year_;
 }
 
-int DateStamp::getQuarter() const
+int DateStamp::getQuarter(void) const
 {
     int Quarter = ((month_ - 1) / 3) + 1;
     X_ASSERT(Quarter >= 1 && Quarter <= 4, "Quarter is not valid")(Quarter);
     return Quarter;
 }
 
-int DateStamp::getMonth() const
+int DateStamp::getMonth(void) const
 {
     return month_;
 }
 
-int DateStamp::getDay() const
+int DateStamp::getDay(void) const
 {
     return day_;
 }
 
-int DateStamp::getDayOfYear() const
+int DateStamp::getDayOfYear(void) const
 {
     int DayOfYear = g_YearDayFromMonth[month_] + day_ + (isLeapYear() & (month_ > 2)) - 1;
 
@@ -75,7 +75,7 @@ int DateStamp::getDayOfYear() const
     return DayOfYear;
 }
 
-int DateStamp::isLeapYear() const
+int DateStamp::isLeapYear(void) const
 {
     return (year_ % 4 == 0) & ((year_ % 100 != 0) | (year_ % 400 == 0));
 }
@@ -90,7 +90,7 @@ DateStamp DateStamp::getSystemDate(void)
     _SYSTEMTIME Time;
     GetLocalTime(&Time);
 
-    return DateStamp(Time.wYear, safe_static_cast<BYTE, WORD>(Time.wMonth), safe_static_cast<BYTE, WORD>(Time.wDay));
+    return DateStamp(Time.wYear, Time.wMonth, Time.wDay);
 }
 
 const char* DateStamp::toString(Description& desc) const

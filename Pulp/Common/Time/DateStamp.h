@@ -12,8 +12,7 @@ public:
 
 public:
     DateStamp();
-    DateStamp(uint16_t year, uint8_t month, uint8_t day);
-
+    DateStamp(int year, int month, int day);
     bool operator>(const DateStamp& rhs) const;
     bool operator<(const DateStamp& rhs) const;
 
