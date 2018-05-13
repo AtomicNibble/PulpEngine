@@ -240,7 +240,7 @@ bool Level::processEnts(void)
 
     core::XFileMemScoped entFile;
 
-    if (!entFile.openFile("entdesc.json", core::fileMode::READ)) {
+    if (!entFile.openFile("entdesc.json", core::fileMode::READ | core::fileMode::SHARE)) {
         return false;
     }
 
