@@ -466,6 +466,9 @@ namespace entity
 
         player.firstPersonViewAxis = axis;
         player.firstPersonViewOrigin = origin;
+
+        // this seams wrong should be yaw not roll o.o?
+        trans.quat = Quatf(Vec3f(0,0,1), Quatf(axis).getRoll());
     }
 
 } // namespace entity
