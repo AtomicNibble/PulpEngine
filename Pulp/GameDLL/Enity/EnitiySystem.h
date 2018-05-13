@@ -52,7 +52,7 @@ namespace entity
         EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
-        void update(core::FrameData& frame, UserCmdMan& userCmdMan);
+        void update(core::FrameData& frame, UserCmdMan& userCmdMan, EntityId localPlayerId);
 
         void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
         void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);

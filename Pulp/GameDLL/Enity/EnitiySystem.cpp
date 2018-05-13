@@ -118,13 +118,23 @@ namespace entity
         return true;
     }
 
-    void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan)
+    void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan, EntityId localPlayerId)
     {
         // process input.
         //	inputSys_.update(frame.timeInfo, reg_, pPhysScene_);
 
         // process the userCmd for the current player.
-        EntityId id = 0;
+        EntityId id = localPlayerId;
+
+        if (!reg_.has<CharacterController>(id))
+        {
+            addController(id);
+        }
+        //    if (playerIdx == 0) {
+        //        ents_.addController(id);
+        //    }
+
+        cameraSys_.setActiveEnt(id);
 
         auto& userCmd = userCmdMan.getUserCmdForPlayer(id);
         auto unread = userCmdMan.getNumUnreadFrames(id);
@@ -303,9 +313,6 @@ namespace entity
 
         // temp, give player a weapon
         player.weaponEnt = createWeapon(id);
-
-        // temp.
-        cameraSys_.setActiveEnt(id);
     }
 
     bool EnititySystem::addController(EntityId id)

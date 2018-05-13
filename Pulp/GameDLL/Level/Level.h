@@ -94,12 +94,12 @@ public:
     bool loadMap(const MapNameStr& name);
     bool hasLoaded(void) const;
 
-    void update(core::FrameData& frame, UserCmdMan& userCmdMan);
+    void update(core::FrameData& frame, UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
     void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
     void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
 
-    void spawnPlayer(entity::EntityId id);
+    void spawnPlayer(int32_t playerIdx);
 
 private:
     bool createPhysicsScene(physics::IPhysics* pPhys);

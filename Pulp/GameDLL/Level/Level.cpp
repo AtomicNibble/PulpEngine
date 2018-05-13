@@ -312,13 +312,13 @@ bool World::hasLoaded(void) const
     return level_->isLoaded();
 }
 
-void World::update(core::FrameData& frame, UserCmdMan& userCmdMan)
+void World::update(core::FrameData& frame, UserCmdMan& userCmdMan, entity::EntityId localPlayerId)
 {
     X_UNUSED(userCmdMan);
 
     X_ASSERT(level_ && level_->isLoaded(), "Level not valid")();
 
-    ents_.update(frame, userCmdMan);
+    ents_.update(frame, userCmdMan, localPlayerId);
 
     level_->update(frame);
 }
@@ -334,9 +334,9 @@ void World::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
 }
 
 
-void World::spawnPlayer(entity::EntityId id)
+void World::spawnPlayer(int32_t playerIdx)
 {
-    X_ASSERT(id < net::MAX_PLAYERS, "Invalide player id")(id);
+    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
     X_ASSERT_NOT_NULL(pScene_);
 
     // we want to take the give ent and set it up as a player.
@@ -347,17 +347,18 @@ void World::spawnPlayer(entity::EntityId id)
     // which ia suspect should be handled by the enitiy system.
     // so we allmost what a make ent type helper, that we can just call and it makes the ent a player.
     // then here we can do shit with the player.
+    entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
 
     ents_.makePlayer(id);
 
     auto& trans = ents_.getRegister().get<entity::TransForm>(id);
-    trans.pos = Vec3f(-80, 0 + (id * 50.f), 10);
+    trans.pos = Vec3f(-80, 0 + (playerIdx * 50.f), 10);
     
-    if (id == 0) {
-        ents_.addController(id);
-    }
+//    if (playerIdx == 0) {
+//        ents_.addController(id);
+//    }
 
-    userCmdMan_.resetPlayer(id);
+    // userCmdMan_.resetPlayer(playerIdx);
 }
 
 bool World::createPhysicsScene(physics::IPhysics* pPhys)
