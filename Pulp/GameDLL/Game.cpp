@@ -7,6 +7,7 @@
 #include <IFrameData.h>
 
 #include <Math\XMatrixAlgo.h>
+#include <Containers\FixedFifo.h>
 
 // TMP
 #include <I3DEngine.h>
@@ -30,9 +31,9 @@ XGame::XGame(ICore* pCore) :
     pRender_(nullptr),
     pFovVar_(nullptr),
     world_(arena_),
-    localClientId_(entity::INVALID_ID),
     weaponDefs_(arena_)
 {
+
     X_ASSERT_NOT_NULL(pCore);
 }
 
@@ -83,7 +84,8 @@ bool XGame::init(void)
     {
         auto* pNet = gEnv->pNet;
         auto* pPeer = pNet->createPeer();
-
+        
+        myGuid_  = pPeer->getMyGUID();
         pPeer->setMaximumIncomingConnections(4);
 
         net::Port basePort = 1337;
@@ -104,7 +106,7 @@ bool XGame::init(void)
 
         X_LOG0("Game", "Listening on port ^6%" PRIu16, sd.getPort());
 
-        if (!pNet->createSession(pPeer)) {
+        if (!pNet->createSession(pPeer, this)) {
             X_ERROR("Game", "Failed to create net session");
             return false;
         }
@@ -118,9 +120,6 @@ bool XGame::init(void)
     X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
     cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
-
-    // fiuxed for now, will match network id or something later
-    localClientId_ = 0;
 
     userCmdGen_.init();
     weaponDefs_.init();
@@ -196,6 +195,8 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
+    userCmdGen_.buildUserCmd();
+
     if (status == net::SessionStatus::Idle)
     {
         // main menu :D
@@ -238,7 +239,80 @@ bool XGame::update(core::FrameData& frame)
         // where to store this state?
         if (world_->hasLoaded() && !pSession_->hasFinishedLoading())
         {
-            world_->spawnPlayer(0);
+            // spawn stuff like players!
+            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+          //  if (pLobby->isHost())
+            {
+                // users not peers?
+                core::FixedFifo<net::NetGUID, net::MAX_PLAYERS> userUsers;
+
+                auto numUsers = pLobby->getNumUsers();
+                for (int32_t i = 0; i < numUsers; i++)
+                {
+                    net::UserInfo info;
+                    pLobby->getUserInfoForIdx(i, info);
+
+                    X_ASSERT(info.guid.isValid(), "User is no valid")();
+
+                    auto it = std::find_if(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), [&info](const net::NetGUID& guid) {
+                        return guid == info.guid;
+                    });
+
+                    if (it == lobbyUserGuids_.end())
+                    {
+                        userUsers.push(info.guid);
+                    }
+                }
+
+
+                // add the new users.
+                while (userUsers.isNotEmpty())
+                {
+                    net::NetGuidStr buf;
+                    X_LOG0("Game", "Spawning user with guid: %s", userUsers.peek().toString(buf));
+
+                    // find a free local player slot.
+                    int32_t plyIdx = -1;
+                    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+                    {
+                        if (!lobbyUserGuids_[i])
+                        {
+                            plyIdx = i;
+                            break;
+                        }
+                    }
+
+                    if (plyIdx == -1)
+                    {
+                        X_ERROR("Game", "Failed to find free player slot for connected player");
+                        break;
+                    }
+
+                    auto userGuid = userUsers.peek();
+                    userUsers.pop();
+
+                    X_LOG0("Game", "Client connected %" PRIi32, plyIdx);
+
+                    lobbyUserGuids_[plyIdx] = userGuid;
+
+                    userCmdMan_.resetPlayer(plyIdx);
+
+                    // spawn!
+                    world_->spawnPlayer(plyIdx);
+
+
+                }
+
+#if 0
+                    auto entId = static_cast<entity::EntityId>(i);
+                    X_LOG0("Game", "Client connected %" PRIi32, i);
+                    world_->spawnPlayer(entId);
+                    playerEnts_[i] = entId;
+#endif
+
+                
+            }
 
             pSession_->finishedLoading();
         }
@@ -266,7 +340,15 @@ bool XGame::update(core::FrameData& frame)
     {
         X_ASSERT_NOT_NULL(world_.ptr());
 
-        world_->update(frame, userCmdMan_);
+        auto idx = getLocalClientIdx();
+        entity::EntityId id = static_cast<entity::EntityId>(idx);
+
+        world_->update(frame, userCmdMan_, id);
+
+        auto& userCmd = userCmdGen_.getCurrentUsercmd();
+        userCmd.gameTime = frame.timeInfo.ellapsed[core::ITimer::Timer::GAME];
+
+        userCmdMan_.addUserCmdForPlayer(idx, userCmd);
 
         // if we are host we make snapshot.
         if (pSession_->isHost())
@@ -278,15 +360,20 @@ bool XGame::update(core::FrameData& frame)
         }
         else
         {
-            // send userCmd?
-            auto usrCmd = userCmdMan_.getUserCmdForPlayer(0);
-            pSession_->sendUserCmd(usrCmd);
+            // we send N cmds, but this should be rate limited by 'net_ucmd_rate_ms'
+
+            core::FixedBitStreamStack<(sizeof(net::UserCmd) * net::MAX_USERCMD_SEND) + 0x100> bs;
+            bs.write(net::MessageID::UserCmd);
+            userCmdMan_.writeUserCmdToBs(bs, net::MAX_USERCMD_SEND, idx);
+
+            pSession_->sendUserCmd(bs);
 
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
             {
                 world_->applySnapShot(frame, pSnap);
             }
+
         }
     }
     else if (status == net::SessionStatus::PartyLobby)
@@ -354,33 +441,20 @@ bool XGame::update(core::FrameData& frame)
         con.size = Vec2f(24.f, 24.f);
         con.flags.Clear();
 
+        net::NetGuidStr buf;
         core::StackString256 txt;
         txt.appendFmt("Session: %s\n", net::SessionStatus::ToString(status));
-        txt.appendFmt("Host: %" PRIi8, pSession_->isHost());
+        txt.appendFmt("Host: %" PRIi8 "\n", pSession_->isHost());
+        txt.appendFmt("PlyIdx: %" PRIi32 " Guid: %s", getLocalClientIdx(), myGuid_.toString(buf));
 
         pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
     }
 
 
-    Angles<float> goat;
 
-    auto quat = goat.toQuat();
-    auto foward = goat.toForward();
-
-    userCmdGen_.buildUserCmd();
-    auto& userCmd = userCmdGen_.getCurrentUsercmd();
-
-    // so i want to store the input for what ever player we are but maybe I don't event have a level yet.
-    // but we will likley want players before we have a level
-    // for lobbies and stuff.
-    // i kinda wanna clear all ents when you change level, which is why it's part of the world currently.
-    // but makes it annoying to persist shit.
-    // what if we just have diffrent registries?
-    // one for players lol.
-    // or should all this logic only happen if you in a bucket?
-
-    userCmdMan_.addUserCmdForPlayer(localClientId_, userCmd);
-
+ //   if (playerEnts_[0] != entity::INVALID_ID) {
+ //       userCmdMan_.addUserCmdForPlayer(playerEnts_[0], userCmd);
+ //   }
     // do we actually have a player?
     // aka is a level loaded shut like that.
     // if not nothing todo.
@@ -415,6 +489,11 @@ bool XGame::update(core::FrameData& frame)
 
 void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 {
+    // we got user cmds o.o
+    // what if i don't like you HEY!
+    auto clientIdx = getPlayerIdxForGuid(guid);
+
+    userCmdMan_.readUserCmdToBs(bs, clientIdx);
 }
 
 void XGame::ProcessInput(core::FrameTimeData& timeInfo)
@@ -489,6 +568,33 @@ void XGame::ProcessInput(core::FrameTimeData& timeInfo)
 
     inputEvents_.clear();
 }
+
+int32_t XGame::getLocalClientIdx(void) const
+{
+    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+    {
+        if (myGuid_ == lobbyUserGuids_[i])
+        {
+            return i;
+        }
+    }
+
+    // return 0?
+    // X_ASSERT_UNREACHABLE();
+    return -1;
+}
+
+int32_t XGame::getPlayerIdxForGuid(net::NetGUID guid) const
+{
+    auto it = std::find(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), guid);
+    if (it != lobbyUserGuids_.end()) {
+        auto idx = std::distance(lobbyUserGuids_.begin(), it);
+        return safe_static_cast<int32_t>(idx);
+    }
+
+    return -1;
+}
+
 
 void XGame::OnFovChanged(core::ICVar* pVar)
 {

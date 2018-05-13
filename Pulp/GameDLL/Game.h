@@ -29,6 +29,9 @@ X_NAMESPACE_BEGIN(game)
 
 class XGame : public IGame, net::IGameCallbacks
 {
+    using PlayerEntsArr = std::array<entity::EntityId, net::MAX_PLAYERS>;
+    using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
+
 public:
     XGame(ICore* pCore);
     ~XGame() X_FINAL;
@@ -54,8 +57,10 @@ public:
 private:
     void ProcessInput(core::FrameTimeData& timeInfo);
 
-    void OnFovChanged(core::ICVar* pVar);
+    int32_t getLocalClientIdx(void) const;
+    int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
 
+    void OnFovChanged(core::ICVar* pVar);
     void Command_Map(core::IConsoleCmdArgs* Cmd);
     void Command_MainMenu(core::IConsoleCmdArgs* Cmd);
 
@@ -78,7 +83,8 @@ private:
 private:
     GameVars vars_;
 
-    entity::EntityId localClientId_;
+    net::NetGUID myGuid_;
+    PlayerGuidArr lobbyUserGuids_;
 
     core::UniquePointer<World> world_;
 
