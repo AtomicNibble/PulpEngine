@@ -105,7 +105,8 @@ class Lobby : public ILobby
     X_NO_COPY_MOVE_ALL(Lobby);
 
 public:
-    Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena);
+    Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGameCallbacks* pGameCallbacks, 
+        LobbyType::Enum type, core::MemoryArenaBase* arena);
 
     void reset(void);
 
@@ -217,6 +218,7 @@ private:
     core::MemoryArenaBase* arena_;
     ISessionCallbacks* pCallbacks_;
     IPeer* pPeer_;
+    IGameCallbacks* pGameCallbacks_;
     const LobbyType::Enum type_;
     LobbyState::Enum state_;
 

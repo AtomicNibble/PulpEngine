@@ -27,7 +27,7 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
-class XGame : public IGame
+class XGame : public IGame, net::IGameCallbacks
 {
 public:
     XGame(ICore* pCore);
@@ -45,6 +45,11 @@ public:
 
     bool update(core::FrameData& frame) X_FINAL;
     // ~IGame
+
+    // IGameCallbacks
+    void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_FINAL;
+
+    // ~IGameCallbacks
 
 private:
     void ProcessInput(core::FrameTimeData& timeInfo);

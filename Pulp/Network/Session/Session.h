@@ -62,7 +62,7 @@ class Session : public ISession, ISessionCallbacks
     using LobbyArr = std::array<Lobby,LobbyType::ENUM_COUNT>;
 
 public:
-    Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena);
+    Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks, core::MemoryArenaBase* arena);
 
     void update(void) X_FINAL;
 
@@ -134,6 +134,7 @@ private:
 private:
     SessionVars& vars_;
     IPeer* pPeer_;
+    IGameCallbacks* pGameCallbacks_;
     core::MemoryArenaBase* arena_;
 
     SessionState::Enum state_;

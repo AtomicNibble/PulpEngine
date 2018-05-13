@@ -556,6 +556,13 @@ struct ILobby
 
 };
 
+struct IGameCallbacks
+{
+    virtual ~IGameCallbacks() = default;
+
+    virtual void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_ABSTRACT;
+};
+
 struct ISession
 {
     virtual ~ISession() = default;
@@ -594,7 +601,7 @@ struct INet : public core::IEngineSysBase
     virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;
 
     // Creates the session, with the given peer for transport.
-    virtual bool createSession(IPeer* pPeer) X_ABSTRACT;
+    virtual bool createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_ABSTRACT;
     virtual ISession* getSession(void) X_ABSTRACT;
 
     // ipv4/6 address with optional trailing |port, or explicit port.

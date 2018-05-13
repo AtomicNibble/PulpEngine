@@ -413,6 +413,10 @@ bool XGame::update(core::FrameData& frame)
     return true;
 }
 
+void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
+{
+}
+
 void XGame::ProcessInput(core::FrameTimeData& timeInfo)
 {
     X_UNUSED(timeInfo);

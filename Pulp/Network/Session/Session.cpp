@@ -16,13 +16,14 @@ X_NAMESPACE_BEGIN(net)
 
 X_DISABLE_WARNING(4355) // 'this': used in base member initializer list
 
-Session::Session(SessionVars& vars, IPeer* pPeer, core::MemoryArenaBase* arena) :
+Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks, core::MemoryArenaBase* arena) :
     vars_(vars),
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
+    pGameCallbacks_(X_ASSERT_NOT_NULL(pGameCallbacks)),
     arena_(X_ASSERT_NOT_NULL(arena)),
     lobbys_{ {
-        {vars_, this, pPeer_, LobbyType::Party, arena},
-        {vars_, this, pPeer_, LobbyType::Game, arena}
+        {vars_, this, pPeer, pGameCallbacks, LobbyType::Party, arena},
+        {vars_, this, pPeer, pGameCallbacks, LobbyType::Game, arena}
     }}
 {
     X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();

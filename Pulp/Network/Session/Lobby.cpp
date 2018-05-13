@@ -131,11 +131,13 @@ X_INLINE void LobbyPeer::setConnectionState(ConnectionState::Enum state)
 
 // ------------------------------------------------------
 
-Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, LobbyType::Enum type, core::MemoryArenaBase* arena) :
+Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGameCallbacks* pGameCallbacks,
+        LobbyType::Enum type, core::MemoryArenaBase* arena) :
     vars_(vars),
     arena_(arena),
     pCallbacks_(X_ASSERT_NOT_NULL(pCallbacks)),
-    pPeer_(pPeer),
+    pPeer_(X_ASSERT_NOT_NULL(pPeer)),
+    pGameCallbacks_(X_ASSERT_NOT_NULL(pGameCallbacks)),
     type_(type),
     users_(arena),
     peers_(arena),
@@ -865,12 +867,11 @@ void Lobby::handleUserCmd(Packet* pPacket)
         return;
     }
 
-
-    // Helllo my smelly pickle.
-    // you want to move? my head says NO!
-    // BUt my bodyyyy is telling me YES!!
-
-
+    // pass back to game.
+    // this will only happen during a call to handle state, so the game knows
+    // when this callback can happen.
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+    pGameCallbacks_->onUserCmdReceive(pPacket->guid, bs);
 }
 
 

@@ -153,14 +153,14 @@ void XNet::deletePeer(IPeer* pIPeer)
     X_DELETE(pPeer, arena_);
 }
 
-bool XNet::createSession(IPeer* pPeer)
+bool XNet::createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks)
 {
     if (pSession_) {
         X_ERROR("Net", "Can't create session, session already active");
         return false;
     }
 
-    pSession_ = core::makeUnique<Session>(arena_, sessionVars_, pPeer, arena_);
+    pSession_ = core::makeUnique<Session>(arena_, sessionVars_, pPeer, pGameCallbacks, arena_);
     return true;
 }
 

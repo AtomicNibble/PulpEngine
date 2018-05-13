@@ -44,7 +44,7 @@ public:
     IPeer* createPeer(void) X_FINAL;
     void deletePeer(IPeer* pPeer) X_FINAL;
 
-    bool createSession(IPeer* pPeer) X_FINAL;
+    bool createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_FINAL;
     ISession* getSession(void) X_FINAL;
 
 
