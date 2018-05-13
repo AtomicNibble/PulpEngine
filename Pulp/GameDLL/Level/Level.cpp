@@ -351,8 +351,11 @@ void World::spawnPlayer(entity::EntityId id)
     ents_.makePlayer(id);
 
     auto& trans = ents_.getRegister().get<entity::TransForm>(id);
-    trans.pos = Vec3f(-80, 0, 10);
-    ents_.addController(id);
+    trans.pos = Vec3f(-80, 0 + (id * 50.f), 10);
+    
+    if (id == 0) {
+        ents_.addController(id);
+    }
 
     userCmdMan_.resetPlayer(id);
 }
