@@ -174,6 +174,15 @@ bool XGame::update(core::FrameData& frame)
     // the problem is this data not linked to framedata
     // so
 
+    // orth
+    Matrix44f orthoProj;
+    MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
+
+    frame.view.viewMatrixOrtho = Matrix44f::identity();
+    frame.view.projMatrixOrtho = orthoProj;
+    frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
+
+
     font::TextDrawContext con;
     con.col = Col_Whitesmoke;
     con.size = Vec2f(36.f, 36.f);
@@ -204,7 +213,7 @@ bool XGame::update(core::FrameData& frame)
             world_.reset();
         }
 
-        auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds() * 0.5f;
+        auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds();
 
         float t = (math<float>::sin(val) + 1.f) * 0.5f;
 
@@ -269,9 +278,6 @@ bool XGame::update(core::FrameData& frame)
                 // add the new users.
                 while (userUsers.isNotEmpty())
                 {
-                    net::NetGuidStr buf;
-                    X_LOG0("Game", "Spawning user with guid: %s", userUsers.peek().toString(buf));
-
                     // find a free local player slot.
                     int32_t plyIdx = -1;
                     for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
@@ -292,7 +298,8 @@ bool XGame::update(core::FrameData& frame)
                     auto userGuid = userUsers.peek();
                     userUsers.pop();
 
-                    X_LOG0("Game", "Client connected %" PRIi32, plyIdx);
+                    net::NetGuidStr buf;
+                    X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, userGuid.toString(buf));
 
                     lobbyUserGuids_[plyIdx] = userGuid;
 
@@ -300,18 +307,7 @@ bool XGame::update(core::FrameData& frame)
 
                     // spawn!
                     world_->spawnPlayer(plyIdx);
-
-
                 }
-
-#if 0
-                    auto entId = static_cast<entity::EntityId>(i);
-                    X_LOG0("Game", "Client connected %" PRIi32, i);
-                    world_->spawnPlayer(entId);
-                    playerEnts_[i] = entId;
-#endif
-
-                
             }
 
             pSession_->finishedLoading();
@@ -343,12 +339,11 @@ bool XGame::update(core::FrameData& frame)
         auto idx = getLocalClientIdx();
         entity::EntityId id = static_cast<entity::EntityId>(idx);
 
-        world_->update(frame, userCmdMan_, id);
-
         auto& userCmd = userCmdGen_.getCurrentUsercmd();
         userCmd.gameTime = frame.timeInfo.ellapsed[core::ITimer::Timer::GAME];
-
         userCmdMan_.addUserCmdForPlayer(idx, userCmd);
+
+        world_->update(frame, userCmdMan_, id);
 
         // if we are host we make snapshot.
         if (pSession_->isHost())
@@ -449,40 +444,6 @@ bool XGame::update(core::FrameData& frame)
 
         pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
     }
-
-
-
- //   if (playerEnts_[0] != entity::INVALID_ID) {
- //       userCmdMan_.addUserCmdForPlayer(playerEnts_[0], userCmd);
- //   }
-    // do we actually have a player?
-    // aka is a level loaded shut like that.
-    // if not nothing todo.
-    if (world_) {
-    //    world_->update(frame, userCmdMan_);
-    }
-    else {
-        // orth
-    //    Matrix44f orthoProj;
-    //    MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
-    //
-    //    frame.view.viewMatrixOrtho = Matrix44f::identity();
-    //    frame.view.projMatrixOrtho = orthoProj;
-    //    frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
-    }
-
-    //	ProcessInput(frame.timeInfo);
-
-    //	cam_.setAngles(cameraAngle_);
-    //	cam_.setPosition(cameraPos_);
-
-    // orth
-    Matrix44f orthoProj;
-    MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
-
-    frame.view.viewMatrixOrtho = Matrix44f::identity();
-    frame.view.projMatrixOrtho = orthoProj;
-    frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
 
     return true;
 }
