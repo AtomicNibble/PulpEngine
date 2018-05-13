@@ -607,7 +607,7 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
     X_UNUSED(pPrim);
 
     // draw me some shit.
-    Vec2f base0(5.f, 120.f);
+    Vec2f base0(5.f, 150.f);
 
     if (vars_.drawLobbyDebug() >= 2)
     {
