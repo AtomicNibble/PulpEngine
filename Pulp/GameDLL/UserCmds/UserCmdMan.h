@@ -26,6 +26,8 @@ public:
     const net::UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
     const net::UserCmd& getUserCmdForPlayer(int32_t playerIndex);
 
+    void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
+    void readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
     X_INLINE size_t getNumUnreadFrames(int32_t playerIndex);
 
 private:

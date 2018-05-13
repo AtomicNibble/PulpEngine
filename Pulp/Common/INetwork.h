@@ -38,6 +38,7 @@ static const uint32_t MAX_CHAT_MSGS = 16;
 
 static const uint32_t MAX_CHAT_BUFFER_SIZE = 1024;
 
+static const int32_t MAX_USERCMD_SEND = 8;
 
 typedef core::FixedArray<SystemAddress, MAX_RESOLVE_ADDR> SystemAddressResolveArr;
 
