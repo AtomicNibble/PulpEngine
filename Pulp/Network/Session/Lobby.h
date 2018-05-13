@@ -70,7 +70,7 @@ struct LobbyPeer
 public:
     bool loaded;
     bool inGame;
-    bool _pad;
+    bool pauseSnapShots; // stop sending snaps :D
 private:
     ConnectionState::Enum connectionState;
 public:

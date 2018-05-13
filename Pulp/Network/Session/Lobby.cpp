@@ -103,6 +103,7 @@ void LobbyPeer::reset(void)
 
     loaded = false;
     inGame = false;
+    pauseSnapShots = false;
 
     snapHz = 0.f;
     numSnapsSent = 0;
