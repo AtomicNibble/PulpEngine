@@ -378,7 +378,7 @@ void Lobby::sendSnapShot(const SnapShot& snap)
         }
 
         NetGuidStr str;
-        X_LOG0("Lobby", "Sending snap to ", peer.guid.toString(str));
+        X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(str));
 
         // for now just send whole snap, later will need to build deltas and shit.
         // how do i know it's a snapshot tho?
