@@ -1306,6 +1306,18 @@ const char* Lobby::getUserName(LobbyUserHandle handle) const
     return users_[idx].username.c_str();
 }
 
+
+bool Lobby::getUserInfoForIdx(size_t idx, UserInfo& info) const
+{
+    auto& user = users_[idx];
+
+    info.pName = user.username.c_str();
+    info.peerIdx = user.peerIdx;
+    info.guid = user.guid;
+    return true;
+}
+
+
 bool Lobby::getUserInfo(LobbyUserHandle handle, UserInfo& info) const
 {
     size_t idx = static_cast<size_t>(handle);

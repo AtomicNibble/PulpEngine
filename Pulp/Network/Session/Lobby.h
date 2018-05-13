@@ -141,6 +141,7 @@ public:
     X_INLINE LobbyUserHandle getUserHandleForIdx(size_t idx) const X_FINAL;
 
     const char* getUserName(LobbyUserHandle handle) const X_FINAL;
+    bool getUserInfoForIdx(size_t idx, UserInfo& info) const X_FINAL;
     bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_FINAL;
 
     // Misc
