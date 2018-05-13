@@ -114,9 +114,6 @@
     <ClInclude Include="Enity\PlayerSys.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\InputSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="Enity\WeaponSystem.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
@@ -162,9 +159,6 @@
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Enity\CameraSys.cpp">
-      <Filter>Source Files\Entity\Systems</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\InputSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Enity\PhysicsSystem.cpp">

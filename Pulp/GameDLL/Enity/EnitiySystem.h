@@ -6,7 +6,6 @@
 #include "EnityComponents.h"
 
 #include "CameraSys.h"
-#include "InputSys.h"
 #include "PlayerSys.h"
 #include "SoundSys.h"
 #include "PhysicsSystem.h"
