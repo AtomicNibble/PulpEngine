@@ -30,6 +30,7 @@ public:
     void readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
 
     X_INLINE size_t getNumUnreadFrames(int32_t playerIndex) const;
+    X_INLINE bool hasUnreadFrames(int32_t playerIndex) const;
 
 private:
     IndexArr writeFrame_;
@@ -40,6 +41,11 @@ private:
 X_INLINE size_t UserCmdMan::getNumUnreadFrames(int32_t playerIndex) const
 {
     return safe_static_cast<size_t>((writeFrame_[playerIndex] - 1) - readFrame_[playerIndex]);
+}
+
+X_INLINE bool UserCmdMan::hasUnreadFrames(int32_t playerIndex) const
+{
+    return readFrame_[playerIndex] < (writeFrame_[playerIndex] - 1);
 }
 
 X_NAMESPACE_END
