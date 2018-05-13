@@ -314,8 +314,6 @@ bool XGame::update(core::FrameData& frame)
         }
 
         // draw some shitty load screen?
-       
-
         pPrim->drawQuad(0.f, 0.f, width, height, Col_Black);
 
         con.col = Col_Whitesmoke;
@@ -336,18 +334,38 @@ bool XGame::update(core::FrameData& frame)
     {
         X_ASSERT_NOT_NULL(world_.ptr());
 
-        auto idx = getLocalClientIdx();
-        entity::EntityId id = static_cast<entity::EntityId>(idx);
+        auto localIdx = getLocalClientIdx();
+        entity::EntityId localId = static_cast<entity::EntityId>(localIdx);
 
-        auto& userCmd = userCmdGen_.getCurrentUsercmd();
-        userCmd.gameTime = frame.timeInfo.ellapsed[core::ITimer::Timer::GAME];
-        userCmdMan_.addUserCmdForPlayer(idx, userCmd);
-
-        world_->update(frame, userCmdMan_, id);
+        {
+            auto& userCmd = userCmdGen_.getCurrentUsercmd();
+            userCmd.gameTime = frame.timeInfo.ellapsed[core::ITimer::Timer::GAME];
+            userCmdMan_.addUserCmdForPlayer(localIdx, userCmd);
+        }
 
         // if we are host we make snapshot.
         if (pSession_->isHost())
         {
+            // run user cmds for all the valid players.
+            for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+            {
+                if (!lobbyUserGuids_[i]) {
+                    continue;
+                }
+
+                // meow !
+                if (userCmdMan_.hasUnreadFrames(i))
+                {
+                    auto& userCmd = userCmdMan_.getUserCmdForPlayer(i);
+
+                    world_->runUserCmdForPlayer(frame, userCmd, i);
+                }
+                else
+                {
+                    X_WARNING("Game", "no user cmds for player: %" PRIi32, i);
+                }
+            }
+
             net::SnapShot snap(arena_);
             world_->createSnapShot(frame, snap);
 
@@ -359,7 +377,7 @@ bool XGame::update(core::FrameData& frame)
 
             core::FixedBitStreamStack<(sizeof(net::UserCmd) * net::MAX_USERCMD_SEND) + 0x100> bs;
             bs.write(net::MessageID::UserCmd);
-            userCmdMan_.writeUserCmdToBs(bs, net::MAX_USERCMD_SEND, idx);
+            userCmdMan_.writeUserCmdToBs(bs, net::MAX_USERCMD_SEND, localIdx);
 
             pSession_->sendUserCmd(bs);
 
@@ -369,7 +387,21 @@ bool XGame::update(core::FrameData& frame)
                 world_->applySnapShot(frame, pSnap);
             }
 
+            // run me some user cmds!
+            auto& userCmd = userCmdMan_.getUserCmdForPlayer(localIdx);
+            auto unread = userCmdMan_.getNumUnreadFrames(localIdx);
+            
+            if (userCmd.moveForwrd)
+            {
+                X_LOG0("Game", "client move forward");
+            }
+
+            X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
+            
+            world_->runUserCmdForPlayer(frame, userCmd, localIdx);
         }
+
+        world_->update(frame, userCmdMan_, localId);
     }
     else if (status == net::SessionStatus::PartyLobby)
     {

@@ -118,31 +118,27 @@ namespace entity
         return true;
     }
 
+    void EnititySystem::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, EntityId playerId)
+    {
+        playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
+    }
+
     void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan, EntityId localPlayerId)
     {
-        // process input.
-        //	inputSys_.update(frame.timeInfo, reg_, pPhysScene_);
+        X_UNUSED(userCmdMan);
 
-        // process the userCmd for the current player.
-        EntityId id = localPlayerId;
+        cameraSys_.setActiveEnt(localPlayerId);
 
-        if (!reg_.has<CharacterController>(id))
-        {
-            addController(id);
-        }
-        //    if (playerIdx == 0) {
-        //        ents_.addController(id);
-        //    }
+        // we always want to run use cmd for the locally controlled player
+        // if we are host we need to check if we have some sexy user cmds and run them.
 
-        cameraSys_.setActiveEnt(id);
 
-        auto& userCmd = userCmdMan.getUserCmdForPlayer(id);
-        auto unread = userCmdMan.getNumUnreadFrames(id);
-        X_UNUSED(unread);
-
-        X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
-
-        playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, userCmd, id);
+       // auto& userCmd = userCmdMan.getUserCmdForPlayer(localPlayerId);
+       // auto unread = userCmdMan.getNumUnreadFrames(localPlayerId);
+       //
+       // X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
+       //
+       // playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, userCmd, localPlayerId);
 
         // update the cameras.
         cameraSys_.update(frame, reg_, pPhysScene_);
@@ -163,7 +159,7 @@ namespace entity
 
     void EnititySystem::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
     {
-        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap, pPhysScene_);
+        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap, pPhysScene_, p3DWorld_);
     }
 
     EntityId EnititySystem::createEnt(void)
@@ -271,9 +267,18 @@ namespace entity
         auto& player = reg_.assign<Player>(id);
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
-        //	auto& rend = reg_.assign<RenderComponent>(id);
+        auto& net = reg_.assign<NetworkSync>(id);
 
-        X_UNUSED(player);
+        auto& rend = reg_.assign<RenderComponent>(id);
+
+
+        rend.pModel = pModelManager_->loadModel("test/prop/rolling_pan");
+        engine::RenderEntDesc entDsc;
+        entDsc.pModel = rend.pModel;
+        // entDsc.trans = trans;
+        rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+
+        X_UNUSED(player, net);
         player.armsEnt = entity::INVALID_ID;
         //		player.eyeOffset = Vec3f(0, 0, 50.f);
         //		player.cameraOrigin = Vec3f(0, 0, 50.f);
@@ -310,6 +315,8 @@ namespace entity
 
 		X_ASSERT_NOT_NULL(rend.pRenderEnt);
 #endif
+
+        addController(id);
 
         // temp, give player a weapon
         player.weaponEnt = createWeapon(id);

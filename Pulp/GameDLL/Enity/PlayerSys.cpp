@@ -225,6 +225,12 @@ namespace entity
         // calculate first person view.
         calculateFirstPersonView(trans, player);
 
+        if(reg.has<RenderComponent>(playerId))
+        {
+            auto& rend = reg.get<RenderComponent>(playerId);
+            p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
+        }
+
         if (player.weaponEnt != entity::INVALID_ENT_ID) {
             auto& wpn = reg.get<Weapon>(player.weaponEnt);
 

@@ -4,6 +4,7 @@
 #include <IFrameData.h>
 #include <MetaTable.h>
 #include <SnapShot.h>
+#include <IWorld3D.h>
 
 #include <Containers\FixedBitStream.h>
 
@@ -136,7 +137,8 @@ namespace entity
         }
     }
 
-    void NetworkSystem::applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const net::SnapShot* pSnap, physics::IScene* pScene)
+    void NetworkSystem::applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
+        const net::SnapShot* pSnap, physics::IScene* pScene, engine::IWorld3D* p3DWorld)
     {
         X_UNUSED(timeInfo, reg, pSnap);
 
@@ -161,6 +163,16 @@ namespace entity
                 auto& col = reg.get<DynamicObject>(entityId);
 
                 pScene->setGlobalPose(col.actor, trans);
+            }
+            if (reg.has<Player>(entityId))
+            {
+               // auto& ply = reg.get<Player>(entityId);
+
+                if (reg.has<RenderComponent>(entityId))
+                {
+                    auto& rend = reg.get<RenderComponent>(entityId);
+                    p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
+                }
             }
         }
     }

@@ -94,6 +94,7 @@ public:
     bool loadMap(const MapNameStr& name);
     bool hasLoaded(void) const;
 
+    void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, int32_t playerIdx);
     void update(core::FrameData& frame, UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
     void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
