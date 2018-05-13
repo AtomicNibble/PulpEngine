@@ -2,9 +2,14 @@
 
 X_NAMESPACE_BEGIN(net)
 
-X_INLINE bool SessionVars::lobbyDebug(void)
+X_INLINE bool SessionVars::lobbyDebug(void) const
 {
     return lobbyDebug_ != 0;
+}
+
+X_INLINE int32_t SessionVars::drawLobbyDebug(void) const
+{
+    return drawLobbyDebug_;
 }
 
 X_INLINE int32_t SessionVars::connectionAttemps(void) const

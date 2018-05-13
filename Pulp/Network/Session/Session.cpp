@@ -608,9 +608,16 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
     // draw me some shit.
     Vec2f base0(5.f, 120.f);
 
-    base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
-    base0.y += 20.f;
-    lobbys_[LobbyType::Game].drawDebug(base0, pPrim);
+    if (vars_.drawLobbyDebug() >= 2)
+    {
+        base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
+        base0.y += 20.f;
+    }
+
+    if (vars_.drawLobbyDebug() >= 1)
+    {
+        lobbys_[LobbyType::Game].drawDebug(base0, pPrim);
+    }
 }
 
 
