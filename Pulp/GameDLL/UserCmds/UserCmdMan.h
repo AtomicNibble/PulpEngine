@@ -28,7 +28,8 @@ public:
 
     void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
     void readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
-    X_INLINE size_t getNumUnreadFrames(int32_t playerIndex);
+
+    X_INLINE size_t getNumUnreadFrames(int32_t playerIndex) const;
 
 private:
     IndexArr writeFrame_;
@@ -36,7 +37,7 @@ private:
     UserCmdBuf userCmds_; // buffers for each player.
 };
 
-X_INLINE size_t UserCmdMan::getNumUnreadFrames(int32_t playerIndex)
+X_INLINE size_t UserCmdMan::getNumUnreadFrames(int32_t playerIndex) const
 {
     return safe_static_cast<size_t>((writeFrame_[playerIndex] - 1) - readFrame_[playerIndex]);
 }
