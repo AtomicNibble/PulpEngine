@@ -279,6 +279,10 @@ public:
     {
     }
 
+    X_INLINE bool isValid(void) const
+    {
+        return val_ != 0;
+    }
     X_INLINE bool operator==(const NetGUID& rhs) const
     {
         return val_ == rhs.val_;
