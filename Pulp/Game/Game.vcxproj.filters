@@ -32,10 +32,10 @@
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Game.cpp">
+    <ClCompile Include="EngineApp.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="EngineApp.cpp">
+    <ClCompile Include="GameMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
