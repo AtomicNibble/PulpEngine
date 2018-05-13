@@ -118,7 +118,7 @@ public:
 
     void sendChatMsg(core::span<const char> msg);
     // if we are a peer, we send user cmds.
-    void sendUserCmd(const UserCmd& snap);
+    void sendUserCmd(const core::FixedBitStreamBase& bs);
     // if we are a host and have peers we send snaps.
     void sendSnapShot(const SnapShot& snap);
 

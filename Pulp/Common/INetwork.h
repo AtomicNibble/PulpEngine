@@ -573,7 +573,7 @@ struct ISession
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
 
-    virtual void sendUserCmd(const UserCmd& snap) X_ABSTRACT;
+    virtual void sendUserCmd(const core::FixedBitStreamBase& bs) X_ABSTRACT;
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;

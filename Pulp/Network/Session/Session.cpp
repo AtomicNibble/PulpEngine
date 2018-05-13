@@ -166,11 +166,11 @@ void Session::sendChatMsg(core::span<const char> msg)
     }
 }
 
-void Session::sendUserCmd(const UserCmd& snap)
+void Session::sendUserCmd(const core::FixedBitStreamBase& bs)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
 
-    lobbys_[LobbyType::Game].sendUserCmd(snap);
+    lobbys_[LobbyType::Game].sendUserCmd(bs);
 }
 
 void Session::sendSnapShot(SnapShot&& snap)

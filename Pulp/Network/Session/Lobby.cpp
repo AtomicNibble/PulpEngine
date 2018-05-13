@@ -349,15 +349,10 @@ void Lobby::sendChatMsg(core::span<const char> msg)
     }
 }
 
-void Lobby::sendUserCmd(const UserCmd& cmd)
+void Lobby::sendUserCmd(const core::FixedBitStreamBase& bs)
 {
     X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
     const auto& peer = peers_[hostIdx_];
-
-    // do i want to compress this or something?
-    core::FixedBitStreamStack<1500> bs;
-    bs.write(MessageID::UserCmd);
-    cmd.writeToBitStream(bs);
 
     pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
 }
