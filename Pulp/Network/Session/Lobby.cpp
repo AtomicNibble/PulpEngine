@@ -1154,7 +1154,18 @@ void Lobby::handleLoadingDone(Packet* pPacket)
 
 void Lobby::handleInGame(Packet* pPacket)
 {
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Recived loading done from a unknown peer");
+        return;
+    }
 
+    auto& peer = peers_[peerIdx];
+    if (peer.inGame) {
+        X_WARNING("Lobby", "Peer %" PRIi32 " was already marked as in game", peerIdx);
+    }
+
+    peer.inGame = true;
 }
 
 void Lobby::handleChatMsg(Packet* pPacket)
