@@ -253,6 +253,11 @@ int32_t UserCmdGen::buttonState(UserButton::Enum but) const
 
 bool UserCmdGen::OnInputEvent(const input::InputEvent& event)
 {
+    if(inputEvents_.size() == inputEvents_.capacity()) {
+        X_WARNING("UserCmd", "Input event overflow");
+        return false;
+    }
+
     inputEvents_.emplace_back(event);
     return false;
 }
