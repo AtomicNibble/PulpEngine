@@ -109,6 +109,7 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
 
     X_LOG0("Game", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
 
+    // these are added for 0-N so in order.
     for (auto& cmd : userCmds)
     {
         addUserCmdForPlayer(playerIndex, cmd);
