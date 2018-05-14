@@ -282,7 +282,7 @@ bool XGame::update(core::FrameData& frame)
                     int32_t plyIdx = -1;
                     for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
                     {
-                        if (!lobbyUserGuids_[i])
+                        if (!lobbyUserGuids_[i].isValid())
                         {
                             plyIdx = i;
                             break;
@@ -349,7 +349,7 @@ bool XGame::update(core::FrameData& frame)
             // run user cmds for all the valid players.
             for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
             {
-                if (!lobbyUserGuids_[i]) {
+                if (!lobbyUserGuids_[i].isValid()) {
                     continue;
                 }
 
