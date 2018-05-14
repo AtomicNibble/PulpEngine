@@ -49,6 +49,7 @@ struct UserCmd
     void fromBitStream(core::FixedBitStreamBase& bs);
 
     core::TimeVal gameTime;
+    core::TimeVal serverTime;
 
     int16_t moveForwrd;
     int16_t moveRight;
