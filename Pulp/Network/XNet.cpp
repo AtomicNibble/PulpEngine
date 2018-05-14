@@ -21,6 +21,7 @@ XNet::XNet(core::MemoryArenaBase* arena) :
     arena_(arena),
     pInitJob_(nullptr)
 {
+    
 }
 
 XNet::~XNet()
@@ -113,6 +114,10 @@ void XNet::shutDown(void)
 {
     X_LOG0("Net", "Shutting Down");
 
+    for (auto* pSession : sessions_) {
+        X_DELETE(pSession, arena_);
+    }
+
     for (auto* pPeer : peers_) {
         X_DELETE(pPeer, arena_);
     }
@@ -153,20 +158,29 @@ void XNet::deletePeer(IPeer* pIPeer)
     X_DELETE(pPeer, arena_);
 }
 
-bool XNet::createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks)
+ISession* XNet::createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks)
 {
-    if (pSession_) {
-        X_ERROR("Net", "Can't create session, session already active");
+    if (sessions_.size() == sessions_.capacity()) {
+        X_ERROR("Net", "Failed to create session, reached max session count: %" PRIu32, MAX_SESSION);
         return false;
     }
 
-    pSession_ = core::makeUnique<Session>(arena_, sessionVars_, pPeer, pGameCallbacks, arena_);
-    return true;
+    auto* pSession = X_NEW(Session, arena_,"Session")(sessionVars_, pPeer, pGameCallbacks, arena_);
+    sessions_.append(pSession);
+    return pSession;
 }
 
-ISession* XNet::getSession(void)
+void XNet::deleteSession(ISession* pISession)
 {
-    return pSession_.get();
+    if (!pISession) {
+        return;
+    }
+
+    Session* pSession = static_cast<Session*>(pISession);
+    auto idx = sessions_.find(pSession);
+    X_ASSERT(idx != SessionArr::invalid_index, "Failed to find session instance")();
+    sessions_.removeIndex(idx);
+    X_DELETE(pSession, arena_);
 }
 
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
@@ -454,10 +468,12 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
 
 void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
 {
-    if (!pSession_) {
+    if (sessions_.isEmpty()) {
         X_ERROR("Net", "Can't connect no active session");
         return;
     }
+
+    auto* pSession = sessions_.front();
 
     if (pCmd->GetArgCount() < 2) {
         X_WARNING("Net", "connect <host>");
@@ -475,27 +491,31 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
     IPStr strBuf;
     X_LOG0("Net", "Connecting to: \"%s\"", sa.toString(strBuf, true));
 
-    pSession_->connect(sa);
+    pSession->connect(sa);
 }
 
 void XNet::Cmd_createParty(core::IConsoleCmdArgs* pCmd)
 {
-    if (!pSession_) {
+    if (sessions_.isEmpty()) {
         X_ERROR("Net", "Can't createParty no active session");
         return;
     }
 
+    auto* pSession = sessions_.front();
+
     MatchParameters params;
     params.flags.Set(MatchFlag::Online);
-    pSession_->createPartyLobby(params);
+    pSession->createPartyLobby(params);
 }
 
 void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
 {
-    if (!pSession_) {
+    if (sessions_.isEmpty()) {
         X_ERROR("Net", "Can't createMatch no active session");
         return;
     }
+
+    auto* pSession = sessions_.front();
 
     const char* pMap = "test01";
 
@@ -509,28 +529,30 @@ void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
     params.mode = GameMode::SinglePlayer;
     params.flags.Set(MatchFlag::Online);
 
-    pSession_->createMatch(params);
+    pSession->createMatch(params);
 }
 
 void XNet::Cmd_startMatch(core::IConsoleCmdArgs* pCmd)
 {
-    if (!pSession_) {
+    if (sessions_.isEmpty()) {
         X_ERROR("Net", "Can't startMatch no active session");
         return;
     }
 
-    if (pSession_->getState() != SessionState::GameLobbyHost) {
+    auto* pSession = sessions_.front();
+
+    if (pSession->getState() != SessionState::GameLobbyHost) {
         X_ERROR("Net", "Can't startMatch unless game lobby host");
         return;
    }
 
-    pSession_->startMatch();
+    pSession->startMatch();
 }
 
 
 void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 {
-    if (!pSession_) {
+    if (sessions_.isEmpty()) {
         X_ERROR("Net", "Can't chat no active session");
         return;
     }
@@ -540,8 +562,9 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    
-    switch(pSession_->getStatus())
+    auto* pSession = sessions_.front();
+
+    switch(pSession->getStatus())
     {
         case SessionStatus::GameLobby:
         case SessionStatus::PartyLobby:
@@ -570,7 +593,7 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     msg.trimRight();
 
-    pSession_->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
+    pSession->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
 }
 
 X_NAMESPACE_END

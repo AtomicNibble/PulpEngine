@@ -23,6 +23,7 @@ class SystemAddress;
 static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
+static const uint32_t MAX_SESSION = 2;
 static const uint32_t MAX_USERNAME_LEN = 64;
 
 static const uint32_t MAX_PLAYERS = 8;
@@ -601,8 +602,8 @@ struct INet : public core::IEngineSysBase
     virtual void deletePeer(IPeer* pPeer) X_ABSTRACT;
 
     // Creates the session, with the given peer for transport.
-    virtual bool createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_ABSTRACT;
-    virtual ISession* getSession(void) X_ABSTRACT;
+    virtual ISession* createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_ABSTRACT;
+    virtual void deleteSession(ISession* pSession) X_ABSTRACT;
 
     // ipv4/6 address with optional trailing |port, or explicit port.
     // specify what ip version you want the returned address to be. aka asking for a ipv6 address of '127.0.0.1'

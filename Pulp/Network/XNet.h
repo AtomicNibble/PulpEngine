@@ -23,6 +23,7 @@ class Session;
 class XNet : public INet
 {
     typedef core::FixedArray<XPeer*, MAX_PEERS> PeerArr;
+    typedef core::FixedArray<Session*, MAX_SESSION> SessionArr;
     typedef core::FixedArray<SystemAddressEx, MAX_INTERNAL_IDS> SystemAddArr;
 
     X_NO_COPY(XNet);
@@ -44,8 +45,8 @@ public:
     IPeer* createPeer(void) X_FINAL;
     void deletePeer(IPeer* pPeer) X_FINAL;
 
-    bool createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_FINAL;
-    ISession* getSession(void) X_FINAL;
+    ISession* createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_FINAL;
+    void deleteSession(ISession* pSession) X_FINAL;
 
 
     bool systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_FINAL;
@@ -88,10 +89,9 @@ private:
     SystemAddArr ipList_;
 
     PeerArr peers_;
+    SessionArr sessions_;
     NetVars vars_;
     SessionVars sessionVars_;
-
-    core::UniquePointer<Session> pSession_;
 };
 
 X_NAMESPACE_END

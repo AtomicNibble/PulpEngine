@@ -106,12 +106,11 @@ bool XGame::init(void)
 
         X_LOG0("Game", "Listening on port ^6%" PRIu16, sd.getPort());
 
-        if (!pNet->createSession(pPeer, this)) {
+        pSession_ = pNet->createSession(pPeer, this);
+        if (!pSession_) {
             X_ERROR("Game", "Failed to create net session");
             return false;
         }
-
-        pSession_ = X_ASSERT_NOT_NULL(pNet->getSession());
     }
 
     auto deimension = gEnv->pRender->getDisplayRes();
@@ -124,13 +123,16 @@ bool XGame::init(void)
     userCmdGen_.init();
     weaponDefs_.init();
 
-
     return true;
 }
 
 bool XGame::shutDown(void)
 {
     X_LOG0("Game", "Shutting Down");
+
+    if (pSession_) {
+        gEnv->pNet->deleteSession(pSession_);
+    }
 
     if (pFovVar_) {
         pFovVar_->Release();
