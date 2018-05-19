@@ -36,7 +36,7 @@ void CmdPacketAllocator::createAllocaotrsForThreads(core::V2::JobSystem& jobSys)
     }
 
     // calling thread
-    threadIdToIndex_.push_back(core::Thread::GetCurrentID());
+    threadIdToIndex_.push_back(core::Thread::getCurrentID());
 
     // create the allocators.
     const size_t numAllocators = threadIdToIndex_.size();

@@ -52,7 +52,7 @@ Thread::~Thread(void)
 {
 }
 
-void Thread::Create(const char* pName, uint32_t stackSize)
+void Thread::create(const char* pName, uint32_t stackSize)
 {
     name_.set(pName);
 
@@ -65,13 +65,13 @@ void Thread::Create(const char* pName, uint32_t stackSize)
     }
 }
 
-void Thread::Destroy(void)
+void Thread::destroy(void)
 {
-    Stop();
-    Join();
+    stop();
+    join();
 }
 
-void Thread::Start(Function::Pointer function)
+void Thread::start(Function::Pointer function)
 {
     function_ = function;
     state_ = State::RUNNING;
@@ -81,17 +81,17 @@ void Thread::Start(Function::Pointer function)
         X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
     }
 
-    setThreadName(GetID(), name_.c_str());
+    setThreadName(getID(), name_.c_str());
 }
 
-void Thread::Stop(void)
+void Thread::stop(void)
 {
     if (state_ != State::READY) {
         state_ = State::STOPPING;
     }
 }
 
-void Thread::Join(void)
+void Thread::join(void)
 {
     if (state_ != State::READY && handle_ != NULL) {
         if (WaitForSingleObject(handle_, INFINITE) == WAIT_FAILED) {
@@ -104,17 +104,17 @@ void Thread::Join(void)
     id_ = 0;
 }
 
-bool Thread::ShouldRun(void) const volatile
+bool Thread::shouldRun(void) const volatile
 {
     return state_ == State::RUNNING;
 }
 
-bool Thread::HasFinished(void) const volatile
+bool Thread::hasFinished(void) const volatile
 {
     return state_ == State::FINISHED;
 }
 
-bool Thread::SetThreadAffinity(const AffinityFlags flags)
+bool Thread::setThreadAffinity(const AffinityFlags flags)
 {
     DWORD_PTR mask = flags.ToInt();
 
@@ -127,12 +127,12 @@ bool Thread::SetThreadAffinity(const AffinityFlags flags)
     return true;
 }
 
-void Thread::SetFPE(FPE::Enum fpe)
+void Thread::setFPE(FPE::Enum fpe)
 {
-    SetFPE(GetID(), fpe);
+    setFPE(getID(), fpe);
 }
 
-void Thread::CancelSynchronousIo(void)
+void Thread::cancelSynchronousIo(void)
 {
     if (!::CancelSynchronousIo(handle_)) {
         lastError::Description Dsc;
@@ -140,7 +140,7 @@ void Thread::CancelSynchronousIo(void)
     }
 }
 
-bool Thread::SleepAlertable(uint32_t milliSeconds)
+bool Thread::sleepAlertable(uint32_t milliSeconds)
 {
     DWORD res = ::SleepEx(milliSeconds, TRUE);
     if (res == WAIT_IO_COMPLETION) {
@@ -154,7 +154,7 @@ bool Thread::SleepAlertable(uint32_t milliSeconds)
     return false;
 }
 
-void Thread::Join(uint32_t threadId)
+void Thread::join(uint32_t threadId)
 {
     HANDLE hThread = ::OpenThread(THREAD_ALL_ACCESS, FALSE, threadId);
     if (hThread == NULL) {
@@ -169,18 +169,18 @@ void Thread::Join(uint32_t threadId)
     }
 }
 
-void Thread::SetName(uint32_t threadId, const char* name)
+void Thread::setName(uint32_t threadId, const char* name)
 {
     setThreadName(threadId, name);
 }
 
-Thread::Priority::Enum Thread::GetPriority(void)
+Thread::Priority::Enum Thread::getPriority(void)
 {
     int32_t pri = ::GetThreadPriority(::GetCurrentThread());
     if (pri == THREAD_PRIORITY_ERROR_RETURN) {
         lastError::Description Dsc;
         X_ERROR("Thread", "Failed to get thread priority for id: % " PRIu32 ". Error: %s",
-            GetCurrentID(), lastError::ToString(Dsc));
+            getCurrentID(), lastError::ToString(Dsc));
         return Priority::NORMAL;
     }
 
@@ -208,7 +208,7 @@ Thread::Priority::Enum Thread::GetPriority(void)
     return Priority::NORMAL;
 }
 
-bool Thread::SetPriority(Priority::Enum priority)
+bool Thread::setPriority(Priority::Enum priority)
 {
     int pri = THREAD_PRIORITY_NORMAL;
 
@@ -243,14 +243,14 @@ bool Thread::SetPriority(Priority::Enum priority)
     if (!SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_TIME_CRITICAL)) {
         lastError::Description Dsc;
         X_ERROR("Thread", "Failed to set thread priority for id: % " PRIu32 ". Error: %s",
-            GetCurrentID(), lastError::ToString(Dsc));
+            getCurrentID(), lastError::ToString(Dsc));
         return false;
     }
 
     return true;
 }
 
-void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
+void Thread::setFPE(uint32_t threadId, FPE::Enum fpe)
 {
     // Enable:
     // - _EM_ZERODIVIDE
@@ -276,7 +276,7 @@ void Thread::SetFPE(uint32_t threadId, FPE::Enum fpe)
     const uint32_t ALL_DISABLE = _EM_INEXACT | _EM_DENORMAL;
     const uint32_t ALL_MM_DISABLE = _MM_MASK_INEXACT | _MM_MASK_DENORM;
 
-    if (threadId == 0 || threadId == GetCurrentID()) {
+    if (threadId == 0 || threadId == getCurrentID()) {
         uint32_t current = 0;
 
         _controlfp_s(&current, _DN_FLUSH, _MCW_DN);
@@ -402,43 +402,43 @@ ThreadAbstract::ThreadAbstract()
 
 ThreadAbstract::~ThreadAbstract()
 {
-    thread_.Destroy();
+    thread_.destroy();
 }
 
-void ThreadAbstract::Create(const char* name, uint32_t stackSize)
+void ThreadAbstract::create(const char* name, uint32_t stackSize)
 {
-    thread_.Create(name ? name : "AbstractThread", stackSize);
+    thread_.create(name ? name : "AbstractThread", stackSize);
     thread_.setData(this);
 }
 
-void ThreadAbstract::Start(void)
+void ThreadAbstract::start(void)
 {
-    thread_.Start(ThreadFunc);
+    thread_.start(ThreadFunc);
 }
 
-void ThreadAbstract::Stop(void)
+void ThreadAbstract::stop(void)
 {
-    thread_.Stop();
+    thread_.stop();
 }
 
-void ThreadAbstract::Join(void)
+void ThreadAbstract::join(void)
 {
-    thread_.Join();
+    thread_.join();
 }
 
-uint32_t ThreadAbstract::GetID(void) const
+uint32_t ThreadAbstract::getID(void) const
 {
-    return thread_.GetID();
+    return thread_.getID();
 }
 
-Thread::State::Enum ThreadAbstract::GetState(void) const
+Thread::State::Enum ThreadAbstract::getState(void) const
 {
-    return thread_.GetState();
+    return thread_.getState();
 }
 
-void ThreadAbstract::CancelSynchronousIo(void)
+void ThreadAbstract::cancelSynchronousIo(void)
 {
-    thread_.CancelSynchronousIo();
+    thread_.cancelSynchronousIo();
 }
 
 Thread::ReturnValue ThreadAbstract::ThreadFunc(const Thread& thread)

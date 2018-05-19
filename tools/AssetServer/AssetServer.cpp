@@ -355,8 +355,8 @@ AssetServer::ClientThread::ClientThread(ClientPtr client, core::MemoryArenaBase*
 
 bool AssetServer::ClientThread::listen(void)
 {
-    Create("ClientThread");
-    Start();
+    create("ClientThread");
+    start();
     return true;
 }
 
@@ -381,9 +381,9 @@ AssetServer::AssetServer(core::MemoryArenaBase* arena) :
 AssetServer::~AssetServer()
 {
     if (threadStarted_) {
-        CancelSynchronousIo();
-        Stop();
-        Join();
+        cancelSynchronousIo();
+        stop();
+        join();
     }
 
     // shut down the slut.
@@ -396,8 +396,8 @@ void AssetServer::Run(bool blocking)
         Run_Internal();
     }
     else {
-        Create("AssetServerWorker");
-        Start();
+        create("AssetServerWorker");
+        start();
 
         threadStarted_ = true;
     }

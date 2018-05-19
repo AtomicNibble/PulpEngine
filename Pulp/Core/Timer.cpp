@@ -100,7 +100,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
                 X_LOG0("Timer", "Sleeping for %gms to limit frame rate.", sleepMs);
             }
 
-            core::Thread::Sleep(static_cast<uint32_t>(sleepMs));
+            core::Thread::sleep(static_cast<uint32_t>(sleepMs));
 
             frameDelta = targetTicks;
             frameDeltaCapped = targetTicks;

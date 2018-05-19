@@ -164,7 +164,7 @@ void Level::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     req.pFile = pFile;
     pFileSys_->AddIoRequestToQue(req);
 
-    //	core::Thread::Sleep(5000);
+    //	core::Thread::sleep(5000);
 
     // activate the scene and 3d world.
     gEnv->p3DEngine->addWorldToActiveList(p3DWorld_);

@@ -83,14 +83,14 @@ namespace JobList
             bool waited = false;
 
             while (syncCount_ > 0) {
-                core::Thread::Yield();
+                core::Thread::yield();
                 waited = true;
             }
 
             ++version_;
 
             while (numThreadsExecuting_ > 0) {
-                core::Thread::Yield();
+                core::Thread::yield();
                 waited = true;
             }
 
@@ -335,7 +335,7 @@ namespace JobList
         X_ASSERT_NOT_NULL(pJobList);
 
         while (lastJobList_ - firstJobList_ >= MAX_JOB_LISTS) {
-            core::Thread::Yield();
+            core::Thread::yield();
         }
 
         jobLists_[lastJobList_ & (MAX_JOB_LISTS - 1)].jobList = pJobList;
@@ -353,7 +353,7 @@ namespace JobList
 
     void JobThread::Stop(void)
     {
-        ThreadAbstract::Stop();
+        ThreadAbstract::stop();
         SignalWork();
     }
 
@@ -391,7 +391,7 @@ namespace JobList
                     }
                 }
 
-                if (!thread.ShouldRun()) {
+                if (!thread.shouldRun()) {
                     break;
                 }
 
@@ -413,7 +413,7 @@ namespace JobList
         size_t currentJobListIdx;
         size_t lastStalledJobList = InvalidJobIdx;
 
-        while (thread.ShouldRun()) {
+        while (thread.shouldRun()) {
             // can we fit any more jobs in the local stack.
             if (jobStates.size() < jobStates.capacity()) {
                 if (firstJobList_ < lastJobList_) {
@@ -536,8 +536,8 @@ namespace JobList
             core::StackString<64> name;
             name.appendFmt("Worker_%" PRIi32, i);
             threads_[i].setThreadIdx(i);
-            threads_[i].Create(name.c_str()); // default stack size.
-            threads_[i].Start();
+            threads_[i].create(name.c_str()); // default stack size.
+            threads_[i].start();
         }
     }
 
@@ -551,7 +551,7 @@ namespace JobList
             threads_[i].Stop();
         }
         for (i = 0; i < numThreads_; i++) {
-            threads_[i].Join();
+            threads_[i].join();
         }
     }
 

@@ -90,7 +90,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
     if (!notCompiled) {
         while (pCompilingPerm->status == TechStatus::NOT_COMPILED) {
             // TODO: something useful.
-            core::Thread::Yield();
+            core::Thread::yield();
         }
 
         if (pCompilingPerm->status == TechStatus::ERROR) {
@@ -355,7 +355,7 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
 
     if (loaded) {
         while (*pTechDefRef == nullptr) {
-            core::Thread::Yield();
+            core::Thread::yield();
         }
 
         if (*pTechDefRef == INVALID_TECH_DEF_STATE) {

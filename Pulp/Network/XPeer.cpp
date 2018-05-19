@@ -375,9 +375,9 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         ThreadArr::Type::FunctionDelagate del;
         del.Bind<XPeer, &XPeer::socketRecvThreadProc>(this);
 
-        socketThread.Create(threadName.c_str(), 1024 * 4);
+        socketThread.create(threadName.c_str(), 1024 * 4);
         socketThread.setData(&socket);
-        socketThread.Start(del);
+        socketThread.start(del);
     }
 
     // set out local adress port as that of 1st bound socket.
@@ -453,7 +453,7 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
                     break;
                 }
 
-                core::Thread::Sleep(sleepTime);
+                core::Thread::sleep(sleepTime);
 
                 timeNow = gEnv->pTimer->GetTimeNowReal();
 
@@ -472,16 +472,16 @@ void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
     }
 
     for (auto& socketThread : socketThreads_) {
-        socketThread.Stop();
+        socketThread.stop();
     }
 
     for (size_t i = 0; i < socketThreads_.size(); i++) {
         auto& socket = sockets_[i];
         auto& socketThread = socketThreads_[i];
 
-        if (!socketThread.HasFinished()) {
+        if (!socketThread.hasFinished()) {
             if (socket.sendSendTest()) {
-                socketThread.Join();
+                socketThread.join();
             }
             else {
                 // if the send test failed potentially the thread won't join.
@@ -2149,7 +2149,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
                 hash.update(timeNow);
                 hash.update(randBytes.data(), randBytes.size());
                 hash.update(core::TimeStamp::getSystemTime());
-                hash.update(core::Thread::GetCurrentID());
+                hash.update(core::Thread::getCurrentID());
 
                 pRemoteSys->nonce = hash.finalize();
 
@@ -2607,7 +2607,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
 
     RecvData* pData = allocRecvData();
 
-    while (thread.ShouldRun()) {
+    while (thread.shouldRun()) {
         auto res = pSocket->recv(*pData);
 
         if (res == RecvResult::Success) {
@@ -2616,7 +2616,7 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
                 pData = allocRecvData();
             }
             else {
-                core::Thread::Sleep(0);
+                core::Thread::sleep(0);
             }
         }
         else if (res == RecvResult::ConnectionReset) {

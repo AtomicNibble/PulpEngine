@@ -1241,7 +1241,7 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase* pRequest)
     }
 
     if (vars_.queueDebug_) {
-        uint32_t threadId = core::Thread::GetCurrentID();
+        uint32_t threadId = core::Thread::getCurrentID();
         X_LOG0("FileSys", "IoRequest(0x%x) type: %s", threadId, IoRequest::ToString(pRequest->getType()));
     }
 
@@ -1271,18 +1271,18 @@ void xFileSys::CancelRequest(RequestHandle handle)
 
 bool xFileSys::StartRequestWorker(void)
 {
-    ThreadAbstract::Create("IoWorker", 1024 * 128); // small stack
-    ThreadAbstract::Start();
+    ThreadAbstract::create("IoWorker", 1024 * 128); // small stack
+    ThreadAbstract::start();
     return true;
 }
 
 void xFileSys::ShutDownRequestWorker(void)
 {
-    if (ThreadAbstract::GetState() != core::Thread::State::RUNNING) {
+    if (ThreadAbstract::getState() != core::Thread::State::RUNNING) {
         return;
     }
 
-    ThreadAbstract::Stop();
+    ThreadAbstract::stop();
 
     {
         // post a close job with a none null callback.
@@ -1295,7 +1295,7 @@ void xFileSys::ShutDownRequestWorker(void)
     }
 
     requestSignal_.raise();
-    ThreadAbstract::Join();
+    ThreadAbstract::join();
 }
 
 IoRequestBase* xFileSys::popRequest(void)
@@ -1339,7 +1339,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         static_assert(core::compileTime::IsTrivialDestruct<IoRequestRead>::Value, "Need to call destructor");
 
         if (vars_.queueDebug_) {
-            uint32_t threadId = core::Thread::GetCurrentID();
+            uint32_t threadId = core::Thread::getCurrentID();
 
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async read request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
@@ -1356,7 +1356,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         static_assert(core::compileTime::IsTrivialDestruct<IoRequestWrite>::Value, "Need to call destructor");
 
         if (vars_.queueDebug_) {
-            uint32_t threadId = core::Thread::GetCurrentID();
+            uint32_t threadId = core::Thread::getCurrentID();
 
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async write request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
@@ -1373,7 +1373,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         static_assert(core::compileTime::IsTrivialDestruct<IoRequestOpenRead>::Value, "Need to call destructor");
 
         if (vars_.queueDebug_) {
-            uint32_t threadId = core::Thread::GetCurrentID();
+            uint32_t threadId = core::Thread::getCurrentID();
 
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-read request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
@@ -1403,7 +1403,7 @@ void xFileSys::onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd)
         XFileAsync* pReqFile = pAsyncReq->pFile;
 
         if (vars_.queueDebug_) {
-            uint32_t threadId = core::Thread::GetCurrentID();
+            uint32_t threadId = core::Thread::getCurrentID();
 
             X_LOG0("FileSys", "IoRequest(0x%x) '%s' async open-write request complete. "
                               "bytesTrans: 0x%x pBuf: %p",
@@ -1538,7 +1538,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             ;
     };
 
-    while (thread.ShouldRun()) {
+    while (thread.shouldRun()) {
         if (pendingCompOps_.isEmpty() && noPendingOps()) {
             pRequest = popRequest();
         }

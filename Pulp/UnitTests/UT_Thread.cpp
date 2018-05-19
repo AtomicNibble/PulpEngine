@@ -34,11 +34,11 @@ namespace
             {
                 int local = g_nonAtomicInt;
                 local += 64;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_nonAtomicInt = local;
             }
 
-            Thread::Sleep(gEnv->xorShift.rand() % 5);
+            Thread::sleep(gEnv->xorShift.rand() % 5);
             atomic::Add(&g_atomicInt, 64);
         }
         return Thread::ReturnValue(0);
@@ -50,11 +50,11 @@ namespace
             {
                 int local = g_nonAtomicInt;
                 --local;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_nonAtomicInt = local;
             }
 
-            Thread::Sleep(gEnv->xorShift.rand() % 5);
+            Thread::sleep(gEnv->xorShift.rand() % 5);
             atomic::Decrement(&g_atomicInt);
         }
         return Thread::ReturnValue(0);
@@ -66,11 +66,11 @@ namespace
             {
                 int local = g_nonAtomicInt;
                 ++local;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_nonAtomicInt = local;
             }
 
-            Thread::Sleep(gEnv->xorShift.rand() % 5);
+            Thread::sleep(gEnv->xorShift.rand() % 5);
             atomic::Increment(&g_atomicInt);
         }
         return Thread::ReturnValue(0);
@@ -80,9 +80,9 @@ namespace
 
     static Thread::ReturnValue ThreadFunction(const Thread& thread)
     {
-        while (thread.ShouldRun()) {
+        while (thread.shouldRun()) {
             g_nonProtectedInt++;
-            Thread::Sleep(10);
+            Thread::sleep(10);
         }
 
         return Thread::ReturnValue(0);
@@ -108,7 +108,7 @@ namespace
             // make sure that the operation is not atomic
             int local = g_nonProtectedInt;
             ++local;
-            Thread::Sleep(gEnv->xorShift.rand() % 5);
+            Thread::sleep(gEnv->xorShift.rand() % 5);
             g_nonProtectedInt = local;
 
             {
@@ -116,7 +116,7 @@ namespace
 
                 int local = g_protectedInt;
                 ++local;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_protectedInt = local;
             }
         }
@@ -130,7 +130,7 @@ namespace
             // make sure that the operation is not atomic
             int local = g_nonProtectedInt;
             ++local;
-            Thread::Sleep(gEnv->xorShift.rand() % 5);
+            Thread::sleep(gEnv->xorShift.rand() % 5);
             g_nonProtectedInt = local;
 
             {
@@ -138,7 +138,7 @@ namespace
 
                 int local = g_protectedInt;
                 ++local;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_protectedInt = local;
             }
         }
@@ -160,7 +160,7 @@ namespace
                 // the critical section is now owned by us
                 int local = g_protectedInt;
                 ++local;
-                Thread::Sleep(gEnv->xorShift.rand() % 5);
+                Thread::sleep(gEnv->xorShift.rand() % 5);
                 g_protectedInt = local;
 
                 g_entryCondition = 0;
@@ -175,14 +175,14 @@ namespace
         Thread threads[THREAD_NUM];
 
         for (int i = 0; i < THREAD_NUM; i++)
-            threads[i].Create("Test Thread");
+            threads[i].create("Test Thread");
         for (int i = 0; i < THREAD_NUM; i++)
-            threads[i].Start(func);
+            threads[i].start(func);
 
         for (int i = 0; i < THREAD_NUM; i++)
-            threads[i].Stop();
+            threads[i].stop();
         for (int i = 0; i < THREAD_NUM; i++)
-            threads[i].Join();
+            threads[i].join();
     }
 
 } // namespace
@@ -213,16 +213,16 @@ TEST(Threading, Threads)
     g_nonProtectedInt = 0;
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Create("Test Thread");
+        threads[i].create("Test Thread");
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Start(ThreadFunction);
+        threads[i].start(ThreadFunction);
 
-    Thread::Sleep(50);
+    Thread::sleep(50);
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Stop();
+        threads[i].stop();
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Join();
+        threads[i].join();
 
     int val = g_nonProtectedInt;
     EXPECT_TRUE(val > 5);
@@ -246,16 +246,16 @@ TEST(Threading, Semaphore)
     g_int = 0;
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Create("Test Thread");
+        threads[i].create("Test Thread");
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Start(ThreadFunction_semaphone);
+        threads[i].start(ThreadFunction_semaphone);
 
     for (int i = 0; i < THREAD_NUM; i++)
         g_Sema.ReleaseSlot();
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Join();
+        threads[i].join();
 
     EXPECT_TRUE(g_int == THREAD_NUM);
 }
@@ -291,27 +291,28 @@ TEST(Threading, Conditional)
     g_protectedInt = 0;
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Create("Test Thread");
+        threads[i].create("Test Thread");
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Start(ThreadFunction_conditional);
+        threads[i].start(ThreadFunction_conditional);
 
     uint32_t finishedCount = 0;
     while (finishedCount != THREAD_NUM) {
         finishedCount = 0;
         for (uint32_t i = 0; i < THREAD_NUM; ++i) {
-            if (threads[i].HasFinished())
+            if (threads[i].hasFinished()) {
                 ++finishedCount;
+            }
         }
 
         // signal one thread to enter the the critical section
         g_entryCondition = 1;
         g_cond.NotifyOne();
-        Thread::Yield();
+        Thread::yield();
     }
 
     for (int i = 0; i < THREAD_NUM; i++)
-        threads[i].Join();
+        threads[i].join();
 
     int val = g_protectedInt / LOOP_COUNT;
 

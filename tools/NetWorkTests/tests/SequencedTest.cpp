@@ -101,7 +101,7 @@ TEST(net, SequencedPacketsTest)
                 timer.Start();
             }
 
-            core::Thread::Sleep(1);
+            core::Thread::sleep(1);
         }
         else if (curState == State::Sending) {
             // sends packets on diffrent streams.

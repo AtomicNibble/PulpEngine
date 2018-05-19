@@ -224,7 +224,7 @@ namespace shader
 
             // wait for it to finish loading on another thread.
             while (*pSourceFileRef == nullptr) {
-                core::Thread::BackOff(backOff++);
+                core::Thread::backOff(backOff++);
             }
 
             if (*pSourceFileRef == INVALID_SOURCE) {

@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-Process::Process(HANDLE process, uint32_t processID) :
+Process::Process(HANDLE process, ProcessId  processID) :
     process_(process),
     processID_(processID)
 {
@@ -19,7 +19,7 @@ Process::~Process()
 {
 }
 
-Process::Priority::Enum Process::GetPriorityClass(void) const
+Process::Priority::Enum Process::getPriorityClass(void) const
 {
     DWORD priorityClass = ::GetPriorityClass(process_);
     if (priorityClass == 0) {
@@ -48,7 +48,7 @@ Process::Priority::Enum Process::GetPriorityClass(void) const
     }
 }
 
-bool Process::SetPriorityClass(Priority::Enum priority)
+bool Process::setPriorityClass(Priority::Enum priority)
 {
     int32_t pri = NORMAL_PRIORITY_CLASS;
 
@@ -86,7 +86,7 @@ bool Process::SetPriorityClass(Priority::Enum priority)
     return true;
 }
 
-Process Process::GetCurrent(void)
+Process Process::getCurrent(void)
 {
     auto currentHandle = ::GetCurrentProcess();
     auto currentID = ::GetCurrentProcessId();
@@ -94,9 +94,9 @@ Process Process::GetCurrent(void)
     return Process(currentHandle, currentID);
 }
 
-uint32_t Process::GetCurrentID(void)
+ProcessId Process::getCurrentID(void)
 {
-    return safe_static_cast<uint32_t>(::GetCurrentProcessId());
+    return safe_static_cast<ProcessId >(::GetCurrentProcessId());
 }
 
 X_NAMESPACE_END

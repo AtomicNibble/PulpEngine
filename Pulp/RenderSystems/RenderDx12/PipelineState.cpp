@@ -106,7 +106,7 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
         int32_t backOff = 0;
 
         while (*pPSORef == nullptr) {
-            core::Thread::BackOff(backOff++);
+            core::Thread::backOff(backOff++);
         }
     }
 
@@ -153,8 +153,11 @@ bool PSODeviceCache::compile(D3D12_COMPUTE_PIPELINE_STATE_DESC& cpsoDesc, ID3D12
     }
     else {
         if (*pPSORef == nullptr) {
+
+            int32_t backOff = 0;
+
             while (*pPSORef == nullptr) {
-                core::Thread::Yield();
+                core::Thread::backOff(backOff++);
             }
 
             // did the compile that we waited for fail?

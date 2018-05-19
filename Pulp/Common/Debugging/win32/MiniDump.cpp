@@ -46,7 +46,7 @@ namespace debugging
         PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam = nullptr;
         PMINIDUMP_CALLBACK_INFORMATION CallbackParam = nullptr;
 
-        miniDumpInfo.ThreadId = core::Thread::GetCurrentID();
+        miniDumpInfo.ThreadId = core::Thread::getCurrentID();
         miniDumpInfo.ExceptionPointers = exceptionPointers;
         miniDumpInfo.ClientPointers = FALSE;
 

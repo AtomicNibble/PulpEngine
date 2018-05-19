@@ -449,7 +449,7 @@ void XFontTexture::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threa
     // we have the font data now we just need to setup the font render.
     JobData* pJobData = static_cast<JobData*>(pData);
 
-    //	core::Thread::Sleep(2000);
+    //	core::Thread::sleep(2000);
 
     if (!glyphCache_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData),
             pJobData->dataSize,

@@ -74,7 +74,7 @@ namespace shader
     {
         X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")(status_); 
 
-        const auto id = core::Thread::GetCurrentID();
+        const auto id = core::Thread::getCurrentID();
 
         X_LOG0("Shader", "(%" PRIu32 ") Compiling shader: \"%s\"", id, name_.c_str());
 

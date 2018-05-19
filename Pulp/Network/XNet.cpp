@@ -256,8 +256,8 @@ NetGUID XNet::generateGUID(void)
     core::Hash::SHA1 sha1;
     sha1.update(date);
     sha1.update(now.GetValue());
-    sha1.update(core::Thread::GetCurrentID());
-    sha1.update(core::Process::GetCurrentID());
+    sha1.update(core::Thread::getCurrentID());
+    sha1.update(core::Process::getCurrentID());
 
     auto digest = sha1.finalize();
 

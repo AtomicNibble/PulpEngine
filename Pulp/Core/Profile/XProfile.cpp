@@ -63,15 +63,15 @@ namespace
             uint64_t start, elapsed;
             const uint32_t delayMS = 1;
 
-            core::Process pro = core::Process::GetCurrent();
+            core::Process pro = core::Process::getCurrent();
 
             // We want absolute maximum priority
-            const auto priorityClass = pro.GetPriorityClass();
-            const auto curThreadPri = core::Thread::GetPriority();
+            const auto priorityClass = pro.getPriorityClass();
+            const auto curThreadPri = core::Thread::getPriority();
 
-            pro.SetPriorityClass(core::Process::Priority::REALTIME);
-            core::Thread::SetPriority(core::Thread::Priority::REALTIME);
-            core::Thread::Sleep(0); // Give up the rest of our timeslice so we don't get a context switch
+            pro.setPriorityClass(core::Process::Priority::REALTIME);
+            core::Thread::setPriority(core::Thread::Priority::REALTIME);
+            core::Thread::sleep(0); // Give up the rest of our timeslice so we don't get a context switch
 
             core::StopWatch time;
 
@@ -79,14 +79,14 @@ namespace
             time.Start();
 
             start = getTicksFlush();
-            core::Thread::Sleep(delayMS);
+            core::Thread::sleep(delayMS);
             elapsed = (getTicksFlush() - start);
 
             auto elapsedTime = time.GetMilliSeconds() - (overhead);
 
             // Reset priority and get speed
-            core::Thread::SetPriority(curThreadPri);
-            pro.SetPriorityClass(priorityClass);
+            core::Thread::setPriority(curThreadPri);
+            pro.setPriorityClass(priorityClass);
 
             auto ticksPerMS = static_cast<uint64_t>(static_cast<double>(elapsed) / static_cast<double>(elapsedTime));
 

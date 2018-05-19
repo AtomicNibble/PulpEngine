@@ -293,7 +293,7 @@ bool XCore::Init(const SCoreInitParams& startupParams)
     core::StopWatch time;
 
     // init the system baby!
-    gEnv->mainThreadId = core::Thread::GetCurrentID();
+    gEnv->mainThreadId = core::Thread::getCurrentID();
     gEnv->seed == startupParams.seed;
 
     core::invalidParameterHandler::Startup();
@@ -680,7 +680,7 @@ bool XCore::parseSeed(Vec4i seed)
         core::GetProcessMemInfo(meminfo);
 
         core::Hash::SHA1 sha1;
-        sha1.update(core::Thread::GetCurrentID());
+        sha1.update(core::Thread::getCurrentID());
         sha1.update(core::SysTimer::Get());
         sha1.update(meminfo);
 

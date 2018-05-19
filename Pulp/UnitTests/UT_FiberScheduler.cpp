@@ -113,7 +113,7 @@ TEST(Threading, FiberScheduler)
 
         core::TimeVal MultiElapsed;
         {
-            core::Thread::SetName(core::Thread::GetCurrentID(), "MainThread");
+            core::Thread::setName(core::Thread::getCurrentID(), "MainThread");
 
             core::StopWatch timer;
 

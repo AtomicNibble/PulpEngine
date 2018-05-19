@@ -99,7 +99,7 @@ namespace profiler
             timeSelf_(0),
             pParent_(nullptr),
             callCount_(0),
-            threadID_(core::Thread::GetCurrentID()),
+            threadID_(core::Thread::getCurrentID()),
             hasChildren_(0),
             subSystem_(sys),
             type_(type)

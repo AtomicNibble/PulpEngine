@@ -83,7 +83,7 @@ X_INLINE uint8_t* CmdPacketAllocator::auxAlloc(size_t size)
 
 X_INLINE size_t CmdPacketAllocator::getThreadIdx(void)
 {
-    uint32_t threadId = core::Thread::GetCurrentID();
+    uint32_t threadId = core::Thread::getCurrentID();
     size_t idx = 0;
 
     for (auto id : threadIdToIndex_) {

@@ -104,7 +104,7 @@ TEST(net, OrderedPacketsTest)
                 timer.Start();
             }
 
-            core::Thread::Sleep(1);
+            core::Thread::sleep(1);
         }
         else if (curState == State::Sending) {
             packetsSent = 0;

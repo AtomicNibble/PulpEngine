@@ -89,7 +89,7 @@ namespace
             }
 
             // sleep, as other thread will handle incoming requests and buffer then for us.
-            core::Thread::Sleep(50);
+            core::Thread::sleep(50);
 
             char key = Console.ReadKey();
             if (key == 'X') {
@@ -176,7 +176,7 @@ namespace
             }
 
             // sleep, as other thread will handle incoming requests and buffer then for us.
-            core::Thread::Sleep(10);
+            core::Thread::sleep(10);
 
             char key = Console.ReadKey();
             if (key == 'X') {

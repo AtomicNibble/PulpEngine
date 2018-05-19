@@ -47,7 +47,7 @@ X_INLINE SpinlockRecursive::SpinlockRecursive() :
 
 X_INLINE void SpinlockRecursive::Enter(void)
 {
-    uint32_t threadId = core::Thread::GetCurrentID();
+    uint32_t threadId = core::Thread::getCurrentID();
 
     if (threadId != threadId_) {
         for (;;) {
@@ -64,9 +64,7 @@ X_INLINE void SpinlockRecursive::Enter(void)
 
 X_INLINE void SpinlockRecursive::Leave(void)
 {
-    X_ASSERT(core::Thread::GetCurrentID() == threadId_,
-        "Recursive spin lock leave called from a none owning thread")
-    (core::Thread::GetCurrentID(), threadId_);
+    X_ASSERT(core::Thread::getCurrentID() == threadId_, "Recursive spin lock leave called from a none owning thread")(core::Thread::getCurrentID(), threadId_);
 
     --count_;
 

@@ -2,6 +2,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+typedef uint32_t ProcessId;
+
 class Process
 {
 public:
@@ -15,24 +17,24 @@ public:
         REALTIME);
 
 private:
-    explicit Process(HANDLE process, uint32_t processID);
+    explicit Process(HANDLE process, ProcessId  processID);
 
 public:
     Process();
     ~Process();
 
-    uint32_t GetID(void);
+    ProcessId getID(void);
 
-    Priority::Enum GetPriorityClass(void) const;
-    bool SetPriorityClass(Priority::Enum priority);
+    Priority::Enum getPriorityClass(void) const;
+    bool setPriorityClass(Priority::Enum priority);
 
 public:
-    static Process GetCurrent(void);
-    static uint32_t GetCurrentID(void);
+    static Process getCurrent(void);
+    static ProcessId getCurrentID(void);
 
 private:
     HANDLE process_;
-    uint32_t processID_;
+    ProcessId processID_;
 };
 
 X_NAMESPACE_END

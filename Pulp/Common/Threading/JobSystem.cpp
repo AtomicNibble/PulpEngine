@@ -52,7 +52,7 @@ void JobThread::SignalWork(void)
 
 void JobThread::Stop(void)
 {
-    ThreadAbstract::Stop();
+    ThreadAbstract::stop();
     SignalWork();
 }
 
@@ -95,7 +95,7 @@ Thread::ReturnValue JobThread::ThreadRun(const Thread& thread)
                 }
             }
 
-            if (!thread.ShouldRun()) {
+            if (!thread.shouldRun()) {
                 break;
             }
 
@@ -112,7 +112,7 @@ Thread::ReturnValue JobThread::ThreadRunInternal(const Thread& thread)
     JobDecl job;
     size_t i;
 
-    while (thread.ShouldRun()) {
+    while (thread.shouldRun()) {
         // pop from the ques in order.
         for (i = 0; i < JobPriority::ENUM_COUNT; i++) {
             if (ques_[i]->tryPop(job)) {
@@ -217,7 +217,7 @@ void JobSystem::waitForAllJobs(void)
     int32_t i;
     for (i = 0; i < JobPriority::ENUM_COUNT; i++) {
         while (ques_[i].isNotEmpty()) {
-            core::Thread::Yield();
+            core::Thread::yield();
         }
     }
 
@@ -240,8 +240,8 @@ bool JobSystem::StartThreads(void)
         core::StackString<64> name;
         name.appendFmt("JobSystem::Worker_%i", i);
         threads_[i].init(i, ques_);
-        threads_[i].Create(name.c_str()); // default stack size.
-        threads_[i].Start();
+        threads_[i].create(name.c_str()); // default stack size.
+        threads_[i].start();
     }
 
     return true;
@@ -257,7 +257,7 @@ void JobSystem::ShutDown(void)
         threads_[i].Stop();
     }
     for (i = 0; i < numThreads_; i++) {
-        threads_[i].Join();
+        threads_[i].join();
     }
 }
 

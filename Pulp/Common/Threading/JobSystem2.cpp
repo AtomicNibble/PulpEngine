@@ -202,13 +202,13 @@ namespace V2
     {
         size_t i;
         for (i = 0; i < numThreads_; i++) {
-            threads_[i].Stop();
+            threads_[i].stop();
         }
 
         cond_.NotifyAll();
 
         for (i = 0; i < numThreads_; i++) {
-            threads_[i].Join();
+            threads_[i].join();
         }
 
         // clean up allocators and ques.
@@ -266,7 +266,7 @@ namespace V2
     {
         X_ASSERT(numThreads_ > 0, "Can't create que for thread before StartUp has been called")(numThreads_);
 
-        uint32_t threadId = Thread::GetCurrentID();
+        uint32_t threadId = Thread::getCurrentID();
 
         if (CurrentThreadHasWorkerQueue()) {
             X_WARNING("JobSys", "Thread 0x%x already has a que", threadId);
@@ -296,7 +296,7 @@ namespace V2
         ThreadIdArray arr;
 
         for (uint32_t i = 0; i < numThreads_; i++) {
-            arr.push_back(threads_[i].GetID());
+            arr.push_back(threads_[i].getID());
         }
 
         return arr;
@@ -309,7 +309,7 @@ namespace V2
         X_LOG0("JobSystemV2", "Creating %" PRIu32 " threads", numThreads_);
 
         // que for main thread also.
-        uint32_t threadId = Thread::GetCurrentID();
+        uint32_t threadId = Thread::getCurrentID();
 
         CreateThreadObjects(threadId);
         {
@@ -323,13 +323,13 @@ namespace V2
             core::StackString<64> name;
             name.appendFmt("JobSystemV2::Worker_%" PRIu32, i);
             threads_[i].setData(this);
-            threads_[i].Create(name.c_str()); // default stack size.
+            threads_[i].create(name.c_str()); // default stack size.
 
-            threadId = threads_[i].GetID();
+            threadId = threads_[i].getID();
             CreateThreadObjects(threadId);
         }
         for (i = 0; i < numThreads_; i++) {
-            threads_[i].Start(ThreadRun_s);
+            threads_[i].start(ThreadRun_s);
         }
 
         return true;
@@ -432,13 +432,13 @@ namespace V2
     void JobSystem::WaitWithoutHelp(Job* pJob) const
     {
         while (!HasJobCompleted(pJob)) {
-            Thread::Yield();
+            Thread::yield();
         }
     }
 
     bool JobSystem::HelpWithWork(void)
     {
-        X_ASSERT(CurrentThreadHasWorkerQueue(), "HelpWithWork called on thread that has no que")(core::Thread::GetCurrentID());
+        X_ASSERT(CurrentThreadHasWorkerQueue(), "HelpWithWork called on thread that has no que")(core::Thread::getCurrentID());
 
         size_t threadIdx = GetThreadIndex();
         ThreadQue& threadQue = *GetWorkerThreadQueue(threadIdx);
@@ -682,7 +682,7 @@ namespace V2
 
     size_t JobSystem::GetThreadIndex(void) const
     {
-        const uint32_t threadId = Thread::GetCurrentID();
+        const uint32_t threadId = Thread::getCurrentID();
 
         for (auto id : threadIdToIndex_) {
             if (id.first == threadId) {
@@ -696,7 +696,7 @@ namespace V2
 
     bool JobSystem::CurrentThreadHasIndex(void) const
     {
-        const uint32_t threadId = Thread::GetCurrentID();
+        const uint32_t threadId = Thread::getCurrentID();
 
         for (auto id : threadIdToIndex_) {
             if (id.first == threadId) {
@@ -716,18 +716,18 @@ namespace V2
     void JobSystem::ThreadBackOff(int32_t backoff)
     {
         if (backoff < 10 && backoff > 0) {
-            Thread::YieldProcessor();
+            Thread::yieldProcessor();
         }
         else if (backoff < 20) {
             for (size_t i = 0; i != 50; i += 1) {
-                Thread::YieldProcessor();
+                Thread::yieldProcessor();
             }
         }
         else if (backoff < 28) {
-            Thread::Yield();
+            Thread::yield();
         }
 
-        Thread::Sleep(0);
+        Thread::sleep(0);
     }
 
     Thread::ReturnValue JobSystem::ThreadRun(const Thread& thread)
@@ -743,7 +743,7 @@ namespace V2
 
         {
             CriticalSection::ScopedLock lock(condCS_);
-            if (thread.ShouldRun()) // check after we got lock, as may have shutdown right away.
+            if (thread.shouldRun()) // check after we got lock, as may have shutdown right away.
             {
                 cond_.Wait(condCS_);
             }
@@ -752,7 +752,7 @@ namespace V2
 #endif // !X_ENABLE_JOBSYS_PROFILER
         }
 
-        while (thread.ShouldRun()) {
+        while (thread.shouldRun()) {
             Job* pJob = GetJob(threadQue);
             if (pJob) {
                 backoff = 0;

@@ -109,7 +109,7 @@ namespace techset
 
         if (loaded) {
             while (*pTechDefRef == nullptr) {
-                core::Thread::Sleep(1);
+                core::Thread::sleep(1);
             }
 
             if (*pTechDefRef == INVALID_TECH_SET_DEF) {

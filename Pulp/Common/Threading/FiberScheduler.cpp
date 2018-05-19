@@ -20,24 +20,24 @@ namespace Fiber
         void ThreadBackOff(int32_t& backoff)
         {
             if (backoff < 10 && backoff > 0) {
-                Thread::YieldProcessor();
+                Thread::yieldProcessor();
             }
             else if (backoff < 20) {
                 for (size_t i = 0; i != 50; i += 1) {
-                    Thread::YieldProcessor();
+                    Thread::yieldProcessor();
                 }
             }
             else if (backoff < 22) {
-                Thread::Yield();
+                Thread::yield();
             }
             else if (backoff < 28) {
-                Thread::Sleep(0);
+                Thread::sleep(0);
             }
             else if (backoff < 32) {
-                Thread::Sleep(1);
+                Thread::sleep(1);
             }
             else {
-                Thread::Sleep(5);
+                Thread::sleep(5);
             }
 
             backoff += 1;
@@ -122,7 +122,7 @@ namespace Fiber
         uint32_t numCores = pCpu->GetCoreCount();
         numThreads_ = core::Max(core::Min(HW_THREAD_MAX, numCores - HW_THREAD_NUM_DELTA), 1u);
 
-        startUpThreadId_ = core::Thread::GetCurrentID();
+        startUpThreadId_ = core::Thread::getCurrentID();
 
         if (!StartThreads()) {
             X_ERROR("Scheduler", "Failed to start worker threads");
@@ -142,13 +142,13 @@ namespace Fiber
 
         ++stop_;
 
-        uint32_t curThreadId = core::Thread::GetCurrentID();
+        uint32_t curThreadId = core::Thread::getCurrentID();
 
         Fiber::ConvertFiberToThread();
 
         uint32_t i;
         for (i = 0; i < numThreads_; i++) {
-            threads_[i].Stop();
+            threads_[i].stop();
         }
 
         if (startUpThreadId_ != curThreadId) {
@@ -158,25 +158,25 @@ namespace Fiber
 
             // wait for them to exit out.
             while (activeWorkers_ > 0) {
-                core::Thread::Yield();
+                core::Thread::yield();
             }
 
             // call join on any that are not this one.
             for (i = 0; i < numThreads_; i++) {
-                if (threads_[i].GetID() != curThreadId) {
-                    threads_[i].Join();
+                if (threads_[i].getID() != curThreadId) {
+                    threads_[i].join();
                 }
             }
 
             // update thread name
-            core::Thread::SetName(curThreadId, "MainThread");
+            core::Thread::setName(curThreadId, "MainThread");
 
             X_LOG2("Scheduler", "Main thread switched from: ^60x%x^7 to ^60x%x",
                 startUpThreadId_, curThreadId);
         }
         else {
             for (i = 0; i < numThreads_; i++) {
-                threads_[i].Join();
+                threads_[i].join();
             }
         }
 
@@ -279,7 +279,7 @@ namespace Fiber
             tasks_[priority].Unlock();
 
             if ((i + 1) != numBatches) {
-                core::Thread::YieldProcessor();
+                core::Thread::yieldProcessor();
             }
         }
 #endif
@@ -354,14 +354,14 @@ namespace Fiber
         }
 
         for (i = 0; i < numThreads_; i++) {
-            uint32_t threadId = threads_[i].GetID();
+            uint32_t threadId = threads_[i].getID();
             CreateFibersForThread(threadId);
         }
 
         mainThreadFiber_ = Fiber::ConvertThreadToFiber(nullptr);
 
         // make switch fibers for main thread
-        CreateFibersForThread(core::Thread::GetCurrentID());
+        CreateFibersForThread(core::Thread::getCurrentID());
 
         return mainThreadFiber_ != Fiber::InvalidFiberHandle;
     }
@@ -387,8 +387,8 @@ namespace Fiber
             core::StackString<64> name;
             name.appendFmt("Fiber::Scheduler::Worker_%i", i);
             threads_[i].setData(this);
-            threads_[i].Create(name.c_str()); // default stack size.
-            threads_[i].Start(ThreadRun);
+            threads_[i].create(name.c_str()); // default stack size.
+            threads_[i].start(ThreadRun);
         }
 
         activeWorkers_ = numThreads_;
@@ -433,7 +433,7 @@ namespace Fiber
 
     size_t Scheduler::GetCurrentThreadIndex(void) const
     {
-        uint32_t threadId = core::Thread::GetCurrentID();
+        uint32_t threadId = core::Thread::getCurrentID();
 
         for (size_t i = 0; i < threadToFiberIndex_.size(); i++) {
             if (threadToFiberIndex_[i].first == threadId) {

@@ -107,7 +107,7 @@ void XWinInput::Update(core::FrameData& frameData)
     const bool keyboardEnabled = pKeyBoard_->IsEnabled();
 
     // this only returns results for windows created on the same thread.
-    X_ASSERT(gEnv->mainThreadId == core::Thread::GetCurrentID(), "Input must be got from main thread")();
+    X_ASSERT(gEnv->mainThreadId == core::Thread::getCurrentID(), "Input must be got from main thread")();
 
     for (;;) {
         size = sizeof(input);
@@ -115,7 +115,7 @@ void XWinInput::Update(core::FrameData& frameData)
 
         // log size even if empty
         if (debug) {
-            X_LOG0("Input", "Buffer size: %i threadId: 0x%x", num, core::Thread::GetCurrentID());
+            X_LOG0("Input", "Buffer size: %i threadId: 0x%x", num, core::Thread::getCurrentID());
         }
 
         if (num == 0) {

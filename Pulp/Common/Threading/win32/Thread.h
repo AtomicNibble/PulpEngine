@@ -67,42 +67,42 @@ public:
     Thread(void);  // no thread is created.
     ~Thread(void); /// Calls Destroy() to stop and join the thread.
 
-    void Create(const char* pName, uint32_t stackSize = 0);
+    void create(const char* pName, uint32_t stackSize = 0);
 
-    /// \brief Destroys the OS thread by calling Stop() and Join().
-    /// \remark A new OS thread must be created before the thread can be started again.
-    void Destroy(void);
+    void destroy(void);
 
-    void Start(Function::Pointer function); // runs the thread with given function
-    void Stop(void);                        // tells the thread to stop dose not wait.
-    void Join(void);                        // waits till thread has finished.
+    void start(Function::Pointer function); // runs the thread with given function
+    void stop(void);                        // tells the thread to stop dose not wait.
+    void join(void);                        // waits till thread has finished.
 
-    bool ShouldRun(void) const volatile;
-    bool HasFinished(void) const volatile;
+    bool shouldRun(void) const volatile;
+    bool hasFinished(void) const volatile;
 
-    bool SetThreadAffinity(const AffinityFlags flags);
-    void SetFPE(FPE::Enum fpe);
+    bool setThreadAffinity(const AffinityFlags flags);
+    void setFPE(FPE::Enum fpe);
 
-    X_INLINE uint32_t GetID(void) const;
-    X_INLINE State::Enum GetState(void) const;
+    X_INLINE uint32_t getID(void) const;
+    X_INLINE State::Enum getState(void) const;
 
-    void CancelSynchronousIo(void);
+    void cancelSynchronousIo(void);
 
     X_INLINE void setData(void* pData);
     X_INLINE void* getData(void) const;
 
-    X_INLINE static void Sleep(uint32_t milliSeconds);
-    static bool SleepAlertable(uint32_t milliSeconds = INFINITE_SLEEP); // returns true if alerted
-    X_INLINE static void Yield(void);
-    X_INLINE static void YieldProcessor(void);
-    X_INLINE static void BackOff(int32_t backoffCount);
-    X_INLINE static uint32_t GetCurrentID(void);
-    static void Join(uint32_t threadId);
-    static void SetName(uint32_t threadId, const char* name);
+    X_INLINE static void sleep(uint32_t milliSeconds);
+    static bool sleepAlertable(uint32_t milliSeconds = INFINITE_SLEEP); // returns true if alerted
+    X_INLINE static void yield(void);
+    X_INLINE static void yieldProcessor(void);
+    X_INLINE static void backOff(int32_t backoffCount);
+    template<class Predicate>
+    X_INLINE static typename std::enable_if<std::is_function<Predicate>::value, void>::type backOff(Predicate p);
+    X_INLINE static uint32_t getCurrentID(void);
+    static void join(uint32_t threadId);
+    static void setName(uint32_t threadId, const char* name);
 
-    static Priority::Enum GetPriority(void);
-    static bool SetPriority(Priority::Enum priority);
-    static void SetFPE(uint32_t threadId, FPE::Enum fpe);
+    static Priority::Enum getPriority(void);
+    static bool setPriority(Priority::Enum priority);
+    static void setFPE(uint32_t threadId, FPE::Enum fpe);
 
 protected:
     bool createThreadInternal(uint32_t stackSize, LPTHREAD_START_ROUTINE func);
@@ -129,20 +129,20 @@ public:
 public:
     using Thread::Thread;
 
-    X_INLINE void Create(const char* pName, uint32_t stackSize = 0);
-    X_INLINE void Start(FunctionDelagate delagate);
+    X_INLINE void create(const char* pName, uint32_t stackSize = 0);
+    X_INLINE void start(FunctionDelagate delagate);
 
-    X_INLINE void Stop(void); // tells the thread to stop dose not wait.
-    X_INLINE void Join(void); // waits till thread has finished.
+    X_INLINE void stop(void); // tells the thread to stop dose not wait.
+    X_INLINE void join(void); // waits till thread has finished.
 
-    X_INLINE bool ShouldRun(void) const volatile;
-    X_INLINE bool HasFinished(void) const volatile;
+    X_INLINE bool shouldRun(void) const volatile;
+    X_INLINE bool hasFinished(void) const volatile;
 
-    X_INLINE bool SetThreadAffinity(const AffinityFlags flags);
-    X_INLINE void SetFPE(FPE::Enum fpe);
+    X_INLINE bool setThreadAffinity(const AffinityFlags flags);
+    X_INLINE void setFPE(FPE::Enum fpe);
 
-    X_INLINE uint32_t GetID(void) const;
-    X_INLINE State::Enum GetState(void) const;
+    X_INLINE uint32_t getID(void) const;
+    X_INLINE State::Enum getState(void) const;
 
     X_INLINE void setData(void* pData);
     X_INLINE void* getData(void) const;
@@ -162,15 +162,15 @@ class ThreadAbstract
 public:
     ThreadAbstract();
 
-    void Create(const char* name, uint32_t stackSize = 0);
-    void Start(void); // runs the thread
-    void Stop(void);  // tells the thread to stop dose not wait.
-    void Join(void);  // waits till thread has finished.
+    void create(const char* name, uint32_t stackSize = 0);
+    void start(void); // runs the thread
+    void stop(void);  // tells the thread to stop dose not wait.
+    void join(void);  // waits till thread has finished.
 
-    uint32_t GetID(void) const;
-    Thread::State::Enum GetState(void) const;
+    uint32_t getID(void) const;
+    Thread::State::Enum getState(void) const;
 
-    void CancelSynchronousIo(void);
+    void cancelSynchronousIo(void);
 
 protected:
     virtual ~ThreadAbstract();

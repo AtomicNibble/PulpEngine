@@ -74,7 +74,7 @@ bool RootSignatureDeviceCache::compile(D3D12_ROOT_SIGNATURE_DESC& rootDesc, Root
     else {
         // if might of been inserted but not finished compiling, so wait.
         while (*pRootSigRef == nullptr) {
-            core::Thread::Yield();
+            core::Thread::yield();
         }
         *pSignature = *pRootSigRef;
     }

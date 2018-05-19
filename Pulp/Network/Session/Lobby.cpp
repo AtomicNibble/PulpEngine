@@ -691,7 +691,7 @@ void Lobby::addLocalUsers(void)
     user.guid = localGuid;
     user.address = address;
     user.username.set(core::strUtil::Convert(nameStr, buffer));
-    user.username.appendFmt("_%" PRIx32, core::Process::GetCurrentID());
+    user.username.appendFmt("_%" PRIx32, core::Process::getCurrentID());
     users_.emplace_back(user);
 
     X_ASSERT(users_.isNotEmpty(), "User list empty")(users_.size());

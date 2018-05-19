@@ -2,12 +2,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
-X_INLINE uint32_t Thread::GetID(void) const
+X_INLINE uint32_t Thread::getID(void) const
 {
     return ::GetThreadId(handle_);
 }
 
-X_INLINE Thread::State::Enum Thread::GetState(void) const
+X_INLINE Thread::State::Enum Thread::getState(void) const
 {
     return state_;
 }
@@ -22,18 +22,18 @@ X_INLINE void* Thread::getData(void) const
     return pData_;
 }
 
-X_INLINE void Thread::Sleep(uint32_t milliSeconds)
+X_INLINE void Thread::sleep(uint32_t milliSeconds)
 {
     ::Sleep(milliSeconds);
 }
 
-X_INLINE void Thread::Yield(void)
+X_INLINE void Thread::yield(void)
 {
     // http://msdn.microsoft.com/en-us/library/windows/desktop/ms686352(v=vs.85).aspx
     ::SwitchToThread();
 }
 
-X_INLINE void Thread::YieldProcessor(void)
+X_INLINE void Thread::yieldProcessor(void)
 {
     // about a 9 cycle delay
 #if !defined(__midl) && !defined(GENUTIL) && !defined(_GENIA64_) && defined(_IA64_)
@@ -43,28 +43,37 @@ X_INLINE void Thread::YieldProcessor(void)
 #endif
 }
 
-X_INLINE void Thread::BackOff(int32_t backoff)
+X_INLINE void Thread::backOff(int32_t backoff)
 {
     if (backoff < 10 && backoff > 0) {
-        Thread::YieldProcessor();
+        Thread::yieldProcessor();
     }
     else if (backoff < 20) {
         for (size_t i = 0; i != 50; i += 1) {
-            Thread::YieldProcessor();
+            Thread::yieldProcessor();
         }
     }
     else if (backoff < 28) {
-        Thread::Yield();
+        Thread::yield();
     }
     else if (backoff < 10) {
-        Thread::Sleep(0);
+        Thread::sleep(0);
     }
 
     // rip
-    Thread::Sleep(1);
+    Thread::sleep(1);
 }
 
-X_INLINE uint32_t Thread::GetCurrentID(void)
+template<class Predicate>
+X_INLINE typename std::enable_if<std::is_function<Predicate>::value, void>::type Thread::backOff(Predicate p)
+{
+    int32_t backOff = 0;
+    while (p()) {
+        backOff(backOff);
+    }
+}
+
+X_INLINE uint32_t Thread::getCurrentID(void)
 {
     return ::GetCurrentThreadId();
 }
@@ -72,7 +81,7 @@ X_INLINE uint32_t Thread::GetCurrentID(void)
 // ----------------------------------------
 
 template<class T>
-X_INLINE void ThreadMember<T>::Create(const char* pName, uint32_t stackSize)
+X_INLINE void ThreadMember<T>::create(const char* pName, uint32_t stackSize)
 {
     name_.set(pName);
 
@@ -86,65 +95,65 @@ X_INLINE void ThreadMember<T>::Create(const char* pName, uint32_t stackSize)
 }
 
 template<class T>
-X_INLINE void ThreadMember<T>::Start(FunctionDelagate delagate)
+X_INLINE void ThreadMember<T>::start(FunctionDelagate delagate)
 {
     delagate_ = delagate;
     state_ = State::RUNNING;
 
-    if (ResumeThread(handle_) == (DWORD)-1) {
+    if (::ResumeThread(handle_) == (DWORD)-1) {
         lastError::Description Dsc;
         X_ERROR("Thread", "failed to start thread. Erorr: %s", lastError::ToString(Dsc));
     }
 
-    Thread::SetName(GetID(), name_.c_str());
+    Thread::setName(getID(), name_.c_str());
 }
 
 template<class T>
-X_INLINE void ThreadMember<T>::Stop(void)
+X_INLINE void ThreadMember<T>::stop(void)
 {
-    Thread::Stop();
+    Thread::stop();
 }
 
 template<class T>
-X_INLINE void ThreadMember<T>::Join(void)
+X_INLINE void ThreadMember<T>::join(void)
 {
-    Thread::Join();
+    Thread::join();
 }
 
 template<class T>
-X_INLINE bool ThreadMember<T>::ShouldRun(void) const volatile
+X_INLINE bool ThreadMember<T>::shouldRun(void) const volatile
 {
-    return Thread::ShouldRun();
+    return Thread::shouldRun();
 }
 
 template<class T>
-X_INLINE bool ThreadMember<T>::HasFinished(void) const volatile
+X_INLINE bool ThreadMember<T>::hasFinished(void) const volatile
 {
-    return Thread::HasFinished();
+    return Thread::hasFinished();
 }
 
 template<class T>
-X_INLINE bool ThreadMember<T>::SetThreadAffinity(const AffinityFlags flags)
+X_INLINE bool ThreadMember<T>::setThreadAffinity(const AffinityFlags flags)
 {
-    return Thread::SetThreadAffinity(flags);
+    return Thread::setThreadAffinity(flags);
 }
 
 template<class T>
-X_INLINE void ThreadMember<T>::SetFPE(FPE::Enum fpe)
+X_INLINE void ThreadMember<T>::setFPE(FPE::Enum fpe)
 {
-    Thread::SetFPE(fpe);
+    Thread::setFPE(fpe);
 }
 
 template<class T>
-X_INLINE uint32_t ThreadMember<T>::GetID(void) const
+X_INLINE uint32_t ThreadMember<T>::getID(void) const
 {
-    return Thread::GetID();
+    return Thread::getID();
 }
 
 template<class T>
-X_INLINE Thread::State::Enum ThreadMember<T>::GetState(void) const
+X_INLINE Thread::State::Enum ThreadMember<T>::getState(void) const
 {
-    return Thread::GetState();
+    return Thread::getState();
 }
 
 template<class T>
