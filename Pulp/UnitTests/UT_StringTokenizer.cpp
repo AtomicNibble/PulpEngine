@@ -13,9 +13,9 @@ TEST(StringTokenizer, Narrow)
 
     core::StringTokenizer<char> tokenizer(text, text + sizeof(text), L'=');
     core::StringRange<char> valueName(nullptr, nullptr);
-    const bool foundValueName = tokenizer.ExtractToken(valueName);
+    const bool foundValueName = tokenizer.extractToken(valueName);
     core::StringRange<char> value(nullptr, nullptr);
-    const bool foundValue = tokenizer.ExtractToken(value);
+    const bool foundValue = tokenizer.extractToken(value);
 
     ASSERT_TRUE(foundValueName);
     ASSERT_TRUE(foundValue);
@@ -32,9 +32,9 @@ TEST(StringTokenizer, Wide)
 
     core::StringTokenizer<wchar_t> tokenizer(text, text + sizeof(text), L'=');
     core::StringRange<wchar_t> valueName(nullptr, nullptr);
-    const bool foundValueName = tokenizer.ExtractToken(valueName);
+    const bool foundValueName = tokenizer.extractToken(valueName);
     core::StringRange<wchar_t> value(nullptr, nullptr);
-    const bool foundValue = tokenizer.ExtractToken(value);
+    const bool foundValue = tokenizer.extractToken(value);
 
     ASSERT_TRUE(foundValueName);
     ASSERT_TRUE(foundValue);

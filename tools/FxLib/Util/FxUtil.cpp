@@ -84,7 +84,7 @@ namespace fx
 
             StageFlags flags;
 
-            while (tokens.ExtractToken(token)) {
+            while (tokens.extractToken(token)) {
                 static_assert(StageFlag::FLAGS_COUNT == 14, "Added more flags? this needs updating");
 
                 switch (core::Hash::Fnv1aHash(token.getStart(), token.getLength())) {

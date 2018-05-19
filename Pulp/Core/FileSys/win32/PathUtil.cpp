@@ -200,7 +200,7 @@ namespace PathUtil
         core::StringTokenizer<wchar_t> tokenizer(pDir, pDir + core::strUtil::strlen(pDir), Path::NATIVE_SLASH_W);
         core::StringRange<wchar_t> range(nullptr, nullptr);
 
-        while (tokenizer.ExtractToken(range)) {
+        while (tokenizer.extractToken(range)) {
             path.append(range.getStart(), range.getEnd());
 
             if (!DoesDirectoryExist(path)) {

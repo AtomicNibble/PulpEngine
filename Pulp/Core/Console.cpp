@@ -622,13 +622,13 @@ void XConsole::saveChangedVars(void)
                 StringRange<char> line(nullptr, nullptr);
 
                 // we save this file so it should only have 'seta' in but lets not error if something else.
-                while (tokenizer.ExtractToken(line)) {
+                while (tokenizer.extractToken(line)) {
                     core::StringTokenizer<char> lineTokenizer(line.getStart(), line.getEnd(), ' ');
                     StringRange<char> token(nullptr, nullptr);
 
-                    if (lineTokenizer.ExtractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
+                    if (lineTokenizer.extractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
                         // get the name.
-                        if (lineTokenizer.ExtractToken(token)) {
+                        if (lineTokenizer.extractToken(token)) {
                             // work out if we have this var.
                             core::StackString256 name(token.getStart(), token.getEnd());
 
@@ -1193,7 +1193,7 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
     // lets not clear, we can append and just pop off end if too many in total.
     // CmdHistory_.clear();
 
-    while (tokenizer.ExtractToken(range)) {
+    while (tokenizer.extractToken(range)) {
         if (range.getLength() > 0) {
             CmdHistory_.emplace_front(core::string(range.getStart(), range.getEnd()));
         }

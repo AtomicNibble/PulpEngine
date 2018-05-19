@@ -192,7 +192,7 @@ namespace shader
             // need to split them into defins.
             core::StringRange<char> token(nullptr, nullptr);
             core::StringTokenizer<char> tokens(customDefines_.begin(), customDefines_.end(), ',');
-            while (tokens.ExtractToken(token)) {
+            while (tokens.extractToken(token)) {
                 const size_t tokenLen = token.getLength();
 
                 if (macroBufIdx + tokenLen > macroBuffer.size()) {

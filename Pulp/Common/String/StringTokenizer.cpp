@@ -4,8 +4,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \brief Constructs a string tokenizer for the given range of characters.
-/// \remark Ownership of the provided arguments stays at the calling site.
 template<typename TChar>
 StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar* endExclusive,
     TChar delimiter) :
@@ -13,14 +11,13 @@ StringTokenizer<TChar>::StringTokenizer(const TChar* startInclusive, const TChar
     end_(endExclusive),
     delimiter_(delimiter)
 {
-    while (*start_ == delimiter && start_ < end_)
+    while (*start_ == delimiter && start_ < end_) {
         ++start_;
+    }
 }
 
-/// \brief Tries to extract the next token, and returns whether a token could be found or not.
-/// \remark If no token could be extracted, no assumptions should be made about the contents of \a range.
 template<typename TChar>
-bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
+bool StringTokenizer<TChar>::extractToken(StringRange<TChar>& range)
 {
     bool result = false;
 
@@ -31,27 +28,31 @@ bool StringTokenizer<TChar>::ExtractToken(StringRange<TChar>& range)
     const TChar* lastnon;
 
     if (start_ < end_) {
-        tokenBegin = this->start_;
+        tokenBegin = start_;
 
-        while (*this->start_ != this->delimiter_ && this->start_ < this->end_)
-            ++this->start_;
+        while (*start_ != delimiter_ && start_ < end_) {
+            ++start_;
+        }
 
-        tokenEnd = this->start_;
+        tokenEnd = start_;
 
-        while (*this->start_ == this->delimiter_ && this->start_ < this->end_)
-            ++this->start_;
+        while (*start_ == delimiter_ && start_ < end_) {
+            ++start_;
+        }
 
         nonWhitespace = strUtil::FindNonWhitespace(tokenBegin, tokenEnd);
 
-        if (nonWhitespace)
+        if (nonWhitespace) {
             tokenBegin = nonWhitespace;
+        }
 
         lastnon = strUtil::FindLastNonWhitespace(tokenBegin, tokenEnd);
 
         lastNonWhitespace = lastnon + 1;
 
-        if (lastnon != nullptr)
+        if (lastnon != nullptr) {
             tokenEnd = lastNonWhitespace;
+        }
 
         range = StringRange<TChar>(tokenBegin, tokenEnd);
 

@@ -2952,7 +2952,7 @@ bool AssetDB::ValidName(const core::string& name)
     core::StringTokenizer<char> tokenize(name.begin(), name.end(), ASSET_NAME_SLASH);
     core::StringRange<char> token(nullptr, nullptr);
 
-    while (tokenize.ExtractToken(token)) {
+    while (tokenize.extractToken(token)) {
         // don't allow "name\\post_double"
         if (token.getLength() < 1) {
             return false;
