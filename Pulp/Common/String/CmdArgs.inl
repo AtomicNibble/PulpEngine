@@ -101,7 +101,7 @@ bool CmdArgs<BUF_SIZE, char>::hasFlag(const char* pFlag) const
 }
 
 template<size_t BUF_SIZE>
-void CmdArgs<BUF_SIZE, char>::AppendArg(const char* pArg)
+void CmdArgs<BUF_SIZE, char>::appendArg(const char* pArg)
 {
     const size_t argLen = strlen(pArg);
 
@@ -242,7 +242,7 @@ bool CmdArgs<BUF_SIZE, wchar_t>::hasFlag(const wchar_t* pFlag) const
 }
 
 template<size_t BUF_SIZE>
-void CmdArgs<BUF_SIZE, wchar_t>::AppendArg(const wchar_t* pArg)
+void CmdArgs<BUF_SIZE, wchar_t>::appendArg(const wchar_t* pArg)
 {
     const size_t argLen = wcslen(pArg);
 

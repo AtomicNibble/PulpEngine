@@ -660,13 +660,13 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 
         const wchar_t* pArg = args.getArgv(i);
         if ((*pArg == L'+' || *pArg == L'-') && core::strUtil::strlen(pArg) > 1) {
-            args_.AddOne().AppendArg(args.getArgv(i) + 1);
+            args_.AddOne().appendArg(args.getArgv(i) + 1);
         }
         else {
             if (args_.isEmpty()) {
                 args_.AddOne();
             }
-            args_[args_.size() - 1].AppendArg(args.getArgv(i));
+            args_[args_.size() - 1].appendArg(args.getArgv(i));
         }
     }
 

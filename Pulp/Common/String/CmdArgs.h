@@ -26,7 +26,7 @@ public:
     // check if a flag is present.
     X_INLINE bool hasFlag(const TChar* pFlag) const;
 
-    X_INLINE void AppendArg(const TChar* pArg);
+    X_INLINE void appendArg(const TChar* pArg);
 
 private:
     X_INLINE void tokenize(const TChar* pText);
@@ -56,7 +56,7 @@ public:
     // check if a flag is present.
     X_INLINE bool hasFlag(const char* pFlag) const;
 
-    X_INLINE void AppendArg(const char* pArg);
+    X_INLINE void appendArg(const char* pArg);
 
 private:
     X_INLINE void tokenize(const char* pText);
@@ -86,7 +86,7 @@ public:
     // check if a flag is present.
     X_INLINE bool hasFlag(const wchar_t* pFlag) const;
 
-    X_INLINE void AppendArg(const wchar_t* pArg);
+    X_INLINE void appendArg(const wchar_t* pArg);
 
 private:
     X_INLINE void tokenize(const wchar_t* pText);
