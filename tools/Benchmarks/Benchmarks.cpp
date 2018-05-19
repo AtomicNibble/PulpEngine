@@ -58,9 +58,9 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
     X_UNUSED(hPrevInstance, nCmdShow);
 
     core::Console console(L"Engine Benchmark Log");
-    console.RedirectSTD();
-    console.SetSize(150, 60, 8000);
-    console.MoveTo(10, 10);
+    console.redirectSTD();
+    console.setSize(150, 60, 8000);
+    console.moveTo(10, 10);
 
     BenchmarkArena::AllocationPolicy allocator;
     BenchmarkArena arena(&allocator, "BenchmarkArena");
@@ -78,7 +78,7 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
             ::benchmark::RunSpecifiedBenchmarks();
 
             if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, "-CI")) {
-                console.PressToContinue();
+                console.pressToContinue();
             }
         }
     }

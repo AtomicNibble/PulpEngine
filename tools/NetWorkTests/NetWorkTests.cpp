@@ -91,7 +91,7 @@ namespace
             // sleep, as other thread will handle incoming requests and buffer then for us.
             core::Thread::sleep(50);
 
-            char key = Console.ReadKey();
+            char key = Console.readKey();
             if (key == 'X') {
                 break;
             }
@@ -108,18 +108,18 @@ namespace
         bool isServer = true;
 
         X_LOG0("ServerTest", "Press enter for server mode or c+enter for client");
-        char key = Console.ReadKeyBlocking();
+        char key = Console.readKeyBlocking();
         if (key == 'C' || key == 'c') {
             isServer = false;
         }
 
         if (isServer) {
-            Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
-            Console.MoveTo(3000, 10);
+            Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
+            Console.moveTo(3000, 10);
         }
         else {
-            Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
-            Console.MoveTo(3000, 800);
+            Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
+            Console.moveTo(3000, 800);
         }
 
         run(Console, pPeer, isServer);
@@ -132,8 +132,8 @@ namespace
         net::INet* pNet = gEnv->pNet;
         net::IPeer* pPeer = pNet->createPeer();
 
-        Console.SetTitle(X_WIDEN(X_ENGINE_NAME) L" - EchoServer");
-        Console.MoveTo(3000, 10);
+        Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - EchoServer");
+        Console.moveTo(3000, 10);
 
         X_LOG0("EchoServer", "Starting...");
 
@@ -178,7 +178,7 @@ namespace
             // sleep, as other thread will handle incoming requests and buffer then for us.
             core::Thread::sleep(10);
 
-            char key = Console.ReadKey();
+            char key = Console.readKey();
             if (key == 'X') {
                 break;
             }
@@ -216,9 +216,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     {
         core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Network Tests");
-        Console.RedirectSTD();
-        Console.SetSize(60, 40, 2000);
-        Console.MoveTo(10, 10);
+        Console.redirectSTD();
+        Console.setSize(60, 40, 2000);
+        Console.moveTo(10, 10);
 
         core::MallocFreeAllocator allocator;
         ServerTestArena arena(&allocator, "NetworkTestArena");
@@ -275,7 +275,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
         }
 
-        Console.PressToContinue();
+        Console.pressToContinue();
         engine.ShutDown();
     }
 

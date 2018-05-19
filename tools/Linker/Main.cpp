@@ -91,9 +91,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ int nCmdShow)
 {
     core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Linker");
-    Console.RedirectSTD();
-    Console.SetSize(90, 40, 2000);
-    Console.MoveTo(10, 10);
+    Console.redirectSTD();
+    Console.setSize(90, 40, 2000);
+    Console.moveTo(10, 10);
 
     core::MallocFreeAllocator allocator;
     LinkerArena arena(&allocator, "LinkerArena");
@@ -140,7 +140,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 X_ERROR("Linker", "Failed to init linker");
             }
 
-            Console.PressToContinue();
+            Console.pressToContinue();
         }
     }
 

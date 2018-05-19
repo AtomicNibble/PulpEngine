@@ -727,8 +727,8 @@ bool XCore::InitLogging(const SCoreInitParams& initParams)
             }
             else {
                 pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
-                pConsole_->SetSize(120, 60, 8000);
-                pConsole_->MoveTo(10, 10);
+                pConsole_->setSize(120, 60, 8000);
+                pConsole_->moveTo(10, 10);
             }
 
             //	if (!initParams.bTesting) {

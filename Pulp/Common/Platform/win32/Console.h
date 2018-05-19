@@ -6,14 +6,8 @@
 #include "Math\XAlignment.h"
 #include "Math\XPair.h"
 
-// #include "Types/Rectangle.h"
-
 X_NAMESPACE_BEGIN(core)
 
-/// \ingroup Platform
-/// \brief A class for manipulating Windows-specific consoles.
-/// \remark Only one instance of this class should be created because Windows does not allow more than one console
-/// to be created in a system process.
 class Console
 {
 public:
@@ -21,56 +15,30 @@ public:
     typedef Vec2i Position;
     typedef Recti Rect;
 
-    /// \brief Constructs a console with the given title.
-    /// \details Standard handles like stdout, stdin and stderr will be redirected to the console. Additionally, the
-    /// console will try to set the icon with the resource ID 101.
     explicit Console(const wchar_t* title);
 
-    /// Frees all resources.
     ~Console(void);
 
-    /// Sets the console title.
-    void SetTitle(const wchar_t* title);
+    void setTitle(const wchar_t* title);
+    void setSize(uint32_t windowWidth, uint32_t windowHeight, uint32_t numLines);
+    void setCursorPosition(uint32_t x, uint32_t y);
+    void moveTo(int x, int y);
+    void moveTo(const Position& position);
 
-    /// \brief Sets the console window size and number of lines stored internally, in character units.
-    void SetSize(unsigned int windowWidth, unsigned int windowHeight, unsigned int numLines);
+    void alignTo(const Rect& xRect, AlignmentFlags alignment);
 
-    /// Sets the cursor position inside the console, in character units.
-    void SetCursorPosition(unsigned int x, unsigned int y);
+    Rect getRect(void) const;
 
-    /// Moves the console window to a certain position, in pixel units.
-    void MoveTo(int x, int y);
+    char readKey(void) const;
+    char readKeyBlocking(void) const;
 
-    /// Moves the console window to a certain position, in pixel units.
-    void MoveTo(const Position& position);
+    void show(bool show);
 
-    /// Aligns the console window to any xRect.
-    void AlignTo(const Rect& xRect, AlignmentFlags alignment);
+    void redirectSTD(void);
+    void pressToContinue(void) const;
 
-    /// Returns the console xRect, in pixel units.
-    Rect GetRect(void) const;
-
-    /// \brief Tries to read a key from the console, and returns its virtual key-code.
-    /// \details Returns 0 if no key has been pressed.
-    char ReadKey(void) const;
-    /// blocks untill gets a key from console
-    char ReadKeyBlocking(void) const;
-
-    /// Shows/hides the console window.
-    void Show(bool show);
-
-    /// Redirects the std logging (output,error)
-    void RedirectSTD(void);
-
-    void PressToContinue(void) const;
-
-    /// \brief Returns the native console object.
-    /// \remark For internal use only.
-    inline HANDLE GetNativeConsole(void) const;
-
-    /// \brief Returns the native console window handle.
-    /// \remark For internal use only.
-    inline HWND GetNativeConsoleWindow(void) const;
+    inline HANDLE getNativeConsole(void) const;
+    inline PLATFORM_HWND getNativeConsoleWindow(void) const;
 
 private:
     X_NO_COPY(Console);
@@ -78,7 +46,7 @@ private:
 
     HANDLE console_;
     HANDLE consoleInput_;
-    HWND window_;
+    PLATFORM_HWND window_;
     FILE* stdout_;
     FILE* stdin_;
     FILE* stderr_;

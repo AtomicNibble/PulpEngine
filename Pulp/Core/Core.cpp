@@ -305,7 +305,7 @@ void XCore::ShutDown()
 
 #if X_ENABLE_LOGGING
     if (!initParams_.bTesting && initParams_.bPauseShutdown && pConsole_) { // don't pause when testing.
-        pConsole_->PressToContinue();
+        pConsole_->pressToContinue();
     }
 #endif // !X_ENABLE_LOGGING
 

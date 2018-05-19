@@ -102,7 +102,7 @@ Console::Console(const wchar_t* title) :
         return;
     }
 
-    SetTitle(title);
+    setTitle(title);
 }
 
 /// Frees all resources.
@@ -129,13 +129,13 @@ Console::~Console(void)
 }
 
 /// Sets the console title.
-void Console::SetTitle(const wchar_t* title)
+void Console::setTitle(const wchar_t* title)
 {
-    SetConsoleTitleW(title);
+    ::SetConsoleTitleW(title);
 }
 
 /// \brief Sets the console window size and number of lines stored internally, in character units.
-void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsigned int numLines)
+void Console::setSize(uint32_t windowWidth, uint32_t windowHeight, uint32_t numLines)
 {
     lastError::Description Dsc;
     CONSOLE_SCREEN_BUFFER_INFO Info;
@@ -184,8 +184,7 @@ void Console::SetSize(unsigned int windowWidth, unsigned int windowHeight, unsig
     }
 }
 
-/// Sets the cursor position inside the console, in character units.
-void Console::SetCursorPosition(unsigned int x, unsigned int y)
+void Console::setCursorPosition(uint32_t x, uint32_t y)
 {
     if (!SetConsoleCursorPosition(console_, GetCoord(x, y))) {
         lastError::Description Dsc;
@@ -193,8 +192,7 @@ void Console::SetCursorPosition(unsigned int x, unsigned int y)
     }
 }
 
-/// Moves the console window to a certain position, in pixel units.
-void Console::MoveTo(int x, int y)
+void Console::moveTo(int x, int y)
 {
     RECT rec;
     GetWindowRect(window_, &rec);
@@ -208,20 +206,17 @@ void Console::MoveTo(int x, int y)
     }
 }
 
-/// Moves the console window to a certain position, in pixel units.
-void Console::MoveTo(const Position& position)
+void Console::moveTo(const Position& position)
 {
-    MoveTo(position.x, position.y);
+    moveTo(position.x, position.y);
 }
 
-/// Aligns the console window to any xRect.
-void Console::AlignTo(const Rect& xRect, AlignmentFlags alignment)
+void Console::alignTo(const Rect& xRect, AlignmentFlags alignment)
 {
-    MoveTo(GetRect().Align(xRect, alignment).getUpperLeft());
+    moveTo(getRect().Align(xRect, alignment).getUpperLeft());
 }
 
-/// Returns the console xRect, in pixel units.
-Console::Rect Console::GetRect(void) const
+Console::Rect Console::getRect(void) const
 {
     RECT rec;
     GetWindowRect(window_, &rec);
@@ -232,9 +227,7 @@ Console::Rect Console::GetRect(void) const
     return Rect(rec.left, rec.top, rec.right, rec.bottom);
 }
 
-/// \brief Tries to read a key from the console, and returns its virtual key-code.
-/// \details Returns 0 if no key has been pressed.
-char Console::ReadKey(void) const
+char Console::readKey(void) const
 {
     lastError::Description Dsc;
     DWORD NumEvents;
@@ -265,7 +258,7 @@ char Console::ReadKey(void) const
     return 0;
 }
 
-char Console::ReadKeyBlocking(void) const
+char Console::readKeyBlocking(void) const
 {
     INPUT_RECORD InputInfo;
     DWORD NumEventsRead;
@@ -283,13 +276,12 @@ char Console::ReadKeyBlocking(void) const
     return 0;
 }
 
-/// Shows/hides the console window.
-void Console::Show(bool show)
+void Console::show(bool show)
 {
     ShowWindow(window_, (show ? SW_SHOW : SW_HIDE));
 }
 
-void Console::RedirectSTD(void)
+void Console::redirectSTD(void)
 {
 #if _MSC_FULL_VER >= 190023026
     // shit got broken in vs2015 toolset v140
@@ -327,7 +319,7 @@ void Console::RedirectSTD(void)
 #endif // !_MSC_FULL_VER
 }
 
-void Console::PressToContinue(void) const
+void Console::pressToContinue(void) const
 {
     if (gEnv && gEnv->pLog) {
         X_LOG0("Console", "Press to continue");

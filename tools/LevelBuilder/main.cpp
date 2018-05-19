@@ -72,8 +72,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
         level::g_arena = &arena;
 
         core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
-        Console.SetSize(150, 60, 8000);
-        Console.MoveTo(10, 10);
+        Console.setSize(150, 60, 8000);
+        Console.moveTo(10, 10);
 
         {
             EngineApp engine;

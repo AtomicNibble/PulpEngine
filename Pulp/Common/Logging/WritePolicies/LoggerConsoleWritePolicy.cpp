@@ -78,7 +78,7 @@ namespace
 } // namespace
 
 LoggerConsoleWritePolicy::LoggerConsoleWritePolicy(const Console& console) :
-    console_(console.GetNativeConsole()),
+    console_(console.getNativeConsole()),
     cs_(50)
 {
 }
