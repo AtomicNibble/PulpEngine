@@ -64,15 +64,6 @@ X_INLINE void Thread::backOff(int32_t backoff)
     Thread::sleep(1);
 }
 
-template<class Predicate>
-X_INLINE typename std::enable_if<std::is_function<Predicate>::value, void>::type Thread::backOff(Predicate p)
-{
-    int32_t backOff = 0;
-    while (p()) {
-        backOff(backOff);
-    }
-}
-
 X_INLINE uint32_t Thread::getCurrentID(void)
 {
     return ::GetCurrentThreadId();

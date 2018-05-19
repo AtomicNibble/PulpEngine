@@ -94,8 +94,6 @@ public:
     X_INLINE static void yield(void);
     X_INLINE static void yieldProcessor(void);
     X_INLINE static void backOff(int32_t backoffCount);
-    template<class Predicate>
-    X_INLINE static typename std::enable_if<std::is_function<Predicate>::value, void>::type backOff(Predicate p);
     X_INLINE static uint32_t getCurrentID(void);
     static void join(uint32_t threadId);
     static void setName(uint32_t threadId, const char* name);
