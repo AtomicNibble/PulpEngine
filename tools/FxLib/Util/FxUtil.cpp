@@ -87,7 +87,7 @@ namespace fx
             while (tokens.ExtractToken(token)) {
                 static_assert(StageFlag::FLAGS_COUNT == 14, "Added more flags? this needs updating");
 
-                switch (core::Hash::Fnv1aHash(token.GetStart(), token.GetLength())) {
+                switch (core::Hash::Fnv1aHash(token.getStart(), token.getLength())) {
                     case "Looping"_fnv1a:
                         flags.Set(StageFlag::Looping);
                         break;
@@ -131,7 +131,7 @@ namespace fx
                         flags.Set(StageFlag::SpawnCylindrical);
                         break;
                     default:
-                        X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.GetLength(), token.GetStart());
+                        X_ERROR("Fx", "Unknown flag: \"%.*s\"", token.getLength(), token.getStart());
                         break;
                 }
             }

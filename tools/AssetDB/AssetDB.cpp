@@ -2954,12 +2954,12 @@ bool AssetDB::ValidName(const core::string& name)
 
     while (tokenize.ExtractToken(token)) {
         // don't allow "name\\post_double"
-        if (token.GetLength() < 1) {
+        if (token.getLength() < 1) {
             return false;
         }
 
-        const auto len = token.GetLength();
-        const auto pSrc = token.GetStart();
+        const auto len = token.getLength();
+        const auto pSrc = token.getStart();
 
         size_t i = 0;
         if (pSrc[i] == ASSET_NAME_PREFIX) {

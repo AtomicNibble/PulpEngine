@@ -13,14 +13,14 @@ TEST(StringRange, Construct)
     core::StringRange<char> range2(text, text + strlen(text) / 2);
     core::StringRange<char> range3(text, strlen(text) - 1);
 
-    EXPECT_EQ(0, range.GetLength());
-    EXPECT_EQ(20, range1.GetLength());
-    EXPECT_EQ(10, range2.GetLength());
-    EXPECT_EQ(19, range3.GetLength());
+    EXPECT_EQ(0, range.getLength());
+    EXPECT_EQ(20, range1.getLength());
+    EXPECT_EQ(10, range2.getLength());
+    EXPECT_EQ(19, range3.getLength());
 
-    EXPECT_TRUE(core::strUtil::IsEqual(range1.GetStart(), range1.GetEnd(), text));
-    EXPECT_TRUE(core::strUtil::IsEqual(range2.GetStart(), range2.GetEnd(), text, text + 10));
-    EXPECT_TRUE(core::strUtil::IsEqual(range3.GetStart(), range3.GetEnd(), text, text + 19));
+    EXPECT_TRUE(core::strUtil::IsEqual(range1.getStart(), range1.getEnd(), text));
+    EXPECT_TRUE(core::strUtil::IsEqual(range2.getStart(), range2.getEnd(), text, text + 10));
+    EXPECT_TRUE(core::strUtil::IsEqual(range3.getStart(), range3.getEnd(), text, text + 19));
 }
 
 TEST(StringRange, ConstructW)
@@ -32,14 +32,14 @@ TEST(StringRange, ConstructW)
     core::StringRange<wchar_t> range2(text, text + core::strUtil::strlen(text) / 2);
     core::StringRange<wchar_t> range3(text, core::strUtil::strlen(text) - 1);
 
-    EXPECT_EQ(0, range.GetLength());
-    EXPECT_EQ(20, range1.GetLength());
-    EXPECT_EQ(10, range2.GetLength());
-    EXPECT_EQ(19, range3.GetLength());
+    EXPECT_EQ(0, range.getLength());
+    EXPECT_EQ(20, range1.getLength());
+    EXPECT_EQ(10, range2.getLength());
+    EXPECT_EQ(19, range3.getLength());
 
-    EXPECT_TRUE(core::strUtil::IsEqual(range1.GetStart(), range1.GetEnd(), text));
-    EXPECT_TRUE(core::strUtil::IsEqual(range2.GetStart(), range2.GetEnd(), text, text + 10));
-    EXPECT_TRUE(core::strUtil::IsEqual(range3.GetStart(), range3.GetEnd(), text, text + 19));
+    EXPECT_TRUE(core::strUtil::IsEqual(range1.getStart(), range1.getEnd(), text));
+    EXPECT_TRUE(core::strUtil::IsEqual(range2.getStart(), range2.getEnd(), text, text + 10));
+    EXPECT_TRUE(core::strUtil::IsEqual(range3.getStart(), range3.getEnd(), text, text + 19));
 }
 
 TEST(StringRange, Find)
@@ -51,10 +51,10 @@ TEST(StringRange, Find)
     core::StringRange<char> range2(text, text + core::strUtil::strlen(text) / 2);
     core::StringRange<char> range3(text, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 10) == range1.Find("pickle"));
-    EXPECT_TRUE(nullptr == range2.Find("plz"));
-    EXPECT_TRUE(nullptr == range3.Find("plz"));
-    EXPECT_TRUE((text + 17) == range3.Find("pl"));
+    EXPECT_TRUE((text + 10) == range1.find("pickle"));
+    EXPECT_TRUE(nullptr == range2.find("plz"));
+    EXPECT_TRUE(nullptr == range3.find("plz"));
+    EXPECT_TRUE((text + 17) == range3.find("pl"));
 }
 
 TEST(StringRange, FindW)
@@ -66,10 +66,10 @@ TEST(StringRange, FindW)
     core::StringRange<wchar_t> range2(text, text + core::strUtil::strlen(text) / 2);
     core::StringRange<wchar_t> range3(text, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 10) == range1.Find(L"pickle"));
-    EXPECT_TRUE(nullptr == range2.Find(L"plz"));
-    EXPECT_TRUE(nullptr == range3.Find(L"plz"));
-    EXPECT_TRUE((text + 17) == range3.Find(L"pl"));
+    EXPECT_TRUE((text + 10) == range1.find(L"pickle"));
+    EXPECT_TRUE(nullptr == range2.find(L"plz"));
+    EXPECT_TRUE(nullptr == range3.find(L"plz"));
+    EXPECT_TRUE((text + 17) == range3.find(L"pl"));
 }
 
 TEST(StringRange, FindWhiteSpace)
@@ -81,10 +81,10 @@ TEST(StringRange, FindWhiteSpace)
     core::StringRange<char> range2(text, text + core::strUtil::strlen(text) / 2);
     core::StringRange<char> range3(text, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 6) == range1.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range2.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range3.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range3.FindWhitespace());
+    EXPECT_TRUE((text + 6) == range1.findWhitespace());
+    EXPECT_TRUE((text + 6) == range2.findWhitespace());
+    EXPECT_TRUE((text + 6) == range3.findWhitespace());
+    EXPECT_TRUE((text + 6) == range3.findWhitespace());
 }
 
 TEST(StringRange, FindWhiteSpaceW)
@@ -96,10 +96,10 @@ TEST(StringRange, FindWhiteSpaceW)
     core::StringRange<wchar_t> range2(text, text + core::strUtil::strlen(text) / 2);
     core::StringRange<wchar_t> range3(text, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 6) == range1.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range2.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range3.FindWhitespace());
-    EXPECT_TRUE((text + 6) == range3.FindWhitespace());
+    EXPECT_TRUE((text + 6) == range1.findWhitespace());
+    EXPECT_TRUE((text + 6) == range2.findWhitespace());
+    EXPECT_TRUE((text + 6) == range3.findWhitespace());
+    EXPECT_TRUE((text + 6) == range3.findWhitespace());
 }
 
 TEST(StringRange, FindNonWhitespace)
@@ -110,9 +110,9 @@ TEST(StringRange, FindNonWhitespace)
     core::StringRange<char> range2(text + 7, text + core::strUtil::strlen(text) / 2);
     core::StringRange<char> range3(text + 10, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 1) == range1.FindNonWhitespace());
-    EXPECT_TRUE((text + 8) == range2.FindNonWhitespace());
-    EXPECT_TRUE((text + 11) == range3.FindNonWhitespace());
+    EXPECT_TRUE((text + 1) == range1.findNonWhitespace());
+    EXPECT_TRUE((text + 8) == range2.findNonWhitespace());
+    EXPECT_TRUE((text + 11) == range3.findNonWhitespace());
 }
 
 TEST(StringRange, FindNonWhitespaceW)
@@ -123,9 +123,9 @@ TEST(StringRange, FindNonWhitespaceW)
     core::StringRange<wchar_t> range2(text + 7, text + core::strUtil::strlen(text) / 2);
     core::StringRange<wchar_t> range3(text + 10, core::strUtil::strlen(text) - 1);
 
-    EXPECT_TRUE((text + 1) == range1.FindNonWhitespace());
-    EXPECT_TRUE((text + 8) == range2.FindNonWhitespace());
-    EXPECT_TRUE((text + 11) == range3.FindNonWhitespace());
+    EXPECT_TRUE((text + 1) == range1.findNonWhitespace());
+    EXPECT_TRUE((text + 8) == range2.findNonWhitespace());
+    EXPECT_TRUE((text + 11) == range3.findNonWhitespace());
 }
 
 TEST(StringRange, ArrayOperator)

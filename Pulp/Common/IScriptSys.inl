@@ -42,8 +42,8 @@ X_INLINE ScriptValue::ScriptValue(const char* pValue) :
 X_INLINE ScriptValue::ScriptValue(core::StringRange<char>& value) :
     type_(Type::String)
 {
-    str_.pStr = value.GetStart();
-    str_.len = safe_static_cast<int32_t>(value.GetLength());
+    str_.pStr = value.getStart();
+    str_.len = safe_static_cast<int32_t>(value.getLength());
 }
 
 X_INLINE ScriptValue::ScriptValue(IScriptTable* table) :

@@ -34,12 +34,12 @@ StackString<N, wchar_t>::StackString(const char* const str) :
 
 template<size_t N>
 StackString<N, wchar_t>::StackString(const StringRange<wchar_t>& range) :
-    len_(safe_static_cast<size_t>(range.GetLength()))
+    len_(safe_static_cast<size_t>(range.getLength()))
 {
     X_ASSERT(len_ < N, "StringRange  of length %d does not fit into StackString of size %d.", len_, N)(len_, N);
 
     // ranges do not necessarily contain a null-terminator, hence we add it manually
-    memcpy(str_, range.GetStart(), len_ * sizeof(wchar_t));
+    memcpy(str_, range.getStart(), len_ * sizeof(wchar_t));
     str_[len_] = L'\0';
 }
 
@@ -259,6 +259,17 @@ void StackString<N, wchar_t>::set(const wchar_t* const beginInclusive, const wch
     len_ = len;
     str_[len_] = 0;
 }
+
+template<size_t N>
+void StackString<N, wchar_t>::set(const StringRange<wchar_t>& range)
+{
+    X_ASSERT(range.getLength() < N, "String of length %d does not fit into StackString of size %d.", range.getLength(), N)();
+
+    memcpy(str_, range.begin(), range.getLength());
+    len_ = range.getLength();
+    str_[len_] = 0;
+}
+
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------

@@ -193,7 +193,7 @@ namespace shader
             core::StringRange<char> token(nullptr, nullptr);
             core::StringTokenizer<char> tokens(customDefines_.begin(), customDefines_.end(), ',');
             while (tokens.ExtractToken(token)) {
-                const size_t tokenLen = token.GetLength();
+                const size_t tokenLen = token.getLength();
 
                 if (macroBufIdx + tokenLen > macroBuffer.size()) {
                     X_ERROR("Shader", "Failed to fit all macros in buffer");
@@ -201,7 +201,7 @@ namespace shader
                 }
 
                 char* pStart = &macroBuffer[macroBufIdx];
-                std::copy(token.GetStart(), token.GetEnd(), pStart);
+                std::copy(token.getStart(), token.getEnd(), pStart);
 
                 macroBufIdx += tokenLen;
                 macroBuffer[macroBufIdx++] = '\0';

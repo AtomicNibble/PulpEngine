@@ -201,7 +201,7 @@ namespace PathUtil
         core::StringRange<wchar_t> range(nullptr, nullptr);
 
         while (tokenizer.ExtractToken(range)) {
-            path.append(range.GetStart(), range.GetEnd());
+            path.append(range.getStart(), range.getEnd());
 
             if (!DoesDirectoryExist(path)) {
                 if (!CreateDirectory(path)) {

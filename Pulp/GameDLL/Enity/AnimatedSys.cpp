@@ -184,9 +184,9 @@ namespace entity
 
                     core::StringRange<char> str(pValue, pValue + core::strUtil::strlen(pValue));
 
-                    if (str.GetLength() > 4 && core::strUtil::IsEqual(str.GetStart(), str.GetStart() + 4, "snd#")) {
+                    if (str.getLength() > 4 && core::strUtil::IsEqual(str.getStart(), str.getStart() + 4, "snd#")) {
                         // it's a snd event.
-                        const char* pSndEvent = str.GetStart() + 4;
+                        const char* pSndEvent = str.getStart() + 4;
 
                         gEnv->pSound->postEvent(pSndEvent, sound::GLOBAL_OBJECT_ID);
                     }

@@ -623,14 +623,14 @@ void XConsole::saveChangedVars(void)
 
                 // we save this file so it should only have 'seta' in but lets not error if something else.
                 while (tokenizer.ExtractToken(line)) {
-                    core::StringTokenizer<char> lineTokenizer(line.GetStart(), line.GetEnd(), ' ');
+                    core::StringTokenizer<char> lineTokenizer(line.getStart(), line.getEnd(), ' ');
                     StringRange<char> token(nullptr, nullptr);
 
-                    if (lineTokenizer.ExtractToken(token) && core::strUtil::IsEqual(token.GetStart(), token.GetEnd(), "seta")) {
+                    if (lineTokenizer.ExtractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
                         // get the name.
                         if (lineTokenizer.ExtractToken(token)) {
                             // work out if we have this var.
-                            core::StackString256 name(token.GetStart(), token.GetEnd());
+                            core::StackString256 name(token.getStart(), token.getEnd());
 
                             ICVar* pVar = GetCVar(name.c_str());
                             if (!pVar) {
@@ -649,7 +649,7 @@ void XConsole::saveChangedVars(void)
         file.writeStringNNT("// auto generated\n");
 
         for (auto& k : keep) {
-            file.write(k.GetStart(), k.GetLength());
+            file.write(k.getStart(), k.getLength());
             file.write('\n');
         }
 
@@ -1194,8 +1194,8 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
     // CmdHistory_.clear();
 
     while (tokenizer.ExtractToken(range)) {
-        if (range.GetLength() > 0) {
-            CmdHistory_.emplace_front(core::string(range.GetStart(), range.GetEnd()));
+        if (range.getLength() > 0) {
+            CmdHistory_.emplace_front(core::string(range.getStart(), range.getEnd()));
         }
     }
 
@@ -1674,16 +1674,16 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 
     while (parser.extractCommand(range)) {
         // work out name / value
-        pPos = range.Find('=');
+        pPos = range.find('=');
 
         if (pPos) {
-            name.set(range.GetStart(), pPos);
+            name.set(range.getStart(), pPos);
         }
-        else if ((pPos = range.Find(' ')) != nullptr) {
-            name.set(range.GetStart(), pPos);
+        else if ((pPos = range.find(' ')) != nullptr) {
+            name.set(range.getStart(), pPos);
         }
         else {
-            name.set(range.GetStart(), range.GetEnd());
+            name.set(range);
         }
 
         name.trim();
@@ -1696,7 +1696,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
         // === Check if is a command ===
         auto itrCmd = CmdMap_.find(X_CONST_STRING(name.c_str()));
         if (itrCmd != CmdMap_.end()) {
-            value.set(range.GetStart(), range.GetEnd());
+            value.set(range);
             value.trim();
             ExecuteCommand((itrCmd->second), value);
             continue;
@@ -1709,7 +1709,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
 
             if (pPos) // is there a space || = symbol (meaning there is a possible value)
             {
-                value.set(pPos + 1, range.GetEnd());
+                value.set(pPos + 1, range.getEnd());
                 value.trim();
 
                 if (value.isEmpty()) {
@@ -1732,7 +1732,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
         // if this was from config, add it to list.
         // so vars not yet registerd can get the value
         if (cmd.source == ExecSource::CONFIG && pPos) {
-            value.set(pPos + 1, range.GetEnd());
+            value.set(pPos + 1, range.getEnd());
             value.trim();
 
             auto it = configCmds_.find(X_CONST_STRING(name.c_str()));
