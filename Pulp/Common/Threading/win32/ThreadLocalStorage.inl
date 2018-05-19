@@ -19,7 +19,7 @@ inline ThreadLocalStorage::~ThreadLocalStorage(void)
     }
 }
 
-inline void ThreadLocalStorage::SetValue(void* value)
+inline void ThreadLocalStorage::setValue(void* value)
 {
     const BOOL success = TlsSetValue(index_, value);
     if (success == 0) {
@@ -29,14 +29,14 @@ inline void ThreadLocalStorage::SetValue(void* value)
     }
 }
 
-inline void ThreadLocalStorage::SetValueInt(intptr_t value)
+inline void ThreadLocalStorage::setValueInt(intptr_t value)
 {
-    SetValue(reinterpret_cast<void*>(value));
+    setValue(reinterpret_cast<void*>(value));
 }
 
 
 template<typename T>
-inline T* ThreadLocalStorage::GetValue(void) const
+inline T* ThreadLocalStorage::getValue(void) const
 {
     void* data = TlsGetValue(index_);
 
@@ -50,9 +50,9 @@ inline T* ThreadLocalStorage::GetValue(void) const
     return static_cast<T*>(data);
 }
 
-inline intptr_t ThreadLocalStorage::GetValueInt(void) const
+inline intptr_t ThreadLocalStorage::getValueInt(void) const
 {
-    void* pData = GetValue<void>();
+    void* pData = getValue<void>();
 
     return reinterpret_cast<intptr_t>(pData);
 }

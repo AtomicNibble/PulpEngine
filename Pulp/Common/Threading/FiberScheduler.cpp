@@ -298,10 +298,10 @@ namespace Fiber
 
             FiberHandle curFiber = Fiber::GetCurrentFiber();
 
-            tlsOriginFiber.SetValue(curFiber);
-            tlsDestFiber.SetValue(newFiber);
-            tlsWaitCounter.SetValue(pCounter);
-            tlsWaitValue.SetValue(union_cast<void*, intptr_t>(value));
+            tlsOriginFiber.setValue(curFiber);
+            tlsDestFiber.setValue(newFiber);
+            tlsWaitCounter.setValue(pCounter);
+            tlsWaitValue.setValue(union_cast<void*, intptr_t>(value));
         }
 
         FiberHandle switchFiber = GetWaitFiberForThread();
@@ -322,10 +322,10 @@ namespace Fiber
 
             FiberHandle curFiber = Fiber::GetCurrentFiber();
 
-            tlsOriginFiber.SetValue(curFiber);
-            tlsDestFiber.SetValue(newFiber);
-            tlsWaitCounter.SetValue(pCounter);
-            tlsWaitValue.SetValue(union_cast<void*, intptr_t>(value));
+            tlsOriginFiber.setValue(curFiber);
+            tlsDestFiber.setValue(newFiber);
+            tlsWaitCounter.setValue(pCounter);
+            tlsWaitValue.setValue(union_cast<void*, intptr_t>(value));
         }
 
         FiberHandle switchFiber = GetWaitFiberForThread();
@@ -423,8 +423,8 @@ namespace Fiber
         {
             FiberHandle curFiber = Fiber::GetCurrentFiber();
 
-            tlsOriginFiber.SetValue(curFiber);
-            tlsDestFiber.SetValue(fiberToSwitchTo);
+            tlsOriginFiber.setValue(curFiber);
+            tlsDestFiber.setValue(fiberToSwitchTo);
         }
 
         FiberHandle switchFiber = GetSwitchFiberForThread();
@@ -557,8 +557,8 @@ namespace Fiber
         while (true)
             X_ENABLE_WARNING(4127)
             {
-                FiberHandle originFiber = tlsOriginFiber.GetValue<FiberHandle>();
-                FiberHandle destFiber = tlsDestFiber.GetValue<FiberHandle>();
+                FiberHandle originFiber = tlsOriginFiber.getValue<FiberHandle>();
+                FiberHandle destFiber = tlsDestFiber.getValue<FiberHandle>();
 
                 // it's not safe to place the fiber we just left into the pool of useable fibers.
                 pScheduler->fibers_.push(originFiber);
@@ -582,15 +582,15 @@ namespace Fiber
                     Spinlock::ScopedLock lock(pScheduler->waitingTaskLock_);
 
                     WaitingTask waitingTask;
-                    waitingTask.fiber = tlsOriginFiber.GetValue<FiberHandle>();
-                    waitingTask.pCounter = tlsWaitCounter.GetValue<core::AtomicInt>();
+                    waitingTask.fiber = tlsOriginFiber.getValue<FiberHandle>();
+                    waitingTask.pCounter = tlsWaitCounter.getValue<core::AtomicInt>();
                     waitingTask.val = safe_static_cast<int32_t, intptr_t>(
-                        union_cast<intptr_t, int32_t*>(tlsWaitValue.GetValue<int32_t>()));
+                        union_cast<intptr_t, int32_t*>(tlsWaitValue.getValue<int32_t>()));
 
                     pScheduler->waitingTasks_.append(waitingTask);
                 }
 
-                FiberHandle destFiber = tlsDestFiber.GetValue<FiberHandle>();
+                FiberHandle destFiber = tlsDestFiber.getValue<FiberHandle>();
 
                 Fiber::SwitchToFiber(destFiber);
             }

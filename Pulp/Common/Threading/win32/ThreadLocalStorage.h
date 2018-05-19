@@ -7,33 +7,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-/// \code
-///   core::ThreadLocalStorage tlsTest;
-///
-///   // assume this function is called from several different threads
-///   void Work(void)
-///   {
-///     // get the data associated with the current thread from thread local storage
-///     DataStructure* data = tlsTest.GetValue<DataStructure>();
-///     ...
-///   }
-///
-///   core::Thread::ReturnValue ThreadFunction(const core::Thread& thread)
-///   {
-///     DataStructure* data = new DataStructure(...);
-///
-///     // add this thread's data to the thread local storage
-///     tlsTest.SetValue(data);
-///
-///     // do something
-///     ...
-///     Work();
-///     ...
-///
-///     delete data;
-///   	return core::Thread::ReturnValue(0);
-///   }
-/// \endcode
 
 class ThreadLocalStorage
 {
@@ -43,13 +16,13 @@ public:
     inline ~ThreadLocalStorage(void);
 
     /// Associate data with the calling thread.
-    inline void SetValue(void* value);
-    inline void SetValueInt(intptr_t value);
+    inline void setValue(void* value);
+    inline void setValueInt(intptr_t value);
 
     /// Retrieve data from thread local storage for the calling thread.
     template<typename T>
-    inline T* GetValue(void) const;
-    inline intptr_t GetValueInt(void) const;
+    inline T* getValue(void) const;
+    inline intptr_t getValueInt(void) const;
 
 
 private:

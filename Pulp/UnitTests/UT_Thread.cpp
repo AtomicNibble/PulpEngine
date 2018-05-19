@@ -90,7 +90,7 @@ namespace
 
     static Thread::ReturnValue ThreadFunction_tls(const Thread& thread)
     {
-        g_local.SetValue(nullptr);
+        g_local.setValue(nullptr);
 
         return Thread::ReturnValue(0);
     }
@@ -232,11 +232,11 @@ TEST(Threading, LocalStorage)
 {
     int dead = 0xdead;
 
-    g_local.SetValue(&dead);
+    g_local.setValue(&dead);
 
     RunThreads(ThreadFunction_tls);
 
-    EXPECT_TRUE(g_local.GetValue<int>() == &dead);
+    EXPECT_TRUE(g_local.getValue<int>() == &dead);
 }
 
 TEST(Threading, Semaphore)
