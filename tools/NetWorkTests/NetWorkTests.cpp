@@ -235,6 +235,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 strLower.toLower();
 
                 switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length())) {
+                    case "ut"_fnv1a:
                     case "unit"_fnv1a:
                     case "unittests"_fnv1a:
                         mode = Mode::UnitTests;
@@ -250,6 +251,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                         return -1;
                 }
             }
+
+            X_LOG0("NetworkTests", "Mode: \"%s\"", Mode::ToString(mode));
+
 
             if (mode == Mode::UnitTests) {
                 ::testing::GTEST_FLAG(filter) = "*OrderedPacketsTest*";
