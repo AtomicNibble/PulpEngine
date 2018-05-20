@@ -453,6 +453,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="Enity\DataTranslator.inl" />
+    <None Include="Vars\GameVars.inl" />
     <None Include="Vars\PlayerVars.inl" />
     <None Include="Weapon\WeaponDef.inl" />
   </ItemGroup>

@@ -190,5 +190,8 @@
     <None Include="Weapon\WeaponDef.inl">
       <Filter>Header Files\Weapon</Filter>
     </None>
+    <None Include="Vars\GameVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
   </ItemGroup>
 </Project>

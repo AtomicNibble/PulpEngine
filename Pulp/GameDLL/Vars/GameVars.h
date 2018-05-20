@@ -12,7 +12,14 @@ public:
 
     void registerVars(void);
 
+    X_INLINE bool userCmdDrawDebug(void) const;
+
     PlayerVars player;
+
+private:
+    int32_t userCmdDrawDebug_;
 };
 
 X_NAMESPACE_END
+
+#include "GameVars.inl"

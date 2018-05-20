@@ -479,6 +479,24 @@ bool XGame::update(core::FrameData& frame)
         pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
     }
 
+    if (vars_.userCmdDrawDebug())
+    {
+        core::StackString256 txt;
+
+        txt.appendFmt("UserCmds:");
+
+        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        {
+            if (userCmdMan_.hasUnreadFrames(i))
+            {
+                txt.appendFmt("\nPly%" PRIi32 "Unread UCmd: %" PRIuS, i, userCmdMan_.getNumUnreadFrames(i));
+            }
+        }
+
+        pPrim->drawText(Vec3f(5.f, 500.f, 1.f), con, txt.begin(), txt.end());
+
+    }
+
     return true;
 }
 
