@@ -246,6 +246,8 @@ namespace entity
 
     struct Player
     {
+        ADD_META()
+
         X_DECLARE_FLAGS(State)
         (
             Jump,

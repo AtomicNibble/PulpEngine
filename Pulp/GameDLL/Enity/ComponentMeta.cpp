@@ -36,6 +36,10 @@ namespace entity
         net::CompPropVec(ADD_FIELD(offset)),
     END_META()
 
+    IMPLEMENT_META(Player, PlayerMeta, PlayerTable)
+        net::CompPropInt(ADD_FIELD(currentWpn)),
+    END_META()
+
 
 } // namespace entity
 
