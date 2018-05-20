@@ -576,6 +576,7 @@ Global
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|Win32.ActiveCfg = Debug Dynamic|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|Win32.Build.0 = Debug Dynamic|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|x64.ActiveCfg = Debug Dynamic|x64
+		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug Dynamic|x64.Build.0 = Debug Dynamic|x64
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|Win32.ActiveCfg = Debug|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|Win32.Build.0 = Debug|Win32
 		{41988F49-7A86-4F8D-9A27-650C33CDA156}.Debug|x64.ActiveCfg = Debug|x64
