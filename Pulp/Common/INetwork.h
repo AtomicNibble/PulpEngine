@@ -66,11 +66,9 @@ X_DECLARE_ENUM(ConnectionAttemptResult)
 X_DECLARE_ENUM(StartupResult)
 (
     Started,
-    AlreadyStarted,
     InvalidSocketDescriptors,
     InvalidMaxCon,
     InvalidPort,
-    SocketFamilyNotSupported,
     SocketPortInUse,
     SocketFailedToBind,
     SocketFailedToTestSend,
