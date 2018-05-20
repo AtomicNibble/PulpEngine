@@ -351,8 +351,8 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
             if (res == BindResult::AddrInUse) {
                 return StartupResult::SocketPortInUse;
             }
-            if (res == BindResult::SendTestFailed) {
-                return StartupResult::SocketFailedToTestSend;
+            if (res == BindResult::FailedToBind) {
+                return StartupResult::SocketFailedToBind;
             }
             if (res == BindResult::SendTestFailed) {
                 return StartupResult::SocketFailedToTestSend;
