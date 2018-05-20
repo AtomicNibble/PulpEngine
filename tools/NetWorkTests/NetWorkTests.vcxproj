@@ -528,6 +528,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="tests\LargePacketTest.cpp" />
+    <ClCompile Include="tests\MiscPeerTests.cpp" />
     <ClCompile Include="tests\MsgSizeTest.cpp" />
     <ClCompile Include="tests\OrderedTest.cpp" />
     <ClCompile Include="tests\SequencedTest.cpp" />
