@@ -359,6 +359,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
             }
 
             X_ASSERT_UNREACHABLE();
+            return StartupResult::Error;
         }
 
         sockets_.emplace_back(std::move(socket));
