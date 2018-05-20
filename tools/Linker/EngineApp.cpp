@@ -40,7 +40,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.bEnableJobSystem = true;
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
-    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Linker";
+    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Linker";
 
 #ifdef X_LIB
 

@@ -40,7 +40,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
     params.bPauseShutdown = false;
-    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - ImgTool";
+    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - ImgTool";
 
 #ifdef X_LIB
 

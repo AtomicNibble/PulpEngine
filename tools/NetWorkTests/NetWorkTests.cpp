@@ -114,11 +114,11 @@ namespace
         }
 
         if (isServer) {
-            Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - Server");
+            Console.setTitle(X_ENGINE_NAME_W L" - Server");
             Console.moveTo(3000, 10);
         }
         else {
-            Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - Client");
+            Console.setTitle(X_ENGINE_NAME_W L" - Client");
             Console.moveTo(3000, 800);
         }
 
@@ -132,7 +132,7 @@ namespace
         net::INet* pNet = gEnv->pNet;
         net::IPeer* pPeer = pNet->createPeer();
 
-        Console.setTitle(X_WIDEN(X_ENGINE_NAME) L" - EchoServer");
+        Console.setTitle(X_ENGINE_NAME_W L" - EchoServer");
         Console.moveTo(3000, 10);
 
         X_LOG0("EchoServer", "Starting...");

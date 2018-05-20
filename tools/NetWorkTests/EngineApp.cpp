@@ -39,7 +39,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
     params.bEnableNetowrking = true;
     params.pCoreArena = g_arena;
     params.bFileSysWorkingDir = true;
-    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Network Tests";
+    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Network Tests";
 
 #ifdef X_LIB
 

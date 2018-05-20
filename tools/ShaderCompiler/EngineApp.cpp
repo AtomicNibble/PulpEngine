@@ -40,7 +40,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.bEnableJobSystem = true; // some converters make use of the job system.
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = false;
-    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - ShaderCompiler";
+    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - ShaderCompiler";
 
 #ifdef X_LIB
 

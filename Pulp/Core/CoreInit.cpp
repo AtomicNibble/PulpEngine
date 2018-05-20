@@ -324,7 +324,7 @@ bool XCore::Init(const SCoreInitParams& startupParams)
 
         if (!bIsWindowsXPorLater) {
             core::msgbox::show(L"Versions of windows older than and including XP are not supported.",
-                X_WIDEN(X_ENGINE_NAME) L" Start Error",
+                X_ENGINE_NAME_W L" Start Error",
                 core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
                 core::msgbox::Buttons::OK);
             return false;

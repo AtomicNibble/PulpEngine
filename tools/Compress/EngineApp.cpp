@@ -40,7 +40,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.bEnableJobSystem = false;
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
-    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Compressor";
+    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Compressor";
 
 #ifdef X_LIB
 
