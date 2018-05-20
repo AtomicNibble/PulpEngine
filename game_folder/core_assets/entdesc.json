@@ -62,8 +62,6 @@
                 "start" : {"x": -128, "y": 256, "z": 32},
                 "end" : {"x": 192, "y": 256, "z": 32},
                 "time" : 3.0
-            },
-            "NetworkSync" : {
             }
         },
         {
@@ -82,8 +80,6 @@
                 "start" : {"x": -80, "y": -660, "z": 0},
                 "end" : {"x": -80, "y": -660, "z": -248},
                 "time" : 4.0
-            },
-            "NetworkSync" : {
             }
         },
         {
@@ -106,7 +102,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
-
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -119,7 +116,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
-
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -132,7 +130,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
-
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -145,7 +144,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
-
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -156,6 +156,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
       {
@@ -166,6 +168,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -176,6 +180,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -186,6 +192,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -196,6 +204,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -206,6 +216,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -216,6 +228,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -226,6 +240,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -236,6 +252,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -246,6 +264,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             }
         },
         {
@@ -290,6 +310,8 @@
             "MeshRenderer" : {
             },
             "DynamicObject" : {
+            },
+            "NetworkSync" : {
             },
             "Emitter" : {
       //          "effect" : "test/env/smk_test",
