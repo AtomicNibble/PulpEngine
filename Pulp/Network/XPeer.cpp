@@ -310,14 +310,23 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         return StartupResult::InvalidSocketDescriptors;
     }
 
-    if (maxPeers_ == 0) {
-        if (maxIncommingConnections_ > maxConnections) {
-            maxIncommingConnections_ = maxConnections;
+    for (auto& sd : socketDescriptors)
+    {
+        if (sd.getPort() == 0)
+        {
+            return StartupResult::InvalidPort;
         }
+    }
 
-        maxPeers_ = maxConnections;
+    X_ASSERT(maxPeers_ == 0, "Already init")(maxPeers_);
 
-        // todo create a pool for packets to share between rel layers.
+    maxPeers_ = maxConnections;
+  
+    if (maxIncommingConnections_ > maxConnections) {
+        maxIncommingConnections_ = maxConnections;
+    }
+
+    {
         core::MemoryArenaBase* packetPool = &pool2Arena_;
 
         remoteSystems_.reserve(maxPeers_);
