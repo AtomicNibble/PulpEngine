@@ -170,11 +170,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
-    core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Converter");
-    Console.redirectSTD();
-    Console.setSize(60, 40, 2000);
-    Console.moveTo(10, 10);
-
     core::MallocFreeAllocator allocator;
     ConverterArena arena(&allocator, "ConverterArena");
 
@@ -183,7 +178,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     {
         EngineApp app; // needs to clear up before arena.
 
-        if (app.Init(hInstance, &arena, lpCmdLine, Console)) {
+        if (app.Init(hInstance, &arena, lpCmdLine)) 
+        {
             assetDb::AssetDB db;
 
             converter::Converter con(db, &arena);
@@ -255,7 +251,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 X_ERROR("Convert", "Failed to init converter");
             }
 
-            Console.pressToContinue();
+            gEnv->pConsoleWnd->pressToContinue();
         }
     }
 

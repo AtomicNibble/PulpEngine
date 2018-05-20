@@ -234,18 +234,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
-    core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - ImgTool");
-    Console.redirectSTD();
-    Console.setSize(100, 40, 2000);
-    Console.moveTo(10, 10);
-
     core::MallocFreeAllocator allocator;
     ImgToolArena arena(&allocator, "ImgToolArena");
 
 
     EngineApp app;
 
-    if (!app.Init(hInstance, &arena, lpCmdLine, Console)) {
+    if (!app.Init(hInstance, &arena, lpCmdLine)) {
         return -1;
     }
 

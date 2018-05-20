@@ -57,11 +57,6 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
 {
     X_UNUSED(hPrevInstance, nCmdShow);
 
-    core::Console console(L"Engine Benchmark Log");
-    console.redirectSTD();
-    console.setSize(150, 60, 8000);
-    console.moveTo(10, 10);
-
     BenchmarkArena::AllocationPolicy allocator;
     BenchmarkArena arena(&allocator, "BenchmarkArena");
 
@@ -70,15 +65,18 @@ int APIENTRY WinMain(_In_ HINSTANCE hInstance,
     {
         EngineApp engine;
 
-        if (engine.Init(hInstance, ::GetCommandLineW(), console)) {
+        if (engine.Init(hInstance, ::GetCommandLineW())) 
+        {
             X_ASSERT_NOT_NULL(gEnv);
             X_ASSERT_NOT_NULL(gEnv->pCore);
+
+            gEnv->pConsoleWnd->redirectSTD();
 
             ::benchmark::Initialize(&__argc, __argv);
             ::benchmark::RunSpecifiedBenchmarks();
 
             if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, "-CI")) {
-                console.pressToContinue();
+                gEnv->pConsoleWnd->pressToContinue();
             }
         }
     }

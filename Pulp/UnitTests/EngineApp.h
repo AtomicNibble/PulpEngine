@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ICore.h>
-#include <Platform\Console.h>
 #include <Platform\Module.h>
 
 class AssetHandler : public IAssertHandler
@@ -21,7 +20,7 @@ public:
     EngineApp();
     ~EngineApp();
 
-    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
+    bool Init(HINSTANCE hInstance, const wchar_t* pInCmdLine);
     bool ShutDown(void);
 
 private:

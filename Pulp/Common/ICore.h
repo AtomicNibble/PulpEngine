@@ -116,13 +116,30 @@ struct IAssertHandler
     virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_ABSTRACT;
 };
 
+struct ConsoleDesc
+{
+    ConsoleDesc() {
+        pTitle = L"Engine Log";
+        windowWidth = 120;
+        windowHeight = 60;
+        numLines = 9000;
+        x = y = 10;
+    }
+
+    const wchar_t* pTitle;
+    uint32_t windowWidth;
+    uint32_t windowHeight;
+    uint32_t numLines;
+    int32_t x;
+    int32_t y;
+};
+
 struct SCoreInitParams
 {
     void* hInstance;
     PLATFORM_HWND hWnd;
     const wchar_t* pCmdLine;
 
-    core::Console* pConsoleWnd;
     core::MemoryArenaBase* pCoreArena;
 
     // these should be turned into flags.
@@ -144,6 +161,8 @@ struct SCoreInitParams
     bool bPauseShutdown;
 
     Vec4i seed;
+
+    ConsoleDesc consoleDesc;
 
     const bool isCoreOnly(void) const
     {
@@ -185,7 +204,6 @@ struct SCoreInitParams
         hWnd(nullptr),
         pCmdLine(nullptr),
 
-        pConsoleWnd(nullptr),
         pCoreArena(nullptr),
 
         bTesting(false),
@@ -234,6 +252,7 @@ struct SCoreGlobals // obbject is zerod on start.
     font::IFontSys* pFontSys;
     sound::ISound* pSound;
     core::ILog* pLog;
+    core::Console* pConsoleWnd;
     script::IScriptSys* pScriptSys;
     render::IRender* pRender;
     engine::I3DEngine* p3DEngine;
@@ -266,6 +285,7 @@ struct SCoreGlobals // obbject is zerod on start.
         pFontSys = nullptr;
         pSound = nullptr;
         pLog = nullptr;
+        pConsoleWnd = nullptr;
         pScriptSys = nullptr;
         pRender = nullptr;
         p3DEngine = nullptr;

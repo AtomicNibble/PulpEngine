@@ -8,6 +8,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+#define CONSOLE_STD_HANDLES stdout, stderr
+
 class Console
 {
 public:
@@ -34,7 +36,7 @@ public:
 
     void show(bool show);
 
-    void redirectSTD(void);
+    void redirectSTD(FILE* pOut = stdout, FILE* pErr = stderr);
     void pressToContinue(void) const;
 
     inline HANDLE getNativeConsole(void) const;

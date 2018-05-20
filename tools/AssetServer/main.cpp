@@ -62,18 +62,14 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
-    core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - AssetServer");
-    Console.redirectSTD();
-    Console.setSize(60, 40, 2000);
-    Console.moveTo(10, 10);
-
     core::MallocFreeAllocator allocator;
     AssertServerArena arena(&allocator, "AssetServerArena");
 
     {
         EngineApp engine;
 
-        if (engine.Init(hInstance, &arena, lpCmdLine, Console)) {
+        if (engine.Init(hInstance, &arena, lpCmdLine)) 
+        {
 #if X_PLATFORM_WIN32
             pEngine = &engine;
             if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE)) {

@@ -335,8 +335,7 @@ void XCore::ShutDown()
 
         X_DELETE(pVsLogger_, g_coreArena);
         X_DELETE(pConsoleLogger_, g_coreArena);
-        if (initParams_.pConsoleWnd == nullptr)
-            X_DELETE(pConsole_, g_coreArena);
+        X_DELETE(pConsole_, g_coreArena);
 
         core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
     }

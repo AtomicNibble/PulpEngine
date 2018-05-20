@@ -3,16 +3,13 @@
 #include <ICore.h>
 #include <Platform\Module.h>
 
-X_NAMESPACE_DECLARE(core,
-                    class Console);
-
 class EngineApp : public IAssertHandler
 {
 public:
     EngineApp();
     ~EngineApp() X_OVERRIDE;
 
-    bool Init(const wchar_t* sInCmdLine, core::Console& Console);
+    bool Init(const wchar_t* sInCmdLine);
     bool ShutDown(void);
     int MainLoop(void);
 

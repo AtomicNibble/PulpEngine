@@ -27,7 +27,7 @@ EngineApp::~EngineApp()
 }
 
 bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
-    const wchar_t* sInCmdLine, core::Console& Console)
+    const wchar_t* sInCmdLine)
 {
     SCoreInitParams params;
     params.hInstance = hInstance;
@@ -40,9 +40,9 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = true; // some converters make use of the job system.
-    params.pConsoleWnd = &Console;
     params.pCoreArena = arena;
     params.bFileSysWorkingDir = true;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - AssetServer";
 
 #ifdef X_LIB
 

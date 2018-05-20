@@ -71,15 +71,11 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
 
         level::g_arena = &arena;
 
-        core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Level Compiler");
-        Console.setSize(150, 60, 8000);
-        Console.moveTo(10, 10);
-
         {
             EngineApp engine;
 
             // we need the engine for Assets, Logging, Profiling, FileSystem.
-            if (engine.Init(hInstance, lpCmdLine, &arena, Console)) {
+            if (engine.Init(hInstance, lpCmdLine, &arena)) {
                 {
                     core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
                     X_ASSERT_NOT_NULL(pLogVerbosity);

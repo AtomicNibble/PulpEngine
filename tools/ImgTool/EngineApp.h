@@ -10,7 +10,7 @@ public:
     EngineApp();
     ~EngineApp() X_OVERRIDE;
 
-    bool Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine, core::Console& Console);
+    bool Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine);
     bool ShutDown(void);
 
 private:

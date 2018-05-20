@@ -1,7 +1,6 @@
 #pragma once
 
 #include <ICore.h>
-#include <Platform\Console.h>
 #include <Platform\TrayIcon.h>
 #include <Platform\Module.h>
 
@@ -12,7 +11,7 @@ public:
     EngineApp();
     ~EngineApp() X_OVERRIDE;
 
-    bool Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine, core::Console& Console);
+    bool Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine);
     bool ShutDown(void);
     bool PumpMessages(void);
 

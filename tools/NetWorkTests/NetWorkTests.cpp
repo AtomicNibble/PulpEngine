@@ -215,18 +215,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     using namespace core::Hash::Literals;
 
     {
-        core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Network Tests");
-        Console.redirectSTD();
-        Console.setSize(60, 40, 2000);
-        Console.moveTo(10, 10);
-
         core::MallocFreeAllocator allocator;
         ServerTestArena arena(&allocator, "NetworkTestArena");
         g_arena = &arena;
 
         EngineApp engine;
 
-        if (engine.Init(hInstance, lpCmdLine, Console)) {
+        if (engine.Init(hInstance, lpCmdLine)) 
+        {
+            auto& console = *gEnv->pConsoleWnd;
+            console.redirectSTD();
+
             const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
 
             Mode::Enum mode = Mode::UnitTests;
@@ -265,17 +264,18 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             else if (mode == Mode::ClientTest) {
                 // start instance as server or client.
                 // please talk to me... :X
-                ClientServerSelector(Console);
+                ClientServerSelector(console);
             }
             else if (mode == Mode::EchoServer) {
-                RunEchoServer(Console);
+                RunEchoServer(console);
             }
             else {
                 X_ASSERT_UNREACHABLE();
             }
+
+            console.pressToContinue();
         }
 
-        Console.pressToContinue();
         engine.ShutDown();
     }
 

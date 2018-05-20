@@ -27,7 +27,7 @@ public:
     EngineApp();
     ~EngineApp();
 
-    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console);
+    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
     bool ShutDown(void);
 
 private:

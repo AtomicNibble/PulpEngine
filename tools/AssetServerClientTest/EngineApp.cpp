@@ -25,7 +25,7 @@ EngineApp::~EngineApp()
     }
 }
 
-bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(const wchar_t* sInCmdLine)
 {
     SCoreInitParams params;
     params.hInstance = g_hInstance;
@@ -38,9 +38,10 @@ bool EngineApp::Init(const wchar_t* sInCmdLine, core::Console& Console)
     params.bCoreOnly = true;
     params.bEnableBasicConsole = false;
     params.bEnableJobSystem = true; // some converters make use of the job system.
-    params.pConsoleWnd = &Console;
     params.pCoreArena = g_arena;
     params.bFileSysWorkingDir = true;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - AssetServer Test Client";
+
 
 #ifdef X_LIB
 

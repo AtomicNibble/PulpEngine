@@ -121,11 +121,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     g_hInstance = hInstance;
 
     {
-        core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - AssetServer Test Client");
-        Console.redirectSTD();
-        Console.setSize(60, 40, 2000);
-        Console.moveTo(10, 10);
-
         core::MallocFreeAllocator allocator;
         AssetServerTestArena arena(&allocator, "AssetServerTestArena");
         g_arena = &arena;
@@ -134,7 +129,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         EngineApp engine;
 
-        if (engine.Init(lpCmdLine, Console)) {
+        if (engine.Init(lpCmdLine))
+        {
+            gEnv->pConsoleWnd->redirectSTD();
+
             core::IPC::Pipe pipe;
 
             if (pipe.open("\\\\.\\pipe\\" X_ENGINE_NAME "_AssetServer",
@@ -334,12 +332,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     }
                 }
             }
+
+            // shut down the slut.
+            google::protobuf::ShutdownProtobufLibrary();
+
+            // muh consolas!
+            gEnv->pConsoleWnd->pressToContinue();
         }
-
-        // shut down the slut.
-        google::protobuf::ShutdownProtobufLibrary();
-
-        Console.pressToContinue();
 
         engine.ShutDown();
     }

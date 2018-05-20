@@ -435,11 +435,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
-    core::Console Console(X_WIDEN(X_ENGINE_NAME) L" - Compressor");
-    Console.redirectSTD();
-    Console.setSize(100, 40, 2000);
-    Console.moveTo(10, 10);
-
     core::MallocFreeAllocator allocator;
     CompressorArena arena(&allocator, "CompressorArena");
 
@@ -455,7 +450,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     EngineApp app;
 
-    if (!app.Init(hInstance, &arena, lpCmdLine, Console)) {
+    if (!app.Init(hInstance, &arena, lpCmdLine)) {
         return -1;
     }
 

@@ -23,7 +23,7 @@ EngineApp::~EngineApp()
     }
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 {
     SCoreInitParams params;
     params.hInstance = hInstance;
@@ -37,9 +37,9 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
     params.bEnableBasicConsole = true;
     params.bEnableJobSystem = true;
     params.bEnableNetowrking = true;
-    params.pConsoleWnd = &Console;
     params.pCoreArena = g_arena;
     params.bFileSysWorkingDir = true;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Network Tests";
 
 #ifdef X_LIB
 

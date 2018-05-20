@@ -50,7 +50,7 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 {
     SCoreInitParams params;
     params.hInstance = hInstance;
@@ -63,9 +63,9 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
     params.bCoreOnly = true;
     params.bEnableJobSystem = false;
     params.bProfileSysEnabled = false;
-    params.pConsoleWnd = &Console;
     params.pCoreArena = &arena_;
     params.bThreadSafeStringAlloc = false;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Benchmark Log";
 
 #ifdef X_LIB
 

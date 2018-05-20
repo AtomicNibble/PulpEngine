@@ -25,7 +25,7 @@ EngineApp::~EngineApp()
 }
 
 bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
-    core::MemoryArenaBase* arena, core::Console& Console)
+    core::MemoryArenaBase* arena)
 {
     SCoreInitParams params;
     params.hInstance = hInstance;
@@ -33,9 +33,9 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
     params.bVsLog = false;
     params.bConsoleLog = true;
     params.bCoreOnly = true;
-    params.pConsoleWnd = &Console;
     params.pCoreArena = arena;
     params.bEnableBasicConsole = true;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Level Compiler";
     //	params.bFileSysWorkingDir = true;
 
 #ifdef X_LIB

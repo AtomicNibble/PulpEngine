@@ -722,14 +722,14 @@ bool XCore::InitLogging(const SCoreInitParams& initParams)
             env_.pLog->AddLogger(pVsLogger_);
         }
         if (initParams.bConsoleLog) {
-            if (initParams.pConsoleWnd) {
-                pConsole_ = initParams.pConsoleWnd;
-            }
-            else {
-                pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(L"Engine Log");
-                pConsole_->setSize(120, 60, 8000);
-                pConsole_->moveTo(10, 10);
-            }
+
+            const auto& desc = initParams.consoleDesc;
+            
+            pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(desc.pTitle);
+            pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
+            pConsole_->moveTo(desc.x, desc.y);
+            
+            env_.pConsoleWnd = pConsole_;
 
             pConsoleLogger_ = X_NEW(ConsoleLogger, g_coreArena, "ConsoleLogger")(
                 ConsoleLogger::FilterPolicy(2, "console"),

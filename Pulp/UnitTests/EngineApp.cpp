@@ -41,11 +41,11 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Console& Console)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 {
     SCoreInitParams params;
     params.hInstance = hInstance;
-    params.pCmdLine = sInCmdLine;
+    params.pCmdLine = pInCmdLine;
     params.bSkipInput = true;
     params.bSkipSound = true;
     params.bVsLog = false;
@@ -54,8 +54,8 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::Conso
     params.bCoreOnly = true;
     params.bEnableJobSystem = false;
     params.bProfileSysEnabled = false;
-    params.pConsoleWnd = &Console;
     params.pCoreArena = g_arena;
+    params.consoleDesc.pTitle = X_WIDEN(X_ENGINE_NAME) L" - Test Log";
 
 #ifdef X_LIB
 

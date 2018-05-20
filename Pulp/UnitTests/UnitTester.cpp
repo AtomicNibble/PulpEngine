@@ -70,11 +70,6 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
 {
     int nRes = -1; // if we never run the tests that is also a fail.
 
-    core::Console Console(L"Engine Uint Test Log");
-    Console.redirectSTD();
-    Console.setSize(150, 60, 8000);
-    Console.moveTo(10, 10);
-
     core::MallocFreeAllocator allocator;
     UnitTestArena arena(&allocator, "UintTestArena");
 
@@ -83,7 +78,9 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
     {
         EngineApp engine;
 
-        if (engine.Init(hInstance, lpCmdLine, Console)) {
+        if (engine.Init(hInstance, lpCmdLine)) 
+        {
+            gEnv->pConsoleWnd->redirectSTD();
             {
                 X_ASSERT_NOT_NULL(gEnv);
                 X_ASSERT_NOT_NULL(gEnv->pCore);
