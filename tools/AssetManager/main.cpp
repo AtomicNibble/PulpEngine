@@ -51,8 +51,11 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 X_USING_NAMESPACE;
 
-
+#if X_DEBUG
+#define REDIRECT_QT_LOGGS 1
+#else
 #define REDIRECT_QT_LOGGS 0
+#endif
 
 int main(int argc, char *argv[])
 {
