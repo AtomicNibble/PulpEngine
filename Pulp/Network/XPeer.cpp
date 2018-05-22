@@ -2310,9 +2310,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
     if (rs.connectState != ConnectState::UnverifiedSender) {
         X_ERROR("Net", "Recived unexpected connection request from client, ignoring.");
 
-        IPStr ipStr;
-        rs.systemAddress.toString(ipStr);
-        addToBanList(ipStr, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
+        addToBanList(rs.systemAddress, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
 
         disconnectRemote(rs);
         return;
