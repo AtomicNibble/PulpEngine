@@ -66,7 +66,7 @@ public:
 
     void update(void) X_FINAL;
 
-    void connect(SystemAddress address);
+    void connect(SystemAddress address) X_FINAL;
 
     void finishedLoading(void) X_FINAL; // tell the session we finished loading the map.
     bool hasFinishedLoading(void) const X_FINAL;

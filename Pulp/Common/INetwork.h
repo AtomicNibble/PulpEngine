@@ -567,6 +567,9 @@ struct ISession
     virtual ~ISession() = default;
 
     virtual void update(void) X_ABSTRACT;
+
+    virtual void connect(SystemAddress address) X_ABSTRACT;
+    
     virtual void finishedLoading(void) X_ABSTRACT;
     virtual bool hasFinishedLoading(void) const X_ABSTRACT;
 
