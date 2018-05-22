@@ -155,6 +155,8 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGa
 
 void Lobby::reset(void)
 {
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "reset \"%s\" lobby", LobbyType::ToString(type_));
+
     isHost_ = false;
     startLoading_ = false;
     finishedLoading_ = false;
@@ -436,7 +438,7 @@ void Lobby::sendToAll(const uint8_t* pData, size_t lengthInBytes)
 
 void Lobby::setState(LobbyState::Enum state)
 {
-    X_LOG0("Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
 
     if (state == state_) {
         X_WARNING("Lobby", "Redundant State changed");
@@ -1142,9 +1144,7 @@ void Lobby::handleLoadingDone(Packet* pPacket)
         X_WARNING("Lobby", "Peer %" PRIi32 " was already marked as loaded", peerIdx);
     }
     
-    if (vars_.lobbyDebug()) {
-        X_LOG0("Lobby", "Peer %" PRIi32 " loaded", peerIdx);
-    }
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Peer %" PRIi32 " loaded", peerIdx);
 
     peer.loaded = true;
 }
