@@ -326,8 +326,7 @@ private:
     void removePacketFromResendList(MessageNumber msgNum);
     void freeResendList(void);
 
-    INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink)
-    resendList_;
+    INTRUSIVE_LIST_DECLARE(ReliablePacket, reliableLink) resendList_;
 
     X_INLINE bool isOlderPacket(OrderingIndex packetIdx, OrderingIndex currentIdx);
 
