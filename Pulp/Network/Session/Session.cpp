@@ -67,6 +67,10 @@ void Session::connect(SystemAddress address)
 #endif
 }
 
+void Session::disconnect(void)
+{
+    quitToMenu();
+}
 
 void Session::finishedLoading(void)
 {
