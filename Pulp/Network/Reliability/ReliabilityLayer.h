@@ -319,8 +319,11 @@ private:
 
 private:
     X_INLINE size_t resendBufferIdxForMsgNum(MessageNumber msgNum) const;
+
     X_INLINE bool isResendBufferFull(void) const; // checks if current index is occupied.
     X_INLINE bool isResendListEmpty(void) const;
+    void setResendBuffer(size_t idx, ReliablePacket* pPacket);
+    void clearResendBuffer(size_t idx);
     void insertPacketToResendList(ReliablePacket* pPacket);
     void movePacketToTailOfResendList(ReliablePacket* pPacket);
     void removePacketFromResendList(MessageNumber msgNum);

@@ -1154,13 +1154,13 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
                     pPacket->nextActionTime = time + pPacket->retransmissionTime;
 
                     const auto resendBufIdx = resendBufferIdxForMsgNum(pPacket->reliableMessageNumber);
-                    X_ASSERT(resendBuf_[resendBufIdx] == nullptr, "Resent buffer has valid data already in it")();
-                    resendBuf_[resendBufIdx] = pPacket;
+                    setResendBuffer(resendBufIdx, pPacket);
 
                     ++reliableMessageNumberIdx_;
 
                     insertPacketToResendList(pPacket);
-                 
+
+
                     ++currentReliablePackets;
                 }
                 else if (pPacket->reliability == PacketReliability::UnReliableWithAck) {
@@ -1645,12 +1645,28 @@ bool ReliabilityLayer::clearDataGramHistory(DataGramSequenceNumber number)
 
 // -----------------------------------------
 
-void ReliabilityLayer::insertPacketToResendList(ReliablePacket* pPacket)
+void ReliabilityLayer::setResendBuffer(size_t idx, ReliablePacket* pPacket)
 {
-    resendList_.insertTail(pPacket);
+    X_ASSERT(resendBuf_[idx] == nullptr, "Resent buffer has valid data already in it")(idx, resendBuf_[idx]);
+    resendBuf_[idx] = pPacket;
 
     ++msgInReSendBuffers_;
     bytesInReSendBuffers_ += core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+}
+
+void ReliabilityLayer::clearResendBuffer(size_t idx)
+{
+    ReliablePacket* pPacket = resendBuf_[idx];
+
+    resendBuf_[idx] = nullptr;
+    
+    --msgInReSendBuffers_;
+    bytesInReSendBuffers_ -= core::bitUtil::bitsToBytes(pPacket->dataBitLength);
+}
+
+void ReliabilityLayer::insertPacketToResendList(ReliablePacket* pPacket)
+{
+    resendList_.insertTail(pPacket);
 }
 
 void ReliabilityLayer::movePacketToTailOfResendList(ReliablePacket* pPacket)
@@ -1666,12 +1682,8 @@ void ReliabilityLayer::removePacketFromResendList(MessageNumber msgNum)
 
     ReliablePacket* pPacket = resendBuf_[resendBufIdx];
     if (pPacket && pPacket->reliableMessageNumber == msgNum) {
-        resendBuf_[resendBufIdx] = nullptr;
-
-        // stats
-        --msgInReSendBuffers_;
-        bytesInReSendBuffers_ -= core::bitUtil::bitsToBytes(pPacket->dataBitLength);
-        // ~
+        
+        clearResendBuffer(resendBufIdx);
 
         if (pPacket->isAckRequired() && (pPacket->splitPacketCount == 0 || pPacket->splitPacketIndex + 1 == pPacket->splitPacketCount)) {
             ReliablePacket* pAckPacket = allocPacket();
