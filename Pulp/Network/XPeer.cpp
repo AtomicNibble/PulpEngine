@@ -1907,7 +1907,7 @@ void XPeer::processRecvData(core::FixedBitStreamBase& updateBS, RecvData* pData,
     RemoteSystem* pRemoteSys = getRemoteSystem(pData->systemAddress, true);
     if (!pRemoteSys) {
         IPStr ipStr;
-        X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", pData->systemAddress.toString(ipStr, false));
+        X_ERROR("Net", "Recived reliabile message for none connected client: \"%s\"", pData->systemAddress.toString(ipStr, true));
 
         // temp ban them.
         addToBanList(pData->systemAddress, core::TimeVal::fromMS(vars_.unexpectedMsgBanTime()));
