@@ -1775,7 +1775,6 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
                 pCloseReason = "Disconnect request(noack)";
             }
 
-
             IPStr ipStr;
             X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
         }
