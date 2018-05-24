@@ -26,9 +26,9 @@ typedef core::Hash::SHA1 PasswdHash;
 X_DECLARE_ENUM(ConnectState)
 (
     NoAction,
-    DisconnectAsap,
-    DisconnectAsapSilent,
-    DisconnectOnNoAck,
+    DisconnectAsap,         // Disconnect when we have sent all pending data / and reliable data has been ack'd
+    DisconnectAsapSilent,   // Disconnect with no notification.
+    DisconnectOnNoAck,      // Disconnect when have no more acks to send.
     RequestedConnection,
     HandlingConnectionRequest,
     UnverifiedSender,
