@@ -55,10 +55,21 @@ X_INLINE const uint8_t* PacketData::end(void) const
 
 // --------------------------------------------------
 
+X_INLINE size_t ReliabilityLayer::numMsgInResendBuffer(void) const
+{
+    // could I just use 'resendList_.isEmpty()' 
+    if (msgInReSendBuffers_ == 0) {
+        X_ASSERT(resendList_.isEmpty(), "Resent list should be empty")(resendList_.isEmpty());
+    }
+
+    return msgInReSendBuffers_;
+}
+
 X_INLINE bool ReliabilityLayer::pendingOutgoingData(void) const
 {
     return outGoingPackets_.isNotEmpty();
 }
+
 
 X_INLINE bool ReliabilityLayer::isWaitingForAcks(void) const
 {

@@ -269,6 +269,7 @@ public:
     void getStatistics(NetStatistics& stats);
     void getStatistics(NetStatistics& stats) const;
 
+    X_INLINE size_t numMsgInResendBuffer(void) const;
     X_INLINE bool pendingOutgoingData(void) const;
     X_INLINE bool isWaitingForAcks(void) const;
     X_INLINE bool isConnectionDead(void) const;
