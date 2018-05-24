@@ -946,7 +946,8 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
 {
     if (state_ != LobbyState::Connecting)
     {
-        X_ERROR("Lobby", "Recived connection failed when not trying to connect. State: \"%s\"", LobbyState::ToString(state_));
+        X_ERROR("Lobby", "Recived connection failed when not trying to connect. State: \"%s\" Msg: \"%s\"", 
+            LobbyState::ToString(state_), MessageID::ToString(id));
         return;
     }
 
