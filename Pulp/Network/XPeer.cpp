@@ -1795,6 +1795,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
         }
 
         disconnectRemote(rs);
+        return;
     }
 
     if (rs.connectState == ConnectState::Connected && timeNow > rs.nextPingTime) {
