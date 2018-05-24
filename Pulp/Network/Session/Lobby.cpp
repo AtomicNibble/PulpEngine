@@ -231,10 +231,11 @@ bool Lobby::handlePacket(Packet* pPacket)
             break;
 
         case MessageID::ConnectionLost:
-        case MessageID::DisconnectNotification:
             handleConnectionLost(pPacket);
             break;
-
+        case MessageID::DisconnectNotification:
+            handleDisconnectNotification(pPacket);
+            break;
         case MessageID::LobbyJoinRequest:
             handleLobbyJoinRequest(pPacket);
             break;
@@ -973,6 +974,30 @@ void Lobby::handleConnectionLost(Packet* pPacket)
     {
         // we lost connection to server :(
         X_ERROR("Lobby", "Lost connection to host");
+
+        pCallbacks_->onLostConnectionToHost();
+    }
+}
+
+void Lobby::handleDisconnectNotification(Packet* pPacket)
+{
+    if (isHost())
+    {
+        // bye!
+        auto peerIdx = findPeerIdx(pPacket->systemHandle);
+        if (peerIdx < 0) {
+            X_ERROR("Lobby", "Failed to find peer to remove");
+            return;
+        }
+
+        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Peer %" PRIi32 " disconnected", peerIdx);
+
+        setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
+    }
+    else
+    {
+        // we lost connection to server :(
+        X_ERROR("Lobby", "Host disconnected from us");
 
         pCallbacks_->onLostConnectionToHost();
     }
