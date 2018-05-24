@@ -809,7 +809,7 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, 
     IPStr ipStr;
     X_LOG0_IF(vars_.debugEnabled(), "Net", "sending disconnectNotification to remoteSystem: \"%s\"", rs.systemAddress.toString(ipStr));
 
-    core::FixedBitStream<core::FixedBitStreamStackPolicy<16>> bsOut;
+    core::FixedBitStreamStack<16> bsOut;
     bsOut.write(MessageID::DisconnectNotification);
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
@@ -1134,7 +1134,7 @@ void XPeer::ping(const SystemHandle handle)
 {
     X_ASSERT(handle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(handle);
 
-    core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
+    core::FixedBitStreamStack<64> bsOut;
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
     bsOut.write(MessageID::ConnectedPing);
@@ -1157,7 +1157,7 @@ bool XPeer::ping(const HostStr& host, Port remotePort, bool onlyReplyOnAccepting
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
 
-    core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
+    core::FixedBitStreamStack<64> bsOut;
     if (onlyReplyOnAcceptingConnections) {
         bsOut.write(MessageID::UnConnectedPingOpenConnections);
     }
@@ -1181,7 +1181,7 @@ bool XPeer::ping(const HostStr& host, Port remotePort, bool onlyReplyOnAccepting
 
 void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
 {
-    core::FixedBitStream<core::FixedBitStreamStackPolicy<64>> bsOut;
+    core::FixedBitStreamStack<64> bsOut;
 
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
     bsOut.write(MessageID::ConnectedPing);
@@ -1998,7 +1998,7 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
         pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + SystemAddress::serializedSize()));
     }
 
-    core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
+    core::FixedBitStreamNoneOwning packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
     packetBs.write(failureType);
     pData->systemAddress.writeToBitStream(packetBs);
 
@@ -2290,7 +2290,7 @@ void XPeer::handleUnConnectedPong(UpdateBitStream& bsOut, RecvData* pData, RecvB
     Packet* pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(int64_t) + SystemAddress::serializedSize()));
     pPacket->guid = clientGuid;
 
-    core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
+    core::FixedBitStreamNoneOwning packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
     packetBs.write(MessageID::UnConnectedPong);
     packetBs.write(timeStamp);
     pData->systemAddress.writeToBitStream(packetBs);
