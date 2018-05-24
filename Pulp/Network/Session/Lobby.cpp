@@ -536,7 +536,9 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
         if (curState == LobbyPeer::ConnectionState::Established)
         {
             // tell the user to get fucked?
+            // HELL YER!
             
+            pPeer_->closeConnection(peer.systemHandle, true, 0, PacketPriority::Low);
         }
 
         // this won't break removing the user below.
