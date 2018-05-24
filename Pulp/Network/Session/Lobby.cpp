@@ -532,7 +532,7 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
 
     if (newState == LobbyPeer::ConnectionState::Free)
     {
-        if (newState == LobbyPeer::ConnectionState::Established)
+        if (curState == LobbyPeer::ConnectionState::Established)
         {
             // tell the user to get fucked?
             
