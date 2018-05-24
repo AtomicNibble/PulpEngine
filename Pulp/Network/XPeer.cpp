@@ -1749,7 +1749,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
     const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
     const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
     const bool dissconectNoAck = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
-    const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
+    const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData() && rs.relLayer.numMsgInResendBuffer() == 0;
     const bool socketClosed = false;
 
     if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectNoAck || socketClosed) {
