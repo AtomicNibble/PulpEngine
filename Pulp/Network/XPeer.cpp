@@ -1748,16 +1748,22 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
     // has this connection not completed yet?
     const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
     const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
-    const bool dissconectAckTimedOut = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
+    const bool dissconectNoAck = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
     const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData();
     const bool socketClosed = false;
 
-    if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectAckTimedOut || socketClosed) {
+    if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectNoAck || socketClosed) {
         if (vars_.debugEnabled()) {
             const char* pCloseReason = "<ukn>";
 
             if (deadConnection) {
-                pCloseReason = "Connection timeout";
+                // did we timeout waiting for acks to send?
+                if (disconnectingAfterAck) {
+                    pCloseReason = "Disconnect noack timeout";
+                }
+                else {
+                    pCloseReason = "Connection timeout";
+                }
             }
             else if (disconnectingNoData) {
                 pCloseReason = "Disconnection request";
@@ -1765,12 +1771,10 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
             else if (connectionOpenTimeout) {
                 pCloseReason = "Partial connection timeout";
             }
-            else if (dissconectAckTimedOut) {
-                pCloseReason = "Discconect ack timeout";
+            else if (dissconectNoAck) {
+                pCloseReason = "Disconnect request(noack)";
             }
-            else if (dissconectAckTimedOut) {
-                pCloseReason = "Socket Closed";
-            }
+
 
             IPStr ipStr;
             X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
