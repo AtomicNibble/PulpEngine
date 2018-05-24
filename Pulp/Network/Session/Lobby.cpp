@@ -1288,6 +1288,7 @@ void Lobby::initStateLobbyHost(void)
 bool Lobby::allPeersLoaded(void) const
 {
     bool loaded = true;
+    bool anyConnected = false;
 
     for (auto& peer : peers_)
     {
@@ -1295,10 +1296,12 @@ bool Lobby::allPeersLoaded(void) const
             continue;
         }
 
+        anyConnected = true;
+
         loaded &= peer.loaded;
     }
 
-    return loaded;
+    return anyConnected && loaded;
 }
 
 int32_t Lobby::getNumConnectedPeers(void) const
