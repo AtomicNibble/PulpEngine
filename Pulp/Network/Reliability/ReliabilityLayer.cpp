@@ -1160,12 +1160,7 @@ void ReliabilityLayer::update(core::FixedBitStreamBase& bs, NetSocket& socket, S
                     ++reliableMessageNumberIdx_;
 
                     insertPacketToResendList(pPacket);
-
-                    // stats
-                    bytesInReSendBuffers_ += byteLength;
-                    ++msgInReSendBuffers_;
-                    // ~
-
+                 
                     ++currentReliablePackets;
                 }
                 else if (pPacket->reliability == PacketReliability::UnReliableWithAck) {
@@ -1653,6 +1648,9 @@ bool ReliabilityLayer::clearDataGramHistory(DataGramSequenceNumber number)
 void ReliabilityLayer::insertPacketToResendList(ReliablePacket* pPacket)
 {
     resendList_.insertTail(pPacket);
+
+    ++msgInReSendBuffers_;
+    bytesInReSendBuffers_ += core::bitUtil::bitsToBytes(pPacket->dataBitLength);
 }
 
 void ReliabilityLayer::movePacketToTailOfResendList(ReliablePacket* pPacket)
