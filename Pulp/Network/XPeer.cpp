@@ -1776,16 +1776,19 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
             X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\"", rs.systemAddress.toString(ipStr), pCloseReason);
         }
 
-        MessageID::Enum msgId = MessageID::DisconnectNotification;
-        if (rs.connectState == ConnectState::RequestedConnection) {
-            msgId = MessageID::ConnectionRequestFailed;
-        }
-        else if (rs.connectState == ConnectState::Connected) {
-            msgId = MessageID::ConnectionLost;
-        }
+        if (rs.connectState != ConnectState::DisconnectAsapSilent)
+        {
+            MessageID::Enum msgId = MessageID::DisconnectNotification;
+            if (rs.connectState == ConnectState::RequestedConnection) {
+                msgId = MessageID::ConnectionRequestFailed;
+            }
+            else if (rs.connectState == ConnectState::Connected) {
+                msgId = MessageID::ConnectionLost;
+            }
 
-        // ya cunt!
-        pushPacket(msgId, rs);
+            // ya cunt!
+            pushPacket(msgId, rs);
+        }
 
         disconnectRemote(rs);
     }
