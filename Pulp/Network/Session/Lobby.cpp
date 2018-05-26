@@ -252,7 +252,10 @@ bool Lobby::handlePacket(Packet* pPacket)
         case MessageID::LobbyGameParams:
             handleLobbyGameParams(pPacket);
             break;
-
+        case MessageID::LobbyConnectAndMove:
+            handleLobbyConnectAndMove(pPacket);
+            break;
+            
         case MessageID::LoadingStart:
             handleLoadingStart(pPacket);
             break;
@@ -319,6 +322,28 @@ void Lobby::finishedLoading(void)
 {
     finishedLoading_ = true;
 }
+
+// -------------------------------------------
+
+void Lobby::sendMembersToLobby(Lobby& destLobby) const
+{
+    // want to send the sluts a pack saying to connect to lobby :D
+    // which should support this been a diffrent host.
+    // but it may be us.
+    auto dstLobbyType = destLobby.getType();
+
+    ChatMsgBs bs;
+    bs.write(MessageID::LobbyConnectAndMove);
+    bs.write(safe_static_cast<uint8_t>(type_));
+    bs.write(safe_static_cast<uint8_t>(dstLobbyType));
+
+    // TODO: inssert remote address.
+    SystemAddress sa = pPeer_->getMyBoundAddress();
+    sa.writeToBitStream(bs);
+
+    sendToPeers(bs.data(), bs.sizeInBytes());
+}
+
 
 // -------------------------------------------
 
@@ -1150,6 +1175,27 @@ void Lobby::handleLobbyGameParams(Packet* pPacket)
     X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
 
     params_.fromBitStream(bs);
+}
+
+void Lobby::handleLobbyConnectAndMove(Packet* pPacket)
+{
+    X_ASSERT(isPeer(), "Recived ConnectAndMove when not peer")(isPeer(), isHost());
+
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    auto type = bs.read<LobbyType::Enum>();
+    X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
+
+    // Where do you want me!
+    auto destType = bs.read<LobbyType::Enum>();
+    
+    X_ASSERT(destType < LobbyType::ENUM_COUNT, "Recived Lobby packet with invalid type")(destType);
+    X_ASSERT(destType > type, "Invalid lobby transition")(destType, type);
+
+    SystemAddress sa;
+    sa.fromBitStream(bs);
+
+    pCallbacks_->connectAndMoveToLobby(destType, sa);
 }
 
 void Lobby::handleLoadingStart(Packet* pPacket)

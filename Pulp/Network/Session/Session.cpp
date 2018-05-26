@@ -330,7 +330,7 @@ bool Session::stateCreateAndMoveToGameLobby(void)
 {
     if (hasLobbyCreateCompleted(lobbys_[LobbyType::Game]))
     {
-     //   lobbys_[LobbyType::Party].sendMembersToLobby(lobbys_[LobbyType::Game]);
+        lobbys_[LobbyType::Party].sendMembersToLobby(lobbys_[LobbyType::Game]);
 
         // Success
         setState(SessionState::GameLobbyHost);
@@ -541,7 +541,7 @@ bool Session::readPackets(void)
             case MessageID::LobbyUsersConnected:
             case MessageID::LobbyUsersDiconnected:
             case MessageID::LobbyGameParams:
-
+            case MessageID::LobbyConnectAndMove:
             case MessageID::LobbyChatMsg:
                 sendPacketToDesiredLobby(pPacket);
                 break;

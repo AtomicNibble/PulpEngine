@@ -117,6 +117,8 @@ public:
     void startHosting(const MatchParameters& params);
     void finishedLoading(void);
 
+    void sendMembersToLobby(Lobby& destLobby) const;
+
     void sendChatMsg(core::span<const char> msg);
     // if we are a peer, we send user cmds.
     void sendUserCmd(const core::FixedBitStreamBase& bs);
@@ -200,6 +202,7 @@ private:
     void handleLobbyUsersConnected(Packet* pPacket);
     void handleLobbyUsersDiconnected(Packet* pPacket);
     void handleLobbyGameParams(Packet* pPacket);
+    void handleLobbyConnectAndMove(Packet* pPacket);
     void handleLoadingStart(Packet* pPacket);
     void handleLoadingDone(Packet* pPacket);
     void handleInGame(Packet* pPacket);
