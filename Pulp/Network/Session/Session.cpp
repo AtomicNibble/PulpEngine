@@ -626,29 +626,35 @@ void Session::sendPacketToLobbyIfGame(Packet* pPacket)
 void Session::sendPacketToDesiredLobby(Packet* pPacket)
 {
     // message should have a lobby prefix.
-    auto lobbyId = safe_static_cast<LobbyType::Enum>(pPacket->pData[1]);
+    auto lobbyType = static_cast<LobbyType::Enum>(pPacket->pData[1]);
 
     // ignore the packet if idle.
     // should we send them a packet to tell them, or let them timeout?
     if (state_ == SessionState::Idle) {
-        X_WARNING("Session", "Recived lobby packet when idle. LobbyType: %" PRIu8, LobbyType::ToString(lobbyId));
+        X_WARNING("Session", "Recived lobby packet when idle. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
         return;
     }
 
-    switch (lobbyId)
+    switch (lobbyType)
     {
         case LobbyType::Party:
-            lobbys_[LobbyType::Party].handlePacket(pPacket);
-            break;
         case LobbyType::Game:
-            lobbys_[LobbyType::Game].handlePacket(pPacket);
             break;
 
         default:
-            X_ERROR("Session", "Recived packet with invalid lobbyType: %s Type: %" PRIu8, SessionState::ToString(state_), lobbyId);
+            X_ERROR("Session", "Recived packet with invalid lobbyType: %s Type: %" PRIu8, SessionState::ToString(state_), lobbyType);
             X_ASSERT_UNREACHABLE();
-            break;
+            return;
     }
+
+    auto& lobby = lobbys_[lobbyType];
+
+    if (!lobby.isActive()) {
+        X_WARNING("Session", "Recived packet for inactive lobby. LobbyType: %" PRIu8, LobbyType::ToString(lobbyType));
+        return;
+    }
+
+    lobby.handlePacket(pPacket);
 }
 
 bool Session::isHost(void) const
