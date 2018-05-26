@@ -287,18 +287,51 @@ void Lobby::connectTo(SystemAddress address)
     auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
 
     auto res = pPeer_->connect(address, PasswordStr(), vars_.connectionAttemps(), delay);
-    if (res != ConnectionAttemptResult::Started)
+
+    switch (res)
     {
-        X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));
-        setState(LobbyState::Error);
-        return;
+        case ConnectionAttemptResult::Started:
+        case ConnectionAttemptResult::AlreadyConnected:
+            break;
+
+        default:
+            X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));
+            setState(LobbyState::Error);
+            return;
     }
 
     // add the address as a peer and mark as host.
     hostIdx_ = addPeer(address);
     X_ASSERT(peers_[hostIdx_].getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peers_[hostIdx_].getConnectionState());
 
-    setState(LobbyState::Connecting);
+    if (res != ConnectionAttemptResult::AlreadyConnected) {
+        setState(LobbyState::Connecting);
+        return;
+    }
+
+    // we are already connected to the remote system we just wanna join the lobby.
+    // currently there is going to be a problem when shutting down lobby tho.
+    // as it will close the connection in both lobby.
+
+    auto systemHandle = pPeer_->getSystemHandleForAddress(address);
+    if (systemHandle == INVALID_SYSTEM_HANDLE) {
+        setState(LobbyState::Error);
+        return;
+    }
+
+    auto guid = pPeer_->getGuidForHandle(systemHandle);
+    X_ASSERT(guid != NetGUID(), "Guid is invalid")(guid);
+
+    auto& peer = peers_[hostIdx_];
+    peer.systemHandle = systemHandle;
+    peer.guid = guid;
+
+    addLocalUsers();
+
+    // ask to join the lobby.
+    sendJoinRequestToHost();
+
+    setState(LobbyState::Joining);
 }
 
 
@@ -1039,8 +1072,16 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived join request from a unknown peer");
-        return;
+
+        // this peer is likley already connected to another lobby.
+        // and they want to join this one also.
+        handleConnectionHandShake(pPacket);
+
+        peerIdx = findPeerIdx(pPacket->systemHandle);
+        if (peerIdx < 0) {
+            X_ERROR("Lobby", "Failed to add peer for JoinRequest");
+            return;
+        }
     }
 
     auto& peer = peers_[peerIdx];
