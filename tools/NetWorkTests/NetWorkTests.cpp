@@ -127,67 +127,6 @@ namespace
         pNet->deletePeer(pPeer);
     }
 
-    void RunEchoServer(core::Console& Console)
-    {
-        net::INet* pNet = gEnv->pNet;
-        net::IPeer* pPeer = pNet->createPeer();
-
-        Console.setTitle(X_ENGINE_NAME_W L" - EchoServer");
-        Console.moveTo(3000, 10);
-
-        X_LOG0("EchoServer", "Starting...");
-
-        pPeer->setMaximumIncomingConnections(16);
-        net::SocketDescriptor sd(SERVER_PORT);
-        auto res = pPeer->init(16, sd);
-        if (res != net::StartupResult::Started) {
-            return;
-        }
-
-        X_LOG0("EchoServer", "Waiting for packets..");
-
-        while (1) {
-            pPeer->runUpdate();
-
-            net::Packet* pPacket = nullptr;
-            for (pPacket = pPeer->receive(); pPacket; pPeer->freePacket(pPacket), pPacket = pPeer->receive()) {
-                X_LOG0("EchoServer", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
-
-                core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
-
-                if (pPacket->getID() == net::MessageID::ChatMsg) {
-                    char buf[256] = {'\0'};
-
-                    auto len = bs.read<int16_t>();
-                    bs.read(buf, len);
-
-                    X_LOG0("Char", "Msg: %s", buf);
-
-                    // send it back lol?
-                    core::FixedBitStreamStack<256> bsOut;
-
-                    bsOut.write(net::MessageID::ChatMsg);
-                    bsOut.write(len);
-                    bsOut.write(buf, len);
-
-                    pPeer->send(bsOut.data(), bsOut.sizeInBytes(), net::PacketPriority::High,
-                        net::PacketReliability::Reliable, pPacket->systemHandle);
-                }
-            }
-
-            // sleep, as other thread will handle incoming requests and buffer then for us.
-            core::Thread::sleep(10);
-
-            char key = Console.readKey();
-            if (key == 'X') {
-                break;
-            }
-        }
-
-        pPeer->shutdown(core::TimeVal::fromMS(500));
-        pNet->deletePeer(pPeer);
-    }
-
 } // namespace
 
 const char* googleTestResTostr(int nRes)
@@ -269,9 +208,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 // start instance as server or client.
                 // please talk to me... :X
                 ClientServerSelector(console);
-            }
-            else if (mode == Mode::EchoServer) {
-                RunEchoServer(console);
             }
             else {
                 X_ASSERT_UNREACHABLE();
