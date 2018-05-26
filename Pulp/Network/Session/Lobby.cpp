@@ -455,6 +455,7 @@ void Lobby::sendToHost(MessageID::Enum id)
 {
     MsgIdBs bs;
     bs.write(id);
+    bs.write(safe_static_cast<uint8_t>(type_));
 
     sendToHost(bs.data(), bs.sizeInBytes());
 }
@@ -471,6 +472,7 @@ void Lobby::sendToPeers(MessageID::Enum id) const
 {
     MsgIdBs bs;
     bs.write(id);
+    bs.write(safe_static_cast<uint8_t>(type_));
 
     sendToPeers(bs.data(), bs.sizeInBytes());
 }
