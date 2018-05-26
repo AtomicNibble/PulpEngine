@@ -681,7 +681,8 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 }
 
 // connection util
-ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle)
+
+ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle) const
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 

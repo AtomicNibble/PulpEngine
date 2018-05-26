@@ -262,7 +262,7 @@ public:
         uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
 
     // connection util
-    ConnectionState::Enum getConnectionState(SystemHandle systemHandle) X_FINAL;
+    ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_FINAL;
     ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
     void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
 

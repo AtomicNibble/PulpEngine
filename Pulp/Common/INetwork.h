@@ -367,7 +367,7 @@ struct IPeer
         OrderingChannelIdx orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
     // connection util
-    virtual ConnectionState::Enum getConnectionState(SystemHandle systemHandle) X_ABSTRACT;
+    virtual ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_ABSTRACT;
     virtual ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_ABSTRACT;
     virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
 
