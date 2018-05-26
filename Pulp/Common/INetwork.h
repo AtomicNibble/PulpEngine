@@ -367,6 +367,7 @@ struct IPeer
         OrderingChannelIdx orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
     // connection util
+    virtual SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_ABSTRACT;
     virtual ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_ABSTRACT;
     virtual ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_ABSTRACT;
     virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
@@ -407,10 +408,12 @@ struct IPeer
     virtual int32_t getLowestPing(SystemHandle systemHandle) const X_ABSTRACT;
 
     virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;
+    virtual SystemAddress getMyBoundAddress(void) const X_ABSTRACT;
 
     // MTU for a given system
     virtual int getMTUSize(SystemHandle systemHandle) const X_ABSTRACT;
     virtual SystemAddress getAddressForHandle(SystemHandle systemHandle) const X_ABSTRACT;
+    virtual NetGUID getGuidForHandle(SystemHandle systemHandle) const X_ABSTRACT;
 
     virtual bool getStatistics(const NetGUID guid, NetStatistics& stats) X_ABSTRACT;
 

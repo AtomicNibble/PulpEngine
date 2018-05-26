@@ -262,6 +262,7 @@ public:
         uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
 
     // connection util
+    SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_FINAL;
     ConnectionState::Enum getConnectionState(SystemHandle systemHandle) const X_FINAL;
     ConnectionState::Enum getConnectionState(const SystemAddress& systemAddress) X_FINAL;
     void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
@@ -302,10 +303,12 @@ public:
     int32_t getLowestPing(SystemHandle system) const X_FINAL;
 
     X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
+    SystemAddress getMyBoundAddress(void) const X_FINAL;
 
     // MTU for a given system
     int32_t getMTUSize(SystemHandle systemHandle = INVALID_SYSTEM_HANDLE) const X_FINAL;
     SystemAddress getAddressForHandle(SystemHandle systemHandle) const X_FINAL;
+    NetGUID getGuidForHandle(SystemHandle systemHandle) const X_FINAL;
 
     bool getStatistics(const NetGUID guid, NetStatistics& stats) X_FINAL;
 

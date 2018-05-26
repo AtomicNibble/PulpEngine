@@ -681,6 +681,18 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 }
 
 // connection util
+SystemHandle XPeer::getSystemHandleForAddress(const SystemAddress& sysAdd) const
+{
+    const SystemAddressEx& systemAddress = static_cast<const SystemAddressEx&>(sysAdd);
+
+    const RemoteSystem* pRemoteSys = getRemoteSystem(systemAddress, false);
+    if (!pRemoteSys) {
+        return INVALID_SYSTEM_HANDLE;
+    }
+
+    return pRemoteSys->systemHandle;
+}
+
 
 ConnectionState::Enum XPeer::getConnectionState(SystemHandle systemHandle) const
 {
@@ -1392,6 +1404,16 @@ int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
     return pRemoteSys->lowestPing;
 }
 
+SystemAddress XPeer::getMyBoundAddress(void) const
+{
+    if (sockets_.isEmpty()) {
+        return SystemAddress();
+    }
+
+    return sockets_.front().getBoundAdd();
+}
+
+
 // MTU for a given system
 int32_t XPeer::getMTUSize(SystemHandle systemHandle) const
 {
@@ -1427,6 +1449,18 @@ SystemAddress XPeer::getAddressForHandle(SystemHandle systemHandle) const
     return SystemAddress();
 }
 
+NetGUID XPeer::getGuidForHandle(SystemHandle systemHandle) const
+{
+    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+
+    auto* pRemoteSys = getRemoteSystem(systemHandle, false);
+    if (pRemoteSys) {
+        return pRemoteSys->guid;
+    }
+
+    X_ERROR("Net", "Failed to find remote system for Guid");
+    return NetGUID();
+}
 
 bool XPeer::getStatistics(const NetGUID guid, NetStatistics& stats)
 {
