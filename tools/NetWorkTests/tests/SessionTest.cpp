@@ -53,6 +53,38 @@ protected:
         pClientSes_->update();
     }
 
+
+    void connectToServer()
+    {
+        net::SystemAddress sa;
+        sa.setToLoopback();
+        sa.setPortFromHostByteOrder(SERVER_PORT_BASE);
+        pClientSes_->connect(sa);
+
+        auto status = pClientSes_->getStatus();
+
+        ASSERT_NE(SessionStatus::Idle, status);
+
+        int32_t i = 0;
+        for (; i < 300; i++)
+        {
+            pump();
+
+            status = pClientSes_->getStatus();
+
+            if (status == SessionStatus::Connecting)
+            {
+                core::Thread::sleep(5);
+            }
+            else
+            {
+                break;
+            }
+        }
+
+        ASSERT_TRUE(i < 100) << "failed to connect";
+    }
+
 private:
     bool initSessions()
     {
@@ -158,38 +190,9 @@ TEST_F(SessionTest, ConnectToPartyLobby)
 
     EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
 
-    net::SystemAddress sa;
-    sa.setToLoopback();
-    sa.setPortFromHostByteOrder(SERVER_PORT_BASE);
-    pClientSes_->connect(sa);
-
-    auto status = pClientSes_->getStatus();
-
-    EXPECT_NE(SessionStatus::Idle, status);
-
     // we only know the result based on status.
     // poll !
-    int32_t i = 0;
-    for (; i < 300; i++)
-    {
-        pump();
-
-        status = pClientSes_->getStatus();
-
-        if (status == SessionStatus::Connecting)
-        {
-            core::Thread::sleep(5);
-        }
-        else
-        {
-            EXPECT_EQ(SessionStatus::PartyLobby, status);
-            break;
-        }
-    }
-
-    if (i == 100) {
-        ASSERT_TRUE(false) << "failed to connect";
-    }
+    connectToServer();
 
     // we have connected to the server.
     // check some states.
