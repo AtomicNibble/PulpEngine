@@ -910,17 +910,11 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
     addLocalUsers();
 
     // ask to join the lobby.
-    UserInfoBs bs;
-    bs.write(MessageID::LobbyJoinRequest);
-    bs.write(safe_static_cast<uint8_t>(type_));
-
-    addUsersToBs(bs);
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+    sendJoinRequestToHost();
 
     // todo wait for reponse.
     setState(LobbyState::Joining);
 }
-
 
 void Lobby::handleConnectionHandShake(Packet* pPacket)
 {
@@ -1256,6 +1250,23 @@ void Lobby::handleLobbyChatMsg(Packet* pPacket)
     }
 }
 
+// -----------------------------------------------------------
+
+
+void Lobby::sendJoinRequestToHost(void)
+{
+    X_ASSERT(hostIdx_ != -1, "Hostidx invalid")(hostIdx_);
+
+    auto& peer = peers_[hostIdx_];
+    X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peer.getConnectionState());
+
+    UserInfoBs bs;
+    bs.write(MessageID::LobbyJoinRequest);
+    bs.write(safe_static_cast<uint8_t>(type_));
+
+    addUsersToBs(bs);
+    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+}
 
 // -----------------------------------------------------------
 

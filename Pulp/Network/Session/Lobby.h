@@ -206,6 +206,9 @@ private:
     void handleLobbyChatMsg(Packet* pPacket);
 
 private:
+    void sendJoinRequestToHost(void);
+
+private:
     bool stateIdle(void);
     bool stateCreating(void);
     bool stateConnecting(void);
