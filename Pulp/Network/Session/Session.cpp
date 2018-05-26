@@ -518,10 +518,12 @@ bool Session::readPackets(void)
 
         switch (msg)
         {
-            case MessageID::AlreadyConnected:
             case MessageID::ConnectionLost:
             case MessageID::DisconnectNotification:
+                broadcastPacketToActiveLobbyies(pPacket);
+                break;
 
+            case MessageID::AlreadyConnected:
             case MessageID::ConnectionRequestFailed:
             case MessageID::ConnectionBanned:
             case MessageID::ConnectionNoFreeSlots:
