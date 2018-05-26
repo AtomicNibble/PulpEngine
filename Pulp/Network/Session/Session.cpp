@@ -566,6 +566,16 @@ bool Session::readPackets(void)
     return true;
 }
 
+void Session::broadcastPacketToActiveLobbyies(Packet* pPacket)
+{
+    for (int32_t i = 0; i < LobbyType::ENUM_COUNT; i++)
+    {
+        if (lobbys_[i].isActive()) {
+            lobbys_[i].handlePacket(pPacket);
+        }
+    }
+}
+
 void Session::sendPacketToLobby(Packet* pPacket)
 {
     // so the server accepted us.
