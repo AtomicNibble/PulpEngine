@@ -241,6 +241,33 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     // core should not care if you have a networked game or not.
 }
 
+void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
+{
+    // hellooo !
+    // you want to move HEY?
+    // That will be £5 move fee plz.
+    // ask player to transerfer bitcoin, for payment now.
+
+    auto& lobby = lobbys_[type];
+
+    lobby.reset();
+    lobby.connectTo(sa);
+
+    switch (type)
+    {
+        case LobbyType::Party:
+            setState(SessionState::ConnectAndMoveToParty);
+            break;
+
+        case LobbyType::Game:
+            setState(SessionState::ConnectAndMoveToGame);
+            break;
+
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT
+            break;
+    }
+}
 
 // --------------------------------------
 
