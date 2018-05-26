@@ -200,7 +200,7 @@ X_DECLARE_ENUM8(MessageID)
 
     // ------
     
-    ChatMsg,
+    LobbyChatMsg,
     
     PingValues // from host has all the users pings.
     

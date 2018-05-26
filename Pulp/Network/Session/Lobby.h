@@ -202,7 +202,7 @@ private:
     void handleLoadingStart(Packet* pPacket);
     void handleLoadingDone(Packet* pPacket);
     void handleInGame(Packet* pPacket);
-    void handleChatMsg(Packet* pPacket);
+    void handleLobbyChatMsg(Packet* pPacket);
 
 private:
     bool stateIdle(void);

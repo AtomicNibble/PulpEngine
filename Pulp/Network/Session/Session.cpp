@@ -491,9 +491,6 @@ bool Session::readPackets(void)
 
         switch (msg)
         {
-            case MessageID::SnapShot:
-            case MessageID::UserCmd:
-
             case MessageID::AlreadyConnected:
             case MessageID::ConnectionLost:
             case MessageID::DisconnectNotification:
@@ -507,6 +504,10 @@ bool Session::readPackets(void)
             case MessageID::ConnectionRequestHandShake:
             case MessageID::ConnectionRequestAccepted:
 
+                sendPacketToLobby(pPacket);
+                break; 
+
+            // Lobby type prefixed.
             case MessageID::LobbyJoinRequest:
             case MessageID::LobbyJoinAccepted:
             case MessageID::LobbyJoinNoFreeSlots:
@@ -514,13 +515,19 @@ bool Session::readPackets(void)
             case MessageID::LobbyUsersDiconnected:
             case MessageID::LobbyGameParams:
 
+            case MessageID::LobbyChatMsg:
+                sendPacketToDesiredLobby(pPacket);
+                break;
+
+            // Only valid if we are in game lobby.
             case MessageID::LoadingStart:
             case MessageID::LoadingDone:
             case MessageID::InGame:
 
-            case MessageID::ChatMsg:
-                sendPacketToLobby(pPacket);
-                break; 
+            case MessageID::SnapShot:
+            case MessageID::UserCmd:
+                sendPacketToLobbyIfGame(pPacket);
+                break;
           
             default:
                 X_ERROR("Session", "Unhandled message: %s", MessageID::ToString(msg));
@@ -552,6 +559,46 @@ void Session::sendPacketToLobby(Packet* pPacket)
             break;
         default:
             X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
+            X_ASSERT_UNREACHABLE();
+            break;
+    }
+}
+
+void Session::sendPacketToLobbyIfGame(Packet* pPacket)
+{
+    switch (state_)
+    {
+        case SessionState::ConnectAndMoveToGame:
+        case SessionState::GameLobbyHost:
+        case SessionState::GameLobbyPeer:
+        case SessionState::Loading:
+        case SessionState::InGame:
+            lobbys_[LobbyType::Game].handlePacket(pPacket);
+            break;
+
+        default:
+            X_ERROR("Session", "Recived Game packet when not in game state: %s", SessionState::ToString(state_));
+            X_ASSERT_UNREACHABLE();
+            break;
+    }
+}
+
+void Session::sendPacketToDesiredLobby(Packet* pPacket)
+{
+    // message should have a lobby prefix.
+    uint8_t lobbyId = pPacket->pData[1];
+
+    switch (lobbyId)
+    {
+        case LobbyType::Party:
+            lobbys_[LobbyType::Party].handlePacket(pPacket);
+            break;
+        case LobbyType::Game:
+            lobbys_[LobbyType::Game].handlePacket(pPacket);
+            break;
+
+        default:
+            X_ERROR("Session", "Recived packet with invalid lobbyType: %s Type: %" PRIu8, SessionState::ToString(state_), lobbyId);
             X_ASSERT_UNREACHABLE();
             break;
     }

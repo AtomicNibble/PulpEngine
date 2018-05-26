@@ -105,6 +105,8 @@ private:
 
 private:
     void sendPacketToLobby(Packet* pPacket);
+    void sendPacketToLobbyIfGame(Packet* pPacket);
+    void sendPacketToDesiredLobby(Packet* pPacket);
 
 private:
     void setState(SessionState::Enum state);

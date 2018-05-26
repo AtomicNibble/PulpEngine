@@ -488,7 +488,7 @@ X_DECLARE_ENUM(SessionStatus)(
     InGame
 );
 
-X_DECLARE_ENUM(LobbyType)(
+X_DECLARE_ENUM8(LobbyType)(
     Party, //  your not invited
     Game
 );
