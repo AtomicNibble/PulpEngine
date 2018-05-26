@@ -348,5 +348,179 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
 }
 
 
+TEST_F(SessionTest, LobbyPartyToGameAndOut)
+{
+    // Host a party lobby, have peer join.
+    // Host enters a game lobby, peer should follow.
+    // Host leaves game lobby, peer follows.
+    // both host and peer never leave party lobby.
+
+    EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    MatchParameters params;
+    pSeverSes_->createPartyLobby(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+
+    connectToServer();
+
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
+
+    // sluts are in our lobby.
+
+    pSeverSes_->createMatch(params);
+
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+
+    // The host should of moved to game lobby, and peers have been notified to join.
+    // but they won't of yet recived the packet.
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
+
+    // The client should enter Connecting them GameLobby
+    auto lastStatus = pClientSes_->getStatus();
+    auto status = lastStatus;
+
+    int32_t i;
+    for (i = 0; i < 100; i++)
+    {
+        pump();
+
+        status = pClientSes_->getStatus();
+
+        if (status != lastStatus)
+        {
+            if (status == SessionStatus::PartyLobby)
+            {
+                // waiting for cleint to be told to move.
+            }
+            if (status == SessionStatus::Connecting)
+            {
+                X_LOG0("LobbyPartyToGame", "Conneting to lobby");
+                EXPECT_EQ(SessionStatus::PartyLobby, lastStatus);
+            }
+            else if (status == SessionStatus::GameLobby)
+            {
+                X_LOG0("LobbyPartyToGame", "Joined game lobby");
+                EXPECT_EQ(SessionStatus::Connecting, lastStatus);
+                break;
+            }
+            else
+            {
+                ASSERT_TRUE(false) << "Unexpected status";
+            }
+
+            lastStatus = status;
+        }
+
+        core::Thread::sleep(5);
+    }
+
+    ASSERT_TRUE(i < 100) << "failed to move lobby";
+
+    // game lobby buddies?
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+
+    // we should be in both lobbies.
+    for (auto lobbyType : { LobbyType::Party, LobbyType::Game })
+    {
+        {
+            auto* pLobby = pSeverSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(1, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(2, pLobby->getNumUsers());
+            EXPECT_TRUE(pLobby->isHost());
+            EXPECT_FALSE(pLobby->isPeer());
+            EXPECT_FALSE(pLobby->allPeersLoaded());
+        }
+
+        {
+            auto* pLobby = pClientSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(1, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(2, pLobby->getNumUsers());
+            EXPECT_FALSE(pLobby->isHost());
+            EXPECT_TRUE(pLobby->isPeer());
+            EXPECT_FALSE(pLobby->allPeersLoaded());
+        }
+    }
+
+    // now the host leaves the game.
+    pSeverSes_->cancel();
+
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    // check the server shut it's lobby down.
+    {
+        auto* pPartyLobby = pSeverSes_->getLobby(LobbyType::Party);
+        auto* pGameLobby = pSeverSes_->getLobby(LobbyType::Game);
+
+        EXPECT_TRUE(pPartyLobby->isActive());
+        EXPECT_FALSE(pGameLobby->isActive());
+    }
+
+    // now we should be told to leave the game lobby.
+    for (i = 0; i < 100; i++)
+    {
+        pump();
+
+        status = pClientSes_->getStatus();
+
+        if (status == SessionStatus::GameLobby)
+        {
+            core::Thread::sleep(5);
+        }
+        else
+        {
+            // should be a instant change
+            EXPECT_EQ(SessionStatus::PartyLobby, status);
+            break;
+        }
+    }
+
+    ASSERT_TRUE(i < 100) << "failed to move lobby";
+
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
+
+    {
+        auto* pPartyLobby = pSeverSes_->getLobby(LobbyType::Party);
+        auto* pGameLobby = pSeverSes_->getLobby(LobbyType::Game);
+
+        EXPECT_TRUE(pPartyLobby->isActive());
+        EXPECT_FALSE(pGameLobby->isActive());
+
+        EXPECT_EQ(1, pPartyLobby->getNumConnectedPeers());
+        EXPECT_EQ(2, pPartyLobby->getNumUsers());
+        EXPECT_TRUE(pPartyLobby->isHost());
+        EXPECT_FALSE(pPartyLobby->isPeer());
+        EXPECT_FALSE(pPartyLobby->allPeersLoaded());
+    }
+
+    {
+        auto* pPartyLobby = pClientSes_->getLobby(LobbyType::Party);
+        auto* pGameLobby = pClientSes_->getLobby(LobbyType::Game);
+
+        EXPECT_TRUE(pPartyLobby->isActive());
+        EXPECT_FALSE(pGameLobby->isActive());
+
+        EXPECT_EQ(1, pPartyLobby->getNumConnectedPeers());
+        EXPECT_EQ(2, pPartyLobby->getNumUsers());
+        EXPECT_FALSE(pPartyLobby->isHost());
+        EXPECT_TRUE(pPartyLobby->isPeer());
+        EXPECT_FALSE(pPartyLobby->allPeersLoaded());
+    }
+}
+
 
 X_NAMESPACE_END
