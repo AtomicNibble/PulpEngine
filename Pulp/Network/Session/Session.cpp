@@ -586,7 +586,14 @@ void Session::sendPacketToLobbyIfGame(Packet* pPacket)
 void Session::sendPacketToDesiredLobby(Packet* pPacket)
 {
     // message should have a lobby prefix.
-    uint8_t lobbyId = pPacket->pData[1];
+    auto lobbyId = safe_static_cast<LobbyType::Enum>(pPacket->pData[1]);
+
+    // ignore the packet if idle.
+    // should we send them a packet to tell them, or let them timeout?
+    if (state_ == SessionState::Idle) {
+        X_WARNING("Session", "Recived lobby packet when idle. LobbyType: %" PRIu8, LobbyType::ToString(lobbyId));
+        return;
+    }
 
     switch (lobbyId)
     {
