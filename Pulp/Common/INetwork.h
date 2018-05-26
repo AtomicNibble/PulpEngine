@@ -547,6 +547,7 @@ struct ILobby
     virtual bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_ABSTRACT;
 
     // Misc
+    virtual bool isActive(void) const X_ABSTRACT;
     virtual bool isHost(void) const X_ABSTRACT;
     virtual bool isPeer(void) const X_ABSTRACT;
     virtual LobbyType::Enum getType(void) const X_ABSTRACT;
