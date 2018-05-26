@@ -69,6 +69,9 @@ public:
     void connect(SystemAddress address) X_FINAL;
     void disconnect(void) X_FINAL; // basically quitToMenu()
 
+    SessionStatus::Enum getBackStatus(void) const;
+    void cancel(void) X_FINAL;
+
     void finishedLoading(void) X_FINAL; // tell the session we finished loading the map.
     bool hasFinishedLoading(void) const X_FINAL;
 

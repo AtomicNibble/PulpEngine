@@ -574,6 +574,9 @@ struct ISession
 
     virtual void connect(SystemAddress address) X_ABSTRACT;
     virtual void disconnect(void) X_ABSTRACT; // basically quitToMenu()
+    
+    virtual SessionStatus::Enum getBackStatus(void) const X_ABSTRACT;
+    virtual void cancel(void) X_ABSTRACT; 
 
     virtual void finishedLoading(void) X_ABSTRACT;
     virtual bool hasFinishedLoading(void) const X_ABSTRACT;

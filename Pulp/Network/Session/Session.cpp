@@ -72,6 +72,68 @@ void Session::disconnect(void)
     quitToMenu();
 }
 
+SessionStatus::Enum Session::getBackStatus(void) const
+{
+    switch (getStatus())
+    {
+        case SessionStatus::InGame:
+        case SessionStatus::Loading:
+            return SessionStatus::GameLobby;
+
+        case SessionStatus::GameLobby:
+            return SessionStatus::PartyLobby;
+
+        case SessionStatus::PartyLobby:
+            return SessionStatus::Idle;
+
+        default:
+            break;
+    }
+
+    return SessionStatus::Idle;
+}
+
+void Session::cancel(void)
+{
+    if (state_ == SessionState::Idle) {
+        return;
+    }
+
+    switch(getBackStatus())
+    {
+        case SessionStatus::GameLobby:
+            X_ASSERT_NOT_IMPLEMENTED();
+            break;
+
+        case SessionStatus::PartyLobby:
+        {
+            auto& party = lobbys_[LobbyType::Party];
+
+            if (party.isHost())
+            {
+                party.notifyPeersLeavingGameLobby();
+                
+                auto& gameLobby = lobbys_[LobbyType::Game];
+                gameLobby.reset();
+
+                setState(SessionState::PartyLobbyHost);
+            }
+            else
+            {
+
+                X_ASSERT_NOT_IMPLEMENTED();
+            }
+            break;
+        }
+        case SessionStatus::Idle:
+            quitToMenu();
+            break;
+
+        default:
+            break;
+    }
+}
+
 void Session::finishedLoading(void)
 {
     // we finished loading.
