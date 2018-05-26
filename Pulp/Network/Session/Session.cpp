@@ -533,7 +533,6 @@ bool Session::readPackets(void)
 
             case MessageID::ConnectionRequestHandShake:
             case MessageID::ConnectionRequestAccepted:
-
                 sendPacketToLobby(pPacket);
                 break; 
 
