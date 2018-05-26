@@ -146,6 +146,7 @@ public:
     bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_FINAL;
 
     // Misc
+    X_INLINE bool isActive(void) const;
     X_INLINE bool isHost(void) const X_FINAL;
     X_INLINE bool isPeer(void) const X_FINAL;
     X_INLINE LobbyType::Enum getType(void) const X_FINAL;

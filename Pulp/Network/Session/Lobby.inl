@@ -25,6 +25,11 @@ X_INLINE LobbyUserHandle Lobby::getUserHandleForIdx(size_t idx) const
 
 // ---------------------------------
 
+X_INLINE bool Lobby::isActive(void) const
+{
+    return isHost() || isPeer();
+}
+
 X_INLINE bool Lobby::isHost(void) const
 {
     return isHost_;
