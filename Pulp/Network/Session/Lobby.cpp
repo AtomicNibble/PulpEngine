@@ -409,7 +409,7 @@ void Lobby::sendToHost(const uint8_t* pData, size_t lengthInBytes)
     pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
 }
 
-void Lobby::sendToPeers(MessageID::Enum id)
+void Lobby::sendToPeers(MessageID::Enum id) const
 {
     MsgIdBs bs;
     bs.write(id);
@@ -417,7 +417,7 @@ void Lobby::sendToPeers(MessageID::Enum id)
     sendToPeers(bs.data(), bs.sizeInBytes());
 }
 
-void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes)
+void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes) const
 {
     X_ASSERT(!isPeer() && isHost(), "Invalid operation")(isPeer(), isHost());
 
