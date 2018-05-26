@@ -518,6 +518,7 @@ bool Session::readPackets(void)
 
         switch (msg)
         {
+            // these are transport loss, so tell all lobby.
             case MessageID::ConnectionLost:
             case MessageID::DisconnectNotification:
                 broadcastPacketToActiveLobbyies(pPacket);
