@@ -269,6 +269,19 @@ void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
     }
 }
 
+void Session::leaveGameLobby(void)
+{
+    if(state_ != SessionState::GameLobbyPeer) {
+        X_ERROR("Session", "Can't leave game lobby on request if not peer");
+        return;
+    }
+
+    auto& lobby = lobbys_[LobbyType::Game];
+    lobby.reset();
+
+    setState(SessionState::PartyLobbyPeer);
+}
+
 // --------------------------------------
 
 bool Session::handleState(void)
@@ -543,6 +556,7 @@ bool Session::readPackets(void)
             case MessageID::LobbyUsersConnected:
             case MessageID::LobbyUsersDiconnected:
             case MessageID::LobbyGameParams:
+            case MessageID::LobbyLeaveGameLobby:
             case MessageID::LobbyConnectAndMove:
             case MessageID::LobbyChatMsg:
                 sendPacketToDesiredLobby(pPacket);

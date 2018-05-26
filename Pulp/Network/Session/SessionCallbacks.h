@@ -13,6 +13,8 @@ struct ISessionCallbacks
     virtual void onReciveSnapShot(SnapShot&& snap) X_ABSTRACT;
 
     virtual void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_ABSTRACT;
+
+    virtual void leaveGameLobby(void) X_ABSTRACT;
 };
 
 

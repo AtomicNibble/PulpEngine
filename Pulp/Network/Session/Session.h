@@ -102,6 +102,7 @@ private:
     void onLostConnectionToHost(void) X_FINAL;
     void onReciveSnapShot(SnapShot&& snap) X_FINAL;
     void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_FINAL;
+    void leaveGameLobby(void) X_FINAL;
 
 
 private:

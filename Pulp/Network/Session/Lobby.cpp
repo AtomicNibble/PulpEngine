@@ -255,7 +255,10 @@ bool Lobby::handlePacket(Packet* pPacket)
         case MessageID::LobbyConnectAndMove:
             handleLobbyConnectAndMove(pPacket);
             break;
-            
+        case MessageID::LobbyLeaveGameLobby:
+            handleLobbyLeaveGameLobby(pPacket);
+            break;
+
         case MessageID::LoadingStart:
             handleLoadingStart(pPacket);
             break;
@@ -373,6 +376,19 @@ void Lobby::sendMembersToLobby(Lobby& destLobby) const
     // TODO: inssert remote address.
     SystemAddress sa = pPeer_->getMyBoundAddress();
     sa.writeToBitStream(bs);
+
+    sendToPeers(bs.data(), bs.sizeInBytes());
+}
+
+void Lobby::notifyPeersLeavingGameLobby(void)
+{
+    X_ASSERT(isHost(), "Can only notify leaving lobby if host")(isPeer(), isHost());
+    X_ASSERT(type_ == LobbyType::Party, "Can't only notify leaving game lobby via party lobby")(type_);
+
+
+    ChatMsgBs bs;
+    bs.write(MessageID::LobbyLeaveGameLobby);
+    bs.write(safe_static_cast<uint8_t>(type_));
 
     sendToPeers(bs.data(), bs.sizeInBytes());
 }
@@ -1239,6 +1255,18 @@ void Lobby::handleLobbyConnectAndMove(Packet* pPacket)
     sa.fromBitStream(bs);
 
     pCallbacks_->connectAndMoveToLobby(destType, sa);
+}
+
+void Lobby::handleLobbyLeaveGameLobby(Packet* pPacket)
+{
+    X_ASSERT(type_ == LobbyType::Party, "Recived leave game not from party")(type_);
+    X_ASSERT(isPeer(), "Recived LeaveGameLobby when not peer")(isPeer(), isHost());
+
+
+    // only reason i handle packet in here, is for validation really.
+    // but also might easy some 3rd party lobby intergation.
+
+    pCallbacks_->leaveGameLobby();
 }
 
 void Lobby::handleLoadingStart(Packet* pPacket)

@@ -118,6 +118,7 @@ public:
     void finishedLoading(void);
 
     void sendMembersToLobby(Lobby& destLobby) const;
+    void notifyPeersLeavingGameLobby(void);
 
     void sendChatMsg(core::span<const char> msg);
     // if we are a peer, we send user cmds.
@@ -203,6 +204,7 @@ private:
     void handleLobbyUsersDiconnected(Packet* pPacket);
     void handleLobbyGameParams(Packet* pPacket);
     void handleLobbyConnectAndMove(Packet* pPacket);
+    void handleLobbyLeaveGameLobby(Packet* pPacket);
     void handleLoadingStart(Packet* pPacket);
     void handleLoadingDone(Packet* pPacket);
     void handleInGame(Packet* pPacket);
