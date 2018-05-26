@@ -159,7 +159,7 @@ TEST_F(SessionTest, ConnectToIdleHostFail)
 
         if (status == SessionStatus::Connecting)
         {
-            core::Thread::sleep(100);
+            core::Thread::sleep(10);
         }
         else
         {
@@ -168,9 +168,7 @@ TEST_F(SessionTest, ConnectToIdleHostFail)
         }
     }
 
-    if (i == 100) {
-        EXPECT_TRUE(false) << "failed to timeout";
-    }
+    ASSERT_TRUE(i < 300) << "failed to timeout";
 
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
@@ -293,7 +291,7 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
 
             if (pLobby->getNumUsers() == 2)
             {
-                core::Thread::sleep(100);
+                core::Thread::sleep(50);
             }
             else
             {
