@@ -188,6 +188,7 @@ X_DECLARE_ENUM8(MessageID)
     LobbyGameParams,        // Game meta.
 
     LobbyConnectAndMove,    // The host of a patry told us to join this party.
+    LobbyLeaveGameLobby,    // The host suggests you leave with him :)
 
     // --- Session ---
 
