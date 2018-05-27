@@ -529,7 +529,7 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
             lastStatus = status;
         }
 
-        core::Thread::sleep(5);
+        core::Thread::sleep(1);
     }
 
     ASSERT_TRUE(i < 100) << "failed to move lobby";
@@ -587,7 +587,7 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
 
         if (status == SessionStatus::GameLobby)
         {
-            core::Thread::sleep(5);
+            core::Thread::sleep(1);
         }
         else
         {
