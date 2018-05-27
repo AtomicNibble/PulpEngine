@@ -464,8 +464,9 @@ bool Session::stateLoading(void)
     }
     else
     {
-        // we are a dirty pleb.
-        // check the host is still around?
+        // we are a dirty pleb, and have finished loading.
+        // we will keep coming back here until we have synced world with host.
+        // so check we are still connected.
         if (gameLobby.getNumConnectedPeers() < 1)
         {
             X_ERROR("Session", "No peers");
@@ -473,7 +474,7 @@ bool Session::stateLoading(void)
             return false;
         }
 
-     //   return false;
+        return false;
     }
 
     setState(SessionState::InGame);
