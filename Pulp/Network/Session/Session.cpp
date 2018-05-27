@@ -352,12 +352,14 @@ void Session::endGame(bool early)
 
     if (gameLobby.isHost())
     {
-        // we ended the game :( tell the players.
-        core::FixedBitStreamStack<0x10> bs;
-        bs.write(MessageID::EndGame);
-        bs.write(early);
-        gameLobby.sendToPeers(bs.data(), bs.sizeInBytes());
-
+        if (gameLobby.hasActivePeers())
+        {
+            // we ended the game :( tell the players.
+            core::FixedBitStreamStack<0x10> bs;
+            bs.write(MessageID::EndGame);
+            bs.write(early);
+            gameLobby.sendToPeers(bs.data(), bs.sizeInBytes());
+        }
     }
     else if (early)
     {
