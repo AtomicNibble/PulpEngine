@@ -614,7 +614,7 @@ bool Session::readPackets(void)
 
             case MessageID::ConnectionRequestHandShake:
             case MessageID::ConnectionRequestAccepted:
-                sendPacketToLobby(pPacket);
+                handleTransportConnectionPacket(pPacket);
                 break; 
 
             // Lobby type prefixed.
@@ -660,7 +660,7 @@ void Session::broadcastPacketToActiveLobbyies(Packet* pPacket)
     }
 }
 
-void Session::sendPacketToLobby(Packet* pPacket)
+void Session::handleTransportConnectionPacket(Packet* pPacket)
 {
     if (state_ == SessionState::Idle) {
         // we got a packet when idle, should this ever happen?

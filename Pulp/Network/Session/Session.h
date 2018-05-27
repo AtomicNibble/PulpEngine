@@ -109,7 +109,7 @@ private:
 
 private:
     void broadcastPacketToActiveLobbyies(Packet* pPacket);
-    void sendPacketToLobby(Packet* pPacket);
+    void handleTransportConnectionPacket(Packet* pPacket);
     void sendPacketToLobbyIfGame(Packet* pPacket);
     void sendPacketToDesiredLobby(Packet* pPacket);
 
