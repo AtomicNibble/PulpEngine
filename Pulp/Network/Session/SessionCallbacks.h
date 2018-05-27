@@ -8,6 +8,8 @@ struct ISessionCallbacks
 {
     virtual ~ISessionCallbacks() = default;
 
+    virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
+
     virtual void onLostConnectionToHost(void) X_ABSTRACT;
 
     virtual void onReciveSnapShot(SnapShot&& snap) X_ABSTRACT;
