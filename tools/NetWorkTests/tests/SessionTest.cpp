@@ -425,7 +425,7 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
             EXPECT_EQ(1, pLobby->getNumUsers());
             EXPECT_TRUE(pLobby->isHost());
             EXPECT_FALSE(pLobby->isPeer());
-            EXPECT_FALSE(pLobby->allPeersLoaded());
+            EXPECT_FALSE(pLobby->hasActivePeers());
         }
 
         {
@@ -435,7 +435,7 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
             EXPECT_EQ(0, pLobby->getNumUsers());
             EXPECT_FALSE(pLobby->isHost());
             EXPECT_FALSE(pLobby->isPeer());
-            EXPECT_FALSE(pLobby->allPeersLoaded());
+            EXPECT_FALSE(pLobby->hasActivePeers());
         }
 
     }
@@ -454,7 +454,7 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
         EXPECT_EQ(0, pLobby->getNumUsers());
         EXPECT_FALSE(pLobby->isHost());
         EXPECT_FALSE(pLobby->isPeer());
-        EXPECT_FALSE(pLobby->allPeersLoaded());
+        EXPECT_FALSE(pLobby->hasActivePeers());
     }
 }
 
