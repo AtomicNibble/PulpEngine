@@ -1474,6 +1474,12 @@ void Lobby::initStateLobbyHost(void)
 
 // -----------------------------------------------------------
 
+bool Lobby::hasActivePeers(void) const
+{
+    return std::any_of(peers_.begin(), peers_.end(), [](const LobbyPeer& p) {
+        return p.getConnectionState() != LobbyPeer::ConnectionState::Free;
+    });
+}
 
 bool Lobby::allPeersLoaded(void) const
 {

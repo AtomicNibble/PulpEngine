@@ -137,6 +137,7 @@ public:
     void sendToAll(const uint8_t* pData, size_t lengthInBytes);
 
     // Peers
+    bool hasActivePeers(void) const X_FINAL;
     bool allPeersLoaded(void) const X_FINAL;
     bool allPeersInGame(void) const X_FINAL;
     int32_t getNumConnectedPeers(void) const X_FINAL;
