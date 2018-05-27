@@ -454,7 +454,9 @@ X_DECLARE_FLAGS(MatchFlag)(
 );
 
 X_DECLARE_ENUM(GameMode)(
-    SinglePlayer    
+    SinglePlayer,
+    MultiPlayer,
+    Cooperative
 );
 
 typedef Flags<MatchFlag> MatchFlags;
