@@ -232,11 +232,11 @@ TEST_F(SessionTest, SPLoadAndQuit)
 
     pSeverSes_->startMatch();
     EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
-    EXPECT_FALSE(pGameLobby->allPeersLoaded());
+    EXPECT_TRUE(pGameLobby->allPeersLoaded());
 
     pSeverSes_->finishedLoading();
     EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
-    EXPECT_FALSE(pGameLobby->allPeersLoaded()); // we have no peers.
+    EXPECT_TRUE(pGameLobby->allPeersLoaded()); // we have no peers.
 
     pSeverSes_->quitToMenu();
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
