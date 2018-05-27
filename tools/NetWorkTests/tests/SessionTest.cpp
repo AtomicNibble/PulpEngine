@@ -82,7 +82,7 @@ protected:
             }
         }
 
-        ASSERT_TRUE(i < 100) << "failed to connect";
+        ASSERT_TRUE(i < 300) << "failed to connect";
     }
 
 private:
