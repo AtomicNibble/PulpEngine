@@ -336,6 +336,35 @@ void Session::leaveGameLobby(void)
     setState(SessionState::PartyLobbyPeer);
 }
 
+void Session::endGame(bool early)
+{
+    X_UNUSED(early);
+
+    numSnapsReceived_ = 0;
+
+    auto& gameLobby = lobbys_[LobbyType::Game];
+
+    if (gameLobby.isHost())
+    {
+        // we ended the game :( tell the players.
+        core::FixedBitStreamStack<0x10> bs;
+        bs.write(MessageID::EndGame);
+        bs.write(early);
+        gameLobby.sendToPeers(bs.data(), bs.sizeInBytes());
+
+    }
+    else if (early)
+    {
+        // we are a peer and the host left early.
+        // tell the user the host left?
+
+    }
+
+    // TODO: put you back in lobby?
+    quitToMenu();
+}
+
+
 // --------------------------------------
 
 bool Session::handleState(void)
@@ -634,6 +663,7 @@ bool Session::readPackets(void)
             case MessageID::LoadingStart:
             case MessageID::LoadingDone:
             case MessageID::InGame:
+            case MessageID::EndGame:
 
             case MessageID::SnapShot:
             case MessageID::UserCmd:

@@ -217,6 +217,7 @@ private:
     void handleLoadingStart(Packet* pPacket);
     void handleLoadingDone(Packet* pPacket);
     void handleInGame(Packet* pPacket);
+    void handleEndGame(Packet* pPacket);
     void handleLobbyChatMsg(Packet* pPacket);
 
 private:

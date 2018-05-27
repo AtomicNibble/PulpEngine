@@ -17,6 +17,8 @@ struct ISessionCallbacks
     virtual void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_ABSTRACT;
 
     virtual void leaveGameLobby(void) X_ABSTRACT;
+
+    virtual void endGame(bool early) X_ABSTRACT;
 };
 
 

@@ -105,7 +105,7 @@ private:
     void onReciveSnapShot(SnapShot&& snap) X_FINAL;
     void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_FINAL;
     void leaveGameLobby(void) X_FINAL;
-
+    void endGame(bool early) X_FINAL;
 
 private:
     void broadcastPacketToActiveLobbyies(Packet* pPacket);

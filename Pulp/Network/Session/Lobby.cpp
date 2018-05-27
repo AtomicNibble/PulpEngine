@@ -268,6 +268,9 @@ bool Lobby::handlePacket(Packet* pPacket)
         case MessageID::InGame:
             handleInGame(pPacket);
             break;
+        case MessageID::EndGame:
+            handleEndGame(pPacket);
+            break;
 
         case MessageID::LobbyChatMsg:
             handleLobbyChatMsg(pPacket);
@@ -1399,6 +1402,31 @@ void Lobby::handleInGame(Packet* pPacket)
     }
 
     peer.inGame = true;
+}
+
+void Lobby::handleEndGame(Packet* pPacket)
+{
+    X_ASSERT(type_ == LobbyType::Game, "None game lobby recived EndGame")(type_);
+    X_ASSERT(isPeer(), "Recived EndGame when not peer")(isPeer(), isHost());
+
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_ERROR("Lobby", "Recived EndGame from a unknown peer");
+        return;
+    }
+
+    if (peerIdx != hostIdx_) {
+        NetGuidStr buf;
+        X_ERROR("Lobby", "Recived EndGame from a peer that's not host. guid: %s", peers_[peerIdx].guid.toString(buf));
+        return;
+    }
+
+    // the host ended the game rip.
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    auto early = bs.read<bool>();
+
+    pCallbacks_->endGame(early);
 }
 
 void Lobby::handleLobbyChatMsg(Packet* pPacket)
