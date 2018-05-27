@@ -1,6 +1,7 @@
 #include "stdafx.h"
 
 #include <SystemAddress.h>
+#include <SnapShot.h>
 
 X_NAMESPACE_BEGIN(net)
 
@@ -629,6 +630,111 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
         EXPECT_TRUE(pPartyLobby->isPeer());
         EXPECT_FALSE(pPartyLobby->allPeersLoaded());
     }
+}
+
+TEST_F(SessionTest, LoadGameSync)
+{
+    // go through the process of players loading a game.
+    createAndJoinGameServer();
+
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    pSeverSes_->startMatch();
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    auto status = pClientSes_->getStatus();
+
+    // wait for client to start loading
+    int32_t i;
+    for (i = 0; i < 100; i++)
+    {
+        pump();
+
+        status = pClientSes_->getStatus();
+
+        if (status == SessionStatus::GameLobby)
+        {
+            core::Thread::sleep(1);
+        }
+        else
+        {
+            EXPECT_EQ(SessionStatus::Loading, status);
+            break;
+        }
+    }
+
+    ASSERT_TRUE(i < 100) << "Client failed to start loading";
+
+    core::Thread::sleep(5);
+
+    // The player finished loading, but should stay in loading state untill told by host.
+    pClientSes_->finishedLoading();
+
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    auto* pGameLobby = pSeverSes_->getLobby(LobbyType::Game);
+    EXPECT_TRUE(pGameLobby->isActive());
+    EXPECT_EQ(2, pGameLobby->getNumUsers());
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(0, pGameLobby->getNumConnectedPeersInGame());
+    EXPECT_TRUE(pGameLobby->isHost());
+
+    // this should be false, as host won't of recived packet telling peer has loaded.
+    EXPECT_FALSE(pGameLobby->allPeersLoaded());
+
+    for (i = 0; i < 100; i++)
+    {
+        pump();
+
+        if (pGameLobby->allPeersLoaded()) {
+            break;
+        }
+    }
+
+    ASSERT_TRUE(i < 100) << "Failed to recive loading done packet";
+
+    // okay now have to host finish loading.
+    pSeverSes_->finishedLoading();
+
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    // Send a snap shot to the player, kinky.
+    SnapShot snap0(g_arena);
+    SnapShot snap1(g_arena);
+    pSeverSes_->sendSnapShot(std::move(snap0));
+    
+    pump();
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    pSeverSes_->sendSnapShot(std::move(snap1));
+
+    pump();
+    EXPECT_EQ(SessionStatus::InGame, pClientSes_->getStatus());
+
+    // the host don't know yet
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(0, pGameLobby->getNumConnectedPeersInGame());
+
+    pump();
+    pump();
+
+    // now they do.
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeersInGame());
+
+    // all good?
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::InGame, pClientSes_->getStatus());
+
 }
 
 
