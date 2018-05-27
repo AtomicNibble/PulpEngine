@@ -534,7 +534,8 @@ struct ILobby
     virtual ~ILobby() = default;
 
     // Peers
-    virtual bool allPeersLoaded(void) const X_ABSTRACT;
+    virtual bool allPeersLoaded(void) const X_ABSTRACT;         // return true if no peers
+    virtual bool allPeersInGame(void) const X_ABSTRACT;         // return true if no peers
     virtual int32_t getNumConnectedPeers(void) const X_ABSTRACT;
     virtual int32_t getNumConnectedPeersInGame(void) const X_ABSTRACT;
     virtual int32_t getHostPeerIdx(void) const X_ABSTRACT;

@@ -1490,6 +1490,21 @@ bool Lobby::allPeersLoaded(void) const
     return loaded;
 }
 
+bool Lobby::allPeersInGame(void) const
+{
+    bool inGame = true;
+
+    for (auto& peer : peers_) {
+        if (!peer.isConnected()) {
+            continue;
+        }
+
+        inGame &= peer.inGame;
+    }
+
+    return inGame;
+}
+
 int32_t Lobby::getNumConnectedPeers(void) const
 {
     int32_t num = 0;
