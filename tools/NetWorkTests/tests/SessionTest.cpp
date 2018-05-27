@@ -254,7 +254,7 @@ TEST_F(SessionTest, ConnectToIdleHostFail)
     sa.setToLoopback();
     sa.setPortFromHostByteOrder(SERVER_PORT_BASE);
     pClientSes_->connect(sa);
-    
+
     auto status = pClientSes_->getStatus();
 
     EXPECT_NE(SessionStatus::Idle, status);
@@ -294,7 +294,7 @@ TEST_F(SessionTest, ConnectToPartyLobby)
     pSeverSes_->createPartyLobby(params);
 
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
-    
+
     pump();
 
     EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
@@ -853,7 +853,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
     SnapShot snap0(g_arena);
     SnapShot snap1(g_arena);
     pSeverSes_->sendSnapShot(std::move(snap0));
-    
+
     pump();
     EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
 
