@@ -486,12 +486,18 @@ struct MatchParameters
 // A session is what's used for game state and snapshots.
 X_DECLARE_ENUM(SessionStatus)(
     Idle,
+    Connecting,
     PartyLobby,
     GameLobby,
-    Connecting,
     Loading,
     InGame
 );
+
+static_assert(SessionStatus::GameLobby > SessionStatus::PartyLobby, "Incorrect enum order");
+static_assert(SessionStatus::Loading > SessionStatus::GameLobby, "Incorrect enum order");
+static_assert(SessionStatus::InGame > SessionStatus::Loading, "Incorrect enum order");
+static_assert((SessionStatus::InGame + 1) == SessionStatus::ENUM_COUNT, "Incorrect enum order");
+
 
 X_DECLARE_ENUM8(LobbyType)(
     Party, //  your not invited
