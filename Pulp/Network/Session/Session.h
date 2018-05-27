@@ -80,7 +80,6 @@ public:
     void createMatch(const MatchParameters& parms) X_FINAL;
     void startMatch(void) X_FINAL;
 
-    void sendChatMsg(core::span<const char> msg);
     // if we are a peer, we send user cmds.
     void sendUserCmd(const core::FixedBitStreamBase& bs) X_FINAL;
     // if we are a host and have peers we send snaps.

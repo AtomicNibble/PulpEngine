@@ -210,29 +210,6 @@ void Session::startMatch(void)
     startLoading();
 }
 
-void Session::sendChatMsg(core::span<const char> msg)
-{
-    switch (state_)
-    {
-        case SessionState::ConnectAndMoveToParty:
-        case SessionState::PartyLobbyHost:
-        case SessionState::PartyLobbyPeer:
-            lobbys_[LobbyType::Game].sendChatMsg(msg);
-            break;
-
-        case SessionState::ConnectAndMoveToGame:
-        case SessionState::GameLobbyHost:
-        case SessionState::GameLobbyPeer:
-        case SessionState::Loading:
-        case SessionState::InGame:
-            lobbys_[LobbyType::Game].sendChatMsg(msg);
-            break;
-        default:
-            X_ERROR("Session", "Can't send chat msg in current state: %s", SessionState::ToString(state_));
-            break;
-    }
-}
-
 void Session::sendUserCmd(const core::FixedBitStreamBase& bs)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
