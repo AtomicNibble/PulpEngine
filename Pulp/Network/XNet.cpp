@@ -56,6 +56,9 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("connect", this, XNet, &XNet::Cmd_connect, core::VarFlag::SYSTEM,
         "Connect to server <address>");
 
+    ADD_COMMAND_MEMBER("disconnect", this, XNet, &XNet::Cmd_disconnect, core::VarFlag::SYSTEM,
+        "Disconnect from current game");
+
     ADD_COMMAND_MEMBER("createParty", this, XNet, &XNet::Cmd_createParty, core::VarFlag::SYSTEM,
         "Create and join a party");
 
@@ -492,6 +495,19 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
     X_LOG0("Net", "Connecting to: \"%s\"", sa.toString(strBuf, true));
 
     pSession->connect(sa);
+}
+
+
+void XNet::Cmd_disconnect(core::IConsoleCmdArgs* pCmd)
+{
+    if (sessions_.isEmpty()) {
+        X_ERROR("Net", "Can't connect no active session");
+        return;
+    }
+
+    auto* pSession = sessions_.front();
+
+    pSession->quitMatch();
 }
 
 void XNet::Cmd_createParty(core::IConsoleCmdArgs* pCmd)
