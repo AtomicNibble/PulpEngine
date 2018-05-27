@@ -59,13 +59,8 @@ void Session::connect(SystemAddress address)
     quitToMenu();
 
     // connect
-#if 1
-    lobbys_[LobbyType::Game].connectTo(address);
-    setState(SessionState::ConnectAndMoveToGame);
-#else
     lobbys_[LobbyType::Party].connectTo(address);
     setState(SessionState::ConnectAndMoveToParty);
-#endif
 }
 
 void Session::disconnect(void)
