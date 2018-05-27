@@ -471,12 +471,21 @@ bool Session::stateLoading(void)
 
     if (gameLobby.isHost())
     {
-        if (!gameLobby.allPeersLoaded()) {
-            X_LOG0("Session", "Waiting for peers to load..");
-            return false;
+        if (gameLobby.hasActivePeers())
+        {
+            if (!gameLobby.allPeersLoaded()) {
+                X_LOG0("Session", "Waiting for peers to load..");
+                return false;
+            }
+            
+            // TODO: timeout peers loading very slow.
+            // ...
+            X_LOG0("Session", "All peers loaded...");
         }
-
-        X_LOG0("Session", "All peers loaded...");
+        else
+        {
+            X_LOG0("Session", "No peers, starting game...");
+        }
     }
     else
     {
