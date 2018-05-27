@@ -363,15 +363,19 @@ void Lobby::finishedLoading(void)
 
 void Lobby::sendMembersToLobby(Lobby& destLobby) const
 {
-    // want to send the sluts a pack saying to connect to lobby :D
-    // which should support this been a diffrent host.
-    // but it may be us.
     auto dstLobbyType = destLobby.getType();
+
+    sendMembersToLobby(dstLobbyType);
+}
+
+void Lobby::sendMembersToLobby(LobbyType::Enum type) const
+{
+    X_ASSERT(type != type_, "Trying to send member to lobby of same type")(type, type_);
 
     core::FixedBitStreamStack<0x20> bs;
     bs.write(MessageID::LobbyConnectAndMove);
     bs.write(safe_static_cast<uint8_t>(type_));
-    bs.write(safe_static_cast<uint8_t>(dstLobbyType));
+    bs.write(safe_static_cast<uint8_t>(type));
 
     // TODO: inssert remote address.
     SystemAddress sa = pPeer_->getMyBoundAddress();
@@ -379,6 +383,29 @@ void Lobby::sendMembersToLobby(Lobby& destLobby) const
 
     sendToPeers(bs.data(), bs.sizeInBytes());
 }
+
+void Lobby::sendPeerToLobby(int32_t peerIdx, LobbyType::Enum type) const
+{
+    X_ASSERT(peerIdx >= 0, "Invalid peerIdx")(peerIdx);
+
+    auto& peer = peers_[peerIdx];
+    if (!peer.isConnected()) {
+        X_ERROR("Lobby", "Can't send a none connected peer to lobby");
+        return;
+    }
+
+    // away with you pleb!
+    core::FixedBitStreamStack<0x20> bs;
+    bs.write(MessageID::LobbyConnectAndMove);
+    bs.write(safe_static_cast<uint8_t>(type_));
+    bs.write(safe_static_cast<uint8_t>(type));
+
+    SystemAddress sa = pPeer_->getMyBoundAddress();
+    sa.writeToBitStream(bs);
+
+    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+}
+
 
 void Lobby::notifyPeersLeavingGameLobby(void)
 {
