@@ -85,6 +85,84 @@ protected:
         ASSERT_TRUE(i < 300) << "failed to connect";
     }
 
+    void createAndJoinGameServer()
+    {
+        ASSERT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
+        ASSERT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+        MatchParameters params;
+        params.mode = GameMode::Cooperative;
+        params.flags.Set(MatchFlag::Online);
+
+        pSeverSes_->createPartyLobby(params);
+        ASSERT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+        pump();
+        ASSERT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+
+        connectToServer();
+
+        ASSERT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+        ASSERT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
+
+        // sluts are in our lobby.
+        pSeverSes_->createMatch(params);
+        ASSERT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+        pump();
+        ASSERT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+
+        // The host should of moved to game lobby, and peers have been notified to join.
+        // but they won't of yet recived the packet.
+        ASSERT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+        ASSERT_EQ(SessionStatus::PartyLobby, pClientSes_->getStatus());
+
+        // The client should enter Connecting them GameLobby
+        auto lastStatus = pClientSes_->getStatus();
+        auto status = lastStatus;
+
+        int32_t i;
+        for (i = 0; i < 100; i++)
+        {
+            pump();
+
+            status = pClientSes_->getStatus();
+
+            if (status != lastStatus)
+            {
+                if (status == SessionStatus::PartyLobby)
+                {
+                    // waiting for cleint to be told to move.
+                }
+                if (status == SessionStatus::Connecting)
+                {
+                    X_LOG0("LobbyPartyToGame", "Conneting to lobby");
+                    EXPECT_EQ(SessionStatus::PartyLobby, lastStatus);
+                }
+                else if (status == SessionStatus::GameLobby)
+                {
+                    X_LOG0("LobbyPartyToGame", "Joined game lobby");
+                    EXPECT_EQ(SessionStatus::Connecting, lastStatus);
+                    break;
+                }
+                else
+                {
+                    ASSERT_TRUE(false) << "Unexpected status";
+                }
+
+                lastStatus = status;
+            }
+
+            core::Thread::sleep(5);
+        }
+
+        ASSERT_TRUE(i < 100) << "failed to move lobby";
+
+        // game lobby buddies?
+        ASSERT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+        ASSERT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+    }
+
 private:
     bool initSessions()
     {
@@ -378,7 +456,6 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
         EXPECT_FALSE(pLobby->allPeersLoaded());
     }
 }
-
 
 TEST_F(SessionTest, LobbyPartyToGameAndOut)
 {
