@@ -560,12 +560,14 @@ void Session::handleConnectionFailed(Lobby& lobby)
 
 void Session::startLoading(void)
 {
+    auto& gameLobby = lobbys_[LobbyType::Game];
+
     // should only be called if we are the host.
-    if(lobbys_[LobbyType::Game].getMatchFlags().IsSet(MatchFlag::Online))
-    {
-        X_ASSERT(lobbys_[LobbyType::Game].isHost(), "Cant start loading if we are not the host")(lobbys_[LobbyType::Game].isHost());
+    X_ASSERT(gameLobby.isHost(), "Cant start loading if we are not the host")(gameLobby.isHost());
         
-        lobbys_[LobbyType::Game].sendToPeers(MessageID::LoadingStart);
+    if (gameLobby.getMatchFlags().IsSet(MatchFlag::Online))
+    {
+        gameLobby.sendToPeers(MessageID::LoadingStart);
     }
 
     // Weeeeeeeeeeee!!
