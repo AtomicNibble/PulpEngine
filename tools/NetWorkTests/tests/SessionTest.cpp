@@ -689,6 +689,90 @@ TEST_F(SessionTest, PremoteToGameLobby)
     }
 }
 
+TEST_F(SessionTest, PremoteToInGame)
+{
+    // Have the peer join a game in progress.
+    EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    MatchParameters params;
+    params.mode = GameMode::Cooperative;
+    params.flags.Set(MatchFlag::Online);
+
+    pSeverSes_->createPartyLobby(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+
+    pSeverSes_->createMatch(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+
+    pSeverSes_->startMatch();
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+
+    pSeverSes_->finishedLoading();
+    pump();
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+
+    auto* pServerGameLobby = pSeverSes_->getLobby(LobbyType::Game);
+    EXPECT_EQ(0, pServerGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(1, pServerGameLobby->getNumUsers());
+    EXPECT_TRUE(pServerGameLobby->allPeersLoaded());
+    EXPECT_TRUE(pServerGameLobby->allPeersInGame());
+
+    // connect
+    connectToServer();
+
+
+    EXPECT_EQ(1, pServerGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(2, pServerGameLobby->getNumUsers());
+    EXPECT_FALSE(pServerGameLobby->allPeersLoaded());
+    EXPECT_FALSE(pServerGameLobby->allPeersInGame());
+
+    // so we will join the party.
+    // we should get told to join the game.
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    pClientSes_->finishedLoading();
+
+    int32_t i;
+    for (i = 0; i < 10; i++) {
+        pump();
+    }
+
+    // even tho we have finished loading, we should not switch to in game till got snaps.
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    // The server should know we are loaded tho
+    EXPECT_TRUE(pServerGameLobby->allPeersLoaded());
+    EXPECT_FALSE(pServerGameLobby->allPeersInGame());
+
+    SnapShot snap0(g_arena);
+    SnapShot snap1(g_arena);
+    pSeverSes_->sendSnapShot(std::move(snap0));
+    pSeverSes_->sendSnapShot(std::move(snap1));
+
+    // sync in game with host.
+    for (i = 0; i < 10; i++) {
+        pump();
+    }
+
+    // Now we should be in game, and the host should know.
+    EXPECT_EQ(SessionStatus::InGame, pClientSes_->getStatus());
+    EXPECT_TRUE(pServerGameLobby->allPeersLoaded());
+    EXPECT_TRUE(pServerGameLobby->allPeersInGame());
+}
 
 TEST_F(SessionTest, LoadGameSyncPeerFirst)
 {
