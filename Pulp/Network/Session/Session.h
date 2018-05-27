@@ -149,6 +149,7 @@ private:
 
     LobbyArr lobbys_;
 
+    int32_t numSnapsReceived_;
     core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
 };
 

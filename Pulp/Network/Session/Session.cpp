@@ -30,6 +30,7 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
 
     state_ = SessionState::Idle;
+    numSnapsReceived_ = 0;
 }
 
 X_ENABLE_WARNING(4355)
@@ -279,6 +280,24 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     // i think it been in the network session is fine.
     // rather than core, since snapshots are 'network' related.
     // core should not care if you have a networked game or not.
+    // but all local games have a session, humm..
+    ++numSnapsReceived_;
+
+    if (state_ != SessionState::InGame)
+    {
+        // wait till we have 2.
+        if (numSnapsReceived_ < 2) {
+            return;
+        }
+
+        auto& gameLobby = lobbys_[LobbyType::Game];
+        X_ASSERT(gameLobby.isPeer(), "Should only be not in game if peer")(gameLobby.isHost(), gameLobby.isPeer());
+
+        // meow.
+        gameLobby.sendToHost(MessageID::InGame);
+
+        setState(SessionState::InGame);
+    }
 }
 
 void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
