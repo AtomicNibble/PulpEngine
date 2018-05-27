@@ -1392,7 +1392,7 @@ void Lobby::handleInGame(Packet* pPacket)
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived loading done from a unknown peer");
+        X_ERROR("Lobby", "Recived InGame from a unknown peer");
         return;
     }
 
