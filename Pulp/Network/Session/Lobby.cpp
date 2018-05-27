@@ -386,11 +386,7 @@ void Lobby::notifyPeersLeavingGameLobby(void)
     X_ASSERT(type_ == LobbyType::Party, "Can't only notify leaving game lobby via party lobby")(type_);
 
 
-    ChatMsgBs bs;
-    bs.write(MessageID::LobbyLeaveGameLobby);
-    bs.write(safe_static_cast<uint8_t>(type_));
-
-    sendToPeers(bs.data(), bs.sizeInBytes());
+    sendToPeers(MessageID::LobbyLeaveGameLobby);
 }
 
 
