@@ -555,6 +555,7 @@ struct ILobby
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
 
     // Chat
+    virtual void sendChatMsg(core::span<const char> msg) X_ABSTRACT;
     virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
 
 };

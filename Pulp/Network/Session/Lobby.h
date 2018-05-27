@@ -120,7 +120,7 @@ public:
     void sendMembersToLobby(Lobby& destLobby) const;
     void notifyPeersLeavingGameLobby(void);
 
-    void sendChatMsg(core::span<const char> msg);
+    void sendChatMsg(core::span<const char> msg) X_FINAL;
     // if we are a peer, we send user cmds.
     void sendUserCmd(const core::FixedBitStreamBase& bs);
     // if we are a host and have peers we send snaps.
