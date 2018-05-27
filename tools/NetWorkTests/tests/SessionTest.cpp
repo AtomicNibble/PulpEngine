@@ -632,6 +632,65 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
     }
 }
 
+TEST_F(SessionTest, PremoteToGameLobby)
+{
+    // if a host is in game lobby, and a peer connects that peer should move to game lobby.
+    EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    MatchParameters params;
+    params.mode = GameMode::Cooperative;
+    params.flags.Set(MatchFlag::Online);
+
+    pSeverSes_->createPartyLobby(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+
+    pSeverSes_->createMatch(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+
+    // connect
+    connectToServer();
+
+    // so we will join the party.
+    // we should get told to join the game.
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    // We should be in both lobbies.
+    for (auto lobbyType : { LobbyType::Party, LobbyType::Game })
+    {
+        {
+            auto* pLobby = pSeverSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(1, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(2, pLobby->getNumUsers());
+            EXPECT_TRUE(pLobby->isActive());
+            EXPECT_TRUE(pLobby->isHost());
+            EXPECT_FALSE(pLobby->isPeer());
+            EXPECT_FALSE(pLobby->allPeersLoaded());
+        }
+
+        {
+            auto* pLobby = pClientSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(1, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(2, pLobby->getNumUsers());
+            EXPECT_TRUE(pLobby->isActive());
+            EXPECT_FALSE(pLobby->isHost());
+            EXPECT_TRUE(pLobby->isPeer());
+            EXPECT_FALSE(pLobby->allPeersLoaded());
+        }
+    }
+}
+
 
 TEST_F(SessionTest, LoadGameSyncPeerFirst)
 {
