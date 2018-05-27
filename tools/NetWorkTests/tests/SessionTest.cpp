@@ -133,6 +133,38 @@ protected:
 // 5) check various state behaviour, like failing to connect results in idle.
 // do the hookie pokie.
 
+TEST_F(SessionTest, SPLoadAndQuit)
+{
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    MatchParameters params;
+    pSeverSes_->createMatch(params);
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+
+    auto* pGameLobby = pSeverSes_->getLobby(LobbyType::Game);
+    EXPECT_TRUE(pGameLobby->isActive());
+    EXPECT_EQ(1, pGameLobby->getNumUsers());
+    EXPECT_EQ(0, pGameLobby->getNumConnectedPeers());
+    EXPECT_TRUE(pGameLobby->isHost());
+
+
+    pSeverSes_->startMatch();
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_FALSE(pGameLobby->allPeersLoaded());
+
+    pSeverSes_->finishedLoading();
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_FALSE(pGameLobby->allPeersLoaded()); // we have no peers.
+
+    pSeverSes_->quitToMenu();
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    EXPECT_FALSE(pGameLobby->isActive());
+}
+
 
 TEST_F(SessionTest, ConnectToIdleHostFail)
 {
