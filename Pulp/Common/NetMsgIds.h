@@ -195,6 +195,7 @@ X_DECLARE_ENUM8(MessageID)
     LoadingStart,   // tell peer to start loading
     LoadingDone,    // peer finished loading assets
     InGame,         // peer is in game (aka synced world state)
+    EndGame,
 
     SnapShot,
     SnapShotAck,
