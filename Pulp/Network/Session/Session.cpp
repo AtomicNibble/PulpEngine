@@ -138,6 +138,7 @@ void Session::finishedLoading(void)
 {
     // we finished loading.
     // noice.
+    X_ASSERT(state_ == SessionState::Loading, "Can't finish loading if not loading")(state_);
 
     lobbys_[LobbyType::Game].finishedLoading();
 
