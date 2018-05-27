@@ -134,7 +134,11 @@ public:
 
     void sendToPeers(MessageID::Enum id) const;
     void sendToPeers(const uint8_t* pData, size_t lengthInBytes) const;
+
     void sendToAll(const uint8_t* pData, size_t lengthInBytes);
+
+    void sendToPeer(int32_t peerIdx, MessageID::Enum id) const;
+    void sendToPeer(int32_t peerIdx, const uint8_t* pData, size_t lengthInBytes) const;
 
     // Peers
     bool hasActivePeers(void) const X_FINAL;

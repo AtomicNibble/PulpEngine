@@ -538,6 +538,31 @@ void Lobby::sendToAll(const uint8_t* pData, size_t lengthInBytes)
     pPeer_->sendLoopback(pData, lengthInBytes);
 }
 
+
+void Lobby::sendToPeer(int32_t peerIdx, MessageID::Enum id) const
+{
+    MsgIdBs bs;
+    bs.write(id);
+    bs.write(safe_static_cast<uint8_t>(type_));
+
+    sendToPeer(peerIdx, bs.data(), bs.sizeInBytes());
+}
+
+void Lobby::sendToPeer(int32_t peerIdx, const uint8_t* pData, size_t lengthInBytes) const
+{
+    X_ASSERT(peerIdx >= 0, "Invalid peerIdx")(peerIdx);
+
+    auto& peer = peers_[peerIdx];
+    if (!peer.isConnected()) {
+        X_ERROR("Lobby", "Can't send a none connected peer a msg");
+        return;
+    }
+
+    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
+}
+
+// ----------------------------------------------------
+
 void Lobby::setState(LobbyState::Enum state)
 {
     X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
