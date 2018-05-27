@@ -402,7 +402,9 @@ bool Session::stateCreateAndMoveToGameLobby(void)
 {
     if (hasLobbyCreateCompleted(lobbys_[LobbyType::Game]))
     {
-        lobbys_[LobbyType::Party].sendMembersToLobby(lobbys_[LobbyType::Game]);
+        if (lobbys_[LobbyType::Party].isActive()) {
+            lobbys_[LobbyType::Party].sendMembersToLobby(lobbys_[LobbyType::Game]);
+        }
 
         // Success
         setState(SessionState::GameLobbyHost);
