@@ -564,11 +564,15 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     auto* pSession = sessions_.front();
 
+    ILobby* pLobby = nullptr;
     switch(pSession->getStatus())
     {
-        case SessionStatus::GameLobby:
         case SessionStatus::PartyLobby:
+            pLobby = pSession->getLobby(LobbyType::Party);
+            break;
+        case SessionStatus::GameLobby:
         case SessionStatus::InGame:
+            pLobby = pSession->getLobby(LobbyType::Game);
             break;
         
         default:
@@ -576,8 +580,9 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
             return;
     }
 
-    core::StackString<1024> msg;
+    X_ASSERT_NOT_NULL(pLobby);
 
+    core::StackString<1024> msg;
     for (int32_t i = 1; i < pCmd->GetArgCount(); i++)
     {
         const char* pMsg = pCmd->GetArg(i);
@@ -593,7 +598,7 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     msg.trimRight();
 
-    pSession->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
+    pLobby->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
 }
 
 X_NAMESPACE_END
