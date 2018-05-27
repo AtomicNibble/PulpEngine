@@ -1191,19 +1191,29 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::ReliableOrdered, pPacket->systemHandle);
     }
 
-    // if a user just connected to our party lobby, and we are in game.
-    // send them to the game.
-    if (type_ == LobbyType::Party)
     {
-        auto status = pCallbacks_->getStatus();
+        auto sessionStatus = pCallbacks_->getStatus();
 
-        if (status >= SessionStatus::GameLobby)
+        if (type_ == LobbyType::Party)
         {
-            // we are in game, join the orgy!
-            sendPeerToLobby(peerIdx, LobbyType::Game);
+            // if a user just connected to our party lobby, and we are in gamelobby have them join us.
+            if (sessionStatus >= SessionStatus::GameLobby)
+            {
+                // we are in game, join the orgy!
+                sendPeerToLobby(peerIdx, LobbyType::Game);
+            }
+        }
+        else if (type_ == LobbyType::Game)
+        {
+            // if we are 'inGame' have new player join us.
+            // basically join in progress.
+            if (sessionStatus >= SessionStatus::Loading)
+            {
+                sendToPeer(peerIdx, MessageID::LoadingStart);
+            }
         }
     }
-    
+
     // send some recent chat history.
     sendChatHistoryToPeer(peerIdx);
 }
