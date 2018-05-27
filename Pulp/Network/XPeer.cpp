@@ -1713,7 +1713,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             }
 
             if (!pRemoteSystem) {
-                X_WARNING("Net", "Failed to fine system for connection close");
+                X_WARNING("Net", "Failed to find system for connection close");
                 freeBufferdCmd(pBufCmd);
                 continue;
             }
