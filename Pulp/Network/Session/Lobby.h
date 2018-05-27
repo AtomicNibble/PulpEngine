@@ -118,6 +118,9 @@ public:
     void finishedLoading(void);
 
     void sendMembersToLobby(Lobby& destLobby) const;
+    void sendMembersToLobby(LobbyType::Enum type) const;
+    void sendPeerToLobby(int32_t peerIdx, LobbyType::Enum type) const;
+
     void notifyPeersLeavingGameLobby(void);
 
     void sendChatMsg(core::span<const char> msg) X_FINAL;
