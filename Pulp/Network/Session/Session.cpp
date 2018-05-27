@@ -662,7 +662,17 @@ void Session::broadcastPacketToActiveLobbyies(Packet* pPacket)
 
 void Session::sendPacketToLobby(Packet* pPacket)
 {
-    // so the server accepted us.
+    if (state_ == SessionState::Idle) {
+        // we got a packet when idle, should this ever happen?
+        // This means we have set the transport to allow incoming connections.
+        // we should tell them to go away?
+        X_ERROR("Session", "Recived packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
+
+        // close connections for now when this happens
+        pPeer_->closeConnection(pPacket->systemHandle, true);
+        return;
+    }
+
     switch (state_)
     {
         case SessionState::ConnectAndMoveToParty:
