@@ -148,7 +148,7 @@ void Session::finishedLoading(void)
         {
             if (vars_.waitForPlayers())
             {
-                X_LOG0("Session", "Not waiting for players to load");
+                X_LOG0("Session", "Waiting for players to load");
             }
             else
             {
