@@ -646,14 +646,12 @@ TEST_F(SessionTest, PremoteToGameLobby)
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
 
     pump();
-
     EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
 
     pSeverSes_->createMatch(params);
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
 
     pump();
-
     EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
 
     // connect
