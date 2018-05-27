@@ -1163,9 +1163,21 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         params_.writeToBitStream(bs);
         addUsersToBs(bs);
 
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::ReliableOrdered, pPacket->systemHandle);
     }
 
+    // if a user just connected to our party lobby, and we are in game.
+    // send them to the game.
+    if (type_ == LobbyType::Party)
+    {
+        auto status = pCallbacks_->getStatus();
+
+        if (status >= SessionStatus::GameLobby)
+        {
+            // we are in game, join the orgy!
+            sendPeerToLobby(peerIdx, LobbyType::Game);
+        }
+    }
     
     // send some recent chat history.
     sendChatHistoryToPeer(peerIdx);
