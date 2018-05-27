@@ -368,7 +368,7 @@ void Lobby::sendMembersToLobby(Lobby& destLobby) const
     // but it may be us.
     auto dstLobbyType = destLobby.getType();
 
-    ChatMsgBs bs;
+    core::FixedBitStreamStack<0x20> bs;
     bs.write(MessageID::LobbyConnectAndMove);
     bs.write(safe_static_cast<uint8_t>(type_));
     bs.write(safe_static_cast<uint8_t>(dstLobbyType));
