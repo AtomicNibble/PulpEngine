@@ -76,6 +76,7 @@ public:
     bool hasFinishedLoading(void) const X_FINAL;
 
     void quitToMenu(void) X_FINAL;
+    void quitMatch(void) X_FINAL;        // gracefull quit of match, will tell peers we left etc.
     void createPartyLobby(const MatchParameters& parms) X_FINAL;
     void createMatch(const MatchParameters& parms) X_FINAL;
     void startMatch(void) X_FINAL;

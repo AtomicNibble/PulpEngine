@@ -182,6 +182,12 @@ void Session::quitToMenu(void)
     setState(SessionState::Idle);
 }
 
+void Session::quitMatch(void)
+{
+    // So long, farewell, auf Wiedersehen!
+    endGame(true);
+}
+
 void Session::createPartyLobby(const MatchParameters& params)
 {
     X_ASSERT(state_ == SessionState::Idle, "Must be idle")(state_);

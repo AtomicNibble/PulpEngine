@@ -596,7 +596,8 @@ struct ISession
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
  
-    virtual void quitToMenu(void) X_ABSTRACT;
+    virtual void quitToMenu(void) X_ABSTRACT;       // force move to menu, no telling peers etc.
+    virtual void quitMatch(void) X_ABSTRACT;        // gracefull quit of match, will tell peers we left etc.
     virtual void createPartyLobby(const MatchParameters& parms) X_ABSTRACT;
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
