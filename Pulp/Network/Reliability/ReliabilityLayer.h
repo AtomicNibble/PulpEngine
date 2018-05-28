@@ -23,6 +23,7 @@ typedef uint32_t SplitPacketIndex;
 typedef uint16_t MessageNumber;
 typedef uint16_t OrderingIndex;
 typedef uint16_t DataGramSequenceNumber;
+typedef uint8_t OrderingChannelIdx;
 
 struct ReliablePacket;
 
@@ -99,7 +100,7 @@ public:
     uint8_t sendAttemps;
     SendReceipt sendReceipt;
 
-    uint8_t orderingChannel;
+    OrderingChannelIdx orderingChannel;
     SplitPacketId splitPacketId;
     SplitPacketIndex splitPacketIndex;
     SplitPacketIndex splitPacketCount; // uses index type, so index type can represent any count value.
@@ -252,7 +253,7 @@ public:
 
     // que some data for sending, reliability is handled.
     bool send(const uint8_t* pData, const BitSizeT lengthBits, core::TimeVal time, uint32_t mtuSize,
-        PacketPriority::Enum priority, PacketReliability::Enum reliability, uint8_t orderingChannel, SendReceipt receipt, bool ownData);
+        PacketPriority::Enum priority, PacketReliability::Enum reliability, OrderingChannelIdx orderingChannel, SendReceipt receipt, bool ownData);
 
     // pass data from socket for processing
     bool recv(uint8_t* pData, const size_t lengt, NetSocket& socket,
