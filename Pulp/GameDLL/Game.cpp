@@ -228,6 +228,20 @@ bool XGame::update(core::FrameData& frame)
     else if (status == net::SessionStatus::Loading)
     {
         // loading the map :(
+        // i need a better way to know this is first call to loading.
+        // rather than relying on world.
+        // guess could store last state.
+        // if not that, num frames since state change?
+        if (prevStatus_ != net::SessionStatus::Loading)
+        {
+            // frist frame in loading.
+            if (world_) {
+                world_.reset();
+            }
+
+            lobbyUserGuids_.fill(net::NetGUID());
+        }
+
         if (!world_)
         {
             auto matchParams = pSession_->getMatchParams();
