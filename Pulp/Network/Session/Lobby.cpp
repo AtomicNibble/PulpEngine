@@ -803,7 +803,7 @@ void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num)
             continue;
         }
 
-        sendToPeer(i, bs.data(), bs.sizeInBytes());
+        sendToPeer(static_cast<int32_t>(i), bs.data(), bs.sizeInBytes());
     }
 }
 
