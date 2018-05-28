@@ -240,7 +240,11 @@ bool Level::processEnts(void)
 
     core::XFileMemScoped entFile;
 
-    if (!entFile.openFile("entdesc.json", core::fileMode::READ | core::fileMode::SHARE)) {
+    // use name of level.
+    auto entDescPath = path_;
+    entDescPath.setExtension("json");
+
+    if (!entFile.openFile(entDescPath.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
         return false;
     }
 
