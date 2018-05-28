@@ -49,6 +49,27 @@
         }                                                                  \
     }
 
+#define X_DECLARE_ENUM_NUMERIC_LIMITS(enumType)                            \
+namespace std                                                              \
+{                                                                          \
+    template<>                                                             \
+    class numeric_limits<enumType::Enum>                                   \
+    {                                                                      \
+    public:                                                                \
+        static constexpr int32_t min() {                                   \
+            return 0;                                                      \
+        }                                                                  \
+        static constexpr int32_t max() {                                   \
+            return enumType::ENUM_COUNT - 1;                               \
+        }                                                                  \
+                                                                           \
+        static constexpr bool is_signed = numeric_limits<                  \
+                                underlying_type<enumType::Enum>::type      \
+                            >::is_signed;                                  \
+    };                                                                     \
+}
+
+
 #define X_DECLARE_ENUM_IMPL(...) X_DECLARE_ENUM_IMPL_HELPER(X_PP_EXPAND_ARGS(X_DECLARE_ENUM_IMPL_TO_STRING, __VA_ARGS__), X_PP_EXPAND_ARGS(X_DECLARE_ENUM_IMPL_ENUM, __VA_ARGS__), __VA_ARGS__)
 #define X_DECLARE_ENUM8_IMPL(...) X_DECLARE_ENUM8_IMPL_HELPER(X_PP_EXPAND_ARGS(X_DECLARE_ENUM_IMPL_TO_STRING, __VA_ARGS__), X_PP_EXPAND_ARGS(X_DECLARE_ENUM_IMPL_ENUM, __VA_ARGS__), __VA_ARGS__)
 
