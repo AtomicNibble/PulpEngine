@@ -792,7 +792,7 @@ void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num)
     }
 
     // send the msg to all peers except skip peer.
-    for (size_t i = 0; i < peers_.size(); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(peers_.size()); i++)
     {
         if (i == skipPeer) {
             continue;
@@ -803,7 +803,7 @@ void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num)
             continue;
         }
 
-        sendToPeer(static_cast<int32_t>(i), bs.data(), bs.sizeInBytes());
+        sendToPeer(i, bs.data(), bs.sizeInBytes());
     }
 }
 
