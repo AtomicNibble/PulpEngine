@@ -95,11 +95,17 @@ X_DECLARE_ENUM8(PacketReliability)
     ReliableOrderedWithAck);
 
 X_DECLARE_ENUM8(OrderingChannel)(
-    Default    
-    
+    Default,    
+    Channel1,
+    Channel2,
+    Channel3,
+    Channel4,
+    Channel5,
+    Channel6,
+    Channel7
 );
 
-static_assert(OrderingChannel::ENUM_COUNT < MAX_ORDERED_STREAMS, "Defined ordering channels exceeds MAX_ORDERED_STREAMS");
+static_assert(OrderingChannel::ENUM_COUNT <= MAX_ORDERED_STREAMS, "Defined ordering channels exceeds MAX_ORDERED_STREAMS");
 
 #if NET_IPv6_SUPPORT // can't if/def inside DECLARE_ENUM.
 
