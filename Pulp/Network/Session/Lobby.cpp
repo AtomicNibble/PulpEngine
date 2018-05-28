@@ -406,7 +406,7 @@ void Lobby::sendPeerToLobby(int32_t peerIdx, LobbyType::Enum type) const
     SystemAddress sa = pPeer_->getMyBoundAddress();
     sa.writeToBitStream(bs);
 
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+    sendToPeer(peerIdx, bs.data(), bs.sizeInBytes());
 }
 
 
@@ -507,7 +507,7 @@ void Lobby::sendToHost(const uint8_t* pData, size_t lengthInBytes)
     X_ASSERT(isPeer() && !isHost(), "Invalid operation")(isPeer(), isHost());
     const auto& peer = peers_[hostIdx_];
 
-    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+    sendToPeer(hostIdx_, pData, lengthInBytes);
 }
 
 void Lobby::sendToPeers(MessageID::Enum id) const
@@ -805,7 +805,7 @@ void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num)
             continue;
         }
 
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+        sendToPeer(i, bs.data(), bs.sizeInBytes());
     }
 }
 
@@ -961,7 +961,7 @@ void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
         auto& msg = chatHistory_[i];
         msg.writeToBitStream(bs);
 
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::ReliableOrdered, peer.systemHandle);
+        sendToPeer(peerIdx, bs.data(), bs.sizeInBytes());
     }
 }
 
@@ -1191,7 +1191,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         params_.writeToBitStream(bs);
         addUsersToBs(bs);
 
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::ReliableOrdered, pPacket->systemHandle);
+        sendToPeer(peerIdx, bs.data(), bs.sizeInBytes());
     }
 
     {
