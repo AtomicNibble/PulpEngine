@@ -59,7 +59,7 @@ namespace entity
         ADD_META()
 
         Vec3f offset; // offset of sound object relative to ent's transform.
-        core::string occType;
+        sound::OcclusionType::Enum occType;
         sound::SndObjectHandle handle;
     };
 

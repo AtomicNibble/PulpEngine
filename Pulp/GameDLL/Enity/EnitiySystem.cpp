@@ -16,6 +16,8 @@
 #include <IAnimManager.h>
 #include <IEffect.h>
 
+using namespace core::Hash::Literals;
+
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
@@ -103,7 +105,26 @@ namespace entity
         ADD_TRANS_MEMBER(dtMesh_, name);
 
         ADD_TRANS_MEMBER(dtSoundObj_, offset);
-        ADD_TRANS_MEMBER(dtSoundObj_, occType);
+        dtSoundObj_.initializeFromString("occType", [&](SoundObject& snd, const char* pOccType, size_t length) -> bool {
+            snd.occType = sound::OcclusionType::None;
+
+            switch (core::Hash::Fnv1aHash(pOccType, length)) {
+                case "None"_fnv1a:
+                    snd.occType = sound::OcclusionType::None;
+                    break;
+                case "SingleRay"_fnv1a:
+                    snd.occType = sound::OcclusionType::SingleRay;
+                    break;
+                case "MultiRay"_fnv1a:
+                    snd.occType = sound::OcclusionType::MultiRay;
+                    break;
+                default:
+                    X_ERROR("Ent", "Invalid occlusion type: \"%s\"", pOccType);
+                    return false;
+            }
+
+            return true;
+        });
 
         ADD_TRANS_MEMBER(dtRotator_, axis);
         ADD_TRANS_MEMBER(dtRotator_, speed);
@@ -561,8 +582,6 @@ namespace entity
 
     bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
     {
-        using namespace core::Hash::Literals;
-
         if (entDesc.GetType() != core::json::Type::kObjectType) {
             X_ERROR("Ents", "Ent description must be a object");
             return false;
@@ -604,6 +623,11 @@ namespace entity
                         snd.handle = gEnv->pSound->registerObject(sndTrans);
                     }
 
+#if 1
+                    if (snd.occType != sound::OcclusionType::None) {
+                        gEnv->pSound->setOcclusionType(snd.handle, snd.occType);
+                    }
+#else
                     if (snd.occType.isNotEmpty()) {
                         sound::OcclusionType::Enum occ = sound::OcclusionType::None;
 
@@ -626,6 +650,7 @@ namespace entity
                             gEnv->pSound->setOcclusionType(snd.handle, occ);
                         }
                     }
+#endif
 
                     break;
                 }
