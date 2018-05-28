@@ -656,5 +656,7 @@ struct INet : public core::IEngineSysBase
     virtual const char* systemAddressToString(const SystemAddress& systemAddress, IPStr& strBuf, bool incPort) const X_ABSTRACT;
 };
 
-
 X_NAMESPACE_END
+
+
+X_DECLARE_ENUM_NUMERIC_LIMITS(X_NAMESPACE(net)::OrderingChannel);
