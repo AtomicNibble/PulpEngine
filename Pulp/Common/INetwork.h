@@ -96,7 +96,7 @@ X_DECLARE_ENUM8(PacketReliability)
 
 X_DECLARE_ENUM8(OrderingChannel)(
     Default,    
-    Channel1,
+    SessionMsg,
     Channel2,
     Channel3,
     Channel4,
