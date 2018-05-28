@@ -529,7 +529,7 @@ void Lobby::sendToPeers(const uint8_t* pData, size_t lengthInBytes) const
             continue;
         }
 
-        pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+        pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::ReliableOrdered, peer.systemHandle, OrderingChannel::SessionMsg);
     }
 }
 
@@ -559,7 +559,7 @@ void Lobby::sendToPeer(int32_t peerIdx, const uint8_t* pData, size_t lengthInByt
         return;
     }
 
-    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
+    pPeer_->send(pData, lengthInBytes, PacketPriority::High, PacketReliability::ReliableOrdered, peer.systemHandle, OrderingChannel::SessionMsg);
 }
 
 // ----------------------------------------------------
@@ -1478,7 +1478,9 @@ void Lobby::sendJoinRequestToHost(void)
     bs.write(safe_static_cast<uint8_t>(type_));
 
     addUsersToBs(bs);
-    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle);
+    
+    // we don't use sendToPeer/host as they check connection is established.
+    pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, peer.systemHandle, OrderingChannel::SessionMsg);
 }
 
 // -----------------------------------------------------------
