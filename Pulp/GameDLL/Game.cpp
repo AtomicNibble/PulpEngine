@@ -206,9 +206,7 @@ bool XGame::update(core::FrameData& frame)
     if (status == net::SessionStatus::Idle)
     {
         // main menu :D
-        if (world_) {
-            world_.reset();
-        }
+        clearWorld();
 
         auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds();
 
@@ -229,11 +227,9 @@ bool XGame::update(core::FrameData& frame)
         if (prevStatus_ != net::SessionStatus::Loading)
         {
             // frist frame in loading.
-            if (world_) {
-                world_.reset();
-            }
+            clearWorld();
 
-            lobbyUserGuids_.fill(net::NetGUID());
+        
         }
 
 
@@ -519,6 +515,15 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     auto clientIdx = getPlayerIdxForGuid(guid);
 
     userCmdMan_.readUserCmdToBs(bs, clientIdx);
+}
+
+void XGame::clearWorld(void)
+{
+    if (world_) {
+        world_.reset();
+    }
+
+    lobbyUserGuids_.fill(net::NetGUID());
 }
 
 int32_t XGame::getLocalClientIdx(void) const
