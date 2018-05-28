@@ -949,6 +949,7 @@ void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
 
     auto& peer = peers_[peerIdx];
     
+    // TODO: pack multiple msg's that fit in single BS.
     for (size_t i = 0; i < chatHistory_.size(); i++)
     {
         ChatMsgBs bs;
