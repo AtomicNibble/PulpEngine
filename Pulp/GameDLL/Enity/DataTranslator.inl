@@ -4,122 +4,156 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
+    inline BaseField::BaseField(const char* pName, core::StrHash hash, FieldType::Enum type, int32_t offset) :
+        name(pName),
+        nameHash(hash),
+        type(type),
+        offset(offset)
+    {
+
+    }
+
+    // -----------------------------------------------------
+
+    template<typename T>
+    inline DataTranslator<T>::Field::Field(const char* pName, core::StrHash hash, TypeCallBack<const char*>&& fn) :
+        BaseField(pName, hash, FieldType::String, -1),
+        initializer(std::move(fn))
+    {
+
+    }
+
+    // -----------------------------------------------------
+
+
     template<typename T>
     DataTranslator<T>::DataTranslator(core::MemoryArenaBase* arena) :
-        bools_(arena),
-        ints_(arena),
-        floats_(arena),
-        vecs_(arena),
-        strings_(arena)
+        hashes_(arena),
+        fields_(arena)
     {
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignBool(T& out, core::StrHash nameHash, bool value) const
+    void DataTranslator<T>::add(const char* pName, BoolMember member)
     {
-        return Assign(bools_, out, nameHash, value);
+        addInternal(pName, FieldType::Bool, static_cast<int32_t>(X_OFFSETOF(T, *member)));
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignInt(T& out, core::StrHash nameHash, int32_t value) const
+    void DataTranslator<T>::add(const char* pName, IntMember member)
     {
-        return Assign(ints_, out, nameHash, value);
+        addInternal(pName, FieldType::Int, static_cast<int32_t>(X_OFFSETOF(T, *member)));
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignFloat(T& out, core::StrHash nameHash, float value) const
+    void DataTranslator<T>::add(const char* pName, FloatMember member)
     {
-        return Assign(floats_, out, nameHash, value);
+        addInternal(pName, FieldType::Float, static_cast<int32_t>(X_OFFSETOF(T, *member)));
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignVec3(T& out, core::StrHash nameHash, Vec3f value) const
+    void DataTranslator<T>::add(const char* pName, Vec3Member member)
     {
-        return Assign(vecs_, out, nameHash, value);
+        addInternal(pName, FieldType::Vec3, static_cast<int32_t>(X_OFFSETOF(T, *member)));
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignString(T& out, core::StrHash nameHash, core::string value) const
+    void DataTranslator<T>::add(const char* pName, StringMember member)
     {
-        return Assign(strings_, out, nameHash, value);
+        addInternal(pName, FieldType::String, static_cast<int32_t>(X_OFFSETOF(T, *member)));
     }
 
     template<typename T>
-    bool DataTranslator<T>::AssignString(T& out, core::StrHash nameHash, const char* pValue) const
+    bool DataTranslator<T>::assignBool(T& out, core::StrHash nameHash, bool value) const
     {
-        return Assign(strings_, out, nameHash, pValue);
-    }
+        auto* pField = findField(nameHash);
 
-    // -----------------------------------------------------
+        if (pField->type != FieldType::Bool) {
+            return false;
+        }
 
-    template<typename T>
-    DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, BoolMember member)
-    {
-        X_ASSERT(!ContainsHash(bools_, nameHash), "Hash collision")(nameHash);
-
-        bools_.emplace_back(nameHash, member);
-        return *this;
+        auto* pValue = pField->getValuePtr<bool>(out);
+        *pValue = value;
+        return true;
     }
 
     template<typename T>
-    DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, IntMember member)
+    bool DataTranslator<T>::assignInt(T& out, core::StrHash nameHash, int32_t value) const
     {
-        X_ASSERT(!ContainsHash(ints_, nameHash), "Hash collision")(nameHash);
+        auto* pField = findField(nameHash);
 
-        ints_.emplace_back(nameHash, member);
-        return *this;
+        if (pField->type != FieldType::Int) {
+            return false;
+        }
+
+        auto* pValue = pField->getValuePtr<int32_t>(out);
+        *pValue = value;
+        return true;
     }
 
     template<typename T>
-    DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, FloatMember member)
+    bool DataTranslator<T>::assignFloat(T& out, core::StrHash nameHash, float value) const
     {
-        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
+        auto* pField = findField(nameHash);
 
-        floats_.emplace_back(nameHash, member);
-        return *this;
+        if (pField->type != FieldType::Float) {
+            return false;
+        }
+
+        auto* pValue = pField->getValuePtr<float>(out);
+        *pValue = value;
+        return true;
     }
 
     template<typename T>
-    DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, Vec3Member member)
+    bool DataTranslator<T>::assignVec3(T& out, core::StrHash nameHash, Vec3f value) const
     {
-        X_ASSERT(!ContainsHash(floats_, nameHash), "Hash collision")(nameHash);
+        auto* pField = findField(nameHash);
 
-        vecs_.emplace_back(nameHash, member);
-        return *this;
+        if (pField->type != FieldType::Vec3) {
+            return false;
+        }
+
+        auto* pValue = pField->getValuePtr<Vec3f>(out);
+        *pValue = value;
+        return true;
     }
 
     template<typename T>
-    DataTranslator<T>& DataTranslator<T>::Add(core::StrHash nameHash, StringMember member)
+    bool DataTranslator<T>::assignString(T& out, core::StrHash nameHash, const char* pString, size_t length) const
     {
-        X_ASSERT(!ContainsHash(strings_, nameHash), "Hash collision")(nameHash);
+        auto* pField = findField(nameHash);
 
-        strings_.emplace_back(nameHash, member);
-        return *this;
+        if (pField->type != FieldType::String) {
+            return false;
+        }
+
+        auto* pValue = pField->getValuePtr<core::string>(out);
+        pValue->assign(pString, length);
+        return true;
     }
 
-    // -----------------------------------------------------
-
     template<typename T>
-    template<typename MemberArrT, typename ValueT>
-    inline bool DataTranslator<T>::Assign(MemberArrT& members, T& out, core::StrHash nameHash, ValueT value) const
+    const typename DataTranslator<T>::Field* DataTranslator<T>::findField(core::StrHash nameHash) const
     {
-        for (auto& b : members) {
-            if (b.first == nameHash) {
-                (out.*b.second) = value;
-                return true;
+        for (size_t i = 0; i < hashes_.size(); i++) {
+            if (hashes_[i] == nameHash) {
+                X_ASSERT(fields_[i].nameHash == nameHash, "Hash of field not match lookup")();
+                return &fields_[i];
             }
         }
-        return false;
+
+        return nullptr;
     }
 
     template<typename T>
-    template<typename MemberArrT>
-    bool DataTranslator<T>::ContainsHash(MemberArrT& members, typename MemberArrT::value_type::first_type hash)
+    bool DataTranslator<T>::containsHash(core::StrHash hash) const
     {
-        return std::find_if(members.begin(), members.end(), [hash](const MemberArrT::value_type& v) {
-            return v.first == hash;
-        }) != members.end();
+        return std::find_if(fields_.begin(), fields_.end(), [hash](const FieldArray::value_type& v) {
+            return v.nameHash == hash;
+        }) != fields_.end();
     }
+
 
 } // namespace entity
 

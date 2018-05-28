@@ -114,7 +114,6 @@ namespace entity
 
         ADD_TRANS_MEMBER(dtEmitter_, effect);
         ADD_TRANS_MEMBER(dtEmitter_, offset);
-
         return true;
     }
 
@@ -519,13 +518,13 @@ namespace entity
                 case core::json::Type::kNumberType:
 
                     if (val.IsInt()) {
-                        translator.AssignInt(comp, nameHash, val.GetInt());
+                        translator.assignInt(comp, nameHash, val.GetInt());
                     }
                     else if (val.IsBool()) {
-                        translator.AssignBool(comp, nameHash, val.GetBool());
+                        translator.assignBool(comp, nameHash, val.GetBool());
                     }
                     else if (val.IsFloat()) {
-                        translator.AssignFloat(comp, nameHash, val.GetFloat());
+                        translator.assignFloat(comp, nameHash, val.GetFloat());
                     }
                     else {
                         X_ERROR("Ent", "Unknown component numeric type: %" PRIi32, val.GetType());
@@ -534,7 +533,7 @@ namespace entity
 
                     break;
                 case core::json::Type::kStringType:
-                    translator.AssignString(comp, nameHash, val.GetString());
+                    translator.assignString(comp, nameHash, val.GetString(), val.GetStringLength());
                     break;
 
                 case core::json::Type::kObjectType: {
@@ -548,7 +547,7 @@ namespace entity
                         val["y"].GetFloat(),
                         val["z"].GetFloat());
 
-                    translator.AssignVec3(comp, nameHash, vec);
+                    translator.assignVec3(comp, nameHash, vec);
                 } break;
 
                 default:
