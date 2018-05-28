@@ -5,7 +5,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template<class, size_t MaxSize = 256>
+template<class, size_t MaxSize = 64>
 class Function;
 
 template<class R, class... Args, size_t MaxSize>
