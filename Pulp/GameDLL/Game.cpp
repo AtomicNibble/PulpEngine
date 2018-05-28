@@ -47,12 +47,6 @@ void XGame::registerVars(void)
 	weaponDefs_.registerVars();
     vars_.registerVars();
 
-    // register some vars
-    //	ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, s_DefaultCamPosition, core::VarFlag::CHEAT,
-    //		"camera position");
-    //	ADD_CVAR_REF_VEC3("cam_angle", cameraAngle_, s_DefaultCamAngle, core::VarFlag::CHEAT,
-    //		"camera angle(radians)");
-
     pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI),
         core::VarFlag::SAVE_IF_CHANGED, "camera fov");
 
@@ -241,6 +235,7 @@ bool XGame::update(core::FrameData& frame)
 
             lobbyUserGuids_.fill(net::NetGUID());
         }
+
 
         if (!world_)
         {
@@ -524,79 +519,6 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     auto clientIdx = getPlayerIdxForGuid(guid);
 
     userCmdMan_.readUserCmdToBs(bs, clientIdx);
-}
-
-void XGame::ProcessInput(core::FrameTimeData& timeInfo)
-{
-    X_UNUSED(timeInfo);
-
-    const float speed = 250.f;
-    const float timeScale = speed * timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
-
-    for (const auto& e : inputEvents_) {
-        Vec3f posDelta;
-
-        // rotate.
-        switch (e.keyId) {
-            case input::KeyId::MOUSE_X:
-                cameraAngle_.z += -(e.value * 0.002f);
-                continue;
-            case input::KeyId::MOUSE_Y:
-                cameraAngle_.x += -(e.value * 0.002f);
-                continue;
-            default:
-                break;
-        }
-
-        float scale = 1.f;
-        if (e.modifiers.IsSet(input::InputEvent::ModiferType::LSHIFT)) {
-            scale = 2.f;
-        }
-
-        scale *= timeScale;
-
-#if 0
-		switch (e.keyId)
-		{
-			// forwards.
-		case input::KeyId::W:
-			posDelta.y = scale;
-			break;
-			// backwards
-		case input::KeyId::A:
-			posDelta.x = -scale;
-			break;
-
-			// Left
-		case input::KeyId::S:
-			posDelta.y = -scale;
-			break;
-			// right
-		case input::KeyId::D:
-			posDelta.x = scale;
-			break;
-
-			// up / Down
-		case input::KeyId::Q:
-			posDelta.z = -scale;
-			break;
-		case input::KeyId::E:
-			posDelta.z = scale;
-			break;
-
-		default:
-			continue;
-		}
-#endif
-
-        // I want movement to be relative to the way the camera is facing.
-        // so if i'm looking 90 to the right the direction also needs to be rotated.
-        Matrix33f angle = Matrix33f::createRotation(cameraAngle_);
-
-        cameraPos_ += (angle * posDelta);
-    }
-
-    inputEvents_.clear();
 }
 
 int32_t XGame::getLocalClientIdx(void) const

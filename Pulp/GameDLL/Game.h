@@ -55,8 +55,6 @@ public:
     // ~IGameCallbacks
 
 private:
-    void ProcessInput(core::FrameTimeData& timeInfo);
-
     int32_t getLocalClientIdx(void) const;
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
 
@@ -72,11 +70,6 @@ private:
     render::IRender* pRender_;
     core::ITimer* pTimer_;
     core::ICVar* pFovVar_;
-
-    Vec3f cameraPos_;
-    Vec3f cameraAngle_;
-
-    input::InputEventBuffer inputEvents_;
 
     XCamera cam_;
 
