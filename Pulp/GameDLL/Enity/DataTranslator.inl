@@ -16,7 +16,7 @@ namespace entity
     // -----------------------------------------------------
 
     template<typename T>
-    inline DataTranslator<T>::Field::Field(const char* pName, core::StrHash hash, TypeCallBack<const char*>&& fn) :
+    inline DataTranslator<T>::Field::Field(const char* pName, core::StrHash hash, StringTypeCallBack&& fn) :
         BaseField(pName, hash, FieldType::String, -1),
         initializer(std::move(fn))
     {
@@ -126,6 +126,10 @@ namespace entity
 
         if (pField->type != FieldType::String) {
             return false;
+        }
+
+        if (pField->initializer) {
+            return pField->initializer(out, pString, length);
         }
 
         auto* pValue = pField->getValuePtr<core::string>(out);

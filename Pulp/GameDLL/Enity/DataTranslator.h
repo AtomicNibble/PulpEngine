@@ -40,21 +40,23 @@ namespace entity
         template<typename T>
         using MulArray = core::Array<T, core::ArrayAllocator<T>, core::growStrat::FixedLinear<4>>;
 
-        template<typename T2>
-        using TypeCallBack = core::Function<void(T&, T2), 32>;
+        template<class... Args>
+        using TypeCallBack = core::Function<bool(T&, Args...), 32>;
+
+        using StringTypeCallBack = TypeCallBack<const char*, size_t>;
 
         struct Field : public BaseField
         {
             using BaseField::BaseField;
 
-            Field(const char* pName, core::StrHash hash, TypeCallBack<const char*>&& fn);
+            Field(const char* pName, core::StrHash hash, StringTypeCallBack&& fn);
 
             template<typename T2>
             T2* getValuePtr(T& instance) const {
                 return reinterpret_cast<T2*>(reinterpret_cast<char*>(&instance) + offset);
             }
 
-            TypeCallBack<const char*> initializer;
+            mutable StringTypeCallBack initializer;
         };
 
         using FieldArray = MulArray<Field>;
@@ -78,7 +80,7 @@ namespace entity
         void add(const char* pName, Vec3Member member);
         void add(const char* pName, StringMember member);
 
-        void initializeFromString(const char* pName, TypeCallBack<const char*> fn);
+        void initializeFromString(const char* pName, StringTypeCallBack fn);
 
     private:
         void addInternal(const char* pName, FieldType::Enum type, int32_t offset);
@@ -104,13 +106,14 @@ namespace entity
 
 
     template<typename T>
-    void DataTranslator<T>::initializeFromString(const char* pName, TypeCallBack<const char*> fn)
+    void DataTranslator<T>::initializeFromString(const char* pName, StringTypeCallBack fn)
     {
         // so we will have a function that has diffrent return type :(
         // can i generalize this slut?
         core::StrHash hash(pName);
         
         fields_.emplace_back(pName, hash, std::move(fn));
+        hashes_.push_back(hash);
     }
 
 } // namespace entity
