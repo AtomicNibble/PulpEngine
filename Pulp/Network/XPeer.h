@@ -52,7 +52,7 @@ struct BufferdCommand
     // 4
     PacketPriority::Enum priority;
     PacketReliability::Enum reliability;
-    uint8_t orderingChannel;
+    OrderingChannel::Enum orderingChannel;
     bool broadcast;
 
     // ?
@@ -90,8 +90,8 @@ X_ALIGNED_SYMBOL(struct RemoteSystem, 64) // each remote can be updated on diffr
     X_NO_ASSIGN(RemoteSystem);
 
 public:
-    RemoteSystem(NetVars & vars, core::MemoryArenaBase * arena, core::MemoryArenaBase * packetDataArena, core::MemoryArenaBase * packetPool);
-    RemoteSystem(RemoteSystem && oth) = default;
+    RemoteSystem(NetVars& vars, core::MemoryArenaBase* arena, core::MemoryArenaBase* packetDataArena, core::MemoryArenaBase* packetPool);
+    RemoteSystem(RemoteSystem&& oth) = default;
 
     RemoteSystem& operator=(RemoteSystem&& rhs) = default;
 
@@ -110,9 +110,9 @@ public:
     void onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime);
 
     X_INLINE bool sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
-        PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
+        PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
     X_INLINE bool sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-        PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
+        PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt = INVALID_SEND_RECEIPT);
 
 private:
     X_INLINE void onSend(PacketReliability::Enum reliability, core::TimeVal sendTime);
@@ -243,8 +243,8 @@ public:
     // IPeer
 
     StartupResult::Enum init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors) X_FINAL;
-    void shutdown(core::TimeVal blockDuration, uint8_t orderingChannel = 0,
-        PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_FINAL;
+    void shutdown(core::TimeVal blockDuration, OrderingChannel::Enum orderingChannel,
+        PacketPriority::Enum disconnectionNotificationPriority) X_FINAL;
 
     void runUpdate(void) X_FINAL;
 
@@ -259,7 +259,7 @@ public:
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_FINAL;
 
     void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
-        uint8_t orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_FINAL;
+        OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority) X_FINAL;
 
     // connection util
     SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_FINAL;
@@ -268,7 +268,7 @@ public:
     void cancelConnectionAttempt(const SystemAddress& target) X_FINAL;
 
     SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-        PacketReliability::Enum reliability, SystemHandle systemHandle, uint8_t orderingChannel,
+        PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannel::Enum orderingChannel,
         bool broadcast, SendReceipt forceReceiptNumber = INVALID_SEND_RECEIPT) X_FINAL;
 
     void sendLoopback(const uint8_t* pData, size_t lengthBytes) X_FINAL;
@@ -327,13 +327,13 @@ public:
 
 private:
     void sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-        PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
+        PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
 
     X_INLINE void sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-        PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
+        PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt);
 
     void sendPing(RemoteSystem& rs, PacketReliability::Enum rel);
-    void notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority);
+    void notifyAndFlagForShutdown(RemoteSystem& rs, OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority);
 
     X_INLINE static bool isLoopbackHandle(SystemHandle systemHandle);
 

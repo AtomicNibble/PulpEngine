@@ -97,7 +97,7 @@ namespace
             }
         }
 
-        pPeer->shutdown(core::TimeVal::fromMS(500));
+        pPeer->shutdown(core::TimeVal::fromMS(500), net::OrderingChannel::Default);
     }
 
     void ClientServerSelector(core::Console& Console)
@@ -195,7 +195,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
 
             if (mode == Mode::UnitTests) {
-                ::testing::GTEST_FLAG(filter) = "*OrderedPacketsTest*";
+                ::testing::GTEST_FLAG(filter) = "*ConnectToIdleHostFail*";
 
                 X_LOG0("TESTS", "Running unit tests...");
                 testing::InitGoogleTest(&__argc, __wargv);

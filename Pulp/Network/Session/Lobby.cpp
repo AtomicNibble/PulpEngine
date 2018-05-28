@@ -667,7 +667,7 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
             // tell the user to get fucked?
             // HELL YER!
             
-            pPeer_->closeConnection(peer.systemHandle, true, 0, PacketPriority::Low);
+            pPeer_->closeConnection(peer.systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
         }
 
         // this won't break removing the user below.

@@ -298,7 +298,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 
 XPeer::~XPeer()
 {
-    shutdown(0_tv);
+    shutdown(0_tv, OrderingChannel::Default, PacketPriority::High);
 }
 
 StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors)
@@ -425,7 +425,7 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
     return StartupResult::Started;
 }
 
-void XPeer::shutdown(core::TimeVal blockDuration, uint8_t orderingChannel,
+void XPeer::shutdown(core::TimeVal blockDuration, OrderingChannel::Enum orderingChannel,
     PacketPriority::Enum disconnectionNotificationPriority)
 {
     X_LOG0("Net", "Shutting down peer");
@@ -667,7 +667,7 @@ ConnectionAttemptResult::Enum XPeer::connect(const SystemAddress& sysAdd, const 
 }
 
 void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
-    uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
+    OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority)
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
@@ -745,7 +745,7 @@ void XPeer::cancelConnectionAttempt(const SystemAddress& target)
 
 SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle,
-    uint8_t orderingChannel, bool broadcast,
+    OrderingChannel::Enum orderingChannel, bool broadcast,
     SendReceipt forceReceiptNumber)
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
@@ -800,7 +800,7 @@ SendReceipt XPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPr
 }
 
 void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, PacketPriority::Enum priority,
-    PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
+    PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
 {
     X_ASSERT(numberOfBitsToSend > 0, "Null request should not reach here")(numberOfBitsToSend);
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
@@ -817,7 +817,7 @@ void XPeer::sendBuffered(const uint8_t* pData, BitSizeT numberOfBitsToSend, Pack
     bufferdCmds_.push(pCmd);
 }
 
-void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, PacketPriority::Enum notificationPriority)
+void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority)
 {
     IPStr ipStr;
     X_LOG0_IF(vars_.debugEnabled(), "Net", "sending disconnectNotification to remoteSystem: \"%s\"", rs.systemAddress.toString(ipStr));
@@ -831,7 +831,7 @@ void XPeer::notifyAndFlagForShutdown(RemoteSystem& rs, uint8_t orderingChannel, 
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::ReliableOrdered,
-        0,
+        orderingChannel,
         now);
 
     rs.connectState = ConnectState::DisconnectAsap;
@@ -1157,7 +1157,7 @@ void XPeer::ping(const SystemHandle handle)
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::UnReliable,
-        0,
+        OrderingChannel::Default,
         handle,
         false,
         0);
@@ -1204,7 +1204,7 @@ void XPeer::sendPing(RemoteSystem& rs, PacketReliability::Enum rel)
         bsOut,
         PacketPriority::Immediate,
         rel,
-        0,
+        OrderingChannel::Default,
         now);
 }
 
@@ -2273,7 +2273,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
                         bsOut,
                         PacketPriority::Immediate,
                         PacketReliability::Reliable,
-                        0,
+                        OrderingChannel::Default,
                         timeNow);
                 }
                 else {
@@ -2388,7 +2388,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
                 bsOut,
                 PacketPriority::Immediate,
                 PacketReliability::Reliable,
-                0,
+                OrderingChannel::Default,
                 timeNow);
 
             rs.connectState = ConnectState::DisconnectAsapSilent;
@@ -2412,7 +2412,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::Reliable,
-        0,
+        OrderingChannel::Default,
         timeNow);
 }
 
@@ -2461,7 +2461,7 @@ void XPeer::handleConnectionRequestAccepted(UpdateBitStream& bsOut, RecvBitStrea
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::Reliable,
-        0,
+        OrderingChannel::Default,
         timeNow);
 
     sendPing(rs, PacketReliability::UnReliable);
@@ -2523,7 +2523,7 @@ void XPeer::handleConnectedPing(UpdateBitStream& bsOut, RecvBitStream& bs, Remot
         bsOut,
         PacketPriority::Immediate,
         PacketReliability::UnReliable,
-        0,
+        OrderingChannel::Default,
         timeNow);
 }
 

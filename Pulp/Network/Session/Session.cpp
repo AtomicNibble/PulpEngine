@@ -707,7 +707,7 @@ void Session::handleTransportConnectionPacket(Packet* pPacket)
         X_ERROR("Session", "Recived packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
 
         // close connections for now when this happens
-        pPeer_->closeConnection(pPacket->systemHandle, true);
+        pPeer_->closeConnection(pPacket->systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
         return;
     }
 

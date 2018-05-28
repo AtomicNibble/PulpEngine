@@ -20,7 +20,7 @@ X_NAMESPACE_BEGIN(net)
 
 class SystemAddress;
 
-static const uint32_t MAX_ORDERED_STREAMS = 16; // can bump this but it increases memory per connection.
+static const uint32_t MAX_ORDERED_STREAMS = 8; // can bump this but it increases memory per connection.
 static const uint32_t MAX_PASSWORD_LEN = 128;
 static const uint32_t MAX_PEERS = 4; // a server only needs 1 peer.
 static const uint32_t MAX_SESSION = 2;
@@ -94,6 +94,13 @@ X_DECLARE_ENUM8(PacketReliability)
     ReliableWithAck,
     ReliableOrderedWithAck);
 
+X_DECLARE_ENUM8(OrderingChannel)(
+    Default    
+    
+);
+
+static_assert(OrderingChannel::ENUM_COUNT < MAX_ORDERED_STREAMS, "Defined ordering channels exceeds MAX_ORDERED_STREAMS");
+
 #if NET_IPv6_SUPPORT // can't if/def inside DECLARE_ENUM.
 
 X_DECLARE_ENUM8(IpVersion)
@@ -130,8 +137,6 @@ typedef uint16_t Port;
 // typedef uint8_t MessageID;
 typedef uint32_t SendReceipt;
 typedef uint32_t BitSizeT;
-
-typedef uint8_t OrderingChannelIdx;
 
 typedef core::StackString<512, char> HostStr;
 typedef core::StackString<45 + 11, char> IPStr; // 11 for port. and ipv6 is 39 / 45 for ipv4 mapped notation
@@ -348,7 +353,7 @@ struct IPeer
     virtual StartupResult::Enum init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors) X_ABSTRACT;
     X_INLINE StartupResult::Enum init(int32_t maxConnections, const SocketDescriptor& socketDescriptors);
 
-    virtual void shutdown(core::TimeVal blockDuration, OrderingChannelIdx orderingChannel = 0,
+    virtual void shutdown(core::TimeVal blockDuration, OrderingChannel::Enum orderingChannel,
         PacketPriority::Enum disconnectionNotificationPriority = PacketPriority::Low) X_ABSTRACT;
 
     virtual void runUpdate(void) X_ABSTRACT;
@@ -364,7 +369,7 @@ struct IPeer
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
 
     virtual void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
-        OrderingChannelIdx orderingChannel = 0, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
+        OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
 
     // connection util
     virtual SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_ABSTRACT;
@@ -373,8 +378,8 @@ struct IPeer
     virtual void cancelConnectionAttempt(const SystemAddress& address) X_ABSTRACT;
 
     // send some data :)
-    virtual SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel, bool broadcast, SendReceipt forceReceiptNumber) X_ABSTRACT;
-    X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel);
+    virtual SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannel::Enum orderingChannel, bool broadcast, SendReceipt forceReceiptNumber) X_ABSTRACT;
+    X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannel::Enum orderingChannel);
     X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel);
     X_INLINE SendReceipt send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority, PacketReliability::Enum reliability, SystemHandle systemHandle);
 
@@ -426,7 +431,7 @@ X_INLINE StartupResult::Enum IPeer::init(int32_t maxConnections, const SocketDes
 }
 
 X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
-    PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannelIdx orderingChannel)
+    PacketReliability::Enum reliability, SystemHandle systemHandle, OrderingChannel::Enum orderingChannel)
 {
     return send(pData, lengthBytes, priority, reliability, systemHandle, orderingChannel, false, INVALID_SEND_RECEIPT);
 }
@@ -434,13 +439,13 @@ X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes,
 X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle, size_t orderingChannel)
 {
-    return send(pData, lengthBytes, priority, reliability, systemHandle, safe_static_cast<OrderingChannelIdx>(orderingChannel), false, INVALID_SEND_RECEIPT);
+    return send(pData, lengthBytes, priority, reliability, systemHandle, safe_static_cast<OrderingChannel::Enum>(orderingChannel), false, INVALID_SEND_RECEIPT);
 }
 
 X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes, PacketPriority::Enum priority,
     PacketReliability::Enum reliability, SystemHandle systemHandle)
 {
-    return send(pData, lengthBytes, priority, reliability, systemHandle, 0, false, INVALID_SEND_RECEIPT);
+    return send(pData, lengthBytes, priority, reliability, systemHandle, OrderingChannel::Default, false, INVALID_SEND_RECEIPT);
 }
 
 // ---------------------------------

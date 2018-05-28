@@ -9,7 +9,7 @@ X_INLINE bool PingAndClockDifferential::isValid(void) const
 // --------------------------------------------------------------
 
 X_INLINE bool RemoteSystem::sendReliabile(const uint8_t* pData, BitSizeT numberOfBitsToSend, bool ownData, PacketPriority::Enum priority,
-    PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
+    PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
 {
     if (!canSend()) {
         X_WARNING("Net", "Tried to send data to remote, where sending is currently disabled");
@@ -33,7 +33,7 @@ X_INLINE bool RemoteSystem::sendReliabile(const uint8_t* pData, BitSizeT numberO
 }
 
 X_INLINE bool RemoteSystem::sendReliabile(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-    PacketReliability::Enum reliability, uint8_t orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
+    PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, core::TimeVal currentTime, SendReceipt receipt)
 {
     if (!canSend()) {
         X_WARNING("Net", "Tried to send data to remote, where sending is currently disabled");
@@ -74,7 +74,7 @@ X_INLINE void RemoteSystem::onSend(PacketReliability::Enum reliability, core::Ti
 // --------------------------------------------------------------
 
 X_INLINE void XPeer::sendBuffered(const core::FixedBitStreamBase& bs, PacketPriority::Enum priority,
-    PacketReliability::Enum reliability, uint8_t orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
+    PacketReliability::Enum reliability, OrderingChannel::Enum orderingChannel, SystemHandle systemHandle, bool broadcast, SendReceipt receipt)
 {
     X_ASSERT(bs.isStartOfStream(), "Stream has been read from, potential bug?")();
 
