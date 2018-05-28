@@ -113,8 +113,7 @@ public:
     uint8_t* pData;
     DataRefrence* pRefData;
 
-    INTRUSIVE_LIST_LINK(ReliablePacket)
-    reliableLink;
+    INTRUSIVE_LIST_LINK(ReliablePacket) reliableLink;
 
 private:
     core::MemoryArenaBase* arena; // arena this memory is from.
