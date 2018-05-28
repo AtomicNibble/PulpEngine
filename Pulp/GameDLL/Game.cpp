@@ -30,6 +30,7 @@ XGame::XGame(ICore* pCore) :
     pSession_(nullptr),
     pRender_(nullptr),
     pFovVar_(nullptr),
+    prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
     weaponDefs_(arena_)
 {
@@ -463,6 +464,8 @@ bool XGame::update(core::FrameData& frame)
     {
         X_ERROR("Game", "Unhandle session status: %s", net::SessionStatus::ToString(status));
     }
+
+    prevStatus_ = status;
 
     {
 

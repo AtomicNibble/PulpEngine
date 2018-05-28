@@ -83,6 +83,7 @@ private:
 private:
     GameVars vars_;
 
+    net::SessionStatus::Enum prevStatus_;
     net::NetGUID myGuid_;
     PlayerGuidArr lobbyUserGuids_;
 
