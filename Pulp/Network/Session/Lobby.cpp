@@ -553,8 +553,6 @@ void Lobby::sendToPeer(int32_t peerIdx, MessageID::Enum id) const
 
 void Lobby::sendToPeer(int32_t peerIdx, const uint8_t* pData, size_t lengthInBytes) const
 {
-    X_ASSERT(peerIdx >= 0, "Invalid peerIdx")(peerIdx);
-
     auto& peer = peers_[peerIdx];
     if (!peer.isConnected()) {
         X_ERROR("Lobby", "Can't send a none connected peer a msg");
