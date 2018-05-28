@@ -1121,7 +1121,7 @@ void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
     maxIncommingConnections_ = numberAllowed;
 
     if (maxIncommingConnections_ > maxPeers_) {
-        X_ERROR("Net", "Tried to set max incomming connections(%" PRIu16 ") above max connections(%" PRIi32 "), capping", numberAllowed, maxIncommingConnections_);
+        X_ERROR("Net", "Tried to set max incomming connections(%" PRIu16 ") above max peers(%" PRIi32 "), capping", numberAllowed, maxPeers_);
         maxIncommingConnections_ = maxPeers_;
     }
 
