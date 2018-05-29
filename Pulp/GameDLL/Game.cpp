@@ -595,7 +595,7 @@ void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
 
     // holly moly!!!!
     net::MatchParameters match;
-    match.numSlots = 1;
+    match.numSlots = 2;
     match.mode = net::GameMode::SinglePlayer;
     match.mapName.set(pMapName);
 
