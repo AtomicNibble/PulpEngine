@@ -28,6 +28,12 @@ X_INLINE int32_t CompProp::getSizeOfVar(void) const
     return sizeOfVar_;
 }
 
+X_INLINE int32_t CompProp::getNumElements(void) const
+{
+    X_ASSERT(type_ == CompPropType::Array, "Num Elements only valid for arrays")(type_, numElements_);
+    return numElements_;
+}
+
 // --------------------------------------------------------------------
 
 X_INLINE size_t CompTable::numProps(void) const

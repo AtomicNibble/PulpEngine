@@ -11,9 +11,17 @@ CompProp::CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffs
     sizeOfVar_(sizeOfVar),
     flags_(flags),
     fltLowValue_(0.f),
-    fltHighValue_(0.f)
+    fltHighValue_(0.f),
+    numElements_(-1)
 {
 }
+
+CompProp::CompProp(const char* pName, CompPropType::Enum type, int32_t fieldOffset, int32_t sizeOfVar, int32_t numBits, int32_t numElements) :
+    CompProp(pName, type, fieldOffset, sizeOfVar, numBits, CompPropFlags())
+{
+    numElements_ = numElements;
+}
+
 
 // ---------------------------------------------------
 
@@ -64,19 +72,26 @@ CompProp CompPropInt(const char* pName, int32_t offset, int32_t sizeOfVar, int32
 
 CompProp CompPropQuat(const char* pName, int32_t offset, int32_t sizeOfVar, int32_t numBits, CompPropFlags flags)
 {
-    X_ASSERT(sizeOfVar == sizeof(Quatf), "Size not match")
-        (sizeOfVar, sizeof(Quatf));
+    X_ASSERT(sizeOfVar == sizeof(Quatf), "Size not match")(sizeOfVar, sizeof(Quatf));
 
     return{ pName, CompPropType::Quaternion, offset, sizeOfVar, numBits, flags };
 }
 
 CompProp CompPropVec(const char* pName, int32_t offset, int32_t sizeOfVar, int32_t numBits, CompPropFlags flags)
 {
-    X_ASSERT(sizeOfVar == sizeof(Vec3f), "Size not match")
-        (sizeOfVar, sizeof(Vec3f));
+    X_ASSERT(sizeOfVar == sizeof(Vec3f), "Size not match")(sizeOfVar, sizeof(Vec3f));
 
     return{ pName, CompPropType::Vector, offset, sizeOfVar, numBits, flags };
 }
+
+CompProp CompPropArray(const char* pName, int32_t offset, int32_t sizeOfVar, int32_t elementSize, int32_t numElemets)
+{
+    X_ASSERT(numElemets <= MAX_ARRAY_ELEMENTS, "Array has too many elements")(numElemets, MAX_ARRAY_ELEMENTS);
+    X_ASSERT(sizeOfVar / numElemets == elementSize, "Elements require stride")(sizeOfVar, numElemets, elementSize);
+
+    return{ pName, CompPropType::Array, offset, sizeOfVar, core::bitUtil::bytesToBits(elementSize), numElemets };
+}
+
 
 
 X_NAMESPACE_END
