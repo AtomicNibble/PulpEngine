@@ -301,6 +301,7 @@ XPeer::~XPeer()
     shutdown(0_tv, OrderingChannel::Default, PacketPriority::High);
 }
 
+// TODO: make this handle been called multiple times better.
 StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketDescriptor> socketDescriptors)
 {
     if (maxConnections < 1) {
@@ -315,26 +316,6 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         if (sd.getPort() == 0)
         {
             return StartupResult::InvalidPort;
-        }
-    }
-
-    X_ASSERT(maxPeers_ == 0, "Already init")(maxPeers_);
-
-    maxPeers_ = maxConnections;
-  
-    if (maxIncommingConnections_ > maxConnections) {
-        maxIncommingConnections_ = maxConnections;
-    }
-
-    {
-        core::MemoryArenaBase* packetPool = &pool2Arena_;
-
-        remoteSystems_.reserve(maxPeers_);
-        activeRemoteSystems_.reserve(maxPeers_);
-        remoteSystemLookup_.reserve(maxPeers_);
-        for (int32_t i = 0; i < maxPeers_; i++) {
-            remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
-            remoteSystems_[i].setHandle(i);
         }
     }
 
@@ -374,6 +355,31 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         sockets_.emplace_back(std::move(socket));
     }
 
+    if (!cryptRnd_.init()) {
+        X_ERROR("Net", "Failed to init rnd");
+        return StartupResult::Error;
+    }
+
+    X_ASSERT(maxPeers_ == 0, "Already init")(maxPeers_);
+
+    maxPeers_ = maxConnections;
+
+    if (maxIncommingConnections_ > maxConnections) {
+        maxIncommingConnections_ = maxConnections;
+    }
+
+    {
+        core::MemoryArenaBase* packetPool = &pool2Arena_;
+
+        remoteSystems_.reserve(maxPeers_);
+        activeRemoteSystems_.reserve(maxPeers_);
+        remoteSystemLookup_.reserve(maxPeers_);
+        for (int32_t i = 0; i < maxPeers_; i++) {
+            remoteSystems_.emplace_back(vars_, arena_, &blockArena_, packetPool);
+            remoteSystems_[i].setHandle(i);
+        }
+    }
+
     socketThreads_.resize(sockets_.size());
     for (size_t i = 0; i < socketThreads_.size(); i++) {
         auto& socket = sockets_[i];
@@ -398,10 +404,6 @@ StartupResult::Enum XPeer::init(int32_t maxConnections, core::span<const SocketD
         }
     }
 
-    if (!cryptRnd_.init()) {
-        X_ERROR("Net", "Failed to init rnd");
-        return StartupResult::Error;
-    }
 
     if (vars_.debugEnabled() > 1) {
         NetGuidStr guidStr;
