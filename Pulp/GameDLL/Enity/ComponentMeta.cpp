@@ -20,23 +20,22 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-
-    IMPLEMENT_META(TransForm, TransFormMeta, TransFormTable)
+    IMPLEMENT_META(TransForm)
         net::CompPropQuat(ADD_FIELD(quat)),
         net::CompPropVec(ADD_FIELD(pos)),
     END_META()
 
 
-    IMPLEMENT_META(Health, HealthMeta, HealthTable)
+    IMPLEMENT_META(Health)
         net::CompPropInt(ADD_FIELD(hp)),
         net::CompPropInt(ADD_FIELD(max)),
     END_META()
 
-    IMPLEMENT_META(SoundObject, SoundObjectMeta, SoundObjectTable)
+    IMPLEMENT_META(SoundObject)
         net::CompPropVec(ADD_FIELD(offset)),
     END_META()
 
-    IMPLEMENT_META(Player, PlayerMeta, PlayerTable)
+    IMPLEMENT_META(Player)
         net::CompPropInt(ADD_FIELD(currentWpn)),
     END_META()
 
