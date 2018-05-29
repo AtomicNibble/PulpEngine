@@ -81,7 +81,6 @@ bool XGame::init(void)
         auto* pPeer = pNet->createPeer();
         
         myGuid_  = pPeer->getMyGUID();
-        pPeer->setMaximumIncomingConnections(4);
 
         net::Port basePort = 1337;
         net::Port maxPort = basePort + 10;
@@ -99,6 +98,7 @@ bool XGame::init(void)
             return false;
         }
 
+        pPeer->setMaximumIncomingConnections(4);
         X_LOG0("Game", "Listening on port ^6%" PRIu16, sd.getPort());
 
         pSession_ = pNet->createSession(pPeer, this);
