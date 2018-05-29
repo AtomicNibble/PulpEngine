@@ -44,6 +44,7 @@ namespace entity
                 case net::CompPropType::Int64:
                 case net::CompPropType::Float:
                 case net::CompPropType::VectorXY:
+                case net::CompPropType::Array:
                 case net::CompPropType::String:
                 case net::CompPropType::DataTable:
                     X_ASSERT_NOT_IMPLEMENTED();
@@ -85,6 +86,7 @@ namespace entity
                 case net::CompPropType::Float:
                 case net::CompPropType::VectorXY:
                 case net::CompPropType::String:
+                case net::CompPropType::Array:
                 case net::CompPropType::DataTable:
                     X_ASSERT_NOT_IMPLEMENTED();
                     break;
