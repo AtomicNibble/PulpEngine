@@ -1049,7 +1049,7 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
 
     if (getNumFreeUserSlots() == 0) {
-       X_WARNING("Lobby", "Rejected peer, looby is full"); // owned.
+       X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
         
         MsgIdBs bs;
         bs.write(MessageID::LobbyJoinNoFreeSlots);
