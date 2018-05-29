@@ -6,7 +6,6 @@
 #include <UserCmd.h>
 #include <MetaTableMacros.h>
 
-
 X_NAMESPACE_DECLARE(model,
                     class XModel;)
 
@@ -65,6 +64,10 @@ namespace entity
 
     struct Mesh
     {
+        ADD_META()
+
+        // core::StackString<64> name;
+        // TODO replace this with networked string.
         core::string name;
         model::XModel* pModel;
     };
@@ -108,19 +111,23 @@ namespace entity
         // lets says the order weapons are loaded don't matter. and we deal with networking later.
         // we get int id's for each loaded asset, can we use that how we want?
         // well i think so.
-        void giveAmmo(weapon::AmmoTypeId type, int32_t num) {
+        void giveAmmo(weapon::AmmoTypeId type, int32_t num)
+        {
             ammo[type] += num;
         }
 
-        int32_t numAmmo(weapon::AmmoTypeId type) const {
+        int32_t numAmmo(weapon::AmmoTypeId type) const
+        {
             return ammo[type];
         }
 
-        bool hasAmmo(weapon::AmmoTypeId type, int32_t num) const {
+        bool hasAmmo(weapon::AmmoTypeId type, int32_t num) const
+        {
             return ammo[type] >= num;
         }
 
-        bool useAmmo(weapon::AmmoTypeId type, int32_t num) {
+        bool useAmmo(weapon::AmmoTypeId type, int32_t num)
+        {
             if (hasAmmo(type, num)) {
                 ammo[type] -= num;
                 return true;
@@ -128,29 +135,34 @@ namespace entity
             return false;
         }
 
-        int32_t getClipAmmo(int32_t weaponId) const {
+        int32_t getClipAmmo(int32_t weaponId) const
+        {
             return clip[weaponId];
         }
-        void setClipAmmo(int32_t weaponId, int32_t num) {
+        void setClipAmmo(int32_t weaponId, int32_t num)
+        {
             clip[weaponId] = num;
         }
 
         std::bitset<weapon::WEAPON_MAX_LOADED> weapons;
-        
+
     private:
         std::array<int32_t, weapon::WEAPON_MAX_LOADED> clip; // only sync'd when you switch weapon.
-        std::array<int32_t, weapon::WEAPON_MAX_AMMO_TYPES> ammo; 
+        std::array<int32_t, weapon::WEAPON_MAX_AMMO_TYPES> ammo;
     };
 
     struct Weapon
     {
-        X_INLINE bool isReady(void) const {
+        X_INLINE bool isReady(void) const
+        {
             return state == weapon::State::Idle;
         }
-        X_INLINE bool isHolstered(void) const {
+        X_INLINE bool isHolstered(void) const
+        {
             return state == weapon::State::Holstered;
         }
-        X_INLINE void raise(void) {
+        X_INLINE void raise(void)
+        {
             holster = false;
         }
 
