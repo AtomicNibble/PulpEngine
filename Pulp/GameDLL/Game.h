@@ -55,6 +55,7 @@ public:
     // ~IGameCallbacks
 
 private:
+    void syncLobbyUsers(void);
     void clearWorld(void);
 
     int32_t getLocalClientIdx(void) const;

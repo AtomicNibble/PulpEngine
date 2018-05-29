@@ -257,66 +257,7 @@ bool XGame::update(core::FrameData& frame)
         if (world_->hasLoaded() && !pSession_->hasFinishedLoading())
         {
             // spawn stuff like players!
-            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-          //  if (pLobby->isHost())
-            {
-                // users not peers?
-                core::FixedFifo<net::NetGUID, net::MAX_PLAYERS> userUsers;
-
-                auto numUsers = pLobby->getNumUsers();
-                for (int32_t i = 0; i < numUsers; i++)
-                {
-                    net::UserInfo info;
-                    pLobby->getUserInfoForIdx(i, info);
-
-                    X_ASSERT(info.guid.isValid(), "User is no valid")();
-
-                    auto it = std::find_if(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), [&info](const net::NetGUID& guid) {
-                        return guid == info.guid;
-                    });
-
-                    if (it == lobbyUserGuids_.end())
-                    {
-                        userUsers.push(info.guid);
-                    }
-                }
-
-
-                // add the new users.
-                while (userUsers.isNotEmpty())
-                {
-                    // find a free local player slot.
-                    int32_t plyIdx = -1;
-                    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
-                    {
-                        if (!lobbyUserGuids_[i].isValid())
-                        {
-                            plyIdx = i;
-                            break;
-                        }
-                    }
-
-                    if (plyIdx == -1)
-                    {
-                        X_ERROR("Game", "Failed to find free player slot for connected player");
-                        break;
-                    }
-
-                    auto userGuid = userUsers.peek();
-                    userUsers.pop();
-
-                    net::NetGuidStr buf;
-                    X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, userGuid.toString(buf));
-
-                    lobbyUserGuids_[plyIdx] = userGuid;
-
-                    userCmdMan_.resetPlayer(plyIdx);
-
-                    // spawn!
-                    world_->spawnPlayer(plyIdx);
-                }
-            }
+            syncLobbyUsers();
 
             pSession_->finishedLoading();
         }
@@ -341,6 +282,8 @@ bool XGame::update(core::FrameData& frame)
     else if (status == net::SessionStatus::InGame)
     {
         X_ASSERT_NOT_NULL(world_.ptr());
+
+        syncLobbyUsers();
 
         auto localIdx = getLocalClientIdx();
         entity::EntityId localId = static_cast<entity::EntityId>(localIdx);
@@ -515,6 +458,86 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     auto clientIdx = getPlayerIdxForGuid(guid);
 
     userCmdMan_.readUserCmdToBs(bs, clientIdx);
+}
+
+void XGame::syncLobbyUsers(void)
+{
+    core::FixedArray<net::NetGUID, net::MAX_PLAYERS> currentUsers;
+    core::FixedFifo<net::NetGUID, net::MAX_PLAYERS> newUsers;
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+    auto numUsers = pLobby->getNumUsers();
+    for (int32_t i = 0; i < numUsers; i++)
+    {
+        net::UserInfo info;
+        pLobby->getUserInfoForIdx(i, info);
+
+        X_ASSERT(info.guid.isValid(), "User is no valid")();
+
+        auto it = std::find_if(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), [info](const net::NetGUID& guid) {
+            return guid == info.guid;
+        });
+
+        if (it == lobbyUserGuids_.end())
+        {
+            newUsers.push(info.guid);
+        }
+        else
+        {
+            currentUsers.push_back(info.guid);
+        }
+    }
+
+    // You still here?
+    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+    {
+        auto userGuid = lobbyUserGuids_[i];
+        if (!userGuid.isValid()) {
+            continue;
+        }
+
+        if (currentUsers.find(userGuid) == decltype(currentUsers)::invalid_index) {
+            lobbyUserGuids_[i] = net::NetGUID();
+
+            world_->removePlayer(i);
+        }
+    }
+
+    // add the new users.
+    while (newUsers.isNotEmpty())
+    {
+        // find a free local player slot.
+        int32_t plyIdx = -1;
+        for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+        {
+            if (!lobbyUserGuids_[i].isValid())
+            {
+                plyIdx = i;
+                break;
+            }
+        }
+
+        if (plyIdx == -1)
+        {
+            X_ERROR("Game", "Failed to find free player slot for connected player");
+            break;
+        }
+
+        auto userGuid = newUsers.peek();
+        newUsers.pop();
+
+        net::NetGuidStr buf;
+        X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, userGuid.toString(buf));
+
+        lobbyUserGuids_[plyIdx] = userGuid;
+
+        userCmdMan_.resetPlayer(plyIdx);
+
+        // spawn!
+        world_->spawnPlayer(plyIdx);
+    }
+
 }
 
 void XGame::clearWorld(void)
