@@ -30,20 +30,15 @@ namespace weapon
 
 namespace entity
 {
-
-
     typedef uint16_t EntityId;
 
     struct NetworkSync
     {
-
     };
-
 
     struct TransForm : public Transformf
     {
         ADD_META()
-
     };
 
     struct Health
