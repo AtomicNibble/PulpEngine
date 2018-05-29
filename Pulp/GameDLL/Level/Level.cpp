@@ -372,6 +372,16 @@ void World::spawnPlayer(int32_t playerIdx)
     // userCmdMan_.resetPlayer(playerIdx);
 }
 
+void World::removePlayer(int32_t playerIdx)
+{
+    X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
+    X_ASSERT_NOT_NULL(pScene_);
+
+    entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
+
+    ents_.removePlayer(id);
+}
+
 bool World::createPhysicsScene(physics::IPhysics* pPhys)
 {
     if (pScene_) {

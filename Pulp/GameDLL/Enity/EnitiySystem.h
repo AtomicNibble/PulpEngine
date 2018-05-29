@@ -62,6 +62,7 @@ namespace entity
         EntityId createWeapon(EntityId playerId);
 
         void makePlayer(EntityId id);
+        void removePlayer(EntityId id);
         bool addController(EntityId id);
 
         bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);

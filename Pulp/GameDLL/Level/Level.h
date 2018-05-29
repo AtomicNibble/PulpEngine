@@ -101,6 +101,7 @@ public:
     void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
 
     void spawnPlayer(int32_t playerIdx);
+    void removePlayer(int32_t playerIdx);
 
 private:
     bool createPhysicsScene(physics::IPhysics* pPhys);

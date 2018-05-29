@@ -342,6 +342,23 @@ namespace entity
         player.weaponEnt = createWeapon(id);
     }
 
+    void EnititySystem::removePlayer(EntityId id)
+    {
+        // TODO: i need to keep the player ents reserved, so calling destory is not really going to work.
+
+        auto& player = reg_.get<Player>(id);
+
+        if (player.armsEnt != entity::INVALID_ID) {
+            reg_.destroy(player.armsEnt);
+        }
+
+        if (player.weaponEnt != entity::INVALID_ID) {
+            reg_.destroy(player.weaponEnt);
+        }
+
+        reg_.destroy(id);
+    }
+
     bool EnititySystem::addController(EntityId id)
     {
         auto& trans = reg_.get<TransForm>(id);
