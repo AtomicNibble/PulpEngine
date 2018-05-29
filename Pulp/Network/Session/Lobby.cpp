@@ -1081,7 +1081,7 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
         return;
     }
 
-    X_ERROR("Net", "Connection attempt failed: \"%s\"", MessageID::ToString(id));
+    X_ERROR("Lobby", "Connection attempt failed: \"%s\"", MessageID::ToString(id));
         
     setState(LobbyState::Error);
 }
