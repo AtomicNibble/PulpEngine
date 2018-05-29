@@ -457,6 +457,9 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     // what if i don't like you HEY!
     auto clientIdx = getPlayerIdxForGuid(guid);
 
+    net::NetGuidStr buf;
+    X_ASSERT(clientIdx >= 0, "Failed to get client index for guid \"%s\"", guid.toString(buf))(guid);
+
     userCmdMan_.readUserCmdToBs(bs, clientIdx);
 }
 
