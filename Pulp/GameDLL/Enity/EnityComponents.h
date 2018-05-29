@@ -98,12 +98,7 @@ namespace entity
 
     struct Inventory
     {
-
-
-        // i will want per ammo type stores at somepoint
-        // but the types are data driven.
-        // need some sort of type to index shit maybe.
-   //     int32_t ammo;
+        ADD_META()
 
         // you can have multiple weapons in invetory.
         // what do i store these as?

@@ -39,6 +39,10 @@ namespace entity
         net::CompPropInt(ADD_FIELD(currentWpn)),
     END_META()
 
+    IMPLEMENT_META(Inventory)
+        net::CompPropArray(ADD_FIELD_ARRAY(clip)),
+        net::CompPropArray(ADD_FIELD_ARRAY(ammo)),
+    END_META()
 
 } // namespace entity
 
