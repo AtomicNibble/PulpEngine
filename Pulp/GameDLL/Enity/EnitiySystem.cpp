@@ -81,7 +81,7 @@ namespace entity
         }
 
         for (uint32_t i = 0; i < net::MAX_PLAYERS; i++) {
-            auto id = createEnt();
+            auto id = reg_.create();
             if (id != i) {
                 X_ASSERT_UNREACHABLE();
                 return false;
@@ -283,7 +283,7 @@ namespace entity
 
     void EnititySystem::makePlayer(EntityId id)
     {
-        // auto trans = reg_.assign<TransForm>(id);
+        reg_.assign<TransForm>(id);
         auto& player = reg_.assign<Player>(id);
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
