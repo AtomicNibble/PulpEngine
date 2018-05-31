@@ -159,6 +159,7 @@ X_NAMESPACE_END
 #define X_ASSERT_NOT_NULL(ptr)                          (ptr != nullptr) ? (ptr) : ((X_ASSERT(ptr != nullptr, "Pointer \"" #ptr "\" is null.")()), nullptr)
 #define X_ASSERT_UNREACHABLE()                          X_ASSERT(false, "Source code defect, code should never be reached.")()
 #define X_ASSERT_NOT_IMPLEMENTED()                      X_ASSERT(false, "This function is not implemented yet.")()
+#define X_ASSERT_DEPRECATED()                           X_ASSERT(false, "This function is deprecated.")()
 #define X_ASSERT_ALIGNMENT(argument, alignment, offset) X_ASSERT(X_NAMESPACE(core)::internal::IsAligned(argument, alignment, offset), "Argument \"" #argument "\" is not properly aligned.") (argument, alignment, offset)
 #else
 #define X_ASSERT(condition, format, ...) X_UNUSED(condition), X_UNUSED(format), X_UNUSED(__VA_ARGS__), X_UNUSED
@@ -171,6 +172,7 @@ X_NAMESPACE_END
 
 #define X_ASSERT_UNREACHABLE()
 #define X_ASSERT_NOT_IMPLEMENTED()
+#define X_ASSERT_DEPRECATED()
 #define X_ASSERT_ALIGNMENT(argument, alignment, offset) X_UNUSED(argument), X_UNUSED(alignment), X_UNUSED(offset)
 #endif
 
