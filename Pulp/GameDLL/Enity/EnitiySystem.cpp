@@ -361,7 +361,7 @@ namespace entity
     bool EnititySystem::addController(EntityId id)
     {
         auto& trans = reg_.get<TransForm>(id);
-        auto& con = reg_.assign<CharacterController>(id);
+        
 
         physics::CapsuleControllerDesc desc;
         desc.radius = 20.f;
@@ -372,13 +372,14 @@ namespace entity
         desc.upDirection = Vec3f::zAxis();
         desc.maxJumpHeight = vars_.player.jumpHeight_;
 
+        physics::ICharacterController* pController;
         {
             physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-            con.pController = pPhysScene_->createCharacterController(desc);
+            pController = pPhysScene_->createCharacterController(desc);
         }
 
-        if (con.pController == nullptr) {
-            reg_.remove<CharacterController>(id);
+        if (pController) {
+            reg_.assign<CharacterController>(id, pController);
             return false;
         }
 
@@ -709,7 +710,6 @@ namespace entity
                     }
 
                     reg_.assign<DynamicObject>(ent);
-
                     break;
                 }
 

@@ -202,6 +202,10 @@ namespace entity
 
     struct CharacterController
     {
+        CharacterController(physics::ICharacterController* pCon) :
+            pController(pCon)
+        {
+        }
         physics::ICharacterController* pController;
     };
 
