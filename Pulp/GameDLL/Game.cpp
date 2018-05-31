@@ -342,13 +342,8 @@ bool XGame::update(core::FrameData& frame)
             auto& userCmd = userCmdMan_.getUserCmdForPlayer(localIdx);
             auto unread = userCmdMan_.getNumUnreadFrames(localIdx);
             
-            if (userCmd.moveForwrd)
-            {
-                X_LOG0("Game", "client move forward");
-            }
+            X_UNUSED(unread);
 
-            X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
-            
             world_->runUserCmdForPlayer(frame, userCmd, localIdx);
         }
 
