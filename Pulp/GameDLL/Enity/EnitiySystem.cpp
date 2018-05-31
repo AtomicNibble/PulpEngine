@@ -375,23 +375,39 @@ namespace entity
         // TODO: i need to keep the player ents reserved, so calling destory is not really going to work.
 
         auto& player = reg_.get<Player>(id);
+        auto& mesh = reg_.get<Mesh>(id);
+        auto& meshRend = reg_.get<MeshRenderer>(id);
+
+        if (meshRend.pRenderEnt) {
+            p3DWorld_->removeRenderEnt(meshRend.pRenderEnt);
+        }
+
+        if (mesh.pModel) {
+            pModelManager_->releaseModel(mesh.pModel);
+        }
 
         if (player.armsEnt != entity::INVALID_ID) {
-            reg_.destroy(player.armsEnt);
+            destroyEnt(player.armsEnt);
         }
 
         if (player.weaponEnt != entity::INVALID_ID) {
-            reg_.destroy(player.weaponEnt);
+            destroyEnt(player.weaponEnt);
         }
 
-        reg_.destroy(id);
+        if (reg_.has<CharacterController>(id)) {
+            auto& con = reg_.get<CharacterController>(id);
+
+            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+            pPhysScene_->releaseCharacterController(con.pController);
+        }
+
+        reg_.reset(id);
     }
 
     bool EnititySystem::addController(EntityId id)
     {
         auto& trans = reg_.get<TransForm>(id);
         
-
         physics::CapsuleControllerDesc desc;
         desc.radius = 20.f;
         desc.height = vars_.player.normalHeight_;
