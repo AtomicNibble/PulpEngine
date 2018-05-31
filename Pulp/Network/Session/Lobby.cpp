@@ -1097,7 +1097,7 @@ void Lobby::handleConnectionLost(Packet* pPacket)
             return;
         }
 
-        X_ERROR("Lobby", "Peer lost connection");
+        X_ERROR("Lobby", "Peer lost connection to \"%s\"  lobby", LobbyType::ToString(type_));
 
         setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
     }
