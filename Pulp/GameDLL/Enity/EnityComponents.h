@@ -89,6 +89,12 @@ namespace entity
 
     struct Animator
     {
+        Animator() = default;
+        Animator(anim::Animator* pAnimator_) : 
+            pAnimator(pAnimator_)
+        {
+        }
+
         anim::Animator* pAnimator;
     };
 
@@ -206,6 +212,7 @@ namespace entity
             pController(pCon)
         {
         }
+
         physics::ICharacterController* pController;
     };
 

@@ -730,7 +730,6 @@ namespace entity
                 }
 
                 case "Animator"_fnv1a: {
-                    auto& an = reg_.assign<Animator>(ent);
                     if (!reg_.has<Mesh>(ent)) {
                         X_ERROR("Ents", "Animator requires a Mesh component");
                         return false;
@@ -738,7 +737,9 @@ namespace entity
 
                     auto& mesh = reg_.get<Mesh>(ent);
 
-                    an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
+                    auto* pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
+
+                    reg_.assign<Animator>(ent, pAnimator);
                     break;
                 }
                 case "Rotator"_fnv1a: {
