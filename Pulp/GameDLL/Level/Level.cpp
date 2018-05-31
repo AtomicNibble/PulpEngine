@@ -362,13 +362,6 @@ void World::spawnPlayer(int32_t playerIdx)
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
 
     ents_.makePlayer(id, pos);
-
-    
-//    if (playerIdx == 0) {
-//        ents_.addController(id);
-//    }
-
-    // userCmdMan_.resetPlayer(playerIdx);
 }
 
 void World::removePlayer(int32_t playerIdx)
