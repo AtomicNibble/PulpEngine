@@ -44,7 +44,7 @@ public:
     XModel* loadModel(const char* pModelName) X_FINAL;
     XModel* getDefaultModel(void) const X_FINAL;
 
-    void releaseModel(XModel* pModel);
+    void releaseModel(XModel* pModel) X_FINAL;
 
     void reloadModel(const char* pName);
     void listModels(const char* pSearchPatten = nullptr) const;
