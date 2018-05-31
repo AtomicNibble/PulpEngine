@@ -496,8 +496,11 @@ void XGame::syncLobbyUsers(void)
         }
 
         if (currentUsers.find(userGuid) == decltype(currentUsers)::invalid_index) {
-            lobbyUserGuids_[i] = net::NetGUID();
 
+            net::NetGuidStr buf;
+            X_LOG0("Game", "Client left %" PRIi32 " guid: %s", i, userGuid.toString(buf));
+
+            lobbyUserGuids_[i] = net::NetGUID();
             world_->removePlayer(i);
         }
     }
