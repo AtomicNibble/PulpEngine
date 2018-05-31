@@ -225,9 +225,9 @@ namespace entity
         // calculate first person view.
         calculateFirstPersonView(trans, player);
 
-        if(reg.has<RenderComponent>(playerId))
+        if(reg.has<MeshRenderer>(playerId))
         {
-            auto& rend = reg.get<RenderComponent>(playerId);
+            auto& rend = reg.get<MeshRenderer>(playerId);
             p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
         }
 

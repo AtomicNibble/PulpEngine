@@ -205,12 +205,6 @@ namespace entity
         physics::ICharacterController* pController;
     };
 
-    struct RenderComponent
-    {
-        engine::IRenderEnt* pRenderEnt;
-        model::XModel* pModel;
-    };
-
     struct Rotator
     {
         Vec3f axis;
@@ -319,7 +313,6 @@ namespace entity
 
         Animator,
         Velocity,
-        RenderComponent,
         PhysicsComponent,
         PhysicsTrigger,
         CharacterController,

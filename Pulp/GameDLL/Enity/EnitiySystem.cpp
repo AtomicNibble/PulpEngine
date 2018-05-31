@@ -288,13 +288,12 @@ namespace entity
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
         auto& net = reg_.assign<NetworkSync>(id);
+        auto& mesh = reg_.assign<Mesh>(id);
+        auto& rend = reg_.assign<MeshRenderer>(id);
 
-        auto& rend = reg_.assign<RenderComponent>(id);
-
-
-        rend.pModel = pModelManager_->loadModel("test/prop/rolling_pan");
+        mesh.pModel = pModelManager_->loadModel("test/prop/rolling_pan");
         engine::RenderEntDesc entDsc;
-        entDsc.pModel = rend.pModel;
+        entDsc.pModel = mesh.pModel;
         // entDsc.trans = trans;
         rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
 

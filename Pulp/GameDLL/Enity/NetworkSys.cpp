@@ -170,9 +170,9 @@ namespace entity
             {
                // auto& ply = reg.get<Player>(entityId);
 
-                if (reg.has<RenderComponent>(entityId))
+                if (reg.has<MeshRenderer>(entityId))
                 {
-                    auto& rend = reg.get<RenderComponent>(entityId);
+                    auto& rend = reg.get<MeshRenderer>(entityId);
                     p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
                 }
             }
