@@ -348,21 +348,6 @@ namespace entity
         player.currentWpn = 1;
         player.targetWpn = 1;
 
-#if 0
-		engine::RenderEntDesc entDsc;
-		entDsc.pModel = pModelManager_->loadModel("test/anim/smooth_bind_02");
-		entDsc.trans.pos = Vec3f(-90, 0, 10);
-
-		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
-
-		entDsc.trans.pos = Vec3f(-190, 0, 10);
-		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
-
-		entDsc.trans.pos = Vec3f(-190, -100, 10);
-		rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
-
-		X_ASSERT_NOT_NULL(rend.pRenderEnt);
-#endif
 
         addController(id);
 
