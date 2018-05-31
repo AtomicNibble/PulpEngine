@@ -402,11 +402,7 @@ namespace entity
         }
 
         if (d.HasMember("misc_model")) {
-            auto arr = d["misc_model"].GetArray();
-
-            if (!parseMiscModels(arr)) {
-                return false;
-            }
+            X_ASSERT_DEPRECATED();
         }
 
         if (d.HasMember("script_origin")) {
@@ -475,36 +471,6 @@ namespace entity
         }
 
         return true;
-    }
-
-    bool EnititySystem::parseMiscModels(core::json::Value::Array arr)
-    {
-#if 1
-        X_UNUSED(arr);
-        return true;
-#else
-        for (auto it = arr.begin(); it != arr.end(); ++it) {
-            auto ent = reg_.create<TransForm, PhysicsComponent, RenderComponent>();
-            auto& trans = reg_.get<TransForm>(ent);
-            auto& phys = reg_.get<PhysicsComponent>(ent);
-            auto& rend = reg_.get<RenderComponent>(ent);
-
-            X_UNUSED(phys, rend);
-
-            auto& kvps = *it;
-
-            const char* pOrigin = kvps["origin"].GetString();
-            const char* pModelName = kvps["model"].GetString();
-
-            if (sscanf_s(pOrigin, "%f %f %f", &trans.pos.x, &trans.pos.y, &trans.pos.z) != 3) {
-                return false;
-            }
-
-            rend.pModel = pModelManager_->loadModel(pModelName);
-        }
-
-        return true;
-#endif
     }
 
     bool EnititySystem::parseScriptOrigins(core::json::Value::Array arr)

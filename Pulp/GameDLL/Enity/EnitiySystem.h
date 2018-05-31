@@ -77,7 +77,6 @@ namespace entity
         bool createTranslatours(void);
 
         // Temp
-        bool parseMiscModels(core::json::Value::Array val);
         bool parseScriptOrigins(core::json::Value::Array val);
 
         template<typename CompnentT>
