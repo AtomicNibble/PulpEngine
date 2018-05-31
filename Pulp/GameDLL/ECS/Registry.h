@@ -488,6 +488,17 @@ namespace ecs
             }
         }
 
+        void reset(entity_type entity)
+        {
+            X_ASSERT(isValid(entity), "Not valid entity")();
+
+            using accumulator_type = int[];
+            accumulator_type accumulator = { 0, (reset<Components>(entity), 0)... };
+            (void)accumulator;
+
+            X_ASSERT(isValid(entity), "Not valid entity")();
+        }
+
         template<typename Comp>
         void reset(void)
         {
