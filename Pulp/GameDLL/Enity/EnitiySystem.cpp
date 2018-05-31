@@ -189,6 +189,33 @@ namespace entity
         return ent;
     }
 
+    void EnititySystem::destroyEnt(EntityId id)
+    {
+        if (reg_.has<MeshRenderer>(id)) {
+            auto& meshRend = reg_.get<MeshRenderer>(id);
+            p3DWorld_->removeRenderEnt(meshRend.pRenderEnt);
+        }
+
+        if (reg_.has<Mesh>(id)) {
+            auto& mesh = reg_.get<Mesh>(id);
+            pModelManager_->releaseModel(mesh.pModel);
+        }
+
+        if (reg_.has<Weapon>(id)) {
+            auto& wpn = reg_.get<Weapon>(id);
+            weaponDefs_.releaseWeaponDef(wpn.pWeaponDef);
+        }
+
+        if (reg_.has<Animator>(id)) {
+            auto& an = reg_.get<Animator>(id);
+            if (an.pAnimator) {
+                X_DELETE(an.pAnimator, g_gameArena);
+            }
+        }
+
+        reg_.destroy(id);
+    }
+
     EntityId EnititySystem::createWeapon(EntityId playerId)
     {
         Player& ply = reg_.get<Player>(playerId);

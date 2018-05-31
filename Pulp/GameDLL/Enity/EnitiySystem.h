@@ -59,6 +59,7 @@ namespace entity
 
 
         EntityId createEnt(void);
+        void destroyEnt(EntityId id);
         EntityId createWeapon(EntityId playerId);
 
         void makePlayer(EntityId id);
