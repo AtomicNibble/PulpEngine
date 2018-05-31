@@ -32,6 +32,7 @@ XGame::XGame(ICore* pCore) :
     pFovVar_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
+    userCmdMan_(vars_),
     weaponDefs_(arena_)
 {
 

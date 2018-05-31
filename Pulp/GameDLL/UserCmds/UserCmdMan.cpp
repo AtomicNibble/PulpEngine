@@ -4,10 +4,13 @@
 #include <Containers\FixedBitStream.h>
 #include <Time\TimeLiterals.h>
 
+#include "Vars\GameVars.h"
+
 X_NAMESPACE_BEGIN(game)
 
 
-UserCmdMan::UserCmdMan()
+UserCmdMan::UserCmdMan(GameVars& vars) :
+    vars_(vars)
 {
     writeFrame_.fill(0);
     readFrame_.fill(-1);
@@ -107,7 +110,10 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
         }
     }
 
-    X_LOG0("Game", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
+    if (vars_.userCmdDebug())
+    {
+        X_LOG0("Game", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
+    }
 
     // these are added for 0-N so in order.
     for (auto& cmd : userCmds)

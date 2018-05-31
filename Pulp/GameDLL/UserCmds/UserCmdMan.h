@@ -8,6 +8,8 @@ X_NAMESPACE_BEGIN(game)
 //
 // Manages user commands for multiple clients, keeping a history.
 //
+class GameVars;
+
 class UserCmdMan
 {
     static const size_t BUFFER_SIZE = 64;
@@ -18,7 +20,7 @@ class UserCmdMan
     typedef std::array<int32_t, net::MAX_PLAYERS> IndexArr;
 
 public:
-    UserCmdMan();
+    UserCmdMan(GameVars& vars);
 
     void addUserCmdForPlayer(int32_t playerIndex, const net::UserCmd& cmd);
     void resetPlayer(int32_t playerIndex);
@@ -33,6 +35,7 @@ public:
     X_INLINE bool hasUnreadFrames(int32_t playerIndex) const;
 
 private:
+    GameVars& vars_;
     IndexArr writeFrame_;
     IndexArr readFrame_;
     UserCmdBuf userCmds_; // buffers for each player.

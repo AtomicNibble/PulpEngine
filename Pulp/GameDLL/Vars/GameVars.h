@@ -12,11 +12,13 @@ public:
 
     void registerVars(void);
 
+    X_INLINE int32_t userCmdDebug(void) const;
     X_INLINE bool userCmdDrawDebug(void) const;
 
     PlayerVars player;
 
 private:
+    int32_t userCmdDebug_;
     int32_t userCmdDrawDebug_;
 };
 
