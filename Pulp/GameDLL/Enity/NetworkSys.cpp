@@ -154,7 +154,7 @@ namespace entity
             auto bs = snap.getMessageByIndex(i);
             
             auto entityId = bs.read<entity::EntityId>();
-            X_ASSERT(reg.has<NetworkSync>(entityId), "Enitity in shap shot not synced")(entityId);
+            X_ASSERT(reg.has<NetworkSync>(entityId), "Enitity in shapshot not synced")(entityId);
 
             auto& trans = reg.get<TransForm>(entityId);
 
