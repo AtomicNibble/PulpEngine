@@ -447,7 +447,7 @@ namespace entity
         }
 
         if (d.HasMember("misc_model")) {
-            X_ASSERT_DEPRECATED();
+        //    X_ASSERT_DEPRECATED();
         }
 
         if (d.HasMember("script_origin")) {
