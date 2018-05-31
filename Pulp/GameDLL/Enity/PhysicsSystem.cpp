@@ -132,27 +132,6 @@ namespace entity
 
                 actors.push_back(col.actor);
             }
-
-#if 0
-			for (size_t i = 0; i < 10; i++)
-			{
-				Transformf trans;
-				trans.pos.z = 50;
-				trans.pos.x = (float)(-300 + ((float)i * 45));
-				trans.pos.y = 120;
-
-#if 0
-				auto a  = pPhysics->createActor(trans, 50.0f, false);
-				pPhysics->addBox(a, AABB(Vec3f(0,0,0), 15.f));
-
-#else
-				//pPhysics->addSphere(a, 15.f);
-				// auto a = pPhysics->createSphere(trans, 15.f, 15.5f);
-				auto a = pPhysics->createBox(trans, AABB(Vec3f(0, 0, 0), 15.f), 15.f);
-#endif
-                actors.push_back(a);
-			}
-#endif
         }
 
         if (actors.isNotEmpty()) {
