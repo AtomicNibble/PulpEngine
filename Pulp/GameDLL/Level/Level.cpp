@@ -359,11 +359,10 @@ void World::spawnPlayer(int32_t playerIdx)
     // so we allmost what a make ent type helper, that we can just call and it makes the ent a player.
     // then here we can do shit with the player.
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
+    auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
 
-    ents_.makePlayer(id);
+    ents_.makePlayer(id, pos);
 
-    auto& trans = ents_.getRegister().get<entity::TransForm>(id);
-    trans.pos = Vec3f(-80, 0 + (playerIdx * 50.f), 10);
     
 //    if (playerIdx == 0) {
 //        ents_.addController(id);

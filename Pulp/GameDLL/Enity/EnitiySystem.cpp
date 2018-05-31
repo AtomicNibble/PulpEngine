@@ -308,15 +308,17 @@ namespace entity
         return ent;
     }
 
-    void EnititySystem::makePlayer(EntityId id)
+    void EnititySystem::makePlayer(EntityId id, const Vec3f& pos)
     {
-        reg_.assign<TransForm>(id);
+        auto& trans = reg_.assign<TransForm>(id);
         auto& player = reg_.assign<Player>(id);
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
         auto& net = reg_.assign<NetworkSync>(id);
         auto& mesh = reg_.assign<Mesh>(id);
         auto& rend = reg_.assign<MeshRenderer>(id);
+
+        trans.pos = pos;
 
         mesh.pModel = pModelManager_->loadModel("test/prop/rolling_pan");
         engine::RenderEntDesc entDsc;
