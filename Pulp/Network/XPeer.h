@@ -101,6 +101,7 @@ public:
     bool canSend(void) const;
     ConnectionState::Enum getConnectionState(void) const;
     int32_t getAveragePing(void) const;
+    int32_t getLastPing(void) const;
 
     SystemHandle getHandle(void) const;
     void setHandle(SystemHandle handle);

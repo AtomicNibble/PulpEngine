@@ -188,6 +188,11 @@ int32_t RemoteSystem::getAveragePing(void) const
     return -1;
 }
 
+int32_t RemoteSystem::getLastPing(void) const
+{
+    return pings[lastPingIdx].pingTime;
+}
+
 SystemHandle RemoteSystem::getHandle(void) const
 {
     return systemHandle;
