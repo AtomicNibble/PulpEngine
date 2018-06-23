@@ -28,30 +28,26 @@ X_NAMESPACE_BEGIN(core)
 namespace V2
 {
     /*
+        Job system that has per thread wait free queues, that support job stealing.
 
-For this one i'm going to have ques for each thread.
-And job stealing from other threads ques.
+        A job is added to the queue of the calling thread, so it's better to not submit all jobs from one thread.
+        as all the other threads will have to steal.
 
-Jobs are added to the que of the thread calling Add.
+        One way to achive this is to use the splitting functionality. that splits one job into many for you.
+        typially resulting in jobs fanning out across the threads.
+    
+        The goal of the design is high throughput and low overhead, allowing for lower job granularity.
+        The system is currently tuned to assume more work will be added very soon if none currenly.
+        Making it a bit wastefull if you have a 'burst' of work todo rather than constant stream.
 
-I think i'll have a fixed amount of jobs per a frame
-THen between each frame call reset?
-
-But that won't allow for multiple frames to be worked on at the same time.
-
-THis would not be a issue if the ques stored the job not just a job pointer.
-But that would mean once a job is submitted can't get it back.
-
-Lets work out how to delete the jobs later.
-
-
-*/
+    */
 
     class JobSystem;
     struct Job;
 
     typedef core::traits::Function<void(JobSystem&, size_t, Job*, void*)> JobFunction;
 
+    // Job data is 128 bytes, but the last 64 bytes are never touched unless continuations present.
     X_ALIGNED_SYMBOL(struct Job, 64)
     {
         static const size_t THREAD_IDX_BITS = 4; // 12 threads
