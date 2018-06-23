@@ -11,12 +11,12 @@ namespace VirtualMem
 {
     namespace
     {
-        DWORD g_pageSize = 0;
+        uint32_t g_pageSize = 0;
 
-        void _GetPageSize()
+        void LoadPageSize(void)
         {
             _SYSTEM_INFO systemInfo;
-            GetSystemInfo(&systemInfo);
+            ::GetSystemInfo(&systemInfo);
             g_pageSize = systemInfo.dwPageSize;
         }
     } // namespace
@@ -83,12 +83,13 @@ namespace VirtualMem
         }
     }
 
-    unsigned int GetPageSize(void)
+    uint32_t GetPageSize(void)
     {
-        if (!g_pageSize) {
-            _GetPageSize();
+        if (g_pageSize) {
+            return g_pageSize;
         }
-
+        
+        LoadPageSize();
         return g_pageSize;
     }
 

@@ -19,7 +19,7 @@ namespace VirtualMem
 
     void ReleaseAndFreePhysicalMemory(void* allocatedMemory);
 
-    unsigned int GetPageSize(void);
+    uint32_t GetPageSize(void);
 } // namespace VirtualMem
 
 X_NAMESPACE_END
