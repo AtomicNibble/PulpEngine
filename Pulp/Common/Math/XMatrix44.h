@@ -190,6 +190,10 @@ public:
     Vec3<T> postMultiply(const Vec3<T>& v) const;
     Vec4<T> postMultiply(const Vec4<T>& v) const;
 
+    // post-multiplies column vector v - divide by w
+    Vec3<T> postMultiplyW(const Vec3<T>& v) const;
+
+
     //! Computes inverse; assumes the matrix is affine, i.e. the bottom row is [0 0 0 1]
     void affineInvert();
     Matrix44<T> affineInverted() const;

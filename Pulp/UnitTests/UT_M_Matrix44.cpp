@@ -505,6 +505,19 @@ TYPED_TEST(Mat44, Operator)
         EXPECT_LE(diff.y, Matrix44<T>::EPSILON);
         EXPECT_LE(diff.z, Matrix44<T>::EPSILON);
     }
+    // const Vec3<T> operator*( const Vec3<T> &rhs ) const;
+    {
+        Vec3<T> cv0(0, 0, 0);
+        MatT c0(1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            10, 20, 30, 1);
+        Vec3<T> out = (c0 * cv0);
+
+        EXPECT_NEAR(out.x, 10.f, Matrix44<T>::EPSILON);
+        EXPECT_NEAR(out.y, 20.f, Matrix44<T>::EPSILON);
+        EXPECT_NEAR(out.z, 30.f, Matrix44<T>::EPSILON);
+    }
     // const Vec4<T> operator*( const Vec4<T> &rhs ) const;
     {
         Vec4<T> cv0(1, 2, 3, 4);
@@ -1039,6 +1052,19 @@ TYPED_TEST(Mat44, Util)
         EXPECT_LE(diff.y, Matrix44<T>::EPSILON);
         EXPECT_LE(diff.z, Matrix44<T>::EPSILON);
         EXPECT_LE(diff.w, Matrix44<T>::EPSILON);
+    }
+    // Vec3<T> postMultiplyW( const Vec3<T> &v ) const;
+    {
+        Vec3<T> cv0(0, 0, 0);
+        MatT c0(1, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 0, 1, 0,
+            10, 20, 30, 1);
+        Vec3<T> out = c0.postMultiplyW(cv0);
+
+        EXPECT_NEAR(out.x, 10.f, Matrix44<T>::EPSILON);
+        EXPECT_NEAR(out.y, 20.f, Matrix44<T>::EPSILON);
+        EXPECT_NEAR(out.z, 30.f, Matrix44<T>::EPSILON);
     }
     // void affineInvert(){ *this = affineInverted(); }
     {
