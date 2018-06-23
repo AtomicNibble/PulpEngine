@@ -298,9 +298,7 @@ public:
     void listBans(void) const;
     void listLocalAddress(void) const;
 
-    int32_t getAveragePing(SystemHandle system) const X_FINAL;
-    int32_t getLastPing(SystemHandle system) const X_FINAL;
-    int32_t getLowestPing(SystemHandle system) const X_FINAL;
+    PingInfo getPingInfo(SystemHandle systemHandle) const X_FINAL;
 
     X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
     SystemAddress getMyBoundAddress(void) const X_FINAL;

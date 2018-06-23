@@ -352,6 +352,23 @@ X_ENSURE_SIZE(Packet, 32)
 
 // ---------------------------------
 
+struct PingInfo
+{
+    PingInfo() {
+        cur = -1_i16;
+        avg = -1_i16;
+        min = -1_i16;
+    }
+
+    int16_t cur;
+    int16_t avg;
+    int16_t min;
+};
+
+X_ENSURE_SIZE(PingInfo, 6)
+
+// ---------------------------------
+
 struct IPeer
 {
     virtual ~IPeer() = default;
@@ -414,9 +431,7 @@ struct IPeer
     virtual bool isBanned(const IPStr& ip) X_ABSTRACT;
     virtual void clearBanList(void) X_ABSTRACT;
 
-    virtual int32_t getAveragePing(SystemHandle systemHandle) const X_ABSTRACT;
-    virtual int32_t getLastPing(SystemHandle systemHandle) const X_ABSTRACT;
-    virtual int32_t getLowestPing(SystemHandle systemHandle) const X_ABSTRACT;
+    virtual PingInfo getPingInfo(SystemHandle systemHandle) const X_ABSTRACT;
 
     virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;
     virtual SystemAddress getMyBoundAddress(void) const X_ABSTRACT;

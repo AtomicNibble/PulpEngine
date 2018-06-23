@@ -1370,40 +1370,22 @@ void XPeer::listLocalAddress(void) const
     }
 }
 
-int32_t XPeer::getAveragePing(SystemHandle systemHandle) const
+PingInfo XPeer::getPingInfo(SystemHandle systemHandle) const
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
-    const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
-    if (!pRemoteSys) {
-        return -1;
-    }
-
-    return pRemoteSys->getAveragePing();
-}
-
-int32_t XPeer::getLastPing(SystemHandle systemHandle) const
-{
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
+    PingInfo info;
 
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
-        return -1;
+        return info;
     }
 
-    return pRemoteSys->pings[pRemoteSys->lastPingIdx].pingTime;
-}
+    info.cur = pRemoteSys->getLastPing();
+    info.avg = pRemoteSys->getAveragePing();
+    info.min = pRemoteSys->lowestPing;
 
-int32_t XPeer::getLowestPing(SystemHandle systemHandle) const
-{
-    X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
-
-    const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
-    if (!pRemoteSys) {
-        return -1;
-    }
-
-    return pRemoteSys->lowestPing;
+    return info;
 }
 
 SystemAddress XPeer::getMyBoundAddress(void) const
