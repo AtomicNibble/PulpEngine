@@ -18,47 +18,6 @@ X_NAMESPACE_BEGIN(net)
 
 namespace
 {
-#if 0 
-
-	// returns if ip is matched by the pattern.
-	bool ipWildMatch(const IPStr& pattern, const IPStr& ip)
-	{
-		// do lame matching?
-		// 127.1.*.*
-		// 127.1.25.255
-		// so make sure we match untill we reach a *, then just check we only have '.' && '*' left.
-
-		// simple case where match
-		if (pattern == ip) {
-			return true;
-		}
-
-		// do wild matching.
-		size_t idx = 0;
-		while (idx < pattern.length() && idx < ip.length())
-		{
-			if (pattern[idx] == ip[idx])
-			{
-				++idx;
-			}
-			else if (pattern[idx] == '*')
-			{
-				// check the rest of the pattern is not digits.
-				while (idx < pattern.length()) {
-					if (pattern[idx] != '.' && pattern[idx] != '*') {
-						X_WARNING("Net", "Potential ip matching error: \"%s\" - \"%s\"", pattern.c_str(), ip.c_str());
-					}
-				}
-
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-#endif
-
     // start of packet to mark offline msg.
     const std::array<uint8_t, 8> OFFLINE_MSG_ID = {
         0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85};
