@@ -364,6 +364,33 @@ void Lobby::finishedLoading(void)
 
 // -------------------------------------------
 
+
+void Lobby::sendPingsToPeers(void) const
+{
+    X_ASSERT(isHost(), "Should not be trying to sendPings if not host")(isHost(), isPeer());
+
+    core::FixedBitStreamStack<0x40> bs;
+    bs.write(MessageID::LobbyPingValues);
+    bs.write(safe_static_cast<uint8_t>(type_));
+
+    for (int32_t i = 0; i < peers_.size(); i++)
+    {
+        auto& peer = peers_[i];
+
+        PingInfo info;
+
+        if (peer.isConnected()) {
+            info = pPeer_->getPingInfo(peer.systemHandle);
+        }
+
+        bs.write(info);
+    }
+
+    sendToPeers(bs.data(), bs.sizeInBytes());
+}
+
+// -------------------------------------------
+
 void Lobby::sendMembersToLobby(Lobby& destLobby) const
 {
     auto dstLobbyType = destLobby.getType();

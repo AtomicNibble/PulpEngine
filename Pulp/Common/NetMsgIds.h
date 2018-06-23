@@ -190,6 +190,9 @@ X_DECLARE_ENUM8(MessageID)
     LobbyConnectAndMove,    // The host of a patry told us to join this party.
     LobbyLeaveGameLobby,    // The host suggests you leave with him :)
 
+    LobbyPingValues, // from host has all the users pings.
+    LobbyChatMsg,
+
     // --- Session ---
 
     LoadingStart,   // tell peer to start loading
@@ -204,10 +207,8 @@ X_DECLARE_ENUM8(MessageID)
 
     // ------
     
-    LobbyChatMsg,
-    
-    PingValues // from host has all the users pings.
-    
+    GameSoundEvent
+
 );
 
 X_NAMESPACE_END

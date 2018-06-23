@@ -117,6 +117,7 @@ public:
     void startHosting(const MatchParameters& params);
     void finishedLoading(void);
 
+    void sendPingsToPeers(void) const;
     void sendMembersToLobby(Lobby& destLobby) const;
     void sendMembersToLobby(LobbyType::Enum type) const;
     void sendPeerToLobby(int32_t peerIdx, LobbyType::Enum type) const;
