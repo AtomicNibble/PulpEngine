@@ -16,13 +16,6 @@
 
 X_NAMESPACE_BEGIN(game)
 
-namespace
-{
-    static const Vec3f s_DefaultCamPosition(0, -150, 150);
-    static const Vec3f s_DefaultCamAngle(toRadians(-45.f), 0, toRadians(0.f));
-
-} // namespace
-
 XGame::XGame(ICore* pCore) :
     arena_(g_gameArena),
     pCore_(pCore),
