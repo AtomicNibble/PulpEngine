@@ -919,9 +919,22 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
                     auto* pTex = pTextureMan_->getByID(texState.textureId);
                     X_ASSERT_NOT_NULL(pTex);
 
+                    // texture may not have a device texture yet.
+                    // maybe just use default if not loaded?
                     auto& gpuResource = pTex->getGpuResource();
 
                     context.transitionResource(gpuResource, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+
+                    // HACK: spin till valid.
+                    auto srv = pTex->getSRV();
+                    if(srv.ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+                    {
+                        int backOff = 0;
+                        while (srv.ptr == render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN)
+                        {
+                            core::Thread::backOff(backOff);
+                        }
+                    }
 
                     textureSRVS[t] = pTex->getSRV();
 
