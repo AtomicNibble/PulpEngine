@@ -97,7 +97,7 @@ namespace ecs
 
             reverse_[entity] = pos_type(direct_.size());
             direct_.emplace_back(entity);
-            data_.push_back({std::forward<Args>(args)...});
+            data_.emplace_back(std::forward<Args>(args)...);
 
             return data_.back();
         }
