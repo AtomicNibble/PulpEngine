@@ -190,6 +190,10 @@ namespace V2
         // main and IO job list space.
         numThreads_ = math<uint32_t>::clamp(numThreads_, 1u, HW_THREAD_MAX - 2);
 
+        // HACK: we have some jobs that wait on other jobs.
+        // so we need atleast two.
+        numThreads_ = math<uint32_t>::max(numThreads_, 2u);
+
         if (!StartThreads()) {
             X_ERROR("Scheduler", "Failed to start worker threads");
             return false;

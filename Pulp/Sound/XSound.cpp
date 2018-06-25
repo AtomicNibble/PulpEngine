@@ -506,7 +506,14 @@ bool XSound::asyncInitFinalize(void)
     bool loaded = true;
 
     for (auto& bank : banks_) {
-        loaded &= waitForBankLoad(bank);
+		auto ok = waitForBankLoad(bank);
+
+		if (!ok)
+		{
+			X_ERROR("SoundSys", "Failed to load bank: \"%s\"", bank.name.c_str());
+		}
+
+		loaded &= ok;
     }
 
     pPrimCon_ = gEnv->p3DEngine->getPrimContext(engine::PrimContext::SOUND);

@@ -80,11 +80,11 @@ bool XGame::init(void)
         net::Port maxPort = basePort + 10;
 
         net::SocketDescriptor sd(basePort);
-        auto res = pPeer->init(2, sd);
+        auto res = pPeer->init(4, sd);
 
         while (res == net::StartupResult::SocketPortInUse && sd.getPort() <= maxPort) {
             sd.setPort(sd.getPort() + 1);
-            res = pPeer->init(2, sd);
+            res = pPeer->init(4, sd);
         }
 
         if (res != net::StartupResult::Started) {
