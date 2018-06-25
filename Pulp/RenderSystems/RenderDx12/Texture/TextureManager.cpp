@@ -115,8 +115,6 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
     else {
         pTexRes = textures_.createAsset(name, name);
 
-        threadPolicy.Leave();
-
         pTexRes->setDepth(1);
         pTexRes->setNumFaces(1);
         pTexRes->setNumMips(1);
@@ -146,6 +144,12 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
                 // we should mark the texture as invalid.
             }
         }
+
+        // TEMP
+        // don't let another thread get this texture till it's fully init.
+        // kinda lame tho, since pretty long lock time.
+        // should do something per texture.
+        threadPolicy.Leave();
     }
 
     return pTexRes;
