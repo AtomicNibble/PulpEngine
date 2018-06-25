@@ -1104,11 +1104,6 @@ bool XFont::CreateDeviceTexture(void)
         render::BufUsage::DYNAMIC,
         buf.data());
 
-    if (!pTexture_->isLoaded()) {
-        X_WARNING("Font", "Failed to create font texture.");
-        return false;
-    }
-
     // create a material here.
     // default_font
     auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();

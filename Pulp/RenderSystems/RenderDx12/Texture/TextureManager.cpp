@@ -86,7 +86,7 @@ Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
             return pTexRes;
         }
 
-        pTexRes = textures_.createAsset(name, core::string(pNickName), TextureFlags());
+        pTexRes = textures_.createAsset(name, core::string(pNickName));
     }
 
     return pTexRes;
@@ -113,7 +113,7 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
         }
     }
     else {
-        pTexRes = textures_.createAsset(name, name, TexFlag::DONT_STREAM | TexFlag::DONT_RESIZE | TexFlag::NOMIPS);
+        pTexRes = textures_.createAsset(name, name);
 
         threadPolicy.Leave();
 
@@ -174,7 +174,7 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
         pTexRes->addReference();
     }
     else {
-        pTexRes = textures_.createAsset(name, name, TextureFlags());
+        pTexRes = textures_.createAsset(name, name);
 
         threadPolicy.Leave();
 

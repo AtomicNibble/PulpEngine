@@ -312,10 +312,8 @@ struct IDeviceTexture
     virtual const int getNumMips(void) const X_ABSTRACT;
     virtual const int getDepth(void) const X_ABSTRACT;
     virtual const int getDataSize(void) const X_ABSTRACT;
-    virtual const bool isLoaded(void) const X_ABSTRACT;
 
     virtual const texture::TextureType::Enum getTextureType(void) const X_ABSTRACT;
-    virtual const texture::TextureFlags getFlags(void) const X_ABSTRACT;
     virtual const texture::Texturefmt::Enum getFormat(void) const X_ABSTRACT;
 
     virtual void setProperties(const texture::XTextureFile& imgFile) X_ABSTRACT;

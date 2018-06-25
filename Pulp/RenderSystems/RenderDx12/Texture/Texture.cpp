@@ -10,9 +10,8 @@
 
 X_NAMESPACE_BEGIN(texture)
 
-Texture::Texture(core::string name, TextureFlags flags) :
-    fileName_(name),
-    flags_(flags)
+Texture::Texture(core::string name) :
+    fileName_(name)
 {
     hCpuDescriptorHandle_.ptr = render::D3D12_GPU_VIRTUAL_ADDRESS_UNKNOWN;
     dimensions_ = Vec2<uint16_t>::zero();

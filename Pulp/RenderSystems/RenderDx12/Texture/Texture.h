@@ -29,7 +29,7 @@ class Texture : public render::IPixelBuffer // ::texture::ITexture
     friend class render::ShadowBuffer;
 
 public:
-    Texture(core::string name, TextureFlags flags);
+    Texture(core::string name);
     ~Texture();
 
     void destroy(void);
@@ -49,10 +49,7 @@ public:
     X_INLINE const int32_t getNumMips(void) const X_FINAL;
     X_INLINE const int32_t getDataSize(void) const X_FINAL;
 
-    X_INLINE const bool isLoaded(void) const X_FINAL;
-
     X_INLINE const TextureType::Enum getTextureType(void) const X_FINAL;
-    X_INLINE const TextureFlags getFlags(void) const X_FINAL;
     X_INLINE const Texturefmt::Enum getFormat(void) const X_FINAL;
     X_INLINE const render::BufUsage::Enum getUsage(void) const;
 
@@ -103,11 +100,11 @@ protected:
     Vec2<uint16_t> dimensions_;
     uint32_t datasize_; // size of the higest mip in bytes.
     TextureType::Enum type_;
-    TextureFlags flags_;
     Texturefmt::Enum format_;
     uint8_t numMips_;
     uint8_t depth_;
     uint8_t numFaces_;
+    uint8_t _pad[7];
 
     render::BufUsage::Enum usage_;
     render::PixelBufferType::Enum pixelBufType_;

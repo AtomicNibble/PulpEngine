@@ -41,19 +41,9 @@ X_INLINE const int32_t Texture::getDataSize(void) const
     return 0;
 }
 
-X_INLINE const bool Texture::isLoaded(void) const
-{
-    return !flags_.IsSet(TextureFlags::LOAD_FAILED);
-}
-
 X_INLINE const TextureType::Enum Texture::getTextureType(void) const
 {
     return type_;
-}
-
-X_INLINE const TextureFlags Texture::getFlags(void) const
-{
-    return flags_;
 }
 
 X_INLINE const Texturefmt::Enum Texture::getFormat(void) const
