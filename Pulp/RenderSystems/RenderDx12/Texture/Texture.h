@@ -117,7 +117,8 @@ protected:
     };
 };
 
-static const size_t goat = sizeof(Texture);
+X_ENSURE_LE(sizeof(Texture), 96, "Try keep texture <= 96 bytes plz!")
+
 
 X_NAMESPACE_END
 
