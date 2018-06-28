@@ -307,7 +307,7 @@ retry:
 		// give it upto 100ms to.
 		if (err == EACCES && retryCount < 10) {
 			retryCount++;
-			core::Thread::Sleep(10);
+			core::Thread::sleep(10);
 			goto retry;
 		}
 

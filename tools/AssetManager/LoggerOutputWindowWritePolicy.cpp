@@ -29,7 +29,7 @@ void LoggerOutputWindowWritePolicy::Init()
 	X_ASSERT(warningFmt_.isValid(), "Not valid")();
 	X_ASSERT(errorFmt_.isValid(), "Not valid")();
 
-	uiThreadId_ = core::Thread::GetCurrentID();
+	uiThreadId_ = core::Thread::getCurrentID();
 }
 
 void LoggerOutputWindowWritePolicy::setOutputWindow(OutputWindow* pOutWindow)
@@ -90,7 +90,7 @@ void LoggerOutputWindowWritePolicy::WriteInternal(const core::LoggerBase::Line& 
 
 void LoggerOutputWindowWritePolicy::submitMsgs(void)
 {
-	X_ASSERT(core::Thread::GetCurrentID() == uiThreadId_, "Can only submit msg's from the ui thread")();
+	X_ASSERT(core::Thread::getCurrentID() == uiThreadId_, "Can only submit msg's from the ui thread")();
 
 	// could swap vec to reduce contention.
 	core::CriticalSection::ScopedLock lock(cs_);
