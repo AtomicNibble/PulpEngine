@@ -178,7 +178,7 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
         core::Array<uint8_t> compressed(g_arena);
         {
             core::Compression::Compressor<core::Compression::LZ4> comp;
-            if (!comp.deflate(g_arena, interMidiateData.begin(), interMidiateData.end(), compressed, core::Compression::CompressLevel::HIGH)) {
+            if (!comp.deflate(g_arena, core::make_span<const char>(interMidiateData.begin(), interMidiateData.end()), compressed, core::Compression::CompressLevel::HIGH)) {
                 X_ERROR("Anim", "Failed to defalte inter anim");
                 return MS::kFailure;
             }

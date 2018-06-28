@@ -1232,8 +1232,8 @@ ModelExporter::MeshNameStr ModelExporter::getMeshDisplayName(const MString& full
     core::StringTokenizer<char> tokens(fullname.asChar(), fullname.asChar() + fullname.length(), '|');
     core::StringRange<char> range(nullptr, nullptr);
 
-    while (tokens.ExtractToken(range)) {
-        Stack.push(MeshNameStr(range.GetStart(), range.GetEnd()));
+    while (tokens.extractToken(range)) {
+        Stack.push(MeshNameStr(range.getStart(), range.getEnd()));
     }
 
     // ok the name is 2nd one.
