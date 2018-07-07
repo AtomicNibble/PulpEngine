@@ -1467,8 +1467,13 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 {
     X_UNUSED(lparam);
 
-    if (event == CoreEvent::CHANGE_FOCUS) {
-        if (wparam == 1) // activated
+    if (!AK::SoundEngine::IsInitialized()) {
+        return;
+    }
+
+    if (event == CoreEvent::CHANGE_FOCUS) 
+    {
+        if (wparam == 0)
         {
             X_LOG2("SoundSys", "Suspending sound system");
             AKRESULT res = AK::SoundEngine::Suspend(false);
@@ -1477,7 +1482,8 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
                 X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
             }
         }
-        else {
+        else 
+        {
             X_LOG2("SoundSys", "Waking up sound system from suspend");
 
             AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
