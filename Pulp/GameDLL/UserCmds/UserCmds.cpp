@@ -11,22 +11,28 @@ UserCmdGen::UserCmdGen()
 bool UserCmdGen::init(void)
 {
     gEnv->pInput->AddEventListener(this);
+    gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 
     return true;
 }
 
 void UserCmdGen::shutdown(void)
 {
+    gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
     gEnv->pInput->RemoveEventListener(this);
 }
 
 void UserCmdGen::clear(void)
 {
-    viewAngles_ = Vec3f::zero();
     mouseDelta_ = Vec2f::zero();
 
     buttonStates_.fill(0);
     keyState_.fill(false);
+}
+
+void UserCmdGen::clearAngles(void)
+{
+    viewAngles_ = Vec3f::zero();
 }
 
 void UserCmdGen::buildUserCmd(void)
@@ -266,6 +272,16 @@ bool UserCmdGen::OnInputEventChar(const input::InputEvent& event)
 {
     X_UNUSED(event);
     return false;
+}
+
+void UserCmdGen::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+{
+    X_UNUSED(wparam, lparam);
+
+    if (event == CoreEvent::CHANGE_FOCUS)
+    {
+        clear();
+    }
 }
 
 X_NAMESPACE_END
