@@ -96,6 +96,15 @@ namespace entity
         return true;
     }
 
+    void EnititySystem::shutdown(void)
+    {
+        for (EntityId i = 0; i < net::MAX_PLAYERS; i++) {
+            if (reg_.isValid(i) && reg_.has<Player>(i)) {
+                removePlayer(i);
+            }
+        }
+    }
+
     bool EnititySystem::createTranslatours(void)
     {
         // translators.

@@ -274,6 +274,8 @@ World::~World()
 {
     level_.reset();
 
+    ents_.shutdown();
+
     if (pScene_) {
         gEnv->pSound->unRegisterAll();
         gEnv->pSound->setPhysicsScene(nullptr);

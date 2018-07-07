@@ -51,6 +51,7 @@ namespace entity
         EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
+        void shutdown(void);
         void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, EntityId playerId);
         void update(core::FrameData& frame, UserCmdMan& userCmdMan, EntityId localPlayerId);
 
