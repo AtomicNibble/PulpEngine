@@ -257,6 +257,8 @@ bool XSound::init(void)
     X_LOG0("SoundSys", "Starting");
     X_PROFILE_NO_HISTORY_BEGIN("SoundInit", core::profiler::SubSys::SOUND);
 
+    gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
+
     // TODO: call from somewhere.
     registerScriptBinds();
 
@@ -528,6 +530,8 @@ bool XSound::asyncInitFinalize(void)
 void XSound::shutDown(void)
 {
     X_LOG0("SoundSys", "Shutting Down");
+
+    gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 
     if (pScriptBinds_) {
         X_DELETE(pScriptBinds_, arena_);
