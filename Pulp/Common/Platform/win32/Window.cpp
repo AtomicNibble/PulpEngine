@@ -333,23 +333,26 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             }
             break;
         case WM_ACTIVATE:
+        {
+            int32_t active = (wParam != WA_INACTIVE);
+
             gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(
-                CoreEvent::CHANGE_FOCUS, wParam, lParam);
-
-            if (wParam != WA_INACTIVE) {
-                gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(
-                    CoreEvent::ACTIVATE, wParam, lParam);
-            }
+                CoreEvent::CHANGE_FOCUS, active, lParam);
             break;
-
+        }
         case WM_SIZE:
             gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(
                 CoreEvent::RESIZE, wParam, lParam);
             break;
         case WM_MOVE:
+        {
+            int32_t xPos = static_cast<short>(LOWORD(lParam));
+            int32_t yPos = static_cast<short>(HIWORD(lParam));
+
             gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(
-                CoreEvent::MOVE, wParam, lParam);
+                CoreEvent::MOVE, xPos, yPos);
             break;
+        }
     }
 
     if (pFrame_) {

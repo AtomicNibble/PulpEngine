@@ -77,12 +77,11 @@ X_USING_NAMESPACE;
 
 X_DECLARE_ENUM(CoreEvent)
 (
-    CHANGE_FOCUS,
-    MOVE,
-    RESIZE,
-    ACTIVATE,
+    CHANGE_FOCUS,                   //  window focus changed.  (active, hwnd)
+    MOVE,                           //  window moved.          (x, y)
+    RESIZE,                         //  window size change.    ()
 
-    RENDER_RES_CHANGED, // broadcast when the render resolution changes.
+    RENDER_RES_CHANGED,             // broadcast when the render resolution changes.
 
     LEVEL_LOAD_START_LOADINGSCREEN,
     LEVEL_LOAD_START,

@@ -379,9 +379,11 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
             core::xWindow::Rect rect = pWindow_->GetClientRect();
             vars_.updateWinDim(rect.getWidth(), rect.getHeight());
         } break;
-        case CoreEvent::ACTIVATE:
-            if (pWindow_) {
-                pWindow_->ClipCursorToWindow();
+        case CoreEvent::CHANGE_FOCUS:
+            if (wparam != 0) {
+                if (pWindow_) {
+                    pWindow_->ClipCursorToWindow();
+                }
             }
             break;
 
