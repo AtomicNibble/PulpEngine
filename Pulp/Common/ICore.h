@@ -48,11 +48,15 @@ X_NAMESPACE_DECLARE(core,
                     class AssetLoader;
 
                     namespace V2 {
-	class JobSystem;
-	struct Job; } namespace profiler {
+	                    class JobSystem;
+	                    struct Job; 
+                    } 
+                    namespace profiler {
                         struct IProfiler;
                         class XProfileStartupScope;
-                    })
+                    }
+)
+
 X_NAMESPACE_DECLARE(font, struct IFontSys; struct IFont)
 X_NAMESPACE_DECLARE(sound, struct ISound)
 X_NAMESPACE_DECLARE(script, struct IScriptSys)
