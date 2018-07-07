@@ -159,6 +159,8 @@ namespace entity
 
     struct Weapon
     {
+        Weapon();
+
         X_INLINE bool isReady(void) const
         {
             return state == weapon::State::Idle;

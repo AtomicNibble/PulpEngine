@@ -424,6 +424,7 @@
     <ClCompile Include="Enity\CameraSys.cpp" />
     <ClCompile Include="Enity\ComponentMeta.cpp" />
     <ClCompile Include="Enity\EnitiySystem.cpp" />
+    <ClCompile Include="Enity\EnityComponents.cpp" />
     <ClCompile Include="Enity\NetworkSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
     <ClCompile Include="Enity\PlayerSys.cpp" />
