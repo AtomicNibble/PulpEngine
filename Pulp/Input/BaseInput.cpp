@@ -260,10 +260,9 @@ bool XBaseInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
 
 void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
-    X_UNUSED(wparam);
-    X_UNUSED(lparam);
-    if (
-        event == CoreEvent::CHANGE_FOCUS || event == CoreEvent::LEVEL_LOAD_START || event == CoreEvent::LEVEL_POST_UNLOAD) {
+    X_UNUSED(wparam, lparam);
+
+    if (event == CoreEvent::CHANGE_FOCUS || event == CoreEvent::LEVEL_LOAD_START || event == CoreEvent::LEVEL_POST_UNLOAD) {
         ClearKeyState();
     }
 }
