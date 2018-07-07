@@ -1478,7 +1478,7 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
             }
         }
         else {
-            X_LOG2("SoundSys", "Waking sound system from syspend");
+            X_LOG2("SoundSys", "Waking up sound system from suspend");
 
             AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
             if (res != AK_Success) {
