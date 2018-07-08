@@ -47,7 +47,8 @@ bool XFontSystem::init(void)
 {
     X_LOG0("FontSys", "Starting");
 
-    gEnv->pHotReload->addfileType(this, "font");
+    gEnv->pHotReload->addfileType(this, FONT_DESC_FILE_EXTENSION);
+    gEnv->pHotReload->addfileType(this, FONT_BAKED_FILE_EXTENSION);
     gEnv->pHotReload->addfileType(this, "ttf");
 
     // load a default font.
@@ -75,7 +76,8 @@ void XFontSystem::shutDown(void)
     }
     fonts_.clear();
 
-    gEnv->pHotReload->addfileType(nullptr, "font");
+    gEnv->pHotReload->addfileType(nullptr, FONT_DESC_FILE_EXTENSION);
+    gEnv->pHotReload->addfileType(nullptr, FONT_BAKED_FILE_EXTENSION);
     gEnv->pHotReload->addfileType(nullptr, "ttf");
 }
 

@@ -17,7 +17,7 @@ FontLib::~FontLib()
 
 const char* FontLib::getOutExtension(void) const
 {
-    return FONT_FILE_EXTENSION;
+    return FONT_BAKED_FILE_EXTENSION;
 }
 
 bool FontLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
