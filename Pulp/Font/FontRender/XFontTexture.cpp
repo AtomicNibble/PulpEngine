@@ -472,7 +472,7 @@ bool XFontTexture::WriteToFile(const char* filename)
         file.write(pHeader);
         file.write(pInfoHeader);
 
-        unsigned char cRGB[3];
+        uint8_t cRGB[3];
 
         core::ByteStream stream(g_fontArena);
 
