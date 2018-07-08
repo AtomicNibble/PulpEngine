@@ -120,7 +120,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <String\StringUtil.h>
 #include <String\Path.h>
 #include <String\StackString.h>
-#include <String\Xml.h>
+// #include <String\Xml.h>
 #include <String\Json.h>
 
 // Math
