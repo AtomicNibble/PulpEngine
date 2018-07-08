@@ -33,7 +33,6 @@ public:
     ~XFont();
 
     // IFont
-    void Release(void) X_FINAL;
     void Free(void) X_FINAL;
     void FreeBuffers(void) X_FINAL;
     void FreeTexture(void) X_FINAL;

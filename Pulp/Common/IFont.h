@@ -157,7 +157,6 @@ typedef Flags8<FontFlag> FontFlags;
 struct IFont
 {
     virtual ~IFont() = default;
-    virtual void Release(void) X_ABSTRACT;     // release the object
     virtual void Free(void) X_ABSTRACT;        // free internal memory
     virtual void FreeBuffers(void) X_ABSTRACT; // free texture buffers
     virtual void FreeTexture(void) X_ABSTRACT;
