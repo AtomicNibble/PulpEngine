@@ -4,50 +4,9 @@
 #include "FontRender\XFontGlyph.h"
 #include "FontRender\XGlyphBitmap.h"
 
-#include <Time\CompressedStamps.h>
-
 #include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(font)
-
-namespace
-{
-    // probs move, as runtime will need to load.
-    struct BakedFontHdr
-    {
-        static const uint32_t X_FONT_BIN_FOURCC = X_TAG('X', 'B', 'K', 'F');
-        static const uint32_t X_FONT_BIN_VERSION = 1;
-
-        uint32_t forcc;
-        uint8_t version;
-        uint8_t _pad[3];
-        core::DateTimeStampSmall modifed;
-
-        uint16_t numGlyphs;
-        uint16_t glyphWidth;
-        uint16_t glyphHeight;
-
-        Metrics metrics;
-
-        uint32_t sourceFontSize;
-    };
-
-    struct GlyphHdr
-    {
-        wchar_t currentChar;
-
-        uint16_t advanceX;
-        uint8_t charWidth;   // size in pixel
-        uint8_t charHeight;  // size in pixel
-                             // these are 16bit as can be big if downsampling.
-        int16_t charOffsetX; // these can be negative.
-        int16_t charOffsetY;
-
-        int8_t bitmapOffsetX;
-        int8_t bitmapOffsetY;
-    };
-
-} // namespace
 
 FontCompiler::FontCompiler(core::MemoryArenaBase* arena) :
     arena_(arena),
