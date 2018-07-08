@@ -16,7 +16,7 @@ public:
 	ICoreListener(QObject* pParent = nullptr) : QObject(pParent) {}
 	virtual ~ICoreListener() = default;
 
-	virtual bool editorAboutToClose(IEditor* pEditor) { return true; }
+	virtual bool editorAboutToClose(IEditor*) { return true; }
 	virtual bool coreAboutToClose(void) { return true; }
 };
 
