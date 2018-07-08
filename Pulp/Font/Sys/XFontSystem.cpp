@@ -151,11 +151,10 @@ XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
         return it->second;
     }
 
-    XFontTexture* pFontTexture = X_NEW(XFontTexture, g_fontArena, "FontTexture")(name, vars_, g_fontArena);
+    auto pFontTexture = core::makeUnique<XFontTexture>(g_fontArena, name, vars_, g_fontArena);
 
     // setup the font texture cpu buffers.
     if (!pFontTexture->Create(512, 512, 16, 16)) {
-        X_DELETE(pFontTexture, g_fontArena);
         return nullptr;
     }
 
@@ -164,7 +163,6 @@ XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
     // the font file is optionally loaded in the background so it may be a few frames before this fontTexture is usable.
     // you must check with 'IsReady'
     if (!pFontTexture->LoadGlyphSource(async)) {
-        X_DELETE(pFontTexture, g_fontArena);
         return nullptr;
     }
 
@@ -172,8 +170,10 @@ XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
         X_ASSERT(pFontTexture->IsReady(), "Should be ready if loaded none async")(async, pFontTexture->IsReady());
     }
 
-    fontTextures_.insert(std::make_pair(name, pFontTexture));
-    return pFontTexture;
+    auto* pPtr = pFontTexture.get();
+
+    fontTextures_.insert(std::make_pair(name, pFontTexture.release()));
+    return pPtr;
 }
 
 void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
