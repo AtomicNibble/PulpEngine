@@ -70,9 +70,8 @@ void XFontSystem::shutDown(void)
 {
     X_LOG0("FontSys", "Shutting Down");
 
-    FontMapItor it = fonts_.begin();
-    for (; it != fonts_.end(); ++it) {
-        X_DELETE(it->second, g_fontArena);
+    for (auto& it: fonts_) {
+        X_DELETE(it.second, g_fontArena);
     }
     fonts_.clear();
 
