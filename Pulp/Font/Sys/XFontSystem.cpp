@@ -58,7 +58,7 @@ bool XFontSystem::init(void)
         return false;
     }
 
-    if (!pDefaultFont_->loadFont(true)) {
+    if (!pDefaultFont_->loadFont()) {
         X_ERROR("Font", "Failed to load default font");
         return false;
     }
@@ -141,7 +141,7 @@ IFont* XFontSystem::GetDefault(void) const
     return X_ASSERT_NOT_NULL(pDefaultFont_);
 }
 
-XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
+XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name)
 {
     core::CriticalSection::ScopedLock lock(lock_);
 
@@ -162,12 +162,8 @@ XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name, bool async)
     // so we can't actually create any glyphs yet.
     // the font file is optionally loaded in the background so it may be a few frames before this fontTexture is usable.
     // you must check with 'IsReady'
-    if (!pFontTexture->LoadGlyphSource(async)) {
+    if (!pFontTexture->LoadGlyphSource()) {
         return nullptr;
-    }
-
-    if (!async) {
-        X_ASSERT(pFontTexture->IsReady(), "Should be ready if loaded none async")(async, pFontTexture->IsReady());
     }
 
     auto* pPtr = pFontTexture.get();

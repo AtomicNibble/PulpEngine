@@ -20,6 +20,7 @@ class XGlyphCache;
 class XFontSystem : public IFontSys
     , public core::IXHotReload
 {
+    typedef core::UniquePointer<XFont> XFontPtr;
     typedef core::HashMap<FontNameStr, XFont*> FontMap;
     typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
 
@@ -54,7 +55,7 @@ public:
     void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
     // ~IXHotReload
 
-    XFontTexture* getFontTexture(const SourceNameStr& name, bool async);
+    XFontTexture* getFontTexture(const SourceNameStr& name);
     void releaseFontTexture(XFontTexture* pFontTex);
 
     X_INLINE const FontVars& getVars(void) const;

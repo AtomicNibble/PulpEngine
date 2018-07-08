@@ -38,7 +38,7 @@ public:
     void FreeBuffers(void) X_FINAL;
     void FreeTexture(void) X_FINAL;
 
-    bool loadFont(bool async) X_FINAL;
+    bool loadFont(void) X_FINAL;
     void Reload(void) X_FINAL;
 
     bool isReady(void);
@@ -92,7 +92,7 @@ private:
     static bool processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
         EffetsArr& effectsOut, FontFlags& flags);
 
-    bool loadFontDef(bool async);
+    bool loadFontDef(void);
 
 private:
     Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex);

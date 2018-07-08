@@ -97,7 +97,7 @@ public:
 
     X_INLINE bool IsReady(void) const;
     bool WaitTillReady(void);
-    bool LoadGlyphSource(bool async);
+    bool LoadGlyphSource(void);
 
     // returns 1 if texture updated, returns 2 if texture not updated, returns 0 on error
     // pUpdated is the number of slots updated

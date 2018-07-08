@@ -60,7 +60,7 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
         // now create a fontTexture and async load it's glyph file.
         // as soon as we assign 'pFontTexture_' other threads might start accessing it.
         // other threads will not access any logic other than IsReady untill after IsReady returns true.
-        pFontTexture_ = fontSys_.getFontTexture(sourceName_, true);
+        pFontTexture_ = fontSys_.getFontTexture(sourceName_);
         if (!pFontTexture_) {
             X_ERROR("Font", "Failed to get font texture for: \"%s\"", sourceName_.c_str());
             loadStatus_ = LoadStatus::Error;
@@ -81,15 +81,15 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
 
 void XFont::Reload(void)
 {
-    loadFont(true);
+    loadFont();
 }
 
-bool XFont::loadFont(bool async)
+bool XFont::loadFont(void)
 {
-    return loadFontDef(async);
+    return loadFontDef();
 }
 
-bool XFont::loadFontDef(bool async)
+bool XFont::loadFontDef(void)
 {
     // are we loading already?
     if (loadStatus_ == LoadStatus::Loading) {
@@ -105,43 +105,17 @@ bool XFont::loadFontDef(bool async)
     mode.Set(fileMode::READ);
     mode.Set(fileMode::SHARE);
 
-    if (async) {
-        signal_.clear();
-        loadStatus_ = LoadStatus::Loading;
+    signal_.clear();
+    loadStatus_ = LoadStatus::Loading;
 
-        // load the file async
-        core::IoRequestOpenRead open;
-        open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
-        open.mode = mode;
-        open.path = path;
-        open.arena = g_fontArena;
+    // load the file async
+    core::IoRequestOpenRead open;
+    open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
+    open.mode = mode;
+    open.path = path;
+    open.arena = g_fontArena;
 
-        gEnv->pFileSys->AddIoRequestToQue(open);
-    }
-    else {
-        core::XFileMemScoped file;
-        if (!file.openFile(path.c_str(), mode)) {
-            return false;
-        }
-
-        if (!processData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_, flags_)) {
-            X_ERROR("Font", "Error processing font def file: \"%s\"", path.c_str());
-            return false;
-        }
-
-        X_ASSERT(sourceName_.isNotEmpty(), "Source name is empty")(sourceName_.isEmpty());
-        X_ASSERT(pFontTexture_ == nullptr, "Fonttexture already set")(pFontTexture_);
-
-        // now we need a glyph cache.
-        pFontTexture_ = fontSys_.getFontTexture(sourceName_, async);
-        if (!pFontTexture_) {
-            X_ERROR("Font", "Error loaded font file: \"%s\"", sourceName_.c_str());
-            return false;
-        }
-
-        loadStatus_ = LoadStatus::Complete;
-    }
-
+    gEnv->pFileSys->AddIoRequestToQue(open);
     return true;
 }
 

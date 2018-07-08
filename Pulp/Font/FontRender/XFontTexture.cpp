@@ -138,7 +138,7 @@ bool XFontTexture::WaitTillReady(void)
     return true;
 }
 
-bool XFontTexture::LoadGlyphSource(bool async)
+bool XFontTexture::LoadGlyphSource(void)
 {
     if (IsReady()) {
         return true;
@@ -157,50 +157,17 @@ bool XFontTexture::LoadGlyphSource(bool async)
     mode.Set(core::fileMode::READ);
     mode.Set(core::fileMode::SHARE);
 
-    if (async) {
-        signal_.clear();
-        loadStatus_ = core::LoadStatus::Loading;
+    signal_.clear();
+    loadStatus_ = core::LoadStatus::Loading;
 
-        // load the file async
-        core::IoRequestOpenRead open;
-        open.callback.Bind<XFontTexture, &XFontTexture::IoRequestCallback>(this);
-        open.mode = mode;
-        open.path = path;
-        open.arena = g_fontArena;
+    // load the file async
+    core::IoRequestOpenRead open;
+    open.callback.Bind<XFontTexture, &XFontTexture::IoRequestCallback>(this);
+    open.mode = mode;
+    open.path = path;
+    open.arena = g_fontArena;
 
-        gEnv->pFileSys->AddIoRequestToQue(open);
-    }
-    else {
-        core::XFileScoped file;
-
-        if (!file.openFile(path.c_str(), core::fileModeFlags::READ)) {
-            return false;
-        }
-
-        const size_t fileSize = safe_static_cast<size_t>(file.remainingBytes());
-        if (!fileSize) {
-            X_ERROR("Font", "Font file is zero bytes in size");
-            return false;
-        }
-
-        core::UniquePointer<uint8_t[]> buf = core::makeUnique<uint8_t[]>(g_fontArena, fileSize);
-        if (file.read(buf.ptr(), fileSize) != fileSize) {
-            X_ERROR("Font", "Error reading font data");
-            return false;
-        }
-
-        if (!glyphCache_.SetRawFontBuffer(std::move(buf), safe_static_cast<int32_t>(fileSize), FontEncoding::Unicode)) {
-            X_ERROR("Font", "Error setting up font renderer");
-            return false;
-        }
-
-        if (vars_.glyphCachePreWarm()) {
-            PreWarmCache();
-        }
-
-        loadStatus_ = core::LoadStatus::Complete;
-    }
-
+    gEnv->pFileSys->AddIoRequestToQue(open);
     return true;
 }
 
