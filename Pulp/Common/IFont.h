@@ -139,14 +139,14 @@ X_DECLARE_ENUM(FontEncoding)
     // For more information, see `http://www.ceviz.net/symbol.htm'.
     MSSymbol);
 
-X_DECLARE_FLAGS(FontFlag)
+X_DECLARE_FLAGS8(FontFlag)
 (
     // The font is proportional, aka not monospace.
     PROPORTIONAL,
     SDF
 );
 
-typedef Flags<FontFlag> FontFlags;
+typedef Flags8<FontFlag> FontFlags;
 
 //
 //	We support both ascii and wide char.
@@ -200,26 +200,6 @@ struct IFont
 };
 
 // File types
-
-struct BakedFontHdr
-{
-    static const uint32_t X_FONT_BIN_FOURCC = X_TAG('X', 'B', 'K', 'F');
-    static const uint32_t X_FONT_BIN_VERSION = 1;
-
-    uint32_t forcc;
-    uint8_t version;
-    uint8_t _pad[3];
-    core::DateTimeStampSmall modifed;
-
-    uint16_t numGlyphs;
-    uint16_t glyphWidth;
-    uint16_t glyphHeight;
-
-    Metrics metrics;
-
-    uint32_t sourceFontSize;
-};
-
 struct GlyphHdr
 {
     wchar_t currentChar;
@@ -236,8 +216,46 @@ struct GlyphHdr
     uint8_t _pad[4];
 };
 
-X_ENSURE_SIZE(BakedFontHdr, 36);
+struct FontHdr
+{
+    static const uint32_t X_FONT_BIN_FOURCC = X_TAG('X', 'B', 'K', 'F');
+    static const uint32_t X_FONT_BIN_VERSION = 1;
+
+    size_t glyphDataSize(void) const {
+        return numGlyphs * ((glyphHeight * glyphWidth) + sizeof(GlyphHdr));
+    }
+
+    uint32_t forcc;
+    uint8_t version;
+    FontFlags flags;
+    uint8_t numEffects;
+    uint8_t _pad[1];
+    core::DateTimeStampSmall modifed;
+
+    uint16_t numGlyphs;
+    uint16_t glyphWidth;
+    uint16_t glyphHeight;
+
+    Metrics metrics;
+
+    uint32_t sourceFontSize;
+};
+
+struct FontEffectHdr
+{
+    int8_t numPass;
+};
+
+struct FontPass
+{
+    Color8u col;
+    Vec2f offset;
+};
+
+X_ENSURE_SIZE(FontHdr, 36);
 X_ENSURE_SIZE(GlyphHdr, 16);
+X_ENSURE_SIZE(FontEffectHdr, 1);
+X_ENSURE_SIZE(FontPass, 12);
 
 X_NAMESPACE_END
 

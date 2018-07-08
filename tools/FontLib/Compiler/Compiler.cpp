@@ -11,6 +11,7 @@ X_NAMESPACE_BEGIN(font)
 FontCompiler::FontCompiler(core::MemoryArenaBase* arena) :
     arena_(arena),
     glyphs_(arena),
+    effects_(arena),
     sourceFontData_(arena),
     render_(arena)
 {
@@ -42,6 +43,12 @@ bool FontCompiler::bake(bool sdf)
 {
     const size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
 
+    flags_.Clear();
+
+    if (sdf) {
+        flags_.Set(FontFlag::SDF);
+    }
+
     glyphs_.reserve(len);
     glyphs_.clear();
 
@@ -71,14 +78,16 @@ bool FontCompiler::bake(bool sdf)
 
 bool FontCompiler::writeToFile(core::XFile* pFile) const
 {
-    BakedFontHdr hdr;
+    FontHdr hdr;
     core::zero_object(hdr);
 
     int32_t width, height;
     render_.GetGlyphBitmapSize(&width, &height);
 
-    hdr.forcc = BakedFontHdr::X_FONT_BIN_FOURCC;
-    hdr.version = BakedFontHdr::X_FONT_BIN_VERSION;
+    hdr.forcc = FontHdr::X_FONT_BIN_FOURCC;
+    hdr.version = FontHdr::X_FONT_BIN_VERSION;
+    hdr.flags = flags_;
+    hdr.numEffects = safe_static_cast<uint8_t>(effects_.size());
     hdr.modifed = core::DateTimeStampSmall::systemDateTime();
     hdr.numGlyphs = safe_static_cast<uint16_t>(glyphs_.size());
     hdr.glyphWidth = safe_static_cast<uint16_t>(width);
@@ -90,16 +99,39 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
     // basically I need all the info for each glyph.
 
     size_t dataSize = (sizeof(GlyphHdr) + (width * height)) * glyphs_.size();
+
+    X_ASSERT(hdr.glyphDataSize() == dataSize, "Data size calc error")(hdr.glyphDataSize(), dataSize);
+
     dataSize += sizeof(hdr);
     dataSize += sourceFontData_.size();
+
+    for (const auto& eff : effects_)
+    {
+        dataSize += sizeof(FontEffectHdr);
+        dataSize += eff.passes.size() * sizeof(FontPass);
+    }
 
     core::ByteStream stream(arena_);
     stream.reserve(dataSize);
 
     stream.write(hdr);
 
-    for (size_t i = 0; i < glyphs_.size(); i++) {
-        const auto& glyph = glyphs_[i];
+    for (const auto& efx : effects_)
+    {
+        if (efx.passes.isEmpty()) {
+            X_ERROR("Font", "Effect has zero passes");
+            return false;
+        }
+
+        FontEffectHdr efxHdr;
+        efxHdr.numPass = safe_static_cast<uint8_t>(efx.passes.size());
+
+        stream.write(efxHdr);
+        stream.write(efx.passes.data(), efx.passes.size());
+    }
+
+    for (const auto& glyph : glyphs_)
+    {
         auto& bitmap = glyph.glyphBitmap.GetBuffer();
 
         GlyphHdr glyphHdr;

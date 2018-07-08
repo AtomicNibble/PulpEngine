@@ -4,15 +4,6 @@
 
 X_NAMESPACE_BEGIN(font)
 
-struct FontPass
-{
-    FontPass() :
-        col(255, 255, 255, 255)
-    {
-    }
-    Color8u col;
-    Vec2f offset;
-};
 
 struct FontEffect
 {

@@ -9,10 +9,19 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(font)
 
+
+struct FontEffect
+{
+    core::StackString<64> name;
+    core::Array<FontPass> passes;
+};
+
+
 class FontCompiler
 {
     typedef core::Array<uint8_t> DataVec;
     typedef core::Array<XGlyph> XGlyphArr;
+    typedef core::Array<FontEffect> EffetsArr;
 
 public:
     FontCompiler(core::MemoryArenaBase* arena);
@@ -26,7 +35,9 @@ public:
 
 private:
     core::MemoryArenaBase* arena_;
+    FontFlags flags_;
     XGlyphArr glyphs_;
+    EffetsArr effects_;
 
     DataVec sourceFontData_;
 
