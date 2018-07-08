@@ -7,6 +7,12 @@ X_NAMESPACE_BEGIN(game)
 namespace entity
 {
 
+    Inventory::Inventory()
+    {
+        clip.fill(0);
+        ammo.fill(0);
+    }
+
     Weapon::Weapon()
     {
         ownerEnt = EnitiyRegister::INVALID_ID;

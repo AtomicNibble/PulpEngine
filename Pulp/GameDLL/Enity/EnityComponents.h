@@ -109,6 +109,8 @@ namespace entity
     {
         ADD_META()
 
+        Inventory();
+
         // you can have multiple weapons in invetory.
         // what do i store these as?
         // well when we switch weapons we need to basically play the putaway anim then switch weapon def.
@@ -138,15 +140,19 @@ namespace entity
                 ammo[type] -= num;
                 return true;
             }
+
+            X_ASSERT_UNREACHABLE();
             return false;
         }
 
         int32_t getClipAmmo(int32_t weaponId) const
         {
+            X_ASSERT(clip[weaponId] >= 0, "Invalid ammo count")(clip[weaponId]);
             return clip[weaponId];
         }
         void setClipAmmo(int32_t weaponId, int32_t num)
         {
+            X_ASSERT(num >= 0, "Invalid ammo count")(num);
             clip[weaponId] = num;
         }
 
