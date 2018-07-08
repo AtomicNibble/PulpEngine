@@ -139,7 +139,9 @@ X_DECLARE_ENUM(FontEncoding)
 X_DECLARE_FLAGS(FontFlag)
 (
     // The font is proportional, aka not monospace.
-    PROPORTIONAL);
+    PROPORTIONAL,
+    SDF
+);
 
 typedef Flags<FontFlag> FontFlags;
 

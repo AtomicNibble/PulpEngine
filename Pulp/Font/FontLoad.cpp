@@ -11,163 +11,9 @@
 X_NAMESPACE_BEGIN(font)
 
 using namespace core;
-using namespace xml;
-using namespace rapidxml;
 
 namespace
 {
-    void* XmlAllocate(std::size_t size)
-    {
-        return X_NEW_ARRAY(char, size, g_fontArena, "xmlPool");
-    }
-
-    void XmlFree(void* pointer)
-    {
-        char* pChar = (char*)pointer;
-        X_DELETE_ARRAY(pChar, g_fontArena);
-    }
-
-    bool ParseColValue(const char* attr, uint8_t& col)
-    {
-        if (strUtil::IsNumeric(attr)) {
-            float value = strUtil::StringToFloat<float>(attr);
-            if (value >= 0.f && value <= 1.f) {
-                col = static_cast<uint8_t>(value * 255.f);
-                return true;
-            }
-        }
-        X_ERROR("Font", "color value is not a valid float beetween: 0 - 1");
-        return false;
-    }
-
-    bool ParsePassCol(xml_node<>* node, Color8u& col)
-    {
-        X_ASSERT_NOT_NULL(node);
-        xml_attribute<>* attr;
-        int num = 0;
-
-        for (attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
-            if (strUtil::IsEqual("r", attr->name())) {
-                if (ParseColValue(attr->value(), col.r))
-                    num++;
-            }
-            else if (strUtil::IsEqual("g", attr->name())) {
-                if (ParseColValue(attr->value(), col.g))
-                    num++;
-            }
-            else if (strUtil::IsEqual("b", attr->name())) {
-                if (ParseColValue(attr->value(), col.b))
-                    num++;
-            }
-            else if (strUtil::IsEqual("a", attr->name())) {
-                if (ParseColValue(attr->value(), col.a))
-                    num++;
-            }
-        }
-
-        if (num == 4) {
-            return true;
-        }
-        X_ERROR("Font", "invalid color node required attr: r,g,b,a");
-        return false;
-    }
-
-    bool ParsePassPos(xml_node<>* node, Vec2f& pos)
-    {
-        X_ASSERT_NOT_NULL(node);
-        xml_attribute<>* attr;
-        int num = 0;
-
-        for (attr = node->first_attribute(); attr; attr = attr->next_attribute()) {
-            if (strUtil::IsEqual("x", attr->name())) {
-                if (strUtil::IsNumeric(attr->value())) {
-                    pos.x = strUtil::StringToFloat<float>(attr->value());
-                    num++;
-                }
-            }
-
-            if (strUtil::IsEqual("y", attr->name())) {
-                if (strUtil::IsNumeric(attr->value())) {
-                    pos.y = strUtil::StringToFloat<float>(attr->value());
-                    num++;
-                }
-            }
-        }
-        if (num == 2) {
-            return true;
-        }
-        X_ERROR("Font", "invalid pos node required attr: x and y");
-        return false;
-    }
-
-    bool ParseEffect(xml_node<>* node, FontEffect& effect)
-    {
-        X_ASSERT_NOT_NULL(node);
-        core::StackString<64> name;
-        xml_attribute<>* attr;
-        xml_node<>* passNode;
-        xml_node<>* pass;
-
-        for (attr = node->first_attribute();
-             attr; attr = attr->next_attribute()) {
-            if (strUtil::IsEqualCaseInsen("name", attr->name())) {
-                if (attr->value_size() <= 64) {
-                    name.append(attr->value());
-                }
-                else {
-                    X_ERROR("Font", "effect name is longer then 64: %s", attr->name());
-                }
-            }
-        }
-
-        if (name.isEmpty()) {
-            X_ERROR("Font", "effect missing name attribute");
-            return false;
-        }
-
-        effect.name = name;
-
-        for (pass = node->first_node();
-             pass; pass = pass->next_sibling()) {
-            if (strUtil::IsEqualCaseInsen("pass", pass->name())) {
-                // add a pass, additional info is optional.
-                FontPass effectPass;
-
-                if (effect.passes.size() == MAX_FONT_PASS) {
-                    X_ERROR("Font", "font exceeds max pass count: " X_STRINGIZE(MAX_FONT_PASS) " ignoring extra passes");
-                    break;
-                }
-
-                for (passNode = pass->first_node();
-                     passNode; passNode = passNode->next_sibling()) {
-                    if (strUtil::IsEqualCaseInsen("color", passNode->name())) {
-                        // r, g, b, a nodes
-                        Color8u col;
-                        if (ParsePassCol(passNode, col)) {
-                            effectPass.col = col;
-                        }
-                    }
-                    else if (strUtil::IsEqualCaseInsen("pos", passNode->name())) {
-                        // x / y nodes.
-                        Vec2f pos;
-                        if (ParsePassPos(passNode, pos)) {
-                            effectPass.offset = pos;
-                        }
-                    }
-                }
-
-                effect.passes.append(effectPass);
-            }
-        }
-
-        // we support effects with no passes defied.
-        // it's the same as a single empty pass.
-        if (effect.passes.isEmpty()) {
-            effect.passes.emplace_back(FontPass());
-        }
-
-        return true;
-    }
 
     struct JobData
     {
@@ -210,7 +56,7 @@ void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
     JobData* pJobData = static_cast<JobData*>(pData);
 
     // so we have the file data just need to process it.
-    if (processXmlData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_, flags_)) {
+    if (processData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_, flags_)) {
         // now create a fontTexture and async load it's glyph file.
         // as soon as we assign 'pFontTexture_' other threads might start accessing it.
         // other threads will not access any logic other than IsReady untill after IsReady returns true.
@@ -278,7 +124,7 @@ bool XFont::loadFontDef(bool async)
             return false;
         }
 
-        if (!processXmlData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_, flags_)) {
+        if (!processData(file->getBufferStart(), file->getBufferEnd(), sourceName_, effects_, flags_)) {
             X_ERROR("Font", "Error processing font def file: \"%s\"", path.c_str());
             return false;
         }
@@ -299,7 +145,7 @@ bool XFont::loadFontDef(bool async)
     return true;
 }
 
-bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
+bool XFont::processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
     EffetsArr& effectsOut, FontFlags& flags)
 {
     ptrdiff_t size = (pEnd - pBegin);
@@ -307,62 +153,114 @@ bool XFont::processXmlData(const char* pBegin, const char* pEnd, SourceNameStr& 
         return false;
     }
 
-    core::Array<char> data(g_fontArena, size + 1);
-    std::memcpy(data.data(), pBegin, size);
-    data.back() = '\0';
-
-    xml_document<> doc; // character type defaults to char
-    doc.set_allocator(XmlAllocate, XmlFree);
-    doc.parse<0>(data.data()); // 0 means default parse flags
-
     effectsOut.clear();
     sourceNameOut.clear();
     flags.Clear();
 
-    xml_node<>* node = doc.first_node("font");
-    if (node) {
-        xml_attribute<>* source = node->first_attribute("source");
-        if (source) {
-            if (source->value_size() < 128) {
-                sourceNameOut.append(source->value());
-            }
-        }
+    core::json::MemoryStream ms(pBegin, size);
+    core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
 
-        xml_attribute<>* proportional = node->first_attribute("proportional");
-        if (proportional) {
-            // 'true' | '1'
-            const char* pPropBegin = proportional->value();
-            const char* pPropEnd = proportional->value() + proportional->value_size();
+    core::json::Document d;
+    if (d.ParseStream<core::json::kParseCommentsFlag>(is).HasParseError()) {
+        auto err = d.GetParseError();
+        const char* pErrStr = core::json::GetParseError_En(err);
+        size_t offset = d.GetErrorOffset();
+        size_t line = core::strUtil::LineNumberForOffset(pBegin, pEnd, offset);
 
-            if (core::strUtil::StringToBool(pPropBegin, pPropEnd) == true) {
-                flags.Set(FontFlag::PROPORTIONAL);
-            }
-        }
+        X_ERROR("Font", "Failed to parse font desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s",
+            err, offset, line, pErrStr);
+        return false;
+    }
 
-        if (!sourceNameOut.isEmpty()) {
-            // parse the nodes.
-            for (xml_node<>* child = node->first_node();
-                 child; child = child->next_sibling()) {
-                if (core::strUtil::IsEqualCaseInsen("effect", child->name())) {
-                    FontEffect effect;
+    if (d.GetType() != core::json::Type::kObjectType) {
+        X_ERROR("Font", "Unexpected type");
+        return false;
+    }
 
-                    if (ParseEffect(child, effect)) {
-                        effectsOut.append(effect);
-                    }
-                }
-                else {
-                    // do i care?
-                    // just skip them.
-                }
-            }
-        }
-        else {
-            X_ERROR("Font", "missing source attr from <font> tag");
-            return false;
+    if (!d.HasMember("font")) {
+        X_ERROR("Font", "Missing font object");
+        return false;
+    }
+
+    auto& font = d["font"];
+    if (!font.HasMember("source")) {
+        X_ERROR("Font", "Missing source field");
+        return false;
+    }
+
+    auto& source = font["source"];
+    sourceNameOut.set(source.GetString(), source.GetString() + source.GetStringLength());
+
+    if (font.HasMember("proportional")) {
+        if (font["proportional"].GetBool()) {
+            flags.Set(FontFlag::PROPORTIONAL);
         }
     }
-    else {
-        return false;
+    if (font.HasMember("sdf")) {
+        if (font["sdf"].GetBool()) {
+            flags.Set(FontFlag::SDF);
+        }
+    }
+
+    if (font.HasMember("effects"))
+    {
+        auto& effects = font["effects"];
+        if (effects.GetType() != core::json::Type::kArrayType) {
+            X_ERROR("Font", "Effects field should be a array");
+            return false;
+        }
+
+        for (auto& effectDesc : effects.GetArray())
+        {
+            FontEffect effect;
+
+            if (effectDesc.HasMember("name")) {
+                auto& name = effectDesc["name"];
+                effect.name.set(name.GetString(), name.GetString() + name.GetStringLength());
+            }
+
+            if (!effectDesc.HasMember("passes")) {
+                X_ERROR("Font", "Missing passes field");
+                return false;
+            }
+            
+            auto& passes = effectDesc["passes"];
+            if (passes.GetType() != core::json::Type::kArrayType) {
+                X_ERROR("Font", "Passes field should be a array");
+                return false;
+            }
+
+            for (auto& passDesc : passes.GetArray())
+            {
+                FontPass pass;
+
+                if (passDesc.HasMember("color")) {
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+                if (passDesc.HasMember("pos")) {
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+
+                effect.passes.append(pass);
+            }
+
+            if (effect.passes.isEmpty())
+            {
+                X_ERROR("Font", "Effect has no passes");
+                return false;
+            }
+
+            effectsOut.append(effect);
+        }
+    }
+
+    if (effectsOut.isEmpty())
+    {
+        X_WARNING("Font", "No effects provided, adding default");
+
+        FontEffect effect;
+        effect.passes.resize(1);
+        effectsOut.append(effect);
     }
 
     return true;
