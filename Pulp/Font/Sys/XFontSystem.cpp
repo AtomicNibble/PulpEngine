@@ -245,9 +245,9 @@ void XFontSystem::Command_ListFonts(core::IConsoleCmdArgs* pCmd)
 
 void XFontSystem::Command_DumpForName(core::IConsoleCmdArgs* pCmd)
 {
-    size_t Num = pCmd->GetArgCount();
+    size_t num = pCmd->GetArgCount();
 
-    if (Num < 2) {
+    if (num < 2) {
         X_WARNING("Console", "fonts_dump_for_name <name>");
         return;
     }
