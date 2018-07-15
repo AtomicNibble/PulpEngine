@@ -433,7 +433,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
 
     if (totalFileSize > 1024 * 1024 * 100) {
         core::HumanSize::Str sizeStr;
-        X_LOG0("AssetPak", "Writing %s pak...", core::HumanSize::toString(sizeStr, totalFileSize));
+        X_LOG0("AssetPak", "Writing ^6%s^7 pak...", core::HumanSize::toString(sizeStr, totalFileSize));
     }
 
     if (file.writeObj(hdr) != sizeof(hdr)) {
@@ -475,6 +475,25 @@ bool AssetPakBuilder::save(core::Path<char>& path)
         X_ERROR("AssetPak", "File size mismatch actual %" PRIu64" Calculated %" PRIu64, file.tell(), totalFileSize);
         return false;
     }
+
+    // some stats.
+    if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
+    {
+        uint64_t defaltedSize = 0;
+        uint64_t infaltedSize = 0;
+
+        for (const auto& a : assets_) {
+            infaltedSize += a.infaltedSize;
+            defaltedSize += a.data.size();
+        }
+
+        core::HumanSize::Str sizeStr0, sizeStr1;
+        X_LOG0("AssetPak", "Stats:");
+        X_LOG_BULLET;
+        X_LOG0("AssetPak", "Raw asset size:  ^6%s", core::HumanSize::toString(sizeStr0, infaltedSize));
+        X_LOG0("AssetPak", "Compressed size: ^6%s", core::HumanSize::toString(sizeStr1, defaltedSize));
+    }
+
 
     return true;
 }
