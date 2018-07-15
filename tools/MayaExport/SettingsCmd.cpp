@@ -9,6 +9,8 @@
 
 #include <FileAPI.h>
 
+#include <String\Xml.h>
+
 using namespace core::xml::rapidxml;
 
 X_NAMESPACE_BEGIN(maya)
