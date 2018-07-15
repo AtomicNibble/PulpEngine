@@ -80,10 +80,6 @@ private:
         const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation);
 
 private:
-//   static bool processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
-//       EffetsArr& effectsOut, FontFlags& flags);
-
-private:
     Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex);
 
     bool CreateDeviceTexture(void);

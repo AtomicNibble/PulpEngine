@@ -34,7 +34,7 @@ public:
 
     bool setFont(DataVec&& trueTypeData, int32_t width, int32_t height, float sizeRatio);
     bool bake(bool sdf);
-    bool compile(void);
+    bool loadFromJson(core::string& str);
 
     bool writeToFile(core::XFile* pFile) const;
     bool writeImageToFile(core::XFile* pFile) const;

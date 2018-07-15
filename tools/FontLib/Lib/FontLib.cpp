@@ -76,13 +76,13 @@ bool FontLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, 
         return false;
     }
 
-    if (!compiler.bake(sdf)) {
-        X_ERROR("Font", "Failed to bake font data");
+    if (!compiler.loadFromJson(args)) {
+        X_ERROR("Font", "Failed to parse font desc");
         return false;
     }
 
-    if (!compiler.compile()) {
-        X_ERROR("Font", "Failed to compile font data");
+    if (!compiler.bake(sdf)) {
+        X_ERROR("Font", "Failed to bake font data");
         return false;
     }
 

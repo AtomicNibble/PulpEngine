@@ -72,8 +72,93 @@ bool FontCompiler::bake(bool sdf)
     return true;
 }
 
-bool FontCompiler::compile(void)
+bool FontCompiler::loadFromJson(core::string& str)
 {
+    core::json::MemoryStream ms(str.begin(), str.length());
+    core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
+
+    core::json::Document d;
+    if (d.ParseStream<core::json::kParseCommentsFlag>(is).HasParseError()) {
+        auto err = d.GetParseError();
+        const char* pErrStr = core::json::GetParseError_En(err);
+        size_t offset = d.GetErrorOffset();
+        size_t line = core::strUtil::LineNumberForOffset(str.begin(), str.end(), offset);
+
+        X_ERROR("Font", "Failed to parse font desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s",
+            err, offset, line, pErrStr);
+        return false;
+    }
+
+    if (d.GetType() != core::json::Type::kObjectType) {
+        X_ERROR("Font", "Unexpected type");
+        return false;
+    }
+
+
+    if (d.HasMember("proportional")) {
+        if (d["proportional"].GetBool()) {
+            flags_.Set(FontFlag::PROPORTIONAL);
+        }
+    }
+    if (d.HasMember("sdf")) {
+        if (d["sdf"].GetBool()) {
+            flags_.Set(FontFlag::SDF);
+        }
+    }
+
+    if (d.HasMember("effects"))
+    {
+        auto& effects = d["effects"];
+        if (effects.GetType() != core::json::Type::kArrayType) {
+            X_ERROR("Font", "Effects field should be a array");
+            return false;
+        }
+
+        for (auto& effectDesc : effects.GetArray())
+        {
+            FontEffect effect(arena_);
+
+            if (effectDesc.HasMember("name")) {
+                auto& name = effectDesc["name"];
+                effect.name.set(name.GetString(), name.GetString() + name.GetStringLength());
+            }
+
+            if (!effectDesc.HasMember("passes")) {
+                X_ERROR("Font", "Missing passes field");
+                return false;
+            }
+
+            auto& passes = effectDesc["passes"];
+            if (passes.GetType() != core::json::Type::kArrayType) {
+                X_ERROR("Font", "Passes field should be a array");
+                return false;
+            }
+
+            for (auto& passDesc : passes.GetArray())
+            {
+                FontPass pass;
+
+                if (passDesc.HasMember("color")) {
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+                if (passDesc.HasMember("pos")) {
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+
+                effect.passes.append(pass);
+            }
+
+            if (effect.passes.isEmpty())
+            {
+                X_ERROR("Font", "Effect has no passes");
+                return false;
+            }
+
+            effects_.append(effect);
+        }
+    }
+
+    // TEMP
     if (effects_.isEmpty()) {
         X_WARNING("Font", "No effects provided, adding default");
 
