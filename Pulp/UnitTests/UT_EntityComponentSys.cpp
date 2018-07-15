@@ -368,7 +368,7 @@ TEST(ECSComponentPool, ConstructDestroy)
     ASSERT_FALSE(pool.has<int>(1));
     ASSERT_FALSE(pool.has<double>(1));
 
-    ASSERT_EQ(pool.construct<int>(1), 0);
+    ASSERT_EQ(pool.construct<int>(1, 0), 0);
     ASSERT_FALSE(pool.empty<int>());
     ASSERT_TRUE(pool.empty<double>());
     ASSERT_GE(pool.capacity<int>(), pool_type::size_type{4});
