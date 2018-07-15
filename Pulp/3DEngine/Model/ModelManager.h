@@ -63,7 +63,7 @@ private:
 
 private:
     // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
+    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
     // ~IXHotReload
 
 private:
