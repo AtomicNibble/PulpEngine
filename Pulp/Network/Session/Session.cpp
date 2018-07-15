@@ -324,8 +324,7 @@ void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
             break;
 
         default:
-            X_NO_SWITCH_DEFAULT_ASSERT
-            break;
+            X_NO_SWITCH_DEFAULT_ASSERT;
     }
 }
 
