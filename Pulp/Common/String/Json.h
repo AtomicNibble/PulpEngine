@@ -32,6 +32,7 @@
 #include <../../3rdparty/source/rapidjson/rapidjson.h>
 #include <../../3rdparty/source/rapidjson/document.h>
 #include <../../3rdparty/source/rapidjson/writer.h>
+#include <../../3rdparty/source/rapidjson/prettywriter.h>
 #include <../../3rdparty/source/rapidjson/reader.h>
 #include <../../3rdparty/source/rapidjson/stringbuffer.h>
 #include <../../3rdparty/source/rapidjson/error/en.h>
