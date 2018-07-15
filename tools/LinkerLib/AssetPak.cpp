@@ -401,8 +401,11 @@ bool AssetPakBuilder::save(core::Path<char>& path)
     uint64_t totalFileSize = 0;
     totalFileSize += sizeof(hdr);
     totalFileSize += stringDataSize;
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
     totalFileSize += entryTablesize;
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
     totalFileSize += sharedDictsData.size();
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
     totalFileSize += dataSize;
 
     if (totalFileSize > PAK_MAX_SIZE) {
