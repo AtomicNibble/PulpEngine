@@ -87,11 +87,14 @@ bool FontCompiler::compile(void)
     // add in drop.
     FontEffect effect(arena_);
     effect.name.set("drop");
-    effect.passes.resize(1);
+    effect.passes.resize(2);
     auto& pass = effect.passes.front();
     pass.col.set(0, 0, 0, 255);
     pass.offset.x = 2.f;
     pass.offset.y = 2.f;
+
+    effect.passes.back().col.set(255, 255, 255, 255);
+
     effects_.emplace_back(std::move(effect));
 
     return true;
