@@ -19,6 +19,13 @@ typedef core::Array<uint8_t> DataVec;
 struct Asset
 {
     Asset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena);
+   
+    // Disable copy
+    Asset(const Asset&) = delete;
+    Asset& operator=(const Asset&) = delete;
+    Asset(Asset&&) = default;
+    Asset& operator=(Asset&&) = default;
+
 
     core::string name;
     core::string relativePath;
