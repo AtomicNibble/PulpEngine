@@ -207,12 +207,24 @@ bool AssetPakBuilder::bake(void)
     auto* pJobSys = gEnv->pJobSys;
 
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION)) {
+
+        std::array<int32_t, AssetType::ENUM_COUNT> assetCounts;
+        assetCounts.fill(0);
+
+        for (auto& a : assets_) {
+            ++assetCounts[a.type];
+        }
+
         // compression.
         for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
             auto type = static_cast<AssetType::Enum>(i);
             const auto& compOpt = compression_[type];
 
             if (!compOpt.enabled) {
+                continue;
+            }
+
+            if (assetCounts[type] == 0) {
                 continue;
             }
 
