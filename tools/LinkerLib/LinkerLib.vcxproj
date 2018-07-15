@@ -527,12 +527,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="AssetList.h" />
     <ClInclude Include="AssetPak.h" />
     <ClInclude Include="Linker.h" />
     <ClInclude Include="LinkerLib.h" />
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="AssetList.cpp" />
     <ClCompile Include="AssetPak.cpp" />
     <ClCompile Include="Linker.cpp" />
     <ClCompile Include="Module.cpp" />
