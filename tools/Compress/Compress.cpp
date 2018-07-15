@@ -448,22 +448,24 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     // algo: lz4, lzma, zlib
     // lvl: 1-3
 
-    EngineApp app;
-
-    if (!app.Init(hInstance, &arena, lpCmdLine)) {
-        return -1;
-    }
-
-    PrintArgs();
-
     int res = 0;
 
-    const wchar_t* pTrain = gEnv->pCore->GetCommandLineArgForVarW(L"train");
-    if (pTrain && core::strUtil::StringToBool(pTrain)) {
-        res = DoTrain(arena);
-    }
-    else {
-        res = DoCompression(arena);
+    {
+        EngineApp app;
+
+        if (!app.Init(hInstance, &arena, lpCmdLine)) {
+            return -1;
+        }
+
+        PrintArgs();
+
+        const wchar_t* pTrain = gEnv->pCore->GetCommandLineArgForVarW(L"train");
+        if (pTrain && core::strUtil::StringToBool(pTrain)) {
+            res = DoTrain(arena);
+        }
+        else {
+            res = DoCompression(arena);
+        }
     }
 
     return res;
