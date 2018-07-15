@@ -29,8 +29,7 @@ public:
     FONTLIB_EXPORT XFontRender(core::MemoryArenaBase* arena);
     FONTLIB_EXPORT ~XFontRender();
 
-    FONTLIB_EXPORT bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding);
-    FONTLIB_EXPORT bool Release(void);
+    FONTLIB_EXPORT bool SetRawFontBuffer(core::span<const uint8_t> fontSrc, FontEncoding::Enum encoding);
 
     FONTLIB_EXPORT bool GetGlyph(XGlyph& glphy, XGlyphBitmap& destBitMap, wchar_t charCode, bool sdf);
 
@@ -58,7 +57,7 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
-    core::UniquePointer<uint8_t[]> data_; // must stay valid for lifetime of FT_Face
+    core::span<const uint8_t> data_; // must stay valid for lifetime of FT_Face
 
     FT_Library pLibrary_;
     FT_Face pFace_;

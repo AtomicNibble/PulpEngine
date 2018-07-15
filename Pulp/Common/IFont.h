@@ -8,6 +8,7 @@
 #include <IConverterModule.h>
 
 #include <Time\CompressedStamps.h>
+#include <String\StringHash.h>
 
 struct ICore;
 
@@ -20,7 +21,10 @@ static const char* FONT_DESC_FILE_EXTENSION = "font";
 static const char* FONT_BAKED_FILE_EXTENSION = "fnt";
 
 static const wchar_t FONT_PRECACHE_STR[] = L" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]"
-                                           "^_`abcdefghijklmnopqrstuvwxyz{|}~¢£¤¥¦§¨©ª«¬­";
+                                           "^_`abcdefghijklmnopqrstuvwxyz{|}~¢£¤¥¦§¨©ª«¬­\n\t";
+
+static const uint32_t FONT_MAX_LOADED = 8;
+
 
 struct IFontLib : public IConverter
 {
@@ -44,12 +48,16 @@ struct IFontSys : public core::IEngineSysBase
 
     virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
-    virtual IFont* NewFont(const char* pFontName) X_ABSTRACT;
-    virtual IFont* GetFont(const char* pFontName) const X_ABSTRACT;
-    virtual IFont* GetDefault(void) const X_ABSTRACT;
+    virtual IFont* loadFont(const char* pFontName) X_ABSTRACT;
+    virtual IFont* findFont(const char* pFontName) const X_ABSTRACT;
+    virtual IFont* getDefault(void) const X_ABSTRACT;
+
+    virtual void releaseFont(IFont* pFont) X_ABSTRACT;
+
+    virtual bool waitForLoad(IFont* pFont) X_ABSTRACT;
 
     // this should really take a sink no?
-    virtual void ListFonts(void) const X_ABSTRACT;
+    virtual void listFonts(const char* pSearchPatten = nullptr) const X_ABSTRACT;
 };
 
 #ifdef GetCharWidth
@@ -158,16 +166,7 @@ struct IFont
 {
     virtual ~IFont() = default;
     virtual void Free(void) X_ABSTRACT;        // free internal memory
-    virtual void FreeBuffers(void) X_ABSTRACT; // free texture buffers
     virtual void FreeTexture(void) X_ABSTRACT;
-
-    virtual bool loadFont(void) X_ABSTRACT;
-    virtual void Reload(void) X_ABSTRACT;
-
-    // blocks untill the font is ready to render.
-    // returns false if loading / setup has failed.
-    // only call this if you requested a async load, calling for sync loads is undefined.
-    virtual bool WaitTillReady(void) X_ABSTRACT;
 
     // draw a load of test text.
     virtual void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_ABSTRACT;
@@ -224,11 +223,20 @@ struct FontHdr
         return numGlyphs * ((glyphHeight * glyphWidth) + sizeof(GlyphHdr));
     }
 
+    X_INLINE bool isValid(void) const {
+        if (version != X_FONT_BIN_VERSION) {
+            X_ERROR("Font", "model version is invalid. FileVer: %" PRIu8 " RequiredVer: %" PRIu32,
+                version, X_FONT_BIN_VERSION);
+        }
+
+        return forcc == X_FONT_BIN_FOURCC && version == X_FONT_BIN_VERSION;
+    }
+
     uint32_t forcc;
     uint8_t version;
     FontFlags flags;
     uint8_t numEffects;
-    uint8_t _pad[1];
+    uint8_t numPasses;
     core::DateTimeStampSmall modifed;
 
     uint16_t numGlyphs;
@@ -243,6 +251,9 @@ struct FontHdr
 struct FontEffectHdr
 {
     int8_t numPass;
+    int8_t passStartIdx;
+    int8_t _pad[2];
+    core::StrHash nameHash;
 };
 
 struct FontPass
@@ -253,7 +264,7 @@ struct FontPass
 
 X_ENSURE_SIZE(FontHdr, 36);
 X_ENSURE_SIZE(GlyphHdr, 16);
-X_ENSURE_SIZE(FontEffectHdr, 1);
+X_ENSURE_SIZE(FontEffectHdr, 8);
 X_ENSURE_SIZE(FontPass, 12);
 
 X_NAMESPACE_END

@@ -6,14 +6,14 @@
 
 #include <IConsole.h>
 
+#include <Assets\AssetLoader.h>
+
 X_NAMESPACE_BEGIN(font)
 
 XFontSystem::XFontSystem(ICore* pCore) :
     pCore_(pCore),
     pDefaultFont_(nullptr),
-    fonts_(g_fontArena, 6),
-    lock_(10),
-    fontTextures_(g_fontArena, 4)
+    fonts_(g_fontArena, sizeof(FontResource), X_ALIGN_OF(FontResource), "FontPool")
 {
     X_ASSERT_NOT_NULL(pCore);
     X_ASSERT_NOT_NULL(g_fontArena);
@@ -36,10 +36,10 @@ void XFontSystem::registerVars(void)
 void XFontSystem::registerCmds(void)
 {
     // add font commands
-    ADD_COMMAND_MEMBER("listFonts", this, XFontSystem, &XFontSystem::Command_ListFonts, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("listFonts", this, XFontSystem, &XFontSystem::Cmd_ListFonts, core::VarFlag::SYSTEM,
         "Lists all the loaded fonts");
 
-    ADD_COMMAND_MEMBER("fontDumpForMame", this, XFontSystem, &XFontSystem::Command_DumpForName, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("fontDumpForMame", this, XFontSystem, &XFontSystem::Cmd_DumpForName, core::VarFlag::SYSTEM,
         "Dumps the font texture for a given font name");
 }
 
@@ -47,19 +47,17 @@ bool XFontSystem::init(void)
 {
     X_LOG0("FontSys", "Starting");
 
+    pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+    pAssetLoader_->registerAssetType(assetDb::AssetType::FONT, this, FONT_BAKED_FILE_EXTENSION);
+
     gEnv->pHotReload->addfileType(this, FONT_DESC_FILE_EXTENSION);
     gEnv->pHotReload->addfileType(this, FONT_BAKED_FILE_EXTENSION);
     gEnv->pHotReload->addfileType(this, "ttf");
 
     // load a default font.
-    pDefaultFont_ = static_cast<XFont*>(NewFont("default"));
+    pDefaultFont_ = static_cast<XFont*>(loadFont("default"));
     if (!pDefaultFont_) {
-        X_ERROR("Font", "Failed to create default font");
-        return false;
-    }
-
-    if (!pDefaultFont_->loadFont()) {
-        X_ERROR("Font", "Failed to load default font");
+        X_ERROR("FontSys", "Failed to create default font");
         return false;
     }
 
@@ -70,10 +68,7 @@ void XFontSystem::shutDown(void)
 {
     X_LOG0("FontSys", "Shutting Down");
 
-    for (auto& it: fonts_) {
-        X_DELETE(it.second, g_fontArena);
-    }
-    fonts_.clear();
+    freeDangling();
 
     gEnv->pHotReload->addfileType(nullptr, FONT_DESC_FILE_EXTENSION);
     gEnv->pHotReload->addfileType(nullptr, FONT_BAKED_FILE_EXTENSION);
@@ -84,7 +79,7 @@ bool XFontSystem::asyncInitFinalize(void)
 {
     // potentiall we will hold this lock for a while.
     // but we should not really see any contention.
-    core::CriticalSection::ScopedLock lock(lock_);
+    core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
     bool result = true;
 
@@ -92,7 +87,7 @@ bool XFontSystem::asyncInitFinalize(void)
         auto* pFont = fontIt.second;
 
         // we call all even if one fails.
-        result &= pFont->WaitTillReady();
+        result &= waitForLoad(pFont);
     }
 
     return result;
@@ -100,7 +95,7 @@ bool XFontSystem::asyncInitFinalize(void)
 
 void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
 {
-    core::CriticalSection::ScopedLock lock(lock_);
+    core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
     for (const auto& fontIt : fonts_) {
         auto* pFont = fontIt.second;
@@ -111,156 +106,205 @@ void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) co
     }
 }
 
-IFont* XFontSystem::NewFont(const char* pFontName)
+IFont* XFontSystem::loadFont(const char* pFontName)
 {
-    {
-        IFont* pFont;
-        if ((pFont = GetFont(pFontName)) != nullptr) {
-            return pFont;
-        }
+    X_ASSERT_NOT_NULL(pFontName);
+    X_ASSERT(core::strUtil::FileExtension(pFontName) == nullptr, "Extension not allowed")(pFontName);
+
+    core::string name(pFontName);
+    core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
+
+    auto* pFontRes = fonts_.findAsset(name);
+    if (pFontRes) {
+        // inc ref count.
+        pFontRes->addReference();
+        return pFontRes;
     }
 
-    XFont* pFont = X_NEW(XFont, g_fontArena, "FontObject")(*this, pFontName);
-    fonts_.insert(FontMap::value_type(core::string(pFontName), pFont));
-    return pFont;
+    pFontRes = fonts_.createAsset(name, *this, name);
+
+    addLoadRequest(pFontRes);
+
+    return pFontRes;
 }
 
-IFont* XFontSystem::GetFont(const char* pFontName) const
+IFont* XFontSystem::findFont(const char* pFontName) const
 {
-    auto it = fonts_.find(SourceNameStr(pFontName));
-    if (it != fonts_.end()) {
-        return it->second;
+    core::string name(pFontName);
+    core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
+
+    auto* pFontRes = fonts_.findAsset(name);
+    if (pFontRes) {
+        return pFontRes;
     }
 
+    X_WARNING("FontSys", "Failed to find model: \"%s\"", pFontName);
     return nullptr;
 }
 
-IFont* XFontSystem::GetDefault(void) const
+IFont* XFontSystem::getDefault(void) const
 {
     return X_ASSERT_NOT_NULL(pDefaultFont_);
 }
 
-XFontTexture* XFontSystem::getFontTexture(const SourceNameStr& name)
+void XFontSystem::releaseFont(IFont* pFont)
 {
-    core::CriticalSection::ScopedLock lock(lock_);
+    FontResource* pModelRes = static_cast<FontResource*>(pFont);
+    if (pModelRes->removeReference() == 0) {
+        releaseResources(pModelRes);
 
-    auto it = fontTextures_.find(name);
-    if (it != fontTextures_.end()) {
-        it->second->addReference();
-        return it->second;
-    }
-
-    auto pFontTexture = core::makeUnique<XFontTexture>(g_fontArena, name, vars_, g_fontArena);
-
-    // setup the font texture cpu buffers.
-    if (!pFontTexture->Create(512, 512, 16, 16)) {
-        return nullptr;
-    }
-
-    // the font cache's are now valid but we have not yet loaded the font glyph file into the font renderer.
-    // so we can't actually create any glyphs yet.
-    // the font file is optionally loaded in the background so it may be a few frames before this fontTexture is usable.
-    // you must check with 'IsReady'
-    if (!pFontTexture->LoadGlyphSource()) {
-        return nullptr;
-    }
-
-    auto* pPtr = pFontTexture.get();
-
-    fontTextures_.insert(std::make_pair(name, pFontTexture.release()));
-    return pPtr;
-}
-
-void XFontSystem::releaseFontTexture(XFontTexture* pFontTex)
-{
-    if (!pFontTex) {
-        return;
-    }
-
-    core::CriticalSection::ScopedLock lock(lock_);
-
-    auto it = fontTextures_.find(pFontTex->GetName());
-    if (it == fontTextures_.end()) {
-        X_ERROR("Font", "Failed to find FontTexture for removal. name: \"%s\"", pFontTex->GetName().c_str());
-        return;
-    }
-
-    if (pFontTex->removeReference() == 0) {
-        //		fontTextures_.erase(it);
-        X_DELETE(pFontTex, g_fontArena);
+        fonts_.releaseAsset(pModelRes);
     }
 }
 
-void XFontSystem::ListFonts(void) const
+bool XFontSystem::waitForLoad(IFont* pFont)
 {
-    FontMapConstItor it = fonts_.begin();
+    FontResource* pModelRes = static_cast<FontResource*>(pFont);
+
+    if (pModelRes->getStatus() == core::LoadStatus::Complete) {
+        return true;
+    }
+
+    return pAssetLoader_->waitForLoad(pModelRes);
+}
+
+void XFontSystem::freeDangling(void)
+{
+    {
+        core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
+
+        // any left?
+        for (const auto& m : fonts_) {
+            auto* pModelRes = m.second;
+            const auto& name = pModelRes->getName();
+            X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+
+            releaseResources(pModelRes);
+        }
+    }
+
+    fonts_.free();
+}
+
+void XFontSystem::releaseResources(XFont* pFont)
+{
+    X_UNUSED(pFont);
+}
+
+
+void XFontSystem::addLoadRequest(FontResource* pFont)
+{
+    pAssetLoader_->addLoadRequest(pFont);
+}
+
+void XFontSystem::onLoadRequestFail(core::AssetBase* pAsset)
+{
+    X_UNUSED(pAsset);
+
+}
+
+bool XFontSystem::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
+{
+    auto* pFont = static_cast<XFont*>(pAsset);
+
+    return pFont->processData(std::move(data), dataSize);
+}
+
+void XFontSystem::listFonts(const char* pSearchPatten) const
+{
+    core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
+
+    core::Array<FontResource*> sorted(g_fontArena);
+    sorted.setGranularity(fonts_.size());
+
+    for (const auto& font : fonts_) {
+        auto* pFontRes = font.second;
+
+        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pFontRes->getName())) {
+            sorted.push_back(pFontRes);
+        }
+    }
+
+    std::sort(sorted.begin(), sorted.end(), [](FontResource* a, FontResource* b) {
+        const auto& nameA = a->getName();
+        const auto& nameB = b->getName();
+        return nameA.compareInt(nameB) < 0;
+    });
+
     FontFlags::Description FlagDesc;
 
-    X_LOG0("Fonts", "---------------- ^8Fonts^7 ---------------");
-    for (; it != fonts_.end(); ++it) {
-        XFont* pFont = it->second;
+    X_LOG0("FontSys", "---------------- ^8Fonts^7 ---------------");
+
+    for (const auto* pFont : sorted) {
         XFontTexture* pTex = pFont->getFontTexture();
-        if (pTex && pTex->IsReady()) {
+        if (pTex) {
             X_LOG0("Fonts", "Name: ^2\"%s\"^7 Flags: [^1%s^7] Size: ^2(%" PRIi32 ",%" PRIi32 ")^7 Usage: ^2%" PRIi32 " ^7CacheMiss: ^2%" PRIi32,
                 pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc),
                 pTex->GetWidth(), pTex->GetHeight(), pTex->GetSlotUsage(), pTex->GetCacheMisses());
         }
         else {
-            X_LOG0("Fonts", "Name: ^2\"%s\"^7 Flags: [^1%s^7]", pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc));
+            X_LOG0("FontSys", "Name: ^2\"%s\"^7 Flags: [^1%s^7]", pFont->getName().c_str(), pFont->getFlags().ToString(FlagDesc));
         }
     }
 
-    X_LOG0("Fonts", "------------- ^8Fonts End^7 --------------");
+    X_LOG0("FontSys", "------------- ^8Fonts End^7 --------------");
 }
+
+
 
 void XFontSystem::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
     X_UNUSED(jobSys);
 #if 0
-	Path<char> path(name);
-	if (strUtil::IsEqual(".font", path.extension()))
-	{
-		path.removeExtension();
+    Path<char> path(name);
+    if (strUtil::IsEqual(".font", path.extension()))
+    {
+        path.removeExtension();
 
-		XFFont* pFont = static_cast<XFFont*>(GetFont(path.fileName()));
-		if (pFont)
-		{
-			pFont->Reload();
-		}
-		return true;
-	}
+        XFFont* pFont = static_cast<XFFont*>(GetFont(path.fileName()));
+        if (pFont)
+        {
+            pFont->Reload();
+        }
+        return true;
+    }
 
-	return false;
+    return false;
 #else
     X_UNUSED(name);
 #endif
 }
 
-void XFontSystem::Command_ListFonts(core::IConsoleCmdArgs* pCmd)
-{
-    X_UNUSED(pCmd);
 
-    ListFonts();
+void XFontSystem::Cmd_ListFonts(core::IConsoleCmdArgs* pCmd)
+{
+    const char* pSearchPatten = nullptr;
+
+    if (pCmd->GetArgCount() >= 2) {
+        pSearchPatten = pCmd->GetArg(1);
+    }
+
+    listFonts(pSearchPatten);
 }
 
-void XFontSystem::Command_DumpForName(core::IConsoleCmdArgs* pCmd)
+void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
 {
     size_t num = pCmd->GetArgCount();
 
     if (num < 2) {
-        X_WARNING("Console", "fonts_dump_for_name <name>");
+        X_WARNING("FontSys", "fonts_dump_for_name <name>");
         return;
     }
 
     const char* pName = pCmd->GetArg(1);
-    XFont* pFont = static_cast<XFont*>(GetFont(pName));
+    XFont* pFont = static_cast<XFont*>(findFont(pName));
     if (pFont) {
         if (pFont->getFontTexture()->WriteToFile(pName)) {
-            X_LOG0("Font", "^8font texture successfully dumped!");
+            X_LOG0("FontSys", "^8font texture successfully dumped!");
         }
     }
     else {
-        X_ERROR("Font", "failed to dump font, no font exsists for name: %s", pName);
+        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %s", pName);
     }
 }
 

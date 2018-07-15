@@ -50,38 +50,6 @@ XGlyphCache::~XGlyphCache()
 {
 }
 
-bool XGlyphCache::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding, float sizeRatio)
-{
-    if (!fontRenderer_.SetRawFontBuffer(std::move(data), length, encoding)) {
-        X_ERROR("Font", "Error setting up font renderer");
-        return false;
-    }
-
-    if (scaledGlyphWidth_) {
-        fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_, sizeRatio);
-    }
-    else {
-        fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_, sizeRatio);
-    }
-
-    metrics_ = fontRenderer_.GetMetrics();
-
-    if (smoothMethod_ == FontSmooth::SUPERSAMPLE) {
-        auto offsetMult = getOffsetMulti(smoothAmount_);
-
-        metrics_.ascender >>= offsetMult >> 1;
-        metrics_.descender >>= offsetMult >> 1;
-        metrics_.max_advance >>= offsetMult >> 1;
-    }
-
-    if (vars_.glyphCachePreWarm()) {
-        X_PROFILE_NO_HISTORY_BEGIN("FontWarmCache", core::profiler::SubSys::FONT);
-
-        PreWarmCache();
-    }
-
-    return true;
-}
 
 bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
 {
@@ -126,19 +94,79 @@ bool XGlyphCache::Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight)
     return true;
 }
 
-void XGlyphCache::Release(void)
+bool XGlyphCache::SetRawFontBuffer(core::span<const uint8_t> fontSrc, FontEncoding::Enum encoding, float sizeRatio)
 {
-    fontRenderer_.Release();
+    if (!fontRenderer_.SetRawFontBuffer(fontSrc, encoding)) {
+        X_ERROR("Font", "Error setting up font renderer");
+        return false;
+    }
 
-    ReleaseSlotList();
+    if (scaledGlyphWidth_) {
+        fontRenderer_.SetGlyphBitmapSize(scaledGlyphWidth_, scaledGlyphHeight_, sizeRatio);
+    }
+    else {
+        fontRenderer_.SetGlyphBitmapSize(glyphBitmapWidth_, glyphBitmapHeight_, sizeRatio);
+    }
 
-    cacheTable_.clear();
+    metrics_ = fontRenderer_.GetMetrics();
 
-    scaleBitmap_.release();
+    if (smoothMethod_ == FontSmooth::SUPERSAMPLE) {
+        auto offsetMult = getOffsetMulti(smoothAmount_);
 
-    glyphBitmapWidth_ = 0;
-    glyphBitmapHeight_ = 0;
+        metrics_.ascender >>= offsetMult >> 1;
+        metrics_.descender >>= offsetMult >> 1;
+        metrics_.max_advance >>= offsetMult >> 1;
+    }
+
+    return true;
 }
+
+bool XGlyphCache::SetBakedData(core::span<const GlyphHdr> bakedGlyphs, core::span<const char> bakedData)
+{
+    X_UNUSED(bakedGlyphs, bakedData);
+
+    if (bakedGlyphs.empty()) {
+        return true;
+    }
+
+    auto usage = ++usage_;
+    auto bitMapSize = glyphBitmapWidth_ * glyphBitmapHeight_;
+
+    for (int32_t i=0; i<bakedGlyphs.size(); i++)
+    {
+        auto& baked = bakedGlyphs[i];
+
+        X_ASSERT(bitMapSize * (i + 1) <= static_cast<size_t>(bakedData.length()), "Out of range")(bitMapSize * (i + 1), bakedData.length());
+        const char* pBitMapSrc = bakedData.data() + (bitMapSize * i);
+
+        // glyph.
+        XGlyph* pSlot = GetLRUSlot();
+        if (!pSlot) {
+            return false;
+        }
+
+        pSlot->usage = usage;
+        pSlot->currentChar = baked.currentChar;
+        pSlot->charWidth = baked.charWidth;
+        pSlot->charHeight = baked.charHeight;
+        pSlot->charOffsetX = baked.charOffsetX;
+        pSlot->charOffsetY = baked.charOffsetY;
+        pSlot->bitmapOffsetX = baked.bitmapOffsetX;
+        pSlot->bitmapOffsetY = baked.bitmapOffsetY;
+
+        // fill in the bitmap.
+        auto& bitmap = pSlot->glyphBitmap;
+        auto& bitBuf = bitmap.GetBuffer();
+
+        X_ASSERT(bitBuf.size() == bitMapSize, "Size mismatch")(bitBuf.size(), bitMapSize);
+        std::memcpy(bitBuf.data(), pBitMapSrc, bitMapSize);
+
+        cacheTable_.insert(std::make_pair(baked.currentChar, pSlot));
+    }
+
+    return true;
+}
+
 
 void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 {
@@ -148,22 +176,6 @@ void XGlyphCache::GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const
 
     if (pHeight) {
         *pHeight = glyphBitmapHeight_;
-    }
-}
-
-void XGlyphCache::PreWarmCache(void)
-{
-    X_ASSERT(cacheTable_.empty(), "Can only be run when the cache is empty")(cacheTable_.size());
-
-    size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
-    len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
-
-    X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
-
-    ++usage_; // give them fake usage.
-
-    for (size_t x = 0; x < len; x++) {
-        PreCacheGlyph(FONT_PRECACHE_STR[x]);
     }
 }
 

@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(font)
 
 struct FontEffect
 {
-    core::StackString<64> name;
+    core::StrHash nameHash;
     core::FixedArray<FontPass, MAX_FONT_PASS> passes;
 };
 

@@ -23,19 +23,15 @@ FontCompiler::~FontCompiler()
 
 bool FontCompiler::setFont(DataVec&& trueTypeData, int32_t width, int32_t height, float sizeRatio)
 {
-    int32_t length = safe_static_cast<int32_t>(trueTypeData.size());
+    sourceFontData_ = std::move(trueTypeData);
 
-    auto data = core::makeUnique<uint8_t[]>(arena_, trueTypeData.size());
-    std::memcpy(data.ptr(), trueTypeData.data(), trueTypeData.size());
-
-    if (!render_.SetRawFontBuffer(std::move(data), length, FontEncoding::Unicode)) {
+    if (!render_.SetRawFontBuffer(core::make_span(sourceFontData_), FontEncoding::Unicode)) {
         X_ERROR("Font", "Failed to load font data");
         return false;
     }
 
     render_.SetGlyphBitmapSize(width, height, sizeRatio);
 
-    sourceFontData_ = std::move(trueTypeData);
     return true;
 }
 
@@ -76,6 +72,31 @@ bool FontCompiler::bake(bool sdf)
     return true;
 }
 
+bool FontCompiler::compile(void)
+{
+    if (effects_.isEmpty()) {
+        X_WARNING("Font", "No effects provided, adding default");
+
+        FontEffect effect(arena_);
+        effect.passes.resize(1);
+        auto& pass = effect.passes.front();
+        pass.col.set(255, 255, 255, 255);
+        effects_.emplace_back(std::move(effect));
+    }
+
+    // add in drop.
+    FontEffect effect(arena_);
+    effect.name.set("drop");
+    effect.passes.resize(1);
+    auto& pass = effect.passes.front();
+    pass.col.set(0, 0, 0, 255);
+    pass.offset.x = 2.f;
+    pass.offset.y = 2.f;
+    effects_.emplace_back(std::move(effect));
+
+    return true;
+}
+
 bool FontCompiler::writeToFile(core::XFile* pFile) const
 {
     FontHdr hdr;
@@ -84,10 +105,15 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
     int32_t width, height;
     render_.GetGlyphBitmapSize(&width, &height);
 
+    auto totalPass = core::accumulate(effects_.begin(), effects_.end(), 0_sz, [](const FontEffect& efx) {
+        return efx.passes.size();
+    });
+
     hdr.forcc = FontHdr::X_FONT_BIN_FOURCC;
     hdr.version = FontHdr::X_FONT_BIN_VERSION;
     hdr.flags = flags_;
     hdr.numEffects = safe_static_cast<uint8_t>(effects_.size());
+    hdr.numPasses = safe_static_cast<uint8_t>(totalPass);
     hdr.modifed = core::DateTimeStampSmall::systemDateTime();
     hdr.numGlyphs = safe_static_cast<uint16_t>(glyphs_.size());
     hdr.glyphWidth = safe_static_cast<uint16_t>(width);
@@ -116,6 +142,8 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
 
     stream.write(hdr);
 
+    size_t passOffset = 0;
+
     for (const auto& efx : effects_)
     {
         if (efx.passes.isEmpty()) {
@@ -124,16 +152,22 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
         }
 
         FontEffectHdr efxHdr;
-        efxHdr.numPass = safe_static_cast<uint8_t>(efx.passes.size());
-
+        efxHdr.numPass = safe_static_cast<int8_t>(efx.passes.size());
+        efxHdr.passStartIdx = safe_static_cast<int8_t>(passOffset);
+        efxHdr.nameHash = core::StrHash(efx.name.begin(), efx.name.end());
+        
         stream.write(efxHdr);
+        
+        passOffset += efx.passes.size();
+    }
+
+    for (const auto& efx : effects_)
+    {
         stream.write(efx.passes.data(), efx.passes.size());
     }
 
     for (const auto& glyph : glyphs_)
     {
-        auto& bitmap = glyph.glyphBitmap.GetBuffer();
-
         GlyphHdr glyphHdr;
         core::zero_object(glyphHdr);
         glyphHdr.currentChar = glyph.currentChar;
@@ -146,6 +180,12 @@ bool FontCompiler::writeToFile(core::XFile* pFile) const
         glyphHdr.bitmapOffsetY = glyph.bitmapOffsetY;
 
         stream.write(glyphHdr);
+    }
+
+    for (const auto& glyph : glyphs_)
+    {
+        auto& bitmap = glyph.glyphBitmap.GetBuffer();
+
         stream.write(bitmap.data(), bitmap.size());
     }
 

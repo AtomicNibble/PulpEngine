@@ -8,19 +8,7 @@
 
 X_NAMESPACE_BEGIN(font)
 
-namespace
-{
-    struct JobData
-    {
-        uint8_t* pData;
-        uint32_t dataSize;
-    };
-
-} // namespace
-
-XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core::MemoryArenaBase* arena) :
-    vars_(vars),
-    name_(name),
+XFontTexture::XFontTexture(const FontVars& vars, core::MemoryArenaBase* arena) :
     glyphCache_(vars, arena),
     textureSlotArea_(arena),
 
@@ -44,10 +32,7 @@ XFontTexture::XFontTexture(const SourceNameStr& name, const FontVars& vars, core
     cacheMisses_(0),
 
     slotList_(arena),
-    slotTable_(arena, 8),
-
-    signal_(false),
-    loadStatus_(core::LoadStatus::NotLoaded)
+    slotTable_(arena, 8)
 {
 }
 
@@ -76,7 +61,8 @@ void XFontTexture::Clear(void)
     ReleaseSlotList();
 }
 
-bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount, int32_t heightCellCount)
+bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount, int32_t heightCellCount,
+    core::span<const GlyphHdr> bakedGlyphs, core::span<const char> bakedData, core::span<const uint8_t> fontSrc)
 {
     if (!core::bitUtil::IsPowerOfTwo(width) || !core::bitUtil::IsPowerOfTwo(height)) {
         X_ERROR("Font", "Font texture must be pow2. width: %" PRIi32 " height: %" PRIi32, width, height);
@@ -112,63 +98,30 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount,
     }
 
     CreateGradientSlot();
-    return true;
-}
 
-bool XFontTexture::WaitTillReady(void)
-{
-    if (IsReady()) {
-        return true;
+    if (!glyphCache_.SetRawFontBuffer(fontSrc, FontEncoding::Unicode)) {
+        Clear();
+        return false;
     }
 
-    while (loadStatus_ == core::LoadStatus::Loading) {
-        // if we have job system try help with work.
-        // if no work wait...
-        if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork()) {
-            signal_.wait();
-        }
-    }
-
-    signal_.clear();
-
-    if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
+    if (!glyphCache_.SetBakedData(bakedGlyphs, bakedData)) {
+        Clear();
         return false;
     }
 
     return true;
 }
 
-bool XFontTexture::LoadGlyphSource(void)
+void XFontTexture::PreWarmCache(void)
 {
-    if (IsReady()) {
-        return true;
-    }
+    X_PROFILE_NO_HISTORY_BEGIN("FontWarmCache", core::profiler::SubSys::FONT);
 
-    // are we loading already?
-    if (loadStatus_ == core::LoadStatus::Loading) {
-        return true;
-    }
+    size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
+    len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
 
-    core::Path<char> path;
-    path /= "Fonts/";
-    path.setFileName(name_.begin(), name_.end());
+    X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
 
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::READ);
-    mode.Set(core::fileMode::SHARE);
-
-    signal_.clear();
-    loadStatus_ = core::LoadStatus::Loading;
-
-    // load the file async
-    core::IoRequestOpenRead open;
-    open.callback.Bind<XFontTexture, &XFontTexture::IoRequestCallback>(this);
-    open.mode = mode;
-    open.path = path;
-    open.arena = g_fontArena;
-
-    gEnv->pFileSys->AddIoRequestToQue(open);
-    return true;
+    PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
 }
 
 CacheResult::Enum XFontTexture::PreCacheString(const wchar_t* pBegin, const wchar_t* pEnd, int32_t* pUpdatedOut)
@@ -372,69 +325,6 @@ void XFontTexture::CreateGradientSlot(void)
                 dwY * 255 / (pSlot->charHeight - 1));
         }
     }
-}
-
-void XFontTexture::PreWarmCache(void)
-{
-    size_t len = X_ARRAY_SIZE(FONT_PRECACHE_STR) - 1;
-    len = core::Min(len, slotList_.size()); // only precache what we can fit in the cache.
-
-    X_ASSERT(len > 0, "Cache must not be zero in size")(slotList_.size());
-
-    PreCacheString(FONT_PRECACHE_STR, FONT_PRECACHE_STR + len);
-}
-
-void XFontTexture::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-    core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-    X_UNUSED(fileSys);
-    X_UNUSED(bytesTransferred);
-
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
-    const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
-
-    if (!pFile) {
-        loadStatus_ = core::LoadStatus::Error;
-        X_ERROR("Font", "Error reading font data");
-        return;
-    }
-
-    JobData data;
-    data.pData = static_cast<uint8_t*>(pOpenRead->pBuf);
-    data.dataSize = pOpenRead->dataSize;
-
-    // dispatch a job to parse it?
-    gEnv->pJobSys->CreateMemberJobAndRun<XFontTexture>(this, &XFontTexture::ProcessFontFile_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::FONT));
-}
-
-void XFontTexture::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-    X_UNUSED(jobSys);
-    X_UNUSED(threadIdx);
-    X_UNUSED(pJob);
-
-    // we have the font data now we just need to setup the font render.
-    JobData* pJobData = static_cast<JobData*>(pData);
-
-    //	core::Thread::sleep(2000);
-
-    if (!glyphCache_.SetRawFontBuffer(core::UniquePointer<uint8_t[]>(g_fontArena, pJobData->pData),
-            pJobData->dataSize,
-            FontEncoding::Unicode)) {
-        loadStatus_ = core::LoadStatus::Error;
-        signal_.raise();
-        X_ERROR("Font", "Error setting up font renderer");
-        return;
-    }
-
-    // preform the precache in this job.
-    if (vars_.glyphCachePreWarm()) {
-        PreWarmCache();
-    }
-
-    // now we are ready.
-    loadStatus_ = core::LoadStatus::Complete;
-    signal_.raise();
 }
 
 bool XFontTexture::WriteToFile(const char* filename)

@@ -81,6 +81,11 @@ bool FontLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, 
         return false;
     }
 
+    if (!compiler.compile()) {
+        X_ERROR("Font", "Failed to compile font data");
+        return false;
+    }
+
     core::XFileScoped file;
     core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 

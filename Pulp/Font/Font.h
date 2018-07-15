@@ -12,6 +12,8 @@
 #include <Util\UniquePointer.h>
 #include <IFileSys.h>
 
+#include <Assets\AssetBase.h>
+
 struct Vertex_P3F_T2F_C4B;
 
 X_NAMESPACE_DECLARE(engine,
@@ -25,23 +27,20 @@ X_NAMESPACE_BEGIN(font)
 class XFontTexture;
 class XFontSystem;
 
-class XFont : public IFont
+class XFont : public IFont, public core::AssetBase
 {
 public:
 public:
-    XFont(XFontSystem& fontSys, const char* pFontName);
+    XFont(XFontSystem& fontSys, core::string& name);
     ~XFont();
 
     // IFont
     void Free(void) X_FINAL;
-    void FreeBuffers(void) X_FINAL;
     void FreeTexture(void) X_FINAL;
 
-    bool loadFont(void) X_FINAL;
-    void Reload(void) X_FINAL;
-
     bool isReady(void);
-    bool WaitTillReady(void) X_FINAL;
+
+    bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
     void DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time) X_FINAL;
 
@@ -70,7 +69,6 @@ public:
 
     void GetGradientTextureCoord(float& minU, float& minV, float& maxU, float& maxV) const;
 
-    X_INLINE const FontNameStr& getName(void) const;
     X_INLINE FontFlags getFlags(void) const;
     X_INLINE bool isDirty(void) const;
     X_INLINE XFontTexture* getFontTexture(void) const;
@@ -82,16 +80,8 @@ private:
         const TextDrawContext& contex, const wchar_t* pBegin, const wchar_t* pEnd, const Matrix33f* pRotation);
 
 private:
-    // loading logic
-    void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-        core::XFileAsync* pFile, uint32_t bytesTransferred);
-
-    void ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
-    static bool processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
-        EffetsArr& effectsOut, FontFlags& flags);
-
-    bool loadFontDef(void);
+//   static bool processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
+//       EffetsArr& effectsOut, FontFlags& flags);
 
 private:
     Vec2f GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, const TextDrawContext& contex);
@@ -104,30 +94,25 @@ private:
 
 private:
     XFontSystem& fontSys_;
-    FontNameStr name_;
-    SourceNameStr sourceName_;
+
+    core::UniquePointer<char[]> data_;
+    core::span<const FontEffectHdr> effectsHdr_;
+    core::span<const FontPass> effectsPasses_;
+    core::span<const GlyphHdr> bakedGlyphs_;
+    core::span<const char> bakedData_;
+    core::span<const uint8_t> fontSrc_;
+
     FontFlags flags_;
 
-    EffetsArr effects_;
-
     // the cpu texture
-    XFontTexture* pFontTexture_;
+    core::UniquePointer<XFontTexture> pFontTexture_;
 
     render::IDeviceTexture* pTexture_;
     bool fontTexDirty_;
 
     // shader and state.
     engine::Material* pMaterial_;
-
-    // loading
-    core::Signal signal_;
-    core::LoadStatus::Enum loadStatus_;
 };
-
-X_INLINE const FontNameStr& XFont::getName(void) const
-{
-    return name_;
-}
 
 X_INLINE FontFlags XFont::getFlags(void) const
 {
@@ -141,7 +126,7 @@ X_INLINE bool XFont::isDirty(void) const
 
 X_INLINE XFontTexture* XFont::getFontTexture(void) const
 {
-    return pFontTexture_;
+    return pFontTexture_.ptr();
 }
 
 X_NAMESPACE_END

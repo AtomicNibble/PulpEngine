@@ -19,7 +19,6 @@ XFontRender::XFontRender(core::MemoryArenaBase* arena) :
     sizeRatio_(0.8f),
     glyphBitmapWidth_(0),
     glyphBitmapHeight_(0),
-    data_(arena),
     xdist_(arena),
     ydist_(arena),
     gx_(arena),
@@ -32,12 +31,15 @@ XFontRender::XFontRender(core::MemoryArenaBase* arena) :
 
 XFontRender::~XFontRender()
 {
-    Release();
+    FT_Done_Face(pFace_);
+    FT_Done_FreeType(pLibrary_);
+    pFace_ = nullptr;
+    pLibrary_ = nullptr;
 }
 
-bool XFontRender::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length, FontEncoding::Enum encoding)
+bool XFontRender::SetRawFontBuffer(core::span<const uint8_t> fontSrc, FontEncoding::Enum encoding)
 {
-    data_ = std::move(data);
+    data_ = fontSrc;
 
     int32_t err = FT_Init_FreeType(&pLibrary_);
     if (err) {
@@ -52,8 +54,8 @@ bool XFontRender::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t 
 
     err = FT_New_Memory_Face(
         pLibrary_,
-        data_.ptr(),
-        length,
+        data_.data(),
+        safe_static_cast<FT_Long>(data_.length()),
         0,
         &pFace_);
 
@@ -63,17 +65,6 @@ bool XFontRender::SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t 
     }
 
     SetEncoding(encoding);
-    return true;
-}
-
-bool XFontRender::Release(void)
-{
-    FT_Done_Face(pFace_);
-    FT_Done_FreeType(pLibrary_);
-    pFace_ = nullptr;
-    pLibrary_ = nullptr;
-
-    data_.reset();
     return true;
 }
 

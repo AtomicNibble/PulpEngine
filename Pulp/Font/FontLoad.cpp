@@ -2,123 +2,72 @@
 #include "Font.h"
 
 #include "Sys\XFontSystem.h"
+#include "FontRender\XFontTexture.h"
 
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
-#include <Memory\AllocationPolicies\MallocFreeAllocator.h>
+#include <Memory\MemCursor.h>
 
 X_NAMESPACE_BEGIN(font)
 
 using namespace core;
 
-namespace
+
+bool XFont::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 {
-
-    struct JobData
-    {
-        char* pData;
-        uint32_t dataSize;
-    };
-
-} // namespace
-
-void XFont::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-    core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-    X_UNUSED(fileSys);
-    X_UNUSED(bytesTransferred);
-
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
-    const core::IoRequestOpenRead* pOpenRead = static_cast<const core::IoRequestOpenRead*>(pRequest);
-
-    if (!pFile) {
-        loadStatus_ = LoadStatus::Error;
-        X_ERROR("Font", "Failed to load font def file");
-        signal_.raise();
-        return;
+    if (dataSize < sizeof(FontHdr)) {
+        return false;
     }
 
-    JobData data;
-    data.pData = reinterpret_cast<char*>(pOpenRead->pBuf);
-    data.dataSize = pOpenRead->dataSize;
+    FontHdr& hdr = *reinterpret_cast<FontHdr*>(data.get());
 
-    // dispatch a job to parse it?
-    gEnv->pJobSys->CreateMemberJobAndRun<XFont>(this, &XFont::ProcessFontFile_job, data JOB_SYS_SUB_ARG(core::profiler::SubSys::FONT));
-}
-
-void XFont::ProcessFontFile_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-    X_UNUSED(jobSys);
-    X_UNUSED(threadIdx);
-    X_UNUSED(pJob);
-
-    JobData* pJobData = static_cast<JobData*>(pData);
-
-    // so we have the file data just need to process it.
-    if (processData(pJobData->pData, pJobData->pData + pJobData->dataSize, sourceName_, effects_, flags_)) {
-        // now create a fontTexture and async load it's glyph file.
-        // as soon as we assign 'pFontTexture_' other threads might start accessing it.
-        // other threads will not access any logic other than IsReady untill after IsReady returns true.
-        pFontTexture_ = fontSys_.getFontTexture(sourceName_);
-        if (!pFontTexture_) {
-            X_ERROR("Font", "Failed to get font texture for: \"%s\"", sourceName_.c_str());
-            loadStatus_ = LoadStatus::Error;
-        }
-        else {
-            loadStatus_ = LoadStatus::Complete;
-        }
-    }
-    else {
-        X_ERROR("Font", "Error parsing font def file");
-        loadStatus_ = LoadStatus::Error;
+    if (!hdr.isValid()) {
+        X_ERROR("Font", "\"%s\" header is invalid", name_.c_str());
+        return false;
     }
 
-    X_DELETE_ARRAY(pJobData->pData, g_fontArena);
-
-    signal_.raise();
-}
-
-void XFont::Reload(void)
-{
-    loadFont();
-}
-
-bool XFont::loadFont(void)
-{
-    return loadFontDef();
-}
-
-bool XFont::loadFontDef(void)
-{
-    // are we loading already?
-    if (loadStatus_ == LoadStatus::Loading) {
-        return true;
+    if (hdr.numEffects < 1) {
+        X_ERROR("Font", "\"%s\" has no effects", name_.c_str());
+        return false;
     }
 
-    core::Path<char> path;
-    path = "Fonts/";
-    path.setFileName(name_.c_str());
-    path.setExtension(".font");
+    core::MemCursor cursor(data.ptr() + sizeof(hdr), dataSize - sizeof(hdr));
 
-    core::fileModeFlags mode;
-    mode.Set(fileMode::READ);
-    mode.Set(fileMode::SHARE);
+    // each effect has multiple passes.
+    effectsHdr_ = core::make_span(cursor.postSeekPtr<FontEffectHdr>(hdr.numEffects), hdr.numEffects);
+    effectsPasses_ = core::make_span(cursor.postSeekPtr<FontPass>(hdr.numPasses), hdr.numPasses);
 
-    signal_.clear();
-    loadStatus_ = LoadStatus::Loading;
+    // baked glphys hdr
+    bakedGlyphs_ = core::make_span(cursor.postSeekPtr<GlyphHdr>(hdr.numGlyphs), hdr.numGlyphs);
+    
+    // baked glphys bitmaps
+    auto bakedDataSize = (hdr.glyphWidth * hdr.glyphHeight) * hdr.numGlyphs;
+    bakedData_ = core::make_span(cursor.postSeekPtr<char>(bakedDataSize), bakedDataSize);
 
-    // load the file async
-    core::IoRequestOpenRead open;
-    open.callback.Bind<XFont, &XFont::IoRequestCallback>(this);
-    open.mode = mode;
-    open.path = path;
-    open.arena = g_fontArena;
+    // src.
+    X_ASSERT(hdr.sourceFontSize == cursor.numBytesRemaning(), "Font parse error")(hdr.sourceFontSize, cursor.numBytesRemaning());
 
-    gEnv->pFileSys->AddIoRequestToQue(open);
+    fontSrc_ = core::make_span(cursor.postSeekPtr<uint8_t>(hdr.sourceFontSize), hdr.sourceFontSize);
+
+    // Make a font texture for it.
+    pFontTexture_ = core::makeUnique<XFontTexture>(g_fontArena, fontSys_.getVars(), g_fontArena);
+
+    // setup the font texture cpu buffers.
+    if (!pFontTexture_->Create(512, 512, 16, 16, bakedGlyphs_, bakedData_, fontSrc_)) {
+        X_ERROR("Font", "\"%s\" failed to create font texture", name_.c_str());
+        return false;
+    }
+
+    if (fontSys_.getVars().glyphCachePreWarm()) {
+        pFontTexture_->PreWarmCache();
+    }
+
+    data_ = std::move(data);
     return true;
 }
 
+#if 0
 bool XFont::processData(const char* pBegin, const char* pEnd, SourceNameStr& sourceNameOut,
     EffetsArr& effectsOut, FontFlags& flags)
 {
@@ -239,5 +188,6 @@ bool XFont::processData(const char* pBegin, const char* pEnd, SourceNameStr& sou
 
     return true;
 }
+#endif
 
 X_NAMESPACE_END

@@ -38,16 +38,13 @@ namespace
     };
 } // namespace
 
-XFont::XFont(XFontSystem& fontSys, const char* pFontName) :
+XFont::XFont(XFontSystem& fontSys, core::string& name) :
+    core::AssetBase(name, assetDb::AssetType::FONT),
     fontSys_(fontSys),
-    name_(pFontName),
-    effects_(g_fontArena),
     pFontTexture_(nullptr),
     pTexture_(nullptr),
     fontTexDirty_(false),
-    pMaterial_(nullptr),
-    signal_(false),
-    loadStatus_(core::LoadStatus::NotLoaded)
+    pMaterial_(nullptr)
 {
     X_ASSERT_NOT_NULL(g_fontArena);
 }
@@ -59,17 +56,7 @@ XFont::~XFont()
 
 void XFont::Free(void)
 {
-    effects_.free();
-
-    FreeBuffers();
     FreeTexture();
-}
-
-void XFont::FreeBuffers(void)
-{
-    fontSys_.releaseFontTexture(pFontTexture_);
-    pFontTexture_ = nullptr;
-    fontTexDirty_ = true;
 }
 
 void XFont::FreeTexture(void)
@@ -85,36 +72,7 @@ void XFont::FreeTexture(void)
 
 bool XFont::isReady(void)
 {
-    return (pFontTexture_ && pFontTexture_->IsReady());
-}
-
-bool XFont::WaitTillReady(void)
-{
-    if (isReady()) {
-        return true;
-    }
-
-    // if we don't have a font texture :S
-    // how do we wait!
-    if (!pFontTexture_) {
-        while (loadStatus_ == core::LoadStatus::Loading) {
-            // if we have job system try help with work.
-            // if no work wait...
-            if (!gEnv->pJobSys || !gEnv->pJobSys->HelpWithWork()) {
-                signal_.wait();
-            }
-        }
-
-        signal_.clear();
-
-        if (loadStatus_ == core::LoadStatus::Error || loadStatus_ == core::LoadStatus::NotLoaded) {
-            return false;
-        }
-
-        X_ASSERT_NOT_NULL(pFontTexture_);
-    }
-
-    return pFontTexture_->WaitTillReady();
+    return (bool)pFontTexture_;
 }
 
 void XFont::DrawTestText(engine::IPrimativeContext* pPrimCon, const core::FrameTimeData& time)
@@ -373,14 +331,13 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
         return;
     }
 
-    if (effects_.isEmpty()) {
+    if (effectsHdr_.empty()) {
         X_WARNING("Font", "\"%s\" has no effects.", getName().c_str());
         return;
     }
 
-    X_ASSERT(ctx.GetEffectId() >= 0 && ctx.GetEffectId() < static_cast<int32_t>(effects_.size()),
-        "Effect index invalid")
-    (ctx.GetEffectId(), effects_.size());
+    X_ASSERT(ctx.GetEffectId() >= 0 && ctx.GetEffectId() < static_cast<int32_t>(effectsHdr_.size()),
+        "Effect index invalid")(ctx.GetEffectId(), effectsHdr_.size());
 
     // updates LRU cache and adds glyphs to font texture if missing.
     // the device texture is not updated here tho.
@@ -434,9 +391,10 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
         baseXY.y = math<float>::floor(baseXY.y);
     }
 
-    FontEffect& effect = effects_[effecIdx];
-    for (auto passIdx = 0u; passIdx < effect.passes.size(); passIdx++) {
-        const FontPass& pass = effect.passes[passIdx];
+    const FontEffectHdr& effect = effectsHdr_[effecIdx];
+    for (int32_t passIdx = 0u; passIdx < effect.numPass; passIdx++) {
+
+        const FontPass& pass = effectsPasses_[effect.passStartIdx + passIdx];
 
         Color8u col = ctx.col;
 
@@ -744,7 +702,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
     }
 
     if (debugGlyphRect) {
-        const FontPass& pass = effect.passes[0];
+        const FontPass& pass = effectsPasses_[effect.passStartIdx];
 
         float charX = baseXY.x + pass.offset.x;
         float charY = baseXY.y + pass.offset.y;
@@ -1017,14 +975,16 @@ int32_t XFont::GetEffectId(const char* pEffectName) const
 {
     X_ASSERT_NOT_NULL(pEffectName);
 
+    core::StrHash nameHash(pEffectName);
+
     int32_t idx = 0;
-    for (; idx < static_cast<int32_t>(effects_.size()); ++idx) {
-        if (effects_[idx].name.isEqual(pEffectName)) {
+    for (; idx < static_cast<int32_t>(effectsHdr_.size()); ++idx) {
+        if (effectsHdr_[idx].nameHash == nameHash) {
             break;
         }
     }
 
-    if (idx == static_cast<int32_t>(effects_.size())) {
+    if (idx == static_cast<int32_t>(effectsHdr_.size())) {
         X_ERROR("Font", "Failed to find effect with name: \"%s\"", pEffectName);
         return -1;
     }

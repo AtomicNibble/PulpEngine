@@ -12,6 +12,11 @@ X_NAMESPACE_BEGIN(font)
 
 struct FontEffect
 {
+    FontEffect(core::MemoryArenaBase* arena) :
+        passes(arena)
+    {
+    }
+
     core::StackString<64> name;
     core::Array<FontPass> passes;
 };
@@ -28,7 +33,8 @@ public:
     ~FontCompiler();
 
     bool setFont(DataVec&& trueTypeData, int32_t width, int32_t height, float sizeRatio);
-    bool bake(bool sdf = true);
+    bool bake(bool sdf);
+    bool compile(void);
 
     bool writeToFile(core::XFile* pFile) const;
     bool writeImageToFile(core::XFile* pFile) const;

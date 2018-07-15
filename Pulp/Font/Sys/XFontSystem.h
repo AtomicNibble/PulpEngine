@@ -4,8 +4,8 @@
 #define _X_XFONNT_H_
 
 #include <Platform\DirectoryWatcher.h>
-#include <Containers\HashMap.h>
 #include <Util\ReferenceCounted.h>
+#include <Assets\AssertContainer.h>
 
 #include "Vars\FontVars.h"
 
@@ -19,60 +19,68 @@ class XGlyphCache;
 
 class XFontSystem : public IFontSys
     , public core::IXHotReload
+    , private core::IAssetLoadSink
 {
-    typedef core::UniquePointer<XFont> XFontPtr;
-    typedef core::HashMap<FontNameStr, XFont*> FontMap;
-    typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
+    typedef core::AssetContainer<XFont, FONT_MAX_LOADED, core::SingleThreadPolicy> FontContainer;
+    typedef FontContainer::Resource FontResource;
 
-    typedef FontMap::iterator FontMapItor;
-    typedef FontMap::const_iterator FontMapConstItor;
+    typedef core::HashMap<SourceNameStr, XFontTexture*> FontTextureMap;
 
 public:
     XFontSystem(ICore* pCore);
     virtual ~XFontSystem();
 
     // IEngineSysBase
-    virtual void registerVars(void) X_FINAL;
-    virtual void registerCmds(void) X_FINAL;
+    void registerVars(void) X_FINAL;
+    void registerCmds(void) X_FINAL;
 
-    virtual bool init(void) X_FINAL;
-    virtual void shutDown(void) X_FINAL;
-    virtual void release(void) X_FINAL;
+    bool init(void) X_FINAL;
+    void shutDown(void) X_FINAL;
+    void release(void) X_FINAL;
 
-    virtual bool asyncInitFinalize(void) X_FINAL;
+    bool asyncInitFinalize(void) X_FINAL;
 
     // IXFont
-    virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
+    void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
-    virtual IFont* NewFont(const char* pFontName) X_FINAL;
-    virtual IFont* GetFont(const char* pFontName) const X_FINAL;
-    virtual IFont* GetDefault(void) const X_FINAL;
-    virtual void ListFonts(void) const X_FINAL;
+    IFont* loadFont(const char* pFontName) X_FINAL;
+    IFont* findFont(const char* pFontName) const X_FINAL;
+    IFont* getDefault(void) const X_FINAL;
+
+    void releaseFont(IFont* pFont) X_FINAL;
+
+    bool waitForLoad(IFont* pFont) X_FINAL;
+
+    void listFonts(const char* pSearchPatten = nullptr) const X_FINAL;
     // ~IXFont
-
-    // IXHotReload
-    // returns true if it action was eaten.
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
-    // ~IXHotReload
-
-    XFontTexture* getFontTexture(const SourceNameStr& name);
-    void releaseFontTexture(XFontTexture* pFontTex);
 
     X_INLINE const FontVars& getVars(void) const;
 
 private:
-    void Command_ListFonts(core::IConsoleCmdArgs* pCmd);
-    void Command_DumpForName(core::IConsoleCmdArgs* pCmd);
+    void freeDangling(void);
+    void releaseResources(XFont* pFont);
+
+    void addLoadRequest(FontResource* pFont);
+    void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+    bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+
+private:
+    // IXHotReload
+    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
+    // ~IXHotReload
+
+private:
+    void Cmd_ListFonts(core::IConsoleCmdArgs* pCmd);
+    void Cmd_DumpForName(core::IConsoleCmdArgs* pCmd);
 
 private:
     ICore* pCore_;
     XFont* pDefaultFont_;
-    FontMap fonts_;
-
     FontVars vars_;
 
-    mutable core::CriticalSection lock_;
-    FontTextureMap fontTextures_;
+    FontContainer fonts_;
+
+    core::AssetLoader* pAssetLoader_;
 };
 
 X_INLINE const FontVars& XFontSystem::getVars(void) const

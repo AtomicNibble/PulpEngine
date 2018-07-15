@@ -27,22 +27,19 @@ public:
     ~XGlyphCache();
 
     X_INLINE bool IsLoaded(void) const;
-    bool WaitTillReady(void);
 
     X_INLINE bool SetEncoding(FontEncoding::Enum encoding);
     X_INLINE FontEncoding::Enum GetEncoding(void) const;
     X_INLINE const Metrics& GetMetrics(void) const;
 
-    bool SetRawFontBuffer(core::UniquePointer<uint8_t[]> data, int32_t length,
-        FontEncoding::Enum encoding, float sizeRatio = 1.0f);
-    bool LoadGlyphSource(const SourceNameStr& name, bool async);
-
     bool Create(int32_t glyphBitmapWidth, int32_t glyphBitmapHeight);
-    void Release(void);
+
+    bool SetRawFontBuffer(core::span<const uint8_t> fontSrc,
+        FontEncoding::Enum encoding, float sizeRatio = 1.0f);
+    bool SetBakedData(core::span<const GlyphHdr> bakedGlyphs, core::span<const char> bakedData);
 
     void GetGlyphBitmapSize(int32_t* pWidth, int32_t* pHeight) const;
 
-    void PreWarmCache(void);
     bool PreCacheGlyph(wchar_t cChar);
     bool UnCacheGlyph(wchar_t cChar);
     bool GlyphCached(wchar_t cChar);
