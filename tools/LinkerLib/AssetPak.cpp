@@ -111,6 +111,8 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     // per asset shared dictonary.
     dictonaries_.fill(nullptr);
     // dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
+
+    assetCounts_.fill(0);
 }
 
 AssetPakBuilder::~AssetPakBuilder()
@@ -208,13 +210,6 @@ bool AssetPakBuilder::bake(void)
 
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION)) {
 
-        std::array<int32_t, AssetType::ENUM_COUNT> assetCounts;
-        assetCounts.fill(0);
-
-        for (auto& a : assets_) {
-            ++assetCounts[a.type];
-        }
-
         // compression.
         for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
             auto type = static_cast<AssetType::Enum>(i);
@@ -224,7 +219,7 @@ bool AssetPakBuilder::bake(void)
                 continue;
             }
 
-            if (assetCounts[type] == 0) {
+            if (assetCounts_[type] == 0) {
                 continue;
             }
 
@@ -493,6 +488,10 @@ bool AssetPakBuilder::save(core::Path<char>& path)
     }
 
     // some stats.
+
+    core::HumanSize::Str sizeStr0, sizeStr1;
+    X_LOG0("AssetPak", "Stats:");
+    X_LOG_BULLET;
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
     {
         uint64_t defaltedSize = 0;
@@ -503,13 +502,21 @@ bool AssetPakBuilder::save(core::Path<char>& path)
             defaltedSize += a.data.size();
         }
 
-        core::HumanSize::Str sizeStr0, sizeStr1;
-        X_LOG0("AssetPak", "Stats:");
-        X_LOG_BULLET;
         X_LOG0("AssetPak", "RawAssetSize:        ^6%s", core::HumanSize::toString(sizeStr0, infaltedSize));
         X_LOG0("AssetPak", "CompressedAssetSize: ^6%s", core::HumanSize::toString(sizeStr1, defaltedSize));
     }
 
+    X_LOG0("AssetPak", "%-16s %-8s", "Type", "Num");
+
+    for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
+        auto type = static_cast<AssetType::Enum>(i);
+
+        if (!assetCounts_[i]) {
+            continue;
+        }
+
+        X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIi32, AssetType::ToString(type), assetCounts_[i]);
+    }
 
     return true;
 }
@@ -521,6 +528,8 @@ void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::strin
     X_ASSERT(data.isNotEmpty(), "Empty data")(data.size()); 
 
     assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
+
+    ++assetCounts_[type];
 }
 
 bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)

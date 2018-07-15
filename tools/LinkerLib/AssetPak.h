@@ -63,6 +63,7 @@ class AssetPakBuilder
     typedef core::Array<Asset, core::ArrayAllocator<Asset>, core::growStrat::Multiply> AssetArr;
     typedef std::array<SharedDict*, AssetType::ENUM_COUNT> SharedDicArr;
     typedef std::array<CompressionOptions, AssetType::ENUM_COUNT> CompressionOptionsArr;
+    typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetCountArr;
 
 public:
     AssetPakBuilder(core::MemoryArenaBase* arena);
@@ -84,6 +85,7 @@ private:
     AssetArr assets_;
     CompressionOptionsArr compression_;
     SharedDicArr dictonaries_;
+    AssetCountArr assetCounts_;
 };
 
 X_NAMESPACE_END
