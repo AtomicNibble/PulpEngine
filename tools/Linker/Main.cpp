@@ -83,18 +83,16 @@ namespace
         return false;
     }
 
-    bool GetInputfile(core::Path<char>& name, bool slient = false)
+    bool GetInputfile(core::Path<char>& name)
     {
         const wchar_t* pFileName = gEnv->pCore->GetCommandLineArgForVarW(L"if");
-        if (pFileName) {
-            core::StackString512 nameNarrow(pFileName);
-
-            name = core::Path<char>(nameNarrow.begin(), nameNarrow.end());
-            return true;
+        if (!pFileName) {
+            return false;
         }
-
-        X_ERROR_IF(!slient, "Linker", "missing input file");
-        return false;
+         
+        core::StackString512 nameNarrow(pFileName);
+        name = core::Path<char>(nameNarrow.begin(), nameNarrow.end());
+        return true;
     }
 
     bool LoadBuildOptions(linker::BuildOptions& options)
@@ -164,7 +162,8 @@ namespace
         {
             core::Path<char> inputFile;
 
-            if (GetInputfile(inputFile)) {
+            if (!GetInputfile(inputFile)) {
+                X_ERROR("Linker", "Failed to get input file for meta dump");
                 return false;
             }
             if (!linker.dumpMeta(inputFile)) {
