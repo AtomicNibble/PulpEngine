@@ -178,7 +178,7 @@ bool XGame::update(core::FrameData& frame)
     con.col = Col_Whitesmoke;
     con.size = Vec2f(36.f, 36.f);
     con.effectId = 0;
-    con.pFont = gEnv->pFontSys->GetDefault();
+    con.pFont = gEnv->pFontSys->getDefault();
     con.flags.Set(font::DrawTextFlag::CENTER);
     con.flags.Set(font::DrawTextFlag::CENTER_VER);
 

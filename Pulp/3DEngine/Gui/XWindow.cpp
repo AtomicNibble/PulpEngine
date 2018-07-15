@@ -114,7 +114,7 @@ namespace gui
         pOverChild_ = nullptr;
 
         // default font
-        pFont_ = gEnv->pFontSys->GetDefault();
+        pFont_ = gEnv->pFontSys->getDefault();
         pBackgroundMat_ = nullptr;
 
         hover_ = false;

@@ -783,7 +783,7 @@ void X3DEngine::OnFrameBegin(core::FrameData& frame)
 
     // in a really silly place currently.
     if (gEnv->pFontSys && drawVars_.drawFontDebug()) {
-        auto* pFont = gEnv->pFontSys->GetDefault();
+        auto* pFont = gEnv->pFontSys->getDefault();
         auto* pContext = getPrimContext(engine::PrimContext::CONSOLE);
 
         pFont->DrawTestText(pContext, frame.timeInfo);

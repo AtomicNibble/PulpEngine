@@ -1674,7 +1674,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     con.col = Col_Whitesmoke;
     con.size = Vec2f(16.f, 16.f);
     con.effectId = 0;
-    con.pFont = gEnv->pFontSys->GetDefault();
+    con.pFont = gEnv->pFontSys->getDefault();
 
     float width = 750.f;
     float height = 300.f;

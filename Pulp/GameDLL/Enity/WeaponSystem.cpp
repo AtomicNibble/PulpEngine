@@ -62,7 +62,7 @@ namespace entity
             con.col = Col_Mintcream;
             con.size = Vec2f(24.f, 24.f);
             con.effectId = 0;
-            con.pFont = gEnv->pFontSys->GetDefault();
+            con.pFont = gEnv->pFontSys->getDefault();
 
             // update the emitter positions.
             {
