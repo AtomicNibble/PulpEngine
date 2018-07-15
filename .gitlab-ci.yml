@@ -9,7 +9,7 @@ before_script:
   - "echo off"
   - 'call "%VS140COMNTOOLS%\vsvars32.bat"'
   - echo.
-  - 'set QTDIR=D:\QT\Qt5.5.0_64_VS2015\qtbase'
+  - 'set QTDIR=E:\Qt\Qt-5.10.1_64'
   - 'set PATH=%QTDIR%\bin;%PATH%'
   - set
   - echo.
