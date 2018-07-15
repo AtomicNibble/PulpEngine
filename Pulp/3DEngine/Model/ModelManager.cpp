@@ -22,6 +22,7 @@ XModelManager::XModelManager(core::MemoryArenaBase* arena, core::MemoryArenaBase
     pDefaultModel_(nullptr),
     models_(arena, sizeof(ModelResource), X_ALIGN_OF(ModelResource), "ModelPool")
 {
+
 }
 
 XModelManager::~XModelManager()
