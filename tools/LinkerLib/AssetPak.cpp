@@ -490,8 +490,8 @@ bool AssetPakBuilder::save(core::Path<char>& path)
         core::HumanSize::Str sizeStr0, sizeStr1;
         X_LOG0("AssetPak", "Stats:");
         X_LOG_BULLET;
-        X_LOG0("AssetPak", "Raw asset size:  ^6%s", core::HumanSize::toString(sizeStr0, infaltedSize));
-        X_LOG0("AssetPak", "Compressed size: ^6%s", core::HumanSize::toString(sizeStr1, defaltedSize));
+        X_LOG0("AssetPak", "RawAssetSize:        ^6%s", core::HumanSize::toString(sizeStr0, infaltedSize));
+        X_LOG0("AssetPak", "CompressedAssetSize: ^6%s", core::HumanSize::toString(sizeStr1, defaltedSize));
     }
 
 
@@ -654,11 +654,11 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 
     X_LOG0("AssetPak", "^8Assets");
     X_LOG_BULLET;
-    X_LOG0("AssetPak", "%-4s %-45s %-10s %-10s %s", "Idx", "Name", "Offset", "Size", "NameHash");
+    X_LOG0("AssetPak", "%-4s %-50s %-10s %-10s %-12s %s", "Idx", "Name", "Offset", "Size", "NameHash", "Type");
 
     for (size_t i = 0; i < strings.size(); i++) {
-        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-45s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32, i, strings[i],
-            (uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]).hash());
+        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-50s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32 "   ^8%s", i, strings[i],
+            (uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]).hash(), AssetType::ToString(entries[i].type));
     }
 
     return true;
