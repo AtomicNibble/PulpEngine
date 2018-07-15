@@ -1,15 +1,22 @@
 
 #pragma once
 
+
+
 #pragma once
+
+
+
 
 /// \def X_PP_COMMA
 /// \brief Internal macro used by \ref X_PP_COMMA_IF.
 /// \sa X_PP_COMMA_IF
 
+
 /// \def X_PP_COMMA_EMPTY
 /// \brief Internal macro used by \ref X_PP_COMMA_IF.
 /// \sa X_PP_COMMA_IF
+
 
 /// \def X_PP_COMMA_IF
 /// \ingroup Preprocessor
@@ -31,15 +38,24 @@
 ///   template <typename R X_PP_COMMA_IF(COUNT) ARG_TYPENAMES>
 /// \endcode
 
+
+
+
+
 #pragma once
+
+
+
 
 /// \def X_PP_IF_0
 /// \brief Internal macro used by \ref X_PP_IF.
 /// \sa X_PP_IF
 
+
 /// \def X_PP_IF_1
 /// \brief Internal macro used by \ref X_PP_IF.
 /// \sa X_PP_IF
+
 
 /// \def X_PP_IF
 /// \ingroup Preprocessor
@@ -56,19 +72,46 @@
 ///   X_PP_IF(10, 10, 20);				// outputs 10
 /// \endcode
 
+
+
+
+
+
 #pragma once
+
+
+
 
 /// \def X_PP_JOIN_HELPER_HELPER
 /// \brief Internal macro used by \ref X_PP_JOIN.
 /// \sa X_PP_JOIN
 
+
 /// \def X_PP_JOIN_HELPER
 /// \brief Internal macro used by \ref X_PP_JOIN.
 /// \sa X_PP_JOIN
 
+
 /// \def X_PP_JOIN_IMPL
 /// \brief Internal macro used by \ref X_PP_JOIN.
 /// \sa X_PP_JOIN
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// \def X_PP_JOIN
 /// \ingroup Preprocessor
@@ -97,7 +140,46 @@
 /// Note that no matter how many arguments we provide, the macro to use is always \ref X_PP_JOIN. This offers a powerful
 /// facility for concatenating an unlimited amount of tokens.
 
+
+
+
+
+
+
+
+
+
+
+
 #pragma once
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// \def X_PP_LIST
 /// \ingroup Preprocessor
@@ -123,7 +205,35 @@
 ///   ...
 /// \endcode
 
+
+
+
+
+
 #pragma once
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 /// \def X_PP_TO_BOOL
 /// \ingroup Preprocessor
@@ -141,14 +251,31 @@
 ///   X_PP_TO_BOOL(3)				outputs 1
 /// \endcode
 
+
+
+
+
+
 X_NAMESPACE_BEGIN(core)
 
-template<typename T>
-class Delegate
-{
-};
+template <typename T>
+class Delegate {};
 
-template<typename R>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R  >
 class Delegate<R()>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -171,7 +298,7 @@ class Delegate<R()>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr)> InternalFunction;
+    typedef traits::Function<R(InstancePtr  )> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -196,7 +323,7 @@ class Delegate<R()>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)()>
-    static X_INLINE R FunctionStub(InstancePtr)
+    static X_INLINE R FunctionStub(InstancePtr  )
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)();
@@ -204,7 +331,7 @@ class Delegate<R()>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)()>
-    static X_INLINE R ClassMethodStub(InstancePtr instance)
+    static X_INLINE R ClassMethodStub(InstancePtr instance  )
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -213,7 +340,7 @@ class Delegate<R()>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)() const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance  )
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -281,7 +408,7 @@ public:
     R Invoke() const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance);
+        return stub_.function(stub_.instance  );
     }
 
     X_INLINE operator bool() const
@@ -293,7 +420,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0>
 class Delegate<R(ARG0)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -316,7 +468,7 @@ class Delegate<R(ARG0)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -341,7 +493,7 @@ class Delegate<R(ARG0)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0);
@@ -349,7 +501,7 @@ class Delegate<R(ARG0)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -358,7 +510,7 @@ class Delegate<R(ARG0)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -426,7 +578,7 @@ public:
     R Invoke(ARG0 arg0) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0);
+        return stub_.function(stub_.instance , arg0);
     }
 
     X_INLINE operator bool() const
@@ -438,7 +590,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1>
 class Delegate<R(ARG0, ARG1)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -461,7 +638,7 @@ class Delegate<R(ARG0, ARG1)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -486,7 +663,7 @@ class Delegate<R(ARG0, ARG1)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1);
@@ -494,7 +671,7 @@ class Delegate<R(ARG0, ARG1)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -503,7 +680,7 @@ class Delegate<R(ARG0, ARG1)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -571,7 +748,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1);
+        return stub_.function(stub_.instance , arg0, arg1);
     }
 
     X_INLINE operator bool() const
@@ -583,7 +760,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2>
 class Delegate<R(ARG0, ARG1, ARG2)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -606,7 +808,7 @@ class Delegate<R(ARG0, ARG1, ARG2)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -631,7 +833,7 @@ class Delegate<R(ARG0, ARG1, ARG2)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2);
@@ -639,7 +841,7 @@ class Delegate<R(ARG0, ARG1, ARG2)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -648,7 +850,7 @@ class Delegate<R(ARG0, ARG1, ARG2)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -716,7 +918,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2);
+        return stub_.function(stub_.instance , arg0, arg1, arg2);
     }
 
     X_INLINE operator bool() const
@@ -728,7 +930,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2, typename ARG3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2, typename ARG3>
 class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -751,7 +978,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2, ARG3)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2, ARG3)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -776,7 +1003,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2, arg3);
@@ -784,7 +1011,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -793,7 +1020,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -861,7 +1088,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2, arg3);
+        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3);
     }
 
     X_INLINE operator bool() const
@@ -873,7 +1100,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4>
 class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -896,7 +1148,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2, ARG3, ARG4)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2, ARG3, ARG4)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -921,7 +1173,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2, arg3, arg4);
@@ -929,7 +1181,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -938,7 +1190,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1006,7 +1258,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4);
+        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4);
     }
 
     X_INLINE operator bool() const
@@ -1018,7 +1270,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5>
 class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -1041,7 +1318,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -1066,7 +1343,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2, arg3, arg4, arg5);
@@ -1074,7 +1351,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1083,7 +1360,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1151,7 +1428,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5);
+        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
     X_INLINE operator bool() const
@@ -1163,7 +1440,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5, typename ARG6>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5, typename ARG6>
 class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -1186,7 +1488,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -1211,7 +1513,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2, arg3, arg4, arg5, arg6);
@@ -1219,7 +1521,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1228,7 +1530,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1296,7 +1598,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
     X_INLINE operator bool() const
@@ -1308,7 +1610,32 @@ private:
     Stub stub_;
 };
 
-template<typename R, typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5, typename ARG6, typename ARG7>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+template<typename R , typename ARG0, typename ARG1, typename ARG2, typename ARG3, typename ARG4, typename ARG5, typename ARG6, typename ARG7>
 class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 {
     /// Internal union that can hold a pointer to both non-const and const class instances.
@@ -1331,7 +1658,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
     };
 
     /// Internal type representing functions that are stored and used by the stub class.
-    typedef traits::Function<R(InstancePtr, ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)> InternalFunction;
+    typedef traits::Function<R(InstancePtr , ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)> InternalFunction;
 
     /// \brief Internal stub that holds both a class instance (if any) and a pointer to the function which is called
     /// when the delegate is invoked.
@@ -1356,7 +1683,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 
     /// Internal function used when binding delegates to free functions.
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
-    static X_INLINE R FunctionStub(InstancePtr, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
+    static X_INLINE R FunctionStub(InstancePtr , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
     {
         // we don't need the instance pointer because we're dealing with free functions
         return (Function)(arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
@@ -1364,7 +1691,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 
     /// Internal function used when binding delegates to non-const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
-    static X_INLINE R ClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
+    static X_INLINE R ClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1373,7 +1700,7 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
 
     /// Internal function used when binding delegates to const member functions.
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) const>
-    static X_INLINE R ConstClassMethodStub(InstancePtr instance, ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
+    static X_INLINE R ConstClassMethodStub(InstancePtr instance , ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7)
     {
         // cast the instance pointer back into the original class instance. this does not compromise type-safety
         // because we always know the concrete class type, given as a template argument.
@@ -1441,7 +1768,7 @@ public:
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
     {
         X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance, arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
 
     X_INLINE operator bool() const
@@ -1452,5 +1779,17 @@ public:
 private:
     Stub stub_;
 };
+
+
+
+
+
+
+
+
+
+
+
+
 
 X_NAMESPACE_END
