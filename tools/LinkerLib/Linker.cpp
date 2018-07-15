@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "LinkerLib.h"
+#include "AssetList.h"
 
 #include <String\HumanDuration.h>
 #include <Time\StopWatch.h>
@@ -50,22 +51,60 @@ bool Linker::Build(BuildOptions& options)
         outPath = "asset_pack_01";
     }
 
-    int32_t numAssets = 0;
-    if (!db_.GetNumAssets(numAssets)) {
-        X_ERROR("Converter", "Failed to get asset count");
-        return false;
-    }
-
-    X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
-
-    assetDb::AssetDB::AssetDelegate func;
-    func.Bind<Linker, &Linker::AddAsset>(this);
-
     core::StopWatch timer;
+    int32_t numAssets = 0;
 
-    if (!db_.IterateAssets(func)) {
-        X_ERROR("Linker", "Failed to convert all assets");
-        return false;
+    if (options.assetList.isNotEmpty())
+    {
+        AssetList assetList(scratchArea_);
+
+        if (!assetList.loadFromFile(options.assetList)) {
+            return false;
+        }
+
+        auto& assets = assetList.getAssetList();
+
+        numAssets = core::accumulate(assets.begin(), assets.end(), 0_i32, [](const AssetList::StringArr& list) {
+            return safe_static_cast<int32_t>(list.size());
+        });
+
+        X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
+
+        for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+        {
+            auto assetType = static_cast<assetDb::AssetType::Enum>(i);
+            auto& namesArr = assets[assetType];
+            
+            if (namesArr.isEmpty()) {
+                continue;
+            }
+
+            for (auto& name : namesArr)
+            {
+                if (!AddAsset(assetType, name))
+                {
+                    X_ERROR("Converter", "Failed to add asset");
+                    return false;
+                }
+            }
+        }
+    }
+    else
+    {
+        if (!db_.GetNumAssets(numAssets)) {
+            X_ERROR("Converter", "Failed to get asset count");
+            return false;
+        }
+
+        X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
+
+        assetDb::AssetDB::AssetDelegate func;
+        func.Bind<Linker, &Linker::AddAsset>(this);
+
+        if (!db_.IterateAssets(func)) {
+            X_ERROR("Linker", "Failed to convert all assets");
+            return false;
+        }
     }
 
     core::HumanDuration::Str timeStr;
@@ -92,7 +131,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
     if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
-        X_ERROR("Linker", "Asset does not exists");
+        X_ERROR("Linker", "Asset does not exists: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
         return false;
     }
 
