@@ -136,7 +136,7 @@ bool XGlyphCache::SetBakedData(core::span<const GlyphHdr> bakedGlyphs, core::spa
     {
         auto& baked = bakedGlyphs[i];
 
-        X_ASSERT(bitMapSize * (i + 1) <= static_cast<size_t>(bakedData.length()), "Out of range")(bitMapSize * (i + 1), bakedData.length());
+        X_ASSERT(bitMapSize * (i + 1) <= static_cast<int32_t>(bakedData.length()), "Out of range")(bitMapSize * (i + 1), bakedData.length());
         const char* pBitMapSrc = bakedData.data() + (bitMapSize * i);
 
         // glyph.
@@ -158,7 +158,7 @@ bool XGlyphCache::SetBakedData(core::span<const GlyphHdr> bakedGlyphs, core::spa
         auto& bitmap = pSlot->glyphBitmap;
         auto& bitBuf = bitmap.GetBuffer();
 
-        X_ASSERT(bitBuf.size() == bitMapSize, "Size mismatch")(bitBuf.size(), bitMapSize);
+        X_ASSERT(static_cast<int32_t>(bitBuf.size()) == bitMapSize, "Size mismatch")(bitBuf.size(), bitMapSize);
         std::memcpy(bitBuf.data(), pBitMapSrc, bitMapSize);
 
         cacheTable_.insert(std::make_pair(baked.currentChar, pSlot));

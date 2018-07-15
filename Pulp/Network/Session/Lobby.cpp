@@ -373,7 +373,7 @@ void Lobby::sendPingsToPeers(void) const
     bs.write(MessageID::LobbyPingValues);
     bs.write(safe_static_cast<uint8_t>(type_));
 
-    for (int32_t i = 0; i < peers_.size(); i++)
+    for (size_t i = 0; i < peers_.size(); i++)
     {
         auto& peer = peers_[i];
 
@@ -1633,7 +1633,7 @@ const char* Lobby::getUserName(LobbyUserHandle handle) const
 }
 
 
-bool Lobby::getUserInfoForIdx(size_t idx, UserInfo& info) const
+bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
 {
     auto& user = users_[idx];
 

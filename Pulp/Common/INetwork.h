@@ -576,10 +576,10 @@ struct ILobby
     // Users
     virtual int32_t getNumUsers(void) const X_ABSTRACT;
     virtual int32_t getNumFreeUserSlots(void) const X_ABSTRACT;
-    virtual LobbyUserHandle getUserHandleForIdx(size_t idx) const X_ABSTRACT;
+    virtual LobbyUserHandle getUserHandleForIdx(int32_t idx) const X_ABSTRACT;
 
     virtual const char* getUserName(LobbyUserHandle handle) const X_ABSTRACT;
-    virtual bool getUserInfoForIdx(size_t idx, UserInfo& info) const X_ABSTRACT;
+    virtual bool getUserInfoForIdx(int32_t idx, UserInfo& info) const X_ABSTRACT;
     virtual bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_ABSTRACT;
 
     // Misc

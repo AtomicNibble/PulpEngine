@@ -18,7 +18,7 @@ X_INLINE int32_t Lobby::getNumFreeUserSlots(void) const
     return params_.numSlots - getNumUsers();
 }
 
-X_INLINE LobbyUserHandle Lobby::getUserHandleForIdx(size_t idx) const
+X_INLINE LobbyUserHandle Lobby::getUserHandleForIdx(int32_t idx) const
 {
     return static_cast<LobbyUserHandle>(idx);
 }

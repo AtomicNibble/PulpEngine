@@ -599,7 +599,7 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
     X_ASSERT_NOT_NULL(pLobby);
 
     core::StackString<1024> msg;
-    for (int32_t i = 1; i < pCmd->GetArgCount(); i++)
+    for (size_t i = 1; i < pCmd->GetArgCount(); i++)
     {
         const char* pMsg = pCmd->GetArg(i);
         auto len = core::strUtil::strlen(pMsg);

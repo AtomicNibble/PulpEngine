@@ -292,7 +292,7 @@ bool XGame::update(core::FrameData& frame)
         if (pSession_->isHost())
         {
             // run user cmds for all the valid players.
-            for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+            for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
             {
                 if (!lobbyUserGuids_[i].isValid()) {
                     continue;
@@ -373,7 +373,7 @@ bool XGame::update(core::FrameData& frame)
         core::StackString512 txt;
         txt.setFmt("---- GameLobby(%" PRIuS "/%" PRIuS ") ----\n", numUsers, numUsers + freeSlots);
         
-        for (size_t i = 0; i < numUsers; i++)
+        for (int32_t i = 0; i < numUsers; i++)
         {
             auto handle = pLobby->getUserHandleForIdx(i);
             
@@ -482,7 +482,7 @@ void XGame::syncLobbyUsers(void)
     }
 
     // You still here?
-    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
     {
         auto userGuid = lobbyUserGuids_[i];
         if (!userGuid.isValid()) {
@@ -504,7 +504,7 @@ void XGame::syncLobbyUsers(void)
     {
         // find a free local player slot.
         int32_t plyIdx = -1;
-        for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
         {
             if (!lobbyUserGuids_[i].isValid())
             {
@@ -546,7 +546,7 @@ void XGame::clearWorld(void)
 
 int32_t XGame::getLocalClientIdx(void) const
 {
-    for (int32_t i = 0; i < lobbyUserGuids_.size(); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
     {
         if (myGuid_ == lobbyUserGuids_[i])
         {

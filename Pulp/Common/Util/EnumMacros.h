@@ -56,10 +56,10 @@ namespace std                                                              \
     class numeric_limits<enumType::Enum>                                   \
     {                                                                      \
     public:                                                                \
-        static constexpr int32_t min() {                                   \
+        static constexpr size_t min() {                                   \
             return 0;                                                      \
         }                                                                  \
-        static constexpr int32_t max() {                                   \
+        static constexpr size_t max() {                                   \
             return enumType::ENUM_COUNT - 1;                               \
         }                                                                  \
                                                                            \

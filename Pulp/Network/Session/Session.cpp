@@ -174,9 +174,9 @@ void Session::quitToMenu(void)
         return;
     }
 
-    for (int32_t i = 0; i < lobbys_.size(); i++)
+    for (auto& lobby : lobbys_)
     {
-        lobbys_[i].reset();
+        lobby.reset();
     }
 
     setState(SessionState::Idle);
