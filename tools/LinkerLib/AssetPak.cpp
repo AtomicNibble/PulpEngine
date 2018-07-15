@@ -469,7 +469,7 @@ bool AssetPakBuilder::save(core::Path<char>& path)
     }
 
     if (file.tell() != totalFileSize) {
-        X_ERROR("AssetPak", "File size mismatch");
+        X_ERROR("AssetPak", "File size mismatch actual %" PRIu64" Calculated %" PRIu64, file.tell(), totalFileSize);
         return false;
     }
 

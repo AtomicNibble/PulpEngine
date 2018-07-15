@@ -48,6 +48,20 @@ namespace
     X_DECLARE_ENUM(LinkMode)
     (BUILD, META);
 
+
+    void PrintArgs(void)
+    {
+        X_LOG0("Linker", "Args:");
+        X_LOG0("Linker", "^6-mode^7         (build, meta)");
+        X_LOG0("Linker", "BuildArgs:");
+        X_LOG0("Linker", "^6-al^7           (asset list)");
+        X_LOG0("Linker", "^6-of^7           (output file)");
+        X_LOG0("Linker", "^6-nocompress^7   (disable compression)");
+        X_LOG0("Linker", "^6-sharedict^7    (use shared compression dict)");
+        X_LOG0("Linker", "MetaArgs:");
+        X_LOG0("Linker", "^6-if^7           (input file)");
+    }
+
     bool GetMode(LinkMode::Enum& mode)
     {
         const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
@@ -83,6 +97,87 @@ namespace
         return false;
     }
 
+    bool LoadBuildOptions(linker::BuildOptions& options)
+    {
+        if (!gEnv->pCore->GetCommandLineArgForVarW(L"nocompress")) {
+            options.flags.Set(AssetPak::PakBuilderFlag::COMPRESSION);
+        } 
+
+        if (gEnv->pCore->GetCommandLineArgForVarW(L"sharedict")) {
+            options.flags.Set(AssetPak::PakBuilderFlag::SHARED_DICT);
+        }
+
+        const wchar_t* pOutFileName = gEnv->pCore->GetCommandLineArgForVarW(L"of");
+        if (!pOutFileName) {
+            X_ERROR("Linker", "Missing output file -of");
+            return false;
+        }
+
+        char buf[core::Path<char>::BUF_SIZE];
+        options.outFile.set(core::strUtil::Convert(pOutFileName, buf));
+
+        const wchar_t* pAssetList = gEnv->pCore->GetCommandLineArgForVarW(L"al");
+        if (pAssetList) {
+            options.assetList.set(core::strUtil::Convert(pAssetList, buf));
+        }
+
+        return true;
+    }
+
+
+    bool Run(LinkerArena& arena)
+    {
+        PrintArgs();
+
+        assetDb::AssetDB db;
+
+        linker::Linker linker(db, &arena);
+        linker.PrintBanner();
+
+        if (!linker.Init()) {
+            X_ERROR("Linker", "Failed to init linker");
+            return false;
+        }
+
+        LinkMode::Enum mode;
+        if (!GetMode(mode)) {
+            mode = LinkMode::BUILD;
+        }
+
+        core::StopWatch timer;
+
+        if (mode == LinkMode::BUILD) 
+        {
+            linker::BuildOptions options;
+
+            if (!LoadBuildOptions(options)) {
+                X_ERROR("Linker", "Failed to load build options");
+                return false;
+            }
+
+            if (!linker.Build(options)) {
+                X_ERROR("Linker", "Failed to perform build");
+                return false;
+            }
+        }
+        else if (mode == LinkMode::META) 
+        {
+            core::Path<char> inputFile;
+
+            if (GetInputfile(inputFile)) {
+                return false;
+            }
+            if (!linker.dumpMeta(inputFile)) {
+                X_ERROR("Linker", "Failed to dump meta");
+                return false;
+            }
+        }
+
+        core::HumanDuration::Str timeStr;
+        X_LOG0("Linker", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
+        return true;
+    }
+
 } // namespace
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -100,41 +195,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         if (app.Init(hInstance, &arena, lpCmdLine)) 
         {
-            assetDb::AssetDB db;
-
-            linker::Linker linker(db, &arena);
-            linker.PrintBanner();
-
-            if (linker.Init()) {
-                LinkMode::Enum mode;
-
-                if (!GetMode(mode)) {
-                    mode = LinkMode::BUILD;
-                }
-
-                core::StopWatch timer;
-
-                if (mode == LinkMode::BUILD) {
-                    if (!linker.Build()) {
-                        X_ERROR("Linker", "Failed to perform build");
-                    }
-                }
-                else if (mode == LinkMode::META) {
-                    core::Path<char> inputFile;
-
-                    if (GetInputfile(inputFile)) {
-                        if (!linker.dumpMeta(inputFile)) {
-                            X_ERROR("Linker", "Failed to dump meta");
-                        }
-                    }
-                }
-
-                core::HumanDuration::Str timeStr;
-                X_LOG0("Linker", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
-            }
-            else {
-                X_ERROR("Linker", "Failed to init linker");
-            }
+            res = Run(arena);
 
             gEnv->pConsoleWnd->pressToContinue();
         }

@@ -6,6 +6,13 @@
 
 X_NAMESPACE_BEGIN(linker)
 
+struct BuildOptions
+{
+    core::Path<char> assetList;
+    core::Path<char> outFile;
+    AssetPak::PakBuilderFlags flags;
+};
+
 class Linker
 {
     typedef core::Array<uint8_t> DataVec;
@@ -19,7 +26,7 @@ public:
 
     LINKERLIB_EXPORT bool dumpMeta(core::Path<char>& inputFile);
 
-    LINKERLIB_EXPORT bool Build(void);
+    LINKERLIB_EXPORT bool Build(BuildOptions& options);
 
 private:
     bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);

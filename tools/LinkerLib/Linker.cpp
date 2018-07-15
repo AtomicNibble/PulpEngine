@@ -42,10 +42,13 @@ bool Linker::dumpMeta(core::Path<char>& inputFile)
     return builder_.dumpMeta(inputFile);
 }
 
-bool Linker::Build(void)
+bool Linker::Build(BuildOptions& options)
 {
-    core::Path<char> outPath;
-    outPath = "asset_pack_01";
+    core::Path<char> outPath = options.outFile;
+
+    if (outPath.isEmpty()) {
+        outPath = "asset_pack_01";
+    }
 
     int32_t numAssets = 0;
     if (!db_.GetNumAssets(numAssets)) {
@@ -69,10 +72,7 @@ bool Linker::Build(void)
     X_LOG0("Linker", "Added %" PRIi32 " asset(s) in ^6%s", numAssets,
         core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 
-    AssetPak::PakBuilderFlags flags;
-    flags.Set(AssetPak::PakBuilderFlag::COMPRESSION);
-
-    builder_.setFlags(flags);
+    builder_.setFlags(options.flags);
 
     if (!builder_.bake()) {
         X_ERROR("Linker", "Failed to bake");
