@@ -79,7 +79,7 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
             namesArr.emplace_back(nameVal.GetString(), nameVal.GetStringLength());
         }
 
-        if (namesArr.size() != num)
+        if (safe_static_cast<int32_t>(namesArr.size()) != num)
         {
             X_ERROR("AssetList", "Asset name count mismatch. got: %" PRIuS " expected: %" PRIi32, namesArr.size(), num);
             return false;
