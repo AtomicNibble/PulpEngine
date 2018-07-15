@@ -421,6 +421,12 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
                 return pValue;
             }
         }
+        else if (arg.getArgc() == 1) {
+            const wchar_t* pName = arg.getArgv(0);
+            if (core::strUtil::IsEqualCaseInsen(pName, pVarName)) {
+                return L"";
+            }
+        }
     }
 
     return nullptr;
