@@ -115,7 +115,7 @@ bool XGlyphCache::SetRawFontBuffer(core::span<const uint8_t> fontSrc, FontEncodi
 
         metrics_.ascender >>= offsetMult >> 1;
         metrics_.descender >>= offsetMult >> 1;
-        metrics_.max_advance >>= offsetMult >> 1;
+        metrics_.maxAdvance >>= offsetMult >> 1;
     }
 
     return true;

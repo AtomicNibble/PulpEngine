@@ -34,7 +34,7 @@ struct Metrics
 {
     int32_t ascender;
     int32_t descender;
-    int32_t max_advance;
+    int32_t maxAdvance;
 };
 
 struct IFont;

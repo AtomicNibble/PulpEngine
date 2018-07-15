@@ -219,7 +219,7 @@ void XFontRender::SetGlyphBitmapSize(int32_t width, int32_t height, float sizeRa
 
     metrics_.ascender = pFace_->size->metrics.ascender / 64;
     metrics_.descender = pFace_->size->metrics.descender / 64;
-    metrics_.max_advance = pFace_->size->metrics.max_advance / 64;
+    metrics_.maxAdvance = pFace_->size->metrics.max_advance / 64;
 
     if (err) {
         X_ERROR("Font", "failed to set pixel size(%i,%i). Error(%" PRIi32 "): \"%s\"", width, height, err, errToStr(err));

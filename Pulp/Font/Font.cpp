@@ -356,7 +356,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
     const float scaleX = ctx.size.x / pFontTexture_->GetCellWidth();
     const float scaleY = ctx.size.y / pFontTexture_->GetCellHeight();
     const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
-    const float hozAdvance = (metrics.max_advance * scaleX);
+    const float hozAdvance = (metrics.maxAdvance * scaleX);
 
     // for render don't think i want to move down including descenders only for text size.
     // const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
@@ -789,7 +789,7 @@ Vec2f XFont::GetTextSizeWInternal(const wchar_t* pBegin, const wchar_t* pEnd, co
     const float scaleX = ctx.size.x / pFontTexture_->GetCellWidth();
     const float scaleY = ctx.size.y / pFontTexture_->GetCellHeight();
     //	const float verBase = ctx.size.y - (metrics.ascender * scaleY); // we need to take 64 - this scaled.
-    const float hozAdvance = (metrics.max_advance * scaleX);
+    const float hozAdvance = (metrics.maxAdvance * scaleX);
     const float verAdvance = ctx.size.y + -(metrics.descender * scaleY);
 
     // starting points.
