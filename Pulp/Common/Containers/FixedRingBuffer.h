@@ -7,6 +7,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_DISABLE_WARNING(4324) // structure was padded due to alignment specifier
+
 template<
     typename T,                                  //circular_buffer type
     typename T_nonconst,                         //with any consts
@@ -219,6 +221,8 @@ protected:
 
     uint8_t X_ALIGNED_SYMBOL(array_[N * sizeof(T)], X_ALIGN_OF(T));
 };
+
+X_ENABLE_WARNING(4324)
 
 X_NAMESPACE_END
 
