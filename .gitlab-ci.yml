@@ -1,4 +1,8 @@
 
+variables:
+  GIT_SSL_NO_VERIFY: "true"
+
+
 before_script:
   - git submodule sync --recursive
   - git submodule update --init --recursive
