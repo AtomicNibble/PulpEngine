@@ -76,6 +76,8 @@ void XScriptSys::registerCmds(void)
 
 bool XScriptSys::init(void)
 {
+    X_PROFILE_NO_HISTORY_BEGIN("ScriptSysInit", core::profiler::SubSys::SCRIPT);
+
     X_LOG0("Script", "Starting script system");
     X_ASSERT(initialised_ == false, "Already init")(initialised_);
 
