@@ -1567,7 +1567,8 @@ void OriginInfoWidget::setValue(const OriginInfo& org)
 			pSphere_->setChecked(true);
 			break;
 
-		X_NO_SWITCH_DEFAULT_ASSERT
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 
 	blockSignals(false);
@@ -1598,7 +1599,8 @@ void OriginInfoWidget::getValue(OriginInfo& org)
 			org.offsetType = OriginInfo::OffsetType::Cylindrical;
 			break;
 
-		X_NO_SWITCH_DEFAULT_ASSERT
+        default:
+            X_NO_SWITCH_DEFAULT_ASSERT;
 	}
 }
 
