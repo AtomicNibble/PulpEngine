@@ -312,7 +312,7 @@ bool XCore::Init(const SCoreInitParams& startupParams)
     core::SysTimer::Startup();
 
     if (startupParams.loadSymbols()) {
-        X_PROFILE_NO_HISTORY_BEGIN("SymRes", core::profiler::SubSys::CORE);
+        X_PROFILE_NO_HISTORY_BEGIN("SymResInit", core::profiler::SubSys::CORE);
 
         core::symbolResolution::Startup();
     }
@@ -574,7 +574,7 @@ bool XCore::Init(const SCoreInitParams& startupParams)
     AddIgnoredHotReloadExtensions();
 
     if (startupParams.loadSymbols()) {
-        X_PROFILE_NO_HISTORY_BEGIN("SymRes", core::profiler::SubSys::CORE);
+        X_PROFILE_NO_HISTORY_BEGIN("SymResRefresh", core::profiler::SubSys::CORE);
         core::symbolResolution::Refresh();
     }
 
