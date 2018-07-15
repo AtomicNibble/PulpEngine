@@ -74,8 +74,15 @@ bool Linker::Build(void)
 
     builder_.setFlags(flags);
 
-    builder_.bake();
-    builder_.save(outPath);
+    if (!builder_.bake()) {
+        X_ERROR("Linker", "Failed to bake");
+        return false;
+    }
+
+    if (!builder_.save(outPath)) {
+        X_ERROR("Linker", "Failed to save: \"%s\"", outPath.c_str());
+        return false;
+    }
 
     return true;
 }
