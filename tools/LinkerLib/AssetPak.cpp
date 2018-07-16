@@ -129,7 +129,7 @@ void AssetPakBuilder::setFlags(PakBuilderFlags flags)
     flags_ = flags;
 }
 
-bool AssetPakBuilder::bake(void)
+bool AssetPakBuilder::process(void)
 {
     X_LOG0("AssetPak", "===== Processing %" PRIuS " asset(s) =====", assets_.size());
 

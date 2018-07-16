@@ -120,7 +120,7 @@ bool Linker::Build(BuildOptions& options)
 
     builder_.setFlags(options.flags);
 
-    if (!builder_.bake()) {
+    if (!builder_.process()) {
         X_ERROR("Linker", "Failed to bake");
         return false;
     }
