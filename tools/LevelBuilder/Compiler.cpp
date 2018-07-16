@@ -178,6 +178,11 @@ Compiler::~Compiler()
 
 bool Compiler::init(void)
 {
+    if (!db_.OpenDB()) {
+        X_ERROR("Lvl", "Failed to open AssetDb");
+        return false;
+    }
+
     if (!pMaterialMan_->Init()) {
         return false;
     }
