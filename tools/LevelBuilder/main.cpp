@@ -12,6 +12,8 @@
 #include <Memory\AllocationPolicies\GrowingPoolAllocator.h>
 #include <Memory\VirtualMem.h>
 
+#include <../AssetDB/AssetDB.h>
+
 X_NAMESPACE_BEGIN(level)
 
 core::MemoryArenaBase* g_arena = nullptr;
@@ -40,6 +42,7 @@ namespace
 X_LINK_ENGINE_LIB("MaterialLib");
 X_LINK_ENGINE_LIB("ModelLib");
 X_LINK_ENGINE_LIB("Physics");
+X_LINK_ENGINE_LIB("AssetDB");
 
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -87,7 +90,9 @@ namespace
             return false;
         }
 
-        level::Compiler comp(&arena, pCooking);
+        assetDb::AssetDB db;
+
+        level::Compiler comp(&arena, db, pCooking);
         if (!comp.init()) {
             return false;
         }

@@ -18,6 +18,8 @@
 #include "Model/ModelCache.h"
 #include "Material/MaterialManager.h"
 
+#include <../AssetDB/AssetDB.h>
+
 X_NAMESPACE_BEGIN(level)
 
 namespace
@@ -129,8 +131,9 @@ core::MemoryArenaBase* g_bspNodeArena = nullptr;
 core::MemoryArenaBase* g_windingArena = nullptr;
 core::MemoryArenaBase* g_windingPointsArena = nullptr;
 
-Compiler::Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking) :
+Compiler::Compiler(core::MemoryArenaBase* arena, assetDb::AssetDB& db, physics::IPhysicsCooking* pPhysCooking) :
     arena_(arena),
+    db_(db),
     planes_(arena),
     pPhysCooking_(X_ASSERT_NOT_NULL(pPhysCooking)),
     bspFaceAllocator_(sizeof(bspFace), X_ALIGN_OF(bspFace), 1 << 20, core::VirtualMem::GetPageSize() * 8), // grow 32k at a time.

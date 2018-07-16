@@ -7,6 +7,8 @@
 #include "LvlEntity.h"
 #include "LvlArea.h"
 
+X_NAMESPACE_DECLARE(assetDb, class AssetDB)
+
 X_NAMESPACE_BEGIN(level)
 
 class ModelCache;
@@ -58,7 +60,7 @@ class Compiler
         MultiRefArr;
 
 public:
-    Compiler(core::MemoryArenaBase* arena, physics::IPhysicsCooking* pPhysCooking);
+    Compiler(core::MemoryArenaBase* arena, assetDb::AssetDB& db, physics::IPhysicsCooking* pPhysCooking);
     ~Compiler();
 
     bool init(void);
@@ -81,6 +83,7 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
+    assetDb::AssetDB& db_;
     physics::IPhysicsCooking* pPhysCooking_;
     ModelCache* pModelCache_;
     MatManager* pMaterialMan_;
