@@ -35,6 +35,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
     params.bCoreOnly = true;
     params.pCoreArena = arena;
     params.bEnableBasicConsole = true;
+    params.bFileSysWorkingDir = true;
     params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Level Compiler";
     //	params.bFileSysWorkingDir = true;
 
