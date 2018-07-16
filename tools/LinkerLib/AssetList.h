@@ -10,6 +10,9 @@ X_NAMESPACE_BEGIN(linker)
 // Intented to be used for telling the linker what assets to include.
 class AssetList
 {
+    static const int32_t ASSET_LIST_VERSION = 1;
+
+
 public:
     typedef core::ArrayGrowMultiply<core::string> StringArr;
     typedef std::array<StringArr, assetDb::AssetType::ENUM_COUNT> AssetNameLists;

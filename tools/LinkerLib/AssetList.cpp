@@ -5,7 +5,6 @@
 
 X_NAMESPACE_BEGIN(linker)
 
-
 AssetList::AssetList(core::MemoryArenaBase* arena) :
     assets_{{ X_PP_REPEAT_COMMA_SEP(17, arena) }}
 {
@@ -30,6 +29,20 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
     if (d.GetType() != core::json::Type::kObjectType) {
         X_ERROR("AssetList", "Unexpected type");
         return false;
+    }
+
+    if (!d.HasMember("version")) {
+        X_ERROR("AssetList", "Missing version field");
+        return false;
+    }
+
+    {
+        auto version = d["version"].GetInt();
+        if (version != ASSET_LIST_VERSION)
+        {
+            X_ERROR("AssetList", "Invalid vesion: %" PRIi32 " expected %" PRIi32, version, ASSET_LIST_VERSION);
+            return false;
+        }
     }
 
     if (!d.HasMember("assets")) {
@@ -112,6 +125,8 @@ bool AssetList::saveToFile(core::XFile* pFile) const
     core::json::PrettyWriter<core::json::StringBuffer> writer(s);
 
     writer.StartObject();
+    writer.Key("version");
+    writer.Int(ASSET_LIST_VERSION);
     writer.Key("assets");
     writer.StartObject();
 
