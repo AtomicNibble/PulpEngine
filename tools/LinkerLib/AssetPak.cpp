@@ -242,6 +242,13 @@ bool AssetPakBuilder::process(void)
         }
     }
 
+    X_LOG1("AssetPak", "Sorting assets");
+
+    // sort them?
+    std::sort(assets_.begin(), assets_.end(), [](const Asset& a, const Asset& b) {
+        return a.data.size() < b.data.size();
+    });
+
     return true;
 }
 
