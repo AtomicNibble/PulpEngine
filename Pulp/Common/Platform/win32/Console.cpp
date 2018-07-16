@@ -325,7 +325,9 @@ void Console::pressToContinue(void) const
         X_LOG0("Console", "Press to continue");
     }
 
-    (void)_getch();
+    if (!gEnv || !gEnv->noPause()) {
+        (void)_getch();
+    }
 }
 
 X_NAMESPACE_END

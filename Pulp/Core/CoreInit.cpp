@@ -670,6 +670,10 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
         }
     }
 
+    if (GetCommandLineArgForVarW(L"nopause")) {
+        env_.noPause_ = true;
+    }
+
     return true;
 }
 

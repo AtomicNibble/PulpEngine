@@ -304,6 +304,7 @@ struct SCoreGlobals // obbject is zerod on start.
 
         client_ = false;
         dedicated_ = false;
+        noPause_ = false;
         state_ = State::STARTING;
     }
 
@@ -334,12 +335,17 @@ struct SCoreGlobals // obbject is zerod on start.
 #endif // defined(X_DEDICATED_SERVER)
     }
 
+    X_INLINE const bool noPause(void) const
+    {
+        return noPause_;
+    }
+
 protected:
     friend class XCore;
 
     bool client_;
     bool dedicated_; // Engine is in dedicated
-    bool _pad;
+    bool noPause_;
     State::Enum state_;
 };
 
