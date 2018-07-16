@@ -10,6 +10,7 @@ struct BuildOptions
 {
     core::Path<char> assetList;
     core::Path<char> outFile;
+    core::string mod;
     AssetPak::PakBuilderFlags flags;
 };
 

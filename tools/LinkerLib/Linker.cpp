@@ -54,6 +54,13 @@ bool Linker::Build(BuildOptions& options)
     core::StopWatch timer;
     int32_t numAssets = 0;
 
+    if (options.mod.isNotEmpty()) {
+        if (!db_.SetMod(options.mod)) {
+            X_LOG0("Linker", "Failed to set active mod");
+            return false;
+        }
+    }
+
     if (options.assetList.isNotEmpty())
     {
         AssetList assetList(scratchArea_);
