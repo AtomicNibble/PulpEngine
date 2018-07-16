@@ -55,6 +55,56 @@ X_FORCE_LINK_FACTORY("XConverterLib_Phys")
 
 #endif // !X_LIB
 
+namespace
+{
+    void PrintArgs(void)
+    {
+        X_LOG0("Level", "Args:");
+        X_LOG0("Level", "^6-if^7           (map file)");
+    }
+
+    bool GetInputfile(core::Path<char>& name)
+    {
+        const wchar_t* pFileName = gEnv->pCore->GetCommandLineArgForVarW(L"if");
+        if (!pFileName) {
+            return false;
+        }
+
+        core::StackString512 nameNarrow(pFileName);
+        name = core::Path<char>(nameNarrow.begin(), nameNarrow.end());
+        return true;
+    }
+
+
+    bool Run(LvlBuilderArena& arena, physics::IPhysicsCooking* pCooking)
+    {
+        core::Path<char> path;
+        path.set("map_source\\");
+        path.setFileName("test01.map");
+
+        if (!GetInputfile(path)) {
+            X_ERROR("Level", "Failed to get input file");
+            return false;
+        }
+
+        level::Compiler comp(&arena, pCooking);
+        if (!comp.init()) {
+            return false;
+        }
+
+        core::Path<char> outPath;
+        outPath.setFileName(path.fileName());
+
+        if (!comp.compileLevel(path, outPath)) {
+            return false;
+        }
+
+        X_LOG0("Level", "Operation Complete...");
+        return true;
+    }
+
+} // namespace
+
 int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPTSTR lpCmdLine,
@@ -75,41 +125,17 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             EngineApp engine;
 
             // we need the engine for Assets, Logging, Profiling, FileSystem.
-            if (engine.Init(hInstance, lpCmdLine, &arena)) {
+            if (engine.Init(hInstance, lpCmdLine, &arena)) 
+            {
                 {
                     core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
                     X_ASSERT_NOT_NULL(pLogVerbosity);
                     pLogVerbosity->Set(0);
                 }
 
-                core::Path<char> path;
-                path.set("map_source\\");
-                path.setFileName("basic - Copy.map");
-                path.setFileName("alcatraz.map");
-                path.setFileName("killzone.map");
-                path.setFileName("box.map");
-                path.setFileName("boxmap.map");
-                path.setFileName("box2.map");
-                path.setFileName("box3.map");
-                path.setFileName("box4.map");
-                path.setFileName("boxmap.map");
-                path.setFileName("portal_test.map");
-                path.setFileName("entity_test.map");
-                path.setFileName("physics_test.map");
-                path.setFileName("test01.map");
-
-                level::Compiler comp(&arena, engine.GetPhysCooking());
-
-                if (comp.init()) {
-                    core::Path<char> outPath;
-                    outPath.setFileName(path.fileName());
-
-                    if (comp.compileLevel(path, outPath)) {
-                        res = 0;
-                    }
+                if (Run(arena, engine.GetPhysCooking())) {
+                    res = 0;
                 }
-
-                X_LOG0("Level", "Operation Complete...");
             }
 
             level::g_arena = nullptr;
