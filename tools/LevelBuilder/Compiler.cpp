@@ -201,12 +201,12 @@ bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
         return false;
     }
 
-    X_LOG0("Map", "Loading: \"%s\"", path.fileName());
+    X_LOG0("Lvl", "Loading: \"%s\"", path.fileName());
     core::StopWatch stopwatch;
 
     mapFile::MapFileSource source(g_arena, *pModelCache_, *pMaterialMan_, planes_);
     if (!source.load(path)) {
-        X_ERROR("Map", "Failed to load source");
+        X_ERROR("Lvl", "Failed to load source");
         return false;
     }
 
@@ -223,14 +223,14 @@ bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
     }
 
     core::HumanDuration::Str durStr;
-    X_LOG0("Info", "Compile time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
+    X_LOG0("Lvl", "Compile time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
     stopwatch.Start();
 
     if (!save(ents, outPath)) {
         return false;
     }
 
-    X_LOG0("Info", "Save time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
+    X_LOG0("Lvl", "Save time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
     return true;
 }
 
@@ -242,7 +242,7 @@ bool Compiler::processModels(LvlEntsArr& ents)
             continue;
         }
 
-        X_LOG0("Entity", "^5processing entity %" PRIuS, i);
+        X_LOG0("Lvl", "^5processing entity %" PRIuS, i);
 
         if (i == 0) {
             // return false if leak.
@@ -252,8 +252,7 @@ bool Compiler::processModels(LvlEntsArr& ents)
         }
         else {
             if (!processModel(entity)) {
-                X_ERROR("Entity", "Failed to process entity: %" PRIuS, i);
-
+                X_ERROR("Lvl", "Failed to process entity: %" PRIuS, i);
                 return false;
             }
         }
