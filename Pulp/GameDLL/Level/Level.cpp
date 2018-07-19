@@ -40,7 +40,11 @@ void Level::update(core::FrameData& frame)
 
 void Level::beginLoad(const MapNameStr& name)
 {
-    path_.set(name.begin(), name.end());
+    path_ = assetDb::AssetType::ToString(assetDb::AssetType::LEVEL);
+    path_.append('s', 1);
+    path_.toLower();
+    path_.append(assetDb::ASSET_NAME_SLASH, 1);
+    path_.append(name.begin(), name.end());
     path_.setExtension(level::LVL_FILE_EXTENSION);
 
     clear();
