@@ -74,7 +74,7 @@ public:
     bool dumpMeta(core::Path<char>& pakPath);
 
     bool process(void);
-    bool save(core::Path<char>& path);
+    bool save(const core::Path<char>& path);
 
     void addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& vec);
 

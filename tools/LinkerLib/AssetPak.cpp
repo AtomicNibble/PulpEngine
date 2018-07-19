@@ -252,7 +252,7 @@ bool AssetPakBuilder::process(void)
     return true;
 }
 
-bool AssetPakBuilder::save(core::Path<char>& path)
+bool AssetPakBuilder::save(const core::Path<char>& path)
 {
     if (assets_.size() > PAK_MAX_ASSETS) {
         X_ERROR("AssetPak", "Pak contains too many assets %" PRIuS " max: " PRIu32, assets_.size(), PAK_MAX_ASSETS);
