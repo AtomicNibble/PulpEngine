@@ -147,7 +147,7 @@ namespace
         if (pProfileName) {
             core::StackString512 profileStr(pProfileName);
 
-            name = profileStr.c_str();
+            name.assign(profileStr.begin(), profileStr.end());
             return true;
         }
 
