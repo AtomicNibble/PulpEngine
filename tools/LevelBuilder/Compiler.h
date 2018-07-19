@@ -63,7 +63,7 @@ public:
     Compiler(core::MemoryArenaBase* arena, assetDb::AssetDB& db, physics::IPhysicsCooking* pPhysCooking);
     ~Compiler();
 
-    bool init(void);
+    bool init(core::string& modName);
     bool compileLevel(core::Path<char>& path, core::Path<char>& outPath);
 
 private:

@@ -64,6 +64,7 @@ namespace
     {
         X_LOG0("Level", "Args:");
         X_LOG0("Level", "^6-if^7           (map file)");
+        X_LOG0("Level", "^6-mod^7          (set active mod)");
     }
 
     bool GetInputfile(core::Path<char>& name)
@@ -78,20 +79,33 @@ namespace
         return true;
     }
 
+    void GetMod(core::string& name)
+    {
+        const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
+        if (!pModName) {
+            return;
+        }
+
+        core::StackString512 nameNarrow(pModName);
+        name.assign(nameNarrow.begin(), nameNarrow.end());
+    }
+
 
     bool Run(LvlBuilderArena& arena, physics::IPhysicsCooking* pCooking)
     {
         core::Path<char> path;
-
         if (!GetInputfile(path)) {
             X_ERROR("Level", "Failed to get input file");
             return false;
         }
 
+        core::string modName;
+        GetMod(modName);
+
         assetDb::AssetDB db;
 
         level::Compiler comp(&arena, db, pCooking);
-        if (!comp.init()) {
+        if (!comp.init(modName)) {
             return false;
         }
 

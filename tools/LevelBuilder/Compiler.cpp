@@ -176,11 +176,18 @@ Compiler::~Compiler()
     X_DELETE(pMaterialMan_, arena_);
 }
 
-bool Compiler::init(void)
+bool Compiler::init(core::string& modName)
 {
     if (!db_.OpenDB()) {
         X_ERROR("Lvl", "Failed to open AssetDb");
         return false;
+    }
+
+    if (modName.isNotEmpty()) {
+        if (!db_.SetMod(modName)) {
+            X_ERROR("Lvl", "Failed to set mod");
+            return false;
+        }
     }
 
     if (!pMaterialMan_->Init()) {
