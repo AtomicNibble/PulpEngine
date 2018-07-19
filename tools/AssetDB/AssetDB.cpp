@@ -867,7 +867,12 @@ bool AssetDB::SetMod(const core::string& name)
     sql::SqlLiteQuery::iterator it = qry.begin();
 
     if (it != qry.end()) {
-        modId_ = safe_static_cast<ModId>((*it).get<int32_t>(0));
+        auto modId = safe_static_cast<ModId>((*it).get<int32_t>(0));
+        if (modId_ == modId) {
+            return true;
+        }
+
+        modId_ = modId;
 
         X_LOG0("AssetDB", "Mod set: \"%s\" id: %" PRIi32, name.c_str(), modId_);
         return true;
