@@ -114,7 +114,6 @@ void MatManager::releaseMaterial(engine::Material* pMat)
 bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name)
 {
     core::Path<char> path;
-
     if (!getMatPath(name, path)) {
         return false;
     }
