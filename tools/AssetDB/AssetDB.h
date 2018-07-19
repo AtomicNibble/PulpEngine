@@ -218,6 +218,9 @@ public:
     bool GetTypeForAsset(AssetId assetId, AssetType::Enum& typeOut); // this could be removed, or made private as GetAssetInfoForAsset, provides same ability.
     bool GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut);
 
+    // compile data helper.
+    bool GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut);
+
     bool MarkAssetsStale(ModId modId);
     bool IsAssetStale(AssetId assetId);
     bool OnAssetCompiled(AssetId assetId);

@@ -2345,6 +2345,38 @@ bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
     return true;
 }
 
+bool AssetDB::GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut)
+{
+    AssetInfo info;
+    if (!GetAssetInfoForAsset(assetId, info)) {
+        return false;
+    }
+
+    assetDb::AssetDB::Mod modInfo;
+    if (!GetModInfo(info.modId, modInfo)) {
+        return false;
+    }
+
+    core::Path<char> assetPath;
+    AssetDB::GetOutputPathForAsset(info.type, info.name, modInfo.outDir, assetPath);
+
+    core::XFileScoped file;
+    if (!file.openFile(assetPath.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+        X_ERROR("AssetLoader", "Failed to open file");
+        return false;
+    }
+
+    auto* pFile = file.GetFile();
+    auto fileSize = pFile->remainingBytes();
+
+    dataOut.resize(fileSize);
+    if (file.read(dataOut.data(), dataOut.size()) != dataOut.size()) {
+        return false;
+    }
+
+    return true;
+}
+
 bool AssetDB::MarkAssetsStale(ModId modId)
 {
     // basically set NULL for all compiledHashes on file_ids that match this mod.
