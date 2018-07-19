@@ -163,6 +163,18 @@ namespace
         return false;
     }
 
+    void GetMod(core::string& name)
+    {
+        const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
+        if (!pModName) {
+            return;
+        }
+
+        core::StackString512 nameNarrow(pModName);
+        name.assign(nameNarrow.begin(), nameNarrow.end());
+    }
+
+
 } // namespace
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -190,7 +202,10 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             con.PrintBanner();
             con.forceConvert(ForceModeEnabled());
 
-            if (con.Init()) {
+            core::string modName;
+            GetMod(modName);
+
+            if (con.Init(modName)) {
                 core::string profile;
                 if (GetConversionProfile(profile)) {
                     con.setConversionProfiles(profile);

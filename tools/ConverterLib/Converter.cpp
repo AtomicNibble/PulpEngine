@@ -41,11 +41,18 @@ void Converter::PrintBanner(void)
     X_LOG0("Converter", "=================== V0.1 ===================");
 }
 
-bool Converter::Init(void)
+bool Converter::Init(const core::string& modName)
 {
     if (!db_.OpenDB()) {
         X_ERROR("Converter", "Failed to open AssetDb");
         return false;
+    }
+
+    if (modName.isNotEmpty()) {
+        if (!db_.SetMod(modName)) {
+            X_ERROR("Converter", "Failed to set mod");
+            return false;
+        }
     }
 
     return true;
