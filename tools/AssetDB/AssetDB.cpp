@@ -2088,6 +2088,30 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, Asset
     return true;
 }
 
+bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut)
+{
+    if (name.isEmpty()) {
+        return false;
+    }
+
+    sql::SqlLiteQuery qry(db_, "SELECT file_id FROM file_ids WHERE type = ? AND name = ? AND mod_id = ?");
+    qry.bind(1, type);
+    qry.bind(2, name.c_str());
+    qry.bind(3, modId);
+
+    const auto it = qry.begin();
+
+    if (it == qry.end()) {
+        return false;
+    }
+
+    if (pIdOut) {
+        *pIdOut = safe_static_cast<AssetId>((*it).get<int32_t>(0));
+    }
+
+    return true;
+}
+
 bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");

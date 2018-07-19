@@ -204,6 +204,7 @@ public:
 
     // if you want to get a assets id use this.
     bool AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);
+    bool AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut = nullptr);
 
     // Misc data / info retrival
     bool GetArgsForAsset(AssetId assetId, core::string& argsOut);
