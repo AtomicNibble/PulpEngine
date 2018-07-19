@@ -6,7 +6,7 @@
 X_NAMESPACE_BEGIN(linker)
 
 AssetList::AssetList(core::MemoryArenaBase* arena) :
-    assets_{{ X_PP_REPEAT_COMMA_SEP(17, arena) }}
+    assets_{{ X_PP_REPEAT_COMMA_SEP(18, arena) }}
 {
 
 }

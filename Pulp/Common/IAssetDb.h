@@ -49,7 +49,8 @@ X_DECLARE_ENUM8(AssetType)
     VIDEO,
     SCRIPT,
     FONT,
-    SHADER);
+    SHADER,
+    LEVEL);
 
 namespace api
 {

@@ -191,7 +191,7 @@ struct APakHeader
     // not needed to unpack, just meta data.
     CompressionAlgoArr algos;
 
-    uint8_t pad[15];
+    uint8_t pad[14];
 };
 
 struct APakStrPool

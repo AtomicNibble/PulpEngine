@@ -13,6 +13,8 @@ namespace Util
     {
         const size_t len = (pEnd - pBegin);
 
+        static_assert(AssetType::ENUM_COUNT == 18, "More asset types :[] ? this code need updating.");
+
         switch (core::Hash::Fnv1aHash(pBegin, len)) {
             case "model"_fnv1a:
                 return AssetType::MODEL;
@@ -64,6 +66,9 @@ namespace Util
                 break;
             case "shader"_fnv1a:
                 return AssetType::SHADER;
+                break;
+            case "level"_fnv1a:
+                return AssetType::LEVEL;
                 break;
 
             default:
