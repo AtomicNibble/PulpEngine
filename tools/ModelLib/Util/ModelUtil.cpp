@@ -9,13 +9,8 @@ X_NAMESPACE_BEGIN(model)
 
 namespace Util
 {
-    bool GetModelAABB(const core::string& name, AABB& boxOut)
+    bool GetModelAABB(const core::Path<char>& path, AABB& boxOut)
     {
-        core::Path<char> path;
-        path /= "models";
-        path /= name;
-        path.setExtension(model::MODEL_FILE_EXTENSION);
-
         core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
         core::XFileScoped file;
 

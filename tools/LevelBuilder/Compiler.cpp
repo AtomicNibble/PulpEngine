@@ -149,8 +149,8 @@ Compiler::Compiler(core::MemoryArenaBase* arena, assetDb::AssetDB& db, physics::
         X_PP_REPEAT_COMMA_SEP(8, arena)},
     stringTable_(arena)
 {
-    pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(arena);
-    pMaterialMan_ = X_NEW(MatManager, arena, "LvlMaterialMan")(arena);
+    pModelCache_ = X_NEW(ModelCache, arena, "LvlModelCache")(db_, arena);
+    pMaterialMan_ = X_NEW(MatManager, arena, "LvlMaterialMan")(db_, arena);
 
     // set the pointers.
     g_bspFaceArena = &bspFaceAllocator_.arena_;

@@ -1,10 +1,13 @@
 #include "stdafx.h"
 #include "MaterialManager.h"
 
+#include <../AssetDB/AssetDB.h>
+
 X_NAMESPACE_BEGIN(level)
 
-MatManager::MatManager(core::MemoryArenaBase* arena) :
+MatManager::MatManager(assetDb::AssetDB& db, core::MemoryArenaBase* arena) :
     arena_(arena),
+    db_(db),
     materials_(arena, sizeof(MaterialResource), core::Max<size_t>(8u, X_ALIGN_OF(MaterialResource)), "MaterialPool"),
     nameOverRide_(arena, 64),
     pDefaultMtl_(nullptr)
@@ -111,9 +114,10 @@ void MatManager::releaseMaterial(engine::Material* pMat)
 bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name)
 {
     core::Path<char> path;
-    path = "materials/";
-    path.setFileName(name);
-    path.setExtension(engine::MTL_B_FILE_EXTENSION);
+
+    if (!getMatPath(name, path)) {
+        return false;
+    }
 
     core::XFileScoped file;
     if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
@@ -131,6 +135,25 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
 
     mat.assignProps(hdr);
     mat.setStatus(core::LoadStatus::Complete);
+    return true;
+}
+
+bool MatManager::getMatPath(const core::string& name, core::Path<char>& path)
+{
+    assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
+    assetDb::AssetDB::ModId modId;
+    if (!db_.AssetExsists(assetDb::AssetType::MATERIAL, name, &assetId, &modId)) {
+        X_ERROR("MatMan", "Mat does not exists: \"%s\"", name.c_str());
+        return false;
+    }
+
+    assetDb::AssetDB::Mod modInfo;
+    if (!db_.GetModInfo(modId, modInfo)) {
+        X_ERROR("MatMan", "Failed to get mod info");
+        return false;
+    }
+
+    assetDb::AssetDB::GetOutputPathForAsset(assetDb::AssetType::MATERIAL, name, modInfo.outDir, path);
     return true;
 }
 

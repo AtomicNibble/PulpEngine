@@ -8,6 +8,8 @@
 
 #include <../../tools/MaterialLib/MatLib.h>
 
+X_NAMESPACE_DECLARE(assetDb, class AssetDB)
+
 X_NAMESPACE_BEGIN(level)
 
 class MatManager
@@ -18,7 +20,7 @@ class MatManager
     typedef core::HashMap<core::string, core::string> NameOverrideMap;
 
 public:
-    MatManager(core::MemoryArenaBase* arena);
+    MatManager(assetDb::AssetDB& db, core::MemoryArenaBase* arena);
     ~MatManager();
 
     bool Init(void);
@@ -36,12 +38,16 @@ private:
 private:
     bool loadMatFromFile(MaterialResource& mat, const core::string& name);
 
+    bool getMatPath(const core::string& name, core::Path<char>& path);
+
     // only call if you know don't exsists in map.
     MaterialResource* createMaterial_Internal(core::string& name);
     MaterialResource* findMaterial_Internal(const core::string& name) const;
 
 private:
     core::MemoryArenaBase* arena_;
+    assetDb::AssetDB& db_;
+
     MaterialContainer materials_;
     NameOverrideMap nameOverRide_;
 

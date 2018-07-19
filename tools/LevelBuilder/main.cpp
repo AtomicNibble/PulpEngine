@@ -82,8 +82,6 @@ namespace
     bool Run(LvlBuilderArena& arena, physics::IPhysicsCooking* pCooking)
     {
         core::Path<char> path;
-        path.set("map_source\\");
-        path.setFileName("test01.map");
 
         if (!GetInputfile(path)) {
             X_ERROR("Level", "Failed to get input file");
