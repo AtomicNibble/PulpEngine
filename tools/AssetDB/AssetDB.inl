@@ -40,18 +40,20 @@ X_INLINE AssetDB::AssetInfo::AssetInfo() :
 {
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, const char* pName, AssetType::Enum type_) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, ModId modId_, const char* pName, AssetType::Enum type_) :
     id(id_),
     parentId(parentId_),
     type(type_),
+    modId(modId_),
     name(pName)
 {
 }
 
-X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, const core::string& name_, AssetType::Enum type_) :
+X_INLINE AssetDB::AssetInfo::AssetInfo(AssetId id_, AssetId parentId_, ModId modId_, const core::string& name_, AssetType::Enum type_) :
     id(id_),
     parentId(parentId_),
     type(type_),
+    modId(modId_),
     name(name_)
 {
 }

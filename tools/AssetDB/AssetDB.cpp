@@ -1060,7 +1060,7 @@ bool AssetDB::GetAssetList(ModId modId, AssetType::Enum type, AssetInfoArr& asse
             parentId = safe_static_cast<AssetId>(row.get<int32_t>(1));
         }
 
-        assetsOut.emplace_back(id, parentId, pName, type);
+        assetsOut.emplace_back(id, parentId, modId, pName, type);
     }
 
     return true;
@@ -1077,7 +1077,7 @@ bool AssetDB::GetAssetList(AssetType::Enum type, AssetInfoArr& assetsOut)
     // could resize if so.
     assetsOut.reserve(count);
 
-    sql::SqlLiteQuery qry(db_, "SELECT file_id, parent_id, type, name FROM file_ids WHERE type = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT file_id, parent_id, mod_id, type, name FROM file_ids WHERE type = ?");
     qry.bind(1, type);
 
     auto it = qry.begin();
@@ -1085,15 +1085,16 @@ bool AssetDB::GetAssetList(AssetType::Enum type, AssetInfoArr& assetsOut)
         auto row = *it;
 
         const AssetId id = safe_static_cast<AssetId>(row.get<int32_t>(0));
-        const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
-        const char* pName = row.get<const char*>(3);
+        const ModId modId = safe_static_cast<ModId>(row.get<int32_t>(2));
+        const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(3));
+        const char* pName = row.get<const char*>(4);
 
         AssetId parentId = INVALID_ASSET_ID;
         if (row.columnType(1) != sql::ColumType::SNULL) {
             parentId = safe_static_cast<AssetId>(row.get<int32_t>(1));
         }
 
-        assetsOut.emplace_back(id, parentId, pName, type);
+        assetsOut.emplace_back(id, parentId, modId, pName, type);
     }
 
     return true;
@@ -2317,7 +2318,7 @@ bool AssetDB::GetTypeForAsset(AssetId assetId, AssetType::Enum& typeOut)
 
 bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT name, file_id, type, parent_id FROM file_ids WHERE file_ids.file_id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT name, file_id, type, mod_id, parent_id FROM file_ids WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -2332,9 +2333,10 @@ bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
     infoOut.name = row.get<const char*>(0);
     infoOut.id = safe_static_cast<AssetId>(row.get<int32_t>(1));
     infoOut.type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
+    infoOut.modId = static_cast<AssetType::Enum>(row.get<int32_t>(3));
 
     if (row.columnType(3) != sql::ColumType::SNULL) {
-        infoOut.parentId = safe_static_cast<AssetId>(row.get<int32_t>(3));
+        infoOut.parentId = safe_static_cast<AssetId>(row.get<int32_t>(4));
     }
     else {
         infoOut.parentId = INVALID_ASSET_ID;
