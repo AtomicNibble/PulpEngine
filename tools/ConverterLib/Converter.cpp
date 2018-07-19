@@ -85,14 +85,11 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
         return false;
     }
 
-    assetDb::AssetDB::Mod modInfo;
-    if (!db_.GetModInfo(modId, modInfo)) {
-        X_ERROR("Converter", "Failed to get mod info");
+    core::Path<char> pathOut;
+    if (!db_.GetOutputPathForAsset(modId, assType, name, pathOut)) {
+        X_ERROR("Converter", "Failed to asset path");
         return false;
     }
-
-    core::Path<char> pathOut;
-    assetDb::AssetDB::GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
 
     // file exist already?
     if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str())) {

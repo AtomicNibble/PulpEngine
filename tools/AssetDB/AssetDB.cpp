@@ -2960,6 +2960,18 @@ void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOu
     pathOut.replaceSeprators();
 }
 
+bool AssetDB::GetOutputPathForAsset(ModId modId, assetDb::AssetType::Enum assType, const core::string& name, core::Path<char>& pathOut)
+{
+    Mod modInfo;
+    if (!GetModInfo(modId, modInfo)) {
+        X_ERROR("AssetDB", "Failed to get mod info");
+        return false;
+    }
+
+    GetOutputPathForAsset(assType, name, modInfo.outDir, pathOut);
+    return true;
+}
+
 void AssetDB::GetOutputPathForAssetType(assetDb::AssetType::Enum assType,
     const core::Path<char>& modPath, core::Path<char>& pathOut)
 {

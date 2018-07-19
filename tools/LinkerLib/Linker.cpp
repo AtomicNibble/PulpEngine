@@ -142,14 +142,11 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
         return false;
     }
 
-    assetDb::AssetDB::Mod modInfo;
-    if (!db_.GetModInfo(modId, modInfo)) {
-        X_ERROR("Linker", "Failed to get mod info");
+    core::Path<char> assetPath;
+    if (!db_.GetOutputPathForAsset(modId, assType, name, assetPath)) {
+        X_ERROR("Converter", "Failed to asset path");
         return false;
     }
-
-    core::Path<char> assetPath;
-    assetDb::AssetDB::GetOutputPathForAsset(assType, name, modInfo.outDir, assetPath);
 
     // load it.
     core::XFileScoped file;

@@ -147,13 +147,12 @@ bool MatManager::getMatPath(const core::string& name, core::Path<char>& path)
         return false;
     }
 
-    assetDb::AssetDB::Mod modInfo;
-    if (!db_.GetModInfo(modId, modInfo)) {
-        X_ERROR("MatMan", "Failed to get mod info");
+    core::Path<char> assetPath;
+    if (!db_.GetOutputPathForAsset(modId, assetDb::AssetType::MATERIAL, name, assetPath)) {
+        X_ERROR("ModelCache", "Failed to asset path");
         return false;
     }
 
-    assetDb::AssetDB::GetOutputPathForAsset(assetDb::AssetType::MATERIAL, name, modInfo.outDir, path);
     return true;
 }
 
