@@ -184,16 +184,16 @@ bool Level::processHeader(void)
     if (!fileHdr_.isValid()) {
         // this header is not valid :Z
         if (fileHdr_.fourCC == level::LVL_FOURCC_INVALID) {
-            X_ERROR("Level", "%s file is corrupt, please re-compile.", path_.fileName());
+            X_ERROR("Level", "\"%s\" file is corrupt, please re-compile.", path_.fileName());
             return false;
         }
 
-        X_ERROR("Level", "%s is not a valid level", path_.fileName());
+        X_ERROR("Level", "\"%s\" is not a valid level", path_.fileName());
         return false;
     }
 
     if (fileHdr_.version != level::LVL_VERSION) {
-        X_ERROR("Level", "%s has a invalid version. provided: %i required: %i",
+        X_ERROR("Level", "\"%s\" has a invalid version. provided: %i required: %i",
             path_.fileName(), fileHdr_.version, level::LVL_VERSION);
         return false;
     }
