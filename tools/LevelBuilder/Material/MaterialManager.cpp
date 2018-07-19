@@ -147,8 +147,7 @@ bool MatManager::getMatPath(const core::string& name, core::Path<char>& path)
         return false;
     }
 
-    core::Path<char> assetPath;
-    if (!db_.GetOutputPathForAsset(modId, assetDb::AssetType::MATERIAL, name, assetPath)) {
+    if (!db_.GetOutputPathForAsset(modId, assetDb::AssetType::MATERIAL, name, path)) {
         X_ERROR("ModelCache", "Failed to asset path");
         return false;
     }
