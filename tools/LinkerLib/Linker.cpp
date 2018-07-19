@@ -45,12 +45,6 @@ bool Linker::dumpMeta(core::Path<char>& inputFile)
 
 bool Linker::Build(BuildOptions& options)
 {
-    core::Path<char> outPath = options.outFile;
-
-    if (outPath.isEmpty()) {
-        outPath = "asset_pack_01";
-    }
-
     core::StopWatch timer;
     int32_t numAssets = 0;
 
@@ -125,8 +119,8 @@ bool Linker::Build(BuildOptions& options)
         return false;
     }
 
-    if (!builder_.save(outPath)) {
-        X_ERROR("Linker", "Failed to save: \"%s\"", outPath.c_str());
+    if (!builder_.save(options.outFile)) {
+        X_ERROR("Linker", "Failed to save: \"%s\"", options.outFile.c_str());
         return false;
     }
 
