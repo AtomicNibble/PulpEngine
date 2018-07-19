@@ -2374,7 +2374,7 @@ bool AssetDB::GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut)
     auto* pFile = file.GetFile();
     auto fileSize = pFile->remainingBytes();
 
-    dataOut.resize(fileSize);
+    dataOut.resize(safe_static_cast<size_t>(fileSize));
     if (file.read(dataOut.data(), dataOut.size()) != dataOut.size()) {
         return false;
     }
