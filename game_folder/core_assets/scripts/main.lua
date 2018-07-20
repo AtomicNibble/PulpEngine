@@ -51,7 +51,7 @@ end
 --Game = Game or {}
 --Game.__index = Game
 
-OnInit();
-TestFile();
-TestRead();
----TestVector();
+--OnInit();
+--TestFile();
+--TestRead();
+--TestVector();
