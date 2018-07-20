@@ -109,7 +109,16 @@ namespace
             return false;
         }
 
+        auto modId = db.GetcurrentModId();
+
+        assetDb::AssetDB::Mod modInfo;
+        if (!db.GetModInfo(modId, modInfo)) {
+            return false;
+        }
+
         core::Path<char> outPath;
+        assetDb::AssetDB::GetOutputPathForAssetType(assetDb::AssetType::LEVEL, modInfo.outDir, outPath);
+        outPath.ensureSlash();
         outPath.setFileName(path.fileName());
 
         if (!comp.compileLevel(path, outPath)) {
