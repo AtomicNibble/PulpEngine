@@ -212,6 +212,12 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
 
 World3D::~World3D()
 {
+    for (auto* pRenderEnt : renderEnts_)
+    {
+        X_DELETE(pRenderEnt, arena_);
+    }
+
+
 }
 
 void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket)
