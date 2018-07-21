@@ -75,6 +75,7 @@ class XOsFileAsyncOperation : public XOsFileAsyncOperationBase
 {
 public:
     using XOsFileAsyncOperationBase::XOsFileAsyncOperationBase;
+    using XOsFileAsyncOperationBase::operator=;
 
     // Waits until the asynchronous operation has finished
     // returns the number of transferred bytes.
