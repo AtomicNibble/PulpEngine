@@ -202,7 +202,7 @@ namespace entity
     {
         if (reg_.has<MeshRenderer>(id)) {
             auto& meshRend = reg_.get<MeshRenderer>(id);
-            p3DWorld_->removeRenderEnt(meshRend.pRenderEnt);
+            p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
         }
 
         if (reg_.has<Mesh>(id)) {
@@ -373,7 +373,7 @@ namespace entity
         auto& meshRend = reg_.get<MeshRenderer>(id);
 
         if (meshRend.pRenderEnt) {
-            p3DWorld_->removeRenderEnt(meshRend.pRenderEnt);
+            p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
         }
 
         if (mesh.pModel) {

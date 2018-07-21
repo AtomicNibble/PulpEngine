@@ -335,7 +335,7 @@ namespace entity
                     pModelManager->waitForLoad(mesh.pModel);
 
                     if (meshRend.pRenderEnt) {
-                        p3DWorld->removeRenderEnt(meshRend.pRenderEnt);
+                        p3DWorld->freeRenderEnt(meshRend.pRenderEnt);
                     }
 
                     engine::RenderEntDesc entDsc;

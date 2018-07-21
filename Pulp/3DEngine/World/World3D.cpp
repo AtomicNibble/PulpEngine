@@ -694,11 +694,13 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
     return pRenderEnt;
 }
 
-void World3D::removeRenderEnt(IRenderEnt* pEnt)
+void World3D::freeRenderEnt(IRenderEnt* pEnt)
 {
     RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);
 
     renderEnts_.remove(pRenderEnt);
+
+    X_DELETE(pRenderEnt, arena_);
 }
 
 void World3D::updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force)
