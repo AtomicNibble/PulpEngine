@@ -136,9 +136,6 @@ public:
 
     void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
 
-    bool asyncInitFinalize(void);
-    void dispatchPendingLoads(void);
-
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
     IVideo* findVideo(const char* pVideoName) const X_FINAL;
