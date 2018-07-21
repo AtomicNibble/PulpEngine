@@ -13,6 +13,7 @@
 #include <IGame.h>
 #include <IPhysics.h>
 #include <INetwork.h>
+#include <IVideo.h>
 #include <IEngineModule.h>
 
 #include <Hashing\crc32.h>
@@ -240,6 +241,11 @@ void XCore::ShutDown()
     if (env_.pNet) {
         env_.pNet->shutDown();
         core::SafeRelease(env_.pNet);
+    }
+
+    if (env_.pVideoSys) {
+        env_.pVideoSys->shutDown();
+        core::SafeRelease(env_.pVideoSys);
     }
 
     if (pWindow_) {

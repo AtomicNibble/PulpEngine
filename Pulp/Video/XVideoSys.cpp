@@ -41,10 +41,14 @@ bool XVideoSys::init(void)
 
 void XVideoSys::shutDown(void)
 {
+    X_LOG0("Video", "Shutting Down");
+
+    freeDangling();
 }
 
 void XVideoSys::release(void)
 {
+    X_DELETE(this, g_VideoArena);
 }
 
 void XVideoSys::update(const core::FrameTimeData& frameTimeInfo)
@@ -152,6 +156,23 @@ bool XVideoSys::waitForLoad(IVideo* pIVideo)
     X_ASSERT_UNREACHABLE();
     return false;
 }
+
+void XVideoSys::freeDangling(void)
+{
+    {
+        core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+        // any left?
+        for (const auto& m : videos_) {
+            auto* pVideoRes = m.second;
+            const auto& name = pVideoRes->getName();
+            X_WARNING("Video", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pVideoRes->getRefCount());
+        }
+    }
+
+    videos_.free();
+}
+
 
 void XVideoSys::queueLoadRequest(VideoResource* pVideoRes)
 {

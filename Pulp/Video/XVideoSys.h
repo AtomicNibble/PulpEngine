@@ -151,6 +151,9 @@ public:
     void listVideos(const char* pSearchPatten = nullptr) const;
 
 private:
+    void freeDangling(void);
+
+private:
     void queueLoadRequest(VideoResource* pVideoRes);
     void dispatchLoadRequest(VideoLoadRequest* pLoadReq);
 
