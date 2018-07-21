@@ -127,6 +127,10 @@ bool XGame::shutDown(void)
         pFovVar_->Release();
     }
 
+    if (world_) {
+        world_.reset();
+    }
+
     userCmdGen_.shutdown();
     weaponDefs_.shutDown();
     return true;
