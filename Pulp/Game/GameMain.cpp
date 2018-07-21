@@ -57,28 +57,6 @@ X_FORCE_LINK_FACTORY("XConverterLib_Font")
 
 #endif // !X_LIB
 
-void InitRootDir(void)
-{
-#ifdef WIN32
-    WCHAR szExeFileName[_MAX_PATH] = {0};
-    GetModuleFileNameW(GetModuleHandleW(NULL), szExeFileName, sizeof(szExeFileName));
-
-    core::Path<wchar_t> path(szExeFileName);
-
-    path.removeFileName();
-    path.removeTrailingSlash();
-
-    if (!SetCurrentDirectoryW(path.c_str())) {
-        core::msgbox::show("Failed to set current directory",
-            X_ENGINE_NAME " Fatal Error",
-            core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
-            core::msgbox::Buttons::OK);
-
-        ExitProcess(static_cast<uint32_t>(-1));
-    }
-#endif
-}
-
 namespace
 {
     core::MallocFreeAllocator gAlloc;
@@ -130,7 +108,6 @@ int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     X_UNUSED(hPrevInstance);
     X_UNUSED(lpCmdLine);
     X_UNUSED(nCmdShow);
-    InitRootDir();
 
     int nRes = 0;
 
