@@ -20,7 +20,7 @@ namespace
 
 TEST(Debug, SymbolRes)
 {
-#if X_ENABLE_SYMBOL_RESOLUTION
+#if X_ENABLE_SYMBOL_RESOLUTION && X_SUPER == 0
     const CallStack& stack = Foo1();
     const SymbolInfo info = symbolResolution::ResolveSymbolsForAddress(stack.GetFrame(0));
 

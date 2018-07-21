@@ -115,6 +115,7 @@ TEST(StackAlloc, Stack)
         EXPECT_EQ(1024, allocator.getSize(alloc1));
 
         // the allocator should complain about freeing the allocations in the wrong order
+#if X_ENABLE_STACK_ALLOCATOR_CHECK
         core::debugging::EnableBreakpoints(false);
 
         g_AssetChecker.ExpectAssertion(true);
@@ -127,6 +128,7 @@ TEST(StackAlloc, Stack)
         g_AssetChecker.ExpectAssertion(false);
 
         core::debugging::EnableBreakpoints(true);
+#endif // !X_ENABLE_STACK_ALLOCATOR_CHECK
     }
 
     //	X_NEW(int, &arena, "test");
