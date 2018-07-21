@@ -73,15 +73,11 @@ class XRender : public IRender
     struct DeviceState
     {
         typedef core::Array<TextureState> TextureStateArray;
-        typedef core::Array<SamplerState> SamplerStateArray;
+        typedef core::FixedArray<SamplerState, MAX_SAMPLERS_STATIC> SamplerStateArray;
 
         DeviceState(core::MemoryArenaBase* arena) :
             rootSig(arena),
             pPso(nullptr)
-#if PSO_HOT_RELOAD
-            ,
-            staticSamplers(arena)
-#endif // !PSO_HOT_RELOAD
         {
             texRootIdxBase = std::numeric_limits<decltype(texRootIdxBase)>::max();
             samplerRootIdxBase = std::numeric_limits<decltype(samplerRootIdxBase)>::max();
