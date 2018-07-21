@@ -86,6 +86,7 @@ void XMaterialManager::shutDown(void)
 
     if (pDefaultMtl_) {
         releaseMaterial(pDefaultMtl_);
+        pDefaultMtl_ = nullptr;
     }
 
     freeDangling();
