@@ -198,7 +198,7 @@ bool xFileSys::init(const SCoreInitParams& params)
 
 bool xFileSys::initWorker(void)
 {
-    if (!StartRequestWorker()) {
+    if (!startRequestWorker()) {
         X_ERROR("FileSys", "Failed to start io request worker");
         return false;
     }
@@ -210,7 +210,7 @@ void xFileSys::shutDown(void)
 {
     X_LOG0("FileSys", "Shutting Down");
 
-    ShutDownRequestWorker();
+    shutDownRequestWorker();
 
     for (Search* s = searchPaths_; s;) {
         Search* cur = s;
@@ -1260,20 +1260,20 @@ RequestHandle xFileSys::AddIoRequestToQue(IoRequestBase* pRequest)
     return reqHandle;
 }
 
-void xFileSys::CancelRequest(RequestHandle handle)
+void xFileSys::cancelRequest(RequestHandle handle)
 {
     X_UNUSED(handle);
     X_ASSERT_NOT_IMPLEMENTED();
 }
 
-bool xFileSys::StartRequestWorker(void)
+bool xFileSys::startRequestWorker(void)
 {
     ThreadAbstract::create("IoWorker", 1024 * 128); // small stack
     ThreadAbstract::start();
     return true;
 }
 
-void xFileSys::ShutDownRequestWorker(void)
+void xFileSys::shutDownRequestWorker(void)
 {
     if (ThreadAbstract::getState() != core::Thread::State::RUNNING) {
         return;

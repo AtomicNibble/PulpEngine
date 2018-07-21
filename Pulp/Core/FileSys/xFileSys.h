@@ -310,9 +310,9 @@ public:
     RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_FINAL;
     RequestHandle AddIoRequestToQue(IoRequestBase& request) X_FINAL;
     RequestHandle AddIoRequestToQue(IoRequestBase* pRequest);
-    void CancelRequest(RequestHandle handle);
-    bool StartRequestWorker(void);
-    void ShutDownRequestWorker(void);
+    void cancelRequest(RequestHandle handle);
+    bool startRequestWorker(void);
+    void shutDownRequestWorker(void);
 
     void listPaks(const char* pSearchPatten = nullptr) const;
 
