@@ -268,6 +268,7 @@ World::World(GameVars& vars, physics::IPhysics* pPhys,
     arena_(arena),
     pPhys_(pPhys),
     pScene_(nullptr),
+    p3DWorld_(nullptr),
     ents_(vars, weaponDefs, arena),
     level_(arena),
     userCmdMan_(userCmdMan)
@@ -287,6 +288,9 @@ World::~World()
         pPhys_->releaseScene(pScene_);
     }
 
+    if (p3DWorld_) {
+        gEnv->p3DEngine->release3DWorld(p3DWorld_);
+    }
 }
 
 bool World::loadMap(const MapNameStr& name)
@@ -298,14 +302,14 @@ bool World::loadMap(const MapNameStr& name)
     }
 
     gEnv->pSound->setPhysicsScene(pScene_);
+    
+    p3DWorld_ = gEnv->p3DEngine->create3DWorld(pScene_);
 
-    auto* pWorld3D = gEnv->p3DEngine->create3DWorld(pScene_);
-
-    if (!ents_.init(pPhys_, pScene_, pWorld3D)) {
+    if (!ents_.init(pPhys_, pScene_, p3DWorld_)) {
         return false;
     }
 
-    level_ = core::makeUnique<Level>(arena_, pScene_, pWorld3D, ents_, arena_);
+    level_ = core::makeUnique<Level>(arena_, pScene_, p3DWorld_, ents_, arena_);
     level_->beginLoad(name);
 
     // TEMP

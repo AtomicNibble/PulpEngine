@@ -110,6 +110,7 @@ private:
     core::MemoryArenaBase* arena_;
     physics::IPhysics* pPhys_;
     physics::IScene* pScene_;
+    engine::IWorld3D* p3DWorld_;
 
     entity::EnititySystem ents_;
     core::UniquePointer<Level> level_;
