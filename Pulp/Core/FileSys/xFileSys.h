@@ -318,6 +318,9 @@ public:
     void listSearchPaths(const char* pSearchPatten = nullptr) const;
 
 private:
+    void addDirInteral(pathTypeW path, bool isGame);
+
+private:
     IoRequestBase* popRequest(void);
     IoRequestBase* tryPopRequest(void);
     void onOpFinsihed(PendingOpBase& asyncOp, uint32_t bytesTransferd);

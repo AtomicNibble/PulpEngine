@@ -587,15 +587,19 @@ bool xFileSys::setGameDir(pathTypeW path)
         return false;
     }
 
-    addModDir(path);
-    X_ASSERT_NOT_NULL(searchPaths_);
-    X_ASSERT_NOT_NULL(searchPaths_->pDir);
-    gameDir_ = searchPaths_->pDir;
+    addDirInteral(path, true);
 
+    X_ASSERT_NOT_NULL(gameDir_);
     return true;
 }
 
 void xFileSys::addModDir(pathTypeW path)
+{
+    addDirInteral(path, false);
+}
+
+
+void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 {
     if (isDebug()) {
         X_LOG0("FileSys", "addModDir: \"%ls\"", path);
@@ -621,6 +625,10 @@ void xFileSys::addModDir(pathTypeW path)
     // work out if this directory is a sub directory of any of the current
     // searxh paths.
     for (Search* s = searchPaths_; s; s = s->pNext) {
+        if (!s->pDir) {
+            continue;
+        }
+
         if (strUtil::FindCaseInsensitive(fixedPath.c_str(), s->pDir->path.c_str()) != nullptr) {
             X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%ls\" -> \"%ls\"",
                 fixedPath, s->pDir->path.c_str());
@@ -637,8 +645,35 @@ void xFileSys::addModDir(pathTypeW path)
     search->pNext = searchPaths_;
     searchPaths_ = search;
 
+    if (isGame) {
+        gameDir_ = searchPaths_->pDir;
+    }
+
     // add hotreload dir.
     gEnv->pDirWatcher->addDirectory(fixedPath.c_str());
+
+    // Load packs.
+    auto searchPath = fixedPath;
+    searchPath.appendFmt(L"*.%S", AssetPak::PAK_FILE_EXTENSION);
+
+    PathUtil::findData findInfo;
+    uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), findInfo);
+
+    if (handle != PathUtil::INVALID_FIND_HANDLE)
+    {
+        do
+        {
+            core::StackString256 name(findInfo.name);
+
+            if (!openPak(name.c_str()))
+            {
+                X_ERROR("FileSys", "Failed to add pak: \"%s\"", name.c_str());
+            }
+        }
+        while(PathUtil::findNext(handle, findInfo));
+
+        PathUtil::findClose(handle);
+    }
 }
 
 // --------------------- Find util ---------------------
