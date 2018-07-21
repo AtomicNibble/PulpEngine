@@ -259,16 +259,17 @@ bool xFileSys::InitDirectorys(bool working)
         return setGameDir(path.c_str());
     }
     else {
+        
         core::Path<wchar_t> curDir = PathUtil::GetCurrentDirectory();
 
         core::Path<wchar_t> base(curDir);
-        base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
+        // base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
 
         core::Path<wchar_t> core(base);
         core /= L"core_assets\\";
 
-        core::Path<wchar_t> mod(base);
-        mod /= L"mod\\";
+        // core::Path<wchar_t> mod(base);
+        // mod /= L"mod\\";
 
         core::Path<wchar_t> testAssets(base);
         testAssets /= L"test_assets\\";
@@ -276,7 +277,7 @@ bool xFileSys::InitDirectorys(bool working)
         // TODO: yup.
         if (setGameDir(core.c_str())) {
             // add mod dir's
-            addModDir(mod.c_str());
+       //     addModDir(mod.c_str());
             addModDir(testAssets.c_str());
             return true;
         }
