@@ -40,6 +40,10 @@ public:
     XOsFileAsyncOperationBase(const XOsFileAsyncOperationBase& oth) = default;
     X_INLINE XOsFileAsyncOperationBase(XOsFileAsyncOperationBase&& oth);
 
+protected:
+    ~XOsFileAsyncOperationBase() = default;
+
+public:
     XOsFileAsyncOperationBase& operator=(const XOsFileAsyncOperationBase& oth) = default;
     X_INLINE XOsFileAsyncOperationBase& operator=(XOsFileAsyncOperationBase&& oth);
 
