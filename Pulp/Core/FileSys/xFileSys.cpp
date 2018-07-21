@@ -582,7 +582,7 @@ bool xFileSys::setGameDir(pathTypeW path)
     if (!this->directoryExistsOS(path)) {
         core::Path<wchar_t> fullPath;
         PathUtil::GetFullPath(path, fullPath);
-        X_ERROR("FileSys", "Faled to set game drectory the directory does not exsists: \"%ls\"", fullPath.c_str());
+        X_ERROR("FileSys", "Faled to set game directory, path does not exsists: \"%ls\"", fullPath.c_str());
         return false;
     }
 
