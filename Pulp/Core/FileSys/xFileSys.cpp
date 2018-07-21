@@ -628,7 +628,7 @@ void xFileSys::addModDir(pathTypeW path)
         }
     }
 
-    // at it to virtual file system.
+    // add it to virtual file system.
     Search* search = X_NEW(Search, g_coreArena, "FileSysSearch");
     search->pDir = X_NEW(Directory, g_coreArena, "FileSysDir");
     search->pDir->path = fixedPath;
