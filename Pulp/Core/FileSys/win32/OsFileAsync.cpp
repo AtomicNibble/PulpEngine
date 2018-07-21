@@ -131,7 +131,7 @@ XOsFileAsyncOperation OsFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
 #if X_ENABLE_FILE_STATS
     s_stats.NumBytesRead += length;
-    ++s_stats.NumWrties;
+    ++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 
     return op;
