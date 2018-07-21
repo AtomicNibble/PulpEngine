@@ -225,7 +225,7 @@ struct FontHdr
 
     X_INLINE bool isValid(void) const {
         if (version != X_FONT_BIN_VERSION) {
-            X_ERROR("Font", "model version is invalid. FileVer: %" PRIu8 " RequiredVer: %" PRIu32,
+            X_ERROR("Font", "font version is invalid. FileVer: %" PRIu8 " RequiredVer: %" PRIu32,
                 version, X_FONT_BIN_VERSION);
         }
 
