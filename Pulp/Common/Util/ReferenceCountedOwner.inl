@@ -52,6 +52,10 @@ ReferenceCountedOwner<T>& ReferenceCountedOwner<T>::operator=(const ReferenceCou
 template<class T>
 ReferenceCountedOwner<T>& ReferenceCountedOwner<T>::operator=(ReferenceCountedOwner<T>&& other)
 {
+    if (instance_ && instance_->removeReference() == 0) {
+        X_DELETE(instance_, arena_);
+    }
+
     instance_ = other.instance_;
     arena_ = other.arena_;
 

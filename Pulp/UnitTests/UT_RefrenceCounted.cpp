@@ -60,6 +60,12 @@ TEST(RefCounted, ArenaObject)
             otherOwner = owner;
         }
 
+        // check move assignment
+        {
+            OwnerType otherOwner = owner;
+            otherOwner = std::move(owner);
+        }
+
         // back to one.
     }
 
