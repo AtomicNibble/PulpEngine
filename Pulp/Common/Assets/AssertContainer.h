@@ -175,6 +175,8 @@ public:
         }
 
         hash_.free();
+        list_.free();
+        freeList_.free();
     }
 
     X_INLINE Resource* findAsset(const core::string& name) const
