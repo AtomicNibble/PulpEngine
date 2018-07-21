@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <_PropertySheetDisplayName>Engine Delay Load Dlls</_PropertySheetDisplayName>
+    <_PropertySheetDisplayName>Engine Game Delay Load Dlls</_PropertySheetDisplayName>
   </PropertyGroup>
   <ItemDefinitionGroup>
 	<Link>
-          <DelayLoadDLLs>Winmm.dll;GDI32.dll;MSIMG32.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
+          <DelayLoadDLLs>ispc_texcomp.dll;%(DelayLoadDLLs)</DelayLoadDLLs>
 	</Link>
   </ItemDefinitionGroup>
 </Project>
