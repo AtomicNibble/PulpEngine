@@ -155,6 +155,8 @@ namespace weapon
 
     void WeaponDefManager::releaseWeaponDef(WeaponDef* pWeaponDef)
     {
+        X_ASSERT(weaponDefs_.size() > 0, "Freeing a weapon def when assets is emtpy")(weaponDefs_.size(), pWeaponDef);
+
         WeaponDefResource* pWeaponDefRes = reinterpret_cast<WeaponDefResource*>(pWeaponDef);
         if (pWeaponDefRes->removeReference() == 0) {
             weaponDefs_.releaseAsset(pWeaponDefRes);
