@@ -135,7 +135,13 @@ FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
 
         case dliNotePreLoadLibrary: {
             const char* pName = gDelayLoadHook.getPhysxName(pdli->szDll);
-            return static_cast<FARPROC>(core::Module::Load(pName));
+            auto module = core::Module::Load(pName);
+            if (!module)
+            {
+                X_ERROR("Phys", "Failed to load: \"%s\"", pName);
+            }
+
+            return static_cast<FARPROC>(module);
         } break;
 
         case dliNotePreGetProcAddress:
