@@ -318,7 +318,7 @@ namespace exceptionHandler
 #if X_64 == 1
                         X_LOG0("ExceptionHandler", "RIP	  = 0x%016" PRIxPTR, ContextRecord->Rip);
                         X_LOG0("ExceptionHandler", "RSP	  = 0x%016" PRIxPTR, ContextRecord->Rsp);
-                        X_LOG0("ExceptionHandler", "RSP	  = 0x%016" PRIxPTR, ContextRecord->Rbp);
+                        X_LOG0("ExceptionHandler", "RBP	  = 0x%016" PRIxPTR, ContextRecord->Rbp);
                         X_LOG0("ExceptionHandler", "EFlags = 0x%016" PRIxPTR, ContextRecord->EFlags);
                         X_LOG0("ExceptionHandler", "CS	  = 0x%016" PRIxPTR, ContextRecord->SegCs);
                         X_LOG0("ExceptionHandler", "SS	  = 0x%016" PRIxPTR, ContextRecord->SegSs);
