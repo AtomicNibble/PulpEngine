@@ -234,7 +234,7 @@ public:
     bool initWorker(void) X_FINAL;
     void shutDown(void) X_FINAL;
 
-    bool InitDirectorys(bool workingDir);
+    bool initDirectorys(bool workingDir);
 
     core::Path<wchar_t> getWorkingDirectory(void) const X_FINAL;
 
