@@ -115,7 +115,8 @@ namespace profiler
         frameTime_(0),
         totalTime_(0),
         profilerData_(arena),
-        profilerHistoryData_(arena)
+        profilerHistoryData_(arena),
+        eventListerReg_(false)
 
 #if X_ENABLE_PROFILER_WARNINGS
         ,
@@ -152,9 +153,8 @@ namespace profiler
     bool XProfileSys::init(ICore* pCore)
     {
         X_LOG0("ProfileSys", "Starting");
-        X_UNUSED(pCore);
 
-        pCore->GetCoreEventDispatcher()->RegisterListener(this);
+        eventListerReg_ = pCore->GetCoreEventDispatcher()->RegisterListener(this);
         pCore->GetIInput()->AddEventListener(this);
 
         ProfileTimer::CalculateCPUSpeed();
@@ -232,8 +232,13 @@ namespace profiler
 
         // ...
         auto* pCore = gEnv->pCore;
-        pCore->GetCoreEventDispatcher()->RemoveListener(this);
-        pCore->GetIInput()->RemoveEventListener(this);
+
+        if (eventListerReg_) {
+            pCore->GetCoreEventDispatcher()->RemoveListener(this);
+        }
+        if (pCore->GetIInput()) {
+            pCore->GetIInput()->RemoveEventListener(this);
+        }
     }
 
     bool XProfileSys::asyncInitFinalize(void)

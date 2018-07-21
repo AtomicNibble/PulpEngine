@@ -145,6 +145,8 @@ namespace profiler
 
         WarningArr warningList_;
 #endif // !X_ENABLE_PROFILER_WARNINGS
+
+        bool eventListerReg_;
     };
 
 } // namespace profiler
