@@ -315,6 +315,7 @@ public:
     void shutDownRequestWorker(void);
 
     void listPaks(const char* pSearchPatten = nullptr) const;
+    void listSearchPaths(const char* pSearchPatten = nullptr) const;
 
 private:
     IoRequestBase* popRequest(void);
@@ -363,6 +364,7 @@ private:
 
 private:
     void Cmd_ListPaks(IConsoleCmdArgs* pCmd);
+    void Cmd_ListSearchPaths(IConsoleCmdArgs* pCmd);
 
 private:
 #if X_DEBUG == 1

@@ -180,7 +180,8 @@ void xFileSys::registerVars(void)
 
 void xFileSys::registerCmds(void)
 {
-    ADD_COMMAND_MEMBER("listPaks", this, xFileSys, &xFileSys::Cmd_ListPaks, core::VarFlag::SYSTEM, "List open asset pak's");
+    ADD_COMMAND_MEMBER("listAssetPaks", this, xFileSys, &xFileSys::Cmd_ListPaks, core::VarFlag::SYSTEM, "List open asset pak's");
+    ADD_COMMAND_MEMBER("listFileSystemPaths", this, xFileSys, &xFileSys::Cmd_ListSearchPaths, core::VarFlag::SYSTEM, "List the virtual filesystem paths");
 }
 
 bool xFileSys::init(const SCoreInitParams& params)
@@ -1890,7 +1891,7 @@ bool xFileSys::openPak(const char* pName)
 
 void xFileSys::listPaks(const char* pSearchPatten) const
 {
-    X_UNUSED(pSearchPatten);
+    X_UNUSED(pSearchPatten); // TODO
 
     size_t numPacks = 0;
 
@@ -1911,6 +1912,26 @@ void xFileSys::listPaks(const char* pSearchPatten) const
     X_LOG0("FileSys", "-------------- ^8Paks End^7 --------------");
 }
 
+void xFileSys::listSearchPaths(const char* pSearchPatten) const
+{
+    X_UNUSED(pSearchPatten); // TODO
+
+    size_t numPacks = 0;
+
+    X_LOG0("FileSys", "-------------- ^8Paths(%" PRIuS ")^7 ---------------", numPacks);
+
+    for (Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
+        if (pSearch->pPak) {
+            continue;
+        }
+
+        const auto& path = pSearch->pDir->path;
+        X_LOG0("FileSys", "^2%S", path.c_str());
+    }
+
+    X_LOG0("FileSys", "-------------- ^8Paths End^7 --------------");
+}
+
 void xFileSys::Cmd_ListPaks(IConsoleCmdArgs* pCmd)
 {
     const char* pSearchPattern = nullptr;
@@ -1920,6 +1941,18 @@ void xFileSys::Cmd_ListPaks(IConsoleCmdArgs* pCmd)
     }
 
     listPaks(pSearchPattern);
+}
+
+
+void xFileSys::Cmd_ListSearchPaths(IConsoleCmdArgs* pCmd)
+{
+    const char* pSearchPattern = nullptr;
+
+    if (pCmd->GetArgCount() > 1) {
+        pSearchPattern = pCmd->GetArg(1);
+    }
+
+    listSearchPaths(pSearchPattern);
 }
 
 X_NAMESPACE_END
