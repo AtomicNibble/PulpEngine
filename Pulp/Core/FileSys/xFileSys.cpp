@@ -281,10 +281,6 @@ bool xFileSys::InitDirectorys(bool working)
             addModDir(testAssets.c_str());
             return true;
         }
-        else {
-            // set as working.
-            return setGameDir(curDir.c_str());
-        }
     }
 
     return false;
