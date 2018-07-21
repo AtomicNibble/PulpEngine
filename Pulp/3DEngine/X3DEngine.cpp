@@ -824,6 +824,7 @@ IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 
 void X3DEngine::release3DWorld(IWorld3D* pWorld)
 {
+    X_ASSERT(worlds_.find(pWorld) == WorldArr::invalid_index, "World is still ative")(pWorld);
     X_DELETE(pWorld, g_3dEngineArena);
 }
 
