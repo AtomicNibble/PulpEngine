@@ -610,7 +610,9 @@ bool XCore::InitAsyncWait(void)
     // aka we must wait for all to finish even if some fail.
     bool allOk = true;
 
-    allOk &= env_.pConsole->asyncInitFinalize();
+    if (env_.pConsole) {
+        allOk &= env_.pConsole->asyncInitFinalize();
+    }
 
     // wait for default font to fully load.
     if (env_.pFontSys) {
