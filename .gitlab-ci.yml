@@ -18,6 +18,7 @@ stages:
  - build
  - build_edtior
  - test
+ - pack
 
 
 build:win32_debug:
@@ -253,3 +254,18 @@ test:x64_super:
    - windows
    - test
 
+
+build:x64_super:
+  stage: test
+  script:
+   - 'cd "game_folder'
+   - buildGame.bat
+  artifacts:
+    expire_in: 1 week
+    paths:
+    - game.7z
+  dependencies:
+    - build:x64_super
+  tags:
+   - windows
+  when: manual
