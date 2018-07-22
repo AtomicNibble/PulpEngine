@@ -13,7 +13,7 @@ namespace Util
     {
         const size_t len = (pEnd - pBegin);
 
-        static_assert(AssetType::ENUM_COUNT == 18, "More asset types :[] ? this code need updating.");
+        static_assert(AssetType::ENUM_COUNT == 20, "More asset types :[] ? this code need updating.");
 
         switch (core::Hash::Fnv1aHash(pBegin, len)) {
             case "model"_fnv1a:
@@ -69,6 +69,12 @@ namespace Util
                 break;
             case "level"_fnv1a:
                 return AssetType::LEVEL;
+                break;
+            case "config"_fnv1a:
+                return AssetType::CONFIG;
+                break;
+            case "techdef"_fnv1a:
+                return AssetType::TECHDEF;
                 break;
 
             default:

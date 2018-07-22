@@ -47,10 +47,13 @@ X_DECLARE_ENUM8(AssetType)
     CAMERA,
 
     VIDEO,
-    SCRIPT,
-    FONT,
-    SHADER,
-    LEVEL);
+    SCRIPT,     // Not in db
+    FONT,   
+    SHADER,     // Not in db
+    LEVEL,      // Not in db
+    CONFIG,     // Not in db
+    TECHDEF     // Not in db
+);
 
 namespace api
 {

@@ -20,6 +20,7 @@
 #include <IPrimativeContext.h>
 #include <IFont.h>
 #include <I3DEngine.h>
+#include <IConfig.h>
 
 #include "Platform\Window.h"
 
@@ -286,7 +287,6 @@ void ConsoleCommandArgs::TokenizeString(const char* begin, const char* end)
 //////////////////////////////////////////////////////////////////////////
 
 const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
-const char* XConsole::CONFIG_FILE_EXTENSION = "cfg";
 
 //////////////////////////////////////////////////////////////////////////
 
