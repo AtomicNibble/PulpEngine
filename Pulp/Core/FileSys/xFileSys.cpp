@@ -1845,6 +1845,10 @@ bool xFileSys::openPak(const char* pName)
         pakMode = PakMode::MEMORY;
     }
 
+    if (hdr.flags.IsSet(AssetPak::APakFlag::HINT_MEMORY)) {
+        pakMode = PakMode::MEMORY;
+    }
+
     if (pakMode == PakMode::MEMORY) {
         if (hdr.size > std::numeric_limits<int32_t>::max()) {
             core::HumanSize::Str str;
