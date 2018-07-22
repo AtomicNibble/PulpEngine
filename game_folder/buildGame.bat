@@ -13,19 +13,19 @@ set ABS_PATH=%CD%
 popd
 
 REM convert all the assets...
-REM "%ABS_PATH%\engine_Converter.exe" +mode all +mod core +profile release +nopause
+"%ABS_PATH%\engine_Converter.exe" +mode all +mod core +profile release +nopause
 
 REM build all shader perms...
 "%ABS_PATH%\engine_ShaderCompiler.exe" +mode all +nopause
 
 REM build levels...
-REM "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
+"%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
 REM pack them up!
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\core +nopause +nocompress +mod core
 
 REM build sound packs...
-REM "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
+"%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
 
 mkdir build
 mkdir build\core_assets
