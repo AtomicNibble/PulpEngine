@@ -52,7 +52,7 @@ PS_OUTPUT ps_main( VS_OUTPUT IN )
     return output;
 }
 
-
+#if X_TEXTURED
 float LinearizeDepth(float2 uv)
 {
     float zNear = 1;
@@ -65,6 +65,7 @@ float LinearizeDepth(float2 uv)
 
     return (2.0 * zNear) / (zFar + zNear - depth * (zFar - zNear));
 }
+#endif // !X_TEXTURED
 
 PS_OUTPUT ps_depth( VS_OUTPUT IN )
 {
