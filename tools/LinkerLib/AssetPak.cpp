@@ -63,6 +63,19 @@ namespace
             keep ? "^8<keep>" : "^1<original>");
     }
 
+    void hashAsset_job(Asset* pAssets, size_t num)
+    {
+        core::Hash::xxHash64 hasher;
+
+        for (size_t i = 0; i < num; i++)
+        {
+            auto& asset = pAssets[i];
+
+            hasher.reset();
+            asset.hash = hasher.calc(asset.data.data(), asset.data.size());
+        }
+    }
+
 } // namespace
 
 Asset::Asset(AssetId id, const core::string& name, core::string&& relativePath,
@@ -72,7 +85,8 @@ Asset::Asset(AssetId id, const core::string& name, core::string&& relativePath,
     id(id),
     type(type),
     infaltedSize(data.size()),
-    data(std::move(data))
+    data(std::move(data)),
+    hash(0)
 {
     X_ASSERT(infaltedSize > 0, "size is zero")(infaltedSize, data.size(), this->data.size()); 
     X_UNUSED(arena);
@@ -210,6 +224,15 @@ bool AssetPakBuilder::process(void)
 
     auto* pJobSys = gEnv->pJobSys;
 
+    // hash the assets.
+    {
+        X_LOG1("AssetPak", "Calculating raw hashes");
+
+        auto* pJob = pJobSys->parallel_for(assets_.data(), assets_.size(), hashAsset_job, core::V2::CountSplitter(4)
+            JOB_SYS_SUB_ARG(core::profiler::SubSys::TOOL));
+
+        pJobSys->RunAndWait(pJob);
+    }
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION)) {
 
         // compression.

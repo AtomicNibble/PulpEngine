@@ -5,6 +5,8 @@
 
 #include <ICompression.h>
 
+#include <Hashing\xxHash.h>
+
 X_NAMESPACE_BEGIN(AssetPak)
 
 X_DECLARE_FLAGS(PakBuilderFlag)
@@ -15,6 +17,8 @@ X_DECLARE_FLAGS(PakBuilderFlag)
 typedef Flags<PakBuilderFlag> PakBuilderFlags;
 
 typedef core::Array<uint8_t> DataVec;
+
+typedef core::Hash::xxHash64Val AssetHash;
 
 struct Asset
 {
@@ -34,6 +38,8 @@ struct Asset
 
     size_t infaltedSize;
     DataVec data; // may be compressed.
+
+    AssetHash hash;
 };
 
 struct SharedDict
