@@ -368,6 +368,7 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     core::ByteStream strings(arena_);
     core::ByteStream entries(arena_);
     core::ByteStream sharedDictsData(arena_);
+    core::ByteStream hashes(arena_);
     core::ByteStream data(arena_);
 
     // write all the strings.
@@ -457,6 +458,17 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
         sharedDictsData.alignWrite(PAK_ASSET_PADDING);
     }
 
+    // assets hashes.
+    {
+        hashes.reserve(sizeof(AssetHash) * assets_.size());
+
+        for (const auto& a : assets_) {
+            hashes.write(a.hash);
+        }
+
+        hashes.alignWrite(PAK_BLOCK_PADDING);
+    }
+
     // write all the asset data.
     {
         for (const auto& a : assets_) {
@@ -481,7 +493,8 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     // calculate the offsets of the data.
     const uint64_t entryTableOffset = core::bitUtil::RoundUpToMultiple(sizeof(hdr) + strings.size(), PAK_BLOCK_PADDING);
     const uint64_t dictsOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(entryTableOffset + entryTablesize, PAK_BLOCK_PADDING);
-    const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(dictsOffset + sharedDictsData.size(), PAK_BLOCK_PADDING);
+    const uint64_t hashesOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(dictsOffset + sharedDictsData.size(), PAK_BLOCK_PADDING);
+    const uint64_t dataOffset = core::bitUtil::RoundUpToMultiple<uint64_t>(hashesOffset + hashes.size(), PAK_BLOCK_PADDING);
 
     uint64_t totalFileSize = 0;
     totalFileSize += sizeof(hdr);
@@ -490,6 +503,8 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     totalFileSize += entryTablesize;
     totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
     totalFileSize += sharedDictsData.size();
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
+    totalFileSize += hashes.size();
     totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
     totalFileSize += dataSize;
 
@@ -547,6 +562,13 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
             X_ERROR("AssetPak", "Failed to write data");
             return false;
         }
+    }
+
+    X_ASSERT_ALIGNMENT(file.tell(), PAK_BLOCK_PADDING, 0);
+
+    if (file.write(hashes.data(), hashes.size()) != hashes.size()) {
+        X_ERROR("AssetPak", "Failed to write data");
+        return false;
     }
 
     X_ASSERT_ALIGNMENT(file.tell(), PAK_BLOCK_PADDING, 0);
