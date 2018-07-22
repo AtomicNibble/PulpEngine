@@ -83,7 +83,13 @@ X_NAMESPACE_BEGIN(AssetPak)
 //		max_total_size:		(1 << 32 * 64) 256gb
 //		max_asset_size:		1 << 32
 //
+//  Version History:
 //
+//      Version 1:
+//                  base version
+//      Version 2:
+//                  Added global COMPRESSED flag
+//                  Added asset hash table.
 //
 //	How do i want looks to work?
 //  I want to be able to ask for a file and open it.
@@ -91,7 +97,7 @@ X_NAMESPACE_BEGIN(AssetPak)
 //  basically want a hash index i think.
 
 static const uint32_t PAK_MAGIC = core::X_FOURCC<uint32_t>('a', 'p', 'a', 'k');
-static const uint8_t PAK_VERSION = 1;
+static const uint8_t PAK_VERSION = 2;
 static const char* PAK_FILE_EXTENSION = "apak";
 
 static const size_t PAK_BLOCK_PADDING = 16; // each section of the pak file is aligned to this, aka string / entry data.
@@ -133,7 +139,7 @@ X_DECLARE_FLAGS8(APakFlag)
     DIRTY,
     FAST_UPDATE,
     FULL_LOAD,
-    SHARED_DICTS // Pack contains shared dictonaries.
+    SHARED_DICTS           // Pack contains shared dictonaries.
 );
 
 typedef Flags8<APakFlag> APakFlags;
@@ -172,6 +178,12 @@ struct APakHeader
     X_INLINE bool isCompressed(void) const
     {
         return size != inflatedSize;
+    }
+    X_INLINE bool hasCompressedAssets(void) const
+    {
+        return std::any_of(algos.begin(), algos.end(), [](core::Compression::Algo::Enum algo) -> bool {
+            return algo != core::Compression::Algo::STORE;
+        });
     }
 
     uint32_t magic;

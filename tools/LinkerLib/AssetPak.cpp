@@ -129,6 +129,7 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     // dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
 
     assetCounts_.fill(0);
+    compressedAssetCounts_.fill(0);
 }
 
 AssetPakBuilder::~AssetPakBuilder()
@@ -233,6 +234,8 @@ bool AssetPakBuilder::process(void)
 
         pJobSys->RunAndWait(pJob);
     }
+
+
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION)) {
 
         // compression.
@@ -340,12 +343,27 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     hdr.modified = core::DateTimeStampSmall::systemDateTime();
 
     for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
-        if (!compression_[i].enabled) {
+        auto type = static_cast<AssetType::Enum>(i);
+
+        X_ASSERT(compressedAssetCounts_[type] <= assetCounts_[type], "More compressed assets than assets")(compressedAssetCounts_[type], assetCounts_[type]);
+
+        if (!compression_[type].enabled) {
             continue;
         }
 
-        hdr.algos[i] = compression_[i].algo;
+        if (!compressedAssetCounts_[type]) {
+            X_WARNING("AssetPak", "Compression was enabled for \"%s\" but no compressed versions where kept", AssetType::ToString(type));
+            continue;
+        }
+
+        hdr.algos[type] = compression_[type].algo;
     }
+
+    {
+        bool compressed = (core::accumulate(compressedAssetCounts_.begin(), compressedAssetCounts_.end(), 0_sz) > 0);
+        X_ASSERT(compressed == hdr.hasCompressedAssets(), "Logic error")(compressed, hdr.hasCompressedAssets());
+    }
+    
 
     core::ByteStream strings(arena_);
     core::ByteStream entries(arena_);
