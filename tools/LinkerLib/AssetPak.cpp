@@ -529,6 +529,7 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     hdr.stringDataOffset = sizeof(hdr);
     hdr.entryTableOffset = safe_static_cast<uint32_t>(entryTableOffset);
     hdr.dictOffset = safe_static_cast<uint32_t>(dictsOffset);
+    hdr.hashesOffset = safe_static_cast<uint32_t>(hashesOffset);
     hdr.dataOffset = safe_static_cast<uint32_t>(dataOffset);
 
     if (totalFileSize > 1024 * 1024 * 100) {

@@ -199,12 +199,13 @@ struct APakHeader
     uint32_t stringDataOffset;
     uint32_t entryTableOffset;
     uint32_t dictOffset;
+    uint32_t hashesOffset;
     uint32_t dataOffset;
 
     // not needed to unpack, just meta data.
     CompressionAlgoArr algos;
 
-    uint8_t pad[12];
+    uint8_t pad[8];
 };
 
 struct APakStrPool
