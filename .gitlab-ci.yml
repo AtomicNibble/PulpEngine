@@ -255,7 +255,7 @@ test:x64_super:
    - test
 
 
-build:x64_super:
+pack:x64_super:
   stage: test
   script:
    - 'cd "game_folder'
