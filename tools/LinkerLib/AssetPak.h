@@ -86,6 +86,9 @@ private:
     CompressionOptionsArr compression_;
     SharedDicArr dictonaries_;
     AssetCountArr assetCounts_;
+
+    uint64_t defaltedAssetSize_;
+    uint64_t infaltedAssetSize_;
 };
 
 X_NAMESPACE_END

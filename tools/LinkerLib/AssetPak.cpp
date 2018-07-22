@@ -87,7 +87,9 @@ SharedDict::SharedDict(core::MemoryArenaBase* arena) :
 
 AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     arena_(arena),
-    assets_(arena)
+    assets_(arena),
+    defaltedAssetSize_(0),
+    infaltedAssetSize_(0)
 {
     assets_.reserve(1024);
 
@@ -248,6 +250,30 @@ bool AssetPakBuilder::process(void)
     std::sort(assets_.begin(), assets_.end(), [](const Asset& a, const Asset& b) {
         return a.data.size() < b.data.size();
     });
+
+    X_LOG1("AssetPak", "Calculating sizes");
+
+    {
+        uint64_t defaltedSize = 0;
+        uint64_t infaltedSize = 0;
+
+        for (const auto& a : assets_) {
+            infaltedSize += a.infaltedSize;
+            defaltedSize += a.data.size();
+
+            int32_t isCompressed = (a.infaltedSize > a.data.size());
+
+            compressedAssetCounts_[a.type] += isCompressed;
+        }
+
+        defaltedAssetSize_ = defaltedSize;
+        infaltedAssetSize_ = infaltedSize;
+    }
+
+    if (!flags_.IsSet(PakBuilderFlag::COMPRESSION))
+    {
+        X_ASSERT(defaltedAssetSize_ == infaltedAssetSize_, "Should be identical")(defaltedAssetSize_, infaltedAssetSize_);
+    }
 
     return true;
 }
@@ -495,22 +521,13 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     }
 
     // some stats.
-
-    core::HumanSize::Str sizeStr0, sizeStr1;
     X_LOG0("AssetPak", "Stats:");
     X_LOG_BULLET;
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
     {
-        uint64_t defaltedSize = 0;
-        uint64_t infaltedSize = 0;
-
-        for (const auto& a : assets_) {
-            infaltedSize += a.infaltedSize;
-            defaltedSize += a.data.size();
-        }
-
-        X_LOG0("AssetPak", "RawAssetSize:        ^6%s", core::HumanSize::toString(sizeStr0, infaltedSize));
-        X_LOG0("AssetPak", "CompressedAssetSize: ^6%s", core::HumanSize::toString(sizeStr1, defaltedSize));
+        core::HumanSize::Str sizeStr0, sizeStr1;
+        X_LOG0("AssetPak", "RawAssetSize:        ^6%s", core::HumanSize::toString(sizeStr0, infaltedAssetSize_));
+        X_LOG0("AssetPak", "CompressedAssetSize: ^6%s", core::HumanSize::toString(sizeStr1, defaltedAssetSize_));
     }
 
     X_LOG0("AssetPak", "%-16s %-8s", "Type", "Num");
