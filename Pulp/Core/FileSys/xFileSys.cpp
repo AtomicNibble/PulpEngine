@@ -1832,6 +1832,11 @@ bool xFileSys::openPak(const char* pName)
         return false;
     }
 
+    if (hdr.size != hdr.inflatedSize) {
+        X_ERROR("FileSys", "Compressed Paks not currently supported");
+        return false;
+    }
+
     // for now switch to memory loading if below setting.
     // dunno if want to be more smart about which pak's we load to memory..
     PakMode::Enum pakMode = PakMode::STREAM;
