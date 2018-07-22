@@ -15,6 +15,9 @@ popd
 REM convert all the assets...
 REM "%ABS_PATH%\engine_Converter.exe" +mode all +mod core +profile release +nopause
 
+REM build all shader perms...
+"%ABS_PATH%\engine_ShaderCompiler.exe" +mode all +nopause
+
 REM build levels...
 REM "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
@@ -44,6 +47,15 @@ xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
 xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
 xcopy /y /i /s /e /d "core_assets\scripts" "build\core_assets\scripts"
+
+del /s /q /f "build\core_assets\sound\*.xml"
+del /s /q /f "build\core_assets\sound\*.json"
+del /s /q /f "build\core_assets\sound\*.txt"
+
+rmdir /s /q "build\core_assets\shaders\old"
+rmdir /s /q "build\core_assets\shaders\temp"
+
+del /s /q game.7z
 
 "C:\Program Files\7-Zip\7z.exe" a -r -m0=lzma2 -mmt=6 -mx=2 game "./build/*"
 
