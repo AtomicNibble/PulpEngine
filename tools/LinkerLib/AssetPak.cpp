@@ -498,14 +498,10 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
 
     uint64_t totalFileSize = 0;
     totalFileSize += sizeof(hdr);
-    totalFileSize += stringDataSize;
-    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
-    totalFileSize += entryTablesize;
-    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
-    totalFileSize += sharedDictsData.size();
-    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
-    totalFileSize += hashes.size();
-    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize, PAK_BLOCK_PADDING);
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize + stringDataSize, PAK_BLOCK_PADDING);
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize + entryTablesize, PAK_BLOCK_PADDING);
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize + sharedDictsData.size(), PAK_BLOCK_PADDING);
+    totalFileSize = core::bitUtil::RoundUpToMultiple<uint64_t>(totalFileSize + hashes.size(), PAK_BLOCK_PADDING);
     totalFileSize += dataSize;
 
     if (totalFileSize > PAK_MAX_SIZE) {
