@@ -342,21 +342,24 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     hdr.numAssets = safe_static_cast<uint32_t>(assets_.size());
     hdr.modified = core::DateTimeStampSmall::systemDateTime();
 
-    for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
-        auto type = static_cast<AssetType::Enum>(i);
+    if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
+    {
+        for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
+            auto type = static_cast<AssetType::Enum>(i);
 
-        X_ASSERT(compressedAssetCounts_[type] <= assetCounts_[type], "More compressed assets than assets")(compressedAssetCounts_[type], assetCounts_[type]);
+            X_ASSERT(compressedAssetCounts_[type] <= assetCounts_[type], "More compressed assets than assets")(compressedAssetCounts_[type], assetCounts_[type]);
 
-        if (!compression_[type].enabled) {
-            continue;
+            if (!compression_[type].enabled) {
+                continue;
+            }
+
+            if (!compressedAssetCounts_[type]) {
+                X_WARNING("AssetPak", "Compression was enabled for \"%s\" but no compressed versions where kept", AssetType::ToString(type));
+                continue;
+            }
+
+            hdr.algos[type] = compression_[type].algo;
         }
-
-        if (!compressedAssetCounts_[type]) {
-            X_WARNING("AssetPak", "Compression was enabled for \"%s\" but no compressed versions where kept", AssetType::ToString(type));
-            continue;
-        }
-
-        hdr.algos[type] = compression_[type].algo;
     }
 
     {
