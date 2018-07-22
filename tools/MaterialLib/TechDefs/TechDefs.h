@@ -53,6 +53,7 @@ namespace techset
 
         static bool loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut);
         static bool loadFile(const core::Path<char>& path, FileBuf& bufOut);
+        static void getTechCatPath(MaterialCat::Enum cat, core::Path<char>& path);
 
         bool includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath);
 

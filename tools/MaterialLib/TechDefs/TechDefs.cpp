@@ -51,9 +51,8 @@ namespace techset
     {
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        core::Path<char> path(TECH_DEFS_DIR);
-        path /= MaterialCat::ToString(cat);
-        path.toLower();
+        core::Path<char> path;
+        getTechCatPath(cat, path);
 
         return gEnv->pFileSys->directoryExists(path.c_str());
     }
@@ -64,9 +63,8 @@ namespace techset
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        core::Path<char> path(TECH_DEFS_DIR);
-        path /= MaterialCat::ToString(cat);
-        path.toLower();
+        core::Path<char> path;
+        getTechCatPath(cat, path);
 
         if (gEnv->pFileSys->directoryExists(path.c_str())) {
             if (loadTechCat(cat, typesOut)) {
@@ -131,8 +129,8 @@ namespace techset
 
     bool TechSetDefs::loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut)
     {
-        core::Path<char> path(TECH_DEFS_DIR);
-        path /= MaterialCat::ToString(cat);
+        core::Path<char> path;
+        getTechCatPath(cat, path);
         path.ensureSlash();
         path.appendFmt("*.%s", TECH_DEFS_FILE_EXTENSION);
         path.toLower();
@@ -167,7 +165,10 @@ namespace techset
         core::XFileScoped file;
         core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
 
-        core::Path<char> fullPath(TECH_DEFS_DIR);
+        core::Path<char> fullPath;
+        fullPath.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));
+        fullPath.append('s', 1);
+        fullPath.toLower();
         fullPath /= path;
 
         if (!file.openFile(fullPath.c_str(), mode)) {
@@ -185,6 +186,16 @@ namespace techset
         }
 
         return true;
+    }
+
+    void TechSetDefs::getTechCatPath(MaterialCat::Enum cat, core::Path<char>& path)
+    {
+        path.clear();
+        path.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));
+        path.append('s', 1);
+        path.toLower();
+        path /= MaterialCat::ToString(cat);
+        path.toLower();
     }
 
     TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
