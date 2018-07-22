@@ -16,8 +16,82 @@ before_script:
 
 stages:
  - build
- - pack
+ - build_edtior
+ - test
 
+
+build:win32_debug:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
+    -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/Win32/Debug/*.exe
+    - build/Win32/Debug/*.dll
+    - build/Win32/Debug/*.pdb
+  tags:
+    - windows
+
+build:win32_release:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/Win32/Release/*.exe
+    - build/Win32/Release/*.dll
+  tags:
+    - windows
+
+build:win32_super:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=win32
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/Win32/Super/*.exe
+    - build/Win32/Super/*.dll
+  tags:
+    - windows
+
+
+build:x64_debug:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Debug/*.exe
+    - build/x64/Debug/*.dll
+    - build/x64/Debug/*.pdb
+  tags:
+    - windows
+
+build:x64_release:
+  stage: build
+  script:
+    - echo building...
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Release/*.exe
+    - build/x64/Release/*.dll
+  tags:
+    - windows
 
 build:x64_super:
   stage: build
@@ -33,19 +107,149 @@ build:x64_super:
   tags:
     - windows
 
-
-
-pack:x64_super:
-  stage: pack
+build_edtior:x64_debug:
+  stage: build_edtior
   script:
-   - 'cd "game_folder'
-   - buildGame.bat
+    - echo building...
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Debug;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Debug/*.exe
+  tags:
+    - windows, qt
+
+
+build_edtior:x64_release:
+  stage: build_edtior
+  script:
+    - echo building...
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Release;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Release/*.exe
+  tags:
+    - windows, qt
+
+
+build_edtior:x64_super:
+  stage: build_edtior
+  script:
+    - echo building...
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
+    -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
+  artifacts:
+   expire_in: 1 week
+   paths:
+    - build/x64/Super/*.exe
+  tags:
+    - windows, qt
+
+
+
+
+test:win32_debug:
+  stage: test
+  script:
+   - echo "testing (win32 Debug)"
+   -  'cd "build/win32/Debug/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
     expire_in: 1 week
     paths:
-    - game.7z
+    - build/Win32/Debug/*.xml
+  dependencies:
+    - build:win32_debug
+  tags:
+   - windows
+   - test
+
+test:win32_release:
+  stage: test
+  script:
+   - echo "testing (win32 Release)"
+   -  'cd "build/win32/Release/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+    - build/Win32/Release/*.xml
+  dependencies:
+    - build:win32_release
+  tags:
+   - windows
+   - test
+
+test:win32_super:
+  stage: test
+  script:
+   - echo "testing (win32 Super)"
+   -  'cd "build/win32/Super/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+    - build/Win32/Super/*.xml
+  dependencies:
+    - build:win32_super
+  tags:
+   - windows
+   - test
+
+test:x64_debug:
+  stage: test
+  script:
+   - echo "testing (x64 Debug)"
+   -  'cd "build/x64/Debug/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+    - build/x64/Debug/*.xml
+  dependencies:
+    - build:x64_debug
+  tags:
+   - windows
+   - test
+
+test:x64_release:
+  stage: test
+  script:
+   - echo "testing (x64 Release)"
+   -  'cd "build/x64/Release/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+    - build/x64/Release/*.xml
+  dependencies:
+    - build:x64_release
+  tags:
+   - windows
+   - test
+
+test:x64_super:
+  stage: test
+  script:
+   - echo "testing (x64 Super)"
+   -  'cd "build/x64/Super/'
+   - engine_UnitTester.exe +fs_basepath "..\..\..\game_folder" -CI --gtest_output="xml:report.xml"
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths:
+    - build/x64/Super/*.xml
   dependencies:
     - build:x64_super
   tags:
    - windows
-  when: manual
+   - test
+
