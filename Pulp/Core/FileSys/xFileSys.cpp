@@ -132,6 +132,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     gameDir_(nullptr),
     searchPaths_(nullptr),
+    loadPacks_(false),
     // ..
     filePoolHeap_(
         bitUtil::RoundUpToMultiple<size_t>(
@@ -232,29 +233,9 @@ void xFileSys::shutDown(void)
 
 bool xFileSys::initDirectorys(bool working)
 {
-    // check if game dir set via cmd line.
-    const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
-    if (pGameDir) {
-        core::Path<wchar_t> base(pGameDir);
-        base.ensureSlash();
+    loadPacks_ = !working; // TODO: work out somethign better? basically only want packs in game and maybe some tools?
 
-        core::Path<wchar_t> core(base);
-        core /= L"core_assets\\";
-
-        core::Path<wchar_t> mod(base);
-        mod /= L"mod\\";
-
-        core::Path<wchar_t> testAssets(base);
-        testAssets /= L"test_assets\\";
-
-        if (setGameDir(core.c_str())) {
-            // add mod dir's
-            addModDir(mod.c_str());
-            addModDir(testAssets.c_str());
-            return true;
-        }
-    }
-    else if (working) {
+    if (working) {
         // working dir added.
         core::Path<wchar_t> path = PathUtil::GetCurrentDirectory();
         return setGameDir(path.c_str());
@@ -263,22 +244,21 @@ bool xFileSys::initDirectorys(bool working)
         
         core::Path<wchar_t> curDir = PathUtil::GetCurrentDirectory();
 
+        const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
+        if (pGameDir) {
+            curDir = pGameDir;
+        }
+
         core::Path<wchar_t> base(curDir);
-        // base /= L"\\..\\..\\..\\potatoengine\\game_folder\\";
+        base.ensureSlash();
 
         core::Path<wchar_t> core(base);
         core /= L"core_assets\\";
 
-        // core::Path<wchar_t> mod(base);
-        // mod /= L"mod\\";
-
         core::Path<wchar_t> testAssets(base);
         testAssets /= L"test_assets\\";
 
-        // TODO: yup.
         if (setGameDir(core.c_str())) {
-            // add mod dir's
-       //     addModDir(mod.c_str());
             addModDir(testAssets.c_str());
             return true;
         }
@@ -651,6 +631,10 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 
     // add hotreload dir.
     gEnv->pDirWatcher->addDirectory(fixedPath.c_str());
+
+    if (!loadPacks_) {
+        return;
+    }
 
     // Load packs.
     auto searchPath = fixedPath;
@@ -1809,6 +1793,8 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, Virtua
 
 bool xFileSys::openPak(const char* pName)
 {
+    X_ERROR("FileSys", "Mounting pak: \"%s\"", pName);
+
     // you can only open pak's from inside the virtual filesystem.
     // so file is opened as normal.
     fileModeFlags mode;

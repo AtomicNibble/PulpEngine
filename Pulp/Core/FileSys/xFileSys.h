@@ -377,6 +377,7 @@ private:
 
     Directory* gameDir_;
     Search* searchPaths_;
+    bool loadPacks_;
 
     XFileSysVars vars_;
 
