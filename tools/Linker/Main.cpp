@@ -122,7 +122,7 @@ namespace
 
         const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
         if (pModName) {
-            options.mod = core::strUtil::Convert(pAssetList, buf);
+            options.mod = core::strUtil::Convert(pModName, buf);
         }
 
         return true;
