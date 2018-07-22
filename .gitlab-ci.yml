@@ -256,7 +256,7 @@ test:x64_super:
 
 
 pack:x64_super:
-  stage: test
+  stage: pack
   script:
    - 'cd "game_folder'
    - buildGame.bat
