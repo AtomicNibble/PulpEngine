@@ -88,7 +88,7 @@ X_NAMESPACE_BEGIN(AssetPak)
 //      Version 1:
 //                  base version
 //      Version 2:
-//                  Added global COMPRESSED flag
+//                  Added HINT_MEMORY flag
 //                  Added asset hash table.
 //
 //	How do i want looks to work?
@@ -139,7 +139,8 @@ X_DECLARE_FLAGS8(APakFlag)
     DIRTY,
     FAST_UPDATE,
     FULL_LOAD,
-    SHARED_DICTS           // Pack contains shared dictonaries.
+    SHARED_DICTS,           // Pack contains shared dictonaries.
+    HINT_MEMORY             // A hint that this pak should be kept in memory     
 );
 
 typedef Flags8<APakFlag> APakFlags;
