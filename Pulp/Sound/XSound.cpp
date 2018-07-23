@@ -37,21 +37,16 @@ X_ENABLE_WARNING(4505)
 #if PLUGIN_All == 0
 #define PLUGIN_Codec 1
 #define PLUGIN_Effect 1
-#define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
-#define PLUGIN_Source_mp3 0
 #define PLUGIN_Auro 0
 #else
 #define PLUGIN_Codec 1
 #define PLUGIN_Effect 1
-#define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
-#define PLUGIN_Source_mp3 0
-#define PLUGIN_Auro 0
+#define PLUGIN_Auro 1
 #endif // !PLUGIN_All
 
 // link the libs..
-X_LINK_LIB("dinput8");
 
 // engine
 X_LINK_LIB("AkMusicEngine");
@@ -68,45 +63,46 @@ X_LINK_LIB("AkVorbisDecoder");
 #endif // !PLUGIN_Codec
 
 // source
-X_LINK_LIB("AkSilenceSource");
-#if PLUGIN_Source_mp3
-X_LINK_LIB("AkMP3Source");
-#endif // !PLUGIN_Source_mp3
-X_LINK_LIB("AkToneSource");
 X_LINK_LIB("AkAudioInputSource");
+X_LINK_LIB("AkSilenceSource");
 X_LINK_LIB("AkSineSource");
+X_LINK_LIB("AkSoundSeedWindSource");
+X_LINK_LIB("AkSoundSeedWooshSource");
+X_LINK_LIB("AkSynthOneSource");
+X_LINK_LIB("AkToneSource");
 
 // fx
-// X_LINK_LIB("AkConvolutionReverbFX");
+X_LINK_LIB("AkCompressorFX");
+X_LINK_LIB("AkDelayFX");
+X_LINK_LIB("AkExpanderFX");
 X_LINK_LIB("AkFlangerFX");
+X_LINK_LIB("AkGainFX");
+X_LINK_LIB("AkGuitarDistortionFX");
+X_LINK_LIB("AkHarmonizerFX");
+X_LINK_LIB("AkMatrixReverbFX");
+X_LINK_LIB("AkMeterFX");
+X_LINK_LIB("AkParametricEQFX");
+X_LINK_LIB("AkPeakLimiterFX");
+X_LINK_LIB("AkPitchShifterFX");
+X_LINK_LIB("AkRoomVerbFX");
+X_LINK_LIB("AkSoundSeedImpactFX");
+X_LINK_LIB("AkStereoDelayFX");
+X_LINK_LIB("AkTimeStretchFX");
 X_LINK_LIB("AkTremoloFX");
+
+
+X_LINK_LIB("McDSPFutzBoxFX");
+X_LINK_LIB("McDSPLimiterFX");
+
 #if PLUGIN_Auro
 X_LINK_LIB("AuroHeadphoneFX");
 #endif // !PLUGIN_Auro
-X_LINK_LIB("AkStereoDelayFX");
-X_LINK_LIB("AkGuitarDistortionFX");
-X_LINK_LIB("AkSoundSeedImpactFX");
-X_LINK_LIB("AkRoomVerbFX");
-X_LINK_LIB("AkParametricEQFX");
-X_LINK_LIB("AkCompressorFX");
-X_LINK_LIB("AkPitchShifterFX");
-X_LINK_LIB("AkPeakLimiterFX");
-X_LINK_LIB("AkDelayFX");
-X_LINK_LIB("AkGainFX");
-X_LINK_LIB("AkMeterFX");
-X_LINK_LIB("AkMatrixReverbFX");
-X_LINK_LIB("AkHarmonizerFX");
-X_LINK_LIB("AkTimeStretchFX");
-X_LINK_LIB("AkExpanderFX");
-X_LINK_LIB("McDSPFutzBoxFX");
-X_LINK_LIB("McDSPLimiterFX");
-// X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
+
 
 // new?
-X_LINK_LIB("AkSynthOneSource");
 X_LINK_LIB("AkMotionGeneratorSource");
-X_LINK_LIB("AkRecorderFX");
 X_LINK_LIB("AkMotionSink");
+X_LINK_LIB("AkRecorderFX");
 
 
 // fx2
@@ -124,21 +120,9 @@ X_LINK_LIB("iZTrashFiltersFX");
 #if PLUGIN_Auro
 X_LINK_LIB("AuroPannerMixer");
 #endif // !PLUGIN_Auro
-//X_LINK_LIB("AkSoundSeedWoosh");
-//X_LINK_LIB("AkSynthOne");
-//X_LINK_LIB("AkMotionGenerator");
-//X_LINK_LIB("AkSoundSeedWind");
-//X_LINK_LIB("IOSONOProximityMixer");
 
-// rumble
-#if PLUGIN_Rumble
-X_LINK_LIB("AkRumble");
-#endif // !PLUGIN_Rumble
-
-// devices
-#if PLUGIN_Source_mp3
-X_LINK_LIB("msacm32");
-#endif // !PLUGIN_Source_mp3
+// platform
+X_LINK_LIB("dinput8");
 X_LINK_LIB("dxguid");
 
 #if X_SUPER == 0
