@@ -11,16 +11,19 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
-    class XGui : public IGui, core::AssetBase
+    class XGui : public IGui, public core::AssetBase
     {
     public:
         XGui(core::string& name);
         ~XGui() X_OVERRIDE;
 
-        void Draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
+        void draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
+
+        bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
     private:
-
+        core::UniquePointer<char[]> data_;
+        uint32_t dataSize_;
     };
 
 

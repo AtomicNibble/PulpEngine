@@ -109,7 +109,7 @@ namespace gui
     {
         virtual ~IGui() = default;
 
-        virtual void Draw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
+        virtual void draw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
     };
 
     struct IGuiManger
@@ -121,6 +121,10 @@ namespace gui
 
         virtual IGui* loadGui(const char* pName) X_ABSTRACT;
         virtual IGui* findGui(const char* pName) X_ABSTRACT;
+
+        virtual void releaseGui(IGui* pGui) X_ABSTRACT;
+
+        virtual bool waitForLoad(IGui* pGui) X_ABSTRACT;
 
         virtual void listGuis(const char* pWildcardSearch = nullptr) const X_ABSTRACT;
     };

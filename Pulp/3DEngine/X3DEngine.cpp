@@ -815,6 +815,11 @@ fx::IEffectManager* X3DEngine::getEffectManager(void)
     return pEffectManager_;
 }
 
+gui::IGuiManger* X3DEngine::getGuiManager(void)
+{
+    return pGuiManger_;
+}
+
 IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)
 {
     auto* pPrimContex = &primContexts_[engine::PrimContext::MISC3D];

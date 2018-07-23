@@ -12,10 +12,11 @@
 #include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_DECLARE(core,
-                    struct IConsoleCmdArgs;)
+                    struct IConsoleCmdArgs)
 
 X_NAMESPACE_DECLARE(anim,
-                    class AnimManager;)
+                    class AnimManager)
+
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -54,6 +55,7 @@ public:
     model::IModelManager* getModelManager(void) X_FINAL;
     anim::IAnimManager* getAnimManager(void) X_FINAL;
     fx::IEffectManager* getEffectManager(void) X_FINAL;
+    gui::IGuiManger* getGuiManager(void) X_FINAL;
 
     IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
     void release3DWorld(IWorld3D* pWorld) X_FINAL;
