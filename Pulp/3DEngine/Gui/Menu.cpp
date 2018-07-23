@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "Gui.h"
+#include "Menu.h"
 
 #include <IRender.h>
 #include <IPrimativeContext.h>
@@ -11,16 +11,16 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
-    XGui::XGui(core::string& name) :
+    XMenu::XMenu(core::string& name) :
         core::AssetBase(name, assetDb::AssetType::MENU)
     {
     }
 
-    XGui::~XGui()
+    XMenu::~XMenu()
     {
     }
 
-    void XGui::draw(engine::IPrimativeContext* pDrawCon)
+    void XMenu::draw(engine::IPrimativeContext* pDrawCon)
     {
         X_UNUSED(pDrawCon);
 
@@ -29,7 +29,7 @@ namespace gui
 
     }
 
-    bool XGui::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
+    bool XMenu::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
     {
         data_ = std::move(data);
         dataSize_ = dataSize;

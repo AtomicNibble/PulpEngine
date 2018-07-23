@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "GuiManger.h"
+#include "MenuManger.h"
 
 #include <Assets\AssetLoader.h>
 
@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
-    XGuiManager::XGuiManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan) :
+    XMenuManager::XMenuManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan) :
         arena_(arena),
         pMatMan_(pMatMan),
         menus_(arena, sizeof(MenuResource), X_ALIGN_OF(MenuResource), "MenuPool")
@@ -22,16 +22,16 @@ namespace gui
 
     }
 
-    XGuiManager::~XGuiManager()
+    XMenuManager::~XMenuManager()
     {
 
     }
 
-    bool XGuiManager::init(void)
+    bool XMenuManager::init(void)
     {
         X_LOG0("GuiManager", "Starting GUI System");
 
-        ADD_COMMAND_MEMBER("listUi", this, XGuiManager, &XGuiManager::Cmd_ListUis, core::VarFlags::SYSTEM, "List the loaded ui");
+        ADD_COMMAND_MEMBER("listUi", this, XMenuManager, &XMenuManager::Cmd_ListUis, core::VarFlags::SYSTEM, "List the loaded ui");
 
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::MENU, this, MENU_FILE_EXTENSION);
@@ -39,14 +39,14 @@ namespace gui
         return true;
     }
 
-    void XGuiManager::shutdown(void)
+    void XMenuManager::shutdown(void)
     {
         X_LOG0("GuiManager", "Shutting Down");
 
 
     }
 
-    IGui* XGuiManager::loadGui(const char* pName)
+    IMenu* XMenuManager::loadMenu(const char* pName)
     {
         X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
 
@@ -68,7 +68,7 @@ namespace gui
         return pMenu;
     }
 
-    IGui* XGuiManager::findGui(const char* pName)
+    IMenu* XMenuManager::findMenu(const char* pName)
     {
         core::string name(pName);
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
@@ -82,18 +82,18 @@ namespace gui
         return nullptr;
     }
 
-    void XGuiManager::releaseGui(IGui* pGui)
+    void XMenuManager::releaseGui(IMenu* pMenu)
     {
-        MenuResource* pGuiRes = static_cast<MenuResource*>(pGui);
-        if (pGuiRes->removeReference() == 0) {
+        MenuResource* pMenuRes = static_cast<MenuResource*>(pMenu);
+        if (pMenuRes->removeReference() == 0) {
 
-            menus_.releaseAsset(pGuiRes);
+            menus_.releaseAsset(pMenuRes);
         }
     }
 
-    bool XGuiManager::waitForLoad(IGui* pIGui)
+    bool XMenuManager::waitForLoad(IMenu* pIGui)
     {
-        auto* pGui = static_cast<XGui*>(pIGui);
+        auto* pGui = static_cast<XMenu*>(pIGui);
         if (pGui->getStatus() == core::LoadStatus::Complete) {
             return true;
         }
@@ -101,30 +101,30 @@ namespace gui
         return pAssetLoader_->waitForLoad(pGui);
     }
 
-    void XGuiManager::addLoadRequest(MenuResource* pMenu)
+    void XMenuManager::addLoadRequest(MenuResource* pMenu)
     {
         pAssetLoader_->addLoadRequest(pMenu);
     }
 
-    void XGuiManager::onLoadRequestFail(core::AssetBase* pAsset)
+    void XMenuManager::onLoadRequestFail(core::AssetBase* pAsset)
     {
         X_UNUSED(pAsset);
     }
 
-    bool XGuiManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
+    bool XMenuManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
     {
-        auto* pMenu = static_cast<XGui*>(pAsset);
+        auto* pMenu = static_cast<XMenu*>(pAsset);
 
         return pMenu->processData(std::move(data), dataSize);
     }
 
-    void XGuiManager::listGuis(const char* pWildcardSearch) const
+    void XMenuManager::listGuis(const char* pWildcardSearch) const
     {
         X_UNUSED(pWildcardSearch);
     }
 
 
-    void XGuiManager::Cmd_ListUis(core::IConsoleCmdArgs* pArgs)
+    void XMenuManager::Cmd_ListUis(core::IConsoleCmdArgs* pArgs)
     {
         // we support wildcards
         const char* pSearchString = nullptr;

@@ -2,7 +2,7 @@
 
 #include <IGui.h>
 
-#include "Gui.h"
+#include "Menu.h"
 
 #include <Assets\AssertContainer.h>
 #include <IAsyncLoad.h>
@@ -14,29 +14,29 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
-    class XGuiManager : public IGuiManger
+    class XMenuManager : public IMenuManager
         , private core::IAssetLoadSink
     {
-        typedef core::AssetContainer<XGui, MENU_MAX_LOADED, core::SingleThreadPolicy> MenuContainer;
+        typedef core::AssetContainer<XMenu, MENU_MAX_LOADED, core::SingleThreadPolicy> MenuContainer;
         typedef MenuContainer::Resource MenuResource;
 
     public:
-        XGuiManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan);
-        ~XGuiManager() X_FINAL;
+        XMenuManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan);
+        ~XMenuManager() X_FINAL;
 
-        //IGuiManger
+        //IMenuManager
         bool init(void) X_FINAL;
         void shutdown(void) X_FINAL;
 
-        IGui* loadGui(const char* pName) X_FINAL;
-        IGui* findGui(const char* pName) X_FINAL;
+        IMenu* loadMenu(const char* pName) X_FINAL;
+        IMenu* findMenu(const char* pName) X_FINAL;
 
-        void releaseGui(IGui* pGui) X_FINAL;
+        void releaseGui(IMenu* pGui) X_FINAL;
 
-        bool waitForLoad(IGui* pGui) X_FINAL;
+        bool waitForLoad(IMenu* pGui) X_FINAL;
 
         void listGuis(const char* pWildcardSearch = nullptr) const X_FINAL;
-        //~IGuiManger
+        //~IMenuManager
 
     private:
         // load / processing

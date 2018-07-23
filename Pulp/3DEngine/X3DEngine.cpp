@@ -20,7 +20,7 @@
 #include "Model\ModelManager.h"
 #include "Anim\AnimManager.h"
 #include "Particles\FxManager.h"
-#include "Gui\GuiManger.h"
+#include "Gui\MenuManger.h"
 
 #include "CmdBucket.h"
 
@@ -41,7 +41,7 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
     pModelManager_(nullptr),
     pAnimManager_(nullptr),
     pEffectManager_(nullptr),
-    pGuiManger_(nullptr),
+    pMenuManager_(nullptr),
     pCBufMan_(nullptr),
     pVariableStateMan_(nullptr),
     primContexts_{
@@ -113,7 +113,7 @@ bool X3DEngine::init(void)
     pModelManager_ = X_NEW(model::XModelManager, g_3dEngineArena, "ModelManager")(g_3dEngineArena, g_3dEngineArena);
     pAnimManager_ = X_NEW(anim::AnimManager, g_3dEngineArena, "AnimManager")(g_3dEngineArena, g_3dEngineArena);
     pEffectManager_ = X_NEW(fx::EffectManager, g_3dEngineArena, "EffectManager")(g_3dEngineArena, g_3dEngineArena);
-    pGuiManger_ = X_NEW(gui::XGuiManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
+    pMenuManager_ = X_NEW(gui::XMenuManager, g_3dEngineArena, "GuiManager")(g_3dEngineArena, pMaterialManager_);
 
     pTextureManager_->registerCmds();
     pTextureManager_->registerVars();
@@ -126,7 +126,7 @@ bool X3DEngine::init(void)
     pEffectManager_->registerCmds();
     pEffectManager_->registerVars();
 
-    gEngEnv.pGuiMan_ = pGuiManger_;
+    gEngEnv.pMenuMan_ = pMenuManager_;
     gEngEnv.pMaterialMan_ = pMaterialManager_;
     gEngEnv.pTextureMan_ = pTextureManager_;
     gEngEnv.pModelMan_ = pModelManager_;
@@ -151,7 +151,7 @@ bool X3DEngine::init(void)
         if (!pEffectManager_->init()) {
             return false;
         }
-        if (!pGuiManger_->init()) {
+        if (!pMenuManager_->init()) {
             return false;
         }
     }
@@ -206,11 +206,11 @@ void X3DEngine::shutDown(void)
 
     primResources_.releaseResources(pRender, pMaterialManager_);
 
-    if (pGuiManger_) {
-        pGuiManger_->shutdown();
-        X_DELETE(pGuiManger_, g_3dEngineArena);
+    if (pMenuManager_) {
+        pMenuManager_->shutdown();
+        X_DELETE(pMenuManager_, g_3dEngineArena);
 
-        gEngEnv.pGuiMan_ = nullptr;
+        gEngEnv.pMenuMan_ = nullptr;
     }
 
     if (pEffectManager_) {
@@ -815,9 +815,9 @@ fx::IEffectManager* X3DEngine::getEffectManager(void)
     return pEffectManager_;
 }
 
-gui::IGuiManger* X3DEngine::getGuiManager(void)
+gui::IMenuManager* X3DEngine::getMenuManager(void)
 {
-    return pGuiManger_;
+    return pMenuManager_;
 }
 
 IWorld3D* X3DEngine::create3DWorld(physics::IScene* pPhysScene)

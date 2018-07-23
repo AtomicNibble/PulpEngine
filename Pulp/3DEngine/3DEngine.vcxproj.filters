@@ -1,12 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <ClCompile Include="Gui\Gui.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\GuiManger.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -88,14 +82,14 @@
     <ClCompile Include="Particles\Emitter.cpp">
       <Filter>Source Files\Particles</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\MenuManger.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\Menu.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Gui\GuiManger.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\Gui.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="X3DEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -170,6 +164,12 @@
     </ClInclude>
     <ClInclude Include="Particles\Emitter.h">
       <Filter>Header Files\Particles</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\MenuManger.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\Menu.h">
+      <Filter>Header Files\Gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -247,9 +247,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Gui\Gui.inl">
-      <Filter>Header Files\Gui</Filter>
-    </None>
     <None Include="Model\RenderMesh.inl">
       <Filter>Header Files\Model</Filter>
     </None>
@@ -285,6 +282,9 @@
     </None>
     <None Include="Particles\Effect.inl">
       <Filter>Header Files\Particles</Filter>
+    </None>
+    <None Include="Gui\Menu.inl">
+      <Filter>Header Files\Gui</Filter>
     </None>
   </ItemGroup>
 </Project>

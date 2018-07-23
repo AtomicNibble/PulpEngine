@@ -6,7 +6,7 @@ X_NAMESPACE_DECLARE(engine,
                     class CBufferManager;
                     class VariableStateManager;
 
-                    namespace gui { class XGuiManager; }
+                    namespace gui { class XMenuManager; }
 
                     namespace fx {
                         class EffectManager;
@@ -22,7 +22,7 @@ struct EngineEnv
     engine::XMaterialManager* pMaterialMan_;
     engine::TextureManager* pTextureMan_;
     model::XModelManager* pModelMan_;
-    gui::XGuiManager* pGuiMan_;
+    gui::XMenuManager* pMenuMan_;
 
     engine::I3DEngine* p3DEngine_;
     engine::fx::EffectManager* pEffectMan_;

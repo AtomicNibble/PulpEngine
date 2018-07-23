@@ -11,11 +11,11 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
-    class XGui : public IGui, public core::AssetBase
+    class XMenu : public IMenu, public core::AssetBase
     {
     public:
-        XGui(core::string& name);
-        ~XGui() X_OVERRIDE;
+        XMenu(core::string& name);
+        ~XMenu() X_OVERRIDE;
 
         void draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
 
@@ -31,4 +31,4 @@ namespace gui
 
 X_NAMESPACE_END
 
-#include "Gui.inl"
+#include "Menu.inl"

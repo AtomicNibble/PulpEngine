@@ -38,7 +38,7 @@ namespace fx
 
 namespace gui 
 {
-    struct IGuiManger;
+    struct IMenuManager;
 } // namespace gui
 
 struct I3DEngine : public core::IEngineSysBase
@@ -57,7 +57,7 @@ struct I3DEngine : public core::IEngineSysBase
     virtual model::IModelManager* getModelManager(void) X_ABSTRACT;
     virtual anim::IAnimManager* getAnimManager(void) X_ABSTRACT;
     virtual fx::IEffectManager* getEffectManager(void) X_ABSTRACT;
-    virtual gui::IGuiManger* getGuiManager(void) X_ABSTRACT;
+    virtual gui::IMenuManager* getMenuManager(void) X_ABSTRACT;
 
     virtual IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_ABSTRACT;
     virtual void release3DWorld(IWorld3D* pWorld) X_ABSTRACT;

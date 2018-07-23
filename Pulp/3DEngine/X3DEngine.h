@@ -55,7 +55,7 @@ public:
     model::IModelManager* getModelManager(void) X_FINAL;
     anim::IAnimManager* getAnimManager(void) X_FINAL;
     fx::IEffectManager* getEffectManager(void) X_FINAL;
-    gui::IGuiManger* getGuiManager(void) X_FINAL;
+    gui::IMenuManager* getMenuManager(void) X_FINAL;
 
     IWorld3D* create3DWorld(physics::IScene* pPhysScene) X_FINAL;
     void release3DWorld(IWorld3D* pWorld) X_FINAL;
@@ -76,7 +76,7 @@ private:
     anim::AnimManager* pAnimManager_;
     fx::EffectManager* pEffectManager_;
 
-    gui::XGuiManager* pGuiManger_;
+    gui::XMenuManager* pMenuManager_;
 
     CBufferManager* pCBufMan_;
     VariableStateManager* pVariableStateMan_;
