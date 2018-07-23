@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 // AkSpeakerVolumes.h
 
@@ -18,29 +39,7 @@
 
 #include <AK/SoundEngine/Common/AkTypes.h>
 #include <AK/Tools/Common/AkPlatformFuncs.h>
-
-// Multi-channel volumes/mix.
-// ------------------------------------------------
-
-// Platform-specific section.
-//----------------------------------------------------------------------------------------------------
-
-#if defined( AK_XBOX360 )
-
-	#include <AK/SoundEngine/Platforms/XBox360/AkSpeakerVolumes.h>
-
-#elif defined (AK_PS3)
-
-	#include <AK/SoundEngine/Platforms/PS3/AkSpeakerVolumes.h>
-	
-#else
-
-	#include <AK/SoundEngine/Platforms/Generic/AkSpeakerVolumes.h>
-
-#endif
-
-// Cross-platform section.
-//----------------------------------------------------------------------------------------------------
+#include <AK/SoundEngine/Platforms/Generic/AkSpeakerVolumes.h>
 
 namespace AK
 {
@@ -89,6 +88,19 @@ namespace SpeakerVolumes
 			{
 				in_pVolumesDst[uChan] += in_pVolumesSrc[uChan];
 			}
+		}
+
+		/// Compute the sum of all components of a volume vector.
+		AkForceInline AkReal32 L1Norm(ConstVectorPtr io_pVolumes, AkUInt32 in_uNumChannels)
+		{
+			AkReal32 total = 0;
+			AKASSERT((io_pVolumes) || in_uNumChannels == 0);
+			for (AkUInt32 uChan = 0; uChan < in_uNumChannels; uChan++)
+			{
+				total += io_pVolumes[uChan];
+			}
+
+			return total;
 		}
 
 		/// Multiply volume vector with a scalar.
@@ -202,7 +214,7 @@ namespace SpeakerVolumes
 		}
 
 		/// Add all elements of two volume matrices, independently.
-		AkForceInline void Add(AkReal32 * in_pVolumesDst, const AkReal32 * in_pVolumesSrc, AkUInt32 in_uNumChannelsIn, AkUInt32 in_uNumChannelsOut)
+		AkForceInline void Add(MatrixPtr in_pVolumesDst, ConstMatrixPtr in_pVolumesSrc, AkUInt32 in_uNumChannelsIn, AkUInt32 in_uNumChannelsOut)
 		{
 			AkUInt32 uNumElements = Matrix::GetNumElements(in_uNumChannelsIn, in_uNumChannelsOut);
 			AKASSERT((in_pVolumesDst && in_pVolumesSrc) || uNumElements == 0);
@@ -212,14 +224,25 @@ namespace SpeakerVolumes
 			}
 		}
 		
-		/// Get max for all elements of two volume matrices, independently.
-		AkForceInline void Max( AkReal32 * in_pVolumesDst, const AkReal32 * in_pVolumesSrc, AkUInt32 in_uNumChannelsIn, AkUInt32 in_uNumChannelsOut )
+		/// Get absolute max for all elements of two volume matrices, independently.
+		AkForceInline void AbsMax(MatrixPtr in_pVolumesDst, ConstMatrixPtr in_pVolumesSrc, AkUInt32 in_uNumChannelsIn, AkUInt32 in_uNumChannelsOut)
 		{
 			AkUInt32 uNumElements = Matrix::GetNumElements( in_uNumChannelsIn, in_uNumChannelsOut );
 			AKASSERT( ( in_pVolumesDst && in_pVolumesSrc ) || uNumElements == 0 );
 			for ( AkUInt32 uChan = 0; uChan < uNumElements; uChan++ )
 			{
-				in_pVolumesDst[uChan] = AkMax( in_pVolumesDst[uChan], in_pVolumesSrc[uChan] );
+				in_pVolumesDst[uChan] = ((in_pVolumesDst[uChan] * in_pVolumesDst[uChan]) > (in_pVolumesSrc[uChan] * in_pVolumesSrc[uChan])) ? in_pVolumesDst[uChan] : in_pVolumesSrc[uChan];
+			}
+		}
+
+		/// Get max for all elements of two volume matrices, independently.
+		AkForceInline void Max(MatrixPtr in_pVolumesDst, ConstMatrixPtr in_pVolumesSrc, AkUInt32 in_uNumChannelsIn, AkUInt32 in_uNumChannelsOut)
+		{
+			AkUInt32 uNumElements = Matrix::GetNumElements(in_uNumChannelsIn, in_uNumChannelsOut);
+			AKASSERT((in_pVolumesDst && in_pVolumesSrc) || uNumElements == 0);
+			for (AkUInt32 uChan = 0; uChan < uNumElements; uChan++)
+			{
+				in_pVolumesDst[uChan] = (in_pVolumesDst[uChan] > in_pVolumesSrc[uChan]) ? in_pVolumesDst[uChan] : in_pVolumesSrc[uChan];
 			}
 		}
 	}

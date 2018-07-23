@@ -1,15 +1,32 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 #ifndef _AK_BANKREADHELPERS_H_
 #define _AK_BANKREADHELPERS_H_
-
-#ifdef AK_WIIU
-#pragma ghs nowarning 1518
-#endif
 
 /// Read data from bank and advance pointer.
 template< typename T > 
@@ -21,7 +38,7 @@ inline T ReadBankData(
 						)
 {
 	T l_Value;
-#if defined(AK_IOS) || defined(AK_3DS) || defined(AK_ANDROID) || defined(AK_VITA) || defined(AK_LINUX)
+#if defined(AK_IOS) || defined(AK_ANDROID) || defined(AK_LINUX) || defined(__EMSCRIPTEN__) || defined (AK_NX)
 	typedef struct {T t;} __attribute__((__packed__)) packedStruct;
 	l_Value = ((packedStruct *)in_rptr)->t;
 #else
@@ -33,6 +50,36 @@ inline T ReadBankData(
 	in_rSize -= sizeof( T );
 #endif
 	return l_Value;
+}
+
+template< typename T >
+inline T ReadVariableSizeBankData(
+	AkUInt8*& in_rptr
+#ifdef _DEBUG
+	, AkUInt32& in_rSize
+#endif
+	)
+{
+	AkUInt32 l_Value = 0;
+
+	AkUInt8 currentByte = *in_rptr;
+	++in_rptr;
+#ifdef _DEBUG
+	--in_rSize;
+#endif
+	l_Value = (currentByte & 0x7F);
+	while (0x80 & currentByte)
+	{
+		currentByte = *in_rptr;
+		++in_rptr;
+#ifdef _DEBUG
+		--in_rSize;
+#endif
+		l_Value = l_Value << 7;
+		l_Value |= (currentByte & 0x7F);
+	}
+
+	return (T)l_Value;
 }
 
 inline char * ReadBankStringUtf8( 
@@ -75,104 +122,44 @@ inline T ReadUnaligned( const AkUInt8* in_rptr, AkUInt32 in_bytesToSkip = 0 )
 	);
 }
 
-
-#ifdef AK_XBOX360
-/// Handle reading float not aligned on proper memory boundaries (banks are byte packed).
-inline AkReal32 AlignFloat( AkReal32* __unaligned ptr )
-{
-	return *ptr;
-}
-
-/// Read data from bank and advance pointer.
-template<> 
-inline AkReal32 ReadBankData<AkReal32>( 
-									   AkUInt8*& in_rptr
-#ifdef _DEBUG
-									   ,AkUInt32& in_rSize
-#endif
-									   )
-{
-	AkReal32 l_Value = AlignFloat( ( AkReal32* )in_rptr );
-	in_rptr += sizeof( AkReal32 );
-#ifdef _DEBUG
-	in_rSize -= sizeof( AkReal32 );
-#endif
-	return l_Value;
-}
+#ifdef __EMSCRIPTEN__
 
 /// Handle reading float not aligned on proper memory boundaries (banks are byte packed).
-inline AkReal64 AlignFloat( AkReal64* __unaligned ptr )
+inline AkReal64 AlignFloat(AkReal64* ptr)
 {
-	return *ptr;
+	AkReal64 LocalValue;
+
+	// Forcing the char copy instead of the memcpy, as memcpy was optimized....
+	char* pSource = (char*)ptr;
+	char* pDest = (char*)&LocalValue;
+	for( int i = 0; i < 8; ++i)
+	{
+		pDest[i] = pSource[i];
+	}
+
+	//memcpy( &LocalValue, ptr, sizeof( AkReal64 ) );
+	return LocalValue;
 }
 
 /// Read data from bank and advance pointer.
 template<> 
 inline AkReal64 ReadBankData<AkReal64>( 
-									   AkUInt8*& in_rptr
+	AkUInt8*& in_rptr
 #ifdef _DEBUG
-									   ,AkUInt32& in_rSize
+	,AkUInt32& in_rSize
 #endif
-									   )
+	)
 {
-	AkReal64 l_Value = AlignFloat( ( AkReal64* )in_rptr );
+	AkReal64 l_Value = AlignFloat( (AkReal64*)in_rptr );
 	in_rptr += sizeof( AkReal64 );
 #ifdef _DEBUG
 	in_rSize -= sizeof( AkReal64 );
 #endif
 	return l_Value;
 }
+#endif
 
-#endif //AK_XBOX360
-
-#if defined( __SNC__ ) // Valid for both Vita and PS3 (w/SN Compiler)
-	/// Handle reading float not aligned on proper memory boundaries (banks are byte packed).
-	inline AkReal32 AlignFloat( AkReal32 __unaligned * ptr )
-	{
-		return *ptr;
-	}
-	
-	/// Read data from bank and advance pointer.
-	template<> 
-	inline AkReal32 ReadBankData<AkReal32>( 
-										   AkUInt8*& in_rptr
-	#ifdef _DEBUG
-										   ,AkUInt32& in_rSize
-	#endif
-										   )
-	{
-		AkReal32 l_Value = AlignFloat( ( AkReal32* )in_rptr );
-		in_rptr += sizeof( AkReal32 );
-	#ifdef _DEBUG
-		in_rSize -= sizeof( AkReal32 );
-	#endif
-		return l_Value;
-	}
-	
-	/// Handle reading float not aligned on proper memory boundaries (banks are byte packed).
-	inline AkReal64 AlignFloat( AkReal64 __unaligned * ptr )
-	{
-		return *ptr;
-	}
-	
-	/// Read data from bank and advance pointer.
-	template<> 
-	inline AkReal64 ReadBankData<AkReal64>( 
-										   AkUInt8*& in_rptr
-	#ifdef _DEBUG
-										   ,AkUInt32& in_rSize
-	#endif
-										   )
-	{
-		AkReal64 l_Value = AlignFloat( ( AkReal64* )in_rptr );
-		in_rptr += sizeof( AkReal64 );
-	#ifdef _DEBUG
-		in_rSize -= sizeof( AkReal64 );
-	#endif
-		return l_Value;
-	}
-
-#elif defined (AK_PS3) || defined(AK_WII) || defined (AK_WIIU) || (defined(AK_IOS) && defined(_DEBUG)) // bug with iOS SDK 4.3 in Debug only
+#if (defined(AK_IOS) && defined(_DEBUG)) // bug with iOS SDK 4.3 in Debug only
 
 /// Type conversion helper on some platforms.
 template < typename TO, typename FROM >
@@ -232,13 +219,16 @@ inline AkReal64 ReadBankData<AkReal64>(
 #endif
 	return l_Value;
 }
-#endif // AK_PS3 || AK_WII
+#endif
 
 #ifdef _DEBUG
 
 /// Read and return bank data of a given type, incrementing running pointer and decrementing block size for debug tracking purposes
 #define READBANKDATA( _Type, _Ptr, _Size )		\
 		ReadBankData<_Type>( _Ptr, _Size )
+
+#define READVARIABLESIZEBANKDATA( _Type, _Ptr, _Size )		\
+		ReadVariableSizeBankData<_Type>( _Ptr, _Size )
 
 /// Read and return non-null-terminatd UTF-8 string stored in bank, and its size.
 #define READBANKSTRING_UTF8( _Ptr, _Size, _out_StringSize )		\
@@ -264,6 +254,9 @@ inline AkReal64 ReadBankData<AkReal64>(
 #define READBANKDATA( _Type, _Ptr, _Size )		\
 		ReadBankData<_Type>( _Ptr )
 
+#define READVARIABLESIZEBANKDATA( _Type, _Ptr, _Size )		\
+		ReadVariableSizeBankData<_Type>( _Ptr )
+
 #define READBANKSTRING_UTF8( _Ptr, _Size, _out_StringSize )		\
 		ReadBankStringUtf8( _Ptr, _out_StringSize )
 
@@ -288,10 +281,6 @@ inline AkReal64 ReadBankData<AkReal64>(
 	#define CHECKBANKDATASIZE( _DATASIZE_, _ERESULT_ ) AKASSERT( _DATASIZE_ == 0 || _ERESULT_ != AK_Success );
 #else
 	#define CHECKBANKDATASIZE(_DATASIZE_, _ERESULT_ )
-#endif
-
-#ifdef AK_WIIU
-#pragma ghs endnowarning 1518
 #endif
 
 #endif //_AK_BANKREADHELPERS_H_

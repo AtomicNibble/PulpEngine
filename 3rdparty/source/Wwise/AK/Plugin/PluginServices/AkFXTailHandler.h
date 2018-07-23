@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
  
 #ifndef _AKFXTAILHANDLER_H_
 #define _AKFXTAILHANDLER_H_
@@ -69,66 +90,7 @@ public:
 		}
 	}
 
-#ifdef __SPU__
-	/// Interface for handling one channel at a time (neccessary when channels are processed sequentially on SPU)
-
-	/// Recompute target fx tail length has necessary.
-	AkForceInline void HandleTailChannelPre( AKRESULT in_eAudioBufferState, AkUInt32 in_uTotalTailFrames )
-	{
-		bool bPreStop = in_eAudioBufferState == AK_NoMoreData;
-		if ( bPreStop )
-		{	
-			// Tail not yet finished processing
-			if ( uTailFramesRemaining > 0 )
-			{
-				// Not previously in tail, compute tail time
-				if ( uTailFramesRemaining == AKFXTAILHANDLER_NOTINTAIL )
-				{
-					uTailFramesRemaining = in_uTotalTailFrames;
-					uTotalTailFrames	 = in_uTotalTailFrames;
-				}
-				// Tail time changed, augment if necessary but preserve where we are so that effect will 
-				// still finish when constanly changing this based on RTPC parameters
-				else if ( in_uTotalTailFrames > uTotalTailFrames )
-				{
-					AkUInt32 uFramesElapsed = uTotalTailFrames - uTailFramesRemaining;
-					uTailFramesRemaining = in_uTotalTailFrames - uFramesElapsed;
-					uTotalTailFrames	 = in_uTotalTailFrames;
-				}
-			}
-		}
-		else
-		{
-			// Reset tail mode for next time if exits tail mode (on bus only)
-			uTailFramesRemaining = AKFXTAILHANDLER_NOTINTAIL;
-		}
-	}
-	
-	/// Zero pads given channel data (local storage address).
-	AkForceInline void HandleTailChannel( AkAudioBuffer * in_pAudioBuffer, AkReal32 * io_pfChannelData )
-	{
-		bool bPreStop = in_pAudioBuffer->eState == AK_NoMoreData;
-		if ( bPreStop && (uTailFramesRemaining > 0) )
-		{	
-			// Always full buffers while in tail
-			AkUInt32 uNumTailFrames = (AkUInt32)(in_pAudioBuffer->MaxFrames()-in_pAudioBuffer->uValidFrames); 
-			AkZeroMemLarge( io_pfChannelData + in_pAudioBuffer->uValidFrames, uNumTailFrames * sizeof(AkReal32) );
-			in_pAudioBuffer->uValidFrames = in_pAudioBuffer->MaxFrames();
-		}
-	}
-
-	/// Determine when done and adjust return code appropriately.
-	AkForceInline void HandleTailChannelPost( AkAudioBuffer * io_pBuffer )
-	{
-		bool bPreStop = io_pBuffer->eState == AK_NoMoreData;
-		if ( bPreStop && (uTailFramesRemaining > 0) )
-		{		
-			uTailFramesRemaining -= AkMin( uTailFramesRemaining, (AkUInt32)(io_pBuffer->MaxFrames()-io_pBuffer->uValidFrames) ); 
-			if ( uTailFramesRemaining > 0 )
-				io_pBuffer->eState = AK_DataReady;	
-		}
-	}
-#endif
+	inline bool HasTailRemaining() { return uTailFramesRemaining > 0; } // Also true when AKFXTAILHANDLER_NOTINTAIL
 
 protected:
 

@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 // AkSimd.h
 
@@ -42,7 +63,6 @@ typedef float	AKSIMD_F32;		///< 32-bit float
 typedef __m128	AKSIMD_V4F32;	///< Vector of 4 32-bit floats
 typedef AKSIMD_V4F32 AKSIMD_V4COND;	 ///< Vector of 4 comparison results
 typedef AKSIMD_V4F32 AKSIMD_V4FCOND;	 ///< Vector of 4 comparison results
-#define AKSIMD_V4F32_SUPPORTED
 
 //@}
 ////////////////////////////////////////////////////////////////////////
@@ -269,6 +289,14 @@ static AKSIMD_V4F32 AKSIMD_COMPLEXMUL_SSE3( const AKSIMD_V4F32 vCIn1, const AKSI
 /// Adds the four integer values of a and b
 #define AKSIMD_ADD_V4I32( a, b ) _mm_add_epi32( a, b )
 
+#define AKSIMD_CMPLT_V4I32( a, b ) _mm_cmplt_epi32(a,b)
+#define AKSIMD_CMPGT_V4I32( a, b ) _mm_cmpgt_epi32(a,b)
+#define AKSIMD_XOR_V4I32( a, b ) _mm_xor_si128(a,b)
+#define AKSIMD_XOR_V4F32( a, b ) _mm_xor_ps(a,b)
+#define AKSIMD_SUB_V4I32( a, b ) _mm_sub_epi32(a,b)
+
+/// Multiplies the low 16bits of a by b and stores it in V4I32 (no overflow)
+#define AKSIMD_MULLO16_V4I32( a , b) _mm_mullo_epi16(a, b)
 //@}
 ////////////////////////////////////////////////////////////////////////
 
@@ -319,6 +347,8 @@ static AkForceInline AKSIMD_V4F32 AKSIMD_VSEL_V4F32( AKSIMD_V4F32 vA, AKSIMD_V4F
 #define AKSIMD_SEL_GTEZ_V4F32( __a__, __b__, __c__ ) AKSIMD_VSEL_V4F32( (__c__), (__b__), AKSIMD_GTEQ_V4F32( __a__, _mm_set1_ps(0) ) )
 
 #define AKSIMD_SPLAT_V4F32(var, idx) AKSIMD_SHUFFLE_V4F32(var,var, AKSIMD_SHUFFLE(idx,idx,idx,idx))
+
+#define AKSIMD_MASK_V4F32( __a__ ) _mm_movemask_ps( __a__ )
 
 //@}
 ////////////////////////////////////////////////////////////////////////
@@ -405,7 +435,7 @@ typedef AKSIMD_V4I32 AKSIMD_V4ICOND;
 //@}
 ////////////////////////////////////////////////////////////////////////
 
-#if defined( AK_CPU_X86 ) && !defined(AK_IOS)	/// MMX
+#if defined( AK_CPU_X86 ) && !defined(AK_IOS) /// MMX
 
 typedef __m64	AKSIMD_V2F32;	///< Vector of 2 32-bit floats
 

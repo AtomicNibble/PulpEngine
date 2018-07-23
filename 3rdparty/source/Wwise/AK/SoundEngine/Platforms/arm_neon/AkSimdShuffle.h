@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 /// \file 
 /// _AKSIMD_LOCAL::SHUFFLE_V4F32<zyxw>(a, b) - arm_neon implementation
@@ -110,7 +131,12 @@ namespace _AKSIMD_LOCAL
 				}
 	/* 55 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 1, 3)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_wyda( xyzw, abcd ); }
 	/* 56 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 2, 0)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_xzda( xyzw, abcd ); }
-	/* 57 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 2, 1)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_yzda( xyzw, abcd ); }
+	/* 57 */ 	template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 2, 1)>( const AKSIMD_V4F32& a, const AKSIMD_V4F32& b ) 
+				{ 
+					float32x2_t a21 = vget_high_f32(vextq_f32(a, a, 3));
+					float32x2_t b03 = vget_low_f32(vextq_f32(b, b, 3));
+					return vcombine_f32(a21, b03);
+				}
 	/* 58 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 2, 2)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_zzda( xyzw, abcd ); }
 	/* 59 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 2, 3)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_wzda( xyzw, abcd ); }
 	/* 60 */ 	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(0, 3, 3, 0)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_xwda( xyzw, abcd ); }
@@ -323,7 +349,13 @@ namespace _AKSIMD_LOCAL
 	/* 167 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 1, 3)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_wycc( xyzw, abcd ); }
 	/* 168 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 2, 0)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_xzcc( xyzw, abcd ); }
 	/* 169 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 2, 1)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_yzcc( xyzw, abcd ); }
-	/* 170 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 2, 2)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_zzcc( xyzw, abcd ); }
+	/* 170 */	template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 2, 2)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) 
+				{ 
+					AKSIMD_V2F32 zz = vdup_lane_f32( vget_high_f32( xyzw ), 0 );
+					AKSIMD_V2F32 cc = vdup_lane_f32( vget_high_f32( abcd ), 0 );
+					AKSIMD_V4F32 zzcc = vcombine_f32( zz, cc );
+					return zzcc;
+				}
 	/* 171 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 2, 3)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_wzcc( xyzw, abcd ); }
 	/* 172 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 3, 0)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_xwcc( xyzw, abcd ); }
 	/* 173 */	//template<> AkForceInline AKSIMD_V4F32 SHUFFLE_V4F32<AKSIMD_SHUFFLE(2, 2, 3, 1)>( const AKSIMD_V4F32& xyzw, const AKSIMD_V4F32& abcd ) { return akshuffle_ywcc( xyzw, abcd ); }

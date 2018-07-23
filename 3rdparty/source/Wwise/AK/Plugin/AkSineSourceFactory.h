@@ -1,44 +1,36 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
 
-// AkSineSourceFactory.h
+Commercial License Usage
 
-/// \file 
-///! Plug-in unique ID and creation functions (hooks) necessary to register the Sine plug-in to the sound engine.
-/// <br><b>Wwise source name:</b>  Sine
-/// <br><b>Library file:</b> AkSineTone.lib
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
 
-#ifndef _AK_SINESOURCEFACTORY_H_
-#define _AK_SINESOURCEFACTORY_H_
+Apache License Usage
 
-#include <AK/SoundEngine/Common/IAkPlugin.h>
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
 
-/// - This is the Plug-in unique ID (when combined with Company ID AKCOMPANYID_AUDIOKINETIC)
-/// - This ID must be the same as the PluginID in the Plug-in's XML definition file, and is persisted in project files. 
-/// \aknote Don't change the ID or existing projects will not recognize this plug-in anymore.
-const AkUInt32 AKSOURCEID_SINE = 100;
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
 
-/// Static creation function that returns an instance of the sound engine plug-in parameter node to be hooked by the sound engine plug-in manager.
-AK_FUNC( AK::IAkPluginParam *, CreateSineSourceParams )(
-	AK::IAkPluginMemAlloc * in_pAllocator			///< Memory allocator interface
-	);
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
-/// Plugin mechanism. Source create function and register its address to the plug-in manager.
-AK_FUNC( AK::IAkPlugin*, CreateSineSource )(
-	AK::IAkPluginMemAlloc * in_pAllocator			///< Memory allocator interface
-	);
+#pragma once
+/// \file
+/// Plug-in function necessary to link the Wwise Sine plug-in in the sound engine.
+/// <strong>WARNING</strong>: Include this file only if you wish to link statically with the plugins.  Dynamic Libaries (DLL, so, etc) are automatically detected and do not need this include file.
+/// <br><b>Wwise plugin name:</b>  Wwise Sine
+/// <br><b>Library file:</b> AkSineSource.lib
 
-/*
-Use the following code to register your plug-in
 
-AK::SoundEngine::RegisterPlugin( AkPluginTypeSource, 
-								 AKCOMPANYID_AUDIOKINETIC, 
-								 AKSOURCEID_SINE,
-								 CreateSineSource,
-								 CreateSineSourceParams );
-*/
-
-#endif // _AK_SINESOURCEFACTORY_H_
+AK_STATIC_LINK_PLUGIN(SineSource)

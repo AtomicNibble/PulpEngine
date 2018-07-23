@@ -1,48 +1,36 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2009 McDSP, All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
 
-// McDSPLimiterFXFactory.h
+Commercial License Usage
 
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
+
+#pragma once
 /// \file
-/// Plug-in unique ID and creation functions (hooks) necessary to register the McLimiter plug-in in the sound engine.
-/// <br><b>Wwise effect name:</b>  McDSP ML1
+/// Registers the McDSP ML1 plugin automatically.
+/// This file should be included once in a .CPP (not a .h, really).  The simple inclusion of this file and the linking of the library is enough to use the plugin.
+/// <b>WARNING</b>: Include this file only if you wish to link statically with the plugins.  Dynamic Libaries (DLL, so, etc) are automatically detected and do not need this include file.
+/// <br><b>Wwise plugin name:</b>  McDSP ML1
 /// <br><b>Library file:</b> McDSPLimiterFX.lib
 
-#ifndef _MCDSP_LIMITERFXFACTORY_H_
-#define _MCDSP_LIMITERFXFACTORY_H_
-
-#include <AK/SoundEngine/Common/IAkPlugin.h>
-
-///
-/// - This is the plug-in's unique ID (combined with the AKCOMPANYID_MCDSP company ID)
-/// - This ID must be the same as the plug-in ID in the plug-in's XML definition file, and is persisted in project files. 
-/// \akwarning
-/// Changing this ID will cause existing projects not to recognize the plug-in anymore.
-/// \endakwarning
-const unsigned long AKEFFECTID_MCDSPML1 = 103;
-
-/// Static creation function that returns an instance of the sound engine plug-in parameter node to be hooked by the sound engine's plug-in manager.
-AK_FUNC( AK::IAkPluginParam *, CreateMcDSPML1FXParams )(
-	AK::IAkPluginMemAlloc * in_pAllocator			///< Memory allocator interface
-	);
-
-/// Static creation function that returns an instance of the sound engine plug-in to be hooked by the sound engine's plug-in manager.
-AK_FUNC( AK::IAkPlugin*, CreateMcDSPML1FX )(
-	AK::IAkPluginMemAlloc * in_pAllocator			///< Memory allocator interface
-	);
-
-/*
-Use the following code to register your plug-in
-
-AK::SoundEngine::RegisterPlugin( AkPluginTypeEffect, 
-								 AKCOMPANYID_MCDSP, 
-								 AKEFFECTID_MCDSPML1,
-								 CreateMcDSPML1FX,
-								 CreateMcDSPML1FXParams );
-*/
-
-#endif // _MCDSP_LIMITERFXFACTORY_H_
-
+AK_STATIC_LINK_PLUGIN(McDSPLimiterFX)

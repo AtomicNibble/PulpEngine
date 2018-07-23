@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 /// \file
 /// Persistance interface for Wwise plugins.
@@ -104,13 +125,6 @@ namespace AK
 		/// This is a helper method for reading simple text-only elements. 
 		/// \return The text contained in the element that was read. An empty string if the element is empty. 
 		virtual CString ReadElementString( const CString& in_rcsElementNameValidation ) = 0;
-
-		/// Reads the element and decodes the BinHex content. 
-		/// \return The number of bytes written to the buffer. 
-		virtual int ReadBinHex( BYTE* io_pBuffer,	/// The buffer into which to copy the resulting text. This value cannot be NULL.
-								int in_offset,		/// The offset into the buffer where to start copying the result.
-								int in_length		/// The maximum number of bytes to copy into the buffer. The actual number of bytes copied is returned from this method.
-								) = 0;
 
 		/// Reads all the content, including markup, as a string. 
 		/// \return All the XML content, including markup, in the current node. If the current node has no children, an empty string is returned. If the current node is neither an element nor attribute, an empty string is returned. 

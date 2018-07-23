@@ -1,12 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// AkPlatformFuncs.h 
-//
-// Audiokinetic platform-dependent functions definition.
-//
-// Copyright (c) 2011 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 #pragma once
 
@@ -44,11 +61,6 @@ namespace AK
     extern AkReal32 g_fFreqRatio;
 }
 
-#ifdef AK_NACL
-#define sched_get_priority_max( _a ) 0
-#define sched_get_priority_min( _a ) 0
-#endif
-
 //-----------------------------------------------------------------------------
 // Defines for POSIX (Mac, iOS, Android)
 //-----------------------------------------------------------------------------
@@ -59,18 +71,16 @@ namespace AK
 #define AK_RETURN_THREAD_OK                     0x00000000
 #define AK_RETURN_THREAD_ERROR                  0x00000001
 
-// WG-21467
-// For GameSim to play AAC soundbanks on Mac, stacksize has to be bigger to avoid crashing.
-#ifdef AK_APPLE
-	#define AK_DEFAULT_STACK_SIZE                   (32768*2)
-#else
-	#define AK_DEFAULT_STACK_SIZE                   (32768)
-#endif
+#define AK_DEFAULT_STACK_SIZE                   (65536)
+
 
 #define AK_THREAD_DEFAULT_SCHED_POLICY			SCHED_FIFO
+
+
 #define AK_THREAD_PRIORITY_NORMAL				(((sched_get_priority_max( SCHED_FIFO ) - sched_get_priority_min( SCHED_FIFO )) / 2) + sched_get_priority_min( SCHED_FIFO ))
 #define AK_THREAD_PRIORITY_ABOVE_NORMAL			sched_get_priority_max( SCHED_FIFO )
 #define AK_THREAD_PRIORITY_BELOW_NORMAL			sched_get_priority_min( SCHED_FIFO )
+
 #define AK_THREAD_AFFINITY_DEFAULT				0xFFFF
 
 
@@ -78,8 +88,6 @@ namespace AK
 #define AK_NULL_THREAD                          0
 
 #define AK_INFINITE                             (AK_UINT_MAX)
-
-#define AkMakeLong(a,b)							MAKELONG((a),(b))
 
 #define AkMax(x1, x2)	(((x1) > (x2))? (x1): (x2))
 #define AkMin(x1, x2)	(((x1) < (x2))? (x1): (x2))
@@ -89,8 +97,11 @@ namespace AK
 
 namespace AKPLATFORM
 {
+#define AkExitThread( _result ) return _result;
+
 	// Simple automatic event API
     // ------------------------------------------------------------------
+
 #ifndef AK_APPLE	
 	/// Platform Independent Helper
 	inline void AkClearEvent( AkEvent & out_event )
@@ -153,8 +164,6 @@ namespace AKPLATFORM
         AkClearThread( in_pThread );
     }
 
-#define AkExitThread( _result ) return _result;
-
 	/// Platform Independent Helper
 	inline void AkGetDefaultThreadProperties( AkThreadProperties & out_threadProperties )
 	{
@@ -164,7 +173,7 @@ namespace AKPLATFORM
 		out_threadProperties.dwAffinityMask = AK_THREAD_AFFINITY_DEFAULT;	
 	}
 
-#ifndef AK_ANDROID
+#ifndef AK_ANDROID 
 	/// Platform Independent Helper
 	inline void AkCreateThread( 
 		AkThreadRoutine pStartRoutine,					// Thread routine.
@@ -180,11 +189,13 @@ namespace AKPLATFORM
 		// Create the attr
 		AKVERIFY(!pthread_attr_init(&attr));
 		// Set the stack size
+#ifndef AK_EMSCRIPTEN 
+		// Apparently Emscripten doesn't like that we try to specify stack sizes.
 		AKVERIFY(!pthread_attr_setstacksize(&attr,in_threadProperties.uStackSize));
+#endif //AK_EMSCRIPTEN
 		
 		AKVERIFY(!pthread_attr_setdetachstate(&attr, PTHREAD_CREATE_JOINABLE));
 		
-#ifndef AK_NACL		
 		// Try to set the thread policy
 		int sched_policy = in_threadProperties.uSchedPolicy;
 		if( pthread_attr_setschedpolicy( &attr, sched_policy )  )
@@ -208,7 +219,6 @@ namespace AKPLATFORM
 			schedParam.sched_priority = in_threadProperties.nPriority;
 			AKVERIFY( !pthread_attr_setschedparam( &attr, &schedParam ));
 		}
-#endif
 #ifdef AK_APPLE
 		int inherit;
 		pthread_attr_getinheritsched(&attr, &inherit );
@@ -224,7 +234,7 @@ namespace AKPLATFORM
 			AkClearThread( out_pThread );
 			return;
 		}
-		
+
 		// ::CreateThread() return NULL if it fails.
         if ( !*out_pThread )
         {

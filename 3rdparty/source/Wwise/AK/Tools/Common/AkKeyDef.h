@@ -1,20 +1,30 @@
-/***********************************************************************
-  The content of this file includes source code for the sound engine
-  portion of the AUDIOKINETIC Wwise Technology and constitutes "Level
-  Two Source Code" as defined in the Source Code Addendum attached
-  with this file.  Any use of the Level Two Source Code shall be
-  subject to the terms and conditions outlined in the Source Code
-  Addendum and the End User License Agreement for Wwise(R).
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
 
-  Version: <VERSION>  Build: <BUILDNUMBER>
-  Copyright (c) <COPYRIGHTYEAR> Audiokinetic Inc.
- ***********************************************************************/
+Commercial License Usage
 
-//////////////////////////////////////////////////////////////////////
-//
-// AkKeyDef.h
-//
-//////////////////////////////////////////////////////////////////////
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
+
 #ifndef _KEYDEF_H_
 #define _KEYDEF_H_
 
@@ -29,6 +39,12 @@ struct MapStruct
 	{
 		return ( (key == in_Op.key) /*&& (item == in_Op.item)*/ );
 	}
+
+	void Transfer(MapStruct<T_KEY, T_ITEM>& in_rSource)
+	{
+		key = in_rSource.key;
+		item.Transfer(in_rSource.item); //transfer ownership of resources.
+	}
 };
 
 
@@ -36,7 +52,7 @@ struct MapStruct
 //	 on the data that you are referencing.  For example if you wanted to to use an AkArray type.
 // NOTE: AllocData() and FreeData() must be explicitly called, or else pData can be manually Alloc'd/Free'd.
 template < typename T_KEY, typename T_DATA, class T_ALLOC = ArrayPoolDefault >
-struct AkKeyDataPtrStruct
+struct AkKeyDataPtrStruct: public T_ALLOC
 {
 	AkKeyDataPtrStruct(): pData(NULL) {}
 	AkKeyDataPtrStruct(T_KEY in_key): key(in_key), pData(NULL) {}

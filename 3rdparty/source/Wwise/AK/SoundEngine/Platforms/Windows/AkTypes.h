@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 // AkTypes.h
 
@@ -36,18 +57,17 @@
 #ifdef WINAPI_FAMILY
 	#include <winapifamily.h>
 	#if !WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_DESKTOP)
-		#define AK_USE_METRO_API
-		#define AK_USE_THREAD_EMULATION
-		#if defined(WINAPI_PARTITION_PHONE) && WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PHONE)
-			#define AK_WINPHONE
+		#define AK_USE_UWP_API
+		#define AK_USE_METRO_API // deprecated
+		#if WINAPI_FAMILY_PARTITION(WINAPI_PARTITION_PC_APP)
+			#define AK_WIN_UNIVERSAL_APP
 		#endif
 	#endif
 #endif
 
-#ifndef AK_WINPHONE
-#define AK_MOTION								///< Internal use
 #define AK_71AUDIO
-#endif
+#define AK_71FROMSTEREOMIXER
+#define AK_51FROMSTEREOMIXER
 
 #define AK_LFECENTER							///< Internal use
 #define AK_REARCHANNELS							///< Internal use
@@ -56,6 +76,9 @@
 #define AK_OS_WCHAR								///< Use wchar natively
 
 #define AK_RESTRICT		__restrict				///< Refers to the __restrict compilation flag available on some platforms
+#if defined(_MSC_VER) && (_MSC_VER >= 1700)
+	#define AK_FINAL		final					///< Refers to the C++11 final keyword
+#endif
 #define AK_EXPECT_FALSE( _x )	(_x)
 #define AkForceInline	__forceinline			///< Force inlining
 #define AkNoInline		__declspec(noinline)	///< Disable inlining
@@ -67,8 +90,15 @@
 #define AK_ALIGN_SIZE_FOR_DMA( __Size__ ) (__Size__) ///< Used to align sizes to next 16 byte boundary on platfroms that require it
 #define AK_BUFFER_ALIGNMENT AK_SIMD_ALIGNMENT
 #define AK_XAUDIO2_FLAGS 0
+#if defined AK_CPU_X86 || defined AK_CPU_X86_64 || defined AK_CPU_ARM_NEON
+#define AKSIMD_V4F32_SUPPORTED
+#endif
+
 
 #define AKSOUNDENGINE_CALL __cdecl				///< Calling convention for the Wwise API
+
+#define AK_DLLEXPORT __declspec(dllexport)
+#define AK_DLLIMPORT __declspec(dllimport)		
 
 typedef unsigned char		AkUInt8;			///< Unsigned 8-bit integer
 typedef unsigned short		AkUInt16;			///< Unsigned 16-bit integer
@@ -133,7 +163,7 @@ enum AkMemPoolAttributes
 	AkNoAlloc		= 0,	///< CreatePool will not allocate memory.  You need to allocate the buffer yourself.
 	AkMalloc		= 1<<0,	///< CreatePool will use AK::AllocHook() to allocate the memory block.
 
-	AkVirtualAlloc	= 1<<1,	///< CreatePool will use AK::VirtualAllocHook() to allocate the memory block (Windows & Xbox360 only).
+	AkVirtualAlloc	= 1<<1,	///< CreatePool will use AK::VirtualAllocHook() to allocate the memory block (Windows & XboxOne only).
 	AkAllocMask		= AkNoAlloc | AkMalloc | AkVirtualAlloc,	///< Block allocation type mask.		
 
 	AkFixedSizeBlocksMode	= 1<<3,			///< Block management type: Fixed-size blocks. Get blocks through GetBlock/ReleaseBlock API.  If not specified, use AkAlloc/AkFree.

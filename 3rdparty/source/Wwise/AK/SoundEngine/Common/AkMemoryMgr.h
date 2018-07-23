@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 /// \file 
 /// Memory Manager namespace.
@@ -24,7 +45,7 @@
 		AK::MemoryMgr::SetPoolName( _poolid, _name );	\
 	}
 
-//#define AK_MEMDEBUG
+// #define AK_MEMDEBUG
 
 #else
 #define AK_SETPOOLNAME(_poolid,_name)
@@ -67,6 +88,16 @@ namespace AK
 			// Current state
 			AkUInt32 uReserved;		///< Reserved memory (in bytes)
 			AkUInt32 uUsed;			///< Used memory (in bytes)
+		};
+
+
+		/// Memory management debug tools.  When specified in Init, each memory allocation will have a extra tag that can be verified periodically.
+		/// Enabling this will use a lot of CPU and additional memory.  This should not be enabled unless required by Audiokinetic's support.  These are enabled in Debug configuration only.
+		enum DebugFlags
+		{
+			CheckOverwriteAtFree = 1,	///< Performs a for buffer overflow when an allocation is freed.
+			CheckOverwritePerFrame = 2,	///< Performs a check for buffer overflow once per audio frame
+			CheckOverwritePerVoice = 4, ///< Performs a check for buffer overflow once per audio voice			
 		};
 
 		/// Query whether the Memory Manager has been sucessfully initialized.
@@ -325,6 +356,20 @@ namespace AK
 			AkMemPoolId in_PoolId	///< Pool to profile
 			);
 
+
+		/// Debugging method that verifies if buffer overflow occurred in a specific pool.
+		/// Called at various moments depending on the DebugFlags set in AkMemSettings.
+		/// In the default implementation it is not called in Release otherwise will assert if overrun found.
+		/// Implementation is not mendatory if the MemoryMgr is overriden.
+		AK_EXTERNAPIFUNC(void, CheckForOverwrite) (
+			AkUInt32 in_uPoolID
+			);		
+
+#if defined (AK_MEMDEBUG)
+		/// Debugging method that dumps a snapshot list of actual memory allocations to a file.
+		/// The list contains the size allocated and the source file and line number where the memory allocation was done.
+		AK_EXTERNAPIFUNC(void, DumpToFile) (const char* strFileName = "AkMemDump.txt");
+#endif
 		//@}
     }
 }

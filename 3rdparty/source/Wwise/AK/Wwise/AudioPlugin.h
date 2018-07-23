@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 /// \file
 /// Wwise audio plug-in interface, used to implement the Wwise side of a source or effect plug-in.
@@ -14,7 +35,10 @@
 
 #include <AK/Wwise/Utilities.h>
 #include <AK/SoundEngine/Common/AkSoundEngine.h> /// Dummy assert hook definition.
+#include <AK/SoundEngine/Common/IAkPluginMemAlloc.h>
 #include <AK/Wwise/PlatformID.h>
+
+#include <float.h>
 
 // Audiokinetic namespace
 namespace AK
@@ -108,7 +132,7 @@ namespace AK
 			/// and GetPluginData will be called when the plugin is about to play in Wwise, to
 			/// transfer the internal data to the Sound Engine part of the plugin.
 			/// Use ALL_PLUGIN_DATA_ID to tell that all the data has to be refreshed.
-			virtual void NotifyInternalDataChanged(AkPluginParamID in_idData) = 0;
+			virtual void NotifyInternalDataChanged(AkPluginParamID in_idData, bool in_bMakeProjectDirty = true) = 0;
 
 			/// Call this function when you are about to log an undo event to know if Wwise is 
 			/// in a state where undos are enabled.  Undo logging can be disabled for a particular
@@ -119,7 +143,15 @@ namespace AK
 			/// to check the status of the undo system.
 			virtual AK::Wwise::IUndoManager * GetUndoManager() = 0;
 
-			/// Obtain licensing status for a plug-in-specific asset ID.
+			/// Obtain licensing status for the plug-in. Refer to \ref wwiseplugin_dll_license for more information.
+			virtual void GetLicenseStatus(
+				const GUID & in_guidPlatform,			///< GUID of the platform
+				AK::Wwise::LicenseType & out_eType,		///< License Type
+				AK::Wwise::LicenseStatus & out_eStatus, ///< License Status
+				UINT32 & out_uDaysToExpiry				///< Days until license expiry
+				) = 0;
+
+			/// Obtain licensing status for a plug-in-specific asset ID. Refer to \ref wwiseplugin_dll_license for more information.
 			virtual void GetAssetLicenseStatus( 
 				const GUID & in_guidPlatform,			///< GUID of the platform
 				AkUInt32 in_uAssetID,					///< ID of the asset
@@ -127,6 +159,19 @@ namespace AK
 				AK::Wwise::LicenseStatus & out_eStatus, ///< License Status
 				UINT32 & out_uDaysToExpiry				///< Days until license expiry
 				) = 0;
+
+			/// Obtain the unique identifier of the corresponding IWObject.
+			virtual const GUID& GetID() const = 0;
+
+			/// Find and call the specified procedure. Calls made using this function are always blocking.
+			virtual void WaapiCall(
+				const char* in_szUri,		 ///< URI of the procedure to call
+				const char* in_szArgs,		 ///< JSON string (utf-8) of arguments to pass to the procedure or NULL for no arguments
+				const char* in_szOptions,	 ///< JSON string (utf-8) of options to pass to the procedure or NULL for no options
+				AK::IAkPluginMemAlloc* in_pAlloc, ///< Allocator used to allocate memory for the results or the error
+				char*& out_szResults,		 ///< JSON string (utf-8) containing the results (if any)
+				char*& out_szError			 ///< JSON string (utf-8) containing the error (if any)
+				) const = 0;
 		};
 
 		/// Plug-in object store interface. An instance of this class is created and
@@ -208,7 +253,7 @@ namespace AK
 			
 			/// Requests to set the specified file as a data input file.
 			virtual bool SetMediaSource( 
-				LPCWSTR in_pszFilePathToImport,	///< File path
+				LPCWSTR in_pszFilePathToImport,	///< File path: can be null in the case of plugin-generated data not requiring an original file
 				unsigned int in_Index = 0,		///< Optional index
 				bool in_bReplace = false		///< Optional: set to true to replace existing file if the name is already in used
 				) = 0;
@@ -296,6 +341,13 @@ namespace AK
 			{
 				InnerObjectAdded,
 				InnerObjectRemoved
+			};
+
+			struct MonitorData
+			{
+				AkUInt64 uGameObjectID;
+				void* pData;
+				unsigned int uDataSize;
 			};
 
 			/// The property set interface is given to the plug-in through this method. It is called by Wwise during
@@ -527,12 +579,14 @@ namespace AK
 				) const = 0;
 
 			/// Called when an instance of the run-time component of the plug-in sends data 
-			/// using AK::IAkEffectPluginContext::PostMonitorData(), and this plug-in's settings 
-			/// are being displayed in a window.
+			/// using \c AK::IAkEffectPluginContext::PostMonitorData(), and this plug-in's settings 
+			/// are being displayed in a window. Because multiple run-time instances may exist for a single
+			///	authoring tool plug-in, the data is batched together and passed at the end of the frame.
 			virtual void NotifyMonitorData( 
-				void * in_pData, 				///< Blob of data
-				unsigned int in_uDataSize, 		///< Size of data
-				bool in_bNeedsByteSwap			///< True if data comes from platform with a different byte ordering (i.e. Big Endian)
+				const MonitorData * in_pDataArray, 	///< Array of blobs of data
+				unsigned int in_uCount,				///< Number of elements in array 'in_pDataArray'
+				bool in_bNeedsByteSwap,				///< True if data comes from platform with a different byte ordering (i.e. Big Endian)
+				bool in_bRealtime					///< True if monitoring in real-time, false if scrubbing through profiler history
 				) = 0;
 
 			/// Retrieve a pointer to the class implementing IPluginObjectMedia. Plug-ins using the media sources
@@ -540,15 +594,24 @@ namespace AK
 			virtual IPluginMediaConverter* GetPluginMediaConverterInterface() = 0;
 
 			/// Retrieve the licensing status of the plug-in for the given platform.
-			/// \return True if the license is valid, False if the license is expired or not present (the plug-in will then be omitted from SoundBanks).
+			/// \return Licensing status of the plug-in; LicenseStatus_Unlicensed or LicenseStatus_Expired will prevent the plug-in from being included in a SoundBank.
 			/// \sa
+			/// - \ref IPluginPropertySet::GetLicenseStatus
 			/// - \ref IPluginPropertySet::GetAssetLicenseStatus
-			virtual bool GetLicenseStatus(
+			/// - \ref wwiseplugin_dll_license
+			virtual AK::Wwise::LicenseStatus GetLicenseStatus(
 				const GUID & in_guidPlatform,		///< GUID of the platform
 				AK::Wwise::Severity& out_eSeverity,	///< (Optional) If set, the string placed in out_pszMessage will be shown in the log with the corresponding severity. 
 				LPWSTR out_pszMessage,				///< Pointer to the buffer that will hold the message string
 				unsigned int in_uiBufferSize		///< Size of the buffer pointed by out_pszMessage (in number of WCHAR, including null terminator)
 				) = 0;
+
+			/// Return the minimum and maximum duration, in seconds.  This function is only useful with source plug-ins.
+			/// \return True if the duration values are valid, False otherwise.
+			virtual bool GetSourceDuration(
+				double& out_dblMinDuration,	///< Minimum duration, in seconds
+				double& out_dblMaxDuration	///< Maximum duration, in seconds
+				) const = 0;
 		};
 
 		/// Use this base class to quickly implement most plugin functions empty
@@ -575,19 +638,43 @@ namespace AK
 			virtual bool DisplayNameForProp( LPCWSTR in_pszPropertyName, LPWSTR out_pszDisplayName, UINT in_unCharCount	) const { return false; }
 			virtual bool DisplayNamesForPropValues( LPCWSTR in_pszPropertyName,	LPWSTR out_pszValuesName, UINT in_unCharCount ) const { return false; }
 			virtual bool Help( HWND in_hWnd, eDialog in_eDialog, LPCWSTR in_szLanguageCode ) const { return false; }
-			virtual void NotifyMonitorData( void * in_pData, unsigned int in_uDataSize, bool in_bNeedsByteSwap ){}
+			virtual void NotifyMonitorData( const AK::Wwise::IAudioPlugin::MonitorData * in_pData, unsigned int in_uDataSize, bool in_bNeedsByteSwap, bool in_bRealtime){}
 			virtual IPluginMediaConverter* GetPluginMediaConverterInterface() { return NULL; }
-			virtual bool GetLicenseStatus( const GUID &, AK::Wwise::Severity&, LPWSTR, unsigned int in_uiBufferSize ){ return true; }
+			virtual AK::Wwise::LicenseStatus GetLicenseStatus(const GUID &, AK::Wwise::Severity&, LPWSTR, unsigned int in_uiBufferSize){ return AK::Wwise::LicenseStatus_Valid; }
+			virtual bool GetSourceDuration( double& out_dblMinDuration, double& out_dblMaxDuration ) const { out_dblMinDuration = 0.f; out_dblMaxDuration = FLT_MAX; return false; }
+		};
+
+		typedef AKRESULT(CALLBACK* RegisterWwisePluginFn)(AK::PluginRegistration *in_pList);
+		inline AKRESULT RegisterWwisePlugin()
+		{
+			if (!g_pAKPluginList)
+			{
+				AKASSERT(!"g_pAKPluginList is NULL. Did you use the AK_STATIC_LINK_PLUGIN macro in your DLL?"); // Should be populated by now.
+				return AK_Fail;
+			}
+
+			HMODULE hLib = ::LoadLibrary(L"WwiseSoundEngine.dll");
+			if (hLib == NULL)
+				return AK_Fail;
+
+			RegisterWwisePluginFn pReg = (RegisterWwisePluginFn)::GetProcAddress(hLib, "RegisterWwisePlugin");
+			if (pReg == NULL)
+				return AK_Fail;
+
+			return pReg(g_pAKPluginList);
+		}
+
+		/// Struct to be used with the function GetSinkPluginDevices to return devices.
+#define AK_MAX_OUTPUTDEVICEDESCRIPTOR 256
+		struct OutputDeviceDescriptor
+		{
+			WCHAR name[AK_MAX_OUTPUTDEVICEDESCRIPTOR];	/// Display name of the device.  Null terminated.  Note that the name can't be more than 256 characters including the null.
+			AkUInt32 idDevice;	/// ID of the device as used with AK::SoundEngine::AddOutput.  
+			/// This will be passed back to the plugin through AK::IAkSinkPluginContext::GetOutputID.  
+			/// Default device ID can be 0.
 		};
 	}
 }
-
-/// Dummy assert hook for Wwise plug-ins using AKASSERT (cassert used by default).
-#ifdef _DEBUG
-#define DEFINEDUMMYASSERTHOOK AkAssertHook g_pAssertHook = NULL;
-#else
-#define DEFINEDUMMYASSERTHOOK 
-#endif
 
 /// Private message sent to Wwise window to open a topic in the help file
 /// the WPARAM defines the help topic ID

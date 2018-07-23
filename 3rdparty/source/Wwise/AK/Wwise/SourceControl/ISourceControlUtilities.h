@@ -1,8 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 /// \file
 /// Wwise source control plug-in utilities interface, used to create custom dialogs, display the progress dialog, and get
@@ -78,8 +99,37 @@ namespace AK
 			/// Get the path to the registry for the current project. This path is to be used with
 			/// the HKEY_CURRENT_USER registry key.
 			/// \warning This function is not thread-safe.
-			/// \return A string containing the registry path
+			/// \return A string containing the registry path.
 			virtual LPCWSTR GetRegistryPath() = 0;
+
+			/// Set DWORD value in user preferences.
+			/// \warning This function is not thread-safe.
+			virtual void SetUserPreferenceDword(
+				LPCWSTR in_pszPreference,		///< Name of preference
+				DWORD in_dwValue				///< Value to set in user preferences.
+				) = 0;
+
+			/// Get DWORD value in user preferences.
+			/// \warning This function is not thread-safe.
+			virtual void GetUserPreferenceDword(
+				LPCWSTR in_pszPreference,		///< Name of preference
+				DWORD& io_dwValue				///< in: value to return if preference is not set; out: changed to user preference value if set
+				) = 0;
+
+			/// Set string value in user preferences.
+			/// \warning This function is not thread-safe.
+			virtual void SetUserPreferenceString(
+				LPCWSTR in_pszPreference,		///< Name of preference
+				LPCWSTR in_pszValue				///< Value to set in user preferences.
+				) = 0;
+
+			/// Get string value from user preferences.
+			/// \warning This function is not thread-safe.
+			virtual void GetUserPreferenceString(
+				LPCWSTR in_pszPreference,		///< Name of preference
+				LPWSTR io_pszValue,				///< in: value to return if preference is not set; out: changed to user preference value if set
+				DWORD in_dwSize					///< Size of out_pszValue buffer.
+				) = 0;
 
 			/// Get the root path for a move operation.  
 			/// The input file can either be a work unit or a source file

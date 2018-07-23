@@ -1,13 +1,29 @@
-//////////////////////////////////////////////////////////////////////
-//
-// AkObject.h
-//
-// Base class for object that use dynamic allocation.
-// Overloads new and delete to call those of the memory manager.
-//
-// Copyright (c) 2006 Audiokinetic Inc. / All Rights Reserved
-//
-//////////////////////////////////////////////////////////////////////
+/*******************************************************************************
+The content of this file includes portions of the AUDIOKINETIC Wwise Technology
+released in source code form as part of the SDK installer package.
+
+Commercial License Usage
+
+Licensees holding valid commercial licenses to the AUDIOKINETIC Wwise Technology
+may use this file in accordance with the end user license agreement provided 
+with the software or, alternatively, in accordance with the terms contained in a
+written agreement between you and Audiokinetic Inc.
+
+Apache License Usage
+
+Alternatively, this file may be used under the Apache License, Version 2.0 (the 
+"Apache License"); you may not use this file except in compliance with the 
+Apache License. You may obtain a copy of the Apache License at 
+http://www.apache.org/licenses/LICENSE-2.0.
+
+Unless required by applicable law or agreed to in writing, software distributed
+under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
+OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
+the specific language governing permissions and limitations under the License.
+
+  Version: v2017.2.6  Build: 6636
+  Copyright (c) 2006-2018 Audiokinetic Inc.
+*******************************************************************************/
 
 #ifndef _AK_OBJECT_H_
 #define _AK_OBJECT_H_
@@ -38,9 +54,7 @@ AkForceInline void * operator new( size_t /*size*/, void * memory, const AkPlace
 
 // Matching operator delete for AK placement new. This needs to be defined to avoid compiler warnings
 // with projects built with exceptions enabled.
-#ifndef AK_3DS
 AkForceInline void operator delete( void *, void *, const AkPlacementNewKey & ) throw() {}
-#endif
 
 //-----------------------------------------------------------------------------
 // Macros
@@ -83,10 +97,8 @@ struct AkPoolNewKey
 		return AK::MemoryMgr::dMalign( in_PoolId, size, in_align, szFile, ulLine );
 	}
 	
-	#ifndef AK_3DS
-	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &,char*,AkUInt32) throw() {}
-	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &,AkUInt32,char*,AkUInt32) throw() {}
-	#endif
+	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &,const char*,AkUInt32) throw() {}
+	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &,AkUInt32,const char*,AkUInt32) throw() {}
 	
 #else
 
@@ -100,24 +112,10 @@ struct AkPoolNewKey
 		return AK::MemoryMgr::Malign( in_PoolId, size, in_align );
 	}
 	
-	#ifndef AK_3DS
 	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &) throw() {}
 	AkForceInline void operator delete(void *,AkMemPoolId,const AkPoolNewKey &,AkUInt32) throw() {}
-	#endif
 
 #endif
-
-//-----------------------------------------------------------------------------
-// Name: Class CAkObject
-// Desc: Base allocator object: DEPRECATED.
-//-----------------------------------------------------------------------------
-
-class CAkObject
-{
-public:
-	/// Destructor
-    virtual ~CAkObject( ) { }
-};
 
 template <class T>
 AkForceInline void AkDelete( AkMemPoolId in_PoolId, T * in_pObject )
