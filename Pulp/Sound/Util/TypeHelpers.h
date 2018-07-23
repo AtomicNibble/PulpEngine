@@ -10,11 +10,12 @@ X_INLINE const AkVector& Vec3ToAkVector(const Vec3f& vec)
 X_INLINE AkSoundPosition TransToAkPos(const Transformf& trans)
 {
     AkSoundPosition pos;
-    pos.Position = Vec3ToAkVector(trans.pos);
-    // dunno what this is axis? TELL ME.
-    pos.Orientation.X = 0;
-    pos.Orientation.Y = 0;
-    pos.Orientation.Z = 1;
+    pos.SetPosition(Vec3ToAkVector(trans.pos));
+    // TODO: dunno what this is axis? TELL ME.
+    pos.SetOrientation(
+        0.f, 1.f, 0.f,
+        0.f, 0.f, 1.f
+    );
 
     return pos;
 }

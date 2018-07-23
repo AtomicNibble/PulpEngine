@@ -32,7 +32,7 @@ X_DISABLE_WARNING(4505)
 X_ENABLE_WARNING(4505)
 
 // link all plugins
-#define PLUGIN_All 0
+#define PLUGIN_All 1
 
 #if PLUGIN_All == 0
 #define PLUGIN_Codec 1
@@ -44,13 +44,14 @@ X_ENABLE_WARNING(4505)
 #else
 #define PLUGIN_Codec 1
 #define PLUGIN_Effect 1
-#define PLUGIN_Rumble 1
+#define PLUGIN_Rumble 0
 #define PLUGIN_Source 1
-#define PLUGIN_Source_mp3 1
-#define PLUGIN_Auro 1
+#define PLUGIN_Source_mp3 0
+#define PLUGIN_Auro 0
 #endif // !PLUGIN_All
 
 // link the libs..
+X_LINK_LIB("dinput8");
 
 // engine
 X_LINK_LIB("AkMusicEngine");
@@ -76,7 +77,7 @@ X_LINK_LIB("AkAudioInputSource");
 X_LINK_LIB("AkSineSource");
 
 // fx
-X_LINK_LIB("AkConvolutionReverbFX");
+// X_LINK_LIB("AkConvolutionReverbFX");
 X_LINK_LIB("AkFlangerFX");
 X_LINK_LIB("AkTremoloFX");
 #if PLUGIN_Auro
@@ -99,7 +100,14 @@ X_LINK_LIB("AkTimeStretchFX");
 X_LINK_LIB("AkExpanderFX");
 X_LINK_LIB("McDSPFutzBoxFX");
 X_LINK_LIB("McDSPLimiterFX");
-X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
+// X_LINK_LIB("CrankcaseAudioREVModelPlayerFX");
+
+// new?
+X_LINK_LIB("AkSynthOneSource");
+X_LINK_LIB("AkMotionGeneratorSource");
+X_LINK_LIB("AkRecorderFX");
+X_LINK_LIB("AkMotionSink");
+
 
 // fx2
 #if 0 
@@ -116,14 +124,14 @@ X_LINK_LIB("iZTrashFiltersFX");
 #if PLUGIN_Auro
 X_LINK_LIB("AuroPannerMixer");
 #endif // !PLUGIN_Auro
-X_LINK_LIB("AkSoundSeedWoosh");
-X_LINK_LIB("AkSynthOne");
-X_LINK_LIB("AkMotionGenerator");
-X_LINK_LIB("AkSoundSeedWind");
-X_LINK_LIB("IOSONOProximityMixer");
+//X_LINK_LIB("AkSoundSeedWoosh");
+//X_LINK_LIB("AkSynthOne");
+//X_LINK_LIB("AkMotionGenerator");
+//X_LINK_LIB("AkSoundSeedWind");
+//X_LINK_LIB("IOSONOProximityMixer");
 
 // rumble
-#if PLUGIN_Rumble == 0
+#if PLUGIN_Rumble
 X_LINK_LIB("AkRumble");
 #endif // !PLUGIN_Rumble
 
@@ -162,37 +170,40 @@ namespace
 
     X_INLINE AkGameObjectID GameObjHandleToAKObject(SndObjectHandle object)
     {
-        static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "can't represent type");
+        static_assert(sizeof(SndObjectHandle) <= sizeof(AkGameObjectID), "can't represent type");
         return reinterpret_cast<AkGameObjectID>(&object);
     }
 
     X_INLINE AkGameObjectID SoundObjToAKObject(SoundObject* pObject)
     {
-        static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+        static_assert(sizeof(SoundObject*) <= sizeof(AkGameObjectID), "can't represent type");
         return reinterpret_cast<AkGameObjectID>(pObject);
     }
 
     X_INLINE SndObjectHandle SoundObjToObjHandle(SoundObject* pObject)
     {
-        static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+        static_assert(sizeof(SoundObject*) <= sizeof(SndObjectHandle), "can't represent type");
         return reinterpret_cast<SndObjectHandle>(pObject);
     }
 
     X_INLINE SoundObject* SoundHandleToObject(SndObjectHandle object)
     {
-        static_assert(sizeof(SoundObject*) == sizeof(SndObjectHandle), "can't represent type");
+        static_assert(sizeof(SoundObject*) <= sizeof(SndObjectHandle), "can't represent type");
         return reinterpret_cast<SoundObject*>(object);
     }
 
     X_INLINE SoundObject* AKObjectToObject(AkGameObjectID object)
     {
-        static_assert(sizeof(SoundObject*) == sizeof(AkGameObjectID), "can't represent type");
+        static_assert(sizeof(SoundObject*) <= sizeof(AkGameObjectID), "can't represent type");
         return reinterpret_cast<SoundObject*>(object);
     }
 
 } // namespace
 
-static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(-2), "Should be negative 2 yo");
+static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "Handle size mismtach");
+
+static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(2), "Should be 2 yo");
+static_assert(LISTNER_OBJECT_ID == static_cast<SndObjectHandle>(1), "Should be 1 yo");
 static_assert(INVALID_OBJECT_ID == AK_INVALID_GAME_OBJECT, "Invalid id incorrect");
 
 XSound::XSound(core::MemoryArenaBase* arena) :
@@ -304,40 +315,40 @@ bool XSound::init(void)
 
     // Initialize sound engine.
     l_InitSettings.pfnAssertHook = akAssertHook;
-    l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Default;
-    {
-        const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
-        if (pOutputDevice) {
-            if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
-                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_XAudio2;
-                X_LOG1("SoundSys", "using output device: XAudio2");
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
-                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_DirectSound;
-                X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
-                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Wasapi;
-                X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
-                l_InitSettings.eMainOutputType = AkAudioAPI::AkAPI_Dummy;
-                X_LOG1("SoundSys", "using output device: none (no sound)");
-            }
-            else {
-                X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
-                                    "xaudio2, directsound, wasapi, none",
-                    pOutputDevice);
-            }
-        }
-    }
-
     l_InitSettings.uDefaultPoolSize = vars_.SoundEngineDefaultMemoryPoolBytes();
     l_InitSettings.uCommandQueueSize = vars_.CommandQueueMemoryPoolBytes();
     l_InitSettings.uMonitorPoolSize = vars_.MonitorMemoryPoolBytes();
     l_InitSettings.uMonitorQueuePoolSize = vars_.MonitorQueueMemoryPoolBytes();
 
     l_platInitSetings.uLEngineDefaultPoolSize = vars_.SoundEngineLowerDefaultMemoryPoolBytes();
+    
+    l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Default;
+    {
+        const wchar_t* pOutputDevice = gEnv->pCore->GetCommandLineArgForVarW(L"snd_output_device");
+        if (pOutputDevice) {
+            if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"xaudio2")) {
+                l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_XAudio2;
+                X_LOG1("SoundSys", "using output device: XAudio2");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"directsound")) {
+                l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_DirectSound;
+                X_LOG1("SoundSys", "using output device: directsound (DirectX Sound)");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"wasapi")) {
+                l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Wasapi;
+                X_LOG1("SoundSys", "using output device: Wasapi (Windows Audio Session)");
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pOutputDevice, L"none")) {
+                l_platInitSetings.eAudioAPI = AkAudioAPI::AkAPI_Default;
+                X_LOG1("SoundSys", "using output device: none (no sound)");
+            }
+            else {
+                X_ERROR("SoundSys", "Unknown output device \"%ls\" using default instead. valid options: "
+                    "xaudio2, directsound, wasapi, none",
+                    pOutputDevice);
+            }
+        }
+    }
 
     if (SoundEngine::Init(&l_InitSettings, &l_platInitSetings) != AK_Success) {
         X_ERROR("SoundSys", "Cannot initialize sound engine");
@@ -373,113 +384,26 @@ bool XSound::init(void)
     }
 #endif // !X_SUPER
 
-    // Register plugins
-#if !PLUGIN_All
-
-    // what ones do i even want o.o
-
-#if PLUGIN_Codec
-    if (AK::SoundEngine::RegisterAllCodecPlugins() != AK_Success) {
-        X_ERROR("SoundSys", "Error while registering codec plug-ins");
-        return false;
-    }
-#endif // !PLUGIN_Codec
-
-#if PLUGIN_Effect
-    if (AK::SoundEngine::RegisterAllEffectPlugins() != AK_Success) {
-        X_ERROR("SoundSys", "Error while registering effect plug-ins");
-        return false;
-    }
-#endif // !PLUGIN_Effect
-
-#if PLUGIN_Rumble
-    if (AK::SoundEngine::RegisterAllRumblePlugins() != AK_Success) {
-        X_ERROR("SoundSys", "Error while registering rumble plug-ins");
-        return false;
-    }
-#endif // !PLUGIN_Rumble
-
-#if PLUGIN_Source
-    {
-        if (AK::SoundEngine::RegisterPlugin(
-                AkPluginTypeSource,
-                AKCOMPANYID_AUDIOKINETIC,
-                AKSOURCEID_SILENCE,
-                CreateSilenceSource,
-                CreateSilenceSourceParams)
-            != AK_Success) {
-            X_ERROR("SoundSys", "Error while registering silence souce plug-in");
-            return false;
-        }
-
-        if (AK::SoundEngine::RegisterPlugin(
-                AkPluginTypeSource,
-                AKCOMPANYID_AUDIOKINETIC,
-                AKSOURCEID_SINE,
-                CreateSineSource,
-                CreateSineSourceParams)
-            != AK_Success) {
-            X_ERROR("SoundSys", "Error while registering sine souce plug-in");
-            return false;
-        }
-
-        if (AK::SoundEngine::RegisterPlugin(
-                AkPluginTypeSource,
-                AKCOMPANYID_AUDIOKINETIC,
-                AKSOURCEID_TONE,
-                CreateToneSource,
-                CreateToneSourceParams)
-            != AK_Success) {
-            X_ERROR("SoundSys", "Error while registering tone souce plug-in");
-            return false;
-        }
-
-#if defined(AK_WIN) && !defined(AK_USE_METRO_API) && PLUGIN_Source_mp3
-        if (AK::SoundEngine::RegisterPlugin(
-                AkPluginTypeSource,
-                AKCOMPANYID_AUDIOKINETIC,
-                AKSOURCEID_MP3,
-                CreateMP3Source,
-                CreateMP3SourceParams)
-            != AK_Success) {
-            X_ERROR("SoundSys", "Error while registering mp3 souce plug-in");
-            return false;
-        }
-#endif
-
-        if (AK::SoundEngine::RegisterPlugin(
-                AkPluginTypeSource,
-                AKCOMPANYID_AUDIOKINETIC,
-                AKSOURCEID_SYNTHONE,
-                CreateSynthOne,
-                CreateSynthOneParams)
-            != AK_Success) {
-            X_ERROR("SoundSys", "Error while registering synthone souce plug-in");
-            return false;
-        }
-    }
-
-#endif // !PLUGIN_Source
-
-#if PLUGIN_Auro
-    if (AK::SoundEngine::RegisterAuroPlugins() != AK_Success) {
-        X_ERROR("SoundSys", "Error while registering auro plug-ins");
-        return false;
-    }
-#endif // !PLUGIN_Auro
-
-#else
-    /// Note: This a convenience method for rapid prototyping.
-    /// To reduce executable code size register/link only the plug-ins required by your game
-    if (AK::SoundEngine::RegisterAllPlugins() != AK_Success) {
-        X_ERROR("SoundSys", "Error while registering plug-ins");
-        return false;
-    }
-#endif
 
     vars_.applyVolume();
 
     AKRESULT res;
+
+
+    // Register the main listener.
+    res = AK::SoundEngine::RegisterGameObj(LISTNER_OBJECT_ID, "Default Listener");
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error creating listner object. %s", AkResult::ToString(res, desc));
+        return false;
+    }
+    
+    res = AK::SoundEngine::SetDefaultListeners(&LISTNER_OBJECT_ID, 1);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error setting default listners. %s", AkResult::ToString(res, desc));
+        return false;
+    }
 
     // register a object for stuff with no position.
     res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
@@ -600,15 +524,14 @@ void XSound::Update(core::FrameData& frame)
         }
 
         AkListenerPosition listener;
-        listener.OrientationFront.X = 0;
-        listener.OrientationFront.Y = 0;
-        listener.OrientationFront.Z = 0;
-        listener.OrientationTop.X = 0;
-        listener.OrientationTop.Y = 0;
-        listener.OrientationTop.Z = 1.0f;
-        listener.Position = Vec3ToAkVector(listenerTrans_.pos);
+        listener.SetOrientation(
+            0.f, 1.f, 0.f,
+            0.f, 0.f, 1.f
+        );
+        listener.SetPosition(Vec3ToAkVector(listenerTrans_.pos));
 
-        AKRESULT res = SoundEngine::SetListenerPosition(listener);
+        AKRESULT res;
+        res = SoundEngine::SetPosition(LISTNER_OBJECT_ID, listener);
         if (res != AK_Success) {
             AkResult::Description desc;
             X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));

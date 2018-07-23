@@ -26,7 +26,7 @@ X_NAMESPACE_BEGIN(sound)
 #endif // !X_SOUND_ENABLE_DEBUG_NAMES
 
 typedef core::Hash::Fnv1Val HashVal;
-typedef uintptr_t SndObjectHandle;
+typedef uint64_t SndObjectHandle;
 typedef HashVal EventID;
 typedef HashVal RtpcID;
 typedef HashVal SwitchGroupID;
@@ -35,7 +35,8 @@ typedef float RtpcValue;
 
 static const uint32_t MAX_SOUND_OBJECTS = 1 << 9;
 
-static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(-2);
+static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(2);
+static const SndObjectHandle LISTNER_OBJECT_ID = static_cast<SndObjectHandle>(1);
 static const SndObjectHandle INVALID_OBJECT_ID = static_cast<SndObjectHandle>(-1);
 
 X_DECLARE_ENUM(CurveInterpolation)
