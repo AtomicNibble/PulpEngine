@@ -490,11 +490,6 @@
     <ClInclude Include="EngineEnv.h" />
     <ClInclude Include="Gui\Gui.h" />
     <ClInclude Include="Gui\GuiManger.h" />
-    <ClInclude Include="Gui\GuiScript.h" />
-    <ClInclude Include="Gui\RegExp.h" />
-    <ClInclude Include="Gui\SimpleWindow.h" />
-    <ClInclude Include="Gui\WinVar.h" />
-    <ClInclude Include="Gui\XWindow.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Material\TechDefStateManager.h" />
@@ -523,11 +518,6 @@
     <ClCompile Include="Drawing\VariableStateManager.cpp" />
     <ClCompile Include="Gui\Gui.cpp" />
     <ClCompile Include="Gui\GuiManger.cpp" />
-    <ClCompile Include="Gui\GuiScript.cpp" />
-    <ClCompile Include="Gui\RegExp.cpp" />
-    <ClCompile Include="Gui\SimpleWindow.cpp" />
-    <ClCompile Include="Gui\WinVar.cpp" />
-    <ClCompile Include="Gui\XWindow.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\Level_debug.cpp" />
     <ClCompile Include="Level\Level_load.cpp" />
@@ -569,8 +559,6 @@
   <ItemGroup>
     <None Include="Drawing\PrimativeContext.inl" />
     <None Include="Gui\Gui.inl" />
-    <None Include="Gui\SimpleWindow.inl" />
-    <None Include="Gui\XWindow.inl" />
     <None Include="Material\MaterialManager.inl" />
     <None Include="Material\TechDefStateManager.inl" />
     <None Include="Model\RenderMesh.inl" />

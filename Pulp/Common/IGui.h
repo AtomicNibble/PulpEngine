@@ -5,42 +5,6 @@
 
 #include <Math\XVector.h>
 
-//
-//	===== GUI =====
-//
-//	This is a custom gui system.
-//
-//	It will work on menu files that define a menu's layout and items.
-//
-//	the order of the items is the order they are drawn in.
-//
-//	each frame stuff that is been draw is added into a Vb/ IB
-//	we allow diffrent shapes to be made like rectangles and others made from verts.
-//
-//	since we are sending verts for rectangles, supporting other shapes is easy.
-//	Lines are also allowed.
-//
-//	I want to store everything in screen space for 2d menu's
-//
-//	what about menu's that are in the 3d world?
-//
-//	I could just take the size of them 3d menu items and scale them into the area.
-//	instead of the screen space.
-//
-//	But what if i want a 3d menu that is not scaled, but can be any size.
-//
-//	will work it out later :Z
-//
-//	What about using swf? it means i only have to render and not do goaty things like
-//	manage the layout of shit.
-//
-//
-//	How should i draw the gui?
-//  Since somethings will be visable some frames, and also move around between frames.
-//
-//	So I think it's probs best if each frame i create a vb / IB in system memory.
-//	It can be done as a job since it has real dependancies.
-//
 
 X_NAMESPACE_DECLARE(engine,
                     class IPrimativeContext);
@@ -50,23 +14,11 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
     static const char* MENU_FILE_EXTENSION = "lua";
-    static const char* GUI_FILE_EXTENSION = "gui";
-    static const char* GUI_BINARY_FILE_EXTENSION = "guib";
 
-    static const uint32_t GUI_BINARY_MAGIC = X_TAG('g', 'u', 'i', 'b');
-    static const uint8_t GUI_BINARY_VERSION = 1;
+    static const uint32_t MENU_MAX_LOADED = 64;
 
-    // some limits
-    static const uint32_t GUI_MAX_MENUS = 64;
-    static const uint32_t GUI_MENU_MAX_ITEMS = 512; // max per a menu
 
-    static const uint32_t GUI_CAPTION_HEIGHT = 16;
-    static const uint32_t GUI_SCROLLER_SIZE = 16;
-    static const uint32_t GUI_SCROLLBAR_SIZE = 16;
-
-    static const uint32_t GUI_MAX_WINDOW_NAME_LEN = 28; // error on longer, instead of just clipping.
-    static const uint32_t GUI_MAX_LIST_ITEMS = 1024;
-
+#if 0
     X_DECLARE_FLAGS(WindowFlag)
     (
         CAPTION,
@@ -151,65 +103,26 @@ namespace gui
         static const uint32_t MAX_VALUE = BOTTOM_RIGHT;
     };
 
-    struct FileHdr
-    {
-        FileHdr()
-        {
-            core::zero_this(this);
-        }
-
-        uint32_t Magic;
-        uint8_t version;
-        uint8_t pad[3];
-        uint32_t crc32;
-        uint32_t fileSize;
-
-        X_INLINE bool IsValid(void) const
-        {
-            return Magic == GUI_BINARY_MAGIC;
-        }
-
-        X_INLINE bool IsCurrentVersion(void) const
-        {
-            return version == GUI_BINARY_VERSION;
-        }
-    };
-
-    X_ENSURE_SIZE(FileHdr, 16)
-    // i won't have a seprate gui flag.
-    // i'll just implment a seralise methord in the window class.
+#endif
 
     struct IGui
     {
-        virtual ~IGui(){};
+        virtual ~IGui() = default;
 
-        virtual const char* getName(void) const X_ABSTRACT;
-
-        virtual void setCursorPos(float x, float y) X_ABSTRACT;
-        virtual void setCursorPos(const Vec2f& pos) X_ABSTRACT;
-        virtual Vec2f getCursorPos(void) X_ABSTRACT;
-        virtual float getCursorPosX(void) X_ABSTRACT;
-        virtual float getCursorPosY(void) X_ABSTRACT;
-
-        // repaints the ui
-        virtual void Redraw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
-        virtual void DrawCursor(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
-
-        // dose shit.
-        virtual const char* Activate(bool activate, int time) X_ABSTRACT;
+        virtual void Draw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
     };
 
     struct IGuiManger
     {
-        virtual ~IGuiManger(){};
+        virtual ~IGuiManger() = default;
 
         virtual bool init(void) X_ABSTRACT;
         virtual void shutdown(void) X_ABSTRACT;
 
-        virtual IGui* loadGui(const char* name) X_ABSTRACT;
-        virtual IGui* findGui(const char* name) X_ABSTRACT;
+        virtual IGui* loadGui(const char* pName) X_ABSTRACT;
+        virtual IGui* findGui(const char* pName) X_ABSTRACT;
 
-        virtual void listGuis(const char* wildcardSearch = nullptr) const X_ABSTRACT;
+        virtual void listGuis(const char* pWildcardSearch = nullptr) const X_ABSTRACT;
     };
 
 } // namespace gui

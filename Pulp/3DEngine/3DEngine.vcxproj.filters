@@ -7,21 +7,6 @@
     <ClCompile Include="Gui\GuiManger.cpp">
       <Filter>Source Files\Gui</Filter>
     </ClCompile>
-    <ClCompile Include="Gui\GuiScript.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\RegExp.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\SimpleWindow.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\WinVar.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Gui\XWindow.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
     <ClCompile Include="X3DEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -105,21 +90,6 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Gui\XWindow.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\WinVar.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\SimpleWindow.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\RegExp.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="Gui\GuiScript.h">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
     <ClInclude Include="Gui\GuiManger.h">
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
@@ -277,12 +247,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="Gui\XWindow.inl">
-      <Filter>Header Files\Gui</Filter>
-    </None>
-    <None Include="Gui\SimpleWindow.inl">
-      <Filter>Header Files\Gui</Filter>
-    </None>
     <None Include="Gui\Gui.inl">
       <Filter>Header Files\Gui</Filter>
     </None>
