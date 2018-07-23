@@ -26,9 +26,6 @@ X_DISABLE_WARNING(4505)
 // Comms
 #include <AK/Comm/AkCommunication.h>
 
-// Plugin
-#include <AK/Plugin/AllPluginsRegistrationHelpers.h>
-
 X_ENABLE_WARNING(4505)
 
 // link all plugins
