@@ -122,10 +122,10 @@ X_LINK_LIB("AuroPannerMixer");
 X_LINK_LIB("dinput8");
 X_LINK_LIB("dxguid");
 
-#if X_SUPER == 0
+#if X_ENABLE_SOUND_COMS
 X_LINK_LIB("ws2_32"); // used for winsock
 X_LINK_LIB("CommunicationCentral");
-#endif // !X_SUPER
+#endif // X_ENABLE_SOUND_COMS
 
 using namespace AK;
 
@@ -349,7 +349,7 @@ bool XSound::init(void)
         return false;
     }
 
-#if X_SUPER == 0
+#if X_ENABLE_SOUND_COMS
 
     if (vars_.EnableComs()) {
         // Initialize communication.
@@ -363,7 +363,7 @@ bool XSound::init(void)
 
         comsSysInit_ = true;
     }
-#endif // !X_SUPER
+#endif // !X_ENABLE_SOUND_COMS
 
 
     vars_.applyVolume();
@@ -442,12 +442,12 @@ void XSound::shutDown(void)
         X_DELETE(pScriptBinds_, arena_);
     }
 
-#if X_SUPER == 0
+#if X_ENABLE_SOUND_COMS
     if (comsSysInit_) {
         Comm::Term();
         comsSysInit_ = false;
     }
-#endif // !X_SUPER
+#endif // !X_ENABLE_SOUND_COMS
 
     freeDangling();
 
