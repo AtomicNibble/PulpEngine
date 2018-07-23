@@ -49,6 +49,7 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    static const char* MENU_FILE_EXTENSION = "lua";
     static const char* GUI_FILE_EXTENSION = "gui";
     static const char* GUI_BINARY_FILE_EXTENSION = "guib";
 

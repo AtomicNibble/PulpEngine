@@ -52,7 +52,8 @@ X_DECLARE_ENUM8(AssetType)
     SHADER,     // Not in db
     LEVEL,      // Not in db
     CONFIG,     // Not in db
-    TECHDEF     // Not in db
+    TECHDEF,    // Not in db
+    MENU
 );
 
 namespace api
