@@ -1359,7 +1359,7 @@ void IPrimativeContext::drawImageWithUV(float xpos, float ypos, float z, float w
     pQuad[3].pos.y = ypos + h;
     pQuad[3].pos.z = z;
 
-    for (int32_t i = 0; i < 6; ++i) {
+    for (int32_t i = 0; i < 4; ++i) {
         pQuad[i].color = col;
         pQuad[i].st = core::XHalf2::compress(s[i], t[i]);
     }
