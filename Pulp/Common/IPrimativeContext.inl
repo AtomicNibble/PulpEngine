@@ -33,6 +33,12 @@ X_INLINE void IPrimativeContext::drawQuad(const Rectf& rect, Material* pMaterial
         pMaterial, 0, 1, 1, 0, col);
 }
 
+X_INLINE void IPrimativeContext::drawQuad(const Rectf& rect, Color8u col)
+{
+    drawQuad(rect.getX1(), rect.getY1(), 0.f, rect.getWidth(), rect.getHeight(), col);
+}
+
+
 X_INLINE void IPrimativeContext::drawImage(float xpos, float ypos, float z, float w, float h,
     Material* pMaterial, float s0, float t0, float s1, float t1,
     const Colorf& col, bool filtered)
@@ -107,6 +113,11 @@ X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2, 
     pLine[0].color = color1;
     pLine[1].pos = pos2;
     pLine[1].color = color1;
+}
+
+X_INLINE void IPrimativeContext::drawRect(const Rectf& rect, Color8u col)
+{
+    drawRect(rect.getX1(), rect.getY1(), rect.getWidth(), rect.getHeight(), col);
 }
 
 // Points

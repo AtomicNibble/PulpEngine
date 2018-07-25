@@ -81,6 +81,7 @@ public:
 
     X_INLINE void drawQuad(float x, float y, float width, float height, Material* pMaterial, Color8u col);
     X_INLINE void drawQuad(const Rectf& rect, Material* pMaterial, Color8u col);
+    X_INLINE void drawQuad(const Rectf& rect, Color8u col);
 
     // for 2d, z is depth not position
     void drawQuad(float x, float y, float z, float width, float height, Color8u col);
@@ -101,6 +102,7 @@ public:
         const Vec3f& pos2, Color8u color2);
     X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, Color8u color1);
 
+    X_INLINE void drawRect(const Rectf& rect, Color8u col);
     void drawRect(float x, float y, float width, float height, Color8u col);
     void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
     void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
