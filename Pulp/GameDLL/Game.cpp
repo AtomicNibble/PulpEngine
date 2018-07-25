@@ -8,11 +8,14 @@
 
 #include <Math\XMatrixAlgo.h>
 #include <Containers\FixedFifo.h>
+#include <Hashing\Fnva1Hash.h>
 
 // TMP
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <SnapShot.h>
+
+#include <IGui.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -58,6 +61,325 @@ void XGame::registerCmds(void)
     
 }
 
+engine::gui::IMenu* pPause = nullptr;
+
+engine::Material* pCamel;
+engine::Material* gpCursor;
+
+
+class GuiContex
+{
+    X_DECLARE_ENUM(Mouse)(
+        LEFT,
+        RIGHT
+    );
+
+    using MouseDownArr = std::array<bool, Mouse::ENUM_COUNT>;
+
+    typedef core::Hash::Fnv1aVal ItemID;
+
+    static const ItemID INVALID_ITEM_ID = static_cast<ItemID>(0);
+
+public:
+    GuiContex();
+
+    void init(engine::Material* pCursor);
+    void setPrimContet(engine::IPrimativeContext* pPrim);
+    
+    void processInput(core::FrameInput& input);
+
+    void begin(Rectf rect);
+    void end(void);
+
+    void setCursorPos(Vec2f pos);
+    void setFont(font::IFont* pFont);
+
+
+    void fill(Color8u col);
+
+    bool button(const char* pText);
+    void text(const char* pText);
+
+private:
+    bool itemHoverable(ItemID id, const Rectf& r);
+
+    void setActiveID(ItemID id);
+    void clearActiveID(void);
+
+    static ItemID getID(const char* pLabel);
+
+private:
+    engine::IPrimativeContext* pPrim_;
+    Rectf rect_;
+    font::TextDrawContext txtCtx_;
+
+    // buttons
+    Vec2f btnSize_;
+    Vec2f btnPos_;
+
+    MouseDownArr mouseDown_;
+
+    ItemID activeId_;
+    ItemID hoveredId_;
+
+    Vec2f cursorPos_;
+    Vec2f cursorDelta_;
+
+
+    engine::Material* pCursor_;
+};
+
+GuiContex gui;
+
+GuiContex::GuiContex() :
+    pPrim_(nullptr),
+    pCursor_(nullptr)
+{
+    txtCtx_.col = Col_Midnightblue;
+    txtCtx_.size = Vec2f(30.f, 30.f);
+    txtCtx_.effectId = 0;
+    txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
+    txtCtx_.flags.Set(font::DrawTextFlag::CENTER_VER);
+
+    mouseDown_.fill(false);
+
+    activeId_ = INVALID_ITEM_ID;
+}
+
+void GuiContex::init(engine::Material* pCursor)
+{
+    pCursor_ = pCursor;
+
+    txtCtx_.pFont = gEnv->pFontSys->getDefault();
+}
+
+void GuiContex::setPrimContet(engine::IPrimativeContext* pPrim)
+{
+    pPrim_ = pPrim;
+}
+
+void GuiContex::processInput(core::FrameInput& input)
+{
+    cursorDelta_ = Vec2f::zero();
+
+    for (auto& e : input.events)
+    {
+        if (e.deviceType == input::InputDeviceType::MOUSE)
+        {
+            if (e.keyId == input::KeyId::MOUSE_LEFT)
+            {
+                mouseDown_[Mouse::LEFT] = e.action == input::InputState::PRESSED;
+            }
+            else if (e.keyId == input::KeyId::MOUSE_RIGHT)
+            {
+                mouseDown_[Mouse::RIGHT] = e.action == input::InputState::PRESSED;
+            }
+            else if (e.keyId == input::KeyId::MOUSE_X)
+            {
+                cursorDelta_.x += e.value;
+            }
+            else if (e.keyId == input::KeyId::MOUSE_Y)
+            {
+                cursorDelta_.y += e.value;
+            }
+        }
+    }
+
+}
+
+void GuiContex::begin(Rectf rect)
+{
+    hoveredId_ = INVALID_ITEM_ID;
+
+    rect_ = rect;
+
+    btnSize_.Set(256.f, 64.f);
+    btnPos_.Set((rect_.getWidth() * 0.5f) - (btnSize_.x * 0.5f), 400.f);
+
+    cursorPos_ += cursorDelta_;
+}
+
+void GuiContex::end(void)
+{
+    pPrim_->drawCrosshair(Vec3f(cursorPos_), 10.f, Col_Red);
+}
+
+
+void GuiContex::setCursorPos(Vec2f pos)
+{
+    cursorPos_ = pos;
+}
+
+void GuiContex::setFont(font::IFont* pFont)
+{
+    txtCtx_.pFont = pFont;
+}
+
+void GuiContex::fill(Color8u col)
+{
+    pPrim_->drawQuad(rect_, col);
+}
+
+
+bool GuiContex::button(const char* pText)
+{
+    // pos?
+    X_UNUSED(pText);
+    Rectf r(btnPos_, btnPos_+ btnSize_);
+
+    auto id = getID(pText);
+
+    bool hover = itemHoverable(id, r);
+    if (hover)
+    {
+        if (mouseDown_[Mouse::LEFT])
+        {
+            activeId_ = id;
+        }
+
+    }
+
+    bool held = false;
+    bool pressed = false;
+
+    if (id == activeId_)
+    {
+        if (mouseDown_[Mouse::LEFT])
+        {
+            held = true;
+        }
+        else
+        {
+            if (hover) {
+                pressed = true;
+            }
+            clearActiveID();
+        }
+
+    }
+
+    auto btnCol = Color8u(15, 15, 15, 255);
+    auto borderCol = Color8u(35, 35, 35, 255);
+
+    if (held) {
+        btnCol = Color8u(45, 30, 30, 255);
+    }
+    else if (hover) {
+        btnCol = Color8u(30, 30, 30, 255);
+    }
+
+    pPrim_->drawQuad(r, btnCol);
+    pPrim_->drawRect(r, borderCol);
+    pPrim_->drawText(Vec3f(r.getCenter()), txtCtx_, pText);
+
+    btnPos_.y += btnSize_.y;
+    btnPos_.y += 20.f;
+    return pressed;
+}
+
+void GuiContex::text(const char* pText)
+{
+    X_UNUSED(pText);
+}
+
+bool GuiContex::itemHoverable(ItemID id, const Rectf& r)
+{
+    if (hoveredId_ != INVALID_ITEM_ID && hoveredId_ != id) {
+        return false;
+    }
+    if (activeId_ != INVALID_ITEM_ID && activeId_ != id) {
+        return false;
+    }
+
+    if (!r.contains(cursorPos_)) {
+        return false;
+    }
+
+    hoveredId_ = id;
+    return true;
+}
+
+
+void GuiContex::setActiveID(ItemID id)
+{
+    activeId_ = id;
+}
+
+void GuiContex::clearActiveID(void)
+{
+    activeId_ = INVALID_ITEM_ID;
+}
+
+GuiContex::ItemID GuiContex::getID(const char* pLabel)
+{
+    return core::Hash::Fnv1Hash(pLabel, core::strUtil::strlen(pLabel));
+}
+
+// ---------------------------------
+
+bool drawMEow = true;
+
+void drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
+{
+    gui.setPrimContet(pPrim);
+    gui.processInput(frame.input);
+
+    for (auto e : frame.input.events)
+    {
+        if (e.keyId == input::KeyId::ESCAPE && e.action == input::InputState::RELEASED)
+        {
+            drawMEow = !drawMEow;
+        }
+    }
+
+    if (!drawMEow) {
+        return;
+    }
+
+    // dunno how todo this cursor pos.
+    // since i have relative mouse shit.
+    // so somewhere i need to store current position
+    // and update it.
+    Rectf rect;
+    rect.set(0.f, 0.f, 1680.f, 1050.f);
+
+    static Vec2f curPos(rect.getCenter());
+
+    curPos += frame.input.mouseDelta;
+
+    // mouse.
+
+    gui.begin(rect);
+    gui.fill(Color8u(20, 20, 20, 220));
+
+    if (gui.button("Resume"))
+    {
+        // do stuff
+        X_LOG0("Game", "Resume Game!");
+        drawMEow = false;
+    }
+
+    if (gui.button("Options"))
+    {
+        // do stuff
+    }
+
+    if (gui.button("Quit"))
+    {
+        // do stuff
+    }
+
+    auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds() * 0.75f;
+
+    float t = (math<float>::sin(val) + 1.f) * 256.f;
+    float x = (1700.f) - t;
+
+    pPrim->drawQuad(x, 538.f, 512.f, 512.f, pCamel, Col_White);
+
+    gui.end();
+}
+
+
 bool XGame::init(void)
 {
     X_LOG0("Game", "init");
@@ -68,6 +390,21 @@ bool XGame::init(void)
 
     pTimer_ = gEnv->pTimer;
     pRender_ = gEnv->pRender;
+
+    auto* pGuiMan = gEnv->p3DEngine->getMenuManager();
+
+    pPause = pGuiMan->loadMenu("pause");
+    pGuiMan->waitForLoad(pPause);
+
+    auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
+
+    pCamel = pMatMan->loadMaterial("misc/camel");
+    pMatMan->waitForLoad(pCamel);
+
+    gpCursor = pMatMan->loadMaterial("ui/cursor");
+    pMatMan->waitForLoad(gpCursor);
+
+    gui.init(gpCursor);
 
     // networking.
     {
@@ -214,6 +551,11 @@ bool XGame::update(core::FrameData& frame)
 
         con.col = col.lerp(t, Col_Red);
         pPrim->drawText(Vec3f(center.x, 75, 1.f), con, "Insert fancy main menu here");
+
+        // TEMP
+        drawMenu(frame, pPrim);
+
+        //pPause->draw(pPrim);
     }
     else if (status == net::SessionStatus::Loading)
     {
@@ -346,6 +688,8 @@ bool XGame::update(core::FrameData& frame)
         }
 
         world_->update(frame, userCmdMan_, localId);
+
+        drawMenu(frame, pPrim);
     }
     else if (status == net::SessionStatus::PartyLobby)
     {
@@ -408,8 +752,8 @@ bool XGame::update(core::FrameData& frame)
 
     prevStatus_ = status;
 
+#if 0
     {
-
         con.col = Col_Crimson;
         con.size = Vec2f(24.f, 24.f);
         con.flags.Clear();
@@ -422,6 +766,7 @@ bool XGame::update(core::FrameData& frame)
 
         pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
     }
+#endif
 
     if (vars_.userCmdDrawDebug())
     {
