@@ -490,6 +490,7 @@
     <ClInclude Include="EngineEnv.h" />
     <ClInclude Include="Gui\Menu.h" />
     <ClInclude Include="Gui\MenuManger.h" />
+    <ClInclude Include="Gui\ScriptBinds.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Material\MaterialManager.h" />
     <ClInclude Include="Material\TechDefStateManager.h" />
@@ -518,6 +519,7 @@
     <ClCompile Include="Drawing\VariableStateManager.cpp" />
     <ClCompile Include="Gui\Menu.cpp" />
     <ClCompile Include="Gui\MenuManger.cpp" />
+    <ClCompile Include="Gui\ScriptBinds.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Level\Level_debug.cpp" />
     <ClCompile Include="Level\Level_load.cpp" />

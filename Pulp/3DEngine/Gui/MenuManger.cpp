@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "MenuManger.h"
 
+#include "ScriptBinds.h"
+
 #include <Assets\AssetLoader.h>
 
 #include <IConsole.h>
@@ -16,6 +18,8 @@ namespace gui
     XMenuManager::XMenuManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan) :
         arena_(arena),
         pMatMan_(pMatMan),
+        pScriptSys_(nullptr),
+        pAssetLoader_(nullptr),
         menus_(arena, sizeof(MenuResource), X_ALIGN_OF(MenuResource), "MenuPool")
     {
         
@@ -29,19 +33,24 @@ namespace gui
 
     bool XMenuManager::init(void)
     {
-        X_LOG0("GuiManager", "Starting GUI System");
+        X_LOG0("MenuManager", "Starting GUI System");
 
         ADD_COMMAND_MEMBER("listUi", this, XMenuManager, &XMenuManager::Cmd_ListUis, core::VarFlags::SYSTEM, "List the loaded ui");
 
+        pScriptSys_ = gEnv->pScriptSys;
+
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::MENU, this, MENU_FILE_EXTENSION);
+
+        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_);
+        pScriptBinds_->bind();
 
         return true;
     }
 
     void XMenuManager::shutdown(void)
     {
-        X_LOG0("GuiManager", "Shutting Down");
+        X_LOG0("MenuManager", "Shutting Down");
 
 
     }
@@ -61,7 +70,7 @@ namespace gui
         }
 
         // we create a model and give it back
-        pMenu = menus_.createAsset(name, name);
+        pMenu = menus_.createAsset(name, *this, name);
 
         addLoadRequest(pMenu);
 
@@ -78,7 +87,7 @@ namespace gui
             return pMenu;
         }
 
-        X_WARNING("GuiManager", "Failed to find menu: \"%s\"", pName);
+        X_WARNING("MenuManager", "Failed to find menu: \"%s\"", pName);
         return nullptr;
     }
 
@@ -123,6 +132,15 @@ namespace gui
         X_UNUSED(pWildcardSearch);
     }
 
+    void XMenuManager::draw(IPrimativeContext* pPrim, IMenu* pMenu)
+    {
+        X_UNUSED(pPrim, pMenu);
+
+
+        
+
+
+    }
 
     void XMenuManager::Cmd_ListUis(core::IConsoleCmdArgs* pArgs)
     {

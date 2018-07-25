@@ -11,10 +11,12 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    class XMenuManager;
+
     class XMenu : public IMenu, public core::AssetBase
     {
     public:
-        XMenu(core::string& name);
+        XMenu(XMenuManager& menuMan, core::string& name);
         ~XMenu() X_OVERRIDE;
 
         void draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
@@ -22,6 +24,7 @@ namespace gui
         bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
     private:
+        XMenuManager& menuMan_;
         core::UniquePointer<char[]> data_;
         uint32_t dataSize_;
     };

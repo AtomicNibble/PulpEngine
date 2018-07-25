@@ -10,10 +10,15 @@
 X_NAMESPACE_DECLARE(core,
                     struct IConsoleCmdArgs);
 
+X_NAMESPACE_DECLARE(engine,
+    class IPrimativeContext);
+
 X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    class ScriptBinds_Menu;
+
     class XMenuManager : public IMenuManager
         , private core::IAssetLoadSink
     {
@@ -31,12 +36,13 @@ namespace gui
         IMenu* loadMenu(const char* pName) X_FINAL;
         IMenu* findMenu(const char* pName) X_FINAL;
 
-        void releaseGui(IMenu* pGui) X_FINAL;
-
-        bool waitForLoad(IMenu* pGui) X_FINAL;
+        void releaseGui(IMenu* pMenu) X_FINAL;
+        bool waitForLoad(IMenu* pMenu) X_FINAL;
 
         void listGuis(const char* pWildcardSearch = nullptr) const X_FINAL;
         //~IMenuManager
+
+        void draw(IPrimativeContext* pPrim, IMenu* pMenu);
 
     private:
         // load / processing
@@ -50,9 +56,11 @@ namespace gui
     private:
         core::MemoryArenaBase* arena_;
         XMaterialManager* pMatMan_;
-
+        script::IScriptSys* pScriptSys_;
         core::AssetLoader* pAssetLoader_;
     
+        ScriptBinds_Menu* pScriptBinds_;
+
         MenuContainer menus_;
     };
 
