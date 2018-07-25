@@ -332,6 +332,7 @@ X_ALIGNED_SYMBOL(struct InputEvent, 32)
         modifiers = ModifiersMasks::NONE;
         value = 0.f;
         pSymbol = nullptr;
+        inputchar = 0;
     }
 
     InputDeviceType::Enum deviceType; // keyboard, mouse etc
