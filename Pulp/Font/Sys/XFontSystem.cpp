@@ -149,23 +149,23 @@ IFont* XFontSystem::getDefault(void) const
 
 void XFontSystem::releaseFont(IFont* pFont)
 {
-    FontResource* pModelRes = static_cast<FontResource*>(pFont);
-    if (pModelRes->removeReference() == 0) {
-        releaseResources(pModelRes);
+    FontResource* pFontRes = static_cast<FontResource*>(pFont);
+    if (pFontRes->removeReference() == 0) {
+        releaseResources(pFontRes);
 
-        fonts_.releaseAsset(pModelRes);
+        fonts_.releaseAsset(pFontRes);
     }
 }
 
 bool XFontSystem::waitForLoad(IFont* pFont)
 {
-    FontResource* pModelRes = static_cast<FontResource*>(pFont);
+    FontResource* pFontRes = static_cast<FontResource*>(pFont);
 
-    if (pModelRes->getStatus() == core::LoadStatus::Complete) {
+    if (pFontRes->getStatus() == core::LoadStatus::Complete) {
         return true;
     }
 
-    return pAssetLoader_->waitForLoad(pModelRes);
+    return pAssetLoader_->waitForLoad(pFontRes);
 }
 
 void XFontSystem::freeDangling(void)
@@ -175,11 +175,11 @@ void XFontSystem::freeDangling(void)
 
         // any left?
         for (const auto& m : fonts_) {
-            auto* pModelRes = m.second;
-            const auto& name = pModelRes->getName();
-            X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+            auto* pFontRes = m.second;
+            const auto& name = pFontRes->getName();
+            X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pFontRes->getRefCount());
 
-            releaseResources(pModelRes);
+            releaseResources(pFontRes);
         }
     }
 
