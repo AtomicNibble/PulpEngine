@@ -87,7 +87,12 @@ bool XFontSystem::asyncInitFinalize(void)
         auto* pFont = fontIt.second;
 
         // we call all even if one fails.
-        result &= waitForLoad(pFont);
+        auto ok = waitForLoad(pFont);
+        if (!ok) {
+            X_ERROR("Font", "Failed to load: \"%s\"", pFont->getName().c_str());
+        }
+
+        result &= ok;
     }
 
     return result;
