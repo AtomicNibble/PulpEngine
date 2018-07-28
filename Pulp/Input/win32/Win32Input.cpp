@@ -10,7 +10,6 @@
 #include <Util\LastError.h>
 #include "InputCVars.h"
 
-#include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(input)
 
@@ -19,8 +18,7 @@ XWinInput::XWinInput(core::MemoryArenaBase* arena, HWND hWnd) :
     isWow64_(FALSE),
     hWnd_(hWnd),
     pKeyBoard_(nullptr),
-    pMouse_(nullptr),
-    pJobSystem_(nullptr)
+    pMouse_(nullptr)
 {
     devices_.reserve(2);
 };
@@ -44,8 +42,6 @@ bool XWinInput::Init(void)
     X_PROFILE_NO_HISTORY_BEGIN("InputInit", core::profiler::SubSys::INPUT);
 
     XBaseInput::Init();
-
-    pJobSystem_ = gEnv->pJobSys;
 
     // work out if WOW64.
     if (!::IsWow64Process(::GetCurrentProcess(), &isWow64_)) {

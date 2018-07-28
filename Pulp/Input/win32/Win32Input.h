@@ -61,8 +61,6 @@ private:
 
     XInputDeviceWin32* pKeyBoard_;
     XInputDeviceWin32* pMouse_;
-
-    core::V2::JobSystem* pJobSystem_;
 };
 
 X_NAMESPACE_END
