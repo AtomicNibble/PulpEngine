@@ -570,8 +570,13 @@ void XConsole::shutDown(void)
     // clear up vars.
     if (!VarMap_.empty()) {
 
-        for (auto it : VarMap_) {
-            X_DELETE(it.second, &varArena_);
+        // we use the value of the last item to move iterator
+        for (auto it = VarMap_.begin(); it != VarMap_.end();) 
+        {
+            auto* pVar = it->second;
+            ++it;
+
+            X_DELETE(pVar, &varArena_);
         }
 
         VarMap_.clear();
