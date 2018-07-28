@@ -569,8 +569,9 @@ void XConsole::shutDown(void)
 
     // clear up vars.
     if (!VarMap_.empty()) {
-        while (!VarMap_.empty()) {
-            VarMap_.begin()->second->Release();
+
+        for (auto it : VarMap_) {
+            X_DELETE(it.second, &varArena_);
         }
 
         VarMap_.clear();
@@ -1424,16 +1425,21 @@ ICVar* XConsole::GetCVar(const char* pName)
 
 void XConsole::UnregisterVariable(const char* pVarName)
 {
-    auto itor = VarMap_.find(pVarName);
-
-    if (itor == VarMap_.end()) {
+    auto it = VarMap_.find(pVarName);
+    if (it == VarMap_.end()) {
         X_WARNING("Console", "Failed to find var \"%s\" for removal", pVarName);
         return;
     }
 
-    ICVar* pCVar = itor->second;
-
     VarMap_.erase(pVarName);
+    X_DELETE(it->second, &varArena_);
+}
+
+void XConsole::UnregisterVariable(ICVar* pCVar)
+{
+    auto pName = pCVar->GetName();
+
+    VarMap_.erase(pName);
     X_DELETE(pCVar, &varArena_);
 }
 

@@ -182,6 +182,11 @@ void XConsoleNULL::UnregisterVariable(const char* sVarName)
     X_UNUSED(sVarName);
 }
 
+void XConsoleNULL::UnregisterVariable(ICVar* pVar)
+{
+    X_UNUSED(pVar);
+}
+
 void XConsoleNULL::RegisterCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags,
     const char* desc)
 {

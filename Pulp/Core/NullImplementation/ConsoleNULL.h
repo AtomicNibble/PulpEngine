@@ -52,6 +52,7 @@ public:
     virtual ICVar* GetCVar(const char* name) X_FINAL;
 
     virtual void UnregisterVariable(const char* sVarName) X_FINAL;
+    virtual void UnregisterVariable(ICVar* pVar) X_FINAL;
 
     virtual void RegisterCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
     virtual void UnRegisterCommand(const char* Name) X_FINAL;

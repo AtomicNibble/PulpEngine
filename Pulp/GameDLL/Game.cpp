@@ -461,7 +461,7 @@ bool XGame::shutDown(void)
     }
 
     if (pFovVar_) {
-        pFovVar_->Release();
+        gEnv->pConsole->UnregisterVariable(pFovVar_);
     }
 
     if (world_) {

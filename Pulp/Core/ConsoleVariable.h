@@ -28,8 +28,6 @@ public:
     virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
     virtual void SetModified(void) X_FINAL;
 
-    virtual void Release(void) X_OVERRIDE;
-
     virtual void ForceSet(const char* s) X_OVERRIDE;
     virtual void SetDefault(const char* s) X_OVERRIDE;
 

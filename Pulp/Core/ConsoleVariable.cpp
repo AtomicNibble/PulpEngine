@@ -106,11 +106,6 @@ void CVarBase::SetDesc(const char* pDesc)
     pDesc_ = pDesc;
 }
 
-void CVarBase::Release(void)
-{
-    this->pConsole_->UnregisterVariable(GetName());
-}
-
 ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)
 {
     const bool wasSet = changeFunc_;

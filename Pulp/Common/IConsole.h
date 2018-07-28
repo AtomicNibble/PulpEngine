@@ -116,6 +116,7 @@ struct IConsole
     virtual ICVar* GetCVar(const char* pName) X_ABSTRACT;
 
     virtual void UnregisterVariable(const char* pVarName) X_ABSTRACT;
+    virtual void UnregisterVariable(ICVar* pVar) X_ABSTRACT;
 
     virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_ABSTRACT;
     virtual void UnRegisterCommand(const char* pName) X_ABSTRACT;
@@ -165,7 +166,6 @@ struct ICVar
 
     virtual VarFlag::Enum GetType(void) const X_ABSTRACT;
 
-    virtual void Release(void) X_ABSTRACT;
     virtual void Reset(void) X_ABSTRACT; // reset to default value.
 
     virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_ABSTRACT;
