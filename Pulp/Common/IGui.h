@@ -5,25 +5,31 @@
 
 #include <Math\XVector.h>
 
-
-X_NAMESPACE_DECLARE(engine,
-                    class IPrimativeContext);
+X_NAMESPACE_DECLARE(core, struct FrameData);
 
 X_NAMESPACE_BEGIN(engine)
 
+class IPrimativeContext;
+
 namespace gui
 {
-    static const char* MENU_FILE_EXTENSION = "lua";
+    static const char* MENU_FILE_EXTENSION = "lua"; // HOT DAM!
 
     static const uint32_t MENU_MAX_LOADED = 64;
-
 
 
     struct IMenu
     {
         virtual ~IMenu() = default;
 
-        virtual void draw(engine::IPrimativeContext* pDrawCon) X_ABSTRACT;
+        virtual void draw(IPrimativeContext* pDrawCon) X_ABSTRACT;
+    };
+
+    struct IMenuHandler
+    {
+        virtual ~IMenuHandler() = default;
+
+        virtual void update(core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
     };
 
     struct IMenuManager
@@ -33,6 +39,7 @@ namespace gui
         virtual bool init(void) X_ABSTRACT;
         virtual void shutdown(void) X_ABSTRACT;
 
+        virtual IMenuHandler* getMenuHandler(void) X_ABSTRACT;
         virtual IMenu* loadMenu(const char* pName) X_ABSTRACT;
         virtual IMenu* findMenu(const char* pName) X_ABSTRACT;
 

@@ -3,6 +3,7 @@
 #include <IGui.h>
 
 #include "Menu.h"
+#include "MenuHandler.h"
 
 #include <Assets\AssertContainer.h>
 #include <IAsyncLoad.h>
@@ -33,6 +34,7 @@ namespace gui
         bool init(void) X_FINAL;
         void shutdown(void) X_FINAL;
 
+        IMenuHandler* getMenuHandler(void) X_FINAL;
         IMenu* loadMenu(const char* pName) X_FINAL;
         IMenu* findMenu(const char* pName) X_FINAL;
 
@@ -62,6 +64,7 @@ namespace gui
         core::AssetLoader* pAssetLoader_;
     
         ScriptBinds_Menu* pScriptBinds_;
+        MenuHandler menuHandler_;
 
         MenuContainer menus_;
     };
