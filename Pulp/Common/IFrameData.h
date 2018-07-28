@@ -20,6 +20,9 @@ struct FrameInput
     // this is just a buffer where this frames input events get stored.
     // you should not read from this, but instead register a input listner.
     // as that respects priority and filtering.
+    Vec2i cusorPos;
+    Vec2i cusorPosClient;
+
     input::InputEventBuffer events;
 };
 

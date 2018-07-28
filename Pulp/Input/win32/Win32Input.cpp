@@ -10,6 +10,7 @@
 #include <Util\LastError.h>
 #include "InputCVars.h"
 
+#include <Platform\Window.h>
 
 X_NAMESPACE_BEGIN(input)
 
@@ -88,6 +89,13 @@ void XWinInput::Update(core::FrameData& frameData)
     X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
     X_ASSERT_NOT_NULL(pMouse_);
     X_ASSERT_NOT_NULL(pKeyBoard_);
+
+    frameData.input.cusorPos = core::xWindow::GetCusroPos();
+    auto* pWindow = gEnv->pCore->GetGameWindow();
+    if (pWindow) {
+        frameData.input.cusorPosClient = pWindow->GetCusroPosClient();
+    }
+
 
     AddHoldEvents(frameData.input);
 
