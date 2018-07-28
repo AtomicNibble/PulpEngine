@@ -13,11 +13,11 @@ namespace gui
 {
     class XMenuManager;
 
-    class XMenu : public IMenu, public core::AssetBase
+    class Menu : public IMenu, public core::AssetBase
     {
     public:
-        XMenu(XMenuManager& menuMan, core::string& name);
-        ~XMenu() X_OVERRIDE;
+        Menu(XMenuManager& menuMan, core::string& name);
+        ~Menu() X_OVERRIDE;
 
         void draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
 

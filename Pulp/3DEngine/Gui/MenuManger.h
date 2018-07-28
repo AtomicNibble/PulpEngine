@@ -22,7 +22,7 @@ namespace gui
     class XMenuManager : public IMenuManager
         , private core::IAssetLoadSink
     {
-        typedef core::AssetContainer<XMenu, MENU_MAX_LOADED, core::SingleThreadPolicy> MenuContainer;
+        typedef core::AssetContainer<Menu, MENU_MAX_LOADED, core::SingleThreadPolicy> MenuContainer;
         typedef MenuContainer::Resource MenuResource;
 
     public:

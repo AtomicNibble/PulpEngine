@@ -22,7 +22,6 @@ namespace gui
         pAssetLoader_(nullptr),
         menus_(arena, sizeof(MenuResource), X_ALIGN_OF(MenuResource), "MenuPool")
     {
-        
 
     }
 
@@ -45,6 +44,10 @@ namespace gui
         pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_);
         pScriptBinds_->bind();
 
+        auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");
+
+        menuHandler_.init(pCursor);
+
         return true;
     }
 
@@ -57,6 +60,11 @@ namespace gui
         }
 
         freeDangling();
+    }
+
+    IMenuHandler* XMenuManager::getMenuHandler(void)
+    {
+        return &menuHandler_;
     }
 
     IMenu* XMenuManager::loadMenu(const char* pName)
@@ -106,7 +114,7 @@ namespace gui
 
     bool XMenuManager::waitForLoad(IMenu* pIGui)
     {
-        auto* pGui = static_cast<XMenu*>(pIGui);
+        auto* pGui = static_cast<Menu*>(pIGui);
         if (pGui->getStatus() == core::LoadStatus::Complete) {
             return true;
         }
@@ -143,7 +151,7 @@ namespace gui
 
     bool XMenuManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
     {
-        auto* pMenu = static_cast<XMenu*>(pAsset);
+        auto* pMenu = static_cast<Menu*>(pAsset);
 
         return pMenu->processData(std::move(data), dataSize);
     }

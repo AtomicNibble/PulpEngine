@@ -10,17 +10,17 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
-    XMenu::XMenu(XMenuManager& menuMan, core::string& name) :
+    Menu::Menu(XMenuManager& menuMan, core::string& name) :
         core::AssetBase(name, assetDb::AssetType::MENU),
         menuMan_(menuMan)
     {
     }
 
-    XMenu::~XMenu()
+    Menu::~Menu()
     {
     }
 
-    void XMenu::draw(engine::IPrimativeContext* pDrawCon)
+    void Menu::draw(engine::IPrimativeContext* pDrawCon)
     {
         X_UNUSED(pDrawCon);
 
@@ -37,7 +37,7 @@ namespace gui
         menuMan_.draw(pDrawCon, this);
     }
 
-    bool XMenu::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
+    bool Menu::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
     {
         data_ = std::move(data);
         dataSize_ = dataSize;
