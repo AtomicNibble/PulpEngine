@@ -45,6 +45,8 @@ namespace gui
         void draw(IPrimativeContext* pPrim, IMenu* pMenu);
 
     private:
+        void freeDangling(void);
+
         // load / processing
         void addLoadRequest(MenuResource* pMenu);
         void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;

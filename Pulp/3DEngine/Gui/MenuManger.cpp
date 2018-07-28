@@ -52,7 +52,7 @@ namespace gui
     {
         X_LOG0("MenuManager", "Shutting Down");
 
-
+        freeDangling();
     }
 
     IMenu* XMenuManager::loadMenu(const char* pName)
@@ -109,6 +109,23 @@ namespace gui
 
         return pAssetLoader_->waitForLoad(pGui);
     }
+
+    void XMenuManager::freeDangling(void)
+    {
+        {
+            core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
+
+            // any left?
+            for (const auto& m : menus_) {
+                auto* pMenuRes = m.second;
+                const auto& name = pMenuRes->getName();
+                X_WARNING("MenuManager", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pMenuRes->getRefCount());
+            }
+        }
+
+        menus_.free();
+    }
+
 
     void XMenuManager::addLoadRequest(MenuResource* pMenu)
     {
