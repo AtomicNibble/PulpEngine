@@ -7,6 +7,8 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
+    class GuiContex;
+
     class ScriptBinds_Menu : public script::IScriptBindsBase
     {
     public:
@@ -16,9 +18,17 @@ namespace gui
         void bind(void);
 
     private:
-        int32_t Text(script::IFunctionHandler* pH);
+        int32_t fill(script::IFunctionHandler* pH);
 
+        int32_t open(script::IFunctionHandler* pH);
+        int32_t close(script::IFunctionHandler* pH);
 
+        int32_t button(script::IFunctionHandler* pH);
+        
+        int32_t sliderVar(script::IFunctionHandler* pH);
+
+    private:
+        GuiContex* pCtx_;
     };
 
 } // namespace gui
