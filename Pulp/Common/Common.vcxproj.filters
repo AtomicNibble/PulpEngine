@@ -892,9 +892,6 @@
     <ClInclude Include="Util\FloatIEEEUtil.h">
       <Filter>Headers\Util</Filter>
     </ClInclude>
-    <ClInclude Include="IGui.h">
-      <Filter>Interfaces_h</Filter>
-    </ClInclude>
     <ClInclude Include="Containers\HashIndex.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
@@ -1338,6 +1335,9 @@
     </ClInclude>
     <ClInclude Include="IConfig.h">
       <Filter>Interfaces_h</Filter>
+    </ClInclude>
+    <ClInclude Include="IGui.h">
+      <Filter>Interfaces_h\3DEngine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
