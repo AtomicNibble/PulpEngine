@@ -1431,8 +1431,10 @@ void XConsole::UnregisterVariable(const char* pVarName)
         return;
     }
 
+    auto* pVar = it->second;
+
     VarMap_.erase(pVarName);
-    X_DELETE(it->second, &varArena_);
+    X_DELETE(pVar, &varArena_);
 }
 
 void XConsole::UnregisterVariable(ICVar* pCVar)
