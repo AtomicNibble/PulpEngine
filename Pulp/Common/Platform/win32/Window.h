@@ -70,6 +70,8 @@ public:
     //	X_INLINE bool isValid(void);
 
     void ClipCursorToWindow(void);
+    static Vec2i GetCusroPos(void);
+    Vec2i GetCusroPosClient(void);
 
     virtual void MoveTo(int x, int y);
     virtual void MoveTo(const Position& position);

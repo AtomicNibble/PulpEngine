@@ -209,6 +209,35 @@ void xWindow::ClipCursorToWindow(void)
     ClipCursor(&r);
 }
 
+Vec2i xWindow::GetCusroPos(void)
+{
+    POINT pos;
+    if (!::GetCursorPos(&pos)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to GetCusroPos. Err: %s", core::lastError::ToString(Dsc));
+    }
+
+    return Vec2i(pos.x, pos.y);
+}
+
+Vec2i xWindow::GetCusroPosClient(void)
+{
+    POINT pos;
+
+    {
+        auto p = GetCusroPos();
+        pos.x = p.x;
+        pos.y = p.y;
+    }
+
+    if (!::ScreenToClient(window_, &pos)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to map cursor point to screen. Err: %s", core::lastError::ToString(Dsc));
+    }
+
+    return Vec2i(pos.x, pos.y);
+}
+
 void xWindow::MoveTo(int x, int y)
 {
     RECT rect;
