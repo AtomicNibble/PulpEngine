@@ -91,6 +91,12 @@
     <ClCompile Include="Gui\ScriptBinds.cpp">
       <Filter>Source Files\Gui</Filter>
     </ClCompile>
+    <ClCompile Include="Gui\MenuHandler.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="Gui\GuiContex.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="X3DEngine.h">
@@ -175,6 +181,12 @@
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
     <ClInclude Include="Gui\ScriptBinds.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\MenuHandler.h">
+      <Filter>Header Files\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="Gui\GuiContex.h">
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
   </ItemGroup>

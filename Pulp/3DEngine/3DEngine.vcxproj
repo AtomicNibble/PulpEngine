@@ -488,7 +488,9 @@
     <ClInclude Include="Drawing\PrimativeContext.h" />
     <ClInclude Include="Drawing\VariableStateManager.h" />
     <ClInclude Include="EngineEnv.h" />
+    <ClInclude Include="Gui\GuiContex.h" />
     <ClInclude Include="Gui\Menu.h" />
+    <ClInclude Include="Gui\MenuHandler.h" />
     <ClInclude Include="Gui\MenuManger.h" />
     <ClInclude Include="Gui\ScriptBinds.h" />
     <ClInclude Include="Level\Level.h" />
@@ -517,7 +519,9 @@
     <ClCompile Include="Drawing\CBufferManager.cpp" />
     <ClCompile Include="Drawing\PrimativeContext.cpp" />
     <ClCompile Include="Drawing\VariableStateManager.cpp" />
+    <ClCompile Include="Gui\GuiContex.cpp" />
     <ClCompile Include="Gui\Menu.cpp" />
+    <ClCompile Include="Gui\MenuHandler.cpp" />
     <ClCompile Include="Gui\MenuManger.cpp" />
     <ClCompile Include="Gui\ScriptBinds.cpp" />
     <ClCompile Include="Level\Level.cpp" />
