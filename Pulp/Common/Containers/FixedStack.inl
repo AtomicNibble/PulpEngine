@@ -62,7 +62,7 @@ inline const T& FixedStack<T, N>::top(void) const
 template<typename T, size_t N>
 inline bool FixedStack<T, N>::isEmpty(void) const
 {
-    return current_ == array_;
+    return current_ == begin();
 }
 
 template<typename T, size_t N>
