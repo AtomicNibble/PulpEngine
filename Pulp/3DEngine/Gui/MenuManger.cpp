@@ -52,6 +52,10 @@ namespace gui
     {
         X_LOG0("MenuManager", "Shutting Down");
 
+        if (pScriptBinds_) {
+            X_DELETE(pScriptBinds_, arena_);
+        }
+
         freeDangling();
     }
 
