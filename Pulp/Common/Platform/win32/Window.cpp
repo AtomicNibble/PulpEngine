@@ -241,8 +241,14 @@ Vec2i xWindow::GetCusroPosClient(void)
 void xWindow::MoveTo(int x, int y)
 {
     RECT rect;
-    GetWindowRect(window_, &rect);
-    MoveWindow(window_, x, y, rect.right - rect.left, rect.bottom - rect.top, FALSE);
+    if (!::GetWindowRect(window_, &rect)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to get rect. Err: %s", core::lastError::ToString(Dsc));
+    }
+    if (!::MoveWindow(window_, x, y, rect.right - rect.left, rect.bottom - rect.top, FALSE)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to move window. Err: %s", core::lastError::ToString(Dsc));
+    }
 }
 
 void xWindow::MoveTo(const Position& position)
@@ -252,10 +258,7 @@ void xWindow::MoveTo(const Position& position)
 
 void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
 {
-    RECT _Rect;
-    GetWindowRect(window_, &_Rect);
-
-    Recti rect = Convert(_Rect);
+    Recti rect = GetRect();
     rect.Align(Rect, alignment);
 
     MoveTo(rect.x1, rect.y1);
@@ -264,7 +267,10 @@ void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
 Recti xWindow::GetRect(void) const
 {
     RECT rect;
-    GetWindowRect(window_, &rect);
+    if (!::GetWindowRect(window_, &rect)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to get rect. Err: %s", core::lastError::ToString(Dsc));
+    }
 
     return Convert(rect);
 }
@@ -272,7 +278,10 @@ Recti xWindow::GetRect(void) const
 Recti xWindow::GetClientRect(void) const
 {
     RECT rect;
-    ::GetClientRect(window_, &rect);
+    if (!::GetClientRect(window_, &rect)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to get client rect. Err: %s", core::lastError::ToString(Dsc));
+    }
 
     return Convert(rect);
 }
