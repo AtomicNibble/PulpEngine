@@ -19,6 +19,8 @@ namespace gui
     // it's state bsed and handles switching between menus.
     class MenuHandler : public IMenuHandler
     {
+        using MenuStack = core::FixedStack<Menu*, 8>;
+
     public:
         MenuHandler(GuiContex& ctx);
         ~MenuHandler() X_OVERRIDE = default;
@@ -27,10 +29,16 @@ namespace gui
 
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
 
+        void openMenu(const char* pName);
+        void closeMenu(void);
+        void back(void);
+
     private:
         GuiContex& ctx_;
 
-        Menu* pMenu_;
+       // Menu* pMenu_;
+
+        MenuStack stack_;
     };
 
 

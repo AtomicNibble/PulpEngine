@@ -23,6 +23,7 @@ namespace gui
 
         int32_t open(script::IFunctionHandler* pH);
         int32_t close(script::IFunctionHandler* pH);
+        int32_t back(script::IFunctionHandler* pH);
 
         int32_t button(script::IFunctionHandler* pH);
         

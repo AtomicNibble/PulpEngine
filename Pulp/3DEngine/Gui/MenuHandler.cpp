@@ -23,14 +23,18 @@ namespace gui
     {
         ctx_.init(pCursor);
 
-        pMenu_ = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu("pause"));
+        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu("pause"));
+
+        stack_.push(pMenu);
     }
 
     void MenuHandler::update(core::FrameData& frame, IPrimativeContext* pIPrim)
     {
         auto* pPrim = static_cast<PrimativeContext*>(pIPrim);
 
-        // auto r = frame.view.viewport.getRect();
+        if (stack_.isEmpty()) {
+            return;
+        }
 
         GuiContex::Params p;
         p.rect.set(0.f, 0.f, 1680.f, 1050.f);
@@ -42,15 +46,37 @@ namespace gui
         ctx_.processInput(frame.input);
         ctx_.begin(p);
 
-
         // if menu active.. blar.. blar..
-        if(pMenu_->isLoaded())
+        auto* pMenu = stack_.top();
+        if(pMenu->isLoaded())
         {
-            pMenu_->draw();
+            pMenu->draw();
         }
 
         ctx_.end();
     }
+
+    void MenuHandler::openMenu(const char* pName)
+    {
+        X_UNUSED(pName);
+
+        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
+       
+        stack_.push(pMenu);
+    }
+
+    void MenuHandler::closeMenu(void)
+    {
+        stack_.clear();
+    }
+
+    void MenuHandler::back(void)
+    {
+        if (!stack_.isEmpty()) {
+            stack_.pop();
+        }
+    }
+
 
 } // namespace gui
 

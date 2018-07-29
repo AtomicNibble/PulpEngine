@@ -27,8 +27,11 @@ namespace gui
         setGlobalName("ui");
 
         X_SCRIPT_BIND(ScriptBinds_Menu, fill);
+
         X_SCRIPT_BIND(ScriptBinds_Menu, open);
         X_SCRIPT_BIND(ScriptBinds_Menu, close);
+        X_SCRIPT_BIND(ScriptBinds_Menu, back);
+
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
     }
@@ -80,15 +83,30 @@ namespace gui
 
     int32_t ScriptBinds_Menu::open(script::IFunctionHandler* pH)
     {
+        SCRIPT_CHECK_PARAMETERS(1);
+
+        const char* pMenuName = nullptr;
+        pH->getParam(1, pMenuName);
+
+        menuHandler_.openMenu(pMenuName);
 
         return pH->endFunction();
     }
 
     int32_t ScriptBinds_Menu::close(script::IFunctionHandler* pH)
     {
+        menuHandler_.closeMenu();
 
         return pH->endFunction();
     }
+
+    int32_t ScriptBinds_Menu::back(script::IFunctionHandler* pH)
+    {
+        menuHandler_.back();
+
+        return pH->endFunction();
+    }
+
 
     int32_t ScriptBinds_Menu::button(script::IFunctionHandler* pH)
     {
