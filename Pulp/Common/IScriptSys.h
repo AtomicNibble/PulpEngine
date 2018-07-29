@@ -244,7 +244,7 @@ struct IScriptSys : public core::IEngineSysBase
     virtual bool compareFuncRef(ScriptFunctionHandle f1, ScriptFunctionHandle f2) X_ABSTRACT;
     virtual void releaseFunc(ScriptFunctionHandle f) X_ABSTRACT;
 
-    virtual IScriptTable* createTable(bool empty = false) X_ABSTRACT;
+    virtual IScriptTable* createTable(bool empty) X_ABSTRACT;
     virtual IScriptBinds* createScriptBind(void) X_ABSTRACT;
 
     // set values.
