@@ -229,7 +229,9 @@ struct IScriptSys : public core::IEngineSysBase
 
     virtual void Update(void) X_ABSTRACT;
 
-    virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_ABSTRACT;
+    virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) const X_ABSTRACT;
+
+    virtual bool loadBufferToTable(const char* pBegin, const char* pEnd, const char* pDesc, IScriptTable* pTable) X_ABSTRACT;
 
     virtual IScript* findScript(const char* pFileName) X_ABSTRACT;
     virtual IScript* loadScript(const char* pFileName) X_ABSTRACT;

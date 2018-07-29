@@ -82,7 +82,8 @@ public:
     bool onInclude(const char* pFileName);
     bool executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc);
 
-    bool runScriptInSandbox(const char* pBegin, const char* pEnd) X_FINAL;
+    bool runScriptInSandbox(const char* pBegin, const char* pEnd) const X_FINAL;
+    bool loadBufferToTable(const char* pBegin, const char* pEnd, const char* pDesc, IScriptTable* pTable) X_FINAL;
 
     ScriptFunctionHandle getFunctionPtr(const char* pFuncName) X_FINAL;
     ScriptFunctionHandle getFunctionPtr(const char* pTableName, const char* pFuncName) X_FINAL;

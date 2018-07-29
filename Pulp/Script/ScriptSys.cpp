@@ -357,7 +357,44 @@ bool XScriptSys::executeBuffer(const char* pBegin, const char* pEnd, const char*
     return true;
 }
 
-bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd)
+bool XScriptSys::loadBufferToTable(const char* pBegin, const char* pEnd, const char* pDesc, IScriptTable* pITable)
+{
+    lua::StateView state(L);
+
+    if (!state.loadScript(pBegin, pEnd, pDesc)) {
+        return false;
+    }
+
+    int base = stack::top(state);
+    stack::push_ref(state, errrorHandler_);
+    stack::move_top_to(state, base); // move the error hander before the script.
+
+    auto status = stack::pcall(state, 0, LUA_MULTRET, base);
+
+    int numResults = stack::top(L) - base;
+
+    if (numResults > 0)
+    {
+        auto type = stack::get_type(L);
+
+        if (type == Type::Table)
+        {
+            auto* pTable = static_cast<XScriptTable*>(pITable);
+            
+            pTable->attach();
+        }
+    }
+
+    stack::remove(state, base);
+
+    if (status != CallResult::Ok) {
+        stack::pop(L);
+    }
+
+    return true;
+}
+
+bool XScriptSys::runScriptInSandbox(const char* pBegin, const char* pEnd) const
 {
     //	lua::State state(g_ScriptArena);
     lua::StateView state(L);
