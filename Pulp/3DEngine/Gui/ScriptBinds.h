@@ -8,11 +8,12 @@ namespace gui
 {
 
     class GuiContex;
+    class MenuHandler;
 
     class ScriptBinds_Menu : public script::IScriptBindsBase
     {
     public:
-        ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx);
+        ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx, MenuHandler& menuHandler);
         ~ScriptBinds_Menu();
 
         void bind(void);
@@ -29,6 +30,7 @@ namespace gui
 
     private:
         GuiContex& ctx_;
+        MenuHandler& menuHandler_;
     };
 
 } // namespace gui

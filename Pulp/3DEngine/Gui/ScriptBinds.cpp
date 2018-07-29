@@ -3,14 +3,17 @@
 
 #include "GuiContex.h"
 
+#include "MenuHandler.h"
+
 X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
 
-    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx) :
+    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx, MenuHandler& menuHandler) :
         IScriptBindsBase(pSS),
-        ctx_(ctx)
+        ctx_(ctx),
+        menuHandler_(menuHandler)
     {
     }
 
