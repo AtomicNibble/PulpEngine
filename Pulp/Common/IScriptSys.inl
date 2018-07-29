@@ -317,25 +317,25 @@ X_INLINE bool IFunctionHandler::getParam(int32_t idx, T& value)
 template<typename T>
 X_INLINE bool IFunctionHandler::getParam(T& value)
 {
-    return getParam<T>(value);
+    return getParam<T>(1, value);
 }
 
 template<typename T, typename T2>
 X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2)
 {
-    return getParam<T>(value1) && getParam<T2>(value2);
+    return getParam<T>(1, value1) && getParam<T2>(v2, alue2);
 }
 
 template<typename T, typename T2, typename T3>
 X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2, T3& value3)
 {
-    return getParam<T>(value1) && getParam<T2>(value2) && getParam<T3>(value3);
+    return getParam<T>(1, value1) && getParam<T2>(2, value2) && getParam<T3>(3, value3);
 }
 
 template<typename T, typename T2, typename T3, typename T4>
 X_INLINE bool IFunctionHandler::getParam(T& value1, T2& value2, T3& value3, T4& value4)
 {
-    return getParam<T>(value1) && getParam<T2>(value2) && getParam<T3>(value3) && getParam<T4>(value4);
+    return getParam<T>(1, value1) && getParam<T2>(2, value2) && getParam<T3>(3, value3) && getParam<T4>(4, value4);
 }
 
 X_INLINE int32_t IFunctionHandler::endFunction(void) const
