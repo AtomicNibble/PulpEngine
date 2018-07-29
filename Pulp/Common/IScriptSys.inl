@@ -91,7 +91,8 @@ X_INLINE ScriptValue::ScriptValue(Type::Enum type) :
 }
 
 X_INLINE ScriptValue::ScriptValue() :
-    type_(Type::None)
+    type_(Type::None),
+    pPtr_(nullptr)
 {
 }
 
