@@ -1,16 +1,16 @@
 
 function LogError(fmt, ...)
-	Core.Error(string.format(fmt, ...));
+	core.error(string.format(fmt, ...));
 end
 
 
 function LogWarning(fmt, ...)
-	Core.Warning(string.format(fmt, ...));
+	core.warning(string.format(fmt, ...));
 end
 
 
 function Log(fmt, ...)
-	Core.Log(string.format(fmt, ...));
+	core.log(string.format(fmt, ...));
 end
 
 
@@ -20,6 +20,6 @@ function count(_tbl)
 		for i,v in pairs(_tbl) do
 			count = count+1;
 		end
-	end	
+	end
 	return count;
 end
