@@ -22,7 +22,6 @@ namespace gui
     {
         virtual ~IMenu() = default;
 
-        virtual void draw(IPrimativeContext* pDrawCon) X_ABSTRACT;
     };
 
     struct IMenuHandler

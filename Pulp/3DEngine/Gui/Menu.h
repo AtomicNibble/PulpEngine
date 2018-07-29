@@ -1,6 +1,7 @@
 #pragma once
 
 #include <IGui.h>
+#include <IScriptSys.h>
 
 #include <Assets\AssetBase.h>
 
@@ -16,17 +17,19 @@ namespace gui
     class Menu : public IMenu, public core::AssetBase
     {
     public:
-        Menu(XMenuManager& menuMan, core::string& name);
+        Menu(core::string& name);
         ~Menu() X_OVERRIDE;
 
-        void draw(engine::IPrimativeContext* pDrawCon) X_FINAL;
+        void draw(void);
 
         bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
     private:
-        XMenuManager& menuMan_;
         core::UniquePointer<char[]> data_;
         uint32_t dataSize_;
+
+        script::IScriptTable* pScriptTable_;
+        script::ScriptValue updateFunc_;
     };
 
 

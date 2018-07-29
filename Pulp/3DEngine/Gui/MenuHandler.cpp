@@ -46,38 +46,7 @@ namespace gui
         // if menu active.. blar.. blar..
         if(pMenu_->isLoaded())
         {
-#if 1
-            pMenu_->draw(nullptr);
-#else
-            // I want to tickle a goat.
-            // but alas my pickle jar is empty!
-            // if not for the camel under the tree, i would wiggle my knee.
-            // tis a problem you see!
-            // 
-            // auto* pScriptSys = gEnv->pScriptSys;
-
-            // draw menu.
-            if (ctx_.button("RESUME"))
-            {
-                // do stuff
-                X_LOG0("Game", "Resume Game!");
-            }
-
-            if (ctx_.button("OPTIONS"))
-            {
-                // do stuff, basically i just want to change the active menu.
-                // and the menu manager should just keep a navigation stack?
-                X_LOG0("Game", "Options menu");
-            }
-
-            if (ctx_.button("QUIT"))
-            {
-                // do stuff
-                X_LOG0("Game", "Quit why :( ?");
-            }
-
-            ctx_.slider("VOLUME", "snd_vol_master");
-#endif
+            pMenu_->draw();
         }
 
         ctx_.end();

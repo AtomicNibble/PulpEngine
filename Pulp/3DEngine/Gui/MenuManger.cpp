@@ -83,7 +83,7 @@ namespace gui
         }
 
         // we create a model and give it back
-        pMenu = menus_.createAsset(name, *this, name);
+        pMenu = menus_.createAsset(name, name);
 
         addLoadRequest(pMenu);
 
