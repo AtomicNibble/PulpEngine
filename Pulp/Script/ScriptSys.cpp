@@ -576,7 +576,7 @@ bool XScriptSys::beginCall(ScriptFunctionHandle f)
 
     stack::push_ref(L, f);
 
-    X_ASSERT(stack::isfunction(L), "Invalid function handle")(f);
+    X_ASSERT(stack::isfunction(L), "Invalid function handle")(f, stack::get_type(L));
     return true;
 }
 
