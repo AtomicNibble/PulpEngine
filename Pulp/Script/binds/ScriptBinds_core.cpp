@@ -24,19 +24,33 @@ void XBinds_Core::bind(ICore* pCore)
     pTimer_ = X_ASSERT_NOT_NULL(pCore->GetITimer());
 
     createBindTable();
-    setGlobalName("Core");
+    setGlobalName("core");
 
-    X_SCRIPT_BIND(XBinds_Core, GetDvarInt);
-    X_SCRIPT_BIND(XBinds_Core, GetDvarFloat);
-    X_SCRIPT_BIND(XBinds_Core, GetDvar);
-    X_SCRIPT_BIND(XBinds_Core, SetDvar);
+    X_SCRIPT_BIND(XBinds_Core, exec);
 
-    X_SCRIPT_BIND(XBinds_Core, Log);
-    X_SCRIPT_BIND(XBinds_Core, Warning);
-    X_SCRIPT_BIND(XBinds_Core, Error);
+    X_SCRIPT_BIND(XBinds_Core, getDvarInt);
+    X_SCRIPT_BIND(XBinds_Core, getDvarFloat);
+    X_SCRIPT_BIND(XBinds_Core, getDvar);
+    X_SCRIPT_BIND(XBinds_Core, setDvar);
+
+    X_SCRIPT_BIND(XBinds_Core, log);
+    X_SCRIPT_BIND(XBinds_Core, warning);
+    X_SCRIPT_BIND(XBinds_Core, error);
 }
 
-int XBinds_Core::GetDvarInt(IFunctionHandler* pH)
+int XBinds_Core::exec(IFunctionHandler* pH)
+{
+    SCRIPT_CHECK_PARAMETERS(1);
+
+    const char* pCmdStr = nullptr;
+    pH->getParam(1, pCmdStr);
+
+    pConsole_->Exec(pCmdStr);
+
+    return pH->endFunction();
+}
+
+int XBinds_Core::getDvarInt(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -55,7 +69,7 @@ int XBinds_Core::GetDvarInt(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
+int XBinds_Core::getDvarFloat(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -74,7 +88,7 @@ int XBinds_Core::GetDvarFloat(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::GetDvar(IFunctionHandler* pH)
+int XBinds_Core::getDvar(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -108,7 +122,7 @@ int XBinds_Core::GetDvar(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::SetDvar(IFunctionHandler* pH)
+int XBinds_Core::setDvar(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(2);
 
@@ -141,7 +155,7 @@ int XBinds_Core::SetDvar(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::Log(IFunctionHandler* pH)
+int XBinds_Core::log(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -159,7 +173,7 @@ int XBinds_Core::Log(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::Warning(IFunctionHandler* pH)
+int XBinds_Core::warning(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -171,7 +185,7 @@ int XBinds_Core::Warning(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Core::Error(IFunctionHandler* pH)
+int XBinds_Core::error(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 

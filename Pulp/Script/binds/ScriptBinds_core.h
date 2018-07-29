@@ -27,14 +27,16 @@ public:
 private:
     void bind(ICore* pCore) X_FINAL;
 
-    int GetDvarInt(IFunctionHandler* pH);
-    int GetDvarFloat(IFunctionHandler* pH);
-    int GetDvar(IFunctionHandler* pH);
-    int SetDvar(IFunctionHandler* pH);
+    int exec(IFunctionHandler* pH);
 
-    int Log(IFunctionHandler* pH);
-    int Warning(IFunctionHandler* pH);
-    int Error(IFunctionHandler* pH);
+    int getDvarInt(IFunctionHandler* pH);
+    int getDvarFloat(IFunctionHandler* pH);
+    int getDvar(IFunctionHandler* pH);
+    int setDvar(IFunctionHandler* pH);
+
+    int log(IFunctionHandler* pH);
+    int warning(IFunctionHandler* pH);
+    int error(IFunctionHandler* pH);
 
 private:
     core::IConsole* pConsole_;
