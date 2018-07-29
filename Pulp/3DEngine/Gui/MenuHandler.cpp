@@ -12,6 +12,12 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    
+    MenuHandler::MenuHandler(GuiContex& ctx) :
+        ctx_(ctx)
+    {
+
+    }
 
     void MenuHandler::init(engine::Material* pCursor)
     {
@@ -40,6 +46,9 @@ namespace gui
         // if menu active.. blar.. blar..
         if(pMenu_->isLoaded())
         {
+#if 1
+            pMenu_->draw(nullptr);
+#else
             // I want to tickle a goat.
             // but alas my pickle jar is empty!
             // if not for the camel under the tree, i would wiggle my knee.
@@ -68,6 +77,7 @@ namespace gui
             }
 
             ctx_.slider("VOLUME", "snd_vol_master");
+#endif
         }
 
         ctx_.end();

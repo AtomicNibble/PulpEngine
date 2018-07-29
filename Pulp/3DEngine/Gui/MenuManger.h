@@ -63,8 +63,9 @@ namespace gui
         script::IScriptSys* pScriptSys_;
         core::AssetLoader* pAssetLoader_;
     
-        ScriptBinds_Menu* pScriptBinds_;
+        GuiContex ctx_;
         MenuHandler menuHandler_;
+        ScriptBinds_Menu* pScriptBinds_;
 
         MenuContainer menus_;
     };

@@ -20,7 +20,7 @@ namespace gui
     class MenuHandler : public IMenuHandler
     {
     public:
-        MenuHandler() = default;
+        MenuHandler(GuiContex& ctx);
         ~MenuHandler() X_OVERRIDE = default;
 
         void init(engine::Material* pCursor);
@@ -28,7 +28,7 @@ namespace gui
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
 
     private:
-        GuiContex ctx_;
+        GuiContex& ctx_;
 
         Menu* pMenu_;
     };

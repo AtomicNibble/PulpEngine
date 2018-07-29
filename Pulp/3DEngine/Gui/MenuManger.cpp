@@ -20,6 +20,7 @@ namespace gui
         pMatMan_(pMatMan),
         pScriptSys_(nullptr),
         pAssetLoader_(nullptr),
+        menuHandler_(ctx_),
         menus_(arena, sizeof(MenuResource), X_ALIGN_OF(MenuResource), "MenuPool")
     {
 
@@ -41,7 +42,7 @@ namespace gui
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::MENU, this, MENU_FILE_EXTENSION);
 
-        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_);
+        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_);
         pScriptBinds_->bind();
 
         auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");

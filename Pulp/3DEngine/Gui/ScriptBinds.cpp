@@ -8,8 +8,9 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
-    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS) :
-        IScriptBindsBase(pSS)
+    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx) :
+        IScriptBindsBase(pSS),
+        ctx_(ctx)
     {
     }
 
@@ -55,7 +56,7 @@ namespace gui
         const char* pLabel = nullptr;
         pH->getParam(1, pLabel);
 
-        bool res = pCtx_->button(pLabel);
+        bool res = ctx_.button(pLabel);
 
         return pH->endFunction(res);
     }
@@ -70,7 +71,7 @@ namespace gui
         pH->getParam(1, pLabel);
         pH->getParam(2, pVarName);
 
-        pCtx_->slider(pLabel, pVarName);
+        ctx_.slider(pLabel, pVarName);
 
         return pH->endFunction();
     }

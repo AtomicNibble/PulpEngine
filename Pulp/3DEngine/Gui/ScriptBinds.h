@@ -12,7 +12,7 @@ namespace gui
     class ScriptBinds_Menu : public script::IScriptBindsBase
     {
     public:
-        ScriptBinds_Menu(script::IScriptSys* pSS);
+        ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx);
         ~ScriptBinds_Menu();
 
         void bind(void);
@@ -28,7 +28,7 @@ namespace gui
         int32_t sliderVar(script::IFunctionHandler* pH);
 
     private:
-        GuiContex* pCtx_;
+        GuiContex& ctx_;
     };
 
 } // namespace gui
