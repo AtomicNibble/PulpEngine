@@ -42,7 +42,7 @@ namespace gui
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::MENU, this, MENU_FILE_EXTENSION);
 
-        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_);
+        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_, menuHandler_);
         pScriptBinds_->bind();
 
         auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");
@@ -160,16 +160,6 @@ namespace gui
     void XMenuManager::listGuis(const char* pWildcardSearch) const
     {
         X_UNUSED(pWildcardSearch);
-    }
-
-    void XMenuManager::draw(IPrimativeContext* pPrim, IMenu* pMenu)
-    {
-        X_UNUSED(pPrim, pMenu);
-
-
-        
-
-
     }
 
     void XMenuManager::Cmd_ListUis(core::IConsoleCmdArgs* pArgs)

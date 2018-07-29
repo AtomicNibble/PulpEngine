@@ -44,8 +44,6 @@ namespace gui
         void listGuis(const char* pWildcardSearch = nullptr) const X_FINAL;
         //~IMenuManager
 
-        void draw(IPrimativeContext* pPrim, IMenu* pMenu);
-
     private:
         void freeDangling(void);
 
