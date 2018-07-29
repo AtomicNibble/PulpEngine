@@ -13,9 +13,9 @@ public:
 private:
     void bind(ICore* pCore) X_FINAL;
 
-    int Load(IFunctionHandler* pH);
-    int ReLoad(IFunctionHandler* pH);
-    int UnLoad(IFunctionHandler* pH);
+    int load(IFunctionHandler* pH);
+    int reLoad(IFunctionHandler* pH);
+    int unLoad(IFunctionHandler* pH);
 
 private:
 };

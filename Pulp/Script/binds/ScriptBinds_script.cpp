@@ -17,14 +17,14 @@ void XBinds_Script::bind(ICore* pCore)
     X_UNUSED(pCore);
 
     createBindTable();
-    setGlobalName("Script");
+    setGlobalName("script");
 
-    X_SCRIPT_BIND(XBinds_Script, Load);
-    X_SCRIPT_BIND(XBinds_Script, ReLoad);
-    X_SCRIPT_BIND(XBinds_Script, UnLoad);
+    X_SCRIPT_BIND(XBinds_Script, load);
+    X_SCRIPT_BIND(XBinds_Script, reLoad);
+    X_SCRIPT_BIND(XBinds_Script, unLoad);
 }
 
-int XBinds_Script::Load(IFunctionHandler* pH)
+int XBinds_Script::load(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -38,7 +38,7 @@ int XBinds_Script::Load(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Script::ReLoad(IFunctionHandler* pH)
+int XBinds_Script::reLoad(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 
@@ -51,7 +51,7 @@ int XBinds_Script::ReLoad(IFunctionHandler* pH)
     return pH->endFunction();
 }
 
-int XBinds_Script::UnLoad(IFunctionHandler* pH)
+int XBinds_Script::unLoad(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
 

@@ -28,7 +28,7 @@ void XBinds_Io_File::bind(ICore* pCore)
 
     createBindTable();
     setParamOffset(1);
-    setName("Io::File");
+    setName("io::file");
 
     X_SCRIPT_BIND(XBinds_Io_File, write);
     X_SCRIPT_BIND(XBinds_Io_File, read);
@@ -324,15 +324,15 @@ void XBinds_Io::bind(ICore* pCore)
     pFileSys_ = pCore->GetIFileSys();
 
     createBindTable();
-    setGlobalName("Io");
+    setGlobalName("io");
 
-    X_SCRIPT_BIND(XBinds_Io, OpenFile);
-    X_SCRIPT_BIND(XBinds_Io, CloseFile);
+    X_SCRIPT_BIND(XBinds_Io, openFile);
+    X_SCRIPT_BIND(XBinds_Io, closeFile);
 
     file_.bind(pCore);
 }
 
-int XBinds_Io::OpenFile(IFunctionHandler* pH)
+int XBinds_Io::openFile(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS_MIN(1);
 
@@ -447,7 +447,7 @@ SmartScriptTable XBinds_Io::WrapFileReturn(core::XFile* pFile)
     return userData;
 }
 
-int XBinds_Io::CloseFile(IFunctionHandler* pH)
+int XBinds_Io::closeFile(IFunctionHandler* pH)
 {
     SCRIPT_CHECK_PARAMETERS(1);
     using namespace core;
