@@ -563,6 +563,7 @@ bool XScriptSys::call(ScriptFunctionHandle f)
         return false;
     }
 
+    numCallParams_ = 0;
     return endCall(0);
 }
 
