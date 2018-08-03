@@ -18,7 +18,7 @@ namespace gui
     {
         txtCtx_.pFont = nullptr;
         txtCtx_.col = Col_White;
-        txtCtx_.size = Vec2f(30.f, 30.f);
+        txtCtx_.size = Vec2f(24.f, 24.f);
         txtCtx_.effectId = 0;
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER_VER);
@@ -27,17 +27,17 @@ namespace gui
 
         activeId_ = INVALID_ITEM_ID;
 
-        itemWidth_ = 256.f;
+        itemWidth_ = 400.f;
         itemWidthDefault_ = 256.f;
 
-        style_.framePadding.Set(5.f, 4.f);
+        style_.framePadding.Set(5.f, 8.f);
         style_.itemSpacing.Set(10.f, 8.f);
 
-        style_.btnCol = Color8u(10, 10, 10, 30);
-        style_.btnHover = Color8u(20, 20, 20, 120);
-        style_.btnHold = Color8u(60, 20, 20, 120);
+        style_.btnCol = Color8u(24, 24, 24, 255);
+        style_.btnHover = Color8u(70, 70, 70, 255);
+        style_.btnHold = Color8u(60, 20, 20, 255);
 
-        style_.borderCol = Col_Gray;
+        style_.borderCol = Color8u(25, 25, 25, 255);
         style_.borderColForcus = Col_Orange;
     }
 
@@ -223,11 +223,17 @@ namespace gui
 
         // so i want to just draw like a box?
         auto width = itemWidth_;
-        auto height = 16.f;
+        auto height = 32.f;
         auto pos = dc_.currentPos;
         auto size = Vec2f(width, height + style_.framePadding.y * 2.f);
 
         Rectf r(pos, pos + size);
+        Rectf bar(r);
+        bar.set(r.getX1() + (r.getWidth() * 0.5f), r.getY1(), r.getX2(), r.getY2());
+
+        auto barWidth = bar.getWidth() * percent;
+        Rectf barFill;
+        barFill.set(bar.getX1(), bar.getY1(), bar.getX1() + barWidth, bar.getY2());
 
         addItem(r, id);
 
@@ -236,19 +242,59 @@ namespace gui
         {
             if (mouseDown_[Mouse::LEFT])
             {
-                setActiveID(id);
+                if (bar.contains(cursorPos_))
+                {
+                    setActiveID(id);
+                }
+            }
+        }
+
+        if (id == activeId_)
+        {
+            if (mouseDown_[Mouse::LEFT])
+            {
+                auto offsetX = cursorPos_.x - bar.getX1();
+                auto barRange = bar.getWidth();
+
+                offsetX = core::Min(offsetX, barRange);
+                offsetX = core::Max(offsetX, 0.f);
+
+                auto newPercent = offsetX / barRange;
+                auto newValue = range * newPercent;
+
+                pVar->Set(newValue);
+            }
+            else
+            {
+                clearActiveID();
             }
         }
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
 
+        txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
 
-        auto barWidth = r.getWidth() * percent;
-        Rectf bar(r);
-        bar.set(r.getX1(), r.getY1(), r.getX1() + barWidth, r.getY2());
+        Color8u bckCol(24, 24, 24, 200);
+        Color8u barBckCol(36, 36, 36, 200);
+        Color8u barFillCol(72, 72, 72, 200);
 
-        pPrim_->drawQuad(bar, Col_Cadetblue);
+        bckCol = style_.btnCol;
+
+        pPrim_->drawQuad(r, bckCol);
+        pPrim_->drawQuad(bar, barBckCol);
+        pPrim_->drawQuad(barFill, barFillCol);
         pPrim_->drawRect(r, borderCol);
+        pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
+
+        core::StackString<16, char> percentStr;
+        percentStr.setFmt("%g", percent);
+
+        txtCtx_.flags.Set(font::DrawTextFlag::RIGHT);
+        
+        pPrim_->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, percentStr.begin(), percentStr.end());
+
+        txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
+        txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
     }
 
     Vec2f GuiContex::calcTextSize(const char* pBegin, const char* pEnd)
