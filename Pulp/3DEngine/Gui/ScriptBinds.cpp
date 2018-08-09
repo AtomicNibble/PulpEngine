@@ -38,6 +38,9 @@ namespace gui
         // center based on item width.
         X_SCRIPT_BIND(ScriptBinds_Menu, center);
 
+        X_SCRIPT_BIND(ScriptBinds_Menu, pushItemWidth);
+        X_SCRIPT_BIND(ScriptBinds_Menu, popItemWidth);
+
     }
 
     int32_t ScriptBinds_Menu::fill(script::IFunctionHandler* pH)
@@ -142,6 +145,23 @@ namespace gui
     int32_t ScriptBinds_Menu::center(script::IFunctionHandler* pH)
     {
         ctx_.center();
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::pushItemWidth(script::IFunctionHandler* pH)
+    {
+        SCRIPT_CHECK_PARAMETERS(1);
+
+        float width;
+        pH->getParam(width);
+
+        ctx_.pushItemWidth(width);
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::popItemWidth(script::IFunctionHandler* pH)
+    {
+        ctx_.popItemWidth();
         return pH->endFunction();
     }
 

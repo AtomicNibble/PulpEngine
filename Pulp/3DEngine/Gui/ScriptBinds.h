@@ -30,6 +30,11 @@ namespace gui
         int32_t sliderVar(script::IFunctionHandler* pH);
 
         int32_t center(script::IFunctionHandler* pH);
+
+        int32_t pushItemWidth(script::IFunctionHandler* pH);
+        int32_t popItemWidth(script::IFunctionHandler* pH);
+
+
     private:
         GuiContex& ctx_;
         MenuHandler& menuHandler_;
