@@ -88,7 +88,7 @@ namespace gui
         cursorPos_ = params.cursorPos;
 
 
-        dc_.currentPos = Vec2f((rect_.getWidth() * 0.5f), 400.f);
+        dc_.currentPos = Vec2f((rect_.getWidth() * 0.1f), 400.f);
         dc_.lastItemID = INVALID_ITEM_ID;
         dc_.lastItemRect = Rectf();
     }
