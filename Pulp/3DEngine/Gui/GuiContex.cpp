@@ -96,6 +96,10 @@ namespace gui
     void GuiContex::end(void)
     {
         pPrim_->drawQuad(cursorPos_.x, cursorPos_.y, 32.f, 32.f, pCursor_, Col_White);
+
+        while (!itemWidthStack_.isEmpty()) {
+            popItemWidth();
+        }
     }
 
 
