@@ -109,6 +109,16 @@ namespace gui
         pPrim_->drawQuad(rect_, col);
     }
 
+    void GuiContex::center(void)
+    {
+        auto center = rect_.getWidth() * 0.5f;
+        auto offset = itemWidth_ * 0.5f;
+
+        auto x = center - offset;
+
+        dc_.currentPos.x = x;
+    }
+
     void GuiContex::pushItemWidth(float width)
     {
         itemWidthStack_.push(itemWidth_);

@@ -73,6 +73,9 @@ namespace gui
         void setFont(font::IFont* pFont);
         void fill(Color8u col);
 
+        // layout
+        void center(void);
+
         // item width
         void pushItemWidth(float width);
         void popItemWidth(void);

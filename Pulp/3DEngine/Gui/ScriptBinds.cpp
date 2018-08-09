@@ -34,6 +34,10 @@ namespace gui
 
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
+
+        // center based on item width.
+        X_SCRIPT_BIND(ScriptBinds_Menu, center);
+
     }
 
     int32_t ScriptBinds_Menu::fill(script::IFunctionHandler* pH)
@@ -135,6 +139,11 @@ namespace gui
         return pH->endFunction();
     }
 
+    int32_t ScriptBinds_Menu::center(script::IFunctionHandler* pH)
+    {
+        ctx_.center();
+        return pH->endFunction();
+    }
 
 
 } // namespace gui
