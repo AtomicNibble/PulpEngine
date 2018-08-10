@@ -32,7 +32,6 @@ class Material;
 
 class XMaterialManager : public IMaterialManager
     , public ICoreEventListener
-    , public core::IXHotReload
     , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
@@ -90,6 +89,7 @@ private:
     void addLoadRequest(MaterialResource* pMaterial);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+    bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     bool processData(Material* pMaterial, core::XFile* pFile);
 
@@ -97,10 +97,6 @@ private:
     // ICoreEventListener
     virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
     // ~ICoreEventListener
-
-    // IXHotReload
-    virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
 
 private:
     void Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd);

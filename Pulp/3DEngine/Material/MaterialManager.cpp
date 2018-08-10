@@ -62,7 +62,6 @@ void XMaterialManager::registerVars(void)
 bool XMaterialManager::init(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
-    X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::MATERIAL, this, MTL_B_FILE_EXTENSION);
@@ -71,18 +70,12 @@ bool XMaterialManager::init(void)
         return false;
     }
 
-    // hotreload support.
-    gEnv->pHotReload->addfileType(this, MTL_B_FILE_EXTENSION);
-
     return true;
 }
 
 void XMaterialManager::shutDown(void)
 {
     X_LOG0("Material", "Shutting Down");
-
-    // hotreload support.
-    gEnv->pHotReload->unregisterListener(this);
 
     if (pDefaultMtl_) {
         releaseMaterial(pDefaultMtl_);
@@ -874,26 +867,11 @@ void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_
 }
 // ~ICoreEventListener
 
-void XMaterialManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool XMaterialManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys);
-#if 0
-	const char* fileExt;
+    X_UNUSED(assetName, name);
 
-	fileExt = core::strUtil::FileExtension(name);
-	if (fileExt)
-	{	
-		if (core::strUtil::IsEqual(MTL_B_FILE_EXTENSION, fileExt))
-		{
-			//	X_LOG0("Material", "reload material: \"%s\"", name);
-
-
-		}
-	}
-	return true;
-#else
-    X_UNUSED(name);
-#endif
+    return true;
 }
 
 void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd)

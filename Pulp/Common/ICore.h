@@ -35,7 +35,6 @@ X_NAMESPACE_DECLARE(core,
                     struct IConsole;
                     struct IFileSys;
                     struct IJobSystem;
-                    struct IXHotReloadManager;
                     struct IDirectoryWatcher;
                     struct FrameData;
                     // class XProfileScope;
@@ -267,7 +266,6 @@ struct CoreGlobals // obbject is zerod on start.
     video::IVideoSys* pVideoSys;
 
     core::IDirectoryWatcher* pDirWatcher;
-    core::IXHotReloadManager* pHotReload;
 
     //	core::MallocFreeAllocator*  pMalloc;
     core::MemoryArenaBase* pArena;
@@ -298,7 +296,6 @@ struct CoreGlobals // obbject is zerod on start.
         pJobSys = nullptr;
         pProfiler = nullptr;
         pDirWatcher = nullptr;
-        pHotReload = nullptr;
         pArena = nullptr;
         pStrArena = nullptr;
 
@@ -387,7 +384,6 @@ struct ICore
     virtual core::profiler::IProfiler* GetProfiler(void) X_ABSTRACT;
     virtual core::ILog* GetILog(void) X_ABSTRACT;
     virtual core::IDirectoryWatcher* GetDirWatcher(void) X_ABSTRACT;
-    virtual core::IXHotReloadManager* GetHotReloadMan(void) X_ABSTRACT;
     virtual ICoreEventDispatcher* GetCoreEventDispatcher(void) X_ABSTRACT;
     virtual core::Crc32* GetCrc32(void) X_ABSTRACT;
     virtual const core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;

@@ -3,6 +3,7 @@
 #include <Util\EnumMacros.h>
 #include <Util\NamespaceMacros.h>
 #include <Util\UniquePointer.h>
+#include <String\AssetName.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -28,6 +29,7 @@ struct IAssetLoadSink
 
     virtual bool processData(AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_ABSTRACT;
     virtual void onLoadRequestFail(AssetBase* pAsset) X_ABSTRACT;
+    virtual bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

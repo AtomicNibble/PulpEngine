@@ -99,7 +99,6 @@ XCore::XCore() :
 #endif //!X_ENABLE_PROFILER
 
     pEventDispatcher_(nullptr),
-    hotReloadExtMap_(g_coreArena),
 
 #if X_DEBUG
     hotReloadIgnores_(g_coreArena),
@@ -113,20 +112,15 @@ XCore::XCore() :
 {
     X_ASSERT_NOT_NULL(g_coreArena);
 
-    hotReloadExtMap_.reserve(32);
-
     pDirWatcher_ = X_NEW(core::XDirectoryWatcher, g_coreArena, "CoreDirectoryWatcher")(g_coreArena);
 
     pEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
     pEventDispatcher_->RegisterListener(this);
 
-
-
     env_.state_ = CoreGlobals::State::STARTING;
     env_.pCore = this;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
-    env_.pHotReload = this;
     //	env_.pMalloc = &g_coreArena;
     env_.pArena = g_coreArena;
 
@@ -159,7 +153,6 @@ XCore::~XCore()
     env_.pCore = nullptr;
     env_.pTimer = nullptr;
     env_.pDirWatcher = nullptr;
-    env_.pHotReload = nullptr;
     env_.pArena = nullptr;
 }
 
@@ -381,7 +374,7 @@ bool XCore::PumpMessages()
 void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
     X_UNUSED(wparam);
-    X_UNUSED(lparam);
+    X_UNUSED(lparam); 
 
     switch (event) {
         case CoreEvent::MOVE: {
@@ -417,9 +410,7 @@ bool XCore::OnFileChange(core::IDirectoryWatcher::Action::Enum action,
 
     if (action == core::IDirectoryWatcher::Action::MODIFIED) 
     {
-
-
-
+        assetLoader_.onFileChanged(pName);
     }
 
     return true;
@@ -464,45 +455,6 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 
     return nullptr;
 }
-
-// IXHotReloadManager
-bool XCore::addfileType(core::IXHotReload* pHotReload, const char* extension)
-{
-    X_ASSERT(!env_.isRunning(), "File types must only be registerd in startup / shutdown")(pHotReload, env_.isRunning());
-
-    X_ASSERT_NOT_NULL(extension);
-
-    if (core::strUtil::Find(extension, '.')) {
-        X_ERROR("HotReload", "extension can't contain dots");
-        return false;
-    }
-
-    // note: hotReloadExtMap_ stores char* pointer.
-    if (pHotReload == nullptr) {
-        hotReloadExtMap_.erase(extension);
-        return true;
-    }
-
-    if (hotReloadExtMap_.find(extension) != hotReloadExtMap_.end()) {
-        X_ERROR("HotReload", "failed to register file type, it already has a handler");
-        return false;
-    }
-
-    hotReloadExtMap_.insert(HotReloadMap::value_type(extension, pHotReload));
-    return true;
-}
-
-void XCore::unregisterListener(core::IXHotReload* pHotReload)
-{
-    for (auto it = hotReloadExtMap_.begin(); it != hotReloadExtMap_.end(); ++it) {
-        if (it->second == pHotReload) {
-            hotReloadExtMap_.erase(it);
-            it = hotReloadExtMap_.begin();
-        }
-    }
-}
-
-// ~IXHotReloadManager
 
 void XCore::OnFatalError(const char* format, va_list args)
 {
@@ -553,13 +505,6 @@ void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
     }
 }
 
-void XCore::Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd)
-{
-    X_UNUSED(Cmd);
-
-    HotReloadListExts();
-}
-
 void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
 {
     X_UNUSED(Cmd);
@@ -567,16 +512,6 @@ void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
     ListProgramArgs();
 }
 
-void XCore::HotReloadListExts(void)
-{
-    X_LOG0("HotReload", "-------- ^8Registerd Extensions^7 --------");
-
-    for (const auto& hr : hotReloadExtMap_) {
-        X_LOG0("HotReload", "^2%s", hr.first);
-    }
-
-    X_LOG0("HotReload", "------ ^8Registerd Extensions End^7 ------");
-}
 
 void XCore::ListProgramArgs(void)
 {

@@ -22,7 +22,6 @@ X_NAMESPACE_BEGIN(model)
 class RenderModel;
 
 class XModelManager : public IModelManager
-    , public core::IXHotReload
     , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<RenderModel, MODEL_MAX_LOADED, core::SingleThreadPolicy> ModelContainer;
@@ -60,11 +59,7 @@ private:
     void addLoadRequest(ModelResource* pModel);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
-
-private:
-    // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
+    bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
 private:
     void Cmd_ListModels(core::IConsoleCmdArgs* pCmd);

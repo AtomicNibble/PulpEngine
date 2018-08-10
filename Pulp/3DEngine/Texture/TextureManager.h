@@ -29,8 +29,7 @@ X_NAMESPACE_BEGIN(engine)
 
 class Texture;
 
-class TextureManager : public core::IXHotReload
-    , private core::IAssetLoadSink
+class TextureManager : private core::IAssetLoadSink
 {
     typedef core::AssetContainer<Texture, texture::TEX_MAX_LOADED_IMAGES, core::MultiThreadPolicy<core::Spinlock>> TextureContainer;
     typedef TextureContainer::Resource TextureResource;
@@ -106,10 +105,7 @@ private:
     void addLoadRequest(TextureResource* pTexture);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
-
-    // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
-    // ~IXHotReload
+    bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     void listTextures(const char* pSearchPattern);
 

@@ -446,7 +446,7 @@ bool XConsole::init(ICore* pCore, bool basic)
         coreEventListernRegd_ = pCore_->GetCoreEventDispatcher()->RegisterListener(this);
 
         // hot reload
-        pCore_->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
+        // pCore_->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
 
         if (console_save_history) {
             LoadCmdHistory(true);
@@ -561,7 +561,7 @@ void XConsole::shutDown(void)
         if (coreEventListernRegd_) {
             pCore_->GetCoreEventDispatcher()->RemoveListener(this);
         }
-        pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
+    //    pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
         pCore_->GetILog()->RemoveLogger(&logger_);
     }
 
@@ -1568,11 +1568,11 @@ bool XConsole::LoadAndExecConfigFile(const char* pFileName)
 }
 
 // IXHotReload
+#if X_ENABLE_CONFIG_HOT_RELOAD && 0
 void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
 {
     X_UNUSED(jobSys);
 
-#if X_ENABLE_CONFIG_HOT_RELOAD && 0
     if (!ignoreHotReload_) {
         core::Path<char> temp(name);
 
@@ -1580,11 +1580,8 @@ void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<ch
     }
 
     ignoreHotReload_ = false;
-
-#else
-    X_UNUSED(name);
-#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 }
+#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 // ~IXHotReload
 
 void XConsole::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)

@@ -1030,9 +1030,6 @@ void XCore::registerCmds(void)
 {
     using namespace core;
 
-    ADD_COMMAND_MEMBER("listHotReloadEtx", this, XCore, &XCore::Command_HotReloadListExts, VarFlag::SYSTEM,
-        "Display all registered file extensions in the hotreload system");
-
     ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
         "Lists the processed command line arguments parsed to the program");
 }

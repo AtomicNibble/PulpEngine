@@ -157,6 +157,13 @@ namespace gui
         return pMenu->processData(std::move(data), dataSize);
     }
 
+    bool XMenuManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
+    {
+        X_UNUSED(assetName, name);
+
+        return true;
+    }
+
     void XMenuManager::listGuis(const char* pWildcardSearch) const
     {
         X_UNUSED(pWildcardSearch);

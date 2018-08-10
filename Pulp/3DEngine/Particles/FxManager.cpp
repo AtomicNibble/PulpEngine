@@ -56,15 +56,11 @@ namespace fx
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::FX, this, EFFECT_FILE_EXTENSION);
 
-        gEnv->pHotReload->addfileType(this, EFFECT_FILE_EXTENSION);
-
         return true;
     }
 
     void EffectManager::shutDown(void)
     {
-        gEnv->pHotReload->unregisterListener(this);
-
         freeDangling();
     }
 
@@ -228,30 +224,24 @@ namespace fx
 
     // -------------------------------------
 
-    void EffectManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+    bool EffectManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
     {
-        X_UNUSED(jobSys, name);
-
-        core::AssetName assetName(name);
-        assetName.replaceSeprators();
-        assetName.stripAssetFolder(assetDb::AssetType::FX);
-        assetName.removeExtension();
-
-        core::string nameStr(assetName.begin(), assetName.end());
+        X_UNUSED(assetName);
 
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(nameStr);
+        EffectResource* pEffectRes = effects_.findAsset(name);
 
         // so i wnat to reload the fx :D
         if (!pEffectRes) {
-            X_LOG1("Effect", "Not reloading \"%s\" it's not currently used", nameStr.c_str());
-            return;
+            X_LOG1("Effect", "Not reloading \"%s\" it's not currently used", name.c_str());
+            return false;
         }
 
-        X_LOG0("Effect", "Reloading: %s", nameStr.c_str());
+        X_LOG0("Effect", "Reloading: %s", name.c_str());
 
         pAssetLoader_->reload(pEffectRes, core::ReloadFlag::Beginframe);
+        return true;
     }
 
     // -----------------------------------

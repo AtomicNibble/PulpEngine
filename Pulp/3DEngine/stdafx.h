@@ -17,7 +17,6 @@
 #define IPRENDERSYS_EXPORTS
 
 #include <IMaterial.h>
-#include <IDirectoryWatcher.h>
 
 // Img Lib
 #include <../../tools/ImgLib/ImgLib.h>

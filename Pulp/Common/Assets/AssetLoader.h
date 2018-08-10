@@ -88,6 +88,7 @@ public:
     void registerVars(void);
 
     void registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt);
+    bool onFileChanged(const char* pName);
 
     void update(void);
 

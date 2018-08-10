@@ -1,7 +1,7 @@
 #pragma once
 
 #include <IShader.h>
-#include <IDirectoryWatcher.h>
+#include <IAsyncLoad.h>
 
 #include <Containers\HashMap.h>
 #include <Containers\Array.h>
@@ -31,7 +31,7 @@ namespace shader
     class XHWShader;
     class ShaderPermatation;
 
-    class XShaderManager : public core::IXHotReload
+    class XShaderManager : private core::IAssetLoadSink
     {
         // HWShaders
         typedef core::AssetContainer<XHWShader, MAX_HW_SHADERS, core::MultiThreadPolicy<core::Spinlock>> HWShaderContainer;
@@ -117,9 +117,9 @@ namespace shader
     private:
         void IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
 
-        // IXHotReload
-        void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_OVERRIDE;
-        // ~IXHotReload
+        void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
+        bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+        bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
         void Cmd_ListHWShaders(core::IConsoleCmdArgs* pArgs);

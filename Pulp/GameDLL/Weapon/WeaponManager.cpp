@@ -35,7 +35,6 @@ namespace weapon
     bool WeaponDefManager::init(void)
     {
         X_ASSERT_NOT_NULL(gEnv);
-        X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::WEAPON, this, WEAPON_FILE_EXTENSION);
@@ -44,15 +43,11 @@ namespace weapon
             return false;
         }
 
-        gEnv->pHotReload->addfileType(this, WEAPON_FILE_EXTENSION);
-
         return true;
     }
 
     void WeaponDefManager::shutDown(void)
     {
-        gEnv->pHotReload->unregisterListener(this);
-
         if (pDefaultWeaponDef_) {
             releaseWeaponDef(pDefaultWeaponDef_);
         }
@@ -263,30 +258,23 @@ namespace weapon
         return true;
     }
 
-    void WeaponDefManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+    bool WeaponDefManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
     {
-        X_UNUSED(jobSys, name);
-
-        core::AssetName assetName(name);
-        assetName.replaceSeprators();
-        assetName.stripAssetFolder(assetDb::AssetType::WEAPON);
-        assetName.removeExtension();
-
-        core::string nameStr(assetName.begin(), assetName.end());
+        X_UNUSED(assetName);
 
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
-        auto* pWeaponRes = weaponDefs_.findAsset(nameStr);
+        auto* pWeaponRes = weaponDefs_.findAsset(name);
         if (!pWeaponRes) {
-            X_LOG1("WeaponDef", "Not reloading \"%s\" it's not currently used", nameStr.c_str());
-            return;
+            X_LOG1("WeaponDef", "Not reloading \"%s\" it's not currently used", name.c_str());
+            return false;
         }
 
-        X_LOG0("WeaponDef", "Reloading: %s", nameStr.c_str());
+        X_LOG0("WeaponDef", "Reloading: %s", name.c_str());
 
         pAssetLoader_->reload(pWeaponRes, core::ReloadFlag::Beginframe);
+        return true;
     }
-
 
     void WeaponDefManager::listWeapons(const char* pSearchPatten) const
     {

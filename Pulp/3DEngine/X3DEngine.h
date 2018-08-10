@@ -30,7 +30,6 @@ namespace fx
 } // namespace fx
 
 class X3DEngine : public I3DEngine
-    , public core::IXHotReload
 {
     typedef core::Array<IWorld3D*> WorldArr;
 
@@ -61,10 +60,6 @@ public:
     void release3DWorld(IWorld3D* pWorld) X_FINAL;
     void addWorldToActiveList(IWorld3D* pWorld) X_FINAL;
     void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
-
-    // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
 
 private:
     void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);

@@ -101,9 +101,6 @@ bool XScriptSys::init(void)
     XScriptTable::L = L;
     XScriptTable::pScriptSystem_ = this;
 
-    // hotreload
-    gEnv->pHotReload->addfileType(this, SCRIPT_FILE_EXTENSION);
-
     baseBinds_.append(X_NEW(XBinds_Script, arena_, "ScriptBinds")(this));
     baseBinds_.append(X_NEW(XBinds_Core, arena_, "CoreBinds")(this));
     baseBinds_.append(X_NEW(XBinds_Io, arena_, "IoBinds")(this));
@@ -124,8 +121,6 @@ void XScriptSys::shutDown(void)
     }
 
     X_LOG0("ScriptSys", "Shutting Down");
-
-    gEnv->pHotReload->addfileType(nullptr, SCRIPT_FILE_EXTENSION);
 
     for (auto* pBind : scriptBinds_) {
         X_DELETE(pBind, arena_);
@@ -1030,26 +1025,12 @@ bool XScriptSys::processData(core::AssetBase* pAsset, core::UniquePointer<char[]
     return true;
 }
 
-// IXHotReload
-
-void XScriptSys::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool XScriptSys::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys);
-#if 0
-	ScriptFileList::iterator it = fileList_.find(X_CONST_STRING(name));
+    X_UNUSED(assetName, name);
 
-	if (it != fileList_.end())
-	{
-		ReloadScript(name, true);
-	}
-
-	return true;
-#else
-    X_UNUSED(name);
-#endif
+    return true;
 }
-
-// ~IXHotReload
 
 void XScriptSys::listBinds(void) const
 {

@@ -104,7 +104,6 @@ X_DECLARE_FLAGS(ExecSource)
 
 class XConsole : public IConsole
     , public input::IInputEventListner
-    , public core::IXHotReload
     , public ICoreEventListener
 {
     struct ExecCommand
@@ -205,10 +204,6 @@ public:
     virtual void Exec(const char* pCommand) X_FINAL;
 
     virtual bool LoadAndExecConfigFile(const char* pFileName) X_FINAL;
-
-    // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
 
     // ICoreEventListener
     void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;

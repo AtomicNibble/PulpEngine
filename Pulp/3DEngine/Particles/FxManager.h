@@ -18,7 +18,6 @@ namespace fx
     class Emitter;
 
     class EffectManager : public IEffectManager
-        , public core::IXHotReload
         , private core::IAssetLoadSink
     {
         typedef core::AssetContainer<Effect, EFFECT_MAX_LOADED, core::SingleThreadPolicy> EffectContainer;
@@ -74,10 +73,9 @@ namespace fx
         void addLoadRequest(EffectResource* pEffect);
         void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
         bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+        bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
-        void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-
         void listAssets(const char* pSearchPattern);
 
     private:

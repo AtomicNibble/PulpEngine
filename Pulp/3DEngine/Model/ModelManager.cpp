@@ -42,7 +42,6 @@ void XModelManager::registerVars(void)
 bool XModelManager::init(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
-    X_ASSERT_NOT_NULL(gEnv->pHotReload);
 
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::MODEL, this, MODEL_FILE_EXTENSION);
@@ -51,17 +50,12 @@ bool XModelManager::init(void)
         return false;
     }
 
-    // hotreload support.
-    gEnv->pHotReload->addfileType(this, MODEL_FILE_EXTENSION);
-
     return true;
 }
 
 void XModelManager::shutDown(void)
 {
     X_LOG0("ModelManager", "Shutting Down");
-
-    gEnv->pHotReload->unregisterListener(this);
 
     // default model
     if (pDefaultModel_) {
@@ -262,30 +256,11 @@ void XModelManager::listModels(const char* pSearchPatten) const
     X_LOG0("Model", "------------ ^8Models End^7 --------------");
 }
 
-void XModelManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool XModelManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys);
-#if 0
-	const char* fileExt;
+    X_UNUSED(assetName, name);
 
-	fileExt = core::strUtil::FileExtension(name);
-	if (fileExt)
-	{
-		if (core::strUtil::IsEqual(MODEL_FILE_EXTENSION, fileExt))
-		{
-			// all asset names need forward slashes, for the hash.
-			core::Path<char> path(name);
-			path.replaceAll('\\', '/');
-			path.removeExtension();
-
-			ReloadModel(path.fileName());
-			return true;
-		}
-	}
-	return false;
-#else
-    X_UNUSED(name);
-#endif
+    return true;
 }
 
 void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)

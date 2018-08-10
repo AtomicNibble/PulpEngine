@@ -51,6 +51,7 @@ namespace gui
         void addLoadRequest(MenuResource* pMenu);
         void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
         bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+        bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
         void Cmd_ListUis(core::IConsoleCmdArgs* pArgs);

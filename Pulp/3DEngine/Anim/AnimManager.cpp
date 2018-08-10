@@ -36,14 +36,12 @@ bool AnimManager::init(void)
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::ANIM, this, ANIM_FILE_EXTENSION);
 
-    gEnv->pHotReload->addfileType(this, ANIM_FILE_EXTENSION);
 
     return true;
 }
 
 void AnimManager::shutDown(void)
 {
-    gEnv->pHotReload->unregisterListener(this);
 
     freeDangling();
 }
@@ -207,9 +205,11 @@ bool AnimManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[
 
 // -------------------------------------
 
-void AnimManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool AnimManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys, name);
+    X_UNUSED(assetName, name);
+
+    return true;
 }
 
 // -------------------------------------

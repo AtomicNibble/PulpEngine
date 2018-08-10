@@ -50,10 +50,6 @@ bool XFontSystem::init(void)
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::FONT, this, FONT_BAKED_FILE_EXTENSION);
 
-    gEnv->pHotReload->addfileType(this, FONT_DESC_FILE_EXTENSION);
-    gEnv->pHotReload->addfileType(this, FONT_BAKED_FILE_EXTENSION);
-    gEnv->pHotReload->addfileType(this, "ttf");
-
     // load a default font.
     pDefaultFont_ = static_cast<XFont*>(loadFont("default"));
     if (!pDefaultFont_) {
@@ -69,10 +65,6 @@ void XFontSystem::shutDown(void)
     X_LOG0("FontSys", "Shutting Down");
 
     freeDangling();
-
-    gEnv->pHotReload->addfileType(nullptr, FONT_DESC_FILE_EXTENSION);
-    gEnv->pHotReload->addfileType(nullptr, FONT_BAKED_FILE_EXTENSION);
-    gEnv->pHotReload->addfileType(nullptr, "ttf");
 }
 
 bool XFontSystem::asyncInitFinalize(void)
@@ -257,27 +249,16 @@ void XFontSystem::listFonts(const char* pSearchPatten) const
 
 
 
-void XFontSystem::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool XFontSystem::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys);
-#if 0
-    Path<char> path(name);
-    if (strUtil::IsEqual(".font", path.extension()))
-    {
-        path.removeExtension();
+    X_UNUSED(assetName, name);
 
-        XFFont* pFont = static_cast<XFFont*>(GetFont(path.fileName()));
-        if (pFont)
-        {
-            pFont->Reload();
-        }
-        return true;
-    }
+    //   FONT_DESC_FILE_EXTENSION
+    //   FONT_BAKED_FILE_EXTENSION
+    //   "ttf"
 
-    return false;
-#else
-    X_UNUSED(name);
-#endif
+
+    return true;
 }
 
 

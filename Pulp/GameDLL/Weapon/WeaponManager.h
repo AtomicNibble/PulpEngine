@@ -1,7 +1,6 @@
 #pragma once
 
 #include <IWeapon.h>
-#include <IDirectoryWatcher.h>
 
 #include <Assets\AssertContainer.h>
 #include <IAsyncLoad.h>
@@ -24,7 +23,6 @@ namespace weapon
     class WeaponDef;
 
     class WeaponDefManager : public core::IAssetLoader
-        , public core::IXHotReload
         , private core::IAssetLoadSink
     {
         typedef core::AssetContainer<WeaponDef, WEAPON_MAX_LOADED, core::SingleThreadPolicy> WeaponDefContainer;
@@ -67,12 +65,9 @@ namespace weapon
         void addLoadRequest(WeaponDefResource* pWeaponDef);
         void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
         bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+        bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
-        // IXHotReload
-        virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-        // ~IXHotReload
-
         void Cmd_List(core::IConsoleCmdArgs* pCmd);
 
     private:

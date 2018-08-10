@@ -86,14 +86,8 @@ namespace shader
     bool XShaderManager::init(void)
     {
         X_ASSERT_NOT_NULL(gEnv);
-        X_ASSERT_NOT_NULL(gEnv->pHotReload);
         X_LOG1("ShadersManager", "Starting");
         X_PROFILE_NO_HISTORY_BEGIN("ShaderMan", core::profiler::SubSys::RENDER);
-
-        // hotreload support.
-        gEnv->pHotReload->addfileType(this, SOURCE_FILE_EXTENSION);
-        gEnv->pHotReload->addfileType(this, SOURCE_INCLUDE_FILE_EXTENSION);
-        gEnv->pHotReload->addfileType(this, COMPILED_SHADER_FILE_EXTENSION);
 
         return true;
     }
@@ -102,12 +96,6 @@ namespace shader
     {
         X_LOG1("ShadersManager", "Shutting Down");
         X_ASSERT_NOT_NULL(gEnv);
-        X_ASSERT_NOT_NULL(gEnv->pHotReload);
-
-        // remove the hotreloads.
-        gEnv->pHotReload->addfileType(nullptr, SOURCE_FILE_EXTENSION);
-        gEnv->pHotReload->addfileType(nullptr, SOURCE_INCLUDE_FILE_EXTENSION);
-        gEnv->pHotReload->addfileType(nullptr, COMPILED_SHADER_FILE_EXTENSION);
 
         freeSourcebin();
         freeHwShaders();
@@ -462,47 +450,57 @@ namespace shader
     {
     }
 
-    void XShaderManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
-    {
-        X_UNUSED(jobSys);
 
-        const char* pExt = name.extension(false);
+    void XShaderManager::onLoadRequestFail(core::AssetBase* pAsset)
+    {
+        X_UNUSED(pAsset);
+        X_ASSERT_UNREACHABLE();
+    }
+
+    bool XShaderManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize)
+    {
+        X_UNUSED(pAsset, data, dataSize);
+        X_ASSERT_UNREACHABLE();
+        return true;
+    }
+
+    bool XShaderManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
+    {
+        // SOURCE_FILE_EXTENSION
+        // SOURCE_INCLUDE_FILE_EXTENSION
+        // COMPILED_SHADER_FILE_EXTENSION
+
+        const char* pExt = assetName.extension(false);
         if (pExt) {
             // this is just a cache update ignore this.
             if (core::strUtil::IsEqualCaseInsen(pExt, COMPILED_SHADER_FILE_EXTENSION)) {
-                return;
+                return false;
             }
 
             // ignore .fxcb.hlsl which are merged sources saved out for debuggin.
-            if (name.findCaseInsen(SOURCE_MERGED_FILE_EXTENSION)) {
-                return;
+            if (assetName.findCaseInsen(SOURCE_MERGED_FILE_EXTENSION)) {
+                return false;
             }
 
-            core::AssetName assetName(name);
-            assetName.replaceSeprators();
-            assetName.stripAssetFolder(assetDb::AssetType::SHADER);
-
-            core::string nameStr(assetName.begin(), assetName.end());
-
-            if (!sourceBin_.sourceForName(nameStr)) {
-                X_WARNING("Shader", "Skipping reload of \"%s\" it's not currently used", nameStr.c_str());
-                return;
+            if (!sourceBin_.sourceForName(name)) {
+                X_WARNING("Shader", "Skipping reload of \"%s\" it's not currently used", name.c_str());
+                return false;
             }
 
             // force a reload of the source.
-            const auto* pSource = sourceBin_.loadRawSourceFile(nameStr, true);
+            const auto* pSource = sourceBin_.loadRawSourceFile(name, true);
             if (!pSource) {
-                return;
+                return false;
             }
 
             /*
-				we can have dozens of hardware shaders that use this source file.
-				each hardware shader holds a pointer to it's shader source.
-				so we could just iterate all hardware shaders and invalid any using it.
+            we can have dozens of hardware shaders that use this source file.
+            each hardware shader holds a pointer to it's shader source.
+            so we could just iterate all hardware shaders and invalid any using it.
 
-				might want todo something diffrent if end up with loads of shaders
-				like storing refrence lists on the shaders.
-			*/
+            might want todo something diffrent if end up with loads of shaders
+            like storing refrence lists on the shaders.
+            */
 
             core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
@@ -513,7 +511,10 @@ namespace shader
                 }
             }
         }
+
+        return true;
     }
+
 
     void XShaderManager::Cmd_ListHWShaders(core::IConsoleCmdArgs* pArgs)
     {

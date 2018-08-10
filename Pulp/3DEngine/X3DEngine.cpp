@@ -97,14 +97,9 @@ bool X3DEngine::init(void)
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
     X_ASSERT_NOT_NULL(gEnv->pConsole);
     X_ASSERT_NOT_NULL(gEnv->pRender);
-    X_ASSERT_NOT_NULL(gEnv->pHotReload);
     X_ASSERT_NOT_NULL(gEnv->pPhysics);
 
     auto* pRender = gEnv->pRender;
-
-    // register some file types.
-    gEnv->pHotReload->addfileType(this, "level");
-    gEnv->pHotReload->addfileType(this, "map");
 
     pCBufMan_ = X_NEW(CBufferManager, g_3dEngineArena, "CBufMan")(g_3dEngineArena, pRender);
     pVariableStateMan_ = X_NEW(VariableStateManager, g_3dEngineArena, "StateMan");
@@ -194,9 +189,6 @@ bool X3DEngine::init(void)
 void X3DEngine::shutDown(void)
 {
     X_LOG0("3DEngine", "Shutting Down");
-
-    gEnv->pHotReload->addfileType(nullptr, "level");
-    gEnv->pHotReload->addfileType(nullptr, "map");
 
     auto* pRender = gEnv->pRender;
 
@@ -844,15 +836,6 @@ void X3DEngine::removeWorldFromActiveList(IWorld3D* pWorld)
     if (idx != WorldArr::invalid_index) {
         worlds_.remove(pWorld);
     }
-}
-
-// =======================================
-
-void X3DEngine::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
-{
-    // do nothing for now.
-    X_UNUSED(jobSys);
-    X_UNUSED(name);
 }
 
 // =======================================

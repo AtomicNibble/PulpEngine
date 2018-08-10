@@ -63,14 +63,6 @@ bool TextureManager::init(void)
     X_LOG1("TextureManager", "Starting");
     X_PROFILE_NO_HISTORY_BEGIN("TextureMan", core::profiler::SubSys::ENGINE3D);
 
-    auto hotReload = gEnv->pHotReload;
-    hotReload->addfileType(this, "ci");
-    hotReload->addfileType(this, "dds");
-    hotReload->addfileType(this, "png");
-    hotReload->addfileType(this, "jpg");
-    hotReload->addfileType(this, "psd");
-    hotReload->addfileType(this, "tga");
-
     pCILoader_ = X_NEW(texture::CI::XTexLoaderCI, arena_, "CILoader");
 
     static_assert(texture::ImgFileFormat::ENUM_COUNT == 7, "Added additional img src fmts? this code needs updating.");
@@ -109,14 +101,6 @@ bool TextureManager::init(void)
 void TextureManager::shutDown(void)
 {
     X_LOG0("TextureManager", "Shutting Down");
-
-    auto hotReload = gEnv->pHotReload;
-    hotReload->addfileType(nullptr, "ci");
-    hotReload->addfileType(nullptr, "dds");
-    hotReload->addfileType(nullptr, "png");
-    hotReload->addfileType(nullptr, "jpg");
-    hotReload->addfileType(nullptr, "psd");
-    hotReload->addfileType(nullptr, "tga");
 
     for (auto* pTexLoader : textureLoaders_) {
         X_DELETE(pTexLoader, arena_);
@@ -354,11 +338,12 @@ void TextureManager::releaseResources(Texture* pTex)
     X_UNUSED(pTex);
 }
 
-void TextureManager::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+bool TextureManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(jobSys, name);
-}
+    X_UNUSED(assetName, name);
 
+    return true;
+}
 // -----------------------------------
 
 void TextureManager::listTextures(const char* pSearchPattern)

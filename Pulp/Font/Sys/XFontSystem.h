@@ -18,7 +18,6 @@ class XFontTexture;
 class XGlyphCache;
 
 class XFontSystem : public IFontSys
-    , public core::IXHotReload
     , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<XFont, FONT_MAX_LOADED, core::SingleThreadPolicy> FontContainer;
@@ -63,13 +62,8 @@ private:
     void addLoadRequest(FontResource* pFont);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
+    bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
-private:
-    // IXHotReload
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
-
-private:
     void Cmd_ListFonts(core::IConsoleCmdArgs* pCmd);
     void Cmd_DumpForName(core::IConsoleCmdArgs* pCmd);
 

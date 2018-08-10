@@ -58,7 +58,6 @@ typedef core::Logger<
     ConsoleLogger;
 
 class XCore : public ICore
-    , public core::IXHotReloadManager
     , public core::IDirectoryWatcherListener
     , public ICoreEventListener
 {
@@ -76,8 +75,7 @@ class XCore : public ICore
     typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
     typedef core::Array<ConverterModule> ConverterModulesArr;
     typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
-    // I think i can just use stack strings, since all handlers are hard coded.
-    typedef core::HashMap<const char* const, core::IXHotReload*> HotReloadMap;
+    
     typedef core::Array<core::string> HotRelodIgnoreArr;
     typedef core::CmdArgs<1024, wchar_t> CmdArg;
     typedef core::FixedArray<CmdArg, MAX_CMD_ARS> CmdArgs;
@@ -112,7 +110,6 @@ public:
 
     X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
     core::IDirectoryWatcher* GetDirWatcher(void) X_FINAL;
-    X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 
     X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
     X_INLINE core::ILog* GetILog(void) X_FINAL;
@@ -167,25 +164,16 @@ private:
 
     void AddIgnoredHotReloadExtensions(void);
 
-    void Command_HotReloadListExts(core::IConsoleCmdArgs* Cmd);
     void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
 
-    void HotReloadListExts(void);
     void ListProgramArgs(void);
     void LogSystemInfo(void) const;
 
     void Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-    void Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
     void Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
     void Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
-    // IXHotReloadManager
-    bool addfileType(core::IXHotReload* pHotReload, const char* extension) X_FINAL;
-    void unregisterListener(core::IXHotReload* pHotReload) X_FINAL;
-
-    // ~IXHotReloadManager
-
     // IDirectoryWatcherListener
     bool OnFileChange(core::IDirectoryWatcher::Action::Enum action,
         const char* name, const char* oldName, bool isDirectory) X_OVERRIDE;
@@ -229,8 +217,6 @@ private:
     core::XDirectoryWatcher* pDirWatcher_;
 
     ICoreEventDispatcher* pEventDispatcher_;
-
-    HotReloadMap hotReloadExtMap_;
 
 #if X_DEBUG
     HotRelodIgnoreArr hotReloadIgnores_;

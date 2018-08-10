@@ -29,7 +29,6 @@ X_NAMESPACE_BEGIN(script)
 class Script;
 
 class XScriptSys : public IScriptSys
-    , public core::IXHotReload
     , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<Script, SCRIPT_MAX_LOADED, core::SingleThreadPolicy> ScriptContainer;
@@ -139,11 +138,7 @@ private:
     void addLoadRequest(ScriptResource* pScript);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
-
-private:
-    // IXHotReload
-    virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name) X_FINAL;
-    // ~IXHotReload
+    bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
 private:
     void listBinds(void) const;
