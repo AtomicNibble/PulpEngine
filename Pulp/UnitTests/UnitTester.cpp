@@ -15,8 +15,6 @@ X_LINK_LIB("gtestd")
 X_LINK_LIB("gtest")
 #endif
 
-// X_LINK_LIB("Shlwapi") // GetModuleFileNameW
-
 #define _LAUNCHER
 #include <ModuleExports.h>
 
