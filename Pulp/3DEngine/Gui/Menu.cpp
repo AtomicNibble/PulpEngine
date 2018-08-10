@@ -49,7 +49,14 @@ namespace gui
         data_ = std::move(data);
         dataSize_ = dataSize;
 
+        // need to remake the script table.
+        if (pScriptTable_)
+        {
+            updateFunc_.clear();
 
+            pScriptTable_->release();
+            pScriptTable_ = nullptr;
+        }
 
         return true;
     }
