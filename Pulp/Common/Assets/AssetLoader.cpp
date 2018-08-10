@@ -166,6 +166,7 @@ bool AssetLoader::onFileChanged(const char* pName)
 
     core::StackString<128> assetTypeStr(assetName.begin(), pSlash);
     assetTypeStr.toLower();
+    assetTypeStr.trimRight('s');
 
     assetDb::AssetType::Enum type;
     if (!assetTypeFromStr(type, assetTypeStr.begin(), assetTypeStr.length())) {
