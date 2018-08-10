@@ -7,30 +7,41 @@
 
 X_NAMESPACE_BEGIN(core)
 
-class XDirectoryWatcherListener;
+struct IDirectoryWatcherListener;
 
-struct IXDirectoryWatcher
+struct IDirectoryWatcher
 {
+    X_DECLARE_ENUM(Action)(
+        ADDED,    ///< A file or directory has been added.
+        REMOVED,  ///< A file or directory has been removed.
+        MODIFIED, ///< A file or directory has been modified.
+        RENAMED   ///< A file or directory has been renamed.
+    );
+
+    virtual ~IDirectoryWatcher() = default;
+
     virtual void addDirectory(const char* directory) X_ABSTRACT;
     virtual void addDirectory(const wchar_t* directory) X_ABSTRACT;
 
-    virtual void registerListener(XDirectoryWatcherListener* pListener) X_ABSTRACT;
-    virtual void unregisterListener(XDirectoryWatcherListener* pListener) X_ABSTRACT;
-
-protected:
-    virtual ~IXDirectoryWatcher()
-    {
-    }
+    virtual void registerListener(IDirectoryWatcherListener* pListener) X_ABSTRACT;
+    virtual void unregisterListener(IDirectoryWatcherListener* pListener) X_ABSTRACT;
 };
+
+struct IDirectoryWatcherListener
+{
+    virtual ~IDirectoryWatcherListener() = default;
+
+    // returns true if it action was eaten.
+    virtual bool OnFileChange(IDirectoryWatcher::Action::Enum action,
+        const char* pName, const char* pOldName, bool isDirectory) X_ABSTRACT;
+};
+
 
 struct IXHotReload
 {
-    virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& path) X_ABSTRACT;
+    virtual ~IXHotReload() = default;
 
-protected:
-    virtual ~IXHotReload()
-    {
-    }
+    virtual void Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& path) X_ABSTRACT;
 };
 
 struct IXHotReloadManager

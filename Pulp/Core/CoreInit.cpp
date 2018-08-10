@@ -43,6 +43,7 @@
 
 #include <Memory\MemInfo.h>
 #include <Platform\MessageBox.h>
+#include <Platform\DirectoryWatcher.h>
 
 #include "PotatoFactoryRegistryImpl.h"
 
@@ -392,7 +393,9 @@ bool XCore::Init(const SCoreInitParams& startupParams)
         pConsoleLogger_->GetFilterPolicy().RegisterVars();
     }
 
-    dirWatcher_.Init();
+    if (pDirWatcher_) {
+        pDirWatcher_->Init();
+    }
 
     // register filesystemvars.
     env_.pFileSys->registerVars();

@@ -64,11 +64,6 @@ X_INLINE core::profiler::IProfiler* XCore::GetProfiler(void)
 #endif // !X_ENABLE_PROFILER
 }
 
-X_INLINE core::IXDirectoryWatcher* XCore::GetDirWatcher(void)
-{
-    return &dirWatcher_;
-}
-
 X_INLINE core::IXHotReloadManager* XCore::GetHotReloadMan(void)
 {
     return this;

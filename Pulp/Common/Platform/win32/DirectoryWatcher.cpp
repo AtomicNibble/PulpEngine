@@ -70,23 +70,9 @@ void XDirectoryWatcher::Init(void)
 
 void XDirectoryWatcher::ShutDown(void)
 {
-    // clear the monitors on listeners, to prevent them trying to access
-    // invalid memory.
-    listeners::Iterator it;
-    for (it = listeners_.begin(); it != listeners_.end(); ++it) {
-        XDirectoryWatcherListener* pListener = *it;
-
-        if (pListener) {
-            pListener->setMonitor(nullptr);
-        }
-    }
-
-    Directorys::Iterator it2;
-    for (it2 = dirs_.begin(); it2 != dirs_.end(); ++it2) {
-        WatchInfo* pInfo = it2;
-
-        CloseHandle(pInfo->event);
-        CloseHandle(pInfo->directory);
+    for (const auto& dirInfo : dirs_) {
+        ::CloseHandle(dirInfo.event);
+        ::CloseHandle(dirInfo.directory);
     }
 
     listeners_.clear();
@@ -330,26 +316,22 @@ bool XDirectoryWatcher::IsRepeat(const core::Path<wchar_t>& path)
     return false;
 }
 
-void XDirectoryWatcher::registerListener(XDirectoryWatcherListener* pListener)
+void XDirectoryWatcher::registerListener(IDirectoryWatcherListener* pListener)
 {
-    X_ASSERT_NOT_NULL(pListener);
-    pListener->setMonitor(this);
-    listeners_.append(pListener);
+    listeners_.append(X_ASSERT_NOT_NULL(pListener));
 }
 
-void XDirectoryWatcher::unregisterListener(XDirectoryWatcherListener* pListener)
+void XDirectoryWatcher::unregisterListener(IDirectoryWatcherListener* pListener)
 {
-    X_ASSERT_NOT_NULL(pListener);
-    pListener->setMonitor(nullptr);
-    listeners_.removeIndex(listeners_.find(pListener));
+    listeners_.removeIndex(listeners_.find(X_ASSERT_NOT_NULL(pListener)));
 }
 
 void XDirectoryWatcher::notify(Action::Enum action,
-    const char* name, const char* oldName, bool isDirectory)
+    const char* pName, const char* pOldName, bool isDirectory)
 {
-    listeners::ConstIterator it = listeners_.begin();
+    auto it = listeners_.begin();
     for (; it != listeners_.end(); ++it) {
-        if ((*it)->OnFileChange(action, name, oldName, isDirectory)) {
+        if ((*it)->OnFileChange(action, pName, pOldName, isDirectory)) {
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
             X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Event was handled");
 #endif // !X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING

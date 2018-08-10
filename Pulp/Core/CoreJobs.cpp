@@ -6,6 +6,8 @@
 #include <IInput.h>
 #include <IFrameData.h>
 
+#include <Platform\DirectoryWatcher.h>
+
 namespace
 {
     struct FileChangeJobData
@@ -18,14 +20,13 @@ namespace
 void XCore::Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx,
     core::V2::Job* pJob, void* pData)
 {
-    X_UNUSED(jobSys);
-    X_UNUSED(threadIdx);
-    X_UNUSED(pJob);
-    X_UNUSED(pData);
+    X_UNUSED(jobSys, threadIdx, pJob, pData);
 
     // will cause  OnFileChange below to get called from this job.
     // which then makes jobs for each change calling Job_OnFileChange
-    dirWatcher_.tick();
+    X_ASSERT_NOT_NULL(pDirWatcher_);
+
+    pDirWatcher_->tick();
 }
 
 void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
@@ -55,7 +56,7 @@ void XCore::Job_OnFileChange(core::V2::JobSystem& jobSys, size_t threadIdx,
         }
     }
     else {
-        if (this->dirWatcher_.isDebugEnabled()) {
+        if (pDirWatcher_->isDebugEnabled()) {
             X_LOG1("hotReload", "No file extension ignoring: %s", pFileName);
         }
     }
@@ -97,28 +98,3 @@ void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
         env_.pConsole->Job_runCmds();
     }
 }
-
-// XDirectoryWatcherListener
-
-bool XCore::OnFileChange(core::XDirectoryWatcher::Action::Enum action,
-    const char* name, const char* oldName, bool isDirectory)
-{
-    X_UNUSED(oldName);
-
-    if (isDirectory) {
-        return false;
-    }
-
-    if (action == core::XDirectoryWatcher::Action::MODIFIED) {
-        FileChangeJobData* pData = X_NEW(FileChangeJobData, g_coreArena, "FileChangeJobData");
-        pData->name.set(name);
-
-        core::V2::JobSystem& jobSys = *env_.pJobSys;
-        core::V2::Job* pJob = jobSys.CreateMemberJob<XCore>(this, &XCore::Job_OnFileChange, pData JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-        jobSys.Run(pJob);
-    }
-
-    return true;
-}
-
-// ~XDirectoryWatcherListener

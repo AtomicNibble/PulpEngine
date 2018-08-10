@@ -5,6 +5,7 @@
 
 #include <ICore.h>
 #include <IConsole.h>
+#include <IDirectoryWatcher.h>
 
 #include "Vars\CoreVars.h"
 
@@ -27,9 +28,7 @@
 #include "Logging\WritePolicies\LoggerDebuggerWritePolicy.h"
 #include "Logging\WritePolicies\LoggerConsoleWritePolicy.h"
 
-#include <Platform\DirectoryWatcher.h>
 #include <Platform\Module.h>
-#include "IDirectoryWatcher.h"
 
 #include "Containers\HashMap.h"
 
@@ -43,7 +42,8 @@ struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
                     class xWindow;
-                    class Console;)
+                    class Console;
+                    class XDirectoryWatcher;)
 
 typedef core::Logger<
     core::LoggerNoFilterPolicy,
@@ -59,7 +59,7 @@ typedef core::Logger<
 
 class XCore : public ICore
     , public core::IXHotReloadManager
-    , public core::XDirectoryWatcherListener
+    , public core::IDirectoryWatcherListener
     , public ICoreEventListener
 {
     static const size_t MAX_CMD_ARS = 16;
@@ -111,7 +111,7 @@ public:
     X_INLINE physics::IPhysics* GetPhysics(void) X_FINAL;
 
     X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
-    X_INLINE core::IXDirectoryWatcher* GetDirWatcher(void) X_FINAL;
+    core::IDirectoryWatcher* GetDirWatcher(void) X_FINAL;
     X_INLINE core::IXHotReloadManager* GetHotReloadMan(void) X_FINAL;
 
     X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
@@ -126,10 +126,6 @@ public:
     X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
     IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
-
-private:
-    static SCoreGlobals env_;
-    static core::MallocFreeAllocator malloc_;
 
 public:
     virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
@@ -147,8 +143,7 @@ private:
 
     core::Module::Handle LoadDLL(const char* pDllName);
 
-    bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName,
-        const SCoreInitParams& initParams);
+    bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const SCoreInitParams& initParams);
 
     bool ParseCmdArgs(const wchar_t* pArgs);
     bool parseSeed(Vec4i seed);
@@ -191,10 +186,10 @@ private:
 
     // ~IXHotReloadManager
 
-    // XDirectoryWatcherListener
-    bool OnFileChange(core::XDirectoryWatcher::Action::Enum action,
+    // IDirectoryWatcherListener
+    bool OnFileChange(core::IDirectoryWatcher::Action::Enum action,
         const char* name, const char* oldName, bool isDirectory) X_OVERRIDE;
-    // ~XDirectoryWatcherListener
+    // ~IDirectoryWatcherListener
 
     // ICoreEventListener
     void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
@@ -205,6 +200,10 @@ private:
     void WindowPosVarChange(core::ICVar* pVar);
     void WindowSizeVarChange(core::ICVar* pVar);
     void WindowCustomFrameVarChange(core::ICVar* pVar);
+
+private:
+    static SCoreGlobals env_;
+    static core::MallocFreeAllocator malloc_;
 
 private:
     core::CoreVars vars_;
@@ -228,7 +227,7 @@ private:
 #endif // !X_ENABLE_PROFILER
 
     // Hot reload stuff
-    core::XDirectoryWatcher dirWatcher_;
+    core::XDirectoryWatcher* pDirWatcher_;
 
     ICoreEventDispatcher* pEventDispatcher_;
 

@@ -31,6 +31,7 @@
 #include <Console.h>
 
 #include "CoreEventDispatcher.h"
+#include <Platform\DirectoryWatcher.h>
 
 #include <Threading\JobSystem2.h>
 
@@ -98,8 +99,6 @@ XCore::XCore() :
     pProfiler_(nullptr),
 #endif //!X_ENABLE_PROFILER
 
-    dirWatcher_(g_coreArena),
-
     pEventDispatcher_(nullptr),
     hotReloadExtMap_(g_coreArena),
 
@@ -117,13 +116,17 @@ XCore::XCore() :
 
     hotReloadExtMap_.reserve(32);
 
+    pDirWatcher_ = X_NEW(core::XDirectoryWatcher, g_coreArena, "CoreDirectoryWatcher")(g_coreArena);
+
     pEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
     pEventDispatcher_->RegisterListener(this);
+
+
 
     env_.state_ = SCoreGlobals::State::STARTING;
     env_.pCore = this;
     env_.pTimer = &time_;
-    env_.pDirWatcher = &dirWatcher_;
+    env_.pDirWatcher = pDirWatcher_;
     env_.pHotReload = this;
     //	env_.pMalloc = &g_coreArena;
     env_.pArena = g_coreArena;
@@ -145,7 +148,9 @@ XCore::XCore() :
     //	env_.pJobSys = X_NEW(core::JobSystem, g_coreArena, "JobSystem");
     //env_.pJobSys = X_NEW(core::V2::JobSystem, g_coreArena, "JobSystem");
 
-    dirWatcher_.registerListener(this);
+    if (pDirWatcher_) {
+        pDirWatcher_->registerListener(this);
+    }
 }
 
 XCore::~XCore()
@@ -188,7 +193,10 @@ void XCore::ShutDown()
 
     core::StopWatch timer;
 
-    dirWatcher_.ShutDown();
+    if (pDirWatcher_) {
+        pDirWatcher_->ShutDown();
+        X_DELETE(pDirWatcher_, g_coreArena);
+    }
 
     // save the vars before we start deleting things.
     if (env_.pConsole && !initParams_.basicConsole()) {
@@ -398,6 +406,26 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
     }
 }
 
+
+bool XCore::OnFileChange(core::IDirectoryWatcher::Action::Enum action,
+    const char* pName, const char* pOldName, bool isDirectory)
+{
+    X_UNUSED(pName, pOldName);
+
+    if (isDirectory) {
+        return false;
+    }
+
+    if (action == core::IDirectoryWatcher::Action::MODIFIED) 
+    {
+
+
+
+    }
+
+    return true;
+}
+
 const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
 {
     X_ASSERT_NOT_NULL(pVarName);
@@ -603,6 +631,13 @@ void XCore::LogSystemInfo(void) const
         displayInfo.pelsWidth,
         displayInfo.pelsHeight,
         displayInfo.bitsPerPel);
+}
+
+// -------------------------------
+
+core::IDirectoryWatcher* XCore::GetDirWatcher(void)
+{
+    return pDirWatcher_;
 }
 
 X_NAMESPACE_BEGIN(core)
