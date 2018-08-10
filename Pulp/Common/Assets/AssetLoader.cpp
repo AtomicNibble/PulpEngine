@@ -185,7 +185,7 @@ bool AssetLoader::onFileChanged(const char* pName)
     tmp.stripAssetFolder(type);
     tmp.removeExtension();
 
-    core::string nameStr(assetName.begin(), assetName.end());
+    core::string nameStr(tmp.begin(), tmp.end());
 
     assetsinks_[type]->onFileChanged(assetName, nameStr);
     return true;
