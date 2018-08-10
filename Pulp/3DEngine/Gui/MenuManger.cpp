@@ -159,8 +159,19 @@ namespace gui
 
     bool XMenuManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
     {
-        X_UNUSED(assetName, name);
+        X_UNUSED(assetName);
 
+        core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
+
+        auto* pMenuRes = menus_.findAsset(name);
+        if (!pMenuRes) {
+            X_LOG1("MenuManager", "Not reloading \"%s\" it's not currently used", name.c_str());
+            return false;
+        }
+
+        X_LOG0("MenuManager", "Reloading: %s", name.c_str());
+
+        pAssetLoader_->reload(pMenuRes, core::ReloadFlag::Beginframe);
         return true;
     }
 
