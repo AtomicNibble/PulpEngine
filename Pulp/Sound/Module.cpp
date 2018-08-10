@@ -53,7 +53,7 @@ class XEngineModule_Sound : public IEngineModule
     };
 
     //////////////////////////////////////////////////////////////////////////
-    virtual bool Initialize(SCoreGlobals& env, const SCoreInitParams& initParams) X_OVERRIDE
+    virtual bool Initialize(SCoreGlobals& env, const CoreInitParams& initParams) X_OVERRIDE
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pArena);

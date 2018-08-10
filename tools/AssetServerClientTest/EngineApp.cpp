@@ -27,7 +27,7 @@ EngineApp::~EngineApp()
 
 bool EngineApp::Init(const wchar_t* sInCmdLine)
 {
-    SCoreInitParams params;
+    CoreInitParams params;
     params.hInstance = g_hInstance;
     params.pCmdLine = sInCmdLine;
     params.bSkipInput = true;

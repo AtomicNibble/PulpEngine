@@ -57,7 +57,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
 {
     X_UNUSED(sInCmdLine);
 
-    SCoreInitParams params;
+    CoreInitParams params;
     params.pCmdLine = sInCmdLine;
     params.hInstance = hInstance;
     params.bSkipInput = false;

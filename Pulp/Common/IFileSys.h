@@ -682,7 +682,7 @@ struct IFileSys
     virtual void registerVars(void) X_ABSTRACT;
     virtual void registerCmds(void) X_ABSTRACT;
 
-    virtual bool init(const SCoreInitParams& params) X_ABSTRACT;
+    virtual bool init(const CoreInitParams& params) X_ABSTRACT;
     virtual bool initWorker(void) X_ABSTRACT;
     virtual void shutDown(void) X_ABSTRACT;
 

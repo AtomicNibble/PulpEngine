@@ -137,7 +137,7 @@ struct ConsoleDesc
     int32_t y;
 };
 
-struct SCoreInitParams
+struct CoreInitParams
 {
     void* hInstance;
     PLATFORM_HWND hWnd;
@@ -202,7 +202,7 @@ struct SCoreInitParams
         return bScriptSystem;
     }
 
-    SCoreInitParams() :
+    CoreInitParams() :
         hInstance(nullptr),
         hWnd(nullptr),
         pCmdLine(nullptr),
@@ -353,7 +353,7 @@ struct ICore
 {
     virtual ~ICore() = default;
 
-    virtual bool Init(const SCoreInitParams& startupParams) X_ABSTRACT;
+    virtual bool Init(const CoreInitParams& startupParams) X_ABSTRACT;
     virtual bool InitAsyncWait(void) X_ABSTRACT; // call this if init fails, before shutting down.
     virtual void Release(void) X_ABSTRACT;
 
@@ -450,9 +450,9 @@ extern "C" DLL_EXPORT void LinkModule(ICore* pCore, const char* moduleName);
 // Summary:
 //	 Interface of the DLL.
 extern "C" {
-typedef core::traits::Function<ICore*(SCoreInitParams& initParams)> CreateCoreInfterFaceFunc;
+typedef core::traits::Function<ICore*(CoreInitParams& initParams)> CreateCoreInfterFaceFunc;
 
-IPCORE_API ICore* CreateCoreInterface(const SCoreInitParams& initParams);
+IPCORE_API ICore* CreateCoreInterface(const CoreInitParams& initParams);
 
 #define CORE_DLL_NAME X_ENGINE_OUTPUT_PREFIX "Core"
 #define CORE_DLL_INITFUNC "CreateCoreInterface"

@@ -230,7 +230,7 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
     return false;
 }
 
-bool XCore::IntializeEngineModule(const char* dllName, const char* moduleClassName, const SCoreInitParams& initParams)
+bool XCore::IntializeEngineModule(const char* dllName, const char* moduleClassName, const CoreInitParams& initParams)
 {
     X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
 
@@ -289,7 +289,7 @@ bool XCore::IntializeEngineModule(const char* dllName, const char* moduleClassNa
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool XCore::Init(const SCoreInitParams& startupParams)
+bool XCore::Init(const CoreInitParams& startupParams)
 {
     core::StopWatch time;
 
@@ -702,7 +702,7 @@ bool XCore::parseSeed(Vec4i seed)
     return true;
 }
 
-bool XCore::InitFileSys(const SCoreInitParams& initParams)
+bool XCore::InitFileSys(const CoreInitParams& initParams)
 {
     X_UNUSED(initParams);
     env_.pFileSys = X_NEW_ALIGNED(core::xFileSys, g_coreArena, "FileSys", 8)(g_coreArena);
@@ -720,7 +720,7 @@ bool XCore::InitFileSys(const SCoreInitParams& initParams)
 //////////////////////////////////////////////////////////////////////////
 
 //////////////////////////////////////////////////////////////////////////
-bool XCore::InitLogging(const SCoreInitParams& initParams)
+bool XCore::InitLogging(const CoreInitParams& initParams)
 {
     env_.pLog = X_NEW_ALIGNED(core::XLog, g_coreArena, "LogSystem", 8);
 
@@ -755,7 +755,7 @@ bool XCore::InitLogging(const SCoreInitParams& initParams)
     return env_.pLog != nullptr;
 }
 
-bool XCore::InitConsole(const SCoreInitParams& initParams)
+bool XCore::InitConsole(const CoreInitParams& initParams)
 {
     // console can load it's render resources now.
     if (!initParams.basicConsole()) {
@@ -767,7 +767,7 @@ bool XCore::InitConsole(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitInput(const SCoreInitParams& initParams)
+bool XCore::InitInput(const CoreInitParams& initParams)
 {
     if (initParams.bSkipInput) {
         env_.pInput = X_NEW(input::XNullInput, g_coreArena, "NullInput");
@@ -791,7 +791,7 @@ bool XCore::InitInput(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitFont(const SCoreInitParams& initParams)
+bool XCore::InitFont(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_FONT, "Engine_Font", initParams)) {
         return false;
@@ -810,7 +810,7 @@ bool XCore::InitFont(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitSound(const SCoreInitParams& initParams)
+bool XCore::InitSound(const CoreInitParams& initParams)
 {
     if (initParams.bSkipSound) {
         env_.pSound = nullptr;
@@ -834,7 +834,7 @@ bool XCore::InitSound(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitPhysics(const SCoreInitParams& initParams)
+bool XCore::InitPhysics(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_PHYSICS, "Engine_Physics", initParams)) {
         return false;
@@ -848,7 +848,7 @@ bool XCore::InitPhysics(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitNet(const SCoreInitParams& initParams)
+bool XCore::InitNet(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_NET, "Engine_Network", initParams)) {
         return false;
@@ -867,7 +867,7 @@ bool XCore::InitNet(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitVideo(const SCoreInitParams& initParams)
+bool XCore::InitVideo(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_VIDEO, "Engine_Video", initParams)) {
         return false;
@@ -886,7 +886,7 @@ bool XCore::InitVideo(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitScriptSys(const SCoreInitParams& initParams)
+bool XCore::InitScriptSys(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_SCRIPT, "Engine_Script", initParams)) {
         return false;
@@ -905,7 +905,7 @@ bool XCore::InitScriptSys(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitRenderSys(const SCoreInitParams& initParams)
+bool XCore::InitRenderSys(const CoreInitParams& initParams)
 {
     if (initParams.bTesting) {
         if (!IntializeEngineModule(DLL_RENDER_NULL, "Engine_RenderNull", initParams)) {
@@ -960,7 +960,7 @@ bool XCore::InitRenderSys(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::Init3DEngine(const SCoreInitParams& initParams)
+bool XCore::Init3DEngine(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_3D_ENGINE, "Engine_3DEngine", initParams)) {
         return false;
@@ -983,7 +983,7 @@ bool XCore::Init3DEngine(const SCoreInitParams& initParams)
     return true;
 }
 
-bool XCore::InitGameDll(const SCoreInitParams& initParams)
+bool XCore::InitGameDll(const CoreInitParams& initParams)
 {
     if (!IntializeEngineModule(DLL_GAME_DLL, "Engine_Game", initParams)) {
         return false;
@@ -1004,7 +1004,7 @@ bool XCore::InitGameDll(const SCoreInitParams& initParams)
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 
-void XCore::registerVars(const SCoreInitParams& initParams)
+void XCore::registerVars(const CoreInitParams& initParams)
 {
     vars_.registerVars();
 

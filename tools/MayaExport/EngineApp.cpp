@@ -40,7 +40,7 @@ bool EngineApp::Init(void)
         return true; // already loaded.
     }
 
-    SCoreInitParams params;
+    CoreInitParams params;
     params.hInstance = nullptr;
     params.pCmdLine = L"";
     params.bSkipInput = true;

@@ -185,7 +185,7 @@ void xFileSys::registerCmds(void)
     ADD_COMMAND_MEMBER("listFileSystemPaths", this, xFileSys, &xFileSys::Cmd_ListSearchPaths, core::VarFlag::SYSTEM, "List the virtual filesystem paths");
 }
 
-bool xFileSys::init(const SCoreInitParams& params)
+bool xFileSys::init(const CoreInitParams& params)
 {
     X_ASSERT_NOT_NULL(gEnv->pCore);
     X_LOG0("FileSys", "Starting Filesys..");

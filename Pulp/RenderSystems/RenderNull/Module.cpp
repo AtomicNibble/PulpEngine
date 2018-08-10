@@ -39,7 +39,7 @@ class XEngineModule_Render : public IEngineModule
     };
 
     //////////////////////////////////////////////////////////////////////////
-    virtual bool Initialize(SCoreGlobals& env, const SCoreInitParams& initParams) X_OVERRIDE
+    virtual bool Initialize(SCoreGlobals& env, const CoreInitParams& initParams) X_OVERRIDE
     {
         X_UNUSED(initParams);
 

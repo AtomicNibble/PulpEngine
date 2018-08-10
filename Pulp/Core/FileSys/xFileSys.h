@@ -230,7 +230,7 @@ public:
     void registerVars(void) X_FINAL;
     void registerCmds(void) X_FINAL;
 
-    bool init(const SCoreInitParams& params) X_FINAL;
+    bool init(const CoreInitParams& params) X_FINAL;
     bool initWorker(void) X_FINAL;
     void shutDown(void) X_FINAL;
 
