@@ -16,7 +16,7 @@ struct IEngineModule : public IEngineUnknown
     virtual const char* GetName(void) X_ABSTRACT;
 
     // This is called to initialize the new module.
-    virtual bool Initialize(SCoreGlobals& env, const CoreInitParams& initParams) X_ABSTRACT;
+    virtual bool Initialize(CoreGlobals& env, const CoreInitParams& initParams) X_ABSTRACT;
     virtual bool ShutDown(void) X_ABSTRACT;
 };
 

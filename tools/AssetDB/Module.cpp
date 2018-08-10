@@ -37,7 +37,7 @@ class XEngineModule_AssetDB : public IEngineModule
         return "AssetDB";
     }
 
-    virtual bool Initialize(SCoreGlobals& env, const CoreInitParams& initParams) X_OVERRIDE
+    virtual bool Initialize(CoreGlobals& env, const CoreInitParams& initParams) X_OVERRIDE
     {
         X_UNUSED(initParams);
         ICore* pCore = env.pCore;

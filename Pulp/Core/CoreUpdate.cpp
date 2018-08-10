@@ -38,7 +38,7 @@ Also instead of sleeping we could be running physcis steps...
 
 bool XCore::RunGameLoop(void)
 {
-    env_.state_ = SCoreGlobals::State::RUNNING;
+    env_.state_ = CoreGlobals::State::RUNNING;
 
     while (PumpMessages()) {
         X_PROFILE_BEGIN("GameLoop", core::profiler::SubSys::GAME);

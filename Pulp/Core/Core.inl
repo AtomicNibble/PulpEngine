@@ -99,7 +99,7 @@ X_INLINE core::AssetLoader* XCore::GetAssetLoader(void)
     return &assetLoader_;
 }
 
-X_INLINE SCoreGlobals* XCore::GetGlobalEnv(void)
+X_INLINE CoreGlobals* XCore::GetGlobalEnv(void)
 {
     return &env_;
 }

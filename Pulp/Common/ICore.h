@@ -239,7 +239,7 @@ struct CoreInitParams
     }
 };
 
-struct SCoreGlobals // obbject is zerod on start.
+struct CoreGlobals // obbject is zerod on start.
 {
     X_DECLARE_ENUM8(State)
     (
@@ -278,7 +278,7 @@ struct SCoreGlobals // obbject is zerod on start.
     Vec4i seed;
     core::random::XorShift xorShift;
 
-    X_INLINE SCoreGlobals()
+    X_INLINE CoreGlobals()
     {
         pCore = nullptr;
         pInput = nullptr;
@@ -370,7 +370,7 @@ struct ICore
 
     virtual IEngineFactoryRegistry* GetFactoryRegistry(void) const X_ABSTRACT;
 
-    virtual SCoreGlobals* GetGlobalEnv(void) X_ABSTRACT;
+    virtual CoreGlobals* GetGlobalEnv(void) X_ABSTRACT;
     virtual core::MallocFreeAllocator* GetGlobalMalloc(void) X_ABSTRACT;
 
     virtual core::ITimer* GetITimer(void) X_ABSTRACT;
@@ -403,7 +403,7 @@ struct ICore
     virtual void OnFatalError(const char* format, va_list args) X_ABSTRACT;
 };
 
-extern SCoreGlobals* gEnv;
+extern CoreGlobals* gEnv;
 extern core::MallocFreeAllocator* gMalloc;
 
 #if defined(X_CVAR_NO_DESCRIPTION) && X_CVAR_NO_DESCRIPTION == 1

@@ -122,7 +122,7 @@ public:
     X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
     X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
 
-    X_INLINE SCoreGlobals* GetGlobalEnv(void) X_FINAL;
+    X_INLINE CoreGlobals* GetGlobalEnv(void) X_FINAL;
     X_INLINE core::MallocFreeAllocator* GetGlobalMalloc(void) X_FINAL;
 
     IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
@@ -202,7 +202,7 @@ private:
     void WindowCustomFrameVarChange(core::ICVar* pVar);
 
 private:
-    static SCoreGlobals env_;
+    static CoreGlobals env_;
 
 private:
     core::CoreVars vars_;

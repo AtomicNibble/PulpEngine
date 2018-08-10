@@ -77,7 +77,7 @@ namespace
 
 } // namespace
 
-SCoreGlobals XCore::env_;
+CoreGlobals XCore::env_;
 
 XCore::XCore() :
     pWindow_(nullptr),
@@ -122,7 +122,7 @@ XCore::XCore() :
 
 
 
-    env_.state_ = SCoreGlobals::State::STARTING;
+    env_.state_ = CoreGlobals::State::STARTING;
     env_.pCore = this;
     env_.pTimer = &time_;
     env_.pDirWatcher = pDirWatcher_;
@@ -171,7 +171,7 @@ void XCore::Release()
 void XCore::ShutDown()
 {
     X_LOG0("Core", "Shutting Down");
-    env_.state_ = SCoreGlobals::State::CLOSING;
+    env_.state_ = CoreGlobals::State::CLOSING;
 
 #if X_DEBUG
     hotReloadIgnores_.free();

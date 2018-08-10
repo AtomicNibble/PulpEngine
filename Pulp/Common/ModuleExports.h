@@ -15,11 +15,11 @@
 // #include <Debugging\SymbolResolution.h>
 
 #if defined(X_LIB) && !defined(_LAUNCHER)
-extern SCoreGlobals* gEnv;
+extern CoreGlobals* gEnv;
 extern core::MallocFreeAllocator* gMalloc;
 #else // !X_LIB
 
-SCoreGlobals* gEnv = nullptr;
+CoreGlobals* gEnv = nullptr;
 core::MallocFreeAllocator* gMalloc = nullptr;
 
 #if !defined(X_LIB)
