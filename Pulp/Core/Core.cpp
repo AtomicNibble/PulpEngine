@@ -100,10 +100,6 @@ XCore::XCore() :
 
     pEventDispatcher_(nullptr),
 
-#if X_DEBUG
-    hotReloadIgnores_(g_coreArena),
-#endif // !X_DEBUG
-
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
         StrArena::getMemoryAlignmentRequirement(8),
         StrArena::getMemoryOffsetRequirement() + 12),
@@ -165,10 +161,6 @@ void XCore::ShutDown()
 {
     X_LOG0("Core", "Shutting Down");
     env_.state_ = CoreGlobals::State::CLOSING;
-
-#if X_DEBUG
-    hotReloadIgnores_.free();
-#endif // !X_DEBUG
 
     if (vars_.coreFastShutdown_) {
         X_LOG0("Core", "Fast shutdown, skipping cleanup");

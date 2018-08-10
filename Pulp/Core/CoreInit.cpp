@@ -574,8 +574,6 @@ bool XCore::Init(const CoreInitParams& startupParams)
         return false;
     }
 
-    AddIgnoredHotReloadExtensions();
-
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResRefresh", core::profiler::SubSys::CORE);
         core::symbolResolution::Refresh();
@@ -1034,15 +1032,6 @@ void XCore::registerCmds(void)
         "Lists the processed command line arguments parsed to the program");
 }
 
-void XCore::AddIgnoredHotReloadExtensions(void)
-{
-#if X_DEBUG
-
-    // don't warn about shit like .txt!
-    hotReloadIgnores_.append(core::string("txt"));
-
-#endif // !X_DEBUG
-}
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 

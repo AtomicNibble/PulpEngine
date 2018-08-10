@@ -162,8 +162,6 @@ private:
     void registerVars(const CoreInitParams& initParams);
     void registerCmds(void);
 
-    void AddIgnoredHotReloadExtensions(void);
-
     void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
 
     void ListProgramArgs(void);
@@ -217,10 +215,6 @@ private:
     core::XDirectoryWatcher* pDirWatcher_;
 
     ICoreEventDispatcher* pEventDispatcher_;
-
-#if X_DEBUG
-    HotRelodIgnoreArr hotReloadIgnores_;
-#endif // !X_DEBUG \
     // ~Hotreload
 
     CoreInitParams initParams_;
