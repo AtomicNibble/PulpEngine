@@ -6,7 +6,7 @@
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 
 #include <Threading\CriticalSection.h>
-#include <Util\Process.h>
+#include <Platform\Process.h>
 
 // Google Test
 #if X_DEBUG == 1

@@ -10,7 +10,7 @@
 #include <INetwork.h>
 
 #include <Platform\SystemInfo.h>
-#include <Util\Process.h>
+#include <Platform\Process.h>
 
 // debug drawing
 #include <IPrimativeContext.h>

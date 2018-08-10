@@ -1192,12 +1192,6 @@
     <ClInclude Include="Threading\FixedThreadQue.h">
       <Filter>Headers\Threading</Filter>
     </ClInclude>
-    <ClInclude Include="Util\Process.h">
-      <Filter>Headers\Util</Filter>
-    </ClInclude>
-    <ClInclude Include="Util\win32\Process.h">
-      <Filter>Headers\Util\win32</Filter>
-    </ClInclude>
     <ClInclude Include="IEngineSysBase.h">
       <Filter>Interfaces_h</Filter>
     </ClInclude>
@@ -1338,6 +1332,12 @@
     </ClInclude>
     <ClInclude Include="IGui.h">
       <Filter>Interfaces_h\3DEngine</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\win32\Process.h">
+      <Filter>Headers\Platform\win32</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Process.h">
+      <Filter>Headers\Platform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -2046,9 +2046,6 @@
     <ClCompile Include="SystemAddress.cpp">
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
-    <ClCompile Include="Util\win32\Process.cpp">
-      <Filter>SourceFiles\Util\win32</Filter>
-    </ClCompile>
     <ClCompile Include="Sampler.cpp">
       <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
@@ -2111,6 +2108,9 @@
     </ClCompile>
     <ClCompile Include="Time\DateTimeStamp.cpp">
       <Filter>SourceFiles\Time</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\win32\Process.cpp">
+      <Filter>SourceFiles\Platform\win32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -290,6 +290,7 @@
     <ClInclude Include="Platform\MessageBox.h" />
     <ClInclude Include="Platform\Module.h" />
     <ClInclude Include="Platform\Pipe.h" />
+    <ClInclude Include="Platform\Process.h" />
     <ClInclude Include="Platform\SystemInfo.h" />
     <ClInclude Include="Platform\TrayIcon.h" />
     <ClInclude Include="Platform\Types.h" />
@@ -299,6 +300,7 @@
     <ClInclude Include="Platform\win32\DirectoryWatcher.h" />
     <ClInclude Include="Platform\win32\Module.h" />
     <ClInclude Include="Platform\win32\Pipe.h" />
+    <ClInclude Include="Platform\win32\Process.h" />
     <ClInclude Include="Platform\win32\SystemInfo.h" />
     <ClInclude Include="Platform\win32\TrayIcon.h" />
     <ClInclude Include="Platform\win32\Types.h" />
@@ -443,7 +445,6 @@
     <ClInclude Include="Util\Pointer64.h" />
     <ClInclude Include="Util\PointerFlags.h" />
     <ClInclude Include="Util\PointerUtil.h" />
-    <ClInclude Include="Util\Process.h" />
     <ClInclude Include="Util\ReferenceCounted.h" />
     <ClInclude Include="Util\ReferenceCountedOwner.h" />
     <ClInclude Include="Util\Span.h" />
@@ -454,7 +455,6 @@
     <ClInclude Include="Util\ToggleChecker.h" />
     <ClInclude Include="Util\UserLiterals.h" />
     <ClInclude Include="Util\win32\LastError.h" />
-    <ClInclude Include="Util\win32\Process.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\3rdparty\source\lz5\entropy\entropy_common.c">
@@ -720,13 +720,13 @@
     <ClCompile Include="Hashing\Digest.cpp" />
     <ClCompile Include="Math\XColor.cpp" />
     <ClCompile Include="MetaTable.cpp" />
+    <ClCompile Include="Platform\win32\Process.cpp" />
     <ClCompile Include="Random\win32\CryptRand.cpp" />
     <ClCompile Include="Sampler.cpp" />
     <ClCompile Include="SnapShot.cpp" />
     <ClCompile Include="Texture.cpp" />
     <ClCompile Include="Time\DateTimeStamp.cpp" />
     <ClCompile Include="UserCmd.cpp" />
-    <ClCompile Include="Util\win32\Process.cpp" />
     <None Include="Casts\safe_static_cast.inl" />
     <None Include="Casts\union_cast.inl" />
     <None Include="CBuffer.inl" />
