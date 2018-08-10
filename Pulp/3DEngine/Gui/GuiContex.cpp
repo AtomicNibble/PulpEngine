@@ -300,12 +300,12 @@ namespace gui
         pPrim_->drawRect(r, borderCol);
         pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
 
-        core::StackString<16, char> percentStr;
-        percentStr.setFmt("%g", percent);
+        core::StackString<16, char> valueStr;
+        valueStr.setFmt("%g", value);
 
         txtCtx_.flags.Set(font::DrawTextFlag::RIGHT);
         
-        pPrim_->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, percentStr.begin(), percentStr.end());
+        pPrim_->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, valueStr.begin(), valueStr.end());
 
         txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
