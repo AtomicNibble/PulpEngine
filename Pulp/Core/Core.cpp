@@ -78,7 +78,6 @@ namespace
 } // namespace
 
 SCoreGlobals XCore::env_;
-core::MallocFreeAllocator XCore::malloc_;
 
 XCore::XCore() :
     pWindow_(nullptr),

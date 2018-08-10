@@ -203,7 +203,6 @@ private:
 
 private:
     static SCoreGlobals env_;
-    static core::MallocFreeAllocator malloc_;
 
 private:
     core::CoreVars vars_;
@@ -241,6 +240,7 @@ private:
     SCoreInitParams initParams_;
 
     core::GrowingGenericAllocator strAlloc_;
+    core::MallocFreeAllocator malloc_;
 
     // args
     CmdArgs args_;
