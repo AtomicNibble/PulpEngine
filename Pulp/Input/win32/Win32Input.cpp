@@ -94,7 +94,7 @@ void XWinInput::update(core::FrameData& frameData)
         frameData.input.cusorPosClient = pWindow->GetCusroPosClient();
     }
 
-    AddHoldEvents(frameData.input);
+    addHoldEvents(frameData.input);
 
     RAWINPUT X_ALIGNED_SYMBOL(input[BUF_NUM], 8);
 

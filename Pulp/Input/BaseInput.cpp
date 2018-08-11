@@ -82,8 +82,8 @@ void XBaseInput::release(void)
 
 void XBaseInput::update(core::FrameData& frameData)
 {
-    AddClearEvents(frameData.input);
-    AddHoldEvents(frameData.input);
+    addClearEvents(frameData.input);
+    addHoldEvents(frameData.input);
 }
 
 void XBaseInput::clearKeyState(void)
@@ -118,7 +118,7 @@ bool XBaseInput::addInputDevice(XInputDevicePtr pDevice)
     return true;
 }
 
-bool XBaseInput::PostInputEvent(const InputEvent& event)
+bool XBaseInput::postInputEvent(const InputEvent& event)
 {
     if (event.keyId == KeyId::UNKNOWN) {
         if (pCVars_->inputDebug_ > 1) {
@@ -127,11 +127,11 @@ bool XBaseInput::PostInputEvent(const InputEvent& event)
         return false;
     }
 
-    if (!SendEventToListeners(event)) {
+    if (!sendEventToListeners(event)) {
         return false;
     }
 
-    AddEventToHoldSymbols(event);
+    addEventToHoldSymbols(event);
     return true;
 }
 
@@ -141,7 +141,7 @@ bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData
 
     const auto& input = frameData.input;
     for (const auto& e : input.events) {
-        PostInputEvent(e);
+        postInputEvent(e);
     }
 
     return true;
@@ -156,7 +156,7 @@ void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lp
     }
 }
 
-void XBaseInput::AddClearEvents(core::FrameInput& inputFrame)
+void XBaseInput::addClearEvents(core::FrameInput& inputFrame)
 {
     if (clearStateEvents_.isEmpty()) {
         return;
@@ -183,7 +183,7 @@ void XBaseInput::AddClearEvents(core::FrameInput& inputFrame)
 }
 
 // Hold symbols shizzz
-void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
+void XBaseInput::addHoldEvents(core::FrameInput& inputFrame)
 {
     X_PROFILE_BEGIN("PostHoldEvents", core::profiler::SubSys::INPUT);
 
@@ -206,7 +206,7 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
     }
 }
 
-bool XBaseInput::SendEventToListeners(const InputEvent& event)
+bool XBaseInput::sendEventToListeners(const InputEvent& event)
 {
     // return true if add to hold.
 #if 1
@@ -242,7 +242,7 @@ bool XBaseInput::SendEventToListeners(const InputEvent& event)
     return true;
 }
 
-void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
+void XBaseInput::addEventToHoldSymbols(const InputEvent& event)
 {
     if (!event.pSymbol) {
         return;
@@ -253,11 +253,11 @@ void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
         holdSymbols_.push_back(event.pSymbol);
     }
     else if (event.pSymbol->state == InputState::RELEASED && !holdSymbols_.isEmpty()) {
-        ClearHoldEvent(event.pSymbol);
+        clearHoldEvent(event.pSymbol);
     }
 }
 
-void XBaseInput::ClearHoldEvent(InputSymbol* pSymbol)
+void XBaseInput::clearHoldEvent(InputSymbol* pSymbol)
 {
     // remove hold key
     int32_t slot = std::numeric_limits<int32_t>::max();

@@ -61,14 +61,14 @@ public:
         ModifiersMasks::Enum modMask = ModifiersMasks::NONE);
 
 protected:
-    void AddClearEvents(core::FrameInput& inputFrame);
-    void AddHoldEvents(core::FrameInput& inputFrame);
+    void addClearEvents(core::FrameInput& inputFrame);
+    void addHoldEvents(core::FrameInput& inputFrame);
 
 private:
-    bool PostInputEvent(const InputEvent& event);
-    void ClearHoldEvent(InputSymbol* pSymbol);
-    bool SendEventToListeners(const InputEvent& event);
-    void AddEventToHoldSymbols(const InputEvent& event);
+    bool postInputEvent(const InputEvent& event);
+    void clearHoldEvent(InputSymbol* pSymbol);
+    bool sendEventToListeners(const InputEvent& event);
+    void addEventToHoldSymbols(const InputEvent& event);
 
 protected:
     core::MemoryArenaBase* arena_;
