@@ -10,7 +10,8 @@ X_NAMESPACE_BEGIN(game)
 namespace entity
 {
     CameraSystem::CameraSystem() :
-        activeEnt_(EnitiyRegister::INVALID_ID)
+        activeEnt_(EnitiyRegister::INVALID_ID),
+        pFovVar_(nullptr)
     {
     }
 
@@ -32,7 +33,22 @@ namespace entity
         ADD_CVAR_REF_VEC3("cam_angle_rad", cameraAngle_, cameraAngle_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
             "camera angle(radians)");
 
+        pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI),
+            core::VarFlag::SAVE_IF_CHANGED, "camera fov");
+
+        core::ConsoleVarFunc del;
+        del.Bind<CameraSystem, &CameraSystem::OnFovChanged>(this);
+        pFovVar_->SetOnChangeCallback(del);
+
         return true;
+    }
+
+    void CameraSystem::OnFovChanged(core::ICVar* pVar)
+    {
+        float fovDegress = pVar->GetFloat();
+        float fov = ::toRadians(fovDegress);
+
+        cam_.setFov(fov);
     }
 
     void CameraSystem::update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)

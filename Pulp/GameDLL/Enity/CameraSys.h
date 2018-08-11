@@ -22,6 +22,9 @@ namespace entity
         void setActiveEnt(EntityId entId);
 
     private:
+        void OnFovChanged(core::ICVar* pVar);
+
+    private:
         EntityId activeEnt_;
 
         bool setCamPos_;
@@ -32,6 +35,8 @@ namespace entity
         Vec3f cameraAngleDeg_;
 
         XCamera cam_;
+
+        core::ICVar* pFovVar_;
     };
 
 } // namespace entity
