@@ -37,8 +37,9 @@ namespace entity
         ADD_CVAR_REF_VEC3("cam_angle_rad", cameraAngle_, cameraAngle_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
                 "camera angle(radians)");
 
-        auto fov = DEFAULT_FOV;
-        
+        auto deimension = gEnv->pRender->getDisplayRes();
+        cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
+
         // we don't store fov var here, since this system only exsistins in game.
         // so can't change the setting out of game.
         if (vars_.getFovVar()) {
@@ -47,13 +48,8 @@ namespace entity
             core::ConsoleVarFunc del;
             del.Bind<CameraSystem, &CameraSystem::OnFovChanged>(this);
             pFov->SetOnChangeCallback(del);
-
-            fov = pFov->GetFloat();
         }
 
-        auto deimension = gEnv->pRender->getDisplayRes();
-
-        cam_.setFrustum(deimension.x, deimension.y, fov, 1.f, 2048.f);
         return true;
     }
 
