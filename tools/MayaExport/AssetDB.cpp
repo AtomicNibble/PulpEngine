@@ -630,7 +630,7 @@ MStatus AssetDBCmd::doIt(const MArgList& args)
 
         // work out action type.
         // is it a valid path id?
-        static_assert(AssetType::ENUM_COUNT == 20, "More asset types :[] ? this code needs updating.");
+        static_assert(AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code needs updating.");
 
         typeStr.toLowerCase();
 
@@ -695,6 +695,9 @@ MStatus AssetDBCmd::doIt(const MArgList& args)
                 break;
             case "techdef"_fnv1a:
                 assetType = AssetType::TECHDEF;
+                break;
+            case "menu"_fnv1a:
+                assetType = AssetType::MENU;
                 break;
             default:
                 core::StackString512 msg;
