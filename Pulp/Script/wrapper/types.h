@@ -163,6 +163,24 @@ namespace lua
         return true;
     }
 
+    X_INLINE bool isTypeCompatible(Type::Enum type, Type::Enum oth)
+    {
+        if (type == oth) {
+            return true;
+        }
+
+        switch (oth) {
+            case Type::Number:
+            case Type::Boolean:
+                return type == Type::Number || type == Type::Boolean;
+            case Type::Table:
+            case Type::Vector:
+                return type == Type::Table || type == Type::Vector;
+        }
+
+        return false;
+    }
+
 } // namespace lua
 
 X_NAMESPACE_END
