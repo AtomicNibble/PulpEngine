@@ -28,6 +28,21 @@ X_DISABLE_WARNING(4505)
 
 X_ENABLE_WARNING(4505)
 
+#if X_DEBUG
+
+#if !X_ENABLE_SOUND_COMS
+#error must have sound coms for debug 
+#endif // !X_ENABLE_SOUND_COMS
+
+#define WWISE_LIB "Debug"
+#elif X_ENABLE_SOUND_COMS
+#define WWISE_LIB "Profile" // Profile is 
+#else
+#define WWISE_LIB "Release"
+#endif
+
+#define X_LINK_LIB_WWISE(name) X_LINK_LIB(WWISE_LIB "/" name)
+
 // link all plugins
 #define PLUGIN_All 1
 
@@ -46,76 +61,76 @@ X_ENABLE_WARNING(4505)
 // link the libs..
 
 // engine
-X_LINK_LIB("AkMusicEngine");
-X_LINK_LIB("AkSoundEngine");
-X_LINK_LIB("AkMusicEngine");
+X_LINK_LIB_WWISE("AkMusicEngine");
+X_LINK_LIB_WWISE("AkSoundEngine");
+X_LINK_LIB_WWISE("AkMusicEngine");
 
 // managers
-X_LINK_LIB("AkMemoryMgr");
-X_LINK_LIB("AkStreamMgr");
+X_LINK_LIB_WWISE("AkMemoryMgr");
+X_LINK_LIB_WWISE("AkStreamMgr");
 
 // decoeer / source?
 #if PLUGIN_Codec
-X_LINK_LIB("AkVorbisDecoder");
+X_LINK_LIB_WWISE("AkVorbisDecoder");
 #endif // !PLUGIN_Codec
 
 // source
-X_LINK_LIB("AkAudioInputSource");
-X_LINK_LIB("AkSilenceSource");
-X_LINK_LIB("AkSineSource");
-X_LINK_LIB("AkSoundSeedWindSource");
-X_LINK_LIB("AkSoundSeedWooshSource");
-X_LINK_LIB("AkSynthOneSource");
-X_LINK_LIB("AkToneSource");
+X_LINK_LIB_WWISE("AkAudioInputSource");
+X_LINK_LIB_WWISE("AkSilenceSource");
+X_LINK_LIB_WWISE("AkSineSource");
+X_LINK_LIB_WWISE("AkSoundSeedWindSource");
+X_LINK_LIB_WWISE("AkSoundSeedWooshSource");
+X_LINK_LIB_WWISE("AkSynthOneSource");
+X_LINK_LIB_WWISE("AkToneSource");
 
 // fx
-X_LINK_LIB("AkCompressorFX");
-X_LINK_LIB("AkDelayFX");
-X_LINK_LIB("AkExpanderFX");
-X_LINK_LIB("AkFlangerFX");
-X_LINK_LIB("AkGainFX");
-X_LINK_LIB("AkGuitarDistortionFX");
-X_LINK_LIB("AkHarmonizerFX");
-X_LINK_LIB("AkMatrixReverbFX");
-X_LINK_LIB("AkMeterFX");
-X_LINK_LIB("AkParametricEQFX");
-X_LINK_LIB("AkPeakLimiterFX");
-X_LINK_LIB("AkPitchShifterFX");
-X_LINK_LIB("AkRoomVerbFX");
-X_LINK_LIB("AkSoundSeedImpactFX");
-X_LINK_LIB("AkStereoDelayFX");
-X_LINK_LIB("AkTimeStretchFX");
-X_LINK_LIB("AkTremoloFX");
+X_LINK_LIB_WWISE("AkCompressorFX");
+X_LINK_LIB_WWISE("AkDelayFX");
+X_LINK_LIB_WWISE("AkExpanderFX");
+X_LINK_LIB_WWISE("AkFlangerFX");
+X_LINK_LIB_WWISE("AkGainFX");
+X_LINK_LIB_WWISE("AkGuitarDistortionFX");
+X_LINK_LIB_WWISE("AkHarmonizerFX");
+X_LINK_LIB_WWISE("AkMatrixReverbFX");
+X_LINK_LIB_WWISE("AkMeterFX");
+X_LINK_LIB_WWISE("AkParametricEQFX");
+X_LINK_LIB_WWISE("AkPeakLimiterFX");
+X_LINK_LIB_WWISE("AkPitchShifterFX");
+X_LINK_LIB_WWISE("AkRoomVerbFX");
+X_LINK_LIB_WWISE("AkSoundSeedImpactFX");
+X_LINK_LIB_WWISE("AkStereoDelayFX");
+X_LINK_LIB_WWISE("AkTimeStretchFX");
+X_LINK_LIB_WWISE("AkTremoloFX");
 
 
-X_LINK_LIB("McDSPFutzBoxFX");
-X_LINK_LIB("McDSPLimiterFX");
+X_LINK_LIB_WWISE("McDSPFutzBoxFX");
+X_LINK_LIB_WWISE("McDSPLimiterFX");
 
 #if PLUGIN_Auro
-X_LINK_LIB("AuroHeadphoneFX");
+X_LINK_LIB_WWISE("AuroHeadphoneFX");
 #endif // !PLUGIN_Auro
 
 
 // new?
-X_LINK_LIB("AkMotionGeneratorSource");
-X_LINK_LIB("AkMotionSink");
-X_LINK_LIB("AkRecorderFX");
+X_LINK_LIB_WWISE("AkMotionGeneratorSource");
+X_LINK_LIB_WWISE("AkMotionSink");
+X_LINK_LIB_WWISE("AkRecorderFX");
 
 
 // fx2
 #if 0 
-X_LINK_LIB("iZTrashBoxModelerFX");
-X_LINK_LIB("iZTrashDelayFX");
-X_LINK_LIB("iZTrashMultibandDistortionFX");
-X_LINK_LIB("iZHybridReverbFX");
-X_LINK_LIB("iZTrashDynamicsFX");
-X_LINK_LIB("iZTrashDistortionFX");
-X_LINK_LIB("iZTrashFiltersFX");
+X_LINK_LIB_WWISE("iZTrashBoxModelerFX");
+X_LINK_LIB_WWISE("iZTrashDelayFX");
+X_LINK_LIB_WWISE("iZTrashMultibandDistortionFX");
+X_LINK_LIB_WWISE("iZHybridReverbFX");
+X_LINK_LIB_WWISE("iZTrashDynamicsFX");
+X_LINK_LIB_WWISE("iZTrashDistortionFX");
+X_LINK_LIB_WWISE("iZTrashFiltersFX");
 #endif
 
 // misc
 #if PLUGIN_Auro
-X_LINK_LIB("AuroPannerMixer");
+X_LINK_LIB_WWISE("AuroPannerMixer");
 #endif // !PLUGIN_Auro
 
 // platform
@@ -124,7 +139,7 @@ X_LINK_LIB("dxguid");
 
 #if X_ENABLE_SOUND_COMS
 X_LINK_LIB("ws2_32"); // used for winsock
-X_LINK_LIB("CommunicationCentral");
+X_LINK_LIB_WWISE("CommunicationCentral");
 #endif // X_ENABLE_SOUND_COMS
 
 using namespace AK;

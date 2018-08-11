@@ -8,7 +8,7 @@
       <AdditionalIncludeDirectories>$(SolutionDir)..\3rdparty\source\Wwise\;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
   <Link>
-    <AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\Wwise_libs\$(PlatformName)\Super\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    <AdditionalLibraryDirectories>$(SolutionDir)..\3rdparty\Wwise_libs\$(PlatformName)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
   </Link>
   </ItemDefinitionGroup>
 </Project>
