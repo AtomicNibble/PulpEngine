@@ -28,6 +28,7 @@ namespace gui
     {
         virtual ~IMenuHandler() = default;
 
+        virtual bool isActive(void) const X_ABSTRACT;
         virtual void update(core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
     };
 

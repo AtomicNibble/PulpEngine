@@ -59,6 +59,10 @@ bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
 {
     auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
 
+    if (!pMenuHandler->isActive()) {
+        return false;
+    }
+
     pMenuHandler->update(frame, pPrim);
     return true;
 }

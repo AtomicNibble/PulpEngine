@@ -28,6 +28,11 @@ namespace gui
         stack_.push(pMenu);
     }
 
+    bool MenuHandler::isActive(void) const
+    {
+        return !stack_.isEmpty();
+    }
+
     void MenuHandler::update(core::FrameData& frame, IPrimativeContext* pIPrim)
     {
         auto* pPrim = static_cast<PrimativeContext*>(pIPrim);
