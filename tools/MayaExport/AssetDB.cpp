@@ -630,8 +630,6 @@ MStatus AssetDBCmd::doIt(const MArgList& args)
 
         // work out action type.
         // is it a valid path id?
-        static_assert(AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code needs updating.");
-
         typeStr.toLowerCase();
 
         if (!assetDb::assetTypeFromStr(assetType, typeStr.asChar(), typeStr.asChar() + typeStr.length())) {
