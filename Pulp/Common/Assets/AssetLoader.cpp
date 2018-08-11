@@ -4,7 +4,6 @@
 #include <String\AssetName.h>
 #include <String\HumanDuration.h>
 #include <Threading\ThreadLocalStorage.h>
-#include <Hashing\Fnva1Hash.h>
 
 #include <ITimer.h>
 #include <IConsole.h>
@@ -12,91 +11,6 @@
 #include <Threading\JobSystem2.h>
 
 X_NAMESPACE_BEGIN(core)
-
-
-namespace
-{
-
-    bool assetTypeFromStr(assetDb::AssetType::Enum& type, const char* pBegin, size_t length)
-    {
-        static_assert(assetDb::AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code need updating.");
-
-        using namespace core::Hash::Literals;
-
-        switch (core::Hash::Fnv1aHash(pBegin, length)) {
-            case "model"_fnv1a:
-                type = assetDb::AssetType::MODEL;
-                break;
-            case "anim"_fnv1a:
-                type = assetDb::AssetType::ANIM;
-                break;
-            case "material"_fnv1a:
-                type = assetDb::AssetType::MATERIAL;
-                break;
-            case "img"_fnv1a:
-                type = assetDb::AssetType::IMG;
-                break;
-            case "weapon"_fnv1a:
-                type = assetDb::AssetType::WEAPON;
-                break;
-            case "turret"_fnv1a:
-                type = assetDb::AssetType::TURRET;
-                break;
-            case "light"_fnv1a:
-                type = assetDb::AssetType::LIGHT;
-                break;
-            case "fx"_fnv1a:
-                type = assetDb::AssetType::FX;
-                break;
-            case "rumble"_fnv1a:
-                type = assetDb::AssetType::RUMBLE;
-                break;
-            case "shellshock"_fnv1a:
-                type = assetDb::AssetType::SHELLSHOCK;
-                break;
-            case "character"_fnv1a:
-                type = assetDb::AssetType::CHARACTER;
-                break;
-            case "vehicle"_fnv1a:
-                type = assetDb::AssetType::VEHICLE;
-                break;
-            case "camera"_fnv1a:
-                type = assetDb::AssetType::CAMERA;
-                break;
-            case "video"_fnv1a:
-                type = assetDb::AssetType::VIDEO;
-                break;
-            case "script"_fnv1a:
-                type = assetDb::AssetType::SCRIPT;
-                break;
-            case "font"_fnv1a:
-                type = assetDb::AssetType::FONT;
-                break;
-            case "shader"_fnv1a:
-                type = assetDb::AssetType::SHADER;
-                break;
-            case "level"_fnv1a:
-                type = assetDb::AssetType::LEVEL;
-                break;
-            case "config"_fnv1a:
-                type = assetDb::AssetType::CONFIG;
-                break;
-            case "techdef"_fnv1a:
-                type = assetDb::AssetType::TECHDEF;
-                break;
-            case "menu"_fnv1a:
-                type = assetDb::AssetType::MENU;
-                break;
-
-            default:
-                return false;
-        }
-
-        return true;
-    }
-
-} // namespace
-
 
 AssetLoaderVars::AssetLoaderVars()
 {
@@ -169,7 +83,7 @@ bool AssetLoader::onFileChanged(const char* pName)
     assetTypeStr.trimRight('s');
 
     assetDb::AssetType::Enum type;
-    if (!assetTypeFromStr(type, assetTypeStr.begin(), assetTypeStr.length())) {
+    if (!assetDb::assetTypeFromStr(type, assetTypeStr.begin(), assetTypeStr.end())) {
         X_LOG0("AssetLoader", "File is not in asset folder: \"%s\"", assetName.c_str());
         return false;
     }

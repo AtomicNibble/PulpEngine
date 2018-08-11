@@ -9,7 +9,7 @@ using namespace core::Hash::Literals;
 
 namespace Util
 {
-    AssetType::Enum AssetTypeFromStr(const char* pBegin, const char* pEnd)
+    AssetType::Enum assetTypeFromStr(const char* pBegin, const char* pEnd)
     {
         const size_t len = (pEnd - pBegin);
 

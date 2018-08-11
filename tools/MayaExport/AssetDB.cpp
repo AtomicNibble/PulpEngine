@@ -634,76 +634,11 @@ MStatus AssetDBCmd::doIt(const MArgList& args)
 
         typeStr.toLowerCase();
 
-        using namespace core::Hash::Literals;
-        switch (core::Hash::Fnv1aHash(typeStr.asChar(), typeStr.length())) {
-            case "model"_fnv1a:
-                assetType = AssetType::MODEL;
-                break;
-            case "anim"_fnv1a:
-                assetType = AssetType::ANIM;
-                break;
-            case "material"_fnv1a:
-                assetType = AssetType::MATERIAL;
-                break;
-            case "img"_fnv1a:
-                assetType = AssetType::IMG;
-                break;
-            case "weapon"_fnv1a:
-                assetType = AssetType::WEAPON;
-                break;
-            case "turret"_fnv1a:
-                assetType = AssetType::TURRET;
-                break;
-            case "light"_fnv1a:
-                assetType = AssetType::LIGHT;
-                break;
-            case "fx"_fnv1a:
-                assetType = AssetType::FX;
-                break;
-            case "rumble"_fnv1a:
-                assetType = AssetType::RUMBLE;
-                break;
-            case "shellshock"_fnv1a:
-                assetType = AssetType::SHELLSHOCK;
-                break;
-            case "character"_fnv1a:
-                assetType = AssetType::CHARACTER;
-                break;
-            case "vehicle"_fnv1a:
-                assetType = AssetType::VEHICLE;
-                break;
-            case "camera"_fnv1a:
-                assetType = AssetType::CAMERA;
-                break;
-            case "video"_fnv1a:
-                assetType = AssetType::VIDEO;
-                break;
-            case "script"_fnv1a:
-                assetType = AssetType::SCRIPT;
-                break;
-            case "font"_fnv1a:
-                assetType = AssetType::FONT;
-                break;
-            case "shader"_fnv1a:
-                assetType = AssetType::SHADER;
-                break;
-            case "level"_fnv1a:
-                assetType = AssetType::LEVEL;
-                break;
-            case "config"_fnv1a:
-                assetType = AssetType::CONFIG;
-                break;
-            case "techdef"_fnv1a:
-                assetType = AssetType::TECHDEF;
-                break;
-            case "menu"_fnv1a:
-                assetType = AssetType::MENU;
-                break;
-            default:
-                core::StackString512 msg;
-                msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
-                setResult(msg.c_str());
-                return MS::kSuccess;
+        if (!assetDb::assetTypeFromStr(assetType, typeStr.asChar(), typeStr.asChar() + typeStr.length())) {
+            core::StackString512 msg;
+            msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
+            setResult(msg.c_str());
+            return MS::kSuccess;
         }
     }
     else {

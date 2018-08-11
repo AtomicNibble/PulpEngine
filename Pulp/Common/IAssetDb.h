@@ -1,5 +1,7 @@
 #pragma once
 
+#include <Hashing\Fnva1Hash.h>
+
 X_NAMESPACE_BEGIN(assetDb)
 
 static const char ASSET_NAME_SLASH = '/';
@@ -59,6 +61,86 @@ X_DECLARE_ENUM8(AssetType)
 namespace api
 {
     static const size_t MESSAGE_BUFFER_SIZE = 0x200; // max size of message sent by api.
+}
+
+X_INLINE bool assetTypeFromStr(AssetType::Enum& type, const char* pBegin, const char* pEnd)
+{
+    using namespace core::Hash::Literals;
+
+    const size_t len = (pEnd - pBegin);
+
+    static_assert(AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code need updating.");
+
+    switch (core::Hash::Fnv1aHash(pBegin, len)) {
+        case "model"_fnv1a:
+            type = AssetType::MODEL;
+            break;
+        case "anim"_fnv1a:
+            type = AssetType::ANIM;
+            break;
+        case "material"_fnv1a:
+            type = AssetType::MATERIAL;
+            break;
+        case "img"_fnv1a:
+            type = AssetType::IMG;
+            break;
+        case "weapon"_fnv1a:
+            type = AssetType::WEAPON;
+            break;
+        case "turret"_fnv1a:
+            type = AssetType::TURRET;
+            break;
+        case "light"_fnv1a:
+            type = AssetType::LIGHT;
+            break;
+        case "fx"_fnv1a:
+            type = AssetType::FX;
+            break;
+        case "rumble"_fnv1a:
+            type = AssetType::RUMBLE;
+            break;
+        case "shellshock"_fnv1a:
+            type = AssetType::SHELLSHOCK;
+            break;
+        case "character"_fnv1a:
+            type = AssetType::CHARACTER;
+            break;
+        case "vehicle"_fnv1a:
+            type = AssetType::VEHICLE;
+            break;
+        case "camera"_fnv1a:
+            type = AssetType::CAMERA;
+            break;
+        case "video"_fnv1a:
+            type = AssetType::VIDEO;
+            break;
+        case "script"_fnv1a:
+            type = AssetType::SCRIPT;
+            break;
+        case "font"_fnv1a:
+            type = AssetType::FONT;
+            break;
+        case "shader"_fnv1a:
+            type = AssetType::SHADER;
+            break;
+        case "level"_fnv1a:
+            type = AssetType::LEVEL;
+            break;
+        case "config"_fnv1a:
+            type = AssetType::CONFIG;
+            break;
+        case "techdef"_fnv1a:
+            type = AssetType::TECHDEF;
+            break;
+        case "menu"_fnv1a:
+            type = AssetType::MENU;
+            break;
+
+        default:
+            return false;
+    }
+
+    return true;
 }
 
 X_NAMESPACE_END
