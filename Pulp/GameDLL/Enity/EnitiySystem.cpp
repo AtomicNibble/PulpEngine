@@ -30,6 +30,7 @@ namespace entity
         vars_(vars),
         weaponDefs_(weaponDefs),
         playerSys_(vars.player),
+        cameraSys_(vars),
         dtHealth_(arena),
         dtMesh_(arena),
         dtSoundObj_(arena),

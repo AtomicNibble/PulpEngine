@@ -8,12 +8,14 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
+class GameVars;
+
 namespace entity
 {
     class CameraSystem
     {
     public:
-        CameraSystem();
+        CameraSystem(GameVars& vars);
         ~CameraSystem();
 
         bool init(void);
@@ -25,6 +27,7 @@ namespace entity
         void OnFovChanged(core::ICVar* pVar);
 
     private:
+        GameVars& vars_;
         EntityId activeEnt_;
 
         bool setCamPos_;
@@ -35,8 +38,6 @@ namespace entity
         Vec3f cameraAngleDeg_;
 
         XCamera cam_;
-
-        core::ICVar* pFovVar_;
     };
 
 } // namespace entity

@@ -4,42 +4,56 @@
 
 #include <IFrameData.h>
 #include <IConsole.h>
+#include "Vars\GameVars.h"
 
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    CameraSystem::CameraSystem() :
-        activeEnt_(EnitiyRegister::INVALID_ID),
-        pFovVar_(nullptr)
+    CameraSystem::CameraSystem(GameVars& vars) :
+        vars_(vars),
+        activeEnt_(EnitiyRegister::INVALID_ID)
     {
     }
 
     CameraSystem::~CameraSystem()
     {
+        if (vars_.getFovVar()) {
+            vars_.getFovVar()->SetOnChangeCallback(core::ConsoleVarFunc());
+        }
+
+        auto* pConsole = gEnv->pConsole;
+        pConsole->UnregisterVariable("cam_pos");
+        pConsole->UnregisterVariable("cam_angle");
+        pConsole->UnregisterVariable("cam_angle_rad");
     }
 
     bool CameraSystem::init(void)
     {
-        auto deimension = gEnv->pRender->getDisplayRes();
-
-        cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
-
         ADD_CVAR_REF_VEC3("cam_pos", cameraPos_, cameraPos_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
             "camera position");
         ADD_CVAR_REF_VEC3("cam_angle", cameraAngleDeg_, cameraAngleDeg_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
             "camera angle(radians)");
-
         ADD_CVAR_REF_VEC3("cam_angle_rad", cameraAngle_, cameraAngle_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
-            "camera angle(radians)");
+                "camera angle(radians)");
 
-        pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI),
-            core::VarFlag::SAVE_IF_CHANGED, "camera fov");
+        auto fov = DEFAULT_FOV;
+        
+        // we don't store fov var here, since this system only exsistins in game.
+        // so can't change the setting out of game.
+        if (vars_.getFovVar()) {
+            auto* pFov = vars_.getFovVar();
 
-        core::ConsoleVarFunc del;
-        del.Bind<CameraSystem, &CameraSystem::OnFovChanged>(this);
-        pFovVar_->SetOnChangeCallback(del);
+            core::ConsoleVarFunc del;
+            del.Bind<CameraSystem, &CameraSystem::OnFovChanged>(this);
+            pFov->SetOnChangeCallback(del);
 
+            fov = pFov->GetFloat();
+        }
+
+        auto deimension = gEnv->pRender->getDisplayRes();
+
+        cam_.setFrustum(deimension.x, deimension.y, fov, 1.f, 2048.f);
         return true;
     }
 
