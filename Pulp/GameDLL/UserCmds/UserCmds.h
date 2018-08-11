@@ -46,7 +46,7 @@ public:
     void clear(void);
     void clearAngles(void);
 
-    void buildUserCmd(void);
+    void buildUserCmd(bool block);
 
     net::UserCmd& getCurrentUsercmd(void);
     const net::UserCmd& getCurrentUsercmd(void) const;

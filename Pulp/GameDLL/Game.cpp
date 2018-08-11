@@ -55,11 +55,12 @@ void XGame::registerCmds(void)
 
 // ---------------------------------
 
-void drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
+bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
 {
     auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
 
     pMenuHandler->update(frame, pPrim);
+    return true;
 }
 
 
@@ -200,7 +201,10 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
-    userCmdGen_.buildUserCmd();
+
+    bool blockUserCmd = drawMenu(frame, pPrim);
+
+    userCmdGen_.buildUserCmd(blockUserCmd);
 
     if (status == net::SessionStatus::Idle)
     {
@@ -215,11 +219,6 @@ bool XGame::update(core::FrameData& frame)
 
         con.col = col.lerp(t, Col_Red);
         pPrim->drawText(Vec3f(center.x, 75, 1.f), con, "Insert fancy main menu here");
-
-        // TEMP
-        drawMenu(frame, pPrim);
-
-        //pPause->draw(pPrim);
     }
     else if (status == net::SessionStatus::Loading)
     {
@@ -352,8 +351,6 @@ bool XGame::update(core::FrameData& frame)
         }
 
         world_->update(frame, userCmdMan_, localId);
-
-        drawMenu(frame, pPrim);
     }
     else if (status == net::SessionStatus::PartyLobby)
     {

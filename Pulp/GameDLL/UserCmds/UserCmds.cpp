@@ -35,16 +35,22 @@ void UserCmdGen::clearAngles(void)
     viewAngles_ = Vec3f::zero();
 }
 
-void UserCmdGen::buildUserCmd(void)
+void UserCmdGen::buildUserCmd(bool block)
 {
     resetCmd();
-
     processInput();
 
-    setButtonFlags();
+    if (block)
+    {
+        mouseDelta_ = Vec2f::zero();
+    }
+    else
+    {
+        setButtonFlags();
 
-    mouseMove();
-    keyMove();
+        mouseMove();
+        keyMove();
+    }
 
     cmd_.angles = Anglesf(viewAngles_);
 }
