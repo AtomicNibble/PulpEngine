@@ -17,7 +17,6 @@ local function Update()
 
     ui.sliderVar("FOV", "cam_fov");
 
-
     if ui.button("BACK") then
         ui.back()
     end
