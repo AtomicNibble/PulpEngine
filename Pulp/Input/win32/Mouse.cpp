@@ -20,8 +20,7 @@ XMouse::~XMouse()
 {
 }
 
-///////////////////////////////////////////
-bool XMouse::Init(void)
+bool XMouse::init(XBaseInput& input)
 {
     RAWINPUTDEVICE Mouse;
     Mouse.hwndTarget = 0;
@@ -47,11 +46,9 @@ bool XMouse::Init(void)
         X_WARNING("Mouse", "Failed to retrieve sys scroll settings, defaulting to: %i", vars_.scrollLines_);
     }
 
-    IInput& input = GetIInput();
-
     // init the symbols
 #define DEFINE_SYM(id, name) \
-    pSymbol_[id - KeyId::INPUT_MOUSE_BASE] = input.DefineSymbol(InputDeviceType::MOUSE, id, name);
+    pSymbol_[id - KeyId::INPUT_MOUSE_BASE] = input.defineSymbol(InputDeviceType::MOUSE, id, name);
 
     DEFINE_SYM(KeyId::MOUSE_LEFT, "MOUSE LEFT");
     DEFINE_SYM(KeyId::MOUSE_MIDDLE, "MOUSE_MIDDLE");
@@ -75,7 +72,7 @@ bool XMouse::Init(void)
     return res;
 }
 
-void XMouse::ShutDown(void)
+void XMouse::shutDown(void)
 {
     RAWINPUTDEVICE Mouse;
     Mouse.hwndTarget = 0;
@@ -89,20 +86,18 @@ void XMouse::ShutDown(void)
     }
 }
 
-///////////////////////////////////////////
-void XMouse::Update(core::FrameData& frameData)
+void XMouse::clearKeyState(InputEventArr& clearEvents)
 {
-    X_ASSERT_UNREACHABLE();
-    X_UNUSED(frameData);
+    X_UNUSED(clearEvents);
 }
 
-void XMouse::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
+void XMouse::processInput(const uint8_t* pData, core::FrameInput& inputFrame)
 {
     const RAWMOUSE& mouse = *reinterpret_cast<const RAWMOUSE*>(pData);
-    ProcessMouseData(mouse, inputFrame);
+    processMouseData(mouse, inputFrame);
 }
 
-void XMouse::PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
+void XMouse::postEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
 {
     if (inputFrame.events.size() == inputFrame.events.capacity()) {
         X_WARNING("Mouse", "Exceeded input frame event limit of: %" PRIuS " dropping event for symbol: \"%s\"",
@@ -110,10 +105,10 @@ void XMouse::PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame)
         return;
     }
 
-    pSymbol->AssignToEvent(inputFrame.events.AddOne(), GetIInput().GetModifiers());
+    pSymbol->AssignToEvent(inputFrame.events.AddOne(), input_.getModifiers());
 }
 
-void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame)
+void XMouse::postOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame)
 {
     if (pSymbol->state != InputState::RELEASED && newState == InputState::RELEASED) {
         pSymbol->state = newState;
@@ -127,12 +122,12 @@ void XMouse::PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, 
         return;
     }
 
-    PostEvent(pSymbol, inputFrame);
+    postEvent(pSymbol, inputFrame);
 }
 
-void XMouse::OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame)
+void XMouse::onButtonDown(KeyId::Enum id, core::FrameInput& inputFrame)
 {
-    InputSymbol* pSymbol = GetSymbol(id);
+    InputSymbol* pSymbol = getSymbol(id);
 
     pSymbol->value = 1.f;
     pSymbol->state = InputState::PRESSED;
@@ -141,12 +136,12 @@ void XMouse::OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame)
         X_LOG0("Mouse", "Button Down: \"%s\"", pSymbol->name.c_str());
     }
 
-    PostEvent(pSymbol, inputFrame);
+    postEvent(pSymbol, inputFrame);
 }
 
-void XMouse::OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame)
+void XMouse::onButtonUP(KeyId::Enum id, core::FrameInput& inputFrame)
 {
-    InputSymbol* pSymbol = GetSymbol(id);
+    InputSymbol* pSymbol = getSymbol(id);
 
     pSymbol->value = 0.f;
     pSymbol->state = InputState::RELEASED;
@@ -155,50 +150,50 @@ void XMouse::OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame)
         X_LOG0("Mouse", "Button Up: \"%s\"", pSymbol->name.c_str());
     }
 
-    PostEvent(pSymbol, inputFrame);
+    postEvent(pSymbol, inputFrame);
 }
 
-void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame)
+void XMouse::processMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame)
 {
     // i think i can get all info from raw input tbh.
     // get rekt.
     if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_DOWN) {
-        OnButtonDown(KeyId::MOUSE_LEFT, inputFrame);
+        onButtonDown(KeyId::MOUSE_LEFT, inputFrame);
     }
     else if (mouse.usButtonFlags & RI_MOUSE_LEFT_BUTTON_UP) {
-        OnButtonUP(KeyId::MOUSE_LEFT, inputFrame);
+        onButtonUP(KeyId::MOUSE_LEFT, inputFrame);
     }
 
     // Right Mouse
     if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_DOWN) {
-        OnButtonDown(KeyId::MOUSE_RIGHT, inputFrame);
+        onButtonDown(KeyId::MOUSE_RIGHT, inputFrame);
     }
     else if (mouse.usButtonFlags & RI_MOUSE_RIGHT_BUTTON_UP) {
-        OnButtonUP(KeyId::MOUSE_RIGHT, inputFrame);
+        onButtonUP(KeyId::MOUSE_RIGHT, inputFrame);
     }
 
     // Middle Mouse
     if (mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_DOWN) {
-        OnButtonDown(KeyId::MOUSE_MIDDLE, inputFrame);
+        onButtonDown(KeyId::MOUSE_MIDDLE, inputFrame);
     }
     else if (mouse.usButtonFlags & RI_MOUSE_MIDDLE_BUTTON_UP) {
-        OnButtonUP(KeyId::MOUSE_MIDDLE, inputFrame);
+        onButtonUP(KeyId::MOUSE_MIDDLE, inputFrame);
     }
 
     // aux 4
     if (mouse.usButtonFlags & RI_MOUSE_BUTTON_4_DOWN) {
-        OnButtonDown(KeyId::MOUSE_AUX_4, inputFrame);
+        onButtonDown(KeyId::MOUSE_AUX_4, inputFrame);
     }
     else if (mouse.usButtonFlags & RI_MOUSE_BUTTON_4_UP) {
-        OnButtonUP(KeyId::MOUSE_AUX_4, inputFrame);
+        onButtonUP(KeyId::MOUSE_AUX_4, inputFrame);
     }
 
     // aux 5
     if (mouse.usButtonFlags & RI_MOUSE_BUTTON_5_DOWN) {
-        OnButtonDown(KeyId::MOUSE_AUX_5, inputFrame);
+        onButtonDown(KeyId::MOUSE_AUX_5, inputFrame);
     }
     else if (mouse.usButtonFlags & RI_MOUSE_BUTTON_5_UP) {
-        OnButtonUP(KeyId::MOUSE_AUX_5, inputFrame);
+        onButtonUP(KeyId::MOUSE_AUX_5, inputFrame);
     }
 
     if (mouse.usButtonFlags & RI_MOUSE_WHEEL) {
@@ -218,7 +213,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
             X_LOG0("Mouse", "ScrollUp(%g)", mouseWheel_);
         }
 
-        PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELUP), newState, inputFrame);
+        postOnlyIfChanged(getSymbol(KeyId::MOUSE_WHEELUP), newState, inputFrame);
 
         newState = (mouseWheel_ < 0.0f) ? InputState::PRESSED : InputState::RELEASED;
 
@@ -226,20 +221,20 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
             X_LOG0("Mouse", "ScrollDown(%g)", mouseWheel_);
         }
 
-        PostOnlyIfChanged(GetSymbol(KeyId::MOUSE_WHEELDOWN), newState, inputFrame);
+        postOnlyIfChanged(getSymbol(KeyId::MOUSE_WHEELDOWN), newState, inputFrame);
 
         // we post scrool direction events.
-        InputSymbol* pSymbol = GetSymbol(KeyId::MOUSE_Z);
+        InputSymbol* pSymbol = getSymbol(KeyId::MOUSE_Z);
 
         pSymbol->value = mouseWheel_;
         pSymbol->state = InputState::CHANGED;
 
-        PostEvent(pSymbol, inputFrame);
+        postEvent(pSymbol, inputFrame);
     }
 
     if (mouse.usFlags == MOUSE_MOVE_RELATIVE) {
         if (mouse.lLastX != 0) {
-            InputSymbol* pSymbol = GetSymbol(KeyId::MOUSE_X);
+            InputSymbol* pSymbol = getSymbol(KeyId::MOUSE_X);
 
             pSymbol->value = (float)mouse.lLastX;
             pSymbol->state = InputState::CHANGED;
@@ -248,10 +243,10 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
                 X_LOG0("Mouse", "posX: \"%g\"", pSymbol->value);
             }
 
-            PostEvent(pSymbol, inputFrame);
+            postEvent(pSymbol, inputFrame);
         }
         if (mouse.lLastY != 0) {
-            InputSymbol* pSymbol = GetSymbol(KeyId::MOUSE_Y);
+            InputSymbol* pSymbol = getSymbol(KeyId::MOUSE_Y);
 
             pSymbol->value = (float)mouse.lLastY;
             pSymbol->state = InputState::CHANGED;
@@ -260,7 +255,7 @@ void XMouse::ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFram
                 X_LOG0("Mouse", "posY: \"%g\"", pSymbol->value);
             }
 
-            PostEvent(pSymbol, inputFrame);
+            postEvent(pSymbol, inputFrame);
         }
     }
 

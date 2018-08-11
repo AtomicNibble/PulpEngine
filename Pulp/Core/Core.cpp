@@ -178,7 +178,7 @@ void XCore::ShutDown()
     core::StopWatch timer;
 
     if (pDirWatcher_) {
-        pDirWatcher_->ShutDown();
+        pDirWatcher_->shutDown();
         X_DELETE(pDirWatcher_, g_coreArena);
     }
 
@@ -272,7 +272,7 @@ void XCore::ShutDown()
 
     // needs to be done after engine, since it has input listners.
     if (env_.pInput) {
-        env_.pInput->ShutDown();
+        env_.pInput->shutDown();
         core::SafeRelease(env_.pInput);
     }
 

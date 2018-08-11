@@ -2,7 +2,7 @@
 
 X_NAMESPACE_BEGIN(input)
 
-X_INLINE HWND XWinInput::GetHWnd(void) const
+X_INLINE HWND XWinInput::getHWnd(void) const
 {
     return hWnd_;
 }

@@ -31,26 +31,23 @@ class XKeyboard : public XInputDeviceWin32
 
 public:
     XKeyboard(XWinInput& input, XInputCVars& vars);
-    ~XKeyboard() X_OVERRIDE;
+    ~XKeyboard() X_FINAL;
 
     // IInputDevice overrides
-    X_INLINE int GetDeviceIndex(void) const X_OVERRIDE;
-    bool Init(void) X_OVERRIDE;
-    void ShutDown(void) X_OVERRIDE;
-    void Update(core::FrameData& frameData) X_OVERRIDE;
-    void ClearKeyState(InputEventArr& clearEvents) X_OVERRIDE;
-    X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
+    bool init(XBaseInput& input) X_FINAL;
+    void shutDown(void) X_FINAL;
+    void clearKeyState(InputEventArr& clearEvents) X_FINAL;
     // ~IInputDevice
 
-    void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_OVERRIDE;
+    void processInput(const uint8_t* pData, core::FrameInput& inputFrame) X_FINAL;
 
 private:
     void initAsciiCache(void);
 
-    char Event2Char(const InputEvent& event);
-    inline bool IsCHAR(const InputEvent& event);
+    char event2Char(const InputEvent& event);
+    inline bool isCHAR(const InputEvent& event);
 
-    void ProcessKeyboardData(const RAWKEYBOARD& rawKb, core::FrameInput& inputFrame);
+    void processKeyboardData(const RAWKEYBOARD& rawKb, core::FrameInput& inputFrame);
 
 private:
     AsciiValArr asciiCache_;

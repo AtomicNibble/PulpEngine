@@ -2,6 +2,8 @@
 #include "BaseInput.h"
 #include "InputCVars.h"
 
+#include "InputDevice.h"
+
 #include <algorithm>
 
 X_NAMESPACE_BEGIN(input)
@@ -26,13 +28,8 @@ XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
     arena_(arena),
     pCVars_(X_NEW(XInputCVars, arena, "InputCvars")),
     devices_(arena),
-    listners_(arena),
-    consoleListeners_(arena),
     holdSymbols_(arena),
-    clearStateEvents_(arena),
-    enableEventPosting_(true),
-    hasFocus_(false),
-    retriggering_(false)
+    clearStateEvents_(arena)
 {
     holdSymbols_.setGranularity(32);
     holdSymbols_.reserve(64);
@@ -54,7 +51,7 @@ void XBaseInput::registerCmds(void)
 {
 }
 
-bool XBaseInput::Init(void)
+bool XBaseInput::init(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pCore);
@@ -65,28 +62,17 @@ bool XBaseInput::Init(void)
     return true;
 }
 
-void XBaseInput::ShutDown(void)
+void XBaseInput::shutDown(void)
 {
     X_LOG0("InputSys", "Shutting Down");
 
     gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 
-    for (auto& device : devices_) {
-        device->ShutDown();
+    for (auto& pDevice : devices_) {
+        pDevice->shutDown();
     }
 
-    std::for_each(devices_.begin(), devices_.end(), [](IInputDevice* pDevice) { X_DELETE(pDevice, g_InputArena); });
     devices_.clear();
-
-    if (listners_.isNotEmpty()) {
-        X_WARNING("InputSys", "%i listners still registered", listners_.size());
-    }
-    if (consoleListeners_.isNotEmpty()) {
-        X_WARNING("InputSys", "%i console listners still registered", consoleListeners_.size());
-    }
-
-    listners_.clear();
-    consoleListeners_.clear();
 }
 
 void XBaseInput::release(void)
@@ -94,28 +80,13 @@ void XBaseInput::release(void)
     X_DELETE(this, g_InputArena);
 }
 
-void XBaseInput::PostInit(void)
+void XBaseInput::update(core::FrameData& frameData)
 {
-    for (auto& device : devices_) {
-        device->PostInit();
-    }
-}
-
-void XBaseInput::Update(core::FrameData& frameData)
-{
-    hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
-
     AddClearEvents(frameData.input);
     AddHoldEvents(frameData.input);
-
-    for (auto& device : devices_) {
-        if (device->IsEnabled()) {
-            device->Update(frameData);
-        }
-    }
 }
 
-void XBaseInput::ClearKeyState(void)
+void XBaseInput::clearKeyState(void)
 {
     if (pCVars_->inputDebug_) {
         X_LOG0("Input", "clearing key states.");
@@ -126,82 +97,25 @@ void XBaseInput::ClearKeyState(void)
 
     // when we clear states some devices might want to broadcast release events.
     // we store them to be picked up by the next frame.
-    for (auto& device : devices_) {
-        device->ClearKeyState(clearStateEvents_);
+    for (auto& pDevice : devices_) {
+        pDevice->clearKeyState(clearStateEvents_);
     }
 
-    retriggering_ = false;
     holdSymbols_.clear();
 }
 
-void XBaseInput::RetriggerKeyState(void)
+bool XBaseInput::addInputDevice(XInputDevicePtr pDevice)
 {
-    retriggering_ = true;
-    InputEvent event;
-
-    const size_t count = holdSymbols_.size();
-    for (size_t i = 0; i < count; ++i) {
-        InputState::Enum oldState = holdSymbols_[i]->state;
-        holdSymbols_[i]->state = InputState::PRESSED;
-        holdSymbols_[i]->AssignToEvent(event, GetModifiers());
-        PostInputEvent(event);
-        holdSymbols_[i]->state = oldState;
+    if (!pDevice) {
+        return false;
     }
-    retriggering_ = false;
-}
 
-void XBaseInput::AddEventListener(IInputEventListner* pListener)
-{
-    // Add new listener to list if not added yet.
-    if (std::find(listners_.begin(), listners_.end(), pListener) == listners_.end()) {
-        listners_.push_back(pListener);
-        std::stable_sort(listners_.begin(), listners_.end(), compareInputListener);
+    if (!pDevice->init(*this)) {
+        return false;
     }
-}
-
-void XBaseInput::RemoveEventListener(IInputEventListner* pListener)
-{
-    // Remove listener if it is in list.
-    auto it = std::find(listners_.begin(), listners_.end(), pListener);
-    if (it != listners_.end()) {
-        listners_.erase(it);
-    }
-}
-
-void XBaseInput::AddConsoleEventListener(IInputEventListner* pListener)
-{
-    if (std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener) == consoleListeners_.end()) {
-        consoleListeners_.push_back(pListener);
-        std::stable_sort(consoleListeners_.begin(), consoleListeners_.end(), compareInputListener);
-    }
-}
-
-void XBaseInput::RemoveConsoleEventListener(IInputEventListner* pListener)
-{
-    auto it = std::find(consoleListeners_.begin(), consoleListeners_.end(), pListener);
-    if (it != consoleListeners_.end()) {
-        consoleListeners_.erase(it);
-    }
-}
-
-bool XBaseInput::AddInputDevice(IInputDevice* pDevice)
-{
-    if (pDevice) {
-        if (pDevice->Init()) {
-            devices_.push_back(pDevice);
-            return true;
-        }
-        X_DELETE(pDevice, g_InputArena);
-    }
-    return false;
-}
-
-void XBaseInput::EnableEventPosting(bool bEnable)
-{
-    enableEventPosting_ = bEnable;
-    if (pCVars_->inputDebug_) {
-        X_LOG0("Input", "Eventposting: %s", bEnable ? "true" : "false");
-    }
+    
+    devices_.emplace_back(std::move(pDevice));
+    return true;
 }
 
 bool XBaseInput::PostInputEvent(const InputEvent& event)
@@ -221,14 +135,9 @@ bool XBaseInput::PostInputEvent(const InputEvent& event)
     return true;
 }
 
-bool XBaseInput::Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
+bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
 {
     X_UNUSED(jobSys);
-
-    if (!enableEventPosting_) {
-        X_LOG2("Input", "Input posting is disable");
-        return false;
-    }
 
     const auto& input = frameData.input;
     for (const auto& e : input.events) {
@@ -238,32 +147,12 @@ bool XBaseInput::Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData
     return true;
 }
 
-void XBaseInput::EnableDevice(InputDeviceType::Enum deviceType, bool enable)
-{
-    for (auto& device : devices_) {
-        if (device->IsOfDeviceType(deviceType)) {
-            device->Enable(enable);
-            break;
-        }
-    }
-}
-
-bool XBaseInput::HasInputDeviceOfType(InputDeviceType::Enum type) const
-{
-    for (const auto& device : devices_) {
-        if (device->IsOfDeviceType(type)) {
-            return true;
-        }
-    }
-    return false;
-}
-
 void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
     X_UNUSED(wparam, lparam);
 
     if (event == CoreEvent::CHANGE_FOCUS || event == CoreEvent::LEVEL_LOAD_START || event == CoreEvent::LEVEL_POST_UNLOAD) {
-        ClearKeyState();
+        clearKeyState();
     }
 }
 
@@ -310,7 +199,7 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
         count = eventSpace;
     }
 
-    ModifierFlags modifiers = GetModifiers();
+    ModifierFlags modifiers = getModifiers();
     for (size_t i = 0; i < count; ++i) {
         InputEvent& event = inputFrame.events.AddOne();
         holdSymbols_[i]->AssignToEvent(event, modifiers);
@@ -320,7 +209,9 @@ void XBaseInput::AddHoldEvents(core::FrameInput& inputFrame)
 bool XBaseInput::SendEventToListeners(const InputEvent& event)
 {
     // return true if add to hold.
-
+#if 1
+    X_UNUSED(event);
+#else
     if (event.action == InputState::CHAR) {
         for (auto* pListener : consoleListeners_) {
             if (pListener->OnInputEventChar(event)) {
@@ -347,20 +238,22 @@ bool XBaseInput::SendEventToListeners(const InputEvent& event)
             }
         }
     }
-
+#endif
     return true;
 }
 
 void XBaseInput::AddEventToHoldSymbols(const InputEvent& event)
 {
-    if (!retriggering_ && event.pSymbol) {
-        if (event.pSymbol->state == InputState::PRESSED) {
-            event.pSymbol->state = InputState::DOWN;
-            holdSymbols_.push_back(event.pSymbol);
-        }
-        else if (event.pSymbol->state == InputState::RELEASED && !holdSymbols_.isEmpty()) {
-            ClearHoldEvent(event.pSymbol);
-        }
+    if (!event.pSymbol) {
+        return;
+    }
+
+    if (event.pSymbol->state == InputState::PRESSED) {
+        event.pSymbol->state = InputState::DOWN;
+        holdSymbols_.push_back(event.pSymbol);
+    }
+    else if (event.pSymbol->state == InputState::RELEASED && !holdSymbols_.isEmpty()) {
+        ClearHoldEvent(event.pSymbol);
     }
 }
 

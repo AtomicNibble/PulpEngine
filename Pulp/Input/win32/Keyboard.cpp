@@ -41,8 +41,7 @@ XKeyboard::~XKeyboard()
 {
 }
 
-///////////////////////////////////////////
-bool XKeyboard::Init(void)
+bool XKeyboard::init(XBaseInput& input)
 {
     RAWINPUTDEVICE Keyboard;
     Keyboard.hwndTarget = 0;
@@ -59,79 +58,78 @@ bool XKeyboard::Init(void)
     }
 
     // register the wins.
-    IInput& input = GetIInput();
 
 #define ADD_DIGITS(idx, not_used) \
-    pSymbol_[KeyId::DIGIT_##idx] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::DIGIT_##idx, #idx);
+    pSymbol_[KeyId::DIGIT_##idx] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::DIGIT_##idx, #idx);
 
 #define ADD_NUMPAD(idx, not_used) \
-    pSymbol_[KeyId::NUMPAD_##idx] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_##idx, "NUMPAD " #idx);
+    pSymbol_[KeyId::NUMPAD_##idx] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_##idx, "NUMPAD " #idx);
 
 #define ADD_FUNCTION(idx, not_used) \
-    pSymbol_[KeyId::F##idx] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::F##idx, "F" #idx);
+    pSymbol_[KeyId::F##idx] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::F##idx, "F" #idx);
 
 #define DEFINE_SYM(id, name) \
-    pSymbol_[id] = input.DefineSymbol(InputDeviceType::KEYBOARD, id, name);
+    pSymbol_[id] = input.defineSymbol(InputDeviceType::KEYBOARD, id, name);
 
 #define DEFINE_SYM_TYPE(id, name, type, modifier) \
-    pSymbol_[id] = input.DefineSymbol(InputDeviceType::KEYBOARD, id, name, type, modifier);
+    pSymbol_[id] = input.defineSymbol(InputDeviceType::KEYBOARD, id, name, type, modifier);
 
-    pSymbol_[KeyId::BACKSPACE] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::BACKSPACE, "Backspace");
-    pSymbol_[KeyId::TAB] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::TAB, "Tab");
-    pSymbol_[KeyId::CLEAR] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::CLEAR, "Clear");
-    pSymbol_[KeyId::ENTER] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::ENTER, "Enter");
-    pSymbol_[KeyId::CAPSLOCK] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::CAPSLOCK, "Capslock", InputSymbol::Toggle, ModifiersMasks::CAPSLOCK);
-    pSymbol_[KeyId::ESCAPE] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::ESCAPE, "Esc");
-    pSymbol_[KeyId::SPACEBAR] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::SPACEBAR, "Spacebar");
-    pSymbol_[KeyId::INSERT] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::INSERT, "Insert", InputSymbol::Toggle, ModifiersMasks::INSERT);
-    pSymbol_[KeyId::DELETE] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::DELETE, "Delete");
-    pSymbol_[KeyId::HOME] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::HOME, "Home");
-    pSymbol_[KeyId::END] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::END, "End");
-    pSymbol_[KeyId::PAGE_UP] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::PAGE_UP, "Page Up");
-    pSymbol_[KeyId::PAGE_DOWN] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::PAGE_DOWN, "Pade Down");
+    pSymbol_[KeyId::BACKSPACE] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::BACKSPACE, "Backspace");
+    pSymbol_[KeyId::TAB] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::TAB, "Tab");
+    pSymbol_[KeyId::CLEAR] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::CLEAR, "Clear");
+    pSymbol_[KeyId::ENTER] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::ENTER, "Enter");
+    pSymbol_[KeyId::CAPSLOCK] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::CAPSLOCK, "Capslock", InputSymbol::Toggle, ModifiersMasks::CAPSLOCK);
+    pSymbol_[KeyId::ESCAPE] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::ESCAPE, "Esc");
+    pSymbol_[KeyId::SPACEBAR] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::SPACEBAR, "Spacebar");
+    pSymbol_[KeyId::INSERT] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::INSERT, "Insert", InputSymbol::Toggle, ModifiersMasks::INSERT);
+    pSymbol_[KeyId::DELETE] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::DELETE, "Delete");
+    pSymbol_[KeyId::HOME] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::HOME, "Home");
+    pSymbol_[KeyId::END] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::END, "End");
+    pSymbol_[KeyId::PAGE_UP] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::PAGE_UP, "Page Up");
+    pSymbol_[KeyId::PAGE_DOWN] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::PAGE_DOWN, "Pade Down");
 
-    pSymbol_[KeyId::LEFT_ARROW] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::LEFT_ARROW, "Left");
-    pSymbol_[KeyId::UP_ARROW] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::UP_ARROW, "Up");
-    pSymbol_[KeyId::RIGHT_ARROW] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::RIGHT_ARROW, "Right");
-    pSymbol_[KeyId::DOWN_ARROW] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::DOWN_ARROW, "Down");
+    pSymbol_[KeyId::LEFT_ARROW] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::LEFT_ARROW, "Left");
+    pSymbol_[KeyId::UP_ARROW] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::UP_ARROW, "Up");
+    pSymbol_[KeyId::RIGHT_ARROW] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::RIGHT_ARROW, "Right");
+    pSymbol_[KeyId::DOWN_ARROW] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::DOWN_ARROW, "Down");
 
     X_PP_REPEAT_10(ADD_DIGITS, 0)
 
-    pSymbol_[KeyId::A] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::A, "A");
-    pSymbol_[KeyId::B] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::B, "B");
-    pSymbol_[KeyId::C] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::C, "C");
-    pSymbol_[KeyId::D] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::D, "D");
-    pSymbol_[KeyId::E] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::E, "E");
-    pSymbol_[KeyId::F] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::F, "F");
-    pSymbol_[KeyId::G] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::G, "G");
-    pSymbol_[KeyId::H] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::H, "H");
-    pSymbol_[KeyId::I] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::I, "I");
-    pSymbol_[KeyId::J] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::J, "J");
-    pSymbol_[KeyId::K] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::K, "K");
-    pSymbol_[KeyId::L] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::L, "L");
-    pSymbol_[KeyId::M] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::M, "M");
-    pSymbol_[KeyId::N] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::N, "N");
-    pSymbol_[KeyId::O] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::O, "O");
-    pSymbol_[KeyId::P] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::P, "P");
-    pSymbol_[KeyId::Q] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::Q, "Q");
-    pSymbol_[KeyId::R] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::R, "R");
-    pSymbol_[KeyId::S] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::S, "S");
-    pSymbol_[KeyId::T] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::T, "T");
-    pSymbol_[KeyId::U] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::U, "U");
-    pSymbol_[KeyId::V] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::V, "V");
-    pSymbol_[KeyId::W] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::W, "W");
-    pSymbol_[KeyId::X] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::X, "X");
-    pSymbol_[KeyId::Y] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::Y, "Y");
-    pSymbol_[KeyId::Z] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::Z, "Z");
+    pSymbol_[KeyId::A] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::A, "A");
+    pSymbol_[KeyId::B] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::B, "B");
+    pSymbol_[KeyId::C] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::C, "C");
+    pSymbol_[KeyId::D] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::D, "D");
+    pSymbol_[KeyId::E] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::E, "E");
+    pSymbol_[KeyId::F] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::F, "F");
+    pSymbol_[KeyId::G] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::G, "G");
+    pSymbol_[KeyId::H] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::H, "H");
+    pSymbol_[KeyId::I] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::I, "I");
+    pSymbol_[KeyId::J] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::J, "J");
+    pSymbol_[KeyId::K] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::K, "K");
+    pSymbol_[KeyId::L] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::L, "L");
+    pSymbol_[KeyId::M] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::M, "M");
+    pSymbol_[KeyId::N] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::N, "N");
+    pSymbol_[KeyId::O] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::O, "O");
+    pSymbol_[KeyId::P] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::P, "P");
+    pSymbol_[KeyId::Q] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::Q, "Q");
+    pSymbol_[KeyId::R] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::R, "R");
+    pSymbol_[KeyId::S] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::S, "S");
+    pSymbol_[KeyId::T] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::T, "T");
+    pSymbol_[KeyId::U] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::U, "U");
+    pSymbol_[KeyId::V] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::V, "V");
+    pSymbol_[KeyId::W] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::W, "W");
+    pSymbol_[KeyId::X] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::X, "X");
+    pSymbol_[KeyId::Y] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::Y, "Y");
+    pSymbol_[KeyId::Z] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::Z, "Z");
 
     X_PP_REPEAT_10(ADD_NUMPAD, 0)
 
-    pSymbol_[KeyId::NUMPAD_MULTIPLY] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_MULTIPLY, "NUM MULTIPLY");
-    pSymbol_[KeyId::NUMPAD_ADD] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_ADD, "NUM ADD");
-    pSymbol_[KeyId::NUMPAD_SUBTRACT] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_SUBTRACT, "NUM SUBSTRACT");
-    pSymbol_[KeyId::NUMPAD_DECIMAL] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_DECIMAL, "NUM DECIMAL");
-    pSymbol_[KeyId::NUMPAD_DIVIDE] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_DIVIDE, "NUM DIVIDE");
-    pSymbol_[KeyId::NUMPAD_ENTER] = input.DefineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_ENTER, "NUM ENTER");
+    pSymbol_[KeyId::NUMPAD_MULTIPLY] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_MULTIPLY, "NUM MULTIPLY");
+    pSymbol_[KeyId::NUMPAD_ADD] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_ADD, "NUM ADD");
+    pSymbol_[KeyId::NUMPAD_SUBTRACT] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_SUBTRACT, "NUM SUBSTRACT");
+    pSymbol_[KeyId::NUMPAD_DECIMAL] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_DECIMAL, "NUM DECIMAL");
+    pSymbol_[KeyId::NUMPAD_DIVIDE] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_DIVIDE, "NUM DIVIDE");
+    pSymbol_[KeyId::NUMPAD_ENTER] = input.defineSymbol(InputDeviceType::KEYBOARD, KeyId::NUMPAD_ENTER, "NUM ENTER");
 
     X_PP_REPEAT_24(ADD_FUNCTION, 24)
 
@@ -239,7 +237,7 @@ void XKeyboard::initAsciiCache(void)
     }
 }
 
-void XKeyboard::ShutDown(void)
+void XKeyboard::shutDown(void)
 {
     RAWINPUTDEVICE Keyboard;
     Keyboard.hwndTarget = 0;
@@ -253,7 +251,7 @@ void XKeyboard::ShutDown(void)
     }
 }
 
-bool XKeyboard::IsCHAR(const InputEvent& event)
+bool XKeyboard::isCHAR(const InputEvent& event)
 {
 #ifdef ASSCI_CACHE_TABLE
     KeyId::Enum Vkey = event.keyId;
@@ -312,7 +310,7 @@ bool XKeyboard::IsCHAR(const InputEvent& event)
 #endif
 }
 
-char XKeyboard::Event2Char(const InputEvent& event)
+char XKeyboard::event2Char(const InputEvent& event)
 {
     KeyId::Enum key = event.keyId;
 
@@ -360,22 +358,18 @@ char XKeyboard::Event2Char(const InputEvent& event)
 }
 
 ///////////////////////////////////////////
-void XKeyboard::Update(core::FrameData& frameData)
-{
-    X_ASSERT_UNREACHABLE();
-    X_UNUSED(frameData);
-}
 
-void XKeyboard::ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame)
+
+void XKeyboard::processInput(const uint8_t* pData, core::FrameInput& inputFrame)
 {
     const RAWKEYBOARD& RawKb = *reinterpret_cast<const RAWKEYBOARD*>(pData);
 
-    ProcessKeyboardData(RawKb, inputFrame);
+    processKeyboardData(RawKb, inputFrame);
 }
 
-void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& inputFrame)
+void XKeyboard::processKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& inputFrame)
 {
-    IInput& input = GetIInput();
+    auto& input = input_;
 
     USHORT virtualKey = RawKb.VKey;
     USHORT scanCode = RawKb.MakeCode; // it's name is makecode yet MSDN describes it as scan code lol.
@@ -511,7 +505,7 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
         InputState::Enum newstate;
 
         // get the modifiers.
-        IInput::ModifierFlags modifierFlags = input.GetModifiers();
+        IInput::ModifierFlags modifierFlags = input.getModifiers();
 
         if (IsDown) {
             if (pSymbol->state == InputState::DOWN) {
@@ -523,29 +517,29 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
             }
 
             if (pSymbol->type == InputSymbol::Toggle) {
-                if (modifierFlags.IsSet(pSymbol->modifer_mask))
-                    modifierFlags.Remove(pSymbol->modifer_mask);
+                if (modifierFlags.IsSet(pSymbol->modiferMask))
+                    modifierFlags.Remove(pSymbol->modiferMask);
                 else
-                    modifierFlags.Set(pSymbol->modifer_mask);
+                    modifierFlags.Set(pSymbol->modiferMask);
             }
-            else if (pSymbol->modifer_mask != ModifiersMasks::NONE) {
-                modifierFlags.Set(pSymbol->modifer_mask);
+            else if (pSymbol->modiferMask != ModifiersMasks::NONE) {
+                modifierFlags.Set(pSymbol->modiferMask);
             }
 
             newstate = InputState::PRESSED;
             pSymbol->value = 1.f;
         }
         else {
-            if (pSymbol->modifer_mask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button) {
+            if (pSymbol->modiferMask != ModifiersMasks::NONE && pSymbol->type == InputSymbol::Button) {
                 // this key is a modifer but is not togle type :)
-                modifierFlags.Remove(pSymbol->modifer_mask);
+                modifierFlags.Remove(pSymbol->modiferMask);
             }
 
             newstate = InputState::RELEASED;
             pSymbol->value = 0.f;
         }
 
-        input.SetModifiers(modifierFlags);
+        input.setModifiers(modifierFlags);
 
         if (newstate == pSymbol->state) {
             if (vars_.inputDebug_) {
@@ -574,10 +568,10 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
         event.action = newstate;
         event.pSymbol = pSymbol;
 
-        isChar = IsCHAR(event);
+        isChar = isCHAR(event);
 
         if (isChar) {
-            event.inputchar = Event2Char(event);
+            event.inputchar = event2Char(event);
         }
 
         if (vars_.inputDebug_) {
@@ -599,13 +593,12 @@ void XKeyboard::ProcessKeyboardData(const RAWKEYBOARD& RawKb, core::FrameInput& 
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-void XKeyboard::ClearKeyState(InputEventArr& clearEvents)
+void XKeyboard::clearKeyState(InputEventArr& clearEvents)
 {
-    IInput& input = GetIInput();
+    auto& input = input_;
 
     // we need to clear the modifiers.
-    IInput::ModifierFlags flags = input.GetModifiers();
+    IInput::ModifierFlags flags = input.getModifiers();
 
     // clear any lock state flags.
     // flags &= ModifiersMasks::LockKeys;
@@ -618,18 +611,20 @@ void XKeyboard::ClearKeyState(InputEventArr& clearEvents)
     bool bNumLock = GetKeyState(VK_NUMLOCK) & 0x1;
     bool bCapsLock = GetKeyState(VK_CAPITAL) & 0x1;
 
-    if (bScroll)
+    if (bScroll) {
         flags.Set(ModifiersMasks::SCROLLOCK);
-    if (bNumLock)
+    }
+    if (bNumLock) {
         flags.Set(ModifiersMasks::NUMLOCK);
-    if (bCapsLock)
+    }
+    if (bCapsLock) {
         flags.Set(ModifiersMasks::CAPSLOCK);
+    }
 
-    input.SetModifiers(flags);
+    input.setModifiers(flags);
 
     // clear the symbols.
-    for (size_t i = 0; i < 256; i++) {
-        InputSymbol* pSymbol = pSymbol_[i];
+    for (auto* pSymbol : pSymbol_) {
         if (pSymbol) {
             if (pSymbol->value > 0.f) {
                 // broadcast a release event and reset it etc.
@@ -640,8 +635,8 @@ void XKeyboard::ClearKeyState(InputEventArr& clearEvents)
                 event.action = InputState::RELEASED;
                 event.value = 0.0f;
 
-                if (IsCHAR(event)) {
-                    event.inputchar = Event2Char(event);
+                if (isCHAR(event)) {
+                    event.inputchar = event2Char(event);
                     event.action = InputState::CHAR;
                 }
 

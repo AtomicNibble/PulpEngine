@@ -10,7 +10,7 @@ UserCmdGen::UserCmdGen()
 
 bool UserCmdGen::init(void)
 {
-    gEnv->pInput->AddEventListener(this);
+//    gEnv->pInput->AddEventListener(this);
     gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 
     return true;
@@ -19,7 +19,7 @@ bool UserCmdGen::init(void)
 void UserCmdGen::shutdown(void)
 {
     gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
-    gEnv->pInput->RemoveEventListener(this);
+//    gEnv->pInput->RemoveEventListener(this);
 }
 
 void UserCmdGen::clear(void)

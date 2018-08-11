@@ -23,28 +23,26 @@ class XMouse : public XInputDeviceWin32
 
 public:
     XMouse(XWinInput& input, XInputCVars& vars);
-    ~XMouse() X_OVERRIDE;
+    ~XMouse() X_FINAL;
 
-    // IInputDevice overrides
-    X_INLINE int32_t GetDeviceIndex(void) const X_OVERRIDE;
-    bool Init(void) X_OVERRIDE;
-    void ShutDown(void) X_OVERRIDE;
-    void Update(core::FrameData& frameData) X_OVERRIDE;
-    X_INLINE bool IsOfDeviceType(InputDeviceType::Enum type) const X_OVERRIDE;
-    // ~IInputDevice
+    // XInputDevice overrides
+    bool init(XBaseInput& input) X_FINAL;
+    void shutDown(void) X_FINAL;
+    void clearKeyState(InputEventArr& clearEvents) X_FINAL;
+    // ~XInputDevice
 
-    void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_OVERRIDE;
+    void processInput(const uint8_t* pData, core::FrameInput& inputFrame) X_FINAL;
 
 private:
-    void PostEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame);
-    void PostOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame);
+    void postEvent(InputSymbol* pSymbol, core::FrameInput& inputFrame);
+    void postOnlyIfChanged(InputSymbol* pSymbol, InputState::Enum newState, core::FrameInput& inputFrame);
 
-    void OnButtonDown(KeyId::Enum id, core::FrameInput& inputFrame);
-    void OnButtonUP(KeyId::Enum id, core::FrameInput& inputFrame);
+    void onButtonDown(KeyId::Enum id, core::FrameInput& inputFrame);
+    void onButtonUP(KeyId::Enum id, core::FrameInput& inputFrame);
 
-    void ProcessMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame);
+    void processMouseData(const RAWMOUSE& mouse, core::FrameInput& inputFrame);
 
-    X_INLINE InputSymbol* GetSymbol(KeyId::Enum id);
+    X_INLINE InputSymbol* getSymbol(KeyId::Enum id);
 
 private:
     float mouseWheel_;

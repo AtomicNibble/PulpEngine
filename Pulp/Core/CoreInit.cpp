@@ -781,7 +781,7 @@ bool XCore::InitInput(const CoreInitParams& initParams)
     env_.pInput->registerVars();
     env_.pInput->registerCmds();
 
-    if (!env_.pInput->Init()) {
+    if (!env_.pInput->init()) {
         X_ERROR("Font", "failed to init input system");
         return false;
     }

@@ -32,7 +32,7 @@ void XCore::Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx,
 
     if (env_.pInput) {
         // during the running of this is when command and Var callbacks will be run.
-        env_.pInput->Job_PostInputFrame(jobSys, frameData);
+        env_.pInput->job_PostInputFrame(jobSys, frameData);
     }
 }
 

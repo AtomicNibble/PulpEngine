@@ -9,42 +9,32 @@
 X_NAMESPACE_BEGIN(input)
 
 class XInputCVars;
+class XBaseInput;
 
-class XInputDevice : public IInputDevice
+class XInputDevice
 {
-    typedef core::HashMap<KeyId::Enum, InputSymbol*> TIdToSymbolMap;
+public:
+    typedef core::Array<InputEvent> InputEventArr;
 
 public:
-    XInputDevice(IInput& input, XInputCVars& vars, const char* pDeviceName);
-    virtual ~XInputDevice() X_OVERRIDE;
+    XInputDevice(XBaseInput& input, XInputCVars& vars, const char* pDeviceName);
+    virtual ~XInputDevice() = default;
 
     // IInputDevice
-    X_INLINE const char* GetDeviceName(void) const X_OVERRIDE;
-    X_INLINE bool Init(void) X_OVERRIDE;
-    X_INLINE void PostInit(void) X_OVERRIDE;
-    X_INLINE void ShutDown(void) X_OVERRIDE;
-    void Update(core::FrameData& frameData) X_OVERRIDE;
-    void Enable(bool enable) X_OVERRIDE;
-    X_INLINE bool IsEnabled(void) const X_OVERRIDE;
-    void ClearKeyState(InputEventArr& clearEvents) X_OVERRIDE;
-    InputSymbol* LookupSymbol(KeyId::Enum id) const X_OVERRIDE;
+    X_INLINE const char* getDeviceName(void) const;
+    virtual bool init(XBaseInput& input) X_ABSTRACT;
+    virtual void shutDown(void) X_ABSTRACT;
+    virtual void clearKeyState(InputEventArr& clearEvents) X_ABSTRACT;
     // ~IInputDevice
 
 protected:
-    X_INLINE IInput& GetIInput(void) const;
-
-    InputSymbol* IdToSymbol(KeyId::Enum id) const;
-
-protected:
+    XBaseInput& input_;
+    XInputCVars& vars_;
     InputDeviceType::Enum deviceType_;
     bool enabled_;
 
-    XInputCVars& vars_;
-
 private:
-    IInput& input_;           // point to input system in use
     core::string deviceName_; // name of the device (used for input binding)
-    TIdToSymbolMap idToInfo_;
 
 private:
     X_NO_ASSIGN(XInputDevice);

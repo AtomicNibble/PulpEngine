@@ -14,14 +14,12 @@ X_NAMESPACE_BEGIN(input)
 class XInputDeviceWin32 : public XInputDevice
 {
 public:
-    XInputDeviceWin32(IInput& input, XInputCVars& vars, const char* pDeviceName);
-    virtual ~XInputDeviceWin32() X_OVERRIDE;
+    XInputDeviceWin32(XBaseInput& input, XInputCVars& vars, const char* pDeviceName);
+    virtual ~XInputDeviceWin32() X_OVERRIDE = default;
 
-    virtual void Update(core::FrameData& frameData) X_OVERRIDE;
-    virtual void ShutDown(void) X_ABSTRACT;
-    virtual void ProcessInput(const uint8_t* pData, core::FrameInput& inputFrame) X_ABSTRACT;
+    virtual void processInput(const uint8_t* pData, core::FrameInput& inputFrame) X_ABSTRACT;
 
-    // ~IInputDevice
+    // ~XInputDevice
 
 private:
     X_NO_ASSIGN(XInputDeviceWin32);

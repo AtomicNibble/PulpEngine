@@ -389,7 +389,7 @@ struct InputSymbol
     KeyId::Enum keyId;
     InputState::Enum state; // the state of the key, UP, DOWN
     InputDeviceType::Enum deviceType;
-    ModifiersMasks::Enum modifer_mask; // if modifier has it's mask
+    ModifiersMasks::Enum modiferMask; // if modifier has it's mask
 };
 
 // inherit from this if you want to register from input events.
@@ -411,95 +411,24 @@ struct IInputEventListner
     }
 };
 
-struct IInputDevice
-{
-    typedef core::Array<InputEvent> InputEventArr;
-
-public:
-    virtual ~IInputDevice() = default;
-
-    virtual bool Init(void) X_ABSTRACT;
-    virtual void PostInit(void) X_ABSTRACT;
-    virtual void ShutDown(void) X_ABSTRACT;
-
-    virtual const char* GetDeviceName(void) const X_ABSTRACT;
-    virtual int GetDeviceIndex(void) const X_ABSTRACT;
-
-    // Update.
-    virtual void Update(core::FrameData& frameData) X_ABSTRACT;
-
-    virtual void Enable(bool enable) X_ABSTRACT;
-    virtual bool IsEnabled(void) const X_ABSTRACT;
-
-    virtual void ClearKeyState(InputEventArr& clearEvents) X_ABSTRACT;
-
-    virtual bool IsOfDeviceType(InputDeviceType::Enum type) const X_ABSTRACT;
-    virtual InputSymbol* LookupSymbol(KeyId::Enum id) const X_ABSTRACT;
-};
-
 struct IInput
 {
     typedef Flags<ModifiersMasks> ModifierFlags;
 
     virtual ~IInput() = default;
 
-    // Registers new input events listener.
-    virtual void AddEventListener(IInputEventListner* pListener) X_ABSTRACT;
-    virtual void RemoveEventListener(IInputEventListner* pListener) X_ABSTRACT;
-
-    // Registers new console input event listeners. console input listeners receive all events, no matter what.
-    virtual void AddConsoleEventListener(IInputEventListner* pListener) X_ABSTRACT;
-    virtual void RemoveConsoleEventListener(IInputEventListner* pListener) X_ABSTRACT;
-
-    virtual bool AddInputDevice(IInputDevice* pDevice) X_ABSTRACT;
-
-    virtual void EnableEventPosting(bool bEnable) X_ABSTRACT;
-    virtual bool IsEventPostingEnabled(void) const X_ABSTRACT;
-    virtual bool Job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_ABSTRACT;
-
     virtual void registerVars(void) X_ABSTRACT;
     virtual void registerCmds(void) X_ABSTRACT;
 
-    virtual bool Init(void) X_ABSTRACT;
-    virtual void PostInit(void) X_ABSTRACT;
-    virtual void ShutDown(void) X_ABSTRACT;
+    virtual bool init(void) X_ABSTRACT;
+    virtual void shutDown(void) X_ABSTRACT;
     virtual void release(void) X_ABSTRACT;
 
-    // called with frame data and parent job calling.
-    virtual void Update(core::FrameData& frameData) X_ABSTRACT;
-
-    virtual void ClearKeyState(void) X_ABSTRACT;
-
-    // Re-triggers pressed keys.
-    virtual void RetriggerKeyState(void) X_ABSTRACT;
-
-    // true if currently re-triggering.
-    virtual bool Retriggering(void) const X_ABSTRACT;
-
-    //	Queries to see if this machine has some kind of input device connected.
-    virtual bool HasInputDeviceOfType(InputDeviceType::Enum type) const X_ABSTRACT;
-
-    // Tells devices whether to report input or not.
-    virtual void EnableDevice(InputDeviceType::Enum type, bool enable) X_ABSTRACT;
-
-    virtual ModifierFlags GetModifiers(void) X_ABSTRACT;
-    virtual void SetModifiers(ModifierFlags flags) X_ABSTRACT;
-
-    virtual InputSymbol* DefineSymbol(InputDeviceType::Enum deviceType, KeyId::Enum id_, const KeyName& name_,
-        InputSymbol::Type type_ = InputSymbol::Type::Button, ModifiersMasks::Enum mod_mask = ModifiersMasks::NONE) X_ABSTRACT;
+    virtual bool job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_ABSTRACT;
+    virtual void update(core::FrameData& frameData) X_ABSTRACT;
+    virtual void clearKeyState(void) X_ABSTRACT;
 };
 
 X_NAMESPACE_END
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-typedef X_NAMESPACE(input)::IInput(*IP_PTRCREATEINPUTFNC(ICore* pCore, void* hwnd));
-
-IPINPUT_API X_NAMESPACE(input)::IInput* CreateInput(ICore* pCore, void* hwnd);
-
-#ifdef __cplusplus
-};
-#endif
 
 #endif // !_X_INPUT_I_H_

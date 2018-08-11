@@ -493,7 +493,7 @@ bool XConsole::registerInputListener(void)
     X_ASSERT_NOT_NULL(pInput_);
 
     // we want input events plooxx.
-    pInput_->AddConsoleEventListener(this);
+//    pInput_->AddConsoleEventListener(this);
     return true;
 }
 
@@ -690,7 +690,7 @@ void XConsole::unregisterInputListener(void)
 {
     pInput_ = gEnv->pInput;
     if (pInput_) {
-        pInput_->RemoveConsoleEventListener(this);
+    //    pInput_->RemoveConsoleEventListener(this);
     }
 }
 
@@ -822,7 +822,7 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
         bool visable = isVisable();
 
         // clear states.
-        pInput_->ClearKeyState();
+        pInput_->clearKeyState();
 
         if (expand) { // shift + ` dose not close anymore just expands.
             ShowConsole(consoleState::EXPANDED);

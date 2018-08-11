@@ -6,6 +6,8 @@
 #include "BaseInput.h"
 #include "IFrameData.h"
 
+#include <Util\UniquePointer.h>
+
 struct ICore;
 
 X_NAMESPACE_BEGIN(input)
@@ -40,20 +42,16 @@ public:
     void registerVars(void) X_FINAL;
     void registerCmds(void) X_FINAL;
 
-    bool Init(void) X_FINAL;
-    void PostInit(void) X_FINAL;
-    void ShutDown(void) X_FINAL;
+    bool init(void) X_FINAL;
+    void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    void Update(core::FrameData& frameData) X_FINAL;
+    void update(core::FrameData& frameData) X_FINAL;
 
-    void ClearKeyState(void) X_FINAL;
+    void clearKeyState(void) X_FINAL;
     // ~IInput
 
-    bool AddInputDevice(IInputDevice* pDevice) X_FINAL;
-    bool AddInputDevice(XInputDeviceWin32* pDevice);
-
-    X_INLINE HWND GetHWnd(void) const;
+    X_INLINE HWND getHWnd(void) const;
 
 private:
     BOOL isWow64_;

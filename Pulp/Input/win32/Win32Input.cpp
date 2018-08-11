@@ -6,10 +6,9 @@
 #include "Keyboard.h"
 
 #include "InputDeviceWin32.h"
-
-#include <Util\LastError.h>
 #include "InputCVars.h"
 
+#include <Util\LastError.h>
 #include <Platform\Window.h>
 
 X_NAMESPACE_BEGIN(input)
@@ -31,18 +30,20 @@ XWinInput::~XWinInput()
 void XWinInput::registerVars(void)
 {
     XBaseInput::registerVars();
+
 }
 
 void XWinInput::registerCmds(void)
 {
     XBaseInput::registerCmds();
+
 }
 
-bool XWinInput::Init(void)
+bool XWinInput::init(void)
 {
     X_PROFILE_NO_HISTORY_BEGIN("InputInit", core::profiler::SubSys::INPUT);
 
-    XBaseInput::Init();
+    XBaseInput::init();
 
     // work out if WOW64.
     if (!::IsWow64Process(::GetCurrentProcess(), &isWow64_)) {
@@ -51,32 +52,31 @@ bool XWinInput::Init(void)
         return false;
     }
 
-    pKeyBoard_ = X_NEW_ALIGNED(XKeyboard, g_InputArena, "Keyboard", 8)(*this, *pCVars_);
-    pMouse_ = X_NEW_ALIGNED(XMouse, g_InputArena, "Mouse", 8)(*this, *pCVars_);
+    auto keyBoard = core::makeUnique<XKeyboard>(g_InputArena, *this, *pCVars_);
+    auto mouse = core::makeUnique<XMouse>(g_InputArena, *this, *pCVars_);
+
+    // weak refs
+    pKeyBoard_ = keyBoard.ptr();
+    pMouse_ = mouse.ptr();
 
     // o baby!
-    if (!AddInputDevice(pKeyBoard_)) {
+    if (!addInputDevice(XInputDevicePtr(std::move(keyBoard)))) {
         X_ERROR("Input", "Failed to add keyboard input device");
         return false;
     }
 
-    if (!AddInputDevice(pMouse_)) {
+    if (!addInputDevice(XInputDevicePtr(std::move(mouse)))) {
         X_ERROR("Input", "Failed to add mouse input device");
         return false;
     }
 
-    ClearKeyState();
+    clearKeyState();
     return true;
 }
 
-void XWinInput::PostInit(void)
+void XWinInput::shutDown(void)
 {
-    XBaseInput::PostInit();
-}
-
-void XWinInput::ShutDown(void)
-{
-    XBaseInput::ShutDown();
+    XBaseInput::shutDown();
 }
 
 void XWinInput::release(void)
@@ -84,11 +84,9 @@ void XWinInput::release(void)
     X_DELETE(this, g_InputArena);
 }
 
-void XWinInput::Update(core::FrameData& frameData)
+void XWinInput::update(core::FrameData& frameData)
 {
     X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
-    X_ASSERT_NOT_NULL(pMouse_);
-    X_ASSERT_NOT_NULL(pKeyBoard_);
 
     frameData.input.cusorPos = core::xWindow::GetCusroPos();
     auto* pWindow = gEnv->pCore->GetGameWindow();
@@ -96,10 +94,7 @@ void XWinInput::Update(core::FrameData& frameData)
         frameData.input.cusorPosClient = pWindow->GetCusroPosClient();
     }
 
-
     AddHoldEvents(frameData.input);
-
-    hasFocus_ = frameData.flags.IsSet(core::FrameFlag::HAS_FOCUS);
 
     RAWINPUT X_ALIGNED_SYMBOL(input[BUF_NUM], 8);
 
@@ -107,9 +102,7 @@ void XWinInput::Update(core::FrameData& frameData)
     size_t num;
 
     const bool debug = (pCVars_->inputDebug_ > 1);
-    const bool mouseEnabled = pMouse_->IsEnabled();
-    const bool keyboardEnabled = pKeyBoard_->IsEnabled();
-
+    
     // this only returns results for windows created on the same thread.
     X_ASSERT(gEnv->mainThreadId == core::Thread::getCurrentID(), "Input must be got from main thread")();
 
@@ -148,11 +141,11 @@ void XWinInput::Update(core::FrameData& frameData)
                 pData += 8;
             }
 
-            if (rawInput->header.dwType == RIM_TYPEMOUSE && mouseEnabled) {
-                pMouse_->ProcessInput(pData, inputData);
+            if (rawInput->header.dwType == RIM_TYPEMOUSE) {
+                pMouse_->processInput(pData, inputData);
             }
-            else if (rawInput->header.dwType == RIM_TYPEKEYBOARD && keyboardEnabled) {
-                pKeyBoard_->ProcessInput(pData, inputData);
+            else if (rawInput->header.dwType == RIM_TYPEKEYBOARD) {
+                pKeyBoard_->processInput(pData, inputData);
             }
 
             rawInput = NEXTRAWINPUTBLOCK(rawInput);
@@ -160,20 +153,9 @@ void XWinInput::Update(core::FrameData& frameData)
     }
 }
 
-void XWinInput::ClearKeyState(void)
+void XWinInput::clearKeyState(void)
 {
-    XBaseInput::ClearKeyState();
-}
-
-bool XWinInput::AddInputDevice(IInputDevice* pDevice)
-{
-    X_UNUSED(pDevice);
-    return false;
-}
-
-bool XWinInput::AddInputDevice(XInputDeviceWin32* pDevice)
-{
-    return XBaseInput::AddInputDevice(pDevice);
+    XBaseInput::clearKeyState();
 }
 
 X_NAMESPACE_END
