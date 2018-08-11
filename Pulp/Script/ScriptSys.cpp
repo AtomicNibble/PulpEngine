@@ -913,6 +913,7 @@ bool XScriptSys::toAny(lua_State* L, ScriptValue& var, int index)
     auto luaType = stack::get_type(L, index);
 
     if (var.getType() != Type::None && !isTypeCompatible(var.getType(), luaType)) {
+        X_WARNING("Script", "toAny type mismatch");
         return false;
     }
 
