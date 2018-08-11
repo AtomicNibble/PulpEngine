@@ -7,7 +7,8 @@ end
 
 local function Update()
 
-    ui.fill(20,20,20,220)
+    ui.fill(2,2,2,220)
+    ui.center();
 
     if ui.button("RESUME") then
         ui.close()
@@ -18,8 +19,6 @@ local function Update()
     if ui.button("QUIT") then
         core.exec("quit")
     end
-
-    ui.sliderVar("VOLUME", "snd_vol_master");
 
 end
 
