@@ -25,7 +25,6 @@ XGame::XGame(ICore* pCore) :
     pTimer_(nullptr),
     pSession_(nullptr),
     pRender_(nullptr),
-    pFovVar_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
     userCmdMan_(vars_),
@@ -43,13 +42,6 @@ void XGame::registerVars(void)
 {
 	weaponDefs_.registerVars();
     vars_.registerVars();
-
-    pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI),
-        core::VarFlag::SAVE_IF_CHANGED, "camera fov");
-
-    core::ConsoleVarFunc del;
-    del.Bind<XGame, &XGame::OnFovChanged>(this);
-    pFovVar_->SetOnChangeCallback(del);
 }
 
 void XGame::registerCmds(void)
@@ -122,8 +114,6 @@ bool XGame::init(void)
     X_ASSERT(deimension.x > 0, "height is not valid")(deimension.x);
     X_ASSERT(deimension.y > 0, "height is not valid")(deimension.y);
 
-    cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
-
     userCmdGen_.init();
     weaponDefs_.init();
 
@@ -136,10 +126,6 @@ bool XGame::shutDown(void)
 
     if (pSession_) {
         gEnv->pNet->deleteSession(pSession_);
-    }
-
-    if (pFovVar_) {
-        gEnv->pConsole->UnregisterVariable(pFovVar_);
     }
 
     if (world_) {
@@ -595,15 +581,6 @@ int32_t XGame::getPlayerIdxForGuid(net::NetGUID guid) const
     }
 
     return -1;
-}
-
-
-void XGame::OnFovChanged(core::ICVar* pVar)
-{
-    float fovDegress = pVar->GetFloat();
-    float fov = ::toRadians(fovDegress);
-
-    cam_.setFov(fov);
 }
 
 void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)

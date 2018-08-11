@@ -61,7 +61,6 @@ private:
     int32_t getLocalClientIdx(void) const;
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
 
-    void OnFovChanged(core::ICVar* pVar);
     void Command_Map(core::IConsoleCmdArgs* Cmd);
     void Command_MainMenu(core::IConsoleCmdArgs* Cmd);
 
@@ -72,9 +71,6 @@ private:
     net::ISession* pSession_;
     render::IRender* pRender_;
     core::ITimer* pTimer_;
-    core::ICVar* pFovVar_;
-
-    XCamera cam_;
 
 private:
     GameVars vars_;
