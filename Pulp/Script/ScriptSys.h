@@ -68,7 +68,7 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    void Update(void) X_FINAL;
+    void update(void) X_FINAL;
 
     IScript* findScript(const char* pFileName) X_FINAL;
     IScript* loadScript(const char* pFileName) X_FINAL;

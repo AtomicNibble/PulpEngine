@@ -46,8 +46,8 @@ public:
 
     bool asyncInitFinalize(void) X_FINAL;
 
-    void Update(core::FrameData& frame) X_FINAL;
-    void OnFrameBegin(core::FrameData& frame) X_FINAL;
+    void update(core::FrameData& frame) X_FINAL;
+    void onFrameBegin(core::FrameData& frame) X_FINAL;
 
     IPrimativeContext* getPrimContext(PrimContext::Enum user) X_FINAL;
     IMaterialManager* getMaterialManager(void) X_FINAL;

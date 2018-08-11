@@ -58,17 +58,17 @@ XDirectoryWatcher::XDirectoryWatcher(core::MemoryArenaBase* arena) :
 
 XDirectoryWatcher::~XDirectoryWatcher(void)
 {
-    ShutDown();
+    shutDown();
 }
 
-void XDirectoryWatcher::Init(void)
+void XDirectoryWatcher::init(void)
 {
     ADD_CVAR_REF("filesys_dir_watcher_debug", debug_, 0, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Debug messages for directory watcher. 0=off 1=on");
 }
 
-void XDirectoryWatcher::ShutDown(void)
+void XDirectoryWatcher::shutDown(void)
 {
     for (const auto& dirInfo : dirs_) {
         ::CloseHandle(dirInfo.event);

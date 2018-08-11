@@ -285,7 +285,7 @@ bool X3DEngine::asyncInitFinalize(void)
     return allOk;
 }
 
-void X3DEngine::Update(core::FrameData& frame)
+void X3DEngine::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);
 
@@ -299,7 +299,7 @@ void X3DEngine::Update(core::FrameData& frame)
     //	pCBufMan_->update(frame, false);
 }
 
-void X3DEngine::OnFrameBegin(core::FrameData& frame)
+void X3DEngine::onFrameBegin(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DFrameBegin", core::profiler::SubSys::ENGINE3D);
 

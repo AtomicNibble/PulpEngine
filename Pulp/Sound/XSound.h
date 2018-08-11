@@ -101,7 +101,7 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    void Update(core::FrameData& frame) X_FINAL;
+    void update(core::FrameData& frame) X_FINAL;
     void setPhysicsScene(physics::IScene* pScene) X_FINAL;
 
     // Shut up!

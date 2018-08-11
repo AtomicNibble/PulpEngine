@@ -394,7 +394,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
     }
 
     if (pDirWatcher_) {
-        pDirWatcher_->Init();
+        pDirWatcher_->init();
     }
 
     // register filesystemvars.

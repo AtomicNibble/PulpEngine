@@ -131,7 +131,7 @@ bool XCore::Update(void)
     }
 
     if (env_.p3DEngine) {
-        env_.p3DEngine->Update(frameData);
+        env_.p3DEngine->update(frameData);
     }
 
     if (env_.pPhysics) {
@@ -142,11 +142,11 @@ bool XCore::Update(void)
 
     // we could update the sound system while rendering on gpu.
     if (env_.pSound) {
-        env_.pSound->Update(frameData);
+        env_.pSound->update(frameData);
     }
 
     if (env_.pScriptSys) {
-        env_.pScriptSys->Update();
+        env_.pScriptSys->update();
     }
 
     RenderBegin(frameData);
@@ -240,7 +240,7 @@ void XCore::RenderBegin(core::FrameData& frameData)
     X_UNUSED(frameData);
 
     env_.pRender->renderBegin();
-    env_.p3DEngine->OnFrameBegin(frameData);
+    env_.p3DEngine->onFrameBegin(frameData);
 }
 
 void XCore::RenderEnd(core::FrameData& frameData)

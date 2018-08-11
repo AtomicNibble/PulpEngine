@@ -502,7 +502,7 @@ void XSound::release(void)
     X_DELETE(this, g_SoundArena);
 }
 
-void XSound::Update(core::FrameData& frame)
+void XSound::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
 

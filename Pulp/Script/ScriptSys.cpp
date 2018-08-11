@@ -147,7 +147,7 @@ void XScriptSys::release(void)
     X_DELETE(this, g_ScriptArena);
 }
 
-void XScriptSys::Update(void)
+void XScriptSys::update(void)
 {
     X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 

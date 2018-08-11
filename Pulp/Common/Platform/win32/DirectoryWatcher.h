@@ -69,8 +69,8 @@ public:
     explicit XDirectoryWatcher(core::MemoryArenaBase* arena);
     ~XDirectoryWatcher(void);
 
-    void Init(void);
-    void ShutDown(void);
+    void init(void);
+    void shutDown(void);
 
     void addDirectory(const char* pDirectory) X_OVERRIDE;
     void addDirectory(const wchar_t* pDirectory) X_OVERRIDE;
