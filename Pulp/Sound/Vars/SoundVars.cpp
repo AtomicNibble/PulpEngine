@@ -57,6 +57,7 @@ namespace
 
 SoundVars::SoundVars()
 {
+    suspectOnFocusLost_ = 1;
     enableCommSys_ = 0;
     enableOutputCapture_ = 0;
     enableCulling_ = 0;
@@ -115,6 +116,8 @@ void SoundVars::RegisterVars(void)
 
     const int32_t maxVal = std::numeric_limits<int32_t>::max();
 
+    ADD_CVAR_REF("snd_mute_lost_focus", suspectOnFocusLost_, suspectOnFocusLost_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Suspend the sound system when window focus is lost");
     ADD_CVAR_REF("snd_enable_coms", enableCommSys_, enableCommSys_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "initialize Wwise Comm system on startup");
     ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

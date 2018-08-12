@@ -23,6 +23,7 @@ public:
     void setVoiceVolume(float vol);
     void setSFXVolume(float vol);
 
+    X_INLINE bool SuspectOnFocusLost(void) const;
     X_INLINE bool EnableComs(void) const;
     X_INLINE bool EnableOutputCapture(void) const;
     X_INLINE bool EnableCulling(void) const;
@@ -51,6 +52,7 @@ private:
     core::ICVar* pVarVolSfx_;
     core::ICVar* pVarVolVoice_;
 
+    int32_t suspectOnFocusLost_;
     int32_t enableCommSys_;
     int32_t enableOutputCapture_;
     int32_t enableCulling_;

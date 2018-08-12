@@ -203,7 +203,8 @@ private:
 
     bool comsSysInit_;
     bool outputCaptureEnabled_;
-    bool _pad[2];
+    bool suspended_;
+    bool _pad[1];
 
     Transformf listenerTrans_;
 

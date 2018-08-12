@@ -1,6 +1,11 @@
 
 X_NAMESPACE_BEGIN(sound)
 
+X_INLINE bool SoundVars::SuspectOnFocusLost(void) const
+{
+    return suspectOnFocusLost_ != 0;
+}
+
 X_INLINE bool SoundVars::EnableComs(void) const
 {
     return enableCommSys_ != 0;

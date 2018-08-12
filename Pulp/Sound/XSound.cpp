@@ -214,6 +214,7 @@ XSound::XSound(core::MemoryArenaBase* arena) :
     comsSysInit_(false),
     outputCaptureEnabled_(false),
     bankSignal_(true),
+    suspended_(false),
     pScriptBinds_(nullptr)
 {
     objects_.reserve(128);
@@ -786,6 +787,10 @@ void XSound::mute(bool mute)
         return;
     }
 
+    if (suspended_ == mute) {
+        return;
+    }
+
     if (mute)
     {
         X_LOG2("SoundSys", "Suspending sound system");
@@ -805,6 +810,8 @@ void XSound::mute(bool mute)
             X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
         }
     }
+
+    suspended_ = mute;
 }
 
 void XSound::setListenPos(const Transformf& trans)
@@ -1421,7 +1428,10 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
     {
         auto focusLost = wparam == 0;
 
-        mute(focusLost);
+        if (vars_.SuspectOnFocusLost())
+        {
+            mute(focusLost);
+        }
     }
 }
 
