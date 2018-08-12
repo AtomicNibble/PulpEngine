@@ -72,7 +72,7 @@ struct ModifiersMasks
 
 struct InputState
 {
-    enum Enum
+    enum Enum : uint8_t
     {
         UNKNOWN,
         PRESSED = BIT(1),
@@ -110,7 +110,7 @@ struct InputState
     }
 };
 
-X_DECLARE_ENUM(InputDeviceType)
+X_DECLARE_ENUM8(InputDeviceType)
 (
     KEYBOARD,
     MOUSE,
@@ -320,7 +320,7 @@ struct InputSymbol;
 
 X_DISABLE_WARNING(4324);
 
-X_ALIGNED_SYMBOL(struct InputEvent, 32)
+struct InputEvent
 {
     typedef Flags<ModifiersMasks> ModiferType;
 
@@ -335,15 +335,17 @@ X_ALIGNED_SYMBOL(struct InputEvent, 32)
         inputchar = 0;
     }
 
+    float value;                      // typically mouse pos.
+    char inputchar;                   // pre translate
     InputDeviceType::Enum deviceType; // keyboard, mouse etc
     InputState::Enum action;          //
     KeyId::Enum keyId;                // id for the event.
     ModiferType modifiers;            // Key modifiers enabled at the time of this event.
     KeyName name;                     // the name
-    float value;                      // typically mouse pos.
     InputSymbol* pSymbol;             // Input symbol the event originated from.
-    char inputchar;                   // pre translate
 };
+
+X_ENSURE_LE(sizeof(InputEvent), 32, "InputEvent bigger than 32 bytes");
 
 typedef core::FixedArray<InputEvent, MAX_INPUT_EVENTS_PER_FRAME> InputEventBuffer;
 
