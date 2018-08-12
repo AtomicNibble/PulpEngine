@@ -59,7 +59,9 @@ bool XCore::Update(void)
     auto height = vars_.getWinHeight();
 
     core::FrameData frameData;
-    frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
+    if (pWindow_->Hasfocus()) {
+        frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
+    }
     frameData.view.viewport.set(width, height);
     frameData.view.viewport.setZ(0.f, 1.f);
 
