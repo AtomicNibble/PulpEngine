@@ -85,17 +85,17 @@ public:
     XCore();
     ~XCore() X_FINAL;
 
-    virtual bool Init(const CoreInitParams& startupParams) X_FINAL;
-    virtual bool InitAsyncWait(void) X_FINAL;
-    virtual void ShutDown(void); // not part of ICore currently
-    virtual void Release(void) X_FINAL;
+    bool Init(const CoreInitParams& startupParams) X_FINAL;
+    bool InitAsyncWait(void) X_FINAL;
+    void ShutDown(void); // not part of ICore currently
+    void Release(void) X_FINAL;
 
-    virtual bool RunGameLoop(void) X_FINAL;
-    virtual const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
-    virtual bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
-    virtual bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
+    bool RunGameLoop(void) X_FINAL;
+    const wchar_t* GetCommandLineArgForVarW(const wchar_t* pVarName) X_FINAL;
+    bool IntializeLoadedEngineModule(const char* pDllName, const char* pModuleClassName) X_FINAL;
+    bool IntializeLoadedConverterModule(const char* pDllName, const char* pModuleClassName,
         IConverterModule** pConvertModuleOut = nullptr, IConverter** pConverterInstance = nullptr) X_FINAL;
-    virtual bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
+    bool FreeConverterModule(IConverterModule* pConvertModule) X_FINAL;
 
     X_INLINE core::ITimer* GetITimer(void) X_FINAL;
     X_INLINE input::IInput* GetIInput(void) X_FINAL;
@@ -126,12 +126,12 @@ public:
     IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 
 public:
-    virtual void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
-    virtual void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
-    virtual void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
-    virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
+    void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+    void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+    void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
+    void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
 
-    virtual void OnFatalError(const char* format, va_list args) X_FINAL;
+    void OnFatalError(const char* format, va_list args) X_FINAL;
 
 private:
     bool PumpMessages(void);
