@@ -60,7 +60,6 @@ private:
 
     // IInputEventListner
     bool OnInputEvent(const input::InputEvent& event) X_FINAL;
-    bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
     // ~IInputEventListner
 
     void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;

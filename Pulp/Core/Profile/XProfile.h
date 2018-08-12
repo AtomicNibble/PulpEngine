@@ -85,8 +85,6 @@ namespace profiler
 
         // IInputEventListner
         bool OnInputEvent(const input::InputEvent& event) X_FINAL;
-        bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
-        int32_t GetInputPriority(void) const X_FINAL;
 
     private:
         void UpdateProfileData(void);

@@ -376,6 +376,10 @@ namespace profiler
 
         return false;
 #else
+        if (event.action == input::InputState::CHAR) {
+            return false;
+        }
+
         if (event.action == input::InputState::RELEASED) {
             repeatEvent_.keyId = input::KeyId::UNKNOWN;
         }
@@ -411,16 +415,6 @@ namespace profiler
 #endif // !X_ENABLE_JOBSYS_PROFILER
     }
 
-    bool XProfileSys::OnInputEventChar(const input::InputEvent& event)
-    {
-        X_UNUSED(event);
-        return false;
-    }
-
-    int32_t XProfileSys::GetInputPriority(void) const
-    {
-        return 1;
-    }
     // ~IInputEventListner
 
     void XProfileSys::UpdateProfileData(void)

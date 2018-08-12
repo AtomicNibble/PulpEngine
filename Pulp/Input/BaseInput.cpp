@@ -8,21 +8,6 @@
 
 X_NAMESPACE_BEGIN(input)
 
-namespace
-{
-    bool compareInputListener(const IInputEventListner* pListenerA, const IInputEventListner* pListenerB)
-    {
-        X_ASSERT_NOT_NULL(pListenerA);
-        X_ASSERT_NOT_NULL(pListenerB);
-
-        if (pListenerA->GetInputPriority() > pListenerB->GetInputPriority()) {
-            return true;
-        }
-
-        return false;
-    }
-
-} // namespace
 
 XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
     arena_(arena),

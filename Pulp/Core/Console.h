@@ -181,7 +181,6 @@ public:
 
     // input callbacks
     virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;
-    virtual bool OnInputEventChar(const input::InputEvent& event) X_FINAL;
 
     virtual ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
     virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;

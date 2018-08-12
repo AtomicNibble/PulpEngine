@@ -845,21 +845,6 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
     return ProcessInput(event);
 }
 
-// i want to send input char once.
-
-bool XConsole::OnInputEventChar(const input::InputEvent& event)
-{
-    if (!isVisable()) {
-        return false;
-    }
-
-    repeatEvent_ = event;
-
-    AddInputChar(event.inputchar);
-
-    return true;
-}
-
 void XConsole::AddInputChar(const char c)
 {
     const char tidle = '¬';
@@ -927,6 +912,11 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
     if (!isVisable()) {
         return false;
+    }
+
+    if (event.action == input::InputState::CHAR) {
+        AddInputChar(event.inputchar);
+        return true;
     }
 
     if (event.keyId == KeyId::ENTER || event.keyId == KeyId::NUMPAD_ENTER) {
@@ -1876,13 +1866,7 @@ void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
         repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
 
         if (repeatEventTimer_.GetValue() < 0) {
-            if (repeatEvent_.action == input::InputState::CHAR) {
-                OnInputEventChar(repeatEvent_);
-            }
-            else {
-                // do we even want to repeat none char events?
-                ProcessInput(repeatEvent_);
-            }
+            ProcessInput(repeatEvent_);
 
             repeatEventTimer_ = repeatEventInterval_;
         }
