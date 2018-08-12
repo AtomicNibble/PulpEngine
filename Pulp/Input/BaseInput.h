@@ -65,10 +65,10 @@ protected:
     void addClearEvents(core::FrameInput& inputFrame);
     void addHoldEvents(core::FrameInput& inputFrame);
 
-private:
     void addEventToHoldSymbols(const InputEvent& event);
     void clearHoldEvent(const InputSymbol* pSymbol);
 
+private:
     bool postInputEvent(const InputEvent& event);
     bool sendEventToListeners(const InputEvent& event);
 
