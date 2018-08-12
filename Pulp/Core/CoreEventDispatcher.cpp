@@ -19,6 +19,27 @@ XCoreEventDispatcher::~XCoreEventDispatcher()
     listners_.clear();
 }
 
+void XCoreEventDispatcher::pumpEvents(void)
+{
+    if (events_.isEmpty()) {
+        return;
+    }
+
+    while (events_.isNotEmpty()) {
+        auto& ed = events_.peek();
+
+        if (coreVars_.coreEventDebug_) {
+            X_LOG0("CoreEvent", "CoreEvent: \"%s\"", CoreEvent::ToString(ed.event));
+        }
+
+        for (auto* pList : listners_) {
+            pList->OnCoreEvent(ed.event, ed.wparam, ed.lparam);
+        }
+
+        events_.pop();
+    }
+}
+
 bool XCoreEventDispatcher::RegisterListener(ICoreEventListener* pListener)
 {
     X_ASSERT_NOT_NULL(pListener);
@@ -49,15 +70,23 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
     return true;
 }
 
-void XCoreEventDispatcher::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+void XCoreEventDispatcher::QueueCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
     if (coreVars_.coreEventDebug_) {
-        X_LOG0("CoreEvent", "---- CoreEvent: %s ----", CoreEvent::ToString(event));
+        X_LOG0("CoreEvent", "CoreEvent Queued: \"%s\"", CoreEvent::ToString(event));
     }
 
-    for (auto* pList : listners_) {
-        pList->OnCoreEvent(event, wparam, lparam);
+    CoreEventData ed;
+    ed.event = event;
+    ed.wparam = wparam;
+    ed.lparam = lparam;
+
+    if (!events_.freeSpace()) {
+        X_ERROR("CoreEvent", "Event queue overflow!");
+        events_.pop();
     }
+
+    events_.push(ed);
 }
 
 X_NAMESPACE_END

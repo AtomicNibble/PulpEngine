@@ -566,6 +566,11 @@ core::IDirectoryWatcher* XCore::GetDirWatcher(void)
     return pDirWatcher_;
 }
 
+ICoreEventDispatcher* XCore::GetCoreEventDispatcher(void)
+{
+    return pEventDispatcher_;
+}
+
 X_NAMESPACE_BEGIN(core)
 
 X_NAMESPACE_END

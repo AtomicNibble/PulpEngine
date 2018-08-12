@@ -104,7 +104,7 @@ struct ICoreEventDispatcher
     virtual bool RegisterListener(ICoreEventListener* pListener) X_ABSTRACT;
     virtual bool RemoveListener(ICoreEventListener* pListener) X_ABSTRACT;
 
-    virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_ABSTRACT;
+    virtual void QueueCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_ABSTRACT;
 };
 
 struct IAssertHandler

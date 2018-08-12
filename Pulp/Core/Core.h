@@ -43,7 +43,8 @@ struct IEngineModule;
 X_NAMESPACE_DECLARE(core,
                     class xWindow;
                     class Console;
-                    class XDirectoryWatcher;)
+                    class XDirectoryWatcher;
+                    class XCoreEventDispatcher;)
 
 typedef core::Logger<
     core::LoggerNoFilterPolicy,
@@ -111,7 +112,7 @@ public:
     X_INLINE core::profiler::IProfiler* GetProfiler(void) X_FINAL;
     core::IDirectoryWatcher* GetDirWatcher(void) X_FINAL;
 
-    X_INLINE ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
+    ICoreEventDispatcher* GetCoreEventDispatcher(void) X_FINAL;
     X_INLINE core::ILog* GetILog(void) X_FINAL;
     X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
     X_INLINE const core::CpuInfo* GetCPUInfo(void) X_FINAL;
@@ -214,7 +215,7 @@ private:
     // Hot reload stuff
     core::XDirectoryWatcher* pDirWatcher_;
 
-    ICoreEventDispatcher* pEventDispatcher_;
+    core::XCoreEventDispatcher* pEventDispatcher_;
     // ~Hotreload
 
     CoreInitParams initParams_;

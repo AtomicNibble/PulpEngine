@@ -356,7 +356,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
     initILDescriptions();
 
     // send a event for initial size.
-    gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
+    gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
 
     return true;
 }
@@ -1950,7 +1950,7 @@ bool XRender::resize(uint32_t width, uint32_t height)
     }
 
     // post a event.
-    gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
+    gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::RENDER_RES_CHANGED, displayRes_.x, displayRes_.y);
     return true;
 }
 

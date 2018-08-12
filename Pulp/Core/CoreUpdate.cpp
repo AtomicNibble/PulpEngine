@@ -15,6 +15,8 @@
 #include <Threading\JobSystem2.h>
 #include <Platform\Window.h>
 
+#include "CoreEventDispatcher.h"
+
 X_USING_NAMESPACE;
 
 // we have a load of things todo.
@@ -100,6 +102,8 @@ bool XCore::Update(void)
     if (env_.pVideoSys) {
         env_.pVideoSys->update(frameData.timeInfo);
     }
+
+    pEventDispatcher_->pumpEvents();
 
     // top job that we can use to wait for the chain of jobs to complete.
     Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));

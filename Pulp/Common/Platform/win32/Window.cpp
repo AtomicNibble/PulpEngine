@@ -360,12 +360,12 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_ACTIVATE:
         {
             int32_t active = (wParam != WA_INACTIVE);
-            gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::CHANGE_FOCUS, active, lParam);
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::CHANGE_FOCUS, active, lParam);
             break;
         }
         case WM_SIZE:
         {
-            gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::RESIZE, wParam, lParam);
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::RESIZE, wParam, lParam);
             break;
         }
         case WM_SIZING:
@@ -381,7 +381,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             int32_t xPos = static_cast<short>(LOWORD(lParam));
             int32_t yPos = static_cast<short>(HIWORD(lParam));
 
-            gEnv->pCore->GetCoreEventDispatcher()->OnCoreEvent(CoreEvent::MOVE, xPos, yPos);
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::MOVE, xPos, yPos);
             break;
         }
     }
