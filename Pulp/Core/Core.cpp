@@ -98,7 +98,7 @@ XCore::XCore() :
     pProfiler_(nullptr),
 #endif //!X_ENABLE_PROFILER
 
-    pEventDispatcher_(nullptr),
+    pCoreEventDispatcher_(nullptr),
 
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
         StrArena::getMemoryAlignmentRequirement(8),
@@ -110,8 +110,8 @@ XCore::XCore() :
 
     pDirWatcher_ = X_NEW(core::XDirectoryWatcher, g_coreArena, "CoreDirectoryWatcher")(g_coreArena);
 
-    pEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
-    pEventDispatcher_->RegisterListener(this);
+    pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
+    pCoreEventDispatcher_->RegisterListener(this);
 
     env_.state_ = CoreGlobals::State::STARTING;
     env_.pCore = this;
@@ -338,9 +338,9 @@ void XCore::ShutDown()
         core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
     }
 
-    if (pEventDispatcher_) {
-        pEventDispatcher_->RemoveListener(this);
-        core::Mem::DeleteAndNull(pEventDispatcher_, g_coreArena);
+    if (pCoreEventDispatcher_) {
+        pCoreEventDispatcher_->RemoveListener(this);
+        core::Mem::DeleteAndNull(pCoreEventDispatcher_, g_coreArena);
     }
 
     for (size_t i = 0; i < moduleDLLHandles_.size(); i++) {
@@ -568,7 +568,7 @@ core::IDirectoryWatcher* XCore::GetDirWatcher(void)
 
 ICoreEventDispatcher* XCore::GetCoreEventDispatcher(void)
 {
-    return pEventDispatcher_;
+    return pCoreEventDispatcher_;
 }
 
 X_NAMESPACE_BEGIN(core)

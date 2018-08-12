@@ -92,7 +92,7 @@ bool XCore::Update(void)
     }
 
     // dispatch the core events.
-    pEventDispatcher_->pumpEvents();
+    pCoreEventDispatcher_->pumpEvents();
 
     // get input events for this frame
     if (env_.pInput) {

@@ -215,7 +215,7 @@ private:
     // Hot reload stuff
     core::XDirectoryWatcher* pDirWatcher_;
 
-    core::XCoreEventDispatcher* pEventDispatcher_;
+    core::XCoreEventDispatcher* pCoreEventDispatcher_;
     // ~Hotreload
 
     CoreInitParams initParams_;
