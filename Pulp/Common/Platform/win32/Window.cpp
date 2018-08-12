@@ -151,7 +151,7 @@ bool xWindow::Create(const wchar_t* const pTitle, int x, int y, int width, int h
         height = safe_static_cast<int, LONG>(Rect.bottom - Rect.top);
     }
 
-    window_ = CreateWindowExW(
+    window_ = ::CreateWindowExW(
         0,
         g_ClassName,
         pTitle,
@@ -190,20 +190,20 @@ void xWindow::CustomFrame(bool enable)
         if (pFrame_ == nullptr) {
             pFrame_ = X_NEW(xFrame, gEnv->pArena, "Win32CustomFrame");
 
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
         }
         else {
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
         }
     }
     else {
         if (pFrame_ != nullptr) {
             X_DELETE_AND_NULL(pFrame_, gEnv->pArena);
 
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
-            RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_INVALIDATE);
+            ::RedrawWindow(window_, NULL, NULL, RDW_FRAME | RDW_NOCHILDREN | RDW_VALIDATE);
         }
     }
 }
@@ -214,26 +214,26 @@ xWindow::Notification::Enum xWindow::PumpMessages(void)
     uint32_t msgNumStart = numMsgs_;
 
     // need two for WM_INPUT goat shiz.
-    while (PeekMessage(&msg, this->window_, 0, WM_INPUT - 1, PM_REMOVE)) {
+    while (::PeekMessage(&msg, window_, 0, WM_INPUT - 1, PM_REMOVE)) {
         numMsgs_++;
 
         if (msg.message == WM_CLOSE) {
             return Notification::CLOSE;
         }
 
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        ::TranslateMessage(&msg);
+        ::DispatchMessage(&msg);
     }
 
-    while (PeekMessage(&msg, this->window_, WM_INPUT + 1, 0xffffffff, PM_REMOVE)) {
+    while (::PeekMessage(&msg, window_, WM_INPUT + 1, 0xffffffff, PM_REMOVE)) {
         numMsgs_++;
 
         if (msg.message == WM_CLOSE) {
             return Notification::CLOSE;
         }
 
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+        ::TranslateMessage(&msg);
+        ::DispatchMessage(&msg);
     }
 
     if (isDebugEnable()) {
@@ -250,9 +250,9 @@ void xWindow::ClipCursorToWindow(void)
 {
     RECT r;
     ::GetClientRect(window_, &r);
-    ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.left));
-    ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.right));
-    ClipCursor(&r);
+    ::ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.left));
+    ::ClientToScreen(window_, reinterpret_cast<LPPOINT>(&r.right));
+    ::ClipCursor(&r);
 }
 
 Vec2i xWindow::GetCusroPosClient(void)
@@ -338,7 +338,7 @@ Recti xWindow::GetClientRect(void) const
 Recti xWindow::GetPrimaryRect(void)
 {
     RECT rect;
-    SystemParametersInfo(SPI_GETWORKAREA, NULL, &rect, NULL);
+    ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rect, NULL);
 
     return Convert(rect);
 }
@@ -347,10 +347,10 @@ Recti xWindow::GetPrimaryRect(void)
 Recti xWindow::GetDesktopRect(void)
 {
     return Recti(
-        GetSystemMetrics(SM_XVIRTUALSCREEN),
-        GetSystemMetrics(SM_YVIRTUALSCREEN),
-        GetSystemMetrics(SM_CXVIRTUALSCREEN),
-        GetSystemMetrics(SM_CYVIRTUALSCREEN));
+        ::GetSystemMetrics(SM_XVIRTUALSCREEN),
+        ::GetSystemMetrics(SM_YVIRTUALSCREEN),
+        ::GetSystemMetrics(SM_CXVIRTUALSCREEN),
+        ::GetSystemMetrics(SM_CYVIRTUALSCREEN));
 }
 
 
