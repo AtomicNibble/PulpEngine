@@ -59,12 +59,6 @@ X_INLINE void xWindow::SetTitle(const char* str)
     ::SetWindowTextA(window_, str);
 }
 
-X_INLINE void xWindow::Destroy(void)
-{
-    ::DestroyWindow(window_);
-    window_ = NULL;
-}
-
 X_INLINE void xWindow::HideClientCursor(bool hide)
 {
     hideClientCursor_ = hide;
@@ -73,6 +67,11 @@ X_INLINE void xWindow::HideClientCursor(bool hide)
 X_INLINE void xWindow::FixedAspectRatioSizing(bool enable)
 {
     sizingFixedAspectRatio_ = enable;
+}
+
+X_INLINE bool xWindow::HasFocus(void) const
+{
+    return hasFocus_;
 }
 
 X_INLINE const uint32_t xWindow::GetNumMsgs(void) const

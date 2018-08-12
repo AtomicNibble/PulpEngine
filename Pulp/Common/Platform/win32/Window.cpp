@@ -102,6 +102,7 @@ xWindow::xWindow() :
     mode_(Mode::NONE),
     hideClientCursor_(false),
     sizingFixedAspectRatio_(true),
+    hasFocus_(false),
     pFrame_(nullptr)
 {
     RegisterClass();
@@ -172,6 +173,15 @@ bool xWindow::Create(const wchar_t* const pTitle, int x, int y, int width, int h
     X_ERROR_IF(window_ == NULL, "Window", "Failed to create window. Title: '%ls'. Error: %s", pTitle, lastError::ToString(Dsc));
 
     return window_ != NULL;
+}
+
+void xWindow::Destroy(void)
+{
+    ::DestroyWindow(window_);
+    window_ = NULL;
+
+    mode_ = Mode::NONE;
+    hasFocus_ = false;
 }
 
 void xWindow::CustomFrame(bool enable)
@@ -360,6 +370,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_ACTIVATE:
         {
             int32_t active = (wParam != WA_INACTIVE);
+            hasFocus_ = active > 0;
             gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::CHANGE_FOCUS, active, lParam);
             break;
         }

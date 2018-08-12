@@ -55,6 +55,7 @@ public:
     static void RegisterVars(void);
 
     bool Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode);
+    void Destroy(void);
     void CustomFrame(bool enable);
 
     Notification::Enum PumpMessages(void);
@@ -65,9 +66,9 @@ public:
     X_INLINE void Minamise(void);
     X_INLINE void MaxiMise(void);
     X_INLINE void Restore(void);
-    X_INLINE void Destroy(void);
     X_INLINE void HideClientCursor(bool hide);
     X_INLINE void FixedAspectRatioSizing(bool enable);
+    X_INLINE bool HasFocus(void) const;
     //	X_INLINE bool isValid(void);
 
     void ClipCursorToWindow(void);
@@ -116,6 +117,8 @@ protected:
     PLATFORM_HWND window_;
     bool hideClientCursor_;
     bool sizingFixedAspectRatio_;
+    bool hasFocus_;
+    bool _pad[2];
 
     xFrame* pFrame_;
 
