@@ -33,6 +33,7 @@ public:
     {
         enum Enum : uint32_t
         {
+            NONE,
             FULLSCREEN = WS_POPUP,                            ///< Fullscreen window.
             APPLICATION = WS_OVERLAPPEDWINDOW,                ///< Application window (windowed mode with standard icons)
             TOOL = WS_THICKFRAME | WS_CAPTION | WS_OVERLAPPED ///< Tool window (windowed mode with no icons)
@@ -53,11 +54,10 @@ public:
 
     static void RegisterVars(void);
 
-    bool Create(const wchar_t* const Title, int x, int y, int width, int height, Mode::Enum mode);
+    bool Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode);
+    void CustomFrame(bool enable);
 
     Notification::Enum PumpMessages(void);
-
-    void CustomFrame(bool val);
 
     X_INLINE void Show(void);
     X_INLINE void Hide(void);
@@ -66,16 +66,17 @@ public:
     X_INLINE void MaxiMise(void);
     X_INLINE void Restore(void);
     X_INLINE void Destroy(void);
-    X_INLINE void HideClientCursor(bool hide = true);
+    X_INLINE void HideClientCursor(bool hide);
+    X_INLINE void FixedAspectRatioSizing(bool enable);
     //	X_INLINE bool isValid(void);
 
     void ClipCursorToWindow(void);
-    static Vec2i GetCusroPos(void);
     Vec2i GetCusroPosClient(void);
+    static Vec2i GetCusroPos(void);
 
-    virtual void MoveTo(int x, int y);
-    virtual void MoveTo(const Position& position);
-    virtual void AlignTo(const Rect& Rect, AlignmentFlags alignment);
+    void MoveTo(int x, int y);
+    void MoveTo(const Position& position);
+    void AlignTo(const Rect& Rect, AlignmentFlags alignment);
 
     void SetTitle(const char* str);
 
@@ -100,15 +101,18 @@ public:
     X_INLINE PLATFORM_HWND GetNativeWindow(void);
     X_INLINE const PLATFORM_HWND GetNativeWindow(void) const;
 
-    virtual LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    void onSizing(WPARAM side, RECT* pRect);
 
 private:
     X_INLINE static bool isDebugEnable(void);
 
 protected:
     uint32_t numMsgs_;
+    Mode::Enum mode_;
     PLATFORM_HWND window_;
     bool hideClientCursor_;
+    bool sizingFixedAspectRatio_;
 
     xFrame* pFrame_;
 
@@ -116,8 +120,6 @@ protected:
 };
 
 #include "Window.inl"
-
-// extern xWindow* g_gamewindow;
 
 X_NAMESPACE_END
 

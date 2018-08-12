@@ -21,7 +21,7 @@ X_INLINE const PLATFORM_HWND xWindow::GetNativeWindow(void) const
 
 X_INLINE bool xWindow::Hasfocus(void) const
 {
-    return ::GetForegroundWindow() == this->window_;
+    return ::GetForegroundWindow() == window_;
 }
 
 X_INLINE void xWindow::Show(void)
@@ -61,12 +61,18 @@ X_INLINE void xWindow::SetTitle(const char* str)
 
 X_INLINE void xWindow::Destroy(void)
 {
-    DestroyWindow(window_);
+    ::DestroyWindow(window_);
+    window_ = NULL;
 }
 
 X_INLINE void xWindow::HideClientCursor(bool hide)
 {
-    this->hideClientCursor_ = hide;
+    hideClientCursor_ = hide;
+}
+
+X_INLINE void xWindow::FixedAspectRatioSizing(bool enable)
+{
+    sizingFixedAspectRatio_ = enable;
 }
 
 X_INLINE const uint32_t xWindow::GetNumMsgs(void) const
