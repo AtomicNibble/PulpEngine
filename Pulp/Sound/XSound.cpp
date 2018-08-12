@@ -781,7 +781,30 @@ void XSound::unregisterObjectSndEngine(SoundObject* pObject)
 // Shut up!
 void XSound::mute(bool mute)
 {
-    X_UNUSED(mute);
+    if (!AK::SoundEngine::IsInitialized()) {
+        X_WARNING("SoundSys", "Mute called when sound system not init");
+        return;
+    }
+
+    if (mute)
+    {
+        X_LOG2("SoundSys", "Suspending sound system");
+        AKRESULT res = AK::SoundEngine::Suspend(false);
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
+        }
+    }
+    else
+    {
+        X_LOG2("SoundSys", "Waking up sound system from suspend");
+
+        AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
+        if (res != AK_Success) {
+            AkResult::Description desc;
+            X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
+        }
+    }
 }
 
 void XSound::setListenPos(const Transformf& trans)
@@ -1396,27 +1419,9 @@ void XSound::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam
 
     if (event == CoreEvent::CHANGE_FOCUS) 
     {
-        if (wparam == 0)
-        {
-            X_LOG2("SoundSys", "Suspending sound system");
-            AKRESULT res = AK::SoundEngine::Suspend(false);
-            if (res != AK_Success) {
-                AkResult::Description desc;
-                X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
-            }
-        }
-        else 
-        {
-            X_LOG2("SoundSys", "Waking up sound system from suspend");
+        auto focusLost = wparam == 0;
 
-            AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
-            if (res != AK_Success) {
-                AkResult::Description desc;
-                X_ERROR("SoundSys", "Error waking up sound system. %s", AkResult::ToString(res, desc));
-            }
-            // might need to be called here not sure.
-            // SoundEngine::RenderAudio();
-        }
+        mute(focusLost);
     }
 }
 
