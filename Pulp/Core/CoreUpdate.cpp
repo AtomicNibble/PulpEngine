@@ -16,6 +16,7 @@
 #include <Platform\Window.h>
 
 #include "CoreEventDispatcher.h"
+#include "Console.h"
 
 X_USING_NAMESPACE;
 
@@ -99,6 +100,26 @@ bool XCore::Update(void)
         env_.pInput->update(frameData.input);
     }
 
+    {
+        // dispatch the input events.
+        for (auto& ev : frameData.input.events)
+        {
+            if (static_cast<core::XConsole*>(env_.pConsole)->onInputEvent(ev)) {
+                continue;
+            }
+
+#if X_ENABLE_PROFILER
+            if (pProfiler_ && pProfiler_->onInputEvent(ev)) {
+                continue;
+            }
+#endif // !X_ENABLE_PROFILER
+
+
+            gEnv->pGame->onInputEvent(ev);
+        }
+
+    }
+
     if (env_.pVideoSys) {
         env_.pVideoSys->update(frameData.timeInfo);
     }
@@ -113,13 +134,9 @@ bool XCore::Update(void)
         // create a job for syncing all input related jobs.
         Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
         {
-            Job* pPostInputFrame = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_PostInputFrame, &frameData JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
             Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
 
-            // we run console updates after input events have been posted.
-            jobSys.AddContinuation(pPostInputFrame, pConsoleUpdates);
-
-            jobSys.Run(pPostInputFrame);
+            jobSys.Run(pConsoleUpdates);
         }
 
         jobSys.Run(pInputSync);

@@ -6,6 +6,9 @@
 X_NAMESPACE_DECLARE(core,
     struct FrameData);
 
+X_NAMESPACE_DECLARE(input,
+    struct InputEvent);
+
 X_NAMESPACE_BEGIN(game)
 
 struct IGame
@@ -22,6 +25,7 @@ struct IGame
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
 
     virtual bool update(core::FrameData& frame) X_ABSTRACT;
+    virtual bool onInputEvent(const input::InputEvent& event) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

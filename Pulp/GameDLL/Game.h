@@ -47,6 +47,7 @@ public:
     bool asyncInitFinalize(void) X_FINAL;
 
     bool update(core::FrameData& frame) X_FINAL;
+    bool onInputEvent(const input::InputEvent& event) X_FINAL;
     // ~IGame
 
     // IGameCallbacks

@@ -64,17 +64,6 @@ void XBaseInput::release(void)
     X_DELETE(this, g_InputArena);
 }
 
-bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
-{
-    X_UNUSED(jobSys);
-
-    const auto& input = frameData.input;
-    for (const auto& e : input.events) {
-        postInputEvent(e);
-    }
-
-    return true;
-}
 
 void XBaseInput::update(core::FrameInput& inputFrame)
 {
@@ -210,58 +199,6 @@ void XBaseInput::clearHoldEvent(const InputSymbol* pSymbol)
     }
 }
 
-bool XBaseInput::postInputEvent(const InputEvent& event)
-{
-    if (event.keyId == KeyId::UNKNOWN) {
-        if (pCVars_->inputDebug_ > 1) {
-            X_WARNING("Input", "Ingoring unknown event key from device: %s", InputDeviceType::ToString(event.deviceType));
-        }
-        return false;
-    }
-
-    if (!sendEventToListeners(event)) {
-        return false;
-    }
-
-    addEventToHoldSymbols(event);
-    return true;
-}
-
-bool XBaseInput::sendEventToListeners(const InputEvent& event)
-{
-    // return true if add to hold.
-#if 1
-    X_UNUSED(event);
-#else
-    if (event.action == InputState::CHAR) {
-        for (auto* pListener : consoleListeners_) {
-            if (pListener->OnInputEventChar(event)) {
-                return false;
-            }
-        }
-        for (auto* pListener : listners_) {
-            if (pListener->OnInputEventChar(event)) {
-                break;
-            }
-        }
-    }
-    else {
-        for (auto* pListener : consoleListeners_)
-
-        {
-            if (pListener->OnInputEvent(event)) {
-                return false;
-            }
-        }
-        for (auto* pListener : listners_) {
-            if (pListener->OnInputEvent(event)) {
-                break;
-            }
-        }
-    }
-#endif
-    return true;
-}
 
 
 X_NAMESPACE_END

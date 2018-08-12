@@ -73,7 +73,7 @@ namespace profiler
 
         void OnFrameBegin(const FrameTimeData& frameTimeInfo);
         void OnFrameEnd(void);
-        bool OnInputEvent(const input::InputEvent& event);
+        bool onInputEvent(const input::InputEvent& event);
 
         void Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
 

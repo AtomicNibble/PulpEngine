@@ -636,7 +636,7 @@ void XConsole::freeRenderResources(void)
     pRender_ = nullptr;
 }
 
-bool XConsole::OnInputEvent(const input::InputEvent& event)
+bool XConsole::onInputEvent(const input::InputEvent& event)
 {
     // NOT OPEN
 
@@ -707,7 +707,8 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
             return true;
         }
     }
-    else {
+    else 
+    {
         // OPEN
         if (isExpanded()) // you can only scroll a expanded console.
         {

@@ -41,7 +41,6 @@ public:
     void shutDown(void) X_OVERRIDE;
     void release(void) X_OVERRIDE;
 
-    bool job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_OVERRIDE;
     void update(core::FrameInput& inputFrame) X_OVERRIDE;
     void clearKeyState(void) X_OVERRIDE;
 
@@ -67,10 +66,6 @@ protected:
 
     void addEventToHoldSymbols(const InputEvent& event);
     void clearHoldEvent(const InputSymbol* pSymbol);
-
-private:
-    bool postInputEvent(const InputEvent& event);
-    bool sendEventToListeners(const InputEvent& event);
 
 protected:
     core::MemoryArenaBase* arena_;

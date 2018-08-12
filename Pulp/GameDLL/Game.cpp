@@ -156,6 +156,25 @@ bool XGame::asyncInitFinalize(void)
     return allOk;
 }
 
+bool XGame::onInputEvent(const input::InputEvent& event)
+{
+    // okay!
+    // so we decide where to send the input here.
+    if (event.action == input::InputState::RELEASED) {
+        if (event.keyId == input::KeyId::ESCAPE) {
+
+            auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
+            if (!pMenuHandler->isActive())
+            {
+                pMenuHandler->open("pause");
+            }
+        }
+    }
+
+
+    return false;
+}
+
 bool XGame::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("Update", core::profiler::SubSys::GAME);
@@ -235,10 +254,7 @@ bool XGame::update(core::FrameData& frame)
         {
             // frist frame in loading.
             clearWorld();
-
-        
         }
-
 
         if (!world_)
         {

@@ -149,6 +149,11 @@ void XWinInput::update(core::FrameInput& inputFrame)
             rawInput = NEXTRAWINPUTBLOCK(rawInput);
         }
     }
+
+    for (auto& event : inputFrame.events)
+    {
+        addEventToHoldSymbols(event);
+    }
 }
 
 void XWinInput::clearKeyState(void)

@@ -176,7 +176,7 @@ public:
     consoleState::Enum getVisState(void) const X_FINAL;
 
     // input callbacks
-    bool OnInputEvent(const input::InputEvent& event);
+    bool onInputEvent(const input::InputEvent& event);
 
     ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
     ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;

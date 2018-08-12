@@ -21,21 +21,6 @@ void XCore::Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx,
     pDirWatcher_->tick();
 }
 
-void XCore::Job_PostInputFrame(core::V2::JobSystem& jobSys, size_t threadIdx,
-    core::V2::Job* pJob, void* pData)
-{
-    X_UNUSED(jobSys);
-    X_UNUSED(threadIdx);
-    X_UNUSED(pJob);
-
-    core::FrameData& frameData = *reinterpret_cast<core::FrameData*>(pData);
-
-    if (env_.pInput) {
-        // during the running of this is when command and Var callbacks will be run.
-        env_.pInput->job_PostInputFrame(jobSys, frameData);
-    }
-}
-
 void XCore::Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx,
     core::V2::Job* pJob, void* pData)
 {

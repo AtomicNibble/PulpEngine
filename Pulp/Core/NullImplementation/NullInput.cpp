@@ -26,13 +26,6 @@ void XNullInput::shutDown(void)
 {
 }
 
-bool XNullInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
-{
-    X_UNUSED(jobSys);
-    X_UNUSED(frameData);
-    return false;
-}
-
 void XNullInput::release(void)
 {
     X_ASSERT_NOT_NULL(gEnv);

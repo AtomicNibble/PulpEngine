@@ -322,7 +322,7 @@ namespace profiler
             repeatEventTimer_ -= frameTimeInfo.unscaledDeltas[ITimer::Timer::UI];
 
             if (repeatEventTimer_.GetValue() < 0) {
-                OnInputEvent(repeatEvent_);
+                onInputEvent(repeatEvent_);
                 repeatEventTimer_ = repeatEventInterval_;
             }
         }
@@ -361,7 +361,7 @@ namespace profiler
     }
 
     // IInputEventListner
-    bool XProfileSys::OnInputEvent(const input::InputEvent& event)
+    bool XProfileSys::onInputEvent(const input::InputEvent& event)
     {
         if (!vars_.getProlfilerDrawFlags()) {
             return false;
