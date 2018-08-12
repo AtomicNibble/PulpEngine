@@ -789,7 +789,7 @@ void XSound::mute(bool mute)
     if (mute)
     {
         X_LOG2("SoundSys", "Suspending sound system");
-        AKRESULT res = AK::SoundEngine::Suspend(false);
+        AKRESULT res = AK::SoundEngine::Suspend(true);
         if (res != AK_Success) {
             AkResult::Description desc;
             X_ERROR("SoundSys", "Error suspending. %s", AkResult::ToString(res, desc));
