@@ -27,6 +27,7 @@ namespace gui
 
         void init(engine::Material* pCursor);
 
+        bool open(const char* pName) X_FINAL;
         bool isActive(void) const X_FINAL;
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
 

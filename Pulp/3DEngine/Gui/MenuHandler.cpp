@@ -28,6 +28,17 @@ namespace gui
         stack_.push(pMenu);
     }
 
+    bool MenuHandler::open(const char* pName)
+    {
+        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
+        if (!pMenu) {
+            return false;
+        }
+
+        stack_.push(pMenu);
+        return true;
+    }
+
     bool MenuHandler::isActive(void) const
     {
         return !stack_.isEmpty();
