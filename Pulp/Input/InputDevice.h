@@ -14,7 +14,7 @@ class XBaseInput;
 class XInputDevice
 {
 public:
-    typedef core::Array<InputEvent> InputEventArr;
+    typedef core::ArrayGrowMultiply<InputEvent> InputEventArr;
 
 public:
     XInputDevice(XBaseInput& input, XInputCVars& vars, const char* pDeviceName);

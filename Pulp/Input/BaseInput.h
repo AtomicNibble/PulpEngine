@@ -20,10 +20,11 @@ class XBaseInput : public IInput
 {
     // listener functionality
 protected:
+    typedef core::UniquePointer<XInputCVars> XInputCVarsPtr;
     typedef core::UniquePointer<XInputDevice> XInputDevicePtr;
     typedef core::Array<XInputDevicePtr> InputDevicesArr;
     typedef core::Array<InputSymbol*> InputSymbolsArr;
-    typedef core::Array<InputEvent> InputEventArr;
+    typedef core::ArrayGrowMultiply<InputEvent> InputEventArr;
 
     X_NO_ASSIGN(XBaseInput);
     X_NO_COPY(XBaseInput);
@@ -65,10 +66,11 @@ protected:
     void addHoldEvents(core::FrameInput& inputFrame);
 
 private:
-    bool postInputEvent(const InputEvent& event);
-    void clearHoldEvent(InputSymbol* pSymbol);
-    bool sendEventToListeners(const InputEvent& event);
     void addEventToHoldSymbols(const InputEvent& event);
+    void clearHoldEvent(InputSymbol* pSymbol);
+
+    bool postInputEvent(const InputEvent& event);
+    bool sendEventToListeners(const InputEvent& event);
 
 protected:
     core::MemoryArenaBase* arena_;
@@ -79,7 +81,7 @@ protected:
     InputDevicesArr devices_;
 
     // CVars
-    XInputCVars* pCVars_;
+    XInputCVarsPtr pCVars_;
 
     ModifierFlags modifiers_; // caps ALT, SHIFT etc.
 

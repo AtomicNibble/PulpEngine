@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(input)
 
 XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
     arena_(arena),
-    pCVars_(X_NEW(XInputCVars, arena, "InputCvars")),
+    pCVars_(core::makeUnique<XInputCVars>(arena)),
     devices_(arena),
     holdSymbols_(arena),
     clearStateEvents_(arena)
@@ -19,12 +19,11 @@ XBaseInput::XBaseInput(core::MemoryArenaBase* arena) :
     holdSymbols_.setGranularity(32);
     holdSymbols_.reserve(64);
     clearStateEvents_.reserve(16);
-    clearStateEvents_.setGranularity(16);
 }
 
 XBaseInput::~XBaseInput(void)
 {
-    X_DELETE(pCVars_, arena_);
+
 }
 
 void XBaseInput::registerVars(void)
@@ -65,6 +64,18 @@ void XBaseInput::release(void)
     X_DELETE(this, g_InputArena);
 }
 
+bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
+{
+    X_UNUSED(jobSys);
+
+    const auto& input = frameData.input;
+    for (const auto& e : input.events) {
+        postInputEvent(e);
+    }
+
+    return true;
+}
+
 void XBaseInput::update(core::FrameData& frameData)
 {
     addClearEvents(frameData.input);
@@ -103,35 +114,6 @@ bool XBaseInput::addInputDevice(XInputDevicePtr pDevice)
     return true;
 }
 
-bool XBaseInput::postInputEvent(const InputEvent& event)
-{
-    if (event.keyId == KeyId::UNKNOWN) {
-        if (pCVars_->inputDebug_ > 1) {
-            X_WARNING("Input", "Ingoring unknown event key from device: %s", InputDeviceType::ToString(event.deviceType));
-        }
-        return false;
-    }
-
-    if (!sendEventToListeners(event)) {
-        return false;
-    }
-
-    addEventToHoldSymbols(event);
-    return true;
-}
-
-bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData)
-{
-    X_UNUSED(jobSys);
-
-    const auto& input = frameData.input;
-    for (const auto& e : input.events) {
-        postInputEvent(e);
-    }
-
-    return true;
-}
-
 void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
 {
     X_UNUSED(wparam, lparam);
@@ -160,18 +142,20 @@ void XBaseInput::addClearEvents(core::FrameInput& inputFrame)
     }
 
     for (size_t i = 0; i < num; ++i) {
-        InputEvent& event = inputFrame.events.AddOne();
-        event = clearStateEvents_[i];
+        inputFrame.events.emplace_back(clearStateEvents_[i]);
     }
 
-    clearStateEvents_.clear();
+    if (eventSpace < num) {
+        clearStateEvents_.erase(clearStateEvents_.begin(), clearStateEvents_.begin() + num);
+    }
+    else {
+        clearStateEvents_.clear();
+    }
 }
 
 // Hold symbols shizzz
 void XBaseInput::addHoldEvents(core::FrameInput& inputFrame)
 {
-    X_PROFILE_BEGIN("PostHoldEvents", core::profiler::SubSys::INPUT);
-
     size_t count = holdSymbols_.size();
 
     if (pCVars_->inputDebug_ > 2) {
@@ -189,6 +173,58 @@ void XBaseInput::addHoldEvents(core::FrameInput& inputFrame)
         InputEvent& event = inputFrame.events.AddOne();
         holdSymbols_[i]->AssignToEvent(event, modifiers);
     }
+}
+
+void XBaseInput::addEventToHoldSymbols(const InputEvent& event)
+{
+    if (!event.pSymbol) {
+        return;
+    }
+
+    if (event.pSymbol->state == InputState::PRESSED) {
+        event.pSymbol->state = InputState::DOWN;
+        holdSymbols_.push_back(event.pSymbol);
+    }
+    else if (event.pSymbol->state == InputState::RELEASED && !holdSymbols_.isEmpty()) {
+        clearHoldEvent(event.pSymbol);
+    }
+}
+
+void XBaseInput::clearHoldEvent(InputSymbol* pSymbol)
+{
+    // remove hold key
+    int32_t slot = std::numeric_limits<int32_t>::max();
+    int32_t last = safe_static_cast<int32_t>(holdSymbols_.size() - 1);
+
+    for (int32_t i = last; i >= 0; --i) {
+        if (holdSymbols_[i] == pSymbol) {
+            slot = i;
+            break;
+        }
+    }
+    if (slot != std::numeric_limits<int32_t>::max()) {
+        // swap last and found symbol
+        holdSymbols_[slot] = holdSymbols_[last];
+        // pop last ... which is now the one we want to get rid of
+        holdSymbols_.pop_back();
+    }
+}
+
+bool XBaseInput::postInputEvent(const InputEvent& event)
+{
+    if (event.keyId == KeyId::UNKNOWN) {
+        if (pCVars_->inputDebug_ > 1) {
+            X_WARNING("Input", "Ingoring unknown event key from device: %s", InputDeviceType::ToString(event.deviceType));
+        }
+        return false;
+    }
+
+    if (!sendEventToListeners(event)) {
+        return false;
+    }
+
+    addEventToHoldSymbols(event);
+    return true;
 }
 
 bool XBaseInput::sendEventToListeners(const InputEvent& event)
@@ -227,39 +263,5 @@ bool XBaseInput::sendEventToListeners(const InputEvent& event)
     return true;
 }
 
-void XBaseInput::addEventToHoldSymbols(const InputEvent& event)
-{
-    if (!event.pSymbol) {
-        return;
-    }
-
-    if (event.pSymbol->state == InputState::PRESSED) {
-        event.pSymbol->state = InputState::DOWN;
-        holdSymbols_.push_back(event.pSymbol);
-    }
-    else if (event.pSymbol->state == InputState::RELEASED && !holdSymbols_.isEmpty()) {
-        clearHoldEvent(event.pSymbol);
-    }
-}
-
-void XBaseInput::clearHoldEvent(InputSymbol* pSymbol)
-{
-    // remove hold key
-    int32_t slot = std::numeric_limits<int32_t>::max();
-    int32_t last = safe_static_cast<int32_t, size_t>(holdSymbols_.size() - 1);
-
-    for (int32_t i = last; i >= 0; --i) {
-        if (holdSymbols_[i] == pSymbol) {
-            slot = i;
-            break;
-        }
-    }
-    if (slot != std::numeric_limits<int32_t>::max()) {
-        // swap last and found symbol
-        holdSymbols_[slot] = holdSymbols_[last];
-        // pop last ... which is now the one we want to get rid of
-        holdSymbols_.pop_back();
-    }
-}
 
 X_NAMESPACE_END
