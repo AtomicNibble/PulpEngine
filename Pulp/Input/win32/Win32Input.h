@@ -13,6 +13,8 @@ struct ICore;
 X_NAMESPACE_BEGIN(input)
 
 class XInputDeviceWin32;
+class XKeyboard;
+class XMouse;
 
 class XWinInput : public XBaseInput
 {
@@ -57,8 +59,8 @@ private:
     BOOL isWow64_;
     HWND hWnd_;
 
-    XInputDeviceWin32* pKeyBoard_;
-    XInputDeviceWin32* pMouse_;
+    XKeyboard* pKeyBoard_;
+    XMouse* pMouse_;
 };
 
 X_NAMESPACE_END
