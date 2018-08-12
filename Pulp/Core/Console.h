@@ -155,61 +155,61 @@ public:
 public:
     XConsole();
 
-    virtual ~XConsole();
+    ~XConsole() X_FINAL;
 
-    virtual void registerVars(void) X_FINAL;
-    virtual void registerCmds(void) X_FINAL;
+    void registerVars(void) X_FINAL;
+    void registerCmds(void) X_FINAL;
 
     // called at start when not much else exists, just so subsystems can register vars
-    virtual bool init(ICore* pCore, bool basic) X_FINAL;
+    bool init(ICore* pCore, bool basic) X_FINAL;
     // finialize any async init tasks.
-    virtual bool asyncInitFinalize(void) X_FINAL;
+    bool asyncInitFinalize(void) X_FINAL;
     // for registering once other systems exsist.
-    virtual bool registerInputListener(void) X_FINAL;
-    virtual bool loadRenderResources(void) X_FINAL;
+    bool registerInputListener(void) X_FINAL;
+    bool loadRenderResources(void) X_FINAL;
 
-    virtual void shutDown(void) X_FINAL;
-    virtual void unregisterInputListener(void) X_FINAL;
-    virtual void freeRenderResources(void) X_FINAL;
-    virtual void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
+    void shutDown(void) X_FINAL;
+    void unregisterInputListener(void) X_FINAL;
+    void freeRenderResources(void) X_FINAL;
+    void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
-    virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
-    virtual void Job_runCmds(void) X_FINAL;
-    virtual void draw(core::FrameTimeData& time) X_FINAL;
+    void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
+    void Job_runCmds(void) X_FINAL;
+    void draw(core::FrameTimeData& time) X_FINAL;
 
-    virtual consoleState::Enum getVisState(void) const X_FINAL;
+    consoleState::Enum getVisState(void) const X_FINAL;
 
     // input callbacks
     virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;
 
-    virtual ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
-    virtual ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
-    virtual ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    virtual ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* Register(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
 
-    virtual ICVar* GetCVar(const char* pName) X_FINAL;
+    ICVar* GetCVar(const char* pName) X_FINAL;
 
-    virtual void UnregisterVariable(const char* pVarName) X_FINAL;
-    virtual void UnregisterVariable(ICVar* pVar) X_FINAL;
+    void UnregisterVariable(const char* pVarName) X_FINAL;
+    void UnregisterVariable(ICVar* pVar) X_FINAL;
 
-    virtual void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
-    virtual void UnRegisterCommand(const char* pName) X_FINAL;
+    void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
+    void UnRegisterCommand(const char* pName) X_FINAL;
 
-    virtual void Exec(const char* pCommand) X_FINAL;
+    void Exec(const char* pCommand) X_FINAL;
 
-    virtual bool LoadAndExecConfigFile(const char* pFileName) X_FINAL;
+    bool LoadAndExecConfigFile(const char* pFileName) X_FINAL;
 
     // ICoreEventListener
     void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
     // ~ICoreEventListener
 
-    virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
-    virtual int32_t getLineCount(void) const X_FINAL;
+    void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
+    int32_t getLineCount(void) const X_FINAL;
 
     X_INLINE void ShowConsole(consoleState::Enum state);
     X_INLINE bool isVisable(void) const;
