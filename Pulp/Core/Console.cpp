@@ -432,8 +432,6 @@ void XConsole::registerCmds(void)
 
 // ------------------------------------
 
-#if 1
-
 bool XConsole::init(ICore* pCore, bool basic)
 {
     X_LOG0("Console", "Starting console");
@@ -514,43 +512,6 @@ bool XConsole::loadRenderResources(void)
 }
 
 // --------------------
-
-#else
-
-void XConsole::startup(ICore* pCore, bool basic)
-{
-    X_ASSERT_NOT_NULL(pCore);
-    X_LOG0("Console", "Starting console");
-
-    pCore_ = pCore;
-
-    if (!basic) {
-        // add this as a logger.
-        pCore->GetILog()->AddLogger(&logger_);
-
-        LoadRenderResources();
-        RegisterInputListener();
-    }
-
-    RegisterVars();
-
-    if (!basic) {
-        coreEventListernRegd_ = pCore->GetCoreEventDispatcher()->RegisterListener(this);
-
-        // hot reload
-        pCore->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
-
-        if (console_save_history) {
-            LoadCmdHistory();
-        }
-    }
-    else {
-        // when in basic mode, don't save out.
-        console_save_history = 0;
-    }
-}
-
-#endif
 
 void XConsole::shutDown(void)
 {
