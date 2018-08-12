@@ -14,7 +14,8 @@ X_NAMESPACE_BEGIN(core)
 
 namespace
 {
-    const char* g_ClassName = X_ENGINE_NAME "Engine";
+    const wchar_t* g_ClassName = X_ENGINE_NAME_W L"Engine";
+
     bool g_ClassRegisterd = false;
 
     LRESULT CALLBACK PreWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
@@ -22,13 +23,11 @@ namespace
     void RegisterClass(void)
     {
         if (!g_ClassRegisterd) {
-            wchar_t classNameWide[128];
-            core::strUtil::Convert(g_ClassName, classNameWide);
 
             auto hInstance = GetModuleHandle(NULL);
             WNDCLASSEXW wcex;
 
-            if (GetClassInfoExW(hInstance, classNameWide, &wcex)) {
+            if (GetClassInfoExW(hInstance, g_ClassName, &wcex)) {
                 return;
             }
 
@@ -42,7 +41,7 @@ namespace
             wcex.hCursor = LoadCursor(NULL, IDC_ARROW);
             wcex.hbrBackground = 0;
             wcex.lpszMenuName = 0;
-            wcex.lpszClassName = classNameWide;
+            wcex.lpszClassName = g_ClassName;
             wcex.hIconSm = 0;
 
             if (RegisterClassExW(&wcex) == 0) {
@@ -332,12 +331,9 @@ bool xWindow::Create(const wchar_t* const Title, int x, int y, int width, int he
         height = safe_static_cast<int, LONG>(Rect.bottom - Rect.top);
     }
 
-    wchar_t wTxt[128] = {0};
-    core::strUtil::Convert(g_ClassName, wTxt);
-
     window_ = CreateWindowExW(
         0,
-        wTxt,
+        g_ClassName,
         Title,
         mode,
         x, y,
