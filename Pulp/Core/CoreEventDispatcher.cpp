@@ -13,8 +13,7 @@ XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArena
 
 XCoreEventDispatcher::~XCoreEventDispatcher()
 {
-    // the core listner is static and left.
-    X_ASSERT(listners_.size() <= 1, "Core listners are still registerd")(listners_.size());
+    X_ASSERT(listners_.isEmpty(), "Core listners are still registerd")(listners_.size());
 
     listners_.clear();
 }
