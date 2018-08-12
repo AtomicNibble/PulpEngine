@@ -15,7 +15,7 @@ XInputCVars::XInputCVars()
 
 XInputCVars::~XInputCVars()
 {
-    gEnv->pConsole->UnregisterVariable("input_debug");
+
 }
 
 void XInputCVars::registerVars(void)
