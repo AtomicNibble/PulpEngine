@@ -55,9 +55,6 @@ bool XCore::Update(void)
     X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
     using namespace core::V2;
 
-    assetLoader_.dispatchPendingLoads();
-    assetLoader_.update();
-
     auto width = vars_.getWinWidth();
     auto height = vars_.getWinHeight();
 
@@ -65,6 +62,9 @@ bool XCore::Update(void)
     frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
     frameData.view.viewport.set(width, height);
     frameData.view.viewport.setZ(0.f, 1.f);
+
+    assetLoader_.dispatchPendingLoads();
+    assetLoader_.update();
 
     // get time deltas for this frame.
     time_.OnFrameBegin(frameData.timeInfo);
@@ -89,14 +89,13 @@ bool XCore::Update(void)
         jobSys.OnFrameBegin(paused);
     }
 
+    // dispatch the core events.
+    pEventDispatcher_->pumpEvents();
 
     // get input events for this frame
     if (env_.pInput) {
         env_.pInput->update(frameData.input);
     }
-
-    // dispatch the core events.
-    pEventDispatcher_->pumpEvents();
 
     if (env_.pVideoSys) {
         env_.pVideoSys->update(frameData.timeInfo);
