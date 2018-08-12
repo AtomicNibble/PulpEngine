@@ -674,7 +674,7 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
     repeatEventTimer_ = repeatEventInitialDelay_;
 
     // process key binds when console is hidden
-    if (this->consoleState_ == consoleState::CLOSED) {
+    if (consoleState_ == consoleState::CLOSED) {
         const char* pCmdStr = 0;
 
         if (!event.modifiers.IsAnySet()) {
@@ -1845,7 +1845,7 @@ int32_t XConsole::MaxVisibleLogLines(void) const
 
 void XConsole::DrawBuffer(void)
 {
-    if (this->consoleState_ == consoleState::CLOSED) {
+    if (consoleState_ == consoleState::CLOSED) {
         return;
     }
 
