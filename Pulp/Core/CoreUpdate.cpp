@@ -97,7 +97,7 @@ bool XCore::Update(void)
         env_.pInput->update(frameData.input);
     }
 
-    if (env_.pInput) {
+    if (env_.pVideoSys) {
         env_.pVideoSys->update(frameData.timeInfo);
     }
 
