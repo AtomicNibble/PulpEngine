@@ -86,11 +86,7 @@ X_DECLARE_ENUM(CoreEvent)
     LEVEL_LOAD_START,
     LEVEL_LOAD_END,
     LEVEL_UNLOAD,
-    LEVEL_POST_UNLOAD,
-
-    SHUTDOWN,
-    TOGGLE_FULLSCREEN,
-    USER);
+    LEVEL_POST_UNLOAD);
 
 // Description:
 //	 Interface used for getting notified when a system event occurs.
