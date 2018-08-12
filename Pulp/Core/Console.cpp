@@ -638,43 +638,54 @@ void XConsole::freeRenderResources(void)
 
 bool XConsole::onInputEvent(const input::InputEvent& event)
 {
-    // NOT OPEN
-
-    if (event.action == input::InputState::RELEASED && isVisable()) {
-        repeatEvent_.keyId = input::KeyId::UNKNOWN;
+    if (event.action == input::InputState::CHAR) {
+        return HandleInputChar(event);
     }
 
-    if (event.action != input::InputState::PRESSED) {
-        // if open we eat all none mouse
-        if (event.deviceType == input::InputDeviceType::KEYBOARD) {
-            return isVisable();
-        }
+    return HandleInput(event);
+}
 
-        // eat mouse move?
-        // Stops the camera moving around when we have console open.
-        if (event.deviceType == input::InputDeviceType::MOUSE) {
-            if (event.keyId != input::KeyId::MOUSE_Z) {
-                if (console_disable_mouse == 1) // only if expanded
-                {
-                    return isExpanded();
-                }
-                if (console_disable_mouse == 2) {
-                    return isVisable();
-                }
+bool XConsole::HandleInput(const input::InputEvent& event)
+{
+    // open / close
+    const auto keyReleased = event.action == input::InputState::RELEASED;
 
-                return false;
+    if (keyReleased)
+    {
+        if (event.keyId == input::KeyId::OEM_8)
+        {
+            bool expand = event.modifiers.IsSet(input::ModifiersMasks::Shift);
+            bool visable = isVisable();
+
+            // clear states.
+            gEnv->pInput->clearKeyState();
+
+            if (expand) { // shift + ` dose not close anymore just expands.
+                ShowConsole(consoleState::EXPANDED);
             }
+            else {
+                ToggleConsole(); // toggle it.
+            }
+
+            // don't clear if already visable, as we are just expanding.
+            if (!visable) {
+                ClearInputBuffer();
+            }
+
+            return true;
         }
-        else {
+        else if (event.keyId == input::KeyId::ESCAPE && isVisable())
+        {
+            ClearInputBuffer();
+            ShowConsole(consoleState::CLOSED);
             return false;
         }
     }
 
-    repeatEvent_ = event;
-    repeatEventTimer_ = repeatEventInitialDelay_;
-
+#if 0
     // process key binds when console is hidden
-    if (consoleState_ == consoleState::CLOSED) {
+    if (consoleState_ == consoleState::CLOSED)
+    {
         const char* pCmdStr = 0;
 
         if (!event.modifiers.IsAnySet()) {
@@ -707,82 +718,105 @@ bool XConsole::onInputEvent(const input::InputEvent& event)
             return true;
         }
     }
-    else 
-    {
-        // OPEN
-        if (isExpanded()) // you can only scroll a expanded console.
-        {
-            if (event.keyId == input::KeyId::MOUSE_Z) {
-                int32_t scaled = static_cast<int32_t>(event.value);
-                bool positive = (scaled >= 0);
+#endif
 
-                scaled /= 20;
-
-                // enuse scaled didnt remove all scrolling
-                if (positive && scaled < 1) {
-                    scaled = 1;
-                }
-                else if (!positive && scaled > -1) {
-                    scaled = -1;
-                }
-
-                ScrollPos_ += scaled;
-
-                ValidateScrollPos();
-                return true;
-            }
-            else if (event.keyId == input::KeyId::PAGE_UP) {
-                PageUp();
-            }
-            else if (event.keyId == input::KeyId::PAGE_DOWN) {
-                PageDown();
-            }
-        }
-
-        if (event.keyId != input::KeyId::TAB) {
-            //	ResetAutoCompletion();
-        }
-
-        if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-            Paste();
-            return false;
-        }
-
-        if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-            Copy();
-            return false;
-        }
+    if (!isVisable()) {
+        return false;
     }
 
-    // open / Close console (fixed key)
-    if (event.keyId == input::KeyId::OEM_8) {
-        bool expand = event.modifiers.IsSet(input::ModifiersMasks::Shift);
-        bool visable = isVisable();
+    // -- OPEN --
+    if (keyReleased) {
+        repeatEvent_.keyId = input::KeyId::UNKNOWN;
+    }
 
-        // clear states.
-        gEnv->pInput->clearKeyState();
+    if (event.action != input::InputState::PRESSED) 
+    {
+        if (event.deviceType == input::InputDeviceType::KEYBOARD) {
+            return isVisable();
+        }
 
-        if (expand) { // shift + ` dose not close anymore just expands.
-            ShowConsole(consoleState::EXPANDED);
+        // eat mouse move?
+        // Stops the camera moving around when we have console open.
+        if (event.deviceType == input::InputDeviceType::MOUSE) {
+            if (event.keyId != input::KeyId::MOUSE_Z) {
+                if (console_disable_mouse == 1) // only if expanded
+                {
+                    return isExpanded();
+                }
+                if (console_disable_mouse == 2) {
+                    return isVisable();
+                }
+
+                return false;
+            }
         }
         else {
-            ToggleConsole(); // toggle it.
+            return false;
         }
-
-        if (!visable) { /// don't clear if already visable, as we are just expanding.
-            ClearInputBuffer();
-        }
-        return true;
     }
-    else if (event.keyId == input::KeyId::ESCAPE) {
-        if (isVisable()) {
-            ClearInputBuffer();
-            ShowConsole(consoleState::CLOSED);
+
+    if (event.action == input::InputState::PRESSED) {
+        repeatEvent_ = event;
+        repeatEventTimer_ = repeatEventInitialDelay_;
+    }
+
+    if (isExpanded()) // you can only scroll a expanded console.
+    {
+        if (event.keyId == input::KeyId::MOUSE_Z) {
+            int32_t scaled = static_cast<int32_t>(event.value);
+            bool positive = (scaled >= 0);
+
+            scaled /= 20;
+
+            // enuse scaled didnt remove all scrolling
+            if (positive && scaled < 1) {
+                scaled = 1;
+            }
+            else if (!positive && scaled > -1) {
+                scaled = -1;
+            }
+
+            ScrollPos_ += scaled;
+
+            ValidateScrollPos();
+            return true;
         }
+        else if (event.keyId == input::KeyId::PAGE_UP) {
+            PageUp();
+        }
+        else if (event.keyId == input::KeyId::PAGE_DOWN) {
+            PageDown();
+        }
+    }
+
+  
+    if (event.keyId != input::KeyId::TAB) {
+        //	ResetAutoCompletion();
+    }
+
+    if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+        Paste();
+        return false;
+    }
+
+    if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+        Copy();
         return false;
     }
 
     return ProcessInput(event);
+}
+
+bool XConsole::HandleInputChar(const input::InputEvent& event)
+{
+    if (!isVisable()) {
+        return false;
+    }
+
+    repeatEvent_ = event;
+
+    ProcessInput(event);
+    return true;
 }
 
 void XConsole::AddInputChar(const char c)
@@ -850,11 +884,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 {
     using namespace input;
 
-    if (!isVisable()) {
-        return false;
-    }
+    X_ASSERT(isVisable(), "ProcessInput called when not visible")(isVisable());
 
-    if (event.action == input::InputState::CHAR) {
+    // consume char input.
+    if (event.action == InputState::CHAR) {
         AddInputChar(event.inputchar);
         return true;
     }
@@ -870,7 +903,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
     }
     else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE) {
         // shift + DEL / BACK fully clears
-        if (event.modifiers.IsSet(input::ModifiersMasks::Shift)) {
+        if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
             ClearInputBuffer();
         }
         else {
@@ -883,7 +916,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
             CursorPos_--;
 
             // support moving whole words
-            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
                 while (CursorPos_ && InputBuffer_[CursorPos_] != ' ') {
                     CursorPos_--;
                 }
@@ -915,12 +948,12 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
     }
     else if (event.keyId == KeyId::RIGHT_ARROW) {
         // are we pre end ?
-        if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
+        if (CursorPos_ < safe_static_cast<int32_t>(InputBuffer_.length())) {
             CursorPos_++;
 
             // support moving whole words
-            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-                while (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())
+            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
+                while (CursorPos_ < safe_static_cast<int32_t>(InputBuffer_.length())
                        && InputBuffer_[CursorPos_] != ' ') {
                     CursorPos_++;
                 }
@@ -931,7 +964,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
             cursor_.draw = true;
 
             if (console_cursor_skip_color_codes) {
-                uint32_t charsLeft = (safe_static_cast<int32_t, size_t>(InputBuffer_.length()) - CursorPos_);
+                uint32_t charsLeft = (safe_static_cast<int32_t>(InputBuffer_.length()) - CursorPos_);
                 if (charsLeft >= 2) {
                     const char curChar = InputBuffer_[CursorPos_];
                     const char nextChar = InputBuffer_[CursorPos_ + 1];
@@ -950,7 +983,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
         CursorPos_ = 0;
     }
     else if (event.keyId == KeyId::END) {
-        CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.length());
+        CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.length());
     }
     else if (event.keyId == KeyId::UP_ARROW) {
         if (isAutocompleteVis() && autoCompleteIdx_ >= 0) {
@@ -965,7 +998,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
                 }
 
                 InputBuffer_ = HistoryLine;
-                CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.size());
+                CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.size());
             }
         }
         return true;
@@ -990,17 +1023,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
                 }
 
                 InputBuffer_ = HistoryLine;
-                CursorPos_ = safe_static_cast<int32_t, size_t>(InputBuffer_.size());
+                CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.size());
             }
         }
         return true;
-    }
-    else if (event.keyId == KeyId::ESCAPE) {
-        // don't think this is every reached.
-        // lets check..
-        X_ASSERT_UNREACHABLE();
-
-        // ClearInputBuffer();
     }
 
     return true;
@@ -1806,6 +1832,9 @@ void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
         repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
 
         if (repeatEventTimer_.GetValue() < 0) {
+
+            X_LOG0("Goat", "Event: %s", repeatEvent_.name.c_str());
+
             ProcessInput(repeatEvent_);
 
             repeatEventTimer_ = repeatEventInterval_;

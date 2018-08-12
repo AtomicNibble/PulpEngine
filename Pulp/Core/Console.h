@@ -234,6 +234,9 @@ private:
     void RemoveInputChar(bool bBackSpace);
     void ClearInputBuffer(void);
 
+    bool HandleInput(const input::InputEvent& event);
+    bool HandleInputChar(const input::InputEvent& event);
+
     bool ProcessInput(const input::InputEvent& event);
 
     void ExecuteInputBuffer(void);
