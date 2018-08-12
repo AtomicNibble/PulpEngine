@@ -101,6 +101,9 @@ public:
     X_INLINE PLATFORM_HWND GetNativeWindow(void);
     X_INLINE const PLATFORM_HWND GetNativeWindow(void) const;
 
+private:
+    friend static LRESULT WndProcProxy(xWindow* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+
     LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     void onSizing(WPARAM side, RECT* pRect);
 

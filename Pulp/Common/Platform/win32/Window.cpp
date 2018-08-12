@@ -12,6 +12,11 @@
 
 X_NAMESPACE_BEGIN(core)
 
+static X_INLINE LRESULT WndProcProxy(xWindow* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+{
+    return pWindow->WndProc(hWnd, msg, wParam, lParam);
+}
+
 namespace
 {
     const wchar_t* g_ClassName = X_ENGINE_NAME_W L"Engine";
@@ -80,11 +85,13 @@ namespace
     // The pre one waits untill we can get the class pointer.
     // Then switches to a lightweight winproc as each window is only created once.
     // and we no longer need to do checks for msgs.
+
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         LONG_PTR data = GetWindowLongPtr(hWnd, GWLP_USERDATA); // GetWindowLongPtr required for 64
+        auto* pClass = reinterpret_cast<xWindow*>(data);
 
-        return reinterpret_cast<xWindow*>(data)->WndProc(hWnd, msg, wParam, lParam);
+        return WndProcProxy(pClass, hWnd, msg, wParam, lParam);
     }
 
     LRESULT CALLBACK PreWndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
@@ -96,7 +103,7 @@ namespace
             SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pClass));
             SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc));
 
-            return pClass->WndProc(hWnd, msg, wParam, lParam);
+            return WndProcProxy(pClass, hWnd, msg, wParam, lParam);
         }
         return DefWindowProc(hWnd, msg, wParam, lParam);
     }
