@@ -94,7 +94,7 @@ bool XCore::Update(void)
 
     // we must call this on same thread as window.
     if (env_.pInput) {
-        env_.pInput->update(frameData);
+        env_.pInput->update(frameData.input);
     }
 
     if (env_.pInput) {

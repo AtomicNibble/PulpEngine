@@ -17,9 +17,9 @@ bool XNullInput::init(void)
     return true;
 }
 
-void XNullInput::update(core::FrameData& frameData)
+void XNullInput::update(core::FrameInput& inputFrame)
 {
-    X_UNUSED(frameData);
+    X_UNUSED(inputFrame);
 }
 
 void XNullInput::shutDown(void)

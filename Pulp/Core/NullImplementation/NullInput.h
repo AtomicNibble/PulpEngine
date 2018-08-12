@@ -18,7 +18,7 @@ public:
     virtual void release(void) X_OVERRIDE;
 
     virtual bool job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_OVERRIDE;
-    virtual void update(core::FrameData& frameData) X_OVERRIDE;
+    virtual void update(core::FrameInput& inputFrame) X_OVERRIDE;
     virtual void clearKeyState(void) X_OVERRIDE;
 };
 

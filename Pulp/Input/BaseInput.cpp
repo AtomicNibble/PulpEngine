@@ -76,10 +76,10 @@ bool XBaseInput::job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData
     return true;
 }
 
-void XBaseInput::update(core::FrameData& frameData)
+void XBaseInput::update(core::FrameInput& inputFrame)
 {
-    addClearEvents(frameData.input);
-    addHoldEvents(frameData.input);
+    addClearEvents(inputFrame);
+    addHoldEvents(inputFrame);
 }
 
 void XBaseInput::clearKeyState(void)

@@ -84,17 +84,17 @@ void XWinInput::release(void)
     X_DELETE(this, g_InputArena);
 }
 
-void XWinInput::update(core::FrameData& frameData)
+void XWinInput::update(core::FrameInput& inputFrame)
 {
     X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
 
-    frameData.input.cusorPos = core::xWindow::GetCusroPos();
+    inputFrame.cusorPos = core::xWindow::GetCusroPos();
     auto* pWindow = gEnv->pCore->GetGameWindow();
     if (pWindow) {
-        frameData.input.cusorPosClient = pWindow->GetCusroPosClient();
+        inputFrame.cusorPosClient = pWindow->GetCusroPosClient();
     }
 
-    addHoldEvents(frameData.input);
+    XBaseInput::update(inputFrame);
 
     RAWINPUT X_ALIGNED_SYMBOL(input[BUF_NUM], 8);
 
@@ -125,9 +125,7 @@ void XWinInput::update(core::FrameData& frameData)
             break;
         }
 
-        auto& inputData = frameData.input;
-
-        const size_t eventSpace = inputData.events.capacity() - inputData.events.size();
+        const size_t eventSpace = inputFrame.events.capacity() - inputFrame.events.size();
         if (eventSpace < num) {
             X_WARNING("Input", "Input frame buffer full ignoring %i events", num - eventSpace);
             num = eventSpace;
@@ -142,10 +140,10 @@ void XWinInput::update(core::FrameData& frameData)
             }
 
             if (rawInput->header.dwType == RIM_TYPEMOUSE) {
-                pMouse_->processInput(pData, inputData);
+                pMouse_->processInput(pData, inputFrame);
             }
             else if (rawInput->header.dwType == RIM_TYPEKEYBOARD) {
-                pKeyBoard_->processInput(pData, inputData);
+                pKeyBoard_->processInput(pData, inputFrame);
             }
 
             rawInput = NEXTRAWINPUTBLOCK(rawInput);

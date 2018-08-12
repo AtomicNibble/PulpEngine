@@ -48,7 +48,7 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
-    void update(core::FrameData& frameData) X_FINAL;
+    void update(core::FrameInput& inputFrame) X_FINAL;
 
     void clearKeyState(void) X_FINAL;
     // ~IInput

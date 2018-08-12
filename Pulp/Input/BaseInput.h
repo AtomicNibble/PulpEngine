@@ -42,7 +42,7 @@ public:
     void release(void) X_OVERRIDE;
 
     bool job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_OVERRIDE;
-    void update(core::FrameData& frameData) X_OVERRIDE;
+    void update(core::FrameInput& inputFrame) X_OVERRIDE;
     void clearKeyState(void) X_OVERRIDE;
 
     // ~IInput

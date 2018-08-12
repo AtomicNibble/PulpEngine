@@ -416,7 +416,7 @@ struct IInput
     virtual void release(void) X_ABSTRACT;
 
     virtual bool job_PostInputFrame(core::V2::JobSystem& jobSys, core::FrameData& frameData) X_ABSTRACT;
-    virtual void update(core::FrameData& frameData) X_ABSTRACT;
+    virtual void update(core::FrameInput& inputFrame) X_ABSTRACT;
     virtual void clearKeyState(void) X_ABSTRACT;
 };
 
