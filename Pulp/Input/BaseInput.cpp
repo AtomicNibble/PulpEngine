@@ -190,7 +190,7 @@ void XBaseInput::addEventToHoldSymbols(const InputEvent& event)
     }
 }
 
-void XBaseInput::clearHoldEvent(InputSymbol* pSymbol)
+void XBaseInput::clearHoldEvent(const InputSymbol* pSymbol)
 {
     // remove hold key
     int32_t slot = std::numeric_limits<int32_t>::max();

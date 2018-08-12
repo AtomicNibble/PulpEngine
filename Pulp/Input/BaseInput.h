@@ -67,7 +67,7 @@ protected:
 
 private:
     void addEventToHoldSymbols(const InputEvent& event);
-    void clearHoldEvent(InputSymbol* pSymbol);
+    void clearHoldEvent(const InputSymbol* pSymbol);
 
     bool postInputEvent(const InputEvent& event);
     bool sendEventToListeners(const InputEvent& event);
