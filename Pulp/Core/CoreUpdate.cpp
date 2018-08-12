@@ -89,21 +89,18 @@ bool XCore::Update(void)
         jobSys.OnFrameBegin(paused);
     }
 
-#if 1
 
-    // Core events like windows move or resize & focus will have been dispatched during PumpMessages
-    // so the happen at a defined time before a frame starts.
-
-    // we must call this on same thread as window.
+    // get input events for this frame
     if (env_.pInput) {
         env_.pInput->update(frameData.input);
     }
 
+    // dispatch the core events.
+    pEventDispatcher_->pumpEvents();
+
     if (env_.pVideoSys) {
         env_.pVideoSys->update(frameData.timeInfo);
     }
-
-    pEventDispatcher_->pumpEvents();
 
     // top job that we can use to wait for the chain of jobs to complete.
     Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
@@ -182,58 +179,6 @@ bool XCore::Update(void)
 
     int goat = 0;
     goat = 2;
-#endif
-
-#else
-
-    if (env_.pGame) {
-        env_.pGame->Update();
-    }
-
-    if (env_.p3DEngine)
-        env_.p3DEngine->Update();
-
-    if (env_.pInput) {
-        env_.pInput->Update(true);
-    }
-
-    if (env_.pConsole) {
-        // runs commands that have been deffered.
-        env_.pConsole->OnFrameBegin();
-    }
-
-    if (env_.pSound) {
-        // bum tis bum tis!
-        env_.pSound->Update();
-    }
-
-    if (env_.pScriptSys) {
-        env_.pScriptSys->Update();
-    }
-
-#if X_SUPER == 0 && 1
-    static core::TimeVal start = time_.GetAsyncTime();
-    core::TimeVal time = time_.GetAsyncTime();
-
-    float val = time.GetDifferenceInSeconds(start);
-    if (val >= 0.95f) {
-        start = time;
-
-        float fps = time_.GetFrameRate();
-        float frametime = time_.GetFrameTime();
-
-        core::StackString<128> title;
-        title.clear();
-        title.appendFmt(X_ENGINE_NAME " Engine " X_CPUSTRING " (fps:%" PRIi32 ", %ims) Time: %I64u(x%g) UI: %I64u",
-            static_cast<int>(fps),
-            static_cast<int>(frametime * 1000.f),
-            static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::GAME).GetMilliSeconds()),
-            time_.GetTimeScale(),
-            static_cast<__int64>(time_.GetFrameStartTime(core::ITimer::Timer::UI).GetMilliSeconds()));
-
-        pWindow_->SetTitle(title.c_str());
-    }
-#endif
 #endif
     return true;
 }
