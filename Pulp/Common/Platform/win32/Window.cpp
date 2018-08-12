@@ -59,28 +59,6 @@ namespace
         }
     }
 
-    void UnRegisterClass(void)
-    {
-        // I can't really safley unregister this.
-        // since if another dll in the process registeres it
-        // i can't know when it will unregister it.
-
-#if 0
-		if (g_ClassRegisterd)
-		{
-			g_ClassRegisterd = false;
-
-			wchar_t classNameWide[256] = { 0 };
-			core::strUtil::Convert(g_ClassName, classNameWide);
-
-			if (!UnregisterClassW(classNameWide, GetModuleHandle(NULL)))
-			{
-
-			}
-		}
-#endif
-    }
-
     // We have a pre and final winproc.
     // The pre one waits untill we can get the class pointer.
     // Then switches to a lightweight winproc as each window is only created once.
@@ -132,7 +110,6 @@ xWindow::xWindow() :
 xWindow::~xWindow(void)
 {
     Destroy();
-    UnRegisterClass();
     X_DELETE(pFrame_, gEnv->pArena);
 }
 
