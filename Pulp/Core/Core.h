@@ -126,12 +126,12 @@ public:
     IEngineFactoryRegistry* GetFactoryRegistry(void) const X_FINAL;
 
 public:
-    void RegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
-    void UnRegisterAssertHandler(IAssertHandler* errorHandler) X_FINAL;
+    void RegisterAssertHandler(IAssertHandler* pErrorHandler) X_FINAL;
+    void UnRegisterAssertHandler(IAssertHandler* pErrorHandler) X_FINAL;
     void OnAssert(const core::SourceInfo& sourceInfo) X_FINAL;
     void OnAssertVariable(const core::SourceInfo& sourceInfo) X_FINAL;
 
-    void OnFatalError(const char* format, va_list args) X_FINAL;
+    void OnFatalError(const char* pFormat, va_list args) X_FINAL;
 
 private:
     bool PumpMessages(void);
@@ -163,7 +163,7 @@ private:
     void registerVars(const CoreInitParams& initParams);
     void registerCmds(void);
 
-    void Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd);
+    void Command_ListProgramArgs(core::IConsoleCmdArgs* pCmd);
 
     void ListProgramArgs(void);
     void LogSystemInfo(void) const;
@@ -175,7 +175,7 @@ private:
 private:
     // IDirectoryWatcherListener
     bool OnFileChange(core::IDirectoryWatcher::Action::Enum action,
-        const char* name, const char* oldName, bool isDirectory) X_OVERRIDE;
+        const char* pName, const char* pOldName, bool isDirectory) X_OVERRIDE;
     // ~IDirectoryWatcherListener
 
     // ICoreEventListener

@@ -92,7 +92,7 @@ core::Module::Handle XCore::LoadDLL(const char* pDllName)
 
     core::Module::Handle handle = core::Module::Load(pDllName);
     if (!handle) {
-        return 0;
+        return nullptr;
     }
 
     ModuleLinkfunc::Pointer pfnModuleInitICore = reinterpret_cast<ModuleLinkfunc::Pointer>(
@@ -230,11 +230,11 @@ bool XCore::FreeConverterModule(IConverterModule* pConvertModule)
     return false;
 }
 
-bool XCore::IntializeEngineModule(const char* dllName, const char* moduleClassName, const CoreInitParams& initParams)
+bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const CoreInitParams& initParams)
 {
     X_PROFILE_NO_HISTORY_BEGIN("ModuleInit", core::profiler::SubSys::CORE);
 
-    core::Path<char> path(dllName);
+    core::Path<char> path(pDllName);
     path.setExtension(".dll");
 
     core::StopWatch time;
@@ -259,28 +259,28 @@ bool XCore::IntializeEngineModule(const char* dllName, const char* moduleClassNa
     bool res = false;
 
     std::shared_ptr<IEngineModule> pModule;
-    if (EngineCreateClassInstance(moduleClassName, pModule)) {
+    if (EngineCreateClassInstance(pModuleClassName, pModule)) {
         res = pModule->Initialize(env_, initParams);
     }
     else {
-        X_ERROR("Core", "failed to find interface: %s -> %s", dllName, moduleClassName);
+        X_ERROR("Core", "failed to find interface: %s -> %s", pDllName, pModuleClassName);
         return false;
     }
 
     moduleInterfaces_.append(pModule);
 
-    const char* pName = core::strUtil::Find(dllName, dllName + strlen(dllName), "_");
+    const char* pName = core::strUtil::Find(pDllName, pDllName + core::strUtil::strlen(pDllName), "_");
     X_UNUSED(pName);
 
 #if !defined(X_LIB)
     core::GetProcessMemInfo(memEnd);
     int64 memUsed = static_cast<int64_t>(memEnd.WorkingSetSize) - static_cast<int64_t>(memStart.WorkingSetSize);
     core::HumanSize::Str sizeStr;
-    X_LOG0("Engine", "ModuleInit \"%s\", MemUsage=%s ^6%gms", pName ? (pName + 1) : dllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
+    X_LOG0("Engine", "ModuleInit \"%s\", MemUsage=%s ^6%gms", pName ? (pName + 1) : pDllName, core::HumanSize::toString(sizeStr, memUsed), time.GetMilliSeconds());
 #else
 
 #if X_SUPER == 0
-    X_LOG0("Engine", "ModuleInit \"%s\": %s ^6%gms", pName ? (pName + 1) : dllName, res ? "OK" : "Fail", time.GetMilliSeconds());
+    X_LOG0("Engine", "ModuleInit \"%s\": %s ^6%gms", pName ? (pName + 1) : pDllName, res ? "OK" : "Fail", time.GetMilliSeconds());
 #endif // !X_SUPER
 
 #endif // #if !defined(X_LIB)
@@ -1035,16 +1035,16 @@ void XCore::registerCmds(void)
 
 // ->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->->
 
-void XCore::RegisterAssertHandler(IAssertHandler* errorHandler)
+void XCore::RegisterAssertHandler(IAssertHandler* pErrorHandler)
 {
-    X_ASSERT(!env_.isRunning(), "Assert handlers must be registerd at statup")(env_.isRunning(), errorHandler);
+    X_ASSERT(!env_.isRunning(), "Assert handlers must be registerd at statup")(env_.isRunning(), pErrorHandler);
 
-    assertHandlers_.push_back(errorHandler);
+    assertHandlers_.push_back(pErrorHandler);
 }
 
-void XCore::UnRegisterAssertHandler(IAssertHandler* errorHandler)
+void XCore::UnRegisterAssertHandler(IAssertHandler* pErrorHandler)
 {
-    assertHandlers_.remove(errorHandler);
+    assertHandlers_.remove(pErrorHandler);
 }
 
 void XCore::OnAssert(const core::SourceInfo& sourceInfo)

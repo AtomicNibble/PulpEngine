@@ -448,7 +448,7 @@ const wchar_t* XCore::GetCommandLineArgForVarW(const wchar_t* pVarName)
     return nullptr;
 }
 
-void XCore::OnFatalError(const char* format, va_list args)
+void XCore::OnFatalError(const char* pFormat, va_list args)
 {
     core::CallStack::Description Dsc;
     core::CallStack stack(1);
@@ -458,7 +458,7 @@ void XCore::OnFatalError(const char* format, va_list args)
     X_LOG0("FatalError", "CallStack:\n%s", Dsc);
 
     core::LoggerBase::Line Line;
-    vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, format, args);
+    vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, pFormat, args);
 
     core::msgbox::show(Line,
         X_ENGINE_NAME " Fatal Error",
@@ -497,9 +497,9 @@ void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
     }
 }
 
-void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* Cmd)
+void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* pCmd)
 {
-    X_UNUSED(Cmd);
+    X_UNUSED(pCmd);
 
     ListProgramArgs();
 }
