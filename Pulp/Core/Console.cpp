@@ -1206,25 +1206,25 @@ void XConsole::AddCmdToHistory(const string& command)
 }
 
 // Binds a cmd to a key
-void XConsole::AddBind(const char* key, const char* cmd)
+void XConsole::AddBind(const char* pKey, const char* pCmd)
 {
     // check for override ?
-    const char* Old = FindBind(key);
+    const char* Old = FindBind(pKey);
 
     if (Old) {
-        if (core::strUtil::IsEqual(Old, cmd)) {
+        if (core::strUtil::IsEqual(Old, pCmd)) {
             // bind is same.
             return;
         }
         if (console_debug) {
-            X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", key, Old, cmd);
+            X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, Old, pCmd);
         }
 
-        auto it = Binds_.find(X_CONST_STRING(key));
-        it->second = cmd;
+        auto it = Binds_.find(X_CONST_STRING(pKey));
+        it->second = pCmd;
     }
 
-    Binds_.insert(ConsoleBindMap::value_type(core::string(key), core::string(cmd)));
+    Binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
 }
 
 // returns the command for a given key

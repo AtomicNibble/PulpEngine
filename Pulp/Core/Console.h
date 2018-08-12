@@ -252,11 +252,11 @@ private:
     const char* GetHistory(CmdHistory::Enum direction);
 
     // Binds a cmd to a key
-    void AddBind(const char* key, const char* cmd);
+    void AddBind(const char* pKey, const char* pCmd);
 
     // returns the command for a given key
     // returns null if no bind found
-    const char* FindBind(const char* key);
+    const char* FindBind(const char* pKey);
 
     // removes all the binds.
     void ClearAllBinds(void);
