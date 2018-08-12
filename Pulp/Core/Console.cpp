@@ -678,7 +678,7 @@ bool XConsole::HandleInput(const input::InputEvent& event)
         {
             ClearInputBuffer();
             ShowConsole(consoleState::CLOSED);
-            return false;
+            return true;
         }
     }
 
