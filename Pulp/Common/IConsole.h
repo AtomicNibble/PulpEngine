@@ -87,11 +87,9 @@ struct IConsole
     virtual bool init(ICore* pCore, bool basic) X_ABSTRACT;
     // finialize any async init tasks.
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
-    virtual bool registerInputListener(void) X_ABSTRACT;
     virtual bool loadRenderResources(void) X_ABSTRACT;
 
     virtual void shutDown(void) X_ABSTRACT;
-    virtual void unregisterInputListener(void) X_ABSTRACT;
     virtual void freeRenderResources(void) X_ABSTRACT;
     virtual void saveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 

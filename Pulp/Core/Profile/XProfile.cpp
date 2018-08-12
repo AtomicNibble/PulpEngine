@@ -155,7 +155,6 @@ namespace profiler
         X_LOG0("ProfileSys", "Starting");
 
         eventListerReg_ = pCore->GetCoreEventDispatcher()->RegisterListener(this);
-//        pCore->GetIInput()->AddEventListener(this);
 
         ProfileTimer::CalculateCPUSpeed();
 
@@ -235,9 +234,6 @@ namespace profiler
 
         if (eventListerReg_) {
             pCore->GetCoreEventDispatcher()->RemoveListener(this);
-        }
-        if (pCore->GetIInput()) {
-    //        pCore->GetIInput()->RemoveEventListener(this);
         }
     }
 

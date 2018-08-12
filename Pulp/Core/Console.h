@@ -103,7 +103,6 @@ X_DECLARE_FLAGS(ExecSource)
     SYSTEM);
 
 class XConsole : public IConsole
-    , public input::IInputEventListner
     , public ICoreEventListener
 {
     struct ExecCommand
@@ -164,12 +163,9 @@ public:
     bool init(ICore* pCore, bool basic) X_FINAL;
     // finialize any async init tasks.
     bool asyncInitFinalize(void) X_FINAL;
-    // for registering once other systems exsist.
-    bool registerInputListener(void) X_FINAL;
     bool loadRenderResources(void) X_FINAL;
 
     void shutDown(void) X_FINAL;
-    void unregisterInputListener(void) X_FINAL;
     void freeRenderResources(void) X_FINAL;
     void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
@@ -180,7 +176,7 @@ public:
     consoleState::Enum getVisState(void) const X_FINAL;
 
     // input callbacks
-    virtual bool OnInputEvent(const input::InputEvent& event) X_FINAL;
+    bool OnInputEvent(const input::InputEvent& event);
 
     ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
     ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
@@ -338,7 +334,6 @@ private:
     font::IFont* pFont_;
     render::IRender* pRender_;
     engine::IPrimativeContext* pPrimContext_;
-    input::IInput* pInput_;
 
     Cursor cursor_;
 

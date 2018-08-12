@@ -31,21 +31,12 @@ bool XConsoleNULL::asyncInitFinalize(void)
     return true;
 }
 
-bool XConsoleNULL::registerInputListener(void)
-{
-    return true;
-}
-
 bool XConsoleNULL::loadRenderResources(void)
 {
     return true;
 }
 
 void XConsoleNULL::shutDown(void)
-{
-}
-
-void XConsoleNULL::unregisterInputListener(void)
 {
 }
 

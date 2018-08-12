@@ -27,7 +27,6 @@ namespace profiler
 {
     class XProfileSys : public IProfiler
         , public ICoreEventListener
-        , public input::IInputEventListner
     {
         struct SubSystemInfo
         {
@@ -74,6 +73,7 @@ namespace profiler
 
         void OnFrameBegin(const FrameTimeData& frameTimeInfo);
         void OnFrameEnd(void);
+        bool OnInputEvent(const input::InputEvent& event);
 
         void Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
 
@@ -82,9 +82,6 @@ namespace profiler
     private:
         // ICoreEventListener
         void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
-
-        // IInputEventListner
-        bool OnInputEvent(const input::InputEvent& event) X_FINAL;
 
     private:
         void UpdateProfileData(void);

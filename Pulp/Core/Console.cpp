@@ -339,7 +339,6 @@ XConsole::XConsole() :
     pFont_ = nullptr;
     pRender_ = nullptr;
     pPrimContext_ = nullptr;
-    pInput_ = nullptr;
 
     // Auto goat a boat.
     autoCompleteNum_ = 0;
@@ -482,19 +481,6 @@ bool XConsole::asyncInitFinalize(void)
     return true;
 }
 
-bool XConsole::registerInputListener(void)
-{
-    X_ASSERT_NOT_NULL(pCore_);
-
-    pInput_ = pCore_->GetIInput();
-
-    X_ASSERT_NOT_NULL(pInput_);
-
-    // we want input events plooxx.
-//    pInput_->AddConsoleEventListener(this);
-    return true;
-}
-
 bool XConsole::loadRenderResources(void)
 {
     X_ASSERT_NOT_NULL(pCore_);
@@ -525,8 +511,6 @@ void XConsole::shutDown(void)
     //    pCore_->GetHotReloadMan()->addfileType(nullptr, CONFIG_FILE_EXTENSION);
         pCore_->GetILog()->RemoveLogger(&logger_);
     }
-
-    unregisterInputListener();
 
     // clear up vars.
     if (!VarMap_.empty()) {
@@ -644,14 +628,6 @@ void XConsole::saveChangedVars(void)
     }
     else {
         X_ERROR("Console", "Failed to open file for saving modifed vars");
-    }
-}
-
-void XConsole::unregisterInputListener(void)
-{
-    pInput_ = gEnv->pInput;
-    if (pInput_) {
-    //    pInput_->RemoveConsoleEventListener(this);
     }
 }
 
@@ -783,7 +759,7 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
         bool visable = isVisable();
 
         // clear states.
-        pInput_->clearKeyState();
+        gEnv->pInput->clearKeyState();
 
         if (expand) { // shift + ` dose not close anymore just expands.
             ShowConsole(consoleState::EXPANDED);

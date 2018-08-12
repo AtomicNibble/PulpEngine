@@ -450,11 +450,6 @@ bool XCore::Init(const CoreInitParams& startupParams)
             return false;
         }
 
-        // now we can register the console input listner
-        if (!env_.pConsole->registerInputListener()) {
-            return false;
-        }
-
         // #------------------------- Font -------------------------
         if (!InitFont(startupParams)) {
             return false;

@@ -10,9 +10,6 @@ X_NAMESPACE_BEGIN(core)
 class XConsoleNULL : public IConsole
 {
 public:
-    static const size_t MAX_HISTORY_ENTRIES = 50;
-
-public:
     XConsoleNULL();
 
     virtual ~XConsoleNULL() X_FINAL;
@@ -24,12 +21,9 @@ public:
     virtual bool init(ICore* pCore, bool basic) X_FINAL;
     // finialize any async init tasks.
     virtual bool asyncInitFinalize(void) X_FINAL;
-    // for registering once other systems exsist.
-    virtual bool registerInputListener(void) X_FINAL;
     virtual bool loadRenderResources(void) X_FINAL;
 
     virtual void shutDown(void) X_FINAL;
-    virtual void unregisterInputListener(void) X_FINAL;
     virtual void freeRenderResources(void) X_FINAL;
     virtual void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
 

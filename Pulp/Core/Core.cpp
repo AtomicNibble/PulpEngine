@@ -265,11 +265,6 @@ void XCore::ShutDown()
         core::Mem::DeleteAndNull(env_.pFileSys, g_coreArena);
     }
 
-    // free any listners here.
-    if (env_.pConsole) {
-        env_.pConsole->unregisterInputListener();
-    }
-
     // needs to be done after engine, since it has input listners.
     if (env_.pInput) {
         env_.pInput->shutDown();
