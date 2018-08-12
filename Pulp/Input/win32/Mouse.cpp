@@ -39,7 +39,7 @@ bool XMouse::init(XBaseInput& input)
     // Load the user setting.
     UINT LinesToScroll;
     if (SystemParametersInfo(SPI_GETWHEELSCROLLLINES, 0, &LinesToScroll, 0)) {
-        ADD_CVAR_REF("mouse_scroll_linenum", vars_.scrollLines_, LinesToScroll, 0, 1920,
+        ADD_CVAR_REF("mouse_scroll_linenum", vars_.scrollLines_, LinesToScroll, 1, 1920,
             core::VarFlag::SYSTEM, "The number of lines to scroll at a time");
     }
     else {
