@@ -774,8 +774,10 @@ bool XConsole::OnInputEvent(const input::InputEvent& event)
         return true;
     }
     else if (event.keyId == input::KeyId::ESCAPE) {
-        ClearInputBuffer();
-        ShowConsole(consoleState::CLOSED);
+        if (isVisable()) {
+            ClearInputBuffer();
+            ShowConsole(consoleState::CLOSED);
+        }
         return false;
     }
 
