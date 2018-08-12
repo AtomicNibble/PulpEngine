@@ -28,10 +28,11 @@ namespace gui
     {
         virtual ~IMenuHandler() = default;
 
-        virtual bool open(const char* pName) X_ABSTRACT;
-
         virtual bool isActive(void) const X_ABSTRACT;
         virtual void update(core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
+
+        virtual bool openMenu(const char* pName) X_ABSTRACT;
+        virtual void back(void) X_ABSTRACT;
     };
 
     struct IMenuManager

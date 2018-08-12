@@ -27,13 +27,12 @@ namespace gui
 
         void init(engine::Material* pCursor);
 
-        bool open(const char* pName) X_FINAL;
         bool isActive(void) const X_FINAL;
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
 
-        void openMenu(const char* pName);
+        bool openMenu(const char* pName) X_FINAL;
         void closeMenu(void);
-        void back(void);
+        void back(void) X_FINAL;
 
     private:
         GuiContex& ctx_;

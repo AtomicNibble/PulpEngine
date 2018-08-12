@@ -23,20 +23,7 @@ namespace gui
     {
         ctx_.init(pCursor);
 
-        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu("pause"));
-
-        stack_.push(pMenu);
-    }
-
-    bool MenuHandler::open(const char* pName)
-    {
-        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
-        if (!pMenu) {
-            return false;
-        }
-
-        stack_.push(pMenu);
-        return true;
+        openMenu("pause");
     }
 
     bool MenuHandler::isActive(void) const
@@ -72,13 +59,15 @@ namespace gui
         ctx_.end();
     }
 
-    void MenuHandler::openMenu(const char* pName)
+    bool MenuHandler::openMenu(const char* pName)
     {
-        X_UNUSED(pName);
-
         auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
-       
+        if (!pMenu) {
+            return false;
+        }
+
         stack_.push(pMenu);
+        return true;
     }
 
     void MenuHandler::closeMenu(void)

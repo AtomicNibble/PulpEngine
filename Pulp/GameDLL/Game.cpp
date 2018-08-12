@@ -166,7 +166,11 @@ bool XGame::onInputEvent(const input::InputEvent& event)
             auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
             if (!pMenuHandler->isActive())
             {
-                pMenuHandler->open("pause");
+                pMenuHandler->openMenu("pause");
+            }
+            else
+            {
+                pMenuHandler->back();
             }
         }
     }
