@@ -167,12 +167,19 @@ bool XGame::onInputEvent(const input::InputEvent& event)
             if (!pMenuHandler->isActive())
             {
                 pMenuHandler->openMenu("pause");
+                return true;
             }
             else
             {
-                pMenuHandler->back();
+                if (pMenuHandler->back()) {
+                    return true;
+                }
             }
         }
+    }
+
+    if (userCmdGen_.onInputEvent(event)) {
+        return true;
     }
 
 

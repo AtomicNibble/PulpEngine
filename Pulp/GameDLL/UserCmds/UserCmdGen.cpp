@@ -33,6 +33,22 @@ void UserCmdGen::clearAngles(void)
     viewAngles_ = Vec3f::zero();
 }
 
+bool UserCmdGen::onInputEvent(const input::InputEvent& event)
+{
+    if (event.action == input::InputState::CHAR) {
+        return false;
+    }
+
+    if (inputEvents_.size() == inputEvents_.capacity()) {
+        X_WARNING("UserCmd", "Input event overflow");
+        return false;
+    }
+
+    inputEvents_.emplace_back(event);
+    return false;
+}
+
+
 void UserCmdGen::buildUserCmd(bool block)
 {
     resetCmd();
@@ -259,21 +275,6 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
 int32_t UserCmdGen::buttonState(UserButton::Enum but) const
 {
     return buttonStates_[but];
-}
-
-bool UserCmdGen::OnInputEvent(const input::InputEvent& event)
-{
-    if (event.action == input::InputState::CHAR) {
-        return false;
-    }
-
-    if(inputEvents_.size() == inputEvents_.capacity()) {
-        X_WARNING("UserCmd", "Input event overflow");
-        return false;
-    }
-
-    inputEvents_.emplace_back(event);
-    return false;
 }
 
 void UserCmdGen::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)

@@ -36,16 +36,18 @@ X_DECLARE_ENUM(UserButton)
     WEAP_PREV
 );
 
-class UserCmdGen : public input::IInputEventListner, public ICoreEventListener
+class UserCmdGen : public ICoreEventListener
 {
 public:
     UserCmdGen();
 
     bool init(void);
     void shutdown(void);
+
     void clear(void);
     void clearAngles(void);
 
+    bool onInputEvent(const input::InputEvent& event);
     void buildUserCmd(bool block);
 
     net::UserCmd& getCurrentUsercmd(void);
@@ -58,9 +60,6 @@ private:
     void setButtonFlags(void);
     void processInput(void);
 
-    // IInputEventListner
-    bool OnInputEvent(const input::InputEvent& event) X_FINAL;
-    // ~IInputEventListner
 
     void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_FINAL;
 
