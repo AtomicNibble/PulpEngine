@@ -32,7 +32,7 @@ namespace gui
         virtual void update(core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
 
         virtual bool openMenu(const char* pName) X_ABSTRACT;
-        virtual void back(void) X_ABSTRACT;
+        virtual bool back(void) X_ABSTRACT;
     };
 
     struct IMenuManager

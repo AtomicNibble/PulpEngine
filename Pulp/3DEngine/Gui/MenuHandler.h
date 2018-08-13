@@ -32,7 +32,7 @@ namespace gui
 
         bool openMenu(const char* pName) X_FINAL;
         void closeMenu(void);
-        void back(void) X_FINAL;
+        bool back(void) X_FINAL;
 
     private:
         GuiContex& ctx_;

@@ -75,11 +75,14 @@ namespace gui
         stack_.clear();
     }
 
-    void MenuHandler::back(void)
+    bool MenuHandler::back(void)
     {
-        if (!stack_.isEmpty()) {
-            stack_.pop();
+        if (stack_.isEmpty()) {
+            return false;
         }
+
+        stack_.pop();
+        return true;
     }
 
 
