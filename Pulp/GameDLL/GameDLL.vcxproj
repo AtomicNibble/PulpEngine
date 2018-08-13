@@ -413,7 +413,7 @@
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UserCmds\UserCmdMan.h" />
-    <ClInclude Include="UserCmds\UserCmds.h" />
+    <ClInclude Include="UserCmds\UserCmdGen.h" />
     <ClInclude Include="Vars\GameVars.h" />
     <ClInclude Include="Vars\PlayerVars.h" />
     <ClInclude Include="Weapon\WeaponDef.h" />
@@ -446,7 +446,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="UserCmds\UserCmdMan.cpp" />
-    <ClCompile Include="UserCmds\UserCmds.cpp" />
+    <ClCompile Include="UserCmds\UserCmdGen.cpp" />
     <ClCompile Include="Vars\GameVars.cpp" />
     <ClCompile Include="Vars\PlayerVars.cpp" />
     <ClCompile Include="Weapon\WeaponDef.cpp" />

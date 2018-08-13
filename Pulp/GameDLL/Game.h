@@ -10,7 +10,7 @@
 #include "Level\Level.h"
 #include "Vars\GameVars.h"
 
-#include "UserCmds\UserCmds.h"
+#include "UserCmds\UserCmdGen.h"
 #include "UserCmds\UserCmdMan.h"
 
 #include "Weapon\WeaponManager.h"

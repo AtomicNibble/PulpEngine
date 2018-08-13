@@ -34,9 +34,6 @@
     <Filter Include="Header Files\Level">
       <UniqueIdentifier>{1bb2fc81-7c7f-49c2-affd-f303a0cff40b}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Level">
-      <UniqueIdentifier>{472eaa32-2158-4064-8e80-4ad49b57ce6f}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\UserCmds">
       <UniqueIdentifier>{dfd0fcff-e228-4d3c-be79-a32a97852f6b}</UniqueIdentifier>
     </Filter>
@@ -54,6 +51,9 @@
     </Filter>
     <Filter Include="Source Files\Entity\Systems">
       <UniqueIdentifier>{8d6a7a9d-dffa-4382-ac13-13c5400fa6bf}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Level">
+      <UniqueIdentifier>{472eaa32-2158-4064-8e80-4ad49b57ce6f}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -80,9 +80,6 @@
     </ClInclude>
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
-    </ClInclude>
-    <ClInclude Include="UserCmds\UserCmds.h">
-      <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
     <ClInclude Include="UserCmds\UserCmdMan.h">
       <Filter>Header Files\UserCmds</Filter>
@@ -120,6 +117,9 @@
     <ClInclude Include="Enity\NetworkSys.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="UserCmds\UserCmdGen.h">
+      <Filter>Header Files\UserCmds</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -139,9 +139,6 @@
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Source Files\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="UserCmds\UserCmds.cpp">
-      <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
     <ClCompile Include="UserCmds\UserCmdMan.cpp">
       <Filter>Source Files\UserCmds</Filter>
@@ -181,6 +178,9 @@
     </ClCompile>
     <ClCompile Include="Enity\EnityComponents.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCmds\UserCmdGen.cpp">
+      <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

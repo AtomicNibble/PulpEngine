@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "UserCmds.h"
+#include "UserCmdGen.h"
 
 X_NAMESPACE_BEGIN(game)
 
