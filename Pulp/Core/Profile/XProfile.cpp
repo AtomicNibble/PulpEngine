@@ -360,7 +360,6 @@ namespace profiler
         }
     }
 
-    // IInputEventListner
     bool XProfileSys::onInputEvent(const input::InputEvent& event)
     {
         if (!vars_.getProlfilerDrawFlags()) {
@@ -410,8 +409,6 @@ namespace profiler
         return true;
 #endif // !X_ENABLE_JOBSYS_PROFILER
     }
-
-    // ~IInputEventListner
 
     void XProfileSys::UpdateProfileData(void)
     {
