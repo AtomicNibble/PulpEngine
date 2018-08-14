@@ -39,9 +39,6 @@ namespace gui
     {
         virtual ~IMenuManager() = default;
 
-        virtual bool init(void) X_ABSTRACT;
-        virtual void shutdown(void) X_ABSTRACT;
-
         virtual IMenuHandler* getMenuHandler(void) X_ABSTRACT;
         virtual IMenu* loadMenu(const char* pName) X_ABSTRACT;
         virtual IMenu* findMenu(const char* pName) X_ABSTRACT;

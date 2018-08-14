@@ -30,10 +30,11 @@ namespace gui
         XMenuManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan);
         ~XMenuManager() X_FINAL;
 
-        //IMenuManager
-        bool init(void) X_FINAL;
-        void shutdown(void) X_FINAL;
 
+        bool init(void);
+        void shutdown(void);
+
+        //IMenuManager
         IMenuHandler* getMenuHandler(void) X_FINAL;
         IMenu* loadMenu(const char* pName) X_FINAL;
         IMenu* findMenu(const char* pName) X_FINAL;
