@@ -9,6 +9,54 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    namespace 
+    {
+
+        Color8u parseColor(script::IFunctionHandler* pH, int32_t paramIdx)
+        {
+            Vec4i v;
+
+            auto type = pH->getParamType(paramIdx);
+            if (type == script::Type::Table)
+            {
+                script::ScriptValue any;
+                pH->getParamAny(paramIdx, any);
+
+                X_ASSERT(any.getType() == script::Type::Table, "Should be table")(any.getType());
+
+                any.pTable_->getValue("r", v.x);
+                any.pTable_->getValue("g", v.y);
+                any.pTable_->getValue("b", v.z);
+                any.pTable_->getValue("a", v.w);
+            }
+            if (type == script::Type::Number)
+            {
+               // support ints?
+                auto type1 = pH->getParamType(paramIdx + 1);
+                auto type2 = pH->getParamType(paramIdx + 2);
+                auto type3 = pH->getParamType(paramIdx + 3);
+
+                if (type1 != script::Type::Number || type2 != script::Type::Number || type3 != script::Type::Number) {
+                    X_ERROR("Script", "Invalid color param");
+                    return Col_White;
+                }
+
+                pH->getParam(paramIdx, v.x);
+                pH->getParam(paramIdx + 1, v.y);
+                pH->getParam(paramIdx + 2, v.z);
+                pH->getParam(paramIdx + 3, v.w);
+            }
+
+            Color8u col;
+            col.r = static_cast<uint8_t>(v.x);
+            col.g = static_cast<uint8_t>(v.y);
+            col.b = static_cast<uint8_t>(v.z);
+            col.a = static_cast<uint8_t>(v.w);
+            return col;
+        }
+
+    } // namespace
+
 
     ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx, MenuHandler& menuHandler) :
         IScriptBindsBase(pSS),
@@ -32,6 +80,7 @@ namespace gui
         X_SCRIPT_BIND(ScriptBinds_Menu, close);
         X_SCRIPT_BIND(ScriptBinds_Menu, back);
 
+        X_SCRIPT_BIND(ScriptBinds_Menu, text);
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
 
@@ -47,42 +96,7 @@ namespace gui
     {
         SCRIPT_CHECK_PARAMETERS_MIN(1);
 
-        Color8u col;
-        Vec4i v;
-
-        auto type = pH->getParamType(1);
-        if (type == script::Type::Table)
-        {
-            script::ScriptValue any;
-            pH->getParamAny(1, any);
-
-            X_ASSERT(any.getType() == script::Type::Table, "Should be table")(any.getType());
-
-            any.pTable_->getValue(1, v.x);
-            any.pTable_->getValue(2, v.y);
-            any.pTable_->getValue(3, v.z);
-            any.pTable_->getValue(4, v.w);
-        }
-        else
-        {
-            // should have 4 ints,
-            pH->getParam(v.x, v.y, v.z);
-
-            if (pH->getParamCount() > 3)
-            {
-                pH->getParam(4, v.w);
-            }
-            else
-            {
-                v.w = 255;
-            }
-        }
-
-        col.r = static_cast<uint8_t>(v.x);
-        col.g = static_cast<uint8_t>(v.y);
-        col.b = static_cast<uint8_t>(v.z);
-        col.a = static_cast<uint8_t>(v.w);
-
+        auto col = parseColor(pH, 1);
         ctx_.fill(col);
 
         return pH->endFunction();
