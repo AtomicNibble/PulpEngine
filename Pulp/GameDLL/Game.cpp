@@ -160,19 +160,25 @@ bool XGame::onInputEvent(const input::InputEvent& event)
 {
     // okay!
     // so we decide where to send the input here.
-    if (event.action == input::InputState::RELEASED) {
-        if (event.keyId == input::KeyId::ESCAPE) {
+    auto status = pSession_->getStatus();
 
-            auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
-            if (!pMenuHandler->isActive())
+    if (status == net::SessionStatus::InGame)
+    {
+        if (event.action == input::InputState::RELEASED)
+        {
+            if (event.keyId == input::KeyId::ESCAPE)
             {
-                pMenuHandler->openMenu("pause");
-                return true;
-            }
-            else
-            {
-                if (pMenuHandler->back()) {
+                auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
+                if (!pMenuHandler->isActive())
+                {
+                    pMenuHandler->openMenu("pause");
                     return true;
+                }
+                else
+                {
+                    if (pMenuHandler->back()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -181,7 +187,6 @@ bool XGame::onInputEvent(const input::InputEvent& event)
     if (userCmdGen_.onInputEvent(event)) {
         return true;
     }
-
 
     return false;
 }
