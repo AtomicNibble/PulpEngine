@@ -30,6 +30,8 @@ namespace gui
         XMenuManager(core::MemoryArenaBase* arena, XMaterialManager* pMatMan);
         ~XMenuManager() X_FINAL;
 
+        void registerVars(void);
+        void registerCmds(void);
 
         bool init(void);
         void shutdown(void);
@@ -55,6 +57,7 @@ namespace gui
         bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
+        void Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs);
         void Cmd_ListUis(core::IConsoleCmdArgs* pArgs);
 
     private:

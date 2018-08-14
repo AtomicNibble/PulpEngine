@@ -31,11 +31,21 @@ namespace gui
 
     }
 
+    void XMenuManager::registerVars(void)
+    {
+
+    }
+
+    void XMenuManager::registerCmds(void)
+    {
+        ADD_COMMAND_MEMBER("uiOpenMenu", this, XMenuManager, &XMenuManager::Cmd_OpenMenu, core::VarFlags::SYSTEM, "Open menu");
+
+        ADD_COMMAND_MEMBER("listUi", this, XMenuManager, &XMenuManager::Cmd_ListUis, core::VarFlags::SYSTEM, "List the loaded ui");
+    }
+
     bool XMenuManager::init(void)
     {
         X_LOG0("MenuManager", "Starting GUI System");
-
-        ADD_COMMAND_MEMBER("listUi", this, XMenuManager, &XMenuManager::Cmd_ListUis, core::VarFlags::SYSTEM, "List the loaded ui");
 
         pScriptSys_ = gEnv->pScriptSys;
 
@@ -173,6 +183,19 @@ namespace gui
 
         pAssetLoader_->reload(pMenuRes, core::ReloadFlag::Beginframe);
         return true;
+    }
+
+    void XMenuManager::Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs)
+    {
+        if (pArgs->GetArgCount() < 2) {
+            X_WARNING("MenuManager", "uiOpenMenu <name>");
+            return;
+        }
+
+        auto* pMenuName = pArgs->GetArg(1);
+
+        menuHandler_.closeMenu();
+        menuHandler_.openMenu(pMenuName);
     }
 
     void XMenuManager::listGuis(const char* pWildcardSearch) const

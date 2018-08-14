@@ -120,6 +120,8 @@ bool X3DEngine::init(void)
     pAnimManager_->registerVars();
     pEffectManager_->registerCmds();
     pEffectManager_->registerVars();
+    pMenuManager_->registerCmds();
+    pMenuManager_->registerVars();
 
     gEngEnv.pMenuMan_ = pMenuManager_;
     gEngEnv.pMaterialMan_ = pMaterialManager_;
