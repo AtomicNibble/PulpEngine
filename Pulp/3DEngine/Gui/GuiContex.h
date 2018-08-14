@@ -88,7 +88,7 @@ namespace gui
         void text(const char* pText);
 
         // Sliders
-        void slider(const char* pLabel, const char* pVarName);
+        void slider(const char* pLabel, const char* pVarName, float increment);
 
     private:
         Vec2f calcTextSize(const char* pBegin, const char* pEnd);

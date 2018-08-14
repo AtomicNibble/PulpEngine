@@ -129,7 +129,7 @@ namespace gui
 
     int32_t ScriptBinds_Menu::sliderVar(script::IFunctionHandler* pH)
     {
-        SCRIPT_CHECK_PARAMETERS(2);
+        SCRIPT_CHECK_PARAMETERS_MIN(2);
 
         const char* pLabel = nullptr;
         const char* pVarName = nullptr;
@@ -137,7 +137,14 @@ namespace gui
         pH->getParam(1, pLabel);
         pH->getParam(2, pVarName);
 
-        ctx_.slider(pLabel, pVarName);
+        float increment = 0.01f;
+
+        if (pH->getParamCount() > 2)
+        {
+            pH->getParam(3, increment);
+        }
+
+        ctx_.slider(pLabel, pVarName, increment);
 
         return pH->endFunction();
     }

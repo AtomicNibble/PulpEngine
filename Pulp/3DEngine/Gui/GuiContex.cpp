@@ -214,7 +214,7 @@ namespace gui
         X_UNUSED(pText);
     }
 
-    void GuiContex::slider(const char* pLabel, const char* pVarName)
+    void GuiContex::slider(const char* pLabel, const char* pVarName, float increment)
     {
         auto* pVar = gEnv->pConsole->GetCVar(pVarName);
         if (!pVar) {
@@ -275,6 +275,9 @@ namespace gui
 
                 auto newPercent = offsetX / barRange;
                 auto newValue = range * newPercent;
+
+                // interval
+                newValue = static_cast<float>(static_cast<int>((newValue + (increment * 0.5f)) / increment) * increment);
 
                 pVar->Set(newValue);
             }
