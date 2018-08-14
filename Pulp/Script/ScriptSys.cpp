@@ -13,6 +13,7 @@
 #include <IFileSys.h>
 #include <IRender.h>
 #include <IConsole.h>
+#include <IFrameData.h>
 
 #include <Threading\JobSystem2.h>
 #include <Memory\VirtualMem.h>
@@ -147,12 +148,23 @@ void XScriptSys::release(void)
     X_DELETE(this, g_ScriptArena);
 }
 
-void XScriptSys::update(void)
+void XScriptSys::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 
-    //	float time = 0.f; //  gEnv->pTimer->GetCurrTime();
-    //	setGlobalValue("_time", time);
+    auto ti = frame.timeInfo;
+
+    auto timeGame = ti.ellapsed[core::ITimer::Timer::GAME].GetMilliSeconds();
+    auto timeMS = ti.ellapsed[core::ITimer::Timer::UI].GetMilliSeconds();
+    auto timeDeltaGame = ti.deltas[core::ITimer::Timer::GAME].GetMilliSeconds();
+    auto timeDeltaMS = ti.deltas[core::ITimer::Timer::UI].GetMilliSeconds();
+
+
+    setGlobalValue("timeMS", timeGame);
+    setGlobalValue("uiTimeMS", timeMS);
+    setGlobalValue("timeDeltaMS", timeDeltaGame);
+    setGlobalValue("uiTimeDeltaMS", timeDeltaMS);
+
     {
         while (completedLoads_.isNotEmpty()) {
             X_LUA_CHECK_STACK(L);

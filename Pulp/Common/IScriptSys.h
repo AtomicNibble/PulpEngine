@@ -227,7 +227,7 @@ struct IScriptSys : public core::IEngineSysBase
 
     virtual ~IScriptSys() = default;
 
-    virtual void update(void) X_ABSTRACT;
+    virtual void update(core::FrameData& frame) X_ABSTRACT;
 
     virtual bool runScriptInSandbox(const char* pBegin, const char* pEnd) const X_ABSTRACT;
 

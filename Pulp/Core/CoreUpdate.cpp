@@ -114,7 +114,6 @@ bool XCore::Update(void)
             }
 #endif // !X_ENABLE_PROFILER
 
-
             gEnv->pGame->onInputEvent(ev);
         }
 
@@ -165,7 +164,7 @@ bool XCore::Update(void)
     }
 
     if (env_.pScriptSys) {
-        env_.pScriptSys->update();
+        env_.pScriptSys->update(frameData);
     }
 
     RenderBegin(frameData);
