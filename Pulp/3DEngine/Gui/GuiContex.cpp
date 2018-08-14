@@ -145,13 +145,6 @@ namespace gui
         return button(pText, pText + core::strUtil::strlen(pText));
     }
 
-    void GuiContex::addItem(const Rectf& r, ItemID id)
-    {
-        dc_.currentPos.y += r.getHeight() + style_.itemSpacing.y;
-        dc_.lastItemID = id;
-        dc_.lastItemRect = r;
-    }
-
     bool GuiContex::button(const char* pText, const char* pEnd)
     {
         auto id = getID(pText, pEnd);
@@ -338,6 +331,13 @@ namespace gui
         }
 
         return size;
+    }
+
+    void GuiContex::addItem(const Rectf& r, ItemID id)
+    {
+        dc_.currentPos.y += r.getHeight() + style_.itemSpacing.y;
+        dc_.lastItemID = id;
+        dc_.lastItemRect = r;
     }
 
     bool GuiContex::itemHoverable(ItemID id, const Rectf& r)
