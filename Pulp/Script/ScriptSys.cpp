@@ -110,6 +110,11 @@ bool XScriptSys::init(void)
         pBind->bind(gEnv->pCore);
     }
 
+    setGlobalValue("timeMS", 0.f);
+    setGlobalValue("uiTimeMS", 0.f);
+    setGlobalValue("timeDeltaMS", 0.f);
+    setGlobalValue("uiTimeDeltaMS", 0.f);
+
     loadScript("main");
 
     return true;
