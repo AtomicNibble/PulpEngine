@@ -395,12 +395,14 @@ struct InputSymbol
 };
 
 // inherit from this if you want to register from input events.
+#if 0 // deprecated
 struct IInputEventListner
 {
     virtual ~IInputEventListner() = default;
 
     virtual bool OnInputEvent(const InputEvent& event) X_ABSTRACT;
 };
+#endif
 
 struct IInput
 {
