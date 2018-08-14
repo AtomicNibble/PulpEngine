@@ -41,7 +41,12 @@ namespace gui
             }
         }
 
-        pScriptSys->call(updateFunc_.pFunction_);
+        if (updateFunc_.getType() == script::Type::Function) {
+            pScriptSys->call(updateFunc_.pFunction_);
+        }
+        else {
+            X_ERROR("Menu", "Update function is invalid for: \"%s\"", name_.c_str());
+        }
     }
 
     bool Menu::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
