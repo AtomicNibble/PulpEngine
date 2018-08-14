@@ -387,6 +387,8 @@ void XConsole::registerVars(void)
     ADD_CVAR_REF_NO_NAME(console_output_font_line_height, CONSOLE_DEFAULT_LOG_LINE_HIEGHT, 0.1f, 10.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
         "Line height of log messages");
 
+    ADD_CVAR_REF_COL_NO_NAME(console_cmd_color, Color(0.0f, 0.5f, 0.5f, 1.f),
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console cmd color");
     ADD_CVAR_REF_COL_NO_NAME(console_input_box_color, Color(0.3f, 0.3f, 0.3f, 0.75f),
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Console input box color");
     ADD_CVAR_REF_COL_NO_NAME(console_input_box_color_border, Color(0.1f, 0.1f, 0.1f, 1.0f),
@@ -2041,7 +2043,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
             // check if we have atleast 1 char.
             if (InputBuffer_.length() > 7) {
                 inputBegin = core::Min(vreset + 7, inputEnd); // cap search.
-                txtCol = Col_Darkblue;
+                txtCol = console_cmd_color;
             }
         }
 
@@ -2168,7 +2170,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                 temp.trim();
 
                 if (temp.isEqual(fullName)) {
-                    txtCol = Col_Darkblue;
+                    txtCol = console_cmd_color;
                 }
             }
             else if (results.size() > 1) {
@@ -2381,7 +2383,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                 xpos += 5.f;
 
                 // cmd color
-                ctx.SetColor(Col_Darkblue);
+                ctx.SetColor(console_cmd_color);
                 pPrimContext_->drawText(xpos, ypos, ctx, result.pName);
 
                 ypos += fCharHeight;
@@ -2417,7 +2419,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                         ctx.SetColor(Col_Whitesmoke);
                     }
                     else {
-                        ctx.SetColor(Col_Darkblue);
+                        ctx.SetColor(console_cmd_color);
                     }
 
                     pPrimContext_->drawText(xpos, ypos, ctx, resIt->pName);

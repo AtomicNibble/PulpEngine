@@ -365,6 +365,7 @@ private:
     int console_output_font_size;
     float console_output_font_line_height;
 
+    Color console_cmd_color;
     Color console_input_box_color;
     Color console_input_box_color_border;
     Color console_output_box_color;
