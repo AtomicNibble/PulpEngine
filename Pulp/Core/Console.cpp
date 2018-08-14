@@ -1832,9 +1832,6 @@ void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
         repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
 
         if (repeatEventTimer_.GetValue() < 0) {
-
-            X_LOG0("Goat", "Event: %s", repeatEvent_.name.c_str());
-
             ProcessInput(repeatEvent_);
 
             repeatEventTimer_ = repeatEventInterval_;
