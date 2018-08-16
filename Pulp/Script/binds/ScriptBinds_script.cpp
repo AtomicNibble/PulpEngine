@@ -26,16 +26,7 @@ void XBinds_Script::bind(ICore* pCore)
 
 int XBinds_Script::load(IFunctionHandler* pH)
 {
-    SCRIPT_CHECK_PARAMETERS(1);
-
-    const char* pFileName = nullptr;
-    if (pH->getParam(1, pFileName)) {
-        if (pScriptSys_->onInclude(pFileName)) {
-            return pH->endFunction(1);
-        }
-    }
-
-    return pH->endFunction();
+    return pScriptSys_->onInclude(pH);
 }
 
 int XBinds_Script::reLoad(IFunctionHandler* pH)

@@ -78,7 +78,7 @@ public:
 
     bool processLoadedScript(Script* pScript);
 
-    bool onInclude(const char* pFileName);
+    int32_t onInclude(IFunctionHandler* pH);
     bool executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc);
 
     bool runScriptInSandbox(const char* pBegin, const char* pEnd) const X_FINAL;

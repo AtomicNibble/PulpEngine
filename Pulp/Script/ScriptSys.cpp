@@ -17,6 +17,7 @@
 
 #include <Threading\JobSystem2.h>
 #include <Memory\VirtualMem.h>
+#include <String\StringTokenizer.h>
 
 #include <Assets\AssetLoader.h>
 
@@ -164,7 +165,6 @@ void XScriptSys::update(core::FrameData& frame)
     auto timeDeltaGame = ti.deltas[core::ITimer::Timer::GAME].GetMilliSeconds();
     auto timeDeltaMS = ti.deltas[core::ITimer::Timer::UI].GetMilliSeconds();
 
-
     setGlobalValue("timeMS", timeGame);
     setGlobalValue("uiTimeMS", timeMS);
     setGlobalValue("timeDeltaMS", timeDeltaGame);
@@ -256,10 +256,14 @@ bool XScriptSys::processLoadedScript(Script* pScript)
     // script had a include, that's not loaded, rip.
     // we must dispatch a load and wait for the result of that.
     if (result == CallResult::TryAgain) {
-        const char* pFileName = stack::as_string(L);
-        Script* pInclude = static_cast<Script*>(loadScript(pFileName));
 
-        pScript->setPendingInclude(X_ASSERT_NOT_NULL(pInclude));
+        X_ASSERT(stack::get_type(L) == Type::String, "Type should be string")(stack::get_type(L));
+
+        size_t length;
+        const char* pMissingFiles = stack::as_string(L, &length);
+        
+        proicessMissingIncludes(pScript, pMissingFiles, pMissingFiles + length);
+
         stack::pop(L);
         return true;
     }
@@ -267,6 +271,7 @@ bool XScriptSys::processLoadedScript(Script* pScript)
     if (result != CallResult::Ok) {
         X_ERROR("Script", "\"%s\" failed to exec: \"%s\"", pScript->getName().c_str(), CallResult::ToString(result));
         stack::pop(L);
+        return false;
     }
 
     return true;
@@ -330,21 +335,57 @@ bool XScriptSys::waitForLoad(IScript* pIScript)
     return pAssetLoader_->waitForLoad(pScript);
 }
 
-bool XScriptSys::onInclude(const char* pFileName)
+int32_t XScriptSys::onInclude(IFunctionHandler* pH)
 {
-    {
-        Script* pScriptRes = static_cast<Script*>(findScript(pFileName));
-        if (pScriptRes) {
-            // do we need to run it?
+    core::StackString512 missing;
 
-            return true;
+    auto num = pH->getParamCount();
+    for (int32_t i = 0; i < num; i++)
+    {
+        const char* pFileName = nullptr;
+        if (!pH->getParam(i + 1, pFileName)) {
+            return pH->endFunction();
+        }
+
+        Script* pScriptRes = static_cast<Script*>(findScript(pFileName));
+        if (!pScriptRes || !pScriptRes->isLoaded()) {
+            if (missing.isNotEmpty()) {
+                missing.append(";");
+            }
+
+            missing.append(pFileName);
         }
     }
 
-    // Throw a expection, the return won't run.
+    if (missing.isEmpty()) {
+        return pH->endFunction();
+    }
+
+    // push the files.
+    stack::push(L, missing.c_str(), missing.length());
+
     lua_tryagain(L);
-    return false;
+
+    return pH->endFunction();
 }
+
+void XScriptSys::proicessMissingIncludes(Script* pScript, const char* pBegin, const char* pEnd)
+{
+    X_ASSERT_NOT_NULL(pBegin);
+    X_ASSERT_NOT_NULL(pEnd);
+
+    core::StringTokenizer<char> tokens(pBegin, pEnd, ';');
+    core::StringRange<> range(nullptr, nullptr);
+
+    while (tokens.extractToken(range))
+    {
+        core::StackString256 name(range.begin(), range.end());
+        Script* pInclude = static_cast<Script*>(loadScript(name.c_str()));
+
+        pScript->setPendingInclude(X_ASSERT_NOT_NULL(pInclude));
+    }
+}
+
 
 bool XScriptSys::executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc)
 {
