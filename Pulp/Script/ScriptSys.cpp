@@ -176,11 +176,17 @@ bool XScriptSys::asyncInitFinalize(void)
         return true;
     }
 
-    for (auto* pScript : preloads_) {
-        if (!waitForLoad(pScript)) {
-
-            return false;
+    bool ok = true;
+    for (auto* pIScript : preloads_) {
+        if (!waitForLoad(pIScript)) {
+            Script* pScript = static_cast<Script*>(pIScript);
+            X_ERROR("ScriptSys", "Preload load failed: \"%s\"", pScript->getName().c_str());
+            ok = false;
         }
+    }
+
+    if (!ok) {
+        return false;
     }
 
     X_PROFILE_NO_HISTORY_BEGIN("ProcessPreloads", core::profiler::SubSys::SCRIPT);
