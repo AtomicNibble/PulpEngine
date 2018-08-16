@@ -49,8 +49,7 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
     scriptBinds_(arena),
     baseBinds_(arena),
     scripts_(arena, sizeof(ScriptResource), X_ALIGN_OF(ScriptResource), "ScriptPool"),
-    completedLoads_(arena),
-    initialised_(false)
+    completedLoads_(arena)
 {
     arena->addChildArena(&poolArena_);
 
@@ -81,9 +80,6 @@ bool XScriptSys::init(void)
     X_PROFILE_NO_HISTORY_BEGIN("ScriptSysInit", core::profiler::SubSys::SCRIPT);
 
     X_LOG0("Script", "Starting script system");
-    X_ASSERT(initialised_ == false, "Already init")(initialised_);
-
-    initialised_ = true;
 
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::SCRIPT, this, SCRIPT_FILE_EXTENSION);
@@ -123,10 +119,6 @@ bool XScriptSys::init(void)
 
 void XScriptSys::shutDown(void)
 {
-    if (!initialised_) {
-        return;
-    }
-
     X_LOG0("ScriptSys", "Shutting Down");
 
     for (auto* pBind : scriptBinds_) {
@@ -146,7 +138,6 @@ void XScriptSys::shutDown(void)
         L = nullptr;
     }
 
-    initialised_ = false;
 }
 
 void XScriptSys::release(void)

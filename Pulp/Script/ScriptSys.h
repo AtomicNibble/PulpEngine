@@ -173,8 +173,6 @@ private:
 
     // loading
     ScriptQueue completedLoads_;
-
-    bool initialised_;
 };
 
 X_INLINE lua_State* XScriptSys::getLuaState(void)
