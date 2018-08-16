@@ -85,7 +85,7 @@ namespace gui
         bool button(const char* pText, const char* pEnd);
 
         // Labels
-        void text(const char* pText);
+        void text(const char* pText, const char* pEnd, Color8u col);
 
         // Sliders
         void slider(const char* pLabel, const char* pVarName, float increment);

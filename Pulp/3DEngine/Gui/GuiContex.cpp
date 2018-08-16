@@ -202,9 +202,28 @@ namespace gui
         return pressed;
     }
 
-    void GuiContex::text(const char* pText)
+    void GuiContex::text(const char* pText, const char* pEnd, Color8u col)
     {
-        X_UNUSED(pText);
+        auto oldCol = txtCtx_.col;
+        txtCtx_.col = col;
+        txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
+        txtCtx_.size = Vec2f(36, 36);
+
+        auto id = getID(pText, pEnd);
+        auto labelSize = calcTextSize(pText, pEnd);
+
+        auto pos = dc_.currentPos;
+        auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
+
+        Rectf r(pos, pos + size);
+
+        addItem(r, id);
+
+        pPrim_->drawText(Vec3f(pos), txtCtx_, pText, pEnd);
+
+        txtCtx_.size = Vec2f(24.f, 24.f);
+        txtCtx_.col = oldCol;
+        txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
     }
 
     void GuiContex::slider(const char* pLabel, const char* pVarName, float increment)
