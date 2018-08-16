@@ -110,4 +110,10 @@ typename PriorityQueue<T, ContainerT, Pr>::size_type PriorityQueue<T, ContainerT
     return container_.capacity();
 }
 
+template<typename T, class ContainerT, class Pr>
+const ContainerT& PriorityQueue<T, ContainerT, Pr>::getContainer(void) const
+{
+    return container_;
+}
+
 X_NAMESPACE_END

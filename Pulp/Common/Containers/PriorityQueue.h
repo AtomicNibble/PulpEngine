@@ -43,6 +43,8 @@ public:
 
     void swap(MyType& oth);
 
+    const ContainerT& getContainer(void) const;
+
 private:
     ContainerT container_;
     Pr comp_;
