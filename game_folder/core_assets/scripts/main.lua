@@ -1,4 +1,4 @@
-script.load("util.lua");
+
 
 function OnInit()
 

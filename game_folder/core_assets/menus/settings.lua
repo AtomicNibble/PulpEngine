@@ -15,7 +15,7 @@ local function Update()
     ui.sliderVar("VOLUME SFX", "snd_vol_sfx");
     ui.sliderVar("VOLUME VOICE", "snd_vol_voice");
 
-    ui.sliderVar("FOV", "cam_fov");
+    ui.sliderVar("FOV", "cam_fov", 1);
 
     if ui.button("BACK") then
         ui.back()

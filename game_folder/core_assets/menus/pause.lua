@@ -17,7 +17,8 @@ local function Update()
         ui.open("settings")
     end
     if ui.button("QUIT") then
-        core.exec("quit")
+        core.exec("mainMenu")
+        ui.close();
     end
 
 end
