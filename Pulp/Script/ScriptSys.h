@@ -76,7 +76,6 @@ public:
     bool waitForLoad(core::AssetBase* pScript) X_FINAL;
     bool waitForLoad(IScript* pScript) X_FINAL; // returns true if load succeed.
 
-    bool processLoadedScript(Script* pScript);
 
     int32_t onInclude(IFunctionHandler* pH);
     bool executeBuffer(const char* pBegin, const char* pEnd, const char* pDesc);
@@ -135,6 +134,8 @@ private:
     void freeDangling(void);
     void releaseScript(Script* pScript);
 
+    void processLoadedScritpts(void);
+    bool processLoadedScript(Script* pScript);
     void addLoadRequest(ScriptResource* pScript);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;

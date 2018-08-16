@@ -161,37 +161,46 @@ void XScriptSys::update(core::FrameData& frame)
     setGlobalValue("timeDeltaMS", timeDeltaGame);
     setGlobalValue("uiTimeDeltaMS", timeDeltaMS);
 
-    {
-        while (completedLoads_.isNotEmpty()) {
-            X_LUA_CHECK_STACK(L);
-
-            Script* pScript = completedLoads_.peek();
-
-            // if the script already fully run script processing.
-            if (pScript->getLastCallResult() == lua::CallResult::Ok) {
-                completedLoads_.pop();
-                continue;
-            }
-
-            // the script can either error.
-            // fail on dependancy
-            // or run okay.
-            // we only don't remove if we are waiting for a depedancy,
-            if (!processLoadedScript(pScript)) {
-            }
-
-            if (!pScript->hasPendingInclude()) {
-                completedLoads_.pop();
-            }
-            else {
-                break;
-            }
-        }
-    }
+    processLoadedScritpts();
 
     {
         X_PROFILE_BEGIN("Lua GC", core::profiler::SubSys::SCRIPT);
         state::gc_step(L, vars_.gcStepSize());
+    }
+}
+
+
+void XScriptSys::processLoadedScritpts(void)
+{
+    while (completedLoads_.isNotEmpty())
+    {
+        X_LUA_CHECK_STACK(L);
+
+        Script* pScript = completedLoads_.peek();
+
+        // if the script already fully run script processing.
+        if (pScript->getLastCallResult() == lua::CallResult::Ok) {
+            completedLoads_.pop();
+            continue;
+        }
+
+        X_LOG0("ScriptSys", "Processing loaded script: \"%s\"", pScript->getName().c_str());
+
+        // the script can either error.
+        // fail on dependancy
+        // or run okay.
+        // we only don't remove if we are waiting for a depedancy,
+        if (!processLoadedScript(pScript)) {
+            // failed?
+
+        }
+
+        if (!pScript->hasPendingInclude()) {
+            completedLoads_.pop();
+        }
+        else {
+            break;
+        }
     }
 }
 
