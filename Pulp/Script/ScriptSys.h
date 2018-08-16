@@ -14,6 +14,8 @@
 #include <Assets\AssetBase.h>
 #include <Assets\AssetLoader.h>
 
+#include <IFileSys.h>
+
 X_NAMESPACE_DECLARE(core,
                     namespace V2 {
                         struct Job;
@@ -40,6 +42,7 @@ class XScriptSys : public IScriptSys
     typedef core::Array<XScriptTable*> ScriptTableArr;
     typedef core::Array<XScriptBinds*> ScriptBindsArr;
     typedef core::Array<XScriptBindsBase*> ScriptBindsBaseArr;
+    typedef core::Array<IScript*> ScriptArr;
 
     typedef core::MemoryArena<
         core::GrowingPoolAllocator,
@@ -67,6 +70,8 @@ public:
     bool init(void) X_FINAL;
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
+
+    bool asyncInitFinalize(void) X_FINAL;
 
     void update(core::FrameData& frame) X_FINAL;
 
@@ -137,10 +142,14 @@ private:
     void processLoadedScritpts(void);
     bool processLoadedScript(Script* pScript);
     void proicessMissingIncludes(Script* pScript, const char* pBegin, const char* pEnd);
+    bool processPreload(uint8_t* pData, size_t length);
+
     void addLoadRequest(ScriptResource* pScript);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
     bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
+
+    void IoRequestCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);
 
 private:
     void listBinds(void) const;
@@ -175,6 +184,11 @@ private:
 
     // loading
     ScriptQueue completedLoads_;
+
+    // preload
+    ScriptArr preloads_;
+    core::RequestHandle preloadFileReq_;
+    bool preloadParseFailed_;
 };
 
 X_INLINE lua_State* XScriptSys::getLuaState(void)

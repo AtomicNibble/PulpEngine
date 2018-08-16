@@ -49,7 +49,10 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
     scriptBinds_(arena),
     baseBinds_(arena),
     scripts_(arena, sizeof(ScriptResource), X_ALIGN_OF(ScriptResource), "ScriptPool"),
-    completedLoads_(arena)
+    completedLoads_(arena),
+    preloads_(arena),
+    preloadFileReq_(core::INVALID_IO_REQ_HANDLE),
+    preloadParseFailed_(false)
 {
     arena->addChildArena(&poolArena_);
 
@@ -84,6 +87,17 @@ bool XScriptSys::init(void)
     pAssetLoader_ = gEnv->pCore->GetAssetLoader();
     pAssetLoader_->registerAssetType(assetDb::AssetType::SCRIPT, this, SCRIPT_FILE_EXTENSION);
 
+    // load the preload.json
+    // which tells us what scripts to load during init.
+    core::IoRequestOpenRead req;
+    req.arena = gEnv->pArena;
+    req.path = "scripts/preload.json";
+    req.mode.Set(core::fileMode::READ);
+    req.mode.Set(core::fileMode::SHARE);
+    req.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
+    preloadFileReq_ = gEnv->pFileSys->AddIoRequestToQue(req);
+
+
     L = luaL_newstate();
 
     lua::StateView view(L);
@@ -112,7 +126,6 @@ bool XScriptSys::init(void)
     setGlobalValue("timeDeltaMS", 0.f);
     setGlobalValue("uiTimeDeltaMS", 0.f);
 
-    loadScript("main");
 
     return true;
 }
@@ -144,6 +157,40 @@ void XScriptSys::release(void)
 {
     X_DELETE(this, g_ScriptArena);
 }
+
+bool XScriptSys::asyncInitFinalize(void)
+ {
+    if (preloadFileReq_ != core::INVALID_IO_REQ_HANDLE) 
+    {
+        // wait for it to load?
+        gEnv->pFileSys->waitForRequest(preloadFileReq_);
+    }
+
+    if (preloadParseFailed_) {
+        X_ERROR("ScriptSys", "Error parsing preload info");
+        return false;
+    }
+
+    // any preloads?
+    if (preloads_.isEmpty()) {
+        return true;
+    }
+
+    for (auto* pScript : preloads_) {
+        if (!waitForLoad(pScript)) {
+
+            return false;
+        }
+    }
+
+    X_PROFILE_NO_HISTORY_BEGIN("ProcessPreloads", core::profiler::SubSys::SCRIPT);
+
+    // run the scripts...?
+    processLoadedScritpts();
+
+    return true;
+}
+
 
 void XScriptSys::update(core::FrameData& frame)
 {
@@ -1100,6 +1147,89 @@ bool XScriptSys::processData(core::AssetBase* pAsset, core::UniquePointer<char[]
 bool XScriptSys::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
     X_UNUSED(assetName, name);
+
+    return true;
+}
+
+
+void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+    core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+    X_UNUSED(fileSys, pRequest, pFile, bytesTransferred);
+
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Unecpted request")(pRequest->getType());
+    X_ASSERT(preloadFileReq_ != core::INVALID_IO_REQ_HANDLE, "Load request not set")(preloadFileReq_);
+
+    preloadFileReq_ = core::INVALID_IO_REQ_HANDLE;
+
+    const auto* pOpenReadReq = static_cast<const core::IoRequestOpenRead*>(pRequest);
+    if (!pOpenReadReq->pFile) {
+        X_WARNING("Script", "Failed to open preload.json");
+        return;
+    }
+
+    core::UniquePointer<uint8[]> data(pOpenReadReq->arena, pOpenReadReq->pBuf);
+
+    // we preocess the preload here, so the scripts start loading now.
+    if (!processPreload(data.get(), pOpenReadReq->dataSize)) {
+        X_ERROR("Script", "Failed to prase preload info");
+        preloadParseFailed_ = true;
+    }
+
+}
+
+bool XScriptSys::processPreload(uint8_t* pData, size_t length)
+{
+    core::json::MemoryStream ms(reinterpret_cast<const char*>(pData), length);
+    core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
+    
+    core::json::Document d;
+
+    if (d.ParseStream<core::json::kParseCommentsFlag>(is).HasParseError()) {
+        auto err = d.GetParseError();
+        const char* pErrStr = core::json::GetParseError_En(err);
+        size_t offset = d.GetErrorOffset();
+        size_t line = core::strUtil::LineNumberForOffset(ms.begin_, ms.begin_ + ms.size_, offset);
+
+        X_ERROR("Script", "Failed to parse preload desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s",
+            err, offset, line, pErrStr);
+        return false;
+    }
+
+    if (d.GetType() != core::json::Type::kObjectType) {
+        X_ERROR("Script", "Unexpected type");
+        return false;
+    }
+
+    if (!d.HasMember("init"))
+    {
+        X_ERROR("Script", "Unexpected type");
+        return false;
+    }
+
+    auto& init = d["init"];
+    if (init.GetType() != core::json::Type::kArrayType)
+    {
+        X_ERROR("Script", "Unexpected type: %" PRIi32, init.GetType());
+        return false;
+    }
+
+    X_ASSERT(preloads_.isEmpty(), "Preload list not empty")(preloads_.size());
+
+    for (auto& scriptName : init.GetArray())
+    {
+        core::StackString256 name;
+        name.set(scriptName.GetString(), scriptName.GetString() + scriptName.GetStringLength());
+
+        X_LOG0("Script", "Preload: \"%s\"", name.c_str());
+
+        auto* pScript = loadScript(name.c_str());
+
+        // re use this lock
+        core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
+
+        preloads_.emplace_back(pScript);
+    }
 
     return true;
 }

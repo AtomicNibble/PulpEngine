@@ -633,6 +633,10 @@ bool XCore::InitAsyncWait(void)
         allOk &= env_.pGame->asyncInitFinalize();
     }
 
+    if (env_.pScriptSys) {
+        allOk &= env_.pScriptSys->asyncInitFinalize();
+    }
+
     return allOk;
 }
 
