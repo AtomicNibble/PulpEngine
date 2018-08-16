@@ -424,28 +424,39 @@ bool XScriptSys::loadBufferToTable(const char* pBegin, const char* pEnd, const c
     stack::push_ref(state, errrorHandler_);
     stack::move_top_to(state, base); // move the error hander before the script.
 
-    auto status = stack::pcall(state, 0, LUA_MULTRET, base);
-
-    int numResults = stack::top(L) - base;
-
-    if (numResults > 0)
-    {
-        auto type = stack::get_type(L);
-
-        if (type == Type::Table)
-        {
-            auto* pTable = static_cast<XScriptTable*>(pITable);
-            
-            pTable->attach();
-        }
-    }
-
+    auto result = stack::pcall(state, 0, LUA_MULTRET, base);
+   
+    // remove error handler.
     stack::remove(state, base);
 
-    if (status != CallResult::Ok) {
+    auto type = stack::get_type(L);
+
+    if (result == CallResult::TryAgain)
+    {
+        X_ASSERT(stack::get_type(L) == Type::String, "Type should be string")(stack::get_type(L));
+        const char* pMissingFiles = stack::as_string(L);
+        X_UNUSED(pMissingFiles);
+
         stack::pop(L);
+        return false;
+    }
+    
+    if (result != CallResult::Ok) 
+    {
+        X_ERROR("Script", "failed to exec: \"%s\"", CallResult::ToString(result));
+        stack::pop(L);
+        return false;
+    }
+    
+    if (type != Type::Table)
+    {
+        X_ERROR("Script", "Not a table: \"%s\"", Type::ToString(type));
+        stack::pop(L);
+        return false;
     }
 
+    auto* pTable = static_cast<XScriptTable*>(pITable);
+    pTable->attach();
     return true;
 }
 
