@@ -604,7 +604,7 @@ struct IoRequestOpenRead : public IoRequestOpen
     core::MemoryArenaBase* arena; // the arena the buffer to read the whole file into is allocated from.
     // these are only valid if read completed.
     XFileAsync* pFile;
-    uint8_t* pBuf;
+    uint8_t* pBuf;      // for this to be uniqueptr have to pass none const IoRequestBase in callbacks.
     uint32_t dataSize;
 };
 
