@@ -39,7 +39,8 @@ namespace gui
     {
         virtual ~IMenuManager() = default;
 
-        virtual IMenuHandler* getMenuHandler(void) X_ABSTRACT;
+        virtual IMenuHandler* createMenuHandler(void) X_ABSTRACT;
+        virtual void releaseMenuHandler(IMenuHandler* pHandler) X_ABSTRACT;
         virtual IMenu* loadMenu(const char* pName) X_ABSTRACT;
         virtual IMenu* findMenu(const char* pName) X_ABSTRACT;
 

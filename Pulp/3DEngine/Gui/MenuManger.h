@@ -36,8 +36,11 @@ namespace gui
         bool init(void);
         void shutdown(void);
 
+        void setActiveHandler(MenuHandler* pMenuHandler);
+
         //IMenuManager
-        IMenuHandler* getMenuHandler(void) X_FINAL;
+        IMenuHandler* createMenuHandler(void) X_FINAL;
+        void releaseMenuHandler(IMenuHandler* pHandler) X_FINAL;
         IMenu* loadMenu(const char* pName) X_FINAL;
         IMenu* findMenu(const char* pName) X_FINAL;
 
@@ -67,7 +70,6 @@ namespace gui
         core::AssetLoader* pAssetLoader_;
     
         GuiContex ctx_;
-        MenuHandler menuHandler_;
         ScriptBinds_Menu* pScriptBinds_;
 
         MenuContainer menus_;

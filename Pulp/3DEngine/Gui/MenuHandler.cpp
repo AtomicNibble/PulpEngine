@@ -13,17 +13,11 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
     
-    MenuHandler::MenuHandler(GuiContex& ctx) :
-        ctx_(ctx)
+    MenuHandler::MenuHandler(GuiContex& ctx, XMenuManager& man) :
+        ctx_(ctx),
+        man_(man)
     {
 
-    }
-
-    void MenuHandler::init(engine::Material* pCursor)
-    {
-        ctx_.init(pCursor);
-
-        openMenu("main");
     }
 
     bool MenuHandler::isActive(void) const
@@ -49,12 +43,18 @@ namespace gui
         ctx_.processInput(frame.input);
         ctx_.begin(p);
 
+        man_.setActiveHandler(this);
+
         // if menu active.. blar.. blar..
         auto* pMenu = stack_.top();
         if(pMenu->isLoaded())
         {
             pMenu->draw();
         }
+
+#if X_SUPER == 0
+        man_.setActiveHandler(nullptr);
+#endif // !X_SUPER
 
         ctx_.end();
     }

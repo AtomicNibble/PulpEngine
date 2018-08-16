@@ -28,7 +28,8 @@ XGame::XGame(ICore* pCore) :
     prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
     userCmdMan_(vars_),
-    weaponDefs_(arena_)
+    weaponDefs_(arena_),
+    pMenuHandler_(nullptr)
 {
 
     X_ASSERT_NOT_NULL(pCore);
@@ -55,19 +56,6 @@ void XGame::registerCmds(void)
 
 // ---------------------------------
 
-bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
-{
-    auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
-
-    if (!pMenuHandler->isActive()) {
-        return false;
-    }
-
-    pMenuHandler->update(frame, pPrim);
-    return true;
-}
-
-
 bool XGame::init(void)
 {
     X_LOG0("Game", "init");
@@ -79,7 +67,10 @@ bool XGame::init(void)
     pTimer_ = gEnv->pTimer;
     pRender_ = gEnv->pRender;
 
-//    auto* pGuiMan = gEnv->p3DEngine->getMenuManager();
+    auto* pMenuMan = gEnv->p3DEngine->getMenuManager();
+
+    pMenuHandler_ = pMenuMan->createMenuHandler();
+    pMenuHandler_->openMenu("main");
 
     // networking.
     {
@@ -137,6 +128,12 @@ bool XGame::shutDown(void)
         world_.reset();
     }
 
+    if (pMenuHandler_) {
+        auto* pMenuMan = gEnv->p3DEngine->getMenuManager();
+        
+        pMenuMan->releaseMenuHandler(pMenuHandler_);
+    }
+
     userCmdGen_.shutdown();
     weaponDefs_.shutDown();
     return true;
@@ -168,16 +165,18 @@ bool XGame::onInputEvent(const input::InputEvent& event)
         {
             if (event.keyId == input::KeyId::ESCAPE)
             {
-                auto* pMenuHandler = gEnv->p3DEngine->getMenuManager()->getMenuHandler();
-                if (!pMenuHandler->isActive())
+                if (pMenuHandler_)
                 {
-                    pMenuHandler->openMenu("pause");
-                    return true;
-                }
-                else
-                {
-                    if (pMenuHandler->back()) {
+                    if (!pMenuHandler_->isActive())
+                    {
+                        pMenuHandler_->openMenu("pause");
                         return true;
+                    }
+                    else
+                    {
+                        if (pMenuHandler_->back()) {
+                            return true;
+                        }
                     }
                 }
             }
@@ -240,7 +239,6 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
-
     bool blockUserCmd = drawMenu(frame, pPrim);
 
     userCmdGen_.buildUserCmd(blockUserCmd);
@@ -250,14 +248,15 @@ bool XGame::update(core::FrameData& frame)
         // main menu :D
         clearWorld();
 
+#if 0
         auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds();
 
         float t = (math<float>::sin(val) + 1.f) * 0.5f;
 
-        Color col = Col_White;
-
-        con.col = col.lerp(t, Col_Red);
+        Color col = Col_Red;
+        con.col = col.lerp(t, Col_White);
         pPrim->drawText(Vec3f(center.x, 75, 1.f), con, "Insert fancy main menu here");
+#endif
     }
     else if (status == net::SessionStatus::Loading)
     {
@@ -497,6 +496,21 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 
     userCmdMan_.readUserCmdToBs(bs, clientIdx);
 }
+
+bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
+{
+    if (!pMenuHandler_) {
+        return false;
+    }
+
+    if (!pMenuHandler_->isActive()) {
+        return false;
+    }
+
+    pMenuHandler_->update(frame, pPrim);
+    return true;
+}
+
 
 void XGame::syncLobbyUsers(void)
 {

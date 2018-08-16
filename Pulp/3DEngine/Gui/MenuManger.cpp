@@ -20,7 +20,6 @@ namespace gui
         pMatMan_(pMatMan),
         pScriptSys_(nullptr),
         pAssetLoader_(nullptr),
-        menuHandler_(ctx_),
         menus_(arena, sizeof(MenuResource), X_ALIGN_OF(MenuResource), "MenuPool")
     {
 
@@ -52,13 +51,12 @@ namespace gui
         pAssetLoader_ = gEnv->pCore->GetAssetLoader();
         pAssetLoader_->registerAssetType(assetDb::AssetType::MENU, this, MENU_FILE_EXTENSION);
 
-        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_, menuHandler_);
+        pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_);
         pScriptBinds_->bind();
 
         auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");
 
-        menuHandler_.init(pCursor);
-
+        ctx_.init(pCursor);
         return true;
     }
 
@@ -73,9 +71,19 @@ namespace gui
         freeDangling();
     }
 
-    IMenuHandler* XMenuManager::getMenuHandler(void)
+    void XMenuManager::setActiveHandler(MenuHandler* pMenuHandler)
     {
-        return &menuHandler_;
+        pScriptBinds_->setActiveHandler(pMenuHandler);
+    }
+
+    IMenuHandler* XMenuManager::createMenuHandler(void)
+    {
+        return X_NEW(MenuHandler, arena_, "MenuHandler")(ctx_, *this);
+    }
+
+    void XMenuManager::releaseMenuHandler(IMenuHandler* pHandler)
+    {
+        X_DELETE(pHandler, arena_);
     }
 
     IMenu* XMenuManager::loadMenu(const char* pName)
@@ -192,10 +200,14 @@ namespace gui
             return;
         }
 
+#if 1
+        X_ASSERT_NOT_IMPLEMENTED();
+#else
         auto* pMenuName = pArgs->GetArg(1);
 
         menuHandler_.closeMenu();
         menuHandler_.openMenu(pMenuName);
+#endif
     }
 
     void XMenuManager::listGuis(const char* pWildcardSearch) const

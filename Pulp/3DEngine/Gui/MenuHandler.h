@@ -22,10 +22,8 @@ namespace gui
         using MenuStack = core::FixedStack<Menu*, 8>;
 
     public:
-        MenuHandler(GuiContex& ctx);
+        MenuHandler(GuiContex& ctx, XMenuManager& man);
         ~MenuHandler() X_OVERRIDE = default;
-
-        void init(engine::Material* pCursor);
 
         bool isActive(void) const X_FINAL;
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
@@ -36,8 +34,7 @@ namespace gui
 
     private:
         GuiContex& ctx_;
-
-       // Menu* pMenu_;
+        XMenuManager& man_;
 
         MenuStack stack_;
     };

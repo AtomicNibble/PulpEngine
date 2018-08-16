@@ -25,6 +25,14 @@ X_NAMESPACE_DECLARE(core,
                     struct ICVar;
                     struct IConsoleCmdArgs);
 
+X_NAMESPACE_DECLARE(engine,
+namespace gui
+{
+    struct IMenuHandler;
+}
+);
+
+
 X_NAMESPACE_BEGIN(game)
 
 class XGame : public IGame, net::IGameCallbacks
@@ -54,8 +62,10 @@ public:
     void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_FINAL;
 
     // ~IGameCallbacks
-
+    
 private:
+    bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim);
+
     void syncLobbyUsers(void);
     void clearWorld(void);
 
@@ -86,6 +96,9 @@ private:
     UserCmdMan userCmdMan_;
 
     weapon::WeaponDefManager weaponDefs_;
+
+
+    engine::gui::IMenuHandler* pMenuHandler_;
 };
 
 X_NAMESPACE_END

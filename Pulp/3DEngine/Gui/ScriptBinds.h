@@ -13,10 +13,12 @@ namespace gui
     class ScriptBinds_Menu : public script::IScriptBindsBase
     {
     public:
-        ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx, MenuHandler& menuHandler);
+        ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx);
         ~ScriptBinds_Menu();
 
         void bind(void);
+
+        void setActiveHandler(MenuHandler* pMenuHandler);
 
     private:
         int32_t fill(script::IFunctionHandler* pH);
@@ -37,7 +39,7 @@ namespace gui
 
     private:
         GuiContex& ctx_;
-        MenuHandler& menuHandler_;
+        MenuHandler* pMenuHandler_;
     };
 
 } // namespace gui

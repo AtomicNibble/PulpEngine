@@ -58,10 +58,10 @@ namespace gui
     } // namespace
 
 
-    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx, MenuHandler& menuHandler) :
+    ScriptBinds_Menu::ScriptBinds_Menu(script::IScriptSys* pSS, GuiContex& ctx) :
         IScriptBindsBase(pSS),
         ctx_(ctx),
-        menuHandler_(menuHandler)
+        pMenuHandler_(nullptr)
     {
     }
 
@@ -92,6 +92,11 @@ namespace gui
 
     }
 
+    void ScriptBinds_Menu::setActiveHandler(MenuHandler* pMenuHandler)
+    {
+        pMenuHandler_ = pMenuHandler;
+    }
+
     int32_t ScriptBinds_Menu::fill(script::IFunctionHandler* pH)
     {
         SCRIPT_CHECK_PARAMETERS_MIN(1);
@@ -109,21 +114,21 @@ namespace gui
         const char* pMenuName = nullptr;
         pH->getParam(1, pMenuName);
 
-        menuHandler_.openMenu(pMenuName);
+        pMenuHandler_->openMenu(pMenuName);
 
         return pH->endFunction();
     }
 
     int32_t ScriptBinds_Menu::close(script::IFunctionHandler* pH)
     {
-        menuHandler_.closeMenu();
+        pMenuHandler_->closeMenu();
 
         return pH->endFunction();
     }
 
     int32_t ScriptBinds_Menu::back(script::IFunctionHandler* pH)
     {
-        menuHandler_.back();
+        pMenuHandler_->back();
 
         return pH->endFunction();
     }
