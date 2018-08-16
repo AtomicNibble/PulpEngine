@@ -412,6 +412,8 @@ bool XScriptSys::executeBuffer(const char* pBegin, const char* pEnd, const char*
 
 bool XScriptSys::loadBufferToTable(const char* pBegin, const char* pEnd, const char* pDesc, IScriptTable* pITable)
 {
+    X_LUA_CHECK_STACK(L);
+
     lua::StateView state(L);
 
     if (!state.loadScript(pBegin, pEnd, pDesc)) {
