@@ -749,6 +749,8 @@ struct IFileSys
 
     virtual RequestHandle AddCloseRequestToQue(core::XFileAsync* pFile) X_ABSTRACT;
     virtual RequestHandle AddIoRequestToQue(IoRequestBase& request) X_ABSTRACT;
+
+    virtual void waitForRequest(RequestHandle handle) X_ABSTRACT;
 };
 
 class XFileMemScoped

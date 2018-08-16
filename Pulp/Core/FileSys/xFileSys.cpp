@@ -1286,6 +1286,12 @@ void xFileSys::cancelRequest(RequestHandle handle)
     X_ASSERT_NOT_IMPLEMENTED();
 }
 
+void xFileSys::waitForRequest(RequestHandle handle)
+{
+    X_UNUSED(handle);
+    X_ASSERT_NOT_IMPLEMENTED();
+}
+
 bool xFileSys::startRequestWorker(void)
 {
     ThreadAbstract::create("IoWorker", 1024 * 128); // small stack

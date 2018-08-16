@@ -311,6 +311,7 @@ public:
     RequestHandle AddIoRequestToQue(IoRequestBase& request) X_FINAL;
     RequestHandle AddIoRequestToQue(IoRequestBase* pRequest);
     void cancelRequest(RequestHandle handle);
+    void waitForRequest(RequestHandle handle) X_FINAL;
     bool startRequestWorker(void);
     void shutDownRequestWorker(void);
 
