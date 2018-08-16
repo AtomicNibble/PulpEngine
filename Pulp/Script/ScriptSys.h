@@ -136,6 +136,7 @@ private:
 
     void processLoadedScritpts(void);
     bool processLoadedScript(Script* pScript);
+    void proicessMissingIncludes(Script* pScript, const char* pBegin, const char* pEnd);
     void addLoadRequest(ScriptResource* pScript);
     void onLoadRequestFail(core::AssetBase* pAsset) X_FINAL;
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
