@@ -23,7 +23,7 @@ namespace gui
     {
         ctx_.init(pCursor);
 
-        openMenu("pause");
+        openMenu("main");
     }
 
     bool MenuHandler::isActive(void) const
