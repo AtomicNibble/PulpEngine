@@ -338,6 +338,7 @@ namespace lua
 
             auto result = static_cast<CallResult::Enum>(lua_pcall(L, numArgs, numResults, base));
 
+            // remove the error handler.
             stack::remove(L, base);
 
             return result;
