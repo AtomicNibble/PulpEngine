@@ -52,6 +52,7 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
     completedLoads_(arena),
     preloads_(arena),
     preloadFileReq_(core::INVALID_IO_REQ_HANDLE),
+    requestSignal_(true),
     preloadParseFailed_(false)
 {
     arena->addChildArena(&poolArena_);
@@ -96,7 +97,6 @@ bool XScriptSys::init(void)
     req.mode.Set(core::fileMode::SHARE);
     req.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
     preloadFileReq_ = gEnv->pFileSys->AddIoRequestToQue(req);
-
 
     L = luaL_newstate();
 
@@ -162,8 +162,9 @@ bool XScriptSys::asyncInitFinalize(void)
  {
     if (preloadFileReq_ != core::INVALID_IO_REQ_HANDLE) 
     {
-        // wait for it to load?
-        gEnv->pFileSys->waitForRequest(preloadFileReq_);
+        X_LOG2("ScriptSys", "Waiting for preload file to load"); // if hangs give me a hint.
+
+        requestSignal_.wait();
     }
 
     if (preloadParseFailed_) {
@@ -1166,22 +1167,24 @@ void XScriptSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoReques
     X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Unecpted request")(pRequest->getType());
     X_ASSERT(preloadFileReq_ != core::INVALID_IO_REQ_HANDLE, "Load request not set")(preloadFileReq_);
 
-    preloadFileReq_ = core::INVALID_IO_REQ_HANDLE;
-
     const auto* pOpenReadReq = static_cast<const core::IoRequestOpenRead*>(pRequest);
-    if (!pOpenReadReq->pFile) {
+    if (pOpenReadReq->pFile)
+    {
+        core::UniquePointer<uint8[]> data(pOpenReadReq->arena, pOpenReadReq->pBuf);
+
+        // we preocess the preload here, so the scripts start loading now.
+        if (!processPreload(data.get(), pOpenReadReq->dataSize)) {
+            X_ERROR("Script", "Failed to prase preload info");
+            preloadParseFailed_ = true;
+        }
+    }
+    else
+    {
         X_WARNING("Script", "Failed to open preload.json");
-        return;
     }
 
-    core::UniquePointer<uint8[]> data(pOpenReadReq->arena, pOpenReadReq->pBuf);
-
-    // we preocess the preload here, so the scripts start loading now.
-    if (!processPreload(data.get(), pOpenReadReq->dataSize)) {
-        X_ERROR("Script", "Failed to prase preload info");
-        preloadParseFailed_ = true;
-    }
-
+    preloadFileReq_ = core::INVALID_IO_REQ_HANDLE;
+    requestSignal_.raise();
 }
 
 bool XScriptSys::processPreload(uint8_t* pData, size_t length)

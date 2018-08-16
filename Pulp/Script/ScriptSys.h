@@ -14,6 +14,8 @@
 #include <Assets\AssetBase.h>
 #include <Assets\AssetLoader.h>
 
+#include <Threading\Signal.h>
+
 #include <IFileSys.h>
 
 X_NAMESPACE_DECLARE(core,
@@ -187,7 +189,8 @@ private:
 
     // preload
     ScriptArr preloads_;
-    core::RequestHandle preloadFileReq_;
+    volatile core::RequestHandle preloadFileReq_;
+    core::Signal requestSignal_;
     bool preloadParseFailed_;
 };
 
