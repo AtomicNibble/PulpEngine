@@ -1289,7 +1289,9 @@ void xFileSys::cancelRequest(RequestHandle handle)
 void xFileSys::waitForRequest(RequestHandle handle)
 {
     X_UNUSED(handle);
-    X_ASSERT_NOT_IMPLEMENTED();
+    X_ASSERT_NOT_IMPLEMENTED(); 
+    // i can't think how to implement this, other than many some extra callback you can set on the request.
+    // like if you pass supportWaiting = true, \o/
 }
 
 bool xFileSys::startRequestWorker(void)
