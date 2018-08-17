@@ -102,6 +102,7 @@ public:
     bool getGlobalValue(const char* pKey, ScriptValue& any) X_FINAL;
 
     bool call(ScriptFunctionHandle f) X_FINAL;
+    bool call(ScriptFunctionHandle f, const ScriptValue& value) X_FINAL;
 
     bool beginCall(ScriptFunctionHandle f) X_FINAL;
     bool beginCall(const char* pFunName) X_FINAL;

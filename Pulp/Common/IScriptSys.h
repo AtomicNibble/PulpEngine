@@ -269,6 +269,7 @@ struct IScriptSys : public core::IEngineSysBase
     // pushFuncArg(2);
     // endCall();
     virtual bool call(ScriptFunctionHandle f) X_ABSTRACT;
+    virtual bool call(ScriptFunctionHandle f, const ScriptValue& value) X_ABSTRACT;
 
     virtual bool beginCall(ScriptFunctionHandle f) X_ABSTRACT;
     virtual bool beginCall(const char* pFunName) X_ABSTRACT;

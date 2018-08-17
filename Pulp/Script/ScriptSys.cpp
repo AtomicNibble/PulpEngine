@@ -688,6 +688,17 @@ bool XScriptSys::call(ScriptFunctionHandle f)
     return endCall(0);
 }
 
+bool XScriptSys::call(ScriptFunctionHandle f, const ScriptValue& value)
+{
+    if (!beginCall(f)) {
+        return false;
+    }
+
+    numCallParams_ = 0;
+    pushCallArg(value);
+    return endCall(0);
+}
+
 bool XScriptSys::beginCall(ScriptFunctionHandle f)
 {
     X_ASSERT(numCallParams_ < 0, "Begin called when in the middle of a function call block")(numCallParams_);

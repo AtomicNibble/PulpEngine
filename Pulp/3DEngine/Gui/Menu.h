@@ -5,6 +5,8 @@
 
 #include <Assets\AssetBase.h>
 
+X_NAMESPACE_DECLARE(core, struct FrameData)
+
 X_NAMESPACE_DECLARE(engine,
                     class IPrimativeContext);
 
@@ -20,9 +22,13 @@ namespace gui
         Menu(core::string& name);
         ~Menu() X_OVERRIDE;
 
-        void draw(void);
+        void draw(core::FrameData& frame);
+        void onOpen(void);
 
         bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
+
+    private:
+        bool ensureScript(void);
 
     private:
         core::UniquePointer<char[]> data_;
@@ -30,6 +36,7 @@ namespace gui
 
         script::IScriptTable* pScriptTable_;
         script::ScriptValue updateFunc_;
+        script::ScriptValue onOpenFunc_;
     };
 
 

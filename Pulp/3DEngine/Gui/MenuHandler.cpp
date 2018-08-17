@@ -15,7 +15,8 @@ namespace gui
     
     MenuHandler::MenuHandler(GuiContex& ctx, XMenuManager& man) :
         ctx_(ctx),
-        man_(man)
+        man_(man),
+        pActiveMenu_(nullptr)
     {
 
     }
@@ -49,7 +50,13 @@ namespace gui
         auto* pMenu = stack_.top();
         if(pMenu->isLoaded())
         {
-            pMenu->draw();
+            if (pActiveMenu_ != pMenu)
+            {
+                pMenu->onOpen();
+                pActiveMenu_ = pMenu;
+            }
+
+            pMenu->draw(frame);
         }
 
 #if X_SUPER == 0
@@ -72,6 +79,7 @@ namespace gui
 
     void MenuHandler::closeMenu(void)
     {
+        pActiveMenu_ = nullptr;
         stack_.clear();
     }
 
@@ -81,6 +89,7 @@ namespace gui
             return false;
         }
 
+        pActiveMenu_ = nullptr;
         stack_.pop();
         return true;
     }
