@@ -36,6 +36,7 @@ namespace gui
         GuiContex& ctx_;
         XMenuManager& man_;
 
+        bool firstMenu_;
         Menu* pActiveMenu_;
         MenuStack stack_;
     };

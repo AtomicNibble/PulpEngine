@@ -16,7 +16,8 @@ namespace gui
     MenuHandler::MenuHandler(GuiContex& ctx, XMenuManager& man) :
         ctx_(ctx),
         man_(man),
-        pActiveMenu_(nullptr)
+        pActiveMenu_(nullptr),
+        firstMenu_(false)
     {
 
     }
@@ -52,7 +53,12 @@ namespace gui
         {
             if (pActiveMenu_ != pMenu)
             {
-                pMenu->onOpen();
+                if(firstMenu_)
+                { 
+                    firstMenu_ = false;
+                    pMenu->onOpen();
+                }
+
                 pActiveMenu_ = pMenu;
             }
 
@@ -71,6 +77,10 @@ namespace gui
         auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
         if (!pMenu) {
             return false;
+        }
+
+        if (stack_.isEmpty()) {
+            firstMenu_ = true;
         }
 
         stack_.push(pMenu);
