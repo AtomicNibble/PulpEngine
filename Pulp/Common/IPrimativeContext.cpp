@@ -77,19 +77,23 @@ void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& 
 
 void IPrimativeContext::drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col)
 {
-    PrimVertex* pQuad = addPrimative(4, PrimitiveType::TRIANGLESTRIP, pMaterial);
+    PrimVertex* pQuad = addPrimative(6, PrimitiveType::TRIANGLELIST, pMaterial);
 
     pQuad[0].pos = tl;
     pQuad[1].pos = tr;
-    pQuad[2].pos = bl;
+    pQuad[2].pos = br;
     pQuad[3].pos = br;
+    pQuad[4].pos = bl;
+    pQuad[5].pos = tl;
 
     pQuad[0].st = uv_00;
     pQuad[1].st = uv_10;
-    pQuad[2].st = uv_01;
+    pQuad[2].st = uv_11;
     pQuad[3].st = uv_11;
+    pQuad[4].st = uv_01;
+    pQuad[5].st = uv_00;
 
-    for (uint32 i = 0; i < 4; ++i) {
+    for (uint32 i = 0; i < 6; ++i) {
         pQuad[i].color = col;
     }
 }
