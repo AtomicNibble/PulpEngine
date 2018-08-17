@@ -10,6 +10,7 @@ local function Update(dt)
 
     local t = ((math.sin(uiTimeMS / 1000) + 1.0) * 0.5)
 
+    ui.fill(2,2,2,220);
     ui.center();
 
     --really I want to just have normal and big font sizes.
