@@ -121,7 +121,7 @@ namespace gui
 
     int32_t ScriptBinds_Menu::close(script::IFunctionHandler* pH)
     {
-        pMenuHandler_->closeMenu();
+        pMenuHandler_->close();
 
         return pH->endFunction();
     }

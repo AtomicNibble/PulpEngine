@@ -29,7 +29,7 @@ namespace gui
         void update(core::FrameData& frame, IPrimativeContext* pPrim) X_FINAL;
 
         bool openMenu(const char* pName) X_FINAL;
-        void closeMenu(void);
+        void close(void) X_FINAL;
         bool back(void) X_FINAL;
 
     private:

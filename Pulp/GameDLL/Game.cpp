@@ -268,6 +268,8 @@ bool XGame::update(core::FrameData& frame)
         if (prevStatus_ != net::SessionStatus::Loading)
         {
             // frist frame in loading.
+            pMenuHandler_->openMenu("loading");
+
             clearWorld();
         }
 
@@ -300,25 +302,14 @@ bool XGame::update(core::FrameData& frame)
             pSession_->finishedLoading();
         }
 
-        // draw some shitty load screen?
-        pPrim->drawQuad(0.f, 0.f, width, height, Col_Black);
-
-        con.col = Col_Whitesmoke;
-        pPrim->drawText(Vec3f(center.x, center.y, 1.f), con, L"loading");
-
-        const float barWidth = 400.f;
-        const float barHeight = 10.f;
-        float progress = 0.3f;
-
-        Vec2f barPos(center);
-        barPos.x -= barWidth * 0.5f;
-        barPos.y += 30.f;
-
-        pPrim->drawQuad(barPos.x, barPos.y, barWidth * progress, barHeight, Col_Red);
-        pPrim->drawRect(barPos.x, barPos.y, barWidth, barHeight, Col_Red);
     }
     else if (status == net::SessionStatus::InGame)
     {
+        if (prevStatus_ != net::SessionStatus::InGame)
+        {
+            pMenuHandler_->close();
+        }
+
         X_ASSERT_NOT_NULL(world_.ptr());
 
         syncLobbyUsers();

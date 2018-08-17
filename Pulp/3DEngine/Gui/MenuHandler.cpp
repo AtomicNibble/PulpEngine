@@ -87,7 +87,7 @@ namespace gui
         return true;
     }
 
-    void MenuHandler::closeMenu(void)
+    void MenuHandler::close(void)
     {
         pActiveMenu_ = nullptr;
         stack_.clear();
