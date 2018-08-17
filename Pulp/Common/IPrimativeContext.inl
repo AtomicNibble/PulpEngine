@@ -1,25 +1,6 @@
 
 X_NAMESPACE_BEGIN(engine)
 
-X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float height,
-    Color8u col, Color8u borderCol)
-{
-    drawQuadSS(x, y, width, height, col);
-    drawRectSS(x, y, width, height, borderCol);
-}
-
-X_INLINE void IPrimativeContext::drawQuadSS(float x, float y, float width, float height, Material* pMaterial, Color8u col)
-{
-    const Rectf rect(x, y, x + width, y + height);
-    drawQuadSS(rect, pMaterial, col);
-}
-
-X_INLINE void IPrimativeContext::drawRectSS(float x, float y, float width, float height, Color8u col)
-{
-    const Rectf rect(x, y, x + width, y + height);
-    drawRectSS(rect, col);
-}
-
 X_INLINE void IPrimativeContext::drawQuad(float xpos, float ypos,
     float w, float h, Material* pMaterial, Color8u col)
 {
