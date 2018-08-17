@@ -497,7 +497,7 @@ bool XScriptSys::loadBufferToTable(const char* pBegin, const char* pEnd, const c
     
     if (result != CallResult::Ok) 
     {
-        X_ERROR("Script", "failed to exec: \"%s\"", CallResult::ToString(result));
+        X_ERROR("Script", "Failed to exec: \"%s\"", CallResult::ToString(result));
         stack::pop(L);
         return false;
     }
