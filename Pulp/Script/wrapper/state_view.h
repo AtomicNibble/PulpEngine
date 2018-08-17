@@ -440,7 +440,17 @@ namespace lua
     {
         auto status = state::load(L_, pBegin, pEnd, pChunkName);
 
-        return status == LoadResult::Ok;
+        if (status == LoadResult::Ok) {
+            return true;
+        }
+
+        X_ASSERT(stack::get_type(L_) == Type::String, "Expected error string")();
+        const char* pErrStr = stack::as_string(L_);
+
+        X_ERROR("Script", "Failed to load buffer(%s) Err: %s", pChunkName, pErrStr);
+
+        stack::pop(L_);
+        return false;
     }
 
 } // namespace lua
