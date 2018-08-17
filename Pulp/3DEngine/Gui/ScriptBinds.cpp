@@ -80,6 +80,7 @@ namespace gui
         X_SCRIPT_BIND(ScriptBinds_Menu, close);
         X_SCRIPT_BIND(ScriptBinds_Menu, back);
 
+        X_SCRIPT_BIND(ScriptBinds_Menu, pacifier);
         X_SCRIPT_BIND(ScriptBinds_Menu, text);
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
@@ -129,6 +130,20 @@ namespace gui
     int32_t ScriptBinds_Menu::back(script::IFunctionHandler* pH)
     {
         pMenuHandler_->back();
+
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::pacifier(script::IFunctionHandler* pH)
+    {
+        float dt = 0.f;
+
+        if (pH->getParamCount() > 0)
+        {
+            pH->getParam(dt);
+        }
+
+        ctx_.pacifier(dt);
 
         return pH->endFunction();
     }

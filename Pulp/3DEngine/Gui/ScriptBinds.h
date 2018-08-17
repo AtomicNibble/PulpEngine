@@ -27,6 +27,7 @@ namespace gui
         int32_t close(script::IFunctionHandler* pH);
         int32_t back(script::IFunctionHandler* pH);
 
+        int32_t pacifier(script::IFunctionHandler* pH);
         int32_t text(script::IFunctionHandler* pH);
         int32_t button(script::IFunctionHandler* pH);
         int32_t sliderVar(script::IFunctionHandler* pH);

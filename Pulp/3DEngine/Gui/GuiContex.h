@@ -62,7 +62,7 @@ namespace gui
     public:
         GuiContex();
 
-        void init(engine::Material* pCursor);
+        void init(engine::Material* pCursor, engine::Material* pSpinner);
         void setPrimContet(PrimativeContext* pPrim);
 
         void processInput(core::FrameInput& input);
@@ -89,6 +89,9 @@ namespace gui
 
         // Sliders
         void slider(const char* pLabel, const char* pVarName, float increment);
+
+        // who's a good baby?
+        void pacifier(float dt);
 
     private:
         Vec2f calcTextSize(const char* pBegin, const char* pEnd);
@@ -127,6 +130,7 @@ namespace gui
         ItemWidthStack itemWidthStack_;
 
         engine::Material* pCursor_;
+        engine::Material* pSpinner_;
     };
 
 

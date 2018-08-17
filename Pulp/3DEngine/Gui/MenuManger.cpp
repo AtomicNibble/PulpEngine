@@ -55,8 +55,9 @@ namespace gui
         pScriptBinds_->bind();
 
         auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");
+        auto* pSpinner = gEngEnv.pMaterialMan_->loadMaterial("ui/spinner");
 
-        ctx_.init(pCursor);
+        ctx_.init(pCursor, pSpinner);
         return true;
     }
 

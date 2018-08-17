@@ -14,7 +14,8 @@ namespace gui
 
     GuiContex::GuiContex() :
         pPrim_(nullptr),
-        pCursor_(nullptr)
+        pCursor_(nullptr),
+        pSpinner_(nullptr)
     {
         txtCtx_.pFont = nullptr;
         txtCtx_.col = Col_White;
@@ -41,9 +42,10 @@ namespace gui
         style_.borderColForcus = Col_Orange;
     }
 
-    void GuiContex::init(engine::Material* pCursor)
+    void GuiContex::init(engine::Material* pCursor, engine::Material* pSpinner)
     {
         pCursor_ = pCursor;
+        pSpinner_ = pSpinner;
     }
 
     void GuiContex::setPrimContet(PrimativeContext* pPrim)
@@ -325,6 +327,46 @@ namespace gui
         txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
     }
+
+    void GuiContex::pacifier(float dt)
+    {
+        // what to draw!
+        // the options are endless..
+        const float size = 64.f;
+        const float radius = size * 0.5f;
+        const float padding = 16.f;
+        const float offset = radius + padding;
+
+        // i want it to spin!
+        static float elapse = 0.f;
+
+        elapse += dt;
+
+        auto rotation = elapse / 5.f;
+
+        auto mat = Matrix22f::createRotation(::toRadians(-rotation));
+        
+        Vec2f tl(-radius, -radius);
+        Vec2f bl(-radius, radius);
+        Vec2f tr(radius, -radius);
+        Vec2f br(radius, radius);
+
+        Vec2f base(rect_.x2 - offset, rect_.y2 - offset);
+        tl = (mat * tl) + base;
+        tr = (mat * tr) + base;
+        bl = (mat * bl) + base;
+        br = (mat * br) + base;
+
+        pPrim_->drawQuad(
+            Vec3f(tl),
+            Vec3f(tr),
+            Vec3f(bl),
+            Vec3f(br),
+            pSpinner_,
+            Color8u(255,255,255,255)
+        );
+    }
+
 
     Vec2f GuiContex::calcTextSize(const char* pBegin, const char* pEnd)
     {
