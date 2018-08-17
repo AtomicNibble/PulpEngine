@@ -5,12 +5,12 @@ local function LoadAssets()
 
 end
 
-local function Update()
 
-    ui.fill(2,2,2,220)
-    ui.center();
+local function Update(dt)
 
     local t = ((math.sin(uiTimeMS / 1000) + 1.0) * 0.5)
+
+    ui.center();
 
     --really I want to just have normal and big font sizes.
     --ui.pushFont();
@@ -35,8 +35,13 @@ local function Update()
 
 end
 
+local function OnOpen()
+
+end
+
 
 return {
   LoadAssets = LoadAssets,
   Update = Update,
+  OnOpen = OnOpen,
 }

@@ -5,9 +5,22 @@ local function LoadAssets()
 
 end
 
-local function Update()
+local totalTime = 0;
 
-    ui.fill(2,2,2,220)
+local function fadeIn(dt)
+
+    totalTime = totalTime + dt;
+
+    local speed = 900;
+    local t = math.min(1, totalTime / speed);
+
+    ui.fill(2,2,2,220 * t)
+end
+
+local function Update(dt)
+
+    fadeIn(dt);
+
     ui.center();
 
     if ui.button("RESUME") then
@@ -23,8 +36,12 @@ local function Update()
 
 end
 
+local function OnOpen()
+    totalTime = 0;
+end
 
 return {
   LoadAssets = LoadAssets,
   Update = Update,
+  OnOpen = OnOpen,
 }
