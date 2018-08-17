@@ -711,12 +711,12 @@ void XSound::performOcclusionChecks(void)
             if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC)) {
                 pObject->flags.Set(SoundFlag::Occluded);
 
-                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.5f);
+                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), LISTNER_OBJECT_ID, 0.f, 0.5f);
             }
             else {
                 pObject->flags.Remove(SoundFlag::Occluded);
 
-                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+                AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), LISTNER_OBJECT_ID, 0.f, 0.f);
             }
         }
         else {
@@ -752,7 +752,7 @@ void XSound::registerObjectSndEngine(SoundObject* pObject)
     culledObjects_.remove(pObject);
     objects_.push_back(pObject);
     if (pObject->flags.IsSet(SoundFlag::Occlusion)) {
-        AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), 0, 0.f, 0.f);
+        AK::SoundEngine::SetObjectObstructionAndOcclusion(SoundObjToAKObject(pObject), LISTNER_OBJECT_ID, 0.f, 0.f);
 
         occlusion_.push_back(pObject);
     }
