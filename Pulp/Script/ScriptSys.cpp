@@ -471,6 +471,7 @@ bool XScriptSys::loadBufferToTable(const char* pBegin, const char* pEnd, const c
     lua::StateView state(L);
 
     if (!state.loadScript(pBegin, pEnd, pDesc)) {
+        X_ERROR("Script", "Failed to load script: \"%s\"", pDesc);
         return false;
     }
 
