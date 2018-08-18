@@ -339,8 +339,19 @@ void TextureManager::releaseResources(Texture* pTex)
 
 bool TextureManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(assetName, name);
+    X_UNUSED(assetName);
 
+    core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
+
+    auto* pTextureRes = textures_.findAsset(name);
+    if (!pTextureRes) {
+        X_LOG1("Texture", "Not reloading \"%s\" it's not currently used", name.c_str());
+        return false;
+    }
+
+    X_LOG0("Texture", "Reloading: %s", name.c_str());
+
+    pAssetLoader_->reload(pTextureRes, core::ReloadFlag::Beginframe);
     return true;
 }
 // -----------------------------------

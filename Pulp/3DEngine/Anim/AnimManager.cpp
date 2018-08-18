@@ -201,8 +201,19 @@ bool AnimManager::processData(core::AssetBase* pAsset, core::UniquePointer<char[
 
 bool AnimManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(assetName, name);
+    X_UNUSED(assetName);
 
+    core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
+
+    auto* pAnimRes = anims_.findAsset(name);
+    if (!pAnimRes) {
+        X_LOG1("Anim", "Not reloading \"%s\" it's not currently used", name.c_str());
+        return false;
+    }
+
+    X_LOG0("Anim", "Reloading: %s", name.c_str());
+
+    pAssetLoader_->reload(pAnimRes, core::ReloadFlag::Beginframe);
     return true;
 }
 

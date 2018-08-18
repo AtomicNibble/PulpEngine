@@ -238,8 +238,19 @@ void XModelManager::listModels(const char* pSearchPatten) const
 
 bool XModelManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
-    X_UNUSED(assetName, name);
+    X_UNUSED(assetName);
 
+    core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
+    auto* pModelRes = models_.findAsset(name);
+    if (!pModelRes) {
+        X_LOG1("ModelManager", "Not reloading \"%s\" it's not currently used", name.c_str());
+        return false;
+    }
+
+    X_LOG0("ModelManager", "Reloading: %s", name.c_str());
+
+    pAssetLoader_->reload(pModelRes, core::ReloadFlag::Beginframe);
     return true;
 }
 
