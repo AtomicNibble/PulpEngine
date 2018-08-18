@@ -17,6 +17,8 @@ local function Update()
 
     ui.sliderVar("FOV", "cam_fov", 1);
 
+    ui.checkboxVar("DRAW DEPTH", "r_draw_depth");
+
     if ui.button("BACK") then
         ui.back()
     end
