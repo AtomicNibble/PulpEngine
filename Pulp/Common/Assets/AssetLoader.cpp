@@ -133,7 +133,7 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
     loadReq->flags.Set(LoadFlag::Reload);
     loadReq->reloadFlags = flags;
 
-    X_LOG0_IF(vars_.debugLvl(), "AssetLoader", "Reloading: ^8%s^7 -> \"%s\"",
+    X_LOG0_IF(vars_.debugLvl(), "AssetLoader", "Reloading: ^4%s^7 -> \"%s\"",
         assetDb::AssetType::ToString(pAsset->getType()), pAsset->getName().c_str());
 
     // dispatch IO
