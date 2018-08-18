@@ -1029,8 +1029,11 @@ void XCore::registerCmds(void)
 
     assetLoader_.registerCmds();
 
-    ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Cmd_ListProgramArgs, VarFlag::SYSTEM,
         "Lists the processed command line arguments parsed to the program");
+
+    ADD_COMMAND_MEMBER("listDisplayDevices", this, XCore, &XCore::Cmd_ListDisplayDevices, VarFlag::SYSTEM,
+        "Lists the display devices <verbose>");
 }
 
 

@@ -163,10 +163,12 @@ private:
     void registerVars(const CoreInitParams& initParams);
     void registerCmds(void);
 
-    void Command_ListProgramArgs(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ListProgramArgs(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd);
 
     void ListProgramArgs(void);
     void LogSystemInfo(void) const;
+    void ListDisplayDevices(bool verbose) const;
 
     void Job_DirectoryWatcher(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
     void Job_ConsoleUpdates(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);

@@ -492,13 +492,23 @@ void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
     }
 }
 
-void XCore::Command_ListProgramArgs(core::IConsoleCmdArgs* pCmd)
+void XCore::Cmd_ListProgramArgs(core::IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);
 
     ListProgramArgs();
 }
 
+void XCore::Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd)
+{
+    bool verbose = false;
+
+    if (pCmd->GetArgCount() > 1) {
+        verbose = core::strUtil::StringToBool(pCmd->GetArg(1));
+    }
+
+    ListDisplayDevices(verbose);
+}
 
 void XCore::ListProgramArgs(void)
 {
@@ -552,6 +562,59 @@ void XCore::LogSystemInfo(void) const
         mode.pelsWidth,
         mode.pelsHeight,
         mode.bitsPerPel);
+}
+
+void XCore::ListDisplayDevices(bool verbose) const
+{
+    core::SysInfo::DisplayDeviceArr devices(g_coreArena);
+    core::SysInfo::GetDisplayDevices(devices);
+
+    X_LOG0("SysInfo", "DisplayDevices: %" PRIuS, devices.size());
+
+    for (auto& device : devices)
+    {
+        X_LOG0("SysInfo", "DeviceName: \"%ls\"", device.deviceName.c_str());
+        X_LOG0("SysInfo", "DeviceString: \"%ls\"", device.deviceString.c_str());
+        X_LOG0("SysInfo", "DeviceID: \"%ls\"", device.deviceID.c_str());
+        X_LOG0("SysInfo", "DeviceKey: \"%ls\"", device.deviceKey.c_str());
+        X_LOG0("SysInfo", "Monitors: %" PRIuS, device.monitors.size());
+
+        if (device.monitors.isEmpty()) {
+            continue;
+        }
+
+        X_LOG_BULLET;
+        for (auto& monitor : device.monitors)
+        {
+            X_LOG0("SysInfo", "DeviceName: \"%ls\"", monitor.deviceName.c_str());
+            X_LOG0("SysInfo", "DeviceString: \"%ls\"", monitor.deviceString.c_str());
+            X_LOG0("SysInfo", "DeviceID: \"%ls\"", monitor.deviceID.c_str());
+            X_LOG0("SysInfo", "DeviceKey: \"%ls\"", monitor.deviceKey.c_str());
+
+            auto printMode = [](const core::SysInfo::DeviceMode& mode) {
+                X_LOG0("SysInfo", "Width: %" PRIu32, mode.pelsWidth);
+                X_LOG0("SysInfo", "Height: %" PRIu32, mode.pelsHeight);
+                X_LOG0("SysInfo", "BitsPerPel: %" PRIu32, mode.bitsPerPel);
+                X_LOG0("SysInfo", "DispalyFrequency: %" PRIu32, mode.dispalyFrequency);
+            };
+            
+            X_LOG0("SysInfo", "CurrentMode:");
+            X_LOG_BULLET;
+            printMode(monitor.currentMode);
+
+            if (!verbose) {
+                continue;
+            }
+
+            for (auto& mode : monitor.modes)
+            {
+                X_LOG0("SysInfo", "------------------------");
+                printMode(mode);
+            }
+        }
+
+        X_LOG0("SysInfo", "");
+    }
 }
 
 // -------------------------------
