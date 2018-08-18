@@ -532,12 +532,12 @@ void XCore::LogSystemInfo(void) const
     core::SysInfo::UserNameStr userName;
     core::SysInfo::LanguageStr lang;
     core::SysInfo::MemInfo memInfo;
-    core::SysInfo::DisplayInfo displayInfo;
+    core::SysInfo::DeviceMode mode;
 
     core::SysInfo::GetUserName(userName);
     core::SysInfo::GetLanguage(lang);
     core::SysInfo::GetSystemMemInfo(memInfo);
-    core::SysInfo::GetDisplayInfo(displayInfo);
+    core::SysInfo::GetCurrentDisplayMode(mode);
 
     core::HumanSize::Str s1, s2, s3;
 
@@ -549,9 +549,9 @@ void XCore::LogSystemInfo(void) const
         core::HumanSize::toString(s3, memInfo.TotalVirtual),
         memInfo.dwMemoryLoad);
     X_LOG0("SysInfo", "Display: ^6%d^7x^6%d^7x^6%d",
-        displayInfo.pelsWidth,
-        displayInfo.pelsHeight,
-        displayInfo.bitsPerPel);
+        mode.pelsWidth,
+        mode.pelsHeight,
+        mode.bitsPerPel);
 }
 
 // -------------------------------

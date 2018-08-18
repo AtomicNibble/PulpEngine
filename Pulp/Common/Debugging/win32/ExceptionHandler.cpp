@@ -409,12 +409,12 @@ namespace exceptionHandler
                     core::SysInfo::UserNameStr userName;
                     core::SysInfo::LanguageStr lang;
                     core::SysInfo::MemInfo memInfo;
-                    core::SysInfo::DisplayInfo displayInfo;
+                    core::SysInfo::DeviceMode mode;
 
                     core::SysInfo::GetUserName(userName);
                     core::SysInfo::GetLanguage(lang);
                     core::SysInfo::GetSystemMemInfo(memInfo);
-                    core::SysInfo::GetDisplayInfo(displayInfo);
+                    core::SysInfo::GetCurrentDisplayMode(mode);
 
                     core::HumanSize::Str s1, s2, s3;
 
@@ -426,9 +426,9 @@ namespace exceptionHandler
                         core::HumanSize::toString(s3, memInfo.TotalVirtual),
                         memInfo.dwMemoryLoad);
                     X_LOG0("ExceptionHandler", "Display: %dx%dx%d",
-                        displayInfo.pelsWidth,
-                        displayInfo.pelsHeight,
-                        displayInfo.bitsPerPel);
+                        mode.pelsWidth,
+                        mode.pelsHeight,
+                        mode.bitsPerPel);
                 }
 
                 {
