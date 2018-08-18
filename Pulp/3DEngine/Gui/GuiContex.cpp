@@ -40,6 +40,9 @@ namespace gui
 
         style_.borderCol = Color8u(25, 25, 25, 255);
         style_.borderColForcus = Col_Orange;
+
+        style_.chkBoxCol = Color8u(255, 255, 255, 255);
+        style_.chkBoxFillCol = Color8u(255, 255, 255, 255);
     }
 
     void GuiContex::init(engine::Material* pCursor, engine::Material* pSpinner)
@@ -303,7 +306,6 @@ namespace gui
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
 
-        txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
 
         Color8u bckCol(24, 24, 24, 200);
         Color8u barBckCol(36, 36, 36, 200);
@@ -315,6 +317,8 @@ namespace gui
         pPrim_->drawQuad(bar, barBckCol);
         pPrim_->drawQuad(barFill, barFillCol);
         pPrim_->drawRect(r, borderCol);
+
+        txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
         pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
 
         core::StackString<16, char> valueStr;
@@ -325,6 +329,110 @@ namespace gui
         pPrim_->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, valueStr.begin(), valueStr.end());
 
         txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
+        txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
+    }
+
+    void GuiContex::checkbox(const char* pLabel, const char* pVarName)
+    {
+        auto* pVar = gEnv->pConsole->GetCVar(pVarName);
+        if (!pVar) {
+            X_ERROR("Gui", "Failed to find var for checkbox: \"%s\"", pVarName);
+            return;
+        }
+
+        auto type = pVar->GetType();
+        if (type != core::VarFlag::INT) {
+            X_ERROR("Gui", "Var must be type int for checkbox: \"%s\"", pVarName);
+            return;
+        }
+
+        auto min = pVar->GetMinInt();
+        auto max = pVar->GetMaxInt();
+        auto value = pVar->GetInteger();
+
+        // able to toggle?
+        if (min > 0 || max < 1) {
+            X_ERROR("Gui", "Var not supported for checkbox: \"%s\"", pVarName);
+            return;
+        }
+
+        auto id = getID(pLabel);
+
+        auto width = itemWidth_;
+        auto height = 32.f;
+        auto pos = dc_.currentPos;
+        auto size = Vec2f(width, height + style_.framePadding.y * 2.f);
+
+        Rectf r(pos, pos + size);
+
+        addItem(r, id);
+
+        bool hovered = itemHoverable(id, r);
+        if (hovered)
+        {
+            if (mouseDown_[Mouse::LEFT])
+            {
+                if (r.contains(cursorPos_))
+                {
+                    setActiveID(id);
+                }
+            }
+        }
+
+        bool held = false;
+
+        if (id == activeId_)
+        {
+            if (!mouseDown_[Mouse::LEFT])
+            {
+                // toggle.
+                if (hovered)
+                {
+                    value = math<int>::clamp(value);
+                    value = !value;
+
+                    pVar->Set(value);
+                }
+
+                clearActiveID();
+            }
+            else
+            {
+                held = true;
+            }
+        }
+
+        auto boxSize = 20.f;
+        auto boxOffsetY = 4.f;
+        auto boxFillSpacing = 2.f;
+
+        if (held) {
+            boxFillSpacing += 2.f;
+        }
+
+        Rectf boxRing(pos, pos + size);
+        boxRing.x1 = r.x2 - (boxSize + style_.framePadding.x + boxOffsetY);
+        boxRing.x2 = boxRing.x1 + boxSize;
+        boxRing.y1 = r.y1 + ((size.y - boxSize) * 0.5f);
+        boxRing.y2 = boxRing.y1 + boxSize;
+
+        Rectf boxFill(boxRing);
+        boxFill.x1 += boxFillSpacing;
+        boxFill.y1 += boxFillSpacing;
+        boxFill.x2 -= (boxFillSpacing + 1.F);
+        boxFill.y2 -= (boxFillSpacing + 1.F);
+
+        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
+
+        pPrim_->drawQuad(r, style_.btnCol);
+        pPrim_->drawRect(r, borderCol);
+        pPrim_->drawRect(boxRing, style_.chkBoxCol);
+        if (value > 0 || held) {
+            pPrim_->drawQuad(boxFill, style_.chkBoxFillCol);
+        }
+        
+        txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
+        pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
     }
 

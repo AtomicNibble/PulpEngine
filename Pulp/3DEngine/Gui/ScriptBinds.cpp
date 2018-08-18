@@ -84,6 +84,7 @@ namespace gui
         X_SCRIPT_BIND(ScriptBinds_Menu, text);
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
+        X_SCRIPT_BIND(ScriptBinds_Menu, checkboxVar);
 
         // center based on item width.
         X_SCRIPT_BIND(ScriptBinds_Menu, center);
@@ -198,6 +199,21 @@ namespace gui
         }
 
         ctx_.slider(pLabel, pVarName, increment);
+
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::checkboxVar(script::IFunctionHandler* pH)
+    {
+        SCRIPT_CHECK_PARAMETERS(2);
+
+        const char* pLabel = nullptr;
+        const char* pVarName = nullptr;
+
+        pH->getParam(1, pLabel);
+        pH->getParam(2, pVarName);
+
+        ctx_.checkbox(pLabel, pVarName);
 
         return pH->endFunction();
     }

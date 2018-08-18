@@ -57,6 +57,9 @@ namespace gui
 
             Color8u borderCol;
             Color8u borderColForcus;
+
+            Color8u chkBoxCol;
+            Color8u chkBoxFillCol;
         };
 
     public:
@@ -89,6 +92,9 @@ namespace gui
 
         // Sliders
         void slider(const char* pLabel, const char* pVarName, float increment);
+
+        // checkbox
+        void checkbox(const char* pLabel, const char* pVarName);
 
         // who's a good baby?
         void pacifier(float dt);
