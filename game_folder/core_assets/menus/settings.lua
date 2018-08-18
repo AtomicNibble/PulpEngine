@@ -15,7 +15,7 @@ local function Update()
     ui.sliderVar("VOLUME SFX", "snd_vol_sfx");
     ui.sliderVar("VOLUME VOICE", "snd_vol_voice");
 
-    ui.sliderVar("FOV", "cam_fov", 1);
+    ui.sliderVar("FIELD OF VIEW", "cam_fov", 1);
 
     ui.checkboxVar("DRAW DEPTH", "r_draw_depth");
 
