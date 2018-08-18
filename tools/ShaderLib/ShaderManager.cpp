@@ -71,7 +71,7 @@ namespace shader
 
     void XShaderManager::registerCmds(void)
     {
-        ADD_COMMAND_MEMBER("ShaderListHw", this, XShaderManager, &XShaderManager::Cmd_ListHWShaders, core::VarFlag::SYSTEM,
+        ADD_COMMAND_MEMBER("shaderListHw", this, XShaderManager, &XShaderManager::Cmd_ListHWShaders, core::VarFlag::SYSTEM,
             "lists the loaded shaders");
         ADD_COMMAND_MEMBER("shaderListsourcebin", this, XShaderManager, &XShaderManager::Cmd_ListShaderSources, core::VarFlag::SYSTEM,
             "lists the loaded shaders sources");
