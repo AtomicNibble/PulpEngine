@@ -77,7 +77,7 @@ void X3DEngine::registerVars(void)
 
 void X3DEngine::registerCmds(void)
 {
-    ADD_COMMAND_MEMBER("r_clear_persistent", this, X3DEngine, &X3DEngine::Command_ClearPersistent,
+    ADD_COMMAND_MEMBER("rClearPersistent", this, X3DEngine, &X3DEngine::Command_ClearPersistent,
         core::VarFlag::SYSTEM, "Clears persistent primatives");
 }
 

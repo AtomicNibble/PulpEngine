@@ -37,20 +37,20 @@ void XNet::registerVars(void)
 
 void XNet::registerCmds(void)
 {
-    ADD_COMMAND_MEMBER("net_list_local_add", this, XNet, &XNet::Cmd_listLocalAddress, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netListLocalAdd", this, XNet, &XNet::Cmd_listLocalAddress, core::VarFlag::SYSTEM,
         "Lists local addresses");
-    ADD_COMMAND_MEMBER("net_list_remotes", this, XNet, &XNet::Cmd_listRemoteSystems, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netListRemotes", this, XNet, &XNet::Cmd_listRemoteSystems, core::VarFlag::SYSTEM,
         "List all the connected systems for each peer. <verbose>");
-    ADD_COMMAND_MEMBER("net_bans_clear", this, XNet, &XNet::Cmd_clearBans, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netBansClear", this, XNet, &XNet::Cmd_clearBans, core::VarFlag::SYSTEM,
         "Clears all bans");
-    ADD_COMMAND_MEMBER("net_bans_list", this, XNet, &XNet::Cmd_listBans, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netBansList", this, XNet, &XNet::Cmd_listBans, core::VarFlag::SYSTEM,
         "Lists all bans");
-    ADD_COMMAND_MEMBER("net_bans_add", this, XNet, &XNet::Cmd_addBan, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netBansAdd", this, XNet, &XNet::Cmd_addBan, core::VarFlag::SYSTEM,
         "Add a ban. <address>, <timeoutMS> (0=unlimted)");
-    ADD_COMMAND_MEMBER("net_bans_remove", this, XNet, &XNet::Cmd_removeBan, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netBansRemove", this, XNet, &XNet::Cmd_removeBan, core::VarFlag::SYSTEM,
         "Removes a ban if found. <address>");
 
-    ADD_COMMAND_MEMBER("net_resolve", this, XNet, &XNet::Cmd_resolveHost, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netResolve", this, XNet, &XNet::Cmd_resolveHost, core::VarFlag::SYSTEM,
         "Resolves a given host, result is logged. <host>, <forceIpVersion(ipv4|ipv6)>");
 
     ADD_COMMAND_MEMBER("connect", this, XNet, &XNet::Cmd_connect, core::VarFlag::SYSTEM,
@@ -68,7 +68,7 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("startMatch", this, XNet, &XNet::Cmd_startMatch, core::VarFlag::SYSTEM,
         "Guess what? yep it starts that match, magic.");
 
-    ADD_COMMAND_MEMBER("net_chat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("netChat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM,
         "Send a chat message");
 }
 

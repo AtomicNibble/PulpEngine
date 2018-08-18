@@ -234,17 +234,17 @@ void XSound::registerCmds(void)
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pConsole);
 
-    ADD_COMMAND_MEMBER("snd_set_rtpc", this, XSound, &XSound::cmd_SetRtpc, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("sndSetRtpc", this, XSound, &XSound::cmd_SetRtpc, core::VarFlag::SYSTEM,
         "Set a audio RTPC value. <name> <state> <ObjectId>");
-    ADD_COMMAND_MEMBER("snd_set_switchstate", this, XSound, &XSound::cmd_SetSwitchState, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("sndSetWwitchstate", this, XSound, &XSound::cmd_SetSwitchState, core::VarFlag::SYSTEM,
         "Set a audio Switch State. <name> <state> <ObjectId>");
 
-    ADD_COMMAND_MEMBER("snd_post_event", this, XSound, &XSound::cmd_PostEvent, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("sndPostEvent", this, XSound, &XSound::cmd_PostEvent, core::VarFlag::SYSTEM,
         "Post a audio event. <eventName> <ObjectId>");
-    ADD_COMMAND_MEMBER("snd_stop_event", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("sndStopEvent", this, XSound, &XSound::cmd_StopEvent, core::VarFlag::SYSTEM,
         "Stop a audio event on a object. <eventName> <ObjectId>");
 
-    ADD_COMMAND_MEMBER("snd_stop_event_all", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("sndStopEventAll", this, XSound, &XSound::cmd_StopAllEvent, core::VarFlag::SYSTEM,
         "Stop all audio events for a object. <ObjectId>");
 
     ADD_COMMAND_MEMBER("listSndBanks", this, XSound, &XSound::cmd_ListBanks, core::VarFlag::SYSTEM,
