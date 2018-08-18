@@ -54,6 +54,13 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
     assetExt_.fill("");
 }
 
+void AssetLoader::registerCmds(void)
+{
+    ADD_COMMAND_MEMBER("reloadAsset", this, AssetLoader, &AssetLoader::Cmd_ReloadAsset, core::VarFlag::SYSTEM, 
+        "Force asset reload <type> <name>");
+
+}
+
 void AssetLoader::registerVars(void)
 {
     vars_.registerVars();
@@ -424,6 +431,30 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
     }
 
     onLoadRequestSuccess(pRequest);
+}
+
+void AssetLoader::Cmd_ReloadAsset(core::IConsoleCmdArgs* pCmd)
+{
+    if (pCmd->GetArgCount() < 3) {
+        X_WARNING("AssetLoader", "reloadAsset <type> <name>");
+        return;
+    }
+
+    auto* pTypeStr = pCmd->GetArg(1);
+    auto* pName = pCmd->GetArg(2);
+
+
+    assetDb::AssetType::Enum type;
+    if (!assetDb::assetTypeFromStr(type, pTypeStr, pTypeStr + strUtil::strlen(pTypeStr))) {
+        X_ERROR("AssetLoader", "Invalid asset type: \"%s\"", pTypeStr);
+        return;
+    }
+
+    core::string name(pName);
+    core::AssetName assetName(type, name);
+
+    // re use the onFileChanged logic.
+    onFileChanged(assetName.c_str());
 }
 
 X_NAMESPACE_END

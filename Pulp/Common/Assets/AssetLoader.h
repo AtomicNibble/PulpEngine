@@ -10,6 +10,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+struct IConsoleCmdArgs;
+
 namespace V2
 {
     struct Job;
@@ -86,6 +88,7 @@ class AssetLoader
 public:
     AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
 
+    void registerCmds(void);
     void registerVars(void);
 
     void registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSink* pSink, const char* pExt);
@@ -115,6 +118,9 @@ private:
 
     void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
     void processData(AssetLoadRequest* pRequest);
+
+private:
+    void Cmd_ReloadAsset(core::IConsoleCmdArgs* pCmd);
 
 private:
     core::MemoryArenaBase* arena_;

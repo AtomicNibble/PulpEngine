@@ -1027,6 +1027,8 @@ void XCore::registerCmds(void)
 {
     using namespace core;
 
+    assetLoader_.registerCmds();
+
     ADD_COMMAND_MEMBER("listProgramArgs", this, XCore, &XCore::Command_ListProgramArgs, VarFlag::SYSTEM,
         "Lists the processed command line arguments parsed to the program");
 }
