@@ -205,8 +205,7 @@ void TextureManager::releaseTexture(Texture* pTex)
 
 bool TextureManager::waitForLoad(core::AssetBase* pTexture)
 {
-    X_ASSERT(pTexture->getType() == assetDb::AssetType::IMG, "Invalid asset passed")
-    ();
+    X_ASSERT(pTexture->getType() == assetDb::AssetType::IMG, "Invalid asset passed")();
 
     if (pTexture->isLoaded()) {
         return true;
