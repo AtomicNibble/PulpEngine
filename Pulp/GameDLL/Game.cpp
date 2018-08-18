@@ -52,6 +52,8 @@ void XGame::registerCmds(void)
     ADD_COMMAND_MEMBER("map", this, XGame, &XGame::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
     ADD_COMMAND_MEMBER("mainMenu", this, XGame, &XGame::Command_MainMenu, core::VarFlag::SYSTEM, "Return to main menu");
     
+    ADD_COMMAND_MEMBER("uiOpenMenu", this, XGame, &XGame::Cmd_OpenMenu, core::VarFlags::SYSTEM, "Open menu");
+
 }
 
 // ---------------------------------
@@ -666,5 +668,17 @@ void XGame::Command_MainMenu(core::IConsoleCmdArgs* pCmd)
     pSession_->quitToMenu();
 }
 
+void XGame::Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs)
+{
+    if (pArgs->GetArgCount() < 2) {
+        X_WARNING("Game", "uiOpenMenu <name>");
+        return;
+    }
+
+    auto* pMenuName = pArgs->GetArg(1);
+
+    pMenuHandler_->close();
+    pMenuHandler_->openMenu(pMenuName);
+}
 
 X_NAMESPACE_END
