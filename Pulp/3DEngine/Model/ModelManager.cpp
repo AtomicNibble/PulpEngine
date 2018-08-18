@@ -152,7 +152,7 @@ void XModelManager::freeDangling(void)
         for (const auto& m : models_) {
             auto* pModelRes = m.second;
             const auto& name = pModelRes->getName();
-            X_WARNING("XModel", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
+            X_WARNING("ModelManager", "\"%s\" was not deleted. refs: %" PRIi32, name.c_str(), pModelRes->getRefCount());
 
             releaseResources(pModelRes);
         }
