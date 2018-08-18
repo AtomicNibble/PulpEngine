@@ -32,7 +32,6 @@ XModelManager::~XModelManager()
 void XModelManager::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("listModels", this, XModelManager, &XModelManager::Cmd_ListModels, core::VarFlag::SYSTEM, "List all the loaded models");
-    ADD_COMMAND_MEMBER("modelReload", this, XModelManager, &XModelManager::Cmd_ReloadModel, core::VarFlag::SYSTEM, "Reload a model <name>");
 }
 
 void XModelManager::registerVars(void)
@@ -167,25 +166,6 @@ void XModelManager::releaseResources(XModel* pModel)
     X_UNUSED(pModel);
 }
 
-void XModelManager::reloadModel(const char* pModelName)
-{
-    core::string name(pModelName);
-
-    ModelResource* pModelRes = nullptr;
-    {
-        core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-        pModelRes = models_.findAsset(name);
-    }
-
-    if (pModelRes) {
-        X_LOG0("Model", "Reload model: \"%s\"", name.c_str());
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-    else {
-        X_WARNING("Model", "\"%s\" is not loaded skipping reload", name.c_str());
-    }
-}
-
 bool XModelManager::waitForLoad(XModel* pModel)
 {
     if (pModel->getStatus() == core::LoadStatus::Complete) {
@@ -273,18 +253,6 @@ void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)
     }
 
     listModels(pSearchPatten);
-}
-
-void XModelManager::Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd)
-{
-    if (pCmd->GetArgCount() < 2) {
-        X_WARNING("Model", "reloadModel <name>");
-        return;
-    }
-
-    const char* pName = pCmd->GetArg(1);
-
-    reloadModel(pName);
 }
 
 X_NAMESPACE_END

@@ -40,7 +40,6 @@ public:
 
     void releaseAnim(Anim* pAnim);
 
-    void reloadAnim(const char* pName);
     void listAnims(const char* pSearchPatten = nullptr) const;
 
     // returns true if load succeed.
@@ -58,7 +57,6 @@ private:
 
 private:
     void Cmd_ListAnims(core::IConsoleCmdArgs* pCmd);
-    void Cmd_ReloadAnim(core::IConsoleCmdArgs* pCmd);
 
 private:
     core::MemoryArenaBase* arena_;

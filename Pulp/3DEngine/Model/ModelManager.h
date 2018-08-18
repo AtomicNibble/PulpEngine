@@ -45,7 +45,6 @@ public:
 
     void releaseModel(XModel* pModel) X_FINAL;
 
-    void reloadModel(const char* pName);
     void listModels(const char* pSearchPatten = nullptr) const;
 
     bool waitForLoad(XModel* pModel) X_FINAL; // returns true if load succeed.
@@ -63,7 +62,6 @@ private:
 
 private:
     void Cmd_ListModels(core::IConsoleCmdArgs* pCmd);
-    void Cmd_ReloadModel(core::IConsoleCmdArgs* pCmd);
 
 private:
     core::MemoryArenaBase* arena_;

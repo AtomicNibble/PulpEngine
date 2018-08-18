@@ -136,12 +136,6 @@ namespace fx
         }
     }
 
-    void EffectManager::reloadEffect(const char* pName)
-    {
-        X_UNUSED(pName);
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-
     bool EffectManager::waitForLoad(core::AssetBase* pEffect)
     {
         X_ASSERT(pEffect->getType() == assetDb::AssetType::FX, "Invalid asset passed")();

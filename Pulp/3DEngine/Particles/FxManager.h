@@ -59,9 +59,6 @@ namespace fx
 
         void releaseEffect(Effect* pEffect);
 
-        void reloadEffect(const char* pName);
-        void listEffects(const char* pSearchPatten = nullptr) const;
-
         // returns true if load succeed.
         bool waitForLoad(core::AssetBase* pEffect) X_FINAL;
         bool waitForLoad(Effect* pEffect) X_FINAL;

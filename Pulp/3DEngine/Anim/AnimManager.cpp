@@ -24,8 +24,7 @@ AnimManager::~AnimManager()
 void AnimManager::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("listAnims", this, AnimManager, &AnimManager::Cmd_ListAnims, core::VarFlag::SYSTEM, "List all the loaded anims");
-    ADD_COMMAND_MEMBER("animReload", this, AnimManager, &AnimManager::Cmd_ReloadAnim, core::VarFlag::SYSTEM, "Reload a anim <name>");
-}
+} 
 
 void AnimManager::registerVars(void)
 {
@@ -99,11 +98,6 @@ void AnimManager::releaseAnim(Anim* pAnim)
     }
 }
 
-void AnimManager::reloadAnim(const char* pName)
-{
-    X_UNUSED(pName);
-    X_ASSERT_NOT_IMPLEMENTED();
-}
 
 void AnimManager::listAnims(const char* pSearchPatten) const
 {
@@ -224,18 +218,6 @@ void AnimManager::Cmd_ListAnims(core::IConsoleCmdArgs* pCmd)
     }
 
     listAnims(pSearchPatten);
-}
-
-void AnimManager::Cmd_ReloadAnim(core::IConsoleCmdArgs* pCmd)
-{
-    if (pCmd->GetArgCount() < 2) {
-        X_WARNING("Anim", "reloadAnim <name>");
-        return;
-    }
-
-    const char* pName = pCmd->GetArg(1);
-
-    reloadAnim(pName);
 }
 
 X_NAMESPACE_END
