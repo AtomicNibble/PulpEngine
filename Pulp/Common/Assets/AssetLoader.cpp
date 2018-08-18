@@ -229,8 +229,6 @@ void AssetLoader::dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedL
 
     auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
 
-    loadReq->dispatchTime = gEnv->pTimer->GetTimeNowReal();
-
     // dispatch IO
     dispatchLoadRequest(loadReq.get());
 
@@ -260,6 +258,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
     X_LOG0_IF(vars_.debugLvl(), "AssetLoader", "Dispatching: ^4%s^7 -> \"%s\"",
         assetDb::AssetType::ToString(type), name.c_str());
 
+    pLoadReq->dispatchTime = gEnv->pTimer->GetTimeNowReal();
 
     core::AssetName assetName(pAsset->getType(), name, assetExt_[type]);
 
@@ -294,17 +293,19 @@ void AssetLoader::onLoadRequestSuccess(AssetLoadRequest* pLoadReq)
     if (vars_.debugLvl() > 1)
     {
         auto now = gEnv->pTimer->GetTimeNowReal();
-        auto loadTime = pLoadReq->processBegin - pLoadReq->dispatchTime;
+        auto loadTime = pLoadReq->ioCompleteTime - pLoadReq->dispatchTime;
+        auto processDelay = pLoadReq->processBegin - pLoadReq->ioCompleteTime;
         auto processTime = now - pLoadReq->processBegin;
         auto totalTime = now - pLoadReq->dispatchTime;
 
-        X_UNUSED(totalTime);
+        core::HumanDuration::Str durStr0, durStr1, durStr2, durStr3;
 
-        core::HumanDuration::Str durStr0, durStr1;
-
-        X_LOG0("assetLoader", "^4%s^7 -> \"%s\" loaded IO ^6%s^7 Process ^6%s", assetDb::AssetType::ToString(pAsset->getType()),
+        X_LOG0("assetLoader", "^4%s^7 -> \"%s\" IO ^6%s^7 Delay ^6%s^7 Process ^6%s^7 Total ^6%s", assetDb::AssetType::ToString(pAsset->getType()),
             pAsset->getName().c_str(), core::HumanDuration::toString(durStr0, loadTime.GetMilliSeconds()),
-            core::HumanDuration::toString(durStr1, processTime.GetMilliSeconds()));
+            core::HumanDuration::toString(durStr1, processDelay.GetMilliSeconds()),
+            core::HumanDuration::toString(durStr2, processTime.GetMilliSeconds()),
+            core::HumanDuration::toString(durStr3, totalTime.GetMilliSeconds())
+        );
     }
 
     loadRequestCleanup(pLoadReq);
@@ -375,6 +376,8 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
             return;
         }
 
+        pLoadReq->ioCompleteTime = gEnv->pTimer->GetTimeNowReal();
+
         // hello my sexy reload!
         if (pLoadReq->flags.IsSet(LoadFlag::Reload)) {
             if (!pLoadReq->reloadFlags.IsSet(ReloadFlag::AnyTime)) {
@@ -394,7 +397,6 @@ void AssetLoader::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx,
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
     auto* pLoadReq = static_cast<AssetLoadRequest*>(X_ASSERT_NOT_NULL(pData));
-    pLoadReq->processBegin = gEnv->pTimer->GetTimeNowReal();
 
     processData(pLoadReq);
 }
@@ -403,6 +405,8 @@ void AssetLoader::processData(AssetLoadRequest* pRequest)
 {
     auto* pAsset = pRequest->pAsset;
     auto type = pAsset->getType();
+
+    pRequest->processBegin = gEnv->pTimer->GetTimeNowReal();
 
 #if X_ENABLE_ASSET_LOADER_DEADLOCK_CHECK
     processingThreads_.setValueInt(1);

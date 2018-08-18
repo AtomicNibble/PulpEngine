@@ -74,6 +74,7 @@ class AssetLoader
         ReloadFlags reloadFlags;
         uint16_t _pad;
         core::TimeVal dispatchTime;
+        core::TimeVal ioCompleteTime;
         core::TimeVal processBegin;
     };
 
