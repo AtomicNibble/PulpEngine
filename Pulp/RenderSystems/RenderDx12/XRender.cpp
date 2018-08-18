@@ -2141,6 +2141,7 @@ void XRender::Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd)
         const auto& a = adapters_[i];
 
         X_LOG0("Dx12", "Name: \"%ls\" active: %s", a.deviceName.c_str(), i == adapterIdx_ ? "^81" : "^10");
+        X_LOG_BULLET;
         X_LOG0("Dx12", "DedicatedVideoMemory: ^6%s (%" PRIuS ")", core::HumanSize::toString(sizeStr, a.dedicatedvideoMemory), a.dedicatedvideoMemory);
         X_LOG0("Dx12", "DedicatedSystemMemory: ^6%s (%" PRIuS ")", core::HumanSize::toString(sizeStr, a.dedicatedSystemMemory), a.dedicatedSystemMemory);
         X_LOG0("Dx12", "SharedSystemMemory: ^6%s (%" PRIuS ")", core::HumanSize::toString(sizeStr, a.sharedSystemMemory), a.sharedSystemMemory);
