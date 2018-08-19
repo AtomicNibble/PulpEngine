@@ -2,15 +2,15 @@
 
 
 // define a sampler for it, that can't be edited in AssMan.
-Sampler( "TextureSampler" )
+Sampler( "colorSampler" )
 {
-	repeat   = "tile both"
+	repeat   = "no tile"
 	filter = "nearest (mip none)"
 }
 
-Technique( "unlit" )
+Technique( "blend" )
 {
-	state = State() : "disable"
+	state = State() : "blend"
 	{
 		primitiveType = "tristrip"
 	}
@@ -19,11 +19,45 @@ Technique( "unlit" )
 
 	vs = VertexShader()
 	{
-
 	}
 	ps = PixelShader()
 	{
-    	colorSampler = "TextureSampler"
+		colorMap = CodeTexture( "codeTexture0" )
+	}
+}
+
+Technique( "add" )
+{
+	state = State() : "add"
+	{
+		primitiveType = "tristrip"
+	}
+
+	source = "FullScreen.hlsl"
+
+	vs = VertexShader()
+	{
+	}
+	ps = PixelShader()
+	{
+		colorMap = CodeTexture( "codeTexture0" )
+	}
+}
+
+Technique( "replace" )
+{
+	state = State() : "replace"
+	{
+		primitiveType = "tristrip"
+	}
+
+	source = "FullScreen.hlsl"
+
+	vs = VertexShader()
+	{
+	}
+	ps = PixelShader()
+	{
 		colorMap = CodeTexture( "codeTexture0" )
 	}
 }
