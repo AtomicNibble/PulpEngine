@@ -86,10 +86,8 @@ render::IPixelBuffer* pDepthStencil = nullptr;
 bool X3DEngine::init(void)
 {
     X_PROFILE_NO_HISTORY_BEGIN("3DEngineInit", core::profiler::SubSys::ENGINE3D);
+    X_ASSERT(gEngEnv.p3DEngine_ == nullptr, "Doble init")();
 
-    if (gEngEnv.p3DEngine_) {
-        return false;
-    }
 
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pCore);
