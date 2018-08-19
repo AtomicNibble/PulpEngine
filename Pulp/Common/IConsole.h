@@ -36,9 +36,13 @@ X_DECLARE_FLAGS(VarFlag)
     SAVE_IF_CHANGED, // saved to config if changed.
     RESTART_REQUIRED,
 
-    SYSTEM,  // system related
-    TOOL,    // tool related
-    CPY_NAME // makes a copy of the name
+    // sub systems
+    SYSTEM,
+    SOUND,
+    RENDERER,
+    TOOL,       
+
+    CPY_NAME    // makes a copy of the name
 );
 
 typedef Flags<VarFlag> VarFlags;

@@ -21,15 +21,15 @@ void RenderVars::registerVars(void)
 {
     X_ASSERT(!varsRegisterd_, "Vars already init")(varsRegisterd_);
 
-    ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+    ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Enable d3d debug layer");
 
     ADD_CVAR_REF_COL("r_clear_color", clearColor_, clearColor_,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Clear color");
+        core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED, "Clear color");
 
-    pNativeRes_ = ADD_CVAR_STRING("r_native_res", "", core::VarFlag::SYSTEM | core::VarFlag::READONLY,
+    pNativeRes_ = ADD_CVAR_STRING("r_native_res", "", core::VarFlag::RENDERER | core::VarFlag::READONLY,
         "The final render resolution");
-    pRes_ = ADD_CVAR_STRING("r_res", "", core::VarFlag::SYSTEM | core::VarFlag::READONLY,
+    pRes_ = ADD_CVAR_STRING("r_res", "", core::VarFlag::RENDERER | core::VarFlag::READONLY,
         "The render buffer resolution, scaled to 'r_native_res'");
 
     varsRegisterd_ = true;

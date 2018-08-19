@@ -96,10 +96,10 @@ void XRender::registerVars(void)
 void XRender::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("rListAdapters", this, XRender, &XRender::Cmd_ListAdapters,
-        core::VarFlag::SYSTEM, "List the gpu adapters");
+        core::VarFlag::RENDERER, "List the gpu adapters");
 
     ADD_COMMAND_MEMBER("rListDeviceFeatures", this, XRender, &XRender::Cmd_ListDeviceFeatures,
-        core::VarFlag::SYSTEM, "List the gpu devices features");
+        core::VarFlag::RENDERER, "List the gpu devices features");
 
     if (pTextureMan_) {
         pTextureMan_->registerCmds();

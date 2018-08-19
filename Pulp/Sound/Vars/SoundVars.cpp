@@ -93,13 +93,13 @@ SoundVars::~SoundVars()
 void SoundVars::RegisterVars(void)
 {
     pVarVolMaster_ = ADD_CVAR_FLOAT("snd_vol_master", 1.f, 0.f, 1.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
     pVarVolMusic_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
     pVarVolSfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
     pVarVolVoice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Voice volume");
 
     core::ConsoleVarFunc del;
     del.Bind<Var_MasterVolChanged>();
@@ -116,54 +116,54 @@ void SoundVars::RegisterVars(void)
 
     const int32_t maxVal = std::numeric_limits<int32_t>::max();
 
-    ADD_CVAR_REF("snd_mute_lost_focus", suspectOnFocusLost_, suspectOnFocusLost_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_mute_lost_focus", suspectOnFocusLost_, suspectOnFocusLost_, 0, 1, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Suspend the sound system when window focus is lost");
-    ADD_CVAR_REF("snd_enable_coms", enableCommSys_, enableCommSys_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_enable_coms", enableCommSys_, enableCommSys_, 0, 1, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "initialize Wwise Comm system on startup");
-    ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_enable_capture", enableOutputCapture_, enableOutputCapture_, 0, 1, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Allows for capturing the output audio to a wav file.");
-    ADD_CVAR_REF("snd_enable_cull", enableCulling_, enableCulling_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_enable_cull", enableCulling_, enableCulling_, 0, 1, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Enable inactive sound object culling");
 
-    ADD_CVAR_REF("snd_debug_draw", enableDebugRender_, enableDebugRender_, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_debug_draw", enableDebugRender_, enableDebugRender_, 0, 2, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Enables sound debug rendering. 1=pos/occ 2=info text");
 
     ADD_CVAR_REF("snd_debug_obj_scale", debugObjectScale_, debugObjectScale_, 1.f, 32.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Debug draw scale for objects");
     ADD_CVAR_REF("snd_debug_text_size", debugTextSize_, debugTextSize_, 0.001f, 128.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Debug draw text size");
 
     ADD_CVAR_REF("snd_active_cull_distance", registeredCullDistance_, registeredCullDistance_, 0.f, 1024.f * 16.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Distance active sound objects are culled. Inactive sound objects exceeding this distance will be put to sleep");
     ADD_CVAR_REF("snd_occlusion_refresh_rate", occlusionRefreshRate_, occlusionRefreshRate_, 0.f, 60.f,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "The rate in seconds occlusion values are refreshed.");
 
     // LEEERORRRY Jenkins!!
     ADD_CVAR_REF("snd_mem_engine_default_pool", soundEngineDefaultMemoryPoolSize_, soundEngineDefaultMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine default memory pool size (KiB).");
     ADD_CVAR_REF("snd_mem_engine_lower_default_pool", soundEngineLowerDefaultPoolSize_, soundEngineLowerDefaultPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine lower default memory pool size (KiB).");
     ADD_CVAR_REF("snd_mem_engine_stream_pool", streamManagerMemoryPoolSize_, streamManagerMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine stream memory pool size (KiB).");
     ADD_CVAR_REF("snd_mem_engine_stream_device_pool", streamDeviceMemoryPoolSize_, streamDeviceMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine stream device memory pool size (KiB).");
     ADD_CVAR_REF("snd_mem_engine_command_queue_pool", commandQueueMemoryPoolSize_, commandQueueMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine command queue memory pool size (KiB).");
 
     ADD_CVAR_REF("snd_mem_engine_monitor_pool", monitorMemoryPoolSize_, monitorMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine monitor memory pool size (KiB).");
     ADD_CVAR_REF("snd_mem_engine_monitor_queue_pool", monitorQueueMemoryPoolSize_, monitorQueueMemoryPoolSize_, 0, maxVal,
-        core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Sound engine monitor queue memory pool size (KiB).");
 }
 
