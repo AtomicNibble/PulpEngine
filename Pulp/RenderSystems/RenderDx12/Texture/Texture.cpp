@@ -60,9 +60,7 @@ const DXGI_FORMAT Texture::getFormatDX(void) const
 
 void Texture::setPixelBuffer(render::PixelBufferType::Enum type, render::PixelBuffer* pInst)
 {
-    X_ASSERT(pixelBufType_ == render::PixelBufferType::NONE || type == render::PixelBufferType::NONE,
-        "Already has a pixel buffer")
-    (pixelBufType_);
+    X_ASSERT(pixelBufType_ == render::PixelBufferType::NONE || type == render::PixelBufferType::NONE,"Already has a pixel buffer")(pixelBufType_);
 
     pixelBufType_ = type;
     pPixelBuffer_ = pInst;
