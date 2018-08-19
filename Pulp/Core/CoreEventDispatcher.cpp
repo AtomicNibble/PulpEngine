@@ -9,6 +9,8 @@ XCoreEventDispatcher::XCoreEventDispatcher(CoreVars& coreVars, core::MemoryArena
     coreVars_(coreVars),
     listners_(arena)
 {
+    core::zero_object(resizeEvent_);
+    core::zero_object(moveEvent_);
 }
 
 XCoreEventDispatcher::~XCoreEventDispatcher()
@@ -20,20 +22,30 @@ XCoreEventDispatcher::~XCoreEventDispatcher()
 
 void XCoreEventDispatcher::pumpEvents(void)
 {
-    if (events_.isEmpty()) {
-        return;
-    }
-
-    while (events_.isNotEmpty()) {
-        auto& ed = events_.peek();
-
+    auto dispatchEvent = [&](const CoreEventData& ed) {
         if (coreVars_.coreEventDebug_) {
             X_LOG0("CoreEvent", "CoreEvent: \"%s\"", CoreEvent::ToString(ed.event));
         }
 
         for (auto* pList : listners_) {
-            pList->OnCoreEvent(ed.event, ed.wparam, ed.lparam);
+            pList->OnCoreEvent(ed.event, ed);
         }
+    };
+
+    // only send the last merge and resize event since last frame?
+    if (resizeEvent_.event == CoreEvent::RESIZE) {
+        dispatchEvent(resizeEvent_);
+        core::zero_object(resizeEvent_);
+    }
+    if (moveEvent_.event == CoreEvent::MOVE) {
+        dispatchEvent(moveEvent_);
+        core::zero_object(moveEvent_);
+    }
+
+    while (events_.isNotEmpty()) {
+        auto& ed = events_.peek();
+
+        dispatchEvent(ed);
 
         events_.pop();
     }
@@ -69,23 +81,31 @@ bool XCoreEventDispatcher::RemoveListener(ICoreEventListener* pListener)
     return true;
 }
 
-void XCoreEventDispatcher::QueueCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+void XCoreEventDispatcher::QueueCoreEvent(CoreEventData data)
 {
+    X_ASSERT(data.event != CoreEvent::NONE, "Event not set")();
+
     if (coreVars_.coreEventDebug_) {
-        X_LOG0("CoreEvent", "CoreEvent Queued: \"%s\"", CoreEvent::ToString(event));
+        X_LOG0("CoreEvent", "CoreEvent Queued: \"%s\"", CoreEvent::ToString(data.event));
     }
 
-    CoreEventData ed;
-    ed.event = event;
-    ed.wparam = wparam;
-    ed.lparam = lparam;
+    if (data.event == CoreEvent::RESIZE)
+    {
+        resizeEvent_ = data;
+        return;
+    }
+    if (data.event == CoreEvent::MOVE)
+    {
+        moveEvent_ = data;
+        return;
+    }
 
     if (!events_.freeSpace()) {
         X_ERROR("CoreEvent", "Event queue overflow!");
         events_.pop();
     }
 
-    events_.push(ed);
+    events_.push(data);
 }
 
 X_NAMESPACE_END

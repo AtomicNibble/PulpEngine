@@ -76,6 +76,7 @@ X_USING_NAMESPACE;
 
 X_DECLARE_ENUM(CoreEvent)
 (
+    NONE,
     CHANGE_FOCUS,                   //  window focus changed.  (active, hwnd)
     MOVE,                           //  window moved.          (x, y)
     RESIZE,                         //  window size change.    ()
@@ -88,12 +89,42 @@ X_DECLARE_ENUM(CoreEvent)
     LEVEL_UNLOAD,
     LEVEL_POST_UNLOAD);
 
+struct SizeData
+{
+    int16_t width;
+    int16_t height;
+};
+
+struct PosData
+{
+    int16_t x;
+    int16_t y;
+};
+
+struct FocusData
+{
+    int32_t active;
+};
+
+struct CoreEventData
+{
+    CoreEvent::Enum event;
+
+    union {
+        SizeData resize;
+        SizeData renderRes;
+        PosData move;
+        FocusData focus;
+    };
+};
+
+
 // Description:
 //	 Interface used for getting notified when a system event occurs.
 struct ICoreEventListener
 {
     virtual ~ICoreEventListener() = default;
-    virtual void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_ABSTRACT;
+    virtual void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_ABSTRACT;
 };
 
 // Description:
@@ -104,7 +135,7 @@ struct ICoreEventDispatcher
     virtual bool RegisterListener(ICoreEventListener* pListener) X_ABSTRACT;
     virtual bool RemoveListener(ICoreEventListener* pListener) X_ABSTRACT;
 
-    virtual void QueueCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_ABSTRACT;
+    virtual void QueueCoreEvent(CoreEventData data) X_ABSTRACT;
 };
 
 struct IAssertHandler

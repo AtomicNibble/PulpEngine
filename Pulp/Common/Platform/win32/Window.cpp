@@ -362,21 +362,29 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_SETCURSOR:
         {
             if (LOWORD(lParam) == HTCLIENT && hideClientCursor_) {
-                SetCursor(NULL);
+                ::SetCursor(NULL);
                 return TRUE;
             }
             break;
         }
         case WM_ACTIVATE:
         {
-            int32_t active = (wParam != WA_INACTIVE);
-            hasFocus_ = active > 0;
-            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::CHANGE_FOCUS, active, lParam);
+            CoreEventData ed;
+            ed.event = CoreEvent::CHANGE_FOCUS;
+            ed.focus.active = (wParam != WA_INACTIVE);
+            
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
+            hasFocus_ = ed.focus.active > 0;
             break;
         }
         case WM_SIZE:
         {
-            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::RESIZE, wParam, lParam);
+            CoreEventData ed;
+            ed.event = CoreEvent::RESIZE;
+            ed.resize.width = static_cast<int16_t>(LOWORD(lParam));
+            ed.resize.height = static_cast<int16_t>(HIWORD(lParam));
+
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
             break;
         }
         case WM_SIZING:
@@ -389,10 +397,12 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         }
         case WM_MOVE:
         {
-            int32_t xPos = static_cast<short>(LOWORD(lParam));
-            int32_t yPos = static_cast<short>(HIWORD(lParam));
+            CoreEventData ed;
+            ed.event = CoreEvent::RESIZE;
+            ed.move.x = static_cast<int16_t>(LOWORD(lParam));
+            ed.move.y = static_cast<int16_t>(HIWORD(lParam));
 
-            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(CoreEvent::MOVE, xPos, yPos);
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
             break;
         }
     }

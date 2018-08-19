@@ -171,7 +171,7 @@ private:
     void bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
 
 private:
-    void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
+    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
 
 private:
     void cmd_SetRtpc(core::IConsoleCmdArgs* pArgs);

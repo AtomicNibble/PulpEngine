@@ -176,11 +176,11 @@ private:
 private:
     // IDirectoryWatcherListener
     bool OnFileChange(core::IDirectoryWatcher::Action::Enum action,
-        const char* pName, const char* pOldName, bool isDirectory) X_OVERRIDE;
+        const char* pName, const char* pOldName, bool isDirectory) X_FINAL;
     // ~IDirectoryWatcherListener
 
     // ICoreEventListener
-    void OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam) X_OVERRIDE;
+    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
     // ~ICoreEventListener
 
 private:

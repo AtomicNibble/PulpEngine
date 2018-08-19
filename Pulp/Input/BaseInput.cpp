@@ -103,9 +103,9 @@ bool XBaseInput::addInputDevice(XInputDevicePtr pDevice)
     return true;
 }
 
-void XBaseInput::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+void XBaseInput::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
 {
-    X_UNUSED(wparam, lparam);
+    X_UNUSED(ed);
 
     if (event == CoreEvent::CHANGE_FOCUS || event == CoreEvent::LEVEL_LOAD_START || event == CoreEvent::LEVEL_POST_UNLOAD) {
         clearKeyState();

@@ -859,11 +859,9 @@ TechDefPerm* XMaterialManager::getCodeTech(const core::string& name, core::StrHa
 }
 
 // ICoreEventListener
-void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
 {
-    X_UNUSED(event);
-    X_UNUSED(wparam);
-    X_UNUSED(lparam);
+    X_UNUSED(event, ed);
 }
 // ~ICoreEventListener
 

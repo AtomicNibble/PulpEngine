@@ -358,10 +358,9 @@ bool XCore::PumpMessages()
     return false;
 }
 
-void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
+void XCore::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
 {
-    X_UNUSED(wparam);
-    X_UNUSED(lparam); 
+    X_UNUSED(ed);
 
     switch (event) {
         case CoreEvent::MOVE: {
@@ -373,7 +372,7 @@ void XCore::OnCoreEvent(CoreEvent::Enum event, UINT_PTR wparam, UINT_PTR lparam)
             vars_.updateWinDim(rect.getWidth(), rect.getHeight());
         } break;
         case CoreEvent::CHANGE_FOCUS:
-            if (wparam != 0) {
+            if (ed.focus.active != 0) {
                 if (pWindow_) {
                     pWindow_->ClipCursorToWindow();
                 }
