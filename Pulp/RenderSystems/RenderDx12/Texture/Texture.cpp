@@ -37,7 +37,7 @@ Texture::~Texture()
 void Texture::destroy(void)
 {
     resource_.destroy();
-    hCpuDescriptorHandle_.ptr = 0;
+    hCpuDescriptorHandle_.ptr = render::D3D12_GPU_VIRTUAL_ADDRESS_NULL;
 }
 
 void Texture::setProperties(const XTextureFile& imgFile)
