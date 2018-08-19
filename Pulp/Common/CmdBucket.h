@@ -129,7 +129,7 @@ public:
 #endif // !X_COMPILE_CLANG
 
 protected:
-    CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XCamera& cam, const XViewPort& viewport);
+    CommandBucketBase(core::MemoryArenaBase* arena, size_t size, const XViewPort& viewport);
     ~CommandBucketBase() = default;
 
 public:
@@ -188,7 +188,7 @@ public:
     CommandBucket(core::MemoryArenaBase* arena, // used to allocate key and packet arrays
         CmdPacketAllocator& packetAlloc,        // used to allocate the packets, needs to be thread safe
         size_t size,                            // number of keys / packets.
-        const XCamera& cam, const XViewPort& viewport);
+        const XViewPort& viewport);
     ~CommandBucket();
 
     void sort(void);

@@ -305,12 +305,11 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     auto* pRender = gEnv->pRender;
 
     {
-        XCamera cam;
         XViewPort viewPort = frame.view.viewport;
 
         render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
         cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-        render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, cam, viewPort);
+        render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, viewPort);
 
         geoBucket.appendRenderTarget(pRender->getCurBackBuffer());
         geoBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
@@ -380,12 +379,11 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     }
 
     if (totalElems > 0) {
-        XCamera cam;
         XViewPort viewPort = frame.view.viewport;
 
         render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 1024);
         cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-        render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, cam, viewPort);
+        render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
         primBucket.appendRenderTarget(pRender->getCurBackBuffer());
         primBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::WRITE);
