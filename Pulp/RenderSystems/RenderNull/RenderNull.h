@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(render)
 class RenderNull : public IRender
 {
 public:
-    bool init(HWND hWnd, uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
+    bool init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
     void shutDown(void) X_FINAL;
     void freeResources(void) X_FINAL;
 
@@ -22,7 +22,7 @@ public:
 
     void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-    Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
+    Vec2ui getDisplayRes(void) const X_FINAL;
 
     IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
     IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,

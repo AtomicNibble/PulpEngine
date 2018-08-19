@@ -87,8 +87,6 @@ void XRender::registerVars(void)
     X_ASSERT_NOT_NULL(pShaderMan_);
 
     vars_.registerVars();
-    vars_.setNativeRes(currentNativeRes_);
-    vars_.setRes(displayRes_);
 
     pTexVars_->registerVars();
     pShaderMan_->registerVars();
@@ -111,7 +109,7 @@ void XRender::registerCmds(void)
     }
 }
 
-bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ)
+bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
     X_ASSERT(vars_.varsRegisterd(), "Vars must be init before calling XRender::Init()")(vars_.varsRegisterd());
     X_PROFILE_NO_HISTORY_BEGIN("RenderInit", core::profiler::SubSys::RENDER);
@@ -121,8 +119,12 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
         return false;
     }
 
-    currentNativeRes_ = Vec2<uint32_t>(width, height);
-    displayRes_ = Vec2<uint32_t>(width, height);
+    RECT rect;
+    if (!::GetClientRect(hWnd, &rect)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Dx12", "Failed to get window rect: %s", core::lastError::ToString(Dsc));
+        return false;
+    }
 
     HRESULT hr;
 
@@ -280,15 +282,14 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
     pPSOCache_->registerVars();
 
+    displayRes_.x = rect.right - rect.left;
+    displayRes_.y = rect.bottom - rect.top;
+    targetRes_ = displayRes_;
+
     DXGI_SWAP_CHAIN_DESC1 swapChainDesc;
     core::zero_object(swapChainDesc);
-
-    currentNativeRes_.x = width;
-    currentNativeRes_.y = height;
-    targetNativeRes_ = currentNativeRes_;
-
-    swapChainDesc.Width = width;
-    swapChainDesc.Height = height;
+    swapChainDesc.Width = displayRes_.x;
+    swapChainDesc.Height = displayRes_.y;
     swapChainDesc.Format = SWAP_CHAIN_FORMAT;
     swapChainDesc.Scaling = DXGI_SCALING_NONE;
     swapChainDesc.SampleDesc.Quality = 0;
@@ -1072,7 +1073,7 @@ void XRender::applyIndexBuffer(GraphicsContext& context, State& curState, IndexB
     }
 }
 
-Vec2<uint32_t> XRender::getDisplayRes(void) const
+Vec2ui XRender::getDisplayRes(void) const
 {
     return displayRes_;
 }
@@ -1932,23 +1933,18 @@ void XRender::initILDescriptions(void)
     ilHwSkin_.append(elem_stream_skin[1]);
 }
 
-bool XRender::initRenderBuffers(Vec2<uint32_t> res)
-{
-    return true;
-}
 
-bool XRender::resize(uint32_t width, uint32_t height)
+bool XRender::resize(Vec2ui res)
 {
-    X_LOG1("Dx12", "Resizing display res to: (%" PRIu32 ",%" PRIu32 ")", width, height);
+    X_LOG1("Dx12", "Resizing display res to: (%" PRIu32 ",%" PRIu32 ")", res.x, res.y);
     X_ASSERT_NOT_NULL(pSwapChain_);
     X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 
+    displayRes_ = res;
+    vars_.setNativeRes(res);
+
     // wait till gpu idle.
     cmdListManager_.idleGPU();
-
-    displayRes_.x = width;
-    displayRes_.y = height;
-    vars_.setRes(displayRes_);
 
     for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
         if (pDisplayPlanes_[i]) {
@@ -1981,28 +1977,17 @@ bool XRender::resize(uint32_t width, uint32_t height)
     ed.event = CoreEvent::RENDER_RES_CHANGED;
     ed.renderRes.width = displayRes_.x;
     ed.renderRes.height = displayRes_.y;
-
     gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
     return true;
 }
 
 void XRender::handleResolutionChange(void)
 {
-    if (currentNativeRes_ == targetNativeRes_) {
+    if (displayRes_ == targetRes_) {
         return;
     }
 
-    X_LOG1("Dx12", "Changing native res from: (%" PRIu32 "x%" PRIu32 ") -> (%" PRIu32 ",%" PRIu32 ")",
-        currentNativeRes_.x, currentNativeRes_.y, targetNativeRes_.x, targetNativeRes_.y);
-
-    currentNativeRes_ = targetNativeRes_;
-    vars_.setNativeRes(currentNativeRes_);
-
-    // wait till gpu idle.
-    cmdListManager_.idleGPU();
-
-    // re int buffers
-    initRenderBuffers(targetNativeRes_);
+    resize(targetRes_);
 }
 
 void XRender::populateFeatureInfo(void)
@@ -2171,10 +2156,8 @@ void XRender::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
     {
         case CoreEvent::RESIZE:
         {
-            auto& resize = ed.resize;
-            
-            targetNativeRes_.x = resize.width;
-            targetNativeRes_.y = resize.height;
+            targetRes_.x = ed.resize.width;
+            targetRes_.y = ed.resize.height;
         }
         break;
         default:

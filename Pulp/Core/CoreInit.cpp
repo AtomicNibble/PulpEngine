@@ -924,7 +924,7 @@ bool XCore::InitRenderSys(const CoreInitParams& initParams)
     if (initParams.bTesting) {
         // should never fail since it's null render system.
         // but it may get changed later that it can fail so check.
-        if (!env_.pRender->init(NULL, 0, 0, texture::Texturefmt::UNKNOWN, reverseZ)) {
+        if (!env_.pRender->init(nullptr, texture::Texturefmt::UNKNOWN, reverseZ)) {
             X_ERROR("Core", "Failed to init render system");
             return false;
         }
@@ -938,13 +938,11 @@ bool XCore::InitRenderSys(const CoreInitParams& initParams)
         core::StopWatch timer;
 
         HWND hWnd = pWindow_->GetNativeWindow();
-        uint32_t width = pWindow_->GetClientWidth();
-        uint32_t height = pWindow_->GetClientHeight();
 
         // vars required pre init.
         env_.pRender->registerVars();
 
-        if (!env_.pRender->init(hWnd, width, height, texture::Texturefmt::D32_FLOAT, reverseZ)) {
+        if (!env_.pRender->init(hWnd, texture::Texturefmt::D32_FLOAT, reverseZ)) {
             X_ERROR("Core", "Failed to init render system");
             return false;
         }

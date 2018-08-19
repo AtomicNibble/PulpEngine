@@ -7,12 +7,9 @@ X_NAMESPACE_BEGIN(render)
 
 RenderNull g_NullRender;
 
-bool RenderNull::init(HWND hWnd,
-    uint32_t width, uint32_t hieght, texture::Texturefmt::Enum depthFmt, bool reverseZ)
+bool RenderNull::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ)
 {
     X_UNUSED(hWnd);
-    X_UNUSED(width);
-    X_UNUSED(hieght);
     X_UNUSED(depthFmt);
     X_UNUSED(reverseZ);
 
@@ -52,9 +49,9 @@ void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     X_UNUSED(cmdBucket);
 }
 
-Vec2<uint32_t> RenderNull::getDisplayRes(void) const
+Vec2ui RenderNull::getDisplayRes(void) const
 {
-    return Vec2<uint32_t>::zero();
+    return Vec2ui::zero();
 }
 
 IPixelBuffer* RenderNull::createDepthBuffer(const char* pNickName, Vec2i dim)

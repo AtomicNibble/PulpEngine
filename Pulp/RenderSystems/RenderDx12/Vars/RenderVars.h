@@ -18,7 +18,6 @@ public:
     X_INLINE const Colorf& getClearCol(void) const;
 
     void setNativeRes(const Vec2<uint32_t>& res);
-    void setRes(const Vec2<uint32_t>& res);
 
 private:
     bool varsRegisterd_;
@@ -28,7 +27,6 @@ private:
     Colorf clearColor_;
 
     core::ICVar* pNativeRes_;
-    core::ICVar* pRes_;
 };
 
 X_NAMESPACE_END

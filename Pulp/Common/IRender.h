@@ -393,7 +393,7 @@ struct IRender
     virtual void registerVars(void) X_ABSTRACT;
     virtual void registerCmds(void) X_ABSTRACT;
 
-    virtual bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_ABSTRACT;
+    virtual bool init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_ABSTRACT;
     virtual void shutDown(void) X_ABSTRACT;
     virtual void freeResources(void) X_ABSTRACT;
     virtual void release(void) X_ABSTRACT;
@@ -404,7 +404,7 @@ struct IRender
     virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
 
     // display res is stored as int, if you want float cast this.
-    virtual Vec2<uint32_t> getDisplayRes(void) const X_ABSTRACT;
+    virtual Vec2ui getDisplayRes(void) const X_ABSTRACT;
 
     // this is used for creating buffers for rendering to.
     // for example creating depth buffers, or shadow map buffers that can then be bound to pipeline.

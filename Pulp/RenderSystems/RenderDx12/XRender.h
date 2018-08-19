@@ -202,7 +202,7 @@ public:
     void registerVars(void) X_FINAL;
     void registerCmds(void) X_FINAL;
 
-    bool init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
+    bool init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool reverseZ) X_FINAL;
     void shutDown(void) X_FINAL;
     void freeResources(void) X_FINAL;
     void release(void) X_FINAL;
@@ -212,7 +212,7 @@ public:
 
     void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-    Vec2<uint32_t> getDisplayRes(void) const X_FINAL;
+    Vec2ui getDisplayRes(void) const X_FINAL;
 
     IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
     IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
@@ -282,8 +282,7 @@ private:
     bool freeSwapChainResources(void);
 
     void initILDescriptions(void);
-    bool initRenderBuffers(Vec2<uint32_t> res);
-    bool resize(uint32_t width, uint32_t height);
+    bool resize(Vec2ui res);
     void handleResolutionChange(void);
     void populateFeatureInfo(void);
     bool deviceIsSupported(void) const;
@@ -326,10 +325,9 @@ private:
     core::PoolAllocator statePoolAllocator_;
     StatePoolArena statePool_;
 
-    Vec2<uint32_t> currentNativeRes_; // the resolution we render to.
-    Vec2<uint32_t> targetNativeRes_;  // if diffrent, the render buffers we be resized to this next frame.
-    Vec2<uint32_t> displayRes_;       // the resolution of the final screen
-
+    Vec2ui displayRes_; // the resolution we render to.
+    Vec2ui targetRes_;  // if diffrent, the render buffers we be resized to this next frame.
+    
     texture::Texture* pDisplayPlanes_[SWAP_CHAIN_BUFFER_COUNT];
     uint32_t currentBufferIdx_;
 
