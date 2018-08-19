@@ -30,6 +30,7 @@ namespace fx
 } // namespace fx
 
 class X3DEngine : public I3DEngine
+    , public ICoreEventListener
 {
     typedef core::Array<IWorld3D*> WorldArr;
 
@@ -62,6 +63,9 @@ public:
     void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
 
 private:
+    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
+
+private:
     void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);
 
 private:
@@ -80,7 +84,12 @@ private:
     PrimativeContextSharedResources primResources_;
     PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 
+    render::IPixelBuffer* pDepthStencil_;
+    render::IPixelBuffer* p3DRenderTarget_;
+    render::IPixelBuffer* p2DRenderTarget_;
+
     bool clearPersistent_;
+    bool coreEventReg_;
 
     DrawVars drawVars_;
     WorldArr worlds_;

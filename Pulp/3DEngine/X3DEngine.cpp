@@ -53,7 +53,11 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
         {primResources_, IPrimativeContext::Mode::Mode2D, arena}, // profile
         {primResources_, IPrimativeContext::Mode::Mode2D, arena}  // console
     },
+    pDepthStencil_(nullptr),
+    p3DRenderTarget_(nullptr),
+    p2DRenderTarget_(nullptr),
     clearPersistent_(false),
+    coreEventReg_(false),
     worlds_(arena)
 {
     // check if the enum order was changed in a way that resulted in incorrect modes.
@@ -81,8 +85,6 @@ void X3DEngine::registerCmds(void)
         core::VarFlag::SYSTEM, "Clears persistent primatives");
 }
 
-render::IPixelBuffer* pDepthStencil = nullptr;
-
 bool X3DEngine::init(void)
 {
     X_PROFILE_NO_HISTORY_BEGIN("3DEngineInit", core::profiler::SubSys::ENGINE3D);
@@ -96,6 +98,8 @@ bool X3DEngine::init(void)
     X_ASSERT_NOT_NULL(gEnv->pConsole);
     X_ASSERT_NOT_NULL(gEnv->pRender);
     X_ASSERT_NOT_NULL(gEnv->pPhysics);
+
+    coreEventReg_ = gEnv->pCore->GetCoreEventDispatcher()->RegisterListener(this);
 
     auto* pRender = gEnv->pRender;
 
@@ -156,8 +160,13 @@ bool X3DEngine::init(void)
         return false;
     }
 
+    // so i will need some textures to render into.
+    auto dispalyRes = pRender->getDisplayRes();
 
-    pDepthStencil = pRender->createDepthBuffer("$depth_buffer", Vec2i(1680, 1050));
+    pDepthStencil_ = pRender->createDepthBuffer("$depth_buffer", Vec2i(1280, 720));
+    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", Vec2i(1280, 720), 1, texture::Texturefmt::A8R8G8B8);
+    // this should be the size of the render
+    p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::A8R8G8B8);
 
     return true;
 }
@@ -166,7 +175,21 @@ void X3DEngine::shutDown(void)
 {
     X_LOG0("3DEngine", "Shutting Down");
 
+    if (coreEventReg_) {
+        gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
+    }
+
     auto* pRender = gEnv->pRender;
+
+    if (pDepthStencil_) {
+        pRender->releasePixelBuffer(pDepthStencil_);
+    }
+    if (p3DRenderTarget_) {
+        pRender->releasePixelBuffer(p3DRenderTarget_);
+    }
+    if (p2DRenderTarget_) {
+        pRender->releasePixelBuffer(p2DRenderTarget_);
+    }
 
     for (auto& primcon : primContexts_) {
         primcon.freePages(pRender);
@@ -281,37 +304,6 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
     auto* pRender = gEnv->pRender;
 
-#if 0
-	XCamera cam;
-	CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 0x4000 * 64);
-
-	cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-
-	CommandBucket<uint16_t> testBucket(g_3dEngineArena, cmdBucketAllocator, 0x4000, cam);
-
-	core::StopWatch timer;
-
-	for (size_t i = 0; i < 0x4000; i++)
-	{
-		render::Commands::Draw* pDraw = testBucket.addCommand<render::Commands::Draw>(13, 0);
-		pDraw->indexBuffer = 0;
-		pDraw->vertexBuffer = 0;
-	}
-
-	const core::TimeVal addTime = timer.GetTimeVal();
-	timer.Start();
-
-	testBucket.sort();
-
-	const core::TimeVal sortTime = timer.GetTimeVal();
-
-	X_LOG0("test", "addTime: %fms", addTime.GetMilliSeconds());
-	X_LOG0("test", "sortTime: %fms", sortTime.GetMilliSeconds());
-
-	testBucket.submit();
-#endif
-
-#if 1
     {
         XCamera cam;
         XViewPort viewPort = frame.view.viewport;
@@ -321,7 +313,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
         render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, cam, viewPort);
 
         geoBucket.appendRenderTarget(pRender->getCurBackBuffer());
-        geoBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
+        geoBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
 
         if (pCBufMan_->update(frame, false)) {
             render::Commands::Nop* pNop = geoBucket.addCommand<render::Commands::Nop>(0, 0);
@@ -350,7 +342,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
             if (pTech->variableStateSize) {
                 RegisterCtx ctx;
-                ctx.regs[Register::CodeTexture0] = pDepthStencil->getTexID();
+                ctx.regs[Register::CodeTexture0] = pDepthStencil_->getTexID();
 
                 pMaterialManager_->initStateFromRegisters(pTech, &pDraw->resourceState, ctx);
             }
@@ -360,38 +352,6 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
         pRender->submitCommandPackets(geoBucket);
     }
-
-#else
-    {
-        // we need a buffer for the depth.
-        //	render::IPixelBuffer* pDepthStencil = pRender_->createPixelBuffer("$depth_buffer", Vec2i(1680, 1050),
-        //		texture::Texturefmt::R24G8_TYPELESS, render::PixelBufferType::DEPTH);
-
-        XCamera cam;
-        XViewPort viewPort = frame.view.viewport;
-
-        render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
-        cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
-        render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, cam, viewPort);
-
-        geoBucket.appendRenderTarget(pRender->getCurBackBuffer());
-        geoBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
-
-        if (pCBufMan_->update(frame, false)) {
-            render::Commands::Nop* pNop = geoBucket.addCommand<render::Commands::Nop>(0, 0);
-
-            pCBufMan_->updatePerFrameCBs(geoBucket, pNop);
-        }
-
-        //	pCBufMan_->update(frame, false);
-
-        level_.dispatchJobs(frame, geoBucket);
-
-        geoBucket.sort();
-
-        pRender->submitCommandPackets(geoBucket);
-    }
-#endif
 
     for (auto* pWorld : worlds_) {
         static_cast<World3D*>(pWorld)->renderEmitters(frame, &primContexts_[PrimContext::MISC3D]);
@@ -428,7 +388,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
         render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, cam, viewPort);
 
         primBucket.appendRenderTarget(pRender->getCurBackBuffer());
-        primBucket.setDepthStencil(pDepthStencil, render::DepthBindFlag::WRITE);
+        primBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::WRITE);
 
         // the updating of dirty font buffers should happen regardless of
         // prim drawing.
@@ -728,7 +688,6 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             }
         }
 
-        //primBucket.sort();
         primBucket.sort();
 
         pRender->submitCommandPackets(primBucket);
@@ -815,6 +774,15 @@ void X3DEngine::removeWorldFromActiveList(IWorld3D* pWorld)
 }
 
 // =======================================
+
+void X3DEngine::OnCoreEvent(const CoreEventData& ed)
+{
+    if (ed.event == CoreEvent::RENDER_RES_CHANGED) 
+    {
+        // TODO: when doing stuff like rendering scene at 50% might want to change out buffers.
+
+    }
+}
 
 void X3DEngine::Command_ClearPersistent(core::IConsoleCmdArgs* pCmd)
 {
