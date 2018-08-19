@@ -69,9 +69,9 @@ const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-void CVarString<T>::Set(const char* pStr)
+void CVarString<T>::ForceSet(const char* pStr)
 {
-    if (CVarBase::flags_.IsSet(VarFlag::READONLY) || !pStr) {
+    if (!pStr) {
         return;
     }
 
@@ -82,6 +82,16 @@ void CVarString<T>::Set(const char* pStr)
 
     String_ = pStr;
     CVarBase::OnModified();
+}
+
+template<class T>
+void CVarString<T>::Set(const char* pStr)
+{
+    if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
+        return;
+    }
+
+    ForceSet(pStr);
 }
 
 template<class T>

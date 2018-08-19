@@ -89,6 +89,7 @@ public:
     X_INLINE virtual float GetFloat(void) const X_OVERRIDE;
     X_INLINE virtual const char* GetString(CVarBase::StrBuf& buf) const X_OVERRIDE;
 
+    X_INLINE void ForceSet(const char* s) X_FINAL;
     X_INLINE virtual void Set(const char* s) X_OVERRIDE;
     X_INLINE virtual void Set(const float f) X_OVERRIDE;
     X_INLINE virtual void Set(const int i) X_OVERRIDE;
