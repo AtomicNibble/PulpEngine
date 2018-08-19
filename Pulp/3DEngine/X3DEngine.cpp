@@ -156,30 +156,6 @@ bool X3DEngine::init(void)
         return false;
     }
 
-    auto* pPhysics = gEnv->pPhysics;
-
-    // init physics.
-    // this don't create a scene, that's done later..
-    physics::ToleranceScale scale;
-    scale.length = physics::SCALE_LENGTH;
-    scale.mass = physics::SCALE_MASS;
-    scale.speed = physics::SCALE_SPEED;
-
-    if (!pPhysics->init(scale)) {
-        X_ERROR("3DEngine", "Failed to setup physics scene");
-        return false;
-    }
-
-    // setup groups collision filters.
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Ai, true);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Vehicle, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Ai, true);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Vehicle, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
 
     pDepthStencil = pRender->createDepthBuffer("$depth_buffer", Vec2i(1680, 1050));
 

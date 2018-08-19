@@ -65,6 +65,33 @@ bool XGame::init(void)
     X_ASSERT_NOT_NULL(gEnv->pTimer);
     X_ASSERT_NOT_NULL(gEnv->pRender);
     X_ASSERT_NOT_NULL(gEnv->pNet);
+    X_ASSERT_NOT_NULL(gEnv->pPhysics);
+
+    auto* pPhysics = gEnv->pPhysics;
+
+    // init physics.
+    // this don't create a scene, that's done later..
+    physics::ToleranceScale scale;
+    scale.length = physics::SCALE_LENGTH;
+    scale.mass = physics::SCALE_MASS;
+    scale.speed = physics::SCALE_SPEED;
+
+    if (!pPhysics->init(scale)) {
+        X_ERROR("3DEngine", "Failed to setup physics scene");
+        return false;
+    }
+
+    // setup groups collision filters.
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Player, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Ai, true);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Vehicle, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Player, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Ai, true);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Vehicle, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
+    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
+
 
     pTimer_ = gEnv->pTimer;
     pRender_ = gEnv->pRender;
