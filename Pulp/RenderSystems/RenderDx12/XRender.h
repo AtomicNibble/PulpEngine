@@ -288,10 +288,6 @@ private:
     bool deviceIsSupported(void) const;
 
 private:
-    //	static void createDescFromState(StateFlag state, D3D12_BLEND_DESC& blendDesc);
-    //	static void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc);
-    //	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
-
     void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
 
 private:
