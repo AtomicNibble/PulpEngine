@@ -40,7 +40,7 @@ void RenderVars::setNativeRes(const Vec2<uint32_t>& res)
     core::StackString<64> buf;
     buf.appendFmt("%" PRIu32 "x%" PRIu32, res.x, res.y);
 
-    pNativeRes_->Set(buf.c_str());
+    pNativeRes_->ForceSet(buf.c_str());
 }
 
 void RenderVars::setRes(const Vec2<uint32_t>& res)
@@ -48,7 +48,7 @@ void RenderVars::setRes(const Vec2<uint32_t>& res)
     core::StackString<64> buf;
     buf.appendFmt("%" PRIu32 "x%" PRIu32, res.x, res.y);
 
-    pNativeRes_->Set(buf.c_str());
+    pRes_->ForceSet(buf.c_str());
 }
 
 X_NAMESPACE_END
