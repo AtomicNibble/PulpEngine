@@ -793,7 +793,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")();
 
                     ColorBuffer& colBuf = pTexture->getColorBuf();
-
+                    context.transitionResource(colBuf.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
                     context.clearColor(colBuf);
                 } break;
 
