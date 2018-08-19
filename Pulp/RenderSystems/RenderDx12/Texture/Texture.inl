@@ -6,52 +6,52 @@ X_INLINE const core::string& Texture::getName(void) const
     return fileName_;
 }
 
-X_INLINE const Vec2<uint16_t> Texture::getDimensions(void) const
+X_INLINE Vec2i Texture::getDimensions(void) const
 {
-    return dimensions_;
+    return Vec2i(dimensions_.x, dimensions_.y);
 }
 
-X_INLINE const int32_t Texture::getWidth(void) const
+X_INLINE int32_t Texture::getWidth(void) const
 {
     return dimensions_.x;
 }
 
-X_INLINE const int32_t Texture::getHeight(void) const
+X_INLINE int32_t Texture::getHeight(void) const
 {
     return dimensions_.y;
 }
 
-X_INLINE const int32_t Texture::getNumFaces(void) const
+X_INLINE int32_t Texture::getNumFaces(void) const
 {
     return numFaces_;
 }
 
-X_INLINE const int32_t Texture::getDepth(void) const
+X_INLINE int32_t Texture::getDepth(void) const
 {
     return depth_;
 }
 
-X_INLINE const int32_t Texture::getNumMips(void) const
+X_INLINE int32_t Texture::getNumMips(void) const
 {
     return static_cast<int32_t>(numMips_);
 }
 
-X_INLINE const int32_t Texture::getDataSize(void) const
+X_INLINE int32_t Texture::getDataSize(void) const
 {
     return 0;
 }
 
-X_INLINE const TextureType::Enum Texture::getTextureType(void) const
+X_INLINE TextureType::Enum Texture::getTextureType(void) const
 {
     return type_;
 }
 
-X_INLINE const Texturefmt::Enum Texture::getFormat(void) const
+X_INLINE Texturefmt::Enum Texture::getFormat(void) const
 {
     return format_;
 }
 
-X_INLINE const render::BufUsage::Enum Texture::getUsage(void) const
+X_INLINE render::BufUsage::Enum Texture::getUsage(void) const
 {
     return usage_;
 }

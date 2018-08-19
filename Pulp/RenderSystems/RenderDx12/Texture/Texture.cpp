@@ -53,7 +53,7 @@ void Texture::setProperties(const XTextureFile& imgFile)
     numMips_ = imgFile.getNumMips();
 }
 
-const DXGI_FORMAT Texture::getFormatDX(void) const
+DXGI_FORMAT Texture::getFormatDX(void) const
 {
     return Util::DXGIFormatFromTexFmt(format_);
 }

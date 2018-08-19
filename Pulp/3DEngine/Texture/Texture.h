@@ -15,7 +15,7 @@ public:
 
     X_INLINE const int32_t getDeviceID(void) const;
 
-    X_INLINE const Vec2<uint16_t> getDimensions(void) const;
+    X_INLINE Vec2i getDimensions(void) const;
     X_INLINE const int32_t getWidth(void) const;
     X_INLINE const int32_t getHeight(void) const;
     X_INLINE const int32_t getNumFaces(void) const;

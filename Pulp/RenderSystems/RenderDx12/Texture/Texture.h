@@ -41,19 +41,19 @@ public:
     };
 
     X_INLINE const core::string& getName(void) const X_FINAL;
-    X_INLINE const Vec2<uint16_t> getDimensions(void) const X_FINAL;
-    X_INLINE const int32_t getWidth(void) const X_FINAL;
-    X_INLINE const int32_t getHeight(void) const X_FINAL;
-    X_INLINE const int32_t getNumFaces(void) const X_FINAL;
-    X_INLINE const int32_t getDepth(void) const X_FINAL;
-    X_INLINE const int32_t getNumMips(void) const X_FINAL;
-    X_INLINE const int32_t getDataSize(void) const X_FINAL;
+    X_INLINE Vec2i getDimensions(void) const X_FINAL;
+    X_INLINE int32_t getWidth(void) const X_FINAL;
+    X_INLINE int32_t getHeight(void) const X_FINAL;
+    X_INLINE int32_t getNumFaces(void) const X_FINAL;
+    X_INLINE int32_t getDepth(void) const X_FINAL;
+    X_INLINE int32_t getNumMips(void) const X_FINAL;
+    X_INLINE int32_t getDataSize(void) const X_FINAL;
 
-    X_INLINE const TextureType::Enum getTextureType(void) const X_FINAL;
-    X_INLINE const Texturefmt::Enum getFormat(void) const X_FINAL;
-    X_INLINE const render::BufUsage::Enum getUsage(void) const;
+    X_INLINE TextureType::Enum getTextureType(void) const X_FINAL;
+    X_INLINE Texturefmt::Enum getFormat(void) const X_FINAL;
+    X_INLINE render::BufUsage::Enum getUsage(void) const;
 
-    const DXGI_FORMAT getFormatDX(void) const;
+    DXGI_FORMAT getFormatDX(void) const;
 
     void setProperties(const XTextureFile& imgFile) X_FINAL;
 

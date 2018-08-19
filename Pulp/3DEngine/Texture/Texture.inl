@@ -7,9 +7,9 @@ X_INLINE const int32_t Texture::getDeviceID(void) const
     return pDeviceTexture_->getTexID();
 }
 
-X_INLINE const Vec2<uint16_t> Texture::getDimensions(void) const
+X_INLINE Vec2i Texture::getDimensions(void) const
 {
-    return dimensions_;
+    return Vec2i(dimensions_.x, dimensions_.y);
 }
 
 X_INLINE const int32_t Texture::getWidth(void) const

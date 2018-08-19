@@ -306,16 +306,16 @@ struct IDeviceTexture
     virtual const TexID getTexID(void) const X_ABSTRACT;
 
     virtual const core::string& getName(void) const X_ABSTRACT;
-    virtual const Vec2<uint16_t> getDimensions(void) const X_ABSTRACT;
-    virtual const int getWidth(void) const X_ABSTRACT;
-    virtual const int getHeight(void) const X_ABSTRACT;
-    virtual const int getNumFaces(void) const X_ABSTRACT;
-    virtual const int getNumMips(void) const X_ABSTRACT;
-    virtual const int getDepth(void) const X_ABSTRACT;
-    virtual const int getDataSize(void) const X_ABSTRACT;
+    virtual Vec2i getDimensions(void) const X_ABSTRACT;
+    virtual int getWidth(void) const X_ABSTRACT;
+    virtual int getHeight(void) const X_ABSTRACT;
+    virtual int getNumFaces(void) const X_ABSTRACT;
+    virtual int getNumMips(void) const X_ABSTRACT;
+    virtual int getDepth(void) const X_ABSTRACT;
+    virtual int getDataSize(void) const X_ABSTRACT;
 
-    virtual const texture::TextureType::Enum getTextureType(void) const X_ABSTRACT;
-    virtual const texture::Texturefmt::Enum getFormat(void) const X_ABSTRACT;
+    virtual texture::TextureType::Enum getTextureType(void) const X_ABSTRACT;
+    virtual texture::Texturefmt::Enum getFormat(void) const X_ABSTRACT;
 
     virtual void setProperties(const texture::XTextureFile& imgFile) X_ABSTRACT;
 };
