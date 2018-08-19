@@ -404,7 +404,7 @@ struct IRender
     virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
 
     // display res is stored as int, if you want float cast this.
-    virtual Vec2ui getDisplayRes(void) const X_ABSTRACT;
+    virtual Vec2i getDisplayRes(void) const X_ABSTRACT;
 
     // this is used for creating buffers for rendering to.
     // for example creating depth buffers, or shadow map buffers that can then be bound to pipeline.

@@ -1073,7 +1073,7 @@ void XRender::applyIndexBuffer(GraphicsContext& context, State& curState, IndexB
     }
 }
 
-Vec2ui XRender::getDisplayRes(void) const
+Vec2i XRender::getDisplayRes(void) const
 {
     return displayRes_;
 }
@@ -1934,9 +1934,9 @@ void XRender::initILDescriptions(void)
 }
 
 
-bool XRender::resize(Vec2ui res)
+bool XRender::resize(Vec2i res)
 {
-    X_LOG1("Dx12", "Resizing display res to: (%" PRIu32 ",%" PRIu32 ")", res.x, res.y);
+    X_LOG1("Dx12", "Resizing display res to: (%" PRIi32 ",%" PRIi32 ")", res.x, res.y);
     X_ASSERT_NOT_NULL(pSwapChain_);
     X_ASSERT_NOT_NULL(pDescriptorAllocator_);
 

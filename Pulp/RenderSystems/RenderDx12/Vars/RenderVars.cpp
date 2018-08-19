@@ -32,7 +32,7 @@ void RenderVars::registerVars(void)
     varsRegisterd_ = true;
 }
 
-void RenderVars::setNativeRes(const Vec2<uint32_t>& res)
+void RenderVars::setNativeRes(const Vec2i& res)
 {
     core::StackString<64> buf;
     buf.appendFmt("%" PRIu32 "x%" PRIu32, res.x, res.y);

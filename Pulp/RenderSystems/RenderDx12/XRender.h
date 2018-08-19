@@ -212,7 +212,7 @@ public:
 
     void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-    Vec2ui getDisplayRes(void) const X_FINAL;
+    Vec2i getDisplayRes(void) const X_FINAL;
 
     IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
     IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
@@ -282,7 +282,7 @@ private:
     bool freeSwapChainResources(void);
 
     void initILDescriptions(void);
-    bool resize(Vec2ui res);
+    bool resize(Vec2i res);
     void handleResolutionChange(void);
     void populateFeatureInfo(void);
     bool deviceIsSupported(void) const;
@@ -321,8 +321,8 @@ private:
     core::PoolAllocator statePoolAllocator_;
     StatePoolArena statePool_;
 
-    Vec2ui displayRes_; // the resolution we render to.
-    Vec2ui targetRes_;  // if diffrent, the render buffers we be resized to this next frame.
+    Vec2i displayRes_; // the resolution we render to.
+    Vec2i targetRes_;  // if diffrent, the render buffers we be resized to this next frame.
     
     texture::Texture* pDisplayPlanes_[SWAP_CHAIN_BUFFER_COUNT];
     uint32_t currentBufferIdx_;

@@ -22,7 +22,7 @@ public:
 
     void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
 
-    Vec2ui getDisplayRes(void) const X_FINAL;
+    Vec2i getDisplayRes(void) const X_FINAL;
 
     IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
     IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,

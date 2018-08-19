@@ -17,7 +17,7 @@ public:
     X_INLINE bool enableDebugLayer(void) const;
     X_INLINE const Colorf& getClearCol(void) const;
 
-    void setNativeRes(const Vec2<uint32_t>& res);
+    void setNativeRes(const Vec2i& res);
 
 private:
     bool varsRegisterd_;

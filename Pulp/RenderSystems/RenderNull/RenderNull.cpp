@@ -49,9 +49,9 @@ void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     X_UNUSED(cmdBucket);
 }
 
-Vec2ui RenderNull::getDisplayRes(void) const
+Vec2i RenderNull::getDisplayRes(void) const
 {
-    return Vec2ui::zero();
+    return Vec2i::zero();
 }
 
 IPixelBuffer* RenderNull::createDepthBuffer(const char* pNickName, Vec2i dim)
