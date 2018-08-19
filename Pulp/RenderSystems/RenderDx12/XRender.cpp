@@ -532,7 +532,16 @@ void XRender::renderEnd(void)
     HRESULT hr = pSwapChain_->Present(0, 0);
     if (FAILED(hr)) {
         Error::Description Dsc;
-        X_ERROR("Dx12", "Present failed. err: %s", Error::ToString(hr, Dsc));
+
+        if (hr == DXGI_ERROR_DEVICE_REMOVED)
+        {
+            auto reason = pDevice_->GetDeviceRemovedReason();
+            X_ERROR("Dx12", "Present failed(DeviceRemoved): %s", Error::ToString(reason, Dsc));
+        }
+        else
+        {
+            X_ERROR("Dx12", "Present failed: %s", Error::ToString(hr, Dsc));
+        }
     }
 
     currentBufferIdx_ = (currentBufferIdx_ + 1) % SWAP_CHAIN_BUFFER_COUNT;
