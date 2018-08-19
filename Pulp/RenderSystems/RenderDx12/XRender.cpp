@@ -498,26 +498,13 @@ void XRender::renderBegin(void)
 
     ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
 
-    D3D12_CPU_DESCRIPTOR_HANDLE RTVs[] = {
-        colBuf.getRTV()};
-
     colBuf.setClearColor(vars_.getClearCol());
 
     GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
     pContext->transitionResource(colBuf.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
     pContext->clearColor(colBuf);
-    // pContext->setRenderTargets(_countof(RTVs), RTVs);
 
-    //	pContext->setViewportAndScissor(0, 0, currentNativeRes_.x, currentNativeRes_.y);
-    //	pContext->setRootSignature(presentRS_);
-    //
-    //	pContext->setRenderTargets(_countof(RTVs), RTVs);
-    //	pContext->setPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-    //	pContext->draw(3);
-
-    // pContext->clearColor(displayPlane_[currentBufferIdx_]);
-    //	pContext->transitionResource(displayPlane_[currentBufferIdx_], D3D12_RESOURCE_STATE_PRESENT);
     pContext->finishAndFree(false);
 }
 
