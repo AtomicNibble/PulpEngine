@@ -1416,13 +1416,13 @@ void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPt
 
 // ------------------ CoreEvnt ----------------------------
 
-void XSound::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+void XSound::OnCoreEvent(const CoreEventData& ed)
 {
     if (!AK::SoundEngine::IsInitialized()) {
         return;
     }
 
-    if (event == CoreEvent::CHANGE_FOCUS) 
+    if (ed.event == CoreEvent::CHANGE_FOCUS) 
     {
         auto focusLost = ed.focus.active == 0;
 

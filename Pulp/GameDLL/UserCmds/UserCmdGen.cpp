@@ -277,11 +277,9 @@ int32_t UserCmdGen::buttonState(UserButton::Enum but) const
     return buttonStates_[but];
 }
 
-void UserCmdGen::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+void UserCmdGen::OnCoreEvent(const CoreEventData& ed)
 {
-    X_UNUSED(ed);
-
-    if (event == CoreEvent::CHANGE_FOCUS)
+    if (ed.event == CoreEvent::CHANGE_FOCUS)
     {
         clear();
     }

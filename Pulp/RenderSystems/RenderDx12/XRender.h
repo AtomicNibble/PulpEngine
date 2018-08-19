@@ -288,7 +288,7 @@ private:
     bool deviceIsSupported(void) const;
 
 private:
-    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
+    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
 
 private:
     void Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd);

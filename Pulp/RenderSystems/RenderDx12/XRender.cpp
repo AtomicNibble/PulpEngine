@@ -2150,9 +2150,9 @@ bool XRender::deviceIsSupported(void) const
     return true;
 }
 
-void XRender::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+void XRender::OnCoreEvent(const CoreEventData& ed)
 {
-    switch (event)
+    switch (ed.event)
     {
         case CoreEvent::RESIZE:
         {

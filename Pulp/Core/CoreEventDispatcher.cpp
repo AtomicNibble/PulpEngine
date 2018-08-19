@@ -28,7 +28,7 @@ void XCoreEventDispatcher::pumpEvents(void)
         }
 
         for (auto* pList : listners_) {
-            pList->OnCoreEvent(ed.event, ed);
+            pList->OnCoreEvent(ed);
         }
     };
 

@@ -124,7 +124,7 @@ struct CoreEventData
 struct ICoreEventListener
 {
     virtual ~ICoreEventListener() = default;
-    virtual void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_ABSTRACT;
+    virtual void OnCoreEvent(const CoreEventData& ed) X_ABSTRACT;
 };
 
 // Description:

@@ -81,7 +81,7 @@ namespace profiler
 
     private:
         // ICoreEventListener
-        void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
+        void OnCoreEvent(const CoreEventData& ed) X_FINAL;
 
     private:
         void UpdateProfileData(void);

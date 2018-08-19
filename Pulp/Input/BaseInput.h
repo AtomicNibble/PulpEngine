@@ -49,7 +49,7 @@ public:
     bool addInputDevice(XInputDevicePtr pDevice);
 
     // ISystemEventListener
-    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_OVERRIDE;
+    void OnCoreEvent(const CoreEventData& ed) X_OVERRIDE;
     // ~ISystemEventListener
 
     X_INLINE ModifierFlags getModifiers(void);

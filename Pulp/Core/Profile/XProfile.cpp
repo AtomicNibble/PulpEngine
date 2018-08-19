@@ -352,9 +352,9 @@ namespace profiler
     }
 
     // ICoreEventListener
-    void XProfileSys::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+    void XProfileSys::OnCoreEvent(const CoreEventData& ed)
     {
-        if (event == CoreEvent::RENDER_RES_CHANGED) {
+        if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
             renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
             renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
         }

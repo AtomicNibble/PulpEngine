@@ -61,7 +61,7 @@ private:
     void processInput(void);
 
 
-    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
+    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
 
 private:
     static UserButton::Enum getUserButton(input::KeyId::Enum key);

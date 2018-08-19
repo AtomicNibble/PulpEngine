@@ -201,7 +201,7 @@ public:
     bool LoadAndExecConfigFile(const char* pFileName) X_FINAL;
 
     // ICoreEventListener
-    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
+    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
     // ~ICoreEventListener
 
     void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

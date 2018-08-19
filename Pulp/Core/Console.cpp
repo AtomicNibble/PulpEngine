@@ -1542,9 +1542,9 @@ void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<ch
 #endif // !X_ENABLE_CONFIG_HOT_RELOAD
 // ~IXHotReload
 
-void XConsole::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+void XConsole::OnCoreEvent(const CoreEventData& ed)
 {
-    if (event == CoreEvent::RENDER_RES_CHANGED) {
+    if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
         renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
         renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
     }

@@ -358,11 +358,9 @@ bool XCore::PumpMessages()
     return false;
 }
 
-void XCore::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+void XCore::OnCoreEvent(const CoreEventData& ed)
 {
-    X_UNUSED(ed);
-
-    switch (event) {
+    switch (ed.event) {
         case CoreEvent::MOVE: {
             core::xWindow::Rect rect = pWindow_->GetRect();
             vars_.updateWinPos(rect.getX1(), rect.getY1());
