@@ -339,14 +339,15 @@ bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool 
             return false;
         }
 
-        core::StackString512 name;
+        core::StackString<64> name;
         name.appendFmt("$backbuffer_%i", i);
 
         pDisplayPlanes_[i] = pTextureMan_->createPixelBuffer(name.c_str(), Vec2i::zero(), 1, PixelBufferType::COLOR);
 
         ColorBuffer& colBuf = pDisplayPlanes_[i]->getColorBuf();
-        colBuf.createFromSwapChain(pDevice_, descriptorAllocator, displayPlane.Detach());
         colBuf.setClearColor(vars_.getClearCol());
+        colBuf.createFromSwapChain(pDevice_, descriptorAllocator, displayPlane.Detach());
+        D3DDebug::SetDebugObjectName(colBuf.getGpuResource().getResource(), name.c_str());
     }
 
     X_ASSERT_NOT_NULL(pShaderMan_);
@@ -1069,6 +1070,8 @@ IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
 {
     texture::Texture* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, 1, PixelBufferType::DEPTH);
 
+    render::D3DDebug::SetDebugObjectName(pPixelBuf->getGpuResource().getResource(), pNickName);
+
     return pPixelBuf;
 }
 
@@ -1080,6 +1083,8 @@ IPixelBuffer* XRender::createColorBuffer(const char* pNickName, Vec2i dim, uint3
 
     DXGI_FORMAT dxFmt = texture::Util::DXGIFormatFromTexFmt(fmt);
     colBuf.create(pDevice_, *pDescriptorAllocator_, dim.x, dim.y, numMips, dxFmt);
+
+    D3DDebug::SetDebugObjectName(colBuf.getGpuResource().getResource(), pNickName);
 
     return pColBuf;
 }
