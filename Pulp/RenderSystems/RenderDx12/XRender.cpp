@@ -1959,8 +1959,8 @@ bool XRender::resize(uint32_t width, uint32_t height)
     pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
 
     for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
-        ID3D12Resource* pDisplayPlane;
-        HRESULT hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&pDisplayPlane));
+        Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
+        hr = pSwapChain_->GetBuffer(i, IID_PPV_ARGS(&displayPlane));
         if (FAILED(hr)) {
             Error::Description Dsc;
             X_ERROR("Dx12", "Failed to get swap chain buffer: %s", Error::ToString(hr, Dsc));
@@ -1968,7 +1968,7 @@ bool XRender::resize(uint32_t width, uint32_t height)
         }
 
         ColorBuffer& colBuf = pDisplayPlanes_[i]->getColorBuf();
-        colBuf.createFromSwapChain(pDevice_, *pDescriptorAllocator_, pDisplayPlane);
+        colBuf.createFromSwapChain(pDevice_, *pDescriptorAllocator_, displayPlane.Detach());
     }
 
     // post a event.
