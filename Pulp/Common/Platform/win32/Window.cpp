@@ -398,7 +398,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         case WM_MOVE:
         {
             CoreEventData ed;
-            ed.event = CoreEvent::RESIZE;
+            ed.event = CoreEvent::MOVE;
             ed.move.x = static_cast<int16_t>(LOWORD(lParam));
             ed.move.y = static_cast<int16_t>(HIWORD(lParam));
 
