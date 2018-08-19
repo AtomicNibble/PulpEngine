@@ -6,7 +6,7 @@ X_INLINE void XViewPort::setZ(float32_t near_, float32_t far_)
     z_.y = far_;
 }
 
-X_INLINE void XViewPort::set(uint32_t left, uint32_t top, uint32_t right, uint32_t bottom)
+X_INLINE void XViewPort::set(int32_t left, int32_t top, int32_t right, int32_t bottom)
 {
     view_.set(left, top, right, bottom);
     viewf_.set(
@@ -16,32 +16,32 @@ X_INLINE void XViewPort::set(uint32_t left, uint32_t top, uint32_t right, uint32
         static_cast<float>(bottom));
 }
 
-X_INLINE void XViewPort::set(uint32_t width, uint32_t height)
+X_INLINE void XViewPort::set(int32_t width, int32_t height)
 {
     set(0, 0, width, height);
 }
 
-X_INLINE void XViewPort::set(const Vec2<uint32_t>& wh)
+X_INLINE void XViewPort::set(const Vec2i& wh)
 {
     set(wh.x, wh.y);
 }
 
-X_INLINE uint32_t XViewPort::getX(void) const
+X_INLINE int32_t XViewPort::getX(void) const
 {
     return view_.getX1();
 }
 
-X_INLINE uint32_t XViewPort::getY(void) const
+X_INLINE int32_t XViewPort::getY(void) const
 {
     return view_.getY1();
 }
 
-X_INLINE uint32_t XViewPort::getWidth(void) const
+X_INLINE int32_t XViewPort::getWidth(void) const
 {
     return view_.getWidth();
 }
 
-X_INLINE uint32_t XViewPort::getHeight(void) const
+X_INLINE int32_t XViewPort::getHeight(void) const
 {
     return view_.getHeight();
 }
