@@ -72,11 +72,13 @@ CVarBase::~CVarBase()
 
 void CVarBase::ForceSet(const char* pStr)
 {
+    X_ASSERT_NOT_IMPLEMENTED();
     X_UNUSED(pStr);
 }
 
 void CVarBase::SetDefault(const char* pStr)
 {
+    X_ASSERT_NOT_IMPLEMENTED();
     X_UNUSED(pStr);
 }
 
