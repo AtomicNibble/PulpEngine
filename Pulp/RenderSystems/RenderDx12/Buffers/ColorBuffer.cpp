@@ -28,6 +28,10 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
     D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc;
     D3D12_SHADER_RESOURCE_VIEW_DESC SRVDesc;
 
+    core::zero_object(RTVDesc);
+    core::zero_object(UAVDesc);
+    core::zero_object(SRVDesc);
+
     RTVDesc.Format = format;
     UAVDesc.Format = getUAVFormat(format);
     SRVDesc.Format = format;
