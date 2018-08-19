@@ -63,12 +63,9 @@ IPixelBuffer* RenderNull::createDepthBuffer(const char* pNickName, Vec2i dim)
 }
 
 IPixelBuffer* RenderNull::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
-    texture::Texturefmt::Enum fmt)
+    texture::Texturefmt::Enum fmt, Color8u col)
 {
-    X_UNUSED(pNickName);
-    X_UNUSED(dim);
-    X_UNUSED(fmt);
-    X_UNUSED(numMips);
+    X_UNUSED(pNickName, dim, numMips, fmt, col);
 
     return nullptr;
 }

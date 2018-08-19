@@ -411,7 +411,7 @@ struct IRender
     // they also support been passed to shaders, so you can take the texture id of a pixel buffer and place it in variable state.
     // this allows you todo things like populate a depth buffer then read it from a shader (SRV)
     virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_ABSTRACT;
-    virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, texture::Texturefmt::Enum fmt) X_ABSTRACT;
+    virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, texture::Texturefmt::Enum fmt, Color8u clearCol) X_ABSTRACT;
 
     virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 

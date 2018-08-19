@@ -163,10 +163,10 @@ bool X3DEngine::init(void)
     // so i will need some textures to render into.
     auto dispalyRes = pRender->getDisplayRes();
 
-    pDepthStencil_ = pRender->createDepthBuffer("$depth_buffer", Vec2i(1280, 720));
-    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", Vec2i(1280, 720), 1, texture::Texturefmt::A8R8G8B8);
+    pDepthStencil_ = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
+    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::A8R8G8B8, Color8u(0, 0, 0, 1));
     // this should be the size of the render
-    p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::A8R8G8B8);
+    p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::A8R8G8B8, Color8u(0, 0, 0, 0));
 
     return true;
 }

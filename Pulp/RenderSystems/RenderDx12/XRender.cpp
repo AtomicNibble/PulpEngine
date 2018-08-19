@@ -1076,10 +1076,11 @@ IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
 }
 
 IPixelBuffer* XRender::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
-    texture::Texturefmt::Enum fmt)
+    texture::Texturefmt::Enum fmt, Color8u clearCol)
 {
     texture::Texture* pColBuf = pTextureMan_->createPixelBuffer(pNickName, dim, numMips, PixelBufferType::COLOR);
     ColorBuffer& colBuf = pColBuf->getColorBuf();
+    colBuf.setClearColor(clearCol);
 
     DXGI_FORMAT dxFmt = texture::Util::DXGIFormatFromTexFmt(fmt);
     colBuf.create(pDevice_, *pDescriptorAllocator_, dim.x, dim.y, numMips, dxFmt);

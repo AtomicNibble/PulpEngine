@@ -26,7 +26,7 @@ public:
 
     IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
     IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
-        texture::Texturefmt::Enum fmt) X_FINAL;
+        texture::Texturefmt::Enum fmt, Color8u col) X_FINAL;
     void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
 
     IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_FINAL;
