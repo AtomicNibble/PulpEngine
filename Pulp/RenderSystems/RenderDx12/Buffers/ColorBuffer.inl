@@ -29,7 +29,7 @@ X_INLINE void ColorBuffer::setClearColor(const Colorf& col)
 
 X_INLINE Colorf ColorBuffer::getClearColor(void) const
 {
-    return clearColor_;
+    return Colorf(clearColor_);
 }
 
 X_NAMESPACE_END

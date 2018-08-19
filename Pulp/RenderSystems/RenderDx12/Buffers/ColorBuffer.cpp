@@ -117,13 +117,15 @@ void ColorBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
     D3D12_RESOURCE_DESC resourceDesc = describeTex2D(width, height, 1, numMips, format,
         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
+    Colorf col = clearColor_;
+
     D3D12_CLEAR_VALUE ClearValue;
     core::zero_object(ClearValue);
     ClearValue.Format = format;
-    ClearValue.Color[0] = clearColor_[0];
-    ClearValue.Color[1] = clearColor_[1];
-    ClearValue.Color[2] = clearColor_[2];
-    ClearValue.Color[3] = clearColor_[3];
+    ClearValue.Color[0] = col[0];
+    ClearValue.Color[1] = col[1];
+    ClearValue.Color[2] = col[2];
+    ClearValue.Color[3] = col[3];
 
     createTextureResource(pDevice, resourceDesc, ClearValue, vidMemPtr);
     createDerivedViews(pDevice, allocator, format, 1, numMips);
@@ -135,13 +137,15 @@ void ColorBuffer::createArray(ID3D12Device* pDevice, DescriptorAllocator& alloca
     D3D12_RESOURCE_DESC resourceDesc = describeTex2D(width, height, arrayCount, 1, format,
         D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET | D3D12_RESOURCE_FLAG_ALLOW_UNORDERED_ACCESS);
 
+    Colorf col = clearColor_;
+
     D3D12_CLEAR_VALUE ClearValue;
     core::zero_object(ClearValue);
     ClearValue.Format = format;
-    ClearValue.Color[0] = clearColor_[0];
-    ClearValue.Color[1] = clearColor_[1];
-    ClearValue.Color[2] = clearColor_[2];
-    ClearValue.Color[3] = clearColor_[3];
+    ClearValue.Color[0] = col[0];
+    ClearValue.Color[1] = col[1];
+    ClearValue.Color[2] = col[2];
+    ClearValue.Color[3] = col[3];
 
     createTextureResource(pDevice, resourceDesc, ClearValue, vidMemPtr);
     createDerivedViews(pDevice, allocator, format, arrayCount, 1);
