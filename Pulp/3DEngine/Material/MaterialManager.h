@@ -31,7 +31,6 @@ class CBufferManager;
 class Material;
 
 class XMaterialManager : public IMaterialManager
-    , public ICoreEventListener
     , private core::IAssetLoadSink
 {
     typedef core::AssetContainer<Material, MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
@@ -92,11 +91,6 @@ private:
     bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     bool processData(Material* pMaterial, core::XFile* pFile);
-
-private:
-    // ICoreEventListener
-    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
-    // ~ICoreEventListener
 
 private:
     void Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd);

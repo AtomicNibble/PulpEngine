@@ -858,13 +858,6 @@ TechDefPerm* XMaterialManager::getCodeTech(const core::string& name, core::StrHa
     return pPerm;
 }
 
-// ICoreEventListener
-void XMaterialManager::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
-{
-    X_UNUSED(event, ed);
-}
-// ~ICoreEventListener
-
 bool XMaterialManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
     X_UNUSED(assetName, name);
