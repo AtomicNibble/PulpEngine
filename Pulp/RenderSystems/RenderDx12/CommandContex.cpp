@@ -616,24 +616,24 @@ void GraphicsContext::clearUAV(ColorBuffer& target)
 }
 
 // not inline so can forward declare.
-void GraphicsContext::clearColor(ColorBuffer& target)
+void GraphicsContext::clearColor(const ColorBuffer& target)
 {
     pCommandList_->ClearRenderTargetView(target.getRTV(), target.getClearColor(), 0, nullptr);
 }
 
-void GraphicsContext::clearDepth(DepthBuffer& Target)
+void GraphicsContext::clearDepth(const DepthBuffer& target)
 {
-    pCommandList_->ClearDepthStencilView(Target.getDSV(), D3D12_CLEAR_FLAG_DEPTH,
-        Target.getClearDepth(), safe_static_cast<uint8_t>(Target.getClearStencil()), 0, nullptr);
+    pCommandList_->ClearDepthStencilView(target.getDSV(), D3D12_CLEAR_FLAG_DEPTH,
+        target.getClearDepth(), safe_static_cast<uint8_t>(target.getClearStencil()), 0, nullptr);
 }
 
-void GraphicsContext::clearStencil(DepthBuffer& Target)
+void GraphicsContext::clearStencil(const DepthBuffer& target)
 {
-    pCommandList_->ClearDepthStencilView(Target.getDSV(), D3D12_CLEAR_FLAG_STENCIL,
-        Target.getClearDepth(), Target.getClearStencil(), 0, nullptr);
+    pCommandList_->ClearDepthStencilView(target.getDSV(), D3D12_CLEAR_FLAG_STENCIL,
+        target.getClearDepth(), target.getClearStencil(), 0, nullptr);
 }
 
-void GraphicsContext::clearDepthAndStencil(DepthBuffer& target)
+void GraphicsContext::clearDepthAndStencil(const DepthBuffer& target)
 {
     pCommandList_->ClearDepthStencilView(target.getDSV(), D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL,
         target.getClearDepth(), target.getClearStencil(), 0, nullptr);
