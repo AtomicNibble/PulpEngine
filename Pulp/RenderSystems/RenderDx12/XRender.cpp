@@ -1956,7 +1956,12 @@ bool XRender::resize(uint32_t width, uint32_t height)
         }
     }
 
-    pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
+    auto hr = pSwapChain_->ResizeBuffers(SWAP_CHAIN_BUFFER_COUNT, displayRes_.x, displayRes_.y, SWAP_CHAIN_FORMAT, 0);
+    if (FAILED(hr)) {
+        Error::Description Dsc;
+        X_ERROR("Dx12", "Failed to ResizeBuffers: %s", Error::ToString(hr, Dsc));
+        return false;
+    }
 
     for (uint32_t i = 0; i < SWAP_CHAIN_BUFFER_COUNT; ++i) {
         Microsoft::WRL::ComPtr<ID3D12Resource> displayPlane;
