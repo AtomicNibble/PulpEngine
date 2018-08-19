@@ -44,6 +44,7 @@ class CommandBucket;
 class GraphicsPSO;
 
 class XRender : public IRender
+    , public ICoreEventListener
 {
     static const uint32_t SWAP_CHAIN_BUFFER_COUNT = 3;
 
@@ -292,6 +293,8 @@ private:
     //	static void createDescFromState(StateFlag state, D3D12_RASTERIZER_DESC& rasterizerDesc);
     //	static void createDescFromState(StateFlag state, StencilState stencilState, D3D12_DEPTH_STENCIL_DESC& depthStencilDesc);
 
+    void OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed) X_FINAL;
+
 private:
     void Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd);
     void Cmd_ListDeviceFeatures(core::IConsoleCmdArgs* pCmd);
@@ -350,6 +353,8 @@ private:
 #if RENDER_STATS
     Stats stats_;
 #endif // !RENDER_STATS
+
+    bool coreEventReg_;
 };
 
 X_NAMESPACE_END

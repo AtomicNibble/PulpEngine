@@ -50,12 +50,13 @@ XRender::XRender(core::MemoryArenaBase* arena) :
         StatePoolArena::getMemoryRequirement(MAX_STATE_ALOC_SIZE),
         StatePoolArena::getMemoryAlignmentRequirement(MAX_STATE_ALOC_ALIGN),
         StatePoolArena::getMemoryOffsetRequirement()),
-    statePool_(&statePoolAllocator_, "StatePool")
+    statePool_(&statePoolAllocator_, "StatePool"),
 
 #if PSO_HOT_RELOAD
-    ,
-    deviceStates_(arena)
+    deviceStates_(arena),
 #endif // !PSO_HOT_RELOAD
+
+    coreEventReg_(false)
 {
     core::zero_object(pDisplayPlanes_);
 
@@ -363,6 +364,7 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 
     auto* pCoreEvents = gEnv->pCore->GetCoreEventDispatcher();
     pCoreEvents->QueueCoreEvent(ed);
+    coreEventReg_ = pCoreEvents->RegisterListener(this);
 
     return true;
 }
@@ -370,6 +372,11 @@ bool XRender::init(PLATFORM_HWND hWnd, uint32_t width, uint32_t height, texture:
 void XRender::shutDown(void)
 {
     //	presentRS_.free();
+
+    if (coreEventReg_) {
+        gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
+        coreEventReg_ = false;
+    }
 
     if (pBuffMan_) {
         pBuffMan_->shutDown();
@@ -2143,6 +2150,23 @@ bool XRender::deviceIsSupported(void) const
     }
 
     return true;
+}
+
+void XRender::OnCoreEvent(CoreEvent::Enum event, const CoreEventData& ed)
+{
+    switch (event)
+    {
+        case CoreEvent::RESIZE:
+        {
+            auto& resize = ed.resize;
+            
+            targetNativeRes_.x = resize.width;
+            targetNativeRes_.y = resize.height;
+        }
+        break;
+        default:
+            break;
+    }
 }
 
 void XRender::Cmd_ListAdapters(core::IConsoleCmdArgs* pCmd)
