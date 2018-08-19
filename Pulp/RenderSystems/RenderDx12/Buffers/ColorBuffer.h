@@ -42,7 +42,6 @@ protected:
 
 protected:
     Color8u clearColor_;
-    // D3D12_CPU_DESCRIPTOR_HANDLE SRVHandle_; texture base holds the SRV.
     D3D12_CPU_DESCRIPTOR_HANDLE RTVHandle_;
 
     DescriptorHandleArr UAVHandles_;
