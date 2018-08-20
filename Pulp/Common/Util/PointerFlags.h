@@ -46,6 +46,8 @@ public:
     // this way we can get none const pointer from const pointerflags.
     X_INLINE operator T*(void) const;
 
+    X_INLINE T* ptr(void) const;
+
 private:
     X_INLINE T* GetRawPointer(void) const;
 

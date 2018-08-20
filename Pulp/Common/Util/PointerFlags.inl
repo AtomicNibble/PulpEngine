@@ -112,6 +112,13 @@ X_INLINE PointerFlags<T, BIT_COUNT>::operator T*(void) const
 }
 
 template<class T, uintptr_t BIT_COUNT>
+X_INLINE T* PointerFlags<T, BIT_COUNT>::ptr(void) const
+{
+    return GetRawPointer();
+}
+
+
+template<class T, uintptr_t BIT_COUNT>
 X_INLINE T* PointerFlags<T, BIT_COUNT>::GetRawPointer(void) const
 {
     return union_cast<T*>(union_cast<uintptr_t>(pointer_) & ~BIT_MASK);
