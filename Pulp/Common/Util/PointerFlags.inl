@@ -88,7 +88,7 @@ X_INLINE T& PointerFlags<T, BIT_COUNT>::operator*(void)
 }
 
 template<class T, uintptr_t BIT_COUNT>
-X_INLINE const T& PointerFlags<T, BIT_COUNT>::operator*(void)const
+X_INLINE const T& PointerFlags<T, BIT_COUNT>::operator*(void) const
 {
     return *(GetRawPointer());
 }
@@ -100,13 +100,13 @@ X_INLINE T* PointerFlags<T, BIT_COUNT>::operator->(void)
 }
 
 template<class T, uintptr_t BIT_COUNT>
-X_INLINE const T* PointerFlags<T, BIT_COUNT>::operator->(void)const
+X_INLINE const T* PointerFlags<T, BIT_COUNT>::operator->(void) const
 {
     return GetRawPointer();
 }
 
 template<class T, uintptr_t BIT_COUNT>
-X_INLINE PointerFlags<T, BIT_COUNT>::operator T*(void)const
+X_INLINE PointerFlags<T, BIT_COUNT>::operator T*(void) const
 {
     return GetRawPointer();
 }
