@@ -75,14 +75,22 @@ public:
 
     typedef std::array<InstancedPage, MAX_PAGES> InstancedPageArr;
 
+
+    X_DECLARE_ENUM(MaterialSet)(
+        BASE,
+        BASE_2D,
+        DEPTH
+    );
+
+    typedef std::array<PrimMaterialArr, MaterialSet::ENUM_COUNT> PrimMaterialSetArr;
+
 public:
     PrimativeContextSharedResources();
 
     bool init(render::IRender * pRender, XMaterialManager * pMatMan);
     void releaseResources(render::IRender * pRender, XMaterialManager * pMatMan);
 
-    X_INLINE Material* getMaterial(PrimitiveType::Enum prim) const;
-    X_INLINE Material* getMaterialDepthTest(PrimitiveType::Enum prim) const;
+    X_INLINE Material* getMaterial(MaterialSet::Enum set, PrimitiveType::Enum prim) const;
 
     X_INLINE const Shape& getShapeResources(ShapeType::Enum shape) const;
 
@@ -103,8 +111,7 @@ private:
         float radius, float height, uint32_t sections);
 
 private:
-    PrimMaterialArr primMaterials_;
-    PrimMaterialArr primMaterialsDepth_;
+    PrimMaterialSetArr primMaterials_;
     PrimShapeArr shapes_;
 
     int32_t currentInstacePageIdx_;
@@ -193,6 +200,8 @@ public:
 
     typedef std::array<ShapeInstanceDataContainer, ShapeType::ENUM_COUNT> ShapeParamLodTypeArr; // come up with better name for this?
 
+    using MaterialSet = PrimativeContextSharedResources::MaterialSet;
+
 private:
     // I think i'm going to just support pages of verts.
     // so we just allocate more pages if we run out of space.
@@ -213,12 +222,12 @@ private:
     typedef std::array<render::VertexBufferHandle, MAX_PAGES> VertexPageHandlesArr;
 
 public:
-    PrimativeContext(PrimativeContextSharedResources & sharedRes, Mode mode, core::MemoryArenaBase * arena);
+    PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena);
     ~PrimativeContext() X_OVERRIDE;
 
-    bool freePages(render::IRender * pRender);
+    bool freePages(render::IRender* pRender);
 
-    void appendDirtyBuffers(render::CommandBucket<uint32_t> & bucket) const;
+    void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const;
 
     size_t maxVertsPerPrim(void) const X_FINAL;
     Mode getMode(void) const X_FINAL;
@@ -253,7 +262,7 @@ private:
     PushBufferArr pushBufferArr_;
     VertexPagesArr vertexPages_;
 
-    int32_t depthPrim_;
+    PrimativeContextSharedResources::MaterialSet::Enum set_;
     int32_t currentPage_;
     Mode mode_;
 

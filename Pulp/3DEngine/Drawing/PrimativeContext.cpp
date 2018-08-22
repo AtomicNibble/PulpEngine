@@ -310,7 +310,6 @@ PrimativeContextSharedResources::PrimativeContextSharedResources() :
     currentInstacePageIdx_(0)
 {
     core::zero_object(primMaterials_);
-    core::zero_object(primMaterialsDepth_);
 }
 
 bool PrimativeContextSharedResources::init(render::IRender* pRender, XMaterialManager* pMatMan)
@@ -359,10 +358,13 @@ bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
         return true;
     };
 
-    if (!loadMaterials(primMaterials_, "")) {
+    if (!loadMaterials(primMaterials_[MaterialSet::BASE], "")) {
         return false;
     }
-    if (!loadMaterials(primMaterialsDepth_, "_depth")) {
+    if (!loadMaterials(primMaterials_[MaterialSet::BASE_2D], "_2d")) {
+        return false;
+    }
+    if (!loadMaterials(primMaterials_[MaterialSet::DEPTH], "_depth")) {
         return false;
     }
 
@@ -477,8 +479,10 @@ void PrimativeContextSharedResources::releaseResources(render::IRender* pRender,
         core::zero_object(primMaterials);
     };
 
-    releaseMaterials(primMaterials_);
-    releaseMaterials(primMaterialsDepth_);
+    for(auto& mats : primMaterials_)
+    {
+        releaseMaterials(mats);
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -528,10 +532,10 @@ void PrimativeContext::ShapeInstanceDataContainer::sort(void)
 
 // ---------------------------------------------------------------------------
 
-PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, core::MemoryArenaBase* arena) :
+PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, Mode mode, MaterialSet::Enum set, core::MemoryArenaBase* arena) :
     pushBufferArr_(arena),
     vertexPages_(arena, MAX_PAGES, arena),
-    depthPrim_(0),
+    set_(set),
     currentPage_(-1),
     mode_(mode),
     shapeLodArrays_{
@@ -624,7 +628,12 @@ void PrimativeContext::reset(void)
 
 void PrimativeContext::setDepthTest(bool enabled)
 {
-    depthPrim_ = enabled ? 1 : 0;
+    if (enabled) {
+        set_ = MaterialSet::DEPTH;
+    }
+    else {
+        set_ = MaterialSet::BASE;
+    }
 }
 
 bool PrimativeContext::isEmpty(void) const
@@ -782,7 +791,7 @@ PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertice
 
 PrimativeContext::PrimVertex* PrimativeContext::addPrimative(uint32_t numVertices, PrimitiveType::Enum primType)
 {
-    auto* pMat = depthPrim_ ? sharedRes_.getMaterialDepthTest(primType) : sharedRes_.getMaterial(primType);
+    auto* pMat = sharedRes_.getMaterial(set_, primType);
 
     return addPrimative(numVertices, primType, pMat);
 }

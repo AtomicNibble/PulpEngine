@@ -11,14 +11,9 @@ X_INLINE bool PrimativeContextSharedResources::InstancedPage::isVbValid(void) co
 
 // --------------------------------------------------------
 
-X_INLINE Material* PrimativeContextSharedResources::getMaterial(PrimitiveType::Enum prim) const
+X_INLINE Material* PrimativeContextSharedResources::getMaterial(MaterialSet::Enum set, PrimitiveType::Enum prim) const
 {
-    return primMaterials_[prim];
-}
-
-X_INLINE Material* PrimativeContextSharedResources::getMaterialDepthTest(PrimitiveType::Enum prim) const
-{
-    return primMaterialsDepth_[prim];
+    return primMaterials_[set][prim];
 }
 
 X_INLINE const PrimativeContextSharedResources::Shape& PrimativeContextSharedResources::getShapeResources(ShapeType::Enum shape) const

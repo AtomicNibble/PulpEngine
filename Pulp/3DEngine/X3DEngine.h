@@ -34,6 +34,8 @@ class X3DEngine : public I3DEngine
 {
     typedef core::Array<IWorld3D*> WorldArr;
 
+    typedef core::FixedArray<PrimativeContext*, PrimContext::ENUM_COUNT> PrimativeContextArr;
+
 public:
     X3DEngine(core::MemoryArenaBase* arena);
     virtual ~X3DEngine() X_FINAL;
@@ -61,6 +63,14 @@ public:
     void release3DWorld(IWorld3D* pWorld) X_FINAL;
     void addWorldToActiveList(IWorld3D* pWorld) X_FINAL;
     void removeWorldFromActiveList(IWorld3D* pWorld) X_FINAL;
+
+private:
+    void renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mode mode);
+    void addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,
+        IPrimativeContext::Mode mode, core::span<PrimativeContext*> prims);
+
+    void getPrimsWithData(PrimativeContextArr& prims, IPrimativeContext::Mode mode);
+    static size_t getTotalElems(const PrimativeContextArr& prims);
 
 private:
     void OnCoreEvent(const CoreEventData& ed) X_FINAL;
