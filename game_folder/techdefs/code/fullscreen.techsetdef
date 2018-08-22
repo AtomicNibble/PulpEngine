@@ -61,3 +61,23 @@ Technique( "replace" )
 		colorMap = CodeTexture( "codeTexture0" )
 	}
 }
+
+
+Technique( "premul" )
+{
+	state = State() : "premul"
+	{
+		primitiveType = "tristrip"
+	}
+
+	source = "FullScreen.hlsl"
+
+	vs = VertexShader()
+	{
+	}
+	ps = PixelShader()
+	{
+		colorMap = CodeTexture( "codeTexture0" )
+	}
+}
+
