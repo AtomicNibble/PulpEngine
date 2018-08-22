@@ -69,6 +69,12 @@ void DrawVars::registerVars(void)
     ADD_CVAR_REF("r_draw_depth", drawDepth_, 0, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws depth buffer");
 
+    ADD_CVAR_REF("r_draw_buf_2d", drawBuffer2D_, 1, 0, 1,
+        core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws 2d buffer");
+
+    ADD_CVAR_REF("r_draw_buf_3d", drawBuffer3D_, 1, 0, 1,
+        core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws 3d buffer");
+
     ADD_CVAR_REF("r_detach_cam", detachCam_, 0, 0, 2,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
 

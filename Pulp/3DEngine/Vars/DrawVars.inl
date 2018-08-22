@@ -67,6 +67,16 @@ X_INLINE int32_t DrawVars::drawDepth(void) const
     return drawDepth_;
 }
 
+X_INLINE int32_t DrawVars::drawBuffer2D(void) const
+{
+    return drawBuffer2D_;
+}
+
+X_INLINE int32_t DrawVars::drawBuffer3D(void) const
+{
+    return drawBuffer3D_;
+}
+
 X_INLINE int32_t DrawVars::detachCam(void) const
 {
     return detachCam_;

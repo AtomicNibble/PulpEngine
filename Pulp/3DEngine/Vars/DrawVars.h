@@ -26,6 +26,10 @@ public:
     X_INLINE int32_t drawModelBoneNames(void) const;
     X_INLINE int32_t drawPortalStacks(void) const;
     X_INLINE int32_t drawDepth(void) const;
+
+    X_INLINE int32_t drawBuffer2D(void) const;
+    X_INLINE int32_t drawBuffer3D(void) const;
+
     X_INLINE int32_t detachCam(void) const;
     X_INLINE int32_t cullEnts(void) const;
 
@@ -48,6 +52,9 @@ private:
     int32_t drawModelBoneNames_;
     int32_t drawPortalStacks_;
     int32_t drawDepth_;
+
+    int32_t drawBuffer2D_;
+    int32_t drawBuffer3D_;
 
     int32_t detachCam_;
     int32_t cullEnts_;
