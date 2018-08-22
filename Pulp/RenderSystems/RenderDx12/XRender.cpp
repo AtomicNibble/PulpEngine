@@ -579,7 +579,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     core::zero_object(RTVFormats);
 
     for (size_t i = 0; i < rtvs.size(); i++) {
-        const texture::Texture& tex = *static_cast<const texture::Texture*>(rtvs[i]);
+        const texture::Texture& tex = *static_cast<const texture::Texture*>(rtvs[i].ptr());
         const ColorBuffer& colBuf = tex.getColorBuf();
         RTVs[i] = colBuf.getRTV();
         RTVFormats[i] = tex.getFormatDX();
@@ -591,9 +591,26 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     GraphicsContext& context = *pContext;
 
     for (size_t i = 0; i < rtvs.size(); i++) {
-        texture::Texture& tex = *static_cast<texture::Texture*>(rtvs[i]);
+        texture::Texture& tex = *static_cast<texture::Texture*>(rtvs[i].ptr());
         context.transitionResource(tex.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET);
     }
+
+    context.flushResourceBarriers();
+
+    
+    for (size_t i = 0; i < rtvs.size(); i++) {
+
+        auto flags = RenderTargetFlags(safe_static_cast<uint8_t>(rtvs[i].GetBits()));
+
+        if (!flags.IsSet(render::RenderTargetFlag::CLEAR)) {
+            continue;
+        }
+
+        texture::Texture& tex = *static_cast<texture::Texture*>(rtvs[i].ptr());
+        const ColorBuffer& colBuf = tex.getColorBuf();
+        context.clearColor(colBuf);
+    }
+
 
     if (cmdBucket.getDepthStencil()) {
         render::IPixelBuffer* pDethStencil = static_cast<render::IPixelBuffer*>(cmdBucket.getDepthStencil());

@@ -4,9 +4,9 @@ X_NAMESPACE_BEGIN(render)
 
 // -------------------------------------------------------
 
-X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV)
+X_INLINE void CommandBucketBase::appendRenderTarget(IRenderTarget* pRTV, RenderTargetFlags flags)
 {
-    rtvs_.push_back(pRTV);
+    rtvs_.emplace_back(RenderTargetWithFlags(pRTV, flags.ToInt()));
 }
 
 X_INLINE void CommandBucketBase::setDepthStencil(render::IPixelBuffer* pPB, DepthBindFlags bindFlags)

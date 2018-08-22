@@ -112,6 +112,15 @@ typedef Flags8<DepthBindFlag> DepthBindFlags;
 
 X_DECLARE_FLAG_OPERATORS(DepthBindFlags);
 
+X_DECLARE_FLAGS8(RenderTargetFlag)
+(
+    CLEAR // clears on bind.
+);
+
+typedef Flags8<RenderTargetFlag> RenderTargetFlags;
+
+X_DECLARE_FLAG_OPERATORS(RenderTargetFlags);
+
 class CommandBucketBase
 {
     X_NO_COPY(CommandBucketBase);
@@ -121,11 +130,14 @@ public:
     typedef Commands::CmdBase CmdBase;
     typedef core::Array<CommandPacket::Packet> PacketArr;
     typedef core::Array<uint32_t> SortedIdxArr;
-    typedef core::FixedArray<IRenderTarget*, MAX_RENDER_TARGETS> RenderTargetsArr;
-    typedef core::PointerFlags<render::IPixelBuffer, 2> PixelBufferWithFlags;
+    typedef core::PointerFlags<IPixelBuffer, 2> PixelBufferWithFlags;
+    typedef core::PointerFlags<IRenderTarget, 2> RenderTargetWithFlags;
+
+    typedef core::FixedArray<RenderTargetWithFlags, MAX_RENDER_TARGETS> RenderTargetsArr;
 
 #if X_COMPILER_CLANG == 0
     static_assert(PixelBufferWithFlags::BIT_COUNT >= DepthBindFlag::FLAGS_COUNT, "Not enougth space for flags");
+    static_assert(RenderTargetWithFlags::BIT_COUNT >= RenderTargetFlag::FLAGS_COUNT, "Not enougth space for flags");
 #endif // !X_COMPILE_CLANG
 
 protected:
@@ -135,8 +147,8 @@ protected:
 public:
     // Maybe allowing diffrent index's to be set is better idea.
     // and what ever is not null is set.
-    X_INLINE void appendRenderTarget(IRenderTarget* pRTV);
-    X_INLINE void setDepthStencil(render::IPixelBuffer* pPB, DepthBindFlags bindFlags);
+    X_INLINE void appendRenderTarget(IRenderTarget* pRTV, RenderTargetFlags flags = RenderTargetFlags());
+    X_INLINE void setDepthStencil(render::IPixelBuffer* pPB, DepthBindFlags bindFlags = DepthBindFlags());
 
     X_INLINE const Matrix44f& getViewMatrix(void) const;
     X_INLINE const Matrix44f& getProjMatrix(void) const;
