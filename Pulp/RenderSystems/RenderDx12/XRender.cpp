@@ -497,16 +497,22 @@ void XRender::renderBegin(void)
     core::atomic::Exchange(&stats_.numTexUploadSize, 0);
 #endif // !RENDER_STATS
 
-    ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
 
+    ColorBuffer& colBuf = pDisplayPlanes_[currentBufferIdx_]->getColorBuf();
     colBuf.setClearColor(vars_.getClearCol());
+
+#if 0
+
 
     GraphicsContext* pContext = pContextMan_->allocateGraphicsContext();
 
+    // so don't think will flush these here antmore.
+    // since the final buffer will be made from other buffers.
     pContext->transitionResource(colBuf.getGpuResource(), D3D12_RESOURCE_STATE_RENDER_TARGET, true);
     pContext->clearColor(colBuf);
 
     pContext->finishAndFree(false);
+#endif
 }
 
 void XRender::renderEnd(void)
