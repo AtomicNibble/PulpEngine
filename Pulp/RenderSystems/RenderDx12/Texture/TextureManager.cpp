@@ -411,14 +411,14 @@ bool TextureManager::updateTextureData(render::GpuResource& dest, uint32_t numSu
     return true;
 }
 
-uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pDestinationResource,
+uint64_t TextureManager::getRequiredIntermediateSize(ID3D12Resource* pResource,
     uint32_t firstSubresource, uint32_t numSubresources)
 {
-    const D3D12_RESOURCE_DESC desc = pDestinationResource->GetDesc();
+    const D3D12_RESOURCE_DESC desc = pResource->GetDesc();
     uint64_t requiredSize = 0;
 
     ID3D12Device* pDevice;
-    pDestinationResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
+    pResource->GetDevice(__uuidof(*pDevice), reinterpret_cast<void**>(&pDevice));
     pDevice->GetCopyableFootprints(&desc, firstSubresource, numSubresources, 0, nullptr, nullptr, nullptr, &requiredSize);
     pDevice->Release();
 
