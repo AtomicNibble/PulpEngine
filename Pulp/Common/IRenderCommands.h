@@ -19,7 +19,9 @@ namespace Commands
         UPDATE_TEXTUTE_BUF_DATA,
         UPDATE_TEXTUTE_SUB_BUF_DATA,
         CLEAR_DEPTH_STENCIL,
-        CLEAR_COLOR);
+        CLEAR_COLOR,
+        READ_BUFFER
+    );
 
     // how to pass these states in nice way.
     // i don't really want to create handles for them as these are just arrays of handles.
@@ -385,6 +387,16 @@ namespace Commands
 
         IPixelBuffer* pColorBuffer;
     };
+
+    struct ReadBuffer : public CmdBase
+    {
+        static const Command::Enum CMD = Command::READ_BUFFER;
+
+        IPixelBuffer* pBuffer;
+        uint8_t* pDstBuffer;
+        int32_t bufSize;
+    };
+
 
     //~
 

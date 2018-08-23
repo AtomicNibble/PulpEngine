@@ -820,6 +820,16 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
                     context.clearColor(colBuf);
                 } break;
 
+                case Commands::Command::READ_BUFFER: {
+                    const Commands::ReadBuffer& readBuffer = *reinterpret_cast<const Commands::ReadBuffer*>(pCmd);
+                    texture::Texture* pTexture = static_cast<texture::Texture*>(readBuffer.pBuffer);
+
+                    X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")();
+                    X_ASSERT_NOT_IMPLEMENTED();
+
+                } break;
+
+
                 default:
 #if X_DEBUG
                     X_ASSERT_NOT_IMPLEMENTED();
