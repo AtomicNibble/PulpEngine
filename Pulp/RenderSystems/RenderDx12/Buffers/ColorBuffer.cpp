@@ -22,7 +22,9 @@ void ColorBuffer::createDerivedViews(ID3D12Device* pDevice, DescriptorAllocator&
     X_ASSERT(numMips < texture::TEX_MAX_MIPS, "numMips exceeds max")(numMips, texture::TEX_MAX_MIPS);
 
     auto& tex = getTex();
-    tex.setNumMips(numMips - 1);
+    tex.setNumMips(numMips);
+    tex.setNumFaces(1);
+    tex.setDepth(1);
 
     D3D12_RENDER_TARGET_VIEW_DESC RTVDesc;
     D3D12_UNORDERED_ACCESS_VIEW_DESC UAVDesc;

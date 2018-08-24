@@ -23,13 +23,15 @@ D3D12_RESOURCE_DESC PixelBuffer::describeTex2D(uint32_t width, uint32_t height,
 
     tex.setWidth(safe_static_cast<uint16_t>(width));
     tex.setHeight(safe_static_cast<uint16_t>(height));
-    tex.setNumMips(safe_static_cast<uint8_t>(depthOrArraySize));
+    tex.setNumMips(safe_static_cast<uint8_t>(numMips));
+    tex.setNumFaces(1);
+    tex.setDepth(1);
     tex.setFormat(texture::Util::texFmtFromDXGI(format));
 
     D3D12_RESOURCE_DESC desc;
     core::zero_object(desc);
     desc.Alignment = 0;
-    desc.DepthOrArraySize = safe_static_cast<uint16_t, uint32_t>(depthOrArraySize);
+    desc.DepthOrArraySize = safe_static_cast<uint16_t>(depthOrArraySize);
     desc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
     desc.Flags = (D3D12_RESOURCE_FLAGS)flags;
     desc.Format = getBaseFormat(format);
@@ -56,7 +58,9 @@ void PixelBuffer::associateWithResource(ID3D12Device* pDevice, ID3D12Resource* p
 
     tex.setWidth(safe_static_cast<uint16_t>(resourceDesc.Width));
     tex.setHeight(safe_static_cast<uint16_t>(resourceDesc.Height));
-    tex.setNumMips(safe_static_cast<uint8_t>(resourceDesc.DepthOrArraySize));
+    tex.setNumMips(safe_static_cast<uint8_t>(resourceDesc.MipLevels));
+    tex.setNumFaces(1);
+    tex.setDepth(1);
     tex.setFormat(texture::Util::texFmtFromDXGI(resourceDesc.Format));
 }
 
