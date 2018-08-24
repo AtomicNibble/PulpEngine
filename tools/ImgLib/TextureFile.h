@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(texture)
 
 class XTextureFile
 {
-    typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 16>> DataArrAligned;
+    typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 16>, core::growStrat::Multiply> DataArrAligned;
 
 public:
     X_INLINE XTextureFile(core::MemoryArenaBase* arena);
