@@ -997,7 +997,7 @@ namespace profiler
         engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
         const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut)
     {
-        pPrim->drawQuad(xStart, yStart, width, height, Color(0.55f, 0.35f, 0.35f, 0.1f));
+        pPrim->drawQuad(xStart, yStart, width, height, Color(0.05f, 0.05f, 0.05f, 0.1f));
 
         X_UNUSED(frameTimeInfo);
         X_UNUSED(history);
