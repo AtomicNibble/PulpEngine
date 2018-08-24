@@ -122,7 +122,6 @@ void ColorBuffer::create(ID3D12Device* pDevice, DescriptorAllocator& allocator, 
     Colorf col = clearColor_;
 
     D3D12_CLEAR_VALUE ClearValue;
-    core::zero_object(ClearValue);
     ClearValue.Format = format;
     ClearValue.Color[0] = col[0];
     ClearValue.Color[1] = col[1];
@@ -142,7 +141,6 @@ void ColorBuffer::createArray(ID3D12Device* pDevice, DescriptorAllocator& alloca
     Colorf col = clearColor_;
 
     D3D12_CLEAR_VALUE ClearValue;
-    core::zero_object(ClearValue);
     ClearValue.Format = format;
     ClearValue.Color[0] = col[0];
     ClearValue.Color[1] = col[1];
