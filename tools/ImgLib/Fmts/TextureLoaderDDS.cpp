@@ -1145,8 +1145,23 @@ namespace DDS
                     return false;
             }
         }
-        else {
-            return false;
+        else 
+        {
+            switch (imgFile.getFormat()) 
+            {
+                case Texturefmt::R8G8B8A8:
+                    hdr.sPixelFormat.dwFlags |= DDPF_RGB | DDPF_ALPHAPIXELS;
+                    hdr.sPixelFormat.dwFourCC = PIXEL_FMT_A8R8G8B8;
+                    hdr.sPixelFormat.dwRGBBitCount = 32;
+                    hdr.sPixelFormat.dwRBitMask = 0x000000ff;
+                    hdr.sPixelFormat.dwGBitMask = 0x0000ff00;
+                    hdr.sPixelFormat.dwBBitMask = 0x00ff0000;
+                    hdr.sPixelFormat.dwAlphaBitMask = 0xff000000;
+                    break;
+                default:
+                    X_ERROR("DDS", "Unsupported fmt: %s", Texturefmt::ToString(imgFile.getFormat()));
+                    return false;
+            }
         }
 
         if (file->writeObj(hdr) != sizeof(hdr)) {
