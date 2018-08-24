@@ -461,6 +461,7 @@
     <ClInclude Include="Buffers\DepthBuffer.h" />
     <ClInclude Include="Buffers\GpuBuffer.h" />
     <ClInclude Include="Buffers\PixelBuffer.h" />
+    <ClInclude Include="Buffers\ReadbackBuffer.h" />
     <ClInclude Include="Buffers\ShadowBuffer.h" />
     <ClInclude Include="CommandContex.h" />
     <ClInclude Include="CommandListManger.h" />
@@ -496,6 +497,7 @@
     <ClCompile Include="Buffers\DepthBuffer.cpp" />
     <ClCompile Include="Buffers\GpuBuffer.cpp" />
     <ClCompile Include="Buffers\PixelBuffer.cpp" />
+    <ClCompile Include="Buffers\ReadbackBuffer.cpp" />
     <ClCompile Include="Buffers\ShadowBuffer.cpp" />
     <ClCompile Include="CommandContex.cpp" />
     <ClCompile Include="CommandListManger.cpp" />

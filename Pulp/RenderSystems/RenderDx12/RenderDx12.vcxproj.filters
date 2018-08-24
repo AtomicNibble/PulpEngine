@@ -146,6 +146,9 @@
     <ClInclude Include="Util\ErrorStr.h">
       <Filter>Header Files\Util</Filter>
     </ClInclude>
+    <ClInclude Include="Buffers\ReadbackBuffer.h">
+      <Filter>Header Files\Buffers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -231,6 +234,9 @@
     </ClCompile>
     <ClCompile Include="Util\ErrorStr.cpp">
       <Filter>Source Files\Util</Filter>
+    </ClCompile>
+    <ClCompile Include="Buffers\ReadbackBuffer.cpp">
+      <Filter>Source Files\Buffers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
