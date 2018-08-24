@@ -287,6 +287,20 @@ void CommandContext::copySubresource(GpuResource& dest, uint32_t destSubIndex, G
     pCommandList_->CopyTextureRegion(&destLocation, 0, 0, 0, &srcLocation, nullptr);
 }
 
+void CommandContext::readbackTexture2D(GpuResource& readbackBuffer, GpuResource& src, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footPrint)
+{
+    transitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE, true);
+
+    pCommandList_->CopyTextureRegion(
+        &CD3DX12_TEXTURE_COPY_LOCATION(readbackBuffer.getResource(), footPrint),
+        0,
+        0,
+        0,
+        &CD3DX12_TEXTURE_COPY_LOCATION(src.getResource(), 0), 
+        nullptr
+    );
+}
+
 // used for compute shaders
 void CommandContext::copyCounter(GpuResource& dest, size_t destOffset, StructuredBuffer& src)
 {
