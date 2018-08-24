@@ -403,6 +403,8 @@ struct IRender
 
     virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
 
+    virtual bool getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut) X_ABSTRACT;
+
     // display res is stored as int, if you want float cast this.
     virtual Vec2i getDisplayRes(void) const X_ABSTRACT;
 

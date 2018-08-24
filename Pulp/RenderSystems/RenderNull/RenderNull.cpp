@@ -49,6 +49,12 @@ void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     X_UNUSED(cmdBucket);
 }
 
+bool RenderNull::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut)
+{
+    X_UNUSED(pSource, imgOut);
+    return false;
+}
+
 Vec2i RenderNull::getDisplayRes(void) const
 {
     return Vec2i::zero();

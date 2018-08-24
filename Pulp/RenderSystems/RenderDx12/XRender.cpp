@@ -9,6 +9,7 @@
 #include "Allocators\LinearAllocator.h"
 #include "Buffers\BufferManager.h"
 #include "Buffers\DepthBuffer.h"
+#include "Buffers\ReadbackBuffer.h"
 #include "CommandContex.h"
 #include "PipelineState.h"
 
@@ -18,6 +19,10 @@
 
 #include <IConsole.h>
 #include <String\HumanSize.h>
+
+// TEMP: for rowBytes
+#include <../../tools/ImgLib/ImgLib.h>
+
 
 X_NAMESPACE_BEGIN(render)
 
@@ -855,6 +860,90 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     core::atomic::Add(&stats_.numTexUpload, curState.numTexUpload);
     core::atomic::Add(&stats_.numTexUploadSize, curState.numTexUploadSize);
 #endif // !RENDER_STATS
+}
+
+bool XRender::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut)
+{
+    texture::Texture* pTexture = static_cast<texture::Texture*>(pSource);
+
+    X_ASSERT(pTexture->getBufferType() == PixelBufferType::COLOR, "Invalid buffer passed to clear color")();
+
+    auto& src = pTexture->getGpuResource();
+
+    const auto desc = src->GetDesc();
+
+    D3D12_PLACED_SUBRESOURCE_FOOTPRINT bufferFootprint;
+    uint64_t fpRowPitch = 0;
+
+    pDevice_->GetCopyableFootprints(
+        &desc,
+        0,
+        1,
+        0,
+        &bufferFootprint,
+        nullptr,
+        &fpRowPitch,
+        nullptr
+    );
+    
+    uint64_t dstRowPitch = core::bitUtil::RoundUpToMultiple<uint64_t>(fpRowPitch, D3D12_TEXTURE_DATA_PITCH_ALIGNMENT);
+
+    if (desc.Dimension != D3D12_RESOURCE_DIMENSION_TEXTURE2D) {
+        X_ERROR("Render", "1d or volume textures not supported for buffer data");
+        return false;
+    }
+
+    if (desc.DepthOrArraySize > 1 || desc.MipLevels > 1) {
+        X_ERROR("Render", "2d arrays, cubemap and mipmaps not supported for buffer data");
+        return false;
+    }
+
+    D3D12_HEAP_PROPERTIES sourceHeapProperties;
+    HRESULT hr = src->GetHeapProperties(&sourceHeapProperties, nullptr);
+    if (FAILED(hr)) {
+        Error::Description Dsc;
+        X_ERROR("Dx12", "Failed to get heap properties: %s", Error::ToString(hr, Dsc));
+        return false;
+    }
+
+    if (sourceHeapProperties.Type == D3D12_HEAP_TYPE_READBACK) {
+        // Handle case where the source is already a staging texture we can use directly
+        X_ASSERT_NOT_IMPLEMENTED();
+        return false;
+    }
+
+    ReadbackBuffer readBackBuf;
+    readBackBuf.create(pDevice_, desc.Height, safe_static_cast<uint32_t>(dstRowPitch));
+
+    // Copy the texture
+    render::CommandContext* pContext = pContextMan_->allocateContext(D3D12_COMMAND_LIST_TYPE_DIRECT);
+    pContext->transitionResource(src, D3D12_RESOURCE_STATE_COPY_SOURCE, true);
+    pContext->readbackTexture2D(readBackBuf, src, bufferFootprint);
+    pContext->finishAndFree(true);
+
+    imgOut.setWidth(pSource->getWidth());
+    imgOut.setHeigth(pSource->getHeight());
+    imgOut.setFormat(pSource->getFormat());
+    imgOut.setDepth(pSource->getDepth());
+    imgOut.setNumMips(pSource->getNumMips());
+    imgOut.setNumFaces(pSource->getNumFaces());
+    imgOut.resize();
+
+    void* pMappedMemory = readBackBuf.map();
+    auto* pSrc = static_cast<const uint8_t*>(pMappedMemory);
+
+    auto rowBytes = imgOut.getLevelRowbytes(0);
+    auto* pDest = imgOut.getFace(0);
+
+    for (size_t h = 0; h < pSource->getHeight(); h++)
+    {
+        std::memcpy(pDest, pSrc, rowBytes);
+        pSrc += dstRowPitch;
+        pDest += rowBytes;
+    }
+
+    readBackBuf.unmap();
+    return true;
 }
 
 X_INLINE void XRender::createVBView(GraphicsContext& context, const VertexHandleArr& vertexBuffers,
