@@ -14,8 +14,6 @@ X_INLINE XTextureFile::XTextureFile(core::MemoryArenaBase* arena) :
     numMips_ = 0;
     depth_ = 0;
     numFaces_ = 0;
-
-    sizeValid_ = false;
 }
 
 X_INLINE XTextureFile::~XTextureFile()
@@ -357,7 +355,6 @@ X_INLINE void XTextureFile::swap(XTextureFile& oth)
     core::Swap(numMips_, oth.numMips_);
     core::Swap(depth_, oth.depth_);
     core::Swap(numFaces_, oth.numFaces_);
-    core::Swap(sizeValid_, oth.sizeValid_);
 
     data_.swap(oth.data_);
 }

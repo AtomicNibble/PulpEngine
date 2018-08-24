@@ -82,8 +82,7 @@ private:
     uint8_t numMips_;
     uint8_t depth_;    // Volume x,y,w
     uint8_t numFaces_; // Cube maps aka 6 faces.
-    bool sizeValid_;
-    uint8_t _PAD[2];
+    uint8_t _PAD[3];
 
     DataArrAligned data_;
     // pad to 128 bytes.
