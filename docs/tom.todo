@@ -3,7 +3,6 @@ Core:
 
   ☐ Sort out potential job system lock, due to not always helping with work when waiting.
 
-
 Game:
 
   ☐ Main menu need to open again
@@ -12,10 +11,11 @@ Game:
 Engine:
 
   ☐ Make cntl+enter toggle fullscreen
+  ☐ Support borderless window mode
+    So I can make a borderless window, just need setting for it.
+  ☐ Expose resolution settings
   ☐ Support setting the clear color for various render buffers
   ☐ Commands for changing the render scale on fly (for fillrate testing)
-  ☐ Expose resolution settings
-  ☐ Support borderless window mode
   ☐ Allow maintaining aspect ration? (basically don't stretch render buffers)
 
   GUI:
@@ -43,7 +43,9 @@ Render:
 AssetDB:
 
   ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
+    ☐ Change the thumb hash coloum to be BLOB type
   ☐ Change hash function for raw assets to xxHash
+  ☐ Support repack for images, so can optimise compression.
 
 AssetPak:
 
