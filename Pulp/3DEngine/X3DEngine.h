@@ -77,6 +77,7 @@ private:
 
 private:
     void Command_ClearPersistent(core::IConsoleCmdArgs* pCmd);
+    void Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd);
 
 private:
     XMaterialManager* pMaterialManager_;

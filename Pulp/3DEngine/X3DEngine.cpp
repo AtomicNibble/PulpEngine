@@ -29,6 +29,7 @@
 
 #include "World\World3D.h"
 
+
 X_NAMESPACE_BEGIN(engine)
 
 EngineEnv gEngEnv;
@@ -83,6 +84,9 @@ void X3DEngine::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("rClearPersistent", this, X3DEngine, &X3DEngine::Command_ClearPersistent,
         core::VarFlag::SYSTEM, "Clears persistent primatives");
+
+    ADD_COMMAND_MEMBER("rWriteBufferToFile", this, X3DEngine, &X3DEngine::Command_WriteBufferToFile,
+        core::VarFlag::SYSTEM, "Write a frame buffer to file <2d,3d>");
 }
 
 bool X3DEngine::init(void)
@@ -1264,6 +1268,54 @@ void X3DEngine::Command_ClearPersistent(core::IConsoleCmdArgs* pCmd)
     X_UNUSED(pCmd);
 
     clearPersistent_ = true;
+}
+
+void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
+{
+    if (pCmd->GetArgCount() < 2) {
+        return;
+    }
+
+    const char* pBufferStr = pCmd->GetArg(1);
+
+    render::IPixelBuffer* pBuffer = nullptr;
+
+    if (core::strUtil::IsEqualCaseInsen(pBufferStr, "2d")) {
+        pBuffer = p2DRenderTarget_;
+    } 
+    else if (core::strUtil::IsEqualCaseInsen(pBufferStr, "3d")) {
+        pBuffer = p3DRenderTarget_;
+    }
+
+    if (!pBuffer) {
+        X_ERROR("3DEngine", "Unkown buffer: %s", pBufferStr);
+        return;
+    }
+
+    // need to build a texture file.
+    texture::XTextureFile texure(g_3dEngineArena);
+
+    if (!gEnv->pRender->getBufferData(pBuffer, texure)) {
+        X_ERROR("3DEngine", "Failed to get frame buffer data");
+        return;
+    }
+
+    core::StackString<128> name;
+    name.setFmt("framebuffer_%s.dds", pBufferStr);
+
+    core::XFileScoped file;
+    if (!file.openFile(name.c_str(), core::fileModeFlags::WRITE | core::fileModeFlags::RECREATE)) {
+        X_ERROR("3DEngine", "Failed to open file for writing frame buffer");
+        return;
+    }
+
+    texture::DDS::XTexLoaderDDS dds;
+    if (!dds.saveTexture(file.GetFile(), texure, g_3dEngineArena)) {
+        X_ERROR("3DEngine", "Failed to save frame buffer image");
+        return;
+    }
+
+    X_LOG0("3DEngine", "Saved frame buffer to file...");
 }
 
 X_NAMESPACE_END
