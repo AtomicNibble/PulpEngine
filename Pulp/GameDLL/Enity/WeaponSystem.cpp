@@ -90,9 +90,11 @@ namespace entity
                 }
             }
 
-            //	pPrim->drawQuadImage(400.f, 400.f, 256, 128, wpn.pWeaponDef->getIcon(weapon::IconSlot::AmmoCounter), Color(0.2f, 0.2f, 0.2f));
+            // pPrim->drawQuad(400.f, 400.f, 256, 128, wpn.pWeaponDef->getIcon(weapon::IconSlot::AmmoCounter), Color(0.2f, 0.2f, 0.2f));
 
-            pPrim->drawText(Vec3f(5.f, 1000.f - 30.f, 1.f), con, ammoText.begin(), ammoText.end());
+            auto res = frame.view.displayRes;
+
+            pPrim->drawText(Vec3f(5.f, res.y - 80.f, 1.f), con, ammoText.begin(), ammoText.end());
 
             /*
 				so everything kinda works nice anim wise if we play the same animation on both arms and weapon.
