@@ -1,0 +1,55 @@
+
+Core:
+
+  ☐ Sort out potential job system lock, due to not always helping with work when waiting.
+
+
+Game:
+
+  ☐ Main menu need to open again
+  ☐ Make menus for lobby etc.
+
+Engine:
+
+  ☐ Make cntl+enter toggle fullscreen
+  ☐ Support setting the clear color for various render buffers
+  ☐ Commands for changing the render scale on fly (for fillrate testing)
+  ☐ Expose resolution settings
+  ☐ Support borderless window mode
+  ☐ Allow maintaining aspect ration? (basically don't stretch render buffers)
+
+  GUI:
+    ☐ Support combo boxes (for selecting resolution etc)
+    ☐ Support scrollable areas (will be probs needed for settings menus)
+
+Font:
+
+  ☐ Work out if should prebake different resolutions for SDF:
+    don't think that should be required as kinda defaults the whole point.
+    But my font rendering is pretty shitty currently.
+
+Script:
+
+  ☐ Pre process scripts for includes, so we know all includes upfront.
+
+Sound:
+
+  ☐ Support wwise packages (basically bundled streaming files)
+
+Render:
+
+  ☐ Fix rendering on AMD cards (some sync issue?)
+
+AssetDB:
+
+  ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
+  ☐ Change hash function for raw assets to xxHash
+
+AssetPak:
+
+  ☐ Support techdefs in packages.
+  ☐ Support shaders in packages.
+
+LevelBuilder:
+
+  ☐ Generate asset lists for level
