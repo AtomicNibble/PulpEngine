@@ -14,6 +14,10 @@ namespace
 
 } // namespace
 
+// so the problem with TRIANGLESTRIP
+// is that when we pass a material to draw with it may have a state that is not tristrip.
+// and if not doing tristrip we can have less draw calls.
+
 IPrimativeContext::IPrimativeContext()
 {
 }
