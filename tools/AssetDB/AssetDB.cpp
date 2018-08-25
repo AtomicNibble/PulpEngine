@@ -2816,7 +2816,7 @@ bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pT
     const size_t hashBlobSize = row.columnBytes(6);
     // u fucking pineapple.
     if (hashBlobSize != sizeof(dataOut.hash.bytes)) {
-        X_ERROR("AssetDB", "THumb hash blob incorrect size: %" PRIuS, hashBlobSize);
+        X_ERROR("AssetDB", "Thumb hash blob incorrect size: %" PRIuS, hashBlobSize);
         return false;
     }
 
