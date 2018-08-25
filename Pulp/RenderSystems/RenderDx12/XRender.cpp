@@ -2087,6 +2087,10 @@ bool XRender::resize(Vec2i res)
         colBuf.createFromSwapChain(pDevice_, *pDescriptorAllocator_, displayPlane.Detach());
     }
 
+    X_ASSERT(pSwapChain_->GetCurrentBackBufferIndex() == 0, "Unexpected index")();
+
+    currentBufferIdx_ = 0;
+
     // post a event.
     CoreEventData ed;
     ed.event = CoreEvent::RENDER_RES_CHANGED;
