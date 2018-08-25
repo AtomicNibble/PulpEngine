@@ -23,7 +23,7 @@ Technique( "unlit" )
 
 Technique( "wireframe" )
 {
-	state = State() : "blend + nocull"
+	state = State() : "premul + nocull"
 	{
 		primitiveType = "trilist"
 		wireframe      = true

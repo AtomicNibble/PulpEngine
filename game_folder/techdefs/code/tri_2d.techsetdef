@@ -4,7 +4,7 @@
 
 Technique( "unlit" )
 {
-	state = State() : "blend + nocull"
+	state = State() : "premul + nocull"
 	{
 		primitiveType = "tristrip"
 	}
