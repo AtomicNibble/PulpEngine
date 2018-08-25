@@ -4,7 +4,7 @@ REM build the assets..
 
 SEt WWISE_BIN=C:\Program Files (x86)\Audiokinetic\Wwise v2015.1.5 build 5533\Authoring\x64\Release\bin
 
-set BIN_PATH=..\..\build\x64\Super
+set GAME_BIN_PATH=..\..\build\x64\Super
 set REL_PATH="../../build/x64/Release Dynamic"
 set ABS_PATH=
 
@@ -31,12 +31,16 @@ mkdir build
 mkdir build\core_assets
 
 rem Copy binary..
-
-xcopy /y /d "%BIN_PATH%\PhysX*.dll" "build"
-xcopy /y /d "%BIN_PATH%\nvToolsExt*.dll" "build"
-xcopy /y /d "%BIN_PATH%\engine_Game.exe" "build"
+xcopy /y /d "%GAME_BIN_PATH%\engine_Game.exe" "build"
 
 rem 3rd party dlls
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysX.dll" "build"
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCommon.dll" "build"
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCooking.dll" "build"
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCharacterKinematic.dll" "build"
+
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\nvToolsExt*.dll" "build"
+
 xcopy /y /d "..\3rdparty\bin\x64\D3DCompiler_47.dll" "build"
 
 rem some assets.. !
