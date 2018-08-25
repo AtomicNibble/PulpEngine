@@ -36,7 +36,7 @@ namespace gui
         }
 
         GuiContex::Params p;
-        p.rect.set(0.f, 0.f, 1680.f, 1050.f);
+        p.rect.set(0.f, 0.f, static_cast<float>(frame.view.displayRes.x), static_cast<float>(frame.view.displayRes.y));
         p.cursorPos = frame.input.cusorPosClient;
         p.frameDelta = frame.timeInfo.deltas[core::Timer::UI];
 
