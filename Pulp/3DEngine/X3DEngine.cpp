@@ -54,13 +54,12 @@ X3DEngine::X3DEngine(core::MemoryArenaBase* arena) :
         {primResources_, PrimativeContext::Mode::Mode2D, PrimativeContext::MaterialSet::BASE_2D, arena}, // profile
         {primResources_, PrimativeContext::Mode::Mode2D, PrimativeContext::MaterialSet::BASE_2D, arena}  // console
     },
-    pDepthStencil_(nullptr),
-    p3DRenderTarget_(nullptr),
-    p2DRenderTarget_(nullptr),
     clearPersistent_(false),
     coreEventReg_(false),
     worlds_(arena)
 {
+    pixelBufffers_.fill(nullptr);
+
     // check if the enum order was changed in a way that resulted in incorrect modes.
     X_ASSERT(primContexts_[PrimContext::SOUND].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
     X_ASSERT(primContexts_[PrimContext::PHYSICS].getMode() == IPrimativeContext::Mode::Mode3D, "Incorrect mode")();
@@ -168,11 +167,11 @@ bool X3DEngine::init(void)
     auto dispalyRes = pRender->getDisplayRes();
 
     // these must be same size.
-    pDepthStencil_ = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
-    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
+    pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
+    pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
     
     // this can be any size, but typically have it match display.
-    p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(0, 0, 0, 0));
+    pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(0, 0, 0, 0));
 
     return true;
 }
@@ -187,14 +186,10 @@ void X3DEngine::shutDown(void)
 
     auto* pRender = gEnv->pRender;
 
-    if (pDepthStencil_) {
-        pRender->releasePixelBuffer(pDepthStencil_);
-    }
-    if (p3DRenderTarget_) {
-        pRender->releasePixelBuffer(p3DRenderTarget_);
-    }
-    if (p2DRenderTarget_) {
-        pRender->releasePixelBuffer(p2DRenderTarget_);
+    for (auto* pPixelBuffer : pixelBufffers_) {
+        if (pPixelBuffer) {
+            pRender->releasePixelBuffer(pPixelBuffer);
+        }
     }
 
     for (auto& primcon : primContexts_) {
@@ -316,14 +311,14 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     {
         XViewPort& viewPort = frame.view.viewport;
         viewPort.setZ(0.f, 1.f);
-        viewPort.set(p3DRenderTarget_->getDimensions());
+        viewPort.set(pixelBufffers_[PixelBuf::COL_3D]->getDimensions());
 
         render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, 8096 * 12);
         cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
         render::CommandBucket<uint32_t> geoBucket(g_3dEngineArena, cmdBucketAllocator, 8096 * 5, viewPort);
 
-        geoBucket.appendRenderTarget(p3DRenderTarget_, render::RenderTargetFlag::CLEAR);
-        geoBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
+        geoBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_3D], render::RenderTargetFlag::CLEAR);
+        geoBucket.setDepthStencil(pixelBufffers_[PixelBuf::DEPTH_STENCIL], render::DepthBindFlag::CLEAR | render::DepthBindFlag::WRITE);
 
         // clear some buffers.
         // 2d - is cleared as we might not render to it, yet still blend it in (could skip composite)
@@ -332,7 +327,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             pClear->pColorBuffer = pRender->getCurBackBuffer();
 
             pClear = geoBucket.addCommand<render::Commands::ClearColor>(0, 0);
-            pClear->pColorBuffer = p2DRenderTarget_;
+            pClear->pColorBuffer = pixelBufffers_[PixelBuf::COL_2D];
         }
 
         // TODO: move
@@ -366,7 +361,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
             if (pTech->variableStateSize) {
                 RegisterCtx ctx;
-                ctx.regs[Register::CodeTexture0] = pDepthStencil_->getTexID();
+                ctx.regs[Register::CodeTexture0] = pixelBufffers_[PixelBuf::DEPTH_STENCIL]->getTexID();
 
                 pMaterialManager_->initStateFromRegisters(pTech, &pDraw->resourceState, ctx);
             }
@@ -735,14 +730,14 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
             XViewPort viewPort;
             viewPort.setZ(0.f, 1.f);
-            viewPort.set(p3DRenderTarget_->getDimensions());
+            viewPort.set(pixelBufffers_[PixelBuf::COL_3D]->getDimensions());
 
             render::CmdPacketAllocator cmdBucketAllocator(g_3dEngineArena, totalElems * 1024);
             cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
             render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
-            primBucket.appendRenderTarget(p3DRenderTarget_);
-            primBucket.setDepthStencil(pDepthStencil_, render::DepthBindFlag::WRITE);
+            primBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_3D]);
+            primBucket.setDepthStencil(pixelBufffers_[PixelBuf::DEPTH_STENCIL], render::DepthBindFlag::WRITE);
 
             addPrimsToBucket(frame, primBucket, IPrimativeContext::Mode::Mode3D, core::make_span(prims.begin(), prims.end()));
 
@@ -799,7 +794,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
             if (pTechBlend->variableStateSize) {
                 RegisterCtx ctx;
-                ctx.regs[Register::CodeTexture0] = p3DRenderTarget_->getTexID();
+                ctx.regs[Register::CodeTexture0] = pixelBufffers_[PixelBuf::COL_3D]->getTexID();
 
                 pMaterialManager_->initStateFromRegisters(pTechBlend, &pDraw->resourceState, ctx);
             }
@@ -816,7 +811,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
             if (pPreMul->variableStateSize) {
                 RegisterCtx ctx;
-                ctx.regs[Register::CodeTexture0] = p2DRenderTarget_->getTexID();
+                ctx.regs[Register::CodeTexture0] = pixelBufffers_[PixelBuf::COL_2D]->getTexID();
 
                 pMaterialManager_->initStateFromRegisters(pPreMul, &pDraw->resourceState, ctx);
             }
@@ -881,7 +876,7 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
 
     XViewPort& viewPort = frame.view.viewport;
     viewPort.setZ(0.f, 1.f);
-    viewPort.set(p2DRenderTarget_->getDimensions());
+    viewPort.set(pixelBufffers_[PixelBuf::COL_2D]->getDimensions());
 
     // invisible?
     if (viewPort.getWidth() <= 0 || viewPort.getHeight() <= 0) {
@@ -893,8 +888,8 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
     cmdBucketAllocator.createAllocaotrsForThreads(*gEnv->pJobSys);
     render::CommandBucket<uint32_t> primBucket(g_3dEngineArena, cmdBucketAllocator, totalElems * 4, viewPort);
 
-    primBucket.appendRenderTarget(p2DRenderTarget_);
-    primBucket.setDepthStencil(pDepthStencil_);
+    primBucket.appendRenderTarget(pixelBufffers_[PixelBuf::COL_2D]);
+    primBucket.setDepthStencil(pixelBufffers_[PixelBuf::DEPTH_STENCIL]);
 
     addPrimsToBucket(frame, primBucket, mode, core::make_span(prims.begin(), prims.end()));
 
@@ -1246,18 +1241,45 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
     if (ed.event == CoreEvent::RENDER_RES_CHANGED)
     {
         // TODO: when doing stuff like rendering scene at 50% might want to change out buffers.
-        if (p2DRenderTarget_ && false)
+        Vec2i newDim(ed.renderRes.width, ed.renderRes.height);
+
+        auto* pRender = gEnv->pRender;
+
+        if (pixelBufffers_[PixelBuf::COL_2D])
         {
-            auto dim = p2DRenderTarget_->getDimensions();
+            auto dim = pixelBufffers_[PixelBuf::COL_2D]->getDimensions();
 
-            if (dim.x != ed.renderRes.width || dim.y != ed.renderRes.height)
+            if (dim != newDim)
             {
-                auto* pRender = gEnv->pRender;
+                pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_2D]);
 
-                pRender->releasePixelBuffer(p2DRenderTarget_);
+                pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d",
+                    newDim, 1, texture::Texturefmt::A8R8G8B8, Color8u(0,0,0,0));
+            }
+        }
 
-                p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d",
-                    Vec2i(ed.renderRes.width, ed.renderRes.height), 1, texture::Texturefmt::A8R8G8B8, Color8u(0,0,0,0));
+        if (pixelBufffers_[PixelBuf::COL_3D])
+        {
+            auto dim = pixelBufffers_[PixelBuf::COL_3D]->getDimensions();
+
+            if (dim != newDim)
+            {
+                pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_3D]);
+
+                pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", 
+                    newDim, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
+            }
+        }
+
+        if (pixelBufffers_[PixelBuf::DEPTH_STENCIL])
+        {
+            auto dim = pixelBufffers_[PixelBuf::DEPTH_STENCIL]->getDimensions();
+
+            if (dim != newDim)
+            {
+                pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::DEPTH_STENCIL]);
+
+                pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer", newDim);
             }
         }
     }
@@ -1281,10 +1303,10 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
     render::IPixelBuffer* pBuffer = nullptr;
 
     if (core::strUtil::IsEqualCaseInsen(pBufferStr, "2d")) {
-        pBuffer = p2DRenderTarget_;
+        pBuffer = pixelBufffers_[PixelBuf::COL_2D];
     } 
     else if (core::strUtil::IsEqualCaseInsen(pBufferStr, "3d")) {
-        pBuffer = p3DRenderTarget_;
+        pBuffer = pixelBufffers_[PixelBuf::COL_3D];
     }
 
     if (!pBuffer) {

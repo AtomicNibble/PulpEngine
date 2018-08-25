@@ -36,6 +36,14 @@ class X3DEngine : public I3DEngine
 
     typedef core::FixedArray<PrimativeContext*, PrimContext::ENUM_COUNT> PrimativeContextArr;
 
+    X_DECLARE_ENUM(PixelBuf)(
+        DEPTH_STENCIL,
+        COL_3D,
+        COL_2D
+    );
+
+    typedef std::array<render::IPixelBuffer*, PixelBuf::ENUM_COUNT> PixelBufferArr;
+
 public:
     X3DEngine(core::MemoryArenaBase* arena);
     virtual ~X3DEngine() X_FINAL;
@@ -95,9 +103,7 @@ private:
     PrimativeContextSharedResources primResources_;
     PrimativeContext primContexts_[PrimContext::ENUM_COUNT];
 
-    render::IPixelBuffer* pDepthStencil_;
-    render::IPixelBuffer* p3DRenderTarget_;
-    render::IPixelBuffer* p2DRenderTarget_;
+    PixelBufferArr pixelBufffers_;
 
     bool clearPersistent_;
     bool coreEventReg_;
