@@ -4,6 +4,7 @@
 
 #include <Util\Delegate.h>
 #include <Hashing\MD5.h>
+#include <Hashing\sha1.h>
 #include <Containers\Array.h>
 
 #include <IAssetDb.h>
@@ -22,7 +23,8 @@ class DLL_EXPORT AssetDB
     // Version 2: correct compression algo enum, as the order changed
     //				In order to migrate must modify all raw asset compression headers to map to new algo enum.
     // Version 3: compressed buffer header changed
-    static const int32_t DB_VERSION = 3;
+    // Version 4: change asset thump to hash sha1
+    static const int32_t DB_VERSION = 4;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
@@ -41,13 +43,13 @@ public:
     struct ThumbInfo
     {
         X_INLINE ThumbInfo();
-        X_INLINE ThumbInfo(ThumbId id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::MD5Digest& hash);
+        X_INLINE ThumbInfo(ThumbId id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::SHA1Digest& hash);
 
         ThumbId id;
         int32_t fileSize;
         Vec2i thumbDim; // thumb dim
         Vec2i srcDim;   // dim of src, might be zero
-        core::Hash::MD5Digest hash;
+        core::Hash::SHA1Digest hash;
     };
 
     struct Mod

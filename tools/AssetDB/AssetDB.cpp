@@ -4,7 +4,6 @@
 
 #include <Containers\Array.h>
 #include <Hashing\crc32.h>
-#include <Hashing\MD5.h>
 
 #include <IFileSys.h>
 #include <ICompression.h>
@@ -591,6 +590,103 @@ bool AssetDB::PerformMigrations(void)
                 return false;
             }
         }
+    }
+
+    if (dbVersion_ < 4) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 4", dbVersion_);
+
+        // for each thumb load the file caclculate new hash update db and move file on disk.
+        sql::SqlLiteQuery qry(db_, "SELECT thumb_id, hash FROM thumbs");
+
+        core::Array<uint8_t> data(g_AssetDBArena);
+        data.reserve(1024 * 16);
+
+        core::Hash::SHA1 sha1;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            int32_t thumbId = row.get<int32_t>(0);
+
+            const void* pHash = row.get<void const*>(1);
+            const size_t hashBlobSize = row.columnBytes(1);
+            
+            core::Hash::MD5Digest curHash;
+            core::Hash::MD5Digest::String curHashStr;
+
+            if (hashBlobSize != core::Hash::MD5Digest::NUM_BYTES) {
+
+                if (hashBlobSize == core::Hash::SHA1Digest::NUM_BYTES) {
+                    X_WARNING("AssetDB", "Skipping Thumb: %" PRIi32 " already migrated", thumbId);
+                    continue;
+                }
+
+                X_ERROR("AssetDB", "Thumb hash blob incorrect size: %" PRIuS, hashBlobSize);
+                return false;
+            }
+
+            std::memcpy(curHash.bytes, pHash, sizeof(curHash));
+
+            // load the file.
+            core::Path<char> curPath;
+            curPath = ASSET_DB_FOLDER;
+            curPath /= THUMBS_FOLDER;
+            curPath /= curHash.ToString(curHashStr);
+            curPath.replaceSeprators();
+
+            core::XFileScoped file;
+            if (!file.openFile(curPath.c_str(),
+                core::fileMode::READ)) {
+                X_ERROR("AssetDB", "Failed to open thumb file id: %" PRIi32, thumbId);
+                return false;
+            }
+
+            auto fileSize = safe_static_cast<size_t>(file.remainingBytes());
+            data.resize(fileSize);
+
+            if (file.read(data.data(), fileSize) != fileSize) {
+                X_ERROR("AssetDB", "Failed to read thumb data for id: %" PRIi32, thumbId);
+                return false;
+            }
+
+            file.close();
+
+            sha1.reset();
+            sha1.update(data.data(), fileSize);
+            auto newHash = sha1.finalize();
+
+            core::Hash::SHA1Digest::String newHashStr;
+
+            core::Path<char> newPath;
+            newPath = ASSET_DB_FOLDER;
+            newPath /= THUMBS_FOLDER;
+            newPath /= newHash.ToString(newHashStr);
+            newPath.replaceSeprators();
+
+            sql::SqlLiteTransaction trans(db_);
+
+            // update table.
+            sql::SqlLiteCmd cmd(db_, "UPDATE thumbs SET hash = ? WHERE thumb_id = ?");
+            cmd.bind(1, &newHash, sizeof(newHash));
+            cmd.bind(2, thumbId);
+
+            sql::Result::Enum res = cmd.execute();
+            if (res != sql::Result::OK) {
+                X_ERROR("AssetDB", "Failed to update thumb hash id: %" PRIi32, thumbId);
+                return false;
+            }
+
+            // move the file.
+            if (!gEnv->pFileSys->moveFile(curPath.c_str(), newPath.c_str())) {
+                X_ERROR("AssetDB", "Failed to move thumb file for id: %" PRIi32, thumbId);
+                return false;
+            }
+
+            // if we move the file commit it.
+            trans.commit();
+        }
+
     }
 
     return true;
@@ -1958,7 +2054,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
         return Result::ERROR;
     }
 
-    core::Hash::MD5 hasher;
+    core::Hash::SHA1 hasher;
     hasher.update(compressedData.data(), compressedData.size());
     const auto hash = hasher.finalize();
 
@@ -1979,7 +2075,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     // write new data.
     {
         core::Path<char> filePath;
-        core::Hash::MD5Digest::String strBuf;
+        core::Hash::SHA1Digest::String strBuf;
 
         filePath = ASSET_DB_FOLDER;
         filePath /= THUMBS_FOLDER;
@@ -2957,7 +3053,7 @@ void AssetDB::RawFilePathForName(AssetType::Enum type, const core::string& name,
 
 void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
 {
-    core::Hash::MD5Digest::String hashStr;
+    core::Hash::SHA1Digest::String hashStr;
 
     pathOut = ASSET_DB_FOLDER;
     pathOut /= THUMBS_FOLDER;
