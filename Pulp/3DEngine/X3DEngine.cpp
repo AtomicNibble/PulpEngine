@@ -775,18 +775,6 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             render::shader::VertexFormat::NONE,
             PermatationFlags::Textured);
 
-        TechDefPerm* pTechReplace = pMaterialManager_->getCodeTech(
-            core::string("fullscreen"),
-            core::StrHash("replace"),
-            render::shader::VertexFormat::NONE,
-            PermatationFlags::Textured);
-
-        TechDefPerm* pTechAdd = pMaterialManager_->getCodeTech(
-            core::string("fullscreen"),
-            core::StrHash("add"),
-            render::shader::VertexFormat::NONE,
-            PermatationFlags::Textured);
-
         TechDefPerm* pPreMul = pMaterialManager_->getCodeTech(
             core::string("fullscreen"),
             core::StrHash("premul"),
@@ -794,7 +782,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             PermatationFlags::Textured);
 
        
-        X_UNUSED(pTechBlend, pTechReplace, pTechAdd, pPreMul);
+        X_UNUSED(pTechBlend, pPreMul);
 
         if (drawVars_.drawBuffer3D())
         {
