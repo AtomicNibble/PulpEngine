@@ -56,15 +56,10 @@ bool XCore::Update(void)
     X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
     using namespace core::V2;
 
-    auto width = vars_.getWinWidth();
-    auto height = vars_.getWinHeight();
-
     core::FrameData frameData;
     if (pWindow_->Hasfocus()) {
         frameData.flags.Set(core::FrameFlag::HAS_FOCUS);
     }
-    frameData.view.viewport.set(width, height);
-    frameData.view.viewport.setZ(0.f, 1.f);
 
     assetLoader_.dispatchPendingLoads();
     assetLoader_.update();
@@ -119,9 +114,6 @@ bool XCore::Update(void)
 
     }
 
-    if (env_.pVideoSys) {
-        env_.pVideoSys->update(frameData.timeInfo);
-    }
 
     // top job that we can use to wait for the chain of jobs to complete.
     Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
@@ -144,12 +136,16 @@ bool XCore::Update(void)
     jobSys.Run(pSyncJob);
     jobSys.Wait(pSyncJob);
 
-    if (env_.pGame) {
-        env_.pGame->update(frameData);
-    }
-
     if (env_.p3DEngine) {
         env_.p3DEngine->update(frameData);
+    }
+
+    if (env_.pVideoSys) {
+        env_.pVideoSys->update(frameData.timeInfo);
+    }
+
+    if (env_.pGame) {
+        env_.pGame->update(frameData);
     }
 
     if (env_.pPhysics) {

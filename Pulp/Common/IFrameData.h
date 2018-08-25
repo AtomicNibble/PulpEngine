@@ -40,6 +40,8 @@ X_DISABLE_WARNING(4324)
 
 struct FrameView
 {
+    Vec2i displayRes;
+    Vec2i renderRes;
     XViewPort viewport;
 
     XCamera cam; // camera pos for this frame.

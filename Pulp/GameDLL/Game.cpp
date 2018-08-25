@@ -240,7 +240,15 @@ bool XGame::update(core::FrameData& frame)
 
     // orth
     Matrix44f orthoProj;
-    MatrixOrthoOffCenterRH(&orthoProj, 0, frame.view.viewport.getWidthf(), frame.view.viewport.getHeightf(), 0, -1e10f, 1e10);
+    MatrixOrthoOffCenterRH(
+        &orthoProj,
+        0.f, 
+        static_cast<float>(frame.view.displayRes.x), 
+        static_cast<float>(frame.view.displayRes.y), 
+        0.f, 
+        -1e10f, 
+        1e10
+    );
 
     frame.view.viewMatrixOrtho = Matrix44f::identity();
     frame.view.projMatrixOrtho = orthoProj;
@@ -255,8 +263,8 @@ bool XGame::update(core::FrameData& frame)
     con.flags.Set(font::DrawTextFlag::CENTER);
     con.flags.Set(font::DrawTextFlag::CENTER_VER);
 
-    auto width = frame.view.viewport.getWidthf();
-    auto height = frame.view.viewport.getHeightf();
+    auto width = static_cast<float>(frame.view.displayRes.x);
+    auto height = static_cast<float>(frame.view.displayRes.y);
 
     Vec2f center(width * 0.5f, height * 0.5f);
 

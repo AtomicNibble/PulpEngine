@@ -163,9 +163,11 @@ bool X3DEngine::init(void)
     // so i will need some textures to render into.
     auto dispalyRes = pRender->getDisplayRes();
 
+    // these must be same size.
     pDepthStencil_ = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
-    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", Vec2i(640,480), 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
-    // this should be the size of the render
+    p3DRenderTarget_ = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
+    
+    // this can be any size, but typically have it match display.
     p2DRenderTarget_ = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(0, 0, 0, 0));
 
     return true;
@@ -290,12 +292,10 @@ void X3DEngine::update(core::FrameData& frame)
 
     pTextureManager_->scheduleStreaming();
 
-    //	Matrix44f view = Matrix44f::identity();
-    //	Matrix44f viewProj;
-    //	MatrixOrthoOffCenterRH(&viewProj, 0, 1680, 1050, 0, -1e10f, 1e10);
 
-    X_UNUSED(frame);
-    //	pCBufMan_->update(frame, false);
+    auto dispalyRes = gEnv->pRender->getDisplayRes();
+    frame.view.displayRes = dispalyRes;
+    frame.view.renderRes = dispalyRes;
 }
 
 void X3DEngine::onFrameBegin(core::FrameData& frame)
@@ -310,7 +310,7 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
     auto* pRender = gEnv->pRender;
 
     {
-        XViewPort viewPort;
+        XViewPort& viewPort = frame.view.viewport;
         viewPort.setZ(0.f, 1.f);
         viewPort.set(p3DRenderTarget_->getDimensions());
 
@@ -887,7 +887,7 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
 
     auto* pRender = gEnv->pRender;
 
-    XViewPort viewPort;
+    XViewPort& viewPort = frame.view.viewport;
     viewPort.setZ(0.f, 1.f);
     viewPort.set(p2DRenderTarget_->getDimensions());
 
