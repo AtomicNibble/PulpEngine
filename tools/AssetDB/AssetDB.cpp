@@ -130,7 +130,7 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 
         if (dbVersion_ != DB_VERSION) {
             if (dbVersion_ > DB_VERSION) {
-                X_ERROR("AssetDB", "DB was made by a newer version of the tool. db version: %" PRIi32 " supported: " PRIi32,
+                X_ERROR("AssetDB", "DB was made by a newer version of the tool. db version: %" PRIi32 " supported: %" PRIi32,
                     dbVersion_, DB_VERSION);
                 return false;
             }
