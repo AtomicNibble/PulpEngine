@@ -81,10 +81,8 @@ CommandBucket<KeyT>::CommandBucket(core::MemoryArenaBase* arena, CmdPacketAlloca
     // null all the packet pointers.
     // needed since a thread may take some slots but never fill them.
     // so we can't rly on all packets below current_ to be valid
-
-    for (auto& p : packets_) {
-        p = nullptr;
-    }
+    // TODO: actually required?
+    std::memset(packets_.begin(), 0, packets_.size() * sizeof(PacketArr::Type));
 }
 
 template<typename KeyT>
