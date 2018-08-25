@@ -935,7 +935,7 @@ bool XRender::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut
     auto rowBytes = imgOut.getLevelRowbytes(0);
     auto* pDest = imgOut.getFace(0);
 
-    for (size_t h = 0; h < pSource->getHeight(); h++)
+    for (int32_t h = 0; h < pSource->getHeight(); h++)
     {
         std::memcpy(pDest, pSrc, rowBytes);
         pSrc += dstRowPitch;
