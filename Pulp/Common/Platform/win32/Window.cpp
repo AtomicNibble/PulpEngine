@@ -493,7 +493,7 @@ void xWindow::onSizing(WPARAM side, RECT* pRect)
             pRect->left = pRect->right - math<int>::clamp(width, minWidth, maxWidth) - decoWidth;
             break;
         default:
-            X_ASSERT_NOT_IMPLEMENTED();
+            // sometimes I get a 0x9?
             break;
     }
 }
