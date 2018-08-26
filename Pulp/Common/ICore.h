@@ -97,8 +97,10 @@ struct SizeData
 
 struct PosData
 {
-    int16_t x;
-    int16_t y;
+    int16_t windowX;
+    int16_t windowY;
+    int16_t clientX;
+    int16_t clientY;
 };
 
 struct FocusData

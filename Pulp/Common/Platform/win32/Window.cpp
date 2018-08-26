@@ -399,8 +399,23 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
         {
             CoreEventData ed;
             ed.event = CoreEvent::MOVE;
-            ed.move.x = static_cast<int16_t>(LOWORD(lParam));
-            ed.move.y = static_cast<int16_t>(HIWORD(lParam));
+            ed.move.clientX = static_cast<int16_t>(LOWORD(lParam));
+            ed.move.clientY = static_cast<int16_t>(HIWORD(lParam));
+
+            RECT r;
+            r.left = 0;
+            r.top = 0;
+            r.right = 1;
+            r.bottom = 1;
+
+            int style = ::GetWindowLong(hWnd, GWL_STYLE);
+            if (!AdjustWindowRect(&r, style, FALSE)) {
+                core::lastError::Description Dsc;
+                X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
+            }
+
+            ed.move.windowX = safe_static_cast<int16_t>(ed.move.clientX + r.left);
+            ed.move.windowY = safe_static_cast<int16_t>(ed.move.clientY + r.top);
 
             gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
             break;
