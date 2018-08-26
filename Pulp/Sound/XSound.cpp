@@ -414,7 +414,9 @@ bool XSound::init(void)
 
     // Mount packages, this is a blocking IO call currently.
     // If I decide to never store banks in packages, I could make it async.
-    loadPackage("streamed.pck");
+    if (!loadPackage("streamed.pck")) {
+        return false;
+    }
 
     // dispatch async loads for base banks.
     loadBank("Init.bnk");
@@ -1240,7 +1242,7 @@ void XSound::setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object,
 
 // ------------------ Packages ----------------------------
 
-void XSound::loadPackage(const char* pName)
+bool XSound::loadPackage(const char* pName)
 {
     Package pck;
     pck.name = pName;
@@ -1250,8 +1252,8 @@ void XSound::loadPackage(const char* pName)
     });
 
     if (loaded) {
-        X_ASSERT(true, "Package already loaded")(pName);
-        return;
+        X_ERROR("SoundSys", "Package already loaded \"%s\"", pName);
+        return true;
     }
 
     core::StackString<128, AkOSChar> akName(pck.name.begin(), pck.name.end());
@@ -1260,10 +1262,11 @@ void XSound::loadPackage(const char* pName)
     if (res != AK_Success) {
         AkResult::Description desc;
         X_ERROR("SoundSys", "Failed to load pacakge \"%s\" %s", pName, AkResult::ToString(res, desc));
-        return;
+        return false;
     }
 
     packages_.emplace_back(std::move(pck));
+    return true;
 }
 
 // ------------------ Banks ----------------------------

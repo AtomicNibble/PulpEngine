@@ -148,7 +148,7 @@ public:
         core::TimeVal changeDuration = core::TimeVal(0ll),
         CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
-    void loadPackage(const char* pName);
+    bool loadPackage(const char* pName);
 
     void loadBank(const char* pName) X_FINAL;
     void unLoadBank(const char* pName) X_FINAL;
