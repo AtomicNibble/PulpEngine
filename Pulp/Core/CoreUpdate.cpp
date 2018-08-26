@@ -122,16 +122,13 @@ bool XCore::Update(void)
         Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
         jobSys.Run(pDirectoryWatchProcess);
 
-        // create a job for syncing all input related jobs.
-        Job* pInputSync = jobSys.CreateEmtpyJobAsChild(pSyncJob JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-        {
-            Job* pConsoleUpdates = jobSys.CreateMemberJobAsChild<XCore>(pInputSync, this, &XCore::Job_ConsoleUpdates, &frameData.timeInfo JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-
-            jobSys.Run(pConsoleUpdates);
-        }
-
-        jobSys.Run(pInputSync);
     }
+
+    env_.pConsole->Job_dispatchRepeateInputEvents(frameData.timeInfo);
+    // runs any commands that got submitted via input or config / other things.
+    // so basically this is the only place that triggers command callbacks and modified callbacks.
+    env_.pConsole->Job_runCmds();
+
 
     jobSys.Run(pSyncJob);
     jobSys.Wait(pSyncJob);
