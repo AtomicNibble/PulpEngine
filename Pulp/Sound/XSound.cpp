@@ -495,6 +495,7 @@ void XSound::shutDown(void)
         SoundEngine::Term();
     }
 
+    // unloads packages for us.
     ioHook_.Term();
 
     if (IAkStreamMgr::Get()) {
@@ -1267,6 +1268,15 @@ bool XSound::loadPackage(const char* pName)
 
     packages_.emplace_back(std::move(pck));
     return true;
+}
+
+void XSound::unloadAllPackages(void)
+{
+    AKRESULT res = ioHook_.UnloadAllFilePackages();
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Failed to unload pacakges %s", AkResult::ToString(res, desc));
+    }
 }
 
 // ------------------ Banks ----------------------------

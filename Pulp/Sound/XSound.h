@@ -149,6 +149,7 @@ public:
         CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
     bool loadPackage(const char* pName);
+    void unloadAllPackages(void);
 
     void loadBank(const char* pName) X_FINAL;
     void unLoadBank(const char* pName) X_FINAL;
