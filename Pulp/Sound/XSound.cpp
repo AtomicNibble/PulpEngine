@@ -207,6 +207,7 @@ XSound::XSound(core::MemoryArenaBase* arena) :
     pPrimCon_(nullptr),
     pScene_(nullptr),
     banks_(arena_),
+    packages_(arena),
     objectPool_(arena_, sizeof(SoundObject), X_ALIGN_OF(SoundObject), "SoundObjPool"),
     objects_(arena_),
     culledObjects_(arena_),
@@ -290,6 +291,7 @@ bool XSound::init(void)
     MusicEngine::GetDefaultInitSettings(musicInit);
 
     // Create and initialise an instance of our memory manager.
+    // Memory is hooked in Allocators.cpp
     if (MemoryMgr::Init(&memSettings) != AK_Success) {
         X_ERROR("SoundSys", "Could not create the memory manager.");
         return false;
@@ -409,6 +411,10 @@ bool XSound::init(void)
         X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
         return false;
     }
+
+    // Mount packages, this is a blocking IO call currently.
+    // If I decide to never store banks in packages, I could make it async.
+    loadPackage("streamed.pck");
 
     // dispatch async loads for base banks.
     loadBank("Init.bnk");
@@ -1232,6 +1238,34 @@ void XSound::setRTPCValue(RtpcID id, RtpcValue val, SndObjectHandle object,
     }
 }
 
+// ------------------ Packages ----------------------------
+
+void XSound::loadPackage(const char* pName)
+{
+    Package pck;
+    pck.name = pName;
+
+    auto loaded = std::find_if(packages_.begin(), packages_.end(), [&pck](const Package& p) -> bool {
+        return pck.name == p.name;
+    });
+
+    if (loaded) {
+        X_ASSERT(true, "Package already loaded")(pName);
+        return;
+    }
+
+    core::StackString<128, AkOSChar> akName(pck.name.begin(), pck.name.end());
+
+    AKRESULT res = ioHook_.LoadFilePackage(akName.c_str(), pck.pckID);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Failed to load pacakge \"%s\" %s", pName, AkResult::ToString(res, desc));
+        return;
+    }
+
+    packages_.emplace_back(std::move(pck));
+}
+
 // ------------------ Banks ----------------------------
 
 void XSound::loadBank(const char* pName)
@@ -1256,7 +1290,7 @@ void XSound::loadBank(const char* pName)
     AKRESULT res = SoundEngine::LoadBank(pName, bankCallbackFunc_s, this, AK_DEFAULT_POOL_ID, pBank->bankID);
     if (res != AK_Success) {
         AkResult::Description desc;
-        X_ERROR("SoundSys", "Failed to load bank \"\" %s", pName, AkResult::ToString(res, desc));
+        X_ERROR("SoundSys", "Failed to load bank \"%s\" %s", pName, AkResult::ToString(res, desc));
     }
 
     X_ASSERT(pBank->bankID == bankID, "Bank id mismatch")(pBank->bankID, bankID);

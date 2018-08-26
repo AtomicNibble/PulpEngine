@@ -63,7 +63,7 @@ private:
     void IoRequestCallback(core::IFileSys& pFileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
 
-private:
+protected:
     core::IFileSys* pFileSys_;
 
     AkDeviceID deviceID_;

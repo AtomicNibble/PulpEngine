@@ -462,6 +462,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="IDs\Wwise_IDs.h" />
+    <ClInclude Include="IO\AkFilePackage.h" />
+    <ClInclude Include="IO\AkFilePackageLowLevelIO.h" />
+    <ClInclude Include="IO\AkFilePackageLUT.h" />
     <ClInclude Include="IO\AkIoHook.h" />
     <ClInclude Include="IPSound.h" />
     <ClInclude Include="ScriptBinds\ScriptBinds_sound.h" />
@@ -474,6 +477,8 @@
     <ClInclude Include="XSound.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="IO\AkFilePackage.cpp" />
+    <ClCompile Include="IO\AkFilePackageLUT.cpp" />
     <ClCompile Include="IO\AkIoHook.cpp" />
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="ScriptBinds\ScriptBinds_sound.cpp" />

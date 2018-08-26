@@ -74,6 +74,15 @@
     <ClInclude Include="ScriptBinds\ScriptBinds_sound.h">
       <Filter>Header Files\ScriptBinds</Filter>
     </ClInclude>
+    <ClInclude Include="IO\AkFilePackage.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\AkFilePackageLowLevelIO.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="IO\AkFilePackageLUT.h">
+      <Filter>Header Files\IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -99,6 +108,12 @@
     </ClCompile>
     <ClCompile Include="ScriptBinds\ScriptBinds_sound.cpp">
       <Filter>Source Files\ScriptBinds</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\AkFilePackage.cpp">
+      <Filter>Source Files\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\AkFilePackageLUT.cpp">
+      <Filter>Source Files\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

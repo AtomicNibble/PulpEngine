@@ -4,6 +4,8 @@
 #define _X_SOUNG_I_H_
 
 #include "IO\AkIoHook.h"
+#include "IO\AkFilePackageLowLevelIO.h"
+
 #include "Vars\SoundVars.h"
 #include "Util\Allocators.h"
 
@@ -75,10 +77,18 @@ class XSound : public ISound
         core::string name;
     };
 
+    struct Package
+    {
+        AkUInt32 pckID;
+        core::string name;
+    };
+
     template<typename T>
     using ArrayMultiply = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
 
     typedef core::Array<Bank> BanksArr;
+    typedef core::Array<Package> PackageArr;
+
     typedef ArrayMultiply<SoundObject> SoundObjectArr;
     typedef ArrayMultiply<SoundObject*> SoundObjectPtrArr;
 
@@ -138,6 +148,8 @@ public:
         core::TimeVal changeDuration = core::TimeVal(0ll),
         CurveInterpolation::Enum fadeCurve = CurveInterpolation::Linear) X_FINAL;
 
+    void loadPackage(const char* pName);
+
     void loadBank(const char* pName) X_FINAL;
     void unLoadBank(const char* pName) X_FINAL;
     AkBankID getBankId(const char* pName) const;
@@ -187,7 +199,7 @@ private:
     physics::IScene* pScene_;
 
     AllocatorHooks allocators_;
-    IOhook ioHook_;
+    CAkFilePackageLowLevelIO<IOhook> ioHook_;
 
 private:
     SoundVars vars_;
@@ -196,6 +208,7 @@ private:
     mutable core::CriticalSection cs_;
 
     BanksArr banks_;
+    PackageArr packages_;
     SoundObjectPool objectPool_;
     SoundObjectPtrArr objects_;
     SoundObjectPtrArr culledObjects_;
