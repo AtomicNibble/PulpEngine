@@ -37,6 +37,8 @@ TEST(StackStringW, stripColorCodes)
 
 TEST(StackStringW, Construct)
 {
+    auto narrowStr = "cow goes meow";
+
     core::StackString<32, wchar_t> str32_empty;
     core::StackString<32, wchar_t> str32_str(L"hello bob");
     core::StackString<32, wchar_t> str32_bool(true);
@@ -47,6 +49,8 @@ TEST(StackStringW, Construct)
     core::StackString<32, wchar_t> str32_64(123456789123456454);
     core::StackString<32, wchar_t> str32_u64(123456789123456454ull);
     core::StackString<32, wchar_t> str32_startEnd(str32_str.begin(), str32_str.end());
+    core::StackString<32, wchar_t> str32_narrow(L"meow meow");
+    core::StackString<32, wchar_t> str32_narrow_len(narrowStr, narrowStr + core::strUtil::strlen(narrowStr));
 
     core::StringRange<wchar_t> range(str32_str.begin(), str32_str.end());
 
@@ -63,6 +67,8 @@ TEST(StackStringW, Construct)
     EXPECT_STREQ(L"123456789123456454", str32_u64.c_str());
     EXPECT_STREQ(L"hello bob", str32_startEnd.c_str());
     EXPECT_STREQ(L"hello bob", str32_range.c_str());
+    EXPECT_STREQ(L"meow meow", str32_narrow.c_str());
+    EXPECT_STREQ(L"cow goes meow", str32_narrow_len.c_str());
 }
 
 TEST(StackStringW, Set)
