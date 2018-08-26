@@ -104,7 +104,8 @@ XCore::XCore() :
         StrArena::getMemoryAlignmentRequirement(8),
         StrArena::getMemoryOffsetRequirement() + 12),
 
-    assetLoader_(g_coreArena, g_coreArena)
+    assetLoader_(g_coreArena, g_coreArena),
+    insideEventHandler_(false)
 {
     X_ASSERT_NOT_NULL(g_coreArena);
 
@@ -362,12 +363,16 @@ void XCore::OnCoreEvent(const CoreEventData& ed)
 {
     switch (ed.event) {
         case CoreEvent::MOVE: {
-            core::xWindow::Rect rect = pWindow_->GetRect();
-            vars_.updateWinPos(rect.getX1(), rect.getY1());
+            insideEventHandler_ = true;
+
+            vars_.updateWinPos(ed.move.windowX, ed.move.windowY);
+
+            insideEventHandler_ = false;
         } break;
         case CoreEvent::RESIZE: {
-            core::xWindow::Rect rect = pWindow_->GetClientRect();
-            vars_.updateWinDim(rect.getWidth(), rect.getHeight());
+            insideEventHandler_ = true;
+            vars_.updateWinDim(ed.resize.width, ed.resize.height);
+            insideEventHandler_ = false;
         } break;
         case CoreEvent::CHANGE_FOCUS:
             if (ed.focus.active != 0) {
@@ -466,6 +471,10 @@ void XCore::WindowPosVarChange(core::ICVar* pVar)
 {
     X_UNUSED(pVar);
 
+    if (insideEventHandler_) {
+        return;
+    }
+
     int x_pos = vars_.winXPos_;
     int y_pos = vars_.winYPos_;
 
@@ -478,6 +487,10 @@ void XCore::WindowPosVarChange(core::ICVar* pVar)
 void XCore::WindowSizeVarChange(core::ICVar* pVar)
 {
     X_UNUSED(pVar);
+
+    if (insideEventHandler_) {
+        return;
+    }
 }
 
 void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
