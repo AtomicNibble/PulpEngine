@@ -40,6 +40,17 @@ StackString<N, TChar>::StackString(const wchar_t* const str) :
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
+template<size_t N, typename TChar>
+StackString<N, TChar>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive) :
+    len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
+{
+    X_ASSERT(len_ < N, "String(%d) \"%s.*\" does not fit into StackString of size %d.", len_, len_, beginInclusive, N)(len_, N);
+    strUtil::Convert(beginInclusive, str_, capacity());
+    str_[len_] = L'\0';
+}
+
+// ---------------------------------------------------------------------------------------------------------------------
+// ---------------------------------------------------------------------------------------------------------------------
 
 template<size_t N, typename TChar>
 StackString<N, TChar>::StackString(const StringRange<TChar>& range) :

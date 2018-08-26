@@ -41,6 +41,7 @@ public:
     /// Constructs a string by copying the given string.
     explicit StackString(const TChar* const str);
     explicit StackString(const wchar_t* const str);
+    explicit StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive);
 
     /// Constructs a string by copying the given range.
     explicit StackString(const StringRange<TChar>& range);
@@ -170,6 +171,7 @@ public:
     /// Constructs a string by copying the given string.
     explicit StackString(const wchar_t* const str);
     explicit StackString(const char* const str);
+    explicit StackString(const char* const beginInclusive, const char* const endExclusive);
 
     /// Constructs a string by copying the given range.
     explicit StackString(const StringRange<wchar_t>& range);
