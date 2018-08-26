@@ -801,20 +801,20 @@ void xFrame::NCButtonDown(HWND hwnd, ULONG message, WPARAM wparam, LPARAM lparam
         }
 
         if (GetButtonPos(enabled, width_, IsMax_).contains(mouse)) {
-            xWindow* pwind = reinterpret_cast<xWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+            xWindow* pWindow = reinterpret_cast<xWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
             switch (Buttons_[i].Type) {
                 case HTMENU:
-                    pwind->Close();
+                    pWindow->Close();
                     break;
                 case HTGROWBOX: // HTMAXBUTTON:
                 {
                     if (i == 1 && (i + 1) < sizeof(Buttons_) / sizeof(Buttons_[0])) {
-                        pwind->MaxiMise();
+                        pWindow->Maximise();
                         Buttons_[i + 1].Draw = true;
                     }
                     else if (i > 0) {
-                        pwind->Restore();
+                        pWindow->Restore();
                         Buttons_[i - 1].Draw = true;
                     }
 
@@ -822,7 +822,7 @@ void xFrame::NCButtonDown(HWND hwnd, ULONG message, WPARAM wparam, LPARAM lparam
                     break;
                 }
                 case HTMINBUTTON:
-                    pwind->Minamise();
+                    pWindow->Minamise();
                     break;
             }
             goto paint;

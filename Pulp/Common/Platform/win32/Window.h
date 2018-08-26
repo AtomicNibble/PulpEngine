@@ -64,7 +64,7 @@ public:
     X_INLINE void Hide(void);
     X_INLINE void Close(void);
     X_INLINE void Minamise(void);
-    X_INLINE void MaxiMise(void);
+    X_INLINE void Maximise(void);
     X_INLINE void Restore(void);
     X_INLINE void HideClientCursor(bool hide);
     X_INLINE void FixedAspectRatioSizing(bool enable);

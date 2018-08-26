@@ -39,7 +39,7 @@ X_INLINE void xWindow::Minamise(void)
     ShowWindow(window_, SW_MINIMIZE);
 }
 
-X_INLINE void xWindow::MaxiMise(void)
+X_INLINE void xWindow::Maximise(void)
 {
     ShowWindow(window_, SW_MAXIMIZE);
 }
