@@ -38,9 +38,11 @@ void CoreVars::registerVars(void)
 
     core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
 
-    pWinPosX_ = ADD_CVAR_REF("win_x_pos", winXPos_, winXPos_, 0, desktop.getWidth(),
+    auto min = std::numeric_limits<int16_t>::min();
+
+    pWinPosX_ = ADD_CVAR_REF("win_x_pos", winXPos_, winXPos_, min, desktop.getWidth(),
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position x");
-    pWinPosY_ = ADD_CVAR_REF("win_y_pos", winYPos_, winYPos_, 0, desktop.getHeight(),
+    pWinPosY_ = ADD_CVAR_REF("win_y_pos", winYPos_, winYPos_, min, desktop.getHeight(),
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
     pWinWidth_ = ADD_CVAR_REF("win_width", winWidth_, winWidth_, 800, 1,
         VarFlag::SYSTEM, "Game window width");
