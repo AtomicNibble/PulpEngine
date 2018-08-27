@@ -26,27 +26,27 @@ X_INLINE bool xWindow::Hasfocus(void) const
 
 X_INLINE void xWindow::Show(void)
 {
-    ShowWindow(window_, SW_SHOW);
+    ::ShowWindow(window_, SW_SHOW);
 }
 
 X_INLINE void xWindow::Hide(void)
 {
-    ShowWindow(window_, SW_HIDE);
+    ::ShowWindow(window_, SW_HIDE);
 }
 
 X_INLINE void xWindow::Minamise(void)
 {
-    ShowWindow(window_, SW_MINIMIZE);
+    ::ShowWindow(window_, SW_MINIMIZE);
 }
 
 X_INLINE void xWindow::Maximise(void)
 {
-    ShowWindow(window_, SW_MAXIMIZE);
+    ::ShowWindow(window_, SW_MAXIMIZE);
 }
 
 X_INLINE void xWindow::Restore(void)
 {
-    ShowWindow(window_, SW_RESTORE);
+    ::ShowWindow(window_, SW_RESTORE);
 }
 
 X_INLINE void xWindow::Close(void)
