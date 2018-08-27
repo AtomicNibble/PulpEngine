@@ -1079,7 +1079,7 @@ void XConsole::SaveCmdHistory(void) const
     mode.Set(fileMode::RECREATE);
 
     XFileScoped file;
-    if (file.openFile("K:\\goat.txt", mode)) {
+    if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
         file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
     }
 }
