@@ -1065,19 +1065,22 @@ void XConsole::SaveCmdHistory(void) const
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-    fileModeFlags mode;
+    core::ByteStream stream(g_coreArena);
+    stream.reserve(0x100);
 
+    auto it = CmdHistory_.crbegin();
+    for (; it != CmdHistory_.crend(); it++) {
+        stream.write(it->c_str(), it->length());
+        stream.write('\n');
+    }
+
+    fileModeFlags mode;
     mode.Set(fileMode::WRITE);
     mode.Set(fileMode::RECREATE);
-    mode.Set(fileMode::SHARE);
 
     XFileScoped file;
-    if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
-        ConsoleBuffer::const_reverse_iterator it = CmdHistory_.crbegin();
-        for (; it != CmdHistory_.crend(); it++) {
-            file.writeString(it->c_str(), safe_static_cast<uint32_t, size_t>(it->length()));
-            file.write('\n');
-        }
+    if (file.openFile("K:\\goat.txt", mode)) {
+        file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
     }
 }
 
