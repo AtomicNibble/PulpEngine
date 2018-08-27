@@ -24,7 +24,7 @@ void RenderVars::registerVars(void)
         "Enable d3d debug layer");
 
     ADD_CVAR_REF_COL("r_clear_color", clearColor_, clearColor_,
-        core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED, "Clear color");
+        core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED, "Back buffer clear color");
 
     pNativeRes_ = ADD_CVAR_STRING("r_native_res", "<unset>", core::VarFlag::RENDERER | core::VarFlag::READONLY,
         "The window render resolution");
