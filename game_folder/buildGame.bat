@@ -51,6 +51,7 @@ xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
 xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
 xcopy /y /i /s /e /d "core_assets\scripts" "build\core_assets\scripts"
+xcopy /y /i /s /e /d "core_assets\menus" "build\core_assets\menus"
 
 del /s /q /f "build\core_assets\sound\*.xml"
 del /s /q /f "build\core_assets\sound\*.json"
