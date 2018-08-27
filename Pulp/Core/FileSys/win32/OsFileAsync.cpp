@@ -50,6 +50,19 @@ namespace
         s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
     }
 
+    void logFileError(const wchar_t* path, IFileSys::fileModeFlags mode)
+    {
+        lastError::Description Dsc;
+        IFileSys::fileModeFlags::Description DscFlag;
+        {
+            X_LOG_BULLET;
+            X_ERROR("AsyncFile", "Failed to open file. Error: %s", lastError::ToString(Dsc));
+            X_ERROR("AsyncFile", "File: %ls", path);
+            X_ERROR("AsyncFile", "Mode: %s", mode.ToString(DscFlag));
+        }
+    }
+
+
 } // namespace
 
 OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
@@ -78,14 +91,7 @@ OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
-        lastError::Description Dsc;
-        IFileSys::fileModeFlags::Description DscFlag;
-        {
-            X_LOG_BULLET;
-            X_ERROR("AsyncFile", "Failed to open file. Error: %s", lastError::ToString(Dsc));
-            X_ERROR("AsyncFile", "File: %ls", path);
-            X_ERROR("AsyncFile", "Mode: %s", mode.ToString(DscFlag));
-        }
+        logFileError(path, mode);
     }
     else {
 #if X_ENABLE_FILE_STATS
