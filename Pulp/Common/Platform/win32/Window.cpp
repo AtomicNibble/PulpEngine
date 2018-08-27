@@ -333,7 +333,7 @@ void Window::SetRect(const Rect& rect)
     r.right = rect.getWidth();
     r.bottom = rect.getHeight();
 
-    if (!AdjustWindowRect(&r, mode_, FALSE)) {
+    if (!::AdjustWindowRect(&r, mode_, FALSE)) {
         core::lastError::Description Dsc;
         X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
     }
@@ -382,9 +382,9 @@ Recti Window::GetActiveMonitorRect(void)
     auto hMon = MonitorFromWindow(window_, MONITOR_DEFAULTTOPRIMARY);
 
     MONITORINFO mi = { sizeof(mi) };
-    if (!GetMonitorInfo(hMon, &mi)) {
+    if (!::GetMonitorInfo(hMon, &mi)) {
         core::lastError::Description Dsc;
-        X_ERROR("Window", "Failed to monitor rect. Err: %s", core::lastError::ToString(Dsc));
+        X_ERROR("Window", "Failed to get monitor rect. Err: %s", core::lastError::ToString(Dsc));
     }
 
     return Recti(
@@ -486,7 +486,7 @@ LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             r.right = 1;
             r.bottom = 1;
 
-            if (!AdjustWindowRect(&r, mode_, FALSE)) {
+            if (!::AdjustWindowRect(&r, mode_, FALSE)) {
                 core::lastError::Description Dsc;
                 X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
             }
