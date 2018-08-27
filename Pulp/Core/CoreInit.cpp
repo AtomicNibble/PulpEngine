@@ -402,7 +402,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
     env_.pFileSys->registerCmds();
 
     // regeister window vars.
-    core::xWindow::RegisterVars();
+    core::Window::RegisterVars();
 
     // Load the default config.
     if (!startupParams.isCoreOnly()) {
@@ -503,7 +503,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     if (!startupParams.bTesting && !startupParams.isCoreOnly()) {
         // create a window
-        pWindow_ = X_NEW(core::xWindow, g_coreArena, "GameWindow");
+        pWindow_ = X_NEW(core::Window, g_coreArena, "GameWindow");
 
         wchar_t titleW[128];
         const char* pTitle = X_ENGINE_NAME " Engine " X_CPUSTRING
@@ -514,7 +514,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
         if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
                 vars_.winXPos_, vars_.winYPos_,
-                vars_.winWidth_, vars_.winHeight_, core::xWindow::Mode::APPLICATION)) {
+                vars_.winWidth_, vars_.winHeight_, core::Window::Mode::APPLICATION)) {
             return false;
         }
 
@@ -523,7 +523,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
         // Alogn it
         if (pConsole_) {
-            pWindow_->AlignTo(core::xWindow::GetPrimaryRect(),
+            pWindow_->AlignTo(core::Window::GetPrimaryRect(),
                 Alignment::TOP_ALIGN | Alignment::RIGHT_ALIGN);
         }
     }

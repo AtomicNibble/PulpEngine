@@ -12,7 +12,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-static X_INLINE LRESULT WndProcProxy(xWindow* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+static X_INLINE LRESULT WndProcProxy(Window* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     return pWindow->WndProc(hWnd, msg, wParam, lParam);
 }
@@ -67,7 +67,7 @@ namespace
     LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         LONG_PTR data = GetWindowLongPtr(hWnd, GWLP_USERDATA); // GetWindowLongPtr required for 64
-        auto* pClass = reinterpret_cast<xWindow*>(data);
+        auto* pClass = reinterpret_cast<Window*>(data);
 
         return WndProcProxy(pClass, hWnd, msg, wParam, lParam);
     }
@@ -76,7 +76,7 @@ namespace
     {
         if (msg == WM_NCCREATE) {
             LPCREATESTRUCT pInfo = reinterpret_cast<LPCREATESTRUCT>(lParam);
-            xWindow* pClass = reinterpret_cast<xWindow*>(pInfo->lpCreateParams);
+            Window* pClass = reinterpret_cast<Window*>(pInfo->lpCreateParams);
 
             SetWindowLongPtr(hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(pClass));
             SetWindowLongPtr(hWnd, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(WndProc));
@@ -93,11 +93,11 @@ namespace
 
 } // namespace
 
-int32_t xWindow::s_var_windowDebug = 0;
+int32_t Window::s_var_windowDebug = 0;
 
 /// --------------------------------------------------------------------------------------------------------
 
-xWindow::xWindow() :
+Window::Window() :
     numMsgs_(0),
     mode_(Mode::NONE),
     hideClientCursor_(false),
@@ -110,7 +110,7 @@ xWindow::xWindow() :
     RegisterClass();
 }
 
-xWindow::~xWindow(void)
+Window::~Window(void)
 {
     Destroy();
     X_DELETE(pFrame_, gEnv->pArena);
@@ -118,7 +118,7 @@ xWindow::~xWindow(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-void xWindow::RegisterVars(void)
+void Window::RegisterVars(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pConsole);
@@ -129,7 +129,7 @@ void xWindow::RegisterVars(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-bool xWindow::Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode)
+bool Window::Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode)
 {
     lastError::Description Dsc;
 
@@ -140,7 +140,7 @@ bool xWindow::Create(const wchar_t* const pTitle, int x, int y, int width, int h
 
     mode_ = mode;
 
-    if (mode != xWindow::Mode::FULLSCREEN) {
+    if (mode != Window::Mode::FULLSCREEN) {
         // Make the size the client size.
         RECT Rect;
         Rect.left = Rect.top = 0;
@@ -177,7 +177,7 @@ bool xWindow::Create(const wchar_t* const pTitle, int x, int y, int width, int h
     return window_ != NULL;
 }
 
-void xWindow::Destroy(void)
+void Window::Destroy(void)
 {
     ::DestroyWindow(window_);
     window_ = NULL;
@@ -186,7 +186,7 @@ void xWindow::Destroy(void)
     hasFocus_ = false;
 }
 
-void xWindow::CustomFrame(bool enable)
+void Window::CustomFrame(bool enable)
 {
     if (enable) {
         if (pFrame_ == nullptr) {
@@ -210,7 +210,7 @@ void xWindow::CustomFrame(bool enable)
     }
 }
 
-xWindow::Notification::Enum xWindow::PumpMessages(void)
+Window::Notification::Enum Window::PumpMessages(void)
 {
     MSG msg;
     uint32_t msgNumStart = numMsgs_;
@@ -244,7 +244,7 @@ xWindow::Notification::Enum xWindow::PumpMessages(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-void xWindow::SetMode(Mode::Enum mode)
+void Window::SetMode(Mode::Enum mode)
 {
     if (mode_ == mode) {
         return;
@@ -261,7 +261,7 @@ void xWindow::SetMode(Mode::Enum mode)
     mode_ = mode;
 }
 
-void xWindow::ClipCursorToWindow(void)
+void Window::ClipCursorToWindow(void)
 {
     RECT r;
     ::GetClientRect(window_, &r);
@@ -270,7 +270,7 @@ void xWindow::ClipCursorToWindow(void)
     ::ClipCursor(&r);
 }
 
-Vec2i xWindow::GetCusroPosClient(void)
+Vec2i Window::GetCusroPosClient(void)
 {
     POINT pos;
 
@@ -288,7 +288,7 @@ Vec2i xWindow::GetCusroPosClient(void)
     return Vec2i(pos.x, pos.y);
 }
 
-Vec2i xWindow::GetCusroPos(void)
+Vec2i Window::GetCusroPos(void)
 {
     POINT pos;
     if (!::GetCursorPos(&pos)) {
@@ -299,7 +299,7 @@ Vec2i xWindow::GetCusroPos(void)
     return Vec2i(pos.x, pos.y);
 }
 
-void xWindow::MoveTo(int x, int y)
+void Window::MoveTo(int x, int y)
 {
     RECT rect;
     if (!::GetWindowRect(window_, &rect)) {
@@ -312,12 +312,12 @@ void xWindow::MoveTo(int x, int y)
     }
 }
 
-void xWindow::MoveTo(const Position& position)
+void Window::MoveTo(const Position& position)
 {
     MoveTo(position.x, position.y);
 }
 
-void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
+void Window::AlignTo(const Rect& Rect, AlignmentFlags alignment)
 {
     Recti rect = GetRect();
     rect.Align(Rect, alignment);
@@ -325,7 +325,7 @@ void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
     MoveTo(rect.x1, rect.y1);
 }
 
-void xWindow::SetRect(const Rect& rect)
+void Window::SetRect(const Rect& rect)
 {
     RECT r;
     r.left = 0;
@@ -352,7 +352,7 @@ void xWindow::SetRect(const Rect& rect)
     }
 }
 
-Recti xWindow::GetRect(void) const
+Recti Window::GetRect(void) const
 {
     RECT rect;
     if (!::GetWindowRect(window_, &rect)) {
@@ -363,7 +363,7 @@ Recti xWindow::GetRect(void) const
     return Convert(rect);
 }
 
-Recti xWindow::GetClientRect(void) const
+Recti Window::GetClientRect(void) const
 {
     RECT rect;
     if (!::GetClientRect(window_, &rect)) {
@@ -377,7 +377,7 @@ Recti xWindow::GetClientRect(void) const
 /// --------------------------------------------------------------------------------------------------------
 
 
-Recti xWindow::GetActiveMonitorRect(void)
+Recti Window::GetActiveMonitorRect(void)
 {
     auto hMon = MonitorFromWindow(window_, MONITOR_DEFAULTTOPRIMARY);
 
@@ -396,7 +396,7 @@ Recti xWindow::GetActiveMonitorRect(void)
 
 
 // Returns the xRect of the primary display monitor, not overlapping the taskbar.
-Recti xWindow::GetPrimaryRect(void)
+Recti Window::GetPrimaryRect(void)
 {
     return Recti(
         0,
@@ -406,7 +406,7 @@ Recti xWindow::GetPrimaryRect(void)
 }
 
 // Returns the Rect of the primary display monitor, not overlapping the taskbar.
-Recti xWindow::GetPrimaryRectExTaskBar(void)
+Recti Window::GetPrimaryRectExTaskBar(void)
 {
     RECT rect;
     ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rect, NULL);
@@ -415,7 +415,7 @@ Recti xWindow::GetPrimaryRectExTaskBar(void)
 }
 
 // Returns the Rect of the complete desktop area, spanning all monitors and overlapping the taskbar.
-Recti xWindow::GetDesktopRect(void)
+Recti Window::GetDesktopRect(void)
 {
     return Recti(
         ::GetSystemMetrics(SM_XVIRTUALSCREEN),
@@ -427,7 +427,7 @@ Recti xWindow::GetDesktopRect(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
+LRESULT Window::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 {
     switch (msg) {
         case WM_SETCURSOR:
@@ -509,7 +509,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
 /// --------------------------------------------------------------------------------------------------------
 
 
-void xWindow::onSizing(WPARAM side, RECT* pRect)
+void Window::onSizing(WPARAM side, RECT* pRect)
 {
     // restrict to a standard aspect ratio
     int width = pRect->right - pRect->left;

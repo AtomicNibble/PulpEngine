@@ -801,7 +801,7 @@ void xFrame::NCButtonDown(HWND hwnd, ULONG message, WPARAM wparam, LPARAM lparam
         }
 
         if (GetButtonPos(enabled, width_, IsMax_).contains(mouse)) {
-            xWindow* pWindow = reinterpret_cast<xWindow*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
+            Window* pWindow = reinterpret_cast<Window*>(GetWindowLongPtr(hwnd, GWLP_USERDATA));
 
             switch (Buttons_[i].Type) {
                 case HTMENU:

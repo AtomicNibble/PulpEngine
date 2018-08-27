@@ -88,7 +88,7 @@ void XWinInput::update(core::FrameInput& inputFrame)
 {
     X_PROFILE_BEGIN("Win32RawInput", core::profiler::SubSys::INPUT);
 
-    inputFrame.cusorPos = core::xWindow::GetCusroPos();
+    inputFrame.cusorPos = core::Window::GetCusroPos();
     auto* pWindow = gEnv->pCore->GetGameWindow();
     if (pWindow) {
         inputFrame.cusorPosClient = pWindow->GetCusroPosClient();

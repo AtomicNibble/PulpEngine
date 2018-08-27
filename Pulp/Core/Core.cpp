@@ -351,7 +351,7 @@ void XCore::ShutDown()
 bool XCore::PumpMessages()
 {
     if (pWindow_) {
-        return pWindow_->PumpMessages() != core::xWindow::Notification::CLOSE;
+        return pWindow_->PumpMessages() != core::Window::Notification::CLOSE;
     }
 
     // we have no main window
@@ -486,7 +486,7 @@ void XCore::WindowPosVarChange(core::ICVar* pVar)
     int x_pos = vars_.winXPos_;
     int y_pos = vars_.winYPos_;
 
-    core::xWindow* pWin = GetGameWindow();
+    core::Window* pWin = GetGameWindow();
     if (pWin) {
         pWin->MoveTo(x_pos, y_pos);
     }

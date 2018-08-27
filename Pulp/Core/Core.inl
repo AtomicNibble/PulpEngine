@@ -79,7 +79,7 @@ X_INLINE const core::CpuInfo* XCore::GetCPUInfo(void)
     return pCpuInfo_;
 }
 
-X_INLINE core::xWindow* XCore::GetGameWindow(void)
+X_INLINE core::Window* XCore::GetGameWindow(void)
 {
     return pWindow_;
 }

@@ -40,7 +40,7 @@ void CoreVars::registerVars(void)
     ADD_CVAR_REF("core_event_debug", coreEventDebug_, coreEventDebug_, 0, 1, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED,
         "Debug messages for core events. 0=off 1=on");
 
-    core::xWindow::Rect desktop = core::xWindow::GetDesktopRect();
+    core::Window::Rect desktop = core::Window::GetDesktopRect();
 
     auto minWinPos = std::numeric_limits<int16_t>::min();
 

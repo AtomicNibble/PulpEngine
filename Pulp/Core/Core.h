@@ -41,7 +41,7 @@ struct IEngineFactoryRegistryImpl;
 struct IEngineModule;
 
 X_NAMESPACE_DECLARE(core,
-                    class xWindow;
+                    class Window;
                     class Console;
                     class XDirectoryWatcher;
                     class XCoreEventDispatcher;)
@@ -117,7 +117,7 @@ public:
     X_INLINE core::Crc32* GetCrc32(void) X_FINAL;
     X_INLINE const core::CpuInfo* GetCPUInfo(void) X_FINAL;
 
-    X_INLINE core::xWindow* GetGameWindow(void) X_FINAL;
+    X_INLINE core::Window* GetGameWindow(void) X_FINAL;
     X_INLINE core::AssetLoader* GetAssetLoader(void) X_FINAL;
 
     X_INLINE CoreGlobals* GetGlobalEnv(void) X_FINAL;
@@ -193,7 +193,7 @@ private:
 
 private:
     core::CoreVars vars_;
-    core::xWindow* pWindow_;
+    core::Window* pWindow_;
     core::Console* pConsole_;
 
     VisualStudioLogger* pVsLogger_;

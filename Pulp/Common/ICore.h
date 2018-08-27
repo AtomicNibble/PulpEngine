@@ -41,7 +41,7 @@ X_NAMESPACE_DECLARE(core,
                     class Crc32;
                     class CpuInfo;
                     class Console;
-                    class xWindow;
+                    class Window;
                     class MallocFreeAllocator;
                     class MemoryArenaBase;
                     class AssetLoader;
@@ -416,7 +416,7 @@ struct ICore
     virtual ICoreEventDispatcher* GetCoreEventDispatcher(void) X_ABSTRACT;
     virtual core::Crc32* GetCrc32(void) X_ABSTRACT;
     virtual const core::CpuInfo* GetCPUInfo(void) X_ABSTRACT;
-    virtual core::xWindow* GetGameWindow(void) X_ABSTRACT;
+    virtual core::Window* GetGameWindow(void) X_ABSTRACT;
     virtual core::AssetLoader* GetAssetLoader(void) X_ABSTRACT;
 
     // ~Assert

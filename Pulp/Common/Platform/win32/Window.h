@@ -18,10 +18,10 @@ class xFrame;
 // this should be a nice little wrapper for windows that allows resizing and all that shit.
 // Styles etc :D
 
-class xWindow
+class Window
 {
-    X_NO_COPY(xWindow);
-    X_NO_ASSIGN(xWindow);
+    X_NO_COPY(Window);
+    X_NO_ASSIGN(Window);
 
 public:
     /// Types for position size etc.
@@ -49,8 +49,8 @@ public:
         };
     };
 
-    xWindow();
-    ~xWindow(void);
+    Window();
+    ~Window(void);
 
     static void RegisterVars(void);
 
@@ -113,7 +113,7 @@ public:
     X_INLINE const PLATFORM_HWND GetNativeWindow(void) const;
 
 private:
-    friend static LRESULT WndProcProxy(xWindow* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
+    friend static LRESULT WndProcProxy(Window* pWindow, HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
 
     LRESULT WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
     void onSizing(WPARAM side, RECT* pRect);
