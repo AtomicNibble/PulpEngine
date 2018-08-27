@@ -12,6 +12,7 @@ public:
     void registerVars(void);
     
     void setFullScreen(int32_t val);
+    void setMonitorIdx(int32_t val);
     void updateWinPos(int32_t x, int32_t y);
     void updateWinDim(int32_t width, int32_t height);
 
@@ -24,6 +25,7 @@ public:
     X_INLINE int32_t getWinWidth(void) const;
     X_INLINE int32_t getWinHeight(void) const;
     X_INLINE int32_t getFullscreen(void) const;
+    X_INLINE int32_t getMonitor(void) const;
     X_INLINE int32_t getWinVideoMode(void) const;
 
     X_INLINE core::ICVar* getVarWinPosX(void);

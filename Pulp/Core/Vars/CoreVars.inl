@@ -36,10 +36,14 @@ X_INLINE int32_t CoreVars::getWinHeight(void) const
     return winHeight_;
 }
 
-
 X_INLINE int32_t CoreVars::getFullscreen(void) const
 {
     return fullscreen_;
+}
+
+X_INLINE int32_t CoreVars::getMonitor(void) const
+{
+    return monitor_;
 }
 
 X_INLINE int32_t CoreVars::getWinVideoMode(void) const

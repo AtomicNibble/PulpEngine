@@ -77,6 +77,11 @@ void CoreVars::setFullScreen(int32_t val)
     fullscreen_ = val;
 }
 
+void CoreVars::setMonitorIdx(int32_t val)
+{
+    monitor_ = val;
+}
+
 void CoreVars::updateWinPos(int32_t x, int32_t y)
 {
     winXPos_ = x;

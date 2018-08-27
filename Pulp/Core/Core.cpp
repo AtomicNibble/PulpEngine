@@ -368,9 +368,26 @@ void XCore::toggleFullscreen(void)
     {
         auto rect = pWindow_->GetActiveMonitorRect();
 
+        // work out which device we are on.
+        int32_t deviceIdx = 0;
+        core::SysInfo::DeviceMode mode;
+
+        for (deviceIdx = 0; ; deviceIdx++)
+        {
+            if (!core::SysInfo::GetDisplayMode(deviceIdx, mode)) {
+                deviceIdx = -1;
+                break;
+            }
+
+            if (rect.contains(mode.position)) {
+                break;
+            }
+        }
+
         pWindow_->SetMode(core::Window::Mode::FULLSCREEN);
         pWindow_->SetRect(rect);
 
+        vars_.setMonitorIdx(deviceIdx);
         vars_.setFullScreen(1);
     }
 }
