@@ -18,6 +18,8 @@ public:
     int32_t getWinPosY(void) const;
     int32_t getWinWidth(void) const;
     int32_t getWinHeight(void) const;
+    X_INLINE int32_t getFullscreen(void) const;
+    X_INLINE int32_t getWinVideoMode(void) const;
 
     X_INLINE core::ICVar* getVarWinPosX(void);
     X_INLINE core::ICVar* getVarWinPosY(void);
@@ -34,6 +36,10 @@ public:
     int32_t winYPos_;
     int32_t winWidth_;
     int32_t winHeight_;
+
+    int32_t fullscreen_;
+    int32_t monitor_;
+    int32_t videoMode_;
 
 private:
     core::ICVar* pWinPosX_;

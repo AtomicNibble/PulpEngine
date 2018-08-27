@@ -1,6 +1,16 @@
 
 X_NAMESPACE_BEGIN(core)
 
+X_INLINE int32_t CoreVars::getFullscreen(void) const
+{
+    return fullscreen_;
+}
+
+X_INLINE int32_t CoreVars::getWinVideoMode(void) const
+{
+    return videoMode_;
+}
+
 X_INLINE core::ICVar* CoreVars::getVarWinPosX(void)
 {
     return pWinPosX_;

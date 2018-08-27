@@ -24,6 +24,10 @@ CoreVars::CoreVars() :
     winYPos_ = 10;
     winWidth_ = 800;
     winHeight_ = 600;
+
+    fullscreen_ = 0;
+    monitor_ = -1; // detect default monitor.
+    videoMode_ = -1;
 }
 
 void CoreVars::registerVars(void)
@@ -45,12 +49,19 @@ void CoreVars::registerVars(void)
     pWinPosY_ = ADD_CVAR_REF("win_y_pos", winYPos_, winYPos_, minWinPos, desktop.getHeight(),
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window position y");
     pWinWidth_ = ADD_CVAR_REF("win_width", winWidth_, winWidth_, 800, 1,
-        VarFlag::SYSTEM, "Game window width");
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window width");
     pWinHeight_ = ADD_CVAR_REF("win_height", winHeight_, winHeight_, 600, 1,
-        VarFlag::SYSTEM, "Game window height");
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window height");
 
     pWinCustomFrame_ = ADD_CVAR_INT("win_custom_Frame", 1, 0, 1,
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
+
+    ADD_CVAR_REF("win_fullscreen", fullscreen_, fullscreen_, -1, 2,
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "0 = windowed 1 =fullscreen");
+    ADD_CVAR_REF("win_monitor", monitor_, monitor_, -1, 64,
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "-1 = detech default, >= 0 specific");
+    ADD_CVAR_REF("win_mode", videoMode_, videoMode_, -1, -2,
+        VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Game window video mode");
 
     const char* pVersionStr = (X_ENGINE_NAME "Engine " X_PLATFORM_STR "-" X_CPUSTRING " Version " X_ENGINE_VERSION_STR);
     ADD_CVAR_STRING("version", pVersionStr,
