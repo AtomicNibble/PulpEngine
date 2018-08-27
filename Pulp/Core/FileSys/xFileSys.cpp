@@ -277,18 +277,18 @@ core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
 XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
 {
     core::Path<wchar_t> real_path;
-
+    
     if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
         PathUtil::findData findinfo;
-        XFindData FindData(path, this);
+        XFindData findData(path, this);
 
-        if (!FindData.findnext(&findinfo)) {
+        if (!findData.findnext(&findinfo)) {
             fileModeFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
 
-        FindData.getOSPath(real_path, &findinfo);
+        findData.getOSPath(real_path, &findinfo);
     }
     else {
         createOSPath(gameDir_, path, location, real_path);
