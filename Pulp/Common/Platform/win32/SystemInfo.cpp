@@ -86,6 +86,33 @@ namespace SysInfo
         devModeToDeviceMode(win32Mode, mode);
     }
 
+    bool GetDisplayMode(int32_t deviceNum, DeviceMode& mode)
+    {
+        core::zero_object(mode);
+
+        DISPLAY_DEVICEW win32Device;
+        core::zero_object(win32Device);
+        win32Device.cb = sizeof(win32Device);
+        if (!EnumDisplayDevicesW(nullptr, deviceNum, &win32Device, 0)) {
+            return false;
+        }
+
+        DISPLAY_DEVICEW win32Monitor;
+        core::zero_object(win32Monitor);
+        win32Monitor.cb = sizeof(win32Monitor);
+        if (!EnumDisplayDevicesW(win32Device.DeviceName, 0, &win32Monitor, 0)) {
+            return false;
+        }
+
+        DEVMODEW win32Mode;
+        if (!EnumDisplaySettingsW(win32Device.DeviceName, ENUM_CURRENT_SETTINGS, &win32Mode)) {
+            X_ERROR("SysInfo", "Failed to get display info");
+            return false;
+        }
+
+        devModeToDeviceMode(win32Mode, mode);
+        return true;
+    }
 
     void GetDisplayDevices(DisplayDeviceArr& devices)
     {

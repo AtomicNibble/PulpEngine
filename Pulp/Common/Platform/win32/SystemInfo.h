@@ -86,6 +86,7 @@ namespace SysInfo
 
     void GetSystemMemInfo(MemInfo& info);
     void GetCurrentDisplayMode(DeviceMode& mode);
+    bool GetDisplayMode(int32_t deviceNum, DeviceMode& mode);
     void GetDisplayDevices(DisplayDeviceArr& devices);
 
 } // namespace SysInfo
