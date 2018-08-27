@@ -361,18 +361,26 @@ bool XCore::PumpMessages()
 
 void XCore::OnCoreEvent(const CoreEventData& ed)
 {
-    switch (ed.event) {
-        case CoreEvent::MOVE: {
-            insideEventHandler_ = true;
+    switch (ed.event) 
+    {
+        case CoreEvent::MOVE: 
+        case CoreEvent::RESIZE: 
+        {
+            // i only want to save if not fullscreen
+            auto max = pWindow_->isMaximized();
+            if (!max)
+            {
+                insideEventHandler_ = true;
 
-            vars_.updateWinPos(ed.move.windowX, ed.move.windowY);
+                if (ed.event == CoreEvent::MOVE) {
+                    vars_.updateWinPos(ed.move.windowX, ed.move.windowY);
+                }
+                else {
+                    vars_.updateWinDim(ed.resize.width, ed.resize.height);
+                }
 
-            insideEventHandler_ = false;
-        } break;
-        case CoreEvent::RESIZE: {
-            insideEventHandler_ = true;
-            vars_.updateWinDim(ed.resize.width, ed.resize.height);
-            insideEventHandler_ = false;
+                insideEventHandler_ = false;
+            }
         } break;
         case CoreEvent::CHANGE_FOCUS:
             if (ed.focus.active != 0) {
