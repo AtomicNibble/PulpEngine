@@ -629,6 +629,8 @@ void XCore::ListDisplayDevices(bool verbose) const
             X_LOG0("SysInfo", "DeviceKey: \"%ls\"", monitor.deviceKey.c_str());
 
             auto printMode = [](const core::SysInfo::DeviceMode& mode) {
+                X_LOG0("SysInfo", "PosX: %" PRIu32, mode.position.x);
+                X_LOG0("SysInfo", "PosY: %" PRIu32, mode.position.y);
                 X_LOG0("SysInfo", "Width: %" PRIu32, mode.pelsWidth);
                 X_LOG0("SysInfo", "Height: %" PRIu32, mode.pelsHeight);
                 X_LOG0("SysInfo", "BitsPerPel: %" PRIu32, mode.bitsPerPel);
