@@ -166,12 +166,16 @@ bool X3DEngine::init(void)
     // so i will need some textures to render into.
     auto dispalyRes = pRender->getDisplayRes();
 
+
+    auto clearCol2d = drawVars_.clearCol2D();
+    auto clearCol3d = drawVars_.clearCol3D();
+
     // these must be same size.
     pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
-    pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
+    pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol3d);
     
     // this can be any size, but typically have it match display.
-    pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, Color8u(0, 0, 0, 0));
+    pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol2d);
 
     return true;
 }
@@ -1245,6 +1249,9 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
 
         auto* pRender = gEnv->pRender;
 
+        auto clearCol2d = drawVars_.clearCol2D();
+        auto clearCol3d = drawVars_.clearCol3D();
+
         if (pixelBufffers_[PixelBuf::COL_2D])
         {
             auto dim = pixelBufffers_[PixelBuf::COL_2D]->getDimensions();
@@ -1254,7 +1261,7 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
                 pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_2D]);
 
                 pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d",
-                    newDim, 1, texture::Texturefmt::A8R8G8B8, Color8u(0,0,0,0));
+                    newDim, 1, texture::Texturefmt::A8R8G8B8, clearCol2d);
             }
         }
 
@@ -1267,7 +1274,7 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
                 pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_3D]);
 
                 pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", 
-                    newDim, 1, texture::Texturefmt::R8G8B8A8, Color8u(150, 150, 0, 255));
+                    newDim, 1, texture::Texturefmt::R8G8B8A8, clearCol3d);
             }
         }
 

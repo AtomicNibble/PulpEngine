@@ -77,6 +77,16 @@ X_INLINE int32_t DrawVars::drawBuffer3D(void) const
     return drawBuffer3D_;
 }
 
+X_INLINE Colorf DrawVars::clearCol2D(void) const
+{
+    return clearCol2D_;
+}
+
+X_INLINE Colorf DrawVars::clearCol3D(void) const
+{
+    return clearCol3D_;
+}
+
 X_INLINE int32_t DrawVars::detachCam(void) const
 {
     return detachCam_;

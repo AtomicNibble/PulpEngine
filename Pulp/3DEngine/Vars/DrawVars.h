@@ -29,6 +29,8 @@ public:
 
     X_INLINE int32_t drawBuffer2D(void) const;
     X_INLINE int32_t drawBuffer3D(void) const;
+    X_INLINE Colorf clearCol2D(void) const;
+    X_INLINE Colorf clearCol3D(void) const;
 
     X_INLINE int32_t detachCam(void) const;
     X_INLINE int32_t cullEnts(void) const;
@@ -55,6 +57,8 @@ private:
 
     int32_t drawBuffer2D_;
     int32_t drawBuffer3D_;
+    Colorf clearCol2D_;
+    Colorf clearCol3D_;
 
     int32_t detachCam_;
     int32_t cullEnts_;

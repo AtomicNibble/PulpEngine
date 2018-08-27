@@ -75,6 +75,14 @@ void DrawVars::registerVars(void)
     ADD_CVAR_REF("r_draw_buf_3d", drawBuffer3D_, 1, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED, "Draws 3d buffer");
 
+    ADD_CVAR_REF_COL("r_clear_col_2d", clearCol2D_, Color8u(0, 0, 0, 0),
+        core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+        "2D buffer clear color");
+
+    ADD_CVAR_REF_COL("r_clear_col_3d", clearCol3D_, Color8u(150, 150, 0, 255),
+        core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
+        "3D buffer clear color");
+
     ADD_CVAR_REF("r_detach_cam", detachCam_, 0, 0, 2,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT, "Detaches the camera");
 
