@@ -16,17 +16,39 @@ X_NAMESPACE_BEGIN(core)
 XFileStats OsFile::s_stats;
 #endif // !X_ENABLE_FILE_STATS
 
+namespace
+{
+
+    void logFileError(const wchar_t* path, IFileSys::fileModeFlags mode)
+    {
+        lastError::Description Dsc;
+        IFileSys::fileModeFlags::Description DscFlag;
+        {
+            X_LOG_BULLET;
+            X_ERROR("File", "Failed to open file. Error: %s", lastError::ToString(Dsc));
+            X_ERROR("File", "File: %ls", path);
+            X_ERROR("File", "Mode: %s", mode.ToString(DscFlag));
+        }
+    }
+
+    HANDLE createFileHelper(const wchar_t* path, IFileSys::fileModeFlags mode)
+    {
+        DWORD access = mode::GetAccess(mode);
+        DWORD share = mode::GetShareMode(mode);
+        DWORD dispo = mode::GetCreationDispo(mode);
+        DWORD flags = mode::GetFlagsAndAtt(mode, false);
+
+        return CreateFileW(path, access, share, NULL, dispo, flags, NULL);
+    }
+
+} // namespace
+
 OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
     mode_(mode),
     file_(INVALID_HANDLE_VALUE)
 {
-    DWORD access = mode::GetAccess(mode);
-    DWORD share = mode::GetShareMode(mode);
-    DWORD dispo = mode::GetCreationDispo(mode);
-    DWORD flags = mode::GetFlagsAndAtt(mode, false);
-
     // lets open you up.
-    file_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
+    file_ = createFileHelper(path, mode);
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -39,14 +61,7 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
-        lastError::Description Dsc;
-        IFileSys::fileModeFlags::Description DscFlag;
-        {
-            X_LOG_BULLET;
-            X_ERROR("File", "Failed to open file. Error: %s", lastError::ToString(Dsc));
-            X_ERROR("File", "File: %ls", path);
-            X_ERROR("File", "Mode: %s", mode.ToString(DscFlag));
-        }
+        logFileError(path, mode);
     }
     else {
 #if X_ENABLE_FILE_STATS
