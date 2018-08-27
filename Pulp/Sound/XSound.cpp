@@ -811,7 +811,7 @@ void XSound::mute(bool mute)
     }
     else
     {
-        X_LOG2("SoundSys", "Waking up sound system from suspend");
+        X_LOG2("SoundSys", "Waking up sound system");
 
         AKRESULT res = AK::SoundEngine::WakeupFromSuspend();
         if (res != AK_Success) {
