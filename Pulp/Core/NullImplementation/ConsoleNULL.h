@@ -27,8 +27,8 @@ public:
     virtual void freeRenderResources(void) X_FINAL;
     virtual void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
-    virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
-    virtual void Job_runCmds(void) X_FINAL;
+    virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
+    virtual void runCmds(void) X_FINAL;
     virtual void draw(core::FrameTimeData& time) X_FINAL;
 
     virtual consoleState::Enum getVisState(void) const X_FINAL;

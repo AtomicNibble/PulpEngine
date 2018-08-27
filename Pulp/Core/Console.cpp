@@ -1820,7 +1820,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
     VarMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
 }
 
-void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
+void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
     // we must be open to accept input.
     // cancel any repeat events when we close.
@@ -1841,7 +1841,7 @@ void XConsole::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
     }
 }
 
-void XConsole::Job_runCmds(void)
+void XConsole::runCmds(void)
 {
     while (cmds_.isNotEmpty()) {
         ExecuteStringInternal(cmds_.peek());

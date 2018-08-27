@@ -124,10 +124,10 @@ bool XCore::Update(void)
 
     }
 
-    env_.pConsole->Job_dispatchRepeateInputEvents(frameData.timeInfo);
+    env_.pConsole->dispatchRepeateInputEvents(frameData.timeInfo);
     // runs any commands that got submitted via input or config / other things.
     // so basically this is the only place that triggers command callbacks and modified callbacks.
-    env_.pConsole->Job_runCmds();
+    env_.pConsole->runCmds();
 
 
     jobSys.Run(pSyncJob);

@@ -169,8 +169,8 @@ public:
     void freeRenderResources(void) X_FINAL;
     void saveChangedVars(void) X_FINAL; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
-    void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
-    void Job_runCmds(void) X_FINAL;
+    void dispatchRepeateInputEvents(core::FrameTimeData& time) X_FINAL;
+    void runCmds(void) X_FINAL;
     void draw(core::FrameTimeData& time) X_FINAL;
 
     consoleState::Enum getVisState(void) const X_FINAL;

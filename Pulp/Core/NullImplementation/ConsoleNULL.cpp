@@ -48,12 +48,12 @@ void XConsoleNULL::saveChangedVars(void)
 {
 }
 
-void XConsoleNULL::Job_dispatchRepeateInputEvents(core::FrameTimeData& time)
+void XConsoleNULL::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
     X_UNUSED(time);
 }
 
-void XConsoleNULL::Job_runCmds(void)
+void XConsoleNULL::runCmds(void)
 {
 }
 

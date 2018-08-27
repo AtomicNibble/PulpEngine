@@ -98,8 +98,8 @@ struct IConsole
     virtual void saveChangedVars(void) X_ABSTRACT; // saves vars with 'SAVE_IF_CHANGED' if modified.
 
     // console set's it's own input repeat rate, that's timed instead of every frame.
-    virtual void Job_dispatchRepeateInputEvents(core::FrameTimeData& time) X_ABSTRACT;
-    virtual void Job_runCmds(void) X_ABSTRACT;
+    virtual void dispatchRepeateInputEvents(core::FrameTimeData& time) X_ABSTRACT;
+    virtual void runCmds(void) X_ABSTRACT;
     virtual void draw(core::FrameTimeData& time) X_ABSTRACT;
 
     virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
