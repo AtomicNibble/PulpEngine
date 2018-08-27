@@ -354,7 +354,7 @@ bool XCore::PumpMessages()
     }
 
     // we have no main window
-    X_ERROR("PumpMessages", "no main window present");
+    X_ERROR("Core", "PumpMessages: no window present");
     return false;
 }
 
