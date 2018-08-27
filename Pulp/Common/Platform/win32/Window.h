@@ -121,6 +121,7 @@ protected:
     bool sizingFixedAspectRatio_;
     bool hasFocus_;
     bool maximized_;
+    bool close_;
 
     xFrame* pFrame_;
 

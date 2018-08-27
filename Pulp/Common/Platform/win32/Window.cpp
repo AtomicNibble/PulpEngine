@@ -104,6 +104,7 @@ xWindow::xWindow() :
     sizingFixedAspectRatio_(true),
     hasFocus_(false),
     maximized_(false),
+    close_(false),
     pFrame_(nullptr)
 {
     RegisterClass();
@@ -218,20 +219,12 @@ xWindow::Notification::Enum xWindow::PumpMessages(void)
     while (::PeekMessage(&msg, window_, 0, WM_INPUT - 1, PM_REMOVE)) {
         numMsgs_++;
 
-        if (msg.message == WM_CLOSE) {
-            return Notification::CLOSE;
-        }
-
         ::TranslateMessage(&msg);
         ::DispatchMessage(&msg);
     }
 
     while (::PeekMessage(&msg, window_, WM_INPUT + 1, 0xffffffff, PM_REMOVE)) {
         numMsgs_++;
-
-        if (msg.message == WM_CLOSE) {
-            return Notification::CLOSE;
-        }
 
         ::TranslateMessage(&msg);
         ::DispatchMessage(&msg);
@@ -241,6 +234,11 @@ xWindow::Notification::Enum xWindow::PumpMessages(void)
         uint32_t pumpDelta = numMsgs_ - msgNumStart;
         X_LOG0("Window", "num messgaes pumped: %i total: %i", pumpDelta, numMsgs_);
     }
+
+    if (close_) {
+        return Notification::CLOSE;
+    }
+
     return Notification::NONE;
 }
 
@@ -378,7 +376,10 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             hasFocus_ = ed.focus.active > 0;
             break;
         }
+        case WM_CLOSE:
         {
+            close_ = true;
+            return 0;
         }
         case WM_SIZING:
         {
