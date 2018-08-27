@@ -10,8 +10,8 @@ Game:
 
 Engine:
 
-  ☐ Make cntl+enter toggle fullscreen
-  ☐ Support borderless window mode
+  ✔ Make cntl+enter toggle fullscreen @done (18-08-27 17:11)
+  ✔ Support borderless window mode @done (18-08-27 17:11)
     So I can make a borderless window, just need setting for it.
   ☐ Expose resolution settings
   ☐ Support setting the clear color for various render buffers
@@ -34,7 +34,11 @@ Script:
 
 Sound:
 
-  ☐ Support wwise packages (basically bundled streaming files)
+  ✔ Support wwise packages (basically bundled streaming files) @done (18-08-26 14:00)
+    ✔ Generate the packages @done (18-08-25 23:49)
+    ✔ Support loading files from them @done (18-08-26 14:00)
+    ☐ Decide if want to async load package headers (means banks can't be in packages)
+
 
 Render:
 
