@@ -134,6 +134,8 @@ public:
     void OnFatalError(const char* pFormat, va_list args) X_FINAL;
 
 private:
+    void toggleFullscreen(void);
+
     bool PumpMessages(void);
     bool Update(void);
     void RenderBegin(core::FrameData& frameData);

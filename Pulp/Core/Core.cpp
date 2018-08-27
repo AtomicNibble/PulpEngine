@@ -347,7 +347,35 @@ void XCore::ShutDown()
     //	core::invalidParameterHandler::Shutdown();
 }
 
-bool XCore::PumpMessages()
+void XCore::toggleFullscreen(void)
+{
+    auto fullscreen = vars_.getFullscreen();
+
+    if (fullscreen > 0)
+    {
+        pWindow_->SetMode(core::Window::Mode::APPLICATION);
+
+        Recti r;
+        r.x1 = vars_.getWinPosX();
+        r.y1 = vars_.getWinPosY();
+        r.x2 = r.x1 + vars_.getWinWidth();
+        r.y2 = r.y1 + vars_.getWinHeight();
+
+        pWindow_->SetRect(r);
+        vars_.setFullScreen(0);
+    }
+    else
+    {
+        auto rect = pWindow_->GetActiveMonitorRect();
+
+        pWindow_->SetMode(core::Window::Mode::FULLSCREEN);
+        pWindow_->SetRect(rect);
+
+        vars_.setFullScreen(1);
+    }
+}
+
+bool XCore::PumpMessages(void)
 {
     if (pWindow_) {
         return pWindow_->PumpMessages() != core::Window::Notification::CLOSE;
@@ -470,6 +498,8 @@ void XCore::OnFatalError(const char* pFormat, va_list args)
 
     _exit(1);
 }
+
+
 
 void XCore::WindowPosVarChange(core::ICVar* pVar)
 {

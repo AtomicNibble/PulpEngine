@@ -99,6 +99,14 @@ bool XCore::Update(void)
         // dispatch the input events.
         for (auto& ev : frameData.input.events)
         {
+            // Alt-enter toggle fullscreen.
+            if (ev.deviceType == input::InputDeviceType::KEYBOARD && ev.keyId == input::KeyId::ENTER &&
+                ev.modifiers.IsSet(input::ModifiersMasks::Alt) && ev.action == input::InputState::PRESSED) {
+                
+                toggleFullscreen(); 
+                continue;
+            }
+
             if (static_cast<core::XConsole*>(env_.pConsole)->onInputEvent(ev)) {
                 continue;
             }
