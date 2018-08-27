@@ -129,7 +129,7 @@ void Window::RegisterVars(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
-bool Window::Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode)
+bool Window::Create(const wchar_t* const pTitle, Rect r, Mode::Enum mode)
 {
     lastError::Description Dsc;
 
@@ -140,26 +140,28 @@ bool Window::Create(const wchar_t* const pTitle, int x, int y, int width, int he
 
     mode_ = mode;
 
-    if (mode != Window::Mode::FULLSCREEN) {
-        // Make the size the client size.
-        RECT Rect;
-        Rect.left = Rect.top = 0;
-        Rect.right = width;
-        Rect.bottom = height;
+    // Make the size the client size.
+    RECT rect;
+    rect.left = 0;
+    rect.top = 0;
+    rect.right = r.getWidth();
+    rect.bottom = r.getHeight();
 
-        ::AdjustWindowRect(&Rect, mode, FALSE);
-
-        width = safe_static_cast<int, LONG>(Rect.right - Rect.left);
-        height = safe_static_cast<int, LONG>(Rect.bottom - Rect.top);
+    if (!::AdjustWindowRect(&rect, mode, FALSE)) {
+        X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
+        return false;
     }
+
+    r.x2 = r.x1 + (rect.right - rect.left);
+    r.y2 = r.y1 + (rect.bottom - rect.top);
 
     window_ = ::CreateWindowExW(
         0,
         g_ClassName,
         pTitle,
         mode,
-        x, y,
-        width, height,
+        r.x1, r.y1, 
+        r.getWidth(), r.getHeight(),
         GetDesktopWindow(),
         0,
         GetModuleHandle(NULL),

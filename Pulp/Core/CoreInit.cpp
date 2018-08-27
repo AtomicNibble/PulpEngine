@@ -44,6 +44,7 @@
 #include <Memory\MemInfo.h>
 #include <Platform\MessageBox.h>
 #include <Platform\DirectoryWatcher.h>
+#include <Platform\SystemInfo.h>
 
 #include "PotatoFactoryRegistryImpl.h"
 
@@ -512,9 +513,38 @@ bool XCore::Init(const CoreInitParams& startupParams)
 #endif
             ;
 
-        if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
-                vars_.getWinPosX(), vars_.getWinPosY(),
-                vars_.getWinWidth(), vars_.getWinHeight(), core::Window::Mode::APPLICATION)) {
+        auto mode = core::Window::Mode::APPLICATION;
+        Recti r;
+
+        if (vars_.getFullscreen()) {
+            mode = core::Window::Mode::FULLSCREEN;
+            
+            auto monitor = vars_.getMonitor();
+            
+            core::SysInfo::DeviceMode dm;
+            if (monitor >= 0 && core::SysInfo::GetDisplayMode(monitor, dm))
+            {
+                r.set(
+                    dm.position.x,
+                    dm.position.y,
+                    dm.position.x + dm.pelsWidth,
+                    dm.position.y + dm.pelsHeight
+                );
+            }
+            else
+            {
+                r = core::Window::GetPrimaryRect();
+            }
+
+        }
+        else {
+            r.x1 = vars_.getWinPosX();
+            r.y1 = vars_.getWinPosY();
+            r.x2 = r.x1 + vars_.getWinWidth();
+            r.y2 = r.y1 + vars_.getWinHeight();
+        }
+
+        if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW), r, mode)) {
             return false;
         }
 

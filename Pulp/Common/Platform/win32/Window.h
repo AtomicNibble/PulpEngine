@@ -54,7 +54,7 @@ public:
 
     static void RegisterVars(void);
 
-    bool Create(const wchar_t* const pTitle, int x, int y, int width, int height, Mode::Enum mode);
+    bool Create(const wchar_t* const pTitle, Rect r, Mode::Enum mode);
     void Destroy(void);
     void CustomFrame(bool enable);
 
