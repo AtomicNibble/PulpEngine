@@ -14,13 +14,18 @@ Engine:
   ✔ Support borderless window mode @done (18-08-27 17:11)
     So I can make a borderless window, just need setting for it.
   ☐ Expose resolution settings
-  ☐ Support setting the clear color for various render buffers
+  ✔ Support setting the clear color for various render buffers @done (18-08-27 22:38)
+      do i want diffrent clear colors for buffers?
+      guess might be usefull for debugging.
+      so can do stuff like set 2d clear col for testing, kinky.
   ☐ Commands for changing the render scale on fly (for fillrate testing)
   ☐ Allow maintaining aspect ration? (basically don't stretch render buffers)
+  ☐ Make it so GUI knows about new render size without a frame of delay
 
   GUI:
     ☐ Support combo boxes (for selecting resolution etc)
     ☐ Support scrollable areas (will be probs needed for settings menus)
+    ☐ Support passing data to GUI scripts, stuff like resolution list.
 
 Font:
 
@@ -39,6 +44,10 @@ Sound:
     ✔ Support loading files from them @done (18-08-26 14:00)
     ☐ Decide if want to async load package headers (means banks can't be in packages)
 
+Video:
+
+  ☐ Support audio sync, somehow.
+    Think created vorbis audio then decoded myself and feeding into wwise via Audio Input will be the wayto go.
 
 Render:
 
@@ -55,6 +64,7 @@ AssetPak:
 
   ☐ Support techdefs in packages.
   ☐ Support shaders in packages.
+  ☐ Support loose files?
 
 LevelBuilder:
 
