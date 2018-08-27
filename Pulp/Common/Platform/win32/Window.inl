@@ -79,6 +79,11 @@ X_INLINE bool xWindow::isMaximized(void) const
     return maximized_;
 }
 
+X_INLINE xWindow::Mode::Enum xWindow::getMode(void) const
+{
+    return mode_;
+}
+
 X_INLINE const uint32_t xWindow::GetNumMsgs(void) const
 {
     return numMsgs_;

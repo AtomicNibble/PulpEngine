@@ -63,15 +63,17 @@ public:
     X_INLINE void Show(void);
     X_INLINE void Hide(void);
     X_INLINE void Close(void);
-    X_INLINE void Minamise(void);
+    X_INLINE void Minamise(void);   
     X_INLINE void Maximise(void);
     X_INLINE void Restore(void);
     X_INLINE void HideClientCursor(bool hide);
     X_INLINE void FixedAspectRatioSizing(bool enable);
     X_INLINE bool HasFocus(void) const;
     X_INLINE bool isMaximized(void) const;
+    X_INLINE Mode::Enum getMode(void) const;
     //	X_INLINE bool isValid(void);
-
+    
+    void SetMode(Mode::Enum mode);
 
     void ClipCursorToWindow(void);
     Vec2i GetCusroPosClient(void);
@@ -79,7 +81,8 @@ public:
 
     void MoveTo(int x, int y);
     void MoveTo(const Position& position);
-    void AlignTo(const Rect& Rect, AlignmentFlags alignment);
+    void AlignTo(const Rect& rect, AlignmentFlags alignment);
+    void SetRect(const Rect& rect);
 
     void SetTitle(const char* str);
 
@@ -95,10 +98,15 @@ public:
     X_INLINE uint32_t GetClientWidth(void) const;
     X_INLINE uint32_t GetClientHeight(void) const;
 
+    // Returns the Rect of the monitor with the largest intersection with the window
+    Rect GetActiveMonitorRect(void);
+
 public:
-    // Returns the xRect of the primary display monitor, not overlapping the taskbar.
+    // Returns the Rect of the primary display monitor
     static Rect GetPrimaryRect(void);
-    // Returns the xRect of the complete desktop area, spanning all monitors and overlapping the taskbar.
+    // Returns the Rect of the primary display monitor, not overlapping the taskbar.
+    static Rect GetPrimaryRectExTaskBar(void);
+    // Returns the Rect of the complete desktop area, spanning all monitors and overlapping the taskbar.
     static Rect GetDesktopRect(void);
 
     X_INLINE PLATFORM_HWND GetNativeWindow(void);

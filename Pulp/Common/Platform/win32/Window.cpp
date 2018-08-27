@@ -244,6 +244,22 @@ xWindow::Notification::Enum xWindow::PumpMessages(void)
 
 /// --------------------------------------------------------------------------------------------------------
 
+void xWindow::SetMode(Mode::Enum mode)
+{
+    if (mode_ == mode) {
+        return;
+    }
+
+    DWORD dwStyle = GetWindowLong(window_, GWL_STYLE);
+
+    dwStyle = dwStyle & ~mode_;
+
+    SetWindowLong(window_, GWL_STYLE, dwStyle | mode);
+    // TODO: pass HWND_NOTOPMOST for none fullscreen?
+    SetWindowPos(window_, HWND_TOP, 0,0,0,0, SWP_NOSIZE | SWP_FRAMECHANGED);
+
+    mode_ = mode;
+}
 
 void xWindow::ClipCursorToWindow(void)
 {
@@ -309,6 +325,33 @@ void xWindow::AlignTo(const Rect& Rect, AlignmentFlags alignment)
     MoveTo(rect.x1, rect.y1);
 }
 
+void xWindow::SetRect(const Rect& rect)
+{
+    RECT r;
+    r.left = 0;
+    r.top = 0;
+    r.right = rect.getWidth();
+    r.bottom = rect.getHeight();
+
+    if (!AdjustWindowRect(&r, mode_, FALSE)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
+    }
+
+    Rect newRect;
+    newRect.set(
+        rect.x1,
+        rect.y1,    
+        rect.x1 + (r.right - r.left),
+        rect.y1 + (r.bottom - r.top)
+    );
+
+    if (!::SetWindowPos(window_, nullptr, newRect.x1, newRect.y1, newRect.getWidth(), newRect.getHeight(), SWP_NOZORDER | SWP_NOREDRAW)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to set window rect. Err: %s", core::lastError::ToString(Dsc));
+    }
+}
+
 Recti xWindow::GetRect(void) const
 {
     RECT rect;
@@ -333,8 +376,37 @@ Recti xWindow::GetClientRect(void) const
 
 /// --------------------------------------------------------------------------------------------------------
 
+
+Recti xWindow::GetActiveMonitorRect(void)
+{
+    auto hMon = MonitorFromWindow(window_, MONITOR_DEFAULTTOPRIMARY);
+
+    MONITORINFO mi = { sizeof(mi) };
+    if (!GetMonitorInfo(hMon, &mi)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Window", "Failed to monitor rect. Err: %s", core::lastError::ToString(Dsc));
+    }
+
+    return Recti(
+        mi.rcMonitor.left, 
+        mi.rcMonitor.top,
+        mi.rcMonitor.right,
+        mi.rcMonitor.bottom);
+}
+
+
 // Returns the xRect of the primary display monitor, not overlapping the taskbar.
 Recti xWindow::GetPrimaryRect(void)
+{
+    return Recti(
+        0,
+        0,
+        ::GetSystemMetrics(SM_CXSCREEN),
+        ::GetSystemMetrics(SM_CYSCREEN));
+}
+
+// Returns the Rect of the primary display monitor, not overlapping the taskbar.
+Recti xWindow::GetPrimaryRectExTaskBar(void)
 {
     RECT rect;
     ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rect, NULL);
@@ -342,7 +414,7 @@ Recti xWindow::GetPrimaryRect(void)
     return Convert(rect);
 }
 
-// Returns the xRect of the complete desktop area, spanning all monitors and overlapping the taskbar.
+// Returns the Rect of the complete desktop area, spanning all monitors and overlapping the taskbar.
 Recti xWindow::GetDesktopRect(void)
 {
     return Recti(
@@ -414,8 +486,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             r.right = 1;
             r.bottom = 1;
 
-            int style = ::GetWindowLong(hWnd, GWL_STYLE);
-            if (!AdjustWindowRect(&r, style, FALSE)) {
+            if (!AdjustWindowRect(&r, mode_, FALSE)) {
                 core::lastError::Description Dsc;
                 X_ERROR("Window", "Failed to adjust rect. Err: %s", core::lastError::ToString(Dsc));
             }
