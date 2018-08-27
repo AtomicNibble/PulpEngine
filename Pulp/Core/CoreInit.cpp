@@ -995,13 +995,13 @@ bool XCore::Init3DEngine(const CoreInitParams& initParams)
 
     core::StopWatch timer;
 
+    env_.p3DEngine->registerVars();
+    env_.p3DEngine->registerCmds();
+
     if (!env_.p3DEngine->init()) {
         X_ERROR("Core", "Failed to init 3DEngine");
         return false;
     }
-
-    env_.p3DEngine->registerVars();
-    env_.p3DEngine->registerCmds();
 
     X_LOG0("Core", "3DEngine init: ^6%gms", timer.GetMilliSeconds());
 
