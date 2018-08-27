@@ -103,6 +103,7 @@ xWindow::xWindow() :
     hideClientCursor_(false),
     sizingFixedAspectRatio_(true),
     hasFocus_(false),
+    maximized_(false),
     pFrame_(nullptr)
 {
     RegisterClass();
@@ -377,15 +378,7 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
             hasFocus_ = ed.focus.active > 0;
             break;
         }
-        case WM_SIZE:
         {
-            CoreEventData ed;
-            ed.event = CoreEvent::RESIZE;
-            ed.resize.width = static_cast<int16_t>(LOWORD(lParam));
-            ed.resize.height = static_cast<int16_t>(HIWORD(lParam));
-
-            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
-            break;
         }
         case WM_SIZING:
         {
@@ -393,6 +386,18 @@ LRESULT xWindow::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam)
                 onSizing(wParam, reinterpret_cast<RECT*>(lParam));
                 return true;
             }
+            break;
+        }
+        case WM_SIZE:
+        {
+            CoreEventData ed;
+            ed.event = CoreEvent::RESIZE;
+            ed.resize.width = static_cast<int16_t>(LOWORD(lParam));
+            ed.resize.height = static_cast<int16_t>(HIWORD(lParam));
+
+            maximized_ = (wParam == SIZE_MAXIMIZED);
+
+            gEnv->pCore->GetCoreEventDispatcher()->QueueCoreEvent(ed);
             break;
         }
         case WM_MOVE:
