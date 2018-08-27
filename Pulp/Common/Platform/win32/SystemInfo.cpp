@@ -134,6 +134,7 @@ namespace SysInfo
                 
                 devModeToDeviceMode(win32Mode, monitor.registryMode);
 
+                auto& modes = monitor.modes;
                 for (int32_t modeNum = 0; ; modeNum++)
                 {
                     core::zero_object(win32Mode);
@@ -148,9 +149,25 @@ namespace SysInfo
                         continue;
                     }
 
-                    DeviceMode& mode = monitor.modes.AddOne();
+                    DeviceMode& mode = modes.AddOne();
                     devModeToDeviceMode(win32Mode, mode);
                 }
+
+                // sort them so lowest res first
+                // order: height, width, freq
+                std::sort(modes.begin(), modes.end(), [](const DeviceMode& lhs, const DeviceMode& rhs) {
+                    if (lhs.pelsHeight != rhs.pelsHeight) {
+                        return lhs.pelsHeight < rhs.pelsHeight;
+                    }
+                    if (lhs.pelsWidth != rhs.pelsWidth) {
+                        return lhs.pelsWidth < rhs.pelsWidth;
+                    }
+                    if (lhs.dispalyFrequency != rhs.dispalyFrequency) {
+                        return lhs.dispalyFrequency < rhs.dispalyFrequency;
+                    }
+
+                    return false;
+                });
             }
         }
     }
