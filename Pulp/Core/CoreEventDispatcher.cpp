@@ -23,7 +23,7 @@ XCoreEventDispatcher::~XCoreEventDispatcher()
 void XCoreEventDispatcher::pumpEvents(void)
 {
     auto dispatchEvent = [&](const CoreEventData& ed) {
-        if (coreVars_.coreEventDebug_) {
+        if (coreVars_.getCoreEventDebug()) {
             X_LOG0("CoreEvent", "CoreEvent: \"%s\"", CoreEvent::ToString(ed.event));
         }
 
@@ -85,7 +85,7 @@ void XCoreEventDispatcher::QueueCoreEvent(CoreEventData data)
 {
     X_ASSERT(data.event != CoreEvent::NONE, "Event not set")();
 
-    if (coreVars_.coreEventDebug_) {
+    if (coreVars_.getCoreEventDebug()) {
         X_LOG0("CoreEvent", "CoreEvent Queued: \"%s\"", CoreEvent::ToString(data.event));
     }
 

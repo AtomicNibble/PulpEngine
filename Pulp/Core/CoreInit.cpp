@@ -436,7 +436,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     // #------------------------- JOB SYSTEM ------------------------
     if (env_.pJobSys) {
-        env_.pJobSys->StartUp(vars_.schedulerNumThreads_);
+        env_.pJobSys->StartUp(vars_.getSchedulerNumThreads());
     }
 
     // #------------------------- FileSystem Workets ------------------------
@@ -513,8 +513,8 @@ bool XCore::Init(const CoreInitParams& startupParams)
             ;
 
         if (!pWindow_->Create(core::strUtil::Convert(pTitle, titleW),
-                vars_.winXPos_, vars_.winYPos_,
-                vars_.winWidth_, vars_.winHeight_, core::Window::Mode::APPLICATION)) {
+                vars_.getWinPosX(), vars_.getWinPosY(),
+                vars_.getWinWidth(), vars_.getWinHeight(), core::Window::Mode::APPLICATION)) {
             return false;
         }
 
@@ -523,8 +523,8 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
         // Alogn it
         if (pConsole_) {
-            pWindow_->AlignTo(core::Window::GetPrimaryRect(),
-                Alignment::TOP_ALIGN | Alignment::RIGHT_ALIGN);
+        //    pWindow_->AlignTo(core::Window::GetPrimaryRect(),
+        //        Alignment::TOP_ALIGN | Alignment::RIGHT_ALIGN);
         }
     }
 

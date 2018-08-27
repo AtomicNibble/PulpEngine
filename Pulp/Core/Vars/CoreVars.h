@@ -10,14 +10,19 @@ public:
     CoreVars();
 
     void registerVars(void);
-
+    
+    void setFullScreen(int32_t val);
     void updateWinPos(int32_t x, int32_t y);
     void updateWinDim(int32_t width, int32_t height);
 
-    int32_t getWinPosX(void) const;
-    int32_t getWinPosY(void) const;
-    int32_t getWinWidth(void) const;
-    int32_t getWinHeight(void) const;
+    X_INLINE int32_t getSchedulerNumThreads(void) const;
+    X_INLINE int32_t getCoreEventDebug(void) const;
+    X_INLINE int32_t getCoreFastShutdown(void) const;
+
+    X_INLINE int32_t getWinPosX(void) const;
+    X_INLINE int32_t getWinPosY(void) const;
+    X_INLINE int32_t getWinWidth(void) const;
+    X_INLINE int32_t getWinHeight(void) const;
     X_INLINE int32_t getFullscreen(void) const;
     X_INLINE int32_t getWinVideoMode(void) const;
 
@@ -27,7 +32,7 @@ public:
     X_INLINE core::ICVar* getVarWinHeight(void);
     X_INLINE core::ICVar* getVarWinCustomFrame(void);
 
-public:
+private:
     int32_t schedulerNumThreads_;
     int32_t coreFastShutdown_;
     int32_t coreEventDebug_;

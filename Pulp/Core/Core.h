@@ -227,9 +227,6 @@ private:
     CmdArgs args_;
 
     core::AssetLoader assetLoader_;
-
-    bool insideEventHandler_;
-    bool _pad[3];
 };
 
 X_NAMESPACE_BEGIN(core)

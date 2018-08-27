@@ -104,8 +104,7 @@ XCore::XCore() :
         StrArena::getMemoryAlignmentRequirement(8),
         StrArena::getMemoryOffsetRequirement() + 12),
 
-    assetLoader_(g_coreArena, g_coreArena),
-    insideEventHandler_(false)
+    assetLoader_(g_coreArena, g_coreArena)
 {
     X_ASSERT_NOT_NULL(g_coreArena);
 
@@ -163,7 +162,7 @@ void XCore::ShutDown()
     X_LOG0("Core", "Shutting Down");
     env_.state_ = CoreGlobals::State::CLOSING;
 
-    if (vars_.coreFastShutdown_) {
+    if (vars_.getCoreFastShutdown()) {
         X_LOG0("Core", "Fast shutdown, skipping cleanup");
 
         // still save modified vars.
@@ -368,18 +367,15 @@ void XCore::OnCoreEvent(const CoreEventData& ed)
         {
             // i only want to save if not fullscreen
             auto max = pWindow_->isMaximized();
-            if (!max)
+            auto full = pWindow_->getMode() == core::Window::Mode::FULLSCREEN;
+            if (!max && !full)
             {
-                insideEventHandler_ = true;
-
                 if (ed.event == CoreEvent::MOVE) {
                     vars_.updateWinPos(ed.move.windowX, ed.move.windowY);
                 }
                 else {
                     vars_.updateWinDim(ed.resize.width, ed.resize.height);
                 }
-
-                insideEventHandler_ = false;
             }
         } break;
         case CoreEvent::CHANGE_FOCUS:
@@ -479,12 +475,8 @@ void XCore::WindowPosVarChange(core::ICVar* pVar)
 {
     X_UNUSED(pVar);
 
-    if (insideEventHandler_) {
-        return;
-    }
-
-    int x_pos = vars_.winXPos_;
-    int y_pos = vars_.winYPos_;
+    int x_pos = vars_.getWinPosX();
+    int y_pos = vars_.getWinPosY();
 
     core::Window* pWin = GetGameWindow();
     if (pWin) {
@@ -496,9 +488,6 @@ void XCore::WindowSizeVarChange(core::ICVar* pVar)
 {
     X_UNUSED(pVar);
 
-    if (insideEventHandler_) {
-        return;
-    }
 }
 
 void XCore::WindowCustomFrameVarChange(core::ICVar* pVar)
