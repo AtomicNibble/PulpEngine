@@ -166,6 +166,10 @@ bool X3DEngine::init(void)
     // so i will need some textures to render into.
     auto dispalyRes = pRender->getDisplayRes();
 
+    if (dispalyRes.x <= 0 || dispalyRes.y <= 0) {
+        X_ERROR("3DEngine", "Display res is zero");
+        return false;
+    }
 
     auto clearCol2d = drawVars_.clearCol2D();
     auto clearCol3d = drawVars_.clearCol3D();
