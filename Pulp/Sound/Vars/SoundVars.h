@@ -20,6 +20,7 @@ public:
 
     void setMasterVolume(float v);
     void setMusicVolume(float vol);
+    void setVideoVolume(float vol);
     void setVoiceVolume(float vol);
     void setSFXVolume(float vol);
 
@@ -49,6 +50,7 @@ public:
 private:
     core::ICVar* pVarVolMaster_;
     core::ICVar* pVarVolMusic_;
+    core::ICVar* pVarVolVideo_;
     core::ICVar* pVarVolSfx_;
     core::ICVar* pVarVolVoice_;
 

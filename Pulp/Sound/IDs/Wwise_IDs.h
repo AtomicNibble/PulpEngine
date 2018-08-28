@@ -42,7 +42,8 @@ namespace AK
         static const AkUniqueID SW357_RELOAD_LOAD = 111510273U;
         static const AkUniqueID SW357_RELOAD_OPEN = 3332910853U;
         static const AkUniqueID TEST_3D_LOOPED = 2761780017U;
-        static const AkUniqueID VIDEO_RICKROLL = 3469944817U;
+        static const AkUniqueID VIDEOAUDIO_START = 210580041U;
+        static const AkUniqueID VIDEOAUDIO_STOP = 1258391779U;
         static const AkUniqueID WEAP_LOWER = 1994352680U;
         static const AkUniqueID WEAP_RAISE = 2611048663U;
     } // namespace EVENTS
@@ -101,6 +102,7 @@ namespace AK
         static const AkUniqueID MASTERVOLUME = 2918011349U;
         static const AkUniqueID MUSICVOLUME = 2346531308U;
         static const AkUniqueID SFXVOLUME = 988953028U;
+        static const AkUniqueID VIDEOVOLUME = 2745495564U;
         static const AkUniqueID VOICEVOLUME = 414646191U;
     } // namespace GAME_PARAMETERS
 
@@ -122,6 +124,7 @@ namespace AK
         static const AkUniqueID MASTER_SECONDARY_BUS = 805203703U;
         static const AkUniqueID MUSIC = 3991942870U;
         static const AkUniqueID SFX = 393239870U;
+        static const AkUniqueID VIDEO = 2982943478U;
         static const AkUniqueID VOICE = 3170124113U;
         static const AkUniqueID WEAPONS = 1467963052U;
     } // namespace BUSSES

@@ -35,6 +35,15 @@ namespace
         }
     }
 
+    void Var_VideoVolChanged(core::ICVar* pVar)
+    {
+        float vol = pVar->GetFloat();
+
+        if (AK::SoundEngine::IsInitialized()) {
+            AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VIDEOVOLUME, mapVolume(vol));
+        }
+    }
+
     void Var_SFXVolChanged(core::ICVar* pVar)
     {
         float vol = pVar->GetFloat();
@@ -71,6 +80,7 @@ SoundVars::SoundVars()
 
     pVarVolMaster_ = nullptr;
     pVarVolMusic_ = nullptr;
+    pVarVolVideo_ = nullptr;
     pVarVolSfx_ = nullptr;
     pVarVolVoice_ = nullptr;
 
@@ -96,6 +106,8 @@ void SoundVars::RegisterVars(void)
         core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Master volume");
     pVarVolMusic_ = ADD_CVAR_FLOAT("snd_vol_music", 1.f, 0.f, 1.f,
         core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Music volume");
+    pVarVolVideo_ = ADD_CVAR_FLOAT("snd_vol_video", 1.f, 0.f, 1.f,
+        core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "Video volume");
     pVarVolSfx_ = ADD_CVAR_FLOAT("snd_vol_sfx", 1.f, 0.f, 1.f,
         core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED, "SFX volume");
     pVarVolVoice_ = ADD_CVAR_FLOAT("snd_vol_voice", 1.f, 0.f, 1.f,
@@ -107,6 +119,9 @@ void SoundVars::RegisterVars(void)
 
     del.Bind<Var_MusicVolChanged>();
     pVarVolMusic_->SetOnChangeCallback(del);
+
+    del.Bind<Var_VideoVolChanged>();
+    pVarVolVideo_->SetOnChangeCallback(del);
 
     del.Bind<Var_SFXVolChanged>();
     pVarVolSfx_->SetOnChangeCallback(del);
@@ -172,6 +187,7 @@ void SoundVars::applyVolume(void)
     if (AK::SoundEngine::IsInitialized()) {
         AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MASTERVOLUME, mapVolume(pVarVolMaster_->GetFloat()));
         AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::MUSICVOLUME, mapVolume(pVarVolMusic_->GetFloat()));
+        AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VIDEOVOLUME, mapVolume(pVarVolVideo_->GetFloat()));
         AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::SFXVOLUME, mapVolume(pVarVolSfx_->GetFloat()));
         AK::SoundEngine::SetRTPCValue(AK::GAME_PARAMETERS::VOICEVOLUME, mapVolume(pVarVolVoice_->GetFloat()));
     }
@@ -188,6 +204,11 @@ void SoundVars::setMasterVolume(float vol)
 void SoundVars::setMusicVolume(float vol)
 {
     pVarVolMusic_->Set(vol);
+}
+
+void SoundVars::setVideoVolume(float vol)
+{
+    pVarVolVideo_->Set(vol);
 }
 
 void SoundVars::setVoiceVolume(float vol)
