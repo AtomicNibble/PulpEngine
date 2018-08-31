@@ -62,7 +62,7 @@ private:
     bool decodeFrame(void);
 
 private:
-    void DecodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void decodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
     vpx_codec_ctx_t codec_;

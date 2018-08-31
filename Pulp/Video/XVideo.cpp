@@ -91,7 +91,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
                 ringBuffer_.read(encodedFrame_.data(), encodedFrame_.size());
 
                 // we now want to decode the frame.
-                pDecodeJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::DecodeFrame_job,
+                pDecodeJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeFrame_job,
                     nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
             }
         }
@@ -307,7 +307,7 @@ bool Video::decodeFrame(void)
     return true;
 }
 
-void Video::DecodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+void Video::decodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
