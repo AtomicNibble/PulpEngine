@@ -83,6 +83,15 @@ class XSound : public ISound
         core::string name;
     };
 
+    struct MemoryInput
+    {
+        AkPlayingID playingID;
+        SndObjectHandle sndObj;
+        AudioBufferDelegate callback;
+    };
+
+    using MemoryInputArr = core::FixedArray<MemoryInput, 2>;
+
     template<typename T>
     using ArrayMultiply = core::Array<T, core::ArrayAllocator<T>, core::growStrat::Multiply>;
 
@@ -141,6 +150,9 @@ public:
     PlayingID postEvent(EventID event, SndObjectHandle object) X_FINAL;
     PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
 
+    PlayingID playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHandle object) X_FINAL;
+    void stopVideoAudio(PlayingID id) X_FINAL;
+
     void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_FINAL;
     void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
     void setSwitch(SwitchGroupID group, SwitchStateID state, SndObjectHandle object) X_FINAL;
@@ -179,9 +191,17 @@ private:
     static void bankCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);
     static void bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId, void* pCookie);
 
+    static void getFormatCallback_s(AkPlayingID in_playingID, AkAudioFormat& io_AudioFormat);
+    static void executeCallback_s(AkPlayingID in_playingID, AkAudioBuffer* io_pBufferOut);
+
     void postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackInfo);
     void bankCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
     void bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPtr, AKRESULT eLoadResult, AkMemPoolId memPoolId);
+
+    void getFormatCallback(AkPlayingID in_playingID, AkAudioFormat& io_AudioFormat);
+    void executeCallback(AkPlayingID in_playingID, AkAudioBuffer* io_pBufferOut);
+
+    MemoryInput* memoryInputForID(AkPlayingID playingID);
 
 private:
     void OnCoreEvent(const CoreEventData& ed) X_FINAL;
@@ -214,6 +234,9 @@ private:
     SoundObjectPtrArr objects_;
     SoundObjectPtrArr culledObjects_;
     SoundObjectPtrArr occlusion_;
+
+    core::CriticalSection memStreamCS_;
+    MemoryInputArr memoryInputStreams_;
 
     bool comsSysInit_;
     bool outputCaptureEnabled_;

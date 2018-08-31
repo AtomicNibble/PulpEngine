@@ -40,6 +40,61 @@ static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(2);
 static const SndObjectHandle LISTNER_OBJECT_ID = static_cast<SndObjectHandle>(1);
 static const SndObjectHandle INVALID_OBJECT_ID = static_cast<SndObjectHandle>(-1);
 
+struct AudioBuffer
+{
+    typedef float SamepleType;
+
+    AudioBuffer(SamepleType* pBuffer, int32_t numChannels, int32_t maxFrames) :
+        pBuffer_(pBuffer),
+        numChannels_(numChannels),
+        maxFrames_(maxFrames),
+        validFrames_(0)
+    {
+    }
+
+    X_INLINE SamepleType* getChannel(int32_t channelIdx) const {
+        X_ASSERT(channelIdx < numChannels_, "Index out of range")(channelIdx, numChannels_);
+        return pBuffer_ + (channelIdx * maxFrames_);
+    }
+
+    X_INLINE int32_t numChannels(void) const {
+        return numChannels_;
+    }
+
+    X_INLINE int32_t maxFrames(void) const {
+        return maxFrames_;
+    }
+
+    X_INLINE int32_t validFrames(void) const {
+        return validFrames_;
+    }
+
+    X_INLINE void setValidFrames(int32_t num) {
+        validFrames_ = num;
+    }
+
+    X_INLINE void zeroPadToMaxFrames(void) {
+        // Zero out all channels.
+        const auto numZeroFrames = maxFrames_ - validFrames_;
+        if (numZeroFrames)
+        {
+            for (int32_t i = 0; i < numChannels_; ++i) {
+                std::memset(getChannel(i) + validFrames_, 0, numZeroFrames * sizeof(SamepleType));
+            }
+            validFrames_ = maxFrames_;
+        }
+    }
+
+private:
+    SamepleType* pBuffer_;
+
+    const int32_t numChannels_;
+    const int32_t maxFrames_;
+    int32_t validFrames_;
+};
+
+typedef core::Delegate<void(AudioBuffer& ab)> AudioBufferDelegate;
+
 X_DECLARE_ENUM(CurveInterpolation)
 (
     Log3,          ///< Log3
@@ -131,6 +186,9 @@ struct ISound : public core::IEngineSysBase
     // events
     virtual PlayingID postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
     virtual PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
+
+    virtual PlayingID playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHandle object) X_ABSTRACT;
+    virtual void stopVideoAudio(PlayingID id) X_ABSTRACT;
 
     virtual void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_ABSTRACT;
     virtual void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;

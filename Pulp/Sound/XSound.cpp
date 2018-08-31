@@ -26,6 +26,8 @@ X_DISABLE_WARNING(4505)
 // Comms
 #include <AK/Comm/AkCommunication.h>
 
+#include <AK/Plugin/AkAudioInputPlugin.h>
+
 X_ENABLE_WARNING(4505)
 
 #if X_DEBUG
@@ -384,6 +386,8 @@ bool XSound::init(void)
     }
 #endif // !X_ENABLE_SOUND_COMS
 
+
+    SetAudioInputCallbacks(executeCallback_s, getFormatCallback_s, nullptr);
 
     vars_.applyVolume();
 
@@ -1097,6 +1101,46 @@ PlayingID XSound::postEvent(const char* pEventStr, SndObjectHandle object)
     return postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
 
+PlayingID XSound::playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHandle object)
+{
+    auto playingID = postEvent("VideoAudio_Start", object);
+    
+    core::CriticalSection::ScopedLock lock(memStreamCS_);
+
+    // so need to be able to play video on objects, really i should support multiple streams per object.
+    // so in order to stop the stream, i basically should just give you a id.
+    MemoryInput mi;
+    mi.playingID = playingID;
+    mi.sndObj = object;
+    mi.callback = dataCallback;
+
+    memoryInputStreams_.push_back(mi);
+    return playingID;
+}
+
+void XSound::stopVideoAudio(PlayingID id)
+{
+    SndObjectHandle object = INVALID_OBJECT_ID;
+
+    {
+        core::CriticalSection::ScopedLock lock(memStreamCS_);
+
+        auto it = std::find_if(memoryInputStreams_.begin(), memoryInputStreams_.end(), [id](const MemoryInput& mi) {
+            return mi.playingID == id;
+        });
+
+        if (it == memoryInputStreams_.end()) {
+            X_ERROR("Sound", "Failed to find memory stream with playingID: %" PRIu32, id);
+            return;
+        }
+
+        object = it->sndObj;
+        memoryInputStreams_.remove(it);
+    }
+
+    postEvent("VideoAudio_Stop", object);
+}
+
 void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)
 {
     X_ASSERT(object != INVALID_OBJECT_ID && object != GLOBAL_OBJECT_ID, "Invalid object handle for occlusion")(object);
@@ -1408,6 +1452,16 @@ void XSound::bankUnloadCallbackFunc_s(AkUInt32 bankID, const void* pInMemoryBank
     reinterpret_cast<XSound*>(pCookie)->bankUnloadCallbackFunc(bankID, pInMemoryBankPtr, eLoadResult, memPoolId);
 }
 
+void XSound::getFormatCallback_s(AkPlayingID in_playingID, AkAudioFormat& io_AudioFormat)
+{
+    static_cast<XSound*>(gEnv->pSound)->getFormatCallback(in_playingID, io_AudioFormat);
+}
+
+void XSound::executeCallback_s(AkPlayingID in_playingID, AkAudioBuffer* io_pBufferOut)
+{
+    static_cast<XSound*>(gEnv->pSound)->executeCallback(in_playingID, io_pBufferOut);
+}
+
 // ------------------ CallBacks ----------------------------
 
 void XSound::postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackInfo)
@@ -1461,6 +1515,79 @@ void XSound::bankUnloadCallbackFunc(AkUInt32 bankID, const void* pInMemoryBankPt
     });
 
     banks_.erase(it, banks_.end());
+}
+
+void XSound::getFormatCallback(AkPlayingID in_playingID, AkAudioFormat& io_AudioFormat)
+{
+    X_UNUSED(in_playingID, io_AudioFormat);
+
+    core::CriticalSection::ScopedLock lock(memStreamCS_);
+
+    auto* pStream = memoryInputForID(in_playingID);
+    if (!pStream) {
+        X_ERROR("SoundSys", "No memory stream for playing id: %" PRIu32, in_playingID);
+        return;
+    }
+
+    // TODO: allow customisation.
+    io_AudioFormat.SetAll(
+        48000,                  // Sample rate
+        AkChannelConfig(1, AK_SPEAKER_SETUP_MONO),
+        32,						// Bits per samples
+        4,						// bytes per samples
+        AK_FLOAT,			    // feeding floats
+        AK_NONINTERLEAVED       // for floats the plugin only supports non :S ?
+    );
+}
+
+void XSound::executeCallback(AkPlayingID in_playingID, AkAudioBuffer* io_pBufferOut)
+{
+    X_UNUSED(in_playingID, io_pBufferOut);
+
+    core::CriticalSection::ScopedLock lock(memStreamCS_);
+
+    auto* pStream = memoryInputForID(in_playingID);
+    if (!pStream) {
+        io_pBufferOut->uValidFrames = 0;
+        io_pBufferOut->eState = AK_Fail;
+        X_ERROR("SoundSys", "No memory stream for playing id: %" PRIu32, in_playingID);
+        return;
+    }
+
+//    X_ASSERT(io_pBufferOut->NumChannels() == 2, "Channel count mismatch")();
+
+    AudioBuffer ab(
+        io_pBufferOut->GetChannel(0),
+        io_pBufferOut->NumChannels(),
+        io_pBufferOut->MaxFrames()
+    );
+
+    pStream->callback.Invoke(ab);
+
+    // meow.
+    io_pBufferOut->uValidFrames = safe_static_cast<AkUInt16>(ab.validFrames());
+    if (ab.validFrames()) {
+        io_pBufferOut->eState = AK_DataReady;
+    }
+    else {
+        io_pBufferOut->eState = AK_NoDataReady;
+    }
+}
+
+
+// ----------------------------------------------
+
+XSound::MemoryInput* XSound::memoryInputForID(AkPlayingID playingID)
+{
+    auto it = std::find_if(memoryInputStreams_.begin(), memoryInputStreams_.end(), [playingID](const MemoryInput& ms) {
+        return ms.playingID == playingID;
+    });
+
+    if (it == memoryInputStreams_.end()) {
+        return nullptr;
+    }
+
+    return it;
 }
 
 // ------------------ CoreEvnt ----------------------------
