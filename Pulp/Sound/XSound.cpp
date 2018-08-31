@@ -426,7 +426,6 @@ bool XSound::init(void)
     loadBank("PlayerSounds.bnk");
     loadBank("Ambient.bnk");
     loadBank("Weapons.bnk");
-    loadBank("Video.bnk");
     loadBank("SFX.bnk");
 
     return true;
