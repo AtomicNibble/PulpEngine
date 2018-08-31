@@ -197,6 +197,7 @@ namespace
 } // namespace
 
 static_assert(sizeof(SndObjectHandle) == sizeof(AkGameObjectID), "Handle size mismtach");
+static_assert(sizeof(PlayingID) == sizeof(AkPlayingID), "PlayingID size mismtach");
 
 static_assert(GLOBAL_OBJECT_ID == static_cast<SndObjectHandle>(2), "Should be 2 yo");
 static_assert(LISTNER_OBJECT_ID == static_cast<SndObjectHandle>(1), "Should be 1 yo");
@@ -1066,7 +1067,7 @@ void XSound::stopAll(SndObjectHandle object)
     SoundEngine::StopAll(object);
 }
 
-void XSound::postEvent(EventID event, SndObjectHandle object)
+PlayingID XSound::postEvent(EventID event, SndObjectHandle object)
 {
     if (object != GLOBAL_OBJECT_ID) {
         SoundObject* pObject = SoundHandleToObject(object);
@@ -1087,11 +1088,13 @@ void XSound::postEvent(EventID event, SndObjectHandle object)
         // goaty
         X_LOG0("Sound", "PlayingID: %" PRIu32, playingId);
     }
+
+    return playingId;
 }
 
-void XSound::postEvent(const char* pEventStr, SndObjectHandle object)
+PlayingID XSound::postEvent(const char* pEventStr, SndObjectHandle object)
 {
-    postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
+    return postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
 
 void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)

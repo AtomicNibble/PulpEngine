@@ -27,6 +27,7 @@ X_NAMESPACE_BEGIN(sound)
 
 typedef core::Hash::Fnv1Val HashVal;
 typedef uint64_t SndObjectHandle;
+typedef uint32_t PlayingID;
 typedef HashVal EventID;
 typedef HashVal RtpcID;
 typedef HashVal SwitchGroupID;
@@ -128,8 +129,8 @@ struct ISound : public core::IEngineSysBase
     virtual void stopAll(SndObjectHandle object = INVALID_OBJECT_ID) X_ABSTRACT;
 
     // events
-    virtual void postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
-    virtual void postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
+    virtual PlayingID postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
+    virtual PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
 
     virtual void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_ABSTRACT;
     virtual void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_ABSTRACT;

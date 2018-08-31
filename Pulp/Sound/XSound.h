@@ -138,8 +138,8 @@ public:
 
     void stopAll(SndObjectHandle object) X_FINAL;
 
-    void postEvent(EventID event, SndObjectHandle object) X_FINAL;
-    void postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
+    PlayingID postEvent(EventID event, SndObjectHandle object) X_FINAL;
+    PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
 
     void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_FINAL;
     void setMaterial(SndObjectHandle object, engine::MaterialSurType::Enum surfaceType) X_FINAL;
