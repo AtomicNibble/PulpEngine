@@ -151,6 +151,11 @@ void AssetLoader::reload(AssetBase* pAsset, ReloadFlags flags)
 
 void AssetLoader::addLoadRequest(AssetBase* pAsset)
 {
+    addLoadRequest(pAsset, -1);
+}
+
+void AssetLoader::addLoadRequest(AssetBase* pAsset, int32_t readSize)
+{
     X_ASSERT(assetsinks_[pAsset->getType()], "Asset type doest not have a registered handler")(assetDb::AssetType::ToString(pAsset->getType()));
     X_ASSERT(pAsset->getName().isNotEmpty(), "Asset name is empty")(assetDb::AssetType::ToString(pAsset->getType()));
 
@@ -169,12 +174,15 @@ void AssetLoader::addLoadRequest(AssetBase* pAsset)
     //	pAsset->addReference(); // prevent instance sweep
     pAsset->setStatus(core::LoadStatus::Loading);
 
+    auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
+    loadReq->readSize = readSize;
+
     const int32_t maxReq = vars_.maxActiveRequests();
     if (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq) {
-        dispatchLoad(pAsset, lock);
+        dispatchLoad(loadReq.release(), lock);
     }
     else {
-        queueLoadRequest(pAsset, lock);
+        queueLoadRequest(loadReq.release(), lock);
     }
 }
 
@@ -223,23 +231,30 @@ void AssetLoader::dispatchPendingLoads(void)
     }
 }
 
-void AssetLoader::queueLoadRequest(AssetBase* pAsset, core::CriticalSection::ScopedLock&)
+void AssetLoader::queueLoadRequest(AssetLoadRequest* pLoadReq, core::CriticalSection::ScopedLock&)
 {
-    X_ASSERT(!requestQueue_.contains(pAsset), "Queue already contains asset")(pAsset);
+#if X_ENABLE_ASSERTIONS
+    auto contains = requestQueue_.contains_if([pLoadReq](AssetLoadRequest* pReq) { 
+        return pReq->pAsset == pLoadReq->pAsset; 
+    });
 
-    requestQueue_.push(pAsset);
+    X_ASSERT(!contains, "Queue already contains asset")(pLoadReq->pAsset);
+#endif // !X_ENABLE_ASSERTIONS
+
+    requestQueue_.push(pLoadReq);
 }
 
-void AssetLoader::dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedLock&)
+void AssetLoader::dispatchLoad(AssetLoadRequest* pLoadReq, core::CriticalSection::ScopedLock&)
 {
+    auto* pAsset = pLoadReq->pAsset;
+
+    X_ASSERT_NOT_NULL(pAsset);
     X_ASSERT(pAsset->getStatus() == core::LoadStatus::Loading || pAsset->getStatus() == core::LoadStatus::NotLoaded, "Incorrect status")();
 
-    auto loadReq = core::makeUnique<AssetLoadRequest>(arena_, pAsset);
-
     // dispatch IO
-    dispatchLoadRequest(loadReq.get());
+    dispatchLoadRequest(pLoadReq);
 
-    pendingRequests_.emplace_back(loadReq.release());
+    pendingRequests_.emplace_back(pLoadReq);
 }
 
 bool AssetLoader::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
@@ -247,7 +262,7 @@ bool AssetLoader::dispatchPendingLoad(core::CriticalSection::ScopedLock& lock)
     const int32_t maxReq = vars_.maxActiveRequests();
 
     if (requestQueue_.isNotEmpty() && (maxReq == 0 || safe_static_cast<int32_t>(pendingRequests_.size()) < maxReq)) {
-        X_ASSERT(requestQueue_.peek()->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
+        X_ASSERT(requestQueue_.peek()->pAsset->getStatus() == core::LoadStatus::Loading, "Incorrect status")();
         dispatchLoad(requestQueue_.peek(), lock);
         requestQueue_.pop();
         return true;
@@ -360,14 +375,21 @@ void AssetLoader::IoRequestCallback(core::IFileSys& fileSys, const core::IoReque
         // read the whole file.
         uint32_t fileSize = safe_static_cast<uint32_t>(pFile->fileSize());
         X_ASSERT(fileSize > 0, "Datasize must be positive")(fileSize);
-        pLoadReq->data = core::makeUnique<char[]>(blockArena_, fileSize, 16);
-        pLoadReq->dataSize = fileSize;
+
+        auto readSize = fileSize;
+        if (pLoadReq->readSize >= 0) {
+            X_WARNING_IF(readSize > fileSize, "AssetLoader", "Attemp to read to much file data for: %s", pAsset->getName().c_str());
+            readSize = core::Min(readSize, fileSize);
+        }
+
+        pLoadReq->data = core::makeUnique<char[]>(blockArena_, readSize, 16);
+        pLoadReq->dataSize = readSize;
 
         core::IoRequestRead read;
         read.callback.Bind<AssetLoader, &AssetLoader::IoRequestCallback>(this);
         read.pUserData = pLoadReq;
         read.pFile = pFile;
-        read.dataSize = fileSize;
+        read.dataSize = readSize;
         read.offset = 0;
         read.pBuf = pLoadReq->data.ptr();
         fileSys.AddIoRequestToQue(read);

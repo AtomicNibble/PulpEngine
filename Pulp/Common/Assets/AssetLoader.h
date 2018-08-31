@@ -64,7 +64,8 @@ class AssetLoader
         X_INLINE AssetLoadRequest(AssetBase* pAsset) :
             pFile(nullptr),
             pAsset(pAsset),
-            dataSize(0)
+            dataSize(0),
+            readSize(-1)
         {
         }
 
@@ -72,6 +73,7 @@ class AssetLoader
         AssetBase* pAsset;
         core::UniquePointer<char[]> data;
         uint32_t dataSize;
+        int32_t readSize;
         LoadFlags flags;
         ReloadFlags reloadFlags;
         uint16_t _pad;
@@ -80,10 +82,10 @@ class AssetLoader
         core::TimeVal processBegin;
     };
 
-    X_ENSURE_LE(sizeof(AssetLoadRequest), 64, "AssetLoadRequest should be less than 64 bytes")
+    X_ENSURE_LE(sizeof(AssetLoadRequest), 128, "AssetLoadRequest should be less than 64 bytes")
 
     typedef core::Array<AssetLoadRequest*> AssetLoadRequestArr;
-    typedef core::Fifo<AssetBase*> AssetQueue;
+    typedef core::Fifo<AssetLoadRequest*> AssetQueue;
 
 public:
     AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* blockArena);
@@ -98,13 +100,14 @@ public:
 
     void reload(AssetBase* pAsset, ReloadFlags flags);
     void addLoadRequest(AssetBase* pAsset);
+    void addLoadRequest(AssetBase* pAsset, int32_t readSize);
     bool waitForLoad(AssetBase* pAsset);
 
     void dispatchPendingLoads(void);
 
 private:
-    void queueLoadRequest(AssetBase* pAsset, core::CriticalSection::ScopedLock&);
-    void dispatchLoad(AssetBase* pAsset, core::CriticalSection::ScopedLock&);
+    void queueLoadRequest(AssetLoadRequest* pLoadReq, core::CriticalSection::ScopedLock&);
+    void dispatchLoad(AssetLoadRequest* pLoadReq, core::CriticalSection::ScopedLock&);
     bool dispatchPendingLoad(core::CriticalSection::ScopedLock&);
     void dispatchLoadRequest(AssetLoadRequest* pLoadReq);
 
