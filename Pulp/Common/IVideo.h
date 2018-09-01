@@ -72,12 +72,13 @@ struct ClusterHdr
     int32_t numBlocks;
 };
 
-X_PACK_POP
 
 struct VideoTrackHdr
 {
     int16_t pixelWidth;
     int16_t pixelHeight;
+    int32_t numFrames;
+    int32_t largestFrameBytes;
 };
 
 struct AudioTrackHdr
@@ -104,9 +105,11 @@ struct VideoHeader
     }
 };
 
+X_PACK_POP
+
 X_ENSURE_SIZE(BlockHdr, 10);
 X_ENSURE_SIZE(ClusterHdr, 12);
-X_ENSURE_SIZE(VideoHeader, 32);
+X_ENSURE_SIZE(VideoHeader, 40);
 
 
 X_NAMESPACE_END

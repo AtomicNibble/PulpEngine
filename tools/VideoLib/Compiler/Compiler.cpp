@@ -153,6 +153,7 @@ bool VideoCompiler::process(DataVec&& srcData)
 
     durationNS_ = pSegmentInfo->GetDuration();
 
+    core::zero_object(videoTrack_);
     videoTrack_.pixelWidth = safe_static_cast<int32_t>(pVideoTrack->GetWidth());
     videoTrack_.pixelHeight = safe_static_cast<int32_t>(pVideoTrack->GetHeight());
 
@@ -249,6 +250,12 @@ bool VideoCompiler::process(DataVec&& srcData)
                         X_ERROR("Video", "Failed to read block frame data");
                         return false;
                     }
+
+                    if (block.type == TrackType::Video) {
+                        videoTrack_.numFrames++;
+                        videoTrack_.largestFrameBytes = core::Max(videoTrack_.largestFrameBytes,
+                            safe_static_cast<int32_t>(block.data.size()));
+                    }
                 }
 
                 status = pCluster->GetNext(pBlockEntry, pBlockEntry);
@@ -286,6 +293,9 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
         return false;
     }
 
+    const int64_t nanosecondsPerSecond = 1000000000;
+    const int32_t nanosecondsPerMillisecond = 1000000;
+
     VideoHeader hdr;
     core::zero_object(hdr);
     hdr.fourCC = VIDEO_FOURCC;
@@ -309,14 +319,13 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
         return false;
     }
 
-    const int64_t nanosecondsPerSecond = 1000000000;
 
     // write all the clusters.
     for (const auto& cluster : clusters_)
     {
         ClusterHdr clusterHdr;
-        clusterHdr.timeMS = safe_static_cast<int32_t>(cluster.timeNS / nanosecondsPerSecond);
-        clusterHdr.durationMS = safe_static_cast<int32_t>(cluster.durationNS / nanosecondsPerSecond);
+        clusterHdr.timeMS = safe_static_cast<int32_t>(cluster.timeNS / nanosecondsPerMillisecond);
+        clusterHdr.durationMS = safe_static_cast<int32_t>(cluster.durationNS / nanosecondsPerMillisecond);
         clusterHdr.numBlocks = safe_static_cast<decltype(clusterHdr.numBlocks)>(cluster.blocks.size());
 
         if (pFile->writeObj(clusterHdr) != sizeof(clusterHdr)) {
@@ -329,7 +338,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
             BlockHdr blockHdr;
             blockHdr.type = block.type;
             blockHdr.isKey = block.isKey;
-            blockHdr.timeMS = safe_static_cast<int32_t>(block.timeNS / nanosecondsPerSecond);
+            blockHdr.timeMS = safe_static_cast<int32_t>(block.timeNS / nanosecondsPerMillisecond);
             blockHdr.blockSize = safe_static_cast<decltype(blockHdr.blockSize)>(block.data.size());
 
             if (pFile->writeObj(blockHdr) != sizeof(blockHdr)) {
