@@ -8,21 +8,7 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(video)
 
 
-
 typedef core::Array<uint8_t> DataArr;
-
-struct AudioTrack
-{
-    AudioTrack(core::MemoryArenaBase* arena) :
-        headers(arena)
-    {}
-
-    int16_t channels;
-    int16_t bitDepth;
-    int32_t sampleFreq;
-    
-    DataArr headers;
-};
 
 struct Block
 {
@@ -73,7 +59,9 @@ private:
     int64_t durationNS_;
 
     VideoTrackHdr videoTrack_;
-    AudioTrack audioTrack_;
+    AudioTrackHdr audioTrack_;
+
+    DataArr audioHeaders_;
     ClusterArr clusters_;
 };
 

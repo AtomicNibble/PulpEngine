@@ -62,9 +62,11 @@ namespace
 VideoCompiler::VideoCompiler(core::MemoryArenaBase* arena) :
     arena_(arena),
     durationNS_(0),
-    audioTrack_(arena),
+    audioHeaders_(arena),
     clusters_(arena)
 {
+    core::zero_object(videoTrack_);
+    core::zero_object(audioTrack_);
 }
 
 VideoCompiler::~VideoCompiler()
@@ -172,8 +174,8 @@ bool VideoCompiler::process(DataVec&& srcData)
             return false;
         }
 
-        audioTrack_.headers.resize(vorbisHdrSize);
-        std::memcpy(audioTrack_.headers.data(), pData, vorbisHdrSize);
+        audioHeaders_.resize(vorbisHdrSize);
+        std::memcpy(audioHeaders_.data(), pData, vorbisHdrSize);
     }
 
     auto numClusters = segment->GetCount();
@@ -269,14 +271,17 @@ bool VideoCompiler::process(DataVec&& srcData)
     }
 
     // compress vorbis header?
-    auto& data = audioTrack_.headers;
+
     DataVec compData(arena_);
 
-    if (!core::Compression::LZ4HC::deflate(arena_, data, compData, core::Compression::CompressLevel::HIGH)) {
+    if (!core::Compression::LZ4HC::deflate(arena_, audioHeaders_, compData, core::Compression::CompressLevel::HIGH)) {
         return false;
     }
 
-    data.swap(compData);
+    audioTrack_.inflatedHdrSize = safe_static_cast<int32_t>(audioHeaders_.size());
+    audioTrack_.deflatedHdrSize = safe_static_cast<int32_t>(compData.size());
+
+    audioHeaders_.swap(compData);
 
     return true;
 }
@@ -302,11 +307,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
     hdr.version = VIDEO_VERSION;
     hdr.durationNS = durationNS_;
     hdr.video = videoTrack_;
-    hdr.audio.channels = audioTrack_.channels;
-    hdr.audio.bitDepth = audioTrack_.bitDepth;
-    hdr.audio.sampleFreq = audioTrack_.sampleFreq;
-    hdr.audio.headersSize = safe_static_cast<decltype(hdr.audio.headersSize)>(audioTrack_.headers.size());
-
+    hdr.audio = audioTrack_;
 
     if (pFile->writeObj(hdr) != sizeof(hdr)) {
         X_ERROR("Video", "Failed to write data");
@@ -314,11 +315,10 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
     }
 
     // audio headers.
-    if (pFile->write(audioTrack_.headers.data(), audioTrack_.headers.size()) != audioTrack_.headers.size()) {
+    if (pFile->write(audioHeaders_.data(), audioHeaders_.size()) != audioHeaders_.size()) {
         X_ERROR("Video", "Failed to write data");
         return false;
     }
-
 
     // write all the clusters.
     for (const auto& cluster : clusters_)
