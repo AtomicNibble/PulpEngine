@@ -1,0 +1,42 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="K:\libwebm\mkvmuxer\mkvmuxer.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="K:\libwebm\mkvmuxer\mkvmuxerutil.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="K:\libwebm\mkvmuxer\mkvwriter.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="K:\libwebm\mkvmuxer\mkvmuxer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\mkvmuxer\mkvmuxertypes.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\mkvmuxer\mkvmuxerutil.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\mkvmuxer\mkvwriter.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\common\webmids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="K:\libwebm\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{850B44B7-86FA-3170-A33B-08328EF1BA7C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{A88A4AB5-4D49-3A9C-A741-B8D04A100A87}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

@@ -1,0 +1,223 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="MinSizeRel|x64">
+      <Configuration>MinSizeRel</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="RelWithDebInfo|x64">
+      <Configuration>RelWithDebInfo</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGUID>{DC39EB49-91D8-3DE3-B7C9-B7D1818ACAD9}</ProjectGUID>
+    <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
+    <Keyword>Win32Proj</Keyword>
+    <Platform>x64</Platform>
+    <ProjectName>ALL_BUILD</ProjectName>
+    <VCProjectUpgraderObjectName>NoUpgrade</VCProjectUpgraderObjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'" Label="Configuration">
+    <ConfigurationType>Utility</ConfigurationType>
+    <UseOfMfc>false</UseOfMfc>
+    <CharacterSet>MultiByte</CharacterSet>
+    <PlatformToolset>v140</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+    <PropertyGroup>
+      <_ProjectFileVersion>10.0.20506.1</_ProjectFileVersion>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+      <IntDir Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">$(Platform)\$(Configuration)\$(ProjectName)\</IntDir>
+    </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>K:\libwebm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>K:\libwebm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>K:\libwebm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">
+    <Midl>
+      <AdditionalIncludeDirectories>K:\libwebm;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <OutputDirectory>$(ProjectDir)/$(IntDir)</OutputDirectory>
+      <HeaderFileName>%(Filename).h</HeaderFileName>
+      <TypeLibraryName>%(Filename).tlb</TypeLibraryName>
+      <InterfaceIdentifierFileName>%(Filename)_i.c</InterfaceIdentifierFileName>
+      <ProxyFileName>%(Filename)_p.c</ProxyFileName>
+    </Midl>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <CustomBuild Include="K:\libwebm\CMakeLists.txt">
+      <Message Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Building Custom Rule K:/libwebm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">setlocal
+C:\Users\WinCat\Documents\Tools\cmake\bin\cmake.exe -HK:/libwebm -BK:/libwebm/vs/x64 --check-stamp-file K:/libwebm/vs/x64/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">K:/libwebm/CMakeLists.txt;K:\libwebm\CMakeLists.txt;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;K:\libwebm\vs\x64\CMakeFiles\feature_tests.cxx;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;K:\libwebm\build\cxx_flags.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;K:\libwebm\build\msvc_runtime.cmake;K:\libwebm\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">K:\libwebm\vs\x64\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Building Custom Rule K:/libwebm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='Release|x64'">setlocal
+C:\Users\WinCat\Documents\Tools\cmake\bin\cmake.exe -HK:/libwebm -BK:/libwebm/vs/x64 --check-stamp-file K:/libwebm/vs/x64/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">K:/libwebm/CMakeLists.txt;K:\libwebm\CMakeLists.txt;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;K:\libwebm\vs\x64\CMakeFiles\feature_tests.cxx;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;K:\libwebm\build\cxx_flags.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;K:\libwebm\build\msvc_runtime.cmake;K:\libwebm\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='Release|x64'">K:\libwebm\vs\x64\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">Building Custom Rule K:/libwebm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">setlocal
+C:\Users\WinCat\Documents\Tools\cmake\bin\cmake.exe -HK:/libwebm -BK:/libwebm/vs/x64 --check-stamp-file K:/libwebm/vs/x64/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">K:/libwebm/CMakeLists.txt;K:\libwebm\CMakeLists.txt;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;K:\libwebm\vs\x64\CMakeFiles\feature_tests.cxx;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;K:\libwebm\build\cxx_flags.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;K:\libwebm\build\msvc_runtime.cmake;K:\libwebm\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">K:\libwebm\vs\x64\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='MinSizeRel|x64'">false</LinkObjects>
+      <Message Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">Building Custom Rule K:/libwebm/CMakeLists.txt</Message>
+      <Command Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">setlocal
+C:\Users\WinCat\Documents\Tools\cmake\bin\cmake.exe -HK:/libwebm -BK:/libwebm/vs/x64 --check-stamp-file K:/libwebm/vs/x64/CMakeFiles/generate.stamp
+if %errorlevel% neq 0 goto :cmEnd
+:cmEnd
+endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
+:cmErrorLevel
+exit /b %1
+:cmDone
+if %errorlevel% neq 0 goto :VCEnd</Command>
+      <AdditionalInputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">K:/libwebm/CMakeLists.txt;K:\libwebm\CMakeLists.txt;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystem.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInitialize.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-Determine-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerId.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCompilerIdDetection.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ADSP-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\ARMCC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\AppleClang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Borland-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Clang-DetermineCompilerInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Comeau-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Compaq-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Cray-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Embarcadero-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Fujitsu-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GHS-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\GNU-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\HP-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IAR-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Intel-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MIPSpro-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\NVIDIA-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\OpenWatcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PGI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\PathScale-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SCO-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\SunPro-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\TI-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\VisualAge-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\Watcom-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\XL-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\zOS-CXX-DetermineCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\IBMCPP-CXX-DetermineVersionInternal.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CompilerId\VS-10.vcxproj.in;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeFindBinUtils.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeSystemSpecificInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeGenericSystem.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\WindowsPaths.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeLanguageInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC-CXX.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Platform\Windows-MSVC.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeRCInformation.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestRCCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCommonLanguageInclude.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCXXCompiler.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeTestCompilerCommon.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompilerABI.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeParseImplicitLinkInfo.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompilerABI.cpp;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeDetermineCompileFeatures.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Internal\FeatureTesting.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\Compiler\MSVC-CXX-FeatureTests.cmake;K:\libwebm\vs\x64\CMakeFiles\feature_tests.cxx;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCXXCompiler.cmake.in;K:\libwebm\vs\x64\CMakeFiles\3.8.1\CMakeCXXCompiler.cmake;K:\libwebm\build\cxx_flags.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXCompilerFlag.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CheckCXXSourceCompiles.cmake;C:\Users\WinCat\Documents\Tools\cmake\share\cmake-3.8\Modules\CMakeCheckCompilerFlagCommonPatterns.cmake;K:\libwebm\build\msvc_runtime.cmake;K:\libwebm\CMakeLists.txt;%(AdditionalInputs)</AdditionalInputs>
+      <Outputs Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">K:\libwebm\vs\x64\CMakeFiles\generate.stamp</Outputs>
+      <LinkObjects Condition="'$(Configuration)|$(Platform)'=='RelWithDebInfo|x64'">false</LinkObjects>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="K:\libwebm\vs\x64\ZERO_CHECK.vcxproj">
+      <Project>{95C4B61B-2021-31BE-8CF2-6DD458E87CBA}</Project>
+      <Name>ZERO_CHECK</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\dumpvtt.vcxproj">
+      <Project>{A8504720-3069-30A5-B3D1-6C466EDB4689}</Project>
+      <Name>dumpvtt</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\mkvmuxer.vcxproj">
+      <Project>{F4723D91-3D3B-38F2-8BCB-0C7A630C7470}</Project>
+      <Name>mkvmuxer</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\mkvmuxer_sample.vcxproj">
+      <Project>{C64C2160-9D3A-35F2-8D67-7F86ED8938E3}</Project>
+      <Name>mkvmuxer_sample</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\mkvparser.vcxproj">
+      <Project>{D4018DF9-D5C0-3825-BABE-44B39277ECCB}</Project>
+      <Name>mkvparser</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\mkvparser_sample.vcxproj">
+      <Project>{0D697DDF-8722-3773-812A-5AE403DE8C7B}</Project>
+      <Name>mkvparser_sample</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\vttdemux.vcxproj">
+      <Project>{B2654F25-25A0-3F98-AC49-C1B4971198E7}</Project>
+      <Name>vttdemux</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webm.vcxproj">
+      <Project>{0A2F1F7B-57F2-3F8E-B07A-C50F6185EFFE}</Project>
+      <Name>webm</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webm2pes.vcxproj">
+      <Project>{4104398C-708D-3E16-96FB-1FE9F59D399E}</Project>
+      <Name>webm2pes</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webm2ts.vcxproj">
+      <Project>{750B86B2-CAFB-3CA3-9DF0-EE9D412B5316}</Project>
+      <Name>webm2ts</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webm_info.vcxproj">
+      <Project>{2F6CE792-0C81-37E4-BDB2-FF00BAD7F811}</Project>
+      <Name>webm_info</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webmts.vcxproj">
+      <Project>{A58FF01F-1E9E-3E1D-9681-11DAA1166EE8}</Project>
+      <Name>webmts</Name>
+    </ProjectReference>
+    <ProjectReference Include="K:\libwebm\vs\x64\webvtt_common.vcxproj">
+      <Project>{47CEEAB0-3ECA-3399-986E-FD3B147EFFF1}</Project>
+      <Name>webvtt_common</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

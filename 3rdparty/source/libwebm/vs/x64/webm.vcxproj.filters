@@ -1,0 +1,56 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="K:\libwebm\common\file_util.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="K:\libwebm\common\hdr_util.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="K:\libwebm\common\file_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\common\hdr_util.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="K:\libwebm\common\webmids.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="K:\libwebm\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="K:\libwebm\vs\x64\mkvmuxer.dir\$(Configuration)\mkvmuxer.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\x64\mkvmuxer.dir\$(Configuration)\mkvmuxerutil.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\x64\mkvmuxer.dir\$(Configuration)\mkvwriter.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\x64\mkvparser.dir\$(Configuration)\mkvparser.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\x64\mkvparser.dir\$(Configuration)\mkvreader.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{850B44B7-86FA-3170-A33B-08328EF1BA7C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{A88A4AB5-4D49-3A9C-A741-B8D04A100A87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Files">
+      <UniqueIdentifier>{8685681C-5AF9-3C11-82D2-643DB389B371}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{1DFF8E16-A003-3C24-BAF6-116A0CA2C7FE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

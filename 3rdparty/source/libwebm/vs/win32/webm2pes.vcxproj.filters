@@ -1,0 +1,39 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Project ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="K:\libwebm\m2ts\webm2pes_main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <CustomBuild Include="K:\libwebm\CMakeLists.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Object Include="K:\libwebm\vs\win32\webmts.dir\$(Configuration)\libwebm_util.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\win32\webmts.dir\$(Configuration)\video_frame.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\win32\webmts.dir\$(Configuration)\vpxpes2ts.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\win32\webmts.dir\$(Configuration)\vpxpes_parser.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+    <Object Include="K:\libwebm\vs\win32\webmts.dir\$(Configuration)\webm2pes.obj">
+      <Filter>Object Libraries</Filter>
+    </Object>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{7405510B-7E73-3FAF-820D-CA6369E0F20C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Files">
+      <UniqueIdentifier>{1E9AB7BE-8EAC-3ED7-956E-BB117AB7820C}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Object Libraries">
+      <UniqueIdentifier>{44DF728A-6FF3-3403-8F5A-737E21C95CBE}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
