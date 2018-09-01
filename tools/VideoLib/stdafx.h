@@ -33,3 +33,19 @@ extern VideoLibArena* g_VideoLibArena;
 #define VIDEOLIB_EXPORT X_IMPORT
 #endif // !VIDEO_LIB_EXPORT
 #endif // X_LIB
+
+
+// Webm
+#include <common\hdr_util.h>
+#include <common\indent.h>
+#include <common\webm_constants.h>
+#include <common\webm_endian.h>
+
+#include <mkvparser\mkvparser.h>
+
+
+#if X_DEBUG
+X_LINK_LIB("libwebmd");
+#else
+X_LINK_LIB("libwebm");
+#endif

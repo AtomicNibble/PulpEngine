@@ -36,7 +36,7 @@ bool VideoLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
     }
 
     VideoCompiler compiler(g_VideoLibArena);
-    if (!compiler.setVideo(std::move(fileData))) {
+    if (!compiler.process(std::move(fileData))) {
         X_ERROR("Video", "Failed to set source video data");
         return false;
     }

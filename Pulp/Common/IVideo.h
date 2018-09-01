@@ -9,6 +9,12 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(video)
 
+static const uint32_t VIDEO_VERSION = 1;
+static const uint32_t VIDEO_FOURCC = X_TAG('v', 'i', 'd', ' ');
+static const uint32_t VIDEO_MAX_TRACK = 1; // video
+static const uint32_t VIDEO_MAX_AUDIO_TRACK = 4;
+
+
 static const char* VIDEO_FILE_EXTENSION = "vid";
 
 static const uint32_t VIDEO_MAX_LOADED = 4;
@@ -41,5 +47,63 @@ struct IVideoSys : public core::IEngineSysBase
 
     virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 };
+
+// file types
+
+X_DECLARE_ENUM8(TrackType)(
+    Video,
+    Audio
+);
+
+X_PACK_PUSH(1)
+
+struct BlockHdr
+{
+    TrackType::Enum type;
+    bool isKey;
+    int64_t timeNS;
+    int32_t blockSize;
+};
+
+struct ClusterHdr
+{
+    int64_t timeNS;
+    int64_t durationNS;
+    int32_t numBlocks;
+};
+
+X_PACK_POP
+
+struct VideoTrackHdr
+{
+    int16_t pixelWidth;
+    int16_t pixelHeight;
+};
+
+struct AudioTrackHdr
+{
+    int16_t channels;
+    int16_t bitDepth;
+    int32_t sampleFreq;
+    int32_t headersSize;
+};
+
+struct VideoHeader
+{
+    uint32 fourCC;
+    uint8 version;
+
+    VideoTrackHdr video;
+    AudioTrackHdr audio;
+
+    X_INLINE bool isValid(void) const {
+        return fourCC == VIDEO_FOURCC;
+    }
+};
+
+X_ENSURE_SIZE(BlockHdr, 14);
+X_ENSURE_SIZE(ClusterHdr, 20);
+X_ENSURE_SIZE(VideoHeader, 24);
+
 
 X_NAMESPACE_END
