@@ -118,7 +118,7 @@ struct VideoLoadRequest
 
 class XVideoSys : public IVideoSys
 {
-    typedef core::AssetContainer<Video, VID_MAX_LOADED, core::SingleThreadPolicy> VideoContainer;
+    typedef core::AssetContainer<Video, VIDEO_MAX_LOADED, core::SingleThreadPolicy> VideoContainer;
     typedef VideoContainer::Resource VideoResource;
 
     typedef core::Array<VideoLoadRequest*> VideoLoadRequestArr;

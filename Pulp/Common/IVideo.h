@@ -11,7 +11,7 @@ X_NAMESPACE_BEGIN(video)
 
 static const char* VIDEO_FILE_EXTENSION = "vid";
 
-static const uint32_t VID_MAX_LOADED = 4;
+static const uint32_t VIDEO_MAX_LOADED = 4;
 
 struct IVideoLib : public IConverter
 {
