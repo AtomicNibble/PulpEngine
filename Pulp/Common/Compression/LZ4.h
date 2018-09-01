@@ -24,19 +24,33 @@ namespace Compression
         static size_t requiredDeflateDestBuf(size_t sourceLen);
 
         // none buffed single step inflate / deflate.
-        static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-            void* pDstBuf, size_t destBufLen, size_t& destLenOut,
+        static bool deflate(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen, size_t& destLenOut,
             CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
-        static bool inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
-            void* pDstBuf, size_t destBufLen);
+        static bool inflate(const void* pSrcBuf, size_t srcBufLen, void* pDstBuf, size_t destBufLen);
 
         template<typename T>
-        static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+        X_INLINE static bool deflate(const core::Array<T>& data,
             core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
         template<typename T>
-        static bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
+        X_INLINE static bool inflate(const core::Array<uint8_t>& data,
+            core::Array<T>& inflated);
+
+        // overlords taking swap arena (unused).
+        X_INLINE static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+            void* pDstBuf, size_t destBufLen, size_t& destLenOut,
+            CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+        X_INLINE static bool inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+            void* pDstBuf, size_t destBufLen);
+
+        template<typename T>
+        X_INLINE static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+            core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+        template<typename T>
+        X_INLINE static bool inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data,
             core::Array<T>& inflated);
 
     private:
@@ -49,12 +63,21 @@ namespace Compression
     {
     public:
         // none buffed single step inflate / deflate.
-        static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        static bool deflate(const void* pSrcBuf, size_t srcBufLen,
             void* pDstBuf, size_t destBufLen, size_t& destLenOut,
             CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
         template<typename T>
-        static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+        X_INLINE static bool deflate(const core::Array<T>& data,
+            core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+        // overlords taking swap arena (unused).
+        X_INLINE static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+            void* pDstBuf, size_t destBufLen, size_t& destLenOut,
+            CompressLevel::Enum lvl = CompressLevel::NORMAL);
+
+        template<typename T>
+        X_INLINE static bool deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
             core::Array<uint8_t>& compressed, CompressLevel::Enum lvl = CompressLevel::NORMAL);
 
     private:
@@ -113,7 +136,7 @@ namespace Compression
     // --------------------------------------------------------
 
     template<typename T>
-    X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+    X_INLINE bool LZ4::deflate(const core::Array<T>& data,
         core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
     {
         static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
@@ -123,25 +146,60 @@ namespace Compression
 
         compressed.resize(bufSize);
 
-        bool res = deflate(arena, data.ptr(), data.size() * sizeof(T),
+        bool res = deflate(data.ptr(), data.size() * sizeof(T),
             compressed.ptr(), compressed.size(), compressedSize, lvl);
 
         compressed.resize(compressedSize);
         return res;
+    }
+
+    template<typename T>
+    X_INLINE bool LZ4::inflate(const core::Array<uint8_t>& data, core::Array<T>& inflated)
+    {
+        static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+
+        return inflate(data.ptr(), data.size(), inflated.ptr(), inflated.size() * sizeof(T));
+    }
+
+    // strip swap area
+    X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
+
+        return deflate(pSrcBuf, srcBufLen, pDstBuf, destBufLen, destLenOut, lvl);
+    }
+
+    X_INLINE bool LZ4::inflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen)
+    {
+        X_UNUSED(arena);
+
+        return inflate(pSrcBuf, srcBufLen, pDstBuf, destBufLen);
+    }
+
+    template<typename T>
+    X_INLINE bool LZ4::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+        core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
+
+        return deflate<T>(data, compressed, lvl);
     }
 
     template<typename T>
     X_INLINE bool LZ4::inflate(core::MemoryArenaBase* arena, const core::Array<uint8_t>& data, core::Array<T>& inflated)
     {
-        static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
+        X_UNUSED(arena);
 
-        return inflate(arena, data.ptr(), data.size(), inflated.ptr(), inflated.size() * sizeof(T));
+        return inflate<T>(data, inflated);
     }
+
 
     // --------------------------------------------------------
 
     template<typename T>
-    X_INLINE bool LZ4HC::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+    X_INLINE bool LZ4HC::deflate(const core::Array<T>& data,
         core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
     {
         static_assert(compileTime::IsPOD<T>::Value, "T must be a POD type.");
@@ -151,12 +209,30 @@ namespace Compression
 
         compressed.resize(bufSize);
 
-        bool res = deflate(arena, data.ptr(), data.size() * sizeof(T),
+        bool res = deflate(data.ptr(), data.size() * sizeof(T),
             compressed.ptr(), compressed.size(), compressedSize, lvl);
 
         compressed.resize(compressedSize);
         return res;
     }
+
+    X_INLINE bool LZ4HC::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
+        void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
+
+        return deflate(pSrcBuf, srcBufLen, pDstBuf, destBufLen, destLenOut, lvl);
+    }
+
+    template<typename T>
+    X_INLINE bool LZ4HC::deflate(core::MemoryArenaBase* arena, const core::Array<T>& data,
+        core::Array<uint8_t>& compressed, CompressLevel::Enum lvl)
+    {
+        X_UNUSED(arena);
+
+        return deflate<T>(data, compressed, lvl);
+    }
+
 
 } // namespace Compression
 
