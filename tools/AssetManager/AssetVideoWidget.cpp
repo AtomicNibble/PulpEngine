@@ -29,7 +29,7 @@ AssetVideoWidget::AssetVideoWidget(QWidget *parent, IAssetEntry* pAssEntry, cons
 	// browse button
 	QToolButton* pBrowse = new QToolButton();
 	pBrowse->setText("...");
-	setPromptDialogFilter("Video (*.ivf)");
+	setPromptDialogFilter("Video (*.webm)");
 
 	connect(pBrowse, SIGNAL(clicked()), this, SLOT(browseClicked()));
 
@@ -145,7 +145,7 @@ QString AssetVideoWidget::makeDialogTitle(const QString& title)
 
 bool AssetVideoWidget::fileExtensionValid(const QString& path)
 {
-	if (path.endsWith(".ivf", Qt::CaseInsensitive))
+	if (path.endsWith(".webm", Qt::CaseInsensitive))
 	{
 		return true;
 	}
