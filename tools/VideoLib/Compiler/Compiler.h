@@ -70,6 +70,8 @@ public:
 private:
     core::MemoryArenaBase* arena_;
 
+    int64_t durationNS_;
+
     VideoTrackHdr videoTrack_;
     AudioTrack audioTrack_;
     ClusterArr clusters_;

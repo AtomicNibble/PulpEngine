@@ -61,14 +61,14 @@ struct BlockHdr
 {
     TrackType::Enum type;
     bool isKey;
-    int64_t timeNS;
+    int32_t timeMS;
     int32_t blockSize;
 };
 
 struct ClusterHdr
 {
-    int64_t timeNS;
-    int64_t durationNS;
+    int32_t timeMS;
+    int32_t durationMS;
     int32_t numBlocks;
 };
 
@@ -92,6 +92,9 @@ struct VideoHeader
 {
     uint32 fourCC;
     uint8 version;
+    uint8_t _pad[3];
+
+    int64_t durationNS;
 
     VideoTrackHdr video;
     AudioTrackHdr audio;
@@ -101,9 +104,9 @@ struct VideoHeader
     }
 };
 
-X_ENSURE_SIZE(BlockHdr, 14);
-X_ENSURE_SIZE(ClusterHdr, 20);
-X_ENSURE_SIZE(VideoHeader, 24);
+X_ENSURE_SIZE(BlockHdr, 10);
+X_ENSURE_SIZE(ClusterHdr, 12);
+X_ENSURE_SIZE(VideoHeader, 32);
 
 
 X_NAMESPACE_END

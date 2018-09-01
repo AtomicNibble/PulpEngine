@@ -3,6 +3,8 @@
 
 #include <IFileSys.h>
 
+#include <Compression\LZ4.h>
+
 X_NAMESPACE_BEGIN(video)
 
 namespace
@@ -59,6 +61,7 @@ namespace
 
 VideoCompiler::VideoCompiler(core::MemoryArenaBase* arena) :
     arena_(arena),
+    durationNS_(0),
     audioTrack_(arena),
     clusters_(arena)
 {
@@ -97,6 +100,12 @@ bool VideoCompiler::process(DataVec&& srcData)
     auto* pTracks = segment->GetTracks();
     if (!pTracks) {
         X_ERROR("Video", "Failed to get tracks");
+        return false;
+    }
+
+    auto* pSegmentInfo = segment->GetInfo();
+    if (!pSegmentInfo) {
+        X_ERROR("Video", "Failed to get segment info");
         return false;
     }
 
@@ -141,6 +150,8 @@ bool VideoCompiler::process(DataVec&& srcData)
 
     X_ASSERT_NOT_NULL(pVideoTrack);
     X_ASSERT_NOT_NULL(pAudioTrack);
+
+    durationNS_ = pSegmentInfo->GetDuration();
 
     videoTrack_.pixelWidth = safe_static_cast<int32_t>(pVideoTrack->GetWidth());
     videoTrack_.pixelHeight = safe_static_cast<int32_t>(pVideoTrack->GetHeight());
@@ -250,6 +261,16 @@ bool VideoCompiler::process(DataVec&& srcData)
         pCluster = segment->GetNext(pCluster);
     }
 
+    // compress vorbis header?
+    auto& data = audioTrack_.headers;
+    DataVec compData(arena_);
+
+    if (!core::Compression::LZ4HC::deflate(arena_, data, compData, core::Compression::CompressLevel::HIGH)) {
+        return false;
+    }
+
+    data.swap(compData);
+
     return true;
 }
 
@@ -260,9 +281,16 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
         return false;
     }
 
+    if (durationNS_ <= 0) {
+        X_ERROR("Video", "duration is zero");
+        return false;
+    }
+
     VideoHeader hdr;
+    core::zero_object(hdr);
     hdr.fourCC = VIDEO_FOURCC;
     hdr.version = VIDEO_VERSION;
+    hdr.durationNS = durationNS_;
     hdr.video = videoTrack_;
     hdr.audio.channels = audioTrack_.channels;
     hdr.audio.bitDepth = audioTrack_.bitDepth;
@@ -281,12 +309,14 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
         return false;
     }
 
+    const int64_t nanosecondsPerSecond = 1000000000;
+
     // write all the clusters.
     for (const auto& cluster : clusters_)
     {
         ClusterHdr clusterHdr;
-        clusterHdr.timeNS = cluster.timeNS;
-        clusterHdr.durationNS = cluster.durationNS;
+        clusterHdr.timeMS = safe_static_cast<int32_t>(cluster.timeNS / nanosecondsPerSecond);
+        clusterHdr.durationMS = safe_static_cast<int32_t>(cluster.durationNS / nanosecondsPerSecond);
         clusterHdr.numBlocks = safe_static_cast<decltype(clusterHdr.numBlocks)>(cluster.blocks.size());
 
         if (pFile->writeObj(clusterHdr) != sizeof(clusterHdr)) {
@@ -299,7 +329,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
             BlockHdr blockHdr;
             blockHdr.type = block.type;
             blockHdr.isKey = block.isKey;
-            blockHdr.timeNS = block.timeNS;
+            blockHdr.timeMS = safe_static_cast<int32_t>(block.timeNS / nanosecondsPerSecond);
             blockHdr.blockSize = safe_static_cast<decltype(blockHdr.blockSize)>(block.data.size());
 
             if (pFile->writeObj(blockHdr) != sizeof(blockHdr)) {
