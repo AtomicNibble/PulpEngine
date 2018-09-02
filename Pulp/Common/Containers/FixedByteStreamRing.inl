@@ -133,6 +133,30 @@ inline void FixedByteStreamRingBase::read(Type* pBuf, size_type numBytes)
 
 // -------------------------------
 
+
+template<typename T>
+inline void FixedByteStreamRingBase::peek(size_type offset, T* pVal, size_type num) const
+{
+    peek(offset, reinterpret_cast<Type*>(pVal), (sizeof(T) * num));
+}
+
+inline void FixedByteStreamRingBase::peek(size_type offset, Type* pBuf, size_type numBytes) const
+{
+    X_ASSERT(numBytes + offset <= size(), "Tried to read more bytes than avalible")(numBytes, offset, size(), freeSpace(), isEos());
+
+    size_type readIdx = (readByteIdx_ + offset) & mask_;
+    size_type bytesToCopy = core::Min(numBytes, numBytes_ - readIdx);
+
+    std::memcpy(pBuf, pBegin_ + readIdx, bytesToCopy);
+
+    if (bytesToCopy < numBytes) {
+        size_type trailing = numBytes - bytesToCopy;
+        std::memcpy(pBuf + bytesToCopy, pBegin_, trailing);
+    }
+}
+
+// -------------------------------
+
 template<typename T>
 inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
     FixedByteStreamRingBase::peek(void) const
@@ -158,13 +182,47 @@ inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_
     return t;
 }
 
+template<typename T>
+inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
+FixedByteStreamRingBase::peek(size_type offset) const
+{
+    X_ASSERT((sizeof(T) + offset) <= size(), "Tried to peek a type bigger than avalible bytes")(sizeof(T), size(), offset, freeSpace(), isEos());
+
+    size_type readIdx = (readByteIdx_ + offset) & mask_;
+    size_type bytesToCopy = core::Min(sizeof(T), numBytes_ - readIdx);
+
+    union
+    {
+        T t;
+        Type bytes[sizeof(T)];
+    };
+
+    std::memcpy(bytes, pBegin_ + readIdx, bytesToCopy);
+
+    if (bytesToCopy < sizeof(T)) {
+        size_type trailing = sizeof(T) - bytesToCopy;
+        std::memcpy(bytes + bytesToCopy, pBegin_, trailing);
+    }
+
+    return t;
+}
+
 // -------------------------------
+
+inline FixedByteStreamRingBase::size_type FixedByteStreamRingBase::absoluteToRelativeOffset(size_type offset) const
+{
+    X_ASSERT(offset <= capacity(), "Offset out of range")(offset, capacity());
+
+    return offset - tell();
+}
 
 inline void FixedByteStreamRingBase::skip(size_type numBytes)
 {
     X_ASSERT(numBytes <= size(), "Tried to skip more bytes than avalible")(numBytes, size(), freeSpace(), isEos());
 
     readByteIdx_ += numBytes;
+
+    X_ASSERT(readByteIdx_ <= byteIdx_, "read past write index")(readByteIdx_, byteIdx_);
 }
 
 inline void FixedByteStreamRingBase::zeroPadToLength(size_type numBytes)
@@ -209,6 +267,11 @@ inline typename FixedByteStreamRingBase::size_type FixedByteStreamRingBase::size
 inline typename FixedByteStreamRingBase::size_type FixedByteStreamRingBase::freeSpace(void) const
 {
     return capacity() - size();
+}
+
+inline typename FixedByteStreamRingBase::size_type FixedByteStreamRingBase::tell(void) const
+{
+    return readByteIdx_ & mask_;
 }
 
 inline bool FixedByteStreamRingBase::isEos(void) const

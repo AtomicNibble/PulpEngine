@@ -48,8 +48,21 @@ public:
     inline void read(Type* pBuf, size_type numBytes);
 
     template<typename T>
+    inline void peek(size_type offset, T* pVal, size_type num) const;
+
+    inline void peek(size_type offset, Type* pBuf, size_type numBytes) const;
+
+    // can't take refrence, only value.
+    // since the T may be lying on the end of the ring.
+    template<typename T>
     inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
         peek(void) const;
+
+    template<typename T>
+    inline typename std::enable_if<std::is_trivially_copyable<T>::value && !std::is_reference<T>::value, T>::type
+        peek(size_type offset) const;
+
+    inline size_type absoluteToRelativeOffset(size_type offset) const;
 
     // skips forwward in read pointer.
     inline void skip(size_type numBytes);
