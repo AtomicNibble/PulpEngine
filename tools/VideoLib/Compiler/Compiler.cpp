@@ -270,8 +270,36 @@ bool VideoCompiler::process(DataVec&& srcData)
         pCluster = segment->GetNext(pCluster);
     }
 
-    // compress vorbis header?
+    // validate vorbis header
+    auto* pData = audioHeaders_.data();
 
+    if (audioHeaders_.size() < 3) {
+        X_ERROR("Video", "Vorbis header too small");
+        return false;
+    }
+
+    int32_t numPackets = pData[0] + 1;
+    if (numPackets != 3) {
+        X_ERROR("Video", "Unsupported packed count: %" PRIi32, numPackets);
+        return false;
+    }
+
+    int32_t idHdrSize = pData[1];
+    int32_t commentHdrSize = pData[2];
+
+    auto* pIdHeader = &pData[3];
+    auto* pCommentHeader = pIdHeader + idHdrSize;
+
+    X_UNUSED(pIdHeader, pCommentHeader);
+
+    // check block is valid.
+    const size_t setupHeaderSize = audioHeaders_.size() - idHdrSize - commentHdrSize;
+    if ((idHdrSize + commentHdrSize + setupHeaderSize) != audioHeaders_.size()) {
+        X_ERROR("Video", "Invalid vorbis header size");
+        return false;
+    }
+
+    // compress vorbis header?
     DataVec compData(arena_);
 
     if (!core::Compression::LZ4HC::deflate(arena_, audioHeaders_, compData, core::Compression::CompressLevel::HIGH)) {
