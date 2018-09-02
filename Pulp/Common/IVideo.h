@@ -14,6 +14,7 @@ static const uint32_t VIDEO_FOURCC = X_TAG('v', 'i', 'd', ' ');
 static const uint32_t VIDEO_MAX_TRACK = 1; // video
 static const uint32_t VIDEO_MAX_AUDIO_TRACK = 4;
 
+static const uint32_t VIDEO_MAX_AUDIO_CHANNELS = 2;
 
 static const char* VIDEO_FILE_EXTENSION = "vid";
 

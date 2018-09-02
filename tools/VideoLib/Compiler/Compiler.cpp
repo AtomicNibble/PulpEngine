@@ -163,6 +163,11 @@ bool VideoCompiler::process(DataVec&& srcData)
     audioTrack_.bitDepth = safe_static_cast<int16_t>(pAudioTrack->GetBitDepth());
     audioTrack_.sampleFreq = safe_static_cast<int32_t>(pAudioTrack->GetSamplingRate());
 
+    if (audioTrack_.channels > VIDEO_MAX_AUDIO_CHANNELS) {
+        X_ERROR("Video", "Audio has unsupported channel count: %" PRIi32, audioTrack_.channels);
+        return false;
+    }
+
     // load the vorbis headers.
     {
         size_t vorbisHdrSize = 0;
