@@ -92,7 +92,7 @@ private:
     uint64_t fileOffset_; // the file offset we last read from.
     uint64_t fileLength_; // the total file length;
 
-    core::FixedByteStreamOwning ringBuffer_; // buffer that hold pending IO data.
+    core::FixedByteStreamRingOwning ringBuffer_; // buffer that hold pending IO data.
 
     DataVec ioBuffer_;     // file data read into here
     DataVec encodedFrame_; // a frame that's about to be decoded is place here.

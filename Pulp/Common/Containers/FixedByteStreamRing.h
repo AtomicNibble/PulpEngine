@@ -137,8 +137,8 @@ public:
     using StorageType::StorageType;
 };
 
-typedef FixedByteStreamRing<FixedByteStreamRingOwningPolicy> FixedByteStreamOwning;
-typedef FixedByteStreamRing<FixedByteStreamRingNoneOwningPolicy> FixedByteStreamNoneOwning;
+typedef FixedByteStreamRing<FixedByteStreamRingOwningPolicy> FixedByteStreamRingOwning;
+typedef FixedByteStreamRing<FixedByteStreamRingNoneOwningPolicy> FixedByteStreamRingNoneOwning;
 
 template<size_t N>
 using FixedByteStreamRingStack = FixedByteStreamRing<FixedByteStreamRingStackPolicy<N>>;
