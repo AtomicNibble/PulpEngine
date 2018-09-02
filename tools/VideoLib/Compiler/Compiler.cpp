@@ -263,6 +263,11 @@ bool VideoCompiler::process(DataVec&& srcData)
                         videoTrack_.largestFrameBytes = core::Max(videoTrack_.largestFrameBytes,
                             safe_static_cast<int32_t>(block.data.size()));
                     }
+                    else if (block.type == TrackType::Audio) {
+                        audioTrack_.numFrames++;
+                        audioTrack_.largestFrameBytes = core::Max(audioTrack_.largestFrameBytes,
+                            safe_static_cast<int32_t>(block.data.size()));
+                    }
                 }
 
                 status = pCluster->GetNext(pBlockEntry, pBlockEntry);
@@ -356,6 +361,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
     // write all the clusters.
     for (const auto& cluster : clusters_)
     {
+#if 0
         ClusterHdr clusterHdr;
         clusterHdr.timeMS = safe_static_cast<int32_t>(cluster.timeNS / nanosecondsPerMillisecond);
         clusterHdr.durationMS = safe_static_cast<int32_t>(cluster.durationNS / nanosecondsPerMillisecond);
@@ -365,6 +371,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
             X_ERROR("Video", "Failed to write data");
             return false;
         }
+#endif
 
         for (const auto& block : cluster.blocks)
         {

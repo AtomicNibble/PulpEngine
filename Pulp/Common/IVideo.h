@@ -66,13 +66,14 @@ struct BlockHdr
     int32_t blockSize;
 };
 
+#if 0
 struct ClusterHdr
 {
     int32_t timeMS;
     int32_t durationMS;
     int32_t numBlocks;
 };
-
+#endif
 
 struct VideoTrackHdr
 {
@@ -87,6 +88,9 @@ struct AudioTrackHdr
     int16_t channels;
     int16_t bitDepth;
     int32_t sampleFreq;
+    int32_t numFrames;
+    int32_t largestFrameBytes;
+
     int32_t deflatedHdrSize;
     int32_t inflatedHdrSize;
 };
@@ -110,8 +114,8 @@ struct VideoHeader
 X_PACK_POP
 
 X_ENSURE_SIZE(BlockHdr, 10);
-X_ENSURE_SIZE(ClusterHdr, 12);
-X_ENSURE_SIZE(VideoHeader, 44);
+// X_ENSURE_SIZE(ClusterHdr, 12);
+X_ENSURE_SIZE(VideoHeader, 52);
 
 
 X_NAMESPACE_END
