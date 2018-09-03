@@ -297,6 +297,100 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
     }
 }
 
+void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col,
+    float scaleMin, float scaleMax)
+{
+    auto arrayGetter = [](const void* pData, int32_t idx) -> float {
+        return reinterpret_cast<const float*>(pData)[idx];
+    };
+
+    int32_t num = safe_static_cast<int32_t>(pEnd - pBegin); 
+    if (num < 2) {
+        return;
+    }
+
+    drawGraph(rect, pBegin, num, arrayGetter, col, scaleMin, scaleMax);
+}
+
+void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, 
+    DataCallBack::Pointer dataFunc, Color8u col, float scaleMin, float scaleMax)
+{
+    int32_t num = safe_static_cast<int32_t>(numValues); 
+    if (num < 2) {
+        return;
+    }
+
+    // find min / max.
+    if(scaleMin == std::numeric_limits<float>::max() || scaleMax == std::numeric_limits<float>::lowest())
+    {
+        float min = std::numeric_limits<float>::max();
+        float max = std::numeric_limits<float>::lowest();
+
+        for (int32_t i = 0; i < num; i++)
+        {
+            const float v = dataFunc(pUserData, i);
+            min = core::Min(min, v);
+            max = core::Max(max, v);
+        }
+
+        if (scaleMin == std::numeric_limits<float>::max()) {
+            scaleMin = min;
+        }
+        if (scaleMax == std::numeric_limits<float>::lowest()) {
+            scaleMax = max;
+        }
+    }
+
+    const float range = scaleMax - scaleMin;
+
+    // we draw a max of width.
+    const int32_t res_w = core::Min((int)rect.getWidth(), num - 1);
+    const int32_t numItems = num - 1;
+
+    const float t_step = 1.0f / (float)res_w;
+    const float inv_scale = (scaleMin == scaleMax) ? 0.0f : (1.0f / (range));
+
+    const auto tl = rect.getUpperLeft();
+    const auto br = rect.getLowerRight();
+
+    float v0 = dataFunc(pUserData, 0);
+    float t0 = 0.0f;
+    Vec2f tp0 = Vec2f(t0, 1.0f - math<float>::saturate((v0 - scaleMin) * inv_scale));
+
+    drawQuad(rect, Color8u(20, 20, 20, 128));
+    drawRect(rect, Color8u(50, 50, 50, 128));
+
+    PrimVertex* pLine = addPrimative(res_w * 2, PrimitiveType::LINELIST);
+    
+    for (int32_t i = 0; i < res_w; i++)
+    {
+        const float t1 = t0 + t_step;
+
+        const int v1_idx = (int)(t0 * numItems + 0.5f);
+        X_ASSERT(v1_idx >= 0 && v1_idx < num, "Index out of range")(v1_idx, num);
+        const float v1 = dataFunc(pUserData, (v1_idx + 1) % num);
+
+        const auto tp1 = Vec2f(t1, 1.0f - math<float>::saturate((v1 - scaleMin) * inv_scale));
+
+        const auto pos0 = tl.lerp(tp0, br);
+        const auto pos1 = tl.lerp(tp1, br);
+
+        auto& l0 = pLine[(i * 2)];
+        auto& l1 = pLine[(i * 2) + 1];
+
+        l0.color = col;
+        l0.pos.x = pos0.x;
+        l0.pos.y = pos0.y;
+        l1.color = col;
+        l1.pos.x = pos1.x;
+        l1.pos.y = pos1.y;
+
+        // connect
+        t0 = t1;
+        tp0 = tp1;
+    }
+}
+
 void IPrimativeContext::drawTriangle(const Vec3f* pPoints, size_t numPoints, Color8u c0)
 {
     if (numPoints == 0) {

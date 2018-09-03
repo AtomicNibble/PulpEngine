@@ -5,6 +5,8 @@ struct Vertex_P3F_T2F_C4B;
 #include <IRender.h>
 #include <Math\XRect.h>
 
+#include <Traits\FunctionTraits.h>
+
 X_NAMESPACE_DECLARE(font, struct TextDrawContext);
 
 X_NAMESPACE_BEGIN(engine)
@@ -100,6 +102,14 @@ public:
     // ya fucking what!
     void drawBarChart(const Rectf& rect, uint32_t num, const float* pHeights,
         float padding, uint32_t max, Color8u col);
+
+    typedef core::traits::Function<float(const void* pData, int32_t idx)> DataCallBack;
+
+    void drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, 
+        float scaleMin = std::numeric_limits<float>::max(), float scaleMax = std::numeric_limits<float>::lowest());
+    void drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, DataCallBack::Pointer dataFunc, Color8u col,
+        float scaleMin = std::numeric_limits<float>::max(), float scaleMax = std::numeric_limits<float>::lowest());
+
 
     // Points
     X_INLINE void drawPoint(const Vec3f& pos, Color8u col, uint8_t size = 1);
