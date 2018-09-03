@@ -42,14 +42,14 @@ class Video : public core::AssetBase
     // if 44100 that's (44100 * 4) = 176400 bytes per second per channel
     static constexpr size_t AUDIO_RING_DECODED_BUFFER_SIZE = 1024 * 512; // 256KB just over 1 second buffer.
 
-    static constexpr size_t AUDIO_QUEUE_SIZE = 32;
+    static constexpr size_t FRAME_QUEUE_SIZE = 32;
 
 
     template<typename T>
     using ArrayFixedBaseAlign = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
 
     typedef ArrayFixedBaseAlign<uint8_t> DataVec;
-    typedef core::FixedFifo<size_t, AUDIO_QUEUE_SIZE> IntQueue;
+    typedef core::FixedFifo<size_t, FRAME_QUEUE_SIZE> IntQueue;
 
     typedef std::array<core::FixedByteStreamRingOwning, VIDEO_MAX_AUDIO_CHANNELS> AudioRingBufferChannelArr;
     typedef std::array<IntQueue, TrackType::ENUM_COUNT> TrackQueues;
@@ -121,7 +121,7 @@ private:
     bool ioRequestPending_;
 
     core::V2::Job* pDecodeJob_;
-    
+
     // Render texture
     render::IDeviceTexture* pTexture_;
 
