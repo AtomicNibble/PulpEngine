@@ -1571,8 +1571,7 @@ void XSound::executeCallback(AkPlayingID in_playingID, AkAudioBuffer* io_pBuffer
     }
     else {
         io_pBufferOut->eState = AK_NoDataReady;
-
-        X_LOG0("Sound", "Memory buffer starvation");
+        X_ERROR("Sound", "Memory buffer starvation");
     }
 }
 
