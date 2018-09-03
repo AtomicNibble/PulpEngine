@@ -163,7 +163,7 @@ private:
     void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
 
-    void ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
     void Cmd_ListVideo(core::IConsoleCmdArgs* pCmd);

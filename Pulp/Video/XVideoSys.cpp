@@ -280,7 +280,7 @@ void XVideoSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequest
             return;
         }
 
-        gEnv->pJobSys->CreateMemberJobAndRun<XVideoSys>(this, &XVideoSys::ProcessData_job,
+        gEnv->pJobSys->CreateMemberJobAndRun<XVideoSys>(this, &XVideoSys::processData_job,
             pLoadReq JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
     }
     else {
@@ -288,7 +288,7 @@ void XVideoSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequest
     }
 }
 
-void XVideoSys::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+void XVideoSys::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
