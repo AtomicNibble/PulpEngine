@@ -287,6 +287,10 @@ struct math<double>
     {
         return (x < min) ? min : ((x > max) ? max : x);
     }
+    X_INLINE static constexpr double saturate(double val)
+    {
+        return (val < 0.0) ? 0.0 : (val > 1.0) ? 1.0 : val;
+    }
 
     X_INLINE static void sincos(double x, double& s, double& c)
     {
@@ -434,6 +438,10 @@ struct math<float>
     {
         return (x < min) ? min : ((x > max) ? max : x);
     }
+    X_INLINE static constexpr float saturate(float val)
+    {
+        return (val < 0.0f) ? 0.0f : (val > 1.0f) ? 1.0f : val;
+    }
 
     X_INLINE static void sincos(float x, float& s, float& c)
     {
@@ -485,6 +493,7 @@ struct math<int>
         return (x < min) ? min : ((x > max) ? max : x);
     }
 
+    
     X_INLINE static int32 isneg(int32 x)
     {
         return (int32)((uint32)x >> 31);
