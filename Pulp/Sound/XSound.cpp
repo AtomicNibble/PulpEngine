@@ -1531,8 +1531,8 @@ void XSound::getFormatCallback(AkPlayingID in_playingID, AkAudioFormat& io_Audio
 
     // TODO: allow customisation.
     io_AudioFormat.SetAll(
-        48000,                  // Sample rate
-        AkChannelConfig(1, AK_SPEAKER_SETUP_MONO),
+        44100,                  // Sample rate
+        AkChannelConfig(2, AK_SPEAKER_SETUP_STEREO),
         32,						// Bits per samples
         4,						// bytes per samples
         AK_FLOAT,			    // feeding floats
