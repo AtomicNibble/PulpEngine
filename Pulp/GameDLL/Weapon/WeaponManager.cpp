@@ -141,7 +141,7 @@ namespace weapon
 
     bool WeaponDefManager::waitForLoad(WeaponDef* pWeaponDef)
     {
-        if (pWeaponDef->getStatus() == core::LoadStatus::Complete) {
+        if (pWeaponDef->isLoaded()) {
             return true;
         }
 
