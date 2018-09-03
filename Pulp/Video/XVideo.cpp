@@ -12,6 +12,8 @@
 #include <IFrameData.h>
 
 #include <ISound.h>
+
+#include <IFont.h>
 #include <IPrimativeContext.h>
 
 X_NAMESPACE_BEGIN(video)
@@ -826,28 +828,52 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
         ioBufferData.push_back(static_cast<float>(val));
     }
 
+    font::TextDrawContext ctx;
+    ctx.col = Col_Wheat;
+    ctx.pFont = gEnv->pFontSys->getDefault();
+    ctx.size = Vec2f(16.f, 16.f);
+
+    Vec2f textOff(0, ctx.size.y + 6.f);
     Vec2f offset(0, size.y + padding);
 
     {
         Rectf box(r);
-        box.include(Vec2f(r.x1, r.y1 + (offset.y * 4)));
-        box.inflate(Vec2f(10.f, 10.f));
+        box.include(Vec2f(r.x1, r.y1 + ((offset.y + textOff.y) * 4)));
+        box.inflate(Vec2f(10.f, 16.f));
 
         pPrim->drawQuad(box, Color8u(2, 2, 2, 200));
     }
 
+
+    core::StackString<64> txt;
+    core::HumanSize::Str sizeStr0, sizeStr1;
+    txt.setFmt("IO: %s/%s", core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
+        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE));
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
     pPrim->drawGraph(r, ioBufferData.begin(), ioBufferData.end(), Col_Orange, 0.f, static_cast<float>(IO_RING_BUFFER_SIZE));
     r += offset;
 
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++)
     {
-        pPrim->drawGraph(r, queueSizeData[i].begin(), queueSizeData[i].end(), Col_Orange, 0.f, static_cast<float>(AUDIO_QUEUE_SIZE));
+        txt.setFmt("%s %" PRIuS "/%" PRIuS, TrackType::ToString(i), trackQueues_[i].size(), FRAME_QUEUE_SIZE);
+        
+        auto& data = queueSizeData[i];
+        pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+        r += textOff;
+        pPrim->drawGraph(r, data.begin(), data.end(), Col_Orange, 0.f, static_cast<float>(FRAME_QUEUE_SIZE));
         r += offset;
     }
 
+    txt.setFmt("AudioBuf: %s/%s",
+        core::HumanSize::toString(sizeStr0, audioRingBuffers_.front().size()),
+        core::HumanSize::toString(sizeStr1, AUDIO_RING_DECODED_BUFFER_SIZE));
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
     pPrim->drawGraph(r, audioBufferData.begin(), audioBufferData.end(), Col_Orange, 0.f, static_cast<float>(AUDIO_RING_DECODED_BUFFER_SIZE));
 
-    // need me some fooking labels.
 
     return size;
 #endif // !X_ENABLE_VIDEO_DEBUG
