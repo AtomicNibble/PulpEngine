@@ -6,6 +6,11 @@
 #include <String\AssetName.h>
 #include <IConsole.h>
 
+#include <I3DEngine.h>
+
+X_NAMESPACE_DECLARE(engine,
+    class IPrimativeContext);
+
 X_NAMESPACE_BEGIN(video)
 
 // -----------------------------------------------
@@ -60,6 +65,14 @@ void XVideoSys::update(const core::FrameTimeData& frameTimeInfo)
         auto* pVideoRes = video.second;
 
         pVideoRes->update(frameTimeInfo);
+    }
+
+    if (vars_.drawDebug()) {
+        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
+
+        Vec2f pos(20, 100);
+
+        drawDebug(pPrim, pos);
     }
 }
 
@@ -341,6 +354,26 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
     }
 
     X_LOG0("Video", "------------ ^8Videos End^7 --------------");
+}
+
+Vec2f XVideoSys::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
+{
+    Vec2f size;
+    const float padding = 10.f;
+
+    core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+    for (const auto& video : videos_) {
+        auto* pVideoRes = video.second;
+        if (!pVideoRes->isLoaded()) {
+            continue;
+        }
+
+        size += pVideoRes->drawDebug(pPrim, pos + size);
+        size.y += padding;
+    }
+
+    return size;
 }
 
 void XVideoSys::Cmd_ListVideo(core::IConsoleCmdArgs* pCmd)

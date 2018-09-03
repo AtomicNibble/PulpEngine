@@ -12,6 +12,7 @@
 #include <IFrameData.h>
 
 #include <ISound.h>
+#include <IPrimativeContext.h>
 
 X_NAMESPACE_BEGIN(video)
 
@@ -777,6 +778,79 @@ void Video::decodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     if (!decodeFrame()) {
         X_ERROR("Video", "Failed to decode frame");
     }
+}
+
+Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
+{
+#if !X_ENABLE_VIDEO_DEBUG
+    X_UNUSED(pPrim, pos);
+
+    return Vec2f::zero();
+#else
+
+    // draw me some shit!
+    Vec2f size(600, 60);
+    Rectf r(pos, pos + size);
+        
+    const float padding = 16.f;
+
+    // update graphs.
+    for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++) {
+        queueSizes_[i].push_back(safe_static_cast<int16_t>(trackQueues_[i].size()));
+    }
+
+    audioBufferSize_.push_back(safe_static_cast<int32_t>(audioRingBuffers_.front().size()));
+    ioBufferSize_.push_back(safe_static_cast<int32_t>(ioRingBuffer_.size()));
+
+    // build linera array
+    typedef core::FixedArray<float, FRAME_HISTORY_SIZE> PlotData;
+
+    PlotData queueSizeData[TrackType::ENUM_COUNT];
+    PlotData audioBufferData;
+    PlotData ioBufferData;
+
+    for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++) {
+        auto& queue = queueSizes_[i];
+        auto& data = queueSizeData[i];
+
+        for (auto val : queue) {
+            data.push_back(static_cast<float>(val));
+        }
+    }
+
+    for (auto val : audioBufferSize_) {
+        audioBufferData.push_back(static_cast<float>(val));
+    }
+
+    for (auto val : ioBufferSize_) {
+        ioBufferData.push_back(static_cast<float>(val));
+    }
+
+    Vec2f offset(0, size.y + padding);
+
+    {
+        Rectf box(r);
+        box.include(Vec2f(r.x1, r.y1 + (offset.y * 4)));
+        box.inflate(Vec2f(10.f, 10.f));
+
+        pPrim->drawQuad(box, Color8u(2, 2, 2, 200));
+    }
+
+    pPrim->drawGraph(r, ioBufferData.begin(), ioBufferData.end(), Col_Orange, 0.f, static_cast<float>(IO_RING_BUFFER_SIZE));
+    r += offset;
+
+    for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++)
+    {
+        pPrim->drawGraph(r, queueSizeData[i].begin(), queueSizeData[i].end(), Col_Orange, 0.f, static_cast<float>(AUDIO_QUEUE_SIZE));
+        r += offset;
+    }
+
+    pPrim->drawGraph(r, audioBufferData.begin(), audioBufferData.end(), Col_Orange, 0.f, static_cast<float>(AUDIO_RING_DECODED_BUFFER_SIZE));
+
+    // need me some fooking labels.
+
+    return size;
+#endif // !X_ENABLE_VIDEO_DEBUG
 }
 
 X_NAMESPACE_END
