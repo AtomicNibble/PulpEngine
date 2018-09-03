@@ -501,7 +501,7 @@
     <ClInclude Include="Vars\FileSysVars.h" />
     <ClInclude Include="Vars\ProfilerVars.h" />
     <ClInclude Include="win32\SystemTimer.h" />
-    <ClInclude Include="XProfile.h" />
+    <ClInclude Include="Profile\XProfile.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Console.cpp" />
@@ -556,7 +556,7 @@
     <None Include="Vars\CoreVars.inl" />
     <None Include="Vars\ProfilerVars.inl" />
     <None Include="win32\SystemTimer.inl" />
-    <None Include="XProfile.inl" />
+    <None Include="Profile\XProfile.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

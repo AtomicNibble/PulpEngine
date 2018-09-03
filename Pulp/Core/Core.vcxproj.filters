@@ -80,9 +80,6 @@
     <ClInclude Include="CoreEventDispatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="XProfile.h">
-      <Filter>Header Files\Profile</Filter>
-    </ClInclude>
     <ClInclude Include="win32\SystemTimer.h">
       <Filter>Header Files\win32</Filter>
     </ClInclude>
@@ -139,6 +136,9 @@
     </ClInclude>
     <ClInclude Include="FileSys\Pak.h">
       <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
+    <ClInclude Include="Profile\XProfile.h">
+      <Filter>Header Files\Profile</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -243,14 +243,14 @@
     <None Include="Vars\ProfilerVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
-    <None Include="XProfile.inl">
-      <Filter>Header Files\Profile</Filter>
-    </None>
     <None Include="Vars\CoreVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
     <None Include="FileSys\win32\OsFileAsyncOperation.inl">
       <Filter>Header Files\FileSys\win32</Filter>
+    </None>
+    <None Include="Profile\XProfile.inl">
+      <Filter>Header Files\Profile</Filter>
     </None>
   </ItemGroup>
 </Project>
