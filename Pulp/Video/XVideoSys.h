@@ -5,7 +5,6 @@
 
 #include <Assets\AssertContainer.h>
 
-#include "IVFTypes.h"
 
 X_NAMESPACE_DECLARE(core,
                     namespace V2 {
