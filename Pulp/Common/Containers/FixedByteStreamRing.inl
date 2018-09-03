@@ -213,7 +213,11 @@ inline FixedByteStreamRingBase::size_type FixedByteStreamRingBase::absoluteToRel
 {
     X_ASSERT(offset <= capacity(), "Offset out of range")(offset, capacity());
 
-    return offset - tell();
+    auto readOffset = tell();
+
+    X_ASSERT(readOffset <= offset, "Offset is lower than read location")(readOffset, offset);
+
+    return offset - readOffset;
 }
 
 inline void FixedByteStreamRingBase::skip(size_type numBytes)
