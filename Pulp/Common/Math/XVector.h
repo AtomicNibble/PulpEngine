@@ -312,6 +312,11 @@ public:
         return (*this) + (r - (*this)) * fact;
     }
 
+    X_INLINE Vec2<T> lerp(const Vec2<T>& fact, const Vec2<T>& r) const
+    {
+        return Vec2<T>(x + (r.x - x) * fact.x, y + (r.y - y) * fact.y);
+    }
+
     X_INLINE void lerpEq(T fact, const Vec2<T>& rhs)
     {
         x = x + (rhs.x - x) * fact;
