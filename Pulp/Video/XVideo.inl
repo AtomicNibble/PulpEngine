@@ -8,12 +8,12 @@ X_INLINE VideoState::Enum Video::getState(void) const
 
 X_INLINE uint16_t Video::getWidth(void) const
 {
-    return width_;
+    return video_.pixelWidth;
 }
 
 X_INLINE uint16_t Video::getHeight(void) const
 {
-    return height_;
+    return video_.pixelHeight;
 }
 
 X_INLINE uint32_t Video::getFps(void) const
@@ -23,7 +23,7 @@ X_INLINE uint32_t Video::getFps(void) const
 
 X_INLINE uint32_t Video::getNumFrames(void) const
 {
-    return numFrames_;
+    return video_.numFrames;
 }
 
 X_INLINE uint32_t Video::getCurFrame(void) const
@@ -31,9 +31,9 @@ X_INLINE uint32_t Video::getCurFrame(void) const
     return curFrame_;
 }
 
-X_INLINE size_t Video::getBufferSize(void) const
+X_INLINE size_t Video::getIOBufferSize(void) const
 {
-    return ringBuffer_.size();
+    return ioRingBuffer_.size();
 }
 
 X_INLINE bool Video::hasFrame(void) const

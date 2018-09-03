@@ -4,7 +4,10 @@
 #include <Threading\Signal.h>
 
 #include <Containers\FixedByteStreamRing.h>
+#include <Containers\FixedFifo.h>
 #include <Time\TimeVal.h>
+
+#include <ISound.h>
 
 X_NAMESPACE_DECLARE(core,
                     struct IoRequestBase;
@@ -23,15 +26,28 @@ struct FrameData
 X_DECLARE_ENUM8(VideoState)
 (
     Playing,
-    Stopped);
+    Stopped
+);
 
 class Video : public core::AssetBase
     , public IVideo
 {
-    const size_t IO_BUFFER_SIZE = 1024 * 128;
-    const size_t RING_BUFFER_SIZE = 1024 * 1024 * 1; // 1MB
+    static constexpr size_t IO_REQUEST_SIZE = 1024 * 1024 * 4;
+    static constexpr size_t IO_RING_BUFFER_SIZE = 1024 * 1024 * 8; // 1MB
 
-    typedef core::Array<uint8_t, core::ArrayAlignedAllocatorFixed<uint8_t, 64>, core::growStrat::Multiply> DataVec;
+    // if 44100 that's (44100 * 4) = 176400 bytes per second
+    static constexpr size_t AUDIO_RING_DECODED_BUFFER_SIZE = 1024 * 512; // 256KB just over 1 second buffer.
+
+    static_assert(IO_RING_BUFFER_SIZE % IO_REQUEST_SIZE == 0, "Ring buffer not a multiple of IO request size");
+
+    template<typename T>
+    using ArrayFixedBaseAlign = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
+
+    typedef ArrayFixedBaseAlign<uint8_t> DataVec;
+    typedef core::FixedFifo<size_t, 32> IntQueue;
+
+    typedef std::array<core::FixedByteStreamRingOwning, VIDEO_MAX_AUDIO_CHANNELS> AudioRingBufferChannelArr;
+    typedef std::array<IntQueue, TrackType::ENUM_COUNT> TrackQueues;
 
 public:
     Video(core::string name, core::MemoryArenaBase* arena);
@@ -42,7 +58,7 @@ public:
 
     render::TexID getTextureID(void) const X_FINAL;
 
-    bool processHdr(core::XFileAsync* pFile, const IVFHdr& hdr);
+    bool processHdr(core::XFileAsync* pFile, core::span<uint8_t> data);
 
     X_INLINE VideoState::Enum getState(void) const;
     X_INLINE uint16_t getWidth(void) const;
@@ -50,10 +66,16 @@ public:
     X_INLINE uint32_t getFps(void) const;
     X_INLINE uint32_t getNumFrames(void) const;
     X_INLINE uint32_t getCurFrame(void) const;
-    X_INLINE size_t getBufferSize(void) const;
+    X_INLINE size_t getIOBufferSize(void) const;
     X_INLINE bool hasFrame(void) const;
 
 private:
+    bool processVorbisHeader(core::span<uint8_t> data);
+    bool decodeAudioPacket(core::span<uint8_t> data);
+    void validateAudioBufferSizes(void) const;
+
+    void audioDataRequest(sound::AudioBuffer& ab);
+
     void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
 
@@ -67,15 +89,15 @@ private:
 private:
     vpx_codec_ctx_t codec_;
 
-    uint16_t width_;
-    uint16_t height_;
-    uint32_t frameRate_;
-    uint32_t timeScale_;
-    uint32_t numFrames_;
-    uint32_t curFrame_;
+    VideoTrackHdr video_;
+    AudioTrackHdr audio_;
+
+    int32_t frameRate_;
+    int32_t curFrame_;
 
     core::TimeVal timeSinceLastFrame_;
     core::TimeVal timePerFrame_;
+    core::TimeVal playTime_;
 
     VideoState::Enum state_;
     bool presentFrame_;
@@ -83,6 +105,9 @@ private:
     bool ioRequestPending_;
 
     core::V2::Job* pDecodeJob_;
+    
+    // Render texture
+    render::IDeviceTexture* pTexture_;
 
     // Loading stuff
     core::CriticalSection cs_;
@@ -92,14 +117,34 @@ private:
     uint64_t fileOffset_; // the file offset we last read from.
     uint64_t fileLength_; // the total file length;
 
-    core::FixedByteStreamRingOwning ringBuffer_; // buffer that hold pending IO data.
+    int32_t currentCluster_;
+    int32_t blocksLeft_;
 
-    DataVec ioBuffer_;     // file data read into here
-    DataVec encodedFrame_; // a frame that's about to be decoded is place here.
+    // IO Buffers
+    core::FixedByteStreamRingOwning ioRingBuffer_;  // buffer holding loaded IO data, ready for processing.
+    DataVec ioReqBuffer_;                           // file data read into here, then moved into ringBuffer_
+
+    int32_t ioBufferReadOffset_;
+
+    // packet buffer queues
+    TrackQueues trackQueues_;
+
+    // Video buffers
+    DataVec encodedFrame_; // a frame that's about to be decoded is placed here.
     DataVec decodedFrame_; // a decoded frame, read for uploading to gpu.
 
-    // device
-    render::IDeviceTexture* pTexture_;
+    // sound stuff
+    int64_t oggPacketCount_;
+    int64_t oggFramesDecoded_;
+
+    vorbis_info      vorbisInfo_;       // struct that stores all the static vorbis bitstream settings
+    vorbis_comment   vorbisComment_;    // struct that stores all the bitstream user comments
+    vorbis_dsp_state vorbisDsp_;        // central working state for the packet->PCM decoder
+    vorbis_block     vorbisBlock_;      // local working space for packet->PCM decode
+
+    core::CriticalSection audioCs_;
+    DataVec encodedAudioFrame_;                         // encoded audio
+    AudioRingBufferChannelArr audioRingBuffers_;        // decoded audio, ready for sound system.
 };
 
 X_NAMESPACE_END

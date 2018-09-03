@@ -55,7 +55,6 @@ X_NAMESPACE_BEGIN(video)
 
 */
 
-typedef core::Array<uint8_t> DataVec;
 
 #if 0
 
@@ -100,20 +99,24 @@ protected:
 
 #endif
 
+typedef core::Array<uint8_t> DataVec;
+
 class Video;
 
+// Problem with using assetLoader for this is that i need to keep the file handle open after.
+// and continue to make additonal requests.
 struct VideoLoadRequest
 {
-    VideoLoadRequest(Video* pVideo) :
+    VideoLoadRequest(core::MemoryArenaBase* arena, Video* pVideo) :
         pFile(nullptr),
-        pVideo(pVideo)
+        pVideo(pVideo),
+        buffer(arena)
     {
-        core::zero_object(hdr);
     }
 
     core::XFileAsync* pFile;
     Video* pVideo;
-    IVFHdr hdr;
+    DataVec buffer;
 };
 
 class XVideoSys : public IVideoSys

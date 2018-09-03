@@ -30,8 +30,8 @@ void XVideoSys::registerCmds(void)
 
 bool XVideoSys::init(void)
 {
-#if 0
-    auto* pVideo = loadVideo("test/rick_roll");
+#if 1
+    auto* pVideo = loadVideo("test/waiting_all_night");
 
     waitForLoad(pVideo);
 #endif
@@ -183,7 +183,8 @@ void XVideoSys::queueLoadRequest(VideoResource* pVideoRes)
 
     core::CriticalSection::ScopedLock lock(loadReqLock_);
 
-    auto loadReq = core::makeUnique<VideoLoadRequest>(arena_, pVideoRes);
+    auto loadReq = core::makeUnique<VideoLoadRequest>(arena_, blockArena_, pVideoRes);
+    loadReq->buffer.resize(1024 * 16); // 16k baby!
 
     dispatchLoadRequest(loadReq.get());
 
@@ -250,30 +251,31 @@ void XVideoSys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequest
 
         pLoadReq->pFile = pFile;
 
+        auto fileSize = pFile->fileSize();
+        auto readSize = core::Min(pLoadReq->buffer.size(), static_cast<size_t>(fileSize));
+
+        // should not result in allocation.
+        pLoadReq->buffer.resize(readSize);
+
         // read the header.
         core::IoRequestRead read;
         read.callback.Bind<XVideoSys, &XVideoSys::IoRequestCallback>(this);
         read.pUserData = pLoadReq;
         read.pFile = pFile;
-        read.dataSize = sizeof(pLoadReq->hdr);
+        read.dataSize = safe_static_cast<uint32_t>(pLoadReq->buffer.size());
         read.offset = 0;
-        read.pBuf = &pLoadReq->hdr;
+        read.pBuf = pLoadReq->buffer.data();
         fileSys.AddIoRequestToQue(read);
     }
     else if (requestType == core::IoRequest::READ) {
         const core::IoRequestRead* pReadReq = static_cast<const core::IoRequestRead*>(pRequest);
 
-        if (pReadReq->pBuf != &pLoadReq->hdr) {
+        if (pReadReq->pBuf != pLoadReq->buffer.data()) {
             X_ASSERT_UNREACHABLE();
         }
-        if (bytesTransferred != sizeof(pLoadReq->hdr)) {
-            X_ERROR("Video", "Failed to read video header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, sizeof(pLoadReq->hdr));
-            onLoadRequestFail(pLoadReq);
-            return;
-        }
 
-        if (!pLoadReq->hdr.isValid()) {
-            X_ERROR("Video", "\"%s\" video header is invalid", pVideo->getName().c_str());
+        if (bytesTransferred != pLoadReq->buffer.size()) {
+            X_ERROR("Video", "Failed to read video header. Got: 0x%" PRIx32 " need: 0x%" PRIxS, bytesTransferred, pLoadReq->buffer.size());
             onLoadRequestFail(pLoadReq);
             return;
         }
@@ -293,7 +295,7 @@ void XVideoSys::ProcessData_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
     auto* pLoadReq = static_cast<VideoLoadRequest*>(X_ASSERT_NOT_NULL(pData));
     auto* pVideo = pLoadReq->pVideo;
 
-    if (pVideo->processHdr(pLoadReq->pFile, pLoadReq->hdr)) {
+    if (pVideo->processHdr(pLoadReq->pFile, core::make_span(pLoadReq->buffer))) {
         pVideo->setStatus(core::LoadStatus::Complete);
     }
     else {
@@ -332,7 +334,7 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
                         " Frame: ^2%" PRIu32 "/%" PRIu32 "^7 BufferSize: ^2%s^7 State: ^2%s^7 Refs:^2%" PRIi32,
             pVideo->getName(), pVideo->getWidth(), pVideo->getHeight(), pVideo->getFps(),
             pVideo->getCurFrame(), pVideo->getNumFrames(),
-            core::HumanSize::toString(sizeStr, pVideo->getBufferSize()),
+            core::HumanSize::toString(sizeStr, pVideo->getIOBufferSize()),
             VideoState::ToString(pVideo->getState()),
             pVideo->getRefCount());
     }
