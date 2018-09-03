@@ -156,3 +156,42 @@ TYPED_TEST(FixedFifoTest, Iteration)
 
     EXPECT_EQ(CustomType2::CONSTRUCTION_COUNT, CustomType2::DECONSTRUCTION_COUNT);
 }
+
+TEST(FixedFifoTest, WrapAround)
+{
+    // test inserting and pop so that we wrap around.
+    constexpr size_t size = 4;
+    constexpr size_t loops = 64;
+    size_t value = 0;
+
+    FixedFifo<size_t, size> fifo;
+
+    ASSERT_EQ(size, fifo.capacity());
+
+    for (size_t i = 0; i < size; i++) {
+        fifo.push(value++);
+        EXPECT_EQ(0, fifo.peek());
+    }
+
+    EXPECT_EQ(size, fifo.size());
+    ASSERT_EQ(0, fifo.freeSpace());
+
+    for (size_t i = 0; i < loops; i++)
+    {
+        EXPECT_EQ(value - size, fifo.peek());
+        fifo.pop();
+        EXPECT_EQ(value - (size - 1), fifo.peek());
+        fifo.push(value++);
+    }
+
+    EXPECT_EQ(size, fifo.size());
+    ASSERT_EQ(0, fifo.freeSpace());
+
+    for (size_t i = 0; i < size; i++) {
+        EXPECT_EQ(value - (size - i), fifo.peek());
+        fifo.pop();
+    }
+
+    EXPECT_EQ(0, fifo.size());
+    ASSERT_EQ(size, fifo.freeSpace());
+}
