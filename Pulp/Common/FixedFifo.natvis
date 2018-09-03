@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AutoVisualizer xmlns="http://schemas.microsoft.com/vstudio/debugger/natvis/2010">
+  <Type Name="Potato::core::FixedFifo&lt;*&gt;">
+    <Expand>
+      <Item Name="[size]" ExcludeView="simple">num_</Item>
+      <Item Name="[capacity]" ExcludeView="simple">$T2</Item>
+      <Item Name="[freespace]" ExcludeView="simple">$T2 - num_</Item>
+      <Item Name="[read]" ExcludeView="simple">($T1*)read_</Item>
+      <Item Name="[read-idx]" ExcludeView="simple">($T1*)read_ - ($T1*)array_</Item>
+      <Item Name="[write]" ExcludeView="simple">($T1*)write_</Item>
+      <Item Name="[write-idx]" ExcludeView="simple">($T1*)write_ - ($T1*)array_</Item>
+      <Item Name="[begin]" ExcludeView="simple">($T1*)array_</Item>
+      <Item Name="[end]" ExcludeView="simple">($T1*)(array_ + $T2)</Item>
+      <ArrayItems>
+        <Size>num_</Size>
+        <ValuePointer>($T1*)array_</ValuePointer>
+      </ArrayItems>
+    </Expand>
+  </Type>
+</AutoVisualizer>

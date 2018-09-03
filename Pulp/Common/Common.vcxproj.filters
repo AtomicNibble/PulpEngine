@@ -2147,5 +2147,8 @@
     <Natvis Include="FixedByteStreamRing.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="FixedFifo.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>
