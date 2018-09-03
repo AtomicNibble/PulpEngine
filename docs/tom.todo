@@ -48,6 +48,19 @@ Video:
 
   ☐ Support audio sync, somehow.
     Think created vorbis audio then decoded myself and feeding into wwise via Audio Input will be the wayto go.
+    So for wise I need to make a audio SFX object and instead of importing a wav I add a Audio Input source.
+    Then I need play and stop events attached to that event, then I post that event to a game object.
+    which will trigger the Audio Input source plugin to start calling my callbacks for data (kinky)
+    The plugin tell me the playing id so I need to know what data it wants based on playing id, which I will get from posting the event.
+
+     ✔ Change it so I take webm as source format but then process it so we get something simular to IVF but with vorbis audio. @done (18-09-01 20:51)
+
+     ✔ Add support for decoding vorbis audio. @done (18-09-03 22:53)
+       I probs want to store video and audio buffers next to each other in file so can load as blocks.
+       Since webm stores video and audio data interleved i just leave it like that.
+ ☐ Fix frame lookahead when IO buffer wraps around.
+ ☐ Actually use the display times for video frames / audio.
+
 
 Render:
 
@@ -69,3 +82,9 @@ AssetPak:
 LevelBuilder:
 
   ☐ Generate asset lists for level
+
+ UnitTests:
+
+   Containers:
+     ☐ FixedByteStream
+     ☐ FixedByteStreamRing
