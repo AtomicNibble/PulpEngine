@@ -56,6 +56,7 @@ X_DECLARE_ENUM8(TrackType)(
     Audio
 );
 
+
 X_PACK_PUSH(1)
 
 struct BlockHdr
@@ -65,15 +66,6 @@ struct BlockHdr
     int32_t timeMS;
     int32_t blockSize;
 };
-
-#if 0
-struct ClusterHdr
-{
-    int32_t timeMS;
-    int32_t durationMS;
-    int32_t numBlocks;
-};
-#endif
 
 struct VideoTrackHdr
 {
@@ -95,6 +87,13 @@ struct AudioTrackHdr
     int32_t inflatedHdrSize;
 };
 
+struct BufferSizes
+{
+    int32_t maxBytesFor100MS;
+    int32_t maxBytesFor250MS;
+    int32_t maxBytesFor500MS;
+};
+
 struct VideoHeader
 {
     uint32 fourCC;
@@ -106,6 +105,9 @@ struct VideoHeader
     VideoTrackHdr video;
     AudioTrackHdr audio;
 
+    // the max amount of compressed data needed for a 500ms buffer.
+    BufferSizes bufferInfo;
+
     X_INLINE bool isValid(void) const {
         return fourCC == VIDEO_FOURCC;
     }
@@ -114,8 +116,7 @@ struct VideoHeader
 X_PACK_POP
 
 X_ENSURE_SIZE(BlockHdr, 10);
-// X_ENSURE_SIZE(ClusterHdr, 12);
-X_ENSURE_SIZE(VideoHeader, 52);
+X_ENSURE_SIZE(VideoHeader, 64);
 
 
 X_NAMESPACE_END

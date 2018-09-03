@@ -54,9 +54,13 @@ public:
     bool writeToFile(core::XFile* pFile) const;
 
 private:
+    size_t getBufferSizeForWindow(int32_t bufferMS) const;
+
+private:
     core::MemoryArenaBase* arena_;
 
     int64_t durationNS_;
+    BufferSizes bufSizes_;
 
     VideoTrackHdr videoTrack_;
     AudioTrackHdr audioTrack_;

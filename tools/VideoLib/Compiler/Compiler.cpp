@@ -4,6 +4,7 @@
 #include <IFileSys.h>
 
 #include <Compression\LZ4.h>
+#include <Containers\Fifo.h>
 
 X_NAMESPACE_BEGIN(video)
 
@@ -67,6 +68,7 @@ VideoCompiler::VideoCompiler(core::MemoryArenaBase* arena) :
 {
     core::zero_object(videoTrack_);
     core::zero_object(audioTrack_);
+    core::zero_object(bufSizes_);
 }
 
 VideoCompiler::~VideoCompiler()
@@ -280,6 +282,10 @@ bool VideoCompiler::process(DataVec&& srcData)
         pCluster = segment->GetNext(pCluster);
     }
 
+    bufSizes_.maxBytesFor100MS = safe_static_cast<int32_t>(getBufferSizeForWindow(100));
+    bufSizes_.maxBytesFor250MS = safe_static_cast<int32_t>(getBufferSizeForWindow(250));
+    bufSizes_.maxBytesFor500MS = safe_static_cast<int32_t>(getBufferSizeForWindow(500));
+
     // validate vorbis header
     auto* pData = audioHeaders_.data();
 
@@ -324,6 +330,53 @@ bool VideoCompiler::process(DataVec&& srcData)
     return true;
 }
 
+size_t VideoCompiler::getBufferSizeForWindow(int32_t bufferMS) const
+{
+    size_t windowsize = 0;
+    size_t windowsizeMax = 0;
+
+    int64_t bufferNS = bufferMS * 1000000;
+    int64_t windowNS = 0;
+
+    // Slide a window across all the data, finding the biggest one.
+    core::Fifo<const Block*> window(arena_);
+
+    for (const auto& cluster : clusters_)
+    {
+        for (const auto& block : cluster.blocks)
+        {
+            // add the block.
+            if (window.isEmpty()) {
+                windowNS = block.timeNS;
+            }
+            else {
+                windowNS = block.timeNS - window.peek()->timeNS;
+            }
+
+            windowsize += block.data.size() + sizeof(BlockHdr);
+            window.push(&block);
+
+            // if the window is big enougth
+            if (windowNS >= bufferNS)
+            {
+                windowsizeMax = core::Max(windowsizeMax, windowsize);
+
+                // pop
+                windowsize -= window.peek()->data.size() + sizeof(BlockHdr);
+                window.pop();
+
+                // calculate new span
+                auto startTime = window.front()->timeNS;
+                auto endTime = window.back()->timeNS;
+
+                windowNS = endTime - startTime;
+            }
+        }
+    }
+
+    return windowsizeMax;
+};
+
 bool VideoCompiler::writeToFile(core::XFile* pFile) const
 {
     if (clusters_.isEmpty()) {
@@ -346,6 +399,7 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
     hdr.durationNS = durationNS_;
     hdr.video = videoTrack_;
     hdr.audio = audioTrack_;
+    hdr.bufferInfo = bufSizes_;
 
     if (pFile->writeObj(hdr) != sizeof(hdr)) {
         X_ERROR("Video", "Failed to write data");
