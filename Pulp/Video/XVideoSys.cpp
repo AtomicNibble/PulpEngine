@@ -20,6 +20,7 @@ XVideoSys::XVideoSys(core::MemoryArenaBase* arena) :
 
 void XVideoSys::registerVars(void)
 {
+    vars_.RegisterVars();
 }
 
 void XVideoSys::registerCmds(void)

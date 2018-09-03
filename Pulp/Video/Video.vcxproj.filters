@@ -19,6 +19,12 @@
     <Filter Include="Source Files\libyuv">
       <UniqueIdentifier>{b7c6e084-7595-499c-a3f5-bb767b2bf2b9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Vars">
+      <UniqueIdentifier>{bffed075-2ae0-4c43-8a0c-9d8a24813ce5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Vars">
+      <UniqueIdentifier>{41cdde21-1c3c-4509-8fd1-213427ce158d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -32,6 +38,9 @@
     </ClInclude>
     <ClInclude Include="IVFTypes.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Vars\VideoVars.h">
+      <Filter>Header Files\Vars</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -86,10 +95,16 @@
     <ClCompile Include="XVideo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\VideoVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="XVideo.inl">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="Vars\VideoVars.inl">
+      <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
 </Project>

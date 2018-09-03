@@ -5,6 +5,7 @@
 
 #include <Assets\AssertContainer.h>
 
+#include "Vars\VideoVars.h"
 
 X_NAMESPACE_DECLARE(core,
                     namespace V2 {
@@ -170,6 +171,8 @@ private:
 private:
     core::MemoryArenaBase* arena_;
     core::MemoryArenaBase* blockArena_; // for video buffers
+
+    VideoVars vars_;
 
     // loading
     core::CriticalSection loadReqLock_;

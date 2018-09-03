@@ -473,6 +473,7 @@
   <ItemGroup>
     <ClInclude Include="IVFTypes.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Vars\VideoVars.h" />
     <ClInclude Include="XVideo.h" />
     <ClInclude Include="XVideoSys.h" />
   </ItemGroup>
@@ -706,10 +707,12 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="Vars\VideoVars.cpp" />
     <ClCompile Include="XVideo.cpp" />
     <ClCompile Include="XVideoSys.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="Vars\VideoVars.inl" />
     <None Include="XVideo.inl" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
