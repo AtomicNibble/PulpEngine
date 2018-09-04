@@ -264,6 +264,10 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
                 popProcessed(TrackType::Video);
             }
         }
+
+        if (audioQueue.isEmpty() && channel0.isEos()) {
+            X_WARNING("Video", "Audio queue starvation");
+        }
     }
 
     if (encodedFrame_.isEmpty()) 
