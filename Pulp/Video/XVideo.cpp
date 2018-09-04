@@ -141,7 +141,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     auto seekIoBuffer = [&](int32_t numBytes) {
         validateQueues();
 
-        X_ASSERT(numBytes < ioBufferReadOffset_, "")(numBytes, ioBufferReadOffset_);
+        X_ASSERT(numBytes <= ioBufferReadOffset_, "")(numBytes, ioBufferReadOffset_);
         ioRingBuffer_.skip(numBytes);
         ioBufferReadOffset_ -= numBytes;
 
