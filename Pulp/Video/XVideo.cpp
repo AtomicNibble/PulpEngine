@@ -116,7 +116,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     auto validateQueues = [&]() {
 #if X_ENABLE_ASSERTIONS
         // make sure none of the queues have been seeked past.
-        for (int32_t i = 0; i < trackQueues_.size(); i++) {
+        for (size_t i = 0; i < trackQueues_.size(); i++) {
             auto& queue = trackQueues_[i];
 
             if (queue.isEmpty()) {
@@ -124,7 +124,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             }
 
             auto absoluteOffset = queue.peek();
-            auto readOffset = ioRingBuffer_.tell();
+            auto readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
 
             if (absoluteOffset < readOffset)
             {
@@ -207,7 +207,8 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     // add any complete packets to the queues.
     {
         int32_t offset = ioBufferReadOffset_;
-        int32_t readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
+        const int32_t readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
+        const int32_t ringAvail = safe_static_cast<int32_t>(ioRingBuffer_.size());
 
         while (blocksLeft_ > 0 && ioRingBuffer_.size() > (sizeof(BlockHdr) + offset))
         {
@@ -215,7 +216,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
 
             // got this block?
-            if (ioRingBuffer_.size() < hdr.blockSize + offset) {
+            if (ringAvail < hdr.blockSize + offset) {
                 break;
             }
 
