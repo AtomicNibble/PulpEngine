@@ -9,8 +9,8 @@ namespace HumanDuration
     {
         str.clear();
 
-        if (ms <= 10000.f) {
-            str.appendFmt("%.3g ms", ms);
+        if (ms <= 1000.f) {
+            str.appendFmt("%.3f ms", ms);
         }
         else if (ms <= 300000) {
             const float sec = (ms / 1000);
