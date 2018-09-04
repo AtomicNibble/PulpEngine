@@ -120,6 +120,7 @@ public:
     ~FixedByteStreamRingStackPolicy();
 
 protected:
+    static_assert(sizeof(Type) == 1, "Read comment :)");
     Type buf_[N]; // this is fine, since will only ever be 8bit type.
 };
 
