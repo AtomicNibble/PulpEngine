@@ -24,9 +24,6 @@ namespace
 } // namespace
 
 XTimer::XTimer() :
-    timeScale_(1.f),
-    timeScaleUi_(1.f),
-    maxFrameTimeDelta_(0),
     ticksPerSec_(0),
     debugTime_(0),
     maxFps_(0),
@@ -39,23 +36,16 @@ bool XTimer::init(ICore* pCore)
 {
     X_UNUSED(pCore);
     ticksPerSec_ = SysTimer::GetTickPerSec();
-    maxFrameTimeDelta_ = ticksPerSec_ / 5; // 0.2f
-    timeScale_ = 1;
-    timeScaleUi_ = 1;
+
+    timeScale_[Timer::GAME] = 1.f;
+    timeScale_[Timer::UI] = 1.f;
 
     reset();
 
     ADD_CVAR_REF("time_debug", debugTime_, 0, 0, 1, VarFlag::SYSTEM, "Time debugging");
-    core::ICVar* pVar = ADD_CVAR_FLOAT("time_max_frametime", 0.20f, 0.f, 10000.f, VarFlag::SYSTEM, "max time a frame can take (unscaled)");
-    ADD_CVAR_REF("time_scale", timeScale_, 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each frame");
-    ADD_CVAR_REF("time_scale_ui", timeScaleUi_, 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each UI frame");
+    ADD_CVAR_REF("time_scale", timeScale_[Timer::GAME], 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each frame");
+    ADD_CVAR_REF("time_scale_ui", timeScale_[Timer::UI], 1.f, 0, 2000.f, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED | VarFlag::CHEAT, "scale time of each UI frame");
     ADD_CVAR_REF("maxfps", maxFps_, 24, 0, 1000, VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Max fps 0=unlimated");
-
-    if (pVar) {
-        core::ConsoleVarFunc del;
-        del.Bind<XTimer, &XTimer::OnMaxFrameTimeChanged>(this);
-        pVar->SetOnChangeCallback(del);
-    }
 
     return true;
 }
@@ -75,25 +65,18 @@ void XTimer::reset(void)
 
 void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 {
-    const int64_t now = SysTimer::Get();
-
+    int64_t now = SysTimer::Get();
     currentTime_ = now - baseTime_;
 
-    int64_t frameDelta = currentTime_ - lastFrameStartTime_;
-    int64_t frameDeltaCapped = core::Min(frameDelta, maxFrameTimeDelta_);
+    const int64_t realFrameDelta = currentTime_ - lastFrameStartTime_;
 
-    if (frameDelta != frameDeltaCapped && debugTime_) {
-        const float32_t deltaMs = SysTimer::ToMilliSeconds(frameDelta);
-        const float32_t cappedDeltaMs = SysTimer::ToMilliSeconds(frameDeltaCapped);
-        X_LOG0("Time", "Frame delta was capped. delta: %f cappedDelta: %f", deltaMs, cappedDeltaMs);
-    }
-
-    if (maxFps_ != 0) {
+    if (maxFps_ != 0) 
+    {
         // sleep the diffrence.
         const int64_t targetTicks = (ticksPerSec_ / maxFps_);
 
-        if (frameDelta < targetTicks) {
-            const int64_t sleepTicks = targetTicks - frameDelta;
+        if (realFrameDelta < targetTicks) {
+            const int64_t sleepTicks = targetTicks - realFrameDelta;
             const float sleepMs = math<float>::abs(SysTimer::ToMilliSeconds(sleepTicks));
 
             if (debugTime_) {
@@ -102,26 +85,29 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
 
             core::Thread::sleep(static_cast<uint32_t>(sleepMs));
 
-            frameDelta = targetTicks;
-            frameDeltaCapped = targetTicks;
+            // how long did we actually sleep for.
+            now = SysTimer::Get();
+            currentTime_ = now - baseTime_;
         }
     }
+
+    const int64_t frameDelta = currentTime_ - lastFrameStartTime_;
 
     frameTime.startTimeReal.SetValue(now);
     frameTime.startTimeRealative.SetValue(currentTime_);
 
     // set the unscaled timers
-    frameTime.unscaledDeltas[Timer::GAME].SetValue(frameDeltaCapped);
-    frameTime.unscaledDeltas[Timer::UI].SetValue(frameDeltaCapped);
+    frameTime.unscaledDeltas[Timer::GAME].SetValue(frameDelta);
+    frameTime.unscaledDeltas[Timer::UI].SetValue(frameDelta);
 
     // now we need to scale each of the timers.
     {
-        const int64_t gameTime = scaleTime(frameDeltaCapped, timeScale_);
+        const int64_t gameTime = scaleTime(frameDelta, timeScale_[Timer::GAME]);
         accumalatedTime_[Timer::GAME] += gameTime;
         frameTime.deltas[Timer::GAME].SetValue(gameTime);
     }
     {
-        const int64_t uiTime = scaleTime(frameDeltaCapped, timeScaleUi_);
+        const int64_t uiTime = scaleTime(frameDelta, timeScale_[Timer::UI]);
         accumalatedTime_[Timer::UI] += uiTime;
         frameTime.deltas[Timer::UI].SetValue(uiTime);
     }
@@ -130,7 +116,7 @@ void XTimer::OnFrameBegin(core::FrameTimeData& frameTime)
     frameTime.ellapsed[Timer::GAME].SetValue(accumalatedTime_[Timer::GAME]);
     frameTime.ellapsed[Timer::UI].SetValue(accumalatedTime_[Timer::UI]);
 
-    updateAvgFrameTime(TimeVal(frameDeltaCapped));
+    updateAvgFrameTime(TimeVal(frameDelta));
 
     // set last time for use next frame.
     lastFrameStartTime_ = currentTime_;
@@ -168,23 +154,7 @@ float XTimer::GetAvgFrameRate(void)
 
 float XTimer::GetScale(Timer::Enum timer)
 {
-    if (timer == Timer::GAME) {
-        return timeScale_;
-    }
-    else if (timer == Timer::UI) {
-        return timeScaleUi_;
-    }
-
-    X_ASSERT_UNREACHABLE();
-    return 0.f;
-}
-
-void XTimer::OnMaxFrameTimeChanged(core::ICVar* pVar)
-{
-    const float val = pVar->GetFloat();
-
-    // turn it into ticks.
-    maxFrameTimeDelta_ = static_cast<int64_t>(ticksPerSec_ * val);
+    return timeScale_[timer];
 }
 
 void XTimer::updateAvgFrameTime(TimeVal delta)

@@ -36,8 +36,6 @@ public:
     float GetScale(Timer::Enum timer) X_FINAL;
 
 private:
-    void OnMaxFrameTimeChanged(core::ICVar* pVar);
-
     void updateAvgFrameTime(TimeVal delta);
 
 private:
@@ -46,9 +44,7 @@ private:
     int64_t currentTime_;                        // relative to base.
     int64_t accumalatedTime_[Timer::ENUM_COUNT]; // accumalted scaled time
 
-    float32_t timeScale_;       // scale for game
-    float32_t timeScaleUi_;     // scale for ui
-    int64_t maxFrameTimeDelta_; // cap delta's that exceed this value.
+    float32_t timeScale_[Timer::ENUM_COUNT];
     int64_t ticksPerSec_;
 
     int32_t debugTime_;
