@@ -7,6 +7,9 @@
 #include <Memory\MemCursor.h>
 #include <Compression\LZ4.h>
 
+#include <String\HumanDuration.h>
+#include <String\HumanSize.h>
+
 #include <IRenderCommands.h>
 #include <CmdBucket.h>
 #include <IFrameData.h>
@@ -71,7 +74,6 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
 
     ioBufferReadOffset_ = 0;
 
-    currentCluster_ = 0;
     blocksLeft_ = 0;
 }
 
@@ -410,7 +412,13 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
 
     video_ = hdr.video;
     audio_ = hdr.audio;
-    frameRate_ = safe_static_cast<int32_t>(hdr.video.numFrames / (hdr.durationNS / 1000000000));
+
+    auto durationMS = hdr.durationNS / 1000000;
+    auto durationS = durationMS / 1000;
+
+    duration_ = core::TimeVal::fromMS(durationMS);
+
+    frameRate_ = safe_static_cast<int32_t>(hdr.video.numFrames / durationS);
     pFile_ = pFile;
 
     // audio header HYPE!
@@ -836,26 +844,62 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     {
         Rectf box(r);
-        box.include(Vec2f(r.x1, r.y1 + ((offset.y + textOff.y) * 4)));
+        box.include(Vec2f(r.x1, r.y1 + (textOff.y * 3) + ((offset.y + textOff.y) * 4)));
         box.inflate(Vec2f(10.f, 16.f));
 
         pPrim->drawQuad(box, Color8u(2, 2, 2, 200));
     }
 
 
-    core::StackString<64> txt;
     core::HumanSize::Str sizeStr0, sizeStr1;
-    txt.setFmt("IO: %s/%s", core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
+    core::StackString<64> txt;
+
+    core::HumanDuration::Str durStr0, durStr1;
+    txt.setFmt("Duration: %s - %s (%" PRIi32 "fps)", core::HumanDuration::toString(durStr0, playTime_.GetMilliSeconds()),
+        core::HumanDuration::toString(durStr1, duration_.GetMilliSeconds()), frameRate_);
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
+
+    txt.setFmt("Audio: BR %s %" PRIi32 "hz(%" PRIi16 ") %" PRIi16 " chan" , core::HumanSize::toString(sizeStr0, vorbisInfo_.bitrate_nominal),
+        audio_.sampleFreq, audio_.bitDepth, audio_.channels);
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
+
+    size_t memUsage = 0;
+    memUsage += ioRingBuffer_.capacity();
+    memUsage += ioReqBuffer_.capacity();
+    memUsage += encodedFrame_.capacity();
+    memUsage += decodedFrame_.capacity();
+
+    for (const auto& tq : trackQueues_) {
+        memUsage += tq.capacity() * sizeof(IntQueue::Type);
+    }
+
+    memUsage += encodedAudioFrame_.capacity();
+
+    for (const auto& arb : audioRingBuffers_) {
+        memUsage += arb.capacity();
+    }
+
+    txt.setFmt("Mem Usage: %s", core::HumanSize::toString(sizeStr0, memUsage));
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
+
+    txt.setFmt("Buffer: %s/%s", core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
         core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE));
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
+
     pPrim->drawGraph(r, ioBufferData.begin(), ioBufferData.end(), Col_Orange, 0.f, static_cast<float>(IO_RING_BUFFER_SIZE));
     r += offset;
 
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++)
     {
-        txt.setFmt("%s %" PRIuS "/%" PRIuS, TrackType::ToString(i), trackQueues_[i].size(), FRAME_QUEUE_SIZE);
+        txt.setFmt("%s: %" PRIuS "/%" PRIuS, TrackType::ToString(i), trackQueues_[i].size(), FRAME_QUEUE_SIZE);
         
         auto& data = queueSizeData[i];
         pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());

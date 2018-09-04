@@ -114,6 +114,7 @@ private:
     core::TimeVal timeSinceLastFrame_;
     core::TimeVal timePerFrame_;
     core::TimeVal playTime_;
+    core::TimeVal duration_;
 
     VideoState::Enum state_;
     bool presentFrame_;
@@ -133,7 +134,6 @@ private:
     uint64_t fileOffset_; // the file offset we last read from.
     uint64_t fileLength_; // the total file length;
 
-    int32_t currentCluster_;
     int32_t blocksLeft_;
 
     // IO Buffers
