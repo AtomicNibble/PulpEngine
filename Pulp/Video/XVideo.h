@@ -35,8 +35,8 @@ X_DECLARE_ENUM8(VideoState)
 class Video : public core::AssetBase
     , public IVideo
 {
-    static constexpr size_t IO_REQUEST_SIZE = 1024 * 512;
-    static constexpr size_t IO_RING_BUFFER_SIZE = 1024 * 1024 * 2; // 1MB
+    static constexpr size_t IO_REQUEST_SIZE = 1024 * 128;
+    static constexpr size_t IO_RING_BUFFER_SIZE = 1024 * 1024; // 1MB
     static_assert(IO_RING_BUFFER_SIZE % IO_REQUEST_SIZE == 0, "Ring buffer not a multiple of IO request size");
 
     // if 44100 that's (44100 * 4) = 176400 bytes per second per channel
