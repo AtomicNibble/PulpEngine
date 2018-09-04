@@ -660,7 +660,7 @@ void Video::validateAudioBufferSizes(void) const
 #if X_ENABLE_ASSERTIONS
     {
         auto& bufs = audioRingBuffers_;
-        auto allSame = std::all_of(bufs.begin() + 1, bufs.end(), [&](const AudioRingBufferChannelArr::value_type& b) {
+        auto allSame = std::all_of(bufs.begin() + 1, bufs.begin() + audio_.channels, [&](const AudioRingBufferChannelArr::value_type& b) {
             return b.size() == bufs.front().size();
         });
 
