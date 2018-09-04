@@ -211,13 +211,20 @@ FixedByteStreamRingBase::peek(size_type offset) const
 
 inline FixedByteStreamRingBase::size_type FixedByteStreamRingBase::absoluteToRelativeOffset(size_type offset) const
 {
-    X_ASSERT(offset <= capacity(), "Offset out of range")(offset, capacity());
+    offset &= mask_;
 
     auto readOffset = tell();
 
-    X_ASSERT(readOffset <= offset, "Offset is lower than read location")(readOffset, offset);
+    if (offset < readOffset)
+    {
+        X_ASSERT(offset < byteIdx_, "Offset is lower than read location")(readOffset, offset);
+        auto trailing = numBytes_ - readOffset;
+        return offset + trailing;
+    }
 
-    return offset - readOffset;
+    offset -= readOffset;
+
+    return offset;
 }
 
 inline void FixedByteStreamRingBase::skip(size_type numBytes)
