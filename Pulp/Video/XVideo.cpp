@@ -235,12 +235,6 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     auto& audioQueue = trackQueues_[TrackType::Audio];
     auto& videoQueue = trackQueues_[TrackType::Video];
 
-    {
-        auto& channel0 = audioRingBuffers_[0];
-
-        X_LOG0("Video", "Audio %" PRIuS " Video: %" PRIuS " AudioBufferSize: %" PRIuS, audioQueue.size(), videoQueue.size(), channel0.size() / 1024);
-
-    }
     // any audio packets ready?
     if (audioQueue.isNotEmpty())
     {
