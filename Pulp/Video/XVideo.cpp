@@ -888,8 +888,10 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    txt.setFmt("Buffer: %s/%s", core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
-        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE));
+    auto totalblocks = video_.numFrames + audio_.numFrames;
+
+    txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
+        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - blocksLeft_, totalblocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
