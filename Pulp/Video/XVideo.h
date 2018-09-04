@@ -36,13 +36,13 @@ class Video : public core::AssetBase
     , public IVideo
 {
     static constexpr size_t IO_REQUEST_SIZE = 1024 * 128;
-    static constexpr size_t IO_RING_BUFFER_SIZE = 1024 * 1024; // 1MB
+    static constexpr size_t IO_RING_BUFFER_SIZE = 1024 * 1024 * 2; // 2MB
     static_assert(IO_RING_BUFFER_SIZE % IO_REQUEST_SIZE == 0, "Ring buffer not a multiple of IO request size");
 
     // if 44100 that's (44100 * 4) = 176400 bytes per second per channel
     static constexpr size_t AUDIO_RING_DECODED_BUFFER_SIZE = 1024 * 512; // 256KB just over 1 second buffer.
 
-    static constexpr size_t FRAME_QUEUE_SIZE = 32;
+    static constexpr size_t FRAME_QUEUE_SIZE = 1024 * 4;
 
 
     template<typename T>
