@@ -86,6 +86,8 @@ class XSound : public ISound
     struct MemoryInput
     {
         AkPlayingID playingID;
+        int32_t channels;
+        int32_t sampleFreq;
         SndObjectHandle sndObj;
         AudioBufferDelegate callback;
     };
@@ -150,7 +152,7 @@ public:
     PlayingID postEvent(EventID event, SndObjectHandle object) X_FINAL;
     PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
 
-    PlayingID playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHandle object) X_FINAL;
+    PlayingID playVideoAudio(int32_t channels, int32_t sampleFreq, AudioBufferDelegate dataCallback, SndObjectHandle object) X_FINAL;
     void stopVideoAudio(PlayingID id) X_FINAL;
 
     void setOcclusionType(SndObjectHandle object, OcclusionType::Enum type) X_FINAL;

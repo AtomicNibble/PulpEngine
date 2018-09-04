@@ -1101,7 +1101,7 @@ PlayingID XSound::postEvent(const char* pEventStr, SndObjectHandle object)
     return postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
 
-PlayingID XSound::playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHandle object)
+PlayingID XSound::playVideoAudio(int32_t channels, int32_t sampleFreq, AudioBufferDelegate dataCallback, SndObjectHandle object)
 {
     auto playingID = postEvent("VideoAudio_Start", object);
     
@@ -1111,6 +1111,8 @@ PlayingID XSound::playVideoAudio(AudioBufferDelegate dataCallback, SndObjectHand
     // so in order to stop the stream, i basically should just give you a id.
     MemoryInput mi;
     mi.playingID = playingID;
+    mi.channels = channels;
+    mi.sampleFreq = sampleFreq;
     mi.sndObj = object;
     mi.callback = dataCallback;
 
@@ -1529,10 +1531,27 @@ void XSound::getFormatCallback(AkPlayingID in_playingID, AkAudioFormat& io_Audio
         return;
     }
 
+    AkChannelConfig channelCfg;
+    
+    if (pStream->channels == 1)
+    {
+        channelCfg.uNumChannels = 1;
+        channelCfg.uChannelMask = AK_SPEAKER_SETUP_MONO;
+    }
+    else if (pStream->channels == 2)
+    {
+        channelCfg.uNumChannels = 2;
+        channelCfg.uChannelMask = AK_SPEAKER_SETUP_STEREO;
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+
     // TODO: allow customisation.
     io_AudioFormat.SetAll(
-        44100,                  // Sample rate
-        AkChannelConfig(2, AK_SPEAKER_SETUP_STEREO),
+        pStream->sampleFreq,                  // Sample rate
+        channelCfg,
         32,						// Bits per samples
         4,						// bytes per samples
         AK_FLOAT,			    // feeding floats

@@ -478,7 +478,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
 
     sound::AudioBufferDelegate del;
     del.Bind<Video, &Video::audioDataRequest>(this);
-    gEnv->pSound->playVideoAudio(del, obj);
+    gEnv->pSound->playVideoAudio(audio_.channels, audio_.sampleFreq, del, obj);
 #endif
 
     dispatchRead();
