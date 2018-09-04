@@ -49,7 +49,7 @@ class Video : public core::AssetBase
     using ArrayFixedBaseAlign = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
 
     typedef ArrayFixedBaseAlign<uint8_t> DataVec;
-    typedef core::FixedFifo<size_t, FRAME_QUEUE_SIZE> IntQueue;
+    typedef core::FixedFifo<int32_t, FRAME_QUEUE_SIZE> IntQueue;
 
     typedef std::array<core::FixedByteStreamRingOwning, VIDEO_MAX_AUDIO_CHANNELS> AudioRingBufferChannelArr;
     typedef std::array<IntQueue, TrackType::ENUM_COUNT> TrackQueues;

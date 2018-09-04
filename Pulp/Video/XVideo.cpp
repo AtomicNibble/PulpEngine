@@ -207,7 +207,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     // add any complete packets to the queues.
     {
         int32_t offset = ioBufferReadOffset_;
-        auto readOffset = ioRingBuffer_.tell();
+        int32_t readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
 
         while (blocksLeft_ > 0 && ioRingBuffer_.size() > (sizeof(BlockHdr) + offset))
         {
