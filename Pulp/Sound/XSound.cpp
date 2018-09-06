@@ -1581,16 +1581,21 @@ void XSound::executeCallback(AkPlayingID in_playingID, AkAudioBuffer* io_pBuffer
         io_pBufferOut->MaxFrames()
     );
 
-    pStream->callback.Invoke(ab);
+    auto result = pStream->callback.Invoke(ab);
 
-    // meow.
-    io_pBufferOut->uValidFrames = safe_static_cast<AkUInt16>(ab.validFrames());
-    if (ab.validFrames()) {
-        io_pBufferOut->eState = AK_DataReady;
-    }
-    else {
-        io_pBufferOut->eState = AK_NoDataReady;
-        X_ERROR("Sound", "Memory buffer starvation");
+    switch (result)
+    {
+        case BufferResult::DataReady:
+            io_pBufferOut->uValidFrames = safe_static_cast<AkUInt16>(ab.validFrames());
+            io_pBufferOut->eState = AK_DataReady;
+            break;
+        case BufferResult::NoDataReady:
+            io_pBufferOut->eState = AK_NoDataReady;
+            X_ERROR("Sound", "Memory buffer starvation");
+            break;
+        case BufferResult::NoMoreData:
+            io_pBufferOut->eState = AK_NoMoreData;
+            break;
     }
 }
 

@@ -39,6 +39,7 @@ static const uint32_t MAX_SOUND_OBJECTS = 1 << 9;
 static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(2);
 static const SndObjectHandle LISTNER_OBJECT_ID = static_cast<SndObjectHandle>(1);
 static const SndObjectHandle INVALID_OBJECT_ID = static_cast<SndObjectHandle>(-1);
+static const PlayingID INVALID_PLAYING_ID = static_cast<PlayingID>(0);
 
 struct AudioBuffer
 {
@@ -93,7 +94,14 @@ private:
     int32_t validFrames_;
 };
 
-typedef core::Delegate<void(AudioBuffer& ab)> AudioBufferDelegate;
+X_DECLARE_ENUM(BufferResult)(
+    DataReady,
+    NoDataReady,
+    NoMoreData
+);
+
+
+typedef core::Delegate<BufferResult::Enum(AudioBuffer& ab)> AudioBufferDelegate;
 
 X_DECLARE_ENUM(CurveInterpolation)
 (
