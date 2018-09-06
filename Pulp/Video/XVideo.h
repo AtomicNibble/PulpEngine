@@ -48,7 +48,7 @@ class Video : public core::AssetBase
     // if 44100 that's (44100 * 4) = 176400 bytes per second per channel
     static constexpr size_t AUDIO_RING_DECODED_BUFFER_SIZE = 1024 * 256; // 256KB just over 1 second buffer.
 
-    static constexpr size_t FRAME_QUEUE_SIZE = 128 * 5;
+    static constexpr size_t FRAME_QUEUE_SIZE = 128 * 4;
 
 
     template<typename T>
