@@ -92,6 +92,12 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
 
 Video::~Video()
 {
+    // TODO: work out way to unregister this safly.
+    // since if we delte a sound object, then get a event for it, we crash :(
+    if (sndObj_ != sound::INVALID_OBJECT_ID) {
+        gEnv->pSound->unRegisterObject(sndObj_);
+    }
+
     if (pFile_) {
         gEnv->pFileSys->AddCloseRequestToQue(pFile_);
     }
@@ -160,7 +166,9 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
         if (availFrames_.size() == availFrames_.capacity() && channel0.size() > 0)
         {
-            sndObj_ = gEnv->pSound->registerObject("VideoAudio");
+            if (sndObj_ == sound::INVALID_OBJECT_ID) {
+                sndObj_ = gEnv->pSound->registerObject("VideoAudio");
+            }
 
             sound::AudioBufferDelegate del;
             del.Bind<Video, &Video::audioDataRequest>(this);
@@ -173,7 +181,6 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     if (playTime_ >= duration_)
     {
         gEnv->pSound->stopVideoAudio(sndPlayingId_);
-        gEnv->pSound->unRegisterObject(sndObj_);
 
         // TODO: validate we played everything.
 

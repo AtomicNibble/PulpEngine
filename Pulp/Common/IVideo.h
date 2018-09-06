@@ -70,6 +70,7 @@ struct BlockHdr
 
 struct VideoTrackHdr
 {
+    int16_t frameRate;
     int16_t pixelWidth;
     int16_t pixelHeight;
     int32_t numBlocks;
@@ -99,12 +100,12 @@ struct VideoHeader
 {
     uint32 fourCC;
     uint8 version;
-    uint8_t _pad[3];
-
-    int64_t durationNS;
+    uint8_t _pad[1];
 
     VideoTrackHdr video;
     AudioTrackHdr audio;
+
+    int64_t durationNS;
 
     // the max amount of compressed data needed for a 500ms buffer.
     BufferSizes bufferInfo;
