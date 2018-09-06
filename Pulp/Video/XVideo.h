@@ -113,7 +113,6 @@ private:
     void processIOData(void);
 
     bool processVorbisHeader(core::span<uint8_t> data);
-    bool decodeAudioPacket(core::span<uint8_t> data);
     void validateAudioBufferSizes(void) const;
 
     sound::BufferResult::Enum audioDataRequest(sound::AudioBuffer& ab);
@@ -123,10 +122,16 @@ private:
 
     void dispatchRead(void);
 
-    bool decodeFrame(void);
+    void validateQueues(void);
+    void seekIoBuffer(int32_t numBytes);
+    void popProcessed(TrackType::Enum type);
+
+    bool decodeAudioPacket(void);
+    bool decodeVideo(void);
 
 private:
-    void decodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
+    void decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
     vpx_codec_ctx_t codec_;
@@ -143,7 +148,8 @@ private:
     bool ioRequestPending_;
     bool _pad[2];
 
-    core::V2::Job* pDecodeJob_;
+    core::V2::Job* pDecodeAudioJob_;
+    core::V2::Job* pDecodeVideoJob_;
 
     // Render texture
     render::IDeviceTexture* pTexture_;
