@@ -227,9 +227,8 @@ void Video::processIOData(void)
     {
         auto& channel0 = audioRingBuffers_[0];
 
-        if (audioQueue.isNotEmpty() && pDecodeAudioJob_ == nullptr && channel0.size() < 1024 * (128))
+        if (audioQueue.isNotEmpty() && pDecodeAudioJob_ == nullptr && channel0.size() < AUDIO_RING_MAX_FILL)
         {
-            X_ASSERT(pDecodeAudioJob_ == nullptr, "Deocde job not null")(pDecodeAudioJob_);
             pDecodeAudioJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeAudio_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
         }
@@ -911,7 +910,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     // process packets till we either run out of packets or output buffer full.
     ioCs_.Enter();
 
-    while(audioQueue.isNotEmpty() && channel0.size() < 1024 * (128))
+    while(audioQueue.isNotEmpty() && channel0.size() < AUDIO_RING_MAX_FILL)
     {
         auto absoluteOffset = audioQueue.peek();
         auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
