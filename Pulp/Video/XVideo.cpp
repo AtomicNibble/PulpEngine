@@ -125,14 +125,6 @@ void Video::pause(void)
 
 void Video::update(const core::FrameTimeData& frameTimeInfo)
 {
-    auto dt = frameTimeInfo.deltas[core::Timer::GAME];
-
-    static core::StopWatch timer;
-
-    auto ellapsed = timer.GetMilliSeconds();
-    timer.Start();
-
-    auto goat = dt.GetMilliSeconds();
 
     // TODO: this assumes header finished loading.
     if (!pTexture_) {
@@ -153,6 +145,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
     if (state_ == State::Playing)
     {
+        auto dt = frameTimeInfo.unscaledDeltas[core::Timer::GAME];
         playTime_ += dt;
     }
   
