@@ -57,6 +57,10 @@ namespace
         const DataVec& data_;
     };
 
+
+    const int64_t nanosecondsPerSecond = 1000000000;
+    const int32_t nanosecondsPerMillisecond = 1000000;
+
 } // namespace
 
 
@@ -157,7 +161,7 @@ bool VideoCompiler::process(DataVec&& srcData)
 
     durationNS_ = pSegmentInfo->GetDuration();
 
-    core::zero_object(videoTrack_);
+    videoTrack_.frameRate = safe_static_cast<int32_t>(pVideoTrack->GetFrameRate());
     videoTrack_.pixelWidth = safe_static_cast<int32_t>(pVideoTrack->GetWidth());
     videoTrack_.pixelHeight = safe_static_cast<int32_t>(pVideoTrack->GetHeight());
 
@@ -388,9 +392,6 @@ bool VideoCompiler::writeToFile(core::XFile* pFile) const
         X_ERROR("Video", "duration is zero");
         return false;
     }
-
-    const int64_t nanosecondsPerSecond = 1000000000;
-    const int32_t nanosecondsPerMillisecond = 1000000;
 
     VideoHeader hdr;
     core::zero_object(hdr);
