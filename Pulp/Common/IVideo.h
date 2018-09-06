@@ -39,6 +39,7 @@ struct IVideoSys : public core::IEngineSysBase
     virtual ~IVideoSys() = default;
 
     virtual void update(const core::FrameTimeData& frameTimeInfo) X_ABSTRACT;
+    virtual void unlockBuffers(void) X_ABSTRACT;
 
     virtual IVideo* findVideo(const char* pVideoName) const X_ABSTRACT;
     virtual IVideo* loadVideo(const char* pVideoName) X_ABSTRACT;
@@ -71,8 +72,8 @@ struct VideoTrackHdr
 {
     int16_t pixelWidth;
     int16_t pixelHeight;
-    int32_t numFrames;
-    int32_t largestFrameBytes;
+    int32_t numBlocks;
+    int32_t largestBlockBytes;
 };
 
 struct AudioTrackHdr
@@ -80,8 +81,8 @@ struct AudioTrackHdr
     int16_t channels;
     int16_t bitDepth;
     int32_t sampleFreq;
-    int32_t numFrames;
-    int32_t largestFrameBytes;
+    int32_t numBlocks;
+    int32_t largestBlockBytes;
 
     int32_t deflatedHdrSize;
     int32_t inflatedHdrSize;

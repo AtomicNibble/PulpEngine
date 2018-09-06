@@ -89,6 +89,17 @@ void XVideoSys::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) cons
     }
 }
 
+void XVideoSys::unlockBuffers(void)
+{
+    core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+    for (const auto& video : videos_) {
+        auto* pVideoRes = video.second;
+
+        pVideoRes->releaseFrame();
+    }
+}
+
 IVideo* XVideoSys::findVideo(const char* pVideoName) const
 {
     core::string name(pVideoName);
@@ -316,6 +327,8 @@ void XVideoSys::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
         pVideo->setStatus(core::LoadStatus::Error);
     }
 
+    pVideo->play();
+
     loadRequestCleanup(pLoadReq);
 }
 
@@ -345,11 +358,10 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
     core::HumanSize::Str sizeStr;
     for (const auto* pVideo : sorted_videos) {
         X_LOG0("Video", "^2%-32s^7 Dim: ^2%" PRIu16 "x%" PRIu16 "^7 Fps:^2%" PRIu32 "^7"
-                        " Frame: ^2%" PRIu32 "/%" PRIu32 "^7 BufferSize: ^2%s^7 State: ^2%s^7 Refs:^2%" PRIi32,
+                        "^7 BufferSize: ^2%s^7 State: ^2%s^7 Refs:^2%" PRIi32,
             pVideo->getName(), pVideo->getWidth(), pVideo->getHeight(), pVideo->getFps(),
-            pVideo->getCurFrame(), pVideo->getNumFrames(),
             core::HumanSize::toString(sizeStr, pVideo->getIOBufferSize()),
-            VideoState::ToString(pVideo->getState()),
+            State::ToString(pVideo->getState()),
             pVideo->getRefCount());
     }
 

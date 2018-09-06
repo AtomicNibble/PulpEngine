@@ -19,6 +19,8 @@
 #include <IFont.h>
 #include <IPrimativeContext.h>
 
+#include <Time\StopWatch.h>
+
 X_NAMESPACE_BEGIN(video)
 
 namespace
@@ -41,18 +43,20 @@ namespace
 Video::Video(core::string name, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::VIDEO),
     frameRate_(0),
-    curFrame_(0),
-    state_(VideoState::Playing),
-    presentFrame_(false),
-    isStarved_(false),
+    displayTimeMS_(0),
+    state_(State::UnInit),
     ioRequestPending_(false),
     pFile_(nullptr),
     fileOffset_(0),
     fileLength_(0),
     ioRingBuffer_(arena, IO_RING_BUFFER_SIZE),
     ioReqBuffer_(arena),
-    encodedFrame_(arena),
-    decodedFrame_(arena),
+    frames_{
+        arena, 
+        arena,
+        arena
+    },
+    encodedBlock_(arena),
     pTexture_(nullptr),
     pDecodeJob_(nullptr),
     oggPacketCount_(0),
@@ -67,14 +71,23 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
     core::zero_object(video_);
     core::zero_object(audio_);
 
+    core::zero_object(processedBlocks_);
+
     core::zero_object(vorbisInfo_);
     core::zero_object(vorbisComment_);
     core::zero_object(vorbisDsp_);
     core::zero_object(vorbisBlock_);
 
+    
     ioBufferReadOffset_ = 0;
 
-    blocksLeft_ = 0;
+    pLockedFrame_ = nullptr;
+    vpxFrameIter_ = nullptr;
+    frameIdx_ = 0;
+    fileBlocksLeft_ = 0;
+
+    sndPlayingId_ = sound::INVALID_PLAYING_ID;
+    sndObj_ = sound::INVALID_OBJECT_ID;
 }
 
 Video::~Video()
@@ -94,8 +107,31 @@ Video::~Video()
     vorbis_comment_clear(&vorbisComment_);
 }
 
+void Video::play(void)
+{
+    X_ASSERT(state_ == State::Init, "")();
+
+
+    state_ = State::Buffering;
+    dispatchRead();
+}
+
+void Video::pause(void)
+{
+    X_ASSERT_NOT_IMPLEMENTED();
+}
+
 void Video::update(const core::FrameTimeData& frameTimeInfo)
 {
+    auto dt = frameTimeInfo.deltas[core::Timer::GAME];
+
+    static core::StopWatch timer;
+
+    auto ellapsed = timer.GetMilliSeconds();
+    timer.Start();
+
+    auto goat = dt.GetMilliSeconds();
+
     // TODO: this assumes header finished loading.
     if (!pTexture_) {
         pTexture_ = gEnv->pRender->createTexture(
@@ -105,14 +141,48 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             render::BufUsage::PER_FRAME);
     }
 
-    if (state_ == VideoState::Stopped) {
+    if (state_ != State::Buffering && state_ != State::Playing) {
         return;
     }
 
-    if (curFrame_ == video_.numFrames) {
-        state_ = VideoState::Stopped;
+    dispatchRead();
+
+    processIOData();
+
+    if (state_ == State::Playing)
+    {
+        playTime_ += dt;
+    }
+  
+    if (state_ == State::Buffering)
+    {
+        auto& channel0 = audioRingBuffers_[0];
+
+        if (availFrames_.size() == availFrames_.capacity() && channel0.size() > 0)
+        {
+            sndObj_ = gEnv->pSound->registerObject("VideoAudio");
+
+            sound::AudioBufferDelegate del;
+            del.Bind<Video, &Video::audioDataRequest>(this);
+            sndPlayingId_ = gEnv->pSound->playVideoAudio(audio_.channels, audio_.sampleFreq, del, sndObj_);
+
+            state_ = State::Playing;
+        }
     }
 
+    if (playTime_ >= duration_)
+    {
+        gEnv->pSound->stopVideoAudio(sndPlayingId_);
+        gEnv->pSound->unRegisterObject(sndObj_);
+
+        // TODO: validate we played everything.
+
+        state_ = State::Finished;
+    }
+}
+
+void Video::processIOData(void)
+{
     auto validateQueues = [&]() {
 #if X_ENABLE_ASSERTIONS
         // make sure none of the queues have been seeked past.
@@ -202,15 +272,16 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
         }
     };
 
-    core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(ioCs_);
 
     // add any complete packets to the queues.
+    if(fileBlocksLeft_)
     {
         int32_t offset = ioBufferReadOffset_;
         const int32_t readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
         const int32_t ringAvail = safe_static_cast<int32_t>(ioRingBuffer_.size());
 
-        while (blocksLeft_ > 0 && ioRingBuffer_.size() > (sizeof(BlockHdr) + offset))
+        while (fileBlocksLeft_ > 0 && ioRingBuffer_.size() > (sizeof(BlockHdr) + offset))
         {
             auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
             X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
@@ -229,7 +300,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
             offset += sizeof(hdr) + hdr.blockSize;
 
-            --blocksLeft_;
+            --fileBlocksLeft_;
         }
 
         ioBufferReadOffset_ = offset;
@@ -244,7 +315,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
         auto& channel0 = audioRingBuffers_[0];
 
         // space in the output buffers?
-        while (audioQueue.isNotEmpty() && channel0.size() < 1024 * (256 + 128))
+        while (audioQueue.isNotEmpty() && channel0.size() < 1024 * (128))
         {
             auto absoluteOffset = audioQueue.peek();
             auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
@@ -257,7 +328,9 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
             decodeAudioPacket(core::make_span(encodedAudioFrame_));
 
-            int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
+            ++processedBlocks_[TrackType::Audio];
+
+            const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
 
             audioQueue.pop();
 
@@ -273,11 +346,15 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
         }
     }
 
-    if (encodedFrame_.isEmpty()) 
+    if (availFrames_.freeSpace() > 0 && pDecodeJob_ == nullptr)
     {
-        X_ASSERT(pDecodeJob_ == nullptr, "Deocde job not null")(pDecodeJob_);
+        size_t checkFreeSpace = 0;
+        {
+            core::CriticalSection::ScopedLock lock(frameCs_);
+            checkFreeSpace = availFrames_.freeSpace();
+        }
 
-        if (videoQueue.isNotEmpty())
+        if (checkFreeSpace > 0 && videoQueue.isNotEmpty())
         {
             // the video should always be at start?
             // if not, it means we have a audio buffer still waiting to be processed that came before this video frame
@@ -288,14 +365,19 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
             X_ASSERT(hdr.type == TrackType::Video, "Incorrect type")();
 
-            encodedFrame_.resize(hdr.blockSize);
-            ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedFrame_.data(), encodedFrame_.size());
+            encodedBlock_.resize(hdr.blockSize);
+            ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
+
+            displayTimeMS_ = hdr.timeMS;
+
+            ++processedBlocks_[TrackType::Video];
 
             // we now want to decode the frame.
+            X_ASSERT(pDecodeJob_ == nullptr, "Deocde job not null")(pDecodeJob_);
             pDecodeJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeFrame_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
 
-            int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
+            const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
 
             videoQueue.pop();
 
@@ -306,7 +388,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             }
             else
             {
-               // X_ASSERT_UNREACHABLE();
+                // X_ASSERT_UNREACHABLE();
             }
 
             validateQueues();
@@ -314,69 +396,61 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
         validateQueues();
 
+        // are we starved?
         if (!pDecodeJob_) {
-            isStarved_ = true;
-            X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
-        }
-        else {
-            isStarved_ = false;
-        }
-    }
-
-    // dispatch a read if needed.
-    if (ioRingBuffer_.freeSpace() >= IO_REQUEST_SIZE) {
-        dispatchRead();
-    }
-
-    // do we want to update buffer this frame?
-    // if the video has fixed fps and engine has variable frame rate.
-    // we want to know if enoguth time has passed to update the frame.
-    auto dt = frameTimeInfo.deltas[core::Timer::GAME];
-
-    timeSinceLastFrame_ += dt;
-    playTime_ += dt;
-
-    if (timeSinceLastFrame_ >= timePerFrame_) {
-        timeSinceLastFrame_ = core::TimeVal(0ll);
-        presentFrame_ = true;
-        ++curFrame_;
-
-        if (curFrame_ == video_.numFrames) {
-            state_ = VideoState::Stopped;
+            // Finished all the blocks?
+            if (processedBlocks_[TrackType::Video] != video_.numBlocks) {
+                X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
+            }
         }
     }
+
 }
 
 void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
-    if (!presentFrame_) {
+    core::CriticalSection::ScopedLock lock(frameCs_);
+
+    if (availFrames_.isEmpty()) {
         X_WARNING("Video", "No frame to present");
         return;
     }
 
-    if (isStarved_) {
+    auto* pFrame = availFrames_.peek();
+
+    auto ellapsed = static_cast<int32_t>(playTime_.GetMilliSeconds());
+    auto delta = pFrame->displayTime - ellapsed;
+
+    // if it's negative frame is late by delta MS.
+    if (delta > 0) {
+        X_LOG0("Video", "Frame time till display: %" PRIi32, delta);
         return;
     }
 
-    // stall untill the decode has finished.
-    X_ASSERT_NOT_NULL(pDecodeJob_);
-
-    gEnv->pJobSys->Wait(pDecodeJob_);
-    pDecodeJob_ = nullptr;
+    X_LOG0("Video", "Frame display delta: %" PRIi32 " ellapsed: %" PRIi32, delta, ellapsed);
 
     // we want to submit a draw
     render::Commands::CopyTextureBufferData* pCopyCmd = bucket.addCommand<render::Commands::CopyTextureBufferData>(0, 0);
     pCopyCmd->textureId = pTexture_->getTexID();
-    pCopyCmd->pData = decodedFrame_.data();
-    pCopyCmd->size = safe_static_cast<uint32_t>(decodedFrame_.size());
+    pCopyCmd->pData = pFrame->decoded.data();
+    pCopyCmd->size = safe_static_cast<uint32_t>(pFrame->decoded.size());
 
-    core::CriticalSection::ScopedLock lock(cs_);
+    pLockedFrame_ = pFrame;
+}
 
-    // clearing this will start another decode next update.
-    // if we wanted to start the decode now, we would need to double buffer.
+void Video::releaseFrame(void)
+{
+    if (!pLockedFrame_) {
+        return;
+    }
 
-    encodedFrame_.clear();
-    presentFrame_ = false;
+    X_ASSERT(availFrames_.isNotEmpty(), "Avail frames is empty")();
+    X_ASSERT(pLockedFrame_ == availFrames_.peek(), "Locked frame is not the top one")(pLockedFrame_);
+
+    core::CriticalSection::ScopedLock lock(frameCs_);
+
+    pLockedFrame_ = nullptr;
+    availFrames_.pop();
 }
 
 render::TexID Video::getTextureID(void) const
@@ -419,7 +493,8 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
 
     duration_ = core::TimeVal::fromMS(durationMS);
 
-    frameRate_ = safe_static_cast<int32_t>(hdr.video.numFrames / durationS);
+    // TODO: wrong
+    frameRate_ = safe_static_cast<int32_t>(hdr.video.numBlocks / durationS);
     pFile_ = pFile;
 
     // audio header HYPE!
@@ -459,30 +534,22 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         return false;
     }
 
-    blocksLeft_ = video_.numFrames + audio_.numFrames;
+    fileBlocksLeft_ = video_.numBlocks + audio_.numBlocks;
 
     fileLength_ = pFile->fileSize();
     fileOffset_ = sizeof(hdr) + audioHdrSize;
 
     ioReqBuffer_.resize(safe_static_cast<size_t>(core::Min<uint64>(fileLength_, IO_REQUEST_SIZE)));
   
-    encodedAudioFrame_.reserve(audio_.largestFrameBytes);
-    encodedFrame_.reserve(video_.largestFrameBytes);
+    encodedBlock_.reserve(video_.largestBlockBytes);
+    encodedAudioFrame_.reserve(audio_.largestBlockBytes);
 
-    decodedFrame_.resize(video_.pixelWidth * (video_.pixelHeight * 4));
+    const auto frameBytes = video_.pixelWidth * (video_.pixelHeight * 4);
+    for (auto& frame : frames_) {
+        frame.decoded.resize(frameBytes);
+    }
 
-    int64_t ms = 1000 / frameRate_;
-    timePerFrame_ = core::TimeVal::fromMS(ms);
-
-#if 1
-    auto obj = gEnv->pSound->registerObject();
-
-    sound::AudioBufferDelegate del;
-    del.Bind<Video, &Video::audioDataRequest>(this);
-    gEnv->pSound->playVideoAudio(audio_.channels, audio_.sampleFreq, del, obj);
-#endif
-
-    dispatchRead();
+    state_ = State::Init;
     return true;
 }
 
@@ -630,7 +697,7 @@ bool Video::decodeAudioPacket(core::span<uint8_t> data)
 }
 
 
-void Video::audioDataRequest(sound::AudioBuffer& ab)
+sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
 {
     core::CriticalSection::ScopedLock lock(audioCs_);
 
@@ -638,8 +705,19 @@ void Video::audioDataRequest(sound::AudioBuffer& ab)
     X_ASSERT(ab.numChannels() == vorbisInfo_.channels, "Channel count mismatch")(ab.numChannels(), vorbisInfo_.channels);
 
     auto& bufs = audioRingBuffers_;
+    auto& channel0 = bufs.front();
 
-    auto availFrames = safe_static_cast<int32_t>(bufs.front().size() / sizeof(float));
+    if (channel0.isEos()) {
+
+        // are we done?
+        if (processedBlocks_[TrackType::Audio] == audio_.numBlocks) {
+            return sound::BufferResult::NoMoreData;
+        }
+
+        return sound::BufferResult::NoDataReady;
+    }
+
+    auto availFrames = safe_static_cast<int32_t>(channel0.size() / sizeof(float));
     auto numFrames = core::Min(availFrames, ab.maxFrames());
 
     // What sweet song do you have for me today?
@@ -654,6 +732,7 @@ void Video::audioDataRequest(sound::AudioBuffer& ab)
     ab.setValidFrames(numFrames);
 
     validateAudioBufferSizes();
+    return sound::BufferResult::DataReady;
 }
 
 void Video::validateAudioBufferSizes(void) const
@@ -679,7 +758,7 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
     uint8_t* pBuf = static_cast<uint8_t*>(pReadReq->pBuf);
 
     {
-        core::CriticalSection::ScopedLock lock(cs_);
+        core::CriticalSection::ScopedLock lock(ioCs_);
 
         // the io buffer has loaded, copy into ring buffer.
         X_ASSERT(ioRingBuffer_.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(ioRingBuffer_.freeSpace(), pReadReq->dataSize);
@@ -696,7 +775,7 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 
 void Video::dispatchRead(void)
 {
-    core::CriticalSection::ScopedLock lock(cs_);
+    core::CriticalSection::ScopedLock lock(ioCs_);
 
     // we have one IO buffer currently.
     // could add multiple if decide it's worth dispatching multiple requests.
@@ -733,48 +812,103 @@ void Video::dispatchRead(void)
 
 bool Video::decodeFrame(void)
 {
-    core::CriticalSection::ScopedLock lock(cs_);
 
-    X_ASSERT(encodedFrame_.isNotEmpty(), "Encoded frame is empty")(encodedFrame_.size());
+    auto processImg = [&](vpx_image_t* pImg, Frame& frame) -> bool {
+        if (pImg->fmt != VPX_IMG_FMT_I420) {
+            X_ERROR("Video", "Failed to get frame: \"%s\"", vpx_codec_error_detail(&codec_));
+            return false;
+        }
 
-    if (vpx_codec_decode(&codec_, encodedFrame_.data(), static_cast<uint32_t>(encodedFrame_.size()), nullptr, 0)) {
-        X_ERROR("Video", "Failed to decode frame: \"%s\"", vpx_codec_error_detail(&codec_));
-        return false;
+        vpx_img_flip(pImg);
+
+        const int w = pImg->d_w;
+        const int h = pImg->d_h;
+
+        const int strideY = pImg->stride[VPX_PLANE_Y];
+        const int strideU = pImg->stride[VPX_PLANE_U];
+        const int strideV = pImg->stride[VPX_PLANE_V];
+
+        const uint8_t* pSrcY = pImg->planes[VPX_PLANE_Y];
+        const uint8_t* pSrcU = pImg->planes[VPX_PLANE_U];
+        const uint8_t* pSrcV = pImg->planes[VPX_PLANE_V];
+
+        auto requiredSize = (w * 4) * h;
+        X_ASSERT(requiredSize == frame.decoded.size(), "Size mismatch")(requiredSize, frame.decoded.size());
+
+        // only fails with bad args.
+        int res = libyuv::I420ToARGB(
+            pSrcY, strideY,
+            pSrcU, strideU,
+            pSrcV, strideV,
+            frame.decoded.data(),
+            w * 4,
+            w,
+            h);
+
+        X_ASSERT(res == 0, "Failed to convert video data")(res);
+        return true;
+    };
+
+    auto decodeBlock = [&]() -> bool {
+        if (vpx_codec_decode(&codec_, encodedBlock_.data(), static_cast<uint32_t>(encodedBlock_.size()), nullptr, 0)) {
+            X_ERROR("Video", "Failed to decode frame: \"%s\"", vpx_codec_error_detail(&codec_));
+            return false;
+        }
+
+        curDisplayTimeMS_ = displayTimeMS_;
+        encodedBlock_.clear();
+        return true;
+    };
+
+    {
+        core::CriticalSection::ScopedLock lock(frameCs_);
+        X_ASSERT(availFrames_.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(availFrames_.size(), availFrames_.capacity());
     }
 
-    vpx_codec_iter_t iter = nullptr;
-    vpx_image_t* pImg = vpx_codec_get_frame(&codec_, &iter);
-    if (!pImg) {
-        X_ERROR("Video", "Failed to get frame: \"%s\"", vpx_codec_error_detail(&codec_));
-        return false;
+    // any left over frames?
+    if (!vpxFrameIter_) {
+        if (!decodeBlock()) {
+            return false;
+        }
     }
 
-    vpx_img_flip(pImg);
+retry:
+    while (1)
+    {
+        vpx_image_t* pImg = vpx_codec_get_frame(&codec_, &vpxFrameIter_);
+        if (!pImg) {
+    
+            vpxFrameIter_ = nullptr;
 
-    const int w = pImg->d_w;
-    const int h = pImg->d_h;
+            // no block to decode.
+            if (encodedBlock_.isEmpty()) {
+                return true;
+            }
 
-    const int strideY = pImg->stride[VPX_PLANE_Y];
-    const int strideU = pImg->stride[VPX_PLANE_U];
-    const int strideV = pImg->stride[VPX_PLANE_V];
+            if (!decodeBlock()) {
+                return false;
+            }
+            
+            goto retry;
+        }
 
-    const uint8_t* pSrcY = pImg->planes[VPX_PLANE_Y];
-    const uint8_t* pSrcU = pImg->planes[VPX_PLANE_U];
-    const uint8_t* pSrcV = pImg->planes[VPX_PLANE_V];
+        auto& frame = frames_[frameIdx_ % NUM_FRAME_BUFFERS];
 
-    decodedFrame_.resize((w * 4) * h);
+        if (!processImg(pImg, frame)) {
+            return false;
+        }
 
-    int res = libyuv::I420ToARGB(
-        pSrcY, strideY,
-        pSrcU, strideU,
-        pSrcV, strideV,
-        decodedFrame_.data(),
-        w * 4,
-        w,
-        h);
+        frame.displayTime = curDisplayTimeMS_;
 
-    if (res != 0) {
-        X_ERROR("Video", "Failed to convert decoded frame");
+        ++frameIdx_;
+
+        core::CriticalSection::ScopedLock lock(frameCs_);
+
+        availFrames_.push(&frame);
+        if (availFrames_.freeSpace() == 0) {
+            X_LOG0("Video", "frame buffers full");
+            return true;
+        }
     }
 
     return true;
@@ -787,6 +921,8 @@ void Video::decodeFrame_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     if (!decodeFrame()) {
         X_ERROR("Video", "Failed to decode frame");
     }
+
+    pDecodeJob_ = nullptr;
 }
 
 Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
@@ -856,14 +992,20 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     core::StackString<64> txt;
 
     core::HumanDuration::Str durStr0, durStr1;
-    txt.setFmt("Duration: %s - %s (%" PRIi32 "fps)", core::HumanDuration::toString(durStr0, playTime_.GetMilliSeconds()),
-        core::HumanDuration::toString(durStr1, duration_.GetMilliSeconds()), frameRate_);
+    txt.setFmt("Duration: %s - %s (%" PRIi32 "fps) - %s", core::HumanDuration::toString(durStr0, playTime_.GetMilliSeconds()),
+        core::HumanDuration::toString(durStr1, duration_.GetMilliSeconds()), frameRate_, State::ToString(state_));
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    txt.setFmt("Audio: BR %s %" PRIi32 "hz(%" PRIi16 ") %" PRIi16 " chan" , core::HumanSize::toString(sizeStr0, vorbisInfo_.bitrate_nominal),
-        audio_.sampleFreq, audio_.bitDepth, audio_.channels);
+    txt.setFmt("Audio: BR %s %" PRIi32 "hz(%" PRIi16 ") %" PRIi16 " chan %" PRIi32 " / %" PRIi32, core::HumanSize::toString(sizeStr0, vorbisInfo_.bitrate_nominal),
+        audio_.sampleFreq, audio_.bitDepth, audio_.channels, processedBlocks_[TrackType::Audio], audio_.numBlocks);
+
+    pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
+    r += textOff;
+
+    txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32, video_.pixelWidth, video_.pixelHeight,
+        processedBlocks_[TrackType::Video], video_.numBlocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
@@ -871,8 +1013,11 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     size_t memUsage = 0;
     memUsage += ioRingBuffer_.capacity();
     memUsage += ioReqBuffer_.capacity();
-    memUsage += encodedFrame_.capacity();
-    memUsage += decodedFrame_.capacity();
+    memUsage += encodedBlock_.capacity();
+
+    for (auto& frame : frames_) {
+        memUsage += frame.decoded.capacity();
+    }
 
     for (const auto& tq : trackQueues_) {
         memUsage += tq.capacity() * sizeof(IntQueue::Type);
@@ -889,10 +1034,10 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    auto totalblocks = video_.numFrames + audio_.numFrames;
+    auto totalblocks = video_.numBlocks + audio_.numBlocks;
 
     txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
-        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - blocksLeft_, totalblocks);
+        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - fileBlocksLeft_, totalblocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;

@@ -261,13 +261,13 @@ bool VideoCompiler::process(DataVec&& srcData)
                     }
 
                     if (block.type == TrackType::Video) {
-                        videoTrack_.numFrames++;
-                        videoTrack_.largestFrameBytes = core::Max(videoTrack_.largestFrameBytes,
+                        videoTrack_.numBlocks++;
+                        videoTrack_.largestBlockBytes = core::Max(videoTrack_.largestBlockBytes,
                             safe_static_cast<int32_t>(block.data.size()));
                     }
                     else if (block.type == TrackType::Audio) {
-                        audioTrack_.numFrames++;
-                        audioTrack_.largestFrameBytes = core::Max(audioTrack_.largestFrameBytes,
+                        audioTrack_.numBlocks++;
+                        audioTrack_.largestBlockBytes = core::Max(audioTrack_.largestBlockBytes,
                             safe_static_cast<int32_t>(block.data.size()));
                     }
                 }

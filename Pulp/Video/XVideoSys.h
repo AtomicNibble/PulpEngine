@@ -144,6 +144,7 @@ public:
     void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
 
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
+    void unlockBuffers(void) X_FINAL;
 
     IVideo* findVideo(const char* pVideoName) const X_FINAL;
     IVideo* loadVideo(const char* pVideoName) X_FINAL;

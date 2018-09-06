@@ -303,6 +303,10 @@ void X3DEngine::update(core::FrameData& frame)
     auto dispalyRes = gEnv->pRender->getDisplayRes();
     frame.view.displayRes = dispalyRes;
     frame.view.renderRes = dispalyRes;
+
+    if (gEnv->pVideoSys) {
+        gEnv->pVideoSys->unlockBuffers();
+    }
 }
 
 void X3DEngine::onFrameBegin(core::FrameData& frame)
