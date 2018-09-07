@@ -8,7 +8,7 @@ ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBa
 }
 
 template<typename QueT, typename SynchronizationPrimitive>
-ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena, size_t num) :
+ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena, size_type num) :
     que_(arena, num)
 {
 }
@@ -19,7 +19,7 @@ ThreadQueBase<QueT, SynchronizationPrimitive>::~ThreadQueBase()
 }
 
 template<typename QueT, typename SynchronizationPrimitive>
-void ThreadQueBase<QueT, SynchronizationPrimitive>::reserve(size_t num)
+void ThreadQueBase<QueT, SynchronizationPrimitive>::reserve(size_type num)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
