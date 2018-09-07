@@ -4,7 +4,9 @@
 #include "IVFTypes.h"
 
 #include <Threading\JobSystem2.h>
+
 #include <Memory\MemCursor.h>
+
 #include <Compression\LZ4.h>
 
 #include <String\HumanDuration.h>
@@ -141,6 +143,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
     dispatchRead();
 
+    // dispatch decode jobs.
     processIOData();
 
     if (state_ == State::Playing)
@@ -216,17 +219,18 @@ void Video::processIOData(void)
     auto& audioQueue = trackQueues_[TrackType::Audio];
     auto& videoQueue = trackQueues_[TrackType::Video];
 
-    // Audio
-    {
-        auto& channel0 = audioRingBuffers_[0];
+    const auto& channel0 = audioRingBuffers_[0];
 
-        if (audioQueue.isNotEmpty() && pDecodeAudioJob_ == nullptr && channel0.size() < AUDIO_RING_MAX_FILL)
+    // Audio
+    if (channel0.size() < AUDIO_RING_MAX_FILL && pDecodeAudioJob_ == nullptr)
+    {
+        if (audioQueue.isNotEmpty())
         {
             pDecodeAudioJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeAudio_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
         }
-
-        if (audioQueue.isEmpty() && channel0.isEos()) {
+        else if(channel0.isEos())
+        {
             X_WARNING("Video", "Audio queue starvation");
         }
     }
@@ -234,56 +238,14 @@ void Video::processIOData(void)
     // Video
     if (availFrames_.freeSpace() > 0 && pDecodeVideoJob_ == nullptr)
     {
-        size_t checkFreeSpace = 0;
+        if (videoQueue.isNotEmpty())
         {
-            core::CriticalSection::ScopedLock lock(frameCs_);
-            checkFreeSpace = availFrames_.freeSpace();
-        }
-
-        if (checkFreeSpace > 0 && videoQueue.isNotEmpty())
-        {
-            // the video should always be at start?
-            // if not, it means we have a audio buffer still waiting to be processed that came before this video frame
-            // sounds like something that should not happen..
-            auto absoluteOffset = videoQueue.peek();
-            auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
-
-            auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
-            X_ASSERT(hdr.type == TrackType::Video, "Incorrect type")();
-
-            encodedBlock_.resize(hdr.blockSize);
-            ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
-
-            displayTimeMS_ = hdr.timeMS;
-
-            ++processedBlocks_[TrackType::Video];
-
-            // we now want to decode the frame.
-            X_ASSERT(pDecodeVideoJob_ == nullptr, "Deocde job not null")(pDecodeVideoJob_);
             pDecodeVideoJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeVideo_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
-
-            const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
-
-            videoQueue.pop();
-
-            if (offset == 0)
-            {
-                seekIoBuffer(blockSize);
-                popProcessed(TrackType::Audio);
-            }
-            else
-            {
-                // X_ASSERT_UNREACHABLE();
-            }
-
-            validateQueues();
         }
-
-        validateQueues();
-
-        // are we starved?
-        if (!pDecodeVideoJob_) {
+        else
+        {
+            // are we starved?
             // Finished all the blocks?
             if (processedBlocks_[TrackType::Video] != video_.numBlocks) {
                 X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
@@ -293,10 +255,10 @@ void Video::processIOData(void)
 
 }
 
+
+
 void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
-    core::CriticalSection::ScopedLock lock(frameCs_);
-
     if (availFrames_.isEmpty()) {
         X_WARNING("Video", "No frame to present");
         return;
@@ -308,8 +270,8 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
     auto delta = pFrame->displayTime - ellapsed;
 
     // if it's negative frame is late by delta MS.
-    if (delta > 0) {
-        X_LOG0("Video", "Frame time till display: %" PRIi32, delta);
+    if (delta > 10) {
+        X_WARNING("Video", "Frame time till display: %" PRIi32, delta);
         return;
     }
 
@@ -333,8 +295,6 @@ void Video::releaseFrame(void)
 
     X_ASSERT(availFrames_.isNotEmpty(), "Avail frames is empty")();
     X_ASSERT(pLockedFrame_ == availFrames_.peek(), "Locked frame is not the top one")(pLockedFrame_);
-
-    core::CriticalSection::ScopedLock lock(frameCs_);
 
     pLockedFrame_ = nullptr;
     availFrames_.pop();
@@ -790,6 +750,53 @@ bool Video::decodeAudioPacket(void)
     return true;
 }
 
+void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
+{
+    X_UNUSED(jobSys, threadIdx, pJob, pData);
+
+    auto& audioQueue = trackQueues_[TrackType::Audio];
+    auto& channel0 = audioRingBuffers_[0];
+
+    // process packets till we either run out of packets or output buffer full.
+    ioCs_.Enter();
+
+    while(audioQueue.isNotEmpty() && channel0.size() < AUDIO_RING_MAX_FILL)
+    {
+        auto absoluteOffset = audioQueue.peek();
+        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
+
+        auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
+        X_ASSERT(hdr.type == TrackType::Audio, "Incorrect type")();
+
+        encodedAudioFrame_.resize(hdr.blockSize);
+        ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedAudioFrame_.data(), encodedAudioFrame_.size());
+
+        ioCs_.Leave();
+
+        if (!decodeAudioPacket()) {
+            X_ERROR("Vidoe", "Failed to decode audio packet");
+        }
+
+        ioCs_.Enter();
+
+        ++processedBlocks_[TrackType::Audio];
+
+        const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
+
+        audioQueue.pop();
+
+        if (offset == 0)
+        {
+            seekIoBuffer(blockSize);
+            popProcessed(TrackType::Video);
+        }
+    }
+
+    ioCs_.Leave();
+
+    pDecodeAudioJob_ = nullptr;
+}
+
 bool Video::decodeVideo(void)
 {
     auto processImg = [&](vpx_image_t* pImg, Frame& frame) -> bool {
@@ -839,10 +846,7 @@ bool Video::decodeVideo(void)
         return true;
     };
 
-    {
-        core::CriticalSection::ScopedLock lock(frameCs_);
-        X_ASSERT(availFrames_.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(availFrames_.size(), availFrames_.capacity());
-    }
+    X_ASSERT(availFrames_.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(availFrames_.size(), availFrames_.capacity());
 
     // any left over frames?
     if (!vpxFrameIter_) {
@@ -856,7 +860,7 @@ retry:
     {
         vpx_image_t* pImg = vpx_codec_get_frame(&codec_, &vpxFrameIter_);
         if (!pImg) {
-    
+
             vpxFrameIter_ = nullptr;
 
             // no block to decode.
@@ -867,7 +871,7 @@ retry:
             if (!decodeBlock()) {
                 return false;
             }
-            
+
             goto retry;
         }
 
@@ -881,8 +885,6 @@ retry:
 
         ++frameIdx_;
 
-        core::CriticalSection::ScopedLock lock(frameCs_);
-
         availFrames_.push(&frame);
         if (availFrames_.freeSpace() == 0) {
             return true;
@@ -892,61 +894,52 @@ retry:
     return true;
 }
 
-
-void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
-{
-    X_UNUSED(jobSys, threadIdx, pJob, pData);
-
-    auto& audioQueue = trackQueues_[TrackType::Audio];
-    auto& channel0 = audioRingBuffers_[0];
-
-    // process packets till we either run out of packets or output buffer full.
-    ioCs_.Enter();
-
-    while(audioQueue.isNotEmpty() && channel0.size() < AUDIO_RING_MAX_FILL)
-    {
-        auto absoluteOffset = audioQueue.peek();
-        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
-
-        auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
-        X_ASSERT(hdr.type == TrackType::Audio, "Incorrect type")();
-
-        encodedAudioFrame_.resize(hdr.blockSize);
-        ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedAudioFrame_.data(), encodedAudioFrame_.size());
-
-        ioCs_.Leave();
-
-        if (!decodeAudioPacket()) {
-            X_ERROR("Vidoe", "Failed to decode audio packet");
-        }
-
-        ioCs_.Enter();
-
-        ++processedBlocks_[TrackType::Audio];
-
-        const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
-
-        audioQueue.pop();
-
-        if (offset == 0)
-        {
-            seekIoBuffer(blockSize);
-            popProcessed(TrackType::Video);
-        }
-    }
-
-    ioCs_.Leave();
-
-    pDecodeAudioJob_ = nullptr;
-}
-
 void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData)
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
-    if (!decodeVideo()) {
-        X_ERROR("Video", "Failed to decode video frame");
+    auto& videoQueue = trackQueues_[TrackType::Video];
+
+    ioCs_.Enter();
+
+    // decode frames till we filled frame buffer.
+    while (availFrames_.freeSpace() > 0 && videoQueue.isNotEmpty())
+    {
+        auto absoluteOffset = videoQueue.peek();
+        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
+
+        auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
+        X_ASSERT(hdr.type == TrackType::Video, "Incorrect type")();
+
+        encodedBlock_.resize(hdr.blockSize);
+        ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
+
+        ioCs_.Leave();
+
+        displayTimeMS_ = hdr.timeMS;
+
+        ++processedBlocks_[TrackType::Video];
+
+        if (!decodeVideo()) {
+            X_ERROR("Video", "Failed to decode video frame");
+        }
+
+        ioCs_.Enter();
+
+        const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
+
+        videoQueue.pop();
+
+        if (offset == 0)
+        {
+            seekIoBuffer(blockSize);
+            popProcessed(TrackType::Audio);
+        }
+
+        validateQueues();
     }
+
+    ioCs_.Leave();
 
     pDecodeVideoJob_ = nullptr;
 }

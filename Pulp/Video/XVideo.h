@@ -2,6 +2,7 @@
 
 #include <Assets\AssetBase.h>
 #include <Threading\Signal.h>
+#include <Threading\FixedThreadQue.h>
 
 #include <Containers\FixedByteStreamRing.h>
 #include <Containers\FixedFifo.h>
@@ -62,16 +63,6 @@ class Video : public core::AssetBase
     typedef std::array<IntQueue, TrackType::ENUM_COUNT> TrackQueues;
     typedef std::array<int32_t, TrackType::ENUM_COUNT> TrackIntArr;
 
-
-    // Debug
-    static constexpr int32_t FRAME_HISTORY_SIZE = 128;
-
-    template<typename T>
-    using FrameHistory = core::FixedRingBuffer<T, FRAME_HISTORY_SIZE>;
-
-    template<typename T>
-    using TrackFrameHistory = std::array<FrameHistory<T>, TrackType::ENUM_COUNT>;
-
     struct Frame
     {
         Frame(core::MemoryArenaBase* arena) :
@@ -84,7 +75,16 @@ class Video : public core::AssetBase
     };
 
     typedef std::array<Frame, NUM_FRAME_BUFFERS> FrameArr;
-    typedef core::FixedFifo<FrameArr::value_type*, NUM_FRAME_BUFFERS> FramePtrQueue;
+    typedef core::FixedThreadQue<FrameArr::value_type*, NUM_FRAME_BUFFERS, core::CriticalSection> FramePtrQueue;
+
+    // Debug
+    static constexpr int32_t FRAME_HISTORY_SIZE = 128;
+
+    template<typename T>
+    using FrameHistory = core::FixedRingBuffer<T, FRAME_HISTORY_SIZE>;
+
+    template<typename T>
+    using TrackFrameHistory = std::array<FrameHistory<T>, TrackType::ENUM_COUNT>;
 
 public:
     Video(core::string name, core::MemoryArenaBase* arena);
@@ -171,7 +171,6 @@ private:
     TrackQueues trackQueues_; // packet buffer queues
 
     // Video buffers
-    core::CriticalSection frameCs_;
     Frame* pLockedFrame_;
     FramePtrQueue availFrames_;
     int32_t frameIdx_;
@@ -182,6 +181,8 @@ private:
 
     int32_t curDisplayTimeMS_;
     vpx_codec_iter_t vpxFrameIter_;
+
+    X_ALIGNED_SYMBOL(uint8_t _threadPad[1], 64);
 
     // sound stuff
     int64_t oggPacketCount_;
