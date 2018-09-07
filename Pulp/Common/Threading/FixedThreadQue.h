@@ -11,6 +11,9 @@
 X_NAMESPACE_BEGIN(core)
 
 // A fixed sized thread Que, it's blocking by default.
+// there is little point to a none blocking one, even if you check if space first.
+// since you don't own the lock between checking size and pushing, so you could loose = crash
+// the only time that would work is for single producer
 
 template<typename T, size_t N, typename SynchronizationPrimitive>
 class FixedThreadQueBase
@@ -25,6 +28,7 @@ public:
 
     size_type size(void);
     size_type freeSpace(void);
+    size_type capacity(void) const;
     bool isEmpty(void) const;
     bool isNotEmpty(void) const;
 

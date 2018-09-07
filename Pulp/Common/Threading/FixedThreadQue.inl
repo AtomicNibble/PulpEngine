@@ -30,6 +30,12 @@ size_t FixedThreadQueBase<T, N, SynchronizationPrimitive>::freeSpace(void)
 }
 
 template<typename T, size_t N, typename SynchronizationPrimitive>
+size_t FixedThreadQueBase<T, N, SynchronizationPrimitive>::capacity(void) const
+{
+    return que_.capacity();
+}
+
+template<typename T, size_t N, typename SynchronizationPrimitive>
 bool FixedThreadQueBase<T, N, SynchronizationPrimitive>::isEmpty(void) const
 {
     return que_.isEmpty();
