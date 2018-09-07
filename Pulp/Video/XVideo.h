@@ -27,7 +27,7 @@ struct FrameData
     const uint8_t* pData;
 };
 
-X_DECLARE_ENUM8(State)
+X_DECLARE_ENUM(State)
 (
     UnInit,
     Init,
@@ -135,9 +135,8 @@ private:
     void decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
-    vpx_codec_ctx_t codec_;
 
-    VideoTrackHdr video_;
+    VideoTrackHdr vidHdr_;
     AudioTrackHdr audio_;
 
     int32_t frameRate_;
@@ -146,8 +145,6 @@ private:
     core::TimeVal duration_;
 
     State::Enum state_;
-    bool ioRequestPending_;
-    bool _pad[2];
 
     core::V2::Job* pDecodeAudioJob_;
     core::V2::Job* pDecodeVideoJob_;
@@ -159,6 +156,7 @@ private:
     {
         IoFields(core::MemoryArenaBase* arena) :
             pFile(nullptr),
+            requestPending(false),
             fileOffset(0),
             fileLength(0),
             fileBlocksLeft(0),
@@ -172,34 +170,57 @@ private:
         core::CriticalSection cs;
         core::XFileAsync* pFile;
 
+        bool requestPending;
+        bool _pad[3];
+
         uint64_t fileOffset;       // the file offset we last read from.
         uint64_t fileLength;       // the total file length;
         int32_t fileBlocksLeft;    //
 
         DataVec reqBuffer;                           // file data read into here, then moved into ringBuffer_
         int32_t bufferReadOffset;
-        
+
         core::FixedByteStreamRingOwning ringBuffer;  // buffer holding loaded IO data, ready for processing.
 
         // inline
         TrackQueues trackQueues; // packet buffer queues
     };
 
+    struct VideoFields
+    {
+        VideoFields(core::MemoryArenaBase* arena) :
+            pLockedFrame(nullptr),
+            frameIdx(0),
+            frames{
+            arena,
+            arena,
+            arena
+            },
+            encodedBlock(arena),
+            displayTimeMS(0),
+            curDisplayTimeMS(0)
+        {
+            core::zero_object(codec);
+        }
+
+        Frame* pLockedFrame;
+        FramePtrQueue availFrames;
+        int32_t frameIdx;
+        FrameArr frames;
+
+        DataVec encodedBlock;
+
+        int32_t displayTimeMS; // the disaply time of the encode block.
+        int32_t curDisplayTimeMS;
+
+        vpx_codec_ctx_t codec;
+        vpx_codec_iter_t vpxFrameIter;
+    };
+
     X_ALIGNED_SYMBOL(IoFields io_, 64);
+    X_ALIGNED_SYMBOL(VideoFields vid_, 64);
 
     TrackIntArr processedBlocks_;
-
-    // Video buffers
-    Frame* pLockedFrame_;
-    FramePtrQueue availFrames_;
-    int32_t frameIdx_;
-    FrameArr frames_;
-
-    int32_t displayTimeMS_; // the disaply time of the encode block.
-    DataVec encodedBlock_;
-
-    int32_t curDisplayTimeMS_;
-    vpx_codec_iter_t vpxFrameIter_;
 
     X_ALIGNED_SYMBOL(uint8_t _threadPad[1], 64);
 

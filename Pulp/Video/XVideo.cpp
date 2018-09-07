@@ -45,18 +45,9 @@ namespace
 Video::Video(core::string name, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::VIDEO),
     frameRate_(0),
-    displayTimeMS_(0),
     state_(State::UnInit),
-    ioRequestPending_(false),
     io_(arena),
-    pLockedFrame_(nullptr),
-    frameIdx_(0),
-    frames_{
-        arena, 
-        arena,
-        arena
-    },
-    encodedBlock_(arena),
+    vid_(arena),
     pTexture_(nullptr),
     pDecodeAudioJob_(nullptr),
     pDecodeVideoJob_(nullptr),
@@ -70,8 +61,7 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
     sndPlayingId_(sound::INVALID_PLAYING_ID),
     sndObj_(sound::INVALID_OBJECT_ID)
 {
-    core::zero_object(codec_);
-    core::zero_object(video_);
+    core::zero_object(vidHdr_);
     core::zero_object(audio_);
 
     core::zero_object(processedBlocks_);
@@ -94,7 +84,7 @@ Video::~Video()
         gEnv->pFileSys->AddCloseRequestToQue(io_.pFile);
     }
 
-    auto err = vpx_codec_destroy(&codec_);
+    auto err = vpx_codec_destroy(&vid_.codec);
     if (err != VPX_CODEC_OK) {
         X_ERROR("Video", "Failed to destory decoder: %s", vpx_codec_err_to_string(err));
     }
@@ -126,7 +116,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     if (!pTexture_) {
         pTexture_ = gEnv->pRender->createTexture(
             name_.c_str(),
-            Vec2i(video_.pixelWidth, video_.pixelHeight),
+            Vec2i(vidHdr_.pixelWidth, vidHdr_.pixelHeight),
             texture::Texturefmt::B8G8R8A8,
             render::BufUsage::PER_FRAME);
     }
@@ -150,7 +140,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
     {
         auto& channel0 = audioRingBuffers_[0];
 
-        if (availFrames_.size() == availFrames_.capacity() && channel0.size() > 0)
+        if (vid_.availFrames.size() == vid_.availFrames.capacity() && channel0.size() > 0)
         {
             if (sndObj_ == sound::INVALID_OBJECT_ID) {
                 sndObj_ = gEnv->pSound->registerObject("VideoAudio");
@@ -230,7 +220,7 @@ void Video::processIOData(void)
     }
 
     // Video
-    if (availFrames_.freeSpace() > 0 && pDecodeVideoJob_ == nullptr)
+    if (vid_.availFrames.freeSpace() > 0 && pDecodeVideoJob_ == nullptr)
     {
         if (videoQueue.isNotEmpty())
         {
@@ -241,24 +231,23 @@ void Video::processIOData(void)
         {
             // are we starved?
             // Finished all the blocks?
-            if (processedBlocks_[TrackType::Video] != video_.numBlocks) {
+            if (processedBlocks_[TrackType::Video] != vidHdr_.numBlocks) {
                 X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
             }
         }
     }
-
 }
 
 
 
 void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
-    if (availFrames_.isEmpty()) {
+    if (vid_.availFrames.isEmpty()) {
         X_WARNING("Video", "No frame to present");
         return;
     }
 
-    auto* pFrame = availFrames_.peek();
+    auto* pFrame = vid_.availFrames.peek();
 
     auto ellapsed = static_cast<int32_t>(playTime_.GetMilliSeconds());
     auto delta = pFrame->displayTime - ellapsed;
@@ -278,20 +267,21 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
     pCopyCmd->pData = pFrame->decoded.data();
     pCopyCmd->size = safe_static_cast<uint32_t>(pFrame->decoded.size());
 #endif
-    pLockedFrame_ = pFrame;
+
+    vid_.pLockedFrame = pFrame;
 }
 
 void Video::releaseFrame(void)
 {
-    if (!pLockedFrame_) {
+    if (!vid_.pLockedFrame) {
         return;
     }
 
-    X_ASSERT(availFrames_.isNotEmpty(), "Avail frames is empty")();
-    X_ASSERT(pLockedFrame_ == availFrames_.peek(), "Locked frame is not the top one")(pLockedFrame_);
+    X_ASSERT(vid_.availFrames.isNotEmpty(), "Avail frames is empty")();
+    X_ASSERT(vid_.pLockedFrame == vid_.availFrames.peek(), "Locked frame is not the top one")(vid_.pLockedFrame);
 
-    pLockedFrame_ = nullptr;
-    availFrames_.pop();
+    vid_.pLockedFrame = nullptr;
+    vid_.availFrames.pop();
 }
 
 render::TexID Video::getTextureID(void) const
@@ -326,7 +316,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         return false;
     }
 
-    video_ = hdr.video;
+    vidHdr_ = hdr.video;
     audio_ = hdr.audio;
 
     auto durationMS = hdr.durationNS / 1000000;
@@ -370,23 +360,23 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
     vpx_codec_iface_t* pInterface = vpx_codec_vp8_dx();
 
     int flags = 0;
-    if (vpx_codec_dec_init(&codec_, pInterface, nullptr, flags)) {
-        X_ERROR("Video", "Failed to initialize decoder: %s", vpx_codec_error_detail(&codec_));
+    if (vpx_codec_dec_init(&vid_.codec, pInterface, nullptr, flags)) {
+        X_ERROR("Video", "Failed to initialize decoder: %s", vpx_codec_error_detail(&vid_.codec));
         return false;
     }
 
-    io_.fileBlocksLeft = video_.numBlocks + audio_.numBlocks;
+    io_.fileBlocksLeft = vidHdr_.numBlocks + audio_.numBlocks;
     io_.fileLength = pFile->fileSize();
     io_.fileOffset = sizeof(hdr) + audioHdrSize;
     io_.reqBuffer.resize(safe_static_cast<size_t>(core::Min<uint64>(io_.fileLength, IO_REQUEST_SIZE)));
   
-    encodedBlock_.reserve(video_.largestBlockBytes);
-    encodedAudioFrame_.reserve(audio_.largestBlockBytes);
-
-    const auto frameBytes = video_.pixelWidth * (video_.pixelHeight * 4);
-    for (auto& frame : frames_) {
+    vid_.encodedBlock.reserve(vidHdr_.largestBlockBytes);
+    const auto frameBytes = vidHdr_.pixelWidth * (vidHdr_.pixelHeight * 4);
+    for (auto& frame : vid_.frames) {
         frame.decoded.resize(frameBytes);
     }
+
+    encodedAudioFrame_.reserve(audio_.largestBlockBytes);
 
     state_ = State::Init;
     return true;
@@ -533,8 +523,7 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
         X_ASSERT(io_.ringBuffer.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(io_.ringBuffer.freeSpace(), pReadReq->dataSize);
 
         io_.ringBuffer.write(pBuf, bytesTransferred);
-
-        ioRequestPending_ = false;
+        io_.requestPending = false;
 
         if (io_.ringBuffer.freeSpace() >= IO_REQUEST_SIZE) {
             dispatchRead();
@@ -549,7 +538,7 @@ void Video::dispatchRead(void)
     // we have one IO buffer currently.
     // could add multiple if decide it's worth dispatching multiple requests.
     // i think having atleast 2 active would be worth it.
-    if (ioRequestPending_) {
+    if (io_.requestPending) {
         return;
     }
 
@@ -562,7 +551,7 @@ void Video::dispatchRead(void)
         return;
     }
 
-    ioRequestPending_ = true;
+    io_.requestPending = true;
 
     auto requestSize = core::Min<uint64_t>(IO_REQUEST_SIZE, bytesLeft);
 
@@ -796,7 +785,7 @@ bool Video::decodeVideo(void)
 {
     auto processImg = [&](vpx_image_t* pImg, Frame& frame) -> bool {
         if (pImg->fmt != VPX_IMG_FMT_I420) {
-            X_ERROR("Video", "Failed to get frame: \"%s\"", vpx_codec_error_detail(&codec_));
+            X_ERROR("Video", "Failed to get frame: \"%s\"", vpx_codec_error_detail(&vid_.codec));
             return false;
         }
 
@@ -831,20 +820,20 @@ bool Video::decodeVideo(void)
     };
 
     auto decodeBlock = [&]() -> bool {
-        if (vpx_codec_decode(&codec_, encodedBlock_.data(), static_cast<uint32_t>(encodedBlock_.size()), nullptr, 0)) {
-            X_ERROR("Video", "Failed to decode frame: \"%s\"", vpx_codec_error_detail(&codec_));
+        if (vpx_codec_decode(&vid_.codec, vid_.encodedBlock.data(), static_cast<uint32_t>(vid_.encodedBlock.size()), nullptr, 0)) {
+            X_ERROR("Video", "Failed to decode frame: \"%s\"", vpx_codec_error_detail(&vid_.codec));
             return false;
         }
 
-        curDisplayTimeMS_ = displayTimeMS_;
-        encodedBlock_.clear();
+        vid_.curDisplayTimeMS = vid_.displayTimeMS;
+        vid_.encodedBlock.clear();
         return true;
     };
 
-    X_ASSERT(availFrames_.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(availFrames_.size(), availFrames_.capacity());
+    X_ASSERT(vid_.availFrames.freeSpace() > 0, "decode frame called, when no avalible frame buffers")(vid_.availFrames.size(), vid_.availFrames.capacity());
 
     // any left over frames?
-    if (!vpxFrameIter_) {
+    if (!vid_.vpxFrameIter) {
         if (!decodeBlock()) {
             return false;
         }
@@ -853,13 +842,13 @@ bool Video::decodeVideo(void)
 retry:
     while (1)
     {
-        vpx_image_t* pImg = vpx_codec_get_frame(&codec_, &vpxFrameIter_);
+        vpx_image_t* pImg = vpx_codec_get_frame(&vid_.codec, &vid_.vpxFrameIter);
         if (!pImg) {
 
-            vpxFrameIter_ = nullptr;
+            vid_.vpxFrameIter = nullptr;
 
             // no block to decode.
-            if (encodedBlock_.isEmpty()) {
+            if (vid_.encodedBlock.isEmpty()) {
                 return true;
             }
 
@@ -870,18 +859,18 @@ retry:
             goto retry;
         }
 
-        auto& frame = frames_[frameIdx_ % NUM_FRAME_BUFFERS];
+        auto& frame = vid_.frames[vid_.frameIdx % NUM_FRAME_BUFFERS];
 
         if (!processImg(pImg, frame)) {
             return false;
         }
 
-        frame.displayTime = curDisplayTimeMS_;
+        frame.displayTime = vid_.curDisplayTimeMS;
 
-        ++frameIdx_;
+        ++vid_.frameIdx;
 
-        availFrames_.push(&frame);
-        if (availFrames_.freeSpace() == 0) {
+        vid_.availFrames.push(&frame);
+        if (vid_.availFrames.freeSpace() == 0) {
             return true;
         }
     }
@@ -898,7 +887,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     auto& videoQueue = io_.trackQueues[TrackType::Video];
 
     // decode frames till we filled frame buffer.
-    while (availFrames_.freeSpace() > 0 && videoQueue.isNotEmpty())
+    while (vid_.availFrames.freeSpace() > 0 && videoQueue.isNotEmpty())
     {
         auto absoluteOffset = videoQueue.peek();
         auto offset = io_.ringBuffer.absoluteToRelativeOffset(absoluteOffset);
@@ -906,12 +895,12 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
         X_ASSERT(hdr.type == TrackType::Video, "Incorrect type")();
 
-        encodedBlock_.resize(hdr.blockSize);
-        io_.ringBuffer.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
+        vid_.encodedBlock.resize(hdr.blockSize);
+        io_.ringBuffer.peek(offset + sizeof(BlockHdr), vid_.encodedBlock.data(), vid_.encodedBlock.size());
 
         io_.cs.Leave();
 
-        displayTimeMS_ = hdr.timeMS;
+        vid_.displayTimeMS = hdr.timeMS;
 
         ++processedBlocks_[TrackType::Video];
 
@@ -1018,8 +1007,8 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32, video_.pixelWidth, video_.pixelHeight,
-        processedBlocks_[TrackType::Video], video_.numBlocks);
+    txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32, vidHdr_.pixelWidth, vidHdr_.pixelHeight,
+        processedBlocks_[TrackType::Video], vidHdr_.numBlocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
@@ -1027,9 +1016,9 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     size_t memUsage = 0;
     memUsage += io_.ringBuffer.capacity();
     memUsage += io_.reqBuffer.capacity();
-    memUsage += encodedBlock_.capacity();
+    memUsage += vid_.encodedBlock.capacity();
 
-    for (auto& frame : frames_) {
+    for (auto& frame : vid_.frames) {
         memUsage += frame.decoded.capacity();
     }
 
@@ -1048,7 +1037,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    auto totalblocks = video_.numBlocks + audio_.numBlocks;
+    auto totalblocks = vidHdr_.numBlocks + audio_.numBlocks;
 
     txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, io_.ringBuffer.size()),
         core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - io_.fileBlocksLeft, totalblocks);
