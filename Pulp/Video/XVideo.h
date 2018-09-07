@@ -137,7 +137,7 @@ private:
 private:
 
     VideoTrackHdr vidHdr_;
-    AudioTrackHdr audio_;
+    AudioTrackHdr audioHdr_;
 
     int32_t frameRate_;
 
@@ -190,12 +190,13 @@ private:
     {
         VideoFields(core::MemoryArenaBase* arena) :
             pLockedFrame(nullptr),
-            frameIdx(0),
             frames{
             arena,
             arena,
             arena
             },
+            frameIdx(0),
+            processedBlocks(0),
             encodedBlock(arena),
             displayTimeMS(0),
             curDisplayTimeMS(0)
@@ -205,8 +206,9 @@ private:
 
         Frame* pLockedFrame;
         FramePtrQueue availFrames;
-        int32_t frameIdx;
         FrameArr frames;
+        int32_t frameIdx;
+        int32_t processedBlocks;
 
         DataVec encodedBlock;
 
@@ -217,28 +219,48 @@ private:
         vpx_codec_iter_t vpxFrameIter;
     };
 
+    struct AudioFields
+    {
+        AudioFields(core::MemoryArenaBase* arena) :
+            oggPacketCount(0),
+            oggFramesDecoded(0),
+            processedBlocks(0),
+            encodedAudioFrame(arena),
+            audioRingBuffers{ {
+                { arena, AUDIO_RING_DECODED_BUFFER_SIZE },
+                { arena, AUDIO_RING_DECODED_BUFFER_SIZE }
+            } },
+            sndPlayingId(sound::INVALID_PLAYING_ID),
+            sndObj(sound::INVALID_OBJECT_ID)
+        {
+            core::zero_object(vorbisInfo);
+            core::zero_object(vorbisComment);
+            core::zero_object(vorbisDsp);
+            core::zero_object(vorbisBlock);
+        }
+
+        int64_t oggPacketCount;
+        int64_t oggFramesDecoded;
+        int32_t processedBlocks;
+
+        vorbis_info      vorbisInfo;       // struct that stores all the static vorbis bitstream settings
+        vorbis_comment   vorbisComment;    // struct that stores all the bitstream user comments
+        vorbis_dsp_state vorbisDsp;        // central working state for the packet->PCM decoder
+        vorbis_block     vorbisBlock;      // local working space for packet->PCM decode
+
+        core::CriticalSection audioCs;
+        DataVec encodedAudioFrame;                         // encoded audio
+        AudioRingBufferChannelArr audioRingBuffers;        // decoded audio, ready for sound system.
+
+        sound::PlayingID sndPlayingId;
+        sound::SndObjectHandle sndObj;
+    };
+
+    // shove in structs and align to prevent false sharing.
     X_ALIGNED_SYMBOL(IoFields io_, 64);
     X_ALIGNED_SYMBOL(VideoFields vid_, 64);
+    X_ALIGNED_SYMBOL(AudioFields audio_, 64);
 
-    TrackIntArr processedBlocks_;
-
-    X_ALIGNED_SYMBOL(uint8_t _threadPad[1], 64);
-
-    // sound stuff
-    int64_t oggPacketCount_;
-    int64_t oggFramesDecoded_;
-
-    vorbis_info      vorbisInfo_;       // struct that stores all the static vorbis bitstream settings
-    vorbis_comment   vorbisComment_;    // struct that stores all the bitstream user comments
-    vorbis_dsp_state vorbisDsp_;        // central working state for the packet->PCM decoder
-    vorbis_block     vorbisBlock_;      // local working space for packet->PCM decode
-
-    core::CriticalSection audioCs_;
-    DataVec encodedAudioFrame_;                         // encoded audio
-    AudioRingBufferChannelArr audioRingBuffers_;        // decoded audio, ready for sound system.
-
-    sound::PlayingID sndPlayingId_;
-    sound::SndObjectHandle sndObj_;
 
     // show me the goat.
 #if X_ENABLE_VIDEO_DEBUG

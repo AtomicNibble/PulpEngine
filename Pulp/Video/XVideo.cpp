@@ -48,36 +48,21 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
     state_(State::UnInit),
     io_(arena),
     vid_(arena),
+    audio_(arena),
     pTexture_(nullptr),
     pDecodeAudioJob_(nullptr),
-    pDecodeVideoJob_(nullptr),
-    oggPacketCount_(0),
-    oggFramesDecoded_(0),
-    encodedAudioFrame_(arena),
-    audioRingBuffers_{{
-        { arena, AUDIO_RING_DECODED_BUFFER_SIZE },
-        { arena, AUDIO_RING_DECODED_BUFFER_SIZE }
-    }},
-    sndPlayingId_(sound::INVALID_PLAYING_ID),
-    sndObj_(sound::INVALID_OBJECT_ID)
+    pDecodeVideoJob_(nullptr)
 {
     core::zero_object(vidHdr_);
-    core::zero_object(audio_);
-
-    core::zero_object(processedBlocks_);
-
-    core::zero_object(vorbisInfo_);
-    core::zero_object(vorbisComment_);
-    core::zero_object(vorbisDsp_);
-    core::zero_object(vorbisBlock_);
+    core::zero_object(audioHdr_);
 }
 
 Video::~Video()
 {
     // TODO: work out way to unregister this safly.
     // since if we delte a sound object, then get a event for it, we crash :(
-    if (sndObj_ != sound::INVALID_OBJECT_ID) {
-        gEnv->pSound->unRegisterObject(sndObj_);
+    if (audio_.sndObj != sound::INVALID_OBJECT_ID) {
+        gEnv->pSound->unRegisterObject(audio_.sndObj);
     }
 
     if (io_.pFile) {
@@ -89,10 +74,10 @@ Video::~Video()
         X_ERROR("Video", "Failed to destory decoder: %s", vpx_codec_err_to_string(err));
     }
 
-    vorbis_block_clear(&vorbisBlock_);
-    vorbis_dsp_clear(&vorbisDsp_);
-    vorbis_info_clear(&vorbisInfo_);
-    vorbis_comment_clear(&vorbisComment_);
+    vorbis_block_clear(&audio_.vorbisBlock);
+    vorbis_dsp_clear(&audio_.vorbisDsp);
+    vorbis_info_clear(&audio_.vorbisInfo);
+    vorbis_comment_clear(&audio_.vorbisComment);
 }
 
 void Video::play(void)
@@ -138,17 +123,17 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
   
     if (state_ == State::Buffering)
     {
-        auto& channel0 = audioRingBuffers_[0];
+        auto& channel0 = audio_.audioRingBuffers[0];
 
         if (vid_.availFrames.size() == vid_.availFrames.capacity() && channel0.size() > 0)
         {
-            if (sndObj_ == sound::INVALID_OBJECT_ID) {
-                sndObj_ = gEnv->pSound->registerObject("VideoAudio");
+            if (audio_.sndObj == sound::INVALID_OBJECT_ID) {
+                audio_.sndObj = gEnv->pSound->registerObject("VideoAudio");
             }
 
             sound::AudioBufferDelegate del;
             del.Bind<Video, &Video::audioDataRequest>(this);
-            sndPlayingId_ = gEnv->pSound->playVideoAudio(audio_.channels, audio_.sampleFreq, del, sndObj_);
+            audio_.sndPlayingId = gEnv->pSound->playVideoAudio(audioHdr_.channels, audioHdr_.sampleFreq, del, audio_.sndObj);
 
             state_ = State::Playing;
         }
@@ -156,7 +141,7 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
     if (playTime_ >= duration_)
     {
-        gEnv->pSound->stopVideoAudio(sndPlayingId_);
+        gEnv->pSound->stopVideoAudio(audio_.sndPlayingId);
 
         // TODO: validate we played everything.
 
@@ -203,7 +188,7 @@ void Video::processIOData(void)
     auto& audioQueue = io_.trackQueues[TrackType::Audio];
     auto& videoQueue = io_.trackQueues[TrackType::Video];
 
-    const auto& channel0 = audioRingBuffers_[0];
+    const auto& channel0 = audio_.audioRingBuffers.front();
 
     // Audio
     if (channel0.size() < AUDIO_RING_MAX_FILL && pDecodeAudioJob_ == nullptr)
@@ -231,7 +216,7 @@ void Video::processIOData(void)
         {
             // are we starved?
             // Finished all the blocks?
-            if (processedBlocks_[TrackType::Video] != vidHdr_.numBlocks) {
+            if (vid_.processedBlocks != vidHdr_.numBlocks) {
                 X_WARNING("Video", "Decode buffer starved: \"%s\"", name_.c_str());
             }
         }
@@ -312,12 +297,12 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
     }
 
     if (hdr.audio.channels > VIDEO_MAX_AUDIO_CHANNELS) {
-        X_ERROR("Video", "Audio has unsupported channel count: %" PRIi32, vorbisInfo_.channels);
+        X_ERROR("Video", "Audio has unsupported channel count: %" PRIi32, hdr.audio.channels);
         return false;
     }
 
     vidHdr_ = hdr.video;
-    audio_ = hdr.audio;
+    audioHdr_ = hdr.audio;
 
     auto durationMS = hdr.durationNS / 1000000;
     auto durationS = durationMS / 1000;
@@ -365,7 +350,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         return false;
     }
 
-    io_.fileBlocksLeft = vidHdr_.numBlocks + audio_.numBlocks;
+    io_.fileBlocksLeft = vidHdr_.numBlocks + audioHdr_.numBlocks;
     io_.fileLength = pFile->fileSize();
     io_.fileOffset = sizeof(hdr) + audioHdrSize;
     io_.reqBuffer.resize(safe_static_cast<size_t>(core::Min<uint64>(io_.fileLength, IO_REQUEST_SIZE)));
@@ -376,7 +361,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         frame.decoded.resize(frameBytes);
     }
 
-    encodedAudioFrame_.reserve(audio_.largestBlockBytes);
+    audio_.encodedAudioFrame.reserve(audioHdr_.largestBlockBytes);
 
     state_ = State::Init;
     return true;
@@ -386,13 +371,13 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
 {
     auto decodeHeader = [&](const uint8_t* pData, size_t length) -> bool
     {
-        bool bos = oggPacketCount_ == 0;
+        bool bos = audio_.oggPacketCount == 0;
         bool eos = false;
 
-        ogg_packet pkt = buildOggPacket(pData, length, bos, eos, 0, oggPacketCount_);
-        int r = vorbis_synthesis_headerin(&vorbisInfo_, &vorbisComment_, &pkt);
+        ogg_packet pkt = buildOggPacket(pData, length, bos, eos, 0, audio_.oggPacketCount);
+        int r = vorbis_synthesis_headerin(&audio_.vorbisInfo, &audio_.vorbisComment, &pkt);
 
-        ++oggPacketCount_;
+        ++audio_.oggPacketCount;
 
         return r == 0;
     };
@@ -402,8 +387,8 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
         return false;
     }
 
-    vorbis_info_init(&vorbisInfo_);
-    vorbis_comment_init(&vorbisComment_);
+    vorbis_info_init(&audio_.vorbisInfo);
+    vorbis_comment_init(&audio_.vorbisComment);
 
 
     auto* pData = data.data();
@@ -427,8 +412,8 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
         return false;
     }
 
-    if (vorbisInfo_.channels > VIDEO_MAX_AUDIO_CHANNELS) {
-        X_ERROR("Video", "Audio has unsupported channel count: %" PRIi32, vorbisInfo_.channels);
+    if (audio_.vorbisInfo.channels > VIDEO_MAX_AUDIO_CHANNELS) {
+        X_ERROR("Video", "Audio has unsupported channel count: %" PRIi32, audio_.vorbisInfo.channels);
         return false;
     }
 
@@ -442,12 +427,12 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
         return false;
     }
 
-    if (vorbis_synthesis_init(&vorbisDsp_, &vorbisInfo_) != 0) {
+    if (vorbis_synthesis_init(&audio_.vorbisDsp, &audio_.vorbisInfo) != 0) {
         X_ERROR("Video", "Failed to init audio synthesis");
         return false;
     }
 
-    if (vorbis_block_init(&vorbisDsp_, &vorbisBlock_) != 0) {
+    if (vorbis_block_init(&audio_.vorbisDsp, &audio_.vorbisBlock) != 0) {
         X_ERROR("Video", "Failed to init audio block");
         return false;
     }
@@ -458,18 +443,18 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
 
 sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
 {
-    core::CriticalSection::ScopedLock lock(audioCs_);
+    core::CriticalSection::ScopedLock lock(audio_.audioCs);
 
     X_ASSERT(ab.numChannels() <= VIDEO_MAX_AUDIO_CHANNELS, "Invalid channel count")(ab.numChannels());
-    X_ASSERT(ab.numChannels() == vorbisInfo_.channels, "Channel count mismatch")(ab.numChannels(), vorbisInfo_.channels);
+    X_ASSERT(ab.numChannels() == audio_.vorbisInfo.channels, "Channel count mismatch")(ab.numChannels(), audio_.vorbisInfo.channels);
 
-    auto& bufs = audioRingBuffers_;
+    auto& bufs = audio_.audioRingBuffers;
     auto& channel0 = bufs.front();
 
     if (channel0.isEos()) {
 
         // are we done?
-        if (processedBlocks_[TrackType::Audio] == audio_.numBlocks) {
+        if (audio_.processedBlocks == audioHdr_.numBlocks) {
             return sound::BufferResult::NoMoreData;
         }
 
@@ -498,8 +483,8 @@ void Video::validateAudioBufferSizes(void) const
 {
 #if X_ENABLE_ASSERTIONS
     {
-        auto& bufs = audioRingBuffers_;
-        auto allSame = std::all_of(bufs.begin() + 1, bufs.begin() + audio_.channels, [&](const AudioRingBufferChannelArr::value_type& b) {
+        auto& bufs = audio_.audioRingBuffers;
+        auto allSame = std::all_of(bufs.begin() + 1, bufs.begin() + audioHdr_.channels, [&](const AudioRingBufferChannelArr::value_type& b) {
             return b.size() == bufs.front().size();
         });
 
@@ -665,13 +650,13 @@ void Video::popProcessed(TrackType::Enum type)
 
 bool Video::decodeAudioPacket(void)
 {
-    X_ASSERT(oggPacketCount_ >= 3, "Headers not parsed")(oggPacketCount_);
-    X_ASSERT(encodedAudioFrame_.isNotEmpty(), "Audio packet empty")();
+    X_ASSERT(audio_.oggPacketCount >= 3, "Headers not parsed")(audio_.oggPacketCount);
+    X_ASSERT(audio_.encodedAudioFrame.isNotEmpty(), "Audio packet empty")();
 
-    ogg_packet pkt = buildOggPacket(encodedAudioFrame_.data(), encodedAudioFrame_.size(), false, false, -1, oggPacketCount_++);
-    bool firstPacket = oggPacketCount_ == 4;
+    ogg_packet pkt = buildOggPacket(audio_.encodedAudioFrame.data(), audio_.encodedAudioFrame.size(), false, false, -1, audio_.oggPacketCount++);
+    bool firstPacket = audio_.oggPacketCount == 4;
 
-    int vsRest = vorbis_synthesis(&vorbisBlock_, &pkt);
+    int vsRest = vorbis_synthesis(&audio_.vorbisBlock, &pkt);
     if (vsRest)
     {
         if (vsRest == OV_ENOTAUDIO) {
@@ -687,26 +672,26 @@ bool Video::decodeAudioPacket(void)
         return false;
     }
 
-    if (vorbis_synthesis_blockin(&vorbisDsp_, &vorbisBlock_)) {
+    if (vorbis_synthesis_blockin(&audio_.vorbisDsp, &audio_.vorbisBlock)) {
         X_ERROR("Video", "Failed to synth audio block");
         return false;
     }
 
     float** pPcm = nullptr;
-    int32_t frames = vorbis_synthesis_pcmout(&vorbisDsp_, &pPcm);
+    int32_t frames = vorbis_synthesis_pcmout(&audio_.vorbisDsp, &pPcm);
     if (frames == 0 && firstPacket)
     {
 
     }
 
-    uint32_t channels = vorbisDsp_.vi->channels;
+    uint32_t channels = audio_.vorbisDsp.vi->channels;
 
     X_ASSERT(channels <= 2, "Unsupported channel count")(channels);
 
     while (frames > 0)
     {
         {
-            core::CriticalSection::ScopedLock lock(audioCs_);
+            core::CriticalSection::ScopedLock lock(audio_.audioCs);
 
             // TODO: handle full buffers.
             // can we back out of this packet and be like don't decode anymore?
@@ -715,20 +700,20 @@ bool Video::decodeAudioPacket(void)
             for (uint32_t i = 0; i < channels; i++)
             {
                 float* pPcmChannel = pPcm[i];
-                audioRingBuffers_[i].write(pPcmChannel, frames);
+                audio_.audioRingBuffers[i].write(pPcmChannel, frames);
             }
 
             validateAudioBufferSizes();
         }
 
-        oggFramesDecoded_ += frames;
+        audio_.oggFramesDecoded += frames;
 
-        if (vorbis_synthesis_read(&vorbisDsp_, frames)) {
+        if (vorbis_synthesis_read(&audio_.vorbisDsp, frames)) {
             X_ERROR("Video", "Failed to read synth audio");
             return false;
         }
 
-        frames = vorbis_synthesis_pcmout(&vorbisDsp_, &pPcm);
+        frames = vorbis_synthesis_pcmout(&audio_.vorbisDsp, &pPcm);
     }
 
     return true;
@@ -739,7 +724,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
     auto& audioQueue = io_.trackQueues[TrackType::Audio];
-    auto& channel0 = audioRingBuffers_[0];
+    auto& channel0 = audio_.audioRingBuffers[0];
 
     // process packets till we either run out of packets or output buffer full.
     io_.cs.Enter();
@@ -752,8 +737,8 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
         X_ASSERT(hdr.type == TrackType::Audio, "Incorrect type")();
 
-        encodedAudioFrame_.resize(hdr.blockSize);
-        io_.ringBuffer.peek(offset + sizeof(BlockHdr), encodedAudioFrame_.data(), encodedAudioFrame_.size());
+        audio_.encodedAudioFrame.resize(hdr.blockSize);
+        io_.ringBuffer.peek(offset + sizeof(BlockHdr), audio_.encodedAudioFrame.data(), audio_.encodedAudioFrame.size());
 
         io_.cs.Leave();
 
@@ -763,7 +748,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 
         io_.cs.Enter();
 
-        ++processedBlocks_[TrackType::Audio];
+        ++audio_.processedBlocks;
 
         const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
 
@@ -902,7 +887,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 
         vid_.displayTimeMS = hdr.timeMS;
 
-        ++processedBlocks_[TrackType::Video];
+        ++vid_.processedBlocks;
 
         if (!decodeVideo()) {
             X_ERROR("Video", "Failed to decode video frame");
@@ -947,7 +932,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
         queueSizes_[i].push_back(safe_static_cast<int16_t>(io_.trackQueues[i].size()));
     }
 
-    audioBufferSize_.push_back(safe_static_cast<int32_t>(audioRingBuffers_.front().size()));
+    audioBufferSize_.push_back(safe_static_cast<int32_t>(audio_.audioRingBuffers.front().size()));
     ioBufferSize_.push_back(safe_static_cast<int32_t>(io_.ringBuffer.size()));
 
     // build linera array
@@ -1001,14 +986,14 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    txt.setFmt("Audio: BR %s %" PRIi32 "hz(%" PRIi16 ") %" PRIi16 " chan %" PRIi32 " / %" PRIi32, core::HumanSize::toString(sizeStr0, vorbisInfo_.bitrate_nominal),
-        audio_.sampleFreq, audio_.bitDepth, audio_.channels, processedBlocks_[TrackType::Audio], audio_.numBlocks);
+    txt.setFmt("Audio: BR %s %" PRIi32 "hz(%" PRIi16 ") %" PRIi16 " chan %" PRIi32 " / %" PRIi32, core::HumanSize::toString(sizeStr0, audio_.vorbisInfo.bitrate_nominal),
+        audioHdr_.sampleFreq, audioHdr_.bitDepth, audioHdr_.channels, audio_.processedBlocks, audioHdr_.numBlocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
     txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32, vidHdr_.pixelWidth, vidHdr_.pixelHeight,
-        processedBlocks_[TrackType::Video], vidHdr_.numBlocks);
+        vid_.processedBlocks, vidHdr_.numBlocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
@@ -1026,9 +1011,9 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
         memUsage += tq.capacity() * sizeof(IntQueue::Type);
     }
 
-    memUsage += encodedAudioFrame_.capacity();
+    memUsage += audio_.encodedAudioFrame.capacity();
 
-    for (const auto& arb : audioRingBuffers_) {
+    for (const auto& arb : audio_.audioRingBuffers) {
         memUsage += arb.capacity();
     }
 
@@ -1037,7 +1022,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    auto totalblocks = vidHdr_.numBlocks + audio_.numBlocks;
+    auto totalblocks = vidHdr_.numBlocks + audioHdr_.numBlocks;
 
     txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, io_.ringBuffer.size()),
         core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - io_.fileBlocksLeft, totalblocks);
@@ -1060,7 +1045,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     }
 
     txt.setFmt("AudioBuf: %s/%s",
-        core::HumanSize::toString(sizeStr0, audioRingBuffers_.front().size()),
+        core::HumanSize::toString(sizeStr0, audio_.audioRingBuffers.front().size()),
         core::HumanSize::toString(sizeStr1, AUDIO_RING_DECODED_BUFFER_SIZE));
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
