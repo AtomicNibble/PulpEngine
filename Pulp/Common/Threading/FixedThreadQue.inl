@@ -34,7 +34,7 @@ template<typename T, size_t N, typename SynchronizationPrimitive>
 size_t FixedThreadQueBase<T, N, SynchronizationPrimitive>::freeSpace(void)
 {
     SynchronizationPrimitive::ScopedLock lock(primitive_);
-    return que_.size();
+    return que_.freeSpace();
 }
 
 template<typename T, size_t N, typename SynchronizationPrimitive>
