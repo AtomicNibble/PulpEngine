@@ -75,7 +75,7 @@ class Video : public core::AssetBase
     };
 
     typedef std::array<Frame, NUM_FRAME_BUFFERS> FrameArr;
-    typedef core::FixedThreadQue<FrameArr::value_type*, NUM_FRAME_BUFFERS, core::CriticalSection> FramePtrQueue;
+    typedef core::FixedThreadQue<FrameArr::value_type*, NUM_FRAME_BUFFERS, core::CriticalSection> FramePtrThreadQueue;
 
     // Debug
     static constexpr int32_t FRAME_HISTORY_SIZE = 128;
@@ -203,8 +203,9 @@ private:
         }
 
         core::V2::Job* pDecodeJob;
+
         Frame* pLockedFrame;
-        FramePtrQueue availFrames;
+        FramePtrThreadQueue availFrames;
         FrameArr frames;
         int32_t frameIdx;
         int32_t processedBlocks;
