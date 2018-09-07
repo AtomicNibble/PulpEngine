@@ -41,13 +41,7 @@ bool FixedThreadQueBase<T, N, SynchronizationPrimitive>::isNotEmpty(void) const
     return que_.isNotEmpty();
 }
 
-#if 0
 // --------------------------------------
-
-
-
-// --------------------------------------
-#endif
 
 template<typename T, size_t N>
 void FixedThreadQue<T, N, core::CriticalSection>::push(T const& value)
