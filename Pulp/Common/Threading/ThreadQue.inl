@@ -1,66 +1,66 @@
 
 X_NAMESPACE_BEGIN(core)
 
-template<typename T, typename SynchronizationPrimitive>
-ThreadQue<T, SynchronizationPrimitive>::ThreadQue(core::MemoryArenaBase* arena) :
+template<typename QueT, typename SynchronizationPrimitive>
+ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena) :
     que_(arena)
 {
 }
 
-template<typename T, typename SynchronizationPrimitive>
-ThreadQue<T, SynchronizationPrimitive>::ThreadQue(core::MemoryArenaBase* arena, size_t num) :
+template<typename QueT, typename SynchronizationPrimitive>
+ThreadQueBase<QueT, SynchronizationPrimitive>::ThreadQueBase(core::MemoryArenaBase* arena, size_t num) :
     que_(arena, num)
 {
 }
 
-template<typename T, typename SynchronizationPrimitive>
-ThreadQue<T, SynchronizationPrimitive>::~ThreadQue()
+template<typename QueT, typename SynchronizationPrimitive>
+ThreadQueBase<QueT, SynchronizationPrimitive>::~ThreadQueBase()
 {
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQue<T, SynchronizationPrimitive>::reserve(size_t num)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBase<QueT, SynchronizationPrimitive>::reserve(size_t num)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
     que_.reserve(num);
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQue<T, SynchronizationPrimitive>::clear(void)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBase<QueT, SynchronizationPrimitive>::clear(void)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
     que_.clear();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQue<T, SynchronizationPrimitive>::free(void)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBase<QueT, SynchronizationPrimitive>::free(void)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
     que_.free();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQue<T, SynchronizationPrimitive>::push(T const& value)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBase<QueT, SynchronizationPrimitive>::push(Type const& value)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
     que_.push(value);
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQue<T, SynchronizationPrimitive>::push(T&& value)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBase<QueT, SynchronizationPrimitive>::push(Type&& value)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
-    que_.push(std::forward<T>(value));
+    que_.push(std::forward<Type>(value));
 }
 
-template<typename T, typename SynchronizationPrimitive>
+template<typename QueT, typename SynchronizationPrimitive>
 template<class UnaryPredicate>
-bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, UnaryPredicate p)
+bool ThreadQueBase<QueT, SynchronizationPrimitive>::push_unique_if(Type const& value, UnaryPredicate p)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
@@ -72,8 +72,8 @@ bool ThreadQue<T, SynchronizationPrimitive>::push_unique_if(T const& value, Unar
     return false;
 }
 
-template<typename T, typename SynchronizationPrimitive>
-bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
+template<typename QueT, typename SynchronizationPrimitive>
+bool ThreadQueBase<QueT, SynchronizationPrimitive>::tryPop(Type& value)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
@@ -86,9 +86,9 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPop(T& value)
     return true;
 }
 
-template<typename T, typename SynchronizationPrimitive>
+template<typename QueT, typename SynchronizationPrimitive>
 template<class CallBack>
-bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
+bool ThreadQueBase<QueT, SynchronizationPrimitive>::tryPopAll(CallBack func)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
@@ -103,138 +103,138 @@ bool ThreadQue<T, SynchronizationPrimitive>::tryPopAll(CallBack func)
     return true;
 }
 
-template<typename T, typename SynchronizationPrimitive>
-size_t ThreadQue<T, SynchronizationPrimitive>::size(void)
+template<typename QueT, typename SynchronizationPrimitive>
+size_t ThreadQueBase<QueT, SynchronizationPrimitive>::size(void)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
 
     return que_.size();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-bool ThreadQue<T, SynchronizationPrimitive>::isEmpty(void) const
+template<typename QueT, typename SynchronizationPrimitive>
+bool ThreadQueBase<QueT, SynchronizationPrimitive>::isEmpty(void) const
 {
     return que_.isEmpty();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-bool ThreadQue<T, SynchronizationPrimitive>::isNotEmpty(void) const
+template<typename QueT, typename SynchronizationPrimitive>
+bool ThreadQueBase<QueT, SynchronizationPrimitive>::isNotEmpty(void) const
 {
     return que_.isNotEmpty();
 }
 
 // --------------------------------------
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQueBlocking<T, SynchronizationPrimitive>::push(T const& value)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBlockingBase<QueT, SynchronizationPrimitive>::push(Type const& value)
 {
-    ThreadQue<T, SynchronizationPrimitive>::push(value);
+    BaseT::push(value);
     signal_.raise();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQueBlocking<T, SynchronizationPrimitive>::push(T&& value)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBlockingBase<QueT, SynchronizationPrimitive>::push(Type&& value)
 {
-    ThreadQue<T, SynchronizationPrimitive>::push(std::forward<T>(value));
+    BaseT::push(std::forward<Type>(value));
     signal_.raise();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-void ThreadQueBlocking<T, SynchronizationPrimitive>::pop(T& value)
+template<typename QueT, typename SynchronizationPrimitive>
+void ThreadQueBlockingBase<QueT, SynchronizationPrimitive>::pop(Type& value)
 {
-    X_DISABLE_WARNING(4127)
+X_DISABLE_WARNING(4127)
     while (true)
-        X_ENABLE_WARNING(4127)
-        {
-            BaseQue::primitive_.Enter();
-            // if que empty wait
-            if (BaseQue::que_.isEmpty()) {
-                BaseQue::primitive_.Leave();
-                signal_.wait();
-                // loop around to reauire lock to check if still empty.
-            }
-            else {
-                break; // break out, we still own lock
-            }
+    {
+        BaseT::primitive_.Enter();
+        // if que empty wait
+        if (BaseT::que_.isEmpty()) {
+            BaseT::primitive_.Leave();
+            signal_.wait();
+            // loop around to reauire lock to check if still empty.
         }
+        else {
+            break; // break out, we still own lock
+        }
+    }
+X_ENABLE_WARNING(4127)
 
-    value = std::move(BaseQue::que_.peek());
-    BaseQue::que_.pop();
+    value = std::move(BaseT::que_.peek());
+    BaseT::que_.pop();
 
     // clear signal and unlock
     signal_.clear();
-    BaseQue::primitive_.Leave();
+    BaseT::primitive_.Leave();
 }
 
-template<typename T, typename SynchronizationPrimitive>
-T ThreadQueBlocking<T, SynchronizationPrimitive>::pop(void)
+template<typename QueT, typename SynchronizationPrimitive>
+typename ThreadQueBlockingBase<QueT, SynchronizationPrimitive>::Type ThreadQueBlockingBase<QueT, SynchronizationPrimitive>::pop(void)
 {
-    X_DISABLE_WARNING(4127)
+X_DISABLE_WARNING(4127)
     while (true)
-        X_ENABLE_WARNING(4127)
-        {
-            BaseQue::primitive_.Enter();
-            // if que empty wait
-            if (BaseQue::que_.isEmpty()) {
-                BaseQue::primitive_.Leave();
-                signal_.wait();
-                // loop around to reauire lock to check if still empty.
-            }
-            else {
-                break; // break out, we still own lock
-            }
+    {
+        BaseT::primitive_.Enter();
+        // if que empty wait
+        if (BaseT::que_.isEmpty()) {
+            BaseT::primitive_.Leave();
+            signal_.wait();
+            // loop around to reauire lock to check if still empty.
         }
+        else {
+            break; // break out, we still own lock
+        }
+    }
+X_ENABLE_WARNING(4127)
 
-    T value = std::move(BaseQue::que_.peek());
-    BaseQue::que_.pop();
+    Type value = std::move(BaseT::que_.peek());
+    BaseT::que_.pop();
 
     // clear signal and unlock
     signal_.clear();
-    BaseQue::primitive_.Leave();
+    BaseT::primitive_.Leave();
 
     return value;
 }
 
 // --------------------------------------
 
-template<typename T>
-void ThreadQueBlocking<T, core::CriticalSection>::push(T const& value)
+template<typename QueT>
+void ThreadQueBlockingBase<QueT, core::CriticalSection>::push(Type const& value)
 {
-    ThreadQue<T, CriticalSection>::push(value);
+    BaseT::push(value);
     cond_.NotifyOne();
 }
 
-template<typename T>
-void ThreadQueBlocking<T, core::CriticalSection>::push(T&& value)
+template<typename QueT>
+void ThreadQueBlockingBase<QueT, core::CriticalSection>::push(Type&& value)
 {
-    ThreadQue<T, CriticalSection>::push(std::forward<T>(value));
+    BaseT::push(std::forward<T>(value));
     cond_.NotifyOne();
 }
 
-template<typename T>
-void ThreadQueBlocking<T, core::CriticalSection>::pop(T& value)
+template<typename QueT>
+void ThreadQueBlockingBase<QueT, core::CriticalSection>::pop(Type& value)
 {
-    CriticalSection::ScopedLock lock(BaseQue::primitive_);
+    CriticalSection::ScopedLock lock(BaseT::primitive_);
 
-    while (BaseQue::que_.isEmpty()) {
-        cond_.Wait(BaseQue::primitive_);
+    while (BaseT::que_.isEmpty()) {
+        cond_.Wait(BaseT::primitive_);
     }
 
-    value = std::move(BaseQue::que_.peek());
-    BaseQue::que_.pop();
+    value = std::move(BaseT::que_.peek());
+    BaseT::que_.pop();
 }
 
-template<typename T>
-T ThreadQueBlocking<T, core::CriticalSection>::pop(void)
+template<typename QueT>
+typename ThreadQueBlockingBase<QueT, core::CriticalSection>::Type ThreadQueBlockingBase<QueT, core::CriticalSection>::pop(void)
 {
-    CriticalSection::ScopedLock lock(BaseQue::primitive_);
+    CriticalSection::ScopedLock lock(BaseT::primitive_);
 
-    while (BaseQue::que_.isEmpty()) {
-        cond_.Wait(BaseQue::primitive_);
+    while (BaseT::que_.isEmpty()) {
+        cond_.Wait(BaseT::primitive_);
     }
 
-    T value = std::move(BaseQue::que_.peek());
-    BaseQue::que_.pop();
+    Type value = std::move(BaseT::que_.peek());
+    BaseT::que_.pop();
     return value;
 }
 

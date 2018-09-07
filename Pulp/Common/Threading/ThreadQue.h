@@ -12,30 +12,30 @@ X_NAMESPACE_BEGIN(core)
 
 // A simple thread que.
 
-template<typename T, typename SynchronizationPrimitive>
-class ThreadQue
+template<typename QueT, typename SynchronizationPrimitive>
+class ThreadQueBase
 {
 public:
     typedef size_t size_type;
-    typedef core::Fifo<T> Que;
+    typedef typename QueT::Type Type;
 
 public:
-    ThreadQue(core::MemoryArenaBase* arena);
-    ThreadQue(core::MemoryArenaBase* arena, size_type num);
-    ~ThreadQue();
+    ThreadQueBase(core::MemoryArenaBase* arena);
+    ThreadQueBase(core::MemoryArenaBase* arena, size_type num);
+    ~ThreadQueBase();
 
     void reserve(size_type num);
     void clear(void);
     void free(void);
 
-    void push(T const& value);
-    void push(T&& value);
+    void push(Type const& value);
+    void push(Type&& value);
     // pushes if predicate don't match.
     // true if pushed.
     template<class UnaryPredicate>
-    bool push_unique_if(T const& value, UnaryPredicate p);
+    bool push_unique_if(Type const& value, UnaryPredicate p);
 
-    bool tryPop(T& value);
+    bool tryPop(Type& value);
     template<class CallBack>
     bool tryPopAll(CallBack func);
 
@@ -44,44 +44,53 @@ public:
     bool isNotEmpty(void) const;
 
 protected:
-    Que que_;
+    QueT que_;
     SynchronizationPrimitive primitive_;
 };
 
-template<typename T, typename SynchronizationPrimitive>
-class ThreadQueBlocking : public ThreadQue<T, SynchronizationPrimitive>
+
+template<typename QueT, typename SynchronizationPrimitive>
+class ThreadQueBlockingBase : public ThreadQueBase<QueT, SynchronizationPrimitive>
 {
-    typedef ThreadQue<T, SynchronizationPrimitive> BaseQue;
+    typedef ThreadQueBase<QueT, SynchronizationPrimitive> BaseT;
+    typedef typename BaseT::Type Type;
 
 public:
-    using ThreadQue<T, SynchronizationPrimitive>::ThreadQue;
+    using BaseT::BaseT;
 
-    void push(T const& value);
-    void push(T&& value);
-    bool tryPop(T& value);
-    void pop(T& value);
-    T pop(void);
+    void push(Type const& value);
+    void push(Type&& value);
+    bool tryPop(Type& value);
+    void pop(Type& value);
+    Type pop(void);
 
 private:
     core::Signal signal_;
 };
 
-template<typename T>
-class ThreadQueBlocking<T, core::CriticalSection> : public ThreadQue<T, core::CriticalSection>
+template<typename QueT>
+class ThreadQueBlockingBase<QueT, core::CriticalSection> : public ThreadQueBase<QueT, core::CriticalSection>
 {
-    typedef ThreadQue<T, core::CriticalSection> BaseQue;
+    typedef ThreadQueBase<QueT, core::CriticalSection> BaseT;
+    typedef typename BaseT::Type Type;
 
 public:
-    using ThreadQue<T, CriticalSection>::ThreadQue;
+    using BaseT::BaseT;
 
-    void push(T const& value);
-    void push(T&& value);
-    void pop(T& value);
-    T pop(void);
+    void push(Type const& value);
+    void push(Type&& value);
+    void pop(Type& value);
+    Type pop(void);
 
 private:
     core::ConditionVariable cond_;
 };
+
+template<typename T, typename SynchronizationPrimitive>
+using ThreadQue = ThreadQueBase<core::Fifo<T>, SynchronizationPrimitive>;
+
+template<typename T, typename SynchronizationPrimitive>
+using ThreadQueBlocking = ThreadQueBlockingBase<core::Fifo<T>, SynchronizationPrimitive>;
 
 X_NAMESPACE_END
 
