@@ -21,6 +21,9 @@ Engine:
   ☐ Commands for changing the render scale on fly (for fillrate testing)
   ☐ Allow maintaining aspect ration? (basically don't stretch render buffers)
   ☐ Make it so GUI knows about new render size without a frame of delay
+  ☐ Fix materials been able to play videos.
+    ☐ If a video is playing but not visible or used don't bother update render text.
+        Think it's kinda safe to assume currently if playing it's used.
 
   GUI:
     ☐ Support combo boxes (for selecting resolution etc)
@@ -58,7 +61,7 @@ Video:
      ✔ Add support for decoding vorbis audio. @done (18-09-03 22:53)
        I probs want to store video and audio buffers next to each other in file so can load as blocks.
        Since webm stores video and audio data interleved i just leave it like that.
- ☐ Fix frame lookahead when IO buffer wraps around.
+ ✔ Fix frame lookahead when IO buffer wraps around. @done (18-09-06 13:58)
  ☐ Actually use the display times for video frames / audio.
 
 
