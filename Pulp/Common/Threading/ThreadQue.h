@@ -60,7 +60,6 @@ public:
 
     void push(Type const& value);
     void push(Type&& value);
-    bool tryPop(Type& value);
     void pop(Type& value);
     Type pop(void);
 
