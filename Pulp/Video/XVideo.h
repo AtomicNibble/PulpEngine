@@ -155,20 +155,39 @@ private:
     // Render texture
     render::IDeviceTexture* pTexture_;
 
-    // IO Stuff
-    core::CriticalSection ioCs_;
-    core::XFileAsync* pFile_;
+    struct IoFields
+    {
+        IoFields(core::MemoryArenaBase* arena) :
+            pFile(nullptr),
+            fileOffset(0),
+            fileLength(0),
+            fileBlocksLeft(0),
+            ringBuffer(arena, IO_RING_BUFFER_SIZE),
+            bufferReadOffset(0),
+            reqBuffer(arena)
+        {
+        }
 
-    uint64_t fileOffset_;       // the file offset we last read from.
-    uint64_t fileLength_;       // the total file length;
-    int32_t fileBlocksLeft_;    //
+        // IO Stuff
+        core::CriticalSection cs;
+        core::XFileAsync* pFile;
 
-    TrackIntArr processedBlocks_;   
+        uint64_t fileOffset;       // the file offset we last read from.
+        uint64_t fileLength;       // the total file length;
+        int32_t fileBlocksLeft;    //
 
-    core::FixedByteStreamRingOwning ioRingBuffer_;  // buffer holding loaded IO data, ready for processing.
-    DataVec ioReqBuffer_;                           // file data read into here, then moved into ringBuffer_
-    int32_t ioBufferReadOffset_;
-    TrackQueues trackQueues_; // packet buffer queues
+        DataVec reqBuffer;                           // file data read into here, then moved into ringBuffer_
+        int32_t bufferReadOffset;
+        
+        core::FixedByteStreamRingOwning ringBuffer;  // buffer holding loaded IO data, ready for processing.
+
+        // inline
+        TrackQueues trackQueues; // packet buffer queues
+    };
+
+    X_ALIGNED_SYMBOL(IoFields io_, 64);
+
+    TrackIntArr processedBlocks_;
 
     // Video buffers
     Frame* pLockedFrame_;

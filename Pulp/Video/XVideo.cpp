@@ -48,13 +48,7 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
     displayTimeMS_(0),
     state_(State::UnInit),
     ioRequestPending_(false),
-    pFile_(nullptr),
-    fileOffset_(0),
-    fileLength_(0),
-    fileBlocksLeft_(0),
-    ioRingBuffer_(arena, IO_RING_BUFFER_SIZE),
-    ioBufferReadOffset_(0),
-    ioReqBuffer_(arena),
+    io_(arena),
     pLockedFrame_(nullptr),
     frameIdx_(0),
     frames_{
@@ -96,8 +90,8 @@ Video::~Video()
         gEnv->pSound->unRegisterObject(sndObj_);
     }
 
-    if (pFile_) {
-        gEnv->pFileSys->AddCloseRequestToQue(pFile_);
+    if (io_.pFile) {
+        gEnv->pFileSys->AddCloseRequestToQue(io_.pFile);
     }
 
     auto err = vpx_codec_destroy(&codec_);
@@ -182,18 +176,18 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
 
 void Video::processIOData(void)
 {
-    core::CriticalSection::ScopedLock lock(ioCs_);
+    core::CriticalSection::ScopedLock lock(io_.cs);
 
     // add any complete packets to the queues.
-    if(fileBlocksLeft_)
+    if(io_.fileBlocksLeft)
     {
-        int32_t offset = ioBufferReadOffset_;
-        const int32_t readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
-        const int32_t ringAvail = safe_static_cast<int32_t>(ioRingBuffer_.size());
+        int32_t offset = io_.bufferReadOffset;
+        const int32_t readOffset = safe_static_cast<int32_t>(io_.ringBuffer.tell());
+        const int32_t ringAvail = safe_static_cast<int32_t>(io_.ringBuffer.size());
 
-        while (fileBlocksLeft_ > 0 && ioRingBuffer_.size() > (sizeof(BlockHdr) + offset))
+        while (io_.fileBlocksLeft > 0 && io_.ringBuffer.size() > (sizeof(BlockHdr) + offset))
         {
-            auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
+            auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
             X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
 
             // got this block?
@@ -201,7 +195,7 @@ void Video::processIOData(void)
                 break;
             }
 
-            auto& que = trackQueues_[hdr.type];
+            auto& que = io_.trackQueues[hdr.type];
             if (que.freeSpace() == 0) {
                 break;
             }
@@ -210,14 +204,14 @@ void Video::processIOData(void)
 
             offset += sizeof(hdr) + hdr.blockSize;
 
-            --fileBlocksLeft_;
+            --io_.fileBlocksLeft;
         }
 
-        ioBufferReadOffset_ = offset;
+        io_.bufferReadOffset = offset;
     }
 
-    auto& audioQueue = trackQueues_[TrackType::Audio];
-    auto& videoQueue = trackQueues_[TrackType::Video];
+    auto& audioQueue = io_.trackQueues[TrackType::Audio];
+    auto& videoQueue = io_.trackQueues[TrackType::Video];
 
     const auto& channel0 = audioRingBuffers_[0];
 
@@ -342,7 +336,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
 
     // TODO: wrong
     frameRate_ = safe_static_cast<int32_t>(hdr.video.numBlocks / durationS);
-    pFile_ = pFile;
+    io_.pFile = pFile;
 
     // audio header HYPE!
     size_t audioHdrSize = hdr.audio.deflatedHdrSize;
@@ -381,12 +375,10 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         return false;
     }
 
-    fileBlocksLeft_ = video_.numBlocks + audio_.numBlocks;
-
-    fileLength_ = pFile->fileSize();
-    fileOffset_ = sizeof(hdr) + audioHdrSize;
-
-    ioReqBuffer_.resize(safe_static_cast<size_t>(core::Min<uint64>(fileLength_, IO_REQUEST_SIZE)));
+    io_.fileBlocksLeft = video_.numBlocks + audio_.numBlocks;
+    io_.fileLength = pFile->fileSize();
+    io_.fileOffset = sizeof(hdr) + audioHdrSize;
+    io_.reqBuffer.resize(safe_static_cast<size_t>(core::Min<uint64>(io_.fileLength, IO_REQUEST_SIZE)));
   
     encodedBlock_.reserve(video_.largestBlockBytes);
     encodedAudioFrame_.reserve(audio_.largestBlockBytes);
@@ -535,16 +527,16 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
     uint8_t* pBuf = static_cast<uint8_t*>(pReadReq->pBuf);
 
     {
-        core::CriticalSection::ScopedLock lock(ioCs_);
+        core::CriticalSection::ScopedLock lock(io_.cs);
 
         // the io buffer has loaded, copy into ring buffer.
-        X_ASSERT(ioRingBuffer_.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(ioRingBuffer_.freeSpace(), pReadReq->dataSize);
+        X_ASSERT(io_.ringBuffer.freeSpace() >= pReadReq->dataSize, "No space to put IO data")(io_.ringBuffer.freeSpace(), pReadReq->dataSize);
 
-        ioRingBuffer_.write(pBuf, bytesTransferred);
+        io_.ringBuffer.write(pBuf, bytesTransferred);
 
         ioRequestPending_ = false;
 
-        if (ioRingBuffer_.freeSpace() >= IO_REQUEST_SIZE) {
+        if (io_.ringBuffer.freeSpace() >= IO_REQUEST_SIZE) {
             dispatchRead();
         }
     }
@@ -552,7 +544,7 @@ void Video::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
 
 void Video::dispatchRead(void)
 {
-    core::CriticalSection::ScopedLock lock(ioCs_);
+    core::CriticalSection::ScopedLock lock(io_.cs);
 
     // we have one IO buffer currently.
     // could add multiple if decide it's worth dispatching multiple requests.
@@ -561,11 +553,11 @@ void Video::dispatchRead(void)
         return;
     }
 
-    if (ioRingBuffer_.freeSpace() < IO_REQUEST_SIZE) {
+    if (io_.ringBuffer.freeSpace() < IO_REQUEST_SIZE) {
         return;
     }
 
-    auto bytesLeft = fileLength_ - fileOffset_;
+    auto bytesLeft = io_.fileLength - io_.fileOffset;
     if (bytesLeft == 0) {
         return;
     }
@@ -574,39 +566,41 @@ void Video::dispatchRead(void)
 
     auto requestSize = core::Min<uint64_t>(IO_REQUEST_SIZE, bytesLeft);
 
-    X_ASSERT(ioReqBuffer_.size() == IO_REQUEST_SIZE, "Buffer size mismatch")();
+    X_ASSERT(io_.reqBuffer.size() == IO_REQUEST_SIZE, "Buffer size mismatch")();
 
     core::IoRequestRead req;
-    req.pFile = pFile_;
+    req.pFile = io_.pFile;
     req.callback.Bind<Video, &Video::IoRequestCallback>(this);
-    req.pBuf = ioReqBuffer_.data();
+    req.pBuf = io_.reqBuffer.data();
     req.dataSize = safe_static_cast<uint32_t>(requestSize);
-    req.offset = fileOffset_;
+    req.offset = io_.fileOffset;
     gEnv->pFileSys->AddIoRequestToQue(req);
 
-    fileOffset_ += requestSize;
+    io_.fileOffset += requestSize;
 }
 
 void Video::validateQueues(void)
 {
 #if X_ENABLE_ASSERTIONS
+    core::CriticalSection::ScopedLock lock(io_.cs);
+
     // make sure none of the queues have been seeked past.
-    for (size_t i = 0; i < trackQueues_.size(); i++) {
-        auto& queue = trackQueues_[i];
+    for (size_t i = 0; i < io_.trackQueues.size(); i++) {
+        auto& queue = io_.trackQueues[i];
 
         if (queue.isEmpty()) {
             continue;
         }
 
         auto absoluteOffset = queue.peek();
-        auto readOffset = safe_static_cast<int32_t>(ioRingBuffer_.tell());
+        auto readOffset = safe_static_cast<int32_t>(io_.ringBuffer.tell());
 
         if (absoluteOffset < readOffset)
         {
             auto diff = readOffset - absoluteOffset;
             X_ASSERT(false, "Item in queue has been skipped")(absoluteOffset, readOffset, diff);
             // what item?
-            auto hdr = ioRingBuffer_.peek<BlockHdr>(readOffset);
+            auto hdr = io_.ringBuffer.peek<BlockHdr>(readOffset);
             X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
         }
     }
@@ -617,23 +611,24 @@ void Video::seekIoBuffer(int32_t numBytes)
 {
     validateQueues();
 
-    X_ASSERT(numBytes <= ioBufferReadOffset_, "")(numBytes, ioBufferReadOffset_);
-    ioRingBuffer_.skip(numBytes);
-    ioBufferReadOffset_ -= numBytes;
+    X_ASSERT(numBytes <= io_.bufferReadOffset, "")(numBytes, io_.bufferReadOffset);
+    io_.ringBuffer.skip(numBytes);
+    io_.bufferReadOffset -= numBytes;
 
     validateQueues();
 };
 
 void Video::popProcessed(TrackType::Enum type)
 {
-    auto& queue = trackQueues_[type];
-
+    core::CriticalSection::ScopedLock lock(io_.cs);
+    
     int32_t skippableBytes = 0;
 
+    auto& queue = io_.trackQueues[type];
     if (queue.isNotEmpty())
     {
         auto absoluteOffset = queue.peek();
-        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
+        auto offset = io_.ringBuffer.absoluteToRelativeOffset(absoluteOffset);
 
         skippableBytes = safe_static_cast<int32_t>(offset);
         if (skippableBytes == 0) {
@@ -643,9 +638,9 @@ void Video::popProcessed(TrackType::Enum type)
     }
 
     // while we have processed blocks of this type skip them.
-    while (ioRingBuffer_.size() > (sizeof(BlockHdr)))
+    while (io_.ringBuffer.size() > (sizeof(BlockHdr)))
     {
-        auto hdr = ioRingBuffer_.peek<BlockHdr>();
+        auto hdr = io_.ringBuffer.peek<BlockHdr>();
         X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
 
         if (hdr.type != type) {
@@ -668,7 +663,7 @@ void Video::popProcessed(TrackType::Enum type)
 
             X_ASSERT(skippableBytes >= 0, "Negative value")(skippableBytes);
         }
-        else if (ioBufferReadOffset_ > 0)
+        else if (io_.bufferReadOffset > 0)
         {
             seekIoBuffer(skipSize);
         }
@@ -754,30 +749,30 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
-    auto& audioQueue = trackQueues_[TrackType::Audio];
+    auto& audioQueue = io_.trackQueues[TrackType::Audio];
     auto& channel0 = audioRingBuffers_[0];
 
     // process packets till we either run out of packets or output buffer full.
-    ioCs_.Enter();
+    io_.cs.Enter();
 
     while(audioQueue.isNotEmpty() && channel0.size() < AUDIO_RING_MAX_FILL)
     {
         auto absoluteOffset = audioQueue.peek();
-        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
+        auto offset = io_.ringBuffer.absoluteToRelativeOffset(absoluteOffset);
 
-        auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
+        auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
         X_ASSERT(hdr.type == TrackType::Audio, "Incorrect type")();
 
         encodedAudioFrame_.resize(hdr.blockSize);
-        ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedAudioFrame_.data(), encodedAudioFrame_.size());
+        io_.ringBuffer.peek(offset + sizeof(BlockHdr), encodedAudioFrame_.data(), encodedAudioFrame_.size());
 
-        ioCs_.Leave();
+        io_.cs.Leave();
 
         if (!decodeAudioPacket()) {
             X_ERROR("Vidoe", "Failed to decode audio packet");
         }
 
-        ioCs_.Enter();
+        io_.cs.Enter();
 
         ++processedBlocks_[TrackType::Audio];
 
@@ -792,7 +787,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         }
     }
 
-    ioCs_.Leave();
+    io_.cs.Leave();
 
     pDecodeAudioJob_ = nullptr;
 }
@@ -898,23 +893,23 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 {
     X_UNUSED(jobSys, threadIdx, pJob, pData);
 
-    auto& videoQueue = trackQueues_[TrackType::Video];
+    io_.cs.Enter();
 
-    ioCs_.Enter();
+    auto& videoQueue = io_.trackQueues[TrackType::Video];
 
     // decode frames till we filled frame buffer.
     while (availFrames_.freeSpace() > 0 && videoQueue.isNotEmpty())
     {
         auto absoluteOffset = videoQueue.peek();
-        auto offset = ioRingBuffer_.absoluteToRelativeOffset(absoluteOffset);
+        auto offset = io_.ringBuffer.absoluteToRelativeOffset(absoluteOffset);
 
-        auto hdr = ioRingBuffer_.peek<BlockHdr>(offset);
+        auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
         X_ASSERT(hdr.type == TrackType::Video, "Incorrect type")();
 
         encodedBlock_.resize(hdr.blockSize);
-        ioRingBuffer_.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
+        io_.ringBuffer.peek(offset + sizeof(BlockHdr), encodedBlock_.data(), encodedBlock_.size());
 
-        ioCs_.Leave();
+        io_.cs.Leave();
 
         displayTimeMS_ = hdr.timeMS;
 
@@ -924,7 +919,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
             X_ERROR("Video", "Failed to decode video frame");
         }
 
-        ioCs_.Enter();
+        io_.cs.Enter();
 
         const int32_t blockSize = sizeof(BlockHdr) + hdr.blockSize;
 
@@ -939,7 +934,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         validateQueues();
     }
 
-    ioCs_.Leave();
+    io_.cs.Leave();
 
     pDecodeVideoJob_ = nullptr;
 }
@@ -960,11 +955,11 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     // update graphs.
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++) {
-        queueSizes_[i].push_back(safe_static_cast<int16_t>(trackQueues_[i].size()));
+        queueSizes_[i].push_back(safe_static_cast<int16_t>(io_.trackQueues[i].size()));
     }
 
     audioBufferSize_.push_back(safe_static_cast<int32_t>(audioRingBuffers_.front().size()));
-    ioBufferSize_.push_back(safe_static_cast<int32_t>(ioRingBuffer_.size()));
+    ioBufferSize_.push_back(safe_static_cast<int32_t>(io_.ringBuffer.size()));
 
     // build linera array
     typedef core::FixedArray<float, FRAME_HISTORY_SIZE> PlotData;
@@ -1030,15 +1025,15 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     r += textOff;
 
     size_t memUsage = 0;
-    memUsage += ioRingBuffer_.capacity();
-    memUsage += ioReqBuffer_.capacity();
+    memUsage += io_.ringBuffer.capacity();
+    memUsage += io_.reqBuffer.capacity();
     memUsage += encodedBlock_.capacity();
 
     for (auto& frame : frames_) {
         memUsage += frame.decoded.capacity();
     }
 
-    for (const auto& tq : trackQueues_) {
+    for (const auto& tq : io_.trackQueues) {
         memUsage += tq.capacity() * sizeof(IntQueue::Type);
     }
 
@@ -1055,8 +1050,8 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     auto totalblocks = video_.numBlocks + audio_.numBlocks;
 
-    txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, ioRingBuffer_.size()),
-        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - fileBlocksLeft_, totalblocks);
+    txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, io_.ringBuffer.size()),
+        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - io_.fileBlocksLeft, totalblocks);
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
@@ -1066,7 +1061,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++)
     {
-        txt.setFmt("%s: %" PRIuS "/%" PRIuS, TrackType::ToString(i), trackQueues_[i].size(), FRAME_QUEUE_SIZE);
+        txt.setFmt("%s: %" PRIuS "/%" PRIuS, TrackType::ToString(i), io_.trackQueues[i].size(), FRAME_QUEUE_SIZE);
         
         auto& data = queueSizeData[i];
         pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());

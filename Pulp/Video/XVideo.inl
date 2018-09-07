@@ -23,7 +23,7 @@ X_INLINE uint32_t Video::getFps(void) const
 
 X_INLINE size_t Video::getIOBufferSize(void) const
 {
-    return ioRingBuffer_.size();
+    return io_.ringBuffer.size();
 }
 
 X_INLINE bool Video::hasFrame(void) const
