@@ -42,6 +42,7 @@ namespace
 
 } // namespace
 
+
 Video::Video(core::string name, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::VIDEO),
     frameRate_(0),
