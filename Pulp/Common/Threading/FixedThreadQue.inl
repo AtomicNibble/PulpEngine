@@ -16,6 +16,14 @@ void FixedThreadQueBase<T, N, SynchronizationPrimitive>::free(void)
 }
 
 template<typename T, size_t N, typename SynchronizationPrimitive>
+typename std::enable_if<std::is_trivial<T>::value, T>::type
+FixedThreadQueBase<T, N, SynchronizationPrimitive>::peek(void)
+{
+    SynchronizationPrimitive::ScopedLock lock(primitive_);
+    return que_.peek();
+}
+
+template<typename T, size_t N, typename SynchronizationPrimitive>
 size_t FixedThreadQueBase<T, N, SynchronizationPrimitive>::size(void)
 {
     SynchronizationPrimitive::ScopedLock lock(primitive_);

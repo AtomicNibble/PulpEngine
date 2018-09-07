@@ -26,6 +26,10 @@ public:
     void clear(void);
     void free(void);
 
+    // only safe to make a copy.
+    typename std::enable_if<std::is_trivial<T>::value, T>::type
+    peek(void);
+
     size_type size(void);
     size_type freeSpace(void);
     size_type capacity(void) const;
