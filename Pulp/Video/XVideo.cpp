@@ -49,9 +49,7 @@ Video::Video(core::string name, core::MemoryArenaBase* arena) :
     io_(arena),
     vid_(arena),
     audio_(arena),
-    pTexture_(nullptr),
-    pDecodeAudioJob_(nullptr),
-    pDecodeVideoJob_(nullptr)
+    pTexture_(nullptr)
 {
     core::zero_object(vidHdr_);
     core::zero_object(audioHdr_);
@@ -191,11 +189,11 @@ void Video::processIOData(void)
     const auto& channel0 = audio_.audioRingBuffers.front();
 
     // Audio
-    if (channel0.size() < AUDIO_RING_MAX_FILL && pDecodeAudioJob_ == nullptr)
+    if (channel0.size() < AUDIO_RING_MAX_FILL && audio_.pDecodeJob == nullptr)
     {
         if (audioQueue.isNotEmpty())
         {
-            pDecodeAudioJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeAudio_job,
+            audio_.pDecodeJob = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeAudio_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
         }
         else if(channel0.isEos())
@@ -205,11 +203,11 @@ void Video::processIOData(void)
     }
 
     // Video
-    if (vid_.availFrames.freeSpace() > 0 && pDecodeVideoJob_ == nullptr)
+    if (vid_.availFrames.freeSpace() > 0 && vid_.pDecodeJob == nullptr)
     {
         if (videoQueue.isNotEmpty())
         {
-            pDecodeVideoJob_ = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeVideo_job,
+            vid_.pDecodeJob = gEnv->pJobSys->CreateMemberJobAndRun<Video>(this, &Video::decodeVideo_job,
                 nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::VIDEO));
         }
         else
@@ -389,7 +387,6 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
 
     vorbis_info_init(&audio_.vorbisInfo);
     vorbis_comment_init(&audio_.vorbisComment);
-
 
     auto* pData = data.data();
 
@@ -763,7 +760,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 
     io_.cs.Leave();
 
-    pDecodeAudioJob_ = nullptr;
+    audio_.pDecodeJob = nullptr;
 }
 
 bool Video::decodeVideo(void)
@@ -910,7 +907,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
 
     io_.cs.Leave();
 
-    pDecodeVideoJob_ = nullptr;
+    vid_.pDecodeJob = nullptr;
 }
 
 Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)

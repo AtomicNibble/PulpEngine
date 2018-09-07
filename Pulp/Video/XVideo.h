@@ -146,9 +146,6 @@ private:
 
     State::Enum state_;
 
-    core::V2::Job* pDecodeAudioJob_;
-    core::V2::Job* pDecodeVideoJob_;
-
     // Render texture
     render::IDeviceTexture* pTexture_;
 
@@ -189,6 +186,7 @@ private:
     struct VideoFields
     {
         VideoFields(core::MemoryArenaBase* arena) :
+            pDecodeJob(nullptr),
             pLockedFrame(nullptr),
             frames{
             arena,
@@ -204,6 +202,7 @@ private:
             core::zero_object(codec);
         }
 
+        core::V2::Job* pDecodeJob;
         Frame* pLockedFrame;
         FramePtrQueue availFrames;
         FrameArr frames;
@@ -222,6 +221,7 @@ private:
     struct AudioFields
     {
         AudioFields(core::MemoryArenaBase* arena) :
+            pDecodeJob(nullptr),
             oggPacketCount(0),
             oggFramesDecoded(0),
             processedBlocks(0),
@@ -238,6 +238,8 @@ private:
             core::zero_object(vorbisDsp);
             core::zero_object(vorbisBlock);
         }
+
+        core::V2::Job* pDecodeJob;
 
         int64_t oggPacketCount;
         int64_t oggFramesDecoded;
