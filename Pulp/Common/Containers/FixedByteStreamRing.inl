@@ -142,7 +142,7 @@ inline void FixedByteStreamRingBase::peek(size_type offset, T* pVal, size_type n
 
 inline void FixedByteStreamRingBase::peek(size_type offset, Type* pBuf, size_type numBytes) const
 {
-    X_ASSERT(numBytes + offset <= size(), "Tried to read more bytes than avalible")(numBytes, offset, size(), freeSpace(), isEos());
+    X_ASSERT(numBytes + offset <= size(), "Tried to read more bytes than avalible")(numBytes + offset, numBytes, offset, size(), freeSpace(), isEos());
 
     size_type readIdx = (readByteIdx_ + offset) & mask_;
     size_type bytesToCopy = core::Min(numBytes, numBytes_ - readIdx);
