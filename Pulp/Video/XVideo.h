@@ -175,7 +175,7 @@ private:
         int32_t fileBlocksLeft;    //
 
         DataVec reqBuffer;                           // file data read into here, then moved into ringBuffer_
-        int32_t bufferReadOffset;
+        volatile int32_t bufferReadOffset;
 
         core::FixedByteStreamRingOwning ringBuffer;  // buffer holding loaded IO data, ready for processing.
 
