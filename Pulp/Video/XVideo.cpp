@@ -654,6 +654,9 @@ bool Video::decodeAudioPacket(void)
     ogg_packet pkt = buildOggPacket(audio_.encodedAudioFrame.data(), audio_.encodedAudioFrame.size(), false, false, -1, audio_.oggPacketCount++);
     bool firstPacket = audio_.oggPacketCount == 4;
 
+    // TODO: use block size to calculate PCM size.
+    // auto size = vorbis_packet_blocksize(&audio_.vorbisInfo, &pkt);
+
     int vsRest = vorbis_synthesis(&audio_.vorbisBlock, &pkt);
     if (vsRest)
     {
