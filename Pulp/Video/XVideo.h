@@ -101,7 +101,7 @@ public:
 
     bool processHdr(core::XFileAsync* pFile, core::span<uint8_t> data);
 
-    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos);
+    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const;
 
     X_INLINE State::Enum getState(void) const;
     X_INLINE uint16_t getWidth(void) const;
@@ -267,9 +267,16 @@ private:
 
     // show me the goat.
 #if X_ENABLE_VIDEO_DEBUG
-    TrackFrameHistory<int16_t> queueSizes_;
-    FrameHistory<int32_t> audioBufferSize_;
-    FrameHistory<int32_t> ioBufferSize_;
+
+    struct Stats 
+    {
+        TrackFrameHistory<int16_t> queueSizes;
+        FrameHistory<int32_t> audioBufferSize;
+        FrameHistory<int32_t> ioBufferSize;
+    };
+
+    // mutable so we can be sure we are read only for all other fields in debug view.
+    mutable Stats stats_;
 #endif // !X_ENABLE_VIDEO_DEBUG
 };
 

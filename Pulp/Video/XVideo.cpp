@@ -911,7 +911,7 @@ void Video::decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
     vid_.pDecodeJob = nullptr;
 }
 
-Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
+Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 {
 #if !X_ENABLE_VIDEO_DEBUG
     X_UNUSED(pPrim, pos);
@@ -927,11 +927,11 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     // update graphs.
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++) {
-        queueSizes_[i].push_back(safe_static_cast<int16_t>(io_.trackQueues[i].size()));
+        stats_.queueSizes[i].push_back(safe_static_cast<int16_t>(io_.trackQueues[i].size()));
     }
 
-    audioBufferSize_.push_back(safe_static_cast<int32_t>(audio_.audioRingBuffers.front().size()));
-    ioBufferSize_.push_back(safe_static_cast<int32_t>(io_.ringBuffer.size()));
+    stats_.audioBufferSize.push_back(safe_static_cast<int32_t>(audio_.audioRingBuffers.front().size()));
+    stats_.ioBufferSize.push_back(safe_static_cast<int32_t>(io_.ringBuffer.size()));
 
     // build linera array
     typedef core::FixedArray<float, FRAME_HISTORY_SIZE> PlotData;
@@ -941,7 +941,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     PlotData ioBufferData;
 
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++) {
-        auto& queue = queueSizes_[i];
+        auto& queue = stats_.queueSizes[i];
         auto& data = queueSizeData[i];
 
         for (auto val : queue) {
@@ -949,11 +949,11 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
         }
     }
 
-    for (auto val : audioBufferSize_) {
+    for (auto val : stats_.audioBufferSize) {
         audioBufferData.push_back(static_cast<float>(val));
     }
 
-    for (auto val : ioBufferSize_) {
+    for (auto val : stats_.ioBufferSize) {
         ioBufferData.push_back(static_cast<float>(val));
     }
 
