@@ -147,7 +147,8 @@ typedef Flags8<APakFlag> APakFlags;
 
 X_DECLARE_FLAGS8(APakEntryFlag)
 (
-    FORCE_REBUILD);
+    UNUSED
+);
 
 typedef Flags8<APakEntryFlag> APakEntryFlags;
 
