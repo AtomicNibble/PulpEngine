@@ -341,10 +341,16 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         }
     }
 
+    vpx_codec_dec_cfg_t vpx_config = { 0 };
+    vpx_config.w = vidHdr_.pixelWidth;
+    vpx_config.h = vidHdr_.pixelHeight;
+    vpx_config.threads = 1;
+
     vpx_codec_iface_t* pInterface = vpx_codec_vp8_dx();
 
+
     int flags = 0;
-    if (vpx_codec_dec_init(&vid_.codec, pInterface, nullptr, flags)) {
+    if (vpx_codec_dec_init(&vid_.codec, pInterface, &vpx_config, flags)) {
         X_ERROR("Video", "Failed to initialize decoder: %s", vpx_codec_error_detail(&vid_.codec));
         return false;
     }
