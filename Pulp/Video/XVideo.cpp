@@ -341,7 +341,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         }
     }
 
-    vpx_codec_dec_cfg_t vpx_config = { 0 };
+    vpx_codec_dec_cfg_t vpx_config = {};
     vpx_config.w = vidHdr_.pixelWidth;
     vpx_config.h = vidHdr_.pixelHeight;
     vpx_config.threads = 1;
