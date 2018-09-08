@@ -88,7 +88,8 @@ struct VideoTrackHdr
 
 struct AudioTrackHdr
 {
-    int16_t channels;
+    AudioFmt::Enum fmt;
+    int8_t channels;
     int16_t bitDepth;
     int32_t sampleFreq;
     int32_t numBlocks;

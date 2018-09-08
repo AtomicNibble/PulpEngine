@@ -150,7 +150,11 @@ bool VideoCompiler::process(DataVec&& srcData)
         }
         else if (type == mkvparser::Track::kAudio)
         {
-            if (!core::strUtil::IsEqual(pCodecID, "A_VORBIS"))
+            if (core::strUtil::IsEqual(pCodecID, "A_VORBIS"))
+            {
+                audioTrack_.fmt = AudioFmt::Vorbis;
+            }
+            else
             {
                 X_ERROR("Video", "Unsupported audio codec: %s", pCodecID);
                 return false;
@@ -173,7 +177,7 @@ bool VideoCompiler::process(DataVec&& srcData)
     videoTrack_.pixelWidth = safe_static_cast<int32_t>(pVideoTrack->GetWidth());
     videoTrack_.pixelHeight = safe_static_cast<int32_t>(pVideoTrack->GetHeight());
 
-    audioTrack_.channels = safe_static_cast<int16_t>(pAudioTrack->GetChannels());
+    audioTrack_.channels = safe_static_cast<int8_t>(pAudioTrack->GetChannels());
     audioTrack_.bitDepth = safe_static_cast<int16_t>(pAudioTrack->GetBitDepth());
     audioTrack_.sampleFreq = safe_static_cast<int32_t>(pAudioTrack->GetSamplingRate());
 
