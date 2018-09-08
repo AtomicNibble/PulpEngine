@@ -352,6 +352,7 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
         pInterface  = vpx_codec_vp8_dx();
     }
     else if (vidHdr_.fmt == VideoFmt::VP9) {
+        // adds about 750kb to binary size.
         pInterface = vpx_codec_vp9_dx();
     }
     else {
