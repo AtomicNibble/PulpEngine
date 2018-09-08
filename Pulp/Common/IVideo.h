@@ -57,6 +57,14 @@ X_DECLARE_ENUM8(TrackType)(
     Audio
 );
 
+X_DECLARE_ENUM8(VideoFmt)(
+    VP8,
+    VP9
+);
+
+X_DECLARE_ENUM8(AudioFmt)(
+    Vorbis
+);
 
 X_PACK_PUSH(1)
 
@@ -70,6 +78,7 @@ struct BlockHdr
 
 struct VideoTrackHdr
 {
+    VideoFmt::Enum fmt;
     int16_t frameRate;
     int16_t pixelWidth;
     int16_t pixelHeight;
@@ -100,8 +109,8 @@ struct VideoHeader
 {
     uint32 fourCC;
     uint8 version;
-    uint8_t _pad[1];
 
+    // video has leading 6 bytes, so no padding after version.
     VideoTrackHdr video;
     AudioTrackHdr audio;
 

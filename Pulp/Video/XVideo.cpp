@@ -346,7 +346,17 @@ bool Video::processHdr(core::XFileAsync* pFile, core::span<uint8_t> data)
     vpx_config.h = vidHdr_.pixelHeight;
     vpx_config.threads = 1;
 
-    vpx_codec_iface_t* pInterface = vpx_codec_vp8_dx();
+    vpx_codec_iface_t* pInterface = nullptr;  
+    
+    if (vidHdr_.fmt == VideoFmt::VP8) {
+        pInterface  = vpx_codec_vp8_dx();
+    }
+    else if (vidHdr_.fmt == VideoFmt::VP9) {
+        pInterface = vpx_codec_vp9_dx();
+    }
+    else {
+        X_ASSERT_UNREACHABLE();
+    }
 
 
     int flags = 0;

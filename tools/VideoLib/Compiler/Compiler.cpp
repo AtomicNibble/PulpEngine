@@ -132,7 +132,15 @@ bool VideoCompiler::process(DataVec&& srcData)
 
         if (type == mkvparser::Track::kVideo)
         {
-            if (!core::strUtil::IsEqual(pCodecID, "V_VP8"))
+            if (core::strUtil::IsEqual(pCodecID, "V_VP8"))
+            {
+                videoTrack_.fmt = VideoFmt::VP8;
+            }
+            else if (core::strUtil::IsEqual(pCodecID, "V_VP9"))
+            {
+                videoTrack_.fmt = VideoFmt::VP9;
+            }
+            else
             {
                 X_ERROR("Video", "Unsupported video codec: %s", pCodecID);
                 return false;
