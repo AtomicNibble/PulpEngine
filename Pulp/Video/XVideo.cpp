@@ -155,33 +155,45 @@ void Video::processIOData(void)
     // add any complete packets to the queues.
     if(io_.fileBlocksLeft)
     {
-        int32_t offset = io_.bufferReadOffset;
-        const int32_t readOffset = safe_static_cast<int32_t>(io_.ringBuffer.tell());
-        const int32_t ringAvail = safe_static_cast<int32_t>(io_.ringBuffer.size());
+#if X_RELEASE
+        auto minTrackSize = std::numeric_limits<size_t>::max();
 
-        while (io_.fileBlocksLeft > 0 && io_.ringBuffer.size() > (sizeof(BlockHdr) + offset))
-        {
-            auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
-            X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
-
-            // got this block?
-            if (ringAvail < hdr.blockSize + offset) {
-                break;
-            }
-
-            auto& que = io_.trackQueues[hdr.type];
-            if (que.freeSpace() == 0) {
-                break;
-            }
-
-            que.push(readOffset + offset);
-
-            offset += sizeof(hdr) + hdr.blockSize;
-
-            --io_.fileBlocksLeft;
+        for (const auto& track : io_.trackQueues) {
+            minTrackSize = core::Min(minTrackSize, track.size());
         }
 
-        io_.bufferReadOffset = offset;
+        // don't bother touching the memory if queus are fine.
+        if (minTrackSize < 128)
+#endif // !X_RELEASE
+        {
+            int32_t offset = io_.bufferReadOffset;
+            const int32_t readOffset = safe_static_cast<int32_t>(io_.ringBuffer.tell());
+            const int32_t ringAvail = safe_static_cast<int32_t>(io_.ringBuffer.size());
+
+            while (io_.fileBlocksLeft > 0 && io_.ringBuffer.size() > (sizeof(BlockHdr) + offset))
+            {
+                auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
+                X_ASSERT(hdr.type < TrackType::ENUM_COUNT, "Invalid type")(hdr.type);
+
+                // got this block?
+                if (ringAvail < hdr.blockSize + offset) {
+                    break;
+                }
+
+                auto& que = io_.trackQueues[hdr.type];
+                if (que.freeSpace() == 0) {
+                    break;
+                }
+
+                que.push(readOffset + offset);
+
+                offset += sizeof(hdr) + hdr.blockSize;
+
+                --io_.fileBlocksLeft;
+            }
+
+            io_.bufferReadOffset = offset;
+        }
     }
 
     auto& audioQueue = io_.trackQueues[TrackType::Audio];
