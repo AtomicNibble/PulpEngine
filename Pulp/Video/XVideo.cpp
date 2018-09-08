@@ -974,7 +974,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
     }
 
 
-    core::HumanSize::Str sizeStr0, sizeStr1;
+    core::HumanSize::Str sizeStr0, sizeStr1, sizeStr2;
     core::StackString<64> txt;
 
     core::HumanDuration::Str durStr0, durStr1;
@@ -1022,8 +1022,9 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos)
 
     auto totalblocks = vidHdr_.numBlocks + audioHdr_.numBlocks;
 
-    txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32, core::HumanSize::toString(sizeStr0, io_.ringBuffer.size()),
-        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - io_.fileBlocksLeft, totalblocks);
+    txt.setFmt("Buffer: %s/%s %" PRIi32 "-%" PRIi32 " File: %s", core::HumanSize::toString(sizeStr0, io_.ringBuffer.size()),
+        core::HumanSize::toString(sizeStr1, IO_RING_BUFFER_SIZE), totalblocks - io_.fileBlocksLeft, totalblocks,
+        core::HumanSize::toString(sizeStr2, io_.fileLength));
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
