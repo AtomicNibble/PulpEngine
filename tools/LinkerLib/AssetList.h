@@ -18,19 +18,20 @@ public:
     typedef std::array<StringArr, assetDb::AssetType::ENUM_COUNT> AssetNameLists;
 
 public:
-    AssetList(core::MemoryArenaBase* arena);
+    LINKERLIB_EXPORT AssetList(core::MemoryArenaBase* arena);
 
-    bool loadFromJson(core::StringRange<char> json);
-    bool loadFromFile(core::Path<char>& path);
-    bool saveToFile(core::XFile* pFile) const;
+    LINKERLIB_EXPORT bool loadFromJson(core::StringRange<char> json);
+    LINKERLIB_EXPORT bool loadFromFile(core::Path<char>& path);
+    LINKERLIB_EXPORT bool saveToFile(core::XFile* pFile) const;
 
-    void add(assetDb::AssetType::Enum type, core::string& name);
+    X_INLINE void add(assetDb::AssetType::Enum type, core::string& name);
 
-    const AssetNameLists& getAssetList(void) const;
+    X_INLINE const AssetNameLists& getAssetList(void) const;
 
 private:
     AssetNameLists assets_;
 };
 
-
 X_NAMESPACE_END
+
+#include "AssetList.inl"

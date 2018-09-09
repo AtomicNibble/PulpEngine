@@ -129,6 +129,11 @@ bool Linker::Build(BuildOptions& options)
 
 bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name)
 {
+    // TODO:
+    if (assType == assetDb::AssetType::VIDEO) {
+        return true;
+    }
+
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
     if (!db_.AssetExsists(assType, name, &assetId, &modId)) {

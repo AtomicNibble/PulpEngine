@@ -19,5 +19,6 @@
 
 
 #include "Linker.h"
+#include "AssetList.h"
 
 #endif // !X_LINKER_LIB_H_

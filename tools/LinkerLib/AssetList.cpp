@@ -168,15 +168,5 @@ bool AssetList::saveToFile(core::XFile* pFile) const
 }
 
 
-void AssetList::add(assetDb::AssetType::Enum type, core::string& name)
-{
-    assets_[type].emplace_back(name);
-}
-
-const AssetList::AssetNameLists& AssetList::getAssetList(void) const
-{
-    return assets_;
-}
-
 
 X_NAMESPACE_END
