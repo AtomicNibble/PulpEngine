@@ -1141,7 +1141,8 @@ void XSound::stopVideoAudio(PlayingID id)
         memoryInputStreams_.remove(it);
     }
 
-    postEvent("VideoAudio_Stop", object);
+    // Tell the plugin to stop asking for data.
+    SoundEngine::PostEvent("VideoAudio_Stop", object);
 }
 
 void XSound::setOcclusionType(SndObjectHandle object, OcclusionType::Enum type)
