@@ -1006,6 +1006,9 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 #else
 
     // draw me some shit!
+    pos.x += 10.f;
+    pos.y += 10.f;
+
     Vec2f size(600, 60);
     Rectf r(pos, pos + size);
         
@@ -1053,6 +1056,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 
     Vec2f textOff(0, ctx.size.y + 6.f);
     Vec2f offset(0, size.y + padding);
+
 
     {
         Rectf box(r);
