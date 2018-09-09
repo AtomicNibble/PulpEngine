@@ -804,7 +804,7 @@ bool Video::decodeVideo(void)
             return false;
         }
 
-        vpx_img_flip(pImg);
+        //vpx_img_flip(pImg);
 
         const int w = pImg->d_w;
         const int h = pImg->d_h;
