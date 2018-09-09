@@ -37,6 +37,7 @@ namespace entity
         ADD_CVAR_REF_VEC3("cam_angle_rad", cameraAngle_, cameraAngle_, core::VarFlag::CHEAT | core::VarFlag::READONLY,
                 "camera angle(radians)");
 
+        // TODO: use 3d res.
         auto deimension = gEnv->pRender->getDisplayRes();
         cam_.setFrustum(deimension.x, deimension.y, DEFAULT_FOV, 1.f, 2048.f);
 
