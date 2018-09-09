@@ -23,6 +23,7 @@ public:
     LINKERLIB_EXPORT bool loadFromJson(core::StringRange<char> json);
     LINKERLIB_EXPORT bool loadFromFile(core::Path<char>& path);
     LINKERLIB_EXPORT bool saveToFile(core::XFile* pFile) const;
+    LINKERLIB_EXPORT bool saveToFile(core::Path<char>& path) const;
 
     X_INLINE void add(assetDb::AssetType::Enum type, core::string& name);
 

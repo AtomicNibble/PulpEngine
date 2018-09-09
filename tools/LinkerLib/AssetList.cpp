@@ -167,6 +167,20 @@ bool AssetList::saveToFile(core::XFile* pFile) const
     return true;
 }
 
+bool AssetList::saveToFile(core::Path<char>& path) const
+{
+    core::XFileScoped file;
+    core::fileModeFlags mode;
+    mode.Set(core::fileMode::WRITE);
+    mode.Set(core::fileMode::RECREATE);
+
+    if (!file.openFile(path.c_str(), mode)) {
+        return false;
+    }
+
+    return saveToFile(file.GetFile());
+}
+
 
 
 X_NAMESPACE_END
