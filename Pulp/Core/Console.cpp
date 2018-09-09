@@ -559,25 +559,24 @@ void XConsole::saveChangedVars(void)
     // so i'm going to parse the exsisting config and keep any var sets that are for vars that don't currently exsist.
 
     core::Array<char> buf(g_coreArena);
-    core::Array<core::StringRange<char>> keep(g_coreArena);
+    core::ArrayGrowMultiply<core::StringRange<char>> keep(g_coreArena);
 
     if (gEnv->pFileSys->fileExists(userConfigPath.c_str())) {
         if (file.openFile(userConfigPath.c_str(), fileMode::READ | fileMode::SHARE)) {
             const auto size = safe_static_cast<size_t>(file.remainingBytes());
 
-            keep.setGranularity(32);
             buf.resize(size);
             if (file.read(buf.data(), size) != size) {
                 X_ERROR("Console", "Failed to read exsisiting config file data");
             }
             else {
                 core::StringTokenizer<char> tokenizer(buf.begin(), buf.end(), '\n');
-                StringRange<char> line(nullptr, nullptr);
+                core::StringRange<char> line(nullptr, nullptr);
 
                 // we save this file so it should only have 'seta' in but lets not error if something else.
                 while (tokenizer.extractToken(line)) {
                     core::StringTokenizer<char> lineTokenizer(line.getStart(), line.getEnd(), ' ');
-                    StringRange<char> token(nullptr, nullptr);
+                    core::StringRange<char> token(nullptr, nullptr);
 
                     if (lineTokenizer.extractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
                         // get the name.
@@ -598,39 +597,47 @@ void XConsole::saveChangedVars(void)
         }
     }
 
-    if (file.openFile(userConfigPath.c_str(), fileMode::WRITE | fileMode::RECREATE)) {
-        file.writeStringNNT("// auto generated\n");
+    core::ByteStream stream(g_coreArena);
+    stream.reserve(4096);
+    stream.write("// auto generated\n", sizeof("// auto generated\n") - 1);
 
-        for (auto& k : keep) {
-            file.write(k.getStart(), k.getLength());
-            file.write('\n');
-        }
+    for (auto& k : keep) {
+        stream.write(k.getStart(), k.getLength());
+        stream.write('\n');
+    }
 
-        for (auto itrVar = VarMap_.begin(); itrVar != itrVarEnd; ++itrVar) {
-            ICVar* pVar = itrVar->second;
-            ICVar::FlagType flags = pVar->GetFlags();
+    core::ICVar::StrBuf strBuf;
 
-            // we always save 'ARCHIVE' and only save 'SAVE_IF_CHANGED' if 'MODIFIED'
-            bool save = (flags.IsSet(VarFlag::SAVE_IF_CHANGED) && flags.IsSet(VarFlag::MODIFIED)) || flags.IsSet(VarFlag::ARCHIVE);
+    for (auto& it : VarMap_) {
+        ICVar* pVar = it.second;
+        ICVar::FlagType flags = pVar->GetFlags();
 
-            if (save) {
-                core::ICVar::StrBuf strBuf;
+        // we always save 'ARCHIVE' and only save 'SAVE_IF_CHANGED' if 'MODIFIED'
+        bool save = (flags.IsSet(VarFlag::SAVE_IF_CHANGED) && flags.IsSet(VarFlag::MODIFIED)) || flags.IsSet(VarFlag::ARCHIVE);
 
-                // save out name + value.
-                const char* pName = pVar->GetName();
-                const char* pValue = pVar->GetString(strBuf);
-
-                file.writeStringNNT("seta ");
-                file.writeStringNNT(pName);
-                file.write(' ');
-                file.writeStringNNT(pValue);
-                file.write('\n');
-            }
+        if (save) {
+            // save out name + value.
+            const char* pName = pVar->GetName();
+            const char* pValue = pVar->GetString(strBuf);
+            
+            stream.write("seta ", 5);
+            stream.write(pName, core::strUtil::strlen(pName));
+            stream.write(' ');
+            stream.write(pValue, core::strUtil::strlen(pValue));
+            stream.write('\n');
         }
     }
-    else {
+
+    if (!file.openFile(userConfigPath.c_str(), fileMode::WRITE | fileMode::RECREATE)) {
         X_ERROR("Console", "Failed to open file for saving modifed vars");
+        return;
     }
+
+    if (file.write(stream.data(), stream.size()) != stream.size()) {
+        X_ERROR("Console", "Failed to write modifed vars data");
+    }
+
+    file.close();
 }
 
 void XConsole::freeRenderResources(void)
