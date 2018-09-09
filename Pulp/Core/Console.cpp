@@ -318,9 +318,9 @@ XConsole::XConsole() :
     varArena_(&varAllocator_, "VarArena"),
     cmdHistory_(g_coreArena),
     consoleLog_(g_coreArena),
-    VarMap_(g_coreArena),
-    CmdMap_(g_coreArena),
-    Binds_(g_coreArena),
+    varMap_(g_coreArena),
+    cmdMap_(g_coreArena),
+    binds_(g_coreArena),
     configCmds_(g_coreArena),
     varArchive_(g_coreArena),
     cmds_(g_coreArena),
@@ -329,9 +329,9 @@ XConsole::XConsole() :
     historyFileSize_(0),
     historyFileBuf_(g_coreArena)
 {
-    HistoryPos_ = -1;
-    CursorPos_ = 0;
-    ScrollPos_ = 0;
+    historyPos_ = -1;
+    cursorPos_ = 0;
+    scrollPos_ = 0;
 
     g_coreArena->addChildArena(&varArena_);
 
@@ -348,9 +348,9 @@ XConsole::XConsole() :
     autoCompleteSelect_ = false;
 
     // reserve a pickle. (vars are registered before 'Startup' might change that)
-    VarMap_.reserve(4096);
-    CmdMap_.reserve(1024);
-    Binds_.reserve(128);
+    varMap_.reserve(4096);
+    cmdMap_.reserve(1024);
+    binds_.reserve(128);
     configCmds_.reserve(64);
     varArchive_.reserve(64);
 
@@ -517,10 +517,10 @@ void XConsole::shutDown(void)
     }
 
     // clear up vars.
-    if (!VarMap_.empty()) {
+    if (!varMap_.empty()) {
 
         // we use the value of the last item to move iterator
-        for (auto it = VarMap_.begin(); it != VarMap_.end();) 
+        for (auto it = varMap_.begin(); it != varMap_.end();) 
         {
             auto* pVar = it->second;
             ++it;
@@ -528,19 +528,19 @@ void XConsole::shutDown(void)
             X_DELETE(pVar, &varArena_);
         }
 
-        VarMap_.clear();
+        varMap_.clear();
     }
 
-    InputBuffer_.clear();
-    RefString_.clear();
+    inputBuffer_.clear();
+    refString_.clear();
     cmdHistory_.clear();
 }
 
 void XConsole::saveChangedVars(void)
 {
-    auto itrVarEnd = VarMap_.end();
+    auto itrVarEnd = varMap_.end();
 
-    if (VarMap_.empty()) {
+    if (varMap_.empty()) {
         X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
         return;
     }
@@ -612,7 +612,7 @@ void XConsole::saveChangedVars(void)
 
     core::ICVar::StrBuf strBuf;
 
-    for (auto& it : VarMap_) {
+    for (auto& it : varMap_) {
         ICVar* pVar = it.second;
         ICVar::FlagType flags = pVar->GetFlags();
 
@@ -789,7 +789,7 @@ bool XConsole::HandleInput(const input::InputEvent& event)
                 scaled = -1;
             }
 
-            ScrollPos_ += scaled;
+            scrollPos_ += scaled;
 
             ValidateScrollPos();
             return true;
@@ -840,28 +840,28 @@ void XConsole::AddInputChar(const char c)
         return;
     }
 
-    if (CursorPos_ < safe_static_cast<int32_t, size_t>(InputBuffer_.length())) {
-        InputBuffer_.insert(CursorPos_, c);
+    if (cursorPos_ < safe_static_cast<int32_t, size_t>(inputBuffer_.length())) {
+        inputBuffer_.insert(cursorPos_, c);
     }
     else {
-        InputBuffer_ = InputBuffer_ + c;
+        inputBuffer_ = inputBuffer_ + c;
     }
 
-    CursorPos_++;
+    cursorPos_++;
 
-    //	X_LOG0("Console Buf", "%s (%i)", InputBuffer_.c_str(), CursorPos_);
+    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
 }
 
 void XConsole::RemoveInputChar(bool bBackSpace)
 {
-    if (InputBuffer_.isEmpty()) {
+    if (inputBuffer_.isEmpty()) {
         return;
     }
 
     if (bBackSpace) {
-        if (CursorPos_ > 0) {
-            InputBuffer_.erase(CursorPos_ - 1, 1);
-            CursorPos_--;
+        if (cursorPos_ > 0) {
+            inputBuffer_.erase(cursorPos_ - 1, 1);
+            cursorPos_--;
         }
     }
     else {
@@ -869,22 +869,22 @@ void XConsole::RemoveInputChar(bool bBackSpace)
         X_ASSERT_NOT_IMPLEMENTED();
     }
 
-    //	X_LOG0("Console Buf", "%s (%i)", InputBuffer_.c_str(), CursorPos_);
+    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
 }
 
 void XConsole::ClearInputBuffer(void)
 {
-    InputBuffer_ = "";
-    CursorPos_ = 0;
+    inputBuffer_ = "";
+    cursorPos_ = 0;
 }
 
 void XConsole::ExecuteInputBuffer(void)
 {
-    if (InputBuffer_.isEmpty()) {
+    if (inputBuffer_.isEmpty()) {
         return;
     }
 
-    core::string Temp = InputBuffer_;
+    core::string Temp = inputBuffer_;
     ClearInputBuffer();
 
     AddCmdToHistory(Temp);
@@ -924,13 +924,13 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
         return true;
     }
     else if (event.keyId == KeyId::LEFT_ARROW) {
-        if (CursorPos_) { // can we go left?
-            CursorPos_--;
+        if (cursorPos_) { // can we go left?
+            cursorPos_--;
 
             // support moving whole words
             if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
-                while (CursorPos_ && InputBuffer_[CursorPos_] != ' ') {
-                    CursorPos_--;
+                while (cursorPos_ && inputBuffer_[cursorPos_] != ' ') {
+                    cursorPos_--;
                 }
             }
 
@@ -940,16 +940,16 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
             if (console_cursor_skip_color_codes) {
                 // if we are at a number and ^ is before us go back two more.
-                if (CursorPos_ >= 1) {
-                    const char curChar = InputBuffer_[CursorPos_];
+                if (cursorPos_ >= 1) {
+                    const char curChar = inputBuffer_[cursorPos_];
 
                     if (core::strUtil::IsDigit(curChar)) {
-                        const char PreChar = InputBuffer_[CursorPos_ - 1];
+                        const char PreChar = inputBuffer_[cursorPos_ - 1];
 
                         if (PreChar == '^') {
-                            CursorPos_--;
-                            if (CursorPos_ > 0) {
-                                CursorPos_--;
+                            cursorPos_--;
+                            if (cursorPos_ > 0) {
+                                cursorPos_--;
                             }
                         }
                     }
@@ -960,14 +960,14 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
     }
     else if (event.keyId == KeyId::RIGHT_ARROW) {
         // are we pre end ?
-        if (CursorPos_ < safe_static_cast<int32_t>(InputBuffer_.length())) {
-            CursorPos_++;
+        if (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())) {
+            cursorPos_++;
 
             // support moving whole words
             if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
-                while (CursorPos_ < safe_static_cast<int32_t>(InputBuffer_.length())
-                       && InputBuffer_[CursorPos_] != ' ') {
-                    CursorPos_++;
+                while (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())
+                       && inputBuffer_[cursorPos_] != ' ') {
+                    cursorPos_++;
                 }
             }
 
@@ -976,12 +976,12 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
             cursor_.draw = true;
 
             if (console_cursor_skip_color_codes) {
-                uint32_t charsLeft = (safe_static_cast<int32_t>(InputBuffer_.length()) - CursorPos_);
+                uint32_t charsLeft = (safe_static_cast<int32_t>(inputBuffer_.length()) - cursorPos_);
                 if (charsLeft >= 2) {
-                    const char curChar = InputBuffer_[CursorPos_];
-                    const char nextChar = InputBuffer_[CursorPos_ + 1];
+                    const char curChar = inputBuffer_[cursorPos_];
+                    const char nextChar = inputBuffer_[cursorPos_ + 1];
                     if (curChar == '^' && core::strUtil::IsDigit(nextChar)) {
-                        CursorPos_ += 2;
+                        cursorPos_ += 2;
                     }
                 }
             }
@@ -992,10 +992,10 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
         return true;
     }
     else if (event.keyId == KeyId::HOME) {
-        CursorPos_ = 0;
+        cursorPos_ = 0;
     }
     else if (event.keyId == KeyId::END) {
-        CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.length());
+        cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.length());
     }
     else if (event.keyId == KeyId::UP_ARROW) {
         if (isAutocompleteVis() && autoCompleteIdx_ >= 0) {
@@ -1009,14 +1009,14 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
                     X_LOG0("Cmd history", "%s", HistoryLine);
                 }
 
-                InputBuffer_ = HistoryLine;
-                CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.size());
+                inputBuffer_ = HistoryLine;
+                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
         return true;
     }
     else if (event.keyId == KeyId::DOWN_ARROW) {
-        bool inHistory = (HistoryPos_ > 0);
+        bool inHistory = (historyPos_ > 0);
         bool multiAutoComplete = autoCompleteNum_ > 1;
 
         if (isAutocompleteVis() && (!inHistory || multiAutoComplete)) {
@@ -1034,8 +1034,8 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
                     X_LOG0("Cmd history", "%s", HistoryLine);
                 }
 
-                InputBuffer_ = HistoryLine;
-                CursorPos_ = safe_static_cast<int32_t>(InputBuffer_.size());
+                inputBuffer_ = HistoryLine;
+                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
         return true;
@@ -1048,22 +1048,22 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
 {
     if (direction == CmdHistory::UP) {
         if (!cmdHistory_.isEmpty()) {
-            if (HistoryPos_ < safe_static_cast<int32_t, size_t>(cmdHistory_.size() - 1)) {
-                HistoryPos_++;
+            if (historyPos_ < safe_static_cast<int32_t, size_t>(cmdHistory_.size() - 1)) {
+                historyPos_++;
 
-                RefString_ = cmdHistory_[HistoryPos_];
-                return RefString_.c_str();
+                refString_ = cmdHistory_[historyPos_];
+                return refString_.c_str();
             }
         }
     }
     else // down
     {
         // are we above base cmd?
-        if (HistoryPos_ > 0) {
-            HistoryPos_--;
+        if (historyPos_ > 0) {
+            historyPos_--;
             // adds a refrence to the string.
-            RefString_ = cmdHistory_[HistoryPos_];
-            return RefString_.c_str();
+            refString_ = cmdHistory_[historyPos_];
+            return refString_.c_str();
         }
     }
 
@@ -1184,7 +1184,7 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
 
 void XConsole::ResetHistoryPos(void)
 {
-    HistoryPos_ = -1;
+    historyPos_ = -1;
 }
 
 void XConsole::AddCmdToHistory(const char* pCommand)
@@ -1227,19 +1227,19 @@ void XConsole::AddBind(const char* pKey, const char* pCmd)
             X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, Old, pCmd);
         }
 
-        auto it = Binds_.find(X_CONST_STRING(pKey));
+        auto it = binds_.find(X_CONST_STRING(pKey));
         it->second = pCmd;
     }
 
-    Binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
+    binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
 }
 
 // returns the command for a given key
 // returns null if no bind found
 const char* XConsole::FindBind(const char* key)
 {
-    auto it = Binds_.find(X_CONST_STRING(key));
-    if (it != Binds_.end()) {
+    auto it = binds_.find(X_CONST_STRING(key));
+    if (it != binds_.end()) {
         return it->second.c_str();
     }
     return nullptr;
@@ -1248,12 +1248,12 @@ const char* XConsole::FindBind(const char* key)
 // removes all the binds.
 void XConsole::ClearAllBinds(void)
 {
-    Binds_.clear();
+    binds_.clear();
 }
 
 void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
 {
-    for (auto bind : Binds_) {
+    for (auto bind : binds_) {
         CallBack->OnKeyBindFound(bind.first.c_str(), bind.second.c_str());
     }
 }
@@ -1384,8 +1384,8 @@ ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
 
 ICVar* XConsole::GetCVar(const char* pName)
 {
-    auto it = VarMap_.find(pName);
-    if (it != VarMap_.end()) {
+    auto it = varMap_.find(pName);
+    if (it != varMap_.end()) {
         return it->second;
     }
     return nullptr;
@@ -1393,15 +1393,15 @@ ICVar* XConsole::GetCVar(const char* pName)
 
 void XConsole::UnregisterVariable(const char* pVarName)
 {
-    auto it = VarMap_.find(pVarName);
-    if (it == VarMap_.end()) {
+    auto it = varMap_.find(pVarName);
+    if (it == varMap_.end()) {
         X_WARNING("Console", "Failed to find var \"%s\" for removal", pVarName);
         return;
     }
 
     auto* pVar = it->second;
 
-    VarMap_.erase(pVarName);
+    varMap_.erase(pVarName);
     X_DELETE(pVar, &varArena_);
 }
 
@@ -1409,7 +1409,7 @@ void XConsole::UnregisterVariable(ICVar* pCVar)
 {
     auto pName = pCVar->GetName();
 
-    VarMap_.erase(pName);
+    varMap_.erase(pName);
     X_DELETE(pCVar, &varArena_);
 }
 
@@ -1429,18 +1429,18 @@ void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
     }
 
     // pass cmd.Name instead of Name, saves creating a second core::string
-    if (CmdMap_.find(cmd.Name) != CmdMap_.end()) {
+    if (cmdMap_.find(cmd.Name) != cmdMap_.end()) {
         X_WARNING("Console", "command already exsists: \"%s", pName);
     }
 
-    CmdMap_.insert(std::make_pair(cmd.Name, cmd));
+    cmdMap_.insert(std::make_pair(cmd.Name, cmd));
 }
 
 void XConsole::UnRegisterCommand(const char* pName)
 {
-    auto it = CmdMap_.find(X_CONST_STRING(pName));
-    if (it != CmdMap_.end()) {
-        CmdMap_.erase(it);
+    auto it = cmdMap_.find(X_CONST_STRING(pName));
+    if (it != cmdMap_.end()) {
+        cmdMap_.erase(it);
     }
 }
 
@@ -1577,7 +1577,7 @@ void XConsole::ConfigExec(const char* pCommand, const char* pEnd)
 void XConsole::PageUp(void)
 {
     const int32_t visibleNum = MaxVisibleLogLines();
-    ScrollPos_ += visibleNum;
+    scrollPos_ += visibleNum;
 
     ValidateScrollPos();
 }
@@ -1585,15 +1585,15 @@ void XConsole::PageUp(void)
 void XConsole::PageDown(void)
 {
     const int32_t visibleNum = MaxVisibleLogLines();
-    ScrollPos_ -= visibleNum;
+    scrollPos_ -= visibleNum;
 
     ValidateScrollPos();
 }
 
 void XConsole::ValidateScrollPos(void)
 {
-    if (ScrollPos_ < 0) {
-        ScrollPos_ = 0;
+    if (scrollPos_ < 0) {
+        scrollPos_ = 0;
     }
     else {
         int32_t logSize = safe_static_cast<int32_t>(consoleLog_.size());
@@ -1602,8 +1602,8 @@ void XConsole::ValidateScrollPos(void)
         logSize -= visibleNum;
         logSize += 2;
 
-        if (ScrollPos_ > logSize) {
-            ScrollPos_ = logSize;
+        if (scrollPos_ > logSize) {
+            scrollPos_ = logSize;
         }
     }
 }
@@ -1667,8 +1667,8 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
         }
 
         // === Check if is a command ===
-        auto itrCmd = CmdMap_.find(X_CONST_STRING(name.c_str()));
-        if (itrCmd != CmdMap_.end()) {
+        auto itrCmd = cmdMap_.find(X_CONST_STRING(name.c_str()));
+        if (itrCmd != cmdMap_.end()) {
             value.set(range);
             value.trim();
             ExecuteCommand((itrCmd->second), value);
@@ -1676,8 +1676,8 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
         }
 
         // === check for var ===
-        auto itrVar = VarMap_.find(X_CONST_STRING(name.c_str()));
-        if (itrVar != VarMap_.end()) {
+        auto itrVar = varMap_.find(X_CONST_STRING(name.c_str()));
+        if (itrVar != varMap_.end()) {
             ICVar* pCVar = itrVar->second;
 
             if (pPos) // is there a space || = symbol (meaning there is a possible value)
@@ -1789,8 +1789,8 @@ void XConsole::ExecuteCommand(const ConsoleCommand& cmd,
 
 ICVar* XConsole::GetCVarForRegistration(const char* pName)
 {
-    auto it = VarMap_.find(X_CONST_STRING(pName));
-    if (it != VarMap_.end()) {
+    auto it = varMap_.find(X_CONST_STRING(pName));
+    if (it != varMap_.end()) {
         // if you get this warning you need to fix it.
         X_ERROR("Console", "var(%s) is already registerd", pName);
         return it->second;
@@ -1822,7 +1822,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
         X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
     }
 
-    VarMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
+    varMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
 }
 
 void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
@@ -1941,7 +1941,7 @@ void XConsole::DrawBuffer(void)
         pos.x += 2;
 
         if (cursor_.draw) {
-            float Lwidth = pFont_->GetTextSize(InputBuffer_.c_str(), InputBuffer_.c_str() + CursorPos_, ctx).x + 3; // 3px offset from engine txt.
+            float Lwidth = pFont_->GetTextSize(inputBuffer_.c_str(), inputBuffer_.c_str() + cursorPos_, ctx).x + 3; // 3px offset from engine txt.
 
             pPrimContext_->drawText(pos.x + Lwidth, pos.y, ctx, "_");
         }
@@ -1963,7 +1963,7 @@ void XConsole::DrawBuffer(void)
             const int32_t num = safe_static_cast<int32_t>(consoleLog_.size());
 
             for (int32_t i = (num - 1); i >= 0 && yPos >= 30; --i, ++scroll) {
-                if (scroll >= ScrollPos_) {
+                if (scroll >= scrollPos_) {
                     const char* pBuf = consoleLog_[i].c_str();
 
                     pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
@@ -2010,7 +2010,7 @@ void XConsole::DrawScrollBar(void)
         const int32_t visibleNum = MaxVisibleLogLines();
         const int32_t scrollableLines = safe_static_cast<int32_t>(consoleLog_.size()) - (visibleNum + 2);
 
-        float positionPercent = PercentageOf(ScrollPos_, scrollableLines) * 0.01f;
+        float positionPercent = PercentageOf(scrollPos_, scrollableLines) * 0.01f;
         float offset = (barHeight - slider_height) * positionPercent;
 
         slider_y += (barHeight - slider_height - offset);
@@ -2033,12 +2033,12 @@ void XConsole::DrawInputTxt(const Vec2f& start)
     Vec2f txtPos = start;
 
     if (pFont_ && pPrimContext_) {
-        const char* inputBegin = InputBuffer_.begin();
-        const char* inputEnd = InputBuffer_.end();
+        const char* inputBegin = inputBuffer_.begin();
+        const char* inputEnd = inputBuffer_.end();
         const char* pName;
         size_t NameLen, inputLen;
 
-        if (InputBuffer_.isEmpty()) {
+        if (inputBuffer_.isEmpty()) {
             ResetAutoCompletion();
             return;
         }
@@ -2046,7 +2046,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
         // check for vreset
         if (const char* vreset = core::strUtil::Find(inputBegin, inputEnd, "vreset ")) {
             // check if we have atleast 1 char.
-            if (InputBuffer_.length() > 7) {
+            if (inputBuffer_.length() > 7) {
                 inputBegin = core::Min(vreset + 7, inputEnd); // cap search.
                 txtCol = console_cmd_color;
             }
@@ -2073,9 +2073,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
         }
 
         // try find and cmd's / dvars that match the current input.
-        auto it = VarMap_.begin();
+        auto it = varMap_.begin();
 
-        for (; it != VarMap_.end(); ++it) {
+        for (; it != varMap_.end(); ++it) {
             pName = it->second->GetName();
             NameLen = core::strUtil::strlen(pName);
 
@@ -2096,8 +2096,8 @@ void XConsole::DrawInputTxt(const Vec2f& start)
 
         if (results.size() < results.capacity()) {
             // do the commands baby!
-            auto cmdIt = CmdMap_.begin();
-            for (; cmdIt != CmdMap_.end(); ++cmdIt) {
+            auto cmdIt = cmdMap_.begin();
+            for (; cmdIt != cmdMap_.end(); ++cmdIt) {
                 pName = cmdIt->second.Name.c_str();
                 NameLen = cmdIt->second.Name.length();
 
@@ -2136,16 +2136,16 @@ void XConsole::DrawInputTxt(const Vec2f& start)
         autoCompleteSelect_ = autoCompleteIdx_ >= 0 ? autoCompleteSelect_ : false;
 
         if (autoCompleteSelect_) {
-            if (InputBuffer_.find("vreset ")) {
-                InputBuffer_ = "vreset ";
-                InputBuffer_ += results[autoCompleteIdx_].pName;
+            if (inputBuffer_.find("vreset ")) {
+                inputBuffer_ = "vreset ";
+                inputBuffer_ += results[autoCompleteIdx_].pName;
             }
             else {
-                InputBuffer_ = results[autoCompleteIdx_].pName;
+                inputBuffer_ = results[autoCompleteIdx_].pName;
             }
             //	if (results[autoCompleteIdx_].var) // for var only?
-            InputBuffer_ += ' '; // add a space
-            CursorPos_ = safe_static_cast<int32, size_t>(InputBuffer_.length());
+            inputBuffer_ += ' '; // add a space
+            cursorPos_ = safe_static_cast<int32, size_t>(inputBuffer_.length());
             autoCompleteIdx_ = -1;
             autoCompleteSelect_ = false;
         }
@@ -2183,11 +2183,11 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                 // we check if the input has a complete match
                 // to any of the results.
                 // if so only show that.
-                string::const_str pos = InputBuffer_.find(' ');
-                if (pos) // != string::npos) //== (InputBuffer_.length() - 1))
+                string::const_str pos = inputBuffer_.find(' ');
+                if (pos) // != string::npos) //== (inputBuffer_.length() - 1))
                 {
                     Results::const_iterator resIt;
-                    core::StackString<128> temp(InputBuffer_.begin(), pos);
+                    core::StackString<128> temp(inputBuffer_.begin(), pos);
 
                     resIt = results.begin();
                     for (; resIt != results.end(); ++resIt) {
@@ -2323,11 +2323,11 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                     pPrimContext_->drawQuad(colxpos, colypos, colorBoxWidth, colHeight, PColVar->GetDefaultColor(), Col_Black);
 
                     // How about a preview of the new color?
-                    string::const_str pos = InputBuffer_.find(nameStr.c_str());
+                    string::const_str pos = inputBuffer_.find(nameStr.c_str());
                     if (pos) {
                         //	static core::StackString<64> lastValue;
                         core::StackString<64> colorStr(&pos[nameStr.length()],
-                            InputBuffer_.end());
+                            inputBuffer_.end());
 
                         colorStr.trim();
 
@@ -2435,7 +2435,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
         }
 
         // the input
-        if (!InputBuffer_.isEmpty()) {
+        if (!inputBuffer_.isEmpty()) {
             const Vec2i& res = renderRes_;
 
             const float width = res.x - 10.f;
@@ -2446,9 +2446,9 @@ void XConsole::DrawInputTxt(const Vec2f& start)
             ctx.flags.Set(font::DrawTextFlag::CLIP);
             ctx.clip.set(0, 0, width, std::numeric_limits<float>::max());
 
-            core::string::const_str space = InputBuffer_.find(' ');
+            core::string::const_str space = inputBuffer_.find(' ');
             if (space) {
-                core::StackString<128> temp(InputBuffer_.begin(), space);
+                core::StackString<128> temp(inputBuffer_.begin(), space);
 
                 // preserve any colors.
                 core::StackString<128> temp2;
@@ -2459,7 +2459,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                     }
                 }
 
-                //	temp2.append(&InputBuffer_[space]);
+                //	temp2.append(&inputBuffer_[space]);
                 temp2.append(space);
 
                 pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, temp.begin(), temp.end());
@@ -2468,7 +2468,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
                 pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, temp2.begin(), temp2.end());
             }
             else {
-                pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, InputBuffer_.begin(), InputBuffer_.end());
+                pPrimContext_->drawText(txtPos.x, txtPos.y, ctx, inputBuffer_.begin(), inputBuffer_.end());
             }
         }
     }
@@ -2501,14 +2501,14 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
             const auto noneScroll = MaxVisibleLogLines();
 
             // move scroll wheel with the moving items?
-            if (ScrollPos_ > 0 && ScrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
-                ScrollPos_++;
+            if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
+                scrollPos_++;
             }
         }
     }
     else {
-        if (ScrollPos_ > 0) {
-            ScrollPos_++;
+        if (scrollPos_ > 0) {
+            scrollPos_++;
         }
     }
 }
@@ -2523,9 +2523,9 @@ int32_t XConsole::getLineCount(void) const
 void XConsole::ListCommands(const char* pSearchPatten)
 {
     core::Array<ConsoleCommand*> sorted_cmds(g_coreArena);
-    sorted_cmds.setGranularity(CmdMap_.size());
+    sorted_cmds.setGranularity(cmdMap_.size());
 
-    for (auto itrCmd = CmdMap_.begin(); itrCmd != CmdMap_.end(); ++itrCmd) {
+    for (auto itrCmd = cmdMap_.begin(); itrCmd != cmdMap_.end(); ++itrCmd) {
         ConsoleCommand& cmd = itrCmd->second;
 
         if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.Name)) {
@@ -2552,9 +2552,9 @@ void XConsole::ListVariables(const char* pSearchPatten)
     // and i only need order when priting them.
     // so it's not biggy doing the sorting here.
     core::Array<ICVar*> sorted_vars(g_coreArena);
-    sorted_vars.setGranularity(VarMap_.size());
+    sorted_vars.setGranularity(varMap_.size());
 
-    for (const auto& it : VarMap_) {
+    for (const auto& it : varMap_) {
         ICVar* var = it.second;
 
         if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName())) {
@@ -2580,9 +2580,9 @@ void XConsole::ListVariablesValues(const char* pSearchPatten)
     // and i only need order when priting them.
     // so it's not biggy doing the sorting here.
     core::Array<ICVar*> sorted_vars(g_coreArena);
-    sorted_vars.setGranularity(VarMap_.size());
+    sorted_vars.setGranularity(varMap_.size());
 
-    for (const auto& it : VarMap_) {
+    for (const auto& it : varMap_) {
         ICVar* var = it.second;
 
         if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName())) {
@@ -2603,7 +2603,7 @@ void XConsole::ListVariablesValues(const char* pSearchPatten)
 
 void XConsole::Copy(void)
 {
-    core::clipboard::setText(InputBuffer_.begin(), InputBuffer_.end());
+    core::clipboard::setText(inputBuffer_.begin(), inputBuffer_.end());
 }
 
 void XConsole::Paste(void)
@@ -2613,9 +2613,9 @@ void XConsole::Paste(void)
 
     if (pTxt) {
         // insert it at current pos.
-        InputBuffer_.insert(CursorPos_, pTxt);
+        inputBuffer_.insert(cursorPos_, pTxt);
         // add to length
-        CursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(pTxt));
+        cursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(pTxt));
     }
     else {
         X_LOG1("Console", "Failed to paste text to console");

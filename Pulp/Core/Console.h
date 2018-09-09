@@ -305,9 +305,9 @@ private:
     ConsoleBuffer consoleLog_;
     core::SpinlockRecursive logLock_;
 
-    ConsoleVarMap VarMap_;
-    ConsoleCmdMap CmdMap_;
-    ConsoleBindMap Binds_; // support sexy bind.
+    ConsoleVarMap varMap_;
+    ConsoleCmdMap cmdMap_;
+    ConsoleBindMap binds_; // support sexy bind.
     ConfigCmdsMap configCmds_;
     ConfigCmdsMap varArchive_;
 
@@ -315,11 +315,11 @@ private:
 
     consoleState::Enum consoleState_;
 
-    int32_t HistoryPos_;
-    int32_t CursorPos_;
-    int32_t ScrollPos_;
-    string InputBuffer_;
-    string RefString_;
+    int32_t historyPos_;
+    int32_t cursorPos_;
+    int32_t scrollPos_;
+    string inputBuffer_;
+    string refString_;
 
     Vec2<int32_t> renderRes_;
 
