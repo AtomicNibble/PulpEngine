@@ -28,6 +28,7 @@ struct IVideo
 {
     virtual ~IVideo() = default;
 
+    virtual void createRenderTexture(render::IRender* pRender) X_ABSTRACT;
     virtual render::TexID getTextureID(void) const X_ABSTRACT;
 };
 

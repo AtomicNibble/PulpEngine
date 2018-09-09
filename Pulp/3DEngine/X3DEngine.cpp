@@ -181,6 +181,30 @@ bool X3DEngine::init(void)
     // this can be any size, but typically have it match display.
     pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol2d);
 
+    auto* pMat = pMaterialManager_->loadMaterial("video/doom_trailer");
+    auto* pTech = pMaterialManager_->getTechForMaterial(pMat, core::StrHash("unlit"),
+        render::shader::VertexFormat::P3F_T4F_C4B_N3F, engine::PermatationFlags::VertStreams);
+
+    if (!pTech) {
+        X_ERROR("Font", "Failed to get 'unlit' tech for font");
+        return false;
+    }
+
+    auto* pVid = gEnv->pVideoSys->loadVideo("test/doom_trailer_720");
+
+    pVid->createRenderTexture(pRender);
+
+    auto id = pVid->getTextureID();
+
+    engine::RegisterCtx con;
+    con.regs[engine::Register::CodeTexture0] = id;
+
+    if (!pMaterialManager_->setRegisters(pTech, con)) {
+        X_ERROR("Font", "Failed to bind fontcache taxture to font state");
+        return false;
+    }
+
+
     return true;
 }
 

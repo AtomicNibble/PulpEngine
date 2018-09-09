@@ -98,16 +98,6 @@ void Video::pause(void)
 
 void Video::update(const core::FrameTimeData& frameTimeInfo)
 {
-
-    // TODO: this assumes header finished loading.
-    if (!pTexture_) {
-        pTexture_ = gEnv->pRender->createTexture(
-            name_.c_str(),
-            Vec2i(vidHdr_.pixelWidth, vidHdr_.pixelHeight),
-            texture::Texturefmt::B8G8R8A8,
-            render::BufUsage::PER_FRAME);
-    }
-
     if (state_ != State::Buffering && state_ != State::Playing) {
         return;
     }
@@ -237,8 +227,6 @@ void Video::processIOData(void)
     }
 }
 
-
-
 void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
     if (vid_.availFrames.isEmpty()) {
@@ -285,6 +273,18 @@ void Video::releaseFrame(void)
 
     vid_.pLockedFrame = nullptr;
     vid_.availFrames.pop();
+}
+
+void Video::createRenderTexture(render::IRender* pRender)
+{
+    X_ASSERT(state_ >= State::Init, "Header not loaded")(state_);
+    X_ASSERT(pTexture_ == nullptr, "Texture already valid")(pTexture_);
+
+    pTexture_ = pRender->createTexture(
+        name_.c_str(),
+        Vec2i(vidHdr_.pixelWidth, vidHdr_.pixelHeight),
+        texture::Texturefmt::B8G8R8A8,
+        render::BufUsage::PER_FRAME);
 }
 
 render::TexID Video::getTextureID(void) const

@@ -92,6 +92,7 @@ public:
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);
     void releaseFrame(void);
 
+    void createRenderTexture(render::IRender* pRender) X_FINAL;
     render::TexID getTextureID(void) const X_FINAL;
 
     bool processHdr(core::XFileAsync* pFile, core::span<uint8_t> data);
