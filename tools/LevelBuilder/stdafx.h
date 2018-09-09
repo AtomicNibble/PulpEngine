@@ -27,8 +27,8 @@
 
 #include <Util\UniquePointer.h>
 
-#include "../../tools/MaterialLib/MatLib.h"
-#include "../../tools/ModelLib/ModelLib.h"
+#include <../../tools/MaterialLib/MatLib.h>
+#include <../../tools/ModelLib/ModelLib.h>
 
 #include <Ilevel.h>
 #include <IPhysics.h>
