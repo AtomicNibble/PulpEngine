@@ -108,8 +108,10 @@ void Video::stop(void)
         }
 
         // we need to fix io eventes for objects gone!
-        gEnv->pSound->stopVideoAudio(audio_.sndPlayingId);
-
+        if (audio_.sndPlayingId != sound::INVALID_PLAYING_ID) {
+            gEnv->pSound->stopVideoAudio(audio_.sndPlayingId);
+            audio_.sndPlayingId = sound::INVALID_PLAYING_ID;
+        }
 
         {
             core::CriticalSection::ScopedLock lock(io_.cs);
@@ -165,6 +167,8 @@ void Video::update(const core::FrameTimeData& frameTimeInfo)
             if (audio_.sndObj == sound::INVALID_OBJECT_ID) {
                 audio_.sndObj = gEnv->pSound->registerObject("VideoAudio");
             }
+
+            X_ASSERT(audio_.sndPlayingId == sound::INVALID_PLAYING_ID, "Playing id already valid")();
 
             sound::AudioBufferDelegate del;
             del.Bind<Video, &Video::audioDataRequest>(this);
