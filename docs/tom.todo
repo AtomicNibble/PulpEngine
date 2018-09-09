@@ -2,6 +2,10 @@
 Core:
 
   ☐ Sort out potential job system lock, due to not always helping with work when waiting.
+  ☐ See if can make job profiler drawing better, by not drawing more blocks than pixels.
+    - Also if we have lots of jobs on same pixel maybe blend the colors?
+
+ ☐ Finish off and test replay logic of input system.
 
 Game:
 
@@ -25,6 +29,9 @@ Engine:
     ☐ If a video is playing but not visible or used don't bother update render text.
         Think it's kinda safe to assume currently if playing it's used.
 
+  ☐ Support single threaded command list generation for better debug.
+  ☐ Support unsorted command lists.
+
   GUI:
     ☐ Support combo boxes (for selecting resolution etc)
     ☐ Support scrollable areas (will be probs needed for settings menus)
@@ -35,6 +42,7 @@ Font:
   ☐ Work out if should prebake different resolutions for SDF:
     don't think that should be required as kinda defaults the whole point.
     But my font rendering is pretty shitty currently.
+    Think it's just pixel offset tho, which I removed to prevent snapping in 3d :/
 
 Script:
 
@@ -62,12 +70,23 @@ Video:
        I probs want to store video and audio buffers next to each other in file so can load as blocks.
        Since webm stores video and audio data interleved i just leave it like that.
  ✔ Fix frame lookahead when IO buffer wraps around. @done (18-09-06 13:58)
- ☐ Actually use the display times for video frames / audio.
-
+ ✔ Actually use the display times for video frames @done (18-09-08 13:37)
+ ☐ Actually use the display times for audio frames
+     - Will need to keep track of when wise is pulling the source data?
+ ☐ Test decoding not been able to keep up.
+   ☐ Stall audio if video jumpy?
+ ☐ Have the video debug move if profiler enabled etc, just need to pass postion basically.
 
 Render:
 
   ☐ Fix rendering on AMD cards (some sync issue?)
+  ☐ Need to support uploading big textures.
+    The allocator i use has fixed page sizes, so limits texture size.
+    - should check if using that allocator is really what i want.
+
+ ☐ Make it so the command lists can be generated but not executed, then the 3dEngine can dispatch multiple command lists as once, since the dispatch has fixed overhead.
+     For example we could generated both 2d and 3d command lists, but dispatch the lists at same time. But maybe it's better to build the 2d dispatch it then start building 3d dunno.
+      But I need to exposes the flexibility.
 
 AssetDB:
 
@@ -84,7 +103,10 @@ AssetPak:
 
 LevelBuilder:
 
-  ☐ Generate asset lists for level
+  ✔ Generate asset lists for level @done (18-09-09 10:55)
+        Curently it's just materials and models. The models materials are not inc.
+  ☐ Bake lighting for level
+
 
  UnitTests:
 
