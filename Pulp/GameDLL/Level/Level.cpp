@@ -312,10 +312,6 @@ bool World::loadMap(const MapNameStr& name)
     level_ = core::makeUnique<Level>(arena_, pScene_, p3DWorld_, ents_, arena_);
     level_->beginLoad(name);
 
-    // TEMP
-    // gEnv->pSound->postEvent(force_hash<"play_ambient"_soundId>(), sound::GLOBAL_OBJECT_ID);
-    // gEnv->pSound->postEvent(force_hash<"video_rickroll"_soundId>(), sound::GLOBAL_OBJECT_ID);
-
     return true;
 }
 
