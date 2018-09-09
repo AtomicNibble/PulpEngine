@@ -215,6 +215,13 @@ void XCore::RenderEnd(core::FrameData& frameData)
 
 #endif // !X_ENABLE_PROFILER
 
+        if (env_.pVideoSys) {
+            pos += env_.pVideoSys->drawDebug(pPrim, pos);
+        }
+        if (env_.pSound) {
+            pos += env_.pSound->drawDebug(pPrim, pos);
+        }
+
         if (core::IConsole* pConsole = GetIConsole()) {
             pConsole->draw(frameData.timeInfo);
         }
