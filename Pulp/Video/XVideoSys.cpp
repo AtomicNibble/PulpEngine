@@ -128,7 +128,7 @@ IVideo* XVideoSys::loadVideo(const char* pVideoName)
         return pVideoRes;
     }
 
-    pVideoRes = videos_.createAsset(name, name, blockArena_);
+    pVideoRes = videos_.createAsset(name, name, vars_, blockArena_);
 
     queueLoadRequest(pVideoRes);
 

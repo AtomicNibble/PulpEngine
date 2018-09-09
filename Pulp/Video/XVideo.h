@@ -21,6 +21,7 @@ X_NAMESPACE_BEGIN(video)
 
 struct IVFHdr;
 
+class VideoVars;
 struct FrameData
 {
     size_t dataSize;
@@ -87,7 +88,7 @@ class Video : public core::AssetBase
     using TrackFrameHistory = std::array<FrameHistory<T>, TrackType::ENUM_COUNT>;
 
 public:
-    Video(core::string name, core::MemoryArenaBase* arena);
+    Video(core::string name, const VideoVars& vars, core::MemoryArenaBase* arena);
     virtual ~Video();
 
     void play(void);
@@ -135,6 +136,7 @@ private:
     void decodeVideo_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
 
 private:
+    const VideoVars& vars_;
 
     VideoTrackHdr vidHdr_;
     AudioTrackHdr audioHdr_;

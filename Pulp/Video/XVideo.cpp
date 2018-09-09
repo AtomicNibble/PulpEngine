@@ -23,6 +23,8 @@
 
 #include <Time\StopWatch.h>
 
+#include "Vars\VideoVars.h"
+
 X_NAMESPACE_BEGIN(video)
 
 namespace
@@ -43,8 +45,9 @@ namespace
 } // namespace
 
 
-Video::Video(core::string name, core::MemoryArenaBase* arena) :
+Video::Video(core::string name, const VideoVars& vars, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::VIDEO),
+    vars_(vars),
     frameRate_(0),
     state_(State::UnInit),
     io_(arena),
@@ -249,20 +252,24 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
     auto delta = pFrame->displayTime - ellapsed;
 
     // if it's negative frame is late by delta MS.
+    // if positive it's how long we should wait till display.
+    // should we allow some slop?
     if (delta > 10) {
-        X_WARNING("Video", "Frame time till display: %" PRIi32, delta);
+        if (vars_.debug()) {
+            X_WARNING("Video", "Frame time till display: %" PRIi32, delta);
+        }
         return;
     }
 
-    X_LOG0("Video", "Frame display delta: %" PRIi32 " ellapsed: %" PRIi32, delta, ellapsed);
+    if (vars_.debug()) {
+        X_LOG0("Video", "Frame display delta: %" PRIi32 " ellapsed: %" PRIi32, delta, ellapsed);
+    }
 
-#if 0
     // we want to submit a draw
     render::Commands::CopyTextureBufferData* pCopyCmd = bucket.addCommand<render::Commands::CopyTextureBufferData>(0, 0);
     pCopyCmd->textureId = pTexture_->getTexID();
     pCopyCmd->pData = pFrame->decoded.data();
     pCopyCmd->size = safe_static_cast<uint32_t>(pFrame->decoded.size());
-#endif
 
     vid_.pLockedFrame = pFrame;
 }
