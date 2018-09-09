@@ -49,6 +49,13 @@ bool ModelCache::loadDefaultModel(void)
     return true;
 }
 
+void ModelCache::addAssets(linker::AssetList& as) const
+{
+    for (auto& m : models_) {
+        as.add(assetDb::AssetType::MODEL, m.first);
+    }
+}
+
 bool ModelCache::getModelPath(const core::string& name, core::Path<char>& path)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;

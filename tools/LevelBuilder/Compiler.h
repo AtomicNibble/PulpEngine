@@ -68,6 +68,7 @@ public:
 
 private:
     bool save(const LvlEntsArr& ent, core::Path<char>& path);
+    bool saveAssetList(const LvlEntsArr& ent, const core::Path<char>& path);
     bool processModels(LvlEntsArr& ents);
     bool processModel(LvlEntity& ent);
     bool processWorldModel(LvlEntsArr& ents, LvlEntity& ent);

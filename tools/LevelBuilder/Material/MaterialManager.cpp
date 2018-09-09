@@ -66,6 +66,13 @@ engine::Material* MatManager::getDefaultMaterial(void) const
     return pDefaultMtl_->instance();
 }
 
+void MatManager::addAssets(linker::AssetList& as) const
+{
+    for (auto& m : materials_) {
+        as.add(assetDb::AssetType::MATERIAL, m.first);
+    }
+}
+
 engine::Material* MatManager::loadMaterial(const char* pMtlName)
 {
     X_ASSERT_NOT_NULL(pMtlName);

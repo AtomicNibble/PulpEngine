@@ -31,6 +31,8 @@ public:
 
     engine::Material* getDefaultMaterial(void) const;
 
+    void addAssets(linker::AssetList& as) const;
+
 private:
     bool loadDefaultMaterial(void);
     void freeDanglingMaterials(void);

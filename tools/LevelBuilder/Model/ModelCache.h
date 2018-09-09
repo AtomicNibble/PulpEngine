@@ -16,6 +16,8 @@ public:
     bool getModelAABB(const core::string& name, AABB& bounds);
     bool loadDefaultModel(void);
 
+    void addAssets(linker::AssetList& as) const;
+
 private:
     bool getModelPath(const core::string& name, core::Path<char>& path);
 

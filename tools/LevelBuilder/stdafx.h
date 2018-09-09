@@ -29,6 +29,7 @@
 
 #include <../../tools/MaterialLib/MatLib.h>
 #include <../../tools/ModelLib/ModelLib.h>
+#include <../../tools/LinkerLib/LinkerLib.h>
 
 #include <Ilevel.h>
 #include <IPhysics.h>

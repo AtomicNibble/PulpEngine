@@ -233,6 +233,11 @@ bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
     X_LOG0("Lvl", "Compile time: ^6%s", core::HumanDuration::toString(durStr, stopwatch.GetMilliSeconds()));
     stopwatch.Start();
 
+    // build asset list.
+    if (!saveAssetList(ents, outPath)) {
+        return false;
+    }
+
     if (!save(ents, outPath)) {
         return false;
     }
@@ -1083,4 +1088,23 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
     return true;
 }
 
+bool Compiler::saveAssetList(const LvlEntsArr& ents, const core::Path<char>& outPath)
+{
+    linker::AssetList as(arena_);
+
+    // can i just be lazy and dump what's in the model and material managers?
+
+    pModelCache_->addAssets(as);
+    pMaterialMan_->addAssets(as);
+    
+    auto asPath(outPath);
+    asPath.setExtension(assetDb::ASSET_LIST_EXT);
+
+    if (!as.saveToFile(asPath)) {
+        X_ERROR("Lvl", "Failed to save asset list");
+        return false;
+    }
+
+    return true;
+}
 X_NAMESPACE_END

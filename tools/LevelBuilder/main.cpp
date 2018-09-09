@@ -43,6 +43,7 @@ X_LINK_ENGINE_LIB("MaterialLib");
 X_LINK_ENGINE_LIB("ModelLib");
 X_LINK_ENGINE_LIB("Physics");
 X_LINK_ENGINE_LIB("AssetDB");
+X_LINK_ENGINE_LIB("LinkerLib");
 
 #ifdef X_LIB
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
