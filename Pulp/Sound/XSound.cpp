@@ -994,6 +994,20 @@ void XSound::freeDangling(void)
         }
     }
 
+    {
+        core::CriticalSection::ScopedLock lock(memStreamCS_);
+
+        if (memoryInputStreams_.isNotEmpty()) {
+            X_WARNING("Sound", "Cleaning up %" PRIuS " dangaling memory streams", memoryInputStreams_.size());
+
+            for (auto& mis : memoryInputStreams_) {
+                AK::SoundEngine::StopPlayingID(mis.playingID);
+            }
+        }
+
+        memoryInputStreams_.clear();
+    }
+
     unRegisterAll();
 }
 
