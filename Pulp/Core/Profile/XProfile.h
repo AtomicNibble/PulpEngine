@@ -75,7 +75,8 @@ namespace profiler
         void OnFrameEnd(void);
         bool onInputEvent(const input::InputEvent& event);
 
-        void Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
+        Vec2f Render(engine::IPrimativeContext* pPrim, Vec2f pos,
+            const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys);
 
         X_INLINE const ProfilerVars& getVars(void) const;
 
@@ -85,14 +86,14 @@ namespace profiler
 
     private:
         void UpdateProfileData(void);
-        Vec2f RenderStartupData(Vec2f pos);
-        Vec2f RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena);
-        Vec2f RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
+        Vec2f RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos);
+        Vec2f RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena);
+        Vec2f RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, const wchar_t* pTitle, const core::StackString512& str);
 
         static size_t countChildren_r(core::MemoryArenaBase* arena);
 
 #if X_ENABLE_JOBSYS_PROFILER
-        Vec2f RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
+        Vec2f RenderJobSystem(engine::IPrimativeContext* pPrim, Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx);
         void DrawThreadInfo(const FrameTimeData& frameTimeInfo, engine::IPrimativeContext* pPrim, float xStart, float yStart, float width, float height,
             const core::V2::JobQueueHistory::FrameHistory& history, SubSystemTimeArr& subTimesOut);
 
@@ -102,7 +103,7 @@ namespace profiler
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 #if X_ENABLE_PROFILER_WARNINGS
-        void drawWarnings(void);
+        void drawWarnings(engine::IPrimativeContext* pPrim);
 #endif // !X_ENABLE_PROFILER_WARNINGS
 
     private:

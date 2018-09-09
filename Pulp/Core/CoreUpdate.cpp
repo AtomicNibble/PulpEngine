@@ -200,11 +200,17 @@ void XCore::RenderEnd(core::FrameData& frameData)
             env_.pPhysics->onTickPostRender(frameData.timeInfo.deltas[core::ITimer::Timer::GAME]);
         }
 
-#if X_ENABLE_PROFILER
+        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
+        const float padding = 10;
+        const float yOffset = 30;
+
+        Vec2f pos(padding, yOffset + padding);
+
+#if X_ENABLE_PROFILER
         // draw me all the profile wins!
         if (pProfiler_) {
-            pProfiler_->Render(frameData.timeInfo, env_.pJobSys);
+            pos = pProfiler_->Render(pPrim, pos, frameData.timeInfo, env_.pJobSys);
         }
 
 #endif // !X_ENABLE_PROFILER

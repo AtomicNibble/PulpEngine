@@ -417,7 +417,8 @@ namespace profiler
         }
     }
 
-    void XProfileSys::Render(const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
+    Vec2f XProfileSys::Render(engine::IPrimativeContext* pPrim, Vec2f pos, 
+        const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys)
     {
         int32_t drawFlags = vars_.getProlfilerDrawFlags();
         if (!vars_.drawProfilerConsoleExpanded()) {
@@ -428,96 +429,98 @@ namespace profiler
             }
         }
 
-        if (drawFlags) {
-            const float padding = 10;
-            const float yOffset = 30;
+        const float padding = 10;
 
-            Vec2f pos(padding, yOffset + padding);
-            Vec2f area;
+        if (!drawFlags) {
+            return pos;
+        }
 
-            if (pJobSys && core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('j'))) {
+        Vec2f area;
+
+        if (pJobSys && core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('j'))) {
 #if X_ENABLE_JOBSYS_PROFILER
-                int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
+            int32_t profilerIdx = pJobSys->getCurrentProfilerIdx();
 
-                // 0-15
-                // we want one before
-                int32_t historyOffset = frameOffset_ + 1;
-                if (historyOffset > profilerIdx) {
-                    int32_t backNum = (historyOffset - profilerIdx);
-                    profilerIdx = core::V2::JOBSYS_HISTORY_COUNT - backNum;
-                }
-                else {
-                    profilerIdx -= historyOffset;
-                }
+            // 0-15
+            // we want one before
+            int32_t historyOffset = frameOffset_ + 1;
+            if (historyOffset > profilerIdx) {
+                int32_t backNum = (historyOffset - profilerIdx);
+                profilerIdx = core::V2::JOBSYS_HISTORY_COUNT - backNum;
+            }
+            else {
+                profilerIdx -= historyOffset;
+            }
 
-                area = RenderJobSystem(pos, frameTimeInfo, pJobSys, profilerIdx);
-                pos.y += area.y + padding;
+            area = RenderJobSystem(pPrim, pos, frameTimeInfo, pJobSys, profilerIdx);
+            pos.y += area.y + padding;
 #else
-                X_UNUSED(frameTimeInfo);
+            X_UNUSED(frameTimeInfo);
 #endif // !X_ENABLE_JOBSYS_PROFILER
-            }
+        }
 
-            if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s'))) {
-                area = RenderStartupData(pos);
-                pos.x += area.x + padding;
-            }
+        if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('s'))) {
+            area = RenderStartupData(pPrim, pos);
+            pos.x += area.x + padding;
+        }
 
-            if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('m'))) {
-                auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
-                auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
+        if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('m'))) {
+            auto strAllocStats = gEnv->pStrArena->getAllocatorStatistics();
+            auto allocStats = gEnv->pArena->getAllocatorStatistics(true);
 
-                core::MemoryAllocatorStatistics::Str str;
-                strAllocStats.toString(str);
+            core::MemoryAllocatorStatistics::Str str;
+            strAllocStats.toString(str);
 
-                area = RenderStr(pos, L"String Mem", str);
-                pos.x += area.x + padding;
+            area = RenderStr(pPrim, pos, L"String Mem", str);
+            pos.x += area.x + padding;
 
-                allocStats.toString(str);
+            allocStats.toString(str);
 
-                area = RenderStr(pos, L"Combined Mem", str);
-                pos.x += area.x + padding;
-            }
+            area = RenderStr(pPrim, pos, L"Combined Mem", str);
+            pos.x += area.x + padding;
+        }
 
 #if X_ENABLE_FILE_STATS
 
-            if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('f'))) {
-                core::xFileSys* pFileSys = static_cast<core::xFileSys*>(gEnv->pFileSys);
+        if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('f'))) {
+            core::xFileSys* pFileSys = static_cast<core::xFileSys*>(gEnv->pFileSys);
 
-                core::XFileStats::Str str1, str2;
-                pFileSys->getStats().toString(str1);
-                pFileSys->getStatsAsync().toString(str2);
-                core::IOQueueStats::Str str3;
-                pFileSys->getIOQueueStats().toString(str3);
+            core::XFileStats::Str str1, str2;
+            pFileSys->getStats().toString(str1);
+            pFileSys->getStatsAsync().toString(str2);
+            core::IOQueueStats::Str str3;
+            pFileSys->getIOQueueStats().toString(str3);
 
-                area = RenderStr(pos, L"IO Stats", str1);
-                pos.x += area.x + padding;
+            area = RenderStr(pPrim, pos, L"IO Stats", str1);
+            pos.x += area.x + padding;
 
-                area = RenderStr(pos, L"IO Stats (Async)", str2);
-                pos.x += area.x + padding;
+            area = RenderStr(pPrim, pos, L"IO Stats (Async)", str2);
+            pos.x += area.x + padding;
 
-                area = RenderStr(pos, L"IO Qeue Stats", str3);
-                pos.x += area.x + padding;
-            }
+            area = RenderStr(pPrim, pos, L"IO Qeue Stats", str3);
+            pos.x += area.x + padding;
+        }
 #endif // !X_ENABLE_FILE_STATS
 
-            if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('t'))) {
-                area = RenderArenaTree(pos, gEnv->pArena);
-            }
+        if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('t'))) {
+            area = RenderArenaTree(pPrim, pos, gEnv->pArena);
+        }
 
-            if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('r'))) {
-                render::Stats::Str str;
-                render::Stats stats = gEnv->pRender->getStats();
+        if (core::bitUtil::IsBitFlagSet(drawFlags, core::bitUtil::AlphaBit('r'))) {
+            render::Stats::Str str;
+            render::Stats stats = gEnv->pRender->getStats();
 
-                stats.toString(str);
+            stats.toString(str);
 
-                area = RenderStr(pos, L"Render Stats", str);
-                pos.x += area.x + padding;
-            }
+            area = RenderStr(pPrim, pos, L"Render Stats", str);
+            pos.x += area.x + padding;
+        }
 
 #if X_ENABLE_PROFILER_WARNINGS
-            drawWarnings();
+        drawWarnings(pPrim);
 #endif // !X_ENABLE_PROFILER_WARNINGS
-        }
+        
+        return pos;
     }
 
     size_t RenderArenaTree_r(engine::IPrimativeContext* pPrim, font::TextDrawContext& ctx, Vec2f pos,
@@ -565,7 +568,7 @@ namespace profiler
         });
     };
 
-    Vec2f XProfileSys::RenderArenaTree(Vec2f pos, core::MemoryArenaBase* arena)
+    Vec2f XProfileSys::RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena)
     {
         const float padding = 10;
         //	const float treeIndent = 10.f;
@@ -582,8 +585,6 @@ namespace profiler
 
         const float width = 520;
         const float height = (20.f * numItems) + colHdrHeight;
-
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         // background.
         pPrim->drawQuad(
@@ -620,7 +621,7 @@ namespace profiler
         return Vec2f(0.f, 0.f);
     }
 
-    Vec2f XProfileSys::RenderStartupData(Vec2f pos)
+    Vec2f XProfileSys::RenderStartupData(engine::IPrimativeContext* pPrim, Vec2f pos)
     {
         size_t maxNickNameWidth = 0;
         for (size_t i = 0; i < profilerData_.size(); ++i) {
@@ -658,8 +659,6 @@ namespace profiler
 
         const float width = titleSize.x + (padding * 2);
         const float height = titleHeight + colHdrHeight + (profilerData_.size() * entryOffset) + (padding * 2);
-
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         // background.
         pPrim->drawQuad(
@@ -723,7 +722,7 @@ namespace profiler
         return Vec2f(width, height);
     }
 
-    Vec2f XProfileSys::RenderStr(Vec2f pos, const wchar_t* pTitle, const core::StackString512& str)
+    Vec2f XProfileSys::RenderStr(engine::IPrimativeContext* pPrim, Vec2f pos, const wchar_t* pTitle, const core::StackString512& str)
     {
         font::TextDrawContext ctx;
         ctx.pFont = pFont_;
@@ -742,7 +741,6 @@ namespace profiler
         const float height = titleHeight + size.y + (padding * 1);
 
         // okay so we have the stats should we just compute the full size?
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         // background.
         pPrim->drawQuad(
@@ -777,7 +775,8 @@ namespace profiler
 
 #if X_ENABLE_JOBSYS_PROFILER
 
-    Vec2f XProfileSys::RenderJobSystem(Vec2f pos, const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
+    Vec2f XProfileSys::RenderJobSystem(engine::IPrimativeContext* pPrim, Vec2f pos, 
+        const FrameTimeData& frameTimeInfo, core::V2::JobSystem* pJobSys, int32_t profileIdx)
     {
         X_UNUSED(pJobSys);
         X_UNUSED(profileIdx);
@@ -815,8 +814,6 @@ namespace profiler
         const float threadInfoEntryHeight = threadInfoHeight / numThreadQueues;
 
         const float height = threadInfoHeight + (threadInfoY - pos.y) + (keyHeight * 2);
-
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         std::array<int32_t, V2::JobSystem::HW_THREAD_MAX> jobCounts;
 
@@ -1048,7 +1045,7 @@ namespace profiler
 
 #if X_ENABLE_PROFILER_WARNINGS
 
-    void XProfileSys::drawWarnings(void)
+    void XProfileSys::drawWarnings(engine::IPrimativeContext* pPrim)
     {
         if (warningList_.isEmpty()) {
             return;
@@ -1066,8 +1063,6 @@ namespace profiler
                 ++it;
             }
         }
-
-        engine::IPrimativeContext* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
 
         for (size_t i = 0; i < warningList_.size(); i++) {
             auto& warn = warningList_[i];
