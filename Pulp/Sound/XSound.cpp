@@ -941,6 +941,7 @@ bool XSound::unRegisterObject(SndObjectHandle object)
     SoundObject* pSound = SoundHandleToObject(object);
     if (pSound->activeEvents) {
         AK::SoundEngine::StopAll(object);
+        AK::SoundEngine::CancelEventCallbackGameObject(object); // When we stop all, it might trigger callbacks (which i don't want)
     }
 
     AKRESULT res = AK::SoundEngine::UnregisterGameObj(object);
