@@ -160,6 +160,8 @@ $RECYCLE.BIN/
 
 # compiled level files
 *.level
+# asset lists, generated.
+*.assList
 # asset packs.
 *.apak
 
