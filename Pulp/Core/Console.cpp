@@ -565,28 +565,30 @@ void XConsole::saveChangedVars(void)
         if (file.openFile(userConfigPath.c_str(), fileMode::READ | fileMode::SHARE)) {
             const auto size = safe_static_cast<size_t>(file.remainingBytes());
 
-            buf.resize(size);
-            if (file.read(buf.data(), size) != size) {
-                X_ERROR("Console", "Failed to read exsisiting config file data");
-            }
-            else {
-                core::StringTokenizer<char> tokenizer(buf.begin(), buf.end(), '\n');
-                core::StringRange<char> line(nullptr, nullptr);
+            if (size > 0) {
+                buf.resize(size);
+                if (file.read(buf.data(), size) != size) {
+                    X_ERROR("Console", "Failed to read exsisiting config file data");
+                }
+                else {
+                    core::StringTokenizer<char> tokenizer(buf.begin(), buf.end(), '\n');
+                    core::StringRange<char> line(nullptr, nullptr);
 
-                // we save this file so it should only have 'seta' in but lets not error if something else.
-                while (tokenizer.extractToken(line)) {
-                    core::StringTokenizer<char> lineTokenizer(line.getStart(), line.getEnd(), ' ');
-                    core::StringRange<char> token(nullptr, nullptr);
+                    // we save this file so it should only have 'seta' in but lets not error if something else.
+                    while (tokenizer.extractToken(line)) {
+                        core::StringTokenizer<char> lineTokenizer(line.getStart(), line.getEnd(), ' ');
+                        core::StringRange<char> token(nullptr, nullptr);
 
-                    if (lineTokenizer.extractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
-                        // get the name.
-                        if (lineTokenizer.extractToken(token)) {
-                            // work out if we have this var.
-                            core::StackString256 name(token.getStart(), token.getEnd());
+                        if (lineTokenizer.extractToken(token) && core::strUtil::IsEqual(token.getStart(), token.getEnd(), "seta")) {
+                            // get the name.
+                            if (lineTokenizer.extractToken(token)) {
+                                // work out if we have this var.
+                                core::StackString256 name(token.getStart(), token.getEnd());
 
-                            ICVar* pVar = GetCVar(name.c_str());
-                            if (!pVar) {
-                                keep.push_back(line);
+                                ICVar* pVar = GetCVar(name.c_str());
+                                if (!pVar) {
+                                    keep.push_back(line);
+                                }
                             }
                         }
                     }
