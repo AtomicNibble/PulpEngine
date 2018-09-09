@@ -120,6 +120,7 @@ namespace
         assetDb::AssetDB::GetOutputPathForAssetType(assetDb::AssetType::LEVEL, modInfo.outDir, outPath);
         outPath.ensureSlash();
         outPath.setFileName(path.fileName());
+        outPath.removeExtension();
 
         if (!comp.compileLevel(path, outPath)) {
             return false;
