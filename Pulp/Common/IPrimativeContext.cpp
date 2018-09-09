@@ -297,7 +297,7 @@ void IPrimativeContext::drawBarChart(const Rectf& rect, uint32_t num, const floa
     }
 }
 
-void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col,
+void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, Color8u colBck,
     float scaleMin, float scaleMax)
 {
     auto arrayGetter = [](const void* pData, int32_t idx) -> float {
@@ -309,11 +309,11 @@ void IPrimativeContext::drawGraph(const Rectf& rect, float* pBegin, float* pEnd,
         return;
     }
 
-    drawGraph(rect, pBegin, num, arrayGetter, col, scaleMin, scaleMax);
+    drawGraph(rect, pBegin, num, arrayGetter, col, colBck, scaleMin, scaleMax);
 }
 
 void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, 
-    DataCallBack::Pointer dataFunc, Color8u col, float scaleMin, float scaleMax)
+    DataCallBack::Pointer dataFunc, Color8u col, Color8u colBck, float scaleMin, float scaleMax)
 {
     int32_t num = safe_static_cast<int32_t>(numValues); 
     if (num < 2) {
@@ -357,7 +357,7 @@ void IPrimativeContext::drawGraph(const Rectf& rect, const void* pUserData, size
     float t0 = 0.0f;
     Vec2f tp0 = Vec2f(t0, 1.0f - math<float>::saturate((v0 - scaleMin) * inv_scale));
 
-    drawQuad(rect, Color8u(20, 20, 20, 128));
+    drawQuad(rect, colBck);
     drawRect(rect, Color8u(50, 50, 50, 128));
 
     PrimVertex* pLine = addPrimative(res_w * 2, PrimitiveType::LINELIST);

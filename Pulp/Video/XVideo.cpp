@@ -1043,6 +1043,9 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
         ioBufferData.push_back(static_cast<float>(val));
     }
 
+    Color8u graphTxtCol(Col_Orange);
+    Color8u graphBckCol(10, 10, 10, 200);
+
     font::TextDrawContext ctx;
     ctx.col = Col_Wheat;
     ctx.pFont = gEnv->pFontSys->getDefault();
@@ -1056,9 +1059,8 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
         box.include(Vec2f(r.x1, r.y1 + (textOff.y * 3) + ((offset.y + textOff.y) * 4)));
         box.inflate(Vec2f(10.f, 16.f));
 
-        pPrim->drawQuad(box, Color8u(2, 2, 2, 200));
+        pPrim->drawQuad(box, Color(0.1f, 0.1f, 0.1f, 0.8f));
     }
-
 
     core::HumanSize::Str sizeStr0, sizeStr1, sizeStr2;
     core::StackString<64> txt;
@@ -1115,7 +1117,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    pPrim->drawGraph(r, ioBufferData.begin(), ioBufferData.end(), Col_Orange, 0.f, static_cast<float>(IO_RING_BUFFER_SIZE));
+    pPrim->drawGraph(r, ioBufferData.begin(), ioBufferData.end(), graphTxtCol, graphBckCol, 0.f, static_cast<float>(IO_RING_BUFFER_SIZE));
     r += offset;
 
     for (int32_t i = 0; i < TrackType::ENUM_COUNT; i++)
@@ -1125,7 +1127,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
         auto& data = queueSizeData[i];
         pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
         r += textOff;
-        pPrim->drawGraph(r, data.begin(), data.end(), Col_Orange, 0.f, static_cast<float>(FRAME_QUEUE_SIZE));
+        pPrim->drawGraph(r, data.begin(), data.end(), graphTxtCol, graphBckCol, 0.f, static_cast<float>(FRAME_QUEUE_SIZE));
         r += offset;
     }
 
@@ -1135,7 +1137,7 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
-    pPrim->drawGraph(r, audioBufferData.begin(), audioBufferData.end(), Col_Orange, 0.f, static_cast<float>(AUDIO_RING_DECODED_BUFFER_SIZE));
+    pPrim->drawGraph(r, audioBufferData.begin(), audioBufferData.end(), graphTxtCol, graphBckCol, 0.f, static_cast<float>(AUDIO_RING_DECODED_BUFFER_SIZE));
 
 
     return size;

@@ -105,9 +105,9 @@ public:
 
     typedef core::traits::Function<float(const void* pData, int32_t idx)> DataCallBack;
 
-    void drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, 
+    void drawGraph(const Rectf& rect, float* pBegin, float* pEnd, Color8u col, Color8u colBck,
         float scaleMin = std::numeric_limits<float>::max(), float scaleMax = std::numeric_limits<float>::lowest());
-    void drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, DataCallBack::Pointer dataFunc, Color8u col,
+    void drawGraph(const Rectf& rect, const void* pUserData, size_t numValues, DataCallBack::Pointer dataFunc, Color8u col, Color8u colBck,
         float scaleMin = std::numeric_limits<float>::max(), float scaleMax = std::numeric_limits<float>::lowest());
 
 
