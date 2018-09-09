@@ -1476,9 +1476,11 @@ void XSound::postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackIn
     X_ASSERT_NOT_NULL(pObject);
 
     if (eType == AkCallbackType::AK_EndOfEvent) {
+        auto* pEventInfo = static_cast<AkEventCallbackInfo*>(pCallbackInfo);
+
         --pObject->activeEvents;
 
-        X_LOG0("SoundSys", "EndOfEvent: object %p debugName: %s", pObject, pObject->debugName.c_str());
+        X_LOG0("SoundSys", "EndOfEvent: 0x%" PRIx32 " object %p debugName: %s", pEventInfo->eventID, pObject, pObject->debugName.c_str());
     }
     else {
         X_ASSERT_UNREACHABLE();
