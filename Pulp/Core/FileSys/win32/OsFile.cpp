@@ -43,12 +43,12 @@ namespace
 
 } // namespace
 
-OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
+OsFile::OsFile(const wchar_t* pPath, IFileSys::fileModeFlags mode) :
     mode_(mode),
     file_(INVALID_HANDLE_VALUE)
 {
     // lets open you up.
-    file_ = createFileHelper(path, mode);
+    file_ = createFileHelper(pPath, mode);
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -61,7 +61,7 @@ OsFile::OsFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
-        logFileError(path, mode);
+        logFileError(pPath, mode);
     }
     else {
 #if X_ENABLE_FILE_STATS
@@ -84,7 +84,7 @@ OsFile::~OsFile(void)
 // ------------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------------
 
-size_t OsFile::read(void* buffer, size_t length)
+size_t OsFile::read(void* pBuffer, size_t length)
 {
     if (!mode_.IsSet(fileMode::READ)) {
         IFileSys::fileModeFlags::Description Dsc;
@@ -101,7 +101,7 @@ size_t OsFile::read(void* buffer, size_t length)
     uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
     DWORD NumRead = 0;
-    if (::ReadFile(file_, buffer, length32, &NumRead, 0)) {
+    if (::ReadFile(file_, pBuffer, length32, &NumRead, 0)) {
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesRead += NumRead;
         ++s_stats.NumReads;
@@ -126,7 +126,7 @@ size_t OsFile::read(void* buffer, size_t length)
     return 0;
 }
 
-size_t OsFile::write(const void* buffer, size_t length)
+size_t OsFile::write(const void* pBuffer, size_t length)
 {
     if (!mode_.IsSet(fileMode::WRITE)) {
         IFileSys::fileModeFlags::Description Dsc;
@@ -143,7 +143,7 @@ size_t OsFile::write(const void* buffer, size_t length)
     uint32_t length32 = safe_static_cast<uint32_t, size_t>(length);
 
     DWORD NumWrite = 0;
-    if (::WriteFile(file_, buffer, length32, &NumWrite, 0)) {
+    if (::WriteFile(file_, pBuffer, length32, &NumWrite, 0)) {
 #if X_ENABLE_FILE_STATS
         s_stats.NumBytesWrite += NumWrite;
         ++s_stats.NumWrties;

@@ -3,8 +3,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
-XDiskFile::XDiskFile(const wchar_t* path, IFileSys::fileModeFlags mode) :
-    file_(path, mode)
+XDiskFile::XDiskFile(const wchar_t* pPath, IFileSys::fileModeFlags mode) :
+    file_(pPath, mode)
 {
 }
 
@@ -12,14 +12,14 @@ XDiskFile::~XDiskFile()
 {
 }
 
-size_t XDiskFile::read(void* buffer, size_t length)
+size_t XDiskFile::read(void* pBuffer, size_t length)
 {
-    return file_.read(buffer, length);
+    return file_.read(pBuffer, length);
 }
 
-size_t XDiskFile::write(const void* buffer, size_t length)
+size_t XDiskFile::write(const void* pBuffer, size_t length)
 {
-    return file_.write(buffer, length);
+    return file_.write(pBuffer, length);
 }
 
 void XDiskFile::seek(int64_t position, SeekMode::Enum origin)

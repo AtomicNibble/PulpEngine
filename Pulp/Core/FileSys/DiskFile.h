@@ -12,17 +12,15 @@ X_NAMESPACE_BEGIN(core)
 class XDiskFile : public XFile
 {
 public:
-    XDiskFile(const wchar_t* path, IFileSys::fileModeFlags mode);
+    XDiskFile(const wchar_t* pPath, IFileSys::fileModeFlags mode);
     ~XDiskFile();
 
-    /// Returns whether the disk file is valid.
-    inline bool valid(void) const
-    {
+    inline bool valid(void) const {
         return file_.valid();
     }
 
-    virtual size_t read(void* buffer, size_t length) X_OVERRIDE;
-    virtual size_t write(const void* buffer, size_t length) X_OVERRIDE;
+    virtual size_t read(void* pBuffer, size_t length) X_OVERRIDE;
+    virtual size_t write(const void* pBuffer, size_t length) X_OVERRIDE;
     virtual void seek(int64_t position, SeekMode::Enum origin) X_OVERRIDE;
     virtual uint64_t remainingBytes(void) const X_OVERRIDE;
     virtual uint64_t tell(void) const X_OVERRIDE;

@@ -19,11 +19,11 @@ public:
     };
 
 public:
-    OsFile(const wchar_t* path, IFileSys::fileModeFlags mode);
+    OsFile(const wchar_t* pPath, IFileSys::fileModeFlags mode);
     ~OsFile(void);
 
-    size_t read(void* buffer, size_t length);
-    size_t write(const void* buffer, size_t length);
+    size_t read(void* pBuffer, size_t length);
+    size_t write(const void* pBuffer, size_t length);
 
     void seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requireRandomAccess);
 
