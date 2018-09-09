@@ -134,6 +134,8 @@ FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
             break;
 
         case dliNotePreLoadLibrary: {
+            X_PROFILE_NO_HISTORY_BEGIN("PhysicsLoadDll", core::profiler::SubSys::PHYSICS);
+
             const char* pName = gDelayLoadHook.getPhysxName(pdli->szDll);
             auto module = core::Module::Load(pName);
             if (!module)
