@@ -4,6 +4,8 @@
 
 X_NAMESPACE_BEGIN(assetDb)
 
+static const char* ASSET_LIST_EXT = "assList"; // show me dat ass.
+
 static const char ASSET_NAME_SLASH = '/';
 static const char ASSET_NAME_INVALID_SLASH = '\\';
 static const char ASSET_NAME_PREFIX = '$'; // allow names with this prefix.
