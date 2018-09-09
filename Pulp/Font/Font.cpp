@@ -1066,7 +1066,8 @@ bool XFont::CreateDeviceTexture(void)
     // we wil lget back default if fails to load.
     // when we are default we ignore the textureSet and it just results in default texture been drawn.
 
-    auto* pTech = pMaterialMan->getTechForMaterial(pMaterial_, core::StrHash("unlit"), render::shader::VertexFormat::P3F_T2S_C4B);
+    auto* pTech = pMaterialMan->getTechForMaterial(pMaterial_, core::StrHash("unlit"), 
+        render::shader::VertexFormat::P3F_T2S_C4B, engine::PermatationFlags());
     if (!pTech) {
         X_ERROR("Font", "Failed to get 'unlit' tech for font");
         return false;

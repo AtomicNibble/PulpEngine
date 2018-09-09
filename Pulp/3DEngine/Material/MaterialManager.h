@@ -69,7 +69,7 @@ public:
     void initStateFromRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);
 
     TechDefPerm* getCodeTech(const core::string& name, core::StrHash techName, render::shader::VertexFormat::Enum,
-        PermatationFlags permFlags = PermatationFlags());
+        PermatationFlags permFlags);
 
     // ~IMaterialManager
     void listMaterials(const char* pSearchPatten = nullptr) const;
