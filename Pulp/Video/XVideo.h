@@ -19,14 +19,8 @@ X_NAMESPACE_DECLARE(engine,
 
 X_NAMESPACE_BEGIN(video)
 
-struct IVFHdr;
 
 class VideoVars;
-struct FrameData
-{
-    size_t dataSize;
-    const uint8_t* pData;
-};
 
 X_DECLARE_ENUM(State)
 (
