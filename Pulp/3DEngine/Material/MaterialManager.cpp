@@ -535,23 +535,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
                 for (const auto& alias : aliases) {
                     // find a alias that points to the persm resource.
                     if (alias.resourceName == permTexture.getName()) {
-#if 0
-						if (alias.isCode)
-						{
-							// if we must assign the texture with code, make it default.
-							texState.textureId = pDefaultTex->getDeviceID();
-
-							if(pMat->getName() == "video/test")
-							{
-								auto* pVid = gEnv->pVideoSys->findVideo("movie");
-
-								texState.textureId = pVid->getTextureID();
-							}
-
-							goto texSet;
-						}
-						else
-#endif
 
                         // okay so now we know the name of the material sampler that we want.
                         for (j = 0; j < matTextures.size(); j++) {
