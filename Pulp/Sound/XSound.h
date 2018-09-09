@@ -122,6 +122,8 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
+    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_FINAL;
+
     void update(core::FrameData& frame) X_FINAL;
     void setPhysicsScene(physics::IScene* pScene) X_FINAL;
 

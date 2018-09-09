@@ -66,14 +66,6 @@ void XVideoSys::update(const core::FrameTimeData& frameTimeInfo)
 
         pVideoRes->update(frameTimeInfo);
     }
-
-    if (vars_.drawDebug()) {
-        auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PROFILE);
-
-        Vec2f pos(20, 100);
-
-        drawDebug(pPrim, pos);
-    }
 }
 
 void XVideoSys::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const
@@ -370,6 +362,10 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
 
 Vec2f XVideoSys::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 {
+    if (!vars_.drawDebug()) {
+        return Vec2f();
+    }
+
     Vec2f size;
     const float padding = 10.f;
 

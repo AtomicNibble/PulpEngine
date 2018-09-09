@@ -141,6 +141,8 @@ public:
     void shutDown(void) X_FINAL;
     void release(void) X_FINAL;
 
+    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_FINAL;
+
     void update(const core::FrameTimeData& frameTimeInfo) X_FINAL;
 
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
@@ -169,8 +171,6 @@ private:
         core::XFileAsync* pFile, uint32_t bytesTransferred);
 
     void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
-
-    Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const;
 
 private:
     void Cmd_ListVideo(core::IConsoleCmdArgs* pCmd);

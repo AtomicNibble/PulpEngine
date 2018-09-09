@@ -11,6 +11,9 @@
 X_NAMESPACE_DECLARE(physics,
     struct IScene);
 
+X_NAMESPACE_DECLARE(engine,
+    class IPrimativeContext);
+
 X_NAMESPACE_BEGIN(sound)
 
 #define X_SOUND_ENABLE_DEBUG_NAMES 1
@@ -156,6 +159,8 @@ struct ISound : public core::IEngineSysBase
     virtual ~ISound() = default;
 
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
+
+    virtual Vec2f drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const X_ABSTRACT;
 
     // ting tong wong, sing me a song in a thong!
     virtual void update(core::FrameData& frame) X_ABSTRACT;

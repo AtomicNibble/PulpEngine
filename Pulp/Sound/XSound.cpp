@@ -516,6 +516,14 @@ void XSound::release(void)
     X_DELETE(this, g_SoundArena);
 }
 
+Vec2f XSound::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
+{
+    X_UNUSED(pPrim, pos);
+
+
+    return Vec2f();
+}
+
 void XSound::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("SoundUpdate", core::profiler::SubSys::SOUND);
