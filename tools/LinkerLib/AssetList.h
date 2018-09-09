@@ -25,7 +25,8 @@ public:
     LINKERLIB_EXPORT bool saveToFile(core::XFile* pFile) const;
     LINKERLIB_EXPORT bool saveToFile(core::Path<char>& path) const;
 
-    X_INLINE void add(assetDb::AssetType::Enum type, core::string& name);
+    X_INLINE void add(assetDb::AssetType::Enum type, core::string&& name);
+    X_INLINE void add(assetDb::AssetType::Enum type, const core::string& name);
 
     X_INLINE const AssetNameLists& getAssetList(void) const;
 
