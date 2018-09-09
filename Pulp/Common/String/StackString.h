@@ -157,8 +157,8 @@ public:
     inline const TChar* end(void) const;
 
 protected:
-    TChar str_[N];
     size_t len_;
+    TChar str_[N];
 };
 
 template<size_t N>
@@ -285,8 +285,8 @@ public:
     inline const wchar_t* end(void) const;
 
 protected:
-    wchar_t str_[N];
     size_t len_;
+    wchar_t str_[N];
 };
 
 #include "StackString.inl"
