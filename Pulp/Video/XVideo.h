@@ -28,7 +28,6 @@ X_DECLARE_ENUM(State)
     Init,
     Buffering,
     Playing,
-    Stopped,
     Finished
 );
 
@@ -87,6 +86,7 @@ public:
 
     void play(void);
     void pause(void);
+    void stop();
 
     void update(const core::FrameTimeData& frameTimeInfo);
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket);

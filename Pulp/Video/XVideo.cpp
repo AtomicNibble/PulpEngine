@@ -61,6 +61,8 @@ Video::Video(core::string name, const VideoVars& vars, core::MemoryArenaBase* ar
 
 Video::~Video()
 {
+    stop();
+
     // TODO: work out way to unregister this safly.
     // since if we delte a sound object, then get a event for it, we crash :(
     if (audio_.sndObj != sound::INVALID_OBJECT_ID) {
@@ -95,6 +97,47 @@ void Video::pause(void)
 {
     X_ASSERT_NOT_IMPLEMENTED();
 }
+
+void Video::stop(void)
+{
+    if (state_ == State::Buffering || state_ == State::Playing)
+    {
+        if (io_.requestPending) {
+            // shieeeeeeeeet.
+
+        }
+
+        // we need to fix io eventes for objects gone!
+        gEnv->pSound->stopVideoAudio(audio_.sndPlayingId);
+
+
+        {
+            core::CriticalSection::ScopedLock lock(io_.cs);
+
+            io_.ringBuffer.reset();
+            for (auto& tq : io_.trackQueues) {
+                tq.clear();
+            }
+        }
+
+        // we need to stop the pickle in the nickle!
+        auto* pJobSys = gEnv->pJobSys;
+
+        if (vid_.pDecodeJob) {
+            pJobSys->Wait(vid_.pDecodeJob);
+            vid_.pDecodeJob = nullptr;
+        }
+        if (audio_.pDecodeJob) {
+            pJobSys->Wait(audio_.pDecodeJob);
+            audio_.pDecodeJob = nullptr;
+        }
+    }
+
+
+    X_ASSERT(vid_.pDecodeJob == nullptr, "Job not finished")();
+    X_ASSERT(audio_.pDecodeJob == nullptr, "Job not finished")();
+}
+
 
 void Video::update(const core::FrameTimeData& frameTimeInfo)
 {
