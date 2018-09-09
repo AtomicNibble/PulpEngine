@@ -20,25 +20,6 @@
 
 X_USING_NAMESPACE;
 
-// we have a load of things todo.
-/*
-Get input. (input events)
-Check dir watcher for changed files.
-Console?
-3dEngine:
-animations
-loading of assets
-culling
-greating drawcalls.
-sounds
-scripts sys
-physics
-
-
-Do we want to be fancy and depending on how much spare frame tiem we have for the target fps, allow more streaming jobs to happen.
-Also instead of sleeping we could be running physcis steps...
-*/
-
 bool XCore::RunGameLoop(void)
 {
     env_.state_ = CoreGlobals::State::RUNNING;
