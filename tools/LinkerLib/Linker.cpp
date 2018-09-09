@@ -129,7 +129,7 @@ bool Linker::Build(BuildOptions& options)
 
 bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name)
 {
-    // TODO:
+    // TODO: fully switch to assetLists
     if (assType == assetDb::AssetType::VIDEO) {
         return true;
     }
