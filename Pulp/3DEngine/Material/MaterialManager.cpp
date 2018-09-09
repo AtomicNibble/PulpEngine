@@ -157,11 +157,8 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
         // name = "door/door_with_windows";
     }
 
-    if (name == "berlin_decals_posters_russian") {
-        name = "video/test";
-    }
-    if (name == "mtl_berlin_mannequin") {
-        name = "video/test";
+    if (name == "case1024x256") {
+        name = "video/doom_trailer";
     }
 
     MaterialResource* pMatRes = nullptr;
