@@ -316,6 +316,8 @@ XConsole::XConsole() :
         VarPool::getMemoryAlignmentRequirement(VAR_ALLOCATION_ALIGNMENT),
         VarPool::getMemoryOffsetRequirement()),
     varArena_(&varAllocator_, "VarArena"),
+    cmdHistory_(g_coreArena),
+    consoleLog_(g_coreArena),
     VarMap_(g_coreArena),
     CmdMap_(g_coreArena),
     Binds_(g_coreArena),
@@ -531,7 +533,7 @@ void XConsole::shutDown(void)
 
     InputBuffer_.clear();
     RefString_.clear();
-    CmdHistory_.clear();
+    cmdHistory_.clear();
 }
 
 void XConsole::saveChangedVars(void)
@@ -882,8 +884,7 @@ void XConsole::ExecuteInputBuffer(void)
         return;
     }
 
-    string Temp = InputBuffer_;
-
+    core::string Temp = InputBuffer_;
     ClearInputBuffer();
 
     AddCmdToHistory(Temp);
@@ -1046,11 +1047,11 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 const char* XConsole::GetHistory(CmdHistory::Enum direction)
 {
     if (direction == CmdHistory::UP) {
-        if (!CmdHistory_.empty()) {
-            if (HistoryPos_ < safe_static_cast<int32_t, size_t>(CmdHistory_.size() - 1)) {
+        if (!cmdHistory_.isEmpty()) {
+            if (HistoryPos_ < safe_static_cast<int32_t, size_t>(cmdHistory_.size() - 1)) {
                 HistoryPos_++;
 
-                RefString_ = CmdHistory_[HistoryPos_];
+                RefString_ = cmdHistory_[HistoryPos_];
                 return RefString_.c_str();
             }
         }
@@ -1061,7 +1062,7 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
         if (HistoryPos_ > 0) {
             HistoryPos_--;
             // adds a refrence to the string.
-            RefString_ = CmdHistory_[HistoryPos_];
+            RefString_ = cmdHistory_[HistoryPos_];
             return RefString_.c_str();
         }
     }
@@ -1077,10 +1078,9 @@ void XConsole::SaveCmdHistory(void) const
     core::ByteStream stream(g_coreArena);
     stream.reserve(0x100);
 
-    auto it = CmdHistory_.crbegin();
-    for (; it != CmdHistory_.crend(); it++) {
-        stream.write(it->c_str(), it->length());
-        stream.write('\n');
+    for (auto& str : cmdHistory_) {
+        stream.write(str.c_str(), str.length());
+        stream.write("\n", 1);
     }
 
     fileModeFlags mode;
@@ -1171,13 +1171,12 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
 
     while (tokenizer.extractToken(range)) {
         if (range.getLength() > 0) {
-            CmdHistory_.emplace_front(core::string(range.getStart(), range.getEnd()));
-        }
-    }
+            cmdHistory_.emplace(range.getStart(), range.getEnd());
 
-    // limit the history.
-    while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
-        CmdHistory_.pop_back();
+            if (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+                cmdHistory_.pop();
+            }
+        }
     }
 
     ResetHistoryPos();
@@ -1198,20 +1197,14 @@ void XConsole::AddCmdToHistory(const string& command)
     // so we can scroll through past commands.
     ResetHistoryPos();
 
-    if (!CmdHistory_.empty()) {
-        // make sure it's not same as last command
-        if (CmdHistory_.front() != command) {
-            CmdHistory_.emplace_front(command);
-        }
-    }
-    else {
-        // 1st commnd :D
-        CmdHistory_.emplace_front(command);
+    // make sure it's not same as last command
+    if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
+        cmdHistory_.emplace(command);
     }
 
     // limit hte history.
-    while (CmdHistory_.size() > MAX_HISTORY_ENTRIES) {
-        CmdHistory_.pop_back();
+    while (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+        cmdHistory_.pop();
     }
 
     if (console_save_history) {
@@ -1603,7 +1596,7 @@ void XConsole::ValidateScrollPos(void)
         ScrollPos_ = 0;
     }
     else {
-        int32_t logSize = safe_static_cast<int32_t>(ConsoleLog_.size());
+        int32_t logSize = safe_static_cast<int32_t>(consoleLog_.size());
         const int32_t visibleNum = MaxVisibleLogLines();
 
         logSize -= visibleNum;
@@ -1967,11 +1960,11 @@ void XConsole::DrawBuffer(void)
 
             decltype(logLock_)::ScopedLock lock(logLock_);
 
-            const int32_t num = safe_static_cast<int32_t>(ConsoleLog_.size());
+            const int32_t num = safe_static_cast<int32_t>(consoleLog_.size());
 
             for (int32_t i = (num - 1); i >= 0 && yPos >= 30; --i, ++scroll) {
                 if (scroll >= ScrollPos_) {
-                    const char* pBuf = ConsoleLog_[i].c_str();
+                    const char* pBuf = consoleLog_[i].c_str();
 
                     pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
                     yPos -= fCharHeight;
@@ -2015,7 +2008,7 @@ void XConsole::DrawScrollBar(void)
         // work out the possition of slider.
         // we take the height of the bar - slider and divide.
         const int32_t visibleNum = MaxVisibleLogLines();
-        const int32_t scrollableLines = safe_static_cast<int32_t>(ConsoleLog_.size()) - (visibleNum + 2);
+        const int32_t scrollableLines = safe_static_cast<int32_t>(consoleLog_.size()) - (visibleNum + 2);
 
         float positionPercent = PercentageOf(ScrollPos_, scrollableLines) * 0.01f;
         float offset = (barHeight - slider_height) * positionPercent;
@@ -2494,12 +2487,12 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
     decltype(logLock_)::ScopedLock lock(logLock_);
 
-    ConsoleLog_.emplace_back(pStr);
+    consoleLog_.emplace(pStr, length);
 
     const int32_t bufferSize = console_buffer_size;
 
-    if (safe_static_cast<int32_t, size_t>(ConsoleLog_.size()) > bufferSize) {
-        ConsoleLog_.pop_front();
+    if (safe_static_cast<int32_t, size_t>(consoleLog_.size()) > bufferSize) {
+        consoleLog_.pop();
 
         // too handle the case we log after render has been shutdown or not init.
         // really the MaxVisibleLogLines should be updated to not use render interface
@@ -2508,7 +2501,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
             const auto noneScroll = MaxVisibleLogLines();
 
             // move scroll wheel with the moving items?
-            if (ScrollPos_ > 0 && ScrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(ConsoleLog_.size()) - noneScroll)) {
+            if (ScrollPos_ > 0 && ScrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
                 ScrollPos_++;
             }
         }
@@ -2522,7 +2515,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
 int32_t XConsole::getLineCount(void) const
 {
-    return safe_static_cast<int32_t, size_t>(ConsoleLog_.size());
+    return safe_static_cast<int32_t, size_t>(consoleLog_.size());
 }
 
 ///////////////////////////////////////////////////////////
@@ -2654,7 +2647,7 @@ void XConsole::Command_History(IConsoleCmdArgs* pCmd)
     X_LOG_BULLET;
 
     int32_t idx = 0;
-    for (auto& history : CmdHistory_) {
+    for (auto& history : cmdHistory_) {
         if (!pSearch || history.find(pSearch)) {
             X_LOG0("Console", "> %" PRIi32 " %s", idx, history.c_str());
         }

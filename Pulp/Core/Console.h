@@ -133,9 +133,7 @@ class XConsole : public IConsole
 
     typedef core::Fifo<ExecCommand> ExecCmdList;
 
-    typedef std::deque<string> ConsoleBuffer;
-    typedef ConsoleBuffer::iterator ConsoleBufferItor;
-    typedef ConsoleBuffer::reverse_iterator ConsoleBufferRItor;
+    typedef core::Fifo<string> ConsoleBuffer;
 
     typedef core::Logger<
         core::LoggerNoFilterPolicy,
@@ -302,9 +300,9 @@ private:
 
     Logger logger_;
 
-    ConsoleBuffer CmdHistory_;
+    ConsoleBuffer cmdHistory_;
     // some sort of lock free ring buffer might work better for this log.
-    ConsoleBuffer ConsoleLog_;
+    ConsoleBuffer consoleLog_;
     core::SpinlockRecursive logLock_;
 
     ConsoleVarMap VarMap_;
