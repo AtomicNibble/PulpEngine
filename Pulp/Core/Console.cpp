@@ -329,7 +329,7 @@ XConsole::XConsole() :
     historyFileSize_(0),
     historyFileBuf_(g_coreArena)
 {
-    historyPos_ = -1;
+    historyPos_ = 0;
     cursorPos_ = 0;
     scrollPos_ = 0;
 
@@ -1016,7 +1016,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
         return true;
     }
     else if (event.keyId == KeyId::DOWN_ARROW) {
-        bool inHistory = (historyPos_ > 0);
+        bool inHistory = (historyPos_ < cmdHistory_.size());
         bool multiAutoComplete = autoCompleteNum_ > 1;
 
         if (isAutocompleteVis() && (!inHistory || multiAutoComplete)) {
@@ -1046,21 +1046,27 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
 const char* XConsole::GetHistory(CmdHistory::Enum direction)
 {
-    if (direction == CmdHistory::UP) {
-        if (!cmdHistory_.isEmpty()) {
-            if (historyPos_ < safe_static_cast<int32_t, size_t>(cmdHistory_.size() - 1)) {
-                historyPos_++;
+    if (cmdHistory_.isEmpty()) {
+        return nullptr;
+    }
 
-                refString_ = cmdHistory_[historyPos_];
-                return refString_.c_str();
-            }
+    if (direction == CmdHistory::UP) {
+
+        if (historyPos_ <= 0) {
+            return nullptr;
         }
+
+        historyPos_--;
+
+        refString_ = cmdHistory_[historyPos_];
+        return refString_.c_str();
     }
     else // down
     {
         // are we above base cmd?
-        if (historyPos_ > 0) {
-            historyPos_--;
+        if (historyPos_ < safe_static_cast<int32_t>(cmdHistory_.size()) - 1) {
+            historyPos_++;
+
             // adds a refrence to the string.
             refString_ = cmdHistory_[historyPos_];
             return refString_.c_str();
@@ -1184,7 +1190,7 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
 
 void XConsole::ResetHistoryPos(void)
 {
-    historyPos_ = -1;
+    historyPos_ = safe_static_cast<int32_t>(cmdHistory_.size());
 }
 
 void XConsole::AddCmdToHistory(const char* pCommand)
@@ -1194,9 +1200,6 @@ void XConsole::AddCmdToHistory(const char* pCommand)
 
 void XConsole::AddCmdToHistory(const string& command)
 {
-    // so we can scroll through past commands.
-    ResetHistoryPos();
-
     // make sure it's not same as last command
     if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
         cmdHistory_.emplace(command);
@@ -1206,6 +1209,8 @@ void XConsole::AddCmdToHistory(const string& command)
     while (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
         cmdHistory_.pop();
     }
+
+    ResetHistoryPos();
 
     if (console_save_history) {
         SaveCmdHistory();
