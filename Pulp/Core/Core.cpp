@@ -215,6 +215,11 @@ void XCore::ShutDown()
         core::SafeRelease(env_.pPhysics);
     }
 
+    if (env_.pVideoSys) {
+        env_.pVideoSys->shutDown();
+        core::SafeRelease(env_.pVideoSys);
+    }
+
     if (env_.pSound) {
         env_.pSound->shutDown();
         core::SafeRelease(env_.pSound);
@@ -233,11 +238,6 @@ void XCore::ShutDown()
     if (env_.pNet) {
         env_.pNet->shutDown();
         core::SafeRelease(env_.pNet);
-    }
-
-    if (env_.pVideoSys) {
-        env_.pVideoSys->shutDown();
-        core::SafeRelease(env_.pVideoSys);
     }
 
     if (pWindow_) {
