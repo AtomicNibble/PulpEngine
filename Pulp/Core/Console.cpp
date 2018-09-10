@@ -1016,7 +1016,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
         return true;
     }
     else if (event.keyId == KeyId::DOWN_ARROW) {
-        bool inHistory = (historyPos_ < cmdHistory_.size());
+        bool inHistory = (historyPos_ < static_cast<int32_t>(cmdHistory_.size()));
         bool multiAutoComplete = autoCompleteNum_ > 1;
 
         if (isAutocompleteVis() && (!inHistory || multiAutoComplete)) {
