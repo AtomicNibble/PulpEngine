@@ -23,7 +23,7 @@ namespace profiler
         ADD_CVAR_REF("profile_pause", profilerPause_, profilerPause_, 0, 1, core::VarFlag::SYSTEM,
             "Pause the profiler collection");
 
-        ADD_CVAR_REF("profile_draw", profilerDrawFlags_, core::bitUtil::AlphaBits("jsmtfr"), 0, core::bitUtil::AlphaBits("jsmtfr"),
+        ADD_CVAR_REF("profile_draw", profilerDrawFlags_, 0, 0, core::bitUtil::AlphaBits("jsmtfr"),
             core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::BITFIELD,
             "Display profiler Flags. "
             "j: JobSys, "
