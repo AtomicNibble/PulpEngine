@@ -6,6 +6,8 @@
 #include <Threading\JobSystem2.h>
 
 #include <Memory\MemCursor.h>
+#include <Memory\SimpleMemoryArena.h>
+#include <Memory\AllocationPolicies\GrowingBlockAllocator.h>
 
 #include <Compression\LZ4.h>
 
@@ -24,6 +26,42 @@
 #include <Time\StopWatch.h>
 
 #include "Vars\VideoVars.h"
+
+
+extern "C" {
+
+    void* __cdecl vorbis_malloc(size_t size)
+    {
+        return g_VideoArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+    }
+
+    void* __cdecl vorbis_calloc(size_t count, size_t size)
+    {
+        void* pMem = g_VideoArena->allocate(size * count, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        std::memset(pMem, 0, count * size);
+        return pMem;
+    }
+
+    void* __cdecl vorbis_realloc(void* pBlock, size_t size)
+    {
+        if (!pBlock) {
+            return vorbis_malloc(size);
+        }
+
+        size_t blockSize = g_VideoArena->getSize(pBlock);
+
+        void* pMem = g_VideoArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        std::memcpy(pMem, pBlock, blockSize);
+        return pMem;
+
+    }
+
+    void __cdecl vorbis_free(void* pBlock)
+    {
+        g_VideoArena->free(pBlock);
+    }
+}
+
 
 X_NAMESPACE_BEGIN(video)
 
