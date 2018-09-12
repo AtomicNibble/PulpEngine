@@ -7,7 +7,7 @@ X_NAMESPACE_BEGIN(video)
 
 VideoVars::VideoVars()
 {
-    drawDebug_ = 1;
+    drawDebug_ = 0;
     debug_ = 0;
 }
 
