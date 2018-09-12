@@ -14,7 +14,7 @@ struct MemoryAllocatorStatistics
     void Clear(void)
     {
         // don't clear the char pointer.
-        memset(&allocationCount_, 0, sizeof(MemoryAllocatorStatistics) - sizeof(type_));
+        memset((&type_) + 1, 0, sizeof(MemoryAllocatorStatistics) - sizeof(type_));
     }
 
     const char* toString(Str& str, bool incMax = false) const
@@ -22,6 +22,7 @@ struct MemoryAllocatorStatistics
         core::HumanSize::Str temp;
 
         str.clear();
+        str.appendFmt("Requests: ^6%" PRIuS "^~\n", totalAllocations_);
         str.appendFmt("Num: ^6%" PRIuS "^~\n", allocationCount_);
         str.appendFmt("Num(Max): ^6%" PRIuS "^~\n", allocationCountMax_);
         str.appendFmt("Physical: ^6%s^~\n", core::HumanSize::toString(temp, physicalMemoryAllocated_));
@@ -44,6 +45,8 @@ struct MemoryAllocatorStatistics
 
     MemoryAllocatorStatistics& operator+=(const MemoryAllocatorStatistics& oth)
     {
+        totalAllocations_ += oth.totalAllocations_;
+        totalAllocationSize_ += oth.totalAllocationSize_;
         allocationCount_ += oth.allocationCount_;
         allocationCountMax_ += oth.allocationCountMax_;
 
@@ -67,6 +70,8 @@ struct MemoryAllocatorStatistics
     const char* type_; ///< A human-readable string describing the type of allocator.
 
     // allocations
+    size_t totalAllocations_;        ///< The total number of allocations.
+    size_t totalAllocationSize_;     ///< The total size of all allocations.
     size_t allocationCount_;    ///< The current number of allocations.
     size_t allocationCountMax_; ///< The maximum number of allocations in flight at any given point in time.
 

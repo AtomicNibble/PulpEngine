@@ -56,6 +56,8 @@ void* MallocFreeAllocator::allocate(size_t Origsize, size_t alignment, size_t of
         as_header[-1].originalSize_ = Origsize;
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+        statistics_.totalAllocations_++;
+        statistics_.totalAllocationSize_ += size;
         statistics_.allocationCount_++;
         statistics_.virtualMemoryReserved_ += size;
         statistics_.physicalMemoryAllocated_ += size;

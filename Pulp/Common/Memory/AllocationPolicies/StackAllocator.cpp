@@ -52,6 +52,8 @@ void* StackAllocator::allocate(size_t size, size_t alignment, size_t align_offse
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     // stats baby !
+    statistics_.totalAllocations_++;
+    statistics_.totalAllocationSize_ += size;
     statistics_.allocationCount_++;
     statistics_.internalOverhead_ += sizeof(BlockHeader);
     statistics_.physicalMemoryUsed_ += size + (current_ - old_current);

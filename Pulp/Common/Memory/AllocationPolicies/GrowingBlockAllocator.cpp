@@ -61,6 +61,8 @@ void* GrowingBlockAllocator::allocate(size_t originalSize, size_t alignment, siz
     as_header[-1].originalSize_ = safe_static_cast<int32_t>(originalSize);
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
+    statistics_.totalAllocations_++;
+    statistics_.totalAllocationSize_ += size;
     statistics_.allocationCount_++;
     statistics_.internalOverhead_ += sizeof(BlockHeader);
     statistics_.wasteAlignment_ += safe_static_cast<size_t>((uintptr_t)as_void - (uintptr_t)pMem);

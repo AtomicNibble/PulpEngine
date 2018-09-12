@@ -90,7 +90,8 @@ void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offse
     if (pMem) {
         // info for when we either grow or not.
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
-
+        statistics_.totalAllocations_++;
+        statistics_.totalAllocationSize_ += size;
         statistics_.allocationCount_++;
         statistics_.physicalMemoryUsed_ += elementSize_;
         statistics_.wasteAlignment_ += wastePerElement_;
@@ -145,6 +146,8 @@ void* GrowingPoolAllocator::allocate(size_t size, size_t alignment, size_t offse
     statistics_.wasteUnusedMax_ = Max(statistics_.wasteUnusedMax_, statistics_.wasteUnused_);
 
     // info for when we either grow or not.
+    statistics_.totalAllocations_++;
+    statistics_.totalAllocationSize_ += size;
     statistics_.allocationCount_++;
     statistics_.physicalMemoryUsed_ += elementSize_;
     statistics_.wasteAlignment_ += wastePerElement_;

@@ -42,6 +42,8 @@ void* LinearAllocator::allocate(size_t size, size_t alignment, size_t align_offs
 
 #if X_ENABLE_MEMORY_ALLOCATOR_STATISTICS
     // stats baby !
+    statistics_.totalAllocations_++;
+    statistics_.totalAllocationSize_ += size;
     statistics_.allocationCount_++;
     statistics_.internalOverhead_ += sizeof(size_t);
     statistics_.wasteAlignment_ += safe_static_cast<size_t>(reinterpret_cast<uintptr_t>(current_) - reinterpret_cast<uintptr_t>(oldCurrent));
