@@ -70,6 +70,7 @@ SoundVars::SoundVars()
     enableCommSys_ = 0;
     enableOutputCapture_ = 0;
     enableCulling_ = 0;
+    drawDebug_ = 0;
     enableDebugRender_ = 0;
 
     debugObjectScale_ = 1.f;
@@ -140,7 +141,10 @@ void SoundVars::RegisterVars(void)
     ADD_CVAR_REF("snd_enable_cull", enableCulling_, enableCulling_, 0, 1, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Enable inactive sound object culling");
 
-    ADD_CVAR_REF("snd_debug_draw", enableDebugRender_, enableDebugRender_, 0, 2, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("snd_draw_debug", drawDebug_, drawDebug_, 0, 1, core::VarFlag::SYSTEM,
+        "Draw Sound debug");
+
+    ADD_CVAR_REF("snd_draw_obj_debug", enableDebugRender_, enableDebugRender_, 0, 2, core::VarFlag::SOUND | core::VarFlag::SAVE_IF_CHANGED,
         "Enables sound debug rendering. 1=pos/occ 2=info text");
 
     ADD_CVAR_REF("snd_debug_obj_scale", debugObjectScale_, debugObjectScale_, 1.f, 32.f,

@@ -518,10 +518,29 @@ void XSound::release(void)
 
 Vec2f XSound::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 {
-    X_UNUSED(pPrim, pos);
+    if (!vars_.drawDebug()) {
+        return Vec2f();
+    }
 
+    const float padding = 16.f;
 
-    return Vec2f();
+    font::TextDrawContext ctx;
+    ctx.col = Col_Dimgray;
+    ctx.pFont = gEnv->pFontSys->getDefault();
+    ctx.size = Vec2f(16.f, 16.f);
+
+    Vec2f size(200, 80);
+    Rectf r(pos, pos + size);
+
+    pPrim->drawQuad(r, Color(0.1f, 0.1f, 0.1f, 0.8f));
+
+    core::StackString<64> txt;
+    txt.setFmt("Snd Obj: ^6%" PRIuS "^~\n", objects_.size());
+    txt.appendFmt("Culled: ^6%" PRIuS, culledObjects_.size());
+
+    pPrim->drawText(Vec3f(r.getUpperLeft() + Vec2f(padding, padding)), ctx, txt.begin(), txt.end());
+
+    return size;
 }
 
 void XSound::update(core::FrameData& frame)
