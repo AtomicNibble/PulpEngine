@@ -506,6 +506,8 @@ bool XGame::update(core::FrameData& frame)
             }
         }
 
+        con.flags.Clear();
+
         pPrim->drawText(Vec3f(5.f, 500.f, 1.f), con, txt.begin(), txt.end());
 
     }
