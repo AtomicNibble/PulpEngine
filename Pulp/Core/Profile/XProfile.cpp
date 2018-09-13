@@ -536,9 +536,10 @@ namespace profiler
         name.append(' ', treeIndent * 2);
         name.append(arenaStats.arenaName_);
 
-        str.appendFmt(L"%-25" PRns "^6%6" PRIuS "%11" PRns "%11" PRns,
+        str.appendFmt(L"%-25" PRns "^6%6" PRIuS "%11" PRIuS "%11" PRns "%11" PRns,
             name.c_str(),
             allocStats.allocationCount_,
+            allocStats.totalAllocations_,
             core::HumanSize::toString(strBuf, allocStats.physicalMemoryUsed_),
             core::HumanSize::toString(strBuf2, allocStats.physicalMemoryAllocated_));
 
@@ -583,7 +584,7 @@ namespace profiler
 
         size_t numItems = countChildren_r(arena);
 
-        const float width = 520;
+        const float width = 520 + 110;
         const float height = (20.f * numItems) + colHdrHeight;
 
         // background.
@@ -605,8 +606,8 @@ namespace profiler
 
         // titles.
         core::StackStringW256 str;
-        str.appendFmt(L"%-25" PRns "%6" PRns "%11" PRns "%11" PRns,
-            "Memory Arena Name", "Num", "Phys(U)", "Phys");
+        str.appendFmt(L"%-25" PRns "%6" PRns "%11" PRns "%11" PRns "%11" PRns,
+            "Memory Arena Name", "Num", "Total", "Phys(U)", "Phys");
 
         font::TextDrawContext ctx;
         ctx.pFont = pFont_;
