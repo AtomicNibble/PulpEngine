@@ -8,7 +8,7 @@ X_NAMESPACE_BEGIN(net)
 SessionVars::SessionVars()
 {
     lobbyDebug_ = 0;
-    drawLobbyDebug_ = 1;
+    drawLobbyDebug_ = 0;
     connectionAttemps_ = 3;
     connectionRetyDelayMs_ = 500;
 
