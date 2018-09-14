@@ -30,14 +30,15 @@
 
 extern "C" {
 
+    // Vorbis
     void* __cdecl vorbis_malloc(size_t size)
     {
-        return g_VideoArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        return g_VideoVorbisArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
     }
 
     void* __cdecl vorbis_calloc(size_t count, size_t size)
     {
-        void* pMem = g_VideoArena->allocate(size * count, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        void* pMem = g_VideoVorbisArena->allocate(size * count, sizeof(uintptr_t), 0, X_SOURCE_INFO);
         std::memset(pMem, 0, count * size);
         return pMem;
     }
@@ -48,17 +49,43 @@ extern "C" {
             return vorbis_malloc(size);
         }
 
-        size_t blockSize = g_VideoArena->getSize(pBlock);
+        size_t blockSize = g_VideoVorbisArena->getSize(pBlock);
 
         void* pMem = g_VideoArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
         std::memcpy(pMem, pBlock, blockSize);
         return pMem;
-
     }
 
     void __cdecl vorbis_free(void* pBlock)
     {
-        g_VideoArena->free(pBlock);
+        if (pBlock) {
+            g_VideoVorbisArena->free(pBlock);
+        }
+    }
+
+    // vpx
+    void* __cdecl vpx_memalign(size_t align, size_t size)
+    {   
+        return g_VideoVpxArena->allocate(size, align, 0, X_SOURCE_INFO);
+    }
+
+    void* __cdecl vpx_malloc(size_t size)
+    { 
+        return vpx_memalign(2 * sizeof(void*), size);
+    }
+
+    void* __cdecl vpx_calloc(size_t num, size_t size)
+    {
+        void* pMem = g_VideoVpxArena->allocate(num * size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        std::memset(pMem, 0, num * size);
+        return pMem;
+    }
+
+    void __cdecl vpx_free(void* pBlock)
+    {
+        if (pBlock) {
+            g_VideoVpxArena->free(pBlock);
+        }
     }
 }
 
@@ -125,7 +152,6 @@ Video::~Video()
 void Video::play(void)
 {
     X_ASSERT(state_ == State::Init, "")();
-
 
     state_ = State::Buffering;
     dispatchRead();

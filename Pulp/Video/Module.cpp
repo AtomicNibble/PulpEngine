@@ -33,9 +33,13 @@ typedef core::MemoryArena<
 namespace
 {
     core::MallocFreeAllocator g_VideoAlloc;
+    core::MallocFreeAllocator g_VideoDecodeAlloc;
+    core::MallocFreeAllocator g_VideoAudioAlloc;
 }
 
 core::MemoryArenaBase* g_VideoArena = nullptr;
+core::MemoryArenaBase* g_VideoVpxArena = nullptr;
+core::MemoryArenaBase* g_VideoVorbisArena = nullptr;
 
 //////////////////////////////////////////////////////////////////////////
 class XEngineModule_Video : public IEngineModule
@@ -60,6 +64,9 @@ class XEngineModule_Video : public IEngineModule
         X_UNUSED(initParams);
 
         g_VideoArena = X_NEW(VideoArena, gEnv->pArena, "VideoArena")(&g_VideoAlloc, "VideoArena");
+        g_VideoVpxArena = X_NEW(VideoArena, g_VideoArena, "VideoArena")(&g_VideoDecodeAlloc, "VideoDecodeArena");
+        g_VideoVorbisArena = X_NEW(VideoArena, g_VideoArena, "VideoArena")(&g_VideoAudioAlloc, "VideoAudioArena");
+
         auto* pVideoSys = X_NEW(video::XVideoSys, g_VideoArena, "VideoSys")(g_VideoArena);
 
         env.pVideoSys = pVideoSys;
@@ -71,6 +78,8 @@ class XEngineModule_Video : public IEngineModule
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pArena);
 
+        X_DELETE_AND_NULL(g_VideoVorbisArena, g_VideoArena);
+        X_DELETE_AND_NULL(g_VideoVpxArena, g_VideoArena);
         X_DELETE_AND_NULL(g_VideoArena, gEnv->pArena);
 
         return true;

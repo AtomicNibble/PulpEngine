@@ -52,6 +52,7 @@ static void *get_actual_malloc_address(void *const mem) {
   return (void *)(*malloc_addr_location);
 }
 
+#if 0
 void *vpx_memalign(size_t align, size_t size) {
   void *x = NULL, *addr;
   const uint64_t aligned_size = get_aligned_malloc_size(size, align);
@@ -82,3 +83,4 @@ void vpx_free(void *memblk) {
     free(addr);
   }
 }
+#endif
