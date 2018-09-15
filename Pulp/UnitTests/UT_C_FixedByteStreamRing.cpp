@@ -93,3 +93,22 @@ TEST(FixByteStreamRing, FillWrapped)
     EXPECT_EQ(0x100, stream.size());
     EXPECT_EQ(0, stream.freeSpace());
 }
+
+TEST(FixByteStreamRing, WrappedComplexType)
+{
+    float val = 0.5291592f;
+
+    uint8_t buf[sizeof(float)];
+    FixedByteStreamRing stream(buf, buf + sizeof(buf), false);
+
+    stream.write<uint8_t>(0);
+    stream.write<uint8_t>(1);
+    EXPECT_EQ(0, stream.read<uint8_t>());
+    EXPECT_EQ(1, stream.read<uint8_t>());
+    
+    EXPECT_EQ(2, stream.tellWrite());
+
+    stream.write(val);
+
+    EXPECT_EQ(val, stream.read<float>());
+}

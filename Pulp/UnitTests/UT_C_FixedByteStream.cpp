@@ -6,7 +6,7 @@ X_USING_NAMESPACE;
 
 typedef core::FixedByteStream<core::FixedByteStreamNoneOwningPolicy> FixedByteStream;
 
-TEST(FixByteStreamBuf, SimpleBytes)
+TEST(FixByteStream, SimpleBytes)
 {
     uint8_t buf[0x200];
     FixedByteStream stream(buf, buf + sizeof(buf), false);
@@ -39,4 +39,16 @@ TEST(FixByteStreamBuf, SimpleBytes)
     EXPECT_EQ(sizeof(buf), stream.capacity());
     EXPECT_EQ(0, stream.size());
     EXPECT_EQ(stream.capacity(), stream.freeSpace());
+}
+
+TEST(FixByteStream,ComplexType)
+{
+    float val = 0.5291592f;
+
+    uint8_t buf[sizeof(float)];
+    FixedByteStream stream(buf, buf + sizeof(buf), false);
+
+    stream.write(val);
+
+    EXPECT_EQ(val, stream.read<float>());
 }
