@@ -16,7 +16,6 @@ X_NAMESPACE_BEGIN(AssetPak)
 // AssetPak:
 //	Description:	Asset Package
 //	File Ext:		.ap
-//	Version:		1.0
 //	Info:
 //
 //	The asset package is like a packed directory.
@@ -76,12 +75,8 @@ X_NAMESPACE_BEGIN(AssetPak)
 //		PAK_FU_STRING_POOL_RESERVER	// number of bytes added to end.
 //		PAK_FU_SPARE_ASSET_SLOTS	// number of blank entries added.
 //
-//  Limits:
-//		max_str_pool_size:  1Mb (default padding scheme)
-//		asset_name_len:		64
-//		max_assets:			1 << 32
-//		max_total_size:		(1 << 32 * 64) 256gb
-//		max_asset_size:		1 << 32
+//  Limits: 
+//      see below
 //
 //  Version History:
 //
