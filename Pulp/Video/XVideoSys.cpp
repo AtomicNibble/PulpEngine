@@ -36,7 +36,7 @@ void XVideoSys::registerCmds(void)
 
 bool XVideoSys::init(void)
 {
-#if 1
+#if 0
     auto* pVideo = loadVideo("test/doom_trailer_720");
 
     waitForLoad(pVideo);

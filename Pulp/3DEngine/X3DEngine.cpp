@@ -181,6 +181,7 @@ bool X3DEngine::init(void)
     // this can be any size, but typically have it match display.
     pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol2d);
 
+#if 0 // some stuff for prelinking video texture to material tech.
     auto* pMat = pMaterialManager_->loadMaterial("video/doom_trailer");
     auto* pTech = pMaterialManager_->getTechForMaterial(pMat, core::StrHash("unlit"),
         render::shader::VertexFormat::P3F_T4F_C4B_N3F, engine::PermatationFlags::VertStreams);
@@ -203,6 +204,7 @@ bool X3DEngine::init(void)
         X_ERROR("Font", "Failed to bind fontcache taxture to font state");
         return false;
     }
+#endif
 
 
     return true;
