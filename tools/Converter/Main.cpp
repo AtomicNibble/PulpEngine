@@ -86,38 +86,11 @@ namespace
         const wchar_t* pAssetType = gEnv->pCore->GetCommandLineArgForVarW(L"type");
         if (pAssetType) {
             core::StackString<128, char> assetTypeStr(pAssetType);
+            assetTypeStr.toLower();
 
-            static_assert(converter::AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code might need updating.");
-
-            switch (core::Hash::Fnv1aHash(assetTypeStr.c_str(), assetTypeStr.length())) {
-                case "model"_fnv1a:
-                    assType = converter::AssetType::MODEL;
-                    break;
-                case "anim"_fnv1a:
-                    assType = converter::AssetType::ANIM;
-                    break;
-                case "material"_fnv1a:
-                    assType = converter::AssetType::MATERIAL;
-                    break;
-                case "img"_fnv1a:
-                    assType = converter::AssetType::IMG;
-                    break;
-                case "weapon"_fnv1a:
-                    assType = converter::AssetType::WEAPON;
-                    break;
-                case "font"_fnv1a:
-                    assType = converter::AssetType::FONT;
-                    break;
-                case "video"_fnv1a:
-                    assType = converter::AssetType::VIDEO;
-                    break;
-                case "fx"_fnv1a:
-                    assType = converter::AssetType::FX;
-                    break;
-
-                default:
-                    X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
-                    return false;
+            if (!assetTypeFromStr(assType, assetTypeStr.begin(), assetTypeStr.end())) {
+                X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
+                return false;
             }
 
             return true;

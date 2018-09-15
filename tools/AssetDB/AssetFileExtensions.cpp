@@ -25,7 +25,7 @@ namespace
     public:
         ExtensionHelper()
         {
-            static_assert(AssetType::ENUM_COUNT == 21, "Added new asset type, this code might need updating");
+            static_assert(AssetType::ENUM_COUNT == 22, "Added new asset type, this code might need updating");
 
             extensions_.fill("");
             extensions_[AssetType::MODEL] = model::MODEL_FILE_EXTENSION;

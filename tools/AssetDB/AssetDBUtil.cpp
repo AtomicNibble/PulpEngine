@@ -13,7 +13,7 @@ namespace Util
     {
         const size_t len = (pEnd - pBegin);
 
-        static_assert(AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code need updating.");
+        static_assert(AssetType::ENUM_COUNT == 22, "More asset types :[] ? this code need updating.");
 
         switch (core::Hash::Fnv1aHash(pBegin, len)) {
             case "model"_fnv1a:
@@ -79,7 +79,9 @@ namespace Util
             case "menu"_fnv1a:
                 return AssetType::MENU;
                 break;
-
+            case "raw"_fnv1a:
+                return AssetType::RAW;
+                break;
             default:
                 X_ERROR("AssetDB", "Unknown AssetType: '%.*s' (case-sen)", len, pBegin);
                 return AssetType::MODEL; // don't have a invalid type currently.

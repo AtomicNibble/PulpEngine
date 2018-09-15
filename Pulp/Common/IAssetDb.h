@@ -57,7 +57,8 @@ X_DECLARE_ENUM8(AssetType)
     LEVEL,      // Not in db
     CONFIG,     // Not in db
     TECHDEF,    // Not in db
-    MENU
+    MENU,
+    RAW         // unclassified data, mainly used for pak storage.
 );
 
 namespace api
@@ -71,7 +72,7 @@ X_INLINE bool assetTypeFromStr(AssetType::Enum& type, const char* pBegin, const 
 
     const size_t len = (pEnd - pBegin);
 
-    static_assert(AssetType::ENUM_COUNT == 21, "More asset types :[] ? this code need updating.");
+    static_assert(AssetType::ENUM_COUNT == 22, "More asset types :[] ? this code need updating.");
 
     switch (core::Hash::Fnv1aHash(pBegin, len)) {
         case "model"_fnv1a:
@@ -137,7 +138,9 @@ X_INLINE bool assetTypeFromStr(AssetType::Enum& type, const char* pBegin, const 
         case "menu"_fnv1a:
             type = AssetType::MENU;
             break;
-
+        case "raw"_fnv1a:
+            type = AssetType::RAW;
+            break;
         default:
             return false;
     }
