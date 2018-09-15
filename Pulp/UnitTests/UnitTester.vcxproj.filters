@@ -346,6 +346,9 @@
     <ClCompile Include="UT_DateTime.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="UT_C_FixedByteStreamRing.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
