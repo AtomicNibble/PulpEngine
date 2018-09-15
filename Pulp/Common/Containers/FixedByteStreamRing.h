@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(core)
 class FixedByteStreamRingBase
 {
 public:
-    typedef char Type;
+    typedef uint8_t Type;
     typedef Type value_type;
     typedef Type* TypePtr;
     typedef const Type* ConstTypePtr;
