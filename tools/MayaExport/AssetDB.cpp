@@ -632,7 +632,7 @@ MStatus AssetDBCmd::doIt(const MArgList& args)
         // is it a valid path id?
         typeStr.toLowerCase();
 
-        if (!assetDb::assetTypeFromStr(assetType, typeStr.asChar(), typeStr.asChar() + typeStr.length())) {
+        if (!assetDb::assetTypeFromStr(typeStr.asChar(), typeStr.asChar() + typeStr.length(), assetType)) {
             core::StackString512 msg;
             msg.appendFmt("unknown type: '%s' valid type's: model, anim, material", typeStr.asChar());
             setResult(msg.c_str());

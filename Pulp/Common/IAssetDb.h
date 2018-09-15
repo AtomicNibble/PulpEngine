@@ -66,7 +66,7 @@ namespace api
     static const size_t MESSAGE_BUFFER_SIZE = 0x200; // max size of message sent by api.
 }
 
-X_INLINE bool assetTypeFromStr(AssetType::Enum& type, const char* pBegin, const char* pEnd)
+X_INLINE bool assetTypeFromStr(const char* pBegin, const char* pEnd, AssetType::Enum& type)
 {
     using namespace core::Hash::Literals;
 

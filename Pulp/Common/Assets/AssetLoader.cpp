@@ -90,7 +90,7 @@ bool AssetLoader::onFileChanged(const char* pName)
     assetTypeStr.trimRight('s');
 
     assetDb::AssetType::Enum type;
-    if (!assetDb::assetTypeFromStr(type, assetTypeStr.begin(), assetTypeStr.end())) {
+    if (!assetDb::assetTypeFromStr(assetTypeStr.begin(), assetTypeStr.end(), type)) {
         X_LOG0("AssetLoader", "File is not in asset folder: \"%s\"", assetName.c_str());
         return false;
     }
@@ -445,7 +445,7 @@ void AssetLoader::Cmd_ReloadAsset(core::IConsoleCmdArgs* pCmd)
 
 
     assetDb::AssetType::Enum type;
-    if (!assetDb::assetTypeFromStr(type, pTypeStr, pTypeStr + strUtil::strlen(pTypeStr))) {
+    if (!assetDb::assetTypeFromStr(pTypeStr, pTypeStr + strUtil::strlen(pTypeStr), type)) {
         X_ERROR("AssetLoader", "Invalid asset type: \"%s\"", pTypeStr);
         return;
     }

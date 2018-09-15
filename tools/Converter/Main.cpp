@@ -88,7 +88,7 @@ namespace
             core::StackString<128, char> assetTypeStr(pAssetType);
             assetTypeStr.toLower();
 
-            if (!assetTypeFromStr(assType, assetTypeStr.begin(), assetTypeStr.end())) {
+            if (!assetTypeFromStr(assetTypeStr.begin(), assetTypeStr.end(), assType)) {
                 X_ERROR("Converter", "Unknown asset type: \"%ls\"", pAssetType);
                 return false;
             }
