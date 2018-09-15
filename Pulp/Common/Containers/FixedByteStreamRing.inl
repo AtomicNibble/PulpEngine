@@ -285,6 +285,11 @@ inline typename FixedByteStreamRingBase::size_type FixedByteStreamRingBase::tell
     return readByteIdx_ & mask_;
 }
 
+inline typename FixedByteStreamRingBase::size_type FixedByteStreamRingBase::tellWrite(void) const
+{
+    return byteIdx_ & mask_;
+}
+
 inline bool FixedByteStreamRingBase::isEos(void) const
 {
     return byteIdx_ == readByteIdx_;
