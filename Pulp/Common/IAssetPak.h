@@ -120,13 +120,11 @@ struct AssetOffset
     static const uint64_t SHIFT_VALUE = 6ull;
     static_assert((1 << SHIFT_VALUE) == PAK_ASSET_PADDING, "Incorrect shift value");
 
-    operator uint64_t() const
-    {
+    operator uint64_t() const {
         return ((uint64_t)(offset_)) << 6ull;
     }
 
-    void operator=(uint64_t val)
-    {
+    void operator=(uint64_t val) {
         offset_ = (uint32_t)(val >> 6ull);
     }
 
@@ -170,16 +168,13 @@ struct APakDictInfo
 
 struct APakHeader
 {
-    X_INLINE bool isValid(void) const
-    {
+    X_INLINE bool isValid(void) const {
         return magic == PAK_MAGIC;
     }
-    X_INLINE bool isCompressed(void) const
-    {
+    X_INLINE bool isCompressed(void) const {
         return size != inflatedSize;
     }
-    X_INLINE bool hasCompressedAssets(void) const
-    {
+    X_INLINE bool hasCompressedAssets(void) const {
         return std::any_of(algos.begin(), algos.end(), [](core::Compression::Algo::Enum algo) -> bool {
             return algo != core::Compression::Algo::STORE;
         });
@@ -217,8 +212,7 @@ struct APakStrPool
 
 struct APakEntry
 {
-    X_INLINE bool isCompressed(void) const
-    {
+    X_INLINE bool isCompressed(void) const {
         return size != inflatedSize;
     }
 
