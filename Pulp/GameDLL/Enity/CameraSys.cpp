@@ -23,9 +23,9 @@ namespace entity
         }
 
         auto* pConsole = gEnv->pConsole;
-        pConsole->UnregisterVariable("cam_pos");
-        pConsole->UnregisterVariable("cam_angle");
-        pConsole->UnregisterVariable("cam_angle_rad");
+        pConsole->unregisterVariable("cam_pos");
+        pConsole->unregisterVariable("cam_angle");
+        pConsole->unregisterVariable("cam_angle_rad");
     }
 
     bool CameraSystem::init(void)

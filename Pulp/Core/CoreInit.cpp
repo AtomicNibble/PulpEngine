@@ -409,11 +409,11 @@ bool XCore::Init(const CoreInitParams& startupParams)
     if (!startupParams.isCoreOnly()) {
         X_PROFILE_NO_HISTORY_BEGIN("ConfigLoad", core::profiler::SubSys::CORE);
 
-        if (!env_.pConsole->LoadAndExecConfigFile("default.cfg")) {
+        if (!env_.pConsole->loadAndExecConfigFile("default.cfg")) {
             return false;
         }
 
-        if (!env_.pConsole->LoadAndExecConfigFile("user_config.cfg")) {
+        if (!env_.pConsole->loadAndExecConfigFile("user_config.cfg")) {
             // this is not required.
         }
     }

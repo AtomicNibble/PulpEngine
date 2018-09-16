@@ -26,7 +26,7 @@ void LoggerVerbosityFilterPolicy::RegisterVars(void)
     // check if 'log_verbosity' has already been registered
     // that way all verbosity instances are controlled by same var.
 
-    core::ICVar* pVar = gEnv->pConsole->GetCVar("log_verbosity");
+    core::ICVar* pVar = gEnv->pConsole->getCVar("log_verbosity");
     if (pVar) {
         pVar_ = pVar;
     }
@@ -43,7 +43,7 @@ bool LoggerVerbosityFilterPolicy::Filter(LogType::Enum type, X_SOURCE_INFO_LOG_C
     X_UNUSED(type, channel, format, args);
 
     // if we where not the first logger to register var
-    // we must update out value.
+    // we must update our value.
     // var sticks around in memory even if 1st instances dies.
     if (pVar_) {
         logVerbosity_ = pVar_->GetInteger();

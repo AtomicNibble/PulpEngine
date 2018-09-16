@@ -257,7 +257,7 @@ void ConsoleCommandArgs::TokenizeString(const char* begin, const char* end)
                         core::StackString<256> name(start, commandLine);
 
                         // it's a var name.
-                        ICVar* var = gEnv->pConsole->GetCVar(name.c_str());
+                        ICVar* var = gEnv->pConsole->getCVar(name.c_str());
 
                         if (var) {
                             core::ICVar::StrBuf strBuf;
@@ -446,11 +446,8 @@ bool XConsole::init(ICore* pCore, bool basic)
 
         coreEventListernRegd_ = pCore_->GetCoreEventDispatcher()->RegisterListener(this);
 
-        // hot reload
-        // pCore_->GetHotReloadMan()->addfileType(this, CONFIG_FILE_EXTENSION);
-
         if (console_save_history) {
-            LoadCmdHistory(true);
+            loadCmdHistory(true);
         }
     }
     else {
@@ -475,7 +472,7 @@ bool XConsole::asyncInitFinalize(void)
             const char* pBegin = historyFileBuf_.get();
             const char* pEnd = pBegin + historyFileSize_;
 
-            ParseCmdHistory(pBegin, pEnd);
+            parseCmdHistory(pBegin, pEnd);
 
             historyFileBuf_.reset();
             historyFileSize_ = 0;
@@ -587,7 +584,7 @@ void XConsole::saveChangedVars(void)
                                 // work out if we have this var.
                                 core::StackString256 name(token.getStart(), token.getEnd());
 
-                                ICVar* pVar = GetCVar(name.c_str());
+                                ICVar* pVar = getCVar(name.c_str());
                                 if (!pVar) {
                                     keep.push_back(line);
                                 }
@@ -652,13 +649,13 @@ void XConsole::freeRenderResources(void)
 bool XConsole::onInputEvent(const input::InputEvent& event)
 {
     if (event.action == input::InputState::CHAR) {
-        return HandleInputChar(event);
+        return handleInputChar(event);
     }
 
-    return HandleInput(event);
+    return handleInput(event);
 }
 
-bool XConsole::HandleInput(const input::InputEvent& event)
+bool XConsole::handleInput(const input::InputEvent& event)
 {
     // open / close
     const auto keyReleased = event.action == input::InputState::RELEASED;
@@ -674,23 +671,23 @@ bool XConsole::HandleInput(const input::InputEvent& event)
             gEnv->pInput->clearKeyState();
 
             if (expand) { // shift + ` dose not close anymore just expands.
-                ShowConsole(consoleState::EXPANDED);
+                showConsole(consoleState::EXPANDED);
             }
             else {
-                ToggleConsole(); // toggle it.
+                toggleConsole(false); // toggle it.
             }
 
             // don't clear if already visable, as we are just expanding.
             if (!visable) {
-                ClearInputBuffer();
+                clearInputBuffer();
             }
 
             return true;
         }
         else if (event.keyId == input::KeyId::ESCAPE && isVisable())
         {
-            ClearInputBuffer();
-            ShowConsole(consoleState::CLOSED);
+            clearInputBuffer();
+            showConsole(consoleState::CLOSED);
             return true;
         }
     }
@@ -791,14 +788,14 @@ bool XConsole::HandleInput(const input::InputEvent& event)
 
             scrollPos_ += scaled;
 
-            ValidateScrollPos();
+            validateScrollPos();
             return true;
         }
         else if (event.keyId == input::KeyId::PAGE_UP) {
-            PageUp();
+            pageUp();
         }
         else if (event.keyId == input::KeyId::PAGE_DOWN) {
-            PageDown();
+            pageDown();
         }
     }
 
@@ -808,19 +805,19 @@ bool XConsole::HandleInput(const input::InputEvent& event)
     }
 
     if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        Paste();
+        paste();
         return false;
     }
 
     if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        Copy();
+        copy();
         return false;
     }
 
-    return ProcessInput(event);
+    return processInput(event);
 }
 
-bool XConsole::HandleInputChar(const input::InputEvent& event)
+bool XConsole::handleInputChar(const input::InputEvent& event)
 {
     if (!isVisable()) {
         return false;
@@ -828,11 +825,11 @@ bool XConsole::HandleInputChar(const input::InputEvent& event)
 
     repeatEvent_ = event;
 
-    ProcessInput(event);
+    processInput(event);
     return true;
 }
 
-void XConsole::AddInputChar(const char c)
+void XConsole::addInputChar(const char c)
 {
     const char tidle = '¬';
 
@@ -852,7 +849,7 @@ void XConsole::AddInputChar(const char c)
     //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
 }
 
-void XConsole::RemoveInputChar(bool bBackSpace)
+void XConsole::removeInputChar(bool bBackSpace)
 {
     if (inputBuffer_.isEmpty()) {
         return;
@@ -872,27 +869,27 @@ void XConsole::RemoveInputChar(bool bBackSpace)
     //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
 }
 
-void XConsole::ClearInputBuffer(void)
+void XConsole::clearInputBuffer(void)
 {
     inputBuffer_ = "";
     cursorPos_ = 0;
 }
 
-void XConsole::ExecuteInputBuffer(void)
+void XConsole::executeInputBuffer(void)
 {
     if (inputBuffer_.isEmpty()) {
         return;
     }
 
     core::string Temp = inputBuffer_;
-    ClearInputBuffer();
+    clearInputBuffer();
 
-    AddCmdToHistory(Temp);
+    addCmdToHistory(Temp);
 
-    AddCmd(Temp, ExecSource::CONSOLE, false);
+    addCmd(Temp, ExecSource::CONSOLE, false);
 }
 
-bool XConsole::ProcessInput(const input::InputEvent& event)
+bool XConsole::processInput(const input::InputEvent& event)
 {
     using namespace input;
 
@@ -900,7 +897,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
     // consume char input.
     if (event.action == InputState::CHAR) {
-        AddInputChar(event.inputchar);
+        addInputChar(event.inputchar);
         return true;
     }
 
@@ -909,17 +906,17 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
             autoCompleteSelect_ = true;
         }
         else {
-            ExecuteInputBuffer();
+            executeInputBuffer();
         }
         return true;
     }
     else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE) {
         // shift + DEL / BACK fully clears
         if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
-            ClearInputBuffer();
+            clearInputBuffer();
         }
         else {
-            RemoveInputChar(true);
+            removeInputChar(true);
         }
         return true;
     }
@@ -1002,14 +999,14 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
             autoCompleteIdx_ = core::Max(-1, --autoCompleteIdx_);
         }
         else {
-            const char* HistoryLine = GetHistory(CmdHistory::UP);
+            const char* pHistoryLine = getHistory(CmdHistory::UP);
 
-            if (HistoryLine) {
+            if (pHistoryLine) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%s", HistoryLine);
+                    X_LOG0("Cmd history", "%s", pHistoryLine);
                 }
 
-                inputBuffer_ = HistoryLine;
+                inputBuffer_ = pHistoryLine;
                 cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
@@ -1024,17 +1021,17 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
 
             // reset history if we move into autocomplete?
             // i think so..
-            ResetHistoryPos();
+            resetHistoryPos();
         }
         else {
-            const char* HistoryLine = GetHistory(CmdHistory::DOWN);
+            const char* pHistoryLine = getHistory(CmdHistory::DOWN);
 
-            if (HistoryLine) {
+            if (pHistoryLine) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%s", HistoryLine);
+                    X_LOG0("Cmd history", "%s", pHistoryLine);
                 }
 
-                inputBuffer_ = HistoryLine;
+                inputBuffer_ = pHistoryLine;
                 cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
@@ -1044,7 +1041,7 @@ bool XConsole::ProcessInput(const input::InputEvent& event)
     return true;
 }
 
-const char* XConsole::GetHistory(CmdHistory::Enum direction)
+const char* XConsole::getHistory(CmdHistory::Enum direction)
 {
     if (cmdHistory_.isEmpty()) {
         return nullptr;
@@ -1076,7 +1073,7 @@ const char* XConsole::GetHistory(CmdHistory::Enum direction)
     return nullptr;
 }
 
-void XConsole::SaveCmdHistory(void) const
+void XConsole::saveCmdHistory(void) const
 {
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
@@ -1099,7 +1096,46 @@ void XConsole::SaveCmdHistory(void) const
     }
 }
 
-void XConsole::HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+void XConsole::loadCmdHistory(bool async)
+{
+    X_ASSERT_NOT_NULL(gEnv);
+    X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+    core::CriticalSection::ScopedLock lock(historyFileLock_);
+
+    if (historyLoadPending_) {
+        return;
+    }
+
+    fileModeFlags mode;
+    mode.Set(fileMode::READ);
+    mode.Set(fileMode::SHARE);
+
+    if (async) {
+        // load the file async
+        historyLoadPending_ = true;
+
+        core::IoRequestOpenRead open;
+        open.callback.Bind<XConsole, &XConsole::historyIoRequestCallback>(this);
+        open.mode = mode;
+        open.path = CMD_HISTORY_FILE_NAME;
+        open.arena = g_coreArena;
+
+        gEnv->pFileSys->AddIoRequestToQue(open);
+    }
+    else {
+        XFileMemScoped file;
+        if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
+            const char* pBegin = file->getBufferStart();
+            const char* pEnd = file->getBufferEnd();
+
+            parseCmdHistory(pBegin, pEnd);
+        }
+    }
+}
+
+
+void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
     core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
     X_UNUSED(fileSys);
@@ -1129,45 +1165,7 @@ void XConsole::HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoR
     historyFileCond_.NotifyAll();
 }
 
-void XConsole::LoadCmdHistory(bool async)
-{
-    X_ASSERT_NOT_NULL(gEnv);
-    X_ASSERT_NOT_NULL(gEnv->pFileSys);
-
-    core::CriticalSection::ScopedLock lock(historyFileLock_);
-
-    if (historyLoadPending_) {
-        return;
-    }
-
-    fileModeFlags mode;
-    mode.Set(fileMode::READ);
-    mode.Set(fileMode::SHARE);
-
-    if (async) {
-        // load the file async
-        historyLoadPending_ = true;
-
-        core::IoRequestOpenRead open;
-        open.callback.Bind<XConsole, &XConsole::HistoryIoRequestCallback>(this);
-        open.mode = mode;
-        open.path = CMD_HISTORY_FILE_NAME;
-        open.arena = g_coreArena;
-
-        gEnv->pFileSys->AddIoRequestToQue(open);
-    }
-    else {
-        XFileMemScoped file;
-        if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
-            const char* pBegin = file->getBufferStart();
-            const char* pEnd = file->getBufferEnd();
-
-            ParseCmdHistory(pBegin, pEnd);
-        }
-    }
-}
-
-void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
+void XConsole::parseCmdHistory(const char* pBegin, const char* pEnd)
 {
     core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
     StringRange<char> range(nullptr, nullptr);
@@ -1185,20 +1183,20 @@ void XConsole::ParseCmdHistory(const char* pBegin, const char* pEnd)
         }
     }
 
-    ResetHistoryPos();
+    resetHistoryPos();
 }
 
-void XConsole::ResetHistoryPos(void)
+void XConsole::resetHistoryPos(void)
 {
     historyPos_ = safe_static_cast<int32_t>(cmdHistory_.size());
 }
 
-void XConsole::AddCmdToHistory(const char* pCommand)
+void XConsole::addCmdToHistory(const char* pCommand)
 {
-    AddCmdToHistory(string(pCommand));
+    addCmdToHistory(string(pCommand));
 }
 
-void XConsole::AddCmdToHistory(const string& command)
+void XConsole::addCmdToHistory(const string& command)
 {
     // make sure it's not same as last command
     if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
@@ -1210,18 +1208,18 @@ void XConsole::AddCmdToHistory(const string& command)
         cmdHistory_.pop();
     }
 
-    ResetHistoryPos();
+    resetHistoryPos();
 
     if (console_save_history) {
-        SaveCmdHistory();
+        saveCmdHistory();
     }
 }
 
 // Binds a cmd to a key
-void XConsole::AddBind(const char* pKey, const char* pCmd)
+void XConsole::addBind(const char* pKey, const char* pCmd)
 {
     // check for override ?
-    const char* Old = FindBind(pKey);
+    const char* Old = findBind(pKey);
 
     if (Old) {
         if (core::strUtil::IsEqual(Old, pCmd)) {
@@ -1241,7 +1239,7 @@ void XConsole::AddBind(const char* pKey, const char* pCmd)
 
 // returns the command for a given key
 // returns null if no bind found
-const char* XConsole::FindBind(const char* key)
+const char* XConsole::findBind(const char* key)
 {
     auto it = binds_.find(X_CONST_STRING(key));
     if (it != binds_.end()) {
@@ -1251,24 +1249,24 @@ const char* XConsole::FindBind(const char* key)
 }
 
 // removes all the binds.
-void XConsole::ClearAllBinds(void)
+void XConsole::clearAllBinds(void)
 {
     binds_.clear();
 }
 
-void XConsole::Listbinds(IKeyBindDumpSink* CallBack)
+void XConsole::listbinds(IKeyBindDumpSink* CallBack)
 {
     for (auto bind : binds_) {
         CallBack->OnKeyBindFound(bind.first.c_str(), bind.second.c_str());
     }
 }
 
-ICVar* XConsole::RegisterString(const char* pName, const char* Value,
+ICVar* XConsole::registerString(const char* pName, const char* Value,
     VarFlags Flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
 
-    ICVar* pCVar = GetCVar(pName);
+    ICVar* pCVar = getCVar(pName);
     if (pCVar) {
         return pCVar;
     }
@@ -1281,47 +1279,48 @@ ICVar* XConsole::RegisterString(const char* pName, const char* Value,
         pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_,
             "CVarString")(this, pName, Value, Flags, pDesc);
     }
-    RegisterVar(pCVar);
+
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::RegisterInt(const char* pName, int Value, int Min,
+ICVar* XConsole::registerInt(const char* pName, int Value, int Min,
     int Max, VarFlags Flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
 
     pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, pName, Value, Min, Max, Flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::RegisterFloat(const char* pName, float Value, float Min,
+ICVar* XConsole::registerFloat(const char* pName, float Value, float Min,
     float Max, VarFlags Flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
 
     pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, pName, Value, Min, Max, Flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue,
+ICVar* XConsole::registerRef(const char* pName, float* src, float defaultvalue,
     float Min, float Max, VarFlags flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
     X_ASSERT_NOT_NULL(src);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
@@ -1329,17 +1328,17 @@ ICVar* XConsole::Register(const char* pName, float* src, float defaultvalue,
     *src = defaultvalue;
 
     pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, pName, src, Min, Max, flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue,
+ICVar* XConsole::registerRef(const char* pName, int* src, int defaultvalue,
     int Min, int Max, VarFlags flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
     X_ASSERT_NOT_NULL(src);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
@@ -1347,17 +1346,17 @@ ICVar* XConsole::Register(const char* pName, int* src, int defaultvalue,
     *src = defaultvalue;
 
     pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, pName, src, Min, Max, flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue,
+ICVar* XConsole::registerRef(const char* pName, Color* src, Color defaultvalue,
     VarFlags flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
     X_ASSERT_NOT_NULL(src);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
@@ -1365,17 +1364,17 @@ ICVar* XConsole::Register(const char* pName, Color* src, Color defaultvalue,
     *src = defaultvalue;
 
     pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, pName, src, flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
+ICVar* XConsole::registerRef(const char* pName, Vec3f* src, Vec3f defaultvalue,
     VarFlags flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
     X_ASSERT_NOT_NULL(src);
 
-    ICVar* pCVar = GetCVarForRegistration(pName);
+    ICVar* pCVar = getCVarForRegistration(pName);
     if (pCVar) {
         return pCVar;
     }
@@ -1383,11 +1382,11 @@ ICVar* XConsole::Register(const char* pName, Vec3f* src, Vec3f defaultvalue,
     *src = defaultvalue;
 
     pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, pName, src, flags, pDesc);
-    RegisterVar(pCVar);
+    registerVar(pCVar);
     return pCVar;
 }
 
-ICVar* XConsole::GetCVar(const char* pName)
+ICVar* XConsole::getCVar(const char* pName)
 {
     auto it = varMap_.find(pName);
     if (it != varMap_.end()) {
@@ -1396,7 +1395,7 @@ ICVar* XConsole::GetCVar(const char* pName)
     return nullptr;
 }
 
-void XConsole::UnregisterVariable(const char* pVarName)
+void XConsole::unregisterVariable(const char* pVarName)
 {
     auto it = varMap_.find(pVarName);
     if (it == varMap_.end()) {
@@ -1410,7 +1409,7 @@ void XConsole::UnregisterVariable(const char* pVarName)
     X_DELETE(pVar, &varArena_);
 }
 
-void XConsole::UnregisterVariable(ICVar* pCVar)
+void XConsole::unregisterVariable(ICVar* pCVar)
 {
     auto pName = pCVar->GetName();
 
@@ -1420,7 +1419,7 @@ void XConsole::UnregisterVariable(ICVar* pCVar)
 
 // Commands :)
 
-void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
+void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
 {
     X_ASSERT_NOT_NULL(pName);
 
@@ -1441,7 +1440,7 @@ void XConsole::RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
     cmdMap_.insert(std::make_pair(cmd.Name, cmd));
 }
 
-void XConsole::UnRegisterCommand(const char* pName)
+void XConsole::unRegisterCommand(const char* pName)
 {
     auto it = cmdMap_.find(X_CONST_STRING(pName));
     if (it != cmdMap_.end()) {
@@ -1449,14 +1448,14 @@ void XConsole::UnRegisterCommand(const char* pName)
     }
 }
 
-void XConsole::Exec(const char* pCommand)
+void XConsole::exec(const char* pCommand)
 {
     X_ASSERT_NOT_NULL(pCommand);
 
-    AddCmd(pCommand, ExecSource::SYSTEM, false);
+    addCmd(pCommand, ExecSource::SYSTEM, false);
 }
 
-bool XConsole::LoadAndExecConfigFile(const char* pFileName)
+bool XConsole::loadAndExecConfigFile(const char* pFileName)
 {
     core::Path<char> path;
 
@@ -1525,7 +1524,7 @@ bool XConsole::LoadAndExecConfigFile(const char* pFileName)
                 }
             }
 
-            ConfigExec(data.begin(), data.begin() + bytes);
+            configExec(data.begin(), data.begin() + bytes);
         }
     }
     else {
@@ -1560,13 +1559,13 @@ void XConsole::OnCoreEvent(const CoreEventData& ed)
     }
 }
 
-void XConsole::ConfigExec(const char* pCommand, const char* pEnd)
+void XConsole::configExec(const char* pCommand, const char* pEnd)
 {
     // if it's from config, should i limit what commands can be used?
     // for now i'll let any be used
 
     if (gEnv->isRunning()) {
-        AddCmd(pCommand, ExecSource::CONFIG, false);
+        addCmd(pCommand, ExecSource::CONFIG, false);
     }
     else {
         // we run the command now.
@@ -1575,34 +1574,34 @@ void XConsole::ConfigExec(const char* pCommand, const char* pEnd)
         cmd.source = ExecSource::CONFIG;
         cmd.silentMode = false;
 
-        ExecuteStringInternal(cmd);
+        executeStringInternal(cmd);
     }
 }
 
-void XConsole::PageUp(void)
+void XConsole::pageUp(void)
 {
-    const int32_t visibleNum = MaxVisibleLogLines();
+    const int32_t visibleNum = maxVisibleLogLines();
     scrollPos_ += visibleNum;
 
-    ValidateScrollPos();
+    validateScrollPos();
 }
 
-void XConsole::PageDown(void)
+void XConsole::pageDown(void)
 {
-    const int32_t visibleNum = MaxVisibleLogLines();
+    const int32_t visibleNum = maxVisibleLogLines();
     scrollPos_ -= visibleNum;
 
-    ValidateScrollPos();
+    validateScrollPos();
 }
 
-void XConsole::ValidateScrollPos(void)
+void XConsole::validateScrollPos(void)
 {
     if (scrollPos_ < 0) {
         scrollPos_ = 0;
     }
     else {
         int32_t logSize = safe_static_cast<int32_t>(consoleLog_.size());
-        const int32_t visibleNum = MaxVisibleLogLines();
+        const int32_t visibleNum = maxVisibleLogLines();
 
         logSize -= visibleNum;
         logSize += 2;
@@ -1613,36 +1612,17 @@ void XConsole::ValidateScrollPos(void)
     }
 }
 
-bool XConsole::CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
-{
-    X_ASSERT_NOT_NULL(pCVar);
-
-    ICVar::FlagType flags = pCVar->GetFlags();
-
-    if (flags.IsSet(VarFlag::READONLY)) {
-        X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
-        return false;
-    }
-
-    if (source == ExecSource::CONFIG) {
-        flags.Set(VarFlag::CONFIG);
-        pCVar->SetFlags(flags);
-    }
-
-    return true;
-}
-
-void XConsole::AddCmd(const char* pCommand, ExecSource::Enum src, bool silent)
+void XConsole::addCmd(const char* pCommand, ExecSource::Enum src, bool silent)
 {
     cmds_.emplace(string(pCommand), src, silent);
 }
 
-void XConsole::AddCmd(const string& command, ExecSource::Enum src, bool silent)
+void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
 {
     cmds_.emplace(command, src, silent);
 }
 
-void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
+void XConsole::executeStringInternal(const ExecCommand& cmd)
 {
     core::StackString512 name;
     core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS> value;
@@ -1693,15 +1673,15 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
                 if (value.isEmpty()) {
                     // no value was given so assume they wanted
                     // to print the value.
-                    DisplayVarInfo(pCVar);
+                    displayVarInfo(pCVar);
                 }
-                else if (CvarModifyBegin(pCVar, cmd.source)) {
+                else if (cvarModifyBegin(pCVar, cmd.source)) {
                     pCVar->Set(value.c_str());
-                    DisplayVarValue(pCVar);
+                    displayVarValue(pCVar);
                 }
             }
             else {
-                DisplayVarInfo(pCVar);
+                displayVarInfo(pCVar);
             }
 
             continue;
@@ -1733,7 +1713,7 @@ void XConsole::ExecuteStringInternal(const ExecCommand& cmd)
     }
 }
 
-void XConsole::DisplayVarValue(const ICVar* pVar)
+void XConsole::displayVarValue(const ICVar* pVar)
 {
     if (!pVar) {
         return;
@@ -1743,7 +1723,7 @@ void XConsole::DisplayVarValue(const ICVar* pVar)
     X_LOG0("Dvar", "^2\"%s\"^7 = ^6%s", pVar->GetName(), pVar->GetString(strBuf));
 }
 
-void XConsole::DisplayVarInfo(const ICVar* pVar, bool fullInfo)
+void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
 {
     if (!pVar) {
         return;
@@ -1792,7 +1772,7 @@ void XConsole::ExecuteCommand(const ConsoleCommand& cmd,
 
 /// ------------------------------------------------------
 
-ICVar* XConsole::GetCVarForRegistration(const char* pName)
+ICVar* XConsole::getCVarForRegistration(const char* pName)
 {
     auto it = varMap_.find(X_CONST_STRING(pName));
     if (it != varMap_.end()) {
@@ -1804,11 +1784,11 @@ ICVar* XConsole::GetCVarForRegistration(const char* pName)
     return nullptr;
 }
 
-void XConsole::RegisterVar(ICVar* pCVar)
+void XConsole::registerVar(ICVar* pCVar)
 {
     auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
     if (it != configCmds_.end()) {
-        if (CvarModifyBegin(pCVar, ExecSource::CONFIG)) {
+        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
             pCVar->Set(it->second);
         }
 
@@ -1817,7 +1797,7 @@ void XConsole::RegisterVar(ICVar* pCVar)
 
     it = varArchive_.find(X_CONST_STRING(pCVar->GetName()));
     if (it != varArchive_.end()) {
-        if (CvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
+        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
             pCVar->Set(it->second);
         }
 
@@ -1844,7 +1824,7 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
         repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
 
         if (repeatEventTimer_.GetValue() < 0) {
-            ProcessInput(repeatEvent_);
+            processInput(repeatEvent_);
 
             repeatEventTimer_ = repeatEventInterval_;
         }
@@ -1854,7 +1834,7 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 void XConsole::runCmds(void)
 {
     while (cmds_.isNotEmpty()) {
-        ExecuteStringInternal(cmds_.peek());
+        executeStringInternal(cmds_.peek());
         cmds_.pop();
     }
 }
@@ -1868,7 +1848,7 @@ void XConsole::draw(core::FrameTimeData& time)
         cursor_.curTime = TimeVal(0ll); // reset
     }
 
-    DrawBuffer();
+    drawBuffer();
 }
 
 consoleState::Enum XConsole::getVisState(void) const
@@ -1876,7 +1856,7 @@ consoleState::Enum XConsole::getVisState(void) const
     return consoleState_;
 }
 
-int32_t XConsole::MaxVisibleLogLines(void) const
+int32_t XConsole::maxVisibleLogLines(void) const
 {
     const int32_t height = renderRes_.y - 40;
 
@@ -1884,7 +1864,7 @@ int32_t XConsole::MaxVisibleLogLines(void) const
     return static_cast<int32_t>(height / lineSize);
 }
 
-void XConsole::DrawBuffer(void)
+void XConsole::drawBuffer(void)
 {
     if (consoleState_ == consoleState::CLOSED) {
         return;
@@ -1976,15 +1956,15 @@ void XConsole::DrawBuffer(void)
                 }
             }
 
-            DrawScrollBar();
+            drawScrollBar();
         }
 
         // draw the auto complete
-        DrawInputTxt(pos);
+        drawInputTxt(pos);
     }
 }
 
-void XConsole::DrawScrollBar(void)
+void XConsole::drawScrollBar(void)
 {
     if (!isExpanded()) {
         return;
@@ -2012,7 +1992,7 @@ void XConsole::DrawScrollBar(void)
 
         // work out the possition of slider.
         // we take the height of the bar - slider and divide.
-        const int32_t visibleNum = MaxVisibleLogLines();
+        const int32_t visibleNum = maxVisibleLogLines();
         const int32_t scrollableLines = safe_static_cast<int32_t>(consoleLog_.size()) - (visibleNum + 2);
 
         float positionPercent = PercentageOf(scrollPos_, scrollableLines) * 0.01f;
@@ -2028,7 +2008,7 @@ void XConsole::DrawScrollBar(void)
     }
 }
 
-void XConsole::DrawInputTxt(const Vec2f& start)
+void XConsole::drawInputTxt(const Vec2f& start)
 {
     const size_t max_auto_complete_results = 32;
     typedef core::FixedArray<AutoResult, max_auto_complete_results> Results;
@@ -2044,7 +2024,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
         size_t NameLen, inputLen;
 
         if (inputBuffer_.isEmpty()) {
-            ResetAutoCompletion();
+            resetAutoCompletion();
             return;
         }
 
@@ -2479,7 +2459,7 @@ void XConsole::DrawInputTxt(const Vec2f& start)
     }
 }
 
-void XConsole::ResetAutoCompletion(void)
+void XConsole::resetAutoCompletion(void)
 {
     autoCompleteIdx_ = -1;
     autoCompleteNum_ = 0;
@@ -2503,7 +2483,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
         // really the MaxVisibleLogLines should be updated to not use render interface
         // and just listen for core events to get size.
         if (pRender_) {
-            const auto noneScroll = MaxVisibleLogLines();
+            const auto noneScroll = maxVisibleLogLines();
 
             // move scroll wheel with the moving items?
             if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
@@ -2525,7 +2505,7 @@ int32_t XConsole::getLineCount(void) const
 
 ///////////////////////////////////////////////////////////
 
-void XConsole::ListCommands(const char* pSearchPatten)
+void XConsole::listCommands(const char* pSearchPatten)
 {
     core::Array<ConsoleCommand*> sorted_cmds(g_coreArena);
     sorted_cmds.setGranularity(cmdMap_.size());
@@ -2551,7 +2531,7 @@ void XConsole::ListCommands(const char* pSearchPatten)
     X_LOG0("Console", "------------ ^8Commands End^7 ------------");
 }
 
-void XConsole::ListVariables(const char* pSearchPatten)
+void XConsole::listVariables(const char* pSearchPatten)
 {
     // i'm not storing the vars in a ordered map since it's slow to get them.
     // and i only need order when priting them.
@@ -2579,7 +2559,7 @@ void XConsole::ListVariables(const char* pSearchPatten)
     X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
 
-void XConsole::ListVariablesValues(const char* pSearchPatten)
+void XConsole::listVariablesValues(const char* pSearchPatten)
 {
     // i'm not storing the vars in a ordered map since it's slow to get them.
     // and i only need order when priting them.
@@ -2600,18 +2580,18 @@ void XConsole::ListVariablesValues(const char* pSearchPatten)
     X_LOG0("Console", "-------------- ^8Vars(%" PRIuS ")^7 --------------", sorted_vars.size());
 
     for (const auto* pVar : sorted_vars) {
-        DisplayVarValue(pVar);
+        displayVarValue(pVar);
     }
 
     X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
 
-void XConsole::Copy(void)
+void XConsole::copy(void)
 {
     core::clipboard::setText(inputBuffer_.begin(), inputBuffer_.end());
 }
 
-void XConsole::Paste(void)
+void XConsole::paste(void)
 {
     core::clipboard::ClipBoardBuffer buffer;
     const char* pTxt = core::clipboard::getText(buffer);
@@ -2629,6 +2609,27 @@ void XConsole::Paste(void)
 
 // ==================================================================
 
+bool XConsole::cvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
+{
+    X_ASSERT_NOT_NULL(pCVar);
+
+    ICVar::FlagType flags = pCVar->GetFlags();
+
+    if (flags.IsSet(VarFlag::READONLY)) {
+        X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
+        return false;
+    }
+
+    if (source == ExecSource::CONFIG) {
+        flags.Set(VarFlag::CONFIG);
+        pCVar->SetFlags(flags);
+    }
+
+    return true;
+}
+
+// ==================================================================
+
 void XConsole::Command_Exec(IConsoleCmdArgs* pCmd)
 {
     if (pCmd->GetArgCount() != 2) {
@@ -2638,7 +2639,7 @@ void XConsole::Command_Exec(IConsoleCmdArgs* pCmd)
 
     const char* pFilename = pCmd->GetArg(1);
 
-    LoadAndExecConfigFile(pFilename);
+    loadAndExecConfigFile(pFilename);
 }
 
 void XConsole::Command_History(IConsoleCmdArgs* pCmd)
@@ -2683,7 +2684,7 @@ void XConsole::Command_ListCmd(IConsoleCmdArgs* pCmd)
         pSearchPatten = pCmd->GetArg(1);
     }
 
-    ListCommands(pSearchPatten);
+    listCommands(pSearchPatten);
 }
 
 void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
@@ -2695,7 +2696,7 @@ void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
         pSearchPatten = pCmd->GetArg(1);
     }
 
-    ListVariables(pSearchPatten);
+    listVariables(pSearchPatten);
 }
 
 void XConsole::Command_ListDvarsValues(IConsoleCmdArgs* pCmd)
@@ -2707,7 +2708,7 @@ void XConsole::Command_ListDvarsValues(IConsoleCmdArgs* pCmd)
         pSearchPatten = pCmd->GetArg(1);
     }
 
-    ListVariablesValues(pSearchPatten);
+    listVariablesValues(pSearchPatten);
 }
 
 void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
@@ -2769,7 +2770,7 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
     }
 
     // find the var
-    ICVar* pCvar = GetCVar(pCmd->GetArg(1));
+    ICVar* pCvar = getCVar(pCmd->GetArg(1));
     if (!pCvar) {
         X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
         return;
@@ -2777,7 +2778,7 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
 
     pCvar->Reset();
 
-    DisplayVarValue(pCvar);
+    displayVarValue(pCvar);
 }
 
 void XConsole::Command_VarDescribe(IConsoleCmdArgs* pCmd)
@@ -2788,13 +2789,13 @@ void XConsole::Command_VarDescribe(IConsoleCmdArgs* pCmd)
     }
 
     // find the var
-    ICVar* pCvar = GetCVar(pCmd->GetArg(1));
+    ICVar* pCvar = getCVar(pCmd->GetArg(1));
     if (!pCvar) {
         X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
         return;
     }
 
-    DisplayVarInfo(pCvar, true);
+    displayVarInfo(pCvar, true);
 }
 
 void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
@@ -2816,14 +2817,14 @@ void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
             cmd.append(' ', 1);
     }
 
-    AddBind(pCmd->GetArg(1), cmd.c_str());
+    addBind(pCmd->GetArg(1), cmd.c_str());
 }
 
 void XConsole::Command_BindsClear(IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);
 
-    ClearAllBinds();
+    clearAllBinds();
 }
 
 void XConsole::Command_BindsList(IConsoleCmdArgs* pCmd)
@@ -2842,7 +2843,7 @@ void XConsole::Command_BindsList(IConsoleCmdArgs* pCmd)
 
     X_LOG0("Console", "--------------- ^8Binds^7 ----------------");
 
-    Listbinds(&print);
+    listbinds(&print);
 
     X_LOG0("Console", "------------- ^8Binds End^7 --------------");
 }
@@ -2858,7 +2859,7 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
 
     const char* pVarName = Cmd->GetArg(1);
 
-    if (ICVar* pCBar = GetCVar(pVarName)) {
+    if (ICVar* pCBar = getCVar(pVarName)) {
         VarFlag::Enum type = pCBar->GetType();
         if (type == VarFlag::COLOR || type == VarFlag::VECTOR) {
             // just concat themm all into a string
@@ -2907,21 +2908,21 @@ void XConsole::Command_ConsoleShow(IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);
 
-    ShowConsole(XConsole::consoleState::OPEN);
+    showConsole(XConsole::consoleState::OPEN);
 }
 
 void XConsole::Command_ConsoleHide(IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);
 
-    ShowConsole(XConsole::consoleState::CLOSED);
+    showConsole(XConsole::consoleState::CLOSED);
 }
 
 void XConsole::Command_ConsoleToggle(IConsoleCmdArgs* pCmd)
 {
     X_UNUSED(pCmd);
 
-    ToggleConsole();
+    toggleConsole(false);
 }
 
 void XConsole::Command_SaveModifiedVars(IConsoleCmdArgs* pCmd)

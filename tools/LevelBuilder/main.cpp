@@ -156,7 +156,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             if (engine.Init(hInstance, lpCmdLine, &arena)) 
             {
                 {
-                    core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
+                    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity");
                     X_ASSERT_NOT_NULL(pLogVerbosity);
                     pLogVerbosity->Set(0);
                 }

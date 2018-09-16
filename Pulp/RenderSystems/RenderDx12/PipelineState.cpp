@@ -36,7 +36,7 @@ PSODeviceCache::~PSODeviceCache()
     destoryAll();
 
     if (gEnv && gEnv->pConsole) {
-        gEnv->pConsole->UnregisterVariable("r_pso_stall_help_with_work");
+        gEnv->pConsole->unregisterVariable("r_pso_stall_help_with_work");
     }
 }
 

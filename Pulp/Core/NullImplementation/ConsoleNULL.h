@@ -33,28 +33,28 @@ public:
 
     virtual consoleState::Enum getVisState(void) const X_FINAL;
 
-    virtual ICVar* RegisterString(const char* Name, const char* Value, VarFlags Flags, const char* desc) X_FINAL;
-    virtual ICVar* RegisterInt(const char* Name, int Value, int Min, int Max, VarFlags Flags, const char* desc) X_FINAL;
-    virtual ICVar* RegisterFloat(const char* Name, float Value, float Min, float Max, VarFlags Flags, const char* desc) X_FINAL;
+    virtual ICVar* registerString(const char* Name, const char* Value, VarFlags Flags, const char* desc) X_FINAL;
+    virtual ICVar* registerInt(const char* Name, int Value, int Min, int Max, VarFlags Flags, const char* desc) X_FINAL;
+    virtual ICVar* registerFloat(const char* Name, float Value, float Min, float Max, VarFlags Flags, const char* desc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    virtual ICVar* Register(const char* name, float* src, float defaultvalue, float Min, float Max, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* name, int* src, int defaultvalue, int Min, int Max, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* name, Color* src, Color defaultvalue, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* Register(const char* name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+    virtual ICVar* registerRef(const char* name, float* src, float defaultvalue, float Min, float Max, VarFlags nFlags, const char* desc) X_FINAL;
+    virtual ICVar* registerRef(const char* name, int* src, int defaultvalue, int Min, int Max, VarFlags nFlags, const char* desc) X_FINAL;
+    virtual ICVar* registerRef(const char* name, Color* src, Color defaultvalue, VarFlags nFlags, const char* desc) X_FINAL;
+    virtual ICVar* registerRef(const char* name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
 
-    virtual ICVar* GetCVar(const char* name) X_FINAL;
+    virtual ICVar* getCVar(const char* name) X_FINAL;
 
-    virtual void UnregisterVariable(const char* sVarName) X_FINAL;
-    virtual void UnregisterVariable(ICVar* pVar) X_FINAL;
+    virtual void unregisterVariable(const char* sVarName) X_FINAL;
+    virtual void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    virtual void RegisterCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
-    virtual void UnRegisterCommand(const char* Name) X_FINAL;
+    virtual void registerCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
+    virtual void unRegisterCommand(const char* Name) X_FINAL;
 
-    virtual void Exec(const char* command) X_FINAL;
+    virtual void exec(const char* command) X_FINAL;
 
     //	virtual void ConfigExec(const char* command) X_FINAL;
-    virtual bool LoadAndExecConfigFile(const char* fileName) X_FINAL;
+    virtual bool loadAndExecConfigFile(const char* fileName) X_FINAL;
 
     // Loggging
     virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

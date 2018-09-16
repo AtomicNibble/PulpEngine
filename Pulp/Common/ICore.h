@@ -437,29 +437,29 @@ extern core::MallocFreeAllocator* gMalloc;
 #define CVARTEXT(_Desc) _Desc
 #endif
 
-#define ADD_CVAR_REF(name, _var, _def_val, _Min, _Max, _flags, _Desc) gEnv->pConsole->Register(name, &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_REF_VEC3(name, _var, _def_val, _flags, _Desc) gEnv->pConsole->Register(name, &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_REF_COL(name, _var, _def_val, _flags, _Desc) gEnv->pConsole->Register(name, &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_REF_NO_NAME(_var, _def_val, _Min, _Max, _flags, _Desc) gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_REF_COL_NO_NAME(_var, _def_val, _flags, _Desc) gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_REF_VEC3_NO_NAME(_var, _def_val, _flags, _Desc) gEnv->pConsole->Register(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF(name, _var, _def_val, _Min, _Max, _flags, _Desc) gEnv->pConsole->registerRef(name, &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_VEC3(name, _var, _def_val, _flags, _Desc) gEnv->pConsole->registerRef(name, &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_COL(name, _var, _def_val, _flags, _Desc) gEnv->pConsole->registerRef(name, &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_NO_NAME(_var, _def_val, _Min, _Max, _flags, _Desc) gEnv->pConsole->registerRef(X_STRINGIZE(_var), &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_COL_NO_NAME(_var, _def_val, _flags, _Desc) gEnv->pConsole->registerRef(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_REF_VEC3_NO_NAME(_var, _def_val, _flags, _Desc) gEnv->pConsole->registerRef(X_STRINGIZE(_var), &(_var), (_def_val), (_flags), CVARTEXT(_Desc))
 
-#define ADD_CVAR_INT(_name, _val, _Min, _Max, _flags, _Desc) gEnv->pConsole->RegisterInt(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_FLOAT(_name, _val, _Min, _Max, _flags, _Desc) gEnv->pConsole->RegisterFloat(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
-#define ADD_CVAR_STRING(_name, _val, _flags, _Desc) gEnv->pConsole->RegisterString(_name, (_val), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_INT(_name, _val, _Min, _Max, _flags, _Desc) gEnv->pConsole->registerInt(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_FLOAT(_name, _val, _Min, _Max, _flags, _Desc) gEnv->pConsole->registerFloat(_name, (_val), (_Min), (_Max), (_flags), CVARTEXT(_Desc))
+#define ADD_CVAR_STRING(_name, _val, _flags, _Desc) gEnv->pConsole->registerString(_name, (_val), (_flags), CVARTEXT(_Desc))
 
 #define ADD_COMMAND(_name, _func, _flags, _Desc)                                              \
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<_func>();                                                      \
-    gEnv->pConsole->RegisterCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
+    gEnv->pConsole->registerCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
     X_MULTILINE_MACRO_END
 
 #define ADD_COMMAND_MEMBER(_name, __inst, __class, _func, _flags, _Desc)                      \
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<__class, _func>(__inst);                                       \
-    gEnv->pConsole->RegisterCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
+    gEnv->pConsole->registerCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
     X_MULTILINE_MACRO_END
 
 // All logging done via this.

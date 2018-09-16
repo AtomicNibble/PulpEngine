@@ -176,27 +176,27 @@ public:
     // input callbacks
     bool onInputEvent(const input::InputEvent& event);
 
-    ICVar* RegisterString(const char* pName, const char* Value, VarFlags flags, const char* desc) X_FINAL;
-    ICVar* RegisterInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
-    ICVar* RegisterFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* registerString(const char* pName, const char* Value, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    ICVar* Register(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* desc) X_FINAL;
-    ICVar* Register(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* desc) X_FINAL;
-    ICVar* Register(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* desc) X_FINAL;
-    ICVar* Register(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+    ICVar* registerRef(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
 
-    ICVar* GetCVar(const char* pName) X_FINAL;
+    ICVar* getCVar(const char* pName) X_FINAL;
 
-    void UnregisterVariable(const char* pVarName) X_FINAL;
-    void UnregisterVariable(ICVar* pVar) X_FINAL;
+    void unregisterVariable(const char* pVarName) X_FINAL;
+    void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    void RegisterCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
-    void UnRegisterCommand(const char* pName) X_FINAL;
+    void registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
+    void unRegisterCommand(const char* pName) X_FINAL;
 
-    void Exec(const char* pCommand) X_FINAL;
+    void exec(const char* pCommand) X_FINAL;
 
-    bool LoadAndExecConfigFile(const char* pFileName) X_FINAL;
+    bool loadAndExecConfigFile(const char* pFileName) X_FINAL;
 
     // ICoreEventListener
     void OnCoreEvent(const CoreEventData& ed) X_FINAL;
@@ -205,74 +205,75 @@ public:
     void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
     int32_t getLineCount(void) const X_FINAL;
 
-    X_INLINE void ShowConsole(consoleState::Enum state);
+    X_INLINE void showConsole(consoleState::Enum state);
     X_INLINE bool isVisable(void) const;
     X_INLINE bool isExpanded(void) const;
-    X_INLINE void ToggleConsole(bool expand = false);
+    X_INLINE void toggleConsole(bool expand);
 
 private:
-    void AddCmd(const char* pCommand, ExecSource::Enum src, bool silent);
-    void AddCmd(const string& command, ExecSource::Enum src, bool silent);
-    void ExecuteStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
+    void addCmd(const char* pCommand, ExecSource::Enum src, bool silent);
+    void addCmd(const string& command, ExecSource::Enum src, bool silent);
+    void executeStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
     // runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
     void ExecuteCommand(const ConsoleCommand& cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const;
 
-    ICVar* GetCVarForRegistration(const char* pName);
+    ICVar* getCVarForRegistration(const char* pName);
 
-    void RegisterVar(ICVar* pCVar);
+    void registerVar(ICVar* pCVar);
 
-    void ListCommands(const char* searchPatten = nullptr);
-    void ListVariables(const char* searchPatten = nullptr);
-    void ListVariablesValues(const char* searchPatten = nullptr);
+    void listCommands(const char* searchPatten = nullptr);
+    void listVariables(const char* searchPatten = nullptr);
+    void listVariablesValues(const char* searchPatten = nullptr);
 
-    void DisplayVarValue(const ICVar* pVar);
-    void DisplayVarInfo(const ICVar* pVar, bool full = false);
+    void displayVarValue(const ICVar* pVar);
+    void displayVarInfo(const ICVar* pVar, bool full = false);
 
-    void AddInputChar(const char c);
-    void RemoveInputChar(bool bBackSpace);
-    void ClearInputBuffer(void);
+    void addInputChar(const char c);
+    void removeInputChar(bool bBackSpace);
+    void clearInputBuffer(void);
 
-    bool HandleInput(const input::InputEvent& event);
-    bool HandleInputChar(const input::InputEvent& event);
+    bool handleInput(const input::InputEvent& event);
+    bool handleInputChar(const input::InputEvent& event);
 
-    bool ProcessInput(const input::InputEvent& event);
+    bool processInput(const input::InputEvent& event);
 
-    void ExecuteInputBuffer(void);
+    void executeInputBuffer(void);
 
-    void SaveCmdHistory(void) const;
-    void LoadCmdHistory(bool async);
-    void HistoryIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+    // History
+    void saveCmdHistory(void) const;
+    void loadCmdHistory(bool async);
+    void historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
-    void ParseCmdHistory(const char* pBegin, const char* pEnd);
-    void AddCmdToHistory(const char* pCommand);
-    void AddCmdToHistory(const string& command);
-    void ResetHistoryPos(void);
-    const char* GetHistory(CmdHistory::Enum direction);
+    void parseCmdHistory(const char* pBegin, const char* pEnd);
+    void addCmdToHistory(const char* pCommand);
+    void addCmdToHistory(const string& command);
+    void resetHistoryPos(void);
+    const char* getHistory(CmdHistory::Enum direction);
 
     // Binds a cmd to a key
-    void AddBind(const char* pKey, const char* pCmd);
+    void addBind(const char* pKey, const char* pCmd);
 
     // returns the command for a given key
     // returns null if no bind found
-    const char* FindBind(const char* pKey);
+    const char* findBind(const char* pKey);
 
     // removes all the binds.
-    void ClearAllBinds(void);
+    void clearAllBinds(void);
 
-    void Listbinds(IKeyBindDumpSink* CallBack);
+    void listbinds(IKeyBindDumpSink* CallBack);
 
-    void ConfigExec(const char* pCommand, const char* pEnd);
+    void configExec(const char* pCommand, const char* pEnd);
 
     // scrool helpers
 private:
-    void PageUp(void);
-    void PageDown(void);
-    void ValidateScrollPos(void);
+    void pageUp(void);
+    void pageDown(void);
+    void validateScrollPos(void);
 
 private:
     // AutoComplete
-    void ResetAutoCompletion(void);
-    void DrawInputTxt(const Vec2f& start);
+    void resetAutoCompletion(void);
+    void drawInputTxt(const Vec2f& start);
 
     int32_t autoCompleteNum_;
     int32_t autoCompleteIdx_;
@@ -281,17 +282,37 @@ private:
     X_INLINE bool isAutocompleteVis(void);
 
     // returns the max log lines that fit on screen.
-    int32_t MaxVisibleLogLines(void) const;
+    int32_t maxVisibleLogLines(void) const;
 
 private:
-    void DrawBuffer(void);
-    void DrawScrollBar(void);
+    void drawBuffer(void);
+    void drawScrollBar(void);
 
-    void Copy(void);
-    void Paste(void);
+    void copy(void);
+    void paste(void);
 
 private:
-    static bool CvarModifyBegin(ICVar* pCVar, ExecSource::Enum source);
+    static bool cvarModifyBegin(ICVar* pCVar, ExecSource::Enum source);
+
+private:
+    void Command_Exit(IConsoleCmdArgs* Cmd);
+    void Command_Exec(IConsoleCmdArgs* Cmd);
+    void Command_History(IConsoleCmdArgs* Cmd);
+    void Command_Help(IConsoleCmdArgs* Cmd);
+    void Command_ListCmd(IConsoleCmdArgs* Cmd);
+    void Command_ListDvars(IConsoleCmdArgs* Cmd);
+    void Command_ListDvarsValues(IConsoleCmdArgs* Cmd);
+    void Command_Echo(IConsoleCmdArgs* Cmd);
+    void Command_VarReset(IConsoleCmdArgs* Cmd);
+    void Command_VarDescribe(IConsoleCmdArgs* Cmd);
+    void Command_Bind(IConsoleCmdArgs* Cmd);
+    void Command_BindsClear(IConsoleCmdArgs* Cmd);
+    void Command_BindsList(IConsoleCmdArgs* Cmd);
+    void Command_SetVarArchive(IConsoleCmdArgs* Cmd);
+    void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
+    void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
+    void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
+    void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 
 private:
     core::HeapArea varHeap_;
@@ -371,26 +392,6 @@ private:
     Color console_output_box_channel_color;
     Color console_output_scroll_bar_color;
     Color console_output_scroll_bar_slider_color;
-
-private:
-    void Command_Exit(IConsoleCmdArgs* Cmd);
-    void Command_Exec(IConsoleCmdArgs* Cmd);
-    void Command_History(IConsoleCmdArgs* Cmd);
-    void Command_Help(IConsoleCmdArgs* Cmd);
-    void Command_ListCmd(IConsoleCmdArgs* Cmd);
-    void Command_ListDvars(IConsoleCmdArgs* Cmd);
-    void Command_ListDvarsValues(IConsoleCmdArgs* Cmd);
-    void Command_Echo(IConsoleCmdArgs* Cmd);
-    void Command_VarReset(IConsoleCmdArgs* Cmd);
-    void Command_VarDescribe(IConsoleCmdArgs* Cmd);
-    void Command_Bind(IConsoleCmdArgs* Cmd);
-    void Command_BindsClear(IConsoleCmdArgs* Cmd);
-    void Command_BindsList(IConsoleCmdArgs* Cmd);
-    void Command_SetVarArchive(IConsoleCmdArgs* Cmd);
-    void Command_ConsoleShow(IConsoleCmdArgs* Cmd);
-    void Command_ConsoleHide(IConsoleCmdArgs* Cmd);
-    void Command_ConsoleToggle(IConsoleCmdArgs* Cmd);
-    void Command_SaveModifiedVars(IConsoleCmdArgs* Cmd);
 };
 
 X_NAMESPACE_END

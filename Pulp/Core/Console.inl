@@ -1,10 +1,10 @@
 
 X_NAMESPACE_BEGIN(core)
 
-X_INLINE void XConsole::ShowConsole(consoleState::Enum state)
+X_INLINE void XConsole::showConsole(consoleState::Enum state)
 {
     if (state == consoleState::CLOSED) {
-        ResetHistoryPos();
+        resetHistoryPos();
     }
 
     consoleState_ = state;
@@ -20,17 +20,18 @@ X_INLINE bool XConsole::isExpanded(void) const
     return consoleState_ == consoleState::EXPANDED;
 }
 
-X_INLINE void XConsole::ToggleConsole(bool expand)
+X_INLINE void XConsole::toggleConsole(bool expand)
 {
     if (isVisable()) {
-        consoleState_ = consoleState::CLOSED;
-        ResetHistoryPos();
+        showConsole(consoleState::CLOSED);
     }
     else {
-        if (expand)
-            consoleState_ = consoleState::EXPANDED;
-        else
-            consoleState_ = consoleState::OPEN;
+        if (expand) {
+            showConsole(consoleState::EXPANDED);
+        }
+        else {
+            showConsole(consoleState::OPEN);
+        }
     }
 }
 

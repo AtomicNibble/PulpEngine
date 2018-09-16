@@ -135,7 +135,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
         }
     }
 
-    core::ICVar* pLogVerbosity = gEnv->pConsole->GetCVar("log_verbosity");
+    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity");
     if (!pLogVerbosity || pLogVerbosity->GetInteger() >= 1) {
         X_LOG1("BspPortal", "Head node windings");
         // print the head nodes portal bounds.
