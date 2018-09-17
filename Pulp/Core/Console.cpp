@@ -666,6 +666,28 @@ void XConsole::saveChangedVars(void)
 }
 
 
+void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
+{
+    // we must be open to accept input.
+    // cancel any repeat events when we close.
+    if (!isVisable()) {
+        repeatEvent_.keyId = input::KeyId::UNKNOWN;
+        return;
+    }
+
+    if (repeatEvent_.keyId != input::KeyId::UNKNOWN) {
+        // we want to be able to de increment the time.
+        repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
+
+        if (repeatEventTimer_.GetValue() < 0) {
+            processInput(repeatEvent_);
+
+            repeatEventTimer_ = repeatEventInterval_;
+        }
+    }
+}
+
+
 void XConsole::runCmds(void)
 {
     while (cmds_.isNotEmpty()) {
@@ -1856,14 +1878,6 @@ void XConsole::listbinds(IKeyBindDumpSink* CallBack)
 
 // --------------------------------------
 
-void XConsole::OnCoreEvent(const CoreEventData& ed)
-{
-    if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
-        renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
-        renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
-    }
-}
-
 void XConsole::pageUp(void)
 {
     const int32_t visibleNum = maxVisibleLogLines();
@@ -1898,30 +1912,14 @@ void XConsole::validateScrollPos(void)
     }
 }
 
+// --------------------------------------
 
 
-/// ------------------------------------------------------
-
-
-void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
+void XConsole::resetAutoCompletion(void)
 {
-    // we must be open to accept input.
-    // cancel any repeat events when we close.
-    if (!isVisable()) {
-        repeatEvent_.keyId = input::KeyId::UNKNOWN;
-        return;
-    }
-
-    if (repeatEvent_.keyId != input::KeyId::UNKNOWN) {
-        // we want to be able to de increment the time.
-        repeatEventTimer_ -= time.unscaledDeltas[ITimer::Timer::UI];
-
-        if (repeatEventTimer_.GetValue() < 0) {
-            processInput(repeatEvent_);
-
-            repeatEventTimer_ = repeatEventInterval_;
-        }
-    }
+    autoCompleteIdx_ = -1;
+    autoCompleteNum_ = 0;
+    autoCompleteSelect_ = false;
 }
 
 int32_t XConsole::maxVisibleLogLines(void) const
@@ -1931,6 +1929,9 @@ int32_t XConsole::maxVisibleLogLines(void) const
     const float lineSize = (console_output_font_size * console_output_font_line_height);
     return static_cast<int32_t>(height / lineSize);
 }
+
+/// ------------------------------------------------------
+
 
 void XConsole::drawBuffer(void)
 {
@@ -2527,14 +2528,40 @@ void XConsole::drawInputTxt(const Vec2f& start)
     }
 }
 
-void XConsole::resetAutoCompletion(void)
+// ----------------------
+
+void XConsole::copy(void)
 {
-    autoCompleteIdx_ = -1;
-    autoCompleteNum_ = 0;
-    autoCompleteSelect_ = false;
+    core::clipboard::setText(inputBuffer_.begin(), inputBuffer_.end());
 }
 
-///////////////////////////////////////////////////////////
+void XConsole::paste(void)
+{
+    core::clipboard::ClipBoardBuffer buffer;
+    const char* pTxt = core::clipboard::getText(buffer);
+
+    if (pTxt) {
+        // insert it at current pos.
+        inputBuffer_.insert(cursorPos_, pTxt);
+        // add to length
+        cursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(pTxt));
+    }
+    else {
+        X_LOG1("Console", "Failed to paste text to console");
+    }
+}
+
+// ----------------------
+
+void XConsole::OnCoreEvent(const CoreEventData& ed)
+{
+    if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
+        renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
+        renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
+    }
+}
+
+// ----------------------
 
 void XConsole::listCommands(const char* pSearchPatten)
 {
@@ -2616,30 +2643,6 @@ void XConsole::listVariablesValues(const char* pSearchPatten)
 
     X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
-
-void XConsole::copy(void)
-{
-    core::clipboard::setText(inputBuffer_.begin(), inputBuffer_.end());
-}
-
-void XConsole::paste(void)
-{
-    core::clipboard::ClipBoardBuffer buffer;
-    const char* pTxt = core::clipboard::getText(buffer);
-
-    if (pTxt) {
-        // insert it at current pos.
-        inputBuffer_.insert(cursorPos_, pTxt);
-        // add to length
-        cursorPos_ += safe_static_cast<int32_t, size_t>(core::strUtil::strlen(pTxt));
-    }
-    else {
-        X_LOG1("Console", "Failed to paste text to console");
-    }
-}
-
-// ==================================================================
-
 
 
 // ==================================================================
