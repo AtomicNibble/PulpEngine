@@ -376,10 +376,6 @@ XConsole::XConsole() :
     repeatEventTimer_ = TimeVal(0ll);
     repeatEventInterval_ = TimeVal(0.025f);
     repeatEventInitialDelay_ = TimeVal(0.5f);
-
-#if X_ENABLE_CONFIG_HOT_RELOAD
-    ignoreHotReload_ = false;
-#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 }
 
 XConsole::~XConsole()
@@ -569,10 +565,6 @@ void XConsole::saveChangedVars(void)
     X_LOG0("Console", "Saving moified vars");
 
     core::XFileScoped file;
-
-#if X_ENABLE_CONFIG_HOT_RELOAD
-    ignoreHotReload_ = true;
-#endif // !X_ENABLE_CONFIG_HOT_RELOAD
 
     core::Path<char> userConfigPath("config//user_config.cfg");
 
