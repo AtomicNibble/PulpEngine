@@ -171,7 +171,7 @@ public:
     void runCmds(void) X_FINAL;
     void draw(core::FrameTimeData& time) X_FINAL;
 
-    consoleState::Enum getVisState(void) const X_FINAL;
+    X_INLINE consoleState::Enum getVisState(void) const X_FINAL;
 
     // input callbacks
     bool onInputEvent(const input::InputEvent& event);
@@ -195,12 +195,7 @@ public:
     void unRegisterCommand(const char* pName) X_FINAL;
 
     void exec(const char* pCommand) X_FINAL;
-
     bool loadAndExecConfigFile(const char* pFileName) X_FINAL;
-
-    // ICoreEventListener
-    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
-    // ~ICoreEventListener
 
     void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
     int32_t getLineCount(void) const X_FINAL;
@@ -211,33 +206,32 @@ public:
     X_INLINE void toggleConsole(bool expand);
 
 private:
-    void addCmd(const char* pCommand, ExecSource::Enum src, bool silent);
-    void addCmd(const string& command, ExecSource::Enum src, bool silent);
-    void executeStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
-    // runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
-    void ExecuteCommand(const ConsoleCommand& cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const;
-
+    // vars
     ICVar* getCVarForRegistration(const char* pName);
-
     void registerVar(ICVar* pCVar);
-
-    void listCommands(const char* searchPatten = nullptr);
-    void listVariables(const char* searchPatten = nullptr);
-    void listVariablesValues(const char* searchPatten = nullptr);
 
     void displayVarValue(const ICVar* pVar);
     void displayVarInfo(const ICVar* pVar, bool full = false);
 
+    // Cmds
+    void addCmd(const char* pCommand, ExecSource::Enum src, bool silent);
+    void addCmd(const string& command, ExecSource::Enum src, bool silent);
+    void executeStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
+                                                        // runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
+    void executeCommand(const ConsoleCommand& cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const;
+
+    // Config
+    void configExec(const char* pCommand, const char* pEnd);
+
+    // input
     void addInputChar(const char c);
     void removeInputChar(bool bBackSpace);
     void clearInputBuffer(void);
+    void executeInputBuffer(void);
 
     bool handleInput(const input::InputEvent& event);
     bool handleInputChar(const input::InputEvent& event);
-
     bool processInput(const input::InputEvent& event);
-
-    void executeInputBuffer(void);
 
     // History
     void saveCmdHistory(void) const;
@@ -250,22 +244,14 @@ private:
     void resetHistoryPos(void);
     const char* getHistory(CmdHistory::Enum direction);
 
-    // Binds a cmd to a key
+    // Binds 
     void addBind(const char* pKey, const char* pCmd);
-
-    // returns the command for a given key
-    // returns null if no bind found
     const char* findBind(const char* pKey);
-
-    // removes all the binds.
     void clearAllBinds(void);
-
     void listbinds(IKeyBindDumpSink* CallBack);
 
-    void configExec(const char* pCommand, const char* pEnd);
-
-    // scrool helpers
 private:
+    // scroll helpers
     void pageUp(void);
     void pageDown(void);
     void validateScrollPos(void);
@@ -273,11 +259,6 @@ private:
 private:
     // AutoComplete
     void resetAutoCompletion(void);
-    void drawInputTxt(const Vec2f& start);
-
-    int32_t autoCompleteNum_;
-    int32_t autoCompleteIdx_;
-    bool autoCompleteSelect_;
 
     X_INLINE bool isAutocompleteVis(void);
 
@@ -287,12 +268,20 @@ private:
 private:
     void drawBuffer(void);
     void drawScrollBar(void);
+    void drawInputTxt(const Vec2f& start);
 
     void copy(void);
     void paste(void);
 
 private:
-    static bool cvarModifyBegin(ICVar* pCVar, ExecSource::Enum source);
+    // ICoreEventListener
+    void OnCoreEvent(const CoreEventData& ed) X_FINAL;
+    // ~ICoreEventListener
+
+private:
+    void listCommands(const char* pSearchPatten = nullptr);
+    void listVariables(const char* pSearchPatten = nullptr);
+    void listVariablesValues(const char* pSearchPatten = nullptr);
 
 private:
     void Command_Exit(IConsoleCmdArgs* Cmd);
@@ -367,6 +356,11 @@ private:
     core::UniquePointer<const char[]> historyFileBuf_;
     core::CriticalSection historyFileLock_;
     core::ConditionVariable historyFileCond_;
+
+    // auto complete
+    int32_t autoCompleteNum_;
+    int32_t autoCompleteIdx_;
+    bool autoCompleteSelect_;
 
 #if X_ENABLE_CONFIG_HOT_RELOAD
     bool ignoreHotReload_;

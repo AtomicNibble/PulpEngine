@@ -1,6 +1,12 @@
 
 X_NAMESPACE_BEGIN(core)
 
+
+X_INLINE consoleState::Enum XConsole::getVisState(void) const
+{
+    return consoleState_;
+}
+
 X_INLINE void XConsole::showConsole(consoleState::Enum state)
 {
     if (state == consoleState::CLOSED) {

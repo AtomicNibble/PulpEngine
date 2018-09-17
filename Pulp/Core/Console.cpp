@@ -170,6 +170,25 @@ namespace
     const float CONSOLE_INPUT_LINE_HIEGHT = 1.1f;
     const float CONSOLE_DEFAULT_LOG_LINE_HIEGHT = 1.1f;
 
+
+    bool cvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
+    {
+        X_ASSERT_NOT_NULL(pCVar);
+
+        ICVar::FlagType flags = pCVar->GetFlags();
+
+        if (flags.IsSet(VarFlag::READONLY)) {
+            X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
+            return false;
+        }
+
+        if (source == ExecSource::CONFIG) {
+            flags.Set(VarFlag::CONFIG);
+            pCVar->SetFlags(flags);
+        }
+
+        return true;
+    }
 } // namespace
 
 // ==================================================
@@ -533,6 +552,11 @@ void XConsole::shutDown(void)
     cmdHistory_.clear();
 }
 
+void XConsole::freeRenderResources(void)
+{
+    pRender_ = nullptr;
+}
+
 void XConsole::saveChangedVars(void)
 {
     auto itrVarEnd = varMap_.end();
@@ -641,9 +665,25 @@ void XConsole::saveChangedVars(void)
     file.close();
 }
 
-void XConsole::freeRenderResources(void)
+
+void XConsole::runCmds(void)
 {
-    pRender_ = nullptr;
+    while (cmds_.isNotEmpty()) {
+        executeStringInternal(cmds_.peek());
+        cmds_.pop();
+    }
+}
+
+void XConsole::draw(core::FrameTimeData& time)
+{
+    cursor_.curTime += time.unscaledDeltas[ITimer::Timer::UI];
+
+    if (cursor_.curTime > cursor_.displayTime) {
+        cursor_.draw = !cursor_.draw;   // toggle it
+        cursor_.curTime = TimeVal(0ll); // reset
+    }
+
+    drawBuffer();
 }
 
 bool XConsole::onInputEvent(const input::InputEvent& event)
@@ -655,611 +695,6 @@ bool XConsole::onInputEvent(const input::InputEvent& event)
     return handleInput(event);
 }
 
-bool XConsole::handleInput(const input::InputEvent& event)
-{
-    // open / close
-    const auto keyReleased = event.action == input::InputState::RELEASED;
-
-    if (keyReleased)
-    {
-        if (event.keyId == input::KeyId::OEM_8)
-        {
-            bool expand = event.modifiers.IsSet(input::ModifiersMasks::Shift);
-            bool visable = isVisable();
-
-            // clear states.
-            gEnv->pInput->clearKeyState();
-
-            if (expand) { // shift + ` dose not close anymore just expands.
-                showConsole(consoleState::EXPANDED);
-            }
-            else {
-                toggleConsole(false); // toggle it.
-            }
-
-            // don't clear if already visable, as we are just expanding.
-            if (!visable) {
-                clearInputBuffer();
-            }
-
-            return true;
-        }
-        else if (event.keyId == input::KeyId::ESCAPE && isVisable())
-        {
-            clearInputBuffer();
-            showConsole(consoleState::CLOSED);
-            return true;
-        }
-    }
-
-#if 0
-    // process key binds when console is hidden
-    if (consoleState_ == consoleState::CLOSED)
-    {
-        const char* pCmdStr = 0;
-
-        if (!event.modifiers.IsAnySet()) {
-            pCmdStr = FindBind(event.name);
-        }
-        else {
-            // build the key.
-            core::StackString<60> bind_name;
-
-            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-                bind_name.append("ctrl ");
-            }
-            if (event.modifiers.IsSet(input::ModifiersMasks::Shift)) {
-                bind_name.append("shift ");
-            }
-            if (event.modifiers.IsSet(input::ModifiersMasks::Alt)) {
-                bind_name.append("alt ");
-            }
-            if (event.modifiers.IsSet(input::ModifiersMasks::Win)) {
-                bind_name.append("win ");
-            }
-
-            bind_name.append(event.name);
-
-            pCmdStr = FindBind(bind_name.c_str());
-        }
-
-        if (pCmdStr) {
-            AddCmd(pCmdStr, ExecSource::CONSOLE, false);
-            return true;
-        }
-    }
-#endif
-
-    if (!isVisable()) {
-        return false;
-    }
-
-    // -- OPEN --
-    if (keyReleased) {
-        repeatEvent_.keyId = input::KeyId::UNKNOWN;
-    }
-
-    if (event.action != input::InputState::PRESSED) 
-    {
-        if (event.deviceType == input::InputDeviceType::KEYBOARD) {
-            return isVisable();
-        }
-
-        // eat mouse move?
-        // Stops the camera moving around when we have console open.
-        if (event.deviceType == input::InputDeviceType::MOUSE) {
-            if (event.keyId != input::KeyId::MOUSE_Z) {
-                if (console_disable_mouse == 1) // only if expanded
-                {
-                    return isExpanded();
-                }
-                if (console_disable_mouse == 2) {
-                    return isVisable();
-                }
-
-                return false;
-            }
-        }
-        else {
-            return false;
-        }
-    }
-
-    if (event.action == input::InputState::PRESSED) {
-        repeatEvent_ = event;
-        repeatEventTimer_ = repeatEventInitialDelay_;
-    }
-
-    if (isExpanded()) // you can only scroll a expanded console.
-    {
-        if (event.keyId == input::KeyId::MOUSE_Z) {
-            int32_t scaled = static_cast<int32_t>(event.value);
-            bool positive = (scaled >= 0);
-
-            scaled /= 20;
-
-            // enuse scaled didnt remove all scrolling
-            if (positive && scaled < 1) {
-                scaled = 1;
-            }
-            else if (!positive && scaled > -1) {
-                scaled = -1;
-            }
-
-            scrollPos_ += scaled;
-
-            validateScrollPos();
-            return true;
-        }
-        else if (event.keyId == input::KeyId::PAGE_UP) {
-            pageUp();
-        }
-        else if (event.keyId == input::KeyId::PAGE_DOWN) {
-            pageDown();
-        }
-    }
-
-  
-    if (event.keyId != input::KeyId::TAB) {
-        //	ResetAutoCompletion();
-    }
-
-    if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        paste();
-        return false;
-    }
-
-    if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        copy();
-        return false;
-    }
-
-    return processInput(event);
-}
-
-bool XConsole::handleInputChar(const input::InputEvent& event)
-{
-    if (!isVisable()) {
-        return false;
-    }
-
-    repeatEvent_ = event;
-
-    processInput(event);
-    return true;
-}
-
-void XConsole::addInputChar(const char c)
-{
-    const char tidle = '¬';
-
-    if (c == '`' || c == tidle) { // sent twice.
-        return;
-    }
-
-    if (cursorPos_ < safe_static_cast<int32_t, size_t>(inputBuffer_.length())) {
-        inputBuffer_.insert(cursorPos_, c);
-    }
-    else {
-        inputBuffer_ = inputBuffer_ + c;
-    }
-
-    cursorPos_++;
-
-    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
-}
-
-void XConsole::removeInputChar(bool bBackSpace)
-{
-    if (inputBuffer_.isEmpty()) {
-        return;
-    }
-
-    if (bBackSpace) {
-        if (cursorPos_ > 0) {
-            inputBuffer_.erase(cursorPos_ - 1, 1);
-            cursorPos_--;
-        }
-    }
-    else {
-        // ho ho h.
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-
-    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
-}
-
-void XConsole::clearInputBuffer(void)
-{
-    inputBuffer_ = "";
-    cursorPos_ = 0;
-}
-
-void XConsole::executeInputBuffer(void)
-{
-    if (inputBuffer_.isEmpty()) {
-        return;
-    }
-
-    core::string Temp = inputBuffer_;
-    clearInputBuffer();
-
-    addCmdToHistory(Temp);
-
-    addCmd(Temp, ExecSource::CONSOLE, false);
-}
-
-bool XConsole::processInput(const input::InputEvent& event)
-{
-    using namespace input;
-
-    X_ASSERT(isVisable(), "ProcessInput called when not visible")(isVisable());
-
-    // consume char input.
-    if (event.action == InputState::CHAR) {
-        addInputChar(event.inputchar);
-        return true;
-    }
-
-    if (event.keyId == KeyId::ENTER || event.keyId == KeyId::NUMPAD_ENTER) {
-        if (autoCompleteIdx_ >= 0) {
-            autoCompleteSelect_ = true;
-        }
-        else {
-            executeInputBuffer();
-        }
-        return true;
-    }
-    else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE) {
-        // shift + DEL / BACK fully clears
-        if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
-            clearInputBuffer();
-        }
-        else {
-            removeInputChar(true);
-        }
-        return true;
-    }
-    else if (event.keyId == KeyId::LEFT_ARROW) {
-        if (cursorPos_) { // can we go left?
-            cursorPos_--;
-
-            // support moving whole words
-            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
-                while (cursorPos_ && inputBuffer_[cursorPos_] != ' ') {
-                    cursorPos_--;
-                }
-            }
-
-            // disable blinking while moving.
-            cursor_.curTime = TimeVal(0ll);
-            cursor_.draw = true;
-
-            if (console_cursor_skip_color_codes) {
-                // if we are at a number and ^ is before us go back two more.
-                if (cursorPos_ >= 1) {
-                    const char curChar = inputBuffer_[cursorPos_];
-
-                    if (core::strUtil::IsDigit(curChar)) {
-                        const char PreChar = inputBuffer_[cursorPos_ - 1];
-
-                        if (PreChar == '^') {
-                            cursorPos_--;
-                            if (cursorPos_ > 0) {
-                                cursorPos_--;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return true;
-    }
-    else if (event.keyId == KeyId::RIGHT_ARROW) {
-        // are we pre end ?
-        if (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())) {
-            cursorPos_++;
-
-            // support moving whole words
-            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
-                while (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())
-                       && inputBuffer_[cursorPos_] != ' ') {
-                    cursorPos_++;
-                }
-            }
-
-            // disable blinking while moving.
-            cursor_.curTime = TimeVal(0ll);
-            cursor_.draw = true;
-
-            if (console_cursor_skip_color_codes) {
-                uint32_t charsLeft = (safe_static_cast<int32_t>(inputBuffer_.length()) - cursorPos_);
-                if (charsLeft >= 2) {
-                    const char curChar = inputBuffer_[cursorPos_];
-                    const char nextChar = inputBuffer_[cursorPos_ + 1];
-                    if (curChar == '^' && core::strUtil::IsDigit(nextChar)) {
-                        cursorPos_ += 2;
-                    }
-                }
-            }
-        }
-        else if (autoCompleteIdx_ >= 0) {
-            autoCompleteSelect_ = true;
-        }
-        return true;
-    }
-    else if (event.keyId == KeyId::HOME) {
-        cursorPos_ = 0;
-    }
-    else if (event.keyId == KeyId::END) {
-        cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.length());
-    }
-    else if (event.keyId == KeyId::UP_ARROW) {
-        if (isAutocompleteVis() && autoCompleteIdx_ >= 0) {
-            autoCompleteIdx_ = core::Max(-1, --autoCompleteIdx_);
-        }
-        else {
-            const char* pHistoryLine = getHistory(CmdHistory::UP);
-
-            if (pHistoryLine) {
-                if (console_debug) {
-                    X_LOG0("Cmd history", "%s", pHistoryLine);
-                }
-
-                inputBuffer_ = pHistoryLine;
-                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
-            }
-        }
-        return true;
-    }
-    else if (event.keyId == KeyId::DOWN_ARROW) {
-        bool inHistory = (historyPos_ < static_cast<int32_t>(cmdHistory_.size()));
-        bool multiAutoComplete = autoCompleteNum_ > 1;
-
-        if (isAutocompleteVis() && (!inHistory || multiAutoComplete)) {
-            autoCompleteIdx_ = core::Min(autoCompleteNum_ - 1, ++autoCompleteIdx_);
-
-            // reset history if we move into autocomplete?
-            // i think so..
-            resetHistoryPos();
-        }
-        else {
-            const char* pHistoryLine = getHistory(CmdHistory::DOWN);
-
-            if (pHistoryLine) {
-                if (console_debug) {
-                    X_LOG0("Cmd history", "%s", pHistoryLine);
-                }
-
-                inputBuffer_ = pHistoryLine;
-                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
-            }
-        }
-        return true;
-    }
-
-    return true;
-}
-
-const char* XConsole::getHistory(CmdHistory::Enum direction)
-{
-    if (cmdHistory_.isEmpty()) {
-        return nullptr;
-    }
-
-    if (direction == CmdHistory::UP) {
-
-        if (historyPos_ <= 0) {
-            return nullptr;
-        }
-
-        historyPos_--;
-
-        refString_ = cmdHistory_[historyPos_];
-        return refString_.c_str();
-    }
-    else // down
-    {
-        // are we above base cmd?
-        if (historyPos_ < safe_static_cast<int32_t>(cmdHistory_.size()) - 1) {
-            historyPos_++;
-
-            // adds a refrence to the string.
-            refString_ = cmdHistory_[historyPos_];
-            return refString_.c_str();
-        }
-    }
-
-    return nullptr;
-}
-
-void XConsole::saveCmdHistory(void) const
-{
-    X_ASSERT_NOT_NULL(gEnv);
-    X_ASSERT_NOT_NULL(gEnv->pFileSys);
-
-    core::ByteStream stream(g_coreArena);
-    stream.reserve(0x100);
-
-    for (auto& str : cmdHistory_) {
-        stream.write(str.c_str(), str.length());
-        stream.write("\n", 1);
-    }
-
-    fileModeFlags mode;
-    mode.Set(fileMode::WRITE);
-    mode.Set(fileMode::RECREATE);
-
-    XFileScoped file;
-    if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
-        file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
-    }
-}
-
-void XConsole::loadCmdHistory(bool async)
-{
-    X_ASSERT_NOT_NULL(gEnv);
-    X_ASSERT_NOT_NULL(gEnv->pFileSys);
-
-    core::CriticalSection::ScopedLock lock(historyFileLock_);
-
-    if (historyLoadPending_) {
-        return;
-    }
-
-    fileModeFlags mode;
-    mode.Set(fileMode::READ);
-    mode.Set(fileMode::SHARE);
-
-    if (async) {
-        // load the file async
-        historyLoadPending_ = true;
-
-        core::IoRequestOpenRead open;
-        open.callback.Bind<XConsole, &XConsole::historyIoRequestCallback>(this);
-        open.mode = mode;
-        open.path = CMD_HISTORY_FILE_NAME;
-        open.arena = g_coreArena;
-
-        gEnv->pFileSys->AddIoRequestToQue(open);
-    }
-    else {
-        XFileMemScoped file;
-        if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
-            const char* pBegin = file->getBufferStart();
-            const char* pEnd = file->getBufferEnd();
-
-            parseCmdHistory(pBegin, pEnd);
-        }
-    }
-}
-
-
-void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
-    core::XFileAsync* pFile, uint32_t bytesTransferred)
-{
-    X_UNUSED(fileSys);
-    X_UNUSED(bytesTransferred);
-
-    // history file loaded.
-    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
-    const core::IoRequestOpenRead* pOpenRead = static_cast<const IoRequestOpenRead*>(pRequest);
-
-    {
-        core::CriticalSection::ScopedLock lock(historyFileLock_);
-
-        historyLoadPending_ = false;
-
-        // if it faild do we care?
-        if (!pFile) {
-            X_LOG2("Console", "Failed to load history file");
-            return;
-        }
-
-        // we can't process it on this thread.
-        // so store it.
-        historyFileBuf_ = core::UniquePointer<const char[]>(pOpenRead->arena, reinterpret_cast<const char*>(pOpenRead->pBuf));
-        historyFileSize_ = pOpenRead->dataSize;
-    }
-
-    historyFileCond_.NotifyAll();
-}
-
-void XConsole::parseCmdHistory(const char* pBegin, const char* pEnd)
-{
-    core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
-    StringRange<char> range(nullptr, nullptr);
-
-    // lets not clear, we can append and just pop off end if too many in total.
-    // CmdHistory_.clear();
-
-    while (tokenizer.extractToken(range)) {
-        if (range.getLength() > 0) {
-            cmdHistory_.emplace(range.getStart(), range.getEnd());
-
-            if (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
-                cmdHistory_.pop();
-            }
-        }
-    }
-
-    resetHistoryPos();
-}
-
-void XConsole::resetHistoryPos(void)
-{
-    historyPos_ = safe_static_cast<int32_t>(cmdHistory_.size());
-}
-
-void XConsole::addCmdToHistory(const char* pCommand)
-{
-    addCmdToHistory(string(pCommand));
-}
-
-void XConsole::addCmdToHistory(const string& command)
-{
-    // make sure it's not same as last command
-    if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
-        cmdHistory_.emplace(command);
-    }
-
-    // limit hte history.
-    while (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
-        cmdHistory_.pop();
-    }
-
-    resetHistoryPos();
-
-    if (console_save_history) {
-        saveCmdHistory();
-    }
-}
-
-// Binds a cmd to a key
-void XConsole::addBind(const char* pKey, const char* pCmd)
-{
-    // check for override ?
-    const char* Old = findBind(pKey);
-
-    if (Old) {
-        if (core::strUtil::IsEqual(Old, pCmd)) {
-            // bind is same.
-            return;
-        }
-        if (console_debug) {
-            X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, Old, pCmd);
-        }
-
-        auto it = binds_.find(X_CONST_STRING(pKey));
-        it->second = pCmd;
-    }
-
-    binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
-}
-
-// returns the command for a given key
-// returns null if no bind found
-const char* XConsole::findBind(const char* key)
-{
-    auto it = binds_.find(X_CONST_STRING(key));
-    if (it != binds_.end()) {
-        return it->second.c_str();
-    }
-    return nullptr;
-}
-
-// removes all the binds.
-void XConsole::clearAllBinds(void)
-{
-    binds_.clear();
-}
-
-void XConsole::listbinds(IKeyBindDumpSink* CallBack)
-{
-    for (auto bind : binds_) {
-        CallBack->OnKeyBindFound(bind.first.c_str(), bind.second.c_str());
-    }
-}
 
 ICVar* XConsole::registerString(const char* pName, const char* Value,
     VarFlags Flags, const char* pDesc)
@@ -1455,6 +890,7 @@ void XConsole::exec(const char* pCommand)
     addCmd(pCommand, ExecSource::SYSTEM, false);
 }
 
+
 bool XConsole::loadAndExecConfigFile(const char* pFileName)
 {
     core::Path<char> path;
@@ -1534,85 +970,120 @@ bool XConsole::loadAndExecConfigFile(const char* pFileName)
     return true;
 }
 
-// IXHotReload
-#if X_ENABLE_CONFIG_HOT_RELOAD && 0
-void XConsole::Job_OnFileChange(core::V2::JobSystem& jobSys, const core::Path<char>& name)
+
+void XConsole::addLineToLog(const char* pStr, uint32_t length)
 {
-    X_UNUSED(jobSys);
+    X_UNUSED(length);
 
-    if (!ignoreHotReload_) {
-        core::Path<char> temp(name);
+    decltype(logLock_)::ScopedLock lock(logLock_);
 
-        LoadConfig(temp.fileName());
-    }
+    consoleLog_.emplace(pStr, length);
 
-    ignoreHotReload_ = false;
-}
-#endif // !X_ENABLE_CONFIG_HOT_RELOAD
-// ~IXHotReload
+    const int32_t bufferSize = console_buffer_size;
 
-void XConsole::OnCoreEvent(const CoreEventData& ed)
-{
-    if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
-        renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
-        renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
-    }
-}
+    if (safe_static_cast<int32_t, size_t>(consoleLog_.size()) > bufferSize) {
+        consoleLog_.pop();
 
-void XConsole::configExec(const char* pCommand, const char* pEnd)
-{
-    // if it's from config, should i limit what commands can be used?
-    // for now i'll let any be used
+        // too handle the case we log after render has been shutdown or not init.
+        // really the MaxVisibleLogLines should be updated to not use render interface
+        // and just listen for core events to get size.
+        if (pRender_) {
+            const auto noneScroll = maxVisibleLogLines();
 
-    if (gEnv->isRunning()) {
-        addCmd(pCommand, ExecSource::CONFIG, false);
+            // move scroll wheel with the moving items?
+            if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
+                scrollPos_++;
+            }
+        }
     }
     else {
-        // we run the command now.
-        ExecCommand cmd;
-        cmd.command = core::string(pCommand, pEnd);
-        cmd.source = ExecSource::CONFIG;
-        cmd.silentMode = false;
-
-        executeStringInternal(cmd);
-    }
-}
-
-void XConsole::pageUp(void)
-{
-    const int32_t visibleNum = maxVisibleLogLines();
-    scrollPos_ += visibleNum;
-
-    validateScrollPos();
-}
-
-void XConsole::pageDown(void)
-{
-    const int32_t visibleNum = maxVisibleLogLines();
-    scrollPos_ -= visibleNum;
-
-    validateScrollPos();
-}
-
-void XConsole::validateScrollPos(void)
-{
-    if (scrollPos_ < 0) {
-        scrollPos_ = 0;
-    }
-    else {
-        int32_t logSize = safe_static_cast<int32_t>(consoleLog_.size());
-        const int32_t visibleNum = maxVisibleLogLines();
-
-        logSize -= visibleNum;
-        logSize += 2;
-
-        if (scrollPos_ > logSize) {
-            scrollPos_ = logSize;
+        if (scrollPos_ > 0) {
+            scrollPos_++;
         }
     }
 }
 
-void XConsole::addCmd(const char* pCommand, ExecSource::Enum src, bool silent)
+int32_t XConsole::getLineCount(void) const
+{
+    return safe_static_cast<int32_t, size_t>(consoleLog_.size());
+}
+
+// -------------------------------------------------
+
+ICVar* XConsole::getCVarForRegistration(const char* pName)
+{
+    auto it = varMap_.find(X_CONST_STRING(pName));
+    if (it != varMap_.end()) {
+        // if you get this warning you need to fix it.
+        X_ERROR("Console", "var(%s) is already registerd", pName);
+        return it->second;
+    }
+
+    return nullptr;
+}
+
+void XConsole::registerVar(ICVar* pCVar)
+{
+    auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
+    if (it != configCmds_.end()) {
+        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
+            pCVar->Set(it->second);
+        }
+
+        X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
+    }
+
+    it = varArchive_.find(X_CONST_STRING(pCVar->GetName()));
+    if (it != varArchive_.end()) {
+        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
+            pCVar->Set(it->second);
+        }
+
+        // mark as archive.
+        pCVar->SetFlags(pCVar->GetFlags() | VarFlag::ARCHIVE);
+
+        X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
+    }
+
+    varMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
+}
+
+
+
+void XConsole::displayVarValue(const ICVar* pVar)
+{
+    if (!pVar) {
+        return;
+    }
+
+    core::ICVar::StrBuf strBuf;
+    X_LOG0("Dvar", "^2\"%s\"^7 = ^6%s", pVar->GetName(), pVar->GetString(strBuf));
+}
+
+void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
+{
+    if (!pVar) {
+        return;
+    }
+
+    ICVar::FlagType::Description dsc;
+    core::ICVar::StrBuf strBuf;
+
+    if (fullInfo) {
+        auto min = pVar->GetMin();
+        auto max = pVar->GetMax();
+        X_LOG0("Dvar", "^2\"%s\"^7 = '%s' min: %f max: %f [^1%s^7] Desc: \"%s\"", pVar->GetName(), pVar->GetString(strBuf), min, max,
+            pVar->GetFlags().ToString(dsc), pVar->GetDesc());
+    }
+    else {
+        X_LOG0("Dvar", "^2\"%s\"^7 = %s [^1%s^7]", pVar->GetName(), pVar->GetString(strBuf),
+            pVar->GetFlags().ToString(dsc));
+    }
+}
+
+// -------------------------
+
+X_INLINE void XConsole::addCmd(const char* pCommand, ExecSource::Enum src, bool silent)
 {
     cmds_.emplace(string(pCommand), src, silent);
 }
@@ -1621,6 +1092,7 @@ void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
 {
     cmds_.emplace(command, src, silent);
 }
+
 
 void XConsole::executeStringInternal(const ExecCommand& cmd)
 {
@@ -1656,7 +1128,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
         if (itrCmd != cmdMap_.end()) {
             value.set(range);
             value.trim();
-            ExecuteCommand((itrCmd->second), value);
+            executeCommand((itrCmd->second), value);
             continue;
         }
 
@@ -1713,38 +1185,8 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
     }
 }
 
-void XConsole::displayVarValue(const ICVar* pVar)
-{
-    if (!pVar) {
-        return;
-    }
 
-    core::ICVar::StrBuf strBuf;
-    X_LOG0("Dvar", "^2\"%s\"^7 = ^6%s", pVar->GetName(), pVar->GetString(strBuf));
-}
-
-void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
-{
-    if (!pVar) {
-        return;
-    }
-
-    ICVar::FlagType::Description dsc;
-    core::ICVar::StrBuf strBuf;
-
-    if (fullInfo) {
-        auto min = pVar->GetMin();
-        auto max = pVar->GetMax();
-        X_LOG0("Dvar", "^2\"%s\"^7 = '%s' min: %f max: %f [^1%s^7] Desc: \"%s\"", pVar->GetName(), pVar->GetString(strBuf), min, max,
-            pVar->GetFlags().ToString(dsc), pVar->GetDesc());
-    }
-    else {
-        X_LOG0("Dvar", "^2\"%s\"^7 = %s [^1%s^7]", pVar->GetName(), pVar->GetString(strBuf),
-            pVar->GetFlags().ToString(dsc));
-    }
-}
-
-void XConsole::ExecuteCommand(const ConsoleCommand& cmd,
+void XConsole::executeCommand(const ConsoleCommand& cmd,
     core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const
 {
     str.replace('"', '\'');
@@ -1770,45 +1212,696 @@ void XConsole::ExecuteCommand(const ConsoleCommand& cmd,
     }
 }
 
-/// ------------------------------------------------------
+// ------------------------------------------
 
-ICVar* XConsole::getCVarForRegistration(const char* pName)
+
+void XConsole::configExec(const char* pCommand, const char* pEnd)
 {
-    auto it = varMap_.find(X_CONST_STRING(pName));
-    if (it != varMap_.end()) {
-        // if you get this warning you need to fix it.
-        X_ERROR("Console", "var(%s) is already registerd", pName);
-        return it->second;
+    // if it's from config, should i limit what commands can be used?
+    // for now i'll let any be used
+
+    if (gEnv->isRunning()) {
+        addCmd(pCommand, ExecSource::CONFIG, false);
+    }
+    else {
+        // we run the command now.
+        ExecCommand cmd;
+        cmd.command = core::string(pCommand, pEnd);
+        cmd.source = ExecSource::CONFIG;
+        cmd.silentMode = false;
+
+        executeStringInternal(cmd);
+    }
+}
+
+// ------------------------------------------
+
+
+void XConsole::addInputChar(const char c)
+{
+    const char tidle = '¬';
+
+    if (c == '`' || c == tidle) { // sent twice.
+        return;
+    }
+
+    if (cursorPos_ < safe_static_cast<int32_t, size_t>(inputBuffer_.length())) {
+        inputBuffer_.insert(cursorPos_, c);
+    }
+    else {
+        inputBuffer_ = inputBuffer_ + c;
+    }
+
+    cursorPos_++;
+
+    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
+}
+
+void XConsole::removeInputChar(bool bBackSpace)
+{
+    if (inputBuffer_.isEmpty()) {
+        return;
+    }
+
+    if (bBackSpace) {
+        if (cursorPos_ > 0) {
+            inputBuffer_.erase(cursorPos_ - 1, 1);
+            cursorPos_--;
+        }
+    }
+    else {
+        // ho ho h.
+        X_ASSERT_NOT_IMPLEMENTED();
+    }
+
+    //	X_LOG0("Console Buf", "%s (%i)", inputBuffer_.c_str(), cursorPos_);
+}
+
+void XConsole::clearInputBuffer(void)
+{
+    inputBuffer_ = "";
+    cursorPos_ = 0;
+}
+
+void XConsole::executeInputBuffer(void)
+{
+    if (inputBuffer_.isEmpty()) {
+        return;
+    }
+
+    core::string Temp = inputBuffer_;
+    clearInputBuffer();
+
+    addCmdToHistory(Temp);
+
+    addCmd(Temp, ExecSource::CONSOLE, false);
+}
+
+
+bool XConsole::handleInput(const input::InputEvent& event)
+{
+    // open / close
+    const auto keyReleased = event.action == input::InputState::RELEASED;
+
+    if (keyReleased)
+    {
+        if (event.keyId == input::KeyId::OEM_8)
+        {
+            bool expand = event.modifiers.IsSet(input::ModifiersMasks::Shift);
+            bool visable = isVisable();
+
+            // clear states.
+            gEnv->pInput->clearKeyState();
+
+            if (expand) { // shift + ` dose not close anymore just expands.
+                showConsole(consoleState::EXPANDED);
+            }
+            else {
+                toggleConsole(false); // toggle it.
+            }
+
+            // don't clear if already visable, as we are just expanding.
+            if (!visable) {
+                clearInputBuffer();
+            }
+
+            return true;
+        }
+        else if (event.keyId == input::KeyId::ESCAPE && isVisable())
+        {
+            clearInputBuffer();
+            showConsole(consoleState::CLOSED);
+            return true;
+        }
+    }
+
+#if 0
+    // process key binds when console is hidden
+    if (consoleState_ == consoleState::CLOSED)
+    {
+        const char* pCmdStr = 0;
+
+        if (!event.modifiers.IsAnySet()) {
+            pCmdStr = FindBind(event.name);
+        }
+        else {
+            // build the key.
+            core::StackString<60> bind_name;
+
+            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+                bind_name.append("ctrl ");
+            }
+            if (event.modifiers.IsSet(input::ModifiersMasks::Shift)) {
+                bind_name.append("shift ");
+            }
+            if (event.modifiers.IsSet(input::ModifiersMasks::Alt)) {
+                bind_name.append("alt ");
+            }
+            if (event.modifiers.IsSet(input::ModifiersMasks::Win)) {
+                bind_name.append("win ");
+            }
+
+            bind_name.append(event.name);
+
+            pCmdStr = FindBind(bind_name.c_str());
+        }
+
+        if (pCmdStr) {
+            AddCmd(pCmdStr, ExecSource::CONSOLE, false);
+            return true;
+        }
+    }
+#endif
+
+    if (!isVisable()) {
+        return false;
+    }
+
+    // -- OPEN --
+    if (keyReleased) {
+        repeatEvent_.keyId = input::KeyId::UNKNOWN;
+    }
+
+    if (event.action != input::InputState::PRESSED) 
+    {
+        if (event.deviceType == input::InputDeviceType::KEYBOARD) {
+            return isVisable();
+        }
+
+        // eat mouse move?
+        // Stops the camera moving around when we have console open.
+        if (event.deviceType == input::InputDeviceType::MOUSE) {
+            if (event.keyId != input::KeyId::MOUSE_Z) {
+                if (console_disable_mouse == 1) // only if expanded
+                {
+                    return isExpanded();
+                }
+                if (console_disable_mouse == 2) {
+                    return isVisable();
+                }
+
+                return false;
+            }
+        }
+        else {
+            return false;
+        }
+    }
+
+    if (event.action == input::InputState::PRESSED) {
+        repeatEvent_ = event;
+        repeatEventTimer_ = repeatEventInitialDelay_;
+    }
+
+    if (isExpanded()) // you can only scroll a expanded console.
+    {
+        if (event.keyId == input::KeyId::MOUSE_Z) {
+            int32_t scaled = static_cast<int32_t>(event.value);
+            bool positive = (scaled >= 0);
+
+            scaled /= 20;
+
+            // enuse scaled didnt remove all scrolling
+            if (positive && scaled < 1) {
+                scaled = 1;
+            }
+            else if (!positive && scaled > -1) {
+                scaled = -1;
+            }
+
+            scrollPos_ += scaled;
+
+            validateScrollPos();
+            return true;
+        }
+        else if (event.keyId == input::KeyId::PAGE_UP) {
+            pageUp();
+        }
+        else if (event.keyId == input::KeyId::PAGE_DOWN) {
+            pageDown();
+        }
+    }
+
+  
+    if (event.keyId != input::KeyId::TAB) {
+        //	ResetAutoCompletion();
+    }
+
+    if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+        paste();
+        return false;
+    }
+
+    if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+        copy();
+        return false;
+    }
+
+    return processInput(event);
+}
+
+bool XConsole::handleInputChar(const input::InputEvent& event)
+{
+    if (!isVisable()) {
+        return false;
+    }
+
+    repeatEvent_ = event;
+
+    processInput(event);
+    return true;
+}
+
+
+bool XConsole::processInput(const input::InputEvent& event)
+{
+    using namespace input;
+
+    X_ASSERT(isVisable(), "ProcessInput called when not visible")(isVisable());
+
+    // consume char input.
+    if (event.action == InputState::CHAR) {
+        addInputChar(event.inputchar);
+        return true;
+    }
+
+    if (event.keyId == KeyId::ENTER || event.keyId == KeyId::NUMPAD_ENTER) {
+        if (autoCompleteIdx_ >= 0) {
+            autoCompleteSelect_ = true;
+        }
+        else {
+            executeInputBuffer();
+        }
+        return true;
+    }
+    else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE) {
+        // shift + DEL / BACK fully clears
+        if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
+            clearInputBuffer();
+        }
+        else {
+            removeInputChar(true);
+        }
+        return true;
+    }
+    else if (event.keyId == KeyId::LEFT_ARROW) {
+        if (cursorPos_) { // can we go left?
+            cursorPos_--;
+
+            // support moving whole words
+            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
+                while (cursorPos_ && inputBuffer_[cursorPos_] != ' ') {
+                    cursorPos_--;
+                }
+            }
+
+            // disable blinking while moving.
+            cursor_.curTime = TimeVal(0ll);
+            cursor_.draw = true;
+
+            if (console_cursor_skip_color_codes) {
+                // if we are at a number and ^ is before us go back two more.
+                if (cursorPos_ >= 1) {
+                    const char curChar = inputBuffer_[cursorPos_];
+
+                    if (core::strUtil::IsDigit(curChar)) {
+                        const char PreChar = inputBuffer_[cursorPos_ - 1];
+
+                        if (PreChar == '^') {
+                            cursorPos_--;
+                            if (cursorPos_ > 0) {
+                                cursorPos_--;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return true;
+    }
+    else if (event.keyId == KeyId::RIGHT_ARROW) {
+        // are we pre end ?
+        if (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())) {
+            cursorPos_++;
+
+            // support moving whole words
+            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
+                while (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())
+                       && inputBuffer_[cursorPos_] != ' ') {
+                    cursorPos_++;
+                }
+            }
+
+            // disable blinking while moving.
+            cursor_.curTime = TimeVal(0ll);
+            cursor_.draw = true;
+
+            if (console_cursor_skip_color_codes) {
+                uint32_t charsLeft = (safe_static_cast<int32_t>(inputBuffer_.length()) - cursorPos_);
+                if (charsLeft >= 2) {
+                    const char curChar = inputBuffer_[cursorPos_];
+                    const char nextChar = inputBuffer_[cursorPos_ + 1];
+                    if (curChar == '^' && core::strUtil::IsDigit(nextChar)) {
+                        cursorPos_ += 2;
+                    }
+                }
+            }
+        }
+        else if (autoCompleteIdx_ >= 0) {
+            autoCompleteSelect_ = true;
+        }
+        return true;
+    }
+    else if (event.keyId == KeyId::HOME) {
+        cursorPos_ = 0;
+    }
+    else if (event.keyId == KeyId::END) {
+        cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.length());
+    }
+    else if (event.keyId == KeyId::UP_ARROW) {
+        if (isAutocompleteVis() && autoCompleteIdx_ >= 0) {
+            autoCompleteIdx_ = core::Max(-1, --autoCompleteIdx_);
+        }
+        else {
+            const char* pHistoryLine = getHistory(CmdHistory::UP);
+
+            if (pHistoryLine) {
+                if (console_debug) {
+                    X_LOG0("Cmd history", "%s", pHistoryLine);
+                }
+
+                inputBuffer_ = pHistoryLine;
+                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
+            }
+        }
+        return true;
+    }
+    else if (event.keyId == KeyId::DOWN_ARROW) {
+        bool inHistory = (historyPos_ < static_cast<int32_t>(cmdHistory_.size()));
+        bool multiAutoComplete = autoCompleteNum_ > 1;
+
+        if (isAutocompleteVis() && (!inHistory || multiAutoComplete)) {
+            autoCompleteIdx_ = core::Min(autoCompleteNum_ - 1, ++autoCompleteIdx_);
+
+            // reset history if we move into autocomplete?
+            // i think so..
+            resetHistoryPos();
+        }
+        else {
+            const char* pHistoryLine = getHistory(CmdHistory::DOWN);
+
+            if (pHistoryLine) {
+                if (console_debug) {
+                    X_LOG0("Cmd history", "%s", pHistoryLine);
+                }
+
+                inputBuffer_ = pHistoryLine;
+                cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
+            }
+        }
+        return true;
+    }
+
+    return true;
+}
+
+
+// ----------------------------
+
+
+void XConsole::saveCmdHistory(void) const
+{
+    X_ASSERT_NOT_NULL(gEnv);
+    X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+    core::ByteStream stream(g_coreArena);
+    stream.reserve(0x100);
+
+    for (auto& str : cmdHistory_) {
+        stream.write(str.c_str(), str.length());
+        stream.write("\n", 1);
+    }
+
+    fileModeFlags mode;
+    mode.Set(fileMode::WRITE);
+    mode.Set(fileMode::RECREATE);
+
+    XFileScoped file;
+    if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
+        file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
+    }
+}
+
+void XConsole::loadCmdHistory(bool async)
+{
+    X_ASSERT_NOT_NULL(gEnv);
+    X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+    core::CriticalSection::ScopedLock lock(historyFileLock_);
+
+    if (historyLoadPending_) {
+        return;
+    }
+
+    fileModeFlags mode;
+    mode.Set(fileMode::READ);
+    mode.Set(fileMode::SHARE);
+
+    if (async) {
+        // load the file async
+        historyLoadPending_ = true;
+
+        core::IoRequestOpenRead open;
+        open.callback.Bind<XConsole, &XConsole::historyIoRequestCallback>(this);
+        open.mode = mode;
+        open.path = CMD_HISTORY_FILE_NAME;
+        open.arena = g_coreArena;
+
+        gEnv->pFileSys->AddIoRequestToQue(open);
+    }
+    else {
+        XFileMemScoped file;
+        if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
+            const char* pBegin = file->getBufferStart();
+            const char* pEnd = file->getBufferEnd();
+
+            parseCmdHistory(pBegin, pEnd);
+        }
+    }
+}
+
+
+void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+    core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+    X_UNUSED(fileSys);
+    X_UNUSED(bytesTransferred);
+
+    // history file loaded.
+    X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
+    const core::IoRequestOpenRead* pOpenRead = static_cast<const IoRequestOpenRead*>(pRequest);
+
+    {
+        core::CriticalSection::ScopedLock lock(historyFileLock_);
+
+        historyLoadPending_ = false;
+
+        // if it faild do we care?
+        if (!pFile) {
+            X_LOG2("Console", "Failed to load history file");
+            return;
+        }
+
+        // we can't process it on this thread.
+        // so store it.
+        historyFileBuf_ = core::UniquePointer<const char[]>(pOpenRead->arena, reinterpret_cast<const char*>(pOpenRead->pBuf));
+        historyFileSize_ = pOpenRead->dataSize;
+    }
+
+    historyFileCond_.NotifyAll();
+}
+
+void XConsole::parseCmdHistory(const char* pBegin, const char* pEnd)
+{
+    core::StringTokenizer<char> tokenizer(pBegin, pEnd, '\n');
+    StringRange<char> range(nullptr, nullptr);
+
+    // lets not clear, we can append and just pop off end if too many in total.
+    // CmdHistory_.clear();
+
+    while (tokenizer.extractToken(range)) {
+        if (range.getLength() > 0) {
+            cmdHistory_.emplace(range.getStart(), range.getEnd());
+
+            if (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+                cmdHistory_.pop();
+            }
+        }
+    }
+
+    resetHistoryPos();
+}
+
+
+X_INLINE void XConsole::addCmdToHistory(const char* pCommand)
+{
+    addCmdToHistory(string(pCommand));
+}
+
+void XConsole::addCmdToHistory(const string& command)
+{
+    // make sure it's not same as last command
+    if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
+        cmdHistory_.emplace(command);
+    }
+
+    // limit hte history.
+    while (cmdHistory_.size() > MAX_HISTORY_ENTRIES) {
+        cmdHistory_.pop();
+    }
+
+    resetHistoryPos();
+
+    if (console_save_history) {
+        saveCmdHistory();
+    }
+}
+
+void XConsole::resetHistoryPos(void)
+{
+    historyPos_ = safe_static_cast<int32_t>(cmdHistory_.size());
+}
+
+
+const char* XConsole::getHistory(CmdHistory::Enum direction)
+{
+    if (cmdHistory_.isEmpty()) {
+        return nullptr;
+    }
+
+    if (direction == CmdHistory::UP) {
+
+        if (historyPos_ <= 0) {
+            return nullptr;
+        }
+
+        historyPos_--;
+
+        refString_ = cmdHistory_[historyPos_];
+        return refString_.c_str();
+    }
+    else // down
+    {
+        // are we above base cmd?
+        if (historyPos_ < safe_static_cast<int32_t>(cmdHistory_.size()) - 1) {
+            historyPos_++;
+
+            // adds a refrence to the string.
+            refString_ = cmdHistory_[historyPos_];
+            return refString_.c_str();
+        }
     }
 
     return nullptr;
 }
 
-void XConsole::registerVar(ICVar* pCVar)
+// --------------------------------
+
+// Binds a cmd to a key
+void XConsole::addBind(const char* pKey, const char* pCmd)
 {
-    auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
-    if (it != configCmds_.end()) {
-        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
-            pCVar->Set(it->second);
+    // check for override ?
+    const char* Old = findBind(pKey);
+
+    if (Old) {
+        if (core::strUtil::IsEqual(Old, pCmd)) {
+            // bind is same.
+            return;
+        }
+        if (console_debug) {
+            X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, Old, pCmd);
         }
 
-        X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
+        auto it = binds_.find(X_CONST_STRING(pKey));
+        it->second = pCmd;
     }
 
-    it = varArchive_.find(X_CONST_STRING(pCVar->GetName()));
-    if (it != varArchive_.end()) {
-        if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
-            pCVar->Set(it->second);
-        }
-
-        // mark as archive.
-        pCVar->SetFlags(pCVar->GetFlags() | VarFlag::ARCHIVE);
-
-        X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
-    }
-
-    varMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
+    binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
 }
+
+// returns the command for a given key
+// returns null if no bind found
+const char* XConsole::findBind(const char* key)
+{
+    auto it = binds_.find(X_CONST_STRING(key));
+    if (it != binds_.end()) {
+        return it->second.c_str();
+    }
+    return nullptr;
+}
+
+// removes all the binds.
+void XConsole::clearAllBinds(void)
+{
+    binds_.clear();
+}
+
+void XConsole::listbinds(IKeyBindDumpSink* CallBack)
+{
+    for (auto bind : binds_) {
+        CallBack->OnKeyBindFound(bind.first.c_str(), bind.second.c_str());
+    }
+}
+
+
+// --------------------------------------
+
+void XConsole::OnCoreEvent(const CoreEventData& ed)
+{
+    if (ed.event == CoreEvent::RENDER_RES_CHANGED) {
+        renderRes_.x = static_cast<int32_t>(ed.renderRes.width);
+        renderRes_.y = static_cast<int32_t>(ed.renderRes.height);
+    }
+}
+
+void XConsole::pageUp(void)
+{
+    const int32_t visibleNum = maxVisibleLogLines();
+    scrollPos_ += visibleNum;
+
+    validateScrollPos();
+}
+
+void XConsole::pageDown(void)
+{
+    const int32_t visibleNum = maxVisibleLogLines();
+    scrollPos_ -= visibleNum;
+
+    validateScrollPos();
+}
+
+void XConsole::validateScrollPos(void)
+{
+    if (scrollPos_ < 0) {
+        scrollPos_ = 0;
+    }
+    else {
+        int32_t logSize = safe_static_cast<int32_t>(consoleLog_.size());
+        const int32_t visibleNum = maxVisibleLogLines();
+
+        logSize -= visibleNum;
+        logSize += 2;
+
+        if (scrollPos_ > logSize) {
+            scrollPos_ = logSize;
+        }
+    }
+}
+
+
+
+/// ------------------------------------------------------
+
 
 void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 {
@@ -1829,31 +1922,6 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
             repeatEventTimer_ = repeatEventInterval_;
         }
     }
-}
-
-void XConsole::runCmds(void)
-{
-    while (cmds_.isNotEmpty()) {
-        executeStringInternal(cmds_.peek());
-        cmds_.pop();
-    }
-}
-
-void XConsole::draw(core::FrameTimeData& time)
-{
-    cursor_.curTime += time.unscaledDeltas[ITimer::Timer::UI];
-
-    if (cursor_.curTime > cursor_.displayTime) {
-        cursor_.draw = !cursor_.draw;   // toggle it
-        cursor_.curTime = TimeVal(0ll); // reset
-    }
-
-    drawBuffer();
-}
-
-consoleState::Enum XConsole::getVisState(void) const
-{
-    return consoleState_;
 }
 
 int32_t XConsole::maxVisibleLogLines(void) const
@@ -2466,43 +2534,6 @@ void XConsole::resetAutoCompletion(void)
     autoCompleteSelect_ = false;
 }
 
-void XConsole::addLineToLog(const char* pStr, uint32_t length)
-{
-    X_UNUSED(length);
-
-    decltype(logLock_)::ScopedLock lock(logLock_);
-
-    consoleLog_.emplace(pStr, length);
-
-    const int32_t bufferSize = console_buffer_size;
-
-    if (safe_static_cast<int32_t, size_t>(consoleLog_.size()) > bufferSize) {
-        consoleLog_.pop();
-
-        // too handle the case we log after render has been shutdown or not init.
-        // really the MaxVisibleLogLines should be updated to not use render interface
-        // and just listen for core events to get size.
-        if (pRender_) {
-            const auto noneScroll = maxVisibleLogLines();
-
-            // move scroll wheel with the moving items?
-            if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
-                scrollPos_++;
-            }
-        }
-    }
-    else {
-        if (scrollPos_ > 0) {
-            scrollPos_++;
-        }
-    }
-}
-
-int32_t XConsole::getLineCount(void) const
-{
-    return safe_static_cast<int32_t, size_t>(consoleLog_.size());
-}
-
 ///////////////////////////////////////////////////////////
 
 void XConsole::listCommands(const char* pSearchPatten)
@@ -2609,24 +2640,7 @@ void XConsole::paste(void)
 
 // ==================================================================
 
-bool XConsole::cvarModifyBegin(ICVar* pCVar, ExecSource::Enum source)
-{
-    X_ASSERT_NOT_NULL(pCVar);
 
-    ICVar::FlagType flags = pCVar->GetFlags();
-
-    if (flags.IsSet(VarFlag::READONLY)) {
-        X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
-        return false;
-    }
-
-    if (source == ExecSource::CONFIG) {
-        flags.Set(VarFlag::CONFIG);
-        pCVar->SetFlags(flags);
-    }
-
-    return true;
-}
 
 // ==================================================================
 
