@@ -11,6 +11,41 @@ X_NAMESPACE_BEGIN(engine)
 
 namespace gui
 {
+    namespace
+    {
+        core::Hash::Fnv1aVal idHash(const char* pBegin, const char* pEnd)
+        {
+            return core::Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pEnd - pBegin));
+        }
+
+        core::Hash::Fnv1aVal idHash(const char* pBegin, const char* pEnd, core::Hash::Fnv1aVal seed)
+        {
+            return core::Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pEnd - pBegin), seed);
+        }
+
+    } // namespace
+
+
+    GuiContex::Window::Window(const char* pName)
+    {
+        name.set(pName);
+        ID = idHash(name.begin(), name.end());
+        // push window ID so id's will be unique per window.
+        IDStack.push(ID);
+    }
+
+    GuiContex::ItemID GuiContex::Window::getID(const char* pLabel)
+    {
+        return getID(pLabel, pLabel + core::strUtil::strlen(pLabel));
+    }
+
+    GuiContex::ItemID GuiContex::Window::getID(const char* pBegin, const char* pEnd)
+    {
+        auto seed = IDStack.top();
+
+        return idHash(pBegin, pBegin + safe_static_cast<size_t>(pEnd - pBegin), seed);
+    }
+
 
     GuiContex::GuiContex() :
         pPrim_(nullptr),
@@ -43,6 +78,8 @@ namespace gui
 
         style_.chkBoxCol = Color8u(255, 255, 255, 255);
         style_.chkBoxFillCol = Color8u(255, 255, 255, 255);
+
+        currentFrame_ = 0;
     }
 
     void GuiContex::init(engine::Material* pCursor, engine::Material* pSpinner)
@@ -85,20 +122,33 @@ namespace gui
 
     }
 
-    void GuiContex::begin(Params& params)
+    void GuiContex::beginFrame(Params& params)
     {
         hoveredId_ = INVALID_ITEM_ID;
 
         rect_ = params.rect;
         cursorPos_ = params.cursorPos;
 
-
         dc_.currentPos = Vec2f((rect_.getWidth() * 0.1f), 400.f);
         dc_.lastItemID = INVALID_ITEM_ID;
         dc_.lastItemRect = Rectf();
+
+        nextWindowData_.posVal = Vec2f(rect_.x1, rect_.y1);
+        nextWindowData_.sizeVal = Vec2f(rect_.getWidth(), rect_.getHeight());
+
+        // mark not visible
+        for (auto* pWindow : windows_) {
+            pWindow->active = false;
+        }
+
+        // clear current each frame.
+        currentWindowStack_.clear();
+        currentPopupStack_.clear();
+
+        currentFrame_++;
     }
 
-    void GuiContex::end(void)
+    void GuiContex::endFrame(void)
     {
         pPrim_->drawQuad(cursorPos_.x, cursorPos_.y, 32.f, 32.f, pCursor_, Col_White);
 
@@ -107,6 +157,49 @@ namespace gui
         }
     }
 
+    void GuiContex::begin(const char* pName, WindowFlags flags)
+    {
+        Window* pWindow = findWindow(pName);
+        if (!pWindow) {
+            pWindow = createWindow(pName, flags);
+        }
+
+        currentWindowStack_.push(pWindow);
+
+        setCurrentWindow(pWindow);
+
+        if (flags.IsSet(WindowFlag::Popup))
+        {
+            PopupRef& ref = openPopupStack_.top();
+            ref.pWindow = pWindow;
+            currentPopupStack_.push(ref);
+        }
+
+        bool justActive = pWindow->lastactiveFrame != currentFrame_;
+
+        if (justActive)
+        {
+            pWindow->active = true;
+            pWindow->lastactiveFrame = currentFrame_;
+        }
+
+        pWindow->pos = nextWindowData_.posVal;
+        pWindow->size = nextWindowData_.sizeVal;
+
+    }
+
+    void GuiContex::end(void)
+    {
+        auto* pWindow = pCurrentWindow;
+
+        currentWindowStack_.pop();
+
+        if (pWindow->flags.IsSet(WindowFlag::Popup)) {
+            currentPopupStack_.pop();
+        }
+
+        setCurrentWindow(currentWindowStack_.isEmpty() ? nullptr : currentWindowStack_.top());
+    }
 
     void GuiContex::setFont(font::IFont* pFont)
     {
@@ -163,32 +256,8 @@ namespace gui
 
         addItem(r, id);
 
-        bool hovered = itemHoverable(id, r);
-        if (hovered)
-        {
-            if (mouseDown_[Mouse::LEFT])
-            {
-                setActiveID(id);
-            }
-        }
-
-        bool held = false;
-        bool pressed = false;
-
-        if (id == activeId_)
-        {
-            if (mouseDown_[Mouse::LEFT])
-            {
-                held = true;
-            }
-            else
-            {
-                if (hovered) {
-                    pressed = true;
-                }
-                clearActiveID();
-            }
-        }
+        bool hovered, held;
+        bool pressed = buttonBehavior(id, r, &hovered, &held);
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
         auto btnCol = style_.btnCol;
@@ -367,39 +436,15 @@ namespace gui
 
         addItem(r, id);
 
-        bool hovered = itemHoverable(id, r);
-        if (hovered)
+        bool hovered, held;
+        bool pressed = buttonBehavior(id, r, &hovered, &held);
+
+        if (pressed)
         {
-            if (mouseDown_[Mouse::LEFT])
-            {
-                if (r.contains(cursorPos_))
-                {
-                    setActiveID(id);
-                }
-            }
-        }
+            value = math<int>::clamp(value);
+            value = !value;
 
-        bool held = false;
-
-        if (id == activeId_)
-        {
-            if (!mouseDown_[Mouse::LEFT])
-            {
-                // toggle.
-                if (hovered)
-                {
-                    value = math<int>::clamp(value);
-                    value = !value;
-
-                    pVar->Set(value);
-                }
-
-                clearActiveID();
-            }
-            else
-            {
-                held = true;
-            }
+            pVar->Set(value);
         }
 
         auto boxSize = 20.f;
@@ -434,6 +479,101 @@ namespace gui
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
         pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
+    }
+
+    bool GuiContex::combo(const char* pLabel, core::span<const char*> items, int32_t& currentIdx)
+    {
+        const char* pPreviewValue = nullptr;
+
+        if (currentIdx >= 0) {
+            pPreviewValue = items[currentIdx];
+        }
+
+        if (!comboBegin(pLabel, pPreviewValue)) {
+            return false;
+        }
+
+        bool changed = false;
+
+        for (int32_t i = 0; i < items.size(); i++)
+        {
+            pushID(i);
+
+            const bool selected = (i == currentIdx);
+            const char* pItemText = items[i];
+
+            if (selectable(pItemText, selected))
+            {
+                changed = true;
+                currentIdx = i;
+            }
+
+            popID();
+        }
+
+        comboEnd();
+        return changed;
+    }
+
+    bool GuiContex::comboBegin(const char* pLabel, const char* pPreviewValue)
+    {
+        auto* pLabelEnd = pLabel + core::strUtil::strlen(pLabel);
+
+        auto id = getID(pLabel, pLabelEnd);
+        auto labelSize = calcTextSize(pLabel, pLabelEnd);
+
+        // calculate pos / size
+        auto pos = dc_.currentPos;
+        auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
+
+        const float arrowSize = size.y;
+
+        Rectf r(pos, pos + size);
+
+        addItem(r, id);
+
+        bool hovered, held;
+        bool pressed = buttonBehavior(id, r, &hovered, &held);
+
+        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
+
+        pPrim_->drawQuad(r, style_.btnCol);
+        pPrim_->drawRect(r, borderCol);
+
+        if (pPreviewValue) {
+            pPrim_->drawText(Vec3f(r.getCenter()), txtCtx_, pPreviewValue);
+        }
+
+        bool popupOpen = isPopupOpen(id);
+        if (pressed && !popupOpen) {
+            openPopUp(id);
+        }
+
+        if (!popupOpen) {
+            return false;
+        }
+
+        begin("Meow", WindowFlag::Popup);
+
+        return true;
+    }
+
+    void GuiContex::comboEnd(void)
+    {
+        endPopUp();
+    }
+
+    bool GuiContex::selectable(const char* pLabel, bool selected)
+    {
+        X_UNUSED(pLabel, selected);
+
+        auto* pWindow = pCurrentWindow;
+
+        auto id = pWindow->getID(pLabel);
+
+        id = 0;
+
+        return false;
     }
 
     void GuiContex::pacifier(float dt)
@@ -526,10 +666,116 @@ namespace gui
         return true;
     }
 
+    bool GuiContex::buttonBehavior(ItemID id, const Rectf& r, bool* pHovered, bool* pHeld)
+    {
+        bool hovered = itemHoverable(id, r);
+
+        // Mouse
+        if (hovered)
+        {
+            if (mouseDown_[Mouse::LEFT])
+            {
+                if (r.contains(cursorPos_))
+                {
+                    setActiveID(id);
+                }
+            }
+        }
+
+        bool pressed = false;
+        bool held = false;
+
+        if (id == activeId_)
+        {
+            if (!mouseDown_[Mouse::LEFT])
+            {
+                if (hovered)
+                {
+                    pressed = true;
+                }
+
+                clearActiveID();
+            }
+            else
+            {
+                held = true;
+            }
+        }
+
+        if (pHovered) {
+            *pHovered = hovered;
+        }
+
+        if (pHeld) {
+            *pHeld = held;
+        }
+
+        return pressed;
+    }
+
+    bool GuiContex::isPopupOpen(ItemID id) const
+    {
+        return !openPopupStack_.isEmpty() && openPopupStack_.top().popupId == id;
+    }
+
+    void GuiContex::openPopUp(ItemID id)
+    {
+        PopupRef popup; 
+        popup.popupId = id;
+     //   popup.OpenParentId = parent_window->IDStack.back();
+     //   popup.OpenMousePos = g.IO.MousePos;
+     //   popup.OpenPopupPos = NavCalcPreferredRefPos();
+
+        openPopupStack_.push(popup);
+    }
+
+    void GuiContex::endPopUp(void)
+    {
+        end();
+    }
+
+    GuiContex::Window* GuiContex::findWindow(const char* pName) const
+    {
+        auto id = getID(pName);
+
+        for (auto* pWindow : windows_) {
+            if (pWindow->ID == id) {
+                return pWindow;
+            }
+        }
+
+        return nullptr;
+    }
+
+    GuiContex::Window* GuiContex::createWindow(const char* pName, WindowFlags flags)
+    {
+        Window* pWindow = X_NEW(Window, g_3dEngineArena, "UIWindow")(pName);
+
+        pWindow->flags = flags;
+
+        windows_.push_back(pWindow);
+
+        return pWindow;
+    }
+
+    void GuiContex::setCurrentWindow(Window* pWindow)
+    {
+        pCurrentWindow = pWindow;
+    }
 
     void GuiContex::setActiveID(ItemID id)
     {
         activeId_ = id;
+    }
+
+    void GuiContex::pushID(ItemID id)
+    {
+        pCurrentWindow->IDStack.push(id);
+    }
+
+    void GuiContex::popID(void)
+    {
+        pCurrentWindow->IDStack.pop();
     }
 
     void GuiContex::clearActiveID(void)
@@ -539,12 +785,12 @@ namespace gui
 
     GuiContex::ItemID GuiContex::getID(const char* pLabel)
     {
-        return core::Hash::Fnv1Hash(pLabel, core::strUtil::strlen(pLabel));
+        return getID(pLabel, pLabel + core::strUtil::strlen(pLabel));
     }
 
     GuiContex::ItemID GuiContex::getID(const char* pBegin, const char* pEnd)
     {
-        return core::Hash::Fnv1Hash(pBegin, safe_static_cast<size_t>(pEnd - pBegin));
+        return idHash(pBegin, pEnd);
     }
 
 

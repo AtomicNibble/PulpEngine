@@ -85,6 +85,7 @@ namespace gui
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
         X_SCRIPT_BIND(ScriptBinds_Menu, checkboxVar);
+        X_SCRIPT_BIND(ScriptBinds_Menu, combo);
 
         // center based on item width.
         X_SCRIPT_BIND(ScriptBinds_Menu, center);
@@ -214,6 +215,16 @@ namespace gui
         pH->getParam(2, pVarName);
 
         ctx_.checkbox(pLabel, pVarName);
+
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::combo(script::IFunctionHandler* pH)
+    {
+        const char* pTest[] = {"goat", "boat", "pickle"};
+        int32_t currentIdx = 0;
+
+        ctx_.combo("Meow", pTest, currentIdx);
 
         return pH->endFunction();
     }

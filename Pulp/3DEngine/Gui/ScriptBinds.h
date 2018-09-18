@@ -32,6 +32,7 @@ namespace gui
         int32_t button(script::IFunctionHandler* pH);
         int32_t sliderVar(script::IFunctionHandler* pH);
         int32_t checkboxVar(script::IFunctionHandler* pH);
+        int32_t combo(script::IFunctionHandler* pH);
 
         int32_t center(script::IFunctionHandler* pH);
 

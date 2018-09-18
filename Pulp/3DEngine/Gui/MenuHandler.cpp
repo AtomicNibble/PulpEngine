@@ -43,7 +43,7 @@ namespace gui
         ctx_.setPrimContet(pPrim);
         ctx_.setFont(gEnv->pFontSys->getDefault());
         ctx_.processInput(frame.input);
-        ctx_.begin(p);
+        ctx_.beginFrame(p);
 
         man_.setActiveHandler(this);
 
@@ -62,14 +62,18 @@ namespace gui
                 pActiveMenu_ = pMenu;
             }
 
+            ctx_.begin("Base", GuiContex::WindowFlags());
+
             pMenu->draw(frame);
+
+            ctx_.end();
         }
 
 #if X_SUPER == 0
         man_.setActiveHandler(nullptr);
 #endif // !X_SUPER
 
-        ctx_.end();
+        ctx_.endFrame();
     }
 
     bool MenuHandler::openMenu(const char* pName)

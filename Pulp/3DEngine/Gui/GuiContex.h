@@ -62,6 +62,57 @@ namespace gui
             Color8u chkBoxFillCol;
         };
 
+        X_DECLARE_FLAGS(WindowFlag)(
+           Popup
+        );
+
+        typedef Flags<WindowFlag> WindowFlags;
+
+        struct NextWindowData
+        {
+            Vec2f posVal;
+            Vec2f sizeVal;
+        };
+
+        struct Window
+        {
+            typedef core::FixedStack<ItemID, 32> ItemIDStack;
+
+        public:
+            Window(const char* pName);
+
+            ItemID getID(const char* pLabel);
+            ItemID getID(const char* pBegin, const char* pEnd);
+
+        public:
+            core::StackString<32, char> name;
+            ItemID ID;
+            WindowFlags flags;
+            bool active;
+
+            int32_t lastactiveFrame;
+
+            Vec2f pos;
+            Vec2f size;
+
+            ItemIDStack IDStack;
+        };
+
+        struct PopupRef
+        {
+            ItemID popupId;
+            ItemID openParentId;
+            Window* pWindow;
+            Vec2f openPopupPos;
+            Vec2f openMousePos;
+        };
+
+        typedef core::FixedStack<Window*, 4> WindowPtrStack;
+        typedef core::FixedArray<Window*, 4> WindowPtrArr;
+
+        typedef core::FixedStack<PopupRef, 4> PopupRefStack;
+        typedef core::FixedArray<PopupRef, 4> PopupRefArr;
+
     public:
         GuiContex();
 
@@ -70,7 +121,10 @@ namespace gui
 
         void processInput(core::FrameInput& input);
 
-        void begin(Params& params);
+        void beginFrame(Params& params);
+        void endFrame(void);
+
+        void begin(const char* pName, WindowFlags flags);
         void end(void);
 
         void setFont(font::IFont* pFont);
@@ -96,6 +150,14 @@ namespace gui
         // checkbox
         void checkbox(const char* pLabel, const char* pVarName);
 
+        // combo - (return true if changed)
+        bool combo(const char* pLabel, core::span<const char*> items, int32_t& currentIdx);
+        bool comboBegin(const char* pLabel, const char* pPreviewValue);
+        void comboEnd(void);
+
+        // selectables
+        bool selectable(const char* pLabel, bool selected);
+
         // who's a good baby?
         void pacifier(float dt);
 
@@ -107,9 +169,21 @@ namespace gui
         void addItem(const Rectf& r, ItemID id);
 
         bool itemHoverable(ItemID id, const Rectf& r);
+        bool buttonBehavior(ItemID id, const Rectf& r, bool* pHovered, bool* pHeld);
+
+        bool isPopupOpen(ItemID id) const;
+        void openPopUp(ItemID id);
+        void endPopUp(void);
+
+        Window* findWindow(const char* pName) const;
+        Window* createWindow(const char* pName, WindowFlags flags);
+        void setCurrentWindow(Window* pWindow);
 
         void setActiveID(ItemID id);
         void clearActiveID(void);
+
+        void pushID(ItemID id);
+        void popID(void);
 
         static ItemID getID(const char* pLabel);
         static ItemID getID(const char* pBegin, const char* pEnd);
@@ -121,6 +195,8 @@ namespace gui
 
         DrawCtx dc_;
         Style style_;
+
+        int32_t currentFrame_;
 
         MouseDownArr mouseDown_;
 
@@ -134,6 +210,17 @@ namespace gui
         float itemWidthDefault_;
         float itemWidth_;
         ItemWidthStack itemWidthStack_;
+
+        // window
+        NextWindowData nextWindowData_;
+
+        WindowPtrArr windows_;
+        WindowPtrStack currentWindowStack_;
+        Window* pCurrentWindow;
+
+        // popup
+        PopupRefStack openPopupStack_;
+        PopupRefStack currentPopupStack_;
 
         engine::Material* pCursor_;
         engine::Material* pSpinner_;
