@@ -13,9 +13,14 @@ namespace Hash
 
     Fnv1aVal Fnv1aHash(const void* key, size_t length)
     {
+        return Fnv1aHash(key, length, FNV1_32_INIT);
+    }
+
+    X_INLINE Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed)
+    {
         uint32_t i;
-        uint32_t hash = FNV1_32_INIT;
-        unsigned char* s = (unsigned char*)key;
+        Fnv1aVal hash = seed;
+        auto* s = reinterpret_cast<const uint8_t*>(key);
 
         for (i = 0; i < length; ++i) {
             hash ^= (uint32_t)*s++;
@@ -27,9 +32,14 @@ namespace Hash
 
     Fnv1Val Fnv1Hash(const void* key, size_t length)
     {
+        return Fnv1Hash(key, length, FNV1_32_INIT);
+    }
+
+    X_INLINE Fnv1Val Fnv1Hash(const void* key, size_t length, Fnv1Val seed)
+    {
         uint32_t i;
-        uint32_t hash = FNV1_32_INIT;
-        unsigned char* s = (unsigned char*)key;
+        Fnv1Val hash = seed;
+        auto* s = reinterpret_cast<const uint8_t*>(key);
 
         for (i = 0; i < length; ++i) {
             hash *= FNV_32_PRIME;
@@ -44,9 +54,14 @@ namespace Hash
 
     Fnv1a64Val Fnv1a64Hash(const void* key, size_t length)
     {
+        return Fnv1a64Hash(key, length, FNV1_64_INIT);
+    }
+
+    Fnv1a64Val Fnv1a64Hash(const void* key, size_t length, Fnv1a64Val seed)
+    {
         size_t i;
-        uint64_t hash = FNV1_64_INIT;
-        unsigned char* s = (unsigned char*)key;
+        Fnv1a64Val hash = seed;
+        auto* s = reinterpret_cast<const uint8_t*>(key);
 
         for (i = 0; i < length; ++i) {
             hash ^= (uint64_t)*s++;
@@ -58,9 +73,14 @@ namespace Hash
 
     Fnv164Val Fnv164Hash(const void* key, size_t length)
     {
+        return Fnv164Hash(key, length, FNV1_64_INIT);
+    }
+
+    Fnv164Val Fnv164Hash(const void* key, size_t length, Fnv164Val seed)
+    {
         size_t i;
-        uint64_t hash = FNV1_64_INIT;
-        unsigned char* s = (unsigned char*)key;
+        Fnv164Val hash = seed;
+        auto* s = reinterpret_cast<const uint8_t*>(key);
 
         for (i = 0; i < length; ++i) {
             hash *= FNV_64_PRIME;

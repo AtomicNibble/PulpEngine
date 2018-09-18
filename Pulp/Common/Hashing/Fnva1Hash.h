@@ -13,13 +13,17 @@ namespace Hash
     typedef uint32_t Fnv1aVal;
 
     Fnv1Val Fnv1Hash(const void* key, size_t length);
+    Fnv1Val Fnv1Hash(const void* key, size_t length, Fnv1Val seed);
     Fnv1aVal Fnv1aHash(const void* key, size_t length);
+    Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed);
 
     typedef uint64_t Fnv164Val;
     typedef uint64_t Fnv1a64Val;
     
     Fnv164Val Fnv164Hash(const void* key, size_t length);
+    Fnv164Val Fnv164Hash(const void* key, size_t length, Fnv164Val seed);
     Fnv1a64Val Fnv1a64Hash(const void* key, size_t length);
+    Fnv1a64Val Fnv1a64Hash(const void* key, size_t length, Fnv1a64Val seed);
 
     // need to organise this a bit better.
     // ideally I don't want these to be used at runtime.
