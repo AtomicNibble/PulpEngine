@@ -80,6 +80,8 @@ public:
     X_INLINE void drawQuad(float x, float y, float width, float height, Color8u col);
     X_INLINE void drawQuad(float x, float y, float width, float height, Color8u col, Color8u borderCol);
     X_INLINE void drawQuad(Vec2<float> pos, float width, float height, Color8u col);
+    X_INLINE void drawQuad(Vec2<float> pos, Vec2<float> size, Color8u col);
+
     // draw a quad in 3d z is position not depth.
     void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
     void drawQuad(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Material* pMaterial, Color8u col);

@@ -62,6 +62,11 @@ X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, float width, float he
     drawQuad(pos.x, pos.y, width, height, col);
 }
 
+X_INLINE void IPrimativeContext::drawQuad(Vec2<float> pos, Vec2<float> size, Color8u col)
+{
+    drawQuad(pos.x, pos.y, size.x, size.y, col);
+}
+
 // Line
 X_INLINE void IPrimativeContext::drawLine(const Vec3f& pos1, const Vec3f& pos2)
 {
