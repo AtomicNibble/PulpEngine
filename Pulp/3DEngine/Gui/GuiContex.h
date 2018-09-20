@@ -40,7 +40,9 @@ namespace gui
 
         struct DrawCtx
         {
+            Vec2f indent;
             Vec2f currentPos;
+            Vec2f currentPosStart;
 
             ItemID lastItemID;
             Rectf lastItemRect;
@@ -50,6 +52,7 @@ namespace gui
         {
             Vec2f framePadding;
             Vec2f itemSpacing;
+            Vec2f windowPadding;
 
             Color8u btnCol;
             Color8u btnHover;
@@ -79,23 +82,26 @@ namespace gui
             typedef core::FixedStack<ItemID, 32> ItemIDStack;
 
         public:
-            Window(const char* pName);
+            Window(PrimativeContext* pPrim, const char* pName);
 
             ItemID getID(const char* pLabel);
             ItemID getID(const char* pBegin, const char* pEnd);
 
         public:
+            PrimativeContext* pPrim;
             core::StackString<32, char> name;
             ItemID ID;
             WindowFlags flags;
             bool active;
 
-            int32_t lastactiveFrame;
+            int32_t lastActiveFrame;
 
             Vec2f pos;
             Vec2f size;
 
             ItemIDStack IDStack;
+
+            DrawCtx dc;
         };
 
         struct PopupRef
@@ -123,6 +129,9 @@ namespace gui
 
         void beginFrame(Params& params);
         void endFrame(void);
+
+        X_INLINE void setNextWindowPos(const Vec2f& pos);
+        X_INLINE void setNextWindowSize(const Vec2f& size);
 
         void begin(const char* pName, WindowFlags flags);
         void end(void);
@@ -190,21 +199,20 @@ namespace gui
 
     private:
         PrimativeContext* pPrim_;
-        Rectf rect_;
+        Rectf screenRect_;
         font::TextDrawContext txtCtx_;
 
-        DrawCtx dc_;
         Style style_;
 
         int32_t currentFrame_;
 
         MouseDownArr mouseDown_;
 
-        ItemID activeId_;
-        ItemID hoveredId_;
-
         Vec2f cursorPos_;
         Vec2f cursorDelta_;
+
+        ItemID activeId_;
+        ItemID hoveredId_;
 
         // items widths.
         float itemWidthDefault_;
@@ -226,6 +234,16 @@ namespace gui
         engine::Material* pSpinner_;
     };
 
+
+    X_INLINE void GuiContex::setNextWindowPos(const Vec2f& pos)
+    {
+        nextWindowData_.posVal = pos;
+    }
+
+    X_INLINE void GuiContex::setNextWindowSize(const Vec2f& size)
+    {
+        nextWindowData_.sizeVal = size;
+    }
 
 } // namespace gui
 

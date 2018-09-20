@@ -31,9 +31,12 @@ namespace gui
     } // namespace
 
 
-    GuiContex::Window::Window(const char* pName)
+    GuiContex::Window::Window(PrimativeContext* pPrim, const char* pName) :
+        pPrim(pPrim),
+        name(pName),
+        lastActiveFrame(0),
+        active(false)
     {
-        name.set(pName);
         ID = idHash(name.begin(), name.end());
         // push window ID so id's will be unique per window.
         IDStack.push(ID);
@@ -131,15 +134,11 @@ namespace gui
     {
         hoveredId_ = INVALID_ITEM_ID;
 
-        rect_ = params.rect;
+        screenRect_ = params.rect;
         cursorPos_ = params.cursorPos;
 
-        dc_.currentPos = Vec2f((rect_.getWidth() * 0.1f), 400.f);
-        dc_.lastItemID = INVALID_ITEM_ID;
-        dc_.lastItemRect = Rectf();
-
-        nextWindowData_.posVal = Vec2f(rect_.x1, rect_.y1);
-        nextWindowData_.sizeVal = Vec2f(rect_.getWidth(), rect_.getHeight());
+        nextWindowData_.posVal = Vec2f(screenRect_.x1, screenRect_.y1);
+        nextWindowData_.sizeVal = Vec2f(screenRect_.getWidth(), screenRect_.getHeight());
 
         // mark not visible
         for (auto* pWindow : windows_) {
@@ -180,17 +179,30 @@ namespace gui
             currentPopupStack_.push(ref);
         }
 
-        bool justActive = pWindow->lastactiveFrame != currentFrame_;
+        bool justActive = pWindow->lastActiveFrame != currentFrame_;
 
         if (justActive)
         {
             pWindow->active = true;
-            pWindow->lastactiveFrame = currentFrame_;
+            pWindow->lastActiveFrame = currentFrame_;
         }
 
         pWindow->pos = nextWindowData_.posVal;
         pWindow->size = nextWindowData_.sizeVal;
 
+        pWindow->IDStack.clear();
+        pWindow->IDStack.push(pWindow->ID);
+
+        auto& dc = pWindow->dc;
+
+        dc.indent.x = style_.windowPadding.x;
+        dc.currentPosStart = pWindow->pos + Vec2f(dc.indent.x, style_.windowPadding.y);
+        dc.currentPos = dc.currentPosStart;
+        dc.lastItemID = INVALID_ITEM_ID;
+        dc.lastItemRect = Rectf();
+
+        // fill(Col_Deeppink);
+        pWindow->pPrim->drawQuad(pWindow->pos, pWindow->size, Col_Deeppink);
     }
 
     void GuiContex::end(void)
@@ -213,17 +225,19 @@ namespace gui
 
     void GuiContex::fill(Color8u col)
     {
-        pPrim_->drawQuad(rect_, col);
+        pPrim_->drawQuad(screenRect_, col);
     }
 
     void GuiContex::center(void)
     {
-        auto center = rect_.getWidth() * 0.5f;
+        auto* pWindow = pCurrentWindow;
+
+        auto center = screenRect_.getCenter() * 0.5f;
+
         auto offset = itemWidth_ * 0.5f;
 
-        auto x = center - offset;
-
-        dc_.currentPos.x = x;
+        pWindow->dc.currentPos = screenRect_.getCenter();
+        pWindow->dc.currentPos.x -= offset;
     }
 
     void GuiContex::pushItemWidth(float width)
@@ -250,11 +264,14 @@ namespace gui
 
     bool GuiContex::button(const char* pText, const char* pEnd)
     {
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
         auto id = getID(pText, pEnd);
         auto labelSize = calcTextSize(pText, pEnd);
 
         // calculate pos / size
-        auto pos = dc_.currentPos;
+        auto pos = pWindow->dc.currentPos;
         auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
 
         Rectf r(pos, pos + size);
@@ -274,15 +291,18 @@ namespace gui
             btnCol = style_.btnHover;
         }
 
-        pPrim_->drawQuad(r, btnCol);
-        pPrim_->drawRect(r, borderCol);
-        pPrim_->drawText(Vec3f(r.getCenter()), txtCtx_, pText);
+        pPrim->drawQuad(r, btnCol);
+        pPrim->drawRect(r, borderCol);
+        pPrim->drawText(Vec3f(r.getCenter()), txtCtx_, pText);
 
         return pressed;
     }
 
     void GuiContex::text(const char* pText, const char* pEnd, Color8u col)
     {
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
         auto oldCol = txtCtx_.col;
         txtCtx_.col = col;
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
@@ -291,14 +311,14 @@ namespace gui
         auto id = getID(pText, pEnd);
         auto labelSize = calcTextSize(pText, pEnd);
 
-        auto pos = dc_.currentPos;
+        auto pos = pWindow->dc.currentPos;
         auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
 
         Rectf r(pos, pos + size);
 
         addItem(r, id);
 
-        pPrim_->drawText(Vec3f(pos), txtCtx_, pText, pEnd);
+        pPrim->drawText(Vec3f(pos), txtCtx_, pText, pEnd);
 
         txtCtx_.size = Vec2f(24.f, 24.f);
         txtCtx_.col = oldCol;
@@ -318,6 +338,9 @@ namespace gui
             return;
         }
 
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
         float min = pVar->GetMin();
         float max = pVar->GetMax();
         float value = pVar->GetFloat();
@@ -329,7 +352,7 @@ namespace gui
         // so i want to just draw like a box?
         auto width = itemWidth_;
         auto height = 32.f;
-        auto pos = dc_.currentPos;
+        auto pos = pWindow->dc.currentPos;
         auto size = Vec2f(width, height + style_.framePadding.y * 2.f);
 
         Rectf r(pos, pos + size);
@@ -380,27 +403,26 @@ namespace gui
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
 
-
         Color8u bckCol(24, 24, 24, 200);
         Color8u barBckCol(36, 36, 36, 200);
         Color8u barFillCol(72, 72, 72, 200);
 
         bckCol = style_.btnCol;
 
-        pPrim_->drawQuad(r, bckCol);
-        pPrim_->drawQuad(bar, barBckCol);
-        pPrim_->drawQuad(barFill, barFillCol);
-        pPrim_->drawRect(r, borderCol);
+        pPrim->drawQuad(r, bckCol);
+        pPrim->drawQuad(bar, barBckCol);
+        pPrim->drawQuad(barFill, barFillCol);
+        pPrim->drawRect(r, borderCol);
 
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
-        pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
+        pPrim->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
 
         core::StackString<16, char> valueStr;
         valueStr.setFmt("%g", value);
 
         txtCtx_.flags.Set(font::DrawTextFlag::RIGHT);
         
-        pPrim_->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, valueStr.begin(), valueStr.end());
+        pPrim->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, valueStr.begin(), valueStr.end());
 
         txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
@@ -430,11 +452,14 @@ namespace gui
             return;
         }
 
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
         auto id = getID(pLabel);
 
         auto width = itemWidth_;
         auto height = 32.f;
-        auto pos = dc_.currentPos;
+        auto pos = pWindow->dc.currentPos;
         auto size = Vec2f(width, height + style_.framePadding.y * 2.f);
 
         Rectf r(pos, pos + size);
@@ -474,15 +499,15 @@ namespace gui
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
 
-        pPrim_->drawQuad(r, style_.btnCol);
-        pPrim_->drawRect(r, borderCol);
-        pPrim_->drawRect(boxRing, style_.chkBoxCol);
+        pPrim->drawQuad(r, style_.btnCol);
+        pPrim->drawRect(r, borderCol);
+        pPrim->drawRect(boxRing, style_.chkBoxCol);
         if (value > 0 || held) {
-            pPrim_->drawQuad(boxFill, style_.chkBoxFillCol);
+            pPrim->drawQuad(boxFill, style_.chkBoxFillCol);
         }
         
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
-        pPrim_->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
+        pPrim->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
     }
 
@@ -522,13 +547,15 @@ namespace gui
 
     bool GuiContex::comboBegin(const char* pLabel, const char* pPreviewValue)
     {
-        auto* pLabelEnd = pLabel + core::strUtil::strlen(pLabel);
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
 
+        auto* pLabelEnd = pLabel + core::strUtil::strlen(pLabel);
         auto id = getID(pLabel, pLabelEnd);
         auto labelSize = calcTextSize(pLabel, pLabelEnd);
 
         // calculate pos / size
-        auto pos = dc_.currentPos;
+        auto pos = pWindow->dc.currentPos;
         auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
 
         const float arrowSize = size.y;
@@ -542,11 +569,11 @@ namespace gui
 
         auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
 
-        pPrim_->drawQuad(r, style_.btnCol);
-        pPrim_->drawRect(r, borderCol);
+        pPrim->drawQuad(r, style_.btnCol);
+        pPrim->drawRect(r, borderCol);
 
         if (pPreviewValue) {
-            pPrim_->drawText(Vec3f(r.getCenter()), txtCtx_, pPreviewValue);
+            pPrim->drawText(Vec3f(r.getCenter()), txtCtx_, pPreviewValue);
         }
 
         bool popupOpen = isPopupOpen(id);
@@ -557,6 +584,12 @@ namespace gui
         if (!popupOpen) {
             return false;
         }
+
+        // need to set the size.
+        // width should match.
+
+        setNextWindowPos(Vec2f(pos.x, pos.y + size.y));
+        setNextWindowSize(Vec2f(size.x, 60.f));
 
         begin("Meow", WindowFlag::Popup);
 
@@ -604,13 +637,14 @@ namespace gui
         Vec2f tr(radius, -radius);
         Vec2f br(radius, radius);
 
-        Vec2f base(rect_.x2 - offset, rect_.y2 - offset);
+        Vec2f base(screenRect_.x2 - offset, screenRect_.y2 - offset);
         tl = (mat * tl) + base;
         tr = (mat * tr) + base;
         bl = (mat * bl) + base;
         br = (mat * br) + base;
 
-        pPrim_->drawQuad(
+        auto* pPrim = pCurrentWindow->pPrim;
+        pPrim->drawQuad(
             Vec3f(tl),
             Vec3f(tr),
             Vec3f(bl),
@@ -649,9 +683,12 @@ namespace gui
 
     void GuiContex::addItem(const Rectf& r, ItemID id)
     {
-        dc_.currentPos.y += r.getHeight() + style_.itemSpacing.y;
-        dc_.lastItemID = id;
-        dc_.lastItemRect = r;
+        auto* pWindow = pCurrentWindow;
+        auto& dc = pWindow->dc;
+
+        dc.currentPos.y += r.getHeight() + style_.itemSpacing.y;
+        dc.lastItemID = id;
+        dc.lastItemRect = r;
     }
 
     bool GuiContex::itemHoverable(ItemID id, const Rectf& r)
@@ -754,7 +791,7 @@ namespace gui
 
     GuiContex::Window* GuiContex::createWindow(const char* pName, WindowFlags flags)
     {
-        Window* pWindow = X_NEW(Window, g_3dEngineArena, "UIWindow")(pName);
+        Window* pWindow = X_NEW(Window, g_3dEngineArena, "UIWindow")(pPrim_, pName);
 
         pWindow->flags = flags;
 
