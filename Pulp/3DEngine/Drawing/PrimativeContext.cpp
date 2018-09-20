@@ -539,9 +539,9 @@ PrimativeContext::PrimativeContext(PrimativeContextSharedResources& sharedRes, M
     currentPage_(-1),
     mode_(mode),
     shapeLodArrays_{
-        arena, // arena, arena, arena, // arena,
-        arena, // arena, arena, arena, // arena,
-        arena, // arena, arena, arena, // arena,
+        arena,
+        arena,
+        arena,
     },
     sharedRes_(sharedRes)
 {
