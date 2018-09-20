@@ -185,8 +185,8 @@ namespace gui
         void pushID(ItemID id);
         void popID(void);
 
-        static ItemID getID(const char* pLabel);
-        static ItemID getID(const char* pBegin, const char* pEnd);
+        ItemID getID(const char* pLabel) const;
+        ItemID getID(const char* pBegin, const char* pEnd) const;
 
     private:
         PrimativeContext* pPrim_;

@@ -783,14 +783,14 @@ namespace gui
         activeId_ = INVALID_ITEM_ID;
     }
 
-    GuiContex::ItemID GuiContex::getID(const char* pLabel)
+    GuiContex::ItemID GuiContex::getID(const char* pLabel) const
     {
-        return getID(pLabel, pLabel + core::strUtil::strlen(pLabel));
+        return pCurrentWindow->getID(pLabel);
     }
 
-    GuiContex::ItemID GuiContex::getID(const char* pBegin, const char* pEnd)
+    GuiContex::ItemID GuiContex::getID(const char* pBegin, const char* pEnd) const
     {
-        return idHash(pBegin, pEnd);
+        return pCurrentWindow->getID(pBegin, pEnd);
     }
 
 
