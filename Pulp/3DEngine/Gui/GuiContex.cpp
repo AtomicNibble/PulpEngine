@@ -13,6 +13,11 @@ namespace gui
 {
     namespace
     {
+        core::Hash::Fnv1aVal idHash(const char* pStr)
+        {
+            return core::Hash::Fnv1aHash(pStr, core::strUtil::strlen(pStr));
+        }
+
         core::Hash::Fnv1aVal idHash(const char* pBegin, const char* pEnd)
         {
             return core::Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pEnd - pBegin));
@@ -736,7 +741,7 @@ namespace gui
 
     GuiContex::Window* GuiContex::findWindow(const char* pName) const
     {
-        auto id = getID(pName);
+        auto id = idHash(pName);
 
         for (auto* pWindow : windows_) {
             if (pWindow->ID == id) {
