@@ -1176,7 +1176,7 @@ bool AssetDB::SetMod(ModId id)
         return true;
     }
 
-    X_ERROR("AssetDB", "Failed to set mod no mod with id \"%" PRIu32 "\" exsists", id);
+    X_ERROR("AssetDB", "Failed to set mod no mod with id \"%" PRIi32 "\" exsists", id);
     return false;
 }
 
