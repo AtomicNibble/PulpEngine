@@ -211,9 +211,6 @@ namespace gui
         dc.currentPos = dc.currentPosStart;
         dc.lastItemID = INVALID_ITEM_ID;
         dc.lastItemRect = Rectf();
-
-        // fill(Col_Deeppink);
-        pWindow->pPrim->drawQuad(pWindow->pos, pWindow->size, Col_Deeppink);
     }
 
     void GuiContex::end(void)
