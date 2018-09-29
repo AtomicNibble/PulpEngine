@@ -23,7 +23,7 @@ void RenderVars::registerVars(void)
     ADD_CVAR_REF("r_d3d_debug_layer", debugLayer_, debugLayer_, 0, 1, core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED | core::VarFlag::RESTART_REQUIRED,
         "Enable d3d debug layer");
 
-    ADD_CVAR_REF_COL("r_clear_color", clearColor_, clearColor_,
+    ADD_CVAR_REF_COL("r_clear_col", clearColor_, clearColor_,
         core::VarFlag::RENDERER | core::VarFlag::SAVE_IF_CHANGED, "Back buffer clear color");
 
     pNativeRes_ = ADD_CVAR_STRING("r_native_res", "<unset>", core::VarFlag::RENDERER | core::VarFlag::READONLY,
