@@ -373,7 +373,7 @@ bool AssetDB::PerformMigrations(void)
 
                 // build the old path.
                 core::StackString512 hashLenStr;
-                hashLenStr.appendFmt(".%" PRIu32, rawfileInfo.hash);
+                hashLenStr.appendFmt(".%" PRIu64, rawfileInfo.hash);
 
                 // build old path by removing hash from name.
                 oldFilePath.set(newFilePath.begin(), newFilePath.end() - hashLenStr.length());
@@ -752,6 +752,128 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 6) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 6", dbVersion_);
+
+        // update all the raw_file data hashes.
+        {
+            sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+
+            DataArr data(g_AssetDBArena);
+
+            auto it = qry.begin();
+            for (; it != qry.end(); ++it) {
+                auto row = *it;
+
+                int32_t rawFileId = row.get<int32_t>(0);
+                RawFile rawfileInfo;
+
+                if (!GetRawfileForRawId(rawFileId, rawfileInfo)) {
+                    X_ERROR("AssetDB", "Failed to get rawfile path");
+                    return false;
+                }
+
+                core::Path<char> filePath;
+                AssetPathForRawFile(rawfileInfo, filePath);
+
+                X_LOG1("AssetDB", "Updating hash for rawfile %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
+
+                core::XFileScoped file;
+                if (!file.openFile(filePath.c_str(), core::fileMode::READ)) {
+                    X_ERROR("AssetDB", "Failed to open rawfile");
+                    return false;
+                }
+
+                data.resize(file.remainingBytes());
+
+                if (file.read(data.data(), data.size()) != data.size()) {
+                    X_ERROR("AssetDB", "Failed to read rawfile");
+                    return false;
+                }
+
+                file.close();
+
+                auto dataHash = core::Hash::xxHash64::calc(data.ptr(), data.size());
+
+                if (dataHash == rawfileInfo.hash) {
+                    X_WARNING("AssetDB", "Hash is already correct for rawfile %" PRIi32, rawFileId);
+                    continue;
+                }
+
+                sql::SqlLiteTransaction trans(db_);
+
+                // need to update rawFile size colum
+                sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET hash = ? WHERE file_id = ?");
+                cmd.bind(1, static_cast<int64_t>(dataHash));
+                cmd.bind(2, rawFileId);
+
+                sql::Result::Enum res = cmd.execute();
+                if (res != sql::Result::OK) {
+                    X_ERROR("AssetDB", "Failed to update RawFileData");
+                    return false;
+                }
+
+                // need to move file.
+                core::Path<char> filePathNew;
+                rawfileInfo.hash = dataHash;
+                AssetPathForRawFile(rawfileInfo, filePathNew);
+
+                if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+                    X_ERROR("AssetDB", "Failed to move asset raw file");
+                    return false;
+                }
+
+                // if this file moved then commit.
+                trans.commit();
+            }
+        }
+
+        // how hash all the args again.
+        {
+            sql::SqlLiteTransaction trans(db_);
+
+            sql::SqlLiteQuery qry(db_, "SELECT file_id, args FROM file_ids");
+
+            core::string args;
+
+            auto it = qry.begin();
+            for (; it != qry.end(); ++it) {
+                auto row = *it;
+
+                int32_t fileId = row.get<int32_t>(0);
+
+                // args can be null.
+                if (row.columnType(0) != sql::ColumType::SNULL) {
+                    auto length = row.columnBytes(1);
+                    const char* pArgs = row.get<const char*>(1);
+                    args.assign(pArgs, pArgs + length);
+                }
+                else {
+                    args.clear();
+                }
+
+                if (args.isEmpty()) {
+                    continue;
+                }
+
+                auto argsHash = core::Hash::xxHash64::calc(args.data(), args.size());
+
+                sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET argsHash = ? WHERE file_id = ?");
+                cmd.bind(1, static_cast<int64_t>(argsHash));
+                cmd.bind(2, fileId);
+
+                sql::Result::Enum res = cmd.execute();
+                if (res != sql::Result::OK) {
+                    X_ERROR("AssetDB", "Failed to update RawFileData");
+                    return false;
+                }
+
+            }
+
+            trans.commit();
+        }
+    }
+
     return true;
 }
 
@@ -773,8 +895,6 @@ bool AssetDB::Chkdsk(bool updateDB)
     // transaction for the update.
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
-
-    core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -810,17 +930,17 @@ bool AssetDB::Chkdsk(bool updateDB)
 
         file.close();
 
-        const auto dataCrc = pCrc32->GetCRC32(data.ptr(), data.size());
+        const auto dataHash = core::Hash::xxHash64::calc(data.ptr(), data.size());
 
-        if (rawfileInfo.size != fileSize || rawfileInfo.hash != dataCrc) {
-            X_ERROR("AssetDB", "RawFile Data don't match RawFile Entry. size: %" PRIi32 " -> %" PRIi32 " hash: %" PRIu32 " -> %" PRIu32,
-                rawfileInfo.size, fileSize, rawfileInfo.hash, dataCrc);
+        if (rawfileInfo.size != fileSize || rawfileInfo.hash != dataHash) {
+            X_ERROR("AssetDB", "RawFile Data don't match RawFile Entry. size: %" PRIi32 " -> %" PRIi32 " hash: %" PRIu64 " -> %" PRIu64,
+                rawfileInfo.size, fileSize, rawfileInfo.hash, dataHash);
 
             if (updateDB) {
                 // need to update rawFile size colum
                 sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ? WHERE file_id = ?");
                 cmd.bind(1, safe_static_cast<int32_t>(data.size()));
-                cmd.bind(2, static_cast<int32_t>(dataCrc));
+                cmd.bind(2, static_cast<int64_t>(dataHash));
                 cmd.bind(3, rawFileId);
 
                 sql::Result::Enum res = cmd.execute();
@@ -832,7 +952,7 @@ bool AssetDB::Chkdsk(bool updateDB)
                 if (rawfileInfo.size != fileSize) {
                     // need to move file.
                     core::Path<char> filePathNew;
-                    rawfileInfo.hash = dataCrc;
+                    rawfileInfo.hash = dataHash;
                     AssetPathForRawFile(rawfileInfo, filePathNew);
 
                     if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
@@ -1723,9 +1843,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
         return Result::ERROR;
     }
 
-    core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-    const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
-    const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
+
+    const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
+    const RawFileHash argsHash = core::Hash::xxHash64::calc(args.c_str(), args.length());
 
     rawId = INVALID_RAWFILE_ID;
     if (compressedData.isNotEmpty()) {
@@ -1737,9 +1857,9 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
         RawFile rawData;
 
         if (GetRawfileForId(assetId, rawData, &rawId)) {
-            if (rawData.hash == dataCrc) {
-                uint32_t argsHash;
-                if (GetArgsHashForAsset(assetId, argsHash) && argsHash == argsCrc) {
+            if (rawData.hash == dataHash) {
+                RawFileHash argsHash;
+                if (GetArgsHashForAsset(assetId, argsHash) && argsHash == argsHash) {
                     X_LOG0("AssetDB", "Skipping updates asset unchanged");
                     return Result::UNCHANGED;
                 }
@@ -1751,7 +1871,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     sql::SqlLiteTransaction trans(db_);
 
     if (compressedData.isNotEmpty()) {
-        auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
+        auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataHash);
         if (res != Result::OK) {
             return res;
         }
@@ -1766,7 +1886,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     cmd.bind(":t", type);
     cmd.bind(":n", name.c_str());
     cmd.bind(":args", args.c_str());
-    cmd.bind(":argsHash", static_cast<int32_t>(argsCrc));
+    cmd.bind(":argsHash", static_cast<int64_t>(argsHash));
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1855,15 +1975,14 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
     X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
-    core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-    const uint32_t dataCrc = pCrc32->GetCRC32(compressedData.ptr(), compressedData.size());
+    const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
 
     int32_t rawId = INVALID_RAWFILE_ID;
     if (compressedData.isNotEmpty()) {
         RawFile rawData;
 
         if (GetRawfileForId(assetId, rawData, &rawId)) {
-            if (rawData.hash == dataCrc) {
+            if (rawData.hash == dataHash) {
                 X_LOG0("AssetDB", "Skipping raw file update file unchanged");
                 return Result::UNCHANGED;
             }
@@ -1873,7 +1992,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
     // start the transaction.
     sql::SqlLiteTransaction trans(db_);
 
-    auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataCrc);
+    auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataHash);
     if (res != Result::OK) {
         return res;
     }
@@ -1883,7 +2002,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
-    AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, const DataArr& compressedData, uint32_t dataCrc)
+    AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, 
+    const DataArr& compressedData, RawFileHash dataHash)
 {
     X_UNUSED(trans); // not used, just ensures you have taken one.
     X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId); 
@@ -1904,7 +2024,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
         // check if changed.
         RawFile curRawData;
         if (GetRawfileForRawId(rawId, curRawData)) {
-            if (curRawData.hash == dataCrc) {
+            if (curRawData.hash == dataHash) {
                 X_LOG0("AssetDB", "Skipping raw file update file unchanged");
                 return Result::UNCHANGED;
             }
@@ -1919,7 +2039,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
             mode.Set(core::fileMode::WRITE);
             mode.Set(core::fileMode::RECREATE);
 
-            AssetPathForName(type, name, dataCrc, filePath);
+            AssetPathForName(type, name, dataHash, filePath);
 
             if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
                 X_ERROR("AssetDB", "Failed to create dir to save raw asset");
@@ -1965,7 +2085,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
             sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
             cmd.bind(1, path.c_str());
             cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
-            cmd.bind(3, static_cast<int32_t>(dataCrc));
+            cmd.bind(3, static_cast<int64_t>(dataHash));
 
             sql::Result::Enum res = cmd.execute();
             if (res != sql::Result::OK) {
@@ -1992,7 +2112,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
         sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
         cmd.bind(1, path.c_str());
         cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
-        cmd.bind(3, static_cast<int32_t>(dataCrc));
+        cmd.bind(3, static_cast<int64_t>(dataHash));
         cmd.bind(4, rawId);
 
         sql::Result::Enum res = cmd.execute();
@@ -2028,8 +2148,9 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
         return Result::ERROR;
     }
 
-    core::Crc32* pCrc32 = gEnv->pCore->GetCrc32();
-    const uint32_t argsCrc = pCrc32->GetCRC32(args.c_str(), args.length());
+    core::Hash::xxHash64 hasher;
+    hasher.updateBytes(args.c_str(), args.length());
+    auto hash = hasher.finalize();
 
     sql::SqlLiteTransaction trans(db_);
     core::string stmt;
@@ -2041,7 +2162,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
     cmd.bind(":t", type);
     cmd.bind(":n", name.c_str());
     cmd.bind(":args", args.c_str());
-    cmd.bind(":argsHash", static_cast<int32_t>(argsCrc));
+    cmd.bind(":argsHash", static_cast<int64_t>(hash));
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -2319,7 +2440,9 @@ bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
 
     // args can be null.
     if ((*it).columnType(0) != sql::ColumType::SNULL) {
-        argsOut = (*it).get<const char*>(0);
+        auto length = (*it).columnBytes(0);
+        const char* pArgs = (*it).get<const char*>(0);
+        argsOut.assign(pArgs, pArgs + length);
     }
     else {
         argsOut.clear();
@@ -2332,7 +2455,7 @@ bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
     return true;
 }
 
-bool AssetDB::GetArgsHashForAsset(AssetId assetId, uint32_t& argsHashOut)
+bool AssetDB::GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT argsHash FROM file_ids WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
@@ -2345,7 +2468,7 @@ bool AssetDB::GetArgsHashForAsset(AssetId assetId, uint32_t& argsHashOut)
 
     // args can be null.
     if ((*it).columnType(0) != sql::ColumType::SNULL) {
-        argsHashOut = static_cast<uint32_t>((*it).get<int32_t>(0));
+        argsHashOut = static_cast<RawFileHash>((*it).get<int64_t>(0));
     }
     else {
         argsHashOut = 0;
@@ -2606,15 +2729,15 @@ bool AssetDB::IsAssetStale(AssetId assetId)
         return true;
     }
 
-    const int32_t compiledHash = row.get<int32_t>(0);
-    const int32_t argsHash = row.get<int32_t>(1);
-    const int32_t rawFileHash = row.get<int32_t>(2);
+    // check if the compiled hash is stale for given data and args.
+    const auto currentCompiledHash = static_cast<RawFileHash>(row.get<int64_t>(0));
+    const auto argsHash = static_cast<RawFileHash>(row.get<int64_t>(1));
+    const auto rawFileHash = static_cast<RawFileHash>(row.get<int64_t>(2));
     const int32_t rawFileSize = row.get<int32_t>(3);
 
-    // work out if somethings changed.
-    const int32_t mergedHash = core::Crc32::Combine(argsHash, rawFileHash, rawFileSize);
+    const auto mergedHash = getMergedHash(argsHash, rawFileHash, rawFileSize);
 
-    return mergedHash != compiledHash;
+    return currentCompiledHash != mergedHash;
 }
 
 bool AssetDB::OnAssetCompiled(AssetId assetId)
@@ -2646,16 +2769,16 @@ bool AssetDB::OnAssetCompiled(AssetId assetId)
     }
 
     auto row = *it;
-    const int32_t argsHash = row.get<int32_t>(0);
-    const int32_t rawFileHash = row.get<int32_t>(1);
+    const auto argsHash = static_cast<RawFileHash>(row.get<int64_t>(0));
+    const auto rawFileHash = static_cast<RawFileHash>(row.get<int64_t>(1));
     const int32_t rawFileSize = row.get<int32_t>(2);
 
-    const int32_t mergedHash = core::Crc32::Combine(argsHash, rawFileHash, rawFileSize);
+    const auto mergedHash = getMergedHash(argsHash, rawFileHash, rawFileSize);
 
     sql::SqlLiteTransaction trans(db_);
 
     sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = ?, lastUpdateTime = DateTime('now') WHERE file_id = ?");
-    cmd.bind(1, mergedHash);
+    cmd.bind(1, static_cast<int64_t>(mergedHash));
     cmd.bind(2, assetId);
 
     sql::Result::Enum res = cmd.execute();
@@ -3110,29 +3233,42 @@ bool AssetDB::isModSet(void) const
     return modId_ >= 0 && modId_ != INVALID_MOD_ID;
 }
 
+AssetDB::RawFileHash AssetDB::getMergedHash(RawFileHash data, RawFileHash args, int32_t dataLen)
+{
+    core::Hash::xxHash64 hasher;
+    hasher.update(data);
+    hasher.update(args);
+    hasher.update(dataLen);
+    return hasher.finalize();
+}
+
 const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
 {
     return AssetType::ToString(type);
 }
 
-void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, uint32_t rawDataHash, core::Path<char>& pathOut)
+void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, RawFileHash rawDataHash, core::Path<char>& pathOut)
 {
+    static_assert(sizeof(rawDataHash) == 8 && std::is_unsigned<decltype(rawDataHash)>::value, "Format mismatch");
+
     pathOut = ASSET_DB_FOLDER;
     pathOut /= RAW_FILES_FOLDER;
     pathOut /= AssetTypeRawFolder(type);
     pathOut.toLower();
     pathOut /= name;
     pathOut.replaceSeprators();
-    pathOut.appendFmt(".%" PRIu32, rawDataHash);
+    pathOut.appendFmt(".%" PRIu64, rawDataHash);
 }
 
 void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 {
+    static_assert(sizeof(raw.hash) == 8 && std::is_unsigned<decltype(raw.hash)>::value, "Format mismatch");
+
     pathOut = ASSET_DB_FOLDER;
     pathOut /= RAW_FILES_FOLDER;
     pathOut /= raw.path;
     pathOut.replaceSeprators();
-    pathOut.appendFmt(".%" PRIu32, raw.hash);
+    pathOut.appendFmt(".%" PRIu64, raw.hash);
 }
 
 void AssetDB::RawFilePathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut)
