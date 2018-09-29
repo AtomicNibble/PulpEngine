@@ -7,7 +7,7 @@ X_INLINE AssetDB::ThumbInfo::ThumbInfo() :
 {
 }
 
-X_INLINE AssetDB::ThumbInfo::ThumbInfo(ThumbId id_, int32_t fileSize_, Vec2i thumbDim_, Vec2i srcDim_, core::Hash::SHA1Digest& hash_) :
+X_INLINE AssetDB::ThumbInfo::ThumbInfo(ThumbId id_, int32_t fileSize_, Vec2i thumbDim_, Vec2i srcDim_, ThumbHash& hash_) :
     id(id_),
     fileSize(fileSize_),
     thumbDim(thumbDim_),

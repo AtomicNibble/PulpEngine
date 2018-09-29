@@ -2138,7 +2138,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     // write new data.
     {
         core::Path<char> filePath;
-        core::Hash::SHA1Digest::String strBuf;
+        ThumbHash::String strBuf;
 
         filePath = ASSET_DB_FOLDER;
         filePath /= THUMBS_FOLDER;
@@ -3145,7 +3145,7 @@ void AssetDB::RawFilePathForName(AssetType::Enum type, const core::string& name,
 
 void AssetDB::ThumbPathForThumb(const ThumbInfo& thumb, core::Path<char>& pathOut)
 {
-    core::Hash::SHA1Digest::String hashStr;
+    ThumbHash::String hashStr;
 
     pathOut = ASSET_DB_FOLDER;
     pathOut /= THUMBS_FOLDER;

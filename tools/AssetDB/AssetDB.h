@@ -32,6 +32,8 @@ class DLL_EXPORT AssetDB
     static const char* RAW_FILES_FOLDER;
     static const char* THUMBS_FOLDER;
 
+    typedef core::Hash::SHA1Digest ThumbHash;
+
     struct RawFile
     {
         int32_t file_id;
@@ -44,13 +46,13 @@ public:
     struct ThumbInfo
     {
         X_INLINE ThumbInfo();
-        X_INLINE ThumbInfo(ThumbId id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, core::Hash::SHA1Digest& hash);
+        X_INLINE ThumbInfo(ThumbId id, int32_t fileSize, Vec2i thumbDim, Vec2i srcDim, ThumbHash& hash);
 
         ThumbId id;
         int32_t fileSize;
         Vec2i thumbDim; // thumb dim
         Vec2i srcDim;   // dim of src, might be zero
-        core::Hash::SHA1Digest hash;
+        ThumbHash hash;
     };
 
     struct Mod
