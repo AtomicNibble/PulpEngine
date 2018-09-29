@@ -689,6 +689,69 @@ bool AssetDB::PerformMigrations(void)
 
     }
 
+    if (dbVersion_ < 5) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 5", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        // add not null.
+        if (!db_.execute(R"(
+            DROP TABLE IF EXISTS migration_temp_table;
+            CREATE TABLE migration_temp_table AS SELECT * FROM thumbs;
+
+            DROP TABLE thumbs;
+
+            CREATE TABLE thumbs (
+                     thumb_id INTEGER PRIMARY KEY,
+                     width INTEGER NOT NULL,
+                     height INTEGER NOT NULL,
+                     srcWidth INTEGER NOT NULL,
+                     srcheight INTEGER NOT NULL,
+                     size INTEGER NOT NULL,
+                     hash TEXT NOT NULL,
+                     lastUpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+            );
+
+            INSERT INTO thumbs (
+                thumb_id, 
+                width,
+                height,
+                srcWidth,
+                srcheight,
+                size,
+                hash, 
+                lastUpdateTime
+            )
+                SELECT 
+                thumb_id, 
+                width,
+                height,
+                srcWidth,
+                srcheight,
+                size,
+                hash, 
+                lastUpdateTime 
+                FROM migration_temp_table;
+
+            DROP TABLE migration_temp_table;
+        )")) {
+            X_ERROR("AssetDB", "Failed to update thumb table");
+            return false;
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
+        }
+    }
+
     return true;
 }
 

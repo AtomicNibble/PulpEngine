@@ -24,7 +24,8 @@ class DLL_EXPORT AssetDB
     //				In order to migrate must modify all raw asset compression headers to map to new algo enum.
     // Version 3: compressed buffer header changed
     // Version 4: change asset thump to hash sha1
-    static const int32_t DB_VERSION = 4;
+    // Version 5: set thumb width, height coloums to NOT NULL
+    static const int32_t DB_VERSION = 5;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
