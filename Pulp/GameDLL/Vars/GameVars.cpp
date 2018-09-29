@@ -7,8 +7,8 @@ X_NAMESPACE_BEGIN(game)
 
 GameVars::GameVars()
 {
-    userCmdDebug_ = 1;
-    userCmdDrawDebug_ = 1;
+    userCmdDebug_ = 0;
+    userCmdDrawDebug_ = 0;
 
     pFovVar_ = nullptr;
 }
