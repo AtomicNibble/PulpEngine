@@ -23,7 +23,7 @@ class DLL_EXPORT AssetDB
     // Version 2: correct compression algo enum, as the order changed
     //				In order to migrate must modify all raw asset compression headers to map to new algo enum.
     // Version 3: compressed buffer header changed
-    // Version 4: change asset thump to hash sha1
+    // Version 4: change asset thumb hash to sha1
     // Version 5: set thumb width, height coloums to NOT NULL
     static const int32_t DB_VERSION = 5;
 
