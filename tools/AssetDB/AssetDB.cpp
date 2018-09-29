@@ -189,8 +189,8 @@ bool AssetDB::CreateTables(void)
                      "thumb_id INTEGER PRIMARY KEY,"
                      "width INTEGER NOT NULL,"
                      "height INTEGER NOT NULL,"
-                     "srcWidth INTEGER,"
-                     "srcheight INTEGER,"
+                     "srcWidth INTEGER NOT NULL,"
+                     "srcheight INTEGER NOT NULL,"
                      "size INTEGER NOT NULL,"
                      // do i want to store thumbs with name of hash or asset name? I guess benfit of hash i don't have to know asset name,
                      // and care if asset is renamed.
