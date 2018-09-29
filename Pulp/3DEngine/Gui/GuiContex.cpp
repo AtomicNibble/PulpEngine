@@ -93,6 +93,14 @@ namespace gui
         currentFrame_ = 0;
     }
 
+    GuiContex::~GuiContex()
+    {
+        for (auto* pWindow : windows_) {
+            X_DELETE(pWindow, g_3dEngineArena);
+        }
+    }
+
+
     void GuiContex::init(engine::Material* pCursor, engine::Material* pSpinner)
     {
         pCursor_ = pCursor;

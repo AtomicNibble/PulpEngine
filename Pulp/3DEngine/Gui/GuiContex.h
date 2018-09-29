@@ -139,6 +139,7 @@ namespace gui
 
     public:
         GuiContex();
+        ~GuiContex();
 
         void init(engine::Material* pCursor, engine::Material* pSpinner);
         void setPrimContet(PrimativeContext* pPrim);
