@@ -14,13 +14,13 @@ class PrimativeContext;
 
 namespace gui
 {
-   
+
     class GuiContex
     {
         X_DECLARE_ENUM(Mouse)(
             LEFT,
             RIGHT
-        );
+            );
 
         using MouseDownArr = std::array<bool, Mouse::ENUM_COUNT>;
         using ItemWidthStack = core::FixedStack<float, 8>;
@@ -50,23 +50,41 @@ namespace gui
 
         struct Style
         {
+            Color8u getBorderCol(bool hovered) const {
+                return hovered ? borderColFocus : borderCol;
+            }
+
+            Color8u getBackgroundCol(bool held, bool hovered) const {
+                if (held) {
+                    return backgroundHoldCol;
+                }
+                else if (hovered) {
+                    return backgroundColFocus;
+                }
+
+                return backgroundCol;
+            }
+
             Vec2f framePadding;
             Vec2f itemSpacing;
             Vec2f windowPadding;
 
-            Color8u btnCol;
-            Color8u btnHover;
-            Color8u btnHold;
+            Color8u backgroundCol;
+            Color8u backgroundColFocus;
+            Color8u backgroundHoldCol;
 
             Color8u borderCol;
-            Color8u borderColForcus;
+            Color8u borderColFocus;
 
             Color8u chkBoxCol;
             Color8u chkBoxFillCol;
+
+            Color8u barBckCol;
+            Color8u barFillCol;
         };
 
         X_DECLARE_FLAGS(WindowFlag)(
-           Popup
+            Popup
         );
 
         typedef Flags<WindowFlag> WindowFlags;

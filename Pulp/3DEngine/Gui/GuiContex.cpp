@@ -77,15 +77,18 @@ namespace gui
         style_.framePadding.Set(5.f, 8.f);
         style_.itemSpacing.Set(10.f, 8.f);
 
-        style_.btnCol = Color8u(24, 24, 24, 255);
-        style_.btnHover = Color8u(70, 70, 70, 255);
-        style_.btnHold = Color8u(60, 20, 20, 255);
+        style_.backgroundCol = Color8u(24, 24, 24, 255);
+        style_.backgroundColFocus = Color8u(24, 24, 24, 255);
+        style_.backgroundHoldCol = Color8u(30, 30, 30, 255);
 
         style_.borderCol = Color8u(25, 25, 25, 255);
-        style_.borderColForcus = Col_Orange;
+        style_.borderColFocus = Col_Orange;
 
         style_.chkBoxCol = Color8u(255, 255, 255, 255);
         style_.chkBoxFillCol = Color8u(255, 255, 255, 255);
+
+        style_.barBckCol = Color8u(36, 36, 36, 200);
+        style_.barFillCol = Color8u(72, 72, 72, 200);
 
         currentFrame_ = 0;
     }
@@ -281,17 +284,10 @@ namespace gui
         bool hovered, held;
         bool pressed = buttonBehavior(id, r, &hovered, &held);
 
-        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
-        auto btnCol = style_.btnCol;
+        auto borderCol = style_.getBorderCol(hovered);
+        auto bckCol = style_.getBackgroundCol(held, hovered);
 
-        if (held) {
-            btnCol = style_.btnHold;
-        }
-        else if (hovered) {
-            btnCol = style_.btnHover;
-        }
-
-        pPrim->drawQuad(r, btnCol);
+        pPrim->drawQuad(r, bckCol);
         pPrim->drawRect(r, borderCol);
         pPrim->drawText(Vec3f(r.getCenter()), txtCtx_, pText);
 
@@ -401,17 +397,12 @@ namespace gui
             }
         }
 
-        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
-
-        Color8u bckCol(24, 24, 24, 200);
-        Color8u barBckCol(36, 36, 36, 200);
-        Color8u barFillCol(72, 72, 72, 200);
-
-        bckCol = style_.btnCol;
+        auto borderCol = style_.getBorderCol(hovered);
+        auto bckCol = style_.getBackgroundCol(false, hovered);
 
         pPrim->drawQuad(r, bckCol);
-        pPrim->drawQuad(bar, barBckCol);
-        pPrim->drawQuad(barFill, barFillCol);
+        pPrim->drawQuad(bar, style_.barBckCol);
+        pPrim->drawQuad(barFill, style_.barFillCol);
         pPrim->drawRect(r, borderCol);
 
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
@@ -421,7 +412,7 @@ namespace gui
         valueStr.setFmt("%g", value);
 
         txtCtx_.flags.Set(font::DrawTextFlag::RIGHT);
-        
+
         pPrim->drawText(Vec3f(r.getX2() - style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, valueStr.begin(), valueStr.end());
 
         txtCtx_.flags.Remove(font::DrawTextFlag::RIGHT);
@@ -497,15 +488,16 @@ namespace gui
         boxFill.x2 -= (boxFillSpacing + 1.F);
         boxFill.y2 -= (boxFillSpacing + 1.F);
 
-        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
+        auto borderCol = style_.getBorderCol(hovered);
+        auto bckCol = style_.getBackgroundCol(held, hovered);
 
-        pPrim->drawQuad(r, style_.btnCol);
+        pPrim->drawQuad(r, bckCol);
         pPrim->drawRect(r, borderCol);
         pPrim->drawRect(boxRing, style_.chkBoxCol);
         if (value > 0 || held) {
             pPrim->drawQuad(boxFill, style_.chkBoxFillCol);
         }
-        
+
         txtCtx_.flags.Remove(font::DrawTextFlag::CENTER);
         pPrim->drawText(Vec3f(r.getX1() + style_.framePadding.x, r.getY1() + (r.getHeight() * 0.5f), 1.f), txtCtx_, pLabel);
         txtCtx_.flags.Set(font::DrawTextFlag::CENTER);
@@ -567,9 +559,10 @@ namespace gui
         bool hovered, held;
         bool pressed = buttonBehavior(id, r, &hovered, &held);
 
-        auto borderCol = hovered ? style_.borderColForcus : style_.borderCol;
+        auto borderCol = style_.getBorderCol(hovered);
+        auto bckCol = style_.getBackgroundCol(held, hovered);
 
-        pPrim->drawQuad(r, style_.btnCol);
+        pPrim->drawQuad(r, bckCol);
         pPrim->drawRect(r, borderCol);
 
         if (pPreviewValue) {
@@ -631,7 +624,7 @@ namespace gui
         auto rotation = elapse / 5.f;
 
         auto mat = Matrix22f::createRotation(::toRadians(-rotation));
-        
+
         Vec2f tl(-radius, -radius);
         Vec2f bl(-radius, radius);
         Vec2f tr(radius, -radius);
@@ -650,7 +643,7 @@ namespace gui
             Vec3f(bl),
             Vec3f(br),
             pSpinner_,
-            Color8u(255,255,255,255)
+            Color8u(255, 255, 255, 255)
         );
     }
 
@@ -762,11 +755,11 @@ namespace gui
 
     void GuiContex::openPopUp(ItemID id)
     {
-        PopupRef popup; 
+        PopupRef popup;
         popup.popupId = id;
-     //   popup.OpenParentId = parent_window->IDStack.back();
-     //   popup.OpenMousePos = g.IO.MousePos;
-     //   popup.OpenPopupPos = NavCalcPreferredRefPos();
+        //   popup.OpenParentId = parent_window->IDStack.back();
+        //   popup.OpenMousePos = g.IO.MousePos;
+        //   popup.OpenPopupPos = NavCalcPreferredRefPos();
 
         openPopupStack_.push(popup);
     }
