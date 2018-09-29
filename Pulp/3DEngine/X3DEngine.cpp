@@ -407,7 +407,8 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
         geoBucket.sort();
 
-        pRender->submitCommandPackets(geoBucket);
+        auto list = pRender->createCommandLists(geoBucket);
+        pRender->submitCommandLists(core::make_span(&list, 1));
     }
 
     // ok so lets dump out the primative context.
@@ -782,7 +783,8 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
             // sort + draw
             primBucket.sort();
 
-            pRender->submitCommandPackets(primBucket);
+            auto list = pRender->createCommandLists(primBucket);
+            pRender->submitCommandLists(core::make_span(&list, 1));
         }
     }
 
@@ -859,7 +861,8 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
         bucket.sort();
 
-        pRender->submitCommandPackets(bucket);
+        auto list = pRender->createCommandLists(bucket);
+        pRender->submitCommandLists(core::make_span(&list, 1));
     }
 #endif
 
@@ -934,7 +937,8 @@ void X3DEngine::renderPrimContex2D(core::FrameData& frame, IPrimativeContext::Mo
     // sort + draw
     primBucket.sort();
 
-    pRender->submitCommandPackets(primBucket);
+    auto list = pRender->createCommandLists(primBucket);
+    pRender->submitCommandLists(core::make_span(&list, 1));
 }
 
 void X3DEngine::addPrimsToBucket(core::FrameData& frame, render::CommandBucket<uint32_t>& primBucket,

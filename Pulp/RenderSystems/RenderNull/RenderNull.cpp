@@ -44,9 +44,17 @@ void RenderNull::renderEnd()
 {
 }
 
-void RenderNull::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
+CommandListHandle RenderNull::createCommandLists(CommandBucket<uint32_t>& cmdBucket)
 {
     X_UNUSED(cmdBucket);
+    return INVALID_HANLDE;
+}
+
+bool RenderNull::submitCommandLists(core::span<CommandListHandle> lists)
+{
+    X_UNUSED(lists);
+
+    return true;
 }
 
 bool RenderNull::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut)

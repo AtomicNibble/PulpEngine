@@ -49,9 +49,11 @@ typedef Handle IndexBufferHandle;
 typedef Handle ConstantBufferHandle;
 typedef Handle PassStateHandle;
 typedef Handle StateHandle;
+typedef Handle CommandListHandle;
 
 typedef std::array<VertexBufferHandle, VertexStream::ENUM_COUNT> VertexBufferHandleArr;
 
+static const Handle INVALID_HANLDE = 0;
 static const Handle INVALID_BUF_HANLDE = 0;
 static const Handle INVALID_STATE_HANLDE = 0;
 
@@ -401,7 +403,8 @@ struct IRender
     virtual void renderBegin(void) X_ABSTRACT;
     virtual void renderEnd(void) X_ABSTRACT;
 
-    virtual void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
+    virtual CommandListHandle createCommandLists(CommandBucket<uint32_t>& cmdBucket) X_ABSTRACT;
+    virtual bool submitCommandLists(core::span<CommandListHandle> lists) X_ABSTRACT;
 
     virtual bool getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut) X_ABSTRACT;
 

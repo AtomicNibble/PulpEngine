@@ -20,7 +20,8 @@ public:
     void renderBegin(void) X_FINAL;
     void renderEnd(void) X_FINAL;
 
-    void submitCommandPackets(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
+    CommandListHandle createCommandLists(CommandBucket<uint32_t>& cmdBucket) X_FINAL;
+    bool submitCommandLists(core::span<CommandListHandle> lists) X_FINAL;
 
     bool getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut) X_FINAL;
 

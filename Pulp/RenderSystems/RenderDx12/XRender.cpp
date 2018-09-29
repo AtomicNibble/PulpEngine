@@ -549,7 +549,7 @@ void XRender::renderEnd(void)
     handleResolutionChange();
 }
 
-void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
+CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket)
 {
 #if RENDER_STATS
     ++stats_.numBatches;
@@ -574,7 +574,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     // will we ever not need one?
     if (rtvs.isEmpty()) {
         X_FATAL("Dx12", "atleast one rt is required");
-        return;
+        return INVALID_HANLDE;
     }
 
     D3D12_CPU_DESCRIPTOR_HANDLE RTVs[MAX_RENDER_TARGETS];
@@ -623,7 +623,9 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
         if (pDethStencil->getBufferType() != PixelBufferType::DEPTH) {
             X_ERROR("Render", "Pixel buffer of type: \"%s\" can't be set as depthStencil",
                 PixelBufferType::ToString(pDethStencil->getBufferType()));
-            return;
+
+            pContextMan_->freeContext(pContext);
+            return INVALID_HANLDE;
         }
 
         texture::Texture& tex = *static_cast<texture::Texture*>(pDethStencil);
@@ -849,7 +851,7 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     }
 
     // for now wait.
-    pContext->finishAndFree(true);
+  //  pContext->finishAndFree(true);
 
 #if RENDER_STATS
     core::atomic::Add(&stats_.numDrawCall, curState.numDrawCall);
@@ -860,6 +862,20 @@ void XRender::submitCommandPackets(CommandBucket<uint32_t>& cmdBucket)
     core::atomic::Add(&stats_.numTexUpload, curState.numTexUpload);
     core::atomic::Add(&stats_.numTexUploadSize, curState.numTexUploadSize);
 #endif // !RENDER_STATS
+
+    return reinterpret_cast<CommandListHandle>(pContext);
+}
+
+bool XRender::submitCommandLists(core::span<CommandListHandle> lists)
+{
+    // TODO: be less lame.
+    for (auto handle : lists) {
+        auto* pContext = reinterpret_cast<CommandContext*>(handle);
+
+        pContext->finishAndFree(true);
+    }
+
+    return true;
 }
 
 bool XRender::getBufferData(IPixelBuffer* pSource, texture::XTextureFile& imgOut)
