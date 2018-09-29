@@ -204,6 +204,9 @@ public:
     Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl = core::Compression::CompressLevel::NORMAL);
     Result::Enum UpdateAssetThumb(AssetType::Enum type, const core::string& name, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData);
     Result::Enum UpdateAssetThumb(AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData);
+    
+    // Deletes all thumb data.
+    bool CleanThumbs(void);
 
     // if you want to get a assets id use this.
     bool AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);

@@ -346,6 +346,13 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
     return true;
 }
 
+bool Converter::CleanThumbs(void)
+{
+    X_LOG0("Converter", "Cleaning thumbs");
+
+    return db_.CleanThumbs();
+}
+
 bool Converter::GenerateThumbs(void)
 {
     X_LOG0("Converter", "Generating thumbs");

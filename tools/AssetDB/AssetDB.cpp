@@ -2164,6 +2164,35 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     return Result::OK;
 }
 
+bool AssetDB::CleanThumbs(void)
+{
+    sql::SqlLiteTransaction trans(db_);
+
+    if (!db_.execute("UPDATE file_ids SET thumb_id = null")) {
+        return false;
+    }
+
+    // truncate..
+    if (!db_.execute("DELETE FROM thumbs")) {
+        return false;
+    }
+
+    trans.commit();
+
+    core::Path<char> thumbsFolder;
+    thumbsFolder = ASSET_DB_FOLDER;
+    thumbsFolder /= THUMBS_FOLDER;
+    thumbsFolder.replaceSeprators();
+
+    if (!gEnv->pFileSys->deleteDirectoryContents(thumbsFolder.c_str())) {
+        X_ERROR("AssetDB", "Failed to delete thumbs directory contents");
+        return false;
+    }
+
+    return true;
+}
+
+
 bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut, ModId* pModIdOut)
 {
     if (name.isEmpty()) {

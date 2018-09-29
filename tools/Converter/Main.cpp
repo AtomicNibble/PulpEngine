@@ -47,7 +47,7 @@ typedef core::MemoryArena<
 namespace
 {
     X_DECLARE_ENUM(ConvertMode)
-    (SINGLE, ALL, CLEAN, GEN_THUMBS, CHKDSK);
+    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK);
 
     bool GetMode(ConvertMode::Enum& mode)
     {
@@ -61,6 +61,9 @@ namespace
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean")) {
                 mode = ConvertMode::CLEAN;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean_thumbs")) {
+                mode = ConvertMode::CLEAN_THUMBS;
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"gen_thumbs")) {
                 mode = ConvertMode::GEN_THUMBS;
@@ -193,6 +196,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 if (mode == ConvertMode::CLEAN) {
                     if (!con.CleanAll()) {
                         X_ERROR("Convert", "Failed to perform clearAll");
+                    }
+                }
+                if (mode == ConvertMode::CLEAN_THUMBS) {
+                    if (!con.CleanThumbs()) {
+                        X_ERROR("Convert", "Failed to clean thumbs");
                     }
                 }
                 else if (mode == ConvertMode::GEN_THUMBS) {
