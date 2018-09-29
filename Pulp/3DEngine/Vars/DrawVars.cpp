@@ -79,7 +79,7 @@ void DrawVars::registerVars(void)
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
         "2D buffer clear color");
 
-    ADD_CVAR_REF_COL("r_clear_col_3d", clearCol3D_, Color8u(150, 150, 0, 255),
+    ADD_CVAR_REF_COL("r_clear_col_3d", clearCol3D_, Color8u(38, 45, 56),
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
         "3D buffer clear color");
 
