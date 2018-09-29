@@ -3156,7 +3156,7 @@ bool AssetDB::MergeArgs(AssetId assetId, core::string& argsInOut)
         return false;
     }
 
-    size_t argsLen = core::strUtil::strlen(pArgs);
+    auto argsLen = (*it).columnBytes(0);
     if (argsLen < 1) {
         return true;
     }
