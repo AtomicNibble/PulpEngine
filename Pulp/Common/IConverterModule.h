@@ -67,18 +67,14 @@ struct IConverter
     virtual bool Convert(IConverterHost& host, assetDb::AssetId assetId, ConvertArgs& args, const OutPath& destPath) X_ABSTRACT;
 
     // thumbs disabled for all types by default.
-    virtual bool thumbGenerationSupported(void) const
-    {
+    virtual bool thumbGenerationSupported(void) const {
         return false;
     }
-    virtual bool CreateThumb(IConverterHost& host, assetDb::AssetId assetId, Vec2i targetDim)
-    {
-        X_UNUSED(host);
-        X_UNUSED(assetId);
-        X_UNUSED(targetDim);
+    virtual bool CreateThumb(IConverterHost& host, assetDb::AssetId assetId, Vec2i targetDim) {
+        X_UNUSED(host, assetId, targetDim);
         X_ASSERT_UNREACHABLE();
         return false;
-    };
+    }
 };
 
 #endif // !X_CONVETER_MODULE_I_H_
