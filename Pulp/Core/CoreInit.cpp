@@ -111,6 +111,13 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
 {
     X_PROFILE_NO_HISTORY_BEGIN("EngModuleInit", core::profiler::SubSys::CORE);
 
+    for (auto& c : moduleInterfaces_) {
+        if (c.dllName.compareCaseInsen(pDllName) && c.moduleClassName.compareCaseInsen(pModuleClassName)) {
+            c.addReference();
+            return true;
+        }
+    }
+
 #if !defined(X_LIB)
     core::Module::Handle handle = core::Module::Load(pDllName);
 
@@ -136,7 +143,12 @@ bool XCore::IntializeLoadedEngineModule(const char* pDllName, const char* pModul
     }
 
     // auto clean up by core shutdown.
-    moduleInterfaces_.append(pModule);
+    EngineModule module;
+    module.dllName = pDllName;
+    module.moduleClassName = pModuleClassName;
+    module.pModule = pModule;
+
+    moduleInterfaces_.emplace_back(std::move(module));
 
     return true;
 }
@@ -268,7 +280,12 @@ bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClass
         return false;
     }
 
-    moduleInterfaces_.append(pModule);
+    EngineModule module;
+    module.dllName = pDllName;
+    module.moduleClassName = pModuleClassName;
+    module.pModule = pModule;
+
+    moduleInterfaces_.emplace_back(std::move(module));
 
     const char* pName = core::strUtil::Find(pDllName, pDllName + core::strUtil::strlen(pDllName), "_");
     X_UNUSED(pName);

@@ -72,8 +72,15 @@ class XCore : public ICore
         std::shared_ptr<IConverterModule> pConModule;
     };
 
+    struct EngineModule : public core::ReferenceCounted<int32_t>
+    {
+        core::string dllName;
+        core::string moduleClassName;
+        std::shared_ptr<IEngineModule> pModule;
+    };
+
     typedef core::Array<core::Module::Handle> ModuleHandlesArr;
-    typedef core::Array<std::shared_ptr<IEngineModule>> ModuleInterfacesArr;
+    typedef core::Array<EngineModule> ModuleInterfacesArr;
     typedef core::Array<ConverterModule> ConverterModulesArr;
     typedef core::Array<IAssertHandler*> ArrsetHandlersArr;
     

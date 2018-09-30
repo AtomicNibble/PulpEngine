@@ -279,7 +279,8 @@ void XCore::ShutDown()
 
     // shut down interfaces before logging is removed.
     for (auto& it : moduleInterfaces_) {
-        if (!it->ShutDown()) {
+        auto* pModule = it.pModule.get();
+        if (!pModule->ShutDown()) {
             X_ERROR("Core", "error shuting down engine module");
         }
     }
