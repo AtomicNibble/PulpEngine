@@ -8,13 +8,14 @@ class ImgLib : public IImgLib
 {
 public:
     ImgLib();
-    ~ImgLib() X_OVERRIDE;
+    ~ImgLib() X_FINAL;
 
-    virtual const char* getOutExtension(void) const X_OVERRIDE;
-    virtual bool thumbGenerationSupported(void) const X_OVERRIDE;
+    const char* getOutExtension(void) const X_FINAL;
+    bool thumbGenerationSupported(void) const X_FINAL;
 
-    virtual bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_OVERRIDE;
-    virtual bool CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim) X_OVERRIDE;
+    bool Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath) X_FINAL;
+    bool CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim) X_FINAL;
+
 
 private:
 };
