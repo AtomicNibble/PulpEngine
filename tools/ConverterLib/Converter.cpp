@@ -66,7 +66,7 @@ bool Converter::Init(const core::string& modName)
         return false;
     }
 
-    if (!cacheDb_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
+    if (!cacheDb_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=delete; PRAGMA foreign_keys = ON;")) {
         return false;
     }
 
