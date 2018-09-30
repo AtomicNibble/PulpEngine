@@ -222,6 +222,7 @@ public:
     bool GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut);
     bool GetModIdForAsset(AssetId assetId, ModId& modIdOut);
     bool GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut);
+    bool GetRawFileCompAlgoForAsset(AssetId assetId, core::Compression::Algo::Enum& algoOut);
     bool AssetHasRawFile(AssetId assetId, int32_t* pRawFileId = nullptr);
     bool AssetHasThumb(AssetId assetId);
     bool GetThumbForAsset(AssetId assetId, ThumbInfo& info, DataArr& thumbDataOut);

@@ -2539,6 +2539,53 @@ bool AssetDB::GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut)
     return true;
 }
 
+bool AssetDB::GetRawFileCompAlgoForAsset(AssetId assetId, core::Compression::Algo::Enum& algoOut)
+{
+    RawFile raw;
+
+    if (!GetRawfileForId(assetId, raw)) {
+        X_ERROR("AssetDB", "Failed to get rawfile info for data retrieval");
+        return false;
+    }
+
+    // load the file.
+    core::XFileScoped file;
+    core::fileModeFlags mode;
+    core::Path<char> filePath;
+
+    mode.Set(core::fileMode::READ);
+    mode.Set(core::fileMode::SHARE);
+
+    AssetPathForRawFile(raw, filePath);
+
+    if (!file.openFile(filePath.c_str(), mode)) {
+        X_ERROR("AssetDB", "Failed to open rawfile");
+        return false;
+    }
+
+    const size_t size = static_cast<size_t>(raw.size);
+
+    if (size < sizeof(core::Compression::BufferHdr)) {
+        X_ERROR("AssetDB", "rawfile is to small");
+        return false;
+    }
+
+    core::Compression::BufferHdr hdr;
+    if (file.readObj(hdr) != sizeof(hdr)) {
+        X_ERROR("AssetDB", "failed to read rawfile header");
+        return false;
+    }
+
+    if (!hdr.IsMagicValid()) {
+        X_ERROR("AssetDB", "rawfile header is invalid");
+        return false;
+    }
+
+    algoOut = hdr.algo;
+    return true;
+}
+
+
 bool AssetDB::AssetHasRawFile(AssetId assetId, int32_t* pRawFileId)
 {
     sql::SqlLiteQuery qry(db_, "SELECT raw_file FROM file_ids WHERE file_id = ?");
