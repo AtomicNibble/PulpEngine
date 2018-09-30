@@ -43,7 +43,7 @@ void Converter::PrintBanner(void)
 
 bool Converter::Init(const core::string& modName)
 {
-    if (!db_.OpenDB()) {
+    if (!db_.OpenDB(assetDb::AssetDB::ThreadMode::SINGLE)) {
         X_ERROR("Converter", "Failed to open AssetDb");
         return false;
     }
