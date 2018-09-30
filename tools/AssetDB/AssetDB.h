@@ -25,16 +25,19 @@ class DLL_EXPORT AssetDB
     // Version 4: change asset thumb hash to sha1
     // Version 5: set thumb width, height coloums to NOT NULL
     // Version 6: Change asset+args hash to xxHash64
+public:
     static const int32_t DB_VERSION = 6;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
+    static const char* CACHE_DB_NAME;
     static const char* RAW_FILES_FOLDER;
     static const char* THUMBS_FOLDER;
 
     typedef core::Hash::xxHash64Val RawFileHash;
     typedef core::Hash::SHA1Digest ThumbHash;
 
+private:
     struct RawFile
     {
         int32_t file_id;

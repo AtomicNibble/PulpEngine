@@ -78,6 +78,7 @@ namespace
 
 const char* AssetDB::ASSET_DB_FOLDER = "asset_db";
 const char* AssetDB::DB_NAME = X_ENGINE_NAME "_asset.db";
+const char* AssetDB::CACHE_DB_NAME = X_ENGINE_NAME "_cache.db";
 const char* AssetDB::RAW_FILES_FOLDER = "raw_files";
 const char* AssetDB::THUMBS_FOLDER = "thumbs";
 
