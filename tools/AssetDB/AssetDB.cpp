@@ -2439,15 +2439,16 @@ bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
-
     if (it == qry.end()) {
         return false;
     }
 
+    auto& row = *it;
+
     // args can be null.
-    if ((*it).columnType(0) != sql::ColumType::SNULL) {
-        auto length = (*it).columnBytes(0);
-        const char* pArgs = (*it).get<const char*>(0);
+    if (row.columnType(0) != sql::ColumType::SNULL) {
+        auto length = row.columnBytes(0);
+        const char* pArgs = row.get<const char*>(0);
         argsOut.assign(pArgs, pArgs + length);
     }
     else {
