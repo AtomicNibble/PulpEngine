@@ -38,7 +38,7 @@
     <ClCompile Include="Module.cpp">
       <Filter>Source Files\EngineModule</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\sqlite-3.19.2\sqlite3.c">
+    <ClCompile Include="..\..\3rdparty\source\sqlite\sqlite3.c">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

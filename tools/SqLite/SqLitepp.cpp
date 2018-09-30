@@ -13,7 +13,7 @@
 
 #endif
 
-#include <../../3rdparty/source/sqlite-3.19.2/sqlite3.h>
+#include <../../3rdparty/source/sqlite/sqlite3.h>
 
 X_NAMESPACE_BEGIN(sql)
 
