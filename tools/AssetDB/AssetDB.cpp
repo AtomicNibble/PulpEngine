@@ -2486,11 +2486,18 @@ bool AssetDB::GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut)
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
+
     if (it == qry.end()) {
         return false;
     }
 
-    argsHashOut = static_cast<RawFileHash>((*it).get<int64_t>(0));
+    // args can be null.
+    if ((*it).columnType(0) != sql::ColumType::SNULL) {
+        argsHashOut = static_cast<RawFileHash>((*it).get<int64_t>(0));
+    }
+    else {
+        argsHashOut = 0;
+    }
     return true;
 }
 
