@@ -4,6 +4,7 @@
 
 #include <Containers\Array.h>
 #include <Hashing\crc32.h>
+#include <Hashing\MD5.h>
 
 #include <IFileSys.h>
 #include <ICompression.h>

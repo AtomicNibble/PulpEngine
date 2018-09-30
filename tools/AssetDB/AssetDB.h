@@ -3,7 +3,6 @@
 #include "../SqLite/SqlLib.h"
 
 #include <Util\Delegate.h>
-#include <Hashing\MD5.h>
 #include <Hashing\sha1.h>
 #include <Hashing\xxHash.h>
 #include <Containers\Array.h>
