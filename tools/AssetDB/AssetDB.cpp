@@ -788,7 +788,7 @@ bool AssetDB::PerformMigrations(void)
                     return false;
                 }
 
-                data.resize(file.remainingBytes());
+                data.resize(safe_static_cast<size_t>(file.remainingBytes()));
 
                 if (file.read(data.data(), data.size()) != data.size()) {
                     X_ERROR("AssetDB", "Failed to read rawfile");
