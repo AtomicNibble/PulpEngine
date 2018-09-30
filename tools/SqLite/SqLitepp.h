@@ -105,7 +105,9 @@ public:
 
     SqlLiteDb& operator=(SqlLiteDb&&);
 
-    bool connect(const char* pDb, ThreadMode::Enum threadMode = ThreadMode::SINGLE);
+    static bool setThreadMode(ThreadMode::Enum threadMode);
+
+    bool connect(const char* pDb, ThreadMode::Enum threadMode);
     bool disconnect(void);
 
     Result::Enum enableForeignKeys(bool enable = true);
