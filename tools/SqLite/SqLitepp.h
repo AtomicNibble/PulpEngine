@@ -110,9 +110,9 @@ public:
     bool connect(const char* pDb, ThreadMode::Enum threadMode);
     bool disconnect(void);
 
-    Result::Enum enableForeignKeys(bool enable = true);
-    Result::Enum enableTriggers(bool enable = true);
-    Result::Enum enableExtendedResultCodes(bool enable = true);
+    Result::Enum enableForeignKeys(bool enable);
+    Result::Enum enableTriggers(bool enable);
+    Result::Enum enableExtendedResultCodes(bool enable);
 
     RowId lastInsertRowid(void) const;
     int32_t numChangesFromLastStmt(void) const;
