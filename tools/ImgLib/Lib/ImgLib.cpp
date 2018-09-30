@@ -599,22 +599,53 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
         return false;
     }
 
+    auto targetAlgo = core::Compression::Algo::LZ4HC;
+
     // we kinda need to know the algo.
     switch (inputFileFmt)
     {
         // if it's dds just make sure compressed?
+        case ImgFileFormat::CI:
         case ImgFileFormat::DDS:
         case ImgFileFormat::TGA:
-            if (compAlgo == core::Compression::Algo::LZ4HC) {
-                return true;
-            }
+        case ImgFileFormat::PSD:
+            // re compress.
+            break;
+
+        case ImgFileFormat::JPG:
+            // just store JGP no real gains to be had.
+            // or can convert to TGA and compress, but don't see point.
+            targetAlgo = core::Compression::Algo::STORE;
             break;
 
         case ImgFileFormat::PNG:
-            return true;
-            break;
+        {
+            X_LOG0("Img", "Repacking png");
 
-        break;
+            // turn to uncompressed format.
+            XTextureFile srcImg(host.getScratchArena());
+            if (!Util::loadImage(host.getScratchArena(), fileData, inputFileFmt, srcImg)) {
+                X_WARNING("Img", "Failed to load src image");
+                return false;
+            }
+
+            core::XFileStream fileStream(host.getScratchArena());
+
+            if (!Util::saveImage(host.getScratchArena(), &fileStream, ImgFileFormat::DDS, srcImg)) {
+                X_ERROR("Img", "Failed to save thumb image");
+                return false;
+            }
+
+            // TODO: make array<T> have a base type so no matter grow policy can assign, simular to byteStream.
+            auto& buffer = fileStream.buffer();
+
+            fileData.resize(buffer.size());
+            std::memcpy(fileData.data(), buffer.data(), fileData.size());
+            break;
+        }
+
+        default:
+            break;
     }
 
     // send the raw data back to asset db with desired algo.
