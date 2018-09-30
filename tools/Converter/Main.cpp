@@ -47,7 +47,7 @@ typedef core::MemoryArena<
 namespace
 {
     X_DECLARE_ENUM(ConvertMode)
-    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK);
+    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK, REPACK);
 
     bool GetMode(ConvertMode::Enum& mode)
     {
@@ -70,6 +70,9 @@ namespace
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"chkdsk")) {
                 mode = ConvertMode::CHKDSK;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"repack")) {
+                mode = ConvertMode::REPACK;
             }
             else {
                 X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
@@ -211,6 +214,11 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 else if (mode == ConvertMode::CHKDSK) {
                     if (!con.Chkdsk()) {
                         X_ERROR("Convert", "Failed to perform Chkdsk");
+                    }
+                }
+                else if (mode == ConvertMode::REPACK) {
+                    if (!con.Repack()) {
+                        X_ERROR("Convert", "Failed to perform repack");
                     }
                 }
                 else if (mode == ConvertMode::ALL) {

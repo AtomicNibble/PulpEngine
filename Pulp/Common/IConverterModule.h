@@ -75,6 +75,16 @@ struct IConverter
         X_ASSERT_UNREACHABLE();
         return false;
     }
+
+    virtual bool repackSupported(void) const {
+        return false;
+    }
+
+    virtual bool Repack(IConverterHost& host, assetDb::AssetId assetId) const {
+        X_UNUSED(host, assetId);
+        X_ASSERT_UNREACHABLE();
+        return false;
+    }
 };
 
 #endif // !X_CONVETER_MODULE_I_H_
