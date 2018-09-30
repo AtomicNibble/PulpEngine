@@ -2433,6 +2433,24 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
     return true;
 }
 
+bool AssetDB::GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFileHash& argsHashOut)
+{
+    sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash FROM file_ids "
+        "INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+    qry.bind(1, assetId);
+
+    const auto it = qry.begin();
+    if (it == qry.end()) {
+        return false;
+    }
+
+    auto row = *it;
+    
+    dataHashOut = static_cast<RawFileHash>(row.get<int64_t>(0));
+    argsHashOut = static_cast<RawFileHash>(row.get<int64_t>(1));
+    return true;
+}
+
 bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT args FROM file_ids WHERE file_ids.file_id = ?");

@@ -220,6 +220,7 @@ public:
     bool AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut = nullptr);
 
     // Misc data / info retrival
+    bool GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFileHash& argsHashOut);
     bool GetArgsForAsset(AssetId assetId, core::string& argsOut);
     bool GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut);
     bool GetModIdForAsset(AssetId assetId, ModId& modIdOut);
