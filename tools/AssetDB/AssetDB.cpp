@@ -2651,7 +2651,7 @@ bool AssetDB::GetAssetInfoForAsset(AssetId assetId, AssetInfo& infoOut)
     infoOut.type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
     infoOut.modId = static_cast<AssetType::Enum>(row.get<int32_t>(3));
 
-    if (row.columnType(3) != sql::ColumType::SNULL) {
+    if (row.columnType(4) != sql::ColumType::SNULL) {
         infoOut.parentId = safe_static_cast<AssetId>(row.get<int32_t>(4));
     }
     else {
