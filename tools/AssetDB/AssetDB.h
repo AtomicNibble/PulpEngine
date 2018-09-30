@@ -12,7 +12,6 @@
 #include <ICompression.h>
 
 X_NAMESPACE_DECLARE(core,
-
                     class LinearAllocator);
 
 X_NAMESPACE_BEGIN(assetDb)
