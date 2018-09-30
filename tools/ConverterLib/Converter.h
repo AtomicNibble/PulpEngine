@@ -17,7 +17,6 @@ X_NAMESPACE_BEGIN(converter)
 typedef assetDb::AssetDB::AssetType AssetType;
 
 class Converter
-    /* CONVERTERLIB_EXPORT <- shows all my privates in export list :/ */
     : public IConverterHost
 {
     typedef core::traits::Function<void*(ICore* pSystem, const char* moduleName)> ModuleLinkfunc;
