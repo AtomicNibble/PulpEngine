@@ -37,10 +37,12 @@ struct IConverterHost
 
     virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_ABSTRACT;
     virtual bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_ABSTRACT;
+    virtual bool GetAssetDataCompAlgo(assetDb::AssetId assetId, core::Compression::Algo::Enum& algoOut) X_ABSTRACT;
     virtual bool GetAssetData(const char* pAssetName, assetDb::AssetType::Enum assType, DataArr& dataOut) X_ABSTRACT;
     virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_ABSTRACT;
     virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
     virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_ABSTRACT;
+    virtual bool UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
 
     // get global conversion settings data.
     virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;

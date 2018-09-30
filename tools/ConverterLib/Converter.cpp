@@ -556,6 +556,17 @@ bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, Da
     return true;
 }
 
+bool Converter::GetAssetDataCompAlgo(assetDb::AssetId assetId, core::Compression::Algo::Enum& algoOut)
+{
+    if (!db_.GetRawFileCompAlgoForAsset(assetId, algoOut)) {
+        X_ERROR("Converter", "Failed to get raw data algo for: %" PRIi32, assetId);
+        return false;
+    }
+
+    return true;
+}
+
+
 bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut)
 {
     if (!db_.AssetExsists(assType, core::string(pAssetName), pIdOut)) {
@@ -585,6 +596,14 @@ bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i
 
     return true;
 }
+
+bool Converter::UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
+{
+    auto result = db_.UpdateAssetRawFile(assetId, data, algo, lvl);
+
+    return result == assetDb::AssetDB::Result::OK || result == assetDb::AssetDB::Result::UNCHANGED;
+}
+
 
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
