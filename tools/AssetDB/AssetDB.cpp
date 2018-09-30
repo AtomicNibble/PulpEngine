@@ -2491,7 +2491,7 @@ bool AssetDB::GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut)
         return false;
     }
 
-    // args can be null.
+    // arg hash can be null
     if ((*it).columnType(0) != sql::ColumType::SNULL) {
         argsHashOut = static_cast<RawFileHash>((*it).get<int64_t>(0));
     }
