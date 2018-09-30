@@ -2446,8 +2446,12 @@ bool AssetDB::GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFi
 
     auto row = *it;
     
-    dataHashOut = static_cast<RawFileHash>(row.get<int64_t>(0));
-    argsHashOut = static_cast<RawFileHash>(row.get<int64_t>(1));
+    argsHashOut = 0;
+    if (row.columnType(0) != sql::ColumType::SNULL) {
+        argsHashOut = static_cast<RawFileHash>(row.get<int64_t>(0));
+    }
+
+    dataHashOut = static_cast<RawFileHash>(row.get<int64_t>(1));
     return true;
 }
 
