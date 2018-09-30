@@ -12,6 +12,7 @@
 
 #include <String\Json.h>
 #include <String\HumanSize.h>
+#include <String\HumanDuration.h>
 #include <String\StringTokenizer.h>
 
 #include <Random\MultiplyWithCarry.h>
@@ -1927,11 +1928,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
         const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
 
         core::HumanSize::Str sizeStr, sizeStr2;
-        X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2f%%) %gms",
+        core::HumanDuration::Str durStr;
+        X_LOG2("AssetDB", "Defalated raw file %s -> %s(%.2f%%) ^6%s",
             core::HumanSize::toString(sizeStr, data.size()),
             core::HumanSize::toString(sizeStr2, compressed.size()),
             percentageSize,
-            elapsed);
+            core::HumanDuration::toString(durStr, elapsed));
     }
 
     return UpdateAssetRawFile(type, name, compressed);
@@ -2203,11 +2205,13 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     const float percentageSize = (static_cast<float>(compressed.size()) / static_cast<float>(data.size())) * 100;
 
     core::HumanSize::Str sizeStr, sizeStr2;
+    core::HumanDuration::Str durStr;
+
     X_LOG2("AssetDB", "Defalated thumb %s -> %s(%.2f%%) %gms",
         core::HumanSize::toString(sizeStr, data.size()),
         core::HumanSize::toString(sizeStr2, compressed.size()),
         percentageSize,
-        elapsed);
+        core::HumanDuration::toString(durStr, elapsed));
 
     return UpdateAssetThumb(assetId, thumbDim, srcDim, compressed);
 }
