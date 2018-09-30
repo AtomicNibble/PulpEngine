@@ -53,19 +53,19 @@ public:
     CONVERTERLIB_EXPORT bool Repack(void);
 
     // IConverterHost
-    CONVERTERLIB_EXPORT virtual bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_FINAL;
-    CONVERTERLIB_EXPORT virtual bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_FINAL;
-    CONVERTERLIB_EXPORT virtual bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_FINAL;
-    CONVERTERLIB_EXPORT virtual bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_FINAL;
-    CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_FINAL;
-    CONVERTERLIB_EXPORT virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_FINAL;
+    CONVERTERLIB_EXPORT bool GetAssetArgs(assetDb::AssetId assetId, ConvertArgs& args) X_FINAL;
+    CONVERTERLIB_EXPORT bool GetAssetData(assetDb::AssetId assetId, DataArr& dataOut) X_FINAL;
+    CONVERTERLIB_EXPORT bool GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut) X_FINAL;
+    CONVERTERLIB_EXPORT bool AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut = nullptr) X_FINAL;
+    CONVERTERLIB_EXPORT bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_FINAL;
+    CONVERTERLIB_EXPORT bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_FINAL;
 
-    CONVERTERLIB_EXPORT virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
+    CONVERTERLIB_EXPORT bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 
-    CONVERTERLIB_EXPORT virtual IConverter* GetConverter(assetDb::AssetType::Enum assType) X_FINAL;
-    CONVERTERLIB_EXPORT virtual physics::IPhysLib* GetPhsicsLib(void) X_FINAL;
+    CONVERTERLIB_EXPORT IConverter* GetConverter(assetDb::AssetType::Enum assType) X_FINAL;
+    CONVERTERLIB_EXPORT physics::IPhysLib* GetPhsicsLib(void) X_FINAL;
 
-    CONVERTERLIB_EXPORT virtual core::MemoryArenaBase* getScratchArena(void) X_FINAL;
+    CONVERTERLIB_EXPORT core::MemoryArenaBase* getScratchArena(void) X_FINAL;
     // ~IConverterHost
 
 private:
