@@ -93,6 +93,7 @@ AssetDB::~AssetDB()
 {
 }
 
+
 bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
 {
     X_ASSERT_NOT_NULL(gEnv);
@@ -874,6 +875,51 @@ bool AssetDB::PerformMigrations(void)
             }
 
             trans.commit();
+        }
+    }
+
+    if (dbVersion_ < 7) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 7", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        if (!db_.execute(R"(
+            CREATE TABLE file_ids_new (
+                     file_id INTEGER PRIMARY KEY,
+                     name TEXT COLLATE NOCASE NOT NULL,
+                     type INTEGER NOT NULL,
+                     args TEXT,
+                     argsHash INTEGER,
+                     raw_file INTEGER,
+                     thumb_id INTEGER,
+                     add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                     lastUpdateTime TIMESTAMP,
+                     parent_id INTEGER NULL,
+                     mod_id INTEGER NOT NULL,
+                     FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),
+                     FOREIGN KEY(mod_id) REFERENCES mods(mod_id),
+                     FOREIGN KEY(thumb_id) REFERENCES thumbs(thumb_id),
+                     unique(name, type)
+            );
+
+            INSERT INTO file_ids_new SELECT file_id,name,type,args,argsHash,raw_file,thumb_id,add_time,lastUpdateTime,parent_id,mod_id FROM file_ids;
+            DROP TABLE file_ids;
+            ALTER TABLE file_ids_new RENAME TO file_ids;
+        )")) {
+            X_ERROR("AssetDB", "Failed to update file_ids table");
+            return false;
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
         }
     }
 
@@ -2766,103 +2812,6 @@ bool AssetDB::GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut)
         return false;
     }
 
-    return true;
-}
-
-bool AssetDB::MarkAssetsStale(ModId modId)
-{
-    // basically set NULL for all compiledHashes on file_ids that match this mod.
-    sql::SqlLiteTransaction trans(db_);
-
-    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = NULL, lastUpdateTime = DateTime('now') WHERE mod_id = ?");
-    cmd.bind(1, modId);
-
-    sql::Result::Enum res = cmd.execute();
-    if (res != sql::Result::OK) {
-        return false;
-    }
-
-    trans.commit();
-    return true;
-}
-
-bool AssetDB::IsAssetStale(AssetId assetId)
-{
-    sql::SqlLiteQuery qry(db_, "SELECT file_ids.compiledHash, file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
-                               "INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
-    qry.bind(1, assetId);
-
-    const auto it = qry.begin();
-
-    if (it == qry.end()) {
-        return true;
-    }
-
-    auto row = *it;
-
-    // ever compiled?
-    if (row.columnType(0) == sql::ColumType::SNULL) {
-        return true;
-    }
-
-    // check if the compiled hash is stale for given data and args.
-    const auto currentCompiledHash = static_cast<RawFileHash>(row.get<int64_t>(0));
-    const auto argsHash = static_cast<RawFileHash>(row.get<int64_t>(1));
-    const auto rawFileHash = static_cast<RawFileHash>(row.get<int64_t>(2));
-    const int32_t rawFileSize = row.get<int32_t>(3);
-
-    const auto mergedHash = getMergedHash(argsHash, rawFileHash, rawFileSize);
-
-    return currentCompiledHash != mergedHash;
-}
-
-bool AssetDB::OnAssetCompiled(AssetId assetId)
-{
-    if (!AssetHasRawFile(assetId)) {
-        sql::SqlLiteTransaction trans(db_);
-
-        // this is more simple, just copy the args hash.
-        sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = argsHash, lastUpdateTime = DateTime('now') WHERE file_id = ?");
-        cmd.bind(1, assetId);
-
-        sql::Result::Enum res = cmd.execute();
-        if (res != sql::Result::OK) {
-            return false;
-        }
-
-        trans.commit();
-        return true;
-    }
-
-    sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash, raw_files.size FROM file_ids "
-                               "INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
-    qry.bind(1, assetId);
-
-    const auto it = qry.begin();
-    if (it == qry.end()) {
-        X_ERROR("AssetDB", "Failed to find asset for updating: %" PRIi32, assetId);
-        return false;
-    }
-
-    auto row = *it;
-    const auto argsHash = static_cast<RawFileHash>(row.get<int64_t>(0));
-    const auto rawFileHash = static_cast<RawFileHash>(row.get<int64_t>(1));
-    const int32_t rawFileSize = row.get<int32_t>(2);
-
-    const auto mergedHash = getMergedHash(argsHash, rawFileHash, rawFileSize);
-
-    sql::SqlLiteTransaction trans(db_);
-
-    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET compiledHash = ?, lastUpdateTime = DateTime('now') WHERE file_id = ?");
-    cmd.bind(1, static_cast<int64_t>(mergedHash));
-    cmd.bind(2, assetId);
-
-    sql::Result::Enum res = cmd.execute();
-    if (res != sql::Result::OK) {
-        return false;
-    }
-
-    trans.commit();
     return true;
 }
 

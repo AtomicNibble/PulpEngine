@@ -29,8 +29,9 @@ class ASSETDBLIB_EXPORT AssetDB
     // Version 4: change asset thumb hash to sha1
     // Version 5: set thumb width, height coloums to NOT NULL
     // Version 6: Change asset+args hash to xxHash64
+    // Version 7: remove compiled hash from file_ids
 public:
-    static const int32_t DB_VERSION = 6;
+    static const int32_t DB_VERSION = 7;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
@@ -238,10 +239,6 @@ public:
 
     // compile data helper.
     bool GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut);
-
-    bool MarkAssetsStale(ModId modId);
-    bool IsAssetStale(AssetId assetId);
-    bool OnAssetCompiled(AssetId assetId);
 
     // some assetRef stuff.
     bool GetAssetRefCount(AssetId assetId, uint32_t& refCountOut);
