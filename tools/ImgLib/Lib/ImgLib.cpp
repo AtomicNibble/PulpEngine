@@ -33,6 +33,11 @@ bool ImgLib::thumbGenerationSupported(void) const
     return true;
 }
 
+bool ImgLib::repackSupported(void) const
+{
+    return true;
+}
+
 bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
     X_UNUSED(host);
@@ -562,5 +567,63 @@ bool ImgLib::CreateThumb(IConverterHost& host, int32_t assetId, Vec2i targetDim)
     host.UpdateAssetThumb(assetId, targetDim, srcDim, buf, core::Compression::Algo::STORE, core::Compression::CompressLevel::NORMAL);
     return true;
 }
+
+bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
+{
+    // HELLO !
+    // would you like me to repack a pickle?
+    // now that is a mighty request.
+
+    // so basically I want to load the current raw data see what image format it is.
+    // convert it and compress it if deemed required.
+    core::Array<uint8_t> fileData(host.getScratchArena());
+    if (!host.GetAssetData(assetId, fileData)) {
+        X_ERROR("Img", "Failed to get asset data");
+        return false;
+    }
+
+    if (fileData.isEmpty()) {
+        X_ERROR("Img", "File data is empty");
+        return false;
+    }
+
+    ImgFileFormat::Enum inputFileFmt = Util::resolveSrcfmt(fileData);
+    if (inputFileFmt == ImgFileFormat::UNKNOWN) {
+        X_ERROR("Img", "Unknown img src format");
+        return false;
+    }
+
+    core::Compression::Algo::Enum compAlgo;
+    if (!host.GetAssetDataCompAlgo(assetId, compAlgo)) {
+        X_ERROR("Img", "Failed to get comp algo");
+        return false;
+    }
+
+    // we kinda need to know the algo.
+    switch (inputFileFmt)
+    {
+        // if it's dds just make sure compressed?
+        case ImgFileFormat::DDS:
+        case ImgFileFormat::TGA:
+            if (compAlgo == core::Compression::Algo::LZ4HC) {
+                return true;
+            }
+            break;
+
+        case ImgFileFormat::PNG:
+            return true;
+            break;
+
+        break;
+    }
+
+    // send the raw data back to asset db with desired algo.
+    if (!host.UpdateAssetRawFile(assetId, fileData, core::Compression::Algo::LZ4HC, core::Compression::CompressLevel::HIGH)) {
+        return false;
+    }
+
+    return true;
+}
+
 
 X_NAMESPACE_END
