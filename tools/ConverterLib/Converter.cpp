@@ -226,7 +226,7 @@ bool Converter::Convert(AssetType::Enum assType)
         X_ERROR("Converter", "Failed to convert \"%s\" assets", AssetType::ToString(assType));
         return false;
     }
-
+    
     core::HumanDuration::Str timeStr;
     X_LOG0("Converter", "Converted %" PRIi32 " asset(s) in ^6%s", numAssets,
         core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
