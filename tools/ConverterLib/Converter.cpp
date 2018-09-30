@@ -55,6 +55,25 @@ bool Converter::Init(const core::string& modName)
         }
     }
 
+    // open cache db.
+    core::Path<char> dbPath;
+    dbPath.append(assetDb::AssetDB::ASSET_DB_FOLDER);
+    dbPath.ensureSlash();
+    dbPath.append(assetDb::AssetDB::CACHE_DB_NAME);
+
+    if (!cacheDb_.connect(dbPath.c_str(), assetDb::AssetDB::ThreadMode::SINGLE)) {
+        X_ERROR("Converter", "Failed to open cache db");
+        return false;
+    }
+
+    if (!cacheDb_.execute("PRAGMA synchronous = OFF; PRAGMA page_size = 4096; PRAGMA journal_mode=wal; PRAGMA foreign_keys = ON;")) {
+        return false;
+    }
+
+    if (!CreateTables()) {
+        return false;
+    }
+
     return true;
 }
 
@@ -98,10 +117,15 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
         return false;
     }
 
+    assetDb::AssetDB::RawFileHash dataHash, argsHash;
+    if (!db_.GetHashesForAsset(assetId, dataHash, argsHash)) {
+        return false;
+    }
+
     // file exist already?
     if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str())) {
         // se if stale.
-        if (!db_.IsAssetStale(assetId)) {
+        if (!IsAssetStale(assetId, dataHash, argsHash)) {
             X_LOG1("Converter", "Skipping conversion, asset is not stale");
             return true;
         }
@@ -132,8 +156,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     bool res = Convert_int(assType, assetId, argsStr, pathOut);
     if (res) {
         X_LOG1("Converter", "processing took: ^6%g ms", timer.GetMilliSeconds());
-
-        db_.OnAssetCompiled(assetId);
+        OnAssetCompiled(assetId, dataHash, argsHash);
     }
     return res;
 }
@@ -310,7 +333,7 @@ bool Converter::CleanAll(assetDb::ModId modId)
 bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name, const core::Path<char>& outDir)
 {
     // mark all the assets for this mod stale.
-    if (!db_.MarkAssetsStale(modId)) {
+    if (!MarkAssetsStale(modId)) {
         X_ERROR("Converter", "Failed to mark mod \"%s\" assets as state", name.c_str());
         return false;
     }
@@ -619,6 +642,77 @@ core::MemoryArenaBase* Converter::getScratchArena(void)
 {
     return scratchArea_;
 }
+
+
+bool Converter::CreateTables(void)
+{
+    if (!cacheDb_.execute("CREATE TABLE IF NOT EXISTS convert_cache ("
+        "assetId INTEGER PRIMARY KEY,"
+        "dataHash INTEGER,"
+        "argsHash INTEGER,"
+        "lastUpdateTime TIMESTAMP"
+        ");")) {
+        X_ERROR("Converter", "Failed to create 'convert_cache' table");
+        return false;
+    }
+
+
+    return true;
+}
+
+bool Converter::MarkAssetsStale(assetDb::ModId modId)
+{
+    sql::SqlLiteTransaction trans(cacheDb_);
+
+    sql::SqlLiteCmd cmd(cacheDb_, "DELETE FROM convert_cache WHERE mod_id = ?");
+    cmd.bind(1, modId);
+
+    sql::Result::Enum res = cmd.execute();
+    if (res != sql::Result::OK) {
+        return false;
+    }
+
+    trans.commit();
+    return true;
+}
+
+bool Converter::IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash dataHash, assetDb::AssetDB::RawFileHash argsHash)
+{
+    sql::SqlLiteQuery qry(cacheDb_, "SELECT dataHash, argsHash FROM convert_cache WHERE assetId = ?");
+    qry.bind(1, assetId);
+
+    const auto it = qry.begin();
+    if (it == qry.end()) {
+        return true;
+    }
+
+    auto row = *it;
+
+    const auto cacheArgsHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(1));
+    const auto cacheDataHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(2));
+
+    if (argsHash != cacheArgsHash || dataHash != cacheDataHash) {
+        return true;
+    }
+
+    return true;
+}
+
+bool Converter::OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash& dataHashOut, assetDb::AssetDB::RawFileHash& argsHashOut)
+{
+    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, dataHash, argsHash, lastUpdateTime) VALUES(?,?,?,DateTime('now'))");
+    cmd.bind(1, assetId);
+    cmd.bind(2, static_cast<int64_t>(dataHashOut));
+    cmd.bind(3, static_cast<int64_t>(argsHashOut));
+
+    sql::Result::Enum res = cmd.execute();
+    if (res != sql::Result::OK) {
+        return false;
+    }
+
+    return true;
+}
+
 
 bool Converter::loadConversionProfiles(const core::string& profileName)
 {

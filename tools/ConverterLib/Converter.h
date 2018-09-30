@@ -1,9 +1,11 @@
 #pragma once
 
+
 #include <IConverterModule.h>
 #include <String\CmdArgs.h>
 #include <Platform\Module.h>
 
+#include <../SqLite/SqlLib.h>
 #include <../AssetDB/AssetDB.h>
 
 X_NAMESPACE_DECLARE(anim,
@@ -70,6 +72,12 @@ public:
     // ~IConverterHost
 
 private:
+    bool CreateTables(void);
+
+    bool MarkAssetsStale(assetDb::ModId modId);
+    bool IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash dataHash, assetDb::AssetDB::RawFileHash argsHash);
+    bool OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash& dataHashOut, assetDb::AssetDB::RawFileHash& argsHashOut);
+
     bool loadConversionProfiles(const core::string& profileName);
     void clearConversionProfiles(void);
 
@@ -86,9 +94,12 @@ private:
     bool IntializeConverterModule(AssetType::Enum assType, const char* dllName, const char* moduleClassName);
     void UnloadConverters(void);
 
+
 private:
     core::MemoryArenaBase* scratchArea_;
     assetDb::AssetDB& db_;
+
+    sql::SqlLiteDb cacheDb_;
 
     // physics converter is special just like you.
     physics::IPhysLib* pPhysLib_;

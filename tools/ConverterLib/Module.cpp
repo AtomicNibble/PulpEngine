@@ -9,6 +9,14 @@
 
 X_USING_NAMESPACE;
 
+X_LINK_ENGINE_LIB("SqLite")
+
+#ifdef X_LIB
+
+X_FORCE_LINK_FACTORY("XEngineModule_SqLite");
+
+#endif // !X_LIB
+
 class XEngineModule_ConverterLib : public IEngineModule
 {
     X_ENGINE_INTERFACE_SIMPLE(IEngineModule);
@@ -27,6 +35,10 @@ class XEngineModule_ConverterLib : public IEngineModule
         ICore* pCore = env.pCore;
 
         LinkModule(pCore, "ConverterLib");
+
+        if (!pCore->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "SqLite", "Engine_SqLite")) {
+            return false;
+        }
 
         return true;
     }
