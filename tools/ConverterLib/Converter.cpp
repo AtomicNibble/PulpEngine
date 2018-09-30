@@ -688,14 +688,14 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::RawFile
 
     auto row = *it;
 
-    const auto cacheArgsHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(0));
-    const auto cacheDataHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(1));
+    const auto cacheDataHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(0));
+    const auto cacheArgsHash = static_cast<assetDb::AssetDB::RawFileHash>(row.get<int64_t>(1));
 
     if (argsHash != cacheArgsHash || dataHash != cacheDataHash) {
         return true;
     }
 
-    return true;
+    return false;
 }
 
 bool Converter::OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash& dataHashOut, assetDb::AssetDB::RawFileHash& argsHashOut)
