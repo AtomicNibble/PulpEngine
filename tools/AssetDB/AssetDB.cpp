@@ -3062,7 +3062,7 @@ bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFi
 
     dataOut.file_id = (*it).get<int32_t>(0);
     dataOut.size = (*it).get<int32_t>(2);
-    dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(3));
+    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(3));
     return true;
 }
 
@@ -3086,7 +3086,7 @@ bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
 
     dataOut.file_id = (*it).get<int32_t>(0);
     dataOut.size = (*it).get<int32_t>(2);
-    dataOut.hash = static_cast<uint32_t>((*it).get<int32_t>(3));
+    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(3));
     return true;
 }
 
