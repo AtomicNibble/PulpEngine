@@ -7,10 +7,21 @@ Core:
 
  ☐ Finish off and test replay logic of input system.
 
+ ✔ Tidy up console code. @done (18-09-17 18:35)
+
 Game:
 
   ☐ Main menu need to open again
+    I need to know when the state changes and basically reset menu to main.
+
+
   ☐ Make menus for lobby etc.
+
+  Netorking:
+
+    ☐ Sync the players better, basically have some sort of 3rd person model.
+        - Basically fix it so host and client can see same shit, currently only host can see some things.
+
 
 Engine:
 
@@ -33,9 +44,23 @@ Engine:
   ☐ Support unsorted command lists.
 
   GUI:
-    ☐ Support combo boxes (for selecting resolution etc)
-    ☐ Support scrollable areas (will be probs needed for settings menus)
-    ☐ Support passing data to GUI scripts, stuff like resolution list.
+   ☐ Support combo boxes (for selecting resolution etc)
+   ☐ Support scrollable areas (will be probs needed for settings menus)
+   ☐ Support passing data to GUI scripts, stuff like resolution list.
+
+   ☐ Stuff like popup menu i don't really know the size till after?
+     which makes something like rendering a second step atractive.
+     But i could pre calculate it, is this gonna crop up again?
+     Dunno don't think i support sizing stuff based on content, will i want to?
+     Don't think there is a need.
+
+     One problem have is that if we have a button
+     that creates another window and adds stuff it needs to be drawn on diffrent layer.
+     so basicalyl need render buffers for each window.
+
+Network:
+
+  ☐  Implement congestion control.
 
 Font:
 
@@ -55,9 +80,11 @@ Sound:
     ✔ Support loading files from them @done (18-08-26 14:00)
     ☐ Decide if want to async load package headers (means banks can't be in packages)
 
+  ✔ Add some basic debug ui, with like active objects and such. @done (18-09-15 00:21)
+
 Video:
 
-  ☐ Support audio sync, somehow.
+  ✔ Support audio sync, somehow. @done (18-09-09 14:07)
     Think created vorbis audio then decoded myself and feeding into wwise via Audio Input will be the wayto go.
     So for wise I need to make a audio SFX object and instead of importing a wav I add a Audio Input source.
     Then I need play and stop events attached to that event, then I post that event to a game object.
@@ -75,7 +102,8 @@ Video:
      - Will need to keep track of when wise is pulling the source data?
  ☐ Test decoding not been able to keep up.
    ☐ Stall audio if video jumpy?
- ☐ Have the video debug move if profiler enabled etc, just need to pass postion basically.
+ ☐ Check what happens when we suspend audio system.
+ ✔ Have the video debug move if profiler enabled etc, just need to pass postion basically. @done (18-09-13 18:58)
 
 Render:
 
@@ -84,16 +112,20 @@ Render:
     The allocator i use has fixed page sizes, so limits texture size.
     - should check if using that allocator is really what i want.
 
- ☐ Make it so the command lists can be generated but not executed, then the 3dEngine can dispatch multiple command lists as once, since the dispatch has fixed overhead.
+ ✔ Make it so the command lists can be generated but not executed, then the 3dEngine can dispatch multiple command lists as once, since the dispatch has fixed overhead. @done (18-09-29 16:17)
      For example we could generated both 2d and 3d command lists, but dispatch the lists at same time. But maybe it's better to build the 2d dispatch it then start building 3d dunno.
       But I need to exposes the flexibility.
 
 AssetDB:
 
   ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
-    ☐ Change the thumb hash coloum to be BLOB type
-  ☐ Change hash function for raw assets to xxHash
-  ☐ Support repack for images, so can optimise compression.
+    ✘ Change the thumb hash coloum to be BLOB type @cancelled (18-09-30 22:49)
+      Not really needed.
+  ✔ Change hash function for raw assets to xxHash @done (18-09-30 12:11)
+  ✔ Support repack for images, so can optimise compression. @done (18-09-30 22:48)
+  ✔ Move compiled hashes out into a converter cache db. @done (18-09-30 22:48)
+     This way we can compile all assets without editing assetDB which is commited.
+  ☐ Make it raw_files refrence a file_id so we can keep track of old rawFiles and list them all, making it easy to clean up unused files and rollback.
 
 AssetPak:
 
@@ -108,8 +140,11 @@ LevelBuilder:
   ☐ Bake lighting for level
 
 
+Linker:
+  ☐ Build level packs
+
  UnitTests:
 
    Containers:
-     ☐ FixedByteStream
-     ☐ FixedByteStreamRing
+     ✔ FixedByteStream @done (18-09-15 18:05)
+     ✔ FixedByteStreamRing @done (18-09-15 17:48)
