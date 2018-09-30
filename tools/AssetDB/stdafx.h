@@ -26,7 +26,7 @@ extern AssetDBArena* g_AssetDBArena;
 #include "../SqLite/SqlLib.h"
 
 #ifdef X_LIB
-#define ASSETDBLIB_EXPORT
+#define ASSETDB_EXPORT
 #else
-#define ASSETDBLIB_EXPORT X_EXPORT
+#define ASSETDB_EXPORT X_EXPORT
 #endif // X_LIB

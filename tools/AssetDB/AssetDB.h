@@ -15,11 +15,13 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(assetDb)
 
-#ifndef ASSETDBLIB_EXPORT
-#define ASSETDBLIB_EXPORT X_IMPORT
+#if !defined(ASSETDBLIB_EXPORT) && !defined(X_LIB)
+#define ASSETDB_EXPORT X_IMPORT
+#else
+#define ASSETDB_EXPORT
 #endif
 
-class ASSETDBLIB_EXPORT AssetDB
+class ASSETDB_EXPORT AssetDB
 {
     // Version 1: stores raw files with hash after file name on disk.
     //				In order to migrate must rename all rawfiles on disk.
