@@ -7,6 +7,7 @@
 #include <Platform\Console.h>
 #include <Time\StopWatch.h>
 #include <Hashing\Fnva1Hash.h>
+#include <String\HumanDuration.h>
 
 #define _LAUNCHER
 #include <ModuleExports.h>
@@ -249,7 +250,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     }
                 }
 
-                X_LOG0("Convert", "Elapsed time: ^6%gms", timer.GetMilliSeconds());
+                core::HumanDuration::Str timeStr;
+                X_LOG0("Convert", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
             }
             else {
                 X_ERROR("Convert", "Failed to init converter");
