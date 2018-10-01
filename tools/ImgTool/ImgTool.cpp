@@ -240,7 +240,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     core::MallocFreeAllocator allocator;
     ImgToolArena arena(&allocator, "ImgToolArena");
 
-
     EngineApp app;
 
     if (!app.Init(hInstance, &arena, lpCmdLine)) {
