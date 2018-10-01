@@ -140,8 +140,8 @@ namespace TGA
             return false;
         }
 
-        if (!isBGR(hdr.ImageType)) {
-            X_ERROR("TextureTGA", "invalid image type. only rgb maps allowed", hdr.ImageType);
+        if (!isBGR(hdr.ImageType) && !isMono(hdr.ImageType)) {
+            X_ERROR("TextureTGA", "invalid image type. only rgb/mono maps allowed", hdr.ImageType);
             return false;
         }
 
