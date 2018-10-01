@@ -504,7 +504,7 @@ namespace PNG
     bool XTexLoaderPNG::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
     {
         // some validation.
-        if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8) {
+        if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8 && imgFile.getFormat() != Texturefmt::A8) {
             X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
             return false;
         }
@@ -520,8 +520,21 @@ namespace PNG
         core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
         PngColorType::Enum colType = PngColorType::TRUECOLOR;
-        if (imgFile.getFormat() == Texturefmt::R8G8B8A8) {
-            colType = PngColorType::TRUECOLOR_ALPHA;
+
+        switch (imgFile.getFormat())
+        {
+            case Texturefmt::R8G8B8A8:
+                colType = PngColorType::TRUECOLOR_ALPHA;
+                break;
+            case Texturefmt::R8G8B8:
+                colType = PngColorType::TRUECOLOR;
+                break;
+            case Texturefmt::A8:
+                colType = PngColorType::GREYSCALE;
+                break;
+            default:
+                X_ASSERT_UNREACHABLE();
+                return false;
         }
 
         file->writeObj(PNG_FILE_MAGIC);
