@@ -280,12 +280,12 @@ namespace PNG
         }
 
         if (ihdr.colType == PngColorType::INDEXED) {
-            X_ERROR("TexturePNG", "invalud color type. expected: TRUECOLOR | TRUECOLOR_ALPHA");
+            X_ERROR("TexturePNG", "invalid color type. expected: TRUECOLOR | TRUECOLOR_ALPHA");
             return false;
         }
 
         if (ihdr.bitDepth != 8 && ihdr.bitDepth != 16) {
-            X_ERROR("TexturePNG", "invalud depth. provided: %" PRIi8 " expected: 8 | 16", ihdr.bitDepth);
+            X_ERROR("TexturePNG", "invalid depth. provided: %" PRIi8 " expected: 8 | 16", ihdr.bitDepth);
             return false;
         }
 
