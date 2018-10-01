@@ -504,10 +504,6 @@ namespace PNG
     bool XTexLoaderPNG::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
     {
         // some validation.
-        if (imgFile.getFormat() != Texturefmt::R8G8B8A8 && imgFile.getFormat() != Texturefmt::R8G8B8 && imgFile.getFormat() != Texturefmt::A8) {
-            X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
-            return false;
-        }
         if (imgFile.getNumMips() > 1) {
             X_ERROR("TexturePNG", "Can't save image with mips");
             return false;
@@ -517,25 +513,26 @@ namespace PNG
             return false;
         }
 
-        core::Crc32* pCrc = gEnv->pCore->GetCrc32();
-
         PngColorType::Enum colType = PngColorType::TRUECOLOR;
-
         switch (imgFile.getFormat())
         {
             case Texturefmt::R8G8B8A8:
+            case Texturefmt::B8G8R8A8:
                 colType = PngColorType::TRUECOLOR_ALPHA;
                 break;
             case Texturefmt::R8G8B8:
+            case Texturefmt::B8G8R8:
                 colType = PngColorType::TRUECOLOR;
                 break;
             case Texturefmt::A8:
                 colType = PngColorType::GREYSCALE;
                 break;
             default:
-                X_ASSERT_UNREACHABLE();
+                X_ERROR("TexturePNG", "Saving fmt \"%s\" is not supported", Texturefmt::ToString(imgFile.getFormat()));
                 return false;
         }
+
+        core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
         file->writeObj(PNG_FILE_MAGIC);
 
@@ -601,9 +598,28 @@ namespace PNG
         // and requires a filter byte at start of each row.
         const int32_t rowBytes = Util::dataSize(imgFile.getWidth(), 1, imgFile.getFormat());
         const int32_t rows = imgFile.getHeight();
+
+        core::Array<uint8_t> swizzleBuf(swapArena);
+        const bool isBGR = Util::isBGR(imgFile.getFormat());
+        if (isBGR) {
+            swizzleBuf.resize(rowBytes);
+        }
+
         for (int32_t row = 0; row < rows; row++) {
             // stupid filter byte.
             const FilterMethodType::Enum filterType = FilterMethodType::None;
+
+            if (isBGR) {
+                const int32_t pixels = imgFile.getWidth();
+                const int32_t stride = rowBytes / pixels;
+                X_ASSERT(rowBytes % pixels == 0, "row bytes is not a multiple of row pixels")(rowBytes, pixels);
+
+                std::memcpy(swizzleBuf.data(), pSrcCur, rowBytes);
+
+                for (int32_t i = 0; i < rowBytes; i += stride) {
+                    core::Swap(swizzleBuf[i], swizzleBuf[i + 2]);
+                }
+            }
 
             auto res = zlib.Deflate(&filterType, sizeof(filterType), false);
             if (res != ZlibDefalte::Result::OK) {
@@ -611,9 +627,11 @@ namespace PNG
                 return false;
             }
 
+            const uint8_t* pRGBRow = isBGR ? swizzleBuf.data() : pSrcCur;
+
             // deflate row.
             const bool lastRow = (row + 1) == rows;
-            res = zlib.Deflate(pSrcCur, rowBytes, lastRow);
+            res = zlib.Deflate(pRGBRow, rowBytes, lastRow);
 
             if (lastRow) {
                 if (res != ZlibDefalte::Result::DONE) {
