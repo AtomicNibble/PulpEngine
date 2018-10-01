@@ -130,7 +130,7 @@ namespace
             const wchar_t* pDim = gEnv->pCore->GetCommandLineArgForVarW(L"dim");
             if (pDim) {
          
-                // wXH
+                // wXh
                 if (::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y) != 2) {
                     X_ERROR("ImgTool", "Failed to parse dim: %S", pDim);
                     return false;
