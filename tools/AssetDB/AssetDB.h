@@ -15,10 +15,14 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(assetDb)
 
-#if !defined(ASSETDBLIB_EXPORT) && !defined(X_LIB)
+#if !defined(ASSETDB_EXPORT)
+
+#if !defined(X_LIB)
 #define ASSETDB_EXPORT X_IMPORT
 #else
 #define ASSETDB_EXPORT
+#endif
+
 #endif
 
 class ASSETDB_EXPORT AssetDB
