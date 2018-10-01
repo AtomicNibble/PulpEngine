@@ -564,9 +564,9 @@ namespace PNG
             pCrc->Update(str.c_str(), str.length(), crc);
             crc = pCrc->Finish(crc);
 
-            file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length())));
+            file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length() + 1)));
             file->writeObj(tEXt::TAG_ID);
-            file->write(str.c_str(), str.length());
+            file->write(str.c_str(), str.length() + 1);
             file->writeObj(core::Endian::swap(crc));
         }
 
