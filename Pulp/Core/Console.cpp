@@ -555,8 +555,6 @@ void XConsole::freeRenderResources(void)
 
 void XConsole::saveChangedVars(void)
 {
-    auto itrVarEnd = varMap_.end();
-
     if (varMap_.empty()) {
         X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
         return;
