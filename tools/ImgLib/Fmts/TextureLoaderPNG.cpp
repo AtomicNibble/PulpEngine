@@ -590,7 +590,7 @@ namespace PNG
             file->writeObj(IDAT::TAG_ID);
             file->write(pData, len);
             file->writeObj(core::Endian::swap(crc));
-        });
+        }, core::Compression::CompressLevel::NORMAL);
 
         zlib.setBufferSize(BLOCK_SIZE);
 
