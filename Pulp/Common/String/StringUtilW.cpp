@@ -84,6 +84,31 @@ namespace strUtil
         return i;
     }
 
+    int Compare(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1,
+        const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2)
+    {
+        size_t len1 = endExclusiveS1 - startInclusiveS1;
+        size_t len2 = endExclusiveS2 - startInclusiveS2;
+
+        auto shortest = core::Min(len1, len2);
+
+        auto res = std::wmemcmp(startInclusiveS1, startInclusiveS2, shortest);
+
+        if (res != 0) {
+            return res;
+        }
+
+        if (len1 < len2) {
+            return -1;
+        }
+
+        if (len1 > len2) {
+            return 1;
+        }
+
+        return 0;
+    }
+
     bool IsEqual(const wchar_t* str1, const wchar_t* str2)
     {
         while (*str1 && (*str1 == *str2))

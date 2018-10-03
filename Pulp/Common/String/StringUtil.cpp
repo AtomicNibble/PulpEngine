@@ -302,6 +302,31 @@ namespace strUtil
         return i;
     }
 
+    int Compare(const char* startInclusiveS1, const char* endExclusiveS1, 
+        const char* startInclusiveS2, const char* endExclusiveS2)
+    {
+        size_t len1 = endExclusiveS1 - startInclusiveS1;
+        size_t len2 = endExclusiveS2 - startInclusiveS2;
+
+        auto shortest = core::Min(len1, len2);
+
+        auto res = std::memcmp(startInclusiveS1, startInclusiveS2, shortest);
+
+        if (res != 0) {
+            return res;
+        }
+
+        if (len1 < len2) {
+            return -1;
+        }
+
+        if (len1 > len2) {
+            return 1;
+        }
+
+        return 0;
+    }
+
     bool IsEqual(const char* str1, const char* str2)
     {
         X_ASSERT_NOT_NULL(str1);

@@ -78,6 +78,9 @@ namespace strUtil
     unsigned int Count(const char* startInclusive, const char* endExclusive, char what);
     unsigned int Count(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what);
 
+    int Compare(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2, const char* endExclusiveS2);
+    int Compare(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
+
     /// Returns whether two strings are equal.
     bool IsEqual(const char* str1, const char* str2);
     bool IsEqual(const wchar_t* str1, const wchar_t* str2);

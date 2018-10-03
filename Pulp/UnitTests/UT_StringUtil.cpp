@@ -324,6 +324,26 @@ TEST(StringUtil, Count)
     EXPECT_TRUE(o_num == 2);
 }
 
+TEST(StringUtil, Compare)
+{
+    StackString512 str0("my name is bob. Hello jane.");
+    StackString512 str1("my name is bob. Hello jane.");
+
+    EXPECT_EQ(0, strUtil::Compare(str0.begin(), str0.end(), str1.begin(), str1.end()));
+    EXPECT_EQ(1, strUtil::Compare(str0.begin(), str0.end(), str1.begin(), str1.end() - 1));
+    EXPECT_EQ(-1, strUtil::Compare(str0.begin(), str0.end() - 1, str1.begin(), str1.end()));
+}
+
+TEST(StringUtil, CompareW)
+{
+    StackStringW512 str0(L"my name is bob. Hello jane.");
+    StackStringW512 str1(L"my name is bob. Hello jane.");
+
+    EXPECT_EQ(0, strUtil::Compare(str0.begin(), str0.end(), str1.begin(), str1.end()));
+    EXPECT_EQ(1, strUtil::Compare(str0.begin(), str0.end(), str1.begin(), str1.end() - 1));
+    EXPECT_EQ(-1, strUtil::Compare(str0.begin(), str0.end() - 1, str1.begin(), str1.end()));
+}
+
 TEST(StringUtil, Equal)
 {
     StackString512 str("Hello jane.");
