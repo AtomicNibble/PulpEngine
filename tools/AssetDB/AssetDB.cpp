@@ -941,6 +941,17 @@ bool AssetDB::Chkdsk(bool updateDB)
 
     DataArr data(g_AssetDBArena);
 
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT MAX(size) FROM raw_files;");
+
+        auto res = qry.begin();
+        if (res != qry.end()) {
+            int32_t maxSize = (*res).get<int32_t>(0);
+
+            data.reserve(maxSize);
+        }
+    }
+
     // transaction for the update.
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
