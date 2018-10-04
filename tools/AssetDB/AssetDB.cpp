@@ -215,7 +215,7 @@ bool AssetDB::CreateTables(void)
     }
 
     if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
-                     " file_id INTEGER PRIMARY KEY,"
+                     "file_id INTEGER PRIMARY KEY,"
                      "name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for diffrent type.
                      "type INTEGER NOT NULL,"
                      "args TEXT,"
@@ -230,6 +230,7 @@ bool AssetDB::CreateTables(void)
                      "FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),"
                      "FOREIGN KEY(mod_id) REFERENCES mods(mod_id),"
                      "FOREIGN KEY(thumb_id) REFERENCES thumbs(thumb_id),"
+                     "FOREIGN KEY(raw_file) REFERENCES raw_files(id),"
                      "unique(name, type)"
                      ");")) {
         X_ERROR("AssetDB", "Failed to create 'file_ids' table");
@@ -237,11 +238,13 @@ bool AssetDB::CreateTables(void)
     }
 
     if (!db_.execute("CREATE TABLE IF NOT EXISTS raw_files ("
-                     "file_id INTEGER PRIMARY KEY,"
+                     "id INTEGER PRIMARY KEY,"
+                     "file_id INTEGER,"
                      "path TEXT NOT NULL,"
                      "size INTEGER NOT NULL,"
                      "hash INTEGER NOT NULL,"
-                     "add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL"
+                     "add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
+                     "FOREIGN KEY(file_id) REFERENCES file_ids(file_id)"
                      ");")) {
         X_ERROR("AssetDB", "Failed to create 'raw_files' table");
         return false;
@@ -923,6 +926,69 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 8) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 8", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        if (!db_.execute(R"(
+            CREATE TABLE IF NOT EXISTS raw_files_new (
+                     id INTEGER PRIMARY KEY,
+                     file_id INTEGER,
+                     path TEXT NOT NULL,
+                     size INTEGER NOT NULL,
+                     hash INTEGER NOT NULL,
+                     add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                     FOREIGN KEY(file_id) REFERENCES file_ids(file_id)
+            );
+
+            INSERT INTO raw_files_new SELECT file_id,null,path,size,hash,add_time FROM raw_files;
+            DROP TABLE raw_files;
+            ALTER TABLE raw_files_new RENAME TO raw_files;
+
+        )")) {
+            X_ERROR("AssetDB", "Failed to update file_ids table");
+            return false;
+        }
+
+        // setthe file_id's
+        sql::SqlLiteQuery qry(db_, "SELECT file_id, raw_file FROM file_ids");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            if (row.columnType(1) == sql::ColumType::SNULL) {
+                continue;
+            }
+
+            int32_t fileId = row.get<int32_t>(0);
+            int32_t rawFileId = row.get<int32_t>(1);
+
+            sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET file_id = ? WHERE id = ?");
+            cmd.bind(1, fileId);
+            cmd.bind(2, rawFileId);
+
+            sql::Result::Enum res = cmd.execute();
+            if (res != sql::Result::OK) {
+                X_ERROR("AssetDB", "Failed to update RawFileData");
+                return false;
+            }
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -954,7 +1020,7 @@ bool AssetDB::Chkdsk(bool updateDB)
 
     // transaction for the update.
     sql::SqlLiteTransaction trans(db_);
-    sql::SqlLiteQuery qry(db_, "SELECT file_id FROM raw_files");
+    sql::SqlLiteQuery qry(db_, "SELECT id FROM raw_files");
 
     auto it = qry.begin();
     for (; it != qry.end(); ++it) {
@@ -998,7 +1064,7 @@ bool AssetDB::Chkdsk(bool updateDB)
 
             if (updateDB) {
                 // need to update rawFile size colum
-                sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ? WHERE file_id = ?");
+                sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET size = ?, hash = ? WHERE id = ?");
                 cmd.bind(1, safe_static_cast<int32_t>(data.size()));
                 cmd.bind(2, static_cast<int64_t>(dataHash));
                 cmd.bind(3, rawFileId);
@@ -1824,7 +1890,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
             RawFilePathForName(type, newName, path);
 
             sql::SqlLiteTransaction trans(db_);
-            sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE file_id = ?");
+            sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE id = ?");
             cmd.bind(1, path.c_str());
             cmd.bind(2, rawId);
 
@@ -2170,7 +2236,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
     }
     else {
         // just update.
-        sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE file_id = ?");
+        sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE id = ?");
         cmd.bind(1, path.c_str());
         cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
         cmd.bind(3, static_cast<int64_t>(dataHash));
@@ -2493,7 +2559,7 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
 bool AssetDB::GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFileHash& argsHashOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash FROM file_ids "
-        "INNER JOIN raw_files on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+        "INNER JOIN raw_files on raw_files.id = file_ids.raw_file WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -3075,8 +3141,8 @@ bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFi
 {
     // we get the raw_id from the asset.
     // and get the data.
-    sql::SqlLiteQuery qry(db_, "SELECT raw_files.file_id, raw_files.path, raw_files.size, raw_files.hash FROM raw_files "
-                               "INNER JOIN file_ids on raw_files.file_id = file_ids.raw_file WHERE file_ids.file_id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT raw_files.id, raw_files.path, raw_files.size, raw_files.hash FROM raw_files "
+                               "INNER JOIN file_ids on raw_files.id = file_ids.raw_file WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -3104,7 +3170,7 @@ bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFi
 
 bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT file_id, path, size, hash FROM raw_files WHERE file_id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT id, path, size, hash FROM raw_files WHERE id = ?");
     qry.bind(1, rawFileId);
 
     const auto it = qry.begin();

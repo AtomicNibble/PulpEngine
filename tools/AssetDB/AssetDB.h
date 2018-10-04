@@ -36,8 +36,9 @@ class ASSETDB_EXPORT AssetDB
     // Version 5: set thumb width, height coloums to NOT NULL
     // Version 6: Change asset+args hash to xxHash64
     // Version 7: remove compiled hash from file_ids
+    // Version 8: add file_id to raw_files
 public:
-    static const int32_t DB_VERSION = 7;
+    static const int32_t DB_VERSION = 8;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
