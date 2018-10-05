@@ -100,6 +100,7 @@ private:
 X_DECLARE_ENUM(BufferResult)(
     DataReady,
     NoDataReady,
+    Paused,
     NoMoreData
 );
 

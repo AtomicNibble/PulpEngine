@@ -1638,6 +1638,9 @@ void XSound::executeCallback(AkPlayingID in_playingID, AkAudioBuffer* io_pBuffer
             io_pBufferOut->eState = AK_NoDataReady;
             X_ERROR("Sound", "Memory buffer starvation");
             break;
+        case BufferResult::Paused:
+            io_pBufferOut->eState = AK_NoDataReady;
+            break;
         case BufferResult::NoMoreData:
             io_pBufferOut->eState = AK_NoMoreData;
             break;
