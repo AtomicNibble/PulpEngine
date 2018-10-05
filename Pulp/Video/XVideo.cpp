@@ -910,7 +910,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         io_.cs.Leave();
 
         if (!decodeAudioPacket()) {
-            X_ERROR("Vidoe", "Failed to decode audio packet");
+            X_ERROR("Video", "Failed to decode audio packet");
         }
 
         io_.cs.Enter();
