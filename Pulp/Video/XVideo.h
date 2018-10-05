@@ -220,6 +220,14 @@ private:
 
     struct AudioTimeTag
     {
+        AudioTimeTag(const AudioTimeTag&) = default;
+        AudioTimeTag& operator=(const AudioTimeTag&) = default;
+        AudioTimeTag(uint32_t displayTimeMS, int32_t frames) :
+            displayTimeMS(displayTimeMS),
+            frames(frames),
+            framesLeft(frames)
+        {}
+
         uint32_t displayTimeMS;
         int32_t frames;
         int32_t framesLeft;

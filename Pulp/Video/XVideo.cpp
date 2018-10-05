@@ -912,18 +912,7 @@ bool Video::decodeAudioPacket(void)
 
             // tag this data range.
             auto& tags = audio_.audioTimeTags;
-            if (tags.isNotEmpty() && tags.back().displayTimeMS == timeMS) {
-                auto& tag = tags.back();
-                tag.frames += frames;
-                tag.framesLeft += frames;
-            }
-            else {
-                AudioTimeTag tag;
-                tag.displayTimeMS = timeMS;
-                tag.frames = frames;
-                tag.framesLeft = frames;
-                tags.push(tag);
-            }
+            tags.emplace(timeMS, frames);
 
             validateAudioBufferSizes();
         }
