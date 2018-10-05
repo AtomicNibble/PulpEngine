@@ -11,9 +11,8 @@ Core:
 
 Game:
 
-  ☐ Main menu need to open again
+  ✔ Main menu need to open again @done (18-10-05 17:36)
     I need to know when the state changes and basically reset menu to main.
-
 
   ☐ Make menus for lobby etc.
 
@@ -125,7 +124,7 @@ AssetDB:
   ✔ Support repack for images, so can optimise compression. @done (18-09-30 22:48)
   ✔ Move compiled hashes out into a converter cache db. @done (18-09-30 22:48)
      This way we can compile all assets without editing assetDB which is commited.
-  ☐ Make it raw_files refrence a file_id so we can keep track of old rawFiles and list them all, making it easy to clean up unused files and rollback.
+  ✔ Make it raw_files refrence a file_id so we can keep track of old rawFiles and list them all, making it easy to clean up unused files and rollback. @done (18-10-05 17:30)
 
 AssetPak:
 
