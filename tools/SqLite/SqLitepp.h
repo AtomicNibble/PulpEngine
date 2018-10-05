@@ -176,6 +176,7 @@ public:
     Result::Enum bind(int idx, double value);
     Result::Enum bind(int idx, long long int value);
     Result::Enum bind(int idx, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(int idx, const char* value, size_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(int idx, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(int idx, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(int idx);
@@ -191,6 +192,7 @@ public:
     Result::Enum bind(const char* pName, double value);
     Result::Enum bind(const char* pName, long long int value);
     Result::Enum bind(const char* pName, const char* value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
+    Result::Enum bind(const char* pName, const char* value, size_t length, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(const char* pName, void const* value, int n, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(const char* pName, std::string const& value, CopySemantic::Enum fcopy = CopySemantic::NOCOPY);
     Result::Enum bind(const char* pName);
