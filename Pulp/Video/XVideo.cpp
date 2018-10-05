@@ -1166,8 +1166,8 @@ Vec2f Video::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
 
-    txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32, vidHdr_.pixelWidth, vidHdr_.pixelHeight,
-        vid_.processedBlocks, vidHdr_.numBlocks);
+    txt.setFmt("Video: %" PRIi32 "x%" PRIi32 " %" PRIi32 " / %" PRIi32 " - %s", vidHdr_.pixelWidth, vidHdr_.pixelHeight,
+        vid_.processedBlocks, vidHdr_.numBlocks, VideoFmt::ToString(vidHdr_.fmt));
 
     pPrim->drawText(Vec3f(r.getUpperLeft()), ctx, txt.begin(), txt.end());
     r += textOff;
