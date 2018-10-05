@@ -631,15 +631,17 @@ sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
     auto& tags = audio_.audioTimeTags;
     X_ASSERT(tags.isNotEmpty(), "Not audio time tags for buffer")(tags.size(), channel0.size());
 
-    auto ellapsed = static_cast<int32_t>(playTime_.GetMilliSeconds());
-
     auto tag = tags.peek();
-    auto consumedFrames = tag.frames - tag.framesLeft;
-    auto msOffset = static_cast<int32_t>((static_cast<float>(consumedFrames) / static_cast<float>(audio_.vorbisInfo.rate)) * 1000);
+    
+    if (vars_.debug()) {
+        auto consumedFrames = tag.frames - tag.framesLeft;
+        auto msOffset = static_cast<int32_t>((static_cast<float>(consumedFrames) / static_cast<float>(audio_.vorbisInfo.rate)) * 1000);
 
-    auto delta = (tag.displayTimeMS + msOffset) - ellapsed;
+        auto ellapsed = static_cast<int32_t>(playTime_.GetMilliSeconds());
+        auto delta = (tag.displayTimeMS + msOffset) - ellapsed;
 
-    X_LOG0("Video", "Audio buffer delta: %" PRIi32 "ms offset: %" PRIi32 "ms", delta, msOffset);
+        X_LOG0("Video", "Audio buffer delta: %" PRIi32 "ms offset: %" PRIi32 "ms", delta, msOffset);
+    }
 
     // pop / update tags.
     {
