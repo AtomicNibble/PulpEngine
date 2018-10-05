@@ -283,7 +283,14 @@ bool XGame::update(core::FrameData& frame)
     if (status == net::SessionStatus::Idle)
     {
         // main menu :D
-        clearWorld();
+
+        if (prevStatus_ != net::SessionStatus::Idle)
+        {
+            clearWorld();
+
+            pMenuHandler_->openMenu("main");
+        }
+
 
 #if 0
         auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds();
