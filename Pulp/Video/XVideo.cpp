@@ -628,6 +628,44 @@ sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
     auto availFrames = safe_static_cast<int32_t>(channel0.size() / sizeof(float));
     auto numFrames = core::Min(availFrames, ab.maxFrames());
 
+    auto& tags = audio_.audioTimeTags;
+    X_ASSERT(tags.isNotEmpty(), "Not audio time tags for buffer")(tags.size(), channel0.size());
+
+    auto ellapsed = static_cast<int32_t>(playTime_.GetMilliSeconds());
+
+    auto tag = tags.peek();
+    auto consumedFrames = tag.frames - tag.framesLeft;
+    auto msOffset = static_cast<int32_t>((static_cast<float>(consumedFrames) / static_cast<float>(audio_.vorbisInfo.rate)) * 1000);
+
+    auto delta = (tag.displayTimeMS + msOffset) - ellapsed;
+
+    X_LOG0("Video", "Audio buffer delta: %" PRIi32 "ms offset: %" PRIi32 "ms", delta, msOffset);
+
+    // pop / update tags.
+    {
+        auto frames = numFrames;
+
+        while (frames) {
+            auto numToRemove = core::Min(frames, tag.framesLeft);
+            frames -= numToRemove;
+
+            if (tag.framesLeft == numToRemove) {
+                tags.pop();
+
+                if (tags.isEmpty()) {
+                    X_ASSERT(frames == 0, "Tags don't match up with avail frames")(frames, numToRemove);
+                    break;
+                }
+
+                tag = tags.peek();
+            }
+            else {
+                tags.peek().framesLeft -= numToRemove;
+                X_ASSERT(frames == 0, "")(frames, numToRemove);
+            }
+        }
+    }
+
     // What sweet song do you have for me today?
     // -> When I gape for you! MY nipples start twitching..
     // Not that kinda song.. O.O
@@ -868,6 +906,23 @@ bool Video::decodeAudioPacket(void)
             {
                 float* pPcmChannel = pPcm[i];
                 audio_.audioRingBuffers[i].write(pPcmChannel, frames);
+            }
+
+            auto timeMS = audio_.displayTimeMS;
+
+            // tag this data range.
+            auto& tags = audio_.audioTimeTags;
+            if (tags.isNotEmpty() && tags.back().displayTimeMS == timeMS) {
+                auto& tag = tags.back();
+                tag.frames += frames;
+                tag.framesLeft += frames;
+            }
+            else {
+                AudioTimeTag tag;
+                tag.displayTimeMS = timeMS;
+                tag.frames = frames;
+                tag.framesLeft = frames;
+                tags.push(tag);
             }
 
             validateAudioBufferSizes();

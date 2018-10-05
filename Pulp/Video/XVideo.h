@@ -6,6 +6,7 @@
 
 #include <Containers\FixedByteStreamRing.h>
 #include <Containers\FixedFifo.h>
+#include <Containers\Fifo.h>
 #include <Time\TimeVal.h>
 
 #include <ISound.h>
@@ -217,8 +218,17 @@ private:
         vpx_codec_iter_t vpxFrameIter;
     };
 
+    struct AudioTimeTag
+    {
+        uint32_t displayTimeMS;
+        int32_t frames;
+        int32_t framesLeft;
+    };
+
     struct AudioFields
     {
+        typedef core::Fifo<AudioTimeTag> AudioTimeTagQueue;
+
         AudioFields(core::MemoryArenaBase* arena) :
             pDecodeJob(nullptr),
             oggPacketCount(0),
@@ -230,6 +240,7 @@ private:
                 { arena, AUDIO_RING_DECODED_BUFFER_SIZE },
                 { arena, AUDIO_RING_DECODED_BUFFER_SIZE }
             } },
+            audioTimeTags(arena, 128),
             sndPlayingId(sound::INVALID_PLAYING_ID),
             sndObj(sound::INVALID_OBJECT_ID)
         {
@@ -254,6 +265,7 @@ private:
         DataVec encodedAudioFrame;                         // encoded audio
         uint32_t displayTimeMS;                            //
         AudioRingBufferChannelArr audioRingBuffers;        // decoded audio, ready for sound system.
+        AudioTimeTagQueue audioTimeTags;                   // time info the for audioRingBuffers
 
         sound::PlayingID sndPlayingId;
         sound::SndObjectHandle sndObj;
