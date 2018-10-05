@@ -225,6 +225,7 @@ private:
             oggFramesDecoded(0),
             processedBlocks(0),
             encodedAudioFrame(arena),
+            displayTimeMS(0),
             audioRingBuffers{ {
                 { arena, AUDIO_RING_DECODED_BUFFER_SIZE },
                 { arena, AUDIO_RING_DECODED_BUFFER_SIZE }
@@ -251,6 +252,7 @@ private:
 
         core::CriticalSection audioCs;
         DataVec encodedAudioFrame;                         // encoded audio
+        uint32_t displayTimeMS;                            //
         AudioRingBufferChannelArr audioRingBuffers;        // decoded audio, ready for sound system.
 
         sound::PlayingID sndPlayingId;

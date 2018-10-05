@@ -904,6 +904,7 @@ void Video::decodeAudio_job(core::V2::JobSystem& jobSys, size_t threadIdx, core:
         auto hdr = io_.ringBuffer.peek<BlockHdr>(offset);
         X_ASSERT(hdr.type == TrackType::Audio, "Incorrect type")();
 
+        audio_.displayTimeMS = hdr.timeMS;
         audio_.encodedAudioFrame.resize(hdr.blockSize);
         io_.ringBuffer.peek(offset + sizeof(BlockHdr), audio_.encodedAudioFrame.data(), audio_.encodedAudioFrame.size());
 
