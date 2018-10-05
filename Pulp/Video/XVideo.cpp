@@ -151,15 +151,25 @@ Video::~Video()
 
 void Video::play(void)
 {
-    X_ASSERT(state_ == State::Init, "")();
+    X_ASSERT(state_ == State::Init || state_ == State::Paused, "")();
 
-    state_ = State::Buffering;
+    if (state_ == State::Paused) {
+        state_ = State::Playing;
+    }
+    else {
+        state_ = State::Buffering;
+    }
+
     dispatchRead();
 }
 
 void Video::pause(void)
 {
-    X_ASSERT_NOT_IMPLEMENTED();
+    // TODO: support pause mid buffer.
+    if (state_ == State::Playing)
+    {
+        state_ = State::Paused;
+    }
 }
 
 void Video::stop(void)
@@ -342,6 +352,11 @@ void Video::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket)
 {
     if (vid_.availFrames.isEmpty()) {
         X_WARNING("Video", "No frame to present");
+        return;
+    }
+
+    if (!pTexture_) {
+        X_ERROR("Video", "video has no render texture");
         return;
     }
 
@@ -588,6 +603,10 @@ bool Video::processVorbisHeader(core::span<uint8_t> data)
 
 sound::BufferResult::Enum Video::audioDataRequest(sound::AudioBuffer& ab)
 {
+    if (state_ == State::Paused) {
+        return sound::BufferResult::Paused;
+    }
+
     core::CriticalSection::ScopedLock lock(audio_.audioCs);
 
     X_ASSERT(ab.numChannels() <= VIDEO_MAX_AUDIO_CHANNELS, "Invalid channel count")(ab.numChannels());

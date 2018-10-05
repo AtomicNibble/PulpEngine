@@ -32,11 +32,17 @@ void XVideoSys::registerCmds(void)
 {
     ADD_COMMAND_MEMBER("listVideos", this, XVideoSys, &XVideoSys::Cmd_ListVideo, core::VarFlag::SYSTEM,
         "List all the loaded videos");
+
+    ADD_COMMAND_MEMBER("video_pause_all", this, XVideoSys, &XVideoSys::Cmd_PauseAll, core::VarFlag::SYSTEM,
+        "Pause all the playing videos");
+    ADD_COMMAND_MEMBER("video_resume_all", this, XVideoSys, &XVideoSys::Cmd_ResumeAll, core::VarFlag::SYSTEM,
+        "Resume all the paused videos");
+
 }
 
 bool XVideoSys::init(void)
 {
-#if 0
+#if 1
     auto* pVideo = loadVideo("test/doom_trailer_720");
 
     waitForLoad(pVideo);
@@ -360,6 +366,33 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
     X_LOG0("Video", "------------ ^8Videos End^7 --------------");
 }
 
+
+void XVideoSys::pauseAll(void)
+{
+    core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+    for (const auto& video : videos_) {
+        auto* pVideoRes = video.second;
+
+        pVideoRes->pause();
+    }
+}
+
+void XVideoSys::resumeAll(void)
+{
+    core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
+
+    for (const auto& video : videos_) {
+        auto* pVideoRes = video.second;
+
+        auto state = pVideoRes->getState();
+        if (state == State::Paused) {
+            pVideoRes->play();
+        }
+    }
+}
+
+
 Vec2f XVideoSys::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 {
     if (!vars_.drawDebug()) {
@@ -394,6 +427,21 @@ void XVideoSys::Cmd_ListVideo(core::IConsoleCmdArgs* pCmd)
     }
 
     listVideos(pSearchPatten);
+}
+
+
+void XVideoSys::Cmd_PauseAll(core::IConsoleCmdArgs* pCmd)
+{
+    X_UNUSED(pCmd);
+
+    pauseAll();
+}
+
+void XVideoSys::Cmd_ResumeAll(core::IConsoleCmdArgs* pCmd)
+{
+    X_UNUSED(pCmd);
+
+    resumeAll();
 }
 
 X_NAMESPACE_END

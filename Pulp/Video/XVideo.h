@@ -28,6 +28,7 @@ X_DECLARE_ENUM(State)
     Init,
     Buffering,
     Playing,
+    Paused,
     Finished
 );
 

@@ -157,6 +157,9 @@ public:
 
     void listVideos(const char* pSearchPatten = nullptr) const;
 
+    void pauseAll(void);
+    void resumeAll(void);
+
 private:
     void freeDangling(void);
 
@@ -174,6 +177,8 @@ private:
 
 private:
     void Cmd_ListVideo(core::IConsoleCmdArgs* pCmd);
+    void Cmd_PauseAll(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ResumeAll(core::IConsoleCmdArgs* pCmd);
 
 private:
     core::MemoryArenaBase* arena_;
