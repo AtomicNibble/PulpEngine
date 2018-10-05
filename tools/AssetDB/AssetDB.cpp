@@ -1939,7 +1939,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::string& name,
     const DataArr& compressedData, const core::string& argsOpt)
 {
-    AssetId assetId, rawId;
+    AssetId assetId;
 
     if (name.isEmpty()) {
         X_ERROR("AssetDB", "Can't update asset with empty name");
@@ -1973,23 +1973,10 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
     const RawFileHash argsHash = core::Hash::xxHash64::calc(args.c_str(), args.length());
 
-    rawId = INVALID_RAWFILE_ID;
     if (compressedData.isNotEmpty()) {
         if (!core::Compression::ICompressor::validBuffer(compressedData)) {
             X_ERROR("AssetDB", "Passed invalid buffer to UpdateAsset");
             return Result::ERROR;
-        }
-
-        RawFile rawData;
-
-        if (GetRawfileForId(assetId, rawData, &rawId)) {
-            if (rawData.hash == dataHash) {
-                RawFileHash argsHash;
-                if (GetArgsHashForAsset(assetId, argsHash) && argsHash == argsHash) {
-                    X_LOG0("AssetDB", "Skipping updates asset unchanged");
-                    return Result::UNCHANGED;
-                }
-            }
         }
     }
 
@@ -1997,7 +1984,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     sql::SqlLiteTransaction trans(db_);
 
     if (compressedData.isNotEmpty()) {
-        auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataHash);
+        auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, compressedData, dataHash);
         if (res != Result::OK) {
             return res;
         }
@@ -2104,22 +2091,10 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
     const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
 
-    int32_t rawId = INVALID_RAWFILE_ID;
-    if (compressedData.isNotEmpty()) {
-        RawFile rawData;
-
-        if (GetRawfileForId(assetId, rawData, &rawId)) {
-            if (rawData.hash == dataHash) {
-                X_LOG0("AssetDB", "Skipping raw file update file unchanged");
-                return Result::UNCHANGED;
-            }
-        }
-    }
-
     // start the transaction.
     sql::SqlLiteTransaction trans(db_);
 
-    auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, rawId, compressedData, dataHash);
+    auto res = UpdateAssetRawFileHelper(trans, type, name, assetId, compressedData, dataHash);
     if (res != Result::OK) {
         return res;
     }
@@ -2129,7 +2104,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 }
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
-    AssetType::Enum type, const core::string& name, AssetId assetId, int32_t rawId, 
+    AssetType::Enum type, const core::string& name, AssetId assetId,
     const DataArr& compressedData, RawFileHash dataHash)
 {
     X_UNUSED(trans); // not used, just ensures you have taken one.
@@ -2149,15 +2124,18 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 
     {
         // check if changed.
-        RawFile curRawData;
-        if (GetRawfileForRawId(rawId, curRawData)) {
-            if (curRawData.hash == dataHash) {
+        RawFile rawData;
+
+        if (GetRawfileForId(assetId, rawData)) {
+            if (rawData.hash == dataHash) {
                 X_LOG0("AssetDB", "Skipping raw file update file unchanged");
                 return Result::UNCHANGED;
             }
         }
 
         // save the file.
+        // if we already have this file just overrite it.
+        // and we add a new history
         {
             core::XFileScoped file;
             core::fileModeFlags mode;
@@ -2184,35 +2162,22 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
             }
         }
 
-        // rename old. (if exsists)
-        {
-            core::Path<char> filePath;
-            core::Path<char> newFilePath;
-            AssetPathForName(type, name, curRawData.hash, filePath);
-
-            if (gEnv->pFileSys->fileExists(filePath.c_str())) {
-                newFilePath = filePath;
-                newFilePath.append(".old");
-
-                if (!gEnv->pFileSys->moveFile(filePath.c_str(), newFilePath.c_str())) {
-                    X_ERROR("AssetDB", "Failed to move old asset: \"%s\"", filePath.c_str());
-                }
-            }
-        }
     }
 
     core::Path<char> path;
     RawFilePathForName(type, name, path);
 
-    if (rawId == INVALID_RAWFILE_ID) {
+    // we don't clean up old raw_files we let them dangle so can revert to old versions.
+    {
         sql::SqlLiteDb::RowId lastRowId;
 
         // insert entry
         {
-            sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (path, size, hash) VALUES(?,?,?)");
-            cmd.bind(1, path.c_str());
-            cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
-            cmd.bind(3, static_cast<int64_t>(dataHash));
+            sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (file_id, path, size, hash) VALUES(?,?,?,?)");
+            cmd.bind(1, assetId);
+            cmd.bind(2, path.c_str(), path.length());
+            cmd.bind(3, safe_static_cast<int32_t>(compressedData.size()));
+            cmd.bind(4, static_cast<int64_t>(dataHash));
 
             sql::Result::Enum res = cmd.execute();
             if (res != sql::Result::OK) {
@@ -2232,19 +2197,6 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
             if (res != sql::Result::OK) {
                 return Result::ERROR;
             }
-        }
-    }
-    else {
-        // just update.
-        sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ?, size = ?, hash = ?, add_time = DateTime('now') WHERE id = ?");
-        cmd.bind(1, path.c_str());
-        cmd.bind(2, safe_static_cast<int32_t>(compressedData.size()));
-        cmd.bind(3, static_cast<int64_t>(dataHash));
-        cmd.bind(4, rawId);
-
-        sql::Result::Enum res = cmd.execute();
-        if (res != sql::Result::OK) {
-            return Result::ERROR;
         }
     }
 

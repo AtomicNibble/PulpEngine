@@ -37,6 +37,7 @@ class ASSETDB_EXPORT AssetDB
     // Version 6: Change asset+args hash to xxHash64
     // Version 7: remove compiled hash from file_ids
     // Version 8: add file_id to raw_files
+    // Version 9: don't rename old raw_Files keep them so we have history.
 public:
     static const int32_t DB_VERSION = 8;
 
@@ -275,7 +276,7 @@ public:
 
 private:
     Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
-        AssetId assetId, int32_t rawId, const DataArr& compressedData, RawFileHash dataHash);
+        AssetId assetId, const DataArr& compressedData, RawFileHash dataHash);
 
 private:
     bool GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
