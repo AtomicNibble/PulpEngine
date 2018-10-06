@@ -3,6 +3,8 @@
 #ifndef X_STRING_JSON_H_
 #define X_STRING_JSON_H_
 
+#include <Containers\ByteStream.h>
+
 #if X_COMPILER_CLANG
 #ifdef _MSC_VER
 #undef _MSC_VER
@@ -61,6 +63,49 @@ inline const char* ErrorToString(const Document& d, const char* pBegin, const ch
     desc.appendFmt("desc(%" PRIi32 ") : Offset: %" PRIuS " Line : %" PRIuS " Err : %s", err, offset, line, pErrStr);
     return desc.c_str();
 }
+
+class JsonByteBuffer
+{
+public:
+    typedef char Ch;
+
+public:
+    JsonByteBuffer(core::ByteStream& stream) :
+        stream_(stream)
+    {
+    }
+
+    void Put(Ch c)
+    {
+        stream_.write(c);
+    }
+    void PutUnsafe(Ch c)
+    {
+        stream_.write(c);
+    }
+
+    void Flush(void)
+    {
+        // ...
+    }
+
+private:
+    core::ByteStream& stream_;
+};
+
+struct JsonByteStreamWriter
+{
+    JsonByteStreamWriter(core::MemoryArenaBase* arena) :
+        stream(arena),
+        jsonBuf(stream),
+        writer(jsonBuf)
+    {
+    }
+
+    core::ByteStream stream;
+    JsonByteBuffer jsonBuf;
+    core::json::Writer<JsonByteBuffer> writer;
+};
 
 RAPIDJSON_NAMESPACE_END
 

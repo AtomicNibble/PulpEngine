@@ -69,60 +69,6 @@ namespace
         return true;
     }
 
-    class JsonByteBuffer
-    {
-    public:
-        typedef char Ch;
-
-    public:
-        JsonByteBuffer(core::ByteStream& stream) :
-            stream_(stream)
-        {
-        }
-
-        JsonByteBuffer(JsonByteBuffer&& rhs) :
-            stream_(std::move(rhs.stream_))
-        {
-        }
-
-        JsonByteBuffer& operator=(JsonByteBuffer&& rhs)
-        {
-            stream_ = std::move(rhs.stream_);
-            return *this;
-        }
-
-        void Put(Ch c)
-        {
-            stream_.write(c);
-        }
-        void PutUnsafe(Ch c)
-        {
-            stream_.write(c);
-        }
-
-        void Flush(void)
-        {
-            // ...
-        }
-
-    private:
-        core::ByteStream& stream_;
-    };
-
-    struct JsonByteStreamWriter
-    {
-        JsonByteStreamWriter(core::MemoryArenaBase* arena) :
-            stream(arena),
-            jsonBuf(stream),
-            writer(jsonBuf)
-        {
-        }
-
-        core::ByteStream stream;
-        JsonByteBuffer jsonBuf;
-        core::json::Writer<JsonByteBuffer> writer;
-    };
-
 } // namespace
 
 core::MemoryArenaBase* g_bspFaceArena = nullptr;
@@ -982,8 +928,8 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
             classEnts[ent.classType].push_back(&ent);
         }
 
-        JsonByteBuffer jsonBuf(stream);
-        core::json::Writer<JsonByteBuffer> writer(jsonBuf);
+        core::json::JsonByteBuffer jsonBuf(stream);
+        core::json::Writer<core::json::JsonByteBuffer> writer(jsonBuf);
 
         writer.StartObject();
 
