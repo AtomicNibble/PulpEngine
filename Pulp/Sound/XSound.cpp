@@ -419,8 +419,12 @@ bool XSound::init(void)
 
     // Mount packages, this is a blocking IO call currently.
     // If I decide to never store banks in packages, I could make it async.
-    if (!loadPackage("streamed.pck")) {
-        return false;
+    {
+        X_PROFILE_NO_HISTORY_BEGIN("SoundPckLoad", core::profiler::SubSys::SOUND);
+
+        if (!loadPackage("streamed.pck")) {
+            return false;
+        }
     }
 
     // dispatch async loads for base banks.
