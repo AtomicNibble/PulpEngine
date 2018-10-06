@@ -1480,6 +1480,13 @@ bool AssetDB::Export(core::Path<char>& path)
 
     return true;
 }
+
+bool AssetDB::Import(core::Path<char>& path)
+{
+    X_ASSERT_NOT_IMPLEMENTED();
+    return true;
+}
+
 // -----------------------------------
 AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name)
 {
