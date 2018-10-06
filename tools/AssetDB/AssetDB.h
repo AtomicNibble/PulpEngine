@@ -38,8 +38,9 @@ class ASSETDB_EXPORT AssetDB
     // Version 7: remove compiled hash from file_ids
     // Version 8: add file_id to raw_files
     // Version 9: don't rename old raw_Files keep them so we have history.
+    // Version 10: change thumb hash coloum to binary. 
 public:
-    static const int32_t DB_VERSION = 8;
+    static const int32_t DB_VERSION = 10;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;

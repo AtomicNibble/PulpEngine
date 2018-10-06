@@ -989,6 +989,51 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 9) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 9", dbVersion_);
+
+        // just code changes.
+    }
+
+    if (dbVersion_ < 10) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 10", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        if (!db_.execute(R"(
+            CREATE TABLE thumbs_new (
+                     thumb_id INTEGER PRIMARY KEY,
+                     width INTEGER NOT NULL,
+                     height INTEGER NOT NULL,
+                     srcWidth INTEGER NOT NULL,
+                     srcheight INTEGER NOT NULL,
+                     size INTEGER NOT NULL,
+                     hash BLOB NOT NULL,
+                     lastUpdateTime TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL
+            );
+
+            INSERT INTO thumbs_new SELECT thumb_id,width,height,srcWidth,srcheight,size,hash,lastUpdateTime FROM thumbs;
+            DROP TABLE thumbs;
+            ALTER TABLE thumbs_new RENAME TO thumbs;
+
+        )")) {
+            X_ERROR("AssetDB", "Failed to update thumbs table");
+            return false;
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
+        }
+    }
+
     return true;
 }
 
