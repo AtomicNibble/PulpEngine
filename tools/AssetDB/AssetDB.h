@@ -158,6 +158,7 @@ public:
     bool Chkdsk(bool updateDB = false);
     bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
+    bool Export(core::Path<char>& path);
     // Conversion Profile api.
     Result::Enum AddProfile(const core::string& name);
     Result::Enum AddProfile(const core::string& name, const core::string& data);

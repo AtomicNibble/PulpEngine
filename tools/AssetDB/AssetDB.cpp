@@ -1186,6 +1186,301 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 }
 
 // -----------------------------------
+
+
+bool AssetDB::Export(core::Path<char>& path)
+{
+    // Pump and dump!
+    // Should probs change some of this to call the helpers like GetRawfileForRawId
+    // to remove some duplication.
+    core::ByteStream stream(g_AssetDBArena);
+    stream.reserve(1024 * 1024 * 1);
+
+    core::json::JsonByteBuffer jsonBuf(stream);
+    core::json::PrettyWriter<core::json::JsonByteBuffer> writer(jsonBuf);
+
+    writer.StartObject();
+
+    writer.Key("mods");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM mods");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const int32_t id = row.get<int32_t>(0);
+            const char* pName = row.get<const char*>(1);
+            const char* pFolder = row.get<const char*>(2);
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("name");
+            writer.String(pName);
+            writer.Key("folder");
+            writer.String(pFolder);
+
+            writer.EndObject();
+        }
+    }
+
+    writer.EndArray();
+
+    writer.Key("con_profile");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM conversion_profiles");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const int32_t id = row.get<int32_t>(0);
+            const char* pName = row.get<const char*>(1);
+            const char* pData = row.get<const char*>(2);
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("name");
+            writer.String(pName);
+            writer.Key("data");
+            writer.String(pData);
+
+            writer.EndObject();
+        }
+    }
+
+    writer.EndArray();
+
+    writer.Key("assets");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM file_ids");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const AssetId id = safe_static_cast<AssetId>(row.get<int32_t>(0));
+            const char* pName = row.get<const char*>(1);
+            const int32_t nameLength = row.columnBytes(1);
+            const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
+            const char* pArgs = row.get<const char*>(3);
+            const int32_t argsLength = row.columnBytes(3);
+            const int64_t argsHash = row.get<int64_t>(4);
+            // 5 raw_File
+            // 6 thumb_id
+            const char* pAddTimeStr = row.get<const char*>(7);
+            const char* pUpdateTimeStr = row.get<const char*>(8);
+            // 9 parent_id
+            const int32_t modId = row.columnBytes(10);
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("name");
+            writer.String(pName, nameLength);
+            writer.Key("type");
+            writer.Int(type);
+            writer.Key("args");
+            writer.String(pArgs, argsLength);
+            writer.Key("argsHash");
+            writer.Int64(argsHash);
+
+            if (row.columnType(5) != sql::ColumType::SNULL) {
+                auto rawFileId = row.get<int32_t>(5);
+
+                writer.Key("rawFile");
+                writer.Int(rawFileId);
+            }
+            if (row.columnType(6) != sql::ColumType::SNULL) {
+                auto thumbId = row.get<int32_t>(6);
+
+                writer.Key("thumbId");
+                writer.Int(thumbId);
+            }
+
+            if (row.columnType(9) != sql::ColumType::SNULL) {
+                auto parentId = row.get<int32_t>(9);
+
+                writer.Key("parentId");
+                writer.Int(parentId);
+            }
+
+            writer.Key("addTime");
+            writer.String(pAddTimeStr);
+            writer.Key("updateTime");
+            writer.String(pUpdateTimeStr);
+
+            writer.Key("mod");
+            writer.Int64(modId);
+
+            writer.EndObject();
+        }
+
+        writer.EndArray();
+    }
+
+    writer.Key("rawFiles");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM raw_files");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const int32_t id = row.get<int32_t>(0);
+            AssetId fileId = row.get<int32_t>(1);
+            const char* pPath = row.get<const char*>(2);
+            const int32_t pathLength = row.columnBytes(2);
+            const int32_t size = row.get<int32_t>(3);
+            const int64_t hash = row.get<int64_t>(4);
+            const char* pAddTimeStr = row.get<const char*>(5);
+
+            if (row.columnType(1) == sql::ColumType::SNULL) {
+                fileId = INVALID_ASSET_ID;
+            }
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("fileID");
+            writer.Int(fileId);
+            writer.Key("path");
+            writer.String(pPath, pathLength);
+            writer.Key("size");
+            writer.Int(size);
+            writer.Key("hash");
+            writer.Int64(hash);
+            writer.Key("addTime");
+            writer.String(pAddTimeStr);
+
+            writer.EndObject();
+        }
+    }
+
+    writer.EndArray();
+
+    writer.Key("refs");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM refs");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const int32_t id = row.get<int32_t>(0);
+            const int32_t toId = row.get<int32_t>(1);
+            const int32_t fromId = row.get<int32_t>(2);
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("toId");
+            writer.Int(toId);
+            writer.Key("fromId");
+            writer.Int(fromId);
+
+            writer.EndObject();
+        }
+    }
+
+    writer.EndArray();
+
+    writer.Key("thumbs");
+    writer.StartArray();
+
+    {
+        sql::SqlLiteQuery qry(db_, "SELECT * FROM thumbs");
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            const int32_t id = row.get<int32_t>(0);
+            const int32_t width = row.get<int32_t>(1);
+            const int32_t height = row.get<int32_t>(2);
+            const int32_t size = row.get<int32_t>(5);
+            const char* pUpdateTime = row.get<const char*>(7);
+
+            const void* pHash = row.get<void const*>(6);
+            const size_t hashBlobSize = row.columnBytes(6);
+
+            ThumbHash hash;
+            ThumbHash::String hashStr;
+            if (hashBlobSize != sizeof(hash.bytes)) {
+                X_ERROR("AssetDB", "Thumb hash blob incorrect size: %" PRIuS, hashBlobSize);
+                return false;
+            }
+
+            std::memcpy(hash.bytes, pHash, sizeof(hash.bytes));
+
+            writer.StartObject();
+
+            writer.Key("id");
+            writer.Int(id);
+            writer.Key("width");
+            writer.Int(width);
+            writer.Key("height");
+            writer.Int(height);
+
+            if (row.columnType(3) != sql::ColumType::SNULL) {
+                auto srcWidth = row.get<int32_t>(3);
+
+                writer.Key("srcWidth");
+                writer.Int(srcWidth);
+            }
+            if (row.columnType(4) != sql::ColumType::SNULL) {
+                auto srcHeight = row.get<int32_t>(4);
+
+                writer.Key("srcHeight");
+                writer.Int(srcHeight);
+            }
+
+            writer.Key("size");
+            writer.Int(size);
+            writer.Key("hash");
+            writer.String(hash.ToString(hashStr));
+            writer.Key("updateTime");
+            writer.String(pUpdateTime);
+
+            writer.EndObject();
+        }
+    }
+
+    writer.EndArray();
+
+    writer.EndObject();
+
+    core::XFileScoped file;
+    if (!file.openFile(path.c_str(), core::fileMode::RECREATE | core::fileMode::WRITE)) {
+        X_ERROR("AssetDB", "Failed to open file for db export");
+        return false;
+    }
+
+    if (file.write(stream.data(), stream.size()) != stream.size()) {
+        X_ERROR("AssetDB", "Failed to write db export data");
+        return false;
+    }
+
+    return true;
+}
+// -----------------------------------
 AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name)
 {
     return AddProfile(name, core::string("{}"));
