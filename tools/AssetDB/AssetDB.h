@@ -283,7 +283,7 @@ private:
 private:
     bool GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
     bool GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut);
-    bool GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pThumbId = nullptr);
+    bool GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut);
     bool MergeArgs(AssetId assetId, core::string& argsInOut);
     bool getDBVersion(int32_t& versionOut);
     bool setDBVersion(int32_t version);

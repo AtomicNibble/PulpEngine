@@ -2372,7 +2372,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
     if (!compressedData.empty()) {
         ThumbInfo thumb;
 
-        if (GetThumbInfoForId(assetId, thumb, &thumbId)) {
+        if (GetThumbInfoForId(assetId, thumb)) {
+            thumbId = thumb.id;
             if (thumb.hash == hash) {
                 X_LOG0("AssetDB", "Skipping thumb update file unchanged");
                 return Result::UNCHANGED;
@@ -3191,7 +3192,7 @@ bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
     return true;
 }
 
-bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pThumbId)
+bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT thumbs.thumb_id, thumbs.width, thumbs.height, "
                                " thumbs.srcWidth, thumbs.srcHeight, thumbs.size, thumbs.hash FROM thumbs "
@@ -3219,10 +3220,6 @@ bool AssetDB::GetThumbInfoForId(AssetId assetId, ThumbInfo& dataOut, ThumbId* pT
     }
 
     dataOut.fileSize = row.get<int32_t>(5);
-
-    if (pThumbId) {
-        *pThumbId = dataOut.id;
-    }
 
     const void* pHash = row.get<void const*>(6);
     const size_t hashBlobSize = row.columnBytes(6);
