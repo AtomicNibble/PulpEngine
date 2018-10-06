@@ -3138,7 +3138,7 @@ bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFi
 {
     // we get the raw_id from the asset.
     // and get the data.
-    sql::SqlLiteQuery qry(db_, "SELECT raw_files.id, raw_files.path, raw_files.size, raw_files.hash FROM raw_files "
+    sql::SqlLiteQuery qry(db_, "SELECT raw_files.id, raw_files.file_id, raw_files.path, raw_files.size, raw_files.hash FROM raw_files "
                                "INNER JOIN file_ids on raw_files.id = file_ids.raw_file WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
 
@@ -3152,22 +3152,23 @@ bool AssetDB::GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFi
         *pRawFileId = (*it).get<int32_t>(0);
     }
 
-    if ((*it).columnType(1) != sql::ColumType::SNULL) {
-        dataOut.path = (*it).get<const char*>(1);
+    if ((*it).columnType(2) != sql::ColumType::SNULL) {
+        dataOut.path = (*it).get<const char*>(2);
     }
     else {
         dataOut.path.clear();
     }
 
-    dataOut.file_id = (*it).get<int32_t>(0);
-    dataOut.size = (*it).get<int32_t>(2);
-    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(3));
+    dataOut.id = (*it).get<int32_t>(0);
+    dataOut.fileId = (*it).get<int32_t>(1);
+    dataOut.size = (*it).get<int32_t>(3);
+    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(4));
     return true;
 }
 
 bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT id, path, size, hash FROM raw_files WHERE id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT id, file_id, path, size, hash FROM raw_files WHERE id = ?");
     qry.bind(1, rawFileId);
 
     const auto it = qry.begin();
@@ -3176,16 +3177,17 @@ bool AssetDB::GetRawfileForRawId(int32_t rawFileId, RawFile& dataOut)
         return false;
     }
 
-    if ((*it).columnType(1) != sql::ColumType::SNULL) {
-        dataOut.path = (*it).get<const char*>(1);
+    if ((*it).columnType(2) != sql::ColumType::SNULL) {
+        dataOut.path = (*it).get<const char*>(2);
     }
     else {
         dataOut.path.clear();
     }
 
-    dataOut.file_id = (*it).get<int32_t>(0);
-    dataOut.size = (*it).get<int32_t>(2);
-    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(3));
+    dataOut.id = (*it).get<int32_t>(0);
+    dataOut.fileId = (*it).get<int32_t>(1);
+    dataOut.size = (*it).get<int32_t>(3);
+    dataOut.hash = static_cast<uint64_t>((*it).get<int64_t>(4));
     return true;
 }
 

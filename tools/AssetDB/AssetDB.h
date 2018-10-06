@@ -54,7 +54,8 @@ public:
 private:
     struct RawFile
     {
-        int32_t file_id;
+        int32_t id;
+        int32_t fileId;
         int32_t size;
         core::string path;
         RawFileHash hash;
