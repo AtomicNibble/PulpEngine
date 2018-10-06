@@ -78,7 +78,7 @@ Sound:
     ✔ Generate the packages @done (18-08-25 23:49)
     ✔ Support loading files from them @done (18-08-26 14:00)
     ☐ Decide if want to async load package headers (means banks can't be in packages)
-
+      ✔ Should just time them for now. @done (18-10-06 11:43)
   ✔ Add some basic debug ui, with like active objects and such. @done (18-09-15 00:21)
 
 Video:
@@ -101,6 +101,7 @@ Video:
      - Will need to keep track of when wise is pulling the source data?
  ☐ Test decoding not been able to keep up.
    ☐ Stall audio if video jumpy?
+ ☐ Need to handle when the games frame rate is lower than video, skip video frames.
  ☐ Check what happens when we suspend audio system.
  ✔ Have the video debug move if profiler enabled etc, just need to pass postion basically. @done (18-09-13 18:58)
 
