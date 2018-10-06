@@ -119,7 +119,7 @@ Render:
 AssetDB:
 
   ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
-    ✘ Change the thumb hash coloum to be BLOB type @cancelled (18-09-30 22:49)
+    ✔ Change the thumb hash coloum to be BLOB type @done (18-10-06 12:48)
       Not really needed.
   ✔ Change hash function for raw assets to xxHash @done (18-09-30 12:11)
   ✔ Support repack for images, so can optimise compression. @done (18-09-30 22:48)
