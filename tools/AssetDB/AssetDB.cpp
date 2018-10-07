@@ -1198,6 +1198,8 @@ bool AssetDB::Export(core::Path<char>& path)
     // Pump and dump!
     // Should probs change some of this to call the helpers like GetRawfileForRawId
     // to remove some duplication.
+    X_LOG0("AsssetDB", "Exporting to: \"%s\"", path.c_str());
+
     core::ByteStream stream(g_AssetDBArena);
     stream.reserve(1024 * 1024 * 1);
 
