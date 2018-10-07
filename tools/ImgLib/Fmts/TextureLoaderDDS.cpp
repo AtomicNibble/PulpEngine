@@ -1050,8 +1050,8 @@ namespace DDS
         hdr.dwHeight = imgFile.getHeight();
         hdr.dwWidth = imgFile.getWidth();
         hdr.dwPitchOrLinearSize = 0;
-        hdr.dwDepth = imgFile.getDepth();
-        hdr.dwMipMapCount = imgFile.getNumMips();
+        hdr.dwDepth = 0;
+        hdr.dwMipMapCount = 0;
 
         hdr.sPixelFormat.dwSize = sizeof(hdr.sPixelFormat);
         hdr.sPixelFormat.dwFlags = 0;
@@ -1067,7 +1067,8 @@ namespace DDS
         hdr.sCaps.dwDDSX = 0;
         hdr.sCaps.dwReserved = 0;
 
-        if (imgFile.getNumMips()) {
+        if (imgFile.getNumMips() > 1) {
+            hdr.dwMipMapCount = imgFile.getNumMips();
             hdr.dwFlags |= DDSD_MIPMAPCOUNT;
             hdr.sCaps.dwCaps1 |= (DDSCAPS_MIPMAP | DDSCAPS_COMPLEX);
         }
