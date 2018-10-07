@@ -121,6 +121,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
     DataHash dataHash, argsHash;
     if (!db_.GetHashesForAsset(assetId, dataHash, argsHash)) {
+        X_ERROR("Converter", "Failed to get hashes");
         return false;
     }
 
