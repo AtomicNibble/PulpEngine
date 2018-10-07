@@ -128,7 +128,7 @@ bool AssetDB::OpenDB(void)
     // I need multi threaded mode when asset db is inside AssetManager
     // as the conversion needs to be run in a background thread.
     // and some actions are done on the UI thread.
-    if (!db_.connect(dbPath.c_str())) {
+    if (!db_.connect(dbPath.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
         return false;
     }
 

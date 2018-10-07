@@ -141,7 +141,7 @@ public:
     typedef core::Delegate<bool(ModId id, const core::string& name, const core::Path<char>& outDir)> ModDelegate;
     typedef core::Delegate<bool(AssetType::Enum, const core::string& name)> AssetDelegate;
 
-    typedef sql::SqlLiteDb::ThreadMode ThreadMode;
+    typedef sql::ThreadMode ThreadMode;
 
 public:
     AssetDB();

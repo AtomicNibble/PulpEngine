@@ -82,7 +82,7 @@ const char* ColumType::ToString(Enum type)
 
 // --------------------------------------
 
-SqlLiteDb::ThreadMode::Enum SqlLiteDb::currentThreadMode = SqlLiteDb::ThreadMode::UNSPECIFIED;
+ThreadMode::Enum SqlLiteDb::currentThreadMode = ThreadMode::UNSPECIFIED;
 
 SqlLiteDb::SqlLiteDb() :
     db_(nullptr),
@@ -160,7 +160,7 @@ bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
     return true;
 }
 
-bool SqlLiteDb::connect(const char* pDb)
+bool SqlLiteDb::connect(const char* pDb, OpenFlags flags)
 {
     X_ASSERT_NOT_NULL(pDb);
 
@@ -184,8 +184,19 @@ bool SqlLiteDb::connect(const char* pDb)
         return false;
     }
 
+    int sqlFlags = 0;
+    if (flags.IsSet(OpenFlag::CREATE)) {
+        sqlFlags |= SQLITE_OPEN_CREATE;
+    }
+    if (flags.IsSet(OpenFlag::WRITE)) {
+        sqlFlags |= SQLITE_OPEN_READWRITE;
+    }
+    else {
+        sqlFlags |= SQLITE_OPEN_READONLY;
+    }
+
     // open connection to a DB
-    if (Result::OK != (ret = sqlite3_open_v2(pDb, &db_, SQLITE_OPEN_READWRITE | SQLITE_OPEN_CREATE, nullptr))) {
+    if (Result::OK != (ret = sqlite3_open_v2(pDb, &db_, sqlFlags, nullptr))) {
         X_ERROR("SqlLiteDb", "Failed to open conn: %d", ret);
         return false;
     }

@@ -63,7 +63,7 @@ bool Converter::Init(const core::string& modName)
     dbPath.ensureSlash();
     dbPath.append(assetDb::AssetDB::CACHE_DB_NAME);
 
-    if (!cacheDb_.connect(dbPath.c_str())) {
+    if (!cacheDb_.connect(dbPath.c_str(), sql::OpenFlag::CREATE | sql::OpenFlag::WRITE)) {
         X_ERROR("Converter", "Failed to open cache db");
         return false;
     }

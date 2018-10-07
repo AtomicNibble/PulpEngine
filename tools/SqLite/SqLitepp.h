@@ -74,21 +74,31 @@ struct ColumType
     static const char* ToString(Enum type);
 };
 
+X_DECLARE_ENUM(ThreadMode)
+(
+    UNSPECIFIED,
+    SINGLE,    // one thread only
+    MULTI,     // one thread per DB connection
+    SERIALIZED // many threads one db.
+);
+
+X_DECLARE_FLAGS(OpenFlag)
+(
+    WRITE,
+    CREATE
+);
+
+typedef Flags<OpenFlag> OpenFlags;
+
+X_DECLARE_FLAG_OPERATORS(OpenFlags);
+
+
 class DLL_EXPORT SqlLiteDb
 {
     X_NO_COPY(SqlLiteDb);
     X_NO_ASSIGN(SqlLiteDb);
 
     friend class SqlLiteStateMnt;
-
-public:
-    X_DECLARE_ENUM(ThreadMode)
-    (
-        UNSPECIFIED,
-        SINGLE,    // one thread only
-        MULTI,     // one thread per DB connection
-        SERIALIZED // many threads one db.
-    );
 
 private:
     static ThreadMode::Enum currentThreadMode;
@@ -111,7 +121,7 @@ public:
 
     static bool setThreadMode(ThreadMode::Enum threadMode);
 
-    bool connect(const char* pDb);
+    bool connect(const char* pDb, OpenFlags flags);
     bool disconnect(void);
 
     Result::Enum enableForeignKeys(bool enable);
