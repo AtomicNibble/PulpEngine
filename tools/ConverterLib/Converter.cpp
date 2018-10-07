@@ -693,7 +693,8 @@ bool Converter::CreateTables(void)
     }
 
     if (!cacheDb_.execute("CREATE TABLE IF NOT EXISTS dependencies ("
-        "assetId INTEGER PRIMARY KEY,"
+        "id INTEGER PRIMARY KEY,"
+        "assetId INTEGER,"
         "type INTEGER NOT NULL,"
         "name TEXT COLLATE NOCASE NOT NULL"
         ");")) {
