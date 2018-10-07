@@ -127,6 +127,11 @@ AssetDB:
      This way we can compile all assets without editing assetDB which is commited.
   ✔ Make it raw_files refrence a file_id so we can keep track of old rawFiles and list them all, making it easy to clean up unused files and rollback. @done (18-10-05 17:30)
 
+ ☐ Handle multiple people adding/changing assets.
+     Think dumping the data to text file will work best, then can diff the slut.
+   ✔ Support exporting DB to json @done (18-10-07 12:23)
+   ☐ Support importing json to DB
+
 AssetPak:
 
   ☐ Support techdefs in packages.
