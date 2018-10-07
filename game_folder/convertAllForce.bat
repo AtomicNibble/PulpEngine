@@ -1,1 +1,1 @@
-"../../build/x64/Release Dynamic/engine_Converter.exe" +mode all +force 1
+"../../build/x64/Release Dynamic/engine_Converter.exe" +mode all +force 1 +profile release
