@@ -30,6 +30,12 @@ struct IConverterModule : public IEngineUnknown
 
 struct AssetDep
 {
+    AssetDep() = default;
+    AssetDep(assetDb::AssetType::Enum type, const core::string& name) : 
+        type(type),
+        name(name)
+    {}
+
     assetDb::AssetType::Enum type;
     core::string name;
 };
