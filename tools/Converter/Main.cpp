@@ -48,7 +48,7 @@ typedef core::MemoryArena<
 namespace
 {
     X_DECLARE_ENUM(ConvertMode)
-    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK, REPACK);
+    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK, REPACK, DUMP);
 
     bool GetMode(ConvertMode::Enum& mode)
     {
@@ -74,6 +74,9 @@ namespace
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"repack")) {
                 mode = ConvertMode::REPACK;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"dump")) {
+                mode = ConvertMode::DUMP;
             }
             else {
                 X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
@@ -220,6 +223,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 else if (mode == ConvertMode::REPACK) {
                     if (!con.Repack()) {
                         X_ERROR("Convert", "Failed to perform repack");
+                    }
+                }
+                else if (mode == ConvertMode::DUMP) {
+                    core::Path<char> path("asset_db\\db.json");
+                    if (!db.Export(path)) {
+                        X_ERROR("Convert", "Failed to dump db");
                     }
                 }
                 else if (mode == ConvertMode::ALL) {
