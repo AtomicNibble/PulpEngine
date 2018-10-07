@@ -107,7 +107,7 @@ public:
 
     static bool setThreadMode(ThreadMode::Enum threadMode);
 
-    bool connect(const char* pDb, ThreadMode::Enum threadMode);
+    bool connect(const char* pDb);
     bool disconnect(void);
 
     Result::Enum enableForeignKeys(bool enable);

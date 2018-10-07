@@ -148,7 +148,7 @@ public:
     ~AssetDB();
 
     // Startup / shutdown api
-    bool OpenDB(ThreadMode::Enum threadMode);
+    bool OpenDB(void);
     void CloseDB(void);
     bool CreateTables(void);
     bool DropTables(void);

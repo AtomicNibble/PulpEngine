@@ -407,7 +407,7 @@ bool AssetServer::Run_Internal(void)
 {
     GOOGLE_PROTOBUF_VERIFY_VERSION;
 
-    if (!db_.OpenDB(assetDb::AssetDB::ThreadMode::SINGLE)) {
+    if (!db_.OpenDB()) {
         return false;
     }
 

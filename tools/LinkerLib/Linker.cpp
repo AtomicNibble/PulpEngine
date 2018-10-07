@@ -30,7 +30,7 @@ void Linker::PrintBanner(void)
 
 bool Linker::Init(void)
 {
-    if (!db_.OpenDB(assetDb::AssetDB::ThreadMode::SINGLE)) {
+    if (!db_.OpenDB()) {
         X_ERROR("Linker", "Failed to open AssetDb");
         return false;
     }

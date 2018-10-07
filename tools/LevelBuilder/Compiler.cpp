@@ -124,7 +124,7 @@ Compiler::~Compiler()
 
 bool Compiler::init(core::string& modName)
 {
-    if (!db_.OpenDB(assetDb::AssetDB::ThreadMode::SINGLE)) {
+    if (!db_.OpenDB()) {
         X_ERROR("Lvl", "Failed to open AssetDb");
         return false;
     }

@@ -160,14 +160,9 @@ bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
     return true;
 }
 
-bool SqlLiteDb::connect(const char* pDb, ThreadMode::Enum threadMode)
+bool SqlLiteDb::connect(const char* pDb)
 {
     X_ASSERT_NOT_NULL(pDb);
-
-    if (!setThreadMode(threadMode)) {
-        X_WARNING("AssetDB", "Failed to set thread mode");
-        return false;
-    }
 
     if (!disconnect()) {
         X_ERROR("SqlLiteDb", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);

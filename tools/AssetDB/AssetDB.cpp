@@ -94,7 +94,7 @@ AssetDB::~AssetDB()
 }
 
 
-bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
+bool AssetDB::OpenDB(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
@@ -123,7 +123,7 @@ bool AssetDB::OpenDB(ThreadMode::Enum threadMode)
     // I need multi threaded mode when asset db is inside AssetManager
     // as the conversion needs to be run in a background thread.
     // and some actions are done on the UI thread.
-    if (!db_.connect(dbPath.c_str(), threadMode)) {
+    if (!db_.connect(dbPath.c_str())) {
         return false;
     }
 

@@ -43,7 +43,7 @@ void Converter::PrintBanner(void)
 
 bool Converter::Init(const core::string& modName)
 {
-    if (!db_.OpenDB(assetDb::AssetDB::ThreadMode::SINGLE)) {
+    if (!db_.OpenDB()) {
         X_ERROR("Converter", "Failed to open AssetDb");
         return false;
     }
@@ -61,7 +61,7 @@ bool Converter::Init(const core::string& modName)
     dbPath.ensureSlash();
     dbPath.append(assetDb::AssetDB::CACHE_DB_NAME);
 
-    if (!cacheDb_.connect(dbPath.c_str(), assetDb::AssetDB::ThreadMode::SINGLE)) {
+    if (!cacheDb_.connect(dbPath.c_str())) {
         X_ERROR("Converter", "Failed to open cache db");
         return false;
     }
