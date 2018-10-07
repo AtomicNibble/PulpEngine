@@ -75,8 +75,8 @@ private:
     bool CreateTables(void);
 
     bool MarkAssetsStale(assetDb::ModId modId);
-    bool IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash dataHash, assetDb::AssetDB::RawFileHash argsHash);
-    bool OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::RawFileHash& dataHashOut, assetDb::AssetDB::RawFileHash& argsHashOut);
+    bool IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::DataHash dataHash, assetDb::AssetDB::DataHash argsHash);
+    bool OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::DataHash& dataHashOut, assetDb::AssetDB::DataHash& argsHashOut);
 
     bool loadConversionProfiles(const core::string& profileName);
     void clearConversionProfiles(void);

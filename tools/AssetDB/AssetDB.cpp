@@ -2317,8 +2317,8 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     }
 
 
-    const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
-    const RawFileHash argsHash = core::Hash::xxHash64::calc(args.c_str(), args.length());
+    const DataHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
+    const DataHash argsHash = core::Hash::xxHash64::calc(args.c_str(), args.length());
 
     if (compressedData.isNotEmpty()) {
         if (!core::Compression::ICompressor::validBuffer(compressedData)) {
@@ -2436,7 +2436,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
     X_ASSERT(assetId != INVALID_ASSET_ID, "AssetId is invalid")(); 
 
-    const RawFileHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
+    const DataHash dataHash = core::Hash::xxHash64::calc(compressedData.ptr(), compressedData.size());
 
     // start the transaction.
     sql::SqlLiteTransaction trans(db_);
@@ -2452,7 +2452,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
 
 AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans,
     AssetType::Enum type, const core::string& name, AssetId assetId,
-    const DataArr& compressedData, RawFileHash dataHash)
+    const DataArr& compressedData, DataHash dataHash)
 {
     X_UNUSED(trans); // not used, just ensures you have taken one.
     X_ASSERT(assetId != INVALID_ASSET_ID, "Invalid asset ID")(assetId); 
@@ -2856,7 +2856,7 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
     return true;
 }
 
-bool AssetDB::GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFileHash& argsHashOut)
+bool AssetDB::GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash FROM file_ids "
         "INNER JOIN raw_files on raw_files.id = file_ids.raw_file WHERE file_ids.file_id = ?");
@@ -2871,10 +2871,10 @@ bool AssetDB::GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFi
     
     argsHashOut = 0;
     if (row.columnType(0) != sql::ColumType::SNULL) {
-        argsHashOut = static_cast<RawFileHash>(row.get<int64_t>(0));
+        argsHashOut = static_cast<DataHash>(row.get<int64_t>(0));
     }
 
-    dataHashOut = static_cast<RawFileHash>(row.get<int64_t>(1));
+    dataHashOut = static_cast<DataHash>(row.get<int64_t>(1));
     return true;
 }
 
@@ -2907,7 +2907,7 @@ bool AssetDB::GetArgsForAsset(AssetId assetId, core::string& argsOut)
     return true;
 }
 
-bool AssetDB::GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut)
+bool AssetDB::GetArgsHashForAsset(AssetId assetId, DataHash& argsHashOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT argsHash FROM file_ids WHERE file_ids.file_id = ?");
     qry.bind(1, assetId);
@@ -2920,7 +2920,7 @@ bool AssetDB::GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut)
 
     // arg hash can be null
     if ((*it).columnType(0) != sql::ColumType::SNULL) {
-        argsHashOut = static_cast<RawFileHash>((*it).get<int64_t>(0));
+        argsHashOut = static_cast<DataHash>((*it).get<int64_t>(0));
     }
     else {
         argsHashOut = 0;
@@ -3633,7 +3633,7 @@ bool AssetDB::isModSet(void) const
     return modId_ >= 0 && modId_ != INVALID_MOD_ID;
 }
 
-AssetDB::RawFileHash AssetDB::getMergedHash(RawFileHash data, RawFileHash args, int32_t dataLen)
+AssetDB::DataHash AssetDB::getMergedHash(DataHash data, DataHash args, int32_t dataLen)
 {
     core::Hash::xxHash64 hasher;
     hasher.update(data);
@@ -3647,7 +3647,7 @@ const char* AssetDB::AssetTypeRawFolder(AssetType::Enum type)
     return AssetType::ToString(type);
 }
 
-void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, RawFileHash rawDataHash, core::Path<char>& pathOut)
+void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, DataHash rawDataHash, core::Path<char>& pathOut)
 {
     static_assert(sizeof(rawDataHash) == 8 && std::is_unsigned<decltype(rawDataHash)>::value, "Format mismatch");
 

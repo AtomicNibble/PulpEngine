@@ -48,7 +48,7 @@ public:
     static const char* RAW_FILES_FOLDER;
     static const char* THUMBS_FOLDER;
 
-    typedef core::Hash::xxHash64Val RawFileHash;
+    typedef core::Hash::xxHash64Val DataHash;
     typedef core::Hash::SHA1Digest ThumbHash;
 
 private:
@@ -58,7 +58,7 @@ private:
         int32_t fileId;
         int32_t size;
         core::string path;
-        RawFileHash hash;
+        DataHash hash;
     };
 
 public:
@@ -238,9 +238,9 @@ public:
     bool AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut = nullptr);
 
     // Misc data / info retrival
-    bool GetHashesForAsset(AssetId assetId, RawFileHash& dataHashOut, RawFileHash& argsHashOut);
+    bool GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut);
     bool GetArgsForAsset(AssetId assetId, core::string& argsOut);
-    bool GetArgsHashForAsset(AssetId assetId, RawFileHash& argsHashOut);
+    bool GetArgsHashForAsset(AssetId assetId, DataHash& argsHashOut);
     bool GetModIdForAsset(AssetId assetId, ModId& modIdOut);
     bool GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut);
     bool GetRawFileCompAlgoForAsset(AssetId assetId, core::Compression::Algo::Enum& algoOut);
@@ -281,7 +281,7 @@ public:
 
 private:
     Result::Enum UpdateAssetRawFileHelper(const sql::SqlLiteTransactionBase& trans, AssetType::Enum type, const core::string& name,
-        AssetId assetId, const DataArr& compressedData, RawFileHash dataHash);
+        AssetId assetId, const DataArr& compressedData, DataHash dataHash);
 
 private:
     bool GetRawfileForId(AssetId assetId, RawFile& dataOut, int32_t* pRawFileId = nullptr);
@@ -292,10 +292,10 @@ private:
     bool setDBVersion(int32_t version);
     bool isModSet(void) const;
 
-    static RawFileHash getMergedHash(RawFileHash data, RawFileHash args, int32_t dataLen);
+    static DataHash getMergedHash(DataHash data, DataHash args, int32_t dataLen);
 
     static const char* AssetTypeRawFolder(AssetType::Enum type);
-    static void AssetPathForName(AssetType::Enum type, const core::string& name, RawFileHash rawDataHash, core::Path<char>& pathOut);
+    static void AssetPathForName(AssetType::Enum type, const core::string& name, DataHash rawDataHash, core::Path<char>& pathOut);
     static void AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut);
     static void RawFilePathForName(AssetType::Enum type, const core::string& name, core::Path<char>& pathOut);
     static void ThumbPathForThumb(const ThumbInfo& info, core::Path<char>& pathOut);
