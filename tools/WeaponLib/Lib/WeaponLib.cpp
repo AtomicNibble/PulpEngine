@@ -25,10 +25,17 @@ namespace weapon
     {
         X_UNUSED(host, assetId, args, destPath);
 
+        core::Array<AssetDep> dependencies(g_WeaponLibArena);
+
         WeaponCompiler compiler;
 
         if (!compiler.loadFromJson(args)) {
             X_ERROR("Weapon", "Error parsing weapon args");
+            return false;
+        }
+
+        if (!compiler.getDependencies(dependencies)) {
+            X_ERROR("Weapon", "Failed to get dependencies");
             return false;
         }
 
@@ -43,6 +50,12 @@ namespace weapon
         if (!compiler.writeToFile(file.GetFile())) {
             X_ERROR("Weapon", "Failed to write weapon file");
             return false;
+        }
+
+        if (dependencies.isNotEmpty()) {
+            if (!host.SetDependencies(assetId, core::make_span(dependencies))) {
+                return false;
+            }
         }
 
         return true;

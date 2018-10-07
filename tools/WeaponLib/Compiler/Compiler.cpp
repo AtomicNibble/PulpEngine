@@ -135,6 +135,32 @@ namespace weapon
         return true;
     }
 
+    bool WeaponCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
+    {
+        for (auto& str : modelSlots_) {
+            if (str.isNotEmpty()) {
+                dependencies.emplace_back(assetDb::AssetType::MODEL, str);
+            }
+        }
+        for (auto& str : animSlots_) {
+            if (str.isNotEmpty()) {
+                dependencies.emplace_back(assetDb::AssetType::ANIM, str);
+            }
+        }
+        for (auto& str : iconSlots_) {
+            if (str.isNotEmpty()) {
+                dependencies.emplace_back(assetDb::AssetType::MATERIAL, str);
+            }
+        }
+        for (auto& str : effectSlots_) {
+            if (str.isNotEmpty()) {
+                dependencies.emplace_back(assetDb::AssetType::FX, str);
+            }
+        }
+        
+        return true;
+    }
+
     bool WeaponCompiler::writeToFile(core::XFile* pFile) const
     {
         X_UNUSED(pFile);
