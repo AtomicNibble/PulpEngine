@@ -63,7 +63,7 @@ namespace DDS
             PIXEL_FMT_L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'x'),
             PIXEL_FMT_A8 = PIXEL_FMT_FOURCC('x', 'x', 'x', 'A'),
             PIXEL_FMT_A8L8 = PIXEL_FMT_FOURCC('L', 'x', 'x', 'A'),
-            PIXEL_FMT_A8R8G8B8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'A'),
+            PIXEL_FMT_R8G8B8A8 = PIXEL_FMT_FOURCC('R', 'G', 'B', 'A'),
 
             PIXEL_FMT_DX10_HEADER = PIXEL_FMT_FOURCC('D', 'X', '1', '0'),
         };
@@ -271,7 +271,7 @@ namespace DDS
                     case PIXEL_FMT_L8:
                     case PIXEL_FMT_A8:
                     case PIXEL_FMT_A8L8:
-                    case PIXEL_FMT_A8R8G8B8:
+                    case PIXEL_FMT_R8G8B8A8:
                     case PIXEL_FMT_DX10_HEADER: // humm?
                     case PIXEL_FMT_INVALID:
                         return false;
@@ -317,7 +317,7 @@ namespace DDS
                     case PIXEL_FMT_L8:
                     case PIXEL_FMT_A8:
                     case PIXEL_FMT_A8L8:
-                    case PIXEL_FMT_A8R8G8B8:
+                    case PIXEL_FMT_R8G8B8A8:
                     case PIXEL_FMT_DX10_HEADER:
                         return DXTInvalid;
 
@@ -382,7 +382,7 @@ namespace DDS
                         return 4;
                     case PIXEL_FMT_R8G8B8:
                         return 24;
-                    case PIXEL_FMT_A8R8G8B8:
+                    case PIXEL_FMT_R8G8B8A8:
                         return 32;
                     case PIXEL_FMT_A8:
                         return 8;
@@ -432,7 +432,7 @@ namespace DDS
                     case PIXEL_FMT_DXT4:
                     case PIXEL_FMT_DXT5:
                     case PIXEL_FMT_DXT5A:
-                    case PIXEL_FMT_A8R8G8B8:
+                    case PIXEL_FMT_R8G8B8A8:
                     case PIXEL_FMT_A8:
                     case PIXEL_FMT_A8L8:
                     case PIXEL_FMT_DXT5_AGBR:
@@ -529,8 +529,8 @@ namespace DDS
                         return Texturefmt::A8;
                     case PIXEL_FMT_R8G8B8:
                         return Texturefmt::R8G8B8;
-                    case PIXEL_FMT_A8R8G8B8:
-                        return Texturefmt::A8R8G8B8;
+                    case PIXEL_FMT_R8G8B8A8:
+                        return Texturefmt::R8G8B8A8;
 
                     case PIXEL_FMT_DXT1:
                         return Texturefmt::BC1;
@@ -856,7 +856,7 @@ namespace DDS
                 }
             }
             else if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
-                format = PIXEL_FMT_A8R8G8B8;
+                format = PIXEL_FMT_R8G8B8A8;
             }
             else {
                 format = PIXEL_FMT_R8G8B8;
@@ -1152,7 +1152,7 @@ namespace DDS
             {
                 case Texturefmt::R8G8B8A8:
                     hdr.sPixelFormat.dwFlags |= DDPF_RGB | DDPF_ALPHAPIXELS;
-                    hdr.sPixelFormat.dwFourCC = PIXEL_FMT_A8R8G8B8;
+                    hdr.sPixelFormat.dwFourCC = PIXEL_FMT_R8G8B8A8;
                     hdr.sPixelFormat.dwRGBBitCount = 32;
                     hdr.sPixelFormat.dwRBitMask = 0x000000ff;
                     hdr.sPixelFormat.dwGBitMask = 0x0000ff00;
