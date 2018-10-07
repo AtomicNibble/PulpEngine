@@ -28,6 +28,12 @@ struct IConverterModule : public IEngineUnknown
     virtual bool ShutDown(IConverter* pCon) X_ABSTRACT;
 };
 
+struct AssetDep
+{
+    assetDb::AssetType::Enum type;
+    core::string name;
+};
+
 struct IConverterHost
 {
     typedef core::Array<uint8_t> DataArr;
@@ -43,6 +49,7 @@ struct IConverterHost
     virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
     virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_ABSTRACT;
     virtual bool UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
+    virtual bool SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies) X_ABSTRACT;
 
     // get global conversion settings data.
     virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;

@@ -629,6 +629,40 @@ bool Converter::UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data
     return result == assetDb::AssetDB::Result::OK || result == assetDb::AssetDB::Result::UNCHANGED;
 }
 
+bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies)
+{
+    {
+        sql::SqlLiteCmd cmd(cacheDb_, "DELETE FROM dependencies WHERE assetId = ?");
+        cmd.bind(1, assetId);
+
+        if (cmd.execute() != sql::Result::OK) {
+            X_ERROR("Converter", "Failed to clear dependencies for asset: %" PRIi32, assetId);
+            return false;
+        }
+    }
+
+    if (dependencies.empty()) {
+        return true;
+    }
+
+    sql::SqlLiteTransaction trans(cacheDb_);
+
+    for (auto& dep : dependencies)
+    {
+        sql::SqlLiteCmd cmd(cacheDb_, "INSERT INTO dependencies (assetId, type, name) VALUES(?,?,?)");
+        cmd.bind(1, assetId);
+        cmd.bind(2, dep.type);
+        cmd.bind(3, dep.name.c_str(), dep.name.length());
+
+        if (cmd.execute() != sql::Result::OK) {
+            X_ERROR("Converter", "Failed to insert dependencies for asset: %" PRIi32, assetId);
+            return false;
+        }
+    }
+
+    trans.commit();
+    return true;
+}
 
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
@@ -654,6 +688,15 @@ bool Converter::CreateTables(void)
         "lastUpdateTime TIMESTAMP NOT NULL"
         ");")) {
         X_ERROR("Converter", "Failed to create 'convert_cache' table");
+        return false;
+    }
+
+    if (!cacheDb_.execute("CREATE TABLE IF NOT EXISTS dependencies ("
+        "assetId INTEGER PRIMARY KEY,"
+        "type INTEGER NOT NULL,"
+        "name TEXT COLLATE NOCASE NOT NULL"
+        ");")) {
+        X_ERROR("Converter", "Failed to create 'dependencies' table");
         return false;
     }
 
