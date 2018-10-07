@@ -16,6 +16,8 @@
 #include <String\Json.h>
 #include <Time\StopWatch.h>
 
+#include <Hashing\sha1.h>
+
 // need assetDB.
 X_LINK_ENGINE_LIB("AssetDb")
 
@@ -648,15 +650,12 @@ bool Converter::CreateTables(void)
 {
     if (!cacheDb_.execute("CREATE TABLE IF NOT EXISTS convert_cache ("
         "assetId INTEGER PRIMARY KEY,"
-        "dataHash INTEGER,"
-        "argsHash INTEGER,"
-        "conProfileHash INTEGER,"
-        "lastUpdateTime TIMESTAMP"
+        "hash BLOB NOT NULL,"
+        "lastUpdateTime TIMESTAMP NOT NULL"
         ");")) {
         X_ERROR("Converter", "Failed to create 'convert_cache' table");
         return false;
     }
-
 
     return true;
 }
@@ -679,7 +678,7 @@ bool Converter::MarkAssetsStale(assetDb::ModId modId)
 
 bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash)
 {
-    sql::SqlLiteQuery qry(cacheDb_, "SELECT dataHash, argsHash, conProfileHash FROM convert_cache WHERE assetId = ?");
+    sql::SqlLiteQuery qry(cacheDb_, "SELECT hash FROM convert_cache WHERE assetId = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -689,24 +688,34 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
 
     auto row = *it;
 
-    const auto cacheDataHash = static_cast<DataHash>(row.get<int64_t>(0));
-    const auto cacheArgsHash = static_cast<DataHash>(row.get<int64_t>(1));
-    const auto conProfileHash = static_cast<DataHash>(row.get<int64_t>(2));
+    core::Hash::SHA1Digest hash, curHash;
+    GetHash(type, dataHash, argsHash, curHash);
 
-    if (argsHash != cacheArgsHash || dataHash != cacheDataHash || conversionProfiles_[type].hash != conProfileHash) {
+    const void* pHash = row.get<void const*>(0);
+    const size_t hashBlobSize = row.columnBytes(0);
+
+    if (hashBlobSize != sizeof(hash.bytes)) {
+        X_ERROR("AssetDB", "Thumb hash blob incorrect size: %" PRIuS, hashBlobSize);
+        return false;
+    }
+
+    std::memcpy(hash.bytes, pHash, sizeof(hash.bytes));
+
+    if (hash != curHash) {
         return true;
     }
 
     return false;
 }
 
-bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash& dataHashOut, DataHash& argsHashOut)
+bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash)
 {
-    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, dataHash, argsHash, conProfileHash, lastUpdateTime) VALUES(?,?,?,?,DateTime('now'))");
+    core::Hash::SHA1Digest hash;
+    GetHash(type, dataHash, argsHash, hash);
+
+    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, hash, lastUpdateTime) VALUES(?,?,DateTime('now'))");
     cmd.bind(1, assetId);
-    cmd.bind(2, static_cast<int64_t>(dataHashOut));
-    cmd.bind(3, static_cast<int64_t>(argsHashOut));
-    cmd.bind(4, static_cast<int64_t>(conversionProfiles_[type].hash));
+    cmd.bind(2, &hash, sizeof(hash));
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -716,6 +725,14 @@ bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, 
     return true;
 }
 
+void Converter::GetHash(AssetType::Enum type, DataHash dataHash, DataHash argsHash, core::Hash::SHA1Digest& hashOut) const
+{
+    core::Hash::SHA1 hash;
+    hash.update(dataHash);
+    hash.update(argsHash);
+    hash.update(conversionProfiles_[type].hash);
+    hashOut = hash.finalize();
+}
 
 bool Converter::loadConversionProfiles(const core::string& profileName)
 {

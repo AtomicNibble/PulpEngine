@@ -90,7 +90,8 @@ private:
 
     bool MarkAssetsStale(assetDb::ModId modId);
     bool IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash);
-    bool OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash& dataHashOut, DataHash& argsHashOut);
+    bool OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash);
+    void GetHash(AssetType::Enum type, DataHash dataHash, DataHash argsHash, core::Hash::SHA1Digest& hashOut) const;
 
     bool loadConversionProfiles(const core::string& profileName);
     void clearConversionProfiles(void);
