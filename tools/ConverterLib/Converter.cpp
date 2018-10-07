@@ -117,7 +117,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
         return false;
     }
 
-    assetDb::AssetDB::DataHash dataHash, argsHash;
+    DataHash dataHash, argsHash;
     if (!db_.GetHashesForAsset(assetId, dataHash, argsHash)) {
         return false;
     }
@@ -676,7 +676,7 @@ bool Converter::MarkAssetsStale(assetDb::ModId modId)
     return true;
 }
 
-bool Converter::IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::DataHash dataHash, assetDb::AssetDB::DataHash argsHash)
+bool Converter::IsAssetStale(assetDb::AssetId assetId, DataHash dataHash, DataHash argsHash)
 {
     sql::SqlLiteQuery qry(cacheDb_, "SELECT dataHash, argsHash FROM convert_cache WHERE assetId = ?");
     qry.bind(1, assetId);
@@ -688,8 +688,8 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::DataHas
 
     auto row = *it;
 
-    const auto cacheDataHash = static_cast<assetDb::AssetDB::DataHash>(row.get<int64_t>(0));
-    const auto cacheArgsHash = static_cast<assetDb::AssetDB::DataHash>(row.get<int64_t>(1));
+    const auto cacheDataHash = static_cast<DataHash>(row.get<int64_t>(0));
+    const auto cacheArgsHash = static_cast<DataHash>(row.get<int64_t>(1));
 
     if (argsHash != cacheArgsHash || dataHash != cacheDataHash) {
         return true;
@@ -698,7 +698,7 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::DataHas
     return false;
 }
 
-bool Converter::OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::DataHash& dataHashOut, assetDb::AssetDB::DataHash& argsHashOut)
+bool Converter::OnAssetCompiled(assetDb::AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut)
 {
     sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, dataHash, argsHash, lastUpdateTime) VALUES(?,?,?,DateTime('now'))");
     cmd.bind(1, assetId);

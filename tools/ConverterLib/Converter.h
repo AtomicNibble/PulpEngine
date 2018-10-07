@@ -29,6 +29,8 @@ public:
     typedef IConverter::ConvertArgs ConvertArgs;
     typedef IConverter::OutPath OutPath;
 
+    typedef assetDb::AssetDB::DataHash DataHash;
+
 public:
     CONVERTERLIB_EXPORT Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea);
     CONVERTERLIB_EXPORT ~Converter();
@@ -75,8 +77,8 @@ private:
     bool CreateTables(void);
 
     bool MarkAssetsStale(assetDb::ModId modId);
-    bool IsAssetStale(assetDb::AssetId assetId, assetDb::AssetDB::DataHash dataHash, assetDb::AssetDB::DataHash argsHash);
-    bool OnAssetCompiled(assetDb::AssetId assetId, assetDb::AssetDB::DataHash& dataHashOut, assetDb::AssetDB::DataHash& argsHashOut);
+    bool IsAssetStale(assetDb::AssetId assetId, DataHash dataHash, DataHash argsHash);
+    bool OnAssetCompiled(assetDb::AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut);
 
     bool loadConversionProfiles(const core::string& profileName);
     void clearConversionProfiles(void);
