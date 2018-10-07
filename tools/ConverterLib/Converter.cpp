@@ -125,7 +125,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     // file exist already?
     if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str())) {
         // se if stale.
-        if (!IsAssetStale(assetId, dataHash, argsHash)) {
+        if (!IsAssetStale(assetId, assType, dataHash, argsHash)) {
             X_LOG1("Converter", "Skipping conversion, asset is not stale");
             return true;
         }
@@ -156,7 +156,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     bool res = Convert_int(assType, assetId, argsStr, pathOut);
     if (res) {
         X_LOG1("Converter", "processing took: ^6%g ms", timer.GetMilliSeconds());
-        OnAssetCompiled(assetId, dataHash, argsHash);
+        OnAssetCompiled(assetId, assType, dataHash, argsHash);
     }
     return res;
 }
@@ -650,6 +650,7 @@ bool Converter::CreateTables(void)
         "assetId INTEGER PRIMARY KEY,"
         "dataHash INTEGER,"
         "argsHash INTEGER,"
+        "conProfileHash INTEGER,"
         "lastUpdateTime TIMESTAMP"
         ");")) {
         X_ERROR("Converter", "Failed to create 'convert_cache' table");
@@ -676,9 +677,9 @@ bool Converter::MarkAssetsStale(assetDb::ModId modId)
     return true;
 }
 
-bool Converter::IsAssetStale(assetDb::AssetId assetId, DataHash dataHash, DataHash argsHash)
+bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash)
 {
-    sql::SqlLiteQuery qry(cacheDb_, "SELECT dataHash, argsHash FROM convert_cache WHERE assetId = ?");
+    sql::SqlLiteQuery qry(cacheDb_, "SELECT dataHash, argsHash, conProfileHash FROM convert_cache WHERE assetId = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -690,20 +691,22 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, DataHash dataHash, DataHa
 
     const auto cacheDataHash = static_cast<DataHash>(row.get<int64_t>(0));
     const auto cacheArgsHash = static_cast<DataHash>(row.get<int64_t>(1));
+    const auto conProfileHash = static_cast<DataHash>(row.get<int64_t>(2));
 
-    if (argsHash != cacheArgsHash || dataHash != cacheDataHash) {
+    if (argsHash != cacheArgsHash || dataHash != cacheDataHash || conversionProfiles_[type].hash != conProfileHash) {
         return true;
     }
 
     return false;
 }
 
-bool Converter::OnAssetCompiled(assetDb::AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut)
+bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash& dataHashOut, DataHash& argsHashOut)
 {
-    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, dataHash, argsHash, lastUpdateTime) VALUES(?,?,?,DateTime('now'))");
+    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, dataHash, argsHash, conProfileHash, lastUpdateTime) VALUES(?,?,?,?,DateTime('now'))");
     cmd.bind(1, assetId);
     cmd.bind(2, static_cast<int64_t>(dataHashOut));
     cmd.bind(3, static_cast<int64_t>(argsHashOut));
+    cmd.bind(4, static_cast<int64_t>(conversionProfiles_[type].hash));
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {

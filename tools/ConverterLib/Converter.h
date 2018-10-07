@@ -89,8 +89,8 @@ private:
     bool CreateTables(void);
 
     bool MarkAssetsStale(assetDb::ModId modId);
-    bool IsAssetStale(assetDb::AssetId assetId, DataHash dataHash, DataHash argsHash);
-    bool OnAssetCompiled(assetDb::AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut);
+    bool IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash);
+    bool OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash& dataHashOut, DataHash& argsHashOut);
 
     bool loadConversionProfiles(const core::string& profileName);
     void clearConversionProfiles(void);
