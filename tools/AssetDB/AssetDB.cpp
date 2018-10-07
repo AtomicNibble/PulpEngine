@@ -93,6 +93,11 @@ AssetDB::~AssetDB()
 {
 }
 
+bool AssetDB::setThreadMode(ThreadMode::Enum threadMode)
+{
+    return sql::SqlLiteDb::setThreadMode(threadMode);
+}
+
 
 bool AssetDB::OpenDB(void)
 {

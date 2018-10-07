@@ -147,6 +147,8 @@ public:
     AssetDB();
     ~AssetDB();
 
+    static bool setThreadMode(ThreadMode::Enum threadMode);
+
     // Startup / shutdown api
     bool OpenDB(void);
     void CloseDB(void);
