@@ -84,10 +84,14 @@ class DLL_EXPORT SqlLiteDb
 public:
     X_DECLARE_ENUM(ThreadMode)
     (
+        UNSPECIFIED,
         SINGLE,    // one thread only
         MULTI,     // one thread per DB connection
         SERIALIZED // many threads one db.
     );
+
+private:
+    static ThreadMode::Enum currentThreadMode;
 
 public:
     typedef int64_t RowId;

@@ -82,6 +82,8 @@ const char* ColumType::ToString(Enum type)
 
 // --------------------------------------
 
+SqlLiteDb::ThreadMode::Enum SqlLiteDb::currentThreadMode = SqlLiteDb::ThreadMode::UNSPECIFIED;
+
 SqlLiteDb::SqlLiteDb() :
     db_(nullptr),
     bh_(nullptr),
@@ -123,8 +125,6 @@ SqlLiteDb& SqlLiteDb::operator=(SqlLiteDb&& oth)
 
 bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
 {
-    static ThreadMode::Enum currentThreadMode = ThreadMode::SERIALIZED;
-
     X_ASSERT(sqlite3_threadsafe() != 0, "Sqlite was not compiled to support thread safe access")();
 
     if (threadMode == currentThreadMode) {
@@ -163,6 +163,14 @@ bool SqlLiteDb::setThreadMode(ThreadMode::Enum threadMode)
 bool SqlLiteDb::connect(const char* pDb)
 {
     X_ASSERT_NOT_NULL(pDb);
+
+    // if user not set a thread mode apply single threaded mode.
+    if (currentThreadMode == ThreadMode::UNSPECIFIED) {
+        if (!setThreadMode(ThreadMode::SINGLE)) {
+            X_ERROR("AssetDB", "Failed to set thread mode");
+            return false;
+        }
+    }
 
     if (!disconnect()) {
         X_ERROR("SqlLiteDb", "Failed to disconeect beofre conencting to new db: \"%s\"", pDb);
