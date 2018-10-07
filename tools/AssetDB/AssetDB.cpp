@@ -2865,8 +2865,7 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
 
 bool AssetDB::GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT file_ids.argsHash, raw_files.hash FROM file_ids "
-        "INNER JOIN raw_files on raw_files.id = file_ids.raw_file WHERE file_ids.file_id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT argsHash, raw_file FROM file_ids WHERE file_id = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -2875,13 +2874,30 @@ bool AssetDB::GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash
     }
 
     auto row = *it;
-    
+
     argsHashOut = 0;
+    dataHashOut = 0;
+
     if (row.columnType(0) != sql::ColumType::SNULL) {
         argsHashOut = static_cast<DataHash>(row.get<int64_t>(0));
     }
 
-    dataHashOut = static_cast<DataHash>(row.get<int64_t>(1));
+    if (row.columnType(1) != sql::ColumType::SNULL) {
+        auto rawFileId = row.get<int32_t>(1);
+
+        sql::SqlLiteQuery qry1(db_, "SELECT hash FROM raw_files WHERE id = ?");
+        qry1.bind(1, rawFileId);
+
+        const auto itRaw = qry1.begin();
+        if (itRaw == qry1.end()) {
+            return false;
+        }
+
+        auto rawRow = *itRaw;
+
+        dataHashOut = static_cast<DataHash>(rawRow.get<int64_t>(0));
+    }
+
     return true;
 }
 
