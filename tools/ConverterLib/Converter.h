@@ -21,7 +21,7 @@ typedef assetDb::AssetDB::AssetType AssetType;
 class Converter
     : public IConverterHost
 {
-    typedef core::traits::Function<void*(ICore* pSystem, const char* moduleName)> ModuleLinkfunc;
+    typedef core::traits::Function<void*(ICore* pSystem, const char* pModuleName)> ModuleLinkfunc;
 
     typedef std::array<IConverterModule*, AssetType::ENUM_COUNT> ConverterModuleInterfacesArr;
 
