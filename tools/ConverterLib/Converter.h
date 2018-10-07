@@ -31,6 +31,18 @@ public:
 
     typedef assetDb::AssetDB::DataHash DataHash;
 
+
+    struct ConversionProfile
+    {
+        void clear(void) {
+            profile.clear();
+            hash = 0;
+        }
+
+        core::string profile;
+        core::Hash::xxHash64Val hash;
+    };
+
 public:
     CONVERTERLIB_EXPORT Converter(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea);
     CONVERTERLIB_EXPORT ~Converter();
@@ -108,7 +120,7 @@ private:
     IConverterModule* pPhysConverterMod_;
 
     IConverter* converters_[AssetType::ENUM_COUNT];
-    core::string conversionProfiles_[AssetType::ENUM_COUNT];
+    ConversionProfile conversionProfiles_[AssetType::ENUM_COUNT];
 
     bool forceConvert_;
     bool _pad[3];

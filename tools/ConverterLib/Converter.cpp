@@ -630,11 +630,11 @@ bool Converter::UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data
 
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
-    if (conversionProfiles_[type].isEmpty()) {
+    if (conversionProfiles_[type].profile.isEmpty()) {
         return false;
     }
 
-    strOut = conversionProfiles_[type];
+    strOut = conversionProfiles_[type].profile;
     return true;
 }
 
@@ -764,7 +764,8 @@ bool Converter::loadConversionProfiles(const core::string& profileName)
 
         val.Accept(writer);
 
-        conversionProfiles_[type] = core::string(s.GetString(), s.GetSize());
+        conversionProfiles_[type].profile = core::string(s.GetString(), s.GetSize());
+        conversionProfiles_[type].hash = core::Hash::xxHash64::calc(s.GetString(), s.GetSize());
     }
 
     return true;
