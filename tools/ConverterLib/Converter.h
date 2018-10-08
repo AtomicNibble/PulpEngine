@@ -77,6 +77,8 @@ public:
     CONVERTERLIB_EXPORT bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_FINAL;
     CONVERTERLIB_EXPORT bool UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_FINAL;
     CONVERTERLIB_EXPORT bool SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies) X_FINAL;
+    CONVERTERLIB_EXPORT bool GetDependencies(assetDb::AssetId assetId, core::Array<AssetDep>& dependencies);
+    CONVERTERLIB_EXPORT bool ClearDependencies(assetDb::AssetId assetId);
 
     CONVERTERLIB_EXPORT bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 

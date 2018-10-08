@@ -632,14 +632,9 @@ bool Converter::UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data
 
 bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies)
 {
-    {
-        sql::SqlLiteCmd cmd(cacheDb_, "DELETE FROM dependencies WHERE assetId = ?");
-        cmd.bind(1, assetId);
-
-        if (cmd.execute() != sql::Result::OK) {
-            X_ERROR("Converter", "Failed to clear dependencies for asset: %" PRIi32, assetId);
-            return false;
-        }
+    // clear even if new list not empty.
+    if (!ClearDependencies(assetId)) {
+        return false;
     }
 
     if (dependencies.empty()) {
@@ -664,6 +659,38 @@ bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> d
     trans.commit();
     return true;
 }
+
+bool Converter::GetDependencies(assetDb::AssetId assetId, core::Array<AssetDep>& dependencies)
+{
+    sql::SqlLiteQuery qry(cacheDb_, "SELECT type, name FROM dependencies WHERE assetId = ?");
+    qry.bind(1, assetId);
+
+    for (auto it = qry.begin(); it != qry.end(); ++it) {
+        auto row = *it;
+
+        auto type = static_cast<assetDb::AssetType::Enum>(row.get<int32_t>(0));
+        const char* pName = row.get<const char*>(1);
+        const size_t nameLength = row.columnBytes(1);
+
+        dependencies.emplace_back(type, core::string(pName, pName + nameLength));
+    }
+
+    return true;
+}
+
+bool Converter::ClearDependencies(assetDb::AssetId assetId)
+{
+    sql::SqlLiteCmd cmd(cacheDb_, "DELETE FROM dependencies WHERE assetId = ?");
+    cmd.bind(1, assetId);
+
+    if (cmd.execute() != sql::Result::OK) {
+        X_ERROR("Converter", "Failed to clear dependencies for asset: %" PRIi32, assetId);
+        return false;
+    }
+
+    return true;
+}
+
 
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
