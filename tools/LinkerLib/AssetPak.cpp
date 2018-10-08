@@ -693,9 +693,10 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
     X_LOG_BULLET;
     X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, pathExt.fileName(), hdr.version);
     X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
-    X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ")",
+    X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ") ^6%%%.2f",
         core::HumanSize::toString(sizeStr, hdr.size), hdr.size,
-        core::HumanSize::toString(sizeStr2, totalInflatedSize), totalInflatedSize);
+        core::HumanSize::toString(sizeStr2, totalInflatedSize), totalInflatedSize, 
+        core::PercentageOf(hdr.size,totalInflatedSize));
     X_LOG0("AssetPak", "StringDataOffset: ^6%" PRIu32, hdr.stringDataOffset);
     X_LOG0("AssetPak", "EntryTableOffset: ^6%" PRIu32, hdr.entryTableOffset);
     X_LOG0("AssetPak", "DictOffset: ^6%" PRIu32, hdr.dictOffset);
