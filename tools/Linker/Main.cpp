@@ -144,7 +144,7 @@ namespace
 
         LinkMode::Enum mode;
         if (!GetMode(mode)) {
-            mode = LinkMode::BUILD;
+            mode = LinkMode::META;
         }
 
         core::StopWatch timer;
@@ -168,9 +168,18 @@ namespace
             core::Path<wchar_t> inputFile;
 
             if (!GetInputfile(inputFile)) {
-                X_ERROR("Linker", "Failed to get input file for meta dump");
-                return false;
+
+                int32_t numArgs = __argc;
+                if (numArgs == 2) {
+                    inputFile.set(__wargv[1]);
+                }
+                
+                if (inputFile.isEmpty()) {
+                    X_ERROR("Linker", "Failed to get input file for meta dump");
+                    return false;
+                }
             }
+
             if (!linker.dumpMeta(inputFile)) {
                 X_ERROR("Linker", "Failed to dump meta");
                 return false;
