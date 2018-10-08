@@ -712,6 +712,10 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
         for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
             auto type = static_cast<AssetType::Enum>(i);
 
+            if (assetCounts[i] == 0 && compressedCounts[i] == 0) {
+                continue;
+            }
+
             float sizePercent = core::PercentageOf(assetSize[type], hdr.size);
 
             X_LOG0("AssetPak", "^5%-16s ^6%-8" PRIi32 " %-10" PRIi32 " %-16s %-8.2f",
