@@ -158,6 +158,107 @@ namespace
     }
 
 
+    bool run(core::MemoryArenaBase* arena)
+    {
+        assetDb::AssetDB db;
+
+        converter::Converter con(db, arena);
+        converter::AssetType::Enum assType;
+        ConvertMode::Enum mode;
+        core::string assName;
+
+        con.PrintBanner();
+        con.forceConvert(ForceModeEnabled());
+
+        core::string modName;
+        GetMod(modName);
+
+        if (!con.Init()) {
+            X_ERROR("Convert", "Failed to init converter");
+            return false;
+        }
+
+        if (modName.isNotEmpty()) {
+            if (!con.SetMod(modName)) {
+                X_ERROR("Convert", "Failed to set mod");
+            }
+        }
+
+        core::string profile;
+        if (GetConversionProfile(profile)) {
+            con.setConversionProfiles(profile);
+        }
+
+        if (!GetMode(mode)) {
+            mode = ConvertMode::SINGLE;
+        }
+
+        core::StopWatch timer;
+
+        if (mode == ConvertMode::CLEAN) {
+            if (!con.CleanAll()) {
+                X_ERROR("Convert", "Failed to perform clearAll");
+                return false;
+            }
+        }
+        if (mode == ConvertMode::CLEAN_THUMBS) {
+            if (!con.CleanThumbs()) {
+                X_ERROR("Convert", "Failed to clean thumbs");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::GEN_THUMBS) {
+            if (!con.GenerateThumbs()) {
+                X_ERROR("Convert", "Failed to generate thumbs");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::CHKDSK) {
+            if (!con.Chkdsk()) {
+                X_ERROR("Convert", "Failed to perform Chkdsk");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::REPACK) {
+            if (!con.Repack()) {
+                X_ERROR("Convert", "Failed to perform repack");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::DUMP) {
+            core::Path<char> path("asset_db\\db.json");
+            if (!db.Export(path)) {
+                X_ERROR("Convert", "Failed to dump db");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::ALL) {
+            // optionaly convert all asset of Type X
+            if (GetAssetType(assType, true)) {
+                if (!con.Convert(assType)) {
+                    X_ERROR("Convert", "Conversion failed..");
+                    return false;
+                }
+            }
+            else {
+                if (!con.ConvertAll()) {
+                    X_ERROR("Convert", "Conversion failed..");
+                    return false;
+                }
+            }
+        }
+        else if (GetAssetType(assType) && GetAssetName(assName)) {
+            if (!con.Convert(assType, assName)) {
+                X_ERROR("Convert", "Conversion failed..");
+                return false;
+            }
+        }
+
+        core::HumanDuration::Str timeStr;
+        X_LOG0("Convert", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
+        return true;
+    }
+
 } // namespace
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
@@ -175,96 +276,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         if (app.Init(hInstance, &arena, lpCmdLine)) 
         {
-            assetDb::AssetDB db;
-
-            converter::Converter con(db, &arena);
-            converter::AssetType::Enum assType;
-            ConvertMode::Enum mode;
-            core::string assName;
-
-            con.PrintBanner();
-            con.forceConvert(ForceModeEnabled());
-
-            core::string modName;
-            GetMod(modName);
-
-            if (con.Init(modName)) {
-                core::string profile;
-                if (GetConversionProfile(profile)) {
-                    con.setConversionProfiles(profile);
-                }
-
-                if (!GetMode(mode)) {
-                    mode = ConvertMode::SINGLE;
-                }
-
-                core::StopWatch timer;
-
-                if (mode == ConvertMode::CLEAN) {
-                    if (!con.CleanAll()) {
-                        X_ERROR("Convert", "Failed to perform clearAll");
-                    }
-                }
-                if (mode == ConvertMode::CLEAN_THUMBS) {
-                    if (!con.CleanThumbs()) {
-                        X_ERROR("Convert", "Failed to clean thumbs");
-                    }
-                }
-                else if (mode == ConvertMode::GEN_THUMBS) {
-                    if (!con.GenerateThumbs()) {
-                        X_ERROR("Convert", "Failed to generate thumbs");
-                    }
-                }
-                else if (mode == ConvertMode::CHKDSK) {
-                    if (!con.Chkdsk()) {
-                        X_ERROR("Convert", "Failed to perform Chkdsk");
-                    }
-                }
-                else if (mode == ConvertMode::REPACK) {
-                    if (!con.Repack()) {
-                        X_ERROR("Convert", "Failed to perform repack");
-                    }
-                }
-                else if (mode == ConvertMode::DUMP) {
-                    core::Path<char> path("asset_db\\db.json");
-                    if (!db.Export(path)) {
-                        X_ERROR("Convert", "Failed to dump db");
-                    }
-                }
-                else if (mode == ConvertMode::ALL) {
-                    // optionaly convert all asset of Type X
-                    if (GetAssetType(assType, true)) {
-                        if (!con.Convert(assType)) {
-                            X_ERROR("Convert", "Conversion failed..");
-                        }
-                        else {
-                            res = true;
-                        }
-                    }
-                    else {
-                        if (!con.ConvertAll()) {
-                            X_ERROR("Convert", "Conversion failed..");
-                        }
-                        else {
-                            res = true;
-                        }
-                    }
-                }
-                else if (GetAssetType(assType) && GetAssetName(assName)) {
-                    if (!con.Convert(assType, assName)) {
-                        X_ERROR("Convert", "Conversion failed..");
-                    }
-                    else {
-                        res = true;
-                    }
-                }
-
-                core::HumanDuration::Str timeStr;
-                X_LOG0("Convert", "Elapsed time: ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
-            }
-            else {
-                X_ERROR("Convert", "Failed to init converter");
-            }
+            res = run(&arena);
 
             gEnv->pConsoleWnd->pressToContinue();
         }

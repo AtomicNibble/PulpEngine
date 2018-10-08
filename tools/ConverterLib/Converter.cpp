@@ -43,18 +43,11 @@ void Converter::PrintBanner(void)
     X_LOG0("Converter", "=================== V0.1 ===================");
 }
 
-bool Converter::Init(const core::string& modName)
+bool Converter::Init(void)
 {
     if (!db_.OpenDB()) {
         X_ERROR("Converter", "Failed to open AssetDb");
         return false;
-    }
-
-    if (modName.isNotEmpty()) {
-        if (!db_.SetMod(modName)) {
-            X_ERROR("Converter", "Failed to set mod");
-            return false;
-        }
     }
 
     // open cache db.
@@ -73,6 +66,16 @@ bool Converter::Init(const core::string& modName)
     }
 
     if (!CreateTables()) {
+        return false;
+    }
+
+    return true;
+}
+
+bool Converter::SetMod(const core::string& modName)
+{
+    if (!db_.SetMod(modName)) {
+        X_ERROR("Converter", "Failed to set mod");
         return false;
     }
 

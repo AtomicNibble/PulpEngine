@@ -48,7 +48,8 @@ public:
     CONVERTERLIB_EXPORT ~Converter();
 
     CONVERTERLIB_EXPORT void PrintBanner(void);
-    CONVERTERLIB_EXPORT bool Init(const core::string& modName);
+    CONVERTERLIB_EXPORT bool Init(void);
+    CONVERTERLIB_EXPORT bool SetMod(const core::string& modName);
 
     // enables force conversion so assets are rebuilt even if not stale.
     CONVERTERLIB_EXPORT void forceConvert(bool force);
