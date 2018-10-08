@@ -1,6 +1,7 @@
 #pragma once
 
 #include <Containers\Array.h>
+#include <Containers\HashMap.h>
 #include <IAssetPak.h>
 
 #include <ICompression.h>
@@ -70,6 +71,7 @@ class AssetPakBuilder
     typedef std::array<SharedDict*, AssetType::ENUM_COUNT> SharedDicArr;
     typedef std::array<CompressionOptions, AssetType::ENUM_COUNT> CompressionOptionsArr;
     typedef std::array<int32_t, AssetType::ENUM_COUNT> AssetCountArr;
+    typedef core::HashMap<AssetId, bool> AssetIdHashMap;
 
 public:
     AssetPakBuilder(core::MemoryArenaBase* arena);
@@ -83,12 +85,15 @@ public:
     bool save(const core::Path<char>& path);
 
     void addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& vec);
+    bool hasAsset(AssetId id) const;
 
 private:
     core::MemoryArenaBase* arena_;
     PakBuilderFlags flags_;
 
     AssetArr assets_;
+    AssetIdHashMap assetLookup_;
+
     CompressionOptionsArr compression_;
     SharedDicArr dictonaries_;
     AssetCountArr assetCounts_;

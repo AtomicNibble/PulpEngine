@@ -102,10 +102,12 @@ SharedDict::SharedDict(core::MemoryArenaBase* arena) :
 AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     arena_(arena),
     assets_(arena),
+    assetLookup_(arena),
     defaltedAssetSize_(0),
     infaltedAssetSize_(0)
 {
     assets_.reserve(1024);
+    assetLookup_.reserve(1024);
 
     compression_[AssetType::ANIM].enabled = true;
     compression_[AssetType::ANIM].algo = core::Compression::Algo::LZ4HC;
@@ -610,13 +612,20 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
 
 void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data)
 {
-    X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")(); 
+    X_ASSERT(id != assetDb::INVALID_ASSET_ID, "Invalid id")();
     X_ASSERT(name.isNotEmpty() && data.isNotEmpty(), "Empty name or data")(name.length(), data.size());
 
     assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
+    assetLookup_.insert({ id, true });
 
     ++assetCounts_[type];
 }
+
+bool AssetPakBuilder::hasAsset(AssetId id) const
+{
+    return assetLookup_.find(id) != assetLookup_.end();
+}
+
 
 bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
 {
