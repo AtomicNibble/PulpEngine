@@ -351,6 +351,10 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
 
             X_ASSERT(compressedAssetCounts_[type] <= assetCounts_[type], "More compressed assets than assets")(compressedAssetCounts_[type], assetCounts_[type]);
 
+            if (!assetCounts_[type]) {
+                continue;
+            }
+
             if (!compression_[type].enabled) {
                 continue;
             }
