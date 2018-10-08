@@ -36,9 +36,19 @@ struct AssetDep
         name(name)
     {}
 
+    bool operator==(AssetDep& oth) const {
+        return type == oth.type && name == oth.name;
+    }
+
+    bool operator<(AssetDep& oth) const {
+        return type < oth.type && name < oth.name;
+    }
+
     assetDb::AssetType::Enum type;
     core::string name;
 };
+
+using AssetDepArr = core::Array<AssetDep>;
 
 struct IConverterHost
 {

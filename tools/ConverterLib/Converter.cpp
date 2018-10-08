@@ -641,10 +641,23 @@ bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> d
         return true;
     }
 
+    // make unique
+    AssetDepArr depUnique(scratchArea_);
+    depUnique.reserve(dependencies.size());
+    for (auto& dep : dependencies) {
+        depUnique.emplace_back(dep);
+    }
+
+    std::sort(depUnique.begin(), depUnique.end());
+    auto last = std::unique(depUnique.begin(), depUnique.end());
+    depUnique.erase(last, depUnique.end());
+
     sql::SqlLiteTransaction trans(cacheDb_);
 
-    for (auto& dep : dependencies)
+    for (auto& dep : depUnique)
     {
+        X_ASSERT(dep.name.isNotEmpty(), "Empty asset name")();
+
         sql::SqlLiteCmd cmd(cacheDb_, "INSERT INTO dependencies (assetId, type, name) VALUES(?,?,?)");
         cmd.bind(1, assetId);
         cmd.bind(2, dep.type);
