@@ -268,6 +268,8 @@ public:
 
     bool compileModel(void);
 
+    bool getDependencies(core::Array<AssetDep>& dependencies) const;
+
     bool saveModel(const core::Path<char>& outFile);
     bool saveModel(const core::Path<wchar_t>& outFile);
 private:

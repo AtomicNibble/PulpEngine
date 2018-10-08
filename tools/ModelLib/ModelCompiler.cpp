@@ -885,6 +885,19 @@ bool ModelCompiler::compileModel(void)
     return true;
 }
 
+bool ModelCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
+{
+    for (size_t i = 0; i < compiledLods_.size(); i++) {
+        for (auto& mesh : compiledLods_[i].meshes_) {
+            const RawModel::Material& mat = mesh.material_;
+
+            dependencies.emplace_back(assetDb::AssetType::MATERIAL, mat.name_);
+        }
+    }
+
+    return true;
+}
+
 bool ModelCompiler::saveModel(const core::Path<char>& outFile)
 {
     return saveModel(core::Path<wchar_t>(outFile));

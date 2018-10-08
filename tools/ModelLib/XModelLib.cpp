@@ -221,6 +221,16 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
         return false;
     }
 
+    // get the materials.
+    core::Array<AssetDep> dependencies(g_ModelLibArena);
+    if (!model.getDependencies(dependencies)) {
+        return false;
+    }
+
+    if (!host.SetDependencies(assetId, dependencies)) {
+        return false;
+    }
+
     if (!model.saveModel(destPath)) {
         return false;
     }
