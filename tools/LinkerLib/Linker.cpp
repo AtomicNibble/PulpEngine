@@ -8,12 +8,14 @@
 #include <IFileSys.h>
 
 X_LINK_ENGINE_LIB("AssetDb")
+X_LINK_ENGINE_LIB("ConverterLib")
 
 X_NAMESPACE_BEGIN(linker)
 
 Linker::Linker(assetDb::AssetDB& db, core::MemoryArenaBase* scratchArea) :
     scratchArea_(scratchArea),
     db_(db),
+    converter_(db, scratchArea),
     builder_(scratchArea)
 {
     X_ASSERT(scratchArea->isThreadSafe(), "Scratch arena must be thread safe")(); 
@@ -30,8 +32,8 @@ void Linker::PrintBanner(void)
 
 bool Linker::Init(void)
 {
-    if (!db_.OpenDB()) {
-        X_ERROR("Linker", "Failed to open AssetDb");
+    if (!converter_.Init()) {
+        X_ERROR("Linker", "Failed to init converter");
         return false;
     }
 
@@ -80,11 +82,9 @@ bool Linker::Build(BuildOptions& options)
                 continue;
             }
 
-            for (auto& name : namesArr)
-            {
-                if (!AddAsset(assetType, name))
-                {
-                    X_ERROR("Converter", "Failed to add asset");
+            for (auto& name : namesArr) {
+                if (!AddAssetAndDepenency(assetType, name)) {
+                    X_ERROR("Linker", "Failed to add asset");
                     return false;
                 }
             }
@@ -127,13 +127,42 @@ bool Linker::Build(BuildOptions& options)
     return true;
 }
 
-bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name)
+bool Linker::AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name)
 {
-    // TODO: fully switch to assetLists
-    if (assType == assetDb::AssetType::VIDEO) {
+    assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
+    if (!db_.AssetExsists(assType, name, &assetId)) {
+        X_ERROR("Linker", "Failed to get Asset id: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return false;
+    }
+
+    core::Array<AssetDep> dependencies(scratchArea_);
+    if (!converter_.GetDependencies(assetId, dependencies)) {
+        X_ERROR("Linker", "Failed to get dependencies for: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return false;
+    }
+
+    if (!AddAsset(assType, name)) {
+        X_ERROR("Linker", "Failed to add asset");
+        return false;
+    }
+
+    if (dependencies.isEmpty()) {
         return true;
     }
 
+    X_LOG_BULLET;
+    for (auto& dep : dependencies) {
+        if (!AddAssetAndDepenency(dep.type, dep.name)) {
+            X_ERROR("Linker", "Failed to add dependency for Asset: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+            return false;
+        }
+    }
+
+    return true;
+}
+
+bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name)
+{
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
     if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
@@ -141,6 +170,10 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
         return false;
     }
 
+    if (builder_.hasAsset(assetId)) {
+        X_LOG0("Linker", "skipping duplicate asset %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return true;
+    }
 
     core::Path<char> assetPath;
     if (!db_.GetOutputPathForAsset(modId, assType, name, assetPath)) {

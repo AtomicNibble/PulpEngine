@@ -76,6 +76,11 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena,
 
     LinkModule(pICore_, "Linker");
 
+    // ConvertLib
+    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "ConverterLib", "Engine_ConverterLib")) {
+        return false;
+    }
+
     // LinkerLib
     if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "LinkerLib", "Engine_LinkerLib")) {
         return false;

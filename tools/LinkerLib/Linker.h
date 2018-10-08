@@ -3,6 +3,7 @@
 #include "AssetPak.h"
 
 #include <../AssetDB/AssetDB.h>
+#include <../ConverterLib/ConverterLib.h>
 
 X_NAMESPACE_BEGIN(linker)
 
@@ -30,11 +31,13 @@ public:
     LINKERLIB_EXPORT bool Build(BuildOptions& options);
 
 private:
+    bool AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name);
     bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);
 
 private:
     core::MemoryArenaBase* scratchArea_;
     assetDb::AssetDB& db_;
+    converter::Converter converter_;
 
     AssetPak::AssetPakBuilder builder_;
 };
