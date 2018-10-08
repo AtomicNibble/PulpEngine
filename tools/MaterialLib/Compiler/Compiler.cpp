@@ -318,6 +318,15 @@ bool MaterialCompiler::loadFromJson(core::string& str)
     return true;
 }
 
+bool MaterialCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
+{
+    for (const auto& t : textures_) {
+        dependencies.emplace_back(assetDb::AssetType::IMG, t.name);
+    }
+
+    return true;
+}
+
 bool MaterialCompiler::writeToFile(core::XFile* pFile) const
 {
     // lets check asset name will fit.

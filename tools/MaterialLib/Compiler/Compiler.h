@@ -46,6 +46,8 @@ public:
     MaterialCompiler(techset::TechSetDefs& techDefs);
 
     bool loadFromJson(core::string& str);
+    bool getDependencies(core::Array<AssetDep>& dependencies) const;
+
     bool writeToFile(core::XFile* pFile) const;
 
 private:

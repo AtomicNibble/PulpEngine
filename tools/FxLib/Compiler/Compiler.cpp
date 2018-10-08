@@ -488,6 +488,18 @@ namespace fx
         return true;
     }
 
+    bool EffectCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
+    {
+        for (const auto& stage : stages_) {
+            for (auto& m : stage.materials) {
+                dependencies.emplace_back(assetDb::AssetType::MATERIAL, m);
+            }
+        }
+        
+        return true;
+    }
+
+
     bool EffectCompiler::writeToFile(core::XFile* pFile) const
     {
         if (stages_.isEmpty()) {

@@ -33,6 +33,15 @@ namespace fx
             return false;
         }
 
+        core::Array<AssetDep> dependencies(g_FxLibArena);
+        if (!compiler.getDependencies(dependencies)) {
+            return false;
+        }
+
+        if (!host.SetDependencies(assetId, dependencies)) {
+            return false;
+        }
+
         core::XFileScoped file;
         core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 

@@ -42,6 +42,15 @@ bool MaterialLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& ar
         return false;
     }
 
+    core::Array<AssetDep> dependencies(g_MatLibArena);
+    if (!compiler.getDependencies(dependencies)) {
+        return false;
+    }
+
+    if (!host.SetDependencies(assetId, dependencies)) {
+        return false;
+    }
+
     core::XFileScoped file;
     core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
 
