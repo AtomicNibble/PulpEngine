@@ -151,6 +151,7 @@ bool Linker::AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::
     }
 
     X_LOG_BULLET;
+
     for (auto& dep : dependencies) {
         if (!AddAssetAndDepenency(dep.type, dep.name)) {
             X_ERROR("Linker", "Failed to add dependency for Asset: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
