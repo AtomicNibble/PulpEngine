@@ -678,6 +678,8 @@ bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> d
 
 bool Converter::GetDependencies(assetDb::AssetId assetId, core::Array<AssetDep>& dependencies)
 {
+    dependencies.clear();
+
     sql::SqlLiteQuery qry(cacheDb_, "SELECT type, name FROM dependencies WHERE assetId = ?");
     qry.bind(1, assetId);
 
