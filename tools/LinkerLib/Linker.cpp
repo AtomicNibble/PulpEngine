@@ -93,7 +93,7 @@ bool Linker::Build(BuildOptions& options)
     else
     {
         if (!db_.GetNumAssets(numAssets)) {
-            X_ERROR("Converter", "Failed to get asset count");
+            X_ERROR("Linker", "Failed to get asset count");
             return false;
         }
 
@@ -141,9 +141,10 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
         return false;
     }
 
+
     core::Path<char> assetPath;
     if (!db_.GetOutputPathForAsset(modId, assType, name, assetPath)) {
-        X_ERROR("Converter", "Failed to get asset path");
+        X_ERROR("Linker", "Failed to get asset path");
         return false;
     }
 
