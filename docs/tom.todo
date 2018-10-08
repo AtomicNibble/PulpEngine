@@ -132,6 +132,19 @@ AssetDB:
    ✔ Support exporting DB to json @done (18-10-07 12:23)
    ☐ Support importing json to DB
 
+Converter:
+
+ ✔ Support generating list of dependencies for each asset @done (18-10-08 18:34)
+
+Linker:
+  ☐ Build level packs
+  ✔ include all asset dependacies. @done (18-10-08 23:28)
+    Should probs switch to using the ConverterLib instead of assetDb directly.
+    So that the linker can compile assets or is that not it's job?
+
+    Bitch i'm linking not compiling!
+
+
 AssetPak:
 
   ☐ Support techdefs in packages.
@@ -143,10 +156,12 @@ LevelBuilder:
   ✔ Generate asset lists for level @done (18-09-09 10:55)
         Curently it's just materials and models. The models materials are not inc.
   ☐ Bake lighting for level
+    Rip
 
+Sql:
 
-Linker:
-  ☐ Build level packs
+  ☐ Don't re export functions in dll's
+    Currently if link sql.dll you end up exporting some of same stuff sql.dll did.
 
  UnitTests:
 
