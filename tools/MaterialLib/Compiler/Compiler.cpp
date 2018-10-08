@@ -321,7 +321,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 bool MaterialCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
 {
     for (const auto& t : textures_) {
-        dependencies.emplace_back(assetDb::AssetType::IMG, t.name);
+        dependencies.emplace_back(assetDb::AssetType::IMG, t.value);
     }
 
     return true;
