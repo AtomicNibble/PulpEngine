@@ -143,7 +143,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 
     core::Path<char> assetPath;
     if (!db_.GetOutputPathForAsset(modId, assType, name, assetPath)) {
-        X_ERROR("Converter", "Failed to asset path");
+        X_ERROR("Converter", "Failed to get asset path");
         return false;
     }
 
