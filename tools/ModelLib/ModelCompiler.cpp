@@ -891,6 +891,14 @@ bool ModelCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
         for (auto& mesh : compiledLods_[i].meshes_) {
             const RawModel::Material& mat = mesh.material_;
 
+            auto it = std::find_if(dependencies.begin(), dependencies.end(), [&mat](const AssetDep& ad) -> bool {
+                return ad.name == mat.name_;
+            });
+
+            if (it != dependencies.end()) {
+                continue;
+            }
+
             dependencies.emplace_back(assetDb::AssetType::MATERIAL, mat.name_);
         }
     }
