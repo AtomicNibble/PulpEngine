@@ -59,6 +59,78 @@ namespace
 
 } // namespace
 
+const char* Result::ToString(Enum type)
+{
+    switch (type) {
+        case OK:
+            return "OK";
+        case ERROR:
+            return "ERROR";
+        case INTERNAL:
+            return "INTERNAL";
+        case PERM:
+            return "PERM";
+        case ABORT:
+            return "ABORT";
+        case BUSY:
+            return "BUSY";
+        case LOCKED:
+            return "LOCKED";
+        case NOMEM:
+            return "NOMEM";
+        case READONLY:
+            return "READONLY";
+        case INTERRUPT:
+            return "INTERRUPT";
+        case IOERR:
+            return "IOERR";
+        case CORRUPT:
+            return "CORRUPT";
+        case NOTFOUND:
+            return "NOTFOUND";
+        case FULL:
+            return "FULL";
+        case CANTOPEN:
+            return "CANTOPEN";
+        case PROTOCOL:
+            return "PROTOCOL";
+        case EMPTY:
+            return "EMPTY";
+        case SCHEMA:
+            return "SCHEMA";
+        case TOOBIG:
+            return "TOOBIG";
+        case CONSTRAINT:
+            return "CONSTRAINT";
+        case MISMATCH:
+            return "MISMATCH";
+        case MISUSE:
+            return "MISUSE";
+        case NOLFS:
+            return "NOLFS";
+        case AUTH:
+            return "AUTH";
+        case FORMAT:
+            return "FORMAT";
+        case RANGE:
+            return "RANGE";
+        case NOTADB:
+            return "NOTADB";
+        case NOTICE:
+            return "NOTICE";
+        case WARNING:
+            return "WARNING";
+        case ROW:
+            return "ROW";
+        case DONE:
+            return "DONE";
+
+        default:
+        return "<ukn>";
+    }
+}
+
+
 const char* ColumType::ToString(Enum type)
 {
     switch (type) {

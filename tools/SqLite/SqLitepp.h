@@ -58,6 +58,8 @@ struct Result
         ROW = 100,
         DONE = 101,
     };
+
+    static const char* ToString(Enum type);
 };
 
 struct ColumType
