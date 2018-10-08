@@ -870,46 +870,31 @@ void ModelCompiler::clearColMeshes(void)
     }
 }
 
-bool ModelCompiler::compileModel(const core::Path<char>& outFile)
-{
-    return compileModel(core::Path<wchar_t>(outFile));
-}
-
-bool ModelCompiler::compileModel(const core::Path<wchar_t>& outFile)
+bool ModelCompiler::compileModel(void)
 {
     stats_.clear();
 
-    core::Path<wchar_t> path(outFile);
-    path.setExtension(model::MODEL_FILE_EXTENSION_W);
+    core::StopWatch timer;
 
-    // raw models are unprocessed and un optimised.
-    // if you want to make a engine model it must first be loaded into a raw model
-    // that way the opermisation and format writer logic can all be in one place.
-    // So i don't have to update the maya plugin and the converter when i edit the model format or change optermisations.
-    {
-        core::StopWatch timer;
-
-        if (!ProcessModel()) {
-            X_ERROR("Model", "Failed to compile model");
-            return false;
-        }
-
-        stats_.compileTime = timer.GetTimeVal();
-    }
-
-    // save it.
-    if (!saveModel(path)) {
-        X_ERROR("Model", "Failed to save compiled model to: \"%ls\"",
-            path.c_str());
+    if (!ProcessModel()) {
+        X_ERROR("Model", "Failed to compile model");
         return false;
     }
 
-    compiledLods_.clear();
+    stats_.compileTime = timer.GetTimeVal();
     return true;
 }
 
-bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
+bool ModelCompiler::saveModel(const core::Path<char>& outFile)
 {
+    return saveModel(core::Path<wchar_t>(outFile));
+}
+
+bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
+{
+    core::Path<wchar_t> path(outFile);
+    path.setExtension(model::MODEL_FILE_EXTENSION_W);
+
     // open da file!
     core::fileModeFlags mode;
     mode.Set(core::fileMode::WRITE);
@@ -917,12 +902,12 @@ bool ModelCompiler::saveModel(core::Path<wchar_t>& outFile)
 
     core::XFileScoped file;
 
-    if (!gEnv->pFileSys->createDirectoryTree(outFile.c_str())) {
+    if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
         X_ERROR("Model", "Failed to create directory for output file.");
         return false;
     }
 
-    if (!file.openFile(outFile.c_str(), mode)) {
+    if (!file.openFile(path.c_str(), mode)) {
         X_ERROR("Model", "Failed to open compile output file");
         return false;
     }

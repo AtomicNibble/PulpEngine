@@ -266,11 +266,11 @@ public:
 
     void clearColMeshes(void);
 
-    bool compileModel(const core::Path<char>& outFile);
-    bool compileModel(const core::Path<wchar_t>& outFile);
+    bool compileModel(void);
 
+    bool saveModel(const core::Path<char>& outFile);
+    bool saveModel(const core::Path<wchar_t>& outFile);
 private:
-    bool saveModel(core::Path<wchar_t>& outFile);
 
     size_t calculateRootBoneCount(void) const;
     size_t calculateTagNameDataSize(void) const;

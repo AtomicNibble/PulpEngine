@@ -217,7 +217,15 @@ bool XModelLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args
         }
     }
 
-    return model.compileModel(destPath);
+    if (!model.compileModel()) {
+        return false;
+    }
+
+    if (!model.saveModel(destPath)) {
+        return false;
+    }
+
+    return true;
 }
 
 X_NAMESPACE_END
