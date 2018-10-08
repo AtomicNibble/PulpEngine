@@ -627,7 +627,7 @@ bool AssetPakBuilder::hasAsset(AssetId id) const
 }
 
 
-bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
+bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
 {
     core::XFileScoped file;
     core::fileModeFlags mode;
@@ -635,11 +635,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
     mode.Set(core::fileMode::READ);
     mode.Set(core::fileMode::RANDOM_ACCESS);
 
-    // ensure correct extension.
-    core::Path<char> pathExt(pakPath);
-    pathExt.setExtension(PAK_FILE_EXTENSION);
-
-    if (!file.openFile(pathExt.c_str(), mode)) {
+    if (!file.openFile(pakPath.c_str(), mode)) {
         X_ERROR("AssetPak", "Failed to open file for saving");
         return false;
     }
@@ -691,7 +687,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<char>& pakPath)
     APakFlags::Description flagStr;
     X_LOG0("AssetPak", "^9PakMeta");
     X_LOG_BULLET;
-    X_LOG0("AssetPak", "Pak: \"%s\" version: ^6%" PRIu8, pathExt.fileName(), hdr.version);
+    X_LOG0("AssetPak", "Pak: \"%ls\" version: ^6%" PRIu8, pakPath.fileName(), hdr.version);
     X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
     X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ") ^6%%%.2f",
         core::HumanSize::toString(sizeStr, hdr.size), hdr.size,

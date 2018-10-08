@@ -40,7 +40,7 @@ bool Linker::Init(void)
     return true;
 }
 
-bool Linker::dumpMeta(core::Path<char>& inputFile)
+bool Linker::dumpMeta(core::Path<wchar_t>& inputFile)
 {
     return builder_.dumpMeta(inputFile);
 }
