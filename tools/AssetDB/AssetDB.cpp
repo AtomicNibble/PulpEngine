@@ -2196,6 +2196,17 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
         }
     }
 
+    {
+        sql::SqlLiteCmd cmd(db_, "DELETE FROM raw_files WHERE file_id = ?");
+        cmd.bind(1, assetId);
+
+        sql::Result::Enum res = cmd.execute();
+        if (res != sql::Result::OK) {
+            X_ERROR("AssetDB", "Error deleting all assets raw files before removing asset");
+            return Result::ERROR;
+        }
+    }
+
     sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE file_id = ? AND type = ? AND name = ?");
     cmd.bind(1, assetId); // make sure it's same one we found above.
     cmd.bind(2, type);
