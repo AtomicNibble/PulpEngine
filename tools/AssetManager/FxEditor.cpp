@@ -143,7 +143,7 @@ bool FxProperties::loadProps(QString& errorString, const QString& assetName, ass
 	}
 
 	int32_t assetId;
-	if (!db_.AssetExsists(type, name, &assetId)) {
+	if (!db_.AssetExists(type, name, &assetId)) {
 		errorString = "Asset `" + assetName + "` does not exsist";
 		return false;
 	}

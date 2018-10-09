@@ -22,7 +22,7 @@ ConverterHost::~ConverterHost()
 
 void ConverterHost::init()
 {
-	if (!con_.Init(core::string(""))) {
+	if (!con_.Init()) {
 		// shit.
 		QMessageBox::critical(ICore::mainWindow(), "Converter", "Failed to init converter");
 	}

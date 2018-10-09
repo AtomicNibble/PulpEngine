@@ -89,7 +89,7 @@ void AssetAssetRefWidget::browseClicked(void)
 
 
 		int32_t assetId;
-		if (!db_.AssetExsists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
+		if (!db_.AssetExists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
 			X_ERROR("AssetRef", "Failed to get source asset id");
 			return;
 		}
@@ -147,7 +147,7 @@ bool AssetAssetRefWidget::removeRef(int32_t assetId, const QString& assName)
 	const std::string str = assName.toStdString();
 
 	int32_t targetAssetId;
-	if (!db_.AssetExsists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
+	if (!db_.AssetExists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
 		X_ERROR("AssetRef", "Failed to get ref asset's id for removal");
 		return false;
 	}
@@ -166,7 +166,7 @@ bool AssetAssetRefWidget::addRef(int32_t assetId, const QString& assName)
 	const std::string str = assName.toStdString();
 
 	int32_t targetAssetId;
-	if (!db_.AssetExsists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
+	if (!db_.AssetExists(type_, core::string(str.data(), str.data() + str.length()), &targetAssetId)) {
 		X_ERROR("AssetRef", "Failed to get ref asset's id");
 		return false;
 	}

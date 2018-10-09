@@ -896,7 +896,7 @@ bool AssetProperties::getRawFile(ByteArr& rawData)
 	const core::string& assetName = nameNarrow();
 
 	int32_t assetId;
-	if (!db_.AssetExsists(type(), assetName, &assetId)) {
+	if (!db_.AssetExists(type(), assetName, &assetId)) {
 		X_ERROR("AssetProp", "Asset `%s` does not exsist", assetName.c_str());
 		return false;
 	}
@@ -934,7 +934,7 @@ bool AssetProperties::getThumb(ByteArr& data, Vec2i& dim)
 	const core::string& assetName = nameNarrow();
 
 	int32_t assetId;
-	if (!db_.AssetExsists(type(), assetName, &assetId)) {
+	if (!db_.AssetExists(type(), assetName, &assetId)) {
 		X_ERROR("AssetProp", "Asset `%s` does not exsist", assetName.c_str());
 		return false;
 	}
@@ -1024,7 +1024,7 @@ bool AssetProperties::loadProps(QString& errorString, const QString& assetName, 
 	}
 
 	int32_t assetId;
-	if (!db_.AssetExsists(type, name, &assetId)) {
+	if (!db_.AssetExists(type, name, &assetId)) {
 		errorString = "Asset `" + assetName + "` does not exsist";
 		return false;
 	}

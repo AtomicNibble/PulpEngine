@@ -44,7 +44,7 @@ bool AssetRefsDialog::loadInfo(void)
 {
 	// get asset id.
 	int32_t assetId;
-	if (!db_.AssetExsists(type_, name_, &assetId)) {
+	if (!db_.AssetExists(type_, name_, &assetId)) {
 		X_ERROR("AssetRefs", "Can't delete asset it does not exsist.");
 		return false;
 	}
