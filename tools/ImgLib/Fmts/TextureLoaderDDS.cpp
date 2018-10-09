@@ -15,25 +15,7 @@ namespace DDS
     namespace
     {
         static const char* DDS_FILE_EXTENSION = ".dds";
-#if 0
-#define GL_COMPRESSED_RGB_S3TC_DXT1_EXT 0x83F0
-#define GL_COMPRESSED_RGBA_S3TC_DXT1_EXT 0x83F1
-#define GL_COMPRESSED_RGBA_S3TC_DXT3_EXT 0x83F2
-#define GL_COMPRESSED_RGBA_S3TC_DXT5_EXT 0x83F3
-
-#define GL_UNSIGNED_SHORT_5_6_5 0x8363
-#define GL_UNSIGNED_SHORT_1_5_5_5_REV 0x8366
-
-#define GL_RGB8 0x8051
-#define GL_BGR 0x80E0
-#define GL_UNSIGNED_BYTE 0x1401
-#define GL_RGBA8 0x8058
-#define GL_BGRA 0x80E1
-#define GL_RGB5_A1 0x8057
-#define GL_RGB5 0x8050
-#define GL_RGB 0x1907
-#endif
-#define PIXEL_FMT_FOURCC(a, b, c, d) ((a) | ((b) << 8U) | ((c) << 16U) | ((d) << 24U))
+        #define PIXEL_FMT_FOURCC(a, b, c, d) ((a) | ((b) << 8U) | ((c) << 16U) | ((d) << 24U))
 
         enum pixel_format
         {
