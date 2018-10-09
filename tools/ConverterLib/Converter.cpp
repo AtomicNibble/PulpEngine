@@ -788,7 +788,10 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
     auto row = *it;
 
     core::Hash::SHA1Digest hash, curHash;
-    GetHash(type, dataHash, argsHash, curHash);
+    if (!GetHash(assetId, type, dataHash, argsHash, curHash)) {
+        X_ERROR("Converter", "Failed to get hash for stale check");
+        return true; // assume stale
+    }
 
     const void* pHash = row.get<void const*>(0);
     const size_t hashBlobSize = row.columnBytes(0);
@@ -810,7 +813,9 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
 bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash)
 {
     core::Hash::SHA1Digest hash;
-    GetHash(type, dataHash, argsHash, hash);
+    if (!GetHash(assetId, type, dataHash, argsHash, hash)) {
+        return false;
+    }
 
     sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, hash, lastUpdateTime) VALUES(?,?,DateTime('now'))");
     cmd.bind(1, assetId);
@@ -824,13 +829,39 @@ bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, 
     return true;
 }
 
-void Converter::GetHash(AssetType::Enum type, DataHash dataHash, DataHash argsHash, core::Hash::SHA1Digest& hashOut) const
+bool Converter::GetHash(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash, core::Hash::SHA1Digest& hashOut)
 {
     core::Hash::SHA1 hash;
     hash.update(dataHash);
     hash.update(argsHash);
     hash.update(conversionProfiles_[type].hash);
+
+    // HACK: for assuming all anim refs are needed in compile.
+    // sort something out more generic if other assets need this.
+    // this just adds the hashes of all refs.
+    if (type == AssetType::ANIM) {
+
+        AssetIdArr refs(scratchArea_);
+        if (!db_.GetAssetRefsFrom(assetId, refs)) {
+            X_ERROR("Converter", "Failed to get asset refs for hash");
+            return false;
+        }
+
+        for (auto refId : refs) {
+
+            DataHash refDataHash, refArgsHash;
+            if(!db_.GetHashesForAsset(refId, refDataHash, refArgsHash)) {   
+                X_ERROR("Converter", "Failed to get asset ref hash");
+                return false;
+            }
+
+            hash.update(refDataHash);
+            hash.update(refArgsHash);
+        }
+    }
+
     hashOut = hash.finalize();
+    return true;
 }
 
 bool Converter::loadConversionProfiles(const core::string& profileName)
