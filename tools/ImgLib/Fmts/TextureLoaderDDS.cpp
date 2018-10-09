@@ -916,7 +916,7 @@ namespace DDS
             }
 
             // check mask sizes.
-            if (mapped_format == Texturefmt::A8R8G8B8 || mapped_format == Texturefmt::R8G8B8) {
+            if (mapped_format == Texturefmt::R8G8B8A8 || mapped_format == Texturefmt::R8G8B8) {
                 if (mask_size[0] != 8 || mask_size[1] != 8 || mask_size[2] != 8 || mask_size[3] != 8) {
                     bool ValidRGB = (mapped_format == Texturefmt::R8G8B8 && mask_size[3] == 0);
                     if (!ValidRGB) {
@@ -927,7 +927,7 @@ namespace DDS
                 }
 
                 // check for swizle
-                if (mapped_format == Texturefmt::A8R8G8B8) {
+                if (mapped_format == Texturefmt::R8G8B8A8) {
                     if (mask_ofs[0] == 16 && mask_ofs[1] == 8 && mask_ofs[2] == 0
                         && mask_ofs[3] == 24) {
                         // this is BGRA
