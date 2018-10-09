@@ -2870,7 +2870,7 @@ bool AssetDB::AssetExsists(AssetId assetId, AssetType::Enum& typeOut, core::stri
         return false;
     }
 
-    sql::SqlLiteQuery qry(db_, "SELECT name, type FROM file_ids WHERE file_id = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT type, name FROM file_ids WHERE file_id = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
