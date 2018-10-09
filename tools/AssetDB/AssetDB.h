@@ -236,9 +236,9 @@ public:
     bool CleanThumbs(void);
 
     // if you want to get a assets id use this.
-    bool AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);
-    bool AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut = nullptr);
-    bool AssetExsists(AssetId assetId, AssetType::Enum& typeOut, core::string& nameOut);
+    bool AssetExists(AssetType::Enum type, const core::string& name, AssetId* pIdOut = nullptr, ModId* pModIdOut = nullptr);
+    bool AssetExists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut = nullptr);
+    bool AssetExists(AssetId assetId, AssetType::Enum& typeOut, core::string& nameOut);
 
     // Misc data / info retrival
     bool GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut);

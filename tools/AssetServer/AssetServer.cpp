@@ -514,7 +514,7 @@ void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, Res
         core::CriticalSection::ScopedLock slock(lock_);
 
         int32_t id, modId;
-        if (db_.AssetExsists(type, name, &id, &modId)) {
+        if (db_.AssetExists(type, name, &id, &modId)) {
             response.set_id(id);
             response.set_modid(modId);
             response.set_error("");

@@ -148,7 +148,7 @@ bool MatManager::getMatPath(const core::string& name, core::Path<char>& path)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
-    if (!db_.AssetExsists(assetDb::AssetType::MATERIAL, name, &assetId, &modId)) {
+    if (!db_.AssetExists(assetDb::AssetType::MATERIAL, name, &assetId, &modId)) {
         X_ERROR("MatMan", "Mat does not exists: \"%s\"", name.c_str());
         return false;
     }

@@ -130,7 +130,7 @@ bool Linker::Build(BuildOptions& options)
 bool Linker::AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
-    if (!db_.AssetExsists(assType, name, &assetId)) {
+    if (!db_.AssetExists(assType, name, &assetId)) {
         X_ERROR("Linker", "Failed to get Asset id: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
         return false;
     }
@@ -166,7 +166,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
-    if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
+    if (!db_.AssetExists(assType, name, &assetId, &modId)) {
         X_ERROR("Linker", "Asset does not exists: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
         return false;
     }

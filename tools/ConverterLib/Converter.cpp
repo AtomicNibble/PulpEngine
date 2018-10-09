@@ -111,7 +111,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
     assetDb::AssetDB::ModId modId;
-    if (!db_.AssetExsists(assType, name, &assetId, &modId)) {
+    if (!db_.AssetExists(assType, name, &assetId, &modId)) {
         X_ERROR("Converter", "Asset does not exists");
         return false;
     }
@@ -485,7 +485,7 @@ bool Converter::Repack(void)
 bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
-    if (!db_.AssetExsists(assType, name, &assetId)) {
+    if (!db_.AssetExists(assType, name, &assetId)) {
         X_ERROR("Converter", "Asset does not exists");
         return false;
     }
@@ -516,7 +516,7 @@ bool Converter::GenerateThumb(AssetType::Enum assType, const core::string& name)
 bool Converter::RepackAsset(AssetType::Enum assType, const core::string& name)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
-    if (!db_.AssetExsists(assType, name, &assetId)) {
+    if (!db_.AssetExists(assType, name, &assetId)) {
         X_ERROR("Converter", "Asset does not exists");
         return false;
     }
@@ -572,7 +572,7 @@ bool Converter::GetAssetData(assetDb::AssetId assetId, DataArr& dataOut)
 bool Converter::GetAssetData(const char* pAssetName, AssetType::Enum assType, DataArr& dataOut)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
-    if (!db_.AssetExsists(assType, core::string(pAssetName), &assetId)) {
+    if (!db_.AssetExists(assType, core::string(pAssetName), &assetId)) {
         X_ERROR("Converter", "Asset does not exists: \"%s\"", pAssetName);
         return false;
     }
@@ -598,7 +598,7 @@ bool Converter::GetAssetDataCompAlgo(assetDb::AssetId assetId, core::Compression
 
 bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum assType, assetDb::AssetId* pIdOut)
 {
-    if (!db_.AssetExsists(assType, core::string(pAssetName), pIdOut)) {
+    if (!db_.AssetExists(assType, core::string(pAssetName), pIdOut)) {
         return false;
     }
 
@@ -607,7 +607,7 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
 
 bool Converter::AssetExists(assetDb::AssetId assetId, assetDb::AssetType::Enum& typeOut, core::string& nameOut)
 {
-    return db_.AssetExsists(assetId, typeOut, nameOut);
+    return db_.AssetExists(assetId, typeOut, nameOut);
 }
 
 bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data,

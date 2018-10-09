@@ -2083,7 +2083,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, Mo
 
     // previously I would not check if asset already exsist, and let the unique constraint fail.
     // but I error for that, in my sql. so this is more cleaner.
-    if (AssetExsists(type, name)) {
+    if (AssetExists(type, name)) {
         return Result::NAME_TAKEN;
     }
 
@@ -2132,7 +2132,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(ModId modId, AssetType::Enum type, const
 AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::string& name)
 {
     AssetId assetId;
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         X_ERROR("AssetDB", "Failed to delete asset: %s:%s it does not exist", AssetType::ToString(type), name.c_str());
         return Result::ERROR;
     }
@@ -2225,11 +2225,11 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
         return Result::ERROR;
     }
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         return Result::NOT_FOUND;
     }
     // check if asset of same type already has new name
-    if (AssetExsists(type, newName)) {
+    if (AssetExists(type, newName)) {
         return Result::NAME_TAKEN;
     }
 
@@ -2304,7 +2304,7 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
     assetId = INVALID_ASSET_ID;
 #endif // !X_ENABLE_ASSERTIONS
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         // add it?
         if (AddAsset(type, name, &assetId) != Result::OK) {
             X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
@@ -2431,7 +2431,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFile(AssetType::Enum type, const co
     assetId = INVALID_ASSET_ID;
 #endif // !X_ENABLE_ASSERTIONS
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         // add it?
         if (AddAsset(type, name, &assetId) != Result::OK) {
             X_ERROR("AssetDB", "Failed to add assert when trying to update a asset that did not exsists.");
@@ -2566,7 +2566,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
         return Result::ERROR;
     }
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         // I don't allow adding of asset if not providing raw data also.
         X_WARNING("AssetDB", "Failed to update asset args, asset not found");
         return Result::NOT_FOUND;
@@ -2611,7 +2611,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 {
     AssetId assetId;
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         return Result::NOT_FOUND;
     }
 
@@ -2652,7 +2652,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetType::Enum type, const core
 {
     AssetId assetId;
 
-    if (!AssetExsists(type, name, &assetId)) {
+    if (!AssetExists(type, name, &assetId)) {
         return Result::NOT_FOUND;
     }
 
@@ -2813,7 +2813,7 @@ bool AssetDB::CleanThumbs(void)
 }
 
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, AssetId* pIdOut, ModId* pModIdOut)
+bool AssetDB::AssetExists(AssetType::Enum type, const core::string& name, AssetId* pIdOut, ModId* pModIdOut)
 {
     if (name.isEmpty()) {
         return false;
@@ -2839,7 +2839,7 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, Asset
     return true;
 }
 
-bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut)
+bool AssetDB::AssetExists(AssetType::Enum type, const core::string& name, ModId modId, AssetId* pIdOut)
 {
     if (name.isEmpty()) {
         return false;
@@ -2864,7 +2864,7 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
 }
 
 
-bool AssetDB::AssetExsists(AssetId assetId, AssetType::Enum& typeOut, core::string& nameOut)
+bool AssetDB::AssetExists(AssetId assetId, AssetType::Enum& typeOut, core::string& nameOut)
 {
     if (assetId == INVALID_ASSET_ID) {
         return false;
