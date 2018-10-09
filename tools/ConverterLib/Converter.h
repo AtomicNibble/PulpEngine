@@ -80,6 +80,7 @@ public:
     CONVERTERLIB_EXPORT bool SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies) X_FINAL;
     CONVERTERLIB_EXPORT bool GetDependencies(assetDb::AssetId assetId, core::Array<AssetDep>& dependencies);
     CONVERTERLIB_EXPORT bool ClearDependencies(assetDb::AssetId assetId);
+    CONVERTERLIB_EXPORT bool GetAssetRefsFrom(assetDb::AssetId assetId, AssetIdArr& refsOut) X_FINAL;
 
     CONVERTERLIB_EXPORT bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_FINAL;
 

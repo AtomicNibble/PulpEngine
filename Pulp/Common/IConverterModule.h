@@ -53,6 +53,7 @@ using AssetDepArr = core::Array<AssetDep>;
 struct IConverterHost
 {
     typedef core::Array<uint8_t> DataArr;
+    typedef core::Array<assetDb::AssetId> AssetIdArr;
     typedef core::string ConvertArgs;
 
     virtual ~IConverterHost() = default;
@@ -66,6 +67,7 @@ struct IConverterHost
     virtual bool UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> compressedData) X_ABSTRACT;
     virtual bool UpdateAssetRawFile(assetDb::AssetId assetId, const DataArr& data, core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl) X_ABSTRACT;
     virtual bool SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> dependencies) X_ABSTRACT;
+    virtual bool GetAssetRefsFrom(assetDb::AssetId assetId, AssetIdArr& refsOut) X_ABSTRACT;
 
     // get global conversion settings data.
     virtual bool getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut) X_ABSTRACT;

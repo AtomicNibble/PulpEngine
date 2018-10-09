@@ -709,6 +709,10 @@ bool Converter::ClearDependencies(assetDb::AssetId assetId)
     return true;
 }
 
+bool Converter::GetAssetRefsFrom(assetDb::AssetId assetId, AssetIdArr& refsOut)
+{
+    return db_.GetAssetRefsFrom(assetId, refsOut);
+}
 
 bool Converter::getConversionProfileData(assetDb::AssetType::Enum type, core::string& strOut)
 {
