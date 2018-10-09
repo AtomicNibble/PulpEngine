@@ -2863,6 +2863,28 @@ bool AssetDB::AssetExsists(AssetType::Enum type, const core::string& name, ModId
     return true;
 }
 
+
+bool AssetDB::AssetExsists(AssetId assetId, AssetType::Enum& typeOut, core::string& nameOut)
+{
+    if (assetId == INVALID_ASSET_ID) {
+        return false;
+    }
+
+    sql::SqlLiteQuery qry(db_, "SELECT name, type FROM file_ids WHERE file_id = ?");
+    qry.bind(1, assetId);
+
+    const auto it = qry.begin();
+
+    if (it == qry.end()) {
+        return false;
+    }
+
+    typeOut = safe_static_cast<AssetType::Enum>((*it).get<int32_t>(0));
+    nameOut = (*it).get<const char*>(1);
+    return true;
+}
+
+
 bool AssetDB::GetHashesForAsset(AssetId assetId, DataHash& dataHashOut, DataHash& argsHashOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT argsHash, raw_file FROM file_ids WHERE file_id = ?");
