@@ -71,9 +71,10 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
             return false;
         }
 
-        if (!assetList.HasMember("num")) {
-            X_ERROR("AssetList", "Asset missing num field");
-            return false;
+        int32_t num = -1;
+
+        if (assetList.HasMember("num")) {
+            num = assetList["num"].GetInt();
         }
 
         if (!assetList.HasMember("names")) {
@@ -81,19 +82,21 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
             return false;
         }
 
-        auto num = assetList["num"].GetInt();
         auto& nameList = assetList["names"];
-
         auto& namesArr = assets_[assetType];
-        namesArr.reserve(num);
 
-        for (auto& nameVal : nameList.GetArray())
-        {
+        if (num > 0) {
+            namesArr.reserve(num);
+        }
+        else {
+            namesArr.reserve(64);
+        }
+
+        for (auto& nameVal : nameList.GetArray()) {
             namesArr.emplace_back(nameVal.GetString(), nameVal.GetStringLength());
         }
 
-        if (safe_static_cast<int32_t>(namesArr.size()) != num)
-        {
+        if (num != -1 && safe_static_cast<int32_t>(namesArr.size()) != num) {
             X_ERROR("AssetList", "Asset name count mismatch. got: %" PRIuS " expected: %" PRIi32, namesArr.size(), num);
             return false;
         }
