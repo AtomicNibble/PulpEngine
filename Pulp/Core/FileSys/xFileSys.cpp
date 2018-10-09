@@ -278,7 +278,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
 {
     core::Path<wchar_t> real_path;
     
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
         PathUtil::findData findinfo;
         XFindData findData(path, this);
 
@@ -311,7 +311,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
 {
     core::Path<wchar_t> real_path;
 
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
         PathUtil::findData findinfo;
         XFindData FindData(path, this);
 
