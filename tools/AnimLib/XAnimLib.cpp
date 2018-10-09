@@ -30,18 +30,38 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
     core::json::Document d;
     d.Parse(args.c_str(), args.length());
 
-    core::string modelName;
     float posError = AnimCompiler::DEFAULT_POS_ERRR;
     float angError = AnimCompiler::DEFAULT_ANGLE_ERRR;
     bool looping = false;
     AnimType::Enum type = AnimType::RELATIVE;
 
-    if (d.HasMember("model")) {
-        modelName = d["model"].GetString();
-    }
-    else {
-        X_ERROR("AnimLib", "Missing 'model' option");
+    IConverterHost::AssetIdArr refs(g_AnimLibArena);
+    if (!host.GetAssetRefsFrom(assetId, refs)) {
+        X_ERROR("AnimLib", "Failed to get refs");
         return false;
+    }
+
+    if (refs.size() != 1) {
+        X_ERROR("AnimLib", "Got unexpected number of refs %" PRIuS, refs.size());
+        return false;
+    }
+
+    
+    assetDb::AssetId modelAssetId = refs.front();
+    core::string modelName;
+    
+    {
+        assetDb::AssetType::Enum refType;
+
+        if (!host.AssetExists(modelAssetId, refType, modelName)) {
+            X_ERROR("AnimLib", "Failed to get refs");
+            return false;
+        }
+
+        if (refType != assetDb::AssetType::MODEL) {
+            X_ERROR("AnimLib", "Asset refs is not a model %s \"%s\"", assetDb::AssetType::ToString(refType), modelName.c_str());
+            return false;
+        }
     }
 
     if (d.HasMember("posError")) {
@@ -73,11 +93,6 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
         }
     }
 
-    if (modelName.isEmpty()) {
-        X_ERROR("AnimLib", "Src 'model' asset name is empty");
-        return false;
-    }
-
     // load file data
     DataArr fileData(host.getScratchArena());
 
@@ -100,19 +115,13 @@ bool XAnimLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
     // we now need to load the models skelton.
     DataArr modelFile(g_AnimLibArena);
     ConvertArgs modelArgs;
-    assetDb::AssetId modelId = assetDb::INVALID_ASSET_ID;
 
-    if (!host.AssetExists(modelName, assetDb::AssetType::MODEL, &modelId)) {
-        X_ERROR("AnimLib", "Could not find model asset: \"%s\"", modelName.c_str());
-        return false;
-    }
-
-    if (!host.GetAssetData(modelId, modelFile)) {
+    if (!host.GetAssetData(modelAssetId, modelFile)) {
         X_ERROR("AnimLib", "Failed to load model raw data: \"%s\"", modelName.c_str());
         return false;
     }
 
-    if (!host.GetAssetArgs(modelId, modelArgs)) {
+    if (!host.GetAssetArgs(modelAssetId, modelArgs)) {
         X_ERROR("AnimLib", "Failed to load model args: \"%s\"", modelName.c_str());
         return false;
     }
