@@ -794,8 +794,8 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
     const size_t hashBlobSize = row.columnBytes(0);
 
     if (hashBlobSize != sizeof(hash.bytes)) {
-        X_ERROR("AssetDB", "Thumb hash blob incorrect size: %" PRIuS, hashBlobSize);
-        return false;
+        X_ERROR("Converter", "Cache hash incorrect size: %" PRIuS, hashBlobSize);
+        return true;// assume stale
     }
 
     std::memcpy(hash.bytes, pHash, sizeof(hash.bytes));
