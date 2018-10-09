@@ -9,6 +9,9 @@ Core:
 
  ✔ Tidy up console code. @done (18-09-17 18:35)
 
+ ☐ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed.
+   See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
+
 Game:
 
   ✔ Main menu need to open again @done (18-10-05 17:36)
@@ -116,6 +119,9 @@ Render:
      For example we could generated both 2d and 3d command lists, but dispatch the lists at same time. But maybe it's better to build the 2d dispatch it then start building 3d dunno.
       But I need to exposes the flexibility.
 
+ ☐ BufferManager currently uses a single threaded arena but it gets called from jobs.
+     Need to decide who takes a lock.
+
 AssetDB:
 
   ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
@@ -126,6 +132,11 @@ AssetDB:
   ✔ Move compiled hashes out into a converter cache db. @done (18-09-30 22:48)
      This way we can compile all assets without editing assetDB which is commited.
   ✔ Make it raw_files refrence a file_id so we can keep track of old rawFiles and list them all, making it easy to clean up unused files and rollback. @done (18-10-05 17:30)
+
+ ✔ Support assets becoming stale if a ref has changed. @done (18-10-09 21:21)
+   Some assets like animations use a skelton when compiling, if that changes
+   * This is only done for anims currently
+
 
  ☐ Handle multiple people adding/changing assets.
      Think dumping the data to text file will work best, then can diff the slut.
