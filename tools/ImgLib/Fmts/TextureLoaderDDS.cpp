@@ -869,16 +869,20 @@ namespace DDS
         uint32_t mask_size[4];
         uint32_t mask_ofs[4];
 
-        if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
+        if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC) {
             bits_per_pixel = pixel_util::get_bpp(format, dxt_fmt);
+        }
 
-        if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC)
+        if (hdr.sPixelFormat.dwFlags & DDPF_FOURCC) {
             default_pitch = (((hdr.dwWidth + 3) & ~3) * ((hdr.dwHeight + 3) & ~3) * bits_per_pixel) >> 3;
-        else
+        }
+        else {
             default_pitch = (hdr.dwWidth * bits_per_pixel) >> 3;
+        }
 
-        if (!pitch)
+        if (!pitch) {
             pitch = default_pitch;
+        }
         else if (pitch > default_pitch * 8) {
             X_ERROR("DDSLoader", "Pitch Error");
             return false;
@@ -906,8 +910,9 @@ namespace DDS
 
             if ((hdr.sPixelFormat.dwFlags & DDPF_LUMINANCE) && (!mask_size[0])) {
                 mask_size[0] = hdr.sPixelFormat.dwRGBBitCount >> 3;
-                if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS)
+                if (hdr.sPixelFormat.dwFlags & DDPF_ALPHAPIXELS) {
                     mask_size[0] /= 2;
+                }
             }
 
             // check mask sizes.
