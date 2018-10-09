@@ -848,7 +848,6 @@ bool Converter::GetHash(assetDb::AssetId assetId, AssetType::Enum type, DataHash
         }
 
         for (auto refId : refs) {
-
             DataHash refDataHash, refArgsHash;
             if(!db_.GetHashesForAsset(refId, refDataHash, refArgsHash)) {   
                 X_ERROR("Converter", "Failed to get asset ref hash");
