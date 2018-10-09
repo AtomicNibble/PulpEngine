@@ -605,6 +605,11 @@ bool Converter::AssetExists(const char* pAssetName, assetDb::AssetType::Enum ass
     return true;
 }
 
+bool Converter::AssetExists(assetDb::AssetId assetId, assetDb::AssetType::Enum& typeOut, core::string& nameOut)
+{
+    return db_.AssetExsists(assetId, typeOut, nameOut);
+}
+
 bool Converter::UpdateAssetThumb(assetDb::AssetId assetId, Vec2i thumbDim, Vec2i srcDim, core::span<const uint8_t> data,
     core::Compression::Algo::Enum algo, core::Compression::CompressLevel::Enum lvl)
 {
