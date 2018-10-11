@@ -6,6 +6,7 @@
 #include <Time\StopWatch.h>
 
 #include <IFileSys.h>
+#include <ILevel.h>
 
 X_LINK_ENGINE_LIB("AssetDb")
 X_LINK_ENGINE_LIB("ConverterLib")
@@ -57,37 +58,47 @@ bool Linker::Build(BuildOptions& options)
         }
     }
 
-    if (options.assetList.isNotEmpty())
+    if (options.level.isNotEmpty())
     {
-        AssetList assetList(scratchArea_);
+        // so if we have a level look for level list and manual list.
+        core::Path<char> level;
+        core::Path<char> levelEntDesc;
+        core::Path<char> levelAssList;
+        core::Path<char> levelAssListInc;
 
-        if (!assetList.loadFromFile(options.assetList)) {
+        level.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_FILE_EXTENSION);
+        levelEntDesc.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_ENT_FILE_EXTENSION);
+        levelAssList.setFmt("core_assets/levels/%s.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
+        levelAssListInc.setFmt("core_assets/levels/%s_inc.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
+
+        // load the level.
+        if (!AddAssetFromDisk(assetDb::AssetType::LEVEL, options.level, level)) {
+            X_ERROR("Linker", "Failed to add level file");
+            return false;
+        }
+        if (!AddAssetFromDisk(assetDb::AssetType::LEVEL, options.level + "." + level::LVL_ENT_FILE_EXTENSION, levelEntDesc)) {
+            X_ERROR("Linker", "Failed to add level ent desc");
             return false;
         }
 
-        auto& assets = assetList.getAssetList();
+        if (!AddAssetList(levelAssList)) {
+            X_ERROR("Linker", "Failed to add level asset list");
+            return false;
+        }
 
-        numAssets = core::accumulate(assets.begin(), assets.end(), 0_i32, [](const AssetList::StringArr& list) {
-            return safe_static_cast<int32_t>(list.size());
-        });
-
-        X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
-
-        for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
-        {
-            auto assetType = static_cast<assetDb::AssetType::Enum>(i);
-            auto& namesArr = assets[assetType];
-            
-            if (namesArr.isEmpty()) {
-                continue;
+        // optional hardcoded list.
+        if (gEnv->pFileSys->fileExists(levelAssListInc.c_str())) {
+            if (!AddAssetList(levelAssListInc)) {
+                X_ERROR("Linker", "Failed to add level asset inc list");
+                return false;
             }
-
-            for (auto& name : namesArr) {
-                if (!AddAssetAndDepenency(assetType, name)) {
-                    X_ERROR("Linker", "Failed to add asset");
-                    return false;
-                }
-            }
+        }
+    }
+    else if (options.assetList.isNotEmpty())
+    {
+        if (!AddAssetList(options.assetList)) {
+            X_ERROR("Linker", "Failed to add asset list");
+            return false;
         }
     }
     else

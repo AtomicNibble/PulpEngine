@@ -11,6 +11,7 @@ struct BuildOptions
 {
     core::Path<char> assetList;
     core::Path<char> outFile;
+    core::string level;
     core::string mod;
     AssetPak::PakBuilderFlags flags;
 };
@@ -34,6 +35,7 @@ private:
     bool AddAssetList(core::Path<char>& inputFile);
     bool AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name);
     bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);
+    bool AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::string& name, const core::Path<char>& path);
 
 private:
     core::MemoryArenaBase* scratchArea_;
