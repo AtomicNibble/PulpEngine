@@ -14,7 +14,14 @@ class AssetList
 
 
 public:
+    struct DirEntry 
+    {
+        assetDb::AssetType::Enum type;
+        core::Path<char> path;
+    };
+
     typedef core::ArrayGrowMultiply<core::string> StringArr;
+    typedef core::Array<DirEntry> DirEntryArr;
     typedef std::array<StringArr, assetDb::AssetType::ENUM_COUNT> AssetNameLists;
 
 public:
@@ -29,9 +36,11 @@ public:
     X_INLINE void add(assetDb::AssetType::Enum type, const core::string& name);
 
     X_INLINE const AssetNameLists& getAssetList(void) const;
+    X_INLINE const DirEntryArr& getDirList(void) const;
 
 private:
     AssetNameLists assets_;
+    DirEntryArr dirs_;
 };
 
 X_NAMESPACE_END

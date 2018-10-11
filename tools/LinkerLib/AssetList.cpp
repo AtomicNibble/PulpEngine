@@ -6,9 +6,10 @@
 X_NAMESPACE_BEGIN(linker)
 
 AssetList::AssetList(core::MemoryArenaBase* arena) :
-    assets_{{ X_PP_REPEAT_COMMA_SEP(22, arena) }}
+    assets_{{ X_PP_REPEAT_COMMA_SEP(22, arena) }},
+    dirs_(arena)
 {
-
+    dirs_.setGranularity(4);
 }
 
 bool AssetList::loadFromJson(core::StringRange<char> json)
@@ -109,6 +110,49 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
             return false;
         }
     }
+
+    if (d.HasMember("dirs")) {
+        
+        auto& dirsJson = d["dirs"];
+        if (dirsJson.GetType() != core::json::Type::kArrayType) {
+            X_ERROR("AssetList", "Unexpected dirs type");
+            return false;
+        }
+
+        for (auto& dirEntry : dirsJson.GetArray()) {
+
+            if (!dirEntry.HasMember("type")) {
+                X_ERROR("AssetList", "Dir missing type field");
+                return false;
+            }
+            if (!dirEntry.HasMember("path")) {
+                X_ERROR("AssetList", "Dir missing path field");
+                return false;
+            }
+
+            auto& typeJson = dirEntry["type"];
+            auto& pathJson = dirEntry["path"];
+
+            assetDb::AssetType::Enum type;
+            if (!assetDb::assetTypeFromStr(typeJson.GetString(), typeJson.GetString() + typeJson.GetStringLength(), type)) {
+                X_ERROR("AssetList", "Dir type is invalid");
+                return false;
+            }
+
+            if (pathJson.GetStringLength() == 0) {
+                X_ERROR("AssetList", "Dir path is empty");
+                return false;
+            }
+
+            DirEntry dir;
+            dir.type = type;
+            dir.path.set(pathJson.GetString(), pathJson.GetString() + pathJson.GetStringLength());
+            dir.path.ensureSlash();
+            dir.path.replaceSeprators();
+            dirs_.emplace_back(dir);
+        }
+    }
+
     return true;
 }
 

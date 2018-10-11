@@ -17,5 +17,9 @@ const AssetList::AssetNameLists& AssetList::getAssetList(void) const
     return assets_;
 }
 
+const AssetList::DirEntryArr& AssetList::getDirList(void) const
+{
+    return dirs_;
+}
 
 X_NAMESPACE_END
