@@ -627,6 +627,8 @@ void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::strin
 {
     X_ASSERT(name.isNotEmpty() && data.isNotEmpty(), "Empty name or data")(name.length(), data.size());
 
+    relativePath.replace(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
+
     assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
     assetLookup_.insert({ id, true });
 
