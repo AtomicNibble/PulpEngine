@@ -22,7 +22,8 @@ REM build levels...
 "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
 REM pack them up!
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\core +nopause +nocompress +mod core
+REM "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\core +nopause +nocompress +mod core
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nopause +mod core +lvl test01
 
 REM build sound packs...
 "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
@@ -46,7 +47,7 @@ xcopy /y /d "..\3rdparty\bin\x64\D3DCompiler_47.dll" "build"
 rem some assets.. !
 xcopy /y /d "core_assets\*.apak" "build\core_assets"
 xcopy /y /i /s /e /d "core_assets\config" "build\core_assets\config"
-xcopy /y /i /s /e /d "core_assets\levels" "build\core_assets\levels"
+REM xcopy /y /i /s /e /d "core_assets\levels" "build\core_assets\levels"
 xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
 xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
