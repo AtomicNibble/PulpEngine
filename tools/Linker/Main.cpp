@@ -106,14 +106,8 @@ namespace
             options.flags.Set(AssetPak::PakBuilderFlag::SHARED_DICT);
         }
 
-        const wchar_t* pOutFileName = gEnv->pCore->GetCommandLineArgForVarW(L"of");
-        if (!pOutFileName) {
-            X_ERROR("Linker", "Missing output file -of");
-            return false;
-        }
 
         char buf[core::Path<char>::BUF_SIZE];
-        options.outFile.set(core::strUtil::Convert(pOutFileName, buf));
 
         const wchar_t* pAssetList = gEnv->pCore->GetCommandLineArgForVarW(L"al");
         if (pAssetList) {
@@ -123,11 +117,22 @@ namespace
         const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"l");
         if (pLevelName) {
             options.level = core::strUtil::Convert(pLevelName, buf);
+            options.outFile = options.level;
         }
 
         const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");
         if (pModName) {
             options.mod = core::strUtil::Convert(pModName, buf);
+        }
+
+        const wchar_t* pOutFileName = gEnv->pCore->GetCommandLineArgForVarW(L"of");
+        if (pOutFileName) {
+            options.outFile.set(core::strUtil::Convert(pOutFileName, buf));
+        }
+
+        if (options.outFile.isEmpty()) {
+            X_ERROR("Linker", "Missing output file -of");
+            return false;
         }
 
         return true;
