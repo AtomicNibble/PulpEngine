@@ -733,6 +733,9 @@ uintptr_t xFileSys::findFirst2(pathType path, findData& findinfo)
 
     uintptr_t handle = PathUtil::findFirst(buf.c_str(), findinfo);
 
+    // TODO: just have one const?
+    static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
+
     return handle;
 }
 
