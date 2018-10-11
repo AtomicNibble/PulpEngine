@@ -16,7 +16,7 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
     core::json::MemoryStream ms(json.begin(), json.getLength());
 
     core::json::Document d;
-    if (d.ParseStream<core::json::kParseDefaultFlags>(ms).HasParseError()) {
+    if (d.ParseStream<core::json::kParseDefaultFlags | core::json::kParseCommentsFlag>(ms).HasParseError()) {
         auto err = d.GetParseError();
         const char* pErrStr = core::json::GetParseError_En(err);
         size_t offset = d.GetErrorOffset();
