@@ -135,6 +135,11 @@ bool Linker::AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::
         return false;
     }
 
+    if (builder_.hasAsset(assetId)) {
+        X_LOG0("Linker", "skipping duplicate asset %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return true;
+    }
+
     core::Array<AssetDep> dependencies(scratchArea_);
     if (!converter_.GetDependencies(assetId, dependencies)) {
         X_ERROR("Linker", "Failed to get dependencies for: %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
