@@ -127,6 +127,42 @@ bool Linker::Build(BuildOptions& options)
     return true;
 }
 
+bool Linker::AddAssetList(core::Path<char>& inputFile)
+{
+    AssetList assetList(scratchArea_);
+
+    if (!assetList.loadFromFile(inputFile)) {
+        return false;
+    }
+
+    auto& assets = assetList.getAssetList();
+
+    int32_t numAssets = core::accumulate(assets.begin(), assets.end(), 0_i32, [](const AssetList::StringArr& list) {
+        return safe_static_cast<int32_t>(list.size());
+    });
+
+    X_LOG0("Linker", "Adding %" PRIi32 " asset(s) ...", numAssets);
+
+    for (uint32_t i = 0; i < assetDb::AssetType::ENUM_COUNT; i++)
+    {
+        auto assetType = static_cast<assetDb::AssetType::Enum>(i);
+        auto& namesArr = assets[assetType];
+
+        if (namesArr.isEmpty()) {
+            continue;
+        }
+
+        for (auto& name : namesArr) {
+            if (!AddAssetAndDepenency(assetType, name)) {
+                X_ERROR("Linker", "Failed to add asset");
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
 bool Linker::AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name)
 {
     assetDb::AssetId assetId = assetDb::INVALID_ASSET_ID;
