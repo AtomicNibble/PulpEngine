@@ -171,6 +171,62 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
         }
     }
 
+    auto& dirs = assetList.getDirList();
+    for (const auto& dir : dirs)
+    {
+        // want to just add load of fooking files!
+        auto* pFileSys = gEnv->pFileSys;
+
+        assetDb::AssetDB::Mod mod;
+        if (!db_.GetModInfo(db_.GetcurrentModId(), mod)) {
+            X_ERROR("Linker", "Failed to get mod info");
+            return false;
+        }
+
+        core::Path<> dirPath;
+        assetDb::AssetDB::GetOutputPathForAssetType(dir.type, mod.outDir, dirPath);
+        dirPath /= dir.path;
+        dirPath.ensureSlash();
+
+        core::Path<> dirSearch(dirPath);
+        dirSearch.append("*");
+
+        core::IFileSys::findData fd;
+        auto handle = pFileSys->findFirst2(dirSearch.c_str(), fd);
+
+        int32_t numAdded = 0;
+
+        if (handle != core::IFileSys::INVALID_HANDLE)
+        {
+            do
+            {
+                core::Path<char> path(fd.name, fd.name + core::strUtil::strlen(fd.name));
+
+                if (path.isEqual(".") || path.isEqual("..")) {
+                    continue;
+                }
+
+                core::string name;
+                name.append(dir.path.begin(), dir.path.end());
+                name.append(path.begin(), path.end());
+
+                path = dirPath + path;
+
+                if (!AddAssetFromDisk(dir.type, name, path)) {
+                    X_ERROR("Linker", "Failed to add: %s", name.c_str());
+                    return false;
+                }
+
+                ++numAdded;
+
+            } while (pFileSys->findnext2(handle, fd));
+
+            pFileSys->findClose2(handle);
+        }
+
+        X_LOG0("Linker", "Added %" PRIi32 " asset(s) for dir ...", numAdded);
+    }
+
     return true;
 }
 
