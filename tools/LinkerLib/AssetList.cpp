@@ -93,7 +93,15 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
         }
 
         for (auto& nameVal : nameList.GetArray()) {
-            namesArr.emplace_back(nameVal.GetString(), nameVal.GetStringLength());
+            auto len = nameVal.GetStringLength();
+            const char* pString = nameVal.GetString();
+
+            if (len < assetDb::ASSET_NAME_MIN_LENGTH) {
+                X_ERROR("AssetList", "Asset name invalid: %s \"%s\"", assetDb::AssetType::ToString(assetType), pString);
+                return false;
+            }
+
+            namesArr.emplace_back(pString, len);
         }
 
         if (num != -1 && safe_static_cast<int32_t>(namesArr.size()) != num) {
