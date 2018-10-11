@@ -271,4 +271,38 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
     return true;
 }
 
+bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::string& name, const core::Path<char>& path)
+{
+    core::XFileScoped file;
+    core::fileModeFlags mode(core::fileMode::READ | core::fileMode::SHARE);
+
+    if (!file.openFile(path.c_str(), mode)) {
+        return false;
+    }
+
+    const uint64_t realfileSize = file.remainingBytes();
+    if (realfileSize > AssetPak::PAK_MAX_ASSET_SIZE) {
+        core::HumanSize::Str sizeStr;
+        X_ERROR("Linker", "Can't add %s \"%s\" the asset is too big: %s",
+            assetDb::AssetType::ToString(assType), name.c_str(), core::HumanSize::toString(sizeStr, realfileSize));
+        return false;
+    }
+
+    const auto fileSize = safe_static_cast<size_t>(realfileSize);
+
+    core::Array<uint8_t> data(scratchArea_);
+    data.resize(fileSize);
+
+    if (file.read(data.data(), data.size()) != fileSize) {
+        X_ERROR("Linker", "Failed to read data for %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return false;
+    }
+
+    core::Path<char> relAssPath;
+    assetDb::AssetDB::GetRelativeOutputPathForAsset(assType, name, relAssPath);
+
+    builder_.addAsset(-1, name, core::string(relAssPath.begin(), relAssPath.end()), assType, std::move(data));
+    return true;
+}
+
 X_NAMESPACE_END
