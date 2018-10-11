@@ -28,6 +28,21 @@ inline Path<wchar_t>::Path(const Path<char>& oth)
     BaseType::len_ = oth.length();
 }
 
+template<>
+template<>
+inline Path<char>::Path(const wchar_t* const beginInclusive, const wchar_t* const endExclusive) :
+    BaseType(beginInclusive, endExclusive)
+{
+}
+
+template<>
+template<>
+inline Path<wchar_t>::Path(const char* const beginInclusive, const char* const endExclusive) :
+    BaseType(beginInclusive, endExclusive)
+{
+}
+
+
 template<typename TChar>
 Path<TChar>::Path(const TChar* const str) :
     BaseType(str)

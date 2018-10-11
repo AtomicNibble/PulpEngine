@@ -38,6 +38,8 @@ public:
     inline Path(const Path& oth);
     template<typename TCharOth>
     inline explicit Path(const Path<TCharOth>& oth);
+    template<typename TCharOth>
+    inline explicit Path(const TCharOth* const beginInclusive, const TCharOth* const endExclusive);
 
     inline explicit Path(const TChar* const str);
 
