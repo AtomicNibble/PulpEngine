@@ -126,6 +126,15 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     compression_[AssetType::FONT].maxRatio = 0.85f;
     compression_[AssetType::FONT].algo = core::Compression::Algo::LZ4HC;
 
+    compression_[AssetType::LEVEL].enabled = true;
+    compression_[AssetType::LEVEL].maxRatio = 0.90f;
+    compression_[AssetType::LEVEL].algo = core::Compression::Algo::LZ4HC;
+
+    compression_[AssetType::RAW].enabled = true;
+    compression_[AssetType::RAW].maxRatio = 0.90f;
+    compression_[AssetType::RAW].algo = core::Compression::Algo::LZ4HC;
+
+
     // per asset shared dictonary.
     dictonaries_.fill(nullptr);
     // dictonaries_[AssetType::MODEL] = X_NEW(SharedDict, arena, "CompressionDict")(arena);
