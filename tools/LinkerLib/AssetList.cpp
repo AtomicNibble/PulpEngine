@@ -22,7 +22,7 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
         size_t offset = d.GetErrorOffset();
         size_t line = core::strUtil::LineNumberForOffset(json.begin(), json.end(), offset);
 
-        X_ERROR("AssetList", "Failed to parse font desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s", err, offset, line, pErrStr);
+        X_ERROR("AssetList", "Failed to parse assetList(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s", err, offset, line, pErrStr);
         return false;
     }
 
@@ -52,7 +52,7 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
 
     auto& assetsJson = d["assets"];
     if (assetsJson.GetType() != core::json::Type::kObjectType) {
-        X_ERROR("AssetList", "Unexpected type");
+        X_ERROR("AssetList", "Unexpected assets type");
         return false;
     }
 
