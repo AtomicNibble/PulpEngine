@@ -71,10 +71,16 @@ X_INLINE bool assetTypeFromStr(const char* pBegin, const char* pEnd, AssetType::
     using namespace core::Hash::Literals;
 
     const size_t len = (pEnd - pBegin);
+    if (len >= 32) {
+        return false;
+    }
+
+    core::StackString<32> tmp(pBegin, pEnd);
+    tmp.toLower();
 
     static_assert(AssetType::ENUM_COUNT == 22, "More asset types :[] ? this code need updating.");
 
-    switch (core::Hash::Fnv1aHash(pBegin, len)) {
+    switch (core::Hash::Fnv1aHash(tmp.c_str(), tmp.length())) {
         case "model"_fnv1a:
             type = AssetType::MODEL;
             break;
