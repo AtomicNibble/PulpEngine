@@ -112,6 +112,11 @@ namespace
         const wchar_t* pAssetList = gEnv->pCore->GetCommandLineArgForVarW(L"al");
         if (pAssetList) {
             options.assetList.set(core::strUtil::Convert(pAssetList, buf));
+
+            core::Path<char> temp(options.assetList);
+            temp.removeExtension();
+
+            options.outFile = temp.fileName();
         }
 
         const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
