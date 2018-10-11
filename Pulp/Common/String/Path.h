@@ -36,8 +36,8 @@ public:
 
     inline Path();
     inline Path(const Path& oth);
-    template<typename TCHarOth>
-    inline explicit Path(const Path<TCHarOth>& oth);
+    template<typename TCharOth>
+    inline explicit Path(const Path<TCharOth>& oth);
 
     inline explicit Path(const TChar* const str);
 
