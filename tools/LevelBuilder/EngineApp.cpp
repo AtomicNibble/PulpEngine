@@ -88,6 +88,11 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine,
         return false;
     }
 
+    // LinkerLib
+    if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "LinkerLib", "Engine_LinkerLib")) {
+        return false;
+    }
+
     // AssetDB
     if (!pICore_->IntializeLoadedEngineModule(X_ENGINE_OUTPUT_PREFIX "AssetDB", "Engine_AssetDB")) {
         X_ERROR("LvlBuilder", "Failed to init AssetDB");
