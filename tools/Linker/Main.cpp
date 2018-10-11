@@ -55,7 +55,7 @@ namespace
         X_LOG0("Linker", "^6-mode^7         (build, meta)");
         X_LOG0("Linker", "BuildArgs:");
         X_LOG0("Linker", "^6-al^7           (asset list)");
-        X_LOG0("Linker", "^6-l^7            (level name)");
+        X_LOG0("Linker", "^6-lvl^7          (level name)");
         X_LOG0("Linker", "^6-of^7           (output file)");
         X_LOG0("Linker", "^6-mod^7          (mod id/name)");
         X_LOG0("Linker", "^6-nocompress^7   (disable compression)");
@@ -114,7 +114,7 @@ namespace
             options.assetList.set(core::strUtil::Convert(pAssetList, buf));
         }
 
-        const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"l");
+        const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
         if (pLevelName) {
             options.level = core::strUtil::Convert(pLevelName, buf);
             options.outFile = options.level;
