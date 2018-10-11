@@ -240,6 +240,36 @@ TEST(Path, ConstructConvertW)
     }
 }
 
+TEST(Path, isAbsolute)
+{
+    {
+        core::Path<char> path("");
+        EXPECT_FALSE(path.isAbsolute());
+    }
+    {
+        core::Path<char> path("camel");
+        EXPECT_FALSE(path.isAbsolute());
+    }
+    {
+        core::Path<char> path("c:\\o_my\\goat");
+        EXPECT_TRUE(path.isAbsolute());
+    }
+    {
+        core::Path<char> path("c:\\o_my\\goat");
+        path.clear();
+        EXPECT_FALSE(path.isAbsolute());
+    }
+    {
+        core::Path<char> path("\\o_my\\pickle");
+        EXPECT_TRUE(path.isAbsolute());
+    }
+    {
+        core::Path<char> path("c:pickle");
+        EXPECT_FALSE(path.isAbsolute());
+    }
+}
+
+
 TEST(Path, Copy)
 {
     core::Path<char> path1;

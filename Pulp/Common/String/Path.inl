@@ -292,7 +292,20 @@ inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
 template<typename TChar>
 inline bool Path<TChar>::isAbsolute(void) const
 {
-    return BaseType::str_[0] == NATIVE_SLASH || BaseType::str_[0] == NON_NATIVE_SLASH || BaseType::str_[1] == ':';
+    const auto len = length();
+
+    // https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
+    // \folder is absolute
+    if (len > 0 && (BaseType::str_[0] == NATIVE_SLASH || BaseType::str_[0] == NON_NATIVE_SLASH)) {
+        return true;
+    }
+
+    // c:\folder is absolute c:folder is not
+    if (len > 2 && BaseType::str_[1] == ':' && (BaseType::str_[2] == NATIVE_SLASH || BaseType::str_[2] == NON_NATIVE_SLASH)) {
+        return true;
+    }
+
+    return false;
 }
 
 template<typename TChar>
