@@ -12,6 +12,7 @@
 #include <ILevel.h>
 #include <IConfig.h>
 #include <IGui.h>
+#include <IScriptSys.h>
 
 X_NAMESPACE_BEGIN(assetDb)
 
@@ -40,6 +41,7 @@ namespace
             extensions_[AssetType::CONFIG] = core::CONFIG_FILE_EXTENSION;
             extensions_[AssetType::TECHDEF] = engine::TECH_DEFS_FILE_EXTENSION;
             extensions_[AssetType::MENU] = engine::gui::MENU_FILE_EXTENSION;
+            extensions_[AssetType::SCRIPT] = script::SCRIPT_FILE_EXTENSION;
         }
 
         inline const char* operator[](AssetType::Enum type) const
