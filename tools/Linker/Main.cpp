@@ -60,6 +60,7 @@ namespace
         X_LOG0("Linker", "^6-mod^7          (mod id/name)");
         X_LOG0("Linker", "^6-nocompress^7   (disable compression)");
         X_LOG0("Linker", "^6-sharedict^7    (use shared compression dict)");
+        X_LOG0("Linker", "^6-memory^7       (Hint that pak should be kept in memory)");
         X_LOG0("Linker", "MetaArgs:");
         X_LOG0("Linker", "^6-if^7           (input file)");
     }
@@ -106,6 +107,9 @@ namespace
             options.flags.Set(AssetPak::PakBuilderFlag::SHARED_DICT);
         }
 
+        if (gEnv->pCore->GetCommandLineArgForVarW(L"memory")) {
+            options.flags.Set(AssetPak::PakBuilderFlag::HINT_MEMORY);
+        }
 
         char buf[core::Path<char>::BUF_SIZE];
 

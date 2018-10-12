@@ -13,7 +13,9 @@ X_NAMESPACE_BEGIN(AssetPak)
 X_DECLARE_FLAGS(PakBuilderFlag)
 (
     COMPRESSION,
-    SHARED_DICT);
+    SHARED_DICT,
+    HINT_MEMORY
+);
 
 typedef Flags<PakBuilderFlag> PakBuilderFlags;
 

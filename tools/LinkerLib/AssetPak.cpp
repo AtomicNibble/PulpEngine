@@ -353,6 +353,10 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     hdr.numAssets = safe_static_cast<uint32_t>(assets_.size());
     hdr.modified = core::DateTimeStampSmall::systemDateTime();
 
+    if (flags_.IsSet(PakBuilderFlag::HINT_MEMORY)) {
+        hdr.flags.Set(APakFlag::HINT_MEMORY);
+    }
+
     if (flags_.IsSet(PakBuilderFlag::COMPRESSION))
     {
         for (uint32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
