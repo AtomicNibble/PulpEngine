@@ -662,61 +662,6 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst(pathType path, FindData* findinfo)
-{
-    X_ASSERT_NOT_NULL(path);
-    X_ASSERT_NOT_NULL(findinfo);
-
-    XFindData* pFindData = X_NEW(XFindData, g_coreArena, "FileSysFindData")(path, this);
-
-    if (!pFindData->findnext(*findinfo)) {
-        X_DELETE(pFindData, g_coreArena);
-        return static_cast<uintptr_t>(-1);
-    }
-
-    // i could store this info in a member so that i can check that
-    // the handle is really the object we want.
-    // but then that adds a lookup to every findnext call.
-    // I'll add one for debugging.
-#if X_DEBUG == 1
-    findData_.insert(pFindData);
-#endif // !X_DEBUG
-
-    return reinterpret_cast<uintptr_t>(pFindData);
-}
-
-bool xFileSys::findnext(uintptr_t handle, FindData* findinfo)
-{
-    X_ASSERT_NOT_NULL(findinfo);
-
-#if X_DEBUG == 1
-    if (findData_.find(reinterpret_cast<XFindData*>(handle)) == findData_.end()) {
-        X_ERROR("FileSys", "FindData is not a valid handle.");
-        return false;
-    }
-#endif // !X_DEBUG
-
-    return reinterpret_cast<XFindData*>(handle)->findnext(*findinfo);
-}
-
-void xFileSys::findClose(uintptr_t handle)
-{
-    XFindData* pFindData = reinterpret_cast<XFindData*>(handle);
-#if X_DEBUG == 1
-
-    if (findData_.find(pFindData) == findData_.end()) {
-        X_ERROR("FileSys", "FindData is not a valid handle.");
-        return;
-    }
-#endif // !X_DEBUG
-
-    X_DELETE(pFindData, g_coreArena);
-
-#if X_DEBUG == 1
-    findData_.erase(pFindData);
-#endif // !X_DEBUG
-}
-
 uintptr_t xFileSys::findFirst2(pathType path, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
