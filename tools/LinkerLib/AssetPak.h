@@ -33,7 +33,6 @@ struct Asset
     Asset(Asset&&) = default;
     Asset& operator=(Asset&&) = default;
 
-
     core::string name;
     core::string relativePath;
     AssetId id;
