@@ -8,18 +8,17 @@ X_NAMESPACE_BEGIN(linker)
 
 // used for saving/loading a list of assets to a file.
 // Intented to be used for telling the linker what assets to include.
+struct DirEntry
+{
+    assetDb::AssetType::Enum type;
+    core::Path<char> path;
+};
+
 class AssetList
 {
     static const int32_t ASSET_LIST_VERSION = 1;
 
-
 public:
-    struct DirEntry 
-    {
-        assetDb::AssetType::Enum type;
-        core::Path<char> path;
-    };
-
     typedef core::ArrayGrowMultiply<core::string> StringArr;
     typedef core::Array<DirEntry> DirEntryArr;
     typedef std::array<StringArr, assetDb::AssetType::ENUM_COUNT> AssetNameLists;
