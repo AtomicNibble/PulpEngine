@@ -130,6 +130,10 @@ AssetPakBuilder::AssetPakBuilder(core::MemoryArenaBase* arena) :
     compression_[AssetType::LEVEL].maxRatio = 0.90f;
     compression_[AssetType::LEVEL].algo = core::Compression::Algo::LZ4HC;
 
+    compression_[AssetType::TECHDEF].enabled = true;
+    compression_[AssetType::TECHDEF].maxRatio = 0.90f;
+    compression_[AssetType::TECHDEF].algo = core::Compression::Algo::LZ4HC;
+
     compression_[AssetType::RAW].enabled = true;
     compression_[AssetType::RAW].maxRatio = 0.90f;
     compression_[AssetType::RAW].algo = core::Compression::Algo::LZ4HC;
