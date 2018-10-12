@@ -16,6 +16,8 @@ struct BuildOptions
     AssetPak::PakBuilderFlags flags;
 };
 
+struct DirEntry;
+
 class Linker
 {
     typedef core::Array<uint8_t> DataVec;
@@ -33,6 +35,7 @@ public:
 
 private:
     bool AddAssetList(core::Path<char>& inputFile);
+    bool AddAssetDir(const DirEntry& entry, const core::Path<>& relPath, const core::Path<>& dirPath, int32_t& numAdded);
     bool AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name);
     bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);
     bool AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::string& name, const core::Path<char>& path);

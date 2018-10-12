@@ -49,7 +49,6 @@ bool Linker::dumpMeta(core::Path<wchar_t>& inputFile)
 bool Linker::Build(BuildOptions& options)
 {
     core::StopWatch timer;
-    int32_t numAssets = 0;
 
     if (options.mod.isNotEmpty()) {
         if (!db_.SetMod(options.mod)) {
@@ -103,6 +102,7 @@ bool Linker::Build(BuildOptions& options)
     }
     else
     {
+        int32_t numAssets = 0;
         if (!db_.GetNumAssets(numAssets)) {
             X_ERROR("Linker", "Failed to get asset count");
             return false;
@@ -120,8 +120,7 @@ bool Linker::Build(BuildOptions& options)
     }
 
     core::HumanDuration::Str timeStr;
-    X_LOG0("Linker", "Added %" PRIi32 " asset(s) in ^6%s", numAssets,
-        core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
+    X_LOG0("Linker", "Added asset(s) in ^6%s", core::HumanDuration::toString(timeStr, timer.GetMilliSeconds()));
 
     builder_.setFlags(options.flags);
 
@@ -175,8 +174,6 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
     for (const auto& dir : dirs)
     {
         // want to just add load of fooking files!
-        auto* pFileSys = gEnv->pFileSys;
-
         assetDb::AssetDB::Mod mod;
         if (!db_.GetModInfo(db_.GetcurrentModId(), mod)) {
             X_ERROR("Linker", "Failed to get mod info");
@@ -188,49 +185,72 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
         dirPath /= dir.path;
         dirPath.ensureSlash();
 
-        core::Path<> dirSearch(dirPath);
-        dirSearch.append("*");
-
-        core::IFileSys::FindData fd;
-        auto handle = pFileSys->findFirst2(dirSearch.c_str(), fd);
-
         int32_t numAdded = 0;
 
-        if (handle != core::IFileSys::INVALID_HANDLE)
-        {
-            do
-            {
-                if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
-                    continue;
-                }
-
-                if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
-                    continue;
-                }
-
-                core::Path<char> path(fd.name);
-
-                core::string name;
-                name.append(dir.path.begin(), dir.path.end());
-                name.append(path.begin(), path.end());
-
-                path = dirPath + path;
-
-                if (!AddAssetFromDisk(dir.type, name, path)) {
-                    X_ERROR("Linker", "Failed to add: %s", name.c_str());
-                    return false;
-                }
-
-                ++numAdded;
-
-            } while (pFileSys->findnext2(handle, fd));
-
-            pFileSys->findClose2(handle);
+        if (!AddAssetDir(dir, dir.path, dirPath, numAdded)) {
+            return false;
         }
 
         X_LOG0("Linker", "Added %" PRIi32 " asset(s) for dir ...", numAdded);
     }
 
+    return true;
+}
+
+bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const core::Path<>& dirPath, int32_t& numAdded)
+{
+    auto* pFileSys = gEnv->pFileSys;
+
+    core::Path<> dirSearch(dirPath);
+    dirSearch.ensureSlash();
+    dirSearch.append("*");
+
+    core::IFileSys::FindData fd;
+    auto handle = pFileSys->findFirst2(dirSearch.c_str(), fd);
+
+    if (handle == core::IFileSys::INVALID_HANDLE) {
+        return false;
+    }
+
+    core::Path<> basePath(dirPath);
+
+    do
+    {
+        if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
+            continue;
+        }
+
+        core::Path<char> path(fd.name);
+
+        if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
+            core::Path<> subDir(dirPath);
+            subDir /= path;
+
+            auto rel = relPath / core::Path<>(fd.name);
+            rel.ensureSlash();
+
+            if (!AddAssetDir(dir, rel, subDir, numAdded)) {
+                return false;
+            }
+            continue;
+        }
+
+        core::string name;
+        name.append(relPath.begin(), relPath.end());
+        name.append(path.begin(), path.end());
+
+        path = basePath / path;
+
+        if (!AddAssetFromDisk(dir.type, name, path)) {
+            X_ERROR("Linker", "Failed to add: %s", name.c_str());
+            return false;
+        }
+
+        ++numAdded;
+
+    } while (pFileSys->findnext2(handle, fd));
+
+    pFileSys->findClose2(handle);
     return true;
 }
 
