@@ -146,11 +146,11 @@ TEST(DISABLED_FileSys, Find)
     //	pFileSys->setGameDir(strUtil::workingDir());
 
     int num = 0;
-    IFileSys::findData fd;
+    IFileSys::FindData fd;
     uintptr_t handle = pFileSys->findFirst("models/*.model", &fd);
     if (handle != IFileSys::INVALID_HANDLE) {
         do {
-            EXPECT_TRUE(strUtil::Find(fd.name, L".model") != nullptr);
+            EXPECT_TRUE(fd.name.find(L".model") != nullptr);
 
             X_LOG0("findresult", "name: \"%ls\"", fd.name);
             num++;

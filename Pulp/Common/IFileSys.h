@@ -666,6 +666,19 @@ struct IoRequestWrite : public IoRequestBase
     uint32_t dataSize; // don't support reading >4gb at once.
 };
 
+struct FindData
+{
+    X_DECLARE_FLAGS(AttrFlag)(
+        DIRECTORY    
+    );
+
+    typedef Flags<AttrFlag> AttrFlags;
+
+    AttrFlags attrib;
+    int64_t size;
+    core::Path<wchar_t> name;
+};
+
 struct IFileSys
 {
     typedef fileMode fileMode;
@@ -673,7 +686,7 @@ struct IFileSys
     typedef SeekMode SeekMode;
     typedef const char* pathType;
     typedef const wchar_t* pathTypeW;
-    typedef _wfinddatai64_t findData;
+    typedef FindData FindData;
 
     static const uintptr_t INVALID_HANDLE = (uintptr_t)-1;
 
@@ -709,12 +722,12 @@ struct IFileSys
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
-    virtual uintptr_t findFirst(pathType path, findData* findinfo) X_ABSTRACT;
-    virtual bool findnext(uintptr_t handle, findData* findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst(pathType path, FindData* findinfo) X_ABSTRACT;
+    virtual bool findnext(uintptr_t handle, FindData* findinfo) X_ABSTRACT;
     virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
-    virtual uintptr_t findFirst2(pathType path, findData& findinfo) X_ABSTRACT;
-    virtual bool findnext2(uintptr_t handle, findData& findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst2(pathType path, FindData& findinfo) X_ABSTRACT;
+    virtual bool findnext2(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
     virtual void findClose2(uintptr_t handle) X_ABSTRACT;
 
     // Delete
@@ -1162,11 +1175,11 @@ public:
         return pFileSys_->findnext2(handle_, fd_);
     }
 
-    X_INLINE core::IFileSys::findData& fileData(void)
+    X_INLINE core::IFileSys::FindData& fileData(void)
     {
         return fd_;
     }
-    X_INLINE const core::IFileSys::findData& fileData(void) const
+    X_INLINE const core::IFileSys::FindData& fileData(void) const
     {
         return fd_;
     }
@@ -1177,7 +1190,7 @@ public:
     }
 
 private:
-    core::IFileSys::findData fd_;
+    core::IFileSys::FindData fd_;
     core::IFileSys* pFileSys_;
     uintptr_t handle_;
 };

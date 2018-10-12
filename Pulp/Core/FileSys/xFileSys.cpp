@@ -279,16 +279,16 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
     core::Path<wchar_t> real_path;
     
     if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
-        PathUtil::findData findinfo;
+        FindData findinfo;
         XFindData findData(path, this);
 
-        if (!findData.findnext(&findinfo)) {
+        if (!findData.findnext(findinfo)) {
             fileModeFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
 
-        findData.getOSPath(real_path, &findinfo);
+        findData.getOSPath(real_path, findinfo);
     }
     else {
         createOSPath(gameDir_, path, location, real_path);
@@ -312,16 +312,16 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
     core::Path<wchar_t> real_path;
 
     if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
-        PathUtil::findData findinfo;
-        XFindData FindData(path, this);
+        FindData findinfo;
+        XFindData findData(path, this);
 
-        if (!FindData.findnext(&findinfo)) {
+        if (!findData.findnext(findinfo)) {
             fileModeFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
 
-        FindData.getOSPath(real_path, &findinfo);
+        findData.getOSPath(real_path, findinfo);
     }
     else {
         createOSPath(gameDir_, path, location, real_path);
@@ -430,16 +430,16 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
     core::Path<wchar_t> real_path;
 
     if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
-        PathUtil::findData findinfo;
-        XFindData FindData(path, this);
+        FindData findinfo;
+        XFindData findData(path, this);
 
-        if (!FindData.findnext(&findinfo)) {
+        if (!findData.findnext(findinfo)) {
             fileModeFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
 
-        FindData.getOSPath(real_path, &findinfo);
+        findData.getOSPath(real_path, findinfo);
     }
     else {
         createOSPath(gameDir_, path, location, real_path);
@@ -473,16 +473,16 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
         return nullptr;
     }
 
-    PathUtil::findData findinfo;
-    XFindData FindData(path, this);
-    if (!FindData.findnext(&findinfo)) {
+    FindData findinfo;
+    XFindData findData(path, this);
+    if (!findData.findnext(findinfo)) {
         fileModeFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
         return nullptr;
     }
 
     core::Path<wchar_t> real_path;
-    FindData.getOSPath(real_path, &findinfo);
+    findData.getOSPath(real_path, findinfo);
 
     if (isDebug()) {
         X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
@@ -513,16 +513,16 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
         return nullptr;
     }
 
-    PathUtil::findData findinfo;
-    XFindData FindData(path, this);
-    if (!FindData.findnext(&findinfo)) {
+    FindData findinfo;
+    XFindData findData(path, this);
+    if (!findData.findnext(findinfo)) {
         fileModeFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
         return nullptr;
     }
 
     core::Path<wchar_t> real_path;
-    FindData.getOSPath(real_path, &findinfo);
+    findData.getOSPath(real_path, findinfo);
 
     if (isDebug()) {
         X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
@@ -640,14 +640,14 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
     auto searchPath = fixedPath;
     searchPath.appendFmt(L"*.%S", AssetPak::PAK_FILE_EXTENSION);
 
-    PathUtil::findData findInfo;
+    FindData findInfo;
     uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), findInfo);
 
     if (handle != PathUtil::INVALID_FIND_HANDLE)
     {
         do
         {
-            core::StackString256 name(findInfo.name);
+            core::Path<char> name(findInfo.name);
 
             if (!openPak(name.c_str()))
             {
@@ -662,14 +662,14 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst(pathType path, findData* findinfo)
+uintptr_t xFileSys::findFirst(pathType path, FindData* findinfo)
 {
     X_ASSERT_NOT_NULL(path);
     X_ASSERT_NOT_NULL(findinfo);
 
     XFindData* pFindData = X_NEW(XFindData, g_coreArena, "FileSysFindData")(path, this);
 
-    if (!pFindData->findnext(findinfo)) {
+    if (!pFindData->findnext(*findinfo)) {
         X_DELETE(pFindData, g_coreArena);
         return static_cast<uintptr_t>(-1);
     }
@@ -685,7 +685,7 @@ uintptr_t xFileSys::findFirst(pathType path, findData* findinfo)
     return reinterpret_cast<uintptr_t>(pFindData);
 }
 
-bool xFileSys::findnext(uintptr_t handle, findData* findinfo)
+bool xFileSys::findnext(uintptr_t handle, FindData* findinfo)
 {
     X_ASSERT_NOT_NULL(findinfo);
 
@@ -696,7 +696,7 @@ bool xFileSys::findnext(uintptr_t handle, findData* findinfo)
     }
 #endif // !X_DEBUG
 
-    return reinterpret_cast<XFindData*>(handle)->findnext(findinfo);
+    return reinterpret_cast<XFindData*>(handle)->findnext(*findinfo);
 }
 
 void xFileSys::findClose(uintptr_t handle)
@@ -717,7 +717,7 @@ void xFileSys::findClose(uintptr_t handle)
 #endif // !X_DEBUG
 }
 
-uintptr_t xFileSys::findFirst2(pathType path, findData& findinfo)
+uintptr_t xFileSys::findFirst2(pathType path, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
     // so this is start of new version but i dunno how i want it to work yet.
@@ -739,7 +739,7 @@ uintptr_t xFileSys::findFirst2(pathType path, findData& findinfo)
     return handle;
 }
 
-bool xFileSys::findnext2(uintptr_t handle, findData& findinfo)
+bool xFileSys::findnext2(uintptr_t handle, FindData& findinfo)
 {
     X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
 
@@ -806,18 +806,17 @@ bool xFileSys::deleteDirectoryContents(pathType path)
     searchPath.ensureSlash();
     searchPath.append(L"*");
 
-    PathUtil::findData fd;
+    FindData fd;
     uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
     if (handle != PathUtil::INVALID_FIND_HANDLE) {
         do {
-            if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
+            if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
                 continue;
             }
 
             // build a OS Path.
             core::Path<wchar_t> dirItem(buf);
-            dirItem.ensureSlash();
-            dirItem.append(fd.name);
+            dirItem /= fd.name;
 
             if (PathUtil::IsDirectory(fd)) {
                 if (dirItem.fillSpaceWithNullTerm() < 1) {
@@ -1774,16 +1773,16 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, Virtua
     core::Path<wchar_t> real_path;
 
     if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
-        PathUtil::findData findinfo;
-        XFindData FindData(path, this);
+        FindData findinfo;
+        XFindData findData(path, this);
 
-        if (!FindData.findnext(&findinfo)) {
+        if (!findData.findnext(findinfo)) {
             fileModeFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
 
-        FindData.getOSPath(real_path, &findinfo);
+        findData.getOSPath(real_path, findinfo);
     }
     else {
         createOSPath(gameDir_, path, location, real_path);

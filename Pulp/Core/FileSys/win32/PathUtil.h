@@ -1,6 +1,7 @@
 #pragma once
 
 #include <String\Path.h>
+#include <IFileSys.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -14,7 +15,7 @@ X_NAMESPACE_BEGIN(core)
 
 namespace PathUtil
 {
-    typedef _wfinddatai64_t findData;
+    typedef FindData FindData;
     typedef intptr_t findhandle;
     static const findhandle INVALID_FIND_HANDLE = -1;
 
@@ -51,13 +52,13 @@ namespace PathUtil
 
     bool IsDirectory(const Path& path);
     bool IsDirectory(const wchar_t* pDir);
-    bool IsDirectory(const findData& fd);
+    bool IsDirectory(const FindData& fd);
 
     bool MoveFile(const Path& fullPath, const Path& fullPathNew);
     bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew);
 
-    findhandle findFirst(const wchar_t* path, findData& findInfo);
-    bool findNext(findhandle handle, findData& findInfo);
+    findhandle findFirst(const wchar_t* path, FindData& findInfo);
+    bool findNext(findhandle handle, FindData& findInfo);
     bool findClose(findhandle handle);
 
 } // namespace PathUtil

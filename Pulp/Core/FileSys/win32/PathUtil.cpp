@@ -10,6 +10,22 @@ X_NAMESPACE_BEGIN(core)
 
 namespace PathUtil
 {
+    namespace
+    {
+
+        void win32FindDataToFindData(const _wfinddata64_t& fi, FindData& findInfo)
+        {
+            findInfo.attrib.Clear();
+            if ((fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+                findInfo.attrib.Set(FindData::AttrFlag::DIRECTORY);
+            }
+
+            findInfo.size = fi.size;
+            findInfo.name.set(fi.name);
+        }
+
+    } // namespace
+
     Path GetCurrentDirectory(void)
     {
         WCHAR workingDir[Path::BUF_SIZE] = {0};
@@ -97,13 +113,13 @@ namespace PathUtil
         searchPath.ensureSlash();
         searchPath.append(L"*");
 
-        PathUtil::findData fd;
+        FindData fd;
         uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
         if (handle != PathUtil::INVALID_FIND_HANDLE) {
             Path dirItem;
 
             do {
-                if (core::strUtil::IsEqual(fd.name, L".") || core::strUtil::IsEqual(fd.name, L"..")) {
+                if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
                     continue;
                 }
 
@@ -342,9 +358,9 @@ namespace PathUtil
         return false;
     }
 
-    bool IsDirectory(const findData& fd)
+    bool IsDirectory(const FindData& fd)
     {
-        return (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0;
+        return fd.attrib.IsSet(FindData::AttrFlag::DIRECTORY);
     }
 
     // ------------------------------------------------
@@ -371,19 +387,24 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    findhandle findFirst(const wchar_t* path, findData& findInfo)
+    findhandle findFirst(const wchar_t* path, FindData& findInfo)
     {
-        intptr_t handle = _wfindfirst64(path, &findInfo);
+        _wfinddata64_t fi;
+        intptr_t handle = _wfindfirst64(path, &fi);
         if (handle == -1) {
             return INVALID_FIND_HANDLE;
         }
 
+        win32FindDataToFindData(fi, findInfo);
         return handle;
     }
 
-    bool findNext(findhandle handle, findData& findInfo)
+    bool findNext(findhandle handle, FindData& findInfo)
     {
-        if (_wfindnext64(handle, &findInfo) == 0) {
+        _wfinddata64_t fi;
+
+        if (_wfindnext64(handle, &fi) == 0) {
+            win32FindDataToFindData(fi, findInfo);
             return true;
         }
 

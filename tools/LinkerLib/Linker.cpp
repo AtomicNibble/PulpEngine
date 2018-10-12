@@ -191,7 +191,7 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
         core::Path<> dirSearch(dirPath);
         dirSearch.append("*");
 
-        core::IFileSys::findData fd;
+        core::IFileSys::FindData fd;
         auto handle = pFileSys->findFirst2(dirSearch.c_str(), fd);
 
         int32_t numAdded = 0;
@@ -200,11 +200,15 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
         {
             do
             {
-                core::Path<char> path(fd.name, fd.name + core::strUtil::strlen(fd.name));
-
-                if (path.isEqual(".") || path.isEqual("..")) {
+                if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
                     continue;
                 }
+
+                if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
+                    continue;
+                }
+
+                core::Path<char> path(fd.name);
 
                 core::string name;
                 name.append(dir.path.begin(), dir.path.end());

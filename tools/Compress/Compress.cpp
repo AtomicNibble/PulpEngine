@@ -340,7 +340,7 @@ namespace
             if (find.findfirst(path.c_str())) {
                 do {
                     const auto& fd = find.fileData();
-                    if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
+                    if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
                         continue;
                     }
 

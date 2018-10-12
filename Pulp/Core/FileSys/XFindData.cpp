@@ -37,7 +37,7 @@ XFindData::~XFindData()
 {
 }
 
-bool XFindData::findnext(_wfinddatai64_t* fi)
+bool XFindData::findnext(FindData& fi)
 {
     if (!current_) {
         return returnFalse(fi);
@@ -54,19 +54,17 @@ bool XFindData::findnext(_wfinddatai64_t* fi)
     return returnFindhNext(fi);
 }
 
-bool XFindData::getOSPath(core::Path<wchar_t>& path, _wfinddatai64_t* fi)
+bool XFindData::getOSPath(core::Path<wchar_t>& path, FindData& fi)
 {
-    X_ASSERT_NOT_NULL(fi);
-
     if (current_->pDir) {
-        path /= current_->pDir->path / fi->name;
+        path /= current_->pDir->path / fi.name;
         return true;
     }
 
     return false;
 }
 
-bool XFindData::searchDir(Directory* dir, _wfinddatai64_t* fi)
+bool XFindData::searchDir(Directory* dir, FindData& fi)
 {
     if (handle_ == -1) {
         // new search dir.
@@ -109,29 +107,30 @@ bool XFindData::searchDir(Directory* dir, _wfinddatai64_t* fi)
     return returnFindhNext(fi);
 }
 
-inline void XFindData::updateFindInfo(_wfinddatai64_t* fi)
+inline void XFindData::updateFindInfo(FindData& fi)
 {
-    fi->attrib = fdw.attrib;
-    fi->size = fdw.size;
-    fi->time_access = fdw.time_access;
-    fi->time_create = fdw.time_create;
-    fi->time_write = fdw.time_write;
-    wcscpy_s(fi->name, folder_.c_str());
-    wcscat_s(fi->name, fdw.name);
+    fi.attrib.Clear();
+    if ((fdw.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0) {
+        fi.attrib.Set(FindData::AttrFlag::DIRECTORY);
+    }
+
+    fi.size = fdw.size;
+    fi.name = folder_;
+    fi.name.append(fdw.name);
 }
 
-inline bool XFindData::searchPak(_wfinddatai64_t* fi)
+inline bool XFindData::searchPak(FindData& fi)
 {
     return returnFalse(fi);
 }
 
-inline bool XFindData::returnFalse(_wfinddatai64_t* fi)
+inline bool XFindData::returnFalse(FindData& fi)
 {
-    core::zero_this(fi);
+    core::zero_object(fi);
     return false;
 }
 
-inline bool XFindData::returnFindhNext(_wfinddatai64_t* findinfo)
+inline bool XFindData::returnFindhNext(FindData& findinfo)
 {
     current_ = current_->pNext;
     return findnext(findinfo);

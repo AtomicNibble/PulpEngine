@@ -9,6 +9,7 @@ class xFileSys;
 struct Directory;
 struct Pak;
 struct Search;
+struct FindData;
 
 struct XFindData
 {
@@ -16,16 +17,16 @@ struct XFindData
     XFindData(const char* path, xFileSys* pFileSys);
     ~XFindData();
 
-    bool findnext(_wfinddatai64_t* fi);
-    bool getOSPath(core::Path<wchar_t>& path, _wfinddatai64_t* fi);
+    bool findnext(FindData& fi);
+    bool getOSPath(core::Path<wchar_t>& path, FindData& fi);
 
 private:
-    bool searchDir(Directory* dir, _wfinddatai64_t* fi);
+    bool searchDir(Directory* dir, FindData& fi);
 
-    inline void updateFindInfo(_wfinddatai64_t* fi);
-    inline bool searchPak(_wfinddatai64_t* fi);
-    inline static bool returnFalse(_wfinddatai64_t* fi);
-    inline bool returnFindhNext(_wfinddatai64_t* findinfo);
+    void updateFindInfo(FindData& fi);
+    bool searchPak(FindData& fi);
+    static bool returnFalse(FindData& fi);
+    bool returnFindhNext(FindData& findinfo);
 
 private:
     Path<wchar_t> path_;

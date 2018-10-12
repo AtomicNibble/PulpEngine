@@ -138,19 +138,15 @@ namespace techset
         core::FindFirstScoped find;
 
         if (find.findfirst(path.c_str())) {
-            char buf[512];
-
-            core::Path<char> name;
 
             do {
                 const auto& fd = find.fileData();
-
-                if (fd.attrib & FILE_ATTRIBUTE_DIRECTORY) {
+                if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
                     continue;
                 }
 
                 // remove the extension.
-                name.set(core::strUtil::Convert(fd.name, buf));
+                core::Path<char> name(fd.name);
                 name.removeExtension();
 
                 typesOut.emplace_back(name.c_str());
