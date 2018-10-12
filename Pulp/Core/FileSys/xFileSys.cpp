@@ -684,6 +684,18 @@ uintptr_t xFileSys::findFirst2(pathType path, FindData& findinfo)
     return handle;
 }
 
+uintptr_t xFileSys::findFirst2(pathTypeW path, FindData& findinfo)
+{
+    Path<wchar_t> buf;
+    createOSPath(gameDir_, path, buf);
+
+    uintptr_t handle = PathUtil::findFirst(buf.c_str(), findinfo);
+
+    static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
+
+    return handle;
+}
+
 bool xFileSys::findnext2(uintptr_t handle, FindData& findinfo)
 {
     X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);

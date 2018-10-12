@@ -723,6 +723,7 @@ struct IFileSys
 
     // Find util
     virtual uintptr_t findFirst2(pathType path, FindData& findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst2(pathTypeW path, FindData& findinfo) X_ABSTRACT;
     virtual bool findnext2(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
     virtual void findClose2(uintptr_t handle) X_ABSTRACT;
 

@@ -259,6 +259,7 @@ public:
 
     // Find util
     uintptr_t findFirst2(pathType path, FindData& findinfo) X_FINAL;
+    uintptr_t findFirst2(pathTypeW path, FindData& findinfo) X_FINAL;
     bool findnext2(uintptr_t handle, FindData& findinfo) X_FINAL;
     void findClose2(uintptr_t handle) X_FINAL;
 
