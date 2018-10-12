@@ -78,8 +78,8 @@ namespace
 
 } // namespace
 
-Asset::Asset(AssetId id, const core::string& name, core::string&& relativePath,
-    AssetType::Enum type, DataVec&& data, core::MemoryArenaBase* arena) :
+Asset::Asset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath,
+    DataVec&& data, core::MemoryArenaBase* arena) :
     name(name),
     relativePath(relativePath),
     id(id),
@@ -631,13 +631,13 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     return true;
 }
 
-void AssetPakBuilder::addAsset(AssetId id, const core::string& name, core::string&& relativePath, AssetType::Enum type, DataVec&& data)
+void AssetPakBuilder::addAsset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath,  DataVec&& data)
 {
     X_ASSERT(name.isNotEmpty() && data.isNotEmpty(), "Empty name or data")(name.length(), data.size());
 
     relativePath.replace(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
     
-    assets_.emplace_back(id, name, std::move(relativePath), type, std::move(data), arena_);
+    assets_.emplace_back(id, type, name, std::move(relativePath), std::move(data), arena_);
     assets_.back().name.replace(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
     assetLookup_.insert({ id, true });
 
