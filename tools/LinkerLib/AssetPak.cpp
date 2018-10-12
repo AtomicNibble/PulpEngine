@@ -78,10 +78,9 @@ namespace
 
 } // namespace
 
-Asset::Asset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath,
+Asset::Asset(AssetId id, AssetType::Enum type, const core::string& name,
     DataVec&& data, core::MemoryArenaBase* arena) :
     name(name),
-    relativePath(relativePath),
     id(id),
     type(type),
     infaltedSize(data.size()),
@@ -406,8 +405,24 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     uint64_t dataSize = 0;
 
     {
+        std::array<core::StackString<32>, assetDb::AssetType::ENUM_COUNT> assetPrefixes;
+
+        for (int32_t i = 0; i < assetCounts_.size(); i++) {
+            if (!assetCounts_[i]) {
+                continue;
+            }
+
+            auto& prefix = assetPrefixes[i];
+            prefix.append(AssetType::ToString(i));
+            prefix.append('s', 1);
+            prefix.toLower();
+            prefix.append(assetDb::ASSET_NAME_SLASH, 1);
+
+            stringDataSize += (assetCounts_[i] * prefix.length());
+        }
+
         for (const auto& a : assets_) {
-            stringDataSize += core::strUtil::StringBytesIncNull(a.relativePath);
+            stringDataSize += core::strUtil::StringBytesIncNull(a.name);
         }
 
         stringDataSize = core::bitUtil::RoundUpToMultiple<uint64_t>(stringDataSize, PAK_BLOCK_PADDING);
@@ -415,10 +430,13 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
         strings.reserve(safe_static_cast<size_t>(stringDataSize));
 
         for (const auto& a : assets_) {
-            strings.write(a.relativePath.data(), core::strUtil::StringBytesIncNull(a.relativePath));
+            const auto& prefix = assetPrefixes[a.type];
+            strings.write(prefix.c_str(), prefix.length());
+            strings.write(a.name.data(), core::strUtil::StringBytesIncNull(a.name));
         }
 
         strings.alignWrite(PAK_BLOCK_PADDING);
+        X_ASSERT(strings.size() == stringDataSize, "Size calculation invalid")(strings.size(), stringDataSize);
     }
 
     // write all the asset entries.
@@ -635,13 +653,11 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     return true;
 }
 
-void AssetPakBuilder::addAsset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath,  DataVec&& data)
+void AssetPakBuilder::addAsset(AssetId id, AssetType::Enum type, const core::string& name, DataVec&& data)
 {
     X_ASSERT(name.isNotEmpty() && data.isNotEmpty(), "Empty name or data")(name.length(), data.size());
 
-    relativePath.replace(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
-    
-    assets_.emplace_back(id, type, name, std::move(relativePath), std::move(data), arena_);
+    assets_.emplace_back(id, type, name, std::move(data), arena_);
     assets_.back().name.replace(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
     assetLookup_.insert({ id, true });
 

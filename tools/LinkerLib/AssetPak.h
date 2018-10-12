@@ -25,7 +25,7 @@ typedef core::Hash::xxHash64Val AssetHash;
 
 struct Asset
 {
-    Asset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath, DataVec&& data, core::MemoryArenaBase* arena);
+    Asset(AssetId id, AssetType::Enum type, const core::string& name, DataVec&& data, core::MemoryArenaBase* arena);
    
     // Disable copy
     Asset(const Asset&) = delete;
@@ -34,7 +34,6 @@ struct Asset
     Asset& operator=(Asset&&) = default;
 
     core::string name;
-    core::string relativePath;
     AssetId id;
     AssetType::Enum type;
 
@@ -85,7 +84,7 @@ public:
     bool process(void);
     bool save(const core::Path<char>& path);
 
-    void addAsset(AssetId id, AssetType::Enum type, const core::string& name, core::string&& relativePath, DataVec&& vec);
+    void addAsset(AssetId id, AssetType::Enum type, const core::string& name, DataVec&& vec);
     bool hasAsset(AssetId id) const;
 
 private:

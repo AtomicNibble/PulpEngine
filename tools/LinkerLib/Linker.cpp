@@ -344,10 +344,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
         return false;
     }
 
-    core::Path<char> relAssPath;
-    assetDb::AssetDB::GetRelativeOutputPathForAsset(assType, name, relAssPath);
-
-    builder_.addAsset(assetId, assType, name, core::string(relAssPath.begin(), relAssPath.end()), std::move(data));
+    builder_.addAsset(assetId, assType, name, std::move(data));
     return true;
 }
 
@@ -378,10 +375,7 @@ bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::stri
         return false;
     }
 
-    core::Path<char> relAssPath;
-    assetDb::AssetDB::GetRelativeOutputPathForAsset(assType, name, relAssPath);
-
-    builder_.addAsset(-1, assType, name, core::string(relAssPath.begin(), relAssPath.end()), std::move(data));
+    builder_.addAsset(-1, assType, name, std::move(data));
     return true;
 }
 
