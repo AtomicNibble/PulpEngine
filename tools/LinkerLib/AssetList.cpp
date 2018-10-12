@@ -139,11 +139,6 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
                 return false;
             }
 
-            if (pathJson.GetStringLength() == 0) {
-                X_ERROR("AssetList", "Dir path is empty");
-                return false;
-            }
-
             DirEntry dir;
             dir.type = type;
             dir.path.set(pathJson.GetString(), pathJson.GetString() + pathJson.GetStringLength());
