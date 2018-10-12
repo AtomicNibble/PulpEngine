@@ -21,8 +21,9 @@ REM build all shader perms...
 REM build levels...
 "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
-REM pack them up!
-REM "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\core +nopause +nocompress +mod core
+REM Base packs
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init +nopause +mod core +al asset_lists/init.assList +memory
+REM level packs
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nopause +mod core +lvl test01
 
 REM build sound packs...
