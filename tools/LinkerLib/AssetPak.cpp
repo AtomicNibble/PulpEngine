@@ -809,20 +809,35 @@ bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
 
     strings.push_back(stringData.begin());
 
+    size_t longestString = 0;
+
     for (size_t i = 0; i < stringData.size() && strings.size() < hdr.numAssets; i++) {
         if (stringData[i] == '\0') {
             strings.push_back(&stringData[i + 1]);
+
+            auto strLength = static_cast<size_t>(strings.back() - strings[strings.size() - 2]) - 1;
+            longestString = core::Max(longestString, strLength);
+
             ++i;
         }
     }
 
+    // trailing.
+    if (strings.isNotEmpty()) {
+        auto strLength = core::strUtil::strlen(strings.back());
+        longestString = core::Max(longestString, strLength);
+    }
+
+    // add some space.
+    longestString += 2;
+
     X_LOG0("AssetPak", "^8Assets");
     X_LOG_BULLET;
-    X_LOG0("AssetPak", "%-4s %-50s %-10s %-10s %-12s %s", "Idx", "Name", "Offset", "Size", "NameHash", "Type");
+    X_LOG0("AssetPak", "%-4s %-*s %-10s %-10s %-12s %s", "Idx", longestString, "Name", "Offset", "Size", "NameHash", "Type");
 
     for (size_t i = 0; i < strings.size(); i++) {
-        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-50s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32 "   ^8%s", i, strings[i],
-            (uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]).hash(), AssetType::ToString(entries[i].type));
+        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-*s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32 "   ^8%s", 
+            i, longestString, strings[i], (uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]).hash(), AssetType::ToString(entries[i].type));
     }
 
     return true;
