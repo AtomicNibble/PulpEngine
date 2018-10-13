@@ -14,6 +14,8 @@
 
 #include <Threading\JobSystem2.h>
 
+#include <../../tools/AssetDB/AssetFileExtensions.h>
+
 X_NAMESPACE_BEGIN(AssetPak)
 
 namespace
@@ -406,23 +408,35 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
 
     {
         std::array<core::StackString<32>, assetDb::AssetType::ENUM_COUNT> assetPrefixes;
+        std::array<core::StackString<32>, assetDb::AssetType::ENUM_COUNT> assetExt;
 
         for (int32_t i = 0; i < assetCounts_.size(); i++) {
             if (!assetCounts_[i]) {
                 continue;
             }
 
+            auto type = static_cast<AssetType::Enum>(i);
+
             auto& prefix = assetPrefixes[i];
-            prefix.append(AssetType::ToString(i));
+            prefix.append(AssetType::ToString(type));
             prefix.append('s', 1);
             prefix.toLower();
             prefix.append(assetDb::ASSET_NAME_SLASH, 1);
 
             stringDataSize += (assetCounts_[i] * prefix.length());
+
+            assetExt[i].setFmt(".%s", assetDb::getAssetTypeExtension(type));
         }
 
+
         for (const auto& a : assets_) {
-            stringDataSize += core::strUtil::StringBytesIncNull(a.name);
+            stringDataSize += core::strUtil::StringBytes(a.name);
+
+            if (a.id != assetDb::INVALID_ASSET_ID) {
+                stringDataSize += assetExt[a.type].length();
+            }
+
+            ++stringDataSize; // null term
         }
 
         stringDataSize = core::bitUtil::RoundUpToMultiple<uint64_t>(stringDataSize, PAK_BLOCK_PADDING);
@@ -432,7 +446,14 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
         for (const auto& a : assets_) {
             const auto& prefix = assetPrefixes[a.type];
             strings.write(prefix.c_str(), prefix.length());
-            strings.write(a.name.data(), core::strUtil::StringBytesIncNull(a.name));
+            strings.write(a.name.data(), core::strUtil::StringBytes(a.name));
+
+            if (a.id != assetDb::INVALID_ASSET_ID) {
+                const auto& ext = assetExt[a.type];
+                 strings.write(ext.c_str(), ext.length());
+            }
+
+            strings.write('\0');
         }
 
         strings.alignWrite(PAK_BLOCK_PADDING);
