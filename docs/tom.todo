@@ -164,8 +164,8 @@ Linker:
 
 AssetPak:
 
-  ☐ Support techdefs in packages.
-  ☐ Support shaders in packages.
+  ✔ Support techdefs in packages. @done (18-10-13 13:58)
+  ✔ Support shaders in packages. @done (18-10-13 13:58)
   ☐ Support loose files?
 
 LevelBuilder:
