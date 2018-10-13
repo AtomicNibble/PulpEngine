@@ -1636,7 +1636,8 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
         }
 
         // make sure this stream starts on a aligned boundry.
-        const size_t paddedSize = (MODEL_STREAM_ALIGN - file.tell() % MODEL_STREAM_ALIGN);
+        const size_t curFileSize = file.tell();
+        const size_t paddedSize = curFileSize % MODEL_STREAM_ALIGN == 0 ? 0 : (MODEL_STREAM_ALIGN - (curFileSize % MODEL_STREAM_ALIGN));
 
         X_ASSERT(paddedSize == preMeshDataPadSize, "Alignment size mismatch")(paddedSize, preMeshDataPadSize); 
 
