@@ -181,8 +181,8 @@ namespace RawModel
             return false;
         }
 
-        for (auto lod : lods_) {
-            for (auto mesh : lod.meshes_) {
+        for (auto& lod : lods_) {
+            for (auto& mesh : lod.meshes_) {
                 if (isColisionMesh(mesh.displayName_)) {
                     hasColisionMeshes_ = true;
                     break;
