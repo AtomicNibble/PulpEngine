@@ -586,7 +586,7 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
     }
 
     if (!directoryExistsOS(path)) {
-        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%s\"", path);
+        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", path);
         return;
     }
 
