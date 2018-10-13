@@ -190,6 +190,17 @@ namespace RawModel
             }
         }
 
+#if X_MODEL_MTL_PATCH_DOUBLE_UNDERSCORE
+        // Patch material names
+        core::StackString<4> slashStr(assetDb::ASSET_NAME_SLASH);
+
+        for (auto& lod : lods_) {
+            for (auto& mesh : lod.meshes_) {
+                mesh.material_.name_.replace("__", slashStr.c_str());
+            }
+        }
+#endif
+
         return true;
     }
 
