@@ -88,8 +88,8 @@ XFileAsyncOperation XPakFileAsync::readAsync(void* pBuffer, size_t length, uint6
 
     if (pPak_->mode == PakMode::MEMORY) {
 #if X_ENABLE_FILE_STATS
-        s_stats.NumBytesWrite += pakLength;
-        ++s_stats.NumWrties;
+        s_stats.NumBytesRead += pakLength;
+        ++s_stats.NumReads;
 #endif // !X_ENABLE_FILE_STATS
 
         auto* pSrc = &pPak_->data[safe_static_cast<size_t>(pakPos)];
