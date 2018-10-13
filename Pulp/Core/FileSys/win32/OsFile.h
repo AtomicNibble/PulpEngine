@@ -19,7 +19,7 @@ public:
     };
 
 public:
-    OsFile(const wchar_t* pPath, IFileSys::fileModeFlags mode);
+    OsFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode);
     ~OsFile(void);
 
     size_t read(void* pBuffer, size_t length);

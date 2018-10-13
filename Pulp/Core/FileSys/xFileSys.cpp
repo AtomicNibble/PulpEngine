@@ -298,7 +298,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
         X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
     }
 
-    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
+    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path, mode);
     if (pFile->valid()) {
         return pFile;
     }
@@ -331,7 +331,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
         X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
     }
 
-    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path.c_str(), mode);
+    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path, mode);
     if (pFile->valid()) {
         return pFile;
     }
@@ -381,7 +381,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
                         X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
                     }
 
-                    pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath.c_str(), mode, &asyncOpPoolArena_);
+                    pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath, mode, &asyncOpPoolArena_);
                     break;
                 }
             }
@@ -414,7 +414,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
             X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
         }
 
-        pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath.c_str(), mode, &asyncOpPoolArena_);
+        pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath, mode, &asyncOpPoolArena_);
     }
 
     if (pFile->valid()) {
@@ -449,7 +449,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
         X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
     }
 
-    XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+    XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path, mode, &asyncOpPoolArena_);
     if (pFile->valid()) {
         return pFile;
     }
@@ -488,7 +488,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
         X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
     }
 
-    OsFile file(real_path.c_str(), mode);
+    OsFile file(real_path, mode);
     if (!file.valid()) {
         return nullptr;
     }
@@ -528,7 +528,7 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
         X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
     }
 
-    OsFile file(real_path.c_str(), mode);
+    OsFile file(real_path, mode);
     if (!file.valid()) {
         return nullptr;
     }
@@ -1777,7 +1777,7 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, Virtua
         X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
     }
 
-    OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(real_path.c_str(), mode, &asyncOpPoolArena_);
+    OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(real_path, mode, &asyncOpPoolArena_);
     if (pFile->valid()) {
         return pFile;
     }

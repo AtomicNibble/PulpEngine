@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(core)
 class XDiskFile : public XFile
 {
 public:
-    XDiskFile(const wchar_t* pPath, IFileSys::fileModeFlags mode);
+    XDiskFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode);
     ~XDiskFile();
 
     inline bool valid(void) const {

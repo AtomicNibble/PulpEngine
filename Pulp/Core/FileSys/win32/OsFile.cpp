@@ -43,12 +43,12 @@ namespace
 
 } // namespace
 
-OsFile::OsFile(const wchar_t* pPath, IFileSys::fileModeFlags mode) :
+OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode) :
     mode_(mode),
     file_(INVALID_HANDLE_VALUE)
 {
     // lets open you up.
-    file_ = createFileHelper(pPath, mode);
+    file_ = createFileHelper(path.c_str(), mode);
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 
@@ -61,7 +61,7 @@ OsFile::OsFile(const wchar_t* pPath, IFileSys::fileModeFlags mode) :
 #endif // !X_ENABLE_FILE_ARTIFICAIL_DELAY
 
     if (!valid()) {
-        logFileError(pPath, mode);
+        logFileError(path.c_str(), mode);
     }
     else {
 #if X_ENABLE_FILE_STATS

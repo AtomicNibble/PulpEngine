@@ -50,14 +50,14 @@ namespace
         s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
     }
 
-    void logFileError(const wchar_t* path, IFileSys::fileModeFlags mode)
+    void logFileError(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode)
     {
         lastError::Description Dsc;
         IFileSys::fileModeFlags::Description DscFlag;
         {
             X_LOG_BULLET;
             X_ERROR("AsyncFile", "Failed to open file. Error: %s", lastError::ToString(Dsc));
-            X_ERROR("AsyncFile", "File: %ls", path);
+            X_ERROR("AsyncFile", "File: %ls", path.c_str());
             X_ERROR("AsyncFile", "Mode: %s", mode.ToString(DscFlag));
         }
     }
@@ -65,20 +65,18 @@ namespace
 
 } // namespace
 
-OsFileAsync::OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
+OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
     overlappedArena_(overlappedArena),
     mode_(mode),
     hFile_(INVALID_HANDLE_VALUE)
 {
-    X_ASSERT_NOT_NULL(path);
-
     DWORD access = mode::GetAccess(mode);
     DWORD share = mode::GetShareMode(mode);
     DWORD dispo = mode::GetCreationDispo(mode);
     DWORD flags = mode::GetFlagsAndAtt(mode, true);
 
     // lets open you up.
-    hFile_ = CreateFileW(path, access, share, NULL, dispo, flags, NULL);
+    hFile_ = CreateFileW(path.c_str(), access, share, NULL, dispo, flags, NULL);
 
 #if X_ENABLE_FILE_ARTIFICAIL_DELAY
 

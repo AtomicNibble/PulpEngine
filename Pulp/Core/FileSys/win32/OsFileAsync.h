@@ -13,7 +13,7 @@ X_NAMESPACE_BEGIN(core)
 class OsFileAsync
 {
 public:
-    OsFileAsync(const wchar_t* path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena);
+    OsFileAsync(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena);
     ~OsFileAsync(void);
 
     XOsFileAsyncOperation readAsync(void* pBuffer, size_t length, uint64_t position);
