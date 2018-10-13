@@ -1564,18 +1564,18 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
         }
         else if (type == IoRequest::OPEN_READ_ALL) {
             IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
-            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode));
+            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
 
             // make sure it's safe to allocate the buffer in this thread.
             X_ASSERT_NOT_NULL(pOpenRead->arena);
             X_ASSERT(pOpenRead->arena->isThreadSafe(), "Async OpenRead requests require thread safe arena")(pOpenRead->arena->isThreadSafe());
 
-            if (!pFile) {
-                pOpenRead->callback.Invoke(fileSys, pOpenRead, pFile, 0);
+            if (!pFileAsync) {
+                pOpenRead->callback.Invoke(fileSys, pOpenRead, pFileAsync, 0);
                 goto nextRequest;
             }
 
-            const uint64_t fileSize = pFile->fileSize();
+            const uint64_t fileSize = pFileAsync->fileSize();
 
             // we don't support open and read for files over >2gb
             // if you are trying todo that you are retarded.
@@ -1584,7 +1584,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
                 X_ERROR("FileSys", "A request was made to read a entire file which is >2GB, ignoring request. File: \"%s\"",
                     pOpenRead->path.c_str());
 
-                closeFileAsync(pFile);
+                closeFileAsync(pFileAsync);
                 pOpenRead->callback.Invoke(fileSys, pOpenRead, nullptr, 0);
             }
             else {
@@ -1593,20 +1593,48 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 #endif // !X_ENABLE_FILE_STATS
 
                 uint8_t* pData = X_NEW_ARRAY_ALIGNED(uint8_t, safe_static_cast<size_t>(fileSize), pOpenRead->arena, "AsyncIOReadAll", 16);
+                auto fileType = pFileAsync->getType();
 
-                XFileAsyncOperationCompiltion operation = pFile->readAsync(
-                    pData,
-                    safe_static_cast<size_t>(fileSize),
-                    0,
-                    compRoutine);
-
-                // now we need to wait for the read to finish, then close the file and call the callback.
-                // just need to work out a nice way to close the file post read.
-                pOpenRead->pFile = pFile;
+                pOpenRead->pFile = pFileAsync;
                 pOpenRead->pBuf = pData;
                 pOpenRead->dataSize = safe_static_cast<uint32_t>(fileSize);
 
-                pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
+                if (fileType == XFileAsync::Type::DISK) {
+                    XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(pFileAsync);
+
+                    XFileAsyncOperationCompiltion operation = pFile->readAsync(
+                        pData,
+                        safe_static_cast<size_t>(fileSize),
+                        0,
+                        compRoutine);
+
+                    pendingCompOps_.emplace_back(std::move(requestPtr), std::move(operation));
+                }
+                else if (fileType == XFileAsync::Type::VIRTUAL) {
+                    XPakFileAsync* pFile = static_cast<XPakFileAsync*>(pFileAsync);
+
+                    if (pFile->supportsComplitionRoutine()) {
+                        pendingCompOps_.emplace_back(std::move(requestPtr), pFile->readAsync(
+                            pData,
+                            safe_static_cast<size_t>(fileSize),
+                            0,
+                            compRoutine));
+                    }
+                    else {
+                        PendingOp op(std::move(requestPtr), pFile->readAsync(
+                            pData,
+                            safe_static_cast<size_t>(fileSize),
+                            0));
+
+                        uint32_t bytesTrans = 0;
+                        if (op.op.hasFinished(&bytesTrans)) {
+                            onOpFinsihed(op, bytesTrans);
+                        }
+                        else {
+                            pendingOps_.emplace_back(std::move(op));
+                        }
+                    }
+                }
             }
         }
         else if (type == IoRequest::OPEN_WRITE_ALL) {
@@ -1760,7 +1788,7 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, Virtua
 
 bool xFileSys::openPak(const char* pName)
 {
-    X_ERROR("FileSys", "Mounting pak: \"%s\"", pName);
+    X_LOG1("FileSys", "Mounting pak: \"%s\"", pName);
 
     // you can only open pak's from inside the virtual filesystem.
     // so file is opened as normal.
