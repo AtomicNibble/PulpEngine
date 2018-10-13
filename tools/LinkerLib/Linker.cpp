@@ -375,7 +375,7 @@ bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::stri
         return false;
     }
 
-    builder_.addAsset(-1, assType, name, std::move(data));
+    builder_.addAsset(assetDb::INVALID_ASSET_ID, assType, name, std::move(data));
     return true;
 }
 
