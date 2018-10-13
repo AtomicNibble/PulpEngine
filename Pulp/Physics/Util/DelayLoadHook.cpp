@@ -148,18 +148,41 @@ FARPROC WINAPI delayHook(unsigned dliNotify, PDelayLoadInfo pdli)
 
         case dliNotePreGetProcAddress:
             break;
-
-        case dliFailLoadLib:
-            break;
-
-        case dliFailGetProc:
-            break;
-
         case dliNoteEndProcessing:
             break;
 
         default:
             return nullptr;
+    }
+
+    return nullptr;
+}
+
+FARPROC WINAPI delayLoadFail(uint32_t dliNotify, PDelayLoadInfo pdli)
+{
+    switch (dliNotify)
+    {
+        case dliFailLoadLib: {
+            const char* pName = gDelayLoadHook.getPhysxName(pdli->szDll);
+            X_FATAL("Phys", "Failed to load lib: \"%s\"", pName);
+            break;
+        }
+        case dliFailGetProc: {
+            core::StackString256 func;
+
+            auto& dlp = pdli->dlp;
+            if (dlp.fImportByName) {
+                func.set(dlp.szProcName);
+            }
+            else {
+                func.setFmt("<0x%" PRIx32 ">", dlp.dwOrdinal);
+            }
+
+            X_FATAL("Phys", "Failed to resolved: \"%s\"", func.c_str());
+            break;
+        }
+        default: 
+            break;
     }
 
     return nullptr;
@@ -177,5 +200,14 @@ extern "C"
     = delayHook;
 
 #endif //!X_PLATFORM_WIN32
+
+extern "C"
+
+#if _MSC_FULL_VER >= 190024210 && !defined(DELAYIMP_INSECURE_WRITABLE_HOOKS)
+const
+#endif // !_MSC_FULL_VER
+
+    PfnDliHook __pfnDliFailureHook2
+    = delayLoadFail;
 
 X_NAMESPACE_END
