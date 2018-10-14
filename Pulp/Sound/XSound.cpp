@@ -26,7 +26,6 @@ X_DISABLE_WARNING(4505)
 // Comms
 #include <AK/Comm/AkCommunication.h>
 
-#include <AK/Plugin/AkAudioInputPlugin.h>
 
 X_ENABLE_WARNING(4505)
 
@@ -57,7 +56,7 @@ X_ENABLE_WARNING(4505)
 #define PLUGIN_Codec 1
 #define PLUGIN_Effect 1
 #define PLUGIN_Source 1
-#define PLUGIN_Auro 1
+#define PLUGIN_Auro 0
 #endif // !PLUGIN_All
 
 // link the libs..
@@ -78,47 +77,60 @@ X_LINK_LIB_WWISE("AkVorbisDecoder");
 #endif // !PLUGIN_Codec
 
 // source
+#include <AK/Plugin/AkAudioInputSourceFactory.h>
 X_LINK_LIB_WWISE("AkAudioInputSource");
-X_LINK_LIB_WWISE("AkSilenceSource");
-X_LINK_LIB_WWISE("AkSineSource");
-X_LINK_LIB_WWISE("AkSoundSeedWindSource");
-X_LINK_LIB_WWISE("AkSoundSeedWooshSource");
-X_LINK_LIB_WWISE("AkSynthOneSource");
-X_LINK_LIB_WWISE("AkToneSource");
+// #include <AK/Plugin/AkSilenceSourceFactory.h>
+// X_LINK_LIB_WWISE("AkSilenceSource");
+// #include <AK/Plugin/AkSineSourceFactory.h>
+// X_LINK_LIB_WWISE("AkSineSource");
+// #include <AK/Plugin/AkSoundSeedWindSourceFactory.h>
+// X_LINK_LIB_WWISE("AkSoundSeedWindSource");
+// #include <AK/Plugin/AkSoundSeedWooshSourceFactory.h>
+// X_LINK_LIB_WWISE("AkSoundSeedWooshSource");
+// #include <AK/Plugin/AkSynthOneSourceFactory.h>
+// X_LINK_LIB_WWISE("AkSynthOneSource");
+// #include <AK/Plugin/AkToneSourceFactory.h>
+// X_LINK_LIB_WWISE("AkToneSource");
 
 // fx
-X_LINK_LIB_WWISE("AkCompressorFX");
-X_LINK_LIB_WWISE("AkDelayFX");
-X_LINK_LIB_WWISE("AkExpanderFX");
-X_LINK_LIB_WWISE("AkFlangerFX");
-X_LINK_LIB_WWISE("AkGainFX");
-X_LINK_LIB_WWISE("AkGuitarDistortionFX");
-X_LINK_LIB_WWISE("AkHarmonizerFX");
-X_LINK_LIB_WWISE("AkMatrixReverbFX");
-X_LINK_LIB_WWISE("AkMeterFX");
-X_LINK_LIB_WWISE("AkParametricEQFX");
-X_LINK_LIB_WWISE("AkPeakLimiterFX");
-X_LINK_LIB_WWISE("AkPitchShifterFX");
-X_LINK_LIB_WWISE("AkRoomVerbFX");
-X_LINK_LIB_WWISE("AkSoundSeedImpactFX");
-X_LINK_LIB_WWISE("AkStereoDelayFX");
-X_LINK_LIB_WWISE("AkTimeStretchFX");
-X_LINK_LIB_WWISE("AkTremoloFX");
+// TODO: add includes if enable.
+// X_LINK_LIB_WWISE("AkCompressorFX");
+// X_LINK_LIB_WWISE("AkDelayFX");
+// X_LINK_LIB_WWISE("AkExpanderFX");
+// X_LINK_LIB_WWISE("AkFlangerFX");
+// X_LINK_LIB_WWISE("AkGainFX");
+// X_LINK_LIB_WWISE("AkGuitarDistortionFX");
+// X_LINK_LIB_WWISE("AkHarmonizerFX");
+// X_LINK_LIB_WWISE("AkMatrixReverbFX");
+// X_LINK_LIB_WWISE("AkMeterFX");
+// X_LINK_LIB_WWISE("AkParametricEQFX");
+// X_LINK_LIB_WWISE("AkPeakLimiterFX");
+// X_LINK_LIB_WWISE("AkPitchShifterFX");
+// X_LINK_LIB_WWISE("AkRoomVerbFX");
+// X_LINK_LIB_WWISE("AkSoundSeedImpactFX");
+// X_LINK_LIB_WWISE("AkStereoDelayFX");
+// X_LINK_LIB_WWISE("AkTimeStretchFX");
+// X_LINK_LIB_WWISE("AkTremoloFX");
 
 
-X_LINK_LIB_WWISE("McDSPFutzBoxFX");
-X_LINK_LIB_WWISE("McDSPLimiterFX");
+// X_LINK_LIB_WWISE("McDSPFutzBoxFX");
+// X_LINK_LIB_WWISE("McDSPLimiterFX");
 
 #if PLUGIN_Auro
+#include <AK/Plugin/AuroHeadphoneFXFactory.h>
 X_LINK_LIB_WWISE("AuroHeadphoneFX");
 #endif // !PLUGIN_Auro
 
 
 // new?
+#if 0
+#include <AK/Plugin/AuroHeadphoneFXFactory.h>
 X_LINK_LIB_WWISE("AkMotionGeneratorSource");
+#include <AK/Plugin/AkMotionSinkFactory.h>
 X_LINK_LIB_WWISE("AkMotionSink");
+#include <AK/Plugin/AkRecorderFXFactory.h>
 X_LINK_LIB_WWISE("AkRecorderFX");
-
+#endif
 
 // fx2
 #if 0 
@@ -133,6 +145,7 @@ X_LINK_LIB_WWISE("iZTrashFiltersFX");
 
 // misc
 #if PLUGIN_Auro
+#include <AK/Plugin/AuroPannerMixerFactory.h>
 X_LINK_LIB_WWISE("AuroPannerMixer");
 #endif // !PLUGIN_Auro
 
