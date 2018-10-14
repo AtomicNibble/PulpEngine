@@ -12,6 +12,13 @@ Core:
  ☐ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed.
    See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
 
+   FileSys:
+     ☐ Don't apply OS slashes until we hit OS specific code paths.
+     ☐ Limit the use of wchar_t to win32 specific code.
+         All relative paths are asci only.
+         So I only need unicode in tools. for absolute paths.
+         Which should really jsut be utf-8
+
 Game:
 
   ✔ Main menu need to open again @done (18-10-05 17:36)
@@ -161,6 +168,10 @@ Linker:
     Or is this justa UI problem? like if an just click them all in a UI it's not a problem.
 
   ✔ Support building a pack with memory hint flag set. @done (18-10-12 17:24)
+
+  ✔ Need to add files with thier actual file names. @done (18-10-14 14:11)
+    Since it's basically a packing of a dir.
+
 
 AssetPak:
 
