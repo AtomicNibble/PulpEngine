@@ -7,6 +7,8 @@
 
 #include <IFileSys.h>
 
+#if 0
+
 X_USING_NAMESPACE;
 
 using namespace core;
@@ -171,3 +173,5 @@ TEST(DISABLED_FileSys, FileUtil)
     EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME "_filesys_ut_data.ut_dat"));
     EXPECT_TRUE(pFileSys->deleteFile(X_ENGINE_NAME "_filesys_ut_async_data.ut_dat"));
 }
+
+#endif
