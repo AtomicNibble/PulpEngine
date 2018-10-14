@@ -136,6 +136,7 @@ public:
 
     inline size_t length(void) const;
     inline constexpr size_t capacity(void) const;
+    inline size_t freeSpace(void) const;
 
     inline bool isEmpty(void) const;
     inline bool isNotEmpty(void) const;
@@ -235,6 +236,7 @@ public:
 
     inline size_t length(void) const;
     inline constexpr size_t capacity(void) const;
+    inline size_t freeSpace(void) const;
 
     inline bool isEmpty(void) const;
     inline bool isNotEmpty(void) const;

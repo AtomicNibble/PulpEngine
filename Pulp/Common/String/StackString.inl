@@ -747,3 +747,9 @@ inline constexpr size_t StackString<N, TChar>::capacity(void) const
 {
     return N;
 }
+
+template<size_t N, typename TChar>
+inline size_t StackString<N, TChar>::freeSpace(void) const
+{
+    return capacity() - len_;
+}
