@@ -13,8 +13,7 @@ struct FindData;
 
 struct XFindData
 {
-    XFindData(const wchar_t* path, xFileSys* pFileSys);
-    XFindData(const char* path, xFileSys* pFileSys);
+    XFindData(const Path<char>& path, xFileSys* pFileSys);
     ~XFindData();
 
     bool findnext(FindData& fi);
@@ -29,7 +28,7 @@ private:
     bool returnFindhNext(FindData& findinfo);
 
 private:
-    Path<wchar_t> path_;
+    Path<char> path_;
     Path<wchar_t> folder_;
 
     intptr_t handle_;

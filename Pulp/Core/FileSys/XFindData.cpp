@@ -6,28 +6,13 @@
 
 X_NAMESPACE_BEGIN(core)
 
-XFindData::XFindData(const wchar_t* path, xFileSys* pFileSys) :
+XFindData::XFindData(const Path<char>& path, xFileSys* pFileSys) :
     path_(path),
+    folder_(path_),
     handle_(-1),
     current_(pFileSys->searchPaths_),
     pFileSys_(pFileSys)
 {
-    folder_ = path_;
-    folder_.removeFileName();
-    folder_.replaceSeprators();
-    folder_.ensureSlash();
-}
-
-XFindData::XFindData(const char* path, xFileSys* pFileSys) :
-    handle_(-1),
-    current_(pFileSys->searchPaths_),
-    pFileSys_(pFileSys)
-{
-    wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
-
-    path_ = strUtil::Convert(path, pathW, sizeof(pathW));
-
-    folder_ = path_;
     folder_.removeFileName();
     folder_.replaceSeprators();
     folder_.ensureSlash();

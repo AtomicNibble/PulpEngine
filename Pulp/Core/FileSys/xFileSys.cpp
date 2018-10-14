@@ -282,7 +282,7 @@ XFile* xFileSys::openFile(const PathT& path, FileFlags mode)
     
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
-        XFindData findData(path.c_str(), this);
+        XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
             FileFlags::Description Dsc;
@@ -430,7 +430,7 @@ XFileMem* xFileSys::openFileMem(const PathT& path, FileFlags mode)
     }
 
     FindData findinfo;
-    XFindData findData(path.c_str(), this);
+    XFindData findData(path, this);
     if (!findData.findnext(findinfo)) {
         FileFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
@@ -931,7 +931,17 @@ bool xFileSys::moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) con
 // Ajust path
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const
 {
-    return createOSPath(dir, PathWT(path), buffer);
+    if (!isAbsolute(path)) {
+        buffer = dir->path; 
+        buffer.ensureSlash();
+        buffer.append(path.begin(), path.end());
+    }
+    else {
+        buffer.set(path.begin(), path.end());
+    }
+
+    buffer.replaceSeprators();
+    return buffer.c_str();
 }
 
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const
@@ -1596,7 +1606,7 @@ OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode)
 
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
-        XFindData findData(path.c_str(), this);
+        XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
             FileFlags::Description Dsc;
