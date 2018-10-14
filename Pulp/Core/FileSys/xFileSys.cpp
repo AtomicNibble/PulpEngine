@@ -853,7 +853,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
     }
 
     for (const auto d : driveLettters) {
-        core::StackString<64, wchar_t> device(L"\\\\.\\");
+        core::StackString<64, wchar_t> device(L"\\\\.\\"); // this is OS specific.
 
         device.append(d, 1);
         device.append(L":");
