@@ -133,6 +133,7 @@ public:
     inline const TChar& operator[](size_t i) const;
 
     inline const TChar* c_str(void) const;
+    inline const TChar* data(void) const; // assumes we don't need a null term 
 
     inline size_t length(void) const;
     inline constexpr size_t capacity(void) const;
@@ -233,6 +234,7 @@ public:
     inline const wchar_t& operator[](size_t i) const;
 
     inline const wchar_t* c_str(void) const;
+    inline const wchar_t* data(void) const;
 
     inline size_t length(void) const;
     inline constexpr size_t capacity(void) const;

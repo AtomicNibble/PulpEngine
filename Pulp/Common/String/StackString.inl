@@ -699,6 +699,12 @@ inline const TChar* StackString<N, TChar>::c_str(void) const
 }
 
 template<size_t N, typename TChar>
+inline const TChar* StackString<N, TChar>::data(void) const
+{
+    return str_;
+}
+
+template<size_t N, typename TChar>
 inline size_t StackString<N, TChar>::length(void) const
 {
     return len_;

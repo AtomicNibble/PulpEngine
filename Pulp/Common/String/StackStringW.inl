@@ -688,6 +688,12 @@ inline const wchar_t* StackString<N, wchar_t>::c_str(void) const
 }
 
 template<size_t N>
+inline const wchar_t* StackString<N, wchar_t>::data(void) const
+{
+    return str_;
+}
+
+template<size_t N>
 inline size_t StackString<N, wchar_t>::length(void) const
 {
     return len_;
