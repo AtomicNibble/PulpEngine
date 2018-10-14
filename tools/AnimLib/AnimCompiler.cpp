@@ -780,12 +780,7 @@ void AnimCompiler::setAnimType(AnimType::Enum type)
     type_ = type;
 }
 
-bool AnimCompiler::compile(const core::Path<char>& filePath, const float posError, const float angError)
-{
-    return compile(core::Path<wchar_t>(filePath), posError, angError);
-}
-
-bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError, const float angError)
+bool AnimCompiler::compile(const float posError, const float angError)
 {
     if (type_ != AnimType::RELATIVE) {
         X_ERROR("Anim", "Compiling of none relative animations is not yet supported");
@@ -879,16 +874,15 @@ bool AnimCompiler::compile(const core::Path<wchar_t>& path, const float posError
         stats_.totalBonesPosData += static_cast<int32_t>(bone.pos.hasData());
     }
 
-    return save(path);
+    return true;
 }
 
-bool AnimCompiler::save(const core::Path<wchar_t>& path)
+bool AnimCompiler::save(const core::Path<char>& path)
 {
-    X_ASSERT_NOT_NULL(gEnv);
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-    core::Path<wchar_t> fullPath(path);
-    fullPath.setExtension(anim::ANIM_FILE_EXTENSION_W);
+    core::Path<char> fullPath(path);
+    fullPath.setExtension(anim::ANIM_FILE_EXTENSION);
 
     core::FileFlags mode;
     mode.Set(core::FileFlag::RECREATE);
@@ -899,6 +893,34 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
         X_ERROR("Anim", "Failed to open output file for compiled animation: \"%ls\"", fullPath.c_str());
         return false;
     }
+
+    return save(file.GetFile());
+}
+
+
+bool AnimCompiler::save(const core::Path<wchar_t>& path)
+{
+    X_ASSERT_NOT_NULL(gEnv->pFileSys);
+
+    core::Path<wchar_t> fullPath(path);
+    fullPath.setExtension(anim::ANIM_FILE_EXTENSION_W);
+
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::RECREATE);
+    mode.Set(core::FileFlag::WRITE);
+
+    core::XFileScoped file;
+    if (!file.openFileOS(fullPath, mode)) {
+        X_ERROR("Anim", "Failed to open output file for compiled animation: \"%ls\"", fullPath.c_str());
+        return false;
+    }
+
+    return save(file.GetFile());
+}
+
+bool AnimCompiler::save(core::XFile* pFile)
+{
+    X_ASSERT_NOT_NULL(gEnv);
 
     const size_t numBonesWithData = core::accumulate(bones_.begin(), bones_.end(), 0_sz, [](const Bone& b) {
         return static_cast<int32_t>(b.hasData());
@@ -996,12 +1018,12 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 
     hdr.dataSize = safe_static_cast<uint32_t>(stream.size());
 
-    if (file.writeObj(hdr) != sizeof(hdr)) {
+    if (pFile->writeObj(hdr) != sizeof(hdr)) {
         X_ERROR("Anim", "Failed to write header");
         return false;
     }
 
-    if (file.write(stream.data(), stream.size()) != stream.size()) {
+    if (pFile->write(stream.data(), stream.size()) != stream.size()) {
         X_ERROR("Anim", "Failed to write data");
         return false;
     }

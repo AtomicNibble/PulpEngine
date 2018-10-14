@@ -29,24 +29,26 @@ namespace Inter
     {
     }
 
-    bool Anim::load(core::Path<wchar_t>& filePath)
+    bool Anim::load(const core::Path<wchar_t>& path)
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
         // swap a woggle watch it toggle!
-        if (filePath.isEmpty()) {
+        if (path.isEmpty()) {
             X_ERROR("Anim", "invalid path");
             return false;
         }
 
-        filePath.setExtension(anim::ANIM_INTER_FILE_EXTENSION_W);
+        core::Path<wchar_t> filePath(path);
+        filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
 
         core::FileFlags mode;
         mode.Set(core::FileFlag::READ);
+        mode.Set(core::FileFlag::SHARE);
 
         core::XFileScoped file;
-        if (file.openFile(filePath, mode)) {
+        if (file.openFileOS(filePath, mode)) {
             X_ERROR("Anim", "failed to open file: %ls", filePath.c_str());
             return false;
         }
@@ -85,12 +87,13 @@ namespace Inter
         return ParseData(lex);
     }
 
-    bool Anim::save(core::Path<wchar_t>& path) const
+    bool Anim::save(const core::Path<wchar_t>& path) const
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        path.setExtension(ANIM_INTER_FILE_EXTENSION_W);
+        core::Path<wchar_t> filePath(path);
+        filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
 
         {
             core::XFileScoped file;
@@ -103,7 +106,7 @@ namespace Inter
                 X_ERROR("Anim", "Failed to create export directory");
             }
 
-            if (!file.openFile(path, mode)) {
+            if (!file.openFileOS(filePath, mode)) {
                 X_ERROR("Anim", "Failed to open file for inter anim");
                 return false;
             }

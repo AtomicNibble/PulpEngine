@@ -276,25 +276,12 @@ bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFile(const PathT& path, FileFlags mode)
+XFile* xFileSys::openFileOS(const PathWT& path, FileFlags mode)
 {
+    // This is only for opening a a absolute path really.
     PathWT osPath;
-    
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
-        FindData findinfo;
-        XFindData findData(path, this);
 
-        if (!findData.findnext(findinfo)) {
-            FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path.c_str(), mode.ToString(Dsc));
-            return nullptr;
-        }
-
-        findData.getOSPath(osPath, findinfo);
-    }
-    else {
-        createOSPath(gameDir_, path, osPath);
-    }
+    createOSPath(gameDir_, path, osPath);
 
     if (isDebug()) {
         X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
@@ -309,12 +296,26 @@ XFile* xFileSys::openFile(const PathT& path, FileFlags mode)
     return nullptr;
 }
 
-XFile* xFileSys::openFile(const PathWT& path, FileFlags mode)
-{
-    // This is only for opening a a absolute path really.
-    PathWT osPath;
 
-    createOSPath(gameDir_, path, osPath);
+XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode)
+{
+    PathWT osPath;
+    
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(relPath)) {
+        FindData findinfo;
+        XFindData findData(relPath, this);
+
+        if (!findData.findnext(findinfo)) {
+            FileFlags::Description Dsc;
+            X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", relPath.c_str(), mode.ToString(Dsc));
+            return nullptr;
+        }
+
+        findData.getOSPath(osPath, findinfo);
+    }
+    else {
+        createOSPath(gameDir_, relPath, osPath);
+    }
 
     if (isDebug()) {
         X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
@@ -338,7 +339,7 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(const PathT& path, FileFlags mode)
+XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode)
 {
     PathWT osPath;
 
@@ -357,13 +358,13 @@ XFileAsync* xFileSys::openFileAsync(const PathT& path, FileFlags mode)
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         // so we are going to look in the search list, till we find a file.
         // findData can't deal with files in pak's correcly, it has the wrong api.
-        core::StrHash hash(path.data(), path.length());
+        core::StrHash hash(relPath.data(), relPath.length());
 
         for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
             if (pSearch->pDir) {
                 const auto* pDir = pSearch->pDir;
 
-                createOSPath(pDir, path, osPath);
+                createOSPath(pDir, relPath, osPath);
 
                 if (PathUtil::DoesFileExist(osPath, true)) {
                     if (isDebug()) {
@@ -377,10 +378,10 @@ XFileAsync* xFileSys::openFileAsync(const PathT& path, FileFlags mode)
             else if (pSearch->pPak) {
                 auto* pPak = pSearch->pPak;
 
-                auto idx = pPak->find(hash, path.c_str());
+                auto idx = pPak->find(hash, relPath.c_str());
                 if (idx != -1) {
                     if (isDebug()) {
-                        X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", path.c_str(), pPak->name.c_str());
+                        X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
                     }
 
                     auto& entry = pPak->pEntires[idx];
@@ -397,7 +398,7 @@ XFileAsync* xFileSys::openFileAsync(const PathT& path, FileFlags mode)
         }
     }
     else {
-        createOSPath(gameDir_, path, osPath);
+        createOSPath(gameDir_, relPath, osPath);
 
         if (isDebug()) {
             X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
@@ -422,7 +423,7 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 // --------------------------------------------------
 
-XFileMem* xFileSys::openFileMem(const PathT& path, FileFlags mode)
+XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode)
 {
     if (mode.IsSet(FileFlag::WRITE)) {
         X_ERROR("FileSys", "can't open a memory file for writing.");
@@ -430,10 +431,10 @@ XFileMem* xFileSys::openFileMem(const PathT& path, FileFlags mode)
     }
 
     FindData findinfo;
-    XFindData findData(path, this);
+    XFindData findData(relPath, this);
     if (!findData.findnext(findinfo)) {
         FileFlags::Description Dsc;
-        X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+        X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", relPath, mode.ToString(Dsc));
         return nullptr;
     }
 

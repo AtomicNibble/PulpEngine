@@ -61,11 +61,11 @@ namespace Inter
         Anim(core::MemoryArenaBase* arena);
         ~Anim() = default;
 
-        bool load(core::Path<wchar_t>& path);
+        bool load(const core::Path<wchar_t>& path);
         bool load(const core::Array<uint8_t>& fileData);
         bool load(const core::ByteStream& fileData);
 
-        bool save(core::Path<wchar_t>& path) const;
+        bool save(const core::Path<wchar_t>& path) const;
         bool save(core::ByteStream& stream) const;
 
         void setSourceInfo(const core::string& sourceFile, int32_t startFrame, int32_t endFrame);

@@ -908,7 +908,21 @@ bool ModelCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
 
 bool ModelCompiler::saveModel(const core::Path<char>& outFile)
 {
-    return saveModel(core::Path<wchar_t>(outFile));
+    core::Path<char> path(outFile);
+    path.setExtension(model::MODEL_FILE_EXTENSION);
+
+    core::XFileScoped file;
+    if (!gEnv->pFileSys->createDirectoryTree(path)) {
+        X_ERROR("Model", "Failed to create directory for output file");
+        return false;
+    }
+
+    if (!file.openFile(path, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+        X_ERROR("Model", "Failed to open compile output file");
+        return false;
+    }
+
+    return saveModel(file.GetFile());
 }
 
 bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
@@ -916,23 +930,22 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
     core::Path<wchar_t> path(outFile);
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
-    // open da file!
-    core::FileFlags mode;
-    mode.Set(core::FileFlag::WRITE);
-    mode.Set(core::FileFlag::RECREATE);
-
     core::XFileScoped file;
-
     if (!gEnv->pFileSys->createDirectoryTree(path)) {
         X_ERROR("Model", "Failed to create directory for output file");
         return false;
     }
 
-    if (!file.openFile(path, mode)) {
+    if (!file.openFileOS(path, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
         X_ERROR("Model", "Failed to open compile output file");
         return false;
     }
 
+    return saveModel(file.GetFile());
+}
+
+bool ModelCompiler::saveModel(core::XFile* pFile)
+{
     stats_.totalJoints = safe_static_cast<uint8_t, size_t>(bones_.size());
 
     const size_t totalColMesh = totalColMeshes();
@@ -1610,58 +1623,58 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
         header.meshDataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
         header.dataSize += safe_static_cast<uint32_t>(meshDataNumPadBytes);
 
-        if (file.writeObj(header) != sizeof(header)) {
+        if (pFile->writeObj(header) != sizeof(header)) {
             X_ERROR("Model", "Failed to write header");
             return false;
         }
-        if (file.write(matNameStream.ptr(), matNameStream.size()) != matNameStream.size()) {
+        if (pFile->write(matNameStream.ptr(), matNameStream.size()) != matNameStream.size()) {
             X_ERROR("Model", "Failed to write mat stream");
             return false;
         }
-        if (file.write(tagNameStream.ptr(), tagNameStream.size()) != tagNameStream.size()) {
+        if (pFile->write(tagNameStream.ptr(), tagNameStream.size()) != tagNameStream.size()) {
             X_ERROR("Model", "Failed to write tag stream");
             return false;
         }
-        if (file.write(boneDataStream.ptr(), boneDataStream.size()) != boneDataStream.size()) {
+        if (pFile->write(boneDataStream.ptr(), boneDataStream.size()) != boneDataStream.size()) {
             X_ERROR("Model", "Failed to write bone stream");
             return false;
         }
-        if (file.write(physDataStream.ptr(), physDataStream.size()) != physDataStream.size()) {
+        if (pFile->write(physDataStream.ptr(), physDataStream.size()) != physDataStream.size()) {
             X_ERROR("Model", "Failed to write phys stream");
             return false;
         }
-        if (file.write(hitboxDataStream.ptr(), hitboxDataStream.size()) != hitboxDataStream.size()) {
+        if (pFile->write(hitboxDataStream.ptr(), hitboxDataStream.size()) != hitboxDataStream.size()) {
             X_ERROR("Model", "Failed to write hitbox stream");
             return false;
         }
 
         // make sure this stream starts on a aligned boundry.
-        const size_t curFileSize = file.tell();
+        const size_t curFileSize = pFile->tell();
         const size_t padSize = curFileSize % MODEL_STREAM_ALIGN == 0 ? 0 : (MODEL_STREAM_ALIGN - (curFileSize % MODEL_STREAM_ALIGN));
 
         X_ASSERT(padSize == preMeshDataPadSize, "Alignment size mismatch")(padSize, preMeshDataPadSize);
 
         if (padSize > 0) {
             char pad[MODEL_STREAM_ALIGN] = {};
-            if (file.write(pad, padSize) != padSize) {
+            if (pFile->write(pad, padSize) != padSize) {
                 X_ERROR("Model", "Failed to write mesh stream");
                 return false;
             }
         }
 
 #if X_ENABLE_ASSERTIONS
-        const auto fileSize = file.tell();
+        const auto fileSize = pFile->tell();
 
         X_ASSERT((fileSize % MODEL_STREAM_ALIGN) == 0, "Not aligned")(fileSize, fileSize); 
 #endif // !X_ENABLE_ASSERTIONS
 
-        if (file.write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
+        if (pFile->write(meshDataStream.ptr(), meshDataStream.size()) != meshDataStream.size()) {
             X_ERROR("Model", "Failed to write mesh stream");
             return false;
         }
     }
 
-    X_ASSERT(file.tell() == (header.dataSize + sizeof(header)), "Incorrect header size")(file.tell(), header.dataSize + sizeof(header)); 
+    X_ASSERT(pFile->tell() == (header.dataSize + sizeof(header)), "Incorrect header size")(pFile->tell(), header.dataSize + sizeof(header));
     return true;
 }
 

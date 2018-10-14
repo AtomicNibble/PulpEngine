@@ -60,17 +60,12 @@ void ModelSkeleton::dumpToLog(void) const
 
 bool ModelSkeleton::LoadCompiledSkelton(const core::Path<char>& filePath)
 {
-    return LoadCompiledSkelton(core::Path<wchar_t>(filePath));
-}
-
-bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
-{
     if (filePath.isEmpty()) {
         return false;
     }
 
-    core::Path<wchar_t> path(filePath);
-    path.setExtension(model::MODEL_FILE_EXTENSION_W);
+    core::Path<char> path(filePath);
+    path.setExtension(model::MODEL_FILE_EXTENSION);
 
     core::FileFlags mode;
     mode.Set(core::FileFlag::READ);
@@ -177,17 +172,12 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
 
 bool ModelSkeleton::LoadRawModelSkelton(const core::Path<char>& filePath)
 {
-    return LoadCompiledSkelton(core::Path<wchar_t>(filePath));
-}
-
-bool ModelSkeleton::LoadRawModelSkelton(const core::Path<wchar_t>& filePath)
-{
     if (filePath.isEmpty()) {
         return false;
     }
 
-    core::Path<wchar_t> path(filePath);
-    path.setExtension(model::MODEL_FILE_EXTENSION_W);
+    core::Path<char> path(filePath);
+    path.setExtension(model::MODEL_FILE_EXTENSION);
 
     core::FileFlags mode;
     mode.Set(core::FileFlag::READ);

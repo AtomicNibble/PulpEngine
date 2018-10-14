@@ -26,10 +26,8 @@ public:
     void dumpToLog(void) const;
 
     bool LoadCompiledSkelton(const core::Path<char>& path);
-    bool LoadCompiledSkelton(const core::Path<wchar_t>& path);
 
     bool LoadRawModelSkelton(const core::Path<char>& path);
-    bool LoadRawModelSkelton(const core::Path<wchar_t>& path);
     bool LoadRawModelSkelton(const core::Array<uint8_t>& data);
 
     void scale(float scale);

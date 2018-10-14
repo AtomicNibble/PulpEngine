@@ -272,6 +272,7 @@ public:
 
     bool saveModel(const core::Path<char>& outFile);
     bool saveModel(const core::Path<wchar_t>& outFile);
+    bool saveModel(core::XFile* pFile);
 private:
 
     size_t calculateRootBoneCount(void) const;

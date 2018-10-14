@@ -174,11 +174,11 @@ public:
     void disableOptimizations(bool disable);
     void setAnimType(AnimType::Enum type);
 
-    bool compile(const core::Path<char>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
-    bool compile(const core::Path<wchar_t>& path, const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
+    bool compile(const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
 
-private:
+    bool save(const core::Path<char>& path);
     bool save(const core::Path<wchar_t>& path);
+    bool save(core::XFile* pFile);
 
 private:
     void loadBones(void);
