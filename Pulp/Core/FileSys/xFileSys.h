@@ -262,28 +262,28 @@ public:
     void findClose(uintptr_t handle) X_FINAL;
 
     // Delete
-    bool deleteFile(pathType path) const X_FINAL;
-    bool deleteDirectory(pathType path, bool recursive = true) const X_FINAL;
-    bool deleteDirectoryContents(pathType path) X_FINAL;
+    bool deleteFile(const PathT& path) const X_FINAL;
+    bool deleteDirectory(const PathT& path, bool recursive = true) const X_FINAL;
+    bool deleteDirectoryContents(const PathT& path) X_FINAL;
 
     // Create
-    bool createDirectory(pathType path) const X_FINAL;
+    bool createDirectory(const PathT& path) const X_FINAL;
     bool createDirectory(const PathWT& path) const X_FINAL;
-    bool createDirectoryTree(pathType path) const X_FINAL;
+    bool createDirectoryTree(const PathT& path) const X_FINAL;
     bool createDirectoryTree(const PathWT& path) const X_FINAL;
 
     // exsists.
-    bool fileExists(pathType path) const X_FINAL;
+    bool fileExists(const PathT& path) const X_FINAL;
     bool fileExists(const PathWT& path) const X_FINAL;
-    bool directoryExists(pathType path) const X_FINAL;
+    bool directoryExists(const PathT& path) const X_FINAL;
     bool directoryExists(const PathWT& path) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
-    bool isDirectory(pathType path) const X_FINAL;
+    bool isDirectory(const PathT& path) const X_FINAL;
     bool isDirectory(const PathWT& path) const X_FINAL;
 
     // rename
-    bool moveFile(pathType path, pathType newPath) const X_FINAL;
+    bool moveFile(const PathT& path, const PathT& newPath) const X_FINAL;
     bool moveFile(const PathWT& path, const PathWT& newPath) const X_FINAL;
 
     size_t getMinimumSectorSize(void) const X_FINAL;
@@ -350,10 +350,12 @@ private:
     // Ajust path
     const wchar_t* createOSPath(const Directory* dir, pathType path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const;
+    const wchar_t* createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const;
 
     bool isAbsolute(pathType path) const;
     bool isAbsolute(pathTypeW path) const;
+    bool isAbsolute(const PathT& path) const;
     bool isAbsolute(const PathWT& path) const;
 
     bool isDebug(void) const;

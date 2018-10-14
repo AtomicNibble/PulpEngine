@@ -633,7 +633,7 @@ void xFileSys::findClose(uintptr_t handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(pathType path) const
+bool xFileSys::deleteFile(const PathT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -645,7 +645,7 @@ bool xFileSys::deleteFile(pathType path) const
     return PathUtil::DeleteFile(osPath);
 }
 
-bool xFileSys::deleteDirectory(pathType path, bool recursive) const
+bool xFileSys::deleteDirectory(const PathT& path, bool recursive) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -662,7 +662,7 @@ bool xFileSys::deleteDirectory(pathType path, bool recursive) const
     return PathUtil::DeleteDirectory(osPath, recursive);
 }
 
-bool xFileSys::deleteDirectoryContents(pathType path)
+bool xFileSys::deleteDirectoryContents(const PathT& path)
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -718,10 +718,8 @@ bool xFileSys::deleteDirectoryContents(pathType path)
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(pathType path) const
+bool xFileSys::createDirectory(const PathT& path) const
 {
-    X_ASSERT_NOT_NULL(path);
-
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
 
@@ -748,13 +746,11 @@ bool xFileSys::createDirectory(const PathWT& path) const
     return PathUtil::CreateDirectory(osPath);
 }
 
-bool xFileSys::createDirectoryTree(pathType _path) const
+bool xFileSys::createDirectoryTree(const PathT& path) const
 {
-    X_ASSERT_NOT_NULL(_path);
-
     // we want to just loop and create like a goat.
     Path<wchar_t> osPath;
-    createOSPath(gameDir_, _path, osPath);
+    createOSPath(gameDir_, path, osPath);
 
     osPath.removeFileName();
 
@@ -782,7 +778,7 @@ bool xFileSys::createDirectoryTree(const PathWT& path) const
 
 // --------------------- exsists ---------------------
 
-bool xFileSys::fileExists(pathType path) const
+bool xFileSys::fileExists(const PathT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -798,7 +794,7 @@ bool xFileSys::fileExists(const PathWT& path) const
     return fileExistsOS(osPath);
 }
 
-bool xFileSys::directoryExists(pathType path) const
+bool xFileSys::directoryExists(const PathT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -814,7 +810,7 @@ bool xFileSys::directoryExists(const PathWT& path) const
     return directoryExistsOS(osPath);
 }
 
-bool xFileSys::isDirectory(pathType path) const
+bool xFileSys::isDirectory(const PathT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -830,7 +826,7 @@ bool xFileSys::isDirectory(const PathWT& path) const
     return isDirectoryOS(osPath);
 }
 
-bool xFileSys::moveFile(pathType path, pathType newPath) const
+bool xFileSys::moveFile(const PathT& path, const PathT& newPath) const
 {
     Path<wchar_t> osPath, osPathNew;
 
@@ -979,21 +975,12 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, PathW
 
 const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const
 {
-    // is it absolute?
-    if (!isAbsolute(path)) {
-        buffer = dir->path / path;
-    }
-    else {
-        // the engine should never be trying to load a absolute path.
-        // unless filesystem been used in a tool.
-        // but then again tool could probs just use relative paths also.
-        // i think I'll only disable it when used in game.exe
+    return createOSPath(dir, PathWT(path), buffer);
+}
 
-        buffer = path;
-    }
-
-    buffer.replaceSeprators();
-    return buffer.c_str();
+const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const
+{
+    return createOSPath(dir, PathWT(path), buffer);
 }
 
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const
@@ -1018,6 +1005,11 @@ bool xFileSys::isAbsolute(pathType path) const
 bool xFileSys::isAbsolute(pathTypeW path) const
 {
     return path[0] == NATIVE_SLASH_W || path[0] == NON_NATIVE_SLASH_W || path[1] == L':';
+}
+
+bool xFileSys::isAbsolute(const PathT& path) const
+{
+    return path.isAbsolute();
 }
 
 bool xFileSys::isAbsolute(const PathWT& path) const

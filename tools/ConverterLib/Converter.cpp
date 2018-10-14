@@ -129,7 +129,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     }
 
     // file exist already?
-    if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut.c_str())) {
+    if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut)) {
         // se if stale.
         if (!IsAssetStale(assetId, assType, dataHash, argsHash)) {
             X_LOG1("Converter", "Skipping conversion, asset is not stale");
@@ -149,8 +149,8 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     {
         core::Path<char> dir(pathOut);
         dir.removeFileName();
-        if (!gEnv->pFileSys->directoryExists(dir.c_str())) {
-            if (!gEnv->pFileSys->createDirectoryTree(dir.c_str())) {
+        if (!gEnv->pFileSys->directoryExists(dir)) {
+            if (!gEnv->pFileSys->createDirectoryTree(dir)) {
                 X_ERROR("Converter", "Failed to create output directory for asset");
                 return false;
             }
@@ -350,7 +350,7 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 
     // nuke the output directory. BOOM!
     // if they put files in here that are custom. RIP.
-    if (pFileSys->directoryExists(outDir.c_str())) {
+    if (pFileSys->directoryExists(outDir)) {
         // lets be nice and only clear dir's we actually populate.
         for (int32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
             AssetType::Enum assType = static_cast<AssetType::Enum>(i);
@@ -358,8 +358,8 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
             core::Path<char> assetPath;
             assetDb::AssetDB::GetOutputPathForAssetType(assType, outDir, assetPath);
 
-            if (pFileSys->directoryExists(assetPath.c_str())) {
-                if (!pFileSys->deleteDirectoryContents(assetPath.c_str())) {
+            if (pFileSys->directoryExists(assetPath)) {
+                if (!pFileSys->deleteDirectoryContents(assetPath)) {
                     X_ERROR("Converter", "Failed to clear mod \"%s\" \"%s\" assets directory", assetPath.c_str(), AssetType::ToString(assType));
                     return false;
                 }

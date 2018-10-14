@@ -729,28 +729,28 @@ struct IFileSys
     virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
     // Delete
-    virtual bool deleteFile(pathType path) const X_ABSTRACT;
-    virtual bool deleteDirectory(pathType path, bool recursive = true) const X_ABSTRACT;
-    virtual bool deleteDirectoryContents(pathType path) X_ABSTRACT;
+    virtual bool deleteFile(const PathT& path) const X_ABSTRACT;
+    virtual bool deleteDirectory(const PathT& path, bool recursive = true) const X_ABSTRACT;
+    virtual bool deleteDirectoryContents(const PathT& path) X_ABSTRACT;
 
     // Create
-    virtual bool createDirectory(pathType path) const X_ABSTRACT;
+    virtual bool createDirectory(const PathT& path) const X_ABSTRACT;
     virtual bool createDirectory(const PathWT& path) const X_ABSTRACT;
-    virtual bool createDirectoryTree(pathType path) const X_ABSTRACT;
+    virtual bool createDirectoryTree(const PathT& path) const X_ABSTRACT;
     virtual bool createDirectoryTree(const PathWT& path) const X_ABSTRACT;
 
     // exsists.
-    virtual bool fileExists(pathType path) const X_ABSTRACT;
+    virtual bool fileExists(const PathT& path) const X_ABSTRACT;
     virtual bool fileExists(const PathWT& path) const X_ABSTRACT;
-    virtual bool directoryExists(pathType path) const X_ABSTRACT;
+    virtual bool directoryExists(const PathT& path) const X_ABSTRACT;
     virtual bool directoryExists(const PathWT& path) const X_ABSTRACT;
 
     // does not error, when it's a file or not exsist.
-    virtual bool isDirectory(pathType path) const X_ABSTRACT;
+    virtual bool isDirectory(const PathT& path) const X_ABSTRACT;
     virtual bool isDirectory(const PathWT& path) const X_ABSTRACT;
 
     // rename
-    virtual bool moveFile(pathType path, pathType newPath) const X_ABSTRACT;
+    virtual bool moveFile(const PathT& path, const PathT& newPath) const X_ABSTRACT;
     virtual bool moveFile(const PathWT& path, const PathWT& newPath) const X_ABSTRACT;
 
     // returns the min sector size for all virtual directories.

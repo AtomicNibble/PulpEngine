@@ -112,14 +112,14 @@ bool AssetDB::OpenDB(void)
     dbPath.append(ASSET_DB_FOLDER);
     dbPath.ensureSlash();
 
-    if (!gEnv->pFileSys->createDirectoryTree(dbPath.c_str())) {
+    if (!gEnv->pFileSys->createDirectoryTree(dbPath)) {
         X_ERROR("AssetDB", "Failed to create dir for asset_db");
         return false;
     }
 
     dbPath.append(DB_NAME);
 
-    const bool dbExsists = gEnv->pFileSys->fileExists(dbPath.c_str());
+    const bool dbExsists = gEnv->pFileSys->fileExists(dbPath);
 
     if (!dbExsists) {
         X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
@@ -394,13 +394,13 @@ bool AssetDB::PerformMigrations(void)
 
                 // make sure dir tree for new name is valid.
                 // not really needed here since renaming in same folder but it's not hurting anything.
-                if (!gEnv->pFileSys->createDirectoryTree(newFilePath.c_str())) {
+                if (!gEnv->pFileSys->createDirectoryTree(newFilePath)) {
                     X_ERROR("AssetDB", "Failed to create dir to move raw asset");
                     // don't early out migrations keep trying the others.
                 }
 
                 // if this fails, we return and the update is not commited.
-                if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
+                if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath)) {
                     X_ERROR("AssetDB", "Failed to move asset raw file");
                 }
             }
@@ -597,7 +597,7 @@ bool AssetDB::PerformMigrations(void)
             rawfileInfo.hash = dataCrc;
             AssetPathForRawFile(rawfileInfo, filePathNew);
 
-            if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+            if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
                 X_ERROR("AssetDB", "Failed to move asset raw file");
                 return false;
             }
@@ -690,7 +690,7 @@ bool AssetDB::PerformMigrations(void)
             }
 
             // move the file.
-            if (!gEnv->pFileSys->moveFile(curPath.c_str(), newPath.c_str())) {
+            if (!gEnv->pFileSys->moveFile(curPath, newPath)) {
                 X_ERROR("AssetDB", "Failed to move thumb file for id: %" PRIi32, thumbId);
                 return false;
             }
@@ -830,7 +830,7 @@ bool AssetDB::PerformMigrations(void)
                 rawfileInfo.hash = dataHash;
                 AssetPathForRawFile(rawfileInfo, filePathNew);
 
-                if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+                if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
                     X_ERROR("AssetDB", "Failed to move asset raw file");
                     return false;
                 }
@@ -1131,7 +1131,7 @@ bool AssetDB::Chkdsk(bool updateDB)
                     rawfileInfo.hash = dataHash;
                     AssetPathForRawFile(rawfileInfo, filePathNew);
 
-                    if (!gEnv->pFileSys->moveFile(filePath.c_str(), filePathNew.c_str())) {
+                    if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
                         X_ERROR("AssetDB", "Failed to move asset raw file");
                         return false;
                     }
@@ -2270,13 +2270,13 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
             AssetPathForRawFile(rawData, oldFilePath);
 
             // make sure dir tree for new name is valid.
-            if (!gEnv->pFileSys->createDirectoryTree(newFilePath.c_str())) {
+            if (!gEnv->pFileSys->createDirectoryTree(newFilePath)) {
                 X_ERROR("AssetDB", "Failed to create dir to move raw asset");
                 return Result::ERROR;
             }
 
             // if this fails, we return and the update is not commited.
-            if (!gEnv->pFileSys->moveFile(oldFilePath.c_str(), newFilePath.c_str())) {
+            if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath)) {
                 X_ERROR("AssetDB", "Failed to move asset raw file");
                 return Result::ERROR;
             }
@@ -2511,7 +2511,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 
             AssetPathForName(type, name, dataHash, filePath);
 
-            if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+            if (!gEnv->pFileSys->createDirectoryTree(filePath)) {
                 X_ERROR("AssetDB", "Failed to create dir to save raw asset");
                 return Result::ERROR;
             }
@@ -2715,8 +2715,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 
         // if a thumb with same md5 exsists don't update.
         // now we wait for a collsion, (that we notice) before this code needs updating :D
-        if (!gEnv->pFileSys->fileExists(filePath.c_str())) {
-            if (!gEnv->pFileSys->createDirectoryTree(filePath.c_str())) {
+        if (!gEnv->pFileSys->fileExists(filePath)) {
+            if (!gEnv->pFileSys->createDirectoryTree(filePath)) {
                 X_ERROR("AssetDB", "Failed to create dir to save thumb");
                 return Result::ERROR;
             }
@@ -2815,7 +2815,7 @@ bool AssetDB::CleanThumbs(void)
     thumbsFolder /= THUMBS_FOLDER;
     thumbsFolder.replaceSeprators();
 
-    if (!gEnv->pFileSys->deleteDirectoryContents(thumbsFolder.c_str())) {
+    if (!gEnv->pFileSys->deleteDirectoryContents(thumbsFolder)) {
         X_ERROR("AssetDB", "Failed to delete thumbs directory contents");
         return false;
     }

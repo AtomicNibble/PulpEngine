@@ -657,7 +657,7 @@ namespace RawModel
             mode.Set(core::FileFlag::WRITE);
             mode.Set(core::FileFlag::SHARE);
 
-            if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
+            if (!gEnv->pFileSys->createDirectoryTree(path)) {
                 X_ERROR("RawModel", "Failed to create export directory");
             }
 

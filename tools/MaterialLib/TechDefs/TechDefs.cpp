@@ -54,7 +54,7 @@ namespace techset
         core::Path<char> path;
         getTechCatPath(cat, path);
 
-        return gEnv->pFileSys->directoryExists(path.c_str());
+        return gEnv->pFileSys->directoryExists(path);
     }
 
     // bool TechSetDefs::getTechCats(TechCatArr& techsOut)
@@ -66,7 +66,7 @@ namespace techset
         core::Path<char> path;
         getTechCatPath(cat, path);
 
-        if (gEnv->pFileSys->directoryExists(path.c_str())) {
+        if (gEnv->pFileSys->directoryExists(path)) {
             if (loadTechCat(cat, typesOut)) {
                 return true;
             }

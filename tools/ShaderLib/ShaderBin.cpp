@@ -200,7 +200,7 @@ namespace shader
             return false;
         }
 
-        if (!gEnv->pFileSys->fileExists(path.c_str())) {
+        if (!gEnv->pFileSys->fileExists(path)) {
             X_LOG1("Shader", "no cache exsits for: \"%s\"", path.c_str());
             return false;
         }
@@ -321,7 +321,7 @@ namespace shader
         core::Path<char> binFolder;
         binFolder.appendFmt("shaders/compiled");
 
-        return gEnv->pFileSys->deleteDirectoryContents(binFolder.c_str());
+        return gEnv->pFileSys->deleteDirectoryContents(binFolder);
     }
 
     bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const
@@ -351,7 +351,7 @@ namespace shader
         destOut.appendFmt("shaders/compiled/%s.fxcb", pShader->getName().c_str());
 
         // make sure the directory is created.
-        gEnv->pFileSys->createDirectoryTree(destOut.c_str());
+        gEnv->pFileSys->createDirectoryTree(destOut);
     }
 
 } // namespace shader

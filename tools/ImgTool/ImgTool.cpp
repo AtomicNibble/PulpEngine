@@ -156,7 +156,7 @@ namespace
         }
 
         // output exists?
-        if (gEnv->pFileSys->fileExists(outFile.c_str())) {
+        if (gEnv->pFileSys->fileExists(outFile)) {
             return 1;
         }
 

@@ -322,7 +322,7 @@ namespace shader
         srcOut.appendFmt("shaders/temp/%s.fxcb.%s", pShader->getName().c_str(), SOURCE_FILE_EXTENSION);
 
         // make sure the directory is created.
-        gEnv->pFileSys->createDirectoryTree(srcOut.c_str());
+        gEnv->pFileSys->createDirectoryTree(srcOut);
     }
 
     IShaderSource* XShaderManager::sourceforName(const core::string& name)

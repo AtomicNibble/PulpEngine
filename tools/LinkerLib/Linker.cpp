@@ -86,7 +86,7 @@ bool Linker::Build(BuildOptions& options)
         }
 
         // optional hardcoded list.
-        if (gEnv->pFileSys->fileExists(levelAssListInc.c_str())) {
+        if (gEnv->pFileSys->fileExists(levelAssListInc)) {
             if (!AddAssetList(levelAssListInc)) {
                 X_ERROR("Linker", "Failed to add level asset inc list");
                 return false;
