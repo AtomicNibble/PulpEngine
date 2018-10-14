@@ -100,7 +100,6 @@ namespace PathUtil
             X_ASSERT_NOT_IMPLEMENTED();
         }
 
-#if 1
         // SHFileOperationW seams to be crashing when called in a qt app.
         // so just gonna do the delete logic myself.
         // we need to empty the dir before we can call RemoveDirectory.
@@ -149,29 +148,6 @@ namespace PathUtil
         }
 
         return true;
-#else
-        FILEOP_FLAGS flags = FOF_NOCONFIRMATION | FOF_NOERRORUI | FOF_SILENT;
-
-        if (!resursive) {
-            flags |= FOF_NORECURSION;
-        }
-
-        SHFILEOPSTRUCTW file_op = {
-            nullptr,
-            FO_DELETE,
-            pDir,
-            nullptr,
-            flags,
-            false,
-            nullptr,
-            nullptr};
-
-        int ret = SHFileOperationW(&file_op);
-
-        X_ERROR_IF(ret != 0, "FileSys", "Failed to delete directory: \"%ls\"", pDir);
-
-        return ret == 0; // returns 0 on success, non zero on failure.
-#endif
     }
 
     // ------------------------------------------------
