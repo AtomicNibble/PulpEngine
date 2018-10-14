@@ -72,8 +72,8 @@ public:
     void init(void);
     void shutDown(void);
 
-    void addDirectory(const char* pDirectory) X_OVERRIDE;
-    void addDirectory(const wchar_t* pDirectory) X_OVERRIDE;
+    void addDirectory(const core::Path<char>& directory) X_OVERRIDE;
+    void addDirectory(const core::Path<wchar_t>& directory) X_OVERRIDE;
 
     void registerListener(IDirectoryWatcherListener* pListener) X_OVERRIDE;
     void unregisterListener(IDirectoryWatcherListener* pListener) X_OVERRIDE;

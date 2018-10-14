@@ -20,8 +20,8 @@ struct IDirectoryWatcher
 
     virtual ~IDirectoryWatcher() = default;
 
-    virtual void addDirectory(const char* directory) X_ABSTRACT;
-    virtual void addDirectory(const wchar_t* directory) X_ABSTRACT;
+    virtual void addDirectory(const core::Path<char>& directory) X_ABSTRACT;
+    virtual void addDirectory(const core::Path<wchar_t>& directory) X_ABSTRACT;
 
     virtual void registerListener(IDirectoryWatcherListener* pListener) X_ABSTRACT;
     virtual void unregisterListener(IDirectoryWatcherListener* pListener) X_ABSTRACT;

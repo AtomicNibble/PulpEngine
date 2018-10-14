@@ -79,15 +79,12 @@ void XDirectoryWatcher::shutDown(void)
     dirs_.clear();
 }
 
-void XDirectoryWatcher::addDirectory(const char* directory)
+void XDirectoryWatcher::addDirectory(const core::Path<char>& directory)
 {
-    wchar_t dirW[1024];
-    strUtil::Convert(directory, dirW, sizeof(dirW));
-
-    addDirectory(dirW);
+    addDirectory(core::Path<wchar_t>(directory));
 }
 
-void XDirectoryWatcher::addDirectory(const wchar_t* directory)
+void XDirectoryWatcher::addDirectory(const core::Path<wchar_t>& directory)
 {
     WatchInfo info;
 
@@ -96,7 +93,7 @@ void XDirectoryWatcher::addDirectory(const wchar_t* directory)
     info.directoryName.ensureSlash();
 
     info.directory = CreateFileW(
-        directory,
+        directory.c_str(),
         FILE_SHARE_READ,
         FILE_SHARE_WRITE | FILE_SHARE_READ | FILE_SHARE_DELETE,
         0,

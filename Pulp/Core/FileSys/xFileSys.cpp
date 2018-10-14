@@ -630,7 +630,7 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
     }
 
     // add hotreload dir.
-    gEnv->pDirWatcher->addDirectory(fixedPath.c_str());
+    gEnv->pDirWatcher->addDirectory(fixedPath);
 
     if (!loadPacks_) {
         return;
