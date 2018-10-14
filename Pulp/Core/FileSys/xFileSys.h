@@ -239,16 +239,16 @@ public:
     bool getWorkingDirectory(PathWT& pathOut) const X_FINAL;
 
     // Open / Close
-    XFile* openFile(pathType path, FileFlags mode) X_FINAL;
+    XFile* openFile(const PathT& path, FileFlags mode) X_FINAL;
     XFile* openFile(const PathWT& path, FileFlags mode) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
-    XFileAsync* openFileAsync(pathType path, FileFlags mode) X_FINAL;
+    XFileAsync* openFileAsync(const PathT& path, FileFlags mode) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
-    XFileMem* openFileMem(pathType path, FileFlags mode) X_FINAL;
+    XFileMem* openFileMem(const PathT& path, FileFlags mode) X_FINAL;
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders

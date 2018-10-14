@@ -710,16 +710,16 @@ struct IFileSys
     virtual bool addModDir(const PathWT& path) X_ABSTRACT;
 
     // Open Files
-    virtual XFile* openFile(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFile* openFile(const PathT& path, FileFlags mode) X_ABSTRACT;
     virtual XFile* openFile(const PathWT& path, FileFlags mode) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
     // async
-    virtual XFileAsync* openFileAsync(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(const PathT& path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
     // loads the whole file into memory.
-    virtual XFileMem* openFileMem(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFileMem* openFileMem(const PathT& path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
@@ -780,7 +780,7 @@ public:
         close();
     }
 
-    inline bool openFile(const char* path, IFileSys::FileFlags mode)
+    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode)
     {
         pFile_ = pFileSys_->openFileMem(path, mode);
         return pFile_ != nullptr;
@@ -976,7 +976,7 @@ public:
         close();
     }
 
-    inline bool openFile(const char* path, IFileSys::FileFlags mode)
+    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode)
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);

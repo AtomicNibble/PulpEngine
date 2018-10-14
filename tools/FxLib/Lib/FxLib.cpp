@@ -43,7 +43,7 @@ namespace fx
         core::XFileScoped file;
         core::FileFlags mode = core::FileFlag::RECREATE | core::FileFlag::WRITE;
 
-        if (!file.openFile(destPath.c_str(), mode)) {
+        if (!file.openFile(destPath, mode)) {
             X_ERROR("Fx", "Failed to open output file");
             return false;
         }

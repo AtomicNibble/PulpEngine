@@ -345,7 +345,7 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     core::Path<char> pathExt(path);
     pathExt.setExtension(PAK_FILE_EXTENSION);
 
-    if (!file.openFile(pathExt.c_str(), mode)) {
+    if (!file.openFile(pathExt, mode)) {
         X_ERROR("AssetPak", "Failed to open file for saving");
         return false;
     }

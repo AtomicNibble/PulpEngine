@@ -40,7 +40,7 @@ bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path, const TextureDesc* p
     core::Path<char> testFolder("images/");
     testFolder /= path;
 
-    if (!file.openFile(testFolder.c_str(), mode)) {
+    if (!file.openFile(testFolder, mode)) {
         return false;
     }
 

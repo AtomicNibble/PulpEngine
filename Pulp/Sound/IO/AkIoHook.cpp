@@ -119,7 +119,7 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
         path.append("sound/");
         path.append(pszFileName, pszFileName + core::strUtil::strlen(pszFileName));
 
-        core::XFileAsync* pFile = pFileSys_->openFileAsync(path.c_str(), mode);
+        core::XFileAsync* pFile = pFileSys_->openFileAsync(path, mode);
         if (!pFile) {
             return AK_Fail;
         }
@@ -160,7 +160,7 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
         core::Path<> path;
         path.appendFmt("sound/%" PRIu32 ".wem", fileID);
 
-        core::XFileAsync* pFile = pFileSys_->openFileAsync(path.c_str(), mode);
+        core::XFileAsync* pFile = pFileSys_->openFileAsync(path, mode);
         if (!pFile) {
             return AK_Fail;
         }

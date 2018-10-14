@@ -23,8 +23,6 @@ namespace weapon
 
     bool WeaponLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
     {
-        X_UNUSED(host, assetId, args, destPath);
-
         core::Array<AssetDep> dependencies(g_WeaponLibArena);
 
         WeaponCompiler compiler;
@@ -42,7 +40,7 @@ namespace weapon
         core::XFileScoped file;
         core::FileFlags mode = core::FileFlag::RECREATE | core::FileFlag::WRITE;
 
-        if (!file.openFile(destPath.c_str(), mode)) {
+        if (!file.openFile(destPath, mode)) {
             X_ERROR("Weapon", "Failed to open output file");
             return false;
         }

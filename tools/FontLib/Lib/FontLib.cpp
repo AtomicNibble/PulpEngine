@@ -87,7 +87,7 @@ bool FontLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, 
     core::XFileScoped file;
     core::FileFlags mode = core::FileFlag::RECREATE | core::FileFlag::WRITE;
 
-    if (!file.openFile(destPath.c_str(), mode)) {
+    if (!file.openFile(destPath, mode)) {
         X_ERROR("Font", "Failed to open output file");
         return false;
     }

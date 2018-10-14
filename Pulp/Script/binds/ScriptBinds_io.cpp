@@ -411,7 +411,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
         return pH->endFunction();
     }
 
-    XFile* pFile = pFileSys_->openFile(path.c_str(), flags);
+    XFile* pFile = pFileSys_->openFile(path, flags);
 
     if (pFile) {
         return pH->endFunction(WrapFileReturn(pFile));

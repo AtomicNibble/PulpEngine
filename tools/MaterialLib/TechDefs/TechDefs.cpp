@@ -167,7 +167,7 @@ namespace techset
         fullPath.toLower();
         fullPath /= path;
 
-        if (!file.openFile(fullPath.c_str(), mode)) {
+        if (!file.openFile(fullPath, mode)) {
             X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", path.c_str());
             return false;
         }

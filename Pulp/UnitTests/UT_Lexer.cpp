@@ -566,13 +566,12 @@ bool XMapFile::Parse(core::XFile* file)
 
 TEST(Lexer, Mapfile)
 {
-    // load a map file Drool
-
+    // load a map file
     core::XFileScoped map_file;
     core::IFileSys::FileFlags mode;
     mode.Set(FileFlag::READ);
 
-    if (map_file.openFile("alcatraz.map", mode)) {
+    if (map_file.openFile(core::Path<>("alcatraz.map"), mode)) {
         XMapFile map;
 
         EXPECT_TRUE(map.Parse(map_file.GetFile()));

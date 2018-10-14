@@ -103,9 +103,8 @@ namespace RawModel
 
         core::XFileScoped file;
 
-        if (!file.openFile(path.c_str(), mode)) {
-            X_ERROR("RawModel", "Failed to open raw model file: \"%s\"",
-                path.c_str());
+        if (!file.openFile(path, mode)) {
+            X_ERROR("RawModel", "Failed to open raw model file: \"%s\"", path.c_str());
             return false;
         }
 
@@ -661,7 +660,7 @@ namespace RawModel
                 X_ERROR("RawModel", "Failed to create export directory");
             }
 
-            if (!file.openFile(path.c_str(), mode)) {
+            if (!file.openFile(path, mode)) {
                 X_ERROR("RawModel", "Failed to open file for rawmodel");
                 return false;
             }

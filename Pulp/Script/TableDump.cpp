@@ -114,7 +114,7 @@ bool dumpStateToFile(lua_State* L, const char* pFileName)
     path.setExtension(".txt");
 
     core::XFileScoped file;
-    if (!file.openFile(path.c_str(), core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+    if (!file.openFile(path, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
         return false;
     }
 

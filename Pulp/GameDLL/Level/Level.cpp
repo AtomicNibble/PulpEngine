@@ -248,7 +248,7 @@ bool Level::processEnts(void)
     auto entDescPath = path_;
     entDescPath.setExtension("json");
 
-    if (!entFile.openFile(entDescPath.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
+    if (!entFile.openFile(entDescPath, core::FileFlag::READ | core::FileFlag::SHARE)) {
         return false;
     }
 

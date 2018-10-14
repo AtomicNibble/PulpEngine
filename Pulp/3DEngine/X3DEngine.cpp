@@ -1367,11 +1367,11 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    core::StackString<128> name;
+    core::Path<> name;
     name.setFmt("framebuffer_%s.dds", pBufferStr);
 
     core::XFileScoped file;
-    if (!file.openFile(name.c_str(), core::FileFlags::WRITE | core::FileFlags::RECREATE)) {
+    if (!file.openFile(name, core::FileFlags::WRITE | core::FileFlags::RECREATE)) {
         X_ERROR("3DEngine", "Failed to open file for writing frame buffer");
         return;
     }

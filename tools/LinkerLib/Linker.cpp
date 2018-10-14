@@ -315,7 +315,7 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
     mode.Set(core::FileFlag::READ);
     mode.Set(core::FileFlag::SHARE);
 
-    if (!file.openFile(assetPath.c_str(), mode)) {
+    if (!file.openFile(assetPath, mode)) {
         X_ERROR("Linker", "Failed to open asset: \"%s\"", name.c_str());
         return false;
     }
@@ -348,7 +348,7 @@ bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::stri
     core::XFileScoped file;
     core::FileFlags mode(core::FileFlag::READ | core::FileFlag::SHARE);
 
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         return false;
     }
 

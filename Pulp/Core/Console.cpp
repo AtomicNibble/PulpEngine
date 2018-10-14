@@ -575,7 +575,7 @@ void XConsole::saveChangedVars(void)
     core::ArrayGrowMultiply<core::StringRange<char>> keep(g_coreArena);
 
     if (gEnv->pFileSys->fileExists(userConfigPath)) {
-        if (file.openFile(userConfigPath.c_str(), FileFlag::READ | FileFlag::SHARE)) {
+        if (file.openFile(userConfigPath, FileFlag::READ | FileFlag::SHARE)) {
             const auto size = safe_static_cast<size_t>(file.remainingBytes());
 
             if (size > 0) {
@@ -643,7 +643,7 @@ void XConsole::saveChangedVars(void)
         }
     }
 
-    if (!file.openFile(userConfigPath.c_str(), FileFlag::WRITE | FileFlag::RECREATE)) {
+    if (!file.openFile(userConfigPath, FileFlag::WRITE | FileFlag::RECREATE)) {
         X_ERROR("Console", "Failed to open file for saving modifed vars");
         return;
     }
@@ -916,7 +916,7 @@ bool XConsole::loadAndExecConfigFile(const char* pFileName)
 
     X_LOG0("Config", "Loading config: \"%s\"", pFileName);
 
-    if (file.openFile(path.c_str(), FileFlag::READ)) {
+    if (file.openFile(path, FileFlag::READ)) {
         bytes = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
 
         if (bytes > 0) {
@@ -1659,7 +1659,7 @@ void XConsole::saveCmdHistory(void) const
     mode.Set(FileFlag::RECREATE);
 
     XFileScoped file;
-    if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
+    if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode)) {
         file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
     }
 }
@@ -1693,7 +1693,7 @@ void XConsole::loadCmdHistory(bool async)
     }
     else {
         XFileMemScoped file;
-        if (file.openFile(CMD_HISTORY_FILE_NAME, mode)) {
+        if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode)) {
             const char* pBegin = file->getBufferStart();
             const char* pEnd = file->getBufferEnd();
 

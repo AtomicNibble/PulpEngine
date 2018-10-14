@@ -191,7 +191,7 @@ TEST(GrowingStringTable, Serialize)
     fileName += "uint16_t";
     fileName += ").ut_dat";
 
-    XFile* file = pFileSys->openFile(fileName.c_str(),
+    XFile* file = pFileSys->openFile(fileName,
         FileFlag::WRITE | FileFlag::READ | FileFlag::RECREATE | FileFlag::RANDOM_ACCESS);
     ASSERT_TRUE(NULL != file);
     if (file) {

@@ -276,17 +276,17 @@ bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFile(pathType path, FileFlags mode)
+XFile* xFileSys::openFile(const PathT& path, FileFlags mode)
 {
     PathWT osPath;
     
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
-        XFindData findData(path, this);
+        XFindData findData(path.c_str(), this);
 
         if (!findData.findnext(findinfo)) {
             FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
+            X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path.c_str(), mode.ToString(Dsc));
             return nullptr;
         }
 
@@ -338,7 +338,7 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
+XFileAsync* xFileSys::openFileAsync(const PathT& path, FileFlags mode)
 {
     PathWT osPath;
 
@@ -357,7 +357,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         // so we are going to look in the search list, till we find a file.
         // findData can't deal with files in pak's correcly, it has the wrong api.
-        core::StrHash hash(path, strUtil::strlen(path));
+        core::StrHash hash(path.data(), path.length());
 
         for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
             if (pSearch->pDir) {
@@ -377,10 +377,10 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
             else if (pSearch->pPak) {
                 auto* pPak = pSearch->pPak;
 
-                auto idx = pPak->find(hash, path);
+                auto idx = pPak->find(hash, path.c_str());
                 if (idx != -1) {
                     if (isDebug()) {
-                        X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", path, pPak->name.c_str());
+                        X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", path.c_str(), pPak->name.c_str());
                     }
 
                     auto& entry = pPak->pEntires[idx];
@@ -422,7 +422,7 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 // --------------------------------------------------
 
-XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
+XFileMem* xFileSys::openFileMem(const PathT& path, FileFlags mode)
 {
     if (mode.IsSet(FileFlag::WRITE)) {
         X_ERROR("FileSys", "can't open a memory file for writing.");
@@ -430,7 +430,7 @@ XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
     }
 
     FindData findinfo;
-    XFindData findData(path, this);
+    XFindData findData(path.c_str(), this);
     if (!findData.findnext(findinfo)) {
         FileFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
@@ -1418,13 +1418,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
         if (type == IoRequest::OPEN) {
             IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
-            XFileAsync* pFile = openFileAsync(pOpen->path.c_str(), pOpen->mode);
+            XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode);
 
             pOpen->callback.Invoke(fileSys, pOpen, pFile, 0);
         }
         else if (type == IoRequest::OPEN_READ_ALL) {
             IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
-            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path.c_str(), pOpenRead->mode);
+            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path, pOpenRead->mode);
 
             // make sure it's safe to allocate the buffer in this thread.
             X_ASSERT_NOT_NULL(pOpenRead->arena);
@@ -1499,7 +1499,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
         }
         else if (type == IoRequest::OPEN_WRITE_ALL) {
             IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
-            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path.c_str(), core::FileFlags::RECREATE | core::FileFlags::WRITE));
+            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path, core::FileFlags::RECREATE | core::FileFlags::WRITE));
 
             X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
             X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());

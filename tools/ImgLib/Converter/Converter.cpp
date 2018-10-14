@@ -122,7 +122,7 @@ namespace Converter
         mode.Set(core::FileFlag::RECREATE);
 
         core::XFileScoped file;
-        if (!file.openFile(outPath.c_str(), mode)) {
+        if (!file.openFile(outPath, mode)) {
             return false;
         }
 

@@ -158,7 +158,7 @@ bool AssetList::loadFromFile(core::Path<char>& path)
     mode.Set(core::FileFlag::READ);
     mode.Set(core::FileFlag::SHARE);
 
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         return false;
     }
 
@@ -224,7 +224,7 @@ bool AssetList::saveToFile(core::Path<char>& path) const
     mode.Set(core::FileFlag::WRITE);
     mode.Set(core::FileFlag::RECREATE);
 
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         return false;
     }
 

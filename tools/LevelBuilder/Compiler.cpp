@@ -1002,7 +1002,7 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
 
     path.setExtension(level::LVL_FILE_EXTENSION);
 
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         return false;
     }
 

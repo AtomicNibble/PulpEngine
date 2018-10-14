@@ -16,7 +16,7 @@ namespace Util
 
         boxOut.clear();
 
-        if (file.openFile(path.c_str(), mode)) {
+        if (file.openFile(path, mode)) {
             ModelHeader hdr;
 
             if (file.readObj(hdr) != sizeof(hdr)) {

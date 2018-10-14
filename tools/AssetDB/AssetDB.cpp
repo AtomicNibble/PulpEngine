@@ -446,7 +446,7 @@ bool AssetDB::PerformMigrations(void)
             X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
             core::XFileScoped file;
-            if (!file.openFile(filePath.c_str(),
+            if (!file.openFile(filePath,
                     core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS)) {
                 X_ERROR("AssetDB", "Failed to open rawfile");
                 return false;
@@ -513,7 +513,7 @@ bool AssetDB::PerformMigrations(void)
             X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
             core::XFileScoped file;
-            if (!file.openFile(filePath.c_str(),
+            if (!file.openFile(filePath,
                     core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS)) {
                 X_ERROR("AssetDB", "Failed to open rawfile");
                 return false;
@@ -648,8 +648,7 @@ bool AssetDB::PerformMigrations(void)
             curPath.replaceSeprators();
 
             core::XFileScoped file;
-            if (!file.openFile(curPath.c_str(),
-                core::FileFlag::READ)) {
+            if (!file.openFile(curPath, core::FileFlag::READ)) {
                 X_ERROR("AssetDB", "Failed to open thumb file id: %" PRIi32, thumbId);
                 return false;
             }
@@ -791,7 +790,7 @@ bool AssetDB::PerformMigrations(void)
                 X_LOG1("AssetDB", "Updating hash for rawfile %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
                 core::XFileScoped file;
-                if (!file.openFile(filePath.c_str(), core::FileFlag::READ)) {
+                if (!file.openFile(filePath, core::FileFlag::READ)) {
                     X_ERROR("AssetDB", "Failed to open rawfile");
                     return false;
                 }
@@ -1090,7 +1089,7 @@ bool AssetDB::Chkdsk(bool updateDB)
         AssetPathForRawFile(rawfileInfo, filePath);
 
         core::XFileScoped file;
-        if (!file.openFile(filePath.c_str(),
+        if (!file.openFile(filePath,
                 core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS)) {
             X_ERROR("AssetDB", "Failed to open rawfile");
             return false;
@@ -1475,7 +1474,7 @@ bool AssetDB::Export(core::Path<char>& path)
     writer.EndObject();
 
     core::XFileScoped file;
-    if (!file.openFile(path.c_str(), core::FileFlag::RECREATE | core::FileFlag::WRITE)) {
+    if (!file.openFile(path, core::FileFlag::RECREATE | core::FileFlag::WRITE)) {
         X_ERROR("AssetDB", "Failed to open file for db export");
         return false;
     }
@@ -2516,7 +2515,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
                 return Result::ERROR;
             }
 
-            if (!file.openFile(filePath.c_str(), mode)) {
+            if (!file.openFile(filePath, mode)) {
                 X_ERROR("AssetDB", "Failed to write raw asset");
                 return Result::ERROR;
             }
@@ -2726,7 +2725,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 
             core::XFileScoped file;
 
-            if (!file.openFile(filePath.c_str(), mode)) {
+            if (!file.openFile(filePath, mode)) {
                 X_ERROR("AssetDB", "Failed to write thumb");
                 return Result::ERROR;
             }
@@ -3018,7 +3017,7 @@ bool AssetDB::GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut)
 
     AssetPathForRawFile(raw, filePath);
 
-    if (!file.openFile(filePath.c_str(), mode)) {
+    if (!file.openFile(filePath, mode)) {
         X_ERROR("AssetDB", "Failed to open rawfile");
         return false;
     }
@@ -3066,7 +3065,7 @@ bool AssetDB::GetRawFileCompAlgoForAsset(AssetId assetId, core::Compression::Alg
 
     AssetPathForRawFile(raw, filePath);
 
-    if (!file.openFile(filePath.c_str(), mode)) {
+    if (!file.openFile(filePath, mode)) {
         X_ERROR("AssetDB", "Failed to open rawfile");
         return false;
     }
@@ -3148,7 +3147,7 @@ bool AssetDB::GetThumbForAsset(AssetId assetId, ThumbInfo& info, DataArr& thumbD
 
     ThumbPathForThumb(info, filePath);
 
-    if (!file.openFile(filePath.c_str(), mode)) {
+    if (!file.openFile(filePath, mode)) {
         X_ERROR("AssetDB", "Failed to open thumb");
         return false;
     }
@@ -3232,7 +3231,7 @@ bool AssetDB::GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut)
     AssetDB::GetOutputPathForAsset(info.type, info.name, modInfo.outDir, assetPath);
 
     core::XFileScoped file;
-    if (!file.openFile(assetPath.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
+    if (!file.openFile(assetPath, core::FileFlag::READ | core::FileFlag::SHARE)) {
         X_ERROR("AssetLoader", "Failed to open file");
         return false;
     }
