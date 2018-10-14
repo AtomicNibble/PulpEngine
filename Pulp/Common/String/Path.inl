@@ -5,27 +5,23 @@ Path<TChar>::Path()
 }
 
 template<typename TChar>
-Path<TChar>::Path(const Path& oth)
+Path<TChar>::Path(const Path& oth) :
+    BaseType(oth.begin(), oth.end())
 {
-    BaseType::append(oth.c_str(), oth.length());
 }
 
 template<>
 template<>
-inline Path<char>::Path(const Path<wchar_t>& oth)
+inline Path<char>::Path(const Path<wchar_t>& oth) :
+    BaseType(oth.begin(), oth.end())
 {
-    strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
-    BaseType::str_[oth.length()] = L'\0';
-    BaseType::len_ = oth.length();
 }
 
 template<>
 template<>
-inline Path<wchar_t>::Path(const Path<char>& oth)
+inline Path<wchar_t>::Path(const Path<char>& oth) :
+     BaseType(oth.begin(), oth.end())
 {
-    strUtil::Convert(oth.c_str(), BaseType::str_, capacity());
-    BaseType::str_[oth.length()] = L'\0';
-    BaseType::len_ = oth.length();
 }
 
 template<>
