@@ -896,8 +896,7 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
 
     core::XFileScoped file;
     if (!file.openFile(fullPath.c_str(), mode)) {
-        X_ERROR("Anim", "Failed to open output file for compiled animation: \"%s\"",
-            fullPath.c_str());
+        X_ERROR("Anim", "Failed to open output file for compiled animation: \"%ls\"", fullPath.c_str());
         return false;
     }
 
