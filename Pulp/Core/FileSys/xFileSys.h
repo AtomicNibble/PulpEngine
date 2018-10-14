@@ -268,23 +268,23 @@ public:
 
     // Create
     bool createDirectory(pathType path) const X_FINAL;
-    bool createDirectory(pathTypeW path) const X_FINAL;
+    bool createDirectory(const PathWT& path) const X_FINAL;
     bool createDirectoryTree(pathType path) const X_FINAL;
-    bool createDirectoryTree(pathTypeW path) const X_FINAL;
+    bool createDirectoryTree(const PathWT& path) const X_FINAL;
 
     // exsists.
     bool fileExists(pathType path) const X_FINAL;
-    bool fileExists(pathTypeW path) const X_FINAL;
+    bool fileExists(const PathWT& path) const X_FINAL;
     bool directoryExists(pathType path) const X_FINAL;
-    bool directoryExists(pathTypeW path) const X_FINAL;
+    bool directoryExists(const PathWT& path) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
     bool isDirectory(pathType path) const X_FINAL;
-    bool isDirectory(pathTypeW path) const X_FINAL;
+    bool isDirectory(const PathWT& path) const X_FINAL;
 
     // rename
     bool moveFile(pathType path, pathType newPath) const X_FINAL;
-    bool moveFile(pathTypeW path, pathTypeW newPath) const X_FINAL;
+    bool moveFile(const PathWT& path, const PathWT& newPath) const X_FINAL;
 
     size_t getMinimumSectorSize(void) const X_FINAL;
 

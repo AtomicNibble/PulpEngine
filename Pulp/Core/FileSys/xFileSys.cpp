@@ -734,10 +734,8 @@ bool xFileSys::createDirectory(pathType path) const
     return PathUtil::CreateDirectory(osPath);
 }
 
-bool xFileSys::createDirectory(pathTypeW path) const
+bool xFileSys::createDirectory(const PathWT& path) const
 {
-    X_ASSERT_NOT_NULL(path);
-
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
 
@@ -767,13 +765,11 @@ bool xFileSys::createDirectoryTree(pathType _path) const
     return PathUtil::CreateDirectoryTree(osPath);
 }
 
-bool xFileSys::createDirectoryTree(pathTypeW _path) const
+bool xFileSys::createDirectoryTree(const PathWT& path) const
 {
-    X_ASSERT_NOT_NULL(_path);
-
     // we want to just loop and create like a goat.
     Path<wchar_t> osPath;
-    createOSPath(gameDir_, _path, osPath);
+    createOSPath(gameDir_, path, osPath);
 
     osPath.removeFileName();
 
@@ -794,7 +790,7 @@ bool xFileSys::fileExists(pathType path) const
     return fileExistsOS(osPath);
 }
 
-bool xFileSys::fileExists(pathTypeW path) const
+bool xFileSys::fileExists(const PathWT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -810,7 +806,7 @@ bool xFileSys::directoryExists(pathType path) const
     return directoryExistsOS(osPath);
 }
 
-bool xFileSys::directoryExists(pathTypeW path) const
+bool xFileSys::directoryExists(const PathWT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -826,7 +822,7 @@ bool xFileSys::isDirectory(pathType path) const
     return isDirectoryOS(osPath);
 }
 
-bool xFileSys::isDirectory(pathTypeW path) const
+bool xFileSys::isDirectory(const PathWT& path) const
 {
     Path<wchar_t> osPath;
     createOSPath(gameDir_, path, osPath);
@@ -844,7 +840,7 @@ bool xFileSys::moveFile(pathType path, pathType newPath) const
     return moveFileOS(osPath, osPathNew);
 }
 
-bool xFileSys::moveFile(pathTypeW path, pathTypeW newPath) const
+bool xFileSys::moveFile(const PathWT& path, const PathWT& newPath) const
 {
     Path<wchar_t> osPath, osPathNew;
 
