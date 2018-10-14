@@ -242,7 +242,7 @@ bool xFileSys::initDirectorys(bool working)
 
     if (working) {
         // working dir added.
-        return setGameDir(workingDir.c_str());
+        return setGameDir(workingDir);
     }
     else {
         
@@ -260,8 +260,8 @@ bool xFileSys::initDirectorys(bool working)
         core::Path<wchar_t> testAssets(base);
         testAssets /= L"test_assets\\";
 
-        if (setGameDir(core.c_str())) {
-            addModDir(testAssets.c_str());
+        if (setGameDir(core)) {
+            addModDir(testAssets);
             return true;
         }
     }
@@ -557,9 +557,9 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 // --------------------- folders ---------------------
 
-bool xFileSys::setGameDir(pathTypeW path)
+bool xFileSys::setGameDir(const PathT& path)
 {
-    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path, gameDir_);
+    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path.c_str(), gameDir_);
 
     // check if the irectory is even valid.
     if (!directoryExistsOS(path)) {
@@ -575,33 +575,33 @@ bool xFileSys::setGameDir(pathTypeW path)
     return true;
 }
 
-void xFileSys::addModDir(pathTypeW path)
+void xFileSys::addModDir(const PathT& path)
 {
     addDirInteral(path, false);
 }
 
 
-void xFileSys::addDirInteral(pathTypeW path, bool isGame)
+bool xFileSys::addDirInteral(const PathT& path, bool isGame)
 {
     if (isDebug()) {
         X_LOG0("FileSys", "addModDir: \"%ls\"", path);
     }
 
     if (!directoryExistsOS(path)) {
-        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", path);
-        return;
+        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", path.c_str());
+        return false;
     }
 
     // ok remove any ..//
     core::Path<wchar_t> fixedPath;
     if (!PathUtil::GetFullPath(path, fixedPath)) {
         X_ERROR("FileSys", "addModDir full path name creation failed");
-        return;
+        return false;
     }
 
     if (!directoryExistsOS(fixedPath)) {
-        X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath);
-        return;
+        X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath.c_str());
+        return false;
     }
 
     // work out if this directory is a sub directory of any of the current
@@ -613,8 +613,8 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 
         if (strUtil::FindCaseInsensitive(fixedPath.c_str(), s->pDir->path.c_str()) != nullptr) {
             X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%ls\" -> \"%ls\"",
-                fixedPath, s->pDir->path.c_str());
-            return;
+                fixedPath.c_str(), s->pDir->path.c_str());
+            return false;
         }
     }
 
@@ -635,7 +635,7 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
     gEnv->pDirWatcher->addDirectory(fixedPath);
 
     if (!loadPacks_) {
-        return;
+        return true;
     }
 
     // Load packs.
@@ -660,6 +660,8 @@ void xFileSys::addDirInteral(pathTypeW path, bool isGame)
 
         PathUtil::findClose(handle);
     }
+
+    return true;
 }
 
 // --------------------- Find util ---------------------
