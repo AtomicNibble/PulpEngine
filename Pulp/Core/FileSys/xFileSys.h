@@ -334,7 +334,7 @@ private:
 private:
     OsFileAsync* openOsFileAsync(const PathT& path, FileFlags mode);
 
-    bool openPak(const PathT& name);
+    bool openPak(const PathT& path);
 
 private:
     bool fileExistsOS(const PathWT& fullPath) const;

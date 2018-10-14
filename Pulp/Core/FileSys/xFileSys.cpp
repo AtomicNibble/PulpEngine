@@ -1680,9 +1680,9 @@ OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode)
     return nullptr;
 }
 
-bool xFileSys::openPak(const PathT& name)
+bool xFileSys::openPak(const PathT& path)
 {
-    X_LOG1("FileSys", "Mounting pak: \"%s\"", name.c_str());
+    X_LOG1("FileSys", "Mounting pak: \"%s\"", path.c_str());
 
     // you can only open pak's from inside the virtual filesystem.
     // so file is opened as normal.
@@ -1691,7 +1691,7 @@ bool xFileSys::openPak(const PathT& name)
     mode.Set(FileFlag::RANDOM_ACCESS);
     // I'm not sharing, fuck you!
 
-    auto* pFile = openOsFileAsync(name, mode);
+    auto* pFile = openOsFileAsync(path, mode);
     if (!pFile) {
         X_ERROR("FileSys", "Failed to open pak");
         return false;
@@ -1750,7 +1750,7 @@ bool xFileSys::openPak(const PathT& name)
     const size_t dataSize = safe_static_cast<size_t>(pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
     auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
-    pPak->name.set(name.begin(), name.end());
+    pPak->name.set(path.fileName());
     pPak->mode = pakMode;
     pPak->pFile = pFile;
     pPak->numAssets = hdr.numAssets;
