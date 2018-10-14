@@ -612,9 +612,7 @@ bool xFileSys::findnext(uintptr_t handle, FindData& findinfo)
 
 void xFileSys::findClose(uintptr_t handle)
 {
-    if (handle != PathUtil::INVALID_FIND_HANDLE) {
-        PathUtil::findClose(handle);
-    }
+    PathUtil::findClose(handle);
 }
 
 // --------------------- Delete ---------------------
