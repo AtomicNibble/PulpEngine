@@ -332,9 +332,9 @@ private:
     // ~ThreadAbstract
 
 private:
-    OsFileAsync* openOsFileAsync(pathType path, FileFlags mode);
+    OsFileAsync* openOsFileAsync(const PathT& path, FileFlags mode);
 
-    bool openPak(const char* pName);
+    bool openPak(const PathT& name);
 
 private:
     bool fileExistsOS(const PathWT& fullPath) const;

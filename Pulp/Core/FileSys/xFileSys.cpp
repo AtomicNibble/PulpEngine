@@ -566,11 +566,9 @@ bool xFileSys::addDirInteral(const PathWT& path, bool isGame)
     {
         do
         {
-            core::Path<char> name(findInfo.name);
-
-            if (!openPak(name.c_str()))
+            if (!openPak(findInfo.name))
             {
-                X_ERROR("FileSys", "Failed to add pak: \"%s\"", name.c_str());
+                X_ERROR("FileSys", "Failed to add pak: \"%s\"", findInfo.name.c_str());
             }
         }
         while(PathUtil::findNext(handle, findInfo));
@@ -1649,13 +1647,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
     return Thread::ReturnValue(0);
 }
 
-OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
+OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode)
 {
     PathWT osPath;
 
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
-        XFindData findData(path, this);
+        XFindData findData(path.c_str(), this);
 
         if (!findData.findnext(findinfo)) {
             FileFlags::Description Dsc;
@@ -1682,9 +1680,9 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
     return nullptr;
 }
 
-bool xFileSys::openPak(const char* pName)
+bool xFileSys::openPak(const PathT& name)
 {
-    X_LOG1("FileSys", "Mounting pak: \"%s\"", pName);
+    X_LOG1("FileSys", "Mounting pak: \"%s\"", name.c_str());
 
     // you can only open pak's from inside the virtual filesystem.
     // so file is opened as normal.
@@ -1693,7 +1691,7 @@ bool xFileSys::openPak(const char* pName)
     mode.Set(FileFlag::RANDOM_ACCESS);
     // I'm not sharing, fuck you!
 
-    auto* pFile = openOsFileAsync(pName, mode);
+    auto* pFile = openOsFileAsync(name, mode);
     if (!pFile) {
         X_ERROR("FileSys", "Failed to open pak");
         return false;
@@ -1752,7 +1750,7 @@ bool xFileSys::openPak(const char* pName)
     const size_t dataSize = safe_static_cast<size_t>(pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
     auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
-    pPak->name.set(pName);
+    pPak->name.set(name.begin(), name.end());
     pPak->mode = pakMode;
     pPak->pFile = pFile;
     pPak->numAssets = hdr.numAssets;
