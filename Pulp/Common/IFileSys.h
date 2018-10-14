@@ -685,6 +685,7 @@ struct IFileSys
     typedef FileFlag FileFlag;
     typedef Flags<FileFlag> FileFlags;
     typedef SeekMode SeekMode;
+    typedef core::Path<char> PathT;
     typedef core::Path<wchar_t> PathWT;
     typedef const char* pathType;
     typedef const wchar_t* pathTypeW;
@@ -710,7 +711,7 @@ struct IFileSys
 
     // Open Files
     virtual XFile* openFile(pathType path, FileFlags mode) X_ABSTRACT;
-    virtual XFile* openFile(pathTypeW path, FileFlags mode) X_ABSTRACT;
+    virtual XFile* openFile(const PathWT& path, FileFlags mode) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
     // async
@@ -983,7 +984,7 @@ public:
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
-    inline bool openFile(const wchar_t* path, IFileSys::FileFlags mode)
+    inline bool openFile(const IFileSys::PathWT& path, IFileSys::FileFlags mode)
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);

@@ -77,7 +77,7 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
     mode.Set(core::FileFlag::RANDOM_ACCESS);
 
     core::XFileScoped file;
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         X_ERROR("Model", "Failed to open model for skelton load");
         return false;
     }
@@ -193,7 +193,7 @@ bool ModelSkeleton::LoadRawModelSkelton(const core::Path<wchar_t>& filePath)
     mode.Set(core::FileFlag::READ);
 
     core::XFileScoped file;
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         X_ERROR("Model", "Failed to open raw model for skelton load");
         return false;
     }

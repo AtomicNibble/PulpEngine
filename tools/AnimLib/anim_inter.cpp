@@ -46,7 +46,7 @@ namespace Inter
         mode.Set(core::FileFlag::READ);
 
         core::XFileScoped file;
-        if (file.openFile(filePath.c_str(), mode)) {
+        if (file.openFile(filePath, mode)) {
             X_ERROR("Anim", "failed to open file: %ls", filePath.c_str());
             return false;
         }
@@ -103,7 +103,7 @@ namespace Inter
                 X_ERROR("Anim", "Failed to create export directory");
             }
 
-            if (!file.openFile(path.c_str(), mode)) {
+            if (!file.openFile(path, mode)) {
                 X_ERROR("Anim", "Failed to open file for inter anim");
                 return false;
             }

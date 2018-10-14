@@ -240,7 +240,7 @@ public:
 
     // Open / Close
     XFile* openFile(pathType path, FileFlags mode) X_FINAL;
-    XFile* openFile(pathTypeW path, FileFlags mode) X_FINAL;
+    XFile* openFile(const PathWT& path, FileFlags mode) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
@@ -350,11 +350,13 @@ private:
     bool moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew) const;
 
     // Ajust path
-    const wchar_t* createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const;
-    const wchar_t* createOSPath(const Directory* dir, pathTypeW path, Path<wchar_t>& buffer) const;
+    const wchar_t* createOSPath(const Directory* dir, pathType path, PathWT& buffer) const;
+    const wchar_t* createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const;
+    const wchar_t* createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const;
 
     bool isAbsolute(pathType path) const;
     bool isAbsolute(pathTypeW path) const;
+    bool isAbsolute(const PathWT& path) const;
 
     bool isDebug(void) const;
 

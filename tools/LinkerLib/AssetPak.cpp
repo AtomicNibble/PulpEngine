@@ -699,7 +699,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
     mode.Set(core::FileFlag::READ);
     mode.Set(core::FileFlag::RANDOM_ACCESS);
 
-    if (!file.openFile(pakPath.c_str(), mode)) {
+    if (!file.openFile(pakPath, mode)) {
         X_ERROR("AssetPak", "Failed to open file for saving");
         return false;
     }

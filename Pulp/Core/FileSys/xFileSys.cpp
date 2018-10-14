@@ -309,31 +309,18 @@ XFile* xFileSys::openFile(pathType path, FileFlags mode)
     return nullptr;
 }
 
-XFile* xFileSys::openFile(pathTypeW path, FileFlags mode)
+XFile* xFileSys::openFile(const PathWT& path, FileFlags mode)
 {
-    core::Path<wchar_t> real_path;
+    // This is only for opening a a absolute path really.
+    core::Path<wchar_t> osPath;
 
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
-        FindData findinfo;
-        XFindData findData(path, this);
-
-        if (!findData.findnext(findinfo)) {
-            FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
-            return nullptr;
-        }
-
-        findData.getOSPath(real_path, findinfo);
-    }
-    else {
-        createOSPath(gameDir_, path, real_path);
-    }
+    createOSPath(gameDir_, path, osPath);
 
     if (isDebug()) {
-        X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
+        X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
     }
 
-    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path, mode);
+    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(osPath, mode);
     if (pFile->valid()) {
         return pFile;
     }
@@ -1058,7 +1045,7 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 // --------------------------------------------------
 
 // Ajust path
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const
+const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, PathWT& buffer) const
 {
     wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
     strUtil::Convert(path, pathW, sizeof(pathW));
@@ -1066,7 +1053,7 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, Path<
     return createOSPath(dir, pathW, buffer);
 }
 
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path, Path<wchar_t>& buffer) const
+const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const
 {
     // is it absolute?
     if (!isAbsolute(path)) {
@@ -1085,6 +1072,20 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path, Path
     return buffer.c_str();
 }
 
+const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const
+{
+    // is it absolute?
+    if (!isAbsolute(path)) {
+        buffer = dir->path / path;
+    }
+    else {
+        buffer = path;
+    }
+
+    buffer.replaceSeprators();
+    return buffer.c_str();
+}
+
 bool xFileSys::isAbsolute(pathType path) const
 {
     return path[0] == NATIVE_SLASH || path[0] == NON_NATIVE_SLASH || path[1] == ':';
@@ -1093,6 +1094,11 @@ bool xFileSys::isAbsolute(pathType path) const
 bool xFileSys::isAbsolute(pathTypeW path) const
 {
     return path[0] == NATIVE_SLASH_W || path[0] == NON_NATIVE_SLASH_W || path[1] == L':';
+}
+
+bool xFileSys::isAbsolute(const PathWT& path) const
+{
+    return path.isAbsolute();
 }
 
 bool xFileSys::isDebug(void) const

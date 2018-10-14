@@ -928,7 +928,7 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
         return false;
     }
 
-    if (!file.openFile(path.c_str(), mode)) {
+    if (!file.openFile(path, mode)) {
         X_ERROR("Model", "Failed to open compile output file");
         return false;
     }
