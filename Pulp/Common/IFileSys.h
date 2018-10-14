@@ -707,13 +707,13 @@ struct IFileSys
     virtual void addModDir(pathTypeW path) X_ABSTRACT;
 
     // Open Files
-    virtual XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
-    virtual XFile* openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
+    virtual XFile* openFile(pathType path, fileModeFlags mode) X_ABSTRACT;
+    virtual XFile* openFile(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
     // async
-    virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
-    virtual XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
     virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
     // loads the whole file into memory.
@@ -728,25 +728,25 @@ struct IFileSys
     virtual void findClose2(uintptr_t handle) X_ABSTRACT;
 
     // Delete
-    virtual bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+    virtual bool deleteFile(pathType path) const X_ABSTRACT;
     virtual bool deleteDirectory(pathType path, bool recursive = true) const X_ABSTRACT;
     virtual bool deleteDirectoryContents(pathType path) X_ABSTRACT;
 
     // Create
-    virtual bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool createDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool createDirectoryTree(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+    virtual bool createDirectory(pathType path) const X_ABSTRACT;
+    virtual bool createDirectory(pathTypeW path) const X_ABSTRACT;
+    virtual bool createDirectoryTree(pathType path) const X_ABSTRACT;
+    virtual bool createDirectoryTree(pathTypeW path) const X_ABSTRACT;
 
     // exsists.
-    virtual bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+    virtual bool fileExists(pathType path) const X_ABSTRACT;
+    virtual bool fileExists(pathTypeW path) const X_ABSTRACT;
+    virtual bool directoryExists(pathType path) const X_ABSTRACT;
+    virtual bool directoryExists(pathTypeW path) const X_ABSTRACT;
 
     // does not error, when it's a file or not exsist.
-    virtual bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
-    virtual bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_ABSTRACT;
+    virtual bool isDirectory(pathType path) const X_ABSTRACT;
+    virtual bool isDirectory(pathTypeW path) const X_ABSTRACT;
 
     // rename
     virtual bool moveFile(pathType path, pathType newPath) const X_ABSTRACT;

@@ -239,13 +239,13 @@ public:
     core::Path<wchar_t> getWorkingDirectory(void) const X_FINAL;
 
     // Open / Close
-    XFile* openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
-    XFile* openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
+    XFile* openFile(pathType path, fileModeFlags mode) X_FINAL;
+    XFile* openFile(pathTypeW path, fileModeFlags mode) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
-    XFileAsync* openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
-    XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME) X_FINAL;
+    XFileAsync* openFileAsync(pathType path, fileModeFlags mode) X_FINAL;
+    XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
@@ -264,25 +264,25 @@ public:
     void findClose2(uintptr_t handle) X_FINAL;
 
     // Delete
-    bool deleteFile(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+    bool deleteFile(pathType path) const X_FINAL;
     bool deleteDirectory(pathType path, bool recursive = true) const X_FINAL;
     bool deleteDirectoryContents(pathType path) X_FINAL;
 
     // Create
-    bool createDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool createDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool createDirectoryTree(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool createDirectoryTree(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+    bool createDirectory(pathType path) const X_FINAL;
+    bool createDirectory(pathTypeW path) const X_FINAL;
+    bool createDirectoryTree(pathType path) const X_FINAL;
+    bool createDirectoryTree(pathTypeW path) const X_FINAL;
 
     // exsists.
-    bool fileExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool fileExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool directoryExists(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool directoryExists(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+    bool fileExists(pathType path) const X_FINAL;
+    bool fileExists(pathTypeW path) const X_FINAL;
+    bool directoryExists(pathType path) const X_FINAL;
+    bool directoryExists(pathTypeW path) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
-    bool isDirectory(pathType path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
-    bool isDirectory(pathTypeW path, VirtualDirectory::Enum location = VirtualDirectory::GAME) const X_FINAL;
+    bool isDirectory(pathType path) const X_FINAL;
+    bool isDirectory(pathTypeW path) const X_FINAL;
 
     // rename
     bool moveFile(pathType path, pathType newPath) const X_FINAL;
@@ -334,7 +334,7 @@ private:
     // ~ThreadAbstract
 
 private:
-    OsFileAsync* openOsFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location = VirtualDirectory::GAME);
+    OsFileAsync* openOsFileAsync(pathType path, fileModeFlags mode);
 
     bool openPak(const char* pName);
 
@@ -350,9 +350,6 @@ private:
     bool moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew) const;
 
     // Ajust path
-    const wchar_t* createOSPath(const Directory* dir, pathType path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
-    const wchar_t* createOSPath(const Directory* dir, pathTypeW path, VirtualDirectory::Enum location, Path<wchar_t>& buffer) const;
-
     const wchar_t* createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, pathTypeW path, Path<wchar_t>& buffer) const;
 

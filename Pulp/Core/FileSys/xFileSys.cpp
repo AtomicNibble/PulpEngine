@@ -274,7 +274,7 @@ core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
+XFile* xFileSys::openFile(pathType path, fileModeFlags mode)
 {
     core::Path<wchar_t> real_path;
     
@@ -291,7 +291,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
         findData.getOSPath(real_path, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, location, real_path);
+        createOSPath(gameDir_, path, real_path);
     }
 
     if (isDebug()) {
@@ -307,7 +307,7 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode, VirtualDirectory::E
     return nullptr;
 }
 
-XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
+XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode)
 {
     core::Path<wchar_t> real_path;
 
@@ -324,7 +324,7 @@ XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode, VirtualDirectory::
         findData.getOSPath(real_path, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, location, real_path);
+        createOSPath(gameDir_, path, real_path);
     }
 
     if (isDebug()) {
@@ -349,7 +349,7 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
+XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode)
 {
     core::Path<wchar_t> fullPath;
 
@@ -374,7 +374,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
             if (pSearch->pDir) {
                 const auto* pDir = pSearch->pDir;
 
-                createOSPath(pDir, path, location, fullPath);
+                createOSPath(pDir, path, fullPath);
 
                 if (PathUtil::DoesFileExist(fullPath, true)) {
                     if (isDebug()) {
@@ -408,7 +408,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
         }
     }
     else {
-        createOSPath(gameDir_, path, location, fullPath);
+        createOSPath(gameDir_, path, fullPath);
 
         if (isDebug()) {
             X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
@@ -425,7 +425,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode, VirtualDi
     return nullptr;
 }
 
-XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualDirectory::Enum location)
+XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode)
 {
     core::Path<wchar_t> real_path;
 
@@ -442,7 +442,7 @@ XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode, VirtualD
         findData.getOSPath(real_path, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, location, real_path);
+        createOSPath(gameDir_, path, real_path);
     }
 
     if (isDebug()) {
@@ -712,10 +712,8 @@ void xFileSys::findClose2(uintptr_t handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::deleteFile(pathType path) const
 {
-    X_UNUSED(location);
-
     Path<wchar_t> buf;
     createOSPath(gameDir_, path, buf);
 
@@ -801,10 +799,9 @@ bool xFileSys::deleteDirectoryContents(pathType path)
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::createDirectory(pathType path) const
 {
     X_ASSERT_NOT_NULL(path);
-    X_UNUSED(location);
 
     Path<wchar_t> buf;
     createOSPath(gameDir_, path, buf);
@@ -818,10 +815,9 @@ bool xFileSys::createDirectory(pathType path, VirtualDirectory::Enum location) c
     return PathUtil::CreateDirectory(buf);
 }
 
-bool xFileSys::createDirectory(pathTypeW path, VirtualDirectory::Enum location) const
+bool xFileSys::createDirectory(pathTypeW path) const
 {
     X_ASSERT_NOT_NULL(path);
-    X_UNUSED(location);
 
     Path<wchar_t> buf;
     createOSPath(gameDir_, path, buf);
@@ -835,10 +831,9 @@ bool xFileSys::createDirectory(pathTypeW path, VirtualDirectory::Enum location) 
     return PathUtil::CreateDirectory(buf);
 }
 
-bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum location) const
+bool xFileSys::createDirectoryTree(pathType _path) const
 {
     X_ASSERT_NOT_NULL(_path);
-    X_UNUSED(location);
 
     // we want to just loop and create like a goat.
     Path<wchar_t> buf;
@@ -853,10 +848,9 @@ bool xFileSys::createDirectoryTree(pathType _path, VirtualDirectory::Enum locati
     return PathUtil::CreateDirectoryTree(buf);
 }
 
-bool xFileSys::createDirectoryTree(pathTypeW _path, VirtualDirectory::Enum location) const
+bool xFileSys::createDirectoryTree(pathTypeW _path) const
 {
     X_ASSERT_NOT_NULL(_path);
-    X_UNUSED(location);
 
     // we want to just loop and create like a goat.
     Path<wchar_t> buf;
@@ -873,50 +867,50 @@ bool xFileSys::createDirectoryTree(pathTypeW _path, VirtualDirectory::Enum locat
 
 // --------------------- exsists ---------------------
 
-bool xFileSys::fileExists(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::fileExists(pathType path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return fileExistsOS(buf);
 }
 
-bool xFileSys::fileExists(pathTypeW path, VirtualDirectory::Enum location) const
+bool xFileSys::fileExists(pathTypeW path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return fileExistsOS(buf);
 }
 
-bool xFileSys::directoryExists(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::directoryExists(pathType path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return directoryExistsOS(buf);
 }
 
-bool xFileSys::directoryExists(pathTypeW path, VirtualDirectory::Enum location) const
+bool xFileSys::directoryExists(pathTypeW path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return directoryExistsOS(buf);
 }
 
-bool xFileSys::isDirectory(pathType path, VirtualDirectory::Enum location) const
+bool xFileSys::isDirectory(pathType path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return isDirectoryOS(buf);
 }
 
-bool xFileSys::isDirectory(pathTypeW path, VirtualDirectory::Enum location) const
+bool xFileSys::isDirectory(pathTypeW path) const
 {
     Path<wchar_t> buf;
-    createOSPath(gameDir_, path, location, buf);
+    createOSPath(gameDir_, path, buf);
 
     return isDirectoryOS(buf);
 }
@@ -1060,30 +1054,6 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 // --------------------------------------------------
 
 // Ajust path
-
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path,
-    VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
-{
-    if (location != VirtualDirectory::GAME) {
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-
-    wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
-    strUtil::Convert(path, pathW, sizeof(pathW));
-
-    return createOSPath(dir, pathW, buffer);
-}
-
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path,
-    VirtualDirectory::Enum location, Path<wchar_t>& buffer) const
-{
-    if (location != VirtualDirectory::GAME) {
-        X_ASSERT_NOT_IMPLEMENTED();
-    }
-
-    return createOSPath(dir, path, buffer);
-}
-
 const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, Path<wchar_t>& buffer) const
 {
     wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
@@ -1753,7 +1723,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
     return Thread::ReturnValue(0);
 }
 
-OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, VirtualDirectory::Enum location)
+OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode)
 {
     core::Path<wchar_t> real_path;
 
@@ -1770,7 +1740,7 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode, Virtua
         findData.getOSPath(real_path, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, location, real_path);
+        createOSPath(gameDir_, path, real_path);
     }
 
     if (isDebug()) {
