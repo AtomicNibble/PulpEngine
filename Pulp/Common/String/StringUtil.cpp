@@ -275,6 +275,38 @@ namespace strUtil
         return output;
     }
 
+    const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes, size_t& lengthOut)
+    {
+        if (!outputBytes) {
+            return output;
+        }
+
+        const int32_t srcLenChars = safe_static_cast<int32_t>(endExclusive - startInclusive);
+        const int32_t bytesWritten = WideCharToMultiByte(
+            CP_UTF8,
+            0,
+            startInclusive,
+            srcLenChars,
+            output,
+            safe_static_cast<int32_t>(outputBytes - 1), // space for nullterm.
+            nullptr,
+            nullptr
+        );
+
+        if (bytesWritten == 0)
+        {
+            // error
+            lengthOut = 0;
+        }
+        else
+        {
+            lengthOut = bytesWritten;
+        }
+
+        output[lengthOut] = '\0';
+        return output;
+    }
+
     const wchar_t* Convert(const char* input, wchar_t* output, size_t outputBytes)
     {
         if (!outputBytes) {
@@ -285,6 +317,36 @@ namespace strUtil
 
         size_t convertedChars = 0;
         mbstowcs_s(&convertedChars, output, outputBytes / 2, input, _TRUNCATE);
+        return output;
+    }
+
+    const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t* output, size_t outputBytes, size_t& lengthOut)
+    {
+        if (!outputBytes) {
+            return output;
+        }
+
+        const int32_t srcLenBytes = safe_static_cast<int32_t>(endExclusive - startInclusive);
+        const int32_t charsWritten = MultiByteToWideChar(
+            CP_UTF8, 
+            0, 
+            startInclusive, 
+            srcLenBytes, 
+            output, 
+            safe_static_cast<int32_t>((outputBytes - 1) / sizeof(wchar_t)) // space for nullterm.
+        );
+
+        if (charsWritten == 0)
+        {
+            // error
+            lengthOut = 0;
+        }
+        else
+        {
+            lengthOut = charsWritten;
+        }
+
+        output[lengthOut] = L'\0';
         return output;
     }
 
