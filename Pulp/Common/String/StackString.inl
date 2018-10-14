@@ -144,10 +144,12 @@ StackString<N, TChar>::StackString(const float f) :
 
     size_t l = sprintf_s(text, "%f", f);
 
-    while (l > 0 && text[l - 1] == '0')
+    while (l > 0 && text[l - 1] == '0') {
         text[--l] = '\0';
-    while (l > 0 && text[l - 1] == '.')
+    }
+    while (l > 0 && text[l - 1] == '.') {
         text[--l] = '\0';
+    }
 
     strcpy_s(str_, text);
     len_ = l;
