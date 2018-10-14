@@ -71,7 +71,7 @@ namespace strUtil
     /// Converts a wide-character string into a single-byte character string, and returns the converted string.
     const char* Convert(const wchar_t* input, char* output, size_t outputBytes);
 
-    /// Converts a wide-character string into a single-byte character string, and returns the converted string.
+    /// Converts a single-byte string into a wide-character string, and returns the converted string.
     const wchar_t* Convert(const char* input, wchar_t* output, size_t outputBytes);
 
     /// Returns the number of occurrences of a character in a string in the given range.
