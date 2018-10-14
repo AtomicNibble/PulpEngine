@@ -245,12 +245,10 @@ public:
 
     // async
     XFileAsync* openFileAsync(pathType path, FileFlags mode) X_FINAL;
-    XFileAsync* openFileAsync(pathTypeW path, FileFlags mode) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
     XFileMem* openFileMem(pathType path, FileFlags mode) X_FINAL;
-    XFileMem* openFileMem(pathTypeW path, FileFlags mode) X_FINAL;
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders

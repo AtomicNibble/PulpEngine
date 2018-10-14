@@ -414,39 +414,6 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
     return nullptr;
 }
 
-XFileAsync* xFileSys::openFileAsync(pathTypeW path, FileFlags mode)
-{
-    PathWT real_path;
-
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
-        FindData findinfo;
-        XFindData findData(path, this);
-
-        if (!findData.findnext(findinfo)) {
-            FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
-            return nullptr;
-        }
-
-        findData.getOSPath(real_path, findinfo);
-    }
-    else {
-        createOSPath(gameDir_, path, real_path);
-    }
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
-    }
-
-    XDiskFileAsync* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(real_path, mode, &asyncOpPoolArena_);
-    if (pFile->valid()) {
-        return pFile;
-    }
-
-    closeFileAsync(pFile);
-    return nullptr;
-}
-
 void xFileSys::closeFileAsync(XFileAsync* file)
 {
     X_ASSERT_NOT_NULL(file);
@@ -495,45 +462,6 @@ XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
     return pFile;
 }
 
-XFileMem* xFileSys::openFileMem(pathTypeW path, FileFlags mode)
-{
-    if (mode.IsSet(FileFlag::WRITE)) {
-        X_ERROR("FileSys", "can't open a memory file for writing.");
-        return nullptr;
-    }
-
-    FindData findinfo;
-    XFindData findData(path, this);
-    if (!findData.findnext(findinfo)) {
-        FileFlags::Description Dsc;
-        X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
-        return nullptr;
-    }
-
-    PathWT real_path;
-    findData.getOSPath(real_path, findinfo);
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
-    }
-
-    OsFile file(real_path, mode);
-    if (!file.valid()) {
-        return nullptr;
-    }
-
-    size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-    char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-    if (file.read(pBuf, size) != size) {
-        X_DELETE_ARRAY(pBuf, &memFileArena_);
-        return nullptr;
-    }
-
-    XFileMem* pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-
-    return pFile;
-}
 
 void xFileSys::closeFileMem(XFileMem* file)
 {

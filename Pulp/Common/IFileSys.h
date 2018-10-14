@@ -716,12 +716,10 @@ struct IFileSys
 
     // async
     virtual XFileAsync* openFileAsync(pathType path, FileFlags mode) X_ABSTRACT;
-    virtual XFileAsync* openFileAsync(pathTypeW path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
     // loads the whole file into memory.
     virtual XFileMem* openFileMem(pathType path, FileFlags mode) X_ABSTRACT;
-    virtual XFileMem* openFileMem(pathTypeW path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
