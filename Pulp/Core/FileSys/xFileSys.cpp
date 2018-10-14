@@ -276,15 +276,10 @@ bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFileOS(const PathWT& path, FileFlags mode)
+XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
 {
-    // This is only for opening a a absolute path really.
-    PathWT osPath;
-
-    createOSPath(gameDir_, path, osPath);
-
     if (isDebug()) {
-        X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
+        X_LOG0("FileSys", "openFileOS: \"%ls\"", osPath.c_str());
     }
 
     XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(osPath, mode);

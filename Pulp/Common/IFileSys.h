@@ -708,7 +708,7 @@ struct IFileSys
     virtual bool addModDir(const PathWT& path) X_ABSTRACT;
 
     // Open Files
-    virtual XFile* openFileOS(const PathWT& path, FileFlags mode) X_ABSTRACT;
+    virtual XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_ABSTRACT;
     virtual XFile* openFile(const PathT& relPath, FileFlags mode) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 

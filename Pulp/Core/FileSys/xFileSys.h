@@ -239,7 +239,7 @@ public:
     bool getWorkingDirectory(PathWT& pathOut) const X_FINAL;
 
     // Open / Close
-    XFile* openFileOS(const PathWT& path, FileFlags mode) X_FINAL;
+    XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_FINAL;
     XFile* openFile(const PathT& relPath, FileFlags mode) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
