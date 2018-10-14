@@ -349,6 +349,9 @@
     <ClCompile Include="UT_C_FixedByteStreamRing.cpp">
       <Filter>Source Files\tests\Containers</Filter>
     </ClCompile>
+    <ClCompile Include="UT_FileSys.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">

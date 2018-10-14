@@ -565,6 +565,7 @@
     <ClCompile Include="UT_Fiber.cpp" />
     <ClCompile Include="UT_FiberScheduler.cpp" />
     <ClCompile Include="UT_C_FixedByteStream.cpp" />
+    <ClCompile Include="UT_FileSys.cpp" />
     <ClCompile Include="UT_FixedThreadQueue.cpp" />
     <ClCompile Include="UT_Function.cpp" />
     <ClCompile Include="UT_F_ReadWrite.cpp" />

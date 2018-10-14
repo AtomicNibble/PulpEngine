@@ -33,7 +33,7 @@ namespace
     static uint32_t TEST_MAGIC = 0xF00DDEAD;
 } // namespace
 
-TEST(FileSys, Write)
+TEST(DISABLED_FileSys, Write)
 {
     ASSERT_TRUE(NULL != gEnv->pFileSys);
     IFileSys* pFileSys = gEnv->pFileSys;
@@ -54,7 +54,7 @@ TEST(FileSys, Write)
     }
 }
 
-TEST(FileSys, Append)
+TEST(DISABLED_FileSys, Append)
 {
     ASSERT_TRUE(NULL != gEnv->pFileSys);
     IFileSys* pFileSys = gEnv->pFileSys;
@@ -75,7 +75,7 @@ TEST(FileSys, Append)
     }
 }
 
-TEST(FileSys, Read)
+TEST(DISABLED_FileSys, Read)
 {
     ASSERT_TRUE(NULL != gEnv->pFileSys);
     IFileSys* pFileSys = gEnv->pFileSys;
@@ -99,7 +99,7 @@ TEST(FileSys, Read)
     pFileSys->closeFile(file);
 }
 
-TEST(FileSys, Async)
+TEST(DISABLED_FileSys, Async)
 {
     ASSERT_TRUE(NULL != gEnv->pFileSys);
     IFileSys* pFileSys = gEnv->pFileSys;
@@ -162,7 +162,7 @@ TEST(DISABLED_FileSys, Find)
     EXPECT_GT(num, 0);
 }
 
-TEST(FileSys, FileUtil)
+TEST(DISABLED_FileSys, FileUtil)
 {
     ASSERT_TRUE(NULL != gEnv->pFileSys);
     IFileSys* pFileSys = gEnv->pFileSys;
