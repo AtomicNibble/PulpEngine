@@ -240,6 +240,55 @@ TEST(Path, ConstructConvertW)
     }
 }
 
+TEST(Path, SetConvert)
+{
+    const core::StackString<32, wchar_t> wideStr(L"meow");
+    {
+        core::Path<char> path("hello");
+        EXPECT_STREQ("hello", path.c_str());
+
+        path.set(wideStr.begin(), wideStr.end());
+        EXPECT_STREQ("meow", path.c_str());
+    }
+}
+
+TEST(Path, SetConvertW)
+{
+    const core::StackString<32, char> narrowStr("meow");
+    {
+        core::Path<wchar_t> path(L"hello");
+        EXPECT_STREQ(L"hello", path.c_str());
+
+        path.set(narrowStr.begin(), narrowStr.end());
+        EXPECT_STREQ(L"meow", path.c_str());
+    }
+}
+
+TEST(Path, AppendConvert)
+{
+    const core::StackString<32, wchar_t> wideStr(L"meow");
+    {
+        core::Path<char> path("hello");
+        EXPECT_STREQ("hello", path.c_str());
+
+        path.append(wideStr.begin(), wideStr.end());
+        EXPECT_STREQ("hellomeow", path.c_str());
+    }
+}
+
+TEST(Path, AppendConvertW)
+{
+    const core::StackString<32, char> narrowStr("meow");
+    {
+        core::Path<wchar_t> path(L"hello");
+        EXPECT_STREQ(L"hello", path.c_str());
+
+        path.append(narrowStr.begin(), narrowStr.end());
+        EXPECT_STREQ(L"hellomeow", path.c_str());
+    }
+}
+
+
 TEST(Path, isAbsolute)
 {
     {
