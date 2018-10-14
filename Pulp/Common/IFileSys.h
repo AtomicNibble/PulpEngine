@@ -687,8 +687,6 @@ struct IFileSys
     typedef SeekMode SeekMode;
     typedef core::Path<char> PathT;
     typedef core::Path<wchar_t> PathWT;
-    typedef const char* pathType;
-    typedef const wchar_t* pathTypeW;
     typedef FindData FindData;
 
     static const uintptr_t INVALID_HANDLE = (uintptr_t)-1;

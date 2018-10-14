@@ -73,7 +73,7 @@ bool XFindData::searchDir(Directory* dir, FindData& fi)
         Path<wchar_t> temp;
 
         core::zero_object(fdw);
-        pFileSys_->createOSPath(dir, path_.c_str(), temp);
+        pFileSys_->createOSPath(dir, path_, temp);
 
         // we have:
         // C:\\Users\\Tom\\Documents\\Visual Studio 2013\\Projects\\WinEngine\\code\\game_folder\\

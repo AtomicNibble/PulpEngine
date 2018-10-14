@@ -929,19 +929,6 @@ bool xFileSys::moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) con
 // --------------------------------------------------
 
 // Ajust path
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, PathWT& buffer) const
-{
-    wchar_t pathW[PathWT::BUF_SIZE];
-    strUtil::Convert(path, pathW, sizeof(pathW));
-
-    return createOSPath(dir, pathW, buffer);
-}
-
-const wchar_t* xFileSys::createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const
-{
-    return createOSPath(dir, PathWT(path), buffer);
-}
-
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const
 {
     return createOSPath(dir, PathWT(path), buffer);

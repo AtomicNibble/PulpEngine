@@ -343,8 +343,6 @@ private:
     bool moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const;
 
     // Ajust path
-    const wchar_t* createOSPath(const Directory* dir, pathType path, PathWT& buffer) const;
-    const wchar_t* createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const;
 
