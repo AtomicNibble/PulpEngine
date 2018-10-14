@@ -342,11 +342,6 @@ private:
     bool isDirectoryOS(const PathWT& fullPath) const;
     bool moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const;
 
-    bool fileExistsOS(const wchar_t* pFullPath) const;
-    bool directoryExistsOS(const wchar_t* pFullPath) const;
-    bool isDirectoryOS(const wchar_t* pFullPath) const;
-    bool moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew) const;
-
     // Ajust path
     const wchar_t* createOSPath(const Directory* dir, pathType path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, pathTypeW path, PathWT& buffer) const;
