@@ -924,7 +924,7 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
     core::XFileScoped file;
 
     if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
-        X_ERROR("Model", "Failed to create directory for output file.");
+        X_ERROR("Model", "Failed to create directory for output file");
         return false;
     }
 
