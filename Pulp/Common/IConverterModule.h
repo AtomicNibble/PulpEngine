@@ -85,7 +85,7 @@ struct IConverter
 {
     typedef core::Array<uint8_t> DataArr;
     typedef core::string ConvertArgs;
-    typedef core::Path<char> OutPath;
+    typedef core::Path<char> OutPath; // these are relative so ascii only.
 
     virtual ~IConverter() = default;
 

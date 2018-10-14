@@ -22,8 +22,6 @@ const char* FontLib::getOutExtension(void) const
 
 bool FontLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, const OutPath& destPath)
 {
-    X_UNUSED(host, assetId, args, destPath);
-
     // load trueTypeFont from assetDB.
     core::Array<uint8_t> fileData(host.getScratchArena());
     if (!host.GetAssetData(assetId, fileData)) {
