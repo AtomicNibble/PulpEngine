@@ -211,7 +211,7 @@ MStatus ModelExporter::convert(const MArgList& args)
         if (exportMode_ == ExpoMode::RAW) {
             PROFILE_MAYA_NAME("Save Raw");
 
-            core::Path<char> outPath = getFilePath();
+            core::Path<wchar_t> outPath = getFilePath();
             {
                 MayaUtil::MayaPrintMsg("Exporting to: '%s'", outPath.c_str());
                 MayaUtil::MayaPrintMsg(""); // new line
@@ -219,7 +219,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
             MayaUtil::SetProgressText("Saving raw model");
 
-            if (!SaveRawModel(outPath)) {
+            if (!SaveRawModelOS(outPath)) {
                 MayaUtil::MayaPrintError("Failed to save raw model");
                 return MS::kFailure;
             }
@@ -234,7 +234,7 @@ MStatus ModelExporter::convert(const MArgList& args)
             }
 
             int32_t assetId, modId;
-            status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::MODEL, MString(getName()), &assetId, &modId);
+            status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::MODEL, getName(), &assetId, &modId);
             if (!status) {
                 X_ERROR("Model", "Failed to get meta from server");
                 return status;
@@ -288,7 +288,7 @@ MStatus ModelExporter::convert(const MArgList& args)
 
                 // send to asset server.
                 status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::MODEL,
-                    MString(getName()),
+                    getName(),
                     compressed);
 
                 if (!status) {
@@ -348,35 +348,33 @@ void ModelExporter::printStats(void) const
 
 void ModelExporter::setFileName(const MString& path)
 {
-    core::StackString512 temp(path.asChar());
+    core::Path<wchar_t> temp(path.asWChar());
     temp.trim();
-    // we don't replace seperators on the name as asset names
-    // have a fixed slash, regardless of native slash of the platform.
-    // so we replace slashes only when building file paths.
-
-    name_ = temp.c_str();
-    fileName_.set(temp.c_str());
-    fileName_.setExtension(model::MODEL_FILE_EXTENSION);
+    
+    name_ = MString(temp.data(), safe_static_cast<int32_t>(temp.length()));
+    
+    fileName_ = temp;
+    fileName_.setExtension(model::MODEL_FILE_EXTENSION_W);
 }
 
 void ModelExporter::setOutdir(const MString& path)
 {
-    core::StackString<512, char> temp(path.asChar());
+    core::StackStringW512 temp(path.asWChar());
     temp.trim();
 
     outDir_.set(temp.c_str());
     outDir_.replaceSeprators();
 }
 
-core::Path<char> ModelExporter::getFilePath(void) const
+core::Path<wchar_t> ModelExporter::getFilePath(void) const
 {
-    core::Path<char> path(outDir_);
+    core::Path<wchar_t> path(outDir_);
     path /= fileName_;
     path.replaceSeprators();
     return path;
 }
 
-const core::string& ModelExporter::getName(void) const
+const MString& ModelExporter::getName(void) const
 {
     return name_;
 }

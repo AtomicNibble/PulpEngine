@@ -88,14 +88,15 @@ namespace RawModel
         return unitOfMeasure_;
     }
 
-    bool Model::LoadRawModel(core::Path<char>& path)
+    bool Model::LoadRawModel(const core::Path<char>& path)
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
         Clear();
 
-        path.setExtension(model::MODEL_RAW_FILE_EXTENSION);
+        core::Path<char> filePath(path);
+        filePath.setExtension(model::MODEL_RAW_FILE_EXTENSION);
 
         core::FileFlags mode;
         mode.Set(core::FileFlag::SHARE);
@@ -103,8 +104,8 @@ namespace RawModel
 
         core::XFileScoped file;
 
-        if (!file.openFile(path, mode)) {
-            X_ERROR("RawModel", "Failed to open raw model file: \"%s\"", path.c_str());
+        if (!file.openFile(filePath, mode)) {
+            X_ERROR("RawModel", "Failed to open raw model file: \"%s\"", filePath.c_str());
             return false;
         }
 
@@ -642,47 +643,87 @@ namespace RawModel
         return true;
     }
 
-    bool Model::SaveRawModel(core::Path<char>& path)
+    bool Model::SaveRawModelOS(const core::Path<wchar_t>& osPath)
+    {
+        core::Path<wchar_t> filePath(osPath);
+        filePath.setExtension(model::MODEL_RAW_FILE_EXTENSION_W);
+
+        core::XFileScoped file;
+        core::FileFlags mode;
+        mode.Set(core::FileFlag::RECREATE);
+        mode.Set(core::FileFlag::WRITE);
+        mode.Set(core::FileFlag::SHARE);
+
+        if (!gEnv->pFileSys->createDirectoryTree(filePath)) {
+            X_ERROR("RawModel", "Failed to create export directory");
+        }
+
+        if (!file.openFileOS(filePath, mode)) {
+            X_ERROR("RawModel", "Failed to open file for rawmodel");
+            return false;
+        }
+
+        if (!SaveRawModel(file.GetFile())) {
+            X_ERROR("RawModel", "Failed to save data");
+            return false;
+        }
+
+        return true;
+    }
+
+    bool Model::SaveRawModel(const core::Path<char>& path)
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        path.setExtension(model::MODEL_RAW_FILE_EXTENSION);
+        core::Path<char> filePath(path);
+        filePath.setExtension(model::MODEL_RAW_FILE_EXTENSION);
 
-        {
-            core::XFileScoped file;
-            core::FileFlags mode;
-            mode.Set(core::FileFlag::RECREATE);
-            mode.Set(core::FileFlag::WRITE);
-            mode.Set(core::FileFlag::SHARE);
+        core::XFileScoped file;
+        core::FileFlags mode;
+        mode.Set(core::FileFlag::RECREATE);
+        mode.Set(core::FileFlag::WRITE);
+        mode.Set(core::FileFlag::SHARE);
 
-            if (!gEnv->pFileSys->createDirectoryTree(path)) {
-                X_ERROR("RawModel", "Failed to create export directory");
-            }
+        if (!gEnv->pFileSys->createDirectoryTree(path)) {
+            X_ERROR("RawModel", "Failed to create export directory");
+        }
 
-            if (!file.openFile(path, mode)) {
-                X_ERROR("RawModel", "Failed to open file for rawmodel");
-                return false;
-            }
+        if (!file.openFile(filePath, mode)) {
+            X_ERROR("RawModel", "Failed to open file for rawmodel");
+            return false;
+        }
 
-            ModelDataStrArr dataArr(arena_);
-            if (!SaveRawModel_Int(dataArr)) {
-                return false;
-            }
-
-            for (auto& buf : dataArr) {
-                if (file.write(buf->c_str(), buf->length()) != buf->length()) {
-                    X_ERROR("RawModel", "Failed to write rawmodel header");
-                    break;
-                }
-            }
-
-            for (auto& buf : dataArr) {
-                X_DELETE(buf, arena_);
-            }
+        if (!SaveRawModel(file.GetFile())) {
+            X_ERROR("RawModel", "Failed to save data");
+            return false;
         }
 
         return true;
+    }
+
+    bool Model::SaveRawModel(core::XFile* pFile)
+    {
+        ModelDataStrArr dataArr(arena_);
+        if (!SaveRawModel_Int(dataArr)) {
+            return false;
+        }
+
+        bool ok = true;
+
+        for (auto& buf : dataArr) {
+            if (pFile->write(buf->c_str(), buf->length()) != buf->length()) {
+                X_ERROR("RawModel", "Failed to write rawmodel data");
+                ok = false;
+                break;
+            }
+        }
+
+        for (auto& buf : dataArr) {
+            X_DELETE(buf, arena_);
+        }
+
+        return ok;
     }
 
     bool Model::SaveRawModel(core::Array<uint8_t>& data)
