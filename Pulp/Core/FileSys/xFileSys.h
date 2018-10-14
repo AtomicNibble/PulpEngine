@@ -257,7 +257,7 @@ public:
 
     // Find util
     uintptr_t findFirst(const PathT& path, FindData& findinfo) X_FINAL;
-    uintptr_t findFirst(const PathWT& path, FindData& findinfo) X_FINAL;
+    uintptr_t findFirstOS(const PathWT& osPath, FindData& findinfo) X_FINAL;
     bool findnext(uintptr_t handle, FindData& findinfo) X_FINAL;
     void findClose(uintptr_t handle) X_FINAL;
 

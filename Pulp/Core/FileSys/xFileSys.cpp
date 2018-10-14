@@ -588,23 +588,15 @@ uintptr_t xFileSys::findFirst(const PathT& path, FindData& findinfo)
     // 3. <insert idea here>
     //
 
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    uintptr_t handle = PathUtil::findFirst(buf.c_str(), findinfo);
-
-    // TODO: just have one const?
-    static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
-
-    return handle;
+    return findFirstOS(osPath, findinfo);
 }
 
-uintptr_t xFileSys::findFirst(const PathWT& path, FindData& findinfo)
+uintptr_t xFileSys::findFirstOS(const PathWT& osPath, FindData& findinfo)
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
-
-    uintptr_t handle = PathUtil::findFirst(buf.c_str(), findinfo);
+    uintptr_t handle = PathUtil::findFirst(osPath.c_str(), findinfo);
 
     static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
 
