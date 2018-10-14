@@ -80,7 +80,7 @@ X_INLINE bool assetTypeFromStr(const char* pBegin, const char* pEnd, AssetType::
 
     static_assert(AssetType::ENUM_COUNT == 22, "More asset types :[] ? this code need updating.");
 
-    switch (core::Hash::Fnv1aHash(tmp.c_str(), tmp.length())) {
+    switch (core::Hash::Fnv1aHash(tmp.data(), tmp.length())) {
         case "model"_fnv1a:
             type = AssetType::MODEL;
             break;
