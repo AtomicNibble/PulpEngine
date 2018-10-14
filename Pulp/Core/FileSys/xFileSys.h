@@ -236,7 +236,7 @@ public:
 
     bool initDirectorys(bool workingDir);
 
-    core::Path<wchar_t> getWorkingDirectory(void) const X_FINAL;
+    bool getWorkingDirectory(core::Path<wchar_t>& pathOut) const X_FINAL;
 
     // Open / Close
     XFile* openFile(pathType path, fileModeFlags mode) X_FINAL;

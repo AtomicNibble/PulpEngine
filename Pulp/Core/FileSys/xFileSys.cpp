@@ -235,21 +235,23 @@ bool xFileSys::initDirectorys(bool working)
 {
     loadPacks_ = !working; // TODO: work out somethign better? basically only want packs in game and maybe some tools?
 
+    core::Path<wchar_t> workingDir;
+    if (!PathUtil::GetCurrentDirectory(workingDir)) {
+        return false;
+    }
+
     if (working) {
         // working dir added.
-        core::Path<wchar_t> path = PathUtil::GetCurrentDirectory();
-        return setGameDir(path.c_str());
+        return setGameDir(workingDir.c_str());
     }
     else {
         
-        core::Path<wchar_t> curDir = PathUtil::GetCurrentDirectory();
-
         const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
         if (pGameDir) {
-            curDir = pGameDir;
+            workingDir = pGameDir;
         }
 
-        core::Path<wchar_t> base(curDir);
+        core::Path<wchar_t> base(workingDir);
         base.ensureSlash();
 
         core::Path<wchar_t> core(base);
@@ -267,9 +269,9 @@ bool xFileSys::initDirectorys(bool working)
     return false;
 }
 
-core::Path<wchar_t> xFileSys::getWorkingDirectory(void) const
+bool xFileSys::getWorkingDirectory(core::Path<wchar_t>& pathOut) const
 {
-    return PathUtil::GetCurrentDirectory();
+    return PathUtil::GetCurrentDirectory(pathOut);
 }
 
 // --------------------- Open / Close ---------------------

@@ -444,7 +444,10 @@ void AssetServer::ConverterInfo(const ProtoBuf::AssetDB::ConverterInfoReqest& mo
     ProtoBuf::AssetDB::ConverterInfoResponse response;
 
     // TODO: utf-8 encode this?
-    auto workingDir = gEnv->pFileSys->getWorkingDirectory();
+    core::Path<wchar_t> workingDir;
+    if (!gEnv->pFileSys->getWorkingDirectory(workingDir)) {
+        // TODO:
+    }
     core::Path<char> narrowPath(workingDir);
 
     response.set_result(ProtoBuf::AssetDB::Result::OK);

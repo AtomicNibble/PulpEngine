@@ -26,21 +26,19 @@ namespace PathUtil
 
     } // namespace
 
-    Path GetCurrentDirectory(void)
+    bool GetCurrentDirectory(Path& pathOut)
     {
         WCHAR workingDir[Path::BUF_SIZE] = {0};
-        Path dir;
 
         if (!GetCurrentDirectoryW(sizeof(workingDir), workingDir)) {
             core::lastError::Description Dsc;
             X_ERROR("FileSys", "GetCurrentDirectory failed. Error: %s", lastError::ToString(Dsc));
-        }
-        else {
-            dir = Path(workingDir);
-            dir.ensureSlash();
+            return false;
         }
 
-        return dir;
+        pathOut.set(workingDir);
+        pathOut.ensureSlash();
+        return true;
     }
 
     // ------------------------------------------------

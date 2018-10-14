@@ -21,7 +21,7 @@ namespace PathUtil
 
     typedef core::Path<wchar_t> Path;
 
-    Path GetCurrentDirectory(void);
+    bool GetCurrentDirectory(Path& pathOut);
 
     bool GetFullPath(const Path& filePath, Path& pathOut);
     bool GetFullPath(const wchar_t* pFilePath, Path& pathOut);
