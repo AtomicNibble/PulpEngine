@@ -16,26 +16,26 @@ namespace Util
 
         boxOut.clear();
 
-        if (file.openFile(path, mode)) {
-            ModelHeader hdr;
-
-            if (file.readObj(hdr) != sizeof(hdr)) {
-                X_ERROR("Model", "Failed to read model header");
-                return false;
-            }
-
-            if (!hdr.isValid()) {
-                X_ERROR("Model", "model hdr is not valid. provided version: %i required: %i",
-                    hdr.version, model::MODEL_VERSION);
-                return false;
-            }
-
-            boxOut = hdr.boundingBox;
-            return true;
+        if (!file.openFile(path, mode)) {
+            X_ERROR("Model", "Failed to open model file for reading.");
+            return false;
         }
 
-        X_ERROR("Model", "Failed to open model file for reading.");
-        return false;
+        ModelHeader hdr;
+
+        if (file.readObj(hdr) != sizeof(hdr)) {
+            X_ERROR("Model", "Failed to read model header");
+            return false;
+        }
+
+        if (!hdr.isValid()) {
+            X_ERROR("Model", "model hdr is not valid. provided version: %i required: %i",
+                hdr.version, model::MODEL_VERSION);
+            return false;
+        }
+
+        boxOut = hdr.boundingBox;
+        return true;
     }
 
 } // namespace Util
