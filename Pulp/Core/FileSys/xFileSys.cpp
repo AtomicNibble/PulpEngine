@@ -235,7 +235,7 @@ bool xFileSys::initDirectorys(bool working)
 {
     loadPacks_ = !working; // TODO: work out somethign better? basically only want packs in game and maybe some tools?
 
-    core::Path<wchar_t> workingDir;
+    PathWT workingDir;
     if (!PathUtil::GetCurrentDirectory(workingDir)) {
         return false;
     }
@@ -251,13 +251,13 @@ bool xFileSys::initDirectorys(bool working)
             workingDir = pGameDir;
         }
 
-        core::Path<wchar_t> base(workingDir);
+        PathWT base(workingDir);
         base.ensureSlash();
 
-        core::Path<wchar_t> core(base);
+        PathWT core(base);
         core /= L"core_assets\\";
 
-        core::Path<wchar_t> testAssets(base);
+        PathWT testAssets(base);
         testAssets /= L"test_assets\\";
 
         if (setGameDir(core)) {
@@ -269,7 +269,7 @@ bool xFileSys::initDirectorys(bool working)
     return false;
 }
 
-bool xFileSys::getWorkingDirectory(core::Path<wchar_t>& pathOut) const
+bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 {
     return PathUtil::GetCurrentDirectory(pathOut);
 }
@@ -278,7 +278,7 @@ bool xFileSys::getWorkingDirectory(core::Path<wchar_t>& pathOut) const
 
 XFile* xFileSys::openFile(pathType path, FileFlags mode)
 {
-    core::Path<wchar_t> real_path;
+    PathWT real_path;
     
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
@@ -312,7 +312,7 @@ XFile* xFileSys::openFile(pathType path, FileFlags mode)
 XFile* xFileSys::openFile(const PathWT& path, FileFlags mode)
 {
     // This is only for opening a a absolute path really.
-    core::Path<wchar_t> osPath;
+    PathWT osPath;
 
     createOSPath(gameDir_, path, osPath);
 
@@ -340,7 +340,7 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
 {
-    core::Path<wchar_t> fullPath;
+    PathWT fullPath;
 
     // so this needs to handle opening both disk files from the virtual dir's
     // or opening files from a pak.
@@ -416,7 +416,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
 
 XFileAsync* xFileSys::openFileAsync(pathTypeW path, FileFlags mode)
 {
-    core::Path<wchar_t> real_path;
+    PathWT real_path;
 
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
@@ -470,7 +470,7 @@ XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
         return nullptr;
     }
 
-    core::Path<wchar_t> real_path;
+    PathWT real_path;
     findData.getOSPath(real_path, findinfo);
 
     if (isDebug()) {
@@ -510,7 +510,7 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, FileFlags mode)
         return nullptr;
     }
 
-    core::Path<wchar_t> real_path;
+    PathWT real_path;
     findData.getOSPath(real_path, findinfo);
 
     if (isDebug()) {
@@ -550,7 +550,7 @@ bool xFileSys::setGameDir(const PathWT& path)
 
     // check if the irectory is even valid.
     if (!directoryExistsOS(path)) {
-        core::Path<wchar_t> fullPath;
+        PathWT fullPath;
         PathUtil::GetFullPath(path, fullPath);
         X_ERROR("FileSys", "Faled to set game directory, path does not exsists: \"%ls\"", fullPath.c_str());
         return false;
@@ -582,7 +582,7 @@ bool xFileSys::addDirInteral(const PathWT& path, bool isGame)
     }
 
     // ok remove any ..//
-    core::Path<wchar_t> fixedPath;
+    PathWT fixedPath;
     if (!PathUtil::GetFullPath(path, fixedPath)) {
         X_ERROR("FileSys", "addModDir full path name creation failed");
         return false;
@@ -750,7 +750,7 @@ bool xFileSys::deleteDirectoryContents(pathType path)
 
     // we build a relative search path.
     // as findFirst works on game dir's
-    core::Path<wchar_t> searchPath(buf);
+    PathWT searchPath(buf);
     searchPath.ensureSlash();
     searchPath.append(L"*");
 
@@ -760,7 +760,7 @@ bool xFileSys::deleteDirectoryContents(pathType path)
         do {
 
             // build a OS Path.
-            core::Path<wchar_t> dirItem(buf);
+            PathWT dirItem(buf);
             dirItem.ensureSlash();
             dirItem.append(fd.name.begin(), fd.name.end());
 
@@ -974,17 +974,17 @@ size_t xFileSys::getMinimumSectorSize(void) const
 
 // --------------------------------------------------
 
-bool xFileSys::fileExistsOS(const core::Path<wchar_t>& fullPath) const
+bool xFileSys::fileExistsOS(const PathWT& fullPath) const
 {
     return core::PathUtil::DoesFileExist(fullPath);
 }
 
-bool xFileSys::directoryExistsOS(const core::Path<wchar_t>& fullPath) const
+bool xFileSys::directoryExistsOS(const PathWT& fullPath) const
 {
     return core::PathUtil::DoesDirectoryExist(fullPath);
 }
 
-bool xFileSys::isDirectoryOS(const core::Path<wchar_t>& fullPath) const
+bool xFileSys::isDirectoryOS(const PathWT& fullPath) const
 {
     bool result = core::PathUtil::IsDirectory(fullPath);
 
@@ -996,7 +996,7 @@ bool xFileSys::isDirectoryOS(const core::Path<wchar_t>& fullPath) const
     return result;
 }
 
-bool xFileSys::moveFileOS(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew) const
+bool xFileSys::moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const
 {
     bool result = core::PathUtil::MoveFile(fullPath, fullPathNew);
 
@@ -1047,7 +1047,7 @@ bool xFileSys::moveFileOS(const wchar_t* pFullPath, const wchar_t* pFullPathNew)
 // Ajust path
 const wchar_t* xFileSys::createOSPath(const Directory* dir, pathType path, PathWT& buffer) const
 {
-    wchar_t pathW[core::Path<wchar_t>::BUF_SIZE];
+    wchar_t pathW[PathWT::BUF_SIZE];
     strUtil::Convert(path, pathW, sizeof(pathW));
 
     return createOSPath(dir, pathW, buffer);
@@ -1735,7 +1735,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
 {
-    core::Path<wchar_t> real_path;
+    PathWT real_path;
 
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;

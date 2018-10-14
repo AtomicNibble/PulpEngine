@@ -236,7 +236,7 @@ public:
 
     bool initDirectorys(bool workingDir);
 
-    bool getWorkingDirectory(core::Path<wchar_t>& pathOut) const X_FINAL;
+    bool getWorkingDirectory(PathWT& pathOut) const X_FINAL;
 
     // Open / Close
     XFile* openFile(pathType path, FileFlags mode) X_FINAL;
@@ -339,10 +339,10 @@ private:
     bool openPak(const char* pName);
 
 private:
-    bool fileExistsOS(const core::Path<wchar_t>& fullPath) const;
-    bool directoryExistsOS(const core::Path<wchar_t>& fullPath) const;
-    bool isDirectoryOS(const core::Path<wchar_t>& fullPath) const;
-    bool moveFileOS(const core::Path<wchar_t>& fullPath, const core::Path<wchar_t>& fullPathNew) const;
+    bool fileExistsOS(const PathWT& fullPath) const;
+    bool directoryExistsOS(const PathWT& fullPath) const;
+    bool isDirectoryOS(const PathWT& fullPath) const;
+    bool moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const;
 
     bool fileExistsOS(const wchar_t* pFullPath) const;
     bool directoryExistsOS(const wchar_t* pFullPath) const;
