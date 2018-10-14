@@ -255,13 +255,13 @@ public:
 
     // folders
     bool setGameDir(const PathT& path) X_FINAL;
-    void addModDir(const PathT& path) X_FINAL;
+    bool addModDir(const PathT& path) X_FINAL;
 
     // Find util
-    uintptr_t findFirst2(pathType path, FindData& findinfo) X_FINAL;
-    uintptr_t findFirst2(pathTypeW path, FindData& findinfo) X_FINAL;
-    bool findnext2(uintptr_t handle, FindData& findinfo) X_FINAL;
-    void findClose2(uintptr_t handle) X_FINAL;
+    uintptr_t findFirst(pathType path, FindData& findinfo) X_FINAL;
+    uintptr_t findFirst(pathTypeW path, FindData& findinfo) X_FINAL;
+    bool findnext(uintptr_t handle, FindData& findinfo) X_FINAL;
+    void findClose(uintptr_t handle) X_FINAL;
 
     // Delete
     bool deleteFile(pathType path) const X_FINAL;

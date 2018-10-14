@@ -147,16 +147,16 @@ TEST(DISABLED_FileSys, Find)
 
     int num = 0;
     IFileSys::FindData fd;
-    uintptr_t handle = pFileSys->findFirst2("models/*.model", fd);
+    uintptr_t handle = pFileSys->findFirst("models/*.model", fd);
     if (handle != IFileSys::INVALID_HANDLE) {
         do {
             EXPECT_TRUE(fd.name.find(L".model") != nullptr);
 
             X_LOG0("findresult", "name: \"%ls\"", fd.name.c_str());
             num++;
-        } while (pFileSys->findnext2(handle, fd));
+        } while (pFileSys->findnext(handle, fd));
 
-        pFileSys->findClose2(handle);
+        pFileSys->findClose(handle);
     }
 
     EXPECT_GT(num, 0);

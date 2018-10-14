@@ -206,7 +206,7 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
     dirSearch.append("*");
 
     core::IFileSys::FindData fd;
-    auto handle = pFileSys->findFirst2(dirSearch.c_str(), fd);
+    auto handle = pFileSys->findFirst(dirSearch.c_str(), fd);
 
     if (handle == core::IFileSys::INVALID_HANDLE) {
         return false;
@@ -248,9 +248,9 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
 
         ++numAdded;
 
-    } while (pFileSys->findnext2(handle, fd));
+    } while (pFileSys->findnext(handle, fd));
 
-    pFileSys->findClose2(handle);
+    pFileSys->findClose(handle);
     return true;
 }
 

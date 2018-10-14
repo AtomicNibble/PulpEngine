@@ -569,15 +569,17 @@ bool xFileSys::setGameDir(const PathT& path)
         return false;
     }
 
-    addDirInteral(path, true);
+    if (!addDirInteral(path, true)) {
+        return false;
+    }
 
     X_ASSERT_NOT_NULL(gameDir_);
     return true;
 }
 
-void xFileSys::addModDir(const PathT& path)
+bool xFileSys::addModDir(const PathT& path)
 {
-    addDirInteral(path, false);
+    return addDirInteral(path, false);
 }
 
 
@@ -666,7 +668,7 @@ bool xFileSys::addDirInteral(const PathT& path, bool isGame)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst2(pathType path, FindData& findinfo)
+uintptr_t xFileSys::findFirst(pathType path, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
     // so this is start of new version but i dunno how i want it to work yet.
@@ -688,7 +690,7 @@ uintptr_t xFileSys::findFirst2(pathType path, FindData& findinfo)
     return handle;
 }
 
-uintptr_t xFileSys::findFirst2(pathTypeW path, FindData& findinfo)
+uintptr_t xFileSys::findFirst(pathTypeW path, FindData& findinfo)
 {
     Path<wchar_t> buf;
     createOSPath(gameDir_, path, buf);
@@ -700,14 +702,14 @@ uintptr_t xFileSys::findFirst2(pathTypeW path, FindData& findinfo)
     return handle;
 }
 
-bool xFileSys::findnext2(uintptr_t handle, FindData& findinfo)
+bool xFileSys::findnext(uintptr_t handle, FindData& findinfo)
 {
     X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
 
     return PathUtil::findNext(handle, findinfo);
 }
 
-void xFileSys::findClose2(uintptr_t handle)
+void xFileSys::findClose(uintptr_t handle)
 {
     if (handle != PathUtil::INVALID_FIND_HANDLE) {
         PathUtil::findClose(handle);

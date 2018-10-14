@@ -705,7 +705,7 @@ struct IFileSys
     // folders - there is only one game dirtory.
     // but other folders can be added with 'addModDir' to add to the virtual directory.
     virtual bool setGameDir(const PathT& path) X_ABSTRACT;
-    virtual void addModDir(const PathT& path) X_ABSTRACT;
+    virtual bool addModDir(const PathT& path) X_ABSTRACT;
 
     // Open Files
     virtual XFile* openFile(pathType path, fileModeFlags mode) X_ABSTRACT;
@@ -723,10 +723,10 @@ struct IFileSys
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
-    virtual uintptr_t findFirst2(pathType path, FindData& findinfo) X_ABSTRACT;
-    virtual uintptr_t findFirst2(pathTypeW path, FindData& findinfo) X_ABSTRACT;
-    virtual bool findnext2(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
-    virtual void findClose2(uintptr_t handle) X_ABSTRACT;
+    virtual uintptr_t findFirst(pathType path, FindData& findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst(pathTypeW path, FindData& findinfo) X_ABSTRACT;
+    virtual bool findnext(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
+    virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
     // Delete
     virtual bool deleteFile(pathType path) const X_ABSTRACT;
@@ -1157,20 +1157,20 @@ public:
     X_INLINE ~FindFirstScoped()
     {
         if (handle_ != core::IFileSys::INVALID_HANDLE) {
-            pFileSys_->findClose2(handle_);
+            pFileSys_->findClose(handle_);
         }
     }
 
     X_INLINE bool findfirst(const char* pPath)
     {
-        handle_ = pFileSys_->findFirst2(pPath, fd_);
+        handle_ = pFileSys_->findFirst(pPath, fd_);
         return handle_ != core::IFileSys::INVALID_HANDLE;
     }
 
     X_INLINE bool findNext(void)
     {
         X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")();
-        return pFileSys_->findnext2(handle_, fd_);
+        return pFileSys_->findnext(handle_, fd_);
     }
 
     X_INLINE core::IFileSys::FindData& fileData(void)
