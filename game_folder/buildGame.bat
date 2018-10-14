@@ -4,7 +4,7 @@ REM build the assets..
 
 SEt WWISE_BIN=C:\Program Files (x86)\Audiokinetic\Wwise v2015.1.5 build 5533\Authoring\x64\Release\bin
 
-set GAME_BIN_PATH=..\..\build\x64\Super
+set GAME_BIN_PATH=..\..\build\x64\Debug
 set REL_PATH="../../build/x64/Release Dynamic"
 set ABS_PATH=
 
@@ -22,9 +22,9 @@ REM build levels...
 "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
 REM Base packs
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init +nopause +mod core +al asset_lists/init.assList +memory
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init +nocompress +nopause +mod core +al asset_lists/init.assList +memory
 REM level packs
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nopause +mod core +lvl test01
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nocompress +mod core +lvl test01
 
 REM build sound packs...
 "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
