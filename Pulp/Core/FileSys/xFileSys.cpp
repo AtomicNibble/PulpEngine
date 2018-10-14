@@ -278,7 +278,7 @@ bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 
 XFile* xFileSys::openFile(pathType path, FileFlags mode)
 {
-    PathWT real_path;
+    PathWT osPath;
     
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
@@ -290,17 +290,17 @@ XFile* xFileSys::openFile(pathType path, FileFlags mode)
             return nullptr;
         }
 
-        findData.getOSPath(real_path, findinfo);
+        findData.getOSPath(osPath, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, real_path);
+        createOSPath(gameDir_, path, osPath);
     }
 
     if (isDebug()) {
-        X_LOG0("FileSys", "openFile: \"%ls\"", real_path.c_str());
+        X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
     }
 
-    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(real_path, mode);
+    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(osPath, mode);
     if (pFile->valid()) {
         return pFile;
     }
@@ -340,7 +340,7 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
 {
-    PathWT fullPath;
+    PathWT osPath;
 
     // so this needs to handle opening both disk files from the virtual dir's
     // or opening files from a pak.
@@ -363,14 +363,14 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
             if (pSearch->pDir) {
                 const auto* pDir = pSearch->pDir;
 
-                createOSPath(pDir, path, fullPath);
+                createOSPath(pDir, path, osPath);
 
-                if (PathUtil::DoesFileExist(fullPath, true)) {
+                if (PathUtil::DoesFileExist(osPath, true)) {
                     if (isDebug()) {
-                        X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
+                        X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
                     }
 
-                    pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath, mode, &asyncOpPoolArena_);
+                    pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
                     break;
                 }
             }
@@ -397,13 +397,13 @@ XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
         }
     }
     else {
-        createOSPath(gameDir_, path, fullPath);
+        createOSPath(gameDir_, path, osPath);
 
         if (isDebug()) {
-            X_LOG0("FileSys", "openFileAsync: \"%ls\"", fullPath.c_str());
+            X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
         }
 
-        pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(fullPath, mode, &asyncOpPoolArena_);
+        pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
     }
 
     if (pFile->valid()) {
@@ -437,14 +437,14 @@ XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
         return nullptr;
     }
 
-    PathWT real_path;
-    findData.getOSPath(real_path, findinfo);
+    PathWT osPath;
+    findData.getOSPath(osPath, findinfo);
 
     if (isDebug()) {
-        X_LOG0("FileSys", "openFileMem: \"%ls\"", real_path.c_str());
+        X_LOG0("FileSys", "openFileMem: \"%ls\"", osPath.c_str());
     }
 
-    OsFile file(real_path, mode);
+    OsFile file(osPath, mode);
     if (!file.valid()) {
         return nullptr;
     }
@@ -635,50 +635,50 @@ void xFileSys::findClose(uintptr_t handle)
 
 bool xFileSys::deleteFile(pathType path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
     if (isDebug()) {
-        X_LOG0("FileSys", "deleteFile: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "deleteFile: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::DeleteFile(buf);
+    return PathUtil::DeleteFile(osPath);
 }
 
 bool xFileSys::deleteDirectory(pathType path, bool recursive) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    if (buf.fillSpaceWithNullTerm() < 1) {
+    if (osPath.fillSpaceWithNullTerm() < 1) {
         X_ERROR("FileSys", "Failed to pad puffer for OS operation");
         return false;
     }
 
     if (isDebug()) {
-        X_LOG0("FileSys", "deleteDirectory: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "deleteDirectory: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::DeleteDirectory(buf, recursive);
+    return PathUtil::DeleteDirectory(osPath, recursive);
 }
 
 bool xFileSys::deleteDirectoryContents(pathType path)
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
     if (isDebug()) {
         X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path);
     }
 
     // check if the dir exsists.
-    if (!directoryExistsOS(buf)) {
+    if (!directoryExistsOS(osPath)) {
         return false;
     }
 
     // we build a relative search path.
     // as findFirst works on game dir's
-    PathWT searchPath(buf);
+    PathWT searchPath(osPath);
     searchPath.ensureSlash();
     searchPath.append(L"*");
 
@@ -688,7 +688,7 @@ bool xFileSys::deleteDirectoryContents(pathType path)
         do {
 
             // build a OS Path.
-            PathWT dirItem(buf);
+            PathWT dirItem(osPath);
             dirItem.ensureSlash();
             dirItem.append(fd.name.begin(), fd.name.end());
 
@@ -722,32 +722,32 @@ bool xFileSys::createDirectory(pathType path) const
 {
     X_ASSERT_NOT_NULL(path);
 
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    buf.removeFileName();
+    osPath.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "createDirectory: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::CreateDirectory(buf);
+    return PathUtil::CreateDirectory(osPath);
 }
 
 bool xFileSys::createDirectory(pathTypeW path) const
 {
     X_ASSERT_NOT_NULL(path);
 
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    buf.removeFileName();
+    osPath.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "createDirectory: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "createDirectory: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::CreateDirectory(buf);
+    return PathUtil::CreateDirectory(osPath);
 }
 
 bool xFileSys::createDirectoryTree(pathType _path) const
@@ -755,16 +755,16 @@ bool xFileSys::createDirectoryTree(pathType _path) const
     X_ASSERT_NOT_NULL(_path);
 
     // we want to just loop and create like a goat.
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, _path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, _path, osPath);
 
-    buf.removeFileName();
+    osPath.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::CreateDirectoryTree(buf);
+    return PathUtil::CreateDirectoryTree(osPath);
 }
 
 bool xFileSys::createDirectoryTree(pathTypeW _path) const
@@ -772,86 +772,86 @@ bool xFileSys::createDirectoryTree(pathTypeW _path) const
     X_ASSERT_NOT_NULL(_path);
 
     // we want to just loop and create like a goat.
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, _path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, _path, osPath);
 
-    buf.removeFileName();
+    osPath.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", buf.c_str());
+        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", osPath.c_str());
     }
 
-    return PathUtil::CreateDirectoryTree(buf);
+    return PathUtil::CreateDirectoryTree(osPath);
 }
 
 // --------------------- exsists ---------------------
 
 bool xFileSys::fileExists(pathType path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return fileExistsOS(buf);
+    return fileExistsOS(osPath);
 }
 
 bool xFileSys::fileExists(pathTypeW path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return fileExistsOS(buf);
+    return fileExistsOS(osPath);
 }
 
 bool xFileSys::directoryExists(pathType path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return directoryExistsOS(buf);
+    return directoryExistsOS(osPath);
 }
 
 bool xFileSys::directoryExists(pathTypeW path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return directoryExistsOS(buf);
+    return directoryExistsOS(osPath);
 }
 
 bool xFileSys::isDirectory(pathType path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return isDirectoryOS(buf);
+    return isDirectoryOS(osPath);
 }
 
 bool xFileSys::isDirectory(pathTypeW path) const
 {
-    Path<wchar_t> buf;
-    createOSPath(gameDir_, path, buf);
+    Path<wchar_t> osPath;
+    createOSPath(gameDir_, path, osPath);
 
-    return isDirectoryOS(buf);
+    return isDirectoryOS(osPath);
 }
 
 bool xFileSys::moveFile(pathType path, pathType newPath) const
 {
-    Path<wchar_t> pathOs, newPathOs;
+    Path<wchar_t> osPath, osPathNew;
 
-    createOSPath(gameDir_, path, pathOs);
-    createOSPath(gameDir_, newPath, newPathOs);
+    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, newPath, osPathNew);
 
-    return moveFileOS(pathOs, newPathOs);
+    return moveFileOS(osPath, osPathNew);
 }
 
 bool xFileSys::moveFile(pathTypeW path, pathTypeW newPath) const
 {
-    Path<wchar_t> pathOs, newPathOs;
+    Path<wchar_t> osPath, osPathNew;
 
-    createOSPath(gameDir_, path, pathOs);
-    createOSPath(gameDir_, newPath, newPathOs);
+    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, newPath, osPathNew);
 
-    return moveFileOS(pathOs, newPathOs);
+    return moveFileOS(osPath, osPathNew);
 }
 
 size_t xFileSys::getMinimumSectorSize(void) const
@@ -1663,7 +1663,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
 OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
 {
-    PathWT real_path;
+    PathWT osPath;
 
     if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
@@ -1675,17 +1675,17 @@ OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
             return nullptr;
         }
 
-        findData.getOSPath(real_path, findinfo);
+        findData.getOSPath(osPath, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, real_path);
+        createOSPath(gameDir_, path, osPath);
     }
 
     if (isDebug()) {
-        X_LOG0("FileSys", "openFileAsync: \"%ls\"", real_path.c_str());
+        X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
     }
 
-    OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(real_path, mode, &asyncOpPoolArena_);
+    OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
     if (pFile->valid()) {
         return pFile;
     }
