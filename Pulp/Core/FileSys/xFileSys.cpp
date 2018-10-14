@@ -961,16 +961,6 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathWT& path, 
     return buffer.c_str();
 }
 
-bool xFileSys::isAbsolute(pathType path) const
-{
-    return path[0] == NATIVE_SLASH || path[0] == NON_NATIVE_SLASH || path[1] == ':';
-}
-
-bool xFileSys::isAbsolute(pathTypeW path) const
-{
-    return path[0] == NATIVE_SLASH_W || path[0] == NON_NATIVE_SLASH_W || path[1] == L':';
-}
-
 bool xFileSys::isAbsolute(const PathT& path) const
 {
     return path.isAbsolute();

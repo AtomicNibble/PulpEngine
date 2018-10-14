@@ -348,8 +348,6 @@ private:
     const wchar_t* createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const;
 
-    bool isAbsolute(pathType path) const;
-    bool isAbsolute(pathTypeW path) const;
     bool isAbsolute(const PathT& path) const;
     bool isAbsolute(const PathWT& path) const;
 
