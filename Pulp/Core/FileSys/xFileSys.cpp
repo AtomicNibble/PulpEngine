@@ -468,19 +468,19 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 // --------------------- folders ---------------------
 
-bool xFileSys::setGameDir(const PathWT& path)
+bool xFileSys::setGameDir(const PathWT& osPath)
 {
-    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path.c_str(), gameDir_);
+    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), gameDir_);
 
     // check if the irectory is even valid.
-    if (!directoryExistsOS(path)) {
+    if (!directoryExistsOS(osPath)) {
         PathWT fullPath;
-        PathUtil::GetFullPath(path, fullPath);
+        PathUtil::GetFullPath(osPath, fullPath);
         X_ERROR("FileSys", "Faled to set game directory, path does not exsists: \"%ls\"", fullPath.c_str());
         return false;
     }
 
-    if (!addDirInteral(path, true)) {
+    if (!addDirInteral(osPath, true)) {
         return false;
     }
 
@@ -488,26 +488,26 @@ bool xFileSys::setGameDir(const PathWT& path)
     return true;
 }
 
-bool xFileSys::addModDir(const PathWT& path)
+bool xFileSys::addModDir(const PathWT& osPath)
 {
-    return addDirInteral(path, false);
+    return addDirInteral(osPath, false);
 }
 
 
-bool xFileSys::addDirInteral(const PathWT& path, bool isGame)
+bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
 {
     if (isDebug()) {
-        X_LOG0("FileSys", "addModDir: \"%ls\"", path);
+        X_LOG0("FileSys", "addModDir: \"%ls\"", osPath.c_str());
     }
 
-    if (!directoryExistsOS(path)) {
-        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", path.c_str());
+    if (!directoryExistsOS(osPath)) {
+        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
         return false;
     }
 
     // ok remove any ..//
     PathWT fixedPath;
-    if (!PathUtil::GetFullPath(path, fixedPath)) {
+    if (!PathUtil::GetFullPath(osPath, fixedPath)) {
         X_ERROR("FileSys", "addModDir full path name creation failed");
         return false;
     }

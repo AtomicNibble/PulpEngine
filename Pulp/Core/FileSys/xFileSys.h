@@ -252,8 +252,8 @@ public:
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders
-    bool setGameDir(const PathWT& path) X_FINAL;
-    bool addModDir(const PathWT& path) X_FINAL;
+    bool setGameDir(const PathWT& osPath) X_FINAL;
+    bool addModDir(const PathWT& osPath) X_FINAL;
 
     // Find util
     uintptr_t findFirst(const PathT& path, FindData& findinfo) X_FINAL;

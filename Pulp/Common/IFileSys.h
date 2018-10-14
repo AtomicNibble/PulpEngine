@@ -704,8 +704,8 @@ struct IFileSys
 
     // folders - there is only one game dirtory.
     // but other folders can be added with 'addModDir' to add to the virtual directory.
-    virtual bool setGameDir(const PathWT& path) X_ABSTRACT;
-    virtual bool addModDir(const PathWT& path) X_ABSTRACT;
+    virtual bool setGameDir(const PathWT& osPath) X_ABSTRACT;
+    virtual bool addModDir(const PathWT& osPath) X_ABSTRACT;
 
     // Open Files
     virtual XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_ABSTRACT;
