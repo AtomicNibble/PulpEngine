@@ -45,6 +45,14 @@ public:
 
     Path(const TChar* const beginInclusive, const TChar* const endExclusive);
 
+    using BaseType::set;
+    template<typename TCharOth>
+    inline void set(const TCharOth* const beginInclusive, const TCharOth* const endExclusive);
+
+    using BaseType::append;
+    template<typename TCharOth>
+    inline void append(const TCharOth* const beginInclusive, const TCharOth* const endExclusive);
+
     inline const TChar* fileName(void) const;
     inline const TChar* extension(bool incDot = true) const;
 

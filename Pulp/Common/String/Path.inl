@@ -55,6 +55,45 @@ Path<TChar>::Path(const TChar* const beginInclusive, const TChar* const endExclu
 {
 }
 
+template<>
+template<>
+inline void Path<char>::set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
+{
+    len_ = safe_static_cast<size_t>(endExclusive - beginInclusive);
+    strUtil::Convert(beginInclusive, str_, BaseType::capacity());
+    str_[len_] = L'\0';
+}
+
+template<>
+template<>
+inline void Path<wchar_t>::set(const char* const beginInclusive, const char* const endExclusive)
+{
+    len_ = safe_static_cast<size_t>(endExclusive - beginInclusive);
+    strUtil::Convert(beginInclusive, str_, BaseType::capacity());
+    str_[len_] = L'\0';
+}
+
+template<>
+template<>
+inline void Path<char>::append(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
+{
+    auto len = safe_static_cast<size_t>(endExclusive - beginInclusive);
+    strUtil::Convert(beginInclusive, &str_[len_], BaseType::freeSpace());
+    len_ += len;
+    str_[len_] = L'\0';
+}
+
+template<>
+template<>
+inline void Path<wchar_t>::append(const char* const beginInclusive, const char* const endExclusive)
+{
+    auto len = safe_static_cast<size_t>(endExclusive - beginInclusive);
+    strUtil::Convert(beginInclusive, &str_[len_], BaseType::freeSpace());
+    len_ += len;
+    str_[len_] = L'\0';
+}
+
+
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
