@@ -131,7 +131,7 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
         auto filePath = getFilePath();
         MayaUtil::MayaPrintMsg("Exporting to: '%s'", filePath.c_str());
 
-        if (!save(filePath)) {
+        if (!saveOS(filePath)) {
             MayaUtil::MayaPrintError("Failed to save file: %s", filePath.c_str());
             return MS::kFailure;
         }

@@ -270,8 +270,8 @@ public:
 
     bool getDependencies(core::Array<AssetDep>& dependencies) const;
 
-    bool saveModel(const core::Path<char>& outFile);
-    bool saveModel(const core::Path<wchar_t>& outFile);
+    bool saveModel(const core::Path<char>& path);
+    bool saveModelOS(const core::Path<wchar_t>& osPath);
     bool saveModel(core::XFile* pFile);
 private:
 

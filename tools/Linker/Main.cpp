@@ -201,7 +201,7 @@ namespace
                 }
             }
 
-            if (!linker.dumpMeta(inputFile)) {
+            if (!linker.dumpMetaOS(inputFile)) {
                 X_ERROR("Linker", "Failed to dump meta");
                 return false;
             }

@@ -691,7 +691,7 @@ bool AssetPakBuilder::hasAsset(AssetId id) const
 }
 
 
-bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
+bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
 {
     core::XFileScoped file;
     core::FileFlags mode;
@@ -699,7 +699,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
     mode.Set(core::FileFlag::READ);
     mode.Set(core::FileFlag::RANDOM_ACCESS);
 
-    if (!file.openFileOS(pakPath, mode)) {
+    if (!file.openFileOS(osPath, mode)) {
         X_ERROR("AssetPak", "Failed to open file for saving");
         return false;
     }
@@ -751,7 +751,7 @@ bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
     APakFlags::Description flagStr;
     X_LOG0("AssetPak", "^9PakMeta");
     X_LOG_BULLET;
-    X_LOG0("AssetPak", "Pak: \"%ls\" version: ^6%" PRIu8, pakPath.fileName(), hdr.version);
+    X_LOG0("AssetPak", "Pak: \"%ls\" version: ^6%" PRIu8, osPath.fileName(), hdr.version);
     X_LOG0("AssetPak", "flags: \"%s\"", hdr.flags.ToString(flagStr));
     X_LOG0("AssetPak", "Size: ^6%s (%" PRIu64 ") ^7RawAssetSize: ^6%s (%" PRIu64 ") ^6%%%.2f",
         core::HumanSize::toString(sizeStr, hdr.size), hdr.size,

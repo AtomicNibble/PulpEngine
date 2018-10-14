@@ -29,7 +29,7 @@ public:
     LINKERLIB_EXPORT void PrintBanner(void);
     LINKERLIB_EXPORT bool Init(void);
 
-    LINKERLIB_EXPORT bool dumpMeta(core::Path<wchar_t>& inputFile);
+    LINKERLIB_EXPORT bool dumpMetaOS(core::Path<wchar_t>& osPath);
 
     LINKERLIB_EXPORT bool Build(BuildOptions& options);
 

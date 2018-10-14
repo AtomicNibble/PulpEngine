@@ -906,10 +906,10 @@ bool ModelCompiler::getDependencies(core::Array<AssetDep>& dependencies) const
     return true;
 }
 
-bool ModelCompiler::saveModel(const core::Path<char>& outFile)
+bool ModelCompiler::saveModel(const core::Path<char>& path)
 {
-    core::Path<char> path(outFile);
-    path.setExtension(model::MODEL_FILE_EXTENSION);
+    core::Path<char> filePath(path);
+    filePath.setExtension(model::MODEL_FILE_EXTENSION);
 
     core::XFileScoped file;
     if (!gEnv->pFileSys->createDirectoryTree(path)) {
@@ -917,7 +917,7 @@ bool ModelCompiler::saveModel(const core::Path<char>& outFile)
         return false;
     }
 
-    if (!file.openFile(path, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+    if (!file.openFile(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
         X_ERROR("Model", "Failed to open compile output file");
         return false;
     }
@@ -925,9 +925,9 @@ bool ModelCompiler::saveModel(const core::Path<char>& outFile)
     return saveModel(file.GetFile());
 }
 
-bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
+bool ModelCompiler::saveModelOS(const core::Path<wchar_t>& osPath)
 {
-    core::Path<wchar_t> path(outFile);
+    core::Path<wchar_t> path(osPath);
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
     core::XFileScoped file;

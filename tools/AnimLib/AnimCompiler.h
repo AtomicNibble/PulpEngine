@@ -177,7 +177,7 @@ public:
     bool compile(const float posError = DEFAULT_POS_ERRR, const float angError = DEFAULT_ANGLE_ERRR);
 
     bool save(const core::Path<char>& path);
-    bool save(const core::Path<wchar_t>& path);
+    bool saveOS(const core::Path<wchar_t>& osPath);
     bool save(core::XFile* pFile);
 
 private:

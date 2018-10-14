@@ -29,18 +29,12 @@ namespace Inter
     {
     }
 
-    bool Anim::load(const core::Path<wchar_t>& path)
+    bool Anim::loadOS(const core::Path<wchar_t>& osPath)
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        // swap a woggle watch it toggle!
-        if (path.isEmpty()) {
-            X_ERROR("Anim", "invalid path");
-            return false;
-        }
-
-        core::Path<wchar_t> filePath(path);
+        core::Path<wchar_t> filePath(osPath);
         filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
 
         core::FileFlags mode;
@@ -87,12 +81,12 @@ namespace Inter
         return ParseData(lex);
     }
 
-    bool Anim::save(const core::Path<wchar_t>& path) const
+    bool Anim::saveOS(const core::Path<wchar_t>& osPath) const
     {
         X_ASSERT_NOT_NULL(gEnv);
         X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-        core::Path<wchar_t> filePath(path);
+        core::Path<wchar_t> filePath(osPath);
         filePath.setExtension(ANIM_INTER_FILE_EXTENSION_W);
 
         {
@@ -102,7 +96,7 @@ namespace Inter
             mode.Set(core::FileFlag::WRITE);
             mode.Set(core::FileFlag::SHARE);
 
-            if (!gEnv->pFileSys->createDirectoryTree(path)) {
+            if (!gEnv->pFileSys->createDirectoryTree(osPath)) {
                 X_ERROR("Anim", "Failed to create export directory");
             }
 

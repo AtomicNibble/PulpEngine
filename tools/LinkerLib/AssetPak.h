@@ -79,7 +79,7 @@ public:
 
     void setFlags(PakBuilderFlags flags);
 
-    bool dumpMeta(core::Path<wchar_t>& pakPath);
+    bool dumpMetaOS(core::Path<wchar_t>& osPath);
 
     bool process(void);
     bool save(const core::Path<char>& path);

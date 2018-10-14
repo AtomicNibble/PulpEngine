@@ -41,9 +41,9 @@ bool Linker::Init(void)
     return true;
 }
 
-bool Linker::dumpMeta(core::Path<wchar_t>& inputFile)
+bool Linker::dumpMetaOS(core::Path<wchar_t>& osPath)
 {
-    return builder_.dumpMeta(inputFile);
+    return builder_.dumpMetaOS(osPath);
 }
 
 bool Linker::Build(BuildOptions& options)

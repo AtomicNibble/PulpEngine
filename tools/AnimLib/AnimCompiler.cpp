@@ -898,11 +898,11 @@ bool AnimCompiler::save(const core::Path<char>& path)
 }
 
 
-bool AnimCompiler::save(const core::Path<wchar_t>& path)
+bool AnimCompiler::saveOS(const core::Path<wchar_t>& osPath)
 {
     X_ASSERT_NOT_NULL(gEnv->pFileSys);
 
-    core::Path<wchar_t> fullPath(path);
+    core::Path<wchar_t> fullPath(osPath);
     fullPath.setExtension(anim::ANIM_FILE_EXTENSION_W);
 
     core::FileFlags mode;
