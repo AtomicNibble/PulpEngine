@@ -67,16 +67,16 @@ private:
 
 public:
     explicit XDirectoryWatcher(core::MemoryArenaBase* arena);
-    ~XDirectoryWatcher(void);
+    ~XDirectoryWatcher(void) X_FINAL;
 
     void init(void);
     void shutDown(void);
 
-    void addDirectory(const core::Path<char>& directory) X_OVERRIDE;
-    void addDirectory(const core::Path<wchar_t>& directory) X_OVERRIDE;
+    void addDirectory(const core::Path<char>& directory) X_FINAL;
+    void addDirectory(const core::Path<wchar_t>& directory) X_FINAL;
 
-    void registerListener(IDirectoryWatcherListener* pListener) X_OVERRIDE;
-    void unregisterListener(IDirectoryWatcherListener* pListener) X_OVERRIDE;
+    void registerListener(IDirectoryWatcherListener* pListener) X_FINAL;
+    void unregisterListener(IDirectoryWatcherListener* pListener) X_FINAL;
 
     void tick(void);
 
