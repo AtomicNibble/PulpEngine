@@ -159,7 +159,7 @@ namespace techset
     bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
     {
         core::XFileScoped file;
-        core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
+        core::FileFlags mode = core::FileFlag::READ | core::FileFlag::SHARE;
 
         core::Path<char> fullPath;
         fullPath.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));

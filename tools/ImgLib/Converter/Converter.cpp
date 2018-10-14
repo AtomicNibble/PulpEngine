@@ -117,9 +117,9 @@ namespace Converter
 
     bool ImgConveter::saveImg(const core::Path<char>& outPath, CompileFlags flags, ImgFileFormat::Enum dstFileFmt)
     {
-        core::fileModeFlags mode;
-        mode.Set(core::fileMode::WRITE);
-        mode.Set(core::fileMode::RECREATE);
+        core::FileFlags mode;
+        mode.Set(core::FileFlag::WRITE);
+        mode.Set(core::FileFlag::RECREATE);
 
         core::XFileScoped file;
         if (!file.openFile(outPath.c_str(), mode)) {

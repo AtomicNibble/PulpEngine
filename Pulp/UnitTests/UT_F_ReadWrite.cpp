@@ -41,7 +41,7 @@ TEST(DISABLED_FileSys, Write)
     IFileSys* pFileSys = gEnv->pFileSys;
 
     XFile* file = pFileSys->openFile(X_ENGINE_NAME "_filesys_ut_data.ut_dat",
-        fileMode::WRITE | fileMode::RECREATE);
+        FileFlag::WRITE | FileFlag::RECREATE);
 
     ASSERT_TRUE(NULL != file);
     if (file) {
@@ -62,7 +62,7 @@ TEST(DISABLED_FileSys, Append)
     IFileSys* pFileSys = gEnv->pFileSys;
 
     XFile* file = pFileSys->openFile(X_ENGINE_NAME "_filesys_ut_data.ut_dat",
-        fileMode::WRITE | fileMode::APPEND);
+        FileFlag::WRITE | FileFlag::APPEND);
 
     ASSERT_TRUE(NULL != file);
     if (file) {
@@ -83,7 +83,7 @@ TEST(DISABLED_FileSys, Read)
     IFileSys* pFileSys = gEnv->pFileSys;
 
     XFile* file = pFileSys->openFile(X_ENGINE_NAME "_filesys_ut_data.ut_dat",
-        fileMode::READ);
+        FileFlag::READ);
 
     ASSERT_TRUE(NULL != file);
 
@@ -107,7 +107,7 @@ TEST(DISABLED_FileSys, Async)
     IFileSys* pFileSys = gEnv->pFileSys;
 
     XFileAsync* file = pFileSys->openFileAsync(X_ENGINE_NAME "_filesys_ut_async_data.ut_dat",
-        fileMode::WRITE | fileMode::READ | fileMode::RANDOM_ACCESS | fileMode::RECREATE);
+        FileFlag::WRITE | FileFlag::READ | FileFlag::RANDOM_ACCESS | FileFlag::RECREATE);
 
     ASSERT_TRUE(NULL != file);
 

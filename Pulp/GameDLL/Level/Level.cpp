@@ -53,7 +53,7 @@ void Level::beginLoad(const MapNameStr& name)
 
     core::IoRequestOpen open;
     open.callback.Bind<Level, &Level::IoRequestCallback>(this);
-    open.mode = core::fileMode::READ | core::fileMode::SHARE;
+    open.mode = core::FileFlag::READ | core::FileFlag::SHARE;
     open.path = path_;
 
     pFileSys_->AddIoRequestToQue(open);
@@ -248,7 +248,7 @@ bool Level::processEnts(void)
     auto entDescPath = path_;
     entDescPath.setExtension("json");
 
-    if (!entFile.openFile(entDescPath.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+    if (!entFile.openFile(entDescPath.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
         return false;
     }
 

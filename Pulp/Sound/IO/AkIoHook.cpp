@@ -7,31 +7,31 @@ X_NAMESPACE_BEGIN(sound)
 
 namespace
 {
-    core::fileModeFlags AKModeToEngineMode(AkOpenMode openMode)
+    core::FileFlags AKModeToEngineMode(AkOpenMode openMode)
     {
-        core::fileModeFlags mode;
+        core::FileFlags mode;
 
         switch (openMode) {
             case AK_OpenModeRead:
-                mode.Set(core::fileMode::READ);
-                mode.Set(core::fileMode::SHARE);
-                mode.Set(core::fileMode::RANDOM_ACCESS);
+                mode.Set(core::FileFlag::READ);
+                mode.Set(core::FileFlag::SHARE);
+                mode.Set(core::FileFlag::RANDOM_ACCESS);
                 break;
             case AK_OpenModeWrite:
-                mode.Set(core::fileMode::WRITE);
-                mode.Set(core::fileMode::SHARE);
+                mode.Set(core::FileFlag::WRITE);
+                mode.Set(core::FileFlag::SHARE);
                 break;
             case AK_OpenModeWriteOvrwr:
-                mode.Set(core::fileMode::WRITE);
-                mode.Set(core::fileMode::RECREATE);
+                mode.Set(core::FileFlag::WRITE);
+                mode.Set(core::FileFlag::RECREATE);
                 break;
             case AK_OpenModeReadWrite:
-                mode.Set(core::fileMode::READ);
-                mode.Set(core::fileMode::WRITE);
+                mode.Set(core::FileFlag::READ);
+                mode.Set(core::FileFlag::WRITE);
                 break;
             default:
                 X_ASSERT_UNREACHABLE();
-                return core::fileModeFlags();
+                return core::FileFlags();
         }
 
         return mode;
@@ -114,7 +114,7 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
         // sync open
         SyncOpen = true;
 
-        core::fileModeFlags mode = AKModeToEngineMode(eOpenMode);
+        core::FileFlags mode = AKModeToEngineMode(eOpenMode);
         if (!mode.IsAnySet()) {
             return AK_InvalidParameter;
         }
@@ -160,7 +160,7 @@ AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
     if (SyncOpen || !asyncOpen_) {
         // sync open
         SyncOpen = true;
-        core::fileModeFlags mode = AKModeToEngineMode(eOpenMode);
+        core::FileFlags mode = AKModeToEngineMode(eOpenMode);
         if (!mode.IsAnySet()) {
             return AK_InvalidParameter;
         }

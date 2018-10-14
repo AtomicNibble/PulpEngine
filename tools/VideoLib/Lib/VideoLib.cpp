@@ -42,7 +42,7 @@ bool VideoLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args,
     }
 
     core::XFileScoped file;
-    core::fileModeFlags mode = core::fileMode::RECREATE | core::fileMode::WRITE;
+    core::FileFlags mode = core::FileFlag::RECREATE | core::FileFlag::WRITE;
 
     if (!file.openFile(destPath.c_str(), mode)) {
         X_ERROR("Video", "Failed to open output file");

@@ -19,7 +19,7 @@ public:
     };
 
 public:
-    OsFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode);
+    OsFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode);
     ~OsFile(void);
 
     size_t read(void* pBuffer, size_t length);
@@ -41,7 +41,7 @@ public:
 #endif // !X_ENABLE_FILE_STATS
 
 private:
-    IFileSys::fileModeFlags mode_;
+    IFileSys::FileFlags mode_;
     HANDLE file_;
 
 #if X_ENABLE_FILE_STATS

@@ -995,10 +995,10 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
     hdr.datacrc32 = gEnv->pCore->GetCrc32()->GetCRC32OfObject(hdr);
 
     core::XFileScoped file;
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::WRITE);
-    mode.Set(core::fileMode::RECREATE);
-    mode.Set(core::fileMode::RANDOM_ACCESS); // we do a seek.
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::WRITE);
+    mode.Set(core::FileFlag::RECREATE);
+    mode.Set(core::FileFlag::RANDOM_ACCESS); // we do a seek.
 
     path.setExtension(level::LVL_FILE_EXTENSION);
 

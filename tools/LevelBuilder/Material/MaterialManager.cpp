@@ -126,7 +126,7 @@ bool MatManager::loadMatFromFile(MaterialResource& mat, const core::string& name
     }
 
     core::XFileScoped file;
-    if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+    if (!file.openFile(path.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
         return false;
     }
 

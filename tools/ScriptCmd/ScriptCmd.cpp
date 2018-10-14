@@ -117,7 +117,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             if (mode == ScriptMode::RUN) {
                 core::XFileMemScoped file;
 
-                if (!file.openFile(inputPath.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+                if (!file.openFile(inputPath.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
                     X_ERROR("Script", "Failed to open file: \"%s\"", inputFile.c_str());
                     return -1;
                 }

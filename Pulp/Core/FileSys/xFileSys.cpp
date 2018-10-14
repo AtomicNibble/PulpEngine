@@ -276,16 +276,16 @@ bool xFileSys::getWorkingDirectory(core::Path<wchar_t>& pathOut) const
 
 // --------------------- Open / Close ---------------------
 
-XFile* xFileSys::openFile(pathType path, fileModeFlags mode)
+XFile* xFileSys::openFile(pathType path, FileFlags mode)
 {
     core::Path<wchar_t> real_path;
     
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
         XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
-            fileModeFlags::Description Dsc;
+            FileFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
@@ -309,16 +309,16 @@ XFile* xFileSys::openFile(pathType path, fileModeFlags mode)
     return nullptr;
 }
 
-XFile* xFileSys::openFile(pathTypeW path, fileModeFlags mode)
+XFile* xFileSys::openFile(pathTypeW path, FileFlags mode)
 {
     core::Path<wchar_t> real_path;
 
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE) && !isAbsolute(path)) {
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(path)) {
         FindData findinfo;
         XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
-            fileModeFlags::Description Dsc;
+            FileFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
@@ -351,7 +351,7 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode)
+XFileAsync* xFileSys::openFileAsync(pathType path, FileFlags mode)
 {
     core::Path<wchar_t> fullPath;
 
@@ -367,7 +367,7 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode)
     // i think the linked list layout is still appropriate, just might add a pak group node.
     XDiskFileAsync* pFile = nullptr;
 
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         // so we are going to look in the search list, till we find a file.
         // findData can't deal with files in pak's correcly, it has the wrong api.
         core::StrHash hash(path, strUtil::strlen(path));
@@ -427,16 +427,16 @@ XFileAsync* xFileSys::openFileAsync(pathType path, fileModeFlags mode)
     return nullptr;
 }
 
-XFileAsync* xFileSys::openFileAsync(pathTypeW path, fileModeFlags mode)
+XFileAsync* xFileSys::openFileAsync(pathTypeW path, FileFlags mode)
 {
     core::Path<wchar_t> real_path;
 
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
         XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
-            fileModeFlags::Description Dsc;
+            FileFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
@@ -468,9 +468,9 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 // --------------------------------------------------
 
-XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
+XFileMem* xFileSys::openFileMem(pathType path, FileFlags mode)
 {
-    if (mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(FileFlag::WRITE)) {
         X_ERROR("FileSys", "can't open a memory file for writing.");
         return nullptr;
     }
@@ -478,7 +478,7 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
     FindData findinfo;
     XFindData findData(path, this);
     if (!findData.findnext(findinfo)) {
-        fileModeFlags::Description Dsc;
+        FileFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
         return nullptr;
     }
@@ -508,9 +508,9 @@ XFileMem* xFileSys::openFileMem(pathType path, fileModeFlags mode)
     return pFile;
 }
 
-XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
+XFileMem* xFileSys::openFileMem(pathTypeW path, FileFlags mode)
 {
-    if (mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(FileFlag::WRITE)) {
         X_ERROR("FileSys", "can't open a memory file for writing.");
         return nullptr;
     }
@@ -518,7 +518,7 @@ XFileMem* xFileSys::openFileMem(pathTypeW path, fileModeFlags mode)
     FindData findinfo;
     XFindData findData(path, this);
     if (!findData.findnext(findinfo)) {
-        fileModeFlags::Description Dsc;
+        FileFlags::Description Dsc;
         X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", path, mode.ToString(Dsc));
         return nullptr;
     }
@@ -943,7 +943,7 @@ size_t xFileSys::getMinimumSectorSize(void) const
 {
     // get all the driver letters.
     size_t sectorSize = 0;
-    fileModeFlags mode(fileMode::READ);
+    FileFlags mode(FileFlag::READ);
 
     core::FixedArray<wchar_t, 128> driveLettters;
 
@@ -1613,7 +1613,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
         }
         else if (type == IoRequest::OPEN_WRITE_ALL) {
             IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
-            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path.c_str(), core::fileModeFlags::RECREATE | core::fileModeFlags::WRITE));
+            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path.c_str(), core::FileFlags::RECREATE | core::FileFlags::WRITE));
 
             X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
             X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());
@@ -1727,16 +1727,16 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
     return Thread::ReturnValue(0);
 }
 
-OsFileAsync* xFileSys::openOsFileAsync(pathType path, fileModeFlags mode)
+OsFileAsync* xFileSys::openOsFileAsync(pathType path, FileFlags mode)
 {
     core::Path<wchar_t> real_path;
 
-    if (mode.IsSet(fileMode::READ) && !mode.IsSet(fileMode::WRITE)) {
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
         FindData findinfo;
         XFindData findData(path, this);
 
         if (!findData.findnext(findinfo)) {
-            fileModeFlags::Description Dsc;
+            FileFlags::Description Dsc;
             X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
             return nullptr;
         }
@@ -1766,9 +1766,9 @@ bool xFileSys::openPak(const char* pName)
 
     // you can only open pak's from inside the virtual filesystem.
     // so file is opened as normal.
-    fileModeFlags mode;
-    mode.Set(fileMode::READ);
-    mode.Set(fileMode::RANDOM_ACCESS);
+    FileFlags mode;
+    mode.Set(FileFlag::READ);
+    mode.Set(FileFlag::RANDOM_ACCESS);
     // I'm not sharing, fuck you!
 
     auto* pFile = openOsFileAsync(pName, mode);

@@ -337,9 +337,9 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     }
 
     core::XFileScoped file;
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::RECREATE);
-    mode.Set(core::fileMode::WRITE);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::RECREATE);
+    mode.Set(core::FileFlag::WRITE);
 
     // ensure correct extension.
     core::Path<char> pathExt(path);
@@ -694,10 +694,10 @@ bool AssetPakBuilder::hasAsset(AssetId id) const
 bool AssetPakBuilder::dumpMeta(core::Path<wchar_t>& pakPath)
 {
     core::XFileScoped file;
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::SHARE);
-    mode.Set(core::fileMode::READ);
-    mode.Set(core::fileMode::RANDOM_ACCESS);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::SHARE);
+    mode.Set(core::FileFlag::READ);
+    mode.Set(core::FileFlag::RANDOM_ACCESS);
 
     if (!file.openFile(pakPath.c_str(), mode)) {
         X_ERROR("AssetPak", "Failed to open file for saving");

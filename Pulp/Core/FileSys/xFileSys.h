@@ -239,18 +239,18 @@ public:
     bool getWorkingDirectory(core::Path<wchar_t>& pathOut) const X_FINAL;
 
     // Open / Close
-    XFile* openFile(pathType path, fileModeFlags mode) X_FINAL;
-    XFile* openFile(pathTypeW path, fileModeFlags mode) X_FINAL;
+    XFile* openFile(pathType path, FileFlags mode) X_FINAL;
+    XFile* openFile(pathTypeW path, FileFlags mode) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
-    XFileAsync* openFileAsync(pathType path, fileModeFlags mode) X_FINAL;
-    XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode) X_FINAL;
+    XFileAsync* openFileAsync(pathType path, FileFlags mode) X_FINAL;
+    XFileAsync* openFileAsync(pathTypeW path, FileFlags mode) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
-    XFileMem* openFileMem(pathType path, fileModeFlags mode) X_FINAL;
-    XFileMem* openFileMem(pathTypeW path, fileModeFlags mode) X_FINAL;
+    XFileMem* openFileMem(pathType path, FileFlags mode) X_FINAL;
+    XFileMem* openFileMem(pathTypeW path, FileFlags mode) X_FINAL;
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders
@@ -334,7 +334,7 @@ private:
     // ~ThreadAbstract
 
 private:
-    OsFileAsync* openOsFileAsync(pathType path, fileModeFlags mode);
+    OsFileAsync* openOsFileAsync(pathType path, FileFlags mode);
 
     bool openPak(const char* pName);
 

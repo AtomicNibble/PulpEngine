@@ -50,10 +50,10 @@ namespace
         s_CompiletionRoutine(dwErrorCode, dwNumberOfBytesTransfered, lpOverlap);
     }
 
-    void logFileError(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode)
+    void logFileError(const core::Path<wchar_t>& path, IFileSys::FileFlags mode)
     {
         lastError::Description Dsc;
-        IFileSys::fileModeFlags::Description DscFlag;
+        IFileSys::FileFlags::Description DscFlag;
         {
             X_LOG_BULLET;
             X_ERROR("AsyncFile", "Failed to open file. Error: %s", lastError::ToString(Dsc));
@@ -65,7 +65,7 @@ namespace
 
 } // namespace
 
-OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* overlappedArena) :
+OsFileAsync::OsFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mode, core::MemoryArenaBase* overlappedArena) :
     overlappedArena_(overlappedArena),
     mode_(mode),
     hFile_(INVALID_HANDLE_VALUE)
@@ -301,8 +301,8 @@ XFileStats& OsFileAsync::fileStats(void)
 void OsFileAsync::seek(int64_t position, IFileSys::SeekMode::Enum origin)
 {
     // is this condition correct?
-    if (!mode_.IsSet(fileMode::RANDOM_ACCESS) && !mode_.IsSet(fileMode::APPEND)) {
-        IFileSys::fileModeFlags::Description Dsc;
+    if (!mode_.IsSet(FileFlag::RANDOM_ACCESS) && !mode_.IsSet(FileFlag::APPEND)) {
+        IFileSys::FileFlags::Description Dsc;
         X_ERROR("AsyncFile", "can't seek in file, requires random access. Flags: %s", mode_.ToString(Dsc));
         return;
     }

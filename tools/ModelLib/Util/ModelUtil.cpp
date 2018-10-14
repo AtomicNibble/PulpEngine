@@ -11,7 +11,7 @@ namespace Util
 {
     bool GetModelAABB(const core::Path<char>& path, AABB& boxOut)
     {
-        core::fileModeFlags mode = core::fileMode::READ | core::fileMode::SHARE;
+        core::FileFlags mode = core::FileFlag::READ | core::FileFlag::SHARE;
         core::XFileScoped file;
 
         boxOut.clear();

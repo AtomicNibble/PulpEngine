@@ -343,7 +343,7 @@ bool XFontTexture::WriteToFile(const char* filename)
         return false;
     }
 
-    if (file.openFile(path.c_str(), core::fileMode::RECREATE | core::fileMode::WRITE)) {
+    if (file.openFile(path.c_str(), core::FileFlag::RECREATE | core::FileFlag::WRITE)) {
         core::zero_object(pHeader);
         core::zero_object(pInfoHeader);
 

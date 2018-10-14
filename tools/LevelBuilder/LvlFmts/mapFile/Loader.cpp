@@ -20,7 +20,7 @@ namespace mapFile
         core::StopWatch stopwatch;
 
         core::XFileMemScoped file;
-        if (!file.openFile(path.c_str(), core::IFileSys::fileMode::READ | core::IFileSys::fileMode::SHARE)) {
+        if (!file.openFile(path.c_str(), core::IFileSys::FileFlag::READ | core::IFileSys::FileFlag::SHARE)) {
             return false;
         }
 

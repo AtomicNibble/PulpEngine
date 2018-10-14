@@ -72,9 +72,9 @@ bool ModelSkeleton::LoadCompiledSkelton(const core::Path<wchar_t>& filePath)
     core::Path<wchar_t> path(filePath);
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::READ);
-    mode.Set(core::fileMode::RANDOM_ACCESS);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::READ);
+    mode.Set(core::FileFlag::RANDOM_ACCESS);
 
     core::XFileScoped file;
     if (!file.openFile(path.c_str(), mode)) {
@@ -189,8 +189,8 @@ bool ModelSkeleton::LoadRawModelSkelton(const core::Path<wchar_t>& filePath)
     core::Path<wchar_t> path(filePath);
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::READ);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::READ);
 
     core::XFileScoped file;
     if (!file.openFile(path.c_str(), mode)) {

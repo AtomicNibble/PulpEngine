@@ -223,7 +223,7 @@ void XVideoSys::dispatchLoadRequest(VideoLoadRequest* pLoadReq)
     core::IoRequestOpen open;
     open.callback.Bind<XVideoSys, &XVideoSys::IoRequestCallback>(this);
     open.pUserData = pLoadReq;
-    open.mode = core::fileMode::READ;
+    open.mode = core::FileFlag::READ;
     open.path.set(assetName.begin(), assetName.end());
 
     gEnv->pFileSys->AddIoRequestToQue(open);

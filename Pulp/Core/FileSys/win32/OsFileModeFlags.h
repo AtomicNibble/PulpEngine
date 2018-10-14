@@ -23,17 +23,17 @@ namespace mode
         return FILE_BEGIN;
     }
 
-    static DWORD GetAccess(IFileSys::fileModeFlags mode)
+    static DWORD GetAccess(IFileSys::FileFlags mode)
     {
         DWORD val = 0;
 
-        if (mode.IsSet(fileMode::WRITE)) {
+        if (mode.IsSet(FileFlag::WRITE)) {
             val |= FILE_WRITE_DATA;
         }
-        if (mode.IsSet(fileMode::READ)) {
+        if (mode.IsSet(FileFlag::READ)) {
             val |= FILE_READ_DATA;
         }
-        if (mode.IsSet(fileMode::APPEND)) {
+        if (mode.IsSet(FileFlag::APPEND)) {
             val |= FILE_APPEND_DATA;
         }
 
@@ -41,15 +41,15 @@ namespace mode
         return val;
     }
 
-    static DWORD GetShareMode(IFileSys::fileModeFlags mode)
+    static DWORD GetShareMode(IFileSys::FileFlags mode)
     {
         DWORD val = 0;
 
-        if (mode.IsSet(fileMode::SHARE)) {
-            if (mode.IsSet(fileMode::READ)) {
+        if (mode.IsSet(FileFlag::SHARE)) {
+            if (mode.IsSet(FileFlag::READ)) {
                 val |= FILE_SHARE_READ;
             }
-            if (mode.IsSet(fileMode::WRITE)) {
+            if (mode.IsSet(FileFlag::WRITE)) {
                 val |= FILE_SHARE_WRITE;
             }
 
@@ -59,18 +59,18 @@ namespace mode
         return val;
     }
 
-    static DWORD GetCreationDispo(IFileSys::fileModeFlags mode)
+    static DWORD GetCreationDispo(IFileSys::FileFlags mode)
     {
-        if (mode.IsSet(fileMode::RECREATE)) {
+        if (mode.IsSet(FileFlag::RECREATE)) {
             return CREATE_ALWAYS;
         }
-        if (mode.IsSet(fileMode::READ)) {
+        if (mode.IsSet(FileFlag::READ)) {
             return OPEN_EXISTING;
         }
-        if (mode.IsSet(fileMode::APPEND)) {
+        if (mode.IsSet(FileFlag::APPEND)) {
             return OPEN_EXISTING;
         }
-        if (mode.IsSet(fileMode::WRITE)) {
+        if (mode.IsSet(FileFlag::WRITE)) {
             return CREATE_NEW;
         }
 
@@ -78,24 +78,24 @@ namespace mode
         return 0;
     }
 
-    static DWORD GetFlagsAndAtt(IFileSys::fileModeFlags mode, bool async)
+    static DWORD GetFlagsAndAtt(IFileSys::FileFlags mode, bool async)
     {
         DWORD flag = FILE_FLAG_SEQUENTIAL_SCAN;
 
-        if (mode.IsSet(fileMode::RANDOM_ACCESS)) {
+        if (mode.IsSet(FileFlag::RANDOM_ACCESS)) {
             flag = FILE_FLAG_RANDOM_ACCESS;
         }
-        if (mode.IsSet(fileMode::WRITE_FLUSH)) {
+        if (mode.IsSet(FileFlag::WRITE_FLUSH)) {
             flag |= FILE_FLAG_WRITE_THROUGH;
         }
-        if (mode.IsSet(fileMode::NOBUFFER)) {
+        if (mode.IsSet(FileFlag::NOBUFFER)) {
             flag |= FILE_FLAG_NO_BUFFERING;
         }
         if (async) { // dirty potato !
             flag |= FILE_FLAG_OVERLAPPED;
         }
 
-        //	if (flag == FILE_FLAG_SEQUENTIAL_SCAN && mode.IsSet(fileMode::WRITE))
+        //	if (flag == FILE_FLAG_SEQUENTIAL_SCAN && mode.IsSet(FileFlag::WRITE))
         //		return FILE_ATTRIBUTE_NORMAL;
 
         return flag;

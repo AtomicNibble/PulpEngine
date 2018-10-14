@@ -154,9 +154,9 @@ bool AssetList::loadFromJson(core::StringRange<char> json)
 bool AssetList::loadFromFile(core::Path<char>& path)
 {
     core::XFileMemScoped file;
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::READ);
-    mode.Set(core::fileMode::SHARE);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::READ);
+    mode.Set(core::FileFlag::SHARE);
 
     if (!file.openFile(path.c_str(), mode)) {
         return false;
@@ -220,9 +220,9 @@ bool AssetList::saveToFile(core::XFile* pFile) const
 bool AssetList::saveToFile(core::Path<char>& path) const
 {
     core::XFileScoped file;
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::WRITE);
-    mode.Set(core::fileMode::RECREATE);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::WRITE);
+    mode.Set(core::FileFlag::RECREATE);
 
     if (!file.openFile(path.c_str(), mode)) {
         return false;

@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-XDiskFile::XDiskFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode) :
+XDiskFile::XDiskFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode) :
     file_(path, mode)
 {
 }

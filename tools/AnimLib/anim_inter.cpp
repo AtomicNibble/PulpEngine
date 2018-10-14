@@ -42,8 +42,8 @@ namespace Inter
 
         filePath.setExtension(anim::ANIM_INTER_FILE_EXTENSION_W);
 
-        core::fileModeFlags mode;
-        mode.Set(core::fileMode::READ);
+        core::FileFlags mode;
+        mode.Set(core::FileFlag::READ);
 
         core::XFileScoped file;
         if (file.openFile(filePath.c_str(), mode)) {
@@ -94,10 +94,10 @@ namespace Inter
 
         {
             core::XFileScoped file;
-            core::fileModeFlags mode;
-            mode.Set(core::fileMode::RECREATE);
-            mode.Set(core::fileMode::WRITE);
-            mode.Set(core::fileMode::SHARE);
+            core::FileFlags mode;
+            mode.Set(core::FileFlag::RECREATE);
+            mode.Set(core::FileFlag::WRITE);
+            mode.Set(core::FileFlag::SHARE);
 
             if (!gEnv->pFileSys->createDirectoryTree(path.c_str())) {
                 X_ERROR("Anim", "Failed to create export directory");

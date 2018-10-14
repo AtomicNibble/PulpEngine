@@ -365,17 +365,17 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
     struct ModeMap
     {
         const char* mode;
-        core::fileModeFlags flags;
+        core::FileFlags flags;
     };
 
     ModeMap modeLookup[] = {
         // allow RANDOM_ACCESS for the plebs :)
-        {"r", fileMode::READ | fileMode::RANDOM_ACCESS},
-        {"w", fileMode::WRITE | fileMode::RANDOM_ACCESS | fileMode::RECREATE},
-        {"a", fileMode::APPEND},
-        {"r+", fileMode::WRITE | fileMode::READ | fileMode::RANDOM_ACCESS},
-        {"w+", fileMode::WRITE | fileMode::READ | fileMode::RANDOM_ACCESS | fileMode::RECREATE},
-        //	{ "a+", fileMode::READ | fileMode::RANDOM_ACCESS }, not supported
+        {"r", FileFlag::READ | FileFlag::RANDOM_ACCESS},
+        {"w", FileFlag::WRITE | FileFlag::RANDOM_ACCESS | FileFlag::RECREATE},
+        {"a", FileFlag::APPEND},
+        {"r+", FileFlag::WRITE | FileFlag::READ | FileFlag::RANDOM_ACCESS},
+        {"w+", FileFlag::WRITE | FileFlag::READ | FileFlag::RANDOM_ACCESS | FileFlag::RECREATE},
+        //	{ "a+", FileFlag::READ | FileFlag::RANDOM_ACCESS }, not supported
     };
 
     static const size_t numModes = sizeof(modeLookup) / sizeof(modeLookup[0]);
@@ -385,7 +385,7 @@ int XBinds_Io::openFile(IFunctionHandler* pH)
     size_t i;
     core::Path<char> path;
 
-    core::fileModeFlags flags = core::fileMode::READ | fileMode::RANDOM_ACCESS;
+    core::FileFlags flags = core::FileFlag::READ | FileFlag::RANDOM_ACCESS;
 
     pH->getParam(1, fileName);
     if (pH->getParam(2, mode)) {

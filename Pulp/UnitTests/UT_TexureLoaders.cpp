@@ -31,9 +31,9 @@ namespace
 template<class T>
 bool LoadValid(Texturefmt::Enum fmt, core::Path<char> path, const TextureDesc* pDesc = nullptr)
 {
-    IFileSys::fileModeFlags mode;
-    mode.Set(IFileSys::fileMode::READ);
-    mode.Set(IFileSys::fileMode::RANDOM_ACCESS);
+    IFileSys::FileFlags mode;
+    mode.Set(IFileSys::FileFlag::READ);
+    mode.Set(IFileSys::FileFlag::RANDOM_ACCESS);
 
     core::XFileScoped file;
 

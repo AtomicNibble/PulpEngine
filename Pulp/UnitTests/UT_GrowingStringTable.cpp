@@ -192,7 +192,7 @@ TEST(GrowingStringTable, Serialize)
     fileName += ").ut_dat";
 
     XFile* file = pFileSys->openFile(fileName.c_str(),
-        fileMode::WRITE | fileMode::READ | fileMode::RECREATE | fileMode::RANDOM_ACCESS);
+        FileFlag::WRITE | FileFlag::READ | FileFlag::RECREATE | FileFlag::RANDOM_ACCESS);
     ASSERT_TRUE(NULL != file);
     if (file) {
         ASSERT_TRUE(Table.SSave(file));

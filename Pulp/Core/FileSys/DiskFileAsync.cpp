@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-XDiskFileAsync::XDiskFileAsync(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* asyncOpArena) :
+XDiskFileAsync::XDiskFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mode, core::MemoryArenaBase* asyncOpArena) :
     file_(path, mode, asyncOpArena)
 {
 }

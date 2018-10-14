@@ -890,9 +890,9 @@ bool AnimCompiler::save(const core::Path<wchar_t>& path)
     core::Path<wchar_t> fullPath(path);
     fullPath.setExtension(anim::ANIM_FILE_EXTENSION_W);
 
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::RECREATE);
-    mode.Set(core::fileMode::WRITE);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::RECREATE);
+    mode.Set(core::FileFlag::WRITE);
 
     core::XFileScoped file;
     if (!file.openFile(fullPath.c_str(), mode)) {

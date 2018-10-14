@@ -93,8 +93,8 @@ bool XScriptSys::init(void)
     core::IoRequestOpenRead req;
     req.arena = gEnv->pArena;
     req.path = "scripts/preload.json";
-    req.mode.Set(core::fileMode::READ);
-    req.mode.Set(core::fileMode::SHARE);
+    req.mode.Set(core::FileFlag::READ);
+    req.mode.Set(core::FileFlag::SHARE);
     req.callback.Bind<XScriptSys, &XScriptSys::IoRequestCallback>(this);
     preloadFileReq_ = gEnv->pFileSys->AddIoRequestToQue(req);
 

@@ -241,7 +241,7 @@ namespace shader
         path.setFileName(namelc.begin(), namelc.end());
 
         core::XFileScoped file;
-        if (!file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+        if (!file.openFile(path.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
             X_WARNING("Shader", "File not found: \"%s\"", namelc.c_str());
             *pSourceFileRef = INVALID_SOURCE;
             return nullptr;

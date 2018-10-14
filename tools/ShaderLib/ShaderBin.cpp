@@ -157,7 +157,7 @@ namespace shader
         }
 
         core::XFileScoped file;
-        if (file.openFile(path.c_str(), core::fileMode::WRITE | core::fileMode::RECREATE)) {
+        if (file.openFile(path.c_str(), core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
             X_ASSERT_NOT_NULL(pData);
 
             file.write(hdr);
@@ -209,7 +209,7 @@ namespace shader
         core::zero_object(hdr);
 
         core::XFileMemScoped file;
-        if (file.openFile(path.c_str(), core::fileMode::READ | core::fileMode::SHARE)) {
+        if (file.openFile(path.c_str(), core::FileFlag::READ | core::FileFlag::SHARE)) {
             file.readObj(hdr);
 
             if (hdr.isValid()) {

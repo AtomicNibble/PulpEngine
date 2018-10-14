@@ -19,10 +19,10 @@ XFileStats OsFile::s_stats;
 namespace
 {
 
-    void logFileError(const wchar_t* path, IFileSys::fileModeFlags mode)
+    void logFileError(const wchar_t* path, IFileSys::FileFlags mode)
     {
         lastError::Description Dsc;
-        IFileSys::fileModeFlags::Description DscFlag;
+        IFileSys::FileFlags::Description DscFlag;
         {
             X_LOG_BULLET;
             X_ERROR("File", "Failed to open file. Error: %s", lastError::ToString(Dsc));
@@ -31,7 +31,7 @@ namespace
         }
     }
 
-    HANDLE createFileHelper(const wchar_t* path, IFileSys::fileModeFlags mode)
+    HANDLE createFileHelper(const wchar_t* path, IFileSys::FileFlags mode)
     {
         DWORD access = mode::GetAccess(mode);
         DWORD share = mode::GetShareMode(mode);
@@ -43,7 +43,7 @@ namespace
 
 } // namespace
 
-OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode) :
+OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::FileFlags mode) :
     mode_(mode),
     file_(INVALID_HANDLE_VALUE)
 {
@@ -68,7 +68,7 @@ OsFile::OsFile(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode) :
         ++s_stats.NumFilesOpened;
 #endif // !X_ENABLE_FILE_STATS
 
-        if (mode.IsSet(IFileSys::fileModeFlags::APPEND)) {
+        if (mode.IsSet(IFileSys::FileFlags::APPEND)) {
             this->seek(0, SeekMode::END, false);
         }
     }
@@ -86,8 +86,8 @@ OsFile::~OsFile(void)
 
 size_t OsFile::read(void* pBuffer, size_t length)
 {
-    if (!mode_.IsSet(fileMode::READ)) {
-        IFileSys::fileModeFlags::Description Dsc;
+    if (!mode_.IsSet(FileFlag::READ)) {
+        IFileSys::FileFlags::Description Dsc;
         X_ERROR("File", "can't read from file. Flags: %s", mode_.ToString(Dsc));
         return 0;
     }
@@ -128,8 +128,8 @@ size_t OsFile::read(void* pBuffer, size_t length)
 
 size_t OsFile::write(const void* pBuffer, size_t length)
 {
-    if (!mode_.IsSet(fileMode::WRITE)) {
-        IFileSys::fileModeFlags::Description Dsc;
+    if (!mode_.IsSet(FileFlag::WRITE)) {
+        IFileSys::FileFlags::Description Dsc;
         X_ERROR("File", "can't write to file. Flags: %s", mode_.ToString(Dsc));
         return 0;
     }
@@ -172,8 +172,8 @@ void OsFile::seek(int64_t position, IFileSys::SeekMode::Enum origin, bool requir
 {
     // seeking is allowed by win32 when RANDOM_ACCESS is not passed.
     // but i want to prevent a user trying to seek if they did not use RANDOM_ACCESS.
-    if (requireRandomAccess && !mode_.IsSet(fileMode::RANDOM_ACCESS)) {
-        IFileSys::fileModeFlags::Description Dsc;
+    if (requireRandomAccess && !mode_.IsSet(FileFlag::RANDOM_ACCESS)) {
+        IFileSys::FileFlags::Description Dsc;
         X_ERROR("File", "can't seek in file, requires random access. Flags: %s", mode_.ToString(Dsc));
         return;
     }

@@ -569,8 +569,8 @@ TEST(Lexer, Mapfile)
     // load a map file Drool
 
     core::XFileScoped map_file;
-    core::IFileSys::fileModeFlags mode;
-    mode.Set(fileMode::READ);
+    core::IFileSys::FileFlags mode;
+    mode.Set(FileFlag::READ);
 
     if (map_file.openFile("alcatraz.map", mode)) {
         XMapFile map;

@@ -20,7 +20,7 @@ X_NAMESPACE_BEGIN(core)
 
 static const size_t FS_MAX_VIRTUAL_DIR = 10;
 
-X_DECLARE_FLAGS(fileMode)
+X_DECLARE_FLAGS(FileFlag)
 (
     READ,
     WRITE,
@@ -29,7 +29,8 @@ X_DECLARE_FLAGS(fileMode)
     RECREATE,
     SHARE,
     RANDOM_ACCESS,
-    NOBUFFER);
+    NOBUFFER
+);
 
 X_DECLARE_FLAGS(SeekMode)
 (
@@ -42,9 +43,9 @@ X_DECLARE_ENUM(VirtualDirectory)
     GAME,
     MOD);
 
-typedef Flags<fileMode> fileModeFlags;
+typedef Flags<FileFlag> FileFlags;
 
-X_DECLARE_FLAG_OPERATORS(fileModeFlags);
+X_DECLARE_FLAG_OPERATORS(FileFlags);
 
 typedef core::XOsFileAsyncOperation XFileAsyncOperation;
 typedef core::XOsFileAsyncOperationCompiltion XFileAsyncOperationCompiltion;
@@ -585,7 +586,7 @@ struct IoRequestOpen : public IoRequestBase
         type = IoRequest::OPEN;
     }
 
-    fileModeFlags mode;
+    FileFlags mode;
     core::Path<char> path;
 };
 
@@ -681,8 +682,8 @@ struct FindData
 
 struct IFileSys
 {
-    typedef fileMode fileMode;
-    typedef Flags<fileMode> fileModeFlags;
+    typedef FileFlag FileFlag;
+    typedef Flags<FileFlag> FileFlags;
     typedef SeekMode SeekMode;
     typedef core::Path<wchar_t> PathT;
     typedef const char* pathType;
@@ -708,18 +709,18 @@ struct IFileSys
     virtual bool addModDir(const PathT& path) X_ABSTRACT;
 
     // Open Files
-    virtual XFile* openFile(pathType path, fileModeFlags mode) X_ABSTRACT;
-    virtual XFile* openFile(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
+    virtual XFile* openFile(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFile* openFile(pathTypeW path, FileFlags mode) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
     // async
-    virtual XFileAsync* openFileAsync(pathType path, fileModeFlags mode) X_ABSTRACT;
-    virtual XFileAsync* openFileAsync(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(pathTypeW path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
     // loads the whole file into memory.
-    virtual XFileMem* openFileMem(pathType path, fileModeFlags mode) X_ABSTRACT;
-    virtual XFileMem* openFileMem(pathTypeW path, fileModeFlags mode) X_ABSTRACT;
+    virtual XFileMem* openFileMem(pathType path, FileFlags mode) X_ABSTRACT;
+    virtual XFileMem* openFileMem(pathTypeW path, FileFlags mode) X_ABSTRACT;
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
@@ -780,7 +781,7 @@ public:
         close();
     }
 
-    inline bool openFile(const char* path, IFileSys::fileModeFlags mode)
+    inline bool openFile(const char* path, IFileSys::FileFlags mode)
     {
         pFile_ = pFileSys_->openFileMem(path, mode);
         return pFile_ != nullptr;
@@ -976,13 +977,13 @@ public:
         close();
     }
 
-    inline bool openFile(const char* path, IFileSys::fileModeFlags mode)
+    inline bool openFile(const char* path, IFileSys::FileFlags mode)
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);
         return pFile_ != nullptr;
     }
-    inline bool openFile(const wchar_t* path, IFileSys::fileModeFlags mode)
+    inline bool openFile(const wchar_t* path, IFileSys::FileFlags mode)
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode);

@@ -12,7 +12,7 @@ X_NAMESPACE_BEGIN(core)
 class XDiskFileAsync : public XFileAsync
 {
 public:
-    XDiskFileAsync(const core::Path<wchar_t>& path, IFileSys::fileModeFlags mode, core::MemoryArenaBase* asyncOpArena);
+    XDiskFileAsync(const core::Path<wchar_t>& path, IFileSys::FileFlags mode, core::MemoryArenaBase* asyncOpArena);
     ~XDiskFileAsync() X_FINAL;
 
     /// Returns whether the disk file is valid.

@@ -917,9 +917,9 @@ bool ModelCompiler::saveModel(const core::Path<wchar_t>& outFile)
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
     // open da file!
-    core::fileModeFlags mode;
-    mode.Set(core::fileMode::WRITE);
-    mode.Set(core::fileMode::RECREATE);
+    core::FileFlags mode;
+    mode.Set(core::FileFlag::WRITE);
+    mode.Set(core::FileFlag::RECREATE);
 
     core::XFileScoped file;
 

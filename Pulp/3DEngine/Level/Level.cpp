@@ -238,7 +238,7 @@ bool Level::Load(const char* mapName)
 
     core::IoRequestOpen open;
     open.callback.Bind<Level, &Level::IoRequestCallback>(this);
-    open.mode = core::fileMode::READ;
+    open.mode = core::FileFlag::READ;
     open.path = path_;
 
     pFileSys_->AddIoRequestToQue(open);
