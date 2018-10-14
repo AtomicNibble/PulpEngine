@@ -30,22 +30,26 @@ StackString<N, TChar>::StackString(const TChar* const str) :
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<size_t N, typename TChar>
-StackString<N, TChar>::StackString(const wchar_t* const str) :
-    len_(strUtil::strlen(str))
+StackString<N, TChar>::StackString(const wchar_t* const str)
 {
-    X_ASSERT(len_ < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len_, str, N)(len_, N);
-    strUtil::Convert(str, str_, capacity());
+    // TODO: not quite correct, assumes we need same number of char as wchar_t
+    auto len = strUtil::strlen(str);
+    X_ASSERT(len < N, "String(%d) \"%s\" does not fit into StackString of size %d.", len, str, N)(len, N);
+
+    strUtil::Convert(str, str + len, str_, capacity(), len_);
     str_[len_] = L'\0';
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<size_t N, typename TChar>
-StackString<N, TChar>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive) :
-    len_(safe_static_cast<size_t>(endExclusive - beginInclusive))
+StackString<N, TChar>::StackString(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 {
-    X_ASSERT(len_ < N, "String(%d) \"%s.*\" does not fit into StackString of size %d.", len_, len_, beginInclusive, N)(len_, N);
-    strUtil::Convert(beginInclusive, str_, capacity());
+    // TODO: not quite correct, assumes we need same number of char as wchar_t
+    auto len = (safe_static_cast<size_t>(endExclusive - beginInclusive));
+    X_ASSERT(len < N, "String(%d) \"%s.*\" does not fit into StackString of size %d.", len, len, beginInclusive, N)(len, N);
+
+    strUtil::Convert(beginInclusive, endExclusive, str_, capacity(), len_);
     str_[len_] = L'\0';
 }
 
