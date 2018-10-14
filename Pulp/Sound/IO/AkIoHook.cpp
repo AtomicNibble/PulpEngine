@@ -104,11 +104,7 @@ void IOhook::Term(void)
 AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
     AkFileSystemFlags* pFlags, bool& SyncOpen, AkFileDesc& outFileDesc)
 {
-    X_UNUSED(pszFileName);
-    X_UNUSED(eOpenMode);
     X_UNUSED(pFlags);
-    X_UNUSED(SyncOpen);
-    X_UNUSED(outFileDesc);
 
     if (SyncOpen || !asyncOpen_) {
         // sync open
@@ -151,11 +147,7 @@ AKRESULT IOhook::Open(const AkOSChar* pszFileName, AkOpenMode eOpenMode,
 AKRESULT IOhook::Open(AkFileID fileID, AkOpenMode eOpenMode,
     AkFileSystemFlags* pFlags, bool& SyncOpen, AkFileDesc& outFileDesc)
 {
-    X_UNUSED(fileID);
-    X_UNUSED(eOpenMode);
     X_UNUSED(pFlags);
-    X_UNUSED(SyncOpen);
-    X_UNUSED(outFileDesc);
 
     if (SyncOpen || !asyncOpen_) {
         // sync open
