@@ -254,8 +254,8 @@ public:
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders
-    bool setGameDir(const PathT& path) X_FINAL;
-    bool addModDir(const PathT& path) X_FINAL;
+    bool setGameDir(const PathWT& path) X_FINAL;
+    bool addModDir(const PathWT& path) X_FINAL;
 
     // Find util
     uintptr_t findFirst(pathType path, FindData& findinfo) X_FINAL;
@@ -316,7 +316,7 @@ public:
     void listSearchPaths(const char* pSearchPatten = nullptr) const;
 
 private:
-    bool addDirInteral(const PathT& path, bool isGame);
+    bool addDirInteral(const PathWT& path, bool isGame);
 
 private:
     IoRequestBase* popRequest(void);

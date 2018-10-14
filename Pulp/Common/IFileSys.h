@@ -685,7 +685,7 @@ struct IFileSys
     typedef FileFlag FileFlag;
     typedef Flags<FileFlag> FileFlags;
     typedef SeekMode SeekMode;
-    typedef core::Path<wchar_t> PathT;
+    typedef core::Path<wchar_t> PathWT;
     typedef const char* pathType;
     typedef const wchar_t* pathTypeW;
     typedef FindData FindData;
@@ -705,8 +705,8 @@ struct IFileSys
 
     // folders - there is only one game dirtory.
     // but other folders can be added with 'addModDir' to add to the virtual directory.
-    virtual bool setGameDir(const PathT& path) X_ABSTRACT;
-    virtual bool addModDir(const PathT& path) X_ABSTRACT;
+    virtual bool setGameDir(const PathWT& path) X_ABSTRACT;
+    virtual bool addModDir(const PathWT& path) X_ABSTRACT;
 
     // Open Files
     virtual XFile* openFile(pathType path, FileFlags mode) X_ABSTRACT;

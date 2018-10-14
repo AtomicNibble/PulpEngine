@@ -557,7 +557,7 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 // --------------------- folders ---------------------
 
-bool xFileSys::setGameDir(const PathT& path)
+bool xFileSys::setGameDir(const PathWT& path)
 {
     X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(path.c_str(), gameDir_);
 
@@ -577,13 +577,13 @@ bool xFileSys::setGameDir(const PathT& path)
     return true;
 }
 
-bool xFileSys::addModDir(const PathT& path)
+bool xFileSys::addModDir(const PathWT& path)
 {
     return addDirInteral(path, false);
 }
 
 
-bool xFileSys::addDirInteral(const PathT& path, bool isGame)
+bool xFileSys::addDirInteral(const PathWT& path, bool isGame)
 {
     if (isDebug()) {
         X_LOG0("FileSys", "addModDir: \"%ls\"", path);
