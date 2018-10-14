@@ -581,7 +581,7 @@ bool xFileSys::addDirInteral(const PathWT& path, bool isGame)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst(pathType path, FindData& findinfo)
+uintptr_t xFileSys::findFirst(const PathT& path, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
     // so this is start of new version but i dunno how i want it to work yet.
@@ -603,7 +603,7 @@ uintptr_t xFileSys::findFirst(pathType path, FindData& findinfo)
     return handle;
 }
 
-uintptr_t xFileSys::findFirst(pathTypeW path, FindData& findinfo)
+uintptr_t xFileSys::findFirst(const PathWT& path, FindData& findinfo)
 {
     Path<wchar_t> buf;
     createOSPath(gameDir_, path, buf);

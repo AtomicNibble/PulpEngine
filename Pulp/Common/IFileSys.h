@@ -723,8 +723,8 @@ struct IFileSys
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
-    virtual uintptr_t findFirst(pathType path, FindData& findinfo) X_ABSTRACT;
-    virtual uintptr_t findFirst(pathTypeW path, FindData& findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst(const PathT& path, FindData& findinfo) X_ABSTRACT;
+    virtual uintptr_t findFirst(const PathWT& path, FindData& findinfo) X_ABSTRACT;
     virtual bool findnext(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
     virtual void findClose(uintptr_t handle) X_ABSTRACT;
 
@@ -1161,9 +1161,9 @@ public:
         }
     }
 
-    X_INLINE bool findfirst(const char* pPath)
+    X_INLINE bool findfirst(const IFileSys::PathT& path)
     {
-        handle_ = pFileSys_->findFirst(pPath, fd_);
+        handle_ = pFileSys_->findFirst(path, fd_);
         return handle_ != core::IFileSys::INVALID_HANDLE;
     }
 

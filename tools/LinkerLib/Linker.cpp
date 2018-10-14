@@ -206,7 +206,7 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
     dirSearch.append("*");
 
     core::IFileSys::FindData fd;
-    auto handle = pFileSys->findFirst(dirSearch.c_str(), fd);
+    auto handle = pFileSys->findFirst(dirSearch, fd);
 
     if (handle == core::IFileSys::INVALID_HANDLE) {
         X_ERROR("Linker", "Failed to iterate dir: %s", dirSearch.c_str());

@@ -337,7 +337,7 @@ namespace
             X_LOG0("Train", "Gathering files for training");
 
             core::FindFirstScoped find;
-            if (find.findfirst(path.c_str())) {
+            if (find.findfirst(path)) {
                 do {
                     const auto& fd = find.fileData();
                     if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {

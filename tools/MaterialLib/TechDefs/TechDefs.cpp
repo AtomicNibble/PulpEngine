@@ -137,7 +137,7 @@ namespace techset
 
         core::FindFirstScoped find;
 
-        if (find.findfirst(path.c_str())) {
+        if (find.findfirst(path)) {
 
             do {
                 const auto& fd = find.fileData();
