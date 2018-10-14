@@ -21,7 +21,9 @@ namespace PathUtil
             }
 
             findInfo.size = fi.size;
-            findInfo.name.set(fi.name);
+            findInfo.name.set(fi.name, fi.name + strUtil::strlen(fi.name));
+            // "." && ".." should not reach here.
+            X_ASSERT(!findInfo.name.isEqual(".") && !findInfo.name.isEqual(".."), "Handle .. in findNext")();
         }
 
     } // namespace
@@ -31,7 +33,7 @@ namespace PathUtil
         WCHAR workingDir[Path::BUF_SIZE] = {0};
 
         if (!GetCurrentDirectoryW(sizeof(workingDir), workingDir)) {
-            core::lastError::Description Dsc;
+            lastError::Description Dsc;
             X_ERROR("FileSys", "GetCurrentDirectory failed. Error: %s", lastError::ToString(Dsc));
             return false;
         }
@@ -58,7 +60,7 @@ namespace PathUtil
             return true;
         }
 
-        core::lastError::Description Dsc;
+        lastError::Description Dsc;
         X_ERROR("FileSys", "GetFullPathName failed. Error: %s", lastError::ToString(Dsc));
         return false;
     }
@@ -73,7 +75,7 @@ namespace PathUtil
     bool DeleteFile(const wchar_t* pFilePath)
     {
         if (!::DeleteFileW(pFilePath)) {
-            core::lastError::Description Dsc;
+            lastError::Description Dsc;
             X_ERROR("FileSys", "DeleteFile failed. Error: %s", lastError::ToString(Dsc));
             return false;
         }
@@ -110,39 +112,43 @@ namespace PathUtil
         searchPath.ensureSlash();
         searchPath.append(L"*");
 
-        FindData fd;
-        uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
-        if (handle != PathUtil::INVALID_FIND_HANDLE) {
+        _wfinddata64_t fi;
+        intptr_t handle = ::_wfindfirst64(searchPath.c_str(), &fi);
+        if (handle != -1) {
             Path dirItem;
 
             do {
-                if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
-                    continue;
+                const auto isDir = (fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0;
+
+                if (isDir) {
+                    if (strUtil::IsEqual(L".", fi.name) || strUtil::IsEqual(L"..", fi.name)) {
+                        continue;
+                    }
                 }
 
                 dirItem.set(pDir, pDirEnd);
-                dirItem /= fd.name;
+                dirItem /= fi.name;
 
-                if (PathUtil::IsDirectory(fd)) {
+                if (isDir) {
                     if (!DeleteDirectory(dirItem, resursive)) {
-                        PathUtil::findClose(handle);
+                        ::_findclose(handle);
                         return false;
                     }
                 }
                 else {
                     if (!DeleteFile(dirItem)) {
-                        PathUtil::findClose(handle);
+                        ::_findclose(handle);
                         return false;
                     }
                 }
 
-            } while (PathUtil::findNext(handle, fd));
+            } while (::_wfindnext64(handle, &fi));
 
-            PathUtil::findClose(handle);
+            ::_findclose(handle);
         }
 
         if (!RemoveDirectoryW(pDir)) {
-            core::lastError::Description Dsc;
+            lastError::Description Dsc;
             X_ERROR("FileSys", "RemoveDirectory failed. Error: %s", lastError::ToString(Dsc));
             return false;
         }
@@ -187,8 +193,8 @@ namespace PathUtil
 
         Path path(L"");
 
-        core::StringTokenizer<wchar_t> tokenizer(pDir, pDir + core::strUtil::strlen(pDir), Path::NATIVE_SLASH_W);
-        core::StringRange<wchar_t> range(nullptr, nullptr);
+        StringTokenizer<wchar_t> tokenizer(pDir, pDir + strUtil::strlen(pDir), Path::NATIVE_SLASH_W);
+        StringRange<wchar_t> range(nullptr, nullptr);
 
         while (tokenizer.extractToken(range)) {
             path.append(range.getStart(), range.getEnd());
@@ -212,13 +218,13 @@ namespace PathUtil
         return GetFileSize(filePath.c_str());
     }
 
-    uint64_t GetFileSize(const wchar_t* pDir)
+    uint64_t GetFileSize(const wchar_t* pFilePath)
     {
         WIN32_FILE_ATTRIBUTE_DATA fad;
-        core::zero_object(fad);
+        zero_object(fad);
 
-        if (!GetFileAttributesExW(pDir, GetFileExInfoStandard, &fad)) {
-            core::lastError::Description Dsc;
+        if (!GetFileAttributesExW(pFilePath, GetFileExInfoStandard, &fad)) {
+            lastError::Description Dsc;
             X_ERROR("FileSys", "GetFileSize failed. Error: %s", lastError::ToString(Dsc));
             return 0;
         }
@@ -364,9 +370,19 @@ namespace PathUtil
     findhandle findFirst(const wchar_t* path, FindData& findInfo)
     {
         _wfinddata64_t fi;
-        intptr_t handle = _wfindfirst64(path, &fi);
+        intptr_t handle = ::_wfindfirst64(path, &fi);
         if (handle == -1) {
             return INVALID_FIND_HANDLE;
+        }
+
+        // skip "." & ".."
+        while ((fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 && 
+            (strUtil::IsEqual(L".", fi.name) || strUtil::IsEqual(L"..", fi.name)))
+        {
+            if (::_wfindnext64(handle, &fi) != 0) {
+                ::_findclose(handle);
+                return INVALID_FIND_HANDLE;
+            }
         }
 
         win32FindDataToFindData(fi, findInfo);
@@ -377,7 +393,7 @@ namespace PathUtil
     {
         _wfinddata64_t fi;
 
-        if (_wfindnext64(handle, &fi) == 0) {
+        if (::_wfindnext64(handle, &fi) == 0) {
             win32FindDataToFindData(fi, findInfo);
             return true;
         }
@@ -388,7 +404,7 @@ namespace PathUtil
     bool findClose(findhandle handle)
     {
         if (handle != INVALID_FIND_HANDLE) {
-            return _findclose(handle) == 0;
+            return ::_findclose(handle) == 0;
         }
 
         return false;

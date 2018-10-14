@@ -217,15 +217,9 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
 
     do
     {
-        if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
-            continue;
-        }
-
-        core::Path<char> path(fd.name);
-
         if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
             core::Path<> subDir(dirPath);
-            subDir /= path;
+            subDir /= fd.name;
 
             auto rel = relPath / core::Path<>(fd.name);
             rel.ensureSlash();
@@ -238,9 +232,9 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
 
         core::string name;
         name.append(relPath.begin(), relPath.end());
-        name.append(path.begin(), path.end());
+        name.append(fd.name.begin(), fd.name.end());
 
-        path = basePath / path;
+        auto path = basePath / fd.name;
 
         if (!AddAssetFromDisk(dir.type, name, path)) {
             X_ERROR("Linker", "Failed to add: %s", name.c_str());

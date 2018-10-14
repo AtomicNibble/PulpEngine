@@ -676,7 +676,7 @@ struct FindData
 
     AttrFlags attrib;
     int64_t size;
-    core::Path<wchar_t> name;
+    core::Path<char> name;
 };
 
 struct IFileSys

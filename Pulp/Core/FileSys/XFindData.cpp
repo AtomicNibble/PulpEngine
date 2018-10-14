@@ -57,7 +57,9 @@ bool XFindData::findnext(FindData& fi)
 bool XFindData::getOSPath(core::Path<wchar_t>& path, FindData& fi)
 {
     if (current_->pDir) {
-        path /= current_->pDir->path / fi.name;
+        path /= current_->pDir->path;
+        path.ensureSlash();
+        path.append(fi.name.begin(), fi.name.end());
         return true;
     }
 
@@ -115,8 +117,10 @@ inline void XFindData::updateFindInfo(FindData& fi)
     }
 
     fi.size = fdw.size;
-    fi.name = folder_;
-    fi.name.append(fdw.name);
+    fi.name.set(folder_.begin(), folder_.end());
+
+    char buf[core::Path<>::BUF_SIZE] = {};
+    fi.name.append(core::strUtil::Convert(fdw.name, buf));
 }
 
 inline bool XFindData::searchPak(FindData& fi)

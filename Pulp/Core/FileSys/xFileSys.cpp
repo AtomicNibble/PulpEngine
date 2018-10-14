@@ -771,13 +771,11 @@ bool xFileSys::deleteDirectoryContents(pathType path)
     uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
     if (handle != PathUtil::INVALID_FIND_HANDLE) {
         do {
-            if (fd.name.isEqual(L".") || fd.name.isEqual(L"..")) {
-                continue;
-            }
 
             // build a OS Path.
             core::Path<wchar_t> dirItem(buf);
-            dirItem /= fd.name;
+            dirItem.ensureSlash();
+            dirItem.append(fd.name.begin(), fd.name.end());
 
             if (PathUtil::IsDirectory(fd)) {
                 if (dirItem.fillSpaceWithNullTerm() < 1) {
