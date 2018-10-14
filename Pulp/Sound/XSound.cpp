@@ -73,6 +73,7 @@ X_LINK_LIB_WWISE("AkStreamMgr");
 
 // decoeer / source?
 #if PLUGIN_Codec
+#include <AK/Plugin/AkVorbisDecoderFactory.h>
 X_LINK_LIB_WWISE("AkVorbisDecoder");
 #endif // !PLUGIN_Codec
 
