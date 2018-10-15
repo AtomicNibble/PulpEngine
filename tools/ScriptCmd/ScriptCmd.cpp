@@ -106,7 +106,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             }
 
             if (!GetInputFile(inputFile)) {
-                return -1;
+                return 1;
             }
 
             core::Path<char> inputPath;
@@ -119,12 +119,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
                 if (!file.openFile(inputPath, core::FileFlag::READ | core::FileFlag::SHARE)) {
                     X_ERROR("Script", "Failed to open file: \"%s\"", inputFile.c_str());
-                    return -1;
+                    return 1;
                 }
 
                 if (!pScriptSys->runScriptInSandbox(file->getBufferStart(), file->getBufferEnd())) {
                     X_ERROR("Script", "Error running script: \"%s\"", inputFile.c_str());
-                    return -1;
+                    return 1;
                 }
 
                 return 0;

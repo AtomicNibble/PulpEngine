@@ -243,7 +243,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     EngineApp app;
 
     if (!app.Init(hInstance, &arena, lpCmdLine)) {
-        return -1;
+        return 1;
     }
 
     PrintArgs();
@@ -251,7 +251,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     core::StopWatch timer;
 
     if (!texture::Process(arena)) {
-        return -1;
+        return 1;
     }
    
     const float trainTime = timer.GetMilliSeconds();

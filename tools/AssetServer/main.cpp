@@ -73,7 +73,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #if X_PLATFORM_WIN32
             pEngine = &engine;
             if (!SetConsoleCtrlHandler(HandlerRoutine, TRUE)) {
-                return -1;
+                return 1;
             }
 #endif // !X_PLATFORM_WIN32
 

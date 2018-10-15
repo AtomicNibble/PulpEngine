@@ -141,7 +141,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     UNREFERENCED_PARAMETER(hPrevInstance);
 
     // compile my anus.
-    int res = -1;
+    int res = 1;
 
     {
         core::MallocFreeAllocator allocator;

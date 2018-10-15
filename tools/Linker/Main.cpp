@@ -235,5 +235,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    return res ? 0 : -1;
+    return res ? 0 : 1;
 }

@@ -126,7 +126,7 @@ namespace
                 }
                 else {
                     X_ERROR("Compress", "Missing required arg -if");
-                    return -1;
+                    return 1;
                 }
             }
 
@@ -174,7 +174,7 @@ namespace
                 }
                 else {
                     X_ASSERT_UNREACHABLE();
-                    return -1;
+                    return 1;
                 }
             }
 
@@ -199,7 +199,7 @@ namespace
 
         if (!ReadFileToBuf(inFile, inFileData)) {
             X_ERROR("Compress", "Failed to read input file");
-            return -1;
+            return 1;
         }
 
         const float loadTime = timer.GetMilliSeconds();
@@ -209,7 +209,7 @@ namespace
         if (!defalte) {
             if (!ICompressor::validBuffer(inFileData)) {
                 X_ERROR("Compress", "Input file is not a compressed buffer");
-                return -1;
+                return 1;
             }
 
             algo = ICompressor::getAlgo(inFileData);
@@ -246,7 +246,7 @@ namespace
                     break;
                 default:
                     X_ERROR("Compress", "unknown compression algo: %i", algo);
-                    return -1;
+                    return 1;
             }
         }
 
@@ -268,14 +268,14 @@ namespace
 
         if (!res) {
             X_ERROR("Compress", "%s failed.", defalte ? "deflation" : "inflation");
-            return -1;
+            return 1;
         }
 
         timer.Start();
 
         if (!WriteFileFromBuf(outFile, outfileData)) {
             X_ERROR("Compress", "Failed to write output file");
-            return -1;
+            return 1;
         }
 
         const float writeTime = timer.GetMilliSeconds();
@@ -305,15 +305,15 @@ namespace
 
         if (srcDir.isEmpty()) {
             X_ERROR("Train", "Source dir is empty");
-            return -1;
+            return 1;
         }
         if (outFile.isEmpty()) {
             X_ERROR("Train", "Output file name missing.");
-            return -1;
+            return 1;
         }
         if (maxDictSize < 256) {
             X_ERROR("Train", "Invalid maxDictSize must be atleast 256");
-            return -1;
+            return 1;
         }
 
         // we need to load all the files in the src directory and merge them into a single buffer.
@@ -360,7 +360,7 @@ namespace
             if (fileNames.size() < core::Compression::DICT_SAMPLER_MIN_SAMPLES) {
                 X_ERROR("Train", "Only %" PRIuS " samples provided, atleast %" PRIuS " required",
                     fileNames.size(), core::Compression::DICT_SAMPLER_MIN_SAMPLES);
-                return -1;
+                return 1;
             }
 
             const size_t totalSampleSize = core::accumulate(sampleSizes.begin(), sampleSizes.end(), 0_sz);
@@ -399,7 +399,7 @@ namespace
 
         if (!core::Compression::trainDictionary(sampleData, sampleSizes, dictData, maxDictSize)) {
             X_ERROR("Train", "Fail to train dictionary");
-            return -1;
+            return 1;
         }
 
         const float trainTime = timer.GetMilliSeconds();
@@ -409,7 +409,7 @@ namespace
         std::ofstream file(outFile.c_str(), std::ios::binary | std::ios::out);
         if (!file.is_open()) {
             X_ERROR("Train", "Failed to open output file: \"%ls\"", outFile.c_str());
-            return -1;
+            return 1;
         }
 
         // make the file be the size of the requested dict.
@@ -424,7 +424,6 @@ namespace
 
         file.write(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
         file.write(reinterpret_cast<const char*>(pStart), size);
-
         return 0;
     }
 
@@ -454,7 +453,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         EngineApp app;
 
         if (!app.Init(hInstance, &arena, lpCmdLine)) {
-            return -1;
+            return 1;
         }
 
         PrintArgs();
