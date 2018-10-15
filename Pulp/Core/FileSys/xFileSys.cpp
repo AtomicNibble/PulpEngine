@@ -556,7 +556,7 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
     searchPath.appendFmt(L"*.%S", AssetPak::PAK_FILE_EXTENSION);
 
     FindData findInfo;
-    uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), findInfo);
+    uintptr_t handle = PathUtil::findFirst(searchPath, findInfo);
 
     if (handle != PathUtil::INVALID_FIND_HANDLE)
     {
@@ -596,7 +596,7 @@ uintptr_t xFileSys::findFirst(const PathT& path, FindData& findinfo)
 
 uintptr_t xFileSys::findFirstOS(const PathWT& osPath, FindData& findinfo)
 {
-    uintptr_t handle = PathUtil::findFirst(osPath.c_str(), findinfo);
+    uintptr_t handle = PathUtil::findFirst(osPath, findinfo);
 
     static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
 
@@ -667,7 +667,7 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
     searchPath.append(L"*");
 
     FindData fd;
-    uintptr_t handle = PathUtil::findFirst(searchPath.c_str(), fd);
+    uintptr_t handle = PathUtil::findFirst(searchPath, fd);
     if (handle != PathUtil::INVALID_FIND_HANDLE) {
         do {
 

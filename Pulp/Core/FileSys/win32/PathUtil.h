@@ -57,7 +57,7 @@ namespace PathUtil
     bool MoveFile(const Path& fullPath, const Path& fullPathNew);
     bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew);
 
-    findhandle findFirst(const wchar_t* path, FindData& findInfo);
+    findhandle findFirst(const Path& path, FindData& findInfo);
     bool findNext(findhandle handle, FindData& findInfo);
     bool findClose(findhandle handle);
 

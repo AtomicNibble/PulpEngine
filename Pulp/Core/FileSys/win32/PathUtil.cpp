@@ -367,10 +367,10 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    findhandle findFirst(const wchar_t* path, FindData& findInfo)
+    findhandle findFirst(const Path& path, FindData& findInfo)
     {
         _wfinddata64_t fi;
-        intptr_t handle = ::_wfindfirst64(path, &fi);
+        intptr_t handle = ::_wfindfirst64(path.c_str(), &fi);
         if (handle == -1) {
             return INVALID_FIND_HANDLE;
         }
