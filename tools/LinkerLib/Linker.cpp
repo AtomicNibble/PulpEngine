@@ -191,7 +191,8 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
             return false;
         }
 
-        X_LOG0("Linker", "Added %" PRIi32 " asset(s) for dir ...", numAdded);
+        X_LOG0("Linker", "Added %" PRIi32 " asset(s) for dir ^5%s^7 : \"%s\"", 
+            numAdded, assetDb::AssetType::ToString(dir.type), dir.path.c_str());
     }
 
     return true;
