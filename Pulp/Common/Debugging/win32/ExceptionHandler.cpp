@@ -438,11 +438,24 @@ namespace exceptionHandler
                     TimeStamp::FileDescription time_txt;
                     DateStamp::Description date_txt;
 
-                    Path<char> filename;
-                    filename.appendFmt("MiniDump_%s_%s.dmp", date.toString(date_txt), time.toString(time_txt));
+                    Path<wchar_t> filename;
+
+                    wchar_t modPath[0x200] = {};
+                    auto pathLength = ::GetModuleFileNameW(nullptr, modPath, sizeof(modPath) / sizeof(modPath[0]));
+
+                    if(pathLength > 0) {
+                        filename.set(core::strUtil::FileName(modPath, modPath + pathLength));
+                        filename.removeExtension();
+                    }
+                    
+                    if(filename.isEmpty()) {
+                        filename.set(L"unknown");
+                    }
+
+                    filename.appendFmt(L"_%S_%S.dmp", date.toString(date_txt), time.toString(time_txt));
 
                     X_LOG_BULLET;
-                    X_LOG0("ExceptionHandler", "Writing crash dump to file: \"%s\"", filename.c_str());
+                    X_LOG0("ExceptionHandler", "Writing crash dump to file: \"%ls\"", filename.c_str());
 
                     if (!debugging::WriteMiniDump(filename, debugging::DumpType::Full, exceptionPointers)) {
                         X_ERROR("ExceptionHandler", "Could not write crash dump.");
