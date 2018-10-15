@@ -3,6 +3,7 @@
 #include "DiskFile.h"
 #include "DiskFileAsync.h"
 #include "PakFileAsync.h"
+#include "PakFile.h"
 
 #include "PathUtil.h"
 #include "XFindData.h"
@@ -34,11 +35,11 @@ namespace
 
     const size_t FILE_ALLOCATION_SIZE = core::Max(sizeof(XDiskFile),
         core::Max(sizeof(XDiskFileAsync),
-            core::Max(sizeof(XFileMem), sizeof(XPakFileAsync))));
+            core::Max(sizeof(XFileMem), core::Max(sizeof(XPakFile), sizeof(XPakFileAsync)))));
 
     const size_t FILE_ALLOCATION_ALIGN = core::Max(X_ALIGN_OF(XDiskFile),
         core::Max(X_ALIGN_OF(XDiskFileAsync),
-            core::Max(X_ALIGN_OF(XFileMem), X_ALIGN_OF(XPakFileAsync))));
+            core::Max(X_ALIGN_OF(XFileMem), core::Max(X_ALIGN_OF(XPakFile), X_ALIGN_OF(XPakFileAsync)))));
 
     const size_t ASYNC_OP_ALLOCATION_SIZE = sizeof(XOsFileAsyncOperation::AsyncOp);
     const size_t ASYNC_OP_ALLOCATION_ALIGN = X_ALIGN_OF(XOsFileAsyncOperation::AsyncOp);
@@ -294,35 +295,29 @@ XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
 
 XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode)
 {
-    PathWT osPath;
-    
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE) && !isAbsolute(relPath)) {
-        FindData findinfo;
-        XFindData findData(relPath, this);
+    return findFile<XFile>(relPath, mode,
+        [&](Pak* pPak, int32_t idx) -> XFile* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFile: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
+            }
 
-        if (!findData.findnext(findinfo)) {
-            FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", relPath.c_str(), mode.ToString(Dsc));
+            auto& entry = pPak->pEntires[idx];
+            return X_NEW(XPakFile, &filePoolArena_, "PakFile")(pPak, entry);
+        },
+        [&](const PathWT& osPath, FileFlags mode) -> XFile* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
+            }
+
+            auto* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(osPath, mode);
+            if (pFile->valid()) {
+                return pFile;
+            }
+
+            closeFile(pFile);
             return nullptr;
         }
-
-        findData.getOSPath(osPath, findinfo);
-    }
-    else {
-        createOSPath(gameDir_, relPath, osPath);
-    }
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "openFile: \"%ls\"", osPath.c_str());
-    }
-
-    XDiskFile* pFile = X_NEW(XDiskFile, &filePoolArena_, "Diskfile")(osPath, mode);
-    if (pFile->valid()) {
-        return pFile;
-    }
-
-    closeFile(pFile);
-    return nullptr;
+    );
 }
 
 void xFileSys::closeFile(XFile* file)
@@ -336,78 +331,29 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode)
 {
-    PathWT osPath;
-
-    // so this needs to handle opening both disk files from the virtual dir's
-    // or opening files from a pak.
-    // the pak file don't need any disk paths.
-    // you can only open a pak file if no write access tho.
-    // we have search priority also.
-    // so specific dir's / pak's are checked first.
-    // if we have lots of packs and they all have same priority, i want a quicker lookup.
-    // like a pak group that has a hash of all files and pak index.
-    // but we do want override pak's like ones from mod dir so the file is taken from that first.
-    // i think the linked list layout is still appropriate, just might add a pak group node.
-    XDiskFileAsync* pFile = nullptr;
-
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
-        // so we are going to look in the search list, till we find a file.
-        // findData can't deal with files in pak's correcly, it has the wrong api.
-        core::StrHash hash(relPath.data(), relPath.length());
-
-        for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
-            if (pSearch->pDir) {
-                const auto* pDir = pSearch->pDir;
-
-                createOSPath(pDir, relPath, osPath);
-
-                if (PathUtil::DoesFileExist(osPath, true)) {
-                    if (isDebug()) {
-                        X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
-                    }
-
-                    pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
-                    break;
-                }
+    return findFile<XFileAsync>(relPath, mode,
+        [&](Pak* pPak, int32_t idx) -> XFileAsync* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
             }
-            else if (pSearch->pPak) {
-                auto* pPak = pSearch->pPak;
 
-                auto idx = pPak->find(hash, relPath.c_str());
-                if (idx != -1) {
-                    if (isDebug()) {
-                        X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
-                    }
-
-                    auto& entry = pPak->pEntires[idx];
-                    return X_NEW(XPakFileAsync, &filePoolArena_, "PakFileAsync")(pPak, entry, &asyncOpPoolArena_);
-                }
+            auto& entry = pPak->pEntires[idx];
+            return X_NEW(XPakFileAsync, &filePoolArena_, "PakFile")(pPak, entry, &asyncOpPoolArena_);
+        },
+        [&](const PathWT& osPath, FileFlags mode) -> XFileAsync* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
             }
-            else {
-                X_ASSERT_UNREACHABLE();
-            }
-        }
 
-        if (!pFile) {
+            auto* pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
+            if (pFile->valid()) {
+                return pFile;
+            }
+
+            closeFileAsync(pFile);
             return nullptr;
         }
-    }
-    else {
-        createOSPath(gameDir_, relPath, osPath);
-
-        if (isDebug()) {
-            X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
-        }
-
-        pFile = X_NEW(XDiskFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
-    }
-
-    if (pFile->valid()) {
-        return pFile;
-    }
-
-    closeFileAsync(pFile);
-    return nullptr;
+    );
 }
 
 void xFileSys::closeFileAsync(XFileAsync* file)
@@ -420,42 +366,38 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode)
 {
-    if (mode.IsSet(FileFlag::WRITE)) {
-        X_ERROR("FileSys", "can't open a memory file for writing.");
-        return nullptr;
-    }
+    return findFile<XFileMem>(relPath, mode,
+        [&](Pak* pPak, int32_t idx) -> XFileMem* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFileMem: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
+            }
 
-    FindData findinfo;
-    XFindData findData(relPath, this);
-    if (!findData.findnext(findinfo)) {
-        FileFlags::Description Dsc;
-        X_WARNING("FileSys", "Failed to find file: %s, Flags: %s", relPath, mode.ToString(Dsc));
-        return nullptr;
-    }
+            auto& entry = pPak->pEntires[idx];
+            X_UNUSED(entry);
+            X_ASSERT_NOT_IMPLEMENTED();
+            return nullptr; // X_NEW(XPakFileAsync, &filePoolArena_, "PakFile")(pPak, entry, &asyncOpPoolArena_);
+        },
+        [&](const PathWT& osPath, FileFlags mode) -> XFileMem* {
+            if (isDebug()) {
+                X_LOG0("FileSys", "openFileMem: \"%ls\"", osPath.c_str());
+            }
 
-    PathWT osPath;
-    findData.getOSPath(osPath, findinfo);
+            OsFile file(osPath, mode);
+            if (!file.valid()) {
+                return nullptr;
+            }
 
-    if (isDebug()) {
-        X_LOG0("FileSys", "openFileMem: \"%ls\"", osPath.c_str());
-    }
+            size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+            char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
 
-    OsFile file(osPath, mode);
-    if (!file.valid()) {
-        return nullptr;
-    }
+            if (file.read(pBuf, size) != size) {
+                X_DELETE_ARRAY(pBuf, &memFileArena_);
+                return nullptr;
+            }
 
-    size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
-    char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
-
-    if (file.read(pBuf, size) != size) {
-        X_DELETE_ARRAY(pBuf, &memFileArena_);
-        return nullptr;
-    }
-
-    XFileMem* pFile = X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
-
-    return pFile;
+            return X_NEW(XFileMem, &filePoolArena_, "MemFile")(pBuf, pBuf + size, &memFileArena_);
+        }
+    );
 }
 
 
@@ -465,6 +407,55 @@ void xFileSys::closeFileMem(XFileMem* file)
     // class free's the buffer.
     X_DELETE(file, &filePoolArena_);
 }
+
+
+template<typename FileT, typename PakFuncT, typename FuncT>
+FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, PakFuncT pakFunc, FuncT func)
+{
+    PathWT osPath;
+
+    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE))
+    {
+        core::StrHash hash(relPath.data(), relPath.length());
+
+        for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
+        {
+            if (pSearch->pDir)
+            {
+                const auto* pDir = pSearch->pDir;
+
+                createOSPath(pDir, relPath, osPath);
+
+                if (PathUtil::DoesFileExist(osPath, true)) {
+                    return func(osPath, mode);
+                }
+            }
+            else if (pSearch->pPak)
+            {
+                auto* pPak = pSearch->pPak;
+
+                auto idx = pPak->find(hash, relPath.c_str());
+                if (idx != -1)
+                {
+                    return pakFunc(pPak, idx);
+                }
+            }
+            else
+            {
+                X_ASSERT_UNREACHABLE();
+            }
+        }
+    }
+    else
+    {
+        createOSPath(gameDir_, relPath, osPath);
+
+        return func(osPath, mode);
+    }
+
+    return nullptr;
+}
+
 
 // --------------------- folders ---------------------
 

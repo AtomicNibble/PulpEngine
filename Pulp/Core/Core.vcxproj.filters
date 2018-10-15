@@ -140,6 +140,9 @@
     <ClInclude Include="Profile\XProfile.h">
       <Filter>Header Files\Profile</Filter>
     </ClInclude>
+    <ClInclude Include="FileSys\PakFile.h">
+      <Filter>Header Files\FileSys</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -225,6 +228,9 @@
     </ClCompile>
     <ClCompile Include="FileSys\win32\OsFileAsyncOperation.cpp">
       <Filter>Source Files\FileSys\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="FileSys\PakFile.cpp">
+      <Filter>Source Files\FileSys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

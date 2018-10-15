@@ -481,6 +481,7 @@
     <ClInclude Include="FileSys\DiskFileAsync.h" />
     <ClInclude Include="FileSys\OsFile.h" />
     <ClInclude Include="FileSys\Pak.h" />
+    <ClInclude Include="FileSys\PakFile.h" />
     <ClInclude Include="FileSys\PakFileAsync.h" />
     <ClInclude Include="FileSys\PathUtil.h" />
     <ClInclude Include="FileSys\win32\OsFile.h" />
@@ -513,6 +514,7 @@
     <ClCompile Include="DllMain.cpp" />
     <ClCompile Include="FileSys\DiskFile.cpp" />
     <ClCompile Include="FileSys\DiskFileAsync.cpp" />
+    <ClCompile Include="FileSys\PakFile.cpp" />
     <ClCompile Include="FileSys\PakFileAsync.cpp" />
     <ClCompile Include="FileSys\win32\OsFile.cpp" />
     <ClCompile Include="FileSys\win32\OsFileAsync.cpp" />

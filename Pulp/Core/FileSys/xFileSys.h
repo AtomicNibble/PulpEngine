@@ -314,6 +314,9 @@ public:
     void listSearchPaths(const char* pSearchPatten = nullptr) const;
 
 private:
+    template<typename FileT, typename PakFuncT, typename FuncT>
+    FileT* findFile(const PathT& relPath, FileFlags mode, PakFuncT pakFunc, FuncT func);
+
     bool addDirInteral(const PathWT& path, bool isGame);
 
 private:
