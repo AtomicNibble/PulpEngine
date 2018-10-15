@@ -28,8 +28,8 @@ namespace techset
     class TechSetDefs
     {
         typedef core::Array<char> FileBuf;
-        typedef core::HashMap<core::Path<char>, FileBuf> SourceMap;
-        typedef core::HashMap<core::Path<char>, TechSetDef*> TechSetDefMap;
+        typedef core::HashMap<core::string, FileBuf> SourceMap;
+        typedef core::HashMap<core::string, TechSetDef*> TechSetDefMap;
 
         static const char* INCLUDE_DIR;
         static const wchar_t* INCLUDE_DIR_W;
@@ -49,11 +49,11 @@ namespace techset
         MATLIB_EXPORT void clearIncSrcCache(void);
 
     private:
-        TechSetDef* loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name);
+        TechSetDef* loadTechDef(const core::string& name, MaterialCat::Enum cat, const core::string& fileName);
 
         static bool loadTechCat(MaterialCat::Enum cat, CatTypeArr& typesOut);
         static void getTechCatPath(MaterialCat::Enum cat, core::Path<char>& path);
-        static bool loadFile(const core::Path<char>& path, FileBuf& bufOut);
+        static bool loadFile(const core::string& name, FileBuf& bufOut);
 
         bool includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath);
 

@@ -79,14 +79,13 @@ namespace techset
         return false;
     }
 
-    TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& name)
+    TechSetDef* TechSetDefs::getTechDef(const MaterialCat::Enum cat, const core::string& fileName)
     {
-        core::Path<char> path;
-        path /= MaterialCat::ToString(cat);
-        path /= name;
+        core::string path;
+        path = MaterialCat::ToString(cat);
         path.toLower();
-        path.replaceSeprators();
-        path.setExtension(TECH_DEFS_FILE_EXTENSION);
+        path += assetDb::ASSET_NAME_SLASH;
+        path += fileName;
 
         TechSetDef** pTechDefRef = nullptr;
         bool loaded = true;
@@ -117,7 +116,7 @@ namespace techset
             return *pTechDefRef;
         }
 
-        auto* pTechDef = loadTechDef(path, cat, name);
+        auto* pTechDef = loadTechDef(path, cat, fileName);
         if (!pTechDef) {
             *pTechDefRef = INVALID_TECH_SET_DEF;
             return nullptr;
@@ -165,18 +164,17 @@ namespace techset
         path.toLower();
     }
 
-    bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
+    bool TechSetDefs::loadFile(const core::string& name, FileBuf& bufOut)
     {
         core::XFileScoped file;
         core::FileFlags mode = core::FileFlag::READ | core::FileFlag::SHARE;
 
-        core::Path<char> fullPath;
-        fullPath.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));
-        fullPath.append('s', 1);
-        fullPath.toLower();
-        fullPath /= path;
+        core::AssetName assName(assetDb::AssetType::TECHDEF, name, TECH_DEFS_FILE_EXTENSION);
+        assName.replaceSeprators();
 
-        if (!file.openFile(fullPath, mode)) {
+        core::Path<> path(assName.begin(), assName.end());
+
+        if (!file.openFile(path, mode)) {
             X_ERROR("TechSetDefs", "Failed to open file: \"%s\"", path.c_str());
             return false;
         }
@@ -193,21 +191,21 @@ namespace techset
         return true;
     }
 
-    TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
+    TechSetDef* TechSetDefs::loadTechDef(const core::string& name, MaterialCat::Enum cat, const core::string& fileName)
     {
         FileBuf fileData(arena_);
 
-        if (!loadFile(path, fileData)) {
+        if (!loadFile(name, fileData)) {
             return nullptr;
         }
 
-        core::UniquePointer<TechSetDef> techDef = core::makeUnique<TechSetDef>(arena_, name, arena_);
+        core::UniquePointer<TechSetDef> techDef = core::makeUnique<TechSetDef>(arena_, fileName, arena_);
 
         TechSetDef::OpenIncludeDel incDel;
         incDel.Bind<TechSetDefs, &TechSetDefs::includeCallback>(this);
 
         if (!techDef->parseFile(fileData, incDel)) {
-            X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), name.c_str());
+            X_ERROR("TechSetDefs", "Failed to load: \"%s:%s\"", MaterialCat::ToString(cat), fileName.c_str());
             return nullptr;
         }
 
@@ -223,17 +221,16 @@ namespace techset
 
     bool TechSetDefs::includeCallback(core::XLexer& lex, core::string& name, bool useIncludePath)
     {
-        core::Path<char> path;
+        core::string path;
 
         if (useIncludePath) {
             path = INCLUDE_DIR;
-            path /= name;
+            path += assetDb::ASSET_NAME_SLASH;
+            path += name;
         }
         else {
             path = name;
         }
-
-        path.setExtension(TECH_DEFS_FILE_EXTENSION);
 
         SourceMap::iterator it;
         {
