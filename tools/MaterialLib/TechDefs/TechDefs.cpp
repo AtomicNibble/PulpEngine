@@ -156,6 +156,16 @@ namespace techset
         return true;
     }
 
+    void TechSetDefs::getTechCatPath(MaterialCat::Enum cat, core::Path<char>& path)
+    {
+        path.clear();
+        path.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));
+        path.append('s', 1);
+        path.toLower();
+        path /= MaterialCat::ToString(cat);
+        path.toLower();
+    }
+
     bool TechSetDefs::loadFile(const core::Path<char>& path, FileBuf& bufOut)
     {
         core::XFileScoped file;
@@ -182,16 +192,6 @@ namespace techset
         }
 
         return true;
-    }
-
-    void TechSetDefs::getTechCatPath(MaterialCat::Enum cat, core::Path<char>& path)
-    {
-        path.clear();
-        path.append(assetDb::AssetType::ToString(assetDb::AssetType::TECHDEF));
-        path.append('s', 1);
-        path.toLower();
-        path /= MaterialCat::ToString(cat);
-        path.toLower();
     }
 
     TechSetDef* TechSetDefs::loadTechDef(const core::Path<char>& path, MaterialCat::Enum cat, const core::string& name)
