@@ -379,7 +379,8 @@ namespace PathUtil
         while ((fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 && 
             (strUtil::IsEqual(L".", fi.name) || strUtil::IsEqual(L"..", fi.name)))
         {
-            if (::_wfindnext64(handle, &fi) != 0) {
+            auto res = ::_wfindnext64(handle, &fi);
+            if (res != 0) {
                 ::_findclose(handle);
                 return INVALID_FIND_HANDLE;
             }
@@ -393,7 +394,8 @@ namespace PathUtil
     {
         _wfinddata64_t fi;
 
-        if (::_wfindnext64(handle, &fi) == 0) {
+        auto res = ::_wfindnext64(handle, &fi);
+        if (res == 0) {
             win32FindDataToFindData(fi, findInfo);
             return true;
         }
