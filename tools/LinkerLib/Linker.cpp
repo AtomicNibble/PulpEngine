@@ -33,10 +33,6 @@ void Linker::PrintBanner(void)
 
 bool Linker::Init(void)
 {
-    if (!converter_.Init()) {
-        X_ERROR("Linker", "Failed to init converter");
-        return false;
-    }
 
     return true;
 }
@@ -49,6 +45,11 @@ bool Linker::dumpMetaOS(core::Path<wchar_t>& osPath)
 bool Linker::Build(BuildOptions& options)
 {
     core::StopWatch timer;
+
+    if (!converter_.Init()) {
+        X_ERROR("Linker", "Failed to init converter");
+        return false;
+    }
 
     if (options.mod.isNotEmpty()) {
         if (!db_.SetMod(options.mod)) {
