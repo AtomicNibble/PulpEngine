@@ -140,16 +140,15 @@ namespace techset
         if (find.findfirst(path)) {
 
             do {
-                const auto& fd = find.fileData();
+                auto& fd = find.fileData();
                 if (fd.attrib.IsSet(core::FindData::AttrFlag::DIRECTORY)) {
                     continue;
                 }
 
                 // remove the extension.
-                core::Path<char> name(fd.name);
-                name.removeExtension();
+                fd.name.removeExtension();
 
-                typesOut.emplace_back(name.c_str());
+                typesOut.emplace_back(fd.name.c_str());
             } while (find.findNext());
         }
 
