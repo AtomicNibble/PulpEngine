@@ -367,27 +367,29 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    findhandle findFirst(const Path& path, FindData& findInfo)
+    static_assert(reinterpret_cast<uintptr_t>(INVALID_HANDLE_VALUE) == INVALID_FIND_HANDLE, "Invalid handles don't match");
+
+    FindPair findFirst(const Path& path, FindData& findInfo)
     {
         _wfinddata64_t fi;
         intptr_t handle = ::_wfindfirst64(path.c_str(), &fi);
         if (handle == -1) {
-            return INVALID_FIND_HANDLE;
+            return{ INVALID_FIND_HANDLE, false };
         }
 
         // skip "." & ".."
-        while ((fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 && 
+        while ((fi.attrib & FILE_ATTRIBUTE_DIRECTORY) != 0 &&
             (strUtil::IsEqual(L".", fi.name) || strUtil::IsEqual(L"..", fi.name)))
         {
             auto res = ::_wfindnext64(handle, &fi);
             if (res != 0) {
                 ::_findclose(handle);
-                return INVALID_FIND_HANDLE;
+                return{ INVALID_FIND_HANDLE, true };
             }
         }
 
         win32FindDataToFindData(fi, findInfo);
-        return handle;
+        return{ handle, true };
     }
 
     bool findNext(findhandle handle, FindData& findInfo)

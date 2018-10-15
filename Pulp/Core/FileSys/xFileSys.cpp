@@ -556,9 +556,9 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
     searchPath.appendFmt(L"*.%S", AssetPak::PAK_FILE_EXTENSION);
 
     FindData findInfo;
-    uintptr_t handle = PathUtil::findFirst(searchPath, findInfo);
+    auto findPair = PathUtil::findFirst(searchPath, findInfo);
 
-    if (handle != PathUtil::INVALID_FIND_HANDLE)
+    if (findPair.handle != INVALID_FIND_HANDLE)
     {
         do
         {
@@ -567,9 +567,9 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
                 X_ERROR("FileSys", "Failed to add pak: \"%s\"", findInfo.name.c_str());
             }
         }
-        while(PathUtil::findNext(handle, findInfo));
+        while(PathUtil::findNext(findPair.handle, findInfo));
 
-        PathUtil::findClose(handle);
+        PathUtil::findClose(findPair.handle);
     }
 
     return true;
@@ -577,7 +577,7 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
 
 // --------------------- Find util ---------------------
 
-uintptr_t xFileSys::findFirst(const PathT& path, FindData& findinfo)
+FindPair xFileSys::findFirst(const PathT& path, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
     // so this is start of new version but i dunno how i want it to work yet.
@@ -594,23 +594,21 @@ uintptr_t xFileSys::findFirst(const PathT& path, FindData& findinfo)
     return findFirstOS(osPath, findinfo);
 }
 
-uintptr_t xFileSys::findFirstOS(const PathWT& osPath, FindData& findinfo)
+FindPair xFileSys::findFirstOS(const PathWT& osPath, FindData& findinfo)
 {
-    uintptr_t handle = PathUtil::findFirst(osPath, findinfo);
+    auto fp = PathUtil::findFirst(osPath, findinfo);
 
-    static_assert(INVALID_HANDLE == PathUtil::INVALID_FIND_HANDLE, "Invalid handles don't match");
-
-    return handle;
+    return fp;
 }
 
-bool xFileSys::findnext(uintptr_t handle, FindData& findinfo)
+bool xFileSys::findnext(findhandle handle, FindData& findinfo)
 {
-    X_ASSERT(handle != PathUtil::INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
+    X_ASSERT(handle != INVALID_FIND_HANDLE, "FindNext called with invalid handle")(handle);
 
     return PathUtil::findNext(handle, findinfo);
 }
 
-void xFileSys::findClose(uintptr_t handle)
+void xFileSys::findClose(findhandle handle)
 {
     PathUtil::findClose(handle);
 }
@@ -667,36 +665,36 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
     searchPath.append(L"*");
 
     FindData fd;
-    uintptr_t handle = PathUtil::findFirst(searchPath, fd);
-    if (handle != PathUtil::INVALID_FIND_HANDLE) {
-        do {
-
-            // build a OS Path.
-            PathWT dirItem(osPath);
-            dirItem.ensureSlash();
-            dirItem.append(fd.name.begin(), fd.name.end());
-
-            if (PathUtil::IsDirectory(fd)) {
-                if (dirItem.fillSpaceWithNullTerm() < 1) {
-                    X_ERROR("FileSys", "Failed to pad puffer for OS operation");
-                    return false;
-                }
-
-                if (!PathUtil::DeleteDirectory(dirItem, true)) {
-                    return false;
-                }
-            }
-            else {
-                if (!PathUtil::DeleteFile(dirItem)) {
-                    return false;
-                }
-            }
-
-        } while (PathUtil::findNext(handle, fd));
-
-        PathUtil::findClose(handle);
+    auto findPair = PathUtil::findFirst(searchPath, fd);
+    if (findPair.handle != INVALID_FIND_HANDLE) {
+        return findPair.valid;
     }
 
+    do {
+        // build a OS Path.
+        PathWT dirItem(osPath);
+        dirItem.ensureSlash();
+        dirItem.append(fd.name.begin(), fd.name.end());
+
+        if (PathUtil::IsDirectory(fd)) {
+            if (dirItem.fillSpaceWithNullTerm() < 1) {
+                X_ERROR("FileSys", "Failed to pad puffer for OS operation");
+                return false;
+            }
+
+            if (!PathUtil::DeleteDirectory(dirItem, true)) {
+                return false;
+            }
+        }
+        else {
+            if (!PathUtil::DeleteFile(dirItem)) {
+                return false;
+            }
+        }
+
+    } while (PathUtil::findNext(findPair.handle, fd));
+
+    PathUtil::findClose(findPair.handle);
     return true;
 }
 

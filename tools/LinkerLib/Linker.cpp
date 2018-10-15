@@ -206,10 +206,15 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
     dirSearch.append("*");
 
     core::IFileSys::FindData fd;
-    auto handle = pFileSys->findFirst(dirSearch, fd);
+    auto findPair = pFileSys->findFirst(dirSearch, fd);
 
-    if (handle == core::IFileSys::INVALID_HANDLE) {
-        X_ERROR("Linker", "Failed to iterate dir: %s", dirSearch.c_str());
+    if (findPair.handle == core::IFileSys::INVALID_FIND_HANDLE) {
+        if (findPair.valid) {
+            X_WARNING("Linker", "empty dir: \"%s\"", dirPath.c_str());
+            return true;
+        }
+        
+        X_ERROR("Linker", "Failed to iterate dir: \"%s\"", dirPath.c_str());
         return false;
     }
 
@@ -243,9 +248,9 @@ bool Linker::AddAssetDir(const DirEntry& dir, const core::Path<>& relPath, const
 
         ++numAdded;
 
-    } while (pFileSys->findnext(handle, fd));
+    } while (pFileSys->findnext(findPair.handle, fd));
 
-    pFileSys->findClose(handle);
+    pFileSys->findClose(findPair.handle);
     return true;
 }
 

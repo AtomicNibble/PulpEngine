@@ -256,10 +256,10 @@ public:
     bool addModDir(const PathWT& osPath) X_FINAL;
 
     // Find util
-    uintptr_t findFirst(const PathT& path, FindData& findinfo) X_FINAL;
-    uintptr_t findFirstOS(const PathWT& osPath, FindData& findinfo) X_FINAL;
-    bool findnext(uintptr_t handle, FindData& findinfo) X_FINAL;
-    void findClose(uintptr_t handle) X_FINAL;
+    FindPair findFirst(const PathT& path, FindData& findinfo) X_FINAL;
+    FindPair findFirstOS(const PathWT& osPath, FindData& findinfo) X_FINAL;
+    bool findnext(findhandle handle, FindData& findinfo) X_FINAL;
+    void findClose(findhandle handle) X_FINAL;
 
     // Delete
     bool deleteFile(const PathT& path) const X_FINAL;

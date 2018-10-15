@@ -16,8 +16,7 @@ X_NAMESPACE_BEGIN(core)
 namespace PathUtil
 {
     typedef FindData FindData;
-    typedef intptr_t findhandle;
-    static const findhandle INVALID_FIND_HANDLE = -1;
+    typedef findhandle findhandle;
 
     typedef core::Path<wchar_t> Path;
 
@@ -57,7 +56,7 @@ namespace PathUtil
     bool MoveFile(const Path& fullPath, const Path& fullPathNew);
     bool MoveFile(const wchar_t* pFullPath, const wchar_t* pFullPathNew);
 
-    findhandle findFirst(const Path& path, FindData& findInfo);
+    FindPair findFirst(const Path& path, FindData& findInfo);
     bool findNext(findhandle handle, FindData& findInfo);
     bool findClose(findhandle handle);
 

@@ -680,6 +680,26 @@ struct FindData
     core::Path<char> name;
 };
 
+typedef intptr_t findhandle;
+static const findhandle INVALID_FIND_HANDLE = -1;
+
+struct FindPair
+{
+    FindPair(findhandle handle, bool valid) :
+        handle(handle),
+        valid(valid)
+    {
+    }
+
+    FindPair() :
+        FindPair(INVALID_FIND_HANDLE, false)
+    {
+    }
+
+    findhandle handle;
+    bool valid;         // true is we opened a handle to the path.
+};
+
 struct IFileSys
 {
     typedef FileFlag FileFlag;
@@ -689,7 +709,7 @@ struct IFileSys
     typedef core::Path<wchar_t> PathWT;
     typedef FindData FindData;
 
-    static const uintptr_t INVALID_HANDLE = (uintptr_t)-1;
+    static const findhandle INVALID_FIND_HANDLE = INVALID_FIND_HANDLE;
 
     virtual ~IFileSys() = default;
 
@@ -721,10 +741,10 @@ struct IFileSys
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
-    virtual uintptr_t findFirst(const PathT& path, FindData& findinfo) X_ABSTRACT;
-    virtual uintptr_t findFirstOS(const PathWT& osPath, FindData& findinfo) X_ABSTRACT;
-    virtual bool findnext(uintptr_t handle, FindData& findinfo) X_ABSTRACT;
-    virtual void findClose(uintptr_t handle) X_ABSTRACT;
+    virtual FindPair findFirst(const PathT& path, FindData& findinfo) X_ABSTRACT;
+    virtual FindPair findFirstOS(const PathWT& osPath, FindData& findinfo) X_ABSTRACT;
+    virtual bool findnext(findhandle handle, FindData& findinfo) X_ABSTRACT;
+    virtual void findClose(findhandle handle) X_ABSTRACT;
 
     // Delete
     virtual bool deleteFile(const PathT& path) const X_ABSTRACT;
@@ -1146,29 +1166,28 @@ private:
 class FindFirstScoped
 {
 public:
-    X_INLINE FindFirstScoped() :
-        handle_(core::IFileSys::INVALID_HANDLE)
+    X_INLINE FindFirstScoped()
     {
         pFileSys_ = gEnv->pFileSys;
     }
 
     X_INLINE ~FindFirstScoped()
     {
-        if (handle_ != core::IFileSys::INVALID_HANDLE) {
-            pFileSys_->findClose(handle_);
+        if (fp_.handle != core::IFileSys::INVALID_FIND_HANDLE) {
+            pFileSys_->findClose(fp_.handle);
         }
     }
 
     X_INLINE bool findfirst(const IFileSys::PathT& path)
     {
-        handle_ = pFileSys_->findFirst(path, fd_);
-        return handle_ != core::IFileSys::INVALID_HANDLE;
+        fp_ = pFileSys_->findFirst(path, fd_);
+        return fp_.handle != core::IFileSys::INVALID_FIND_HANDLE;
     }
 
     X_INLINE bool findNext(void)
     {
-        X_ASSERT(handle_ != core::IFileSys::INVALID_HANDLE, "handle is invalid")();
-        return pFileSys_->findnext(handle_, fd_);
+        X_ASSERT(fp_.handle != core::IFileSys::INVALID_FIND_HANDLE, "handle is invalid")();
+        return pFileSys_->findnext(fp_.handle, fd_);
     }
 
     X_INLINE core::IFileSys::FindData& fileData(void)
@@ -1182,13 +1201,13 @@ public:
 
     X_INLINE operator bool() const
     {
-        return handle_ != core::IFileSys::INVALID_HANDLE;
+        return fp_.handle != core::IFileSys::INVALID_FIND_HANDLE;
     }
 
 private:
     core::IFileSys::FindData fd_;
     core::IFileSys* pFileSys_;
-    uintptr_t handle_;
+    FindPair fp_;
 };
 
 X_NAMESPACE_END
