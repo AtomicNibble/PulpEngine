@@ -123,6 +123,9 @@ namespace shader
         core::CriticalSection::ScopedLock lock(cs_);
 
         for (auto& s : source_) {
+            if (s.second == INVALID_SOURCE) {
+                continue;
+            }
             X_DELETE(s.second, &sourcePoolArena_);
         }
 
