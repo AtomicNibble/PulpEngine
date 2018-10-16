@@ -16,23 +16,11 @@ public:
     static const size_t BUF_SIZE = MAX_PATH;
 
 public:
-#ifdef X_PLATFORM_WIN32
-    static const TChar NATIVE_SLASH = '\\';
-    static const TChar NON_NATIVE_SLASH = '/';
+    static const TChar SLASH = '/';
+    static const TChar INVALID_SLASH = '\\';
 
-    static const wchar_t NATIVE_SLASH_W = L'\\';
-    static const wchar_t NON_NATIVE_SLASH_W = L'/';
-
-    // using none native slash on windows dose not work well
-    // since the drive slash must be a native one.
-//	static const TChar NATIVE_SLASH = '/';
-//	static const TChar NON_NATIVE_SLASH = '\\';
-#else
-    static const TChar NATIVE_SLASH = '/';
-    static const TChar NON_NATIVE_SLASH = '\\';
-    static const wchar_t NATIVE_SLASH_W = L'/';
-    static const wchar_t NON_NATIVE_SLASH_W = L'\\';
-#endif
+    static const wchar_t SLASH_W = L'/';
+    static const wchar_t INVALID_SLASH_W = L'\\';
 
     inline Path();
     inline Path(const Path& oth);

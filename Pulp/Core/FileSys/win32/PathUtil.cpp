@@ -12,6 +12,8 @@ namespace PathUtil
 {
     namespace
     {
+        const wchar_t NATIVE_SLASH_W = L'\\';
+        const wchar_t NON_NATIVE_SLASH_W = L'/';
 
         void win32FindDataToFindData(const _wfinddata64_t& fi, FindData& findInfo)
         {
@@ -193,7 +195,7 @@ namespace PathUtil
 
         Path path(L"");
 
-        StringTokenizer<wchar_t> tokenizer(pDir, pDir + strUtil::strlen(pDir), Path::NATIVE_SLASH_W);
+        StringTokenizer<wchar_t> tokenizer(pDir, pDir + strUtil::strlen(pDir), NATIVE_SLASH_W);
         StringRange<wchar_t> range(nullptr, nullptr);
 
         while (tokenizer.extractToken(range)) {

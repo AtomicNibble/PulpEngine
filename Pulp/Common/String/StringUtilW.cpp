@@ -21,27 +21,6 @@ namespace strUtil
             return x - (e >> 2);
         }
 
-        uint32_t replaceAll(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t original, const wchar_t replacement)
-        {
-            // find me baby
-            uint32_t count = 0;
-            wchar_t* start = (wchar_t*)startInclusive;
-            while (start < endExclusive) {
-                if (*start == original) {
-                    *start = replacement;
-                    count++;
-                }
-                ++start;
-            }
-            return count;
-        }
-
-        void ReplaceSlashes(const wchar_t* path, const wchar_t* pathEnd)
-        {
-            replaceAll(path, pathEnd,
-                Path<wchar_t>::NON_NATIVE_SLASH, Path<wchar_t>::NATIVE_SLASH);
-        }
-
     } // namespace
 
     bool IsLowerW(const wchar_t character)
@@ -493,8 +472,9 @@ namespace strUtil
     {
         const wchar_t* res = strUtil::FindLast(startInclusive, endExclusive, '.');
         // I think it might be better to return null here, instead of start.
-        if (!res || res == (endExclusive - 1))
+        if (!res || res == (endExclusive - 1)) {
             return nullptr;
+        }
         return res + 1;
     }
 
@@ -506,12 +486,13 @@ namespace strUtil
     const wchar_t* FileName(const wchar_t* startInclusive, const wchar_t* endExclusive)
     {
         // make sure slash is correct.
-        strUtil::ReplaceSlashes(startInclusive, endExclusive);
+        X_ASSERT(Find(startInclusive, endExclusive, Path<wchar_t>::INVALID_SLASH) == nullptr, "Path Invalid slash")();
 
-        const wchar_t* res = strUtil::FindLast(startInclusive, endExclusive, Path<wchar_t>::NATIVE_SLASH);
+        const wchar_t* res = strUtil::FindLast(startInclusive, endExclusive, Path<wchar_t>::SLASH_W);
 
-        if (!res || res == (endExclusive - 1))
+        if (!res || res == (endExclusive - 1)) {
             return startInclusive; // might just be file name.
+        }
         return res + 1;
     }
 

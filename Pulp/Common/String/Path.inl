@@ -91,13 +91,13 @@ inline void Path<wchar_t>::append(const char* const beginInclusive, const char* 
 template<typename TChar>
 const TChar* Path<TChar>::fileName(void) const
 {
-    const TChar* native = BaseType::findLast(NATIVE_SLASH);
+    const TChar* native = BaseType::findLast(SLASH);
     // folder//
     if (native == BaseType::end() - 1) {
         return native + 1;
     }
 
-    const TChar* noneNative = BaseType::findLast(NON_NATIVE_SLASH);
+    const TChar* noneNative = BaseType::findLast(INVALID_SLASH);
     // folder
     if (noneNative == BaseType::end() - 1) {
         return noneNative + 1;
@@ -275,21 +275,21 @@ template<typename TChar>
 inline void Path<TChar>::ensureSlash(void)
 {
     if (BaseType::len_ > 0) {
-        BaseType::stripTrailing(NATIVE_SLASH);
-        BaseType::append(NATIVE_SLASH, 1);
+        BaseType::stripTrailing(SLASH);
+        BaseType::append(SLASH, 1);
     }
 }
 
 template<>
 inline void Path<char>::replaceSeprators(void)
 {
-    replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
+    replaceAll(INVALID_SLASH, SLASH);
 }
 
 template<>
 inline void Path<wchar_t>::replaceSeprators(void)
 {
-    replaceAll(NON_NATIVE_SLASH_W, NATIVE_SLASH_W);
+    replaceAll(INVALID_SLASH_W, SLASH_W);
 }
 
 template<>
@@ -324,7 +324,7 @@ template<typename TChar>
 inline void Path<TChar>::removeTrailingSlash(void)
 {
     replaceSeprators();
-    BaseType::stripTrailing(NATIVE_SLASH);
+    BaseType::stripTrailing(SLASH);
 }
 
 template<typename TChar>
@@ -344,12 +344,12 @@ inline bool Path<TChar>::isAbsolute(void) const
 
     // https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
     // \folder is absolute
-    if (len > 0 && (BaseType::str_[0] == NATIVE_SLASH || BaseType::str_[0] == NON_NATIVE_SLASH)) {
+    if (len > 0 && (BaseType::str_[0] == SLASH || BaseType::str_[0] == INVALID_SLASH)) {
         return true;
     }
 
     // c:\folder is absolute c:folder is not
-    if (len > 2 && BaseType::str_[1] == ':' && (BaseType::str_[2] == NATIVE_SLASH || BaseType::str_[2] == NON_NATIVE_SLASH)) {
+    if (len > 2 && BaseType::str_[1] == ':' && (BaseType::str_[2] == SLASH || BaseType::str_[2] == INVALID_SLASH)) {
         return true;
     }
 

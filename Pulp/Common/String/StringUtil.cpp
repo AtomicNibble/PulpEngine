@@ -130,7 +130,7 @@ namespace strUtil
         }
 
         // only used for function below.
-        uint32_t replaceAll(const char* startInclusive, const char* endExclusive, const char original, const char replacement)
+        uint32_t replaceAll(char* startInclusive, char* endExclusive, const char original, const char replacement)
         {
             // find me baby
             uint32_t count = 0;
@@ -145,10 +145,9 @@ namespace strUtil
             return count;
         }
 
-        void ReplaceSlashes(const char* path, const char* pathEnd)
+        void ReplaceSlashes(char* path, char* pathEnd)
         {
-            replaceAll(path, pathEnd,
-                Path<char>::NON_NATIVE_SLASH, Path<char>::NATIVE_SLASH);
+            replaceAll(path, pathEnd, Path<char>::INVALID_SLASH, Path<char>::SLASH);
         }
 
 #if X_COMPILER_MSVC
@@ -848,9 +847,9 @@ namespace strUtil
     const char* FileName(const char* startInclusive, const char* endExclusive)
     {
         // make sure slash is correct.
-        strUtil::ReplaceSlashes(startInclusive, endExclusive);
+        X_ASSERT(Find(startInclusive, endExclusive, Path<>::INVALID_SLASH) == nullptr, "Path Invalid slash")();
 
-        const char* res = strUtil::FindLast(startInclusive, endExclusive, Path<char>::NATIVE_SLASH);
+        const char* res = strUtil::FindLast(startInclusive, endExclusive, Path<char>::SLASH);
 
         if (!res || res == (endExclusive - 1)) {
             return startInclusive; // might just be file name.
