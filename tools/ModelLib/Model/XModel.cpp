@@ -18,6 +18,8 @@ XModel::XModel(core::string& name) :
     pTagTree_ = nullptr;
     pBoneAngles_ = nullptr;
     pBonePos_ = nullptr;
+    pBoneAnglesRel_ = nullptr;
+    pBonePosRel_ = nullptr;
     pMeshHeads_ = nullptr;
     pHdr_ = nullptr;
 }
