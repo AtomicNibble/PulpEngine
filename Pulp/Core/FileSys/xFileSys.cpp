@@ -61,6 +61,11 @@ namespace
     static_assert(ioReqSize[IoRequest::READ] == sizeof(IoRequestRead), "Enum mismtach?");
     static_assert(ioReqSize[IoRequest::WRITE] == sizeof(IoRequestWrite), "Enum mismtach?");
 
+    // I know want it so all open requests that reach the file system are basically asset names.
+    // unless a OS path.
+    static_assert(core::Path<>::SLASH == assetDb::ASSET_NAME_SLASH, "Slash mismatch");
+    static_assert(core::Path<>::INVALID_SLASH == assetDb::ASSET_NAME_INVALID_SLASH, "Slash mismatch");
+
 } // namespace
 
 // ------------------------------------
