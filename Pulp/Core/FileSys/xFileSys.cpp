@@ -295,6 +295,8 @@ XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
 
 XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode)
 {
+    X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
+
     return findFile<XFile>(relPath, mode,
         [&](Pak* pPak, int32_t idx) -> XFile* {
             if (isDebug()) {
@@ -331,6 +333,8 @@ void xFileSys::closeFile(XFile* file)
 // async
 XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode)
 {
+    X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
+
     return findFile<XFileAsync>(relPath, mode,
         [&](Pak* pPak, int32_t idx) -> XFileAsync* {
             if (isDebug()) {
@@ -366,6 +370,8 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode)
 {
+    X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
+
     return findFile<XFileMem>(relPath, mode,
         [&](Pak* pPak, int32_t idx) -> XFileMem* {
             if (isDebug()) {
