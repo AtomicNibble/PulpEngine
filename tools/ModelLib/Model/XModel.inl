@@ -96,7 +96,7 @@ X_INLINE const char* XModel::getBoneName(size_t idx) const
 {
     X_ASSERT(static_cast<int32_t>(idx) < getNumBones(), "invalid bone index")(getNumBones(), idx); 
 
-    // temp hack.
+    // TODO: temp hack.
     const char* pBoneName = (char*)(data_.ptr() + sizeof(ModelHeader) + pTagNames_[idx]);
 
     return pBoneName;
