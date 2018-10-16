@@ -41,9 +41,16 @@ xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCommon.dll" "build"
 xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCooking.dll" "build"
 xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysXCharacterKinematic.dll" "build"
 
+rem copy all physics for now, be while before have actual release builds.
+xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\PhysX*.dll" "build"
+
 xcopy /y /d "..\3rdparty\Physx_libs\bin\x64\nvToolsExt*.dll" "build"
 
 xcopy /y /d "..\3rdparty\bin\x64\D3DCompiler_47.dll" "build"
+
+rem for debug builds..
+xcopy /y /d "..\3rdparty\bin\x64\ispc_texcomp.dll" "build"
+
 
 rem some assets.. !
 xcopy /y /d "core_assets\*.apak" "build\core_assets"
@@ -51,7 +58,7 @@ xcopy /y /i /s /e /d "core_assets\config" "build\core_assets\config"
 REM xcopy /y /i /s /e /d "core_assets\levels" "build\core_assets\levels"
 xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 REM xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
-REM xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
+xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
 REM xcopy /y /i /s /e /d "core_assets\scripts" "build\core_assets\scripts"
 REM xcopy /y /i /s /e /d "core_assets\menus" "build\core_assets\menus"
 
