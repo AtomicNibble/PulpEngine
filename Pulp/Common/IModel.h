@@ -673,7 +673,7 @@ struct ModelHeader // File header.
 {
     uint8_t version;
     ModelFlags flags;
-    uint8_t numBones;
+    uint8_t numBones; // includes root bones.
     uint8_t numRootBones;
     uint8_t numMesh;
     uint8_t numLod;
