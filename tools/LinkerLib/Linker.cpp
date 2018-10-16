@@ -66,13 +66,14 @@ bool Linker::Build(BuildOptions& options)
         core::Path<char> levelAssList;
         core::Path<char> levelAssListInc;
 
+        // TODO: remove hardcoded mod.
         level.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_FILE_EXTENSION);
         levelEntDesc.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_ENT_FILE_EXTENSION);
         levelAssList.setFmt("core_assets/levels/%s.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
         levelAssListInc.setFmt("core_assets/levels/%s_inc.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
 
         // load the level.
-        if (!AddAssetFromDisk(assetDb::AssetType::LEVEL, options.level, level)) {
+        if (!AddAssetFromDisk(assetDb::AssetType::LEVEL, options.level + "." + level::LVL_FILE_EXTENSION, level)) {
             X_ERROR("Linker", "Failed to add level file");
             return false;
         }
