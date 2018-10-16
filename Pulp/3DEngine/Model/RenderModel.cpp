@@ -168,6 +168,8 @@ void RenderModel::assignDefault(RenderModel* pDefault)
     }
 
     pHdr_ = pDefault->pHdr_;
+
+    X_ASSERT(!data_, "Data is valid, are we assigned over a valid model?")(data_);
 }
 
 X_NAMESPACE_END
