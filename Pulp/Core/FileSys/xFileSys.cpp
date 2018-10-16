@@ -373,9 +373,18 @@ XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode)
             }
 
             auto& entry = pPak->pEntires[idx];
-            X_UNUSED(entry);
-            X_ASSERT_NOT_IMPLEMENTED();
-            return nullptr; // X_NEW(XPakFileAsync, &filePoolArena_, "PakFile")(pPak, entry, &asyncOpPoolArena_);
+            
+            XPakFile file(pPak, entry);
+
+            size_t size = safe_static_cast<size_t, int64_t>(file.remainingBytes());
+            char* pBuf = X_NEW_ARRAY(char, size, &memFileArena_, "MemBuffer");
+
+            if (file.read(pBuf, size) != size) {
+                X_DELETE_ARRAY(pBuf, &memFileArena_);
+                return nullptr;
+            }
+            
+            return X_NEW(XFileMem, &filePoolArena_, "MemFilePak")(pBuf, pBuf + size, &memFileArena_);
         },
         [&](const PathWT& osPath, FileFlags mode) -> XFileMem* {
             if (isDebug()) {
