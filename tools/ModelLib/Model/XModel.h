@@ -61,6 +61,7 @@ public:
 
 protected:
     // runtime pointers.
+    // if you add more don't forget to update RenderModel::assignDefault
     const uint16_t* pTagNames_;
     const uint8_t* pTagTree_;
     const XQuatCompressedf* pBoneAngles_;
