@@ -253,7 +253,7 @@ core::Path<char> SettingsCache::GetSettingsPath(void)
     {
         core::Path<char> folder;
 
-        const char* end = path.find(core::Path<char>::NATIVE_SLASH);
+        const char* end = path.find(core::Path<char>::SLASH);
         while (end != nullptr) {
             folder.set(path.c_str(), end + 1);
 
@@ -265,7 +265,7 @@ core::Path<char> SettingsCache::GetSettingsPath(void)
                 }
             }
 
-            end = core::strUtil::Find(++end, core::Path<char>::NATIVE_SLASH);
+            end = core::strUtil::Find(++end, core::Path<char>::SLASH);
         }
     }
 
