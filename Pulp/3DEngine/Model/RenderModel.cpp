@@ -159,6 +159,8 @@ void RenderModel::assignDefault(RenderModel* pDefault)
     pTagTree_ = pDefault->pTagTree_;
     pBoneAngles_ = pDefault->pBoneAngles_;
     pBonePos_ = pDefault->pBonePos_;
+    pBoneAnglesRel_ = pDefault->pBoneAnglesRel_;
+    pBonePosRel_ = pDefault->pBonePosRel_;
     pMeshHeads_ = pDefault->pMeshHeads_;
 
     for (size_t i = 0; i < MODEL_MAX_LODS; i++) {
