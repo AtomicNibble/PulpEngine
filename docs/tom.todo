@@ -13,9 +13,9 @@ Core:
    See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
 
    FileSys:
-     ☐ Don't apply OS slashes until we hit OS specific code paths.
+     ✔ Don't apply OS slashes until we hit OS specific code paths. @done (18-10-16 22:42)
      ☐ Limit the use of wchar_t to win32 specific code.
-         All relative paths are asci only.
+         All relative paths are assci only.
          So I only need unicode in tools. for absolute paths.
          Which should really jsut be utf-8
 
@@ -25,6 +25,8 @@ Game:
     I need to know when the state changes and basically reset menu to main.
 
   ☐ Make menus for lobby etc.
+
+  ☐ Fix ammo been above clip size on spawn.
 
   Netorking:
 
@@ -163,7 +165,7 @@ Linker:
     Should probs switch to using the ConverterLib instead of assetDb directly.
     So that the linker can compile assets or is that not it's job?
 
-  ☐ Think be nice to support wild card includes for assetLists.
+  ✘ Think be nice to support wild card includes for assetLists. @cancelled (18-10-16 22:39)
     Stuff like the menus and scripts, just wannt include them all tbh.
     Or is this justa UI problem? like if an just click them all in a UI it's not a problem.
 
@@ -177,7 +179,8 @@ AssetPak:
 
   ✔ Support techdefs in packages. @done (18-10-13 13:58)
   ✔ Support shaders in packages. @done (18-10-13 13:58)
-  ☐ Support loose files?
+  ✔ Support loose files? @done (18-10-16 22:40)
+    You can now add asset dir's that are not tracked by db, like script and menu.
 
 LevelBuilder:
 
@@ -189,7 +192,7 @@ LevelBuilder:
 Sql:
 
   ☐ Don't re export functions in dll's
-    Currently if link sql.dll you end up exporting some of same stuff sql.dll did.
+    Currently if link sql.dll you end up exporting some of same stuff sql.dll exports.
 
  UnitTests:
 
