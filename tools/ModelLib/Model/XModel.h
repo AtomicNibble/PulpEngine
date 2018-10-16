@@ -75,7 +75,7 @@ protected:
     // can probs get rid of this pointer.
     const SubMeshHeader* pMeshHeads_;
 
-    core::UniquePointer<char[]> data_;
+    core::UniquePointer<char[]> data_; // can be null, if default model been assigned to us.
     MatrixArr inverseBones_; // could skip this allocation later by just increasing size of data buffer we allocate.
     ModelHeader* pHdr_;
 };

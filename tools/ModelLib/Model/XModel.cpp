@@ -282,7 +282,7 @@ void XModel::addPhysToActor(physics::ActorHandle actor)
     X_ASSERT(pHdr_->flags.IsSet(ModelFlag::PHYS_DATA), "no phys data")(); 
 
     // we need the col header
-    core::MemCursor phys_data_cursor(data_.get() + sizeof(ModelHeader) + pHdr_->materialNameDataSize + pHdr_->tagNameDataSize + pHdr_->boneDataSize, pHdr_->physDataSize);
+    core::MemCursor phys_data_cursor(reinterpret_cast<char*>(pHdr_) + sizeof(ModelHeader) + pHdr_->materialNameDataSize + pHdr_->tagNameDataSize + pHdr_->boneDataSize, pHdr_->physDataSize);
 
     const CollisionInfoHdr& hdr = *phys_data_cursor.getSeekPtr<CollisionInfoHdr>();
 
