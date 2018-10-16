@@ -439,12 +439,20 @@ namespace exceptionHandler
                     DateStamp::Description date_txt;
 
                     Path<wchar_t> filename;
+                    Path<wchar_t> modPath;
 
-                    wchar_t modPath[0x200] = {};
-                    auto pathLength = ::GetModuleFileNameW(nullptr, modPath, sizeof(modPath) / sizeof(modPath[0]));
+                    {
+                        wchar_t buf[core::Path<>::BUF_SIZE] = {};
+                        auto pathLength = ::GetModuleFileNameW(nullptr, buf, sizeof(buf) / sizeof(buf[0]));
 
-                    if(pathLength > 0) {
-                        filename.set(core::strUtil::FileName(modPath, modPath + pathLength));
+                        if (pathLength > 0) {
+                            modPath.set(buf, buf + pathLength);
+                            modPath.replaceSeprators();
+                        }
+                    }
+
+                    if(modPath.isNotEmpty()) {
+                        filename.set(modPath.fileName());
                         filename.removeExtension();
                     }
                     
