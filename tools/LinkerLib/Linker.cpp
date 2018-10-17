@@ -353,6 +353,19 @@ bool Linker::AddAsset(assetDb::AssetType::Enum assType, const core::string& name
 
 bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::string& name, const core::Path<char>& path)
 {
+    core::Array<uint8_t> data(scratchArea_);
+
+    if (!LoadFile(path, data)) {
+        X_ERROR("Linker", "Failed to read data for %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+        return false;
+    }
+
+    builder_.addAsset(assetDb::INVALID_ASSET_ID, assType, name, std::move(data));
+    return true;
+}
+
+bool Linker::LoadFile(const core::Path<char>& path, core::Array<uint8_t>& dataOut)
+{
     core::XFileScoped file;
     core::FileFlags mode(core::FileFlag::READ | core::FileFlag::SHARE);
 
@@ -361,24 +374,21 @@ bool Linker::AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::stri
     }
 
     const uint64_t realfileSize = file.remainingBytes();
-    if (realfileSize > AssetPak::PAK_MAX_ASSET_SIZE) {
-        core::HumanSize::Str sizeStr;
-        X_ERROR("Linker", "Can't add %s \"%s\" the asset is too big: %s",
-            assetDb::AssetType::ToString(assType), name.c_str(), core::HumanSize::toString(sizeStr, realfileSize));
-        return false;
-    }
-
     const auto fileSize = safe_static_cast<size_t>(realfileSize);
 
-    core::Array<uint8_t> data(scratchArea_);
-    data.resize(fileSize);
-
-    if (file.read(data.data(), data.size()) != fileSize) {
-        X_ERROR("Linker", "Failed to read data for %s \"%s\"", assetDb::AssetType::ToString(assType), name.c_str());
+    if (realfileSize > AssetPak::PAK_MAX_ASSET_SIZE) {
+        core::HumanSize::Str sizeStr;
+        X_ERROR("Linker", "Can't add \"%s\" the asset is too big: %s", path.c_str(), core::HumanSize::toString(sizeStr, realfileSize));
         return false;
     }
 
-    builder_.addAsset(assetDb::INVALID_ASSET_ID, assType, name, std::move(data));
+    dataOut.resize(fileSize);
+
+    if (file.read(dataOut.data(), dataOut.size()) != fileSize) {
+        X_ERROR("Linker", "Failed to read data for\"%s\"", path.c_str());
+        return false;
+    }
+
     return true;
 }
 

@@ -40,6 +40,9 @@ private:
     bool AddAsset(assetDb::AssetType::Enum assType, const core::string& name);
     bool AddAssetFromDisk(assetDb::AssetType::Enum assType, const core::string& name, const core::Path<char>& path);
 
+    static bool LoadFile(const core::Path<char>& path, core::Array<uint8_t>& dataOut);
+
+
 private:
     core::MemoryArenaBase* scratchArea_;
     assetDb::AssetDB& db_;
