@@ -1,0 +1,13 @@
+{
+    "version": 1,
+    "assets": {
+        "WEAPON": {
+            "names": [
+                "test/mg42",
+                "test/ppsh",
+                "test/raygun",
+                "test/sw_357"
+            ]
+        }
+    }
+}

@@ -1,0 +1,82 @@
+{
+    "version": 1,
+    "assets": {
+        "WEAPON": {
+            "names": [
+                "default"
+            ]
+        },
+        "FONT": {
+            "names": [
+                "default"
+            ]
+        },
+        "MODEL": {
+            "names": [
+                "default/default"
+            ]
+        },
+        "IMG": {
+            "names": [
+                "default/$identitynormal",
+                "default/$default",
+                "default/$black",
+                "default/$white"
+            ]
+        },
+        "MATERIAL": {
+            "names": [
+                "default/$default",
+                "code/$linelist",
+                "code/$linelist_2d",
+                "code/$linelist_depth",
+                "code/$linestrip",
+                "code/$linestrip_2d",
+                "code/$linestrip_depth",
+                "code/$pointlist",
+                "code/$pointlist_2d",
+                "code/$pointlist_depth",
+                "code/$trianglelist",
+                "code/$trianglelist_2d",
+                "code/$trianglelist_depth",
+                "code/$trianglestrip",
+                "code/$trianglestrip_2d",
+                "code/$trianglestrip_depth",
+                "code/black",
+                "code/white",
+                "code/default_font",
+                "code/logo",
+                "code/warnings/engine3d",
+                "code/warnings/file",
+                "code/warnings/game",
+                "code/warnings/input",
+                "code/warnings/mem",
+                "code/warnings/net",
+                "code/warnings/phys",
+                "code/warnings/sound",
+                "code/warnings/sound_mem",
+                "code/warnings/texture_mem",
+                "ui/cursor",
+                "ui/spinner"
+            ]
+        }
+    },
+    "dirs": [
+        {
+            "type": "SHADER",
+            "path": "compiled"
+        },
+        {
+            "type": "TECHDEF",
+            "path": ""
+        },
+        {
+            "type": "MENU",
+            "path": ""
+        },
+        {
+            "type": "SCRIPT",
+            "path": ""
+        }
+    ]
+}
