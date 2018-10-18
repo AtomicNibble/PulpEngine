@@ -34,6 +34,7 @@ public:
     LINKERLIB_EXPORT bool Build(BuildOptions& options);
 
 private:
+    bool AddEntDesc(core::Path<char>& inputFile);
     bool AddAssetList(core::Path<char>& inputFile);
     bool AddAssetDir(const DirEntry& entry, const core::Path<>& relPath, const core::Path<>& dirPath, int32_t& numAdded);
     bool AddAssetAndDepenency(assetDb::AssetType::Enum assType, const core::string& name);

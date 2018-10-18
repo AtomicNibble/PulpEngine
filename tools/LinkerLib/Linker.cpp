@@ -2,8 +2,10 @@
 #include "LinkerLib.h"
 #include "AssetList.h"
 
+#include <String\Json.h>
 #include <String\HumanDuration.h>
 #include <Time\StopWatch.h>
+#include <Hashing\Fnva1Hash.h>
 
 #include <IFileSys.h>
 #include <ILevel.h>
@@ -82,6 +84,11 @@ bool Linker::Build(BuildOptions& options)
             return false;
         }
 
+        if (!AddEntDesc(levelEntDesc)) {
+            X_ERROR("Linker", "Failed to add level ent desc");
+            return false;
+        }
+
         if (!AddAssetList(levelAssList)) {
             X_ERROR("Linker", "Failed to add level asset list");
             return false;
@@ -134,6 +141,118 @@ bool Linker::Build(BuildOptions& options)
     if (!builder_.save(options.outFile)) {
         X_ERROR("Linker", "Failed to save: \"%s\"", options.outFile.c_str());
         return false;
+    }
+
+    return true;
+}
+
+bool Linker::AddEntDesc(core::Path<char>& inputFile)
+{
+    core::Array<uint8_t> data(scratchArea_);
+
+    if (!LoadFile(inputFile, data)) {
+        X_ERROR("Ents", "Failed to load ent desc");
+        return false;
+    }
+
+    auto* pBegin = reinterpret_cast<const char*>(data.data());
+    auto* pEnd = reinterpret_cast<const char*>(data.data() + data.size());
+
+    // rerad me some ents!
+    core::json::MemoryStream ms(pBegin, data.size());
+    core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
+
+    core::json::Document d;
+
+    if (d.ParseStream<core::json::kParseCommentsFlag>(is).HasParseError()) {
+        auto err = d.GetParseError();
+        const char* pErrStr = core::json::GetParseError_En(err);
+        size_t offset = d.GetErrorOffset();
+        size_t line = core::strUtil::LineNumberForOffset(pBegin, pEnd, offset);
+
+        X_ERROR("Linker", "Failed to parse ent desc(%" PRIi32 "): Offset: %" PRIuS " Line: %" PRIuS " Err: %s",
+            err, offset, line, pErrStr);
+        return false;
+    }
+
+
+    if (d.GetType() != core::json::Type::kObjectType) {
+        X_ERROR("Ents", "Unexpected type");
+        return false;
+    }
+
+    using namespace core::Hash::Literals;
+
+    core::string assName;
+
+    for (auto it = d.MemberBegin(); it != d.MemberEnd(); ++it)
+    {
+        auto& v = *it;
+
+        if (v.name == "ents") 
+        {
+            if (v.value.GetType() != core::json::Type::kArrayType) {
+                X_ERROR("Ents", "Ent data must be array");
+                return false;
+            }
+
+            auto ents = v.value.GetArray();
+            for (auto& entDesc : ents) 
+            {
+                if (entDesc.GetType() != core::json::Type::kObjectType) {
+                    X_ERROR("Ents", "Ent description must be a object");
+                    return false;
+                }
+
+                for (auto entIt = entDesc.MemberBegin(); entIt != entDesc.MemberEnd(); ++entIt) {
+                    const auto& name = entIt->name;
+                    const auto& value = entIt->value;
+
+                    switch (core::Hash::Fnv1aHash(name.GetString(), name.GetStringLength())) 
+                    {
+                        case "Mesh"_fnv1a: {
+                            if (!value.HasMember("name")) {
+                                continue;
+                            }
+
+                            auto& meshName = value["name"];
+                            assName.assign(meshName.GetString(), meshName.GetStringLength());
+
+                            if (!AddAssetAndDepenency(assetDb::AssetType::MODEL, assName)) {
+                                X_ERROR("Ents", "Failed to add asset from entDesc");
+                               return false;
+                            }
+
+                            break;
+                        }
+                        case "Emitter"_fnv1a: {
+                            if (!value.HasMember("effect")) {
+                                continue;
+                            }
+
+                            auto& efxName = value["effect"];
+                            assName.assign(efxName.GetString(), efxName.GetStringLength());
+                          
+                            if (!AddAssetAndDepenency(assetDb::AssetType::FX, assName)) {
+                                X_ERROR("Ents", "Failed to add asset from entDesc");
+                                return false;
+                            }
+
+                            break;
+                        }
+    
+                        default:
+                            break;
+
+                    }
+                }
+            }
+        }
+        else 
+        {
+            X_ERROR("Linker", "Unknown ent data member: \"%s\"", v.name.GetString());
+            return false;
+        }
     }
 
     return true;
