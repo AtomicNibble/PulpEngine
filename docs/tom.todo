@@ -131,6 +131,8 @@ Render:
  ☐ BufferManager currently uses a single threaded arena but it gets called from jobs.
      Need to decide who takes a lock.
 
+ ☐ Don't load shader source if we don't need it.
+
 AssetDB:
 
   ✔ Change the hash function to for thumbs sha1 @done (18-08-25 15:18)
@@ -174,13 +176,7 @@ Linker:
   ✔ Need to add files with thier actual file names. @done (18-10-14 14:11)
     Since it's basically a packing of a dir.
 
- ☐ Should scan the ent list since that is static, then add as dep.
-     Not a fan of parsing compnents tho, guess it's just json.
-     what would make me happy? lists of assets.
-     But we are not going to get that.
-
-     The editor is going to author this json file.
-     so yer..
+ ✔ Should scan the ent list since that is static, then add as dep. @done (18-10-18 21:03)
      For now just hard code the ent types.
      Can make it more data driven later but think it's unlikley to be needed.
 
