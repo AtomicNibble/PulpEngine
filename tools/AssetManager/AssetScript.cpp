@@ -279,7 +279,7 @@ bool AssetPropsScriptManager::ensureSourceCache(assetDb::AssetType::Enum type, b
 bool AssetPropsScriptManager::loadScript(assetDb::AssetType::Enum type, std::string& Out)
 {
 	core::Path<char> path;
-	path.appendFmt("%s%c", ASSET_PROPS_SCRIPT_DIR, core::Path<char>::NATIVE_SLASH);
+	path.appendFmt("%s%c", ASSET_PROPS_SCRIPT_DIR, core::Path<char>::SLASH);
 	path.append(assetDb::AssetType::ToString(type));
 	path.setExtension(ASSET_PROPS_SCRIPT_EXT);
 	path.toLower();
