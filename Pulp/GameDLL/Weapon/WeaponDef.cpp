@@ -11,7 +11,8 @@ namespace weapon
 {
     WeaponDef::WeaponDef(core::string& name) :
         AssetBase(name, assetDb::AssetType::WEAPON),
-        ammoTypeId_(weapon::INVALID_AMMO_TYPE)
+        ammoTypeId_(weapon::INVALID_AMMO_TYPE),
+		pHdr_(nullptr)
     {
         soundHashes_.fill(0);
         icons_.fill(nullptr);
@@ -19,19 +20,16 @@ namespace weapon
         effects_.fill(nullptr);
     }
 
-    bool WeaponDef::processData(core::XFile* pFile)
+	bool WeaponDef::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
     {
-        if (pFile->readObj(hdr_) != sizeof(hdr_)) {
+        if (dataSize < sizeof(WeaponHdr)) {
             return false;
         }
 
-        if (!hdr_.isValid()) {
+		auto& hdr = *reinterpret_cast<WeaponHdr*>(data.get());
+
+        if (!hdr.isValid()) {
             X_ERROR("WeaponDef", "Header is invalid: \"%s\"", getName().c_str());
-            return false;
-        }
-
-        data_ = core::makeUnique<uint8_t[]>(g_gameArena, hdr_.dataSize);
-        if (pFile->read(data_.get(), hdr_.dataSize) != hdr_.dataSize) {
             return false;
         }
 
@@ -39,27 +37,31 @@ namespace weapon
         auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();
         auto* pEffectMan = gEnv->p3DEngine->getEffectManager();
 
+		// Need to set this for getAnimSlot, etc.. to work.
+		pHdr_ = reinterpret_cast<WeaponHdr*>(data.get());
+		data_ = std::move(data);
+
         for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
-            if (hdr_.animSlots[i] != 0) {
+            if (hdr.animSlots[i] != 0) {
                 animations_[i] = pAnimManager->loadAnim(getAnimSlot(static_cast<AnimSlot::Enum>(i)));
             }
         }
 
         for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
-            if (hdr_.iconSlots[i] != 0) {
+            if (hdr.iconSlots[i] != 0) {
                 icons_[i] = pMaterialMan->loadMaterial(getIconSlot(static_cast<IconSlot::Enum>(i)));
             }
         }
 
         for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
-            if (hdr_.effectSlots[i] != 0) {
+            if (hdr.effectSlots[i] != 0) {
                 effects_[i] = pEffectMan->loadEffect(getEffectSlot(static_cast<EffectSlot::Enum>(i)));
             }
         }
 
         // build the sound event hashes.
         for (uint32_t i = 0; i < SoundSlot::ENUM_COUNT; i++) {
-            if (hdr_.sndSlots[i] != 0) {
+            if (hdr.sndSlots[i] != 0) {
                 soundHashes_[i] = sound::getIDFromStr(getSoundSlot(static_cast<SoundSlot::Enum>(i)));
             }
         }
@@ -69,12 +71,18 @@ namespace weapon
 
     void WeaponDef::assignProps(const WeaponDef& oth)
     {
-        X_UNUSED(oth);
-        X_ASSERT_NOT_IMPLEMENTED();
+		soundHashes_ = oth.soundHashes_;
+		icons_ = oth.icons_;
+		animations_ = oth.animations_;
+		effects_ = oth.effects_;
+		ammoTypeId_ = oth.ammoTypeId_;
+		pHdr_ = oth.pHdr_;
     }
 
     bool WeaponDef::waitForLoadDep(void) const
     {
+		X_ASSERT_NOT_NULL(pHdr_);
+
         auto* p3DEngine = gEnv->p3DEngine;
         auto* pAnimManager = p3DEngine->getAnimManager();
         auto* pMaterialMan = p3DEngine->getMaterialManager();
@@ -97,7 +105,7 @@ namespace weapon
         }
 
         for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
-            if (hdr_.effectSlots[i] != 0) {
+            if (pHdr_->effectSlots[i] != 0) {
                 if (!pEffectMan->waitForLoad(effects_[i])) {
                     return false;
                 }

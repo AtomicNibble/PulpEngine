@@ -243,9 +243,7 @@ namespace weapon
     {
         auto* pWeaponDef = static_cast<WeaponDef*>(pAsset);
 
-        core::XFileFixedBuf file(data.ptr(), data.ptr() + dataSize);
-
-        if (!pWeaponDef->processData(&file)) {
+        if (!pWeaponDef->processData(std::move(data), dataSize)) {
             return false;
         }
 

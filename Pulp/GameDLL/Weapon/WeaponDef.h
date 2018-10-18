@@ -18,7 +18,7 @@ namespace weapon
     public:
         WeaponDef(core::string& name);
 
-        bool processData(core::XFile* pFile);
+		bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
         void assignProps(const WeaponDef& oth);
         bool waitForLoadDep(void) const;
 
@@ -61,7 +61,7 @@ namespace weapon
         X_INLINE const char* stringForOffset(int32_t offset) const;
 
     private:
-        core::UniquePointer<uint8_t[]> data_;
+        core::UniquePointer<char[]> data_; // can be null.
 
         SoundHashArr soundHashes_;
         IconMaterialsArr icons_;
@@ -70,7 +70,7 @@ namespace weapon
 
         AmmoTypeId ammoTypeId_;
 
-        WeaponHdr hdr_;
+        WeaponHdr* pHdr_;
     };
 
 } // namespace weapon
