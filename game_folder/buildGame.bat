@@ -23,6 +23,9 @@ REM build levels...
 
 REM Base packs
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init +nocompress +nopause +mod core +al asset_lists/init.assList +memory
+
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\weapons +nocompress +nopause +mod core +al asset_lists/weapons.assList +memory
+
 REM level packs
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nocompress +nopause +mod core +lvl test01
 
