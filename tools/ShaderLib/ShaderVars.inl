@@ -33,6 +33,11 @@ namespace shader
         return compileDebug_ != 0;
     }
 
+    X_INLINE void ShaderVars::setNoSource(bool val)
+    {
+        noSource_ = val ? 1 : 0;
+    }
+
     X_INLINE void ShaderVars::setUseCache(bool use)
     {
         useCache_ = use ? 1 : 0;

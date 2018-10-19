@@ -22,6 +22,7 @@ namespace shader
         X_INLINE bool helpWithWorkOnShaderStall(void) const;
         X_INLINE bool compileDebug(void) const;
 
+        X_INLINE void setNoSource(bool val);
         X_INLINE void setUseCache(bool use);
         X_INLINE void setWriteCompiledShaders(bool write);
 
