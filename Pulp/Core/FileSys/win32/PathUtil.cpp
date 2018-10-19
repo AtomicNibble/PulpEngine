@@ -58,7 +58,7 @@ namespace PathUtil
 
         DWORD retval = GetFullPathNameW(pFilePath, X_ARRAY_SIZE(buf), buf, nullptr);
         if (retval > 0 && retval < X_ARRAY_SIZE(buf)) {
-            pathOut = buf;
+            pathOut.set(buf, buf + retval);
             return true;
         }
 
