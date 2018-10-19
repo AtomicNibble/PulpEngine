@@ -1,0 +1,12 @@
+{
+    "version": 1,
+    "assets": {
+
+    },
+    "dirs": [
+        {
+            "type": "SHADER",
+            "path": "compiled"
+        }
+    ]
+}

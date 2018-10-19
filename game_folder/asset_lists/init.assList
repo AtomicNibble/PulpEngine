@@ -63,10 +63,6 @@
     },
     "dirs": [
         {
-            "type": "SHADER",
-            "path": "compiled"
-        },
-        {
             "type": "TECHDEF",
             "path": ""
         },
