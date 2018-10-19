@@ -430,7 +430,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
             return false;
         }
 
-        if (!env_.pConsole->loadAndExecConfigFile("user_config.cfg")) {
+        if (!env_.pConsole->loadAndExecConfigFile(core::XConsole::USER_CFG_FILE_NAME)) {
             // this is not required.
         }
     }
