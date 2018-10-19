@@ -41,7 +41,8 @@ X_DECLARE_FLAGS(SeekMode)
 X_DECLARE_ENUM(VirtualDirectory)
 (
     GAME,
-    MOD);
+    SAVE
+);
 
 typedef Flags<FileFlag> FileFlags;
 
@@ -753,23 +754,23 @@ struct IFileSys
 
     // Create
     virtual bool createDirectory(const PathT& path) const X_ABSTRACT;
-    virtual bool createDirectory(const PathWT& path) const X_ABSTRACT;
+    virtual bool createDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
     virtual bool createDirectoryTree(const PathT& path) const X_ABSTRACT;
-    virtual bool createDirectoryTree(const PathWT& path) const X_ABSTRACT;
+    virtual bool createDirectoryTreeOS(const PathWT& osPath) const X_ABSTRACT;
 
     // exsists.
     virtual bool fileExists(const PathT& path) const X_ABSTRACT;
-    virtual bool fileExists(const PathWT& path) const X_ABSTRACT;
+    virtual bool fileExistsOS(const PathWT& osPath) const X_ABSTRACT;
     virtual bool directoryExists(const PathT& path) const X_ABSTRACT;
-    virtual bool directoryExists(const PathWT& path) const X_ABSTRACT;
+    virtual bool directoryExistsOS(const PathWT& osPath) const X_ABSTRACT;
 
     // does not error, when it's a file or not exsist.
     virtual bool isDirectory(const PathT& path) const X_ABSTRACT;
-    virtual bool isDirectory(const PathWT& path) const X_ABSTRACT;
+    virtual bool isDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
 
     // rename
     virtual bool moveFile(const PathT& path, const PathT& newPath) const X_ABSTRACT;
-    virtual bool moveFile(const PathWT& path, const PathWT& newPath) const X_ABSTRACT;
+    virtual bool moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const X_ABSTRACT;
 
     // returns the min sector size for all virtual directories.
     // so if game folder is drive A and mod is drive B

@@ -725,18 +725,16 @@ bool xFileSys::createDirectory(const PathT& path) const
     return PathUtil::CreateDirectory(osPath);
 }
 
-bool xFileSys::createDirectory(const PathWT& path) const
+bool xFileSys::createDirectoryOS(const PathWT& osPath) const
 {
-    Path<wchar_t> osPath;
-    createOSPath(gameDir_, path, osPath);
-
-    osPath.removeFileName();
+    Path<wchar_t> path(osPath);
+    path.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "createDirectory: \"%ls\"", osPath.c_str());
+        X_LOG0("FileSys", "createDirectory: \"%ls\"", path.c_str());
     }
 
-    return PathUtil::CreateDirectory(osPath);
+    return PathUtil::CreateDirectory(path);
 }
 
 bool xFileSys::createDirectoryTree(const PathT& path) const
@@ -754,19 +752,17 @@ bool xFileSys::createDirectoryTree(const PathT& path) const
     return PathUtil::CreateDirectoryTree(osPath);
 }
 
-bool xFileSys::createDirectoryTree(const PathWT& path) const
+bool xFileSys::createDirectoryTreeOS(const PathWT& osPath) const
 {
     // we want to just loop and create like a goat.
-    Path<wchar_t> osPath;
-    createOSPath(gameDir_, path, osPath);
-
-    osPath.removeFileName();
+    Path<wchar_t> path(osPath);
+    path.removeFileName();
 
     if (isDebug()) {
-        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", osPath.c_str());
+        X_LOG0("FileSys", "CreateDirectoryTree: \"%ls\"", path.c_str());
     }
 
-    return PathUtil::CreateDirectoryTree(osPath);
+    return PathUtil::CreateDirectoryTree(path);
 }
 
 // --------------------- exsists ---------------------
@@ -779,12 +775,9 @@ bool xFileSys::fileExists(const PathT& path) const
     return fileExistsOS(osPath);
 }
 
-bool xFileSys::fileExists(const PathWT& path) const
+bool xFileSys::fileExistsOS(const PathWT& osPath) const
 {
-    Path<wchar_t> osPath;
-    createOSPath(gameDir_, path, osPath);
-
-    return fileExistsOS(osPath);
+    return core::PathUtil::DoesFileExist(osPath);
 }
 
 bool xFileSys::directoryExists(const PathT& path) const
@@ -795,12 +788,9 @@ bool xFileSys::directoryExists(const PathT& path) const
     return directoryExistsOS(osPath);
 }
 
-bool xFileSys::directoryExists(const PathWT& path) const
+bool xFileSys::directoryExistsOS(const PathWT& osPath) const
 {
-    Path<wchar_t> osPath;
-    createOSPath(gameDir_, path, osPath);
-
-    return directoryExistsOS(osPath);
+    return core::PathUtil::DoesDirectoryExist(osPath);
 }
 
 bool xFileSys::isDirectory(const PathT& path) const
@@ -811,12 +801,15 @@ bool xFileSys::isDirectory(const PathT& path) const
     return isDirectoryOS(osPath);
 }
 
-bool xFileSys::isDirectory(const PathWT& path) const
+bool xFileSys::isDirectoryOS(const PathWT& osPath) const
 {
-    Path<wchar_t> osPath;
-    createOSPath(gameDir_, path, osPath);
+    bool result = core::PathUtil::IsDirectory(osPath);
 
-    return isDirectoryOS(osPath);
+    if (isDebug()) {
+        X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s", osPath.c_str(), result ? "TRUE" : "FALSE");
+    }
+
+    return result;
 }
 
 bool xFileSys::moveFile(const PathT& path, const PathT& newPath) const
@@ -829,14 +822,16 @@ bool xFileSys::moveFile(const PathT& path, const PathT& newPath) const
     return moveFileOS(osPath, osPathNew);
 }
 
-bool xFileSys::moveFile(const PathWT& path, const PathWT& newPath) const
+bool xFileSys::moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const
 {
-    Path<wchar_t> osPath, osPathNew;
+    bool result = core::PathUtil::MoveFile(osPath, osPathNew);
 
-    createOSPath(gameDir_, path, osPath);
-    createOSPath(gameDir_, newPath, osPathNew);
+    if (isDebug()) {
+        X_LOG0("FileSys", "moveFile: \"%ls\" -> \"%ls\" res: ^6%s",
+            osPath.c_str(), osPathNew.c_str(), result ? "TRUE" : "FALSE");
+    }
 
-    return moveFileOS(osPath, osPathNew);
+    return result;
 }
 
 size_t xFileSys::getMinimumSectorSize(void) const
@@ -883,42 +878,6 @@ size_t xFileSys::getMinimumSectorSize(void) const
 
     X_LOG2("FileSys", "Minimumsector size for all virtual dir: %" PRIuS, sectorSize);
     return sectorSize;
-}
-
-// --------------------------------------------------
-
-bool xFileSys::fileExistsOS(const PathWT& fullPath) const
-{
-    return core::PathUtil::DoesFileExist(fullPath);
-}
-
-bool xFileSys::directoryExistsOS(const PathWT& fullPath) const
-{
-    return core::PathUtil::DoesDirectoryExist(fullPath);
-}
-
-bool xFileSys::isDirectoryOS(const PathWT& fullPath) const
-{
-    bool result = core::PathUtil::IsDirectory(fullPath);
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "isDirectory: \"%ls\" res: ^6%s",
-            fullPath.c_str(), result ? "TRUE" : "FALSE");
-    }
-
-    return result;
-}
-
-bool xFileSys::moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const
-{
-    bool result = core::PathUtil::MoveFile(fullPath, fullPathNew);
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "moveFile: \"%ls\" -> \"%ls\" res: ^6%s",
-            fullPath.c_str(), fullPathNew.c_str(), result ? "TRUE" : "FALSE");
-    }
-
-    return result;
 }
 
 // --------------------------------------------------

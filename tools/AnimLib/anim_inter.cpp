@@ -96,7 +96,7 @@ namespace Inter
             mode.Set(core::FileFlag::WRITE);
             mode.Set(core::FileFlag::SHARE);
 
-            if (!gEnv->pFileSys->createDirectoryTree(osPath)) {
+            if (!gEnv->pFileSys->createDirectoryTreeOS(osPath)) {
                 X_ERROR("Anim", "Failed to create export directory");
             }
 

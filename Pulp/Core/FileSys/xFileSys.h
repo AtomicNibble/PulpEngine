@@ -268,23 +268,23 @@ public:
 
     // Create
     bool createDirectory(const PathT& path) const X_FINAL;
-    bool createDirectory(const PathWT& path) const X_FINAL;
+    bool createDirectoryOS(const PathWT& osPath) const X_FINAL;
     bool createDirectoryTree(const PathT& path) const X_FINAL;
-    bool createDirectoryTree(const PathWT& path) const X_FINAL;
+    bool createDirectoryTreeOS(const PathWT& osPath) const X_FINAL;
 
     // exsists.
     bool fileExists(const PathT& path) const X_FINAL;
-    bool fileExists(const PathWT& path) const X_FINAL;
+    bool fileExistsOS(const PathWT& osPath) const X_FINAL;
     bool directoryExists(const PathT& path) const X_FINAL;
-    bool directoryExists(const PathWT& path) const X_FINAL;
+    bool directoryExistsOS(const PathWT& osPath) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
     bool isDirectory(const PathT& path) const X_FINAL;
-    bool isDirectory(const PathWT& path) const X_FINAL;
+    bool isDirectoryOS(const PathWT& osPath) const X_FINAL;
 
     // rename
     bool moveFile(const PathT& path, const PathT& newPath) const X_FINAL;
-    bool moveFile(const PathWT& path, const PathWT& newPath) const X_FINAL;
+    bool moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const X_FINAL;
 
     size_t getMinimumSectorSize(void) const X_FINAL;
 
@@ -340,10 +340,6 @@ private:
     bool openPak(const PathT& path);
 
 private:
-    bool fileExistsOS(const PathWT& fullPath) const;
-    bool directoryExistsOS(const PathWT& fullPath) const;
-    bool isDirectoryOS(const PathWT& fullPath) const;
-    bool moveFileOS(const PathWT& fullPath, const PathWT& fullPathNew) const;
 
     // Ajust path
     const wchar_t* createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const;

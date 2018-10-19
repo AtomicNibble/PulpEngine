@@ -931,7 +931,7 @@ bool ModelCompiler::saveModelOS(const core::Path<wchar_t>& osPath)
     path.setExtension(model::MODEL_FILE_EXTENSION_W);
 
     core::XFileScoped file;
-    if (!gEnv->pFileSys->createDirectoryTree(path)) {
+    if (!gEnv->pFileSys->createDirectoryTreeOS(path)) {
         X_ERROR("Model", "Failed to create directory for output file");
         return false;
     }

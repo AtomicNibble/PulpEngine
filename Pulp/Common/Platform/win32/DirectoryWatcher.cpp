@@ -140,17 +140,19 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                 pInfo = (_FILE_NOTIFY_INFORMATION*)&info.result[offset];
 
                 // null term. (string is not provided with one.)
+                const auto numChars = pInfo->FileNameLength >> 1;
                 pInfo->FileName[(pInfo->FileNameLength >> 1)] = '\0';
 
                 // multibyte me up.
-                core::strUtil::Convert(pInfo->FileName, filename);
+                size_t narrowLen;
+                core::strUtil::Convert(pInfo->FileName, pInfo->FileName + numChars, filename, sizeof(filename), narrowLen);
 
                 // null term.
-                filename[(pInfo->FileNameLength >> 1)] = '\0';
+                filename[narrowLen] = '\0';
 
                 // Path
                 core::Path<wchar_t> path(info.directoryName);
-                path.append(pInfo->FileName);
+                path.append(pInfo->FileName, pInfo->FileName + numChars);
 
 #if X_DEBUG || X_ENABLE_DIR_WATCHER_LOGGING
                 X_LOG1_IF(isDebugEnabled(), "DirWatcher", "Action: ^9%s",
@@ -161,7 +163,7 @@ void XDirectoryWatcher::checkDirectory(WatchInfo& info)
                     bool is_directory = false;
 
                     if (pInfo->Action != FILE_ACTION_REMOVED) {
-                        is_directory = gEnv->pFileSys->isDirectory(path);
+                        is_directory = gEnv->pFileSys->isDirectoryOS(path);
                     }
 
                     if (is_directory) {
