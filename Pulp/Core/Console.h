@@ -146,6 +146,7 @@ public:
     static const size_t VAR_MAX = 1024;
 
     static const char* CMD_HISTORY_FILE_NAME;
+    static const char* USER_CFG_FILE_NAME;
 
     typedef consoleState consoleState;
 

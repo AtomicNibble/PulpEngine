@@ -306,6 +306,7 @@ void ConsoleCommandArgs::TokenizeString(const char* begin, const char* end)
 //////////////////////////////////////////////////////////////////////////
 
 const char* XConsole::CMD_HISTORY_FILE_NAME = "cmdHistory.txt";
+const char* XConsole::USER_CFG_FILE_NAME = "user_config.cfg";
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -564,7 +565,8 @@ void XConsole::saveChangedVars(void)
 
     core::XFileScoped file;
 
-    core::Path<char> userConfigPath("config//user_config.cfg");
+    core::Path<char> userConfigPath("config/");
+    userConfigPath.append(USER_CFG_FILE_NAME);
 
     // we need to handle the case where a modified var is in the config
     // but we are shutting down before that var has been registerd again.
