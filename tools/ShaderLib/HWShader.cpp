@@ -72,7 +72,7 @@ namespace shader
 
     bool XHWShader::compileFromSource(const ByteArr& source, CompileFlags flags)
     {
-        X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")(status_); 
+        X_ASSERT(status_ == ShaderStatus::Compiling, "Invalid status")(status_);
 
         const auto id = core::Thread::getCurrentID();
 
@@ -99,7 +99,7 @@ namespace shader
         }
 #endif
 
-        X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")(); 
+        X_ASSERT(cbuffers_.isEmpty() && samplers_.isEmpty() && textures_.isEmpty() && buffers_.isEmpty(), "Fields not clear")();
 
         compileFlags_ = flags;
 
@@ -158,7 +158,7 @@ namespace shader
                     macroBufIdx += macro.length();
                     macroBuffer[macroBufIdx++] = '\0';
 
-                    macros.push_back({pStart, "1"});
+                    macros.push_back({ pStart, "1" });
                 }
             }
         }
@@ -183,7 +183,7 @@ namespace shader
                     macroBufIdx += macro.length();
                     macroBuffer[macroBufIdx++] = '\0';
 
-                    macros.push_back({pStart, "1"});
+                    macros.push_back({ pStart, "1" });
                 }
             }
         }
@@ -206,7 +206,7 @@ namespace shader
                 macroBufIdx += tokenLen;
                 macroBuffer[macroBufIdx++] = '\0';
 
-                macros.push_back({pStart, "1"});
+                macros.push_back({ pStart, "1" });
             }
         }
 
@@ -218,7 +218,7 @@ namespace shader
         }
 
         // add blank one.
-        macros.push_back({nullptr, nullptr});
+        macros.push_back({ nullptr, nullptr });
 
         ID3DBlob* pBlob = nullptr;
         ID3DBlob* pErrorBlob = nullptr;
@@ -274,7 +274,7 @@ namespace shader
                 pBlob->GetBufferPointer(),
                 pBlob->GetBufferSize(),
                 D3DCOMPILER_STRIP_ROOT_SIGNATURE | // you silly slut.
-                    D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_TEST_BLOBS,
+                D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_TEST_BLOBS,
                 &pStripped);
 
             if (SUCCEEDED(hr)) {
@@ -350,7 +350,7 @@ namespace shader
         line = lex.ParseInt();
 
         if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
-                core::TokenSubType::UNUSET, core::PunctuationId::COMMA, token)) {
+            core::TokenSubType::UNUSET, core::PunctuationId::COMMA, token)) {
             return false;
         }
 
@@ -435,7 +435,7 @@ namespace shader
 
                 const int32_t reg = (CDesc.StartOffset >> 4);
 
-                X_ASSERT(reg << 4 == CDesc.StartOffset, "Offset not multiple of 16")(reg, CDesc.StartOffset); 
+                X_ASSERT(reg << 4 == CDesc.StartOffset, "Offset not multiple of 16")(reg, CDesc.StartOffset);
 
                 XShaderParam bind;
                 bind.setName(CDesc.Name);
@@ -610,7 +610,7 @@ namespace shader
 
             InputLayoutFormat::Enum fmt = pILnode->GetILFmt();
 
-            X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt); 
+            X_ASSERT(fmt != InputLayoutFormat::Invalid, "failed to detect correct input layout format")(fmt);
             // work out the format from the node.
             X_LOG0_IF(vars_.compileDebug(), "Shader", "InputLayout Fmt: \"%s\"", InputLayoutFormat::ToString(fmt));
 
@@ -618,13 +618,13 @@ namespace shader
         }
         else if (type_ == ShaderType::Pixel) {
 #if 0 // i just save number of output params don't store any extra info currently.
-			D3D12_SIGNATURE_PARAMETER_DESC OutputDsc;
-			for (uint32 n = 0; n < shaderDesc.OutputParameters; n++)
-			{
-				pShaderReflection->GetOutputParameterDesc(n, &OutputDsc);
+            D3D12_SIGNATURE_PARAMETER_DESC OutputDsc;
+            for (uint32 n = 0; n < shaderDesc.OutputParameters; n++)
+            {
+                pShaderReflection->GetOutputParameterDesc(n, &OutputDsc);
 
-				int goat = 0;
-			}
+                int goat = 0;
+            }
 #endif
         }
 
