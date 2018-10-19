@@ -104,18 +104,18 @@ namespace shader
     }
 
     XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-        shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
+        const core::string& sourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
     {
         ILFlags ilflags = Util::IlFlagsForVertexFormat(vertFmt);
 
-        return hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ilflags);
+        return hwForName(type, entry, customDefines, sourceFile, permFlags, ilflags);
     }
 
     XHWShader* XShaderManager::createHWShader(shader::ShaderType::Enum type, const core::string& entry,
-        const core::string& customDefines, shader::IShaderSource* pSourceFile,
+        const core::string& customDefines, const core::string& sourceFile,
         shader::PermatationFlags permFlags, ILFlags ILFlags)
     {
-        return hwForName(type, entry, customDefines, static_cast<SourceFile*>(pSourceFile), permFlags, ILFlags);
+        return hwForName(type, entry, customDefines, sourceFile, permFlags, ILFlags);
     }
 
     void XShaderManager::releaseHWShader(XHWShader* pHWSHader)
@@ -143,14 +143,32 @@ namespace shader
             // we adopt the lock we have from tryEnter this is not a re-lock.
             core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
 
+            if (vars_.noSource())
+            {
+                if (shaderBin_.loadShader(pHWShader, nullptr)) {
+                    X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")();
+                    return true;
+                }
+
+                X_ERROR("ShadersManager", "Failed to get baked shader: \"%s\"", pHWShader->getName().c_str());
+                return false;
+            }
+
+            // now load the source file.
+            auto* pSource = sourceBin_.loadRawSourceFile(pHWShader->getShaderSource(), false);
+            if (!pSource) {
+                X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getShaderSource().c_str());
+                return false;
+            }
+
             // try load it from cache.
-            if (vars_.useCache() && shaderBin_.loadShader(pHWShader)) {
-                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")(); 
+            if (vars_.useCache() && shaderBin_.loadShader(pHWShader, pSource)) {
+                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")();
                 return true;
             }
 
             core::Array<uint8_t> source(arena_);
-            if (!sourceBin_.getMergedSource(pHWShader->getShaderSource(), source)) {
+            if (!sourceBin_.getMergedSource(pSource, source)) {
                 X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getName().c_str());
                 return false;
             }
@@ -158,7 +176,7 @@ namespace shader
             if (!pHWShader->compile(source, flags)) {
                 auto errLine = pHWShader->getErrorLineNumber();
                 if (errLine >= 0) {
-                    auto info = sourceBin_.getSourceInfoForMergedLine(pHWShader->getShaderSource(), errLine);
+                    auto info = sourceBin_.getSourceInfoForMergedLine(pSource, errLine);
 
                     X_ERROR("ShadersManager", "Failed to compile shader. Error in \"%s\" line: %" PRIi32,
                         info.name.c_str(), info.line);
@@ -184,7 +202,7 @@ namespace shader
 
             // save it
             if (vars_.writeCompiledShaders()) {
-                if (!shaderBin_.saveShader(pHWShader)) {
+                if (!shaderBin_.saveShader(pHWShader, pSource)) {
                     X_WARNING("ShadersManager", "Failed to save shader to bin: \"%s\"", pHWShader->getName().c_str());
                 }
             }
@@ -331,16 +349,14 @@ namespace shader
     }
 
     XHWShader* XShaderManager::hwForName(ShaderType::Enum type,
-        const core::string& entry, const core::string& customDefines, SourceFile* pSourceFile,
+        const core::string& entry, const core::string& customDefines, const core::string& sourceFile,
         const shader::PermatationFlags permFlags, ILFlags ILFlags)
     {
-        X_ASSERT_NOT_NULL(pSourceFile);
-
         core::StackString512 name;
 
-        const char* pEntry = entry.c_str();
-        if (entry.isEmpty()) {
-            pEntry = DEFAULT_SHADER_ENTRY[type];
+        const char* pEntry = DEFAULT_SHADER_ENTRY[type];
+        if (entry.isNotEmpty()) {
+            pEntry = entry.c_str();
         }
 
         core::Hash::SHA1 sha1;
@@ -352,7 +368,7 @@ namespace shader
         sha1.update(type); // include this?
         auto digest = sha1.finalize();
 
-        name.appendFmt("%s@", pSourceFile->getName().c_str());
+        name.appendFmt("%s@", sourceFile.c_str());
         name.append(digest.ToString(sha1Buf));
 
 #if X_DEBUG
@@ -377,7 +393,7 @@ namespace shader
             nameStr,
             entry,
             customDefines,
-            pSourceFile,
+            sourceFile,
             permFlags,
             ILFlags,
             arena_);
@@ -505,7 +521,7 @@ namespace shader
             core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
             for (const auto& shader : hwShaders_) {
-                if (shader.second->getShaderSource() == pSource) {
+                if (shader.second->getShaderSource() == pSource->getName()) {
                     X_LOG0("Shader", "Reloading: %s", shader.first.c_str());
                     shader.second->markStale();
                 }

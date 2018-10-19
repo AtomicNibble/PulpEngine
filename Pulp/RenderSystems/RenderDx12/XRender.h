@@ -239,7 +239,7 @@ public:
 
     shader::IShaderSource* getShaderSource(const core::string& name) X_FINAL;
     shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-        shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt) X_FINAL;
+		const core::string& sourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt) X_FINAL;
     shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
     PassStateHandle createPassState(const RenderTargetFmtsArr& rtfs) X_FINAL;

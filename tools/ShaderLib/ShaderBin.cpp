@@ -83,7 +83,7 @@ namespace shader
     {
     }
 
-    bool ShaderBin::saveShader(const XHWShader* pShader)
+    bool ShaderBin::saveShader(const XHWShader* pShader, const SourceFile* pSource)
     {
         X_ASSERT_NOT_NULL(pShader);
 
@@ -115,7 +115,7 @@ namespace shader
         hdr.flags.Set(BinFileFlag::COMPRESSED);
         hdr.modifed = core::DateTimeStampSmall::systemDateTime();
         hdr.crc32 = gEnv->pCore->GetCrc32()->GetCRC32(byteCode.data(), byteCode.size());
-        hdr.sourceCRC32 = pShader->getShaderSource()->getSourceCrc32();
+        hdr.sourceCRC32 = pSource->getSourceCrc32();
         hdr.compileFlags = pShader->getCompileFlags();
         hdr.blobLength = safe_static_cast<uint32_t>(byteCode.size());
         hdr.deflatedLength = 0;
@@ -185,18 +185,18 @@ namespace shader
             return false;
         }
 
-        updateCacheCrc(path, pShader->getShaderSource()->getSourceCrc32());
+        updateCacheCrc(path, pSource->getSourceCrc32());
         return true;
     }
 
-    bool ShaderBin::loadShader(XHWShader* pShader)
+    bool ShaderBin::loadShader(XHWShader* pShader, const SourceFile* pSource)
     {
         X_ASSERT_NOT_NULL(pShader);
 
         core::Path<char> path;
         getShaderCompileDest(pShader, path);
 
-        if (cacheNotValid(path, pShader->getShaderSource()->getSourceCrc32())) {
+        if (pSource && cacheNotValid(path, pSource->getSourceCrc32())) {
             return false;
         }
 
@@ -224,9 +224,11 @@ namespace shader
                     return false;
                 }
 
-                if (hdr.sourceCRC32 != pShader->getShaderSource()->getSourceCrc32()) {
-                    X_WARNING("Shader", "bin shader is stale, recompile needed.");
-                    return false;
+                if (pSource) { // only stale check if we have source to know.
+                    if (hdr.sourceCRC32 != pSource->getSourceCrc32()) {
+                        X_WARNING("Shader", "bin shader is stale, recompile needed.");
+                        return false;
+                    }
                 }
 
                 // validate the profile version.
@@ -342,7 +344,7 @@ namespace shader
     {
         core::CriticalSection::ScopedLock lock(cs_);
 
-        cache_.insert(std::make_pair(core::string(path.c_str()), sourceCrc32));
+        cache_.insert(std::make_pair(core::string(path.begin(), path.end()), sourceCrc32));
     }
 
     void ShaderBin::getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut)

@@ -13,6 +13,7 @@ X_NAMESPACE_BEGIN(render)
 namespace shader
 {
     class XHWShader;
+    class SourceFile;
 
     class ShaderBin
     {
@@ -23,8 +24,8 @@ namespace shader
         SHADERLIB_EXPORT ~ShaderBin();
 
         // this is thread safe if saveShader and loadShader are not called for the same instance, must be diffrent instances.
-        SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader);
-        SHADERLIB_EXPORT bool loadShader(XHWShader* pShader);
+        SHADERLIB_EXPORT bool saveShader(const XHWShader* pShader, const SourceFile* pSource);
+        SHADERLIB_EXPORT bool loadShader(XHWShader* pShader, const SourceFile* pSource);
 
         SHADERLIB_EXPORT bool clearBin(void);
 

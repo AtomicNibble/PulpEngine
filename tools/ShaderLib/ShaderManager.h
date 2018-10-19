@@ -83,11 +83,13 @@ namespace shader
 
         SHADERLIB_EXPORT IShaderSource* sourceforName(const core::string& name);
         SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
-            const core::string& customDefines, shader::IShaderSource* pSourceFile,
+            const core::string& customDefines, const core::string& sourceFile,
             shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt);
+
         SHADERLIB_EXPORT XHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry,
-            const core::string& customDefines, shader::IShaderSource* pSourceFile,
+            const core::string& customDefines, const core::string& sourceFile,
             shader::PermatationFlags permFlags, ILFlags ILFlags);
+
         SHADERLIB_EXPORT void releaseHWShader(XHWShader* pHWSHader);
 
         SHADERLIB_EXPORT bool compileShader(XHWShader* pHWShader, CompileFlags flags);
@@ -104,7 +106,7 @@ namespace shader
         void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
 
         XHWShader* hwForName(ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-            SourceFile* pSourceFile, const shader::PermatationFlags permFlags, ILFlags ILFlags);
+            const core::string& sourceFile, const shader::PermatationFlags permFlags, ILFlags ILFlags);
 
     private:
         static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);

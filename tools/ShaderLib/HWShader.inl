@@ -28,9 +28,9 @@ namespace shader
         return entryPoint_;
     }
 
-    X_INLINE SourceFile* XHWShader::getShaderSource(void) const
+    X_INLINE const core::string& XHWShader::getShaderSource(void) const
     {
-        return pSourceFile_;
+        return sourceFile_;
     }
 
     X_INLINE ShaderStatus::Enum XHWShader::getStatus(void) const

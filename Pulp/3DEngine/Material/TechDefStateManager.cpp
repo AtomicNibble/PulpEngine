@@ -26,7 +26,6 @@ TechDef::TechDef(const core::string& name, core::StrHash nameHash, const techset
     X_ASSERT(arena->isThreadSafe(), "Arena must be thread safe")();
 
     perms_.setGranularity(8);
-    shaderSource_.fill(nullptr);
 }
 
 TechDef::~TechDef()
@@ -109,8 +108,8 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
     render::shader::ShaderStagesArr stages{};
 
     for (size_t i = 0; i < shaderSource_.size(); i++) {
-        auto* pSource = shaderSource_[i];
-        if (!pSource) {
+        auto& source = shaderSource_[i];
+        if (source.isEmpty()) {
             continue;
         }
 
@@ -118,7 +117,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
 
         // create a instance of the shader with the flags we want it compiled with.
         // this won't actually compile it.
-        stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], shaderDefines_[type], pSource, permFlags, vertFmt);
+        stages[type] = pRenderSys->createHWShader(type, shaderEntry_[type], shaderDefines_[type], source, permFlags, vertFmt);
     }
 
     render::RenderTargetFmtsArr rtfs;
@@ -415,18 +414,9 @@ TechDefState* TechDefStateManager::loadTechDefState(const MaterialCat::Enum cat,
             //  make sure the shader in the vertex slot is a vertex shader etc..
             X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")(shader.type, type);
 
-            // we ask for the source now, so we know we are able to atleast attempt to compile permatations later on.
-            // and don't have to ask for them each time we make a perm.
-            render::shader::IShaderSource* pShaderSource = gEnv->pRender->getShaderSource(shader.source);
-            if (!pShaderSource) {
-                X_ERROR("TechDefState", "Failed to load shader source \"%s\" for: %s:%s",
-                    shader.source.c_str(), MaterialCat::ToString(cat), name.c_str());
-                return nullptr;
-            }
-
+            tech.shaderSource_[type] = shader.source;
             tech.shaderDefines_[type] = shader.defines;
             tech.shaderEntry_[type] = shader.entry;
-            tech.shaderSource_[type] = pShaderSource;
 
             for (const auto& al : shader.aliases) {
                 tech.aliases_.emplace_back(al);

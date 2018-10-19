@@ -15,6 +15,7 @@ namespace shader
 
         void RegisterVars(void);
 
+        X_INLINE bool noSource(void) const;
         X_INLINE bool useCache(void) const;
         X_INLINE bool writeCompiledShaders(void) const;
         X_INLINE bool writeMergedSource(void) const;
@@ -25,6 +26,7 @@ namespace shader
         X_INLINE void setWriteCompiledShaders(bool write);
 
     private:
+        int32_t noSource_;
         int32_t useCache_;
         int32_t writeCompiledShaders_;
         int32_t writeMergedSource_;

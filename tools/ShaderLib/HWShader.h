@@ -47,7 +47,7 @@ namespace shader
     public:
         SHADERLIB_EXPORT XHWShader(const ShaderVars& vars, ShaderType::Enum type, const core::string& name,
             const core::string& entry, const core::string& customDefines,
-            SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena);
+            const core::string& sourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena);
         SHADERLIB_EXPORT ~XHWShader();
 
         X_INLINE const int32_t getID(void) const;
@@ -57,7 +57,7 @@ namespace shader
 
         X_INLINE const core::string& getName(void) const;
         X_INLINE const core::string& getEntryPoint(void) const;
-        X_INLINE SourceFile* getShaderSource(void) const;
+        X_INLINE const core::string& getShaderSource(void) const;
         X_INLINE PermatationFlags getPermFlags(void) const;
         X_INLINE ILFlags getILFlags(void) const;
         X_INLINE ShaderType::Enum getType(void) const;
@@ -112,6 +112,7 @@ namespace shader
         core::string name_;
         core::string entryPoint_;
         core::string customDefines_;
+        core::string sourceFile_;
 
         int32_t id_;
 #if X_ENABLE_RENDER_SHADER_RELOAD
@@ -119,8 +120,6 @@ namespace shader
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
 
         int32_t errLineNo_;
-
-        SourceFile* pSourceFile_;
 
         // status
         ShaderStatus::Enum status_;

@@ -3,6 +3,11 @@ X_NAMESPACE_BEGIN(render)
 
 namespace shader
 {
+    X_INLINE bool ShaderVars::noSource(void) const
+    {
+        return noSource_ != 0;
+    }
+
     X_INLINE bool ShaderVars::useCache(void) const
     {
         return useCache_ != 0;

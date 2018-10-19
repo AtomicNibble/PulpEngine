@@ -56,7 +56,7 @@ public:
     bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_FINAL;
 
     shader::IShaderSource* getShaderSource(const core::string& name) X_FINAL;
-    shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines, shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt) X_FINAL;
+    shader::IHWShader* createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines, const core::string& sourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt) X_FINAL;
     shader::IShaderPermatation* createPermatation(const shader::ShaderStagesArr& stages) X_FINAL;
 
     void releaseShaderPermatation(shader::IShaderPermatation* pPerm) X_FINAL;

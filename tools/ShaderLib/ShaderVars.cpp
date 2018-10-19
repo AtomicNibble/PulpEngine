@@ -10,6 +10,7 @@ namespace shader
     ShaderVars::ShaderVars()
     {
         // defaults
+        noSource_ = 0;
         useCache_ = 1;
         writeCompiledShaders_ = 1;
         writeMergedSource_ = 1;
@@ -19,6 +20,10 @@ namespace shader
 
     void ShaderVars::RegisterVars(void)
     {
+        ADD_CVAR_REF("shader_no_source", noSource_, noSource_, 0, 1,
+            core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+            "Signals that we have no shader source files, will only load baked shaders");
+
         ADD_CVAR_REF("shader_load_from_cache", useCache_, useCache_, 0, 1,
             core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
             "Loads shader from shader bin if present");

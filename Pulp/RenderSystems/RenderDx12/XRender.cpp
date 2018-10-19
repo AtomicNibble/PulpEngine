@@ -1336,13 +1336,15 @@ bool XRender::initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFil
 
 shader::IShaderSource* XRender::getShaderSource(const core::string& sourceName)
 {
+    X_ASSERT_DEPRECATED();
+
     return pShaderMan_->sourceforName(sourceName);
 }
 
 shader::IHWShader* XRender::createHWShader(shader::ShaderType::Enum type, const core::string& entry, const core::string& customDefines,
-    shader::IShaderSource* pSourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
+	const core::string& sourceFile, shader::PermatationFlags permFlags, render::shader::VertexFormat::Enum vertFmt)
 {
-    return pShaderMan_->createHWShader(type, entry, customDefines, pSourceFile, permFlags, vertFmt);
+    return pShaderMan_->createHWShader(type, entry, customDefines, sourceFile, permFlags, vertFmt);
 }
 
 shader::IShaderPermatation* XRender::createPermatation(const shader::ShaderStagesArr& stages)

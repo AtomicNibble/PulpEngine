@@ -24,12 +24,12 @@ namespace shader
 
     XHWShader::XHWShader(const ShaderVars& vars, ShaderType::Enum type, const core::string& name,
         const core::string& entry, const core::string& customDefines,
-        SourceFile* pSourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena) :
+        const core::string& sourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena) :
         vars_(vars),
         name_(name),
-        pSourceFile_(X_ASSERT_NOT_NULL(pSourceFile)),
         entryPoint_(entry),
         customDefines_(customDefines),
+        sourceFile_(sourceFile),
         status_(ShaderStatus::NotCompiled),
         permFlags_(permFlags),
         type_(type),

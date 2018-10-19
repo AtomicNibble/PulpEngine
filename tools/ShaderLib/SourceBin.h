@@ -52,7 +52,7 @@ namespace shader
         SHADERLIB_EXPORT bool getMergedSource(const SourceFile* pSourceFile, ByteArr& strOut);
         SHADERLIB_EXPORT SourceInfo getSourceInfoForMergedLine(const SourceFile* pSourceFile, size_t line);
 
-        SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload = false);
+        SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload);
         SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
 
         SHADERLIB_EXPORT void listShaderSources(const char* pSearchPatten);

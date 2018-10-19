@@ -121,12 +121,6 @@ namespace compiler
                 //  make sure the shader in the vertex slot is a vertex shader etc..
                 X_ASSERT(shader.type == type, "Incorrect shader type for stage index.")(shader.type, type); 
 
-                IShaderSource* pShaderSource = shaderMan_.sourceforName(shader.source);
-                if (!pShaderSource) {
-                    X_ERROR("TechCompiler", "Failed to get shader source for compiling: \"%s\"", shader.source.c_str());
-                    return false;
-                }
-
                 // potentially auto generate all these
                 // depends..
 
@@ -148,7 +142,7 @@ namespace compiler
 
                 for (auto& permFlags : perms) {
                     for (auto& ilFlags : ilPerms) {
-                        XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, pShaderSource, permFlags, ilFlags);
+                        XHWShader* pHWShader = shaderMan_.createHWShader(type, shader.entry, shader.defines, shader.source, permFlags, ilFlags);
                         if (!pHWShader) {
                             X_ERROR("TechCompiler", "Failed to create HWShader for compiling: \"%s\"", shader.source.c_str());
                             return false;

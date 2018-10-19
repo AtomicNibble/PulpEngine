@@ -11,7 +11,7 @@ class TechDef
 {
     typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderStageStrArr;
 
-    typedef render::shader::ShaderSourceArr ShaderSourceArr;
+    typedef std::array<core::string, render::shader::ShaderStage::FLAGS_COUNT> ShaderSourceArr;
     typedef core::Array<TechDefPerm*> TechDefPermArr;
 
 public:
