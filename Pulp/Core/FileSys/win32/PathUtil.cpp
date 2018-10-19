@@ -32,17 +32,18 @@ namespace PathUtil
 
     bool GetCurrentDirectory(Path& pathOut)
     {
-        WCHAR workingDir[Path::BUF_SIZE] = {0};
+        wchar_t buf[Path::BUF_SIZE] = {};
 
-        if (!GetCurrentDirectoryW(sizeof(workingDir), workingDir)) {
-            lastError::Description Dsc;
-            X_ERROR("FileSys", "GetCurrentDirectory failed. Error: %s", lastError::ToString(Dsc));
-            return false;
+        auto retval = GetCurrentDirectoryW(sizeof(buf), buf);
+        if (retval > 0 && retval < X_ARRAY_SIZE(buf)) {
+            pathOut.set(buf, buf + retval);
+            pathOut.ensureSlash();
+            return true;
         }
 
-        pathOut.set(workingDir);
-        pathOut.ensureSlash();
-        return true;
+        lastError::Description Dsc;
+        X_ERROR("FileSys", "GetCurrentDirectory failed. Error: %s", lastError::ToString(Dsc));
+        return false;
     }
 
     // ------------------------------------------------
@@ -54,7 +55,7 @@ namespace PathUtil
 
     bool GetFullPath(const wchar_t* pFilePath, Path& pathOut)
     {
-        wchar_t buf[Path::BUF_SIZE];
+        wchar_t buf[Path::BUF_SIZE] = {};
 
         DWORD retval = GetFullPathNameW(pFilePath, X_ARRAY_SIZE(buf), buf, nullptr);
         if (retval > 0 && retval < X_ARRAY_SIZE(buf)) {
