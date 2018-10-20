@@ -26,7 +26,9 @@ Game:
 
   ☐ Make menus for lobby etc.
 
-  ☐ Fix ammo been above clip size on spawn.
+  ✔ Fix ammo been above clip size on spawn. @done (18-10-20 14:20)
+ ☐ Support setting max store counts for each ammo type. Currently it's same for all types.
+
 
   Netorking:
 
@@ -131,7 +133,11 @@ Render:
  ☐ BufferManager currently uses a single threaded arena but it gets called from jobs.
      Need to decide who takes a lock.
 
- ☐ Don't load shader source if we don't need it.
+ ✔ Don't load shader source if we don't need it. @done (18-10-19 17:32)
+    Requires setting a var tho.
+
+ ☐ The default texture was not set correct for default material which results in corrupt rendering on AMD cards.
+   I still get the same corrupt issue for videos on AMD tho.
 
 AssetDB:
 
