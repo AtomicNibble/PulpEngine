@@ -228,7 +228,8 @@ namespace entity
 
     EntityId EnititySystem::createWeapon(EntityId playerId)
     {
-        Player& ply = reg_.get<Player>(playerId);
+        auto& ply = reg_.get<Player>(playerId);
+        auto& inv = reg_.get<Inventory>(playerId);
 
         model::BoneHandle tagWeapon = model::INVALID_BONE_HANDLE;
 
@@ -294,13 +295,22 @@ namespace entity
         an.pAnimator = X_NEW(anim::Animator, g_gameArena, "Animator")(mesh.pModel, g_gameArena);
 
         // setup the weapon state.
-        wpn.ammoInClip = 10;
-        wpn.ammoType = 0;
+        const auto ammotTypeId = pWeaponDef->getAmmoTypeId();
+        const auto startingAmmo = pWeaponDef->getAmmoSlot(weapon::AmmoSlot::Start);
+        const auto clipSize = pWeaponDef->getAmmoSlot(weapon::AmmoSlot::ClipSize);
+        const auto clipFill = core::Min(startingAmmo, clipSize);
+        const auto ammoForStore = startingAmmo - clipFill;
+
+        wpn.ammoInClip = clipFill;
+        wpn.ammoType = ammotTypeId;
         wpn.pWeaponDef = pWeaponDef;
         wpn.state = weapon::State::Holstered;
         wpn.raise();
         wpn.ownerEnt = playerId;
         wpn.stateEnd = core::TimeVal(0.f);
+
+        // full me up.
+        inv.giveAmmo(ammotTypeId, ammoForStore);
 
         {
             engine::EmitterDesc dsc;
