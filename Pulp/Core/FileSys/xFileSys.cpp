@@ -137,6 +137,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 
 xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     gameDir_(nullptr),
+    saveDir_(nullptr),
     searchPaths_(nullptr),
     loadPacks_(false),
     // ..
@@ -248,9 +249,16 @@ bool xFileSys::initDirectorys(bool working)
 
     if (working) {
         // working dir added.
-        return setGameDir(workingDir);
+        if (!setGameDir(workingDir)) {
+            return false;
+        }
+
+        if (!setSaveDir(workingDir)) {
+            return false;
+        }
     }
-    else {
+    else 
+    {
         
         const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
         if (pGameDir) {
@@ -258,21 +266,29 @@ bool xFileSys::initDirectorys(bool working)
         }
 
         PathWT base(workingDir);
-        base.ensureSlash();
+        PathUtil::replaceSeprators(workingDir);
+        PathUtil::ensureSlash(workingDir);
 
         PathWT core(base);
-        core /= L"core_assets\\";
+        PathUtil::ensureSlash(core);
+        core += L"core_assets";
 
         PathWT testAssets(base);
-        testAssets /= L"test_assets\\";
+        PathUtil::ensureSlash(testAssets);
+        testAssets += L"test_assets";
 
-        if (setGameDir(core)) {
-            addModDir(testAssets);
-            return true;
+        if (!setGameDir(core)) {
+            return false;
+        }
+        if (!setSaveDir(core)) {
+            return false;
+        }
+        if(!addModDir(testAssets)) {
+            return false;
         }
     }
 
-    return false;
+    return true;
 }
 
 bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
@@ -298,11 +314,11 @@ XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
 }
 
 
-XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode)
+XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFile>(relPath, mode,
+    return findFile<XFile>(relPath, mode, dir,
         [&](Pak* pPak, int32_t idx) -> XFile* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFile: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -336,11 +352,11 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode)
+XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFileAsync>(relPath, mode,
+    return findFile<XFileAsync>(relPath, mode, dir,
         [&](Pak* pPak, int32_t idx) -> XFileAsync* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -373,11 +389,11 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 // --------------------------------------------------
 
-XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode)
+XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFileMem>(relPath, mode,
+    return findFile<XFileMem>(relPath, mode, dir,
         [&](Pak* pPak, int32_t idx) -> XFileMem* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFileMem: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -430,7 +446,7 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 
 template<typename FileT, typename PakFuncT, typename FuncT>
-FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, PakFuncT pakFunc, FuncT func)
+FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir, PakFuncT pakFunc, FuncT func)
 {
     PathWT osPath;
 
@@ -468,7 +484,7 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, PakFuncT pakFunc
     }
     else
     {
-        createOSPath(gameDir_, relPath, osPath);
+        createOSPath(dir, relPath, osPath);
 
         return func(osPath, mode);
     }
@@ -483,7 +499,7 @@ bool xFileSys::setGameDir(const PathWT& osPath)
 {
     X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), gameDir_);
 
-    // check if the irectory is even valid.
+    // check if the directory is even valid.
     if (!directoryExistsOS(osPath)) {
         PathWT fullPath;
         PathUtil::GetFullPath(osPath, fullPath);
@@ -491,21 +507,44 @@ bool xFileSys::setGameDir(const PathWT& osPath)
         return false;
     }
 
-    if (!addDirInteral(osPath, true)) {
+    auto* pDir = addDirInteral(osPath);
+    if (!pDir) {
         return false;
     }
 
-    X_ASSERT_NOT_NULL(gameDir_);
+    gameDir_ = pDir;
     return true;
 }
 
-bool xFileSys::addModDir(const PathWT& osPath)
+bool xFileSys::setSaveDir(const PathWT& osPath)
 {
-    return addDirInteral(osPath, false);
+    X_ASSERT(saveDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), saveDir_);
+
+    // check if the directory is even valid.
+    if (!directoryExistsOS(osPath)) {
+        PathWT fullPath;
+        PathUtil::GetFullPath(osPath, fullPath);
+        X_ERROR("FileSys", "Faled to set save directory, path does not exsists: \"%ls\"", fullPath.c_str());
+        return false;
+    }
+
+    auto* pDir = addDirInteral(osPath);
+    if(!pDir) {
+        return false;
+    }
+
+    saveDir_ = pDir;
+    return true;
 }
 
 
-bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
+bool xFileSys::addModDir(const PathWT& osPath)
+{
+    return addDirInteral(osPath) != nullptr;
+}
+
+
+Directory* xFileSys::addDirInteral(const PathWT& osPath)
 {
     if (isDebug()) {
         X_LOG0("FileSys", "addModDir: \"%ls\"", osPath.c_str());
@@ -513,19 +552,21 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
 
     if (!directoryExistsOS(osPath)) {
         X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
-        return false;
+        return nullptr;
     }
 
     // ok remove any ..//
     PathWT fixedPath;
     if (!PathUtil::GetFullPath(osPath, fixedPath)) {
         X_ERROR("FileSys", "addModDir full path name creation failed");
-        return false;
+        return nullptr;
     }
+
+    PathUtil::ensureSlash(fixedPath);
 
     if (!directoryExistsOS(fixedPath)) {
         X_ERROR("FileSys", "Fixed path does not exsists: \"%ls\"", fixedPath.c_str());
-        return false;
+        return nullptr;
     }
 
     // work out if this directory is a sub directory of any of the current
@@ -536,9 +577,7 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
         }
 
         if (strUtil::FindCaseInsensitive(fixedPath.c_str(), s->pDir->path.c_str()) != nullptr) {
-            X_ERROR("FileSys", "mod dir is identical or inside a current mod dir: \"%ls\" -> \"%ls\"",
-                fixedPath.c_str(), s->pDir->path.c_str());
-            return false;
+            return s->pDir;
         }
     }
 
@@ -546,20 +585,15 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
     Search* search = X_NEW(Search, g_coreArena, "FileSysSearch");
     search->pDir = X_NEW(Directory, g_coreArena, "FileSysDir");
     search->pDir->path = fixedPath;
-    search->pDir->path.ensureSlash();
     search->pPak = nullptr;
     search->pNext = searchPaths_;
     searchPaths_ = search;
-
-    if (isGame) {
-        gameDir_ = searchPaths_->pDir;
-    }
 
     // add hotreload dir.
     gEnv->pDirWatcher->addDirectory(fixedPath);
 
     if (!loadPacks_) {
-        return true;
+        return search->pDir;
     }
 
     // Load packs.
@@ -583,7 +617,7 @@ bool xFileSys::addDirInteral(const PathWT& osPath, bool isGame)
         PathUtil::findClose(findPair.handle);
     }
 
-    return true;
+    return search->pDir;
 }
 
 // --------------------- Find util ---------------------
@@ -672,7 +706,7 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
     // we build a relative search path.
     // as findFirst works on game dir's
     PathWT searchPath(osPath);
-    searchPath.ensureSlash();
+    PathUtil::ensureSlash(searchPath);
     searchPath.append(L"*");
 
     FindData fd;
@@ -684,7 +718,7 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
     do {
         // build a OS Path.
         PathWT dirItem(osPath);
-        dirItem.ensureSlash();
+        PathUtil::ensureSlash(dirItem);
         dirItem.append(fd.name.begin(), fd.name.end());
 
         if (PathUtil::IsDirectory(fd)) {
@@ -883,18 +917,31 @@ size_t xFileSys::getMinimumSectorSize(void) const
 // --------------------------------------------------
 
 // Ajust path
+const wchar_t* xFileSys::createOSPath(VirtualDirectory::Enum dir, const PathT& path, PathWT& buffer) const
+{
+    if (dir == VirtualDirectory::GAME) {
+        return createOSPath(gameDir_, path, buffer);
+    }
+    else if (dir == VirtualDirectory::SAVE) {
+        return createOSPath(saveDir_, path, buffer);
+    } 
+
+    X_ASSERT_UNREACHABLE();
+    return createOSPath(gameDir_, path, buffer);
+}
+
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const
 {
     if (!isAbsolute(path)) {
         buffer = dir->path; 
-        buffer.ensureSlash();
+        PathUtil::ensureSlash(buffer);
         buffer.append(path.begin(), path.end());
     }
     else {
         buffer.set(path.begin(), path.end());
     }
 
-    buffer.replaceSeprators();
+    PathUtil::replaceSeprators(buffer);
     return buffer.c_str();
 }
 
@@ -908,7 +955,7 @@ const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathWT& path, 
         buffer = path;
     }
 
-    buffer.replaceSeprators();
+    PathUtil::replaceSeprators(buffer);
     return buffer.c_str();
 }
 
@@ -1359,13 +1406,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
         if (type == IoRequest::OPEN) {
             IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
-            XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode);
+            XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode, VirtualDirectory::GAME);
 
             pOpen->callback.Invoke(fileSys, pOpen, pFile, 0);
         }
         else if (type == IoRequest::OPEN_READ_ALL) {
             IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
-            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path, pOpenRead->mode);
+            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path, pOpenRead->mode, VirtualDirectory::GAME);
 
             // make sure it's safe to allocate the buffer in this thread.
             X_ASSERT_NOT_NULL(pOpenRead->arena);
@@ -1440,7 +1487,9 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
         }
         else if (type == IoRequest::OPEN_WRITE_ALL) {
             IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
-            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path, core::FileFlags::RECREATE | core::FileFlags::WRITE));
+
+            auto flags = core::FileFlags::RECREATE | core::FileFlags::WRITE;
+            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path, flags, VirtualDirectory::GAME));
 
             X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
             X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());

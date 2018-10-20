@@ -240,19 +240,20 @@ public:
 
     // Open / Close
     XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_FINAL;
-    XFile* openFile(const PathT& relPath, FileFlags mode) X_FINAL;
+    XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
-    XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode) X_FINAL;
+    XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
-    XFileMem* openFileMem(const PathT& relPath, FileFlags mode) X_FINAL;
+    XFileMem* openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders
     bool setGameDir(const PathWT& osPath) X_FINAL;
+    bool setSaveDir(const PathWT& osPath);
     bool addModDir(const PathWT& osPath) X_FINAL;
 
     // Find util
@@ -315,9 +316,9 @@ public:
 
 private:
     template<typename FileT, typename PakFuncT, typename FuncT>
-    FileT* findFile(const PathT& relPath, FileFlags mode, PakFuncT pakFunc, FuncT func);
+    FileT* findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir, PakFuncT pakFunc, FuncT func);
 
-    bool addDirInteral(const PathWT& path, bool isGame);
+    Directory* addDirInteral(const PathWT& path);
 
 private:
     IoRequestBase* popRequest(void);
@@ -342,6 +343,7 @@ private:
 private:
 
     // Ajust path
+    const wchar_t* createOSPath(const VirtualDirectory::Enum dir, const PathT& path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const;
     const wchar_t* createOSPath(const Directory* dir, const PathWT& path, PathWT& buffer) const;
 
@@ -363,6 +365,7 @@ private:
 #endif // !X_DEBUG
 
     Directory* gameDir_;
+    Directory* saveDir_;
     Search* searchPaths_;
     bool loadPacks_;
 

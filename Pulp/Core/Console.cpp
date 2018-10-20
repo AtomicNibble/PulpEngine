@@ -645,7 +645,8 @@ void XConsole::saveChangedVars(void)
         }
     }
 
-    if (!file.openFile(userConfigPath, FileFlag::WRITE | FileFlag::RECREATE)) {
+    // want to open flag in the save game folder.
+    if (!file.openFile(userConfigPath, FileFlag::WRITE | FileFlag::RECREATE, core::VirtualDirectory::SAVE)) {
         X_ERROR("Console", "Failed to open file for saving modifed vars");
         return;
     }
@@ -1659,7 +1660,7 @@ void XConsole::saveCmdHistory(void) const
     mode.Set(FileFlag::RECREATE);
 
     XFileScoped file;
-    if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode)) {
+    if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode, core::VirtualDirectory::SAVE)) {
         file.write(stream.data(), safe_static_cast<uint32_t>(stream.size()));
     }
 }
