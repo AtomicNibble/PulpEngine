@@ -18,7 +18,14 @@ namespace PathUtil
     typedef FindData FindData;
     typedef findhandle findhandle;
 
+    // Native slashes
+    static const wchar_t NATIVE_SLASH = L'\\';
+    static const wchar_t NON_NATIVE_SLASH = L'/';
+
     typedef core::Path<wchar_t> Path;
+
+    void ensureSlash(Path& path);
+    void replaceSeprators(Path& path);
 
     bool GetCurrentDirectory(Path& pathOut);
 

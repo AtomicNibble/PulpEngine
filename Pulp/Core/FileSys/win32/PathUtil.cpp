@@ -30,6 +30,24 @@ namespace PathUtil
 
     } // namespace
 
+    void ensureSlash(Path& path)
+    {
+        if (path.isEmpty()) {
+            return;
+        }
+
+        path.stripTrailing(NATIVE_SLASH);
+        path.stripTrailing(NON_NATIVE_SLASH);
+        path.append(NATIVE_SLASH, 1);
+    }
+
+    void replaceSeprators(Path& path)
+    {
+        path.replaceAll(NON_NATIVE_SLASH, NATIVE_SLASH);
+    }
+
+    // ------------------------------------------------
+
     bool GetCurrentDirectory(Path& pathOut)
     {
         wchar_t buf[Path::BUF_SIZE] = {};
@@ -37,7 +55,7 @@ namespace PathUtil
         auto retval = GetCurrentDirectoryW(sizeof(buf), buf);
         if (retval > 0 && retval < X_ARRAY_SIZE(buf)) {
             pathOut.set(buf, buf + retval);
-            pathOut.ensureSlash();
+            ensureSlash(pathOut);
             return true;
         }
 
@@ -112,7 +130,7 @@ namespace PathUtil
 
         const wchar_t* pDirEnd = pDir + searchPath.length();
 
-        searchPath.ensureSlash();
+        ensureSlash(searchPath);
         searchPath.append(L"*");
 
         _wfinddata64_t fi;
@@ -208,7 +226,7 @@ namespace PathUtil
                 }
             }
 
-            path.ensureSlash();
+            ensureSlash(path);
         }
 
         return true;
