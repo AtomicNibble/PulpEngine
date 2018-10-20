@@ -237,7 +237,7 @@ namespace entity
             // oh shit son.
             // this be like, some crazy weapon switching shit.
             if (userCmd.impulse == net::Impulse::WEAP_NEXT || userCmd.impulse == net::Impulse::WEAP_PREV) {
-                X_LOG0("Goat", "Change the fucking weapon!");
+                X_LOG0("Player", "Change the fucking weapon!");
 
                 // how is this going to work o_o
                 // need to holster the weapon, then switch to new one.
@@ -296,7 +296,7 @@ namespace entity
                     player.targetWpn = wpnIdx;
 
                     auto* pWpnDef = weaponDefs.findWeaponDef(wpnIdx);
-                    X_LOG0("goat", "switch to: %s", pWpnDef->getStrSlot(weapon::StringSlot::DisplayName));
+                    X_LOG0("Player", "switch to: %s", pWpnDef->getStrSlot(weapon::StringSlot::DisplayName));
                 }
             }
 
