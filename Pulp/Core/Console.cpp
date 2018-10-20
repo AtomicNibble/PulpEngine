@@ -913,74 +913,72 @@ bool XConsole::loadAndExecConfigFile(const char* pFileName)
     path /= pFileName;
     path.setExtension(CONFIG_FILE_EXTENSION);
 
-    core::XFileScoped file;
-    size_t bytes;
-
     X_LOG0("Config", "Loading config: \"%s\"", pFileName);
 
-    if (file.openFile(path, FileFlag::READ)) {
-        bytes = safe_static_cast<size_t, uint64_t>(file.remainingBytes());
-
-        if (bytes > 0) {
-            core::Array<char, core::ArrayAlignedAllocator<char>> data(g_coreArena);
-            data.getAllocator().setBaseAlignment(16);
-            data.resize(bytes + 2);
-
-            if (file.read(data.data(), bytes) != bytes) {
-                X_ERROR("Config", "failed to read: \"%s\"", path.c_str());
-                return false;
-            }
-
-            // 2 bytes at end so the multiline search can be more simple.
-            // and not have to worrie about reading out of bounds.
-            data[bytes] = '\0';
-            data[bytes + 1] = '\0';
-
-            // execute all the data in the file.
-            // it's parsed in memory.
-            // remove comments here.
-            char* begin = data.begin();
-            char* end = begin + bytes;
-            const char* pComment;
-
-            // we support // and /* */ so loook for a '/'
-            while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr) {
-                // wee need atleast 1 more char.
-                if (pComment >= (end - 1)) {
-                    break;
-                }
-
-                begin = const_cast<char*>(++pComment);
-
-                if (*begin == '*') {
-                    begin[-1] = ' ';
-                    *begin++ = ' ';
-
-                    while (*begin != '*' && begin[1] != '/' && begin < end) {
-                        *begin++ = ' ';
-                    }
-                }
-                else if (*begin == '/') {
-                    // signle line.
-                    begin[-1] = ' ';
-                    *begin++ = ' ';
-
-                    while (*begin != '\n' && begin < end) {
-                        *begin++ = ' ';
-                    }
-                }
-                else {
-                    ++begin;
-                }
-            }
-
-            configExec(data.begin(), data.begin() + bytes);
-        }
-    }
-    else {
+    core::XFileScoped file;
+    if (!file.openFile(path, FileFlag::READ)) {
         X_ERROR("Config", "failed to load: \"%s\"", path.c_str());
         return false;
     }
+
+    auto bytes = safe_static_cast<size_t>(file.remainingBytes());
+    if (bytes == 0) {
+        return true;
+    }
+
+    core::Array<char, core::ArrayAlignedAllocator<char>> data(g_coreArena);
+    data.getAllocator().setBaseAlignment(16);
+    data.resize(bytes + 2);
+
+    if (file.read(data.data(), bytes) != bytes) {
+        X_ERROR("Config", "failed to read: \"%s\"", path.c_str());
+        return false;
+    }
+
+    // 2 bytes at end so the multiline search can be more simple.
+    // and not have to worrie about reading out of bounds.
+    data[bytes] = '\0';
+    data[bytes + 1] = '\0';
+
+    // execute all the data in the file.
+    // it's parsed in memory.
+    // remove comments here.
+    char* begin = data.begin();
+    char* end = begin + bytes;
+    const char* pComment;
+
+    // we support // and /* */ so loook for a '/'
+    while ((pComment = core::strUtil::Find(begin, end, '/')) != nullptr) {
+        // wee need atleast 1 more char.
+        if (pComment >= (end - 1)) {
+            break;
+        }
+
+        begin = const_cast<char*>(++pComment);
+
+        if (*begin == '*') {
+            begin[-1] = ' ';
+            *begin++ = ' ';
+
+            while (*begin != '*' && begin[1] != '/' && begin < end) {
+                *begin++ = ' ';
+            }
+        }
+        else if (*begin == '/') {
+            // signle line.
+            begin[-1] = ' ';
+            *begin++ = ' ';
+
+            while (*begin != '\n' && begin < end) {
+                *begin++ = ' ';
+            }
+        }
+        else {
+            ++begin;
+        }
+    }
+
+    configExec(data.begin(), data.begin() + bytes);
     return true;
 }
 
