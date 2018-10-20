@@ -142,6 +142,12 @@ namespace weapon
             return false;
         }
 
+        // you can never fill one clip
+        if (ammoSlots_[AmmoSlot::ClipSize] > ammoSlots_[AmmoSlot::Max]) {
+            X_ERROR("Weapon", "ClipSize bigger than max");
+            return false;
+        }
+
         return true;
     }
 
