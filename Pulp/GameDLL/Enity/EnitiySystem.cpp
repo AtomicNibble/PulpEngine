@@ -354,16 +354,18 @@ namespace entity
 
         hp.hp = 100;
 
-        inv.giveAmmo(0, 50);
-        inv.giveAmmo(1, 50);
-        inv.giveAmmo(2, 50);
-        inv.giveAmmo(3, 50);
-        inv.giveAmmo(4, 50);
+        auto giveWeapon = [&](const char* pName) {
+            auto* pWpn = weaponDefs_.loadWeaponDef(pName);
 
+            weaponDefs_.waitForLoad(pWpn);
 
-        inv.weapons.set(weaponDefs_.loadWeaponDef("test/sw_357")->getID());
-        inv.weapons.set(weaponDefs_.loadWeaponDef("test/mg42")->getID());
-        inv.weapons.set(weaponDefs_.loadWeaponDef("test/raygun")->getID());
+            inv.weapons.set(pWpn->getID());
+            inv.giveAmmo(pWpn->getAmmoTypeId(), pWpn->getAmmoSlot(weapon::AmmoSlot::Start));
+        };
+
+        giveWeapon("test/sw_357");
+        giveWeapon("test/mg42");
+        giveWeapon("test/raygun");
 
         player.currentWpn = 1;
         player.targetWpn = 1;
