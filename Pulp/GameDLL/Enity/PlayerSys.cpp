@@ -319,15 +319,24 @@ namespace entity
 
                 if (wpn.isHolstered())
                 {
+                    auto& inv = reg.get<Inventory>(playerId);
                     auto& mesh = reg.get<Mesh>(player.weaponEnt);
                     auto& meshRend = reg.get<MeshRenderer>(player.weaponEnt);
                     auto& an = reg.get<Animator>(player.weaponEnt);
 
+                    // save some info about current weapon.
+                    {
+
+                        inv.setClipAmmo(player.currentWpn, wpn.ammoInClip);
+                    }
+
                     // now switch and raise.
                     // how do we switch 0_0
                     auto* pWpnDef = weaponDefs.findWeaponDef(player.targetWpn);
+                    const auto ammotTypeId = pWpnDef->getAmmoTypeId();
 
-                    // things that need to happen:
+                    X_ASSERT(pWpnDef->getID() == player.targetWpn, "Id mismatch")(pWpnDef->getID(), player.targetWpn);
+
                     // change the model
                     const char* pViewModel = pWpnDef->getModelSlot(weapon::ModelSlot::Gun);
 
@@ -342,10 +351,14 @@ namespace entity
                     entDsc.pModel = mesh.pModel;
                     entDsc.trans = trans;
                     meshRend.pRenderEnt = p3DWorld->addRenderEnt(entDsc);
-
-                    
+     
                     an.pAnimator->setModel(mesh.pModel);
 
+
+                    auto clipAmmo = inv.getClipAmmo(player.targetWpn);
+
+                    wpn.ammoInClip = clipAmmo;
+                    wpn.ammoType = ammotTypeId;
                     wpn.pWeaponDef = pWpnDef;
                     wpn.raise();
 
