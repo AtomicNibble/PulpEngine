@@ -130,9 +130,9 @@ namespace weapon
 
     X_DECLARE_ENUM(AmmoSlot)
     (
-        Max,
-        Start, // this is store not clip
-        ClipSize);
+        Max,        // store + clip
+        Start,      // can be max
+        ClipSize);  
 
     X_DECLARE_ENUM(EffectSlot)
     (
