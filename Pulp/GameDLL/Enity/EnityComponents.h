@@ -113,6 +113,11 @@ namespace entity
             
         static constexpr int32_t MAX_AMMO_PER_TYPE = 500;
 
+        typedef uint16_t AmmoInt;
+
+        static_assert(std::numeric_limits<AmmoInt>::max() >= weapon::WEAPON_MAX_AMMO, "Can't store max ammo value");
+        static_assert(std::numeric_limits<AmmoInt>::max() >= weapon::WEAPON_MAX_CLIP, "Can't store max clip ammo value");
+
         // you can have multiple weapons in invetory.
         // what do i store these as?
         // well when we switch weapons we need to basically play the putaway anim then switch weapon def.
@@ -123,7 +128,7 @@ namespace entity
         // well i think so.
         void giveAmmo(weapon::AmmoTypeId type, int32_t num)
         {
-            ammo[type] = core::Min(ammo[type] + num, MAX_AMMO_PER_TYPE);
+            ammo[type] = safe_static_cast<AmmoInt>(core::Min(ammo[type] + num, MAX_AMMO_PER_TYPE));
         }
 
         int32_t numAmmo(weapon::AmmoTypeId type) const
@@ -139,7 +144,7 @@ namespace entity
         bool useAmmo(weapon::AmmoTypeId type, int32_t num)
         {
             if (hasAmmo(type, num)) {
-                ammo[type] -= num;
+                ammo[type] -= safe_static_cast<AmmoInt>(num);
                 return true;
             }
 
@@ -155,14 +160,14 @@ namespace entity
         void setClipAmmo(int32_t weaponId, int32_t num)
         {
             X_ASSERT(num >= 0, "Invalid ammo count")(num);
-            clip[weaponId] = num;
+            clip[weaponId] = safe_static_cast<AmmoInt>(num);
         }
 
         std::bitset<weapon::WEAPON_MAX_LOADED> weapons;
 
     private:
-        std::array<int32_t, weapon::WEAPON_MAX_LOADED> clip; // only sync'd when you switch weapon.
-        std::array<int32_t, weapon::WEAPON_MAX_AMMO_TYPES> ammo;
+        std::array<int16_t, weapon::WEAPON_MAX_LOADED> clip; // only sync'd when you switch weapon.
+        std::array<int16_t, weapon::WEAPON_MAX_AMMO_TYPES> ammo;
     };
 
     struct Weapon
