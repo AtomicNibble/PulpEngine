@@ -192,7 +192,7 @@ namespace entity
         core::TimeVal stateEnd;
 
         int32_t ammoInClip;
-        int32_t ammoType;
+        weapon::AmmoTypeId ammoType;
 
         bool attack;
         bool reload;
