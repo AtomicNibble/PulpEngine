@@ -110,7 +110,6 @@ namespace weapon
         parseEnum<AmmoSlot>(d, core::json::kNumberType, "ammo", ammoSlots_, assignInt16);
         parseEnum<StateTimer>(d, core::json::kNumberType, "time", stateTimers_, assignFloat);
 
-
         strSlots_[StringSlot::DisplayName] = pDisplayName;
         strSlots_[StringSlot::AmmoName] = pAmmoName;
 
@@ -129,6 +128,17 @@ namespace weapon
 
         if (!processFlagGroup(d, flags_, flags)) {
             X_ERROR("Weapon", "Failed to parse flags");
+            return false;
+        }
+
+        // validate some stuff.
+        if (damageMin_ > damageMax_) {
+            X_ERROR("Weapon", "Min damage bigger than max");
+            return false;
+        }
+
+        if (ammoSlots_[AmmoSlot::Start] > ammoSlots_[AmmoSlot::Max]) {
+            X_ERROR("Weapon", "Starting ammo bigger than max");
             return false;
         }
 
