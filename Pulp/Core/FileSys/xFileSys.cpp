@@ -265,13 +265,32 @@ bool xFileSys::initDirectorys(bool working)
             workingDir = pGameDir;
         }
 
+        const wchar_t* pSaveDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_savepath");
+      
+
         PathWT base(workingDir);
-        PathUtil::replaceSeprators(workingDir);
-        PathUtil::ensureSlash(workingDir);
+        PathUtil::replaceSeprators(base);
+        PathUtil::ensureSlash(base);
 
         PathWT core(base);
-        PathUtil::ensureSlash(core);
         core += L"core_assets";
+
+#if 1
+        PathWT saveDir(core);
+
+        if (pSaveDir) {
+            saveDir = pSaveDir;
+            PathUtil::replaceSeprators(saveDir);
+            PathUtil::ensureSlash(saveDir);
+        }
+#else
+        PathWT saveDir(base);
+        saveDir += L"save_dir";
+
+        if (!PathUtil::DirectoryExist(saveDir)) {
+            PathUtil::CreateDirectoryTree(saveDir);
+        }
+#endif
 
         PathWT testAssets(base);
         PathUtil::ensureSlash(testAssets);
@@ -280,7 +299,7 @@ bool xFileSys::initDirectorys(bool working)
         if (!setGameDir(core)) {
             return false;
         }
-        if (!setSaveDir(core)) {
+        if (!setSaveDir(saveDir)) {
             return false;
         }
         if(!addModDir(testAssets)) {
