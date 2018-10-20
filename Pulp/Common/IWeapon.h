@@ -14,6 +14,8 @@ namespace weapon
 
     static const uint32_t WEAPON_MAX_LOADED = 64;
     static const uint32_t WEAPON_MAX_AMMO_TYPES = 32;
+    static const uint32_t WEAPON_MAX_AMMO = 4096;
+    static const uint32_t WEAPON_MAX_CLIP = 512;
 
     typedef int32_t AmmoTypeId;
 
