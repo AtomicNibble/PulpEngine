@@ -208,7 +208,7 @@ namespace PathUtil
 
     bool CreateDirectoryTree(const wchar_t* pDir)
     {
-        if (DoesDirectoryExist(pDir)) {
+        if (DirectoryExist(pDir)) {
             return true;
         }
 
@@ -220,7 +220,7 @@ namespace PathUtil
         while (tokenizer.extractToken(range)) {
             path.append(range.getStart(), range.getEnd());
 
-            if (!DoesDirectoryExist(path)) {
+            if (!DirectoryExist(path)) {
                 if (!CreateDirectory(path)) {
                     return false;
                 }
@@ -258,12 +258,12 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    bool DoesDirectoryExist(const Path& dirPath)
+    bool DirectoryExist(const Path& dirPath)
     {
-        return DoesDirectoryExist(dirPath.c_str());
+        return DirectoryExist(dirPath.c_str());
     }
 
-    bool DoesDirectoryExist(const wchar_t* pDir)
+    bool DirectoryExist(const wchar_t* pDir)
     {
         DWORD dwAttrib = GetFileAttributesW(pDir);
 
@@ -289,12 +289,12 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    bool DoesFileExist(const Path& filePath, bool supressMissingDirWarn)
+    bool FileExist(const Path& filePath, bool supressMissingDirWarn)
     {
-        return DoesFileExist(filePath.c_str(), supressMissingDirWarn);
+        return FileExist(filePath.c_str(), supressMissingDirWarn);
     }
 
-    bool DoesFileExist(const wchar_t* pFilePath, bool supressMissingDirWarn)
+    bool FileExist(const wchar_t* pFilePath, bool supressMissingDirWarn)
     {
         DWORD dwAttrib = GetFileAttributesW(pFilePath);
 
@@ -323,12 +323,12 @@ namespace PathUtil
 
     // ------------------------------------------------
 
-    bool DoesPathExist(const Path& path)
+    bool PathExist(const Path& path)
     {
-        return DoesPathExist(path.c_str());
+        return PathExist(path.c_str());
     }
 
-    bool DoesPathExist(const wchar_t* pDir)
+    bool PathExist(const wchar_t* pDir)
     {
         return GetFileAttributesW(pDir) != INVALID_FILE_ATTRIBUTES;
     }

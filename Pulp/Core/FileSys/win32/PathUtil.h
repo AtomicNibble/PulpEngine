@@ -47,14 +47,14 @@ namespace PathUtil
     uint64_t GetFileSize(const Path& filePath);
     uint64_t GetFileSize(const wchar_t* pFilePath);
 
-    bool DoesDirectoryExist(const Path& dirPath);
-    bool DoesDirectoryExist(const wchar_t* pDir);
+    bool DirectoryExist(const Path& dirPath);
+    bool DirectoryExist(const wchar_t* pDir);
 
-    bool DoesFileExist(const Path& filePath, bool supressMissingDirWarn = false);
-    bool DoesFileExist(const wchar_t* pFilePath, bool supressMissingDirWarn = false);
+    bool FileExist(const Path& filePath, bool supressMissingDirWarn = false);
+    bool FileExist(const wchar_t* pFilePath, bool supressMissingDirWarn = false);
 
-    bool DoesPathExist(const Path& path);
-    bool DoesPathExist(const wchar_t* pDir);
+    bool PathExist(const Path& path);
+    bool PathExist(const wchar_t* pDir);
 
     bool IsDirectory(const Path& path);
     bool IsDirectory(const wchar_t* pDir);

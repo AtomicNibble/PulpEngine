@@ -462,7 +462,7 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
 
                 createOSPath(pDir, relPath, osPath);
 
-                if (PathUtil::DoesFileExist(osPath, true)) {
+                if (PathUtil::FileExist(osPath, true)) {
                     return func(osPath, mode);
                 }
             }
@@ -811,7 +811,7 @@ bool xFileSys::fileExists(const PathT& path) const
 
 bool xFileSys::fileExistsOS(const PathWT& osPath) const
 {
-    return core::PathUtil::DoesFileExist(osPath);
+    return core::PathUtil::FileExist(osPath);
 }
 
 bool xFileSys::directoryExists(const PathT& path) const
@@ -824,7 +824,7 @@ bool xFileSys::directoryExists(const PathT& path) const
 
 bool xFileSys::directoryExistsOS(const PathWT& osPath) const
 {
-    return core::PathUtil::DoesDirectoryExist(osPath);
+    return core::PathUtil::DirectoryExist(osPath);
 }
 
 bool xFileSys::isDirectory(const PathT& path) const
