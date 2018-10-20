@@ -110,6 +110,8 @@ namespace entity
         ADD_META()
 
         Inventory();
+            
+        static constexpr int32_t MAX_AMMO_PER_TYPE = 500;
 
         // you can have multiple weapons in invetory.
         // what do i store these as?
@@ -121,7 +123,7 @@ namespace entity
         // well i think so.
         void giveAmmo(weapon::AmmoTypeId type, int32_t num)
         {
-            ammo[type] += num;
+            ammo[type] = core::Min(ammo[type] + num, MAX_AMMO_PER_TYPE);
         }
 
         int32_t numAmmo(weapon::AmmoTypeId type) const
