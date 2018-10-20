@@ -17,7 +17,7 @@ public:
 public:
     inline Flags(void);
     inline Flags(Enum flag);
-    inline Flags(const Flags<T>& oth);
+    inline Flags(const Flags<T>& oth) = default;
     inline explicit Flags(uint32_t flags);
 
     inline void Set(Enum flag);
@@ -82,7 +82,7 @@ public:
 public:
     inline Flags8(void);
     inline Flags8(Enum flag);
-    inline Flags8(const Flags8<T>& oth);
+    inline Flags8(const Flags8<T>& oth) = default;
     inline explicit Flags8(uint8_t flags);
 
     inline void Set(Enum flag);

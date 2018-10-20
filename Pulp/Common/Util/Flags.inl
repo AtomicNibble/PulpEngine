@@ -13,12 +13,6 @@ inline Flags<T>::Flags(Enum flag) :
 }
 
 template<class T>
-inline Flags<T>::Flags(const Flags& oth) :
-    flags_(oth.flags_)
-{
-}
-
-template<class T>
 inline Flags<T>::Flags(uint32_t flags) :
     flags_(flags)
 {
@@ -211,12 +205,6 @@ inline Flags8<T>::Flags8(void) :
 template<class T>
 inline Flags8<T>::Flags8(Enum flag) :
     flags_(flag)
-{
-}
-
-template<class T>
-inline Flags8<T>::Flags8(const Flags8& oth) :
-    flags_(oth.flags_)
 {
 }
 
