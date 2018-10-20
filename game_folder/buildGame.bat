@@ -12,6 +12,8 @@ pushd %REL_PATH%
 set ABS_PATH=%CD%
 popd
 
+set LINKER_ARGS= +mod core +nopause +nocompress
+
 REM convert all the assets...
 "%ABS_PATH%\engine_Converter.exe" +mode all +mod core +profile release +nopause
 
@@ -22,14 +24,14 @@ REM build levels...
 "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
 
 REM Base packs
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init +nocompress +nopause +mod core +al asset_lists/init.assList +memory
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init %LINKER_ARGS% +al asset_lists/init.assList +memory
 
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\weapons +nocompress +nopause +mod core +al asset_lists/weapons.assList +memory
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\weapons %LINKER_ARGS% +al asset_lists/weapons.assList +memory
 
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\shaders +nocompress +nopause +mod core +al asset_lists/shaders.assList +memory
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\shaders %LINKER_ARGS% +al asset_lists/shaders.assList +memory
 
 REM level packs
-"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 +nocompress +nopause +mod core +lvl test01
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 %LINKER_ARGS% +lvl test01
 
 REM build sound packs...
 "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
