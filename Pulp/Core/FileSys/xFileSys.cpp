@@ -302,9 +302,11 @@ bool xFileSys::initDirectorys(bool working)
         if (!setSaveDir(saveDir)) {
             return false;
         }
+#if 0 // unit tester should just add this.
         if(!addModDir(testAssets)) {
             return false;
         }
+#endif
     }
 
     return true;
