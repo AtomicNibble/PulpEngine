@@ -253,7 +253,7 @@ public:
 
     // folders
     bool setGameDir(const PathWT& osPath) X_FINAL;
-    bool setSaveDir(const PathWT& osPath);
+    bool setSaveDir(const PathWT& osPath) X_FINAL;
     bool addModDir(const PathWT& osPath) X_FINAL;
 
     // Find util
