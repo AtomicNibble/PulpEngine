@@ -1683,51 +1683,46 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
     return Thread::ReturnValue(0);
 }
 
-OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode, VirtualDirectory::Enum writeDir)
+OsFileAsync* xFileSys::openPakFile(const PathT& relPath)
 {
-    PathWT osPath;
-
-    if (mode.IsSet(FileFlag::READ) && !mode.IsSet(FileFlag::WRITE)) {
-        FindData findinfo;
-        XFindData findData(path, this);
-
-        if (!findData.findnext(findinfo)) {
-            FileFlags::Description Dsc;
-            X_WARNING("FileSys", "Failed to find file: %ls, Flags: %s", path, mode.ToString(Dsc));
-            return nullptr;
-        }
-
-        findData.getOSPath(osPath, findinfo);
-    }
-    else {
-        createOSPath(writeDir, path, osPath);
-    }
-
-    if (isDebug()) {
-        X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
-    }
-
-    OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
-    if (pFile->valid()) {
-        return pFile;
-    }
-
-    X_DELETE(pFile, &filePoolArena_);
-    return nullptr;
-}
-
-bool xFileSys::openPak(const PathT& path)
-{
-    X_LOG1("FileSys", "Mounting pak: \"%s\"", path.c_str());
-
-    // you can only open pak's from inside the virtual filesystem.
-    // so file is opened as normal.
     FileFlags mode;
     mode.Set(FileFlag::READ);
     mode.Set(FileFlag::RANDOM_ACCESS);
-    // I'm not sharing, fuck you!
 
-    auto* pFile = openOsFileAsync(path, mode, VirtualDirectory::BASE);
+    PathWT osPath;
+
+    for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
+    {
+        if (pSearch->pDir)
+        {
+            const auto* pDir = pSearch->pDir;
+            createOSPath(pDir, relPath, osPath);
+
+            if (PathUtil::FileExist(osPath, true)) 
+            {
+                if (isDebug()) {
+                    X_LOG0("FileSys", "openFileAsync: \"%ls\"", osPath.c_str());
+                }
+
+                OsFileAsync* pFile = X_NEW(OsFileAsync, &filePoolArena_, "DiskFileAsync")(osPath, mode, &asyncOpPoolArena_);
+                if (pFile->valid()) {
+                    return pFile;
+                }
+
+                X_DELETE(pFile, &filePoolArena_);
+            }
+        }
+    }
+
+    return nullptr;
+}
+
+bool xFileSys::openPak(const PathT& relPath)
+{
+    X_LOG1("FileSys", "Mounting pak: \"%s\"", relPath.c_str());
+
+    // you can only open pak's from inside the virtual filesystem.
+    auto* pFile = openPakFile(relPath);
     if (!pFile) {
         X_ERROR("FileSys", "Failed to open pak");
         return false;
@@ -1786,7 +1781,7 @@ bool xFileSys::openPak(const PathT& path)
     const size_t dataSize = safe_static_cast<size_t>(pakMode == PakMode::MEMORY ? hdr.size : hdr.dataOffset);
 
     auto pPak = core::makeUnique<Pak>(g_coreArena, g_coreArena);
-    pPak->name.set(path.fileName());
+    pPak->name.set(relPath.fileName());
     pPak->mode = pakMode;
     pPak->pFile = pFile;
     pPak->numAssets = hdr.numAssets;

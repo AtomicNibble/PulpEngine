@@ -338,9 +338,9 @@ private:
     // ~ThreadAbstract
 
 private:
-    OsFileAsync* openOsFileAsync(const PathT& path, FileFlags mode, VirtualDirectory::Enum writeDir);
+    OsFileAsync* openPakFile(const PathT& relPath);
 
-    bool openPak(const PathT& path);
+    bool openPak(const PathT& relPath);
 
 private:
 
