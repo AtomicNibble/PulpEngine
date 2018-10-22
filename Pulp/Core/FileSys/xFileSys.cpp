@@ -643,7 +643,7 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
 
 // --------------------- Find util ---------------------
 
-FindPair xFileSys::findFirst(const PathT& path, FindData& findinfo)
+FindPair xFileSys::findFirst(const PathT& relPath, FindData& findinfo)
 {
     // i don't like how the findData shit works currently it's anoying!
     // so this is start of new version but i dunno how i want it to work yet.
@@ -655,7 +655,7 @@ FindPair xFileSys::findFirst(const PathT& path, FindData& findinfo)
     //
 
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, relPath, osPath);
 
     return findFirstOS(osPath, findinfo);
 }
@@ -681,10 +681,10 @@ void xFileSys::findClose(findhandle handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(const PathT& path) const
+bool xFileSys::deleteFile(const PathT& relPath) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, relPath, osPath);
 
     if (isDebug()) {
         X_LOG0("FileSys", "deleteFile: \"%ls\"", osPath.c_str());
@@ -693,10 +693,10 @@ bool xFileSys::deleteFile(const PathT& path) const
     return PathUtil::DeleteFile(osPath);
 }
 
-bool xFileSys::deleteDirectory(const PathT& path, bool recursive) const
+bool xFileSys::deleteDirectory(const PathT& relPath, bool recursive) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, relPath, osPath);
 
     if (osPath.fillSpaceWithNullTerm() < 1) {
         X_ERROR("FileSys", "Failed to pad puffer for OS operation");
@@ -766,10 +766,10 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(const PathT& path) const
+bool xFileSys::createDirectory(const PathT& relPath) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, relPath, osPath);
 
     osPath.removeFileName();
 
@@ -792,11 +792,11 @@ bool xFileSys::createDirectoryOS(const PathWT& osPath) const
     return PathUtil::CreateDirectory(path);
 }
 
-bool xFileSys::createDirectoryTree(const PathT& path) const
+bool xFileSys::createDirectoryTree(const PathT& relPath) const
 {
     // we want to just loop and create like a goat.
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(gameDir_, relPath, osPath);
 
     osPath.removeFileName();
 
@@ -867,12 +867,12 @@ bool xFileSys::isDirectoryOS(const PathWT& osPath) const
     return result;
 }
 
-bool xFileSys::moveFile(const PathT& path, const PathT& newPath) const
+bool xFileSys::moveFile(const PathT& relPath, const PathT& newPathRel) const
 {
     PathWT osPath, osPathNew;
 
-    createOSPath(gameDir_, path, osPath);
-    createOSPath(gameDir_, newPath, osPathNew);
+    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(gameDir_, newPathRel, osPathNew);
 
     return moveFileOS(osPath, osPathNew);
 }

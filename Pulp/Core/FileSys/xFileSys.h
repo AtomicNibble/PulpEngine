@@ -257,34 +257,34 @@ public:
     bool addModDir(const PathWT& osPath) X_FINAL;
 
     // Find util
-    FindPair findFirst(const PathT& path, FindData& findinfo) X_FINAL;
+    FindPair findFirst(const PathT& relPath, FindData& findinfo) X_FINAL;
     FindPair findFirstOS(const PathWT& osPath, FindData& findinfo) X_FINAL;
     bool findnext(findhandle handle, FindData& findinfo) X_FINAL;
     void findClose(findhandle handle) X_FINAL;
 
     // Delete
-    bool deleteFile(const PathT& path) const X_FINAL;
-    bool deleteDirectory(const PathT& path, bool recursive = true) const X_FINAL;
-    bool deleteDirectoryContents(const PathT& path) X_FINAL;
+    bool deleteFile(const PathT& relPath) const X_FINAL;
+    bool deleteDirectory(const PathT& relPath, bool recursive = true) const X_FINAL;
+    bool deleteDirectoryContents(const PathT& relPath) X_FINAL;
 
     // Create
-    bool createDirectory(const PathT& path) const X_FINAL;
+    bool createDirectory(const PathT& relPath) const X_FINAL;
     bool createDirectoryOS(const PathWT& osPath) const X_FINAL;
-    bool createDirectoryTree(const PathT& path) const X_FINAL;
+    bool createDirectoryTree(const PathT& relPath) const X_FINAL;
     bool createDirectoryTreeOS(const PathWT& osPath) const X_FINAL;
 
     // exsists.
-    bool fileExists(const PathT& path) const X_FINAL;
+    bool fileExists(const PathT& relPath) const X_FINAL;
     bool fileExistsOS(const PathWT& osPath) const X_FINAL;
-    bool directoryExists(const PathT& path) const X_FINAL;
+    bool directoryExists(const PathT& relPath) const X_FINAL;
     bool directoryExistsOS(const PathWT& osPath) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
-    bool isDirectory(const PathT& path) const X_FINAL;
+    bool isDirectory(const PathT& relPath) const X_FINAL;
     bool isDirectoryOS(const PathWT& osPath) const X_FINAL;
 
     // rename
-    bool moveFile(const PathT& path, const PathT& newPath) const X_FINAL;
+    bool moveFile(const PathT& relPath, const PathT& newPathRel) const X_FINAL;
     bool moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const X_FINAL;
 
     size_t getMinimumSectorSize(void) const X_FINAL;
