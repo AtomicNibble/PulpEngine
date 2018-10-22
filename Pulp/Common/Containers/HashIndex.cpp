@@ -3,7 +3,7 @@
 
 X_NAMESPACE_BEGIN(core)
 
-XHashIndex::size_type XHashIndex::INVALID_INDEX[1] = {-1};
+XHashIndex::size_type XHashIndex::INVALID_INDEX_BLOCK[1] = { XHashIndex::INVALID_INDEX };
 
 XHashIndex::XHashIndex(core::MemoryArenaBase* arena) :
     XHashIndex(arena, DEFAULT_HASH_SIZE, DEFAULT_HASH_SIZE)
@@ -17,9 +17,9 @@ XHashIndex::XHashIndex(core::MemoryArenaBase* arena, const size_type initialHash
     X_ASSERT(core::bitUtil::IsPowerOfTwo(initialHashSize), "size must be power of 2")(initialHashSize);
 
     hashSize_ = initialHashSize;
-    hash_ = INVALID_INDEX;
+    hash_ = INVALID_INDEX_BLOCK;
     indexSize_ = initialIndexSize;
-    indexChain_ = INVALID_INDEX;
+    indexChain_ = INVALID_INDEX_BLOCK;
     granularity_ = DEFAULT_HASH_GRANULARITY;
     hashMask_ = hashSize_ - 1;
     lookupMask_ = 0;
@@ -36,8 +36,8 @@ XHashIndex::XHashIndex(XHashIndex&& oth)
     lookupMask_ = oth.lookupMask_;
     arena_ = oth.arena_;
 
-    oth.hash_ = INVALID_INDEX;
-    oth.indexChain_ = INVALID_INDEX;
+    oth.hash_ = INVALID_INDEX_BLOCK;
+    oth.indexChain_ = INVALID_INDEX_BLOCK;
     oth.lookupMask_ = 0;
 }
 
@@ -58,16 +58,16 @@ XHashIndex& XHashIndex::operator=(const XHashIndex& oth)
         free();
     }
     else {
-        if (oth.hashSize_ != hashSize_ || hash_ == INVALID_INDEX) {
-            if (hash_ != INVALID_INDEX) {
+        if (oth.hashSize_ != hashSize_ || hash_ == INVALID_INDEX_BLOCK) {
+            if (hash_ != INVALID_INDEX_BLOCK) {
                 X_DELETE_ARRAY(hash_, arena_);
             }
             hashSize_ = oth.hashSize_;
             hash_ = X_NEW_ARRAY(int, hashSize_, arena_, "HashIndex:Hash");
         }
 
-        if (oth.indexSize_ != indexSize_ || indexChain_ == INVALID_INDEX) {
-            if (indexChain_ != INVALID_INDEX) {
+        if (oth.indexSize_ != indexSize_ || indexChain_ == INVALID_INDEX_BLOCK) {
+            if (indexChain_ != INVALID_INDEX_BLOCK) {
                 X_DELETE_ARRAY(indexChain_, arena_);
             }
             indexSize_ = oth.indexSize_;
@@ -92,8 +92,8 @@ XHashIndex& XHashIndex::operator=(XHashIndex&& oth)
     lookupMask_ = oth.lookupMask_;
     arena_ = oth.arena_;
 
-    oth.hash_ = INVALID_INDEX;
-    oth.indexChain_ = INVALID_INDEX;
+    oth.hash_ = INVALID_INDEX_BLOCK;
+    oth.indexChain_ = INVALID_INDEX_BLOCK;
     oth.lookupMask_ = 0;
     return *this;
 }
@@ -101,7 +101,7 @@ XHashIndex& XHashIndex::operator=(XHashIndex&& oth)
 void XHashIndex::clear(void)
 {
     // only clear the hash table because clearing the indexChain is not really needed
-    if (hash_ != INVALID_INDEX) {
+    if (hash_ != INVALID_INDEX_BLOCK) {
         std::memset(hash_, 0xff, hashSize_ * sizeof(hash_[0]));
     }
 }
@@ -115,21 +115,42 @@ void XHashIndex::clear(const size_type newHashSize, const size_type newIndexSize
 
 void XHashIndex::free(void)
 {
-    if (hash_ != INVALID_INDEX) {
+    if (hash_ != INVALID_INDEX_BLOCK) {
         X_DELETE_ARRAY(hash_, arena_);
-        hash_ = INVALID_INDEX;
+        hash_ = INVALID_INDEX_BLOCK;
     }
-    if (indexChain_ != INVALID_INDEX) {
+    if (indexChain_ != INVALID_INDEX_BLOCK) {
         X_DELETE_ARRAY(indexChain_, arena_);
-        indexChain_ = INVALID_INDEX;
+        indexChain_ = INVALID_INDEX_BLOCK;
     }
 
     lookupMask_ = 0;
 }
 
+void XHashIndex::remove(const uint32_t key, const index_type index)
+{
+    key_type k = key & hashMask_;
+
+    if (hash_ == INVALID_INDEX_BLOCK) {
+        return;
+    }
+    if (hash_[k] == index) {
+        hash_[k] = indexChain_[index];
+    }
+    else {
+        for (int i = hash_[k]; i != -1; i = indexChain_[i]) {
+            if (indexChain_[i] == index) {
+                indexChain_[i] = indexChain_[index];
+                break;
+            }
+        }
+    }
+    indexChain_[index] = -1;
+}
+
 void XHashIndex::insertIndex(const uint32_t key, const index_type index)
 {
-    if (hash_ != INVALID_INDEX) {
+    if (hash_ != INVALID_INDEX_BLOCK) {
         index_type max = index;
 
         index_type i;
@@ -169,7 +190,7 @@ void XHashIndex::removeIndex(const uint32_t key, const index_type index)
 {
     remove(key, index);
 
-    if (hash_ != INVALID_INDEX) {
+    if (hash_ != INVALID_INDEX_BLOCK) {
         index_type i, max = index;
         for (i = 0; i < hashSize_; i++) {
             if (hash_[i] >= index) {
@@ -211,7 +232,7 @@ void XHashIndex::resizeIndex(const size_type newIndexSize)
         newSize = newIndexSize + granularity_ - mod;
     }
 
-    if (indexChain_ == INVALID_INDEX) {
+    if (indexChain_ == INVALID_INDEX_BLOCK) {
         indexSize_ = newSize;
         return;
     }
@@ -226,7 +247,7 @@ void XHashIndex::resizeIndex(const size_type newIndexSize)
 
 int XHashIndex::getSpread(void) const
 {
-    if (hash_ == INVALID_INDEX) {
+    if (hash_ == INVALID_INDEX_BLOCK) {
         return 100;
     }
 

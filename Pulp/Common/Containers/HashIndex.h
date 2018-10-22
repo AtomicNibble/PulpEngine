@@ -12,9 +12,12 @@ class XHashIndex
     static const uint32_t DEFAULT_HASH_SIZE = 1024;
     static const uint32_t DEFAULT_HASH_GRANULARITY = 1024;
 
+public:
     typedef int32_t index_type;
     typedef int32_t size_type;
     typedef uint32_t key_type;
+
+    static constexpr index_type INVALID_INDEX = index_type(-1);
 
 public:
     XHashIndex(core::MemoryArenaBase* arena);
@@ -33,7 +36,7 @@ public:
     void free(void);
 
     // add an index to the hash, assumes the index has not yet been added to the hash
-    void add(const uint32_t key, const index_type index);
+    X_INLINE void add(const uint32_t key, const index_type index);
     // remove an index from the hash
     void remove(const uint32_t key, const index_type index);
     // get the first index from the hash, returns -1 if empty hash entry
@@ -57,17 +60,15 @@ public:
     // returns total size of allocated memory
     X_INLINE size_t allocated(void) const;
     // returns a key for a string
-    X_INLINE uint32_t generateKey(const char* string, bool caseSensitive = true) const;
+    X_INLINE uint32_t generateKey(const char* startInclusive, const char* endExclusive, bool caseSensitive = true) const;
     // returns a key for a vector
     X_INLINE uint32_t generateKey(const Vec3f& v) const;
-    // returns a key for two integers
-    X_INLINE uint32_t generateKey(const int n1, const int n2) const;
 
 private:
     void allocate(const size_type newHashSize, const size_type newIndexSize);
 
 private:
-    static size_type INVALID_INDEX[1];
+    static size_type INVALID_INDEX_BLOCK[1];
 
     size_type hashSize_;
     index_type* hash_;

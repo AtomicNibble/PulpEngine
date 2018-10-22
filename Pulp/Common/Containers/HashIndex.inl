@@ -9,7 +9,7 @@ X_INLINE void XHashIndex::add(const uint32_t key, const index_type index)
 {
     X_ASSERT(index >= 0, "invalid index")(index);
 
-    if (hash_ == INVALID_INDEX) {
+    if (hash_ == INVALID_INDEX_BLOCK) {
         allocate(hashSize_, index >= indexSize_ ? index + 1 : indexSize_);
     }
     else if (index >= indexSize_) {
@@ -18,27 +18,6 @@ X_INLINE void XHashIndex::add(const uint32_t key, const index_type index)
     index_type h = key & hashMask_;
     indexChain_[index] = hash_[h];
     hash_[h] = index;
-}
-
-X_INLINE void XHashIndex::remove(const uint32_t key, const index_type index)
-{
-    key_type k = key & hashMask_;
-
-    if (hash_ == INVALID_INDEX) {
-        return;
-    }
-    if (hash_[k] == index) {
-        hash_[k] = indexChain_[index];
-    }
-    else {
-        for (int i = hash_[k]; i != -1; i = indexChain_[i]) {
-            if (indexChain_[i] == index) {
-                indexChain_[i] = indexChain_[index];
-                break;
-            }
-        }
-    }
-    indexChain_[index] = -1;
 }
 
 X_INLINE int XHashIndex::first(const uint32_t key) const
@@ -68,14 +47,16 @@ X_INLINE void XHashIndex::setGranularity(const size_type newGranularity)
     granularity_ = newGranularity;
 }
 
-X_INLINE uint32_t XHashIndex::generateKey(const char* string, bool caseSensitive) const
+X_INLINE uint32_t XHashIndex::generateKey(const char* startInclusive, const char* endExclusive, bool caseSensitive) const
 {
+    auto len = static_cast<size_t>(endExclusive - startInclusive);
+
     if (caseSensitive) {
-        return core::Hash::Fnv1aHash(string, strlen(string));
+        return core::Hash::Fnv1aHash(startInclusive, len);
     }
     else {
         X_ASSERT_NOT_IMPLEMENTED();
-        return core::Hash::Fnv1aHash(string, strlen(string));
+        return core::Hash::Fnv1aHash(startInclusive, len);
     }
 }
 
@@ -84,7 +65,3 @@ X_INLINE uint32_t XHashIndex::generateKey(const Vec3f& v) const
     return ((((int)v[0]) + ((int)v[1]) + ((int)v[2])) & hashMask_);
 }
 
-X_INLINE uint32_t XHashIndex::generateKey(const int n1, const int n2) const
-{
-    return ((n1 + n2) & hashMask_);
-}
