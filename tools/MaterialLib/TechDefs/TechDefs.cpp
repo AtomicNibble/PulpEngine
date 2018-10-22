@@ -57,7 +57,6 @@ namespace techset
         return gEnv->pFileSys->directoryExists(path);
     }
 
-    // bool TechSetDefs::getTechCats(TechCatArr& techsOut)
     bool TechSetDefs::getTechCatTypes(MaterialCat::Enum cat, CatTypeArr& typesOut)
     {
         X_ASSERT_NOT_NULL(gEnv);
