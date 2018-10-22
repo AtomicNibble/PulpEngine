@@ -492,7 +492,7 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
                 auto* pPak = pSearch->pPak;
 
                 auto idx = pPak->find(hash, relPath.c_str());
-                if (idx != -1)
+                if (idx != core::Pak::INVALID_INDEX)
                 {
                     return pakFunc(pPak, idx);
                 }
