@@ -190,6 +190,7 @@ struct CoreInitParams
     bool bVsLog;
     bool bConsoleLog;
     bool bPauseShutdown;
+    bool bIsGame;
 
     Vec4i seed;
 
@@ -251,6 +252,7 @@ struct CoreInitParams
         bProfileSysEnabled(false),
         bScriptSystem(false),
         bPauseShutdown(true),
+        bIsGame(false),
 
 #if X_DEBUG
         bVsLog(true),
@@ -331,6 +333,7 @@ struct CoreGlobals // obbject is zerod on start.
         client_ = false;
         dedicated_ = false;
         noPause_ = false;
+        isGame_ = false;
         state_ = State::STARTING;
     }
 
@@ -366,12 +369,23 @@ struct CoreGlobals // obbject is zerod on start.
         return noPause_;
     }
 
+    X_INLINE const bool isGame(void) const
+    {
+        return isGame_;
+    }
+
+    X_INLINE const bool isTool(void) const
+    {
+        return !isGame_;
+    }
+
 protected:
     friend class XCore;
 
     bool client_;
     bool dedicated_; // Engine is in dedicated
     bool noPause_;
+    bool isGame_;
     State::Enum state_;
 };
 

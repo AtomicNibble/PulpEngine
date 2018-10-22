@@ -64,6 +64,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
     params.bEnableNetowrking = true;
     params.bEnableVideo = true;
     params.bProfileSysEnabled = true;
+    params.bIsGame = true;
     params.pCoreArena = pArena_;
 
     // enable loggers
