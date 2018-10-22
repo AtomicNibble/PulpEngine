@@ -210,112 +210,116 @@ namespace shader
 
         core::XFileMemScoped file;
         if (file.openFile(path, core::FileFlag::READ | core::FileFlag::SHARE)) {
-            file.readObj(hdr);
+            return false;
+        }
 
-            if (hdr.isValid()) {
-                if (hdr.version != ShaderBinHeader::X_SHADER_BIN_VERSION) {
-                    X_WARNING("Shader", "bin shader \"%s\" version is invalid. provided: %i, required: %i",
-                        path.c_str(), hdr.version, ShaderBinHeader::X_SHADER_BIN_VERSION);
-                    return false;
-                }
+        file.readObj(hdr);
 
-                if (hdr.blobLength == 0) {
-                    X_WARNING("Shader", "bin shader has invalid blob length");
-                    return false;
-                }
+        if (!hdr.isValid()) {
+            return false;
+        }
 
-                if (pSource) { // only stale check if we have source to know.
-                    if (hdr.sourceCRC32 != pSource->getSourceCrc32()) {
-                        X_WARNING("Shader", "bin shader is stale, recompile needed.");
-                        return false;
-                    }
-                }
+        if (hdr.version != ShaderBinHeader::X_SHADER_BIN_VERSION) {
+            X_WARNING("Shader", "bin shader \"%s\" version is invalid. provided: %i, required: %i",
+                path.c_str(), hdr.version, ShaderBinHeader::X_SHADER_BIN_VERSION);
+            return false;
+        }
 
-                // validate the profile version.
-                auto profileVersion = Util::getProfileVersionForType(pShader->getType());
-                if (profileVersion.first != hdr.profileMajorVersion || profileVersion.second != hdr.profileMinorVersion) {
-                    X_WARNING("Shader", "bin shader is stale, compiled with diffrent shader mode: %" PRIu8 "_%" PRIu8 " requested: %" PRIu8 "_%" PRIu8,
-                        hdr.profileMajorVersion, hdr.profileMinorVersion, profileVersion.first, profileVersion.second);
-                    return false;
-                }
+        if (hdr.blobLength == 0) {
+            X_WARNING("Shader", "bin shader has invalid blob length");
+            return false;
+        }
 
-                X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_); 
-
-                auto& cbufs = pShader->getCBuffers();
-                auto& bufs = pShader->getBuffers();
-                auto& samplers = pShader->getSamplers();
-                auto& textures = pShader->getTextures();
-
-                cbufs.resize(hdr.numCBufs, cbufs.getArena());
-                bufs.resize(hdr.numBuffers);
-                samplers.resize(hdr.numSamplers);
-                textures.resize(hdr.numTextures);
-
-                // load bind vars.
-                for (auto& cb : cbufs) {
-                    cb.SLoad(file.GetFile());
-                }
-                for (auto& s : samplers) {
-                    s.SLoad(file.GetFile());
-                }
-                for (auto& t : textures) {
-                    t.SLoad(file.GetFile());
-                }
-                for (auto& b : bufs) {
-                    b.SLoad(file.GetFile());
-                }
-
-                pShader->bytecode_.resize(hdr.blobLength);
-
-                if (hdr.flags.IsSet(BinFileFlag::COMPRESSED)) {
-                    if (hdr.deflatedLength < 1) {
-                        X_ERROR("Shader", "Failed to read shader byte code");
-                        return false;
-                    }
-
-                    core::Compression::Compressor<core::Compression::LZ4> comp;
-                    core::Array<uint8_t> compressed(scratchArena_, hdr.deflatedLength);
-
-                    if (file.read(compressed.data(), hdr.deflatedLength) != hdr.deflatedLength) {
-                        X_ERROR("Shader", "Failed to read shader byte code");
-                        return false;
-                    }
-
-                    if (!comp.inflate(scratchArena_, compressed, pShader->bytecode_)) {
-                        X_ERROR("Shader", "Failed to inflate data");
-                        return false;
-                    }
-                }
-                else {
-                    if (file.read(pShader->bytecode_.data(), hdr.blobLength) != hdr.blobLength) {
-                        X_ERROR("Shader", "Failed to read shader byte code");
-                        return false;
-                    }
-                }
-
-                pShader->compileFlags_ = hdr.compileFlags;
-                pShader->numInputParams_ = hdr.numInputParams;
-                pShader->numInstructions_ = hdr.numInstructions;
-                pShader->numRenderTargets_ = hdr.numRenderTargets;
-                X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")(); 
-
-                pShader->permFlags_ = hdr.permFlags;
-                pShader->IlFmt_ = hdr.ILFmt;
-                pShader->ILFlags_ = hdr.ILFlags;
-
-                // type should already be set.
-                // so we just use it as a sanity check.
-                if (pShader->getType() != hdr.type) {
-                    X_WARNING("Shader", "Shader type is diffrent to that of the cache file for: \"%s\"",
-                        pShader->getName());
-                }
-
-                // ready to use.
-                pShader->status_ = ShaderStatus::Ready;
-                return true;
+        if (pSource) { // only stale check if we have source to know.
+            if (hdr.sourceCRC32 != pSource->getSourceCrc32()) {
+                X_WARNING("Shader", "bin shader is stale, recompile needed.");
+                return false;
             }
         }
-        return false;
+
+        // validate the profile version.
+        auto profileVersion = Util::getProfileVersionForType(pShader->getType());
+        if (profileVersion.first != hdr.profileMajorVersion || profileVersion.second != hdr.profileMinorVersion) {
+            X_WARNING("Shader", "bin shader is stale, compiled with diffrent shader mode: %" PRIu8 "_%" PRIu8 " requested: %" PRIu8 "_%" PRIu8,
+                hdr.profileMajorVersion, hdr.profileMinorVersion, profileVersion.first, profileVersion.second);
+            return false;
+        }
+
+        X_ASSERT(pShader->status_ == ShaderStatus::NotCompiled, "Shader should be in notCompiled mode if loading from bin")(pShader->status_);
+
+        auto& cbufs = pShader->getCBuffers();
+        auto& bufs = pShader->getBuffers();
+        auto& samplers = pShader->getSamplers();
+        auto& textures = pShader->getTextures();
+
+        cbufs.resize(hdr.numCBufs, cbufs.getArena());
+        bufs.resize(hdr.numBuffers);
+        samplers.resize(hdr.numSamplers);
+        textures.resize(hdr.numTextures);
+
+        // load bind vars.
+        for (auto& cb : cbufs) {
+            cb.SLoad(file.GetFile());
+        }
+        for (auto& s : samplers) {
+            s.SLoad(file.GetFile());
+        }
+        for (auto& t : textures) {
+            t.SLoad(file.GetFile());
+        }
+        for (auto& b : bufs) {
+            b.SLoad(file.GetFile());
+        }
+
+        pShader->bytecode_.resize(hdr.blobLength);
+
+        if (hdr.flags.IsSet(BinFileFlag::COMPRESSED)) {
+            if (hdr.deflatedLength < 1) {
+                X_ERROR("Shader", "Failed to read shader byte code");
+                return false;
+            }
+
+            core::Compression::Compressor<core::Compression::LZ4> comp;
+            core::Array<uint8_t> compressed(scratchArena_, hdr.deflatedLength);
+
+            if (file.read(compressed.data(), hdr.deflatedLength) != hdr.deflatedLength) {
+                X_ERROR("Shader", "Failed to read shader byte code");
+                return false;
+            }
+
+            if (!comp.inflate(scratchArena_, compressed, pShader->bytecode_)) {
+                X_ERROR("Shader", "Failed to inflate data");
+                return false;
+            }
+        }
+        else {
+            if (file.read(pShader->bytecode_.data(), hdr.blobLength) != hdr.blobLength) {
+                X_ERROR("Shader", "Failed to read shader byte code");
+                return false;
+            }
+        }
+
+        pShader->compileFlags_ = hdr.compileFlags;
+        pShader->numInputParams_ = hdr.numInputParams;
+        pShader->numInstructions_ = hdr.numInstructions;
+        pShader->numRenderTargets_ = hdr.numRenderTargets;
+        X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
+
+        pShader->permFlags_ = hdr.permFlags;
+        pShader->IlFmt_ = hdr.ILFmt;
+        pShader->ILFlags_ = hdr.ILFlags;
+
+        // type should already be set.
+        // so we just use it as a sanity check.
+        if (pShader->getType() != hdr.type) {
+            X_WARNING("Shader", "Shader type is diffrent to that of the cache file for: \"%s\"",
+                pShader->getName());
+        }
+
+        // ready to use.
+        pShader->status_ = ShaderStatus::Ready;
+        return true;
+
     }
 
     bool ShaderBin::clearBin(void)
