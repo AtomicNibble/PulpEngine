@@ -15,7 +15,6 @@ namespace compiler
 
         // max comp.
         shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);
-        shaderMan_.getShaderVars().setNoSource(false);
         shaderMan_.getShaderVars().setUseCache(true);
         shaderMan_.getShaderVars().setWriteCompiledShaders(true);
     }

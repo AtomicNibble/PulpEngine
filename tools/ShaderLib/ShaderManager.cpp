@@ -143,27 +143,35 @@ namespace shader
             // we adopt the lock we have from tryEnter this is not a re-lock.
             core::UniqueLock<XHWShader::LockType> lock(pHWShader->getLock(), core::adopt_lock);
 
-            if (vars_.noSource())
-            {
-                if (shaderBin_.loadShader(pHWShader, nullptr)) {
-                    X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")();
-                    return true;
-                }
+            // If shader reload is enable 'try' to load the source if can't try from bin.
+            // if shader reload disabled try bin first without passing source, fallback to source.
 
-                X_ERROR("ShadersManager", "Failed to get baked shader: \"%s\"", pHWShader->getName().c_str());
-                return false;
+#if !X_ENABLE_RENDER_SHADER_RELOAD
+
+            // just try load the shader and return
+            if (shaderBin_.loadShader(pHWShader, nullptr)) {
+                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Shader from cache is not read to rock")();
+                return true;
             }
+
+#endif // !X_ENABLE_RENDER_SHADER_RELOAD
 
             // now load the source file.
             auto* pSource = sourceBin_.loadRawSourceFile(pHWShader->getShaderSource(), false);
-            if (!pSource) {
+            if (!pSource) 
+            {
+                if (vars_.useCache() && shaderBin_.loadShader(pHWShader, nullptr)) {
+                    X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Shader from cache is not read to rock")();
+                    return true;
+                }
+
                 X_ERROR("ShadersManager", "Failed to get source for compiling: \"%s\"", pHWShader->getShaderSource().c_str());
                 return false;
             }
 
             // try load it from cache.
             if (vars_.useCache() && shaderBin_.loadShader(pHWShader, pSource)) {
-                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Sahder from cache is not read to rock")();
+                X_ASSERT(pHWShader->getStatus() == ShaderStatus::Ready, "Shader from cache is not read to rock")();
                 return true;
             }
 
@@ -340,7 +348,7 @@ namespace shader
         srcOut.appendFmt("shaders/temp/%s.fxcb.%s", pShader->getName().c_str(), SOURCE_FILE_EXTENSION);
 
         // make sure the directory is created.
-        gEnv->pFileSys->createDirectoryTree(srcOut);
+        gEnv->pFileSys->createDirectoryTree(srcOut, core::VirtualDirectory::BASE);
     }
 
     IShaderSource* XShaderManager::sourceforName(const core::string& name)
