@@ -38,7 +38,7 @@ namespace shader
         void updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32);
 
     private:
-        void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut);
+        void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut, bool createDir);
 
     private:
         core::MemoryArenaBase* scratchArena_;

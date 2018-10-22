@@ -135,7 +135,7 @@ namespace shader
         hdr.ILFmt = pShader->getILFormat();
 
         core::Path<char> path;
-        getShaderCompileDest(pShader, path);
+        getShaderCompileDest(pShader, path, true);
 
         // do the compression pre lock
         typedef core::Array<uint8_t> DataArr;
@@ -194,7 +194,7 @@ namespace shader
         X_ASSERT_NOT_NULL(pShader);
 
         core::Path<char> path;
-        getShaderCompileDest(pShader, path);
+        getShaderCompileDest(pShader, path, false);
 
         if (pSource && cacheNotValid(path, pSource->getSourceCrc32())) {
             return false;
@@ -347,13 +347,15 @@ namespace shader
         cache_.insert(std::make_pair(core::string(path.begin(), path.end()), sourceCrc32));
     }
 
-    void ShaderBin::getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut)
+    void ShaderBin::getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut, bool createDir)
     {
         destOut.clear();
         destOut.appendFmt("shaders/compiled/%s.fxcb", pShader->getName().c_str());
 
         // make sure the directory is created.
-        gEnv->pFileSys->createDirectoryTree(destOut);
+        if (createDir) {
+            gEnv->pFileSys->createDirectoryTree(destOut);
+        }
     }
 
 } // namespace shader
