@@ -230,10 +230,20 @@ void XScriptSys::processLoadedScritpts(void)
     {
         X_LUA_CHECK_STACK(L);
 
-        Script* pScript = completedLoads_.peek();
+        Script* pScript = nullptr;
+        
+        {
+            core::CriticalSection::ScopedLock lock(cs_);
+            if (completedLoads_.isEmpty()) {
+                return;
+            }
+
+            pScript = completedLoads_.peek();
+        }
 
         // if the script already fully run script processing.
         if (pScript->getLastCallResult() == lua::CallResult::Ok) {
+            core::CriticalSection::ScopedLock lock(cs_);
             completedLoads_.pop();
             continue;
         }
@@ -250,6 +260,7 @@ void XScriptSys::processLoadedScritpts(void)
         }
 
         if (!pScript->hasPendingInclude()) {
+            core::CriticalSection::ScopedLock lock(cs_);
             completedLoads_.pop();
         }
         else {
@@ -1158,6 +1169,8 @@ bool XScriptSys::processData(core::AssetBase* pAsset, core::UniquePointer<char[]
     if (!pScript->processData(std::move(data), dataSize)) {
         return false;
     }
+
+    core::CriticalSection::ScopedLock lock(cs_);
 
     completedLoads_.push(pScript);
     return true;
