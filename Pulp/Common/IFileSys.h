@@ -18,7 +18,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
-static const size_t FS_MAX_VIRTUAL_DIR = 10;
+static const size_t FS_MAX_VIRTUAL_DIR = 4;
+static const size_t FS_MAX_PAK = 16;
 
 X_DECLARE_FLAGS(FileFlag)
 (

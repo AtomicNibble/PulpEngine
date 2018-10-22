@@ -164,12 +164,14 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     virtualDirHeap_(
         bitUtil::RoundUpToMultiple<size_t>(
             AsyncOpPoolArena::getMemoryRequirement(sizeof(Directory)) * MAX_VIRTUAL_DIR + 
-            AsyncOpPoolArena::getMemoryRequirement(sizeof(Search)) * MAX_VIRTUAL_DIR,
+            AsyncOpPoolArena::getMemoryRequirement(sizeof(Search)) * (MAX_PAK + MAX_VIRTUAL_DIR),
             VirtualMem::GetPageSize())),
     virtualDirAllocator_(virtualDirHeap_.start(), virtualDirHeap_.end()),
     virtualDirArena_(&virtualDirAllocator_, "VirtualDirPool"),
     // ..
     memFileArena_(&memfileAllocator_, "MemFileData"),
+    numDir_(0),
+    numPak_(0),
     currentRequestIdx_(0),
     requestSignal_(true),
     requests_(arena),
@@ -575,6 +577,11 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
         X_LOG0("FileSys", "addModDir: \"%ls\"", osPath.c_str());
     }
 
+    if (numDir_ == MAX_VIRTUAL_DIR) {
+        X_ERROR("FileSys", "Reached max virtual dir(%" PRIuS ")", MAX_VIRTUAL_DIR);
+        return false;
+    }
+
     if (!directoryExistsOS(osPath)) {
         X_ERROR("FileSys", "Faled to add virtual drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
         return nullptr;
@@ -613,6 +620,8 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     search->pPak = nullptr;
     search->pNext = searchPaths_;
     searchPaths_ = search;
+
+    ++numDir_;
 
     // add hotreload dir.
     gEnv->pDirWatcher->addDirectory(fixedPath);
@@ -1730,6 +1739,11 @@ bool xFileSys::openPak(const PathT& relPath)
 {
     X_LOG1("FileSys", "Mounting pak: \"%s\"", relPath.c_str());
 
+    if (numPak_ == MAX_PAK) {
+        X_ERROR("FileSys", "Reached max open paks(%" PRIuS ")", MAX_PAK);
+        return false;
+    }
+
     // you can only open pak's from inside the virtual filesystem.
     auto* pFile = openPakFile(relPath);
     if (!pFile) {
@@ -1845,6 +1859,7 @@ bool xFileSys::openPak(const PathT& relPath)
     pSearch->pNext = searchPaths_;
     searchPaths_ = pSearch;
 
+    ++numPak_;
     return true;
 }
 

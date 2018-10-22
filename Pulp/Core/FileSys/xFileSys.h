@@ -222,6 +222,7 @@ public:
 #endif
 
     static const size_t MAX_VIRTUAL_DIR = FS_MAX_VIRTUAL_DIR;
+    static const size_t MAX_PAK = FS_MAX_PAK;
 
     friend struct XFindData;
 
@@ -404,6 +405,9 @@ private:
 
     core::MallocFreeAllocator memfileAllocator_;
     MemfileArena memFileArena_;
+
+    int32_t numDir_;
+    int32_t numPak_;
 
 private:
     RequestHandle currentRequestIdx_;
