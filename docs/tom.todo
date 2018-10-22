@@ -9,10 +9,10 @@ Core:
 
  ✔ Tidy up console code. @done (18-09-17 18:35)
 
- ☐ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed.
+   FileSys:
+      ☐ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed.
    See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
 
-   FileSys:
      ✔ Don't apply OS slashes until we hit OS specific code paths. @done (18-10-16 22:42)
      ☐ Limit the use of wchar_t to win32 specific code.
          All relative paths are ascii only.
