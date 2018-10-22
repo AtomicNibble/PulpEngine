@@ -209,7 +209,7 @@ namespace shader
         core::zero_object(hdr);
 
         core::XFileMemScoped file;
-        if (file.openFile(path, core::FileFlag::READ | core::FileFlag::SHARE)) {
+        if (!file.openFile(path, core::FileFlag::READ | core::FileFlag::SHARE)) {
             return false;
         }
 
