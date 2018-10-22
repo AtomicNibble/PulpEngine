@@ -15,10 +15,6 @@
 
 #include <../ImgLib/ImgLib.h>
 
-#include <istream>
-#include <iostream>
-#include <fstream>
-
 #include <IFileSys.h>
 
 X_LINK_ENGINE_LIB("ImgLib")
@@ -50,37 +46,37 @@ namespace
         ImgToolArena;
 
 
-    bool ReadFileToBuf(const core::Path<char>& filePath, core::Array<uint8_t>& bufOut)
+    bool ReadFileToBuf(const core::Path<wchar_t>& filePath, core::Array<uint8_t>& bufOut)
     {
-        std::ifstream file(filePath.c_str(), std::ios::binary | std::ios::ate);
-        if (!file.is_open()) {
-            X_ERROR("ImgTool", "Failed to open input file: \"%s\"", filePath.c_str());
+        core::XFileScoped file;
+        if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
+            X_ERROR("ImgTool", "Failed to open input file: \"%ls\"", filePath.c_str());
             return false;
         }
 
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
+        auto size = safe_static_cast<size_t>(file.remainingBytes());
+        bufOut.resize(size);
 
-        bufOut.resize(safe_static_cast<size_t, std::streamsize>(size));
-
-        if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size)) {
-            return true;
+        if (file.read(bufOut.ptr(), size) != size) {
+            return false;
         }
-        return false;
+
+        return true;
     }
 
-    bool WriteFileFromBuf(const core::Path<char>& filePath, const core::Array<uint8_t>& buf)
+    bool WriteFileFromBuf(const core::Path<wchar_t>& filePath, const core::Array<uint8_t>& buf)
     {
-        std::ofstream file(filePath.c_str(), std::ios::binary | std::ios::out);
-        if (!file.is_open()) {
-            X_ERROR("ImgTool", "Failed to open output file: \"%s\"", filePath.c_str());
+        core::XFileScoped file;
+        if (!file.openFileOS(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+            X_ERROR("ImgTool", "Failed to open input file: \"%ls\"", filePath.c_str());
             return false;
         }
 
-        if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size())) {
-            return true;
+        if (file.write(buf.ptr(), buf.size()) != buf.size()) {
+            return false;
         }
-        return false;
+
+        return true;
     }
 
     void PrintArgs(void)
@@ -105,7 +101,7 @@ namespace
         // currently i want a tool that will take N input images and resize and save as tga.
         // so need input file, output shit, desired size and format.
 
-        core::Path<char> inFile, outFile;
+        core::Path<wchar_t> inFile, outFile;
         Vec2<uint16_t> dim;
 
         bool resize = false;
@@ -120,11 +116,11 @@ namespace
                 return false;
             }
 
-            inFile = core::Path<char>(core::Path<wchar_t>(pInFile));
+            inFile.set(pInFile);
 
             const wchar_t* pOutFile = gEnv->pCore->GetCommandLineArgForVarW(L"of");
             if (pOutFile) {
-                outFile = core::Path<char>(core::Path<wchar_t>(pOutFile));
+                outFile.set(pOutFile);
             }
 
             const wchar_t* pDim = gEnv->pCore->GetCommandLineArgForVarW(L"dim");
@@ -132,7 +128,7 @@ namespace
          
                 // wXh
                 if (::swscanf_s(pDim, L"%" PRIu16 L"x%" PRIu16, &dim.x, &dim.y) != 2) {
-                    X_ERROR("ImgTool", "Failed to parse dim: %S", pDim);
+                    X_ERROR("ImgTool", "Failed to parse dim: %ls", pDim);
                     return false;
                 }
 
@@ -150,17 +146,18 @@ namespace
         if (outFile.isEmpty())
         {
             const char* pExt = texture::Util::getExtension(outputFileFmt);
+            wchar_t buf[0x100] = {};
 
             outFile = inFile;
-            outFile.setExtension(pExt);
+            outFile.setExtension(core::strUtil::Convert(pExt, buf));
         }
 
         // output exists?
-        if (gEnv->pFileSys->fileExists(outFile)) {
+        if (gEnv->pFileSys->fileExistsOS(outFile)) {
             return 1;
         }
 
-        X_LOG0("ImgTool", "Loading: \"%s\"", inFile.c_str());
+        X_LOG0("ImgTool", "Loading: \"%ls\"", inFile.c_str());
 
         core::Array<uint8_t> srcImgData(&arena);
         if (!ReadFileToBuf(inFile, srcImgData)) {
@@ -219,9 +216,18 @@ namespace
 
         Converter::CompileFlags flags;
 
-        X_LOG0("ImgTool", "Saving: \"%s\"", outFile.c_str());
+        X_LOG0("ImgTool", "Saving: \"%ls\"", outFile.c_str());
 
-        if (!con.saveImg(outFile, flags, outputFileFmt)) {
+        core::FileFlags mode;
+        mode.Set(core::FileFlag::WRITE);
+        mode.Set(core::FileFlag::RECREATE);
+
+        core::XFileScoped file;
+        if (!file.openFileOS(outFile, mode)) {
+            return false;
+        }
+
+        if (!con.saveImg(file.GetFile(), flags, outputFileFmt)) {
             return false;
         }
 

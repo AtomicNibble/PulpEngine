@@ -17,10 +17,6 @@
 
 #include <Util\UniquePointer.h>
 
-#include <istream>
-#include <iostream>
-#include <fstream>
-
 #include <ICompression.h>
 #include <IFileSys.h>
 
@@ -55,37 +51,37 @@ namespace
     using core::Compression::ICompressor;
     using core::Compression::Compressor;
 
-    bool ReadFileToBuf(const std::wstring& filePath, core::Array<uint8_t>& bufOut)
+    bool ReadFileToBuf(const core::Path<wchar_t>& filePath, core::Array<uint8_t>& bufOut)
     {
-        std::ifstream file(filePath, std::ios::binary | std::ios::ate);
-        if (!file.is_open()) {
+        core::XFileScoped file;
+        if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
             X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
             return false;
         }
 
-        std::streamsize size = file.tellg();
-        file.seekg(0, std::ios::beg);
+        auto size = safe_static_cast<size_t>(file.remainingBytes());
+        bufOut.resize(size);
 
-        bufOut.resize(safe_static_cast<size_t, std::streamsize>(size));
-
-        if (file.read(reinterpret_cast<char*>(bufOut.ptr()), size)) {
-            return true;
-        }
-        return false;
-    }
-
-    bool WriteFileFromBuf(const std::wstring& filePath, const core::Array<uint8_t>& buf)
-    {
-        std::ofstream file(filePath, std::ios::binary | std::ios::out);
-        if (!file.is_open()) {
-            X_ERROR("Compress", "Failed to open output file: \"%ls\"", filePath.c_str());
+        if (file.read(bufOut.ptr(), size) != size) {
             return false;
         }
 
-        if (file.write(reinterpret_cast<const char*>(buf.ptr()), buf.size())) {
-            return true;
+        return true;
+    }
+
+    bool WriteFileFromBuf(const core::Path<wchar_t>& filePath, const core::Array<uint8_t>& buf)
+    {
+        core::XFileScoped file;
+        if (!file.openFileOS(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+            X_ERROR("Compress", "Failed to open input file: \"%ls\"", filePath.c_str());
+            return false;
         }
-        return false;
+
+        if (file.write(buf.ptr(), buf.size()) != buf.size()) {
+            return false;
+        }
+
+        return true;
     }
 
     void PrintArgs(void)
@@ -107,7 +103,7 @@ namespace
 
     int DoCompression(CompressorArena& arena)
     {
-        std::wstring inFile, outFile;
+        core::Path<wchar_t> inFile, outFile;
 
         Algo::Enum algo = Algo::LZ4;
         bool defalte = true;
@@ -187,7 +183,7 @@ namespace
             }
         }
 
-        if (!defalte && outFile.empty()) {
+        if (!defalte && outFile.isEmpty()) {
             X_ERROR("Compress", "Output file name missing.");
             return 1;
         }
@@ -221,7 +217,7 @@ namespace
         core::Compression::CompressorAlloc compressor(algo);
 
         // auto out file name.
-        if (defalte && outFile.empty()) {
+        if (defalte && outFile.isEmpty()) {
             switch (algo) {
                 case Algo::LZ4:
                     outFile = inFile + L".lz4";
@@ -375,13 +371,16 @@ namespace
                 core::Path<wchar_t> filePath(srcDir);
                 filePath.appendFmt(L"%s", fileNames[i].c_str());
 
-                std::ifstream file(filePath.c_str(), std::ios::binary);
-                if (!file.is_open()) {
+                core::XFileScoped file;
+                if (!file.openFileOS(filePath, core::FileFlag::READ | core::FileFlag::SHARE)) {
                     X_ERROR("Train", "Failed to open input file: \"%ls\"", filePath.c_str());
-                    continue;
+                    return false;
                 }
 
-                file.read(reinterpret_cast<char*>(&sampleData[currentOffset]), sampleSizes[i]);
+                if (file.read(&sampleData[currentOffset], sampleSizes[i]) != sampleSizes[i]) {
+                    X_ERROR("Train", "Failed to read input file: \"%ls\"", filePath.c_str());
+                    return false;
+                }
                 currentOffset += sampleSizes[i];
             }
 
@@ -406,8 +405,8 @@ namespace
         core::HumanDuration::Str timeStr;
         X_LOG0("Train", "Train took: ^6%s", core::HumanDuration::toString(timeStr, trainTime));
 
-        std::ofstream file(outFile.c_str(), std::ios::binary | std::ios::out);
-        if (!file.is_open()) {
+        core::XFileScoped file;
+        if (!file.openFileOS(outFile, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
             X_ERROR("Train", "Failed to open output file: \"%ls\"", outFile.c_str());
             return 1;
         }
@@ -422,8 +421,12 @@ namespace
         hdr.sharedDictId = gEnv->xorShift.rand() & 0xFFFF;
         hdr.size = safe_static_cast<uint32_t>(size);
 
-        file.write(reinterpret_cast<const char*>(&hdr), sizeof(hdr));
-        file.write(reinterpret_cast<const char*>(pStart), size);
+        if (file.writeObj(hdr) != sizeof(hdr)) {
+            return 1;
+        }
+        if (file.write(pStart, size) != size) {
+            return 1;
+        }
         return 0;
     }
 
