@@ -12,6 +12,8 @@ X_DECLARE_ENUM(PakMode)
 
 struct Pak
 {
+    static constexpr core::XHashIndex::index_type INVALID_INDEX = core::XHashIndex::INVALID_INDEX;
+
     Pak(core::MemoryArenaBase* arena);
     ~Pak();
 
