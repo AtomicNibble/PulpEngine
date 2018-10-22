@@ -230,20 +230,20 @@ void xFileSys::shutDown(void)
 
     shutDownRequestWorker();
 
-    for (Search* s = searchPaths_; s;) {
-        Search* cur = s;
-        s = cur->pNext;
-        if (cur->pDir) {
-            X_DELETE(cur->pDir, &virtualDirArena_);
+    for (Search* pSearch = searchPaths_; pSearch;) {
+        Search* pCur = pSearch;
+        pSearch = pCur->pNext;
+        if (pCur->pDir) {
+            X_DELETE(pCur->pDir, &virtualDirArena_);
         }
         else {
-            if (cur->pPak->pFile) {
-                X_DELETE_AND_NULL(cur->pPak->pFile, &filePoolArena_);
+            if (pCur->pPak->pFile) {
+                X_DELETE_AND_NULL(pCur->pPak->pFile, &filePoolArena_);
             }
 
-            X_DELETE(cur->pPak, g_coreArena);
+            X_DELETE(pCur->pPak, g_coreArena);
         }
-        X_DELETE(cur, &virtualDirArena_);
+        X_DELETE(pCur, &virtualDirArena_);
     }
 }
 
