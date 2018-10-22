@@ -130,7 +130,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
 
     // file exist already?
     if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut, core::VirtualDirectory::BASE)) {
-        // se if stale.
+        // see if stale.
         if (!IsAssetStale(assetId, assType, dataHash, argsHash)) {
             X_LOG1("Converter", "Skipping conversion, asset is not stale");
             return true;
