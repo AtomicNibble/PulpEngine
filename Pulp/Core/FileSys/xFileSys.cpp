@@ -576,7 +576,7 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     }
 
     if (!directoryExistsOS(osPath)) {
-        X_ERROR("FileSys", "Faled to add mod drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
+        X_ERROR("FileSys", "Faled to add virtual drectory, the directory does not exsists: \"%ls\"", osPath.c_str());
         return nullptr;
     }
 
