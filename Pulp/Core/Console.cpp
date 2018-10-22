@@ -576,8 +576,8 @@ void XConsole::saveChangedVars(void)
     core::Array<char> buf(g_coreArena);
     core::ArrayGrowMultiply<core::StringRange<char>> keep(g_coreArena);
 
-    if (gEnv->pFileSys->fileExists(userConfigPath)) {
-        if (file.openFile(userConfigPath, FileFlag::READ | FileFlag::SHARE)) {
+    if (gEnv->pFileSys->fileExists(userConfigPath, core::VirtualDirectory::SAVE)) {
+        if (file.openFile(userConfigPath, FileFlag::READ | FileFlag::SHARE, core::VirtualDirectory::SAVE)) {
             const auto size = safe_static_cast<size_t>(file.remainingBytes());
 
             if (size > 0) {

@@ -129,7 +129,7 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     }
 
     // file exist already?
-    if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut)) {
+    if (!forceConvert_ && gEnv->pFileSys->fileExists(pathOut, core::VirtualDirectory::BASE)) {
         // se if stale.
         if (!IsAssetStale(assetId, assType, dataHash, argsHash)) {
             X_LOG1("Converter", "Skipping conversion, asset is not stale");
@@ -149,8 +149,8 @@ bool Converter::Convert(AssetType::Enum assType, const core::string& name)
     {
         core::Path<char> dir(pathOut);
         dir.removeFileName();
-        if (!gEnv->pFileSys->directoryExists(dir)) {
-            if (!gEnv->pFileSys->createDirectoryTree(dir)) {
+        if (!gEnv->pFileSys->directoryExists(dir, core::VirtualDirectory::BASE)) {
+            if (!gEnv->pFileSys->createDirectoryTree(dir, core::VirtualDirectory::BASE)) {
                 X_ERROR("Converter", "Failed to create output directory for asset");
                 return false;
             }
@@ -350,7 +350,7 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
 
     // nuke the output directory. BOOM!
     // if they put files in here that are custom. RIP.
-    if (pFileSys->directoryExists(outDir)) {
+    if (pFileSys->directoryExists(outDir, core::VirtualDirectory::BASE)) {
         // lets be nice and only clear dir's we actually populate.
         for (int32_t i = 0; i < AssetType::ENUM_COUNT; i++) {
             AssetType::Enum assType = static_cast<AssetType::Enum>(i);
@@ -358,8 +358,8 @@ bool Converter::CleanMod(assetDb::AssetDB::ModId modId, const core::string& name
             core::Path<char> assetPath;
             assetDb::AssetDB::GetOutputPathForAssetType(assType, outDir, assetPath);
 
-            if (pFileSys->directoryExists(assetPath)) {
-                if (!pFileSys->deleteDirectoryContents(assetPath)) {
+            if (pFileSys->directoryExists(assetPath, core::VirtualDirectory::BASE)) {
+                if (!pFileSys->deleteDirectoryContents(assetPath, core::VirtualDirectory::BASE)) {
                     X_ERROR("Converter", "Failed to clear mod \"%s\" \"%s\" assets directory", assetPath.c_str(), AssetType::ToString(assType));
                     return false;
                 }

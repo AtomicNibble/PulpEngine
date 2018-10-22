@@ -323,7 +323,7 @@ namespace shader
         core::Path<char> binFolder;
         binFolder.appendFmt("shaders/compiled");
 
-        return gEnv->pFileSys->deleteDirectoryContents(binFolder);
+        return gEnv->pFileSys->deleteDirectoryContents(binFolder, core::VirtualDirectory::BASE);
     }
 
     bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const
@@ -355,7 +355,7 @@ namespace shader
 
         // make sure the directory is created.
         if (createDir) {
-            gEnv->pFileSys->createDirectoryTree(destOut);
+            gEnv->pFileSys->createDirectoryTree(destOut, core::VirtualDirectory::BASE);
         }
     }
 

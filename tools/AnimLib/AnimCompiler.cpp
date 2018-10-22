@@ -889,7 +889,7 @@ bool AnimCompiler::save(const core::Path<char>& path)
     mode.Set(core::FileFlag::WRITE);
 
     core::XFileScoped file;
-    if (!file.openFile(fullPath, mode)) {
+    if (!file.openFile(fullPath, mode, core::VirtualDirectory::BASE)) {
         X_ERROR("Anim", "Failed to open output file for compiled animation: \"%ls\"", fullPath.c_str());
         return false;
     }

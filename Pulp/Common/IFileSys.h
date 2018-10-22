@@ -40,7 +40,7 @@ X_DECLARE_FLAGS(SeekMode)
 
 X_DECLARE_ENUM(VirtualDirectory)
 (
-    GAME,
+    BASE,
     SAVE
 );
 
@@ -725,21 +725,21 @@ struct IFileSys
 
     // folders - there is only one game dirtory.
     // but other folders can be added with 'addModDir' to add to the virtual directory.
-    virtual bool setGameDir(const PathWT& osPath) X_ABSTRACT;
+    virtual bool setBaseDir(const PathWT& osPath) X_ABSTRACT;
     virtual bool setSaveDir(const PathWT& osPath) X_ABSTRACT;
     virtual bool addModDir(const PathWT& osPath) X_ABSTRACT;
 
     // Open Files
     virtual XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_ABSTRACT;
-    virtual XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::GAME) X_ABSTRACT;
+    virtual XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE) X_ABSTRACT;
     virtual void closeFile(XFile* file) X_ABSTRACT;
 
     // async
-    virtual XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::GAME) X_ABSTRACT;
+    virtual XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE) X_ABSTRACT;
     virtual void closeFileAsync(XFileAsync* file) X_ABSTRACT;
 
     // loads the whole file into memory.
-    virtual XFileMem* openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::GAME) X_ABSTRACT;
+    virtual XFileMem* openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE) X_ABSTRACT;
     virtual void closeFileMem(XFileMem* file) X_ABSTRACT;
 
     // Find util
@@ -749,28 +749,30 @@ struct IFileSys
     virtual void findClose(findhandle handle) X_ABSTRACT;
 
     // Delete
-    virtual bool deleteFile(const PathT& path) const X_ABSTRACT;
-    virtual bool deleteDirectory(const PathT& path, bool recursive = true) const X_ABSTRACT;
-    virtual bool deleteDirectoryContents(const PathT& path) X_ABSTRACT;
+    virtual bool deleteFile(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
+    virtual bool deleteDirectory(const PathT& relPath, VirtualDirectory::Enum dir, bool recursive) const X_ABSTRACT;
+    virtual bool deleteDirectoryContents(const PathT& relPath, VirtualDirectory::Enum dir) X_ABSTRACT;
 
     // Create
-    virtual bool createDirectory(const PathT& path) const X_ABSTRACT;
+    virtual bool createDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool createDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
-    virtual bool createDirectoryTree(const PathT& path) const X_ABSTRACT;
+    virtual bool createDirectoryTree(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool createDirectoryTreeOS(const PathWT& osPath) const X_ABSTRACT;
 
     // exsists.
-    virtual bool fileExists(const PathT& path) const X_ABSTRACT;
+    virtual bool fileExists(const PathT& relPath) const X_ABSTRACT;
+    virtual bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool fileExistsOS(const PathWT& osPath) const X_ABSTRACT;
-    virtual bool directoryExists(const PathT& path) const X_ABSTRACT;
+    virtual bool directoryExists(const PathT& relPath) const X_ABSTRACT;
+    virtual bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool directoryExistsOS(const PathWT& osPath) const X_ABSTRACT;
 
     // does not error, when it's a file or not exsist.
-    virtual bool isDirectory(const PathT& path) const X_ABSTRACT;
+    virtual bool isDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool isDirectoryOS(const PathWT& osPath) const X_ABSTRACT;
 
     // rename
-    virtual bool moveFile(const PathT& path, const PathT& newPath) const X_ABSTRACT;
+    virtual bool moveFile(const PathT& relPath, const PathT& newPathRel, VirtualDirectory::Enum dir) const X_ABSTRACT;
     virtual bool moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const X_ABSTRACT;
 
     // returns the min sector size for all virtual directories.
@@ -996,7 +998,7 @@ public:
         close();
     }
 
-    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::GAME)
+    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE)
     {
         X_ASSERT(pFile_ == nullptr, "File already open")();
         pFile_ = pFileSys_->openFile(path, mode, dir);

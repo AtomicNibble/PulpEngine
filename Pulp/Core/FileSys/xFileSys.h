@@ -240,19 +240,19 @@ public:
 
     // Open / Close
     XFile* openFileOS(const PathWT& osPath, FileFlags mode) X_FINAL;
-    XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
+    XFile* openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir) X_FINAL;
     void closeFile(XFile* file) X_FINAL;
 
     // async
-    XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
+    XFileAsync* openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir) X_FINAL;
     void closeFileAsync(XFileAsync* file) X_FINAL;
 
     // Mem
-    XFileMem* openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir) X_FINAL;
+    XFileMem* openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir) X_FINAL;
     void closeFileMem(XFileMem* file) X_FINAL;
 
     // folders
-    bool setGameDir(const PathWT& osPath) X_FINAL;
+    bool setBaseDir(const PathWT& osPath) X_FINAL;
     bool setSaveDir(const PathWT& osPath) X_FINAL;
     bool addModDir(const PathWT& osPath) X_FINAL;
 
@@ -263,28 +263,30 @@ public:
     void findClose(findhandle handle) X_FINAL;
 
     // Delete
-    bool deleteFile(const PathT& relPath) const X_FINAL;
-    bool deleteDirectory(const PathT& relPath, bool recursive = true) const X_FINAL;
-    bool deleteDirectoryContents(const PathT& relPath) X_FINAL;
+    bool deleteFile(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
+    bool deleteDirectory(const PathT& relPath, VirtualDirectory::Enum dir, bool recursive) const X_FINAL;
+    bool deleteDirectoryContents(const PathT& relPath, VirtualDirectory::Enum dir) X_FINAL;
 
     // Create
-    bool createDirectory(const PathT& relPath) const X_FINAL;
+    bool createDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool createDirectoryOS(const PathWT& osPath) const X_FINAL;
-    bool createDirectoryTree(const PathT& relPath) const X_FINAL;
+    bool createDirectoryTree(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool createDirectoryTreeOS(const PathWT& osPath) const X_FINAL;
 
     // exsists.
     bool fileExists(const PathT& relPath) const X_FINAL;
+    bool fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool fileExistsOS(const PathWT& osPath) const X_FINAL;
     bool directoryExists(const PathT& relPath) const X_FINAL;
+    bool directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool directoryExistsOS(const PathWT& osPath) const X_FINAL;
 
     // does not error, when it's a file or not exsist.
-    bool isDirectory(const PathT& relPath) const X_FINAL;
+    bool isDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const X_FINAL;
     bool isDirectoryOS(const PathWT& osPath) const X_FINAL;
 
     // rename
-    bool moveFile(const PathT& relPath, const PathT& newPathRel) const X_FINAL;
+    bool moveFile(const PathT& relPath, const PathT& newPathRel, VirtualDirectory::Enum dir) const X_FINAL;
     bool moveFileOS(const PathWT& osPath, const PathWT& osPathNew) const X_FINAL;
 
     size_t getMinimumSectorSize(void) const X_FINAL;
@@ -316,7 +318,7 @@ public:
 
 private:
     template<typename FileT, typename PakFuncT, typename FuncT>
-    FileT* findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir, PakFuncT pakFunc, FuncT func);
+    FileT* findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir, PakFuncT pakFunc, FuncT func);
 
     Directory* addDirInteral(const PathWT& path);
 
@@ -336,7 +338,7 @@ private:
     // ~ThreadAbstract
 
 private:
-    OsFileAsync* openOsFileAsync(const PathT& path, FileFlags mode);
+    OsFileAsync* openOsFileAsync(const PathT& path, FileFlags mode, VirtualDirectory::Enum writeDir);
 
     bool openPak(const PathT& path);
 
@@ -364,7 +366,7 @@ private:
     findDataSet findData_;
 #endif // !X_DEBUG
 
-    Directory* gameDir_;
+    Directory* baseDir_;
     Directory* saveDir_;
     Search* searchPaths_;
     bool loadPacks_;

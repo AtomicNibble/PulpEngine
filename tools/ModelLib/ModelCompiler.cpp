@@ -912,12 +912,12 @@ bool ModelCompiler::saveModel(const core::Path<char>& path)
     filePath.setExtension(model::MODEL_FILE_EXTENSION);
 
     core::XFileScoped file;
-    if (!gEnv->pFileSys->createDirectoryTree(path)) {
+    if (!gEnv->pFileSys->createDirectoryTree(path, core::VirtualDirectory::BASE)) {
         X_ERROR("Model", "Failed to create directory for output file");
         return false;
     }
 
-    if (!file.openFile(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE)) {
+    if (!file.openFile(filePath, core::FileFlag::WRITE | core::FileFlag::RECREATE, core::VirtualDirectory::BASE)) {
         X_ERROR("Model", "Failed to open compile output file");
         return false;
     }

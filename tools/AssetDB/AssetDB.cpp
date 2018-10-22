@@ -72,6 +72,8 @@ namespace
     // make sure not changed either.
     X_ENSURE_SIZE(core::Compression::BufferHdr, 16);
 
+    constexpr core::VirtualDirectory::Enum virDir = core::VirtualDirectory::BASE;
+
 } // namespace
 
 // -----------------------------------------------------
@@ -112,14 +114,14 @@ bool AssetDB::OpenDB(void)
     dbPath.append(ASSET_DB_FOLDER);
     dbPath.ensureSlash();
 
-    if (!gEnv->pFileSys->createDirectoryTree(dbPath)) {
+    if (!gEnv->pFileSys->createDirectoryTree(dbPath, virDir)) {
         X_ERROR("AssetDB", "Failed to create dir for asset_db");
         return false;
     }
 
     dbPath.append(DB_NAME);
 
-    const bool dbExsists = gEnv->pFileSys->fileExists(dbPath);
+    const bool dbExsists = gEnv->pFileSys->fileExists(dbPath, virDir);
 
     if (!dbExsists) {
         X_WARNING("AssetDB", "Failed to find exsisting asset_db creating a new one");
@@ -394,13 +396,13 @@ bool AssetDB::PerformMigrations(void)
 
                 // make sure dir tree for new name is valid.
                 // not really needed here since renaming in same folder but it's not hurting anything.
-                if (!gEnv->pFileSys->createDirectoryTree(newFilePath)) {
+                if (!gEnv->pFileSys->createDirectoryTree(newFilePath, virDir)) {
                     X_ERROR("AssetDB", "Failed to create dir to move raw asset");
                     // don't early out migrations keep trying the others.
                 }
 
                 // if this fails, we return and the update is not commited.
-                if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath)) {
+                if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath, virDir)) {
                     X_ERROR("AssetDB", "Failed to move asset raw file");
                 }
             }
@@ -446,8 +448,7 @@ bool AssetDB::PerformMigrations(void)
             X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
             core::XFileScoped file;
-            if (!file.openFile(filePath,
-                    core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS)) {
+            if (!file.openFile(filePath, core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS, virDir)) {
                 X_ERROR("AssetDB", "Failed to open rawfile");
                 return false;
             }
@@ -513,8 +514,7 @@ bool AssetDB::PerformMigrations(void)
             X_LOG1("AssetDB", "Updating compression header for raw_file %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
             core::XFileScoped file;
-            if (!file.openFile(filePath,
-                    core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS)) {
+            if (!file.openFile(filePath, core::FileFlag::READ | core::FileFlag::WRITE | core::FileFlag::RANDOM_ACCESS, virDir)) {
                 X_ERROR("AssetDB", "Failed to open rawfile");
                 return false;
             }
@@ -597,7 +597,7 @@ bool AssetDB::PerformMigrations(void)
             rawfileInfo.hash = dataCrc;
             AssetPathForRawFile(rawfileInfo, filePathNew);
 
-            if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
+            if (!gEnv->pFileSys->moveFile(filePath, filePathNew, virDir)) {
                 X_ERROR("AssetDB", "Failed to move asset raw file");
                 return false;
             }
@@ -648,7 +648,7 @@ bool AssetDB::PerformMigrations(void)
             curPath.replaceSeprators();
 
             core::XFileScoped file;
-            if (!file.openFile(curPath, core::FileFlag::READ)) {
+            if (!file.openFile(curPath, core::FileFlag::READ, virDir)) {
                 X_ERROR("AssetDB", "Failed to open thumb file id: %" PRIi32, thumbId);
                 return false;
             }
@@ -689,7 +689,7 @@ bool AssetDB::PerformMigrations(void)
             }
 
             // move the file.
-            if (!gEnv->pFileSys->moveFile(curPath, newPath)) {
+            if (!gEnv->pFileSys->moveFile(curPath, newPath, virDir)) {
                 X_ERROR("AssetDB", "Failed to move thumb file for id: %" PRIi32, thumbId);
                 return false;
             }
@@ -790,7 +790,7 @@ bool AssetDB::PerformMigrations(void)
                 X_LOG1("AssetDB", "Updating hash for rawfile %" PRIi32 " path \"%s\"", rawFileId, filePath.c_str());
 
                 core::XFileScoped file;
-                if (!file.openFile(filePath, core::FileFlag::READ)) {
+                if (!file.openFile(filePath, core::FileFlag::READ, virDir)) {
                     X_ERROR("AssetDB", "Failed to open rawfile");
                     return false;
                 }
@@ -829,7 +829,7 @@ bool AssetDB::PerformMigrations(void)
                 rawfileInfo.hash = dataHash;
                 AssetPathForRawFile(rawfileInfo, filePathNew);
 
-                if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
+                if (!gEnv->pFileSys->moveFile(filePath, filePathNew, virDir)) {
                     X_ERROR("AssetDB", "Failed to move asset raw file");
                     return false;
                 }
@@ -1130,7 +1130,7 @@ bool AssetDB::Chkdsk(bool updateDB)
                     rawfileInfo.hash = dataHash;
                     AssetPathForRawFile(rawfileInfo, filePathNew);
 
-                    if (!gEnv->pFileSys->moveFile(filePath, filePathNew)) {
+                    if (!gEnv->pFileSys->moveFile(filePath, filePathNew, virDir)) {
                         X_ERROR("AssetDB", "Failed to move asset raw file");
                         return false;
                     }
@@ -1474,7 +1474,7 @@ bool AssetDB::Export(core::Path<char>& path)
     writer.EndObject();
 
     core::XFileScoped file;
-    if (!file.openFile(path, core::FileFlag::RECREATE | core::FileFlag::WRITE)) {
+    if (!file.openFile(path, core::FileFlag::RECREATE | core::FileFlag::WRITE, virDir)) {
         X_ERROR("AssetDB", "Failed to open file for db export");
         return false;
     }
@@ -2269,13 +2269,13 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
             AssetPathForRawFile(rawData, oldFilePath);
 
             // make sure dir tree for new name is valid.
-            if (!gEnv->pFileSys->createDirectoryTree(newFilePath)) {
+            if (!gEnv->pFileSys->createDirectoryTree(newFilePath, virDir)) {
                 X_ERROR("AssetDB", "Failed to create dir to move raw asset");
                 return Result::ERROR;
             }
 
             // if this fails, we return and the update is not commited.
-            if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath)) {
+            if (!gEnv->pFileSys->moveFile(oldFilePath, newFilePath, virDir)) {
                 X_ERROR("AssetDB", "Failed to move asset raw file");
                 return Result::ERROR;
             }
@@ -2510,12 +2510,12 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
 
             AssetPathForName(type, name, dataHash, filePath);
 
-            if (!gEnv->pFileSys->createDirectoryTree(filePath)) {
+            if (!gEnv->pFileSys->createDirectoryTree(filePath, virDir)) {
                 X_ERROR("AssetDB", "Failed to create dir to save raw asset");
                 return Result::ERROR;
             }
 
-            if (!file.openFile(filePath, mode)) {
+            if (!file.openFile(filePath, mode, virDir)) {
                 X_ERROR("AssetDB", "Failed to write raw asset");
                 return Result::ERROR;
             }
@@ -2714,8 +2714,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 
         // if a thumb with same md5 exsists don't update.
         // now we wait for a collsion, (that we notice) before this code needs updating :D
-        if (!gEnv->pFileSys->fileExists(filePath)) {
-            if (!gEnv->pFileSys->createDirectoryTree(filePath)) {
+        if (!gEnv->pFileSys->fileExists(filePath, virDir)) {
+            if (!gEnv->pFileSys->createDirectoryTree(filePath, virDir)) {
                 X_ERROR("AssetDB", "Failed to create dir to save thumb");
                 return Result::ERROR;
             }
@@ -2725,7 +2725,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetThumb(AssetId assetId, Vec2i thumbDim,
 
             core::XFileScoped file;
 
-            if (!file.openFile(filePath, mode)) {
+            if (!file.openFile(filePath, mode, virDir)) {
                 X_ERROR("AssetDB", "Failed to write thumb");
                 return Result::ERROR;
             }
@@ -2814,7 +2814,7 @@ bool AssetDB::CleanThumbs(void)
     thumbsFolder /= THUMBS_FOLDER;
     thumbsFolder.replaceSeprators();
 
-    if (!gEnv->pFileSys->deleteDirectoryContents(thumbsFolder)) {
+    if (!gEnv->pFileSys->deleteDirectoryContents(thumbsFolder, virDir)) {
         X_ERROR("AssetDB", "Failed to delete thumbs directory contents");
         return false;
     }
@@ -3017,7 +3017,7 @@ bool AssetDB::GetRawFileDataForAsset(AssetId assetId, DataArr& dataOut)
 
     AssetPathForRawFile(raw, filePath);
 
-    if (!file.openFile(filePath, mode)) {
+    if (!file.openFile(filePath, mode, virDir)) {
         X_ERROR("AssetDB", "Failed to open rawfile");
         return false;
     }
@@ -3065,7 +3065,7 @@ bool AssetDB::GetRawFileCompAlgoForAsset(AssetId assetId, core::Compression::Alg
 
     AssetPathForRawFile(raw, filePath);
 
-    if (!file.openFile(filePath, mode)) {
+    if (!file.openFile(filePath, mode, virDir)) {
         X_ERROR("AssetDB", "Failed to open rawfile");
         return false;
     }
@@ -3147,7 +3147,7 @@ bool AssetDB::GetThumbForAsset(AssetId assetId, ThumbInfo& info, DataArr& thumbD
 
     ThumbPathForThumb(info, filePath);
 
-    if (!file.openFile(filePath, mode)) {
+    if (!file.openFile(filePath, mode, virDir)) {
         X_ERROR("AssetDB", "Failed to open thumb");
         return false;
     }
@@ -3231,7 +3231,7 @@ bool AssetDB::GetCompileFileDataForAsset(AssetId assetId, DataArr& dataOut)
     AssetDB::GetOutputPathForAsset(info.type, info.name, modInfo.outDir, assetPath);
 
     core::XFileScoped file;
-    if (!file.openFile(assetPath, core::FileFlag::READ | core::FileFlag::SHARE)) {
+    if (!file.openFile(assetPath, core::FileFlag::READ | core::FileFlag::SHARE, virDir)) {
         X_ERROR("AssetLoader", "Failed to open file");
         return false;
     }

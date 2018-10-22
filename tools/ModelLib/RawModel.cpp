@@ -685,11 +685,11 @@ namespace RawModel
         mode.Set(core::FileFlag::WRITE);
         mode.Set(core::FileFlag::SHARE);
 
-        if (!gEnv->pFileSys->createDirectoryTree(path)) {
+        if (!gEnv->pFileSys->createDirectoryTree(path, core::VirtualDirectory::BASE)) {
             X_ERROR("RawModel", "Failed to create export directory");
         }
 
-        if (!file.openFile(filePath, mode)) {
+        if (!file.openFile(filePath, mode, core::VirtualDirectory::BASE)) {
             X_ERROR("RawModel", "Failed to open file for rawmodel");
             return false;
         }

@@ -136,7 +136,7 @@ xFileSys::PendingOp& xFileSys::PendingOp::operator=(PendingOp&& oth)
 // --------------------------------------------------------------
 
 xFileSys::xFileSys(core::MemoryArenaBase* arena) :
-    gameDir_(nullptr),
+    baseDir_(nullptr),
     saveDir_(nullptr),
     searchPaths_(nullptr),
     loadPacks_(false),
@@ -249,7 +249,7 @@ bool xFileSys::initDirectorys(bool working)
 
     if (working) {
         // working dir added.
-        if (!setGameDir(workingDir)) {
+        if (!setBaseDir(workingDir)) {
             return false;
         }
 
@@ -296,7 +296,7 @@ bool xFileSys::initDirectorys(bool working)
         PathUtil::ensureSlash(testAssets);
         testAssets += L"test_assets";
 
-        if (!setGameDir(core)) {
+        if (!setBaseDir(core)) {
             return false;
         }
         if (!setSaveDir(saveDir)) {
@@ -335,11 +335,11 @@ XFile* xFileSys::openFileOS(const PathWT& osPath, FileFlags mode)
 }
 
 
-XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
+XFile* xFileSys::openFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFile>(relPath, mode, dir,
+    return findFile<XFile>(relPath, mode, writeDir,
         [&](Pak* pPak, int32_t idx) -> XFile* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFile: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -373,11 +373,11 @@ void xFileSys::closeFile(XFile* file)
 // --------------------------------------------------
 
 // async
-XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
+XFileAsync* xFileSys::openFileAsync(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFileAsync>(relPath, mode, dir,
+    return findFile<XFileAsync>(relPath, mode, writeDir,
         [&](Pak* pPak, int32_t idx) -> XFileAsync* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFileAsync: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -410,11 +410,11 @@ void xFileSys::closeFileAsync(XFileAsync* file)
 
 // --------------------------------------------------
 
-XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir)
+XFileMem* xFileSys::openFileMem(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir)
 {
     X_ASSERT(relPath.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "Path must use asset slashes")(relPath.c_str());
 
-    return findFile<XFileMem>(relPath, mode, dir,
+    return findFile<XFileMem>(relPath, mode, writeDir,
         [&](Pak* pPak, int32_t idx) -> XFileMem* {
             if (isDebug()) {
                 X_LOG0("FileSys", "openFileMem: \"%s\" fnd in pak: \"%s\"", relPath.c_str(), pPak->name.c_str());
@@ -467,7 +467,7 @@ void xFileSys::closeFileMem(XFileMem* file)
 
 
 template<typename FileT, typename PakFuncT, typename FuncT>
-FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum dir, PakFuncT pakFunc, FuncT func)
+FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory::Enum writeDir, PakFuncT pakFunc, FuncT func)
 {
     PathWT osPath;
 
@@ -492,20 +492,15 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
                 auto* pPak = pSearch->pPak;
 
                 auto idx = pPak->find(hash, relPath.c_str());
-                if (idx != core::Pak::INVALID_INDEX)
-                {
+                if (idx != core::Pak::INVALID_INDEX) {
                     return pakFunc(pPak, idx);
                 }
-            }
-            else
-            {
-                X_ASSERT_UNREACHABLE();
             }
         }
     }
     else
     {
-        createOSPath(dir, relPath, osPath);
+        createOSPath(writeDir, relPath, osPath);
 
         return func(osPath, mode);
     }
@@ -516,9 +511,9 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
 
 // --------------------- folders ---------------------
 
-bool xFileSys::setGameDir(const PathWT& osPath)
+bool xFileSys::setBaseDir(const PathWT& osPath)
 {
-    X_ASSERT(gameDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), gameDir_);
+    X_ASSERT(baseDir_ == nullptr, "can only set one game directoy")(osPath.c_str(), baseDir_);
 
     // check if the directory is even valid.
     if (!directoryExistsOS(osPath)) {
@@ -533,7 +528,7 @@ bool xFileSys::setGameDir(const PathWT& osPath)
         return false;
     }
 
-    gameDir_ = pDir;
+    baseDir_ = pDir;
     return true;
 }
 
@@ -655,7 +650,7 @@ FindPair xFileSys::findFirst(const PathT& relPath, FindData& findinfo)
     //
 
     PathWT osPath;
-    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(baseDir_, relPath, osPath); // TODO: search all paths?
 
     return findFirstOS(osPath, findinfo);
 }
@@ -681,10 +676,10 @@ void xFileSys::findClose(findhandle handle)
 
 // --------------------- Delete ---------------------
 
-bool xFileSys::deleteFile(const PathT& relPath) const
+bool xFileSys::deleteFile(const PathT& relPath, VirtualDirectory::Enum dir) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(dir, relPath, osPath);
 
     if (isDebug()) {
         X_LOG0("FileSys", "deleteFile: \"%ls\"", osPath.c_str());
@@ -693,10 +688,10 @@ bool xFileSys::deleteFile(const PathT& relPath) const
     return PathUtil::DeleteFile(osPath);
 }
 
-bool xFileSys::deleteDirectory(const PathT& relPath, bool recursive) const
+bool xFileSys::deleteDirectory(const PathT& relPath, VirtualDirectory::Enum dir, bool recursive) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(dir, relPath, osPath);
 
     if (osPath.fillSpaceWithNullTerm() < 1) {
         X_ERROR("FileSys", "Failed to pad puffer for OS operation");
@@ -710,10 +705,10 @@ bool xFileSys::deleteDirectory(const PathT& relPath, bool recursive) const
     return PathUtil::DeleteDirectory(osPath, recursive);
 }
 
-bool xFileSys::deleteDirectoryContents(const PathT& path)
+bool xFileSys::deleteDirectoryContents(const PathT& path, VirtualDirectory::Enum dir)
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(dir, path, osPath);
 
     if (isDebug()) {
         X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path);
@@ -766,10 +761,10 @@ bool xFileSys::deleteDirectoryContents(const PathT& path)
 
 // --------------------- Create ---------------------
 
-bool xFileSys::createDirectory(const PathT& relPath) const
+bool xFileSys::createDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(dir, relPath, osPath);
 
     osPath.removeFileName();
 
@@ -792,11 +787,11 @@ bool xFileSys::createDirectoryOS(const PathWT& osPath) const
     return PathUtil::CreateDirectory(path);
 }
 
-bool xFileSys::createDirectoryTree(const PathT& relPath) const
+bool xFileSys::createDirectoryTree(const PathT& relPath, VirtualDirectory::Enum dir) const
 {
     // we want to just loop and create like a goat.
     PathWT osPath;
-    createOSPath(gameDir_, relPath, osPath);
+    createOSPath(dir, relPath, osPath);
 
     osPath.removeFileName();
 
@@ -822,12 +817,48 @@ bool xFileSys::createDirectoryTreeOS(const PathWT& osPath) const
 
 // --------------------- exsists ---------------------
 
-bool xFileSys::fileExists(const PathT& path) const
+bool xFileSys::fileExists(const PathT& relPath) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
 
-    return fileExistsOS(osPath);
+    core::StrHash hash(relPath.data(), relPath.length());
+
+    for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
+    {
+        if (pSearch->pDir)
+        {
+            const auto* pDir = pSearch->pDir;
+            createOSPath(pDir, relPath, osPath);
+
+            if (PathUtil::DirectoryExist(osPath)) {
+                return true;
+            }
+        }
+        else if (pSearch->pPak)
+        {
+            auto* pPak = pSearch->pPak;
+
+            auto idx = pPak->find(hash, relPath.c_str());
+            if (idx != core::Pak::INVALID_INDEX) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+
+bool xFileSys::fileExists(const PathT& relPath, VirtualDirectory::Enum dir) const
+{
+    PathWT osPath;
+    createOSPath(dir, relPath, osPath);
+
+    if (PathUtil::FileExist(osPath, true)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool xFileSys::fileExistsOS(const PathWT& osPath) const
@@ -835,12 +866,36 @@ bool xFileSys::fileExistsOS(const PathWT& osPath) const
     return PathUtil::FileExist(osPath, false);
 }
 
-bool xFileSys::directoryExists(const PathT& path) const
+bool xFileSys::directoryExists(const PathT& relPath) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
 
-    return directoryExistsOS(osPath);
+    for (const Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext)
+    {
+        if (pSearch->pDir)
+        {
+            const auto* pDir = pSearch->pDir;
+            createOSPath(pDir, relPath, osPath);
+
+            if (PathUtil::DirectoryExist(osPath)) {
+                return true;
+            }
+        }
+    }
+
+    return false;
+}
+
+bool xFileSys::directoryExists(const PathT& relPath, VirtualDirectory::Enum dir) const
+{
+    PathWT osPath;
+    createOSPath(dir, relPath, osPath);
+
+    if (PathUtil::DirectoryExist(osPath)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool xFileSys::directoryExistsOS(const PathWT& osPath) const
@@ -848,12 +903,16 @@ bool xFileSys::directoryExistsOS(const PathWT& osPath) const
     return core::PathUtil::DirectoryExist(osPath);
 }
 
-bool xFileSys::isDirectory(const PathT& path) const
+bool xFileSys::isDirectory(const PathT& relPath, VirtualDirectory::Enum dir) const
 {
     PathWT osPath;
-    createOSPath(gameDir_, path, osPath);
+    createOSPath(dir, relPath, osPath);
 
-    return isDirectoryOS(osPath);
+    if (PathUtil::IsDirectory(osPath)) {
+        return true;
+    }
+
+    return false;
 }
 
 bool xFileSys::isDirectoryOS(const PathWT& osPath) const
@@ -867,12 +926,12 @@ bool xFileSys::isDirectoryOS(const PathWT& osPath) const
     return result;
 }
 
-bool xFileSys::moveFile(const PathT& relPath, const PathT& newPathRel) const
+bool xFileSys::moveFile(const PathT& relPath, const PathT& newPathRel, VirtualDirectory::Enum dir) const
 {
     PathWT osPath, osPathNew;
 
-    createOSPath(gameDir_, relPath, osPath);
-    createOSPath(gameDir_, newPathRel, osPathNew);
+    createOSPath(dir, relPath, osPath);
+    createOSPath(dir, newPathRel, osPathNew);
 
     return moveFileOS(osPath, osPathNew);
 }
@@ -940,15 +999,15 @@ size_t xFileSys::getMinimumSectorSize(void) const
 // Ajust path
 const wchar_t* xFileSys::createOSPath(VirtualDirectory::Enum dir, const PathT& path, PathWT& buffer) const
 {
-    if (dir == VirtualDirectory::GAME) {
-        return createOSPath(gameDir_, path, buffer);
+    if (dir == VirtualDirectory::BASE) {
+        return createOSPath(baseDir_, path, buffer);
     }
     else if (dir == VirtualDirectory::SAVE) {
         return createOSPath(saveDir_, path, buffer);
     } 
 
     X_ASSERT_UNREACHABLE();
-    return createOSPath(gameDir_, path, buffer);
+    return createOSPath(baseDir_, path, buffer);
 }
 
 const wchar_t* xFileSys::createOSPath(const Directory* dir, const PathT& path, PathWT& buffer) const
@@ -1427,13 +1486,13 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
 
         if (type == IoRequest::OPEN) {
             IoRequestOpen* pOpen = static_cast<IoRequestOpen*>(pRequest);
-            XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode, VirtualDirectory::GAME);
+            XFileAsync* pFile = openFileAsync(pOpen->path, pOpen->mode, VirtualDirectory::BASE);
 
             pOpen->callback.Invoke(fileSys, pOpen, pFile, 0);
         }
         else if (type == IoRequest::OPEN_READ_ALL) {
             IoRequestOpenRead* pOpenRead = static_cast<IoRequestOpenRead*>(pRequest);
-            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path, pOpenRead->mode, VirtualDirectory::GAME);
+            XFileAsync* pFileAsync = openFileAsync(pOpenRead->path, pOpenRead->mode, VirtualDirectory::BASE);
 
             // make sure it's safe to allocate the buffer in this thread.
             X_ASSERT_NOT_NULL(pOpenRead->arena);
@@ -1510,7 +1569,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
             IoRequestOpenWrite* pOpenWrite = static_cast<IoRequestOpenWrite*>(pRequest);
 
             auto flags = core::FileFlags::RECREATE | core::FileFlags::WRITE;
-            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path, flags, VirtualDirectory::GAME));
+            XDiskFileAsync* pFile = static_cast<XDiskFileAsync*>(openFileAsync(pOpenWrite->path, flags, VirtualDirectory::BASE));
 
             X_ASSERT(pOpenWrite->data.getArena()->isThreadSafe(), "Async OpenWrite requests require thread safe arena")();
             X_ASSERT(pOpenWrite->data.size() > 0, "WriteAll called with data size 0")(pOpenWrite->data.size());
@@ -1624,7 +1683,7 @@ Thread::ReturnValue xFileSys::ThreadRun(const Thread& thread)
     return Thread::ReturnValue(0);
 }
 
-OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode)
+OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode, VirtualDirectory::Enum writeDir)
 {
     PathWT osPath;
 
@@ -1641,7 +1700,7 @@ OsFileAsync* xFileSys::openOsFileAsync(const PathT& path, FileFlags mode)
         findData.getOSPath(osPath, findinfo);
     }
     else {
-        createOSPath(gameDir_, path, osPath);
+        createOSPath(writeDir, path, osPath);
     }
 
     if (isDebug()) {
@@ -1668,7 +1727,7 @@ bool xFileSys::openPak(const PathT& path)
     mode.Set(FileFlag::RANDOM_ACCESS);
     // I'm not sharing, fuck you!
 
-    auto* pFile = openOsFileAsync(path, mode);
+    auto* pFile = openOsFileAsync(path, mode, VirtualDirectory::BASE);
     if (!pFile) {
         X_ERROR("FileSys", "Failed to open pak");
         return false;
