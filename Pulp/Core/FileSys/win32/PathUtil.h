@@ -50,8 +50,8 @@ namespace PathUtil
     bool DirectoryExist(const Path& dirPath);
     bool DirectoryExist(const wchar_t* pDir);
 
-    bool FileExist(const Path& filePath, bool supressMissingDirWarn = false);
-    bool FileExist(const wchar_t* pFilePath, bool supressMissingDirWarn = false);
+    bool FileExist(const Path& filePath, bool supressMissingDirWarn);
+    bool FileExist(const wchar_t* pFilePath, bool supressMissingDirWarn);
 
     bool PathExist(const Path& path);
     bool PathExist(const wchar_t* pDir);

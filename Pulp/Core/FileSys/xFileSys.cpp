@@ -832,7 +832,7 @@ bool xFileSys::fileExists(const PathT& path) const
 
 bool xFileSys::fileExistsOS(const PathWT& osPath) const
 {
-    return core::PathUtil::FileExist(osPath);
+    return PathUtil::FileExist(osPath, false);
 }
 
 bool xFileSys::directoryExists(const PathT& path) const
