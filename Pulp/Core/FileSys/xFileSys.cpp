@@ -161,6 +161,14 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
         AsyncOpPoolArena::getMemoryOffsetRequirement()),
     asyncOpPoolArena_(&asyncOpPoolAllocator_, "AsyncOpPool"),
     // ..
+    virtualDirHeap_(
+        bitUtil::RoundUpToMultiple<size_t>(
+            AsyncOpPoolArena::getMemoryRequirement(sizeof(Directory)) * MAX_VIRTUAL_DIR + 
+            AsyncOpPoolArena::getMemoryRequirement(sizeof(Search)) * MAX_VIRTUAL_DIR,
+            VirtualMem::GetPageSize())),
+    virtualDirAllocator_(virtualDirHeap_.start(), virtualDirHeap_.end()),
+    virtualDirArena_(&virtualDirAllocator_, "VirtualDirPool"),
+    // ..
     memFileArena_(&memfileAllocator_, "MemFileData"),
     currentRequestIdx_(0),
     requestSignal_(true),
@@ -174,6 +182,7 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 {
     arena->addChildArena(&filePoolArena_);
     arena->addChildArena(&asyncOpPoolArena_);
+    arena->addChildArena(&virtualDirArena_);
     arena->addChildArena(&memFileArena_);
 }
 
@@ -225,7 +234,7 @@ void xFileSys::shutDown(void)
         Search* cur = s;
         s = cur->pNext;
         if (cur->pDir) {
-            X_DELETE(cur->pDir, g_coreArena);
+            X_DELETE(cur->pDir, &virtualDirArena_);
         }
         else {
             if (cur->pPak->pFile) {
@@ -234,7 +243,7 @@ void xFileSys::shutDown(void)
 
             X_DELETE(cur->pPak, g_coreArena);
         }
-        X_DELETE(cur, g_coreArena);
+        X_DELETE(cur, &virtualDirArena_);
     }
 }
 
@@ -598,8 +607,8 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     }
 
     // add it to virtual file system.
-    Search* search = X_NEW(Search, g_coreArena, "FileSysSearch");
-    search->pDir = X_NEW(Directory, g_coreArena, "FileSysDir");
+    Search* search = X_NEW(Search, &virtualDirArena_, "FileSysSearch");
+    search->pDir = X_NEW(Directory, &virtualDirArena_, "FileSysDir");
     search->pDir->path = fixedPath;
     search->pPak = nullptr;
     search->pNext = searchPaths_;
@@ -1830,7 +1839,7 @@ bool xFileSys::openPak(const PathT& relPath)
     }
 
     // all done?
-    Search* pSearch = X_NEW(Search, g_coreArena, "FileSysSearch");
+    Search* pSearch = X_NEW(Search, &virtualDirArena_, "FileSysSearch");
     pSearch->pDir = nullptr;
     pSearch->pPak = pPak.release();
     pSearch->pNext = searchPaths_;

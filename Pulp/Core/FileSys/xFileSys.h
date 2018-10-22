@@ -18,6 +18,7 @@ X_ENABLE_WARNING(4702)
 
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
+#include <Memory\AllocationPolicies\LinearAllocator.h>
 #include <Memory\HeapArea.h>
 #include <Util\UniquePointer.h>
 
@@ -189,8 +190,23 @@ class xFileSys : public IFileSys
         core::NoMemoryTracking,
         core::NoMemoryTagging
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
-        >
+    >
         MemfileArena;
+
+    typedef core::MemoryArena<
+        core::LinearAllocator,
+        core::SingleThreadPolicy,
+#if X_ENABLE_MEMORY_DEBUG_POLICIES
+        core::SimpleBoundsChecking,
+        core::SimpleMemoryTracking,
+        core::SimpleMemoryTagging
+#else
+        core::NoBoundsChecking,
+        core::NoMemoryTracking,
+        core::NoMemoryTagging
+#endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
+        >
+        VirtualDirArena;
 
 public:
 #ifdef X_PLATFORM_WIN32
@@ -381,6 +397,10 @@ private:
     core::HeapArea asyncOpPoolHeap_;
     core::PoolAllocator asyncOpPoolAllocator_;
     AsyncOpPoolArena asyncOpPoolArena_;
+
+    core::HeapArea virtualDirHeap_;
+    core::LinearAllocator virtualDirAllocator_;
+    VirtualDirArena virtualDirArena_;
 
     core::MallocFreeAllocator memfileAllocator_;
     MemfileArena memFileArena_;
