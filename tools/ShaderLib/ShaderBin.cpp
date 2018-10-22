@@ -351,6 +351,7 @@ namespace shader
     {
         destOut.clear();
         destOut.appendFmt("shaders/compiled/%s.fxcb", pShader->getName().c_str());
+        destOut.toLower();
 
         // make sure the directory is created.
         if (createDir) {
