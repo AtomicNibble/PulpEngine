@@ -56,6 +56,7 @@ X_LINK_ENGINE_LIB("Physics");
 X_FORCE_LINK_FACTORY("XConverterLib_Material")
 X_FORCE_LINK_FACTORY("XConverterLib_Model")
 X_FORCE_LINK_FACTORY("XConverterLib_Phys")
+X_FORCE_LINK_FACTORY("XEngineModule_LinkerLib")
 
 #endif // !X_LIB
 
