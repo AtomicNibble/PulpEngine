@@ -191,6 +191,11 @@ namespace mapFile
         //	info.name = core::StackString<64>(token.begin(), token.end());
         name.set(token.begin(), token.end());
 
+#if X_MTL_PATCH_DOUBLE_UNDERSCORE
+        core::StackString<4> slashStr(assetDb::ASSET_NAME_SLASH);
+        name.replaceAll("__", slashStr.c_str());
+#endif // !X_MTL_PATCH_DOUBLE_UNDERSCORE
+
         // repeats every X / Y
         // if this value is 512 x 512, this means the texture repeats every
         // 512 uints, so if the brush is 256 x 256.

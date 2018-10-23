@@ -19,6 +19,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+#define X_MTL_PATCH_DOUBLE_UNDERSCORE 1
+
 static const uint32_t MTL_MATERIAL_MAX_LEN = 64;
 static const uint32_t MTL_B_VERSION = 5;
 static const uint32_t MTL_B_FOURCC = X_TAG('m', 't', 'l', 'b');
