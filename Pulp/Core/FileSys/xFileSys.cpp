@@ -848,7 +848,7 @@ bool xFileSys::fileExists(const PathT& relPath) const
             const auto* pDir = pSearch->pDir;
             createOSPath(pDir, relPath, osPath);
 
-            if (PathUtil::DirectoryExist(osPath)) {
+            if (PathUtil::FileExist(osPath, true)) {
                 return true;
             }
         }
