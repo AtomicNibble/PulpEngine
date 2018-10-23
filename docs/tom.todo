@@ -10,7 +10,7 @@ Core:
  ✔ Tidy up console code. @done (18-09-17 18:35)
 
    FileSys:
-      ☐ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed.
+      ✔ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed. @done (18-10-22 21:26)
    See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
 
      ✔ Don't apply OS slashes until we hit OS specific code paths. @done (18-10-16 22:42)
@@ -47,7 +47,7 @@ Engine:
       guess might be usefull for debugging.
       so can do stuff like set 2d clear col for testing, kinky.
   ☐ Commands for changing the render scale on fly (for fillrate testing)
-  ☐ Allow maintaining aspect ration? (basically don't stretch render buffers)
+  ☐ Allow maintaining aspect ratio? (basically don't stretch render buffers)
   ☐ Make it so GUI knows about new render size without a frame of delay
   ☐ Fix materials been able to play videos.
     ☐ If a video is playing but not visible or used don't bother update render text.
