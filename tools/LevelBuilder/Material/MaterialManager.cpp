@@ -22,6 +22,7 @@ bool MatManager::Init(void)
 {
     X_ASSERT_NOT_NULL(gEnv);
 
+    nameOverRide_.insert(std::make_pair(core::string("caulk"), core::string("tool/editor/caulk")));
     nameOverRide_.insert(std::make_pair(core::string("portal"), core::string("tool/editor/portal")));
     nameOverRide_.insert(std::make_pair(core::string("portal_nodraw"), core::string("tool/editor/portal_nodraw")));
     nameOverRide_.insert(std::make_pair(core::string("berlin_wall_concrete_block"), core::string("floor/concrete/sidewalk")));
