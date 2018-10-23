@@ -85,10 +85,6 @@ engine::Material* MatManager::loadMaterial(const char* pMtlName)
         name = it->second;
     }
 
-    if (name != "tool/editor/portal" && name != "tool/editor/portal_nodraw") {
-        name = "floor/concrete/sidewalk";
-    }
-
     // try find it.
     MaterialResource* pMatRes = findMaterial_Internal(name);
     if (pMatRes) {
