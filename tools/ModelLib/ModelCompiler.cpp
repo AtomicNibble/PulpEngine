@@ -17,7 +17,6 @@
 #include "Util\KDop.h"
 
 X_DISABLE_WARNING(4702)
-#include <algorithm>
 #include <map>
 #include <numeric>
 X_ENABLE_WARNING(4702)
