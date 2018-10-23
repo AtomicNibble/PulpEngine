@@ -100,6 +100,8 @@ namespace
             return false;
         }
 
+        path.replaceSeprators();
+
         core::string modName;
         GetMod(modName);
 
@@ -122,6 +124,7 @@ namespace
         outPath.ensureSlash();
         outPath.setFileName(path.fileName());
         outPath.removeExtension();
+        outPath.replaceSeprators();
 
         if (!comp.compileLevel(path, outPath)) {
             return false;
