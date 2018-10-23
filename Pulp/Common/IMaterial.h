@@ -14,7 +14,7 @@
 #include <IShader.h>
 #include <IRender.h>
 #include <IConverterModule.h>
-#include "Util\GenericUtil.h"
+#include <Util\GenericUtil.h>
 #include <String\StringHash.h>
 
 X_NAMESPACE_BEGIN(engine)
