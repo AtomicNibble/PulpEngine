@@ -1648,7 +1648,7 @@ bool ModelCompiler::saveModel(core::XFile* pFile)
         }
 
         // make sure this stream starts on a aligned boundry.
-        const size_t curFileSize = pFile->tell();
+        const size_t curFileSize = safe_static_cast<size_t>(pFile->tell());
         const size_t padSize = curFileSize % MODEL_STREAM_ALIGN == 0 ? 0 : (MODEL_STREAM_ALIGN - (curFileSize % MODEL_STREAM_ALIGN));
 
         X_ASSERT(padSize == preMeshDataPadSize, "Alignment size mismatch")(padSize, preMeshDataPadSize);

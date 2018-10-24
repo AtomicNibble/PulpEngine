@@ -411,7 +411,7 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
         std::array<core::StackString<32>, assetDb::AssetType::ENUM_COUNT> assetPrefixes;
         std::array<core::StackString<32>, assetDb::AssetType::ENUM_COUNT> assetExt;
 
-        for (int32_t i = 0; i < assetCounts_.size(); i++) {
+        for (size_t i = 0; i < assetCounts_.size(); i++) {
             if (!assetCounts_[i]) {
                 continue;
             }
