@@ -628,181 +628,181 @@ TEST(Path, AppendPathAssignW)
 
 TEST(Path, Concat)
 {
-    core::Path<char> path("c:\\");
+    core::Path<char> path("c:/");
 
-    EXPECT_STREQ("c:\\", path.c_str());
+    EXPECT_STREQ("c:/", path.c_str());
     path = path / "tickle_me_plz";
-    EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
-    path = path / "goat\\";
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz", path.c_str());
+    path = path / "goat/";
+    EXPECT_STREQ("c:/tickle_me_plz/goat/", path.c_str());
 }
 
 TEST(Path, ConcatW)
 {
-    core::Path<wchar_t> path(L"c:\\");
+    core::Path<wchar_t> path(L"c:/");
 
-    EXPECT_STREQ(L"c:\\", path.c_str());
+    EXPECT_STREQ(L"c:/", path.c_str());
     path = path / L"tickle_me_plz";
-    EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
-    path = path / L"goat\\";
-    EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+    EXPECT_STREQ(L"c:/tickle_me_plz", path.c_str());
+    path = path / L"goat/";
+    EXPECT_STREQ(L"c:/tickle_me_plz/goat/", path.c_str());
 }
 
 TEST(Path, ConcatPath)
 {
-    core::Path<char> path("c:\\");
+    core::Path<char> path("c:/");
 
-    EXPECT_STREQ("c:\\", path.c_str());
+    EXPECT_STREQ("c:/", path.c_str());
     path = path / core::Path<char>("tickle_me_plz");
-    EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
-    path = path / core::Path<char>("goat\\");
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat\\", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz", path.c_str());
+    path = path / core::Path<char>("goat/");
+    EXPECT_STREQ("c:/tickle_me_plz/goat/", path.c_str());
 }
 
 TEST(Path, ConcatPathW)
 {
-    core::Path<wchar_t> path(L"c:\\");
+    core::Path<wchar_t> path(L"c:/");
 
-    EXPECT_STREQ(L"c:\\", path.c_str());
+    EXPECT_STREQ(L"c:/", path.c_str());
     path = path / core::Path<wchar_t>(L"tickle_me_plz");
-    EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
-    path = path / core::Path<wchar_t>(L"goat\\");
-    EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+    EXPECT_STREQ(L"c:/tickle_me_plz", path.c_str());
+    path = path / core::Path<wchar_t>(L"goat/");
+    EXPECT_STREQ(L"c:/tickle_me_plz/goat/", path.c_str());
 }
 
 TEST(Path, ConcatAssign)
 {
-    core::Path<char> path("c:\\");
+    core::Path<char> path("c:/");
 
-    EXPECT_STREQ("c:\\", path.c_str());
+    EXPECT_STREQ("c:/", path.c_str());
     path /= "tickle_me_plz";
-    EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz", path.c_str());
     path /= "goat";
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat", path.c_str());
-    path /= "goat\\"; // should auto add slash.
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz/goat", path.c_str());
+    path /= "goat/"; // should auto add slash.
+    EXPECT_STREQ("c:/tickle_me_plz/goat/goat/", path.c_str());
 }
 
 TEST(Path, ConcatAssignW)
 {
-    core::Path<wchar_t> path(L"c:\\");
+    core::Path<wchar_t> path(L"c:/");
 
-    EXPECT_STREQ(L"c:\\", path.c_str());
+    EXPECT_STREQ(L"c:/", path.c_str());
     path /= L"tickle_me_plz";
-    EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
+    EXPECT_STREQ(L"c:/tickle_me_plz", path.c_str());
     path /= L"goat";
-    EXPECT_STREQ(L"c:\\tickle_me_plz\\goat", path.c_str());
-    path /= L"goat\\"; // should auto add slash.
-    EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
+    EXPECT_STREQ(L"c:/tickle_me_plz/goat", path.c_str());
+    path /= L"goat/"; // should auto add slash.
+    EXPECT_STREQ(L"c:/tickle_me_plz/goat/goat/", path.c_str());
 }
 
 TEST(Path, ConcatPathAssign)
 {
-    core::Path<char> path("c:\\");
+    core::Path<char> path("c:/");
 
-    EXPECT_STREQ("c:\\", path.c_str());
+    EXPECT_STREQ("c:/", path.c_str());
     path /= core::Path<char>("tickle_me_plz");
-    EXPECT_STREQ("c:\\tickle_me_plz", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz", path.c_str());
     path /= core::Path<char>("goat");
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat", path.c_str());
-    path /= core::Path<char>("goat\\");
-    EXPECT_STREQ("c:\\tickle_me_plz\\goat\\goat\\", path.c_str());
+    EXPECT_STREQ("c:/tickle_me_plz/goat", path.c_str());
+    path /= core::Path<char>("goat/");
+    EXPECT_STREQ("c:/tickle_me_plz/goat/goat/", path.c_str());
 }
 
 TEST(Path, ConcatPathAssignW)
 {
-    core::Path<wchar_t> path(L"c:\\");
+    core::Path<wchar_t> path(L"c:/");
 
-    EXPECT_STREQ(L"c:\\", path.c_str());
+    EXPECT_STREQ(L"c:/", path.c_str());
     path /= core::Path<wchar_t>(L"tickle_me_plz");
-    EXPECT_STREQ(L"c:\\tickle_me_plz", path.c_str());
-    path /= core::Path<wchar_t>(L"goat\\");
-    EXPECT_STREQ(L"c:\\tickle_me_plz\\goat\\", path.c_str());
+    EXPECT_STREQ(L"c:/tickle_me_plz", path.c_str());
+    path /= core::Path<wchar_t>(L"goat/");
+    EXPECT_STREQ(L"c:/tickle_me_plz/goat/", path.c_str());
 }
 
 TEST(Path, EncureSlash)
 {
     {
-        core::Path<char> path("c:\\");
+        core::Path<char> path("c:/");
         path.ensureSlash();
-        EXPECT_STREQ("c:\\", path.c_str());
+        EXPECT_STREQ("c:/", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat");
+        core::Path<char> path("c:/goat");
         path.ensureSlash();
-        EXPECT_STREQ("c:\\goat\\", path.c_str());
+        EXPECT_STREQ("c:/goat/", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat/");
+        core::Path<char> path("c:/goat\\");
         path.ensureSlash();
-        EXPECT_STREQ("c:\\goat/\\", path.c_str());
+        EXPECT_STREQ("c:/goat\\/", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat.");
+        core::Path<char> path("c:/goat.");
         path.ensureSlash();
-        EXPECT_STREQ("c:\\goat.\\", path.c_str());
+        EXPECT_STREQ("c:/goat./", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat.ext");
+        core::Path<char> path("c:/goat.ext");
         path.ensureSlash();
-        EXPECT_STREQ("c:\\goat.ext\\", path.c_str());
+        EXPECT_STREQ("c:/goat.ext/", path.c_str());
     }
 }
 
 TEST(Path, EncureSlashW)
 {
     {
-        core::Path<wchar_t> path(L"c:\\");
+        core::Path<wchar_t> path(L"c:/");
         path.ensureSlash();
-        EXPECT_STREQ(L"c:\\", path.c_str());
+        EXPECT_STREQ(L"c:/", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat");
+        core::Path<wchar_t> path(L"c:/goat");
         path.ensureSlash();
-        EXPECT_STREQ(L"c:\\goat\\", path.c_str());
+        EXPECT_STREQ(L"c:/goat/", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat/");
+        core::Path<wchar_t> path(L"c:/goat\\");
         path.ensureSlash();
-        EXPECT_STREQ(L"c:\\goat/\\", path.c_str());
+        EXPECT_STREQ(L"c:/goat\\/", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat.");
+        core::Path<wchar_t> path(L"c:/goat.");
         path.ensureSlash();
-        EXPECT_STREQ(L"c:\\goat.\\", path.c_str());
+        EXPECT_STREQ(L"c:/goat./", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat.ext");
+        core::Path<wchar_t> path(L"c:/goat.ext");
         path.ensureSlash();
-        EXPECT_STREQ(L"c:\\goat.ext\\", path.c_str());
+        EXPECT_STREQ(L"c:/goat.ext/", path.c_str());
     }
 }
 
 TEST(Path, replaceSeprators)
 {
     {
-        core::Path<char> path("c:\\pickle/\\goat\\");
+        core::Path<char> path("c:/pickle//goat/");
         path.replaceSeprators();
-        EXPECT_STREQ("c:\\pickle\\\\goat\\", path.c_str());
+        EXPECT_STREQ("c:/pickle//goat/", path.c_str());
     }
     {
-        core::Path<char> path("c:\\pickle/goat");
+        core::Path<char> path("c:/pickle\\goat");
         path.replaceSeprators();
-        EXPECT_STREQ("c:\\pickle\\goat", path.c_str());
+        EXPECT_STREQ("c:/pickle/goat", path.c_str());
     }
 }
 
 TEST(Path, replaceSepratorsW)
 {
     {
-        core::Path<wchar_t> path(L"c:\\pickle/\\goat\\");
+        core::Path<wchar_t> path(L"c:/pickle//goat/");
         path.replaceSeprators();
-        EXPECT_STREQ(L"c:\\pickle\\\\goat\\", path.c_str());
+        EXPECT_STREQ(L"c:/pickle//goat/", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\pickle/goat");
+        core::Path<wchar_t> path(L"c:/pickle\\goat");
         path.replaceSeprators();
-        EXPECT_STREQ(L"c:\\pickle\\goat", path.c_str());
+        EXPECT_STREQ(L"c:/pickle/goat", path.c_str());
     }
 }
 
@@ -935,47 +935,47 @@ TEST(Path, RemoveExtensionW)
 TEST(Path, RemoveTrailingSlash)
 {
     {
-        core::Path<char> path("c:\\");
+        core::Path<char> path("c:/");
         path.removeTrailingSlash();
         EXPECT_STREQ("c:", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat\\");
+        core::Path<char> path("c:/goat/");
         path.removeTrailingSlash();
-        EXPECT_STREQ("c:\\goat", path.c_str());
+        EXPECT_STREQ("c:/goat", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat/");
+        core::Path<char> path("c:/goat\\");
         path.removeTrailingSlash();
-        EXPECT_STREQ("c:\\goat", path.c_str());
+        EXPECT_STREQ("c:/goat", path.c_str());
     }
     {
-        core::Path<char> path("c:\\goat");
+        core::Path<char> path("c:/goat");
         path.removeTrailingSlash();
-        EXPECT_STREQ("c:\\goat", path.c_str());
+        EXPECT_STREQ("c:/goat", path.c_str());
     }
 }
 
 TEST(Path, RemoveTrailingSlashW)
 {
     {
-        core::Path<wchar_t> path(L"c:\\");
+        core::Path<wchar_t> path(L"c:/");
         path.removeTrailingSlash();
         EXPECT_STREQ(L"c:", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat\\");
+        core::Path<wchar_t> path(L"c:/goat/");
         path.removeTrailingSlash();
-        EXPECT_STREQ(L"c:\\goat", path.c_str());
+        EXPECT_STREQ(L"c:/goat", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat/");
+        core::Path<wchar_t> path(L"c:/goat\\");
         path.removeTrailingSlash();
-        EXPECT_STREQ(L"c:\\goat", path.c_str());
+        EXPECT_STREQ(L"c:/goat", path.c_str());
     }
     {
-        core::Path<wchar_t> path(L"c:\\goat");
+        core::Path<wchar_t> path(L"c:/goat");
         path.removeTrailingSlash();
-        EXPECT_STREQ(L"c:\\goat", path.c_str());
+        EXPECT_STREQ(L"c:/goat", path.c_str());
     }
 }

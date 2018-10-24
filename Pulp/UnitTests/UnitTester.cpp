@@ -8,6 +8,8 @@
 #include <Threading\CriticalSection.h>
 #include <Platform\Process.h>
 
+#include <IFileSys.h>
+
 // Google Test
 #if X_DEBUG == 1
 X_LINK_LIB("gtestd")
@@ -83,6 +85,10 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
                 X_ASSERT_NOT_NULL(gEnv);
                 X_ASSERT_NOT_NULL(gEnv->pCore);
                 gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
+
+                if (!gEnv->pFileSys->addModDir(core::Path<wchar_t>(L"test_assets"))) {
+                    return 1;
+                }
 
                 ::testing::GTEST_FLAG(filter) = "-*Fiber*";
                 //::testing::GTEST_FLAG(filter) = "*JobSystem2Empty_parallel_data:-*Fiber*";
