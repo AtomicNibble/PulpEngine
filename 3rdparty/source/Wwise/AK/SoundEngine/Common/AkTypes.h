@@ -21,7 +21,7 @@ under the Apache License is distributed on an "AS IS" BASIS, WITHOUT WARRANTIES
 OR CONDITIONS OF ANY KIND, either express or implied. See the Apache License for
 the specific language governing permissions and limitations under the License.
 
-  Version: v2017.2.6  Build: 6636
+  Version: v2017.2.7  Build: 6661
   Copyright (c) 2006-2018 Audiokinetic Inc.
 *******************************************************************************/
 
@@ -54,20 +54,10 @@ the specific language governing permissions and limitations under the License.
 #define AK_POINTER_64
 #endif // #if defined(AK_CPU_X86_64) || defined(AK_CPU_ARM_64)
 
-#ifdef AK_USE_STD_ATOMIC
-	// Apple, starting with iOS 10 and MacOS 10.12 is enforcing the type of objects on which we use Atomic Operations.
-	#include <stdatomic.h>
-
-	typedef _Atomic(AkInt32)	AkAtomic32;			///< Signed 32-bit integer - Atomic Declaration
-	typedef _Atomic(AkInt64)	AkAtomic64;			///< Signed 64-bit integer - Atomic Declaration
-	typedef _Atomic(AkUInt32)	AkAtomicU32;		///< Unsigned 32-bit integer - Atomic Declaration
-	typedef _Atomic(AkIntPtr)	AkAtomicPtr;		///< Signed platform sized integer - Atomic Declaration
-#else
-	typedef AkInt32				AkAtomic32;			///< Signed 32-bit integer - Atomic Declaration
-	typedef AkInt64				AkAtomic64;			///< Signed 64-bit integer - Atomic Declaration
-	typedef AkUInt32			AkAtomicU32;		///< Unsigned 32-bit integer - Atomic Declaration
-	typedef AkIntPtr			AkAtomicPtr;		///< Signed platform sized integer - Atomic Declaration
-#endif
+typedef AkInt32				AkAtomic32;			///< Signed 32-bit integer - Atomic Declaration
+typedef AkInt64				AkAtomic64;			///< Signed 64-bit integer - Atomic Declaration
+typedef AkUInt32			AkAtomicU32;		///< Unsigned 32-bit integer - Atomic Declaration
+typedef AkIntPtr			AkAtomicPtr;		///< Signed platform sized integer - Atomic Declaration
 
 typedef AkUInt32		AkUniqueID;			 		///< Unique 32-bit ID
 typedef AkUInt32		AkStateID;			 		///< State ID
