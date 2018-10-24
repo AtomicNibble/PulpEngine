@@ -202,7 +202,7 @@ LevelBuilder:
 
 Sql:
 
-  ☐ Don't re export functions in dll's
+  ✔ Don't re export functions in dll's @done (18-10-24 17:11)
     Currently if link sql.dll you end up exporting some of same stuff sql.dll exports.
 
  UnitTests:
