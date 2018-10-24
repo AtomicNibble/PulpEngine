@@ -365,12 +365,13 @@ public:
 
 class SQL_EXPORT SqlLiteTransactionBase
 {
+    X_NO_COPY(SqlLiteTransactionBase);
+    X_NO_ASSIGN(SqlLiteTransactionBase);
+
 protected:
     SqlLiteTransactionBase() = default;
     ~SqlLiteTransactionBase() = default;
 
-    X_NO_COPY(SqlLiteTransactionBase);
-    X_NO_ASSIGN(SqlLiteTransactionBase);
 };
 
 class SQL_EXPORT SqlLiteTransaction : public SqlLiteTransactionBase
