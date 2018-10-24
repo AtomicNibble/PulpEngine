@@ -95,7 +95,17 @@ typedef Flags<OpenFlag> OpenFlags;
 X_DECLARE_FLAG_OPERATORS(OpenFlags);
 
 
-class DLL_EXPORT SqlLiteDb
+#if !defined(SQL_EXPORT)
+
+#if !defined(X_LIB)
+#define SQL_EXPORT X_IMPORT
+#else
+#define SQL_EXPORT
+#endif
+
+#endif
+
+class SQL_EXPORT SqlLiteDb
 {
     X_NO_COPY(SqlLiteDb);
     X_NO_ASSIGN(SqlLiteDb);
@@ -165,7 +175,7 @@ private:
     AuthorizeHandler::Pointer ah_;
 };
 
-class DLL_EXPORT SqlLiteStateMnt
+class SQL_EXPORT SqlLiteStateMnt
 {
     X_NO_COPY(SqlLiteStateMnt);
     X_NO_ASSIGN(SqlLiteStateMnt);
@@ -226,10 +236,10 @@ protected:
     const char* pTail_;
 };
 
-class DLL_EXPORT SqlLiteCmd : public SqlLiteStateMnt
+class SQL_EXPORT SqlLiteCmd : public SqlLiteStateMnt
 {
 public:
-    class DLL_EXPORT BindStream
+    class SQL_EXPORT BindStream
     {
     public:
         BindStream(SqlLiteCmd& cmd, int idx);
@@ -261,13 +271,13 @@ public:
     Result::Enum executeAll(void);
 };
 
-class DLL_EXPORT SqlLiteQuery : public SqlLiteStateMnt
+class SQL_EXPORT SqlLiteQuery : public SqlLiteStateMnt
 {
 public:
-    class DLL_EXPORT rows
+    class SQL_EXPORT rows
     {
     public:
-        class DLL_EXPORT getstream
+        class SQL_EXPORT getstream
         {
         public:
             getstream(rows* rws, int idx);
@@ -318,7 +328,7 @@ public:
         sqlite3_stmt* pStmt_;
     };
 
-    class DLL_EXPORT query_iterator
+    class SQL_EXPORT query_iterator
         : public std::iterator<std::input_iterator_tag, rows>
     {
     public:
@@ -353,7 +363,7 @@ public:
     iterator end(void);
 };
 
-class DLL_EXPORT SqlLiteTransactionBase
+class SQL_EXPORT SqlLiteTransactionBase
 {
 protected:
     SqlLiteTransactionBase() = default;
@@ -363,7 +373,7 @@ protected:
     X_NO_ASSIGN(SqlLiteTransactionBase);
 };
 
-class DLL_EXPORT SqlLiteTransaction : public SqlLiteTransactionBase
+class SQL_EXPORT SqlLiteTransaction : public SqlLiteTransactionBase
 {
     X_NO_COPY(SqlLiteTransaction);
     X_NO_ASSIGN(SqlLiteTransaction);
