@@ -54,8 +54,10 @@ size_t XPakFile::read(void* pBuffer, size_t length)
     }
     else
     {
-        // read from disk o.o
-        X_ASSERT_NOT_IMPLEMENTED();
+        auto op = pPak_->pFile->readAsync(pBuffer, pakLength, pakPos);
+        auto bytesRead = op.waitUntilFinished();
+
+        pakLength = bytesRead;
     }
 
     return pakLength;
