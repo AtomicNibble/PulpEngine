@@ -83,7 +83,7 @@ namespace
     {
         X_LOG0("ImgTool", "Args:");
         X_LOG0("ImgTool", "^6-if^7		(input file) ^1required");
-        X_LOG0("ImgTool", "^6-of^7		(output file, default: file + algo) ^9not-required");
+        X_LOG0("ImgTool", "^6-of^7		(output file, default: file + fmt ext) ^9not-required");
         X_LOG0("ImgTool", "^6-dim^7		(dimensions) ^9not-required");
         X_LOG0("ImgTool", "^6-fmt^7		(output file format) ^9not-required");
     }
@@ -140,6 +140,10 @@ namespace
 
                 char buf[64];
                 outputFileFmt = texture::Util::ImgFileFmtFromStr(core::strUtil::Convert(pOutFmt, buf));
+                if (outputFileFmt == ImgFileFormat::UNKNOWN) {
+                    X_LOG0("ImgTool", "Unknown extension: \"%ls\"", pOutFmt);
+                    return false;
+                }
             }
         }
 
