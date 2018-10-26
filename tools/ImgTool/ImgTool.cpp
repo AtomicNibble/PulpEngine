@@ -158,7 +158,7 @@ namespace
 
         // output exists?
         if (gEnv->pFileSys->fileExistsOS(outFile)) {
-            return 1;
+            return false;
         }
 
         X_LOG0("ImgTool", "Loading: \"%ls\"", inFile.c_str());
