@@ -802,6 +802,8 @@ namespace Util
                 return JPG::XTexLoaderJPG::EXTENSION;
             case ImgFileFormat::PSD:
                 return PSD::XTexLoaderPSD::EXTENSION;
+            case ImgFileFormat::UNKNOWN:
+                return "";
 
             default:
                 X_ASSERT_UNREACHABLE();
