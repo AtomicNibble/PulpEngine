@@ -65,7 +65,7 @@ xcopy /y /i /s /e /d "core_assets\config" "build\core_assets\config"
 REM xcopy /y /i /s /e /d "core_assets\levels" "build\core_assets\levels"
 xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 REM xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
-xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
+REM xcopy /y /i /s /e /d "core_assets\shaders" "build\core_assets\shaders"
 REM xcopy /y /i /s /e /d "core_assets\scripts" "build\core_assets\scripts"
 REM xcopy /y /i /s /e /d "core_assets\menus" "build\core_assets\menus"
 
