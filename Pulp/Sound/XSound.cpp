@@ -405,29 +405,8 @@ bool XSound::init(void)
 
     vars_.applyVolume();
 
-    AKRESULT res;
-
-
-    // Register the main listener.
-    res = AK::SoundEngine::RegisterGameObj(LISTNER_OBJECT_ID, "Default Listener");
-    if (res != AK_Success) {
-        AkResult::Description desc;
-        X_ERROR("SoundSys", "Error creating listner object. %s", AkResult::ToString(res, desc));
-        return false;
-    }
-    
-    res = AK::SoundEngine::SetDefaultListeners(&LISTNER_OBJECT_ID, 1);
-    if (res != AK_Success) {
-        AkResult::Description desc;
-        X_ERROR("SoundSys", "Error setting default listners. %s", AkResult::ToString(res, desc));
-        return false;
-    }
-
-    // register a object for stuff with no position.
-    res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
-    if (res != AK_Success) {
-        AkResult::Description desc;
-        X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
+    if (!registerBaseObjects()) {
+        X_ERROR("SoundSys", "Failed to register base objects");
         return false;
     }
 
@@ -1010,6 +989,36 @@ bool XSound::unRegisterObject(SndObjectHandle object)
     return true;
 }
 
+bool XSound::registerBaseObjects(void)
+{
+    AKRESULT res;
+
+    // Register the main listener.
+    res = AK::SoundEngine::RegisterGameObj(LISTNER_OBJECT_ID, "Default Listener");
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error creating listner object. %s", AkResult::ToString(res, desc));
+        return false;
+    }
+
+    res = AK::SoundEngine::SetDefaultListeners(&LISTNER_OBJECT_ID, 1);
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error setting default listners. %s", AkResult::ToString(res, desc));
+        return false;
+    }
+
+    // register a object for stuff with no position.
+    res = AK::SoundEngine::RegisterGameObj(GLOBAL_OBJECT_ID, "GlobalObject");
+    if (res != AK_Success) {
+        AkResult::Description desc;
+        X_ERROR("SoundSys", "Error creating global object. %s", AkResult::ToString(res, desc));
+        return false;
+    }
+
+    return true;
+}
+
 void XSound::unRegisterAll(void)
 {
     core::CriticalSection::ScopedLock lock(cs_);
@@ -1027,6 +1036,10 @@ void XSound::unRegisterAll(void)
     objects_.clear();
     culledObjects_.clear();
     occlusion_.clear();
+
+    if (!registerBaseObjects()) {
+        X_ERROR("SoundSys", "Failed to re-register base objects");
+    }
 }
 
 void XSound::freeDangling(void)

@@ -183,6 +183,8 @@ private:
     void registerObjectSndEngine(SoundObject* pObject);
     void unregisterObjectSndEngine(SoundObject* pObject);
 
+    bool registerBaseObjects(void);
+
 private:
     void freeDangling(void);
     SoundObject* allocObject(void);
