@@ -54,6 +54,7 @@ size_t XPakFile::read(void* pBuffer, size_t length)
     }
     else
     {
+        // TODO: ban this?
         auto op = pPak_->pFile->readAsync(pBuffer, pakLength, pakPos);
         auto bytesRead = op.waitUntilFinished();
 
