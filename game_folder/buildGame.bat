@@ -73,8 +73,8 @@ del /s /q /f "build\core_assets\sound\*.xml"
 del /s /q /f "build\core_assets\sound\*.json"
 del /s /q /f "build\core_assets\sound\*.txt"
 
-rmdir /s /q "build\core_assets\shaders\old"
-rmdir /s /q "build\core_assets\shaders\temp"
+REM rmdir /s /q "build\core_assets\shaders\old"
+REM rmdir /s /q "build\core_assets\shaders\temp"
 
 del /s /q game.7z
 
