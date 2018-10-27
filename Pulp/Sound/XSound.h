@@ -111,7 +111,7 @@ class XSound : public ISound
 
 public:
     XSound(core::MemoryArenaBase* arena);
-    ~XSound() X_OVERRIDE;
+    ~XSound() X_FINAL;
 
     void registerVars(void) X_FINAL;
     void registerCmds(void) X_FINAL;
