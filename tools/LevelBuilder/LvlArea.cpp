@@ -427,17 +427,17 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
             level::Vertex vert;
 
             if (j == 0) {
-                const Vec5f vec = pWinding->at(0);
+                const Vec5f& vec = pWinding->at(0);
                 vert.pos = vec.asVec3();
                 vert.texcoord[0] = Vec2f(vec.s, vec.t);
             }
             else if (j == 1) {
-                const Vec5f vec = pWinding->at(i - 1);
+                const Vec5f& vec = pWinding->at(i - 1);
                 vert.pos = vec.asVec3();
                 vert.texcoord[0] = Vec2f(vec.s, vec.t);
             }
             else {
-                const Vec5f vec = pWinding->at(i);
+                const Vec5f& vec = pWinding->at(i);
                 vert.pos = vec.asVec3();
                 vert.texcoord[0] = Vec2f(vec.s, vec.t);
             }
