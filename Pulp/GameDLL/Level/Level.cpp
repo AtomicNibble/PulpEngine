@@ -21,6 +21,7 @@ Level::Level(physics::IScene* pScene, engine::IWorld3D* p3DWorld,
     stringTable_(arena),
     entSys_(entSys),
     loaded_(false),
+    entDescLoadedSignal_(false),
     p3DWorld_(p3DWorld),
     pScene_(pScene)
 {
@@ -57,6 +58,12 @@ void Level::beginLoad(const MapNameStr& name)
     open.path = path_;
 
     pFileSys_->AddIoRequestToQue(open);
+
+    // add a request for the ent desc.
+    open.callback.Bind<Level, &Level::IoRequestCallbackEntDesc>(this);
+    open.path.setExtension("json");
+
+    pFileSys_->AddIoRequestToQue(open);
 }
 
 void Level::clear(void)
@@ -72,6 +79,11 @@ void Level::clear(void)
 
     levelData_.reset();
     stringTable_.free();
+
+    entDescSize_ = 0;
+    entDescData_.reset();
+
+    entDescLoadedSignal_.clear();
 }
 
 void Level::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
@@ -108,6 +120,55 @@ void Level::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase
         else {
             pJobSys_->CreateMemberJobAndRun<Level>(this, &Level::processData_job, pFile JOB_SYS_SUB_ARG(core::profiler::SubSys::GAME));
         }
+    }
+    else {
+        X_ASSERT_UNREACHABLE();
+    }
+}
+
+void Level::IoRequestCallbackEntDesc(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+    core::XFileAsync* pFile, uint32_t bytesTransferred)
+{
+    core::IoRequest::Enum requestType = pRequest->getType();
+
+    if (requestType == core::IoRequest::OPEN) {
+        if (!pFile) {
+            X_WARNING("Level", "Failed to open level ent desc");
+            entDescLoadedSignal_.raise();
+            return;
+        }
+
+        auto size = safe_static_cast<size_t>(pFile->fileSize());
+        X_ASSERT(size > 0, "Handle size been zero")();
+        X_ASSERT(arena_->isThreadSafe(), "Arena needs to be thread safe")(arena_->isThreadSafe());
+
+        entDescSize_ = size;
+        entDescData_ = core::makeUnique<char[]>(arena_, size, 64);
+
+        core::IoRequestRead read;
+        read.callback.Bind<Level, &Level::IoRequestCallbackEntDesc>(this);
+        read.pFile = pFile;
+        read.dataSize = safe_static_cast<uint32_t>(size);
+        read.offset = 0;
+        read.pBuf = entDescData_.ptr();
+
+        fileSys.AddIoRequestToQue(read);
+    }
+    else if (requestType == core::IoRequest::READ) {
+
+        if (!bytesTransferred) {
+            entDescData_.reset();
+        }
+
+        // we are done :D
+        entDescLoadedSignal_.raise();
+
+        core::IoRequestClose req;
+        req.pFile = pFile;
+        fileSys.AddIoRequestToQue(req);
+    }
+    else {
+        X_ASSERT_UNREACHABLE();
     }
 }
 
@@ -244,22 +305,24 @@ bool Level::processEnts(void)
             reinterpret_cast<const char*>(file.getBufferEnd()));
     }
 
-    core::XFileMemScoped entFile;
+    // wait for the ent desc to finish loading.
+    entDescLoadedSignal_.wait();
 
-    // use name of level.
-    auto entDescPath = path_;
-    entDescPath.setExtension("json");
+    if (entDescData_) {
 
-    if (!entFile.openFile(entDescPath, core::FileFlag::READ | core::FileFlag::SHARE)) {
-        return false;
+        const char* pBegin = entDescData_.ptr();
+        const char* pEnd = pBegin + entDescSize_;
+
+        if (!entSys_.loadEntites2(pBegin, pEnd)) {
+
+            return false;
+        }
+
+        entDescSize_ = 0;
+        entDescData_.reset();
     }
 
-    entSys_.loadEntites2(
-        reinterpret_cast<const char*>(entFile->getBufferStart()),
-        reinterpret_cast<const char*>(entFile->getBufferEnd()));
-
     entSys_.postLoad();
-
     return true;
 }
 

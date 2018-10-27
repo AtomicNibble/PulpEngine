@@ -2,6 +2,7 @@
 
 #include <Util\UniquePointer.h>
 #include <String\GrowingStringTable.h>
+#include <Threading\Signal.h>
 
 #include <Ilevel.h>
 
@@ -50,6 +51,8 @@ public:
 private:
     void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
+    void IoRequestCallbackEntDesc(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+        core::XFileAsync* pFile, uint32_t bytesTransferred);
 
     void processHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
     void processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::V2::Job* pJob, void* pData);
@@ -69,6 +72,10 @@ private:
     core::Path<char> path_;
     level::FileHeader fileHdr_;
     core::UniquePointer<uint8_t[]> levelData_;
+
+    size_t entDescSize_;
+    core::UniquePointer<char[]> entDescData_;
+    core::Signal entDescLoadedSignal_;
 
     engine::IWorld3D* p3DWorld_;
     physics::IScene* pScene_;
