@@ -125,6 +125,8 @@ void Level::processHeader_job(core::V2::JobSystem& jobSys, size_t threadIdx, cor
         return;
     }
 
+    X_ASSERT(arena_->isThreadSafe(), "Arena needs to be thread safe")(arena_->isThreadSafe());
+
     // allocate buffer for the file data.
     levelData_ = core::makeUnique<uint8_t[]>(arena_, fileHdr_.totalDataSize, 64);
 
