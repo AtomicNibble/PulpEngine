@@ -237,10 +237,12 @@ namespace mapFile
             for (size_t j = 0; j < pWinding->getNumPoints(); j++) {
                 // gets me position from 0,0 from 2d plane.
                 Vec5f& point = pWinding->operator[](j);
-                Vec3f translated(point.asVec3() + ent.origin);
+                const Vec3f pointWorld(point.asVec3() + ent.origin);
 
-                point.s = mappingVecs[0][3] + mappingVecs[0].dot(translated);
-                point.t = mappingVecs[1][3] + mappingVecs[1].dot(translated);
+                point.s = mappingVecs[0][3] + mappingVecs[0].dot(pointWorld);
+                point.t = mappingVecs[1][3] + mappingVecs[1].dot(pointWorld);
+
+
             }
         }
 
