@@ -320,9 +320,8 @@ void samplerDescFromState(SamplerState state, SamplerDesc& desc)
         case TexRepeat::NO_TILE:
             desc.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_CLAMP);
             break;
-
         case TexRepeat::TILE_BOTH:
-            desc.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_MIRROR);
+            desc.setTextureAddressMode(D3D12_TEXTURE_ADDRESS_MODE_WRAP);
             break;
         case TexRepeat::TILE_HOZ:
             desc.AddressU = D3D12_TEXTURE_ADDRESS_MODE_WRAP;
