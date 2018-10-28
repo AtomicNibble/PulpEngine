@@ -51,6 +51,7 @@ namespace mapFile
             Vec2f matRepeate;
             Vec2f shift;
             float rotate;
+            float scale;
         };
 
     public:

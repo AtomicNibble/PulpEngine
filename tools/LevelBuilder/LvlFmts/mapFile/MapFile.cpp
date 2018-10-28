@@ -222,8 +222,7 @@ namespace mapFile
         // rotation clockwise in degrees(neg is anti)
         rotate = src.ParseFloat();
 
-        // dunno what this value is, goat value?
-        src.ParseFloat();
+        scale = src.ParseFloat();
         return true;
     }
 
