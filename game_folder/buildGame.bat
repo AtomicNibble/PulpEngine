@@ -61,7 +61,7 @@ xcopy /y /d "..\3rdparty\bin\x64\ispc_texcomp.dll" "build"
 
 rem some assets.. !
 xcopy /y /d "core_assets\*.apak" "build\core_assets"
-xcopy /y /i /s /e /F "core_assets\config\default.cfg" "build\core_assets\config\default.cfg"
+xcopy /S /Q /Y /F "core_assets\config\default.cfg" "build\core_assets\config\"
 REM xcopy /y /i /s /e /d "core_assets\levels" "build\core_assets\levels"
 xcopy /y /i /s /e /d "core_assets\sound" "build\core_assets\sound"
 REM xcopy /y /i /s /e /d "core_assets\techdefs" "build\core_assets\techdefs"
