@@ -29,6 +29,7 @@ Game:
   ✔ Fix ammo been above clip size on spawn. @done (18-10-20 14:20)
  ☐ Support setting max store counts for each ammo type. Currently it's same for all types.
 
+ ✔ Fix sound not working when reload level. @done (18-10-27 12:28)
 
   Netorking:
 
