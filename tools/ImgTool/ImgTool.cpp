@@ -158,7 +158,8 @@ namespace
 
         // output exists?
         if (gEnv->pFileSys->fileExistsOS(outFile)) {
-            return false;
+            X_WARNING("ImgTool", "Target already exsists skipping");
+            return true;
         }
 
         X_LOG0("ImgTool", "Loading: \"%ls\"", inFile.c_str());
