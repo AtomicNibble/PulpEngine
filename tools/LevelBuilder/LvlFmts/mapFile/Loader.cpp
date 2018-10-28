@@ -231,8 +231,12 @@ namespace mapFile
             const Vec2f& shift = mat.shift;
             const float& rotate = mat.rotate;
 
+            // creates world-to-texture mapping vecs
             Vec4f mappingVecs[2];
             QuakeTextureVecs(plane, shift, rotate, repeate, mappingVecs);
+
+            Vec2f minUv = { 99999, 99999 };
+            Vec2f maxUv = { -99999, -99999 };
 
             for (size_t j = 0; j < pWinding->getNumPoints(); j++) {
                 // gets me position from 0,0 from 2d plane.
@@ -242,8 +246,35 @@ namespace mapFile
                 point.s = mappingVecs[0][3] + mappingVecs[0].dot(pointWorld);
                 point.t = mappingVecs[1][3] + mappingVecs[1].dot(pointWorld);
 
-
+                minUv.x = core::Min(minUv.x, point.s);
+                minUv.y = core::Min(minUv.y, point.t);
+                maxUv.x = core::Max(maxUv.x, point.s);
+                maxUv.y = core::Max(maxUv.y, point.t);
             }
+
+#if 1
+            // move towards zero.
+            Vec2f midUv;
+            midUv.x = (maxUv.x + minUv.x) * 0.5f;
+            midUv.y = (maxUv.y + minUv.y) * 0.5f;
+
+            Vec2i uvShift;
+            uvShift.x = static_cast<int>(midUv.x - 0.5f);
+            uvShift.y = static_cast<int>(midUv.y - 0.5f);
+
+            if (uvShift.x != 0 || uvShift.y != 0)
+            {
+                Vec2i uvShiftf;
+                uvShiftf.x = uvShift.x;
+                uvShiftf.y = uvShift.y;
+
+                for (size_t j = 0; j < pWinding->getNumPoints(); j++) {
+                    Vec5f& vert = pWinding->operator[](j);
+                    vert.s -= uvShiftf[0];
+                    vert.t -= uvShiftf[1];
+                }
+            }
+#endif
         }
 
         return true;
