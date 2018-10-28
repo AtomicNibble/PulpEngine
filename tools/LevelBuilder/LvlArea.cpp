@@ -424,27 +424,23 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
 
     for (size_t i = 2; i < numPoints; i++) {
         for (size_t j = 0; j < 3; j++) {
-            level::Vertex vert;
 
+            size_t idx = i;
             if (j == 0) {
-                const Vec5f& vec = pWinding->at(0);
-                vert.pos = vec.asVec3();
-                vert.texcoord[0] = Vec2f(vec.s, vec.t);
+                idx = 0;
             }
             else if (j == 1) {
-                const Vec5f& vec = pWinding->at(i - 1);
-                vert.pos = vec.asVec3();
-                vert.texcoord[0] = Vec2f(vec.s, vec.t);
+                idx = i - 1;
             }
-            else {
-                const Vec5f& vec = pWinding->at(i);
-                vert.pos = vec.asVec3();
-                vert.texcoord[0] = Vec2f(vec.s, vec.t);
-            }
+            
+            const Vec5f& vec = pWinding->at(idx);
 
+            level::Vertex vert;
+            vert.pos = vec.asVec3();
+            vert.texcoord[0] = Vec2f(vec.s, vec.t);
             // copy normal
             vert.normal = plane.getNormal();
-            vert.color = Col_White;
+            vert.color = Color8u(255,255,255,255);
 
             pSubMesh->addVert(vert);
         }
