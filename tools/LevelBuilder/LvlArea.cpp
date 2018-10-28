@@ -57,7 +57,7 @@ void ColTriMeshData::addBrush(const LvlBrush& brush)
                 }
 
                 if (v == verts_.size()) {
-                    verts_.append(pos);
+                    verts_.emplace_back(pos);
                     facesIdx[j] = safe_static_cast<model::Index>(v);
                 }
             }
@@ -112,7 +112,7 @@ void ColConvexMeshData::addBrush(const LvlBrush& brush)
         const size_t numPoints = pWinding->getNumPoints();
 
         for (size_t i = 0; i < numPoints; i++) {
-            verts_.append(pWinding->at(i).asVec3());
+            verts_.emplace_back(pWinding->at(i).asVec3());
         }
     }
 }
