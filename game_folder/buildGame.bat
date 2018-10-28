@@ -22,6 +22,7 @@ REM build all shader perms...
 
 REM build levels...
 "%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\test01.map +mod core +nopause
+"%ABS_PATH%\engine_LevelBuilder.exe" +if art_source\maps\text_cord_test.map +mod core +nopause
 
 REM Base packs
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\init %LINKER_ARGS% +al asset_lists/init.assList +memory
@@ -32,6 +33,7 @@ REM Base packs
 
 REM level packs
 "%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\test01 %LINKER_ARGS% +lvl test01
+"%ABS_PATH%\engine_Linker.exe" +mode build +of core_assets\text_cord_test %LINKER_ARGS% +lvl text_cord_test
 
 REM build sound packs...
 "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
