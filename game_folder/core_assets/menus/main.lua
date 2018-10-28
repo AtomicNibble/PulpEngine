@@ -20,10 +20,15 @@ local function Update(dt)
     ui.text("Insert fancy main menu here", Color(255,255 * t,255 * t));
     --ui.popFont();
 
-    if ui.button("SOLO") then
+    if ui.button("SOLO test01") then
         core.exec("map test01");
         ui.close();
     end
+    if ui.button("SOLO text_cord_test") then
+        core.exec("map text_cord_test");
+        ui.close();
+    end
+
     if ui.button("ONLINE") then
         core.log("nope!")
     end
