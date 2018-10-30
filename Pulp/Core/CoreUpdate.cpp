@@ -107,7 +107,7 @@ bool XCore::Update(void)
     // top job that we can use to wait for the chain of jobs to complete.
     Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
     {
-        // start a job to handler any file chnages and create relaod child jobs.
+        // start a job to handler any file changes and create reload child jobs.
         Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
         jobSys.Run(pDirectoryWatchProcess);
 
