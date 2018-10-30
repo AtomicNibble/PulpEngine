@@ -33,12 +33,12 @@ extern "C" {
     // Vorbis
     void* __cdecl vorbis_malloc(size_t size)
     {
-        return g_VideoVorbisArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        return g_VideoVorbisArena->allocate(size, sizeof(uintptr_t), 0 X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
     }
 
     void* __cdecl vorbis_calloc(size_t count, size_t size)
     {
-        void* pMem = g_VideoVorbisArena->allocate(size * count, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        void* pMem = g_VideoVorbisArena->allocate(size * count, sizeof(uintptr_t), 0 X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
         std::memset(pMem, 0, count * size);
         return pMem;
     }
@@ -51,7 +51,7 @@ extern "C" {
 
         size_t blockSize = g_VideoVorbisArena->getSize(pBlock);
 
-        void* pMem = g_VideoArena->allocate(size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        void* pMem = g_VideoArena->allocate(size, sizeof(uintptr_t), 0 X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
         std::memcpy(pMem, pBlock, blockSize);
         return pMem;
     }
@@ -66,7 +66,7 @@ extern "C" {
     // vpx
     void* __cdecl vpx_memalign(size_t align, size_t size)
     {   
-        return g_VideoVpxArena->allocate(size, align, 0, X_SOURCE_INFO);
+        return g_VideoVpxArena->allocate(size, align, 0 X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
     }
 
     void* __cdecl vpx_malloc(size_t size)
@@ -76,7 +76,7 @@ extern "C" {
 
     void* __cdecl vpx_calloc(size_t num, size_t size)
     {
-        void* pMem = g_VideoVpxArena->allocate(num * size, sizeof(uintptr_t), 0, X_SOURCE_INFO);
+        void* pMem = g_VideoVpxArena->allocate(num * size, sizeof(uintptr_t), 0 X_SOURCE_INFO_MEM_CB(X_SOURCE_INFO));
         std::memset(pMem, 0, num * size);
         return pMem;
     }
