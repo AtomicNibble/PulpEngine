@@ -624,7 +624,9 @@ Directory* xFileSys::addDirInteral(const PathWT& osPath)
     ++numDir_;
 
     // add hotreload dir.
+#if X_ENABLE_DIR_WATCHER
     gEnv->pDirWatcher->addDirectory(fixedPath);
+#endif // !X_ENABLE_DIR_WATCHER
 
     if (!loadPacks_) {
         return search->pDir;

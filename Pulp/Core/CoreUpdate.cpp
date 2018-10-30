@@ -108,8 +108,10 @@ bool XCore::Update(void)
     Job* pSyncJob = jobSys.CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::CORE));
     {
         // start a job to handler any file changes and create reload child jobs.
-        Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
-        jobSys.Run(pDirectoryWatchProcess);
+#if X_ENABLE_DIR_WATCHER
+            Job* pDirectoryWatchProcess = jobSys.CreateMemberJobAsChild<XCore>(pSyncJob, this, &XCore::Job_DirectoryWatcher, nullptr JOB_SYS_SUB_ARG(core::profiler::SubSys::CORE));
+            jobSys.Run(pDirectoryWatchProcess);
+#endif // !X_ENABLE_DIR_WATCHER
 
     }
 

@@ -108,7 +108,11 @@ XCore::XCore() :
 {
     X_ASSERT_NOT_NULL(g_coreArena);
 
+#if X_ENABLE_DIR_WATCHER
     pDirWatcher_ = X_NEW(core::XDirectoryWatcher, g_coreArena, "CoreDirectoryWatcher")(g_coreArena);
+#else
+    pDirWatcher_ = nullptr;
+#endif // !X_ENABLE_DIR_WATCHER
 
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
     pCoreEventDispatcher_->RegisterListener(this);
