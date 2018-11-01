@@ -23,11 +23,10 @@ SessionVars::SessionVars()
 void SessionVars::registerVars(void)
 {
     ADD_CVAR_REF("net_lobby_debug", lobbyDebug_, lobbyDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Draw lobby debug");
-
-    ADD_CVAR_REF("net_draw_lobby_debug", drawLobbyDebug_, drawLobbyDebug_, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Enable lobby debug");
 
+    ADD_CVAR_REF("net_draw_lobby_debug", drawLobbyDebug_, drawLobbyDebug_, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Draw lobby debug");
 
     ADD_CVAR_REF("net_connect_attemps", connectionAttemps_, connectionAttemps_, 0, 128, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Number of connection attemps to make");
