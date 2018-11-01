@@ -140,27 +140,6 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
 
     core::string name(pMtlName);
 
-    if (name == "caulk") {
-        name = "floor/tiles/tiles02";
-    }
-    if (name == "berlin_floors_marble_tiles_bank_dry") {
-        name = "floor/tiles/tiles07";
-    }
-    if (name == "berlin_wall_plaster_two_tone_blue") {
-        name = "wall/brick/brick05";
-    }
-
-
-    if (name == "berlin_floors_concrete_tile4" || name == "berlin_ceilings_metal2") //|| name == "floor/concrete/sidewalk")
-    {
-        //	name = "floor/concrete/sidewalk";
-        // name = "door/door_with_windows";
-    }
-
-    if (name == "case1024x256") {
-        name = "video/doom_trailer";
-    }
-
     MaterialResource* pMatRes = nullptr;
     {
         core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
