@@ -99,6 +99,10 @@ namespace mapFile
         }
 
         // rotate axis
+        if (rotate < 0.f) {
+            rotate += 360.f;
+        }
+
         float ang, sinv, cosv;
         if (rotate == 0.f) {
             sinv = 0.f;
