@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(net)
 class SystemAddress
 {
 public:
-    static const char PORT_DELINEATOR = ':';
+    static const char PORT_DELIMITER = ':';
 
 public:
     SystemAddress();

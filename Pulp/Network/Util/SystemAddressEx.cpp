@@ -210,7 +210,7 @@ bool SystemAddressEx::fromIP(const IPStr& ip, char portDelineator, IpVersion::En
 
 bool SystemAddressEx::fromIP(const IPStr& ip, Port port, IpVersion::Enum ipVersion)
 {
-    bool res = fromString(ip.begin(), ip.end(), false, PORT_DELINEATOR, ipVersion);
+    bool res = fromString(ip.begin(), ip.end(), false, PORT_DELIMITER, ipVersion);
     setPortFromHostByteOrder(port);
     return res;
 }
@@ -222,7 +222,7 @@ bool SystemAddressEx::fromHost(const HostStr& host, char portDelineator, IpVersi
 
 bool SystemAddressEx::fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion)
 {
-    bool res = fromString(host.begin(), host.end(), true, PORT_DELINEATOR, ipVersion);
+    bool res = fromString(host.begin(), host.end(), true, PORT_DELIMITER, ipVersion);
     setPortFromHostByteOrder(port);
     return res;
 }

@@ -25,10 +25,10 @@ public:
 
     const char* toString(IPStr& strBuf, bool incPort = true) const;
 
-    bool fromIP(const IPStr& ip, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
+    bool fromIP(const IPStr& ip, char portDelineator = PORT_DELIMITER, IpVersion::Enum ipVersion = IpVersion::Any);
     bool fromIP(const IPStr& ip, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
 
-    bool fromHost(const HostStr& host, char portDelineator = PORT_DELINEATOR, IpVersion::Enum ipVersion = IpVersion::Any);
+    bool fromHost(const HostStr& host, char portDelineator = PORT_DELIMITER, IpVersion::Enum ipVersion = IpVersion::Any);
     bool fromHost(const HostStr& host, Port port, IpVersion::Enum ipVersion = IpVersion::Any);
 
     static bool resolve(const HostStr& hostStr, bool isHost, AddressArr& address, IpVersion::Enum ipVersion);

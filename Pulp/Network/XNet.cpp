@@ -193,7 +193,7 @@ void XNet::deleteSession(ISession* pISession)
 bool XNet::systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
     SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
-    if (!sa.fromIP(ip, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
+    if (!sa.fromIP(ip, SystemAddressEx::PORT_DELIMITER, ipVersion)) {
         return false;
     }
 
@@ -213,7 +213,7 @@ bool XNet::systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, I
 bool XNet::systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion) const
 {
     SystemAddressEx& sa = static_cast<SystemAddressEx&>(out);
-    if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, ipVersion)) {
+    if (!sa.fromHost(host, SystemAddressEx::PORT_DELIMITER, ipVersion)) {
         return false;
     }
 
@@ -491,7 +491,7 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
     HostStr host(pHost);
 
     SystemAddressEx sa;
-    if (!sa.fromHost(host, SystemAddressEx::PORT_DELINEATOR, IpVersion::Any)) {
+    if (!sa.fromHost(host, SystemAddressEx::PORT_DELIMITER, IpVersion::Any)) {
         return;
     }
 
