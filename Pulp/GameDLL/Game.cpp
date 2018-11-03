@@ -425,51 +425,21 @@ bool XGame::update(core::FrameData& frame)
     else if (status == net::SessionStatus::PartyLobby)
     {
         // party!! at stu's house.
+        // open lobby menu?
+        if (prevStatus_ != net::SessionStatus::PartyLobby)
+        {
+            pMenuHandler_->openMenu("lobby");
+        }
 
 
     }
     else if (status == net::SessionStatus::GameLobby)
     {
-        auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-        auto numUsers = pLobby->getNumUsers();
-        auto freeSlots = pLobby->getNumFreeUserSlots();
-        auto hostIdx = pLobby->getHostPeerIdx();
-        auto& params = pLobby->getMatchParams();
-
-        net::ChatMsg msg;
-        while (pLobby->tryPopChatMsg(msg))
+        if (prevStatus_ != net::SessionStatus::GameLobby)
         {
-            core::DateTimeStamp::Description timeStr;
-            
-            X_LOG0("Chat", "%s: \"%s\"", msg.dateTimeStamp.toString(timeStr), msg.msg.c_str());
+            pMenuHandler_->openMenu("lobby");
         }
 
-        con.col = Col_Floralwhite;
-        con.size = Vec2f(24.f, 24.f);
-        con.flags.Clear();
-
-        // who#s in my lobbyyyyy!!
-        core::StackString512 txt;
-        txt.setFmt("---- GameLobby(%" PRIuS "/%" PRIuS ") ----\n", numUsers, numUsers + freeSlots);
-        
-        for (int32_t i = 0; i < numUsers; i++)
-        {
-            auto handle = pLobby->getUserHandleForIdx(i);
-            
-            net::UserInfo info;
-            pLobby->getUserInfo(handle, info);
-
-            bool isHost = (hostIdx == info.peerIdx);
-
-            txt.appendFmt("\n%s ^8%s ^7peerIdx: ^8%" PRIi32 "^7", isHost ? "H" : "P", info.pName, info.peerIdx);
-        }
-
-        pPrim->drawQuad(800.f, 200.f, 320.f + 320.f, 200.f, Color8u(40,40,40,100));
-        pPrim->drawText(Vec3f(802.f, 202.f, 1.f), con, txt.begin(), txt.end());
-
-        txt.setFmt("Options:\nSlots: %" PRIi32 "\nMap: \"%s\"", params.numSlots, params.mapName.c_str());
-
-        pPrim->drawText(Vec3f(1240.f, 202.f, 1.f), con, txt.begin(), txt.end());
 
     }
     else if (status == net::SessionStatus::Connecting)
