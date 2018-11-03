@@ -1643,16 +1643,11 @@ bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
     return true;
 }
 
-
 bool Lobby::getUserInfo(LobbyUserHandle handle, UserInfo& info) const
 {
-    size_t idx = static_cast<size_t>(handle);
-    auto& user = users_[idx];
-
-    info.pName = user.username.c_str();
-    info.peerIdx = user.peerIdx;
-    info.guid = user.guid;
-    return true;
+    auto idx = static_cast<int32_t>(handle);
+   
+    return getUserInfoForIdx(idx, info);
 }
 
 bool Lobby::tryPopChatMsg(ChatMsg& msg)
