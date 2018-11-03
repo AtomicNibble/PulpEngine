@@ -274,9 +274,9 @@ bool XGame::update(core::FrameData& frame)
 
     auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
-    pSession_->drawDebug(pPrim);
-
     bool blockUserCmd = drawMenu(frame, pPrim);
+
+    pSession_->drawDebug(pPrim);
 
     userCmdGen_.buildUserCmd(blockUserCmd);
 
