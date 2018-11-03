@@ -664,7 +664,7 @@ void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
     auto waitForState = [&](net::SessionStatus::Enum status) {
         while (pSession_->getStatus() != status) {
             pSession_->update();
-      }
+        }
     };
 
     pSession_->quitToMenu();
