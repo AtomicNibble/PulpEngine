@@ -65,6 +65,10 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("createMatch", this, XNet, &XNet::Cmd_createMatch, core::VarFlag::SYSTEM,
         "Create and join a game lobby");
 
+    // TODO: maybe temp?
+    ADD_COMMAND_MEMBER("createLobby", this, XNet, &XNet::Cmd_createLobby, core::VarFlag::SYSTEM,
+        "Create a lobby");
+
     ADD_COMMAND_MEMBER("startMatch", this, XNet, &XNet::Cmd_startMatch, core::VarFlag::SYSTEM,
         "Guess what? yep it starts that match, magic.");
 
@@ -545,6 +549,38 @@ void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
     params.mode = GameMode::SinglePlayer;
     params.flags.Set(MatchFlag::Online);
 
+    pSession->createMatch(params);
+}
+
+void XNet::Cmd_createLobby(core::IConsoleCmdArgs* pCmd)
+{
+    if (sessions_.isEmpty()) {
+        X_ERROR("Net", "Can't createMatch no active session");
+        return;
+    }
+
+    auto* pSession = sessions_.front();
+
+    const char* pMap = "test01";
+
+    if (pCmd->GetArgCount() > 1) {
+        pMap = pCmd->GetArg(1);
+    }
+
+    auto waitForState = [&](net::SessionStatus::Enum status) {
+        while (pSession->getStatus() != status) {
+            pSession->update();
+        }
+    };
+
+    MatchParameters params;
+    params.numSlots = 8;
+    params.mapName.set(pMap);
+    params.mode = GameMode::SinglePlayer;
+    params.flags.Set(MatchFlag::Online);
+
+    pSession->createPartyLobby(params);
+    waitForState(net::SessionStatus::PartyLobby);
     pSession->createMatch(params);
 }
 

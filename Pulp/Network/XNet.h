@@ -80,6 +80,7 @@ private:
     void Cmd_disconnect(core::IConsoleCmdArgs* pCmd);
     void Cmd_createParty(core::IConsoleCmdArgs* pCmd);
     void Cmd_createMatch(core::IConsoleCmdArgs* pCmd);
+    void Cmd_createLobby(core::IConsoleCmdArgs* pCmd);
     void Cmd_startMatch(core::IConsoleCmdArgs* pCmd);
     void Cmd_chat(core::IConsoleCmdArgs* pCmd);
 
