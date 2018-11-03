@@ -30,7 +30,7 @@ local function Update(dt)
     end
 
     if ui.button("ONLINE") then
-        core.log("nope!")
+        ui.open("online")
     end
     if ui.button("SETTINGS") then
         ui.open("settings")

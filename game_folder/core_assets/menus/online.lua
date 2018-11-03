@@ -4,10 +4,6 @@ local function LoadAssets()
 
 end
 
-local function IsHost()
-  return core.getDvarInt("net_host") ~= 0;
-end
-
 local function Update(dt)
 
     local t = ((math.sin(uiTimeMS / 1000) + 1.0) * 0.5)
@@ -15,13 +11,17 @@ local function Update(dt)
     ui.fill(2,2,2,220);
     ui.center();
 
-    ui.list();
 
-    if ui.button("START GAME") then
-        core.exec("startMatch");
+    if ui.button("CREATE LOBBY") then
+        core.exec("createLobby");
     end
+    if ui.button("JOIN LOBBY") then
+        -- core.exec("map text_cord_test");
+        core.log("connect manually")
+    end
+
     if ui.button("BACK") then
-        core.exec("mainMenu");
+        ui.back();
     end
 
 end
