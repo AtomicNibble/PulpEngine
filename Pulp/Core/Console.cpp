@@ -1460,16 +1460,6 @@ bool XConsole::handleInput(const input::InputEvent& event)
         //	ResetAutoCompletion();
     }
 
-    if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        paste();
-        return false;
-    }
-
-    if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
-        copy();
-        return false;
-    }
-
     return processInput(event);
 }
 
@@ -1494,6 +1484,17 @@ bool XConsole::processInput(const input::InputEvent& event)
 
     // consume char input.
     if (event.action == InputState::CHAR) {
+
+        if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+            paste();
+            return true;
+        }
+
+        if (event.keyId == input::KeyId::C && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
+            copy();
+            return true;
+        }
+
         addInputChar(event.inputchar);
         return true;
     }
