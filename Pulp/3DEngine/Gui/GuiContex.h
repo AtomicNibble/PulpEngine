@@ -184,6 +184,9 @@ namespace gui
         bool comboBegin(const char* pLabel, const char* pPreviewValue);
         void comboEnd(void);
 
+        // lists
+        void list(void);
+
         // selectables
         bool selectable(const char* pLabel, bool selected);
 

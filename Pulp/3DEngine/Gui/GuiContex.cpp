@@ -5,6 +5,9 @@
 #include <IInput.h>
 #include <IFrameData.h>
 
+#include <IGame.h>
+#include <INetwork.h>
+
 #include "Drawing\PrimativeContext.h"
 
 X_NAMESPACE_BEGIN(engine)
@@ -598,6 +601,106 @@ namespace gui
     void GuiContex::comboEnd(void)
     {
         endPopUp();
+    }
+
+    void GuiContex::list(void)
+    {
+        // draw a predefined list?
+        // where do we get the data from?
+        // well for predefined lists could just query it.
+
+        // i need the session.
+        // which is in the game.
+
+        Vec2f itemSize(itemWidth_,30);
+
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
+        auto id = getID("list");
+
+        // calculate pos / size
+        auto pos = pWindow->dc.currentPos;
+        Vec2f size;
+        size.x = itemSize.x + (style_.framePadding.x * 2.f);
+        size.y = (net::MAX_PLAYERS * (itemSize.y + style_.itemSpacing.y)) + (style_.framePadding.x * 2.f);
+
+        Rectf r(pos, pos + size);
+
+        addItem(r, id);
+
+        auto txtCtx = txtCtx_;
+        txtCtx.flags.Remove(font::DrawTextFlag::CENTER);
+        txtCtx.flags.Remove(font::DrawTextFlag::CENTER_VER);
+        txtCtx.size = Vec2f(16, 16);
+
+        auto* pLobby = params_.pSession->getLobby(net::LobbyType::Party);
+        auto numUsers = pLobby->getNumUsers();
+
+#if 1
+        auto freeSlots = pLobby->getNumFreeUserSlots();
+        auto hostIdx = pLobby->getHostPeerIdx();
+        auto& params = pLobby->getMatchParams();
+
+        net::ChatMsg msg;
+        while (pLobby->tryPopChatMsg(msg))
+        {
+            core::DateTimeStamp::Description timeStr;
+
+            X_LOG0("Chat", "%s: \"%s\"", msg.dateTimeStamp.toString(timeStr), msg.msg.c_str());
+        }
+
+        // who#s in my lobbyyyyy!!
+        core::StackString512 txt;
+        txt.setFmt("---- GameLobby(%" PRIuS "/%" PRIuS ") ----\n", numUsers, numUsers + freeSlots);
+
+        for (int32_t i = 0; i < numUsers; i++)
+        {
+            auto handle = pLobby->getUserHandleForIdx(i);
+
+            net::UserInfo info;
+            pLobby->getUserInfo(handle, info);
+
+            bool isHost = (hostIdx == info.peerIdx);
+
+            txt.appendFmt("\n%s ^8%s ^7peerIdx: ^8%" PRIi32 "^7", isHost ? "H" : "P", info.pName, info.peerIdx);
+        }
+
+        pPrim->drawQuad(800.f, 200.f, 320.f + 320.f, 200.f, Color8u(40, 40, 40, 100));
+        pPrim->drawText(Vec3f(802.f, 202.f, 1.f), txtCtx, txt.begin(), txt.end());
+
+        txt.setFmt("Options:\nSlots: %" PRIi32 "\nMap: \"%s\"", params.numSlots, params.mapName.c_str());
+
+        pPrim->drawText(Vec3f(1240.f, 202.f, 1.f), txtCtx, txt.begin(), txt.end());
+
+#else
+
+        // draw all the slots.
+        pPrim->drawQuad(r, Col_Aquamarine);
+
+        std::array < Rectf, net::MAX_PLAYERS> itemRects;
+
+        for (int32_t i = 0; i<net::MAX_PLAYERS; i++)
+        {
+            Rectf& itemR = itemRects[i];
+            itemR.x1 = r.x1 + style_.framePadding.x;
+            itemR.x2 = itemR.x1 + itemSize.x;
+            itemR.y1 = r.y1 + style_.framePadding.y + (i * (itemSize.y + style_.itemSpacing.y));
+            itemR.y2 = itemR.y1 + itemSize.y;
+
+            pPrim->drawQuad(itemR, style_.backgroundCol);
+        }
+
+        for (int32_t i = 0; i<num; i++)
+        {
+            net::UserInfo info;
+            pParty->getUserInfoForIdx(i, info);
+            
+            Rectf& itemR = itemRects[i];
+
+            pPrim->drawText(Vec3f(itemR.getUpperLeft()), txtCtx, info.pName);
+        }
+#endif
     }
 
     bool GuiContex::selectable(const char* pLabel, bool selected)
