@@ -27,7 +27,7 @@ namespace gui
         return !stack_.isEmpty();
     }
 
-    void MenuHandler::update(core::FrameData& frame, IPrimativeContext* pIPrim)
+    void MenuHandler::update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pIPrim)
     {
         auto* pPrim = static_cast<PrimativeContext*>(pIPrim);
 
@@ -36,6 +36,7 @@ namespace gui
         }
 
         GuiContex::Params p;
+        p.pSession = params.pSession;
         p.rect.set(0.f, 0.f, static_cast<float>(frame.view.displayRes.x), static_cast<float>(frame.view.displayRes.y));
         p.cursorPos = frame.input.cusorPosClient;
         p.frameDelta = frame.timeInfo.deltas[core::Timer::UI];

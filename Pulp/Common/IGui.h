@@ -6,6 +6,7 @@
 #include <Math\XVector.h>
 
 X_NAMESPACE_DECLARE(core, struct FrameData);
+X_NAMESPACE_DECLARE(net, struct ISession);
 
 X_NAMESPACE_BEGIN(engine)
 
@@ -17,6 +18,10 @@ namespace gui
 
     static const uint32_t MENU_MAX_LOADED = 64;
 
+    struct MenuParams
+    {
+        net::ISession* pSession;
+    };
 
     struct IMenu
     {
@@ -29,7 +34,7 @@ namespace gui
         virtual ~IMenuHandler() = default;
 
         virtual bool isActive(void) const X_ABSTRACT;
-        virtual void update(core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
+        virtual void update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
 
         virtual bool openMenu(const char* pName) X_ABSTRACT;
         virtual void close(void) X_ABSTRACT;

@@ -1,6 +1,7 @@
 #pragma once
 
 
+#include <IGui.h>
 #include <Time\TimeVal.h>
 
 #include <IFont.h>
@@ -20,7 +21,7 @@ namespace gui
         X_DECLARE_ENUM(Mouse)(
             LEFT,
             RIGHT
-            );
+        );
 
         using MouseDownArr = std::array<bool, Mouse::ENUM_COUNT>;
         using ItemWidthStack = core::FixedStack<float, 8>;
@@ -30,7 +31,7 @@ namespace gui
         static const ItemID INVALID_ITEM_ID = static_cast<ItemID>(0);
 
     public:
-        struct Params
+        struct Params : MenuParams
         {
             core::TimeVal frameDelta;
             Vec2f displaySize;
@@ -217,6 +218,7 @@ namespace gui
         ItemID getID(const char* pBegin, const char* pEnd) const;
 
     private:
+        MenuParams params_;
         PrimativeContext* pPrim_;
         Rectf screenRect_;
         font::TextDrawContext txtCtx_;

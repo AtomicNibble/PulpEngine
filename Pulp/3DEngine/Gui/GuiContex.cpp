@@ -143,6 +143,7 @@ namespace gui
 
     void GuiContex::beginFrame(Params& params)
     {
+        params_ = params;
         hoveredId_ = INVALID_ITEM_ID;
 
         screenRect_ = params.rect;

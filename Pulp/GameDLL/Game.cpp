@@ -544,7 +544,9 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
         return false;
     }
 
-    pMenuHandler_->update(frame, pPrim);
+    engine::gui::MenuParams params;
+    params.pSession = pSession_;
+    pMenuHandler_->update(params, frame, pPrim);
     return true;
 }
 
