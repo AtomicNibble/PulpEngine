@@ -83,7 +83,6 @@ LoggerConsoleWritePolicy::LoggerConsoleWritePolicy(const Console& console) :
 {
 }
 
-/// Initializes a custom color table for the console.
 void LoggerConsoleWritePolicy::Init(void)
 {
     CONSOLE_SCREEN_BUFFER_INFOEX InfoEx;
@@ -106,7 +105,6 @@ void LoggerConsoleWritePolicy::Init(void)
     }
 }
 
-/// Empty implementation.
 void LoggerConsoleWritePolicy::Exit(void)
 {
 }
@@ -260,7 +258,6 @@ namespace
 
 }; // namespace
 
-/// Writes a log message to the console.
 void LoggerConsoleWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
@@ -268,7 +265,6 @@ void LoggerConsoleWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t l
     WriteToConsole(console_, LOG_COLOR, line, length, true);
 }
 
-/// Writes a warning message to the console.
 void LoggerConsoleWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
@@ -276,7 +272,6 @@ void LoggerConsoleWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32
     WriteToConsole(console_, WARNING_COLOR, line, length, false);
 }
 
-/// Writes an error message to the console.
 void LoggerConsoleWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
@@ -284,7 +279,6 @@ void LoggerConsoleWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t
     WriteToConsole(console_, ERROR_COLOR, line, length, false);
 }
 
-/// Writes a fatal error message to the console.
 void LoggerConsoleWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
@@ -292,7 +286,6 @@ void LoggerConsoleWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t
     WriteToConsole(console_, FATAL_ERROR_COLOR, line, length, false);
 }
 
-/// Writes an assert message to the console.
 void LoggerConsoleWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
@@ -300,7 +293,6 @@ void LoggerConsoleWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_
     WriteToConsole(console_, ASSERT_COLOR, line, length, false);
 }
 
-/// Writes an assert variable message to the console.
 void LoggerConsoleWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
 {
     CriticalSection::ScopedLock lock(cs_);
