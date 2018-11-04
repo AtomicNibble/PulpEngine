@@ -1339,6 +1339,9 @@
     <ClInclude Include="Platform\Process.h">
       <Filter>Headers\Platform</Filter>
     </ClInclude>
+    <ClInclude Include="Logging\WritePolicies\LoggerFileWritePolicy.h">
+      <Filter>Headers\Logging\WritePolicies</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2111,6 +2114,9 @@
     </ClCompile>
     <ClCompile Include="Platform\win32\Process.cpp">
       <Filter>SourceFiles\Platform\win32</Filter>
+    </ClCompile>
+    <ClCompile Include="Logging\WritePolicies\LoggerFileWritePolicy.cpp">
+      <Filter>SourceFiles\Logging\Policys</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

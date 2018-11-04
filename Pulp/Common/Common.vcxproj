@@ -212,6 +212,7 @@
     <ClInclude Include="Logging\LogMacros.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerConsoleWritePolicy.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerDebuggerWritePolicy.h" />
+    <ClInclude Include="Logging\WritePolicies\LoggerFileWritePolicy.h" />
     <ClInclude Include="Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h" />
     <ClInclude Include="Math\MatrixStack.h" />
     <ClInclude Include="Math\QuatAlgo.h" />
@@ -718,6 +719,7 @@
     <ClCompile Include="Compression\CompressorAlloc.cpp" />
     <ClCompile Include="Compression\DictBuilder.cpp" />
     <ClCompile Include="Hashing\Digest.cpp" />
+    <ClCompile Include="Logging\WritePolicies\LoggerFileWritePolicy.cpp" />
     <ClCompile Include="Math\XColor.cpp" />
     <ClCompile Include="MetaTable.cpp" />
     <ClCompile Include="Platform\win32\Process.cpp" />

@@ -1,56 +1,61 @@
-#include "xLib.h"
-
+#include "EngineCommon.h"
 #include "LoggerFileWritePolicy.h"
 
-#include "FileSystem/File.h"
+#include <IFileSys.h>
+
 
 X_NAMESPACE_BEGIN(core)
 
-xLoggerFileWritePolicy::xLoggerFileWritePolicy(FileSystem* fileSystem, const Pathname& path) :
-    m_fileSystem(fileSystem),
-    m_path(path)
+xLoggerFileWritePolicy::xLoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path) :
+    pFileSystem_(pFileSystem),
+    pFile_(nullptr),
+    path_(path)
 {
 }
 
 void xLoggerFileWritePolicy::Init(void)
 {
-    m_file = m_fileSystem->Open(m_path.c_str(), FileSystem::Mode::WRITE | FileSystem::Mode::RECREATE | FileSystem::Mode::WRITE_FLUSH);
-    m_file->WriteString("");
+    auto mode = FileFlag::WRITE | FileFlag::RECREATE | FileFlag::WRITE_FLUSH;
+
+    pFile_ = pFileSystem_->openFile(path_, mode);
 }
 
 void xLoggerFileWritePolicy::Exit(void)
 {
-    m_fileSystem->Close(m_file);
+    if (pFile_) {
+        pFileSystem_->closeFile(pFile_);
+        pFile_ = nullptr;
+    }
 }
 
 void xLoggerFileWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 void xLoggerFileWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 void xLoggerFileWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 void xLoggerFileWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 void xLoggerFileWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 void xLoggerFileWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
 {
-    m_file->Write(line, length);
+    pFile_->write(line, length);
 }
 
 X_NAMESPACE_END
