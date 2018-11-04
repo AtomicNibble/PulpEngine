@@ -85,6 +85,7 @@ XCore::XCore() :
 
     pVsLogger_(nullptr),
     pConsoleLogger_(nullptr),
+    pFileLogger_(nullptr),
 
     pCpuInfo_(nullptr),
     pCrc32_(nullptr),
@@ -263,6 +264,16 @@ void XCore::ShutDown()
         core::Mem::DeleteAndNull(pProfiler_, g_coreArena);
     }
 #endif // !X_ENABLE_PROFILER
+
+    // clean up file logger, now
+    if (pFileLogger_) {
+
+        if (env_.pLog) {
+            env_.pLog->RemoveLogger(pFileLogger_);
+        }
+
+        X_DELETE(pFileLogger_, g_coreArena);
+    }
 
     if (env_.pFileSys) {
         env_.pFileSys->shutDown();

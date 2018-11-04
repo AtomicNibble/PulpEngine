@@ -141,6 +141,7 @@ private:
     bool InitConsole(const CoreInitParams& initParams);
     bool InitFileSys(const CoreInitParams& startupParams);
     bool InitLogging(const CoreInitParams& startupParams);
+    bool InitFileLogging(const CoreInitParams& startupParams);
     bool InitInput(const CoreInitParams& startupParams);
     bool InitFont(const CoreInitParams& startupParams);
     bool InitSound(const CoreInitParams& startupParams);
@@ -190,6 +191,7 @@ private:
 
     core::LoggerBase* pVsLogger_;
     core::LoggerBase* pConsoleLogger_;
+    core::LoggerBase* pFileLogger_;
 
     core::XTimer time_;
     core::CpuInfo* pCpuInfo_;

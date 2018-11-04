@@ -189,6 +189,7 @@ struct CoreInitParams
     bool bScriptSystem;
     bool bVsLog;
     bool bConsoleLog;
+    bool bFileLog;
     bool bPauseShutdown;
     bool bIsGame;
 
@@ -253,6 +254,7 @@ struct CoreInitParams
         bScriptSystem(false),
         bPauseShutdown(true),
         bIsGame(false),
+        bFileLog(false),
 
 #if X_DEBUG
         bVsLog(true),

@@ -45,6 +45,7 @@
 #include "Logging\FormatPolicies\LoggerFullFormatPolicy.h"
 #include "Logging\WritePolicies\LoggerDebuggerWritePolicy.h"
 #include "Logging\WritePolicies\LoggerConsoleWritePolicy.h"
+#include "Logging\WritePolicies\LoggerFileWritePolicy.h"
 
 #include <Extension\IEngineUnknown.h>
 #include <Extension\IEngineFactory.h>
@@ -103,6 +104,13 @@ namespace
         core::LoggerSimpleFormatPolicy,
         core::LoggerConsoleWritePolicy>
         ConsoleLogger;
+
+    typedef core::Logger<
+        core::LoggerNoFilterPolicy,
+        core::LoggerSimpleFormatPolicy,
+        core::LoggerFileWritePolicy>
+        FileLogger;
+
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////
@@ -393,6 +401,11 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     // #------------------------- FileSystem --------------------
     if (!InitFileSys(startupParams)) {
+        return false;
+    }
+
+    // #------------------------- File Logging -----------------------
+    if (!InitFileLogging(startupParams)) {
         return false;
     }
 
@@ -820,6 +833,28 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
     X_UNUSED(initParams);
 #endif
     return env_.pLog != nullptr;
+}
+
+bool XCore::InitFileLogging(const CoreInitParams& initParams)
+{
+#if X_ENABLE_LOGGING
+    if (env_.pLog && initParams.bFileLog) {
+
+        core::Path<> path("log.txt");
+
+        pFileLogger_ = X_NEW(FileLogger, g_coreArena, "FileLogger")(
+            FileLogger::FilterPolicy(),
+            FileLogger::FormatPolicy(),
+            FileLogger::WritePolicy(env_.pFileSys, path));
+
+        env_.pLog->AddLogger(pFileLogger_);
+    }
+
+#else
+    X_UNUSED(initParams);
+#endif
+
+    return true;
 }
 
 bool XCore::InitConsole(const CoreInitParams& initParams)
