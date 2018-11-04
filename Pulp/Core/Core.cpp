@@ -30,6 +30,7 @@
 
 #include <Console.h>
 
+#include "win32\SystemTimer.h"
 #include "CoreEventDispatcher.h"
 #include <Platform\DirectoryWatcher.h>
 
@@ -632,6 +633,8 @@ void XCore::LogSystemInfo(void) const
         mode.pelsWidth,
         mode.pelsHeight,
         mode.bitsPerPel);
+
+    X_LOG0("Core", "TimerFreq: %" PRIi64, core::SysTimer::GetTickPerSec());
 }
 
 void XCore::ListDisplayDevices(bool verbose) const

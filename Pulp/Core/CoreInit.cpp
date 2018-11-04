@@ -414,9 +414,6 @@ bool XCore::Init(const CoreInitParams& startupParams)
         return false;
     }
 
-    // Dump some info here?
-    X_LOG2("Core", "TimerFreq: %" PRIi64, core::SysTimer::GetTickPerSec());
-
     // #------------------------- Create Console ----------------
     if (!startupParams.isCoreOnly() || startupParams.basicConsole()) {
         env_.pConsole = X_NEW(core::XConsole, g_coreArena, "ConsoleSys");
