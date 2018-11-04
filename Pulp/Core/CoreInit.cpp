@@ -358,8 +358,6 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     X_PROFILE_NO_HISTORY_BEGIN("CoreInit", core::profiler::SubSys::CORE);
 
-    core::SysTimer::Startup();
-
     if (startupParams.loadSymbols()) {
         X_PROFILE_NO_HISTORY_BEGIN("SymResInit", core::profiler::SubSys::CORE);
 
@@ -385,12 +383,18 @@ bool XCore::Init(const CoreInitParams& startupParams)
         return false;
     }
 
-    if (!parseSeed(startupParams.seed)) {
-        return false;
-    }
 
     // #------------------------- Logging -----------------------
     if (!InitLogging(startupParams)) {
+        return false;
+    }
+
+
+    // #------------------------- SysTimerM ------------------------
+    core::SysTimer::Startup();
+
+    // #------------------------- PSRNG ------------------------
+    if (!parseSeed(startupParams.seed)) {
         return false;
     }
 
