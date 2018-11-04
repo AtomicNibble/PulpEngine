@@ -112,6 +112,10 @@ namespace
             options.flags.Set(AssetPak::PakBuilderFlag::HINT_MEMORY);
         }
 
+        if (gEnv->pCore->GetCommandLineArgForVarW(L"timestamp")) {
+            options.flags.Set(AssetPak::PakBuilderFlag::TIMESTAMP);
+        }
+
         char buf[core::Path<char>::BUF_SIZE];
 
         const wchar_t* pAssetList = gEnv->pCore->GetCommandLineArgForVarW(L"al");

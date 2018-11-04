@@ -361,7 +361,10 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
     hdr.size = 0;
     hdr.inflatedSize = 0;
     hdr.numAssets = safe_static_cast<uint32_t>(assets_.size());
-    hdr.modified = core::DateTimeStampSmall::systemDateTime();
+
+    if (flags_.IsSet(PakBuilderFlag::TIMESTAMP)) {
+        hdr.modified = core::DateTimeStampSmall::systemDateTime();
+    }
 
     if (flags_.IsSet(PakBuilderFlag::HINT_MEMORY)) {
         hdr.flags.Set(APakFlag::HINT_MEMORY);

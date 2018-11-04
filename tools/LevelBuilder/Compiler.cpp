@@ -147,7 +147,7 @@ bool Compiler::init(core::string& modName)
     return true;
 }
 
-bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
+bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath, LevelBuilderFlags flags)
 {
     if (core::strUtil::IsEqualCaseInsen("map", path.extension())) {
         X_ERROR("Map", "extension is not valid, must be .map");
@@ -184,7 +184,7 @@ bool Compiler::compileLevel(core::Path<char>& path, core::Path<char>& outPath)
         return false;
     }
 
-    if (!save(ents, outPath)) {
+    if (!save(ents, outPath, flags)) {
         return false;
     }
 
@@ -656,7 +656,7 @@ bool Compiler::createCollisionData(LvlEntity& ent)
     return true;
 }
 
-bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
+bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path, LevelBuilderFlags flags)
 {
     std::array<core::ByteStream, FileNodes::ENUM_COUNT> nodeStreams{
         X_PP_REPEAT_COMMA_SEP(10, g_arena)};
@@ -670,8 +670,11 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path)
     hdr.fourCC = LVL_FOURCC_INVALID;
     hdr.version = LVL_VERSION;
     hdr.datacrc32 = 0;
-    hdr.modified = core::DateTimeStampSmall::systemDateTime();
     hdr.numStrings = safe_static_cast<uint32_t>(stringTable_.numStrings());
+
+    if (flags.IsSet(LevelBuilderFlag::TIMESTAMP)) {
+        hdr.modified = core::DateTimeStampSmall::systemDateTime();
+    }
 
     const LvlEntity& worldEnt = ents[0];
 

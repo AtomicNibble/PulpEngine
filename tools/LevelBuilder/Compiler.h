@@ -14,6 +14,12 @@ X_NAMESPACE_BEGIN(level)
 class ModelCache;
 class MatManager;
 
+X_DECLARE_FLAGS(LevelBuilderFlag)(
+    TIMESTAMP
+);
+
+typedef Flags<LevelBuilderFlag> LevelBuilderFlags;
+
 class Compiler
 {
 #if X_ENABLE_MEMORY_DEBUG_POLICIES
@@ -64,10 +70,10 @@ public:
     ~Compiler();
 
     bool init(core::string& modName);
-    bool compileLevel(core::Path<char>& path, core::Path<char>& outPath);
+    bool compileLevel(core::Path<char>& path, core::Path<char>& outPath, LevelBuilderFlags flags);
 
 private:
-    bool save(const LvlEntsArr& ent, core::Path<char>& path);
+    bool save(const LvlEntsArr& ent, core::Path<char>& path, LevelBuilderFlags flags);
     bool saveAssetList(const LvlEntsArr& ent, const core::Path<char>& path);
     bool processModels(LvlEntsArr& ents);
     bool processModel(LvlEntity& ent);

@@ -127,7 +127,9 @@ namespace
         outPath.removeExtension();
         outPath.replaceSeprators();
 
-        if (!comp.compileLevel(path, outPath)) {
+        level::LevelBuilderFlags flags;
+
+        if (!comp.compileLevel(path, outPath, flags)) {
             return false;
         }
 

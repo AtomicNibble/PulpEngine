@@ -14,7 +14,8 @@ X_DECLARE_FLAGS(PakBuilderFlag)
 (
     COMPRESSION,
     SHARED_DICT,
-    HINT_MEMORY
+    HINT_MEMORY,
+    TIMESTAMP
 );
 
 typedef Flags<PakBuilderFlag> PakBuilderFlags;
