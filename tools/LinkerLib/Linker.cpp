@@ -150,6 +150,11 @@ bool Linker::AddEntDesc(core::Path<char>& inputFile)
 {
     core::Array<uint8_t> data(scratchArea_);
 
+    if (!gEnv->pFileSys->fileExists(inputFile)) {
+        X_WARNING("Ents", "Not ent desc, skipping");
+        return true;
+    }
+
     if (!LoadFile(inputFile, data)) {
         X_ERROR("Ents", "Failed to load ent desc");
         return false;
