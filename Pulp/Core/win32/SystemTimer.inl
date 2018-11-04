@@ -73,7 +73,7 @@ namespace SysTimer
         return static_cast<int64_t>(value * g_NanoToValueDouble);
     }
 
-    X_INLINE int64 GetTickPerSec()
+    X_INLINE int64 GetTickPerSec(void)
     {
         extern int64_t g_Frequency;
         return g_Frequency;

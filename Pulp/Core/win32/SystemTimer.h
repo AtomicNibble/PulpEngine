@@ -42,7 +42,7 @@ namespace SysTimer
     X_INLINE int64_t fromMicroSeconds(int64_t value);
     X_INLINE int64_t fromNanoSeconds(int64_t value);
 
-    X_INLINE int64 GetTickPerSec();
+    X_INLINE int64 GetTickPerSec(void);
 } // namespace SysTimer
 
 #include "SystemTimer.inl"
