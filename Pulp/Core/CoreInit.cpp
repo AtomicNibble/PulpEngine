@@ -392,6 +392,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     // #------------------------- SysTimerM ------------------------
     core::SysTimer::Startup();
+    env_.timerFreq = core::SysTimer::GetTickPerSec();
 
     // #------------------------- PSRNG ------------------------
     if (!parseSeed(startupParams.seed)) {

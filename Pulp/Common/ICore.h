@@ -308,6 +308,8 @@ struct CoreGlobals // obbject is zerod on start.
 
     Vec4i seed;
     core::random::XorShift xorShift;
+    
+    int64_t timerFreq;
 
     X_INLINE CoreGlobals()
     {
@@ -331,6 +333,8 @@ struct CoreGlobals // obbject is zerod on start.
         pDirWatcher = nullptr;
         pArena = nullptr;
         pStrArena = nullptr;
+
+        timerFreq = 0;
 
         client_ = false;
         dedicated_ = false;

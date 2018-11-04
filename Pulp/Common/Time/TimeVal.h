@@ -11,6 +11,7 @@ class TimeVal
 public:
     typedef int64_t TimeType;
 
+public:
     X_INLINE TimeVal();
     explicit X_INLINE TimeVal(const float fSeconds);
     explicit X_INLINE TimeVal(const double fSeconds);
@@ -58,10 +59,10 @@ public:
     X_INLINE static core::TimeVal fromMS(TimeType ms);
 
 private:
-    TimeType time_;
+    X_INLINE static TimeType getFreq(void);
 
-    static const TimeType PRECISION = 3134375; // one second
-                                               //	100000;
+private:
+    TimeType time_;
 };
 
 #include "TimeVal.inl"

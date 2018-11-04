@@ -29,60 +29,60 @@ X_INLINE TimeVal& TimeVal::operator=(const TimeVal& inRhs)
 
 X_INLINE float TimeVal::GetSeconds(void) const
 {
-    return time_ * (1.f / PRECISION);
+    return time_ * (1.f / getFreq());
 }
 
 X_INLINE float TimeVal::GetDifferenceInSeconds(const TimeVal& startTime) const
 {
-    return (time_ - startTime.time_) * (1.f / PRECISION);
+    return (time_ - startTime.time_) * (1.f / getFreq());
 }
 
 X_INLINE void TimeVal::SetSeconds(const float infSec)
 {
-    time_ = (TimeType)(infSec * PRECISION);
+    time_ = (TimeType)(infSec * getFreq());
 }
 
 X_INLINE void TimeVal::SetSeconds(const double infSec)
 {
-    time_ = (TimeType)(infSec * PRECISION);
+    time_ = (TimeType)(infSec * getFreq());
 }
 
 X_INLINE void TimeVal::SetSeconds(const TimeType indwSec)
 {
-    time_ = indwSec * PRECISION;
+    time_ = indwSec * getFreq();
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const int32_t iniMilliSec)
 {
-    constexpr const float scale = (PRECISION / 1000.f);
+    const float scale = (getFreq() / 1000.f);
 
     time_ = static_cast<TimeType>(iniMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const double indMilliSec)
 {
-    constexpr const double scale = (PRECISION / 1000.0);
+    const double scale = (getFreq() / 1000.0);
 
     time_ = static_cast<TimeType>(indMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMilliSeconds(const TimeType indwMilliSec)
 {
-    constexpr const double scale = (PRECISION / 1000.0);
+    const double scale = (getFreq() / 1000.0);
 
     time_ = static_cast<TimeType>(indwMilliSec * scale);
 }
 
 X_INLINE void TimeVal::SetMicroSeconds(const TimeType indwMicroSec)
 {
-    constexpr const double scale = (PRECISION / (1000.0 * 1000.0));
+    const double scale = (getFreq() / (1000.0 * 1000.0));
 
     time_ = static_cast<TimeType>(indwMicroSec * scale);
 }
 
 X_INLINE void TimeVal::SetNanoSeconds(const TimeType indwNanoSec)
 {
-    constexpr const double scale = (PRECISION / (1000.0 * 1000.0 * 1000.0));
+    const double scale = (getFreq() / (1000.0 * 1000.0 * 1000.0));
 
     time_ = static_cast<TimeType>(indwNanoSec * scale);
 }
@@ -90,12 +90,12 @@ X_INLINE void TimeVal::SetNanoSeconds(const TimeType indwNanoSec)
 // Use only for relative value, absolute values suffer a lot from precision loss.
 X_INLINE float TimeVal::GetMilliSeconds(void) const
 {
-    return time_ * (1000.f / PRECISION);
+    return time_ * (1000.f / getFreq());
 }
 
 X_INLINE TimeVal::TimeType TimeVal::GetMilliSecondsAsInt64(void) const
 {
-    return time_ * 1000 / PRECISION;
+    return time_ * 1000 / getFreq();
 }
 
 X_INLINE TimeVal::TimeType TimeVal::GetValue(void) const
@@ -193,4 +193,9 @@ X_INLINE core::TimeVal TimeVal::fromMS(TimeType ms)
     TimeVal val;
     val.SetMilliSeconds(ms);
     return val;
+}
+
+X_INLINE TimeVal::TimeType TimeVal::getFreq(void)
+{
+    return gEnv->timerFreq;
 }
