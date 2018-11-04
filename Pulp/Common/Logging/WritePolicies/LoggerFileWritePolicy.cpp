@@ -7,7 +7,7 @@
 X_NAMESPACE_BEGIN(core)
 
 xLoggerFileWritePolicy::xLoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path) :
-    pFileSystem_(pFileSystem),
+    pFileSystem_(X_ASSERT_NOT_NULL(pFileSystem)),
     pFile_(nullptr),
     path_(path)
 {
