@@ -18,7 +18,7 @@ public:
     Logger(void);
     Logger(const FilterPolicy& filter, const FormatPolicy& formatter, const WritePolicy& writer);
 
-    virtual ~Logger(void);
+    virtual ~Logger(void) X_FINAL;
 
     const FilterPolicy& GetFilterPolicy(void) const;
     const FormatPolicy& GetFormatPolicy(void) const;
