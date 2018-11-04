@@ -40,11 +40,11 @@ Logger<FilterPolicy, FormatPolicy, WritePolicy>::~Logger(void)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, int verbosity, const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, int verbosity, const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::INFO, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, verbosity, format, args)) {
+    if (filter_.Filter(LogType::INFO, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, verbosity, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::INFO, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, verbosity, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::INFO, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, verbosity, pFormat, args);
         writer_.WriteLog(line, length);
     }
 }
@@ -52,11 +52,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoLog(X_SOURCE_INFO_LOG_CA
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::WARNING, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args)) {
+    if (filter_.Filter(LogType::WARNING, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::WARNING, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::WARNING, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args);
         writer_.WriteWarning(line, length);
     }
 }
@@ -64,11 +64,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoWarning(X_SOURCE_INFO_LO
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::ERROR, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args)) {
+    if (filter_.Filter(LogType::ERROR, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ERROR, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ERROR, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args);
         writer_.WriteError(line, length);
     }
 }
@@ -76,11 +76,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoError(X_SOURCE_INFO_LOG_
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* channel, const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pChannel, const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::FATAL, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args)) {
+    if (filter_.Filter(LogType::FATAL, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::FATAL, X_SOURCE_INFO_LOG_CA(sourceInfo) channel, 0, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::FATAL, X_SOURCE_INFO_LOG_CA(sourceInfo) pChannel, 0, pFormat, args);
         writer_.WriteFatal(line, length);
     }
 }
@@ -88,11 +88,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoFatal(X_SOURCE_INFO_LOG_
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, format, args)) {
+    if (filter_.Filter(LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, pFormat, args);
         writer_.WriteAssert(line, length);
     }
 }
@@ -100,11 +100,11 @@ void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssert(X_SOURCE_INFO_LOG
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<class FilterPolicy, class FormatPolicy, class WritePolicy>
-void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* format, va_list args)
+void Logger<FilterPolicy, FormatPolicy, WritePolicy>::DoAssertVariable(X_SOURCE_INFO_LOG_CA(const SourceInfo& sourceInfo) const char* pFormat, va_list args)
 {
-    if (filter_.Filter(LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, format, args)) {
+    if (filter_.Filter(LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, pFormat, args)) {
         LoggerBase::Line line;
-        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, format, args);
+        const uint32_t length = formatter_.Format(line, pLog_->GetIndentation(), LogType::ASSERT, X_SOURCE_INFO_LOG_CA(sourceInfo) "Assert", 0, pFormat, args);
         writer_.WriteAssertVariable(line, length);
     }
 }
