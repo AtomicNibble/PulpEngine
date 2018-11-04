@@ -1384,7 +1384,7 @@ bool XSound::loadPackage(const char* pName)
     AKRESULT res = ioHook_.LoadFilePackage(akName.c_str(), pck.pckID);
     if (res != AK_Success) {
         AkResult::Description desc;
-        X_ERROR("SoundSys", "Failed to load pacakge \"%s\" %s", pName, AkResult::ToString(res, desc));
+        X_ERROR("SoundSys", "Failed to load package \"%s\" %s", pName, AkResult::ToString(res, desc));
         return false;
     }
 
@@ -1397,7 +1397,7 @@ void XSound::unloadAllPackages(void)
     AKRESULT res = ioHook_.UnloadAllFilePackages();
     if (res != AK_Success) {
         AkResult::Description desc;
-        X_ERROR("SoundSys", "Failed to unload pacakges %s", AkResult::ToString(res, desc));
+        X_ERROR("SoundSys", "Failed to unload packages %s", AkResult::ToString(res, desc));
     }
 }
 
