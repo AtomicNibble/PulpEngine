@@ -6,21 +6,21 @@
 
 X_NAMESPACE_BEGIN(core)
 
-xLoggerFileWritePolicy::xLoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path) :
+LoggerFileWritePolicy::LoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path) :
     pFileSystem_(X_ASSERT_NOT_NULL(pFileSystem)),
     pFile_(nullptr),
     path_(path)
 {
 }
 
-void xLoggerFileWritePolicy::Init(void)
+void LoggerFileWritePolicy::Init(void)
 {
     auto mode = FileFlag::WRITE | FileFlag::RECREATE | FileFlag::WRITE_FLUSH;
 
     pFile_ = pFileSystem_->openFile(path_, mode);
 }
 
-void xLoggerFileWritePolicy::Exit(void)
+void LoggerFileWritePolicy::Exit(void)
 {
     if (pFile_) {
         pFileSystem_->closeFile(pFile_);
@@ -28,32 +28,32 @@ void xLoggerFileWritePolicy::Exit(void)
     }
 }
 
-void xLoggerFileWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }
 
-void xLoggerFileWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }
 
-void xLoggerFileWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }
 
-void xLoggerFileWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }
 
-void xLoggerFileWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }
 
-void xLoggerFileWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
+void LoggerFileWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
 {
     pFile_->write(line, length);
 }

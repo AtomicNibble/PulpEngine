@@ -10,10 +10,10 @@ X_NAMESPACE_BEGIN(core)
 struct IFileSys;
 struct XFile;
 
-class xLoggerFileWritePolicy
+class LoggerFileWritePolicy
 {
 public:
-    xLoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path);
+    LoggerFileWritePolicy(IFileSys* pFileSystem, const Path<>& path);
 
     void Init(void);
     void Exit(void);
