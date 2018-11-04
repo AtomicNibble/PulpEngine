@@ -32,6 +32,9 @@ REM clean..
 rmdir /s /q "%OUT_PATH_ABS%"
 )
 
+mkdir "%OUT_PATH_ABS%"
+mkdir "%OUT_PATH_ABS%\core_assets"
+
 REM convert all the assets...
 "%BIN_PATH_ABS%\engine_Converter.exe" +mode all +mod core +profile release +nopause
 
@@ -44,21 +47,18 @@ REM build levels...
 "%BIN_PATH_ABS%\engine_LevelBuilder.exe" +if art_source\maps\text_cord_test.map +mod core +nopause
 
 REM Base packs
-"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of core_assets\init %LINKER_ARGS% +al asset_lists/init.assList +memory
+"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of %OUT_PATH_ABS%\core_assets\init %LINKER_ARGS% +al asset_lists/init.assList +memory
 
-"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of core_assets\weapons %LINKER_ARGS% +al asset_lists/weapons.assList +memory
+"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of %OUT_PATH_ABS%\core_assets\weapons %LINKER_ARGS% +al asset_lists/weapons.assList +memory
 
-"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of core_assets\shaders %LINKER_ARGS% +al asset_lists/shaders.assList +memory
+"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of %OUT_PATH_ABS%\core_assets\shaders %LINKER_ARGS% +al asset_lists/shaders.assList +memory
 
 REM level packs
-"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of core_assets\test01 %LINKER_ARGS% +lvl test01
-"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of core_assets\text_cord_test %LINKER_ARGS% +lvl text_cord_test
+"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of %OUT_PATH_ABS%\core_assets\test01 %LINKER_ARGS% +lvl test01
+"%BIN_PATH_ABS%\engine_Linker.exe" +mode build +of %OUT_PATH_ABS%\core_assets\text_cord_test %LINKER_ARGS% +lvl text_cord_test
 
 REM build sound packs...
 "%WWISE_BIN%\WwiseCLI.exe" "art_source\sound\wwise\Projects\Potato\Potato.wproj" -GenerateSoundBanks -Platform Windows -Verbose
-
-mkdir "%OUT_PATH%"
-mkdir "%OUT_PATH%\core_assets"
 
 rem Copy binary..
 xcopy /y /d "%GAME_BIN_PATH%\engine_Game.exe" "%OUT_PATH%"
@@ -81,7 +81,7 @@ xcopy /y /d "..\3rdparty\bin\x64\ispc_texcomp.dll" "%OUT_PATH%"
 
 
 rem some assets.. !
-xcopy /y /d "core_assets\*.apak" "%OUT_PATH%\core_assets"
+REM xcopy /y /d "core_assets\*.apak" "%OUT_PATH%\core_assets"
 xcopy /S /Q /Y /F "core_assets\config\default.cfg" "%OUT_PATH%\core_assets\config\"
 REM xcopy /y /i /s /e /d "core_assets\levels" "%OUT_PATH%\core_assets\levels"
 xcopy /y /i /s /e /d "core_assets\sound" "%OUT_PATH%\core_assets\sound"
