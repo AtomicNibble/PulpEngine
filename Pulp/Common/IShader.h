@@ -22,7 +22,7 @@ namespace shader
     };
 
     static const uint32_t MAX_SHADERS = 256;
-    static const uint32_t MAX_HW_SHADERS = 256;
+    static const uint32_t MAX_HW_SHADERS = 512;
     static const uint32_t MAX_SHADER_SOURCE = 256;
     static const uint32_t MAX_SHADER_PERMS = 512;
     static const uint32_t MAX_SHADER_CB_PER_PERM = 16; // max const buffers allowed for a permatation.
