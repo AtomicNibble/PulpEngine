@@ -18,16 +18,6 @@
 #include "String\StrRef.h"
 #include "String\CmdArgs.h"
 
-// Logging
-#include "Logging\Logger.h"
-#include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
-#include "Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h"
-#include "Logging\FormatPolicies\LoggerExtendedFormatPolicy.h"
-#include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
-#include "Logging\FormatPolicies\LoggerFullFormatPolicy.h"
-#include "Logging\WritePolicies\LoggerDebuggerWritePolicy.h"
-#include "Logging\WritePolicies\LoggerConsoleWritePolicy.h"
-
 #include <Platform\Module.h>
 
 #include "Containers\HashMap.h"
@@ -44,19 +34,12 @@ X_NAMESPACE_DECLARE(core,
                     class Window;
                     class Console;
                     class XDirectoryWatcher;
-                    class XCoreEventDispatcher;)
+                    class XCoreEventDispatcher;
+                    class VisualStudioLogger;
+                    class ConsoleLogger;
+)
 
-typedef core::Logger<
-    core::LoggerNoFilterPolicy,
-    core::LoggerFullFormatPolicy,
-    core::LoggerDebuggerWritePolicy>
-    VisualStudioLogger;
 
-typedef core::Logger<
-    core::LoggerVerbosityFilterPolicy,
-    core::LoggerSimpleFormatPolicy,
-    core::LoggerConsoleWritePolicy>
-    ConsoleLogger;
 
 class XCore : public ICore
     , public core::IDirectoryWatcherListener
@@ -205,8 +188,8 @@ private:
     core::Window* pWindow_;
     core::Console* pConsole_;
 
-    VisualStudioLogger* pVsLogger_;
-    ConsoleLogger* pConsoleLogger_;
+    core::LoggerBase* pVsLogger_;
+    core::LoggerBase* pConsoleLogger_;
 
     core::XTimer time_;
     core::CpuInfo* pCpuInfo_;

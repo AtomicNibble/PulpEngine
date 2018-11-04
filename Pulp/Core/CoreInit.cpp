@@ -37,6 +37,15 @@
 #include <IPhysics.h>
 #include <IVideo.h>
 
+#include "Logging\Logger.h"
+#include "Logging\FilterPolicies\LoggerNoFilterPolicy.h"
+#include "Logging\FilterPolicies\LoggerVerbosityFilterPolicy.h"
+#include "Logging\FormatPolicies\LoggerExtendedFormatPolicy.h"
+#include "Logging\FormatPolicies\LoggerSimpleFormatPolicy.h"
+#include "Logging\FormatPolicies\LoggerFullFormatPolicy.h"
+#include "Logging\WritePolicies\LoggerDebuggerWritePolicy.h"
+#include "Logging\WritePolicies\LoggerConsoleWritePolicy.h"
+
 #include <Extension\IEngineUnknown.h>
 #include <Extension\IEngineFactory.h>
 #include <Extension\EngineCreateClass.h>
@@ -82,6 +91,18 @@ namespace
 {
     typedef core::traits::Function<void*(ICore*, const char*)> ModuleLinkfunc;
 
+
+    typedef core::Logger<
+        core::LoggerNoFilterPolicy,
+        core::LoggerFullFormatPolicy,
+        core::LoggerDebuggerWritePolicy>
+        VisualStudioLogger;
+
+    typedef core::Logger<
+        core::LoggerVerbosityFilterPolicy,
+        core::LoggerSimpleFormatPolicy,
+        core::LoggerConsoleWritePolicy>
+        ConsoleLogger;
 } // namespace
 
 //////////////////////////////////////////////////////////////////////////
@@ -409,7 +430,8 @@ bool XCore::Init(const CoreInitParams& startupParams)
 
     // register verbosity vars.
     if (pConsoleLogger_) {
-        pConsoleLogger_->GetFilterPolicy().RegisterVars();
+        auto* pConsoleLogger = static_cast<ConsoleLogger*>(pConsoleLogger_);
+        pConsoleLogger->GetFilterPolicy().RegisterVars();
     }
 
     if (pDirWatcher_) {
