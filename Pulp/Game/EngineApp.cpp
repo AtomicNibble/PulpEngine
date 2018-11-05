@@ -76,6 +76,10 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
     params.bConsoleLog = true;
 #endif
 
+#if X_SUPER
+    params.bFileLog = true;
+#endif // !X_SUPER
+
 #ifdef X_LIB
 
     pICore_ = CreateCoreInterface(params);
