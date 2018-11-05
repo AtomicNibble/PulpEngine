@@ -25,11 +25,11 @@ EngineApp::~EngineApp()
     }
 }
 
-bool EngineApp::Init(const wchar_t* sInCmdLine)
+bool EngineApp::Init(const wchar_t* pInCmdLine)
 {
     CoreInitParams params;
     params.hInstance = g_hInstance;
-    params.pCmdLine = sInCmdLine;
+    params.pCmdLine = pInCmdLine;
     params.bSkipInput = true;
     params.bSkipSound = true;
     params.bVsLog = false;

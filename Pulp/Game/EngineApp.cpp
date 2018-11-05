@@ -53,12 +53,10 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* sInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 {
-    X_UNUSED(sInCmdLine);
-
     CoreInitParams params;
-    params.pCmdLine = sInCmdLine;
+    params.pCmdLine = pInCmdLine;
     params.hInstance = hInstance;
     params.bSkipInput = false;
     params.bEnableNetowrking = true;

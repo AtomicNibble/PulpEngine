@@ -13,7 +13,7 @@ public:
     EngineApp();
     ~EngineApp() X_OVERRIDE;
 
-    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine, core::MemoryArenaBase* arena);
+    bool Init(HINSTANCE hInstance, const wchar_t* pInCmdLine, core::MemoryArenaBase* arena);
     bool ShutDown(void);
 
     physics::IPhysicsCooking* GetPhysCooking(void);

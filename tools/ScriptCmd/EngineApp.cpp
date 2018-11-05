@@ -24,11 +24,11 @@ EngineApp::~EngineApp()
     gEnv = nullptr;
 }
 
-bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* sInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wchar_t* pInCmdLine)
 {
     CoreInitParams params;
     params.hInstance = hInstance;
-    params.pCmdLine = sInCmdLine;
+    params.pCmdLine = pInCmdLine;
     params.bSkipInput = true;
     params.bSkipSound = true;
     params.bVsLog = false;

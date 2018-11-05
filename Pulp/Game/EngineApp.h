@@ -42,7 +42,7 @@ public:
     EngineApp();
     ~EngineApp();
 
-    bool Init(HINSTANCE hInstance, const wchar_t* sInCmdLine);
+    bool Init(HINSTANCE hInstance, const wchar_t* pInCmdLine);
     int MainLoop();
 
 private:
