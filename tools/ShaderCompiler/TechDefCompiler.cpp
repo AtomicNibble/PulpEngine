@@ -127,10 +127,14 @@ namespace compiler
                 static_assert(Permatation::FLAGS_COUNT == 4, "Potentially this code needs updating");
                 static_assert(ILFlag::FLAGS_COUNT == 4, "Potentially this code needs updating");
 
-                std::array<PermatationFlags, 4> perms = {{{PermatationFlags()},
-                    {PermatationFlags::HwSkin},
-                    {PermatationFlags(PermatationFlags::HwSkin | PermatationFlags::Instanced)},
-                    {PermatationFlags::Instanced}}};
+                std::array<PermatationFlags, 6> perms = { {
+                    { PermatationFlags() },
+                    { PermatationFlags::HwSkin },
+                    { PermatationFlags(PermatationFlags::HwSkin | PermatationFlags::Instanced) },
+                    { PermatationFlags(PermatationFlags::HwSkin | PermatationFlags::Instanced | PermatationFlags::Textured) },
+                    { PermatationFlags::Instanced },
+                    { PermatationFlags::Textured }
+                    } };
 
                 std::array<ILFlags, 5> ilPerms = {{
                     {ILFlags()},
