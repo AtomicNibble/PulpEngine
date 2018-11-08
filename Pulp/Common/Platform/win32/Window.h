@@ -76,8 +76,8 @@ public:
     void SetMode(Mode::Enum mode);
 
     void ClipCursorToWindow(void);
-    Vec2i GetCusroPosClient(void);
-    static Vec2i GetCusroPos(void);
+    Vec2i GetCursorPosClient(void);
+    static Vec2i GetCursorPos(void);
 
     void MoveTo(int x, int y);
     void MoveTo(const Position& position);

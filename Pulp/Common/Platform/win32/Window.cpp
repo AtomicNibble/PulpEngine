@@ -272,12 +272,12 @@ void Window::ClipCursorToWindow(void)
     ::ClipCursor(&r);
 }
 
-Vec2i Window::GetCusroPosClient(void)
+Vec2i Window::GetCursorPosClient(void)
 {
     POINT pos;
 
     {
-        auto p = GetCusroPos();
+        auto p = GetCursorPos();
         pos.x = p.x;
         pos.y = p.y;
     }
@@ -290,12 +290,12 @@ Vec2i Window::GetCusroPosClient(void)
     return Vec2i(pos.x, pos.y);
 }
 
-Vec2i Window::GetCusroPos(void)
+Vec2i Window::GetCursorPos(void)
 {
     POINT pos;
     if (!::GetCursorPos(&pos)) {
         core::lastError::Description Dsc;
-        X_ERROR("Window", "Failed to GetCusroPos. Err: %s", core::lastError::ToString(Dsc));
+        X_ERROR("Window", "Failed to GetCursorPos. Err: %s", core::lastError::ToString(Dsc));
     }
 
     return Vec2i(pos.x, pos.y);
