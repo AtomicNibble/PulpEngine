@@ -197,6 +197,8 @@ private:
     core::CpuInfo* pCpuInfo_;
     core::Crc32* pCrc32_;
 
+    int32_t numFrames_;
+
     ModuleHandlesArr moduleDLLHandles_;
     ModuleInterfacesArr moduleInterfaces_;
     ConverterModulesArr converterInterfaces_;

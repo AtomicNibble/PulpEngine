@@ -49,6 +49,22 @@ namespace SysTimer
             return static_cast<int64_t>(timeGetTime());
         }
 
+        void UpdateHelpers(void)
+        {
+            double resolution = 1.0 / static_cast<double>(g_Frequency);
+
+            g_FrequencySingle = static_cast<float>(g_Frequency);
+            g_FrequencyDouble = static_cast<double>(g_Frequency);
+            // times it by frequency * 1000
+            g_MilliToValueSingle = static_cast<float>(g_FrequencyDouble / 1000);
+            g_MilliToValueDouble = static_cast<double>(g_FrequencyDouble / 1000);
+            g_MicroToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000));
+            g_NanoToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000 * 1000));
+
+            g_oneOverFrequency = static_cast<float>(resolution);
+            g_thousandOverFrequency = static_cast<float>(resolution * 1000.0);
+        }
+
     } // namespace
 
     void Startup(void)
@@ -61,30 +77,45 @@ namespace SysTimer
         }
         else {
             lastError::Description Dsc;
-            X_WARNING("SysTimer", "Failed to query performance timer. Error: ", lastError::ToString(Dsc));
+            X_WARNING("SysTimer", "Failed to query performance freq. Error: ", lastError::ToString(Dsc));
 
             g_Frequency = 1000;
             g_pUpdateFunc = &MMTimeGet;
         }
 
-        double resolution = 1.0 / static_cast<double>(frequency.QuadPart);
-
-        g_FrequencySingle = static_cast<float>(frequency.QuadPart);
-        g_FrequencyDouble = static_cast<double>(frequency.QuadPart);
-        // times it by frequency * 1000
-        g_MilliToValueSingle = static_cast<float>(g_FrequencyDouble / 1000);
-        g_MilliToValueDouble = static_cast<double>(g_FrequencyDouble / 1000);
-        g_MicroToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000));
-        g_NanoToValueDouble = static_cast<double>(g_FrequencyDouble / (1000 * 1000 * 1000));
-
-        g_oneOverFrequency = static_cast<float>(resolution);
-        g_thousandOverFrequency = static_cast<float>(resolution * 1000.0);
+        UpdateHelpers();
     }
 
     void Shutdown(void)
     {
         g_oneOverFrequency = 0;
         g_thousandOverFrequency = 0;
+    }
+
+    bool HasFreqChanged(void)
+    {
+        if (g_pUpdateFunc != &PerformanceCounterTime) {
+            return false;
+        }
+
+        LARGE_INTEGER frequency;
+
+        if (!QueryPerformanceFrequency(&frequency)) {
+            lastError::Description Dsc;
+            X_WARNING("SysTimer", "Failed to query performance freq. Error: ", lastError::ToString(Dsc));
+            return false;
+        }
+
+        if (frequency.QuadPart == g_Frequency) {
+            return false;
+        }
+
+        X_WARNING("SysTime", "Freq changed from %" PRIu64 " tp %" PRIu64, g_Frequency, frequency.QuadPart);
+
+        g_Frequency = frequency.QuadPart;
+
+        UpdateHelpers();
+        return true;
     }
 
 } // namespace SysTimer

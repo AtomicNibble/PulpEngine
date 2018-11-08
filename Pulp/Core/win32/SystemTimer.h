@@ -17,6 +17,7 @@ namespace SysTimer
     void Startup(void);
     void Shutdown(void);
 
+    bool HasFreqChanged(void);
 
     int64_t Get(void);
 

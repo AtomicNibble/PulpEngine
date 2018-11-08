@@ -91,6 +91,8 @@ XCore::XCore() :
     pCpuInfo_(nullptr),
     pCrc32_(nullptr),
 
+    numFrames_(0),
+
     moduleDLLHandles_(g_coreArena),
     moduleInterfaces_(g_coreArena),
     converterInterfaces_(g_coreArena),

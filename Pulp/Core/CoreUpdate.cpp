@@ -17,6 +17,7 @@
 
 #include "CoreEventDispatcher.h"
 #include "Console.h"
+#include "SystemTimer.h"
 
 X_USING_NAMESPACE;
 
@@ -36,6 +37,12 @@ bool XCore::Update(void)
 {
     X_PROFILE_BEGIN("CoreUpdate", core::profiler::SubSys::CORE);
     using namespace core::V2;
+
+    ++numFrames_;
+
+    if ((numFrames_ & 0xff) == 0 && core::SysTimer::HasFreqChanged()) {
+        env_.timerFreq = core::SysTimer::GetTickPerSec();
+    }
 
     core::FrameData frameData;
     if (pWindow_->Hasfocus()) {
