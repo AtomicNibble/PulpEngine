@@ -17,12 +17,15 @@ X_DECLARE_FLAGS(FrameFlag)
 
 struct FrameInput
 {
-    // this is just a buffer where this frames input events get stored.
-    // you should not read from this, but instead register a input listner.
-    // as that respects priority and filtering.
+    // These should be used when showing a visible cursor.
+    // Stuff like player view should just be driven from relative mouse events.
+    // This is because the visible cursor can just jump, eg alt tab or touch screen.
     Vec2i cusorPos;
     Vec2i cusorPosClient;
 
+    // this is just a buffer where this frames input events get stored.
+    // you should not read from this, but instead register a input listner.
+    // as that respects priority and filtering.
     input::InputEventBuffer events;
 };
 
