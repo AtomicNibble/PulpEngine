@@ -79,10 +79,4 @@ namespace SysTimer
         return g_Frequency;
     }
 
-    //
-    //	how to share these values across the engine.
-    //
-    //
-    //
-    //
 } // namespace SysTimer
