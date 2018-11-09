@@ -1142,6 +1142,16 @@ void XCore::registerCmds(void)
 
     ADD_COMMAND_MEMBER("listDisplayDevices", this, XCore, &XCore::Cmd_ListDisplayDevices, VarFlag::SYSTEM,
         "Lists the display devices <verbose>");
+
+    // replay
+    if (pReplaySys_) {
+        ADD_COMMAND_MEMBER("replay_rec", this, XCore, &XCore::Cmd_ReplayRecord, VarFlag::SYSTEM,
+            "Start recording a replay <filename>");
+        ADD_COMMAND_MEMBER("replay_play", this, XCore, &XCore::Cmd_ReplayPlay, VarFlag::SYSTEM,
+            "Start playing a replay <filename>");
+        ADD_COMMAND_MEMBER("replay_stop", this, XCore, &XCore::Cmd_ReplayStop, VarFlag::SYSTEM,
+            "Stop recording a replay");
+    }
 }
 
 

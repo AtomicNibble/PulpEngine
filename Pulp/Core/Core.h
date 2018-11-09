@@ -159,6 +159,9 @@ private:
 
     void Cmd_ListProgramArgs(core::IConsoleCmdArgs* pCmd);
     void Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ReplayRecord(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ReplayPlay(core::IConsoleCmdArgs* pCmd);
+    void Cmd_ReplayStop(core::IConsoleCmdArgs* pCmd);
 
     void ListProgramArgs(void);
     void LogSystemInfo(void) const;

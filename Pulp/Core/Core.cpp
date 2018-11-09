@@ -593,6 +593,41 @@ void XCore::Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd)
     ListDisplayDevices(verbose);
 }
 
+void XCore::Cmd_ReplayRecord(core::IConsoleCmdArgs* pCmd)
+{
+    core::string name;
+
+    if (pCmd->GetArgCount() > 1) {
+        name = pCmd->GetArg(1);
+    }
+    else {
+        name = "replay";
+    }
+
+    pReplaySys_->record(name);
+}
+
+void XCore::Cmd_ReplayPlay(core::IConsoleCmdArgs* pCmd)
+{
+    core::string name;
+
+    if (pCmd->GetArgCount() > 1) {
+        name = pCmd->GetArg(1);
+    }
+    else {
+        name = "replay";
+    }
+
+    pReplaySys_->play(name);
+}
+
+void XCore::Cmd_ReplayStop(core::IConsoleCmdArgs* pCmd)
+{
+    X_UNUSED(pCmd);
+
+    pReplaySys_->stop();
+}
+
 void XCore::ListProgramArgs(void)
 {
     size_t i, num = args_.size();
