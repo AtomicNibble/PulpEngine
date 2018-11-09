@@ -23,7 +23,7 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(input)
 
-static const size_t MAX_INPUT_EVENTS_PER_FRAME = 256;
+static const size_t MAX_INPUT_EVENTS_PER_FRAME = 255;
 
 // the mask's they set.
 struct ModifiersMasks
