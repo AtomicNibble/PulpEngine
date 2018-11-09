@@ -30,7 +30,7 @@
 
 #include <Console.h>
 
-#include "win32\SystemTimer.h"
+#include "SystemTimer.h"
 #include "CoreEventDispatcher.h"
 #include "ReplaySys.h"
 #include <Platform\DirectoryWatcher.h>
