@@ -18,6 +18,7 @@
 #include "CoreEventDispatcher.h"
 #include "Console.h"
 #include "SystemTimer.h"
+#include "ReplaySys.h"
 
 X_USING_NAMESPACE;
 
@@ -84,6 +85,10 @@ bool XCore::Update(void)
     }
 
     {
+        if (pReplaySys_) {
+            pReplaySys_->update(frameData.input);
+        }
+
         // dispatch the input events.
         for (auto& ev : frameData.input.events)
         {
@@ -107,7 +112,6 @@ bool XCore::Update(void)
 
             gEnv->pGame->onInputEvent(ev);
         }
-
     }
 
 

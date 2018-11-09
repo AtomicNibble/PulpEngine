@@ -495,6 +495,7 @@
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
     <ClInclude Include="NullImplementation\NullInput.h" />
+    <ClInclude Include="ReplaySys.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="SystemTimer.h" />
     <ClInclude Include="Timer.h" />
@@ -527,6 +528,7 @@
     <ClCompile Include="Log.cpp" />
     <ClCompile Include="NullImplementation\NullInput.cpp" />
     <ClCompile Include="Profile\XProfile.cpp" />
+    <ClCompile Include="ReplaySys.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Create</PrecompiledHeader>

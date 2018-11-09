@@ -32,6 +32,7 @@
 
 #include "win32\SystemTimer.h"
 #include "CoreEventDispatcher.h"
+#include "ReplaySys.h"
 #include <Platform\DirectoryWatcher.h>
 
 #include <Threading\JobSystem2.h>
@@ -102,6 +103,7 @@ XCore::XCore() :
     pProfiler_(nullptr),
 #endif //!X_ENABLE_PROFILER
 
+    pReplaySys_(nullptr),
     pCoreEventDispatcher_(nullptr),
 
     strAlloc_(1 << 24, core::VirtualMem::GetPageSize() * 2,
@@ -117,6 +119,8 @@ XCore::XCore() :
 #else
     pDirWatcher_ = nullptr;
 #endif // !X_ENABLE_DIR_WATCHER
+
+    pReplaySys_ = X_NEW(core::ReplaySys, g_coreArena, "ReplaySys")(g_coreArena);
 
     pCoreEventDispatcher_ = X_NEW(core::XCoreEventDispatcher, g_coreArena, "CoreEventDispatch")(vars_, g_coreArena);
     pCoreEventDispatcher_->RegisterListener(this);
@@ -261,6 +265,10 @@ void XCore::ShutDown()
         core::Mem::DeleteAndNull(pCrc32_, g_coreArena);
     }
 
+    if (pReplaySys_) {
+        core::Mem::DeleteAndNull(pReplaySys_, g_coreArena);
+    }
+
 #if X_ENABLE_PROFILER
     if (pProfiler_) {
         pProfiler_->shutDown();
@@ -351,6 +359,8 @@ void XCore::ShutDown()
 
         core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
     }
+
+
 
     if (pCoreEventDispatcher_) {
         pCoreEventDispatcher_->RemoveListener(this);

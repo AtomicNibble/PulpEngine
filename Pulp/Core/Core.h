@@ -37,6 +37,7 @@ X_NAMESPACE_DECLARE(core,
                     class XCoreEventDispatcher;
                     class VisualStudioLogger;
                     class ConsoleLogger;
+                    class ReplaySys;
 )
 
 
@@ -196,6 +197,7 @@ private:
     core::XTimer time_;
     core::CpuInfo* pCpuInfo_;
     core::Crc32* pCrc32_;
+    core::ReplaySys* pReplaySys_;
 
     int32_t numFrames_;
 

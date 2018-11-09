@@ -143,6 +143,9 @@
     <ClInclude Include="FileSys\PakFile.h">
       <Filter>Header Files\FileSys</Filter>
     </ClInclude>
+    <ClInclude Include="ReplaySys.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -231,6 +234,9 @@
     </ClCompile>
     <ClCompile Include="FileSys\PakFile.cpp">
       <Filter>Source Files\FileSys</Filter>
+    </ClCompile>
+    <ClCompile Include="ReplaySys.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
