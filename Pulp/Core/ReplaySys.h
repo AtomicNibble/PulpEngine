@@ -24,7 +24,7 @@ public:
     typedef Flags8<DataFlag> DataFlags;
 
     static const size_t MAX_FRAME_SIZE = 256 + (input::MAX_INPUT_EVENTS_PER_FRAME * sizeof(input::InputEvent));
-    static const size_t BUFFER_SIZE = (1024 * 64);
+    static const size_t BUFFER_SIZE = (1024 * 128); // higer = more memory but maybe better compression.
 
     X_PACK_PUSH(1)
 
@@ -47,10 +47,16 @@ public:
 
 public:
     ReplaySys(core::MemoryArenaBase* arena);
+    ~ReplaySys();
 
-    void setMode(Mode::Enum mode);
+    void record(const core::string& name);
+    void play(const core::string& name);
+    void stop(void);
 
     void update(FrameInput& inputFrame);
+
+private:
+    int32_t getOffsetMS(void) const;
 
 private:
     core::MemoryArenaBase* arena_;

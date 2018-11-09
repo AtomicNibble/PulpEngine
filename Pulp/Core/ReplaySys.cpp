@@ -16,52 +16,84 @@ ReplaySys::ReplaySys(core::MemoryArenaBase* arena) :
     pFile_(nullptr),
     mode_(Mode::NONE)
 {
-
 }
 
-void ReplaySys::setMode(Mode::Enum mode)
+ReplaySys::~ReplaySys()
 {
-    if (mode_ == mode) {
+    stop();
+}
+
+void ReplaySys::record(const core::string& name)
+{
+    stop();
+
+    core::Path<> path;
+    path.append(name.begin(), name.end());
+    path.setExtension(".rec");
+
+    pFile_ = gEnv->pFileSys->openFile(path, core::FileFlag::RECREATE | core::FileFlag::WRITE);
+    if (!pFile_) {
+        X_ERROR("ReplaySys", "Failed to open replay output file");
         return;
     }
-    mode_ = mode;
 
     streamData_.resize(BUFFER_SIZE + MAX_FRAME_SIZE);
+    compData_.resize(core::Compression::LZ4::requiredDeflateDestBuf(streamData_.capacity()) + sizeof(BufferHdr));
+    stream_ = core::FixedByteStreamNoneOwningPolicy(streamData_.begin(), streamData_.end(), false);
 
-    auto deflateBufSize = core::Compression::LZ4::requiredDeflateDestBuf(streamData_.capacity());
-    compData_.resize(deflateBufSize + sizeof(BufferHdr));
-
-    if (mode == Mode::RECORD) {
-
-        stream_ = core::FixedByteStreamNoneOwningPolicy(streamData_.begin(), streamData_.end(), false);
-
-        core::FileFlags flags = core::FileFlag::RECREATE | core::FileFlag::WRITE;
-        
-        pFile_ = gEnv->pFileSys->openFile(core::Path<>("replay.dat"), flags);
-    }
-    else if (mode == Mode::PLAY) {
-
-        core::FileFlags flags = core::FileFlag::SHARE | core::FileFlag::READ;
-
-        pFile_ = gEnv->pFileSys->openFile(core::Path<>("replay.dat"), flags);
-    }
-
-    core::zero_object(nextEntry_);
+    mode_ = Mode::RECORD;
     startTime_ = gEnv->pTimer->GetTimeNowNoScale();
+    X_LOG0("ReplaySys", "Started recording replay \"%s\"", name.c_str());
+}
+
+void ReplaySys::play(const core::string& name)
+{
+    stop();
+
+    core::Path<> path;
+    path.append(name.begin(), name.end());
+    path.setExtension(".rec");
+
+    pFile_ = gEnv->pFileSys->openFile(path, core::FileFlag::READ | core::FileFlag::SHARE);
+    if (!pFile_) {
+        X_ERROR("ReplaySys", "Failed to open replay");
+        return;
+    }
+
+    X_ASSERT(stream_.isEos(), "Stream has not been reset")();
+    core::zero_object(nextEntry_);
+
+    mode_ = Mode::PLAY;
+    startTime_ = gEnv->pTimer->GetTimeNowNoScale();
+    X_LOG0("ReplaySys", "Started playing replay \"%s\"", name.c_str());
+}
+
+void ReplaySys::stop(void)
+{
+    if (mode_ == Mode::NONE) {
+        return;
+    }
+
+    streamData_.clear();
+    compData_.clear();
+    stream_.reset();
+    startTime_ = core::TimeVal();
+
+    if (pFile_) {
+        gEnv->pFileSys->closeFile(pFile_);
+        pFile_ = nullptr;
+    }
+
+    mode_ = Mode::NONE;
 }
 
 void ReplaySys::update(FrameInput& inputFrame)
 {
-    // we either doing nothing, record or replay.
     if (mode_ == Mode::NONE) {
         return;
     }
 
     static_assert(input::MAX_INPUT_EVENTS_PER_FRAME <= std::numeric_limits<uint8_t>::max(), "Can't store max number of events");
-
-    // we probs want to compress the stream so probs keep a local buffer.
-    // then everyso often compress it and write the data.
-    // we should not write anything if curpos has not changed.
 
     if (mode_ == Mode::RECORD) {
          
@@ -79,11 +111,7 @@ void ReplaySys::update(FrameInput& inputFrame)
         }
 
         if (hdr.flags.IsAnySet()) {
-
-            auto now = gEnv->pTimer->GetTimeNowNoScale();
-            auto delta = now - startTime_;
-
-            hdr.msOffset = safe_static_cast<int32_t>(delta.GetMilliSecondsAsInt64());
+            hdr.msOffset = getOffsetMS();
             stream_.write(hdr);
 
             if (hdr.flags.IsSet(DataFlag::CURSOR)) {
@@ -98,14 +126,13 @@ void ReplaySys::update(FrameInput& inputFrame)
         }
 
         if (stream_.size() >= BUFFER_SIZE) {
-
             compData_.resize(compData_.capacity());
 
             size_t compDataSize = 0;
             if (!core::Compression::LZ4::deflate(stream_.data(), stream_.size(), compData_.data() + sizeof(BufferHdr), compData_.size() - sizeof(BufferHdr),
                 compDataSize, core::Compression::CompressLevel::NORMAL)) {
                 X_ERROR("ReplaySys", "Failed to compress replay stream buffer");
-                stream_.reset();
+                stop();
                 return;
             }
 
@@ -116,36 +143,46 @@ void ReplaySys::update(FrameInput& inputFrame)
             pHeader->deflatedSize = safe_static_cast<uint32_t>(compDataSize);
             stream_.reset();
 
-            pFile_->write(compData_.data(), compData_.size());
+            if (pFile_->write(compData_.data(), compData_.size()) != compData_.size()) {
+                X_ERROR("ReplaySys", "Failed to write replay data");
+                stop();
+                return;
+            }
         }
     }
     else if (mode_ == Mode::PLAY) {
 
         if (stream_.isEos()) {
-
             // load another buffer
             // we need to read the header :(
             auto bytesLeft = pFile_->remainingBytes();
             if (bytesLeft == 0) {
-                mode_ = Mode::NONE;
                 X_LOG0("ReplaySys", "Replay has ended");
+                stop();
                 return;
             }
 
             BufferHdr hdr;
             if (pFile_->readObj(hdr) != sizeof(hdr)) {
                 X_ERROR("ReplaySys", "Failed to read entry header");
+                stop();
                 return;
             }
 
             compData_.resize(hdr.deflatedSize);
             streamData_.resize(hdr.inflatedSize);
 
-            pFile_->read(compData_.data(), compData_.size());
+            if (pFile_->read(compData_.data(), compData_.size()) != compData_.size()) {
+                X_ERROR("ReplaySys", "Failed to read replay data");
+                stop();
+                return;
+            }
 
             if (!core::Compression::LZ4::inflate(compData_.data(), compData_.size(), 
                 streamData_.data(), streamData_.size())) {
                 X_ERROR("ReplaySys", "Failed to decompress replay data");
+                stop();
+                return;
             }
 
             stream_ = core::FixedByteStreamNoneOwningPolicy(streamData_.begin(), streamData_.end(), true);
@@ -162,9 +199,7 @@ void ReplaySys::update(FrameInput& inputFrame)
         // read events!
         // we have a stream, but don't know when to play them.
         // i want to peek really.
-        auto now = gEnv->pTimer->GetTimeNowNoScale();
-        auto delta = now - startTime_;
-        auto msOffset = safe_static_cast<int32_t>(delta.GetMilliSecondsAsInt64());
+        auto msOffset = getOffsetMS();
 
         if(nextEntry_.msOffset <= msOffset) 
         {
@@ -188,6 +223,13 @@ void ReplaySys::update(FrameInput& inputFrame)
         }
 
     }
+}
+
+int32_t ReplaySys::getOffsetMS(void) const
+{
+    auto now = gEnv->pTimer->GetTimeNowNoScale();
+    auto delta = now - startTime_;
+    return safe_static_cast<int32_t>(delta.GetMilliSecondsAsInt64());
 }
 
 
