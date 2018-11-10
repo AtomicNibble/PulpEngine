@@ -309,6 +309,8 @@ void ReplaySys::dispatchWrite(void)
         signal_.wait();
     }
 
+    X_ASSERT(pendingIO_ == 0, "IO is pending")();
+
     compData_.resize(compData_.capacity());
 
     // could make this a job, but should not be slow.
