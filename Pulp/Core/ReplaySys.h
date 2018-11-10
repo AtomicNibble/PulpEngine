@@ -2,8 +2,12 @@
 
 #include <Containers\FixedByteStream.h>
 #include <Time\TimeVal.h>
+#include <Threading\Signal.h>
 
 X_NAMESPACE_BEGIN(core)
+
+struct XFileAsync;
+struct IoRequestBase;
 
 struct FrameInput;
 
@@ -25,6 +29,7 @@ public:
 
     static const size_t MAX_FRAME_SIZE = 256 + (input::MAX_INPUT_EVENTS_PER_FRAME * sizeof(input::InputEvent));
     static const size_t BUFFER_SIZE = (1024 * 128); // higer = more memory but maybe better compression.
+    static const size_t MAX_STREAM_SIZE = BUFFER_SIZE + MAX_FRAME_SIZE;
 
     X_PACK_PUSH(1)
 
@@ -58,13 +63,19 @@ public:
 private:
     int32_t getOffsetMS(void) const;
 
+    void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
+        core::XFileAsync* pFile, uint32_t bytesTransferred);
+
 private:
     core::MemoryArenaBase* arena_;
     core::FixedByteStreamNoneOwningPolicy stream_;
     core::Array<uint8_t> streamData_;
     core::Array<uint8_t> compData_;
 
-    core::XFile* pFile_;
+    core::Signal signal_;
+    core::XFileAsync* pFile_;
+    uint64_t fileSize_;
+    uint64_t readOffset_;
 
     Mode::Enum mode_;
 
@@ -73,6 +84,8 @@ private:
 
     Vec2i lastCusorPos_;
     Vec2i lastCusorPosClient_;
+
 };
+
 
 X_NAMESPACE_END
