@@ -5,6 +5,7 @@
 #if X_ENABLE_MEMORY_SOURCE_INFO
 
 #define X_SOURCE_INFO_MEM_CB(x) , x
+
 #else
 
 #define X_SOURCE_INFO_MEM_CB(x)
