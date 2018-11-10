@@ -11,9 +11,6 @@
 
 X_NAMESPACE_BEGIN(font)
 
-using namespace core;
-
-
 bool XFont::processData(core::UniquePointer<char[]> data, uint32_t dataSize)
 {
     if (dataSize < sizeof(FontHdr)) {

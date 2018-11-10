@@ -141,7 +141,9 @@ namespace MayaUtil
         gProgressMin = progressMin;
         gProgressMax = progressMax;
 
-        using namespace std;
+        using std::cerr;
+        using std::endl;
+
         if (s_progressCntl.length() > 0) {
             MString min, max;
             min += progressMin;
@@ -174,7 +176,8 @@ namespace MayaUtil
 
     MStatus SetProgressRange(int32_t progressMin, int32_t progressMax)
     {
-        using namespace std;
+        using std::cerr;
+        using std::endl;
 
         gProgressMin = progressMin;
         gProgressMax = progressMax;
@@ -206,7 +209,9 @@ namespace MayaUtil
 
     MStatus HideProgressDlg(void)
     {
-        using namespace std;
+        using std::cerr;
+        using std::endl;
+
         if (s_progressActive) {
             s_progressActive = false;
             CHECK_MSTATUS_AND_RETURN_IT(MProgressWindow::endProgress());

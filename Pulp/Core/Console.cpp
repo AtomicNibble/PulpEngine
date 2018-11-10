@@ -68,22 +68,20 @@ namespace
 
     static void sortVarsByName(core::Array<core::ICVar*>& vars)
     {
-        using namespace std;
-
         std::sort(vars.begin(), vars.end(),
             [](core::ICVar* a, core::ICVar* b) {
-                return strcmp(a->GetName(), b->GetName()) < 0;
-            });
+                return std::strcmp(a->GetName(), b->GetName()) < 0;
+            }
+        );
     }
 
     static void sortCmdsByName(core::Array<core::ConsoleCommand*>& vars)
     {
-        using namespace std;
-
         std::sort(vars.begin(), vars.end(),
             [](core::ConsoleCommand* a, core::ConsoleCommand* b) {
-                return strcmp(a->Name, b->Name) < 0;
-            });
+                return std::strcmp(a->Name, b->Name) < 0;
+            }
+        );
     }
 
     class CommandParser
@@ -1478,12 +1476,10 @@ bool XConsole::handleInputChar(const input::InputEvent& event)
 
 bool XConsole::processInput(const input::InputEvent& event)
 {
-    using namespace input;
-
     X_ASSERT(isVisable(), "ProcessInput called when not visible")(isVisable());
 
     // consume char input.
-    if (event.action == InputState::CHAR) {
+    if (event.action == input::InputState::CHAR) {
 
         if (event.keyId == input::KeyId::V && event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
             paste();
@@ -1499,7 +1495,7 @@ bool XConsole::processInput(const input::InputEvent& event)
         return true;
     }
 
-    if (event.keyId == KeyId::ENTER || event.keyId == KeyId::NUMPAD_ENTER) {
+    if (event.keyId == input::KeyId::ENTER || event.keyId == input::KeyId::NUMPAD_ENTER) {
         if (autoCompleteIdx_ >= 0) {
             autoCompleteSelect_ = true;
         }
@@ -1508,9 +1504,9 @@ bool XConsole::processInput(const input::InputEvent& event)
         }
         return true;
     }
-    else if (event.keyId == KeyId::BACKSPACE || event.keyId == KeyId::DELETE) {
+    else if (event.keyId == input::KeyId::BACKSPACE || event.keyId == input::KeyId::DELETE) {
         // shift + DEL / BACK fully clears
-        if (event.modifiers.IsSet(ModifiersMasks::Shift)) {
+        if (event.modifiers.IsSet(input::ModifiersMasks::Shift)) {
             clearInputBuffer();
         }
         else {
@@ -1518,12 +1514,12 @@ bool XConsole::processInput(const input::InputEvent& event)
         }
         return true;
     }
-    else if (event.keyId == KeyId::LEFT_ARROW) {
+    else if (event.keyId == input::KeyId::LEFT_ARROW) {
         if (cursorPos_) { // can we go left?
             cursorPos_--;
 
             // support moving whole words
-            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
+            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
                 while (cursorPos_ && inputBuffer_[cursorPos_] != ' ') {
                     cursorPos_--;
                 }
@@ -1553,13 +1549,13 @@ bool XConsole::processInput(const input::InputEvent& event)
         }
         return true;
     }
-    else if (event.keyId == KeyId::RIGHT_ARROW) {
+    else if (event.keyId == input::KeyId::RIGHT_ARROW) {
         // are we pre end ?
         if (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())) {
             cursorPos_++;
 
             // support moving whole words
-            if (event.modifiers.IsSet(ModifiersMasks::Ctrl)) {
+            if (event.modifiers.IsSet(input::ModifiersMasks::Ctrl)) {
                 while (cursorPos_ < safe_static_cast<int32_t>(inputBuffer_.length())
                        && inputBuffer_[cursorPos_] != ' ') {
                     cursorPos_++;
@@ -1586,13 +1582,13 @@ bool XConsole::processInput(const input::InputEvent& event)
         }
         return true;
     }
-    else if (event.keyId == KeyId::HOME) {
+    else if (event.keyId == input::KeyId::HOME) {
         cursorPos_ = 0;
     }
-    else if (event.keyId == KeyId::END) {
+    else if (event.keyId == input::KeyId::END) {
         cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.length());
     }
-    else if (event.keyId == KeyId::UP_ARROW) {
+    else if (event.keyId == input::KeyId::UP_ARROW) {
         if (isAutocompleteVis() && autoCompleteIdx_ >= 0) {
             autoCompleteIdx_ = core::Max(-1, --autoCompleteIdx_);
         }
@@ -1610,7 +1606,7 @@ bool XConsole::processInput(const input::InputEvent& event)
         }
         return true;
     }
-    else if (event.keyId == KeyId::DOWN_ARROW) {
+    else if (event.keyId == input::KeyId::DOWN_ARROW) {
         bool inHistory = (historyPos_ < static_cast<int32_t>(cmdHistory_.size()));
         bool multiAutoComplete = autoCompleteNum_ > 1;
 

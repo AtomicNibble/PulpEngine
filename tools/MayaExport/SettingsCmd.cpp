@@ -11,7 +11,7 @@
 
 #include <String\Xml.h>
 
-using namespace core::xml::rapidxml;
+namespace xml = core::xml::rapidxml;
 
 X_NAMESPACE_BEGIN(maya)
 
@@ -166,20 +166,20 @@ bool SettingsCache::ReloadCache(void)
     pText[fileSize] = '\0';
 
     {
-        xml_document<> doc;
+        xml::xml_document<> doc;
         doc.set_allocator(XmlAllocate, XmlFree);
         doc.parse<0>(pText);
 
         settingsCache_.clear();
 
         // parse settings.
-        xml_node<>* pSettings = doc.first_node("settings");
+        xml::xml_node<>* pSettings = doc.first_node("settings");
         if (pSettings) {
-            xml_node<>* pSetNode;
+            xml::xml_node<>* pSetNode;
 
             for (pSetNode = pSettings->first_node("entry"); pSetNode;
                  pSetNode = pSetNode->next_sibling()) {
-                xml_attribute<>* pAttr = pSetNode->first_attribute("id");
+                xml::xml_attribute<>* pAttr = pSetNode->first_attribute("id");
                 if (pAttr) {
                     core::StackString<64> id(pAttr->value(), pAttr->value() + pAttr->value_size());
                     core::StackString512 value(pSetNode->value(),
@@ -198,18 +198,18 @@ bool SettingsCache::ReloadCache(void)
 
 bool SettingsCache::FlushCache(void)
 {
-    xml_document<> doc;
-    xml_node<>* decl = doc.allocate_node(node_declaration);
+    xml::xml_document<> doc;
+    xml::xml_node<>* decl = doc.allocate_node(xml::node_declaration);
     decl->append_attribute(doc.allocate_attribute("version", "1.0"));
     decl->append_attribute(doc.allocate_attribute("encoding", "utf-8"));
     doc.append_node(decl);
 
-    xml_node<>* pSettings = doc.allocate_node(node_element, "settings");
+    xml::xml_node<>* pSettings = doc.allocate_node(xml::node_element, "settings");
     doc.append_node(pSettings);
 
     SettingsCacheMap::const_iterator it = settingsCache_.begin();
     for (; it != settingsCache_.end(); ++it) {
-        xml_node<>* pEntry = doc.allocate_node(node_element, "entry", it->second.c_str());
+        xml::xml_node<>* pEntry = doc.allocate_node(xml::node_element, "entry", it->second.c_str());
         pEntry->append_attribute(doc.allocate_attribute("id", it->first.c_str()));
         pSettings->append_node(pEntry);
     }

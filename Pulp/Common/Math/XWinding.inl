@@ -330,7 +330,7 @@ void XWindingT<Allocator>::GetAABB(AABB& box) const
 template<class Allocator>
 float XWindingT<Allocator>::planeDistance(const Planef& plane) const
 {
-    using namespace core::FloatUtil;
+    namespace fu = core::FloatUtil;
 
     float min = math<float>::INFINITY;
     float max = -min;
@@ -339,22 +339,22 @@ float XWindingT<Allocator>::planeDistance(const Planef& plane) const
         if (d < min) {
             min = d;
 
-            if (isSignBitSet(min) && isSignBitNotSet(max)) {
+            if (fu::isSignBitSet(min) && fu::isSignBitNotSet(max)) {
                 return 0.0f;
             }
         }
         if (d > max) {
             max = d;
 
-            if (isSignBitSet(min) && isSignBitNotSet(max)) {
+            if (fu::isSignBitSet(min) && fu::isSignBitNotSet(max)) {
                 return 0.0f;
             }
         }
     }
-    if (isSignBitNotSet(min)) {
+    if (fu::isSignBitNotSet(min)) {
         return min;
     }
-    if (isSignBitSet(max)) {
+    if (fu::isSignBitSet(max)) {
         return max;
     }
     return 0.0f;
