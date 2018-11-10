@@ -104,6 +104,22 @@ void ReplaySys::stop(void)
         return;
     }
 
+    if (mode_ == Mode::RECORD) {
+        if (stream_.size() > 0) {
+            // Flush it baby!
+            dispatchWrite();
+            signal_.wait();
+        }
+        else {
+            // wait for any pending IO
+            if (pendingIO_) {
+                signal_.wait();
+            }
+        }
+    }
+
+    X_ASSERT(pendingIO_ == 0, "Pending IO")();
+
     streamData_.clear();
     compData_.clear();
     stream_.reset();
@@ -130,7 +146,6 @@ void ReplaySys::update(FrameInput& inputFrame)
     static_assert(input::MAX_INPUT_EVENTS_PER_FRAME <= std::numeric_limits<uint8_t>::max(), "Can't store max number of events");
 
     if (mode_ == Mode::RECORD) {
-         
         EntryHdr hdr;
 
         if (inputFrame.cusorPos != lastCusorPos_ || inputFrame.cusorPosClient != lastCusorPosClient_) {
@@ -160,41 +175,7 @@ void ReplaySys::update(FrameInput& inputFrame)
         }
 
         if (stream_.size() >= BUFFER_SIZE) {
-
-            // make sure the last IO request has finished.
-            // typically this should never wait unless you have very high frame rate like 100+
-            if (compData_.isNotEmpty()) {
-                signal_.wait();
-            }
-
-            compData_.resize(compData_.capacity());
-
-            // could make this a job, but should not be slow.
-            size_t compDataSize = 0;
-            if (!core::Compression::LZ4::deflate(stream_.data(), stream_.size(), compData_.data() + sizeof(BufferHdr), compData_.size() - sizeof(BufferHdr),
-                compDataSize, core::Compression::CompressLevel::NORMAL)) {
-                X_ERROR("ReplaySys", "Failed to compress replay stream buffer");
-                stop();
-                return;
-            }
-
-            compData_.resize(compDataSize + sizeof(BufferHdr));
-
-            BufferHdr* pHeader = reinterpret_cast<BufferHdr*>(compData_.data());
-            pHeader->inflatedSize = safe_static_cast<uint32_t>(stream_.size());
-            pHeader->deflatedSize = safe_static_cast<uint32_t>(compDataSize);
-            stream_.reset();
-
-            core::IoRequestWrite r;
-            r.callback.Bind<ReplaySys, &ReplaySys::IoRequestCallback>(this);
-            r.pFile = pFile_;
-            r.pBuf = compData_.data();
-            r.offset = fileSize_;
-            r.dataSize = safe_static_cast<uint32_t>(compData_.size());
-
-            gEnv->pFileSys->AddIoRequestToQue(r);
-
-            fileSize_ += compData_.size();
+            dispatchWrite();
         }
     }
     else if (mode_ == Mode::PLAY) {
@@ -225,6 +206,7 @@ void ReplaySys::update(FrameInput& inputFrame)
             r.offset = readOffset_;
             r.dataSize = safe_static_cast<uint32_t>(compData_.size());
             gEnv->pFileSys->AddIoRequestToQue(r);
+            pendingIO_ = 1;
 
             // wait :( ?
             signal_.wait();
@@ -258,6 +240,7 @@ void ReplaySys::update(FrameInput& inputFrame)
                 r.offset = readOffset_ + bytesRead;
                 r.dataSize = safe_static_cast<uint32_t>(remaningCompBytes);
                 gEnv->pFileSys->AddIoRequestToQue(r);
+                pendingIO_ = 1;
 
                 readOffset_ += bufferSize;
                 X_ASSERT(readOffset_ <= fileSize_, "Offset greater than size")(readOffset_, fileSize_);
@@ -314,6 +297,49 @@ void ReplaySys::update(FrameInput& inputFrame)
     }
 }
 
+void ReplaySys::dispatchWrite(void)
+{
+    if (stream_.size() == 0) {
+        return;
+    }
+
+    // make sure the last IO request has finished.
+    // typically this should never wait unless you have very high frame rate like 100+
+    if (compData_.isNotEmpty()) {
+        signal_.wait();
+    }
+
+    compData_.resize(compData_.capacity());
+
+    // could make this a job, but should not be slow.
+    size_t compDataSize = 0;
+    if (!core::Compression::LZ4::deflate(stream_.data(), stream_.size(), compData_.data() + sizeof(BufferHdr), compData_.size() - sizeof(BufferHdr),
+        compDataSize, core::Compression::CompressLevel::NORMAL)) {
+        X_ERROR("ReplaySys", "Failed to compress replay stream buffer");
+        stop();
+        return;
+    }
+
+    compData_.resize(compDataSize + sizeof(BufferHdr));
+
+    BufferHdr* pHeader = reinterpret_cast<BufferHdr*>(compData_.data());
+    pHeader->inflatedSize = safe_static_cast<uint32_t>(stream_.size());
+    pHeader->deflatedSize = safe_static_cast<uint32_t>(compDataSize);
+    stream_.reset();
+
+    core::IoRequestWrite r;
+    r.callback.Bind<ReplaySys, &ReplaySys::IoRequestCallback>(this);
+    r.pFile = pFile_;
+    r.pBuf = compData_.data();
+    r.offset = fileSize_;
+    r.dataSize = safe_static_cast<uint32_t>(compData_.size());
+
+    gEnv->pFileSys->AddIoRequestToQue(r);
+    pendingIO_ = 1;
+
+    fileSize_ += compData_.size();
+}
+
 int32_t ReplaySys::getOffsetMS(void) const
 {
     auto now = gEnv->pTimer->GetTimeNowNoScale();
@@ -346,6 +372,7 @@ void ReplaySys::IoRequestCallback(core::IFileSys& fileSys, const core::IoRequest
         X_ASSERT_UNREACHABLE();
     }
     
+    pendingIO_ = 0;
     signal_.raise();
 }
 

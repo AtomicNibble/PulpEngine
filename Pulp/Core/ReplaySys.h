@@ -61,6 +61,8 @@ public:
     void update(FrameInput& inputFrame);
 
 private:
+    void dispatchWrite(void);
+
     int32_t getOffsetMS(void) const;
 
     void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
@@ -76,6 +78,7 @@ private:
     core::XFileAsync* pFile_;
     uint64_t fileSize_;
     uint64_t readOffset_;
+    core::AtomicInt pendingIO_;
 
     Mode::Enum mode_;
 
