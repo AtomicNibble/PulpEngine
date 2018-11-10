@@ -60,7 +60,7 @@ public:
 
     // ~IAkIOHookDeferred
 private:
-    void IoRequestCallback(core::IFileSys& pFileSys, const core::IoRequestBase* pRequest,
+    void IoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
 
 protected:
