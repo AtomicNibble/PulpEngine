@@ -171,6 +171,7 @@ namespace gui
         bool button(const char* pText, const char* pEnd);
 
         // Labels
+        void label(const char* pText, const char* pEnd, Color8u col);
         void text(const char* pText, const char* pEnd, Color8u col);
 
         // Sliders

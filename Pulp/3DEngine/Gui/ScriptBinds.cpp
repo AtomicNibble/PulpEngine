@@ -81,6 +81,7 @@ namespace gui
         X_SCRIPT_BIND(ScriptBinds_Menu, back);
 
         X_SCRIPT_BIND(ScriptBinds_Menu, pacifier);
+        X_SCRIPT_BIND(ScriptBinds_Menu, label);
         X_SCRIPT_BIND(ScriptBinds_Menu, text);
         X_SCRIPT_BIND(ScriptBinds_Menu, button);
         X_SCRIPT_BIND(ScriptBinds_Menu, sliderVar);
@@ -147,6 +148,25 @@ namespace gui
         }
 
         ctx_.pacifier(dt);
+
+        return pH->endFunction();
+    }
+
+    int32_t ScriptBinds_Menu::label(script::IFunctionHandler* pH)
+    {
+        SCRIPT_CHECK_PARAMETERS_MIN(1);
+
+        const char* pLabel = nullptr;
+        Color8u col = Col_White;
+
+        pH->getParam(1, pLabel);
+
+        if (pH->getParamCount() > 1)
+        {
+            col = parseColor(pH, 2);
+        }
+
+        ctx_.label(pLabel, pLabel + core::strUtil::strlen(pLabel), col);
 
         return pH->endFunction();
     }

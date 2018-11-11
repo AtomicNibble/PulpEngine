@@ -303,6 +303,28 @@ namespace gui
         return pressed;
     }
 
+    void GuiContex::label(const char* pText, const char* pEnd, Color8u col)
+    {
+        auto* pWindow = pCurrentWindow;
+        auto* pPrim = pWindow->pPrim;
+
+        auto id = getID(pText, pEnd);
+        auto labelSize = calcTextSize(pText, pEnd);
+
+        // calculate pos / size
+        auto pos = pWindow->dc.currentPos;
+        auto size = calcItemSize(Vec2f::zero(), labelSize + style_.framePadding * 2.f);
+
+        Rectf r(pos, pos + size);
+
+        addItem(r, id);
+
+        auto oldCol = txtCtx_.col;
+        txtCtx_.col = col;
+        pPrim->drawText(Vec3f(r.getCenter()), txtCtx_, pText);
+        txtCtx_.col = oldCol;
+    }
+
     void GuiContex::text(const char* pText, const char* pEnd, Color8u col)
     {
         auto* pWindow = pCurrentWindow;
