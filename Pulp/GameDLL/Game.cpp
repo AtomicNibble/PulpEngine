@@ -352,6 +352,9 @@ bool XGame::update(core::FrameData& frame)
         if (prevStatus_ != net::SessionStatus::InGame)
         {
             pMenuHandler_->close();
+
+            userCmdGen_.clear();
+            userCmdGen_.clearAngles();
         }
 
         X_ASSERT_NOT_NULL(world_.ptr());
