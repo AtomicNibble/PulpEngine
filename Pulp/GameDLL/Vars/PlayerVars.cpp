@@ -19,7 +19,7 @@ PlayerVars::PlayerVars()
     crouchHeight_ = 30.f;
     crouchViewHeight_ = 40.f;
     normalHeight_ = 50.f;
-    normalViewHeight_ = 70.f;
+    normalViewHeight_ = 65.f;
     crouchRate_ = 0.8f;
 
     maxViewPitch_ = 89;
