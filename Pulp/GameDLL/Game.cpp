@@ -601,8 +601,10 @@ void XGame::syncLobbyUsers(void)
 
         userCmdMan_.resetPlayer(plyIdx);
 
+        auto isLocal = myGuid_ == userGuid;
+
         // spawn!
-        world_->spawnPlayer(plyIdx);
+        world_->spawnPlayer(plyIdx, isLocal);
     }
 
 }

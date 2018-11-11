@@ -107,7 +107,7 @@ public:
     void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
     void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
 
-    void spawnPlayer(int32_t playerIdx);
+    void spawnPlayer(int32_t playerIdx, bool local);
     void removePlayer(int32_t playerIdx);
 
 private:

@@ -63,7 +63,7 @@ namespace entity
         void destroyEnt(EntityId id);
         EntityId createWeapon(EntityId playerId);
 
-        void makePlayer(EntityId id, const Vec3f& pos);
+        void makePlayer(EntityId id, const Vec3f& pos, bool local);
         void removePlayer(EntityId id);
         bool addController(EntityId id);
 

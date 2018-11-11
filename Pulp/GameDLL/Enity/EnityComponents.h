@@ -279,6 +279,7 @@ namespace entity
         typedef Flags<State> StateFlags;
 
         StateFlags state;
+        bool isLocal;
 
         core::TimeVal jumpTime;
 

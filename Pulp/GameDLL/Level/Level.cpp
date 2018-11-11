@@ -416,7 +416,7 @@ void World::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
 }
 
 
-void World::spawnPlayer(int32_t playerIdx)
+void World::spawnPlayer(int32_t playerIdx, bool local)
 {
     X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
     X_ASSERT_NOT_NULL(pScene_);
@@ -432,7 +432,7 @@ void World::spawnPlayer(int32_t playerIdx)
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
 
-    ents_.makePlayer(id, pos);
+    ents_.makePlayer(id, pos, local);
 }
 
 void World::removePlayer(int32_t playerIdx)

@@ -328,7 +328,7 @@ namespace entity
         return ent;
     }
 
-    void EnititySystem::makePlayer(EntityId id, const Vec3f& pos)
+    void EnititySystem::makePlayer(EntityId id, const Vec3f& pos, bool local)
     {
         auto& trans = reg_.assign<TransForm>(id);
         auto& player = reg_.assign<Player>(id);
@@ -336,15 +336,26 @@ namespace entity
         auto& inv = reg_.assign<Inventory>(id);
         auto& net = reg_.assign<NetworkSync>(id);
         auto& mesh = reg_.assign<Mesh>(id);
-        auto& rend = reg_.assign<MeshRenderer>(id);
 
         trans.pos = pos;
+        player.isLocal = local;
 
-        mesh.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
-        engine::RenderEntDesc entDsc;
-        entDsc.pModel = mesh.pModel;
-        // entDsc.trans = trans;
-        rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+        if (local)
+        {
+            // arms
+
+        }
+        else
+        {
+            // world model.
+
+            mesh.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
+            engine::RenderEntDesc entDsc;
+            entDsc.pModel = mesh.pModel;
+            
+            auto& rend = reg_.assign<MeshRenderer>(id);
+            rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+        }
 
         X_UNUSED(player, net);
         player.armsEnt = entity::INVALID_ID;
@@ -369,7 +380,6 @@ namespace entity
 
         player.currentWpn = 1;
         player.targetWpn = 1;
-
 
         addController(id);
 
