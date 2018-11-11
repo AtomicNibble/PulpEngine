@@ -1,11 +1,20 @@
 
+Common:
+
+  ☐ Work out why asserts generate so much bloat.
+
 Core:
 
   ☐ Sort out potential job system lock, due to not always helping with work when waiting.
   ☐ See if can make job profiler drawing better, by not drawing more blocks than pixels.
     - Also if we have lots of jobs on same pixel maybe blend the colors?
 
- ☐ Finish off and test replay logic of input system.
+ ✔ Finish off and test replay logic of input system. @done (18-11-10 17:17)
+ ☐ Make replay system support core notifications. Stuff like level loaded.
+   This way replays still work if level takes while to load.
+   Or do we want replays to only be for levels not menus.
+
+
 
  ✔ Tidy up console code. @done (18-09-17 18:35)
 
@@ -31,7 +40,7 @@ Game:
 
  ✔ Fix sound not working when reload level. @done (18-10-27 12:28)
 
-  Netorking:
+  Networking:
 
     ☐ Sync the players better, basically have some sort of 3rd person model.
         - Basically fix it so host and client can see same shit, currently only host can see some things.
