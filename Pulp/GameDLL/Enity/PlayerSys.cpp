@@ -487,7 +487,9 @@ namespace entity
         player.firstPersonViewOrigin = origin;
 
         // this seams wrong should be yaw not roll o.o?
-        trans.quat = Quatf(Vec3f(0,0,1), Quatf(axis).getRoll());
+        // TODO: these is some issue with the quat to mat, and matrix to quat logic.
+        // BROKEN AS FUCK.
+        trans.quat = Quatf(Vec3f(0, 0, 1), Quatf(axis).getRoll() + ::toRadians(90.f));
     }
 
 } // namespace entity
