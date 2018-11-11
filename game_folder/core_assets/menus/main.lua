@@ -17,8 +17,8 @@ local function Update(dt)
     --ui.pushFont();
     --ui.setTextSize(36,36);
     --ui.setTextFlags();
-    ui.text("Insert fancy main menu here", Color(255,255 * t,255 * t));
     --ui.popFont();
+    ui.label("MAIN", Color(255,20,20));
 
     if ui.button("SOLO test01") then
         core.exec("map test01");

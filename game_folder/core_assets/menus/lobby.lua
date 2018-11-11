@@ -16,6 +16,7 @@ local function Update(dt)
     ui.center();
 
     ui.list();
+    ui.label("LOBBY", Color(255,20,20));
 
     if ui.button("START GAME") then
         core.exec("startMatch");

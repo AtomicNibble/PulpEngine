@@ -10,7 +10,7 @@ local function Update(dt)
 
     ui.fill(2,2,2,220);
     ui.center();
-
+    ui.label("ONLINE", Color(255,20,20));
 
     if ui.button("CREATE LOBBY") then
         core.exec("createLobby");

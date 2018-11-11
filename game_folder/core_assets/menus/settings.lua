@@ -10,6 +10,7 @@ local function Update()
     ui.fill(2,2,2,220)
     ui.center();
 
+    ui.label("SETTINGS", Color(255,20,20));
     ui.sliderVar("VOLUME MASTER", "snd_vol_master");
     ui.sliderVar("VOLUME MUSIC", "snd_vol_music");
     ui.sliderVar("VOLUME SFX", "snd_vol_sfx");
