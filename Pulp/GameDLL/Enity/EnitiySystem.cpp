@@ -340,7 +340,7 @@ namespace entity
 
         trans.pos = pos;
 
-        mesh.pModel = pModelManager_->loadModel("test/prop/rolling_pan");
+        mesh.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
         engine::RenderEntDesc entDsc;
         entDsc.pModel = mesh.pModel;
         // entDsc.trans = trans;
