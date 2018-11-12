@@ -23,7 +23,7 @@ X_DECLARE_ENUM(UserButton)
     MOVE_RIGHT,
     MOVE_UP,
     MOVE_DOWN,
-    
+
     WEAP0,
     WEAP1,
     WEAP2,
@@ -36,7 +36,7 @@ X_DECLARE_ENUM(UserButton)
     WEAP9,
     WEAP_NEXT,
     WEAP_PREV
-);
+    );
 
 class ButtonState
 {
