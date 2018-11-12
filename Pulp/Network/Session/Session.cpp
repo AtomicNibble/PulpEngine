@@ -136,12 +136,14 @@ void Session::finishedLoading(void)
     // noice.
     X_ASSERT(state_ == SessionState::Loading, "Can't finish loading if not loading")(state_);
 
-    lobbys_[LobbyType::Game].finishedLoading();
+    auto& gameLobby = lobbys_[LobbyType::Game];
 
-    auto flags = lobbys_[LobbyType::Game].getMatchFlags();
+    gameLobby.finishedLoading();
+
+    auto flags = gameLobby.getMatchFlags();
     if (flags.IsSet(MatchFlag::Online))
     {
-        if (lobbys_[LobbyType::Game].isHost())
+        if (gameLobby.isHost())
         {
             if (vars_.waitForPlayers())
             {
@@ -154,7 +156,7 @@ void Session::finishedLoading(void)
         }
         else
         {
-            lobbys_[LobbyType::Game].sendToHost(MessageID::LoadingDone);
+            gameLobby.sendToHost(MessageID::LoadingDone);
         }
     }
     else
