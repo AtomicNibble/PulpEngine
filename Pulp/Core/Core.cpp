@@ -360,8 +360,6 @@ void XCore::ShutDown()
         core::Mem::DeleteAndNull(env_.pLog, g_coreArena);
     }
 
-
-
     if (pCoreEventDispatcher_) {
         pCoreEventDispatcher_->RemoveListener(this);
         core::Mem::DeleteAndNull(pCoreEventDispatcher_, g_coreArena);
