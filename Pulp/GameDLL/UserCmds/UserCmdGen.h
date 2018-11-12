@@ -66,7 +66,7 @@ public:
     void clearAngles(void);
 
     bool onInputEvent(const input::InputEvent& event);
-    void buildUserCmd(bool block);
+    void buildUserCmd(bool blockInput);
 
     net::UserCmd& getCurrentUsercmd(void);
     const net::UserCmd& getCurrentUsercmd(void) const;

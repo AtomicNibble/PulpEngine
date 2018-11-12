@@ -85,12 +85,12 @@ bool UserCmdGen::onInputEvent(const input::InputEvent& event)
 }
 
 
-void UserCmdGen::buildUserCmd(bool block)
+void UserCmdGen::buildUserCmd(bool blockInput)
 {
     resetCmd();
     processInput();
 
-    if (block)
+    if (blockInput)
     {
         mouseDelta_ = Vec2f::zero();
     }
