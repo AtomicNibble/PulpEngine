@@ -355,8 +355,7 @@ bool XGame::update(core::FrameData& frame)
         {
             pMenuHandler_->close();
 
-            userCmdGen_.clear();
-            userCmdGen_.clearAngles();
+            userCmdGen_.clearForNewLevel();
         }
 
         X_ASSERT_NOT_NULL(world_.ptr());

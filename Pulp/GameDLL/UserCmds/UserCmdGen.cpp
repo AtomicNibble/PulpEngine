@@ -56,6 +56,16 @@ void UserCmdGen::shutdown(void)
     gEnv->pCore->GetCoreEventDispatcher()->RemoveListener(this);
 }
 
+void UserCmdGen::clearForNewLevel(void)
+{
+    toggledCrouch_.clear();
+    toggledRun_.clear();
+    toggledZoom_.clear();
+
+    clear();
+    clearAngles();
+}
+
 void UserCmdGen::clear(void)
 {
     mouseDelta_ = Vec2f::zero();

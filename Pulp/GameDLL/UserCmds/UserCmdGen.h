@@ -62,6 +62,7 @@ public:
     bool init(void);
     void shutdown(void);
 
+    void clearForNewLevel(void);
     void clear(void);
     void clearAngles(void);
 
