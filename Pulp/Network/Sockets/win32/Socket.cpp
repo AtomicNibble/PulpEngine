@@ -207,8 +207,12 @@ SendResult NetSocket::send(SendParameters& sendParameters)
     // eat it you slag!
     int32_t oldTtl = -1;
 
-    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^3send:^7 pData ^5%p^7 length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32,
-        sendParameters.pData, sendParameters.length, sendParameters.ttl);
+    if(vars_.debugSocketsEnabled())
+    {
+        IPStr ipStr;
+        X_LOG0("Net", "^2socket::^3send:^7 pData ^5%p^7 length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32 "^7 Add: \"%s\"",
+            sendParameters.pData, sendParameters.length, sendParameters.ttl, sendParameters.systemAddress.toString(ipStr));
+    }
 
 #if X_ENABLE_NET_STATS
     ++stats_.numPacketsSent;
@@ -265,8 +269,11 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
         &senderAddLen);
 
     dataOut.bytesRead = bytesRead;
+    dataOut.systemAddress.setFromAddStorage(senderAddr);
 
-    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 length: ^5%" PRIi32, bytesRead);
+    IPStr ipStr;
+    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 length: ^5%" PRIi32 "^7 Add: \"%s\"", 
+        bytesRead, dataOut.systemAddress.toString(ipStr));
 
     if (bytesRead <= 0) {
         // this is not error, just making it so single branch if above zero.
@@ -281,7 +288,6 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
         if (err == WSAECONNRESET) {
             dataOut.systemAddress.setFromAddStorage(senderAddr);
 
-            IPStr ipStr;
             X_WARNING("Net", "Failed to recvfrom. \"%s\" Add: \"%s\"",
                 lastErrorWSA::ToString(err, Dsc), dataOut.systemAddress.toString(ipStr));
 
@@ -298,7 +304,6 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 #endif // !X_ENABLE_NET_STATS
 
     dataOut.timeRead = gEnv->pTimer->GetTimeNowReal();
-    dataOut.systemAddress.setFromAddStorage(senderAddr);
     dataOut.pSrcSocket = this;
     return RecvResult::Success;
 }
