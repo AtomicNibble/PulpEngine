@@ -335,7 +335,7 @@ namespace entity
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
         auto& net = reg_.assign<NetworkSync>(id);
-        auto& mesh = reg_.assign<Mesh>(id);
+
 
         trans.pos = pos;
         player.isLocal = local;
@@ -348,12 +348,13 @@ namespace entity
         else
         {
             // world model.
+            auto& mesh = reg_.assign<Mesh>(id);
+            auto& rend = reg_.assign<MeshRenderer>(id);
 
             mesh.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
             engine::RenderEntDesc entDsc;
             entDsc.pModel = mesh.pModel;
             
-            auto& rend = reg_.assign<MeshRenderer>(id);
             rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
         }
 
@@ -392,15 +393,19 @@ namespace entity
         // TODO: i need to keep the player ents reserved, so calling destory is not really going to work.
 
         auto& player = reg_.get<Player>(id);
-        auto& mesh = reg_.get<Mesh>(id);
-        auto& meshRend = reg_.get<MeshRenderer>(id);
 
-        if (meshRend.pRenderEnt) {
-            p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
+        if (reg_.has<MeshRenderer>(id)) {
+            auto& meshRend = reg_.get<MeshRenderer>(id);
+            if (meshRend.pRenderEnt) {
+                p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
+            }
         }
 
-        if (mesh.pModel) {
-            pModelManager_->releaseModel(mesh.pModel);
+        if (reg_.has<Mesh>(id)) {
+            auto& mesh = reg_.get<Mesh>(id);
+            if (mesh.pModel) {
+                pModelManager_->releaseModel(mesh.pModel);
+            }
         }
 
         if (player.armsEnt != entity::INVALID_ID) {
