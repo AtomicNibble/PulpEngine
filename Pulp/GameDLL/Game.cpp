@@ -42,18 +42,18 @@ XGame::~XGame()
 
 void XGame::registerVars(void)
 {
-	weaponDefs_.registerVars();
+    weaponDefs_.registerVars();
     vars_.registerVars();
     inputVars_.registerVars();
 }
 
 void XGame::registerCmds(void)
 {
-	weaponDefs_.registerCmds();
+    weaponDefs_.registerCmds();
 
     ADD_COMMAND_MEMBER("map", this, XGame, &XGame::Command_Map, core::VarFlag::SYSTEM, "Loads a map");
     ADD_COMMAND_MEMBER("mainMenu", this, XGame, &XGame::Command_MainMenu, core::VarFlag::SYSTEM, "Return to main menu");
-    
+
     ADD_COMMAND_MEMBER("uiOpenMenu", this, XGame, &XGame::Cmd_OpenMenu, core::VarFlags::SYSTEM, "Open menu");
 
 }
@@ -107,8 +107,8 @@ bool XGame::init(void)
     {
         auto* pNet = gEnv->pNet;
         auto* pPeer = pNet->createPeer();
-        
-        myGuid_  = pPeer->getMyGUID();
+
+        myGuid_ = pPeer->getMyGUID();
 
         net::Port basePort = 1337;
         net::Port maxPort = basePort + 10;
@@ -161,7 +161,7 @@ bool XGame::shutDown(void)
 
     if (pMenuHandler_) {
         auto* pMenuMan = gEnv->p3DEngine->getMenuManager();
-        
+
         pMenuMan->releaseMenuHandler(pMenuHandler_);
     }
 
@@ -244,11 +244,11 @@ bool XGame::update(core::FrameData& frame)
     Matrix44f orthoProj;
     MatrixOrthoOffCenterRH(
         &orthoProj,
-        0.f, 
-        static_cast<float>(frame.view.displayRes.x), 
-        static_cast<float>(frame.view.displayRes.y), 
-        0.f, 
-        -1e10f, 
+        0.f,
+        static_cast<float>(frame.view.displayRes.x),
+        static_cast<float>(frame.view.displayRes.y),
+        0.f,
+        -1e10f,
         1e10
     );
 
@@ -327,7 +327,7 @@ bool XGame::update(core::FrameData& frame)
                 X_ERROR("Game", "Match map name is empty");
                 pSession_->quitToMenu();
             }
-            else 
+            else
             {
                 world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, weaponDefs_, arena_);
 
@@ -419,7 +419,7 @@ bool XGame::update(core::FrameData& frame)
             // run me some user cmds!
             auto& userCmd = userCmdMan_.getUserCmdForPlayer(localIdx);
             auto unread = userCmdMan_.getNumUnreadFrames(localIdx);
-            
+
             X_UNUSED(unread);
 
             world_->runUserCmdForPlayer(frame, userCmd, localIdx);
