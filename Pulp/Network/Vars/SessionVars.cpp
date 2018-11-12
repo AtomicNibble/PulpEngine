@@ -12,6 +12,7 @@ SessionVars::SessionVars()
     connectionAttemps_ = 3;
     connectionRetyDelayMs_ = 500;
 
+    snapDebug_ = 0;
     snapMaxbufferedMs_ = 100;
     snapRateMs_ = 100;
     userCmdRateMs_ = 40;
@@ -35,6 +36,9 @@ void SessionVars::registerVars(void)
         "Time to wait in MS before retrying");
 
     // snip snap.
+    ADD_CVAR_REF("net_snap_debug", snapDebug_, snapDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Drops the next outgoing snap");
+
     ADD_CVAR_REF("net_snap_force_drop_next", snapFroceDrop_, 0, 0, 1, core::VarFlag::SYSTEM,
         "Drops the next outgoing snap");
 

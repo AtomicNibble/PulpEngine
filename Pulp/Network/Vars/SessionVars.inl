@@ -22,6 +22,11 @@ X_INLINE int32_t SessionVars::connectionRetryDelayMs(void) const
     return connectionRetyDelayMs_;
 }
 
+X_INLINE bool SessionVars::snapDebug(void) const
+{
+    return snapDebug_ != 0;
+}
+
 X_INLINE bool SessionVars::snapFroceDrop(void)
 {
     if (snapFroceDrop_ == 0) {
