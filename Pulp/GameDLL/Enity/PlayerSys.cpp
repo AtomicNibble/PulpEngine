@@ -53,6 +53,44 @@ namespace entity
         return true;
     }
 
+    void PlayerSystem::update(core::FrameTimeData& timeInfo, EnitiyRegister& reg, game::weapon::WeaponDefManager& weaponDefs,
+        model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld)
+    {
+        X_UNUSED(timeInfo, weaponDefs, pModelManager, p3DWorld);
+        
+        auto view = reg.view<Player, TransForm>();
+        for (auto playerId : view) {
+
+            auto& trans = reg.get<TransForm>(playerId);
+            auto& player = reg.get<Player>(playerId);
+
+            // should there just be a system that checks all MeshRenderer see if changed.
+            // or somthing event driven.
+            if (reg.has<MeshRenderer>(playerId))
+            {
+                auto& rend = reg.get<MeshRenderer>(playerId);
+                p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
+            }
+
+            if (vars_.drawPosInfo_) {
+                auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
+
+                core::StackString256 dbgTxt;
+                dbgTxt.appendFmt("pos (%.2f,%.2f,%.2f)\nyaw %.2f pitch: %.2f roll: %.2f",
+                    trans.pos.x, trans.pos.y, trans.pos.z,
+                    player.viewAngles.yaw(), player.viewAngles.pitch(), player.viewAngles.roll());
+
+                font::TextDrawContext con;
+                con.col = Col_Mintcream;
+                con.size = Vec2f(24.f, 24.f);
+                con.effectId = 0;
+                con.pFont = gEnv->pFontSys->getDefault();
+                pPrim->drawText(Vec3f(10.f, 200.f + (playerId * 50.f), 0.8f), con, dbgTxt.begin(), dbgTxt.end());
+            }
+        }
+
+    }
+
     void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
         weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
         engine::IWorld3D* p3DWorld, const net::UserCmd& userCmd, EntityId playerId)
@@ -60,7 +98,7 @@ namespace entity
         X_ASSERT(playerId < net::MAX_PLAYERS, "Invalid player id")(playerId, net::MAX_PLAYERS);
         X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
 
-        X_UNUSED(timeInfo, reg, playerId, p3DWorld);
+        X_UNUSED(timeInfo, p3DWorld);
 
         auto& trans = reg.get<TransForm>(playerId);
         auto& player = reg.get<Player>(playerId);
@@ -111,22 +149,6 @@ namespace entity
             }
 
             player.deltaViewAngles = delta;
-        }
-
-        if (vars_.drawPosInfo_ && player.isLocal) {
-            auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
-
-            core::StackString256 dbgTxt;
-            dbgTxt.appendFmt("pos (%.2f,%.2f,%.2f)\nyaw %.2f pitch: %.2f roll: %.2f",
-                trans.pos.x, trans.pos.y, trans.pos.z,
-                player.viewAngles.yaw(), player.viewAngles.pitch(), player.viewAngles.roll());
-
-            font::TextDrawContext con;
-            con.col = Col_Mintcream;
-            con.size = Vec2f(24.f, 24.f);
-            con.effectId = 0;
-            con.pFont = gEnv->pFontSys->getDefault();
-            pPrim->drawText(Vec3f(10.f, 200.f, 0.8f), con, dbgTxt.begin(), dbgTxt.end());
         }
 
         if (reg.has<CharacterController>(playerId)) {

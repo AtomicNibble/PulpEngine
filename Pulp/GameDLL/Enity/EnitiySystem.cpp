@@ -173,6 +173,8 @@ namespace entity
         // update the cameras.
         cameraSys_.update(frame, reg_, pPhysScene_);
 
+        playerSys_.update(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_);
+
         soundSys_.update(frame, reg_);
 
         animatedSys_.update(frame.timeInfo, reg_, p3DWorld_, pPhysScene_);

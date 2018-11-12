@@ -27,6 +27,9 @@ namespace entity
 
         bool init(physics::IScene* pPhysScene);
 
+        void update(core::FrameTimeData& timeInfo, EnitiyRegister& reg, game::weapon::WeaponDefManager& weaponDefs, 
+            model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld);
+
         void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
             game::weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
             const net::UserCmd& userCmd, EntityId playerId);
