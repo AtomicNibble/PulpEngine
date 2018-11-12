@@ -500,6 +500,8 @@ void Lobby::sendSnapShot(const SnapShot& snap)
     bs.write(MessageID::SnapShot);
     snap.writeToBitStream(bs);
 
+    const auto snapDebug = vars_.snapDebug();
+
     for (auto& peer : peers_)
     {
         if (!peer.isConnected()) {
@@ -507,11 +509,17 @@ void Lobby::sendSnapShot(const SnapShot& snap)
         }
 
         if (!peer.loaded) {
+            if(snapDebug) {
+                NetGuidStr guidStr;
+                X_WARNING("Lobby", "Skipping snap for peer %s they have not loaded", peer.guid.toString(guidStr));
+            }
             continue;
         }
 
-        NetGuidStr str;
-        X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(str));
+        if (snapDebug) {
+            NetGuidStr guidStr;
+            X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(guidStr));
+        }
 
         // for now just send whole snap, later will need to build deltas and shit.
         // how do i know it's a snapshot tho?
