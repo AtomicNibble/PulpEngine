@@ -43,8 +43,8 @@ class ButtonState
 public:
     ButtonState();
 
-    void Clear(void);
-    void SetKeyState(int32_t keystate, bool toggle);
+    void clear(void);
+    void setKeyState(int32_t keystate, bool toggle);
 
     bool isActive(void) const;
 

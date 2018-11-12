@@ -7,16 +7,16 @@ X_NAMESPACE_BEGIN(game)
 
 ButtonState::ButtonState()
 {
-    Clear();
+    clear();
 }
 
-void ButtonState::Clear(void)
+void ButtonState::clear(void)
 {
     active_ = false;
     held_ = false;
 }
 
-void ButtonState::SetKeyState(int32_t keystate, bool toggle)
+void ButtonState::setKeyState(int32_t keystate, bool toggle)
 {
     if (!toggle) {
         active_ = keystate;
@@ -96,9 +96,9 @@ void UserCmdGen::buildUserCmd(bool blockInput)
     }
     else
     {
-        toggledCrouch_.SetKeyState(buttonState(UserButton::MOVE_DOWN), vars_.toggleCrouch());
-        toggledRun_.SetKeyState(buttonState(UserButton::RUN), vars_.toggleRun());
-        toggledZoom_.SetKeyState(buttonState(UserButton::ZOOM), vars_.toggleZoom());
+        toggledCrouch_.setKeyState(buttonState(UserButton::MOVE_DOWN), vars_.toggleCrouch());
+        toggledRun_.setKeyState(buttonState(UserButton::RUN), vars_.toggleRun());
+        toggledZoom_.setKeyState(buttonState(UserButton::ZOOM), vars_.toggleZoom());
 
         setButtonFlags();
 
