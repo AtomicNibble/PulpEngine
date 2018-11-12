@@ -415,6 +415,7 @@
     <ClInclude Include="UserCmds\UserCmdMan.h" />
     <ClInclude Include="UserCmds\UserCmdGen.h" />
     <ClInclude Include="Vars\GameVars.h" />
+    <ClInclude Include="Vars\InputVars.h" />
     <ClInclude Include="Vars\PlayerVars.h" />
     <ClInclude Include="Weapon\WeaponDef.h" />
     <ClInclude Include="Weapon\WeaponManager.h" />
@@ -448,6 +449,7 @@
     <ClCompile Include="UserCmds\UserCmdMan.cpp" />
     <ClCompile Include="UserCmds\UserCmdGen.cpp" />
     <ClCompile Include="Vars\GameVars.cpp" />
+    <ClCompile Include="Vars\InputVars.cpp" />
     <ClCompile Include="Vars\PlayerVars.cpp" />
     <ClCompile Include="Weapon\WeaponDef.cpp" />
     <ClCompile Include="Weapon\WeaponManager.cpp" />
@@ -455,6 +457,7 @@
   <ItemGroup>
     <None Include="Enity\DataTranslator.inl" />
     <None Include="Vars\GameVars.inl" />
+    <None Include="Vars\InputVars.inl" />
     <None Include="Vars\PlayerVars.inl" />
     <None Include="Weapon\WeaponDef.inl" />
   </ItemGroup>

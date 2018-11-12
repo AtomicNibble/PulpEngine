@@ -120,6 +120,9 @@
     <ClInclude Include="UserCmds\UserCmdGen.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
+    <ClInclude Include="Vars\InputVars.h">
+      <Filter>Header Files\Vars</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -182,6 +185,9 @@
     <ClCompile Include="UserCmds\UserCmdGen.cpp">
       <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
+    <ClCompile Include="Vars\InputVars.cpp">
+      <Filter>Source Files\Vars</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Vars\PlayerVars.inl">
@@ -194,6 +200,9 @@
       <Filter>Header Files\Weapon</Filter>
     </None>
     <None Include="Vars\GameVars.inl">
+      <Filter>Header Files\Vars</Filter>
+    </None>
+    <None Include="Vars\InputVars.inl">
       <Filter>Header Files\Vars</Filter>
     </None>
   </ItemGroup>
