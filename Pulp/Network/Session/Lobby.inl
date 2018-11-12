@@ -41,7 +41,7 @@ X_INLINE bool Lobby::isPeer(void) const
         return false;
     }
 
-    X_ASSERT(!isHost(), "Can't host a lobby if peer of another")(isHost(), hostIdx_);
+    X_ASSERT(!isHost(), "Can't be a peer and a host")(isHost(), hostIdx_);
     return true;
 }
 
