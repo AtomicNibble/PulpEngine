@@ -9,6 +9,7 @@
 
 #include "Level\Level.h"
 #include "Vars\GameVars.h"
+#include "Vars\InputVars.h"
 
 #include "UserCmds\UserCmdGen.h"
 #include "UserCmds\UserCmdMan.h"
@@ -86,6 +87,7 @@ private:
 
 private:
     GameVars vars_;
+    InputVars inputVars_;
 
     net::SessionStatus::Enum prevStatus_;
     net::NetGUID myGuid_;

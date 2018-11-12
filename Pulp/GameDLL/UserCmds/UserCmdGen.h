@@ -5,13 +5,15 @@
 
 X_NAMESPACE_BEGIN(game)
 
+class InputVars;
+
 X_DECLARE_ENUM(UserButton)
 (
     NONE,
 
     ATTACK,
     ZOOM,
-    SPEED,
+    RUN,
     USE,
     RELOAD,
 
@@ -36,10 +38,26 @@ X_DECLARE_ENUM(UserButton)
     WEAP_PREV
 );
 
+class ButtonState
+{
+public:
+    ButtonState();
+
+    void Clear(void);
+    void SetKeyState(int32_t keystate, bool toggle);
+
+    bool isActive(void) const;
+
+private:
+    int32_t active_;
+    bool held_;
+};
+
+
 class UserCmdGen : public ICoreEventListener
 {
 public:
-    UserCmdGen();
+    UserCmdGen(const InputVars& vars);
 
     bool init(void);
     void shutdown(void);
@@ -70,7 +88,12 @@ private:
     int32_t buttonState(UserButton::Enum but) const;
 
 private:
+    const InputVars& vars_;
     net::UserCmd cmd_;
+
+    ButtonState toggledCrouch_;
+    ButtonState toggledRun_;
+    ButtonState toggledZoom_;
 
     Vec2f mouseDelta_;
     Vec3f viewAngles_;

@@ -1,9 +1,45 @@
 #include "stdafx.h"
 #include "UserCmdGen.h"
 
+#include "Vars\InputVars.h"
+
 X_NAMESPACE_BEGIN(game)
 
-UserCmdGen::UserCmdGen()
+ButtonState::ButtonState()
+{
+    Clear();
+}
+
+void ButtonState::Clear(void)
+{
+    active_ = false;
+    held_ = false;
+}
+
+void ButtonState::SetKeyState(int32_t keystate, bool toggle)
+{
+    if (!toggle) {
+        active_ = keystate;
+        held_ = false;
+    }
+    else if (!keystate) {
+        held_ = false;
+    }
+    else if (!held_) {
+        active_ ^= 1;
+        held_ = true;
+    }
+}
+
+bool ButtonState::isActive(void) const
+{
+    return active_ > 0;
+}
+
+// ---------------------
+
+UserCmdGen::UserCmdGen(const InputVars& vars) :
+    vars_(vars)
 {
     clear();
 }
@@ -60,6 +96,10 @@ void UserCmdGen::buildUserCmd(bool block)
     }
     else
     {
+        toggledCrouch_.SetKeyState(buttonState(UserButton::MOVE_DOWN), vars_.toggleCrouch());
+        toggledRun_.SetKeyState(buttonState(UserButton::RUN), vars_.toggleRun());
+        toggledZoom_.SetKeyState(buttonState(UserButton::ZOOM), vars_.toggleZoom());
+
         setButtonFlags();
 
         mouseMove();
@@ -130,20 +170,22 @@ void UserCmdGen::setButtonFlags(void)
     if (buttonState(UserButton::USE)) {
         cmd_.buttons.Set(net::Button::USE);
     }
-
     if (buttonState(UserButton::MOVE_UP)) {
         cmd_.buttons.Set(net::Button::JUMP);
     }
-    if (buttonState(UserButton::MOVE_DOWN)) {
-        cmd_.buttons.Set(net::Button::CROUCH);
-    }
-
-    if (buttonState(UserButton::SPEED)) {
-        cmd_.buttons.Set(net::Button::RUN);
-    }
-
     if (buttonState(UserButton::RELOAD)) {
         cmd_.buttons.Set(net::Button::RELOAD);
+    }
+
+    // some stuff that can be either toggle or hold.
+    if (toggledCrouch_.isActive()) {
+        cmd_.buttons.Set(net::Button::CROUCH);
+    }
+    if (toggledRun_.isActive()) {
+        cmd_.buttons.Set(net::Button::RUN);
+    }
+    if (toggledZoom_.isActive()) {
+        cmd_.buttons.Set(net::Button::ZOOM);
     }
 }
 
@@ -208,7 +250,7 @@ UserButton::Enum UserCmdGen::getUserButton(input::KeyId::Enum key)
             return UserButton::MOVE_UP;
 
         case input::KeyId::LEFT_SHIFT:
-            return UserButton::SPEED;
+            return UserButton::RUN;
 
         case input::KeyId::DIGIT_0:
             return UserButton::WEAP0;

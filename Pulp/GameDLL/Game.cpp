@@ -27,6 +27,7 @@ XGame::XGame(ICore* pCore) :
     pRender_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
+    userCmdGen_(inputVars_),
     userCmdMan_(vars_),
     weaponDefs_(arena_),
     pMenuHandler_(nullptr)
@@ -43,6 +44,7 @@ void XGame::registerVars(void)
 {
 	weaponDefs_.registerVars();
     vars_.registerVars();
+    inputVars_.registerVars();
 }
 
 void XGame::registerCmds(void)
