@@ -113,7 +113,7 @@ namespace entity
             player.deltaViewAngles = delta;
         }
 
-        if (vars_.drawPosInfo_) {
+        if (vars_.drawPosInfo_ && player.isLocal) {
             auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
             core::StackString256 dbgTxt;
