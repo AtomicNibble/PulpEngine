@@ -661,6 +661,7 @@ bool Session::readPackets(void)
             case MessageID::LobbyJoinRequest:
             case MessageID::LobbyJoinAccepted:
             case MessageID::LobbyJoinNoFreeSlots:
+            case MessageID::LobbyJoinRejected:
             case MessageID::LobbyUsersConnected:
             case MessageID::LobbyUsersDiconnected:
             case MessageID::LobbyGameParams:

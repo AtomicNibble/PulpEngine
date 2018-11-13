@@ -227,6 +227,7 @@ bool Lobby::handlePacket(Packet* pPacket)
         case MessageID::ConnectionRateLimited:
         case MessageID::InvalidPassword:
         case MessageID::LobbyJoinNoFreeSlots:
+        case MessageID::LobbyJoinRejected:
             handleConnectionAttemptFailed(id);
             break;
 
@@ -1082,6 +1083,16 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     // the peer confirmed connnection with us.
     // what a nice little slut.
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
+
+    if (!params_.flags.IsSet(MatchFlag::Online)) {
+        X_WARNING("Lobby", "Rejected peer, not a online lobby");
+
+        MsgIdBs bs;
+        bs.write(MessageID::LobbyJoinRejected);
+        bs.write(safe_static_cast<uint8_t>(type_));
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+        return;
+    }
 
     if (getNumFreeUserSlots() == 0) {
        X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
