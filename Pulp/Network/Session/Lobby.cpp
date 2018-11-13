@@ -1279,6 +1279,8 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
     clearUsers();
 
     params_.fromBitStream(bs);
+    X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
+
     addUsersFromBs(bs, peerIdx);
 
     setState(LobbyState::Idle);
@@ -1334,6 +1336,7 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
 void Lobby::handleLobbyGameParams(Packet* pPacket)
 {
     X_ASSERT(isPeer(), "Recived GameParams when not peer")(isPeer(), isHost());
+    X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
 
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
@@ -1341,6 +1344,8 @@ void Lobby::handleLobbyGameParams(Packet* pPacket)
     X_ASSERT(type == type_, "Recived Lobby packet with type mismatch")(type_, type);
 
     params_.fromBitStream(bs);
+
+    X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
 }
 
 void Lobby::handleLobbyConnectAndMove(Packet* pPacket)
@@ -1380,6 +1385,7 @@ void Lobby::handleLoadingStart(Packet* pPacket)
 {
     X_ASSERT(type_ == LobbyType::Game, "None game lobby recived loading start")(type_);
     X_ASSERT(isPeer(), "Recived LoadingStart when not peer")(isPeer(), isHost());
+    X_ASSERT(params_.flags.IsSet(MatchFlag::Online), "Missing online flag")();
 
     // stu will take all your loads.
     auto peerIdx = findPeerIdx(pPacket->systemHandle);

@@ -161,6 +161,8 @@ void Session::finishedLoading(void)
     }
     else
     {
+        X_ASSERT(!gameLobby.isPeer() && gameLobby.getNumUsers() < 2, "Can't be a peer of a none online lobby")(gameLobby.isPeer(), gameLobby.getNumUsers());
+
         setState(SessionState::InGame);
     }
 }
