@@ -380,7 +380,7 @@ namespace shader
         name.append(digest.ToString(sha1Buf));
 
 #if X_DEBUG
-        X_LOG1("Shader", "HWS for name: \"%s\"", name.c_str());
+        X_LOG1("Shader", "Load: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
         core::string nameStr(name.begin(), name.end());
