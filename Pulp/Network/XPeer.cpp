@@ -1473,7 +1473,7 @@ void XPeer::listRemoteSystems(bool verbose) const
         if (!verbose) {
             X_LOG0("Net", "Host: \"%s\" connectionTime: ^5%s^7 state: ^5%s",
                 rs.systemAddress.toString(ipStr),
-                core::HumanDuration::toString(durStr, connectionElapsed.GetSeconds()),
+                core::HumanDuration::toString(durStr, connectionElapsed.GetMilliSecondsAsInt64()),
                 ConnectionState::ToString(rs.getConnectionState()));
         }
         else {
@@ -1484,7 +1484,7 @@ void XPeer::listRemoteSystems(bool verbose) const
 
             X_LOG0("Net", "Host: \"%s\" connectionTime: ^5%s^7 state: ^5%s^7 memUsage: ^5%s",
                 rs.systemAddress.toString(ipStr),
-                core::HumanDuration::toString(durStr, connectionElapsed.GetSeconds()),
+                core::HumanDuration::toString(durStr, connectionElapsed.GetMilliSecondsAsInt64()),
                 ConnectionState::ToString(rs.getConnectionState()),
                 core::HumanSize::toString(sizeStr, stats.internalMemUsage));
             X_LOG_BULLET;
