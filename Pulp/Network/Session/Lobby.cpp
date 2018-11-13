@@ -1078,20 +1078,29 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     // what a nice little slut.
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
 
-    // TODO: Better place for this?
-    if (getNumFreeUserSlots() == 0) {
-       X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
-        
+    auto rejectConnection = [&](MessageID::Enum id) {
         MsgIdBs bs;
-        bs.write(MessageID::LobbyJoinNoFreeSlots);
+        bs.write(id);
         bs.write(safe_static_cast<uint8_t>(type_));
         pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+        pPeer_->closeConnection(pPacket->systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
+    };
+
+    if (getNumFreeUserSlots() == 0) {
+       X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
+        rejectConnection(MessageID::LobbyJoinNoFreeSlots);
         return;
     }
-  
+
+    if (!params_.flags.IsSet(MatchFlag::Online)) {
+        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
+        rejectConnection(MessageID::LobbyJoinRejected);
+        return;
+    }
+
     auto address = pPeer_->getAddressForHandle(pPacket->systemHandle);
     auto peerIdx = addPeer(address);
-    
+
     IPStr strBuf;
     X_LOG0("Lobby", "Peer connected to \"%s\" lobby address \"%s\"", LobbyType::ToString(type_), gEnv->pNet->systemAddressToString(address, strBuf, true));
 
@@ -1178,20 +1187,6 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
             X_ERROR("Lobby", "Failed to add peer for JoinRequest");
             return;
         }
-    }
-
-    if (!params_.flags.IsSet(MatchFlag::Online)) {
-        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
-
-        MsgIdBs bs;
-        bs.write(MessageID::LobbyJoinRejected);
-        bs.write(safe_static_cast<uint8_t>(type_));
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
-
-        if (peerIdx >= 0) {
-            disconnectPeer(peerIdx);
-        }
-        return;
     }
 
     auto& peer = peers_[peerIdx];
