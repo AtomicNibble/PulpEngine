@@ -1,7 +1,11 @@
 
+Win32:
+    ☐ Move all windows GUI stuff to sperate thread so we can still process frames when moving window around.
+
 Common:
 
-  ☐ Work out why asserts generate so much bloat.
+  ✔ Work out why asserts generate so much bloat. @done (18-11-12 21:39)
+      was sourceInfo.
 
 Core:
 
@@ -14,12 +18,15 @@ Core:
    This way replays still work if level takes while to load.
    Or do we want replays to only be for levels not menus.
 
+   If we don't have replays be based on the start of a level.
+   How can we reliably start a replay, like a replay in the middle of the map
+   is not much use is it?
 
 
  ✔ Tidy up console code. @done (18-09-17 18:35)
 
    FileSys:
-      ✔ Virtual file system needs bit more work, stuff for allowing tools to write to absolutle paths without getting sandboxed. @done (18-10-22 21:26)
+      ✔ Virtual file system needs bit more work, stuff for allowing tools to write to absolute paths without getting sandboxed. @done (18-10-22 21:26)
    See a3ebe074bdd66ad8938c6654546446d518354139 for current hack
 
      ✔ Don't apply OS slashes until we hit OS specific code paths. @done (18-10-16 22:42)
@@ -40,10 +47,30 @@ Game:
 
  ✔ Fix sound not working when reload level. @done (18-10-27 12:28)
 
+ ☐ Make the bullet ray staring position correct.
+ ✔ Support toggle: crouch, run, zoom @done (18-11-12 20:14)
+ ☐ Make it so each player has a calculated render view.
+     - Or should we just make the render view whem we need it?
+   ☐ Players weapons should be able to effect fov in the render view
+ ✔ Only draw pos for local player. @done (18-11-12 20:49)
+ ☐ Clients can't see host body.
+   So I need to update the render ents for all other players.
+   Currently i only do that in runuserCmdForPlayer, rip.
+
   Networking:
 
     ☐ Sync the players better, basically have some sort of 3rd person model.
         - Basically fix it so host and client can see same shit, currently only host can see some things.
+
+    ☐ If the server thinks we are not loaded / connected it won't send us snapshots.
+      The client should notice this and do something about it.
+
+   ☐ For debugging should have like no timeouts so can pause shit.
+   ☐ Add some snapshot debugging?
+   ☐ Make it so when we leave a game peer connections are closed before state change
+       so we don't get and packets coming from the old game host when in idle.
+   ☐ Should we always bind a port? or online for online stuff.
+       Well we only need it for hosting, since peers are connecting to server.
 
 
 Engine:
@@ -83,7 +110,9 @@ Engine:
 
 Network:
 
-  ☐  Implement congestion control.
+ ☐  Implement congestion control.
+ ☐  Support a debug graph that shows like network usage with category support.
+
 
 Font:
 
@@ -220,3 +249,6 @@ Sql:
    Containers:
      ✔ FixedByteStream @done (18-09-15 18:05)
      ✔ FixedByteStreamRing @done (18-09-15 17:48)
+
+   Maths:
+     ☐ The Angles, Quat, Mat conversions seams broken so fix tests + logic.
