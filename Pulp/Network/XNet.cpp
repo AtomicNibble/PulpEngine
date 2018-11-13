@@ -330,7 +330,7 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
 
     int32_t idx = 0;
     for (auto* pPeer : peers_) {
-        X_LOG0("Net", "Peer%" PRIi32 " remote systems", idx++);
+        X_LOG0("Net", "^6Peer%" PRIi32 "^7 remote systems:", idx++);
         X_LOG_BULLET;
         pPeer->listRemoteSystems(verbose);
     }
