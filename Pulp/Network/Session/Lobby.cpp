@@ -674,10 +674,7 @@ void Lobby::disconnectPeer(int32_t peerIdx)
     X_LOG0("Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
 
     auto& peer = peers_[peerIdx];
-
-    if (peer.getConnectionState() != LobbyPeer::ConnectionState::Free) {
-        setPeerConnectionState(peer, LobbyPeer::ConnectionState::Free);
-    }
+    setPeerConnectionState(peer, LobbyPeer::ConnectionState::Free);
 }
 
 X_INLINE void Lobby::setPeerConnectionState(int32_t peerIdx, LobbyPeer::ConnectionState::Enum state)
