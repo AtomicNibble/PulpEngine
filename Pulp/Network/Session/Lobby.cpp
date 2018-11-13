@@ -1702,7 +1702,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     const auto numConnected = getNumConnectedPeers();
     const auto numInGame = getNumConnectedPeersInGame();
 
-    pPrim->drawQuad(base, width, height, Color8u(20, 20, 20, 60));
+    pPrim->drawQuad(base, width, height, Color8u(20, 20, 20, 150));
 
     auto* pNet = gEnv->pNet;
     IPStr ipStr;
@@ -1713,6 +1713,12 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
 
     txt.appendFmt("HostAddr: \"%s\" Connected: ^1%" PRIi32 "^7 inGame: ^1%" PRIi32 "^7\n",
         pNet->systemAddressToString(hostAddress_, ipStr, true), numConnected, numInGame);
+
+    txt.appendFmt("Slots: %" PRIi32 " Mode %s Map: %s\n",
+        params_.numSlots, GameMode::ToString(params_.mode), params_.mapName.c_str());
+
+    MatchFlags::Description flagsStr;
+    txt.appendFmt("Flags: [%s]\n", params_.flags.ToString(flagsStr));
 
     for (size_t i = 0; i < peers_.size(); i++)
     {
@@ -1740,7 +1746,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     }
 
 
-    pPrim->drawText(base.x + 2.f, base.y + 30.f + (peers_.size() * 16.f), con, txt.begin(), txt.end());
+    pPrim->drawText(base.x + 2.f, base.y + 80.f + (peers_.size() * 16.f), con, txt.begin(), txt.end());
 
     return Vec2f(width, height);
 }
