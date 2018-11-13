@@ -749,8 +749,8 @@ void Session::sendPacketToLobbyIfGame(Packet* pPacket)
             break;
 
         default:
-            X_ERROR("Session", "Recived Game packet when not in game state: %s", SessionState::ToString(state_));
-            X_ASSERT_UNREACHABLE();
+            // TODO: if we just leave a game, can prevent incoming snapshots hitting this?
+            X_WARNING("Session", "Recived Game packet when not in game state: %s", SessionState::ToString(state_));
             break;
     }
 }
