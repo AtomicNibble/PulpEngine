@@ -226,8 +226,6 @@ bool Lobby::handlePacket(Packet* pPacket)
         case MessageID::ConnectionNoFreeSlots:
         case MessageID::ConnectionRateLimited:
         case MessageID::InvalidPassword:
-        case MessageID::LobbyJoinNoFreeSlots:
-        case MessageID::LobbyJoinRejected:
             handleConnectionAttemptFailed(id);
             break;
 
@@ -243,6 +241,10 @@ bool Lobby::handlePacket(Packet* pPacket)
             break;
         case MessageID::LobbyJoinAccepted:
             handleLobbyJoinAccepted(pPacket);
+            break;
+        case MessageID::LobbyJoinNoFreeSlots:
+        case MessageID::LobbyJoinRejected:
+            handleLobbyJoinRejected(pPacket);
             break;
         case MessageID::LobbyUsersConnected:
             handleLobbyUsersConnected(pPacket);
@@ -1080,16 +1082,7 @@ void Lobby::handleConnectionHandShake(Packet* pPacket)
     // what a nice little slut.
     X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
 
-    if (!params_.flags.IsSet(MatchFlag::Online)) {
-        X_WARNING("Lobby", "Rejected peer, not a online lobby");
-
-        MsgIdBs bs;
-        bs.write(MessageID::LobbyJoinRejected);
-        bs.write(safe_static_cast<uint8_t>(type_));
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
-        return;
-    }
-
+    // TODO: Better place for this?
     if (getNumFreeUserSlots() == 0) {
        X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
         
@@ -1194,6 +1187,20 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         }
     }
 
+    if (!params_.flags.IsSet(MatchFlag::Online)) {
+        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
+
+        MsgIdBs bs;
+        bs.write(MessageID::LobbyJoinRejected);
+        bs.write(safe_static_cast<uint8_t>(type_));
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+
+        if (peerIdx >= 0) {
+            disconnectPeer(peerIdx);
+        }
+        return;
+    }
+
     auto& peer = peers_[peerIdx];
     if (peer.getConnectionState() != LobbyPeer::ConnectionState::Pending) {
         X_ERROR("Lobby", "Recived join request for peer not in pending state. State: \"%s\"", LobbyPeer::ConnectionState::ToString(peer.getConnectionState()));
@@ -1291,6 +1298,21 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
     addUsersFromBs(bs, peerIdx);
 
     setState(LobbyState::Idle);
+}
+
+void Lobby::handleLobbyJoinRejected(Packet* pPacket)
+{
+    X_ASSERT(isPeer(), "Should only recive LobbyJoinRejected if peer")(isPeer(), isHost());
+
+    if (state_ != LobbyState::Joining) {
+        X_ERROR("Lobby", "Recived join rejection when not trying to join. State: \"%s\"", LobbyState::ToString(state_));
+        return;
+    }
+
+    // rip.
+    // the host basically told us to `go away`
+    X_ERROR("Lobby", "Join request was rejected by host");
+    setState(LobbyState::Error);
 }
 
 void Lobby::handleLobbyUsersConnected(Packet* pPacket)

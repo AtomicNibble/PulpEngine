@@ -210,6 +210,7 @@ private:
     void handleDisconnectNotification(Packet* pPacket);
     void handleLobbyJoinRequest(Packet* pPacket);
     void handleLobbyJoinAccepted(Packet* pPacket);
+    void handleLobbyJoinRejected(Packet* pPacket);
     void handleLobbyUsersConnected(Packet* pPacket);
     void handleLobbyUsersDiconnected(Packet* pPacket);
     void handleLobbyGameParams(Packet* pPacket);
