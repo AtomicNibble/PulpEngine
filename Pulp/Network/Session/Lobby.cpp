@@ -1127,15 +1127,12 @@ void Lobby::handleConnectionClosed(Packet* pPacket)
             return;
         }
 
-        X_ERROR("Lobby", "Peer lost connection to \"%s\"  lobby", LobbyType::ToString(type_));
-
+        X_ERROR("Lobby", "Closed connection to Peer in \"%s\" lobby", LobbyType::ToString(type_));
         setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
     }
     else
     {
-        // we lost connection to server :(
-        X_ERROR("Lobby", "Lost connection to host");
-
+        X_ERROR("Lobby", "Closed connection to server");
         pCallbacks_->onLostConnectionToHost();
     }
 }
