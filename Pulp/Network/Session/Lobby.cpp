@@ -692,7 +692,7 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
     const auto curState = peer.getConnectionState();
 
     if (newState == curState) {
-        X_ERROR("Lobby", "Peer already in stat: \"%s\"", ConnectionState::ToString(newState));
+        X_ERROR("Lobby", "Peer already in state: \"%s\"", ConnectionState::ToString(newState));
         return;
     }
 
