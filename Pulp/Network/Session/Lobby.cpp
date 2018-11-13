@@ -604,7 +604,7 @@ void Lobby::setState(LobbyState::Enum state)
     X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "State changed: \"%s\"", LobbyState::ToString(state));
 
     if (state == state_) {
-        X_WARNING("Lobby", "Redundant State changed");
+        X_WARNING("Lobby", "Redundant State change \"%s\"", LobbyState::ToString(state));
     }
 
     state_ = state;
