@@ -181,7 +181,7 @@ X_DECLARE_ENUM8(MessageID)
     LobbyJoinRequest,       
     LobbyJoinAccepted,      // your reuqest to join the lobby was accepted.
     LobbyJoinNoFreeSlots,   // get fooked.
-    LobbyJoinRejected,   // get fooked.
+    LobbyJoinRejected,      // get fooked.
 
     LobbyUsersConnected,
     LobbyUsersDiconnected,
