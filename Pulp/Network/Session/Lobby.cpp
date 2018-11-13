@@ -228,8 +228,8 @@ bool Lobby::handlePacket(Packet* pPacket)
             handleConnectionAttemptFailed(id);
             break;
 
-        case MessageID::ConnectionLost:
-            handleConnectionLost(pPacket);
+        case MessageID::ConnectionClosed:
+            handleConnectionClosed(pPacket);
             break;
         case MessageID::DisconnectNotification:
             handleDisconnectNotification(pPacket);
@@ -1116,7 +1116,7 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
     setState(LobbyState::Error);
 }
 
-void Lobby::handleConnectionLost(Packet* pPacket)
+void Lobby::handleConnectionClosed(Packet* pPacket)
 {
     if (isHost())
     {

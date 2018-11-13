@@ -131,9 +131,9 @@ X_DECLARE_ENUM8(MessageID)
     /// action:
     AlreadyConnected,
 
-    // connection to remote system has been lost
+    // we requested the connection to be closed.
     /// action:
-    ConnectionLost,
+    ConnectionClosed,
     // banned from connecting to target remove system
     /// action: cry.
     ConnectionBanned,

@@ -206,7 +206,7 @@ private:
     void handleConnectionAccepted(Packet* pPacket);
     void handleConnectionHandShake(Packet* pPacket);
     void handleConnectionAttemptFailed(MessageID::Enum id);
-    void handleConnectionLost(Packet* pPacket);
+    void handleConnectionClosed(Packet* pPacket);
     void handleDisconnectNotification(Packet* pPacket);
     void handleLobbyJoinRequest(Packet* pPacket);
     void handleLobbyJoinAccepted(Packet* pPacket);

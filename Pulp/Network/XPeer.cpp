@@ -1683,7 +1683,7 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             else {
                 X_ASSERT_NOT_NULL(pRemoteSystem);
                 // tell the game now.
-                pushPacket(MessageID::ConnectionLost, *pRemoteSystem);
+                pushPacket(MessageID::ConnectionClosed, *pRemoteSystem);
 
                 // close it.
                 disconnectRemote(*pRemoteSystem);
@@ -1769,7 +1769,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
                 msgId = MessageID::ConnectionRequestFailed;
             }
             else if (rs.connectState == ConnectState::Connected) {
-                msgId = MessageID::ConnectionLost;
+                msgId = MessageID::ConnectionClosed;
             }
 
             // ya cunt!
