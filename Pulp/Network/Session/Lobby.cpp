@@ -217,7 +217,6 @@ bool Lobby::handlePacket(Packet* pPacket)
             break;
 
         case MessageID::ConnectionRequestHandShake:
-            X_ASSERT(isHost(), "Recived connection handshake when not a host")(isHost());
             handleConnectionHandShake(pPacket);
             break;
 
