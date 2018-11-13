@@ -15,6 +15,7 @@ namespace HumanDuration
     typedef StackString<64> Str;
 
     const char* toString(Str& str, float ms);
+    const char* toString(Str& str, int64_t ms);
 
 } // namespace HumanDuration
 

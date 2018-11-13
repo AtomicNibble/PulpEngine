@@ -32,6 +32,32 @@ namespace HumanDuration
         return str.c_str();
     }
 
+    const char* toString(Str& str, int64_t ms)
+    {
+        str.clear();
+
+        if (ms <= 1000_i64) {
+            str.appendFmt("%" PRIi64 " ms", ms);
+        }
+        else if (ms <= 300000_i64) {
+            const int64_t sec = (ms / 1000);
+            str.appendFmt("%" PRIi64 " sec", sec);
+        }
+        else if (ms <= 16777216_i64) {
+            const int64_t sec = (ms / 1000);
+            const int64_t min = (sec / 60);
+
+            str.appendFmt("%" PRIi64 " min", min);
+        }
+        else {
+            const int64_t sec = (ms / 1000);
+            const int64_t min = (sec / 60);
+
+            str.appendFmt("%" PRIi64 " min", min);
+        }
+
+        return str.c_str();
+    }
 
 } // namespace HumanDuration
 
