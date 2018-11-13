@@ -348,7 +348,7 @@ void Lobby::startHosting(const MatchParameters& params)
     reset();
 
     {
-        // if we have a remote lobby, like on a server.
+        // TODO: if we have a remote lobby, like on a server.
         // would need to dispatch request and wait.
         // for now just instant readdy.
 
