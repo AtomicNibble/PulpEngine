@@ -696,13 +696,9 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
 
     if (newState == LobbyPeer::ConnectionState::Free)
     {
-        if (curState == LobbyPeer::ConnectionState::Established)
-        {
-            // tell the user to get fucked?
-            // HELL YER!
-            
-            pPeer_->closeConnection(peer.systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
-        }
+        // tell the user to get fucked?
+        // HELL YER!
+        pPeer_->closeConnection(peer.systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
 
         // this won't break removing the user below.
         peer.reset();
