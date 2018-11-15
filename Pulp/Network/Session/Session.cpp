@@ -514,7 +514,7 @@ void Session::processPendingPeers(void)
 
         if (elapsed > core::TimeVal(10.0))
         {
-            X_WARNING("Session", "Droping peer connection, peer is not in a lobby");
+            X_WARNING("Session", "Dropping peer connection, peer is not in a lobby");
             pPeer_->closeConnection(pp.sysHandle, true, OrderingChannel::Default, PacketPriority::Low);
             it = pendingJoins_.erase(it);
             continue;
