@@ -1720,7 +1720,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     txt.appendFmt("HostAddr: \"%s\" Connected: ^1%" PRIi32 "^7 inGame: ^1%" PRIi32 "^7\n",
         pNet->systemAddressToString(hostAddress_, ipStr, true), numConnected, numInGame);
 
-    txt.appendFmt("Slots: %" PRIi32 " Mode %s Map: %s\n",
+    txt.appendFmt("Slots: %" PRIi32 " Mode: %s Map: %s\n",
         params_.numSlots, GameMode::ToString(params_.mode), params_.mapName.c_str());
 
     MatchFlags::Description flagsStr;
