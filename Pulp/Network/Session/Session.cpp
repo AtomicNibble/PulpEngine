@@ -504,6 +504,7 @@ void Session::processPendingPeers(void)
     }
 
     auto timeNow = gEnv->pTimer->GetTimeNowReal();
+    auto timeOut = core::TimeVal::fromMS(vars_.joinLobbyTimeoutMs());
 
     // timeout any peers.
     for (auto it = pendingJoins_.begin(); it != pendingJoins_.end(); )
@@ -512,7 +513,7 @@ void Session::processPendingPeers(void)
 
         auto elapsed = timeNow - pp.connectTime;
 
-        if (elapsed > core::TimeVal(10.0))
+        if (elapsed > timeOut)
         {
             X_WARNING("Session", "Dropping peer connection, peer is not in a lobby");
             pPeer_->closeConnection(pp.sysHandle, true, OrderingChannel::Default, PacketPriority::Low);

@@ -19,6 +19,7 @@ public:
     X_INLINE int32_t drawLobbyDebug(void) const;
     X_INLINE int32_t connectionAttemps(void) const;
     X_INLINE int32_t connectionRetryDelayMs(void) const;
+    X_INLINE int32_t joinLobbyTimeoutMs(void) const;
     X_INLINE bool snapDebug(void) const;
     X_INLINE bool snapFroceDrop(void);
     X_INLINE int32_t snapMaxbufferedMs(void) const;
@@ -31,6 +32,7 @@ private:
     int32_t drawLobbyDebug_;
     int32_t connectionAttemps_;
     int32_t connectionRetyDelayMs_;
+    int32_t joinLobbyTimeoutMs_;
     int32_t snapDebug_;
     int32_t snapFroceDrop_;
     int32_t snapMaxbufferedMs_;

@@ -11,6 +11,7 @@ SessionVars::SessionVars()
     drawLobbyDebug_ = 0;
     connectionAttemps_ = 3;
     connectionRetyDelayMs_ = 500;
+    joinLobbyTimeoutMs_ = 5000;
 
     snapDebug_ = 0;
     snapMaxbufferedMs_ = 100;
@@ -34,6 +35,9 @@ void SessionVars::registerVars(void)
 
     ADD_CVAR_REF("net_connect_rety_delay", connectionRetyDelayMs_, connectionRetyDelayMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Time to wait in MS before retrying");
+
+    ADD_CVAR_REF("net_lobby_join_timeout", joinLobbyTimeoutMs_, joinLobbyTimeoutMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Timeout in MS for joining a lobby");
 
     // snip snap.
     ADD_CVAR_REF("net_snap_debug", snapDebug_, snapDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
