@@ -569,7 +569,7 @@ bool Session::hasLobbyCreateCompleted(Lobby& lobby)
 bool Session::handleConnectAndMoveToLobby(Lobby& lobby)
 {
     if (lobby.getState() == LobbyState::Error) {
-        X_ERROR("Session", "Failed to connect to lobby");
+        X_ERROR("Session", "Failed to connect to \"%s\" lobby", LobbyType::ToString(lobby.getType()));
         handleConnectionFailed(lobby);
         return true;
     }
