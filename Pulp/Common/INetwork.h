@@ -392,7 +392,7 @@ struct IPeer
         core::TimeVal retryDelay = core::TimeVal(0.5f), core::TimeVal timeoutTime = core::TimeVal()) X_ABSTRACT;
 
     virtual void closeConnection(SystemHandle systemHandle, bool sendDisconnectionNotification,
-        OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority = PacketPriority::Low) X_ABSTRACT;
+        OrderingChannel::Enum orderingChannel, PacketPriority::Enum notificationPriority) X_ABSTRACT;
 
     // connection util
     virtual SystemHandle getSystemHandleForAddress(const SystemAddress& systemAddress) const X_ABSTRACT;
