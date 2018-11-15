@@ -212,12 +212,12 @@ bool Lobby::handlePacket(Packet* pPacket)
             handleUserCmd(pPacket);
             break;
 
-        case MessageID::ConnectionRequestAccepted:
-            handleConnectionAccepted(pPacket);
+        case MessageID::ConnectionRequestHandShake:
+            X_ASSERT_UNREACHABLE(); // lobby don't handle these anymore
             break;
 
-        case MessageID::ConnectionRequestHandShake:
-            handleConnectionHandShake(pPacket);
+        case MessageID::ConnectionRequestAccepted:
+            handleConnectionAccepted(pPacket);
             break;
 
         case MessageID::ConnectionRequestFailed:
@@ -291,10 +291,10 @@ void Lobby::connectTo(SystemAddress address)
     // i would like to connect plz.
     reset();
 
-    // Bittttttcoooonnneeeeeeeeectt!!!!
-    auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
 
-    auto res = pPeer_->connect(address, PasswordStr(), vars_.connectionAttemps(), delay);
+    // ask the session to open a connection.
+    // the connection may already be open tho.
+    auto res = pCallbacks_->connectToPeer(type_, address);
 
     switch (res)
     {
@@ -318,11 +318,9 @@ void Lobby::connectTo(SystemAddress address)
     }
 
     // we are already connected to the remote system we just wanna join the lobby.
-    // currently there is going to be a problem when shutting down lobby tho.
-    // as it will close the connection in both lobby.
-
     auto systemHandle = pPeer_->getSystemHandleForAddress(address);
     if (systemHandle == INVALID_SYSTEM_HANDLE) {
+        X_ERROR("Lobby", "Failed to get system handle for exsiting peer connection");
         setState(LobbyState::Error);
         return;
     }
@@ -334,6 +332,7 @@ void Lobby::connectTo(SystemAddress address)
     peer.systemHandle = systemHandle;
     peer.guid = guid;
 
+    // TODO: correct?
     addLocalUsers();
 
     // ask to join the lobby.
@@ -696,7 +695,7 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
         // tell the user to get fucked?
         // HELL YER!
         X_ASSERT(peer.systemHandle != INVALID_SYSTEM_HANDLE, "Free called twice on a peer")();
-        pPeer_->closeConnection(peer.systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
+        pCallbacks_->closeConnection(type_, peer.systemHandle);
 
         // this won't break removing the user below.
         peer.reset();
@@ -1053,12 +1052,19 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
         return;
     }
 
-    // check it's the host?
+    X_LOG0("Lobby", "Connected to host for \"%s\" lobby", LobbyType::ToString(type_));
+
     X_ASSERT(hostIdx_ != -1, "Hostidx invalid")(hostIdx_);
 
-    // how can i know this is the host?
-    // guess by system address?
     auto& peer = peers_[hostIdx_];
+
+    // check it's the host?
+    {
+        auto systemHandle = pPeer_->getSystemHandleForAddress(peer.systemAddr);
+        X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Failed to get system handle for host")();
+        X_ASSERT(systemHandle == pPacket->systemHandle, "Peer is not host")();
+    }
+
     X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peer.getConnectionState());
     peer.systemHandle = pPacket->systemHandle;
     peer.guid = pPacket->guid;
@@ -1072,45 +1078,6 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
     setState(LobbyState::Joining);
 }
 
-void Lobby::handleConnectionHandShake(Packet* pPacket)
-{
-    // the peer confirmed connnection with us.
-    // what a nice little slut.
-    X_ASSERT(isHost(), "Recived connection hand shake when not host")(isHost());
-
-    auto rejectConnection = [&](MessageID::Enum id) {
-        MsgIdBs bs;
-        bs.write(id);
-        bs.write(safe_static_cast<uint8_t>(type_));
-        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
-        pPeer_->closeConnection(pPacket->systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
-    };
-
-    if (getNumFreeUserSlots() == 0) {
-       X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32 , params_.numSlots); // owned.
-        rejectConnection(MessageID::LobbyJoinNoFreeSlots);
-        return;
-    }
-
-    if (!params_.flags.IsSet(MatchFlag::Online)) {
-        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
-        rejectConnection(MessageID::LobbyJoinRejected);
-        return;
-    }
-
-    auto address = pPeer_->getAddressForHandle(pPacket->systemHandle);
-    auto peerIdx = addPeer(address);
-
-    IPStr strBuf;
-    X_LOG0("Lobby", "Peer connected to \"%s\" lobby address \"%s\"", LobbyType::ToString(type_), gEnv->pNet->systemAddressToString(address, strBuf, true));
-
-    auto& peer = peers_[peerIdx];
-    peer.systemHandle = pPacket->systemHandle;
-    peer.guid = pPacket->guid;
- 
-    // we now wait for a 'LobbyJoinRequest' or timeout.
-    X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Unexpected connection state")(peer.getConnectionState());
-}
 
 void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
 {
@@ -1122,52 +1089,69 @@ void Lobby::handleConnectionAttemptFailed(MessageID::Enum id)
     }
 
     X_ERROR("Lobby", "Connection attempt failed: \"%s\"", MessageID::ToString(id));
-        
+    
+    // TODO: clean up peers and hostIdx?
+    // or just let session call reset on us.
+    X_ASSERT(hostIdx_ != -1, "Recived connection failed when don't have a valid host idx")();
+
     setState(LobbyState::Error);
 }
 
 void Lobby::handleConnectionClosed(Packet* pPacket)
 {
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_WARNING("Lobby", "Failed to find peer to remove from \"%s\"", LobbyType::ToString(type_));
+        return;
+    }
+
     if (isHost())
     {
-        // bye!
-        auto peerIdx = findPeerIdx(pPacket->systemHandle);
-        if (peerIdx < 0) {
-            X_ERROR("Lobby", "Failed to find peer to remove");
-            return;
-        }
-
         X_ERROR("Lobby", "Closed connection to Peer in \"%s\" lobby", LobbyType::ToString(type_));
         setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
     }
+    else if (isPeer())
+    {
+        if (peerIdx != hostIdx_) {
+            X_ERROR("Lobby", "Peer is not host, ignoring closed connection");
+            return;
+        }
+
+        X_ERROR("Lobby", "Closed connection to host");
+        pCallbacks_->onLostConnectionToHost(type_);
+    }
     else
     {
-        X_ERROR("Lobby", "Closed connection to server");
-        pCallbacks_->onLostConnectionToHost();
+        X_ASSERT_UNREACHABLE();
     }
 }
 
 void Lobby::handleDisconnectNotification(Packet* pPacket)
 {
+    auto peerIdx = findPeerIdx(pPacket->systemHandle);
+    if (peerIdx < 0) {
+        X_WARNING("Lobby", "Failed to find peer to remove from \"%s\"", LobbyType::ToString(type_));
+        return;
+    }
+
     if (isHost())
     {
-        // bye!
-        auto peerIdx = findPeerIdx(pPacket->systemHandle);
-        if (peerIdx < 0) {
-            X_ERROR("Lobby", "Failed to find peer to remove");
+        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Peer %" PRIi32 " disconnected", peerIdx);
+        setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
+    }
+    else if (isPeer())
+    {
+        if (peerIdx != hostIdx_) {
+            X_ERROR("Lobby", "Peer that is not host disconnected from us");
             return;
         }
-
-        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Peer %" PRIi32 " disconnected", peerIdx);
-
-        setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
+        
+        X_ERROR("Lobby", "Host disconnected from us");
+        pCallbacks_->onLostConnectionToHost(type_);
     }
     else
     {
-        // we lost connection to server :(
-        X_ERROR("Lobby", "Host disconnected from us");
-
-        pCallbacks_->onLostConnectionToHost();
+        X_ASSERT_UNREACHABLE();
     }
 }
 
@@ -1175,28 +1159,51 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 {
     X_ASSERT(isHost(), "Should only recive LobbyJoinRequest if host")(isPeer(), isHost());
 
+    X_LOG0("Lobby", "Recived join request for \"%s\" lobby", LobbyType::ToString(type_));
+
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
-    if (peerIdx < 0) {
-
-        // this peer is likley already connected to another lobby.
-        // and they want to join this one also.
-        handleConnectionHandShake(pPacket);
-
-        peerIdx = findPeerIdx(pPacket->systemHandle);
-        if (peerIdx < 0) {
-            X_ERROR("Lobby", "Failed to add peer for JoinRequest");
-            return;
-        }
-    }
-
-    auto& peer = peers_[peerIdx];
-    if (peer.getConnectionState() != LobbyPeer::ConnectionState::Pending) {
-        X_ERROR("Lobby", "Recived join request for peer not in pending state. State: \"%s\"", LobbyPeer::ConnectionState::ToString(peer.getConnectionState()));
+    if (peerIdx >= 0) {
+        X_ERROR("Lobby", "Peer tried to join \"%s\" lobby which they are already in", LobbyType::ToString(type_));
         return;
     }
 
-    X_LOG0("Lobby", "Accepted join request from peerIdx: %" PRId32, peerIdx);
+    auto rejectConnection = [&](MessageID::Enum id) {
+        MsgIdBs bs;
+        bs.write(id);
+        bs.write(safe_static_cast<uint8_t>(type_));
+        pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::Reliable, pPacket->systemHandle);
+        pCallbacks_->closeConnection(type_, pPacket->systemHandle);
+    };
 
+    if (getNumFreeUserSlots() == 0) {
+        X_WARNING("Lobby", "Rejected peer, lobby is full. Total Slots: %" PRIi32, params_.numSlots); // owned.
+        rejectConnection(MessageID::LobbyJoinNoFreeSlots);
+        return;
+    }
+
+    if (!params_.flags.IsSet(MatchFlag::Online)) {
+        X_ERROR("Lobby", "Recived LobbyJoinRequest to \"%s\" which is not online. rejecting", LobbyType::ToString(type_));
+        rejectConnection(MessageID::LobbyJoinRejected);
+        return;
+    }
+
+    // add the peer
+    auto address = pPeer_->getAddressForHandle(pPacket->systemHandle);
+    peerIdx = addPeer(address);
+
+    IPStr strBuf;
+    NetGuidStr guidStr;
+    X_LOG0("Lobby", "Peer %s joined \"%s\" lobby. peerIdx: %" PRId32 " Address \"%s\"", pPacket->guid.toString(guidStr), LobbyType::ToString(type_), peerIdx, gEnv->pNet->systemAddressToString(address, strBuf, true));
+
+    // tell the session.
+    pCallbacks_->peerJoinedLobby(type_, pPacket->systemHandle);
+
+    auto& peer = peers_[peerIdx];
+    peer.systemHandle = pPacket->systemHandle;
+    peer.guid = pPacket->guid;
+    X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Unexpected connection state")(peer.getConnectionState());
+
+    // process packet.
     {
         core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
         auto type = bs.read<LobbyType::Enum>();
@@ -1267,9 +1274,11 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx < 0) {
-        X_ERROR("Lobby", "Recived join accepted from a unknown peer");
+        X_ERROR("Lobby", "Recived \"%s\" lobby join accepted from a unknown peer", LobbyType::ToString(type_));
         return;
     }
+
+    X_LOG0("Lobby", "Join request to \"%s\" lobby was accepted", LobbyType::ToString(type_));
 
     // should be host.
     X_ASSERT(peerIdx == hostIdx_, "Recoved join accepted from a peer that's not host")( peerIdx, hostIdx_);
@@ -1531,6 +1540,8 @@ void Lobby::sendJoinRequestToHost(void)
 
     auto& peer = peers_[hostIdx_];
     X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peer.getConnectionState());
+
+    X_LOG0("Lobby", "Sending join request for \"%s\" lobby", LobbyType::ToString(type_));
 
     UserInfoBs bs;
     bs.write(MessageID::LobbyJoinRequest);

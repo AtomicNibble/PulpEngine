@@ -11,6 +11,29 @@
 
 X_NAMESPACE_BEGIN(net)
 
+
+Session::PendingPeer::PendingPeer(net::SystemHandle sysHandle, net::NetGUID guid, core::TimeVal connectTime) :
+    sysHandle(sysHandle),
+    guid(guid),
+    connectTime(connectTime)
+{
+
+}
+
+Session::PendingConnection::PendingConnection(LobbyType::Enum type, net::SystemAddress address) :
+    type(type),
+    address(address)
+{
+
+}
+
+Session::ConnectedPeer::ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid) :
+    sysHandle(sysHandle),
+    guid(guid)
+{
+
+}
+
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
 
@@ -24,7 +47,10 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     lobbys_{ {
         {vars_, this, pPeer, pGameCallbacks, LobbyType::Party, arena},
         {vars_, this, pPeer, pGameCallbacks, LobbyType::Game, arena}
-    }}
+    }},
+    pendingJoins_(arena),
+    pendingConnections_(arena),
+    peers_(arena)
 {
     X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();
     X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
@@ -49,16 +75,20 @@ void Session::update(void)
     lobbys_[LobbyType::Game].handleState();
 
     handleState();
+
+    processPendingPeers();
 }
 
 
 void Session::connect(SystemAddress address)
 {
     // biiiiitcooooonnneeeecttt!!!!
-
     quitToMenu();
 
-    // connect
+    // we always try to connect to party lobby.
+    // If the party is already in game, it will tell us to join the game lobby.
+
+
     lobbys_[LobbyType::Party].connectTo(address);
     setState(SessionState::ConnectAndMoveToParty);
 }
@@ -183,6 +213,14 @@ void Session::quitToMenu(void)
         lobby.reset();
     }
 
+    for (auto& p : peers_)
+    {
+        X_WARNING("Session", "Dangling peer");
+        pPeer_->closeConnection(p.sysHandle, true, OrderingChannel::Default, PacketPriority::High);
+    }
+
+    peers_.clear();
+
     setState(SessionState::Idle);
 }
 
@@ -262,9 +300,71 @@ void Session::setState(SessionState::Enum state)
     state_ = state;
 }
 
-void Session::onLostConnectionToHost(void)
+ConnectionAttemptResult::Enum Session::connectToPeer(LobbyType::Enum type, SystemAddress sa)
 {
-    // rip
+    // we already connected to peer?
+    auto systemHandle = pPeer_->getSystemHandleForAddress(sa);
+    if (systemHandle != INVALID_SYSTEM_HANDLE) 
+    {
+        for(auto& p : peers_)
+        {
+            if (p.sysHandle == systemHandle) {
+                p.numLobby++;
+                return ConnectionAttemptResult::AlreadyConnected;
+            }
+        }
+    }
+
+    // new connection.
+    // Bittttttcoooonnneeeeeeeeectt!!!!
+    auto delay = core::TimeVal::fromMS(vars_.connectionRetryDelayMs());
+
+    auto res = pPeer_->connect(sa, PasswordStr(), vars_.connectionAttemps(), delay);
+
+    switch (res)
+    {
+        case ConnectionAttemptResult::AlreadyConnected:
+            X_ASSERT_UNREACHABLE();
+            break;
+
+        case ConnectionAttemptResult::Started:
+        case ConnectionAttemptResult::AlreadyInProgress:
+            pendingConnections_.emplace_back(type, sa);
+            break;
+
+        default:
+            X_ERROR("Lobby", "Failed to connectTo: \"%s\"", ConnectionAttemptResult::ToString(res));
+    }
+
+    return res;
+}
+
+void Session::closeConnection(LobbyType::Enum type, SystemHandle systemHandle)
+{
+    for (size_t i = 0; i < peers_.size(); i++)
+    {
+        auto& p = peers_[i];
+
+        if (p.sysHandle == systemHandle) {
+        
+            p.numLobby--;
+            if (p.numLobby == 0) {
+                peers_.removeIndex(i);
+                X_ERROR("Session", "Closing connection for peer");
+
+                pPeer_->closeConnection(systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
+            }
+
+            return;
+        }
+    }
+
+    X_ERROR("Session", "Failed to find peer for removal");
+}
+
+void Session::onLostConnectionToHost(LobbyType::Enum type)
+{
+    X_UNUSED(type);
     X_LOG0("Session", "Lost connection to host");
 
     quitToMenu();
@@ -307,11 +407,6 @@ void Session::onReciveSnapShot(SnapShot&& snap)
 
 void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
 {
-    // hellooo !
-    // you want to move HEY?
-    // That will be £5 move fee plz.
-    // ask player to transerfer bitcoin, for payment now.
-
     auto& lobby = lobbys_[type];
 
     lobby.reset();
@@ -330,6 +425,33 @@ void Session::connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa)
         default:
             X_NO_SWITCH_DEFAULT_ASSERT;
     }
+}
+
+void Session::peerJoinedLobby(LobbyType::Enum type, SystemHandle handle)
+{
+    for (size_t i = 0; i < pendingJoins_.size(); i++)
+    {
+        auto& pp = pendingJoins_[i];
+
+        if (pp.sysHandle == handle) {
+            // they are now a peer.
+            peers_.emplace_back(pp.sysHandle, pp.guid);
+
+            pendingJoins_.removeIndex(i);
+            return;
+        }
+    }
+
+    // they should be a exsiting peer, that has joined another lobby.
+    for (auto& p : peers_)
+    {
+        if (p.sysHandle == handle) {
+            p.numLobby++;
+            return;
+        }
+    }
+
+    X_ERROR("Session", "Failed to find pending peer to remove");
 }
 
 void Session::leaveGameLobby(void)
@@ -375,6 +497,32 @@ void Session::endGame(bool early)
     quitToMenu();
 }
 
+void Session::processPendingPeers(void)
+{
+    if (pendingJoins_.isEmpty()) {
+        return;
+    }
+
+    auto timeNow = gEnv->pTimer->GetTimeNowReal();
+
+    // timeout any peers.
+    for (auto it = pendingJoins_.begin(); it != pendingJoins_.end(); )
+    {
+        const auto& pp = *it;
+
+        auto elapsed = timeNow - pp.connectTime;
+
+        if (elapsed > core::TimeVal(10.0))
+        {
+            X_WARNING("Session", "Droping peer connection, peer is not in a lobby");
+            pPeer_->closeConnection(pp.sysHandle, true, OrderingChannel::Default, PacketPriority::Low);
+            it = pendingJoins_.erase(it);
+            continue;
+        }
+
+        ++it;
+    }
+}
 
 // --------------------------------------
 
@@ -642,7 +790,7 @@ bool Session::readPackets(void)
             // these are transport loss, so tell all lobby.
             case MessageID::ConnectionClosed:
             case MessageID::DisconnectNotification:
-                broadcastPacketToActiveLobbyies(pPacket);
+                handleTransportConnectionTermPacket(pPacket);
                 break;
 
             case MessageID::AlreadyConnected:
@@ -651,10 +799,12 @@ bool Session::readPackets(void)
             case MessageID::ConnectionNoFreeSlots:
             case MessageID::ConnectionRateLimited:
             case MessageID::InvalidPassword:
+            case MessageID::ConnectionRequestAccepted:
+                handleTransportConnectionResponse(pPacket);
+                break;
 
             case MessageID::ConnectionRequestHandShake:
-            case MessageID::ConnectionRequestAccepted:
-                handleTransportConnectionPacket(pPacket);
+                handleTransportConnectionHandShake(pPacket);
                 break; 
 
             // Lobby type prefixed.
@@ -692,49 +842,100 @@ bool Session::readPackets(void)
     return true;
 }
 
-void Session::broadcastPacketToActiveLobbyies(Packet* pPacket)
+void Session::handleTransportConnectionTermPacket(Packet* pPacket)
 {
+    auto msg = pPacket->getID();
+
+    // MessageID::ConnectionClosed:
+    // MessageID::DisconnectNotification:
+
+    // the peer is a slut!
     for (int32_t i = 0; i < LobbyType::ENUM_COUNT; i++)
     {
         if (lobbys_[i].isActive()) {
             lobbys_[i].handlePacket(pPacket);
         }
     }
+
+    for (size_t i = 0; i < peers_.size(); i++) {
+        auto& p = peers_[i];
+        if (p.sysHandle == pPacket->systemHandle) {
+            peers_.removeIndex(i);
+        }
+    }
 }
 
-void Session::handleTransportConnectionPacket(Packet* pPacket)
+void Session::handleTransportConnectionResponse(Packet* pPacket)
+{
+    if (state_ == SessionState::Idle) {
+        X_ERROR("Session", "Recived connection failure packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
+        X_ASSERT_UNREACHABLE(); // we tried to connect to a peer but are idle?
+        return;
+    }
+
+    // Fail:
+    // case MessageID::AlreadyConnected:
+    // case MessageID::ConnectionRequestFailed:
+    // case MessageID::ConnectionBanned:
+    // case MessageID::ConnectionNoFreeSlots:
+    // case MessageID::ConnectionRateLimited:
+    // case MessageID::InvalidPassword:
+    // Ok:
+    // case MessageID::ConnectionRequestAccepted:
+
+    const bool failed = pPacket->getID() != MessageID::ConnectionRequestAccepted;
+
+    // we should have pending connections
+    auto sa = pPeer_->getAddressForHandle(pPacket->systemHandle);
+
+    const auto numPending = pendingConnections_.size();
+    for (auto it = pendingConnections_.begin(); it != pendingConnections_.end(); )
+    {
+        auto& pc = *it;
+
+        if (pc.address == sa)
+        {
+            lobbys_[pc.type].handlePacket(pPacket);
+            it = pendingConnections_.erase(it);
+            continue;
+        }
+
+        ++it;
+    }
+
+    // we had no pending connections for this peer.
+    const auto processed = numPending - pendingConnections_.size();
+    if (processed == 0)
+    {
+        X_ASSERT_UNREACHABLE();
+    }
+
+    if (!failed) {
+        peers_.emplace_back(pPacket->systemHandle, pPacket->guid);
+    }
+}
+
+void Session::handleTransportConnectionHandShake(Packet* pPacket)
 {
     if (state_ == SessionState::Idle) {
         // we got a packet when idle, should this ever happen?
         // This means we have set the transport to allow incoming connections.
         // we should tell them to go away?
         X_ERROR("Session", "Recived packet while idle. Msg: \"%s\"", MessageID::ToString(pPacket->getID()));
-
         // close connections for now when this happens
         pPeer_->closeConnection(pPacket->systemHandle, true, OrderingChannel::Default, PacketPriority::Low);
         return;
     }
 
-    switch (state_)
-    {
-        case SessionState::ConnectAndMoveToParty:
-        case SessionState::PartyLobbyHost:
-        case SessionState::PartyLobbyPeer:
-           lobbys_[LobbyType::Party].handlePacket(pPacket);
-            break;
+    X_ASSERT(pPacket->getID() == net::MessageID::ConnectionRequestHandShake, "Incorrect message")();
 
-        case SessionState::ConnectAndMoveToGame:
-        case SessionState::GameLobbyHost:
-        case SessionState::GameLobbyPeer:
-        case SessionState::Loading:
-        case SessionState::InGame:
-            lobbys_[LobbyType::Game].handlePacket(pPacket);
-            break;
-        default:
-            X_ERROR("Session", "Unhandle state: %s", SessionState::ToString(state_));
-            X_ASSERT_UNREACHABLE();
-            break;
-    }
+    NetGuidStr guidStr;
+    X_LOG0("Session", "Peer connected to us: %s", pPacket->guid.toString(guidStr));
+
+    // a peer just connected to us, if they don't join a lobby time them out.
+    auto timeNow = gEnv->pTimer->GetTimeNowReal();
+
+    pendingJoins_.emplace_back(pPacket->systemHandle, pPacket->guid, timeNow);
 }
 
 void Session::sendPacketToLobbyIfGame(Packet* pPacket)
@@ -846,10 +1047,35 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
     // draw me some shit.
     Vec2f base0(5.f, 150.f);
 
+    const float spacing = 20.f;
+
+    // session debug.
+    {
+        font::TextDrawContext con;
+        con.col = Col_Whitesmoke;
+        con.size = Vec2f(16.f, 16.f);
+        con.effectId = 0;
+        con.pFont = gEnv->pFontSys->getDefault();
+
+
+        core::StackString<512> txt;
+        txt.setFmt("Session - %s PendingJoins: %" PRIuS " PendingCon: %" PRIuS " Peers: %" PRIuS " \n",
+            SessionState::ToString(state_), pendingJoins_.size(), pendingConnections_.size(), peers_.size());
+
+        const float width = 750.f;
+        const float height = 30.f;
+
+        pPrim->drawQuad(base0, width, height, Color8u(20, 20, 20, 150));
+        pPrim->drawText(base0.x + 2.f, base0.y + 2.f, con, txt.begin(), txt.end());
+
+        base0.y += height;
+        base0.y += spacing;
+    }
+
     if (vars_.drawLobbyDebug() >= 2)
     {
         base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
-        base0.y += 20.f;
+        base0.y += spacing;
     }
 
     if (vars_.drawLobbyDebug() >= 1)

@@ -10,11 +10,15 @@ struct ISessionCallbacks
 
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
 
-    virtual void onLostConnectionToHost(void) X_ABSTRACT;
+    virtual ConnectionAttemptResult::Enum connectToPeer(LobbyType::Enum type, SystemAddress sa) X_ABSTRACT;
+    virtual void closeConnection(LobbyType::Enum type, SystemHandle systemHandle) X_ABSTRACT;
+
+    virtual void onLostConnectionToHost(LobbyType::Enum type) X_ABSTRACT;
 
     virtual void onReciveSnapShot(SnapShot&& snap) X_ABSTRACT;
 
     virtual void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_ABSTRACT;
+    virtual void peerJoinedLobby(LobbyType::Enum type, SystemHandle systemHandle) X_ABSTRACT;
 
     virtual void leaveGameLobby(void) X_ABSTRACT;
 

@@ -61,6 +61,40 @@ class Session : public ISession, ISessionCallbacks
 
     using LobbyArr = std::array<Lobby,LobbyType::ENUM_COUNT>;
 
+
+    struct PendingPeer
+    {
+        PendingPeer(net::SystemHandle sysHandle, net::NetGUID guid, core::TimeVal connectTime);
+
+        net::SystemHandle sysHandle;
+        net::NetGUID guid;
+
+        core::TimeVal connectTime;
+    };
+
+    struct PendingConnection
+    {
+        PendingConnection(LobbyType::Enum type, net::SystemAddress address);
+
+        LobbyType::Enum type;
+        net::SystemAddress address;
+    };
+
+    struct ConnectedPeer
+    {
+        ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid);
+
+        net::SystemHandle sysHandle;
+        net::NetGUID guid;
+
+        int32_t numLobby;
+    };
+
+    using PendingPeerArr = core::Array<PendingPeer>;
+    using PendingConnectionArr = core::Array<PendingConnection>;
+    using ConnectedPeerArr = core::Array<ConnectedPeer>;
+
+
 public:
     Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks, core::MemoryArenaBase* arena);
 
@@ -102,17 +136,25 @@ public:
     void drawDebug(engine::IPrimativeContext* pPrim) const X_FINAL;
 
 private:
-    void onLostConnectionToHost(void) X_FINAL;
+    ConnectionAttemptResult::Enum connectToPeer(LobbyType::Enum type, SystemAddress sa) X_FINAL;
+    void closeConnection(LobbyType::Enum type, SystemHandle systemHandle) X_FINAL;
+    void onLostConnectionToHost(LobbyType::Enum type) X_FINAL;
     void onReciveSnapShot(SnapShot&& snap) X_FINAL;
     void connectAndMoveToLobby(LobbyType::Enum type, SystemAddress sa) X_FINAL;
+    void peerJoinedLobby(LobbyType::Enum type, SystemHandle handle) X_FINAL;
     void leaveGameLobby(void) X_FINAL;
     void endGame(bool early) X_FINAL;
 
+    void processPendingPeers(void);
+
 private:
-    void broadcastPacketToActiveLobbyies(Packet* pPacket);
-    void handleTransportConnectionPacket(Packet* pPacket);
+    void handleTransportConnectionTermPacket(Packet* pPacket);
+    void handleTransportConnectionResponse(Packet* pPacket);
+    void handleTransportConnectionHandShake(Packet* pPacket);
     void sendPacketToLobbyIfGame(Packet* pPacket);
     void sendPacketToDesiredLobby(Packet* pPacket);
+
+
 
 private:
     void setState(SessionState::Enum state);
@@ -149,6 +191,9 @@ private:
     SessionState::Enum state_;
 
     LobbyArr lobbys_;
+    PendingPeerArr pendingJoins_;
+    PendingConnectionArr pendingConnections_;
+    ConnectedPeerArr peers_;
 
     int32_t numSnapsReceived_;
     core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
