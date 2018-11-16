@@ -524,6 +524,8 @@ void Lobby::sendSnapShot(const SnapShot& snap)
             X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(guidStr));
         }
 
+        ++peer.numSnapsSent;
+
         // for now just send whole snap, later will need to build deltas and shit.
         // how do i know it's a snapshot tho?
         pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
