@@ -1100,10 +1100,30 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
             SessionState::ToString(state_), pendingJoins_.size(), pendingConnections_.size(), peers_.size());
 
         const float width = 750.f;
-        const float height = 30.f;
+        float height = 30.f;
 
         pPrim->drawQuad(base0, width, height, Color8u(20, 20, 20, 150));
         pPrim->drawText(base0.x + 2.f, base0.y + 2.f, con, txt.begin(), txt.end());
+
+        base0.y += height;
+
+        if(peers_.isNotEmpty())
+        {
+            txt.clear();
+
+            height = 30.f * peers_.size();
+
+            NetGuidStr guidStr;
+            LobbyFlags::Description flagDsc;
+            for (size_t i=0; i<peers_.size(); i++)
+            {
+                const auto& p = peers_[i];
+                txt.setFmt("Peer%" PRIuS " ^1%s^7 Lobby: [^6%s^7]\n", i, p.guid.toString(guidStr), p.flags.ToString(flagDsc));
+            }
+
+            pPrim->drawQuad(base0, width, height, Color8u(20, 20, 20, 150));
+            pPrim->drawText(base0.x + 2.f, base0.y + 2.f, con, txt.begin(), txt.end());
+        }
 
         base0.y += height;
         base0.y += spacing;
