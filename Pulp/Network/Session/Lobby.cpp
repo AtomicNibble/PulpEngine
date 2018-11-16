@@ -346,9 +346,9 @@ void Lobby::connectTo(SystemAddress address)
 
 void Lobby::startHosting(const MatchParameters& params)
 {
-    params_ = params;
-
     reset();
+
+    params_ = params;
 
     {
         // TODO: if we have a remote lobby, like on a server.
