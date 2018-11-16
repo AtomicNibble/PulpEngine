@@ -333,6 +333,7 @@ bool XGame::update(core::FrameData& frame)
 
                 if (!world_->loadMap(matchParams.mapName)) {
                     X_ERROR("Game", "Failed to load map");
+                    // TODO: quite to menu?
                 }
             }
         }
@@ -340,14 +341,16 @@ bool XGame::update(core::FrameData& frame)
         // so i need to support been loaded, yet sillt in the loading state, while we wait for shity peers.
         // to finish loading, this is so the loading screen is still showing and can show pleb progress.
         // where to store this state?
-        if (world_->hasLoaded() && !pSession_->hasFinishedLoading())
+        if (world_)
         {
-            // spawn stuff like players!
-            syncLobbyUsers();
+            if (world_->hasLoaded() && !pSession_->hasFinishedLoading())
+            {
+                // spawn stuff like players!
+                syncLobbyUsers();
 
-            pSession_->finishedLoading();
+                pSession_->finishedLoading();
+            }
         }
-
     }
     else if (status == net::SessionStatus::InGame)
     {
