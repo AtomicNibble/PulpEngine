@@ -84,10 +84,12 @@ class Session : public ISession, ISessionCallbacks
     {
         ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid);
 
+        static LobbyFlag::Enum typeToFlag(LobbyType::Enum type);
+
         net::SystemHandle sysHandle;
         net::NetGUID guid;
 
-        int32_t numLobby;
+        LobbyFlags flags;
     };
 
     using PendingPeerArr = core::Array<PendingPeer>;

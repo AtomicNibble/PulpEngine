@@ -530,6 +530,13 @@ X_DECLARE_ENUM8(LobbyType)(
     Game
 );
 
+X_DECLARE_FLAGS(LobbyFlag)(
+    Party,
+    Game
+);
+
+using LobbyFlags = Flags<LobbyFlag>;
+
 struct UserCmd;
 class SnapShot;
 

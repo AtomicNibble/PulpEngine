@@ -34,6 +34,22 @@ Session::ConnectedPeer::ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID 
 
 }
 
+LobbyFlag::Enum Session::ConnectedPeer::typeToFlag(LobbyType::Enum type)
+{
+    static_assert(LobbyType::ENUM_COUNT == 2, "More enums?");
+
+    switch (type)
+    {
+        case LobbyType::Party:
+            return LobbyFlag::Party;
+        case LobbyType::Game:
+            return LobbyFlag::Game;
+        default:
+            X_NO_SWITCH_DEFAULT;
+    }
+}
+
+
 // ------------------------------------------------------------------------------------
 // ------------------------------------------------------------------------------------
 
@@ -309,7 +325,9 @@ ConnectionAttemptResult::Enum Session::connectToPeer(LobbyType::Enum type, Syste
         for(auto& p : peers_)
         {
             if (p.sysHandle == systemHandle) {
-                p.numLobby++;
+                auto flag = ConnectedPeer::typeToFlag(type);
+                X_ASSERT(!p.flags.IsSet(flag), "Peer is already in lobby")(type);
+                p.flags.Set(flag);
                 return ConnectionAttemptResult::AlreadyConnected;
             }
         }
@@ -347,8 +365,11 @@ void Session::closeConnection(LobbyType::Enum type, SystemHandle systemHandle)
 
         if (p.sysHandle == systemHandle) {
         
-            p.numLobby--;
-            if (p.numLobby == 0) {
+            auto flag = ConnectedPeer::typeToFlag(type);
+            X_ASSERT(p.flags.IsSet(flag), "Peer is not in lobby")(type);
+
+            p.flags.Remove(flag);
+            if (!p.flags.IsAnySet()) {
                 peers_.removeIndex(i);
                 X_ERROR("Session", "Closing connection for peer");
 
@@ -442,11 +463,14 @@ void Session::peerJoinedLobby(LobbyType::Enum type, SystemHandle handle)
         }
     }
 
+    auto flag = ConnectedPeer::typeToFlag(type);
+
     // they should be a exsiting peer, that has joined another lobby.
     for (auto& p : peers_)
     {
         if (p.sysHandle == handle) {
-            p.numLobby++;
+            X_ASSERT(!p.flags.IsSet(flag), "Peer is already in lobby")(type);
+            p.flags.Set(flag);
             return;
         }
     }
