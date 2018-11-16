@@ -110,9 +110,9 @@ Engine:
 
 Network:
 
- ☐  Implement congestion control.
- ☐  Support a debug graph that shows like network usage with category support.
-
+ ☐ Implement congestion control.
+ ☐ Support a debug graph that shows like network usage with category support.
+ ☐ Actually inc numSnapsSent for peers.
 
 Font:
 
@@ -252,3 +252,11 @@ Sql:
 
    Maths:
      ☐ The Angles, Quat, Mat conversions seams broken so fix tests + logic.
+
+
+   Networking:
+
+     Session:
+       ☐ Check peers who connect but don't join a lobby are dropped.
+       ☐ if we try to connect to a lobby but it fails for any reason.
+       ☐ If we are connected to one lobby and try to connect to another lobby on same remote, but the connection drops make sure state is good.
