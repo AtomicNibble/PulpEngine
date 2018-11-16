@@ -1735,7 +1735,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
         params_.numSlots, GameMode::ToString(params_.mode), params_.mapName.c_str());
 
     MatchFlags::Description flagsStr;
-    txt.appendFmt("Flags: [%s]\n", params_.flags.ToString(flagsStr));
+    txt.appendFmt("Flags: [^6%s^7]\n", params_.flags.ToString(flagsStr));
 
     for (size_t i = 0; i < peers_.size(); i++)
     {
