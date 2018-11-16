@@ -2,6 +2,11 @@
 
 X_NAMESPACE_BEGIN(net)
 
+X_INLINE bool SessionVars::sessionDebug(void) const
+{
+    return sessionDebug_ != 0;
+}
+
 X_INLINE bool SessionVars::lobbyDebug(void) const
 {
     return lobbyDebug_ != 0;

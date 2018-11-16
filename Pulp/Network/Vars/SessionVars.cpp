@@ -7,6 +7,7 @@ X_NAMESPACE_BEGIN(net)
 
 SessionVars::SessionVars()
 {
+    sessionDebug_ = 0;
     lobbyDebug_ = 0;
     drawLobbyDebug_ = 0;
     connectionAttemps_ = 3;
@@ -24,6 +25,9 @@ SessionVars::SessionVars()
 
 void SessionVars::registerVars(void)
 {
+    ADD_CVAR_REF("net_session_debug", sessionDebug_, sessionDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Enable session debug");
+
     ADD_CVAR_REF("net_lobby_debug", lobbyDebug_, lobbyDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Enable lobby debug");
 

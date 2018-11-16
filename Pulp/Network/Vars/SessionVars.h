@@ -15,6 +15,7 @@ public:
 
     void registerVars(void);
 
+    X_INLINE bool sessionDebug(void) const;
     X_INLINE bool lobbyDebug(void) const;
     X_INLINE int32_t drawLobbyDebug(void) const;
     X_INLINE int32_t connectionAttemps(void) const;
@@ -28,6 +29,7 @@ public:
     X_INLINE int32_t waitForPlayers(void) const;
 
 private:
+    int32_t sessionDebug_;
     int32_t lobbyDebug_;
     int32_t drawLobbyDebug_;
     int32_t connectionAttemps_;

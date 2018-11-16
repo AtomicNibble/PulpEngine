@@ -318,7 +318,7 @@ void Session::setState(SessionState::Enum state)
         return;
     }
 
-    X_LOG0("Session", "State changed: \"%s\" -> \"%s\"", SessionState::ToString(state_), SessionState::ToString(state));
+    X_LOG0_IF(vars_.sessionDebug(), "Session", "State changed: \"%s\" -> \"%s\"", SessionState::ToString(state_), SessionState::ToString(state));
 
     state_ = state;
 }
@@ -759,7 +759,7 @@ bool Session::handleConnectAndMoveToLobby(Lobby& lobby)
         return true;
     }
 
-    X_LOG0("Session", "Connected to \"%s\" lobby", LobbyType::ToString(lobby.getType()));
+    X_LOG0_IF(vars_.sessionDebug(), "Session", "Connected to \"%s\" lobby", LobbyType::ToString(lobby.getType()));
 
     // we connected!
     switch (lobby.getType())
@@ -967,7 +967,7 @@ void Session::handleTransportConnectionHandShake(Packet* pPacket)
     X_ASSERT(pPacket->getID() == net::MessageID::ConnectionRequestHandShake, "Incorrect message")();
 
     NetGuidStr guidStr;
-    X_LOG0("Session", "Peer connected to us: %s", pPacket->guid.toString(guidStr));
+    X_LOG0_IF(vars_.sessionDebug(), "Session", "Peer connected to us: %s", pPacket->guid.toString(guidStr));
 
     // a peer just connected to us, if they don't join a lobby time them out.
     auto timeNow = gEnv->pTimer->GetTimeNowReal();
