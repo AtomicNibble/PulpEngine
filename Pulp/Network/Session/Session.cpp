@@ -27,9 +27,16 @@ Session::PendingConnection::PendingConnection(LobbyType::Enum type, net::SystemA
 
 }
 
-Session::ConnectedPeer::ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid) :
+Session::ConnectedPeer::ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid, LobbyFlags initalLobbys) :
     sysHandle(sysHandle),
-    guid(guid)
+    guid(guid),
+    flags(initalLobbys)
+{
+
+}
+
+Session::ConnectedPeer::ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid, LobbyType::Enum initialLobbyType) :
+    ConnectedPeer(sysHandle, guid, typeToFlag(initialLobbyType))
 {
 
 }
@@ -456,7 +463,7 @@ void Session::peerJoinedLobby(LobbyType::Enum type, SystemHandle handle)
 
         if (pp.sysHandle == handle) {
             // they are now a peer.
-            peers_.emplace_back(pp.sysHandle, pp.guid);
+            peers_.emplace_back(pp.sysHandle, pp.guid, type);
 
             pendingJoins_.removeIndex(i);
             return;
@@ -913,6 +920,8 @@ void Session::handleTransportConnectionResponse(Packet* pPacket)
     // we should have pending connections
     auto sa = pPeer_->getAddressForHandle(pPacket->systemHandle);
 
+    LobbyFlags flags;
+
     const auto numPending = pendingConnections_.size();
     for (auto it = pendingConnections_.begin(); it != pendingConnections_.end(); )
     {
@@ -920,6 +929,8 @@ void Session::handleTransportConnectionResponse(Packet* pPacket)
 
         if (pc.address == sa)
         {
+            flags.Set(ConnectedPeer::typeToFlag(pc.type));
+
             lobbys_[pc.type].handlePacket(pPacket);
             it = pendingConnections_.erase(it);
             continue;
@@ -936,7 +947,8 @@ void Session::handleTransportConnectionResponse(Packet* pPacket)
     }
 
     if (!failed) {
-        peers_.emplace_back(pPacket->systemHandle, pPacket->guid);
+        X_ASSERT(flags.IsAnySet(), "No flags set")();
+        peers_.emplace_back(pPacket->systemHandle, pPacket->guid, flags);
     }
 }
 

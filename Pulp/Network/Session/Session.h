@@ -82,7 +82,8 @@ class Session : public ISession, ISessionCallbacks
 
     struct ConnectedPeer
     {
-        ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid);
+        ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid, LobbyFlags initalLobbys);
+        ConnectedPeer(net::SystemHandle sysHandle, net::NetGUID guid, LobbyType::Enum initialLobbyType);
 
         static LobbyFlag::Enum typeToFlag(LobbyType::Enum type);
 
