@@ -475,7 +475,7 @@ X_INLINE SendReceipt IPeer::send(const uint8_t* pData, const size_t lengthBytes,
 X_DECLARE_FLAGS(MatchFlag)(
     Online,
     Private,
-    InviteOnly,
+    JoinInviteOnly,
     JoinInProgress
 );
 
