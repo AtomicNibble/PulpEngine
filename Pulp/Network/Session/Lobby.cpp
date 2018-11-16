@@ -157,6 +157,8 @@ void Lobby::reset(void)
 {
     X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "reset \"%s\" lobby", LobbyType::ToString(type_));
 
+    params_ = MatchParameters();
+
     isHost_ = false;
     startLoading_ = false;
     finishedLoading_ = false;
