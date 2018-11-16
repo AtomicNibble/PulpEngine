@@ -790,7 +790,14 @@ void Session::startLoading(void)
 
     // should only be called if we are the host.
     X_ASSERT(gameLobby.isHost(), "Cant start loading if we are not the host")(gameLobby.isHost());
-        
+       
+
+    const auto& params = gameLobby.getMatchParams();
+    if (params.mapName.isEmpty()) {
+        X_ERROR("Session", "Can't start map name is empty");
+        return;
+    }
+
     if (gameLobby.getMatchFlags().IsSet(MatchFlag::Online))
     {
         gameLobby.sendToPeers(MessageID::LoadingStart);
