@@ -671,7 +671,7 @@ void Lobby::disconnectPeer(int32_t peerIdx)
     X_ASSERT(peerIdx >= 0 && peerIdx < safe_static_cast<int32_t>(peers_.size()), "Invalid peerIdx")(peerIdx, peers_.size());
     X_ASSERT(isHost(), "Should not be trying to diconnectPeer if not host")(isHost(), isPeer());
 
-    X_LOG0("Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Diconnecting peerIdx: %" PRIi32, peerIdx);
 
     setPeerConnectionState(peerIdx, LobbyPeer::ConnectionState::Free);
 }
@@ -745,7 +745,7 @@ void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
         LobbyUser user;
         user.fromBitStream(bs);
 
-        X_LOG0("Lobby", "Adding user: \"%s\"", user.username.c_str());
+        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Adding user: \"%s\"", user.username.c_str());
 
         if (isHost())
         {
@@ -810,7 +810,7 @@ void Lobby::sendNewUsersToPeers(int32_t skipPeer, int32_t startIdx, int32_t num)
         X_WARNING("Lobby", "Sending less users than added. num %" PRIi32 " diff %" PRIi32, num, diff);
     }
 
-    X_LOG0("Lobby", "Sending %" PRId32 " new users to peers", diff);
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Sending %" PRId32 " new users to peers", diff);
 
     UserInfoBs bs;
     bs.write(MessageID::LobbyUsersConnected);
@@ -976,7 +976,7 @@ void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
         return;
     }
 
-    X_LOG0("Lobby", "Sending chat log to new peer, num: %" PRIuS, chatHistory_.size());
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Sending chat log to new peer, num: %" PRIuS, chatHistory_.size());
 
     auto& peer = peers_[peerIdx];
     
@@ -1054,7 +1054,7 @@ void Lobby::handleConnectionAccepted(Packet* pPacket)
         return;
     }
 
-    X_LOG0("Lobby", "Connected to host for \"%s\" lobby", LobbyType::ToString(type_));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Connected to host for \"%s\" lobby", LobbyType::ToString(type_));
 
     X_ASSERT(hostIdx_ != -1, "Hostidx invalid")(hostIdx_);
 
@@ -1161,7 +1161,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 {
     X_ASSERT(isHost(), "Should only recive LobbyJoinRequest if host")(isPeer(), isHost());
 
-    X_LOG0("Lobby", "Recived join request for \"%s\" lobby", LobbyType::ToString(type_));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Recived join request for \"%s\" lobby", LobbyType::ToString(type_));
 
     auto peerIdx = findPeerIdx(pPacket->systemHandle);
     if (peerIdx >= 0) {
@@ -1195,7 +1195,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
 
     IPStr strBuf;
     NetGuidStr guidStr;
-    X_LOG0("Lobby", "Peer %s joined \"%s\" lobby. peerIdx: %" PRId32 " Address \"%s\"", pPacket->guid.toString(guidStr), LobbyType::ToString(type_), peerIdx, gEnv->pNet->systemAddressToString(address, strBuf, true));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Peer %s joined \"%s\" lobby. peerIdx: %" PRId32 " Address \"%s\"", pPacket->guid.toString(guidStr), LobbyType::ToString(type_), peerIdx, gEnv->pNet->systemAddressToString(address, strBuf, true));
 
     // tell the session.
     pCallbacks_->peerJoinedLobby(type_, pPacket->systemHandle);
@@ -1280,7 +1280,7 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
         return;
     }
 
-    X_LOG0("Lobby", "Join request to \"%s\" lobby was accepted", LobbyType::ToString(type_));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Join request to \"%s\" lobby was accepted", LobbyType::ToString(type_));
 
     // should be host.
     X_ASSERT(peerIdx == hostIdx_, "Recoved join accepted from a peer that's not host")( peerIdx, hostIdx_);
@@ -1355,7 +1355,7 @@ void Lobby::handleLobbyUsersDiconnected(Packet* pPacket)
     for (auto& id : guids)
     {
         NetGuidStr buf;
-        X_LOG0("Lobby", "User Diconnected: %s", id.toString(buf));
+        X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "User Diconnected: %s", id.toString(buf));
     }
 
     removeUsersByGuid(guids);
@@ -1510,7 +1510,7 @@ void Lobby::handleLobbyChatMsg(Packet* pPacket)
         return;
     }
  
-    X_LOG0("Lobby", "Recived %" PRIi32 " chat msg(s)", num);
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Recived %" PRIi32 " chat msg(s)", num);
 
     for (int32_t i = 0; i < num; i++)
     {
@@ -1543,7 +1543,7 @@ void Lobby::sendJoinRequestToHost(void)
     auto& peer = peers_[hostIdx_];
     X_ASSERT(peer.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(peer.getConnectionState());
 
-    X_LOG0("Lobby", "Sending join request for \"%s\" lobby", LobbyType::ToString(type_));
+    X_LOG0_IF(vars_.lobbyDebug(), "Lobby", "Sending join request for \"%s\" lobby", LobbyType::ToString(type_));
 
     UserInfoBs bs;
     bs.write(MessageID::LobbyJoinRequest);
