@@ -15,6 +15,18 @@ X_NAMESPACE_BEGIN(texture)
 
 using namespace Converter;
 
+namespace
+{
+    X_DECLARE_ENUM(CompressionMethod)(
+        CompressHighCol,
+        CompressHighAlpha,
+        CompressCol,
+        NoCompress,
+        Custom
+    );
+
+} // namespace
+
 ImgLib::ImgLib()
 {
 }
@@ -152,7 +164,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
     // we want to support converting to all the supported image formats.
     // which is basically the Texturefmt enum.
     // which I really can't be botherd to fully support for conversion.
-    bool autoFmt = true;
+    CompressionMethod::Enum compMethod;
 
     if (d.HasMember("compressionMethod")) {
         const auto& val = d["compressionMethod"];
@@ -168,19 +180,19 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
         switch (core::Hash::Fnv1aHash(val.GetString(), val.GetStringLength())) {
             case "compressHighCol"_fnv1a:
-                dstImgFmt = Texturefmt::BC7;
+                compMethod = CompressionMethod::CompressHighCol;
                 break;
             case "compressHighAlpha"_fnv1a:
-                dstImgFmt = Texturefmt::BC3;
+                compMethod = CompressionMethod::CompressHighAlpha;
                 break;
             case "compressCol"_fnv1a:
-                dstImgFmt = Texturefmt::BC1;
+                compMethod = CompressionMethod::CompressCol;
                 break;
             case "noCompress"_fnv1a:
-                dstImgFmt = Texturefmt::R8G8B8A8;
+                compMethod = CompressionMethod::NoCompress;
                 break;
             case "custom"_fnv1a:
-                autoFmt = false;
+                compMethod = CompressionMethod::Custom;
                 break;
 
             default:
@@ -189,7 +201,7 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
         }
     }
 
-    if (!autoFmt) {
+    if (compMethod == CompressionMethod::Custom) {
         if (!d.HasMember("imgFmt")) {
             X_ERROR("Img", "imgFmt option required for custom compressionMethod");
             return false;
@@ -202,20 +214,6 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
             X_ERROR("Img", "Unknown img fmt: \"%s\"", pImgFmt);
             return false;
         }
-    }
-
-    // now we check i support creating the target format.
-    switch (dstImgFmt) {
-        case Texturefmt::BC1:
-        case Texturefmt::BC3:
-        case Texturefmt::BC6:
-        case Texturefmt::BC7:
-        case Texturefmt::R8G8B8A8:
-            break;
-
-        default:
-            X_ERROR("Img", "Format not implemented for conversion: \"%s\"", Texturefmt::ToString(dstImgFmt));
-            return false;
     }
 
     // check we only got here with valid shit!
@@ -336,8 +334,56 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
 
     {
         const auto& src = con.getTextFile();
-
         X_ASSERT(src.isValid(), "Src img not valid after successful loading")(src.isValid()); 
+
+        // pick a format.
+        switch (compMethod) {
+            case CompressionMethod::CompressHighCol:
+                if (src.getFormat() == Texturefmt::A8) {
+                    dstImgFmt = Texturefmt::A8;
+                }
+                else {
+                    dstImgFmt = Texturefmt::BC7;
+                }
+                break;
+            case CompressionMethod::CompressHighAlpha:
+                dstImgFmt = Texturefmt::BC3;
+                break;
+            case CompressionMethod::CompressCol:
+                dstImgFmt = Texturefmt::BC1;
+                break;
+            case CompressionMethod::NoCompress:
+                if (src.getFormat() == Texturefmt::A8) {
+                    dstImgFmt = Texturefmt::A8;
+                }
+                else {
+                    dstImgFmt = Texturefmt::R8G8B8A8;
+                }
+                break;
+            case CompressionMethod::Custom:
+                X_ASSERT(dstImgFmt != Texturefmt::UNKNOWN, "Texture format not set for custom")();
+                break;
+
+            default:
+                X_ASSERT_NOT_IMPLEMENTED();
+                return false;
+        }
+
+
+        // now we check i support creating the target format.
+        switch (dstImgFmt) {
+            case Texturefmt::A8:
+            case Texturefmt::BC1:
+            case Texturefmt::BC3:
+            case Texturefmt::BC6:
+            case Texturefmt::BC7:
+            case Texturefmt::R8G8B8A8:
+                break;
+
+            default:
+                X_ERROR("Img", "Format not implemented for conversion: \"%s\"", Texturefmt::ToString(dstImgFmt));
+                return false;
+        }
 
         if (!core::bitUtil::IsPowerOfTwo(src.getWidth()) || !core::bitUtil::IsPowerOfTwo(src.getHeight())) {
             // none pow 2 img :| https://winpic.co/MAbde113843b.gif
@@ -416,11 +462,13 @@ bool ImgLib::Convert(IConverterHost& host, int32_t assetId, ConvertArgs& args, c
             }
         }
 
-        // we need alpha channel
-        if (!Util::hasAlpha(src.getFormat())) {
-            if (!con.addAlphachannel(flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
-                X_WARNING("Img", "Failed to add alpha channel to src fmt: \"%s\"", Texturefmt::ToString(src.getFormat()));
-                return false;
+        if (src.getFormat() != Texturefmt::A8) { // TODO: we only need alpha channel if target is a dxt format.
+            // we need alpha channel
+            if (!Util::hasAlpha(src.getFormat())) {
+                if (!con.addAlphachannel(flags.IsSet(CompileFlag::IGNORE_SRC_MIPS))) {
+                    X_WARNING("Img", "Failed to add alpha channel to src fmt: \"%s\"", Texturefmt::ToString(src.getFormat()));
+                    return false;
+                }
             }
         }
     }
