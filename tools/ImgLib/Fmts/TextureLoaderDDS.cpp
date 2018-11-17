@@ -1137,6 +1137,15 @@ namespace DDS
         {
             switch (imgFile.getFormat()) 
             {
+                case Texturefmt::A8:
+                    hdr.sPixelFormat.dwFlags |= DDPF_ALPHA;
+                    hdr.sPixelFormat.dwFourCC = 0;
+                    hdr.sPixelFormat.dwRGBBitCount = 8;
+                    hdr.sPixelFormat.dwRBitMask = 0x00000000;
+                    hdr.sPixelFormat.dwGBitMask = 0x00000000;
+                    hdr.sPixelFormat.dwBBitMask = 0x00000000;
+                    hdr.sPixelFormat.dwAlphaBitMask = 0x000000ff;
+                    break;
                 case Texturefmt::R8G8B8A8:
                     hdr.sPixelFormat.dwFlags |= DDPF_RGB | DDPF_ALPHAPIXELS;
                     hdr.sPixelFormat.dwFourCC = PIXEL_FMT_R8G8B8A8;
