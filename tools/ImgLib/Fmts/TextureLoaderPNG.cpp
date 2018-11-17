@@ -340,7 +340,13 @@ namespace PNG
             flags.Set(TextureFlags::ALPHA);
         }
 
-        imgFile.setFormat(map_png_format(ihdr.colType));
+        auto fmt = map_png_format(ihdr.colType);
+        if (fmt == Texturefmt::UNKNOWN) {
+            X_ERROR("TexturePNG", "Unsupported png format");
+            return false;
+        }
+
+        imgFile.setFormat(fmt);
         imgFile.setNumFaces(1);
         imgFile.setNumMips(1);
         imgFile.setDepth(1);
