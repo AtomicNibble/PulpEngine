@@ -668,19 +668,19 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
 
         case ImgFileFormat::PNG:
         {
-            if (srcImg.getFormat() == Texturefmt::R8G8B8) {
-                targetAlgo = core::Compression::Algo::STORE;
-                break;
-            }
-
-            X_LOG0("Img", "Repacking png");
-
             // turn to uncompressed format.
             XTextureFile srcImg(host.getScratchArena());
             if (!Util::loadImage(host.getScratchArena(), fileData, inputFileFmt, srcImg)) {
                 X_WARNING("Img", "Failed to load src image");
                 return false;
             }
+
+            if (srcImg.getFormat() == Texturefmt::R8G8B8) {
+                targetAlgo = core::Compression::Algo::STORE;
+                break;
+            }
+
+            X_LOG0("Img", "Repacking png");
 
             core::XFileStream fileStream(host.getScratchArena());
 
