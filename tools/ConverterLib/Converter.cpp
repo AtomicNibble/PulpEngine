@@ -740,6 +740,8 @@ bool Converter::CreateTables(void)
     if (!cacheDb_.execute("CREATE TABLE IF NOT EXISTS convert_cache ("
         "assetId INTEGER PRIMARY KEY,"
         "hash BLOB NOT NULL,"
+        "precedence INTEGER NOT NULL,"
+        "profileHash BLOB NOT NULL,"
         "lastUpdateTime TIMESTAMP NOT NULL"
         ");")) {
         X_ERROR("Converter", "Failed to create 'convert_cache' table");
@@ -777,7 +779,7 @@ bool Converter::MarkAssetsStale(assetDb::ModId modId)
 
 bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, DataHash dataHash, DataHash argsHash)
 {
-    sql::SqlLiteQuery qry(cacheDb_, "SELECT hash FROM convert_cache WHERE assetId = ?");
+    sql::SqlLiteQuery qry(cacheDb_, "SELECT hash, precedence, profileHash FROM convert_cache WHERE assetId = ?");
     qry.bind(1, assetId);
 
     const auto it = qry.begin();
@@ -795,6 +797,8 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
 
     const void* pHash = row.get<void const*>(0);
     const size_t hashBlobSize = row.columnBytes(0);
+    const ProfileHashVal profileHash = static_cast<ProfileHashVal>(row.get<int64_t>(1));
+    const int32_t precedence = row.get<int32_t>(2);
 
     if (hashBlobSize != sizeof(hash.bytes)) {
         X_ERROR("Converter", "Cache hash incorrect size: %" PRIuS, hashBlobSize);
@@ -807,6 +811,18 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
         return true;
     }
 
+    // if the compiled precedence is less it's stale.
+    if (precedence < conversionProfiles_[type].precedence) {
+        return true;
+    }
+
+    // if the precedence is same but hash diffrent stale.
+    if (precedence == conversionProfiles_[type].precedence) {
+        if (profileHash != conversionProfiles_[type].hash) {
+            return true;
+        }
+    }
+
     return false;
 }
 
@@ -817,9 +833,11 @@ bool Converter::OnAssetCompiled(assetDb::AssetId assetId, AssetType::Enum type, 
         return false;
     }
 
-    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, hash, lastUpdateTime) VALUES(?,?,DateTime('now'))");
+    sql::SqlLiteCmd cmd(cacheDb_, "INSERT OR REPLACE INTO convert_cache(assetId, hash, precedence, profileHash, lastUpdateTime) VALUES(?,?,?,?,DateTime('now'))");
     cmd.bind(1, assetId);
     cmd.bind(2, &hash, sizeof(hash));
+    cmd.bind(3, conversionProfiles_[type].precedence);
+    cmd.bind(4, static_cast<int64_t>(conversionProfiles_[type].hash));
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -834,7 +852,6 @@ bool Converter::GetHash(assetDb::AssetId assetId, AssetType::Enum type, DataHash
     core::Hash::SHA1 hash;
     hash.update(dataHash);
     hash.update(argsHash);
-    hash.update(conversionProfiles_[type].hash);
 
     // HACK: for assuming all anim refs are needed in compile.
     // sort something out more generic if other assets need this.
@@ -915,7 +932,7 @@ bool Converter::loadConversionProfiles(const core::string& profileName)
         val.Accept(writer);
 
         conversionProfiles_[type].profile = core::string(s.GetString(), s.GetSize());
-        conversionProfiles_[type].hash = core::Hash::xxHash64::calc(s.GetString(), s.GetSize());
+        conversionProfiles_[type].hash = ProfileHash::calc(s.GetString(), s.GetSize());
         conversionProfiles_[type].precedence = precedence;
     }
 

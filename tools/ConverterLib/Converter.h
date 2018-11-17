@@ -30,18 +30,23 @@ public:
     typedef IConverter::OutPath OutPath;
 
     typedef assetDb::AssetDB::DataHash DataHash;
-
+    typedef core::Hash::xxHash64 ProfileHash;
+    typedef ProfileHash::HashVal ProfileHashVal;
 
     struct ConversionProfile
     {
+        ConversionProfile() {
+            clear();
+        }
+
         void clear(void) {
             profile.clear();
             hash = 0;
-            precedence = 0;
+            precedence = -1;
         }
 
         core::string profile;
-        core::Hash::xxHash64Val hash;
+        ProfileHashVal hash;
         int32_t precedence;
     };
 
