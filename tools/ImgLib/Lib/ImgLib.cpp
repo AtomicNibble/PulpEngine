@@ -677,6 +677,11 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
                 return false;
             }
 
+            if (srcImg.getFormat() == Texturefmt::R8G8B8) {
+                targetAlgo = core::Compression::Algo::STORE;
+                break;
+            }
+
             core::XFileStream fileStream(host.getScratchArena());
 
             if (!Util::saveImage(host.getScratchArena(), &fileStream, ImgFileFormat::DDS, srcImg)) {
