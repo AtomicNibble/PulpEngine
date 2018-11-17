@@ -199,7 +199,7 @@ private:
     ConnectedPeerArr peers_;
 
     int32_t numSnapsReceived_;
-    core::FixedRingBuffer<SnapShot, 8> recivedSnaps_;
+    core::FixedRingBuffer<SnapShot, MAX_RECEIVE_SNAPSHOT_BUFFER_SIZE> recivedSnaps_;
 };
 
 
