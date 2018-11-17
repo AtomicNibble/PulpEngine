@@ -64,6 +64,7 @@ Game:
 
     ☐ If the server thinks we are not loaded / connected it won't send us snapshots.
       The client should notice this and do something about it.
+      ☐ If we are loading into server loading should not really finish untill we have atleast one snapshot.
 
    ☐ For debugging should have like no timeouts so can pause shit.
    ☐ Add some snapshot debugging?
@@ -71,7 +72,7 @@ Game:
        so we don't get and packets coming from the old game host when in idle.
    ☐ Should we always bind a port? or online for online stuff.
        Well we only need it for hosting, since peers are connecting to server.
-
+       So ideally if only playing single player no need to bind a port.
 
 Engine:
 
@@ -112,7 +113,7 @@ Network:
 
  ☐ Implement congestion control.
  ☐ Support a debug graph that shows like network usage with category support.
- ☐ Actually inc numSnapsSent for peers.
+ ✔ Actually inc numSnapsSent for peers. @done (18-11-16 13:26)
 
 Font:
 
