@@ -145,6 +145,8 @@ namespace PNG
                     return Texturefmt::R8G8B8;
                 case PngColorType::TRUECOLOR_ALPHA:
                     return Texturefmt::R8G8B8A8;
+                case PngColorType::GREYSCALE:
+                    return Texturefmt::A8;
                 default:
                     break;
             }
