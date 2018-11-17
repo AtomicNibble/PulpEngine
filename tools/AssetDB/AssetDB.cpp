@@ -1610,7 +1610,7 @@ bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
 
 bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut, int32_t& precedenceOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT data, name, precedence FROM conversion_profiles WHERE name = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT data, precedence FROM conversion_profiles WHERE name = ?");
     qry.bind(1, name.c_str());
 
     sql::SqlLiteQuery::iterator it = qry.begin();
