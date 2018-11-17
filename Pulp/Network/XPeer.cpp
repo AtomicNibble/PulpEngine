@@ -637,6 +637,8 @@ void XPeer::closeConnection(SystemHandle systemHandle, bool sendDisconnectionNot
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
+    X_LOG0_IF(vars_.debugEnabled(), "Net", "Queued CloseConnection, send notification: %" PRIi32, static_cast<int32_t>(sendDisconnectionNotification));
+
     BufferdCommand* pCmd = allocBufferdCmd(BufferdCommand::Cmd::CloseConnection, 0);
     pCmd->priority = notificationPriority;
     pCmd->orderingChannel = orderingChannel;
