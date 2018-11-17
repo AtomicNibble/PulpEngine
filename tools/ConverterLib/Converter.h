@@ -37,10 +37,12 @@ public:
         void clear(void) {
             profile.clear();
             hash = 0;
+            precedence = 0;
         }
 
         core::string profile;
         core::Hash::xxHash64Val hash;
+        int32_t precedence;
     };
 
 public:

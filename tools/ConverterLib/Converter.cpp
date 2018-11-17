@@ -866,8 +866,9 @@ bool Converter::GetHash(assetDb::AssetId assetId, AssetType::Enum type, DataHash
 bool Converter::loadConversionProfiles(const core::string& profileName)
 {
     core::string profileData;
+    int32_t precedence;
 
-    if (!db_.GetProfileData(profileName, profileData)) {
+    if (!db_.GetProfileData(profileName, profileData, precedence)) {
         return false;
     }
 
@@ -915,6 +916,7 @@ bool Converter::loadConversionProfiles(const core::string& profileName)
 
         conversionProfiles_[type].profile = core::string(s.GetString(), s.GetSize());
         conversionProfiles_[type].hash = core::Hash::xxHash64::calc(s.GetString(), s.GetSize());
+        conversionProfiles_[type].precedence = precedence;
     }
 
     return true;

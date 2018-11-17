@@ -274,7 +274,8 @@ bool AssetDB::CreateTables(void)
     if (!db_.execute("CREATE TABLE IF NOT EXISTS conversion_profiles ("
                      "profile_id INTEGER PRIMARY KEY,"
                      "name TEXT COLLATE NOCASE NOT NULL,"
-                     "data TEXT NOT NULL DEFAULT '{}'"
+                     "data TEXT NOT NULL DEFAULT '{}',"
+                     "precedence INTEGER NOT NULL"
                      ");")) {
         X_ERROR("AssetDB", "Failed to create 'conversion_profiles' table");
         return false;
@@ -334,7 +335,7 @@ bool AssetDB::AddDefaultProfiles(void)
         "qualityProfile":"UltraFast"
     }
 }
-)"));
+)"), 0);
     }
 
     if (!ProfileExsists(release)) {
@@ -344,7 +345,7 @@ bool AssetDB::AddDefaultProfiles(void)
         "qualityProfile":"Slow"
     }
 }
-)"));
+)"), 1);
     }
 
     return true;
@@ -1038,6 +1039,42 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 11) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 11", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        if (!db_.execute(R"(
+
+            CREATE TABLE IF NOT EXISTS conversion_profiles_new (
+                    profile_id INTEGER PRIMARY KEY,
+                    name TEXT COLLATE NOCASE NOT NULL,
+                    data TEXT NOT NULL DEFAULT '{}',
+                    precedence INTEGER NOT NULL DEFAULT 0
+            );
+
+            INSERT INTO conversion_profiles_new SELECT profile_id,name,data,0 FROM conversion_profiles;
+            DROP TABLE conversion_profiles;
+            ALTER TABLE conversion_profiles_new RENAME TO conversion_profiles;
+
+        )")) {
+            X_ERROR("AssetDB", "Failed to update conversion_profiles table");
+            return false;
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1249,6 +1286,7 @@ bool AssetDB::Export(core::Path<char>& path)
             const int32_t id = row.get<int32_t>(0);
             const char* pName = row.get<const char*>(1);
             const char* pData = row.get<const char*>(2);
+            const int32_t precedence = row.get<int32_t>(3);
 
             writer.StartObject();
 
@@ -1258,6 +1296,8 @@ bool AssetDB::Export(core::Path<char>& path)
             writer.String(pName);
             writer.Key("data");
             writer.String(pData);
+            writer.Key("precedence");
+            writer.Int(precedence);
 
             writer.EndObject();
         }
@@ -1494,12 +1534,12 @@ bool AssetDB::Import(core::Path<char>& path)
 }
 
 // -----------------------------------
-AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name)
+AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, int32_t precedence)
 {
-    return AddProfile(name, core::string("{}"));
+    return AddProfile(name, core::string("{}"), precedence);
 }
 
-AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::string& data)
+AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::string& data, int32_t precedence)
 {
     if (name.isEmpty()) {
         X_ERROR("AssetDB", "Profile with empty name not allowed");
@@ -1516,9 +1556,10 @@ AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::
     }
 
     sql::SqlLiteTransaction trans(db_);
-    sql::SqlLiteCmd cmd(db_, "INSERT INTO conversion_profiles (name, data) VALUES(?,?)");
+    sql::SqlLiteCmd cmd(db_, "INSERT INTO conversion_profiles (name, data, precedence) VALUES(?,?,?)");
     cmd.bind(1, name.c_str());
     cmd.bind(2, data.c_str());
+    cmd.bind(3, precedence);
 
     int32_t res = cmd.execute();
     if (res != 0) {
@@ -1567,9 +1608,9 @@ bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
     return true;
 }
 
-bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut)
+bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut, int32_t& precedenceOut)
 {
-    sql::SqlLiteQuery qry(db_, "SELECT data, name FROM conversion_profiles WHERE name = ?");
+    sql::SqlLiteQuery qry(db_, "SELECT data, name, precedence FROM conversion_profiles WHERE name = ?");
     qry.bind(1, name.c_str());
 
     sql::SqlLiteQuery::iterator it = qry.begin();
@@ -1578,6 +1619,7 @@ bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut)
         auto row = *it;
 
         dataOut = row.get<const char*>(0);
+        precedenceOut = row.get<int32_t>(1);
         return true;
     }
 

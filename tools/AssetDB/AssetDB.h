@@ -39,8 +39,9 @@ class ASSETDB_EXPORT AssetDB
     // Version 8: add file_id to raw_files
     // Version 9: don't rename old raw_Files keep them so we have history.
     // Version 10: change thumb hash coloum to binary. 
+    // Version 11: add precedence to conversion profiles.
 public:
-    static const int32_t DB_VERSION = 10;
+    static const int32_t DB_VERSION = 11;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
@@ -164,11 +165,11 @@ public:
     bool Import(core::Path<char>& path);
 
     // Conversion Profile api.
-    Result::Enum AddProfile(const core::string& name);
-    Result::Enum AddProfile(const core::string& name, const core::string& data);
+    Result::Enum AddProfile(const core::string& name, int32_t precedence);
+    Result::Enum AddProfile(const core::string& name, const core::string& data, int32_t precedence);
     bool ProfileExsists(const core::string& name, ProfileId* pProfileId = nullptr);
     bool SetProfileData(const core::string& name, const core::string& data);
-    bool GetProfileData(const core::string& name, core::string& dataOut);
+    bool GetProfileData(const core::string& name, core::string& dataOut, int32_t& precedenceOut);
 
     // Mod api
     Result::Enum AddMod(const core::string& name, const core::Path<char>& outDir);
