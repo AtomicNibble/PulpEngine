@@ -1146,6 +1146,17 @@ namespace DDS
                     hdr.sPixelFormat.dwBBitMask = 0x00000000;
                     hdr.sPixelFormat.dwAlphaBitMask = 0x000000ff;
                     break;
+#if 0 // so looks like dds is really stored as bgr on disk so i would need to swizzle.
+                case Texturefmt::R8G8B8:
+                    hdr.sPixelFormat.dwFlags |= DDPF_RGB;
+                    hdr.sPixelFormat.dwFourCC = 0;
+                    hdr.sPixelFormat.dwRGBBitCount = 24;
+                    hdr.sPixelFormat.dwRBitMask = 0x00ff0000; // nothing opens this 
+                    hdr.sPixelFormat.dwGBitMask = 0x0000ff00;
+                    hdr.sPixelFormat.dwBBitMask = 0x000000ff;
+                    hdr.sPixelFormat.dwAlphaBitMask = 0x00000000;
+                    break;
+#endif
                 case Texturefmt::R8G8B8A8:
                     hdr.sPixelFormat.dwFlags |= DDPF_RGB | DDPF_ALPHAPIXELS;
                     hdr.sPixelFormat.dwFourCC = PIXEL_FMT_R8G8B8A8;
