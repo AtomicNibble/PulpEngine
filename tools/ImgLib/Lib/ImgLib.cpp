@@ -680,7 +680,7 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
             core::XFileStream fileStream(host.getScratchArena());
 
             if (!Util::saveImage(host.getScratchArena(), &fileStream, ImgFileFormat::DDS, srcImg)) {
-                X_ERROR("Img", "Failed to save thumb image");
+                X_ERROR("Img", "Failed to save image");
                 return false;
             }
 
