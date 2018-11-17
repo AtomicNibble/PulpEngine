@@ -697,7 +697,7 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
     }
 
     // send the raw data back to asset db with desired algo.
-    if (!host.UpdateAssetRawFile(assetId, fileData, core::Compression::Algo::LZ4HC, core::Compression::CompressLevel::HIGH)) {
+    if (!host.UpdateAssetRawFile(assetId, fileData, targetAlgo, core::Compression::CompressLevel::HIGH)) {
         return false;
     }
 
