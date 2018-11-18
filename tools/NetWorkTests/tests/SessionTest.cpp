@@ -25,6 +25,14 @@ namespace
     };
 
 
+    struct TestMatchParameters : MatchParameters
+    {
+        TestMatchParameters() {
+            mapName.set("test");
+        }
+
+    };
+
 } // namespace
 
 
@@ -91,7 +99,7 @@ protected:
         ASSERT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
         ASSERT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-        MatchParameters params;
+        TestMatchParameters params;
         params.mode = GameMode::Cooperative;
         params.flags.Set(MatchFlag::Online);
 
@@ -216,7 +224,7 @@ TEST_F(SessionTest, SPLoadAndQuit)
 {
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
     pSeverSes_->createMatch(params);
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
 
@@ -290,7 +298,8 @@ TEST_F(SessionTest, ConnectToPartyLobby)
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
+    params.flags.Set(MatchFlag::Online);
     pSeverSes_->createPartyLobby(params);
 
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
@@ -335,7 +344,8 @@ TEST_F(SessionTest, ReConnectToPartyLobby)
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
+    params.flags.Set(MatchFlag::Online);
     pSeverSes_->createPartyLobby(params);
 
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
@@ -468,7 +478,8 @@ TEST_F(SessionTest, LobbyPartyToGameAndOut)
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
+    params.flags.Set(MatchFlag::Online);
     pSeverSes_->createPartyLobby(params);
     EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
 
@@ -638,7 +649,7 @@ TEST_F(SessionTest, PremoteToGameLobby)
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
     params.mode = GameMode::Cooperative;
     params.flags.Set(MatchFlag::Online);
 
@@ -695,7 +706,7 @@ TEST_F(SessionTest, PremoteToInGame)
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 
-    MatchParameters params;
+    TestMatchParameters params;
     params.mode = GameMode::Cooperative;
     params.flags.Set(MatchFlag::Online);
 
