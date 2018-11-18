@@ -48,12 +48,13 @@ Game:
  ✔ Fix sound not working when reload level. @done (18-10-27 12:28)
 
  ☐ Make the bullet ray staring position correct.
+   ☐ Clients are using host direction lol.
  ✔ Support toggle: crouch, run, zoom @done (18-11-12 20:14)
  ☐ Make it so each player has a calculated render view.
      - Or should we just make the render view whem we need it?
    ☐ Players weapons should be able to effect fov in the render view
  ✔ Only draw pos for local player. @done (18-11-12 20:49)
- ☐ Clients can't see host body.
+ ✔ Clients can't see host body. @done (18-11-16 13:33)
    So I need to update the render ents for all other players.
    Currently i only do that in runuserCmdForPlayer, rip.
 
@@ -73,6 +74,8 @@ Game:
    ☐ Should we always bind a port? or online for online stuff.
        Well we only need it for hosting, since peers are connecting to server.
        So ideally if only playing single player no need to bind a port.
+
+   ☐ Fix physics for clients.
 
 Engine:
 
@@ -194,6 +197,7 @@ AssetDB:
    Some assets like animations use a skelton when compiling, if that changes
    * This is only done for anims currently
 
+ ✔ We have a converter cache, but for things like images if we switch con profile to debug we don't want to reconvert images that where converted with release. Unless the content has actually changed. So need some special handling of conversion profiles in the cache. @done (18-11-17 23:35)
 
  ☐ Handle multiple people adding/changing assets.
      Think dumping the data to text file will work best, then can diff the slut.
