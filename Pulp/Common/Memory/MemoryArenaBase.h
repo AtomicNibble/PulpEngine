@@ -58,9 +58,12 @@ public:
             X_WARNING("Memory", "can't add child arena exceeded max: %i", MAX_ARENA_CHILDREN);
         }
         else {
-            children_.push_back(arena);
+            if (children_.find(arena) != ArenaArr::invalid_index) {
+                children_.push_back(arena);
+            }
         }
     }
+
 
 protected:
     ArenaArr children_;
