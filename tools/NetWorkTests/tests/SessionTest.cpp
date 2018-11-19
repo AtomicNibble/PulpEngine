@@ -293,6 +293,52 @@ TEST_F(SessionTest, ConnectToIdleHostFail)
     EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
 }
 
+TEST_F(SessionTest, ConnectToOfflineLobbyFail)
+{
+    EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    TestMatchParameters params;
+    params.flags.Remove(MatchFlag::Online);
+    pSeverSes_->createPartyLobby(params);
+
+    EXPECT_EQ(SessionStatus::Connecting, pSeverSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+
+    // we only know the result based on status.
+    // poll !
+    connectToServer();
+
+    // Make sure the client could not connect.
+    // TODO: make sure we got told to go away?
+    EXPECT_EQ(SessionStatus::PartyLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    // server
+    {
+        auto* pLobby = pSeverSes_->getLobby(LobbyType::Party);
+
+        EXPECT_EQ(0, pLobby->getNumConnectedPeers());
+        EXPECT_EQ(1, pLobby->getNumUsers());
+        EXPECT_TRUE(pLobby->isHost());
+        EXPECT_FALSE(pLobby->isPeer());
+        EXPECT_TRUE(pLobby->allPeersLoaded()); // we have no peers, so tecnically they are loaded. 
+    }
+
+    {
+        auto* pLobby = pClientSes_->getLobby(LobbyType::Party);
+
+        EXPECT_EQ(0, pLobby->getNumConnectedPeers());
+        EXPECT_EQ(0, pLobby->getNumUsers());
+        EXPECT_FALSE(pLobby->isHost());
+        EXPECT_FALSE(pLobby->isPeer());
+        EXPECT_TRUE(pLobby->allPeersLoaded());
+    }
+}
+
 TEST_F(SessionTest, ConnectToPartyLobby)
 {
     EXPECT_EQ(SessionStatus::Idle, pSeverSes_->getStatus());
