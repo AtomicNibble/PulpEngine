@@ -1174,6 +1174,16 @@ PlayingID XSound::postEvent(const char* pEventStr, SndObjectHandle object)
     return postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
 
+void XSound::stopPlyingID(PlayingID id)
+{
+    if (id != INVALID_PLAYING_ID) {
+        AK::SoundEngine::StopPlayingID(id, 0, AkCurveInterpolation_Linear);
+        return;
+    }
+
+    X_ERROR("Sound", "StopPlaying called with invalid playing ID");
+}
+
 PlayingID XSound::playVideoAudio(int32_t channels, int32_t sampleFreq, AudioBufferDelegate dataCallback, SndObjectHandle object)
 {
     auto playingID = postEvent("VideoAudio_Start", object);

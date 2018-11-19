@@ -201,6 +201,8 @@ struct ISound : public core::IEngineSysBase
     virtual PlayingID postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
     virtual PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
 
+    virtual void stopPlyingID(PlayingID id) X_ABSTRACT;
+
     virtual PlayingID playVideoAudio(int32_t channels, int32_t sampleFreq, 
         AudioBufferDelegate dataCallback, SndObjectHandle object) X_ABSTRACT;
     virtual void stopVideoAudio(PlayingID id) X_ABSTRACT;
