@@ -429,6 +429,7 @@ bool XSound::init(void)
     loadBank("Ambient.bnk");
     loadBank("Weapons.bnk");
     loadBank("SFX.bnk");
+    loadBank("Music.bnk");
 
     return true;
 }
