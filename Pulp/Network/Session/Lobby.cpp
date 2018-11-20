@@ -1659,6 +1659,17 @@ int32_t Lobby::getNumConnectedPeers(void) const
     return num;
 }
 
+int32_t Lobby::getNumConnectedPeersLoaded(void) const
+{
+    int32_t num = 0;
+    for (auto& peer : peers_)
+    {
+        num += static_cast<int32_t>(peer.isConnected() && peer.loaded);
+    }
+
+    return num;
+}
+
 int32_t Lobby::getNumConnectedPeersInGame(void) const
 {
     int32_t num = 0;

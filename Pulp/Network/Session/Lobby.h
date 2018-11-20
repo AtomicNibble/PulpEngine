@@ -146,6 +146,7 @@ public:
     bool allPeersLoaded(void) const X_FINAL;
     bool allPeersInGame(void) const X_FINAL;
     int32_t getNumConnectedPeers(void) const X_FINAL;
+    int32_t getNumConnectedPeersLoaded(void) const X_FINAL;
     int32_t getNumConnectedPeersInGame(void) const X_FINAL;
     X_INLINE int32_t getHostPeerIdx(void) const X_FINAL;
 
