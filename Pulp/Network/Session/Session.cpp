@@ -1076,8 +1076,6 @@ const MatchParameters& Session::getMatchParams(void) const
 
 void Session::drawDebug(engine::IPrimativeContext* pPrim) const
 {
-    X_UNUSED(pPrim);
-
     const auto debugLvl = vars_.drawLobbyDebug();
 
     if (debugLvl <= 0) {
