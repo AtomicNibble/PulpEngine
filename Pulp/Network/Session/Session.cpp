@@ -422,7 +422,7 @@ void Session::onReciveSnapShot(SnapShot&& snap)
         }
 
         auto& gameLobby = lobbys_[LobbyType::Game];
-        X_ASSERT(gameLobby.isPeer(), "Should only be not in game if peer")(gameLobby.isHost(), gameLobby.isPeer());
+        X_ASSERT(gameLobby.isPeer(), "Getting snapshots when not a peer")(gameLobby.isHost(), gameLobby.isPeer());
 
         // meow.
         gameLobby.sendToHost(MessageID::InGame);
