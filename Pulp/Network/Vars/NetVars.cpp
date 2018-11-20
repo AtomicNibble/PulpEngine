@@ -80,6 +80,7 @@ void NetVars::registerVars(void)
     ADD_CVAR_REF("net_art_ping_variance", artificalPingVariance_, 0, 0, 999, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Introduce artifical ping variance");
 
+    // why is this even a thing lol?
     ADD_CVAR_REF("net_ignore_password_if_not_required", ignorePasswordFromClientIfNotRequired_, 1, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "If a client provides as password when connecting, but one is not required allow it to connect");
 
