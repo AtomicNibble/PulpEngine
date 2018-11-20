@@ -1675,6 +1675,9 @@ int32_t Lobby::getNumConnectedPeersInGame(void) const
     int32_t num = 0;
     for (auto& peer : peers_)
     {
+        if (peer.inGame) {
+            X_ASSERT(peer.loaded, "Peer is not loaded but in game")(peer.loaded, peer.inGame, peer.guid);
+        }
         num += static_cast<int32_t>(peer.isConnected() && peer.inGame);
     }
 
