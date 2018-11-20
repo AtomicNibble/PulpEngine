@@ -400,8 +400,6 @@ void Session::onLostConnectionToHost(LobbyType::Enum type)
 
 void Session::onReciveSnapShot(SnapShot&& snap)
 {
-    X_UNUSED(snap);
-
     auto time = gEnv->pTimer->GetTimeNowReal();
 
     snap.setTime(time);
