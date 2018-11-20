@@ -1078,12 +1078,19 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
 {
     X_UNUSED(pPrim);
 
+    const auto debugLvl = vars_.drawLobbyDebug();
+
+    if (debugLvl <= 0) {
+        return;
+    }
+
     // draw me some shit.
     Vec2f base0(5.f, 150.f);
 
     const float spacing = 20.f;
 
     // session debug.
+    if (debugLvl >= 1)
     {
         font::TextDrawContext con;
         con.col = Col_Whitesmoke;
@@ -1126,13 +1133,13 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
         base0.y += spacing;
     }
 
-    if (vars_.drawLobbyDebug() >= 2)
+    if (debugLvl >= 2)
     {
         base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
         base0.y += spacing;
     }
 
-    if (vars_.drawLobbyDebug() >= 1)
+    if (debugLvl >= 1)
     {
         lobbys_[LobbyType::Game].drawDebug(base0, pPrim);
     }
