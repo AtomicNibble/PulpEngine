@@ -350,7 +350,7 @@
       <Filter>Source Files\tests\Containers</Filter>
     </ClCompile>
     <ClCompile Include="UT_FileSys.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source Files\tests</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
