@@ -810,15 +810,7 @@ bool Session::readPackets(void)
     Packet* pPacket = nullptr;
     for (pPacket = pPeer_->receive(); pPacket; pPeer_->freePacket(pPacket), pPacket = pPeer_->receive())
     {
-      //  X_LOG0("Session", "Recived packet: bitLength: %" PRIu32, pPacket->bitLength);
-
         core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
-
-        // so we have party and game lobby.
-        // need to know what todo.
-        // kinda don't gethte point of seperate lobbies currently.
-        // other than platform abstraction.
-        // rip.
 
         auto msg = pPacket->getID();
 
