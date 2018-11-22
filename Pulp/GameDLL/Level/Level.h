@@ -21,10 +21,12 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_DECLARE(engine,
                     struct IWorld3D;)
 
+X_NAMESPACE_DECLARE(net,
+                    class UserCmdMan;)
+
 X_NAMESPACE_BEGIN(game)
 
 class GameVars;
-class UserCmdMan;
 
 namespace entity
 {
@@ -94,7 +96,7 @@ public:
     typedef Level::MapNameStr MapNameStr;
 
 public:
-    World(GameVars& vars, physics::IPhysics* pPhys, UserCmdMan& userCmdMan,
+    World(GameVars& vars, physics::IPhysics* pPhys,
         game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
     ~World();
 
@@ -102,7 +104,7 @@ public:
     bool hasLoaded(void) const;
 
     void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, int32_t playerIdx);
-    void update(core::FrameData& frame, UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
+    void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
     void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
     void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
@@ -121,8 +123,6 @@ private:
 
     entity::EnititySystem ents_;
     core::UniquePointer<Level> level_;
-
-    UserCmdMan& userCmdMan_;
 };
 
 X_NAMESPACE_END

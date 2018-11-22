@@ -49,6 +49,7 @@ X_DECLARE_ENUM(SessionState)(
 );
 
 struct UserCmd;
+class UserCmdMan;
 class SnapShot;
 
 struct MatchParameters;
@@ -119,7 +120,7 @@ public:
     void startMatch(void) X_FINAL;
 
     // if we are a peer, we send user cmds.
-    void sendUserCmd(const core::FixedBitStreamBase& bs) X_FINAL;
+    void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx) X_FINAL;
     // if we are a host and have peers we send snaps.
     void sendSnapShot(SnapShot&& snap) X_FINAL;
 

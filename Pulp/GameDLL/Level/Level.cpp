@@ -9,7 +9,7 @@
 #include <IFileSys.h>
 #include <IFrameData.h>
 
-#include "UserCmds\UserCmdMan.h"
+#include <UserCmdMan.h>
 
 using namespace sound::Literals;
 
@@ -329,14 +329,13 @@ bool Level::processEnts(void)
 // -------------------------------------
 
 World::World(GameVars& vars, physics::IPhysics* pPhys,
-    UserCmdMan& userCmdMan, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
+    game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
     arena_(arena),
     pPhys_(pPhys),
     pScene_(nullptr),
     p3DWorld_(nullptr),
     ents_(vars, weaponDefs, arena),
-    level_(arena),
-    userCmdMan_(userCmdMan)
+    level_(arena)
 {
 }
 
@@ -394,7 +393,7 @@ void World::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd,
     ents_.runUserCmdForPlayer(frame, cmd, static_cast<entity::EntityId>(playerIdx));
 }
 
-void World::update(core::FrameData& frame, UserCmdMan& userCmdMan, entity::EntityId localPlayerId)
+void World::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId)
 {
     X_UNUSED(userCmdMan);
 

@@ -3,30 +3,28 @@
 #include <UserCmd.h>
 #include <INetwork.h>
 
-X_NAMESPACE_BEGIN(game)
+X_NAMESPACE_BEGIN(net)
 
 //
 // Manages user commands for multiple clients, keeping a history.
 //
-class GameVars;
-
 class UserCmdMan
 {
     static const size_t BUFFER_SIZE = 64;
     // we create sets of UserCmds for each player at each read index.
     // just so if all clients are currently on same write index, near in memory.
-    typedef std::array<net::UserCmd, net::MAX_PLAYERS> UserCmdPlayerArr;
+    typedef std::array<UserCmd, MAX_PLAYERS> UserCmdPlayerArr;
     typedef std::array<UserCmdPlayerArr, BUFFER_SIZE> UserCmdBuf;
-    typedef std::array<int32_t, net::MAX_PLAYERS> IndexArr;
+    typedef std::array<int32_t, MAX_PLAYERS> IndexArr;
 
 public:
-    UserCmdMan(GameVars& vars);
+    UserCmdMan();
 
-    void addUserCmdForPlayer(int32_t playerIndex, const net::UserCmd& cmd);
+    void addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd);
     void resetPlayer(int32_t playerIndex);
 
-    const net::UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
-    const net::UserCmd& getUserCmdForPlayer(int32_t playerIndex);
+    const UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
+    const UserCmd& getUserCmdForPlayer(int32_t playerIndex);
 
     void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
     void readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
@@ -35,7 +33,6 @@ public:
     X_INLINE bool hasUnreadFrames(int32_t playerIndex) const;
 
 private:
-    GameVars& vars_;
     IndexArr writeFrame_;
     IndexArr readFrame_;
     UserCmdBuf userCmds_; // buffers for each player.

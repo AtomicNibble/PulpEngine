@@ -12,7 +12,7 @@
 #include "Vars\InputVars.h"
 
 #include "UserCmds\UserCmdGen.h"
-#include "UserCmds\UserCmdMan.h"
+#include <UserCmdMan.h>
 
 #include "Weapon\WeaponManager.h"
 
@@ -96,7 +96,7 @@ private:
     core::UniquePointer<World> world_;
 
     UserCmdGen userCmdGen_;
-    UserCmdMan userCmdMan_;
+    net::UserCmdMan userCmdMan_;
 
     weapon::WeaponDefManager weaponDefs_;
 

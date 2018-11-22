@@ -9,6 +9,9 @@
 #include <IFont.h>
 #include <ITimer.h>
 
+#include <UserCmd.h>
+#include <UserCmdMan.h>
+
 X_NAMESPACE_BEGIN(net)
 
 
@@ -278,9 +281,18 @@ void Session::startMatch(void)
     startLoading();
 }
 
-void Session::sendUserCmd(const core::FixedBitStreamBase& bs)
+void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
+
+    // we send N cmds, but this should be rate limited by 'net_ucmd_rate_ms'
+    using UserCmdBS = core::FixedBitStreamStack<(sizeof(UserCmd) * MAX_USERCMD_SEND) + 0x100>;
+
+    UserCmdBS bs;
+    bs.write(net::MessageID::UserCmd);
+    userCmdMan.writeUserCmdToBs(bs, MAX_USERCMD_SEND, localIdx);
+
+    static_assert(UserCmdBS::BUF_SIZE < MAX_MTU_SIZE, "Can't fit usercmd buffer in single packet.");
 
     lobbys_[LobbyType::Game].sendUserCmd(bs);
 }

@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "EnitiySystem.h"
-#include "UserCmds\UserCmdMan.h"
 #include "Vars\GameVars.h"
 
 #include "Weapon\WeaponDef.h"
@@ -9,6 +8,7 @@
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
 #include <Time\TimeLiterals.h>
+#include <UserCmdMan.h>
 
 #include <IFrameData.h>
 #include <I3DEngine.h>
@@ -153,7 +153,7 @@ namespace entity
         playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
     }
 
-    void EnititySystem::update(core::FrameData& frame, UserCmdMan& userCmdMan, EntityId localPlayerId)
+    void EnititySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId)
     {
         X_UNUSED(userCmdMan);
 

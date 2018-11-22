@@ -18,6 +18,7 @@ X_NAMESPACE_BEGIN(net)
 
 #define NET_IPv6_SUPPORT 1
 
+class UserCmdMan;
 class SystemAddress;
 
 static const uint32_t MAX_ORDERED_STREAMS = 8; // can bump this but it increases memory per connection.
@@ -639,7 +640,7 @@ struct ISession
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
 
-    virtual void sendUserCmd(const core::FixedBitStreamBase& bs) X_ABSTRACT;
+    virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx) X_ABSTRACT;
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;

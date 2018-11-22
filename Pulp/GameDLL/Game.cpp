@@ -28,7 +28,6 @@ XGame::XGame(ICore* pCore) :
     prevStatus_(net::SessionStatus::Idle),
     world_(arena_),
     userCmdGen_(inputVars_),
-    userCmdMan_(vars_),
     weaponDefs_(arena_),
     pMenuHandler_(nullptr)
 {
@@ -329,7 +328,7 @@ bool XGame::update(core::FrameData& frame)
             }
             else
             {
-                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, userCmdMan_, weaponDefs_, arena_);
+                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, weaponDefs_, arena_);
 
                 if (!world_->loadMap(matchParams.mapName)) {
                     X_ERROR("Game", "Failed to load map");
@@ -404,13 +403,8 @@ bool XGame::update(core::FrameData& frame)
         }
         else
         {
-            // we send N cmds, but this should be rate limited by 'net_ucmd_rate_ms'
-
-            core::FixedBitStreamStack<(sizeof(net::UserCmd) * net::MAX_USERCMD_SEND) + 0x100> bs;
-            bs.write(net::MessageID::UserCmd);
-            userCmdMan_.writeUserCmdToBs(bs, net::MAX_USERCMD_SEND, localIdx);
-
-            pSession_->sendUserCmd(bs);
+            // send user commands to server.
+            pSession_->sendUserCmd(userCmdMan_, localIdx);
 
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)

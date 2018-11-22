@@ -1,22 +1,20 @@
-#include "stdafx.h"
+#include "EngineCommon.h"
 #include "UserCmdMan.h"
 
 #include <Containers\FixedBitStream.h>
 #include <Time\TimeLiterals.h>
 
-#include "Vars\GameVars.h"
 
-X_NAMESPACE_BEGIN(game)
+X_NAMESPACE_BEGIN(net)
 
 
-UserCmdMan::UserCmdMan(GameVars& vars) :
-    vars_(vars)
+UserCmdMan::UserCmdMan()
 {
     writeFrame_.fill(0);
     readFrame_.fill(-1);
 }
 
-void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const net::UserCmd& cmd)
+void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd)
 {
     userCmds_[writeFrame_[playerIndex] % BUFFER_SIZE][playerIndex] = cmd;
     writeFrame_[playerIndex]++;
@@ -32,13 +30,13 @@ void UserCmdMan::resetPlayer(int32_t playerIndex)
     readFrame_[playerIndex] = -1;
 }
 
-const net::UserCmd& UserCmdMan::newestUserCmdForPlayer(int32_t playerIndex)
+const UserCmd& UserCmdMan::newestUserCmdForPlayer(int32_t playerIndex)
 {
     int32_t index = core::Max(writeFrame_[playerIndex] - 1, 0);
     return userCmds_[index % BUFFER_SIZE][playerIndex];
 }
 
-const net::UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
+const UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
 {
     if (readFrame_[playerIndex] < writeFrame_[playerIndex] - 1) {
         readFrame_[playerIndex]++;
@@ -52,9 +50,9 @@ const net::UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
 
 void UserCmdMan::writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const
 {
-    if (max > net::MAX_USERCMD_SEND) {
-        X_ERROR("Game", "tried to write %" PRIi32 " user cmd max is %" PRIi32, max, net::MAX_USERCMD_SEND);
-        max = net::MAX_USERCMD_SEND;
+    if (max > MAX_USERCMD_SEND) {
+        X_ERROR("Net", "tried to write %" PRIi32 " user cmd max is %" PRIi32, max, MAX_USERCMD_SEND);
+        max = MAX_USERCMD_SEND;
     }
 
     // extract as many valid user cmds we have for the player, regardless of readFrame_
@@ -77,13 +75,13 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
     // meow.
     int32_t num = bs.read<int16_t>();
     if (num == 0) {
-        X_ERROR("Game", "Recived 0 usr cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Recived 0 usr cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
     // just ignore the bad client!
     if (num > net::MAX_USERCMD_SEND) {
-        X_ERROR("Game", "Recived too many usr cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Recived too many usr cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
@@ -92,11 +90,11 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
     core::TimeVal lastTime = lastCmd.gameTime;
 
     // we get sent redundant usercmds so need to find new ones.
-    core::FixedArray<net::UserCmd, net::MAX_USERCMD_SEND> userCmds;
+    core::FixedArray<UserCmd, MAX_USERCMD_SEND> userCmds;
 
     for (int32_t i = 0; i < num; i++)
     {
-        net::UserCmd cmd;
+        UserCmd cmd;
         cmd.fromBitStream(bs);
 
         if (cmd.gameTime > lastTime)
@@ -106,14 +104,16 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
         }
         else if (cmd.gameTime == 0_tv)
         {
-            X_WARNING("Game", "Recived user cmd with game time of zero");
+            X_WARNING("Net", "Recived user cmd with game time of zero");
         }
     }
 
+#if 0
     if (vars_.userCmdDebug())
     {
-        X_LOG0("Game", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
+        X_LOG0("Net", "Recived %" PRIuS " new usrCmds from player %" PRIi32, userCmds.size(), playerIndex);
     }
+#endif
 
     // these are added for 0-N so in order.
     for (auto& cmd : userCmds)
