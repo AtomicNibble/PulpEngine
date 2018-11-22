@@ -22,11 +22,9 @@ local function Update(dt)
 
     if ui.button("SOLO test01") then
         core.exec("map test01");
-        ui.close();
     end
     if ui.button("SOLO text_cord_test") then
         core.exec("map text_cord_test");
-        ui.close();
     end
 
     if ui.button("ONLINE") then
