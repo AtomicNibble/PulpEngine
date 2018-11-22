@@ -301,7 +301,11 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
 
     static_assert(UserCmdBS::BUF_SIZE < MAX_MTU_SIZE, "Can't fit usercmd buffer in single packet.");
 
-    lobbys_[LobbyType::Game].sendUserCmd(bs);
+    auto& gameLobby = lobbys_[LobbyType::Game];
+
+    X_ASSERT(gameLobby.isPeer(), "Trying to send userCmds when not a peer")(gameLobby.isPeer(), gameLobby.isHost(), gameLobby.isActive());
+
+    gameLobby.sendUserCmd(bs);
 }
 
 void Session::sendSnapShot(SnapShot&& snap)
