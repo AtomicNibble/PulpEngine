@@ -75,13 +75,13 @@ void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerInd
     // meow.
     int32_t num = bs.read<int16_t>();
     if (num == 0) {
-        X_ERROR("Net", "Recived 0 usr cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Recived 0 user cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
     // just ignore the bad client!
     if (num > net::MAX_USERCMD_SEND) {
-        X_ERROR("Net", "Recived too many usr cmds for player %" PRIi32 " ignoring", playerIndex);
+        X_ERROR("Net", "Recived too many user cmds for player %" PRIi32 " ignoring", playerIndex);
         return;
     }
 
