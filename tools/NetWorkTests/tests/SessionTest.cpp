@@ -894,9 +894,14 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
         if (pGameLobby->allPeersLoaded()) {
             break;
         }
+
     }
 
     ASSERT_TRUE(i < 100) << "Failed to recive loading done packet";
+
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeersLoaded());
+    ASSERT_TRUE(pGameLobby->allPeersLoaded());
 
     // okay now have to host finish loading.
     pSeverSes_->finishedLoading();
@@ -924,6 +929,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
 
     // the host don't know yet
     EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeersLoaded());
     EXPECT_EQ(0, pGameLobby->getNumConnectedPeersInGame());
 
     pump();
@@ -931,6 +937,7 @@ TEST_F(SessionTest, LoadGameSyncPeerFirst)
 
     // now they do.
     EXPECT_EQ(1, pGameLobby->getNumConnectedPeers());
+    EXPECT_EQ(1, pGameLobby->getNumConnectedPeersLoaded());
     EXPECT_EQ(1, pGameLobby->getNumConnectedPeersInGame());
 
     // all good?
