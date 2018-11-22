@@ -250,6 +250,7 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
     defaultMTU_ = MAX_MTU_SIZE;
     maxIncommingConnections_ = 0;
     maxPeers_ = 0;
+    drainSockets_ = false;
 
     pJobSys_ = gEnv->pJobSys;
 
@@ -1083,6 +1084,11 @@ void XPeer::removeConnectionRequest(const SystemAddressEx& sysAdd)
     }
 }
 
+void XPeer::setDrainSockets(bool drainSocket)
+{
+    drainSockets_ = drainSocket;
+}
+
 // connection limits
 void XPeer::setMaximumIncomingConnections(uint16_t numberAllowed)
 {
@@ -1846,6 +1852,13 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 void XPeer::processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
     X_UNUSED(timeNow);
+    
+    // For testing we drain the recv buffer.
+    if (drainSockets_) {
+        for (auto& socket : sockets_) {
+            socket.drainRecv();
+        }
+    }
 
     // use a single BS instance for processing all the data, to try improve cache hits.
     RecvData* pRecvData = nullptr;

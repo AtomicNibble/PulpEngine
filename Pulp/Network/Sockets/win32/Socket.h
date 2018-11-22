@@ -93,6 +93,8 @@ public:
 
     NetSocket& operator=(NetSocket&& oth);
 
+    void drainRecv(void);
+
     BindResult::Enum bind(BindParameters& bindParameters);
     bool sendSendTest(void);
     SendResult send(SendParameters& sendParameters);
@@ -113,6 +115,8 @@ private:
     void setBroadcastSocket(bool broadcast);
     void setIPHdrIncl(bool ipHdrIncl);
 
+    int32_t getPendingBytes(void) const;
+
     void setTTL(IpVersion::Enum ipVer, int32_t ttl);
     bool getTTL(IpVersion::Enum ipVer, int32_t& ttl);
 
@@ -126,6 +130,9 @@ private:
     SocketType::Enum socketType_;
     SocketHandle socket_;
     SystemAddressEx boundAdd_;
+
+    // False sharing is not much of a issue here.
+    core::AtomicInt waiting_;
 
 #if X_ENABLE_NET_STATS
     NetBandwidthStatistics stats_;

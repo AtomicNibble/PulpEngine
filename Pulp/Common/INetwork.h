@@ -414,6 +414,8 @@ struct IPeer
     virtual void clearPackets(void) X_ABSTRACT; // free's any packets in the receive que.
     virtual void freePacket(Packet* pPacket) X_ABSTRACT;
 
+    virtual void setDrainSockets(bool drainSocket) X_ABSTRACT;
+
     // connection limits
     virtual void setMaximumIncomingConnections(uint16_t numberAllowed) X_ABSTRACT;
     virtual uint16_t getMaximumIncomingConnections(void) const X_ABSTRACT;

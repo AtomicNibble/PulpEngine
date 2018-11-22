@@ -277,6 +277,9 @@ public:
     Packet* receive(void) X_FINAL;
     void clearPackets(void) X_FINAL; // free's any packets in the receive que.
 
+    // drain me
+    void setDrainSockets(bool drainSocket) X_FINAL;
+
     // connection limits
     void setMaximumIncomingConnections(uint16_t numberAllowed) X_FINAL;
     X_INLINE uint16_t getMaximumIncomingConnections(void) const X_FINAL;
@@ -430,6 +433,7 @@ private:
     int32_t defaultMTU_;
     int32_t maxIncommingConnections_;
     int32_t maxPeers_;
+    bool drainSockets_;
     core::AtomicInt sendReceiptSerial_;
 
     SystemAddArr ipList_;

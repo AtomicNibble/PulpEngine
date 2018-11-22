@@ -112,6 +112,18 @@ NetSocket& NetSocket::operator=(NetSocket&& oth)
     return *this;
 }
 
+void NetSocket::drainRecv(void)
+{
+    // this is just some shitty logic to try drain the socket.
+    // Should only be used in unitTests.
+    auto pending = getPendingBytes();
+
+    while (!waiting_ || pending > 0) {
+        core::Thread::sleep(1);
+        pending = getPendingBytes();
+    }
+}
+
 BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
 {
     struct platform::addrinfo* pResult = nullptr;
@@ -260,6 +272,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
     const int32_t flags = 0;
     senderAddLen = sizeof(senderAddr);
 
+    waiting_ = 1;
+
     int32_t bytesRead = platform::recvfrom(
         socket_,
         reinterpret_cast<char*>(dataOut.data),
@@ -267,6 +281,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
         flags,
         reinterpret_cast<platform::sockaddr*>(&senderAddr),
         &senderAddLen);
+
+    waiting_ = 0;
 
     dataOut.bytesRead = bytesRead;
     dataOut.systemAddress.setFromAddStorage(senderAddr);
@@ -427,6 +443,21 @@ void NetSocket::setIPHdrIncl(bool ipHdrIncl)
         lastErrorWSA::Description Dsc;
         X_ERROR("Net", "Failed to set hdrincl on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
     }
+}
+
+int32_t NetSocket::getPendingBytes(void) const
+{
+    using platform::u_long;
+
+    u_long pendingBytes = 0;
+
+    int32_t res = platform::ioctlsocket(socket_, FIONREAD, &pendingBytes);
+    if (res != 0) {
+        lastErrorWSA::Description Dsc;
+        X_ERROR("Net", "Failed to get pending bytes on socket. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
+    }
+
+    return safe_static_cast<int32_t>(pendingBytes);
 }
 
 void NetSocket::setTTL(IpVersion::Enum ipVer, int32_t ttl)
