@@ -178,6 +178,9 @@ private:
         pServer_ = pNet_->createPeer();
         pPeer_ = pNet_->createPeer();
 
+        pServer_->setDrainSockets(true);
+        pPeer_->setDrainSockets(true);
+
         net::SocketDescriptor sd(SERVER_PORT_BASE);
         net::SocketDescriptor sd2(SERVER_PORT_BASE + 1);
 
