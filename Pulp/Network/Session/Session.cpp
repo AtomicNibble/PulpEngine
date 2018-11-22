@@ -247,6 +247,9 @@ void Session::quitToMenu(void)
 
     peers_.clear();
 
+    nextUserCmdSendTime_.SetValue(0);
+    numSnapsReceived_ = 0;
+
     setState(SessionState::Idle);
 }
 
@@ -524,8 +527,6 @@ void Session::leaveGameLobby(void)
 void Session::endGame(bool early)
 {
     X_UNUSED(early);
-
-    numSnapsReceived_ = 0;
 
     auto& gameLobby = lobbys_[LobbyType::Game];
 
