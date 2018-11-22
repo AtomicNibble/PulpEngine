@@ -93,7 +93,7 @@ public:
 
     NetSocket& operator=(NetSocket&& oth);
 
-    void drainRecv(void);
+    void waitTillRecvDrained(void);
 
     BindResult::Enum bind(BindParameters& bindParameters);
     bool sendSendTest(void);

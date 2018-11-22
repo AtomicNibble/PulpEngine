@@ -1856,7 +1856,7 @@ void XPeer::processRecvData(UpdateBitStream& updateBS, core::TimeVal timeNow)
     // For testing we drain the recv buffer.
     if (drainSockets_) {
         for (auto& socket : sockets_) {
-            socket.drainRecv();
+            socket.waitTillRecvDrained();
         }
     }
 

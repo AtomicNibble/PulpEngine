@@ -112,7 +112,7 @@ NetSocket& NetSocket::operator=(NetSocket&& oth)
     return *this;
 }
 
-void NetSocket::drainRecv(void)
+void NetSocket::waitTillRecvDrained(void)
 {
     // this is just some shitty logic to try drain the socket.
     // Should only be used in unitTests.
