@@ -222,8 +222,8 @@ SendResult NetSocket::send(SendParameters& sendParameters)
     if(vars_.debugSocketsEnabled())
     {
         IPStr ipStr;
-        X_LOG0("Net", "^2socket::^3send:^7 pData ^5%p^7 length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32 "^7 Add: \"%s\"",
-            sendParameters.pData, sendParameters.length, sendParameters.ttl, sendParameters.systemAddress.toString(ipStr));
+        X_LOG0("Net", "^2socket::^3send:^7 pData ^5%p^7 bit-length: ^5%" PRIi32 "^7 ttl: ^5%" PRIi32 "^7 Add: \"%s\"",
+            sendParameters.pData, core::bitUtil::bytesToBits(sendParameters.length), sendParameters.ttl, sendParameters.systemAddress.toString(ipStr));
     }
 
 #if X_ENABLE_NET_STATS
@@ -251,7 +251,7 @@ SendResult NetSocket::send(SendParameters& sendParameters)
             lastErrorWSA::Description Dsc;
             int32_t lastErr = lastErrorWSA::Get();
             len = -lastErr; // pass back the last err but negative
-            X_ERROR("Net", "Failed to sendto, length: %" PRIi32 ". Error: \"%s\"", sendParameters.length, lastErrorWSA::ToString(lastErr, Dsc));
+            X_ERROR("Net", "Failed to sendto, bit-length: %" PRIi32 ". Error: \"%s\"", core::bitUtil::bytesToBits(sendParameters.length), lastErrorWSA::ToString(lastErr, Dsc));
         }
 
     } while (len == 0); // keep trying, while not sent anything and not had a error.
@@ -288,8 +288,8 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
     dataOut.systemAddress.setFromAddStorage(senderAddr);
 
     IPStr ipStr;
-    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 length: ^5%" PRIi32 "^7 Add: \"%s\"", 
-        bytesRead, dataOut.systemAddress.toString(ipStr));
+    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 bit-length: ^5%" PRIi32 "^7 Add: \"%s\"", 
+        core::bitUtil::bytesToBits(bytesRead), dataOut.systemAddress.toString(ipStr));
 
     if (bytesRead <= 0) {
         // this is not error, just making it so single branch if above zero.
