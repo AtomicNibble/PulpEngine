@@ -149,6 +149,8 @@ template<size_t N>
 class FixedBitStreamStackPolicy : public FixedBitStreamBase
 {
 public:
+    static const size_t BUF_SIZE = N;
+public:
     FixedBitStreamStackPolicy();
     ~FixedBitStreamStackPolicy();
 
