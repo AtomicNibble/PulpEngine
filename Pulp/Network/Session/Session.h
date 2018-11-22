@@ -120,7 +120,7 @@ public:
     void startMatch(void) X_FINAL;
 
     // if we are a peer, we send user cmds.
-    void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx) X_FINAL;
+    void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime) X_FINAL;
     // if we are a host and have peers we send snaps.
     void sendSnapShot(SnapShot&& snap) X_FINAL;
 
@@ -198,6 +198,9 @@ private:
     PendingPeerArr pendingJoins_;
     PendingConnectionArr pendingConnections_;
     ConnectedPeerArr peers_;
+
+    // UserCmd
+    core::TimeVal nextUserCmdSendTime_;
 
     int32_t numSnapsReceived_;
     core::FixedRingBuffer<SnapShot, MAX_RECEIVE_SNAPSHOT_BUFFER_SIZE> recivedSnaps_;

@@ -281,9 +281,16 @@ void Session::startMatch(void)
     startLoading();
 }
 
-void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx)
+void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
+
+    if (frameStartTime < nextUserCmdSendTime_) {
+        return;
+    }
+
+    auto rateMS = vars_.userCmdRateMs();
+    nextUserCmdSendTime_ = frameStartTime + core::TimeVal::fromMS(rateMS);
 
     // we send N cmds, but this should be rate limited by 'net_ucmd_rate_ms'
     using UserCmdBS = core::FixedBitStreamStack<(sizeof(UserCmd) * MAX_USERCMD_SEND) + 0x100>;

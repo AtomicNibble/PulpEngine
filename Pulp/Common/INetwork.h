@@ -640,7 +640,7 @@ struct ISession
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
 
-    virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx) X_ABSTRACT;
+    virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime) X_ABSTRACT;
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;

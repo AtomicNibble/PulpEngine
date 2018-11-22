@@ -404,7 +404,7 @@ bool XGame::update(core::FrameData& frame)
         else
         {
             // send user commands to server.
-            pSession_->sendUserCmd(userCmdMan_, localIdx);
+            pSession_->sendUserCmd(userCmdMan_, localIdx, frame.timeInfo.startTimeRealative);
 
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
