@@ -7,6 +7,8 @@ Common:
   ✔ Work out why asserts generate so much bloat. @done (18-11-12 21:39)
       was sourceInfo.
 
+  ☐ Have child arens be correctly removed from parent lists.
+
 Core:
 
   ☐ Sort out potential job system lock, due to not always helping with work when waiting.
@@ -96,6 +98,8 @@ Engine:
 
   ☐ Support single threaded command list generation for better debug.
   ☐ Support unsorted command lists.
+ ☐ Clear persistent prim on level exit?
+
 
   GUI:
    ☐ Support combo boxes (for selecting resolution etc)
@@ -137,6 +141,9 @@ Sound:
     ☐ Decide if want to async load package headers (means banks can't be in packages)
       ✔ Should just time them for now. @done (18-10-06 11:43)
   ✔ Add some basic debug ui, with like active objects and such. @done (18-09-15 00:21)
+
+ ☐ Need to know which banks to load.
+     Could just mount them all?
 
 Video:
 
@@ -249,7 +256,7 @@ Sql:
   ✔ Don't re export functions in dll's @done (18-10-24 17:11)
     Currently if link sql.dll you end up exporting some of same stuff sql.dll exports.
 
- UnitTests:
+UnitTests:
 
    Containers:
      ✔ FixedByteStream @done (18-09-15 18:05)
