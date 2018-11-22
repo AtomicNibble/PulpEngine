@@ -505,6 +505,10 @@ void Lobby::sendSnapShot(const SnapShot& snap)
 
     const auto snapDebug = vars_.snapDebug();
 
+    if (snapDebug) {
+        X_LOG0("Lobby", "Sending snap to peers. Size: %" PRIuS, bs.size());
+    }
+
     for (auto& peer : peers_)
     {
         if (!peer.isConnected()) {
