@@ -396,6 +396,7 @@
     <ClInclude Include="Traits\SignedTypes.h" />
     <ClInclude Include="Traits\UnsignedTypes.h" />
     <ClInclude Include="UserCmd.h" />
+    <ClInclude Include="UserCmdMan.h" />
     <ClInclude Include="Util\BitUtil.h" />
     <ClInclude Include="Util\ClassMacros.h" />
     <ClInclude Include="Util\Cpu.h" />
@@ -926,6 +927,7 @@
     <ClCompile Include="String\HumanDuration.cpp" />
     <ClCompile Include="SystemAddress.cpp" />
     <ClCompile Include="Time\win32\StopWatch.cpp" />
+    <ClCompile Include="UserCmdMan.cpp" />
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>

@@ -81,9 +81,6 @@
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
-    <ClInclude Include="UserCmds\UserCmdMan.h">
-      <Filter>Header Files\UserCmds</Filter>
-    </ClInclude>
     <ClInclude Include="Vars\PlayerVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
@@ -142,9 +139,6 @@
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Source Files\Level</Filter>
-    </ClCompile>
-    <ClCompile Include="UserCmds\UserCmdMan.cpp">
-      <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
     <ClCompile Include="Vars\PlayerVars.cpp">
       <Filter>Source Files\Vars</Filter>

@@ -1342,6 +1342,9 @@
     <ClInclude Include="Logging\WritePolicies\LoggerFileWritePolicy.h">
       <Filter>Headers\Logging\WritePolicies</Filter>
     </ClInclude>
+    <ClInclude Include="UserCmdMan.h">
+      <Filter>Interfaces_h\Network</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -2117,6 +2120,9 @@
     </ClCompile>
     <ClCompile Include="Logging\WritePolicies\LoggerFileWritePolicy.cpp">
       <Filter>SourceFiles\Logging\Policys</Filter>
+    </ClCompile>
+    <ClCompile Include="UserCmdMan.cpp">
+      <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

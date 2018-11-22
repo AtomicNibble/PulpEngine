@@ -412,7 +412,6 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="UserCmds\UserCmdMan.h" />
     <ClInclude Include="UserCmds\UserCmdGen.h" />
     <ClInclude Include="Vars\GameVars.h" />
     <ClInclude Include="Vars\InputVars.h" />
@@ -446,7 +445,6 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|x64'">Create</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="UserCmds\UserCmdMan.cpp" />
     <ClCompile Include="UserCmds\UserCmdGen.cpp" />
     <ClCompile Include="Vars\GameVars.cpp" />
     <ClCompile Include="Vars\InputVars.cpp" />
