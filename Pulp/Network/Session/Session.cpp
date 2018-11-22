@@ -414,6 +414,8 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     // but all local games have a session, humm..
     ++numSnapsReceived_;
 
+    X_LOG0_IF(vars_.snapDebug(), "Session", "Recived snapshot: %" PRIi32, numSnapsReceived_);
+
     if (state_ != SessionState::InGame)
     {
         // wait till we have 2.
