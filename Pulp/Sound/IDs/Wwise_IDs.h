@@ -24,6 +24,8 @@ namespace AK
         static const AkUniqueID MG42_RELOAD_MAG_IN = 1826446817U;
         static const AkUniqueID MG42_RELOAD_MAG_OUT = 1450498656U;
         static const AkUniqueID MG42_RELOAD_PULL = 120902617U;
+        static const AkUniqueID MUSIC_BADASS = 2450179077U;
+        static const AkUniqueID MUSIC_DOOMDIVISION = 651845123U;
         static const AkUniqueID PAIN = 1996139369U;
         static const AkUniqueID PLAY_AMBIENT = 1562304622U;
         static const AkUniqueID PLAYER_BRAG = 3671645601U;
@@ -111,6 +113,7 @@ namespace AK
         static const AkUniqueID INIT = 1355168291U;
         static const AkUniqueID AMBIENT = 77978275U;
         static const AkUniqueID EVENTS = 1381315342U;
+        static const AkUniqueID MUSIC = 3991942870U;
         static const AkUniqueID PLAYERSOUNDS = 1327972334U;
         static const AkUniqueID SFX = 393239870U;
         static const AkUniqueID VIDEO = 2982943478U;
