@@ -123,6 +123,7 @@ namespace bitUtil
     template<typename T>
     inline bool isSignBitNotSet(T value);
 
+    // these are just for clarity in code.
     template<typename T>
     constexpr T bitsToBytes(T numBits);
     template<typename T>
