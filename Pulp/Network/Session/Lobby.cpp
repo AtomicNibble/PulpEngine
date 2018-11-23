@@ -1781,14 +1781,31 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     MatchFlags::Description flagsStr;
     txt.appendFmt("Flags: [^6%s^7]\n", params_.flags.ToString(flagsStr));
 
+    txt.appendFmt("%-6s %-6s %-6s %-9s %-8s %5s %-7s %5s %4s\n",
+        "State", "Loaded", "InGame", "SysHandle", "NumSnaps", "Rate", "NumUCmd", "Rate", "RTT");
+
     for (size_t i = 0; i < peers_.size(); i++)
     {
         auto& peer = peers_[i];
 
         static_assert(std::is_same<uint16_t, decltype(peer.systemHandle)>::value, "format specifier needs updating");
 
-        txt.appendFmt("\n^5Peer%" PRIuS "^7 State: ^1%s^7 loaded: ^1%" PRIu8 "^7 inGame: ^1%" PRIu8 "^7 SysHandle: ^1%" PRIu16 "^7 numSnaps: ^1%" PRIi32 "^7", 
-            i, LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), peer.loaded, peer.inGame, peer.systemHandle, peer.numSnaps;
+        PingInfo ping;
+        if (peer.isConnected()) {
+            ping = pPeer_->getPingInfo(peer.systemHandle);
+        }
+
+        txt.appendFmt("\n^%-6s %6" PRIu8 " %6" PRIu8 " %9" PRIu16 " %8" PRIi32 " %5.1f %7" PRIi32 " %5.1f %4" PRIi16,
+            LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), 
+            peer.loaded, 
+            peer.inGame, 
+            peer.systemHandle, 
+            peer.numSnaps, 
+            peer.snapRate.getRate(),
+            peer.numUserCmd,
+            peer.userCmdRate.getRate(),
+            ping.cur
+        );
     }
 
     pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
