@@ -106,7 +106,7 @@ void LobbyPeer::reset(void)
     pauseSnapShots = false;
 
     snapHz = 0.f;
-    numSnapsSent = 0;
+    numSnaps = 0;
     pSnapMan.reset();
 
     systemHandle = INVALID_SYSTEM_HANDLE;
@@ -528,7 +528,7 @@ void Lobby::sendSnapShot(const SnapShot& snap)
             X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(guidStr));
         }
 
-        ++peer.numSnapsSent;
+        ++peer.numSnaps;
 
         // for now just send whole snap, later will need to build deltas and shit.
         // how do i know it's a snapshot tho?
@@ -1014,6 +1014,8 @@ void Lobby::handleSnapShot(Packet* pPacket)
         X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPerr.guid.toString(str1));
         return;
     }
+
+    ++hostPerr.numSnaps;
 
     // TODO pass the snapshot in to the snapshot manager which will handle deltas from the host.
     // which we will then ACK.
@@ -1766,7 +1768,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
         static_assert(std::is_same<uint16_t, decltype(peer.systemHandle)>::value, "format specifier needs updating");
 
         txt.appendFmt("\n^5Peer%" PRIuS "^7 State: ^1%s^7 loaded: ^1%" PRIu8 "^7 inGame: ^1%" PRIu8 "^7 SysHandle: ^1%" PRIu16 "^7 numSnaps: ^1%" PRIi32 "^7", 
-            i, LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), peer.loaded, peer.inGame, peer.systemHandle, peer.numSnapsSent);
+            i, LobbyPeer::ConnectionState::ToString(peer.getConnectionState()), peer.loaded, peer.inGame, peer.systemHandle, peer.numSnaps;
     }
 
     pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());

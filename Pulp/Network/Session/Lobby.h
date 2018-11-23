@@ -77,7 +77,7 @@ public:
     core::TimeVal lastSnap;
     core::TimeVal stateChangeTime;
     float snapHz;
-    int32_t numSnapsSent;
+    int32_t numSnaps;
     core::UniquePointer<SnapshotManager> pSnapMan;
 
     SystemHandle systemHandle;
