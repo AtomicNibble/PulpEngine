@@ -65,6 +65,8 @@ struct AvgPerSecond
     }
 
     void add(core::TimeVal timeNow) {
+        ++num_;
+
         auto delta = timeNow - lastUpdated_;
         if (delta < core::TimeVal::fromMS(1000)) {
             return;
