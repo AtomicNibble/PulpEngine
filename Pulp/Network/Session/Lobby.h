@@ -52,8 +52,48 @@ public:
     core::StackString<MAX_USERNAME_LEN> username;
 };
 
+struct AvgPerSecond
+{
+    AvgPerSecond() {
+        reset();
+    }
+
+    void reset(void) {
+        lastUpdated_ = core::TimeVal();
+        num_ = 0;
+        rate_ = 0.f;
+    }
+
+    void add(core::TimeVal timeNow) {
+        auto delta = timeNow - lastUpdated_;
+        if (delta < core::TimeVal::fromMS(1000)) {
+            return;
+        }
+
+        auto deltaSec = delta.GetSeconds();
+
+        lastUpdated_ = timeNow;
+        rate_ = static_cast<float>(num_) / deltaSec;
+        num_ = 0;
+    }
+
+    float getRate(void) const {
+        return rate_;
+    }
+
+private:
+    core::TimeVal lastUpdated_;
+    int32_t num_;
+    float rate_;
+};
+
 struct LobbyPeer
 {
+    // how should i calculate the snap rate without using loads of memory.
+    // storing all the times kinda sucks.
+    // so i just wanna count them for a given second.
+    using TimeRingBuffer = core::FixedRingBuffer<core::TimeVal, 64>;
+
     X_DECLARE_ENUM8(ConnectionState)(
         Free,
         Pending,
@@ -70,14 +110,16 @@ struct LobbyPeer
 public:
     bool loaded;
     bool inGame;
-    bool pauseSnapShots; // stop sending snaps :D
 private:
     ConnectionState::Enum connectionState;
-public:
-    core::TimeVal lastSnap;
     core::TimeVal stateChangeTime;
-    float snapHz;
+public:
+    AvgPerSecond userCmdRate;
+    AvgPerSecond snapRate;
+
+    int32_t numUserCmd;
     int32_t numSnaps;
+
     core::UniquePointer<SnapshotManager> pSnapMan;
 
     SystemHandle systemHandle;

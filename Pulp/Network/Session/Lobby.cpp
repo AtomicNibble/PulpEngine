@@ -101,11 +101,14 @@ void LobbyPeer::reset(void)
 {
     connectionState = ConnectionState::Free;
 
+    userCmdRate.reset();
+    snapRate.reset();
+
+    numUserCmd = 0;
+
     loaded = false;
     inGame = false;
-    pauseSnapShots = false;
 
-    snapHz = 0.f;
     numSnaps = 0;
     pSnapMan.reset();
 
@@ -127,6 +130,7 @@ X_INLINE LobbyPeer::ConnectionState::Enum LobbyPeer::getConnectionState(void) co
 X_INLINE void LobbyPeer::setConnectionState(ConnectionState::Enum state)
 {
     connectionState = state;
+    stateChangeTime = gEnv->pTimer->GetTimeNowReal();
 }
 
 
@@ -724,7 +728,6 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
         X_ASSERT_UNREACHABLE();
     }
 
-    peer.stateChangeTime = gEnv->pTimer->GetTimeNowReal();
     peer.setConnectionState(newState);
 
     if (isHost() && newState == LobbyPeer::ConnectionState::Free) 
@@ -1008,14 +1011,17 @@ void Lobby::handleSnapShot(Packet* pPacket)
     X_ASSERT(isPeer(), "Recived snapshot when not a peer")(isPeer());
     X_ASSERT(type_ == LobbyType::Game, "None game lobby recived snapshot")(type_);
 
-    auto& hostPerr = peers_[hostIdx_];
-    if (pPacket->guid != hostPerr.guid) {
+    auto& hostPeer = peers_[hostIdx_];
+    if (pPacket->guid != hostPeer.guid) {
         NetGuidStr str0, str1;
-        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPerr.guid.toString(str1));
+        X_ERROR("Lobby", "Recived snapshot was not from host peer. Packed: %s Host: %s", pPacket->guid.toString(str0), hostPeer.guid.toString(str1));
         return;
     }
 
-    ++hostPerr.numSnaps;
+    auto timeNow = gEnv->pTimer->GetTimeNowNoScale();
+
+    hostPeer.snapRate.add(timeNow);
+    ++hostPeer.numSnaps;
 
     // TODO pass the snapshot in to the snapshot manager which will handle deltas from the host.
     // which we will then ACK.
@@ -1043,6 +1049,12 @@ void Lobby::handleUserCmd(Packet* pPacket)
         X_ERROR("Lobby", "Failed to find peer for incomming userCmd");
         return;
     }
+
+    auto timeNow = gEnv->pTimer->GetTimeNowNoScale();
+
+    auto& peer = peers_[peerIdx];
+    peer.userCmdRate.add(timeNow);
+    ++peer.numUserCmd;
 
     // pass back to game.
     // this will only happen during a call to handle state, so the game knows
