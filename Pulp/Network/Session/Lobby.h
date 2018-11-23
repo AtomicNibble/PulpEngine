@@ -99,7 +99,7 @@ struct LobbyPeer
     X_DECLARE_ENUM8(ConnectionState)(
         Free,
         Pending,
-        Established    
+        Estab // Established
     );
     
     LobbyPeer();

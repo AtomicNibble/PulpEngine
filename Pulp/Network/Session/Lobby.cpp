@@ -119,7 +119,7 @@ void LobbyPeer::reset(void)
 
 X_INLINE bool LobbyPeer::isConnected(void) const
 {
-    return connectionState == ConnectionState::Established;
+    return connectionState == ConnectionState::Estab;
 }
 
 X_INLINE LobbyPeer::ConnectionState::Enum LobbyPeer::getConnectionState(void) const
@@ -726,7 +726,7 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
 
         peer.pSnapMan = core::makeUnique<SnapshotManager>(arena_, arena_);
     }
-    else if (newState == LobbyPeer::ConnectionState::Established)
+    else if (newState == LobbyPeer::ConnectionState::Estab)
     {
         X_ASSERT(curState == LobbyPeer::ConnectionState::Pending, "Invalid peer state")(curState);
 
@@ -1252,7 +1252,7 @@ void Lobby::handleLobbyJoinRequest(Packet* pPacket)
         }
 
         // This peer is now connected.
-        setPeerConnectionState(peer, LobbyPeer::ConnectionState::Established);
+        setPeerConnectionState(peer, LobbyPeer::ConnectionState::Estab);
     }
 
     // send match params and full user list.
@@ -1315,7 +1315,7 @@ void Lobby::handleLobbyJoinAccepted(Packet* pPacket)
 
     auto& host = peers_[peerIdx];
     X_ASSERT(host.getConnectionState() == LobbyPeer::ConnectionState::Pending, "Unexpected connection state")(host.getConnectionState());
-    setPeerConnectionState(host, LobbyPeer::ConnectionState::Established);
+    setPeerConnectionState(host, LobbyPeer::ConnectionState::Estab);
 
     clearUsers();
 
