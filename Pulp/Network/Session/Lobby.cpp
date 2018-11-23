@@ -494,7 +494,12 @@ void Lobby::sendChatMsg(core::span<const char> msg)
 void Lobby::sendUserCmd(const core::FixedBitStreamBase& bs)
 {
     X_ASSERT(isPeer(), "Can only send user cmd if peer")(isPeer(), isHost());
-    const auto& peer = peers_[hostIdx_];
+    auto& peer = peers_[hostIdx_];
+
+    auto timeNow = gEnv->pTimer->GetTimeNowNoScale();
+
+    peer.userCmdRate.add(timeNow);
+    ++peer.numUserCmd;
 
     pPeer_->send(bs.data(), bs.sizeInBytes(), PacketPriority::High, PacketReliability::UnReliableSequenced, peer.systemHandle);
 }
@@ -512,6 +517,8 @@ void Lobby::sendSnapShot(const SnapShot& snap)
     if (snapDebug) {
         X_LOG0("Lobby", "Sending snap to peers. Size: %" PRIuS, bs.size());
     }
+
+    auto timeNow = gEnv->pTimer->GetTimeNowNoScale();
 
     for (auto& peer : peers_)
     {
@@ -532,6 +539,7 @@ void Lobby::sendSnapShot(const SnapShot& snap)
             X_LOG0("Lobby", "Sending snap to %s", peer.guid.toString(guidStr));
         }
 
+        peer.snapRate.add(timeNow);
         ++peer.numSnaps;
 
         // for now just send whole snap, later will need to build deltas and shit.
