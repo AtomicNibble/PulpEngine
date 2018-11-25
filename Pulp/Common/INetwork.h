@@ -612,7 +612,7 @@ struct IGameCallbacks
 {
     virtual ~IGameCallbacks() = default;
 
-    virtual void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_ABSTRACT;
+    virtual void onUserCmdReceive(NetGUID guid, core::FixedBitStreamBase& bs) X_ABSTRACT;
 };
 
 struct ISession
