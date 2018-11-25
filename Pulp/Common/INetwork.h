@@ -641,7 +641,8 @@ struct ISession
     virtual void startMatch(void) X_ABSTRACT;
 
     virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime) X_ABSTRACT;
-    virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT;
+    virtual bool shouldSendSnapShot(core::TimeVal frameStartTime) X_ABSTRACT;
+    virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
