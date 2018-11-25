@@ -309,6 +309,8 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
     X_ASSERT(gameLobby.isPeer(), "Trying to send userCmds when not a peer")(gameLobby.isPeer(), gameLobby.isHost(), gameLobby.isActive());
 
     gameLobby.sendUserCmd(bs);
+
+    pPeer_->runUpdate();
 }
 
 void Session::sendSnapShot(SnapShot&& snap)
@@ -317,6 +319,8 @@ void Session::sendSnapShot(SnapShot&& snap)
 
     // too all peers.
     lobbys_[LobbyType::Game].sendSnapShot(snap);
+
+    pPeer_->runUpdate();
 }
 
 const SnapShot* Session::getSnapShot(void)
