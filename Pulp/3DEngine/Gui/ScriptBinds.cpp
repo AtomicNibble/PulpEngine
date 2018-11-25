@@ -133,7 +133,7 @@ namespace gui
 
     int32_t ScriptBinds_Menu::back(script::IFunctionHandler* pH)
     {
-        pMenuHandler_->back();
+        pMenuHandler_->back(false);
 
         return pH->endFunction();
     }
