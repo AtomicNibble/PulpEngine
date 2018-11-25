@@ -16,6 +16,16 @@ UserCmdMan::UserCmdMan()
 
 void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd)
 {
+    auto freeSlots = getNumFreeSlots(playerIndex);
+    if (freeSlots < 1) {
+
+        // Set to middle of buffer as a temp fix until we can catch the client up correctly
+        readFrame_[playerIndex] = (writeFrame_[playerIndex] - BUFFER_SIZE / 2);
+        X_ASSERT(getNumFreeSlots(playerIndex), "No free slots")(getNumFreeSlots(playerIndex));
+
+        X_WARNING("Net", "Usercmd buffer overflow for index %" PRIi32, playerIndex);
+    }
+
     userCmds_[writeFrame_[playerIndex] % BUFFER_SIZE][playerIndex] = cmd;
     writeFrame_[playerIndex]++;
 }
