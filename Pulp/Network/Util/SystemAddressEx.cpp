@@ -197,9 +197,9 @@ const char* SystemAddressEx::toString(IPStr& strBuf, bool incPort) const
     strBuf.set(tmpBuf);
 
     if (incPort) {
-        strBuf.appendFmt("|%" PRIu16, platform::ntohs(address_.addr4.port));
+        strBuf.appendFmt("%c%" PRIu16, PORT_DELIMITER, platform::ntohs(address_.addr4.port));
     }
-
+     
     return strBuf.c_str();
 }
 
