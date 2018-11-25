@@ -60,9 +60,10 @@ public:
     bool onInputEvent(const input::InputEvent& event) X_FINAL;
     // ~IGame
 
+private:
+
     // IGameCallbacks
     void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_FINAL;
-
     // ~IGameCallbacks
     
 private:
