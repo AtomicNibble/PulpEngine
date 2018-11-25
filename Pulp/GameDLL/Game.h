@@ -17,6 +17,7 @@
 #include "Weapon\WeaponManager.h"
 
 X_NAMESPACE_DECLARE(net,
+    struct IPeer;
     struct ISession);
 
 X_NAMESPACE_DECLARE(render,
@@ -81,6 +82,7 @@ private:
     core::MemoryArenaBase* arena_;
 
     ICore* pCore_;
+    net::IPeer* pPeer_;
     net::ISession* pSession_;
     render::IRender* pRender_;
     core::ITimer* pTimer_;

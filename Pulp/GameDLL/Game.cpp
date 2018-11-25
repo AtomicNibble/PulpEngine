@@ -23,6 +23,7 @@ XGame::XGame(ICore* pCore) :
     arena_(g_gameArena),
     pCore_(pCore),
     pTimer_(nullptr),
+    pPeer_(nullptr),
     pSession_(nullptr),
     pRender_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
@@ -105,19 +106,19 @@ bool XGame::init(void)
     // networking.
     {
         auto* pNet = gEnv->pNet;
-        auto* pPeer = pNet->createPeer();
+        pPeer_ = pNet->createPeer();
 
-        myGuid_ = pPeer->getMyGUID();
+        myGuid_ = pPeer_->getMyGUID();
 
         net::Port basePort = 1337;
         net::Port maxPort = basePort + 10;
 
         net::SocketDescriptor sd(basePort);
-        auto res = pPeer->init(4, sd);
+        auto res = pPeer_->init(4, sd);
 
         while (res == net::StartupResult::SocketPortInUse && sd.getPort() <= maxPort) {
             sd.setPort(sd.getPort() + 1);
-            res = pPeer->init(4, sd);
+            res = pPeer_->init(4, sd);
         }
 
         if (res != net::StartupResult::Started) {
@@ -125,10 +126,10 @@ bool XGame::init(void)
             return false;
         }
 
-        pPeer->setMaximumIncomingConnections(4);
+        pPeer_->setMaximumIncomingConnections(4);
         X_LOG0("Game", "Listening on port ^6%" PRIu16, sd.getPort());
 
-        pSession_ = pNet->createSession(pPeer, this);
+        pSession_ = pNet->createSession(pPeer_, this);
         if (!pSession_) {
             X_ERROR("Game", "Failed to create net session");
             return false;
@@ -152,6 +153,10 @@ bool XGame::shutDown(void)
 
     if (pSession_) {
         gEnv->pNet->deleteSession(pSession_);
+    }
+
+    if (pPeer_) {
+        gEnv->pNet->deletePeer(pPeer_);
     }
 
     if (world_) {
