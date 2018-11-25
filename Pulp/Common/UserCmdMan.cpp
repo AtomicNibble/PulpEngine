@@ -70,7 +70,7 @@ void UserCmdMan::writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int
     }
 }
 
-void UserCmdMan::readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex)
+void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerIndex)
 {
     // meow.
     int32_t num = bs.read<int16_t>();

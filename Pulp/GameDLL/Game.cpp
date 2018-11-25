@@ -517,7 +517,7 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     net::NetGuidStr buf;
     X_ASSERT(clientIdx >= 0, "Failed to get client index for guid \"%s\"", guid.toString(buf))(guid);
 
-    userCmdMan_.readUserCmdToBs(bs, clientIdx);
+    userCmdMan_.readUserCmdFromBs(bs, clientIdx);
 }
 
 bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)

@@ -27,7 +27,7 @@ public:
     const UserCmd& getUserCmdForPlayer(int32_t playerIndex);
 
     void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
-    void readUserCmdToBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
+    void readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
 
     X_INLINE size_t getNumUnreadFrames(int32_t playerIndex) const;
     X_INLINE bool hasUnreadFrames(int32_t playerIndex) const;
