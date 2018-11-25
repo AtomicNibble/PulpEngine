@@ -38,7 +38,7 @@ namespace gui
 
         virtual bool openMenu(const char* pName) X_ABSTRACT;
         virtual void close(void) X_ABSTRACT;
-        virtual bool back(void) X_ABSTRACT;
+        virtual bool back(bool close) X_ABSTRACT;
     };
 
     struct IMenuManager

@@ -98,12 +98,15 @@ namespace gui
         stack_.clear();
     }
 
-    bool MenuHandler::back(void)
+    bool MenuHandler::back(bool close)
     {
         if (stack_.isEmpty()) {
             return false;
         }
 
+        if (!close && stack_.size() < 2) {
+            return false;
+        }
         pActiveMenu_ = nullptr;
         stack_.pop();
         return true;

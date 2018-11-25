@@ -194,13 +194,14 @@ bool XGame::onInputEvent(const input::InputEvent& event)
     // so we decide where to send the input here.
     auto status = pSession_->getStatus();
 
-    if (status == net::SessionStatus::InGame)
+
+    if (event.action == input::InputState::RELEASED)
     {
-        if (event.action == input::InputState::RELEASED)
+        if (event.keyId == input::KeyId::ESCAPE)
         {
-            if (event.keyId == input::KeyId::ESCAPE)
+            if (pMenuHandler_)
             {
-                if (pMenuHandler_)
+                if (status == net::SessionStatus::InGame)
                 {
                     if (!pMenuHandler_->isActive())
                     {
@@ -209,9 +210,15 @@ bool XGame::onInputEvent(const input::InputEvent& event)
                     }
                     else
                     {
-                        if (pMenuHandler_->back()) {
+                        if (pMenuHandler_->back(true)) {
                             return true;
                         }
+                    }
+                }
+                else if (status == net::SessionStatus::Idle)
+                {
+                    if (pMenuHandler_->back(false)) {
+                        return true;
                     }
                 }
             }
