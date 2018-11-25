@@ -248,6 +248,7 @@ void Session::quitToMenu(void)
     peers_.clear();
 
     nextUserCmdSendTime_.SetValue(0);
+    nextSnapshotSendTime_.SetValue(0);
     numSnapsReceived_ = 0;
 
     setState(SessionState::Idle);
@@ -313,7 +314,20 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
     pPeer_->runUpdate();
 }
 
-void Session::sendSnapShot(SnapShot&& snap)
+bool Session::shouldSendSnapShot(core::TimeVal frameStartTime)
+{
+    X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
+
+    if (frameStartTime < nextSnapshotSendTime_) {
+        return false;
+    }
+
+    auto rateMS = vars_.snapRateMs();
+    nextSnapshotSendTime_ = frameStartTime + core::TimeVal::fromMS(rateMS);
+    return true;
+}
+
+void Session::sendSnapShot(const SnapShot& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 

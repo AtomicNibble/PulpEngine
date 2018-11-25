@@ -408,10 +408,13 @@ bool XGame::update(core::FrameData& frame)
                 }
             }
 
-            net::SnapShot snap(arena_);
-            world_->createSnapShot(frame, snap);
 
-            pSession_->sendSnapShot(std::move(snap));
+            if (pSession_->shouldSendSnapShot(frame.timeInfo.startTimeRealative)) {
+                net::SnapShot snap(arena_);
+                world_->createSnapShot(frame, snap);
+
+                pSession_->sendSnapShot(snap);
+            }
         }
         else
         {
