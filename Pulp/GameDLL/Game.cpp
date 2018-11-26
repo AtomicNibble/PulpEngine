@@ -493,12 +493,9 @@ bool XGame::update(core::FrameData& frame)
 
         for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
         {
-            if (userCmdMan_.hasUnreadFrames(i))
-            {
-                txt.appendFmt("\nPly%" PRIi32 "Unread UCmd: %" PRIuS, i, userCmdMan_.getNumUnreadFrames(i));
-            }
+            txt.appendFmt("\nPly%" PRIi32 " UCmd: %" PRIuS, i, userCmdMan_.getNumUnreadFrames(i));
         }
-
+        
         con.flags.Clear();
 
         pPrim->drawText(Vec3f(5.f, 500.f, 1.f), con, txt.begin(), txt.end());
