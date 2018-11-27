@@ -118,6 +118,10 @@ void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerI
         }
     }
 
+    if (userCmds.isEmpty()) {
+        X_WARNING("Net", "Recived no new user cmds for player %" PRIi32, playerIndex);
+    }
+
 #if 0
     if (vars_.userCmdDebug())
     {
