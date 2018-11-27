@@ -97,7 +97,7 @@ void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerI
 
     // the last user cmd we got.
     auto& lastCmd = newestUserCmdForPlayer(playerIndex);
-    core::TimeVal lastTime = lastCmd.gameTime;
+    int32_t lastTime = lastCmd.clientGameTimeMS;
 
     // we get sent redundant usercmds so need to find new ones.
     core::FixedArray<UserCmd, MAX_USERCMD_SEND> userCmds;
@@ -107,12 +107,12 @@ void UserCmdMan::readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerI
         UserCmd cmd;
         cmd.fromBitStream(bs);
 
-        if (cmd.gameTime > lastTime)
+        if (cmd.clientGameTimeMS > lastTime)
         {
-            lastTime = cmd.gameTime;
+            lastTime = cmd.clientGameTimeMS;
             userCmds.append(cmd);
         }
-        else if (cmd.gameTime == 0_tv)
+        else if (cmd.clientGameTimeMS == 0)
         {
             X_WARNING("Net", "Recived user cmd with game time of zero");
         }

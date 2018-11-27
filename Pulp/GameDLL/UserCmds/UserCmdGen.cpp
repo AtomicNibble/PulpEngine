@@ -119,12 +119,12 @@ void UserCmdGen::buildUserCmd(bool blockInput)
     cmd_.angles = Anglesf(viewAngles_);
 }
 
-net::UserCmd& UserCmdGen::getCurrentUsercmd(void)
+net::UserCmd& UserCmdGen::getCurrentUserCmd(void)
 {
     return cmd_;
 }
 
-const net::UserCmd& UserCmdGen::getCurrentUsercmd(void) const
+const net::UserCmd& UserCmdGen::getCurrentUserCmd(void) const
 {
     return cmd_;
 }

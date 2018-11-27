@@ -48,8 +48,8 @@ struct UserCmd
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
 
-    core::TimeVal gameTime;
-    core::TimeVal serverTime;
+    int32_t clientGameTimeMS;
+    int32_t serverGameTimeMS;
 
     int16_t moveForwrd;
     int16_t moveRight;

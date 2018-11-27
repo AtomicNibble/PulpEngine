@@ -27,6 +27,7 @@ XGame::XGame(ICore* pCore) :
     pSession_(nullptr),
     pRender_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
+    localPlayerIdx_(-1),
     world_(arena_),
     userCmdGen_(inputVars_),
     weaponDefs_(arena_),
@@ -291,7 +292,6 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
-    userCmdGen_.buildUserCmd(blockUserCmd);
 
     if (status == net::SessionStatus::Idle)
     {
@@ -302,6 +302,7 @@ bool XGame::update(core::FrameData& frame)
             clearWorld();
 
             pMenuHandler_->openMenu("main");
+
         }
 
 
@@ -367,6 +368,8 @@ bool XGame::update(core::FrameData& frame)
     {
         if (prevStatus_ != net::SessionStatus::InGame)
         {
+            serverGameTimeMS_ = 0;
+
             pMenuHandler_->close();
 
             userCmdGen_.clearForNewLevel();
@@ -374,19 +377,33 @@ bool XGame::update(core::FrameData& frame)
 
         X_ASSERT_NOT_NULL(world_.ptr());
 
+        auto ellapsedMS = safe_static_cast<int32_t>(frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSecondsAsInt64());
+
+        serverGameTimeMS_ += ellapsedMS;
+
         syncLobbyUsers();
 
         auto localIdx = getLocalClientIdx();
         entity::EntityId localId = static_cast<entity::EntityId>(localIdx);
 
+        const bool isHost = pSession_->isHost();
+
         {
-            auto& userCmd = userCmdGen_.getCurrentUsercmd();
-            userCmd.gameTime = frame.timeInfo.ellapsed[core::ITimer::Timer::GAME];
+            userCmdGen_.buildUserCmd(blockUserCmd);
+            auto& userCmd = userCmdGen_.getCurrentUserCmd();
+            userCmd.clientGameTimeMS = ellapsedMS;
+            userCmd.serverGameTimeMS = serverGameTimeMS_;
+
+            if (!isHost) {
+                // don't go past snapshot.
+                userCmd.serverGameTimeMS = core::Min(userCmd.serverGameTimeMS, netInterpolInfo_.snapShotEndMS);
+            }
+
             userCmdMan_.addUserCmdForPlayer(localIdx, userCmd);
         }
 
         // if we are host we make snapshot.
-        if (pSession_->isHost())
+        if (isHost)
         {
             // run user cmds for all the valid players.
             for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
@@ -395,26 +412,9 @@ bool XGame::update(core::FrameData& frame)
                     continue;
                 }
 
-                // meow !
-                if (userCmdMan_.hasUnreadFrames(i))
-                {
-                    auto& userCmd = userCmdMan_.getUserCmdForPlayer(i);
+                runUserCmdsForPlayer(frame, i);
+            }   
 
-                    world_->runUserCmdForPlayer(frame, userCmd, i);
-                }
-                else
-                {
-                    X_WARNING("Game", "no user cmds for player: %" PRIi32, i);
-                }
-            }
-
-
-            if (pSession_->shouldSendSnapShot(frame.timeInfo.startTimeRealative)) {
-                net::SnapShot snap(arena_);
-                world_->createSnapShot(frame, snap);
-
-                pSession_->sendSnapShot(snap);
-            }
         }
         else
         {
@@ -427,16 +427,21 @@ bool XGame::update(core::FrameData& frame)
                 world_->applySnapShot(frame, pSnap);
             }
 
-            // run me some user cmds!
-            auto& userCmd = userCmdMan_.getUserCmdForPlayer(localIdx);
-            auto unread = userCmdMan_.getNumUnreadFrames(localIdx);
-
-            X_UNUSED(unread);
-
-            world_->runUserCmdForPlayer(frame, userCmd, localIdx);
+            runUserCmdsForPlayer(frame, localIdx);
         }
 
         world_->update(frame, userCmdMan_, localId);
+
+        if (isHost) {
+
+            // send snapshot after updating world.
+            if (pSession_->shouldSendSnapShot(frame.timeInfo.startTimeRealative)) {
+                net::SnapShot snap(arena_);
+                world_->createSnapShot(frame, snap);
+
+                pSession_->sendSnapShot(snap);
+            }
+        }
     }
     else if (status == net::SessionStatus::PartyLobby)
     {
@@ -515,6 +520,55 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     X_ASSERT(clientIdx >= 0, "Failed to get client index for guid \"%s\"", guid.toString(buf))(guid);
 
     userCmdMan_.readUserCmdFromBs(bs, clientIdx);
+}
+
+void XGame::setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction)
+{
+    netInterpolInfo_.frac = fraction;
+    netInterpolInfo_.snapShotStartMS = ssStartTimeMS;
+    netInterpolInfo_.snapShotEndMS = ssEndTimeMS;
+    netInterpolInfo_.serverGameTimeMS = serverGameTimeMS;
+    serverGameTimeMS_ = serverGameTimeMS;
+}
+
+void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
+{
+#if 1
+
+    // if the player is local
+    // we run a user command for them
+    if (localPlayerIdx_ == playerIdx) {
+        auto unread = userCmdMan_.getNumUnreadFrames(playerIdx);
+        X_ASSERT(unread > 0, "No user commans for local player")(unread);
+
+        auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
+        runUserCmdForPlayer(frame, userCmd, playerIdx);
+    }
+    else {
+
+
+    }
+
+
+#else
+    if (userCmdMan_.hasUnreadFrames(i))
+    {
+        auto& userCmd = userCmdMan_.getUserCmdForPlayer(i);
+
+        world_->runUserCmdForPlayer(frame, userCmd, i);
+    }
+    else
+    {
+        X_WARNING("Game", "no user cmds for player: %" PRIi32, i);
+    }
+#endif
+}
+
+void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& userCmd, int32_t playerIdx)
+{
+    world_->runUserCmdForPlayer(frame, userCmd, playerIdx);
+
+    userCmdLastLastTime_[playerIdx] = userCmd.clientGameTimeMS;
 }
 
 bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
@@ -612,6 +666,10 @@ void XGame::syncLobbyUsers(void)
         userCmdMan_.resetPlayer(plyIdx);
 
         auto isLocal = myGuid_ == userGuid;
+
+        if (isLocal) {
+            localPlayerIdx_ = plyIdx;
+        }
 
         // spawn!
         world_->spawnPlayer(plyIdx, isLocal);

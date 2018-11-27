@@ -69,8 +69,8 @@ public:
     bool onInputEvent(const input::InputEvent& event);
     void buildUserCmd(bool blockInput);
 
-    net::UserCmd& getCurrentUsercmd(void);
-    const net::UserCmd& getCurrentUsercmd(void) const;
+    net::UserCmd& getCurrentUserCmd(void);
+    const net::UserCmd& getCurrentUserCmd(void) const;
 
 private:
     void resetCmd(void);

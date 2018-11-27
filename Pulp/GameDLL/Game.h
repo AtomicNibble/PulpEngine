@@ -41,6 +41,15 @@ class XGame : public IGame, net::IGameCallbacks
 {
     using PlayerEntsArr = std::array<entity::EntityId, net::MAX_PLAYERS>;
     using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
+    using PlayerTimeMSArr = std::array<int32_t, net::MAX_PLAYERS>;
+
+    struct NetInterpolationInfo
+    {
+        float frac;
+        int32_t snapShotStartMS;
+        int32_t snapShotEndMS;
+        int32_t serverGameTimeMS;
+    };
 
 public:
     XGame(ICore* pCore);
@@ -67,10 +76,16 @@ private:
     // ~IGameCallbacks
     
 private:
+    void setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction);
+
+    void runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx);
+    void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& userCmd, int32_t playerIdx);
+    
     bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim);
 
     void syncLobbyUsers(void);
     void clearWorld(void);
+
 
     int32_t getLocalClientIdx(void) const;
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
@@ -94,17 +109,25 @@ private:
 
     net::SessionStatus::Enum prevStatus_;
     net::NetGUID myGuid_;
+    int32_t localPlayerIdx_;
     PlayerGuidArr lobbyUserGuids_;
 
     core::UniquePointer<World> world_;
 
     UserCmdGen userCmdGen_;
     net::UserCmdMan userCmdMan_;
+    
+    PlayerTimeMSArr userCmdLastLastTime_; // game time of the cient for the last usecmd we ran for them.
+    PlayerTimeMSArr lastUserCmdRunOnClientTime_;
+    PlayerTimeMSArr lastUserCmdRunOnServerTime_;
 
     weapon::WeaponDefManager weaponDefs_;
 
-
     engine::gui::IMenuHandler* pMenuHandler_;
+
+    // 
+    NetInterpolationInfo netInterpolInfo_;
+    int32_t serverGameTimeMS_;
 };
 
 X_NAMESPACE_END
