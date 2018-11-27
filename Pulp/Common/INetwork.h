@@ -530,7 +530,7 @@ static_assert((SessionStatus::InGame + 1) == SessionStatus::ENUM_COUNT, "Incorre
 
 
 X_DECLARE_ENUM8(LobbyType)(
-    Party, //  your not invited
+    Party, //  you'r not invited
     Game
 );
 
