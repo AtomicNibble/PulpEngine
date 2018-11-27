@@ -541,7 +541,6 @@ X_DECLARE_FLAGS(LobbyFlag)(
 
 using LobbyFlags = Flags<LobbyFlag>;
 
-struct UserCmd;
 class SnapShot;
 
 typedef uintptr_t LobbyUserHandle;

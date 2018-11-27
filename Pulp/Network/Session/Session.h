@@ -48,7 +48,6 @@ X_DECLARE_ENUM(SessionState)(
     InGame                          //
 );
 
-struct UserCmd;
 class UserCmdMan;
 class SnapShot;
 
@@ -200,7 +199,6 @@ private:
     PendingConnectionArr pendingConnections_;
     ConnectedPeerArr peers_;
 
-    // UserCmd
     core::TimeVal nextUserCmdSendTime_;
     core::TimeVal nextSnapshotSendTime_;
 

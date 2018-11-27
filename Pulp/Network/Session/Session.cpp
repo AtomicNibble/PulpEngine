@@ -9,7 +9,6 @@
 #include <IFont.h>
 #include <ITimer.h>
 
-#include <UserCmd.h>
 #include <UserCmdMan.h>
 
 X_NAMESPACE_BEGIN(net)

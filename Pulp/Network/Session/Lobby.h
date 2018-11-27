@@ -13,7 +13,6 @@ X_NAMESPACE_BEGIN(net)
 
 struct ISessionCallbacks;
 
-struct UserCmd;
 class SnapShot;
 
 class SessionVars;

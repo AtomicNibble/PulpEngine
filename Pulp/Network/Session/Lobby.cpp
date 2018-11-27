@@ -3,7 +3,6 @@
 #include "SessionCallbacks.h"
 #include "Vars\SessionVars.h"
 
-#include <UserCmd.h>
 #include <SnapShot.h>
 
 #include <ITimer.h>
