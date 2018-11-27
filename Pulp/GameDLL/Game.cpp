@@ -225,6 +225,7 @@ bool XGame::onInputEvent(const input::InputEvent& event)
             }
         }
     }
+  
 
     if (userCmdGen_.onInputEvent(event)) {
         return true;
@@ -473,7 +474,7 @@ bool XGame::update(core::FrameData& frame)
     }
 
     prevStatus_ = status;
-
+    
 #if 0
     {
         con.col = Col_Crimson;
