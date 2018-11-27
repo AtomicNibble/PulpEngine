@@ -8,6 +8,7 @@
 #include <IPrimativeContext.h>
 #include <IFont.h>
 #include <ITimer.h>
+#include <IFrameData.h>
 
 #include <UserCmdMan.h>
 
@@ -284,16 +285,16 @@ void Session::startMatch(void)
     startLoading();
 }
 
-void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime)
+void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::FrameTimeData& timeInfo)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send user cmd if in game")(state_);
 
-    if (frameStartTime < nextUserCmdSendTime_) {
+    if (timeInfo.startTimeRealative < nextUserCmdSendTime_) {
         return;
     }
 
     auto rateMS = vars_.userCmdRateMs();
-    nextUserCmdSendTime_ = frameStartTime + core::TimeVal::fromMS(rateMS);
+    nextUserCmdSendTime_ = timeInfo.startTimeRealative + core::TimeVal::fromMS(rateMS);
 
     // we send N cmds, but this should be rate limited by 'net_ucmd_rate_ms'
     using UserCmdBS = core::FixedBitStreamStack<(sizeof(UserCmd) * MAX_USERCMD_SEND) + 0x100>;
@@ -313,16 +314,16 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
     pPeer_->runUpdate();
 }
 
-bool Session::shouldSendSnapShot(core::TimeVal frameStartTime)
+bool Session::shouldSendSnapShot(core::FrameTimeData& timeInfo)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 
-    if (frameStartTime < nextSnapshotSendTime_) {
+    if (timeInfo.startTimeRealative < nextSnapshotSendTime_) {
         return false;
     }
 
     auto rateMS = vars_.snapRateMs();
-    nextSnapshotSendTime_ = frameStartTime + core::TimeVal::fromMS(rateMS);
+    nextSnapshotSendTime_ = timeInfo.startTimeRealative + core::TimeVal::fromMS(rateMS);
     return true;
 }
 

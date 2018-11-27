@@ -12,6 +12,7 @@ X_NAMESPACE_DECLARE(engine,
     class IPrimativeContext);
 
 X_NAMESPACE_DECLARE(core,
+    struct FrameTimeData;
     class FixedBitStreamBase);
 
 X_NAMESPACE_BEGIN(net)
@@ -550,7 +551,7 @@ struct UserInfo
     const char* pName;
     int32_t peerIdx;
     NetGUID guid;
-};
+};                                               
 
 struct ChatMsg
 {
@@ -639,8 +640,8 @@ struct ISession
     virtual void createMatch(const MatchParameters& parms) X_ABSTRACT;
     virtual void startMatch(void) X_ABSTRACT;
 
-    virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime) X_ABSTRACT;
-    virtual bool shouldSendSnapShot(core::TimeVal frameStartTime) X_ABSTRACT;
+    virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::FrameTimeData& timeInfo) X_ABSTRACT;
+    virtual bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_ABSTRACT;
     virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
     
     virtual const SnapShot* getSnapShot(void) X_ABSTRACT;

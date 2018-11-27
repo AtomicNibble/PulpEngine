@@ -420,7 +420,7 @@ bool XGame::update(core::FrameData& frame)
         else
         {
             // send user commands to server.
-            pSession_->sendUserCmd(userCmdMan_, localIdx, frame.timeInfo.startTimeRealative);
+            pSession_->sendUserCmd(userCmdMan_, localIdx, frame.timeInfo);
 
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
@@ -436,7 +436,7 @@ bool XGame::update(core::FrameData& frame)
         if (isHost) {
 
             // send snapshot after updating world.
-            if (pSession_->shouldSendSnapShot(frame.timeInfo.startTimeRealative)) {
+            if (pSession_->shouldSendSnapShot(frame.timeInfo)) {
                 net::SnapShot snap(arena_);
                 world_->createSnapShot(frame, snap);
 

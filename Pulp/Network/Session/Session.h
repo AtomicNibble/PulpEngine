@@ -119,9 +119,9 @@ public:
     void startMatch(void) X_FINAL;
 
     // if we are a peer, we send user cmds.
-    void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::TimeVal frameStartTime) X_FINAL;
+    void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::FrameTimeData& timeInfo) X_FINAL;
     // if we are a host and have peers we send snaps.
-    bool shouldSendSnapShot(core::TimeVal frameStartTime) X_FINAL;
+    bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_FINAL;
     void sendSnapShot(const SnapShot& snap) X_FINAL;
 
     const SnapShot* getSnapShot(void) X_FINAL;
