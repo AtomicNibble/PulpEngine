@@ -536,8 +536,6 @@ void XGame::setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, in
 
 void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 {
-#if 1
-
     // if the player is local
     // we run a user command for them
     if (localPlayerIdx_ == playerIdx) {
@@ -549,22 +547,16 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
     }
     else {
 
-
+        if (userCmdMan_.hasUnreadFrames(playerIdx))
+        {
+            auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
+            runUserCmdForPlayer(frame, userCmd, playerIdx);
+        }
+        else
+        {
+            X_WARNING("Game", "no user cmds for player: %" PRIi32, playerIdx);
+        }
     }
-
-
-#else
-    if (userCmdMan_.hasUnreadFrames(i))
-    {
-        auto& userCmd = userCmdMan_.getUserCmdForPlayer(i);
-
-        world_->runUserCmdForPlayer(frame, userCmd, i);
-    }
-    else
-    {
-        X_WARNING("Game", "no user cmds for player: %" PRIi32, i);
-    }
-#endif
 }
 
 void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& userCmd, int32_t playerIdx)
