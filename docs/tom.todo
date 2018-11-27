@@ -78,6 +78,11 @@ Game:
        So ideally if only playing single player no need to bind a port.
 
    ☐ Fix physics for clients.
+       ☐ When we are a client the physics capsuls have a center of the player origin.
+   ☐ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go?
+       - Maybe the server waits till all clients have two snapshots them tells you to go.
+       - The server don't have to bother running any frames both snapshots can be the same I guess.
+   ☐ Stuff related to syncing server and client game time
 
 Engine:
 
