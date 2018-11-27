@@ -394,7 +394,7 @@ bool XGame::update(core::FrameData& frame)
 
         {
             auto& userCmd = userCmdGen_.getCurrentUserCmd();
-            userCmd.clientGameTimeMS = ellapsedMS;
+            userCmd.clientGameTimeMS = serverGameTimeMS_; // just make this server game time for now.
             userCmd.serverGameTimeMS = serverGameTimeMS_;
 
             if (!isHost) {
