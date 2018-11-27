@@ -293,6 +293,9 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
+    // this is built all the time currently even if it's not used.
+    // since input events are passed to it all the time.
+    userCmdGen_.buildUserCmd(blockUserCmd);
 
     if (status == net::SessionStatus::Idle)
     {
@@ -390,7 +393,6 @@ bool XGame::update(core::FrameData& frame)
         const bool isHost = pSession_->isHost();
 
         {
-            userCmdGen_.buildUserCmd(blockUserCmd);
             auto& userCmd = userCmdGen_.getCurrentUserCmd();
             userCmd.clientGameTimeMS = ellapsedMS;
             userCmd.serverGameTimeMS = serverGameTimeMS_;
