@@ -43,7 +43,7 @@ namespace strUtil
             return true;
         }
 
-        auto it = std::find_if(startInclusive, endExclusive, [&](char c) {
+        auto it = std::find_if(startInclusive, endExclusive, [&](wchar_t c) {
             return std::isupper(c, loc);
         });
 
