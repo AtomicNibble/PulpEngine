@@ -70,7 +70,7 @@ bool XFontTexture::Create(int32_t width, int32_t height, int32_t widthCellCount,
     }
 
     textureBuffer_.resize(width * height);
-    std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0);
+    std::fill(textureBuffer_.begin(), textureBuffer_.end(), 0_ui8);
 
     width_ = width;
     height_ = height;
