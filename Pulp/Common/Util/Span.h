@@ -16,7 +16,7 @@ class span;
 
 #if _MSC_VER > 1900 // 2015
 #define CPP14_CONSTEXPR 1
-#define CPP14_CONSTEXPR(x) x
+#define CPP14_CONSTEXPR_EXPR(x) x
 #else
 #define CPP14_CONSTEXPR 0
 #define CPP14_CONSTEXPR_EXPR(x)
