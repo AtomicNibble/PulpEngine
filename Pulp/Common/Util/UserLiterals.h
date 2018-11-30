@@ -7,6 +7,11 @@ inline size_t operator"" _sz(unsigned long long int x)
     return static_cast<size_t>(x);
 }
 
+inline uint8_t operator"" _ui8(unsigned long long int x)
+{
+    return static_cast<uint8_t>(x);
+}
+
 inline uint16_t operator"" _ui16(unsigned long long int x)
 {
     return static_cast<uint16_t>(x);
@@ -20,6 +25,11 @@ inline uint32_t operator"" _ui32(unsigned long long int x)
 inline uint64_t operator"" _ui64(unsigned long long int x)
 {
     return static_cast<uint64_t>(x);
+}
+
+inline int8_t operator"" _i8(unsigned long long int x)
+{
+    return static_cast<int8_t>(x);
 }
 
 inline int16_t operator"" _i16(unsigned long long int x)
