@@ -299,7 +299,7 @@ namespace weapon
 
         for (const auto* pWpn : sorted) {
             X_LOG0("WeaponDef", "^2%-32s^7 Refs: ^2%i",
-                pWpn->getName(), pWpn->getRefCount());
+                pWpn->getName().c_str(), pWpn->getRefCount());
         }
 
         X_LOG0("WeaponDef", "------------ ^8Weapnos End^7 --------------");

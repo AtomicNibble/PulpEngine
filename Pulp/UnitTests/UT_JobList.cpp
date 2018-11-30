@@ -131,7 +131,7 @@ TEST(Threading, JobList)
                 jobLists[j]->Wait();
             }
 
-            X_LOG0_EVERY_N(10, "jobListRunner", "JobList run number: %i numJobsDone: %i", p, numJobsRan);
+            X_LOG0_EVERY_N(10, "jobListRunner", "JobList run number: %i numJobsDone: %i", p, int32_t(numJobsRan));
         }
 
         jobSys.WaitForThreads();

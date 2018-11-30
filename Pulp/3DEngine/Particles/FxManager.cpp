@@ -263,7 +263,7 @@ namespace fx
 
         for (const auto* pEfx : sorted_efxs) {
             X_LOG0("Effect", "^2%-32s^7 ^7Stages: ^2%" PRIi32 " ^7Refs: ^2%" PRIi32,
-                pEfx->getName(), pEfx->getNumStages(), pEfx->getRefCount());
+                pEfx->getName().c_str(), pEfx->getNumStages(), pEfx->getRefCount());
         }
 
         X_LOG0("Effect", "------------ ^8Effects End^7 -------------");

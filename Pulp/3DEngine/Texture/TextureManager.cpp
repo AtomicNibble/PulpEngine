@@ -324,7 +324,7 @@ void TextureManager::releaseDanglingTextures(void)
         for (; it != textures_.end(); ++it) {
             auto* pTexRes = it->second;
             releaseResources(pTexRes);
-            X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, pTexRes->getName(), pTexRes->getRefCount());
+            X_WARNING("Texture", "\"%s\" was not deleted. refs: %" PRIi32, pTexRes->getName().c_str(), pTexRes->getRefCount());
         }
     }
 
