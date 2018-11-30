@@ -329,8 +329,10 @@ public:
     };
 
     class SQL_EXPORT query_iterator
-        : public std::iterator<std::input_iterator_tag, rows>
     {
+    public:
+        using value_type = rows;
+
     public:
         query_iterator();
         explicit query_iterator(SqlLiteQuery* pCmd);
