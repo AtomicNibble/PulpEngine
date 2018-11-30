@@ -31,6 +31,8 @@
 #define RAPIDJSON_SSE2
 #endif // !X_^$
 
+#define RAPIDJSON_NOMEMBERITERATORCLASS
+
 #include <../../3rdparty/source/rapidjson/rapidjson.h>
 #include <../../3rdparty/source/rapidjson/document.h>
 #include <../../3rdparty/source/rapidjson/writer.h>
