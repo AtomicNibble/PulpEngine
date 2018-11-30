@@ -731,7 +731,7 @@ bool xFileSys::deleteDirectoryContents(const PathT& path, VirtualDirectory::Enum
     createOSPath(dir, path, osPath);
 
     if (isDebug()) {
-        X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path);
+        X_LOG0("FileSys", "deleteDirectoryContents: \"%s\"", path.c_str());
     }
 
     // check if the dir exsists.
@@ -1882,7 +1882,7 @@ void xFileSys::listPaks(const char* pSearchPatten) const
 
         core::HumanSize::Str sizeStr;
         X_LOG0("FileSys", "^2%-32s ^7size: ^2%s ^7assets: ^2%" PRIu32 " ^7mode: ^2%s ^7openHandles: ^2%" PRIi32,
-            pPak->name.c_str(), core::HumanSize::toString(sizeStr, pPak->fileSize), pPak->numAssets, PakMode::ToString(pPak->mode), pPak->openHandles);
+            pPak->name.c_str(), core::HumanSize::toString(sizeStr, pPak->fileSize), pPak->numAssets, PakMode::ToString(pPak->mode), int32_t(pPak->openHandles));
     }
 
     X_LOG0("FileSys", "-------------- ^8Paks End^7 --------------");
