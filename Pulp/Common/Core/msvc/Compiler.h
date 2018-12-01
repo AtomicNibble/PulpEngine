@@ -69,6 +69,8 @@
 #define COMPILER_BARRIER_W                      atomic_thread_fence(std::memory_order_release)
 #define COMPILER_BARRIER_RW                     _ReadWriteBarrier();
 
+#define X_NO_DISCARD                            [[nodiscard]]
+
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
 extern "C" void* _ReturnAddress(void);
 X_INTRINSIC(_ReturnAddress)

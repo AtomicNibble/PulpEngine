@@ -52,7 +52,7 @@ X_DECLARE_FLAG_OPERATORS(FileFlags);
 typedef core::XOsFileAsyncOperation XFileAsyncOperation;
 typedef core::XOsFileAsyncOperationCompiltion XFileAsyncOperationCompiltion;
 
-struct XFileAsync
+struct X_NO_DISCARD XFileAsync
 {
     X_DECLARE_ENUM(Type)
     (DISK, VIRTUAL);
@@ -75,7 +75,7 @@ struct XFileAsync
     virtual void setSize(int64_t numBytes) X_ABSTRACT;
 };
 
-struct XFile
+struct X_NO_DISCARD XFile
 {
     virtual ~XFile() = default;
     virtual size_t read(void* pBuf, size_t Len) X_ABSTRACT;
@@ -178,7 +178,7 @@ struct XFile
 // I don't like this.
 // as it's taking ownership of buffer.
 // and is simular functionaloty to XFileFixedBuf otherwise.
-struct XFileMem : public XFile
+struct X_NO_DISCARD XFileMem : public XFile
 {
     XFileMem(char* begin, char* end, core::MemoryArenaBase* arena) :
         arena_(arena),
@@ -685,7 +685,7 @@ struct FindData
 typedef intptr_t findhandle;
 static const findhandle INVALID_FIND_HANDLE = -1;
 
-struct FindPair
+struct X_NO_DISCARD FindPair
 {
     FindPair(findhandle handle, bool valid) :
         handle(handle),
