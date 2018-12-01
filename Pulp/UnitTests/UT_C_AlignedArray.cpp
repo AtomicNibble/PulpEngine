@@ -156,7 +156,7 @@ TYPED_TEST(AlignedArrayTest, Append)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     for (int i = 0; i < 64; i++) {
         list.append(i * 4);
@@ -184,7 +184,7 @@ TYPED_TEST(AlignedArrayTest, Append)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 
@@ -405,7 +405,7 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     for (int i = 0; i < 64; i++) {
         list.emplace_back(static_cast<Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>::Type>(i * 4));
@@ -433,7 +433,7 @@ TYPED_TEST(AlignedArrayTest, EmplaceBack)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 
@@ -458,7 +458,7 @@ TEST(AlignedArrayTest, EmplaceBackComplex)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     EXPECT_EQ(0, CONSRUCTION_COUNT);
     EXPECT_EQ(0, MOVE_COUNT);
@@ -497,7 +497,7 @@ TEST(AlignedArrayTest, EmplaceBackComplex)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 

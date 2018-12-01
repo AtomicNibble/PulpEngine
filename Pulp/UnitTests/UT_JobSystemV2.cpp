@@ -210,7 +210,7 @@ TEST(Threading, JobSystem2Empty_parallel_for)
     }
 
     X_LOG0("JobSystem", "parallel_for: 100000 -> %i jobs %gms",
-        numJobsRan, MultiElapsed.GetMilliSeconds());
+        int32_t(numJobsRan), MultiElapsed.GetMilliSeconds());
     jobSys.ShutDown();
 }
 

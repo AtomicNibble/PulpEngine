@@ -214,7 +214,7 @@ TYPED_TEST(ArrayTest, Append)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     for (int i = 0; i < 64; i++) {
         list.append(i * 4);
@@ -242,7 +242,7 @@ TYPED_TEST(ArrayTest, Append)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 
@@ -350,7 +350,7 @@ TEST(ArrayTest, AppendArrMoveComplex)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     EXPECT_EQ(0, CONSRUCTION_COUNT);
     EXPECT_EQ(0, MOVE_COUNT);
@@ -559,7 +559,7 @@ TYPED_TEST(ArrayTest, EmplaceBack)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     for (int i = 0; i < 64; i++) {
         list.emplace_back(static_cast<Array<TypeParam>::Type>(i * 4));
@@ -587,7 +587,7 @@ TYPED_TEST(ArrayTest, EmplaceBack)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 
@@ -612,7 +612,7 @@ TEST(ArrayTest, EmplaceBackComplex)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     EXPECT_EQ(0, CONSRUCTION_COUNT);
     EXPECT_EQ(0, MOVE_COUNT);
@@ -651,7 +651,7 @@ TEST(ArrayTest, EmplaceBackComplex)
 
     EXPECT_EQ(0, list.size());
     EXPECT_EQ(128, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     list.free();
 

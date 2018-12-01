@@ -173,7 +173,7 @@ TEST(FixedArrayTest, EmplaceBackComplex)
 
     EXPECT_EQ(0, list.size());
     ASSERT_EQ(64, list.capacity());
-    EXPECT_NE(nullptr, list.ptr());
+    EXPECT_TRUE(nullptr != list.ptr());
 
     EXPECT_EQ(0, CustomTypeComplex::CONSRUCTION_COUNT);
     EXPECT_EQ(0, CustomTypeComplex::MOVE_COUNT);

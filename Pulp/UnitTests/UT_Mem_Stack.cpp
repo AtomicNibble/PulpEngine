@@ -208,7 +208,7 @@ TEST(StackAlloc, Heap)
 
         // no more space left
         void* failedAlloc = allocator.allocate(4, 4, 0);
-        EXPECT_EQ(failedAlloc, nullptr);
+        EXPECT_EQ(nullptr, failedAlloc);
         allocator.free(alloc0);
 
         core::debugging::EnableBreakpoints(true);
