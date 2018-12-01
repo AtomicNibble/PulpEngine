@@ -23,6 +23,8 @@
 
 #if X_COMPILER_CLANG
 #include <cpuid.h>
+#else
+#include <intrin.h>
 #endif // !X_COMPILER_CLANG
 
 X_NAMESPACE_BEGIN(core)
