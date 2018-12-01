@@ -17,6 +17,7 @@ public:
     typedef T value_type;
     //
     static const size_t MEM_LEN = sizeof(T) * 6;
+    static const T EPSILON;
 
     //
     // This class is OpenGL friendly and stores the m as how OpenGL would expect it.
@@ -72,7 +73,7 @@ public:
     bool equalCompare(const MatrixAffine2<T>& rhs, T epsilon) const;
     bool operator==(const MatrixAffine2<T>& rhs) const
     {
-        return equalCompare(rhs, (T)EPSILON);
+        return equalCompare(rhs, EPSILON);
     }
     bool operator!=(const MatrixAffine2<T>& rhs) const
     {
@@ -142,12 +143,12 @@ public:
     bool isSingular() const;
 
     //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
-    void invert(T epsilon = math<T>::EPSILON)
+    void invert(T epsilon = EPSILON)
     {
         *this = invertCopy(epsilon);
     }
     //! Returns a copy of the matrix inverted. \a epsilon specifies the tolerance for testing for singularity.
-    MatrixAffine2<T> invertCopy(T epsilon = math<T>::EPSILON) const;
+    MatrixAffine2<T> invertCopy(T epsilon = EPSILON) const;
 
     //! concatenate translation by \a v (conceptually, translate is before 'this')
     void translate(const Vec2<T>& v);
@@ -234,6 +235,10 @@ public:
     static MatrixAffine2<T> makeSkewX(T radians);
     static MatrixAffine2<T> makeSkewY(T radians);
 };
+
+template<typename T>
+const T MatrixAffine2<T>::EPSILON = math<T>::CMP_EPSILON;
+
 
 template<typename T>
 MatrixAffine2<T>::MatrixAffine2()
@@ -603,7 +608,7 @@ void MatrixAffine2<T>::setToIdentity()
 template<typename T>
 bool MatrixAffine2<T>::isSingular() const
 {
-    return fabs(m[0] * m[3] - m[2] * m[1]) <= (T)EPSILON;
+    return fabs(m[0] * m[3] - m[2] * m[1]) <= EPSILON;
 }
 
 template<typename T>
