@@ -65,8 +65,8 @@
 #define X_ENSURE_GE(val1, val2, msg)            static_assert(val1 >= val2, msg);
 #define X_ENSURE_LE(val1, val2, msg)            static_assert(val1 <= val2, msg);
 
-#define COMPILER_BARRIER_R                      _ReadBarrier();
-#define COMPILER_BARRIER_W                      _WriteBarrier();
+#define COMPILER_BARRIER_R                      atomic_thread_fence(std::memory_order_acquire)
+#define COMPILER_BARRIER_W                      atomic_thread_fence(std::memory_order_release)
 #define COMPILER_BARRIER_RW                     _ReadWriteBarrier();
 
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic

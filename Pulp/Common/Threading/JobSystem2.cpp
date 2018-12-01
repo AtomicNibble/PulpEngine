@@ -9,6 +9,8 @@
 
 #include <Time\StopWatch.h>
 
+#include <atomic>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace V2
@@ -634,7 +636,7 @@ namespace V2
         pEntry->subsystem = core::profiler::SubSys::UNCLASSIFIED;
 #endif // !X_ENABLE_JOBSYS_RECORD_SUBSYSTEM
 
-        COMPILER_BARRIER_W
+        COMPILER_BARRIER_W;
 
         // mark it readable.
         ++history.top_;
