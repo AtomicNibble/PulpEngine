@@ -68,10 +68,32 @@ void* operator new(size_t sz)
     return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
 
+void* operator new(size_t sz, std::align_val_t al)
+{
+    return gAlloc.allocate(sz, static_cast<size_t>(al), 0);
+}
+
+void* operator new(size_t sz, const std::nothrow_t&) noexcept
+{
+    return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
+}
+
 void* operator new[](size_t sz)
 {
     return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
 }
+
+void* operator new[](size_t sz, std::align_val_t al)
+{
+    return gAlloc.allocate(sz, static_cast<size_t>(al), 0);
+}
+
+void* operator new[](size_t sz, const std::nothrow_t&) noexcept
+{
+    return gAlloc.allocate(sz, sizeof(uintptr_t), 0);
+}
+
+// -------------------
 
 void operator delete(void* m)
 {
@@ -80,8 +102,9 @@ void operator delete(void* m)
     }
 }
 
-void operator delete[](void* m)
+void operator delete (void* m, std::align_val_t al)
 {
+    X_UNUSED(al);
     if (m) {
         gAlloc.free(m);
     }
@@ -94,6 +117,29 @@ void operator delete(void* m, size_t sz)
     }
 }
 
+void operator delete (void* m, size_t sz, std::align_val_t al)
+{
+    X_UNUSED(al);
+    if (m) {
+        gAlloc.free(m, sz);
+    }
+}
+
+void operator delete[](void* m)
+{
+    if (m) {
+        gAlloc.free(m);
+    }
+}
+
+void operator delete[](void* m, std::align_val_t al)
+{
+    X_UNUSED(al);
+    if (m) {
+        gAlloc.free(m);
+    }
+}
+
 void operator delete[](void* m, size_t sz)
 {
     if (m) {
@@ -101,6 +147,13 @@ void operator delete[](void* m, size_t sz)
     }
 }
 
+void operator delete[](void* m, size_t sz, std::align_val_t al)
+{
+    X_UNUSED(al);
+    if (m) {
+        gAlloc.free(m, sz);
+    }
+}
 
 int APIENTRY _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
     LPTSTR lpCmdLine, int nCmdShow)
