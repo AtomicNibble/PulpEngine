@@ -681,6 +681,11 @@ static bool StringEquals(const std::string& lhs, const std::string& rhs)
 	return lhs == rhs;
 }
 
+static std::string StringAdd(const std::string& lhs, const std::string& rhs)
+{
+    return lhs + rhs;
+}
+
 void RegisterStdString_Native(asIScriptEngine *engine)
 {
 	int r = 0;
@@ -708,7 +713,9 @@ void RegisterStdString_Native(asIScriptEngine *engine)
 	// Need to use a wrapper for operator== otherwise gcc 4.7 fails to compile
 	r = engine->RegisterObjectMethod("string", "bool opEquals(const string &in) const", asFUNCTIONPR(StringEquals, (const string &, const string &), bool), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
 	r = engine->RegisterObjectMethod("string", "int opCmp(const string &in) const", asFUNCTION(StringCmp), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
-	r = engine->RegisterObjectMethod("string", "string opAdd(const string &in) const", asFUNCTIONPR(operator +, (const string &, const string &), string), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
+    // TOM: fix for vs2017 not finding `operator +` like a slut!
+    r = engine->RegisterObjectMethod("string", "string opAdd(const string &in) const", asFUNCTIONPR(StringAdd, (const string &, const string &), string), asCALL_CDECL_OBJFIRST); assert(r >= 0);
+    //	r = engine->RegisterObjectMethod("string", "string opAdd(const string &in) const", asFUNCTIONPR(operator +, (const string &, const string &), string), asCALL_CDECL_OBJFIRST); assert( r >= 0 );
 
 	// The string length can be accessed through methods or through virtual property
 	r = engine->RegisterObjectMethod("string", "uint length() const", asFUNCTION(StringLength), asCALL_CDECL_OBJLAST); assert( r >= 0 );
