@@ -16,7 +16,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <AdditionalOptions>/Zc:strictStrings /Zc:rvalueCast /std:c++latest%(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:offsetof- /Zc:strictStrings /Zc:rvalueCast /std:c++latest%(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
