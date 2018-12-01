@@ -55,16 +55,16 @@ template<>
 template<>
 inline void Path<char>::set(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 {
-    strUtil::Convert(beginInclusive, endExclusive, str_, BaseType::capacity(), len_);
-    str_[len_] = L'\0';
+    strUtil::Convert(beginInclusive, endExclusive, BaseType::str_, BaseType::capacity(), BaseType::len_);
+    BaseType::str_[BaseType::len_] = L'\0';
 }
 
 template<>
 template<>
 inline void Path<wchar_t>::set(const char* const beginInclusive, const char* const endExclusive)
 {
-    strUtil::Convert(beginInclusive, endExclusive, str_, BaseType::capacity(), len_);
-    str_[len_] = '\0';
+    strUtil::Convert(beginInclusive, endExclusive, BaseType::str_, BaseType::capacity(), BaseType::len_);
+    BaseType::str_[BaseType::len_] = '\0';
 }
 
 template<>
@@ -72,9 +72,9 @@ template<>
 inline void Path<char>::append(const wchar_t* const beginInclusive, const wchar_t* const endExclusive)
 {
     size_t lenOut;
-    strUtil::Convert(beginInclusive, endExclusive, &str_[len_], BaseType::freeSpace(), lenOut);
-    len_ += lenOut;
-    str_[len_] = '\0';
+    strUtil::Convert(beginInclusive, endExclusive, &BaseType::str_[BaseType::len_], BaseType::freeSpace(), lenOut);
+    BaseType::len_ += lenOut;
+    BaseType::str_[BaseType::len_] = '\0';
 }
 
 template<>
@@ -82,9 +82,9 @@ template<>
 inline void Path<wchar_t>::append(const char* const beginInclusive, const char* const endExclusive)
 {
     size_t lenOut;
-    strUtil::Convert(beginInclusive, endExclusive, &str_[len_], BaseType::freeSpace(), lenOut);
-    len_ += lenOut;
-    str_[len_] = L'\0';
+    strUtil::Convert(beginInclusive, endExclusive, &BaseType::str_[BaseType::len_], BaseType::freeSpace(), lenOut);
+    BaseType::len_ += lenOut;
+    BaseType::str_[BaseType::len_] = L'\0';
 }
 
 
