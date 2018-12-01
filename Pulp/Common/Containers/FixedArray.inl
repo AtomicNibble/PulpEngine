@@ -11,7 +11,7 @@ template<typename T, size_t N>
 FixedArray<T, N>::FixedArray(const T& initalval) :
     size_(N)
 {
-    Mem::ConstructArray(begin(), N, initalval);
+    Mem::template ConstructArray(begin(), N, initalval);
 }
 
 template<typename T, size_t N>
@@ -68,7 +68,7 @@ const T* FixedArray<T, N>::data(void) const
 template<typename T, size_t N>
 inline void FixedArray<T, N>::clear(void)
 {
-    Mem::DestructArray(begin(), size_);
+    Mem::template DestructArray(begin(), size_);
 
     size_ = 0;
 }
@@ -81,7 +81,7 @@ X_INLINE typename FixedArray<T, N>::Type& FixedArray<T, N>::AddOne(Args&&... arg
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct<T>(&pArr[size_], std::forward<Args>(args)...);
+    Mem::template Construct<T>(&pArr[size_], std::forward<Args>(args)...);
 
     return pArr[size_++];
 }
@@ -93,7 +93,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::append(const T& obj)
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct(&pArr[size_], obj);
+    Mem::template Construct(&pArr[size_], obj);
 
     size_++;
     return size_ - 1;
@@ -105,7 +105,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::append(T&& obj)
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct(&pArr[size_], std::forward<T>(obj));
+    Mem::template Construct(&pArr[size_], std::forward<T>(obj));
 
     size_++;
     return size_ - 1;
@@ -118,7 +118,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(const T& obj)
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct(&pArr[size_], obj);
+    Mem::template Construct(&pArr[size_], obj);
 
     size_++;
     return size_ - 1;
@@ -130,7 +130,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::push_back(T&& obj)
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct(&pArr[size_], std::forward<T>(obj));
+    Mem::template Construct(&pArr[size_], std::forward<T>(obj));
 
     size_++;
     return size_ - 1;
@@ -143,7 +143,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::emplace_back(ArgsT&&... a
     X_ASSERT(size_ < N, "Fixed size array is full")(N, size_);
     T* pArr = begin();
 
-    Mem::Construct<T>(&pArr[size_], std::forward<ArgsT>(args)...);
+    Mem::template Construct<T>(&pArr[size_], std::forward<ArgsT>(args)...);
 
     size_++;
     return size_ - 1;
@@ -190,7 +190,7 @@ bool FixedArray<T, N>::removeIndex(size_type idx)
         auto ptr = Mem::Move(pTarget + 1, end(), pTarget);
 
         // now we just need to deconstruct trailing.
-        Mem::Destruct<T>(ptr);
+        Mem::template Destruct<T>(ptr);
 
         size_--;
         return true;
@@ -234,11 +234,11 @@ void FixedArray<T, N>::resize(size_type newNum)
     // remove some?
     if (newNum < size_) {
         // we don't delete memory just deconstruct.
-        Mem::DestructArray<T>(&pArr[newNum], size_ - newNum);
+        Mem::template DestructArray<T>(&pArr[newNum], size_ - newNum);
     }
     else {
         // construct the new items.
-        Mem::ConstructArray<T>(&pArr[size_], newNum - size_);
+        Mem::template ConstructArray<T>(&pArr[size_], newNum - size_);
     }
 
     // set num
@@ -260,11 +260,11 @@ void FixedArray<T, N>::resize(size_type newNum, const T& t)
     // remove some?
     if (newNum < size_) {
         // we don't delete memory just deconstruct.
-        Mem::DestructArray<T>(&pArr[newNum], size_ - newNum);
+        Mem::template DestructArray<T>(&pArr[newNum], size_ - newNum);
     }
     else {
         // construct the new items.
-        Mem::ConstructArray<T>(&pArr[size_], newNum - size_, t);
+        Mem::template ConstructArray<T>(&pArr[size_], newNum - size_, t);
     }
 
     // set num
