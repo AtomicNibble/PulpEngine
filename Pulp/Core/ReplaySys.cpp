@@ -193,7 +193,7 @@ void ReplaySys::update(FrameInput& inputFrame)
             // read the header, but read in a few pages after see if we get lucky add get all the data we need.
             auto pageSize = 4096;
             auto pageTrailingBytes = getTrailingBytes(readOffset_ + sizeof(BufferHdr), pageSize);
-            auto readSize = core::Min(sizeof(BufferHdr) + pageTrailingBytes + pageSize * 2, bytesLeft);
+            auto readSize = safe_static_cast<size_t>(core::Min(sizeof(BufferHdr) + pageTrailingBytes + pageSize * 2, bytesLeft));
 
             X_ASSERT(readSize >= sizeof(BufferHdr), "File is not empty, but no space for header")(readSize, bytesLeft);
 
