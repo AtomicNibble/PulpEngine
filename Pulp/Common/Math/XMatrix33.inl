@@ -686,7 +686,7 @@ const char* Matrix33<T>::toString(Description& desc) const
 {
     desc.setFmt("<%g,%g,%g> - <%g,%g,%g> - <%g,%g,%g>",
         m00, m01, m02,
-        m10, m11, m12
+        m10, m11, m12,
         m20, m21, m22
     );
     return desc.c_str();
