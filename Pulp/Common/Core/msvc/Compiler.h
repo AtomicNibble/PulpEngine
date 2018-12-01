@@ -78,8 +78,9 @@ X_INTRINSIC(_ReturnAddress)
 template<typename ToCheck,
     size_t ExpectedSize,
     size_t RealSize = sizeof(ToCheck)>
-struct check_size_static : std::true_type
+struct check_size_static
 {
+    static constexpr bool value = true;
     static_assert(ExpectedSize == RealSize, "type has a incorrect size");
 };
 
