@@ -340,7 +340,7 @@ inline size_t Path<TChar>::fillSpaceWithNullTerm(void)
 template<typename TChar>
 inline bool Path<TChar>::isAbsolute(void) const
 {
-    const auto len = length();
+    const auto len = BaseType::length();
 
     // https://docs.microsoft.com/en-us/dotnet/standard/io/file-path-formats
     // \folder is absolute
