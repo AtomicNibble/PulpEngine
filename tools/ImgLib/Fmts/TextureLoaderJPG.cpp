@@ -8,6 +8,8 @@
 
 #include "TextureFile.h"
 
+#include <setjmp.h>
+
 #if X_DEBUG
 X_LINK_LIB("jpegd");
 #else
