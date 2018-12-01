@@ -32,7 +32,7 @@ namespace JPG
             jpeg_source_mgr mgr;
             uint32_t bytes_read;
             core::XFile* file;
-            unsigned char buffer[JPEG_MGR_BUFFER_SIZE];
+            uint8_t buffer[JPEG_MGR_BUFFER_SIZE];
         };
 
         static void xfile_init_source(j_decompress_ptr cinfo)
