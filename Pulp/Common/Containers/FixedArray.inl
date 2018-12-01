@@ -298,7 +298,7 @@ typename FixedArray<T, N>::size_type FixedArray<T, N>::size(void) const
 
 // returns number of elements allocated for
 template<typename T, size_t N>
-typename constexpr FixedArray<T, N>::size_type FixedArray<T, N>::capacity(void) const
+constexpr typename FixedArray<T, N>::size_type FixedArray<T, N>::capacity(void) const
 {
     return N;
 }
