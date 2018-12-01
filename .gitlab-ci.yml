@@ -7,7 +7,7 @@ before_script:
   - git submodule sync --recursive
   - git submodule update --init --recursive
   - "echo off"
-  - 'call "%VS140COMNTOOLS%\vsvars32.bat"'
+  - 'call "%VS150COMNTOOLS%\vsvars32.bat"'
   - echo.
   - 'set QTDIR=E:\Qt\Qt-5.10.1_64'
   - 'set PATH=%QTDIR%\bin;%PATH%'
