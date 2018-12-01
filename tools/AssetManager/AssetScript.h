@@ -33,8 +33,8 @@ class AssetPropsScriptManager : public QObject
 		void clear(void);
 		void resetRead(void);
 
-		void Write(const void *ptr, asUINT size) X_OVERRIDE;
-		void Read(void *ptr, asUINT size) X_OVERRIDE;
+		int Write(const void *ptr, asUINT size) X_OVERRIDE;
+		int Read(void *ptr, asUINT size) X_OVERRIDE;
 
 	protected:
 		size_t readPos_;

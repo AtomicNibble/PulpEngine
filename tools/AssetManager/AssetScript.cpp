@@ -44,21 +44,22 @@ void AssetPropsScriptManager::ByteCodeStream::resetRead(void)
 }
 
 
-void AssetPropsScriptManager::ByteCodeStream::Write(const void *ptr, asUINT size)
+int AssetPropsScriptManager::ByteCodeStream::Write(const void *ptr, asUINT size)
 {
 	if (size == 0) {
-		return;
+		return 0;
 	}
 
 	const size_t writePos = data_.size();
 	data_.resize(data_.size() + size);
 	std::memcpy(&data_[writePos], ptr, size);
+    return size;
 }
 
-void AssetPropsScriptManager::ByteCodeStream::Read(void *ptr, asUINT size)
+int AssetPropsScriptManager::ByteCodeStream::Read(void *ptr, asUINT size)
 {
 	if (size == 0) {
-		return;
+		return 0;
 	}
 
 	if ((size + readPos_) > data_.size()) {
@@ -67,6 +68,7 @@ void AssetPropsScriptManager::ByteCodeStream::Read(void *ptr, asUINT size)
 
 	std::memcpy(ptr, &data_[readPos_], size);
 	readPos_ += size;
+    return size;
 }
 
 // ----------------------------------------------------------

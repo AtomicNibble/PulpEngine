@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied
    warranty. In no event will the authors be held liable for any
@@ -153,7 +153,6 @@ AS_API asIScriptContext *asGetActiveContext()
 }
 
 // internal
-// Note: There is no asPopActiveContext(), just call tld->activeContexts.PopLast() instead
 asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 {
 	asCThreadLocalData *tld = asCThreadManager::GetLocalData();
@@ -162,6 +161,15 @@ asCThreadLocalData *asPushActiveContext(asIScriptContext *ctx)
 		return 0;
 	tld->activeContexts.PushLast(ctx);
 	return tld;
+}
+
+// internal
+void asPopActiveContext(asCThreadLocalData *tld, asIScriptContext *ctx)
+{
+	UNUSED_VAR(ctx);
+	asASSERT(tld && tld->activeContexts[tld->activeContexts.GetLength() - 1] == ctx);
+	if (tld)
+		tld->activeContexts.PopLast();
 }
 
 asCContext::asCContext(asCScriptEngine *engine, bool holdRef)
@@ -501,6 +509,11 @@ int asCContext::Unprepare()
 	if( m_status == asEXECUTION_ACTIVE || m_status == asEXECUTION_SUSPENDED )
 		return asCONTEXT_ACTIVE;
 
+	// Set the context as active so that any clean up code can use access it if desired
+	asCThreadLocalData *tld = asPushActiveContext((asIScriptContext *)this);
+	asDWORD count = m_refCount.get();
+	UNUSED_VAR(count);
+
 	// Only clean the stack if the context was prepared but not executed until the end
 	if( m_status != asEXECUTION_UNINITIALIZED &&
 		m_status != asEXECUTION_FINISHED )
@@ -510,6 +523,11 @@ int asCContext::Unprepare()
 
 	// Release the returned object (if any)
 	CleanReturnObject();
+
+	// TODO: Unprepare is called during destruction, so nobody
+	//       must be allowed to keep an extra reference
+	asASSERT(m_refCount.get() == count);
+	asPopActiveContext(tld, this);
 
 	// Release the object if it is a script object
 	if( m_initialFunction && m_initialFunction->objectType && (m_initialFunction->objectType->flags & asOBJ_SCRIPT_OBJECT) )
@@ -1042,7 +1060,7 @@ int asCContext::SetArgObject(asUINT arg, void *obj)
 				((asIScriptFunction*)obj)->AddRef();
 			else
 			{
-				asSTypeBehaviour *beh = &dt->GetTypeInfo()->CastToObjectType()->beh;
+				asSTypeBehaviour *beh = &CastToObjectType(dt->GetTypeInfo())->beh;
 				if (obj && beh->addref)
 					m_engine->CallObjectMethod(obj, beh->addref);
 			}
@@ -1191,7 +1209,11 @@ int asCContext::Execute()
 
 	asCThreadLocalData *tld = asPushActiveContext((asIScriptContext *)this);
 
-	if( m_regs.programPointer == 0 )
+	// Make sure there are not too many nested calls, as it could crash the application 
+	// by filling up the thread call stack
+	if (tld->activeContexts.GetLength() > m_engine->ep.maxNestedCalls)
+		SetInternalException(TXT_TOO_MANY_NESTED_CALLS);
+	else if( m_regs.programPointer == 0 )
 	{
 		if( m_currentFunction->funcType == asFUNC_DELEGATE )
 		{
@@ -1324,9 +1346,7 @@ int asCContext::Execute()
 	}
 
 	// Pop the active context
-	asASSERT(tld && tld->activeContexts[tld->activeContexts.GetLength()-1] == this);
-	if( tld )
-		tld->activeContexts.PopLast();
+	asPopActiveContext(tld, this);
 
 	if( m_status == asEXECUTION_FINISHED )
 	{
@@ -2486,18 +2506,9 @@ void asCContext::ExecuteNext()
 		break;
 
 	case asBC_STR:
-		{
-			// Get the string id from the argument
-			asWORD w = asBC_WORDARG0(l_bc);
-			// Push the string pointer on the stack
-			const asCString &b = m_engine->GetConstantString(w);
-			l_sp -= AS_PTR_SIZE;
-			*(asPWORD*)l_sp = (asPWORD)b.AddressOf();
-			// Push the string length on the stack
-			--l_sp;
-			*l_sp = (asDWORD)b.GetLength();
-			l_bc++;
-		}
+		// TODO: NEWSTRING: Deprecate this instruction
+		asASSERT(false);
+		l_bc++;
 		break;
 
 	case asBC_CALLSYS:
@@ -4522,8 +4533,8 @@ void asCContext::CleanReturnObject()
 	if( m_initialFunction && m_initialFunction->DoesReturnOnStack() && m_status == asEXECUTION_FINISHED )
 	{
 		// If function returns on stack we need to call the destructor on the returned object
-		if( m_initialFunction->returnType.GetTypeInfo()->CastToObjectType()->beh.destruct )
-			m_engine->CallObjectMethod(GetReturnObject(), m_initialFunction->returnType.GetTypeInfo()->CastToObjectType()->beh.destruct);
+		if(CastToObjectType(m_initialFunction->returnType.GetTypeInfo())->beh.destruct )
+			m_engine->CallObjectMethod(GetReturnObject(), CastToObjectType(m_initialFunction->returnType.GetTypeInfo())->beh.destruct);
 
 		return;
 	}
@@ -4543,7 +4554,7 @@ void asCContext::CleanReturnObject()
 		else
 		{
 			// Call the destructor on the object
-			asSTypeBehaviour *beh = &(reinterpret_cast<asCTypeInfo*>(m_regs.objectType)->CastToObjectType()->beh);
+			asSTypeBehaviour *beh = &(CastToObjectType(reinterpret_cast<asCTypeInfo*>(m_regs.objectType))->beh);
 			if (m_regs.objectType->GetFlags() & asOBJ_REF)
 			{
 				asASSERT(beh->release || (m_regs.objectType->GetFlags() & asOBJ_NOCOUNT));
@@ -4800,7 +4811,7 @@ void asCContext::CleanArgsOnStack()
 		for( v = 0; v < m_currentFunction->scriptData->objVariablePos.GetLength(); v++ )
 			if( m_currentFunction->scriptData->objVariablePos[v] == var )
 			{
-				func = m_currentFunction->scriptData->objVariableTypes[v]->CastToFuncdefType()->funcdef;
+				func = CastToFuncdefType(m_currentFunction->scriptData->objVariableTypes[v])->funcdef;
 				break;
 			}
 
@@ -4817,7 +4828,7 @@ void asCContext::CleanArgsOnStack()
 				if( var == paramPos )
 				{
 					if (m_currentFunction->parameterTypes[v].IsFuncdef())
-						func = m_currentFunction->parameterTypes[v].GetTypeInfo()->CastToFuncdefType()->funcdef;
+						func = CastToFuncdefType(m_currentFunction->parameterTypes[v].GetTypeInfo())->funcdef;
 					break;
 				}
 				paramPos -= m_currentFunction->parameterTypes[v].GetSizeOnStackDWords();
@@ -4907,18 +4918,18 @@ void asCContext::CleanStackFrame()
 					}
 					else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_REF )
 					{
-						asSTypeBehaviour *beh = &m_currentFunction->scriptData->objVariableTypes[n]->CastToObjectType()->beh;
+						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 						asASSERT( (m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_NOCOUNT) || beh->release );
 						if( beh->release )
 							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->release);
 					}
 					else
 					{
-						asSTypeBehaviour *beh = &m_currentFunction->scriptData->objVariableTypes[n]->CastToObjectType()->beh;
+						asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 						if( beh->destruct )
 							m_engine->CallObjectMethod((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
 						else if( m_currentFunction->scriptData->objVariableTypes[n]->flags & asOBJ_LIST_PATTERN )
-							m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], m_currentFunction->scriptData->objVariableTypes[n]->CastToObjectType());
+							m_engine->DestroyList((asBYTE*)*(asPWORD*)&m_regs.stackFramePointer[-pos], CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n]));
 
 						// Free the memory
 						m_engine->CallFree((void*)*(asPWORD*)&m_regs.stackFramePointer[-pos]);
@@ -4933,7 +4944,7 @@ void asCContext::CleanStackFrame()
 				// Only destroy the object if it is truly alive
 				if( liveObjects[n] > 0 )
 				{
-					asSTypeBehaviour *beh = &m_currentFunction->scriptData->objVariableTypes[n]->CastToObjectType()->beh;
+					asSTypeBehaviour *beh = &CastToObjectType(m_currentFunction->scriptData->objVariableTypes[n])->beh;
 					if( beh->destruct )
 						m_engine->CallObjectMethod((void*)(asPWORD*)&m_regs.stackFramePointer[-pos], beh->destruct);
 				}

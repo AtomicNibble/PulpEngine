@@ -1,6 +1,6 @@
 /*
    AngelCode Scripting Library
-   Copyright (c) 2003-2016 Andreas Jonsson
+   Copyright (c) 2003-2017 Andreas Jonsson
 
    This software is provided 'as-is', without any express or implied 
    warranty. In no event will the authors be held liable for any 
@@ -100,11 +100,12 @@ struct asCExprValue
 	bool  isVariable : 1;
 	bool  isExplicitHandle : 1;
 	bool  isRefToLocal : 1; // The reference may be to a local variable
-	short dummy : 10;
+	bool  isHandleSafe : 1; // the life-time of the handle is guaranteed for the duration of the access
+	short dummy : 9;
 	short stackOffset;
 
 private:
-	// These values must not be accessed directly, in order to avoid problems with endianess. 
+	// These values must not be accessed directly in order to avoid problems with endianess. 
 	// Use the appropriate accessor methods instead
 	union
 	{
@@ -148,6 +149,8 @@ struct asCExprContext
 	void SetVoidExpression();
 	bool IsVoidExpression() const;
 	void Merge(asCExprContext *after);
+	void SetAnonymousInitList(asCScriptNode *initList);
+	bool IsAnonymousInitList() const;
 
 	asCByteCode bc;
 	asCExprValue type;
@@ -165,6 +168,7 @@ struct asCExprContext
 	// TODO: cleanup: use ambiguousName and an enum to say if it is a method, global func, or enum value
 	asCString methodName;
 	asCString enumValue;
+	bool isAnonymousInitList; // Set to true if the expression is an init list for which the type has not yet been determined
 };
 
 struct asSOverloadCandidate
@@ -247,17 +251,18 @@ protected:
 	int  CompileFunctionCall(asCScriptNode *node, asCExprContext *out, asCObjectType *objectType, bool objIsConst, const asCString &scope = "");
 	int  CompileConstructCall(asCScriptNode *node, asCExprContext *out);
 	int  CompileConversion(asCScriptNode *node, asCExprContext *out);
-	int  CompileOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
+	int  CompileOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken, bool leftToRight = true);
 	void CompileOperatorOnHandles(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileMathOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileBitwiseOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileComparisonOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
 	void CompileBooleanOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, eTokenType opToken = ttUnrecognizedToken);
-	bool CompileOverloadedDualOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, asCExprContext *out, bool isHandle = false, eTokenType opToken = ttUnrecognizedToken);
-	int  CompileOverloadedDualOperator2(asCScriptNode *node, const char *methodName, asCExprContext *l, asCExprContext *r, asCExprContext *out, bool specificReturn = false, const asCDataType &returnType = asCDataType::CreatePrimitive(ttVoid, false));
+	bool CompileOverloadedDualOperator(asCScriptNode *node, asCExprContext *l, asCExprContext *r, bool leftToRight, asCExprContext *out, bool isHandle = false, eTokenType opToken = ttUnrecognizedToken);
+	int  CompileOverloadedDualOperator2(asCScriptNode *node, const char *methodName, asCExprContext *l, asCExprContext *r, bool leftToRight, asCExprContext *out, bool specificReturn = false, const asCDataType &returnType = asCDataType::CreatePrimitive(ttVoid, false));
 
 	void CompileInitList(asCExprValue *var, asCScriptNode *node, asCByteCode *bc, int isVarGlobOrMem);
 	int  CompileInitListElement(asSListPatternNode *&patternNode, asCScriptNode *&valueNode, int bufferTypeId, short bufferVar, asUINT &bufferSize, asCByteCode &byteCode, int &elementsInSubList);
+	int  CompilerAnonymousInitList(asCScriptNode *listNode, asCExprContext *ctx, const asCDataType &dt);
 
 	int  CallDefaultConstructor(const asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCScriptNode *node, int isVarGlobOrMem = 0, bool derefDest = false);
 	int  CallCopyConstructor(asCDataType &type, int offset, bool isObjectOnHeap, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool isGlobalVar = false, bool derefDestination = false);
@@ -268,7 +273,7 @@ protected:
 	int  CompileVariableAccess(const asCString &name, const asCString &scope, asCExprContext *ctx, asCScriptNode *errNode, bool isOptional = false, bool noFunction = false, bool noGlobal = false, asCObjectType *objType = 0);
 	void CompileMemberInitialization(asCByteCode *bc, bool onlyDefaults);
 	bool CompileAutoType(asCDataType &autoType, asCExprContext &compiledCtx, asCScriptNode *exprNode, asCScriptNode *errNode);
-	bool CompileInitialization(asCScriptNode *node, asCByteCode *bc, asCDataType &type, asCScriptNode *errNode, int offset, asQWORD *constantValue, int isVarGlobOrMem, asCExprContext *preCompiled = 0);
+	bool CompileInitialization(asCScriptNode *node, asCByteCode *bc, const asCDataType &type, asCScriptNode *errNode, int offset, asQWORD *constantValue, int isVarGlobOrMem, asCExprContext *preCompiled = 0);
 	void CompileInitAsCopy(asCDataType &type, int offset, asCByteCode *bc, asCExprContext *arg, asCScriptNode *node, bool derefDestination);
 
 	// Helper functions
@@ -387,6 +392,10 @@ protected:
 
 	// This array holds the indices of variables that must not be used in an allocation
 	asCArray<int>         reservedVariables;
+
+	// This array holds the string constants that were allocated during the compilation, 
+	// so they can be released upon completion, whether the compilation was successful or not.
+	asCArray<void*>       usedStringConstants;
 
 	bool isCompilingDefaultArg;
 	bool isProcessingDeferredParams;
