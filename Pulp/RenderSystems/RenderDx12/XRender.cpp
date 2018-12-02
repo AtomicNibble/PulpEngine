@@ -765,6 +765,9 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
                     else {
                         context.writeBufferUnAligned(pCBuf->getBuf(), 0, updateCB.pData, updateCB.size);
                     }
+
+                    // transition back, maybe better todo this at late as possible?
+                    context.transitionResource(pCBuf->getBuf(), D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER);
                 } break;
                 case Commands::Command::COPY_INDEXES_BUF_DATA: {
                     const Commands::CopyIndexBufferData& updateIB = *reinterpret_cast<const Commands::CopyIndexBufferData*>(pCmd);
