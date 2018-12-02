@@ -152,7 +152,7 @@ struct RequestConnection
     SystemAddressEx systemAddress;
 
     core::TimeVal nextRequestTime;
-    core::TimeVal timeoutTime;
+    core::TimeVal timeoutTime; // TODO: this is not even used currently.
     core::TimeVal retryDelay;
 
     uint8_t numRequestsMade;
