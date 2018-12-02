@@ -1375,70 +1375,80 @@ void World3D::cullArea_job(core::V2::JobSystem& jobSys, size_t threadIdx, core::
     }
 
     auto& visPortal = area.visPortals[jobData.visPortalIdx];
-
     visPortal.visibleEnts.clear();
 
-    // we want to cull everything in this area.
-    // it's either culled with the camera or the portal planes.
-    if (visPortal.planes.isEmpty()) {
-        // process all the static models in this area
-        {
-            for (; i < end; i++) {
-                uint32_t modelId = modelRefs_.areaRefs[i].modelId;
-                const level::StaticModel& sm = staticModels_[modelId];
+    auto cullEnts = vars_.cullEnts();
 
-                auto type = cam_.cullSphere_ExactT(sm.boundingSphere);
-                if (type == CullResult::OVERLAP) {
-                    if (vars_.cullEnts() > 1) {
-                        // sphere test says overlap.
-                        // see if we can cull it with AABB.
-                        type = cam_.cullAABB_FastT(sm.boundingBox);
-                        if (type == CullResult::EXCLUSION) {
-                            // got culled by AABB
-                            continue;
-                        }
-                    }
-                }
-                else if (type == CullResult::EXCLUSION) {
-                    //		frameStats_.culledModels++;
-                    continue;
-                }
-
-                // this model is visible.
-                visPortal.visibleEnts.emplace_back(modelId);
-            }
+    // disable culling?
+    if (cullEnts == 0) {
+        for (; i < end; i++) {
+            uint32_t modelId = modelRefs_.areaRefs[i].modelId;
+            visPortal.visibleEnts.emplace_back(modelId);
         }
     }
     else {
-        // get the portal planes we are checking against.
-        const auto& planes = visPortal.planes;
 
-        // process all the static models in this area
-        {
-            for (; i < end; i++) {
-                uint32_t modelId = modelRefs_.areaRefs[i].modelId;
-                const level::StaticModel& sm = staticModels_[modelId];
+        // we want to cull everything in this area.
+        // it's either culled with the camera or the portal planes.
+        if (visPortal.planes.isEmpty()) {
+            // process all the static models in this area
+            {
+                for (; i < end; i++) {
+                    uint32_t modelId = modelRefs_.areaRefs[i].modelId;
+                    const level::StaticModel& sm = staticModels_[modelId];
 
-                // sphere check
-                const Vec3f& center = sm.boundingSphere.center();
-                const float radius = -sm.boundingSphere.radius();
-
-                for (const auto& plane : planes) {
-                    const float d = plane.distance(center);
-                    if (d < radius) {
-                        continue; // not visible in this stack, might be in another.
+                    auto type = cam_.cullSphere_ExactT(sm.boundingSphere);
+                    if (type == CullResult::OVERLAP) {
+                        if (cullEnts > 1) {
+                            // sphere test says overlap.
+                            // see if we can cull it with AABB.
+                            type = cam_.cullAABB_FastT(sm.boundingBox);
+                            if (type == CullResult::EXCLUSION) {
+                                // got culled by AABB
+                                continue;
+                            }
+                        }
                     }
+                    else if (type == CullResult::EXCLUSION) {
+                        //		frameStats_.culledModels++;
+                        continue;
+                    }
+
+                    // this model is visible.
+                    visPortal.visibleEnts.emplace_back(modelId);
                 }
+            }
+        }
+        else {
+            // get the portal planes we are checking against.
+            const auto& planes = visPortal.planes;
 
-                // AABB check?
-                // ...
+            // process all the static models in this area
+            {
+                for (; i < end; i++) {
+                    uint32_t modelId = modelRefs_.areaRefs[i].modelId;
+                    const level::StaticModel& sm = staticModels_[modelId];
 
-                // if we get here we are visible.
-                visPortal.visibleEnts.emplace_back(modelId);
+                    // sphere check
+                    const Vec3f& center = sm.boundingSphere.center();
+                    const float radius = -sm.boundingSphere.radius();
+
+                    for (const auto& plane : planes) {
+                        const float d = plane.distance(center);
+                        if (d < radius) {
+                            continue; // not visible in this stack, might be in another.
+                        }
+                    }
+
+                    // AABB check?
+                    // ...
+
+                    // if we get here we are visible.
+                    visPortal.visibleEnts.emplace_back(modelId);
+                }
             }
         }
     }
-
     // sort them.
     std::sort(visPortal.visibleEnts.begin(), visPortal.visibleEnts.end());
 
