@@ -447,11 +447,11 @@ namespace entity
             pController = pPhysScene_->createCharacterController(desc);
         }
 
-        if (pController) {
-            reg_.assign<CharacterController>(id, pController);
+        if (!pController) {
             return false;
         }
 
+        reg_.assign<CharacterController>(id, pController);
         return true;
     }
 
