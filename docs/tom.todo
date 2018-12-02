@@ -76,13 +76,15 @@ Game:
    ☐ Should we always bind a port? or online for online stuff.
        Well we only need it for hosting, since peers are connecting to server.
        So ideally if only playing single player no need to bind a port.
+       - Think we should just have some like bind if no bound logic.
 
    ☐ Fix physics for clients.
        ☐ When we are a client the physics capsuls have a center of the player origin.
-   ☐ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go?
+   ✘ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go? @cancelled (18-12-02 14:02)
        - Maybe the server waits till all clients have two snapshots them tells you to go.
        - The server don't have to bother running any frames both snapshots can be the same I guess.
-   ☐ Stuff related to syncing server and client game time
+   ✘ Stuff related to syncing server and client game time @cancelled (18-12-02 14:03)
+       - Decided don't need to keep the game times in sync we only care about the delta changes on each side.
 
 Engine:
 
@@ -176,7 +178,10 @@ Video:
 
 Render:
 
-  ☐ Fix rendering on AMD cards (some sync issue?)
+  ✔ Fix rendering on AMD cards (some sync issue?) @done (18-12-02 14:37)
+    - Was a missing transition, don't think i've got all of them tho.
+    ☐ Check resource barriers, and maybe add asserts to help ensure correctness.
+
   ☐ Need to support uploading big textures.
     The allocator i use has fixed page sizes, so limits texture size.
     - should check if using that allocator is really what i want.
@@ -185,7 +190,7 @@ Render:
      For example we could generated both 2d and 3d command lists, but dispatch the lists at same time. But maybe it's better to build the 2d dispatch it then start building 3d dunno.
       But I need to exposes the flexibility.
 
- ☐ BufferManager currently uses a single threaded arena but it gets called from jobs.
+ ✔ BufferManager currently uses a single threaded arena but it gets called from jobs. @done (18-12-02 15:06)
      Need to decide who takes a lock.
 
  ✔ Don't load shader source if we don't need it. @done (18-10-19 17:32)
@@ -263,13 +268,15 @@ Sql:
 
 UnitTests:
 
+     ☐ Move any benchmark style tests in the unittests to benchmark project.
+
    Containers:
      ✔ FixedByteStream @done (18-09-15 18:05)
      ✔ FixedByteStreamRing @done (18-09-15 17:48)
 
    Maths:
      ☐ The Angles, Quat, Mat conversions seams broken so fix tests + logic.
-
+       - look at the player camera logic pitch, yaw and roll are in wrong order.
 
    Networking:
 
@@ -277,3 +284,4 @@ UnitTests:
        ☐ Check peers who connect but don't join a lobby are dropped.
        ☐ if we try to connect to a lobby but it fails for any reason.
        ☐ If we are connected to one lobby and try to connect to another lobby on same remote, but the connection drops make sure state is good.
+       ☐ Check handling of peers timing out during load.
