@@ -11,7 +11,7 @@ SessionVars::SessionVars()
     lobbyDebug_ = 0;
     drawLobbyDebug_ = 0;
     connectionAttemps_ = 3;
-    connectionRetyDelayMs_ = 500;
+    connectionRetryDelayMs_ = 500;
     joinLobbyTimeoutMs_ = 5000;
 
     snapDebug_ = 0;
@@ -37,7 +37,7 @@ void SessionVars::registerVars(void)
     ADD_CVAR_REF("net_connect_attemps", connectionAttemps_, connectionAttemps_, 0, 128, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Number of connection attemps to make");
 
-    ADD_CVAR_REF("net_connect_retry_delay", connectionRetyDelayMs_, connectionRetyDelayMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("net_connect_retry_delay", connectionRetryDelayMs_, connectionRetryDelayMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Time to wait in MS before retrying");
 
     ADD_CVAR_REF("net_lobby_join_timeout", joinLobbyTimeoutMs_, joinLobbyTimeoutMs_, 1, (1000 * 60) * 10, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,

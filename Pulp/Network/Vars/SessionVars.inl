@@ -24,7 +24,7 @@ X_INLINE int32_t SessionVars::connectionAttemps(void) const
 
 X_INLINE int32_t SessionVars::connectionRetryDelayMs(void) const
 {
-    return connectionRetyDelayMs_;
+    return connectionRetryDelayMs_;
 }
 
 X_INLINE int32_t SessionVars::joinLobbyTimeoutMs(void) const

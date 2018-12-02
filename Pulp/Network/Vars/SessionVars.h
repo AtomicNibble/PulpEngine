@@ -33,7 +33,7 @@ private:
     int32_t lobbyDebug_;
     int32_t drawLobbyDebug_;
     int32_t connectionAttemps_;
-    int32_t connectionRetyDelayMs_;
+    int32_t connectionRetryDelayMs_;
     int32_t joinLobbyTimeoutMs_;
     int32_t snapDebug_;
     int32_t snapFroceDrop_;
