@@ -41,7 +41,6 @@ private:
     int32_t snapRateMs_;
     int32_t userCmdRateMs_;
     int32_t waitForPlayers_;
-
 };
 
 X_NAMESPACE_END
