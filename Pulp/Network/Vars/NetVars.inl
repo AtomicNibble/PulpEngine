@@ -62,11 +62,6 @@ X_INLINE int32_t NetVars::pingTimeMS(void) const
     return pingTimeMS_;
 }
 
-X_INLINE int32_t NetVars::unreliableTimeoutMS(void) const
-{
-    return unreliableTimeoutMS_;
-}
-
 X_INLINE int32_t NetVars::unexpectedMsgBanTime(void) const
 {
     return unexpectedMsgBanTime_;

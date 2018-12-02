@@ -55,9 +55,6 @@ void NetVars::registerVars(void)
         "Min amount of time between pings")
         ->SetOnChangeCallback(del);
 
-    ADD_CVAR_REF("net_unreliable_timeout", unreliableTimeoutMS_, 0, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Time in MS before not sending a unreliable msg. 0=never");
-
     ADD_CVAR_REF("net_unexpected_msg_ban_time", unexpectedMsgBanTime_, 2000, 0, std::numeric_limits<int32_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Time in MS to ban a client that sends a unexpected msg. eg: sending post connection msg before connecting. 0=never");
 

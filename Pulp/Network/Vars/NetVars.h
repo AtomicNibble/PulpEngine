@@ -29,7 +29,6 @@ public:
     X_INLINE int32_t defaultTimeoutMS(void) const;
     X_INLINE int32_t dropPartialConnectionsMS(void) const;
     X_INLINE int32_t pingTimeMS(void) const;
-    X_INLINE int32_t unreliableTimeoutMS(void) const;
     X_INLINE int32_t unexpectedMsgBanTime(void) const;
     X_INLINE int32_t connectionBSPLimit(void) const;
 
@@ -61,7 +60,6 @@ private:
     int32_t defaultTimeoutMS_;
     int32_t dropPartialConnectionsMS_;
     int32_t pingTimeMS_;
-    int32_t unreliableTimeoutMS_;
     int32_t unexpectedMsgBanTime_;
     int32_t connectionBSPLimit_;
 
