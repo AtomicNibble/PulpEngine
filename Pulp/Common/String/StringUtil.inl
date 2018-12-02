@@ -114,7 +114,7 @@ namespace strUtil
     template<size_t N>
     inline const wchar_t* Convert(const char* input, wchar_t (&output)[N])
     {
-        return Convert(input, output, N * 2);
+        return Convert(input, output, N * sizeof(wchar_t));
     }
 
     template<typename T>
