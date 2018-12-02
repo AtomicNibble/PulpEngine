@@ -1737,8 +1737,7 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
     const bool waitingforConnection = rs.connectState == ConnectState::RequestedConnection || rs.connectState == ConnectState::HandlingConnectionRequest || rs.connectState == ConnectState::UnverifiedSender;
 
     // has this connection not completed yet?
-    const core::TimeVal dropCon = core::TimeVal::fromMS(vars_.dropPartialConnectionsMS());
-    const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + dropCon));
+    const bool connectionOpenTimeout = (waitingforConnection && timeNow > (rs.connectionTime + core::TimeVal::fromMS(vars_.dropPartialConnectionsMS())));
     const bool dissconectNoAck = (disconnectingAfterAck && !rs.relLayer.isWaitingForAcks());
     const bool disconnectingNoData = disconnecting && !rs.relLayer.pendingOutgoingData() && rs.relLayer.numMsgInResendBuffer() == 0;
     const bool socketClosed = false;
