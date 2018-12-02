@@ -786,7 +786,6 @@ namespace strUtil
     bool StringToBool(const char* str)
     {
         if (IsNumeric(str)) {
-            // TODO: respect range.
             int32_t val = StringToInt<int32_t>(str);
             // anything not zero is true.
             return val != 0;
@@ -802,7 +801,6 @@ namespace strUtil
     bool StringToBool(const char* startInclusive, const char* endExclusive)
     {
         if (IsNumeric(startInclusive, endExclusive)) {
-            // TODO: respect range.
             int32_t val = StringToInt<int32_t>(startInclusive, endExclusive);
             // anything not zero is true.
             return val != 0;
