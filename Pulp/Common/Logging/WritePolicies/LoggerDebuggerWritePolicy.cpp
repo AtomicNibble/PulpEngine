@@ -17,7 +17,7 @@ void LoggerDebuggerWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t 
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 void LoggerDebuggerWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
@@ -25,7 +25,7 @@ void LoggerDebuggerWritePolicy::WriteWarning(const LoggerBase::Line& line, uint3
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 void LoggerDebuggerWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
@@ -33,7 +33,7 @@ void LoggerDebuggerWritePolicy::WriteError(const LoggerBase::Line& line, uint32_
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 void LoggerDebuggerWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
@@ -41,7 +41,7 @@ void LoggerDebuggerWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 void LoggerDebuggerWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
@@ -49,7 +49,7 @@ void LoggerDebuggerWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 void LoggerDebuggerWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
@@ -57,7 +57,7 @@ void LoggerDebuggerWritePolicy::WriteAssertVariable(const LoggerBase::Line& line
     X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
-    OutputDebugStringW(strUtil::Convert(line, wideBuf));
+    OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
 }
 
 X_NAMESPACE_END
