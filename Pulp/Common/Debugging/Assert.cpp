@@ -24,7 +24,7 @@ Assert::Assert(const SourceInfo& sourceInfo, const char* fmt, ...) :
         temp.appendFmt(fmt, ap);
 
         wchar_t wTxt[2048] = {0};
-        strUtil::Convert(temp.c_str(), wTxt);
+        strUtil::Convert(temp.begin(), temp.end(), wTxt);
 
         ::OutputDebugStringW(wTxt);
 #endif
