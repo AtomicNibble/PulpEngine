@@ -139,6 +139,8 @@ private:
     static X_INLINE ConstBuffer* constBufferForHandle(BufferHandle handle);
 
 private:
+    core::CriticalSection cs_;
+
     ID3D12Device* pDevice_;
     ContextManager& contextMan_;
     DescriptorAllocator& descriptorAllocator_;

@@ -84,6 +84,8 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
     X_ASSERT(numElements > 0, "NumElements size must be none zero")(numElements);
     X_ASSERT(elementSize > 0, "Element size must be none zero")(elementSize);
 
+    core::CriticalSection::ScopedLock lock(cs_); // TODO: perf
+
     const uint32_t size = numElements * elementSize;
 
     X3DBuffer* pBuf = Int_CreateVB(size);
@@ -107,6 +109,8 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
 BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numElements, uint32_t elementSize, const void* pInitialData,
     BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     const uint32_t size = numElements * elementSize;
 
     X3DBuffer* pBuf = Int_CreateIB(size);
@@ -130,6 +134,8 @@ BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numEleme
 BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size, const void* pInitialData,
     BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     ConstBuffer* pBuf = Int_CreateCB(size);
 
     pBuf->usage_ = usage;
@@ -150,6 +156,8 @@ BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size,
 
 void BufferManager::freeIB(IndexBufferHandle IBHandle)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     X3DBuffer* pBuf = bufferForHandle(IBHandle);
 
 #if VID_MEMORY_STATS
@@ -163,6 +171,8 @@ void BufferManager::freeIB(IndexBufferHandle IBHandle)
 
 void BufferManager::freeVB(VertexBufferHandle VBHandle)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     X3DBuffer* pBuf = bufferForHandle(VBHandle);
 
 #if VID_MEMORY_STATS
@@ -176,6 +186,8 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
 
 void BufferManager::freeCB(VertexBufferHandle CBHandle)
 {
+    core::CriticalSection::ScopedLock lock(cs_);
+
     X3DBuffer* pBuf = bufferForHandle(CBHandle);
 
 #if VID_MEMORY_STATS
