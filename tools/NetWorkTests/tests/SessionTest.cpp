@@ -832,8 +832,16 @@ TEST_F(SessionTest, PremoteToInGame)
     EXPECT_FALSE(pServerGameLobby->allPeersInGame());
 
     SnapShot snap0(g_arena);
-    SnapShot snap1(g_arena);
     pSeverSes_->sendSnapShot(std::move(snap0));
+
+    for (i = 0; i < 10; i++) {
+        pump();
+    }
+
+    // make sure we are still loading after only getting one snapshop.
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    SnapShot snap1(g_arena);
     pSeverSes_->sendSnapShot(std::move(snap1));
 
     // sync in game with host.
