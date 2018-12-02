@@ -3,6 +3,8 @@
 #include <SystemAddress.h>
 #include <SnapShot.h>
 
+#include <IConsole.h>
+
 X_NAMESPACE_BEGIN(net)
 
 namespace
@@ -42,6 +44,13 @@ protected:
     virtual void SetUp() X_OVERRIDE
     {
         pNet_ = gEnv->pNet;
+
+        core::ICVar* pTimeout = gEnv->pConsole->getCVar("net_default_timeout");
+        defaultTimeout_ = core::TimeVal::fromMS(pTimeout->GetInteger());
+
+        core::ICVar* pWait = gEnv->pConsole->getCVar("net_wait_for_players");
+        waitForPlayers_ = pWait->GetInteger() != 0;
+
 
         ASSERT_TRUE(initSessions());
     }
@@ -211,6 +220,10 @@ protected:
 
     Game server_;
     Game client_;
+
+    // some vars
+    core::TimeVal defaultTimeout_;
+    bool waitForPlayers_;
 };
 
 
