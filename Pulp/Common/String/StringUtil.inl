@@ -112,10 +112,35 @@ namespace strUtil
     }
 
     template<size_t N>
+    inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char(&output)[N])
+    {
+        return Convert(startInclusive, endExclusive, output, N * sizeof(wchar_t));
+    }
+
+    template<size_t N>
     inline const wchar_t* Convert(const char* input, wchar_t (&output)[N])
     {
         return Convert(input, output, N * sizeof(wchar_t));
     }
+
+    template<size_t N>
+    inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t(&output)[N])
+    {
+        return Convert(startInclusive, endExclusive, output, N * sizeof(wchar_t));
+    }
+
+    inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes)
+    {
+        size_t bytesOut;
+        return Convert(startInclusive, endExclusive, output, outputBytes, bytesOut);
+    }
+
+    inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t* output, size_t outputBytes)
+    {
+        size_t bytesOut;
+        return Convert(startInclusive, endExclusive, output, outputBytes, bytesOut);
+    }
+
 
     template<typename T>
     inline T StringToInt(const char* str)
