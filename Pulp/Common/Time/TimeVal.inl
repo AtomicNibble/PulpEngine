@@ -93,6 +93,11 @@ X_INLINE float TimeVal::GetMilliSeconds(void) const
     return time_ * (1000.f / getFreq());
 }
 
+X_INLINE int32_t TimeVal::GetMilliSecondsAsInt32(void) const
+{
+    return safe_static_cast<int32_t>(time_ * 1000 / getFreq());
+}
+
 X_INLINE TimeVal::TimeType TimeVal::GetMilliSecondsAsInt64(void) const
 {
     return time_ * 1000 / getFreq();

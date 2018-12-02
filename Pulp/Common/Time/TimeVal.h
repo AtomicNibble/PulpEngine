@@ -35,6 +35,7 @@ public:
     X_INLINE void SetNanoSeconds(const TimeType indwNanoSec);
     // Use only for relative value, absolute values suffer a lot from precision loss.
     X_INLINE float GetMilliSeconds(void) const;
+    X_INLINE int32_t GetMilliSecondsAsInt32(void) const;
     X_INLINE TimeType GetMilliSecondsAsInt64(void) const;
     X_INLINE TimeType GetValue(void) const;
     X_INLINE void SetValue(TimeType val);
