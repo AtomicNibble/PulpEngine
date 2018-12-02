@@ -140,6 +140,8 @@ BindResult::Enum NetSocket::bind(BindParameters& bindParameters)
     core::StackString<32, char> portStr(bindParameters.port);
     lastErrorWSA::Description Dsc;
 
+    // TODO: should this really be iterating interfaces?
+    // do i class a socket as been tied to a single interface?
     int32_t res = getaddrinfo(0, portStr.c_str(), &hints, &pResult);
     if (res != 0) {
         X_ERROR("Net", "Failed to get address info for binding. Error: \"%s\"", lastErrorWSA::ToString(Dsc));
@@ -385,6 +387,7 @@ void NetSocket::setSocketOptions(void)
     int32_t sock_opt;
     lastErrorWSA::Description Dsc;
 
+    // TODO: perf maybe lower these buffers
     // set the recive buffer to decent size
     sock_opt = 1024 * 256;
     res = platform::setsockopt(socket_, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
@@ -393,6 +396,7 @@ void NetSocket::setSocketOptions(void)
     }
 
     // decent size buf for send.
+    // TODO: why? do I even send anything bigger than MTU?
     sock_opt = 1024 * 16;
     res = platform::setsockopt(socket_, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
