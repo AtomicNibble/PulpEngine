@@ -1081,5 +1081,70 @@ TEST_F(SessionTest, LoadGameSyncHostFirst)
     EXPECT_EQ(SessionStatus::InGame, pClientSes_->getStatus());
 }
 
+TEST_F(SessionTest, LoadGameTimeout)
+{
+    // we start loading and the transport dies for both client and server
+    // make sure both slient and server end up in correct state.
+    createAndJoinGameServer();
+
+    EXPECT_EQ(SessionStatus::GameLobby, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    pSeverSes_->startMatch();
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::GameLobby, pClientSes_->getStatus());
+
+    pump();
+
+    EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+
+    // have the server finish if they are going to wait.
+    if (waitForPlayers_)
+    {
+        pSeverSes_->finishedLoading();
+
+        pump();
+
+        EXPECT_EQ(SessionStatus::Loading, pSeverSes_->getStatus());
+        EXPECT_EQ(SessionStatus::Loading, pClientSes_->getStatus());
+    }
+
+    // okay now just sleep!
+    core::Thread::sleep(defaultTimeout_.GetMilliSecondsAsInt32() + 100);
+
+    // is once enougth?
+    pump();
+
+    // now server should be in game and client idle.
+    EXPECT_EQ(SessionStatus::InGame, pSeverSes_->getStatus());
+    EXPECT_EQ(SessionStatus::Idle, pClientSes_->getStatus());
+
+    for (auto lobbyType : { LobbyType::Party, LobbyType::Game })
+    {
+        {
+            auto* pLobby = pSeverSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(0, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(1, pLobby->getNumUsers());
+            EXPECT_TRUE(pLobby->isActive());
+            EXPECT_TRUE(pLobby->isHost());
+            EXPECT_FALSE(pLobby->isPeer());
+            EXPECT_TRUE(pLobby->allPeersLoaded());
+        }
+
+        {
+            auto* pLobby = pClientSes_->getLobby(lobbyType);
+
+            EXPECT_EQ(0, pLobby->getNumConnectedPeers());
+            EXPECT_EQ(0, pLobby->getNumUsers());
+            EXPECT_FALSE(pLobby->isActive());
+            EXPECT_FALSE(pLobby->isHost());
+            EXPECT_FALSE(pLobby->isPeer());
+            EXPECT_TRUE(pLobby->allPeersLoaded());
+        }
+    }
+}
+
 
 X_NAMESPACE_END
