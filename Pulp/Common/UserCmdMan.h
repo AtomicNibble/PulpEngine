@@ -25,6 +25,7 @@ public:
 
     const UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
     const UserCmd& getUserCmdForPlayer(int32_t playerIndex);
+    int32_t getNextUserCmdClientTimeMSForPlayer(int32_t playerIndex) const;
 
     void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
     void readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerIndex);

@@ -58,6 +58,16 @@ const UserCmd& UserCmdMan::getUserCmdForPlayer(int32_t playerIndex)
     return result;
 }
 
+int32_t UserCmdMan::getNextUserCmdClientTimeMSForPlayer(int32_t playerIndex) const
+{
+    X_ASSERT(hasUnreadFrames(playerIndex), "Can't client time for cmd buffer is empty")(playerIndex);
+
+    int32_t index = readFrame_[playerIndex];
+    auto& cmd = userCmds_[index % BUFFER_SIZE][playerIndex];
+
+    return cmd.clientGameTimeMS;
+}
+
 void UserCmdMan::writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const
 {
     if (max > MAX_USERCMD_SEND) {
