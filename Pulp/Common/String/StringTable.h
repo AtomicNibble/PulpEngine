@@ -37,28 +37,28 @@ public:
 
     X_INLINE StringTable();
 
-    X_INLINE IdType addString(const char* str);
-    X_INLINE IdType addString(const char* str, size_t Len);
+    X_INLINE IdType addString(const char* pStr);
+    X_INLINE IdType addString(const char* pStr, size_t len);
 
     X_INLINE const char* getString(IdType ID) const;
 
     X_INLINE size_t numStrings(void) const
     {
-        return NumStrings_;
+        return numStrings_;
     }
 
     X_INLINE size_t wastedBytes(void) const
     {
-        return WasteSize_;
+        return wasteSize_;
     }
 
 protected:
-    IdType MaxBlocks_;
-    IdType CurrentBlock_;
-    size_t NumStrings_;
-    size_t WasteSize_;
-    core::MemCursor Cursor_;
-    BYTE Buffer_[NumBlocks * BlockSize];
+    const IdType maxBlocks_;
+    IdType currentBlock_;
+    size_t numStrings_;
+    size_t wasteSize_;
+    core::MemCursor cursor_;
+    uint8_t buffer_[NumBlocks * BlockSize];
 };
 
 /// \ingroup String
@@ -75,22 +75,27 @@ protected:
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 class StringTableUnique : public StringTable<NumBlocks, BlockSize, Alignment, IdType>
 {
-public:
-    X_INLINE StringTableUnique(core::MemoryArenaBase* arena);
-    X_INLINE ~StringTableUnique();
+    using MyType = StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>;
 
-    X_INLINE IdType addStringUnqiue(const char* Str);
-    X_INLINE IdType addStringUnqiue(const char* Str, size_t Len);
-
-protected:
     static const int CHAR_TRIE_SIZE = 128; // support Ascii set
 
-    typedef struct Node
+    struct Node
     {
         Node()
         {
             core::zero_this(this);
         }
+
+        void freeChildren(core::MemoryArenaBase* arena) {
+            // skip sentinel
+            for (int i = 1; i < CHAR_TRIE_SIZE; i++) {
+                if (chars[i] != nullptr) {
+                    chars[i]->freeChildren(arena);
+                    X_DELETE(chars[i], arena);
+                }
+            }
+        }
+
         IdType id;
         union
         {
@@ -100,17 +105,23 @@ protected:
                 Node* chars[CHAR_TRIE_SIZE];
             };
         };
-    } Node;
+    };
 
-    X_INLINE void AddStringToTrie(const char* Str, IdType id);
-    X_INLINE bool FindString(const char* Str, size_t Len, IdType& id);
+public:
+    X_INLINE StringTableUnique(core::MemoryArenaBase* arena);
+    X_INLINE ~StringTableUnique();
 
-    size_t LongestStr_;
-    size_t NumNodes_;
-    Node searchTree_;
+    X_INLINE IdType addStringUnqiue(const char* pStr);
+    X_INLINE IdType addStringUnqiue(const char* pStr, size_t len);
+
+private:
+    X_INLINE void AddStringToTrie(const char* pStr, IdType id);
+    X_INLINE bool FindString(const char* pStr, size_t len, IdType& id);
 
 private:
     core::MemoryArenaBase* arena_;
+    size_t longestStr_;
+    Node searchTree_;
 };
 
 #include "StringTable.inl"
