@@ -42,6 +42,7 @@ class XGame : public IGame, net::IGameCallbacks
     using PlayerEntsArr = std::array<entity::EntityId, net::MAX_PLAYERS>;
     using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
     using PlayerTimeMSArr = std::array<int32_t, net::MAX_PLAYERS>;
+    using PlayerUserCmdArr = std::array<net::UserCmd, net::MAX_PLAYERS>;
 
     struct NetInterpolationInfo
     {
@@ -117,10 +118,6 @@ private:
     UserCmdGen userCmdGen_;
     net::UserCmdMan userCmdMan_;
     
-    PlayerTimeMSArr userCmdLastLastTime_; // game time of the cient for the last usecmd we ran for them.
-    PlayerTimeMSArr lastUserCmdRunOnClientTime_;
-    PlayerTimeMSArr lastUserCmdRunOnServerTime_;
-
     weapon::WeaponDefManager weaponDefs_;
 
     engine::gui::IMenuHandler* pMenuHandler_;
@@ -128,6 +125,12 @@ private:
     // 
     NetInterpolationInfo netInterpolInfo_;
     int32_t serverGameTimeMS_;
+
+    // TODO: maybe move to network module
+ //   PlayerTimeMSArr userCmdLastLastTime_; // game time of the cient for the last usecmd we ran for them.
+    PlayerUserCmdArr lastUserCmdRun_;
+    PlayerTimeMSArr lastUserCmdRunOnClientTime_;
+    PlayerTimeMSArr lastUserCmdRunOnServerTime_;
 };
 
 X_NAMESPACE_END

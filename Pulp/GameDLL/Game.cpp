@@ -547,14 +547,54 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
     }
     else {
 
+
         if (userCmdMan_.hasUnreadFrames(playerIdx))
         {
-            auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
-            runUserCmdForPlayer(frame, userCmd, playerIdx);
+            auto nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
+            auto clinetGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
+            auto timeSinceServerRanLastCmd = serverGameTimeMS_ - lastUserCmdRunOnServerTime_[playerIdx];
+
+            int32_t clientTimeRunSoFar = 0;
+
+            if (clinetGameTimedelta < timeSinceServerRanLastCmd <= 1)
+            {
+                // the client might be running slighty faster than us as there delta is smaller the ours.
+                // so process them till they match our delta.
+                while (clientTimeRunSoFar < timeSinceServerRanLastCmd && userCmdMan_.hasUnreadFrames(playerIdx))
+                {
+                    auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
+                    runUserCmdForPlayer(frame, userCmd, playerIdx);
+
+                    lastUserCmdRunOnClientTime_[playerIdx] = userCmd.clientGameTimeMS;
+                    lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
+
+                    clientTimeRunSoFar += clinetGameTimedelta;
+
+                    // log?
+
+                    // update info.
+                    if (userCmdMan_.hasUnreadFrames(playerIdx)) {
+                        nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
+                        clinetGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
+                    }
+                }
+            }
+            else
+            {
+                // the client is probs running slower than us, as it's delta is bigger than servers.
+                // we want to just re run the last players command.
+                auto userCmd = lastUserCmdRun_[playerIdx];
+                runUserCmdForPlayer(frame, userCmd, playerIdx);
+            }
         }
         else
         {
             X_WARNING("Game", "no user cmds for player: %" PRIi32, playerIdx);
+            // dam slut no sending user commads run a empty command.
+            auto userCmd = lastUserCmdRun_[playerIdx];
+            runUserCmdForPlayer(frame, userCmd, playerIdx);
+
+            lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
         }
     }
 }
@@ -563,7 +603,8 @@ void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& user
 {
     world_->runUserCmdForPlayer(frame, userCmd, playerIdx);
 
-    userCmdLastLastTime_[playerIdx] = userCmd.clientGameTimeMS;
+    lastUserCmdRun_[playerIdx] = userCmd;
+//    userCmdLastLastTime_[playerIdx] = userCmd.clientGameTimeMS;
 }
 
 bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
