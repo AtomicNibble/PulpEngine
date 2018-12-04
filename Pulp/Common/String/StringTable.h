@@ -76,7 +76,7 @@ template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
 class StringTableUnique : public StringTable<NumBlocks, BlockSize, Alignment, IdType>
 {
 public:
-    X_INLINE StringTableUnique();
+    X_INLINE StringTableUnique(core::MemoryArenaBase* arena);
     X_INLINE ~StringTableUnique();
 
     X_INLINE IdType addStringUnqiue(const char* Str);
@@ -108,6 +108,9 @@ protected:
     size_t LongestStr_;
     size_t NumNodes_;
     Node searchTree_;
+
+private:
+    core::MemoryArenaBase* arena_;
 };
 
 #include "StringTable.inl"

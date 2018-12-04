@@ -56,10 +56,11 @@ const char* StringTable<NumBlocks, BlockSize, Alignment, IdType>::getString(IdTy
 // ---------------------------------
 
 template<int NumBlocks, int BlockSize, int Alignment, typename IdType>
-StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::StringTableUnique() :
+StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::StringTableUnique(core::MemoryArenaBase* arena) :
     StringTable(),
     LongestStr_(0),
-    NumNodes_(0)
+    NumNodes_(0),
+    arena_(arena)
 {
 }
 
@@ -69,7 +70,7 @@ StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::~StringTableUnique()
     Node* node = &searchTree_;
     for (int i = /*skip sentinel*/ 1; i < CHAR_TRIE_SIZE; i++) {
         if (node->chars[i] != nullptr) {
-            delete node->chars[i];
+            X_DELETE(node->chars[i], arena_);
         }
     }
 }
@@ -105,7 +106,7 @@ void StringTableUnique<NumBlocks, BlockSize, Alignment, IdType>::AddStringToTrie
     int c;
     while ((c = *Txt++)) {
         if (node->chars[c] == nullptr) {
-            node->chars[c] = new Node; // TODO: use a arena!!
+            node->chars[c] = X_NEW(Node, arena_, "TireNode"); // TODO: use a arena!!
             NumNodes_++;
         }
         node = node->chars[c];
