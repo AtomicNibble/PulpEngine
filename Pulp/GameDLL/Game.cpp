@@ -556,7 +556,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 
             int32_t clientTimeRunSoFar = 0;
 
-            if (clinetGameTimedelta < timeSinceServerRanLastCmd <= 1)
+            if (clinetGameTimedelta - timeSinceServerRanLastCmd <= 1_i32)
             {
                 // the client might be running slighty faster than us as there delta is smaller the ours.
                 // so process them till they match our delta.
