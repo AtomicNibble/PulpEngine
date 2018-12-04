@@ -33,7 +33,7 @@ void UserCmdMan::addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd)
 void UserCmdMan::resetPlayer(int32_t playerIndex)
 {
     for (int32_t i = 0; i < BUFFER_SIZE; i++) {
-        core::zero_object(userCmds_[i][playerIndex]);
+        userCmds_[i][playerIndex].clear();
     }
 
     writeFrame_[playerIndex] = 0;

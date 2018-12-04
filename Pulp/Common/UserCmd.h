@@ -45,6 +45,10 @@ typedef Flags8<Button> Buttons;
 // so things like movement and fire.
 struct UserCmd
 {
+    void clear() {
+        core::zero_this(this);
+    }
+
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
 
