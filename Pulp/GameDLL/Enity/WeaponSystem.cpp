@@ -297,6 +297,7 @@ namespace entity
             // or just my view.
             auto& trans = pReg_->get<TransForm>(wpn.ownerEnt);
 
+            // TODO: this is wrong, currently using local player view
             auto forward = -frame.view.viewMatrix.getRow(2);
 
             Vec3f origin = trans.pos + Vec3f(0.f, 0.f, 50.f);
