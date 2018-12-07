@@ -33,7 +33,7 @@ TEST(StringTable, Add)
 
 TEST(StringTable, AddUnique)
 {
-    StringTableUnique<128, 16, 8, uint16_t> Table;
+    StringTableUnique<128, 16, 8, uint16_t> Table(g_arena);
 
     uint16_t id1 = Table.addStringUnqiue("i've fallen over. help");
     uint16_t id2 = Table.addStringUnqiue("Click to start the rape");
