@@ -46,6 +46,14 @@ class XGame : public IGame, net::IGameCallbacks
 
     struct NetInterpolationInfo
     {
+        NetInterpolationInfo() :
+            frac(0.f),
+            snapShotStartMS(0),
+            snapShotEndMS(0),
+            serverGameTimeMS(0)
+        {
+        }
+
         float frac;
         int32_t snapShotStartMS;
         int32_t snapShotEndMS;
