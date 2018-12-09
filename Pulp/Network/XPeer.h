@@ -423,6 +423,10 @@ private:
     X_INLINE void onSocketRecv(RecvData* pData);
     core::Thread::ReturnValue socketRecvThreadProc(const core::Thread& thread);
 
+    // ------
+
+    NonceHash::Digest generateNonce(void);
+
 private:
     NetVars& vars_;
     core::V2::JobSystem* pJobSys_;

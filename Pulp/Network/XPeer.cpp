@@ -2166,19 +2166,7 @@ void XPeer::handleOpenConnectionRequestStage2(UpdateBitStream& bsOut, RecvData* 
                 bsOut.write<uint16_t>(mtu);
 
                 // generate a nonce, for password if requried.
-                // I use a hash just as conventint way to generate a random set of bytes.
-                core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
-
-                std::array<uint8_t, NonceHash::Digest::NUM_BYTES> randBytes;
-                cryptRnd_.genBytes(randBytes.data(), randBytes.size());
-
-                NonceHash hash;
-                hash.update(timeNow);
-                hash.update(randBytes.data(), randBytes.size());
-                hash.update(core::TimeStamp::getSystemTime());
-                hash.update(core::Thread::getCurrentID());
-
-                pRemoteSys->nonce = hash.finalize();
+                pRemoteSys->nonce = generateNonce();
 
                 bsOut.write(pRemoteSys->nonce);
             }
@@ -2663,5 +2651,23 @@ core::Thread::ReturnValue XPeer::socketRecvThreadProc(const core::Thread& thread
     freeRecvData(pData);
     return core::Thread::ReturnValue(0);
 }
+
+NonceHash::Digest XPeer::generateNonce(void)
+{
+    core::TimeVal timeNow = gEnv->pTimer->GetTimeNowReal();
+
+    std::array<uint8_t, NonceHash::Digest::NUM_BYTES> randBytes;
+    cryptRnd_.genBytes(randBytes.data(), randBytes.size());
+
+    // I use a hash just as conventint way to generate a random set of bytes.
+    NonceHash hash;
+    hash.update(timeNow);
+    hash.update(randBytes.data(), randBytes.size());
+    hash.update(core::TimeStamp::getSystemTime());
+    hash.update(core::Thread::getCurrentID());
+
+    return hash.finalize();
+}
+
 
 X_NAMESPACE_END
