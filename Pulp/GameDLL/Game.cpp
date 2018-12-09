@@ -430,6 +430,8 @@ bool XGame::update(core::FrameData& frame)
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
             {
+                lastUserCmdRunTime_ = pSnap->getUserCmdTimes();
+
                 world_->applySnapShot(frame, pSnap);
             }
 
@@ -443,6 +445,9 @@ bool XGame::update(core::FrameData& frame)
             // send snapshot after updating world.
             if (pSession_->shouldSendSnapShot(frame.timeInfo)) {
                 net::SnapShot snap(arena_);
+
+                snap.setUserCmdTimes(lastUserCmdRunTime_);
+
                 world_->createSnapShot(frame, snap);
 
                 pSession_->sendSnapShot(snap);
@@ -616,6 +621,7 @@ void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& user
     world_->runUserCmdForPlayer(frame, userCmd, playerIdx);
 
     lastUserCmdRun_[playerIdx] = userCmd;
+    lastUserCmdRunTime_[playerIdx] = userCmd.clientGameTimeMS;
 }
 
 bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)

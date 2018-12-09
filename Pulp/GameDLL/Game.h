@@ -135,7 +135,11 @@ private:
     int32_t serverGameTimeMS_;
 
     // TODO: maybe move to network module
-    PlayerUserCmdArr lastUserCmdRun_; // the last usecmd ran, used to tell peer what server has processed.
+
+    // the last usecmd ran, used to tell peer what server has processed.
+    // on the client this is updated by snapshot.
+    PlayerUserCmdArr lastUserCmdRun_;
+    PlayerTimeMSArr lastUserCmdRunTime_;
     PlayerTimeMSArr lastUserCmdRunOnClientTime_;
     PlayerTimeMSArr lastUserCmdRunOnServerTime_;
 };
