@@ -966,13 +966,10 @@ void Session::handleTransportConnectionResponse(Packet* pPacket)
     }
     else {
         // read it from the packet
-        if (msg == MessageID::ConnectionRequestFailed)
-        {
-            core::FixedBitStreamNoneOwning packetBs(pPacket->begin(), pPacket->end(), true);
-            X_ASSERT(packetBs.sizeInBytes() >= sa.serializedSize(), "Packet should have a systemAdd")();
+        core::FixedBitStreamNoneOwning packetBs(pPacket->begin(), pPacket->end(), true);
+        X_ASSERT(packetBs.sizeInBytes() >= sa.serializedSize(), "Packet should have a systemAdd")();
 
-            sa.fromBitStream(packetBs);
-        }
+        sa.fromBitStream(packetBs);
     }
 
     LobbyFlags flags;
