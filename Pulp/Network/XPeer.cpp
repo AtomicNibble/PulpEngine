@@ -1068,20 +1068,22 @@ void XPeer::freeConnectionRequest(RequestConnection* pConReq)
 
 void XPeer::removeConnectionRequest(const SystemAddressEx& sysAdd)
 {
-    core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+    {
+        core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
-    auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
-        return pOth->systemAddress == sysAdd;
-    };
+        auto matchSysAddFunc = [&sysAdd](const RequestConnection* pOth) {
+            return pOth->systemAddress == sysAdd;
+        };
 
-    auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
-    if (it != connectionReqs_.end()) {
-        freeConnectionRequest(*it);
-        connectionReqs_.erase(it);
+        auto it = std::find_if(connectionReqs_.begin(), connectionReqs_.end(), matchSysAddFunc);
+        if (it != connectionReqs_.end()) {
+            freeConnectionRequest(*it);
+            connectionReqs_.erase(it);
+            return;
+        }
     }
-    else {
-        X_WARNING("Net", "Failed to find connection request for removal");
-    }
+    
+    X_WARNING("Net", "Failed to find connection request for removal");
 }
 
 void XPeer::setDrainSockets(bool drainSocket)
