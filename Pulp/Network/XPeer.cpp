@@ -1512,78 +1512,80 @@ void XPeer::listRemoteSystems(bool verbose) const
 void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal timeNow)
 {
     // are we wanting to connect to some slutty peers?
-    if (connectionReqs_.isNotEmpty()) {
-        core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+    if (connectionReqs_.isEmpty()) {
+        return;
+    }
 
-        for (auto it = connectionReqs_.begin(); it != connectionReqs_.end(); /* ++it */) {
-            RequestConnection& cr = *(*it);
+    core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
-            // time for a reuest?
-            if (cr.nextRequestTime > timeNow) {
-                ++it;
-                continue;
-            }
+    for (auto it = connectionReqs_.begin(); it != connectionReqs_.end(); /* ++it */) {
+        RequestConnection& cr = *(*it);
 
-            IPStr addStr;
-
-            // give up?
-            if (cr.numRequestsMade == cr.retryCount) {
-                X_LOG0_IF(vars_.debugEnabled(), "Net", "Reached max connection retry count for: \"%s\"", cr.systemAddress.toString(addStr));
-
-                freeConnectionRequest(*it);
-                it = connectionReqs_.erase(it);
-
-                // send packet.
-                pushPacket(MessageID::ConnectionRequestFailed, cr.systemAddress);
-                continue;
-            }
-
-            X_LOG0_IF(vars_.debugEnabled(), "Net", "Dispatching open connection request(%" PRIu8 "): \"%s\"",
-                cr.numRequestsMade, cr.systemAddress.toString(addStr));
-
-            ++cr.numRequestsMade;
-            cr.nextRequestTime = timeNow + cr.retryDelay;
-
-            updateBS.reset();
-            updateBS.write(MessageID::OpenConnectionRequest);
-            updateBS.write(OFFLINE_MSG_ID);
-            updateBS.write<uint8_t>(PROTO_VERSION_MAJOR);
-            updateBS.write<uint8_t>(PROTO_VERSION_MINOR);
-
-            // devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
-            size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
-            mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
-
-            size_t MTUSize = MTUSizesArr[mtuIdx] - UDP_HEADER_SIZE;
-            updateBS.zeroPadToLength(MTUSize);
-
-            core::TimeVal timeSend = gEnv->pTimer->GetTimeNowReal();
-
-            NetSocket& socket = sockets_[cr.socketIdx];
-            SendParameters sp;
-            sp.setData(updateBS);
-            sp.systemAddress = cr.systemAddress;
-            if (socket.send(sp) == -WSAEMSGSIZE) // A message sent on a datagram socket was larger than the internal message buffer
-            {
-                // skip this MTU size.
-                cr.MTUIdxShift++;
-                cr.nextRequestTime = timeNow;
-
-                X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to next MTU size for connection request");
-            }
-            else {
-                core::TimeVal timeSendFin = gEnv->pTimer->GetTimeNowReal();
-                core::TimeVal timeToSend = timeSendFin - timeSend;
-                if (timeToSend > core::TimeVal::fromMS(100)) {
-                    // if you took more than 100ms drop, to lowest MTU size.
-                    cr.MTUIdxShift = safe_static_cast<uint8_t>(MTUSizesArr.size() - 1);
-
-                    X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to last MTU size for connection request");
-                }
-            }
-
+        // time for a reuest?
+        if (cr.nextRequestTime > timeNow) {
             ++it;
+            continue;
         }
+
+        IPStr addStr;
+
+        // give up?
+        if (cr.numRequestsMade == cr.retryCount) {
+            X_LOG0_IF(vars_.debugEnabled(), "Net", "Reached max connection retry count for: \"%s\"", cr.systemAddress.toString(addStr));
+
+            freeConnectionRequest(*it);
+            it = connectionReqs_.erase(it);
+
+            // send packet.
+            pushPacket(MessageID::ConnectionRequestFailed, cr.systemAddress);
+            continue;
+        }
+
+        X_LOG0_IF(vars_.debugEnabled(), "Net", "Dispatching open connection request(%" PRIu8 "): \"%s\"",
+            cr.numRequestsMade, cr.systemAddress.toString(addStr));
+
+        ++cr.numRequestsMade;
+        cr.nextRequestTime = timeNow + cr.retryDelay;
+
+        updateBS.reset();
+        updateBS.write(MessageID::OpenConnectionRequest);
+        updateBS.write(OFFLINE_MSG_ID);
+        updateBS.write<uint8_t>(PROTO_VERSION_MAJOR);
+        updateBS.write<uint8_t>(PROTO_VERSION_MINOR);
+
+        // devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
+        size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
+        mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
+
+        size_t MTUSize = MTUSizesArr[mtuIdx] - UDP_HEADER_SIZE;
+        updateBS.zeroPadToLength(MTUSize);
+
+        core::TimeVal timeSend = gEnv->pTimer->GetTimeNowReal();
+
+        NetSocket& socket = sockets_[cr.socketIdx];
+        SendParameters sp;
+        sp.setData(updateBS);
+        sp.systemAddress = cr.systemAddress;
+        if (socket.send(sp) == -WSAEMSGSIZE) // A message sent on a datagram socket was larger than the internal message buffer
+        {
+            // skip this MTU size.
+            cr.MTUIdxShift++;
+            cr.nextRequestTime = timeNow;
+
+            X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to next MTU size for connection request");
+        }
+        else {
+            core::TimeVal timeSendFin = gEnv->pTimer->GetTimeNowReal();
+            core::TimeVal timeToSend = timeSendFin - timeSend;
+            if (timeToSend > core::TimeVal::fromMS(100)) {
+                // if you took more than 100ms drop, to lowest MTU size.
+                cr.MTUIdxShift = safe_static_cast<uint8_t>(MTUSizesArr.size() - 1);
+
+                X_LOG0_IF(vars_.debugEnabled(), "Net", "Moving to last MTU size for connection request");
+            }
+        }
+
+        ++it;
     }
 }
 
