@@ -2078,7 +2078,7 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
     {
         core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
-        for (auto& pReq : connectionReqs_) {
+        for (auto* pReq : connectionReqs_) {
             if (pReq->systemAddress == pData->systemAddress) {
                 // oh it was me, send stage2
                 bsOut.write(MessageID::OpenConnectionRequestStage2);
