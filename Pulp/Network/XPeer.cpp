@@ -2074,22 +2074,24 @@ void XPeer::handleOpenConnectionResponse(UpdateBitStream& bsOut, RecvData* pData
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection response");
 
     // find this fuck.
-    core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+    {
+        core::CriticalSection::ScopedLock lock(connectionReqsCS_);
 
-    for (auto& pReq : connectionReqs_) {
-        if (pReq->systemAddress == pData->systemAddress) {
-            // oh it was me, send stage2
-            bsOut.write(MessageID::OpenConnectionRequestStage2);
-            bsOut.write(OFFLINE_MSG_ID);
-            bsOut.write(guid_);
-            pReq->systemAddress.writeToBitStream(bsOut);
-            bsOut.write<uint16_t>(MAX_MTU_SIZE);
+        for (auto& pReq : connectionReqs_) {
+            if (pReq->systemAddress == pData->systemAddress) {
+                // oh it was me, send stage2
+                bsOut.write(MessageID::OpenConnectionRequestStage2);
+                bsOut.write(OFFLINE_MSG_ID);
+                bsOut.write(guid_);
+                pReq->systemAddress.writeToBitStream(bsOut);
+                bsOut.write<uint16_t>(MAX_MTU_SIZE);
 
-            SendParameters sp;
-            sp.setData(bsOut);
-            sp.systemAddress = pData->systemAddress;
-            pData->pSrcSocket->send(sp);
-            return;
+                SendParameters sp;
+                sp.setData(bsOut);
+                sp.systemAddress = pData->systemAddress;
+                pData->pSrcSocket->send(sp);
+                return;
+            }
         }
     }
 
