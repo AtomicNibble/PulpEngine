@@ -955,11 +955,25 @@ void Session::handleTransportConnectionResponse(Packet* pPacket)
     // case MessageID::InvalidPassword:
     // Ok:
     // case MessageID::ConnectionRequestAccepted:
-
-    const bool failed = pPacket->getID() != MessageID::ConnectionRequestAccepted;
+    auto msg = pPacket->getID();
+    const bool failed = msg != MessageID::ConnectionRequestAccepted;
 
     // we should have pending connections
-    auto sa = pPeer_->getAddressForHandle(pPacket->systemHandle);
+    net::SystemAddress sa;
+
+    if (pPacket->systemHandle != net::INVALID_SYSTEM_HANDLE) {
+        sa = pPeer_->getAddressForHandle(pPacket->systemHandle);
+    }
+    else {
+        // read it from the packet
+        if (msg == MessageID::ConnectionRequestFailed)
+        {
+            core::FixedBitStreamNoneOwning packetBs(pPacket->begin(), pPacket->end(), true);
+            X_ASSERT(packetBs.sizeInBytes() >= sa.serializedSize(), "Packet should have a systemAdd")();
+
+            sa.fromBitStream(packetBs);
+        }
+    }
 
     LobbyFlags flags;
 
