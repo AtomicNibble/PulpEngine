@@ -33,6 +33,9 @@ XGame::XGame(ICore* pCore) :
     weaponDefs_(arena_),
     pMenuHandler_(nullptr)
 {
+    lastUserCmdRunOnClientTime_.fill(0);
+    lastUserCmdRunOnServerTime_.fill(0);
+
 
     X_ASSERT_NOT_NULL(pCore);
 }
@@ -720,6 +723,12 @@ void XGame::clearWorld(void)
     }
 
     lobbyUserGuids_.fill(net::NetGUID());
+
+    for (auto& uCmd : lastUserCmdRun_) {
+        uCmd.clear();
+    }
+    lastUserCmdRunOnClientTime_.fill(0);
+    lastUserCmdRunOnServerTime_.fill(0);
 }
 
 int32_t XGame::getLocalClientIdx(void) const
