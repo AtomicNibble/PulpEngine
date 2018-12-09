@@ -1083,7 +1083,8 @@ void XPeer::removeConnectionRequest(const SystemAddressEx& sysAdd)
         }
     }
     
-    X_WARNING("Net", "Failed to find connection request for removal");
+    IPStr remoteStr;
+    X_WARNING("Net", "Failed to find connection request for removal for Addr: \"%s\"", sysAdd.toString(remoteStr));
 }
 
 void XPeer::setDrainSockets(bool drainSocket)
