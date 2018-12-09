@@ -713,8 +713,18 @@ void Lobby::setPeerConnectionState(LobbyPeer& peer, LobbyPeer::ConnectionState::
     {
         // tell the user to get fucked?
         // HELL YER!
-        X_ASSERT(peer.systemHandle != INVALID_SYSTEM_HANDLE, "Free called twice on a peer")();
-        pCallbacks_->closeConnection(type_, peer.systemHandle);
+
+        // if we are pending the systemHandle can be invalid since we have not connected.
+        if (curState == LobbyPeer::ConnectionState::Pending)
+        {
+            if (peer.systemHandle != INVALID_SYSTEM_HANDLE) {
+                pCallbacks_->closeConnection(type_, peer.systemHandle);
+            }
+        }
+        else {
+            X_ASSERT(peer.systemHandle != INVALID_SYSTEM_HANDLE, "Free called twice on a peer")();
+            pCallbacks_->closeConnection(type_, peer.systemHandle);
+        }
 
         // this won't break removing the user below.
         peer.reset();
