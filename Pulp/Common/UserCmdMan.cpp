@@ -62,7 +62,7 @@ int32_t UserCmdMan::getNextUserCmdClientTimeMSForPlayer(int32_t playerIndex) con
 {
     X_ASSERT(hasUnreadFrames(playerIndex), "Can't client time for cmd buffer is empty")(playerIndex);
 
-    int32_t index = readFrame_[playerIndex];
+    int32_t index = readFrame_[playerIndex] + 1;
     auto& cmd = userCmds_[index % BUFFER_SIZE][playerIndex];
 
     return cmd.clientGameTimeMS;
