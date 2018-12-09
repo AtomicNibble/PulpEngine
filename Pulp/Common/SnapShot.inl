@@ -1,6 +1,10 @@
 
 X_NAMESPACE_BEGIN(net)
 
+X_INLINE const SnapShot::PlayerTimeMSArr& SnapShot::getUserCmdTimes(void) const
+{
+    return userCmdTimes_;
+}
 
 X_INLINE size_t SnapShot::getNumObjects(void) const
 {

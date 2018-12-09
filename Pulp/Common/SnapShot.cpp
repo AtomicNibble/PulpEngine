@@ -9,7 +9,7 @@ SnapShot::SnapShot(core::MemoryArenaBase* arena) :
     arena_(arena),
     objs_(arena)
 {
-
+    userCmdTimes_.fill(0);
 }
 
 SnapShot::~SnapShot()
@@ -23,6 +23,8 @@ SnapShot::~SnapShot()
 
 void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
+    bs.write(userCmdTimes_.data(), userCmdTimes_.size());
+
     auto num = objs_.size();
     bs.write(safe_static_cast<uint16_t>(num));
 
@@ -38,9 +40,10 @@ void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 
 void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
 {
-    objs_.clear();
+    bs.read(userCmdTimes_.data(), userCmdTimes_.size());
 
     auto num = bs.read<uint16_t>();
+    objs_.clear();
     objs_.reserve(num);
 
     for (size_t i=0; i<num; i++)
@@ -72,7 +75,10 @@ void SnapShot::addObject(ObjectID id, core::FixedBitStreamBase& bs)
     std::memcpy(state.buffer.data(), bs.data(), bs.sizeInBytes());
 }
 
-
+void SnapShot::setUserCmdTimes(const PlayerTimeMSArr& userCmdTimes)
+{
+    userCmdTimes_ = userCmdTimes;
+}
 
 SnapShot::MsgBitStream SnapShot::getMessageByIndex(size_t idx) const
 {

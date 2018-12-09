@@ -1,11 +1,11 @@
 #pragma once
 
 #include <Containers\Array.h>
+#include <Containers\FixedBitStream.h>
 #include <Util\Span.h>
 #include <Time\TimeVal.h>
 
-#include <Containers\FixedBitStream.h>
-
+#include <INetwork.h>
 
 X_NAMESPACE_DECLARE(core,
     class FixedBitStreamBase
@@ -14,7 +14,6 @@ X_NAMESPACE_DECLARE(core,
 X_NAMESPACE_BEGIN(net)
 
 typedef int32_t ObjectID;
-
 
 class SnapShot
 {
@@ -39,6 +38,9 @@ class SnapShot
     typedef core::FixedBitStreamNoneOwning MsgBitStream;
 
 public:
+    using PlayerTimeMSArr = std::array<int32_t, MAX_PLAYERS>;
+
+public:
     SnapShot(core::MemoryArenaBase* arena);
     SnapShot(const SnapShot& oth) = delete;
     SnapShot(SnapShot&& oth) = default;
@@ -51,6 +53,8 @@ public:
     void fromBitStream(core::FixedBitStreamBase& bs);
 
     void addObject(ObjectID id, core::FixedBitStreamBase& bs);
+    void setUserCmdTimes(const PlayerTimeMSArr& userCmdTimes);
+    X_INLINE const PlayerTimeMSArr& getUserCmdTimes(void) const;
 
     X_INLINE size_t getNumObjects(void) const;
     X_INLINE core::TimeVal getTime(void) const;
@@ -68,6 +72,7 @@ private:
     core::TimeVal time_; // the creation or recival time;
 
     ObjectStateArr objs_;
+    PlayerTimeMSArr userCmdTimes_;
 };
 
 
