@@ -128,6 +128,7 @@ Network:
  ☐ Implement congestion control.
  ☐ Support a debug graph that shows like network usage with category support.
  ✔ Actually inc numSnapsSent for peers. @done (18-11-16 13:26)
+ ☐ Detect connecting to self better.
 
 Font:
 
@@ -284,4 +285,7 @@ UnitTests:
        ☐ Check peers who connect but don't join a lobby are dropped.
        ☐ if we try to connect to a lobby but it fails for any reason.
        ☐ If we are connected to one lobby and try to connect to another lobby on same remote, but the connection drops make sure state is good.
-       ☐ Check handling of peers timing out during load.
+       ✔ Check handling of peers timing out during load. @done (18-12-02 21:33)
+       ☐ If the host is in game and a peer connects and starts loading but never joins we time they out?
+           Basically there is a possibility the game gets into a wierd state loading wise but keeps sending network packets.
+           the server should disconenct them, if so.
