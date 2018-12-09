@@ -2216,7 +2216,7 @@ void XPeer::handleOpenConnectionResponseStage2(UpdateBitStream& bsOut, RecvData*
                     bsOut.write(MessageID::ConnectionRequest);
                     bsOut.write(guid_);
                     bsOut.write(timeNow.GetValue());
-                    bsOut.write(pReq->password.isNotEmpty());
+                    bsOut.write<bool>(pReq->password.isNotEmpty());
                     if (pReq->password.isNotEmpty()) {
                         PasswdHash hash;
                         hash.update(nonce);
