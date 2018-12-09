@@ -2041,7 +2041,6 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
     // remove connection request.
     removeConnectionRequest(pData->systemAddress);
 
-    pPacket->pData[0] = failureType;
     pPacket->guid = guid;
     pushBackPacket(pPacket);
 }
