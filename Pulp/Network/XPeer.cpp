@@ -1534,11 +1534,12 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
         if (cr.numRequestsMade == cr.retryCount) {
             X_LOG0_IF(vars_.debugEnabled(), "Net", "Reached max connection retry count for: \"%s\"", cr.systemAddress.toString(addStr));
 
+            auto sa = cr.systemAddress; // copy before free
             freeConnectionRequest(*it);
             it = connectionReqs_.erase(it);
 
             // send packet.
-            pushPacket(MessageID::ConnectionRequestFailed, cr.systemAddress);
+            pushPacket(MessageID::ConnectionRequestFailed, sa);
             continue;
         }
 
