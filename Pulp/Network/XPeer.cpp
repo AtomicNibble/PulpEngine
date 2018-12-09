@@ -1672,6 +1672,25 @@ void XPeer::processBufferdCommands(UpdateBitStream& updateBS, core::TimeVal time
             }
             else {
                 pRemoteSystem = getRemoteSystem(cmd.systemAddress, true);
+
+                // is this a connection request?
+                if (!pRemoteSystem)
+                {
+                    core::CriticalSection::ScopedLock lock(connectionReqsCS_);
+
+                    for (size_t i = 0; i < connectionReqs_.size(); i++) {
+                        RequestConnection* pReq = connectionReqs_[i];
+
+                        if (pReq->systemAddress == cmd.systemAddress) {
+                            X_WARNING("Net", "Connection was closed for a pending connectionRequest");
+
+                            freeConnectionRequest(pReq);
+                            connectionReqs_.removeIndex(i);
+                            pushPacket(MessageID::ConnectionRequestFailed, cmd.systemAddress);
+                            continue;
+                        }
+                    }
+                }
             }
 
             if (!pRemoteSystem) {
