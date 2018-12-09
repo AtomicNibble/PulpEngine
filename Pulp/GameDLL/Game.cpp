@@ -564,7 +564,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
             auto clientServerDelta = clientGameTimedelta - timeSinceServerRanLastCmd;
 
             X_LOG0("Game", "Ply %" PRIi32 " UserCmd clientDelta: %" PRIi32 " serverDelta: %" PRIi32 " delta: %" PRIi32,
-                playerIdx, clientServerDelta, timeSinceServerRanLastCmd, clientServerDelta);
+                playerIdx, clientGameTimedelta, timeSinceServerRanLastCmd, clientServerDelta);
 
             if (clientServerDelta <= 1_i32)
             {
