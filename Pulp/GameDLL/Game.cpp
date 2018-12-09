@@ -548,18 +548,25 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
         runUserCmdForPlayer(frame, userCmd, playerIdx);
     }
-    else {
-
+    else 
+    {
 
         if (userCmdMan_.hasUnreadFrames(playerIdx))
         {
             auto nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
-            auto clinetGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
+            auto clientGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
             auto timeSinceServerRanLastCmd = serverGameTimeMS_ - lastUserCmdRunOnServerTime_[playerIdx];
 
             int32_t clientTimeRunSoFar = 0;
 
-            if (clinetGameTimedelta - timeSinceServerRanLastCmd <= 1_i32)
+            // if the client delta is less than server the client is running 'faster'
+            // so if the dleta is negative client is running faster
+            auto clientServerDelta = clientGameTimedelta - timeSinceServerRanLastCmd;
+
+            X_LOG0("Game", "Ply %" PRIi32 " UserCmd clientDelta: %" PRIi32 " serverDelta: %" PRIi32 " delta: %" PRIi32,
+                playerIdx, clientServerDelta, timeSinceServerRanLastCmd, clientServerDelta);
+
+            if (clientServerDelta <= 1_i32)
             {
                 // the client might be running slighty faster than us as there delta is smaller the ours.
                 // so process them till they match our delta.
@@ -571,19 +578,21 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
                     lastUserCmdRunOnClientTime_[playerIdx] = userCmd.clientGameTimeMS;
                     lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
 
-                    clientTimeRunSoFar += clinetGameTimedelta;
+                    clientTimeRunSoFar += clientGameTimedelta;
 
                     // log?
 
                     // update info.
                     if (userCmdMan_.hasUnreadFrames(playerIdx)) {
                         nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
-                        clinetGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
+                        clientGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
                     }
                 }
             }
             else
             {
+                X_WARNING("Game", "Client delta too large for remote player %" PRIi32 " running last userCmd", playerIdx);
+
                 // the client is probs running slower than us, as it's delta is bigger than servers.
                 // we want to just re run the last players command.
                 auto userCmd = lastUserCmdRun_[playerIdx];
@@ -607,7 +616,6 @@ void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& user
     world_->runUserCmdForPlayer(frame, userCmd, playerIdx);
 
     lastUserCmdRun_[playerIdx] = userCmd;
-//    userCmdLastLastTime_[playerIdx] = userCmd.clientGameTimeMS;
 }
 
 bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
