@@ -589,7 +589,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         }
         else
         {
-            X_WARNING("Game", "no user cmds for player: %" PRIi32, playerIdx);
+            X_WARNING("Game", "no userCmd for remote player %" PRIi32, playerIdx);
             // dam slut no sending user commads run a empty command.
             auto userCmd = lastUserCmdRun_[playerIdx];
             runUserCmdForPlayer(frame, userCmd, playerIdx);
