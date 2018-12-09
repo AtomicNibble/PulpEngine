@@ -2666,9 +2666,8 @@ NonceHash::Digest XPeer::generateNonce(void)
     std::array<uint8_t, NonceHash::Digest::NUM_BYTES> randBytes;
     cryptRnd_.genBytes(randBytes.data(), randBytes.size());
 
-    // I use a hash just as conventint way to generate a random set of bytes.
     NonceHash hash;
-    hash.update(timeNow);
+    hash.update(timeNow.GetValue());
     hash.update(randBytes.data(), randBytes.size());
     hash.update(core::TimeStamp::getSystemTime());
     hash.update(core::Thread::getCurrentID());
