@@ -2021,12 +2021,13 @@ void XPeer::handleConnectionFailure(UpdateBitStream& bsBuf, RecvData* pData, Rec
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection failure: \"%s\"", MessageID::ToString(failureType));
 
     Packet* pPacket = nullptr;
+
+    size_t packetSize = sizeof(MessageID::Enum) + SystemAddress::serializedSize();
     if (failureType == MessageID::ConnectionRateLimited) {
-        pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + sizeof(uint32_t) + SystemAddress::serializedSize()));
+        packetSize += sizeof(uint32_t);
     }
-    else {
-        pPacket = allocPacket(core::bitUtil::bytesToBits(sizeof(MessageID::Enum) + SystemAddress::serializedSize()));
-    }
+
+    pPacket = allocPacket(core::bitUtil::bytesToBits(packetSize));
 
     core::FixedBitStreamNoneOwning packetBs(pPacket->pData, pPacket->pData + pPacket->length, false);
     packetBs.write(failureType);
