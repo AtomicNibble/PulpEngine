@@ -797,8 +797,8 @@ bool Converter::IsAssetStale(assetDb::AssetId assetId, AssetType::Enum type, Dat
 
     const void* pHash = row.get<void const*>(0);
     const size_t hashBlobSize = row.columnBytes(0);
-    const ProfileHashVal profileHash = static_cast<ProfileHashVal>(row.get<int64_t>(1));
-    const int32_t precedence = row.get<int32_t>(2);
+    const int32_t precedence = row.get<int32_t>(1);
+    const ProfileHashVal profileHash = static_cast<ProfileHashVal>(row.get<int64_t>(2));
 
     if (hashBlobSize != sizeof(hash.bytes)) {
         X_ERROR("Converter", "Cache hash incorrect size: %" PRIuS, hashBlobSize);
