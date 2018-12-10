@@ -560,7 +560,8 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
     // we run a user command for them
     if (localPlayerIdx_ == playerIdx) {
         auto unread = userCmdMan_.getNumUnreadFrames(playerIdx);
-        X_ASSERT(unread > 0, "No user commans for local player")(unread);
+        // should only be one, unless we now support running multiple client frames.
+        X_ASSERT(unread == 1, "More than one userCmd for local player")(unread);
 
         auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
         runUserCmdForPlayer(frame, userCmd, playerIdx);
