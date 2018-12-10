@@ -68,6 +68,25 @@ int32_t UserCmdMan::getNextUserCmdClientTimeMSForPlayer(int32_t playerIndex) con
     return cmd.clientGameTimeMS;
 }
 
+void UserCmdMan::getReadUserCmdsAfterGameTime(int32_t playerIndex, int32_t gameTimeMS, UserCmdArr& arr) const
+{
+    int32_t index = readFrame_[playerIndex];
+
+    while (index > 0)
+    {
+        auto& uCmd = userCmds_[index % BUFFER_SIZE][playerIndex];
+
+        if (uCmd.clientGameTimeMS <= gameTimeMS)
+        {
+            break;
+        }
+
+        arr.push_back(uCmd);
+
+        index--;
+    }
+}
+
 void UserCmdMan::writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const
 {
     if (max > MAX_USERCMD_SEND) {

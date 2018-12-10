@@ -18,6 +18,9 @@ class UserCmdMan
     typedef std::array<int32_t, MAX_PLAYERS> IndexArr;
 
 public:
+    typedef core::FixedArray<UserCmd, BUFFER_SIZE> UserCmdArr;
+
+public:
     UserCmdMan();
 
     void addUserCmdForPlayer(int32_t playerIndex, const UserCmd& cmd);
@@ -26,6 +29,8 @@ public:
     const UserCmd& newestUserCmdForPlayer(int32_t playerIndex);
     const UserCmd& getUserCmdForPlayer(int32_t playerIndex);
     int32_t getNextUserCmdClientTimeMSForPlayer(int32_t playerIndex) const;
+
+    void getReadUserCmdsAfterGameTime(int32_t playerIndex, int32_t gameTimeMS, UserCmdArr& arr) const;
 
     void writeUserCmdToBs(core::FixedBitStreamBase& bs, int32_t max, int32_t playerIndex) const;
     void readUserCmdFromBs(core::FixedBitStreamBase& bs, int32_t playerIndex);
