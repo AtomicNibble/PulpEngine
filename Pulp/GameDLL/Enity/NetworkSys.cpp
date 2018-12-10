@@ -170,11 +170,20 @@ namespace entity
             {
                // auto& ply = reg.get<Player>(entityId);
 
-                if (reg.has<MeshRenderer>(entityId))
-                {
-                    auto& rend = reg.get<MeshRenderer>(entityId);
-                    p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
-                }
+
+            }
+
+            if (reg.has<MeshRenderer>(entityId))
+            {
+                auto& rend = reg.get<MeshRenderer>(entityId);
+                p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
+            }
+
+            if (reg.has<CharacterController>(entityId))
+            {
+                auto& con = reg.get<CharacterController>(entityId);
+
+                con.pController->setFootPosition(Vec3d(trans.pos));
             }
         }
     }
