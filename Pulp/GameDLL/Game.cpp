@@ -430,11 +430,23 @@ bool XGame::update(core::FrameData& frame)
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
             {
+                world_->applySnapShot(frame, pSnap);
+
+                // get the games times the server has run
                 lastUserCmdRunTime_ = pSnap->getUserCmdTimes();
 
-                world_->applySnapShot(frame, pSnap);
-            }
+                auto localLastRunTime = lastUserCmdRunTime_[localPlayerIdx_];
 
+                // get all the userCmds we need to replay.
+                net::UserCmdMan::UserCmdArr userCmds;
+                userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTime, userCmds);
+             
+                for (auto& userCmd : userCmds)
+                {
+                    runUserCmdForPlayer(frame, userCmd, localPlayerIdx_);
+                }
+            }
+            
             runUserCmdsForPlayer(frame, localIdx);
         }
 
