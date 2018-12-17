@@ -11,6 +11,11 @@ X_INLINE bool GameVars::userCmdDrawDebug(void) const
     return userCmdDrawDebug_ != 0;
 }
 
+X_INLINE int32_t GameVars::userCmdClientReplay(void) const
+{
+    return userCmdClientReplay_;
+}
+
 X_INLINE core::ICVar* GameVars::getFovVar(void) const
 {
     return pFovVar_;
