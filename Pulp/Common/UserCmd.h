@@ -39,7 +39,13 @@ X_DECLARE_ENUM8(Impulse)
     WEAP_NEXT,
     WEAP_PREV);
 
+X_DECLARE_FLAGS8(UserCmdFlag)
+(
+    REPLAY);
+
 typedef Flags8<Button> Buttons;
+typedef Flags8<UserCmdFlag> UserCmdFlags;
+
 
 // this is a set of user commands, it's what we send upto the server.
 // so things like movement and fire.
@@ -51,6 +57,9 @@ struct UserCmd
 
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
+
+    UserCmdFlags flags;
+    char _pad[3];
 
     int32_t clientGameTimeMS;
     int32_t serverGameTimeMS;

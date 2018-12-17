@@ -6,11 +6,12 @@
 
 X_NAMESPACE_BEGIN(net)
 
-X_ENSURE_SIZE(UserCmd, 36); // More fields? update this;
+X_ENSURE_SIZE(UserCmd, 40); // More fields? update this;
 
 void UserCmd::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
     // Myyyy wugga nugger
+    bs.write(flags);
     bs.write(clientGameTimeMS);
     bs.write(serverGameTimeMS);
     bs.write(moveForwrd);
@@ -25,6 +26,7 @@ void UserCmd::writeToBitStream(core::FixedBitStreamBase& bs) const
 
 void UserCmd::fromBitStream(core::FixedBitStreamBase& bs)
 {
+    bs.read(flags);
     bs.read(clientGameTimeMS);
     bs.read(serverGameTimeMS);
     bs.read(moveForwrd);
