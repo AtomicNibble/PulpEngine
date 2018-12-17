@@ -91,14 +91,14 @@ namespace entity
 
     }
 
-    void PlayerSystem::runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
+    void PlayerSystem::runUserCmdForPlayer(core::TimeVal dt, EnitiyRegister& reg,
         weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
         engine::IWorld3D* p3DWorld, const net::UserCmd& userCmd, EntityId playerId)
     {
         X_ASSERT(playerId < net::MAX_PLAYERS, "Invalid player id")(playerId, net::MAX_PLAYERS);
         X_ASSERT(reg.has<Player>(playerId), "Not a valid player")(playerId);
 
-        X_UNUSED(timeInfo, p3DWorld);
+        X_UNUSED(p3DWorld);
 
         auto& trans = reg.get<TransForm>(playerId);
         auto& player = reg.get<Player>(playerId);
@@ -153,7 +153,7 @@ namespace entity
 
         if (reg.has<CharacterController>(playerId)) {
             auto& con = reg.get<CharacterController>(playerId);
-            const float timeDelta = timeInfo.deltas[core::ITimer::Timer::GAME].GetSeconds();
+            const float timeDelta = dt.GetSeconds();
             const float gravity = -100.f;
 
             float speed = vars_.walkSpeed_;
@@ -194,7 +194,7 @@ namespace entity
             float jumpHeight = 0.f;
 
             if (state.IsSet(Player::State::Jump)) {
-                player.jumpTime += timeInfo.deltas[core::Timer::GAME];
+                player.jumpTime += dt;
 
                 const float gJumpGravity = -vars_.jumpHeight_; // -50.f;
                 const float jumpTime = player.jumpTime.GetSeconds();
@@ -240,7 +240,7 @@ namespace entity
             trans.pos = con.pController->getFootPosition();
         }
 
-        updateViewBob(timeInfo, player);
+        updateViewBob(dt, player);
 
         // who you looking at?
         updateEye(player);
@@ -412,7 +412,7 @@ namespace entity
         }
     }
 
-    void PlayerSystem::updateViewBob(core::FrameTimeData& timeInfo, Player& player)
+    void PlayerSystem::updateViewBob(core::TimeVal dt, Player& player)
     {
         auto& userCmd = player.userCmd;
 
@@ -439,7 +439,7 @@ namespace entity
                 bobmove = vars_.walkBob_;
             }
 
-            auto delta = timeInfo.deltas[core::Timer::GAME].GetMilliSeconds();
+            auto delta = dt.GetMilliSeconds();
             auto old = player.bobCycle;
             player.bobCycle = (int32_t)(old + bobmove * delta) & 255;
             player.bobfracsin = math<float>::abs(math<float>::sin((player.bobCycle & 127) / 127.f * math<float>::PI));

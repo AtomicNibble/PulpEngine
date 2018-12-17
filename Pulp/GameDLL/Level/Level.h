@@ -103,7 +103,7 @@ public:
     bool loadMap(const MapNameStr& name);
     bool hasLoaded(void) const;
 
-    void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, int32_t playerIdx);
+    void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, int32_t playerIdx);
     void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
     void createSnapShot(core::FrameData& frame, net::SnapShot& snap);

@@ -386,11 +386,11 @@ bool World::hasLoaded(void) const
     return level_->isLoaded();
 }
 
-void World::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, int32_t playerIdx)
+void World::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, int32_t playerIdx)
 {
     X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalid player idx")(playerIdx, net::MAX_PLAYERS);
 
-    ents_.runUserCmdForPlayer(frame, cmd, static_cast<entity::EntityId>(playerIdx));
+    ents_.runUserCmdForPlayer(dt, cmd, static_cast<entity::EntityId>(playerIdx));
 }
 
 void World::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId)

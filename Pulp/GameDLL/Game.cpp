@@ -556,6 +556,8 @@ void XGame::setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, in
 
 void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 {
+    auto dt = frame.timeInfo.deltas[core::Timer::GAME];
+
     // if the player is local
     // we run a user command for them
     if (localPlayerIdx_ == playerIdx) {
@@ -564,7 +566,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         X_ASSERT(unread == 1, "More than one userCmd for local player")(unread);
 
         auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
-        runUserCmdForPlayer(frame, userCmd, playerIdx);
+        runUserCmdForPlayer(dt, userCmd, playerIdx);
     }
     else 
     {
@@ -591,7 +593,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
                 while (clientTimeRunSoFar < timeSinceServerRanLastCmd && userCmdMan_.hasUnreadFrames(playerIdx))
                 {
                     auto& userCmd = userCmdMan_.getUserCmdForPlayer(playerIdx);
-                    runUserCmdForPlayer(frame, userCmd, playerIdx);
+                    runUserCmdForPlayer(dt, userCmd, playerIdx);
 
                     lastUserCmdRunOnClientTime_[playerIdx] = userCmd.clientGameTimeMS;
                     lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
@@ -614,7 +616,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
                 // the client is probs running slower than us, as it's delta is bigger than servers.
                 // we want to just re run the last players command.
                 auto userCmd = lastUserCmdRun_[playerIdx];
-                runUserCmdForPlayer(frame, userCmd, playerIdx);
+                runUserCmdForPlayer(dt, userCmd, playerIdx);
             }
         }
         else
@@ -622,16 +624,16 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
             X_WARNING("Game", "no userCmd for remote player %" PRIi32, playerIdx);
             // dam slut no sending user commads run a empty command.
             auto userCmd = lastUserCmdRun_[playerIdx];
-            runUserCmdForPlayer(frame, userCmd, playerIdx);
+            runUserCmdForPlayer(dt, userCmd, playerIdx);
 
             lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
         }
     }
 }
 
-void XGame::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& userCmd, int32_t playerIdx)
+void XGame::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, int32_t playerIdx)
 {
-    world_->runUserCmdForPlayer(frame, userCmd, playerIdx);
+    world_->runUserCmdForPlayer(dt, userCmd, playerIdx);
 
     lastUserCmdRun_[playerIdx] = userCmd;
     lastUserCmdRunTime_[playerIdx] = userCmd.clientGameTimeMS;

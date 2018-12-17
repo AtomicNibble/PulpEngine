@@ -88,7 +88,7 @@ private:
     void setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction);
 
     void runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx);
-    void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& userCmd, int32_t playerIdx);
+    void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, int32_t playerIdx);
     
     bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim);
 

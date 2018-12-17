@@ -54,7 +54,7 @@ namespace entity
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
         void shutdown(void);
-        void runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, EntityId playerId);
+        void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId);
         void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId);
 
         void createSnapShot(core::FrameData& frame, net::SnapShot& snap);

@@ -30,12 +30,12 @@ namespace entity
         void update(core::FrameTimeData& timeInfo, EnitiyRegister& reg, game::weapon::WeaponDefManager& weaponDefs, 
             model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld);
 
-        void runUserCmdForPlayer(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
+        void runUserCmdForPlayer(core::TimeVal dt, EnitiyRegister& reg,
             game::weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
             const net::UserCmd& userCmd, EntityId playerId);
 
     private:
-        void updateViewBob(core::FrameTimeData& timeInfo, Player& player);
+        void updateViewBob(core::TimeVal dt, Player& player);
         void updateEye(Player& player);
         void calculateFirstPersonView(TransForm& trans, Player& player);
 

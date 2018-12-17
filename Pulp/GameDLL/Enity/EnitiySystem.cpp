@@ -148,9 +148,9 @@ namespace entity
         return true;
     }
 
-    void EnititySystem::runUserCmdForPlayer(core::FrameData& frame, const net::UserCmd& cmd, EntityId playerId)
+    void EnititySystem::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId)
     {
-        playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
+        playerSys_.runUserCmdForPlayer(dt, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
     }
 
     void EnititySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId)
