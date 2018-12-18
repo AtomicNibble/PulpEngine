@@ -20,8 +20,8 @@ namespace entity
     public:
         bool init(void);
 
-        void buildSnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, net::SnapShot& snap);
-        void applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, const net::SnapShot* pSnap,
+        void buildSnapShot(EnitiyRegister& reg, net::SnapShot& snap);
+        void applySnapShot(EnitiyRegister& reg, const net::SnapShot& snap,
             physics::IScene* pScene, engine::IWorld3D* p3DWorld);
 
     private:

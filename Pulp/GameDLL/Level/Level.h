@@ -106,8 +106,8 @@ public:
     void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, int32_t playerIdx);
     void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
-    void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
-    void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
+    void createSnapShot(net::SnapShot& snap);
+    void applySnapShot(const net::SnapShot& snap);
 
     void spawnPlayer(int32_t playerIdx, bool local);
     void removePlayer(int32_t playerIdx);

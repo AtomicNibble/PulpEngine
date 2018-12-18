@@ -57,8 +57,8 @@ namespace entity
         void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId);
         void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId);
 
-        void createSnapShot(core::FrameData& frame, net::SnapShot& snap);
-        void applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap);
+        void createSnapShot(net::SnapShot& snap);
+        void applySnapShot(const net::SnapShot& snap);
 
 
         EntityId createEnt(void);

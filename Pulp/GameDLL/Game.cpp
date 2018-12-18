@@ -430,7 +430,7 @@ bool XGame::update(core::FrameData& frame)
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
             {
-                world_->applySnapShot(frame, pSnap);
+                world_->applySnapShot(*pSnap);
 
                 // get the games times the server has run
                 lastUserCmdRunTime_ = pSnap->getUserCmdTimes();
@@ -480,7 +480,7 @@ bool XGame::update(core::FrameData& frame)
 
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
 
-                world_->createSnapShot(frame, snap);
+                world_->createSnapShot(snap);
 
                 pSession_->sendSnapShot(snap);
             }

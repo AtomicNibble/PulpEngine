@@ -100,9 +100,9 @@ namespace entity
         }
     }
 
-    void NetworkSystem::buildSnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg, net::SnapShot& snap)
+    void NetworkSystem::buildSnapShot(EnitiyRegister& reg, net::SnapShot& snap)
     {
-        X_UNUSED(timeInfo, reg, snap);
+        X_UNUSED(reg, snap);
 
         core::FixedBitStreamStack<256> bs;
 
@@ -139,13 +139,10 @@ namespace entity
         }
     }
 
-    void NetworkSystem::applySnapShot(core::FrameTimeData& timeInfo, EnitiyRegister& reg,
-        const net::SnapShot* pSnap, physics::IScene* pScene, engine::IWorld3D* p3DWorld)
+    void NetworkSystem::applySnapShot(EnitiyRegister& reg,
+        const net::SnapShot& snap, physics::IScene* pScene, engine::IWorld3D* p3DWorld)
     {
-        X_UNUSED(timeInfo, reg, pSnap);
-
-        X_ASSERT_NOT_NULL(pSnap);
-        auto& snap = *pSnap;
+        X_UNUSED(reg);
 
         physics::ScopedLock lock(pScene, physics::LockAccess::Write);
 
@@ -159,6 +156,10 @@ namespace entity
             auto& trans = reg.get<TransForm>(entityId);
 
             readData(bs, TransForm::pMetaTable_, reinterpret_cast<uint8_t*>(&trans));
+
+            // for a networked ent we need to know where the server wants us to be.
+            // then move towards it.
+            //
 
             if (reg.has<DynamicObject>(entityId))
             {

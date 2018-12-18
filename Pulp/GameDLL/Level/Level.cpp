@@ -404,14 +404,14 @@ void World::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::
     level_->update(frame);
 }
 
-void World::createSnapShot(core::FrameData& frame, net::SnapShot& snap)
+void World::createSnapShot(net::SnapShot& snap)
 {
-    ents_.createSnapShot(frame, snap);
+    ents_.createSnapShot(snap);
 }
 
-void World::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
+void World::applySnapShot(const net::SnapShot& snap)
 {
-    ents_.applySnapShot(frame, pSnap);
+    ents_.applySnapShot(snap);
 }
 
 

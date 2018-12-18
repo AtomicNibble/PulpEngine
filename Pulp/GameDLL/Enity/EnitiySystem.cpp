@@ -184,14 +184,14 @@ namespace entity
         weaponSys_.update(frame, reg_, pPhysScene_);
     }
 
-    void EnititySystem::createSnapShot(core::FrameData& frame, net::SnapShot& snap)
+    void EnititySystem::createSnapShot(net::SnapShot& snap)
     {
-        networkSys_.buildSnapShot(frame.timeInfo, reg_, snap);
+        networkSys_.buildSnapShot(reg_, snap);
     }
 
-    void EnititySystem::applySnapShot(core::FrameData& frame, const net::SnapShot* pSnap)
+    void EnititySystem::applySnapShot(const net::SnapShot& snap)
     {
-        networkSys_.applySnapShot(frame.timeInfo, reg_, pSnap, pPhysScene_, p3DWorld_);
+        networkSys_.applySnapShot(reg_, snap, pPhysScene_, p3DWorld_);
     }
 
     EntityId EnititySystem::createEnt(void)
