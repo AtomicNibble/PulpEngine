@@ -57,6 +57,16 @@ X_INLINE int32_t SessionVars::snapRateMs(void) const
     return snapRateMs_;
 }
 
+X_INLINE float SessionVars::snapFallbackUpRate(void) const
+{
+    return snapFallbackUpRate_;
+}
+
+X_INLINE float SessionVars::snapCatchUpRate(void) const
+{
+    return snapCatchUpRate_;
+}
+
 X_INLINE int32_t SessionVars::userCmdRateMs(void) const
 {
     return userCmdRateMs_;

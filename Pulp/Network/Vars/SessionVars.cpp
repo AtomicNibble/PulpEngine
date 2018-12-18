@@ -46,14 +46,19 @@ void SessionVars::registerVars(void)
     // snip snap.
     ADD_CVAR_REF("net_snap_debug", snapDebug_, snapDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Drops the next outgoing snap");
-
     ADD_CVAR_REF("net_snap_force_drop_next", snapFroceDrop_, 0, 0, 1, core::VarFlag::SYSTEM,
         "Drops the next outgoing snap");
-
     ADD_CVAR_REF("net_snap_max_buffered_ms", snapMaxbufferedMs_, snapMaxbufferedMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Max ammount of buffered snaps shots in ms");
     ADD_CVAR_REF("net_snap_rate_ms", snapRateMs_, snapRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "How many ms between sending snaps");
+
+    ADD_CVAR_REF("net_snap_fallback_rate", snapFallbackUpRate_, snapFallbackUpRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "The rate we slow down interpolation when ahead");
+    ADD_CVAR_REF("net_snap_catchup_rate", snapCatchUpRate_, snapCatchUpRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "The rate we speed up interpolation when falling behind");
+
+
     ADD_CVAR_REF("net_ucmd_rate_ms", userCmdRateMs_, userCmdRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "How many ms between sending usercmds");
 
