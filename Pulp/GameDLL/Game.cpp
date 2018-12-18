@@ -430,41 +430,7 @@ bool XGame::update(core::FrameData& frame)
             auto* pSnap = pSession_->getSnapShot();
             if (pSnap)
             {
-                world_->applySnapShot(*pSnap);
-
-                // get the games times the server has run
-                lastUserCmdRunTime_ = pSnap->getUserCmdTimes();
-
-                auto localLastRunTime = lastUserCmdRunTime_[localPlayerIdx_];
-
-                if (vars_.userCmdClientReplay())
-                {
-                    // get all the userCmds we need to replay.
-                    net::UserCmdMan::UserCmdArr userCmds;
-                    userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTime, userCmds);
-
-                    if (userCmds.isNotEmpty())
-                    {
-                        int32_t lastCmdMS = localLastRunTime;
-
-                        X_LOG0_IF(vars_.userCmdDebug(), "Game", "Replaying %" PRIuS " userCmd(s)", userCmds.size());
-
-                        // they are in newest to oldest order
-                        for (int32_t i = static_cast<int32_t>(userCmds.size()) - 1; i >= 0; i--)
-                        {
-                            auto& userCmd = userCmds[i];
-                            userCmd.flags.Set(net::UserCmdFlag::REPLAY);
-
-                            auto deltaMS = userCmd.clientGameTimeMS - lastCmdMS;
-                            X_ASSERT(deltaMS > 0, "Delta can't be less than 1")(deltaMS);
-                            auto dt = core::TimeVal::fromMS(deltaMS);
-
-                            runUserCmdForPlayer(dt, userCmd, localPlayerIdx_);
-
-                            lastCmdMS = userCmd.clientGameTimeMS;
-                        }
-                    }
-                }
+                applySnapShot(*pSnap);
             }
             
             runUserCmdsForPlayer(frame, localIdx);
@@ -569,6 +535,40 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 {
     // we need to apply a snapshot.
     world_->applySnapShot(snap);
+
+    // get the games times the server has run
+    lastUserCmdRunTime_ = snap.getUserCmdTimes();
+
+    auto localLastRunTime = lastUserCmdRunTime_[localPlayerIdx_];
+
+    if (vars_.userCmdClientReplay())
+    {
+        // get all the userCmds we need to replay.
+        net::UserCmdMan::UserCmdArr userCmds;
+        userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTime, userCmds);
+
+        if (userCmds.isNotEmpty())
+        {
+            int32_t lastCmdMS = localLastRunTime;
+
+            X_LOG0_IF(vars_.userCmdDebug(), "Game", "Replaying %" PRIuS " userCmd(s)", userCmds.size());
+
+            // they are in newest to oldest order
+            for (int32_t i = static_cast<int32_t>(userCmds.size()) - 1; i >= 0; i--)
+            {
+                auto& userCmd = userCmds[i];
+                userCmd.flags.Set(net::UserCmdFlag::REPLAY);
+
+                auto deltaMS = userCmd.clientGameTimeMS - lastCmdMS;
+                X_ASSERT(deltaMS > 0, "Delta can't be less than 1")(deltaMS);
+                auto dt = core::TimeVal::fromMS(deltaMS);
+
+                runUserCmdForPlayer(dt, userCmd, localPlayerIdx_);
+
+                lastCmdMS = userCmd.clientGameTimeMS;
+            }
+        }
+    }
 }
 
 
