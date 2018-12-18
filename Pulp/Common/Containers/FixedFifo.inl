@@ -2,8 +2,8 @@
 
 template<typename T, size_t N>
 FixedFifo<T, N>::FixedFifo() :
-    read_(reinterpret_cast<T*>(array_)),
-    write_(reinterpret_cast<T*>(array_)),
+    read_(startPtr()),
+    write_(startPtr()),
     num_(0)
 {
 }
@@ -49,7 +49,7 @@ void FixedFifo<T, N>::push(const T& v)
     ++write_;
 
     if (write_ == endPtr()) {
-        write_ = reinterpret_cast<T*>(array_);
+        write_ = startPtr();
     }
 
     ++num_;
@@ -65,7 +65,7 @@ void FixedFifo<T, N>::push(T&& v)
     ++write_;
 
     if (write_ == endPtr()) {
-        write_ = reinterpret_cast<T*>(array_);
+        write_ = startPtr();
     }
 
     ++num_;
@@ -82,7 +82,7 @@ void FixedFifo<T, N>::emplace(ArgsT&&... args)
     ++write_;
 
     if (write_ == endPtr()) {
-        write_ = reinterpret_cast<T*>(array_);
+        write_ = startPtr();
     }
 
     ++num_;
@@ -98,7 +98,7 @@ void FixedFifo<T, N>::pop(void)
     ++read_;
 
     if (read_ == endPtr()) {
-        read_ = reinterpret_cast<T*>(array_);
+        read_ = startPtr();
     }
 
     --num_;
@@ -126,8 +126,8 @@ void FixedFifo<T, N>::clear(void)
     }
 
     num_ = 0;
-    read_ = reinterpret_cast<T*>(array_);
-    write_ = reinterpret_cast<T*>(array_);
+    read_ = startPtr();
+    write_ = startPtr();
 }
 
 template<typename T, size_t N>
@@ -139,7 +139,7 @@ typename FixedFifo<T, N>::size_type FixedFifo<T, N>::size(void) const
 template<typename T, size_t N>
 typename FixedFifo<T, N>::size_type FixedFifo<T, N>::capacity(void) const
 {
-    return union_cast<size_type>(endPtr() - reinterpret_cast<const T*>(array_));
+    return union_cast<size_type>(endPtr() - startPtr());
 }
 
 template<typename T, size_t N>
@@ -164,25 +164,25 @@ bool FixedFifo<T, N>::isNotEmpty(void) const
 template<typename T, size_t N>
 typename FixedFifo<T, N>::iterator FixedFifo<T, N>::begin(void)
 {
-    return iterator(reinterpret_cast<T*>(array_), endPtr(), read_, 0);
+    return iterator(startPtr(), endPtr(), read_, 0_sz);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::iterator FixedFifo<T, N>::end(void)
 {
-    return iterator(reinterpret_cast<T*>(array_), endPtr(), write_, num_);
+    return iterator(startPtr(), endPtr(), write_, num_);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::begin(void) const
 {
-    return const_iterator(reinterpret_cast<const T*>(array_), endPtr(), read_, 0);
+    return const_iterator(startPtr(), endPtr(), read_, 0_sz);
 }
 
 template<typename T, size_t N>
 typename FixedFifo<T, N>::const_iterator FixedFifo<T, N>::end(void) const
 {
-    return const_iterator(reinterpret_cast<const T*>(array_), endPtr(), write_, num_);
+    return const_iterator(startPtr(), endPtr(), write_, num_);
 }
 
 /// ------------------------------------------------------
