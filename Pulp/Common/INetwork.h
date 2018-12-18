@@ -623,6 +623,7 @@ struct ISession
     virtual ~ISession() = default;
 
     virtual void update(void) X_ABSTRACT;
+    virtual void handleSnapShots(core::FrameTimeData& timeInfo) X_ABSTRACT;
 
     virtual void connect(SystemAddress address) X_ABSTRACT;
     virtual void disconnect(void) X_ABSTRACT; // basically quitToMenu()
@@ -647,7 +648,6 @@ struct ISession
     virtual bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_ABSTRACT;
     virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
     
-    virtual const SnapShot* getSnapShot(void) X_ABSTRACT;
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
 
     virtual void drawDebug(engine::IPrimativeContext* pPrim) const X_ABSTRACT;

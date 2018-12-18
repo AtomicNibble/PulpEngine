@@ -2,6 +2,8 @@
 
 
 #include <Containers\Array.h>
+#include <Containers\FixedFifo.h>
+
 #include <Time\TimeVal.h>
 
 #include "SessionCallbacks.h"
@@ -92,16 +94,52 @@ class Session : public ISession, ISessionCallbacks
 
         LobbyFlags flags;
     };
+    
+    struct SnapTime
+    {
+        SnapTime() :
+            currentMS(0),
+            previousMS(0),
+            deltaMS(0)
+        {
+        }
+
+        void rotate(int32_t time) {
+            previousMS = currentMS;
+            currentMS = time;
+            deltaMS = currentMS - previousMS;
+        }
+
+        int32_t currentMS;
+        int32_t previousMS;
+        int32_t deltaMS; // store for easy debug.
+    };
+
+    struct SnapBufferTimeInfo
+    {
+        SnapBufferTimeInfo(int32_t timeLeftMS, int32_t totalTimeMS, int32_t totalRecvTimeMS) :
+            timeLeftMS(timeLeftMS),
+            totalTimeMS(totalTimeMS),
+            totalRecvTimeMS(totalRecvTimeMS)
+        {}
+
+        int32_t timeLeftMS;
+        int32_t totalTimeMS;
+        int32_t totalRecvTimeMS;
+    };
 
     using PendingPeerArr = core::Array<PendingPeer>;
     using PendingConnectionArr = core::Array<PendingConnection>;
     using ConnectedPeerArr = core::Array<ConnectedPeer>;
-
+    using SnapShotRingBuffer = core::FixedFifo<SnapShot, MAX_RECEIVE_SNAPSHOT_BUFFER_SIZE>;
 
 public:
     Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks, core::MemoryArenaBase* arena);
 
     void update(void) X_FINAL;
+    void handleSnapShots(core::FrameTimeData& timeInfo) X_FINAL;
+    SnapBufferTimeInfo calculateSnapShotBufferTime(void) const;
+    void processSnapShot(void);
 
     void connect(SystemAddress address) X_FINAL;
     void disconnect(void) X_FINAL; // basically quitToMenu()
@@ -124,7 +162,6 @@ public:
     bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_FINAL;
     void sendSnapShot(const SnapShot& snap) X_FINAL;
 
-    const SnapShot* getSnapShot(void) X_FINAL;
     ILobby* getLobby(LobbyType::Enum type) X_FINAL;
 
     bool handleState(void);
@@ -202,8 +239,15 @@ private:
     core::TimeVal nextUserCmdSendTime_;
     core::TimeVal nextSnapshotSendTime_;
 
+    // Snapshot - reciving
     int32_t numSnapsReceived_;
-    core::FixedRingBuffer<SnapShot, MAX_RECEIVE_SNAPSHOT_BUFFER_SIZE> recivedSnaps_;
+    SnapShotRingBuffer recivedSnaps_;
+    SnapShot oldSnap_; // TODO: keep around only for debug builds?
+
+    SnapTime snapTime_;
+    SnapTime snapRecvTime_;
+    int32_t snapInterpolationTimeMS_;   // TODO: better name? this is basically snap interpolation fraction in MS.
+    float snapInterpolationResidual_;
 };
 
 

@@ -4,6 +4,8 @@
 #include "Lobby.h"
 #include "Vars\SessionVars.h"
 
+#include <Util/FloatIEEEUtil.h>
+
 #include <I3DEngine.h>
 #include <IPrimativeContext.h>
 #include <IFont.h>
@@ -70,19 +72,22 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     pGameCallbacks_(X_ASSERT_NOT_NULL(pGameCallbacks)),
     arena_(X_ASSERT_NOT_NULL(arena)),
+    state_(SessionState::Idle),
     lobbys_{ {
         {vars_, this, pPeer, pGameCallbacks, LobbyType::Party, arena},
         {vars_, this, pPeer, pGameCallbacks, LobbyType::Game, arena}
     }},
     pendingJoins_(arena),
     pendingConnections_(arena),
-    peers_(arena)
+    peers_(arena),
+    numSnapsReceived_(0),
+    oldSnap_(arena),
+    snapInterpolationTimeMS_(0),
+    snapInterpolationResidual_(0.f)
 {
     X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();
     X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
 
-    state_ = SessionState::Idle;
-    numSnapsReceived_ = 0;
 }
 
 X_ENABLE_WARNING(4355)
@@ -105,6 +110,134 @@ void Session::update(void)
     processPendingPeers();
 }
 
+void Session::handleSnapShots(core::FrameTimeData& timeInfo)
+{
+    // This needs to:
+    // - decide to apply the next snapshot.
+    // - set the interpolation values in game for this frame.
+    // - Look at how big our snapshot buffer is in terms of time.
+    // - speed up or slow down interpolation speed based on this.
+
+    // if we have interpolated past current snap delta and have new snaps process them.
+    while (snapInterpolationTimeMS_ > snapTime_.deltaMS && recivedSnaps_.isNotEmpty())
+    {
+        snapInterpolationTimeMS_ -= snapTime_.deltaMS;
+        processSnapShot();
+    }
+
+    if (snapInterpolationTimeMS_ > snapTime_.deltaMS)
+    {
+        X_WARNING("Session", "Ran out snaps, extrapolation required.");
+    }
+
+    // clamp it for current frame
+    snapInterpolationTimeMS_ = math<int32_t>::clamp(snapInterpolationTimeMS_, 0, snapTime_.deltaMS);
+
+    float fraction = static_cast<float>(snapInterpolationTimeMS_) / static_cast<float>(snapTime_.deltaMS);
+    int32_t serverTimeMS = lerp(snapTime_.previousMS, snapTime_.currentMS, fraction);
+
+    pGameCallbacks_->setInterpolation(fraction, serverTimeMS, snapTime_.previousMS, snapTime_.currentMS);
+
+    // do we need to slow down?
+    auto bufferedTime = calculateSnapShotBufferTime();
+
+    // work out what our effective rate should be.
+    // so if the server is sending 100ms of data but we get it over 110ms we strech the buffer locally.
+    // so our effective rate would be 1.1f;
+    auto effectiveSnapRate = static_cast<float>(bufferedTime.totalTimeMS) / static_cast<float>(bufferedTime.totalRecvTimeMS);
+
+    int32_t desiredBufferedMS = 100;
+    int32_t desiredBufferedWindowMS = 100;
+
+    float snapRateScale = 1.0f; // right on the nail!
+
+    if (bufferedTime.timeLeftMS < desiredBufferedMS)
+    {
+        // steady on trevor...
+        snapRateScale = vars_.snapFallbackRate();
+    }
+    else if (bufferedTime.timeLeftMS > desiredBufferedMS + desiredBufferedWindowMS)
+    {
+        // to slow motherfucker!
+        snapRateScale = vars_.snapCatchupRate();
+    }
+
+    // need to work out how much interpolation time to advance by.
+    float gameFrameDeltaMS = timeInfo.unscaledDeltas[core::Timer::GAME].GetMilliSeconds();
+
+    float interpolateDeltaMS = (gameFrameDeltaMS * snapRateScale * effectiveSnapRate) + snapInterpolationResidual_;
+    if (!core::FloatUtil::isValid(interpolateDeltaMS))
+    {
+        interpolateDeltaMS = 0.f;
+    }
+
+    snapInterpolationResidual_ = math<float>::frac(interpolateDeltaMS);
+    if (!core::FloatUtil::isValid(snapInterpolationResidual_))
+    {
+        snapInterpolationResidual_ = 0.f;
+    }
+
+    if (vars_.snapDebug())
+    {
+        X_LOG0("Session", "SnapUpdate - gameFrameDelta: %g snapRateScale: %g effectiveSnapRate: %g interpolateDeltaMS: %g snapInterpolationResidual: %g bufferedTime: %" PRIi32,
+            gameFrameDeltaMS, snapRateScale, effectiveSnapRate, interpolateDeltaMS, snapInterpolationResidual_, bufferedTime.timeLeftMS);
+    }
+
+    snapInterpolationTimeMS_ += static_cast<int32_t>(interpolateDeltaMS);
+}
+
+Session::SnapBufferTimeInfo Session::calculateSnapShotBufferTime(void) const
+{
+    int32_t lastSnapTimeMS = snapTime_.currentMS;
+    int32_t lastSnapRecvTimeMS = snapRecvTime_.currentMS;
+
+    int32_t totalTimeMS = snapTime_.deltaMS;
+    int32_t totalRecvTimeMS = snapRecvTime_.deltaMS;
+
+    // look at all the pending snaps. (might be none)
+    for (const auto& snap : recivedSnaps_)
+    {
+        auto snapTime = snap.getTimeMS();
+        auto snapRecvTime = snap.getRecvTimeMS();
+
+        X_ASSERT(snapTime > lastSnapTimeMS && snapRecvTime >= lastSnapRecvTimeMS, "Previous snap is ahead")(snapTime, lastSnapTimeMS, snapRecvTime, lastSnapRecvTimeMS);
+
+        totalTimeMS += (snapTime - lastSnapTimeMS);
+        totalRecvTimeMS += (snapRecvTime - lastSnapRecvTimeMS);
+
+        lastSnapTimeMS = snapTime;
+        lastSnapRecvTimeMS = snapRecvTime;
+    }
+
+    // remove time we have interpolated.
+    int32_t timeLeftMS = totalTimeMS - core::Min(snapTime_.deltaMS, snapInterpolationTimeMS_);
+
+    return { timeLeftMS, totalTimeMS, totalRecvTimeMS };
+}
+
+void Session::processSnapShot(void)
+{
+    if (recivedSnaps_.isEmpty()) {
+        X_ERROR("Session", "No snapshot to process");
+        return;
+    }
+
+    auto& snap = recivedSnaps_.peek();
+
+    snapTime_.rotate(snap.getTimeMS());
+    snapRecvTime_.rotate(snap.getRecvTimeMS());
+
+    if (vars_.snapDebug())
+    {
+        X_LOG0("Session", "Processing snapshot. ServerDelta: %" PRIi32 " RecvDelta %" PRIi32, snapTime_.deltaMS, snapRecvTime_.deltaMS);
+    }
+
+    pGameCallbacks_->applySnapShot(snap);
+
+    recivedSnaps_.pop();
+
+    oldSnap_ = std::move(snap);
+}
 
 void Session::connect(SystemAddress address)
 {
@@ -339,22 +472,10 @@ void Session::sendSnapShot(const SnapShot& snap)
     pPeer_->runUpdate();
 }
 
-const SnapShot* Session::getSnapShot(void)
-{
-    if (recivedSnaps_.size() == 0) {
-        return nullptr;
-    }
-
-    auto num = recivedSnaps_.size();
-
-    return &recivedSnaps_[num - 1];
-}
-
 ILobby* Session::getLobby(LobbyType::Enum type)
 {
     return &lobbys_[type];
 }
-
 
 
 void Session::setState(SessionState::Enum state)
@@ -449,10 +570,17 @@ void Session::onReciveSnapShot(SnapShot&& snap)
     X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS(), snap.getRecvTimeMS());
     X_ASSERT(snap.getRecvTimeMS() < 0, "Shapshot recvtime should not be set")(snap.getTimeMS(), snap.getRecvTimeMS());
 
+    if (recivedSnaps_.freeSpace() == 0)
+    {
+        X_ERROR("Session", "Snapshot buffer full forcing snap apply");
+        processSnapShot();
+        X_ASSERT(recivedSnaps_.freeSpace() > 0, "Should have space for snapshot")();
+    }
+
     auto time = gEnv->pTimer->GetTimeNowNoScale();
     snap.setRecvTime(time.GetMilliSecondsAsInt32());
 
-    recivedSnaps_.emplace_back(std::move(snap));
+    recivedSnaps_.emplace(std::move(snap));
 
     // process the snap shot.
     // not sure where i want to put this logic.
@@ -466,7 +594,9 @@ void Session::onReciveSnapShot(SnapShot&& snap)
 
     if (state_ != SessionState::InGame)
     {
-        // wait till we have 2.
+        // the game needs two snapshots to interpolate before we can start.
+        processSnapShot();
+
         if (numSnapsReceived_ < 2) {
             return;
         }

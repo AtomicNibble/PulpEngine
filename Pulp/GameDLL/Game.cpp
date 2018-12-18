@@ -376,6 +376,7 @@ bool XGame::update(core::FrameData& frame)
         if (prevStatus_ != net::SessionStatus::InGame)
         {
             serverGameTimeMS_ = 0;
+            gameTimeMS_ = 0;
 
             pMenuHandler_->close();
 
@@ -383,10 +384,6 @@ bool XGame::update(core::FrameData& frame)
         }
 
         X_ASSERT_NOT_NULL(world_.ptr());
-
-        auto ellapsedMS = safe_static_cast<int32_t>(frame.timeInfo.deltas[core::ITimer::Timer::GAME].GetMilliSecondsAsInt64());
-
-        serverGameTimeMS_ += ellapsedMS;
 
         syncLobbyUsers();
 
@@ -397,7 +394,7 @@ bool XGame::update(core::FrameData& frame)
 
         {
             auto& userCmd = userCmdGen_.getCurrentUserCmd();
-            userCmd.clientGameTimeMS = serverGameTimeMS_; // just make this server game time for now.
+            userCmd.clientGameTimeMS = gameTimeMS_;
             userCmd.serverGameTimeMS = serverGameTimeMS_;
 
             if (!isHost) {
@@ -407,6 +404,11 @@ bool XGame::update(core::FrameData& frame)
 
             userCmdMan_.addUserCmdForPlayer(localIdx, userCmd);
         }
+
+        // both server and clients update this.
+        // but clients get serverGameTimeMS_ set for them.
+        gameTimeMS_ += frame.timeInfo.deltas[core::Timer::GAME].GetMilliSecondsAsInt32();
+
 
         // if we are host we make snapshot.
         if (isHost)
@@ -420,19 +422,15 @@ bool XGame::update(core::FrameData& frame)
 
                 runUserCmdsForPlayer(frame, i);
             }   
-
         }
         else
         {
             // send user commands to server.
             pSession_->sendUserCmd(userCmdMan_, localIdx, frame.timeInfo);
 
-            auto* pSnap = pSession_->getSnapShot();
-            if (pSnap)
-            {
-                applySnapShot(*pSnap);
-            }
-            
+            // this will set out interpolation time and maybe apply a new snapshot.
+            pSession_->handleSnapShots(frame.timeInfo);
+
             runUserCmdsForPlayer(frame, localIdx);
         }
 
@@ -444,6 +442,7 @@ bool XGame::update(core::FrameData& frame)
             if (pSession_->shouldSendSnapShot(frame.timeInfo)) {
                 net::SnapShot snap(arena_);
 
+                snap.setTime(gameTimeMS_); // TODO: temp?
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
 
                 world_->createSnapShot(snap);
@@ -539,19 +538,19 @@ void XGame::applySnapShot(const net::SnapShot& snap)
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
 
-    auto localLastRunTime = lastUserCmdRunTime_[localPlayerIdx_];
+    auto localLastRunTimeMS = lastUserCmdRunTime_[localPlayerIdx_];
 
     if (vars_.userCmdClientReplay())
     {
         // get all the userCmds we need to replay.
         net::UserCmdMan::UserCmdArr userCmds;
-        userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTime, userCmds);
+        userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTimeMS, userCmds);
 
         if (userCmds.isNotEmpty())
         {
-            int32_t lastCmdMS = localLastRunTime;
+            int32_t lastCmdMS = localLastRunTimeMS;
 
-            X_LOG0_IF(vars_.userCmdDebug(), "Game", "Replaying %" PRIuS " userCmd(s)", userCmds.size());
+            X_LOG0_IF(vars_.userCmdDebug(), "Game", "Replaying %" PRIuS " userCmd(s) since: %" PRIi32, userCmds.size(), localLastRunTimeMS);
 
             // they are in newest to oldest order
             for (int32_t i = static_cast<int32_t>(userCmds.size()) - 1; i >= 0; i--)
@@ -574,6 +573,8 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
 {
+    X_ASSERT(!pSession_->isHost(), "Only clients should have interpolation set")();
+
     netInterpolInfo_.frac = fraction;
     netInterpolInfo_.serverGameTimeMS = serverGameTimeMS;
     netInterpolInfo_.snapShotStartMS = ssStartTimeMS;
@@ -602,7 +603,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
         {
             auto nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
             auto clientGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
-            auto timeSinceServerRanLastCmd = serverGameTimeMS_ - lastUserCmdRunOnServerTime_[playerIdx];
+            auto timeSinceServerRanLastCmd = gameTimeMS_ - lastUserCmdRunOnServerTime_[playerIdx];
 
             int32_t clientTimeRunSoFar = 0;
 
@@ -623,7 +624,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
                     runUserCmdForPlayer(dt, userCmd, playerIdx);
 
                     lastUserCmdRunOnClientTime_[playerIdx] = userCmd.clientGameTimeMS;
-                    lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
+                    lastUserCmdRunOnServerTime_[playerIdx] = gameTimeMS_;
 
                     clientTimeRunSoFar += clientGameTimedelta;
 
@@ -653,7 +654,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
             auto userCmd = lastUserCmdRun_[playerIdx];
             runUserCmdForPlayer(dt, userCmd, playerIdx);
 
-            lastUserCmdRunOnServerTime_[playerIdx] = serverGameTimeMS_;
+            lastUserCmdRunOnServerTime_[playerIdx] = gameTimeMS_;
         }
     }
 }
@@ -783,6 +784,8 @@ void XGame::clearWorld(void)
     for (auto& uCmd : lastUserCmdRun_) {
         uCmd.clear();
     }
+
+    lastUserCmdRunTime_.fill(0);
     lastUserCmdRunOnClientTime_.fill(0);
     lastUserCmdRunOnServerTime_.fill(0);
 }

@@ -134,6 +134,7 @@ private:
     // 
     NetInterpolationInfo netInterpolInfo_;
     int32_t serverGameTimeMS_;
+    int32_t gameTimeMS_;
 
     // TODO: maybe move to network module
 
