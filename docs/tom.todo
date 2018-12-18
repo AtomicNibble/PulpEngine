@@ -9,9 +9,13 @@ Common:
 
   ☐ Have child arens be correctly removed from parent lists.
 
+  Math:
+    ☐ Remove functions from math<T> that only really make sense for real types.
+
 Core:
 
   ☐ Sort out potential job system lock, due to not always helping with work when waiting.
+    - Basically if you N jobs that block waiting on other jobs, you can end up blocking on all threads deadlocking the jobSystem.
   ☐ See if can make job profiler drawing better, by not drawing more blocks than pixels.
     - Also if we have lots of jobs on same pixel maybe blend the colors?
 
@@ -67,10 +71,11 @@ Game:
 
     ☐ If the server thinks we are not loaded / connected it won't send us snapshots.
       The client should notice this and do something about it.
-      ☐ If we are loading into server loading should not really finish untill we have atleast one snapshot.
+      ✔ If we are loading into server loading should not really finish untill we have atleast two snapshot. @done (18-12-18 12:30)
 
    ☐ For debugging should have like no timeouts so can pause shit.
    ☐ Add some snapshot debugging?
+       Stuff like seeing positions of ents at each snapshot.
    ☐ Make it so when we leave a game peer connections are closed before state change
        so we don't get and packets coming from the old game host when in idle.
    ☐ Should we always bind a port? or online for online stuff.
@@ -78,13 +83,15 @@ Game:
        So ideally if only playing single player no need to bind a port.
        - Think we should just have some like bind if no bound logic.
 
-   ☐ Fix physics for clients.
-       ☐ When we are a client the physics capsuls have a center of the player origin.
+   ☐ Physics improvements for clients.
+     ☐ Jumping currently is broken as fuck.
+
+       ✔ When we are a client the physics capsuls have a center of the player origin. @done (18-12-18 12:31)
    ✘ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go? @cancelled (18-12-02 14:02)
-       - Maybe the server waits till all clients have two snapshots them tells you to go.
-       - The server don't have to bother running any frames both snapshots can be the same I guess.
+       Maybe the server waits till all clients have two snapshots them tells you to go.
+       The server don't have to bother running any frames both snapshots can be the same I guess.
    ✘ Stuff related to syncing server and client game time @cancelled (18-12-02 14:03)
-       - Decided don't need to keep the game times in sync we only care about the delta changes on each side.
+       Decided don't need to keep the game times in sync we only care about the delta changes on each side.
 
 Engine:
 
@@ -140,6 +147,7 @@ Font:
 Script:
 
   ☐ Pre process scripts for includes, so we know all includes upfront.
+    Was thinking to have have some like #include syntax.
 
 Sound:
 
@@ -286,6 +294,6 @@ UnitTests:
        ☐ if we try to connect to a lobby but it fails for any reason.
        ☐ If we are connected to one lobby and try to connect to another lobby on same remote, but the connection drops make sure state is good.
        ✔ Check handling of peers timing out during load. @done (18-12-02 21:33)
-       ☐ If the host is in game and a peer connects and starts loading but never joins we time they out?
+       ☐ If the host is in game and a peer connects and starts loading but never joins we time them out?
            Basically there is a possibility the game gets into a wierd state loading wise but keeps sending network packets.
            the server should disconenct them, if so.
