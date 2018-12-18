@@ -179,7 +179,7 @@ void Session::handleSnapShots(core::FrameTimeData& timeInfo)
 
     if (vars_.snapDebug())
     {
-        X_LOG0("Session", "SnapUpdate - gameFrameDelta: %g snapRateScale: %g effectiveSnapRate: %g interpolateDeltaMS: %g snapInterpolationResidual: %g bufferedTime: %" PRIi32,
+        X_LOG0("Session", "SnapUpdate - gameFrameDelta: %g snapRateScale: %g effectiveSnapRate: %g interDeltaMS: %g snapInterResidual: %g buffTime: %" PRIi32,
             gameFrameDeltaMS, snapRateScale, effectiveSnapRate, interpolateDeltaMS, snapInterpolationResidual_, bufferedTime.timeLeftMS);
     }
 
