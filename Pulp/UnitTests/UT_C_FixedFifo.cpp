@@ -157,6 +157,48 @@ TYPED_TEST(FixedFifoTest, Iteration)
     EXPECT_EQ(CustomType2::CONSTRUCTION_COUNT, CustomType2::DECONSTRUCTION_COUNT);
 }
 
+TYPED_TEST(FixedFifoTest, Iteration2)
+{
+    { // scoped for con / de-con check
+        FixedFifo<TypeParam, 3> fifo;
+        const auto& constFifo = fifo;
+
+        EXPECT_EQ(0, fifo.size());
+        ASSERT_EQ(3, fifo.capacity());
+
+        fifo.push(16);
+        fifo.push(32);
+        fifo.push(64);
+        fifo.push(128);
+
+        int numvalues = 0;
+        TypeParam valueSum = 0;
+
+        for(auto& val : fifo) {
+            numvalues++;
+            valueSum += val;
+        }
+
+        EXPECT_EQ(3, numvalues);
+        EXPECT_EQ(256, valueSum);
+
+        numvalues = 0;
+        valueSum = 0;
+
+        for (auto& val : constFifo) {
+            numvalues++;
+            valueSum += val;
+        }
+
+        EXPECT_EQ(4, numvalues);
+        EXPECT_EQ(256, valueSum);
+
+        fifo.clear();
+    }
+
+    EXPECT_EQ(CustomType2::CONSTRUCTION_COUNT, CustomType2::DECONSTRUCTION_COUNT);
+}
+
 TEST(FixedFifoTest, WrapAround)
 {
     // test inserting and pop so that we wrap around.

@@ -49,7 +49,7 @@ private:
 template<typename T, size_t N>
 struct FixedFifoConstIterator
 {
-    FixedFifoConstIterator(T* start, T* end, T* cur, size_t count) :
+    FixedFifoConstIterator(const T* start, const T* end, const T* cur, size_t count) :
         start_(start),
         end_(end),
         current_(cur),
@@ -65,9 +65,9 @@ struct FixedFifoConstIterator
     inline bool operator!=(const FixedFifoConstIterator& rhs) const;
 
 private:
-    T* start_;
-    T* end_;
-    T* current_;
+    const T* start_;
+    const T* end_;
+    const T* current_;
     size_t count_;
 };
 
