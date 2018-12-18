@@ -82,6 +82,14 @@ void UserCmdMan::getReadUserCmdsAfterGameTime(int32_t playerIndex, int32_t gameT
         }
 
         arr.push_back(uCmd);
+        
+        // we need to handle when all cmds are after gameTimeMS.
+        // make sure we only return buffer_size.
+        if (arr.size() == arr.capacity())
+        {
+            X_WARNING("Net", "UserCmd history buffer full for given game time %" PRIi32, gameTimeMS);
+            break;
+        }
 
         index--;
     }
