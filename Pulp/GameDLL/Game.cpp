@@ -572,12 +572,12 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 }
 
 
-void XGame::setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction)
+void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
 {
     netInterpolInfo_.frac = fraction;
+    netInterpolInfo_.serverGameTimeMS = serverGameTimeMS;
     netInterpolInfo_.snapShotStartMS = ssStartTimeMS;
     netInterpolInfo_.snapShotEndMS = ssEndTimeMS;
-    netInterpolInfo_.serverGameTimeMS = serverGameTimeMS;
     serverGameTimeMS_ = serverGameTimeMS;
 }
 

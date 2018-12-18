@@ -614,6 +614,8 @@ struct IGameCallbacks
 
     virtual void onUserCmdReceive(NetGUID guid, core::FixedBitStreamBase& bs) X_ABSTRACT;
     virtual void applySnapShot(const net::SnapShot& snap) X_ABSTRACT;
+    virtual void setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS) X_ABSTRACT;
+
 };
 
 struct ISession

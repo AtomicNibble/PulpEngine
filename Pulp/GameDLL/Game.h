@@ -48,16 +48,16 @@ class XGame : public IGame, net::IGameCallbacks
     {
         NetInterpolationInfo() :
             frac(0.f),
+            serverGameTimeMS(0),
             snapShotStartMS(0),
-            snapShotEndMS(0),
-            serverGameTimeMS(0)
+            snapShotEndMS(0)
         {
         }
 
         float frac;
+        int32_t serverGameTimeMS;
         int32_t snapShotStartMS;
         int32_t snapShotEndMS;
-        int32_t serverGameTimeMS;
     };
 
 public:
@@ -86,7 +86,7 @@ private:
     // ~IGameCallbacks
     
 private:
-    void setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction);
+    void setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS) X_FINAL;
 
     void runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx);
     void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, int32_t playerIdx);
