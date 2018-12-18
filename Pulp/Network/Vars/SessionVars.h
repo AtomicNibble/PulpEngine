@@ -48,6 +48,7 @@ private:
     float snapCatchupRate_;
     // userCmd
     int32_t userCmdRateMs_;
+
     int32_t waitForPlayers_;
 };
 
