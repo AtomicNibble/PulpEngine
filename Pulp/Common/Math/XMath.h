@@ -563,6 +563,12 @@ constexpr T lerp(const T& a, const T& b, L factor)
     return a + (b - a) * factor;
 }
 
+template<>
+constexpr int lerp(const int& a, const int& b, float factor)
+{
+    return static_cast<int>(static_cast<float>(a) + (static_cast<float>(b) - static_cast<float>(a)) * factor);
+}
+
 template<typename T>
 constexpr T lmap(T val, T inMin, T inMax, T outMin, T outMax)
 {
