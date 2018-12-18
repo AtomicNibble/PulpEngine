@@ -255,6 +255,10 @@ struct math<double>
     {
         return ::abs(x);
     }
+    X_INLINE static double frac(double x)
+    {
+        return x - floor(x);
+    }
     X_INLINE static double floor(double x)
     {
         return ::floor(x);
@@ -405,6 +409,10 @@ struct math<float>
     X_INLINE static float abs(float x)
     {
         return ::fabsf(x);
+    }
+    X_INLINE static float frac(float x)
+    {
+        return x - floor(x);
     }
     X_INLINE static float floor(float x)
     {
