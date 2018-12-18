@@ -72,6 +72,8 @@ void UserCmdMan::getReadUserCmdsAfterGameTime(int32_t playerIndex, int32_t gameT
 {
     int32_t index = readFrame_[playerIndex];
 
+    const size_t max = BUFFER_SIZE - getNumUnreadFrames(playerIndex);
+
     while (index > 0)
     {
         auto& uCmd = userCmds_[index % BUFFER_SIZE][playerIndex];
@@ -84,8 +86,8 @@ void UserCmdMan::getReadUserCmdsAfterGameTime(int32_t playerIndex, int32_t gameT
         arr.push_back(uCmd);
         
         // we need to handle when all cmds are after gameTimeMS.
-        // make sure we only return buffer_size.
-        if (arr.size() == arr.capacity())
+        // this may be less than buffer size depending on read / write.
+        if (arr.size() == max)
         {
             X_WARNING("Net", "UserCmd history buffer full for given game time %" PRIi32, gameTimeMS);
             break;
