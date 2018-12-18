@@ -57,9 +57,11 @@ public:
     X_INLINE const PlayerTimeMSArr& getUserCmdTimes(void) const;
 
     X_INLINE size_t getNumObjects(void) const;
-    X_INLINE core::TimeVal getTime(void) const;
+    X_INLINE int32_t getTimeMS(void) const;
+    X_INLINE int32_t getRecvTimeMS(void) const;
 
-    X_INLINE void setTime(core::TimeVal time);
+    X_INLINE void setTime(int32_t timeMS);
+    X_INLINE void setRecvTime(int32_t timeMS);
 
     MsgBitStream getMessageByIndex(size_t idx) const;
 
@@ -69,7 +71,8 @@ private:
 
 private:
     core::MemoryArenaBase* arena_;
-    core::TimeVal time_; // the creation or recival time;
+    int32_t timeMS_; // creation time
+    int32_t recvTimeMS_;
 
     ObjectStateArr objs_;
     PlayerTimeMSArr userCmdTimes_;

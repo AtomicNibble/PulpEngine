@@ -11,14 +11,24 @@ X_INLINE size_t SnapShot::getNumObjects(void) const
     return objs_.size();
 }
 
-X_INLINE core::TimeVal SnapShot::getTime(void) const
+X_INLINE int32_t SnapShot::getTimeMS(void) const
 {
-    return time_;
+    return timeMS_;
 }
 
-X_INLINE void SnapShot::setTime(core::TimeVal time)
+X_INLINE int32_t SnapShot::getRecvTimeMS(void) const
 {
-    time_ = time;
+    return recvTimeMS_;
+}
+
+X_INLINE void SnapShot::setTime(int32_t time)
+{
+    timeMS_ = time;
+}
+
+X_INLINE void SnapShot::setRecvTime(int32_t time)
+{
+    recvTimeMS_ = time;
 }
 
 X_NAMESPACE_END

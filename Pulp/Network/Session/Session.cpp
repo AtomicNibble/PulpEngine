@@ -331,6 +331,8 @@ void Session::sendSnapShot(const SnapShot& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 
+    X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS());
+
     // too all peers.
     lobbys_[LobbyType::Game].sendSnapShot(snap);
 
@@ -444,9 +446,11 @@ void Session::onLostConnectionToHost(LobbyType::Enum type)
 
 void Session::onReciveSnapShot(SnapShot&& snap)
 {
-    auto time = gEnv->pTimer->GetTimeNowReal();
+    X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS(), snap.getRecvTimeMS());
+    X_ASSERT(snap.getRecvTimeMS() < 0, "Shapshot recvtime should not be set")(snap.getTimeMS(), snap.getRecvTimeMS());
 
-    snap.setTime(time);
+    auto time = gEnv->pTimer->GetTimeNowNoScale();
+    snap.setRecvTime(time.GetMilliSecondsAsInt32());
 
     recivedSnaps_.emplace_back(std::move(snap));
 

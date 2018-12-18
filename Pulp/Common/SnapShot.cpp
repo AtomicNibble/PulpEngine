@@ -7,6 +7,8 @@ X_NAMESPACE_BEGIN(net)
 
 SnapShot::SnapShot(core::MemoryArenaBase* arena) :
     arena_(arena),
+    timeMS_(-1),
+    recvTimeMS_(-1),
     objs_(arena)
 {
     userCmdTimes_.fill(0);
@@ -23,6 +25,7 @@ SnapShot::~SnapShot()
 
 void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
+    bs.write(timeMS_);
     bs.write(userCmdTimes_.data(), userCmdTimes_.size());
 
     auto num = objs_.size();
@@ -40,6 +43,7 @@ void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 
 void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
 {
+    bs.read(timeMS_);
     bs.read(userCmdTimes_.data(), userCmdTimes_.size());
 
     auto num = bs.read<uint16_t>();
