@@ -565,6 +565,13 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     userCmdMan_.readUserCmdFromBs(bs, clientIdx);
 }
 
+void XGame::applySnapShot(const net::SnapShot& snap)
+{
+    // we need to apply a snapshot.
+    world_->applySnapShot(snap);
+}
+
+
 void XGame::setInterpolation(int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS, float fraction)
 {
     netInterpolInfo_.frac = fraction;

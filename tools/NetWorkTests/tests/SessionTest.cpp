@@ -15,8 +15,12 @@ namespace
     public:
 
         // IGameCallbacks
-        void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) {
+        void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_FINAL {
             X_UNUSED(guid, bs);
+        }
+
+        void applySnapShot(const net::SnapShot& snap) X_FINAL {
+            X_UNUSED(snap);
         }
 
         // ~IGameCallbacks
