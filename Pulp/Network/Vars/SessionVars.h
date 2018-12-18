@@ -26,8 +26,8 @@ public:
     X_INLINE bool snapFroceDrop(void);
     X_INLINE int32_t snapMaxbufferedMs(void) const;
     X_INLINE int32_t snapRateMs(void) const;
-    X_INLINE float snapFallbackUpRate(void) const;
-    X_INLINE float snapCatchUpRate(void) const;
+    X_INLINE float snapFallbackRate(void) const;
+    X_INLINE float snapCatchupRate(void) const;
 
     X_INLINE int32_t userCmdRateMs(void) const;
     X_INLINE int32_t waitForPlayers(void) const;
@@ -44,8 +44,8 @@ private:
     int32_t snapFroceDrop_;
     int32_t snapMaxbufferedMs_;
     int32_t snapRateMs_;
-    float snapFallbackUpRate_;
-    float snapCatchUpRate_;
+    float snapFallbackRate_;
+    float snapCatchupRate_;
     // userCmd
     int32_t userCmdRateMs_;
     int32_t waitForPlayers_;

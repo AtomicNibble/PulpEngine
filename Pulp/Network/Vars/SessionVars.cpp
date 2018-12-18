@@ -14,9 +14,14 @@ SessionVars::SessionVars()
     connectionRetryDelayMs_ = 500;
     joinLobbyTimeoutMs_ = 5000;
 
+    // snap
     snapDebug_ = 0;
     snapMaxbufferedMs_ = 100;
     snapRateMs_ = 100;
+    snapFallbackRate_ = 0.95f;
+    snapCatchupRate_ = 1.3f;
+
+    // ucmd
     userCmdRateMs_ = 40;
 
     waitForPlayers_ = 1;
@@ -53,9 +58,9 @@ void SessionVars::registerVars(void)
     ADD_CVAR_REF("net_snap_rate_ms", snapRateMs_, snapRateMs_, 1, 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "How many ms between sending snaps");
 
-    ADD_CVAR_REF("net_snap_fallback_rate", snapFallbackUpRate_, snapFallbackUpRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("net_snap_fallback_rate", snapFallbackRate_, snapFallbackRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "The rate we slow down interpolation when ahead");
-    ADD_CVAR_REF("net_snap_catchup_rate", snapCatchUpRate_, snapCatchUpRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+    ADD_CVAR_REF("net_snap_catchup_rate", snapCatchupRate_, snapCatchupRate_, 0.001f, 32.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "The rate we speed up interpolation when falling behind");
 
 
