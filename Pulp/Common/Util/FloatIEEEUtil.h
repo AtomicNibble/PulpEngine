@@ -37,6 +37,22 @@ namespace FloatUtil
         return core::bitUtil::IsBitSet<uint32_t>(u, IEEE_FLT_SIGN_BIT) == false;
     }
 
+    X_INLINE bool isNaN(float val)
+    {
+        return std::isnan(val);
+    }
+
+    X_INLINE bool isInf(float val)
+    {
+        return std::isinf(val);
+    }
+
+    X_INLINE bool isValid(float val)
+    {
+        auto c = std::fpclassify(val);
+        return c == FP_NORMAL || c == FP_ZERO;
+    }
+
 } // namespace FloatUtil
 
 X_NAMESPACE_END
