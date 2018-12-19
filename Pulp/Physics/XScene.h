@@ -53,6 +53,9 @@ public:
     // set transforms
     void setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_FINAL;
     void setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_FINAL;
+    void setRigidBodyProps(ActorHandle* pHandles, const RigidBodyProps* pProps, size_t num) X_FINAL;
+
+    void getRigidBodyProps(ActorHandle* pHandles, RigidBodyProps* pProps, size_t num) X_FINAL;
 
     void addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num) X_FINAL;
     void addTorque(ActorHandle* pHandle, const Vec3f* pTorque, size_t num) X_FINAL;

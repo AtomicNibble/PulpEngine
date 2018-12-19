@@ -446,6 +446,47 @@ void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination,
     }
 }
 
+void XScene::setRigidBodyProps(ActorHandle* pHandle, const RigidBodyProps* pProps, size_t num)
+{
+    for (size_t i = 0; i < num; i++) {
+        physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
+        if (!pActor->is<physx::PxRigidBody>()) {
+            X_ERROR("Phys", "Setting rigid body props on a none rigid body is not allowed");
+            continue;
+        }
+
+        const auto& props = pProps[i];
+        physx::PxRigidBody* pRigidBody = static_cast<physx::PxRigidBody*>(pActor);
+
+        pRigidBody->setGlobalPose(PxTransFromQuatTrans(props.trans));
+        pRigidBody->setLinearVelocity(Px3FromVec3(props.linearVelocity));
+        pRigidBody->setAngularVelocity(Px3FromVec3(props.angularVelocity));
+    }
+}
+
+// ------------------------------------------
+
+void XScene::getRigidBodyProps(ActorHandle* pHandle, RigidBodyProps* pProps, size_t num)
+{
+    for (size_t i = 0; i < num; i++) {
+        physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
+        if (!pActor->is<physx::PxRigidBody>()) {
+            X_ERROR("Phys", "Setting rigid body props on a none rigid body is not allowed");
+            continue;
+        }
+
+        auto& props = pProps[i];
+
+        physx::PxRigidBody* pRigidBody = static_cast<physx::PxRigidBody*>(pActor);
+
+        props.trans = QuatTransFromPxTrans(pRigidBody->getGlobalPose());
+        props.linearVelocity = Vec3FromPx3(pRigidBody->getLinearVelocity());
+        props.angularVelocity = Vec3FromPx3(pRigidBody->getAngularVelocity());
+    }
+}
+
+// ------------------------------------------
+
 
 void XScene::addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num)
 {

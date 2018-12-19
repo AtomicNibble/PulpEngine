@@ -962,6 +962,17 @@ struct TriggerPair
 static const HitFlags DEFAULT_HIT_FLAGS = HitFlag::POSITION | HitFlag::NORMAL | HitFlag::DISTANCE;
 static const QueryFlags DEFAULT_QUERY_FLAGS = QueryFlag::STATIC | QueryFlags::DYNAMIC;
 
+// ------------------------------------------------
+
+struct RigidBodyProps
+{
+    Transformf trans;
+    Vec3f linearVelocity;
+    Vec3f angularVelocity;
+};
+
+// ------------------------------------------------
+
 struct IScene;
 
 X_DECLARE_ENUM(LockAccess)(
@@ -1020,9 +1031,15 @@ struct IScene
     // set transforms
     virtual void setKinematicTarget(ActorHandle* pHandle, const Transformf* pDestination, size_t num) X_ABSTRACT;
     virtual void setGlobalPose(ActorHandle* pHandles, const Transformf* pDestination, size_t num) X_ABSTRACT;
+    virtual void setRigidBodyProps(ActorHandle* pHandles, const RigidBodyProps* pProps, size_t num) X_ABSTRACT;
 
     X_INLINE void setKinematicTarget(ActorHandle handle, const Transformf& destination);
     X_INLINE void setGlobalPose(ActorHandle handle, const Transformf& destination);
+    X_INLINE void setRigidBodyProps(ActorHandle handle, const RigidBodyProps& props);
+
+    virtual void getRigidBodyProps(ActorHandle* pHandles, RigidBodyProps* pProps, size_t num) X_ABSTRACT;
+
+    X_INLINE void getRigidBodyProps(ActorHandle handle, RigidBodyProps& props);
 
     virtual void addForce(ActorHandle* pHandle, const Vec3f* pForce, size_t num) X_ABSTRACT;
     virtual void addTorque(ActorHandle* pHandle, const Vec3f* pTorque, size_t num) X_ABSTRACT;
@@ -1068,6 +1085,16 @@ X_INLINE void IScene::setKinematicTarget(ActorHandle handle, const Transformf& d
 X_INLINE void IScene::setGlobalPose(ActorHandle handle, const Transformf& destination)
 {
     setGlobalPose(&handle, &destination, 1);
+}
+
+X_INLINE void IScene::setRigidBodyProps(ActorHandle handle, const RigidBodyProps& props)
+{
+    setRigidBodyProps(&handle, &props, 1);
+}
+
+X_INLINE void IScene::getRigidBodyProps(ActorHandle handle, RigidBodyProps& props)
+{
+    getRigidBodyProps(&handle, &props, 1);
 }
 
 X_INLINE void IScene::addForce(ActorHandle handle, const Vec3f& force)
