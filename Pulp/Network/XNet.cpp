@@ -26,6 +26,8 @@ XNet::XNet(core::MemoryArenaBase* arena) :
 
 XNet::~XNet()
 {
+    X_ASSERT(sessions_.isEmpty(), "Sessions not cleaned up")();
+    X_ASSERT(peers_.isEmpty(), "Peers not cleaned up")();
 }
 
 // INet
@@ -128,6 +130,9 @@ void XNet::shutDown(void)
     for (auto* pPeer : peers_) {
         X_DELETE(pPeer, arena_);
     }
+
+    sessions_.clear();
+    peers_.clear();
 
     PlatLib::deRef();
 }
