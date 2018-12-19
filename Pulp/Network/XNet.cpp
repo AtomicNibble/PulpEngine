@@ -177,7 +177,7 @@ ISession* XNet::createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks)
         return false;
     }
 
-    auto* pSession = X_NEW(Session, arena_,"Session")(sessionVars_, pPeer, pGameCallbacks, arena_);
+    auto* pSession = X_NEW(Session, arena_, "Session")(sessionVars_, pPeer, pGameCallbacks, arena_);
     sessions_.append(pSession);
     return pSession;
 }
