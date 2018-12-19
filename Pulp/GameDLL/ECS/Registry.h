@@ -395,6 +395,12 @@ namespace ecs
             (void)accumulator;
         }
 
+        mask_type getComponentMask(entity_type entity) const
+        {
+            X_ASSERT(isValid(entity), "Not valid entity")();
+            return entities_[entity];
+        }
+
         template<typename Comp, typename... Args>
         Comp& assign(entity_type entity, Args... args)
         {
