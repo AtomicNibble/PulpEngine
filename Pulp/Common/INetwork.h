@@ -30,8 +30,7 @@ static const uint32_t MAX_USERNAME_LEN = 64;
 
 static const uint32_t MAX_PLAYERS = 8;
 
-static const uint32_t MAX_ENTS = 1 << 10; // the max of networked ents.
-static const uint32_t MAX_ENTS_FIELDS = 128; // the max fields a ent can sync
+static const uint32_t MAX_SYNCED_ENTS = 1 << 8; // the max of networked ents.
 
 static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will return.
 
