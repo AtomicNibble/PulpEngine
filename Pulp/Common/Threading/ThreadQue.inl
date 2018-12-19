@@ -88,19 +88,14 @@ bool ThreadQueBase<QueT, SynchronizationPrimitive>::tryPop(Type& value)
 
 template<typename QueT, typename SynchronizationPrimitive>
 template<class CallBack>
-bool ThreadQueBase<QueT, SynchronizationPrimitive>::tryPopAll(CallBack func)
+void ThreadQueBase<QueT, SynchronizationPrimitive>::popAll(CallBack func)
 {
     typename SynchronizationPrimitive::ScopedLock lock(primitive_);
-
-    if (que_.isEmpty()) {
-        return false;
-    }
 
     while (!que_.isEmpty()) {
         func(que_.peek());
         que_.pop();
     }
-    return true;
 }
 
 template<typename QueT, typename SynchronizationPrimitive>

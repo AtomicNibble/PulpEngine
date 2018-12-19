@@ -37,7 +37,7 @@ public:
 
     bool tryPop(Type& value);
     template<class CallBack>
-    bool tryPopAll(CallBack func);
+    void popAll(CallBack func);
 
     size_type size(void);
     bool isEmpty(void) const;

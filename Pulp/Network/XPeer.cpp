@@ -482,15 +482,15 @@ void XPeer::shutdown(core::TimeVal blockDuration, OrderingChannel::Enum ordering
     activeRemoteSystems_.clear();
     remoteSystemLookup_.clear();
 
-    bufferdCmds_.tryPopAll([this](BufferdCommand* pCmd) {
+    bufferdCmds_.popAll([this](BufferdCommand* pCmd) {
         freeBufferdCmd(pCmd);
     });
 
-    packetQue_.tryPopAll([this](Packet* pPacket) {
+    packetQue_.popAll([this](Packet* pPacket) {
         freePacket(pPacket);
     });
 
-    recvDataQue_.tryPopAll([this](RecvData* pData) {
+    recvDataQue_.popAll([this](RecvData* pData) {
         freeRecvData(pData);
     });
 
@@ -839,7 +839,7 @@ void XPeer::clearPackets(void)
         return;
     }
 
-    packetQue_.tryPopAll([this](Packet* pPacket) {
+    packetQue_.popAll([this](Packet* pPacket) {
         freePacket(pPacket);
     });
 }
