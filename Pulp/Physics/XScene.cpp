@@ -437,6 +437,11 @@ void XScene::setGlobalPose(ActorHandle* pHandle, const Transformf* pDestination,
         const physx::PxTransform& trans = PxTransFromQuatTrans(pDestination[i]);
         physx::PxRigidActor* pActor = reinterpret_cast<physx::PxRigidActor*>(pHandle[i]);
 
+        if (!pActor->is<physx::PxRigidBody>()) {
+            X_ERROR("Phys", "Setting global pose on a none rigid body is not allowed");
+            continue;
+        }
+
         pActor->setGlobalPose(trans);
     }
 }
