@@ -57,11 +57,6 @@ namespace entity
         sound::SndObjectHandle handle;
     };
 
-    struct SoundEnviroment
-    {
-        // sound::SndObjectHandle handle;
-    };
-
     struct Mesh
     {
         ADD_META()
@@ -206,21 +201,6 @@ namespace entity
         bool holster;
     };
 
-    struct Velocity
-    {
-        Vec3f dir;
-    };
-
-    struct PhysicsComponent
-    {
-        physics::ActorHandle actor;
-    };
-
-    struct PhysicsTrigger
-    {
-        physics::ActorHandle actor;
-    };
-
     struct CharacterController
     {
         CharacterController(physics::ICharacterController* pCon) :
@@ -251,19 +231,6 @@ namespace entity
         Vec3f offset;
 
         engine::fx::IEmitter* pEmitter;
-    };
-
-    // struct ScriptName
-    // {
-    // 	const char* pName;
-    // };
-
-    struct RenderView
-    {
-        Vec2f fov;
-
-        Vec3f viewOrg;
-        Matrix33f viewAxis;
     };
 
     struct Player
@@ -327,7 +294,6 @@ namespace entity
         DynamicObject,
 
         SoundObject,
-        SoundEnviroment,
 
         Inventory,
         Weapon,
@@ -339,9 +305,6 @@ namespace entity
         NetworkSync,
 
         Animator,
-        Velocity,
-        PhysicsComponent,
-        PhysicsTrigger,
         CharacterController,
         EntName,
         Player>;
