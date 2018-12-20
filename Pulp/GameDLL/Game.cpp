@@ -819,17 +819,8 @@ void XGame::clearWorld(void)
 
 int32_t XGame::getLocalClientIdx(void) const
 {
-    for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
-    {
-        if (myGuid_ == lobbyUserGuids_[i])
-        {
-            return i;
-        }
-    }
-
-    // return 0?
-    // X_ASSERT_UNREACHABLE();
-    return -1;
+    X_ASSERT(localPlayerIdx_ >= 0, "Called when local player is not valid")(localPlayerIdx_);
+    return localPlayerIdx_;
 }
 
 int32_t XGame::getPlayerIdxForGuid(net::NetGUID guid) const
