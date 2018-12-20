@@ -618,6 +618,8 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 
         if (userCmdMan_.hasUnreadFrames(playerIdx))
         {
+            // TODO: this kinda bugs out if the first userCmd is not starting at zero.
+            // also timeSinceServerRanLastCmd could be huge if player joins late.
             auto nextCmdClientTimeMS = userCmdMan_.getNextUserCmdClientTimeMSForPlayer(playerIdx);
             auto clientGameTimedelta = nextCmdClientTimeMS - lastUserCmdRunOnClientTime_[playerIdx];
             auto timeSinceServerRanLastCmd = gameTimeMS_ - lastUserCmdRunOnServerTime_[playerIdx];
@@ -784,8 +786,8 @@ void XGame::syncLobbyUsers(void)
 
         userCmdMan_.resetPlayer(plyIdx);
 
+        // for host.
         auto isLocal = myGuid_ == userGuid;
-
         if (isLocal) {
             localPlayerIdx_ = plyIdx;
         }
