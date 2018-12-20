@@ -227,7 +227,6 @@ bool AssetDB::CreateTables(void)
                      "type INTEGER NOT NULL,"
                      "args TEXT,"
                      "argsHash INTEGER,"
-                     "compiledHash INTEGER," // the merged hash of the args and rawFile last successfully compiled with.
                      "raw_file INTEGER,"
                      "thumb_id INTEGER,"
                      "add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,"
