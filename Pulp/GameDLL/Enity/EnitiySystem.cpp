@@ -265,8 +265,10 @@ namespace entity
                     auto pos = Vec3f(-80, -50.f + (remoteEntityId * 50.f), 10);
 
                     // need to work out if this is local.
+                    auto localPlayerIdx = gEnv->pGame->getLocalClientIdx();
+                    bool isLocal = localPlayerIdx == remoteEntityId;
 
-                    makePlayer(remoteEntityId, pos, false);
+                    makePlayer(remoteEntityId, pos, isLocal);
 
                     // player id's always match up.
                     entityId = remoteEntityId;

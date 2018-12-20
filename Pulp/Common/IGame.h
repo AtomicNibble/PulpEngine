@@ -29,6 +29,9 @@ struct IGame
 
     virtual bool update(core::FrameData& frame) X_ABSTRACT;
     virtual bool onInputEvent(const input::InputEvent& event) X_ABSTRACT;
+
+
+    virtual int32_t getLocalClientIdx(void) const X_ABSTRACT;
 };
 
 X_NAMESPACE_END
