@@ -58,7 +58,7 @@ namespace
 
     // the raw files store compression headers with the algo's in, so verify not changed.
 
-    // the count is not importants, and can change just flag that checks should be added for the new algo enum.
+    // the count is not important, and can change just flag that checks should be added for the new algo enum.
     static_assert(core::Compression::Algo::ENUM_COUNT == 7, "More algo's added? add a additional assert here.");
 
     static_assert(core::Compression::Algo::STORE == 0, "Compression algo index changed");
