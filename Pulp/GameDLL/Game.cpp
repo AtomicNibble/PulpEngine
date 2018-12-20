@@ -708,6 +708,12 @@ void XGame::syncLobbyUsers(void)
 
     auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
+    // only the host spawns players this way.
+    // clients are told to spawn via snapshots.
+    if (!pLobby->isHost()) {
+        return;
+    }
+
     auto numUsers = pLobby->getNumUsers();
     for (int32_t i = 0; i < numUsers; i++)
     {
