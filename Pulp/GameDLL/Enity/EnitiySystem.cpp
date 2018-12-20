@@ -36,7 +36,8 @@ namespace entity
         dtSoundObj_(arena),
         dtRotator_(arena),
         dtMover_(arena),
-        dtEmitter_(arena)
+        dtEmitter_(arena),
+        dtDynamicObject_(arena)
     {
         pPhysics_ = nullptr;
         pPhysScene_ = nullptr;
@@ -145,6 +146,8 @@ namespace entity
 
         ADD_TRANS_MEMBER(dtEmitter_, effect);
         ADD_TRANS_MEMBER(dtEmitter_, offset);
+
+        ADD_TRANS_MEMBER(dtDynamicObject_, kinematic);
         return true;
     }
 
@@ -337,7 +340,6 @@ namespace entity
         auto& hp = reg_.assign<Health>(id);
         auto& inv = reg_.assign<Inventory>(id);
         auto& net = reg_.assign<NetworkSync>(id);
-
 
         trans.pos = pos;
         player.isLocal = local;
@@ -623,6 +625,13 @@ namespace entity
                     translator.assignVec3(comp, nameHash, vec);
                 } break;
 
+                case core::json::Type::kTrueType:
+                    translator.assignBool(comp, nameHash, true);
+                    break;
+                case core::json::Type::kFalseType:
+                    translator.assignBool(comp, nameHash, false);
+                    break;
+
                 default:
                     X_ERROR("Ent", "Unknown component type: %" PRIi32, val.GetType());
                     return false;
@@ -734,7 +743,6 @@ namespace entity
                     // then later before we finished loading we iterate these waiting for the models to
                     // finish loading and then create the physics.
                     reg_.assign<MeshCollider>(ent);
-
                     break;
                 }
 
@@ -744,7 +752,12 @@ namespace entity
                         return false;
                     }
 
-                    reg_.assign<DynamicObject>(ent);
+                    auto& dyn = reg_.assign<DynamicObject>(ent);
+
+                    if (!parseComponent(dtDynamicObject_, dyn, value)) {
+                        return false;
+                    }
+
                     break;
                 }
 

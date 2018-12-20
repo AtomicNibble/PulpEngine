@@ -73,12 +73,15 @@ namespace entity
 
                 emt.pEmitter->setTrans(trans, emt.offset);
             }
-            if (reg.has<MeshCollider>(entity)) {
-                auto& col = reg.get<MeshCollider>(entity);
+            if (reg.has<DynamicObject>(entity)) {
+                auto& col = reg.get<DynamicObject>(entity);
 
-                physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
+                if (col.kinematic)
+                {
+                    physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
 
-                pPhysScene->setKinematicTarget(col.actor, trans);
+                    pPhysScene->setKinematicTarget(col.actor, trans);
+                }
             }
         };
 

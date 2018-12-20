@@ -10,7 +10,8 @@
             },
             "MeshRenderer" : {
             },
-            "MeshCollider" : {
+            "DynamicObject" : {
+                "kinematic": true
             },
             "Rotator" : {
                 "axis" : {"x": 1, "y": 0, "z": 1},
@@ -27,7 +28,8 @@
             },
             "MeshRenderer" : {
             },
-            "MeshCollider" : {
+            "DynamicObject" : {
+                "kinematic": true
             },
             "Rotator" : {
                 "axis" : {"x": 0, "y": 0, "z": 1},
@@ -56,7 +58,8 @@
             },
             "MeshRenderer" : {
             },
-            "MeshCollider" : {
+            "DynamicObject" : {
+                "kinematic": true
             },
             "Mover" : {
                 "start" : {"x": -128, "y": 256, "z": 32},
@@ -74,7 +77,8 @@
             },
             "MeshRenderer" : {
             },
-            "MeshCollider" : {
+            "DynamicObject" : {
+                "kinematic": true
             },
             "Mover" : {
                 "start" : {"x": -80, "y": -660, "z": 0},

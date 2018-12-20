@@ -115,6 +115,7 @@ namespace entity
         DataTranslator<Rotator> dtRotator_;
         DataTranslator<Mover> dtMover_;
         DataTranslator<Emitter> dtEmitter_;
+        DataTranslator<DynamicObject> dtDynamicObject_;
     };
 
     X_INLINE const EnitiyRegister& EnititySystem::getRegister(void) const

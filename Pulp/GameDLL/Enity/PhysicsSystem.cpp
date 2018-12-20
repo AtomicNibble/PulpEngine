@@ -93,12 +93,9 @@ namespace entity
                     continue;
                 }
 
-                // TEMP: make all ents kinematic.
-                col.actor = pPhysics->createActor(trans, true);
+                col.actor = pPhysics->createStaticActor(trans);
 
                 mesh.pModel->addPhysToActor(col.actor);
-
-                pPhysics->updateMassAndInertia(col.actor, 1.f);
 
                 actors.push_back(col.actor);
             }
@@ -114,12 +111,10 @@ namespace entity
 
                 mesh.pModel->waitForLoad(pModelManager);
 
-                col.actor = pPhysics->createActor(trans, false, (void*)entity);
+                col.actor = pPhysics->createActor(trans, col.kinematic, (void*)entity);
 
                 if (!mesh.pModel->hasPhys()) {
-                    X_ERROR("Ent", "Can't add mesh collider to ent with model \"%s\" it has no physics data", mesh.pModel->getName().c_str());
-                    //	reg.remove<DynamicObject>(entity);
-                    //	continue;
+                    X_WARNING("Ent", "No physics shapes for model \"%s\" using model bounds", mesh.pModel->getName().c_str());
 
                     auto& bounds = mesh.pModel->bounds();
                     pPhysics->addBox(col.actor, bounds, bounds.center());
@@ -128,7 +123,7 @@ namespace entity
                     mesh.pModel->addPhysToActor(col.actor);
                 }
 
-                pPhysics->updateMassAndInertia(col.actor, 5.f);
+                pPhysics->updateMassAndInertia(col.actor, 1.f);
 
                 actors.push_back(col.actor);
             }

@@ -72,6 +72,9 @@ namespace entity
         engine::IRenderEnt* pRenderEnt;
     };
 
+    // what is the point in this?
+    // currently i have it for static meshes.
+    // but all static meshes should be spawned in the decicated place, humm.
     struct MeshCollider
     {
         physics::ActorHandle actor;
@@ -79,6 +82,13 @@ namespace entity
 
     struct DynamicObject
     {
+        DynamicObject() :
+            kinematic(false),
+            actor(physics::INVALID_HANLDE)
+        {
+        }
+
+        bool kinematic; // infinite mass, using for moving objects.
         physics::ActorHandle actor;
     };
 
