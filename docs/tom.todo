@@ -85,6 +85,8 @@ Game:
 
    ☐ Physics improvements for clients.
      ☐ Jumping currently is broken as fuck.
+     ☐ Implment client interpolation.
+     ☐ Support extrapolation
 
        ✔ When we are a client the physics capsuls have a center of the player origin. @done (18-12-18 12:31)
    ✘ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go? @cancelled (18-12-02 14:02)
