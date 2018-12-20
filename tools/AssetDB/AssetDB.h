@@ -5,6 +5,7 @@
 #include <Util\Delegate.h>
 #include <Hashing\sha1.h>
 #include <Hashing\xxHash.h>
+#include <Hashing\Fnva1Hash.h>
 #include <Containers\Array.h>
 
 #include <IAssetDb.h>
@@ -40,8 +41,9 @@ class ASSETDB_EXPORT AssetDB
     // Version 9: don't rename old raw_Files keep them so we have history.
     // Version 10: change thumb hash coloum to binary. 
     // Version 11: add precedence to conversion profiles.
+    // Version 12: add name hash collision detection
 public:
-    static const int32_t DB_VERSION = 11;
+    static const int32_t DB_VERSION = 12;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;
@@ -51,6 +53,7 @@ public:
 
     typedef core::Hash::xxHash64Val DataHash;
     typedef core::Hash::SHA1Digest ThumbHash;
+    typedef core::Hash::Fnv1aVal NameHash;
 
 private:
     struct RawFile
@@ -296,6 +299,7 @@ private:
     bool setDBVersion(int32_t version);
     bool isModSet(void) const;
 
+    static NameHash getNameHash(const void* pData, size_t length);
     static DataHash getMergedHash(DataHash data, DataHash args, int32_t dataLen);
 
     static const char* AssetTypeRawFolder(AssetType::Enum type);

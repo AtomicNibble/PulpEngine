@@ -224,6 +224,7 @@ bool AssetDB::CreateTables(void)
     if (!db_.execute("CREATE TABLE IF NOT EXISTS file_ids ("
                      "file_id INTEGER PRIMARY KEY,"
                      "name TEXT COLLATE NOCASE NOT NULL," // names are not unique since we allow same name for diffrent type.
+                     "nameHash INTEGER NOT NULL,"
                      "type INTEGER NOT NULL,"
                      "args TEXT,"
                      "argsHash INTEGER,"
@@ -1074,6 +1075,80 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 12)
+    {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 12", dbVersion_);
+
+        if (!db_.execute("PRAGMA foreign_keys = OFF;")) {
+            X_ERROR("AssetDB", "Failed to disable foreign_keys for migrations");
+            return false;
+        }
+
+        sql::SqlLiteTransaction trans(db_);
+
+        if (!db_.execute(R"(
+
+            CREATE TABLE IF NOT EXISTS file_ids_new (
+                     file_id INTEGER PRIMARY KEY,
+                     name TEXT COLLATE NOCASE NOT NULL,
+                     nameHash INTEGER NOT NULL,
+                     type INTEGER NOT NULL,
+                     args TEXT,
+                     argsHash INTEGER,
+                     raw_file INTEGER,
+                     thumb_id INTEGER,
+                     add_time TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
+                     lastUpdateTime TIMESTAMP,
+                     parent_id INTEGER NULL,
+                     mod_id INTEGER NOT NULL,
+                     FOREIGN KEY(parent_id) REFERENCES file_ids(file_id),
+                     FOREIGN KEY(mod_id) REFERENCES mods(mod_id),
+                     FOREIGN KEY(thumb_id) REFERENCES thumbs(thumb_id),
+                     FOREIGN KEY(raw_file) REFERENCES raw_files(id),
+                     unique(name, type)
+            );
+
+            INSERT INTO file_ids_new SELECT file_id,name,0,type,args,argsHash,raw_file,thumb_id,add_time,lastUpdateTime,parent_id,mod_id FROM file_ids;
+            DROP TABLE file_ids;
+            ALTER TABLE file_ids_new RENAME TO file_ids;
+
+        )")) {
+            X_ERROR("AssetDB", "Failed to update file_ids_new table");
+            return false;
+        }
+
+        sql::SqlLiteQuery qry(db_, "SELECT file_id, name FROM file_ids");
+
+        // update name hashes
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            int32_t fileId = row.get<int32_t>(0);
+            const char* pName = row.get<const char*>(1);
+            int32_t nameLength = row.columnBytes(1);
+
+            auto nameHash = getNameHash(pName, nameLength);
+
+            sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET nameHash = ? WHERE file_id = ?");
+            cmd.bind(1, static_cast<int32_t>(nameHash));
+            cmd.bind(2, fileId);
+
+            sql::Result::Enum res = cmd.execute();
+            if (res != sql::Result::OK) {
+                X_ERROR("AssetDB", "Failed to update name hash");
+                return false;
+            }
+        }
+
+        trans.commit();
+
+        if (!db_.execute("PRAGMA foreign_keys = ON;")) {
+            X_ERROR("AssetDB", "Failed to enable foreign_keys post migrations");
+            return false;
+        }
+    }
+
     return true;
 }
 
@@ -1317,16 +1392,17 @@ bool AssetDB::Export(core::Path<char>& path)
             const AssetId id = safe_static_cast<AssetId>(row.get<int32_t>(0));
             const char* pName = row.get<const char*>(1);
             const int32_t nameLength = row.columnBytes(1);
-            const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(2));
-            const char* pArgs = row.get<const char*>(3);
-            const int32_t argsLength = row.columnBytes(3);
-            const int64_t argsHash = row.get<int64_t>(4);
-            // 5 raw_File
-            // 6 thumb_id
-            const char* pAddTimeStr = row.get<const char*>(7);
-            const char* pUpdateTimeStr = row.get<const char*>(8);
-            // 9 parent_id
-            const int32_t modId = row.columnBytes(10);
+            const int32_t nameHash = row.get<int32_t>(2);
+            const AssetType::Enum type = static_cast<AssetType::Enum>(row.get<int32_t>(3));
+            const char* pArgs = row.get<const char*>(4);
+            const int32_t argsLength = row.columnBytes(4);
+            const int64_t argsHash = row.get<int64_t>(5);
+            // 6 raw_File
+            // 7 thumb_id
+            const char* pAddTimeStr = row.get<const char*>(8);
+            const char* pUpdateTimeStr = row.get<const char*>(9);
+            // 10 parent_id
+            const int32_t modId = row.columnBytes(11);
 
             writer.StartObject();
 
@@ -1334,6 +1410,8 @@ bool AssetDB::Export(core::Path<char>& path)
             writer.Int(id);
             writer.Key("name");
             writer.String(pName, nameLength);
+            writer.Key("nameHash");
+            writer.Int(nameHash);
             writer.Key("type");
             writer.Int(type);
             writer.Key("args");
@@ -1341,21 +1419,21 @@ bool AssetDB::Export(core::Path<char>& path)
             writer.Key("argsHash");
             writer.Int64(argsHash);
 
-            if (row.columnType(5) != sql::ColumType::SNULL) {
-                auto rawFileId = row.get<int32_t>(5);
+            if (row.columnType(6) != sql::ColumType::SNULL) {
+                auto rawFileId = row.get<int32_t>(6);
 
                 writer.Key("rawFile");
                 writer.Int(rawFileId);
             }
-            if (row.columnType(6) != sql::ColumType::SNULL) {
-                auto thumbId = row.get<int32_t>(6);
+            if (row.columnType(7) != sql::ColumType::SNULL) {
+                auto thumbId = row.get<int32_t>(7);
 
                 writer.Key("thumbId");
                 writer.Int(thumbId);
             }
 
-            if (row.columnType(9) != sql::ColumType::SNULL) {
-                auto parentId = row.get<int32_t>(9);
+            if (row.columnType(10) != sql::ColumType::SNULL) {
+                auto parentId = row.get<int32_t>(10);
 
                 writer.Key("parentId");
                 writer.Int(parentId);
@@ -2127,10 +2205,13 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, Mo
         return Result::NAME_TAKEN;
     }
 
-    sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, type, mod_id) VALUES(?,?,?)");
+    auto nameHash = getNameHash(name.c_str(), name.length());
+
+    sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, namehash, type, mod_id) VALUES(?,?,?,?)");
     cmd.bind(1, name.c_str());
-    cmd.bind(2, type);
-    cmd.bind(3, modId_);
+    cmd.bind(2, static_cast<int32_t>(nameHash));
+    cmd.bind(3, type);
+    cmd.bind(4, modId_);
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -2326,11 +2407,14 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
         }
     }
 
+    auto nameHash = getNameHash(newName.c_str(), newName.length());
+
     sql::SqlLiteTransaction trans(db_);
-    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET name = ? WHERE type = ? AND name = ?");
+    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET name = ? hash = ? WHERE type = ? AND name = ?");
     cmd.bind(1, newName);
-    cmd.bind(2, type);
-    cmd.bind(3, name.c_str());
+    cmd.bind(2, static_cast<int32_t>(nameHash));
+    cmd.bind(3, type);
+    cmd.bind(4, name.c_str());
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -3727,6 +3811,11 @@ bool AssetDB::setDBVersion(int32_t version)
 bool AssetDB::isModSet(void) const
 {
     return modId_ >= 0 && modId_ != INVALID_MOD_ID;
+}
+
+AssetDB::NameHash AssetDB::getNameHash(const void* pData, size_t length)
+{
+    return core::Hash::Fnv1aHash(pData, length);
 }
 
 AssetDB::DataHash AssetDB::getMergedHash(DataHash data, DataHash args, int32_t dataLen)
