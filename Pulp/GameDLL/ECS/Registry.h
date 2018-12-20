@@ -419,8 +419,9 @@ namespace ecs
             pool_.template destroy<Comp>(entity);
         }
 
+        // make this a overload of has() if I can be bothered.
         template<typename... Comp>
-        bool has(entity_type entity) const
+        bool hasAll(entity_type entity) const
         {
             X_ASSERT(isValid(entity), "Not valid entity")();
 
@@ -430,6 +431,21 @@ namespace ecs
             accumulator_type accumulator = {true, (all = all && mask.test(ident<Components...>.template get<Comp>()))...};
             (void)accumulator;
             return all;
+        }
+
+        template<typename Comp>
+        bool has(entity_type entity) const
+        {
+            X_ASSERT(isValid(entity), "Not valid entity")();
+
+            auto& mask = entities_[entity];
+            return mask.test(ident<Components...>.template get<Comp>());
+        }
+
+        template<typename Comp>
+        bool has(mask_type mask) const
+        {
+            return mask.test(ident<Components...>.template get<Comp>());
         }
 
         template<typename Comp>
