@@ -5,16 +5,21 @@
 #include "Weapon\WeaponDef.h"
 #include "Weapon\WeaponManager.h"
 
+#include <Containers\FixedBitStream.h>
 #include <String\Json.h>
 #include <Hashing\Fnva1Hash.h>
 #include <Time\TimeLiterals.h>
+
 #include <UserCmdMan.h>
+#include <SnapShot.h>
 
 #include <IFrameData.h>
 #include <I3DEngine.h>
 #include <IWorld3D.h>
 #include <IAnimManager.h>
 #include <IEffect.h>
+
+#include <numeric>
 
 using namespace core::Hash::Literals;
 
@@ -44,10 +49,14 @@ namespace entity
         p3DWorld_ = nullptr;
         pModelManager_ = nullptr;
         pEffectManager_ = nullptr;
+
+        entIdMap_.fill(INVALID_ENT_ID);
     }
 
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
+        reg_.reserve(MAX_ENTS);
+
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
         pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
         p3DWorld_ = X_ASSERT_NOT_NULL(p3DWorld);
@@ -189,12 +198,138 @@ namespace entity
 
     void EnititySystem::createSnapShot(net::SnapShot& snap)
     {
-        networkSys_.buildSnapShot(reg_, snap, pPhysScene_);
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Read);
+
+        core::FixedBitStreamStack<256> bs; // max-size?
+
+        auto view = reg_.view<NetworkSync, entity::TransForm>();
+        for (auto entityId : view)
+        {
+            // you want to be synced, fuck you!
+            auto& netSync = reg_.get<NetworkSync>(entityId);
+            X_UNUSED(netSync);
+
+            auto& trans = reg_.get<TransForm>(entityId);
+            auto mask = reg_.getComponentMask(entityId);
+
+            bs.write(entityId);
+            bs.write(mask);
+
+            // - data -
+            bs.write(trans);
+
+            if (reg_.has<entity::DynamicObject>(entityId))
+            {
+                auto& col = reg_.get<DynamicObject>(entityId);
+                col.writeToSnapShot(pPhysScene_, bs);
+            }
+
+            snap.addObject(entityId, bs);
+
+            bs.reset();
+        }
     }
 
     void EnititySystem::applySnapShot(const net::SnapShot& snap)
     {
-        networkSys_.applySnapShot(reg_, snap, pPhysScene_, p3DWorld_);
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+        for (size_t i = 0; i < snap.getNumObjects(); i++)
+        {
+            auto bs = snap.getMessageByIndex(i);
+
+            auto remoteEntityId = bs.read<entity::EntityId>();
+
+            auto entityId = entIdMap_[remoteEntityId];
+
+            if (bs.isEos())
+            {
+                X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
+
+                // destroy the ent.
+                // TODO: cleanup.
+                reg_.destroy(entityId);
+
+                entIdMap_[remoteEntityId] = INVALID_ENT_ID;
+                continue;
+            }
+
+            // spawn?
+            if (entityId == INVALID_ENT_ID)
+            {
+                if (entityId < net::MAX_PLAYERS)
+                {
+                    // this is a player.
+                    // make a player..
+                    entityId = reg_.create<entity::TransForm>();
+                }
+                else
+                {
+                    // we make the ent and the normal path should handle adding the components.
+                    entityId = reg_.create<entity::TransForm>();
+                }
+
+                entIdMap_[remoteEntityId] = entityId;
+            }
+
+            X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
+
+            auto localMask = reg_.getComponentMask(entityId);
+            decltype(localMask) mask;
+            bs.read(mask);
+
+            // components changed?
+            if (mask != localMask)
+            {
+                // well shit on my tits.
+                if ((mask & localMask).any())
+                {
+                    // add
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+                else
+                {
+                    // remove
+                    X_ASSERT_NOT_IMPLEMENTED();
+                }
+            }
+
+
+            // we always have transform?
+            // for everything else do i just have to check the flags?
+            auto& trans = reg_.get<TransForm>(entityId);
+            bs.read(trans);
+
+            if (reg_.has<DynamicObject>(mask))
+            {
+                auto& dyn = reg_.get<DynamicObject>(entityId);
+                dyn.readFromSnapShot(pPhysScene_, bs);
+            }
+
+            if (reg_.has<Player>(mask))
+            {
+                // auto& ply = reg.get<Player>(entityId);
+
+            }
+
+            if (reg_.has<Inventory>(mask))
+            {
+
+            }
+
+            if (reg_.has<MeshRenderer>(mask))
+            {
+                auto& rend = reg_.get<MeshRenderer>(entityId);
+                p3DWorld_->updateRenderEnt(rend.pRenderEnt, trans);
+            }
+
+            if (reg_.has<CharacterController>(mask))
+            {
+                auto& con = reg_.get<CharacterController>(entityId);
+
+                con.pController->setFootPosition(Vec3d(trans.pos));
+            }
+        }
     }
 
     EntityId EnititySystem::createEnt(void)
@@ -459,35 +594,23 @@ namespace entity
 
     bool EnititySystem::loadEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
-        X_UNUSED(pJsonEnd);
+        // TODO: bother checking we clear? 
 
-        core::json::Document d;
-        if (d.ParseInsitu(const_cast<char*>(pJsonBegin)).HasParseError()) {
-            auto err = d.GetParseError();
-            X_ERROR("Ents", "Failed to parse ent desc: %i", err);
+        if (!parseEntites(pJsonBegin, pJsonEnd)) {
+            X_ERROR("Ents", "Failed to parse ents");
             return false;
         }
 
-        if (d.GetType() != core::json::Type::kObjectType) {
-            return false;
-        }
+        // now i need to build the id map.
+        // i basically need the newst id.
+        endOfmapEnts_ = reg_.create();
 
-        if (d.HasMember("misc_model")) {
-        //    X_ASSERT_DEPRECATED();
-        }
-
-        if (d.HasMember("script_origin")) {
-            auto arr = d["script_origin"].GetArray();
-
-            if (!parseScriptOrigins(arr)) {
-                return false;
-            }
-        }
+        std::iota(entIdMap_.begin(), entIdMap_.begin() + endOfmapEnts_, static_cast<EntityId>(0));
 
         return true;
     }
 
-    bool EnititySystem::loadEntites2(const char* pJsonBegin, const char* pJsonEnd)
+    bool EnititySystem::parseEntites(const char* pJsonBegin, const char* pJsonEnd)
     {
         core::json::MemoryStream ms(pJsonBegin, union_cast<ptrdiff_t>(pJsonEnd - pJsonBegin));
         core::json::EncodedInputStream<core::json::UTF8<>, core::json::MemoryStream> is(ms);
@@ -539,37 +662,6 @@ namespace entity
     {
         if (!physSys_.createColliders(reg_, pPhysics_, pPhysScene_)) {
             return false;
-        }
-
-        return true;
-    }
-
-    bool EnititySystem::parseScriptOrigins(core::json::Value::Array arr)
-    {
-        for (auto it = arr.begin(); it != arr.end(); ++it) {
-            auto ent = reg_.create<TransForm, SoundObject>();
-            auto& trans = reg_.get<TransForm>(ent);
-            auto& snd = reg_.get<SoundObject>(ent);
-
-            auto& kvps = *it;
-
-            const char* pOrigin = kvps["origin"].GetString();
-
-            auto& pos = trans.pos;
-            if (sscanf_s(pOrigin, "%f %f %f", &pos.x, &pos.y, &pos.z) != 3) {
-                return false;
-            }
-
-            //	name.pName = pTargetName;
-
-            snd.handle = gEnv->pSound->registerObject(trans, "Goat");
-            gEnv->pSound->setOcclusionType(snd.handle, sound::OcclusionType::SingleRay);
-
-            if (kvps.HasMember("sound_evt")) {
-                const char* pEvt = kvps["sound_evt"].GetString();
-
-                gEnv->pSound->postEvent(pEvt, snd.handle);
-            }
         }
 
         return true;

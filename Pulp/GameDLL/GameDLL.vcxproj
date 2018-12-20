@@ -404,7 +404,6 @@
     <ClInclude Include="Enity\DataTranslator.h" />
     <ClInclude Include="Enity\EnitiySystem.h" />
     <ClInclude Include="Enity\EnityComponents.h" />
-    <ClInclude Include="Enity\NetworkSys.h" />
     <ClInclude Include="Enity\PhysicsSystem.h" />
     <ClInclude Include="Enity\PlayerSys.h" />
     <ClInclude Include="Enity\SoundSys.h" />
@@ -425,7 +424,6 @@
     <ClCompile Include="Enity\ComponentMeta.cpp" />
     <ClCompile Include="Enity\EnitiySystem.cpp" />
     <ClCompile Include="Enity\EnityComponents.cpp" />
-    <ClCompile Include="Enity\NetworkSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
     <ClCompile Include="Enity\PlayerSys.cpp" />
     <ClCompile Include="Enity\SoundSys.cpp" />

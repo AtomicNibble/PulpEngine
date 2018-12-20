@@ -3,6 +3,9 @@
 #ifndef X_GAME_I_H_
 #define X_GAME_I_H_
 
+static const uint32_t MAX_ENTS = 1 << 9;
+
+
 X_NAMESPACE_DECLARE(core,
     struct FrameData);
 

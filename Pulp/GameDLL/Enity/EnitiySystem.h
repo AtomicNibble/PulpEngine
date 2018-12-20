@@ -11,7 +11,6 @@
 #include "PhysicsSystem.h"
 #include "AnimatedSys.h"
 #include "WeaponSystem.h"
-#include "NetworkSys.h"
 
 #include "DataTranslator.h"
 
@@ -29,6 +28,7 @@ X_NAMESPACE_DECLARE(engine,
                     })
 
 X_NAMESPACE_DECLARE(net,
+                    class SnapShot;
                     class UserCmdMan;)
 
 X_NAMESPACE_BEGIN(game)
@@ -46,6 +46,8 @@ namespace entity
 
     class EnititySystem
     {
+        using EntityIdMapArr = std::array< EntityId, MAX_ENTS>;
+
     public:
         typedef EnitiyRegister::entity_type EntityId;
 
@@ -70,7 +72,6 @@ namespace entity
         bool addController(EntityId id);
 
         bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
-        bool loadEntites2(const char* pJsonBegin, const char* pJsonEnd);
 
         bool postLoad(void);
 
@@ -80,8 +81,7 @@ namespace entity
     private:
         bool createTranslatours(void);
 
-        // Temp
-        bool parseScriptOrigins(core::json::Value::Array val);
+        bool parseEntites(const char* pJsonBegin, const char* pJsonEnd);
 
         template<typename CompnentT>
         static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
@@ -106,7 +106,9 @@ namespace entity
         PhysicsSystem physSys_;
         AnimatedSystem animatedSys_;
         WeaponSystem weaponSys_;
-        NetworkSystem networkSys_;
+
+        EntityId endOfmapEnts_;
+        EntityIdMapArr entIdMap_;
 
     private:
         DataTranslator<Health> dtHealth_;

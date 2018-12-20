@@ -297,6 +297,7 @@ bool Level::processData(void)
 
 bool Level::processEnts(void)
 {
+#if 0 // don't think this is used currently.
     {
         core::XFileFixedBuf file = fileHdr_.FileBufForNode(levelData_.ptr(), level::FileNodes::ENTITIES);
 
@@ -304,6 +305,7 @@ bool Level::processEnts(void)
             reinterpret_cast<const char*>(file.getBufferStart()),
             reinterpret_cast<const char*>(file.getBufferEnd()));
     }
+#endif
 
     // wait for the ent desc to finish loading.
     entDescLoadedSignal_.wait();
@@ -313,7 +315,7 @@ bool Level::processEnts(void)
         const char* pBegin = entDescData_.ptr();
         const char* pEnd = pBegin + entDescSize_;
 
-        if (!entSys_.loadEntites2(pBegin, pEnd)) {
+        if (!entSys_.loadEntites(pBegin, pEnd)) {
 
             return false;
         }

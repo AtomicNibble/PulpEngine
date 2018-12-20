@@ -111,9 +111,6 @@
     <ClInclude Include="Enity\WeaponSystem.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\NetworkSys.h">
-      <Filter>Header Files\Enity\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="UserCmds\UserCmdGen.h">
       <Filter>Header Files\UserCmds</Filter>
     </ClInclude>
@@ -169,9 +166,6 @@
     </ClCompile>
     <ClCompile Include="Enity\ComponentMeta.cpp">
       <Filter>Source Files\Entity</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\NetworkSys.cpp">
-      <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Enity\EnityComponents.cpp">
       <Filter>Source Files\Entity</Filter>
