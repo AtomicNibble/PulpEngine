@@ -264,11 +264,12 @@ namespace entity
                     // TODO: pos
                     auto pos = Vec3f(-80, -50.f + (remoteEntityId * 50.f), 10);
 
+                    // need to work out if this is local.
+
                     makePlayer(remoteEntityId, pos, false);
 
-                    // this is a player.
-                    // make a player..
-                    entityId = reg_.create<entity::TransForm>();
+                    // player id's always match up.
+                    entityId = remoteEntityId;
                 }
                 else
                 {
