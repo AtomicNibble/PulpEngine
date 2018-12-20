@@ -88,6 +88,9 @@ namespace entity
         {
         }
 
+        void readFromSnapShot(physics::IScene* pScene, core::FixedBitStreamBase& bs);
+        void writeToSnapShot(physics::IScene* pScene, core::FixedBitStreamBase& bs);
+
         bool kinematic; // infinite mass, using for moving objects.
         physics::ActorHandle actor;
     };

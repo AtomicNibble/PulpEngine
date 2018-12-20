@@ -1,6 +1,9 @@
 #include "stdafx.h"
 #include "EnityComponents.h"
 
+#include <Containers/FixedBitStream.h>
+
+#include <IPhysics.h>
 
 X_NAMESPACE_BEGIN(game)
 
@@ -28,6 +31,23 @@ namespace entity
         attack = false;
         reload = false;
         holster = true;
+    }
+
+
+    void DynamicObject::readFromSnapShot(physics::IScene* pScene, core::FixedBitStreamBase& bs)
+    {
+        physics::RigidBodyProps props;
+        bs.read(props);
+
+        pScene->setRigidBodyProps(actor, props);
+    }
+    
+    void DynamicObject::writeToSnapShot(physics::IScene* pScene, core::FixedBitStreamBase& bs)
+    {
+        physics::RigidBodyProps props;
+        pScene->getRigidBodyProps(actor, props);
+        
+        bs.write(props);
     }
 
 } //namespace entity
