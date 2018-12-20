@@ -189,7 +189,7 @@ namespace entity
 
     void EnititySystem::createSnapShot(net::SnapShot& snap)
     {
-        networkSys_.buildSnapShot(reg_, snap);
+        networkSys_.buildSnapShot(reg_, snap, pPhysScene_);
     }
 
     void EnititySystem::applySnapShot(const net::SnapShot& snap)
