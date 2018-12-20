@@ -232,6 +232,7 @@ namespace entity
 
     void EnititySystem::applySnapShot(const net::SnapShot& snap)
     {
+        // TODO: maybe gather up physics changes and do them in a batch.
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
 
         for (size_t i = 0; i < snap.getNumObjects(); i++)
@@ -257,8 +258,14 @@ namespace entity
             // spawn?
             if (entityId == INVALID_ENT_ID)
             {
-                if (entityId < net::MAX_PLAYERS)
+                if (remoteEntityId < net::MAX_PLAYERS)
                 {
+                    // spawn a player!
+                    // TODO: pos
+                    auto pos = Vec3f(-80, -50.f + (remoteEntityId * 50.f), 10);
+
+                    makePlayer(remoteEntityId, pos, false);
+
                     // this is a player.
                     // make a player..
                     entityId = reg_.create<entity::TransForm>();
