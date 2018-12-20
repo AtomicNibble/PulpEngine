@@ -1157,7 +1157,7 @@ bool AssetDB::Chkdsk(bool updateDB)
     if (updateDB) {
         core::StackString<1024, char> msg;
         msg.appendFmt("Performing chkdsk for rawfiles. it's recommended to back up the ", dbVersion_, DB_VERSION);
-        msg.appendFmt("'%s' folder before pressin Ok. Cancel will skip chkdsk.", ASSET_DB_FOLDER);
+        msg.appendFmt("'%s' folder before clicking Ok. Cancel will skip chkdsk.", ASSET_DB_FOLDER);
 
         const auto res = core::msgbox::show(msg.c_str(), "AssetDB chkdsk", core::msgbox::Buttons::OKCancel);
         if (res == core::msgbox::Selection::Cancel) {
