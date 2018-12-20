@@ -34,7 +34,7 @@ namespace
                                       "_"
                                       "abcdefghijklmnopqrstuvwxyz";
 
-        core::random::MultiplyWithCarry rand;
+        static core::random::MultiplyWithCarry rand;
 
         const size_t charSetNum = sizeof(charSet) - 1;
         const size_t len = rand.randRange(assetNameLenMin, assetNameLenMax);
