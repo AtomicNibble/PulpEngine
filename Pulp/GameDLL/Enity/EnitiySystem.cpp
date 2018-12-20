@@ -613,7 +613,8 @@ namespace entity
         // i basically need the newst id.
         endOfmapEnts_ = reg_.create();
 
-        std::iota(entIdMap_.begin(), entIdMap_.begin() + endOfmapEnts_, static_cast<EntityId>(0));
+        // players are not valid yet.
+        std::iota(entIdMap_.begin() + net::MAX_PLAYERS, entIdMap_.begin() + endOfmapEnts_, static_cast<EntityId>(net::MAX_PLAYERS));
 
         return true;
     }
