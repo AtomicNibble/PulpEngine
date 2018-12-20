@@ -39,6 +39,7 @@ class SnapShot
 
 public:
     using PlayerTimeMSArr = std::array<int32_t, MAX_PLAYERS>;
+    using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
 
 public:
     SnapShot(core::MemoryArenaBase* arena);
@@ -55,6 +56,9 @@ public:
     void addObject(ObjectID id, core::FixedBitStreamBase& bs);
     void setUserCmdTimes(const PlayerTimeMSArr& userCmdTimes);
     X_INLINE const PlayerTimeMSArr& getUserCmdTimes(void) const;
+
+    X_INLINE void setPlayerGuids(const PlayerGuidArr& userGuids_);
+    X_INLINE const PlayerGuidArr& getPlayerGuids(void) const;
 
     X_INLINE size_t getNumObjects(void) const;
     X_INLINE int32_t getTimeMS(void) const;
@@ -76,6 +80,7 @@ private:
 
     ObjectStateArr objs_;
     PlayerTimeMSArr userCmdTimes_;
+    PlayerGuidArr userGuids_;
 };
 
 

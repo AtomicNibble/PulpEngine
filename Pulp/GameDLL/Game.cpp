@@ -445,6 +445,7 @@ bool XGame::update(core::FrameData& frame)
 
                 snap.setTime(gameTimeMS_); // TODO: temp?
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
+                snap.setPlayerGuids(lobbyUserGuids_);
 
                 world_->createSnapShot(snap);
 
@@ -538,6 +539,21 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
+    lobbyUserGuids_ = snap.getPlayerGuids();
+
+    // mark local player index?
+    if (localPlayerIdx_ < 0)
+    {
+        for (size_t i=0; i<lobbyUserGuids_.size(); i++)
+        {
+            if (myGuid_ == lobbyUserGuids_[i])
+            {
+                localPlayerIdx_ = safe_static_cast<int32_t>(i);
+                X_LOG0("Game", "Local player idx: %" PRIi32, localPlayerIdx_);
+                break;
+            }
+        }
+    }
 
     auto localLastRunTimeMS = lastUserCmdRunTime_[localPlayerIdx_];
 

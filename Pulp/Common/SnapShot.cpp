@@ -27,6 +27,7 @@ void SnapShot::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
     bs.write(timeMS_);
     bs.write(userCmdTimes_.data(), userCmdTimes_.size());
+    bs.write(userGuids_.data(), userGuids_.size());
 
     auto num = objs_.size();
     bs.write(safe_static_cast<uint16_t>(num));
@@ -45,6 +46,7 @@ void SnapShot::fromBitStream(core::FixedBitStreamBase& bs)
 {
     bs.read(timeMS_);
     bs.read(userCmdTimes_.data(), userCmdTimes_.size());
+    bs.read(userGuids_.data(), userGuids_.size());
 
     auto num = bs.read<uint16_t>();
     objs_.clear();
