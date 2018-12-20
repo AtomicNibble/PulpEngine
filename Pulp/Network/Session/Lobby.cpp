@@ -507,7 +507,7 @@ void Lobby::sendSnapShot(const SnapShot& snap)
 {
     X_ASSERT(isHost(), "Can only send snapshot if host")(isPeer(), isHost());
 
-    core::FixedBitStreamStack<1500> bs;
+    core::FixedBitStreamStack<0x800> bs;
     bs.write(MessageID::SnapShot);
     snap.writeToBitStream(bs);
 
