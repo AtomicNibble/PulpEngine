@@ -12,7 +12,7 @@ before_script:
   - 'set QTDIR=E:\Qt\Qt-5.10.1_64'
   - 'set PATH=%QTDIR%\bin;%PATH%'
   - set
-  - echo $CI_COMMIT_SHA
+  - echo $CI_BUILD_REF
 
 stages:
  - build
