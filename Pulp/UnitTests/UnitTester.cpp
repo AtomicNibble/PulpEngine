@@ -87,6 +87,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
                 gEnv->pCore->RegisterAssertHandler(&g_AssetChecker);
 
                 if (!gEnv->pFileSys->addModDir(core::Path<wchar_t>(L"test_assets"))) {
+                    gEnv->pConsoleWnd->pressToContinue();
                     return 1;
                 }
 
@@ -107,7 +108,7 @@ int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmd
             }
 
             if (lpCmdLine && !core::strUtil::FindCaseInsensitive(lpCmdLine, L"-CI")) {
-                system("PAUSE");
+                gEnv->pConsoleWnd->pressToContinue();
             }
         }
     }
