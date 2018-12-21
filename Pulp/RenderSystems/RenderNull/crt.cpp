@@ -1,6 +1,10 @@
 #include "stdafx.h"
 
-#if 0
+#if 1
+
+X_DISABLE_EMPTY_FILE_WARNING
+
+#else
 
 int const EpochStart = INT_MIN;
 
