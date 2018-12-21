@@ -160,11 +160,11 @@ TYPED_TEST(FixedFifoTest, Iteration)
 TYPED_TEST(FixedFifoTest, Iteration2)
 {
     { // scoped for con / de-con check
-        FixedFifo<TypeParam, 3> fifo;
+        FixedFifo<TypeParam, 4> fifo;
         const auto& constFifo = fifo;
 
         EXPECT_EQ(0, fifo.size());
-        ASSERT_EQ(3, fifo.capacity());
+        ASSERT_EQ(4, fifo.capacity());
 
         fifo.push(16);
         fifo.push(32);
@@ -179,8 +179,8 @@ TYPED_TEST(FixedFifoTest, Iteration2)
             valueSum += val;
         }
 
-        EXPECT_EQ(3, numvalues);
-        EXPECT_EQ(256, valueSum);
+        EXPECT_EQ(4, numvalues);
+        EXPECT_EQ(240, valueSum);
 
         numvalues = 0;
         valueSum = 0;
@@ -191,7 +191,7 @@ TYPED_TEST(FixedFifoTest, Iteration2)
         }
 
         EXPECT_EQ(4, numvalues);
-        EXPECT_EQ(256, valueSum);
+        EXPECT_EQ(240, valueSum);
 
         fifo.clear();
     }
