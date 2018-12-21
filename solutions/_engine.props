@@ -16,7 +16,7 @@
       <ExceptionHandling>false</ExceptionHandling>
       <RuntimeTypeInfo>false</RuntimeTypeInfo>
       <OpenMPSupport>false</OpenMPSupport>
-      <AdditionalOptions>/Zc:offsetof- /Zc:strictStrings /Zc:rvalueCast /std:c++17 /DCI_COMMIT_SHA=$(CI_COMMIT_SHA) %(AdditionalOptions)</AdditionalOptions>
+      <AdditionalOptions>/Zc:offsetof- /Zc:strictStrings /Zc:rvalueCast /std:c++17 %(AdditionalOptions)</AdditionalOptions>
       <PreprocessorDefinitions>_SCL_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
 	<Link>
@@ -25,4 +25,9 @@
     <ProgramDatabaseFile>$(OutDir)$(TargetName).pdb</ProgramDatabaseFile>
 	</Link>
   </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(CI_COMMIT_SHA)' != ''">
+    <ClCompile>
+        <AdditionalOptions>/DCI_COMMIT_SHA=$(CI_COMMIT_SHA) %(AdditionalOptions)</AdditionalOptions>
+    </ClCompile>
+</ItemDefinitionGroup>
 </Project>
