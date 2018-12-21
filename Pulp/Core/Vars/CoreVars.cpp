@@ -57,7 +57,7 @@ void CoreVars::registerVars(void)
         VarFlag::SYSTEM | VarFlag::SAVE_IF_CHANGED, "Enable / disable the windows custom frame");
 
     ADD_CVAR_REF("win_fullscreen", fullscreen_, fullscreen_, -1, 2,
-        VarFlag::SYSTEM | VarFlag::ARCHIVE, "0 = windowed 1 =fullscreen");
+        VarFlag::SYSTEM | VarFlag::ARCHIVE, "0 = windowed 1 = fullscreen");
     ADD_CVAR_REF("win_monitor", monitor_, monitor_, -1, 64,
         VarFlag::SYSTEM | VarFlag::ARCHIVE, "-1 = detech default, >= 0 specific");
     ADD_CVAR_REF("win_mode", videoMode_, videoMode_, -1, -2,
