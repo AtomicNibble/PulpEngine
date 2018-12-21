@@ -279,7 +279,7 @@ Sql:
 
 UnitTests:
 
-     ☐ Move any benchmark style tests in the unittests to benchmark project.
+     ✔ Move any benchmark style tests in the unittests to benchmark project. @done (18-12-21 18:42)
 
    Containers:
      ✔ FixedByteStream @done (18-09-15 18:05)
