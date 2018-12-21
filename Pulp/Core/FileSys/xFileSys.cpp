@@ -253,33 +253,32 @@ bool xFileSys::initDirectorys(bool working)
 {
     loadPacks_ = !working; // TODO: work out somethign better? basically only want packs in game and maybe some tools?
 
-    PathWT workingDir;
-    if (!PathUtil::GetCurrentDirectory(workingDir)) {
+    if (!PathUtil::GetCurrentDirectory(basePath_)) {
         return false;
     }
 
     if (working) {
         // working dir added.
-        if (!setBaseDir(workingDir)) {
+        if (!setBaseDir(basePath_)) {
             return false;
         }
 
-        if (!setSaveDir(workingDir)) {
+        if (!setSaveDir(basePath_)) {
             return false;
         }
     }
     else 
     {
         
-        const wchar_t* pGameDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
-        if (pGameDir) {
-            workingDir = pGameDir;
+        const wchar_t* pBasePath = gEnv->pCore->GetCommandLineArgForVarW(L"fs_basepath");
+        if (pBasePath) {
+            basePath_ = pBasePath;
         }
 
         const wchar_t* pSaveDir = gEnv->pCore->GetCommandLineArgForVarW(L"fs_savepath");
       
 
-        PathWT base(workingDir);
+        PathWT base(basePath_);
         PathUtil::replaceSeprators(base);
         PathUtil::ensureSlash(base);
 
@@ -325,6 +324,7 @@ bool xFileSys::initDirectorys(bool working)
 
 bool xFileSys::getWorkingDirectory(PathWT& pathOut) const
 {
+    // TODO: should this be exposed? should we not just expose basepath which may be diffrent than sys working dir.
     return PathUtil::GetCurrentDirectory(pathOut);
 }
 
@@ -567,7 +567,17 @@ bool xFileSys::setSaveDir(const PathWT& osPath)
 
 bool xFileSys::addModDir(const PathWT& osPath)
 {
-    return addDirInteral(osPath) != nullptr;
+    // TODO: should full paths even be allowed for mod_dir?
+    // or should it always just be a folder name.
+    // or is this totally wrong and should just add to baseDir_ humm.
+    if (osPath.isAbsolute()) {
+        return addDirInteral(osPath) != nullptr;
+    }
+
+    auto osFullPath(basePath_);
+    osFullPath /= osPath;
+
+    return addDirInteral(osFullPath) != nullptr;
 }
 
 

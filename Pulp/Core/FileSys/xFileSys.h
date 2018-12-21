@@ -383,6 +383,8 @@ private:
     findDataSet findData_;
 #endif // !X_DEBUG
 
+    PathWT basePath_;
+
     Directory* baseDir_;
     Directory* saveDir_;
     Search* searchPaths_;
