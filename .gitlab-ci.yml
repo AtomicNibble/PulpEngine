@@ -8,7 +8,7 @@ build:win32_debug:
   stage: build
   script:
     - echo building...
-    - echo $CI_COMMIT_SHA
+    - echo %CI_COMMIT_SHA%
     - echo ${CI_COMMIT_SHA}
   artifacts:
    expire_in: 1 week
