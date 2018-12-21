@@ -248,8 +248,7 @@ namespace entity
                 X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
 
                 // destroy the ent.
-                // TODO: cleanup.
-                reg_.destroy(entityId);
+                destroyEnt(entityId);
 
                 entIdMap_[remoteEntityId] = INVALID_ENT_ID;
                 continue;
