@@ -25,7 +25,7 @@ build:win32_debug:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Debug;Platform=win32
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32
     -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -40,7 +40,7 @@ build:win32_release:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Release;Platform=win32
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=win32
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -54,7 +54,7 @@ build:win32_super:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Super;Platform=win32
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=win32
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -69,7 +69,7 @@ build:x64_debug:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Debug;Platform=x64
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -84,7 +84,7 @@ build:x64_release:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Release;Platform=x64
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Release;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -98,7 +98,7 @@ build:x64_super:
   stage: build
   script:
     - echo building...
-    - msbuild solutions/PulpEngine.sln /m:4 /t:build /p:Configuration=Super;Platform=x64
+    - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Super;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -112,7 +112,7 @@ build_edtior:x64_debug:
   stage: build_edtior
   script:
     - echo building...
-    - msbuild solutions/AssetManager.sln /m:4 /t:build /p:Configuration=Debug;Platform=x64
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Debug;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -126,7 +126,7 @@ build_edtior:x64_release:
   stage: build_edtior
   script:
     - echo building...
-    - msbuild solutions/AssetManager.sln /m:4 /t:build /p:Configuration=Release;Platform=x64
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Release;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
@@ -140,7 +140,7 @@ build_edtior:x64_super:
   stage: build_edtior
   script:
     - echo building...
-    - msbuild solutions/AssetManager.sln /m:4 /t:build /p:Configuration=Super;Platform=x64
+    - msbuild solutions/AssetManager.sln /t:build /p:Configuration=Super;Platform=x64
     -  (robocopy ../build build *.xml *.exe *.dll /S /E)  ^& exit /b 0
   artifacts:
    expire_in: 1 week
