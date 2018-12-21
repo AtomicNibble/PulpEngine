@@ -25,6 +25,7 @@ build:win32_debug:
   stage: build
   script:
     - echo building...
+    - echo $CI_COMMIT_SHA
     - msbuild solutions/PulpEngine.sln /t:build /p:Configuration=Debug;Platform=win32;CI_COMMIT_SHA=$CI_COMMIT_SHA
     -  (robocopy ../build build *.xml *.exe *.dll *.pdb /S /E)  ^& exit /b 0
   artifacts:
