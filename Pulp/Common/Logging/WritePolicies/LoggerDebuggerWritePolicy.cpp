@@ -14,7 +14,6 @@ void LoggerDebuggerWritePolicy::Exit(void)
 
 void LoggerDebuggerWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
@@ -22,7 +21,6 @@ void LoggerDebuggerWritePolicy::WriteLog(const LoggerBase::Line& line, uint32_t 
 
 void LoggerDebuggerWritePolicy::WriteWarning(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
@@ -30,7 +28,6 @@ void LoggerDebuggerWritePolicy::WriteWarning(const LoggerBase::Line& line, uint3
 
 void LoggerDebuggerWritePolicy::WriteError(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
@@ -38,7 +35,6 @@ void LoggerDebuggerWritePolicy::WriteError(const LoggerBase::Line& line, uint32_
 
 void LoggerDebuggerWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
@@ -46,7 +42,6 @@ void LoggerDebuggerWritePolicy::WriteFatal(const LoggerBase::Line& line, uint32_
 
 void LoggerDebuggerWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
@@ -54,7 +49,6 @@ void LoggerDebuggerWritePolicy::WriteAssert(const LoggerBase::Line& line, uint32
 
 void LoggerDebuggerWritePolicy::WriteAssertVariable(const LoggerBase::Line& line, uint32_t length)
 {
-    X_UNUSED(length);
     wchar_t wideBuf[sizeof(LoggerBase::Line)];
 
     OutputDebugStringW(strUtil::Convert(line, line + length, wideBuf));
