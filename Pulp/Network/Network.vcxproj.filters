@@ -148,9 +148,6 @@
     <ClCompile Include="Util\BPSTracker.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>
-    <ClCompile Include="Util\RangeList.cpp">
-      <Filter>Source Files\Util</Filter>
-    </ClCompile>
     <ClCompile Include="Util\SystemAddressEx.cpp">
       <Filter>Source Files\Util</Filter>
     </ClCompile>

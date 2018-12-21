@@ -495,7 +495,6 @@
     </ClCompile>
     <ClCompile Include="Module.cpp" />
     <ClCompile Include="Util\BPSTracker.cpp" />
-    <ClCompile Include="Util\RangeList.cpp" />
     <ClCompile Include="Util\SystemAddressEx.cpp" />
     <ClCompile Include="Util\win32\LastErrorWSA.cpp" />
     <ClCompile Include="Util\win32\LibaryStartup.cpp" />
