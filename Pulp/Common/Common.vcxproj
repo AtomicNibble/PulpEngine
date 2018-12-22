@@ -90,6 +90,7 @@
     <ClInclude Include="Containers\FixedByteStream.h" />
     <ClInclude Include="Containers\FixedByteStreamRing.h" />
     <ClInclude Include="Containers\FixedFifo.h" />
+    <ClInclude Include="Containers\FixedHashTable.h" />
     <ClInclude Include="Containers\FixedRingBuffer.h" />
     <ClInclude Include="Containers\FixedStack.h" />
     <ClInclude Include="Containers\Freelist.h" />
@@ -742,6 +743,7 @@
     <None Include="Containers\FixedByteStream.inl" />
     <None Include="Containers\FixedByteStreamRing.inl" />
     <None Include="Containers\FixedFifo.inl" />
+    <None Include="Containers\FixedHashTable.inl" />
     <None Include="Containers\FixedRingBuffer.inl" />
     <None Include="Containers\FixedStack.inl" />
     <None Include="Containers\Freelist.inl" />

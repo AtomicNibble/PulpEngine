@@ -1345,6 +1345,9 @@
     <ClInclude Include="UserCmdMan.h">
       <Filter>Interfaces_h\Network</Filter>
     </ClInclude>
+    <ClInclude Include="Containers\FixedHashTable.h">
+      <Filter>Headers\Containers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1709,6 +1712,9 @@
     </None>
     <None Include="MetaTable.inl">
       <Filter>Interfaces_h\Network</Filter>
+    </None>
+    <None Include="Containers\FixedHashTable.inl">
+      <Filter>Headers\Containers</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
