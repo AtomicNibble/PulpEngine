@@ -245,10 +245,17 @@ namespace entity
 
             if (bs.isEos())
             {
+                // the remotemap should give us a valid ent if we are been told to delete it.
                 X_ASSERT(reg_.isValid(entityId), "Enitity id is not valid")(entityId);
 
-                // destroy the ent.
-                destroyEnt(entityId);
+                if (entityId < net::MAX_PLAYERS)
+                {
+                    removePlayer(entityId);
+                }
+                else
+                {
+                    destroyEnt(entityId);
+                }
 
                 entIdMap_[remoteEntityId] = INVALID_ENT_ID;
                 continue;
