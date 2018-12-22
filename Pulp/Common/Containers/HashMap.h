@@ -47,6 +47,11 @@ struct hash<core::string>
 
         return (size_t)core::Hash::Fnv1aHash(__s.data(), len);
     }
+
+    size_t operator()(const char* const __s) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(__s, strlen(__s));
+    }
 };
 
 template<size_t N>
@@ -100,6 +105,11 @@ struct equal_to<core::string>
     bool operator()(const core::string& _Left, const core::string& _Right) const
     {
         return (_Left == _Right);
+    }
+
+    bool operator()(const core::string& _Left, const char* const _Right) const
+    {
+        return _Left.compare(_Right);
     }
 };
 
