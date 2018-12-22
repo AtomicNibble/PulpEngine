@@ -410,6 +410,7 @@
     <ClInclude Include="Enity\WeaponSystem.h" />
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level\Level.h" />
+    <ClInclude Include="Multiplayer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UserCmds\UserCmdGen.h" />
     <ClInclude Include="Vars\GameVars.h" />
@@ -431,6 +432,7 @@
     <ClCompile Include="Game.cpp" />
     <ClCompile Include="Level\Level.cpp" />
     <ClCompile Include="Module.cpp" />
+    <ClCompile Include="Multiplayer.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>

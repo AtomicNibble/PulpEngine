@@ -10,6 +10,7 @@
 #include "Level\Level.h"
 #include "Vars\GameVars.h"
 #include "Vars\InputVars.h"
+#include "Multiplayer.h"
 
 #include "UserCmds\UserCmdGen.h"
 #include <UserCmdMan.h>
@@ -131,9 +132,11 @@ private:
 
     engine::gui::IMenuHandler* pMenuHandler_;
 
+    core::UniquePointer<Multiplayer> pMultiplayerGame_;
+
     // 
     NetInterpolationInfo netInterpolInfo_;
-    int32_t serverGameTimeMS_;
+    int32_t serverGameTimeMS_;  // only set on clients.
     int32_t gameTimeMS_;
 
     // TODO: maybe move to network module
