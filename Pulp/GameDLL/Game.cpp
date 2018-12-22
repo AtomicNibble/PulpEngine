@@ -410,8 +410,6 @@ bool XGame::update(core::FrameData& frame)
         // but clients get serverGameTimeMS_ set for them.
         gameTimeMS_ += frame.timeInfo.deltas[core::Timer::GAME].GetMilliSecondsAsInt32();
 
-
-        // if we are host we make snapshot.
         if (isHost)
         {
             // run user cmds for all the valid players.
@@ -443,7 +441,7 @@ bool XGame::update(core::FrameData& frame)
             if (pSession_->shouldSendSnapShot(frame.timeInfo)) {
                 net::SnapShot snap(arena_);
 
-                snap.setTime(gameTimeMS_); // TODO: temp?
+                snap.setTime(gameTimeMS_);
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
                 snap.setPlayerGuids(lobbyUserGuids_);
 
