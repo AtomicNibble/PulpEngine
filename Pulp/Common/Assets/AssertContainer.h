@@ -205,6 +205,18 @@ public:
         return nullptr;
     }
 
+    X_INLINE Resource* findAsset(const char* pName) const
+    {
+        X_ASSERT(strUtil::Find(pName, assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")(pName);
+
+        auto it = hash_.find(pName);
+        if (it != hash_.end()) {
+            return it->second;
+        }
+
+        return nullptr;
+    }
+
     X_INLINE Resource* findAsset(int32_t id) const
     {
         return list_[id];
