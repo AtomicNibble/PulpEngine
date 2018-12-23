@@ -352,6 +352,9 @@
     <ClCompile Include="UT_FileSys.cpp">
       <Filter>Source Files\tests</Filter>
     </ClCompile>
+    <ClCompile Include="UT_C_FixedHashTable.cpp">
+      <Filter>Source Files\tests\Containers</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="UnitTester.rc">
