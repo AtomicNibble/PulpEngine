@@ -169,7 +169,7 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::mapped_type& FixedHashT
 template<typename Key, typename Value, class Hash, class KeyEqual>
 typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::mapped_type& FixedHashTableBase<Key, Value, Hash, KeyEqual>::operator[] (key_type&& key)
 {
-    return emplace_impl(std::forward<key_type>(key)).first->second;
+    return emplace_impl(std::move(key)).first->second;
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
