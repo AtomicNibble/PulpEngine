@@ -50,14 +50,6 @@ typedef core::MemoryArena<
     >
     VarPool;
 
-struct equal_to_case_insen
-{
-    bool operator()(const char* const _Left, const char* const _Right) const
-    {
-        return core::strUtil::IsEqualCaseInsen(_Left, _Right);
-    }
-};
-
 struct ConsoleCommand
 {
     ConsoleCommand();
@@ -126,9 +118,9 @@ class XConsole : public IConsole
     };
 
     // members.
-    typedef core::FixedHashTable<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap; // key points into string stored in ICVar or in .exe/.dll
-    typedef core::FixedHashTable<string, ConsoleCommand, core::hash<string>, equal_to_case_insen> ConsoleCmdMap;
-    typedef core::FixedHashTable<string, string, core::hash<string>, equal_to_case_insen> ConfigCmdsMap;
+    typedef core::FixedHashTable<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen<const char*>> ConsoleVarMap; // key points into string stored in ICVar or in .exe/.dll
+    typedef core::FixedHashTable<string, ConsoleCommand, core::hash<string>, equal_to_case_insen<core::string>> ConsoleCmdMap;
+    typedef core::FixedHashTable<string, string, core::hash<string>, equal_to_case_insen<core::string>> ConfigCmdsMap;
     typedef core::FixedHashTable<string, string> ConsoleBindMap;
 
     typedef core::Fifo<ExecCommand> ExecCmdList;

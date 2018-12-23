@@ -125,6 +125,7 @@ struct equal_to<core::string>
     }
 };
 
+
 template<size_t N>
 struct equal_to<core::StackString<N>>
 {
@@ -178,6 +179,59 @@ struct equal_to<const char* const>
     bool operator()(const char* const _Left, const core::string& _Right) const
     {
         return core::strUtil::IsEqual(_Right.begin(), _Right.end(), _Left);
+    }
+};
+
+
+template<class _Type = void>
+struct equal_to_case_insen
+{
+};
+
+template<>
+struct equal_to_case_insen<core::string>
+{
+    bool operator()(const core::string& _Left, const core::string& _Right) const
+    {
+        return _Left.compareCaseInsen(_Right);
+    }
+
+    bool operator()(const core::string& _Left, const core::Path<char>& _Right) const
+    {
+        return core::strUtil::IsEqualCaseInsen(_Left.begin(), _Left.end(), _Right.begin(), _Right.end());
+    }
+
+    bool operator()(const core::string& _Left, const char* const _Right) const
+    {
+        return _Left.compareCaseInsen(_Right);
+    }
+};
+
+template<>
+struct equal_to_case_insen<const char*>
+{
+    bool operator()(const char* const _Left, const char* const _Right) const
+    {
+        return core::strUtil::IsEqualCaseInsen(_Left, _Right);
+    }
+
+    bool operator()(const char* const _Left, const core::string& _Right) const
+    {
+        return core::strUtil::IsEqualCaseInsen(_Right.begin(), _Right.end(), _Left);
+    }
+};
+
+template<>
+struct equal_to_case_insen<const char* const>
+{
+    bool operator()(const char* const _Left, const char* const _Right) const
+    {
+        return core::strUtil::IsEqualCaseInsen(_Left, _Right);
+    }
+
+    bool operator()(const char* const _Left, const core::string& _Right) const
+    {
+        return core::strUtil::IsEqualCaseInsen(_Right.begin(), _Right.end(), _Left);
     }
 };
 
