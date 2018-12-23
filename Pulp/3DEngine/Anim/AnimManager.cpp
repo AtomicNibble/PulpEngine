@@ -52,10 +52,9 @@ bool AnimManager::asyncInitFinalize(void)
 
 Anim* AnimManager::findAnim(const char* pAnimName) const
 {
-    core::string name(pAnimName);
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
-    AnimResource* pAnim = anims_.findAsset(name);
+    AnimResource* pAnim = anims_.findAsset(pAnimName);
     if (pAnim) {
         return pAnim;
     }
@@ -69,10 +68,9 @@ Anim* AnimManager::loadAnim(const char* pAnimName)
     X_ASSERT_NOT_NULL(pAnimName);
     X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
 
-    core::string name(pAnimName);
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
-    AnimResource* pAnimRes = anims_.findAsset(name);
+    AnimResource* pAnimRes = anims_.findAsset(pAnimName);
     if (pAnimRes) {
         // inc ref count.
         pAnimRes->addReference();
@@ -80,6 +78,7 @@ Anim* AnimManager::loadAnim(const char* pAnimName)
     }
 
     // we create a anim and give it back
+    core::string name(pAnimName);
     pAnimRes = anims_.createAsset(name, name, arena_);
 
     // add to list of anims that need loading.

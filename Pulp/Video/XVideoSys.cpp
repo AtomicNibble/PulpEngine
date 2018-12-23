@@ -100,10 +100,9 @@ void XVideoSys::unlockBuffers(void)
 
 IVideo* XVideoSys::findVideo(const char* pVideoName) const
 {
-    core::string name(pVideoName);
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
-    auto* pVideo = videos_.findAsset(name);
+    auto* pVideo = videos_.findAsset(pVideoName);
     if (pVideo) {
         return pVideo;
     }
@@ -117,15 +116,15 @@ IVideo* XVideoSys::loadVideo(const char* pVideoName)
     X_ASSERT_NOT_NULL(pVideoName);
     X_ASSERT(core::strUtil::FileExtension(pVideoName) == nullptr, "Extension not allowed")(pVideoName);
 
-    core::string name(pVideoName);
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
-    VideoResource* pVideoRes = videos_.findAsset(name);
+    VideoResource* pVideoRes = videos_.findAsset(pVideoName);
     if (pVideoRes) {
         pVideoRes->addReference();
         return pVideoRes;
     }
 
+    core::string name(pVideoName);
     pVideoRes = videos_.createAsset(name, name, vars_, blockArena_);
 
     queueLoadRequest(pVideoRes);

@@ -90,10 +90,9 @@ namespace fx
 
     Effect* EffectManager::findEffect(const char* pAnimName) const
     {
-        core::string name(pAnimName);
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(name);
+        EffectResource* pEffectRes = effects_.findAsset(pAnimName);
         if (pEffectRes) {
             return pEffectRes;
         }
@@ -107,10 +106,9 @@ namespace fx
         X_ASSERT_NOT_NULL(pAnimName);
         X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
 
-        core::string name(pAnimName);
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(name);
+        EffectResource* pEffectRes = effects_.findAsset(pAnimName);
         if (pEffectRes) {
             // inc ref count.
             pEffectRes->addReference();
@@ -118,6 +116,7 @@ namespace fx
         }
 
         // we create a anim and give it back
+        core::string name(pAnimName);
         pEffectRes = effects_.createAsset(name, name, arena_);
 
         // add to list of anims that need loading.

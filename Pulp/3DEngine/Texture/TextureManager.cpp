@@ -146,11 +146,9 @@ void TextureManager::scheduleStreaming(void)
 
 Texture* TextureManager::findTexture(const char* pName) const
 {
-    core::string name(pName);
-
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
-    auto* pTex = textures_.findAsset(name);
+    auto* pTex = textures_.findAsset(pName);
     if (pTex) {
         return pTex;
     }
@@ -161,18 +159,19 @@ Texture* TextureManager::findTexture(const char* pName) const
 
 Texture* TextureManager::loadTexture(const char* pName, texture::TextureFlags flags)
 {
-    core::string name(pName);
 
     auto& threadPolicy = textures_.getThreadPolicy();
     threadPolicy.Enter();
 
-    TexRes* pTexRes = textures_.findAsset(name);
+    TexRes* pTexRes = textures_.findAsset(pName);
 
     if (pTexRes) {
         threadPolicy.Leave();
         pTexRes->addReference();
     }
     else {
+        core::string name(pName);
+
         auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, name.c_str());
         if (!pDevicTex) {
             return nullptr;

@@ -108,16 +108,16 @@ IFont* XFontSystem::loadFont(const char* pFontName)
     X_ASSERT_NOT_NULL(pFontName);
     X_ASSERT(core::strUtil::FileExtension(pFontName) == nullptr, "Extension not allowed")(pFontName);
 
-    core::string name(pFontName);
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
-    auto* pFontRes = fonts_.findAsset(name);
+    auto* pFontRes = fonts_.findAsset(pFontName);
     if (pFontRes) {
         // inc ref count.
         pFontRes->addReference();
         return pFontRes;
     }
 
+    core::string name(pFontName);
     pFontRes = fonts_.createAsset(name, *this, name);
 
     addLoadRequest(pFontRes);
@@ -127,10 +127,9 @@ IFont* XFontSystem::loadFont(const char* pFontName)
 
 IFont* XFontSystem::findFont(const char* pFontName) const
 {
-    core::string name(pFontName);
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
-    auto* pFontRes = fonts_.findAsset(name);
+    auto* pFontRes = fonts_.findAsset(pFontName);
     if (pFontRes) {
         return pFontRes;
     }

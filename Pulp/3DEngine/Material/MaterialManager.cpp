@@ -120,11 +120,9 @@ bool XMaterialManager::asyncInitFinalize(void)
 
 Material* XMaterialManager::findMaterial(const char* pMtlName) const
 {
-    core::string name(pMtlName);
-
     core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-    Material* pMtl = materials_.findAsset(name);
+    Material* pMtl = materials_.findAsset(pMtlName);
     if (pMtl) {
         return pMtl;
     }
@@ -138,19 +136,19 @@ Material* XMaterialManager::loadMaterial(const char* pMtlName)
     X_ASSERT_NOT_NULL(pMtlName);
     X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
 
-    core::string name(pMtlName);
 
     MaterialResource* pMatRes = nullptr;
     {
         core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-        pMatRes = materials_.findAsset(name);
+        pMatRes = materials_.findAsset(pMtlName);
         if (pMatRes) {
             // inc ref count.
             pMatRes->addReference();
             return pMatRes;
         }
 
+        core::string name(pMtlName);
         pMatRes = materials_.createAsset(name, name, arena_);
     }
 

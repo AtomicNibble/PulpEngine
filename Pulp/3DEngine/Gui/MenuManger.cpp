@@ -89,10 +89,9 @@ namespace gui
     {
         X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
 
-        core::string name(pName);
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
 
-        auto* pMenu = menus_.findAsset(name);
+        auto* pMenu = menus_.findAsset(pName);
         if (pMenu) {
             // inc ref count.
             pMenu->addReference();
@@ -100,6 +99,7 @@ namespace gui
         }
 
         // we create a model and give it back
+        core::string name(pName);
         pMenu = menus_.createAsset(name, name);
 
         addLoadRequest(pMenu);
@@ -109,10 +109,9 @@ namespace gui
 
     IMenu* XMenuManager::findMenu(const char* pName)
     {
-        core::string name(pName);
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
 
-        auto* pMenu = menus_.findAsset(name);
+        auto* pMenu = menus_.findAsset(pName);
         if (pMenu) {
             return pMenu;
         }

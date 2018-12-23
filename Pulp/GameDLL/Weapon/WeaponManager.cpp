@@ -84,11 +84,9 @@ namespace weapon
 
     WeaponDef* WeaponDefManager::findWeaponDef(const char* pName) const
     {
-        core::string name(pName);
-
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
-        WeaponDef* pDef = weaponDefs_.findAsset(name);
+        WeaponDef* pDef = weaponDefs_.findAsset(pName);
         if (pDef) {
             return pDef;
         }
@@ -101,19 +99,19 @@ namespace weapon
     {
         X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
 
-        core::string name(pName);
         WeaponDefResource* pWeaponDefRes = nullptr;
 
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
         {
-            pWeaponDefRes = weaponDefs_.findAsset(name);
+            pWeaponDefRes = weaponDefs_.findAsset(pName);
             if (pWeaponDefRes) {
                 // inc ref count.
                 pWeaponDefRes->addReference();
                 return pWeaponDefRes;
             }
 
+            core::string name(pName);
             pWeaponDefRes = weaponDefs_.createAsset(name, name);
         }
 

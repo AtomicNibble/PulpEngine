@@ -81,10 +81,9 @@ bool XModelManager::asyncInitFinalize(void)
 
 XModel* XModelManager::findModel(const char* pModelName) const
 {
-    core::string name(pModelName);
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-    ModelResource* pModel = models_.findAsset(name);
+    ModelResource* pModel = models_.findAsset(pModelName);
     if (pModel) {
         return pModel;
     }
@@ -98,10 +97,9 @@ XModel* XModelManager::loadModel(const char* pModelName)
     X_ASSERT_NOT_NULL(pModelName);
     X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
 
-    core::string name(pModelName);
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-    ModelResource* pModelRes = models_.findAsset(name);
+    ModelResource* pModelRes = models_.findAsset(pModelName);
     if (pModelRes) {
         // inc ref count.
         pModelRes->addReference();
@@ -109,6 +107,7 @@ XModel* XModelManager::loadModel(const char* pModelName)
     }
 
     // we create a model and give it back
+    core::string name(pModelName);
     pModelRes = models_.createAsset(name, name);
 
     // add to list of models that need loading.
