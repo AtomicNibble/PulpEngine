@@ -24,9 +24,23 @@ inline FixedHashTableStackPolicy<N, Key, Value, Hash, KeyEqual>::FixedHashTableS
 {
 }
 
+// ---------------------------------------------------------------------
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(FixedHashTableBase&& oth) :
+    pData_(oth.pData_),
+    num_(oth.num_),
+    mask_(oth.mask_),
+    size_(oth.size_)
+{
+    oth.pData_ = nullptr;
+    oth.size_ = 0;
+}
+
+
 template<typename Key, typename Value, class Hash, class KeyEqual>
 FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(value_type* pData, size_type maxItems) :
-    pData_(pData),
+    pData_(X_ASSERT_NOT_NULL(pData)),
     num_(maxItems),
     mask_(maxItems - 1),
     size_(0)
@@ -45,9 +59,26 @@ FixedHashTableBase<Key, Value, Hash, KeyEqual>::~FixedHashTableBase()
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
+FixedHashTableBase<Key, Value, Hash, KeyEqual>& FixedHashTableBase<Key, Value, Hash, KeyEqual>::operator=(FixedHashTableBase&& oth)
+{
+    pData_ = oth.pData_;
+    num_ = oth.num_;
+    mask_ = oth.mask_;
+    size_ = oth.size_;
+
+    oth.pData_ = nullptr;
+    oth.size_ = 0;
+    return *this;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
 void FixedHashTableBase<Key, Value, Hash, KeyEqual>::clear(void)
 {
-    // MEOW !
+    // only times this should be null is if we where moved.
+    if (!pData_) {
+        return;
+    }
+
     size_type idx = 0;
 
     while (size_ > 0)
@@ -199,6 +230,94 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHas
 { 
     return const_iterator(this, num_); 
 }
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K, typename... Args>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::return_pair FixedHashTableBase<Key, Value, Hash, KeyEqual>::emplace_impl(const K& key, Args&&... args)
+{
+    for (size_type idx = key2idx(key); ; idx = probeNext(idx))
+    {
+        if (isIndexEmpty(idx))
+        {
+            Mem::Construct<value_type>(&pData_[idx], key, std::forward<Args>(args)...);
+            size_++;
+            return { iterator(this, idx), true };
+        }
+        else if (key_equal()(pData_[idx].first, key)) {
+            return { iterator(this, idx), false };
+        }
+    }
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::find_impl(const K& key)
+{
+    for (size_type idx = key2idx(key); ; idx = probeNext(idx))
+    {
+        if (isIndexEmpty(idx)) {
+            return end();
+        }
+        if (key_equal()(pData_[idx].first, key)) {
+            return iterator(this, idx);
+        }
+    }
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+void FixedHashTableBase<Key, Value, Hash, KeyEqual>::erase_impl(iterator it)
+{
+    size_type bucket = it.idx_;
+    for (size_type idx = probeNext(bucket);; idx = probeNext(idx))
+    {
+        if (isIndexEmpty(idx)) {
+            destroyIndex(bucket);
+            size_--;
+            return;
+        }
+
+        size_type ideal = key2idx(pData_[idx].first);
+
+        if (diff(bucket, ideal) < diff(idx, ideal)) {
+            // swap, bucket is closer to ideal than idx
+            pData_[bucket] = pData_[idx];
+            bucket = idx;
+        }
+    }
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTableBase<Key, Value, Hash, KeyEqual>::key2idx(const K& key) const
+{
+    return hasher()(key) & mask_;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTableBase<Key, Value, Hash, KeyEqual>::probeNext(size_type idx) const
+{
+    return (idx + 1) & mask_;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTableBase<Key, Value, Hash, KeyEqual>::diff(size_type a, size_type b) const
+{
+    return (num_ + (a - b)) & mask_;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::isIndexEmpty(size_type idx) const 
+{
+    return std::memcmp(&pData_[idx], &emptyEntry_, sizeof(emptyEntry_)) == 0;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+void FixedHashTableBase<Key, Value, Hash, KeyEqual>::destroyIndex(size_type idx) 
+{
+    Mem::Destruct<value_type>(&pData_[idx]);
+    std::memset(&pData_[idx], -1, sizeof(value_type));
+}
+
 
 
 X_NAMESPACE_END

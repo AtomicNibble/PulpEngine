@@ -97,8 +97,13 @@ public:
     typedef std::pair<iterator, bool> return_pair;
 
 public:
+    FixedHashTableBase(const FixedHashTableBase& oth) = delete;
+    FixedHashTableBase(FixedHashTableBase&& oth);
     FixedHashTableBase(value_type* pData, size_type maxItems);
     ~FixedHashTableBase();
+
+    FixedHashTableBase& operator=(FixedHashTableBase&& oth);
+    FixedHashTableBase& operator=(const FixedHashTableBase& oth) = delete;
 
     void clear(void);
 
@@ -127,8 +132,6 @@ public:
     size_type size(void) const;
     size_type capacity(void) const;
 
- //   float loadFactor(void) const;
-
     iterator begin();
     const_iterator begin() const;
     iterator end();
@@ -138,84 +141,19 @@ public:
     const_iterator cend() const;
 
 private:
-
     template <typename K, typename... Args>
-    return_pair emplace_impl(const K& key, Args&&... args) 
-    {
-        for (size_type idx = key2idx(key); ; idx = probeNext(idx))
-        {
-            if(isIndexEmpty(idx))
-            {
-                Mem::Construct<value_type>(&pData_[idx], key, std::forward<Args>(args)...);
-                size_++;
-                return { iterator(this, idx), true };
-            }
-            else if (key_equal()(pData_[idx].first, key)) {
-                return { iterator(this, idx), false };
-            }
-        }
-    }
-
+    return_pair emplace_impl(const K& key, Args&&... args);
     template <typename K> 
-    iterator find_impl(const K& key) 
-    {
-        for (size_type idx = key2idx(key); ; idx = probeNext(idx))
-        {
-            if (isIndexEmpty(idx)) {
-                return end();
-            }
-            if (key_equal()(pData_[idx].first, key)) {
-                return iterator(this, idx);
-            }
-        }
-    }
-
-
-    void erase_impl(iterator it) 
-    {
-        size_type bucket = it.idx_;
-        for (size_type idx = probeNext(bucket);; idx = probeNext(idx))
-        {
-            if (isIndexEmpty(idx)) {
-                destroyIndex(bucket);
-                size_--;
-                return;
-            }
-
-            size_type ideal = key2idx(pData_[idx].first);
-
-            if (diff(bucket, ideal) < diff(idx, ideal)) {
-                // swap, bucket is closer to ideal than idx
-                pData_[bucket] = pData_[idx];
-                bucket = idx;
-            }
-        }
-    }
+    iterator find_impl(const K& key);
+    void erase_impl(iterator it);
 
     template <typename K>
-    size_type key2idx(const K& key) const
-    {
-        return hasher()(key) & mask_;
-    }
+    size_type key2idx(const K& key) const;
+    size_type probeNext(size_type idx) const;
+    size_type diff(size_type a, size_type b) const;
 
-    size_type probeNext(size_type idx) const {
-        return (idx + 1) & mask_;
-    }
-
-    size_type diff(size_type a, size_type b) const {
-        return (num_ + (a - b)) & mask_;
-    }
-
-    bool isIndexEmpty(size_type idx) const {
-        return std::memcmp(&pData_[idx], &emptyEntry_, sizeof(emptyEntry_)) == 0;
-    }
-
-    void destroyIndex(size_type idx) {
-        Mem::Destruct<value_type>(&pData_[idx]);
-        std::memset(&pData_[idx], -1, sizeof(value_type));
-
-    }
-
+    bool isIndexEmpty(size_type idx) const;
+    void destroyIndex(size_type idx);
 
 protected:
     uint8_t X_ALIGNED_SYMBOL(emptyEntry_[sizeof(value_type)], X_ALIGN_OF(value_type));
