@@ -456,7 +456,7 @@ void LvlArea::addWindingForSide(const XPlaneSet& planes, const LvlBrushSide& sid
 
 AreaSubMesh* LvlArea::meshForSide(const LvlBrushSide& side, StringTableUnique& stringTable)
 {
-    auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
+    auto it = areaMeshes.find(core::string(side.matInfo.name.begin(), side.matInfo.name.end()));
     if (it != areaMeshes.end()) {
         return &it->second;
     }
@@ -494,7 +494,7 @@ AreaSubMesh* LvlArea::meshForMat(const core::string& matName, StringTableUnique&
 
 AreaSubMesh* LvlArea::meshForSide(const LvlBrushSide& side)
 {
-    auto it = areaMeshes.find(X_CONST_STRING(side.matInfo.name.c_str()));
+    auto it = areaMeshes.find(core::string(side.matInfo.name.begin(), side.matInfo.name.end()));
     if (it != areaMeshes.end()) {
         return &it->second;
     }

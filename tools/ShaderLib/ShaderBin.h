@@ -6,7 +6,7 @@
 #include <ICompression.h>
 
 #include <Time\CompressedStamps.h>
-#include <Containers\HashMap.h>
+#include <Containers\FixedHashTable.h>
 
 X_NAMESPACE_BEGIN(render)
 
@@ -17,7 +17,7 @@ namespace shader
 
     class ShaderBin
     {
-        typedef core::HashMap<core::string, uint32_t> HashCacheMap;
+        typedef core::FixedHashTable<core::string, uint32_t> HashCacheMap;
 
     public:
         SHADERLIB_EXPORT ShaderBin(core::MemoryArenaBase* arena);
@@ -34,8 +34,8 @@ namespace shader
     private:
         // returns true if we know the file has a diffrent crc32.
         // saves opening it.
-        bool cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const;
-        void updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32);
+        bool cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32) const;
+        void updateCacheCrc(const core::Path<char>& path, uint32_t sourceCrc32);
 
     private:
         void getShaderCompileDest(const XHWShader* pShader, core::Path<char>& destOut, bool createDir);

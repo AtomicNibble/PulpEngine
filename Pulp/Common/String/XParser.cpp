@@ -1273,10 +1273,7 @@ MacroDefine* XParser::FindDefine(XLexToken& token) const
         return nullptr;
     }
 
-    // create a null term string.
-    core::StackString512 temp(token.begin(), token.end());
-
-    auto it = macros_.find(X_CONST_STRING(temp.c_str()));
+    auto it = macros_.find(core::string(token.begin(), token.end()));
     if (it != macros_.end()) {
         return it->second;
     }

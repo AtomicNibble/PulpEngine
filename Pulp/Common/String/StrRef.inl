@@ -87,14 +87,6 @@ StringRef<CharT>::StringRef(const_iterator first, const_iterator last)
     }
 }
 
-template<typename CharT>
-StringRef<CharT>::StringRef(const ConstCharWrapper& str)
-{
-    SetEmpty();
-    X_ASSERT_NOT_NULL(str.getCharPtr());
-    str_ = const_cast<pointer>(str.getCharPtr());
-}
-
 // removes a refrence from the string, delete if == 0
 template<typename CharT>
 StringRef<CharT>::~StringRef()

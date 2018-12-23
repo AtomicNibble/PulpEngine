@@ -74,7 +74,7 @@ namespace shader
 
     ShaderBin::ShaderBin(core::MemoryArenaBase* arena) :
         scratchArena_(arena),
-        cache_(arena, 32),
+        cache_(arena, core::bitUtil::NextPowerOfTwo(MAX_HW_SHADERS)),
         compLvl_(core::Compression::CompressLevel::NORMAL)
     {
     }
@@ -330,11 +330,11 @@ namespace shader
         return gEnv->pFileSys->deleteDirectoryContents(binFolder, core::VirtualDirectory::BASE);
     }
 
-    bool ShaderBin::cacheNotValid(core::Path<char>& path, uint32_t sourceCrc32) const
+    bool ShaderBin::cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32) const
     {
         core::CriticalSection::ScopedLock lock(cs_);
 
-        auto it = cache_.find(X_CONST_STRING(path.c_str()));
+        auto it = cache_.find(path);
         if (it != cache_.end()) {
             if (it->second != sourceCrc32) {
                 // we have a cache file, but it was compiled with source that had diffrent crc.
@@ -344,7 +344,7 @@ namespace shader
         return false;
     }
 
-    void ShaderBin::updateCacheCrc(core::Path<char>& path, uint32_t sourceCrc32)
+    void ShaderBin::updateCacheCrc(const core::Path<char>& path, uint32_t sourceCrc32)
     {
         core::CriticalSection::ScopedLock lock(cs_);
 

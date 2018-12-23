@@ -488,7 +488,7 @@ bool Compiler::createLightList(LvlEntsArr& ents)
         l.type = level::LightType::Point;
 
         {
-            auto it = ent.epairs.find(X_CONST_STRING("_color"));
+            auto it = ent.epairs.find(core::string("_color"));
             if (it == ent.epairs.end()) {
                 X_WARNING("Entity", "light missing '_color' kvp at: (^8%g,%g,%g^7)",
                     ent.origin[0], ent.origin[1], ent.origin[2]);
@@ -552,7 +552,7 @@ bool Compiler::createStaticModelList(LvlEntity& worldEnt, LvlEntsArr& ents)
         sm.boundingBox.move(sm.pos);
 
         {
-            auto it = ent.epairs.find(X_CONST_STRING("model"));
+            auto it = ent.epairs.find(core::string("model"));
             if (it == ent.epairs.end()) {
                 X_WARNING("Entity", "misc_model missing 'model' kvp at: (^8%g,%g,%g^7)",
                     ent.origin[0], ent.origin[1], ent.origin[2]);

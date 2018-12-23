@@ -11,8 +11,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-class ConstCharWrapper; // used to create a string object without allocation.
-
 template<typename CharT>
 class StringRef
 {
@@ -55,11 +53,6 @@ public:
     ~StringRef();
 
     static const size_type npos = std::numeric_limits<size_type>::max();
-
-protected:
-    // used by the charwrapper for allocation free construction.
-    StringRef(const ConstCharWrapper& str);
-    friend class ConstCharWrapper;
 
 public:
     // c_str & operator.
@@ -255,51 +248,11 @@ protected:
     value_type* str_; // pointer to the string data.
 };
 
-// used to create a string object without allocation.
-class ConstCharWrapper
-{
-public:
-    X_DISABLE_WARNING(4355)
-    ConstCharWrapper(const char* const pString) :
-        pChar_(pString),
-        str_(*this)
-    {
-    }
-    X_ENABLE_WARNING(4355)
-
-    ~ConstCharWrapper()
-    {
-        str_.str_ = StringRef<char>::emptyHeader()->getChars();
-    }
-
-    //cast operator to const string reference
-    operator const StringRef<char>&() const
-    {
-        return str_;
-    }
-
-private:
-    friend class StringRef<char>;
-    // must be the first member as construction is done in order
-    // of the fields, and we need this to be init before str_
-    const char* const pChar_;
-    StringRef<char> str_;
-
-    const char* getCharPtr(void) const
-    {
-        return pChar_;
-    }
-
-    X_NO_ASSIGN(ConstCharWrapper);
-    //	X_NO_COPY(ConstCharWrapper);
-};
 
 typedef StringRef<char> string;
 
 #include "StrRef.inl"
 
 X_NAMESPACE_END
-
-#define X_CONST_STRING(a) ((const core::string&)core::ConstCharWrapper(a))
 
 #endif // _X_REFSTRING_H_

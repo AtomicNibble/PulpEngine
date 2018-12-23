@@ -86,7 +86,7 @@ namespace mapFile
             }
         }
 
-        auto it = mapEnt->epairs.find(X_CONST_STRING("origin"));
+        auto it = mapEnt->epairs.find(core::string("origin"));
         if (it != mapEnt->epairs.end()) {
             // set the origin.
             const core::string& value = it->second;
@@ -96,7 +96,7 @@ namespace mapFile
         }
 
         // check for angles.
-        it = mapEnt->epairs.find(X_CONST_STRING("angles"));
+        it = mapEnt->epairs.find(core::string("angles"));
         if (it != mapEnt->epairs.end()) {
             const core::string& value = it->second;
             if (sscanf_s(value.c_str(), "%f %f %f", &ent.angle.x, &ent.angle.y, &ent.angle.z) != 3) {
@@ -105,7 +105,7 @@ namespace mapFile
         }
 
         // get classname.
-        it = mapEnt->epairs.find(X_CONST_STRING("classname"));
+        it = mapEnt->epairs.find(core::string("classname"));
         if (it != mapEnt->epairs.end()) {
             const core::string& classname = it->second;
 
@@ -140,7 +140,7 @@ namespace mapFile
         }
 
         if (ent.classType == game::ClassType::MISC_MODEL) {
-            it = mapEnt->epairs.find(X_CONST_STRING("model"));
+            it = mapEnt->epairs.find(core::string("model"));
             if (it == mapEnt->epairs.end()) {
                 X_ERROR("Lvl", "Ent with classname \"misc_model\" is missing \"model\" kvp at (%g,%g,%g)",
                     ent.origin.x, ent.origin.y, ent.origin.z);
