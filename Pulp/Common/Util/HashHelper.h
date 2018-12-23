@@ -30,16 +30,7 @@ struct hash<core::string>
 {
     size_t operator()(const core::string& __s) const
     {
-        // we can't use the length as it might be a stack string.
-        // this is not as bad as it seams.
-        // since most hash finds we be from const char*
-        // and if we did not do this, we would have to do a string len AND
-        // memory allocation + copy the string.
-        // so it's a win really.
-        // for the cost of a few redundant strlen's
-        size_t len = core::strUtil::strlen(__s);
-
-        return (size_t)core::Hash::Fnv1aHash(__s.data(), len);
+        return (size_t)core::Hash::Fnv1aHash(__s.data(), __s.length());
     }
 
     size_t operator()(const core::Path<char>& __s) const
