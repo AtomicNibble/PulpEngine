@@ -25,8 +25,8 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 // -------------------------------------------------------
 
 EngineApp::EngineApp() :
-    pICore_(nullptr),
-    hSystemHandle_(NULL)
+    hSystemHandle_(core::Module::NULL_HANDLE),
+    pICore_(nullptr)
 {
 }
 

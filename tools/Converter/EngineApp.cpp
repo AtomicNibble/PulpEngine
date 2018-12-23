@@ -8,7 +8,7 @@
 #include <Platform\MessageBox.h>
 
 EngineApp::EngineApp() :
-    hSystemHandle_(NULL),
+    hSystemHandle_(core::Module::NULL_HANDLE),
     pICore_(nullptr)
 {
 }

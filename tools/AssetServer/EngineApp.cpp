@@ -10,7 +10,7 @@
 
 EngineApp::EngineApp() :
     run_(true),
-    hSystemHandle_(NULL),
+    hSystemHandle_(core::Module::NULL_HANDLE),
     pICore_(nullptr)
 {
 }
