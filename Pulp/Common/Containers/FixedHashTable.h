@@ -5,10 +5,6 @@
 #include <Memory/NewAndDelete.h>
 
 #include <iterator>
-#include <cstddef>
-#include <cstdint>
-#include <cstring>
-#include <functional>
 
 X_NAMESPACE_BEGIN(core)
 
