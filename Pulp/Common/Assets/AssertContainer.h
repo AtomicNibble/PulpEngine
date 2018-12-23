@@ -6,6 +6,7 @@
 #include <Threading\AtomicInt.h>
 #include <Threading\ScopedLock.h>
 #include <Containers\HashMap.h>
+#include <Containers\FixedHashTable.h>
 #include <Containers\Array.h>
 #include <Containers\Fifo.h>
 
@@ -143,7 +144,7 @@ class AssetContainer : private AssetPoolRefCounted<AssetType, MaxAssets, core::S
 
 public:
     typedef typename Pool::AssetResource Resource;
-    typedef core::HashMap<core::string, Resource*> ResourceMap;
+    typedef core::FixedHashTable<core::string, Resource*> ResourceMap;
     typedef core::Array<Resource*> ResourceList;
     typedef core::Fifo<int32_t> IndexList;
 
@@ -151,9 +152,22 @@ public:
     typedef typename ResourceMap::const_iterator ResourceConstItor;
     typedef ThreadPolicy ThreadPolicy;
 
+private:
+
+    constexpr static float MAX_LOAD_FACTOR = 0.5f; // hash tables will be about double size max fill.
+
+    constexpr static size_t caclHashTableSize(size_t num)
+    {
+        size_t extra = static_cast<size_t>(static_cast<float>(num) * (1.f - MAX_LOAD_FACTOR));
+
+        num = num + extra;
+        num = core::bitUtil::NextPowerOfTwo(num);
+        return num;
+    }
+
 public:
     AssetContainer(core::MemoryArenaBase* arena, size_t allocSize, size_t allocAlign, const char* pArenaName) :
-        hash_(arena, MaxAssets),
+        hash_(arena, caclHashTableSize(MaxAssets)),
         list_(arena),
         freeList_(arena),
         Pool(arena, allocSize, allocAlign, pArenaName)
@@ -203,7 +217,7 @@ public:
 
         Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
-        hash_.insert(typename ResourceMap::value_type(name, pRes));
+        hash_.emplace(name, pRes);
 
         int32_t id;
 
