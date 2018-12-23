@@ -15,7 +15,9 @@ inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwn
 template<typename Key, typename Value, class Hash, class KeyEqual>
 inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::~FixedHashTableOwningPolicy()
 {
-    X_DELETE_ARRAY(pData_, arena_);
+    clear();
+    X_DELETE_ARRAY(reinterpret_cast<uint8_t*>(pData_), arena_);
+    pData_ = nullptr;
 }
 
 template<size_t N, typename Key, typename Value, class Hash, class KeyEqual>
