@@ -1,8 +1,11 @@
 #include "stdafx.h"
+#include "ComplexTypes.h"
 
 #include <Containers\FixedHashTable.h>
 
 X_USING_NAMESPACE;
+
+using namespace testTypes;
 
 
 namespace
@@ -49,6 +52,39 @@ class FixedHashTable : public ::testing::Test
 {
 public:
 };
+
+TEST(FixedHashTable, ComplexKey)
+{
+    resetConConters();
+
+    using HashTable = core::FixedHashTableStack<16, CustomType, int>;
+
+    {
+        HashTable ht;
+
+        ht.insert({ CustomType(16), 1 });
+        ht.emplace(16, 1);
+    }
+
+    EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
+}
+
+TEST(FixedHashTable, ComplexKeyValue)
+{
+    resetConConters();
+
+    using HashTable = core::FixedHashTableStack<16, CustomType, CustomType>;
+
+    {
+        HashTable ht;
+
+        ht.insert({ CustomType(16), CustomType(20) });
+        ht.emplace(32, 64);
+    }
+
+    EXPECT_EQ(CONSRUCTION_COUNT, DECONSRUCTION_COUNT);
+}
+
 
 TYPED_TEST(FixedHashTable, MoveConstruct)
 {
