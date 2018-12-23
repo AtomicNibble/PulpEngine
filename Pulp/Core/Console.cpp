@@ -327,7 +327,7 @@ XConsole::Cursor::Cursor() :
 XConsole::XConsole() :
     varHeap_(
         bitUtil::RoundUpToMultiple<size_t>(
-            VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * VAR_MAX,
+            VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE) * MAX_CONSOLE_VAR,
             VirtualMem::GetPageSize())),
     varAllocator_(varHeap_.start(), varHeap_.end(),
         VarPool::getMemoryRequirement(VAR_ALLOCATION_SIZE),
@@ -336,11 +336,11 @@ XConsole::XConsole() :
     varArena_(&varAllocator_, "VarArena"),
     cmdHistory_(g_coreArena),
     consoleLog_(g_coreArena),
-    varMap_(g_coreArena),
-    cmdMap_(g_coreArena),
-    binds_(g_coreArena),
-    configCmds_(g_coreArena),
-    varArchive_(g_coreArena),
+    varMap_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_VAR * 2)),
+    cmdMap_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_CMD * 2)),
+    binds_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_BINS * 2)),
+    configCmds_(g_coreArena, 256),
+    varArchive_(g_coreArena, 256),
     cmds_(g_coreArena),
     coreEventListernRegd_(false),
     historyLoadPending_(false),
@@ -364,13 +364,6 @@ XConsole::XConsole() :
     autoCompleteNum_ = 0;
     autoCompleteIdx_ = -1;
     autoCompleteSelect_ = false;
-
-    // reserve a pickle. (vars are registered before 'Startup' might change that)
-    varMap_.reserve(4096);
-    cmdMap_.reserve(1024);
-    binds_.reserve(128);
-    configCmds_.reserve(64);
-    varArchive_.reserve(64);
 
     repeatEventTimer_ = TimeVal(0ll);
     repeatEventInterval_ = TimeVal(0.025f);
@@ -528,7 +521,7 @@ void XConsole::shutDown(void)
     }
 
     // clear up vars.
-    if (!varMap_.empty()) {
+    if (varMap_.isNotEmpty()) {
 
         // we use the value of the last item to move iterator
         for (auto it = varMap_.begin(); it != varMap_.end();) 
@@ -554,7 +547,7 @@ void XConsole::freeRenderResources(void)
 
 void XConsole::saveChangedVars(void)
 {
-    if (varMap_.empty()) {
+    if (varMap_.isEmpty()) {
         X_WARNING("Console", "Skipping saving of modified vars. no registerd vars.");
         return;
     }
@@ -890,7 +883,7 @@ void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
 
 void XConsole::unRegisterCommand(const char* pName)
 {
-    auto it = cmdMap_.find(X_CONST_STRING(pName));
+    auto it = cmdMap_.find(pName);
     if (it != cmdMap_.end()) {
         cmdMap_.erase(it);
     }
@@ -1023,7 +1016,7 @@ int32_t XConsole::getLineCount(void) const
 
 ICVar* XConsole::getCVarForRegistration(const char* pName)
 {
-    auto it = varMap_.find(X_CONST_STRING(pName));
+    auto it = varMap_.find(pName);
     if (it != varMap_.end()) {
         // if you get this warning you need to fix it.
         X_ERROR("Console", "var(%s) is already registerd", pName);
@@ -1035,7 +1028,7 @@ ICVar* XConsole::getCVarForRegistration(const char* pName)
 
 void XConsole::registerVar(ICVar* pCVar)
 {
-    auto it = configCmds_.find(X_CONST_STRING(pCVar->GetName()));
+    auto it = configCmds_.find(pCVar->GetName());
     if (it != configCmds_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
             pCVar->Set(it->second);
@@ -1044,7 +1037,7 @@ void XConsole::registerVar(ICVar* pCVar)
         X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
     }
 
-    it = varArchive_.find(X_CONST_STRING(pCVar->GetName()));
+    it = varArchive_.find(pCVar->GetName());
     if (it != varArchive_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
             pCVar->Set(it->second);
@@ -1056,7 +1049,7 @@ void XConsole::registerVar(ICVar* pCVar)
         X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
     }
 
-    varMap_.insert(ConsoleVarMap::value_type(pCVar->GetName(), pCVar));
+    varMap_.emplace(pCVar->GetName(), pCVar);
 }
 
 
@@ -1135,7 +1128,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
         }
 
         // === Check if is a command ===
-        auto itrCmd = cmdMap_.find(X_CONST_STRING(name.c_str()));
+        auto itrCmd = cmdMap_.find(name.c_str());
         if (itrCmd != cmdMap_.end()) {
             value.set(range);
             value.trim();
@@ -1144,7 +1137,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
         }
 
         // === check for var ===
-        auto itrVar = varMap_.find(X_CONST_STRING(name.c_str()));
+        auto itrVar = varMap_.find(name.c_str());
         if (itrVar != varMap_.end()) {
             ICVar* pCVar = itrVar->second;
 
@@ -1176,9 +1169,9 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
             value.set(pPos + 1, range.getEnd());
             value.trim();
 
-            auto it = configCmds_.find(X_CONST_STRING(name.c_str()));
+            auto it = configCmds_.find(name.c_str());
             if (it == configCmds_.end()) {
-                configCmds_.insert(ConfigCmdsMap::iterator::value_type(name.c_str(), string(value.begin(), value.end())));
+                configCmds_.emplace(name.c_str(), string(value.begin(), value.end()));
             }
             else {
                 it->second = string(value.begin(), value.end());
@@ -1821,29 +1814,29 @@ const char* XConsole::getHistory(CmdHistory::Enum direction)
 void XConsole::addBind(const char* pKey, const char* pCmd)
 {
     // check for override ?
-    const char* Old = findBind(pKey);
+    auto it = binds_.find(pKey);
 
-    if (Old) {
-        if (core::strUtil::IsEqual(Old, pCmd)) {
-            // bind is same.
-            return;
-        }
-        if (console_debug) {
-            X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, Old, pCmd);
-        }
-
-        auto it = binds_.find(X_CONST_STRING(pKey));
-        it->second = pCmd;
+    if (it == binds_.end()) {
+        binds_.emplace(pKey, pCmd);
+        return;
     }
 
-    binds_.insert(ConsoleBindMap::value_type(core::string(pKey), core::string(pCmd)));
+    if (it->second.compare(pCmd)) {
+        // bind is same.
+        return;
+    }
+    if (console_debug) {
+        X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, it->second.c_str(), pCmd);
+    }
+
+    it->second = pCmd;
 }
 
 // returns the command for a given key
 // returns null if no bind found
-const char* XConsole::findBind(const char* key)
+const char* XConsole::findBind(const char* pKey)
 {
-    auto it = binds_.find(X_CONST_STRING(key));
+    auto it = binds_.find(pKey);
     if (it != binds_.end()) {
         return it->second.c_str();
     }
@@ -2899,9 +2892,9 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
         merged.trimRight();
 
         // we just add it to config cmd map
-        auto it = varArchive_.find(X_CONST_STRING(pVarName));
+        auto it = varArchive_.find(pVarName);
         if (it == varArchive_.end()) {
-            varArchive_.insert(ConfigCmdsMap::iterator::value_type(pVarName, merged));
+            varArchive_.emplace(pVarName, merged);
         }
         else {
             it->second = merged;

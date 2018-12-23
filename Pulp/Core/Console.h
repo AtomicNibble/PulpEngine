@@ -22,7 +22,7 @@ X_ENABLE_WARNING(4702)
 #include "Logging\FormatPolicies\LoggerInternalConsoleFormatPolicy.h"
 #include "Logging\WritePolicies\LoggerInternalConsoleWritePolicy.h"
 
-#include <Containers\HashMap.h>
+#include <Containers\FixedHashTable.h>
 #include <Containers\Fifo.h>
 
 #include <Memory\AllocationPolicies\PoolAllocator.h>
@@ -126,10 +126,10 @@ class XConsole : public IConsole
     };
 
     // members.
-    typedef core::HashMap<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap; // key points into string stored in ICVar or in .exe/.dll
-    typedef core::HashMap<string, ConsoleCommand, core::hash<const char*>, equal_to_case_insen> ConsoleCmdMap;
-    typedef core::HashMap<string, string, core::hash<const char*>, equal_to_case_insen> ConfigCmdsMap;
-    typedef core::HashMap<string, string> ConsoleBindMap;
+    typedef core::FixedHashTable<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen> ConsoleVarMap; // key points into string stored in ICVar or in .exe/.dll
+    typedef core::FixedHashTable<string, ConsoleCommand, core::hash<string>, equal_to_case_insen> ConsoleCmdMap;
+    typedef core::FixedHashTable<string, string, core::hash<string>, equal_to_case_insen> ConfigCmdsMap;
+    typedef core::FixedHashTable<string, string> ConsoleBindMap;
 
     typedef core::Fifo<ExecCommand> ExecCmdList;
 
@@ -143,7 +143,6 @@ class XConsole : public IConsole
 
 public:
     static const size_t MAX_HISTORY_ENTRIES = 64;
-    static const size_t VAR_MAX = 1024;
 
     static const char* CMD_HISTORY_FILE_NAME;
     static const char* USER_CFG_FILE_NAME;
