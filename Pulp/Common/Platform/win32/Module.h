@@ -7,6 +7,8 @@ namespace Module
     typedef void* Handle;
     typedef void* Proc;
 
+    inline static Handle NULL_HANDLE;
+
     bool Supported(void);
     const char* Extension(void);
 
