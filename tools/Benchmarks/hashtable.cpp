@@ -88,7 +88,12 @@ struct Hash
 
     size_t operator()(uint32_t x) const noexcept
     {
+#if X_64
         return (size_t{x} << 34) | x;
+#else
+        // todo: do somthing better?
+        return size_t{ x };
+#endif
     }
 };
 
