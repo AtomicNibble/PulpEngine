@@ -442,6 +442,7 @@
     <ClInclude Include="Util\FloatIEEEUtil.h" />
     <ClInclude Include="Util\Function.h" />
     <ClInclude Include="Util\GenericUtil.h" />
+    <ClInclude Include="Util\HashHelper.h" />
     <ClInclude Include="Util\HelperMacros.h" />
     <ClInclude Include="Util\LastError.h" />
     <ClInclude Include="Util\NamespaceMacros.h" />

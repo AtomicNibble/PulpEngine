@@ -1348,6 +1348,9 @@
     <ClInclude Include="Containers\FixedHashTable.h">
       <Filter>Headers\Containers</Filter>
     </ClInclude>
+    <ClInclude Include="Util\HashHelper.h">
+      <Filter>Headers\Util</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">

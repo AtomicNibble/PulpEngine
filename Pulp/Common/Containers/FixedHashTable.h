@@ -1,11 +1,10 @@
 #pragma once
 
 #include <Util/BitUtil.h>
+#include <Util/HashHelper.h>
 #include <Memory/NewAndDelete.h>
 
-#include "HashMap.h" // TODO: move hash out
 #include <iterator>
-
 #include <cstddef>
 #include <cstdint>
 #include <cstring>
