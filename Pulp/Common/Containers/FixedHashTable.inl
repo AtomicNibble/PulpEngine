@@ -35,6 +35,8 @@ FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(FixedHashTabl
 {
     oth.pData_ = nullptr;
     oth.size_ = 0;
+
+    std::memset(emptyEntry_, -1, sizeof(emptyEntry_));
 }
 
 
@@ -56,19 +58,6 @@ template<typename Key, typename Value, class Hash, class KeyEqual>
 FixedHashTableBase<Key, Value, Hash, KeyEqual>::~FixedHashTableBase() 
 {
     clear();
-}
-
-template<typename Key, typename Value, class Hash, class KeyEqual>
-FixedHashTableBase<Key, Value, Hash, KeyEqual>& FixedHashTableBase<Key, Value, Hash, KeyEqual>::operator=(FixedHashTableBase&& oth)
-{
-    pData_ = oth.pData_;
-    num_ = oth.num_;
-    mask_ = oth.mask_;
-    size_ = oth.size_;
-
-    oth.pData_ = nullptr;
-    oth.size_ = 0;
-    return *this;
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
@@ -180,7 +169,7 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::mapped_type& FixedHashT
 template<typename Key, typename Value, class Hash, class KeyEqual>
 typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::mapped_type& FixedHashTableBase<Key, Value, Hash, KeyEqual>::operator[] (key_type&& key)
 {
-    return emplace_impl(key).first->second;
+    return emplace_impl(std::forward<key_type>(key)).first->second;
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
@@ -193,6 +182,18 @@ template<typename Key, typename Value, class Hash, class KeyEqual>
 typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTableBase<Key, Value, Hash, KeyEqual>::capacity(void) const
 {
     return num_;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::isEmpty(void) const
+{
+    return size() == 0;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::isNotEmpty(void) const
+{
+    return size() > 0;
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
@@ -237,9 +238,35 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::return_pair FixedHashTa
 {
     for (size_type idx = key2idx(key); ; idx = probeNext(idx))
     {
-        if (isIndexEmpty(idx))
-        {
-            Mem::Construct<value_type>(&pData_[idx], key, std::forward<Args>(args)...);
+        if (isIndexEmpty(idx)) {
+            if constexpr (sizeof...(args) == 0) {
+                Mem::Construct<value_type>(&pData_[idx], key, Value());
+            }
+            else {
+                Mem::Construct<value_type>(&pData_[idx], key, std::forward<Args>(args)...);
+            }
+            size_++;
+            return { iterator(this, idx), true };
+        }
+        else if (key_equal()(pData_[idx].first, key)) {
+            return { iterator(this, idx), false };
+        }
+    }
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K, typename... Args>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::return_pair FixedHashTableBase<Key, Value, Hash, KeyEqual>::emplace_impl(K&& key, Args&&... args)
+{
+    for (size_type idx = key2idx(key); ; idx = probeNext(idx))
+    {
+        if (isIndexEmpty(idx)) {
+            if constexpr (sizeof...(args) == 0) {
+                Mem::Construct<value_type>(&pData_[idx], std::forward<K>(key), Value());
+            }
+            else {
+                Mem::Construct<value_type>(&pData_[idx], std::forward<K>(key), std::forward<Args>(args)...);
+            }
             size_++;
             return { iterator(this, idx), true };
         }
@@ -265,6 +292,21 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::iterator FixedHashTable
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::const_iterator FixedHashTableBase<Key, Value, Hash, KeyEqual>::find_impl(const K& key) const
+{
+    for (size_type idx = key2idx(key); ; idx = probeNext(idx))
+    {
+        if (isIndexEmpty(idx)) {
+            return end();
+        }
+        if (key_equal()(pData_[idx].first, key)) {
+            return const_iterator(this, idx);
+        }
+    }
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
 void FixedHashTableBase<Key, Value, Hash, KeyEqual>::erase_impl(iterator it)
 {
     size_type bucket = it.idx_;
@@ -280,11 +322,26 @@ void FixedHashTableBase<Key, Value, Hash, KeyEqual>::erase_impl(iterator it)
 
         if (diff(bucket, ideal) < diff(idx, ideal)) {
             // swap, bucket is closer to ideal than idx
+            // TODO: deconstruct?
+            X_ASSERT(!isIndexEmpty(bucket) && !isIndexEmpty(idx), "Potential leak, fix me")(isIndexEmpty(bucket), isIndexEmpty(idx));
             pData_[bucket] = pData_[idx];
             bucket = idx;
         }
     }
 }
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+template <typename K>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTableBase<Key, Value, Hash, KeyEqual>::erase_impl(const K &key) 
+{
+    auto it = find_impl(key);
+    if (it != end()) {
+        erase_impl(it);
+        return 1;
+    }
+    return 0;
+}
+
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
 template <typename K>

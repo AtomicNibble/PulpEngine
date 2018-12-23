@@ -102,7 +102,7 @@ public:
     FixedHashTableBase(value_type* pData, size_type maxItems);
     ~FixedHashTableBase();
 
-    FixedHashTableBase& operator=(FixedHashTableBase&& oth);
+    FixedHashTableBase& operator=(FixedHashTableBase&& oth) = delete; // only allow move construct currently
     FixedHashTableBase& operator=(const FixedHashTableBase& oth) = delete;
 
     void clear(void);
@@ -132,6 +132,9 @@ public:
     size_type size(void) const;
     size_type capacity(void) const;
 
+    bool isEmpty(void) const;
+    bool isNotEmpty(void) const;
+
     iterator begin();
     const_iterator begin() const;
     iterator end();
@@ -143,9 +146,18 @@ public:
 private:
     template <typename K, typename... Args>
     return_pair emplace_impl(const K& key, Args&&... args);
+    template <typename K, typename... Args>
+    return_pair emplace_impl(K&& key, Args&&... args);
+
     template <typename K> 
     iterator find_impl(const K& key);
+    template <typename K>
+    const_iterator find_impl(const K& key) const;
+
     void erase_impl(iterator it);
+
+    template <typename K>
+    size_type erase_impl(const K &key);
 
     template <typename K>
     size_type key2idx(const K& key) const;
