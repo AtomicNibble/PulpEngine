@@ -182,6 +182,8 @@ public:
     FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem);
     ~FixedHashTableOwningPolicy();
 
+    void free(void);
+
 private:
     core::MemoryArenaBase* arena_;
 };
