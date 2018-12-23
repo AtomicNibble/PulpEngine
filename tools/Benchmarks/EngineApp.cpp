@@ -4,14 +4,6 @@
 #include <Platform\Module.h>
 #include <Platform\MessageBox.h>
 
-#ifdef X_LIB
-struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
-
-X_LINK_ENGINE_LIB("Core")
-X_LINK_ENGINE_LIB("RenderNull")
-
-#endif // !X_LIB
-
 AssetHandler::AssetHandler(void)
 {
 }

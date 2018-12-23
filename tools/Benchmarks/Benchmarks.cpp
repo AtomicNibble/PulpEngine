@@ -15,6 +15,17 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
+#ifdef X_LIB
+struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
+
+X_LINK_ENGINE_LIB("Core")
+X_LINK_ENGINE_LIB("RenderNull")
+
+X_FORCE_SYMBOL_LINK("?s_factory@XEngineModule_Render@render@Potato@@0V?$XSingletonFactory@VXEngineModule_Render@render@Potato@@@@A");
+
+#endif // !X_LIB
+
+
 // Google Benchmark
 X_LINK_LIB("shlwapi")
 
