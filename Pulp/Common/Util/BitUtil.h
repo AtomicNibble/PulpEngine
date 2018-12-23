@@ -105,7 +105,7 @@ namespace bitUtil
 
     /// Returns the next power-of-two for a given value.
     template<typename T>
-    inline T NextPowerOfTwo(T v);
+    inline constexpr T NextPowerOfTwo(T v);
 
     /// Rounds a number up to the next multiple of a power-of-two.
     template<typename T>

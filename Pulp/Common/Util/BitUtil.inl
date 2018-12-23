@@ -192,7 +192,7 @@ namespace bitUtil
             }
 
             template<typename T>
-            static inline T NextPowerOfTwo(T v)
+            static inline constexpr T NextPowerOfTwo(T v)
             {
                 static_assert(sizeof(T) == 8, "sizeof(T) is not 8 bytes.");
 
@@ -344,7 +344,7 @@ namespace bitUtil
             }
 
             template<typename T>
-            static inline T NextPowerOfTwo(T v)
+            static inline constexpr T NextPowerOfTwo(T v)
             {
                 static_assert(sizeof(T) == 4, "sizeof(T) is not 4 bytes.");
 
@@ -442,7 +442,7 @@ namespace bitUtil
             }
 
             template<typename T>
-            static inline T NextPowerOfTwo(T v)
+            static inline constexpr T NextPowerOfTwo(T v)
             {
                 static_assert(sizeof(T) == 2, "sizeof(T) is not 2 bytes.");
 
@@ -631,7 +631,7 @@ namespace bitUtil
     }
 
     template<typename T>
-    inline T NextPowerOfTwo(T v)
+    inline constexpr T NextPowerOfTwo(T v)
     {
         return internal::Implementation<sizeof(T)>::NextPowerOfTwo(v);
     }
