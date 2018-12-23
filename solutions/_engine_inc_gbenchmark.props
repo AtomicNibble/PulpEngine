@@ -5,7 +5,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdparty\source\benchmark-1.2.0\include\;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\3rdparty\source\benchmark-2.0\include\;$(SolutionDir)..\3rdparty\source\benchmark-2.0\third_party\json\src\;%(AdditionalIncludeDirectories);</AdditionalIncludeDirectories>
     </ClCompile>
   <Link>
   </Link>
