@@ -12,10 +12,6 @@
 #include <Containers\PriorityQueue.h>
 #include <Containers\FixedFifo.h>
 
-X_DISABLE_WARNING(4702)
-#include <unordered_set>
-X_ENABLE_WARNING(4702)
-
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\AllocationPolicies\LinearAllocator.h>
@@ -378,11 +374,6 @@ private:
     void Cmd_ListSearchPaths(IConsoleCmdArgs* pCmd);
 
 private:
-#if X_DEBUG == 1
-    typedef std::unordered_set<XFindData*> findDataSet;
-    findDataSet findData_;
-#endif // !X_DEBUG
-
     PathWT basePath_;
 
     Directory* baseDir_;
