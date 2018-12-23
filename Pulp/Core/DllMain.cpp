@@ -33,15 +33,13 @@ IPCORE_API ICore* CreateCoreInterface(const CoreInitParams& startupParams)
 {
     X_ASSERT_NOT_NULL(startupParams.pCoreArena);
 
-    XCore* pCore = NULL;
-
     g_coreArena = startupParams.pCoreArena;
 
     if (!g_coreArena) {
         return nullptr;
     }
 
-    pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", 16);
+    auto* pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", 16);
 
     LinkModule(pCore, "Core");
 

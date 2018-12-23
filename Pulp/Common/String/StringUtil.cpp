@@ -42,30 +42,36 @@ namespace strUtil
                 __m128i x = xmload(tgt - f);
                 unsigned u = compxm(zero, x) >> f;
                 unsigned v = ((compxm(p0, x) & (compxm(p1, x) >> 1)) >> f) & ~u & (u - 1);
-                if (v)
+                if (v) {
                     return tgt + bitUtil::ScanBitsForward(v) - 1;
-                if (u)
-                    return NULL;
+                }
+                if (u) {
+                    return nullptr;
+                }
                 tgt += 16 - f;
-                if (load16(tgt - 1) == pair)
+                if (load16(tgt - 1) == pair) {
                     return tgt - 1;
+                }
             }
 
             X_DISABLE_WARNING(4127)
             while (true)
-                X_ENABLE_WARNING(4127)
-                {
-                    __m128i x = xmload(tgt);
-                    unsigned u = compxm(zero, x);
-                    unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1) & ~u & (u - 1);
-                    if (v)
-                        return tgt + bitUtil::ScanBitsForward(v);
-                    if (u)
-                        return NULL;
-                    tgt += 16;
-                    if (load16(tgt - 1) == pair)
-                        return tgt - 1;
+            X_ENABLE_WARNING(4127)
+            {
+                __m128i x = xmload(tgt);
+                unsigned u = compxm(zero, x);
+                unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1) & ~u & (u - 1);
+                if (v) {
+                    return tgt + bitUtil::ScanBitsForward(v);
                 }
+                if (u) {
+                    return nullptr;
+                }
+                tgt += 16;
+                if (load16(tgt - 1) == pair) {
+                    return tgt - 1;
+                }
+            }
         }
 
         char const* scanstr3(char const* tgt, char const pat[3])
@@ -82,37 +88,45 @@ namespace strUtil
                 unsigned u = compxm(zero, x);
                 unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1);
                 v = (v & (compxm(p2, x) >> 2) & ~u & (u - 1)) >> f;
-                if (v)
+                if (v) {
                     return tgt + bitUtil::ScanBitsForward(v) - 1;
+                }
                 tgt += 16 - f;
                 v = load32(tgt - 2);
-                if (trio == (v & 0x00FFFFFF))
+                if (trio == (v & 0x00FFFFFF)) {
                     return tgt - 2;
-                if (trio == v >> 8)
+                }
+                if (trio == v >> 8) {
                     return tgt - 1;
-                if (u >> f)
-                    return NULL;
+                }
+                if (u >> f) {
+                    return nullptr;
+                }
             }
 
             X_DISABLE_WARNING(4127)
             while (true)
-                X_ENABLE_WARNING(4127)
-                {
-                    __m128i x = xmload(tgt);
-                    unsigned u = compxm(zero, x);
-                    unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1);
-                    v = (v & (compxm(p2, x) >> 2) & ~u & (u - 1)) >> f;
-                    if (v)
-                        return tgt + bitUtil::ScanBitsForward(v) - 1;
-                    tgt += 16;
-                    v = load32(tgt - 2);
-                    if (trio == (v & 0x00FFFFFF))
-                        return tgt - 2;
-                    if (trio == v >> 8)
-                        return tgt - 1;
-                    if (u)
-                        return NULL;
+            X_ENABLE_WARNING(4127)
+            {
+                __m128i x = xmload(tgt);
+                unsigned u = compxm(zero, x);
+                unsigned v = compxm(p0, x) & (compxm(p1, x) >> 1);
+                v = (v & (compxm(p2, x) >> 2) & ~u & (u - 1)) >> f;
+                if (v) {
+                    return tgt + bitUtil::ScanBitsForward(v) - 1;
                 }
+                tgt += 16;
+                v = load32(tgt - 2);
+                if (trio == (v & 0x00FFFFFF)) {
+                    return tgt - 2;
+                }
+                if (trio == v >> 8) {
+                    return tgt - 1;
+                }
+                if (u) {
+                    return nullptr;
+                }
+            }
         }
 
         char const* scanstrm(char const* tgt, char const* pat, uint32_t len)
@@ -126,7 +140,7 @@ namespace strUtil
                 if (wind == head && !memcmp(tgt, pat, len))
                     return tgt - 4;
             }
-            return NULL;
+            return nullptr;
         }
 
         // only used for function below.
