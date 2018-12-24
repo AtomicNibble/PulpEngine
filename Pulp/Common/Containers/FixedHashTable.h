@@ -170,8 +170,8 @@ protected:
     uint8_t X_ALIGNED_SYMBOL(emptyEntry_[sizeof(value_type)], X_ALIGN_OF(value_type));
 
     value_type* pData_; // uninitialized
-    const size_type num_;
     size_type size_;
+    const size_type num_;
     const size_type mask_;
 };
 
