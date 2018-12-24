@@ -34,7 +34,7 @@ namespace shader
     private:
         // returns true if we know the file has a diffrent crc32.
         // saves opening it.
-        bool cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32) const;
+        bool cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32);
         void updateCacheCrc(const core::Path<char>& path, uint32_t sourceCrc32);
 
     private:
@@ -47,7 +47,7 @@ namespace shader
         // maybe caching the hashes might be worth it.
         HashCacheMap cache_;
 
-        mutable core::CriticalSection cs_;
+        core::CriticalSection cs_;
 
         core::Compression::CompressLevel::Enum compLvl_;
     };

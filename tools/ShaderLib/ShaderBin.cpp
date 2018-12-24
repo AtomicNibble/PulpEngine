@@ -330,7 +330,7 @@ namespace shader
         return gEnv->pFileSys->deleteDirectoryContents(binFolder, core::VirtualDirectory::BASE);
     }
 
-    bool ShaderBin::cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32) const
+    bool ShaderBin::cacheNotValid(const core::Path<char>& path, uint32_t sourceCrc32)
     {
         core::CriticalSection::ScopedLock lock(cs_);
 
