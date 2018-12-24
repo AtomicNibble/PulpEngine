@@ -413,6 +413,7 @@
     <ClInclude Include="Multiplayer.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UserCmds\UserCmdGen.h" />
+    <ClInclude Include="UserNetMappings.h" />
     <ClInclude Include="Vars\GameVars.h" />
     <ClInclude Include="Vars\InputVars.h" />
     <ClInclude Include="Vars\PlayerVars.h" />
