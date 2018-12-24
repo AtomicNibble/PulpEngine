@@ -27,7 +27,6 @@ XGame::XGame(ICore* pCore) :
     pSession_(nullptr),
     pRender_(nullptr),
     prevStatus_(net::SessionStatus::Idle),
-    localPlayerIdx_(-1),
     world_(arena_),
     userCmdGen_(inputVars_),
     weaponDefs_(arena_),
@@ -36,7 +35,6 @@ XGame::XGame(ICore* pCore) :
     lastUserCmdRunTime_.fill(0);
     lastUserCmdRunOnClientTime_.fill(0);
     lastUserCmdRunOnServerTime_.fill(0);
-
 
     X_ASSERT_NOT_NULL(pCore);
 }
@@ -113,7 +111,7 @@ bool XGame::init(void)
         auto* pNet = gEnv->pNet;
         pPeer_ = pNet->createPeer();
 
-        myGuid_ = pPeer_->getMyGUID();
+        userNetMap_.myGuid = pPeer_->getMyGUID();
 
         net::Port basePort = 1337;
         net::Port maxPort = basePort + 10;
@@ -413,9 +411,9 @@ bool XGame::update(core::FrameData& frame)
         if (isHost)
         {
             // run user cmds for all the valid players.
-            for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
+            for (int32_t i = 0; i < static_cast<int32_t>(userNetMap_.lobbyUserGuids.size()); i++)
             {
-                if (!lobbyUserGuids_[i].isValid()) {
+                if (!userNetMap_.lobbyUserGuids[i].isValid()) {
                     continue;
                 }
 
@@ -443,7 +441,7 @@ bool XGame::update(core::FrameData& frame)
 
                 snap.setTime(gameTimeMS_);
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
-                snap.setPlayerGuids(lobbyUserGuids_);
+                snap.setPlayerGuids(userNetMap_.lobbyUserGuids);
 
                 world_->createSnapShot(snap);
 
@@ -537,29 +535,29 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
-    lobbyUserGuids_ = snap.getPlayerGuids();
+    userNetMap_.lobbyUserGuids = snap.getPlayerGuids();
 
     // mark local player index?
-    if (localPlayerIdx_ < 0)
+    if (userNetMap_.localPlayerIdx < 0)
     {
-        for (size_t i=0; i<lobbyUserGuids_.size(); i++)
+        for (size_t i=0; i< userNetMap_.lobbyUserGuids.size(); i++)
         {
-            if (myGuid_ == lobbyUserGuids_[i])
+            if (userNetMap_.myGuid == userNetMap_.lobbyUserGuids[i])
             {
-                localPlayerIdx_ = safe_static_cast<int32_t>(i);
-                X_LOG0("Game", "Local player idx: %" PRIi32, localPlayerIdx_);
+                userNetMap_.localPlayerIdx = safe_static_cast<int32_t>(i);
+                X_LOG0("Game", "Local player idx: %" PRIi32, userNetMap_.localPlayerIdx);
                 break;
             }
         }
     }
 
-    auto localLastRunTimeMS = lastUserCmdRunTime_[localPlayerIdx_];
+    auto localLastRunTimeMS = lastUserCmdRunTime_[userNetMap_.localPlayerIdx];
 
     if (vars_.userCmdClientReplay())
     {
         // get all the userCmds we need to replay.
         net::UserCmdMan::UserCmdArr userCmds;
-        userCmdMan_.getReadUserCmdsAfterGameTime(localPlayerIdx_, localLastRunTimeMS, userCmds);
+        userCmdMan_.getReadUserCmdsAfterGameTime(userNetMap_.localPlayerIdx, localLastRunTimeMS, userCmds);
 
         if (userCmds.isNotEmpty())
         {
@@ -577,7 +575,7 @@ void XGame::applySnapShot(const net::SnapShot& snap)
                 X_ASSERT(deltaMS > 0, "Delta can't be less than 1")(deltaMS);
                 auto dt = core::TimeVal::fromMS(deltaMS);
 
-                runUserCmdForPlayer(dt, userCmd, localPlayerIdx_);
+                runUserCmdForPlayer(dt, userCmd, userNetMap_.localPlayerIdx);
 
                 lastCmdMS = userCmd.clientGameTimeMS;
             }
@@ -603,7 +601,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
 
     // if the player is local
     // we run a user command for them
-    if (localPlayerIdx_ == playerIdx) {
+    if (userNetMap_.localPlayerIdx == playerIdx) {
         auto unread = userCmdMan_.getNumUnreadFrames(playerIdx);
         // should only be one, unless we now support running multiple client frames.
         X_ASSERT(unread == 1, "More than one userCmd for local player")(unread);
@@ -721,12 +719,8 @@ void XGame::syncLobbyUsers(void)
         pLobby->getUserInfoForIdx(i, info);
 
         X_ASSERT(info.guid.isValid(), "User is no valid")();
-
-        auto it = std::find_if(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), [info](const net::NetGUID& guid) {
-            return guid == info.guid;
-        });
-
-        if (it == lobbyUserGuids_.end())
+        
+        if (userNetMap_.guidPresent(info.guid))
         {
             newUsers.push(info.guid);
         }
@@ -737,9 +731,9 @@ void XGame::syncLobbyUsers(void)
     }
 
     // You still here?
-    for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(userNetMap_.lobbyUserGuids.size()); i++)
     {
-        auto userGuid = lobbyUserGuids_[i];
+        auto userGuid = userNetMap_.lobbyUserGuids[i];
         if (!userGuid.isValid()) {
             continue;
         }
@@ -749,7 +743,7 @@ void XGame::syncLobbyUsers(void)
             net::NetGuidStr buf;
             X_LOG0("Game", "Client left %" PRIi32 " guid: %s", i, userGuid.toString(buf));
 
-            lobbyUserGuids_[i] = net::NetGUID();
+            userNetMap_.lobbyUserGuids[i] = net::NetGUID();
             world_->removePlayer(i);
         }
     }
@@ -759,9 +753,9 @@ void XGame::syncLobbyUsers(void)
     {
         // find a free local player slot.
         int32_t plyIdx = -1;
-        for (int32_t i = 0; i < static_cast<int32_t>(lobbyUserGuids_.size()); i++)
+        for (int32_t i = 0; i < static_cast<int32_t>(userNetMap_.lobbyUserGuids.size()); i++)
         {
-            if (!lobbyUserGuids_[i].isValid())
+            if (!userNetMap_.lobbyUserGuids[i].isValid())
             {
                 plyIdx = i;
                 break;
@@ -780,14 +774,14 @@ void XGame::syncLobbyUsers(void)
         net::NetGuidStr buf;
         X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, userGuid.toString(buf));
 
-        lobbyUserGuids_[plyIdx] = userGuid;
+        userNetMap_.lobbyUserGuids[plyIdx] = userGuid;
 
         userCmdMan_.resetPlayer(plyIdx);
 
         // for host.
-        auto isLocal = myGuid_ == userGuid;
+        auto isLocal = userNetMap_.myGuid == userGuid;
         if (isLocal) {
-            localPlayerIdx_ = plyIdx;
+            userNetMap_.localPlayerIdx = plyIdx;
         }
 
         // spawn!
@@ -802,7 +796,7 @@ void XGame::clearWorld(void)
         world_.reset();
     }
 
-    lobbyUserGuids_.fill(net::NetGUID());
+    userNetMap_.reset();
 
     for (auto& uCmd : lastUserCmdRun_) {
         uCmd.clear();
@@ -811,25 +805,17 @@ void XGame::clearWorld(void)
     lastUserCmdRunTime_.fill(0);
     lastUserCmdRunOnClientTime_.fill(0);
     lastUserCmdRunOnServerTime_.fill(0);
-
-    localPlayerIdx_ = -1;
 }
 
 int32_t XGame::getLocalClientIdx(void) const
 {
-    X_ASSERT(localPlayerIdx_ >= 0, "Called when local player is not valid")(localPlayerIdx_);
-    return localPlayerIdx_;
+    X_ASSERT(userNetMap_.localPlayerIdx >= 0, "Called when local player is not valid")(userNetMap_.localPlayerIdx);
+    return userNetMap_.localPlayerIdx;
 }
 
 int32_t XGame::getPlayerIdxForGuid(net::NetGUID guid) const
 {
-    auto it = std::find(lobbyUserGuids_.begin(), lobbyUserGuids_.end(), guid);
-    if (it != lobbyUserGuids_.end()) {
-        auto idx = std::distance(lobbyUserGuids_.begin(), it);
-        return safe_static_cast<int32_t>(idx);
-    }
-
-    return -1;
+    return userNetMap_.getPlayerIdxForGuid(guid);
 }
 
 void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
