@@ -34,6 +34,7 @@ X_NAMESPACE_DECLARE(net,
 X_NAMESPACE_BEGIN(game)
 
 class GameVars;
+struct UserNetMappings;
 
 namespace weapon
 {
@@ -60,7 +61,7 @@ namespace entity
         void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId);
 
         void createSnapShot(net::SnapShot& snap);
-        void applySnapShot(const net::SnapShot& snap);
+        void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
 
 
         EntityId createEnt(void);

@@ -411,9 +411,9 @@ void World::createSnapShot(net::SnapShot& snap)
     ents_.createSnapShot(snap);
 }
 
-void World::applySnapShot(const net::SnapShot& snap)
+void World::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
 {
-    ents_.applySnapShot(snap);
+    ents_.applySnapShot(unm, snap);
 }
 
 

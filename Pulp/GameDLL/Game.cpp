@@ -531,7 +531,7 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 void XGame::applySnapShot(const net::SnapShot& snap)
 {
     // we need to apply a snapshot.
-    world_->applySnapShot(snap);
+    world_->applySnapShot(userNetMap_, snap);
 
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();

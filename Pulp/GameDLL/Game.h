@@ -99,7 +99,7 @@ private:
     void clearWorld(void);
 
 
-    int32_t getLocalClientIdx(void) const X_FINAL;
+    int32_t getLocalClientIdx(void) const;
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
 
     void Command_Map(core::IConsoleCmdArgs* Cmd);

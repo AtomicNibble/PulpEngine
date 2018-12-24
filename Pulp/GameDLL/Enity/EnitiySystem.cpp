@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "EnitiySystem.h"
 #include "Vars\GameVars.h"
-
+#include "UserNetMappings.h"
 #include "Weapon\WeaponDef.h"
 #include "Weapon\WeaponManager.h"
 
@@ -230,7 +230,7 @@ namespace entity
         }
     }
 
-    void EnititySystem::applySnapShot(const net::SnapShot& snap)
+    void EnititySystem::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
     {
         // TODO: maybe gather up physics changes and do them in a batch.
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
@@ -271,8 +271,7 @@ namespace entity
                     auto pos = Vec3f(-80, -50.f + (remoteEntityId * 50.f), 10);
 
                     // need to work out if this is local.
-                    auto localPlayerIdx = gEnv->pGame->getLocalClientIdx();
-                    bool isLocal = localPlayerIdx == remoteEntityId;
+                    bool isLocal = unm.localPlayerIdx == remoteEntityId;
 
                     makePlayer(remoteEntityId, pos, isLocal);
 

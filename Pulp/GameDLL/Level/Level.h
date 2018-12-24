@@ -107,7 +107,7 @@ public:
     void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
 
     void createSnapShot(net::SnapShot& snap);
-    void applySnapShot(const net::SnapShot& snap);
+    void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
 
     void spawnPlayer(int32_t playerIdx, bool local);
     void removePlayer(int32_t playerIdx);
