@@ -94,7 +94,7 @@ public:
 public:
     FixedHashTableBase(const FixedHashTableBase& oth) = delete;
     FixedHashTableBase(FixedHashTableBase&& oth);
-    FixedHashTableBase(value_type* pData, size_type maxItems);
+    FixedHashTableBase(uint8_t* pData, size_type maxItems);
     ~FixedHashTableBase();
 
     FixedHashTableBase& operator=(FixedHashTableBase&& oth) = delete; // only allow move construct currently

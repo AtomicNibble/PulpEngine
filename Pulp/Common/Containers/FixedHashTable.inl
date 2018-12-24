@@ -5,9 +5,7 @@ X_NAMESPACE_BEGIN(core)
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
 inline FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::FixedHashTableOwningPolicy(core::MemoryArenaBase* arena, size_type maxItem) :
-    FixedHashTableBase<Key, Value, Hash, KeyEqual>(reinterpret_cast<BaseT::value_type*>(
-        X_NEW_ARRAY_ALIGNED(uint8_t, maxItem * sizeof(BaseT::value_type), arena, "FixedHashTableOwningPolicy", X_ALIGN_OF(BaseT::value_type))), maxItem
-    ),
+    FixedHashTableBase<Key, Value, Hash, KeyEqual>(X_NEW_ARRAY_ALIGNED(uint8_t, maxItem * sizeof(BaseT::value_type), arena, "FixedHashTableOwningPolicy", X_ALIGN_OF(BaseT::value_type)), maxItem),
     arena_(arena)
 {
 }
@@ -30,7 +28,7 @@ inline void FixedHashTableOwningPolicy<Key, Value, Hash, KeyEqual>::free(void)
 
 template<size_t N, typename Key, typename Value, class Hash, class KeyEqual>
 inline FixedHashTableStackPolicy<N, Key, Value, Hash, KeyEqual>::FixedHashTableStackPolicy() :
-    FixedHashTableBase<Key, Value, Hash, KeyEqual>(reinterpret_cast<BaseT::value_type*>(array_), N)
+    FixedHashTableBase<Key, Value, Hash, KeyEqual>(array_, N)
 {
 }
 
@@ -51,8 +49,8 @@ FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(FixedHashTabl
 
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
-FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(value_type* pData, size_type maxItems) :
-    pData_(X_ASSERT_NOT_NULL(pData)),
+FixedHashTableBase<Key, Value, Hash, KeyEqual>::FixedHashTableBase(uint8_t* pData, size_type maxItems) :
+    pData_(X_ASSERT_NOT_NULL(reinterpret_cast<value_type*>(pData))),
     num_(maxItems),
     mask_(maxItems - 1),
     size_(0)
