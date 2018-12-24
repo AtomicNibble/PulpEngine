@@ -7,6 +7,8 @@ X_NAMESPACE_DECLARE(core, class FixedBitStreamBase);
 
 X_NAMESPACE_BEGIN(game)
 
+struct UserNetMappings;
+
 class Multiplayer
 {
     X_DECLARE_ENUM(GameState)(
@@ -32,7 +34,7 @@ class Multiplayer
 public:
     Multiplayer();
 
-    void update(void);
+    void update(const UserNetMappings& unm);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);

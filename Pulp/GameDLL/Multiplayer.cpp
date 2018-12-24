@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "Multiplayer.h"
+#include "UserNetMappings.h"
 
 #include <Containers/FixedBitStream.h>
 
@@ -11,12 +12,13 @@ Multiplayer::Multiplayer() :
 
 }
 
-void Multiplayer::update(void)
+void Multiplayer::update(const UserNetMappings& unm)
 {
     // i want to populate all the ping info for connected players.
     // which means i need the lobby and the peer.
     // i need some way to map netGuids to player idx tho.
     // think i might just have some for of player state that i can pass around.
+    X_UNUSED(unm);
 
 }
 
