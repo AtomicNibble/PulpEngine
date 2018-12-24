@@ -75,7 +75,7 @@ public:
 
     virtual size_t GetArgCount(void) const X_OVERRIDE;
     virtual const char* GetArg(size_t idx) const X_OVERRIDE;
-    void TokenizeString(const char* begin, const char* end);
+    void TokenizeString(const char* pBegin, const char* pEnd);
 
 private:
     size_t argNum_;                      // number of arguments

@@ -221,23 +221,23 @@ const char* ConsoleCommandArgs::GetArg(size_t Idx) const
 // we want to get arguemtns.
 // how will a command be formated.
 // command val, val1, #var_name, string var3,
-void ConsoleCommandArgs::TokenizeString(const char* begin, const char* end)
+void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd)
 {
     argNum_ = 0;
     core::zero_object(tokenized_);
 
     size_t len, totalLen = 0;
 
-    len = static_cast<size_t>(end - begin);
+    len = static_cast<size_t>(pEnd - pBegin);
     if (len < 1) {
         return;
     }
 
-    // need to be made use of.
-    X_UNUSED(end);
+    // TODO: need to be made use of.
+    X_UNUSED(pEnd);
 
-    const char* start = begin;
-    const char* commandLine = begin;
+    const char* start = pBegin;
+    const char* commandLine = pBegin;
     while (char ch = *commandLine++) {
         if (argNum_ == MAX_COMMAND_ARGS) {
             return;
