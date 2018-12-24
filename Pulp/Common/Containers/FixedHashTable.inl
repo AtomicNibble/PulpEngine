@@ -195,6 +195,12 @@ typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::size_type FixedHashTabl
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>
+bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::empty(void) const
+{
+    return size() == 0;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
 bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::isEmpty(void) const
 {
     return size() == 0;
@@ -204,6 +210,18 @@ template<typename Key, typename Value, class Hash, class KeyEqual>
 bool FixedHashTableBase<Key, Value, Hash, KeyEqual>::isNotEmpty(void) const
 {
     return size() > 0;
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::hasher FixedHashTableBase<Key, Value, Hash, KeyEqual>::hash_function(void) const
+{
+    return hasher();
+}
+
+template<typename Key, typename Value, class Hash, class KeyEqual>
+typename FixedHashTableBase<Key, Value, Hash, KeyEqual>::key_equal FixedHashTableBase<Key, Value, Hash, KeyEqual>::key_eq(void) const
+{
+    return key_equal();
 }
 
 template<typename Key, typename Value, class Hash, class KeyEqual>

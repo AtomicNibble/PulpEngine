@@ -127,8 +127,12 @@ public:
     size_type size(void) const;
     size_type capacity(void) const;
 
+    bool empty(void) const;
     bool isEmpty(void) const;
     bool isNotEmpty(void) const;
+
+    hasher hash_function(void) const;
+    key_equal key_eq(void) const;
 
     iterator begin();
     const_iterator begin() const;
