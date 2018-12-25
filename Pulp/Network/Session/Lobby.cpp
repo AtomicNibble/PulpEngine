@@ -1721,7 +1721,7 @@ int32_t Lobby::getNumConnectedPeersInGame(void) const
     return num;
 }
 
-bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
+void Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
 {
     auto& user = users_[idx];
 
@@ -1730,12 +1730,11 @@ bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
     info.guid = user.guid;
     info.systemHandle = INVALID_SYSTEM_HANDLE;
 
-    if (user.hasPeer()) {
-        return false;
+    if (!user.hasPeer()) {
+        return;
     }
 
     info.systemHandle = peers_[user.peerIdx].systemHandle;
-    return true;
 }
 
 bool Lobby::tryPopChatMsg(ChatMsg& msg)

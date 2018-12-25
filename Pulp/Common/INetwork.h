@@ -594,7 +594,7 @@ struct ILobby
     virtual int32_t getNumUsers(void) const X_ABSTRACT;
     virtual int32_t getNumFreeUserSlots(void) const X_ABSTRACT;
 
-    virtual bool getUserInfoForIdx(int32_t idx, UserInfo& info) const X_ABSTRACT;
+    virtual void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_ABSTRACT;
 
     // Misc
     virtual bool isActive(void) const X_ABSTRACT;
