@@ -2,8 +2,9 @@
 
 #include <INetwork.h>
 
-X_NAMESPACE_DECLARE(core, class FixedBitStreamBase);
+#include <Containers/FixedFifo.h>
 
+X_NAMESPACE_DECLARE(core, class FixedBitStreamBase);
 
 X_NAMESPACE_BEGIN(game)
 
@@ -29,15 +30,37 @@ class Multiplayer
         int32_t kills;
     };
 
+    static const size_t NUM_CHAT_LINES = 6;
+
+    struct ChatLine
+    {
+        ChatLine(core::string line) :
+            line(line)
+        {
+        }
+
+        core::string line;
+        core::TimeVal ellapsed;
+    };
+
+    using ChatLineFiFo = core::FixedFifo<ChatLine, NUM_CHAT_LINES>;
     using PlayerStateArr = std::array< PlayerState, net::MAX_PLAYERS>;
 
 public:
     Multiplayer();
 
-    void update(const UserNetMappings& unm);
+    void update(net::IPeer* pPeer, const UserNetMappings& unm);
+
+    void draw(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);
+
+    void addChatLine(core::string line);
+
+private:
+    void drawChat(engine::IPrimativeContext* pPrim);
+    void updateChat(core::TimeVal dt);
 
 
 private:
@@ -45,6 +68,10 @@ private:
     GameState::Enum nextState_;
 
     PlayerStateArr playerStates_;
+
+    // Chitty chat
+    core::TimeVal chatTime_;
+    ChatLineFiFo chatLines_;
 };
 
 
