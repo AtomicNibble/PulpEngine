@@ -1345,22 +1345,19 @@ void XPeer::listLocalAddress(void) const
     }
 }
 
-PingInfo XPeer::getPingInfo(SystemHandle systemHandle) const
+bool XPeer::getPingInfo(SystemHandle systemHandle, PingInfo& info) const
 {
     X_ASSERT(systemHandle != INVALID_SYSTEM_HANDLE, "Invalid system handle passed")(systemHandle);
 
-    PingInfo info;
-
     const RemoteSystem* pRemoteSys = getRemoteSystem(systemHandle, false);
     if (!pRemoteSys) {
-        return info;
+        return false;
     }
 
     info.cur = pRemoteSys->getLastPing();
     info.avg = pRemoteSys->getAveragePing();
     info.min = pRemoteSys->lowestPing;
-
-    return info;
+    return true;
 }
 
 SystemAddress XPeer::getMyBoundAddress(void) const

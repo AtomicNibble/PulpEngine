@@ -435,7 +435,7 @@ struct IPeer
     virtual bool isBanned(const IPStr& ip) X_ABSTRACT;
     virtual void clearBanList(void) X_ABSTRACT;
 
-    virtual PingInfo getPingInfo(SystemHandle systemHandle) const X_ABSTRACT;
+    virtual bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_ABSTRACT;
 
     virtual const NetGUID& getMyGUID(void) const X_ABSTRACT;
     virtual SystemAddress getMyBoundAddress(void) const X_ABSTRACT;

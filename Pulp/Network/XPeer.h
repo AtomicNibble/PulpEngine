@@ -302,7 +302,7 @@ public:
     void listBans(void) const;
     void listLocalAddress(void) const;
 
-    PingInfo getPingInfo(SystemHandle systemHandle) const X_FINAL;
+    bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_FINAL;
 
     X_INLINE const NetGUID& getMyGUID(void) const X_FINAL;
     SystemAddress getMyBoundAddress(void) const X_FINAL;

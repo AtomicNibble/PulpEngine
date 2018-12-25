@@ -386,7 +386,9 @@ void Lobby::sendPingsToPeers(void) const
         PingInfo info;
 
         if (peer.isConnected()) {
-            info = pPeer_->getPingInfo(peer.systemHandle);
+            if (!pPeer_->getPingInfo(peer.systemHandle, info)) {
+                X_WARNING("Lobby", "Failed to get peer pings");
+            }
         }
 
         bs.write(info);
@@ -1801,7 +1803,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
 
         PingInfo ping;
         if (peer.isConnected()) {
-            ping = pPeer_->getPingInfo(peer.systemHandle);
+            pPeer_->getPingInfo(peer.systemHandle, ping);
         }
 
         txt.appendFmt("\n^%-6s %6" PRIu8 " %6" PRIu8 " %9" PRIu16 " %8" PRIi32 " %5.1f %7" PRIi32 " %5.1f %4" PRIi16,
