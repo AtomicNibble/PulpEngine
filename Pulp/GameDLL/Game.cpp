@@ -720,7 +720,7 @@ void XGame::syncLobbyUsers(void)
 
         X_ASSERT(info.guid.isValid(), "User is no valid")();
 
-        if (userNetMap_.guidPresent(info.guid))
+        if (!userNetMap_.guidPresent(info.guid))
         {
             newUsers.push(info);
         }
