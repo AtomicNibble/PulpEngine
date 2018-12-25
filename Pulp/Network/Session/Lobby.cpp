@@ -1728,7 +1728,14 @@ bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
     info.pName = user.username.c_str();
     info.peerIdx = user.peerIdx;
     info.guid = user.guid;
+    info.systemHandle = INVALID_SYSTEM_HANDLE;
 
+    if (user.hasPeer()) {
+        return false;
+    }
+
+    info.systemHandle = peers_[user.peerIdx].systemHandle;
+    return true;
 }
 
 bool Lobby::tryPopChatMsg(ChatMsg& msg)

@@ -547,9 +547,15 @@ typedef uintptr_t LobbyUserHandle;
 
 struct UserInfo
 {
+    X_INLINE bool hasPeer(void) const {
+        return peerIdx >= 0;
+    }
+
     const char* pName;
-    int32_t peerIdx;
     NetGUID guid;
+    // Not always valid.
+    int32_t peerIdx;
+    SystemHandle systemHandle;
 };                                               
 
 struct ChatMsg
