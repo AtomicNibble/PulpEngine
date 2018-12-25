@@ -191,7 +191,7 @@ X_DECLARE_ENUM8(MessageID)
     LobbyConnectAndMove,    // The host of a patry told us to join this party.
     LobbyLeaveGameLobby,    // The host suggests you leave with him :)
 
-    LobbyPingValues, // from host has all the users pings.
+    LobbyPingValues,        // from host has all the users pings.
     LobbyChatMsg,
 
     // --- Session ---
