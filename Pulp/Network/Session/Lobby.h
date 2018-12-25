@@ -196,11 +196,8 @@ public:
     // Users
     X_INLINE int32_t getNumUsers(void) const X_FINAL;
     X_INLINE int32_t getNumFreeUserSlots(void) const X_FINAL;
-    X_INLINE LobbyUserHandle getUserHandleForIdx(int32_t idx) const X_FINAL;
 
-    const char* getUserName(LobbyUserHandle handle) const X_FINAL;
     bool getUserInfoForIdx(int32_t idx, UserInfo& info) const X_FINAL;
-    bool getUserInfo(LobbyUserHandle handle, UserInfo& info) const X_FINAL;
 
     // Misc
     X_INLINE bool isActive(void) const X_FINAL;

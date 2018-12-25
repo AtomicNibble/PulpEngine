@@ -1721,15 +1721,6 @@ int32_t Lobby::getNumConnectedPeersInGame(void) const
     return num;
 }
 
-const char* Lobby::getUserName(LobbyUserHandle handle) const
-{
-    size_t idx = static_cast<size_t>(handle);
-
-    // Stu? is that you?
-    return users_[idx].username.c_str();
-}
-
-
 bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
 {
     auto& user = users_[idx];
@@ -1737,14 +1728,7 @@ bool Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
     info.pName = user.username.c_str();
     info.peerIdx = user.peerIdx;
     info.guid = user.guid;
-    return true;
-}
 
-bool Lobby::getUserInfo(LobbyUserHandle handle, UserInfo& info) const
-{
-    auto idx = static_cast<int32_t>(handle);
-   
-    return getUserInfoForIdx(idx, info);
 }
 
 bool Lobby::tryPopChatMsg(ChatMsg& msg)

@@ -678,10 +678,8 @@ namespace gui
 
         for (int32_t i = 0; i < numUsers; i++)
         {
-            auto handle = pLobby->getUserHandleForIdx(i);
-
             net::UserInfo info;
-            pLobby->getUserInfo(handle, info);
+            pLobby->getUserInfoForIdx(i, info);
 
             bool isHost = (hostIdx == info.peerIdx);
 
