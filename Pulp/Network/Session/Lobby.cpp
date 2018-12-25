@@ -874,7 +874,7 @@ void Lobby::addLocalUsers(void)
     core::SysInfo::GetUserName(nameStr);
 
     // Lerrooooooooooooy JENKINS!!! (is a twat? O_O)
-    char buffer[128];
+    char buffer[sizeof(nameStr) / 2];
 
     auto localGuid = pPeer_->getMyGUID();
     SystemAddress address;
