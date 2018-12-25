@@ -551,6 +551,7 @@ struct UserInfo
         return peerIdx >= 0;
     }
 
+public:
     const char* pName;
     NetGUID guid;
     // Not always valid.
@@ -567,11 +568,10 @@ struct ChatMsg
         return dateTimeStamp > rhs.dateTimeStamp;
     }
 
-
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
 
-
+public:
     NetGUID userGuid;
     core::DateTimeStamp dateTimeStamp;
     core::string msg;
