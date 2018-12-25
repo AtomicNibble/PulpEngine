@@ -730,6 +730,8 @@ void XGame::syncLobbyUsers(void)
         }
     }
 
+    X_ASSERT(currentUsers.size() <= userNetMap_.getNumUsers(), "current users is can't be bigger")(currentUsers.size(), userNetMap_.getNumUsers());
+
     // You still here?
     for (int32_t i = 0; i < static_cast<int32_t>(userNetMap_.lobbyUserGuids.size()); i++)
     {

@@ -56,6 +56,12 @@ public:
         return -1;
     }
 
+    int32_t getNumUsers(void) const {
+        return safe_static_cast<int32_t>(std::count_if(lobbyUserGuids.begin(), lobbyUserGuids.end(), [](const net::NetGUID& guid) -> bool {
+            return guid.isValid();
+        }));
+    }
+
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const {
         auto it = std::find(lobbyUserGuids.begin(), lobbyUserGuids.end(), guid);
         if (it != lobbyUserGuids.end()) {
