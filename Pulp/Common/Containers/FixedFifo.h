@@ -27,8 +27,8 @@ struct FixedFifoIterator
     {
     }
 
-    inline const T& operator*(void)const;
-    inline const T* operator->(void)const;
+    inline T& operator*(void);
+    inline T* operator->(void);
     inline FixedFifoIterator& operator++(void);
     inline FixedFifoIterator operator++(int);
     inline bool operator==(const FixedFifoIterator& rhs) const;

@@ -484,13 +484,13 @@ T* Fifo<T>::Allocate(size_type num)
 /// ------------------------------------------------------c
 
 template<typename T>
-inline const T& FifoIterator<T>::operator*(void)const
+inline T& FifoIterator<T>::operator*(void)
 {
     return *current_;
 }
 
 template<typename T>
-inline const T* FifoIterator<T>::operator->(void)const
+inline T* FifoIterator<T>::operator->(void)
 {
     return current_;
 }

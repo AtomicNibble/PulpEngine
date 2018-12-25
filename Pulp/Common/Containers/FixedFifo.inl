@@ -246,13 +246,13 @@ X_INLINE const T* FixedFifo<T, N>::endPtr(void) const
 /// ------------------------------------------------------
 
 template<typename T, size_t N>
-inline const T& FixedFifoIterator<T, N>::operator*(void)const
+inline T& FixedFifoIterator<T, N>::operator*(void)
 {
     return *current_;
 }
 
 template<typename T, size_t N>
-inline const T* FixedFifoIterator<T, N>::operator->(void)const
+inline T* FixedFifoIterator<T, N>::operator->(void)
 {
     return current_;
 }
