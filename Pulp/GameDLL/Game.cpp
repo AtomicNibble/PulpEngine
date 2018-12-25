@@ -701,8 +701,8 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
 
 void XGame::syncLobbyUsers(void)
 {
-    core::FixedArray<net::NetGUID, net::MAX_PLAYERS> currentUsers;
-    core::FixedFifo<net::NetGUID, net::MAX_PLAYERS> newUsers;
+    core::FixedArray<net::UserInfo, net::MAX_PLAYERS> currentUsers;
+    core::FixedFifo<net::UserInfo, net::MAX_PLAYERS> newUsers;
 
     auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
@@ -719,14 +719,14 @@ void XGame::syncLobbyUsers(void)
         pLobby->getUserInfoForIdx(i, info);
 
         X_ASSERT(info.guid.isValid(), "User is no valid")();
-        
+
         if (userNetMap_.guidPresent(info.guid))
         {
-            newUsers.push(info.guid);
+            newUsers.push(info);
         }
         else
         {
-            currentUsers.push_back(info.guid);
+            currentUsers.push_back(info);
         }
     }
 
@@ -738,12 +738,16 @@ void XGame::syncLobbyUsers(void)
             continue;
         }
 
-        if (currentUsers.find(userGuid) == decltype(currentUsers)::invalid_index) {
+        auto it = std::find_if(currentUsers.begin(), currentUsers.end(), [userGuid](const net::UserInfo& ui) {
+            return ui.guid == userGuid;
+        });
+
+        if (it == currentUsers.end()) {
 
             net::NetGuidStr buf;
             X_LOG0("Game", "Client left %" PRIi32 " guid: %s", i, userGuid.toString(buf));
 
-            userNetMap_.lobbyUserGuids[i] = net::NetGUID();
+            userNetMap_.resetIndex(i);
             world_->removePlayer(i);
         }
     }
@@ -752,37 +756,23 @@ void XGame::syncLobbyUsers(void)
     while (newUsers.isNotEmpty())
     {
         // find a free local player slot.
-        int32_t plyIdx = -1;
-        for (int32_t i = 0; i < static_cast<int32_t>(userNetMap_.lobbyUserGuids.size()); i++)
-        {
-            if (!userNetMap_.lobbyUserGuids[i].isValid())
-            {
-                plyIdx = i;
-                break;
-            }
-        }
+        int32_t plyIdx = userNetMap_.findFreeSlot();
 
-        if (plyIdx == -1)
-        {
+        if (plyIdx == -1) {
             X_ERROR("Game", "Failed to find free player slot for connected player");
             break;
         }
 
-        auto userGuid = newUsers.peek();
+        auto user = newUsers.peek();
         newUsers.pop();
 
         net::NetGuidStr buf;
-        X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, userGuid.toString(buf));
+        X_LOG0("Game", "Client connected %" PRIi32 " guid: %s", plyIdx, user.guid.toString(buf));
 
-        userNetMap_.lobbyUserGuids[plyIdx] = userGuid;
+        userNetMap_.addUser(plyIdx, user);
+        bool isLocal = plyIdx == userNetMap_.localPlayerIdx;
 
         userCmdMan_.resetPlayer(plyIdx);
-
-        // for host.
-        auto isLocal = userNetMap_.myGuid == userGuid;
-        if (isLocal) {
-            userNetMap_.localPlayerIdx = plyIdx;
-        }
 
         // spawn!
         world_->spawnPlayer(plyIdx, isLocal);
