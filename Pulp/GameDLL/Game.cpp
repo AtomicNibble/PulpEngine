@@ -380,6 +380,9 @@ bool XGame::update(core::FrameData& frame)
             pMenuHandler_->close();
 
             userCmdGen_.clearForNewLevel();
+
+            // TODO: only create this if we needed it.
+            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_);
         }
 
         X_ASSERT_NOT_NULL(world_.ptr());
