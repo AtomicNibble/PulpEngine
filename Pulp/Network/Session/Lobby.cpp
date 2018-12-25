@@ -1743,7 +1743,7 @@ bool Lobby::tryPopChatMsg(ChatMsg& msg)
         return false;
     }
 
-    msg = chatMsgs_.peek();
+    msg = std::move(chatMsgs_.peek());
     chatMsgs_.pop();
     return true;
 }
