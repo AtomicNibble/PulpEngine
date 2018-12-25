@@ -12,13 +12,38 @@ Multiplayer::Multiplayer() :
 
 }
 
-void Multiplayer::update(const UserNetMappings& unm)
+void Multiplayer::update(net::IPeer* pPeer, net::ILobby* pGameLobby, const UserNetMappings& unm)
 {
-    // i want to populate all the ping info for connected players.
-    // which means i need the lobby and the peer.
-    // i need some way to map netGuids to player idx tho.
-    // think i might just have some for of player state that i can pass around.
-    X_UNUSED(unm);
+    X_UNUSED(pGameLobby);
+
+    // get all the pings yo.
+    // this should just map with players.
+    // maybe we should wait for spawn.
+    for (size_t i = 0; i < unm.lobbyUserGuids.size(); i++)
+    {
+        if (!unm.lobbyUserGuids[i].isValid()) {
+            continue;
+        }
+
+        auto sysHandle = unm.sysHandles[i];
+
+        net::PingInfo pingInfo;
+        if (pPeer->getPingInfo(sysHandle, pingInfo)) {
+            continue;
+        }
+
+        playerStates_[i].ping = pingInfo.avg;
+    }
+
+    switch (state_)
+    {
+        case GameState::GAME:
+            break;
+
+        case GameState::SCOREBOARD:
+            break;
+    }
+
 
 }
 
