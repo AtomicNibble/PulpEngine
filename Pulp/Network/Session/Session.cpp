@@ -81,7 +81,6 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     pendingConnections_(arena),
     peers_(arena),
     numSnapsReceived_(0),
-    oldSnap_(arena),
     snapInterpolationTimeMS_(0),
     snapInterpolationResidual_(0.f)
 {
@@ -235,8 +234,6 @@ void Session::processSnapShot(void)
     pGameCallbacks_->applySnapShot(snap);
 
     recivedSnaps_.pop();
-
-    oldSnap_ = std::move(snap);
 }
 
 void Session::connect(SystemAddress address)

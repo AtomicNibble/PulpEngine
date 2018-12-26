@@ -242,7 +242,6 @@ private:
     // Snapshot - reciving
     int32_t numSnapsReceived_;
     SnapShotRingBuffer recivedSnaps_;
-    SnapShot oldSnap_; // TODO: keep around only for debug builds?
 
     SnapTime snapTime_;
     SnapTime snapRecvTime_;
