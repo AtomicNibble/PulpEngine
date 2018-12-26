@@ -31,6 +31,10 @@ namespace
     template<typename T>
     class AlignedArrayTest : public ::testing::Test
     {
+        void SetUp() X_FINAL {
+            resetConConters();
+        }
+
     public:
     };
 
@@ -63,8 +67,6 @@ TYPED_TEST(AlignedArrayTest, Contruct)
 
 TYPED_TEST(AlignedArrayTest, Clear)
 {
-    resetConConters();
-
     Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
     list.setGranularity(128);
@@ -88,8 +90,6 @@ TYPED_TEST(AlignedArrayTest, Clear)
 
 TYPED_TEST(AlignedArrayTest, Free)
 {
-    resetConConters();
-
     {
         Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 
@@ -122,8 +122,6 @@ TYPED_TEST(AlignedArrayTest, Move)
     // make a stack based arena that can't allocate multiple buffers.
     // meaning allocation will fail if the copy constructors are used.
     const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>>) * 2) + (sizeof(size_t) * 3); // Linear header block.
-
-    resetConConters();
 
     {
         X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
@@ -266,8 +264,6 @@ TYPED_TEST(AlignedArrayTest, Insert)
 
 TYPED_TEST(AlignedArrayTest, Remove)
 {
-    resetConConters();
-
     {
         Array<TypeParam, core::ArrayAlignedAllocator<TypeParam>> list(g_arena);
 

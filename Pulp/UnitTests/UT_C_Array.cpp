@@ -31,6 +31,10 @@ namespace
     template<typename T>
     class ArrayTest : public ::testing::Test
     {
+        void SetUp() X_FINAL {
+            resetConConters();
+        }
+
     public:
     };
 
@@ -63,8 +67,6 @@ TYPED_TEST(ArrayTest, Contruct)
 
 TYPED_TEST(ArrayTest, Clear)
 {
-    resetConConters();
-
     Array<TypeParam> list(g_arena);
 
     list.setGranularity(128);
@@ -88,8 +90,6 @@ TYPED_TEST(ArrayTest, Clear)
 
 TYPED_TEST(ArrayTest, Free)
 {
-    resetConConters();
-
     {
         Array<TypeParam> list(g_arena);
 
@@ -119,8 +119,6 @@ TYPED_TEST(ArrayTest, Free)
 
 TYPED_TEST(ArrayTest, Expand)
 {
-    resetConConters();
-
     {
         Array<TypeParam> list(g_arena);
 
@@ -146,8 +144,6 @@ TYPED_TEST(ArrayTest, Expand)
 
 TYPED_TEST(ArrayTest, ShrinkToFit)
 {
-    resetConConters();
-
     {
         Array<TypeParam> list(g_arena);
 
@@ -180,8 +176,6 @@ TYPED_TEST(ArrayTest, Move)
     // make a stack based arena that can't allocate multiple buffers.
     // meaning allocation will fail if the copy constructors are used.
     const size_t bytes = (sizeof(TypeParam) * (100 + 64)) + (sizeof(Array<TypeParam>) * 2) + (sizeof(size_t) * 3); // Linear header block.
-
-    resetConConters();
 
     {
         X_ALIGNED_SYMBOL(char buf[bytes], 8) = {};
@@ -424,8 +418,6 @@ TYPED_TEST(ArrayTest, Insert)
 
 TYPED_TEST(ArrayTest, Remove)
 {
-    resetConConters();
-
     {
         Array<TypeParam> list(g_arena);
 
