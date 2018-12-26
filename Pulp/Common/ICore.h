@@ -71,6 +71,9 @@ X_NAMESPACE_DECLARE(net,
                     struct INet;)
 X_NAMESPACE_DECLARE(video,
                     struct IVideoSys;)
+X_NAMESPACE_DECLARE(locale,
+                    struct ILocalisation;)
+
 
 X_USING_NAMESPACE;
 
@@ -297,6 +300,7 @@ struct CoreGlobals // obbject is zerod on start.
     core::V2::JobSystem* pJobSys;
     core::profiler::IProfiler* pProfiler;
     video::IVideoSys* pVideoSys;
+    locale::ILocalisation* pLocalisation;
 
     core::IDirectoryWatcher* pDirWatcher;
 
@@ -330,6 +334,8 @@ struct CoreGlobals // obbject is zerod on start.
         pNet = nullptr;
         pJobSys = nullptr;
         pProfiler = nullptr;
+        pVideoSys = nullptr;
+        pLocalisation = nullptr;
         pDirWatcher = nullptr;
         pArena = nullptr;
         pStrArena = nullptr;

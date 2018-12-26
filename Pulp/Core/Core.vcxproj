@@ -491,6 +491,7 @@
     <ClInclude Include="FileSys\win32\PathUtil.h" />
     <ClInclude Include="FileSys\xFileSys.h" />
     <ClInclude Include="FileSys\XFindData.h" />
+    <ClInclude Include="Localisation\Localisation.h" />
     <ClInclude Include="NullImplementation\ConsoleNULL.h" />
     <ClInclude Include="PotatoFactoryRegistryImpl.h" />
     <ClInclude Include="Log.h" />
@@ -523,6 +524,7 @@
     <ClCompile Include="FileSys\win32\PathUtil.cpp" />
     <ClCompile Include="FileSys\xFileSys.cpp" />
     <ClCompile Include="FileSys\XFindData.cpp" />
+    <ClCompile Include="Localisation\Localisation.cpp" />
     <ClCompile Include="NullImplementation\ConsoleNULL.cpp" />
     <ClCompile Include="PotatoFactoryRegistryImpl.cpp" />
     <ClCompile Include="Log.cpp" />

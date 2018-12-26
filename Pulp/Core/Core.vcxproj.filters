@@ -48,6 +48,12 @@
     <Filter Include="Source Files\FileSys\win32">
       <UniqueIdentifier>{a5155093-ab7e-4aed-ad3a-df9d86294760}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source Files\Localisation">
+      <UniqueIdentifier>{d79e990d-584d-4752-98eb-1c829191e934}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Localisation">
+      <UniqueIdentifier>{71798f47-1a06-4731-8a55-f28ad97fff3b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="stdafx.h">
@@ -146,6 +152,9 @@
     <ClInclude Include="ReplaySys.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Localisation\Localisation.h">
+      <Filter>Header Files\Localisation</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -237,6 +246,9 @@
     </ClCompile>
     <ClCompile Include="ReplaySys.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Localisation\Localisation.cpp">
+      <Filter>Source Files\Localisation</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -167,6 +167,7 @@
     <ClInclude Include="IEngineSysBase.h" />
     <ClInclude Include="IEntity.h" />
     <ClInclude Include="IFileSysStats.h" />
+    <ClInclude Include="Ilocalisation.h" />
     <ClInclude Include="IModelManager.h" />
     <ClInclude Include="INetwork.h" />
     <ClInclude Include="IRenderCommands.h" />

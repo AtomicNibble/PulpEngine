@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "Console.h"
 #include "Core.h"
-
 #include "Log.h"
+#include "Localisation/Localisation.h"
 
 #include <String\CmdArgs.h>
 #include <String\HumanSize.h>
@@ -492,13 +492,17 @@ bool XCore::Init(const CoreInitParams& startupParams)
     if (!time_.init(this)) {
         return false;
     }
+    
+    // #------------------------- Locale ------------------------
+    env_.pLocalisation = X_NEW(locale::Localisation, g_coreArena, "Localisation")(g_coreArena);
+
 
     // #------------------------- JOB SYSTEM ------------------------
     if (env_.pJobSys) {
         env_.pJobSys->StartUp(vars_.getSchedulerNumThreads());
     }
 
-    // #------------------------- FileSystem Workets ------------------------
+    // #------------------------- FileSystem Workers ------------------------
     if (startupParams.jobSystemEnabled()) {
         env_.pFileSys->initWorker();
     }

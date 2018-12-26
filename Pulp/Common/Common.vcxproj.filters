@@ -238,6 +238,9 @@
     <Filter Include="SourceFiles\Random\win32">
       <UniqueIdentifier>{1af050cd-8ea9-4633-b1ed-3e72c664e943}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Interfaces_h\Localisation">
+      <UniqueIdentifier>{21444703-dce7-40fd-8083-f422342a64a8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Prepro\PreproCommaIf.h">
@@ -1350,6 +1353,9 @@
     </ClInclude>
     <ClInclude Include="Util\HashHelper.h">
       <Filter>Headers\Util</Filter>
+    </ClInclude>
+    <ClInclude Include="Ilocalisation.h">
+      <Filter>Interfaces_h\Localisation</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

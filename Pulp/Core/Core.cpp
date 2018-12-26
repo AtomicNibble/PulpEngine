@@ -15,6 +15,7 @@
 #include <INetwork.h>
 #include <IVideo.h>
 #include <IEngineModule.h>
+#include <Ilocalisation.h>
 
 #include <Hashing\crc32.h>
 #include <Platform\Window.h>
@@ -250,6 +251,10 @@ void XCore::ShutDown()
     if (env_.pNet) {
         env_.pNet->shutDown();
         core::SafeRelease(env_.pNet);
+    }
+
+    if (env_.pLocalisation) {
+        core::Mem::DeleteAndNull(env_.pLocalisation, g_coreArena);
     }
 
     if (pWindow_) {
