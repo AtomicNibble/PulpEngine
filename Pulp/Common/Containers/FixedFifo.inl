@@ -11,6 +11,7 @@ FixedFifo<T, N>::FixedFifo() :
 template<typename T, size_t N>
 FixedFifo<T, N>::~FixedFifo()
 {
+    clear();
 }
 
 template<typename T, size_t N>
