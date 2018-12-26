@@ -33,6 +33,7 @@
 
 #if X_64
 #define RAPIDJSON_SSE2
+#define RAPIDJSON_48BITPOINTER_OPTIMIZATION 1
 #endif // !X_^$
 
 
