@@ -5,6 +5,10 @@
 
 #include <Containers\ByteStream.h>
 
+#ifdef GetObject
+#undef GetObject
+#endif // !GetObject
+
 #if X_COMPILER_CLANG
 #ifdef _MSC_VER
 #undef _MSC_VER
