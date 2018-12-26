@@ -32,3 +32,4 @@
 
 # line endings
 *.lua eol=lf
+*.json eol=lf
