@@ -33,7 +33,7 @@ void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
         }
 
         net::PingInfo pingInfo;
-        if (pPeer->getPingInfo(sysHandle, pingInfo)) {
+        if (!pPeer->getPingInfo(sysHandle, pingInfo)) {
             continue;
         }
 
