@@ -62,6 +62,7 @@ private:
     void drawChat(engine::IPrimativeContext* pPrim);
     void updateChat(core::TimeVal dt);
 
+    void drawLeaderboard(engine::IPrimativeContext* pPrim);
 
 private:
     GameState::Enum state_;

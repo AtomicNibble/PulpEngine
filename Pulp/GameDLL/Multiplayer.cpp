@@ -55,6 +55,7 @@ void Multiplayer::draw(core::FrameTimeData& time, engine::IPrimativeContext* pPr
     updateChat(time.deltas[core::Timer::UI]);
 
     drawChat(pPrim);
+    drawLeaderboard(pPrim);
 }
 
 void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
@@ -135,6 +136,131 @@ void Multiplayer::updateChat(core::TimeVal dt)
 
     while (chatLines_.isNotEmpty() && chatLines_.peek().ellapsed > chatTime_) {
         chatLines_.pop();
+    }
+}
+
+
+void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
+{
+    // want some rows that are fixed size maybe?
+    // but centered in srreen.
+    // think this is something we should just scale based on res.
+    // 800 X 600 as base.
+
+    constexpr float baseWidth = 600.f;
+
+    constexpr float screenWidth = 1680;
+    // constexpr float screenHeight = 1050.f;
+
+    constexpr float scale = screenWidth / baseWidth;
+
+    constexpr float titleHeight = 30.f;
+    constexpr float rowWidth = 480.f * scale;
+    constexpr float rowHeight = 16.f * scale;
+    constexpr float rowPadding = 4.f * scale;
+    constexpr float padding = 8.f;
+
+    float rowsHeight = ((rowHeight + rowPadding) * net::MAX_PLAYERS) - rowPadding;
+    float height = padding + titleHeight + padding + rowsHeight + padding;
+    float width = rowWidth + (padding * 2);
+
+    float startX = (screenWidth - width) * 0.5f;
+    float startY = 100.f;
+
+    Rectf r(
+        startX,
+        startY,
+        startX + width,
+        startY + height
+    );
+
+    Rectf titleRect(
+        startX + padding,
+        startY + padding,
+        startX + padding + rowWidth,
+        startY + padding + titleHeight
+    );
+
+    Rectf rowsRect(
+        startX + padding,
+        titleRect.y2 + padding,
+        startX + padding + rowWidth,
+        titleRect.y2 + padding + rowsHeight
+    );
+
+    // temp maybe?^
+ //   pPrim->drawQuad(r, Color8u(100, 100, 100, 128));
+    pPrim->drawQuad(titleRect, Color8u(80, 20, 20, 128));
+ //   pPrim->drawQuad(rowsRect, Color8u(20,20,20,128));
+
+    {
+        // draw the row backgrounds
+        float y = rowsRect.y1;
+
+        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        {
+            Rectf row(rowsRect);
+            row.y1 = y;
+            row.y2 = y + rowHeight;
+
+            y += rowHeight + rowPadding;
+
+            pPrim->drawQuad(row, Color8u(10, 10, 10, 192));
+        }
+    }
+
+    {
+        // draw the row borders
+        float y = rowsRect.y1;
+
+        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        {
+            Rectf row(rowsRect);
+            row.y1 = y;
+            row.y2 = y + rowHeight;
+
+            y += rowHeight + rowPadding;
+
+            pPrim->drawRect(row, Color8u(60, 60, 60, 10));
+        }
+    }
+
+    // Draw text now.
+    font::TextDrawContext con;
+    con.col = Col_Whitesmoke;
+    con.size = Vec2f(24.f, 24.f);
+    con.effectId = 0;
+    con.pFont = gEnv->pFontSys->getDefault();
+
+
+    core::StackString512 str;
+    str.setFmt(" %-48s %-12s %-12s %-12s %-12s", "Name", "Points", "Kills", "HeadShots", "Ping");
+
+    // Title
+    con.effectId = 1;
+    pPrim->drawText(titleRect.x1, titleRect.y1, con, str.begin(), str.end());
+
+    con.effectId = 0;
+
+    {
+        float y = rowsRect.y1;
+
+        con.flags.Set(font::DrawTextFlag::CENTER_VER);
+
+        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        {
+            Rectf row(rowsRect);
+            row.y1 = y;
+            row.y2 = y + rowHeight;
+
+            y += rowHeight + rowPadding;
+
+            // Name - Points - Kills - Headshots - Ping
+            auto& ply = playerStates_[i];
+
+            str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, "Stu", 0, ply.kills, 0, ply.ping);
+            pPrim->drawText(row.x1, row.getCenter().y, con, str.begin(), str.end());
+        }
     }
 }
 
