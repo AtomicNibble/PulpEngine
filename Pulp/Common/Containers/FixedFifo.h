@@ -109,8 +109,6 @@ public:
 
     // items are cleared but buffer is not returned.
     X_INLINE void clear(void);
-    // items are cleared and buffer is destroyed
-    X_INLINE void free(void);
 
     // returns the number of items currently inside the fifo
     X_INLINE size_type size(void) const;
