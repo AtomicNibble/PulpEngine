@@ -34,9 +34,10 @@ public:
 
     string_view getString(Key k) const X_FINAL;
 
-    // bool loadDict();
+    bool loadDict(core::Path<char>& name);
 
 private:
+    core::MemoryArenaBase* arena_;
     HashTable ht_;
 };
 
