@@ -512,7 +512,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
             // TODO: support other langs :D
             core::Path<char> path("strings/english/str.json");
 
-            if (loc->loadDict(path)) {
+            if (!loc->loadDict(path)) {
                 X_ERROR("Core", "Failed to load string dict");
                 return false;
             }
