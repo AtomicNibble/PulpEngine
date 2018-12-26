@@ -186,6 +186,9 @@ void UserCmdGen::setButtonFlags(void)
     if (buttonState(UserButton::RELOAD)) {
         cmd_.buttons.Set(net::Button::RELOAD);
     }
+    if (buttonState(UserButton::SHOW_SCORES)) {
+        cmd_.buttons.Set(net::Button::SHOW_SCORES);
+    }
 
     // some stuff that can be either toggle or hold.
     if (toggledCrouch_.isActive()) {
@@ -289,6 +292,10 @@ UserButton::Enum UserCmdGen::getUserButton(input::KeyId::Enum key)
         case input::KeyId::E:
         case input::KeyId::MOUSE_WHEELUP:
             return UserButton::WEAP_PREV;
+
+        case input::KeyId::TAB:
+            return UserButton::SHOW_SCORES;
+
 
         default:
             return UserButton::NONE;

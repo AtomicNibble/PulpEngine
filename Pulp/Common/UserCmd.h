@@ -22,7 +22,8 @@ X_DECLARE_FLAGS8(Button)
     RELOAD,
     ZOOM,
     RUN,
-    USE);
+    USE,
+    SHOW_SCORES);
 
 X_DECLARE_ENUM8(Impulse)
 (

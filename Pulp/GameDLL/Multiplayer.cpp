@@ -50,12 +50,12 @@ void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
     }
 }
 
-void Multiplayer::draw(core::FrameTimeData& time, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim)
 {
+    // TODO: maybe seperate this out.
     updateChat(time.deltas[core::Timer::UI]);
 
     drawChat(pPrim);
-    drawLeaderboard(pPrim);
 }
 
 void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)

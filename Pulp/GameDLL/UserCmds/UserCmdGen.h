@@ -24,6 +24,9 @@ X_DECLARE_ENUM(UserButton)
     MOVE_UP,
     MOVE_DOWN,
 
+    SHOW_SCORES,
+
+    // Impulse
     WEAP0,
     WEAP1,
     WEAP2,

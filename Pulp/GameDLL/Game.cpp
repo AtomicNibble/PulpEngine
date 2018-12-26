@@ -394,8 +394,8 @@ bool XGame::update(core::FrameData& frame)
 
         const bool isHost = pSession_->isHost();
 
+        auto& userCmd = userCmdGen_.getCurrentUserCmd();
         {
-            auto& userCmd = userCmdGen_.getCurrentUserCmd();
             userCmd.clientGameTimeMS = gameTimeMS_;
             userCmd.serverGameTimeMS = serverGameTimeMS_;
 
@@ -450,6 +450,14 @@ bool XGame::update(core::FrameData& frame)
 
                 pSession_->sendSnapShot(snap);
             }
+
+            pMultiplayerGame_->update(pPeer_, userNetMap_);
+        }
+
+        pMultiplayerGame_->drawChat(frame.timeInfo, pPrim);
+
+        if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
+            pMultiplayerGame_->drawLeaderboard(pPrim);
         }
     }
     else if (status == net::SessionStatus::PartyLobby)
