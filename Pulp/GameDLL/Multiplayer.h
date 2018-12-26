@@ -8,6 +8,7 @@ X_NAMESPACE_DECLARE(core, class FixedBitStreamBase);
 
 X_NAMESPACE_BEGIN(game)
 
+class GameVars;
 struct UserNetMappings;
 
 class Multiplayer
@@ -51,7 +52,7 @@ class Multiplayer
     using PlayerStateArr = std::array< PlayerState, net::MAX_PLAYERS>;
 
 public:
-    Multiplayer();
+    Multiplayer(GameVars& vars);
 
     void update(net::IPeer* pPeer, const UserNetMappings& unm);
 
@@ -69,13 +70,14 @@ private:
 
 
 private:
+    GameVars& vars_;
+
     GameState::Enum state_;
     GameState::Enum nextState_;
 
     PlayerStateArr playerStates_;
 
     // Chitty chat
-    core::TimeVal chatTime_;
     ChatLineFiFo chatLines_;
 };
 

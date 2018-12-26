@@ -338,7 +338,7 @@ bool XGame::update(core::FrameData& frame)
 
             // TODO: only create this if we needed it.
             // I create this when loading as the server will send us state for this before we finish loading.
-            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_);
+            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_, vars_);
         }
 
         if (!world_)

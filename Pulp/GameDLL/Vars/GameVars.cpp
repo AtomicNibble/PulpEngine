@@ -7,9 +7,11 @@ X_NAMESPACE_BEGIN(game)
 
 GameVars::GameVars()
 {
-    userCmdDebug_ = 0;
+    userCmdDebug_ = 1;
     userCmdDrawDebug_ = 0;
     userCmdClientReplay_ = 1;
+
+    chatLifeMS_ = 8000;
 
     pFovVar_ = nullptr;
 }
@@ -26,6 +28,9 @@ void GameVars::registerVars(void)
 
     ADD_CVAR_REF("net_ucmd_client_replay", userCmdClientReplay_, userCmdClientReplay_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Replay local user commands the server has not processed");
+
+    ADD_CVAR_REF("g_chat_life_ms", chatLifeMS_, chatLifeMS_, 0, 60 * 1000, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "How long chat msg's live in MS");
 
     pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI) - 1.f,
         core::VarFlag::SAVE_IF_CHANGED, "camera fov");

@@ -2,6 +2,8 @@
 #include "Multiplayer.h"
 #include "UserNetMappings.h"
 
+#include "Vars/GameVars.h"
+
 #include <Containers/FixedBitStream.h>
 
 #include <IFrameData.h>
@@ -9,10 +11,11 @@
 X_NAMESPACE_BEGIN(game)
 
 
-Multiplayer::Multiplayer() :
+Multiplayer::Multiplayer(GameVars& vars) :
+    vars_(vars),
     state_(GameState::NONE)
 {
-    chatTime_ = core::TimeVal::fromMS(8000);
+    
 }
 
 void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
@@ -78,10 +81,12 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
     float x = 5.f;
     float y = 500.f - (height * chatLines_.size());
 
+    auto chatTime = core::TimeVal::fromMS(vars_.chatMsgLifeMS());
+
     for (const auto& line : chatLines_)
     {
         // fade out last 10%?
-        float percent = line.ellapsed.GetMilliSeconds() / chatTime_.GetMilliSeconds();
+        float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
 
         // this really best way :S ?
         const float fadeStart = 0.85f;
@@ -135,7 +140,9 @@ void Multiplayer::updateChat(core::TimeVal dt)
         line.ellapsed += dt;
     }
 
-    while (chatLines_.isNotEmpty() && chatLines_.peek().ellapsed > chatTime_) {
+    auto chatTime = core::TimeVal::fromMS(vars_.chatMsgLifeMS());
+
+    while (chatLines_.isNotEmpty() && chatLines_.peek().ellapsed > chatTime) {
         chatLines_.pop();
     }
 }
