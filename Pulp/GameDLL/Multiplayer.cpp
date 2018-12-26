@@ -105,13 +105,13 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
 void Multiplayer::readFromSnapShot(core::FixedBitStreamBase& bs)
 {
     bs.read(playerStates_.data(), playerStates_.size());
-
+    bs.read(state_);
 }
 
 void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
 {
     bs.write(playerStates_.data(), playerStates_.size());
-
+    bs.write(state_);
 }
 
 void Multiplayer::addChatLine(core::string line)
