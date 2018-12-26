@@ -493,10 +493,6 @@ bool XCore::Init(const CoreInitParams& startupParams)
         return false;
     }
     
-    // #------------------------- Locale ------------------------
-    env_.pLocalisation = X_NEW(locale::Localisation, g_coreArena, "Localisation")(g_coreArena);
-
-
     // #------------------------- JOB SYSTEM ------------------------
     if (env_.pJobSys) {
         env_.pJobSys->StartUp(vars_.getSchedulerNumThreads());
@@ -508,6 +504,21 @@ bool XCore::Init(const CoreInitParams& startupParams)
     }
 
     if (!startupParams.isCoreOnly()) {
+
+        // #------------------------- Locale ------------------------
+        {
+            auto loc = core::makeUnique<locale::Localisation>(g_coreArena, g_coreArena);
+
+            core::Path<char> path("strings/english/str.json");
+
+            if (loc->loadDict(path)) {
+                X_ERROR("Core", "Failed to load string dict");
+                return false;
+            }
+
+            env_.pLocalisation = loc.release();
+        }
+
         // #------------------------- Input ------------------------
         if (!InitInput(startupParams)) {
             return false;
