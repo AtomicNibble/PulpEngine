@@ -1774,7 +1774,7 @@ Vec2f Lobby::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
     txt.setFmt("Lobby - Type: ^1%s^7 State: ^1%s^7 HostIdx: ^1%" PRIi32 "^7 isHost: ^1%" PRIu8 "^7\n",
         LobbyType::ToString(type_), LobbyState::ToString(state_), hostIdx_, isHost_);
 
-    txt.appendFmt("HostAddr: \"%s\" NumConnected: ^1%" PRIi32 "^7 NuminGame: ^1%" PRIi32 "^7\n",
+    txt.appendFmt("HostAddr: \"%s\" NumConnected: ^1%" PRIi32 "^7 NumInGame: ^1%" PRIi32 "^7\n",
         pNet->systemAddressToString(hostAddress_, ipStr, true), numConnected, numInGame);
 
     txt.appendFmt("Slots: %" PRIi32 " Mode: %s Map: %s\n",
