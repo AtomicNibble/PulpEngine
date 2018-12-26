@@ -446,6 +446,13 @@ bool XGame::update(core::FrameData& frame)
                 snap.setUserCmdTimes(lastUserCmdRunTime_);
                 snap.setPlayerGuids(userNetMap_.lobbyUserGuids);
 
+                {
+                    core::FixedBitStreamStack<512> bs;
+                    pMultiplayerGame_->writeToSnapShot(bs);
+
+                    snap.addObject(net::SnapShot::SNAP_MP_STATE, bs);
+                }
+
                 world_->createSnapShot(snap);
 
                 pSession_->sendSnapShot(snap);
@@ -456,6 +463,7 @@ bool XGame::update(core::FrameData& frame)
 
         pMultiplayerGame_->drawChat(frame.timeInfo, pPrim);
 
+        // What's the point we all know stu will be at the top :(
         if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
             pMultiplayerGame_->drawLeaderboard(pPrim);
         }
@@ -541,6 +549,14 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
 
 void XGame::applySnapShot(const net::SnapShot& snap)
 {
+    // get the game state.
+    {
+        net::SnapShot::MsgBitStream bs;
+        if (snap.findObjectByID(net::SnapShot::SNAP_MP_STATE, bs))
+        {
+            pMultiplayerGame_->readFromSnapShot(bs);
+        }
+    }
     // we need to apply a snapshot.
     world_->applySnapShot(userNetMap_, snap);
 

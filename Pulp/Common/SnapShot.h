@@ -35,11 +35,14 @@ class SnapShot
     typedef core::ArrayGrowMultiply<ObjectState> ObjectStateArr;
     typedef core::ArrayGrowMultiply<ObjectState*> ObjectStatePtrArr;
 
+public:
     typedef core::FixedBitStreamNoneOwning MsgBitStream;
 
 public:
     using PlayerTimeMSArr = std::array<int32_t, MAX_PLAYERS>;
     using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
+
+    static inline const ObjectID SNAP_MP_STATE = std::numeric_limits<ObjectID>::max() - 1;
 
 public:
     SnapShot(core::MemoryArenaBase* arena);
@@ -70,7 +73,10 @@ public:
     ObjectID getObjectIDByIndex(size_t idx) const;
     MsgBitStream getMessageByIndex(size_t idx) const;
 
+    bool findObjectByID(ObjectID id, MsgBitStream& msgOut) const;
+
 private:
+    int32_t findStateForId(ObjectID id) const;
     ObjectState& findOrMakeStateForId(ObjectID id);
 
 

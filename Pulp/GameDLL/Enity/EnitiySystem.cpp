@@ -237,6 +237,12 @@ namespace entity
         for (size_t i = 0; i < snap.getNumObjects(); i++)
         {
             net::ObjectID id = snap.getObjectIDByIndex(i);
+
+            // TEMP: temp hack, should really dispatch based on id.
+            if (id == net::SnapShot::SNAP_MP_STATE) {
+                continue;
+            }
+
             auto bs = snap.getMessageByIndex(i);
 
             auto remoteEntityId = static_cast<entity::EntityId>(id);

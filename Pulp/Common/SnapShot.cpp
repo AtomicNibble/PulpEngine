@@ -109,6 +109,30 @@ SnapShot::MsgBitStream SnapShot::getMessageByIndex(size_t idx) const
     return MsgBitStream(pBegin, pBegin + state.buffer.size(), true);
 }
 
+bool SnapShot::findObjectByID(ObjectID id, MsgBitStream& msgOut) const
+{
+    auto idx = findStateForId(id);
+
+    if (idx < 0) {
+        return false;
+    }
+
+    msgOut = getMessageByIndex(idx);
+    return true;
+}
+
+int32_t SnapShot::findStateForId(ObjectID id) const
+{
+    for (size_t i = 0; i < objs_.size(); i++)
+    {
+        if (objs_[i].id == id) {
+            return static_cast<int32_t>(i);
+        }
+    }
+
+    return -1;
+}
+
 SnapShot::ObjectState& SnapShot::findOrMakeStateForId(ObjectID id)
 {
     for (size_t i = 0; i < objs_.size(); i++)
