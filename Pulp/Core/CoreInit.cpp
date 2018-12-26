@@ -509,6 +509,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
         {
             auto loc = core::makeUnique<locale::Localisation>(g_coreArena, g_coreArena);
 
+            // TODO: support other langs :D
             core::Path<char> path("strings/english/str.json");
 
             if (loc->loadDict(path)) {
