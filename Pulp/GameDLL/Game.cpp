@@ -441,24 +441,7 @@ bool XGame::update(core::FrameData& frame)
         if (isHost) {
 
             // send snapshot after updating world.
-            if (pSession_->shouldSendSnapShot(frame.timeInfo)) {
-                net::SnapShot snap(arena_);
-
-                snap.setTime(gameTimeMS_);
-                snap.setUserCmdTimes(lastUserCmdRunTime_);
-                snap.setPlayerGuids(userNetMap_.lobbyUserGuids);
-
-                {
-                    core::FixedBitStreamStack<512> bs;
-                    pMultiplayerGame_->writeToSnapShot(bs);
-
-                    snap.addObject(net::SnapShot::SNAP_MP_STATE, bs);
-                }
-
-                world_->createSnapShot(snap);
-
-                pSession_->sendSnapShot(snap);
-            }
+            pSession_->sendSnapShot(frame.timeInfo);
 
             pMultiplayerGame_->update(pPeer_, userNetMap_);
         }
@@ -547,6 +530,22 @@ void XGame::onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs)
     X_ASSERT(clientIdx >= 0, "Failed to get client index for guid \"%s\"", guid.toString(buf))(guid);
 
     userCmdMan_.readUserCmdFromBs(bs, clientIdx);
+}
+
+void XGame::buildSnapShot(net::SnapShot& snap)
+{
+    snap.setTime(gameTimeMS_);
+    snap.setUserCmdTimes(lastUserCmdRunTime_);
+    snap.setPlayerGuids(userNetMap_.lobbyUserGuids);
+
+    {
+        core::FixedBitStreamStack<512> bs;
+        pMultiplayerGame_->writeToSnapShot(bs);
+
+        snap.addObject(net::SnapShot::SNAP_MP_STATE, bs);
+    }
+
+    world_->createSnapShot(snap);
 }
 
 void XGame::applySnapShot(const net::SnapShot& snap)

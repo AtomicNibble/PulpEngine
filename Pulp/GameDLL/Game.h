@@ -84,6 +84,7 @@ private:
 
     // IGameCallbacks
     void onUserCmdReceive(net::NetGUID guid, core::FixedBitStreamBase& bs) X_FINAL;
+    void buildSnapShot(net::SnapShot& snap) X_FINAL;
     void applySnapShot(const net::SnapShot& snap) X_FINAL;
     // ~IGameCallbacks
     

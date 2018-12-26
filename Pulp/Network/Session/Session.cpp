@@ -451,26 +451,29 @@ void Session::sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::
     pPeer_->runUpdate();
 }
 
-bool Session::shouldSendSnapShot(core::FrameTimeData& timeInfo)
+void Session::sendSnapShot(core::FrameTimeData& timeInfo)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
 
     if (timeInfo.startTimeRealative < nextSnapshotSendTime_) {
-        return false;
+        return;
     }
 
     auto rateMS = vars_.snapRateMs();
     nextSnapshotSendTime_ = timeInfo.startTimeRealative + core::TimeVal::fromMS(rateMS);
-    return true;
+
+    SnapShot snap(&snapArena_);
+    pGameCallbacks_->buildSnapShot(snap);
+
+    sendSnapShot(std::move(snap));
 }
 
-void Session::sendSnapShot(const SnapShot& snap)
+void Session::sendSnapShot(SnapShot&& snap)
 {
     X_ASSERT(state_ == SessionState::InGame, "Should only send snapshot if in game")(state_);
-
     X_ASSERT(snap.getTimeMS() >= 0, "Shapshot time is not valid")(snap.getTimeMS());
 
-    // too all peers.
+    // to all peers.
     lobbys_[LobbyType::Game].sendSnapShot(snap);
 
     pPeer_->runUpdate();

@@ -174,8 +174,8 @@ public:
     // if we are a peer, we send user cmds.
     void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::FrameTimeData& timeInfo) X_FINAL;
     // if we are a host and have peers we send snaps.
-    bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_FINAL;
-    void sendSnapShot(const SnapShot& snap) X_FINAL;
+    void sendSnapShot(core::FrameTimeData& timeInfo) X_FINAL;
+    void sendSnapShot(SnapShot&& snap) X_FINAL; // used for testing
 
     ILobby* getLobby(LobbyType::Enum type) X_FINAL;
 

@@ -615,6 +615,7 @@ struct IGameCallbacks
     virtual ~IGameCallbacks() = default;
 
     virtual void onUserCmdReceive(NetGUID guid, core::FixedBitStreamBase& bs) X_ABSTRACT;
+    virtual void buildSnapShot(net::SnapShot& snap) X_ABSTRACT;
     virtual void applySnapShot(const net::SnapShot& snap) X_ABSTRACT;
     virtual void setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS) X_ABSTRACT;
 
@@ -647,8 +648,8 @@ struct ISession
     virtual void startMatch(void) X_ABSTRACT;
 
     virtual void sendUserCmd(const UserCmdMan& userCmdMan, int32_t localIdx, core::FrameTimeData& timeInfo) X_ABSTRACT;
-    virtual bool shouldSendSnapShot(core::FrameTimeData& timeInfo) X_ABSTRACT;
-    virtual void sendSnapShot(const SnapShot& snap) X_ABSTRACT;
+    virtual void sendSnapShot(core::FrameTimeData& timeInfo) X_ABSTRACT;
+    virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT; // used for testing
     
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
 
