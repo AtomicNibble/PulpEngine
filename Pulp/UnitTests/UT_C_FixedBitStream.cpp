@@ -6,6 +6,19 @@ X_USING_NAMESPACE;
 
 typedef core::FixedBitStream<core::FixedBitStreamNoneOwningPolicy> FixedBitStream;
 
+TEST(FixBitStreamBuf, ConstructEmpty)
+{
+    core::FixedBitStreamNoneOwning emptyBS;
+
+    EXPECT_TRUE(emptyBS.isEos());
+    EXPECT_TRUE(emptyBS.isStartOfStream());
+    EXPECT_EQ(0, emptyBS.size());
+    EXPECT_EQ(0, emptyBS.sizeInBytes());
+    EXPECT_EQ(0, emptyBS.capacity());
+
+    EXPECT_EQ(emptyBS.begin(), emptyBS.end());
+}
+
 TEST(FixBitStreamBuf, SimpleBits)
 {
     uint8_t buf[0x200];

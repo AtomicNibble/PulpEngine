@@ -131,6 +131,7 @@ protected:
 class FixedBitStreamNoneOwningPolicy : public FixedBitStreamBase
 {
 public:
+    FixedBitStreamNoneOwningPolicy();
     FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit);
     ~FixedBitStreamNoneOwningPolicy();
 };

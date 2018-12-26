@@ -4,6 +4,12 @@ X_NAMESPACE_BEGIN(core)
 
 // -------------------------------
 
+inline FixedBitStreamNoneOwningPolicy::FixedBitStreamNoneOwningPolicy() :
+    FixedBitStreamBase(nullptr, 0)
+{
+    
+}
+
 inline FixedBitStreamNoneOwningPolicy::FixedBitStreamNoneOwningPolicy(Type* pBegin, Type* pEnd, bool dataInit) :
     FixedBitStreamBase(pBegin, core::bitUtil::bytesToBits(union_cast<size_type>(pEnd - pBegin)))
 {
