@@ -72,10 +72,12 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     pGameCallbacks_(X_ASSERT_NOT_NULL(pGameCallbacks)),
     arena_(X_ASSERT_NOT_NULL(arena)),
+    snapAllocator_(),
+    snapArena_(&snapAllocator_, "SnapShotArena"),
     state_(SessionState::Idle),
     lobbys_{ {
-        {vars_, this, pPeer, pGameCallbacks, LobbyType::Party, arena},
-        {vars_, this, pPeer, pGameCallbacks, LobbyType::Game, arena}
+        {vars_, this, pPeer, pGameCallbacks, LobbyType::Party, arena, &snapArena_},
+        {vars_, this, pPeer, pGameCallbacks, LobbyType::Game, arena, &snapArena_}
     }},
     pendingJoins_(arena),
     pendingConnections_(arena),
@@ -90,6 +92,11 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
 }
 
 X_ENABLE_WARNING(4355)
+
+Session::~Session()
+{
+    recivedSnaps_.clear();
+}
 
 void Session::update(void)
 {

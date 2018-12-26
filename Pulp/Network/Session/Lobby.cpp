@@ -136,9 +136,10 @@ X_INLINE void LobbyPeer::setConnectionState(ConnectionState::Enum state)
 // ------------------------------------------------------
 
 Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGameCallbacks* pGameCallbacks,
-        LobbyType::Enum type, core::MemoryArenaBase* arena) :
+        LobbyType::Enum type, core::MemoryArenaBase* arena, core::MemoryArenaBase* snapArena) :
     vars_(vars),
     arena_(arena),
+    snapArena_(snapArena),
     pCallbacks_(X_ASSERT_NOT_NULL(pCallbacks)),
     pPeer_(X_ASSERT_NOT_NULL(pPeer)),
     pGameCallbacks_(X_ASSERT_NOT_NULL(pGameCallbacks)),
@@ -1046,7 +1047,7 @@ void Lobby::handleSnapShot(Packet* pPacket)
     // which we will then ACK.
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
-    SnapShot snap(arena_);
+    SnapShot snap(snapArena_);
     snap.fromBitStream(bs);
 
     if (!bs.isEos()) {

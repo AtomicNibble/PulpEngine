@@ -149,7 +149,7 @@ class Lobby : public ILobby
 
 public:
     Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGameCallbacks* pGameCallbacks, 
-        LobbyType::Enum type, core::MemoryArenaBase* arena);
+        LobbyType::Enum type, core::MemoryArenaBase* arena, core::MemoryArenaBase* snapArena);
 
     void reset(void);
 
@@ -278,6 +278,7 @@ private:
 private:
     SessionVars& vars_;
     core::MemoryArenaBase* arena_;
+    core::MemoryArenaBase* snapArena_;
     ISessionCallbacks* pCallbacks_;
     IPeer* pPeer_;
     IGameCallbacks* pGameCallbacks_;

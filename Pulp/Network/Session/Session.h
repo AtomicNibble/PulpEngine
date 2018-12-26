@@ -61,8 +61,22 @@ class Session : public ISession, ISessionCallbacks
 {
     X_NO_COPY_MOVE_ALL(Session);
 
-    using LobbyArr = std::array<Lobby,LobbyType::ENUM_COUNT>;
+    typedef core::MemoryArena<
+        core::MallocFreeAllocator,
+        core::SingleThreadPolicy,
+#if X_DEBUG
+        core::SimpleBoundsChecking,
+        core::SimpleMemoryTracking,
+        core::SimpleMemoryTagging
+#else
+        core::NoBoundsChecking,
+        core::NoMemoryTracking,
+        core::NoMemoryTagging
+#endif // !X_DEBUG
+    >
+    SnapShotArena;
 
+    using LobbyArr = std::array<Lobby,LobbyType::ENUM_COUNT>;
 
     struct PendingPeer
     {
@@ -135,6 +149,7 @@ class Session : public ISession, ISessionCallbacks
 
 public:
     Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks, core::MemoryArenaBase* arena);
+    ~Session();
 
     void update(void) X_FINAL;
     void handleSnapShots(core::FrameTimeData& timeInfo) X_FINAL;
@@ -227,7 +242,10 @@ private:
     SessionVars& vars_;
     IPeer* pPeer_;
     IGameCallbacks* pGameCallbacks_;
+
     core::MemoryArenaBase* arena_;
+    SnapShotArena::AllocationPolicy snapAllocator_;
+    SnapShotArena snapArena_;
 
     SessionState::Enum state_;
 
