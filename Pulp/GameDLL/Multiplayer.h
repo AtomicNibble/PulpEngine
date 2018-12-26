@@ -22,12 +22,16 @@ class Multiplayer
     {
         PlayerState() :
             ping(0),
-            kills(0)
+            points(0),
+            kills(0),
+            headshots(0)
         {
         }
 
         int32_t ping;   // the server tells us the players pings.
+        int32_t points;
         int32_t kills;
+        int32_t headshots;
     };
 
     static const size_t NUM_CHAT_LINES = 6;

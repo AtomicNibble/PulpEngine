@@ -110,6 +110,7 @@ void Multiplayer::readFromSnapShot(core::FixedBitStreamBase& bs)
 
 void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
 {
+    // TODO: variable length encode player score and shit?
     bs.write(playerStates_.data(), playerStates_.size());
     bs.write(state_);
 }
@@ -258,7 +259,7 @@ void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
             // Name - Points - Kills - Headshots - Ping
             auto& ply = playerStates_[i];
 
-            str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, "Stu", 0, ply.kills, 0, ply.ping);
+            str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, "Stu", ply.points, ply.kills, ply.headshots, ply.ping);
             pPrim->drawText(row.x1, row.getCenter().y, con, str.begin(), str.end());
         }
     }
