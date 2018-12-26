@@ -50,6 +50,12 @@ namespace
 
     int CustomType2::CONSTRUCTION_COUNT = 0;
     int CustomType2::DECONSTRUCTION_COUNT = 0;
+
+    void resetConConters(void)
+    {
+        CustomType2::CONSTRUCTION_COUNT = 0;
+        CustomType2::DECONSTRUCTION_COUNT = 0;
+    }
 } // namespace
 
 typedef ::testing::Types<short, int, float, CustomType2> MyTypes;
@@ -58,8 +64,40 @@ TYPED_TEST_CASE(FixedFifoTest, MyTypes);
 template<typename T>
 class FixedFifoTest : public ::testing::Test
 {
+    void SetUp() X_FINAL {
+        resetConConters();
+    }
+
 public:
 };
+
+TYPED_TEST(FixedFifoTest, Cleanup)
+{
+    {
+        FixedFifo<TypeParam, 3> fifo;
+
+        fifo.push(16);
+        fifo.push(32);
+        fifo.push(48);
+    }
+
+    EXPECT_EQ(CustomType2::CONSTRUCTION_COUNT, CustomType2::DECONSTRUCTION_COUNT);
+}
+
+TYPED_TEST(FixedFifoTest, Clear)
+{
+    {
+        FixedFifo<TypeParam, 3> fifo;
+
+        fifo.push(16);
+        fifo.push(32);
+        fifo.push(48);
+        fifo.clear();
+    }
+
+    EXPECT_EQ(CustomType2::CONSTRUCTION_COUNT, CustomType2::DECONSTRUCTION_COUNT);
+}
+
 
 TYPED_TEST(FixedFifoTest, Types)
 {
