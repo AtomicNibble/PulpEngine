@@ -50,9 +50,12 @@ public:
     SnapShot(SnapShot&& oth) = default;
     ~SnapShot();
 
-    SnapShot& operator=(SnapShot&& oth) = default;
+    SnapShot& operator=(SnapShot&& oth);
 
+private:
+    void clearObjs(void);
 
+public:
     void writeToBitStream(core::FixedBitStreamBase& bs) const;
     void fromBitStream(core::FixedBitStreamBase& bs);
 
@@ -78,7 +81,6 @@ public:
 private:
     int32_t findStateForId(ObjectID id) const;
     ObjectState& findOrMakeStateForId(ObjectID id);
-
 
 private:
     core::MemoryArenaBase* arena_;

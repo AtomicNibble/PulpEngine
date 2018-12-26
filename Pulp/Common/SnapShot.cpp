@@ -16,10 +16,30 @@ SnapShot::SnapShot(core::MemoryArenaBase* arena) :
 
 SnapShot::~SnapShot()
 {
+    clearObjs();
+}
+
+SnapShot& SnapShot::operator=(SnapShot&& oth)
+{
+    clearObjs();
+
+    arena_ = std::move(oth.arena_);
+    timeMS_ = std::move(oth.timeMS_);
+    recvTimeMS_ = std::move(oth.recvTimeMS_);
+    objs_ = std::move(oth.objs_);
+    userCmdTimes_ = std::move(oth.userCmdTimes_);
+    userGuids_ = std::move(oth.userGuids_);
+    return *this;
+}
+
+void SnapShot::clearObjs(void)
+{
     for (auto& obj : objs_)
     {
         X_DELETE_ARRAY(obj.buffer.data(), arena_);
     }
+
+    objs_.clear();
 }
 
 
