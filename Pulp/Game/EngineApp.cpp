@@ -30,7 +30,7 @@ void AssetHandler::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 EngineApp::EngineApp() :
     pICore_(nullptr),
-    hSystemHandle_(nullptr),
+    hSystemHandle_(core::Module::NULL_HANDLE),
     allocator_()
 //	arena_(&allocator_, "CoreArena")
 {

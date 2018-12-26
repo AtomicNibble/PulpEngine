@@ -21,7 +21,7 @@ X_LINK_ENGINE_LIB("Core");
 
 EngineApp::EngineApp() :
     pICore_(nullptr),
-    hSystemHandle_(nullptr)
+    hSystemHandle_(core::Module::NULL_HANDLE)
 {
 }
 
