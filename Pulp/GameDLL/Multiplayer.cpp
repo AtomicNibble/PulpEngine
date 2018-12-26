@@ -23,7 +23,7 @@ void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
     // get all the pings yo.
     // this should just map with players.
     // maybe we should wait for spawn.
-    for (size_t i = 0; i < unm.lobbyUserGuids.size(); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(unm.lobbyUserGuids.size()); i++)
     {
         if (!unm.lobbyUserGuids[i].isValid()) {
             continue;
