@@ -326,6 +326,7 @@ void UserCmdGen::setButtonState(input::KeyId::Enum key, bool down)
         --buttonStates_[ub];
 
         if (buttonStates_[ub] < 0) {
+            X_ASSERT_UNREACHABLE();
             buttonStates_[ub] = 0;
         }
     }
