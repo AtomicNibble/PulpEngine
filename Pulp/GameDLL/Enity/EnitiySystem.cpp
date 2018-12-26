@@ -212,7 +212,6 @@ namespace entity
             auto& trans = reg_.get<TransForm>(entityId);
             auto mask = reg_.getComponentMask(entityId);
 
-            bs.write(entityId);
             bs.write(mask);
 
             // - data -
@@ -237,9 +236,10 @@ namespace entity
 
         for (size_t i = 0; i < snap.getNumObjects(); i++)
         {
+            net::ObjectID id = snap.getObjectIDByIndex(i);
             auto bs = snap.getMessageByIndex(i);
 
-            auto remoteEntityId = bs.read<entity::EntityId>();
+            auto remoteEntityId = static_cast<entity::EntityId>(id);
 
             auto entityId = entIdMap_[remoteEntityId];
 

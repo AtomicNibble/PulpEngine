@@ -67,6 +67,7 @@ public:
     X_INLINE void setTime(int32_t timeMS);
     X_INLINE void setRecvTime(int32_t timeMS);
 
+    ObjectID getObjectIDByIndex(size_t idx) const;
     MsgBitStream getMessageByIndex(size_t idx) const;
 
 private:

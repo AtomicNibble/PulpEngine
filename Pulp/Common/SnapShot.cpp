@@ -86,6 +86,14 @@ void SnapShot::setUserCmdTimes(const PlayerTimeMSArr& userCmdTimes)
     userCmdTimes_ = userCmdTimes;
 }
 
+ObjectID SnapShot::getObjectIDByIndex(size_t idx) const
+{
+    X_ASSERT(idx < objs_.size(), "Index out of range")(objs_.size(), idx);
+
+    auto& state = objs_[idx];
+    return state.id;
+}
+
 SnapShot::MsgBitStream SnapShot::getMessageByIndex(size_t idx) const
 {
     X_ASSERT(idx < objs_.size(), "Index out of range")(objs_.size(), idx);
