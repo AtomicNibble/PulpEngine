@@ -70,6 +70,7 @@
 #define COMPILER_BARRIER_RW                     _ReadWriteBarrier();
 
 #define X_NO_DISCARD                            [[nodiscard]]
+#define X_MAYBE_UNUSED                          [[maybe_unused]]
 
 // _ReturnAddress must be prototyped before use, and can only be used as an intrinsic
 extern "C" void* _ReturnAddress(void);
