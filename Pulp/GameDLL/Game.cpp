@@ -335,6 +335,10 @@ bool XGame::update(core::FrameData& frame)
             pMenuHandler_->openMenu("loading");
 
             clearWorld();
+
+            // TODO: only create this if we needed it.
+            // I create this when loading as the server will send us state for this before we finish loading.
+            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_);
         }
 
         if (!world_)
@@ -380,12 +384,10 @@ bool XGame::update(core::FrameData& frame)
             pMenuHandler_->close();
 
             userCmdGen_.clearForNewLevel();
-
-            // TODO: only create this if we needed it.
-            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_);
         }
 
         X_ASSERT_NOT_NULL(world_.ptr());
+        X_ASSERT_NOT_NULL(pMultiplayerGame_.ptr());
 
         syncLobbyUsers();
 
@@ -551,6 +553,8 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 {
     // get the game state.
     {
+        X_ASSERT_NOT_NULL(pMultiplayerGame_.ptr());
+
         net::SnapShot::MsgBitStream bs;
         if (snap.findObjectByID(net::SnapShot::SNAP_MP_STATE, bs))
         {
