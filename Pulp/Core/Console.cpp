@@ -1196,9 +1196,6 @@ void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::Com
 {
     str.replace('"', '\'');
 
-    // dunno what I added this for but it's annoying.
-    // X_LOG_BULLET;
-
     if (cmd.flags.IsSet(VarFlag::CHEAT)) {
         X_WARNING("Console", "Cmd(%s) is cheat protected", cmd.name.c_str());
         return;
