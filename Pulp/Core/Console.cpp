@@ -197,9 +197,10 @@ ConsoleCommand::ConsoleCommand() // flags default con is (0)
 
 // ==================================================
 
-ConsoleCommandArgs::ConsoleCommandArgs(
-    core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line)
+ConsoleCommandArgs::ConsoleCommandArgs(CommandStr& line) :
+    argNum_(0)
 {
+    core::zero_object(tokenized_);
     TokenizeString(line.begin(), line.end());
 }
 
@@ -223,22 +224,20 @@ const char* ConsoleCommandArgs::GetArg(size_t Idx) const
 // command val, val1, #var_name, string var3,
 void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd)
 {
-    argNum_ = 0;
-    core::zero_object(tokenized_);
-
-    size_t len, totalLen = 0;
-
-    len = static_cast<size_t>(pEnd - pBegin);
-    if (len < 1) {
+    if (static_cast<size_t>(pEnd - pBegin) < 1) {
         return;
     }
 
     // TODO: need to be made use of.
     X_UNUSED(pEnd);
+    
+    size_t totalLen = 0;
 
-    const char* start = pBegin;
-    const char* commandLine = pBegin;
-    while (char ch = *commandLine++) {
+    const char* pStart = pBegin;
+    const char* pCommandLine = pBegin;
+
+    while (char ch = *pCommandLine++)
+    {
         if (argNum_ == MAX_COMMAND_ARGS) {
             return;
         }
@@ -246,32 +245,34 @@ void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd)
         switch (ch) {
             case '\'':
             case '\"': {
-                while ((*commandLine++ != ch) && *commandLine)
+                while ((*pCommandLine++ != ch) && *pCommandLine)
                     ; // find end
 
-                argv_[argNum_] = tokenized_ + totalLen;
+                argv_[argNum_] = tokenized_.data() + totalLen;
                 argNum_++;
 
-                size_t Len = (commandLine - start) - 2;
+                size_t len = (pCommandLine - pStart) - 2;
 
-                ::memcpy(tokenized_ + totalLen, start + 1, Len);
-                totalLen += Len + 1;
+                ::memcpy(tokenized_.data() + totalLen, pStart + 1, len);
+                totalLen += len + 1;
 
-                start = commandLine;
+                pStart = pCommandLine;
                 break;
             }
-            case ' ':
-                start = commandLine;
+            case ' ': {
+                pStart = pCommandLine;
                 break;
+            }
+
             default: {
-                if ((*commandLine == ' ') || !*commandLine) {
-                    argv_[argNum_] = tokenized_ + totalLen;
+                if ((*pCommandLine == ' ') || !*pCommandLine) {
+                    argv_[argNum_] = tokenized_.data() + totalLen;
                     argNum_++;
 
-                    if (*start == '#') {
-                        ++start;
+                    if (*pStart == '#') {
+                        ++pStart;
 
-                        core::StackString<256> name(start, commandLine);
+                        core::StackString<256> name(pStart, pCommandLine);
 
                         // it's a var name.
                         ICVar* var = gEnv->pConsole->getCVar(name.c_str());
@@ -282,23 +283,24 @@ void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd)
                             name.clear();
                             name.append(var->GetString(strBuf));
 
-                            ::memcpy(tokenized_ + totalLen, name.begin(), name.length());
+                            ::memcpy(tokenized_.data() + totalLen, name.begin(), name.length());
                             totalLen += (name.length() + 1);
-                            start = commandLine + 1;
+                            pStart = pCommandLine + 1;
                             continue;
                         }
                     }
 
-                    size_t Len = (commandLine - start);
+                    size_t len = (pCommandLine - pStart);
 
-                    ::memcpy(tokenized_ + totalLen, start, Len);
-                    totalLen += (Len + 1);
+                    ::memcpy(tokenized_.data() + totalLen, pStart, len);
+                    totalLen += (len + 1);
 
-                    start = commandLine + 1;
+                    pStart = pCommandLine + 1;
                 }
-            } break;
-        } // switch
-    }     // while
+                break;
+            }
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1101,7 +1103,7 @@ void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
 void XConsole::executeStringInternal(const ExecCommand& cmd)
 {
     core::StackString512 name;
-    core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS> value;
+    ConsoleCommandArgs::CommandStr value;
     core::StringRange<char> range(nullptr, nullptr);
     CommandParser parser(cmd.command.begin());
     const char* pPos;
@@ -1190,8 +1192,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
 }
 
 
-void XConsole::executeCommand(const ConsoleCommand& cmd,
-    core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const
+void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::CommandStr& str) const
 {
     str.replace('"', '\'');
 

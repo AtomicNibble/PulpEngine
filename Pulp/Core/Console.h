@@ -69,18 +69,25 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
     static const size_t MAX_COMMAND_ARGS = 64;
     static const size_t MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
+    using CommandStr = core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>;
+
+    using ArgPtrArr = std::array<const char*, MAX_COMMAND_ARGS>;
+    using StringBufArr = std::array<char, MAX_COMMAND_STRING>;
+
 public:
-    explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line);
+    explicit ConsoleCommandArgs(CommandStr& line);
     ~ConsoleCommandArgs() X_FINAL;
 
     virtual size_t GetArgCount(void) const X_FINAL;
     virtual const char* GetArg(size_t idx) const X_FINAL;
+
+private:
     void TokenizeString(const char* pBegin, const char* pEnd);
 
 private:
-    size_t argNum_;                      // number of arguments
-    char* argv_[MAX_COMMAND_ARGS];       // points into tokenized
-    char tokenized_[MAX_COMMAND_STRING]; // will have terminator bytes inserted
+    size_t argNum_;             // number of arguments
+    ArgPtrArr argv_;            // points into tokenized
+    StringBufArr tokenized_;    // will have terminator bytes inserted
 };
 
 X_DECLARE_ENUM(CmdHistory)
@@ -210,7 +217,7 @@ private:
     void addCmd(const string& command, ExecSource::Enum src, bool silent);
     void executeStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
                                                         // runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
-    void executeCommand(const ConsoleCommand& cmd, core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& str) const;
+    void executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::CommandStr& str) const;
 
     // Config
     void configExec(const char* pCommand, const char* pEnd);
