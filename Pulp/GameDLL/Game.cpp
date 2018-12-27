@@ -554,7 +554,7 @@ void XGame::buildSnapShot(net::SnapShot& snap)
 
 void XGame::applySnapShot(const net::SnapShot& snap)
 {
-    // get the game state.
+    // set the game state.
     {
         X_ASSERT_NOT_NULL(pMultiplayerGame_.ptr());
 
@@ -564,7 +564,7 @@ void XGame::applySnapShot(const net::SnapShot& snap)
             pMultiplayerGame_->readFromSnapShot(bs);
         }
     }
-    // we need to apply a snapshot.
+
     world_->applySnapShot(userNetMap_, snap);
 
     // get the games times the server has run
@@ -589,7 +589,6 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 
     if (vars_.userCmdClientReplay())
     {
-        // get all the userCmds we need to replay.
         net::UserCmdMan::UserCmdArr userCmds;
         userCmdMan_.getReadUserCmdsAfterGameTime(userNetMap_.localPlayerIdx, localLastRunTimeMS, userCmds);
 
