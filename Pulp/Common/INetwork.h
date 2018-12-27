@@ -653,7 +653,7 @@ struct ISession
     
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
 
-    virtual void drawDebug(engine::IPrimativeContext* pPrim) const X_ABSTRACT;
+    virtual Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_ABSTRACT;
 };
 
 // ---------------------------------

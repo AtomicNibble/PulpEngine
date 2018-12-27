@@ -189,7 +189,7 @@ public:
     SessionStatus::Enum getStatus(void) const X_FINAL;
     const MatchParameters& getMatchParams(void) const X_FINAL;
 
-    void drawDebug(engine::IPrimativeContext* pPrim) const X_FINAL;
+    Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_FINAL;
 
 private:
     ConnectionAttemptResult::Enum connectToPeer(LobbyType::Enum type, SystemAddress sa) X_FINAL;

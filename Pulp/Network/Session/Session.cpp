@@ -1270,18 +1270,17 @@ const MatchParameters& Session::getMatchParams(void) const
     return lobbys_[LobbyType::Game].getMatchParams();
 }
 
-void Session::drawDebug(engine::IPrimativeContext* pPrim) const
+Vec2f Session::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
 {
     const auto debugLvl = vars_.drawLobbyDebug();
 
     if (debugLvl <= 0) {
-        return;
+        return Vec2f::zero();
     }
 
-    // draw me some shit.
-    Vec2f base0(5.f, 150.f);
-
     const float spacing = 20.f;
+
+    Vec2f size;
 
     // session debug.
     if (debugLvl >= 1)
@@ -1300,10 +1299,12 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
         const float width = 750.f;
         float height = 30.f;
 
-        pPrim->drawQuad(base0, width, height, Color8u(20, 20, 20, 150));
-        pPrim->drawText(base0.x + 2.f, base0.y + 2.f, con, txt.begin(), txt.end());
+        pPrim->drawQuad(base, width, height, Color8u(20, 20, 20, 150));
+        pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
 
-        base0.y += height;
+        base.y += height;
+
+        size = Vec2f(width, height + spacing);
 
         if(peers_.isNotEmpty())
         {
@@ -1319,24 +1320,39 @@ void Session::drawDebug(engine::IPrimativeContext* pPrim) const
                 txt.setFmt("Peer%" PRIuS " ^1%s^7 Lobby: [^6%s^7]\n", i, p.guid.toString(guidStr), p.flags.ToString(flagDsc));
             }
 
-            pPrim->drawQuad(base0, width, height, Color8u(20, 20, 20, 150));
-            pPrim->drawText(base0.x + 2.f, base0.y + 2.f, con, txt.begin(), txt.end());
+            pPrim->drawQuad(base, width, height, Color8u(20, 20, 20, 150));
+            pPrim->drawText(base.x + 2.f, base.y + 2.f, con, txt.begin(), txt.end());
+        }
+        else
+        {
+            height = 0.f;
         }
 
-        base0.y += height;
-        base0.y += spacing;
+        base.y += height + spacing;
+        size.y += height;
     }
 
     if (debugLvl >= 2)
     {
-        base0.y += lobbys_[LobbyType::Party].drawDebug(base0, pPrim).y;
-        base0.y += spacing;
+        auto s0 = lobbys_[LobbyType::Party].drawDebug(base, pPrim);
+
+        float height = s0.y + spacing;
+
+        base.y += height;
+
+        size.x = core::Max(size.x, s0.x);
+        size.y += height;
     }
 
     if (debugLvl >= 1)
     {
-        lobbys_[LobbyType::Game].drawDebug(base0, pPrim);
+        auto s1 = lobbys_[LobbyType::Game].drawDebug(base, pPrim);
+
+        size.y += s1.y;
+        size.x = core::Max(size.x, s1.x);
     }
+
+    return size;
 }
 
 

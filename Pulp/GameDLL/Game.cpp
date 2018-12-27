@@ -677,7 +677,9 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
 
 void XGame::drawDebug(engine::IPrimativeContext* pPrim)
 {
-    pSession_->drawDebug(pPrim);
+    Vec2f base(5.f, 150.f);
+
+    Vec2f size = pSession_->drawDebug(base, pPrim);
 
     if (!vars_.drawSessionInfoDebug() && !vars_.userCmdDrawDebug() && !vars_.drawGameUserDebug()) {
         return;
