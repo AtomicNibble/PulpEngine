@@ -58,6 +58,8 @@ void XGame::registerCmds(void)
     ADD_COMMAND_MEMBER("mainMenu", this, XGame, &XGame::Command_MainMenu, core::VarFlag::SYSTEM, "Return to main menu");
 
     ADD_COMMAND_MEMBER("uiOpenMenu", this, XGame, &XGame::Cmd_OpenMenu, core::VarFlags::SYSTEM, "Open menu");
+    
+    ADD_COMMAND_MEMBER("chat", this, XGame, &XGame::Cmd_Chat, core::VarFlags::SYSTEM, "Chat");
 
 }
 
@@ -922,6 +924,19 @@ void XGame::Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs)
 
     pMenuHandler_->close();
     pMenuHandler_->openMenu(pMenuName);
+}
+
+void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
+{
+    auto* pMsg = pCmd->GetArg(1);
+
+    if (!pMsg) {
+        return;
+    }
+
+    if (pMultiplayerGame_) {
+        pMultiplayerGame_->addChatLine(core::string(pMsg));
+    }
 }
 
 X_NAMESPACE_END

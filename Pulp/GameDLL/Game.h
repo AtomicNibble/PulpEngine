@@ -107,6 +107,7 @@ private:
     void Command_Map(core::IConsoleCmdArgs* Cmd);
     void Command_MainMenu(core::IConsoleCmdArgs* Cmd);
     void Cmd_OpenMenu(core::IConsoleCmdArgs* Cmd);
+    void Cmd_Chat(core::IConsoleCmdArgs* Cmd);
 
 private:
     core::MemoryArenaBase* arena_;
