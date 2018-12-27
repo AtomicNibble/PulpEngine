@@ -17,7 +17,7 @@ public:
     }
 
     void reset() {
-        localPlayerIdx = 0;
+        localPlayerIdx = -1;
         lobbyUserGuids.fill(net::NetGUID());
         sysHandles.fill(net::INVALID_SYSTEM_HANDLE);
     }
