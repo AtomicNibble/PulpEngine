@@ -173,7 +173,7 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
     float width = rowWidth + (padding * 2);
 
     float startX = (screenWidth - width) * 0.5f;
-    float startY = 100.f;
+    float startY = 160.f;
 
     Rectf r(
         startX,
