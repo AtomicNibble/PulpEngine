@@ -98,6 +98,7 @@ namespace Hash
         {
             return Fnv1Const::Internal::Hash(pStr, strLen, Fnv1Const::default_offset_basis);
         }
+
     } // namespace Literals
 } // namespace Hash
 
