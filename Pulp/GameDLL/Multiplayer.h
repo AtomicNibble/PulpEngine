@@ -49,7 +49,7 @@ class Multiplayer
     };
 
     using ChatLineFiFo = core::FixedFifo<ChatLine, NUM_CHAT_LINES>;
-    using PlayerStateArr = std::array< PlayerState, net::MAX_PLAYERS>;
+    using PlayerStateArr = std::array<PlayerState, net::MAX_PLAYERS>;
 
 public:
     Multiplayer(GameVars& vars);
