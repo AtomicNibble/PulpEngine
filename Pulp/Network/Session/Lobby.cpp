@@ -1726,7 +1726,7 @@ void Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
 {
     auto& user = users_[idx];
 
-    info.pName = user.username.c_str();
+    info.name = core::string_view(user.username.data(), user.username.length());
     info.peerIdx = user.peerIdx;
     info.guid = user.guid;
     info.systemHandle = INVALID_SYSTEM_HANDLE;

@@ -552,7 +552,7 @@ struct UserInfo
     }
 
 public:
-    const char* pName;
+    core::string_view name;
     NetGUID guid;
     // Not always valid.
     int32_t peerIdx;

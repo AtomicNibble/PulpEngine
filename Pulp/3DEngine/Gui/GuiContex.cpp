@@ -683,7 +683,7 @@ namespace gui
 
             bool isHost = (hostIdx == info.peerIdx);
 
-            txt.appendFmt("\n%s ^8%s ^7peerIdx: ^8%" PRIi32 "^7", isHost ? "H" : "P", info.pName, info.peerIdx);
+            txt.appendFmt("\n%s ^8%.*s ^7peerIdx: ^8%" PRIi32 "^7", isHost ? "H" : "P", info.name.length(), info.name.data(), info.peerIdx);
         }
 
         pPrim->drawQuad(800.f, 200.f, 320.f + 320.f, 200.f, Color8u(40, 40, 40, 100));
