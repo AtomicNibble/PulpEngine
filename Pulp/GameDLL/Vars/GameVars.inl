@@ -21,6 +21,11 @@ X_INLINE int32_t GameVars::chatMsgLifeMS(void) const
     return chatLifeMS_;
 }
 
+X_INLINE int32_t GameVars::drawGameUserDebug(void) const
+{
+    return drawGameUserDebug_;
+}
+
 X_INLINE core::ICVar* GameVars::getFovVar(void) const
 {
     return pFovVar_;

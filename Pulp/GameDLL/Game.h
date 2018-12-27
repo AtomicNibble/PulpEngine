@@ -95,6 +95,7 @@ private:
     void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, int32_t playerIdx);
     
     bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim);
+    void drawGameUserDebug(engine::IPrimativeContext* pPrim);
 
     void syncLobbyUsers(void);
     void clearWorld(void);

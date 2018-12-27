@@ -295,6 +295,10 @@ bool XGame::update(core::FrameData& frame)
 
     pSession_->drawDebug(pPrim);
 
+    if (vars_.drawGameUserDebug()) {
+        drawGameUserDebug(pPrim);
+    }
+
     // this is built all the time currently even if it's not used.
     // since input events are passed to it all the time.
     userCmdGen_.buildUserCmd(blockUserCmd);
@@ -567,7 +571,7 @@ void XGame::applySnapShot(const net::SnapShot& snap)
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
     userNetMap_.lobbyUserGuids = snap.getPlayerGuids();
 
-    // mark local player index?
+    // Have the client work out it's localPlayerIdx.
     if (userNetMap_.localPlayerIdx < 0)
     {
         for (size_t i=0; i< userNetMap_.lobbyUserGuids.size(); i++)
@@ -728,6 +732,28 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
     return true;
 }
 
+void XGame::drawGameUserDebug(engine::IPrimativeContext* pPrim)
+{
+    font::TextDrawContext con;
+    con.col = Col_Whitesmoke;
+    con.size = Vec2f(16.f, 16.f);
+    con.effectId = 0;
+    con.pFont = gEnv->pFontSys->getDefault();
+
+    core::StackString512 txt;
+    
+    net::NetGuidStr guidStr;
+    txt.appendFmt("LocalIdx %" PRIi32 " guid: %s\n", userNetMap_.localPlayerIdx, userNetMap_.myGuid.toString(guidStr));
+
+    for (size_t i = 0; i < userNetMap_.lobbyUserGuids.size(); i++)
+    {
+        auto userGuid = userNetMap_.lobbyUserGuids[i];
+
+        txt.appendFmt("%" PRIuS " %s\n", i, userGuid.toString(guidStr));
+    }
+
+    pPrim->drawText(5.f, 200.f, con, txt.begin(), txt.end());
+}
 
 void XGame::syncLobbyUsers(void)
 {
