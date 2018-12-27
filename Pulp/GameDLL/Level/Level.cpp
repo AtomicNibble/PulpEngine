@@ -433,7 +433,7 @@ void World::spawnPlayer(int32_t playerIdx, bool local)
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
 
-    ents_.makePlayer(id, pos, local);
+    ents_.spawnPlayer(id, pos, local);
 }
 
 void World::removePlayer(int32_t playerIdx)

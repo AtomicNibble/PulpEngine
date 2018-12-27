@@ -279,7 +279,7 @@ namespace entity
                     // need to work out if this is local.
                     bool isLocal = unm.localPlayerIdx == remoteEntityId;
 
-                    makePlayer(remoteEntityId, pos, isLocal);
+                    spawnPlayer(remoteEntityId, pos, isLocal);
 
                     // player id's always match up.
                     entityId = remoteEntityId;
@@ -491,7 +491,7 @@ namespace entity
         return ent;
     }
 
-    void EnititySystem::makePlayer(EntityId id, const Vec3f& pos, bool local)
+    void EnititySystem::spawnPlayer(EntityId id, const Vec3f& pos, bool local)
     {
         auto& trans = reg_.assign<TransForm>(id);
         auto& player = reg_.assign<Player>(id);
