@@ -49,15 +49,10 @@ namespace internal
     }
 } // namespace internal
 
-X_INLINE StrHash::StrHash() :
+X_INLINE constexpr StrHash::StrHash() :
     hash_((Type)-1)
 {
 }
-
-// ---------------------------------------------------------------------------------------------------------------------
-X_INLINE StrHash::StrHash(const StrHash& oth)
-
-    = default;
 
 // ---------------------------------------------------------------------------------------------------------------------
 template<typename T>
@@ -82,19 +77,19 @@ X_INLINE StrHash::StrHash(const char* pBegin, const char* pEnd) :
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-X_INLINE StrHash::StrHash(Type hash) :
+X_INLINE constexpr StrHash::StrHash(Type hash) :
     hash_(hash)
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
-X_INLINE StrHash::operator Type(void) const
+X_INLINE constexpr StrHash::operator Type(void) const
 {
     return hash_;
 }
 
 
-X_INLINE StrHash::Type StrHash::hash(void) const
+X_INLINE constexpr StrHash::Type StrHash::hash(void) const
 {
     return hash_;
 }

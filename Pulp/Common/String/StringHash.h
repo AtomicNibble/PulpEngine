@@ -14,21 +14,29 @@ class StrHash
 public:
     typedef uint32_t Type;
 
-    X_INLINE StrHash();
-    X_INLINE StrHash(const StrHash& oth);
+    X_INLINE constexpr StrHash();
+    X_INLINE constexpr StrHash(const StrHash& oth) = default;
 
     template<typename T>
     X_INLINE StrHash(const T& str);
     X_INLINE StrHash(const char* pStr, size_t length); /// Constructs a StringHash from a string with a certain length.
     X_INLINE StrHash(const char* pBegin, const char* pEnd);
-    X_INLINE explicit StrHash(Type hash);
+    X_INLINE constexpr explicit StrHash(Type hash);
 
-    X_INLINE operator Type(void) const; /// Cast operator, returning the string's hash.
-    X_INLINE Type hash(void) const;
+    X_INLINE constexpr operator Type(void) const; /// Cast operator, returning the string's hash.
+    X_INLINE constexpr Type hash(void) const;
 
 private:
     Type hash_;
 };
+
+namespace Literals
+{
+    inline constexpr StrHash operator"" _strhash(const char* const pStr, const size_t strLen)
+    {
+        return StrHash(Hash::Fnv1aConst::Internal::Hash(pStr, strLen, Hash::Fnv1aConst::default_offset_basis));
+    }
+} // namespace Literals
 
 #include "StringHash.inl"
 
