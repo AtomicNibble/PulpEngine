@@ -53,7 +53,7 @@ public:
     /// Appends a string.
     inline void append(const TChar* str);
     /// Appends part of another string.
-    void append(const TChar* str, size_t count);
+    void append(const TChar* str, size_t length);
     /// Appends part of another string.
     inline void append(const TChar* str, const TChar* end);
     /// Appends a formatted string.
@@ -181,7 +181,7 @@ public:
 
     void append(wchar_t ch, size_t count);
     inline void append(const wchar_t* str);
-    void append(const wchar_t* str, size_t count);
+    void append(const wchar_t* str, size_t length);
     inline void append(const wchar_t* str, const wchar_t* end);
     void appendFmt(const wchar_t* format, ...);
     void appendFmt(const wchar_t* format, va_list args);

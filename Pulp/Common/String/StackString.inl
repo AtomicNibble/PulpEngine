@@ -202,11 +202,11 @@ void StackString<N, TChar>::append(const TChar* str)
 // ---------------------------------------------------------------------------------------------------------------------
 // ---------------------------------------------------------------------------------------------------------------------
 template<size_t N, typename TChar>
-void StackString<N, TChar>::append(const TChar* str, size_t count)
+void StackString<N, TChar>::append(const TChar* str, size_t length)
 {
-    X_ASSERT(len_ + count < N, "Cannot append %d character(s) from string \"%s\". Not enough space left.", count, str)(len_, N);
-    memcpy(str_ + len_, str, count);
-    len_ += count;
+    X_ASSERT(len_ + length < N, "Cannot append %d character(s) from string \"%s\". Not enough space left.", length, str)(len_, N);
+    memcpy(str_ + len_, str, length);
+    len_ += length;
     str_[len_] = 0;
 }
 
