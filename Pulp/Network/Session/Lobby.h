@@ -198,6 +198,7 @@ public:
     X_INLINE int32_t getNumFreeUserSlots(void) const X_FINAL;
 
     void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_FINAL;
+    bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_FINAL;
 
     // Misc
     X_INLINE bool isActive(void) const X_FINAL;

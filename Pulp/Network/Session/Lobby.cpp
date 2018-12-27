@@ -1738,6 +1738,22 @@ void Lobby::getUserInfoForIdx(int32_t idx, UserInfo& info) const
     info.systemHandle = peers_[user.peerIdx].systemHandle;
 }
 
+bool Lobby::getUserInfoForGuid(NetGUID guid, UserInfo& info) const
+{
+    auto it = std::find_if(users_.begin(), users_.end(), [guid](const LobbyUser& lu) {
+        return lu.guid == guid;
+    });
+
+    if (it == users_.end()) {
+        return false;
+    }
+
+    int32_t idx = safe_static_cast<int32_t>(std::distance(users_.begin(), it));
+
+    getUserInfoForIdx(idx, info);
+    return true;
+}
+
 bool Lobby::tryPopChatMsg(ChatMsg& msg)
 {
     if (chatMsgs_.isEmpty()) {
