@@ -197,11 +197,11 @@ ConsoleCommand::ConsoleCommand() // flags default con is (0)
 
 // ==================================================
 
-ConsoleCommandArgs::ConsoleCommandArgs(CommandStr& line) :
+ConsoleCommandArgs::ConsoleCommandArgs(CommandStr& line, ParseFlags flags) :
     argNum_(0)
 {
     core::zero_object(tokenized_);
-    TokenizeString(line.begin(), line.end());
+    TokenizeString(line.begin(), line.end(), flags);
 }
 
 ConsoleCommandArgs::~ConsoleCommandArgs()
@@ -222,16 +222,47 @@ const char* ConsoleCommandArgs::GetArg(size_t Idx) const
 // we want to get arguemtns.
 // how will a command be formated.
 // command val, val1, #var_name, string var3,
-void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd)
+void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags)
 {
-    if (static_cast<size_t>(pEnd - pBegin) < 1) {
+    const size_t strLength = static_cast<size_t>(pEnd - pBegin);
+    if (strLength < 1) {
         return;
     }
 
-    // TODO: need to be made use of.
-    X_UNUSED(pEnd);
-    
+    if (flags.IsSet(ParseFlag::SINGLE_ARG)) {
+
+        // just need to split out the command.
+        const char* pCur = pBegin;
+
+        while (*pCur != ' ' && pCur < pEnd) {
+            ++pCur;
+        }
+
+        const auto commandNameLen = pCur - pBegin;
+
+        std::memcpy(tokenized_.data(), pBegin, commandNameLen);
+
+        argv_[argNum_] = tokenized_.data();
+        argNum_++;
+
+        const auto commandNameLenNullTrem = commandNameLen + 1;
+        const auto trailing = strLength - commandNameLenNullTrem;
+        if (trailing == 0) {
+            return;
+        }
+
+        std::memcpy(tokenized_.data() + commandNameLenNullTrem, pCur + 1, trailing);
+
+        argv_[argNum_] = tokenized_.data() + commandNameLenNullTrem;
+        argNum_++;
+        return;
+    }
+
     size_t totalLen = 0;
+
+    // TODO: need to be made use of.
+    X_UNUSED(pEnd, flags);
+    
 
     const char* pStart = pBegin;
     const char* pCommandLine = pBegin;
@@ -1202,8 +1233,14 @@ void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::Com
     }
 
     if (cmd.func) {
-        // This is function command, execute it with a list of parameters.
-        ConsoleCommandArgs cmdArgs(str);
+        
+        ConsoleCommandArgs::ParseFlags flags;
+
+        if (cmd.flags.IsSet(VarFlag::SINGLE_ARG)) {
+            flags.Set(ConsoleCommandArgs::ParseFlag::SINGLE_ARG);
+        }
+
+        ConsoleCommandArgs cmdArgs(str, flags);
 
         if (console_debug) {
             X_LOG0("Console", "Running command \"%s\"", cmdArgs.GetArg(0));

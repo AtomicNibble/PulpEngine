@@ -65,6 +65,12 @@ struct ConsoleCommand
 
 struct ConsoleCommandArgs : public IConsoleCmdArgs
 {
+    X_DECLARE_FLAGS(ParseFlag)(
+        SINGLE_ARG    
+    );
+
+    using ParseFlags = Flags<ParseFlag>;
+
     static const size_t MAX_STRING_CHARS = 1024;
     static const size_t MAX_COMMAND_ARGS = 64;
     static const size_t MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
@@ -75,14 +81,14 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
     using StringBufArr = std::array<char, MAX_COMMAND_STRING>;
 
 public:
-    explicit ConsoleCommandArgs(CommandStr& line);
+    explicit ConsoleCommandArgs(CommandStr& line, ParseFlags flags);
     ~ConsoleCommandArgs() X_FINAL;
 
     virtual size_t GetArgCount(void) const X_FINAL;
     virtual const char* GetArg(size_t idx) const X_FINAL;
 
 private:
-    void TokenizeString(const char* pBegin, const char* pEnd);
+    void TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags);
 
 private:
     size_t argNum_;             // number of arguments

@@ -59,7 +59,7 @@ void XGame::registerCmds(void)
 
     ADD_COMMAND_MEMBER("uiOpenMenu", this, XGame, &XGame::Cmd_OpenMenu, core::VarFlags::SYSTEM, "Open menu");
     
-    ADD_COMMAND_MEMBER("chat", this, XGame, &XGame::Cmd_Chat, core::VarFlags::SYSTEM, "Chat");
+    ADD_COMMAND_MEMBER("chat", this, XGame, &XGame::Cmd_Chat, core::VarFlags::SYSTEM | core::VarFlags::SINGLE_ARG, "Chat");
 
 }
 

@@ -46,7 +46,8 @@ X_DECLARE_FLAGS(VarFlag)
     RENDERER,
     TOOL,       
 
-    CPY_NAME    // makes a copy of the name
+    CPY_NAME,    // makes a copy of the name
+    SINGLE_ARG   // prevents command arg tokenization
 );
 
 typedef Flags<VarFlag> VarFlags;
