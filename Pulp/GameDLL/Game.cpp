@@ -677,9 +677,12 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
 
 void XGame::drawDebug(engine::IPrimativeContext* pPrim)
 {
-    Vec2f base(5.f, 150.f);
+    Vec2f base(5.f, 50.f);
 
-    Vec2f size = pSession_->drawDebug(base, pPrim);
+    {
+        Vec2f size = pSession_->drawDebug(base, pPrim);
+        base.y += size.y;
+    }
 
     if (!vars_.drawSessionInfoDebug() && !vars_.userCmdDrawDebug() && !vars_.drawGameUserDebug()) {
         return;
@@ -695,7 +698,7 @@ void XGame::drawDebug(engine::IPrimativeContext* pPrim)
     core::StackString512 txt;
     net::NetGuidStr guidStr;
 
-    Vec3f pos(5.f, 50.f, 1.f);
+    Vec3f pos(base.x, base.y, 1.f);
 
     if (vars_.drawSessionInfoDebug()) {
         auto status = pSession_->getStatus();
