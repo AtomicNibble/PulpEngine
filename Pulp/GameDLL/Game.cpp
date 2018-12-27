@@ -361,7 +361,7 @@ bool XGame::update(core::FrameData& frame)
 
                 if (!world_->loadMap(matchParams.mapName)) {
                     X_ERROR("Game", "Failed to load map");
-                    // TODO: quite to menu?
+                    // TODO: quit to menu?
                 }
             }
         }
