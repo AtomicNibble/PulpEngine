@@ -161,7 +161,7 @@ void Multiplayer::updateChat(core::TimeVal dt)
 }
 
 
-void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawLeaderboard(net::ISession* pSession, const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
 {
     // want some rows that are fixed size maybe?
     // but centered in srreen.
@@ -214,7 +214,15 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
     pPrim->drawQuad(titleRect, Color8u(80, 20, 20, 128));
  //   pPrim->drawQuad(rowsRect, Color8u(20,20,20,128));
 
-    core::FixedArray<PlayerState, net::MAX_PLAYERS> activeStates;
+    struct LeaderBoardInfo
+    {
+        PlayerState ps;
+        core::StackString<net::MAX_USERNAME_LEN> name;
+    };
+
+    core::FixedArray<LeaderBoardInfo, net::MAX_PLAYERS> activeStates;
+
+    auto* pLobby = pSession->getLobby(net::LobbyType::Game);
 
     for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
     {
@@ -222,7 +230,18 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
             continue;
         }
 
-        activeStates.push_back(playerStates_[i]);
+        LeaderBoardInfo lbi;
+        lbi.ps = playerStates_[i];
+
+        net::UserInfo info;
+        if (pLobby->getUserInfoForGuid(unm.lobbyUserGuids[i], info)) {
+            lbi.name.append(info.name.data(), info.name.length());
+        }
+        else {
+            lbi.name.set("<error>");
+        }
+
+        activeStates.emplace_back(lbi);
     }
 
     {
@@ -279,7 +298,7 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
 
         con.flags.Set(font::DrawTextFlag::CENTER_VER);
 
-        for (auto& ply : activeStates)
+        for (auto& lbi : activeStates)
         {
             Rectf row(rowsRect);
             row.y1 = y;
@@ -288,7 +307,9 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
             y += rowHeight + rowPadding;
 
             // Name - Points - Kills - Headshots - Ping
-            str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, "Stu", ply.points, ply.kills, ply.headshots, ply.ping);
+            auto ply = lbi.ps;
+
+            str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, lbi.name.c_str(), ply.points, ply.kills, ply.headshots, ply.ping);
             pPrim->drawText(row.x1, row.getCenter().y, con, str.begin(), str.end());
         }
     }

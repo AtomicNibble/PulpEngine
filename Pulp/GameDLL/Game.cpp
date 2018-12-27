@@ -429,7 +429,7 @@ bool XGame::update(core::FrameData& frame)
 
         // What's the point we all know stu will be at the top :(
         if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
-            pMultiplayerGame_->drawLeaderboard(userNetMap_, pPrim);
+            pMultiplayerGame_->drawLeaderboard(pSession_, userNetMap_, pPrim);
         }
     }
     else if (status == net::SessionStatus::PartyLobby)
