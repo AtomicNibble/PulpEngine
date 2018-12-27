@@ -29,6 +29,19 @@ void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
             continue;
         }
 
+        playerStates_[i].points++;
+
+        if (playerStates_[i].points % 16 == 0) {
+            playerStates_[i].kills++;
+        }
+
+        if (playerStates_[i].points % 32 == 0) {
+            playerStates_[i].headshots++;
+        }
+
+        // what's the ping of the local player?
+
+        // remote peer pings
         auto sysHandle = unm.sysHandles[i];
         if (sysHandle == net::INVALID_SYSTEM_HANDLE) {
             X_ASSERT(i == unm.localPlayerIdx, "Invalid system handle for none localy player")();
