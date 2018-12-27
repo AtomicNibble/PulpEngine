@@ -71,10 +71,10 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
 
 public:
     explicit ConsoleCommandArgs(core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>& line);
-    ~ConsoleCommandArgs() X_OVERRIDE;
+    ~ConsoleCommandArgs() X_FINAL;
 
-    virtual size_t GetArgCount(void) const X_OVERRIDE;
-    virtual const char* GetArg(size_t idx) const X_OVERRIDE;
+    virtual size_t GetArgCount(void) const X_FINAL;
+    virtual const char* GetArg(size_t idx) const X_FINAL;
     void TokenizeString(const char* pBegin, const char* pEnd);
 
 private:
