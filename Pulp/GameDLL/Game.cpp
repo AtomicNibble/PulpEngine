@@ -199,7 +199,6 @@ bool XGame::onInputEvent(const input::InputEvent& event)
     // so we decide where to send the input here.
     auto status = pSession_->getStatus();
 
-
     if (event.action == input::InputState::RELEASED)
     {
         if (event.keyId == input::KeyId::ESCAPE)
@@ -273,15 +272,6 @@ bool XGame::update(core::FrameData& frame)
     frame.view.projMatrixOrtho = orthoProj;
     frame.view.viewProjMatrixOrth = orthoProj * frame.view.viewMatrixOrtho;
 
-
-    font::TextDrawContext con;
-    con.col = Col_Whitesmoke;
-    con.size = Vec2f(36.f, 36.f);
-    con.effectId = 0;
-    con.pFont = gEnv->pFontSys->getDefault();
-    con.flags.Set(font::DrawTextFlag::CENTER);
-    con.flags.Set(font::DrawTextFlag::CENTER_VER);
-
     auto width = static_cast<float>(frame.view.displayRes.x);
     auto height = static_cast<float>(frame.view.displayRes.y);
 
@@ -294,12 +284,6 @@ bool XGame::update(core::FrameData& frame)
     auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
     bool blockUserCmd = drawMenu(frame, pPrim);
-
-    pSession_->drawDebug(pPrim);
-
-    if (vars_.drawGameUserDebug()) {
-        drawGameUserDebug(pPrim);
-    }
 
     // this is built all the time currently even if it's not used.
     // since input events are passed to it all the time.
@@ -386,7 +370,7 @@ bool XGame::update(core::FrameData& frame)
 
         syncLobbyUsers();
 
-        auto localIdx = getLocalClientIdx();
+        auto localIdx = userNetMap_.localPlayerIdx;
         entity::EntityId localId = static_cast<entity::EntityId>(localIdx);
 
         const bool isHost = pSession_->isHost();
@@ -479,38 +463,7 @@ bool XGame::update(core::FrameData& frame)
 
     prevStatus_ = status;
     
-#if 0
-    {
-        con.col = Col_Crimson;
-        con.size = Vec2f(24.f, 24.f);
-        con.flags.Clear();
-
-        net::NetGuidStr buf;
-        core::StackString256 txt;
-        txt.appendFmt("Session: %s\n", net::SessionStatus::ToString(status));
-        txt.appendFmt("Host: %" PRIi8 "\n", pSession_->isHost());
-        txt.appendFmt("PlyIdx: %" PRIi32 " Guid: %s", getLocalClientIdx(), myGuid_.toString(buf));
-
-        pPrim->drawText(Vec3f(5.f, 50.f, 1.f), con, txt.begin(), txt.end());
-    }
-#endif
-
-    if (vars_.userCmdDrawDebug())
-    {
-        core::StackString256 txt;
-
-        txt.appendFmt("UserCmds:");
-
-        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
-        {
-            txt.appendFmt("\nPly%" PRIi32 " UCmd: %" PRIuS, i, userCmdMan_.getNumUnreadFrames(i));
-        }
-        
-        con.flags.Clear();
-
-        pPrim->drawText(Vec3f(5.f, 500.f, 1.f), con, txt.begin(), txt.end());
-
-    }
+    drawDebug(pPrim);
 
     return true;
 }
@@ -722,27 +675,59 @@ bool XGame::drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim)
     return true;
 }
 
-void XGame::drawGameUserDebug(engine::IPrimativeContext* pPrim)
+void XGame::drawDebug(engine::IPrimativeContext* pPrim)
 {
+    pSession_->drawDebug(pPrim);
+
+    if (!vars_.drawSessionInfoDebug() && !vars_.userCmdDrawDebug() && !vars_.drawGameUserDebug()) {
+        return;
+    }
+
     font::TextDrawContext con;
     con.col = Col_Whitesmoke;
     con.size = Vec2f(16.f, 16.f);
     con.effectId = 0;
     con.pFont = gEnv->pFontSys->getDefault();
+    con.flags.Clear();
 
     core::StackString512 txt;
-    
     net::NetGuidStr guidStr;
-    txt.appendFmt("LocalIdx %" PRIi32 " guid: %s\n", userNetMap_.localPlayerIdx, userNetMap_.myGuid.toString(guidStr));
 
-    for (size_t i = 0; i < userNetMap_.lobbyUserGuids.size(); i++)
-    {
-        auto userGuid = userNetMap_.lobbyUserGuids[i];
+    Vec3f pos(5.f, 50.f, 1.f);
 
-        txt.appendFmt("%" PRIuS " %s\n", i, userGuid.toString(guidStr));
+    if (vars_.drawSessionInfoDebug()) {
+        auto status = pSession_->getStatus();
+
+        txt.setFmt("Session: %s\n", net::SessionStatus::ToString(status));
+        txt.appendFmt("Host: %" PRIi8 "\n", pSession_->isHost());
+        txt.appendFmt("PlyIdx: %" PRIi32 " Guid: %s", userNetMap_.localPlayerIdx, userNetMap_.myGuid.toString(guidStr));
+
+        pPrim->drawText(pos, con, txt.begin(), txt.end());
+        pos.y += 60.f;
     }
 
-    pPrim->drawText(5.f, 200.f, con, txt.begin(), txt.end());
+    if (vars_.userCmdDrawDebug()) {
+        txt.setFmt("UserCmds:");
+
+        for (int32_t i = 0; i < net::MAX_PLAYERS; i++) {
+            txt.appendFmt("\nPly%" PRIi32 " UCmd: %" PRIuS, i, userCmdMan_.getNumUnreadFrames(i));
+        }
+
+        pPrim->drawText(pos, con, txt.begin(), txt.end());
+        pos.y += (net::MAX_PLAYERS * 16.f) + 30.f;
+    }
+
+    if (vars_.drawGameUserDebug()) {
+        txt.setFmt("LocalIdx %" PRIi32 " guid: %s\n", userNetMap_.localPlayerIdx, userNetMap_.myGuid.toString(guidStr));
+
+        for (size_t i = 0; i < userNetMap_.lobbyUserGuids.size(); i++) {
+            auto userGuid = userNetMap_.lobbyUserGuids[i];
+            txt.appendFmt("%" PRIuS " %s\n", i, userGuid.toString(guidStr));
+        }
+
+        pPrim->drawText(pos, con, txt.begin(), txt.end());
+        pos.y += (net::MAX_PLAYERS * 16.f) + 30.f;
+    }
 }
 
 void XGame::syncLobbyUsers(void)
@@ -844,12 +829,6 @@ void XGame::clearWorld(void)
     lastUserCmdRunTime_.fill(0);
     lastUserCmdRunOnClientTime_.fill(0);
     lastUserCmdRunOnServerTime_.fill(0);
-}
-
-int32_t XGame::getLocalClientIdx(void) const
-{
-    X_ASSERT(userNetMap_.localPlayerIdx >= 0, "Called when local player is not valid")(userNetMap_.localPlayerIdx);
-    return userNetMap_.localPlayerIdx;
 }
 
 int32_t XGame::getPlayerIdxForGuid(net::NetGUID guid) const

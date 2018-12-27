@@ -95,13 +95,11 @@ private:
     void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& userCmd, int32_t playerIdx);
     
     bool drawMenu(core::FrameData& frame, engine::IPrimativeContext* pPrim);
-    void drawGameUserDebug(engine::IPrimativeContext* pPrim);
+    void drawDebug(engine::IPrimativeContext* pPrim);
 
     void syncLobbyUsers(void);
     void clearWorld(void);
 
-
-    int32_t getLocalClientIdx(void) const;
     int32_t getPlayerIdxForGuid(net::NetGUID guid) const;
 
     void Command_Map(core::IConsoleCmdArgs* Cmd);
