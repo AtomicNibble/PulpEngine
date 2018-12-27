@@ -455,7 +455,6 @@ void Lobby::notifyPeersLeavingGameLobby(void)
     sendToPeers(MessageID::LobbyLeaveGameLobby);
 }
 
-
 // -------------------------------------------
 
 void Lobby::sendChatMsg(core::span<const char> msg)
@@ -1642,6 +1641,7 @@ void Lobby::initStateLobbyHost(void)
 
     addLocalUsers();
 
+    // TODO: what is this even for
     hostAddress_ = users_.front().address;
 
     // done?
