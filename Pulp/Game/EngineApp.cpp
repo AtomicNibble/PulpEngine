@@ -74,6 +74,8 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bConsoleLog = true;
 #endif
 
+    params.bPauseShutdown = false;
+
 #if X_SUPER
     params.bFileLog = true;
 #endif // !X_SUPER
