@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "EnitiySystem.h"
+#include "EntitySystem.h"
 #include "Vars\GameVars.h"
 #include "UserNetMappings.h"
 #include "Weapon\WeaponDef.h"
@@ -299,6 +299,7 @@ namespace entity
             decltype(localMask) mask;
             bs.read(mask);
 
+#if 0
             // components changed?
             if (mask != localMask)
             {
@@ -314,6 +315,7 @@ namespace entity
                     X_ASSERT_NOT_IMPLEMENTED();
                 }
             }
+#endif
 
 
             // we always have transform?

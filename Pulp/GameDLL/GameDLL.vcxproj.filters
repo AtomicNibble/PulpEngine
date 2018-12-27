@@ -72,12 +72,6 @@
     <ClInclude Include="Vars\GameVars.h">
       <Filter>Header Files\Vars</Filter>
     </ClInclude>
-    <ClInclude Include="Enity\EnityComponents.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
-    <ClInclude Include="Enity\EnitiySystem.h">
-      <Filter>Header Files\Enity</Filter>
-    </ClInclude>
     <ClInclude Include="Level\Level.h">
       <Filter>Header Files\Level</Filter>
     </ClInclude>
@@ -123,6 +117,12 @@
     <ClInclude Include="UserNetMappings.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\EntitySystem.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\EntityComponents.h">
+      <Filter>Header Files\Enity</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -136,9 +136,6 @@
     </ClCompile>
     <ClCompile Include="Vars\GameVars.cpp">
       <Filter>Source Files\Vars</Filter>
-    </ClCompile>
-    <ClCompile Include="Enity\EnitiySystem.cpp">
-      <Filter>Source Files\Entity</Filter>
     </ClCompile>
     <ClCompile Include="Level\Level.cpp">
       <Filter>Source Files\Level</Filter>
@@ -173,9 +170,6 @@
     <ClCompile Include="Enity\ComponentMeta.cpp">
       <Filter>Source Files\Entity</Filter>
     </ClCompile>
-    <ClCompile Include="Enity\EnityComponents.cpp">
-      <Filter>Source Files\Entity</Filter>
-    </ClCompile>
     <ClCompile Include="UserCmds\UserCmdGen.cpp">
       <Filter>Source Files\UserCmds</Filter>
     </ClCompile>
@@ -184,6 +178,12 @@
     </ClCompile>
     <ClCompile Include="Multiplayer.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\EntitySystem.cpp">
+      <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\EntityComponents.cpp">
+      <Filter>Source Files\Entity</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

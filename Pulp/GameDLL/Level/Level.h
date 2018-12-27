@@ -6,7 +6,7 @@
 
 #include <Ilevel.h>
 
-#include "Enity\EnitiySystem.h"
+#include "Enity\EntitySystem.h"
 
 X_NAMESPACE_DECLARE(core,
                     namespace V2 {

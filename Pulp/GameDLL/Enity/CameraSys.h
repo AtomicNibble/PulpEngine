@@ -1,6 +1,6 @@
 #pragma once
 
-#include "EnityComponents.h"
+#include "EntityComponents.h"
 
 X_NAMESPACE_DECLARE(core,
                     struct FrameTimeData;

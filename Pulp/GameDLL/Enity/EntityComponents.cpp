@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "EnityComponents.h"
+#include "EntityComponents.h"
 
 #include <Containers/FixedBitStream.h>
 

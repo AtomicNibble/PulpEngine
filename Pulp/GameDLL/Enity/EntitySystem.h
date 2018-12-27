@@ -3,7 +3,7 @@
 #include <IInput.h>
 #include <IModelManager.h>
 
-#include "EnityComponents.h"
+#include "EntityComponents.h"
 
 #include "CameraSys.h"
 #include "PlayerSys.h"
