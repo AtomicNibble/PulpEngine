@@ -89,6 +89,7 @@ REM xcopy /y /i /s /e /d "core_assets\techdefs" "%OUT_PATH%\core_assets\techdefs
 REM xcopy /y /i /s /e /d "core_assets\shaders" "%OUT_PATH%\core_assets\shaders"
 REM xcopy /y /i /s /e /d "core_assets\scripts" "%OUT_PATH%\core_assets\scripts"
 REM xcopy /y /i /s /e /d "core_assets\menus" "%OUT_PATH%\core_assets\menus"
+xcopy /y /i /s /e /d "core_assets\strings" "%OUT_PATH%\core_assets\strings"
 
 del /s /q /f "%OUT_PATH%\core_assets\sound\*.xml"
 del /s /q /f "%OUT_PATH%\core_assets\sound\*.json"
