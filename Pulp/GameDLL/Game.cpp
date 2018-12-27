@@ -316,17 +316,6 @@ bool XGame::update(core::FrameData& frame)
             pMenuHandler_->openMenu("main");
 
         }
-
-
-#if 0
-        auto val = frame.timeInfo.ellapsed[core::ITimer::Timer::UI].GetSeconds();
-
-        float t = (math<float>::sin(val) + 1.f) * 0.5f;
-
-        Color col = Col_Red;
-        con.col = col.lerp(t, Col_White);
-        pPrim->drawText(Vec3f(center.x, 75, 1.f), con, "Insert fancy main menu here");
-#endif
     }
     else if (status == net::SessionStatus::Loading)
     {
