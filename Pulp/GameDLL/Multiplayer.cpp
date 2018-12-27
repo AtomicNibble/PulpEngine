@@ -148,7 +148,7 @@ void Multiplayer::updateChat(core::TimeVal dt)
 }
 
 
-void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
+void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
 {
     // want some rows that are fixed size maybe?
     // but centered in srreen.
@@ -201,11 +201,22 @@ void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
     pPrim->drawQuad(titleRect, Color8u(80, 20, 20, 128));
  //   pPrim->drawQuad(rowsRect, Color8u(20,20,20,128));
 
+    core::FixedArray<PlayerState, net::MAX_PLAYERS> activeStates;
+
+    for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+    {
+        if (!unm.lobbyUserGuids[i].isValid()) {
+            continue;
+        }
+
+        activeStates.push_back(playerStates_[i]);
+    }
+
     {
         // draw the row backgrounds
         float y = rowsRect.y1;
 
-        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        for (size_t i = 0; i < activeStates.size(); i++)
         {
             Rectf row(rowsRect);
             row.y1 = y;
@@ -221,7 +232,7 @@ void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
         // draw the row borders
         float y = rowsRect.y1;
 
-        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        for (size_t i = 0; i < activeStates.size(); i++)
         {
             Rectf row(rowsRect);
             row.y1 = y;
@@ -255,7 +266,7 @@ void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
 
         con.flags.Set(font::DrawTextFlag::CENTER_VER);
 
-        for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
+        for (auto& ply : activeStates)
         {
             Rectf row(rowsRect);
             row.y1 = y;
@@ -264,8 +275,6 @@ void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
             y += rowHeight + rowPadding;
 
             // Name - Points - Kills - Headshots - Ping
-            auto& ply = playerStates_[i];
-
             str.setFmt(" %-48s %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32 " %-12" PRIi32, "Stu", ply.points, ply.kills, ply.headshots, ply.ping);
             pPrim->drawText(row.x1, row.getCenter().y, con, str.begin(), str.end());
         }
