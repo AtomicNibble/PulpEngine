@@ -14,7 +14,6 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // some std includes.
 #include <limits>
 #include <array>
-#include <string_view>
 
 // Util
 #include <Util\UserLiterals.h>
@@ -123,6 +122,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 #include <String\StackString.h>
 // #include <String\Xml.h>
 #include <String\Json.h>
+#include <String\StringView.h>
 
 // Math
 #include <Math\XMath.h>

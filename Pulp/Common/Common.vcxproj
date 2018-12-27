@@ -352,6 +352,7 @@
     <ClInclude Include="String\StringTable.h" />
     <ClInclude Include="String\StringTokenizer.h" />
     <ClInclude Include="String\StringUtil.h" />
+    <ClInclude Include="String\StringView.h" />
     <ClInclude Include="String\StrRef.h" />
     <ClInclude Include="String\Xml.h" />
     <ClInclude Include="String\XParser.h" />
