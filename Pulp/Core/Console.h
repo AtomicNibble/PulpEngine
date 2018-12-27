@@ -52,14 +52,14 @@ typedef core::MemoryArena<
 
 struct ConsoleCommand
 {
+    typedef VarFlags VarFlags;
+
     ConsoleCommand();
 
-    typedef VarFlags FlagType;
+    string name; // the name of the command.
+    string desc; // descption text for the command
 
-    string Name; // the name of the command.
-    string Desc; // descption text for the command
-
-    FlagType Flags;      // flags like CHEAT etc..
+    VarFlags flags;      // flags like CHEAT etc..
     ConsoleCmdFunc func; // Pointer to console command.
 };
 

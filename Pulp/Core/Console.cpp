@@ -66,20 +66,20 @@ namespace
             X_ALIGN_OF(CVarIntRef)),
         X_ALIGN_OF(CVarColRef));
 
-    static void sortVarsByName(core::Array<core::ICVar*>& vars)
+    static void sortVarsByName(core::Array<const core::ICVar*>& vars)
     {
         std::sort(vars.begin(), vars.end(),
-            [](core::ICVar* a, core::ICVar* b) {
+            [](const core::ICVar* a, const core::ICVar* b) {
                 return std::strcmp(a->GetName(), b->GetName()) < 0;
             }
         );
     }
 
-    static void sortCmdsByName(core::Array<core::ConsoleCommand*>& vars)
+    static void sortCmdsByName(core::Array<const core::ConsoleCommand*>& vars)
     {
         std::sort(vars.begin(), vars.end(),
-            [](core::ConsoleCommand* a, core::ConsoleCommand* b) {
-                return std::strcmp(a->Name, b->Name) < 0;
+            [](const core::ConsoleCommand* a, const core::ConsoleCommand* b) {
+                return a->name.compareInt(b->name) < 0;
             }
         );
     }
@@ -868,19 +868,19 @@ void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
 
     ConsoleCommand cmd;
 
-    cmd.Name = pName;
-    cmd.Flags = Flags;
+    cmd.name = pName;
+    cmd.flags = Flags;
     cmd.func = func;
     if (pDesc) {
-        cmd.Desc = pDesc;
+        cmd.desc = pDesc;
     }
 
     // pass cmd.Name instead of Name, saves creating a second core::string
-    if (cmdMap_.find(cmd.Name) != cmdMap_.end()) {
+    if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
         X_WARNING("Console", "command already exsists: \"%s", pName);
     }
 
-    cmdMap_.insert(std::make_pair(cmd.Name, cmd));
+    cmdMap_.insert(std::make_pair(cmd.name, cmd));
 }
 
 void XConsole::unRegisterCommand(const char* pName)
@@ -1199,8 +1199,8 @@ void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::Com
     // dunno what I added this for but it's annoying.
     // X_LOG_BULLET;
 
-    if (cmd.Flags.IsSet(VarFlag::CHEAT)) {
-        X_WARNING("Console", "Cmd(%s) is cheat protected", cmd.Name.c_str());
+    if (cmd.flags.IsSet(VarFlag::CHEAT)) {
+        X_WARNING("Console", "Cmd(%s) is cheat protected", cmd.name.c_str());
         return;
     }
 
@@ -2134,8 +2134,8 @@ void XConsole::drawInputTxt(const Vec2f& start)
             // do the commands baby!
             auto cmdIt = cmdMap_.begin();
             for (; cmdIt != cmdMap_.end(); ++cmdIt) {
-                pName = cmdIt->second.Name.c_str();
-                NameLen = cmdIt->second.Name.length();
+                pName = cmdIt->second.name.c_str();
+                NameLen = cmdIt->second.name.length();
 
                 // if cmd name shorter than search leave it !
                 if (NameLen < inputLen) {
@@ -2409,7 +2409,7 @@ void XConsole::drawInputTxt(const Vec2f& start)
             }
             else if (isSingleCmd) {
                 AutoResult& result = *results.begin();
-                const core::string& descStr = result.pCmd->Desc;
+                const core::string& descStr = result.pCmd->desc;
 
                 const float box2Offset = 5.f;
                 const float descWidth = core::Max(width, pFont_->GetTextSize(descStr.begin(), descStr.end(), ctx).x) + 10.f;
@@ -2547,13 +2547,13 @@ void XConsole::OnCoreEvent(const CoreEventData& ed)
 
 void XConsole::listCommands(const char* pSearchPatten)
 {
-    core::Array<ConsoleCommand*> sorted_cmds(g_coreArena);
+    core::Array<const ConsoleCommand*> sorted_cmds(g_coreArena);
     sorted_cmds.setGranularity(cmdMap_.size());
 
     for (auto itrCmd = cmdMap_.begin(); itrCmd != cmdMap_.end(); ++itrCmd) {
         ConsoleCommand& cmd = itrCmd->second;
 
-        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.Name)) {
+        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.name)) {
             sorted_cmds.append(&cmd);
         }
     }
@@ -2562,10 +2562,9 @@ void XConsole::listCommands(const char* pSearchPatten)
 
     X_LOG0("Console", "------------ ^8Commands(%" PRIuS ")^7 ------------", sorted_cmds.size());
 
-    ConsoleCommand::FlagType::Description dsc;
+    ConsoleCommand::VarFlags::Description dsc;
     for (const auto* pCmd : sorted_cmds) {
-        X_LOG0("Command", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", pCmd->Name.c_str(),
-            pCmd->Flags.ToString(dsc), pCmd->Desc.c_str());
+        X_LOG0("Command", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", pCmd->name.c_str(), pCmd->flags.ToString(dsc), pCmd->desc.c_str());
     }
 
     X_LOG0("Console", "------------ ^8Commands End^7 ------------");
@@ -2576,7 +2575,7 @@ void XConsole::listVariables(const char* pSearchPatten)
     // i'm not storing the vars in a ordered map since it's slow to get them.
     // and i only need order when priting them.
     // so it's not biggy doing the sorting here.
-    core::Array<ICVar*> sorted_vars(g_coreArena);
+    core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
@@ -2604,7 +2603,7 @@ void XConsole::listVariablesValues(const char* pSearchPatten)
     // i'm not storing the vars in a ordered map since it's slow to get them.
     // and i only need order when priting them.
     // so it's not biggy doing the sorting here.
-    core::Array<ICVar*> sorted_vars(g_coreArena);
+    core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
