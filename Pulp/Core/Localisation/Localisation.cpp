@@ -21,9 +21,9 @@ Localisation::~Localisation()
 }
 
 
-Localisation::string_view Localisation::getString(Key k) const
+Localisation::string_view Localisation::getString(Key StrHash) const
 {
-    auto it = ht_.find(k);
+    auto it = ht_.find(StrHash);
     if (it != ht_.end()) {
         return string_view(it->second.begin(), it->second.length());
     }

@@ -32,7 +32,7 @@ public:
     Localisation(core::MemoryArenaBase* arena);
     ~Localisation() X_FINAL;
 
-    string_view getString(Key k) const X_FINAL;
+    string_view getString(Key StrHash) const X_FINAL;
 
     bool loadDict(core::Path<char>& name);
 

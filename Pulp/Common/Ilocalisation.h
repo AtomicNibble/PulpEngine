@@ -20,7 +20,7 @@ struct ILocalisation
 
     virtual ~ILocalisation() {}
 
-    virtual string_view getString(Key k) const X_ABSTRACT;
+    virtual string_view getString(Key strHash) const X_ABSTRACT;
 
 };
 
