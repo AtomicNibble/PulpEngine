@@ -106,6 +106,11 @@ X_INLINE void IPrimativeContext::drawRect(const Rectf& rect, Color8u col)
     drawRect(rect.getX1(), rect.getY1(), rect.getWidth(), rect.getHeight(), col);
 }
 
+X_INLINE void IPrimativeContext::drawRect(const Vec2f& tl, const Vec2f& size, Color8u col)
+{
+    drawRect(tl.x, tl.y, size.x, size.y, col);
+}
+
 // Points
 X_INLINE void IPrimativeContext::drawPoint(const Vec3f& pos, Color8u col, uint8_t size)
 {

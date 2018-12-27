@@ -96,6 +96,7 @@ public:
     X_INLINE void drawLine(const Vec3f& pos1, const Vec3f& pos2, Color8u color1);
 
     X_INLINE void drawRect(const Rectf& rect, Color8u col);
+    X_INLINE void drawRect(const Vec2f& tl, const Vec2f& size, Color8u col);
     void drawRect(float x, float y, float width, float height, Color8u col);
     void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br, Color8u col);
     void drawRect(const Vec3f& tl, const Vec3f& tr, const Vec3f& bl, const Vec3f& br,
