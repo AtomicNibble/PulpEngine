@@ -1,7 +1,7 @@
 #pragma once
 
 
-#include <string_view>
+#include <String/StringView.h>
 #include <String/StringHash.h>
 
 X_NAMESPACE_BEGIN(locale)
@@ -15,7 +15,7 @@ static const size_t MAX_STRINGS = 512;
 
 struct ILocalisation
 {
-    using string_view = std::string_view;
+    using string_view = core::string_view;
     using Key = core::StrHash;
 
     virtual ~ILocalisation() {}
