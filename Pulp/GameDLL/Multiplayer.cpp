@@ -95,7 +95,7 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
     font::TextDrawContext con;
     con.col = Col_Whitesmoke;
     con.size = Vec2f(18.f, 18.f);
-    con.effectId = 0;
+    con.effectId = 1;
     con.pFont = gEnv->pFontSys->getDefault();
 
     float height = 20.f;
@@ -139,7 +139,7 @@ void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
     font::TextDrawContext con;
     con.col = Col_Whitesmoke;
     con.size = Vec2f(18.f, 18.f);
-    con.effectId = 0;
+    con.effectId = 1;
     con.pFont = gEnv->pFontSys->getDefault();
 
     float height = 20.f;
