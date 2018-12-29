@@ -511,11 +511,12 @@ void XGame::applySnapShot(const net::SnapShot& snap)
         }
     }
 
-    world_->applySnapShot(userNetMap_, snap);
-
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
+    // this must be done before assign snapshot.
     userNetMap_.lobbyUserGuids = snap.getPlayerGuids();
+    
+    world_->applySnapShot(userNetMap_, snap);
 
     // Have the client work out it's localPlayerIdx.
     if (userNetMap_.localPlayerIdx < 0)
