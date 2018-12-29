@@ -213,10 +213,16 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
 
 void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
 {
-    core::StackString256 str;
-    str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
+    X_ASSERT(pSession_->isHost(), "Should only be called on host")();
 
-    addChatLine(core::string_view(str.begin(), str.length()));
+    addChatLine(name, msg);
+
+    // send to peers.
+    ChatPacketBs bs;
+    buildChatPacket(bs, name, msg);
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+    pLobby->sendToPeers(bs);
 }
 
 void Multiplayer::addEventLine(core::string_view line)
@@ -228,13 +234,16 @@ void Multiplayer::addEventLine(core::string_view line)
     eventLines_.emplace(line);
 }
 
-void Multiplayer::addChatLine(core::string_view line)
+void Multiplayer::addChatLine(core::string_view name, core::string_view msg)
 {
     if (chatLines_.freeSpace() == 0) {
         chatLines_.pop();
     }
 
-    chatLines_.emplace(line);
+    core::StackString256 str;
+    str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
+
+    chatLines_.emplace(core::string_view(str.begin(), str.length()));
 }
 
 void Multiplayer::updateChat(core::TimeVal dt)
@@ -271,6 +280,18 @@ void Multiplayer::updateEvents(core::TimeVal dt)
     while (eventLines_.isNotEmpty() && eventLines_.peek().ellapsed > chatTime) {
         eventLines_.pop();
     }
+}
+
+void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg)
+{
+    const uint8_t nameLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_USERNAME_LEN, name.length()));
+    const uint8_t msgLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_CHAT_MSG_LEN, msg.length()));
+
+    bs.write(net::MessageID::GameChatMsg);
+    bs.write(nameLen);
+    bs.write(name.data(), nameLen);
+    bs.write(msgLen);
+    bs.write(msg.data(), msgLen);
 }
 
 void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim)

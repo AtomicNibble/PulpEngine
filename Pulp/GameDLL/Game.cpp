@@ -589,15 +589,20 @@ void XGame::handleChatMsg(net::Packet* pPacket)
     char name[net::MAX_USERNAME_LEN] = {};
     char msg[net::MAX_CHAT_MSG_LEN] = {};
 
-    auto nameLen = bs.read<uint8_t>();
-    nameLen = core::Min<uint8_t>(net::MAX_USERNAME_LEN, nameLen);
+    auto nameLen = core::Min<uint32_t>(net::MAX_USERNAME_LEN, bs.read<uint8_t>());
     bs.read(name, nameLen);
 
-    auto msgLen = bs.read<uint8_t>();
-    msgLen = core::Min<uint8_t>(net::MAX_CHAT_MSGS, msgLen);
+    auto msgLen = core::Min<uint32_t>(net::MAX_CHAT_MSG_LEN, bs.read<uint8_t>());
     bs.read(msg, msgLen);
 
-    pMultiplayerGame_->handleChatMsg(core::string_view(name, nameLen), core::string_view(msg, msgLen));
+    X_LOG0("Game", "nameLen %" PRIu32 " msgLen: %" PRIu32, nameLen, msgLen);
+
+    if (pSession_->isHost()) {
+        pMultiplayerGame_->handleChatMsg(core::string_view(name, nameLen), core::string_view(msg, msgLen));
+    }
+    else {
+        pMultiplayerGame_->addChatLine(core::string_view(name, nameLen), core::string_view(msg, msgLen));
+    }
 }
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
@@ -971,24 +976,13 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
         name = "server";
     }
 
-    // if we are a client we send it to the server :D
     if (pSession_->isHost()) {
         pMultiplayerGame_->handleChatMsg(name, msg);
     }
     else {
-        
-        // so if i want to send a packet to the host, i need to send it via the lobby.
-        // makes sense as that stores all the info for host and peer shit.
-        core::FixedBitStreamStack<net::MAX_USERNAME_LEN + net::MAX_CHAT_MSG_LEN + 16> bs;
-        bs.write(net::MessageID::GameChatMsg);
-
-        uint8_t nameLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_USERNAME_LEN, name.length()));
-        uint8_t msgLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_CHAT_MSG_LEN, msg.length()));
-
-        bs.write(nameLen);
-        bs.write(name.data(), name.length());
-        bs.write(msgLen);
-        bs.write(msg.data(), msg.length());
+        // client sends it to the server, then server will send it us back :D
+        Multiplayer::ChatPacketBs bs;
+        Multiplayer::buildChatPacket(bs, name, msg);
 
         pLobby->sendToHost(bs);
     }

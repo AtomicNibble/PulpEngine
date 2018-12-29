@@ -3,6 +3,7 @@
 #include <INetwork.h>
 
 #include <Containers/FixedFifo.h>
+#include <Containers/FixedBitStream.h>
 
 X_NAMESPACE_DECLARE(core, class FixedBitStreamBase);
 
@@ -67,6 +68,9 @@ class Multiplayer
     using PlayerStateArr = std::array<PlayerState, net::MAX_PLAYERS>;
 
 public:
+    using ChatPacketBs = core::FixedBitStreamStack<net::MAX_USERNAME_LEN + net::MAX_CHAT_MSG_LEN + 16>;
+
+public:
     Multiplayer(GameVars& vars, net::ISession* pSession);
 
     void update(net::IPeer* pPeer, const UserNetMappings& unm);
@@ -81,15 +85,17 @@ public:
     void playerSpawned(const UserNetMappings& unm, int32_t localIndex);
     void handleChatMsg(core::string_view name, core::string_view msg);
 
+    void addChatLine(core::string_view name, core::string_view msg);
 private:
     void addEventLine(core::string_view line);
-    void addChatLine(core::string_view line);
 
     void drawChat(engine::IPrimativeContext* pPrim);
     void drawEvents(engine::IPrimativeContext* pPrim);
     void updateChat(core::TimeVal dt);
     void updateEvents(core::TimeVal dt);
 
+public:
+    static void buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg);
 
 private:
     GameVars& vars_;
