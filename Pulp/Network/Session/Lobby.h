@@ -173,15 +173,17 @@ public:
     // if we are a host and have peers we send snaps.
     void sendSnapShot(const SnapShot& snap);
 
-    void sendToHost(MessageID::Enum id);
-    void sendToHost(const uint8_t* pData, size_t lengthInBytes);
+    void sendToHost(MessageID::Enum id) const;
+    void sendToHost(const core::FixedBitStreamBase& bs) const;
 
     void sendToPeers(MessageID::Enum id) const;
+    void sendToPeers(const core::FixedBitStreamBase& bs) const;
     void sendToPeers(const uint8_t* pData, size_t lengthInBytes) const;
 
     void sendToAll(const uint8_t* pData, size_t lengthInBytes);
 
     void sendToPeer(int32_t peerIdx, MessageID::Enum id) const;
+    void sendToPeer(int32_t peerIdx, const core::FixedBitStreamBase& bs) const;
     void sendToPeer(int32_t peerIdx, const uint8_t* pData, size_t lengthInBytes) const;
 
     // Peers

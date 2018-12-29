@@ -395,7 +395,7 @@ void Lobby::sendPingsToPeers(void) const
         bs.write(info);
     }
 
-    sendToPeers(bs.data(), bs.sizeInBytes());
+    sendToPeers(bs);
 }
 
 // -------------------------------------------
@@ -420,7 +420,7 @@ void Lobby::sendMembersToLobby(LobbyType::Enum type) const
     SystemAddress sa = pPeer_->getMyBoundAddress();
     sa.writeToBitStream(bs);
 
-    sendToPeers(bs.data(), bs.sizeInBytes());
+    sendToPeers(bs);
 }
 
 void Lobby::sendPeerToLobby(int32_t peerIdx, LobbyType::Enum type) const
@@ -478,7 +478,7 @@ void Lobby::sendChatMsg(core::span<const char> msg)
 
     if (isPeer())
     {
-        sendToHost(bs.data(), bs.sizeInBytes()); // we will display the msg when it comes back.
+        sendToHost(bs); // we will display the msg when it comes back.
     }
     else if (isHost())
     {
@@ -550,21 +550,21 @@ void Lobby::sendSnapShot(const SnapShot& snap)
     }
 }
 
-void Lobby::sendToHost(MessageID::Enum id)
+void Lobby::sendToHost(MessageID::Enum id) const
 {
     MsgIdBs bs;
     bs.write(id);
     bs.write(safe_static_cast<uint8_t>(type_));
 
-    sendToHost(bs.data(), bs.sizeInBytes());
+    sendToHost(bs);
 }
 
-void Lobby::sendToHost(const uint8_t* pData, size_t lengthInBytes)
+void Lobby::sendToHost(const core::FixedBitStreamBase& bs) const
 {
     X_ASSERT(isPeer() && !isHost(), "Invalid operation")(isPeer(), isHost());
     const auto& peer = peers_[hostIdx_];
 
-    sendToPeer(hostIdx_, pData, lengthInBytes);
+    sendToPeer(hostIdx_, bs);
 }
 
 void Lobby::sendToPeers(MessageID::Enum id) const
@@ -573,6 +573,11 @@ void Lobby::sendToPeers(MessageID::Enum id) const
     bs.write(id);
     bs.write(safe_static_cast<uint8_t>(type_));
 
+    sendToPeers(bs);
+}
+
+void Lobby::sendToPeers(const core::FixedBitStreamBase& bs) const
+{
     sendToPeers(bs.data(), bs.sizeInBytes());
 }
 
@@ -598,13 +603,17 @@ void Lobby::sendToAll(const uint8_t* pData, size_t lengthInBytes)
     pPeer_->sendLoopback(pData, lengthInBytes);
 }
 
-
 void Lobby::sendToPeer(int32_t peerIdx, MessageID::Enum id) const
 {
     MsgIdBs bs;
     bs.write(id);
     bs.write(safe_static_cast<uint8_t>(type_));
 
+    sendToPeer(peerIdx, bs);
+}
+
+void Lobby::sendToPeer(int32_t peerIdx, const core::FixedBitStreamBase& bs) const
+{
     sendToPeer(peerIdx, bs.data(), bs.sizeInBytes());
 }
 
@@ -877,7 +886,7 @@ void Lobby::addLocalUsers(void)
     char buffer[sizeof(nameStr) / 2];
 
     auto localGuid = pPeer_->getMyGUID();
-    SystemAddress address;
+    SystemAddress address; // TODO: set me?
 
     LobbyUser user;
     user.guid = localGuid;
@@ -955,7 +964,7 @@ void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
         bs.write(safe_static_cast<uint8_t>(type_));
         bs.write(safe_static_cast<int32_t>(ids.size()));
         bs.write(ids.data(), ids.size());
-        sendToPeers(bs.data(), bs.sizeInBytes());
+        sendToPeers(bs);
     }
 }
 
@@ -989,7 +998,7 @@ void Lobby::sendChatMsgToPeers(const ChatMsg& msg)
     bs.write(1_i32);
     msg.writeToBitStream(bs);
 
-    sendToPeers(bs.data(), bs.sizeInBytes());
+    sendToPeers(bs);
 }
 
 void Lobby::sendChatHistoryToPeer(int32_t peerIdx)
