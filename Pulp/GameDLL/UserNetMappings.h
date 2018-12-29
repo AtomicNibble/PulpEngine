@@ -11,6 +11,7 @@ struct UserNetMappings
 
 public:
     UserNetMappings() :
+        pSession(nullptr),
         localPlayerIdx(-1)
     {
     }
@@ -86,6 +87,7 @@ public:
     }
 
 public:
+    net::ISession* pSession; // TODO: feels a bit hacky.
     net::NetGUID myGuid;
     int32_t localPlayerIdx;
     PlayerGuidArr lobbyUserGuids;

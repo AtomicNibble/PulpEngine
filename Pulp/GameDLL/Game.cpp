@@ -139,6 +139,8 @@ bool XGame::init(void)
             X_ERROR("Game", "Failed to create net session");
             return false;
         }
+
+        userNetMap_.pSession = pSession_;
     }
 
     auto deimension = gEnv->pRender->getDisplayRes();
