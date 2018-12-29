@@ -82,7 +82,7 @@ namespace format
             {
                 string.pValue = val;
             }
-            value(std::basic_string_view<char> val)
+            value(core::string_view val)
             {
                 string.pValue = val.data();
                 string.size = val.size();
@@ -192,8 +192,8 @@ namespace format
         MAKE_VALUE_SAME(ValueType::t_cstring, const unsigned char*)
 
         // views and strings
-        MAKE_VALUE_SAME(ValueType::t_string, std::basic_string_view<char>)
-        MAKE_VALUE(ValueType::t_string, const std::basic_string<char>&, std::basic_string_view<char>)
+        MAKE_VALUE_SAME(ValueType::t_string, core::string_view)
+        MAKE_VALUE(ValueType::t_string, const std::basic_string<char>&, core::string_view)
 
         MAKE_VALUE(ValueType::t_pointer, void*, const void*)
         MAKE_VALUE_SAME(ValueType::t_pointer, const void*)
