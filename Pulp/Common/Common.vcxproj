@@ -339,6 +339,7 @@
     <ClInclude Include="String\AssetName.h" />
     <ClInclude Include="String\Base64.h" />
     <ClInclude Include="String\CmdArgs.h" />
+    <ClInclude Include="String\Format.h" />
     <ClInclude Include="String\FormatMacros.h" />
     <ClInclude Include="String\GrowingStringTable.h" />
     <ClInclude Include="String\HumanDuration.h" />

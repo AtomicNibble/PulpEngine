@@ -1360,6 +1360,9 @@
     <ClInclude Include="String\StringView.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="String\Format.h">
+      <Filter>Headers\String</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
