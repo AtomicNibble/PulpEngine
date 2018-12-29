@@ -137,7 +137,6 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
         // oh dear, tut tut.
     }
 
-    // this gets me a string, that works with core::format::format_to
     auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
 
     // mmm.

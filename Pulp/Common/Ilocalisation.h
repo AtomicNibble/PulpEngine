@@ -18,8 +18,10 @@ struct ILocalisation
     using string_view = core::string_view;
     using Key = core::StrHash;
 
+
     virtual ~ILocalisation() {}
 
+    // Returns a string that can be passed to core::format::format_to for inserting params.
     virtual string_view getString(Key strHash) const X_ABSTRACT;
 
 };
