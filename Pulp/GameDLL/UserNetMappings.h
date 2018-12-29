@@ -76,6 +76,11 @@ public:
         return std::find(lobbyUserGuids.begin(), lobbyUserGuids.end(), guid) != lobbyUserGuids.end();
     }
 
+    net::NetGUID getLocalPlayerGUID(void) const
+    {
+        X_ASSERT(localPlayerIdx >= 0 && lobbyUserGuids[localPlayerIdx].isValid(), "Local player index is not valid")(localPlayerIdx);
+        return lobbyUserGuids[localPlayerIdx];
+    }
 
 public:
     net::NetGUID myGuid;
