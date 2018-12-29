@@ -135,6 +135,7 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
     net::UserInfo info;
     if (!pLobby->getUserInfoForGuid(netGuid, info)) {
         // oh dear, tut tut.
+        X_WARNING("Game", "Failed to get name for spawned player for index: %" PRIi32, localIndex);
     }
 
     auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
