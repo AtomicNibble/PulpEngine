@@ -566,7 +566,38 @@ bool XGame::handlePacket(net::Packet* pPacket)
 {
     X_UNUSED(pPacket);
 
+    auto msg = pPacket->getID();
+
+    switch (msg)
+    {
+        case net::MessageID::GameChatMsg: {
+            handleChatMsg(pPacket);
+            break;
+        }
+
+        default:
+            return false;
+    }
+
     return true;
+}
+
+void XGame::handleChatMsg(net::Packet* pPacket)
+{
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    char name[net::MAX_USERNAME_LEN] = {};
+    char msg[net::MAX_CHAT_MSG_LEN] = {};
+
+    auto nameLen = bs.read<uint8_t>();
+    nameLen = core::Min<uint8_t>(net::MAX_USERNAME_LEN, nameLen);
+    bs.read(name, nameLen);
+
+    auto msgLen = bs.read<uint8_t>();
+    msgLen = core::Min<uint8_t>(net::MAX_CHAT_MSGS, msgLen);
+    bs.read(msg, msgLen);
+
+    pMultiplayerGame_->handleChatMsg(core::string_view(name, nameLen), core::string_view(msg, msgLen));
 }
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
@@ -915,28 +946,51 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    if (pMultiplayerGame_) {
+    // who you talking to?
+    if (!pMultiplayerGame_) {
+        // nobody.
+        return;
+    }
 
-        // want the name of the player.
-        core::string_view name = "player";
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+    
+    // want the name of the player.
+    core::string_view name = "player";
+    core::string_view msg(pMsg);
 
-        if (userNetMap_.localPlayerIdx >= 0) {
+    if (userNetMap_.localPlayerIdx >= 0) {
+        const auto& netGuid = userNetMap_.getLocalPlayerGUID();
 
-            const auto& netGuid = userNetMap_.getLocalPlayerGUID();
-
-            // fucking goat muncher!
-            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-            net::UserInfo info;
-            if (pLobby->getUserInfoForGuid(netGuid, info)) {
-                name = info.name;
-            }
+        // fucking goat muncher!
+        net::UserInfo info;
+        if (pLobby->getUserInfoForGuid(netGuid, info)) {
+            name = info.name;
         }
-        else {
-            name = "server";
-        }
+    }
+    else {
+        name = "server";
+    }
 
-        pMultiplayerGame_->handleChatMsg(name, core::string_view(pMsg));
+    // if we are a client we send it to the server :D
+    if (pSession_->isHost()) {
+        pMultiplayerGame_->handleChatMsg(name, msg);
+    }
+    else {
+        
+        // so if i want to send a packet to the host, i need to send it via the lobby.
+        // makes sense as that stores all the info for host and peer shit.
+        core::FixedBitStreamStack<net::MAX_USERNAME_LEN + net::MAX_CHAT_MSG_LEN + 16> bs;
+        bs.write(net::MessageID::GameChatMsg);
+
+        uint8_t nameLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_USERNAME_LEN, name.length()));
+        uint8_t msgLen = safe_static_cast<uint8_t>(core::Min<size_t>(net::MAX_CHAT_MSG_LEN, msg.length()));
+
+        bs.write(nameLen);
+        bs.write(name.data(), name.length());
+        bs.write(msgLen);
+        bs.write(msg.data(), msg.length());
+
+        pLobby->sendToHost(bs);
     }
 }
 

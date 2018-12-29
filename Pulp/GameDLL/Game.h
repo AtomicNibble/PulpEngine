@@ -90,6 +90,9 @@ private:
 
     // ~IGameCallbacks
     
+    void handleChatMsg(net::Packet* pPacket);
+
+
 private:
     void setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS) X_FINAL;
 
