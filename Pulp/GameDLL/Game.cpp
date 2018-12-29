@@ -647,7 +647,7 @@ void XGame::runUserCmdsForPlayer(core::FrameData& frame, int32_t playerIdx)
             // so if the dleta is negative client is running faster
             auto clientServerDelta = clientGameTimedelta - timeSinceServerRanLastCmd;
 
-            X_LOG0("Game", "Ply %" PRIi32 " UserCmd clientDelta: %" PRIi32 " serverDelta: %" PRIi32 " delta: %" PRIi32,
+            X_LOG0_IF(vars_.userCmdDebug(), "Game", "Ply %" PRIi32 " UserCmd clientDelta: %" PRIi32 " serverDelta: %" PRIi32 " delta: %" PRIi32,
                 playerIdx, clientGameTimedelta, timeSinceServerRanLastCmd, clientServerDelta);
 
             if (clientServerDelta <= 1_i32)
