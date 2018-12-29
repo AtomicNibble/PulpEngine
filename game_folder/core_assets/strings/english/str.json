@@ -1,9 +1,6 @@
 {
-    "#str_test_0": "{} meow",
-    "#str_test_1": "{} boat {}",
-    "#str_test_2": "{0} goat {1}",
-    "#str_test_3": "{0}{1}{0}",
     "#str_nice_goat": "This goat is very nice",
-    "#str_joined_game": "{} joined the game"
+    "#str_joined_game": "{} joined the game",
+    "#str_left_game": "{} left the game"
 }
 
