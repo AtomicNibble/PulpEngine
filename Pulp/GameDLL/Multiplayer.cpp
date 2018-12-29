@@ -15,6 +15,30 @@ X_NAMESPACE_BEGIN(game)
 
 using namespace core::Literals;
 
+namespace
+{
+
+    float getAlpha(float percent)
+    {
+        // this really best way :S ?
+        const float fadeStart = 0.85f;
+
+        float a = 1.f;
+        if (percent >= fadeStart) {
+            a = (percent - fadeStart);
+            a = a / (1.f - fadeStart);
+            a = 1.f - a;
+            if (a < 0.f) {
+                a = 0.f;
+            }
+        }
+
+        return a;
+    }
+
+} // namespace
+
+
 Multiplayer::Multiplayer(GameVars& vars) :
     vars_(vars),
     state_(GameState::NONE)
@@ -111,19 +135,7 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
         // fade out last 10%?
         float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
 
-        // this really best way :S ?
-        const float fadeStart = 0.85f;
-        float a = 1.f;
-        if (percent >= fadeStart) {
-            a = (percent - fadeStart);
-            a = a / (1.f - fadeStart);
-            a = 1.f - a;
-            if (a < 0.f) {
-                a = 0.f;
-            }
-        }
-
-        con.col.a = CHANTRAIT<uint8_t>::convert(a);
+        con.col.a = CHANTRAIT<uint8_t>::convert(getAlpha(percent));
 
         pPrim->drawText(x, y, con, line.line.begin(), line.line.end());
         y += 20.f;
@@ -155,19 +167,7 @@ void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
         // fade out last 10%?
         float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
 
-        // this really best way :S ?
-        const float fadeStart = 0.85f;
-        float a = 1.f;
-        if (percent >= fadeStart) {
-            a = (percent - fadeStart);
-            a = a / (1.f - fadeStart);
-            a = 1.f - a;
-            if (a < 0.f) {
-                a = 0.f;
-            }
-        }
-
-        con.col.a = CHANTRAIT<uint8_t>::convert(a);
+        con.col.a = CHANTRAIT<uint8_t>::convert(getAlpha(percent));
 
         pPrim->drawText(x, y, con, line.line.begin(), line.line.end());
         y += 20.f;
