@@ -562,6 +562,12 @@ void XGame::applySnapShot(const net::SnapShot& snap)
     }
 }
 
+bool XGame::handlePacket(net::Packet* pPacket)
+{
+    X_UNUSED(pPacket);
+
+    return true;
+}
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
 {

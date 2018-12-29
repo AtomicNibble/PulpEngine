@@ -1047,7 +1047,9 @@ bool Session::readPackets(void)
                 break;
           
             default:
-                X_ERROR("Session", "Unhandled message: %s", MessageID::ToString(msg));
+                if (!pGameCallbacks_->handlePacket(pPacket)) {
+                    X_ERROR("Session", "Unhandled message: %s", MessageID::ToString(msg));
+                }
                 break;
         }
 

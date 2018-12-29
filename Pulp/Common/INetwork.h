@@ -619,7 +619,7 @@ struct IGameCallbacks
     virtual void buildSnapShot(net::SnapShot& snap) X_ABSTRACT;
     virtual void applySnapShot(const net::SnapShot& snap) X_ABSTRACT;
     virtual void setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS) X_ABSTRACT;
-
+    virtual bool handlePacket(Packet* pPacket) X_ABSTRACT;
 };
 
 struct ISession

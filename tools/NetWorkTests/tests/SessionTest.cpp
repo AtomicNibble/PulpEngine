@@ -32,6 +32,11 @@ namespace
             X_UNUSED(fraction, serverGameTimeMS, ssStartTimeMS, ssEndTimeMS);
         }
 
+        bool handlePacket(net::Packet* pPacket) X_FINAL {
+            X_UNUSED(pPacket);
+            return false;
+        }
+
         // ~IGameCallbacks
 
 
