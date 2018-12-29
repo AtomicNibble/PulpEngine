@@ -213,7 +213,9 @@ namespace format
             static const ValueType::Enum value = value_type::type_tag;
         };
 
-        static_assert(ValueType::ENUM_COUNT < (1 << 4), "Can't store all types in 4 bis");
+        static constexpr int BITS_PER_TYPE = 4;
+
+        static_assert(ValueType::ENUM_COUNT < (1 << BITS_PER_TYPE), "Can't store all types in 4 bis");
 
         template<typename Last>
         constexpr uint64_t get_types()
@@ -224,7 +226,7 @@ namespace format
         template<typename First, typename Second, typename... Args>
         constexpr uint64_t get_types()
         {
-            return get_type<First>::value | (get_types<Second, Args...>() << 4);
+            return get_type<First>::value | (get_types<Second, Args...>() << BITS_PER_TYPE);
         }
 
         template<typename... Args>
@@ -232,6 +234,8 @@ namespace format
         {
             static const size_t NUM_ARGS = sizeof...(Args);
             static const size_t DATA_SIZE = NUM_ARGS;
+
+            static_assert((NUM_ARGS * BITS_PER_TYPE) < sizeof(uint64_t) * 8, "Too many args");
 
             typedef value value_type;
 
@@ -332,7 +336,7 @@ namespace format
         private:
             typename ValueType::Enum type(index_type index) const
             {
-                uint32_t shift = index * 4;
+                uint32_t shift = index * BITS_PER_TYPE;
                 uint64_t mask = 0xf;
                 return static_cast<ValueType::Enum>((types_ & (mask << shift)) >> shift);
             }
