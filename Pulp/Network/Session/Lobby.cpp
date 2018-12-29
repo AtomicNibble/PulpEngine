@@ -816,6 +816,8 @@ void Lobby::addUsersFromBs(core::FixedBitStreamBase& bs, int32_t peerIdx)
             }
         }
 
+        removeFromDisconnected(user.guid);
+
         users_.emplace_back(std::move(user));
     }
 
@@ -895,6 +897,8 @@ void Lobby::addLocalUsers(void)
     user.username.set(core::strUtil::Convert(nameStr, buffer));
     user.username.appendFmt("_%" PRIx32, core::Process::getCurrentID());
     users_.emplace_back(user);
+
+    X_ASSERT(!removeFromDisconnected(localGuid), "Local user guid in disconnect list")();
 
     X_ASSERT(users_.isNotEmpty(), "User list empty")(users_.size());
 }
@@ -984,6 +988,20 @@ void Lobby::saveDisconnectedUser(const LobbyUser& user)
     {
         X_ASSERT_UNREACHABLE();
     }
+}
+
+bool Lobby::removeFromDisconnected(const NetGUID& id)
+{
+    auto it = std::find_if(disconnectedUsers_.begin(), disconnectedUsers_.end(), [&id](const DisconnectedUser& u) {
+        return u.guid == id;
+    });
+
+    if (it == disconnectedUsers_.end()) {
+        return false;
+    }
+
+    disconnectedUsers_.erase(it);
+    return true;
 }
 
 // ----------------------------------------------------

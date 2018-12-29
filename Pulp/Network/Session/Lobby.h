@@ -253,7 +253,8 @@ private:
     void clearUsers(void);
     size_t removeUsersWithDisconnectedPeers(void);
     void removeUsersByGuid(const NetGUIDArr& ids);
-    void saveDisconnectedUser(const LobbyUser& id);
+    void saveDisconnectedUser(const LobbyUser& user);
+    bool removeFromDisconnected(const NetGUID& id);
 
     // Chat
     void pushChatMsg(ChatMsg&& msg);
