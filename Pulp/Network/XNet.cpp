@@ -265,6 +265,7 @@ NetGUID XNet::generateGUID(void)
     core::TimeVal now = gEnv->pTimer->GetTimeNowReal();
     core::DateStamp date = core::DateStamp::getSystemDate();
 
+    // TODO: maybe improve?
     core::Hash::SHA1 sha1;
     sha1.update(date);
     sha1.update(now.GetValue());
