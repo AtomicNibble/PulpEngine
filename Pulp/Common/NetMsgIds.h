@@ -206,9 +206,10 @@ X_DECLARE_ENUM8(MessageID)
 
     UserCmd,
 
-    // ------
-    
-    GameSoundEvent
+    // --- Game ---
+
+    GameChatMsg,
+    GameEvent
 
 );
 
