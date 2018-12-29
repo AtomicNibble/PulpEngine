@@ -128,6 +128,9 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
 {
     // hellow you little shit!
     const auto& netGuid = unm.lobbyUserGuids[localIndex];
+    if (!netGuid.isValid()) {
+        X_ERROR("Game", "Spawned players guid is not valid: %" PRIi32, localIndex);
+    }
 
     // fucking goat muncher!
     auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
