@@ -605,10 +605,9 @@ struct ILobby
 
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
 
-    // Chat
+    // Lobby chat only, not used in game.
     virtual void sendChatMsg(core::span<const char> msg) X_ABSTRACT;
     virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
-
 };
 
 struct IGameCallbacks
