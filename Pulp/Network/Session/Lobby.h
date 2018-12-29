@@ -33,6 +33,7 @@ X_DECLARE_ENUM(LobbyState)(
 // so a server will have peers for all users.
 // while everyone else will just have peer for host.
 
+using UserNameStr = core::StackString<MAX_USERNAME_LEN>;
 
 struct LobbyUser
 {
@@ -48,7 +49,19 @@ public:
     SystemAddress address;
     int32_t peerIdx;
 
-    core::StackString<MAX_USERNAME_LEN> username;
+    UserNameStr username;
+};
+
+struct DisconnectedUser
+{
+    DisconnectedUser(NetGUID guid, UserNameStr username) :
+        guid(guid),
+        username(username)
+    {
+    }
+
+    NetGUID guid;
+    UserNameStr username;
 };
 
 struct AvgPerSecond
@@ -131,6 +144,7 @@ public:
 class Lobby : public ILobby
 {
     typedef core::Array<LobbyUser> LobbyUserArr;
+    typedef core::Array<DisconnectedUser> DisconnectedUserArr;
     typedef core::Array<LobbyPeer> LobbyPeerArr;
     typedef core::PriorityQueue<ChatMsg, core::ArrayGrowMultiply<ChatMsg>, core::greater<ChatMsg>> ChatMsgPriortyQueue;
     typedef core::Fifo<ChatMsg> ChatMsgFifo;
@@ -201,6 +215,7 @@ public:
 
     void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_FINAL;
     bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_FINAL;
+    core::string_view getDisconnectedUserNameForGuid(NetGUID guid) const X_FINAL;
 
     // Misc
     X_INLINE bool isActive(void) const X_FINAL;
@@ -238,6 +253,7 @@ private:
     void clearUsers(void);
     size_t removeUsersWithDisconnectedPeers(void);
     void removeUsersByGuid(const NetGUIDArr& ids);
+    void saveDisconnectedUser(const LobbyUser& id);
 
     // Chat
     void pushChatMsg(ChatMsg&& msg);
@@ -299,6 +315,7 @@ private:
 
     LobbyUserArr users_;
     LobbyPeerArr peers_;
+    DisconnectedUserArr disconnectedUsers_;
 
     ChatMsgPriortyQueue chatMsgs_;
     ChatMsgFifo chatHistory_;

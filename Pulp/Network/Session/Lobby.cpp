@@ -146,6 +146,7 @@ Lobby::Lobby(SessionVars& vars, ISessionCallbacks* pCallbacks, IPeer* pPeer, IGa
     type_(type),
     users_(arena),
     peers_(arena),
+    disconnectedUsers_(arena),
     chatMsgs_(arena_),
     chatHistory_(arena_)
 {
@@ -935,7 +936,7 @@ void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
         return;
     }
 
-    for (auto id : ids)
+    for (const auto& id : ids)
     {
         bool removed = false;
 
@@ -944,6 +945,7 @@ void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
             auto& user = users_[i];
             if (user.guid == id)
             {
+                saveDisconnectedUser(user);
                 removed = users_.removeIndex(i);
                 break;
             }
@@ -965,6 +967,22 @@ void Lobby::removeUsersByGuid(const NetGUIDArr& ids)
         bs.write(safe_static_cast<int32_t>(ids.size()));
         bs.write(ids.data(), ids.size());
         sendToPeers(bs);
+    }
+}
+
+void Lobby::saveDisconnectedUser(const LobbyUser& user)
+{
+    auto it = std::find_if(disconnectedUsers_.begin(), disconnectedUsers_.end(), [&user](const DisconnectedUser& u) {
+        return u.guid == user.guid;
+    });
+
+    if (it == disconnectedUsers_.end())
+    {
+        disconnectedUsers_.emplace_back(user.guid, user.username);
+    }
+    else
+    {
+        X_ASSERT_UNREACHABLE();
     }
 }
 
@@ -1761,6 +1779,19 @@ bool Lobby::getUserInfoForGuid(NetGUID guid, UserInfo& info) const
 
     getUserInfoForIdx(idx, info);
     return true;
+}
+
+core::string_view Lobby::getDisconnectedUserNameForGuid(NetGUID guid) const
+{
+    auto it = std::find_if(disconnectedUsers_.begin(), disconnectedUsers_.end(), [guid](const DisconnectedUser& u) {
+        return u.guid == guid;
+    });
+
+    if (it == disconnectedUsers_.end()) {
+        return {};
+    }
+
+    return core::string_view(it->username.data(), it->username.length());
 }
 
 bool Lobby::tryPopChatMsg(ChatMsg& msg)

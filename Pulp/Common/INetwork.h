@@ -595,6 +595,7 @@ struct ILobby
 
     virtual void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_ABSTRACT;
     virtual bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_ABSTRACT;
+    virtual core::string_view getDisconnectedUserNameForGuid(NetGUID guid) const X_ABSTRACT;
 
     // Misc
     virtual bool isActive(void) const X_ABSTRACT;
