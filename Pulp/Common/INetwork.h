@@ -609,6 +609,7 @@ struct ILobby
     virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
 
     virtual void sendToHost(const core::FixedBitStreamBase& bs) const X_ABSTRACT;
+    virtual void sendToPeers(const core::FixedBitStreamBase& bs) const X_ABSTRACT;
 };
 
 struct IGameCallbacks

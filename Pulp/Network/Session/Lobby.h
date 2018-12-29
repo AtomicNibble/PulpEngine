@@ -177,7 +177,7 @@ public:
     void sendToHost(const core::FixedBitStreamBase& bs) const X_FINAL;
 
     void sendToPeers(MessageID::Enum id) const;
-    void sendToPeers(const core::FixedBitStreamBase& bs) const;
+    void sendToPeers(const core::FixedBitStreamBase& bs) const X_FINAL;
     void sendToPeers(const uint8_t* pData, size_t lengthInBytes) const;
 
     void sendToAll(const uint8_t* pData, size_t lengthInBytes);
