@@ -111,6 +111,77 @@ void Multiplayer::drawEvents(core::FrameTimeData& time, engine::IPrimativeContex
     drawEvents(pPrim);
 }
 
+void Multiplayer::readFromSnapShot(core::FixedBitStreamBase& bs)
+{
+    bs.read(playerStates_.data(), playerStates_.size());
+    bs.read(state_);
+}
+
+void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
+{
+    // TODO: variable length encode player score and shit?
+    bs.write(playerStates_.data(), playerStates_.size());
+    bs.write(state_);
+}
+
+void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
+{
+    // hellow you little shit!
+    const auto& netGuid = unm.lobbyUserGuids[localIndex];
+
+    // fucking goat muncher!
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+    net::UserInfo info;
+    if (!pLobby->getUserInfoForGuid(netGuid, info)) {
+        // oh dear, tut tut.
+    }
+
+    // this gets me a string, that works with core::format::format_to
+    auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
+
+    // mmm.
+    core::StackString256 str;
+    core::format::format_to(str, fmt, info.name);
+
+    addEventLine(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
+{
+    X_ASSERT(pSession_->isHost(), "Should only be called on host")();
+
+    addChatLine(name, msg);
+
+    // send to peers.
+    ChatPacketBs bs;
+    buildChatPacket(bs, name, msg);
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+    pLobby->sendToPeers(bs);
+}
+
+void Multiplayer::addChatLine(core::string_view name, core::string_view msg)
+{
+    if (chatLines_.freeSpace() == 0) {
+        chatLines_.pop();
+    }
+
+    core::StackString256 str;
+    str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
+
+    chatLines_.emplace(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::addEventLine(core::string_view line)
+{
+    if (eventLines_.freeSpace() == 0) {
+        eventLines_.pop();
+    }
+
+    eventLines_.emplace(line);
+}
+
 void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
 {
     if (chatLines_.isEmpty()) {
@@ -173,77 +244,6 @@ void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
         pPrim->drawText(x, y, con, line.line.begin(), line.line.end());
         y += 20.f;
     }
-}
-
-void Multiplayer::readFromSnapShot(core::FixedBitStreamBase& bs)
-{
-    bs.read(playerStates_.data(), playerStates_.size());
-    bs.read(state_);
-}
-
-void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
-{
-    // TODO: variable length encode player score and shit?
-    bs.write(playerStates_.data(), playerStates_.size());
-    bs.write(state_);
-}
-
-void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
-{
-    // hellow you little shit!
-    const auto& netGuid = unm.lobbyUserGuids[localIndex];
-
-    // fucking goat muncher!
-    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-    net::UserInfo info;
-    if (!pLobby->getUserInfoForGuid(netGuid, info)) {
-        // oh dear, tut tut.
-    }
-
-    // this gets me a string, that works with core::format::format_to
-    auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
-
-    // mmm.
-    core::StackString256 str;
-    core::format::format_to(str, fmt, info.name);
-
-    addEventLine(core::string_view(str.begin(), str.length()));
-}
-
-void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
-{
-    X_ASSERT(pSession_->isHost(), "Should only be called on host")();
-
-    addChatLine(name, msg);
-
-    // send to peers.
-    ChatPacketBs bs;
-    buildChatPacket(bs, name, msg);
-
-    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-    pLobby->sendToPeers(bs);
-}
-
-void Multiplayer::addEventLine(core::string_view line)
-{
-    if (eventLines_.freeSpace() == 0) {
-        eventLines_.pop();
-    }
-
-    eventLines_.emplace(line);
-}
-
-void Multiplayer::addChatLine(core::string_view name, core::string_view msg)
-{
-    if (chatLines_.freeSpace() == 0) {
-        chatLines_.pop();
-    }
-
-    core::StackString256 str;
-    str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
-
-    chatLines_.emplace(core::string_view(str.begin(), str.length()));
 }
 
 void Multiplayer::updateChat(core::TimeVal dt)
