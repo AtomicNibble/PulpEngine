@@ -138,7 +138,7 @@ class Lobby : public ILobby
     typedef core::FixedBitStreamStack<0x8> MsgIdBs;
     typedef core::FixedBitStreamStack<0x400> UserInfoBs;
     typedef core::FixedBitStreamStack<0x20 + (sizeof(NetGUID) * MAX_PLAYERS)> NetGUIDBs;
-    typedef core::FixedBitStreamStack<MAX_CHAT_MSG_LENGTH + sizeof(ChatMsg) + 0x20> ChatMsgBs;
+    typedef core::FixedBitStreamStack<MAX_CHAT_MSG_LEN + sizeof(ChatMsg) + 0x20> ChatMsgBs;
 
     using NetGUIDArr = core::FixedArray<NetGUID, MAX_PLAYERS>;
 

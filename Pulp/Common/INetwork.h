@@ -35,7 +35,7 @@ static const uint32_t MAX_SYNCED_ENTS = 1 << 8; // the max of networked ents.
 static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will return.
 
 
-static const uint32_t MAX_CHAT_MSG_LENGTH = 256; // plz no life stories
+static const uint32_t MAX_CHAT_MSG_LEN = 256; // plz no life stories
 static const uint32_t MAX_CHAT_MSGS = 16;
 
 static const uint32_t MAX_CHAT_BUFFER_SIZE = 1024;

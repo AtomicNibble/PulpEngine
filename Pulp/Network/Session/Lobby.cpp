@@ -50,11 +50,11 @@ void ChatMsg::fromBitStream(core::FixedBitStreamBase& bs)
     bs.read(dateTimeStamp);
 
     int32_t len = bs.read<int16_t>();
-    if (len > MAX_CHAT_MSG_LENGTH) {
-        len = MAX_CHAT_MSG_LENGTH;
+    if (len > MAX_CHAT_MSG_LEN) {
+        len = MAX_CHAT_MSG_LEN;
     }
 
-    char buf[MAX_CHAT_MSG_LENGTH];
+    char buf[MAX_CHAT_MSG_LEN];
 
     bs.read(buf, len);
     msg.assign(buf, len);
@@ -459,7 +459,7 @@ void Lobby::notifyPeersLeavingGameLobby(void)
 
 void Lobby::sendChatMsg(core::span<const char> msg)
 {
-    if (msg.length() > MAX_CHAT_MSG_LENGTH) {
+    if (msg.length() > MAX_CHAT_MSG_LEN) {
         X_ERROR("Lobby", "Failed to send chat msg it exceeds max length");
         return;
     }
@@ -1564,7 +1564,7 @@ void Lobby::handleLobbyChatMsg(Packet* pPacket)
     {
         ChatMsg cm;
         cm.fromBitStream(bs);
-        if (cm.msg.length() > MAX_CHAT_MSG_LENGTH) {
+        if (cm.msg.length() > MAX_CHAT_MSG_LEN) {
             X_ERROR("Lobby", "Recived oversized chat msg");
             return;
         }
