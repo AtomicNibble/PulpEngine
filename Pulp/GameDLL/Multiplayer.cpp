@@ -39,8 +39,9 @@ namespace
 } // namespace
 
 
-Multiplayer::Multiplayer(GameVars& vars) :
+Multiplayer::Multiplayer(GameVars& vars, net::ISession* pSession) :
     vars_(vars),
+    pSession_(pSession),
     state_(GameState::NONE)
 {
     
@@ -193,7 +194,7 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
     const auto& netGuid = unm.lobbyUserGuids[localIndex];
 
     // fucking goat muncher!
-    auto* pLobby = unm.pSession->getLobby(net::LobbyType::Game);
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
     net::UserInfo info;
     if (!pLobby->getUserInfoForGuid(netGuid, info)) {
@@ -272,7 +273,7 @@ void Multiplayer::updateEvents(core::TimeVal dt)
     }
 }
 
-void Multiplayer::drawLeaderboard(net::ISession* pSession, const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
 {
     // want some rows that are fixed size maybe?
     // but centered in srreen.
@@ -333,7 +334,7 @@ void Multiplayer::drawLeaderboard(net::ISession* pSession, const UserNetMappings
 
     core::FixedArray<LeaderBoardInfo, net::MAX_PLAYERS> activeStates;
 
-    auto* pLobby = pSession->getLobby(net::LobbyType::Game);
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
     for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
     {

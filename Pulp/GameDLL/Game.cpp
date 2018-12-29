@@ -140,7 +140,6 @@ bool XGame::init(void)
             return false;
         }
 
-        userNetMap_.pSession = pSession_;
     }
 
     auto deimension = gEnv->pRender->getDisplayRes();
@@ -319,7 +318,7 @@ bool XGame::update(core::FrameData& frame)
 
             // TODO: only create this if we needed it.
             // I create this when loading as the server will send us state for this before we finish loading.
-            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_, vars_);
+            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_, vars_, pSession_);
         }
 
         if (!world_)
@@ -432,7 +431,7 @@ bool XGame::update(core::FrameData& frame)
 
         // What's the point we all know stu will be at the top :(
         if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
-            pMultiplayerGame_->drawLeaderboard(pSession_, userNetMap_, pPrim);
+            pMultiplayerGame_->drawLeaderboard(userNetMap_, pPrim);
         }
     }
     else if (status == net::SessionStatus::PartyLobby)

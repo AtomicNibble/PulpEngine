@@ -67,13 +67,13 @@ class Multiplayer
     using PlayerStateArr = std::array<PlayerState, net::MAX_PLAYERS>;
 
 public:
-    Multiplayer(GameVars& vars);
+    Multiplayer(GameVars& vars, net::ISession* pSession);
 
     void update(net::IPeer* pPeer, const UserNetMappings& unm);
 
     void drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
     void drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
-    void drawLeaderboard(net::ISession* pSession, const UserNetMappings& unm, engine::IPrimativeContext* pPrim);
+    void drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);
@@ -93,6 +93,7 @@ private:
 
 private:
     GameVars& vars_;
+    net::ISession* pSession_;
 
     GameState::Enum state_;
     GameState::Enum nextState_;
