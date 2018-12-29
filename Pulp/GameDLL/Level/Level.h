@@ -26,6 +26,8 @@ X_NAMESPACE_DECLARE(net,
 
 X_NAMESPACE_BEGIN(game)
 
+struct UserNetMappings;
+class Multiplayer;
 class GameVars;
 
 namespace entity
@@ -97,7 +99,7 @@ public:
 
 public:
     World(GameVars& vars, physics::IPhysics* pPhys,
-        game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
+        weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
     ~World();
 
     bool loadMap(const MapNameStr& name);
@@ -109,7 +111,7 @@ public:
     void createSnapShot(net::SnapShot& snap);
     void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
 
-    void spawnPlayer(int32_t playerIdx, bool local);
+    void spawnPlayer(const UserNetMappings& unm, int32_t playerIdx, bool local);
     void removePlayer(int32_t playerIdx);
 
 private:

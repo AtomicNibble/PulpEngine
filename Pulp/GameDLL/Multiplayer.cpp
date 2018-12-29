@@ -5,11 +5,15 @@
 #include "Vars/GameVars.h"
 
 #include <Containers/FixedBitStream.h>
+#include <String/Format.h>
 
 #include <IFrameData.h>
+#include <Ilocalisation.h>
+
 
 X_NAMESPACE_BEGIN(game)
 
+using namespace core::Literals;
 
 Multiplayer::Multiplayer(GameVars& vars) :
     vars_(vars),
@@ -74,10 +78,16 @@ void Multiplayer::drawChat(core::FrameTimeData& time, engine::IPrimativeContext*
     drawChat(pPrim);
 }
 
+void Multiplayer::drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim)
+{
+    // TODO: maybe seperate this out.
+    updateEvents(time.deltas[core::Timer::UI]);
+
+    drawEvents(pPrim);
+}
+
 void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
 {
-    X_UNUSED(pPrim);
-
     if (chatLines_.isEmpty()) {
         return;
     }
@@ -120,6 +130,50 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
     }
 }
 
+void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
+{
+    if (eventLines_.isEmpty()) {
+        return;
+    }
+
+    font::TextDrawContext con;
+    con.col = Col_Whitesmoke;
+    con.size = Vec2f(18.f, 18.f);
+    con.effectId = 0;
+    con.pFont = gEnv->pFontSys->getDefault();
+
+    float height = 20.f;
+
+    // TODO: select center?
+    float x = 5.f;
+    float y = 920.f - (height * eventLines_.size());
+
+    auto chatTime = core::TimeVal::fromMS(vars_.chatMsgLifeMS());
+
+    for (const auto& line : eventLines_)
+    {
+        // fade out last 10%?
+        float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
+
+        // this really best way :S ?
+        const float fadeStart = 0.85f;
+        float a = 1.f;
+        if (percent >= fadeStart) {
+            a = (percent - fadeStart);
+            a = a / (1.f - fadeStart);
+            a = 1.f - a;
+            if (a < 0.f) {
+                a = 0.f;
+            }
+        }
+
+        con.col.a = CHANTRAIT<uint8_t>::convert(a);
+
+        pPrim->drawText(x, y, con, line.line.begin(), line.line.end());
+        y += 20.f;
+    }
+}
+
 void Multiplayer::readFromSnapShot(core::FixedBitStreamBase& bs)
 {
     bs.read(playerStates_.data(), playerStates_.size());
@@ -133,7 +187,47 @@ void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
     bs.write(state_);
 }
 
-void Multiplayer::addChatLine(core::string line)
+void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
+{
+    // hellow you little shit!
+    const auto& netGuid = unm.lobbyUserGuids[localIndex];
+
+    // fucking goat muncher!
+    auto* pLobby = unm.pSession->getLobby(net::LobbyType::Game);
+
+    net::UserInfo info;
+    if (!pLobby->getUserInfoForGuid(netGuid, info)) {
+        // oh dear, tut tut.
+    }
+
+    // this gets me a string, that works with core::format::format_to
+    auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
+
+    // mmm.
+    core::StackString256 str;
+    core::format::format_to(str, fmt, info.name);
+
+    addEventLine(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
+{
+    core::StackString256 str;
+    str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
+
+    addChatLine(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::addEventLine(core::string_view line)
+{
+    if (eventLines_.freeSpace() == 0) {
+        eventLines_.pop();
+    }
+
+    eventLines_.emplace(line);
+}
+
+void Multiplayer::addChatLine(core::string_view line)
 {
     if (chatLines_.freeSpace() == 0) {
         chatLines_.pop();
@@ -160,6 +254,23 @@ void Multiplayer::updateChat(core::TimeVal dt)
     }
 }
 
+void Multiplayer::updateEvents(core::TimeVal dt)
+{
+    if (eventLines_.isEmpty()) {
+        return;
+    }
+
+    // fade lines.
+    for (auto& line : eventLines_) {
+        line.ellapsed += dt;
+    }
+
+    auto chatTime = core::TimeVal::fromMS(vars_.chatMsgLifeMS());
+
+    while (eventLines_.isNotEmpty() && eventLines_.peek().ellapsed > chatTime) {
+        eventLines_.pop();
+    }
+}
 
 void Multiplayer::drawLeaderboard(net::ISession* pSession, const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
 {

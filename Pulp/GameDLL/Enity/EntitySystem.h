@@ -33,6 +33,8 @@ X_NAMESPACE_DECLARE(net,
 
 X_NAMESPACE_BEGIN(game)
 
+
+class Multiplayer;
 class GameVars;
 struct UserNetMappings;
 
@@ -53,7 +55,7 @@ namespace entity
         typedef EnitiyRegister::entity_type EntityId;
 
     public:
-        EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena);
+        EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
         void shutdown(void);
@@ -68,7 +70,7 @@ namespace entity
         void destroyEnt(EntityId id);
         EntityId createWeapon(EntityId playerId);
 
-        void spawnPlayer(EntityId id, const Vec3f& pos, bool local);
+        void spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local);
         void removePlayer(EntityId id);
         bool addController(EntityId id);
 
@@ -94,6 +96,7 @@ namespace entity
         EnitiyRegister reg_;
         GameVars& vars_;
         game::weapon::WeaponDefManager& weaponDefs_;
+        Multiplayer* pMultiplayer_;
 
         physics::IPhysics* pPhysics_;
         physics::IScene* pPhysScene_;

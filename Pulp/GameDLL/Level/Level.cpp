@@ -331,12 +331,12 @@ bool Level::processEnts(void)
 // -------------------------------------
 
 World::World(GameVars& vars, physics::IPhysics* pPhys,
-    game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
+    game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
     arena_(arena),
     pPhys_(pPhys),
     pScene_(nullptr),
     p3DWorld_(nullptr),
-    ents_(vars, weaponDefs, arena),
+    ents_(vars, weaponDefs, pMultiplayer, arena),
     level_(arena)
 {
 }
@@ -417,7 +417,7 @@ void World::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
 }
 
 
-void World::spawnPlayer(int32_t playerIdx, bool local)
+void World::spawnPlayer(const UserNetMappings& unm, int32_t playerIdx, bool local)
 {
     X_ASSERT(playerIdx < net::MAX_PLAYERS, "Invalide player id")(playerIdx, net::MAX_PLAYERS);
     X_ASSERT_NOT_NULL(pScene_);
@@ -433,7 +433,7 @@ void World::spawnPlayer(int32_t playerIdx, bool local)
     entity::EntityId id = static_cast<entity::EntityId>(playerIdx);
     auto pos = Vec3f(-80, -50.f + (playerIdx * 50.f), 10);
 
-    ents_.spawnPlayer(id, pos, local);
+    ents_.spawnPlayer(unm, id, pos, local);
 }
 
 void World::removePlayer(int32_t playerIdx)

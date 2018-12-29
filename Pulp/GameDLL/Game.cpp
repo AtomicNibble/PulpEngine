@@ -332,7 +332,7 @@ bool XGame::update(core::FrameData& frame)
             }
             else
             {
-                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, weaponDefs_, arena_);
+                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, weaponDefs_, pMultiplayerGame_.get(), arena_);
 
                 if (!world_->loadMap(matchParams.mapName)) {
                     X_ERROR("Game", "Failed to load map");
@@ -428,6 +428,7 @@ bool XGame::update(core::FrameData& frame)
         }
 
         pMultiplayerGame_->drawChat(frame.timeInfo, pPrim);
+        pMultiplayerGame_->drawEvents(frame.timeInfo, pPrim);
 
         // What's the point we all know stu will be at the top :(
         if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
@@ -816,7 +817,7 @@ void XGame::syncLobbyUsers(void)
         userCmdMan_.resetPlayer(plyIdx);
 
         // spawn!
-        world_->spawnPlayer(plyIdx, isLocal);
+        world_->spawnPlayer(userNetMap_, plyIdx, isLocal);
     }
 
 }
@@ -910,7 +911,27 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
     }
 
     if (pMultiplayerGame_) {
-        pMultiplayerGame_->addChatLine(core::string(pMsg));
+
+        // want the name of the player.
+        core::string_view name = "player";
+
+        if (userNetMap_.localPlayerIdx >= 0) {
+
+            const auto& netGuid = userNetMap_.getLocalPlayerGUID();
+
+            // fucking goat muncher!
+            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+            net::UserInfo info;
+            if (pLobby->getUserInfoForGuid(netGuid, info)) {
+                name = info.name;
+            }
+        }
+        else {
+            name = "server";
+        }
+
+        pMultiplayerGame_->handleChatMsg(name, core::string_view(pMsg));
     }
 }
 

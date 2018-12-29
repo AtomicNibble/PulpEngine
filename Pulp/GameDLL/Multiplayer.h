@@ -13,6 +13,14 @@ struct UserNetMappings;
 
 class Multiplayer
 {
+    X_DECLARE_ENUM(Event)(
+        // We don't need events for a player joining, since the client already knows when a player joins / leaves
+        // based on the snapshot.
+
+        PLY_KILLED, // killed by someone
+        PLY_DIED    // player fell off a cliff or something.
+    );
+
     X_DECLARE_ENUM(GameState)(
         NONE,
         GAME,
@@ -36,10 +44,16 @@ class Multiplayer
     };
 
     static const size_t NUM_CHAT_LINES = 6;
+    static const size_t NUM_EVENT_LINES = 6;
 
-    struct ChatLine
+    struct TextLine
     {
-        ChatLine(core::string line) :
+        TextLine(core::string_view line) :
+            line(line.data(), line.length())
+        {
+        }
+
+        TextLine(core::string line) :
             line(line)
         {
         }
@@ -48,7 +62,8 @@ class Multiplayer
         core::TimeVal ellapsed;
     };
 
-    using ChatLineFiFo = core::FixedFifo<ChatLine, NUM_CHAT_LINES>;
+    using ChatLineFiFo = core::FixedFifo<TextLine, NUM_CHAT_LINES>;
+    using EventLineFiFo = core::FixedFifo<TextLine, NUM_EVENT_LINES>;
     using PlayerStateArr = std::array<PlayerState, net::MAX_PLAYERS>;
 
 public:
@@ -57,16 +72,23 @@ public:
     void update(net::IPeer* pPeer, const UserNetMappings& unm);
 
     void drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
+    void drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
     void drawLeaderboard(net::ISession* pSession, const UserNetMappings& unm, engine::IPrimativeContext* pPrim);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);
 
-    void addChatLine(core::string line);
+    void playerSpawned(const UserNetMappings& unm, int32_t localIndex);
+    void handleChatMsg(core::string_view name, core::string_view msg);
 
 private:
+    void addEventLine(core::string_view line);
+    void addChatLine(core::string_view line);
+
     void drawChat(engine::IPrimativeContext* pPrim);
+    void drawEvents(engine::IPrimativeContext* pPrim);
     void updateChat(core::TimeVal dt);
+    void updateEvents(core::TimeVal dt);
 
 
 private:
@@ -79,6 +101,7 @@ private:
 
     // Chitty chat
     ChatLineFiFo chatLines_;
+    EventLineFiFo eventLines_;
 };
 
 

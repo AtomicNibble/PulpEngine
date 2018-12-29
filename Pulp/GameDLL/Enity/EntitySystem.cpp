@@ -4,6 +4,7 @@
 #include "UserNetMappings.h"
 #include "Weapon\WeaponDef.h"
 #include "Weapon\WeaponManager.h"
+#include "Multiplayer.h"
 
 #include <Containers\FixedBitStream.h>
 #include <String\Json.h>
@@ -29,11 +30,12 @@ namespace entity
 {
     // -----------------------------------------------------------
 
-    EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, core::MemoryArenaBase* arena) :
+    EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
         arena_(arena),
         reg_(arena),
         vars_(vars),
         weaponDefs_(weaponDefs),
+        pMultiplayer_(pMultiplayer),
         playerSys_(vars.player),
         cameraSys_(vars),
         dtHealth_(arena),
@@ -279,7 +281,7 @@ namespace entity
                     // need to work out if this is local.
                     bool isLocal = unm.localPlayerIdx == remoteEntityId;
 
-                    spawnPlayer(remoteEntityId, pos, isLocal);
+                    spawnPlayer(unm, remoteEntityId, pos, isLocal);
 
                     // player id's always match up.
                     entityId = remoteEntityId;
@@ -491,8 +493,12 @@ namespace entity
         return ent;
     }
 
-    void EnititySystem::spawnPlayer(EntityId id, const Vec3f& pos, bool local)
+    void EnititySystem::spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local)
     {
+        X_ASSERT(clientIdx < net::MAX_PLAYERS, "Client index larger than max player")(clientIdx);
+
+        auto id = static_cast<EntityId>(clientIdx);
+
         auto& trans = reg_.assign<TransForm>(id);
         auto& player = reg_.assign<Player>(id);
         auto& hp = reg_.assign<Health>(id);
@@ -548,6 +554,10 @@ namespace entity
 
         // temp, give player a weapon
         player.weaponEnt = createWeapon(id);
+
+        if (pMultiplayer_) {
+            pMultiplayer_->playerSpawned(unm, clientIdx);
+        }
     }
 
     void EnititySystem::removePlayer(EntityId id)
