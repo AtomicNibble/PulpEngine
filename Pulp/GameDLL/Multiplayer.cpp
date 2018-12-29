@@ -150,6 +150,11 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
     addEventLine(core::string_view(str.begin(), str.length()));
 }
 
+void Multiplayer::playerLeft(const UserNetMappings& unm, int32_t localIndex)
+{
+    postEvent(unm, Event::PLY_LEFT, localIndex);
+}
+
 void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
 {
     X_ASSERT(pSession_->isHost(), "Should only be called on host")();
@@ -282,6 +287,64 @@ void Multiplayer::updateEvents(core::TimeVal dt)
 
     while (eventLines_.isNotEmpty() && eventLines_.peek().ellapsed > chatTime) {
         eventLines_.pop();
+    }
+}
+
+void Multiplayer::handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs)
+{
+    auto evt = bs.read<Event::Enum>();
+    auto param = bs.read<uint32_t>();
+
+    postEvent(unm, evt, param);
+}
+
+void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param)
+{
+    switch (evt)
+    {
+        case Event::PLY_LEFT: {
+            const auto& guid = unm.lobbyUserGuids[param];
+            
+            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+            core::string_view name;
+            {
+                net::UserInfo info;
+                if (pLobby->getUserInfoForGuid(guid, info)) {
+                    name = info.name;
+                }
+                else {
+                    name = pLobby->getDisconnectedUserNameForGuid(guid);
+                }
+            }
+
+            if (name.empty()) {
+                name = "<error>";
+            }
+
+            auto fmt = gEnv->pLocalisation->getString("#str_left_game"_strhash);
+
+            core::StackString256 str;
+            core::format::format_to(str, fmt, name);
+
+            addEventLine(core::string_view(str.begin(), str.length()));
+            break;
+        }
+
+        default:
+            X_ASSERT_UNREACHABLE();
+            return;
+    }
+
+    if (pSession_->isHost())
+    {
+        EventPacketBs bs;
+        bs.write(net::MessageID::GameEvent);
+        bs.write(Event::PLY_LEFT);
+        bs.write(param);
+
+        auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+        pLobby->sendToPeers(bs);
     }
 }
 

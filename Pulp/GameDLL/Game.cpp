@@ -571,10 +571,12 @@ bool XGame::handlePacket(net::Packet* pPacket)
 
     switch (msg)
     {
-        case net::MessageID::GameChatMsg: {
+        case net::MessageID::GameChatMsg:
             handleChatMsg(pPacket);
             break;
-        }
+        case net::MessageID::GameEvent:
+            handleGameEvent(pPacket);
+            break;
 
         default:
             return false;
@@ -604,6 +606,13 @@ void XGame::handleChatMsg(net::Packet* pPacket)
     else {
         pMultiplayerGame_->addChatLine(core::string_view(name, nameLen), core::string_view(msg, msgLen));
     }
+}
+
+void XGame::handleGameEvent(net::Packet* pPacket)
+{
+    core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
+
+    pMultiplayerGame_->handleEvent(userNetMap_, bs);
 }
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
@@ -830,6 +839,10 @@ void XGame::syncLobbyUsers(void)
 
             net::NetGuidStr buf;
             X_LOG0("Game", "Client left %" PRIi32 " guid: %s", i, userGuid.toString(buf));
+
+            if (pMultiplayerGame_) {
+                pMultiplayerGame_->playerLeft(userNetMap_, i);
+            }
 
             userNetMap_.resetIndex(i);
             world_->removePlayer(i);

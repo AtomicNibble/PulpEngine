@@ -91,6 +91,7 @@ private:
     // ~IGameCallbacks
     
     void handleChatMsg(net::Packet* pPacket);
+    void handleGameEvent(net::Packet* pPacket);
 
 
 private:

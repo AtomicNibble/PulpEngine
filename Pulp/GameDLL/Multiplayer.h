@@ -18,8 +18,9 @@ class Multiplayer
         // We don't need events for a player joining, since the client already knows when a player joins / leaves
         // based on the snapshot.
 
-        PLY_KILLED, // killed by someone
-        PLY_DIED    // player fell off a cliff or something.
+        PLY_KILLED,     // killed by someone
+        PLY_DIED,       // player fell off a cliff or something.
+        PLY_LEFT        // nobody liked you anyway!
     );
 
     X_DECLARE_ENUM(GameState)(
@@ -69,6 +70,7 @@ class Multiplayer
 
 public:
     using ChatPacketBs = core::FixedBitStreamStack<net::MAX_USERNAME_LEN + net::MAX_CHAT_MSG_LEN + 16>;
+    using EventPacketBs = core::FixedBitStreamStack<64>;
 
 public:
     Multiplayer(GameVars& vars, net::ISession* pSession);
@@ -83,7 +85,9 @@ public:
     void writeToSnapShot(core::FixedBitStreamBase& bs);
 
     void playerSpawned(const UserNetMappings& unm, int32_t localIndex);
+    void playerLeft(const UserNetMappings& unm, int32_t localIndex);
     void handleChatMsg(core::string_view name, core::string_view msg);
+    void handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs);
 
     void addChatLine(core::string_view name, core::string_view msg);
 private:
@@ -93,6 +97,8 @@ private:
     void drawEvents(engine::IPrimativeContext* pPrim);
     void updateChat(core::TimeVal dt);
     void updateEvents(core::TimeVal dt);
+
+    void postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param);
 
 public:
     static void buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg);
