@@ -174,7 +174,7 @@ public:
     void sendSnapShot(const SnapShot& snap);
 
     void sendToHost(MessageID::Enum id) const;
-    void sendToHost(const core::FixedBitStreamBase& bs) const;
+    void sendToHost(const core::FixedBitStreamBase& bs) const X_FINAL;
 
     void sendToPeers(MessageID::Enum id) const;
     void sendToPeers(const core::FixedBitStreamBase& bs) const;

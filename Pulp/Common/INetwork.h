@@ -37,7 +37,6 @@ static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will retu
 
 static const uint32_t MAX_CHAT_MSG_LEN = 256; // plz no life stories
 static const uint32_t MAX_CHAT_MSGS = 16;
-
 static const uint32_t MAX_CHAT_BUFFER_SIZE = 1024;
 
 static const uint32_t MAX_USERCMD_SEND = 8;
@@ -608,6 +607,8 @@ struct ILobby
     // Lobby chat only, not used in game.
     virtual void sendChatMsg(core::span<const char> msg) X_ABSTRACT;
     virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
+
+    virtual void sendToHost(const core::FixedBitStreamBase& bs) const X_ABSTRACT;
 };
 
 struct IGameCallbacks
