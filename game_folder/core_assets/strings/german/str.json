@@ -1,6 +1,7 @@
 {
     "#str_nice_goat": "Diese Ziege ist sehr nett",
-    "#str_joined_game": "{} ist dem Spiel beigetreten"
+    "#str_joined_game": "{} hat sich dem Spiel beigetreten",
+    "#str_left_game": "{} hat das Spiel verlassen"
 }
 
 
