@@ -732,7 +732,6 @@ void XSound::performOcclusionChecks(void)
         X_ASSERT(pObject->occType != OcclusionType::None, "Object don't have occlusion type set")();
 
         if (pObject->occType == OcclusionType::SingleRay) {
-            physics::RaycastBuffer hit;
 
             const auto& listenerPos = listenerTrans_.pos;
 
@@ -746,6 +745,7 @@ void XSound::performOcclusionChecks(void)
 
             physics::ScopedLock lock(pScene, physics::LockAccess::Read);
 
+            physics::RaycastBuffer hit;
             if (pScene->raycast(start, dir, distance, hit, physics::DEFAULT_HIT_FLAGS, physics::QueryFlag::STATIC)) {
                 pObject->flags.Set(SoundFlag::Occluded);
 
