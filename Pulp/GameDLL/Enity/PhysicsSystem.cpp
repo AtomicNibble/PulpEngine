@@ -93,7 +93,7 @@ namespace entity
                     continue;
                 }
 
-                col.actor = pPhysics->createStaticActor(trans);
+                col.actor = pPhysics->createStaticActor(trans, (void*)entity);
 
                 mesh.pModel->addPhysToActor(col.actor);
 
