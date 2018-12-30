@@ -142,11 +142,6 @@ X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
 
 namespace Literals
 {
-    template<uint32_t N>
-    constexpr X_INLINE uint32_t force_hash(void)
-    {
-        return N;
-    }
 
     X_INLINE constexpr uint32_t operator"" _soundId(const char* const pStr, const size_t strLen)
     {

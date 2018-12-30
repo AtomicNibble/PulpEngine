@@ -7,8 +7,6 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
-    /// \brief Creates a FNV-1a hash of the input. See -> http://isthe.com/chongo/tech/comp/fnv/#FNV-1a
-    /// The algorithm is well suited for hashing nearly identical strings such as URLs, hostnames, filenames, text, IP addresses, etc.
     typedef uint32_t Fnv1Val;
     typedef uint32_t Fnv1aVal;
 
@@ -91,12 +89,18 @@ namespace Hash
     {
         inline constexpr uint32_t operator"" _fnv1a(const char* const pStr, const size_t strLen)
         {
-            return Fnv1aConst::Internal::Hash(pStr, strLen, Fnv1aConst::default_offset_basis);
+            return Fnv1aConst::Hash(pStr, strLen);
         }
 
         inline constexpr uint32_t operator"" _fnv1(const char* const pStr, const size_t strLen)
         {
-            return Fnv1Const::Internal::Hash(pStr, strLen, Fnv1Const::default_offset_basis);
+            return Fnv1Const::Hash(pStr, strLen);
+        }
+
+        template<uint32_t N>
+        inline constexpr uint32_t force_hash(void)
+        {
+            return N;
         }
 
     } // namespace Literals
