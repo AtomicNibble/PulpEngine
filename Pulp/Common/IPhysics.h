@@ -741,9 +741,11 @@ protected:
     }
 };
 
+// following 3 are just typedefs for the api defs.
 typedef HitCallback<RaycastHit> RaycastCallback;
 typedef HitCallback<OverlapHit> OverlapCallback;
 typedef HitCallback<SweepHit> SweepCallback;
+// Use these
 typedef HitBuffer<RaycastHit> RaycastBuffer;
 typedef HitBuffer<OverlapHit> OverlapBuffer;
 typedef HitBuffer<SweepHit> SweepBuffer;
