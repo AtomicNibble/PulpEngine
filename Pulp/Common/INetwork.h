@@ -606,7 +606,7 @@ struct ILobby
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
 
     // Lobby chat only, not used in game.
-    virtual void sendChatMsg(core::span<const char> msg) X_ABSTRACT;
+    virtual void sendChatMsg(core::string_view msg) X_ABSTRACT;
     virtual bool tryPopChatMsg(ChatMsg& msg) X_ABSTRACT;
 
     virtual void sendToHost(const core::FixedBitStreamBase& bs) const X_ABSTRACT;

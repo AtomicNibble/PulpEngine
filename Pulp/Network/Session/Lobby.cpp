@@ -458,7 +458,7 @@ void Lobby::notifyPeersLeavingGameLobby(void)
 
 // -------------------------------------------
 
-void Lobby::sendChatMsg(core::span<const char> msg)
+void Lobby::sendChatMsg(core::string_view msg)
 {
     if (msg.length() > MAX_CHAT_MSG_LEN) {
         X_ERROR("Lobby", "Failed to send chat msg it exceeds max length");
@@ -468,7 +468,7 @@ void Lobby::sendChatMsg(core::span<const char> msg)
     ChatMsg cm;
     cm.userGuid = pPeer_->getMyGUID();
     cm.dateTimeStamp = core::DateTimeStamp::getSystemDateTime();
-    cm.msg.assign(msg.data(), msg.size_bytes());
+    cm.msg.assign(msg.data(), msg.length());
 
     // build a BS.
     ChatMsgBs bs;

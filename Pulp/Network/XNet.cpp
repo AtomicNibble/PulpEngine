@@ -74,7 +74,7 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("startMatch", this, XNet, &XNet::Cmd_startMatch, core::VarFlag::SYSTEM,
         "Guess what? yep it starts that match, magic.");
 
-    ADD_COMMAND_MEMBER("netChat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM,
+    ADD_COMMAND_MEMBER("net_lobby_char", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM | core::VarFlag::SINGLE_ARG,
         "Send a chat message");
 }
 
@@ -640,23 +640,9 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     X_ASSERT_NOT_NULL(pLobby);
 
-    core::StackString<1024> msg;
-    for (size_t i = 1; i < pCmd->GetArgCount(); i++)
-    {
-        const char* pMsg = pCmd->GetArg(i);
-        auto len = core::strUtil::strlen(pMsg);
+    auto* pMsg = pCmd->GetArg(1);
 
-        if (len + msg.length() >= msg.capacity()) {
-            break;
-        }
-
-        msg.append(pMsg, len);
-        msg.append(' ', 1);
-    }
-
-    msg.trimRight();
-
-    pLobby->sendChatMsg(core::make_span( msg.c_str(), msg.length() ));
+    pLobby->sendChatMsg(core::string_view(pMsg));
 }
 
 X_NAMESPACE_END

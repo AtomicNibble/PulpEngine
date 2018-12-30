@@ -181,7 +181,7 @@ public:
 
     void notifyPeersLeavingGameLobby(void);
 
-    void sendChatMsg(core::span<const char> msg) X_FINAL;
+    void sendChatMsg(core::string_view msg) X_FINAL;
     // if we are a peer, we send user cmds.
     void sendUserCmd(const core::FixedBitStreamBase& bs);
     // if we are a host and have peers we send snaps.
