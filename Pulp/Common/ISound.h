@@ -131,7 +131,7 @@ X_DECLARE_ENUM8(OcclusionType)
 X_INLINE uint32_t getIDFromStr(const char* pStr)
 {
     X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
-    return core::Hash::Fnv1Hash(pStr, std::strlen(pStr));
+    return core::Hash::Fnv1Hash(pStr, core::strUtil::strlen(pStr));
 }
 
 X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
