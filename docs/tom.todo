@@ -292,6 +292,8 @@ UnitTests:
 
    Networking:
 
+     ☐ Check what happens when players end up with same guid, maybe we can just make a new one.
+
      Session:
        ☐ Check peers who connect but don't join a lobby are dropped.
        ☐ if we try to connect to a lobby but it fails for any reason.
