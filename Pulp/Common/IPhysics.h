@@ -319,6 +319,7 @@ protected:
         volumeGrowth = 1.5f;
         material = INVALID_HANLDE;
         nonWalkableMode = NonWalkableMode::PreventClimbing;
+        pUserData = nullptr;
     }
 
 public:
@@ -335,6 +336,7 @@ public:
     float32_t volumeGrowth;
     MaterialHandle material;
     NonWalkableMode nonWalkableMode;
+    const void* pUserData;
 };
 
 struct BoxControllerDesc : public ControllerDesc

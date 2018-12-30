@@ -111,6 +111,7 @@ namespace
         else {
             X_ASSERT_UNREACHABLE();
         }
+        pxDesc.userData = const_cast<void*>(desc.pUserData);
     }
 
 } // namespace
@@ -357,11 +358,11 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
         physx::PxController* pController = nullptr;
         {
-
             pController = pControllerManager_->createController(pxDesc);
         }
 
         X_ASSERT_NOT_NULL(pController);
+        pController->getActor()->userData = const_cast<void*>(desc.pUserData);
 
         return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
     }
@@ -391,11 +392,11 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
 
         physx::PxController* pController = nullptr;
         {
-
             pController = pControllerManager_->createController(pxDesc);
         }
 
         X_ASSERT_NOT_NULL(pController);
+        pController->getActor()->userData = const_cast<void*>(desc.pUserData);
 
         return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
     }
