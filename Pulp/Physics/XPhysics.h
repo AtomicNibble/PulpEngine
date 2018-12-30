@@ -90,7 +90,8 @@ public:
     void setGroupFlags(ActorHandle handle, const GroupFlags groupFlags) X_FINAL;
     ActorFlags getFlags(ActorHandle handle) X_FINAL;
     ActorType::Enum getType(ActorHandle handle) X_FINAL;
-    ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_FINAL;
+    void* getUserData(ActorHandle handle) X_FINAL;
+    ActorMeta getActorMeta(ActorHandle handle) X_FINAL;
 
     // group collision
     bool getGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_FINAL;

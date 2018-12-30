@@ -756,9 +756,17 @@ X_INLINE ActorType::Enum XPhysics::getType(ActorHandle handle)
     return static_cast<ActorType::Enum>(actor.getType());
 }
 
-ActorTypeAndFlags XPhysics::getTypeAndFlags(ActorHandle handle)
+X_INLINE void* XPhysics::getUserData(ActorHandle handle)
 {
-    return { getType(handle), getFlags(handle) };
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
+
+    return actor.userData;
+}
+
+
+ActorMeta XPhysics::getActorMeta(ActorHandle handle)
+{
+    return { getType(handle), getFlags(handle), getUserData(handle) };
 }
 
 // ------------------------------------------

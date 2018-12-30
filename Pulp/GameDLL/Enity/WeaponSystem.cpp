@@ -133,7 +133,7 @@ namespace entity
                 case weapon::State::Fire:
                     if (curTime >= wpn.stateEnd) {
                         if (wpn.attack) {
-                            beginAttack(curTime, wpn, animator, frame, pPhysScene);
+                            beginAttack(curTime, wpn, animator, frame, reg, pPhysScene);
                         }
                         else {
                             beginIdle(curTime, wpn, animator);
@@ -187,7 +187,7 @@ namespace entity
                         beginReload(curTime, wpn, animator);
                     }
                     else if (wpn.attack) {
-                        beginAttack(curTime, wpn, animator, frame, pPhysScene);
+                        beginAttack(curTime, wpn, animator, frame, reg, pPhysScene);
                     }
 
                 } break;
@@ -239,7 +239,7 @@ namespace entity
     }
 
     void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator,
-        core::FrameData& frame, physics::IScene* pPhysScene)
+        core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)
     {
         // need to check ammo.
         if (wpn.ammoInClip == 0) {
@@ -288,7 +288,6 @@ namespace entity
         {
             float maxRange = static_cast<float>(wpn.pWeaponDef->maxDmgRange());
 
-            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
 
             auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
 
@@ -305,14 +304,17 @@ namespace entity
             float distance = maxRange;
 
             physics::RaycastBuffer hit;
+            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
 
+            // TODO: support dynamic without hitting players own collion
             if (pPhysScene->raycast(
                     origin + (uintDir * 30.f),
                     uintDir,
                     distance,
                     hit,
                     physics::DEFAULT_HIT_FLAGS,
-                    physics::QueryFlag::DYNAMIC | physics::QueryFlag::STATIC)) { // TODO: support dynamic without hitting players own collion
+                    physics::QueryFlag::DYNAMIC | physics::QueryFlag::STATIC)) 
+            {
                 auto b = hit.block;
 
                 float minRange = static_cast<float>(wpn.pWeaponDef->minDmgRange());
@@ -336,19 +338,38 @@ namespace entity
                 // actually i need to know if dynamic and not kinemetic, other wise physicx bitch.
                 // so basically need acess to flags.
 
-                auto atf = gEnv->pPhysics->getTypeAndFlags(b.actor);
-                if (atf.type == physics::ActorType::Dynamic)
+                auto meta = gEnv->pPhysics->getActorMeta(b.actor);
+                if (meta.type == physics::ActorType::Dynamic )
                 {
-                    auto flags = atf.flags;
-                    if (!flags.IsSet(physics::ActorFlags::Kinematic))
+                    if (!meta.flags.IsSet(physics::ActorFlags::Kinematic))
                     {
                         auto dir = b.position - origin;
                         dir.normalize();
-
-                        dir *= 9999000.f;
+                        dir *= 9999000.f; // TODO: de fuck
 
                         pPhysScene->addForce(b.actor, dir);
-                        //       pPhysScene->addTorque(actor, Vec3f(9000000.f, 10.f, 0.f));
+                    }
+
+                    if (meta.pUserData)
+                    {
+                        // Assume valid?
+                        EntityId id = static_cast<EntityId>(reinterpret_cast<uintptr_t>(meta.pUserData) & 0xFFFF);
+
+                        if (reg.has<Player>(id))
+                        {
+                            X_LOG0("Weapon", "You hit a player! index: %" PRIi32, id);
+                        }
+
+                        if (reg.has<Health>(id))
+                        {
+                            auto& health = reg.get<Health>(id);
+                            health.hp--;
+                            if (health.hp < 0) {
+                                health.hp = health.max;
+                            }
+
+                            X_LOG0("Weapon", "Ent health %" PRIi32, health.hp);
+                        }
                     }
                 }
             }

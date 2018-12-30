@@ -53,12 +53,12 @@ X_DECLARE_FLAGS(ActorFlag)(
 
 typedef Flags<ActorFlag> ActorFlags;
 
-struct ActorTypeAndFlags
+struct ActorMeta
 {
     ActorType::Enum type;
     ActorFlags flags;
+    void* pUserData;
 };
-
 
 typedef uintptr_t Handle;
 typedef Handle MaterialHandle;
@@ -1180,7 +1180,8 @@ struct IPhysics
 
     virtual ActorFlags getFlags(ActorHandle handle) X_ABSTRACT;
     virtual ActorType::Enum getType(ActorHandle handle) X_ABSTRACT;
-    virtual ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_ABSTRACT;
+    virtual void* getUserData(ActorHandle handle) X_ABSTRACT;
+    virtual ActorMeta getActorMeta(ActorHandle handle) X_ABSTRACT;
 
     // for setting what collides with what, by default everything collides.
     virtual bool getGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_ABSTRACT;
