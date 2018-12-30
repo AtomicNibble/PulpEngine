@@ -93,8 +93,8 @@ public:
     ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_FINAL;
 
     // group collision
-    bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_FINAL;
-    void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_FINAL;
+    bool getGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_FINAL;
+    void setGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_FINAL;
 
     // you must pass cooked data :|
     // if you don't have cooked data use getCooking() to cook it!

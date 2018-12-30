@@ -764,12 +764,12 @@ ActorTypeAndFlags XPhysics::getTypeAndFlags(ActorHandle handle)
 // ------------------------------------------
 
 // group collision
-bool XPhysics::GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)
+bool XPhysics::getGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2)
 {
     return filter::GetGroupCollisionFlag(group1, group2);
 }
 
-void XPhysics::SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable)
+void XPhysics::setGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable)
 {
     filter::SetGroupCollisionFlag(group1, group2, enable);
 }

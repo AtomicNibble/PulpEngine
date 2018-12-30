@@ -1181,8 +1181,8 @@ struct IPhysics
     virtual ActorTypeAndFlags getTypeAndFlags(ActorHandle handle) X_ABSTRACT;
 
     // for setting what collides with what, by default everything collides.
-    virtual bool GetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_ABSTRACT;
-    virtual void SetGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_ABSTRACT;
+    virtual bool getGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2) X_ABSTRACT;
+    virtual void setGroupCollisionFlag(const GroupFlag::Enum group1, const GroupFlag::Enum group2, const bool enable) X_ABSTRACT;
 
     virtual TriMeshHandle createTriangleMesh(const DataArr& cooked) X_ABSTRACT;
     virtual ConvexMeshHandle createConvexMesh(const DataArr& cooked) X_ABSTRACT;

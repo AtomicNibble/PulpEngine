@@ -89,15 +89,15 @@ bool XGame::init(void)
     }
 
     // setup groups collision filters.
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Ai, true);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Vehicle, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Ai, true);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Vehicle, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
-    pPhysics->SetGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Player, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Ai, true);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::AiClip, physics::GroupFlag::Vehicle, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Player, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Ai, true);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::PlayerClip, physics::GroupFlag::Vehicle, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Player, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Ai, false);
+    pPhysics->setGroupCollisionFlag(physics::GroupFlag::VehicleClip, physics::GroupFlag::Vehicle, true);
 
 
     pTimer_ = gEnv->pTimer;
