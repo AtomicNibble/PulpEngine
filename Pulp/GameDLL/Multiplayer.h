@@ -35,7 +35,8 @@ class Multiplayer
             ping(0),
             points(0),
             kills(0),
-            headshots(0)
+            headshots(0),
+            deaths(0)
         {
         }
 
@@ -43,6 +44,7 @@ class Multiplayer
         int32_t points;
         int32_t kills;
         int32_t headshots;
+        int32_t deaths;
     };
 
     static const size_t NUM_CHAT_LINES = 6;
@@ -85,6 +87,7 @@ public:
     void writeToSnapShot(core::FixedBitStreamBase& bs);
 
     void playerSpawned(const UserNetMappings& unm, int32_t localIndex);
+    void playerDeath(const UserNetMappings& unm, int32_t playerIdx, entity::EntityId attacker);
     void playerLeft(const UserNetMappings& unm, int32_t localIndex);
     void handleChatMsg(core::string_view name, core::string_view msg);
     void handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs);
@@ -98,7 +101,7 @@ private:
     void updateChat(core::TimeVal dt);
     void updateEvents(core::TimeVal dt);
 
-    void postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param);
+    void postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param0, int32_t param1);
 
 public:
     static void buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg);

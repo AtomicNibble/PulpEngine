@@ -150,9 +150,26 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
     addEventLine(core::string_view(str.begin(), str.length()));
 }
 
+void Multiplayer::playerDeath(const UserNetMappings& unm, int32_t playerIdx, entity::EntityId attacker)
+{
+    playerStates_[playerIdx].deaths++;
+
+    if (attacker < net::MAX_PLAYERS) {
+        playerStates_[attacker].kills++;
+    }
+
+    // kill yourself?
+    if (playerIdx == attacker) {
+        postEvent(unm, Event::PLY_DIED, playerIdx, attacker);
+    }
+    else {
+        postEvent(unm, Event::PLY_KILLED, playerIdx, attacker);
+    }
+}
+
 void Multiplayer::playerLeft(const UserNetMappings& unm, int32_t localIndex)
 {
-    postEvent(unm, Event::PLY_LEFT, localIndex);
+    postEvent(unm, Event::PLY_LEFT, localIndex, 0);
 }
 
 void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
@@ -293,17 +310,20 @@ void Multiplayer::updateEvents(core::TimeVal dt)
 void Multiplayer::handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs)
 {
     auto evt = bs.read<Event::Enum>();
-    auto param = bs.read<uint32_t>();
+    auto param0 = bs.read<uint32_t>();
+    auto param1 = bs.read<uint32_t>();
 
-    postEvent(unm, evt, param);
+    postEvent(unm, evt, param0, param1);
 }
 
-void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param)
+void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param0, int32_t param1)
 {
+    X_UNUSED(param0, param1);
+
     switch (evt)
     {
         case Event::PLY_LEFT: {
-            const auto& guid = unm.lobbyUserGuids[param];
+            const auto& guid = unm.lobbyUserGuids[param0];
             
             auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
@@ -331,6 +351,17 @@ void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t
             break;
         }
 
+        case Event::PLY_DIED: {
+
+
+            break;
+        }
+        case Event::PLY_KILLED: {
+
+
+            break;
+        }
+
         default:
             X_ASSERT_UNREACHABLE();
             return;
@@ -341,7 +372,8 @@ void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t
         EventPacketBs bs;
         bs.write(net::MessageID::GameEvent);
         bs.write(Event::PLY_LEFT);
-        bs.write(param);
+        bs.write(param0);
+        bs.write(param1);
 
         auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
         pLobby->sendToPeers(bs);
