@@ -19,7 +19,7 @@ X_NAMESPACE_BEGIN(core)
 
 class MemoryArenaBase
 {
-    static const int MAX_ARENA_CHILDREN = 20;
+    static const int MAX_ARENA_CHILDREN = 32;
 
 public:
 #if X_ENABLE_MEMORY_ARENA_CHILDREN
