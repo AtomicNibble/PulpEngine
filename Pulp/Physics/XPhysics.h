@@ -122,6 +122,7 @@ public:
     // for creating a actor without any initial shape.
     ActorHandle createActor(const Transformf& myTrans, bool kinematic, const void* pUserData) X_FINAL;
     ActorHandle createStaticActor(const Transformf& myTrans, const void* pUserData) X_FINAL;
+    void releaseActor(ActorHandle handle) X_FINAL;
 
     // call this after all the shapes have been added.
     void updateMassAndInertia(ActorHandle a, float density) X_FINAL;

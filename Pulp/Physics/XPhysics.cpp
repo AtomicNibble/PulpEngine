@@ -1067,6 +1067,13 @@ ActorHandle XPhysics::createStaticActor(const Transformf& myTrans, const void* p
     return reinterpret_cast<ActorHandle>(pActor);
 }
 
+void XPhysics::releaseActor(ActorHandle handle)
+{
+    physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);
+
+    actor.release();
+}
+
 void XPhysics::updateMassAndInertia(ActorHandle handle, float density)
 {
     physx::PxActor& actor = *reinterpret_cast<physx::PxActor*>(handle);

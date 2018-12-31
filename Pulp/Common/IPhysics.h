@@ -1212,6 +1212,8 @@ struct IPhysics
     // for creating a actor without any initial shape.
     virtual ActorHandle createActor(const Transformf& myTrans, bool kinematic = false, const void* pUserData = nullptr) X_ABSTRACT;
     virtual ActorHandle createStaticActor(const Transformf& myTrans, const void* pUserData = nullptr) X_ABSTRACT;
+    virtual void releaseActor(ActorHandle handle) X_ABSTRACT;
+
 
     virtual void updateMassAndInertia(ActorHandle a, float density) X_ABSTRACT;
 
