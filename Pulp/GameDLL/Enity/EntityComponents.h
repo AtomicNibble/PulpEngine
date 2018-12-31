@@ -77,6 +77,10 @@ namespace entity
     // but all static meshes should be spawned in the decicated place, humm.
     struct MeshCollider
     {
+        MeshCollider() :
+            actor(physics::INVALID_HANLDE)
+        {}
+
         physics::ActorHandle actor;
     };
 
