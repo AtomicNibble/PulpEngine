@@ -47,8 +47,6 @@ public:
     Array(Array&& oth);
     ~Array(void);
 
-    void setArena(MemoryArenaBase* arena);
-    void setArena(MemoryArenaBase* arena, size_type capacity);
     core::MemoryArenaBase* getArena(void) const; // have one use case for this currently lol.
 
     Allocator& getAllocator(void);

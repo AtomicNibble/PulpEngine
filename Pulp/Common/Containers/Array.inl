@@ -4,7 +4,7 @@ X_INLINE Array<T, Allocator, GrowPolicy>::Array(MemoryArenaBase* arena) :
     list_(nullptr),
     num_(0),
     size_(0),
-    allocator_(arena)
+    allocator_(X_ASSERT_NOT_NULL(arena))
 {
 }
 
@@ -76,22 +76,6 @@ template<typename T, class Allocator, class GrowPolicy>
 X_INLINE Array<T, Allocator, GrowPolicy>::~Array(void)
 {
     free();
-}
-
-template<typename T, class Allocator, class GrowPolicy>
-X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena)
-{
-    X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
-    allocator_.setArena(arena);
-}
-
-template<typename T, class Allocator, class GrowPolicy>
-X_INLINE void Array<T, Allocator, GrowPolicy>::setArena(MemoryArenaBase* arena, size_type capacity)
-{
-    X_ASSERT(num_ == 0, "can't set arena on a array that has items")(num_);
-    allocator_.setArena(arena);
-
-    reserve(capacity);
 }
 
 template<typename T, class Allocator, class GrowPolicy>

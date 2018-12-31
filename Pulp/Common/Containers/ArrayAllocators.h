@@ -21,6 +21,7 @@ namespace growStrat
         {
             granularity_ = granularity;
         }
+
         size_t granularity(void) const
         {
             return granularity_;
@@ -86,10 +87,6 @@ public:
     {
     }
 
-    X_INLINE void setArena(MemoryArenaBase* arena)
-    {
-        arena_ = arena;
-    }
     X_INLINE MemoryArenaBase* getArena(void) const
     {
         return arena_;
@@ -119,10 +116,6 @@ public:
     {
     }
 
-    X_INLINE void setArena(MemoryArenaBase* arena)
-    {
-        arena_ = arena;
-    }
     X_INLINE MemoryArenaBase* getArena(void) const
     {
         return arena_;
@@ -164,10 +157,6 @@ public:
         static_assert(alignment >= X_ALIGN_OF(T), "Fixed alignment don't satisfy type alignment");
     }
 
-    X_INLINE void setArena(MemoryArenaBase* arena)
-    {
-        arena_ = arena;
-    }
     X_INLINE MemoryArenaBase* getArena(void) const
     {
         return arena_;

@@ -239,22 +239,6 @@ public:
         clear();
     }
 
-    void setArena(MemoryArenaBase* arena)
-    {
-        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")(numElements_);
-        arena_ = arena;
-        buckets_.setArena(arena);
-    }
-
-    void setArena(MemoryArenaBase* arena, size_type size)
-    {
-        X_ASSERT(numElements_ == 0, "can't set hash map arena when it has items")(numElements_);
-        arena_ = arena;
-        buckets_.setArena(arena);
-
-        initialize_buckets(size);
-    }
-
     void clear(); // clear all the nodes, the buket list is not deleted.
     void free();  // clears all nodes and deletes the bucket.
 
