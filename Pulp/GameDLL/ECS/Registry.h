@@ -283,8 +283,11 @@ namespace ecs
     class Registry<Pool<Entity, Components...>>
     {
         static_assert(sizeof...(Components) > 1, "!");
-
-        static constexpr auto validity_bit = sizeof...(Components);
+        
+    public:
+        static constexpr auto NUM_COMP = sizeof...(Components);
+    private:
+        static constexpr auto VALIDITY_BIT = NUM_COMP;
 
     public:
         template<typename T>
@@ -363,7 +366,7 @@ namespace ecs
 
         X_INLINE bool isValid(entity_type entity) const
         {
-            return (entity < entities_.size() && entities_[entity].test(validity_bit));
+            return (entity < entities_.size() && entities_[entity].test(VALIDITY_BIT));
         }
 
         template<typename... Comp>
@@ -389,7 +392,7 @@ namespace ecs
                 freelist_.pop_back();
             }
 
-            entities_[entity].set(validity_bit);
+            entities_[entity].set(VALIDITY_BIT);
 
             return entity;
         }
