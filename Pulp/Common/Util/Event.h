@@ -369,6 +369,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)()>
         void AddListener(void)
         {
@@ -440,9 +445,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -596,6 +598,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0)>
         void AddListener(void)
         {
@@ -667,9 +674,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -823,6 +827,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1)>
         void AddListener(void)
         {
@@ -894,9 +903,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -1050,6 +1056,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2)>
         void AddListener(void)
         {
@@ -1121,9 +1132,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -1277,6 +1285,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2, ARG3)>
         void AddListener(void)
         {
@@ -1348,9 +1361,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -1504,6 +1514,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
         void AddListener(void)
         {
@@ -1575,9 +1590,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -1731,6 +1743,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
         void AddListener(void)
         {
@@ -1802,9 +1819,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -1958,6 +1972,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
         void AddListener(void)
         {
@@ -2029,9 +2048,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
@@ -2185,6 +2201,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
         void AddListener(void)
         {
@@ -2256,9 +2277,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 

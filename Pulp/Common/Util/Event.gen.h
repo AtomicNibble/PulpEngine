@@ -103,6 +103,11 @@ public:
             listeners_.reserve(numListeners);
         }
 
+        Sink(Sink&& oth) = default;
+        Sink(const Sink& oth) = default;
+        Sink& operator=(Sink&& oth) = default;
+        Sink& operator=(const Sink& oth) = default;
+
         template<R (*Function)(ARG_TYPES)>
         void AddListener(void)
         {
@@ -174,9 +179,6 @@ public:
         }
 
     private:
-        X_NO_COPY(Sink);
-        X_NO_ASSIGN(Sink);
-
         core::Array<Stub> listeners_;
     };
 
