@@ -30,7 +30,8 @@ namespace entity
 {
     // -----------------------------------------------------------
 
-    EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
+    EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, 
+        Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
         arena_(arena),
         reg_(arena),
         vars_(vars),
