@@ -825,10 +825,10 @@
     <ClCompile Include="Util\Delegate.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
       <FileType>Document</FileType>
-      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</PreprocessToFile>
+      <PreprocessToFile Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessToFile>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
-      <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</PreprocessSuppressLineNumbers>
-      <PreprocessKeepComments Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</PreprocessKeepComments>
+      <PreprocessSuppressLineNumbers Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessSuppressLineNumbers>
+      <PreprocessKeepComments Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">false</PreprocessKeepComments>
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Util\%(Filename).h</ObjectFileName>
       <Command Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">CL /RTCc /MP /P /GS /W4 /Gy /Zc:wchar_t /I"C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\solutions\..\Pulp\Common" /I"C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\Pulp\Common\" /Zi /Gm- /Od /Fd"C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\solutions\..\..\\build\x64\Debug\engine_Common.pdb" /Zc:inline /fp:precise /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "X_DEBUG=1" /D "X_RELEASE=0" /D "X_SUPER=0" /D "X_64=1" /D "_AMD64_" /D "_WIN64" /D "_UNICODE" /D "UNICODE" /fp:except /errorReport:prompt /GF- /WX /Zc:forScope /RTC1 /GR- /Gd /P /MTd /openmp- /Fa"C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\solutions\..\..\Temp\x64\Debug\Common\" /nologo /Fo"Util\Delegate.h" /C /Fp"C:\Users\WinCat\Documents\code\WinCat\engine\potatoengine\solutions\..\..\Temp\x64\Debug\Common\engine_Common.pch" "Util\Delegate.gen"</Command>
       <Outputs Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Delegate.h</Outputs>
@@ -856,6 +856,7 @@
       <ObjectFileName Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">Util\%(Filename).h</ObjectFileName>
     </ClCompile>
     <None Include="Util\EndianUtil.inl" />
+    <ClCompile Include="Util\Event.gen">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -868,6 +869,8 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Super Dynamic|x64'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|x64'">true</ExcludedFromBuild>
+      <FileType>Document</FileType>
+    </ClCompile>
     <None Include="Util\Flags.inl" />
     <None Include="Util\Function.inl" />
     <None Include="Util\Pointer64.inl" />
