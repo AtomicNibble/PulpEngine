@@ -91,7 +91,7 @@ namespace ecs
         {
             X_ASSERT(!valid(entity), "Entity already valid")();
 
-            if (!(entity < reverse_.size())) {
+            if (entity >= reverse_.size()) {
                 reverse_.resize(entity + 1);
             }
 
