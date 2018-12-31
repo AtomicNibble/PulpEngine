@@ -300,17 +300,17 @@ class Delegate<R()>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)()>
@@ -335,23 +335,23 @@ public:
     template<class C, R (C::*Function)()>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)() const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -363,32 +363,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)()>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)() const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke() const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance  );
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance  );
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -445,17 +445,17 @@ class Delegate<R(ARG0)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0)>
@@ -480,23 +480,23 @@ public:
     template<class C, R (C::*Function)(ARG0)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -508,32 +508,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -590,17 +590,17 @@ class Delegate<R(ARG0, ARG1)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1)>
@@ -625,23 +625,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -653,32 +653,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -735,17 +735,17 @@ class Delegate<R(ARG0, ARG1, ARG2)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2)>
@@ -770,23 +770,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -798,32 +798,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -880,17 +880,17 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3)>
@@ -915,23 +915,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -943,32 +943,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2, arg3);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -1025,17 +1025,17 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
@@ -1060,23 +1060,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -1088,32 +1088,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2, arg3, arg4);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -1170,17 +1170,17 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
@@ -1205,23 +1205,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -1233,32 +1233,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -1315,17 +1315,17 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
@@ -1350,23 +1350,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -1378,32 +1378,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:
@@ -1460,17 +1460,17 @@ class Delegate<R(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
@@ -1495,23 +1495,23 @@ public:
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
     struct NonConstWrapper
     {
-        NonConstWrapper(C* instance) :
-            instance_(instance)
+        NonConstWrapper(C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        C* instance_;
+        C* pInstance_;
     };
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) const>
     struct ConstWrapper
     {
-        ConstWrapper(const C* instance) :
-            instance_(instance)
+        ConstWrapper(const C* pInstance) :
+            pInstance_(pInstance)
         {
         }
 
-        const C* instance_;
+        const C* pInstance_;
     };
 
     Delegate(void) :
@@ -1523,32 +1523,32 @@ public:
     void Bind(void)
     {
         stub_.instance.as_void = nullptr;
-        stub_.function = &FunctionStub<Function>;
+        stub_.pFunction = &FunctionStub<Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7)>
     void Bind(NonConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_void = wrapper.instance_;
-        stub_.function = &ClassMethodStub<C, Function>;
+        stub_.instance.as_void = wrapper.pInstance_;
+        stub_.pFunction = &ClassMethodStub<C, Function>;
     }
 
     template<class C, R (C::*Function)(ARG0, ARG1, ARG2, ARG3, ARG4, ARG5, ARG6, ARG7) const>
     void Bind(ConstWrapper<C, Function> wrapper)
     {
-        stub_.instance.as_const_void = wrapper.instance_;
-        stub_.function = &ConstClassMethodStub<C, Function>;
+        stub_.instance.as_const_void = wrapper.pInstance_;
+        stub_.pFunction = &ConstClassMethodStub<C, Function>;
     }
 
     R Invoke(ARG0 arg0, ARG1 arg1, ARG2 arg2, ARG3 arg3, ARG4 arg4, ARG5 arg5, ARG6 arg6, ARG7 arg7) const
     {
-        X_ASSERT(stub_.function != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
-        return stub_.function(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
+        X_ASSERT(stub_.pFunction != nullptr, "Cannot invoke unbound delegate. Call Bind() first.")();
+        return stub_.pFunction(stub_.instance , arg0, arg1, arg2, arg3, arg4, arg5, arg6, arg7);
     }
 
     X_INLINE operator bool() const
     {
-        return stub_.function != nullptr;
+        return stub_.pFunction != nullptr;
     }
 
 private:

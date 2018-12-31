@@ -35,17 +35,17 @@ class Event<R(ARG_TYPES)>
     {
         inline Stub(void) :
             instance(),
-            function(nullptr)
+            pFunction(nullptr)
         {
         }
 
         inline bool operator==(const Stub& other) const
         {
-            return ((instance == other.instance) && (function == other.function));
+            return ((instance == other.instance) && (pFunction == other.pFunction));
         }
 
         InstancePtr instance;
-        typename InternalFunction::Pointer function;
+        typename InternalFunction::Pointer pFunction;
     };
 
     template<R (*Function)(ARG_TYPES)>
@@ -73,23 +73,23 @@ public:
         template<class C, R (C::*Function)(ARG_TYPES)>
         struct NonConstWrapper
         {
-            NonConstWrapper(C* instance) :
-                instance_(instance)
+            NonConstWrapper(C* pInstance) :
+                pInstance_(pInstance)
             {
             }
 
-            C* instance_;
+            C* pInstance_;
         };
 
         template<class C, R (C::*Function)(ARG_TYPES) const>
         struct ConstWrapper
         {
             ConstWrapper(const C* instance) :
-                instance_(instance)
+                pInstance_(instance)
             {
             }
 
-            const C* instance_;
+            const C* pInstance_;
         };
 
         Sink(MemoryArenaBase* arena) :
@@ -108,7 +108,7 @@ public:
         {
             Stub stub;
             stub.instance.as_void = nullptr;
-            stub.function = &FunctionStub<Function>;
+            stub.pFunction = &FunctionStub<Function>;
 
             listeners_.append(stub);
         }
@@ -117,8 +117,8 @@ public:
         void AddListener(NonConstWrapper<C, Function> wrapper)
         {
             Stub stub;
-            stub.instance.as_void = wrapper.instance_;
-            stub.function = &ClassMethodStub<C, Function>;
+            stub.instance.as_void = wrapper.pInstance_;
+            stub.pFunction = &ClassMethodStub<C, Function>;
 
             listeners_.append(stub);
         }
@@ -127,8 +127,8 @@ public:
         void AddListener(ConstWrapper<C, Function> wrapper)
         {
             Stub stub;
-            stub.instance.as_const_void = wrapper.instance_;
-            stub.function = &ConstClassMethodStub<C, Function>;
+            stub.instance.as_const_void = wrapper.pInstance_;
+            stub.pFunction = &ConstClassMethodStub<C, Function>;
 
             listeners_.append(stub);
         }
@@ -138,7 +138,7 @@ public:
         {
             Stub stub;
             stub.instance.as_void = nullptr;
-            stub.function = &FunctionStub<Function>;
+            stub.pFunction = &FunctionStub<Function>;
 
             listeners_.remove(stub);
         }
@@ -147,8 +147,8 @@ public:
         void RemoveListener(NonConstWrapper<C, Function> wrapper)
         {
             Stub stub;
-            stub.instance.as_void = wrapper.instance_;
-            stub.function = &ClassMethodStub<C, Function>;
+            stub.instance.as_void = wrapper.pInstance_;
+            stub.pFunction = &ClassMethodStub<C, Function>;
 
             listeners_.remove(stub);
         }
@@ -157,8 +157,8 @@ public:
         void RemoveListener(ConstWrapper<C, Function> wrapper)
         {
             Stub stub;
-            stub.instance.as_const_void = wrapper.instance_;
-            stub.function = &ConstClassMethodStub<C, Function>;
+            stub.instance.as_const_void = wrapper.pInstance_;
+            stub.pFunction = &ConstClassMethodStub<C, Function>;
 
             listeners_.remove(stub);
         }
@@ -181,35 +181,35 @@ public:
     };
 
     Event(void) :
-        sink_(nullptr)
+        pSink_(nullptr)
     {
     }
     
-    inline void Bind(Sink* sink)
+    inline void Bind(Sink* pSink)
     {
-        sink_ = sink;
+        pSink_ = pSink;
     }
 
     void Signal(ARGS) const
     {
-        X_ASSERT(sink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
+        X_ASSERT(pSink_ != nullptr, "Cannot signal unbound event. Call Bind() first.")();
 
-        for (size_t i = 0; i < sink_->GetListenerCount(); ++i) {
-            const Stub& stub = sink_->GetListener(i);
-            stub.function(stub.instance X_PP_COMMA_IF(COUNT) PASS_ARGS);
+        for (size_t i = 0; i < pSink_->GetListenerCount(); ++i) {
+            const Stub& stub = pSink_->GetListener(i);
+            stub.pFunction(stub.instance X_PP_COMMA_IF(COUNT) PASS_ARGS);
         }
     }
 
     inline bool IsBound(void) const
     {
-        return (sink_ != nullptr);
+        return (pSink_ != nullptr);
     }
 
 private:
     X_NO_COPY(Event);
     X_NO_ASSIGN(Event);
 
-    Sink* sink_;
+    Sink* pSink_;
 };
 
 #undef ARG_TYPENAMES_IMPL
