@@ -557,7 +557,7 @@ namespace profiler
             ++numChildren;
 
             Vec2f p = pos;
-            p.y += numChildren * 20.f;
+            p.y += numChildren * 18.f;
             numChildren += RenderArenaTree_r(pPrim, ctx, p, treeIndent + 1, pChildArena);
         }
 #endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
@@ -593,7 +593,7 @@ namespace profiler
         size_t numItems = countChildren_r(arena);
 
         const float width = 520 + 110;
-        const float height = (20.f * numItems) + colHdrHeight;
+        const float height = (18.f * numItems) + colHdrHeight;
 
         // background.
         pPrim->drawQuad(
