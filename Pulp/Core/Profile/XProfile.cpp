@@ -549,6 +549,7 @@ namespace profiler
 
         size_t numChildren = 0;
 
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
         auto& children = arena->getChildrenAreas();
         for (size_t i = 0; i < children.size(); i++) {
             auto* pChildArena = children[i];
@@ -559,16 +560,21 @@ namespace profiler
             p.y += numChildren * 20.f;
             numChildren += RenderArenaTree_r(pPrim, ctx, p, treeIndent + 1, pChildArena);
         }
-
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
         return numChildren;
     }
 
     size_t XProfileSys::countChildren_r(core::MemoryArenaBase* arena)
     {
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
         auto& children = arena->getChildrenAreas();
         return core::accumulate(children.begin(), children.end(), 1_sz, [](core::MemoryArenaBase* arena) -> size_t {
             return countChildren_r(arena);
         });
+#else
+        X_UNUSED(arena);
+        return 1;
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
     };
 
     Vec2f XProfileSys::RenderArenaTree(engine::IPrimativeContext* pPrim, Vec2f pos, core::MemoryArenaBase* arena)

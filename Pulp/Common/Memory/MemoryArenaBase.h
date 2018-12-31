@@ -5,11 +5,15 @@
 
 #include "Memory/MemoryArenaStatistics.h"
 
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
+
 #if X_COMPILER_CLANG
 #include <vector>
 #else
 #include <Containers\FixedArray.h>
 #endif // !X_COMPILER_CLANG
+
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
 
 X_NAMESPACE_BEGIN(core)
 
@@ -18,11 +22,13 @@ class MemoryArenaBase
     static const int MAX_ARENA_CHILDREN = 20;
 
 public:
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
 #if X_COMPILER_CLANG
     typedef std::vector<MemoryArenaBase*> ArenaArr;
 #else
     typedef core::FixedArray<MemoryArenaBase*, MAX_ARENA_CHILDREN> ArenaArr;
 #endif // !X_COMPILER_CLANG
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
 
 public:
     virtual ~MemoryArenaBase(void) = default;
@@ -46,14 +52,18 @@ public:
 
     virtual bool isThreadSafe(void) const X_ABSTRACT;
 
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
+
     inline const ArenaArr& getChildrenAreas(void) const
     {
         return children_;
     }
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
 
     // adds it baby.
     inline void addChildArena(MemoryArenaBase* arena)
     {
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
         if (children_.size() == MAX_ARENA_CHILDREN) {
             X_WARNING("Memory", "can't add child arena exceeded max: %i", MAX_ARENA_CHILDREN);
         }
@@ -62,11 +72,16 @@ public:
                 children_.push_back(arena);
             }
         }
+#else
+        X_UNUSED(arena);
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
 
 protected:
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
     ArenaArr children_;
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
 };
 
 X_NAMESPACE_END

@@ -113,9 +113,11 @@ MemoryAllocatorStatistics SimpleMemoryArena<AllocationPolicy>::getAllocatorStati
     MemoryAllocatorStatistics stats = statistics_.allocatorStatistics_;
 
     if (children) {
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
         for (const auto& arena : children_) {
             stats += arena->getAllocatorStatistics(true);
         }
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
     return stats;
