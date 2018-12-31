@@ -13,13 +13,13 @@ namespace ecs
     class ComponentPool<Entity, Component>
     {
     public:
+        template<typename T>
+        using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
+
         using component_type = Component;
         using entity_type = Entity;
         using pos_type = entity_type;
-        using size_type = typename core::Array<component_type>::size_type;
-
-        template<typename T>
-        using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
+        using size_type = typename AlignedArray<component_type>::size_type;
 
         typedef AlignedArray<component_type> CompDataArr;
         typedef AlignedArray<pos_type> PosTypeArr;
