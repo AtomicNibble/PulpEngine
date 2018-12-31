@@ -57,7 +57,10 @@ namespace entity
 
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
-        reg_.reserve(MAX_ENTS);
+        reg_.entIdReserve(MAX_ENTS);
+        reg_.compReserve(MAX_ENTS);
+        reg_.freelistReserve(64);
+
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
         pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);

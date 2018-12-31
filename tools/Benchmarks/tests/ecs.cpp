@@ -53,7 +53,7 @@ void BM_ecs_construct(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
+    registry.entIdReserve(size);
 
     while (state.KeepRunning()) {
         for (size_t i = 0; i < size; i++) {
@@ -71,8 +71,8 @@ void BM_ecs_destroy(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
-    registry.availableReserve(size);
+    registry.entIdReserve(size);
+    registry.freelistReserve(size);
     entities.reserve(size);
 
     while (state.KeepRunning()) {
@@ -101,7 +101,8 @@ void BM_ecs_iterate_single_component(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
+    registry.entIdReserve(size);
+    registry.compReserve<Position>(size);
 
     for (size_t i = 0; i < size; i++) {
         registry.create<Position>();
@@ -126,7 +127,9 @@ void BM_ecs_iterate_two_component(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
+    registry.entIdReserve(size);
+    registry.compReserve<Position>(size);
+    registry.compReserve<Velocity>(size);
 
     for (size_t i = 0; i < size; i++) {
         registry.create<Position, Velocity>();
@@ -152,7 +155,8 @@ void BM_ecs_iterate_five_component(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
+    registry.entIdReserve(size);
+    registry.compReserve(size);
 
     for (size_t i = 0; i < size; i++) {
         registry.create<Position, Velocity, Comp1, Comp2, Comp3>();
@@ -181,7 +185,8 @@ void BM_ecs_iterate_five_component_mixed(benchmark::State& state)
 
     const size_t size = state.range(0);
 
-    registry.reserve(size);
+    registry.entIdReserve(size);
+    registry.compReserve(size);
 
     for (size_t i = 0; i < size; i++) {
         // don't have every component have required.

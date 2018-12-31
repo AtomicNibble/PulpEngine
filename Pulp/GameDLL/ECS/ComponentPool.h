@@ -223,6 +223,12 @@ namespace ecs
             Pool<Comp>::reset();
         }
 
+        template<typename Comp>
+        X_INLINE void reserve(size_t size)
+        {
+            Pool<Comp>::reserve(size);
+        }
+
         void reset(void)
         {
             using accumulator_type = int[];

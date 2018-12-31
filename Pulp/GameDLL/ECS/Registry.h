@@ -309,7 +309,7 @@ namespace ecs
         Registry(core::MemoryArenaBase* arena, Args&&... args) :
             pool_{arena, std::forward<Args>(args)...},
             entities_(arena),
-            available_(arena)
+            freelist_(arena)
         {
         }
 
@@ -319,20 +319,30 @@ namespace ecs
         Registry& operator=(const Registry&) = delete;
         Registry& operator=(Registry&&) = delete;
 
-        void reserve(size_t size)
+        void entIdReserve(size_t size)
         {
             entities_.reserve(size);
+        }
+
+        void compReserve(size_t size)
+        {
             pool_.reserve(size);
         }
 
-        void availableReserve(size_t size)
+        template<typename Comp>
+        void compReserve(size_t size)
         {
-            available_.reserve(size);
+            pool_.template reserve<Comp>(size);
+        }
+
+        void freelistReserve(size_t size)
+        {
+            freelist_.reserve(size);
         }
 
         X_INLINE size_type size(void) const
         {
-            return entities_.size() - available_.size();
+            return entities_.size() - freelist_.size();
         }
 
         X_INLINE size_type capacity(void) const
@@ -370,13 +380,13 @@ namespace ecs
         {
             entity_type entity;
 
-            if (available_.isEmpty()) {
+            if (freelist_.isEmpty()) {
                 entity = safe_static_cast<entity_type>(entities_.size());
                 entities_.emplace_back();
             }
             else {
-                entity = available_.back();
-                available_.pop_back();
+                entity = freelist_.back();
+                freelist_.pop_back();
             }
 
             entities_[entity].set(validity_bit);
@@ -390,7 +400,7 @@ namespace ecs
 
             using accumulator_type = int[];
             accumulator_type accumulator = {0, (reset<Components>(entity), 0)...};
-            available_.push_back(entity);
+            freelist_.push_back(entity);
             entities_[entity].reset();
             (void)accumulator;
         }
@@ -534,7 +544,7 @@ namespace ecs
         void reset(void)
         {
             entities_.clear();
-            available_.clear();
+            freelist_.clear();
             pool_.reset();
         }
 
@@ -572,7 +582,7 @@ namespace ecs
 
     private:
         MaskArr entities_;
-        EntityArr available_;
+        EntityArr freelist_;
         pool_type pool_;
     };
 
