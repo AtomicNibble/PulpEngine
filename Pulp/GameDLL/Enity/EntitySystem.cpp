@@ -62,6 +62,8 @@ namespace entity
 
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
+        static_assert(decltype(reg_)::NUM_COMP == 18, "More components? add a sensible reserve call");
+
         reg_.entIdReserve(MAX_ENTS);
         reg_.freelistReserve(64);
         reg_.compReserve<TransForm>(MAX_ENTS);
