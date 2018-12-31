@@ -59,7 +59,16 @@ namespace entity
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
         reg_.entIdReserve(MAX_ENTS);
-        reg_.compReserve(MAX_ENTS);
+        reg_.compReserve<TransForm>(MAX_ENTS);
+        reg_.compReserve<Health>(64);
+        reg_.compReserve<Mesh>(256);
+        reg_.compReserve<MeshRenderer>(256);
+        reg_.compReserve<MeshCollider>(256);
+        reg_.compReserve<DynamicObject>(256);
+        reg_.compReserve<SoundObject>(256);
+        reg_.compReserve<NetworkSync>(256);
+        reg_.compReserve<Player>(8);
+
         reg_.freelistReserve(64);
 
 
