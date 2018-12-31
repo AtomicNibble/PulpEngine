@@ -3,6 +3,8 @@
 #include <tuple>
 #include <bitset>
 
+#include <Util/Function.h>
+
 X_NAMESPACE_BEGIN(game)
 
 namespace ecs
@@ -294,9 +296,12 @@ namespace ecs
         using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 64>, core::growStrat::Multiply>;
 
         using pool_type = Pool<Entity, Components...>;
-        using mask_type = std::bitset<sizeof...(Components) + 1>;
+        using mask_type = std::bitset<NUM_COMP + 1>;
         using entity_type = typename pool_type::entity_type;
         using size_type = typename AlignedArray<mask_type>::size_type;
+
+        using destoryFunc = core::Function<void(void*), 24>;
+        using destoryFuncArr = std::array<destoryFunc, NUM_COMP>;
 
     public:
         template<typename... Comp>
@@ -429,7 +434,24 @@ namespace ecs
             X_ASSERT(isValid(entity), "Not valid entity")();
 
             entities_[entity].reset(ident<Components...>.template get<Comp>());
+
+            // Call handlers for cleanup.
+            auto& func = destoryFuncs_[ident<Components...>.template get<Comp>()];
+            if (func) {
+                func(&get<Comp>(entity));
+            }
+
             pool_.template destroy<Comp>(entity);
+        }
+
+        template<typename S, typename Comp>
+        void setDetroyCallback(S* pSystem)
+        {
+            X_ASSERT(!destoryFuncs_[ident<Components...>.template get<Comp>()], "Destory functino already set for comp")();
+
+            destoryFuncs_[ident<Components...>.template get<Comp>()] = [=](void* pComp) {
+                pSystem->destroy(*reinterpret_cast<Comp*>(pComp));
+            };
         }
 
         // make this a overload of has() if I can be bothered.
@@ -587,6 +609,7 @@ namespace ecs
         MaskArr entities_;
         EntityArr freelist_;
         pool_type pool_;
+        destoryFuncArr destoryFuncs_;
     };
 
     template<typename Entity, typename... Components>
