@@ -61,6 +61,10 @@ namespace entity
     {
         ADD_META()
 
+        Mesh() :
+            pModel(nullptr)
+        {}
+
         // core::StackString<64> name;
         // TODO replace this with networked string.
         core::string name;
@@ -69,6 +73,10 @@ namespace entity
 
     struct MeshRenderer
     {
+        MeshRenderer() :
+            pRenderEnt(nullptr)
+        {}
+
         engine::IRenderEnt* pRenderEnt;
     };
 
@@ -101,7 +109,9 @@ namespace entity
 
     struct Animator
     {
-        Animator() = default;
+        Animator() : Animator(nullptr)
+        {
+        }
         Animator(anim::Animator* pAnimator_) : 
             pAnimator(pAnimator_)
         {
