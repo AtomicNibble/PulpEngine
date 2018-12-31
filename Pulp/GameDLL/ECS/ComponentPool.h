@@ -106,11 +106,14 @@ namespace ecs
         {
             X_ASSERT(valid(entity), "Entity not valid")();
 
-            auto last = direct_.size() - 1;
+            // swap and pop.
+            const auto last = direct_.size() - 1;
+            const auto lastEntId = direct_[last];
+            const auto entDataIndex = reverse_[entity];
 
-            reverse_[direct_[last]] = reverse_[entity];
-            direct_[reverse_[entity]] = direct_[last];
-            data_[reverse_[entity]] = std::move(data_[last]);
+            reverse_[lastEntId] = entDataIndex;
+            direct_[entDataIndex] = lastEntId;
+            data_[entDataIndex] = std::move(data_[last]);
 
             direct_.pop_back();
             data_.pop_back();
