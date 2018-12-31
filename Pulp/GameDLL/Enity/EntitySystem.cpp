@@ -33,10 +33,12 @@ namespace entity
     EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, 
         Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
         arena_(arena),
-        reg_(arena),
+        reg_(&ecsArena_),
         vars_(vars),
         weaponDefs_(weaponDefs),
         pMultiplayer_(pMultiplayer),
+        ecsAllocator_(),
+        ecsArena_(&ecsAllocator_, "ECSArena"),
         playerSys_(vars.player),
         cameraSys_(vars),
         dtHealth_(arena),
@@ -47,6 +49,8 @@ namespace entity
         dtEmitter_(arena),
         dtDynamicObject_(arena)
     {
+        arena->addChildArena(&ecsArena_);
+
         pPhysics_ = nullptr;
         pPhysScene_ = nullptr;
         p3DWorld_ = nullptr;
@@ -124,6 +128,8 @@ namespace entity
 
     void EnititySystem::shutdown(void)
     {
+        arena_->removeChildArena(&ecsArena_);
+
         for (EntityId i = 0; i < net::MAX_PLAYERS; i++) {
             if (reg_.isValid(i) && reg_.has<Player>(i)) {
                 removePlayer(i);

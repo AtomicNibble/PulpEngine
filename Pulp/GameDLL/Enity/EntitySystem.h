@@ -50,6 +50,21 @@ namespace entity
     class EnititySystem
     {
         using EntityIdMapArr = std::array< EntityId, MAX_ENTS>;
+         
+        typedef core::MemoryArena<
+            core::MallocFreeAllocator,
+            core::SingleThreadPolicy,
+#if X_DEBUG
+            core::SimpleBoundsChecking,
+            core::SimpleMemoryTracking,
+            core::SimpleMemoryTagging
+#else
+            core::NoBoundsChecking,
+            core::NoMemoryTracking,
+            core::NoMemoryTagging
+#endif // !X_DEBUG
+        >
+            ECSArena;
 
     public:
         typedef EnitiyRegister::entity_type EntityId;
@@ -93,10 +108,15 @@ namespace entity
 
     private:
         core::MemoryArenaBase* arena_;
+        // before reg_
+        ECSArena::AllocationPolicy ecsAllocator_;
+        ECSArena ecsArena_;
+
         EnitiyRegister reg_;
         GameVars& vars_;
         game::weapon::WeaponDefManager& weaponDefs_;
         Multiplayer* pMultiplayer_;
+
 
         physics::IPhysics* pPhysics_;
         physics::IScene* pPhysScene_;
