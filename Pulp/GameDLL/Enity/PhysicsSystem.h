@@ -20,8 +20,8 @@ namespace entity
         ~PhysicsSystem();
 
         bool init(void);
-        void update(core::FrameData& frame, EnitiyRegister& reg,
-            physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
+
+        void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 
         bool createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
 
