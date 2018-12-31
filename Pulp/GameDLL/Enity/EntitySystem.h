@@ -82,6 +82,7 @@ namespace entity
 
         void destroy(MeshCollider& comp);
         void destroy(DynamicObject& comp);
+        void destroy(CharacterController& comp);
 
         EntityId createEnt(void);
         void destroyEnt(EntityId id);

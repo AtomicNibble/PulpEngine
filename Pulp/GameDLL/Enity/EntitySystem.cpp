@@ -87,6 +87,14 @@ namespace entity
         comp.actor = physics::INVALID_HANLDE;
     }
 
+    void EnititySystem::destroy(CharacterController& comp)
+    {
+        X_ASSERT_NOT_NULL(comp.pController);
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+        pPhysScene_->releaseCharacterController(comp.pController);
+    }
+
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
         static_assert(decltype(reg_)::NUM_COMP == 18, "More components? add a sensible reserve call");
@@ -114,6 +122,7 @@ namespace entity
 
         reg_.setDetroyCallback<EnititySystem, MeshCollider>(this);
         reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
+        reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
 
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
@@ -646,13 +655,6 @@ namespace entity
 
         if (player.weaponEnt != entity::INVALID_ID) {
             destroyEnt(player.weaponEnt);
-        }
-
-        if (reg_.has<CharacterController>(id)) {
-            auto& con = reg_.get<CharacterController>(id);
-
-            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-            pPhysScene_->releaseCharacterController(con.pController);
         }
 
         reg_.reset(id);
