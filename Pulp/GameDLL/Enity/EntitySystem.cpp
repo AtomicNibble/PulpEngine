@@ -60,6 +60,16 @@ namespace entity
         entIdMap_.fill(INVALID_ENT_ID);
     }
 
+    void EnititySystem::destroy(Mesh& comp)
+    {
+        pModelManager_->releaseModel(comp.pModel);
+    }
+
+    void EnititySystem::destroy(MeshRenderer& comp)
+    {
+        p3DWorld_->freeRenderEnt(comp.pRenderEnt);
+    }
+
     void EnititySystem::destroy(MeshCollider& comp)
     {
         // is this for static collision only?
@@ -87,12 +97,35 @@ namespace entity
         comp.actor = physics::INVALID_HANLDE;
     }
 
+    void EnititySystem::destroy(Weapon& comp)
+    {
+        weaponDefs_.releaseWeaponDef(comp.pWeaponDef);
+    }
+
+    void EnititySystem::destroy(Animator& comp)
+    {
+        if (comp.pAnimator) {
+            X_DELETE(comp.pAnimator, g_gameArena);
+        }
+    }
+
     void EnititySystem::destroy(CharacterController& comp)
     {
         X_ASSERT_NOT_NULL(comp.pController);
 
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
         pPhysScene_->releaseCharacterController(comp.pController);
+    }
+
+    void EnititySystem::destroy(Player& comp)
+    {
+        if (comp.armsEnt != entity::INVALID_ID) {
+            destroyEnt(comp.armsEnt);
+        }
+
+        if (comp.weaponEnt != entity::INVALID_ID) {
+            destroyEnt(comp.weaponEnt);
+        }
     }
 
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
@@ -120,9 +153,14 @@ namespace entity
         reg_.compReserve<EntName>(16);
         reg_.compReserve<Player>(net::MAX_PLAYERS);
 
+        reg_.setDetroyCallback<EnititySystem, Mesh>(this);
+        reg_.setDetroyCallback<EnititySystem, MeshRenderer>(this);
         reg_.setDetroyCallback<EnititySystem, MeshCollider>(this);
         reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
+        reg_.setDetroyCallback<EnititySystem, Weapon>(this);
+        reg_.setDetroyCallback<EnititySystem, Animator>(this);
         reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
+        reg_.setDetroyCallback<EnititySystem, Player>(this);
 
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
@@ -435,29 +473,13 @@ namespace entity
 
     void EnititySystem::destroyEnt(EntityId id)
     {
-        if (reg_.has<MeshRenderer>(id)) {
-            auto& meshRend = reg_.get<MeshRenderer>(id);
-            p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
-        }
-
-        if (reg_.has<Mesh>(id)) {
-            auto& mesh = reg_.get<Mesh>(id);
-            pModelManager_->releaseModel(mesh.pModel);
-        }
-
-        if (reg_.has<Weapon>(id)) {
-            auto& wpn = reg_.get<Weapon>(id);
-            weaponDefs_.releaseWeaponDef(wpn.pWeaponDef);
-        }
-
-        if (reg_.has<Animator>(id)) {
-            auto& an = reg_.get<Animator>(id);
-            if (an.pAnimator) {
-                X_DELETE(an.pAnimator, g_gameArena);
-            }
-        }
-
         reg_.destroy(id);
+    }
+
+    void EnititySystem::removePlayer(EntityId id)
+    {
+        // We must reset for players instead of destroy as the enity slots need to remain reserved.
+        reg_.reset(id);
     }
 
     EntityId EnititySystem::createWeapon(EntityId playerId)
@@ -627,37 +649,6 @@ namespace entity
         if (pMultiplayer_) {
             pMultiplayer_->playerSpawned(unm, clientIdx);
         }
-    }
-
-    void EnititySystem::removePlayer(EntityId id)
-    {
-        // TODO: i need to keep the player ents reserved, so calling destory is not really going to work.
-
-        auto& player = reg_.get<Player>(id);
-
-        if (reg_.has<MeshRenderer>(id)) {
-            auto& meshRend = reg_.get<MeshRenderer>(id);
-            if (meshRend.pRenderEnt) {
-                p3DWorld_->freeRenderEnt(meshRend.pRenderEnt);
-            }
-        }
-
-        if (reg_.has<Mesh>(id)) {
-            auto& mesh = reg_.get<Mesh>(id);
-            if (mesh.pModel) {
-                pModelManager_->releaseModel(mesh.pModel);
-            }
-        }
-
-        if (player.armsEnt != entity::INVALID_ID) {
-            destroyEnt(player.armsEnt);
-        }
-
-        if (player.weaponEnt != entity::INVALID_ID) {
-            destroyEnt(player.weaponEnt);
-        }
-
-        reg_.reset(id);
     }
 
     bool EnititySystem::addController(EntityId id)

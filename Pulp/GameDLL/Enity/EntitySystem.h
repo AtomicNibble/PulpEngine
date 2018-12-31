@@ -80,16 +80,22 @@ namespace entity
         void createSnapShot(net::SnapShot& snap);
         void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
 
+        void destroy(Mesh& comp);
+        void destroy(MeshRenderer& comp);
         void destroy(MeshCollider& comp);
         void destroy(DynamicObject& comp);
+        void destroy(Weapon& comp);
+        void destroy(Animator& comp);
         void destroy(CharacterController& comp);
+        void destroy(Player& comp);
 
         EntityId createEnt(void);
         void destroyEnt(EntityId id);
+        void removePlayer(EntityId id);
+
         EntityId createWeapon(EntityId playerId);
 
         void spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local);
-        void removePlayer(EntityId id);
         bool addController(EntityId id);
 
         bool loadEntites(const char* pJsonBegin, const char* pJsonEnd);
