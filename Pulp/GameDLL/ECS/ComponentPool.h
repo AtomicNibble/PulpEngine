@@ -151,7 +151,7 @@ namespace ecs
         using size_type = typename Pool<Component>::size_type;
 
     public:
-        explicit ComponentPool(core::MemoryArenaBase* arena, size_type dim = 4098) :
+        explicit ComponentPool(core::MemoryArenaBase* arena, size_type dim = 16) :
             ComponentPool<Entity, Component>{arena, dim},
             ComponentPool<Entity, Components>{arena, dim}...
         {
