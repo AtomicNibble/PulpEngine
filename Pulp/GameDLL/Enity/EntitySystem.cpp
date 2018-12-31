@@ -60,6 +60,33 @@ namespace entity
         entIdMap_.fill(INVALID_ENT_ID);
     }
 
+    void EnititySystem::destroy(MeshCollider& comp)
+    {
+        // is this for static collision only?
+        X_ERROR("Ent", "A ent with static collision was removed, collision will remain.");
+
+        if (comp.actor == physics::INVALID_HANLDE) {
+            return;
+        }
+
+        // physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+        comp.actor = physics::INVALID_HANLDE;
+    }
+
+    void EnititySystem::destroy(DynamicObject& comp)
+    {
+        if (comp.actor == physics::INVALID_HANLDE) {
+            return;
+        }
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+        pPhysScene_->removeActor(comp.actor);
+        pPhysics_->releaseActor(comp.actor);
+
+        comp.actor = physics::INVALID_HANLDE;
+    }
+
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
         static_assert(decltype(reg_)::NUM_COMP == 18, "More components? add a sensible reserve call");
@@ -84,6 +111,9 @@ namespace entity
         reg_.compReserve<CharacterController>(net::MAX_PLAYERS);
         reg_.compReserve<EntName>(16);
         reg_.compReserve<Player>(net::MAX_PLAYERS);
+
+        reg_.setDetroyCallback<EnititySystem, MeshCollider>(this);
+        reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
 
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
@@ -140,6 +170,7 @@ namespace entity
     {
         arena_->removeChildArena(&ecsArena_);
 
+        // TODO; cleanup should just happen.
         for (EntityId i = 0; i < net::MAX_PLAYERS; i++) {
             if (reg_.isValid(i) && reg_.has<Player>(i)) {
                 removePlayer(i);

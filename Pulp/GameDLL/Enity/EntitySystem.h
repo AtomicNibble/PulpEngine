@@ -80,6 +80,8 @@ namespace entity
         void createSnapShot(net::SnapShot& snap);
         void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
 
+        void destroy(MeshCollider& comp);
+        void destroy(DynamicObject& comp);
 
         EntityId createEnt(void);
         void destroyEnt(EntityId id);
