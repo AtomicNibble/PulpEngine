@@ -615,9 +615,6 @@ namespace ecs
     template<typename Entity, typename... Components>
     using StandardRegistry = Registry<ComponentPool<Entity, Components...>>;
 
-    template<typename... Components>
-    using DefaultRegistry = Registry<ComponentPool<uint16_t, Components...>>;
-
 } // namespace ecs
 
 X_NAMESPACE_END
