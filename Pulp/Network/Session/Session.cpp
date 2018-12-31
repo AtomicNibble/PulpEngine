@@ -86,6 +86,8 @@ Session::Session(SessionVars& vars, IPeer* pPeer, IGameCallbacks* pGameCallbacks
     snapInterpolationTimeMS_(0),
     snapInterpolationResidual_(0.f)
 {
+    arena->addChildArena(&snapArena_);
+
     X_ASSERT(lobbys_[LobbyType::Party].getType() == LobbyType::Party, "Incorrect type")();
     X_ASSERT(lobbys_[LobbyType::Game].getType() == LobbyType::Game, "Incorrect type")();
 
@@ -95,6 +97,8 @@ X_ENABLE_WARNING(4355)
 
 Session::~Session()
 {
+    arena_->removeChildArena(&snapArena_);
+
     recivedSnaps_.clear();
 }
 
