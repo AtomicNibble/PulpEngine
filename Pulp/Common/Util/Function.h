@@ -21,8 +21,8 @@ class Function<R(Args...), MaxSize>
     using Invoker = R (*)(void*, Args&&...);
     using Manager = void (*)(void*, void*, Operation);
     using Storage = typename std::aligned_storage<MaxSize - sizeof(Invoker) - sizeof(Manager), 8>::type;
-
-    static_assert(MaxSize - (sizeof(Invoker) - sizeof(Manager)) > 0, "Size too small");
+    
+    static_assert(MaxSize - (sizeof(Invoker) + sizeof(Manager)) > 0, "Size too small");
 
 public:
     X_INLINE Function();
