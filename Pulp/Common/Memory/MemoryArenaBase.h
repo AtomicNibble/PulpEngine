@@ -53,7 +53,6 @@ public:
     virtual bool isThreadSafe(void) const X_ABSTRACT;
 
 #if X_ENABLE_MEMORY_ARENA_CHILDREN
-
     inline const ArenaArr& getChildrenAreas(void) const
     {
         return children_;
@@ -77,6 +76,17 @@ public:
 #endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
     }
 
+
+    inline void removeChildArena(MemoryArenaBase* arena)
+    {
+#if X_ENABLE_MEMORY_ARENA_CHILDREN
+        if (auto idx = children_.find(arena); idx != ArenaArr::invalid_index) {
+            children_.removeIndex(idx);
+        }
+#else
+        X_UNUSED(arena);
+#endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
+    }
 
 protected:
 #if X_ENABLE_MEMORY_ARENA_CHILDREN
