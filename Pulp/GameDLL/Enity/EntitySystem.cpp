@@ -70,9 +70,18 @@ namespace entity
         reg_.compReserve<MeshRenderer>(256);
         reg_.compReserve<MeshCollider>(256);
         reg_.compReserve<DynamicObject>(256);
-        reg_.compReserve<SoundObject>(256);
+        reg_.compReserve<SoundObject>(64);
+        reg_.compReserve<Inventory>(net::MAX_PLAYERS);
+        reg_.compReserve<Weapon>(64);
+        reg_.compReserve<Attached>(16);
+        reg_.compReserve<Rotator>(16);
+        reg_.compReserve<Mover>(16);
+        reg_.compReserve<Emitter>(64);
         reg_.compReserve<NetworkSync>(256);
-        reg_.compReserve<Player>(8);
+        reg_.compReserve<Animator>(64);
+        reg_.compReserve<CharacterController>(net::MAX_PLAYERS);
+        reg_.compReserve<EntName>(16);
+        reg_.compReserve<Player>(net::MAX_PLAYERS);
 
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
