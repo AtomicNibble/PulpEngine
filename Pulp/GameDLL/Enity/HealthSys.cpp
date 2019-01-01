@@ -29,6 +29,10 @@ namespace entity
 
         auto& h = reg.get<Health>(msg.id);
 
+        if (h.hp <= 0) {
+            return;
+        }
+
         h.hp -= msg.damage;
 
         // cap it?
