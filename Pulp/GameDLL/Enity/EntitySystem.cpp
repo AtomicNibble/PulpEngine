@@ -250,6 +250,12 @@ namespace entity
         meshRendererSys_.update(frame, reg_);
 
         healthSys_.update(frame.timeInfo, reg_);
+
+
+        // do this before the next frame so that it's not simulated in physics.
+        // otherwise we can end up with transform updates for deleted ents.
+        // even tho we delete the actor the transform buffer has already been populated.
+        reg_.cleanupPendingDestroy();
     }
 
     void EnititySystem::createSnapShot(net::SnapShot& snap)

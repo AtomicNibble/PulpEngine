@@ -319,7 +319,8 @@ namespace ecs
         Registry(core::MemoryArenaBase* arena, Args&&... args) :
             pool_{arena, std::forward<Args>(args)...},
             entities_(arena),
-            freelist_(arena)
+            freelist_(arena),
+            pendingRemove_(arena)
         {
         }
 
@@ -413,6 +414,22 @@ namespace ecs
             freelist_.push_back(entity);
             entities_[entity].reset();
             (void)accumulator;
+        }
+
+        void markDestroy(entity_type entity)
+        {
+            X_ASSERT(isValid(entity), "Not valid entity")();
+            pendingRemove_.push_back(entity);
+        }
+
+        void cleanupPendingDestroy(void)
+        {
+            for (auto id : pendingRemove_)
+            {
+                destroy(id);
+            }
+
+            pendingRemove_.clear();
         }
 
         mask_type getComponentMask(entity_type entity) const
@@ -610,6 +627,7 @@ namespace ecs
     private:
         MaskArr entities_;
         EntityArr freelist_;
+        EntityArr pendingRemove_;
         pool_type pool_;
         destoryFuncArr destoryFuncs_;
     };
