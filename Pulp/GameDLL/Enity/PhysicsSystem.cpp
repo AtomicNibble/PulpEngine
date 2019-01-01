@@ -59,6 +59,7 @@ namespace entity
         for (int32_t i = 0; i < triggers.size(); i++) {
             auto& trigPair = triggers[i];
             X_UNUSED(trigPair);
+            X_ASSERT_NOT_IMPLEMENTED();
         }
     }
 
