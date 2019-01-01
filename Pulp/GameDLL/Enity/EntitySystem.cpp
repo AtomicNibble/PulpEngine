@@ -41,6 +41,7 @@ namespace entity
         ecsArena_(&ecsAllocator_, "ECSArena"),
         playerSys_(vars.player),
         cameraSys_(vars),
+        weaponSys_(vars),
         dtHealth_(arena),
         dtMesh_(arena),
         dtSoundObj_(arena),
@@ -100,6 +101,7 @@ namespace entity
         p3DWorld_ = X_ASSERT_NOT_NULL(p3DWorld);
         pModelManager_ = gEnv->p3DEngine->getModelManager();
         pEffectManager_ = gEnv->p3DEngine->getEffectManager();
+        auto* pAnimManager = gEnv->p3DEngine->getAnimManager();
 
         if (!pModelManager_ || !pEffectManager_) {
             return false;
@@ -125,7 +127,7 @@ namespace entity
             return false;
         }
 
-        if (!weaponSys_.init()) {
+        if (!weaponSys_.init(pAnimManager)) {
             return false;
         }
 

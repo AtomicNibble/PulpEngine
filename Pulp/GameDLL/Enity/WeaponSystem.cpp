@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "WeaponSystem.h"
-
 #include "Weapon\WeaponDef.h"
+
+#include "Vars/GameVars.h"
+
 #include <IAnimManager.h>
 #include <IFrameData.h>
 #include <I3DEngine.h>
@@ -20,15 +22,17 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    WeaponSystem::WeaponSystem() :
+    WeaponSystem::WeaponSystem(GameVars& vars) :
+        vars_(vars),
+        pReg_(nullptr),
         pAnimManager_(nullptr)
     {
-        pReg_ = nullptr;
+        
     }
 
-    bool WeaponSystem::init(void)
+    bool WeaponSystem::init(anim::IAnimManager* pAnimManager)
     {
-        pAnimManager_ = gEnv->p3DEngine->getAnimManager();
+        pAnimManager_ = pAnimManager;
 
         return true;
     }

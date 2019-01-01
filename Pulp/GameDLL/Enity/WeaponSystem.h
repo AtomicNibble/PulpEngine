@@ -7,14 +7,16 @@ X_NAMESPACE_DECLARE(core,
 
 X_NAMESPACE_BEGIN(game)
 
+class GameVars;
+
 namespace entity
 {
     class WeaponSystem
     {
     public:
-        WeaponSystem();
+        WeaponSystem(GameVars& vars);
 
-        bool init(void);
+        bool init(anim::IAnimManager* pAnimManager);
         void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
 
     private:
@@ -32,6 +34,8 @@ namespace entity
         void entKilled(EntityId ent, EntityId attackerId);
 
     private:
+        GameVars& vars_;
+
         EnitiyRegister* pReg_;
         anim::IAnimManager* pAnimManager_;
     };
