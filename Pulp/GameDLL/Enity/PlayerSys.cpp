@@ -41,9 +41,9 @@ namespace entity
     } // namespace
 
     PlayerSystem::PlayerSystem(PlayerVars& playerVars) :
-        vars_(playerVars)
+        vars_(playerVars),
+        pPhysScene_(nullptr)
     {
-        pPhysScene_ = nullptr;
     }
 
     bool PlayerSystem::init(physics::IScene* pPhysScene)
