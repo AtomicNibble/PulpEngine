@@ -97,10 +97,10 @@ public:
         {
         }
 
-        Sink(MemoryArenaBase* arena, size_t numListeners) :
+        Sink(MemoryArenaBase* arena, size_t reserve) :
             Sink(arena)
         {
-            listeners_.reserve(numListeners);
+            listeners_.reserve(reserve);
         }
 
         Sink(Sink&& oth) = default;
