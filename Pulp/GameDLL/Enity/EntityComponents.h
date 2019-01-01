@@ -32,7 +32,7 @@ namespace entity
     // Messages
     X_DECLARE_ENUM(MessageType)(
         Move,
-        Dunno
+        Damage
     );
 
     struct MsgMove
@@ -42,11 +42,12 @@ namespace entity
         EntityId id;
     };
 
-    struct MsgDunno
+    struct MsgDamage
     {
-        static constexpr MessageType::Enum MSG_ID = MessageType::Dunno;
+        static constexpr MessageType::Enum MSG_ID = MessageType::Damage;
 
         EntityId id;
+        int32_t damage;
     };
 
 
@@ -383,7 +384,7 @@ namespace entity
 
     using MessageQueue = ecs::MessageQueue<MessageType, 
         MsgMove, 
-        MsgDunno
+        MsgDamage
     >;
 
     using ECS = ECSBase<EnitiyRegister, MessageQueue>;
