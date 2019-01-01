@@ -779,15 +779,12 @@ fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
 
 void World3D::createEntityRefs(RenderEnt* pEnt)
 {
-    X_UNUSED(pEnt);
-
-    if (!pEnt->pModel->isLoaded()) {
-        return;
-    }
+    X_ASSERT(pEnt->pModel->isLoaded(), "Model is not loaded")();
 
     pEnt->localBounds = pEnt->pModel->bounds();
 
     if (pEnt->localBounds.isEmpty()) {
+        X_ERROR("Level", "Model has empty bounds, ignoring");
         return;
     }
 
