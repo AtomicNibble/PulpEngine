@@ -285,7 +285,7 @@ namespace entity
 
     void EnititySystem::applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap)
     {
-        // TODO: maybe gather up physics changes and do them in a batch.
+        // TODO: perf - maybe gather up physics changes and do them in a batch.
         physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
 
         for (size_t i = 0; i < snap.getNumObjects(); i++)
