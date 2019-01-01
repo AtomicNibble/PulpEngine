@@ -19,6 +19,7 @@ public:
     X_INLINE int32_t chatMsgLifeMS(void) const;
     X_INLINE int32_t drawGameUserDebug(void) const;
     X_INLINE int32_t drawSessionInfoDebug(void) const;
+    X_INLINE int32_t drawBulletRay(void) const;
 
     X_INLINE core::ICVar* getFovVar(void) const;
 
@@ -34,6 +35,7 @@ private:
     int32_t chatLifeMS_;
     int32_t drawGameUserDebug_;
     int32_t drawSessionInfoDebug_;
+    int32_t drawBulletRay_;
 
     core::ICVar* pFovVar_;
 };

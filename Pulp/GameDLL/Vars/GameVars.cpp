@@ -14,6 +14,7 @@ GameVars::GameVars()
     chatLifeMS_ = 8000;
     drawGameUserDebug_ = 0;
     drawSessionInfoDebug_ = 0;
+    drawBulletRay_ = 0;
 
     pFovVar_ = nullptr;
 }
@@ -39,6 +40,10 @@ void GameVars::registerVars(void)
 
     ADD_CVAR_REF("g_draw_session_info", drawSessionInfoDebug_, drawSessionInfoDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Draw some session debug info");
+
+    ADD_CVAR_REF("g_draw_bullet_ray", drawBulletRay_, drawBulletRay_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Draw bullet rays");
+
 
     pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI) - 1.f,
         core::VarFlag::SAVE_IF_CHANGED, "camera fov");

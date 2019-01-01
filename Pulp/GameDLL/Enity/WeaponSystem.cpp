@@ -288,9 +288,6 @@ namespace entity
         {
             float maxRange = static_cast<float>(wpn.pWeaponDef->maxDmgRange());
 
-
-            auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
-
             // where do i want to fire from?
             // the end of the gun?
             // or just my view.
@@ -329,9 +326,11 @@ namespace entity
 
                 X_LOG0("Weapon", "Hit %f (%f,%f, %f) dmg: %i", b.distance, b.position.x, b.position.y, b.position.z, dmg);
 
-                pPrim->drawLine(origin, b.position, Col_Red);
-                pPrim->drawAxis(b.position, Vec3f(15.f));
-
+                if (vars_.drawBulletRay()) {
+                    auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
+                    pPrim->drawLine(origin, b.position, Col_Red);
+                    pPrim->drawAxis(b.position, Vec3f(15.f));
+                }
 
                 // so i would like to apply forces to dynamic objects.
                 // would nice to be able to check if actor is dynamic. :/

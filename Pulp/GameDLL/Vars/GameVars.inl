@@ -31,6 +31,11 @@ X_INLINE int32_t GameVars::drawSessionInfoDebug(void) const
     return drawSessionInfoDebug_;
 }
 
+X_INLINE int32_t GameVars::drawBulletRay(void) const
+{
+    return drawBulletRay_;
+}
+
 X_INLINE core::ICVar* GameVars::getFovVar(void) const
 {
     return pFovVar_;
