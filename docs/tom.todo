@@ -10,7 +10,7 @@ Common:
   ☐ Have child arens be correctly removed from parent lists.
 
   Math:
-    ☐ Remove functions from math<T> that only really make sense for real types.
+    ✔ Remove functions from math<T> that only really make sense for real types. @done (19-01-01 18:45)
 
 Core:
 
