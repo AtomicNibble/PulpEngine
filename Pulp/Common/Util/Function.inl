@@ -20,7 +20,7 @@ template<class R, class... Args, size_t MaxSize>
 Function<R(Args...), MaxSize>::Function(const Function& other)
 {
     if (other) {
-        other.manager_(data_, other.data_, Operation::Clone);
+        other.manager_(&data_, &other.data_, Operation::Clone);
         invoker_ = other.invoker_;
         manager_ = other.manager_;
     }
