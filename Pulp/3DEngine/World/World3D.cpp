@@ -216,8 +216,6 @@ World3D::~World3D()
     {
         X_DELETE(pRenderEnt, arena_);
     }
-
-
 }
 
 void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>& bucket)
@@ -698,6 +696,7 @@ void World3D::freeRenderEnt(IRenderEnt* pEnt)
 {
     RenderEnt* pRenderEnt = static_cast<RenderEnt*>(pEnt);
 
+    // TODO: perf.
     renderEnts_.remove(pRenderEnt);
 
     X_DELETE(pRenderEnt, arena_);
