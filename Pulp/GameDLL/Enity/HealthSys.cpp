@@ -41,6 +41,13 @@ namespace entity
         }
 
         X_LOG0("Health", "Ent %" PRIi32 " took Dmg: %" PRIi32 " Ent health %" PRIi32, static_cast<int32_t>(msg.id), msg.damage, h.hp);
+
+        // just died?
+        if (h.hp <= 0) {
+            X_LOG0("Health", "Ent %" PRIi32 " died", static_cast<int32_t>(msg.id));
+
+            reg.markDestroy(msg.id);
+        }
     }
 
 } // namespace entity
