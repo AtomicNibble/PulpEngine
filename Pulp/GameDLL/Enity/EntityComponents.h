@@ -47,6 +47,7 @@ namespace entity
         static constexpr MessageType::Enum MSG_ID = MessageType::Damage;
 
         EntityId id;
+        EntityId attackerId;
         int32_t damage;
     };
 

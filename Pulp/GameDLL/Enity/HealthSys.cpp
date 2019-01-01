@@ -30,6 +30,13 @@ namespace entity
         auto& h = reg.get<Health>(msg.id);
 
         h.hp -= msg.damage;
+
+        // cap it?
+        if (h.hp < 999) {
+            h.hp = 999;
+        }
+
+        X_LOG0("Health", "Ent %" PRIi32 " took Dmg: %" PRIi32 " Ent health %" PRIi32, static_cast<int32_t>(msg.id), msg.damage, h.hp);
     }
 
 } // namespace entity
