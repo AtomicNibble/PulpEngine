@@ -19,7 +19,7 @@ class Function<R(Args...), MaxSize>
 
 
     using Invoker = R (*)(void*, Args&&...);
-    using Manager = void (*)(void*, void*, Operation);
+    using Manager = void (*)(void*, const void*, Operation);
     using Storage = typename std::aligned_storage<MaxSize - sizeof(Invoker) - sizeof(Manager), 8>::type;
     
     static_assert(MaxSize - (sizeof(Invoker) + sizeof(Manager)) > 0, "Size too small");
@@ -60,11 +60,11 @@ private:
     }
 
     template<typename F>
-    X_INLINE static void manage(void* dest, void* src, Operation op)
+    X_INLINE static void manage(void* dest, const void* src, Operation op)
     {
         switch (op) {
             case Operation::Clone:
-                new (dest) F(*static_cast<F*>(src));
+                new (dest) F(*static_cast<const F*>(src));
                 break;
             case Operation::Destroy:
                 static_cast<F*>(dest)->~F();
