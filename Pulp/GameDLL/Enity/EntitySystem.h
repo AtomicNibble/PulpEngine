@@ -13,6 +13,7 @@
 #include "WeaponSystem.h"
 #include "EmitterSys.h"
 #include "MeshRendererSys.h"
+#include "HealthSys.h"
 
 #include "DataTranslator.h"
 
@@ -144,6 +145,7 @@ namespace entity
         WeaponSystem weaponSys_;
         EmitterSys emitterSys_;
         MeshRendererSys meshRendererSys_;
+        HealthSystem healthSys_;
 
         EntityId endOfmapEnts_;
         EntityIdMapArr entIdMap_;

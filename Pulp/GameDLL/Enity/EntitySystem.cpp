@@ -137,6 +137,10 @@ namespace entity
             return false;
         }
 
+        if (!healthSys_.init(reg_)) {
+            return false;
+        }
+
         for (uint32_t i = 0; i < net::MAX_PLAYERS; i++) {
             auto id = reg_.create();
             if (id != i) {
@@ -242,6 +246,8 @@ namespace entity
         emitterSys_.update(frame, reg_);
 
         meshRendererSys_.update(frame, reg_);
+
+        healthSys_.update(frame.timeInfo, reg_);
     }
 
     void EnititySystem::createSnapShot(net::SnapShot& snap)
