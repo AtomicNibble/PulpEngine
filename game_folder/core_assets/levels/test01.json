@@ -150,6 +150,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 2,
+                "max": 10
             }
         },
         {
