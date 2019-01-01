@@ -67,7 +67,17 @@ namespace entity
         auto* pModelManager = gEnv->p3DEngine->getModelManager();
 
         core::ArrayGrowMultiply<physics::ActorHandle> actors(g_gameArena);
-        actors.reserve(128);
+        
+        {
+            size_t num = 0;
+
+            // we can just count how big the arrays are.
+            num += reg.view<MeshCollider>().size();
+            num += reg.view<DynamicObject>().size();
+
+            actors.reserve(num);
+        }
+
 
         {
             auto view = reg.view<TransForm, Mesh, MeshCollider>();
