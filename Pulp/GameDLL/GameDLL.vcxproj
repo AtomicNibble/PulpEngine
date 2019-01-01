@@ -399,6 +399,7 @@
   <ItemGroup>
     <ClInclude Include="ECS\ComponentPool.h" />
     <ClInclude Include="ECS\EntityId.h" />
+    <ClInclude Include="ECS\MessageQueue.h" />
     <ClInclude Include="ECS\Registry.h" />
     <ClInclude Include="Enity\AnimatedSys.h" />
     <ClInclude Include="Enity\CameraSys.h" />
