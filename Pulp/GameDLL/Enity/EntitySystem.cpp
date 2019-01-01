@@ -403,7 +403,6 @@ namespace entity
             if (reg_.has<CharacterController>(mask))
             {
                 auto& con = reg_.get<CharacterController>(entityId);
-
                 con.pController->setFootPosition(Vec3d(trans.pos));
             }
         }
@@ -430,7 +429,6 @@ namespace entity
             return;
         }
 
-        // physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
         comp.actor = physics::INVALID_HANLDE;
     }
 
