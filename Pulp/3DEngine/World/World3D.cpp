@@ -1702,7 +1702,8 @@ void World3D::drawRenderEnts()
         Matrix44f world = Matrix44f::createTranslation(pRendEnt->trans.pos);
 
         if (pRendEnt->trans.quat.getAngle() != 0.f) {
-            world.rotate(pRendEnt->trans.quat.getAxis(), pRendEnt->trans.quat.getAngle());
+            auto& q = pRendEnt->trans.quat;
+            world = world * q.toMatrix44();
         }
 
         model::RenderModel* pModel = static_cast<model::RenderModel*>(pRendEnt->pModel);
