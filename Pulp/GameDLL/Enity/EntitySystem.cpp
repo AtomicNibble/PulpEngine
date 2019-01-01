@@ -60,74 +60,6 @@ namespace entity
         entIdMap_.fill(INVALID_ENT_ID);
     }
 
-    void EnititySystem::destroy(Mesh& comp)
-    {
-        pModelManager_->releaseModel(comp.pModel);
-    }
-
-    void EnititySystem::destroy(MeshRenderer& comp)
-    {
-        p3DWorld_->freeRenderEnt(comp.pRenderEnt);
-    }
-
-    void EnititySystem::destroy(MeshCollider& comp)
-    {
-        // is this for static collision only?
-        X_ERROR("Ent", "A ent with static collision was removed, collision will remain.");
-
-        if (comp.actor == physics::INVALID_HANLDE) {
-            return;
-        }
-
-        // physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-        comp.actor = physics::INVALID_HANLDE;
-    }
-
-    void EnititySystem::destroy(DynamicObject& comp)
-    {
-        if (comp.actor == physics::INVALID_HANLDE) {
-            return;
-        }
-
-        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-
-        pPhysScene_->removeActor(comp.actor);
-        pPhysics_->releaseActor(comp.actor);
-
-        comp.actor = physics::INVALID_HANLDE;
-    }
-
-    void EnititySystem::destroy(Weapon& comp)
-    {
-        weaponDefs_.releaseWeaponDef(comp.pWeaponDef);
-    }
-
-    void EnititySystem::destroy(Animator& comp)
-    {
-        if (comp.pAnimator) {
-            X_DELETE(comp.pAnimator, g_gameArena);
-        }
-    }
-
-    void EnititySystem::destroy(CharacterController& comp)
-    {
-        X_ASSERT_NOT_NULL(comp.pController);
-
-        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-        pPhysScene_->releaseCharacterController(comp.pController);
-    }
-
-    void EnititySystem::destroy(Player& comp)
-    {
-        if (comp.armsEnt != entity::INVALID_ID) {
-            destroyEnt(comp.armsEnt);
-        }
-
-        if (comp.weaponEnt != entity::INVALID_ID) {
-            destroyEnt(comp.weaponEnt);
-        }
-    }
-
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
         static_assert(decltype(reg_)::NUM_COMP == 18, "More components? add a sensible reserve call");
@@ -470,6 +402,78 @@ namespace entity
             }
         }
     }
+
+    // ----------------------------------------------------------
+
+    void EnititySystem::destroy(Mesh& comp)
+    {
+        pModelManager_->releaseModel(comp.pModel);
+    }
+
+    void EnititySystem::destroy(MeshRenderer& comp)
+    {
+        p3DWorld_->freeRenderEnt(comp.pRenderEnt);
+    }
+
+    void EnititySystem::destroy(MeshCollider& comp)
+    {
+        // is this for static collision only?
+        X_ERROR("Ent", "A ent with static collision was removed, collision will remain.");
+
+        if (comp.actor == physics::INVALID_HANLDE) {
+            return;
+        }
+
+        // physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+        comp.actor = physics::INVALID_HANLDE;
+    }
+
+    void EnititySystem::destroy(DynamicObject& comp)
+    {
+        if (comp.actor == physics::INVALID_HANLDE) {
+            return;
+        }
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+        pPhysScene_->removeActor(comp.actor);
+        pPhysics_->releaseActor(comp.actor);
+
+        comp.actor = physics::INVALID_HANLDE;
+    }
+
+    void EnititySystem::destroy(Weapon& comp)
+    {
+        weaponDefs_.releaseWeaponDef(comp.pWeaponDef);
+    }
+
+    void EnititySystem::destroy(Animator& comp)
+    {
+        if (comp.pAnimator) {
+            X_DELETE(comp.pAnimator, g_gameArena);
+        }
+    }
+
+    void EnititySystem::destroy(CharacterController& comp)
+    {
+        X_ASSERT_NOT_NULL(comp.pController);
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+        pPhysScene_->releaseCharacterController(comp.pController);
+    }
+
+    void EnititySystem::destroy(Player& comp)
+    {
+        if (comp.armsEnt != entity::INVALID_ID) {
+            destroyEnt(comp.armsEnt);
+        }
+
+        if (comp.weaponEnt != entity::INVALID_ID) {
+            destroyEnt(comp.weaponEnt);
+        }
+    }
+
+    // ----------------------------------------------------------
 
     EntityId EnititySystem::createEnt(void)
     {
