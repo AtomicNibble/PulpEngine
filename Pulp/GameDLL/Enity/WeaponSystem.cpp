@@ -133,7 +133,7 @@ namespace entity
                 case weapon::State::Fire:
                     if (curTime >= wpn.stateEnd) {
                         if (wpn.attack) {
-                            beginAttack(curTime, wpn, animator, frame, reg, pPhysScene);
+                            beginAttack(curTime, wpn, animator, frame, pPhysScene);
                         }
                         else {
                             beginIdle(curTime, wpn, animator);
@@ -187,7 +187,7 @@ namespace entity
                         beginReload(curTime, wpn, animator);
                     }
                     else if (wpn.attack) {
-                        beginAttack(curTime, wpn, animator, frame, reg, pPhysScene);
+                        beginAttack(curTime, wpn, animator, frame, pPhysScene);
                     }
 
                 } break;
@@ -239,7 +239,7 @@ namespace entity
     }
 
     void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator,
-        core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)
+        core::FrameData& frame, physics::IScene* pPhysScene)
     {
         // need to check ammo.
         if (wpn.ammoInClip == 0) {
@@ -339,7 +339,7 @@ namespace entity
                 // so basically need acess to flags.
 
                 auto meta = gEnv->pPhysics->getActorMeta(b.actor);
-                if (meta.type == physics::ActorType::Dynamic )
+                if (meta.type == physics::ActorType::Dynamic)
                 {
                     if (!meta.flags.IsSet(physics::ActorFlags::Kinematic))
                     {
@@ -354,21 +354,11 @@ namespace entity
                     {
                         // Assume valid?
                         EntityId id = static_cast<EntityId>(reinterpret_cast<uintptr_t>(meta.pUserData) & 0xFFFF);
-
-                        if (reg.has<Player>(id))
-                        {
-                            X_LOG0("Weapon", "You hit a player! index: %" PRIi32, id);
-                        }
-
-                        if (reg.has<Health>(id))
-                        {
-                            auto& health = reg.get<Health>(id);
-                            health.hp--;
-                            if (health.hp < 0) {
-                                health.hp = health.max;
-                            }
-
-                            X_LOG0("Weapon", "Ent health %" PRIi32, health.hp);
+                        
+                        // can only do dmg to stuff that has HP.
+                        // should we do this check for clients tho?
+                        if (pReg_->has<Health>(id)) {
+                            doDamage(id, wpn, b.distance);
                         }
                     }
                 }
@@ -376,6 +366,79 @@ namespace entity
         }
 
         trainsitionToState(wpn, animator, anim, weapon::State::Fire, curTime, fireTime);
+    }
+
+    void WeaponSystem::doDamage(EntityId ent, Weapon& wpn, float distance)
+    {
+        auto* pWeaponDef = wpn.pWeaponDef;
+
+        float minRange = static_cast<float>(pWeaponDef->minDmgRange());
+        float maxRange = static_cast<float>(pWeaponDef->maxDmgRange());
+        
+        if (distance > maxRange) {
+            X_WARNING("Weapon", "Skipping damage distance is greater than weapons max range.");
+            return;
+        }
+
+        int32_t dmg = 0;
+
+        // TODO: should dmg drop linearly between min and max?
+        if (distance <= minRange) {
+            dmg = pWeaponDef->maxDmg();
+        }
+        else {
+            dmg = pWeaponDef->minDmg();
+        }
+
+        // Only the server and single player should actually do damage.
+        bool isHost = true;
+
+        if (isHost)
+        {
+            // do the dmg.
+            serverDoDamage(ent, wpn, dmg);
+        }
+        else
+        {
+            // tell the server about it.
+            X_LOG0("Weapon", "Client hit Dmg: %" PRIi32, dmg);
+        }
+    }
+
+    void WeaponSystem::serverDoDamage(EntityId ent, Weapon& wpn, int32_t dmg)
+    {
+        if (dmg <= 0) {
+            return;
+        }
+
+        auto& health = pReg_->get<Health>(ent);
+
+        health.hp -= dmg;
+
+        X_LOG0("Weapon", "Dmg: %" PRIi32 " Ent health %" PRIi32, dmg, health.hp);
+
+        if (health.hp <= 0)
+        {
+            // R.I.P
+            if (health.hp < -1) {
+                health.hp = -1;
+            }
+
+            // TODO: support a weapon without a owner aka a turret?
+            auto attacker = wpn.ownerEnt;
+
+            entKilled(ent, attacker);
+        }
+    }
+
+    void WeaponSystem::entKilled(EntityId ent, EntityId attackerId)
+    {
+        // well shit.
+        // other compnents might want to know this happend?
+        // i don't know.
+        // some event?
+        X_UNUSED(ent, attackerId);
+
     }
 
     bool WeaponSystem::beginReload(core::TimeVal curTime, Weapon& wpn, Animator& animator)
