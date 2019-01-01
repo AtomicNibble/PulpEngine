@@ -246,7 +246,7 @@ namespace entity
             auto& curTrans = reg.get<TransForm>(playerId); // copy
             if (trans != curTrans)
             {
-                trans = curTrans;
+                curTrans = trans;
                 reg.dispatch<MsgMove>(playerId);
             }
         }
