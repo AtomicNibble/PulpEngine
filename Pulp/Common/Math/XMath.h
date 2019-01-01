@@ -18,110 +18,9 @@ struct math
 {
     static constexpr T EPSILON = T(0);
 
-
     X_INLINE static constexpr T square(T x)
     {
         return x * x;
-    }
-
-    X_INLINE static T acos(T x)
-    {
-        return ::acos(double(x));
-    }
-    X_INLINE static T asin(T x)
-    {
-        return ::asin(double(x));
-    }
-    X_INLINE static T atan(T x)
-    {
-        return ::atan(double(x));
-    }
-    X_INLINE static T atan2(T y, T x)
-    {
-        return ::atan2(double(y), double(x));
-    }
-    X_INLINE static T cos(T x)
-    {
-        return ::cos(double(x));
-    }
-    X_INLINE static T sin(T x)
-    {
-        return ::sin(double(x));
-    }
-    X_INLINE static T tan(T x)
-    {
-        return ::tan(double(x));
-    }
-    X_INLINE static T cosh(T x)
-    {
-        return ::cosh(double(x));
-    }
-    X_INLINE static T sinh(T x)
-    {
-        return ::sinh(double(x));
-    }
-    X_INLINE static T tanh(T x)
-    {
-        return ::tanh(double(x));
-    }
-    X_INLINE static T exp(T x)
-    {
-        return ::exp(double(x));
-    }
-    X_INLINE static T log(T x)
-    {
-        return ::log(double(x));
-    }
-    X_INLINE static T log10(T x)
-    {
-        return ::log10(double(x));
-    }
-    X_INLINE static T modf(T x, T* iptr)
-    {
-        double ival;
-        T rval(::modf(double(x), &ival));
-        *iptr = ival;
-        return rval;
-    }
-    X_INLINE static T pow(T x, T y)
-    {
-        return ::pow(double(x), double(y));
-    }
-    X_INLINE static T sqrt(T x)
-    {
-        return ::sqrt(double(x));
-    }
-    X_INLINE static T cbrt(T x)
-    {
-        return (x > 0) ? (::pow(x, 1.0 / 3.0)) : (-::pow(-x, 1.0 / 3.0));
-    }
-    X_INLINE static T ceil(T x)
-    {
-        return ::ceil(double(x));
-    }
-    X_INLINE static T abs(T x)
-    {
-        return ::fabs(double(x));
-    }
-    X_INLINE static T floor(T x)
-    {
-        return ::floor(double(x));
-    }
-    X_INLINE static T round(T x)
-    {
-        return ::floor(double(x) + T(0.5));
-    }
-    X_INLINE static T fmod(T x, T y)
-    {
-        return ::fmod(double(x), double(y));
-    }
-    X_INLINE static T hypot(T x, T y)
-    {
-        return ::hypot(double(x), double(y));
-    }
-    X_INLINE static T signum(T x)
-    {
-        return (x > 0.0) ? 1.0 : ((x < 0.0) ? -1.0 : 0.0);
     }
     X_INLINE static constexpr T min(T x, T y)
     {
@@ -134,23 +33,6 @@ struct math
     X_INLINE static constexpr T clamp(T x, T min = 0, T max = 1)
     {
         return (x < min) ? min : ((x > max) ? max : x);
-    }
-
-    X_INLINE static void sincos(T x, T& s, T& c)
-    {
-        s = ::sin(double(x));
-        c = ::cos(double(x));
-    }
-
-    X_INLINE static int32 isneg(T x)
-    {
-        union
-        {
-            float32_t f;
-            uint32 i;
-        } u;
-        u.f = (float32_t)x;
-        return (int32_t)(u.i >> 31);
     }
 };
 
@@ -474,11 +356,11 @@ struct math<int>
 {
     X_INLINE static int pow(int x, int y)
     {
-        return ::pow(double(x), double(y));
+        return std::pow(double(x), double(y));
     }
     X_INLINE static int sqrt(int x)
     {
-        return ::sqrt(double(x));
+        return std::sqrt(x);
     }
     X_INLINE static int cbrt(int x)
     {
@@ -486,22 +368,21 @@ struct math<int>
     }
     X_INLINE static int ceil(int x)
     {
-        return ::ceil(double(x));
+        return std::ceil(x);
     }
     X_INLINE static int abs(int x)
     {
-        return ::fabs(double(x));
+        return std::abs(x);
     }
     X_INLINE static int floor(int x)
     {
-        return ::floor(double(x));
+        return std::floor(x);
     }
     X_INLINE static constexpr int clamp(int x, int min = 0, int max = 1)
     {
         return (x < min) ? min : ((x > max) ? max : x);
     }
-
-    
+  
     X_INLINE static int32 isneg(int32 x)
     {
         return (int32)((uint32)x >> 31);
@@ -517,6 +398,24 @@ struct math<int>
     X_INLINE static constexpr int max(int x, int y)
     {
         return (x > y) ? x : y;
+    }
+};
+
+template<>
+struct math<int16_t>
+{
+    X_INLINE static int16_t abs(int16_t x)
+    {
+        return std::abs(x);
+    }
+};
+
+template<>
+struct math<int64_t>
+{
+    X_INLINE static int64_t abs(int64_t x)
+    {
+        return std::abs(x);
     }
 };
 
