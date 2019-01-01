@@ -17,7 +17,7 @@ namespace entity
         WeaponSystem(GameVars& vars);
 
         bool init(anim::IAnimManager* pAnimManager);
-        void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene);
+        void update(core::FrameData& frame, ECS& reg, physics::IScene* pPhysScene);
 
     private:
         void beginRaise(core::TimeVal curTime, Weapon& wpn, Animator& animator);
@@ -31,12 +31,11 @@ namespace entity
 
         void doDamage(EntityId ent, Weapon& wpn, float distance);
         void serverDoDamage(EntityId ent, Weapon& wpn, int32_t dmg);
-        void entKilled(EntityId ent, EntityId attackerId);
 
     private:
         GameVars& vars_;
 
-        EnitiyRegister* pReg_;
+        ECS* pReg_;
         anim::IAnimManager* pAnimManager_;
     };
 

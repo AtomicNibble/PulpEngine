@@ -37,7 +37,7 @@ namespace entity
         return true;
     }
 
-    void WeaponSystem::update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene)
+    void WeaponSystem::update(core::FrameData& frame, ECS& reg, physics::IScene* pPhysScene)
     {
         pReg_ = &reg;
 
@@ -298,6 +298,7 @@ namespace entity
             auto& trans = pReg_->get<TransForm>(wpn.ownerEnt);
 
             // TODO: this is wrong, currently using local player view
+            // which will be wrong on the host.
             auto forward = -frame.view.viewMatrix.getRow(2);
 
             Vec3f origin = trans.pos + Vec3f(0.f, 0.f, 50.f);
@@ -414,34 +415,10 @@ namespace entity
             return;
         }
 
-        auto& health = pReg_->get<Health>(ent);
+        // TODO: support a weapon without a owner aka a turret?
+        auto attacker = wpn.ownerEnt;
 
-        health.hp -= dmg;
-
-        X_LOG0("Weapon", "Dmg: %" PRIi32 " Ent health %" PRIi32, dmg, health.hp);
-
-        if (health.hp <= 0)
-        {
-            // R.I.P
-            if (health.hp < -1) {
-                health.hp = -1;
-            }
-
-            // TODO: support a weapon without a owner aka a turret?
-            auto attacker = wpn.ownerEnt;
-
-            entKilled(ent, attacker);
-        }
-    }
-
-    void WeaponSystem::entKilled(EntityId ent, EntityId attackerId)
-    {
-        // well shit.
-        // other compnents might want to know this happend?
-        // i don't know.
-        // some event?
-        X_UNUSED(ent, attackerId);
-
+        pReg_->dispatch<MsgDamage>(ent, attacker, dmg);
     }
 
     bool WeaponSystem::beginReload(core::TimeVal curTime, Weapon& wpn, Animator& animator)
