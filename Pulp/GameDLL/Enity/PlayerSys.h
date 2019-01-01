@@ -1,7 +1,5 @@
 #pragma once
 
-#include "Vars\PlayerVars.h"
-
 X_NAMESPACE_DECLARE(core,
     struct FrameTimeData)
 
@@ -12,6 +10,8 @@ X_NAMESPACE_DECLARE(model,
     struct IModelManager)
 
 X_NAMESPACE_BEGIN(game)
+
+class PlayerVars;
 
 namespace weapon
 {

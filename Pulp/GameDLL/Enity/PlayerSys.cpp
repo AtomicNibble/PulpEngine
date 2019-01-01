@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "PlayerSys.h"
+#include "Vars\PlayerVars.h"
+#include "Weapon\WeaponManager.h"
 
 #include <IFrameData.h>
 #include <ITimer.h>
@@ -10,7 +12,6 @@
 
 #include <Hashing\Fnva1Hash.h>
 
-#include "Weapon\WeaponManager.h"
 
 using namespace core::Hash::Literals;
 using namespace sound::Literals;
