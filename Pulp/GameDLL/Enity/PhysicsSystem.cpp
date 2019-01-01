@@ -3,15 +3,14 @@
 
 #include <IFrameData.h>
 #include <I3DEngine.h>
-#include <IWorld3D.h>
 #include <IModelManager.h>
-#include <IEffect.h>
 
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    PhysicsSystem::PhysicsSystem()
+    PhysicsSystem::PhysicsSystem() :
+        pPhysScene_(nullptr)
     {
     }
 
@@ -19,24 +18,26 @@ namespace entity
     {
     }
 
-    bool PhysicsSystem::init(void)
+    bool PhysicsSystem::init(ECS& reg, physics::IScene* pPhysScene)
     {
+        reg.registerHandler<PhysicsSystem, MsgMove>(this);
+
+        pPhysScene_ = pPhysScene;
         return true;
     }
 
-    void PhysicsSystem::update(core::FrameData& frame, EnitiyRegister& reg,
-        physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
+    void PhysicsSystem::update(core::FrameData& frame, ECS& reg)
     {
-        X_UNUSED(frame, reg, pPhysScene);
+        X_UNUSED(frame, reg);
 
         core::span<const physics::ActiveTransform> transforms;
         core::span<const physics::TriggerPair> triggers;
 
         {
-            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Read);
+            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Read);
             
-            transforms = pPhysScene->getActiveTransforms();
-            triggers = pPhysScene->getTriggerPairs();
+            transforms = pPhysScene_->getActiveTransforms();
+            triggers = pPhysScene_->getTriggerPairs();
         }
 
         for (int32_t i = 0; i < transforms.size(); i++) {
@@ -49,20 +50,10 @@ namespace entity
             EntityId ent = static_cast<EntityId>(union_cast<uintptr_t>(trans.userData) & 0xFFFF);
 
             auto& entTrans = reg.get<TransForm>(ent);
-
             entTrans.pos = trans.actor2World.pos;
             entTrans.quat = trans.actor2World.quat;
 
-            if (reg.has<MeshRenderer>(ent)) {
-                auto& rendEnt = reg.get<MeshRenderer>(ent);
-
-                p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, entTrans);
-            }
-            if (reg.has<Emitter>(ent)) {
-                auto& emt = reg.get<Emitter>(ent);
-
-                emt.pEmitter->setTrans(entTrans, emt.offset);
-            }
+            reg.dispatch<MsgMove>(ent);
         }
 
         for (int32_t i = 0; i < triggers.size(); i++) {
@@ -71,7 +62,7 @@ namespace entity
         }
     }
 
-    bool PhysicsSystem::createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
+    bool PhysicsSystem::createColliders(ECS& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene)
     {
         auto* pModelManager = gEnv->p3DEngine->getModelManager();
 
@@ -131,12 +122,28 @@ namespace entity
 
         if (actors.isNotEmpty()) {
             physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
-
             pPhysScene->addActorsToScene(actors.data(), actors.size());
         }
 
-
         return true;
+    }
+
+    void PhysicsSystem::onMsg(ECS& reg, const MsgMove& msg)
+    {
+        if (!reg.has<DynamicObject>(msg.id)) {
+            return;
+        }
+
+        // Kinematic actors have there positions set.
+        auto& col = reg.get<DynamicObject>(msg.id);
+        if (!col.kinematic) {
+            return;
+        }
+
+        auto& trans = reg.get<TransForm>(msg.id);
+
+        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+        pPhysScene_->setKinematicTarget(col.actor, trans);
     }
 
 } // namespace entity

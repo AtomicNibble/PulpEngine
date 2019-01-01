@@ -19,13 +19,15 @@ namespace entity
         PhysicsSystem();
         ~PhysicsSystem();
 
-        bool init(void);
+        bool init(ECS& reg, physics::IScene* pPhysScene);
 
-        void update(core::FrameData& frame, EnitiyRegister& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
+        void update(core::FrameData& frame, ECS& reg);
+        bool createColliders(ECS& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
 
-        bool createColliders(EnitiyRegister& reg, physics::IPhysics* pPhysics, physics::IScene* pPhysScene);
+        void onMsg(ECS& reg, const MsgMove& msg);
 
     private:
+        physics::IScene* pPhysScene_;
     };
 
 } // namespace entity

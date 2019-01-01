@@ -404,8 +404,10 @@
     <ClInclude Include="Enity\AnimatedSys.h" />
     <ClInclude Include="Enity\CameraSys.h" />
     <ClInclude Include="Enity\DataTranslator.h" />
+    <ClInclude Include="Enity\EmitterSys.h" />
     <ClInclude Include="Enity\EntitySystem.h" />
     <ClInclude Include="Enity\EntityComponents.h" />
+    <ClInclude Include="Enity\MeshRendererSys.h" />
     <ClInclude Include="Enity\PhysicsSystem.h" />
     <ClInclude Include="Enity\PlayerSys.h" />
     <ClInclude Include="Enity\SoundSys.h" />
@@ -426,8 +428,10 @@
     <ClCompile Include="Enity\AnimatedSys.cpp" />
     <ClCompile Include="Enity\CameraSys.cpp" />
     <ClCompile Include="Enity\ComponentMeta.cpp" />
+    <ClCompile Include="Enity\EmitterSys.cpp" />
     <ClCompile Include="Enity\EntitySystem.cpp" />
     <ClCompile Include="Enity\EntityComponents.cpp" />
+    <ClCompile Include="Enity\MeshRendererSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
     <ClCompile Include="Enity\PlayerSys.cpp" />
     <ClCompile Include="Enity\SoundSys.cpp" />

@@ -53,26 +53,29 @@ namespace entity
         return true;
     }
 
-    void PlayerSystem::update(core::FrameTimeData& timeInfo, EnitiyRegister& reg, game::weapon::WeaponDefManager& weaponDefs,
-        model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld)
+    void PlayerSystem::update(core::FrameTimeData& timeInfo, EnitiyRegister& reg)
     {
-        X_UNUSED(timeInfo, weaponDefs, pModelManager, p3DWorld);
+        X_UNUSED(timeInfo);
         
         auto view = reg.view<Player, TransForm>();
         for (auto playerId : view) {
 
-            auto& trans = reg.get<TransForm>(playerId);
-            auto& player = reg.get<Player>(playerId);
+            //auto& trans = reg.get<TransForm>(playerId);
+            //auto& player = reg.get<Player>(playerId);
 
-            // should there just be a system that checks all MeshRenderer see if changed.
-            // or somthing event driven.
-            if (reg.has<MeshRenderer>(playerId))
-            {
-                auto& rend = reg.get<MeshRenderer>(playerId);
-                p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
-            }
+            //// should there just be a system that checks all MeshRenderer see if changed.
+            //// or somthing event driven.
+            //if (reg.has<MeshRenderer>(playerId))
+            //{
+            //    auto& rend = reg.get<MeshRenderer>(playerId);
+            //    p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
+            //}
 
             if (vars_.drawPosInfo_) {
+
+                auto& trans = reg.get<TransForm>(playerId);
+                auto& player = reg.get<Player>(playerId);
+
                 auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
                 core::StackString256 dbgTxt;
@@ -107,6 +110,8 @@ namespace entity
         player.oldUserCmd = player.userCmd;
         player.userCmd = userCmd;
 
+        // re-palying a old command?
+//        bool userCmdReplay = userCmd.flags.IsSet(net::UserCmdFlag::REPLAY);
         bool crouched = state.IsSet(Player::State::Crouch);
         bool enterCrouch = userCmd.buttons.IsSet(net::Button::CROUCH) && !crouched;
         bool leaveCrouch = !userCmd.buttons.IsSet(net::Button::CROUCH) && crouched;

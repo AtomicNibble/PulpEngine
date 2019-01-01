@@ -22,35 +22,10 @@ namespace entity
         return true;
     }
 
-    void AnimatedSystem::update(core::FrameTimeData& time, EnitiyRegister& reg,
-        engine::IWorld3D* p3DWorld, physics::IScene* pPhysScene)
+    void AnimatedSystem::update(core::FrameTimeData& time, ECS& reg,
+        engine::IWorld3D* p3DWorld)
     {
         X_UNUSED(time, reg, p3DWorld);
-
-#if 0
-		static bool once = true;
-
-		if(once)
-		{
-			once = false;
-
-			auto* panimMan = gEnv->p3DEngine->getAnimManager();
-			// auto* pAnim = panimMan->loadAnim("test/crow_dance_01");
-		//	auto* pAnim = panimMan->loadAnim("test/duck_dance_01");
-			auto* pAnim = panimMan->loadAnim("test/weap/mg42/fire");
-			panimMan->waitForLoad(pAnim);
-
-			auto view = reg.view<Animator, Mesh, TransForm>();
-			for (auto entity : view)
-			{
-				auto& an = reg.get<Animator>(entity);
-				X_ASSERT_NOT_NULL(an.pAnimator);
-
-				an.pAnimator->playAnim(pAnim, time.ellapsed[core::Timer::GAME], 25000_ms, 100_ms);
-				
-			}
-		}
-#endif
 
         Matrix33f rotation;
         rotation.rotate(Vec3f::xAxis(), ::toRadians(90.f));
@@ -63,32 +38,10 @@ namespace entity
         const auto delta = time.deltas[core::Timer::GAME];
         const float deltaSec = delta.GetSeconds();
 
-        auto updateVis = [&](EntityId entity, const Transformf& trans) {
-            if (reg.has<MeshRenderer>(entity)) {
-                auto& rendEnt = reg.get<MeshRenderer>(entity);
-                p3DWorld->updateRenderEnt(rendEnt.pRenderEnt, trans);
-            }
-            if (reg.has<Emitter>(entity)) {
-                auto& emt = reg.get<Emitter>(entity);
-
-                emt.pEmitter->setTrans(trans, emt.offset);
-            }
-            if (reg.has<DynamicObject>(entity)) {
-                auto& col = reg.get<DynamicObject>(entity);
-
-                if (col.kinematic)
-                {
-                    physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
-
-                    pPhysScene->setKinematicTarget(col.actor, trans);
-                }
-            }
-        };
-
         {
             auto view = reg.view<Attached, TransForm>();
             for (auto entity : view) {
-                auto& trans = reg.get<TransForm>(entity);
+                auto newTrans = reg.get<TransForm>(entity); // copy
                 auto& att = reg.get<Attached>(entity);
 
                 if (!reg.isValid(att.parentEnt)) {
@@ -100,8 +53,8 @@ namespace entity
                 // get the parent position.
                 const auto& parTrans = reg.get<TransForm>(parent);
 
-                trans = parTrans;
-                trans.pos += att.offset;
+                newTrans = parTrans;
+                newTrans.pos += att.offset;
 
                 if (att.parentBone != model::INVALID_BONE_HANDLE) {
                     if (!reg.has<Animator>(parent)) {
@@ -113,12 +66,17 @@ namespace entity
                     Matrix33f boneAxis;
 
                     if (an.pAnimator->getBoneTransform(att.parentBone, ellapsedTime, bonePos, boneAxis)) {
-                        trans.pos = parTrans.pos + bonePos * parTrans.quat;
-                        trans.quat = Quatf(boneAxis) * trans.quat;
+                        newTrans.pos = parTrans.pos + bonePos * parTrans.quat;
+                        newTrans.quat = Quatf(boneAxis) * newTrans.quat;
                     }
                 }
 
-                updateVis(entity, trans);
+                auto& trans = reg.get<TransForm>(entity);
+                if(newTrans != trans)
+                {
+                    trans = newTrans;
+                    reg.dispatch<MsgMove>(entity);
+                }
             }
         }
 
@@ -130,7 +88,7 @@ namespace entity
 
                 trans.quat *= Quatf(rot.axis, ::toRadians(rot.speed));
 
-                updateVis(entity, trans);
+                reg.dispatch<MsgMove>(entity);
             }
         }
 
@@ -152,7 +110,7 @@ namespace entity
                 float fract = math<float>::abs(mov.fract);
                 trans.pos = mov.start.lerp(fract, mov.end);
 
-                updateVis(entity, trans);
+                reg.dispatch<MsgMove>(entity);
             }
         }
 

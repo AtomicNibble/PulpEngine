@@ -1,25 +1,27 @@
 #pragma once
 
 X_NAMESPACE_DECLARE(core,
-                    struct FrameTimeData;)
+    struct FrameTimeData)
+
+X_NAMESPACE_DECLARE(engine,
+    struct IWorld3D)
 
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    class SoundSystem
+    class MeshRendererSys
     {
     public:
-        SoundSystem();
+        MeshRendererSys();
 
-        bool init(ECS& reg);
+        bool init(ECS& reg, engine::IWorld3D* p3DWorld);
         void update(core::FrameData& frame, ECS& reg);
 
         void onMsg(ECS& reg, const MsgMove& msg);
 
-
     private:
-        sound::ISound* pSound_;
+        engine::IWorld3D* p3DWorld_;
     };
 
 } // namespace entity

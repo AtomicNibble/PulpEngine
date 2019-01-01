@@ -29,7 +29,28 @@ namespace weapon
 
 namespace entity
 {
+    // Messages
+    X_DECLARE_ENUM(MessageType)(
+        Move,
+        Dunno
+    );
 
+    struct MsgMove
+    {
+        static constexpr MessageType::Enum MSG_ID = MessageType::Move;
+
+        EntityId id;
+    };
+
+    struct MsgDunno
+    {
+        static constexpr MessageType::Enum MSG_ID = MessageType::Dunno;
+
+        EntityId id;
+    };
+
+
+    // Comps
     struct NetworkSync
     {
     };
@@ -310,7 +331,7 @@ namespace entity
         Vec3f offset;
     };
 
-    using EnitiyRegister = ecs::StandardRegistry<EntityId,
+    using EnitiyRegister = ecs::StandardRegistry<   EntityId,
         TransForm,
         Health,
 
@@ -336,6 +357,37 @@ namespace entity
         Player>;
 
     constexpr EnitiyRegister::entity_type INVALID_ENT_ID = EnitiyRegister::INVALID_ID;
+
+
+    template<typename Registry, typename MessageQueue>
+    class ECSBase : public Registry, public MessageQueue
+    {
+    public:
+
+        ECSBase(core::MemoryArenaBase* arena) :
+            Registry(arena),
+            MessageQueue(arena)
+        {}
+
+
+        template<typename S, typename Msg>
+        void registerHandler(S* pSystem)
+        {
+            auto& sink = MessageQueue::msgSinks_[Msg::MSG_ID];
+
+            sink.emplace_back([=](const MessageQueue::Message& msg) {
+                pSystem->onMsg(*this, message_cast<Msg>(msg));
+            });
+        }
+    };
+
+    using MessageQueue = ecs::MessageQueue<MessageType, 
+        MsgMove, 
+        MsgDunno
+    >;
+
+    using ECS = ECSBase<EnitiyRegister, MessageQueue>;
+
 
 } // namespace entity
 

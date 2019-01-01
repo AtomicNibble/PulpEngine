@@ -129,6 +129,12 @@
     <ClInclude Include="ECS\EntityId.h">
       <Filter>Header Files\ECS</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\EmitterSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Enity\MeshRendererSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -190,6 +196,12 @@
     </ClCompile>
     <ClCompile Include="Enity\EntityComponents.cpp">
       <Filter>Source Files\Entity</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\EmitterSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\MeshRendererSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

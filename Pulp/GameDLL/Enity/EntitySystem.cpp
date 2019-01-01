@@ -181,11 +181,11 @@ namespace entity
             return false;
         }
 
-        if (!soundSys_.init()) {
+        if (!soundSys_.init(reg_)) {
             return false;
         }
 
-        if (!physSys_.init()) {
+        if (!physSys_.init(reg_, pPhysScene_)) {
             return false;
         }
 
@@ -194,6 +194,14 @@ namespace entity
         }
 
         if (!weaponSys_.init()) {
+            return false;
+        }
+
+        if (!emitterSys_.init(reg_)) {
+            return false;
+        }
+
+        if (!meshRendererSys_.init(reg_, p3DWorld)) {
             return false;
         }
 
@@ -278,31 +286,30 @@ namespace entity
     {
         X_UNUSED(userCmdMan);
 
+        reg_.update(frame.timeInfo.deltas[core::Timer::GAME]);
+
+        if (reg_.numPendingEvents() > 1024) {
+            X_WARNING("Ent", "Large number of pending events: %" PRIuS, reg_.numPendingEvents());
+        }
+
         cameraSys_.setActiveEnt(localPlayerId);
-
-        // we always want to run use cmd for the locally controlled player
-        // if we are host we need to check if we have some sexy user cmds and run them.
-
-
-       // auto& userCmd = userCmdMan.getUserCmdForPlayer(localPlayerId);
-       // auto unread = userCmdMan.getNumUnreadFrames(localPlayerId);
-       //
-       // X_LOG0_EVERY_N(60, "Goat", "Unread %i", unread);
-       //
-       // playerSys_.runUserCmdForPlayer(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_, userCmd, localPlayerId);
 
         // update the cameras.
         cameraSys_.update(frame, reg_, pPhysScene_);
 
-        playerSys_.update(frame.timeInfo, reg_, weaponDefs_, pModelManager_, p3DWorld_);
+        playerSys_.update(frame.timeInfo, reg_);
 
         soundSys_.update(frame, reg_);
 
-        animatedSys_.update(frame.timeInfo, reg_, p3DWorld_, pPhysScene_);
+        animatedSys_.update(frame.timeInfo, reg_, p3DWorld_);
 
-        physSys_.update(frame, reg_, pPhysScene_, p3DWorld_);
+        physSys_.update(frame, reg_);
 
         weaponSys_.update(frame, reg_, pPhysScene_);
+
+        emitterSys_.update(frame, reg_);
+
+        meshRendererSys_.update(frame, reg_);
     }
 
     void EnititySystem::createSnapShot(net::SnapShot& snap)

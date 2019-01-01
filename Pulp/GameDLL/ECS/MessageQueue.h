@@ -1,6 +1,8 @@
 #pragma once
 
-#include "ECS/EntityId.h"
+#include "EntityId.h"
+
+#include <Time/TimeVal.h>
 #include <Util/Function.h>
 #include <Containers/PriorityQueue.h>
 
@@ -15,6 +17,7 @@ namespace ecs
     {
         static constexpr size_t NUM_MSG = sizeof...(MessageTypes);
 
+    public:
         using MessageTypeEnum = typename MessageType::Enum;
         using TimeType = core::TimeVal;
 
@@ -31,9 +34,10 @@ namespace ecs
             char payload[PAYLOAD_SIZE];
         };
 
+    private:
         static_assert(sizeof(Message) == Message::MSG_SIZE, "Incorrect size");
 
-        using MessageFunc = core::Function<void(const Message&), 24>;
+        using MessageFunc = core::Function<void(const Message&), 32>;
 
         // how do i make these sluts.
         using MessageSink = core::Array<MessageFunc>;
@@ -62,6 +66,11 @@ namespace ecs
             return queue_.isNotEmpty();
         }
 
+        size_t numPendingEvents(void) const
+        {
+            return queue_.size();
+        }
+
         void update(TimeType dt)
         {
             if (dt == TimeType(0ll)) {
@@ -77,14 +86,9 @@ namespace ecs
             }
         }
 
-        template<typename S, typename Msg>
-        void registerHandler(S* pSystem)
+        void register_callback(MessageTypeEnum msg, MessageFunc&& handler)
         {
-            auto& sink = msgSinks_[Msg::MSG_ID];
-
-            sink.emplace_back([=](const Message& msg) {
-                pSystem->onMsg(message_cast<Msg>(msg));
-            });
+            msgSinks_[msg].emplace_back(handler);
         }
 
         void dispatch(const Message& m)
@@ -116,7 +120,7 @@ namespace ecs
             return queue(m);
         }
 
-    private:
+    protected:
         template<typename Payload, typename Message>
         static const Payload& message_cast(const Message& m)
         {
@@ -125,7 +129,7 @@ namespace ecs
             return *reinterpret_cast<const Payload*>(&(m.payload));
         }
 
-    private:
+    protected:
         TimeType time_;
         MessageSinkArr msgSinks_;
         MessagePriorityQueue queue_;

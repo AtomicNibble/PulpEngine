@@ -11,6 +11,8 @@
 #include "PhysicsSystem.h"
 #include "AnimatedSys.h"
 #include "WeaponSystem.h"
+#include "EmitterSys.h"
+#include "MeshRendererSys.h"
 
 #include "DataTranslator.h"
 
@@ -89,6 +91,7 @@ namespace entity
         void destroy(CharacterController& comp);
         void destroy(Player& comp);
 
+
         EntityId createEnt(void);
         void destroyEnt(EntityId id);
         void removePlayer(EntityId id);
@@ -121,7 +124,7 @@ namespace entity
         ECSArena::AllocationPolicy ecsAllocator_;
         ECSArena ecsArena_;
 
-        EnitiyRegister reg_;
+        ECS reg_;
         GameVars& vars_;
         game::weapon::WeaponDefManager& weaponDefs_;
         Multiplayer* pMultiplayer_;
@@ -139,6 +142,8 @@ namespace entity
         PhysicsSystem physSys_;
         AnimatedSystem animatedSys_;
         WeaponSystem weaponSys_;
+        EmitterSys emitterSys_;
+        MeshRendererSys meshRendererSys_;
 
         EntityId endOfmapEnts_;
         EntityIdMapArr entIdMap_;

@@ -5,6 +5,8 @@
 
 #include <Util/Function.h>
 
+#include "MessageQueue.h"
+
 X_NAMESPACE_BEGIN(game)
 
 namespace ecs
