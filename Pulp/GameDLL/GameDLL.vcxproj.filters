@@ -123,6 +123,9 @@
     <ClInclude Include="Enity\EntityComponents.h">
       <Filter>Header Files\Enity</Filter>
     </ClInclude>
+    <ClInclude Include="ECS\EntityId.h">
+      <Filter>Header Files\ECS</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">

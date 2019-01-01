@@ -41,6 +41,7 @@ X_LINK_ENGINE_LIB("AnimLib");
 #include <IPrimativeContext.h>
 #include <IFont.h>
 
+#include "ECS\EntityId.h"
 #include "ECS\ComponentPool.h"
 #include "ECS\Registry.h"
 

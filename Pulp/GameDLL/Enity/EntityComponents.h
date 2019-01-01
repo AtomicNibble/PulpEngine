@@ -29,7 +29,6 @@ namespace weapon
 
 namespace entity
 {
-    typedef uint16_t EntityId;
 
     struct NetworkSync
     {
