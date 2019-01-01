@@ -207,6 +207,7 @@ public:
     IRenderLight* addRenderLight(RenderLightDesc& ent) X_FINAL;
 
     fx::IEmitter* addEmmiter(EmitterDesc& emit) X_FINAL;
+    void freeEmitter(fx::IEmitter* pEmitter) X_FINAL;
 
     // util
     X_INLINE size_t numAreas(void) const;

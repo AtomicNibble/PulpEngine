@@ -54,6 +54,7 @@ struct IWorld3D
     virtual IRenderLight* addRenderLight(RenderLightDesc& ent) X_ABSTRACT;
 
     virtual fx::IEmitter* addEmmiter(EmitterDesc& emit) X_ABSTRACT;
+    virtual void freeEmitter(fx::IEmitter* pEmitter) X_ABSTRACT;
 };
 
 X_NAMESPACE_END

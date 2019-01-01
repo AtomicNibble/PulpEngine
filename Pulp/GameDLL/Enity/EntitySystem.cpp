@@ -91,6 +91,7 @@ namespace entity
         reg_.setDetroyCallback<EnititySystem, MeshCollider>(this);
         reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
         reg_.setDetroyCallback<EnititySystem, Weapon>(this);
+        reg_.setDetroyCallback<EnititySystem, Emitter>(this);
         reg_.setDetroyCallback<EnititySystem, Animator>(this);
         reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
         reg_.setDetroyCallback<EnititySystem, Player>(this);
@@ -457,6 +458,15 @@ namespace entity
     void EnititySystem::destroy(Weapon& comp)
     {
         weaponDefs_.releaseWeaponDef(comp.pWeaponDef);
+    }
+
+    void EnititySystem::destroy(Emitter& comp)
+    {
+        if (!comp.pEmitter) {
+            return;
+        }
+
+        p3DWorld_->freeEmitter(comp.pEmitter);
     }
 
     void EnititySystem::destroy(Animator& comp)

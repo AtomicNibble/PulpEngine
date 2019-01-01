@@ -276,6 +276,11 @@ namespace entity
 
     struct Emitter
     {
+        Emitter() :
+            pEmitter(nullptr)
+        {
+        }
+
         core::string effect;
         Vec3f offset;
 

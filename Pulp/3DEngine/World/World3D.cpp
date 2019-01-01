@@ -776,6 +776,17 @@ fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
     return pEmitter;
 }
 
+void World3D::freeEmitter(fx::IEmitter* pIEmitter)
+{
+    auto* pEmitter = static_cast<fx::Emitter*>(pIEmitter);
+
+    // TODO: perf
+    emitters_.remove(pEmitter);
+
+    gEngEnv.pEffectMan_->freeEmmiter(pEmitter);
+}
+
+
 void World3D::createEntityRefs(RenderEnt* pEnt)
 {
     X_ASSERT(pEnt->pModel->isLoaded(), "Model is not loaded")();

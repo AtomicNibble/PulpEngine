@@ -88,6 +88,7 @@ namespace entity
         void destroy(MeshCollider& comp);
         void destroy(DynamicObject& comp);
         void destroy(Weapon& comp);
+        void destroy(Emitter& comp);
         void destroy(Animator& comp);
         void destroy(CharacterController& comp);
         void destroy(Player& comp);
