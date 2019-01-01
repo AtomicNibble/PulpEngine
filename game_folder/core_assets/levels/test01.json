@@ -152,8 +152,8 @@
             "NetworkSync" : {
             },
             "Health" : {
-                "hp": 2,
-                "max": 10
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -166,6 +166,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
       {
@@ -178,6 +182,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -190,6 +198,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -202,6 +214,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -214,6 +230,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -226,6 +246,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
@@ -238,6 +262,10 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
+            },
+            "Health" : {
+                "hp": 1000,
+                "max": 1000
             }
         },
         {
