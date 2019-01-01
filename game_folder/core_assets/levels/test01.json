@@ -38,7 +38,7 @@
         },
         {
             "name": "Pickle3",
-            "origin" : {"x": 280, "y": -128, "z": 8},
+            "origin" : {"x": 200, "y": -560, "z": 8},
 
             "Mesh" : {
                 "name" : "test/prop/mannequin"
