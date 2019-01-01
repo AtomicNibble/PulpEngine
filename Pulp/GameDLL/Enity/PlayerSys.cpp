@@ -44,32 +44,21 @@ namespace entity
         vars_(playerVars),
         pPhysScene_(nullptr)
     {
+
     }
 
     bool PlayerSystem::init(physics::IScene* pPhysScene)
     {
         pPhysScene_ = pPhysScene;
-
         return true;
     }
 
-    void PlayerSystem::update(core::FrameTimeData& timeInfo, EnitiyRegister& reg)
+    void PlayerSystem::update(core::FrameTimeData& timeInfo, ECS& reg)
     {
         X_UNUSED(timeInfo);
         
         auto view = reg.view<Player, TransForm>();
         for (auto playerId : view) {
-
-            //auto& trans = reg.get<TransForm>(playerId);
-            //auto& player = reg.get<Player>(playerId);
-
-            //// should there just be a system that checks all MeshRenderer see if changed.
-            //// or somthing event driven.
-            //if (reg.has<MeshRenderer>(playerId))
-            //{
-            //    auto& rend = reg.get<MeshRenderer>(playerId);
-            //    p3DWorld->updateRenderEnt(rend.pRenderEnt, trans);
-            //}
 
             if (vars_.drawPosInfo_) {
 
@@ -94,7 +83,7 @@ namespace entity
 
     }
 
-    void PlayerSystem::runUserCmdForPlayer(core::TimeVal dt, EnitiyRegister& reg,
+    void PlayerSystem::runUserCmdForPlayer(core::TimeVal dt, ECS& reg,
         weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager,
         engine::IWorld3D* p3DWorld, const net::UserCmd& userCmd, EntityId playerId)
     {
@@ -103,7 +92,7 @@ namespace entity
 
         X_UNUSED(p3DWorld);
 
-        auto& trans = reg.get<TransForm>(playerId);
+        auto trans = reg.get<TransForm>(playerId); // copy
         auto& player = reg.get<Player>(playerId);
         auto& state = player.state;
 
@@ -251,6 +240,16 @@ namespace entity
         updateEye(player);
         // calculate first person view.
         calculateFirstPersonView(trans, player);
+
+        // update trans?
+        {
+            auto& curTrans = reg.get<TransForm>(playerId); // copy
+            if (trans != curTrans)
+            {
+                trans = curTrans;
+                reg.dispatch<MsgMove>(playerId);
+            }
+        }
 
         if(reg.has<MeshRenderer>(playerId))
         {
@@ -400,7 +399,6 @@ namespace entity
         // TODO: use `tag_view` in arms?
         if (player.armsEnt != entity::INVALID_ENT_ID) {
             auto& armsTrans = reg.get<TransForm>(player.armsEnt);
-            auto& armsRendMesh = reg.get<MeshRenderer>(player.armsEnt);
 
             const Vec3f& viewOrigin = player.firstPersonViewOrigin;
             Matrix33f viewAxis = player.firstPersonViewAxis;
@@ -410,10 +408,13 @@ namespace entity
             const Vec3f gunPos = vars_.gunOffset_;
             Vec3f origin = viewOrigin + (viewAxis * gunPos);
 
-            armsTrans.quat = Quatf(viewAxis);
-            armsTrans.pos = origin;
-
-            p3DWorld->updateRenderEnt(armsRendMesh.pRenderEnt, armsTrans);
+            const Quatf viewAxisQ(viewAxis);
+            if (armsTrans.pos != origin || armsTrans.quat != viewAxisQ)
+            {
+                armsTrans.quat = viewAxisQ;
+                armsTrans.pos = origin;
+                reg.dispatch<MsgMove>(player.armsEnt);
+            }
         }
     }
 
