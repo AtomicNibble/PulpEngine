@@ -51,9 +51,9 @@ void DrawVars::registerVars(void)
     ADD_CVAR_REF("r_draw_light_debug", drawLightDebug_, 0, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Draws light debug");
 
-    ADD_CVAR_REF("r_draw_model_bounds", drawModelBounds_, 0, 0, 4,
+    ADD_CVAR_REF("r_draw_model_bounds", drawModelBounds_, 0, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
-        "Draws bounds around models. 1=visible-AABB 2=visible=Sphere 3=all-AABB 4=all-Sphere");
+        "Draws bounds around models.");
 
     ADD_CVAR_REF("r_draw_model_bones", drawModelBones_, 0, 0, 1,
         core::VarFlag::SYSTEM | core::VarFlag::CHEAT | core::VarFlag::SAVE_IF_CHANGED,
