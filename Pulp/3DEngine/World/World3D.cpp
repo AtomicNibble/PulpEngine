@@ -672,8 +672,6 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 
     auto* pModel = static_cast<model::XModel*>(entDesc.pModel);
 
-    pModel->waitForLoad(gEngEnv.pModelMan_);
-
     auto* pRenderEnt = X_NEW(RenderEnt, arena_, "RenderEnt")(arena_);
     pRenderEnt->index = safe_static_cast<int32_t>(renderEnts_.size());
     pRenderEnt->lastModifiedFrameNum = 0;
@@ -683,11 +681,13 @@ IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
 
     if (pModel->isAnimated()) {
         //		pRenderEnt->bones.resize(pModel->numBones());
-
         //	pModel->assingDefaultPose(pRenderEnt->bones.data(), pRenderEnt->bones.size());
     }
 
     renderEnts_.append(pRenderEnt);
+
+    // load.
+    pModel->waitForLoad(gEngEnv.pModelMan_);
 
     createEntityRefs(pRenderEnt);
 
