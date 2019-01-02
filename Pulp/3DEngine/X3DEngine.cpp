@@ -319,6 +319,11 @@ bool X3DEngine::asyncInitFinalize(void)
     return allOk;
 }
 
+void X3DEngine::clearPersistent(void)
+{
+    clearPersistent_ = true;
+}
+
 void X3DEngine::update(core::FrameData& frame)
 {
     X_PROFILE_BEGIN("3DUpdate", core::profiler::SubSys::ENGINE3D);

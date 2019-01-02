@@ -114,7 +114,7 @@ Engine:
 
   ☐ Support single threaded command list generation for better debug.
   ☐ Support unsorted command lists.
- ☐ Clear persistent prim on level exit?
+ ✔ Clear persistent prim on level exit? @done (19-01-02 18:22)
 
 
   GUI:

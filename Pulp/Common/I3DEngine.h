@@ -47,6 +47,7 @@ struct I3DEngine : public core::IEngineSysBase
 
     // finish any async init tasks for all fonts.
     virtual bool asyncInitFinalize(void) X_ABSTRACT;
+    virtual void clearPersistent(void) X_ABSTRACT;
 
     virtual void update(core::FrameData& frame) X_ABSTRACT;
     virtual void onFrameBegin(core::FrameData& frame) X_ABSTRACT;

@@ -883,6 +883,8 @@ void XGame::clearWorld(void)
         world_.reset();
     }
 
+    gEnv->p3DEngine->clearPersistent();
+
     userNetMap_.reset();
 
     for (auto& uCmd : lastUserCmdRun_) {

@@ -56,6 +56,7 @@ public:
     void release(void) X_FINAL;
 
     bool asyncInitFinalize(void) X_FINAL;
+    void clearPersistent(void) X_FINAL;
 
     void update(core::FrameData& frame) X_FINAL;
     void onFrameBegin(core::FrameData& frame) X_FINAL;
