@@ -317,17 +317,7 @@ namespace entity
             {
                 auto b = hit.block;
 
-                float minRange = static_cast<float>(wpn.pWeaponDef->minDmgRange());
-                int32_t dmg = 0;
-
-                if (b.distance <= minRange) {
-                    dmg = wpn.pWeaponDef->maxDmg();
-                }
-                else {
-                    dmg = wpn.pWeaponDef->minDmg();
-                }
-
-                X_LOG0("Weapon", "Hit %f (%f,%f, %f) dmg: %i", b.distance, b.position.x, b.position.y, b.position.z, dmg);
+                X_LOG0("Weapon", "Hit %f (%f,%f, %f) dmg: %i", b.distance, b.position.x, b.position.y, b.position.z);
 
                 if (vars_.drawBulletRay()) {
                     auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
