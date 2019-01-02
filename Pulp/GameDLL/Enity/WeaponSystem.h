@@ -16,14 +16,14 @@ namespace entity
     public:
         WeaponSystem(GameVars& vars);
 
-        bool init(anim::IAnimManager* pAnimManager);
-        void update(core::FrameData& frame, ECS& reg, physics::IScene* pPhysScene);
+        bool init(ECS& reg, physics::IScene* pPhysScene, anim::IAnimManager* pAnimManager);
+        void update(core::FrameData& frame, ECS& reg);
 
     private:
         void beginRaise(core::TimeVal curTime, Weapon& wpn, Animator& animator);
         void beginLower(core::TimeVal curTime, Weapon& wpn, Animator& animator);
         void beginIdle(core::TimeVal curTime, Weapon& wpn, Animator& animator);
-        void beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, core::FrameData& frame, physics::IScene* pPhysScene);
+        void beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, core::FrameData& frame);
         bool beginReload(core::TimeVal curTime, Weapon& wpn, Animator& animator);
 
         void trainsitionToState(Weapon& wpn, Animator& animator, weapon::AnimSlot::Enum anim, weapon::State::Enum newState,
@@ -36,6 +36,8 @@ namespace entity
         GameVars& vars_;
 
         ECS* pReg_;
+
+        physics::IScene* pPhysScene_;
         anim::IAnimManager* pAnimManager_;
     };
 

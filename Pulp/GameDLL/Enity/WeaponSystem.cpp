@@ -25,22 +25,22 @@ namespace entity
     WeaponSystem::WeaponSystem(GameVars& vars) :
         vars_(vars),
         pReg_(nullptr),
+        pPhysScene_(nullptr),
         pAnimManager_(nullptr)
     {
         
     }
 
-    bool WeaponSystem::init(anim::IAnimManager* pAnimManager)
+    bool WeaponSystem::init(ECS& reg, physics::IScene* pPhysScene, anim::IAnimManager* pAnimManager)
     {
+        pReg_ = &reg;
+        pPhysScene_ = pPhysScene;
         pAnimManager_ = pAnimManager;
-
         return true;
     }
 
-    void WeaponSystem::update(core::FrameData& frame, ECS& reg, physics::IScene* pPhysScene)
+    void WeaponSystem::update(core::FrameData& frame, ECS& reg)
     {
-        pReg_ = &reg;
-
         auto curTime = frame.timeInfo.ellapsed[core::Timer::GAME];
 
         auto view = reg.view<Weapon>();
@@ -137,7 +137,7 @@ namespace entity
                 case weapon::State::Fire:
                     if (curTime >= wpn.stateEnd) {
                         if (wpn.attack) {
-                            beginAttack(curTime, wpn, animator, frame, pPhysScene);
+                            beginAttack(curTime, wpn, animator, frame);
                         }
                         else {
                             beginIdle(curTime, wpn, animator);
@@ -191,7 +191,7 @@ namespace entity
                         beginReload(curTime, wpn, animator);
                     }
                     else if (wpn.attack) {
-                        beginAttack(curTime, wpn, animator, frame, pPhysScene);
+                        beginAttack(curTime, wpn, animator, frame);
                     }
 
                 } break;
@@ -242,8 +242,7 @@ namespace entity
         trainsitionToState(wpn, animator, weapon::AnimSlot::Idle, weapon::State::Idle, curTime, 0_ms);
     }
 
-    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator,
-        core::FrameData& frame, physics::IScene* pPhysScene)
+    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, core::FrameData& frame)
     {
         // need to check ammo.
         if (wpn.ammoInClip == 0) {
@@ -306,10 +305,10 @@ namespace entity
             float distance = maxRange;
 
             physics::RaycastBuffer hit;
-            physics::ScopedLock lock(pPhysScene, physics::LockAccess::Write);
+            physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
 
             // TODO: support dynamic without hitting players own collion
-            if (pPhysScene->raycast(
+            if (pPhysScene_->raycast(
                     origin + (uintDir * 30.f),
                     uintDir,
                     distance,
@@ -351,7 +350,7 @@ namespace entity
                         dir.normalize();
                         dir *= 9999000.f; // TODO: de fuck
 
-                        pPhysScene->addForce(b.actor, dir);
+                        pPhysScene_->addForce(b.actor, dir);
                     }
 
                     if (meta.pUserData)

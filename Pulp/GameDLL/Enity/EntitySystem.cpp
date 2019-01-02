@@ -128,7 +128,7 @@ namespace entity
             return false;
         }
 
-        if (!weaponSys_.init(pAnimManager)) {
+        if (!weaponSys_.init(reg_, pPhysScene, pAnimManager)) {
             return false;
         }
 
@@ -244,7 +244,7 @@ namespace entity
 
         physSys_.update(frame, reg_);
 
-        weaponSys_.update(frame, reg_, pPhysScene_);
+        weaponSys_.update(frame, reg_);
 
         emitterSys_.update(frame, reg_);
 
