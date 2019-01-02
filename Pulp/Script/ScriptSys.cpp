@@ -62,7 +62,8 @@ XScriptSys::XScriptSys(core::MemoryArenaBase* arena) :
 
 XScriptSys::~XScriptSys()
 {
-   
+    arena_->removeChildArena(&poolArena_);
+
 }
 
 void XScriptSys::registerVars(void)

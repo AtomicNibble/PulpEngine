@@ -405,6 +405,7 @@ XConsole::XConsole() :
 
 XConsole::~XConsole()
 {
+    g_coreArena->removeChildArena(&varArena_);
 }
 
 void XConsole::registerVars(void)

@@ -264,6 +264,10 @@ XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaB
 XPeer::~XPeer()
 {
     shutdown(0_tv, OrderingChannel::Default, PacketPriority::High);
+
+    arena_->removeChildArena(&poolArena_);
+    arena_->removeChildArena(&pool2Arena_);
+    arena_->removeChildArena(&blockArena_);
 }
 
 // TODO: make this handle been called multiple times better.

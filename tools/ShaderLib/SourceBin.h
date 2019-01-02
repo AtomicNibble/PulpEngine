@@ -45,6 +45,7 @@ namespace shader
 
     public:
         SHADERLIB_EXPORT SourceBin(core::MemoryArenaBase* arena);
+        SHADERLIB_EXPORT ~SourceBin();
 
         SHADERLIB_EXPORT void free(void);
 

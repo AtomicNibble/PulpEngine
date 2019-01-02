@@ -59,6 +59,8 @@ VariableStateManager::VariableStateManager() :
 
 VariableStateManager::~VariableStateManager()
 {
+    g_3dEngineArena->removeChildArena(&statePool_);
+
 }
 
 void VariableStateManager::shutDown(void)

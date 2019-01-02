@@ -6,6 +6,7 @@ class AllocatorHooks
 {
 public:
     AllocatorHooks();
+    ~AllocatorHooks();
 };
 
 X_NAMESPACE_END

@@ -140,6 +140,7 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
     saveDir_(nullptr),
     searchPaths_(nullptr),
     loadPacks_(false),
+    arena_(arena),
     // ..
     filePoolHeap_(
         bitUtil::RoundUpToMultiple<size_t>(
@@ -190,6 +191,10 @@ xFileSys::xFileSys(core::MemoryArenaBase* arena) :
 
 xFileSys::~xFileSys()
 {
+    arena_->removeChildArena(&filePoolArena_);
+    arena_->removeChildArena(&asyncOpPoolArena_);
+    arena_->removeChildArena(&virtualDirArena_);
+    arena_->removeChildArena(&memFileArena_);
 }
 
 void xFileSys::registerVars(void)

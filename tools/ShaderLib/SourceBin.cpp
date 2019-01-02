@@ -118,6 +118,12 @@ namespace shader
         pCrc32_ = gEnv->pCore->GetCrc32();
     }
 
+    SourceBin::~SourceBin()
+    {
+        arena_->removeChildArena(&sourcePoolArena_);
+
+    }
+
     void SourceBin::free(void)
     {
         core::CriticalSection::ScopedLock lock(cs_);

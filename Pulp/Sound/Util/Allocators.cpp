@@ -227,4 +227,14 @@ AllocatorHooks::AllocatorHooks()
 #endif
 }
 
+AllocatorHooks::~AllocatorHooks()
+{
+    // link to arena tree.
+    g_SoundArena->removeChildArena(&AK::akArena);
+
+#if X_ENABLE_MEMORY_ARENA_STATISTICS
+    g_SoundArena->removeChildArena(&AK::virtualAllocArena);
+#endif
+}
+
 X_NAMESPACE_END

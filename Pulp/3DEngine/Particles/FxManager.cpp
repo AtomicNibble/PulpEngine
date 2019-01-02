@@ -38,6 +38,7 @@ namespace fx
 
     EffectManager::~EffectManager()
     {
+        arena_->removeChildArena(&poolArena_);
     }
 
     void EffectManager::registerCmds(void)

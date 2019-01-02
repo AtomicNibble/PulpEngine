@@ -309,6 +309,8 @@ TechDefStateManager::TechDefStateManager(core::MemoryArenaBase* arena) :
 
 TechDefStateManager::~TechDefStateManager()
 {
+    arena_->removeChildArena(&techsPoolArena_);
+
     shutDown();
 }
 

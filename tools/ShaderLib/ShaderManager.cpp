@@ -62,6 +62,7 @@ namespace shader
 
     XShaderManager::~XShaderManager()
     {
+        arena_->removeChildArena(&permArena_);
     }
 
     void XShaderManager::registerVars(void)

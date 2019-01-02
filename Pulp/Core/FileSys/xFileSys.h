@@ -383,6 +383,8 @@ private:
 
     XFileSysVars vars_;
 
+    core::MemoryArenaBase* arena_;
+
     core::HeapArea filePoolHeap_;
     core::PoolAllocator filePoolAllocator_;
     FilePoolArena filePoolArena_;
