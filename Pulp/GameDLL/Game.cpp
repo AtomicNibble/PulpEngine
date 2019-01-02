@@ -513,24 +513,27 @@ void XGame::applySnapShot(const net::SnapShot& snap)
 
     // get the games times the server has run
     lastUserCmdRunTime_ = snap.getUserCmdTimes();
-    // this must be done before assign snapshot.
-    userNetMap_.lobbyUserGuids = snap.getPlayerGuids();
-    
-    world_->applySnapShot(userNetMap_, snap);
 
-    // Have the client work out it's localPlayerIdx.
-    if (userNetMap_.localPlayerIdx < 0)
+    // logic in following scope must be done before applySnapShot is called.
     {
-        for (size_t i=0; i< userNetMap_.lobbyUserGuids.size(); i++)
+        userNetMap_.lobbyUserGuids = snap.getPlayerGuids();
+
+        // Have the client work out it's localPlayerIdx.
+        if (userNetMap_.localPlayerIdx < 0)
         {
-            if (userNetMap_.myGuid == userNetMap_.lobbyUserGuids[i])
+            for (size_t i = 0; i < userNetMap_.lobbyUserGuids.size(); i++)
             {
-                userNetMap_.localPlayerIdx = safe_static_cast<int32_t>(i);
-                X_LOG0("Game", "Local player idx: %" PRIi32, userNetMap_.localPlayerIdx);
-                break;
+                if (userNetMap_.myGuid == userNetMap_.lobbyUserGuids[i])
+                {
+                    userNetMap_.localPlayerIdx = safe_static_cast<int32_t>(i);
+                    X_LOG0("Game", "Local player idx: %" PRIi32, userNetMap_.localPlayerIdx);
+                    break;
+                }
             }
         }
     }
+
+    world_->applySnapShot(userNetMap_, snap);
 
     auto localLastRunTimeMS = lastUserCmdRunTime_[userNetMap_.localPlayerIdx];
 
