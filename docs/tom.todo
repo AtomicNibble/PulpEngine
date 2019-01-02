@@ -53,8 +53,8 @@ Game:
 
  ✔ Fix sound not working when reload level. @done (18-10-27 12:28)
 
- ☐ Make the bullet ray staring position correct.
-   ☐ Clients are using host direction lol.
+ ✔ Make the bullet ray staring position correct. @done (19-01-02 21:51)
+   ✔ Clients are using host direction lol. @done (19-01-02 21:51)
  ✔ Support toggle: crouch, run, zoom @done (18-11-12 20:14)
  ☐ Make it so each player has a calculated render view.
      - Or should we just make the render view whem we need it?
@@ -77,7 +77,8 @@ Game:
    ☐ Add some snapshot debugging?
        Stuff like seeing positions of ents at each snapshot.
    ☐ Make it so when we leave a game peer connections are closed before state change
-       so we don't get and packets coming from the old game host when in idle.
+       so we don't get any packets coming from the old game host when in idle.
+       But we still need to halde such a case.
    ☐ Should we always bind a port? or online for online stuff.
        Well we only need it for hosting, since peers are connecting to server.
        So ideally if only playing single player no need to bind a port.
