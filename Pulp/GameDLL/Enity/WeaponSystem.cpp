@@ -71,11 +71,12 @@ namespace entity
             // update the emitter positions.
             {
                 // gimmy the bone positions!
-                Vec3f bonePos;
-                Matrix33f boneAxis;
-
                 auto flashBone = animator.pAnimator->getBoneHandle("tag_flash");
                 if (flashBone != model::INVALID_BONE_HANDLE) {
+
+                    Vec3f bonePos;
+                    Matrix33f boneAxis;
+
                     if (animator.pAnimator->getBoneTransform(flashBone, curTime, bonePos, boneAxis)) {
                         //		boneAxis.rotate(Vec3f::xAxis(), ::toRadians(180.f));
 
@@ -137,7 +138,7 @@ namespace entity
                 case weapon::State::Fire:
                     if (curTime >= wpn.stateEnd) {
                         if (wpn.attack) {
-                            beginAttack(curTime, wpn, animator, frame);
+                            beginAttack(curTime, wpn, animator, wpnTrans, frame);
                         }
                         else {
                             beginIdle(curTime, wpn, animator);
@@ -191,7 +192,7 @@ namespace entity
                         beginReload(curTime, wpn, animator);
                     }
                     else if (wpn.attack) {
-                        beginAttack(curTime, wpn, animator, frame);
+                        beginAttack(curTime, wpn, animator, wpnTrans, frame);
                     }
 
                 } break;
@@ -242,8 +243,10 @@ namespace entity
         trainsitionToState(wpn, animator, weapon::AnimSlot::Idle, weapon::State::Idle, curTime, 0_ms);
     }
 
-    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, core::FrameData& frame)
+    void WeaponSystem::beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, TransForm& wpnTrans, core::FrameData& frame)
     {
+        X_UNUSED(frame);
+
         // need to check ammo.
         if (wpn.ammoInClip == 0) {
             X_LOG0("Weapon", "Clip empty");
@@ -294,15 +297,11 @@ namespace entity
             // where do i want to fire from?
             // the end of the gun?
             // or just my view.
-            auto& trans = pReg_->get<TransForm>(wpn.ownerEnt);
-
-            // TODO: this is wrong, currently using local player view
-            // which will be wrong on the host.
-            auto forward = -frame.view.viewMatrix.getRow(2);
-
-            Vec3f origin = trans.pos + Vec3f(0.f, 0.f, 50.f);
-            Vec3f uintDir = Vec3f(forward.xyz()).normalize();
+            Vec3f origin = wpnTrans.pos;
+            Vec3f uintDir = (wpnTrans.quat * Vec3f::xAxis());
             float distance = maxRange;
+
+            // TODO: use a bone for ray origin?
 
             physics::RaycastBuffer hit;
             physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);

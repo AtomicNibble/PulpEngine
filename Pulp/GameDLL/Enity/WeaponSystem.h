@@ -23,7 +23,7 @@ namespace entity
         void beginRaise(core::TimeVal curTime, Weapon& wpn, Animator& animator);
         void beginLower(core::TimeVal curTime, Weapon& wpn, Animator& animator);
         void beginIdle(core::TimeVal curTime, Weapon& wpn, Animator& animator);
-        void beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, core::FrameData& frame);
+        void beginAttack(core::TimeVal curTime, Weapon& wpn, Animator& animator, TransForm& wpnTrans, core::FrameData& frame);
         bool beginReload(core::TimeVal curTime, Weapon& wpn, Animator& animator);
 
         void trainsitionToState(Weapon& wpn, Animator& animator, weapon::AnimSlot::Enum anim, weapon::State::Enum newState,
