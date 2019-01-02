@@ -25,7 +25,9 @@ namespace entity
     public:
         PlayerSystem(PlayerVars& playerVars);
 
-        bool init(physics::IScene* pPhysScene);
+        bool init(ECS& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
+
+        void onMsg(ECS& reg, const MsgMove& msg);
 
         void update(core::FrameTimeData& timeInfo, ECS& reg);
 
@@ -42,6 +44,8 @@ namespace entity
         PlayerVars& vars_;
 
         physics::IScene* pPhysScene_;
+        engine::IWorld3D* p3DWorld_;
+
     };
 
 } // namespace entity

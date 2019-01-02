@@ -48,10 +48,30 @@ namespace entity
 
     }
 
-    bool PlayerSystem::init(physics::IScene* pPhysScene)
+    bool PlayerSystem::init(ECS& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
+        reg.registerHandler<PlayerSystem, MsgMove>(this);
+
         pPhysScene_ = pPhysScene;
+        p3DWorld_ = p3DWorld;
         return true;
+    }
+
+    void PlayerSystem::onMsg(ECS& reg, const MsgMove& msg)
+    {
+        if (!reg.has<Player>(msg.id)) {
+            return;
+        }
+
+        auto& ply = reg.get<Player>(msg.id);
+
+        // Only none local players have a world model.
+        if (!ply.isLocal)
+        {
+            auto& trans = reg.get<TransForm>(msg.id);
+
+            p3DWorld_->updateRenderEnt(ply.pRenderEnt, trans);
+        }
     }
 
     void PlayerSystem::update(core::FrameTimeData& timeInfo, ECS& reg)

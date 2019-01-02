@@ -108,7 +108,7 @@ namespace entity
             return false;
         }
 
-        if (!playerSys_.init(pPhysScene)) {
+        if (!playerSys_.init(reg_, pPhysScene, p3DWorld)) {
             return false;
         }
 
@@ -394,8 +394,11 @@ namespace entity
 
             if (reg_.has<Player>(mask))
             {
-                // auto& ply = reg.get<Player>(entityId);
+                auto& ply = reg_.get<Player>(entityId);
 
+                if (ply.pRenderEnt) {
+                    p3DWorld_->updateRenderEnt(ply.pRenderEnt, trans);
+                }
             }
 
             if (reg_.has<Inventory>(mask))
@@ -640,14 +643,12 @@ namespace entity
         else
         {
             // world model.
-            auto& mesh = reg_.assign<Mesh>(id);
-            auto& rend = reg_.assign<MeshRenderer>(id);
-
-            mesh.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
-            engine::RenderEntDesc entDsc;
-            entDsc.pModel = mesh.pModel;
+            player.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
             
-            rend.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
+            engine::RenderEntDesc entDsc;
+            entDsc.pModel = player.pModel;
+
+            player.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
         }
 
         X_UNUSED(player, net);

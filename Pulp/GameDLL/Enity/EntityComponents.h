@@ -291,6 +291,7 @@ namespace entity
     {
         ADD_META()
 
+
         X_DECLARE_FLAGS(State)
         (
             Jump,
@@ -298,6 +299,12 @@ namespace entity
             OnGround);
 
         typedef Flags<State> StateFlags;
+
+        Player() :
+            pModel(nullptr),
+            pRenderEnt(nullptr)
+        {
+        }
 
         StateFlags state;
         bool isLocal;
@@ -328,6 +335,10 @@ namespace entity
 
         int32_t currentWpn;
         int32_t targetWpn;
+
+        // Only set if local.
+        model::XModel* pModel;
+        engine::IRenderEnt* pRenderEnt;
     };
 
     struct Attached
