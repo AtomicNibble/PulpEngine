@@ -570,14 +570,14 @@ StackString<N, wchar_t>& StackString<N, wchar_t>::trimLeft(void)
     // we just loop over the string while there is white space and we are inside the string.
     const wchar_t* str = str_;
 
-    while (*str && strUtil::IsWhitespaceW(*str)) {
+    while (*str && strUtil::IsWhitespace(*str)) {
         str++;
     }
 
     // if they not equal we found white space.
     if (str != str_) {
         size_t Off = (size_t)(str - str_);
-        size_t NewLength = this->length() - Off;
+        size_t NewLength = length() - Off;
 
         memmove(str_, str_ + Off, NewLength * sizeof(wchar_t));
 
@@ -594,10 +594,10 @@ template<size_t N>
 StackString<N, wchar_t>& StackString<N, wchar_t>::trimRight(void)
 {
     // we want to start at the end and continue untill no more whitespace or end :)
-    const wchar_t* str = this->end() - 1;
-    const wchar_t* start = this->begin();
+    const wchar_t* str = end() - 1;
+    const wchar_t* start = begin();
 
-    while (str > start && strUtil::IsWhitespaceW(*str)) {
+    while (str > start && strUtil::IsWhitespace(*str)) {
         --str;
     }
 
@@ -616,7 +616,7 @@ template<size_t N>
 void StackString<N, wchar_t>::clear(void)
 {
     len_ = 0;
-    str_[0] = 0;
+    str_[0] = 0; // TODO: debug only?
 }
 
 template<size_t N>

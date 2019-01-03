@@ -110,8 +110,8 @@ TEST(StringUtil, WhiteSpace)
                         c == 0xc ||  // FORM FEED(codepoint 12, U + 000C)
                         c == 0xd;    // CARRIAGE RETURN(codepoint 13, U + 000D)
 
-        EXPECT_TRUE(strUtil::IsWhitespace(c) == is_White);
-        EXPECT_TRUE(strUtil::IsWhitespaceW(static_cast<wchar_t>(c)) == is_White);
+        EXPECT_TRUE(strUtil::IsWhitespace(static_cast<char>(c)) == is_White);
+        EXPECT_TRUE(strUtil::IsWhitespace(static_cast<wchar_t>(c)) == is_White);
     }
 }
 
@@ -230,10 +230,10 @@ TEST(StringUtil, IsLower)
 
 TEST(StringUtil, IsLowerW)
 {
-    EXPECT_TRUE(core::strUtil::IsLowerW(L'c'));
-    EXPECT_TRUE(core::strUtil::IsLowerW(L'a'));
-    EXPECT_FALSE(core::strUtil::IsLowerW(L'C'));
-    EXPECT_FALSE(core::strUtil::IsLowerW(L'G'));
+    EXPECT_TRUE(core::strUtil::IsLower(L'c'));
+    EXPECT_TRUE(core::strUtil::IsLower(L'a'));
+    EXPECT_FALSE(core::strUtil::IsLower(L'C'));
+    EXPECT_FALSE(core::strUtil::IsLower(L'G'));
 
     EXPECT_TRUE(core::strUtil::IsLower(L"tickle my pickle 342 'sfs'f1414"));
     EXPECT_FALSE(core::strUtil::IsLower(L"tickle mN pickle 342 'sfs'f1414"));

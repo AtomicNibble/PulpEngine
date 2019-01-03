@@ -32,7 +32,7 @@ namespace strUtil
 
     /// Returns whether or not the given character is a whitespace.
     inline constexpr bool IsWhitespace(const char character);
-    inline constexpr bool IsWhitespaceW(const wchar_t character);
+    inline constexpr bool IsWhitespace(const wchar_t character);
 
     // reutrns if character is decimal digit or upper / lower case letter.
     inline constexpr bool IsAlphaNum(const char str);
@@ -53,7 +53,7 @@ namespace strUtil
     inline bool IsNumeric(const CharT* startInclusive, const CharT* endExclusive);
 
     bool IsLower(const char character);
-    bool IsLowerW(const wchar_t character);
+    bool IsLower(const wchar_t character);
 
     bool IsLower(const char* startInclusive);
     bool IsLower(const char* startInclusive, const char* endExclusive);

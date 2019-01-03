@@ -373,8 +373,9 @@ template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(void)
 {
     const value_type* str = str_;
-    while ((*str != 0) && strUtil::IsWhitespace((unsigned char)*str))
+    while ((*str != 0) && strUtil::IsWhitespace(*str)) {
         str++;
+    }
 
     if (str != str_) {
         size_type nOff = (size_type)(str - str_); // m_str can change in _MakeUnique
@@ -398,14 +399,16 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(value_type ch)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str charSet)
 {
-    if (!charSet || !(*charSet))
+    if (!charSet || !(*charSet)) {
         return *this;
+    }
 
     const_str charSetend = charSet + strlen(charSet);
 
     const_str str = str_;
-    while ((*str != 0) && (strUtil::Find(charSet, charSetend, *str) != nullptr))
+    while ((*str != 0) && (strUtil::Find(charSet, charSetend, *str) != nullptr)) {
         str++;
+    }
 
     if (str != str_) {
         size_type nOff = (size_type)(str - str_); // str_ can change in _MakeUnique
@@ -422,13 +425,15 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimLeft(const_str charSet)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(void)
 {
-    if (length() < 1)
+    if (length() < 1) {
         return *this;
+    }
 
     const value_type* last = str_ + length() - 1;
     const value_type* str = last;
-    while ((str != str_) && strUtil::IsWhitespace((unsigned char)*str))
+    while ((str != str_) && strUtil::IsWhitespace(*str)) {
         str--;
+    }
 
     if (str != last) // something changed?
     {
@@ -452,14 +457,16 @@ typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(value_type ch)
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::trimRight(const_str charSet)
 {
-    if (!charSet || !(*charSet) || length() < 1)
+    if (!charSet || !(*charSet) || length() < 1) {
         return *this;
+    }
 
     const_str charSetend = charSet + strlen(charSet);
     const_str last = str_ + length() - 1;
     const_str str = last;
-    while ((str != str_) && (strUtil::Find(charSet, charSetend, *str) != nullptr))
+    while ((str != str_) && (strUtil::Find(charSet, charSetend, *str) != nullptr)) {
         str--;
+    }
 
     if (str != last) {
         // Just shrink length of the string.
@@ -493,10 +500,12 @@ inline StringRef<CharT>& StringRef<CharT>::append(const StringRef<CharT>& _Str,
     size_type off, size_type count)
 {
     size_type len = _Str.length();
-    if (off > len)
+    if (off > len) {
         return *this;
-    if (off + count > len)
+    }
+    if (off + count > len) {
         count = len - off;
+    }
     ConcatenateInPlace(_Str.str_ + off, count);
     return *this;
 }

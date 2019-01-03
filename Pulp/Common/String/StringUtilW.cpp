@@ -23,7 +23,7 @@ namespace strUtil
 
     } // namespace
 
-    bool IsLowerW(const wchar_t character)
+    bool IsLower(const wchar_t character)
     {
         std::locale loc;
         return std::islower(character, loc);
@@ -122,8 +122,9 @@ namespace strUtil
 
     bool IsEqualCaseInsen(const wchar_t* str1, const wchar_t* str2)
     {
-        while (*str1 && (::tolower(*str1) == ::tolower(*str2)))
+        while (*str1 && (::tolower(*str1) == ::tolower(*str2))) {
             str1++, str2++;
+        }
 
         // are they both null ?
         return (*(const uint8_t*)str1 - *(const uint8_t*)str2) == 0;
@@ -203,13 +204,15 @@ namespace strUtil
     {
         const wchar_t* result = endExclusive - 1;
 
-        if (startInclusive >= result)
+        if (startInclusive >= result) {
             return nullptr;
+        }
 
         while (*result == what) {
             --result;
-            if (startInclusive >= result)
+            if (startInclusive >= result) {
                 return nullptr;
+            }
         }
 
         return result;
@@ -220,8 +223,9 @@ namespace strUtil
     const wchar_t* FindWhitespace(const wchar_t* startInclusive, const wchar_t* endExclusive)
     {
         while (startInclusive < endExclusive) {
-            if (*startInclusive == L' ')
+            if (*startInclusive == L' ') {
                 return startInclusive;
+            }
             ++startInclusive;
         }
 
@@ -233,11 +237,13 @@ namespace strUtil
         do {
             --endExclusive;
             // reached the end ?
-            if (endExclusive < startInclusive)
+            if (endExclusive < startInclusive) {
                 break;
+            }
             // if whitespace return it.
-            if (IsWhitespaceW(*endExclusive))
+            if (IsWhitespace(*endExclusive)) {
                 return endExclusive;
+            }
         }
         X_DISABLE_WARNING(4127)
         while (1)
@@ -252,11 +258,13 @@ namespace strUtil
         do {
             --endExclusive;
             // reached the end ?
-            if (endExclusive < startInclusive)
+            if (endExclusive < startInclusive) {
                 break;
+            }
             // if not whitespace return it.
-            if (!IsWhitespaceW(*endExclusive))
+            if (!IsWhitespace(*endExclusive)) {
                 return endExclusive;
+            }
         }
         X_DISABLE_WARNING(4127)
         while (1)
@@ -270,8 +278,9 @@ namespace strUtil
     {
         while (startInclusive < endExclusive) {
             // if not whitespace return it.
-            if (!IsWhitespaceW(*startInclusive))
+            if (!IsWhitespace(*startInclusive)) {
                 return startInclusive;
+            }
 
             ++startInclusive;
         }
@@ -289,8 +298,9 @@ namespace strUtil
     const wchar_t* Find(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what)
     {
         while (startInclusive < endExclusive) {
-            if (*startInclusive == what)
+            if (*startInclusive == what) {
                 return startInclusive;
+            }
             ++startInclusive;
         }
 
@@ -311,8 +321,9 @@ namespace strUtil
     {
         size_t len = endExclusive - startInclusive;
 
-        if (whatLength > len)
+        if (whatLength > len) {
             return nullptr;
+        }
 
         while (startInclusive < endExclusive) {
             if (*startInclusive == *what) {
@@ -320,19 +331,22 @@ namespace strUtil
                 const wchar_t* currentWhat = what + 1;
                 size_t i = 0;
                 for (; i < (whatLength - 1); i++) {
-                    if (*current != *currentWhat)
+                    if (*current != *currentWhat) {
                         break;
+                    }
 
                     ++current;
                     ++currentWhat;
                 }
 
-                if (i == (whatLength - 1))
+                if (i == (whatLength - 1)) {
                     return startInclusive;
+                }
             }
 
-            if (len == whatLength) // sub string can't fit anymore.
+            if (len == whatLength) { // sub string can't fit anymore.
                 return nullptr;
+            }
 
             --len;
             ++startInclusive;
@@ -365,8 +379,9 @@ namespace strUtil
     {
         size_t len = endExclusive - startInclusive;
 
-        if (whatLength > len)
+        if (whatLength > len) {
             return nullptr;
+        }
 
         while (startInclusive < endExclusive) {
             // we check if we have a match.
@@ -378,19 +393,22 @@ namespace strUtil
                 const wchar_t* currentWhat = what + 1;
                 size_t i = 0;
                 for (; i < (whatLength - 1); i++) {
-                    if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat))
+                    if (upperCaseSIMD(*current) != upperCaseSIMD(*currentWhat)) {
                         break;
+                    }
 
                     ++current;
                     ++currentWhat;
                 }
 
-                if (i == (whatLength - 1))
+                if (i == (whatLength - 1)) {
                     return startInclusive;
+                }
             }
 
-            if (len == whatLength) // sub string can't fit anymore.
+            if (len == whatLength) { // sub string can't fit anymore.
                 return nullptr;
+            }
 
             --len;
             ++startInclusive;
@@ -408,8 +426,9 @@ namespace strUtil
     {
         size_t len = endExclusive - startInclusive;
 
-        if (len == 0)
+        if (len == 0) {
             return nullptr;
+        }
 
         wchar_t upperWhat = safe_static_cast<wchar_t, uint32_t>(upperCaseSIMD(what));
 

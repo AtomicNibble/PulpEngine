@@ -19,7 +19,7 @@ namespace strUtil
         return ((character == 32) || ((character >= 9) && (character <= 13)));
     }
 
-    inline constexpr bool IsWhitespaceW(const wchar_t character)
+    inline constexpr bool IsWhitespace(const wchar_t character)
     {
         return ((character == 32) || ((character >= 9) && (character <= 13)));
     }
@@ -226,7 +226,7 @@ namespace strUtil
     template<typename T>
     inline T StringToInt(const wchar_t* startInclusive, const wchar_t* endExclusive)
     {
-        while (startInclusive < endExclusive && IsWhitespaceW(*startInclusive)) {
+        while (startInclusive < endExclusive && IsWhitespace(*startInclusive)) {
             ++startInclusive;
         }
 
