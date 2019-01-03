@@ -114,6 +114,14 @@ namespace ecs
         }
 
         template < typename Payload, typename ...Args >
+        bool queue(int32_t delayMS, Args&&... args)
+        {
+            Message m{ time_ + core::TimeVal::fromMS(delayMS), Payload::MSG_ID };
+            new(&m.payload) Payload{ std::forward<Args>(args)... };
+            return queue(m);
+        }
+
+        template < typename Payload, typename ...Args >
         bool queue(TimeType delay, Args&&... args)
         {
             Message m{ time_ + delay , Payload::MSG_ID};
