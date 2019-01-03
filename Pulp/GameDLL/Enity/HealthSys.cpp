@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "HealthSys.h"
 
+#include <INetwork.h>
+
 X_NAMESPACE_BEGIN(game)
 
 namespace entity
@@ -46,7 +48,14 @@ namespace entity
         if (h.hp <= 0) {
             X_LOG0("Health", "Ent %" PRIi32 " died", static_cast<int32_t>(msg.id));
 
-            reg.markDestroy(msg.id);
+            if (msg.id < net::MAX_PLAYERS)
+            {
+                reg.queue<MsgPlayerDied>(0, msg.id, msg.attackerId);
+            }
+            else
+            {
+                reg.markDestroy(msg.id);
+            }
         }
     }
 

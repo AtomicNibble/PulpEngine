@@ -93,6 +93,8 @@ namespace entity
         void destroy(CharacterController& comp);
         void destroy(Player& comp);
 
+        void onMsg(ECS& reg, const MsgPlayerDied& msg);
+
 
         EntityId createEnt(void);
         void destroyEnt(EntityId id);

@@ -96,6 +96,8 @@ namespace entity
         reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
         reg_.setDetroyCallback<EnititySystem, Player>(this);
 
+        reg_.registerHandler<EnititySystem, MsgPlayerDied>(this);
+
 
         pPhysics_ = X_ASSERT_NOT_NULL(pPhysics);
         pPhysScene_ = X_ASSERT_NOT_NULL(pPhysScene);
@@ -496,6 +498,25 @@ namespace entity
         if (comp.weaponEnt != entity::INVALID_ID) {
             destroyEnt(comp.weaponEnt);
         }
+    }
+
+    // ----------------------------------------------------------
+
+    void EnititySystem::onMsg(ECS& reg, const MsgPlayerDied& msg)
+    {
+        X_UNUSED(reg, msg);
+
+        X_LOG0("Ents", "Player %" PRIi32 " died", msg.id);
+
+        // if a player has died we don't actually want todo much to them.
+        // just drop them to the floor?
+        if (pMultiplayer_) {
+            pMultiplayer_->playerDeath(msg.id, msg.attackerId);
+        }
+
+        auto& plyHp = reg.get<Health>(msg.id);
+        X_ASSERT(plyHp.max > 0, "Max health is not valid")(plyHp.max);
+        plyHp.hp = plyHp.max;
     }
 
     // ----------------------------------------------------------
