@@ -372,7 +372,7 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
     {
         EventPacketBs bs;
         bs.write(net::MessageID::GameEvent);
-        bs.write(Event::PLY_LEFT);
+        bs.write(evt);
         bs.write(param0);
         bs.write(param1);
 
