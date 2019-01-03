@@ -391,6 +391,8 @@ namespace entity
         template<typename S, typename Msg>
         void registerHandler(S* pSystem)
         {
+            static_assert(Msg::MSG_ID < MessageQueue::NUM_MSG, "Msg out of range");
+
             auto& sink = MessageQueue::msgSinks_[Msg::MSG_ID];
 
             sink.emplace_back([=](const MessageQueue::Message& msg) {
@@ -399,10 +401,7 @@ namespace entity
         }
     };
 
-    using MessageQueue = ecs::MessageQueue<MessageType, 
-        MsgMove, 
-        MsgDamage
-    >;
+    using MessageQueue = ecs::MessageQueue<MessageType>;
 
     using ECS = ECSBase<EnitiyRegister, MessageQueue>;
 

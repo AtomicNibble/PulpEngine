@@ -12,12 +12,13 @@ namespace ecs
 {
     using EntityId = entity::EntityId;
 
-    template<typename MessageType, typename... MessageTypes>
+    template<typename MessageType>
     class MessageQueue
     {
-        static constexpr size_t NUM_MSG = sizeof...(MessageTypes);
+    public:
 
     public:
+        static constexpr size_t NUM_MSG = typename MessageType::ENUM_COUNT;
         using MessageTypeEnum = typename MessageType::Enum;
         using TimeType = core::TimeVal;
 
