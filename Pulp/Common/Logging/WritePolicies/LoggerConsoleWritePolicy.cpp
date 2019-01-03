@@ -174,7 +174,7 @@ namespace
                 wchar_t curChar = *(pCur + SectionSize);
                 if (hasCoolorCode && curChar == L'^' && SectionSize < length) {
                     wchar_t colChar = *(pCur + SectionSize + 1);
-                    if (core::strUtil::IsDigitW(colChar)) {
+                    if (core::strUtil::IsDigit(colChar)) {
                         int colorIndex = colChar - L'0';
 
                         // we draw anything then change color.
@@ -228,7 +228,7 @@ namespace
                 // skip color codes.
                 if (hasCoolorCode && curChar == L'^' && SectionSize < length) {
                     wchar_t colChar = *(pCur + SectionSize + 1);
-                    if (core::strUtil::IsDigitW(colChar)) {
+                    if (core::strUtil::IsDigit(colChar)) {
                         // we draw anything then change color.
                         NumberOfCharsWritten = 0;
                         WriteConsoleW(console, pCur, SectionSize, &NumberOfCharsWritten, 0);

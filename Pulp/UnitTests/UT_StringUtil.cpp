@@ -257,7 +257,7 @@ TEST(StringUtil, Digit)
 
     for (int c = min; c <= max; c++) {
         bool is_Digit = c >= '0' && c <= '9';
-        EXPECT_TRUE(strUtil::IsDigit(c) == is_Digit);
+        EXPECT_TRUE(strUtil::IsDigit(static_cast<char>(c)) == is_Digit);
     }
 }
 
@@ -269,7 +269,7 @@ TEST(StringUtil, DigitW)
 
     for (int c = min; c <= max; c++) {
         bool is_Digit = c >= '0' && c <= '9';
-        EXPECT_TRUE(strUtil::IsDigitW(static_cast<wchar_t>(c)) == is_Digit);
+        EXPECT_TRUE(strUtil::IsDigit(static_cast<wchar_t>(c)) == is_Digit);
     }
 }
 

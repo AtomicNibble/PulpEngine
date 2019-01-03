@@ -506,7 +506,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                         col = ctx.col;
                         ++pChar;
                     }
-                    else if (core::strUtil::IsDigitW(*pChar)) {
+                    else if (core::strUtil::IsDigit(*pChar)) {
                         const int32_t colorIndex = (*pChar) - L'0';
                         X_ASSERT(colorIndex >= 0 && colorIndex < X_ARRAY_SIZE(g_ColorTable), "ColorIndex out of range")(colorIndex);
                         Color8u newColor = g_ColorTable[colorIndex];
@@ -731,7 +731,7 @@ void XFont::DrawStringInternal(engine::IPrimativeContext* pPrimCon, const Vec3f&
                     if (*pChar == L'^') {
                         ++pChar;
                     }
-                    else if (core::strUtil::IsDigitW(*pChar)) {
+                    else if (core::strUtil::IsDigit(*pChar)) {
                         ++pChar;
                     }
                     continue;

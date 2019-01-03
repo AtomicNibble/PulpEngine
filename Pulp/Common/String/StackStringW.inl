@@ -505,7 +505,7 @@ void StackString<N, wchar_t>::stripColorCodes(void)
     const size_t len = buf.length();
     for (size_t i = 0; i < len; i++) {
         const wchar_t& cur = buf.str_[i];
-        if (cur == L'^' && (i + 1) < len && core::strUtil::IsDigitW(buf.str_[i + 1])) {
+        if (cur == L'^' && (i + 1) < len && core::strUtil::IsDigit(buf.str_[i + 1])) {
             i += 1;
         }
         else {

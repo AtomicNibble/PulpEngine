@@ -14,65 +14,71 @@ namespace strUtil
         return (str.length() + 1) * sizeof(typename T::value_type);
     }
 
-    inline bool IsWhitespace(const char character)
+    inline constexpr bool IsWhitespace(const char character)
     {
         return ((character == 32) || ((character >= 9) && (character <= 13)));
     }
 
-    inline bool IsWhitespaceW(const wchar_t character)
+    inline constexpr bool IsWhitespaceW(const wchar_t character)
     {
         return ((character == 32) || ((character >= 9) && (character <= 13)));
     }
 
-    inline bool IsAlphaNum(const char c)
+    inline constexpr bool IsAlphaNum(const char c)
     {
-        return c >= -1 && isalnum(static_cast<int>(c)) != 0;
+        return IsAlpha(c) || IsDigit(c);
     }
 
-    inline bool IsAlphaNum(const uint8_t c)
+    inline constexpr bool IsAlphaNum(const uint8_t c)
     {
-        return isalnum(static_cast<int>(c)) != 0;
+        return IsAlpha(c) || IsDigit(c);
     }
 
-    inline bool IsAlpha(const char c)
+    inline constexpr bool IsAlpha(const char c)
     {
-        return c >= -1 && isalpha(static_cast<int>(c)) != 0;
+        return (c >= 'a' &&  c <= 'z') || (c >= 'A' &&  c <= 'Z');
     }
 
-    inline bool IsAlpha(const uint8_t c)
+    inline constexpr bool IsAlpha(const uint8_t c)
     {
-        return isalpha(static_cast<int>(c)) != 0;
+        return (c >= 'a' &&  c <= 'z') || (c >= 'A' &&  c <= 'Z');
     }
 
-    template<typename CharT>
-    inline bool IsDigit(const CharT character)
+    inline constexpr bool IsDigit(const char character)
     {
         return ((character >= '0') && (character <= '9'));
     }
 
-    inline bool IsDigitW(const wchar_t character)
+    inline constexpr bool IsDigit(const uint8_t character)
+    {
+        return ((character >= '0') && (character <= '9'));
+    }
+
+    inline constexpr bool IsDigit(const wchar_t character)
     {
         return ((character >= '0') && (character <= '9'));
     }
 
     template<typename CharT>
-    inline bool IsNumeric(const CharT* str)
+    inline bool IsNumeric(const CharT* pStr)
     {
-        if (*str == '-') {
-            str++;
+        if (*pStr == '-') {
+            ++pStr;
         }
 
         bool dotFnd = false;
 
-        for (size_t i = 0; str[i]; i++) {
-            if (!IsDigit(str[i])) {
-                if (str[i] == '.' && !dotFnd) {
+        while(*pStr) {
+            if (!IsDigit(*pStr)) {
+                if (*pStr == '.' && !dotFnd) {
                     dotFnd = true;
                 }
                 else {
                     return false;
                 }
             }
+
+            ++pStr;
         }
 
         return true;
@@ -236,7 +242,7 @@ namespace strUtil
         int val = 0;
         while (startInclusive < endExclusive) {
             wchar_t ch = (*startInclusive++);
-            if (!IsDigitW(ch)) {
+            if (!IsDigit(ch)) {
                 break;
             }
 

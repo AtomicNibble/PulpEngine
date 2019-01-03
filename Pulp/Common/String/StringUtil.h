@@ -31,21 +31,21 @@ namespace strUtil
     size_t StringBytesIncNull(const T& str);
 
     /// Returns whether or not the given character is a whitespace.
-    inline bool IsWhitespace(const char character);
-    inline bool IsWhitespaceW(const wchar_t character);
+    inline constexpr bool IsWhitespace(const char character);
+    inline constexpr bool IsWhitespaceW(const wchar_t character);
 
     // reutrns if character is decimal digit or upper / lower case letter.
-    inline bool IsAlphaNum(const char str);
-    inline bool IsAlphaNum(const uint8_t str);
+    inline constexpr bool IsAlphaNum(const char str);
+    inline constexpr bool IsAlphaNum(const uint8_t str);
 
     // reutrns if character is upper / lower case letter.
-    inline bool IsAlpha(const char str);
-    inline bool IsAlpha(const uint8_t str);
+    inline constexpr bool IsAlpha(const char str);
+    inline constexpr bool IsAlpha(const uint8_t str);
 
     /// Returns whether or not the given character is a digit.
-    template<typename CharT>
-    inline bool IsDigit(const CharT character);
-    inline bool IsDigitW(const wchar_t character);
+    inline constexpr bool IsDigit(const char character);
+    inline constexpr bool IsDigit(const uint8_t character);
+    inline constexpr bool IsDigit(const wchar_t character);
 
     template<typename CharT>
     inline bool IsNumeric(const CharT* str);
