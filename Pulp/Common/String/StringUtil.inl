@@ -14,6 +14,26 @@ namespace strUtil
         return (str.length() + 1) * sizeof(typename T::value_type);
     }
 
+    inline constexpr uint8_t HexCharToInt(char character)
+    {
+        if (character >= '0' && character <= '9') {
+            return character - '0';
+        }
+        if (character >= 'A' && character <= 'F') {
+            return character - 'A' + 10;
+        }
+        if (character >= 'a' && character <= 'f') {
+            return character - 'a' + 10;
+        }
+
+        return 0;
+    }
+
+    inline constexpr uint8_t HexChar(char high, char low)
+    {
+        return (HexCharToInt(high) << 4) | HexCharToInt(low);
+    }
+
     inline constexpr bool IsWhitespace(const char character)
     {
         return ((character == 32) || ((character >= 9) && (character <= 13)));

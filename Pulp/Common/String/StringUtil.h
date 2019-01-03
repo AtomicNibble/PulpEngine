@@ -30,6 +30,9 @@ namespace strUtil
     template<typename T>
     size_t StringBytesIncNull(const T& str);
 
+    inline constexpr uint8_t HexCharToInt(char character);
+    inline constexpr uint8_t HexChar(char high, char low);
+
     /// Returns whether or not the given character is a whitespace.
     inline constexpr bool IsWhitespace(const char character);
     inline constexpr bool IsWhitespace(const wchar_t character);
