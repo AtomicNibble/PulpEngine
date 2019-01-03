@@ -660,6 +660,7 @@ namespace entity
         //		player.cameraAxis = Anglesf(0, 0, 0.f);
 
         hp.hp = 100;
+        hp.max = 100;
 
         auto giveWeapon = [&](const char* pName) {
             auto* pWpn = weaponDefs_.loadWeaponDef(pName);

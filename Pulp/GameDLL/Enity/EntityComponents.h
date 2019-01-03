@@ -66,6 +66,12 @@ namespace entity
     {
         ADD_META()
 
+        Health() :
+            hp(0),
+            max(0)
+        {
+        }
+
         int32_t hp;
         int32_t max;
     };
