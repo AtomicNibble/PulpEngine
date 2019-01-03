@@ -18,6 +18,19 @@ X_NAMESPACE_BEGIN(net)
 
 namespace
 {
+    template <typename T, size_t Length, size_t ... Index>
+    constexpr T HexString(const char(&Input)[Length], const std::index_sequence<Index...>&)
+    {
+        return T{ core::strUtil::HexChar(Input[(Index * 2)], Input[((Index * 2) + 1)])... };
+    }
+
+    template <typename T, size_t Length>
+    constexpr T HexString(const char(&Input)[Length])
+    {
+        return HexString<T>(Input, std::make_index_sequence<(Length / 2)>{});
+    }
+
+
     // start of packet to mark offline msg.
     const std::array<uint8_t, 8> OFFLINE_MSG_ID = {
         0x00, 0x35, 0x33, 0x24, 0xbb, 0xa5, 0x38, 0x85};
@@ -1556,6 +1569,11 @@ void XPeer::processConnectionRequests(UpdateBitStream& updateBS, core::TimeVal t
         updateBS.write<uint8_t>(PROTO_VERSION_MAJOR);
         updateBS.write<uint8_t>(PROTO_VERSION_MINOR);
 
+        // lets be cute and send the build revision.
+        // this will just be a hex string.
+        constexpr auto digest = HexString<std::array<uint8_t, core::Hash::SHA1Digest::NUM_BYTES>>(X_STRINGIZE(X_ENGINE_BUILD_REF));
+        updateBS.write<uint8_t>(digest.data(), digest.size());
+
         // devide the mtu array by retry count, so that we try mtu index 0 for 1/3 of request if mtusizes is 3.
         size_t mtuIdx = cr.numRequestsMade / (cr.retryCount / MTUSizesArr.size());
         mtuIdx = core::Min(mtuIdx + cr.MTUIdxShift, MTUSizesArr.size() - 1);
@@ -2052,6 +2070,13 @@ void XPeer::handleOpenConnectionRequest(UpdateBitStream& bsOut, RecvData* pData,
     // hello, pleb.
     uint8_t protoVersionMajor = bs.read<uint8_t>();
     uint8_t protoVersionMinor = bs.read<uint8_t>();
+
+    // the build revision.
+    core::Hash::SHA1Digest revision;
+    bs.read(revision.bytes, revision.NUM_BYTES);
+
+    // TODO: log?
+    X_UNUSED(revision);
 
     IPStr ipStr;
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived open connection request from \"%s\" with proto version: ^5%" PRIu8 ".%" PRIu8,
