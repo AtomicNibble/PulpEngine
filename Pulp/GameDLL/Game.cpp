@@ -318,7 +318,7 @@ bool XGame::update(core::FrameData& frame)
 
             // TODO: only create this if we needed it.
             // I create this when loading as the server will send us state for this before we finish loading.
-            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_, vars_, pSession_);
+            pMultiplayerGame_ = core::makeUnique<Multiplayer>(arena_, vars_, userNetMap_, pSession_);
         }
 
         if (!world_)
@@ -423,7 +423,7 @@ bool XGame::update(core::FrameData& frame)
             // send snapshot after updating world.
             pSession_->sendSnapShot(frame.timeInfo);
 
-            pMultiplayerGame_->update(pPeer_, userNetMap_);
+            pMultiplayerGame_->update(pPeer_);
         }
 
         pMultiplayerGame_->drawChat(frame.timeInfo, pPrim);
@@ -431,7 +431,7 @@ bool XGame::update(core::FrameData& frame)
 
         // What's the point we all know stu will be at the top :(
         if (userCmd.buttons.IsSet(net::Button::SHOW_SCORES)) {
-            pMultiplayerGame_->drawLeaderboard(userNetMap_, pPrim);
+            pMultiplayerGame_->drawLeaderboard(pPrim);
         }
     }
     else if (status == net::SessionStatus::PartyLobby)
@@ -615,7 +615,7 @@ void XGame::handleGameEvent(net::Packet* pPacket)
 {
     core::FixedBitStreamNoneOwning bs(pPacket->begin(), pPacket->end(), true);
 
-    pMultiplayerGame_->handleEvent(userNetMap_, bs);
+    pMultiplayerGame_->handleEvent(bs);
 }
 
 void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t ssStartTimeMS, int32_t ssEndTimeMS)
@@ -844,7 +844,7 @@ void XGame::syncLobbyUsers(void)
             X_LOG0("Game", "Client left %" PRIi32 " guid: %s", i, userGuid.toString(buf));
 
             if (pMultiplayerGame_) {
-                pMultiplayerGame_->playerLeft(userNetMap_, i);
+                pMultiplayerGame_->playerLeft(i);
             }
 
             userNetMap_.resetIndex(i);

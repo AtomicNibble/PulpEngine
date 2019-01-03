@@ -75,22 +75,22 @@ public:
     using EventPacketBs = core::FixedBitStreamStack<64>;
 
 public:
-    Multiplayer(GameVars& vars, net::ISession* pSession);
+    Multiplayer(GameVars& vars, const UserNetMappings& netMappings, net::ISession* pSession);
 
-    void update(net::IPeer* pPeer, const UserNetMappings& unm);
+    void update(net::IPeer* pPeer);
 
     void drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
     void drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
-    void drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim);
+    void drawLeaderboard(engine::IPrimativeContext* pPrim);
 
     void readFromSnapShot(core::FixedBitStreamBase& bs);
     void writeToSnapShot(core::FixedBitStreamBase& bs);
 
-    void playerSpawned(const UserNetMappings& unm, int32_t localIndex);
-    void playerDeath(const UserNetMappings& unm, int32_t playerIdx, entity::EntityId attacker);
-    void playerLeft(const UserNetMappings& unm, int32_t localIndex);
+    void playerSpawned(int32_t localIndex);
+    void playerDeath(int32_t playerIdx, entity::EntityId attacker);
+    void playerLeft(int32_t localIndex);
     void handleChatMsg(core::string_view name, core::string_view msg);
-    void handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs);
+    void handleEvent(core::FixedBitStreamBase& bs);
 
     void addChatLine(core::string_view name, core::string_view msg);
 private:
@@ -101,13 +101,14 @@ private:
     void updateChat(core::TimeVal dt);
     void updateEvents(core::TimeVal dt);
 
-    void postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param0, int32_t param1);
+    void postEvent(Event::Enum evt, int32_t param0, int32_t param1);
 
 public:
     static void buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg);
 
 private:
     GameVars& vars_;
+    const UserNetMappings& netMappings_;
     net::ISession* pSession_;
 
     GameState::Enum state_;

@@ -622,6 +622,8 @@ namespace entity
 
     void EnititySystem::spawnPlayer(const UserNetMappings& unm, int32_t clientIdx, const Vec3f& pos, bool local)
     {
+        X_UNUSED(unm);
+
         X_ASSERT(clientIdx < net::MAX_PLAYERS, "Client index larger than max player")(clientIdx);
 
         auto id = static_cast<EntityId>(clientIdx);
@@ -681,7 +683,7 @@ namespace entity
         player.weaponEnt = createWeapon(id);
 
         if (pMultiplayer_) {
-            pMultiplayer_->playerSpawned(unm, clientIdx);
+            pMultiplayer_->playerSpawned(clientIdx);
         }
     }
 

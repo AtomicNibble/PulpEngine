@@ -39,22 +39,23 @@ namespace
 } // namespace
 
 
-Multiplayer::Multiplayer(GameVars& vars, net::ISession* pSession) :
+Multiplayer::Multiplayer(GameVars& vars, const UserNetMappings& netMappings, net::ISession* pSession) :
     vars_(vars),
+    netMappings_(netMappings),
     pSession_(pSession),
     state_(GameState::NONE)
 {
     
 }
 
-void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
+void Multiplayer::update(net::IPeer* pPeer)
 {
     // get all the pings yo.
     // this should just map with players.
     // maybe we should wait for spawn.
-    for (int32_t i = 0; i < static_cast<int32_t>(unm.lobbyUserGuids.size()); i++)
+    for (int32_t i = 0; i < static_cast<int32_t>(netMappings_.lobbyUserGuids.size()); i++)
     {
-        if (!unm.lobbyUserGuids[i].isValid()) {
+        if (!netMappings_.lobbyUserGuids[i].isValid()) {
             continue;
         }
 
@@ -71,9 +72,9 @@ void Multiplayer::update(net::IPeer* pPeer, const UserNetMappings& unm)
         // what's the ping of the local player?
 
         // remote peer pings
-        auto sysHandle = unm.sysHandles[i];
+        auto sysHandle = netMappings_.sysHandles[i];
         if (sysHandle == net::INVALID_SYSTEM_HANDLE) {
-            X_ASSERT(i == unm.localPlayerIdx, "Invalid system handle for none localy player")();
+            X_ASSERT(i == netMappings_.localPlayerIdx, "Invalid system handle for none localy player")();
             continue;
         }
 
@@ -124,10 +125,10 @@ void Multiplayer::writeToSnapShot(core::FixedBitStreamBase& bs)
     bs.write(state_);
 }
 
-void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
+void Multiplayer::playerSpawned(int32_t localIndex)
 {
     // hellow you little shit!
-    const auto& netGuid = unm.lobbyUserGuids[localIndex];
+    const auto& netGuid = netMappings_.lobbyUserGuids[localIndex];
     if (!netGuid.isValid()) {
         X_ERROR("Game", "Spawned players guid is not valid: %" PRIi32, localIndex);
     }
@@ -150,7 +151,7 @@ void Multiplayer::playerSpawned(const UserNetMappings& unm, int32_t localIndex)
     addEventLine(core::string_view(str.begin(), str.length()));
 }
 
-void Multiplayer::playerDeath(const UserNetMappings& unm, int32_t playerIdx, entity::EntityId attacker)
+void Multiplayer::playerDeath(int32_t playerIdx, entity::EntityId attacker)
 {
     playerStates_[playerIdx].deaths++;
 
@@ -160,16 +161,16 @@ void Multiplayer::playerDeath(const UserNetMappings& unm, int32_t playerIdx, ent
 
     // kill yourself?
     if (playerIdx == attacker) {
-        postEvent(unm, Event::PLY_DIED, playerIdx, attacker);
+        postEvent(Event::PLY_DIED, playerIdx, attacker);
     }
     else {
-        postEvent(unm, Event::PLY_KILLED, playerIdx, attacker);
+        postEvent(Event::PLY_KILLED, playerIdx, attacker);
     }
 }
 
-void Multiplayer::playerLeft(const UserNetMappings& unm, int32_t localIndex)
+void Multiplayer::playerLeft(int32_t localIndex)
 {
-    postEvent(unm, Event::PLY_LEFT, localIndex, 0);
+    postEvent(Event::PLY_LEFT, localIndex, 0);
 }
 
 void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
@@ -307,23 +308,23 @@ void Multiplayer::updateEvents(core::TimeVal dt)
     }
 }
 
-void Multiplayer::handleEvent(const UserNetMappings& unm, core::FixedBitStreamBase& bs)
+void Multiplayer::handleEvent(core::FixedBitStreamBase& bs)
 {
     auto evt = bs.read<Event::Enum>();
     auto param0 = bs.read<uint32_t>();
     auto param1 = bs.read<uint32_t>();
 
-    postEvent(unm, evt, param0, param1);
+    postEvent(evt, param0, param1);
 }
 
-void Multiplayer::postEvent(const UserNetMappings& unm, Event::Enum evt, int32_t param0, int32_t param1)
+void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
 {
     X_UNUSED(param0, param1);
 
     switch (evt)
     {
         case Event::PLY_LEFT: {
-            const auto& guid = unm.lobbyUserGuids[param0];
+            const auto& guid = netMappings_.lobbyUserGuids[param0];
             
             auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
@@ -392,7 +393,7 @@ void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core
     bs.write(msg.data(), msgLen);
 }
 
-void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimativeContext* pPrim)
+void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
 {
     // want some rows that are fixed size maybe?
     // but centered in srreen.
@@ -457,7 +458,7 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
 
     for (int32_t i = 0; i < net::MAX_PLAYERS; i++)
     {
-        if (!unm.lobbyUserGuids[i].isValid()) {
+        if (!netMappings_.lobbyUserGuids[i].isValid()) {
             continue;
         }
 
@@ -465,7 +466,7 @@ void Multiplayer::drawLeaderboard(const UserNetMappings& unm, engine::IPrimative
         lbi.ps = playerStates_[i];
 
         net::UserInfo info;
-        if (pLobby->getUserInfoForGuid(unm.lobbyUserGuids[i], info)) {
+        if (pLobby->getUserInfoForGuid(netMappings_.lobbyUserGuids[i], info)) {
             lbi.name.append(info.name.data(), info.name.length());
         }
         else {
