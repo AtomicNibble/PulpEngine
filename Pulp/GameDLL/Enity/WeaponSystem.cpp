@@ -317,7 +317,7 @@ namespace entity
             {
                 auto b = hit.block;
 
-                X_LOG0("Weapon", "Hit %f (%f,%f, %f) dmg: %i", b.distance, b.position.x, b.position.y, b.position.z);
+                X_LOG0("Weapon", "Hit %f (%f,%f, %f)", b.distance, b.position.x, b.position.y, b.position.z);
 
                 if (vars_.drawBulletRay()) {
                     auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::PERSISTENT);
