@@ -53,11 +53,57 @@ X_DECLARE_FLAGS(ActorFlag)(
 
 typedef Flags<ActorFlag> ActorFlags;
 
+X_DECLARE_FLAGS(UserType)(
+    EntId
+);
+
+struct UserData
+{
+    static constexpr uintptr_t BIT_COUNT = UserType::FLAGS_COUNT;
+    static constexpr uintptr_t BIT_TYPE_MASK = (1ul << BIT_COUNT) - 1ul;
+    static constexpr uintptr_t BIT_VAL_MASK = ~BIT_TYPE_MASK;
+    static constexpr uintptr_t BIT_VAL_SHIFT = BIT_COUNT;
+
+public:
+    UserData() :
+        val_(0)
+    {
+    }
+
+    X_INLINE explicit UserData(void* pData) :
+        val_(reinterpret_cast<uintptr_t>(pData))
+    {
+    }
+    X_INLINE UserData(UserType::Enum type, int32_t val) :
+        val_((val << BIT_VAL_SHIFT) | type)
+    {
+    }
+
+    X_INLINE intptr_t getVal(void) const {
+        return (val_ & BIT_VAL_MASK) >> BIT_VAL_SHIFT;
+    }
+
+    X_INLINE UserType::Enum getType(void) const {
+        return static_cast<UserType::Enum>(val_ & BIT_TYPE_MASK);
+    }
+
+    X_INLINE bool valid(void) const {
+        return (val_ & BIT_TYPE_MASK) != 0;
+    }
+
+    X_INLINE operator void*() const {
+        return reinterpret_cast<void*>(val_);
+    }
+
+private:
+    uintptr_t val_;
+};
+
 struct ActorMeta
 {
     ActorType::Enum type;
     ActorFlags flags;
-    void* pUserData;
+    UserData userData;
 };
 
 typedef uintptr_t Handle;
@@ -319,7 +365,6 @@ protected:
         volumeGrowth = 1.5f;
         material = INVALID_HANLDE;
         nonWalkableMode = NonWalkableMode::PreventClimbing;
-        pUserData = nullptr;
     }
 
 public:
@@ -336,7 +381,7 @@ public:
     float32_t volumeGrowth;
     MaterialHandle material;
     NonWalkableMode nonWalkableMode;
-    const void* pUserData;
+    UserData userData;
 };
 
 struct BoxControllerDesc : public ControllerDesc
@@ -881,7 +926,7 @@ private:
 struct ActiveTransform
 {
     ActorHandle actor;
-    void* userData;
+    UserData userData;
     Transformf actor2World;
 };
 
@@ -890,14 +935,14 @@ struct ActiveTransform
 template<typename HitType>
 struct BatchQueryResult
 {
-    HitType block;       //!< Holds the closest blocking hit for a single query in a batch. Only valid if hasBlock is true.
-    HitType* pTouches;   //!< This pointer will either be set to NULL for 0 nbTouches or will point
-                         //!< into the user provided batch query results buffer specified in PxBatchQueryDesc.
-    uint32_t nbTouches;  //!< Number of touching hits returned by this query, works in tandem with touches pointer.
-    void* pUserData;     //!< Copy of the userData pointer specified in the corresponding query.
-    uint8_t queryStatus; //!< Takes on values from PxBatchQueryStatus::Enum.
-    bool hasBlock;       //!< True if there was a blocking hit.
-    uint16_t pad;        //!< pads the struct to 16 bytes.
+    HitType block;              //!< Holds the closest blocking hit for a single query in a batch. Only valid if hasBlock is true.
+    HitType* pTouches;          //!< This pointer will either be set to NULL for 0 nbTouches or will point
+                                //!< into the user provided batch query results buffer specified in PxBatchQueryDesc.
+    uint32_t nbTouches;         //!< Number of touching hits returned by this query, works in tandem with touches pointer.
+    UserData userData;   //!< Copy of the userData pointer specified in the corresponding query.
+    uint8_t queryStatus;        //!< Takes on values from PxBatchQueryStatus::Enum.
+    bool hasBlock;              //!< True if there was a blocking hit.
+    uint16_t pad;               //!< pads the struct to 16 bytes.
 
     X_INLINE uint32_t getNbAnyHits(void) const
     {
@@ -1182,7 +1227,7 @@ struct IPhysics
 
     virtual ActorFlags getFlags(ActorHandle handle) X_ABSTRACT;
     virtual ActorType::Enum getType(ActorHandle handle) X_ABSTRACT;
-    virtual void* getUserData(ActorHandle handle) X_ABSTRACT;
+    virtual UserData getUserData(ActorHandle handle) X_ABSTRACT;
     virtual ActorMeta getActorMeta(ActorHandle handle) X_ABSTRACT;
 
     // for setting what collides with what, by default everything collides.

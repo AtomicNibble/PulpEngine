@@ -342,16 +342,20 @@ namespace entity
                         pPhysScene_->addForce(b.actor, dir);
                     }
 
-                    if (meta.pUserData)
+                    if (meta.userData.getType() == physics::UserType::EntId)
                     {
                         // Assume valid?
-                        EntityId id = static_cast<EntityId>(reinterpret_cast<uintptr_t>(meta.pUserData) & 0xFFFF);
+                        EntityId id = static_cast<EntityId>(meta.userData.getVal());
                         
                         // can only do dmg to stuff that has HP.
                         // should we do this check for clients tho?
                         if (pReg_->has<Health>(id)) {
                             doDamage(id, wpn, b.distance);
                         }
+                    }
+                    else
+                    {
+                        X_WARNING("Weapon", "Hit physics actor has no ent");
                     }
                 }
             }

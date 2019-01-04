@@ -43,11 +43,11 @@ namespace entity
         for (int32_t i = 0; i < transforms.size(); i++) {
             auto& trans = transforms[i];
 
-            if (!trans.userData) {
+            if (trans.userData.getType() != physics::UserType::EntId) {
                 continue;
             }
 
-            EntityId ent = static_cast<EntityId>(union_cast<uintptr_t>(trans.userData) & 0xFFFF);
+            EntityId ent = static_cast<EntityId>(trans.userData.getVal());
 
             auto& entTrans = reg.get<TransForm>(ent);
             entTrans.pos = trans.actor2World.pos;
@@ -79,7 +79,6 @@ namespace entity
             actors.reserve(num);
         }
 
-
         {
             auto view = reg.view<TransForm, Mesh, MeshCollider>();
             for (auto entity : view) {
@@ -94,8 +93,7 @@ namespace entity
                     reg.remove<MeshCollider>(entity);
                     continue;
                 }
-
-                col.actor = pPhysics->createStaticActor(trans, (void*)entity);
+                col.actor = pPhysics->createStaticActor(trans, physics::UserData(physics::UserType::EntId, entity));
 
                 mesh.pModel->addPhysToActor(col.actor);
 
@@ -113,7 +111,7 @@ namespace entity
 
                 mesh.pModel->waitForLoad(pModelManager);
 
-                col.actor = pPhysics->createActor(trans, col.kinematic, (void*)entity);
+                col.actor = pPhysics->createActor(trans, col.kinematic, physics::UserData(physics::UserType::EntId, entity));
 
                 if (!mesh.pModel->hasPhys()) {
                     X_WARNING("Ent", "No physics shapes for model \"%s\" using model bounds", mesh.pModel->getName().c_str());

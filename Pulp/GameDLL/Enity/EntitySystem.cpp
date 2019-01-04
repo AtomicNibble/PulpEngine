@@ -721,7 +721,7 @@ namespace entity
         desc.position = trans.pos;
         desc.upDirection = Vec3f::zAxis();
         desc.maxJumpHeight = vars_.player.jumpHeight_;
-        desc.pUserData = (const void*)id;
+        desc.userData = physics::UserData(physics::UserType::EntId, id);
 
         physics::ICharacterController* pController;
         {

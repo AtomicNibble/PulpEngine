@@ -80,7 +80,7 @@ namespace
     static_assert(X_OFFSETOF(RaycastQueryResult, block) == X_OFFSETOF(physx::PxRaycastQueryResult, block), "Offset don't match");
     static_assert(X_OFFSETOF(RaycastQueryResult, pTouches) == X_OFFSETOF(physx::PxRaycastQueryResult, touches), "Offset don't match");
     static_assert(X_OFFSETOF(RaycastQueryResult, nbTouches) == X_OFFSETOF(physx::PxRaycastQueryResult, nbTouches), "Offset don't match");
-    static_assert(X_OFFSETOF(RaycastQueryResult, pUserData) == X_OFFSETOF(physx::PxRaycastQueryResult, userData), "Offset don't match");
+    static_assert(X_OFFSETOF(RaycastQueryResult, userData) == X_OFFSETOF(physx::PxRaycastQueryResult, userData), "Offset don't match");
     static_assert(X_OFFSETOF(RaycastQueryResult, queryStatus) == X_OFFSETOF(physx::PxRaycastQueryResult, queryStatus), "Offset don't match");
     static_assert(X_OFFSETOF(RaycastQueryResult, hasBlock) == X_OFFSETOF(physx::PxRaycastQueryResult, hasBlock), "Offset don't match");
     static_assert(X_OFFSETOF(RaycastQueryResult, pad) == X_OFFSETOF(physx::PxRaycastQueryResult, pad), "Offset don't match");
@@ -111,7 +111,7 @@ namespace
         else {
             X_ASSERT_UNREACHABLE();
         }
-        pxDesc.userData = const_cast<void*>(desc.pUserData);
+        pxDesc.userData = static_cast<void*>(desc.userData);
     }
 
 } // namespace
@@ -362,7 +362,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
         }
 
         X_ASSERT_NOT_NULL(pController);
-        pController->getActor()->userData = const_cast<void*>(desc.pUserData);
+        pController->getActor()->userData = static_cast<void*>(desc.userData);
 
         return X_NEW(XBoxCharController, arena_, "BoxCharController")(static_cast<physx::PxBoxController*>(pController));
     }
@@ -396,7 +396,7 @@ ICharacterController* XScene::createCharacterController(const ControllerDesc& de
         }
 
         X_ASSERT_NOT_NULL(pController);
-        pController->getActor()->userData = const_cast<void*>(desc.pUserData);
+        pController->getActor()->userData = static_cast<void*>(desc.userData);
 
         return X_NEW(XCapsuleCharController, arena_, "CapsuleCharController")(static_cast<physx::PxCapsuleController*>(pController));
     }
