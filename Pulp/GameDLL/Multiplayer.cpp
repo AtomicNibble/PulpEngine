@@ -59,6 +59,7 @@ void Multiplayer::update(net::IPeer* pPeer)
             continue;
         }
 
+#if 0
         playerStates_[i].points++;
 
         if (playerStates_[i].points % 16 == 0) {
@@ -68,6 +69,7 @@ void Multiplayer::update(net::IPeer* pPeer)
         if (playerStates_[i].points % 32 == 0) {
             playerStates_[i].headshots++;
         }
+#endif
 
         // what's the ping of the local player?
 
