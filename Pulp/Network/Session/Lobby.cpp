@@ -1799,14 +1799,21 @@ bool Lobby::getUserInfoForGuid(NetGUID guid, UserInfo& info) const
     return true;
 }
 
-core::string_view Lobby::getDisconnectedUserNameForGuid(NetGUID guid) const
+core::string_view Lobby::getUserNameForGuid(NetGUID guid) const
 {
+    {
+        UserInfo info;
+        if (getUserInfoForGuid(guid, info)) {
+            return info.name;
+        }
+    }
+
     auto it = std::find_if(disconnectedUsers_.begin(), disconnectedUsers_.end(), [guid](const DisconnectedUser& u) {
         return u.guid == guid;
     });
 
     if (it == disconnectedUsers_.end()) {
-        return {};
+        return { "<unknown>" };
     }
 
     return core::string_view(it->username.data(), it->username.length());

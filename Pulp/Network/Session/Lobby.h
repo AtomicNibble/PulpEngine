@@ -215,7 +215,7 @@ public:
 
     void getUserInfoForIdx(int32_t idx, UserInfo& info) const X_FINAL;
     bool getUserInfoForGuid(NetGUID guid, UserInfo& info) const X_FINAL;
-    core::string_view getDisconnectedUserNameForGuid(NetGUID guid) const X_FINAL;
+    core::string_view getUserNameForGuid(NetGUID guid) const X_FINAL;
 
     // Misc
     X_INLINE bool isActive(void) const X_FINAL;

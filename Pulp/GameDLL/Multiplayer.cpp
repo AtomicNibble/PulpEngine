@@ -144,7 +144,7 @@ void Multiplayer::playerSpawned(int32_t localIndex)
         X_WARNING("Game", "Failed to get name for spawned player for index: %" PRIi32, localIndex);
     }
 
-    auto fmt = gEnv->pLocalisation->getString("#str_joined_game"_strhash);
+    auto fmt = gEnv->pLocalisation->getString("#str_game_ply_joined"_strhash);
 
     // mmm.
     core::StackString256 str;
@@ -330,22 +330,9 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
             
             auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
-            core::string_view name;
-            {
-                net::UserInfo info;
-                if (pLobby->getUserInfoForGuid(guid, info)) {
-                    name = info.name;
-                }
-                else {
-                    name = pLobby->getDisconnectedUserNameForGuid(guid);
-                }
-            }
+            core::string_view name = pLobby->getUserNameForGuid(guid);
 
-            if (name.empty()) {
-                name = "<error>";
-            }
-
-            auto fmt = gEnv->pLocalisation->getString("#str_left_game"_strhash);
+            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_left"_strhash);
 
             core::StackString256 str;
             core::format::format_to(str, fmt, name);
@@ -360,8 +347,20 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
             break;
         }
         case Event::PLY_KILLED: {
+            const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
+            const auto& KillerGuid = netMappings_.lobbyUserGuids[param1];
 
+            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
+            core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
+            core::string_view killerName = pLobby->getUserNameForGuid(KillerGuid);
+
+            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_killed"_strhash);
+
+            core::StackString256 str;
+            core::format::format_to(str, fmt, diedName, killerName);
+
+            addEventLine(core::string_view(str.begin(), str.length()));
             break;
         }
 

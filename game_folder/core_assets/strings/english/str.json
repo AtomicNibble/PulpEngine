@@ -1,6 +1,8 @@
 {
     "#str_nice_goat": "This goat is very nice",
-    "#str_joined_game": "{} joined the game",
-    "#str_left_game": "{} left the game"
+    "#str_game_ply_joined": "{} joined the game",
+    "#str_game_ply_left": "{} left the game",
+    "#str_game_ply_killed": "{} was killed by {}",
+    "#str_game_ply_died": "{} died"
 }
 
