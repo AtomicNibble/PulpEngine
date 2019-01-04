@@ -32,7 +32,8 @@ namespace entity
     // Messages
     X_DECLARE_ENUM(MessageType)(
         Move,
-        Damage
+        Damage,
+        PlayerDied
     );
 
     struct MsgMove
@@ -50,6 +51,16 @@ namespace entity
         EntityId attackerId;
         int32_t damage;
     };
+
+    struct MsgPlayerDied
+    {
+        static constexpr MessageType::Enum MSG_ID = MessageType::PlayerDied;
+
+        EntityId id;
+        EntityId attackerId;
+    };
+
+    // ------------------
 
 
     // Comps
