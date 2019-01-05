@@ -1245,7 +1245,7 @@ void XPeer::addToBanList(const SystemAddressEx& sysAdd, core::TimeVal timeout)
     };
 
     for (auto& ban : bans_) {
-        if (ban.sysAdd == sysAdd) {
+        if (ban.sysAdd.equalExcludingPort(sysAdd)) {
             assignBanTime(ban, timeout);
             return;
         }
@@ -1280,7 +1280,7 @@ void XPeer::removeFromBanList(const IPStr& ip)
     }
 
     auto findBanIP = [&sysAdd](const Ban& oth) {
-        return oth.sysAdd == sysAdd;
+        return oth.sysAdd.equalExcludingPort(sysAdd);
     };
 
     auto it = std::find_if(bans_.begin(), bans_.end(), findBanIP);
@@ -1316,7 +1316,7 @@ bool XPeer::isBanned(const SystemAddressEx& sysAdd)
     for (auto it = bans_.begin(); it != bans_.end(); /* ++it */) {
         auto& ban = (*it);
 
-        if (ban.sysAdd == sysAdd) {
+        if (ban.sysAdd.equalExcludingPort(sysAdd)) {
             // expired?
             if (ban.timeOut.GetValue() != 0) {
                 core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
@@ -1352,7 +1352,7 @@ void XPeer::listBans(void) const
         }
 
         IPStr ipStr;
-        X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.sysAdd.toString(ipStr), msLeft);
+        X_LOG0("Net", "Ban: \"%s\" timeLeftMS: ^5%" PRIi64, ban.sysAdd.toString(ipStr, false), msLeft);
     }
 }
 
