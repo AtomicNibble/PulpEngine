@@ -212,7 +212,11 @@ void RemoteSystem::onPong(core::TimeVal sendPingTime, core::TimeVal sendPongTime
 
 // -----------------------------------
 
-const std::array<uint32_t, 3> XPeer::MTUSizesArr = {MAX_MTU_SIZE, 1200, 576};
+const std::array<uint32_t, 3> XPeer::MTUSizesArr = {
+    MAX_MTU_SIZE, 
+    1200, 
+    576 // this is the guaranteed minimum hardware must support for IPV4 (IPV6 is 1280)
+};
 
 XPeer::XPeer(NetVars& vars, const SystemAddArr& localAddress, core::MemoryArenaBase* arena) :
     vars_(vars),
