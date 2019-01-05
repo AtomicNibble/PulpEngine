@@ -280,7 +280,7 @@ bool XGame::update(core::FrameData& frame)
     pSession_->update();
     pSession_->getSessionInfo(sessionInfo_);
 
-    auto status = pSession_->getStatus();
+    auto status = sessionInfo_.status;
 
     auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::GUI);
 
@@ -374,7 +374,7 @@ bool XGame::update(core::FrameData& frame)
         auto localIdx = userNetMap_.localPlayerIdx;
         entity::EntityId localId = static_cast<entity::EntityId>(localIdx);
 
-        const bool isHost = pSession_->isHost();
+        const bool isHost = sessionInfo_.isHost;
 
         auto& userCmd = userCmdGen_.getCurrentUserCmd();
         {
@@ -603,7 +603,7 @@ void XGame::handleChatMsg(net::Packet* pPacket)
 
     X_LOG0("Game", "nameLen %" PRIu32 " msgLen: %" PRIu32, nameLen, msgLen);
 
-    if (pSession_->isHost()) {
+    if (sessionInfo_.isHost) {
         pMultiplayerGame_->handleChatMsg(core::string_view(name, nameLen), core::string_view(msg, msgLen));
     }
     else {
@@ -758,10 +758,8 @@ void XGame::drawDebug(engine::IPrimativeContext* pPrim)
     Vec3f pos(base.x, base.y, 1.f);
 
     if (vars_.drawSessionInfoDebug()) {
-        auto status = pSession_->getStatus();
-
-        txt.setFmt("Session: %s\n", net::SessionStatus::ToString(status));
-        txt.appendFmt("Host: %" PRIi8 "\n", pSession_->isHost());
+        txt.setFmt("Session: %s\n", net::SessionStatus::ToString(sessionInfo_.status));
+        txt.appendFmt("Host: %" PRIi8 "\n", sessionInfo_.isHost);
         txt.appendFmt("PlyIdx: %" PRIi32 " Guid: %s", userNetMap_.localPlayerIdx, userNetMap_.myGuid.toString(guidStr));
 
         pPrim->drawText(pos, con, txt.begin(), txt.end());
@@ -801,7 +799,7 @@ void XGame::syncLobbyUsers(void)
 
     // only the host spawns players this way.
     // clients are told to spawn via snapshots.
-    if (!pLobby->isHost()) {
+    if (!sessionInfo_.isHost) {
         return;
     }
 
@@ -995,7 +993,7 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
         name = "server";
     }
 
-    if (pSession_->isHost()) {
+    if (sessionInfo_.isHost) {
         pMultiplayerGame_->handleChatMsg(name, msg);
     }
     else {
