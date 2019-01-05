@@ -8,7 +8,6 @@
 #include <IWorld3D.h>
 #include <I3DEngine.h>
 #include <IModelManager.h>
-#include <INetwork.h>
 
 #include <Hashing\Fnva1Hash.h>
 

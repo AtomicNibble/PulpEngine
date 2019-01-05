@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "HealthSys.h"
 
-#include <INetwork.h>
-
 X_NAMESPACE_BEGIN(game)
 
 namespace entity

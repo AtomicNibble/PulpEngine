@@ -37,6 +37,7 @@ X_LINK_ENGINE_LIB("AnimLib");
 #include <IWeapon.h>
 #include <IEntity.h>
 #include <ISound.h>
+#include <INetwork.h>
 
 #include <IPrimativeContext.h>
 #include <IFont.h>

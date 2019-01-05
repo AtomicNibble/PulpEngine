@@ -1,7 +1,5 @@
 #pragma once
 
-#include <INetwork.h>
-
 #include <Containers/FixedFifo.h>
 #include <Containers/FixedBitStream.h>
 

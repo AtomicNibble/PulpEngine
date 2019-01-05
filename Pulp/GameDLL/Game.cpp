@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "Game.h"
 
-#include <INetwork.h>
 #include <IRender.h>
 #include <IConsole.h>
 #include <IFrameData.h>
