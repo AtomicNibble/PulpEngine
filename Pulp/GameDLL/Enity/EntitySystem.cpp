@@ -125,7 +125,7 @@ namespace entity
         if (!physSys_.init(reg_, pPhysScene_)) {
             return false;
         }
-
+        
         if (!animatedSys_.init()) {
             return false;
         }
