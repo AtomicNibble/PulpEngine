@@ -276,43 +276,42 @@ RecvResult::Enum NetSocket::recv(RecvData& dataOut)
 
     waiting_ = 1;
 
+    int32_t error = 0;
     int32_t bytesRead = platform::recvfrom(
         socket_,
         reinterpret_cast<char*>(dataOut.data),
         sizeof(dataOut.data),
         flags,
         reinterpret_cast<platform::sockaddr*>(&senderAddr),
-        &senderAddLen);
+        &senderAddLen
+    );
 
     waiting_ = 0;
+
+    // must get eror before we reset it.
+    if (bytesRead < 0) {
+        error = lastErrorWSA::Get();
+    }
 
     dataOut.bytesRead = bytesRead;
     dataOut.systemAddress.setFromAddStorage(senderAddr);
 
     IPStr ipStr;
-    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 bit-length: ^5%" PRIi32 "^7 Add: \"%s\"", 
+    X_LOG0_IF(vars_.debugSocketsEnabled(), "Net", "^2socket::^1recv:^7 bit-length: ^5%" PRIi32 "^7 Add: \"%s\"",
         core::bitUtil::bytesToBits(bytesRead), dataOut.systemAddress.toString(ipStr));
 
-    if (bytesRead <= 0) {
-        // this is not error, just making it so single branch if above zero.
-        if (bytesRead == 0) {
-            return RecvResult::Success;
-        }
-
-        // error.
-        const auto err = lastErrorWSA::Get();
+    if (bytesRead == 0) {
+        return RecvResult::Success;
+    }
+    else if (bytesRead < 0) {
         lastErrorWSA::Description Dsc;
 
-        if (err == WSAECONNRESET) {
-            dataOut.systemAddress.setFromAddStorage(senderAddr);
-
-            X_WARNING("Net", "Failed to recvfrom. \"%s\" Add: \"%s\"",
-                lastErrorWSA::ToString(err, Dsc), dataOut.systemAddress.toString(ipStr));
-
+        if (error == WSAECONNRESET) {
+            X_WARNING("Net", "Failed to recvfrom. Error(%" PRIi32 "): \"%s\" Add: \"%s\"", lastErrorWSA::ToString(error, Dsc), dataOut.systemAddress.toString(ipStr));
             return RecvResult::ConnectionReset;
         }
 
-        X_ERROR("Net", "Failed to recvfrom. Error: \"%s\"", lastErrorWSA::ToString(err, Dsc));
+        X_ERROR("Net", "Failed to recvfrom. Error(%" PRIi32 "): \"%s\" Add: \"%s\"", error, lastErrorWSA::ToString(error, Dsc), dataOut.systemAddress.toString(ipStr));
         return RecvResult::Error;
     }
 
