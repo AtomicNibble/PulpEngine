@@ -74,7 +74,7 @@ void XNet::registerCmds(void)
     ADD_COMMAND_MEMBER("startMatch", this, XNet, &XNet::Cmd_startMatch, core::VarFlag::SYSTEM,
         "Guess what? yep it starts that match, magic.");
 
-    ADD_COMMAND_MEMBER("net_lobby_char", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM | core::VarFlag::SINGLE_ARG,
+    ADD_COMMAND_MEMBER("net_lobby_chat", this, XNet, &XNet::Cmd_chat, core::VarFlag::SYSTEM | core::VarFlag::SINGLE_ARG,
         "Send a chat message");
 }
 
