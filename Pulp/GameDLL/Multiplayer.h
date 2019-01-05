@@ -93,9 +93,14 @@ public:
     void handleEvent(core::FixedBitStreamBase& bs);
 
     void addChatLine(core::string_view name, core::string_view msg);
-private:
     void addEventLine(core::string_view line);
 
+private:
+    void onPlyLeft(int32_t param0, int32_t param1);
+    void onPlyDied(int32_t param0, int32_t param1);
+    void onPlyKilled(int32_t param0, int32_t param1);
+
+private:
     void drawChat(engine::IPrimativeContext* pPrim);
     void drawEvents(engine::IPrimativeContext* pPrim);
     void updateChat(core::TimeVal dt);

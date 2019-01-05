@@ -326,51 +326,15 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
     switch (evt)
     {
         case Event::PLY_LEFT: {
-            const auto& guid = netMappings_.lobbyUserGuids[param0];
-            
-            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-            core::string_view name = pLobby->getUserNameForGuid(guid);
-
-            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_left"_strhash);
-
-            core::StackString256 str;
-            core::format::format_to(str, fmt, name);
-
-            addEventLine(core::string_view(str.begin(), str.length()));
+            onPlyLeft(param0, param1);
             break;
         }
-
         case Event::PLY_DIED: {
-            const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
-
-            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-            core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
-
-            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_died"_strhash);
-
-            core::StackString256 str;
-            core::format::format_to(str, fmt, diedName);
-
-            addEventLine(core::string_view(str.begin(), str.length()));
+            onPlyDied(param0, param1);
             break;
         }
         case Event::PLY_KILLED: {
-            const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
-            const auto& KillerGuid = netMappings_.lobbyUserGuids[param1];
-
-            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
-
-            core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
-            core::string_view killerName = pLobby->getUserNameForGuid(KillerGuid);
-
-            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_killed"_strhash);
-
-            core::StackString256 str;
-            core::format::format_to(str, fmt, diedName, killerName);
-
-            addEventLine(core::string_view(str.begin(), str.length()));
+            onPlyKilled(param0, param1);
             break;
         }
 
@@ -390,6 +354,58 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
         auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
         pLobby->sendToPeers(bs);
     }
+}
+
+void Multiplayer::onPlyLeft(int32_t param0, int32_t param1)
+{
+    X_UNUSED(param1);
+    const auto& guid = netMappings_.lobbyUserGuids[param0];
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+    core::string_view name = pLobby->getUserNameForGuid(guid);
+
+    auto fmt = gEnv->pLocalisation->getString("#str_game_ply_left"_strhash);
+
+    core::StackString256 str;
+    core::format::format_to(str, fmt, name);
+
+    addEventLine(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::onPlyDied(int32_t param0, int32_t param1)
+{
+    X_UNUSED(param1);
+    const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+    core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
+
+    auto fmt = gEnv->pLocalisation->getString("#str_game_ply_died"_strhash);
+
+    core::StackString256 str;
+    core::format::format_to(str, fmt, diedName);
+
+    addEventLine(core::string_view(str.begin(), str.length()));
+}
+
+void Multiplayer::onPlyKilled(int32_t param0, int32_t param1)
+{
+    const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
+    const auto& KillerGuid = netMappings_.lobbyUserGuids[param1];
+
+    auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
+
+    core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
+    core::string_view killerName = pLobby->getUserNameForGuid(KillerGuid);
+
+    auto fmt = gEnv->pLocalisation->getString("#str_game_ply_killed"_strhash);
+
+    core::StackString256 str;
+    core::format::format_to(str, fmt, diedName, killerName);
+
+    addEventLine(core::string_view(str.begin(), str.length()));
 }
 
 void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core::string_view msg)
