@@ -1349,6 +1349,9 @@ void XPeer::listBans(void) const
 
         if (ban.timeOut.GetValue() != 0) {
             msLeft = (ban.timeOut - timeNow).GetMilliSecondsAsInt64();
+            if (msLeft < 0) {
+                msLeft = 0;
+            }
         }
 
         IPStr ipStr;
