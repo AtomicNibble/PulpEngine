@@ -1221,7 +1221,7 @@ void XPeer::addToBanList(const IPStr& ip, core::TimeVal timeout)
     }
 
     SystemAddressEx sysAdd;
-    if (sysAdd.fromIP(ip)) {
+    if (!sysAdd.fromIP(ip)) {
         return;
     }
 
@@ -1275,7 +1275,7 @@ void XPeer::removeFromBanList(const IPStr& ip)
     }
 
     SystemAddressEx sysAdd;
-    if (sysAdd.fromIP(ip)) {
+    if (!sysAdd.fromIP(ip)) {
         return;
     }
 
@@ -1299,7 +1299,7 @@ bool XPeer::isBanned(const IPStr& ip)
     }
 
     SystemAddressEx sysAdd;
-    if (sysAdd.fromIP(ip)) {
+    if (!sysAdd.fromIP(ip)) {
         X_ERROR("Net", "BanCheck, failed to load address from ip");
         return false; // say they are banned if we can't check?
     }
