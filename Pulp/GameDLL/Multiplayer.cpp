@@ -48,7 +48,7 @@ Multiplayer::Multiplayer(GameVars& vars, const UserNetMappings& netMappings, net
     
 }
 
-void Multiplayer::update(net::IPeer* pPeer)
+void Multiplayer::update(void)
 {
     // get all the pings yo.
     // this should just map with players.
@@ -81,7 +81,7 @@ void Multiplayer::update(net::IPeer* pPeer)
         }
 
         net::PingInfo pingInfo;
-        if (!pPeer->getPingInfo(sysHandle, pingInfo)) {
+        if (!pSession_->getPingInfo(sysHandle, pingInfo)) {
             continue;
         }
 

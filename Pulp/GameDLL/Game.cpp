@@ -423,7 +423,7 @@ bool XGame::update(core::FrameData& frame)
             // send snapshot after updating world.
             pSession_->sendSnapShot(frame.timeInfo);
 
-            pMultiplayerGame_->update(pPeer_);
+            pMultiplayerGame_->update();
         }
 
         pMultiplayerGame_->drawChat(frame.timeInfo, pPrim);

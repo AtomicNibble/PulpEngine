@@ -1283,6 +1283,11 @@ const MatchParameters& Session::getMatchParams(void) const
     return lobbys_[LobbyType::Game].getMatchParams();
 }
 
+bool Session::getPingInfo(SystemHandle systemHandle, PingInfo& info) const
+{
+    return pPeer_->getPingInfo(systemHandle, info);
+}
+
 Vec2f Session::drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const
 {
     const auto debugLvl = vars_.drawLobbyDebug();

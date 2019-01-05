@@ -75,7 +75,7 @@ public:
 public:
     Multiplayer(GameVars& vars, const UserNetMappings& netMappings, net::ISession* pSession);
 
-    void update(net::IPeer* pPeer);
+    void update(void);
 
     void drawChat(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);
     void drawEvents(core::FrameTimeData& time, engine::IPrimativeContext* pPrim);

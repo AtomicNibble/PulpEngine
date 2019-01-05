@@ -189,6 +189,7 @@ public:
     bool isHost(void) const X_FINAL;
     SessionStatus::Enum getStatus(void) const X_FINAL;
     const MatchParameters& getMatchParams(void) const X_FINAL;
+    bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_FINAL;
 
     Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_FINAL;
 

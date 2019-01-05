@@ -655,6 +655,7 @@ struct ISession
     virtual bool isHost(void) const X_ABSTRACT;
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;
+    virtual bool getPingInfo(SystemHandle systemHandle, PingInfo& info) const X_ABSTRACT;
  
     virtual void quitToMenu(void) X_ABSTRACT;       // force move to menu, no telling peers etc.
     virtual void quitMatch(void) X_ABSTRACT;        // gracefull quit of match, will tell peers we left etc.
@@ -667,6 +668,7 @@ struct ISession
     virtual void sendSnapShot(SnapShot&& snap) X_ABSTRACT; // used for testing
     
     virtual ILobby* getLobby(LobbyType::Enum type) X_ABSTRACT;
+
 
     virtual Vec2f drawDebug(Vec2f base, engine::IPrimativeContext* pPrim) const X_ABSTRACT;
 };
