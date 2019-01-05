@@ -40,7 +40,7 @@ bool EngineApp::Init(const wchar_t* pInCmdLine)
     params.bEnableJobSystem = true; // some converters make use of the job system.
     params.pCoreArena = g_arena;
     params.bFileSysWorkingDir = true;
-    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - AssetServer Test Client";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - AssetServer Test Client";
 
 
 #ifdef X_LIB

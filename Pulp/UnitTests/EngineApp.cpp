@@ -55,7 +55,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bEnableJobSystem = false;
     params.bProfileSysEnabled = false;
     params.pCoreArena = g_arena;
-    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Test Log";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - Test Log";
 
 #ifdef X_LIB
 

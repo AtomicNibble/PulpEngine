@@ -153,14 +153,14 @@ struct IAssertHandler
 struct ConsoleDesc
 {
     ConsoleDesc() {
-        pTitle = L"Engine Log";
+        pTitle = "Engine Log";
         windowWidth = 120;
         windowHeight = 60;
         numLines = 9000;
         x = y = 10;
     }
 
-    const wchar_t* pTitle;
+    const char* pTitle;
     uint32_t windowWidth;
     uint32_t windowHeight;
     uint32_t numLines;

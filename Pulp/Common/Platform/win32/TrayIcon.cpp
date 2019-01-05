@@ -60,7 +60,7 @@ TrayIcon::~TrayIcon()
     UnRegisterClass();
 }
 
-bool TrayIcon::CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t menuID, bool bHidden)
+bool TrayIcon::CreateIcon(HWND hParent, core::string_view toolTip, uint32_t iconId, uint32_t menuID, bool bHidden)
 {
     HICON icon = ::LoadIcon(hInstance_, MAKEINTRESOURCE(iconId));
     if (!icon) {
@@ -90,7 +90,7 @@ bool TrayIcon::CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32
     tnd_.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     tnd_.uCallbackMessage = ::RegisterWindowMessage(L"WM_TRAYICON");
 
-    wcsncpy_s(tnd_.szTip, toolTip, 128);
+    core::strUtil::Convert(toolTip.data(), toolTip.data() + toolTip.length(), tnd_.szTip);
 
     hidden_ = bHidden;      // Starts hidden ?
     targetWnd_ = tnd_.hWnd; // Save target hWnd.

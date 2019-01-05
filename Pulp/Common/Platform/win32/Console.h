@@ -17,11 +17,11 @@ public:
     typedef Vec2i Position;
     typedef Recti Rect;
 
-    explicit Console(const wchar_t* title);
+    explicit Console(core::string_view title);
 
     ~Console(void);
 
-    void setTitle(const wchar_t* title);
+    void setTitle(core::string_view title);
     void setSize(uint32_t windowWidth, uint32_t windowHeight, uint32_t numLines);
     void setCursorPosition(uint32_t x, uint32_t y);
     void moveTo(int x, int y);

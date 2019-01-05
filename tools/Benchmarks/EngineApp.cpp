@@ -57,7 +57,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
     params.bProfileSysEnabled = false;
     params.pCoreArena = &arena_;
     params.bThreadSafeStringAlloc = false;
-    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Benchmark Log";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - Benchmark Log";
 
 #ifdef X_LIB
 

@@ -40,7 +40,7 @@ bool EngineApp::Init(HINSTANCE hInstance, core::MemoryArenaBase* arena, const wc
     params.pCoreArena = arena;
     // params.bFileSysWorkingDir = true;
     params.bScriptSystem = true;
-    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - ScriptCmd";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - ScriptCmd";
 
 
 #ifdef X_LIB

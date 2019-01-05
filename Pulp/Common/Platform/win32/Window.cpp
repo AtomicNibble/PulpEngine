@@ -19,7 +19,7 @@ static X_INLINE LRESULT WndProcProxy(Window* pWindow, HWND hWnd, UINT msg, WPARA
 
 namespace
 {
-    const wchar_t* g_ClassName = X_ENGINE_NAME_W L"Engine";
+    const wchar_t* g_ClassName = X_WIDEN(X_ENGINE_NAME) L"Engine";
 
     bool g_ClassRegisterd = false;
 

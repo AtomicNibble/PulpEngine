@@ -114,11 +114,11 @@ namespace
         }
 
         if (isServer) {
-            Console.setTitle(X_ENGINE_NAME_W L" - Server");
+            Console.setTitle(X_ENGINE_NAME " - Server");
             Console.moveTo(3000, 10);
         }
         else {
-            Console.setTitle(X_ENGINE_NAME_W L" - Client");
+            Console.setTitle(X_ENGINE_NAME " - Client");
             Console.moveTo(3000, 800);
         }
 

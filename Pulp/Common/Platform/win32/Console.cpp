@@ -67,7 +67,7 @@ namespace
 
 }; // namespace
 
-Console::Console(const wchar_t* title) :
+Console::Console(core::string_view title) :
     stdout_(nullptr),
     stdin_(nullptr),
     stderr_(nullptr)
@@ -129,9 +129,11 @@ Console::~Console(void)
 }
 
 /// Sets the console title.
-void Console::setTitle(const wchar_t* title)
+void Console::setTitle(core::string_view title)
 {
-    ::SetConsoleTitleW(title);
+    core::StackStringW256 str(title.data(), title.data() + title.length());
+
+    ::SetConsoleTitleW(str.c_str());
 }
 
 /// \brief Sets the console window size and number of lines stored internally, in character units.

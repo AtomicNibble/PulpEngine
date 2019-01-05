@@ -16,7 +16,7 @@ public:
     TrayIcon();
     ~TrayIcon();
 
-    bool CreateIcon(HWND hParent, LPCTSTR toolTip, uint32_t iconId, uint32_t menuID, bool bHidden = false);
+    bool CreateIcon(HWND hParent, core::string_view toolTip, uint32_t iconId, uint32_t menuID, bool bHidden = false);
     void DestoryIcon(void);
     void RemoveIcon(void);
 

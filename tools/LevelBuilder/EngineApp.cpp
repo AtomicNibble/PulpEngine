@@ -36,7 +36,7 @@ bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine,
     params.pCoreArena = arena;
     params.bEnableBasicConsole = true;
     params.bFileSysWorkingDir = true;
-    params.consoleDesc.pTitle = X_ENGINE_NAME_W L" - Level Compiler";
+    params.consoleDesc.pTitle = X_ENGINE_NAME " - Level Compiler";
     //	params.bFileSysWorkingDir = true;
 
 #ifdef X_LIB
