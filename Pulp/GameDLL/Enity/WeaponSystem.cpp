@@ -22,8 +22,9 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    WeaponSystem::WeaponSystem(GameVars& vars) :
+    WeaponSystem::WeaponSystem(GameVars& vars, net::SessionInfo& sessionInfo) :
         vars_(vars),
+        sessionInfo_(sessionInfo),
         pReg_(nullptr),
         pPhysScene_(nullptr),
         pAnimManager_(nullptr)
@@ -387,9 +388,7 @@ namespace entity
         }
 
         // Only the server and single player should actually do damage.
-        bool isHost = true;
-
-        if (isHost)
+        if (sessionInfo_.isHost)
         {
             // do the dmg.
             serverDoDamage(ent, wpn, dmg);

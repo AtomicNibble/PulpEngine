@@ -330,13 +330,13 @@ bool Level::processEnts(void)
 
 // -------------------------------------
 
-World::World(GameVars& vars, physics::IPhysics* pPhys,
+World::World(GameVars& vars, net::SessionInfo& sessionInfo, physics::IPhysics* pPhys,
     game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
     arena_(arena),
     pPhys_(pPhys),
     pScene_(nullptr),
     p3DWorld_(nullptr),
-    ents_(vars, weaponDefs, pMultiplayer, arena),
+    ents_(vars, sessionInfo, weaponDefs, pMultiplayer, arena),
     level_(arena)
 {
 }

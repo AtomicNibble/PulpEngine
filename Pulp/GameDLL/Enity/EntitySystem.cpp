@@ -30,7 +30,7 @@ namespace entity
 {
     // -----------------------------------------------------------
 
-    EnititySystem::EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, 
+    EnititySystem::EnititySystem(GameVars& vars, net::SessionInfo& sessionInfo, game::weapon::WeaponDefManager& weaponDefs,
         Multiplayer* pMultiplayer, core::MemoryArenaBase* arena) :
         arena_(arena),
         reg_(&ecsArena_),
@@ -41,7 +41,7 @@ namespace entity
         ecsArena_(&ecsAllocator_, "ECSArena"),
         playerSys_(vars.player),
         cameraSys_(vars),
-        weaponSys_(vars),
+        weaponSys_(vars, sessionInfo),
         dtHealth_(arena),
         dtMesh_(arena),
         dtSoundObj_(arena),

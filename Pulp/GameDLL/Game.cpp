@@ -331,7 +331,7 @@ bool XGame::update(core::FrameData& frame)
             }
             else
             {
-                world_ = core::makeUnique<World>(arena_, vars_, gEnv->pPhysics, weaponDefs_, pMultiplayerGame_.get(), arena_);
+                world_ = core::makeUnique<World>(arena_, vars_, sessionInfo_, gEnv->pPhysics, weaponDefs_, pMultiplayerGame_.get(), arena_);
 
                 if (!world_->loadMap(matchParams.mapName)) {
                     X_ERROR("Game", "Failed to load map");

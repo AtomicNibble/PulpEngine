@@ -98,7 +98,7 @@ public:
     typedef Level::MapNameStr MapNameStr;
 
 public:
-    World(GameVars& vars, physics::IPhysics* pPhys,
+    World(GameVars& vars, net::SessionInfo& sessionInfo, physics::IPhysics* pPhys,
         weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
     ~World();
 

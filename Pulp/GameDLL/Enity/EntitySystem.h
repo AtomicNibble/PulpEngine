@@ -73,7 +73,8 @@ namespace entity
         typedef EnitiyRegister::entity_type EntityId;
 
     public:
-        EnititySystem(GameVars& vars, game::weapon::WeaponDefManager& weaponDefs, Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
+        EnititySystem(GameVars& vars, net::SessionInfo& sessionInfo, weapon::WeaponDefManager& weaponDefs,
+            Multiplayer* pMultiplayer, core::MemoryArenaBase* arena);
 
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
         void shutdown(void);
