@@ -342,8 +342,18 @@ void Multiplayer::postEvent(Event::Enum evt, int32_t param0, int32_t param1)
         }
 
         case Event::PLY_DIED: {
+            const auto& plyGuid = netMappings_.lobbyUserGuids[param0];
 
+            auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
 
+            core::string_view diedName = pLobby->getUserNameForGuid(plyGuid);
+
+            auto fmt = gEnv->pLocalisation->getString("#str_game_ply_died"_strhash);
+
+            core::StackString256 str;
+            core::format::format_to(str, fmt, diedName);
+
+            addEventLine(core::string_view(str.begin(), str.length()));
             break;
         }
         case Event::PLY_KILLED: {
