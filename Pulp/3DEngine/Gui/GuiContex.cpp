@@ -244,8 +244,6 @@ namespace gui
     {
         auto* pWindow = pCurrentWindow;
 
-        auto center = screenRect_.getCenter() * 0.5f;
-
         auto offset = itemWidth_ * 0.5f;
 
         pWindow->dc.currentPos = screenRect_.getCenter();
