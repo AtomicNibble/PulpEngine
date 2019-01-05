@@ -1316,16 +1316,16 @@ bool XPeer::isBanned(const SystemAddressEx& sysAdd)
     for (auto it = bans_.begin(); it != bans_.end(); /* ++it */) {
         auto& ban = (*it);
 
-        if (ban.sysAdd.equalExcludingPort(sysAdd)) {
-            // expired?
-            if (ban.timeOut.GetValue() != 0) {
-                core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
-                if (time > ban.timeOut) {
-                    it = bans_.erase(it);
-                    continue;
-                }
+        // expired?
+        if (ban.timeOut.GetValue() != 0) {
+            core::TimeVal time = gEnv->pTimer->GetTimeNowReal();
+            if (time > ban.timeOut) {
+                it = bans_.erase(it);
+                continue;
             }
+        }
 
+        if (ban.sysAdd.equalExcludingPort(sysAdd)) {
             return true;
         }
 
