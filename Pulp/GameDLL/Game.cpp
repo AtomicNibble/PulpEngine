@@ -278,6 +278,7 @@ bool XGame::update(core::FrameData& frame)
     Vec2f center(width * 0.5f, height * 0.5f);
 
     pSession_->update();
+    pSession_->getSessionInfo(sessionInfo_);
 
     auto status = pSession_->getStatus();
 

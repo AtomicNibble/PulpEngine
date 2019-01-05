@@ -125,6 +125,7 @@ private:
 private:
     GameVars vars_;
     InputVars inputVars_;
+    net::SessionInfo sessionInfo_;
 
     net::SessionStatus::Enum prevStatus_;
 
