@@ -185,6 +185,7 @@ public:
 
     X_INLINE SessionState::Enum getState(void) const;
     
+    void getSessionInfo(SessionInfo& info) const X_FINAL;
     bool isHost(void) const X_FINAL;
     SessionStatus::Enum getStatus(void) const X_FINAL;
     const MatchParameters& getMatchParams(void) const X_FINAL;

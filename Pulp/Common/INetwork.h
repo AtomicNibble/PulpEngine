@@ -624,6 +624,17 @@ struct IGameCallbacks
     virtual bool handlePacket(Packet* pPacket) X_ABSTRACT;
 };
 
+struct SessionInfo
+{
+    SessionInfo()
+    {
+        core::zero_this(this);
+    }
+
+    SessionStatus::Enum status;
+    bool isHost;
+};
+
 struct ISession
 {
     virtual ~ISession() = default;
@@ -640,6 +651,7 @@ struct ISession
     virtual void finishedLoading(void) X_ABSTRACT;
     virtual bool hasFinishedLoading(void) const X_ABSTRACT;
 
+    virtual void getSessionInfo(SessionInfo& info) const X_ABSTRACT;
     virtual bool isHost(void) const X_ABSTRACT;
     virtual SessionStatus::Enum getStatus(void) const X_ABSTRACT;
     virtual const MatchParameters& getMatchParams(void) const X_ABSTRACT;

@@ -1227,6 +1227,13 @@ void Session::sendPacketToDesiredLobby(Packet* pPacket)
     lobby.handlePacket(pPacket);
 }
 
+void Session::getSessionInfo(SessionInfo& info) const
+{
+    info.status = getStatus();
+    info.isHost = isHost();
+}
+
+
 bool Session::isHost(void) const
 {
     // not sure what states I will allowthis to be caleld form yet.
