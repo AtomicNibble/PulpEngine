@@ -132,19 +132,10 @@ X_INLINE XBoxCharController::~XBoxCharController()
 {
 }
 
-X_INLINE float32_t XBoxCharController::getHalfHeight(void) const
+X_INLINE XBoxCharController::Info XBoxCharController::geInfo(void) const
 {
-    return getController()->getHalfHeight();
-}
-
-X_INLINE float32_t XBoxCharController::getHalfSideExtent(void) const
-{
-    return getController()->getHalfSideExtent();
-}
-
-X_INLINE float32_t XBoxCharController::getHalfForwardExtent(void) const
-{
-    return getController()->getHalfForwardExtent();
+    auto* pCon = getController();
+    return { pCon ->getHalfHeight(), pCon ->getHalfSideExtent(), pCon->getHalfForwardExtent() };
 }
 
 X_INLINE bool XBoxCharController::setHalfHeight(float32_t halfHeight)
@@ -173,28 +164,16 @@ X_INLINE XCapsuleCharController::~XCapsuleCharController()
 {
 }
 
-X_INLINE float32_t XCapsuleCharController::getRadius(void) const
+X_INLINE XCapsuleCharController::Info XCapsuleCharController::geInfo(void) const
 {
-    return getController()->getRadius();
-}
+    auto* pCon = getController();
+    auto pxMode = pCon->getClimbingMode();
 
-X_INLINE float32_t XCapsuleCharController::getHeight(void) const
-{
-    return getController()->getHeight();
-}
+    static_assert(physx::PxCapsuleClimbingMode::eEASY == ClimbingMode::Easy);
+    static_assert(physx::PxCapsuleClimbingMode::eCONSTRAINED == ClimbingMode::Constrained);
+    static_assert(physx::PxCapsuleClimbingMode::eLAST == CapsuleControllerDesc::ClimbingMode::ENUM_COUNT);
 
-X_INLINE CapsuleControllerDesc::ClimbingMode XCapsuleCharController::getClimbingMode(void) const
-{
-    auto pxMode = getController()->getClimbingMode();
-    if (pxMode == physx::PxCapsuleClimbingMode::eEASY) {
-        return CapsuleControllerDesc::ClimbingMode::Easy;
-    }
-    if (pxMode == physx::PxCapsuleClimbingMode::eCONSTRAINED) {
-        return CapsuleControllerDesc::ClimbingMode::Constrained;
-    }
-
-    X_ASSERT_UNREACHABLE();
-    return CapsuleControllerDesc::ClimbingMode::Easy;
+    return { pCon->getRadius(), pCon->getHeight(), static_cast<ClimbingMode::Enum>(pxMode) };
 }
 
 X_INLINE bool XCapsuleCharController::setRadius(float32_t radius)
@@ -207,17 +186,11 @@ X_INLINE bool XCapsuleCharController::setHeight(float32_t height)
     return getController()->setHeight(height);
 }
 
-X_INLINE bool XCapsuleCharController::setClimbingMode(CapsuleControllerDesc::ClimbingMode mode)
+X_INLINE bool XCapsuleCharController::setClimbingMode(ClimbingMode::Enum mode)
 {
-    if (mode == CapsuleControllerDesc::ClimbingMode::Easy) {
-        return getController()->setClimbingMode(physx::PxCapsuleClimbingMode::eEASY);
-    }
-    if (mode == CapsuleControllerDesc::ClimbingMode::Constrained) {
-        return getController()->setClimbingMode(physx::PxCapsuleClimbingMode::eCONSTRAINED);
-    }
+    auto pxMode = static_cast<physx::PxCapsuleClimbingMode::Enum>(mode);
 
-    X_ASSERT_UNREACHABLE();
-    return false;
+    return getController()->setClimbingMode(pxMode);
 }
 
 X_NAMESPACE_END

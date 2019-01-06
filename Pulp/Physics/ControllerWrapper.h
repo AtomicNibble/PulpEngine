@@ -46,9 +46,7 @@ public:
     X_INLINE XBoxCharController(physx::PxBoxController* pController);
     X_INLINE virtual ~XBoxCharController() X_OVERRIDE;
 
-    X_INLINE float32_t getHalfHeight(void) const X_FINAL;
-    X_INLINE float32_t getHalfSideExtent(void) const X_FINAL;
-    X_INLINE float32_t getHalfForwardExtent(void) const X_FINAL;
+    X_INLINE Info geInfo(void) const X_FINAL;
 
     X_INLINE bool setHalfHeight(float32_t halfHeight) X_FINAL;
     X_INLINE bool setHalfSideExtent(float32_t halfSideExtent) X_FINAL;
@@ -61,13 +59,11 @@ public:
     X_INLINE XCapsuleCharController(physx::PxCapsuleController* pController);
     X_INLINE virtual ~XCapsuleCharController() X_OVERRIDE;
 
-    X_INLINE float32_t getRadius(void) const X_FINAL;
-    X_INLINE float32_t getHeight(void) const X_FINAL;
-    X_INLINE CapsuleControllerDesc::ClimbingMode getClimbingMode(void) const X_FINAL;
+    X_INLINE Info geInfo(void) const X_FINAL;
 
     X_INLINE bool setRadius(float32_t radius) X_FINAL;
     X_INLINE bool setHeight(float32_t height) X_FINAL;
-    X_INLINE bool setClimbingMode(CapsuleControllerDesc::ClimbingMode mode) X_FINAL;
+    X_INLINE bool setClimbingMode(ClimbingMode::Enum mode) X_FINAL;
 };
 
 X_NAMESPACE_END

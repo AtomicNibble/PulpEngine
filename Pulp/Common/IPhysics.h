@@ -401,11 +401,10 @@ struct BoxControllerDesc : public ControllerDesc
 
 struct CapsuleControllerDesc : public ControllerDesc
 {
-    enum class ClimbingMode
-    {
+    X_DECLARE_ENUM(ClimbingMode)(
         Easy,       // Standard mode, let the capsule climb over surfaces according to impact normal
         Constrained // Constrained mode, try to limit climbing according to the step offset
-    };
+    );
 
     X_INLINE CapsuleControllerDesc() :
         ControllerDesc(ShapeType::Capsule)
@@ -416,7 +415,7 @@ struct CapsuleControllerDesc : public ControllerDesc
 
     float32_t radius;
     float32_t height;
-    ClimbingMode climbingMode;
+    ClimbingMode::Enum climbingMode;
 };
 
 X_DECLARE_FLAGS8(CharacterColFlag)
@@ -473,9 +472,14 @@ struct ICharacterController
 
 struct IBoxCharacterController : public ICharacterController
 {
-    virtual float32_t getHalfHeight(void) const X_ABSTRACT;
-    virtual float32_t getHalfSideExtent(void) const X_ABSTRACT;
-    virtual float32_t getHalfForwardExtent(void) const X_ABSTRACT;
+    struct Info
+    {
+        float32_t halfHeight;
+        float32_t halfSideExtent;
+        float32_t halfForwardExtent;
+    };
+
+    virtual Info geInfo(void) const X_ABSTRACT;
 
     virtual bool setHalfHeight(float32_t halfHeight) X_ABSTRACT;
     virtual bool setHalfSideExtent(float32_t halfSideExtent) X_ABSTRACT;
@@ -484,13 +488,20 @@ struct IBoxCharacterController : public ICharacterController
 
 struct ICapsuleCharacterController : public ICharacterController
 {
-    virtual float32_t getRadius(void) const X_ABSTRACT;
-    virtual float32_t getHeight(void) const X_ABSTRACT;
-    virtual CapsuleControllerDesc::ClimbingMode getClimbingMode(void) const X_ABSTRACT;
+    using ClimbingMode = CapsuleControllerDesc::ClimbingMode;
+
+    struct Info
+    {
+        float32_t radius;
+        float32_t height;
+        ClimbingMode::Enum climbingMode;
+    };
+
+    virtual Info geInfo(void) const X_ABSTRACT;
 
     virtual bool setRadius(float32_t radius) X_ABSTRACT;
     virtual bool setHeight(float32_t height) X_ABSTRACT;
-    virtual bool setClimbingMode(CapsuleControllerDesc::ClimbingMode mode) X_ABSTRACT;
+    virtual bool setClimbingMode(ClimbingMode::Enum mode) X_ABSTRACT;
 };
 
 struct IPhysicsCooking
