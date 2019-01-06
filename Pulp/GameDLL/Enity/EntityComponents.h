@@ -64,13 +64,16 @@ namespace entity
 
 
     // Comps
-    struct NetworkSync
-    {
-    };
-
     struct TransForm : public Transformf
     {
         ADD_META()
+    };
+
+    struct NetworkSync
+    {
+        Transformf prev;
+        Transformf next;
+        Transformf current;
     };
 
     struct Health

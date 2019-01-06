@@ -138,6 +138,9 @@
     <ClInclude Include="Enity\HealthSys.h">
       <Filter>Header Files\Enity\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\NetworkSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -207,6 +210,9 @@
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Enity\HealthSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\NetworkSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>

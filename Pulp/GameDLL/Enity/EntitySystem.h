@@ -14,6 +14,7 @@
 #include "EmitterSys.h"
 #include "MeshRendererSys.h"
 #include "HealthSys.h"
+#include "NetworkSys.h"
 
 #include "DataTranslator.h"
 
@@ -134,7 +135,6 @@ namespace entity
         game::weapon::WeaponDefManager& weaponDefs_;
         Multiplayer* pMultiplayer_;
 
-
         physics::IPhysics* pPhysics_;
         physics::IScene* pPhysScene_;
         engine::IWorld3D* p3DWorld_;
@@ -150,6 +150,7 @@ namespace entity
         EmitterSys emitterSys_;
         MeshRendererSys meshRendererSys_;
         HealthSystem healthSys_;
+        NetworkSystem networkSys_;
 
         EntityId endOfmapEnts_;
         EntityIdMapArr entIdMap_;

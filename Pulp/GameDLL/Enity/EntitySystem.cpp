@@ -146,6 +146,10 @@ namespace entity
             return false;
         }
 
+        if (!networkSys_.init()) {
+            return false;
+        }
+
         for (uint32_t i = 0; i < net::MAX_PLAYERS; i++) {
             auto id = reg_.create();
             if (id != i) {
