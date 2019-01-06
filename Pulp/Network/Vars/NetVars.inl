@@ -2,6 +2,11 @@
 
 X_NAMESPACE_BEGIN(net)
 
+X_INLINE uint16_t NetVars::port(void) const
+{
+    return safe_static_cast<uint16_t>(port_);
+}
+
 X_INLINE int32_t NetVars::debugEnabled(void) const
 {
     return debug_;

@@ -13,6 +13,9 @@ void NetVars::registerVars(void)
 {
     core::ConsoleVarFunc del;
 
+    ADD_CVAR_REF("net_port", port_, 1337, 0, std::numeric_limits<uint16_t>::max(), core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "The default port");
+
     ADD_CVAR_REF("net_debug", debug_, 0, 0, 2, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Enable net debug msg's 1=enabled 2=verbose");
 

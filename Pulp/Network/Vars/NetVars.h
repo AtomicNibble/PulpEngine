@@ -15,6 +15,8 @@ public:
 
     void registerVars(void);
 
+    X_INLINE uint16_t port(void) const;
+
     X_INLINE int32_t debugEnabled(void) const;
     X_INLINE int32_t debugIgnoredEnabled(void) const;
     X_INLINE int32_t debugDatagramEnabled(void) const;
@@ -47,6 +49,7 @@ private:
     void Var_OnArtificalNetworkChanged(core::ICVar* pVar);
 
 private:
+    int32_t port_;
     int32_t debug_;
     int32_t debugIgnored_;
     int32_t debugDataGram_;
