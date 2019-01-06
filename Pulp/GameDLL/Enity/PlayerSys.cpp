@@ -263,7 +263,7 @@ namespace entity
 
         // update trans?
         {
-            auto& curTrans = reg.get<TransForm>(playerId); // copy
+            auto& curTrans = reg.get<TransForm>(playerId);
             if (trans != curTrans)
             {
                 curTrans = trans;
