@@ -14,7 +14,7 @@ namespace entity
     class WeaponSystem
     {
     public:
-        WeaponSystem(GameVars& vars, net::SessionInfo& sessionInfo);
+        WeaponSystem(GameVars& vars, const net::SessionInfo& sessionInfo);
 
         bool init(ECS& reg, physics::IScene* pPhysScene, anim::IAnimManager* pAnimManager);
         void update(core::FrameData& frame, ECS& reg);
@@ -34,7 +34,7 @@ namespace entity
 
     private:
         GameVars& vars_;
-        net::SessionInfo& sessionInfo_;
+        const net::SessionInfo& sessionInfo_;
 
         ECS* pReg_;
 

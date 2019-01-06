@@ -22,7 +22,7 @@ X_NAMESPACE_BEGIN(game)
 
 namespace entity
 {
-    WeaponSystem::WeaponSystem(GameVars& vars, net::SessionInfo& sessionInfo) :
+    WeaponSystem::WeaponSystem(GameVars& vars, const net::SessionInfo& sessionInfo) :
         vars_(vars),
         sessionInfo_(sessionInfo),
         pReg_(nullptr),
