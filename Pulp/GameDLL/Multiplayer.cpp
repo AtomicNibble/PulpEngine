@@ -20,9 +20,10 @@ namespace
 
     float getAlpha(float percent)
     {
-        // this really best way :S ?
+        // fade out last 15%?
         const float fadeStart = 0.85f;
 
+        // this really best way :S ?
         float a = 1.f;
         if (percent >= fadeStart) {
             a = (percent - fadeStart);
@@ -232,7 +233,6 @@ void Multiplayer::drawChat(engine::IPrimativeContext* pPrim)
 
     for (const auto& line : chatLines_)
     {
-        // fade out last 10%?
         float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
 
         con.col.a = CHANTRAIT<uint8_t>::convert(getAlpha(percent));
@@ -264,7 +264,6 @@ void Multiplayer::drawEvents(engine::IPrimativeContext* pPrim)
 
     for (const auto& line : eventLines_)
     {
-        // fade out last 10%?
         float percent = line.ellapsed.GetMilliSeconds() / chatTime.GetMilliSeconds();
 
         con.col.a = CHANTRAIT<uint8_t>::convert(getAlpha(percent));
@@ -423,7 +422,7 @@ void Multiplayer::buildChatPacket(ChatPacketBs& bs, core::string_view name, core
 void Multiplayer::drawLeaderboard(engine::IPrimativeContext* pPrim)
 {
     // want some rows that are fixed size maybe?
-    // but centered in srreen.
+    // but centered in screen.
     // think this is something we should just scale based on res.
     // 800 X 600 as base.
 
