@@ -739,10 +739,10 @@ namespace entity
         desc.maxJumpHeight = vars_.player.jumpHeight_;
         desc.userData = physics::UserData(physics::UserType::EntId, id);
 
-        physics::ICharacterController* pController;
+        physics::ICapsuleCharacterController* pController;
         {
             physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-            pController = pPhysScene_->createCharacterController(desc);
+            pController = static_cast<physics::ICapsuleCharacterController*>(pPhysScene_->createCharacterController(desc));
         }
 
         if (!pController) {

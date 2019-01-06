@@ -272,12 +272,12 @@ namespace entity
 
     struct CharacterController
     {
-        CharacterController(physics::ICharacterController* pCon) :
+        CharacterController(physics::ICapsuleCharacterController* pCon) :
             pController(pCon)
         {
         }
 
-        physics::ICharacterController* pController;
+        physics::ICapsuleCharacterController* pController;
     };
 
     struct Rotator
@@ -305,6 +305,12 @@ namespace entity
         Vec3f offset;
 
         engine::fx::IEmitter* pEmitter;
+    };
+
+    // TODO: move into 3dengine or something.
+    struct RenderView
+    {
+
     };
 
     struct Player
@@ -346,6 +352,8 @@ namespace entity
 
         Vec3f firstPersonViewOrigin;
         Matrix33f firstPersonViewAxis;
+
+        RenderView renderView;
 
         net::UserCmd oldUserCmd;
         net::UserCmd userCmd;
