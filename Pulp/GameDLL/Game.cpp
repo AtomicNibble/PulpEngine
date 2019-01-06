@@ -114,6 +114,11 @@ bool XGame::init(void)
 
         userNetMap_.myGuid = pPeer_->getMyGUID();
 
+        // So I would like to only open the port if we actually want to talk to another pickle.
+        // also we should just use default port, but that's a net var :(
+        // sounds like the game should not even be dealing with this.
+        // The game should just have a session and session will open ports based on what the game asked the session todo.
+        // Think this will also mean session should manage own peer instance.
         net::Port basePort = 1337;
         net::Port maxPort = basePort + 10;
 

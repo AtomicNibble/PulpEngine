@@ -135,6 +135,8 @@ Engine:
 
 Network:
 
+ ☐ Make it so Session manages it's own Peer transport, and only listens on ports when we need to.
+     Basically should be able to play single player without ever making a Peer.
  ☐ Implement congestion control.
  ☐ Support a debug graph that shows like network usage with category support.
  ✔ Actually inc numSnapsSent for peers. @done (18-11-16 13:26)
