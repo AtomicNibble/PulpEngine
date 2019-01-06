@@ -417,6 +417,7 @@
     <ClInclude Include="Game.h" />
     <ClInclude Include="Level\Level.h" />
     <ClInclude Include="Multiplayer.h" />
+    <ClInclude Include="NetInterpolationState.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="UserCmds\UserCmdGen.h" />
     <ClInclude Include="UserNetMappings.h" />

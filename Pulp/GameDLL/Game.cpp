@@ -388,7 +388,7 @@ bool XGame::update(core::FrameData& frame)
 
             if (!isHost) {
                 // don't go past snapshot.
-                userCmd.serverGameTimeMS = core::Min(userCmd.serverGameTimeMS, netInterpolInfo_.snapShotEndMS);
+                userCmd.serverGameTimeMS = core::Min(userCmd.serverGameTimeMS, netInterpolState_.snapShotEndMS);
             }
 
             userCmdMan_.addUserCmdForPlayer(localIdx, userCmd);
@@ -627,10 +627,10 @@ void XGame::setInterpolation(float fraction, int32_t serverGameTimeMS, int32_t s
 {
     X_ASSERT(!pSession_->isHost(), "Only clients should have interpolation set")();
 
-    netInterpolInfo_.frac = fraction;
-    netInterpolInfo_.serverGameTimeMS = serverGameTimeMS;
-    netInterpolInfo_.snapShotStartMS = ssStartTimeMS;
-    netInterpolInfo_.snapShotEndMS = ssEndTimeMS;
+    netInterpolState_.frac = fraction;
+    netInterpolState_.serverGameTimeMS = serverGameTimeMS;
+    netInterpolState_.snapShotStartMS = ssStartTimeMS;
+    netInterpolState_.snapShotEndMS = ssEndTimeMS;
     serverGameTimeMS_ = serverGameTimeMS;
 }
 

@@ -12,6 +12,7 @@
 #include "Vars\InputVars.h"
 #include "Multiplayer.h"
 #include "UserNetMappings.h"
+#include "NetInterpolationState.h"
 
 #include "UserCmds\UserCmdGen.h"
 #include <UserCmdMan.h>
@@ -45,22 +46,6 @@ class XGame : public IGame, net::IGameCallbacks
     using PlayerGuidArr = std::array<net::NetGUID, net::MAX_PLAYERS>;
     using PlayerTimeMSArr = std::array<int32_t, net::MAX_PLAYERS>;
     using PlayerUserCmdArr = std::array<net::UserCmd, net::MAX_PLAYERS>;
-
-    struct NetInterpolationInfo
-    {
-        NetInterpolationInfo() :
-            frac(0.f),
-            serverGameTimeMS(0),
-            snapShotStartMS(0),
-            snapShotEndMS(0)
-        {
-        }
-
-        float frac;
-        int32_t serverGameTimeMS;
-        int32_t snapShotStartMS;
-        int32_t snapShotEndMS;
-    };
 
 public:
     XGame(ICore* pCore);
@@ -143,7 +128,7 @@ private:
     core::UniquePointer<Multiplayer> pMultiplayerGame_;
 
     // 
-    NetInterpolationInfo netInterpolInfo_;
+    NetInterpolationState netInterpolState_;
     int32_t serverGameTimeMS_;  // only set on clients.
     int32_t gameTimeMS_;
 
