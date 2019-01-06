@@ -942,7 +942,7 @@ bool XConsole::loadAndExecConfigFile(const char* pFileName)
     X_LOG0("Config", "Loading config: \"%s\"", pFileName);
 
     core::XFileScoped file;
-    if (!file.openFile(path, FileFlag::READ)) {
+    if (!file.openFile(path, FileFlag::READ, core::VirtualDirectory::SAVE)) {
         X_ERROR("Config", "failed to load: \"%s\"", path.c_str());
         return false;
     }
@@ -1720,7 +1720,7 @@ void XConsole::loadCmdHistory(bool async)
     }
     else {
         XFileMemScoped file;
-        if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode)) {
+        if (file.openFile(core::Path<>(CMD_HISTORY_FILE_NAME), mode, core::VirtualDirectory::SAVE)) {
             const char* pBegin = file->getBufferStart();
             const char* pEnd = file->getBufferEnd();
 
