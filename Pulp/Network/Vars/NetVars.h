@@ -38,7 +38,6 @@ public:
     X_INLINE float32_t artificalPacketLoss(void) const;
     X_INLINE int32_t artificalPing(void) const;
     X_INLINE int32_t artificalPingVariance(void) const;
-    X_INLINE bool ignorePasswordFromClientIfNotRequired(void) const;
 
     X_INLINE core::Compression::Algo::Enum ackCompAlgo(void) const;
     X_INLINE core::Compression::Algo::Enum compAlgo(void) const;
@@ -70,7 +69,6 @@ private:
     float32_t artificalPacketLoss_;
     int32_t artificalPing_;
     int32_t artificalPingVariance_;
-    int32_t ignorePasswordFromClientIfNotRequired_;
 
     int32_t ackCompAlgo_;
     int32_t compAlgo_;

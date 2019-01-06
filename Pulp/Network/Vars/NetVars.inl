@@ -97,11 +97,6 @@ X_INLINE int32_t NetVars::artificalPingVariance(void) const
     return artificalPingVariance_;
 }
 
-X_INLINE bool NetVars::ignorePasswordFromClientIfNotRequired(void) const
-{
-    return true;
-}
-
 X_INLINE core::Compression::Algo::Enum NetVars::ackCompAlgo(void) const
 {
     X_ASSERT(ackCompAlgo_ >= 0 && ackCompAlgo_ < core::Compression::Algo::ENUM_COUNT, "Algo enum out of range")();

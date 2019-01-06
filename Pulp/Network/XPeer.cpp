@@ -2387,7 +2387,7 @@ void XPeer::handleConnectionRequest(UpdateBitStream& bsOut, RecvBitStream& bs, R
     X_LOG0_IF(vars_.debugEnabled(), "Net", "Recived connection request. timeStamp: %" PRId64, timeStamp);
 
     // optional don't allow clients that give us a password when one not required.
-    const bool clientMustNotSendPassword = !vars_.ignorePasswordFromClientIfNotRequired();
+    const bool clientMustNotSendPassword = false;
     // if this is true will force the hash check, which will fail.
     const bool invalidPassord = (passwordInc && clientMustNotSendPassword);
 
