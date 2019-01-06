@@ -1733,8 +1733,7 @@ void XConsole::loadCmdHistory(bool async)
 void XConsole::historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
     core::XFileAsync* pFile, uint32_t bytesTransferred)
 {
-    X_UNUSED(fileSys);
-    X_UNUSED(bytesTransferred);
+    X_UNUSED(fileSys, bytesTransferred);
 
     // history file loaded.
     X_ASSERT(pRequest->getType() == core::IoRequest::OPEN_READ_ALL, "Recived unexpected request type")(pRequest->getType());
