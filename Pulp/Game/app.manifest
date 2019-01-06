@@ -25,7 +25,7 @@
       <!-- fallback for Windows 7 and 8 -->
       <dpiAware xmlns="http://schemas.microsoft.com/SMI/2005/WindowsSettings">true/pm</dpiAware>
       <!-- falls back to per-monitor if per-monitor v2 is not supported -->
-      <!-- <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">permonitorv2,permonitor</dpiAwareness>-->
+      <dpiAwareness xmlns="http://schemas.microsoft.com/SMI/2016/WindowsSettings">permonitorv2,permonitor</dpiAwareness>
     </windowsSettings>
   </application>
   
