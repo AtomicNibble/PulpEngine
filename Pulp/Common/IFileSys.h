@@ -803,9 +803,9 @@ public:
         close();
     }
 
-    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode)
+    inline bool openFile(const IFileSys::PathT& path, IFileSys::FileFlags mode, VirtualDirectory::Enum dir = VirtualDirectory::BASE)
     {
-        pFile_ = pFileSys_->openFileMem(path, mode);
+        pFile_ = pFileSys_->openFileMem(path, mode, dir);
         return pFile_ != nullptr;
     }
 
