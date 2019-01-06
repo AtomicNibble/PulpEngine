@@ -501,6 +501,10 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
+    if (sa.getPort() == 0) {
+        sa.setPortFromHostByteOrder(vars_.port());
+    }
+
     IPStr strBuf;
     X_LOG0("Net", "Connecting to: \"%s\"", sa.toString(strBuf, true));
 
