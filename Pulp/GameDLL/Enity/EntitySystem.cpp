@@ -5,6 +5,7 @@
 #include "Weapon\WeaponDef.h"
 #include "Weapon\WeaponManager.h"
 #include "Multiplayer.h"
+#include "NetInterpolationState.h"
 
 #include <Containers\FixedBitStream.h>
 #include <String\Json.h>
@@ -35,6 +36,7 @@ namespace entity
         arena_(arena),
         reg_(&ecsArena_),
         vars_(vars),
+        sessionInfo_(sessionInfo),
         weaponDefs_(weaponDefs),
         pMultiplayer_(pMultiplayer),
         ecsAllocator_(),
@@ -227,7 +229,8 @@ namespace entity
         playerSys_.runUserCmdForPlayer(dt, reg_, weaponDefs_, pModelManager_, p3DWorld_, cmd, playerId);
     }
 
-    void EnititySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId)
+    void EnititySystem::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, 
+        const NetInterpolationState& netInterpolState, EntityId localPlayerId)
     {
         X_UNUSED(userCmdMan);
 
@@ -235,6 +238,10 @@ namespace entity
 
         if (reg_.numPendingEvents() > 1024) {
             X_WARNING("Ent", "Large number of pending events: %" PRIuS, reg_.numPendingEvents());
+        }
+
+        if (!sessionInfo_.isHost) {
+            networkSys_.clientUpdate(reg_, netInterpolState.frac);
         }
 
         cameraSys_.setActiveEnt(localPlayerId);
@@ -275,9 +282,6 @@ namespace entity
         for (auto entityId : view)
         {
             // you want to be synced, fuck you!
-            auto& netSync = reg_.get<NetworkSync>(entityId);
-            X_UNUSED(netSync);
-
             auto& trans = reg_.get<TransForm>(entityId);
             auto mask = reg_.getComponentMask(entityId);
 
@@ -391,6 +395,14 @@ namespace entity
             // for everything else do i just have to check the flags?
             auto& trans = reg_.get<TransForm>(entityId);
             bs.read(trans);
+
+            X_ASSERT(reg_.has<NetworkSync>(mask), "Must have network sync comp on client")();
+            if (reg_.has<NetworkSync>(mask))
+            {
+                auto& netSync = reg_.get<NetworkSync>(entityId);
+                netSync.prev = netSync.next;
+                netSync.next = trans;
+            }
 
             if (reg_.has<DynamicObject>(mask))
             {

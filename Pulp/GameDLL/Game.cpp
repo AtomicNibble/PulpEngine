@@ -421,7 +421,7 @@ bool XGame::update(core::FrameData& frame)
             runUserCmdsForPlayer(frame, localIdx);
         }
 
-        world_->update(frame, userCmdMan_, localId);
+        world_->update(frame, userCmdMan_, netInterpolState_, localId);
 
         if (isHost) {
 

@@ -41,6 +41,7 @@ X_NAMESPACE_BEGIN(game)
 class Multiplayer;
 class GameVars;
 struct UserNetMappings;
+struct NetInterpolationState;
 
 namespace weapon
 {
@@ -80,7 +81,7 @@ namespace entity
         bool init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
         void shutdown(void);
         void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, EntityId playerId);
-        void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, EntityId localPlayerId);
+        void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, const NetInterpolationState& netInterpolState, EntityId localPlayerId);
 
         void createSnapShot(net::SnapShot& snap);
         void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
@@ -132,6 +133,7 @@ namespace entity
 
         ECS reg_;
         GameVars& vars_;
+        net::SessionInfo& sessionInfo_;
         game::weapon::WeaponDefManager& weaponDefs_;
         Multiplayer* pMultiplayer_;
 

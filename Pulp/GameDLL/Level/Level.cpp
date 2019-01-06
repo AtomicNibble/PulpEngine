@@ -395,13 +395,13 @@ void World::runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, int32
     ents_.runUserCmdForPlayer(dt, cmd, static_cast<entity::EntityId>(playerIdx));
 }
 
-void World::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId)
+void World::update(core::FrameData& frame, net::UserCmdMan& userCmdMan, const NetInterpolationState& netInterpolState, entity::EntityId localPlayerId)
 {
     X_UNUSED(userCmdMan);
 
     X_ASSERT(level_ && level_->isLoaded(), "Level not valid")();
 
-    ents_.update(frame, userCmdMan, localPlayerId);
+    ents_.update(frame, userCmdMan, netInterpolState, localPlayerId);
 
     level_->update(frame);
 }

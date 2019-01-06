@@ -27,6 +27,7 @@ X_NAMESPACE_DECLARE(net,
 X_NAMESPACE_BEGIN(game)
 
 struct UserNetMappings;
+struct NetInterpolationState;
 class Multiplayer;
 class GameVars;
 
@@ -106,7 +107,7 @@ public:
     bool hasLoaded(void) const;
 
     void runUserCmdForPlayer(core::TimeVal dt, const net::UserCmd& cmd, int32_t playerIdx);
-    void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, entity::EntityId localPlayerId);
+    void update(core::FrameData& frame, net::UserCmdMan& userCmdMan, const NetInterpolationState& netInterpolState, entity::EntityId localPlayerId);
 
     void createSnapShot(net::SnapShot& snap);
     void applySnapShot(const UserNetMappings& unm, const net::SnapShot& snap);
