@@ -687,13 +687,13 @@ struct INet : public core::IEngineSysBase
     virtual ISession* createSession(IPeer* pPeer, IGameCallbacks* pGameCallbacks) X_ABSTRACT;
     virtual void deleteSession(ISession* pSession) X_ABSTRACT;
 
-    // ipv4/6 address with optional trailing |port, or explicit port.
+    // ipv4/6 address with optional trailing :port, or explicit port.
     // specify what ip version you want the returned address to be. aka asking for a ipv6 address of '127.0.0.1'
     virtual bool systemAddressFromIP(const IPStr& ip, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
     virtual bool systemAddressFromIP(const IPStr& ip, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
 
     // hostname to system address, supports: 'localhost', 'goat.com', 'dial-a-pickle.nz'
-    // supports optional trailing port 'localhost|1234', or explict port using overload.
+    // supports optional trailing port 'localhost: 1234', or explict port using overload.
     // this can be used to pre-resolve a host before trying to connect to it, since resolving may take a while.
     virtual bool systemAddressFromHost(const HostStr& host, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
     virtual bool systemAddressFromHost(const HostStr& host, Port port, SystemAddress& out, IpVersion::Enum ipVersion = IpVersion::Any) const X_ABSTRACT;
