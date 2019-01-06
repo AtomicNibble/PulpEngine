@@ -1363,6 +1363,9 @@
     <ClInclude Include="String\Format.h">
       <Filter>Headers\String</Filter>
     </ClInclude>
+    <ClInclude Include="Core\Version.h">
+      <Filter>Headers\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Util\BitUtil.inl">
@@ -1628,9 +1631,6 @@
     </None>
     <None Include="Time\StopWatch.inl">
       <Filter>Headers\Time</Filter>
-    </None>
-    <None Include="Util\Event.gen">
-      <Filter>Headers\Util</Filter>
     </None>
     <None Include="Math\XViewPort.inl">
       <Filter>Headers\Math</Filter>
@@ -2145,6 +2145,7 @@
     <ClCompile Include="UserCmdMan.cpp">
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
+    <ClCompile Include="Util\Event.gen" />
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">

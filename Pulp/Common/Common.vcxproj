@@ -101,6 +101,7 @@
     <ClInclude Include="Core\msvc\Compiler.h" />
     <ClInclude Include="Core\Platform.h" />
     <ClInclude Include="Core\PlatformWin32.h" />
+    <ClInclude Include="Core\Version.h" />
     <ClInclude Include="Debugging\AbortHandler.h" />
     <ClInclude Include="Debugging\Assert.h" />
     <ClInclude Include="Debugging\AssertionHandler.h" />

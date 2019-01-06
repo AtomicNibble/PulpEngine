@@ -69,11 +69,8 @@
 #error Unknown compiler.
 #endif
 
-#define X_ENGINE_NAME "Blade"
-#define X_ENGINE_NAME_W X_WIDEN(X_ENGINE_NAME)
-#define X_ENGINE_OUTPUT_PREFIX "engine_"
-#define X_ENGINE_VERSION 0.1
-#define X_ENGINE_VERSION_STR X_STRINGIZE(X_ENGINE_VERSION)
+#include "Version.h"
+
 #define X_BUILD_STRING X_PLATFORM_STR "-" X_CPUSTRING
 #define X_ENGINE_BUILD_DATE (__DATE__ " " __TIME__)
 
