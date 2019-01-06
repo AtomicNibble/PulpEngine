@@ -44,37 +44,22 @@ namespace msgbox
     const StyleFlags DEFAULT_STYLE = Style::Info;
     const Buttons DEFAULT_BUTTONS = Buttons::OK;
 
-    Selection show(const char* pMessage, const char* pTitle, StyleFlags style, Buttons buttons);
+    Selection show(core::string_view msg, core::string_view title, StyleFlags style, Buttons buttons);
     Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons);
 
-    inline Selection show(const char* pMessage, const char* pTitle, StyleFlags style)
+    inline Selection show(core::string_view msg, core::string_view title, StyleFlags style)
     {
-        return show(pMessage, pTitle, style, DEFAULT_BUTTONS);
+        return show(msg, title, style, DEFAULT_BUTTONS);
     }
 
-    inline Selection show(const char* pMessage, const char* pTitle, Buttons buttons)
+    inline Selection show(core::string_view msg, core::string_view title, Buttons buttons)
     {
-        return show(pMessage, pTitle, DEFAULT_STYLE, buttons);
+        return show(msg, title, DEFAULT_STYLE, buttons);
     }
 
-    inline Selection show(const char* pMessage, const char* pTitle)
+    inline Selection show(core::string_view msg, core::string_view title)
     {
-        return show(pMessage, pTitle, DEFAULT_STYLE, DEFAULT_BUTTONS);
-    }
-
-    inline Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style)
-    {
-        return show(pMessage, pTitle, style, DEFAULT_BUTTONS);
-    }
-
-    inline Selection show(const wchar_t* pMessage, const wchar_t* pTitle, Buttons buttons)
-    {
-        return show(pMessage, pTitle, DEFAULT_STYLE, buttons);
-    }
-
-    inline Selection show(const wchar_t* pMessage, const wchar_t* pTitle)
-    {
-        return show(pMessage, pTitle, DEFAULT_STYLE, DEFAULT_BUTTONS);
+        return show(msg, title, DEFAULT_STYLE, DEFAULT_BUTTONS);
     }
 
 } // namespace msgbox

@@ -72,7 +72,7 @@ namespace msgbox
 
     } // namespace
 
-    Selection show(const char* pMessage, const char* pTitle, StyleFlags style, Buttons buttons)
+    Selection show(core::string_view msg, core::string_view title, StyleFlags style, Buttons buttons)
     {
         UINT flags = MB_TASKMODAL;
 
@@ -80,18 +80,10 @@ namespace msgbox
         flags |= getFlags(style);
         flags |= getButtons(buttons);
 
-        return getSelection(MessageBoxA(nullptr, pMessage, pTitle, flags));
-    }
+        core::StackStringW256 msgW(msg.data(), msg.data() + msg.length());
+        core::StackStringW256 titleW(title.data(), title.data() + title.length());
 
-    Selection show(const wchar_t* pMessage, const wchar_t* pTitle, StyleFlags style, Buttons buttons)
-    {
-        UINT flags = MB_TASKMODAL;
-
-        flags |= getIcon(style);
-        flags |= getFlags(style);
-        flags |= getButtons(buttons);
-
-        return getSelection(MessageBoxW(nullptr, pMessage, pTitle, flags));
+        return getSelection(MessageBoxW(nullptr, msgW.c_str(), titleW.c_str(), flags));
     }
 
 } // namespace msgbox
