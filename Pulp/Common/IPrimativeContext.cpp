@@ -1007,6 +1007,103 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
     }
 }
 
+void IPrimativeContext::drawCapsule(const Transformf& trans, float radius, float height, Color8u col)
+{
+    const float halfHeight = height * 0.5f;
+
+    Vec3f left(-halfHeight, 0.f, 0.f);
+    Vec3f right(halfHeight, 0.f, 0.f);
+
+    // TODO: draw the 4 archs
+    {
+        Transformf leftTrans(trans);
+        leftTrans.pos += trans.quat * left;
+        drawCircle(leftTrans, 25, radius, col);
+    }
+    {
+        Transformf rightTrans(trans);
+        rightTrans.pos += trans.quat * right;
+        drawCircle(rightTrans, 25, radius, col);
+    }
+
+    // some lines.
+    Vec3f points[2 * 4] = {
+        trans.transform(Vec3f(-halfHeight,  radius, 0)),
+        trans.transform(Vec3f(halfHeight,  radius, 0)),
+        trans.transform(Vec3f(-halfHeight, -radius, 0)),
+        trans.transform(Vec3f(halfHeight, -radius, 0)),
+        trans.transform(Vec3f(-halfHeight,  0, radius)),
+        trans.transform(Vec3f(halfHeight,  0, radius)),
+        trans.transform(Vec3f(-halfHeight, 0, -radius)),
+        trans.transform(Vec3f(halfHeight, 0, -radius))
+    };
+
+    drawLines(points, col);
+}
+
+void IPrimativeContext::drawCircle(const Transformf& trans, int32_t segments, float radius, Color8u col)
+{
+    // Lines!
+    // TODO: why don't i support linestrips again?
+    PrimVertex* pLines = addPrimative(segments * 2, PrimitiveType::LINELIST);
+
+    const float step = math<float>::TWO_PI / segments;
+    float angle = 0.f;
+    int32_t i = 0;
+
+    for (;i < segments; i++, angle += step)
+    {
+        Vec3f pos(0.f, radius * math<float>::sin(angle), radius * math<float>::cos(angle));
+
+        pLines[i * 2].pos = trans.transform(pos);
+        pLines[i * 2].color = col;
+    }
+
+    // TODO: remove once using LINESTRIP
+    // 0  1  3  5  7
+    //    2  4  6  0
+
+    for (i = 0; i < segments - 1; i++)
+    {
+        auto idx = (i * 2) + 1;
+        pLines[idx].pos = pLines[idx + 1].pos;
+        pLines[idx].color = pLines[idx + 1].color;
+    }
+
+    pLines[(i * 2) + 1].pos = pLines[0].pos;
+    pLines[(i * 2) + 1].color = col;
+}
+
+void IPrimativeContext::drawArc(const Transformf& trans, int32_t segments, float radius, float minAng, float maxAng, Color8u col)
+{
+    // TODO: use linestrip
+    PrimVertex* pLines = addPrimative(segments * 2, PrimitiveType::LINELIST);
+
+    const float step = (minAng - maxAng) / segments;
+    float angle = minAng;
+
+    int32_t i = 0;
+
+    for (; i < segments; i++, angle += step)
+    {
+        Vec3f pos(0.f, radius * math<float>::sin(angle), radius * math<float>::cos(angle));
+
+        pLines[i * 2].pos = trans.transform(pos);
+        pLines[i * 2].color = col;
+    }
+
+    // TODO: remove once using LINESTRIP
+    for (i = 0; i < segments - 1; i++)
+    {
+        auto idx = (i * 2) + 1;
+        pLines[idx].pos = pLines[idx + 1].pos;
+        pLines[idx].color = pLines[idx + 1].color;
+    }
+
+    pLines[(i * 2) + 1].pos = pLines[0].pos;
+    pLines[(i * 2) + 1].color = col;
+}
+
 // Bone
 void IPrimativeContext::drawBone(const Transformf& rParent, const Transformf& rChild, Color8u col)
 {

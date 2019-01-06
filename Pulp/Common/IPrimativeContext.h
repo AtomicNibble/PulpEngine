@@ -145,6 +145,15 @@ public:
     // Cylinder
     void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, Color8u col, bool solid = true, int32_t lodIdx = 0);
 
+    // Capsule
+    void drawCapsule(const Transformf& trans, float radius, float height, Color8u col);
+
+    // Circle
+    void drawCircle(const Transformf& trans, int32_t segments, float radius, Color8u col);
+
+    // Arc
+    void drawArc(const Transformf& trans, int32_t segments, float radius, float minAng, float maxAng, Color8u col);
+
     // Bone
     void drawBone(const Transformf& rParent, const Transformf& rBone, Color8u col);
     X_INLINE void drawBone(const Matrix44f& rParent, const Matrix44f& rBone, Color8u col);
