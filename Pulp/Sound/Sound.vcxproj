@@ -62,7 +62,7 @@
     <ProjectGuid>{23D44F54-7077-4BBA-95ED-C05E2484821B}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>Sound</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

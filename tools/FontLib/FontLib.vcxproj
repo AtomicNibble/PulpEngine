@@ -62,7 +62,7 @@
     <ProjectGuid>{8C678E94-7C93-4FA5-B806-77CE41F0B523}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>FontLib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

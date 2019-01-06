@@ -62,7 +62,7 @@
     <ProjectGuid>{EADF2725-1E5E-40D3-A375-2DA5F02E5C33}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>SqLite</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

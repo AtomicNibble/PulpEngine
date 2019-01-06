@@ -62,7 +62,7 @@
     <ProjectGuid>{3DAB5C81-CA0C-43BE-9696-D2A2F255A40E}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>FxLib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

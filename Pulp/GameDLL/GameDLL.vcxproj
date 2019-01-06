@@ -62,7 +62,7 @@
     <ProjectGuid>{71E36592-B7B6-450C-B678-24E63AF5B51C}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>GameDLL</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">

@@ -62,7 +62,7 @@
     <ProjectGuid>{858DF185-AE64-4730-86D3-6E9E4CFBD779}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>AnimLib</RootNamespace>
-    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0.17763.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
