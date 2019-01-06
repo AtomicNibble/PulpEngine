@@ -98,17 +98,14 @@ void XWinInput::update(core::FrameInput& inputFrame)
 
     RAWINPUT X_ALIGNED_SYMBOL(input[BUF_NUM], 8);
 
-    UINT size;
-    size_t num;
-
     const bool debug = (pCVars_->inputDebug_ > 1);
     
     // this only returns results for windows created on the same thread.
     X_ASSERT(gEnv->mainThreadId == core::Thread::getCurrentID(), "Input must be got from main thread")();
 
     for (;;) {
-        size = sizeof(input);
-        num = GetRawInputBuffer(input, &size, static_cast<UINT>(ENTRY_HDR_SIZE));
+        UINT size = sizeof(input);
+        size_t num = GetRawInputBuffer(input, &size, static_cast<UINT>(ENTRY_HDR_SIZE));
 
         // log size even if empty
         if (debug) {
