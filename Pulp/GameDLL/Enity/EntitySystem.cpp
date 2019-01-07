@@ -686,6 +686,7 @@ namespace entity
             
             engine::RenderEntDesc entDsc;
             entDsc.pModel = player.pModel;
+            entDsc.trans = trans;
 
             player.pRenderEnt = p3DWorld_->addRenderEnt(entDsc);
         }
