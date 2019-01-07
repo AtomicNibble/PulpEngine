@@ -68,8 +68,7 @@ namespace entity
         // Only none local players have a world model.
         if (!ply.isLocal)
         {
-            auto& trans = reg.get<TransForm>(msg.id);
-
+            auto trans = reg.get<TransForm>(msg.id);
             p3DWorld_->updateRenderEnt(ply.pRenderEnt, trans);
         }
     }
