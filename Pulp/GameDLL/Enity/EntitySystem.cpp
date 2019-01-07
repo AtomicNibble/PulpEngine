@@ -391,7 +391,6 @@ namespace entity
             }
 #endif
 
-
             // we always have transform?
             // for everything else do i just have to check the flags?
             auto& trans = reg_.get<TransForm>(entityId);
@@ -403,6 +402,9 @@ namespace entity
                 auto& netSync = reg_.get<NetworkSync>(entityId);
                 netSync.prev = netSync.next;
                 netSync.next = trans;
+                // frac of 0.f
+                // TODO: we may not want todo this if we exterpolated maybe ??
+                netSync.current = netSync.prev; 
             }
 
             if (reg_.has<DynamicObject>(mask))
