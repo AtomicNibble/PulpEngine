@@ -170,7 +170,7 @@ scriptDumpState.txt
 # unit test data
 /game_folder/**/*.ut_dat
 /game_folder/compiled_images
-/game_folder/core_assets/cmdHistory.txt
+/game_folder/**/cmdHistory.txt
 user_config.cfg
 *.idb
 /3rdparty/v140/x64/Physx
