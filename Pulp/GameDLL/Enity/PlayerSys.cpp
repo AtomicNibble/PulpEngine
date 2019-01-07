@@ -40,8 +40,9 @@ namespace entity
 
     } // namespace
 
-    PlayerSystem::PlayerSystem(PlayerVars& playerVars) :
+    PlayerSystem::PlayerSystem(PlayerVars& playerVars, const net::SessionInfo& sessionInfo) :
         vars_(playerVars),
+        sessionInfo_(sessionInfo),
         pPhysScene_(nullptr)
     {
 

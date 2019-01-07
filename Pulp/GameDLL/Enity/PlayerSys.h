@@ -23,7 +23,7 @@ namespace entity
     class PlayerSystem
     {
     public:
-        PlayerSystem(PlayerVars& playerVars);
+        PlayerSystem(PlayerVars& playerVars, const net::SessionInfo& sessionInfo);
 
         bool init(ECS& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 
@@ -42,6 +42,7 @@ namespace entity
 
     private:
         PlayerVars& vars_;
+        const net::SessionInfo& sessionInfo_;
 
         physics::IScene* pPhysScene_;
         engine::IWorld3D* p3DWorld_;

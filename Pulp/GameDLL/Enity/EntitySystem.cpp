@@ -41,7 +41,7 @@ namespace entity
         pMultiplayer_(pMultiplayer),
         ecsAllocator_(),
         ecsArena_(&ecsAllocator_, "ECSArena"),
-        playerSys_(vars.player),
+        playerSys_(vars.player, sessionInfo),
         cameraSys_(vars),
         weaponSys_(vars, sessionInfo),
         dtHealth_(arena),
