@@ -11,7 +11,7 @@ X_NAMESPACE_DECLARE(model,
 
 X_NAMESPACE_BEGIN(game)
 
-class PlayerVars;
+class GameVars;
 
 namespace weapon
 {
@@ -23,7 +23,7 @@ namespace entity
     class PlayerSystem
     {
     public:
-        PlayerSystem(PlayerVars& playerVars, const net::SessionInfo& sessionInfo);
+        PlayerSystem(GameVars& vars, const net::SessionInfo& sessionInfo);
 
         bool init(ECS& reg, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld);
 
@@ -41,7 +41,7 @@ namespace entity
         void calculateFirstPersonView(TransForm& trans, Player& player);
 
     private:
-        PlayerVars& vars_;
+        GameVars& vars_;
         const net::SessionInfo& sessionInfo_;
 
         physics::IScene* pPhysScene_;

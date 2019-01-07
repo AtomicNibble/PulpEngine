@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "PlayerSys.h"
-#include "Vars\PlayerVars.h"
+#include "Vars\GameVars.h"
 #include "Weapon\WeaponManager.h"
 
 #include <IFrameData.h>
@@ -40,7 +40,7 @@ namespace entity
 
     } // namespace
 
-    PlayerSystem::PlayerSystem(PlayerVars& playerVars, const net::SessionInfo& sessionInfo) :
+    PlayerSystem::PlayerSystem(GameVars& playerVars, const net::SessionInfo& sessionInfo) :
         vars_(playerVars),
         sessionInfo_(sessionInfo),
         pPhysScene_(nullptr)
@@ -80,7 +80,7 @@ namespace entity
         auto view = reg.view<Player, TransForm>();
         for (auto playerId : view) {
 
-            if (vars_.drawPosInfo_) {
+            if (vars_.player.drawPosInfo_) {
 
                 auto& trans = reg.get<TransForm>(playerId);
                 auto& player = reg.get<Player>(playerId);
@@ -153,7 +153,7 @@ namespace entity
             }
 
             // clamp.
-            float pitch = math<float>::clamp(player.viewAngles.pitch(), vars_.minViewPitch_, vars_.maxViewPitch_);
+            float pitch = math<float>::clamp(player.viewAngles.pitch(), vars_.player.minViewPitch_, vars_.player.maxViewPitch_);
             player.viewAngles.setPitch(pitch);
 
             // calculate delta.
@@ -170,14 +170,14 @@ namespace entity
             const float timeDelta = dt.GetSeconds();
             const float gravity = -100.f;
 
-            float speed = vars_.walkSpeed_;
+            float speed = vars_.player.walkSpeed_;
 
             if (state.IsSet(Player::State::Crouch)) {
-                speed = vars_.crouchSpeed_;
+                speed = vars_.player.crouchSpeed_;
             }
             else if (userCmd.buttons.IsSet(net::Button::RUN)) {
                 // TODO: blend in stamina here.
-                speed = vars_.runSpeed_;
+                speed = vars_.player.runSpeed_;
             }
 
             Vec3f displacement;
@@ -210,7 +210,7 @@ namespace entity
             if (state.IsSet(Player::State::Jump)) {
                 player.jumpTime += dt;
 
-                const float gJumpGravity = -vars_.jumpHeight_; // -50.f;
+                const float gJumpGravity = -vars_.player.jumpHeight_; // -50.f;
                 const float jumpTime = player.jumpTime.GetSeconds();
                 jumpHeight = gJumpGravity * jumpTime * jumpTime + 30.f * jumpTime;
             }
@@ -231,10 +231,10 @@ namespace entity
                 physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
 
                 if (enterCrouch) {
-                    con.pController->resize(vars_.crouchHeight_);
+                    con.pController->resize(vars_.player.crouchHeight_);
                 }
                 else if (leaveCrouch) {
-                    con.pController->resize(vars_.normalHeight_);
+                    con.pController->resize(vars_.player.normalHeight_);
                 }
 
                 auto flags = con.pController->move(displacement, 0.f, timeDelta);
@@ -425,7 +425,7 @@ namespace entity
 
             viewAxis.rotate(Vec3f::zAxis(), ::toRadians(90.f));
 
-            const Vec3f gunPos = vars_.gunOffset_;
+            const Vec3f gunPos = vars_.player.gunOffset_;
             Vec3f origin = viewOrigin + (viewAxis * gunPos);
 
             const Quatf viewAxisQ(viewAxis);
@@ -459,10 +459,10 @@ namespace entity
             float bobmove;
 
             if (player.state.IsSet(Player::State::Crouch)) {
-                bobmove = vars_.crouchBob_;
+                bobmove = vars_.player.crouchBob_;
             }
             else {
-                bobmove = vars_.walkBob_;
+                bobmove = vars_.player.walkBob_;
             }
 
             auto delta = dt.GetMilliSeconds();
@@ -478,27 +478,27 @@ namespace entity
 
         // add angles based on velocity
         float delta = velocity.dot(viewaxis.getColumn(0));
-        player.viewBobAngles[Anglesf::Rotation::PITCH] += delta * vars_.bobRunPitch_;
+        player.viewBobAngles[Anglesf::Rotation::PITCH] += delta * vars_.player.bobRunPitch_;
 
         delta = velocity.dot(viewaxis.getColumn(1));
-        player.viewBobAngles[Anglesf::Rotation::ROLL] -= delta * vars_.bobRunRoll_;
+        player.viewBobAngles[Anglesf::Rotation::ROLL] -= delta * vars_.player.bobRunRoll_;
 
         // add angles based on bob
         // make sure the bob is visible even at low speeds
         float speed = xyspeed > 200 ? xyspeed : 200;
 
-        delta = player.bobfracsin * vars_.bobPitch_ * speed;
+        delta = player.bobfracsin * vars_.player.bobPitch_ * speed;
         if (player.state.IsSet(Player::State::Crouch)) {
             delta *= 3; // crouching
         }
         player.viewBobAngles[Anglesf::Rotation::PITCH] += delta;
-        delta = player.bobfracsin * vars_.bobRoll_ * speed;
+        delta = player.bobfracsin * vars_.player.bobRoll_ * speed;
         if (player.state.IsSet(Player::State::Crouch)) {
             delta *= 3; // crouching accentuates roll
         }
         player.viewBobAngles[Anglesf::Rotation::ROLL] += delta;
 
-        auto bob = player.bobfracsin * xyspeed * vars_.bobUp_;
+        auto bob = player.bobfracsin * xyspeed * vars_.player.bobUp_;
         if (bob > 6) {
             bob = 6;
         }
@@ -512,14 +512,14 @@ namespace entity
         Vec3f newEye;
 
         if (player.state.IsSet(Player::State::Crouch)) {
-            newEye.z = vars_.crouchViewHeight_;
+            newEye.z = vars_.player.crouchViewHeight_;
         }
         else {
-            newEye.z = vars_.normalViewHeight_;
+            newEye.z = vars_.player.normalViewHeight_;
         }
 
         if (newEye != player.eyeOffset) {
-            player.eyeOffset = player.eyeOffset * vars_.crouchRate_ + newEye * (1.0f - vars_.crouchRate_);
+            player.eyeOffset = player.eyeOffset * vars_.player.crouchRate_ + newEye * (1.0f - vars_.player.crouchRate_);
         }
     }
 
