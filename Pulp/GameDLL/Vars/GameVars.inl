@@ -36,9 +36,14 @@ X_INLINE int32_t GameVars::drawBulletRay(void) const
     return drawBulletRay_;
 }
 
-X_INLINE int32_t GameVars::drawClientPredictionDebug(void) const
+X_INLINE int32_t GameVars::drawClientInterpolationDebug(void) const
 {
-    return drawClientPredictionDebug_;
+    return drawClientInterpolationDebug_;
+}
+
+X_INLINE int32_t GameVars::clientInterpolation(void) const
+{
+    return clientInterpolation_;
 }
 
 X_INLINE core::ICVar* GameVars::getFovVar(void) const

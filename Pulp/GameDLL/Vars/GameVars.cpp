@@ -15,7 +15,8 @@ GameVars::GameVars()
     drawGameUserDebug_ = 0;
     drawSessionInfoDebug_ = 0;
     drawBulletRay_ = 0;
-    drawClientPredictionDebug_ = 0;
+    drawClientInterpolationDebug_ = 0;
+    clientInterpolation_ = 1;
 
     pFovVar_ = nullptr;
 }
@@ -45,8 +46,11 @@ void GameVars::registerVars(void)
     ADD_CVAR_REF("g_draw_bullet_ray", drawBulletRay_, drawBulletRay_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
         "Draw bullet rays");
 
-    ADD_CVAR_REF("g_draw_client_prediction", drawClientPredictionDebug_, drawClientPredictionDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
-        "Draw client prrediction info");
+    ADD_CVAR_REF("g_draw_client_interpolation", drawClientInterpolationDebug_, drawClientInterpolationDebug_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Draw client interpolation info");
+
+    ADD_CVAR_REF("g_client_interpolation", clientInterpolation_, clientInterpolation_, 0, 1, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED,
+        "Enable client interpolation");
 
     pFovVar_ = ADD_CVAR_FLOAT("cam_fov", ::toDegrees(DEFAULT_FOV), 0.01f, ::toDegrees(math<float>::PI) - 1.f,
         core::VarFlag::SAVE_IF_CHANGED, "camera fov");

@@ -107,34 +107,39 @@ namespace entity
         X_ASSERT(!sessionInfo_.isHost, "")();
 
         auto view = reg.view<Player>();
-        for (auto playerId : view) 
+
+        if (vars_.clientInterpolation())
         {
-            if (playerId == localPlayerId) {
-                continue;
-            }
-
-            const auto& netSyc = reg.get<NetworkSync>(playerId);
-
-            // what should we do just set the position?
-            if (reg.has<CharacterController>(playerId))
+            for (auto playerId : view)
             {
-                const auto& con = reg.get<CharacterController>(playerId);
-                auto& curTrans = reg.get<TransForm>(playerId);
-
-                {
-                    physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
-
-                    con.pController->setFootPosition(Vec3d(netSyc.current.pos));
-                    auto footPos = con.pController->getFootPosition();
-
-                    curTrans.pos = footPos;
+                if (playerId == localPlayerId) {
+                    continue;
                 }
-                
-                reg.dispatch<MsgMove>(playerId);
+
+                const auto& netSyc = reg.get<NetworkSync>(playerId);
+
+                // what should we do just set the position?
+                if (reg.has<CharacterController>(playerId))
+                {
+                    const auto& con = reg.get<CharacterController>(playerId);
+                    auto& curTrans = reg.get<TransForm>(playerId);
+
+                    {
+                        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+                        con.pController->setFootPosition(Vec3d(netSyc.current.pos));
+                        auto footPos = con.pController->getFootPosition();
+
+                        curTrans.pos = footPos;
+                        curTrans.quat = netSyc.current.quat;
+                    }
+
+                    reg.dispatch<MsgMove>(playerId);
+                }
             }
         }
 
-        if(vars_.drawClientPredictionDebug())
+        if(vars_.drawClientInterpolationDebug())
         {
             auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
 
