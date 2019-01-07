@@ -32,7 +32,7 @@ namespace entity
         void update(core::FrameTimeData& timeInfo, ECS& reg);
 
         void runUserCmdForPlayer(core::TimeVal dt, ECS& reg,
-            game::weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
+            weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,
             const net::UserCmd& userCmd, EntityId playerId);
 
     private:
