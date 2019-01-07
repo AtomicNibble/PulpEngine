@@ -87,7 +87,11 @@ Game:
    ☐ Physics improvements for clients.
      ☐ Jumping currently is broken as fuck.
      ☐ Implment client interpolation.
+       ✔ Player @done (19-01-07 22:35)
+       ☐ Everything
      ☐ Support extrapolation
+     ☐ When we are replaying userCmds we should store current position then work out how far away we are and if it's below a fresh hold move there over a few frames.
+       This will just be so
 
        ✔ When we are a client the physics capsuls have a center of the player origin. @done (18-12-18 12:31)
    ✘ We need to have the clients hold off on incrementing time etc and usercommands untill the server says go? @cancelled (18-12-02 14:02)
