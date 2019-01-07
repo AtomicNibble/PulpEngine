@@ -49,6 +49,12 @@ namespace entity
 
             EntityId ent = static_cast<EntityId>(trans.userData.getVal());
 
+            // Currently I use foot position for players so this data would be wrong.
+            // if we post a MSgMove for players with this they will rotate / move and flicker.
+            if (ent < net::MAX_PLAYERS) {
+                continue;
+            }
+
             auto& entTrans = reg.get<TransForm>(ent);
             entTrans.pos = trans.actor2World.pos;
             entTrans.quat = trans.actor2World.quat;
