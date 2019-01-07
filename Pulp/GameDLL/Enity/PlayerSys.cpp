@@ -100,7 +100,95 @@ namespace entity
                 pPrim->drawText(Vec3f(10.f, 200.f + (playerId * 50.f), 0.8f), con, dbgTxt.begin(), dbgTxt.end());
             }
         }
+    }
 
+    void PlayerSystem::clientUpdate(ECS& reg, EntityId localPlayerId)
+    {
+        X_ASSERT(!sessionInfo_.isHost, "")();
+
+        auto view = reg.view<Player>();
+        for (auto playerId : view) 
+        {
+            if (playerId == localPlayerId) {
+                continue;
+            }
+
+            const auto& netSyc = reg.get<NetworkSync>(playerId);
+
+            // what should we do just set the position?
+            if (reg.has<CharacterController>(playerId))
+            {
+                const auto& con = reg.get<CharacterController>(playerId);
+                auto& curTrans = reg.get<TransForm>(playerId);
+
+                {
+                    physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Write);
+
+                    con.pController->setFootPosition(Vec3d(netSyc.current.pos));
+                    auto footPos = con.pController->getFootPosition();
+
+                    curTrans.pos = footPos;
+                }
+                
+                reg.dispatch<MsgMove>(playerId);
+            }
+        }
+
+        if(vars_.drawClientPredictionDebug())
+        {
+            auto* pPrim = gEnv->p3DEngine->getPrimContext(engine::PrimContext::MISC3D);
+
+            for (auto playerId : view)
+            {
+                if (playerId == localPlayerId) {
+                    continue;
+                }
+
+                const auto& netSyc = reg.get<NetworkSync>(playerId);
+
+                if (reg.has<CharacterController>(playerId))
+                {
+                    const auto& con = reg.get<CharacterController>(playerId);
+
+                    physics::ICapsuleCharacterController::Info info;
+                    Vec3f footDelta;
+
+                    {
+                        physics::ScopedLock lock(pPhysScene_, physics::LockAccess::Read);
+
+                        info = con.pController->geInfo();
+
+                        auto pos = con.pController->getPosition();
+                        auto footPos = con.pController->getFootPosition();
+
+                        footDelta = Vec3f(pos - footPos);
+                    }
+
+                    // show me the way!
+                    // ideally have some sort of capsule draw but AABB for now rip.
+                    Vec3f curPos = netSyc.current.pos + footDelta;
+                    Vec3f nextPos = netSyc.next.pos + footDelta;
+                    Vec3f prevPos = netSyc.prev.pos + footDelta;
+
+                    Transformf trans;
+                    trans.quat = Quatf(Vec3f::yAxis(), ::toRadians(90.f));
+
+                    trans.pos = curPos;
+                    pPrim->drawCapsule(trans, info.radius, info.height, Col_Blue);
+
+                    if (nextPos != curPos)
+                    {
+                        trans.pos = nextPos;
+                        pPrim->drawCapsule(trans, info.radius, info.height, Col_Red);
+                    }
+                    if (prevPos != curPos)
+                    {
+                        trans.pos = prevPos;
+                        pPrim->drawCapsule(trans, info.radius, info.height, Col_Red);
+                    }
+                }
+            }
+        }
     }
 
     void PlayerSystem::runUserCmdForPlayer(core::TimeVal dt, ECS& reg,

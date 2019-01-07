@@ -30,6 +30,7 @@ namespace entity
         void onMsg(ECS& reg, const MsgMove& msg);
 
         void update(core::FrameTimeData& timeInfo, ECS& reg);
+        void clientUpdate(ECS& reg, EntityId localPlayerId);
 
         void runUserCmdForPlayer(core::TimeVal dt, ECS& reg,
             weapon::WeaponDefManager& weaponDefs, model::IModelManager* pModelManager, engine::IWorld3D* p3DWorld,

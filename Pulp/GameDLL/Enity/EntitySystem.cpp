@@ -242,6 +242,7 @@ namespace entity
 
         if (!sessionInfo_.isHost) {
             networkSys_.clientUpdate(reg_, netInterpolState.frac);
+            playerSys_.clientUpdate(reg_, localPlayerId);
         }
 
         cameraSys_.setActiveEnt(localPlayerId);
