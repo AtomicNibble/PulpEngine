@@ -66,7 +66,7 @@ Game:
 
   Networking:
 
-    ☐ Sync the players better, basically have some sort of 3rd person model.
+    ✔ Sync the players better, basically have some sort of 3rd person model. @done (19-01-07 22:47)
         - Basically fix it so host and client can see same shit, currently only host can see some things.
 
     ☐ If the server thinks we are not loaded / connected it won't send us snapshots.
