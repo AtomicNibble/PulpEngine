@@ -27,6 +27,9 @@ local function Update(dt)
         core.exec("map text_cord_test");
     end
 
+    if ui.button("CONNECT LOCAL") then
+        core.exec("connect 127.0.0.1");
+    end
     if ui.button("ONLINE") then
         ui.open("online")
     end
