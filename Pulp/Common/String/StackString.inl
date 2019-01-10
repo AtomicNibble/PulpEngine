@@ -737,17 +737,13 @@ inline bool StackString<N, TChar>::isNotEmpty(void) const
 template<size_t N, typename TChar>
 inline void StackString<N, TChar>::toLower(void)
 {
-    for (size_t i = 0; i < len_; ++i) {
-        str_[i] = safe_static_cast<TChar>(tolower(str_[i]));
-    }
+    strUtil::ToLower(str_, str_ + len_);
 }
 
 template<size_t N, typename TChar>
 inline void StackString<N, TChar>::toUpper(void)
 {
-    for (size_t i = 0; i < len_; ++i) {
-        str_[i] = safe_static_cast<TChar>(toupper(str_[i]));
-    }
+    strUtil::ToUpper(str_, str_ + len_);
 }
 
 template<size_t N, typename TChar>
