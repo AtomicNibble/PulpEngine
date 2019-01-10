@@ -26,6 +26,7 @@ typedef core::MemoryArena<
 extern GameArena* g_gameArena;
 
 #include <../../tools/ModelLib/ModelLib.h>
+#include <../../tools/MaterialLib/MatLib.h>
 #include <../../tools/AnimLib/AnimLib.h>
 
 X_LINK_ENGINE_LIB("ModelLib");
