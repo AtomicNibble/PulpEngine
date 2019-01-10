@@ -14,6 +14,7 @@
 #include <IFont.h>
 #include <IEffect.h>
 #include <IPhysics.h>
+#include <IModelManager.h>
 
 using namespace core::Hash::Literals;
 using namespace sound::Literals;
@@ -332,6 +333,46 @@ namespace entity
                 // so basically need acess to flags.
 
                 auto meta = gEnv->pPhysics->getActorMeta(b.actor);
+
+                sound::SwitchStateID materialTypeId = 0;
+
+                // do some stuff for sound, maybe this should be done via a collide system?
+                {
+                    model::XModel* pModel = nullptr;
+
+                    if (meta.userData.getType() == physics::UserType::EntId)
+                    {
+                        EntityId id = static_cast<EntityId>(meta.userData.getVal());
+                        if (pReg_->has<Mesh>(id))
+                        {
+                            const auto& mesh = pReg_->get<Mesh>(id);
+                            pModel = mesh.pModel;
+                        }
+                    }
+                    else if (meta.userData.getType() == physics::UserType::ModelID)
+                    {
+                        core::AssetID id = static_cast<core::AssetID>(meta.userData.getVal());
+                        
+                        auto* pModelMan = gEnv->p3DEngine->getModelManager();
+
+                        pModel = pModelMan->findModel(id);
+                    }
+
+                    // which material to pick?
+                    // no idea.
+                    if (pModel && pModel->getNumMeshTotal() > 0)
+                    {
+                        const auto& subMesh = pModel->getMeshHead(0);
+                        auto surfaceType = subMesh.pMat->getSurfaceType();
+
+                        const char* pSurfaceTypeStr = engine::MaterialSurType::ToString(surfaceType);
+                        materialTypeId = sound::getIDFromStr(pSurfaceTypeStr);
+                    }
+                }
+
+                gEnv->pSound->setSwitch("Material"_soundId, materialTypeId, sound::GLOBAL_OBJECT_ID);
+                gEnv->pSound->postEvent("bullet_impact_near"_soundId, sound::GLOBAL_OBJECT_ID);
+
                 if (meta.type == physics::ActorType::Dynamic)
                 {
                     if (!meta.flags.IsSet(physics::ActorFlags::Kinematic))
