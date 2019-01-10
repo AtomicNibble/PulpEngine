@@ -131,6 +131,23 @@ namespace strUtil
         return true;
     }
 
+    inline constexpr char ToLower(const char character)
+    {
+        uint8_t rotated = static_cast<uint8_t>(character & 0x7f);
+        rotated += 0x25;
+        rotated &= 0x7f;
+        rotated += 0x1a;
+        rotated &= ~character;
+        rotated >>= 2;
+        rotated &= 0x20;
+        return character + static_cast<char>(rotated);
+    }
+
+    inline constexpr wchar_t ToLower(const wchar_t character)
+    {
+        return (character >= 'A' && character <= 'Z') ? character + ('a' - 'A') : character;
+    }
+
     template<size_t N>
     inline const char* Convert(const wchar_t* input, char (&output)[N])
     {

@@ -55,6 +55,9 @@ namespace strUtil
     template<typename CharT>
     inline bool IsNumeric(const CharT* startInclusive, const CharT* endExclusive);
 
+    inline constexpr char ToLower(const char character);
+    inline constexpr wchar_t ToLower(const wchar_t character);
+
     bool IsLower(const char character);
     bool IsLower(const wchar_t character);
 

@@ -72,14 +72,9 @@ namespace Hash
                 return (strLen == 0) ? val : Hash(pStr + 1, strLen - 1, static_cast<uint32_t>((*pStr ^ (val * static_cast<uint64_t>(prime))) & 0xFFFFFFFF));
             }
 
-            constexpr char charToLower(const char c) 
-            {
-                return (c >= 'A' && c <= 'Z') ? c + ('a' - 'A') : c;
-            }
-
             constexpr inline Fnv1aVal HashLower(char const* const pStr, const size_t strLen, const uint32_t val)
             {
-                return (strLen == 0) ? val : HashLower(pStr + 1, strLen - 1, static_cast<uint32_t>((charToLower(*pStr) ^ (val * static_cast<uint64_t>(prime))) & 0xFFFFFFFF));
+                return (strLen == 0) ? val : HashLower(pStr + 1, strLen - 1, static_cast<uint32_t>((strUtil::ToLower(*pStr) ^ (val * static_cast<uint64_t>(prime))) & 0xFFFFFFFF));
             }
         } // namespace Internal
 
