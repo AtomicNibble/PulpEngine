@@ -58,6 +58,15 @@ namespace strUtil
     inline constexpr char ToLower(const char character);
     inline constexpr wchar_t ToLower(const wchar_t character);
 
+    void ToLower(char* startInclusive, char* endExclusive);
+    void ToLower(wchar_t* startInclusive, wchar_t* endExclusive);
+
+    inline constexpr char ToUpper(const char character);
+    inline constexpr wchar_t ToUpper(const wchar_t character);
+
+    void ToUpper(char* startInclusive, char* endExclusive);
+    void ToUpper(wchar_t* startInclusive, wchar_t* endExclusive);
+
     bool IsLower(const char character);
     bool IsLower(const wchar_t character);
 

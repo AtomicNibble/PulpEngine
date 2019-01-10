@@ -231,7 +231,92 @@ namespace strUtil
             return x - (e >> 2);
         }
 
+        void toLowerAscii8(char& c)
+        {
+            c = ToLower(c);
+        }
+
+        void toLowerAscii32(uint32_t& c) 
+        {
+            uint32_t rotated = c & uint32_t(0x7f7f7f7fL);
+            rotated += uint32_t(0x25252525L);
+            rotated &= uint32_t(0x7f7f7f7fL);
+            rotated += uint32_t(0x1a1a1a1aL);
+
+            rotated &= ~c;
+            rotated >>= 2;
+            rotated &= uint32_t(0x20202020L);
+            c += rotated;
+        }
+
+        void toLowerAscii64(uint64_t& c) 
+        {
+            uint64_t rotated = c & uint64_t(0x7f7f7f7f7f7f7f7fL);
+            rotated += uint64_t(0x2525252525252525L);
+            rotated &= uint64_t(0x7f7f7f7f7f7f7f7fL);
+            rotated += uint64_t(0x1a1a1a1a1a1a1a1aL);
+            rotated &= ~c;
+            rotated >>= 2;
+            rotated &= uint64_t(0x2020202020202020L);
+            c += rotated;
+        }
+
     } // namespace
+
+    void ToLower(char* startInclusive, char* endExclusive)
+    {
+        size_t len = endExclusive - startInclusive;
+
+        constexpr size_t AlignMask64 = 7;
+        constexpr size_t AlignMask32 = 3;
+
+        size_t n = reinterpret_cast<size_t>(startInclusive);
+        n &= AlignMask32;
+        n = std::min(n, len);
+
+        size_t offset = 0;
+        if (n != 0) {
+            n = std::min(4 - n, len);
+            do {
+                toLowerAscii8(startInclusive[offset]);
+                offset++;
+            } while (offset < n);
+        }
+
+        n = reinterpret_cast<size_t>(startInclusive + offset);
+        n &= AlignMask64;
+        if ((n != 0) && (offset + 4 <= len)) {
+            toLowerAscii32(*(uint32_t*)(startInclusive + offset));
+            offset += 4;
+        }
+
+        // Convert 8 characters at a time
+        while (offset + 8 <= len) {
+            toLowerAscii64(*(uint64_t*)(startInclusive + offset));
+            offset += 8;
+        }
+
+        // Convert 4 characters at a time
+        while (offset + 4 <= len) {
+            toLowerAscii32(*(uint32_t*)(startInclusive + offset));
+            offset += 4;
+        }
+
+        // Convert any characters remaining after the last 4-byte aligned group
+        while (offset < len) {
+            toLowerAscii8(startInclusive[offset]);
+            offset++;
+        }
+    }
+
+    void ToUpper(char* startInclusive, char* endExclusive)
+    {
+        size_t len = endExclusive - startInclusive;
+
+        for (size_t i = 0; i < len; i++) {
+            startInclusive[i] = ToUpper(startInclusive[i]);
+        }
+    }
 
     bool IsLower(const char character)
     {

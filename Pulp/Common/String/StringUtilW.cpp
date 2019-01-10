@@ -23,6 +23,24 @@ namespace strUtil
 
     } // namespace
 
+    void ToLower(wchar_t* startInclusive, wchar_t* endExclusive)
+    {
+        size_t len = endExclusive - startInclusive;
+
+        for (size_t i = 0; i < len; i++) {
+            startInclusive[i] = ToLower(startInclusive[i]);
+        }
+    }
+
+    void ToUpper(wchar_t* startInclusive, wchar_t* endExclusive)
+    {
+        size_t len = endExclusive - startInclusive;
+
+        for (size_t i = 0; i < len; i++) {
+            startInclusive[i] = ToUpper(startInclusive[i]);
+        }
+    }
+
     bool IsLower(const wchar_t character)
     {
         std::locale loc;

@@ -148,6 +148,16 @@ namespace strUtil
         return (character >= 'A' && character <= 'Z') ? character + ('a' - 'A') : character;
     }
 
+    inline constexpr char ToUpper(const char character)
+    {
+        return (character >= 'a' && character <= 'z') ? character - ('a' - 'A') : character;
+    }
+
+    inline constexpr wchar_t ToUpper(const wchar_t character)
+    {
+        return (character >= 'a' && character <= 'z') ? character - ('a' - 'A') : character;
+    }
+
     template<size_t N>
     inline const char* Convert(const wchar_t* input, char (&output)[N])
     {
