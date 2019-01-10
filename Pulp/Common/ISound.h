@@ -130,14 +130,12 @@ X_DECLARE_ENUM8(OcclusionType)
 
 X_INLINE HashVal getIDFromStr(const char* pStr)
 {
-    X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
-    return core::Hash::Fnv1Hash(pStr, core::strUtil::strlen(pStr));
+    return core::Hash::Fnv1HashLower(pStr, core::strUtil::strlen(pStr));
 }
 
 X_INLINE HashVal getIDFromStr(const char* pStr, size_t len)
 {
-    X_ASSERT(core::strUtil::IsLower(pStr, pStr + len), "must be lower case")(pStr);
-    return core::Hash::Fnv1Hash(pStr, len);
+    return core::Hash::Fnv1HashLower(pStr, len);
 }
 
 namespace Literals
