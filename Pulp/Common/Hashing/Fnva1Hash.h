@@ -12,8 +12,11 @@ namespace Hash
 
     Fnv1Val Fnv1Hash(const void* key, size_t length);
     Fnv1Val Fnv1Hash(const void* key, size_t length, Fnv1Val seed);
+    Fnv1Val Fnv1HashLower(const char* key, size_t length);
+
     Fnv1aVal Fnv1aHash(const void* key, size_t length);
     Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed);
+    Fnv1aVal Fnv1aHashLower(const char* key, size_t length);
 
     typedef uint64_t Fnv164Val;
     typedef uint64_t Fnv1a64Val;

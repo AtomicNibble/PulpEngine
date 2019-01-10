@@ -5,12 +5,10 @@ X_NAMESPACE_BEGIN(core)
 
 namespace Hash
 {
-    /*
-	 * 32 bit magic FNV-1a prime
-	 */
     static const uint32_t FNV_32_PRIME = 16777619u;
     static const uint32_t FNV1_32_INIT = 2166136261u;
 
+    // Fnv1-a
     Fnv1aVal Fnv1aHash(const void* key, size_t length)
     {
         return Fnv1aHash(key, length, FNV1_32_INIT);
@@ -18,11 +16,10 @@ namespace Hash
 
     X_INLINE Fnv1aVal Fnv1aHash(const void* key, size_t length, Fnv1aVal seed)
     {
-        uint32_t i;
         Fnv1aVal hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (i = 0; i < length; ++i) {
+        for (uint32_t i = 0; i < length; ++i) {
             hash ^= (uint32_t)*s++;
             hash *= FNV_32_PRIME;
         }
@@ -30,6 +27,19 @@ namespace Hash
         return hash;
     }
 
+    Fnv1aVal Fnv1aHashLower(const char* key, size_t length)
+    {
+        Fnv1aVal hash = FNV1_32_INIT;
+
+        for (uint32_t i = 0; i < length; ++i) {
+            hash ^= (uint32_t)core::strUtil::ToLower(*key++);
+            hash *= FNV_32_PRIME;
+        }
+
+        return hash;
+    }
+
+    // Fnv1
     Fnv1Val Fnv1Hash(const void* key, size_t length)
     {
         return Fnv1Hash(key, length, FNV1_32_INIT);
@@ -37,13 +47,24 @@ namespace Hash
 
     X_INLINE Fnv1Val Fnv1Hash(const void* key, size_t length, Fnv1Val seed)
     {
-        uint32_t i;
         Fnv1Val hash = seed;
         auto* s = reinterpret_cast<const uint8_t*>(key);
 
-        for (i = 0; i < length; ++i) {
+        for (uint32_t i = 0; i < length; ++i) {
             hash *= FNV_32_PRIME;
             hash ^= (uint32_t)*s++;
+        }
+
+        return hash;
+    }
+
+    Fnv1Val Fnv1HashLower(const char* key, size_t length)
+    {
+        Fnv1Val hash = FNV1_32_INIT;
+
+        for (uint32_t i = 0; i < length; ++i) {
+            hash *= FNV_32_PRIME;
+            hash ^= (uint32_t)core::strUtil::ToLower(*key++);
         }
 
         return hash;
