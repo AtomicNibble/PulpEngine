@@ -54,7 +54,8 @@ X_DECLARE_FLAGS(ActorFlag)(
 typedef Flags<ActorFlag> ActorFlags;
 
 X_DECLARE_FLAGS(UserType)(
-    EntId
+    EntId,
+    ModelID
 );
 
 struct UserData

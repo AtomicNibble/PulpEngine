@@ -552,7 +552,9 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
 
                 level::AreaCollisionDataHdr dataHdr;
 
-                auto actor = gEnv->pPhysics->createStaticActor(trans, &a);
+                // TODO: pass in some user data so game can get surface type info.
+                // make it so areas are real models?
+                auto actor = gEnv->pPhysics->createStaticActor(trans, nullptr);
 
                 for (uint8_t t = 0; t < groupHdr.numTypes[level::CollisionDataType::TriMesh]; t++) {
                     file.readObj(dataHdr);
@@ -631,13 +633,13 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
             for (size_t i = 0; i < staticModels_.size(); i++) {
                 level::StaticModel& sm = staticModels_[i];
                 model::XModel* pModel = sm.pModel;
-
+                
                 if (!pModel->isLoaded()) {
                     engine::gEngEnv.pModelMan_->waitForLoad(pModel);
                 }
 
                 if (pModel->hasPhys()) {
-                    auto actor = pPhys->createStaticActor(sm.transform, pModel);
+                    auto actor = pPhys->createStaticActor(sm.transform, physics::UserData(physics::UserType::ModelID, pModel->getID()));
 
                     pModel->addPhysToActor(actor);
 
