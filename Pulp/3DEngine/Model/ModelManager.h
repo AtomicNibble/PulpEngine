@@ -39,6 +39,7 @@ public:
 
     bool asyncInitFinalize(void);
 
+    XModel* findModel(core::AssetID id) const X_FINAL;
     XModel* findModel(const char* pModelName) const X_FINAL;
     XModel* loadModel(const char* pModelName) X_FINAL;
     XModel* getDefaultModel(void) const X_FINAL;

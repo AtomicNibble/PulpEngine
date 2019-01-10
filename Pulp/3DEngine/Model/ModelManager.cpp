@@ -79,6 +79,19 @@ bool XModelManager::asyncInitFinalize(void)
     return true;
 }
 
+XModel* XModelManager::findModel(core::AssetID id) const
+{
+    core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
+
+    ModelResource* pModel = models_.findAsset(id);
+    if (pModel) {
+        return pModel;
+    }
+
+    X_WARNING("ModelManager", "Failed to find model for id: %" PRIi32, id);
+    return nullptr;
+}
+
 XModel* XModelManager::findModel(const char* pModelName) const
 {
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
