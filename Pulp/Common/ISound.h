@@ -128,13 +128,13 @@ X_DECLARE_ENUM8(OcclusionType)
     SingleRay,
     MultiRay);
 
-X_INLINE uint32_t getIDFromStr(const char* pStr)
+X_INLINE HashVal getIDFromStr(const char* pStr)
 {
     X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
     return core::Hash::Fnv1Hash(pStr, core::strUtil::strlen(pStr));
 }
 
-X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
+X_INLINE HashVal getIDFromStr(const char* pStr, size_t len)
 {
     X_ASSERT(core::strUtil::IsLower(pStr, pStr + len), "must be lower case")(pStr);
     return core::Hash::Fnv1Hash(pStr, len);
@@ -143,7 +143,7 @@ X_INLINE uint32_t getIDFromStr(const char* pStr, size_t len)
 namespace Literals
 {
 
-    X_INLINE constexpr uint32_t operator"" _soundId(const char* const pStr, const size_t strLen)
+    X_INLINE constexpr HashVal operator"" _soundId(const char* const pStr, const size_t strLen)
     {
         return core::Hash::Fnv1Const::HashLower(pStr, strLen);
     }
