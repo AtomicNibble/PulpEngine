@@ -9,26 +9,30 @@ template<typename T>
 class Pointer64
 {
 public:
+    using type = T;
+    using pointer = type *;
+    using const_pointer = const type*;
+
+public:
     Pointer64();
 
     X_INLINE Pointer64& operator=(size_t val);
     X_INLINE Pointer64& operator=(T* p);
-    X_INLINE operator T*() const;
 
     X_INLINE Pointer64& operator+=(const Pointer64& oth);
+
+    X_INLINE operator pointer() const;
+    X_INLINE pointer operator->() const;
 
     template<typename Type>
     X_INLINE Type* as(void) const;
 
     X_INLINE void* asVoid(void) const;
 
-    X_INLINE const T* operator[](size_t i) const;
-    X_INLINE T* operator[](size_t i);
+    X_INLINE const_pointer operator[](size_t i) const;
+    X_INLINE pointer operator[](size_t i);
 
 private:
-    //should be ok since same type.
-    //	X_NO_ASSIGN(Pointer64);
-
     uint64_t raw_;
 };
 
