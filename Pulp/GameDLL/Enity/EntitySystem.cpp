@@ -707,6 +707,7 @@ namespace entity
 
             inv.weapons.set(pWpn->getID());
             inv.giveAmmo(pWpn->getAmmoTypeId(), pWpn->getAmmoSlot(weapon::AmmoSlot::Start));
+            inv.setClipAmmo(pWpn->getID(), pWpn->getAmmoSlot(weapon::AmmoSlot::ClipSize));
         };
 
         giveWeapon("test/sw_357");
