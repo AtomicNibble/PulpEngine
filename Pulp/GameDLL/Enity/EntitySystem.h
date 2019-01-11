@@ -112,9 +112,6 @@ namespace entity
 
         bool postLoad(void);
 
-        X_INLINE const EnitiyRegister& getRegister(void) const;
-        X_INLINE EnitiyRegister& getRegister(void);
-
     private:
         bool createTranslatours(void);
 
@@ -165,16 +162,6 @@ namespace entity
         DataTranslator<Emitter> dtEmitter_;
         DataTranslator<DynamicObject> dtDynamicObject_;
     };
-
-    X_INLINE const EnitiyRegister& EnititySystem::getRegister(void) const
-    {
-        return reg_;
-    }
-
-    X_INLINE EnitiyRegister& EnititySystem::getRegister(void)
-    {
-        return reg_;
-    }
 
 } // namespace entity
 
