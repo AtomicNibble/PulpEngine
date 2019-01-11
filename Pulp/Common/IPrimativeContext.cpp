@@ -1007,6 +1007,40 @@ void IPrimativeContext::drawCylinder(const Vec3f& pos, const Vec3f& dir, float r
     }
 }
 
+void IPrimativeContext::drawCylinder(const Transformf& trans, float radius, float height, Color8u col)
+{
+    const float halfHeight = height * 0.5f;
+
+    Vec3f left(-halfHeight, 0.f, 0.f);
+    Vec3f right(halfHeight, 0.f, 0.f);
+
+    // TODO: draw the 4 archs
+    {
+        Transformf leftTrans(trans);
+        leftTrans.pos += trans.quat * left;
+        drawCircle(leftTrans, 25, radius, col);
+    }
+    {
+        Transformf rightTrans(trans);
+        rightTrans.pos += trans.quat * right;
+        drawCircle(rightTrans, 25, radius, col);
+    }
+
+    // some lines.
+    Vec3f points[2 * 4] = {
+        trans.transform(Vec3f(-halfHeight,  radius, 0)),
+        trans.transform(Vec3f(halfHeight,  radius, 0)),
+        trans.transform(Vec3f(-halfHeight, -radius, 0)),
+        trans.transform(Vec3f(halfHeight, -radius, 0)),
+        trans.transform(Vec3f(-halfHeight,  0, radius)),
+        trans.transform(Vec3f(halfHeight,  0, radius)),
+        trans.transform(Vec3f(-halfHeight, 0, -radius)),
+        trans.transform(Vec3f(halfHeight, 0, -radius))
+    };
+
+    drawLines(points, col);
+}
+
 void IPrimativeContext::drawCapsule(const Transformf& trans, float radius, float height, Color8u col)
 {
     const float halfHeight = height * 0.5f;
@@ -1015,6 +1049,7 @@ void IPrimativeContext::drawCapsule(const Transformf& trans, float radius, float
     Vec3f right(halfHeight, 0.f, 0.f);
 
     // TODO: draw the 4 archs
+    X_ASSERT_NOT_IMPLEMENTED();
     {
         Transformf leftTrans(trans);
         leftTrans.pos += trans.quat * left;

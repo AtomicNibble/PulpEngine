@@ -179,17 +179,17 @@ namespace entity
                     trans.quat = Quatf(Vec3f::yAxis(), ::toRadians(90.f));
 
                     trans.pos = curPos;
-                    pPrim->drawCapsule(trans, info.radius, info.height, Col_Blue);
+                    pPrim->drawCylinder(trans, info.radius, info.height, Col_Blue);
 
                     if (nextPos != curPos)
                     {
                         trans.pos = nextPos;
-                        pPrim->drawCapsule(trans, info.radius, info.height, Col_Red);
+                        pPrim->drawCylinder(trans, info.radius, info.height, Col_Red);
                     }
                     if (prevPos != curPos)
                     {
                         trans.pos = prevPos;
-                        pPrim->drawCapsule(trans, info.radius, info.height, Col_Red);
+                        pPrim->drawCylinder(trans, info.radius, info.height, Col_Red);
                     }
                 }
             }

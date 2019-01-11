@@ -144,6 +144,7 @@ public:
 
     // Cylinder
     void drawCylinder(const Vec3f& pos, const Vec3f& dir, float radius, float height, Color8u col, bool solid = true, int32_t lodIdx = 0);
+    void drawCylinder(const Transformf& trans, float radius, float height, Color8u col);
 
     // Capsule
     void drawCapsule(const Transformf& trans, float radius, float height, Color8u col);
