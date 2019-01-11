@@ -199,14 +199,14 @@ public:
     void renderEmitters(core::FrameData& frame, IPrimativeContext* pContext);
 
     bool loadNodes(const level::FileHeader& fileHdr, level::StringTable& strTable, uint8_t* pData) X_FINAL;
-    IRenderEnt* addRenderEnt(RenderEntDesc& ent) X_FINAL;
+    IRenderEnt* addRenderEnt(const RenderEntDesc& ent) X_FINAL;
     void freeRenderEnt(IRenderEnt* pEnt) X_FINAL;
     void updateRenderEnt(IRenderEnt* pEnt, const Transformf& trans, bool force) X_FINAL;
     bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_FINAL;
 
-    IRenderLight* addRenderLight(RenderLightDesc& ent) X_FINAL;
+    IRenderLight* addRenderLight(const RenderLightDesc& ent) X_FINAL;
 
-    fx::IEmitter* addEmmiter(EmitterDesc& emit) X_FINAL;
+    fx::IEmitter* addEmmiter(const EmitterDesc& emit) X_FINAL;
     void freeEmitter(fx::IEmitter* pEmitter) X_FINAL;
 
     // util

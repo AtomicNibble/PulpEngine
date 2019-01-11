@@ -665,7 +665,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
     return true;
 }
 
-IRenderEnt* World3D::addRenderEnt(RenderEntDesc& entDesc)
+IRenderEnt* World3D::addRenderEnt(const RenderEntDesc& entDesc)
 {
     X_UNUSED(entDesc);
     X_ASSERT_NOT_NULL(entDesc.pModel);
@@ -753,14 +753,14 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
     return true;
 }
 
-IRenderLight* World3D::addRenderLight(RenderLightDesc& ent)
+IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
 {
     X_UNUSED(ent);
 
     return nullptr;
 }
 
-fx::IEmitter* World3D::addEmmiter(EmitterDesc& emit)
+fx::IEmitter* World3D::addEmmiter(const EmitterDesc& emit)
 {
     auto* pEmitter = gEngEnv.pEffectMan_->allocEmmiter();
     if (!pEmitter) {
