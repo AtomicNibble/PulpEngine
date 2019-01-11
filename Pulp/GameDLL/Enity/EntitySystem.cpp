@@ -602,7 +602,7 @@ namespace entity
         // - animator - to animate model
         // - weapon - to store state
 
-        auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357");
+        auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357"sv);
         weaponDefs_.waitForLoad(pWeaponDef);
 
         pWeaponDef->waitForLoadDep();
@@ -683,7 +683,7 @@ namespace entity
         else
         {
             // world model.
-            player.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev");
+            player.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev"sv);
             
             engine::RenderEntDesc entDsc;
             entDsc.pModel = player.pModel;
@@ -701,8 +701,8 @@ namespace entity
         hp.hp = 100;
         hp.max = 100;
 
-        auto giveWeapon = [&](const char* pName) {
-            auto* pWpn = weaponDefs_.loadWeaponDef(pName);
+        auto giveWeapon = [&](core::string_view name) {
+            auto* pWpn = weaponDefs_.loadWeaponDef(name);
 
             weaponDefs_.waitForLoad(pWpn);
 
@@ -711,9 +711,9 @@ namespace entity
             inv.setClipAmmo(pWpn->getID(), pWpn->getAmmoSlot(weapon::AmmoSlot::ClipSize));
         };
 
-        giveWeapon("test/sw_357");
-        giveWeapon("test/mg42");
-        giveWeapon("test/raygun");
+        giveWeapon("test/sw_357"sv);
+        giveWeapon("test/mg42"sv);
+        giveWeapon("test/raygun"sv);
 
         player.currentWpn = 1;
         player.targetWpn = 1;

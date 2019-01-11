@@ -82,37 +82,37 @@ namespace weapon
         return nullptr;
     }
 
-    WeaponDef* WeaponDefManager::findWeaponDef(const char* pName) const
+    WeaponDef* WeaponDefManager::findWeaponDef(core::string_view name) const
     {
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
-        WeaponDef* pDef = weaponDefs_.findAsset(pName);
+        WeaponDef* pDef = weaponDefs_.findAsset(name);
         if (pDef) {
             return pDef;
         }
 
-        X_WARNING("WeaponDef", "Failed to find material: \"%s\"", pName);
+        X_WARNING("WeaponDef", "Failed to find material: \"%.*s\"", name.length(), name.data());
         return nullptr;
     }
 
-    WeaponDef* WeaponDefManager::loadWeaponDef(const char* pName)
+    WeaponDef* WeaponDefManager::loadWeaponDef(core::string_view name)
     {
-        X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
+        X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
         WeaponDefResource* pWeaponDefRes = nullptr;
 
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
         {
-            pWeaponDefRes = weaponDefs_.findAsset(pName);
+            pWeaponDefRes = weaponDefs_.findAsset(name);
             if (pWeaponDefRes) {
                 // inc ref count.
                 pWeaponDefRes->addReference();
                 return pWeaponDefRes;
             }
 
-            core::string name(pName);
-            pWeaponDefRes = weaponDefs_.createAsset(name, name);
+            core::string nameStr(name.data(), name.length());
+            pWeaponDefRes = weaponDefs_.createAsset(nameStr, nameStr);
         }
 
         addLoadRequest(pWeaponDefRes);
