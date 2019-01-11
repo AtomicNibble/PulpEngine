@@ -52,6 +52,8 @@ struct IWorld3D
     virtual bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_ABSTRACT;
 
     virtual IRenderLight* addRenderLight(const RenderLightDesc& ent) X_ABSTRACT;
+    virtual void updateLight(IRenderLight* pLight, const Transformf& trans) X_ABSTRACT;
+    virtual void freeLight(IRenderLight* pLight) X_ABSTRACT;
 
     virtual fx::IEmitter* addEmmiter(const EmitterDesc& emit) X_ABSTRACT;
     virtual void freeEmitter(fx::IEmitter* pEmitter) X_ABSTRACT;

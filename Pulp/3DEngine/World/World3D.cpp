@@ -770,6 +770,21 @@ IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
     return pRenderLight;
 }
 
+void World3D::updateLight(IRenderLight* pLight, const Transformf& trans)
+{
+    X_UNUSED(pLight, trans);
+}
+
+void World3D::freeLight(IRenderLight* pLight)
+{
+    RenderLight* pRenderLight = static_cast<RenderLight*>(pLight);
+
+    // TODO: perf.
+    renderLights_.remove(pRenderLight);
+
+    X_DELETE(pRenderLight, arena_);
+}
+
 fx::IEmitter* World3D::addEmmiter(const EmitterDesc& emit)
 {
     auto* pEmitter = gEngEnv.pEffectMan_->allocEmmiter();

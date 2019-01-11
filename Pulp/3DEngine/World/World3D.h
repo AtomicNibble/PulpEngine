@@ -205,6 +205,8 @@ public:
     bool setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t num) X_FINAL;
 
     IRenderLight* addRenderLight(const RenderLightDesc& ent) X_FINAL;
+    void updateLight(IRenderLight* pLight, const Transformf& trans) X_FINAL;
+    void freeLight(IRenderLight* pLight) X_FINAL;
 
     fx::IEmitter* addEmmiter(const EmitterDesc& emit) X_FINAL;
     void freeEmitter(fx::IEmitter* pEmitter) X_FINAL;
