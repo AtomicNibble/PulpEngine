@@ -1170,6 +1170,22 @@ PlayingID XSound::postEvent(const char* pEventStr, SndObjectHandle object)
     return postEvent(AK::SoundEngine::GetIDFromString(pEventStr), object);
 }
 
+void XSound::postEventAtPosition(EventID event, const EventSwitches& switches, const Transformf& trans)
+{
+    // create a temp sound object for playing the sound at postion X.
+    auto object = registerObject("PostAtPostTmp");
+    setPosition(object, trans);
+
+    SoundObject* pObject = SoundHandleToObject(object);
+    pObject->flags.Set(SoundFlag::Temp);
+    
+    if (switches.ground != DEFAULT_SWITCH_STATE_ID) {
+        setSwitch(AK::SWITCHES::MATERIAL::GROUP, switches.ground, object);
+    }
+
+    postEvent(event, object);
+}
+
 void XSound::stopPlyingID(PlayingID id)
 {
     if (id != INVALID_PLAYING_ID) {
@@ -1561,6 +1577,10 @@ void XSound::postEventCallback(AkCallbackType eType, AkCallbackInfo* pCallbackIn
         --pObject->activeEvents;
 
         X_LOG0("SoundSys", "EndOfEvent: 0x%" PRIx32 " object %p debugName: %s", pEventInfo->eventID, pObject, pObject->debugName.c_str());
+
+        if (pObject->flags.IsSet(SoundFlag::Temp)) {
+            unRegisterObject(pCallbackInfo->gameObjID);
+        }
     }
     else {
         X_ASSERT_UNREACHABLE();

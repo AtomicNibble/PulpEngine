@@ -43,6 +43,7 @@ static const SndObjectHandle GLOBAL_OBJECT_ID = static_cast<SndObjectHandle>(2);
 static const SndObjectHandle LISTNER_OBJECT_ID = static_cast<SndObjectHandle>(1);
 static const SndObjectHandle INVALID_OBJECT_ID = static_cast<SndObjectHandle>(-1);
 static const PlayingID INVALID_PLAYING_ID = static_cast<PlayingID>(0);
+static const SwitchStateID DEFAULT_SWITCH_STATE_ID = static_cast<SwitchStateID>(0);
 
 struct AudioBuffer
 {
@@ -148,6 +149,16 @@ namespace Literals
 
 } // namespace Literals
 
+struct EventSwitches
+{
+    EventSwitches() :
+        ground(DEFAULT_SWITCH_STATE_ID)
+    {}
+
+    SwitchStateID ground;
+};
+
+
 struct ISound : public core::IEngineSysBase
 {
     virtual ~ISound() = default;
@@ -193,6 +204,8 @@ struct ISound : public core::IEngineSysBase
     // events
     virtual PlayingID postEvent(EventID event, SndObjectHandle object) X_ABSTRACT;
     virtual PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_ABSTRACT;
+
+    virtual void postEventAtPosition(EventID event, const EventSwitches& switches, const Transformf& trans) X_ABSTRACT;
 
     virtual void stopPlyingID(PlayingID id) X_ABSTRACT;
 

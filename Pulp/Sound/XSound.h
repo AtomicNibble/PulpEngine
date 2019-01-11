@@ -36,7 +36,8 @@ X_DECLARE_FLAGS8(SoundFlag)
     Registered,
     Position,
     Occlusion,
-    Occluded);
+    Occluded,
+    Temp);
 
 typedef Flags<SoundFlag> SoundFlags;
 
@@ -153,6 +154,8 @@ public:
 
     PlayingID postEvent(EventID event, SndObjectHandle object) X_FINAL;
     PlayingID postEvent(const char* pEventStr, SndObjectHandle object) X_FINAL;
+
+    void postEventAtPosition(EventID event, const EventSwitches& switches, const Transformf& trans) X_FINAL;
 
     void stopPlyingID(PlayingID id) X_FINAL;
 
