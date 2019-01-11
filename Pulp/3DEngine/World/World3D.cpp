@@ -203,6 +203,7 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
     lights_(arena),
     staticModels_(arena),
     renderEnts_(arena),
+    renderLights_(arena),
     emitters_(arena)
 {
     viewCount_ = 0;
@@ -215,6 +216,11 @@ World3D::~World3D()
     for (auto* pRenderEnt : renderEnts_)
     {
         X_DELETE(pRenderEnt, arena_);
+    }
+
+    for (auto* pRenderLight : renderLights_)
+    {
+        X_DELETE(pRenderLight, arena_);
     }
 }
 
@@ -755,9 +761,13 @@ bool World3D::setBonesMatrix(IRenderEnt* pEnt, const Matrix44f* pMats, size_t nu
 
 IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
 {
-    X_UNUSED(ent);
+    auto* pRenderLight = X_NEW(RenderLight, arena_, "RenderLight")();
+    pRenderLight->trans = ent.trans;
+    pRenderLight->col = ent.col;
 
-    return nullptr;
+    renderLights_.append(pRenderLight);
+
+    return pRenderLight;
 }
 
 fx::IEmitter* World3D::addEmmiter(const EmitterDesc& emit)
@@ -2260,8 +2270,12 @@ void World3D::debugDraw_Lights(void) const
 
     for (auto& light : lights_) {
         Sphere s(light.pos, 2.f);
-
         pPrimContex_->drawSphere(s, light.col, true);
+    }
+
+    for (auto* pLight : renderLights_) {
+        Sphere s(pLight->trans.pos, 2.f);
+        pPrimContex_->drawSphere(s, pLight->col, true);
     }
 }
 

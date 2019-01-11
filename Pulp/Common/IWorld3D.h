@@ -21,7 +21,7 @@ struct RenderLightDesc
 {
     Transformf trans;
 
-    Colorf col;
+    Color8u col;
 };
 
 struct EmitterDesc

@@ -53,12 +53,11 @@ public:
 class RenderLight : public IRenderLight
 {
 public:
-    RenderLight();
+    RenderLight() = default;
 
 public:
     Transformf trans;
-
-    Colorf col;
+    Color8u col;
 };
 
 struct AreaNode
@@ -173,6 +172,7 @@ class World3D : public IWorld3D
     typedef core::Array<level::StaticModel> StaticModelsArr;
     typedef core::Array<level::Light> StaticLightssArr;
     typedef core::Array<RenderEnt*> RenderEntPtrArr;
+    typedef core::Array<RenderLight*> RenderLightPtrArr;
     typedef core::Array<fx::Emitter*> EmitterPtrArr;
 
     struct AreaRefInfo
@@ -313,6 +313,7 @@ private:
 
 private:
     RenderEntPtrArr renderEnts_;
+    RenderLightPtrArr renderLights_;
     EmitterPtrArr emitters_;
 };
 
