@@ -558,15 +558,10 @@ void XSound::update(core::FrameData& frame)
             performOcclusionChecks();
         }
 
-        AkListenerPosition listener;
-        listener.SetOrientation(
-            0.f, 1.f, 0.f,
-            0.f, 0.f, 1.f
-        );
-        listener.SetPosition(Vec3ToAkVector(listenerTrans_.pos));
+        AkListenerPosition listenerPos = TransToAkPos(listenerTrans_);
 
         AKRESULT res;
-        res = SoundEngine::SetPosition(LISTNER_OBJECT_ID, listener);
+        res = SoundEngine::SetPosition(LISTNER_OBJECT_ID, listenerPos);
         if (res != AK_Success) {
             AkResult::Description desc;
             X_ERROR("SoundSys", "Error setting listener pos. %s", AkResult::ToString(res, desc));
