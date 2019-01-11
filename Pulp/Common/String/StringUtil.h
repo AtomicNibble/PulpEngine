@@ -9,6 +9,8 @@
 
 #include <Util\BitUtil.h>
 
+#include <String\StringView.h>
+
 X_NAMESPACE_BEGIN(core)
 
 namespace strUtil
@@ -259,6 +261,7 @@ namespace strUtil
     bool HasFileExtension(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
     // returns nullptr if not found.
+    X_INLINE const char* FileExtension(core::string_view path);
     const char* FileExtension(const char* path);
     const wchar_t* FileExtension(const wchar_t* path);
     const char* FileExtension(const char* startInclusive, const char* endExclusive);

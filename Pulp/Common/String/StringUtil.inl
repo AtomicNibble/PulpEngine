@@ -339,4 +339,14 @@ namespace strUtil
     {
         return wcstod(str, const_cast<wchar_t**>(pEndPtr));
     }
+
+    // -------------------------
+
+    X_INLINE const char* FileExtension(core::string_view path)
+    {
+        return FileExtension(path.data(), path.data() + path.length());
+    }
+
+
+
 } // namespace strUtil
