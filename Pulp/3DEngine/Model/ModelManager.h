@@ -40,8 +40,8 @@ public:
     bool asyncInitFinalize(void);
 
     XModel* findModel(core::AssetID id) const X_FINAL;
-    XModel* findModel(const char* pModelName) const X_FINAL;
-    XModel* loadModel(const char* pModelName) X_FINAL;
+    XModel* findModel(core::string_view name) const X_FINAL;
+    XModel* loadModel(core::string_view name) X_FINAL;
     XModel* getDefaultModel(void) const X_FINAL;
 
     void releaseModel(XModel* pModel) X_FINAL;

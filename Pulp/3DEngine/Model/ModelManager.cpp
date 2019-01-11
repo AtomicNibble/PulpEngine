@@ -92,27 +92,26 @@ XModel* XModelManager::findModel(core::AssetID id) const
     return nullptr;
 }
 
-XModel* XModelManager::findModel(const char* pModelName) const
+XModel* XModelManager::findModel(core::string_view name) const
 {
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-    ModelResource* pModel = models_.findAsset(pModelName);
+    ModelResource* pModel = models_.findAsset(name);
     if (pModel) {
         return pModel;
     }
 
-    X_WARNING("ModelManager", "Failed to find model: \"%s\"", pModelName);
+    X_WARNING("ModelManager", "Failed to find model: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
-XModel* XModelManager::loadModel(const char* pModelName)
+XModel* XModelManager::loadModel(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pModelName);
-    X_ASSERT(core::strUtil::FileExtension(pModelName) == nullptr, "Extension not allowed")(pModelName);
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-    ModelResource* pModelRes = models_.findAsset(pModelName);
+    ModelResource* pModelRes = models_.findAsset(name);
     if (pModelRes) {
         // inc ref count.
         pModelRes->addReference();
@@ -120,8 +119,8 @@ XModel* XModelManager::loadModel(const char* pModelName)
     }
 
     // we create a model and give it back
-    core::string name(pModelName);
-    pModelRes = models_.createAsset(name, name);
+    core::string nameStr(name.data(), name.length());
+    pModelRes = models_.createAsset(nameStr, nameStr);
 
     // add to list of models that need loading.
     addLoadRequest(pModelRes);

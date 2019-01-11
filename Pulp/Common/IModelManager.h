@@ -14,8 +14,8 @@ struct IModelManager : public core::IAssetLoader
 
     // returns null if not found, ref count unaffected
     virtual XModel* findModel(core::AssetID id) const X_ABSTRACT;
-    virtual XModel* findModel(const char* pModelName) const X_ABSTRACT;
-    virtual XModel* loadModel(const char* pModelName) X_ABSTRACT;
+    virtual XModel* findModel(core::string_view name) const X_ABSTRACT;
+    virtual XModel* loadModel(core::string_view name) X_ABSTRACT;
     virtual XModel* getDefaultModel(void) const X_ABSTRACT;
 
     virtual void releaseModel(XModel* pModel) X_ABSTRACT;

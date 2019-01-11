@@ -24,6 +24,7 @@
 #include <numeric>
 
 using namespace core::Hash::Literals;
+using namespace core::string_view_literals;
 
 X_NAMESPACE_BEGIN(game)
 
@@ -573,7 +574,7 @@ namespace entity
 
             trans.pos = Vec3f(-110.f, 16.f, 74.f);
 
-            mesh.pModel = pModelManager_->loadModel("test/arms/view_jap");
+            mesh.pModel = pModelManager_->loadModel("test/arms/view_jap"sv);
             pModelManager_->waitForLoad(mesh.pModel);
 
             tagWeapon = mesh.pModel->getBoneHandle("tag_weapon");
@@ -1031,10 +1032,9 @@ namespace entity
 
                     auto& mesh = reg_.assign<Mesh>(ent);
 
-                    // TODO: support string views for asset loading.
-                    // core::string_view name(nameVal.GetString(), nameVal.GetStringLength());
+                    core::string_view modelName(nameVal.GetString(), nameVal.GetStringLength());
 
-                    mesh.pModel = pModelManager_->loadModel(nameVal.GetString());
+                    mesh.pModel = pModelManager_->loadModel(modelName);
 
                     // TODO: why?
                     mesh.pModel->waitForLoad(pModelManager_);
