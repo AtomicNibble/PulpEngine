@@ -334,7 +334,7 @@ namespace entity
 
                 auto meta = gEnv->pPhysics->getActorMeta(b.actor);
 
-                sound::SwitchStateID materialTypeId = 0;
+                sound::SwitchStateID materialTypeId = sound::DEFAULT_SWITCH_STATE_ID;
 
                 // do some stuff for sound, maybe this should be done via a collide system?
                 {
@@ -366,12 +366,18 @@ namespace entity
                         auto surfaceType = subMesh.pMat->getSurfaceType();
 
                         const char* pSurfaceTypeStr = engine::MaterialSurType::ToString(surfaceType);
+                        X_LOG0("Weapon", "Bullet hit surface of type: %s", pSurfaceTypeStr);
+
                         materialTypeId = sound::getIDFromStr(pSurfaceTypeStr);
                     }
                 }
 
-                gEnv->pSound->setSwitch("Material"_soundId, materialTypeId, sound::GLOBAL_OBJECT_ID);
-                gEnv->pSound->postEvent("bullet_impact_near"_soundId, sound::GLOBAL_OBJECT_ID);
+                Transformf trans;
+                trans.pos = b.position;
+
+                sound::EventSwitches es;
+                es.ground = materialTypeId;
+                gEnv->pSound->postEventAtPosition("bullet_impact_near"_soundId, es, trans);
 
                 if (meta.type == physics::ActorType::Dynamic)
                 {
