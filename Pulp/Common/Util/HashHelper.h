@@ -42,6 +42,11 @@ struct hash<core::string>
     {
         return (size_t)core::Hash::Fnv1aHash(str, strlen(str));
     }
+
+    size_t operator()(const core::string_view& str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
+    }
 };
 
 template<size_t N>
@@ -58,6 +63,11 @@ struct hash<core::StackString<N>>
     }
 
     size_t operator()(const core::string& str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
+    }
+
+    size_t operator()(const core::string_view& str) const
     {
         return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
     }
@@ -81,6 +91,11 @@ struct hash<const char*>
     }
 
     size_t operator()(const core::string& str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
+    }
+
+    size_t operator()(const core::string_view& str) const
     {
         return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
     }
@@ -122,6 +137,11 @@ struct equal_to<core::string>
     bool operator()(const core::string& lhs, const char* const rhs) const
     {
         return lhs.compare(rhs);
+    }
+
+    bool operator()(const core::string& lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.data(), rhs.data() + rhs.length());
     }
 };
 
