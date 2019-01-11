@@ -45,7 +45,6 @@ namespace entity
         cameraSys_(vars),
         weaponSys_(vars, sessionInfo),
         dtHealth_(arena),
-        dtMesh_(arena),
         dtSoundObj_(arena),
         dtRotator_(arena),
         dtMover_(arena),
@@ -185,8 +184,6 @@ namespace entity
         // translators.
         ADD_TRANS_MEMBER(dtHealth_, hp);
         ADD_TRANS_MEMBER(dtHealth_, max);
-
-        ADD_TRANS_MEMBER(dtMesh_, name);
 
         ADD_TRANS_MEMBER(dtSoundObj_, offset);
         dtSoundObj_.initializeFromString("occType", [&](SoundObject& snd, const char* pOccType, size_t length) -> bool {
@@ -1020,17 +1017,25 @@ namespace entity
                 }
 
                 case "Mesh"_fnv1a: {
-                    auto& mesh = reg_.assign<Mesh>(ent);
-                    if (!parseComponent(dtMesh_, mesh, value)) {
+                    if (!value.HasMember("name")) {
+                        X_ERROR("Ents", "Mesh missing name");
                         return false;
                     }
-                    if (mesh.name.isEmpty()) {
+
+                    const auto& nameVal = value["name"];
+                    if (nameVal.GetStringLength() < 1) {
                         X_ERROR("Ents", "Mesh has empty name");
                         return false;
                     }
 
-                    mesh.pModel = pModelManager_->loadModel(mesh.name.c_str());
+                    auto& mesh = reg_.assign<Mesh>(ent);
 
+                    // TODO: support string views for asset loading.
+                    // core::string_view name(nameVal.GetString(), nameVal.GetStringLength());
+
+                    mesh.pModel = pModelManager_->loadModel(nameVal.GetString());
+
+                    // TODO: why?
                     mesh.pModel->waitForLoad(pModelManager_);
                     break;
                 }

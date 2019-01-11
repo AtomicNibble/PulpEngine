@@ -159,7 +159,6 @@ namespace entity
 
     private:
         DataTranslator<Health> dtHealth_;
-        DataTranslator<Mesh> dtMesh_;
         DataTranslator<SoundObject> dtSoundObj_;
         DataTranslator<Rotator> dtRotator_;
         DataTranslator<Mover> dtMover_;

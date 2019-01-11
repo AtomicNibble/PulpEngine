@@ -107,9 +107,6 @@ namespace entity
             pModel(nullptr)
         {}
 
-        // core::StackString<64> name;
-        // TODO replace this with networked string.
-        core::string name;
         model::XModel* pModel;
     };
 
