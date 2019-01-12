@@ -119,7 +119,7 @@ namespace gui
         const char* pMenuName = nullptr;
         pH->getParam(1, pMenuName);
 
-        pMenuHandler_->openMenu(pMenuName);
+        pMenuHandler_->openMenu(core::string_view(pMenuName));
 
         return pH->endFunction();
     }

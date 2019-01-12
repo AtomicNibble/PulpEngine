@@ -18,6 +18,8 @@
 
 X_NAMESPACE_BEGIN(game)
 
+using namespace core::string_view_literals;
+
 XGame::XGame(ICore* pCore) :
     arena_(g_gameArena),
     pCore_(pCore),
@@ -105,7 +107,7 @@ bool XGame::init(void)
     auto* pMenuMan = gEnv->p3DEngine->getMenuManager();
 
     pMenuHandler_ = pMenuMan->createMenuHandler();
-    pMenuHandler_->openMenu("main");
+    pMenuHandler_->openMenu("main"_sv);
 
     // networking.
     {
@@ -214,7 +216,7 @@ bool XGame::onInputEvent(const input::InputEvent& event)
                 {
                     if (!pMenuHandler_->isActive())
                     {
-                        pMenuHandler_->openMenu("pause");
+                        pMenuHandler_->openMenu("pause"_sv);
                         return true;
                     }
                     else
@@ -303,7 +305,7 @@ bool XGame::update(core::FrameData& frame)
         {
             clearWorld();
 
-            pMenuHandler_->openMenu("main");
+            pMenuHandler_->openMenu("main"_sv);
 
         }
     }
@@ -317,7 +319,7 @@ bool XGame::update(core::FrameData& frame)
         if (prevStatus_ != net::SessionStatus::Loading)
         {
             // frist frame in loading.
-            pMenuHandler_->openMenu("loading");
+            pMenuHandler_->openMenu("loading"_sv);
 
             clearWorld();
 
@@ -445,7 +447,7 @@ bool XGame::update(core::FrameData& frame)
         // open lobby menu?
         if (prevStatus_ != net::SessionStatus::PartyLobby)
         {
-            pMenuHandler_->openMenu("lobby");
+            pMenuHandler_->openMenu("lobby"_sv);
         }
 
 
@@ -454,7 +456,7 @@ bool XGame::update(core::FrameData& frame)
     {
         if (prevStatus_ != net::SessionStatus::GameLobby)
         {
-            pMenuHandler_->openMenu("lobby");
+            pMenuHandler_->openMenu("lobby"_sv);
         }
 
 
@@ -962,7 +964,7 @@ void XGame::Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs)
     auto* pMenuName = pArgs->GetArg(1);
 
     pMenuHandler_->close();
-    pMenuHandler_->openMenu(pMenuName);
+    pMenuHandler_->openMenu(core::string_view(pMenuName));
 }
 
 void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
@@ -982,7 +984,7 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
     auto* pLobby = pSession_->getLobby(net::LobbyType::Game);
     
     // want the name of the player.
-    core::string_view name = "player";
+    core::string_view name = "player"_sv;
     core::string_view msg(pMsg);
 
     if (userNetMap_.localPlayerIdx >= 0) {
@@ -995,7 +997,7 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
         }
     }
     else {
-        name = "server";
+        name = "server"_sv;
     }
 
     if (sessionInfo_.isHost) {

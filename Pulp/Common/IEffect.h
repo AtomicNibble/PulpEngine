@@ -186,8 +186,8 @@ namespace fx
 
         virtual ~IEffectManager() = default;
 
-        virtual Effect* findEffect(const char* pName) const X_ABSTRACT;
-        virtual Effect* loadEffect(const char* pName) X_ABSTRACT;
+        virtual Effect* findEffect(core::string_view name) const X_ABSTRACT;
+        virtual Effect* loadEffect(core::string_view name) X_ABSTRACT;
 
         virtual bool waitForLoad(Effect* pMaterial) X_ABSTRACT;
     };

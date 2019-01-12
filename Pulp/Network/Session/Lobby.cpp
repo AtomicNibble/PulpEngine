@@ -17,6 +17,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+using namespace core::string_view_literals;
+
 void MatchParameters::writeToBitStream(core::FixedBitStreamBase& bs) const
 {
     bs.write(numSlots);
@@ -1813,7 +1815,7 @@ core::string_view Lobby::getUserNameForGuid(NetGUID guid) const
     });
 
     if (it == disconnectedUsers_.end()) {
-        return { "<unknown>" };
+        return "<unknown>"_sv;
     }
 
     return core::string_view(it->username.data(), it->username.length());

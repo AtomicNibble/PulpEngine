@@ -256,7 +256,7 @@ bool XModel::processData(core::UniquePointer<char[]> data, uint32_t dataSize, en
     // load the materials.
     for (i = 0; i < hdr.numMesh; i++) {
         SubMeshHeader& mesh = const_cast<SubMeshHeader&>(pMeshHeads_[i]);
-        mesh.pMat = pMatMan->loadMaterial(static_cast<const char*>(mesh.materialName));
+        mesh.pMat = pMatMan->loadMaterial(core::string_view(static_cast<const char*>(mesh.materialName)));
     }
 
     // create the inverse bone matrix.

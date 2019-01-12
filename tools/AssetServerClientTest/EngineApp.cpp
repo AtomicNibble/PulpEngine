@@ -10,6 +10,8 @@
 
 extern HINSTANCE g_hInstance;
 
+using namespace core::string_view_literals;
+
 EngineApp::EngineApp() :
     pICore_(nullptr),
     hSystemHandle_(core::Module::NULL_HANDLE)
@@ -52,7 +54,7 @@ bool EngineApp::Init(const wchar_t* pInCmdLine)
     hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
     if (!hSystemHandle_) {
-        Error(CORE_DLL_NAME " Loading Failed");
+        Error(CORE_DLL_NAME " Loading Failed"_sv);
         return false;
     }
 
@@ -60,7 +62,7 @@ bool EngineApp::Init(const wchar_t* pInCmdLine)
         core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC));
 
     if (!pfnCreateCoreInterface) {
-        Error(CORE_DLL_NAME " not valid");
+        Error(CORE_DLL_NAME " not valid"_sv);
         return false;
     }
 
@@ -69,7 +71,7 @@ bool EngineApp::Init(const wchar_t* pInCmdLine)
 #endif // !X_LIB
 
     if (!pICore_) {
-        Error("Engine Init Failed");
+        Error("Engine Init Failed"_sv);
         return false;
     }
 
@@ -109,10 +111,10 @@ LRESULT CALLBACK EngineApp::WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM l
     return DefWindowProc(hWnd, msg, wParam, lParam);
 }
 
-void EngineApp::Error(const char* pErrorText)
+void EngineApp::Error(core::string_view errorText)
 {
-    core::msgbox::show(pErrorText,
-        X_ENGINE_NAME " Start Error",
+    core::msgbox::show(errorText,
+        X_ENGINE_NAME " Start Error"_sv,
         core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
         core::msgbox::Buttons::OK);
 }

@@ -23,7 +23,7 @@ private:
     virtual LRESULT OnTrayCmd(WPARAM wParam, LPARAM lParam) X_FINAL;
 
 private:
-    static void Error(const char* pErrorText);
+    static void Error(core::string_view errorText);
 
 private:
     bool run_;

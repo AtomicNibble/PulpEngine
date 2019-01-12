@@ -65,6 +65,8 @@
 
 #include "SystemTimer.h"
 
+using namespace core::string_view_literals;
+
 #if defined(WIN32)
 
 #include <VersionHelpers.h>
@@ -370,8 +372,8 @@ bool XCore::Init(const CoreInitParams& startupParams)
         bool bIsWindowsXPorLater = ::IsWindowsXPOrGreater();
 
         if (!bIsWindowsXPorLater) {
-            core::msgbox::show("Versions of windows older than and including XP are not supported.",
-                X_ENGINE_NAME " Start Error",
+            core::msgbox::show("Versions of windows older than and including XP are not supported."_sv,
+                X_ENGINE_NAME " Start Error"_sv,
                 core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
                 core::msgbox::Buttons::OK);
             return false;
@@ -835,7 +837,7 @@ bool XCore::InitLogging(const CoreInitParams& initParams)
 
             const auto& desc = initParams.consoleDesc;
             
-            pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(desc.pTitle);
+            pConsole_ = X_NEW(core::Console, g_coreArena, "ExternalConsoleLog")(core::string_view(desc.pTitle));
             pConsole_->setSize(desc.windowWidth, desc.windowHeight, desc.numLines);
             pConsole_->moveTo(desc.x, desc.y);
             

@@ -65,7 +65,7 @@ bool EngineApp::Init(void)
     hSystemHandle_ = core::Module::Load(CORE_DLL_NAME);
 
     if (!hSystemHandle_) {
-        Error(CORE_DLL_NAME " Loading Failed");
+        Error(CORE_DLL_NAME " Loading Failed"_sv);
         return false;
     }
 
@@ -73,7 +73,7 @@ bool EngineApp::Init(void)
         core::Module::GetProc(hSystemHandle_, CORE_DLL_INITFUNC));
 
     if (!pfnCreateCoreInterface) {
-        Error(CORE_DLL_NAME " not valid");
+        Error(CORE_DLL_NAME " not valid"_sv);
         return false;
     }
 
@@ -82,7 +82,7 @@ bool EngineApp::Init(void)
 #endif // !X_LIB
 
     if (!pICore_) {
-        Error("Engine Init Failed");
+        Error("Engine Init Failed"_sv);
         return false;
     }
 
@@ -112,7 +112,7 @@ void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
     X_UNUSED(sourceInfo);
 }
 
-void EngineApp::Error(const char* pErrorText)
+void EngineApp::Error(core::string_view errorText)
 {
     core::msgbox::show(pErrorText,
         X_ENGINE_NAME " Start Error",

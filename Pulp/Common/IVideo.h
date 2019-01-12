@@ -47,8 +47,8 @@ struct IVideoSys : public core::IEngineSysBase
     virtual void update(const core::FrameTimeData& frameTimeInfo) X_ABSTRACT;
     virtual void unlockBuffers(void) X_ABSTRACT;
 
-    virtual IVideo* findVideo(const char* pVideoName) const X_ABSTRACT;
-    virtual IVideo* loadVideo(const char* pVideoName) X_ABSTRACT;
+    virtual IVideo* findVideo(core::string_view name) const X_ABSTRACT;
+    virtual IVideo* loadVideo(core::string_view name) X_ABSTRACT;
 
     virtual void releaseVideo(IVideo* pVid) X_ABSTRACT;
     virtual bool waitForLoad(IVideo* pVideo) X_ABSTRACT;

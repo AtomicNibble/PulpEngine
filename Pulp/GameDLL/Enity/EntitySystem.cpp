@@ -585,7 +585,7 @@ namespace entity
 
             trans.pos = Vec3f(-110.f, 16.f, 74.f);
 
-            mesh.pModel = pModelManager_->loadModel("test/arms/view_jap"sv);
+            mesh.pModel = pModelManager_->loadModel("test/arms/view_jap"_sv);
             pModelManager_->waitForLoad(mesh.pModel);
 
             tagWeapon = mesh.pModel->getBoneHandle("tag_weapon");
@@ -613,7 +613,7 @@ namespace entity
         // - animator - to animate model
         // - weapon - to store state
 
-        auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357"sv);
+        auto* pWeaponDef = weaponDefs_.loadWeaponDef("test/sw_357"_sv);
         weaponDefs_.waitForLoad(pWeaponDef);
 
         pWeaponDef->waitForLoadDep();
@@ -623,7 +623,7 @@ namespace entity
         trans.pos = Vec3f(-110.f, 16.f, 30.f);
 
         // get model.
-        mesh.pModel = pModelManager_->loadModel(pViewModel);
+        mesh.pModel = pModelManager_->loadModel(core::string_view(pViewModel));
         pModelManager_->waitForLoad(mesh.pModel);
 
         // setup render ent
@@ -694,7 +694,7 @@ namespace entity
         else
         {
             // world model.
-            player.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev"sv);
+            player.pModel = pModelManager_->loadModel("test/anim/char_rus_guard_grachev"_sv);
             
             engine::RenderEntDesc entDsc;
             entDsc.pModel = player.pModel;
@@ -722,9 +722,9 @@ namespace entity
             inv.setClipAmmo(pWpn->getID(), pWpn->getAmmoSlot(weapon::AmmoSlot::ClipSize));
         };
 
-        giveWeapon("test/sw_357"sv);
-        giveWeapon("test/mg42"sv);
-        giveWeapon("test/raygun"sv);
+        giveWeapon("test/sw_357"_sv);
+        giveWeapon("test/mg42"_sv);
+        giveWeapon("test/raygun"_sv);
 
         player.currentWpn = 1;
         player.targetWpn = 1;
@@ -1123,7 +1123,7 @@ namespace entity
                     
                     if (emit.effect.isNotEmpty())
                     {
-                        pEffect = pEffectManager_->loadEffect(emit.effect);
+                        pEffect = pEffectManager_->loadEffect(core::string_view(emit.effect.data(), emit.effect.length()));
                     }
 
                     engine::EmitterDesc dsc;

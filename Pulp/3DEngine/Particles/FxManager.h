@@ -54,8 +54,8 @@ namespace fx
         Emitter* allocEmmiter(void);
         void freeEmmiter(Emitter* pEmitter);
 
-        Effect* findEffect(const char* pEffectName) const X_FINAL;
-        Effect* loadEffect(const char* pEffectName) X_FINAL;
+        Effect* findEffect(core::string_view name) const X_FINAL;
+        Effect* loadEffect(core::string_view name) X_FINAL;
 
         void releaseEffect(Effect* pEffect);
 

@@ -101,7 +101,7 @@ namespace fx
 
                 // play this stage.
                 auto* pStr = efx.getMaterialName(stageDesc.materialStrOffset);
-                auto* pMaterial = gEngEnv.pMaterialMan_->loadMaterial(pStr);
+                auto* pMaterial = gEngEnv.pMaterialMan_->loadMaterial(core::string_view(pStr));
 
                 int32_t maxElems;
 

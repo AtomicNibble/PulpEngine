@@ -369,7 +369,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
             for (x = 0; x < numSub; x++) {
                 model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 
-                pSubMesh->pMat = gEngEnv.pMaterialMan_->loadMaterial(static_cast<const char*>(pSubMesh->materialName));
+                pSubMesh->pMat = gEngEnv.pMaterialMan_->loadMaterial(core::string_view(pSubMesh->materialName));
             }
 
             // set the mesh head pointers.
@@ -631,7 +631,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
                 sm.modelNameIdx = fsm.modelNameIdx;
                 // models need to be loaded at some point.
                 const char* pModelName = strTable.getString(sm.modelNameIdx);
-                model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(pModelName);
+                model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(core::string_view(pModelName));
 
                 sm.pModel = X_ASSERT_NOT_NULL(pModel);
             }

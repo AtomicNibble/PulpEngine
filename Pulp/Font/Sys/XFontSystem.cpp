@@ -10,6 +10,8 @@
 
 X_NAMESPACE_BEGIN(font)
 
+using namespace core::string_view_literals;
+
 XFontSystem::XFontSystem(ICore* pCore) :
     pCore_(pCore),
     pDefaultFont_(nullptr),
@@ -51,7 +53,7 @@ bool XFontSystem::init(void)
     pAssetLoader_->registerAssetType(assetDb::AssetType::FONT, this, FONT_BAKED_FILE_EXTENSION);
 
     // load a default font.
-    pDefaultFont_ = static_cast<XFont*>(loadFont("default"));
+    pDefaultFont_ = static_cast<XFont*>(loadFont("default"_sv));
     if (!pDefaultFont_) {
         X_ERROR("FontSys", "Failed to create default font");
         return false;
@@ -103,38 +105,37 @@ void XFontSystem::appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) co
     }
 }
 
-IFont* XFontSystem::loadFont(const char* pFontName)
+IFont* XFontSystem::loadFont(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pFontName);
-    X_ASSERT(core::strUtil::FileExtension(pFontName) == nullptr, "Extension not allowed")(pFontName);
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
-    auto* pFontRes = fonts_.findAsset(pFontName);
+    auto* pFontRes = fonts_.findAsset(name);
     if (pFontRes) {
         // inc ref count.
         pFontRes->addReference();
         return pFontRes;
     }
 
-    core::string name(pFontName);
-    pFontRes = fonts_.createAsset(name, *this, name);
+    core::string nameStr(name.data(), name.length());
+    pFontRes = fonts_.createAsset(nameStr, *this, nameStr);
 
     addLoadRequest(pFontRes);
 
     return pFontRes;
 }
 
-IFont* XFontSystem::findFont(const char* pFontName) const
+IFont* XFontSystem::findFont(core::string_view name) const
 {
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
-    auto* pFontRes = fonts_.findAsset(pFontName);
+    auto* pFontRes = fonts_.findAsset(name);
     if (pFontRes) {
         return pFontRes;
     }
 
-    X_WARNING("FontSys", "Failed to find model: \"%s\"", pFontName);
+    X_WARNING("FontSys", "Failed to find model: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
@@ -282,7 +283,7 @@ void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
     }
 
     const char* pName = pCmd->GetArg(1);
-    XFont* pFont = static_cast<XFont*>(findFont(pName));
+    XFont* pFont = static_cast<XFont*>(findFont(core::string_view(pName)));
     if (pFont) {
         if (pFont->getFontTexture()->WriteToFile(pName)) {
             X_LOG0("FontSys", "^8font texture successfully dumped!");

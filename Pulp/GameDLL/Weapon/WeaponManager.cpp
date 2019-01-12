@@ -180,7 +180,7 @@ namespace weapon
     bool WeaponDefManager::initDefaults(void)
     {
         if (!pDefaultWeaponDef_) {
-            pDefaultWeaponDef_ = loadWeaponDef(WEAPON_DEFAULT_NAME);
+            pDefaultWeaponDef_ = loadWeaponDef(core::string_view(WEAPON_DEFAULT_NAME));
             if (!pDefaultWeaponDef_) {
                 X_ERROR("WeaponDef", "Failed to create default weapondef");
                 return false;

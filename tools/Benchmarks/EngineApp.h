@@ -31,7 +31,7 @@ public:
     bool ShutDown(void);
 
 private:
-    static void Error(const char* pErrorText);
+    static void Error(core::string_view errorText);
 
 private:
     core::MallocFreeAllocator allocator_;

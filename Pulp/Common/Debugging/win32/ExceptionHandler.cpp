@@ -25,6 +25,8 @@ X_LINK_LIB("dbghelp.lib")
 
 X_NAMESPACE_BEGIN(core)
 
+using namespace string_view_literals;
+
 namespace exceptionHandler
 {
     namespace
@@ -472,8 +474,8 @@ namespace exceptionHandler
                     X_LOG0("ExceptionHandler", "Quitting the application.");
                 }
 
-                core::msgbox::show("Unhandled exception! The program will now close.",
-                    X_ENGINE_NAME " Fatal Error",
+                core::msgbox::show("Unhandled exception! The program will now close."_sv,
+                    X_ENGINE_NAME " Fatal Error"_sv,
                     core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
                     core::msgbox::Buttons::OK);
             }

@@ -10,6 +10,8 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
+using namespace core::string_view_literals;
+
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -114,11 +116,11 @@ namespace
         }
 
         if (isServer) {
-            Console.setTitle(X_ENGINE_NAME " - Server");
+            Console.setTitle(X_ENGINE_NAME " - Server"_sv);
             Console.moveTo(3000, 10);
         }
         else {
-            Console.setTitle(X_ENGINE_NAME " - Client");
+            Console.setTitle(X_ENGINE_NAME " - Client"_sv);
             Console.moveTo(3000, 800);
         }
 

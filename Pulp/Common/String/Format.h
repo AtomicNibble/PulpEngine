@@ -144,11 +144,11 @@ namespace format
 
         template<typename T>
         inline typename std::enable_if<
-            std::is_constructible<std::basic_string_view<char>, T>::value,
-            init<std::basic_string_view<char>, ValueType::t_string>>::type
+            std::is_constructible<core::string_view, T>::value,
+            init<core::string_view, ValueType::t_string>>::type
             make_value(const T& val)
         {
-            return std::basic_string_view<char>(val);
+            return core::string_view(val);
         }
 
 #define MAKE_VALUE(TAG, ArgType, ValueType)                \
@@ -193,7 +193,7 @@ namespace format
 
         // views and strings
         MAKE_VALUE_SAME(ValueType::t_string, core::string_view)
-        MAKE_VALUE(ValueType::t_string, const std::basic_string<char>&, core::string_view)
+        MAKE_VALUE(ValueType::t_string, const core::StringRef<char>&, core::string_view)
 
         MAKE_VALUE(ValueType::t_pointer, void*, const void*)
         MAKE_VALUE_SAME(ValueType::t_pointer, const void*)

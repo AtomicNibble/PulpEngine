@@ -41,8 +41,8 @@ namespace gui
         //IMenuManager
         IMenuHandler* createMenuHandler(void) X_FINAL;
         void releaseMenuHandler(IMenuHandler* pHandler) X_FINAL;
-        IMenu* loadMenu(const char* pName) X_FINAL;
-        IMenu* findMenu(const char* pName) X_FINAL;
+        IMenu* loadMenu(core::string_view name) X_FINAL;
+        IMenu* findMenu(core::string_view name) X_FINAL;
 
         void releaseGui(IMenu* pMenu) X_FINAL;
         bool waitForLoad(IMenu* pMenu) X_FINAL;

@@ -169,7 +169,7 @@ void XMaterialManager::releaseMaterial(Material* pMat)
 bool XMaterialManager::initDefaults(void)
 {
     if (pDefaultMtl_ == nullptr) {
-        pDefaultMtl_ = loadMaterial(MTL_DEFAULT_NAME);
+        pDefaultMtl_ = loadMaterial(core::string_view(MTL_DEFAULT_NAME));
         if (!pDefaultMtl_) {
             X_ERROR("Material", "Failed to create default material");
             return false;
@@ -354,7 +354,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
             return false;
         }
 
-        auto* pTexture = gEngEnv.pTextureMan_->loadTexture(tex.val.c_str(), texFlags);
+        auto* pTexture = gEngEnv.pTextureMan_->loadTexture(core::string_view(tex.val.data(), tex.val.length()), texFlags);
         tex.pTexture = pTexture;
     }
 

@@ -89,27 +89,26 @@ namespace fx
         X_DELETE(pEmitter, &poolArena_);
     }
 
-    Effect* EffectManager::findEffect(const char* pAnimName) const
+    Effect* EffectManager::findEffect(core::string_view name) const
     {
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(pAnimName);
+        EffectResource* pEffectRes = effects_.findAsset(name);
         if (pEffectRes) {
             return pEffectRes;
         }
 
-        X_WARNING("EffectManager", "Failed to find anim: \"%s\"", pAnimName);
+        X_WARNING("EffectManager", "Failed to find anim: \"%*.s\"", name.length(), name.data());
         return nullptr;
     }
 
-    Effect* EffectManager::loadEffect(const char* pAnimName)
+    Effect* EffectManager::loadEffect(core::string_view name)
     {
-        X_ASSERT_NOT_NULL(pAnimName);
-        X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
+        X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(pAnimName);
+        EffectResource* pEffectRes = effects_.findAsset(name);
         if (pEffectRes) {
             // inc ref count.
             pEffectRes->addReference();
@@ -117,8 +116,8 @@ namespace fx
         }
 
         // we create a anim and give it back
-        core::string name(pAnimName);
-        pEffectRes = effects_.createAsset(name, name, arena_);
+        core::string nameStr(name.data(), name.length());
+        pEffectRes = effects_.createAsset(nameStr, nameStr, arena_);
 
         // add to list of anims that need loading.
         addLoadRequest(pEffectRes);

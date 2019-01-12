@@ -48,8 +48,8 @@ struct IFontSys : public core::IEngineSysBase
 
     virtual void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_ABSTRACT;
 
-    virtual IFont* loadFont(const char* pFontName) X_ABSTRACT;
-    virtual IFont* findFont(const char* pFontName) const X_ABSTRACT;
+    virtual IFont* loadFont(core::string_view name) X_ABSTRACT;
+    virtual IFont* findFont(core::string_view name) const X_ABSTRACT;
     virtual IFont* getDefault(void) const X_ABSTRACT;
 
     virtual void releaseFont(IFont* pFont) X_ABSTRACT;

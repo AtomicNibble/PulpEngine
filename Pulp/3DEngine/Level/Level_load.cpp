@@ -262,7 +262,7 @@ bool Level::ProcessData(void)
             for (x = 0; x < numSub; x++) {
                 model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 
-                pSubMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(static_cast<const char*>(pSubMesh->materialName));
+                pSubMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(core::string_view(pSubMesh->materialName));
             }
 
             // set the mesh head pointers.
@@ -522,7 +522,7 @@ bool Level::ProcessData(void)
                 // models need to be loaded at some point.
 
                 const char* modelName = stringTable_.getString(sm.modelNameIdx);
-                model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(modelName);
+                model::XModel* pModel = engine::gEngEnv.pModelMan_->loadModel(core::string_view(modelName));
 
                 //		X_LOG0("SM", "%i name: %s pos: (%g,%g,%g,)", i,  modelName,
                 //			sm.pos[0], sm.pos[1], sm.pos[2]);

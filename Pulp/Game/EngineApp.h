@@ -47,7 +47,7 @@ public:
 
 private:
     static LRESULT CALLBACK WndProc(HWND hWnd, UINT msg, WPARAM wParam, LPARAM lParam);
-    static void Error(const char* pErrorText);
+    static void Error(core::string_view errorText);
 
     // Main Engine loop.
     bool PumpMessages();

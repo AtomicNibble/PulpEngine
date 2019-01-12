@@ -38,6 +38,8 @@
 
 #include <Threading\JobSystem2.h>
 
+using namespace core::string_view_literals;
+
 #if X_PLATFORM_WIN32
 #include <conio.h>
 #endif // !X_PLATFORM_WIN32
@@ -535,11 +537,11 @@ void XCore::OnFatalError(const char* pFormat, va_list args)
 
     X_LOG0("FatalError", "CallStack:\n%s", Dsc);
 
-    core::LoggerBase::Line Line;
-    vsnprintf_s(Line, sizeof(core::LoggerBase::Line), _TRUNCATE, pFormat, args);
+    core::LoggerBase::Line lineStr;
+    int length = vsnprintf_s(lineStr, sizeof(core::LoggerBase::Line), _TRUNCATE, pFormat, args);
 
-    core::msgbox::show(Line,
-        X_ENGINE_NAME " Fatal Error",
+    core::msgbox::show(core::string_view(lineStr, length),
+        X_ENGINE_NAME " Fatal Error"_sv,
         core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
         core::msgbox::Buttons::OK);
 

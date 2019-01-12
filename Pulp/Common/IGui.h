@@ -36,7 +36,7 @@ namespace gui
         virtual bool isActive(void) const X_ABSTRACT;
         virtual void update(MenuParams& params, core::FrameData& frame, IPrimativeContext* pDrawCon) X_ABSTRACT;
 
-        virtual bool openMenu(const char* pName) X_ABSTRACT;
+        virtual bool openMenu(core::string_view name) X_ABSTRACT;
         virtual void close(void) X_ABSTRACT;
         virtual bool back(bool close) X_ABSTRACT;
     };
@@ -47,8 +47,8 @@ namespace gui
 
         virtual IMenuHandler* createMenuHandler(void) X_ABSTRACT;
         virtual void releaseMenuHandler(IMenuHandler* pHandler) X_ABSTRACT;
-        virtual IMenu* loadMenu(const char* pName) X_ABSTRACT;
-        virtual IMenu* findMenu(const char* pName) X_ABSTRACT;
+        virtual IMenu* loadMenu(core::string_view name) X_ABSTRACT;
+        virtual IMenu* findMenu(core::string_view name) X_ABSTRACT;
 
         virtual void releaseGui(IMenu* pMenu) X_ABSTRACT;
 

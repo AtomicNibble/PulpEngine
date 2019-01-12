@@ -54,8 +54,8 @@ namespace gui
         pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_);
         pScriptBinds_->bind();
 
-        auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor"sv);
-        auto* pSpinner = gEngEnv.pMaterialMan_->loadMaterial("ui/spinner"sv);
+        auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor"_sv);
+        auto* pSpinner = gEngEnv.pMaterialMan_->loadMaterial("ui/spinner"_sv);
 
         ctx_.init(pCursor, pSpinner);
         return true;
@@ -87,13 +87,13 @@ namespace gui
         X_DELETE(pHandler, arena_);
     }
 
-    IMenu* XMenuManager::loadMenu(const char* pName)
+    IMenu* XMenuManager::loadMenu(core::string_view name)
     {
-        X_ASSERT(core::strUtil::FileExtension(pName) == nullptr, "Extension not allowed")(pName);
+        X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
 
-        auto* pMenu = menus_.findAsset(pName);
+        auto* pMenu = menus_.findAsset(name);
         if (pMenu) {
             // inc ref count.
             pMenu->addReference();
@@ -101,24 +101,24 @@ namespace gui
         }
 
         // we create a model and give it back
-        core::string name(pName);
-        pMenu = menus_.createAsset(name, name);
+        core::string nameStr(name.data(), name.length());
+        pMenu = menus_.createAsset(nameStr, nameStr);
 
         addLoadRequest(pMenu);
 
         return pMenu;
     }
 
-    IMenu* XMenuManager::findMenu(const char* pName)
+    IMenu* XMenuManager::findMenu(core::string_view name)
     {
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
 
-        auto* pMenu = menus_.findAsset(pName);
+        auto* pMenu = menus_.findAsset(name);
         if (pMenu) {
             return pMenu;
         }
 
-        X_WARNING("MenuManager", "Failed to find menu: \"%s\"", pName);
+        X_WARNING("MenuManager", "Failed to find menu: \"%*.s\"", name.length(), name.data());
         return nullptr;
     }
 

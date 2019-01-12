@@ -5,6 +5,8 @@
 #include <I3DEngine.h>
 #include <IAnimManager.h>
 
+#include <String/StringView.h>
+
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
@@ -43,19 +45,19 @@ namespace weapon
 
         for (uint32_t i = 0; i < AnimSlot::ENUM_COUNT; i++) {
             if (hdr.animSlots[i] != 0) {
-                animations_[i] = pAnimManager->loadAnim(getAnimSlot(static_cast<AnimSlot::Enum>(i)));
+                animations_[i] = pAnimManager->loadAnim(core::string_view(getAnimSlot(static_cast<AnimSlot::Enum>(i))));
             }
         }
 
         for (uint32_t i = 0; i < IconSlot::ENUM_COUNT; i++) {
             if (hdr.iconSlots[i] != 0) {
-                icons_[i] = pMaterialMan->loadMaterial(getIconSlot(static_cast<IconSlot::Enum>(i)));
+                icons_[i] = pMaterialMan->loadMaterial(core::string_view(getIconSlot(static_cast<IconSlot::Enum>(i))));
             }
         }
 
         for (uint32_t i = 0; i < EffectSlot::ENUM_COUNT; i++) {
             if (hdr.effectSlots[i] != 0) {
-                effects_[i] = pEffectMan->loadEffect(getEffectSlot(static_cast<EffectSlot::Enum>(i)));
+                effects_[i] = pEffectMan->loadEffect(core::string_view(getEffectSlot(static_cast<EffectSlot::Enum>(i))));
             }
         }
 

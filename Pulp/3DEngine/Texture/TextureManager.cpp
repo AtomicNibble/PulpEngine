@@ -228,8 +228,8 @@ bool TextureManager::loadDefaultTextures(void)
 
     TextureFlags default_flags = TextureFlags::DONT_RESIZE | TextureFlags::DONT_STREAM;
 
-    pTexDefault_ = loadTexture(TEX_DEFAULT_DIFFUSE, default_flags);
-    pTexDefaultBump_ = loadTexture(TEX_DEFAULT_BUMP, default_flags);
+    pTexDefault_ = loadTexture(core::string_view(TEX_DEFAULT_DIFFUSE), default_flags);
+    pTexDefaultBump_ = loadTexture(core::string_view(TEX_DEFAULT_BUMP), default_flags);
 
     defaultLookup_.fill(pTexDefault_);
     defaultLookup_[render::TextureSlot::NORMAL] = pTexDefaultBump_;

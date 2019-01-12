@@ -50,7 +50,7 @@ namespace fx
 
             const char* pMtlName = getMaterialName(stage.materialStrOffset);
 
-            gEngEnv.pMaterialMan_->loadMaterial(pMtlName);
+            gEngEnv.pMaterialMan_->loadMaterial(core::string_view(pMtlName));
         }
 
         return true;

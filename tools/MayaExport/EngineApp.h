@@ -18,7 +18,7 @@ private:
     virtual void OnAssertVariable(const core::SourceInfo& sourceInfo) X_OVERRIDE;
 
 private:
-    static void Error(const char* pErrorText);
+    static void Error(core::string_view errorText);
 
 private:
     core::Module::Handle hSystemHandle_;

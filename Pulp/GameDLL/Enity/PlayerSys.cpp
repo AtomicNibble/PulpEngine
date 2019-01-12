@@ -479,7 +479,7 @@ namespace entity
                     // change the model
                     const char* pViewModel = pWpnDef->getModelSlot(weapon::ModelSlot::Gun);
 
-                    mesh.pModel = pModelManager->loadModel(pViewModel);
+                    mesh.pModel = pModelManager->loadModel(core::string_view(pViewModel));
                     pModelManager->waitForLoad(mesh.pModel);
 
                     if (meshRend.pRenderEnt) {

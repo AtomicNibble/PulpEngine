@@ -212,17 +212,17 @@ namespace profiler
 
         auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
 
-        subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys"sv);
-        subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net"sv);
-        subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound"sv);
-        subSystemInfo_[SubSys::INPUT].pWarningMat = pMatMan->loadMaterial("code/warnings/input"sv);
-        subSystemInfo_[SubSys::GAME].pWarningMat = pMatMan->loadMaterial("code/warnings/game"sv);
-        subSystemInfo_[SubSys::ENGINE3D].pWarningMat = pMatMan->loadMaterial("code/warnings/engine3d"sv);
+        subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys"_sv);
+        subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net"_sv);
+        subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound"_sv);
+        subSystemInfo_[SubSys::INPUT].pWarningMat = pMatMan->loadMaterial("code/warnings/input"_sv);
+        subSystemInfo_[SubSys::GAME].pWarningMat = pMatMan->loadMaterial("code/warnings/game"_sv);
+        subSystemInfo_[SubSys::ENGINE3D].pWarningMat = pMatMan->loadMaterial("code/warnings/engine3d"_sv);
 
-        pWarnTotalMem_ = pMatMan->loadMaterial("code/warnings/mem"sv);
-        pWarnTextureMem_ = pMatMan->loadMaterial("code/warnings/texture_mem"sv);
-        pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem"sv);
-        pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file"sv);
+        pWarnTotalMem_ = pMatMan->loadMaterial("code/warnings/mem"_sv);
+        pWarnTextureMem_ = pMatMan->loadMaterial("code/warnings/texture_mem"_sv);
+        pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem"_sv);
+        pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file"_sv);
 
 #endif // !X_ENABLE_PROFILER_WARNINGS
 

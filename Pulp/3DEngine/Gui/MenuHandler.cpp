@@ -77,9 +77,9 @@ namespace gui
         ctx_.endFrame();
     }
 
-    bool MenuHandler::openMenu(const char* pName)
+    bool MenuHandler::openMenu(core::string_view name)
     {
-        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(pName));
+        auto* pMenu = static_cast<Menu*>(gEngEnv.pMenuMan_->loadMenu(name));
         if (!pMenu) {
             return false;
         }

@@ -42,8 +42,8 @@ public:
     // IXFont
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
 
-    IFont* loadFont(const char* pFontName) X_FINAL;
-    IFont* findFont(const char* pFontName) const X_FINAL;
+    IFont* loadFont(core::string_view name) X_FINAL;
+    IFont* findFont(core::string_view name) const X_FINAL;
     IFont* getDefault(void) const X_FINAL;
 
     void releaseFont(IFont* pFont) X_FINAL;

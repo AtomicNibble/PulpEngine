@@ -26,6 +26,8 @@
 
 X_NAMESPACE_BEGIN(assetDb)
 
+using namespace core::string_view_literals;
+
 namespace
 {
     core::string randomAssetName(uint32_t assetNameLenMin, uint32_t assetNameLenMax)
@@ -361,7 +363,7 @@ bool AssetDB::PerformMigrations(void)
     msg.appendFmt("Performing DB migrations from %" PRIi32 " -> %" PRIi32 ". it's recommended to back up the ", dbVersion_, DB_VERSION);
     msg.appendFmt("'%s' folder before pressin Ok. Cancel will skip.", ASSET_DB_FOLDER);
 
-    const auto res = core::msgbox::show(msg.c_str(), "AssetDB Migratation", core::msgbox::Buttons::OKCancel);
+    const auto res = core::msgbox::show(msg, "AssetDB Migratation"_sv, core::msgbox::Buttons::OKCancel);
     if (res == core::msgbox::Selection::Cancel) {
         return false;
     }
@@ -1159,7 +1161,7 @@ bool AssetDB::Chkdsk(bool updateDB)
         msg.appendFmt("Performing chkdsk for rawfiles. it's recommended to back up the ", dbVersion_, DB_VERSION);
         msg.appendFmt("'%s' folder before clicking Ok. Cancel will skip chkdsk.", ASSET_DB_FOLDER);
 
-        const auto res = core::msgbox::show(msg.c_str(), "AssetDB chkdsk", core::msgbox::Buttons::OKCancel);
+        const auto res = core::msgbox::show(msg, "AssetDB chkdsk"_sv, core::msgbox::Buttons::OKCancel);
         if (res == core::msgbox::Selection::Cancel) {
             return false;
         }

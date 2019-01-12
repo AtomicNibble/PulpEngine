@@ -98,34 +98,33 @@ void XVideoSys::unlockBuffers(void)
     }
 }
 
-IVideo* XVideoSys::findVideo(const char* pVideoName) const
+IVideo* XVideoSys::findVideo(core::string_view name) const
 {
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
-    auto* pVideo = videos_.findAsset(pVideoName);
+    auto* pVideo = videos_.findAsset(name);
     if (pVideo) {
         return pVideo;
     }
 
-    X_WARNING("VidManager", "Failed to find video: \"%s\"", pVideoName);
+    X_WARNING("VidManager", "Failed to find video: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
-IVideo* XVideoSys::loadVideo(const char* pVideoName)
+IVideo* XVideoSys::loadVideo(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pVideoName);
-    X_ASSERT(core::strUtil::FileExtension(pVideoName) == nullptr, "Extension not allowed")(pVideoName);
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")(name);
 
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
-    VideoResource* pVideoRes = videos_.findAsset(pVideoName);
+    VideoResource* pVideoRes = videos_.findAsset(name);
     if (pVideoRes) {
         pVideoRes->addReference();
         return pVideoRes;
     }
 
-    core::string name(pVideoName);
-    pVideoRes = videos_.createAsset(name, name, vars_, blockArena_);
+    core::string nameStr(name.data(), name.length());
+    pVideoRes = videos_.createAsset(nameStr, nameStr, vars_, blockArena_);
 
     queueLoadRequest(pVideoRes);
 

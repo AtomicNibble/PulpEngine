@@ -148,8 +148,8 @@ public:
     void appendDirtyBuffers(render::CommandBucket<uint32_t>& bucket) const X_FINAL;
     void unlockBuffers(void) X_FINAL;
 
-    IVideo* findVideo(const char* pVideoName) const X_FINAL;
-    IVideo* loadVideo(const char* pVideoName) X_FINAL;
+    IVideo* findVideo(core::string_view name) const X_FINAL;
+    IVideo* loadVideo(core::string_view name) X_FINAL;
 
     void releaseVideo(IVideo* pVid) X_FINAL;
     bool waitForLoad(core::AssetBase* pVideo) X_FINAL; // returns true if load succeed.

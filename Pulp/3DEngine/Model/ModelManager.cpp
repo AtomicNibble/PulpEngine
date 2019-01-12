@@ -145,7 +145,7 @@ void XModelManager::releaseModel(XModel* pModel)
 
 bool XModelManager::initDefaults(void)
 {
-    pDefaultModel_ = static_cast<RenderModel*>(loadModel(MODEL_DEFAULT_NAME));
+    pDefaultModel_ = static_cast<RenderModel*>(loadModel(core::string_view(MODEL_DEFAULT_NAME)));
     if (!pDefaultModel_) {
         X_ERROR("ModelManager", "Failed to create default model");
         return false;
