@@ -3,8 +3,7 @@
 #include "Path.h"
 
 #include "StrRef.h"
-#include <string>
-#include <locale>
+#include <locale> // TODO: remove
 
 #include <direct.h>
 
