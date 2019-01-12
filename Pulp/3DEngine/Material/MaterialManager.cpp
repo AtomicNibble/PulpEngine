@@ -118,38 +118,36 @@ bool XMaterialManager::asyncInitFinalize(void)
 
 // IMaterialManager
 
-Material* XMaterialManager::findMaterial(const char* pMtlName) const
+Material* XMaterialManager::findMaterial(core::string_view name) const
 {
     core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-    Material* pMtl = materials_.findAsset(pMtlName);
+    Material* pMtl = materials_.findAsset(name);
     if (pMtl) {
         return pMtl;
     }
 
-    X_WARNING("Material", "Failed to find material: \"%s\"", pMtlName);
+    X_WARNING("Material", "Failed to find material: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
-Material* XMaterialManager::loadMaterial(const char* pMtlName)
+Material* XMaterialManager::loadMaterial(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pMtlName);
-    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName);
-
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
     MaterialResource* pMatRes = nullptr;
     {
         core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
-        pMatRes = materials_.findAsset(pMtlName);
+        pMatRes = materials_.findAsset(name);
         if (pMatRes) {
             // inc ref count.
             pMatRes->addReference();
             return pMatRes;
         }
 
-        core::string name(pMtlName);
-        pMatRes = materials_.createAsset(name, name, arena_);
+        core::string nameStr(name.data(), name.length());
+        pMatRes = materials_.createAsset(nameStr, nameStr, arena_);
     }
 
     // add to list of Materials that need loading.

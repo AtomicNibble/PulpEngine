@@ -35,8 +35,8 @@ public:
 
     bool asyncInitFinalize(void);
 
-    Anim* findAnim(const char* pAnimName) const X_FINAL;
-    Anim* loadAnim(const char* pAnimName) X_FINAL;
+    Anim* findAnim(core::string_view name) const X_FINAL;
+    Anim* loadAnim(core::string_view name) X_FINAL;
 
     void releaseAnim(Anim* pAnim);
 

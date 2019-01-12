@@ -84,8 +84,8 @@ public:
     void scheduleStreaming(void);
 
 
-    Texture* findTexture(const char* pTexName) const;
-    Texture* loadTexture(const char* pTexName, texture::TextureFlags flags);
+    Texture* findTexture(core::string_view name) const;
+    Texture* loadTexture(core::string_view name, texture::TextureFlags flags);
     Texture* getDefault(render::TextureSlot::Enum slot) const;
 
     void releaseTexture(Texture* pTex);

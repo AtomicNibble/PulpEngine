@@ -29,6 +29,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+using namespace string_view_literals;
+
 namespace
 {
     X_INTRINSIC(__rdtsc)
@@ -210,17 +212,17 @@ namespace profiler
 
         auto* pMatMan = gEnv->p3DEngine->getMaterialManager();
 
-        subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys");
-        subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net");
-        subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound");
-        subSystemInfo_[SubSys::INPUT].pWarningMat = pMatMan->loadMaterial("code/warnings/input");
-        subSystemInfo_[SubSys::GAME].pWarningMat = pMatMan->loadMaterial("code/warnings/game");
-        subSystemInfo_[SubSys::ENGINE3D].pWarningMat = pMatMan->loadMaterial("code/warnings/engine3d");
+        subSystemInfo_[SubSys::PHYSICS].pWarningMat = pMatMan->loadMaterial("code/warnings/phys"sv);
+        subSystemInfo_[SubSys::NETWORK].pWarningMat = pMatMan->loadMaterial("code/warnings/net"sv);
+        subSystemInfo_[SubSys::SOUND].pWarningMat = pMatMan->loadMaterial("code/warnings/sound"sv);
+        subSystemInfo_[SubSys::INPUT].pWarningMat = pMatMan->loadMaterial("code/warnings/input"sv);
+        subSystemInfo_[SubSys::GAME].pWarningMat = pMatMan->loadMaterial("code/warnings/game"sv);
+        subSystemInfo_[SubSys::ENGINE3D].pWarningMat = pMatMan->loadMaterial("code/warnings/engine3d"sv);
 
-        pWarnTotalMem_ = pMatMan->loadMaterial("code/warnings/mem");
-        pWarnTextureMem_ = pMatMan->loadMaterial("code/warnings/texture_mem");
-        pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem");
-        pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file");
+        pWarnTotalMem_ = pMatMan->loadMaterial("code/warnings/mem"sv);
+        pWarnTextureMem_ = pMatMan->loadMaterial("code/warnings/texture_mem"sv);
+        pWarnSndMem_ = pMatMan->loadMaterial("code/warnings/sound_mem"sv);
+        pWarnFileSys_ = pMatMan->loadMaterial("code/warnings/file"sv);
 
 #endif // !X_ENABLE_PROFILER_WARNINGS
 

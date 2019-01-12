@@ -262,7 +262,7 @@ bool Level::ProcessData(void)
             for (x = 0; x < numSub; x++) {
                 model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 
-                pSubMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(pSubMesh->materialName);
+                pSubMesh->pMat = engine::gEngEnv.pMaterialMan_->loadMaterial(static_cast<const char*>(pSubMesh->materialName));
             }
 
             // set the mesh head pointers.

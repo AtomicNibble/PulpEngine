@@ -144,40 +144,40 @@ void TextureManager::scheduleStreaming(void)
     }
 }
 
-Texture* TextureManager::findTexture(const char* pName) const
+Texture* TextureManager::findTexture(core::string_view name) const
 {
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
-    auto* pTex = textures_.findAsset(pName);
+    auto* pTex = textures_.findAsset(name);
     if (pTex) {
         return pTex;
     }
 
-    X_WARNING("Texture", "Failed to find Texture: \"%s\"", pName);
+    X_WARNING("Texture", "Failed to find Texture: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
-Texture* TextureManager::loadTexture(const char* pName, texture::TextureFlags flags)
+Texture* TextureManager::loadTexture(core::string_view name, texture::TextureFlags flags)
 {
 
     auto& threadPolicy = textures_.getThreadPolicy();
     threadPolicy.Enter();
 
-    TexRes* pTexRes = textures_.findAsset(pName);
+    TexRes* pTexRes = textures_.findAsset(name);
 
     if (pTexRes) {
         threadPolicy.Leave();
         pTexRes->addReference();
     }
     else {
-        core::string name(pName);
+        core::string nameStr(name.data(), name.length());
 
-        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, name.c_str());
+        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, nameStr.c_str());
         if (!pDevicTex) {
             return nullptr;
         }
 
-        pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
+        pTexRes = textures_.createAsset(nameStr, nameStr, flags, pDevicTex);
         threadPolicy.Leave();
 
         addLoadRequest(pTexRes);

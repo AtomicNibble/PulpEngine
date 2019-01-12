@@ -12,6 +12,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+using namespace core::string_view_literals;
+
 namespace gui
 {
 
@@ -52,8 +54,8 @@ namespace gui
         pScriptBinds_ = X_NEW(ScriptBinds_Menu, arena_, "MenuScriptBinds")(pScriptSys_, ctx_);
         pScriptBinds_->bind();
 
-        auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor");
-        auto* pSpinner = gEngEnv.pMaterialMan_->loadMaterial("ui/spinner");
+        auto* pCursor = gEngEnv.pMaterialMan_->loadMaterial("ui/cursor"sv);
+        auto* pSpinner = gEngEnv.pMaterialMan_->loadMaterial("ui/spinner"sv);
 
         ctx_.init(pCursor, pSpinner);
         return true;

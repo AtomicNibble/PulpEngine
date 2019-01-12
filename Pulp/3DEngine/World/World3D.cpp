@@ -369,7 +369,7 @@ bool World3D::loadNodes(const level::FileHeader& fileHdr, level::StringTable& st
             for (x = 0; x < numSub; x++) {
                 model::SubMeshHeader* pSubMesh = pMesh->subMeshHeads[x];
 
-                pSubMesh->pMat = gEngEnv.pMaterialMan_->loadMaterial(pSubMesh->materialName);
+                pSubMesh->pMat = gEngEnv.pMaterialMan_->loadMaterial(static_cast<const char*>(pSubMesh->materialName));
             }
 
             // set the mesh head pointers.

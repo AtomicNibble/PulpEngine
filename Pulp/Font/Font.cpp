@@ -22,6 +22,8 @@
 
 X_NAMESPACE_BEGIN(font)
 
+using namespace core::string_view_literals;
+
 namespace
 {
     Color8u g_ColorTable[10] = {
@@ -1062,7 +1064,7 @@ bool XFont::CreateDeviceTexture(void)
     // default_font
     auto* pMaterialMan = gEnv->p3DEngine->getMaterialManager();
 
-    pMaterial_ = pMaterialMan->loadMaterial("code/default_font");
+    pMaterial_ = pMaterialMan->loadMaterial("code/default_font"sv);
     // we wil lget back default if fails to load.
     // when we are default we ignore the textureSet and it just results in default texture been drawn.
 

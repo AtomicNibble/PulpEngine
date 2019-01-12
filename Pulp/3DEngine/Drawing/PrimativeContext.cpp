@@ -345,7 +345,7 @@ bool PrimativeContextSharedResources::loadMaterials(XMaterialManager* pMatMan)
             matName.appendFmt("code%c$%s%s", assetDb::ASSET_NAME_SLASH, PrimitiveType::ToString(primType), pSuffix);
             matName.toLower();
 
-            Material* pMat = pMatMan->loadMaterial(matName.c_str());
+            Material* pMat = pMatMan->loadMaterial(core::string_view(matName.data(), matName.length()));
 
             // we still assign even tho may be default so it get's cleaned up.
             primMaterials[primType] = pMat;

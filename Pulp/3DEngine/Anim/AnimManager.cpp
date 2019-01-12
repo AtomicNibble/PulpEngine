@@ -50,27 +50,26 @@ bool AnimManager::asyncInitFinalize(void)
     return true;
 }
 
-Anim* AnimManager::findAnim(const char* pAnimName) const
+Anim* AnimManager::findAnim(core::string_view name) const
 {
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
-    AnimResource* pAnim = anims_.findAsset(pAnimName);
+    AnimResource* pAnim = anims_.findAsset(name);
     if (pAnim) {
         return pAnim;
     }
 
-    X_WARNING("AnimManager", "Failed to find anim: \"%s\"", pAnimName);
+    X_WARNING("AnimManager", "Failed to find anim: \"%*.s\"", name.length(), name.data());
     return nullptr;
 }
 
-Anim* AnimManager::loadAnim(const char* pAnimName)
+Anim* AnimManager::loadAnim(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pAnimName);
-    X_ASSERT(core::strUtil::FileExtension(pAnimName) == nullptr, "Extension not allowed")(pAnimName);
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
-    AnimResource* pAnimRes = anims_.findAsset(pAnimName);
+    AnimResource* pAnimRes = anims_.findAsset(name);
     if (pAnimRes) {
         // inc ref count.
         pAnimRes->addReference();
@@ -78,8 +77,8 @@ Anim* AnimManager::loadAnim(const char* pAnimName)
     }
 
     // we create a anim and give it back
-    core::string name(pAnimName);
-    pAnimRes = anims_.createAsset(name, name, arena_);
+    core::string nameStr(name.data(), name.length());
+    pAnimRes = anims_.createAsset(nameStr, nameStr, arena_);
 
     // add to list of anims that need loading.
     addLoadRequest(pAnimRes);

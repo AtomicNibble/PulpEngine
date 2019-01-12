@@ -52,8 +52,8 @@ public:
     bool asyncInitFinalize(void);
 
     // IMaterialManager
-    Material* findMaterial(const char* pMtlName) const X_FINAL;
-    Material* loadMaterial(const char* pMtlName) X_FINAL;
+    Material* findMaterial(core::string_view name) const X_FINAL;
+    Material* loadMaterial(core::string_view name) X_FINAL;
     Material* getDefaultMaterial(void) const X_FINAL;
 
     // returns true if load succeed.

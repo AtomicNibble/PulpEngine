@@ -13,8 +13,8 @@ struct IAnimManager : public core::IAssetLoader
     virtual ~IAnimManager() = default;
 
     // returns null if not found, ref count unaffected
-    virtual Anim* findAnim(const char* pAnimName) const X_ABSTRACT;
-    virtual Anim* loadAnim(const char* pAnimName) X_ABSTRACT;
+    virtual Anim* findAnim(core::string_view name) const X_ABSTRACT;
+    virtual Anim* loadAnim(core::string_view name) X_ABSTRACT;
 
     virtual bool waitForLoad(Anim* pAnim) X_ABSTRACT; // returns true if load succeed.
 };
