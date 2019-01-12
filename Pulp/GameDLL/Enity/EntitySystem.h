@@ -92,6 +92,7 @@ namespace entity
         void destroy(DynamicObject& comp);
         void destroy(Weapon& comp);
         void destroy(Emitter& comp);
+        void destroy(Light& comp);
         void destroy(Animator& comp);
         void destroy(CharacterController& comp);
         void destroy(Player& comp);
@@ -119,6 +120,8 @@ namespace entity
 
         template<typename CompnentT>
         static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
+
+        static bool parseColor(const core::json::Value& value, Color8u& col);
 
         bool parseEntDesc(core::json::Value& val);
 

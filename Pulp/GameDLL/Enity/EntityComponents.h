@@ -14,6 +14,7 @@ X_NAMESPACE_DECLARE(anim,
 
 X_NAMESPACE_DECLARE(engine,
                     struct IRenderEnt;
+                    struct IRenderLight;
                     namespace fx {
                         struct IEmitter;
                     })
@@ -304,6 +305,17 @@ namespace entity
         engine::fx::IEmitter* pEmitter;
     };
 
+    struct Light
+    {
+        Light() : 
+            pLight(nullptr)
+        {
+        }
+
+        Color8u col;
+        engine::IRenderLight* pLight;
+    };
+
     // TODO: move into 3dengine or something.
     struct RenderView
     {
@@ -391,6 +403,7 @@ namespace entity
         Rotator,
         Mover,
         Emitter,
+        Light,
 
         NetworkSync,
 

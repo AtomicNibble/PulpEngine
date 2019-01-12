@@ -65,7 +65,7 @@ namespace entity
 
     bool EnititySystem::init(physics::IPhysics* pPhysics, physics::IScene* pPhysScene, engine::IWorld3D* p3DWorld)
     {
-        static_assert(decltype(reg_)::NUM_COMP == 18, "More components? add a sensible reserve call");
+        static_assert(decltype(reg_)::NUM_COMP == 19, "More components? add a sensible reserve call");
 
         reg_.entIdReserve(MAX_ENTS);
         reg_.freelistReserve(64);
@@ -82,6 +82,7 @@ namespace entity
         reg_.compReserve<Rotator>(16);
         reg_.compReserve<Mover>(16);
         reg_.compReserve<Emitter>(64);
+        reg_.compReserve<Light>(64);
         reg_.compReserve<NetworkSync>(256);
         reg_.compReserve<Animator>(64);
         reg_.compReserve<CharacterController>(net::MAX_PLAYERS);
@@ -94,6 +95,7 @@ namespace entity
         reg_.setDetroyCallback<EnititySystem, DynamicObject>(this);
         reg_.setDetroyCallback<EnititySystem, Weapon>(this);
         reg_.setDetroyCallback<EnititySystem, Emitter>(this);
+        reg_.setDetroyCallback<EnititySystem, Light>(this);
         reg_.setDetroyCallback<EnititySystem, Animator>(this);
         reg_.setDetroyCallback<EnititySystem, CharacterController>(this);
         reg_.setDetroyCallback<EnititySystem, Player>(this);
@@ -489,6 +491,15 @@ namespace entity
         }
 
         p3DWorld_->freeEmitter(comp.pEmitter);
+    }
+
+    void EnititySystem::destroy(Light& comp)
+    {
+        if (!comp.pLight) {
+            return;
+        }
+
+        p3DWorld_->freeLight(comp.pLight);
     }
 
     void EnititySystem::destroy(Animator& comp)
@@ -898,6 +909,32 @@ namespace entity
         return true;
     }
 
+    bool EnititySystem::parseColor(const core::json::Value& value, Color8u& col)
+    {
+        if (!value.HasMember("color")) {
+            return false;
+        }
+
+        const auto& colVal = value["color"];
+        if (!colVal.IsObject()) {
+            return false;
+        }
+
+        const auto& colObj = colVal.GetObject();
+        if (!colObj.HasMember("r") || !colObj.HasMember("g") || !colObj.HasMember("b")) {
+            return false;
+        }
+
+        // get me the col!
+        Colorf c;
+        c.r = colObj["r"].GetFloat();
+        c.g = colObj["g"].GetFloat();
+        c.b = colObj["b"].GetFloat();
+        c.a = 1.f;
+        col = c;
+        return true;
+    }
+
     bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
     {
         if (entDesc.GetType() != core::json::Type::kObjectType) {
@@ -1096,6 +1133,21 @@ namespace entity
                     dsc.looping = true;
 
                     emit.pEmitter = p3DWorld_->addEmmiter(dsc);
+                    break;
+                }
+
+                case "Light"_fnv1a: {
+                    auto& light = reg_.assign<Light>(ent);
+
+                    if (!parseColor(value, light.col)) {
+                        return false;
+                    }
+
+                    engine::RenderLightDesc rl;
+                    rl.col = light.col;
+                    rl.trans = trans;
+
+                    p3DWorld_->addRenderLight(rl);
                     break;
                 }
 
