@@ -227,6 +227,15 @@ void StringRef<CharT>::shrinkToFit(void)
 
 // =============================================================================
 
+template<typename CharT>
+const typename StringRef<CharT>::value_type& StringRef<CharT>::operator[] (size_t idx) const
+{
+    X_ASSERT(idx < length(), "Index out of range")(idx, length());
+    return *(str_ + idx);
+}
+
+// =============================================================================
+
 // overloaded assignment
 template<typename CharT>
 typename StringRef<CharT>::StrT& StringRef<CharT>::operator=(const StrT& str)

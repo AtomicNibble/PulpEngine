@@ -86,6 +86,9 @@ public:
     // shrink memory allocated to equal the length of the string.
     void shrinkToFit(void);
 
+    // char& operator[] (size_t pos); <- would have to make new strings if refred.
+    const value_type& operator[] (size_t pos) const;
+
     // overloaded assignment
     StrT& operator=(const StrT& str);
     StrT& operator=(StrT&& str);
