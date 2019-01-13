@@ -216,7 +216,7 @@ void XFontSystem::listFonts(const char* pSearchPatten) const
     for (const auto& font : fonts_) {
         auto* pFontRes = font.second;
 
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pFontRes->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pFontRes->getName()))) {
             sorted.push_back(pFontRes);
         }
     }

@@ -91,13 +91,13 @@ public:
 public:
     explicit XParser(MemoryArenaBase* arena);
     XParser(LexFlags flags, MemoryArenaBase* arena);
-    XParser(const char* startInclusive, const char* endExclusive, const char* name, LexFlags flags, MemoryArenaBase* arena);
+    XParser(const char* startInclusive, const char* endExclusive, const core::string& name, LexFlags flags, MemoryArenaBase* arena);
     ~XParser();
 
     void setIncludeCallback(OpenIncludeDel& del);
 
     // load me up!
-    bool SetMemory(const char* startInclusive, const char* endExclusive, const char* name);
+    bool SetMemory(const char* startInclusive, const char* endExclusive, const core::string& name);
 
     bool ReadToken(XLexToken& token);
     bool ExpectTokenString(const char* string);
@@ -126,8 +126,8 @@ private:
     bool UnreadSourceToken(const XLexToken& token);
     bool ReadDirective(void);
 
-    bool isInCache(const uint8_t ch) const;
-    void addToCache(const uint8_t ch);
+    bool isInCache(const char ch) const;
+    void addToCache(const char ch);
 
     bool Directive_define(void);
     bool Directive_include(void);

@@ -132,16 +132,16 @@ TYPED_TEST(StrRef, Case)
     StrRefT str("tickle a cat");
 
     str.toUpper();
-    EXPECT_STREQ("TICKLE A CAT", str);
+    EXPECT_STREQ("TICKLE A CAT", str.c_str());
     str.toLower();
-    EXPECT_STREQ("tickle a cat", str);
+    EXPECT_STREQ("tickle a cat", str.c_str());
 
     StrRefT str1("HeLlO");
 
     str1.toLower();
-    EXPECT_STREQ("hello", str1);
+    EXPECT_STREQ("hello", str1.c_str());
     str1.toUpper();
-    EXPECT_STREQ("HELLO", str1);
+    EXPECT_STREQ("HELLO", str1.c_str());
 }
 
 TYPED_TEST(StrRef, TrimLeft)
@@ -150,15 +150,15 @@ TYPED_TEST(StrRef, TrimLeft)
 
     StrRefT str("       tickle a cat     ");
     str.trimLeft();
-    EXPECT_STREQ("tickle a cat     ", str);
+    EXPECT_STREQ("tickle a cat     ", str.c_str());
 
     StrRefT str1("      _ tickle a cat     ");
     str1.trimLeft(' ');
-    EXPECT_STREQ("_ tickle a cat     ", str1);
+    EXPECT_STREQ("_ tickle a cat     ", str1.c_str());
 
     StrRefT str2("      _ tickle a cat     ");
     str2.trimLeft("_ ");
-    EXPECT_STREQ("tickle a cat     ", str2);
+    EXPECT_STREQ("tickle a cat     ", str2.c_str());
 }
 
 TYPED_TEST(StrRef, TrimRight)
@@ -167,15 +167,15 @@ TYPED_TEST(StrRef, TrimRight)
 
     StrRefT str("       tickle a cat     ");
     str.trimRight();
-    EXPECT_STREQ("       tickle a cat", str);
+    EXPECT_STREQ("       tickle a cat", str.c_str());
 
     StrRefT str1("      tickle a cat  _____");
     str1.trimRight('_');
-    EXPECT_STREQ("      tickle a cat  ", str1);
+    EXPECT_STREQ("      tickle a cat  ", str1.c_str());
 
     StrRefT str2("      tickle a cat   _  ");
     str2.trimRight("cat _");
-    EXPECT_STREQ("      tickle", str2);
+    EXPECT_STREQ("      tickle", str2.c_str());
 }
 
 TYPED_TEST(StrRef, Trim)
@@ -184,21 +184,21 @@ TYPED_TEST(StrRef, Trim)
 
     StrRefT str("       tickle a cat     ");
     str.trim();
-    EXPECT_STREQ("tickle a cat", str);
+    EXPECT_STREQ("tickle a cat", str.c_str());
 
     StrRefT str1("   _   tickle a cat  _   ");
     str1.trim('_');
-    EXPECT_STREQ("   _   tickle a cat  _   ", str1);
+    EXPECT_STREQ("   _   tickle a cat  _   ", str1.c_str());
     str1.trim(' ');
-    EXPECT_STREQ("_   tickle a cat  _", str1);
+    EXPECT_STREQ("_   tickle a cat  _", str1.c_str());
     str1.trim('_');
-    EXPECT_STREQ("   tickle a cat  ", str1);
+    EXPECT_STREQ("   tickle a cat  ", str1.c_str());
 
     StrRefT str2("      tickle a cat   _  ");
     str2.trim("cat _");
-    EXPECT_STREQ("ickle", str2);
+    EXPECT_STREQ("ickle", str2.c_str());
     str2.trim();
-    EXPECT_STREQ("ickle", str2);
+    EXPECT_STREQ("ickle", str2.c_str());
 }
 
 TYPED_TEST(StrRef, Append)
@@ -211,25 +211,25 @@ TYPED_TEST(StrRef, Append)
     StrRefT str3("cat");
 
     str.append("goat");
-    EXPECT_STREQ("goat", str);
+    EXPECT_STREQ("goat", str.c_str());
 
     str.append("man", 2);
-    EXPECT_STREQ("goatma", str);
+    EXPECT_STREQ("goatma", str.c_str());
 
     str.append(str1, 1, 3);
-    EXPECT_STREQ("goatmaame", str);
+    EXPECT_STREQ("goatmaame", str.c_str());
 
     str.append(str2);
-    EXPECT_STREQ("goatmaamepotato", str);
+    EXPECT_STREQ("goatmaamepotato", str.c_str());
 
     str.append(6, '@');
-    EXPECT_STREQ("goatmaamepotato@@@@@@", str);
+    EXPECT_STREQ("goatmaamepotato@@@@@@", str.c_str());
 
     str.append(str3.begin(), str3.begin()); // should add nothing.
-    EXPECT_STREQ("goatmaamepotato@@@@@@", str);
+    EXPECT_STREQ("goatmaamepotato@@@@@@", str.c_str());
 
     str.append(str3.begin(), str3.end()); // actualy append it now.
-    EXPECT_STREQ("goatmaamepotato@@@@@@cat", str);
+    EXPECT_STREQ("goatmaamepotato@@@@@@cat", str.c_str());
 }
 
 TYPED_TEST(StrRef, Assign)
@@ -242,25 +242,25 @@ TYPED_TEST(StrRef, Assign)
     StrRefT str3("cat");
 
     str.assign("goat");
-    EXPECT_STREQ("goat", str);
+    EXPECT_STREQ("goat", str.c_str());
 
     str.assign("man", 2);
-    EXPECT_STREQ("ma", str);
+    EXPECT_STREQ("ma", str.c_str());
 
     str.assign(str1, 1, 3);
-    EXPECT_STREQ("ame", str);
+    EXPECT_STREQ("ame", str.c_str());
 
     str.assign(str2);
-    EXPECT_STREQ("potato", str);
+    EXPECT_STREQ("potato", str.c_str());
 
     str.assign(6, '@');
-    EXPECT_STREQ("@@@@@@", str);
+    EXPECT_STREQ("@@@@@@", str.c_str());
 
     str.assign(str3.begin(), str3.begin()); // should add nothing.
-    EXPECT_STREQ("", str);
+    EXPECT_STREQ("", str.c_str());
 
     str.assign(str3.begin(), str3.end()); // actualy append it now.
-    EXPECT_STREQ("cat", str);
+    EXPECT_STREQ("cat", str.c_str());
 }
 
 TYPED_TEST(StrRef, Replace)
@@ -270,23 +270,23 @@ TYPED_TEST(StrRef, Replace)
     StrRefT str("camel likes to ride his bike");
 
     str.replace('i', 'g');
-    EXPECT_STREQ("camel lgkes to rgde hgs bgke", str);
+    EXPECT_STREQ("camel lgkes to rgde hgs bgke", str.c_str());
 
     str.replace("camel", "goat");
-    EXPECT_STREQ("goat lgkes to rgde hgs bgke", str);
+    EXPECT_STREQ("goat lgkes to rgde hgs bgke", str.c_str());
 
     str.replace(6, 4, "ikes");
-    EXPECT_STREQ("goat likes to rgde hgs bgke", str);
+    EXPECT_STREQ("goat likes to rgde hgs bgke", str.c_str());
 
     str.replace(23, 4, "camelllls", 5);
-    EXPECT_STREQ("goat likes to rgde hgs camel", str);
+    EXPECT_STREQ("goat likes to rgde hgs camel", str.c_str());
 
     str.replace(0, 4, 10, '#');
-    EXPECT_STREQ("########## likes to rgde hgs camel", str);
+    EXPECT_STREQ("########## likes to rgde hgs camel", str.c_str());
 
     // provide a length longer than new string
     str.replace(20, 4, "camelllls", 50);
-    EXPECT_STREQ("########## likes to camelllls", str);
+    EXPECT_STREQ("########## likes to camelllls", str.c_str());
 }
 
 TYPED_TEST(StrRef, Insert)
@@ -296,16 +296,16 @@ TYPED_TEST(StrRef, Insert)
     StrRefT str("came to his shp");
 
     str.insert(4, 'l');
-    EXPECT_STREQ("camel to his shp", str);
+    EXPECT_STREQ("camel to his shp", str.c_str());
 
     str.insert(15, 2, 'e');
-    EXPECT_STREQ("camel to his sheep", str);
+    EXPECT_STREQ("camel to his sheep", str.c_str());
 
     str.insert(9, "ride ");
-    EXPECT_STREQ("camel to ride his sheep", str);
+    EXPECT_STREQ("camel to ride his sheep", str.c_str());
 
     str.insert(6, "likes cakes", 6);
-    EXPECT_STREQ("camel likes to ride his sheep", str);
+    EXPECT_STREQ("camel likes to ride his sheep", str.c_str());
 }
 
 TYPED_TEST(StrRef, Erase)
@@ -315,10 +315,10 @@ TYPED_TEST(StrRef, Erase)
     StrRefT str("camel likes to ride his sheep");
 
     str.erase(0, 6);
-    EXPECT_STREQ("likes to ride his sheep", str);
+    EXPECT_STREQ("likes to ride his sheep", str.c_str());
 
     str.erase(17);
-    EXPECT_STREQ("likes to ride his", str);
+    EXPECT_STREQ("likes to ride his", str.c_str());
 }
 
 TYPED_TEST(StrRef, Compare)
@@ -394,8 +394,8 @@ TYPED_TEST(StrRef, Swap)
 
     str.swap(str1);
 
-    EXPECT_STREQ("goat", str1);
-    EXPECT_STREQ("boat", str);
+    EXPECT_STREQ("goat", str1.c_str());
+    EXPECT_STREQ("boat", str.c_str());
 }
 
 TYPED_TEST(StrRef, SubStr)
@@ -407,13 +407,13 @@ TYPED_TEST(StrRef, SubStr)
 
     str1 = str.substr(nullptr, pos);
 
-    EXPECT_STREQ("goat man", str);
-    EXPECT_STREQ("goat ", str1);
+    EXPECT_STREQ("goat man", str.c_str());
+    EXPECT_STREQ("goat ", str1.c_str());
 
     str2 = str.substr(pos);
 
-    EXPECT_STREQ("goat man", str);
-    EXPECT_STREQ("man", str2);
+    EXPECT_STREQ("goat man", str.c_str());
+    EXPECT_STREQ("man", str2.c_str());
 }
 
 TYPED_TEST(StrRef, Left)
@@ -425,9 +425,9 @@ TYPED_TEST(StrRef, Left)
     str1 = str.left(2);
     str2 = str.left(200); // give all
 
-    EXPECT_STREQ("goat man", str);
-    EXPECT_STREQ("goat man", str2);
-    EXPECT_STREQ("go", str1);
+    EXPECT_STREQ("goat man", str.c_str());
+    EXPECT_STREQ("goat man", str2.c_str());
+    EXPECT_STREQ("go", str1.c_str());
 }
 
 TYPED_TEST(StrRef, Right)
@@ -439,9 +439,9 @@ TYPED_TEST(StrRef, Right)
     str1 = str.right(2);
     str2 = str.right(200); // give all
 
-    EXPECT_STREQ("goat man", str);
-    EXPECT_STREQ("goat man", str2);
-    EXPECT_STREQ("an", str1);
+    EXPECT_STREQ("goat man", str.c_str());
+    EXPECT_STREQ("goat man", str2.c_str());
+    EXPECT_STREQ("an", str1.c_str());
 }
 
 TYPED_TEST(StrRef, OPAssign)

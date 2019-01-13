@@ -427,7 +427,7 @@ namespace shader
         sorted_shaders.reserve(hwShaders_.size());
 
         for (const auto& shader : hwShaders_) {
-            if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, shader.second->getName())) {
+            if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(shader.second->getName()))) {
                 sorted_shaders.emplace_back(shader.second);
             }
         }

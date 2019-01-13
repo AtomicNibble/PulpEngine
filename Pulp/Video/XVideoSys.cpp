@@ -337,7 +337,7 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
     for (const auto& video : videos_) {
         auto* pVideoRes = video.second;
 
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pVideoRes->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pVideoRes->getName()))) {
             sorted_videos.push_back(pVideoRes);
         }
     }

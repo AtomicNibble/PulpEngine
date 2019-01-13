@@ -115,7 +115,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
             for (size_t i = 0; i < num; i++) {
                 const auto& vecPropName = param.vec4Props[i];
 
-                if (!d.HasMember(vecPropName)) {
+                if (!d.HasMember(vecPropName.c_str())) {
                     X_ERROR("Mat", "Missing required value: \"%s\"", vecPropName.c_str());
                     return false;
                 }
@@ -132,7 +132,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
             }
         }
         else {
-            if (!d.HasMember(propName)) {
+            if (!d.HasMember(propName.c_str())) {
                 X_ERROR("Mat", "Missing required value: \"%s\"", propName.c_str());
                 return false;
             }
@@ -176,7 +176,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
         if (textureDesc.propName.isNotEmpty()) {
             // we need to look for the texture value in props.
-            if (!d.HasMember(textureDesc.propName)) {
+            if (!d.HasMember(textureDesc.propName.c_str())) {
                 // if we have a default texture we just use that.
                 if (textureDesc.defaultName.isNotEmpty()) {
                     tex.value = textureDesc.defaultName;
@@ -221,7 +221,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
             sampler.filterType = samplerDesc.filter;
         }
         else {
-            if (!d.HasMember(samplerDesc.filterStr)) {
+            if (!d.HasMember(samplerDesc.filterStr.c_str())) {
                 X_ERROR("Mat", "Missing required value: \"%s\"", samplerDesc.filterStr.c_str());
                 return false;
             }
@@ -235,7 +235,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
             sampler.texRepeat = samplerDesc.repeat;
         }
         else {
-            if (!d.HasMember(samplerDesc.repeatStr)) {
+            if (!d.HasMember(samplerDesc.repeatStr.c_str())) {
                 X_ERROR("Mat", "Missing required value: \"%s\"", samplerDesc.repeatStr.c_str());
                 return false;
             }

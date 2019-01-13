@@ -958,6 +958,13 @@ namespace strUtil
         return res + 1;
     }
 
+    bool WildCompare(core::string_view wild, core::string_view string)
+    {
+        X_UNUSED(wild, string);
+        X_ASSERT_NOT_IMPLEMENTED();
+        return true;
+    }
+
     bool WildCompare(const char* wild, const char* string)
     {
         const char *cp = nullptr, *mp = nullptr;

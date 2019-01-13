@@ -481,7 +481,7 @@ void AssetServer::ModInfo(const ProtoBuf::AssetDB::ModInfo& modInfo, ResponseBuf
             response.set_error("");
             response.set_result(ProtoBuf::AssetDB::Result::OK);
             response.set_modid(mod.modId);
-            response.set_name(mod.name);
+            response.set_name(mod.name.c_str());
             response.set_path(mod.outDir.c_str());
         }
         else {
@@ -502,7 +502,7 @@ void AssetServer::AssetExsists(const ProtoBuf::AssetDB::AssetExists& exists, Res
     core::string name = fromStdString(exists.name());
 
     ProtoBuf::AssetDB::AssetInfoResponse response;
-    response.set_name(name);
+    response.set_name(name.c_str());
 
     if (!MapAssetType(exists.type(), type)) {
         writeError(response, outputBuffer, "Unknown asset type in AssetExsists()");

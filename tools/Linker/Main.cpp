@@ -131,7 +131,7 @@ namespace
         const wchar_t* pLevelName = gEnv->pCore->GetCommandLineArgForVarW(L"lvl");
         if (pLevelName) {
             options.level = core::strUtil::Convert(pLevelName, buf);
-            options.outFile = options.level;
+            options.outFile.set(options.level.begin(), options.level.end());
         }
 
         const wchar_t* pModName = gEnv->pCore->GetCommandLineArgForVarW(L"mod");

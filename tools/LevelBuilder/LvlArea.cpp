@@ -483,7 +483,7 @@ AreaSubMesh* LvlArea::meshForMat(const core::string& matName, StringTableUnique&
     AreaSubMesh newMesh;
 
     // add mat name to string table.
-    newMesh.matNameID_ = stringTable.addStringUnqiue(matName);
+    newMesh.matNameID_ = stringTable.addStringUnqiue(matName.data(), matName.length());
     newMesh.matName_ = MaterialName(matName.c_str());
 
     auto newIt = areaMeshes.insert(

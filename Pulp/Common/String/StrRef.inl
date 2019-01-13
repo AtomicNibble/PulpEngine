@@ -105,12 +105,6 @@ StringRef<CharT>::~StringRef()
 // =============================================================================
 
 template<typename CharT>
-StringRef<CharT>::operator const_str(void) const
-{
-    return str_;
-}
-
-template<typename CharT>
 constexpr typename StringRef<CharT>::const_pointer StringRef<CharT>::c_str(void) const
 {
     return str_;

@@ -952,8 +952,8 @@ bool Compiler::save(const LvlEntsArr& ents, core::Path<char>& path, LevelBuilder
                 writer.StartObject();
 
                 for (auto it = kvps.begin(); it != kvps.end(); ++it) {
-                    writer.Key(it->first, static_cast<core::json::SizeType>(it->first.length()));
-                    writer.String(it->second, static_cast<core::json::SizeType>(it->second.length()));
+                    writer.Key(it->first.data(), static_cast<core::json::SizeType>(it->first.length()));
+                    writer.String(it->second.data(), static_cast<core::json::SizeType>(it->second.length()));
                 }
 
                 writer.EndObject();

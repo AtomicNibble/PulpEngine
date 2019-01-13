@@ -105,7 +105,7 @@ void AnimManager::listAnims(const char* pSearchPatten) const
     for (const auto& anim : anims_) {
         auto* pAnimRes = anim.second;
 
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pAnimRes->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pAnimRes->getName()))) {
             sorted_anims.push_back(pAnimRes);
         }
     }

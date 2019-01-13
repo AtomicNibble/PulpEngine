@@ -209,7 +209,7 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
     sorted_mats.setGranularity(materials_.size());
 
     for (const auto& mat : materials_) {
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, mat.second->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(mat.second->getName()))) {
             sorted_mats.push_back(mat.second);
         }
     }

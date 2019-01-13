@@ -279,6 +279,7 @@ namespace strUtil
     const wchar_t* FileName(const wchar_t* startInclusive, const wchar_t* endExclusive);
 
     // retrusn true if the wild card search patten matches the string.
+    bool WildCompare(core::string_view wild, core::string_view string);
     bool WildCompare(const char* wild, const char* string);
     bool WildCompare(const wchar_t* wild, const wchar_t* string);
 

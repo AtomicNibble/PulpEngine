@@ -281,7 +281,7 @@ namespace weapon
         for (const auto& wpn : weaponDefs_) {
             auto* pWpnRes = wpn.second;
 
-            if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pWpnRes->getName())) {
+            if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pWpnRes->getName()))) {
                 sorted.push_back(pWpnRes);
             }
         }

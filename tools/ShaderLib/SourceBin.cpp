@@ -461,7 +461,7 @@ namespace shader
 
             for (const auto& s : source_) {
                 pSource = s.second;
-                if (core::strUtil::WildCompare(pSearchPatten, pSource->getName())) {
+                if (core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pSource->getName()))) {
                     printfunc(pSource);
                 }
             }

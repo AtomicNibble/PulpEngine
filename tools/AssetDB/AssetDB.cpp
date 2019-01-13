@@ -3842,7 +3842,8 @@ void AssetDB::AssetPathForName(AssetType::Enum type, const core::string& name, D
     pathOut /= RAW_FILES_FOLDER;
     pathOut /= AssetTypeRawFolder(type);
     pathOut.toLower();
-    pathOut /= name;
+    pathOut.ensureSlash();
+    pathOut.append(name.data(), name.length());
     pathOut.replaceSeprators();
     pathOut.appendFmt(".%" PRIu64, rawDataHash);
 }
@@ -3853,7 +3854,8 @@ void AssetDB::AssetPathForRawFile(const RawFile& raw, core::Path<char>& pathOut)
 
     pathOut = ASSET_DB_FOLDER;
     pathOut /= RAW_FILES_FOLDER;
-    pathOut /= raw.path;
+    pathOut.ensureSlash();
+    pathOut.append(raw.path.data(), raw.path.length());
     pathOut.replaceSeprators();
     pathOut.appendFmt(".%" PRIu64, raw.hash);
 }
@@ -3862,7 +3864,8 @@ void AssetDB::RawFilePathForName(AssetType::Enum type, const core::string& name,
 {
     pathOut = AssetTypeRawFolder(type);
     pathOut.toLower();
-    pathOut /= name;
+    pathOut.ensureSlash();
+    pathOut.append(name.data(), name.length());
     pathOut.replaceSeprators();
 }
 

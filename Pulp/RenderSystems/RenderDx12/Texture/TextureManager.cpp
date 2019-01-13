@@ -302,7 +302,7 @@ bool TextureManager::initDeviceTexture(Texture* pTex) const
 
     pDevice_->CreateShaderResourceView(gpuResource.getResource(), nullptr, pTex->getSRV());
 
-    render::D3DDebug::SetDebugObjectName(gpuResource.getResource(), pTex->getName());
+    render::D3DDebug::SetDebugObjectName(gpuResource.getResource(), core::string_view(pTex->getName()));
 
     return true;
 }
@@ -501,7 +501,7 @@ void TextureManager::listTextures(const char* pSearchPattern)
     sorted_texs.reserve(textures_.size());
 
     for (const auto& mat : textures_) {
-        if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.second->getName())) {
+        if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(mat.second->getName()))) {
             sorted_texs.push_back(mat.second);
         }
     }

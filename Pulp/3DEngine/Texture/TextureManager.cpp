@@ -362,7 +362,7 @@ void TextureManager::listTextures(const char* pSearchPattern)
     sorted_texs.reserve(textures_.size());
 
     for (const auto& mat : textures_) {
-        if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.second->getName())) {
+        if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(mat.second->getName()))) {
             sorted_texs.push_back(mat.second);
         }
     }

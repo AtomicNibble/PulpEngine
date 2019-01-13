@@ -58,7 +58,6 @@ public:
     // c_str & operator.
     // I might disable the operator forcing c_str to be specified
     // makes it more clear what's been passed
-    operator const_str(void) const;
     constexpr const_pointer c_str(void) const;
     constexpr const_pointer data(void) const;
 

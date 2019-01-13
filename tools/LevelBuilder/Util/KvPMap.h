@@ -20,9 +20,9 @@ public:
     KeyPair& operator=(const KeyPair& oth) = default;
     KeyPair& operator=(KeyPair&& oth) = default;
 
-    bool GetString(const char* key, const char* defaultString, const char** out) const;
-    bool GetString(const char* key, const char* defaultString, core::string& out) const;
-    bool GetVector(const char* key, const char* defaultString, Vec3f& out) const;
+    bool GetString(const char* key, core::string_view defaultString, core::string_view& out) const;
+    bool GetString(const char* key, core::string_view defaultString, core::string& out) const;
+    bool GetVector(const char* key, core::string_view defaultString, Vec3f& out) const;
 };
 
 X_NAMESPACE_END

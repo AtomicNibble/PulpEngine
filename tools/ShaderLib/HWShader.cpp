@@ -234,7 +234,7 @@ namespace shader
         HRESULT hr = D3DCompile(
             source.data(),
             source.size(),
-            sourceName,
+            sourceName.c_str(),
             macros.data(), // pDefines
             nullptr,       // pInclude
             pEntry,
@@ -310,12 +310,12 @@ namespace shader
         return true;
     }
 
-    void XHWShader::logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, const char* pErrorStr)
+    void XHWShader::logErrorStr(int32_t id, HRESULT hr, const core::string& sourceName, const char* pErrorStr)
     {
         core::StackString<4096> filterd(pErrorStr, pErrorStr + strlen(pErrorStr));
 
         // skip file path.
-        auto* pErrStr = filterd.find(sourcName);
+        auto* pErrStr = filterd.find(sourceName.begin(), sourceName.end());
         if (!pErrStr) {
             return;
         }
@@ -324,11 +324,11 @@ namespace shader
         filterd.replaceAll(path.c_str(), "");
 
         // we have: name(line, col)
-        pErrStr = filterd.find(sourcName);
+        pErrStr = filterd.find(sourceName.begin(), sourceName.end());
         if (pErrStr) {
             int32_t line, col;
 
-            if (extractLineNumberInfo(pErrStr + sourcName.length(), filterd.end(), line, col)) {
+            if (extractLineNumberInfo(pErrStr + sourceName.length(), filterd.end(), line, col)) {
                 errLineNo_ = line;
             }
         }

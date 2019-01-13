@@ -1065,7 +1065,7 @@ void XConsole::registerVar(ICVar* pCVar)
     auto it = configCmds_.find(pCVar->GetName());
     if (it != configCmds_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
-            pCVar->Set(it->second);
+            pCVar->Set(it->second.c_str());
         }
 
         X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
@@ -1074,7 +1074,7 @@ void XConsole::registerVar(ICVar* pCVar)
     it = varArchive_.find(pCVar->GetName());
     if (it != varArchive_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
-            pCVar->Set(it->second);
+            pCVar->Set(it->second.c_str());
         }
 
         // mark as archive.
@@ -2587,7 +2587,7 @@ void XConsole::listCommands(const char* pSearchPatten)
     for (auto itrCmd = cmdMap_.begin(); itrCmd != cmdMap_.end(); ++itrCmd) {
         ConsoleCommand& cmd = itrCmd->second;
 
-        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.name)) {
+        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.name.c_str())) {
             sorted_cmds.append(&cmd);
         }
     }
@@ -2643,7 +2643,7 @@ void XConsole::listVariablesValues(const char* pSearchPatten)
     for (const auto& it : varMap_) {
         ICVar* var = it.second;
 
-        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName())) {
+        if (!pSearchPatten || strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(var->GetName()))) {
             sorted_vars.emplace_back(var);
         }
     }

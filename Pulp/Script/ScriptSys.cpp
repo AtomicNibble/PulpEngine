@@ -1297,7 +1297,7 @@ void XScriptSys::listScripts(const char* pSearchPatten) const
     for (const auto& script : scripts_) {
         auto* pScriptRes = script.second;
 
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pScriptRes->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pScriptRes->getName()))) {
             sorted_scripts.push_back(pScriptRes);
         }
     }

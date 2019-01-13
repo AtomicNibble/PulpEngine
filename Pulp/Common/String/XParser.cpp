@@ -13,14 +13,14 @@ XParser::XParser(MemoryArenaBase* arena) :
 }
 
 XParser::XParser(LexFlags flags, MemoryArenaBase* arena) :
-    XParser(nullptr, nullptr, nullptr, flags, arena)
+    XParser(nullptr, nullptr, core::string(), flags, arena)
 {
     X_ASSERT_NOT_NULL(arena);
     core::zero_object(macroCharCache);
 }
 
 XParser::XParser(const char* startInclusive, const char* endExclusive,
-    const char* name, LexFlags flags, MemoryArenaBase* arena) :
+    const core::string& name, LexFlags flags, MemoryArenaBase* arena) :
     arena_(arena),
     pTokens_(nullptr),
     macros_(arena, 4),
@@ -70,12 +70,10 @@ void XParser::freeSource(void)
     filename_.clear();
 }
 
-bool XParser::SetMemory(const char* startInclusive, const char* endExclusive,
-    const char* name)
+bool XParser::SetMemory(const char* startInclusive, const char* endExclusive, const core::string& name)
 {
     X_ASSERT_NOT_NULL(startInclusive);
     X_ASSERT_NOT_NULL(endExclusive);
-    X_ASSERT_NOT_NULL(name);
 
     if (scriptStack_.isNotEmpty()) {
         // someting already set.
@@ -420,12 +418,12 @@ bool XParser::ReadDirective(void)
     return false;
 }
 
-bool XParser::isInCache(const uint8_t ch) const
+bool XParser::isInCache(const char ch) const
 {
     return macroCharCache[ch] == 1;
 }
 
-void XParser::addToCache(const uint8_t ch)
+void XParser::addToCache(const char ch)
 {
     macroCharCache[ch] = 1;
 }
@@ -530,7 +528,7 @@ bool XParser::Directive_define(void)
     do {
         XLexToken* pT = X_NEW(XLexToken, arena_, "Macrotoken")(token);
 
-        if (token.GetType() == TokenType::NAME && token.isEqual(define->name)) {
+        if (token.GetType() == TokenType::NAME && token.isEqual(define->name.begin(), define->name.end())) {
             //			token.flags_;
             //	t->flags |= TOKEN_FL_RECURSIVE_DEFINE;
             XParser::Warning("recursive define (removed recursion)");

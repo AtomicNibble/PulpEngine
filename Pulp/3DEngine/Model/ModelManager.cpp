@@ -224,7 +224,7 @@ void XModelManager::listModels(const char* pSearchPatten) const
     for (const auto& model : models_) {
         auto* pModelRes = model.second;
 
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, pModelRes->getName())) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pModelRes->getName()))) {
             sorted_models.push_back(pModelRes);
         }
     }
