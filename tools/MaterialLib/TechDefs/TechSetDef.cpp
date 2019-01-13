@@ -402,14 +402,14 @@ namespace techset
         prims_.free();
     }
 
-    bool TechSetDef::parseFile(FileBuf& buf)
+    bool TechSetDef::parseFile(const FileBuf& buf)
     {
         core::XParser lex(buf.begin(), buf.end(), fileName_, core::LexFlag::ALLOWPATHNAMES, arena_);
 
         return parseFile(lex);
     }
 
-    bool TechSetDef::parseFile(FileBuf& buf, TechSetDef::OpenIncludeDel incDel)
+    bool TechSetDef::parseFile(const FileBuf& buf, TechSetDef::OpenIncludeDel incDel)
     {
         core::XParser lex(buf.begin(), buf.end(), fileName_, core::LexFlag::ALLOWPATHNAMES, arena_);
         lex.setIncludeCallback(incDel);

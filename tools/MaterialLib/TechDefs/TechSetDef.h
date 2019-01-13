@@ -236,8 +236,8 @@ namespace techset
         TechSetDef(core::string fileName, core::MemoryArenaBase* arena);
         ~TechSetDef();
 
-        bool parseFile(FileBuf& buf);
-        bool parseFile(FileBuf& buf, OpenIncludeDel incDel);
+        bool parseFile(const FileBuf& buf);
+        bool parseFile(const FileBuf& buf, OpenIncludeDel incDel);
 
     private:
         bool parseFile(core::XParser& lex);
