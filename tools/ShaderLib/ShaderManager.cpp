@@ -397,7 +397,6 @@ namespace shader
 
         pHWShaderRes = hwShaders_.createAsset(
             nameView,
-            nameView,
             vars_,
             type,
             entry,

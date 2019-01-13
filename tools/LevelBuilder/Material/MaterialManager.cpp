@@ -41,10 +41,7 @@ void MatManager::ShutDown(void)
 bool MatManager::loadDefaultMaterial(void)
 {
     if (!pDefaultMtl_) {
-        pDefaultMtl_ = materials_.createAsset(core::string_view(engine::MTL_DEFAULT_NAME), 
-            core::string_view(engine::MTL_DEFAULT_NAME),
-            arena_
-        );
+        pDefaultMtl_ = materials_.createAsset(core::string_view(engine::MTL_DEFAULT_NAME), arena_);
 
         // it's default :|
         pDefaultMtl_->setFlags(engine::MaterialFlag::DEFAULT | engine::MaterialFlag::STRUCTURAL);
@@ -99,7 +96,7 @@ engine::Material* MatManager::loadMaterial(core::string_view name)
     // TODO: perf - maybe skip this string creation.
     core::string nameStr(name.data(), name.length());
 
-    pMatRes = materials_.createAsset(name, name, arena_);
+    pMatRes = materials_.createAsset(name, arena_);
     if (loadMatFromFile(*pMatRes, nameStr)) {
         return pMatRes;
     }

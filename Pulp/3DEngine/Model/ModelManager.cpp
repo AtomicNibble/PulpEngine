@@ -119,7 +119,7 @@ XModel* XModelManager::loadModel(core::string_view name)
     }
 
     // we create a model and give it back
-    pModelRes = models_.createAsset(name, name);
+    pModelRes = models_.createAsset(name);
 
     // add to list of models that need loading.
     addLoadRequest(pModelRes);

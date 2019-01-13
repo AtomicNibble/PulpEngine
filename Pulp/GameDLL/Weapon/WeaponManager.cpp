@@ -111,7 +111,7 @@ namespace weapon
                 return pWeaponDefRes;
             }
 
-            pWeaponDefRes = weaponDefs_.createAsset(name, name);
+            pWeaponDefRes = weaponDefs_.createAsset(name);
         }
 
         addLoadRequest(pWeaponDefRes);

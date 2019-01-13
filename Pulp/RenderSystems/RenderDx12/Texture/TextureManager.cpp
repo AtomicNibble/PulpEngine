@@ -71,6 +71,8 @@ DXGI_FORMAT TextureManager::getDepthFmt(void) const
 
 Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
 {
+    X_UNUSED(pNickName); // TODO: use
+
     core::StackString<32, char> idStr(id);
     core::StackString<64, char> nameStr("id_");
     nameStr.append(idStr.begin(), idStr.end());
@@ -88,7 +90,7 @@ Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
             return pTexRes;
         }
 
-        pTexRes = textures_.createAsset(nameView, core::string_view(pNickName));
+        pTexRes = textures_.createAsset(nameView);
     }
 
     return pTexRes;
@@ -116,7 +118,7 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name, name);
+    pTexRes = textures_.createAsset(name);
 
     pTexRes->setDepth(1);
     pTexRes->setNumFaces(1);
@@ -180,7 +182,7 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name, name);
+    pTexRes = textures_.createAsset(name);
 
     threadPolicy.Leave();
 

@@ -376,7 +376,7 @@ IScript* XScriptSys::loadScript(core::string_view name)
         return pScriptRes;
     }
 
-    pScriptRes = scripts_.createAsset(nameView, nameView, arena_);
+    pScriptRes = scripts_.createAsset(nameView, arena_);
 
     addLoadRequest(pScriptRes);
 

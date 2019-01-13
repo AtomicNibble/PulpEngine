@@ -178,7 +178,7 @@ Texture* TextureManager::loadTexture(core::string_view name, texture::TextureFla
             return nullptr;
         }
 
-        pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
+        pTexRes = textures_.createAsset(name, flags, pDevicTex);
         threadPolicy.Leave();
 
         addLoadRequest(pTexRes);

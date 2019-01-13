@@ -233,7 +233,7 @@ public:
 
         core::StrHash hash(name.data(), name.length());
 
-        Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
+        Resource* pRes = Pool::allocate(name, std::forward<Args>(args)...);
 
         hash_.emplace(hash, pRes);
 
