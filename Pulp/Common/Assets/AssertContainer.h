@@ -209,7 +209,7 @@ public:
 
     X_INLINE Resource* findAsset(core::string_view name) const
     {
-        X_ASSERT(strUtil::Find(name.data(), name.data() + name.length(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();
+        X_ASSERT(strUtil::Find(name.begin(), name.end(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();
 
         core::StrHash hash(name.data(), name.length());
 
