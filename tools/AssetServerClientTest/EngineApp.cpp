@@ -8,8 +8,6 @@
 #include <Platform\MessageBox.h>
 #include <Platform\Console.h>
 
-extern HINSTANCE g_hInstance;
-
 using namespace core::string_view_literals;
 
 EngineApp::EngineApp() :
@@ -27,10 +25,10 @@ EngineApp::~EngineApp()
     }
 }
 
-bool EngineApp::Init(const wchar_t* pInCmdLine)
+bool EngineApp::Init(HINSTANCE hInstance, const wchar_t* pInCmdLine)
 {
     CoreInitParams params;
-    params.hInstance = g_hInstance;
+    params.hInstance = hInstance;
     params.pCmdLine = pInCmdLine;
     params.bSkipInput = true;
     params.bSkipSound = true;
@@ -123,8 +121,9 @@ bool EngineApp::PumpMessages()
 {
     MSG msg;
     while (PeekMessage(&msg, 0, 0, 0, PM_REMOVE)) {
-        if (msg.message == WM_QUIT)
+        if (msg.message == WM_QUIT) {
             return false;
+        }
         TranslateMessage(&msg);
         DispatchMessage(&msg);
     }

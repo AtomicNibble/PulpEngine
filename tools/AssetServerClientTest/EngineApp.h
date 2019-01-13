@@ -9,7 +9,7 @@ public:
     EngineApp();
     ~EngineApp() X_OVERRIDE;
 
-    bool Init(const wchar_t* pInCmdLine);
+    bool Init(HINSTANCE hInstance, const wchar_t* pInCmdLine);
     bool ShutDown(void);
     int MainLoop(void);
 

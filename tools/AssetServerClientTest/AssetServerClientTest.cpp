@@ -7,8 +7,6 @@
 #define _LAUNCHER
 #include <ModuleExports.h>
 
-HINSTANCE g_hInstance = 0;
-
 #ifdef X_LIB
 
 struct XRegFactoryNode* g_pHeadToRegFactories = nullptr;
@@ -118,8 +116,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_ LPWSTR lpCmdLine,
     _In_ int nCmdShow)
 {
-    g_hInstance = hInstance;
-
     {
         core::MallocFreeAllocator allocator;
         AssetServerTestArena arena(&allocator, "AssetServerTestArena");
@@ -129,7 +125,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
         EngineApp engine;
 
-        if (engine.Init(lpCmdLine))
+        if (engine.Init(hInstance, lpCmdLine))
         {
             gEnv->pConsoleWnd->redirectSTD();
 
