@@ -245,8 +245,11 @@ public:
         core::ScopedLock<ThreadPolicy> lock(threadPolicy_);
 
         X_ASSERT(pRes->getRefCount() == 0, "Tried to release asset with refs")(pRes->getRefCount());
+        
+        const auto& name = pRes->getName();
+        core::StrHash hash(name.data(), name.length());
 
-        auto numErase = hash_.erase(pRes->getName());
+        auto numErase = hash_.erase(hash);
 
         // we should earse only one asset
         X_ASSERT(numErase == 1, "Failed to erase asset correct")();
