@@ -5,8 +5,6 @@
 #include <I3DEngine.h>
 #include <IAnimManager.h>
 
-#include <String/StringView.h>
-
 X_NAMESPACE_BEGIN(game)
 
 namespace weapon
