@@ -500,6 +500,11 @@ namespace strUtil
     }
 
     /// Returns whether two strings are equal, checks the length of both srings are equal.
+    bool IsEqual(core::string_view str1, core::string_view str2)
+    {
+        return IsEqual(str1.begin(), str1.end(), str2.begin(), str2.end());
+    }
+
     bool IsEqual(const char* startInclusiveS1, const char* endExclusiveS1, const char* startInclusiveS2)
     {
         size_t Len = endExclusiveS1 - startInclusiveS1;

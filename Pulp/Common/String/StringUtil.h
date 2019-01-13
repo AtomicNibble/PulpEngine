@@ -114,6 +114,7 @@ namespace strUtil
     int Compare(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
 
     /// Returns whether two strings are equal.
+    bool IsEqual(core::string_view str1, core::string_view str2);
     bool IsEqual(const char* str1, const char* str2);
     bool IsEqual(const wchar_t* str1, const wchar_t* str2);
 
