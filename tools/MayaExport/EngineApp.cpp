@@ -19,6 +19,8 @@
 
 X_LINK_ENGINE_LIB("Core");
 
+using namespace core::string_view_literals;
+
 EngineApp::EngineApp() :
     pICore_(nullptr),
     hSystemHandle_(core::Module::NULL_HANDLE)
@@ -114,8 +116,8 @@ void EngineApp::OnAssertVariable(const core::SourceInfo& sourceInfo)
 
 void EngineApp::Error(core::string_view errorText)
 {
-    core::msgbox::show(pErrorText,
-        X_ENGINE_NAME " Start Error",
+    core::msgbox::show(errorText,
+        X_ENGINE_NAME " Start Error"_sv,
         core::msgbox::Style::Error | core::msgbox::Style::Topmost | core::msgbox::Style::DefaultDesktop,
         core::msgbox::Buttons::OK);
 }
