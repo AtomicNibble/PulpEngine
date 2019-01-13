@@ -17,7 +17,7 @@ class MatManager
     typedef core::AssetContainer<engine::Material, engine::MTL_MAX_LOADED, core::SingleThreadPolicy> MaterialContainer;
     typedef MaterialContainer::Resource MaterialResource;
 
-    typedef core::HashMap<core::string, core::string> NameOverrideMap;
+    typedef core::FixedHashTable<core::string, core::string> NameOverrideMap;
 
 public:
     MatManager(assetDb::AssetDB& db, core::MemoryArenaBase* arena);
