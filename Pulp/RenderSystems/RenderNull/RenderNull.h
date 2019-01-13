@@ -27,8 +27,8 @@ public:
 
     Vec2i getDisplayRes(void) const X_FINAL;
 
-    IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_FINAL;
-    IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+    IPixelBuffer* createDepthBuffer(core::string_view nickName, Vec2i dim) X_FINAL;
+    IPixelBuffer* createColorBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips,
         texture::Texturefmt::Enum fmt, Color8u col) X_FINAL;
     void releasePixelBuffer(render::IPixelBuffer* pPixelBuf) X_FINAL;
 
@@ -48,8 +48,8 @@ public:
     ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_FINAL;
     void destoryConstBuffer(ConstantBufferHandle handle) X_FINAL;
 
-    IDeviceTexture* getDeviceTexture(int32_t id, const char* pNickName) X_FINAL;
-    IDeviceTexture* createTexture(const char* pNickName, Vec2i dim,
+    IDeviceTexture* getDeviceTexture(int32_t id, core::string_view nickName) X_FINAL;
+    IDeviceTexture* createTexture(core::string_view nickName, Vec2i dim,
         texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData = nullptr) X_FINAL;
 
     bool initDeviceTexture(IDeviceTexture* pTex) X_FINAL;

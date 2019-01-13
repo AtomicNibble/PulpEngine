@@ -32,6 +32,8 @@
 
 X_NAMESPACE_BEGIN(engine)
 
+using namespace core::string_view_literals;
+
 EngineEnv gEngEnv;
 
 //------------------------------------------
@@ -175,11 +177,11 @@ bool X3DEngine::init(void)
     auto clearCol3d = drawVars_.clearCol3D();
 
     // these must be same size.
-    pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer", dispalyRes);
-    pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol3d);
+    pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer"_sv, dispalyRes);
+    pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d"_sv, dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol3d);
     
     // this can be any size, but typically have it match display.
-    pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d", dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol2d);
+    pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d"_sv, dispalyRes, 1, texture::Texturefmt::R8G8B8A8, clearCol2d);
 
 #if 0 // some stuff for prelinking video texture to material tech.
     auto* pMat = pMaterialManager_->loadMaterial("video/doom_trailer");
@@ -1303,7 +1305,7 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
             {
                 pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_2D]);
 
-                pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d",
+                pixelBufffers_[PixelBuf::COL_2D] = pRender->createColorBuffer("$rt_2d"_sv,
                     newDim, 1, texture::Texturefmt::A8R8G8B8, clearCol2d);
             }
         }
@@ -1316,7 +1318,7 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
             {
                 pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::COL_3D]);
 
-                pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d", 
+                pixelBufffers_[PixelBuf::COL_3D] = pRender->createColorBuffer("$rt_3d"_sv, 
                     newDim, 1, texture::Texturefmt::R8G8B8A8, clearCol3d);
             }
         }
@@ -1329,7 +1331,7 @@ void X3DEngine::OnCoreEvent(const CoreEventData& ed)
             {
                 pRender->releasePixelBuffer(pixelBufffers_[PixelBuf::DEPTH_STENCIL]);
 
-                pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer", newDim);
+                pixelBufffers_[PixelBuf::DEPTH_STENCIL] = pRender->createDepthBuffer("$depth_buffer"_sv, newDim);
             }
         }
     }

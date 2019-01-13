@@ -415,8 +415,8 @@ struct IRender
     // for example creating depth buffers, or shadow map buffers that can then be bound to pipeline.
     // they also support been passed to shaders, so you can take the texture id of a pixel buffer and place it in variable state.
     // this allows you todo things like populate a depth buffer then read it from a shader (SRV)
-    virtual IPixelBuffer* createDepthBuffer(const char* pNickName, Vec2i dim) X_ABSTRACT;
-    virtual IPixelBuffer* createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips, texture::Texturefmt::Enum fmt, Color8u clearCol) X_ABSTRACT;
+    virtual IPixelBuffer* createDepthBuffer(core::string_view nickName, Vec2i dim) X_ABSTRACT;
+    virtual IPixelBuffer* createColorBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips, texture::Texturefmt::Enum fmt, Color8u clearCol) X_ABSTRACT;
 
     virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 
@@ -428,12 +428,12 @@ struct IRender
     // cb's
     virtual ConstantBufferHandle createConstBuffer(const shader::XCBuffer& cbuffer, BufUsage::Enum usage) X_ABSTRACT;
 
-    virtual IDeviceTexture* getDeviceTexture(int32_t id, const char* pNickName) X_ABSTRACT;
+    virtual IDeviceTexture* getDeviceTexture(int32_t id, core::string_view nickName) X_ABSTRACT;
     virtual bool initDeviceTexture(IDeviceTexture* pTex) X_ABSTRACT;
     virtual bool initDeviceTexture(IDeviceTexture* pTex, const texture::XTextureFile& imgFile) X_ABSTRACT;
 
     // creates a texture for dynamic content, no data loaded from disk.
-    virtual IDeviceTexture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
+    virtual IDeviceTexture* createTexture(core::string_view nickName, Vec2i dim, texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData = nullptr) X_ABSTRACT;
 
     // shaders
     // new api for creating techs in 3dengine

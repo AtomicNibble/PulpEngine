@@ -69,9 +69,9 @@ DXGI_FORMAT TextureManager::getDepthFmt(void) const
     return depthFmt_;
 }
 
-Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
+Texture* TextureManager::getDeviceTexture(int32_t id, core::string_view nickName)
 {
-    X_UNUSED(pNickName); // TODO: use
+    X_UNUSED(nickName); // TODO: use
 
     core::StackString<32, char> idStr(id);
     core::StackString<64, char> nameStr("id_");
@@ -96,29 +96,27 @@ Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
     return pTexRes;
 }
 
-Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
+Texture* TextureManager::createTexture(core::string_view nickName, Vec2i dim,
     texture::Texturefmt::Enum fmt, render::BufUsage::Enum usage, const uint8_t* pInitialData)
 {
-    core::string_view name(pNickName);
-
     auto& threadPolicy = textures_.getThreadPolicy();
     threadPolicy.Enter();
 
-    TexRes* pTexRes = textures_.findAsset(name);
+    TexRes* pTexRes = textures_.findAsset(nickName);
 
     if (pTexRes) {
         threadPolicy.Leave();
 
         pTexRes->addReference();
 
-        X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%*.s\"", name.length(), name.data());
+        X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%*.s\"", nickName.length(), nickName.data());
         if (pInitialData) {
             // update?
         }
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name);
+    pTexRes = textures_.createAsset(nickName);
 
     pTexRes->setDepth(1);
     pTexRes->setNumFaces(1);
@@ -159,10 +157,9 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
     return pTexRes;
 }
 
-Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+Texture* TextureManager::createPixelBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips,
     render::PixelBufferType::Enum type)
 {
-    core::string_view name(pNickName);
     //
     //	For pixel buffers we store them in the same texture pool / hash
     //	This has a number of benfits in that pixel buffers are listed in texture list.
@@ -172,17 +169,17 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
     auto& threadPolicy = textures_.getThreadPolicy();
     threadPolicy.Enter();
 
-    TexRes* pTexRes = textures_.findAsset(name);
+    TexRes* pTexRes = textures_.findAsset(nickName);
     if (pTexRes) {
         threadPolicy.Leave();
 
         // do we want to allow ref counted pixelBuffers?
-        X_WARNING("TexMan", "Pixel buffer already exsists: \"%*.s\"", name.length(), name.data());
+        X_WARNING("TexMan", "Pixel buffer already exsists: \"%*.s\"", nickName.length(), nickName.data());
         pTexRes->addReference();
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name);
+    pTexRes = textures_.createAsset(nickName);
 
     threadPolicy.Leave();
 

@@ -407,7 +407,7 @@ void Video::createRenderTexture(render::IRender* pRender)
     X_ASSERT(pTexture_ == nullptr, "Texture already valid")(pTexture_);
 
     pTexture_ = pRender->createTexture(
-        name_.c_str(),
+        core::string_view(name_),
         Vec2i(vidHdr_.pixelWidth, vidHdr_.pixelHeight),
         texture::Texturefmt::B8G8R8A8,
         render::BufUsage::PER_FRAME);

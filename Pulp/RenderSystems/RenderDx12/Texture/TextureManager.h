@@ -39,13 +39,13 @@ public:
 
     DXGI_FORMAT getDepthFmt(void) const;
 
-    Texture* getDeviceTexture(int32_t id, const char* pNickName);
+    Texture* getDeviceTexture(int32_t id, core::string_view nickName);
 
-    Texture* createTexture(const char* pNickName, Vec2i dim, texture::Texturefmt::Enum fmt,
+    Texture* createTexture(core::string_view nickName, Vec2i dim, texture::Texturefmt::Enum fmt,
         render::BufUsage::Enum usage, const uint8_t* pInitialData = nullptr);
 
     // this is used for creating textures that can be used for more than just SRV's
-    Texture* createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+    Texture* createPixelBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips,
         render::PixelBufferType::Enum type);
 
     Texture* getByID(TexID texId) const;

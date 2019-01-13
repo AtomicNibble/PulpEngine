@@ -170,10 +170,8 @@ Texture* TextureManager::loadTexture(core::string_view name, texture::TextureFla
         pTexRes->addReference();
     }
     else {
-        // TODO: remove.
-        core::string nameStr(name.data(), name.length());
 
-        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, nameStr.c_str());
+        auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, name);
         if (!pDevicTex) {
             return nullptr;
         }

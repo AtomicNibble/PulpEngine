@@ -347,7 +347,7 @@ bool XRender::init(PLATFORM_HWND hWnd, texture::Texturefmt::Enum depthFmt, bool 
         core::StackString<64> name;
         name.appendFmt("$backbuffer_%i", i);
 
-        pDisplayPlanes_[i] = pTextureMan_->createPixelBuffer(name.c_str(), Vec2i::zero(), 1, PixelBufferType::COLOR);
+        pDisplayPlanes_[i] = pTextureMan_->createPixelBuffer(name, Vec2i::zero(), 1, PixelBufferType::COLOR);
 
         ColorBuffer& colBuf = pDisplayPlanes_[i]->getColorBuf();
         colBuf.setClearColor(vars_.getClearCol());
@@ -1207,26 +1207,26 @@ Vec2i XRender::getDisplayRes(void) const
     return displayRes_;
 }
 
-IPixelBuffer* XRender::createDepthBuffer(const char* pNickName, Vec2i dim)
+IPixelBuffer* XRender::createDepthBuffer(core::string_view nickName, Vec2i dim)
 {
-    texture::Texture* pPixelBuf = pTextureMan_->createPixelBuffer(pNickName, dim, 1, PixelBufferType::DEPTH);
+    texture::Texture* pPixelBuf = pTextureMan_->createPixelBuffer(nickName, dim, 1, PixelBufferType::DEPTH);
 
-    render::D3DDebug::SetDebugObjectName(pPixelBuf->getGpuResource().getResource(), pNickName);
+    render::D3DDebug::SetDebugObjectName(pPixelBuf->getGpuResource().getResource(), nickName);
 
     return pPixelBuf;
 }
 
-IPixelBuffer* XRender::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+IPixelBuffer* XRender::createColorBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips,
     texture::Texturefmt::Enum fmt, Color8u clearCol)
 {
-    texture::Texture* pColBuf = pTextureMan_->createPixelBuffer(pNickName, dim, numMips, PixelBufferType::COLOR);
+    texture::Texture* pColBuf = pTextureMan_->createPixelBuffer(nickName, dim, numMips, PixelBufferType::COLOR);
     ColorBuffer& colBuf = pColBuf->getColorBuf();
     colBuf.setClearColor(clearCol);
 
     DXGI_FORMAT dxFmt = texture::Util::DXGIFormatFromTexFmt(fmt);
     colBuf.create(pDevice_, *pDescriptorAllocator_, dim.x, dim.y, numMips, dxFmt);
 
-    D3DDebug::SetDebugObjectName(colBuf.getGpuResource().getResource(), pNickName);
+    D3DDebug::SetDebugObjectName(colBuf.getGpuResource().getResource(), nickName);
 
     return pColBuf;
 }
@@ -1312,17 +1312,17 @@ void XRender::destoryConstBuffer(ConstantBufferHandle handle)
     pBuffMan_->freeCB(handle);
 }
 
-IDeviceTexture* XRender::getDeviceTexture(int32_t id, const char* pNickName)
+IDeviceTexture* XRender::getDeviceTexture(int32_t id, core::string_view nickName)
 {
-    texture::Texture* pText = pTextureMan_->getDeviceTexture(id, pNickName);
+    texture::Texture* pText = pTextureMan_->getDeviceTexture(id, nickName);
 
     return pText;
 }
 
-IDeviceTexture* XRender::createTexture(const char* pNickName, Vec2i dim,
+IDeviceTexture* XRender::createTexture(core::string_view nickName, Vec2i dim,
     texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData)
 {
-    texture::Texture* pText = pTextureMan_->createTexture(pNickName, dim, fmt, usage, pInitialData);
+    texture::Texture* pText = pTextureMan_->createTexture(nickName, dim, fmt, usage, pInitialData);
 
     return pText;
 }

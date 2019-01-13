@@ -68,18 +68,17 @@ Vec2i RenderNull::getDisplayRes(void) const
     return Vec2i::zero();
 }
 
-IPixelBuffer* RenderNull::createDepthBuffer(const char* pNickName, Vec2i dim)
+IPixelBuffer* RenderNull::createDepthBuffer(core::string_view nickName, Vec2i dim)
 {
-    X_UNUSED(pNickName);
-    X_UNUSED(dim);
+    X_UNUSED(nickName, dim);
 
     return nullptr;
 }
 
-IPixelBuffer* RenderNull::createColorBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
+IPixelBuffer* RenderNull::createColorBuffer(core::string_view nickName, Vec2i dim, uint32_t numMips,
     texture::Texturefmt::Enum fmt, Color8u col)
 {
-    X_UNUSED(pNickName, dim, numMips, fmt, col);
+    X_UNUSED(nickName, dim, numMips, fmt, col);
 
     return nullptr;
 }
@@ -174,17 +173,17 @@ void RenderNull::destoryConstBuffer(ConstantBufferHandle handle)
     X_UNUSED(handle);
 }
 
-IDeviceTexture* RenderNull::getDeviceTexture(int32_t id, const char* pNickName)
+IDeviceTexture* RenderNull::getDeviceTexture(int32_t id, core::string_view nickName)
 {
-    X_UNUSED(id, pNickName);
+    X_UNUSED(id, nickName);
 
     return nullptr;
 }
 
-IDeviceTexture* RenderNull::createTexture(const char* pNickName, Vec2i dim,
+IDeviceTexture* RenderNull::createTexture(core::string_view nickName, Vec2i dim,
     texture::Texturefmt::Enum fmt, BufUsage::Enum usage, const uint8_t* pInitialData)
 {
-    X_UNUSED(pNickName, dim, fmt, usage, pInitialData);
+    X_UNUSED(nickName, dim, fmt, usage, pInitialData);
 
     return nullptr;
 }

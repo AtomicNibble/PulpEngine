@@ -1046,7 +1046,7 @@ void XFont::Prepare(const wchar_t* pBegin, const wchar_t* pEnd)
 
 bool XFont::CreateDeviceTexture(void)
 {
-    core::StackString512 name("$fontTexture_");
+    core::StackString256 name("$fontTexture_");
     name.append(getName().begin(), getName().end());
 
     const auto& buf = pFontTexture_->GetBuffer();
@@ -1054,7 +1054,7 @@ bool XFont::CreateDeviceTexture(void)
     X_ASSERT(pTexture_ == nullptr, "double init of font texture")(pTexture_);
 
     pTexture_ = gEnv->pRender->createTexture(
-        name.c_str(),
+        name,
         pFontTexture_->GetSize(),
         texture::Texturefmt::A8,
         render::BufUsage::DYNAMIC,
