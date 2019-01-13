@@ -644,6 +644,12 @@ inline const wchar_t* StackString<N, wchar_t>::find(const wchar_t* string) const
 }
 
 template<size_t N>
+inline const wchar_t* StackString<N, wchar_t>::find(const wchar_t* pBeging, const wchar_t* pEnd) const
+{
+    return strUtil::Find(str_, str_ + len_, pBeging, pEnd);
+}
+
+template<size_t N>
 inline const wchar_t* StackString<N, wchar_t>::findCaseInsen(wchar_t ch) const
 {
     return strUtil::FindCaseInsensitive(str_, str_ + len_, ch);

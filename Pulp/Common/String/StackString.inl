@@ -650,6 +650,12 @@ inline const TChar* StackString<N, TChar>::find(const TChar* string) const
 }
 
 template<size_t N, typename TChar>
+inline const TChar* StackString<N, TChar>::find(const TChar* pBeging, const TChar* pEnd) const
+{
+    return strUtil::Find(str_, str_ + len_, pBeging, pEnd);
+}
+
+template<size_t N, typename TChar>
 inline const TChar* StackString<N, TChar>::findCaseInsen(TChar ch) const
 {
     return strUtil::FindCaseInsensitive(str_, str_ + len_, ch);

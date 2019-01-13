@@ -120,6 +120,7 @@ public:
     /// \brief Finds a string inside the string, and returns a pointer to it.
     /// \remark Returns a \c nullptr if the string could not be found.
     inline const TChar* find(const TChar* string) const;
+    inline const TChar* find(const TChar* pBeging, const TChar* pEnd) const;
 
     inline const TChar* findCaseInsen(TChar ch) const;
     inline const TChar* findCaseInsen(const TChar* string) const;
@@ -222,6 +223,7 @@ public:
     inline const wchar_t* findLast(wchar_t ch) const;
     inline const wchar_t* find(wchar_t ch) const;
     inline const wchar_t* find(const wchar_t* string) const;
+    inline const wchar_t* find(const wchar_t* pBeging, const wchar_t* pEnd) const;
 
     inline const wchar_t* findCaseInsen(wchar_t ch) const;
     inline const wchar_t* findCaseInsen(const wchar_t* string) const;
