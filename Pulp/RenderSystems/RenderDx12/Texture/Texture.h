@@ -29,7 +29,7 @@ class Texture : public render::IPixelBuffer // ::texture::ITexture
     friend class render::ShadowBuffer;
 
 public:
-    Texture(core::string name);
+    Texture(core::string_view name);
     ~Texture();
 
     void destroy(void);
@@ -95,7 +95,7 @@ protected:
     D3D12_CPU_DESCRIPTOR_HANDLE hCpuDescriptorHandle_; // SRV
 
 protected:
-    core::string fileName_;
+    core::string name_;
     TexID id_;
     Vec2<uint16_t> dimensions_;
     uint32_t datasize_; // size of the higest mip in bytes.

@@ -72,21 +72,23 @@ DXGI_FORMAT TextureManager::getDepthFmt(void) const
 Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
 {
     core::StackString<32, char> idStr(id);
-    core::string name("id_");
-    name.append(idStr.begin(), idStr.end());
+    core::StackString<64, char> nameStr("id_");
+    nameStr.append(idStr.begin(), idStr.end());
+
+    core::string_view nameView(nameStr);
 
     TexRes* pTexRes = nullptr;
     {
         core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
-        pTexRes = textures_.findAsset(name);
+        pTexRes = textures_.findAsset(nameView);
 
         if (pTexRes) {
             pTexRes->addReference();
             return pTexRes;
         }
 
-        pTexRes = textures_.createAsset(core::string_view(name), core::string(pNickName));
+        pTexRes = textures_.createAsset(nameView, core::string_view(pNickName));
     }
 
     return pTexRes;
@@ -114,7 +116,7 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name, core::string(name.data(), name.length()));
+    pTexRes = textures_.createAsset(name, name);
 
     pTexRes->setDepth(1);
     pTexRes->setNumFaces(1);
@@ -178,7 +180,7 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name, core::string(name.data(), name.length()));
+    pTexRes = textures_.createAsset(name, name);
 
     threadPolicy.Leave();
 

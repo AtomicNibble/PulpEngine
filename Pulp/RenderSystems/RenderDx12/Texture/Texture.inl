@@ -3,7 +3,7 @@ X_NAMESPACE_BEGIN(texture)
 
 X_INLINE const core::string& Texture::getName(void) const
 {
-    return fileName_;
+    return name_;
 }
 
 X_INLINE Vec2i Texture::getDimensions(void) const
