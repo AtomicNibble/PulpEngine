@@ -1075,18 +1075,22 @@ void XSound::freeObject(SoundObject* pObject)
     objectPool_.free(pObject);
 }
 
-SoundObject* XSound::findObjectForNick(const char* pNick)
+SoundObject* XSound::findObjectForNick(core::string_view name)
 {
+    if (name.empty()) {
+        return nullptr;
+    }
+
     core::CriticalSection::ScopedLock lock(cs_);
 
     for (auto* pObject : objects_) {
-        if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick)) {
+        if (pObject->debugName.isNotEmpty() && core::strUtil::IsEqual(core::string_view(pObject->debugName), name)) {
             return pObject;
         }
     }
 
     for (auto* pObject : culledObjects_) {
-        if (pObject->debugName && core::strUtil::IsEqual(pObject->debugName, pNick)) {
+        if (pObject->debugName.isNotEmpty() && core::strUtil::IsEqual(core::string_view(pObject->debugName), name)) {
             return pObject;
         }
     }
@@ -1512,7 +1516,7 @@ void XSound::listBanks(const char* pSearchPatten) const
     core::Array<const Bank*> sorted_banks(g_SoundArena);
 
     for (const auto& bank : banks_) {
-        if (!pSearchPatten || core::strUtil::WildCompare(pSearchPatten, bank.name)) {
+        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(bank.name))) {
             sorted_banks.push_back(&bank);
         }
     }
@@ -1812,7 +1816,7 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
     // we want a specific object.
     const char* pObjectStr = pArgs->GetArg(2);
 
-    SoundObject* pObject = findObjectForNick(pObjectStr);
+    SoundObject* pObject = findObjectForNick(core::string_view(pObjectStr));
     if (!pObject) {
         X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
         return;
@@ -1858,7 +1862,7 @@ void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
 
     // we want a specific object.
     const char* pObjectStr = pArgs->GetArg(1);
-    SoundObject* pObject = findObjectForNick(pObjectStr);
+    SoundObject* pObject = findObjectForNick(core::string_view(pObjectStr));
 
     if (!pObject) {
         X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);

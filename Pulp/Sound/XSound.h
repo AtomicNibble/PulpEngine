@@ -195,7 +195,7 @@ private:
     SoundObject* allocObject(void);
     void freeObject(SoundObject* pObject);
 
-    SoundObject* findObjectForNick(const char* pNick);
+    SoundObject* findObjectForNick(core::string_view name);
 
 private:
     static void postEventCallback_s(AkCallbackType eType, AkCallbackInfo* pCallbackInfo);
