@@ -163,6 +163,11 @@ struct equal_to<core::StackString<N>>
     {
         return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
+
+    bool operator()(const core::StackString<N>& lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
 };
 
 template<typename CharT>
