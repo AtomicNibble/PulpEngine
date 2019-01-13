@@ -111,26 +111,26 @@ StringRef<CharT>::operator const_str(void) const
 }
 
 template<typename CharT>
-typename StringRef<CharT>::const_pointer StringRef<CharT>::c_str(void) const
+constexpr typename StringRef<CharT>::const_pointer StringRef<CharT>::c_str(void) const
 {
     return str_;
 }
 
 template<typename CharT>
-typename StringRef<CharT>::const_pointer StringRef<CharT>::data(void) const
+constexpr typename StringRef<CharT>::const_pointer StringRef<CharT>::data(void) const
 {
     return str_;
 }
 
 // iterator
 template<typename CharT>
-typename StringRef<CharT>::const_iterator StringRef<CharT>::begin(void) const
+constexpr typename StringRef<CharT>::const_iterator StringRef<CharT>::begin(void) const
 {
     return str_;
 }
 
 template<typename CharT>
-typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
+constexpr typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
 {
     return str_ + length();
 }
@@ -139,21 +139,21 @@ typename StringRef<CharT>::const_iterator StringRef<CharT>::end(void) const
 
 // the length of the string
 template<typename CharT>
-typename StringRef<CharT>::size_type StringRef<CharT>::length(void) const
+constexpr typename StringRef<CharT>::size_type StringRef<CharT>::length(void) const
 {
     return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->length);
 }
 
 // same as length
 template<typename CharT>
-typename StringRef<CharT>::size_type StringRef<CharT>::size(void) const
+constexpr typename StringRef<CharT>::size_type StringRef<CharT>::size(void) const
 {
     return length();
 }
 
 // returns current size of allocated memory
 template<typename CharT>
-typename StringRef<CharT>::size_type StringRef<CharT>::capacity(void) const
+constexpr typename StringRef<CharT>::size_type StringRef<CharT>::capacity(void) const
 {
     return safe_static_cast<StringRef<CharT>::size_type, StringRef<CharT>::length_type>(header()->allocSize);
 }

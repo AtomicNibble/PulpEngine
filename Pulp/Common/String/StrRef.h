@@ -59,19 +59,19 @@ public:
     // I might disable the operator forcing c_str to be specified
     // makes it more clear what's been passed
     operator const_str(void) const;
-    const_pointer c_str(void) const;
-    const_pointer data(void) const;
+    constexpr const_pointer c_str(void) const;
+    constexpr const_pointer data(void) const;
 
     // iterator
-    const_iterator begin(void) const;
-    const_iterator end(void) const;
+    constexpr const_iterator begin(void) const;
+    constexpr const_iterator end(void) const;
 
     // the length of the string
-    size_type length(void) const;
+    constexpr size_type length(void) const;
     // same as length
-    size_type size(void) const;
+    constexpr size_type size(void) const;
     // returns current size of allocated memory
-    size_type capacity(void) const;
+    constexpr size_type capacity(void) const;
 
     bool isEmpty(void) const;
     bool isNotEmpty(void) const;
