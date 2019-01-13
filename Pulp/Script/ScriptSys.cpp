@@ -343,16 +343,16 @@ bool XScriptSys::processLoadedScript(Script* pScript)
     return true;
 }
 
-IScript* XScriptSys::findScript(const char* pFileName)
+IScript* XScriptSys::findScript(core::string_view name)
 {
-    core::Path<char> nameNoExt(pFileName);
+    core::Path<char> nameNoExt(name.begin(), name.end()); // TODO: skip extension in string view.
     nameNoExt.removeExtension();
 
-    core::string name(nameNoExt.begin(), nameNoExt.end());
+    core::string nameStr(nameNoExt.begin(), nameNoExt.end());
 
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
-    ScriptResource* pScript = scripts_.findAsset(name);
+    ScriptResource* pScript = scripts_.findAsset(nameStr);
     if (pScript) {
         return pScript;
     }
@@ -360,23 +360,23 @@ IScript* XScriptSys::findScript(const char* pFileName)
     return nullptr;
 }
 
-IScript* XScriptSys::loadScript(const char* pFileName)
+IScript* XScriptSys::loadScript(core::string_view name)
 {
     // I allow extension to be passed, unlike other assets, since it's allowed in includes.
-    core::Path<char> nameNoExt(pFileName);
+    core::Path<char> nameNoExt(name.begin(), name.end());
     nameNoExt.removeExtension();
 
-    core::string name(nameNoExt.begin(), nameNoExt.end());
+    core::string nameStr(nameNoExt.begin(), nameNoExt.end());
 
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
-    ScriptResource* pScriptRes = scripts_.findAsset(name);
+    ScriptResource* pScriptRes = scripts_.findAsset(nameStr);
     if (pScriptRes) {
         pScriptRes->addReference();
         return pScriptRes;
     }
 
-    pScriptRes = scripts_.createAsset(name, arena_, name);
+    pScriptRes = scripts_.createAsset(nameStr, arena_, nameStr);
 
     addLoadRequest(pScriptRes);
 
@@ -413,7 +413,7 @@ int32_t XScriptSys::onInclude(IFunctionHandler* pH)
             return pH->endFunction();
         }
 
-        Script* pScriptRes = static_cast<Script*>(findScript(pFileName));
+        Script* pScriptRes = static_cast<Script*>(findScript(core::string_view(pFileName)));
         if (!pScriptRes || !pScriptRes->isLoaded()) {
             if (missing.isNotEmpty()) {
                 missing.append(";");
@@ -445,8 +445,8 @@ void XScriptSys::proicessMissingIncludes(Script* pScript, const char* pBegin, co
 
     while (tokens.extractToken(range))
     {
-        core::StackString256 name(range.begin(), range.end());
-        Script* pInclude = static_cast<Script*>(loadScript(name.c_str()));
+        core::string_view name(range.begin(), range.end());
+        Script* pInclude = static_cast<Script*>(loadScript(name));
 
         pScript->setPendingInclude(X_ASSERT_NOT_NULL(pInclude));
     }
@@ -1258,7 +1258,7 @@ bool XScriptSys::processPreload(uint8_t* pData, size_t length)
 
         X_LOG0("Script", "Preload: \"%s\"", name.c_str());
 
-        auto* pScript = loadScript(name.c_str());
+        auto* pScript = loadScript(name);
 
         // re use this lock
         core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());

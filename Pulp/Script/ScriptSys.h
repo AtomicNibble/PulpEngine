@@ -77,8 +77,8 @@ public:
 
     void update(core::FrameData& frame) X_FINAL;
 
-    IScript* findScript(const char* pFileName) X_FINAL;
-    IScript* loadScript(const char* pFileName) X_FINAL;
+    IScript* findScript(core::string_view name) X_FINAL;
+    IScript* loadScript(core::string_view name) X_FINAL;
 
     bool waitForLoad(core::AssetBase* pScript) X_FINAL;
     bool waitForLoad(IScript* pScript) X_FINAL; // returns true if load succeed.
