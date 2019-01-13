@@ -176,30 +176,31 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
         // do we want to allow ref counted pixelBuffers?
         X_WARNING("TexMan", "Pixel buffer already exsists: \"%s\"", name.c_str());
         pTexRes->addReference();
+        return pTexRes;
     }
-    else {
-        pTexRes = textures_.createAsset(name, name);
 
-        threadPolicy.Leave();
+    pTexRes = textures_.createAsset(name, name);
 
-        // okay now we create the buffer resource.
-        if (type == render::PixelBufferType::DEPTH) {
-            render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(*pTexRes, clearDepthVal_, 0);
-            pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
-            pTexRes->setPixelBuffer(type, pDethBuf);
-        }
-        else if (type == render::PixelBufferType::COLOR) {
-            render::ColorBuffer* pColBuffer = X_NEW(render::ColorBuffer, arena_, "ColorBuffer")(*pTexRes);
-            pTexRes->setPixelBuffer(type, pColBuffer);
-        }
-        else if (type == render::PixelBufferType::SHADOW) {
-            X_ASSERT_NOT_IMPLEMENTED();
-        }
+    threadPolicy.Leave();
 
-        // check we have a pixel buf.
-        X_ASSERT_NOT_NULL(pTexRes->pPixelBuffer_);
-        X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")();
+    // okay now we create the buffer resource.
+    if (type == render::PixelBufferType::DEPTH) {
+        render::DepthBuffer* pDethBuf = X_NEW(render::DepthBuffer, arena_, "DepthBuffer")(*pTexRes, clearDepthVal_, 0);
+        pDethBuf->create(pDevice_, descriptorAlloc_, dim.x, dim.y, depthFmt_);
+        pTexRes->setPixelBuffer(type, pDethBuf);
     }
+    else if (type == render::PixelBufferType::COLOR) {
+        render::ColorBuffer* pColBuffer = X_NEW(render::ColorBuffer, arena_, "ColorBuffer")(*pTexRes);
+        pTexRes->setPixelBuffer(type, pColBuffer);
+    }
+    else if (type == render::PixelBufferType::SHADOW) {
+        X_ASSERT_NOT_IMPLEMENTED();
+    }
+
+    // check we have a pixel buf.
+    X_ASSERT_NOT_NULL(pTexRes->pPixelBuffer_);
+    X_ASSERT(pTexRes->getBufferType() != render::PixelBufferType::NONE, "Type not set")();
+    
 
     return pTexRes;
 }
