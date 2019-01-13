@@ -23,6 +23,8 @@ public:
     X_INLINE StrHash(const char* pBegin, const char* pEnd);
     X_INLINE constexpr explicit StrHash(Type hash);
 
+    X_INLINE constexpr StrHash& operator=(const StrHash& oth) = default;
+
     X_INLINE constexpr operator Type(void) const; /// Cast operator, returning the string's hash.
     X_INLINE constexpr Type hash(void) const;
 

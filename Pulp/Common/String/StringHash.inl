@@ -49,12 +49,12 @@ namespace internal
     }
 } // namespace internal
 
+
 X_INLINE constexpr StrHash::StrHash() :
     hash_((Type)-1)
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 template<typename T>
 X_INLINE StrHash::StrHash(const T& str) :
     hash_(
@@ -62,27 +62,25 @@ X_INLINE StrHash::StrHash(const T& str) :
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 X_INLINE StrHash::StrHash(const char* pStr, size_t length) :
     hash_(
         Hash::Fnv1aHash(pStr, length))
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 X_INLINE StrHash::StrHash(const char* pBegin, const char* pEnd) :
     hash_(
         Hash::Fnv1aHash(pBegin, safe_static_cast<size_t>(pEnd - pBegin)))
 {
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
 X_INLINE constexpr StrHash::StrHash(Type hash) :
     hash_(hash)
 {
 }
 
 // ---------------------------------------------------------------------------------------------------------------------
+
 X_INLINE constexpr StrHash::operator Type(void) const
 {
     return hash_;
