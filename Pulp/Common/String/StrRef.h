@@ -55,9 +55,6 @@ public:
     static const size_type npos = std::numeric_limits<size_type>::max();
 
 public:
-    // c_str & operator.
-    // I might disable the operator forcing c_str to be specified
-    // makes it more clear what's been passed
     constexpr const_pointer c_str(void) const;
     constexpr const_pointer data(void) const;
 
