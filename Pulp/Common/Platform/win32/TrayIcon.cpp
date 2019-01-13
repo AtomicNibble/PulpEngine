@@ -90,7 +90,7 @@ bool TrayIcon::CreateIcon(HWND hParent, core::string_view toolTip, uint32_t icon
     tnd_.uFlags = NIF_MESSAGE | NIF_ICON | NIF_TIP;
     tnd_.uCallbackMessage = ::RegisterWindowMessage(L"WM_TRAYICON");
 
-    core::strUtil::Convert(toolTip.data(), toolTip.data() + toolTip.length(), tnd_.szTip);
+    core::strUtil::Convert(toolTip, tnd_.szTip);
 
     hidden_ = bHidden;      // Starts hidden ?
     targetWnd_ = tnd_.hWnd; // Save target hWnd.

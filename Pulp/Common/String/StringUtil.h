@@ -13,6 +13,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+class string_view;
+
 namespace strUtil
 {
     namespace Asm
@@ -90,6 +92,9 @@ namespace strUtil
 
     template<size_t N>
     inline const wchar_t* Convert(const char* startInclusive, const char* endExclusive, wchar_t(&output)[N]);
+
+    template<size_t N>
+    inline const wchar_t* Convert(core::string_view input, wchar_t(&output)[N]);
 
     /// Converts a wide-character string into a single-byte character string, and returns the converted string.
     const char* Convert(const wchar_t* input, char* output, size_t outputBytes);

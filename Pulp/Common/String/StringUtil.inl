@@ -182,6 +182,12 @@ namespace strUtil
         return Convert(startInclusive, endExclusive, output, N * sizeof(wchar_t));
     }
 
+    template<size_t N>
+    inline const wchar_t* Convert(core::string_view input, wchar_t(&output)[N])
+    {
+        return Convert(input.begin(), input.end(), output, N * sizeof(wchar_t));
+    }
+
     inline const char* Convert(const wchar_t* startInclusive, const wchar_t* endExclusive, char* output, size_t outputBytes)
     {
         size_t bytesOut;
