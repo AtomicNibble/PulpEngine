@@ -2146,6 +2146,9 @@
       <Filter>Interfaces_h\Network</Filter>
     </ClCompile>
     <ClCompile Include="Util\Event.gen" />
+    <ClCompile Include="String\StringView.cpp">
+      <Filter>SourceFiles\String</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Natvis Include="Array.natvis">

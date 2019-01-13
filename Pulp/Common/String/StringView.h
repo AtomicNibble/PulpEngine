@@ -1,8 +1,11 @@
 #pragma once
 
-#include <String/StringUtil.h>
+#include <String\StringUtil.h>
 
 X_NAMESPACE_BEGIN(core)
+
+template<typename TChar>
+class StringRef;
 
 template<size_t N, typename TChar>
 class StackString;
@@ -28,8 +31,10 @@ public:
     constexpr string_view(const_pointer pStr, size_type length);
     constexpr string_view(const_pointer pBegin, const_pointer pEnd);
 
+    explicit string_view(const StringRef<value_type>& str);
+
     template<size_t N>
-    constexpr string_view(const core::StackString<N, value_type>& str);
+    constexpr string_view(const StackString<N, value_type>& str);
 
     constexpr string_view& operator=(const string_view&) = default;
 
@@ -74,14 +79,12 @@ constexpr string_view::string_view(const_pointer pBegin, const_pointer pEnd) :
 {
 }
 
-
 template<size_t N>
-constexpr string_view::string_view(const core::StackString<N, value_type>& str) :
+constexpr string_view::string_view(const StackString<N, value_type>& str) :
     pBegin_(str.data()),
     size_(str.length())
 {
 }
-
 
 constexpr typename string_view::const_reference string_view::operator[](const size_type idx) const
 {
