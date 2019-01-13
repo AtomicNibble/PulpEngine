@@ -41,7 +41,8 @@ void MatManager::ShutDown(void)
 bool MatManager::loadDefaultMaterial(void)
 {
     if (!pDefaultMtl_) {
-        pDefaultMtl_ = createMaterial_Internal(core::string(engine::MTL_DEFAULT_NAME));
+        core::string defaultStr(engine::MTL_DEFAULT_NAME);
+        pDefaultMtl_ = materials_.createAsset(defaultStr, defaultStr, arena_);
 
         // it's default :|
         pDefaultMtl_->setFlags(engine::MaterialFlag::DEFAULT | engine::MaterialFlag::STRUCTURAL);
@@ -69,37 +70,39 @@ engine::Material* MatManager::getDefaultMaterial(void) const
 
 void MatManager::addAssets(linker::AssetList& as) const
 {
+    core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
     for (auto& m : materials_) {
-        as.add(assetDb::AssetType::MATERIAL, m.first);
+        as.add(assetDb::AssetType::MATERIAL, m.second->getName());
     }
 }
 
-engine::Material* MatManager::loadMaterial(const char* pMtlName)
+engine::Material* MatManager::loadMaterial(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pMtlName);
-    X_ASSERT(core::strUtil::FileExtension(pMtlName) == nullptr, "Extension not allowed")(pMtlName); 
-
-    core::string name(pMtlName);
+    X_ASSERT(core::strUtil::FileExtension(name) == nullptr, "Extension not allowed")();
 
     auto it = nameOverRide_.find(name);
     if (it != nameOverRide_.end()) {
-        name = it->second;
+        name = core::string_view(it->second.data(), it->second.length());
     }
 
-    // try find it.
-    MaterialResource* pMatRes = findMaterial_Internal(name);
+    core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+    MaterialResource* pMatRes = materials_.findAsset(name);
     if (pMatRes) {
         pMatRes->addReference();
         return pMatRes;
     }
 
     // create a new material.
-    pMatRes = createMaterial_Internal(name);
-    if (loadMatFromFile(*pMatRes, name)) {
+    core::string nameStr(name.data(), name.length());
+
+    pMatRes = materials_.createAsset(nameStr, nameStr, arena_);
+    if (loadMatFromFile(*pMatRes, nameStr)) {
         return pMatRes;
     }
 
-    X_ERROR("MatMan", "Failed to load material: %s", pMtlName);
+    X_ERROR("MatMan", "Failed to load material: %s", nameStr);
 
     pMatRes->assignProps(*pDefaultMtl_);
     return pMatRes;
@@ -158,19 +161,5 @@ bool MatManager::getMatPath(const core::string& name, core::Path<char>& path)
     return true;
 }
 
-MatManager::MaterialResource* MatManager::createMaterial_Internal(core::string& name)
-{
-    // internal create expects you to know no duplicates
-    X_ASSERT(findMaterial_Internal(name) == nullptr, "Creating a material that already exsists")(); 
-
-    auto pMatRes = materials_.createAsset(name, name, arena_);
-
-    return pMatRes;
-}
-
-MatManager::MaterialResource* MatManager::findMaterial_Internal(const core::string& name) const
-{
-    return materials_.findAsset(name);
-}
 
 X_NAMESPACE_END

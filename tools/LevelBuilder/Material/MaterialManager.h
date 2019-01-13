@@ -26,7 +26,7 @@ public:
     bool Init(void);
     void ShutDown(void);
 
-    engine::Material* loadMaterial(const char* MtlName);
+    engine::Material* loadMaterial(core::string_view name);
     void releaseMaterial(engine::Material* pMat);
 
     engine::Material* getDefaultMaterial(void) const;
@@ -41,10 +41,6 @@ private:
     bool loadMatFromFile(MaterialResource& mat, const core::string& name);
 
     bool getMatPath(const core::string& name, core::Path<char>& path);
-
-    // only call if you know don't exsists in map.
-    MaterialResource* createMaterial_Internal(core::string& name);
-    MaterialResource* findMaterial_Internal(const core::string& name) const;
 
 private:
     core::MemoryArenaBase* arena_;

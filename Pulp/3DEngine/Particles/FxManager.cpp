@@ -247,7 +247,7 @@ namespace fx
         sorted_efxs.reserve(effects_.size());
 
         for (const auto& mat : effects_) {
-            if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.first)) {
+            if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, mat.second->getName())) {
                 sorted_efxs.push_back(mat.second);
             }
         }

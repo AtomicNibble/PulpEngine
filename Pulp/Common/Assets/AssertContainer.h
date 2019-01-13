@@ -10,7 +10,7 @@
 #include <Containers\Array.h>
 #include <Containers\Fifo.h>
 
-#include <String\Path.h>
+#include <String\StringHash.h>
 
 // for new
 #include <IAssetDb.h>
@@ -144,7 +144,7 @@ class AssetContainer : private AssetPoolRefCounted<AssetType, MaxAssets, core::S
 
 public:
     typedef typename Pool::AssetResource Resource;
-    typedef core::FixedHashTable<core::string, Resource*> ResourceMap;
+    typedef core::FixedHashTable<core::StrHash, Resource*> ResourceMap;
     typedef core::Array<Resource*> ResourceList;
     typedef core::Fifo<int32_t> IndexList;
 
@@ -197,7 +197,9 @@ public:
     {
         X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")(name.c_str());
 
-        auto it = hash_.find(name);
+        core::StrHash hash(name.data(), name.length());
+
+        auto it = hash_.find(hash);
         if (it != hash_.end()) {
             return it->second;
         }
@@ -205,11 +207,13 @@ public:
         return nullptr;
     }
 
-    X_INLINE Resource* findAsset(core::string_view str) const
+    X_INLINE Resource* findAsset(core::string_view name) const
     {
-        X_ASSERT(strUtil::Find(str.data(), str.data() + str.length(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();
+        X_ASSERT(strUtil::Find(name.data(), name.data() + name.length(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();
 
-        auto it = hash_.find(str);
+        core::StrHash hash(name.data(), name.length());
+
+        auto it = hash_.find(hash);
         if (it != hash_.end()) {
             return it->second;
         }
@@ -227,9 +231,11 @@ public:
     {
         X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")(name.c_str());
 
+        core::StrHash hash(name.data(), name.length());
+
         Resource* pRes = Pool::allocate(std::forward<Args>(args)...);
 
-        hash_.emplace(name, pRes);
+        hash_.emplace(hash, pRes);
 
         int32_t id;
 

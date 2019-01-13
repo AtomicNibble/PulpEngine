@@ -428,7 +428,7 @@ namespace shader
         sorted_shaders.reserve(hwShaders_.size());
 
         for (const auto& shader : hwShaders_) {
-            if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, shader.first)) {
+            if (!pSearchPattern || core::strUtil::WildCompare(pSearchPattern, shader.second->getName())) {
                 sorted_shaders.emplace_back(shader.second);
             }
         }
@@ -531,7 +531,7 @@ namespace shader
 
             for (const auto& shader : hwShaders_) {
                 if (shader.second->getShaderSource() == pSource->getName()) {
-                    X_LOG0("Shader", "Reloading: %s", shader.first.c_str());
+                    X_LOG0("Shader", "Reloading: %s", shader.second->getName().c_str());
                     shader.second->markStale();
                 }
             }

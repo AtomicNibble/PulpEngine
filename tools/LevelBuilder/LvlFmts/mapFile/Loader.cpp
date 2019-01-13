@@ -296,7 +296,8 @@ namespace mapFile
                 DEFAULT_CURVE_MAX_LENGTH, true);
         }
 
-        engine::Material* pMaterial = matMan_.loadMaterial(patch.GetMatName());
+        const auto& name = patch.GetMatName();
+        engine::Material* pMaterial = matMan_.loadMaterial(core::string_view(name.data(), name.length()));
 
         X_ASSERT_NOT_NULL(pMaterial);
         // this code seams to expect material to always load?
