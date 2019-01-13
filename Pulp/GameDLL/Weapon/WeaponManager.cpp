@@ -259,7 +259,7 @@ namespace weapon
 
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
-        auto* pWeaponRes = weaponDefs_.findAsset(name);
+        auto* pWeaponRes = weaponDefs_.findAsset(core::string_view(name));
         if (!pWeaponRes) {
             X_LOG1("WeaponDef", "Not reloading \"%s\" it's not currently used", name.c_str());
             return false;

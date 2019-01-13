@@ -222,7 +222,7 @@ namespace fx
 
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
-        EffectResource* pEffectRes = effects_.findAsset(name);
+        EffectResource* pEffectRes = effects_.findAsset(core::string_view(name));
 
         // so i wnat to reload the fx :D
         if (!pEffectRes) {

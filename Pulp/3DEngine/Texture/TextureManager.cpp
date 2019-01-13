@@ -341,7 +341,7 @@ bool TextureManager::onFileChanged(const core::AssetName& assetName, const core:
 
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
-    auto* pTextureRes = textures_.findAsset(name);
+    auto* pTextureRes = textures_.findAsset(core::string_view(name));
     if (!pTextureRes) {
         X_LOG1("Texture", "Not reloading \"%s\" it's not currently used", name.c_str());
         return false;

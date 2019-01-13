@@ -193,20 +193,6 @@ public:
         freeList_.free();
     }
 
-    X_INLINE Resource* findAsset(const core::string& name) const
-    {
-        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")(name.c_str());
-
-        core::StrHash hash(name.data(), name.length());
-
-        auto it = hash_.find(hash);
-        if (it != hash_.end()) {
-            return it->second;
-        }
-
-        return nullptr;
-    }
-
     X_INLINE Resource* findAsset(core::string_view name) const
     {
         X_ASSERT(strUtil::Find(name.begin(), name.end(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();

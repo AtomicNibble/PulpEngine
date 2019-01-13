@@ -456,30 +456,18 @@ X_INLINE void TextureManager::releasePixelBuffer_internal(render::IPixelBuffer* 
     }
 }
 
-TextureManager::TexRes* TextureManager::findTexture(const char* pName)
-{
-    core::string name(pName);
-    return findTexture(name);
-}
-
-TextureManager::TexRes* TextureManager::findTexture(const core::string& name)
+TextureManager::TexRes* TextureManager::findTexture(core::string_view name)
 {
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
     return textures_.findAsset(name);
 }
 
-bool TextureManager::reloadForName(const char* pName)
+bool TextureManager::reloadForName(core::string_view name)
 {
-    X_ASSERT_NOT_NULL(pName);
-
-    // all asset names need forward slashes, for the hash.
-    core::Path<char> path(pName);
-    path.replaceAll('\\', '/');
-
-    Texture* pTex = findTexture(path.c_str());
+    Texture* pTex = findTexture(name);
     if (!pTex) {
-        X_WARNING("Texture", "Failed to find texture(%s) for reloading", pName);
+        X_WARNING("Texture", "Failed to find texture(%*.s) for reloading", name.length(), name.data());
         return false;
     }
 

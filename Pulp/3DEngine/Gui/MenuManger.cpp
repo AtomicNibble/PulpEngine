@@ -180,7 +180,7 @@ namespace gui
 
         core::ScopedLock<MenuContainer::ThreadPolicy> lock(menus_.getThreadPolicy());
 
-        auto* pMenuRes = menus_.findAsset(name);
+        auto* pMenuRes = menus_.findAsset(core::string_view(name));
         if (!pMenuRes) {
             X_LOG1("MenuManager", "Not reloading \"%s\" it's not currently used", name.c_str());
             return false;

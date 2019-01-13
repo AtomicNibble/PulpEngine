@@ -252,7 +252,7 @@ bool XModelManager::onFileChanged(const core::AssetName& assetName, const core::
 
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
 
-    auto* pModelRes = models_.findAsset(name);
+    auto* pModelRes = models_.findAsset(core::string_view(name));
     if (!pModelRes) {
         X_LOG1("ModelManager", "Not reloading \"%s\" it's not currently used", name.c_str());
         return false;

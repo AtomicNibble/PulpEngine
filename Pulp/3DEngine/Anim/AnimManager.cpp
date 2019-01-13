@@ -201,7 +201,7 @@ bool AnimManager::onFileChanged(const core::AssetName& assetName, const core::st
 
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
-    auto* pAnimRes = anims_.findAsset(name);
+    auto* pAnimRes = anims_.findAsset(core::string_view(name));
     if (!pAnimRes) {
         X_LOG1("Anim", "Not reloading \"%s\" it's not currently used", name.c_str());
         return false;
