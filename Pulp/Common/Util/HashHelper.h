@@ -141,7 +141,7 @@ struct equal_to<core::string>
 
     bool operator()(const core::string& lhs, const core::string_view& rhs) const
     {
-        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.data(), rhs.data() + rhs.length());
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
     }
 };
 

@@ -344,7 +344,7 @@ namespace strUtil
 
     X_INLINE const char* FileExtension(core::string_view path)
     {
-        return FileExtension(path.data(), path.data() + path.length());
+        return FileExtension(path.begin(), path.end());
     }
 
 

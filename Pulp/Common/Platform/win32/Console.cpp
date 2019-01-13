@@ -131,7 +131,7 @@ Console::~Console(void)
 /// Sets the console title.
 void Console::setTitle(core::string_view title)
 {
-    core::StackStringW256 str(title.data(), title.data() + title.length());
+    core::StackStringW256 str(title.begin(), title.end());
 
     ::SetConsoleTitleW(str.c_str());
 }

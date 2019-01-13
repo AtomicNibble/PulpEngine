@@ -80,8 +80,8 @@ namespace msgbox
         flags |= getFlags(style);
         flags |= getButtons(buttons);
 
-        core::StackStringW256 msgW(msg.data(), msg.data() + msg.length());
-        core::StackStringW256 titleW(title.data(), title.data() + title.length());
+        core::StackStringW256 msgW(msg.begin(), msg.end());
+        core::StackStringW256 titleW(title.begin(), title.end());
 
         return getSelection(MessageBoxW(nullptr, msgW.c_str(), titleW.c_str(), flags));
     }
