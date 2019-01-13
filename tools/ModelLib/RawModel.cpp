@@ -62,7 +62,7 @@ namespace RawModel
         return bones_.size();
     }
 
-    const char* Model::getBoneName(size_t idx) const
+    const core::string& Model::getBoneName(size_t idx) const
     {
         return bones_[idx].name_;
     }

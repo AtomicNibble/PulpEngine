@@ -51,7 +51,7 @@ namespace RawModel
         bool hasColMeshes(void) const;
 
         size_t getNumBones(void) const;
-        const char* getBoneName(size_t idx) const;
+        const core::string& getBoneName(size_t idx) const;
         const Quatf getBoneAngle(size_t idx) const;
         const Vec3f getBonePos(size_t idx) const;
 
