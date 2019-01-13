@@ -58,7 +58,7 @@ namespace mapFile
         X_INLINE XMapBrushSide(void);
         X_INLINE ~XMapBrushSide(void);
 
-        X_INLINE const char* GetMaterialName(void) const;
+        X_INLINE const MaterialName& GetMaterialName(void) const;
         X_INLINE const Planef& GetPlane(void) const;
         X_INLINE const MaterialInfo& GetMaterial(void) const;
         X_INLINE const MaterialInfo& GetLightMap(void) const;
@@ -122,7 +122,7 @@ namespace mapFile
 
         X_INLINE void SetMesh(bool b);
         X_INLINE const bool isMesh(void) const;
-        X_INLINE const char* GetMatName(void) const;
+        X_INLINE const core::string& GetMatName(void) const;
 
         // Subdived util.
         void Subdivide(float maxHorizontalError, float maxVerticalError,

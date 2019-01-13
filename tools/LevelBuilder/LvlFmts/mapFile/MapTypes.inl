@@ -45,9 +45,9 @@ namespace mapFile
     {
     }
 
-    const char* XMapBrushSide::GetMaterialName(void) const
+    const MaterialName& XMapBrushSide::GetMaterialName(void) const
     {
-        return material_.name.c_str();
+        return material_.name;
     }
 
     const Planef& XMapBrushSide::GetPlane(void) const
@@ -154,9 +154,9 @@ namespace mapFile
         return isMesh_;
     }
 
-    const char* XMapPatch::GetMatName(void) const
+    const core::string& XMapPatch::GetMatName(void) const
     {
-        return matName_.c_str();
+        return matName_;
     }
 
     // ======================
