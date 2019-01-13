@@ -75,8 +75,9 @@ constexpr string_view::string_view(const_pointer pStr, size_type length) :
 
 constexpr string_view::string_view(const_pointer pBegin, const_pointer pEnd) :
     pBegin_(pBegin),
-    size_(pBegin - pEnd)
+    size_(pEnd - pBegin)
 {
+    X_ASSERT((pEnd - pBegin) >= 0, "Invalid range")(pBegin, pEnd);
 }
 
 template<size_t N>
