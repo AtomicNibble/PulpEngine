@@ -19,7 +19,7 @@ namespace gui
     class Menu : public IMenu, public core::AssetBase
     {
     public:
-        Menu(core::string& name);
+        Menu(core::string_view name);
         ~Menu() X_OVERRIDE;
 
         void draw(core::FrameData& frame);

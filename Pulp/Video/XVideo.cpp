@@ -110,7 +110,7 @@ namespace
 } // namespace
 
 
-Video::Video(core::string name, const VideoVars& vars, core::MemoryArenaBase* arena) :
+Video::Video(core::string_view name, const VideoVars& vars, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::VIDEO),
     vars_(vars),
     frameRate_(0),

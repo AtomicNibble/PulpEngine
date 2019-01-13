@@ -83,7 +83,7 @@ class Video : public core::AssetBase
     using TrackFrameHistory = std::array<FrameHistory<T>, TrackType::ENUM_COUNT>;
 
 public:
-    Video(core::string name, const VideoVars& vars, core::MemoryArenaBase* arena);
+    Video(core::string_view name, const VideoVars& vars, core::MemoryArenaBase* arena);
     virtual ~Video();
 
     void play(void);

@@ -79,7 +79,7 @@ class Anim : public core::AssetBase
     typedef core::Array<Transformf> TransformArr;
 
 public:
-    ANIMLIB_EXPORT Anim(core::string& name, core::MemoryArenaBase* arena);
+    ANIMLIB_EXPORT Anim(core::string_view name, core::MemoryArenaBase* arena);
     ANIMLIB_EXPORT ~Anim();
 
     X_INLINE int32_t getNumBones(void) const;

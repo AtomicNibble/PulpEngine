@@ -17,7 +17,7 @@ namespace fx
         X_NO_ASSIGN(Effect);
 
     public:
-        Effect(core::string& name, core::MemoryArenaBase* arena);
+        Effect(core::string_view name, core::MemoryArenaBase* arena);
         ~Effect();
 
         bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);

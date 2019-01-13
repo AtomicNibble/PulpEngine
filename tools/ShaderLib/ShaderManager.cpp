@@ -361,7 +361,7 @@ namespace shader
         const core::string& entry, const core::string& customDefines, const core::string& sourceFile,
         const shader::PermatationFlags permFlags, ILFlags ILFlags)
     {
-        core::StackString512 name;
+        core::StackString256 name;
 
         const char* pEntry = DEFAULT_SHADER_ENTRY[type];
         if (entry.isNotEmpty()) {
@@ -384,22 +384,22 @@ namespace shader
         X_LOG1("Shader", "Load: \"%s\"", name.c_str());
 #endif // !X_DEBUG
 
-        core::string nameStr(name.begin(), name.end());
+        core::string_view nameView(name);
 
         // we must have a single lock during the find and create otherwise we have a race.
         core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
-        HWShaderResource* pHWShaderRes = hwShaders_.findAsset(nameStr);
+        HWShaderResource* pHWShaderRes = hwShaders_.findAsset(nameView);
         if (pHWShaderRes) {
             pHWShaderRes->addReference();
             return pHWShaderRes;
         }
 
         pHWShaderRes = hwShaders_.createAsset(
-            nameStr,
+            nameView,
+            nameView,
             vars_,
             type,
-            nameStr,
             entry,
             customDefines,
             sourceFile,

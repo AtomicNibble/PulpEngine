@@ -223,7 +223,7 @@ Vec3f Bone::GetPostion(int32_t idx) const
 
 // ----------------------------------
 
-Anim::Anim(core::string& name, core::MemoryArenaBase* arena) :
+Anim::Anim(core::string_view name, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::ANIM),
     bones_(arena),
     pNoteHdr_(nullptr),

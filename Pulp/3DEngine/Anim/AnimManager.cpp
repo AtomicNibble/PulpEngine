@@ -76,9 +76,7 @@ Anim* AnimManager::loadAnim(core::string_view name)
         return pAnimRes;
     }
 
-    // we create a anim and give it back
-    core::string nameStr(name.data(), name.length());
-    pAnimRes = anims_.createAsset(nameStr, nameStr, arena_);
+    pAnimRes = anims_.createAsset(name, name, arena_);
 
     // add to list of anims that need loading.
     addLoadRequest(pAnimRes);

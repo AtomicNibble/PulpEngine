@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 namespace gui
 {
 
-    Menu::Menu(core::string& name) :
+    Menu::Menu(core::string_view name) :
         core::AssetBase(name, assetDb::AssetType::MENU),
         pScriptTable_(nullptr)
     {

@@ -16,7 +16,7 @@ namespace weapon
         typedef std::array<engine::fx::Effect*, AnimSlot::ENUM_COUNT> EffectArr;
 
     public:
-        WeaponDef(core::string& name);
+        WeaponDef(core::string_view name);
 
 		bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
         void assignProps(const WeaponDef& oth);

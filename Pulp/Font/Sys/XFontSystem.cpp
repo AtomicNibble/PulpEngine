@@ -118,8 +118,7 @@ IFont* XFontSystem::loadFont(core::string_view name)
         return pFontRes;
     }
 
-    core::string nameStr(name.data(), name.length());
-    pFontRes = fonts_.createAsset(nameStr, *this, nameStr);
+    pFontRes = fonts_.createAsset(name, name, *this);
 
     addLoadRequest(pFontRes);
 

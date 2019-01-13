@@ -116,8 +116,7 @@ namespace fx
         }
 
         // we create a anim and give it back
-        core::string nameStr(name.data(), name.length());
-        pEffectRes = effects_.createAsset(nameStr, nameStr, arena_);
+        pEffectRes = effects_.createAsset(name, name, arena_);
 
         // add to list of anims that need loading.
         addLoadRequest(pEffectRes);

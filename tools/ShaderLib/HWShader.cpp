@@ -22,11 +22,11 @@ namespace shader
 {
     // -------------------------------------------------------------------
 
-    XHWShader::XHWShader(const ShaderVars& vars, ShaderType::Enum type, const core::string& name,
+    XHWShader::XHWShader(core::string_view name, const ShaderVars& vars, ShaderType::Enum type,
         const core::string& entry, const core::string& customDefines,
         const core::string& sourceFile, PermatationFlags permFlags, ILFlags ILFlags, core::MemoryArenaBase* arena) :
+        name_(name.data(), name.length()),
         vars_(vars),
-        name_(name),
         entryPoint_(entry),
         customDefines_(customDefines),
         sourceFile_(sourceFile),

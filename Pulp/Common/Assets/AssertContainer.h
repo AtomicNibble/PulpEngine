@@ -227,9 +227,9 @@ public:
     }
 
     template<class... Args>
-    Resource* createAsset(const core::string& name, Args&&... args)
+    Resource* createAsset(core::string_view name, Args&&... args)
     {
-        X_ASSERT(name.find(assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")(name.c_str());
+        X_ASSERT(strUtil::Find(name.begin(), name.end(), assetDb::ASSET_NAME_INVALID_SLASH) == nullptr, "asset name has invalid slash")();
 
         core::StrHash hash(name.data(), name.length());
 

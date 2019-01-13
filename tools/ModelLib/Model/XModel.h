@@ -25,7 +25,7 @@ class XModel : public core::AssetBase
     typedef core::Array<Matrix44f> MatrixArr;
 
 public:
-    MODELLIB_EXPORT XModel(core::string& name);
+    MODELLIB_EXPORT XModel(core::string_view name);
     MODELLIB_EXPORT virtual ~XModel();
 
     X_INLINE int32_t getNumLods(void) const;

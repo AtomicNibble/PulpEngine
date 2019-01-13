@@ -86,7 +86,7 @@ Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
             return pTexRes;
         }
 
-        pTexRes = textures_.createAsset(name, core::string(pNickName));
+        pTexRes = textures_.createAsset(core::string_view(name), core::string(pNickName));
     }
 
     return pTexRes;
@@ -95,7 +95,7 @@ Texture* TextureManager::getDeviceTexture(int32_t id, const char* pNickName)
 Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
     texture::Texturefmt::Enum fmt, render::BufUsage::Enum usage, const uint8_t* pInitialData)
 {
-    core::string name(pNickName);
+    core::string_view name(pNickName);
 
     auto& threadPolicy = textures_.getThreadPolicy();
     threadPolicy.Enter();
@@ -107,50 +107,50 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
 
         pTexRes->addReference();
 
-        X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%s\"", pNickName);
+        X_WARNING("Texture", "Created texture with matching name of exsisting texture, returning original: \"%*.s\"", name.length(), name.data());
         if (pInitialData) {
             // update?
         }
+        return pTexRes;
     }
-    else {
-        pTexRes = textures_.createAsset(name, name);
 
-        pTexRes->setDepth(1);
-        pTexRes->setNumFaces(1);
-        pTexRes->setNumMips(1);
-        pTexRes->setWidth(dim.x);
-        pTexRes->setHeight(dim.y);
-        pTexRes->setFormat(fmt);
-        pTexRes->setType(texture::TextureType::T2D);
-        pTexRes->setUsage(usage);
+    pTexRes = textures_.createAsset(name, core::string(name.data(), name.length()));
 
-        if (!initDeviceTexture(pTexRes)) {
-            X_ERROR("Texture", "Failed to create device texture");
+    pTexRes->setDepth(1);
+    pTexRes->setNumFaces(1);
+    pTexRes->setNumMips(1);
+    pTexRes->setWidth(dim.x);
+    pTexRes->setHeight(dim.y);
+    pTexRes->setFormat(fmt);
+    pTexRes->setType(texture::TextureType::T2D);
+    pTexRes->setUsage(usage);
+
+    if (!initDeviceTexture(pTexRes)) {
+        X_ERROR("Texture", "Failed to create device texture");
+    }
+
+    if (pInitialData) {
+        // need to refactor to make this nicer todo without duplication of logic.
+
+        D3D12_SUBRESOURCE_DATA texResource;
+        {
+            const size_t rowBytes = Util::rowBytes(pTexRes->getWidth(), 1, pTexRes->getFormat());
+
+            texResource.pData = pInitialData;
+            texResource.RowPitch = rowBytes;
+            texResource.SlicePitch = texResource.RowPitch * pTexRes->getHeight();
         }
 
-        if (pInitialData) {
-            // need to refactor to make this nicer todo without duplication of logic.
-
-            D3D12_SUBRESOURCE_DATA texResource;
-            {
-                const size_t rowBytes = Util::rowBytes(pTexRes->getWidth(), 1, pTexRes->getFormat());
-
-                texResource.pData = pInitialData;
-                texResource.RowPitch = rowBytes;
-                texResource.SlicePitch = texResource.RowPitch * pTexRes->getHeight();
-            }
-
-            if (!updateTextureData(pTexRes, 1, &texResource)) {
-                // we should mark the texture as invalid.
-            }
+        if (!updateTextureData(pTexRes, 1, &texResource)) {
+            // we should mark the texture as invalid.
         }
-
-        // TEMP
-        // don't let another thread get this texture till it's fully init.
-        // kinda lame tho, since pretty long lock time.
-        // should do something per texture.
-        threadPolicy.Leave();
     }
+
+    // TEMP
+    // don't let another thread get this texture till it's fully init.
+    // kinda lame tho, since pretty long lock time.
+    // should do something per texture.
+    threadPolicy.Leave();
 
     return pTexRes;
 }
@@ -158,8 +158,7 @@ Texture* TextureManager::createTexture(const char* pNickName, Vec2i dim,
 Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uint32_t numMips,
     render::PixelBufferType::Enum type)
 {
-    core::string name(pNickName);
-
+    core::string_view name(pNickName);
     //
     //	For pixel buffers we store them in the same texture pool / hash
     //	This has a number of benfits in that pixel buffers are listed in texture list.
@@ -174,12 +173,12 @@ Texture* TextureManager::createPixelBuffer(const char* pNickName, Vec2i dim, uin
         threadPolicy.Leave();
 
         // do we want to allow ref counted pixelBuffers?
-        X_WARNING("TexMan", "Pixel buffer already exsists: \"%s\"", name.c_str());
+        X_WARNING("TexMan", "Pixel buffer already exsists: \"%*.s\"", name.length(), name.data());
         pTexRes->addReference();
         return pTexRes;
     }
 
-    pTexRes = textures_.createAsset(name, name);
+    pTexRes = textures_.createAsset(name, core::string(name.data(), name.length()));
 
     threadPolicy.Leave();
 

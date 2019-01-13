@@ -40,7 +40,7 @@ namespace
     };
 } // namespace
 
-XFont::XFont(XFontSystem& fontSys, core::string& name) :
+XFont::XFont(core::string_view name, XFontSystem& fontSys) :
     core::AssetBase(name, assetDb::AssetType::FONT),
     fontSys_(fontSys),
     pFontTexture_(nullptr),

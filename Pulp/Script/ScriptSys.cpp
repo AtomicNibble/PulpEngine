@@ -348,11 +348,11 @@ IScript* XScriptSys::findScript(core::string_view name)
     core::Path<char> nameNoExt(name.begin(), name.end()); // TODO: skip extension in string view.
     nameNoExt.removeExtension();
 
-    core::string nameStr(nameNoExt.begin(), nameNoExt.end());
+    core::string_view nameView(nameNoExt.begin(), nameNoExt.end());
 
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
-    ScriptResource* pScript = scripts_.findAsset(nameStr);
+    ScriptResource* pScript = scripts_.findAsset(nameView);
     if (pScript) {
         return pScript;
     }
@@ -366,17 +366,17 @@ IScript* XScriptSys::loadScript(core::string_view name)
     core::Path<char> nameNoExt(name.begin(), name.end());
     nameNoExt.removeExtension();
 
-    core::string nameStr(nameNoExt.begin(), nameNoExt.end());
+    core::string_view nameView(nameNoExt.begin(), nameNoExt.end());
 
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
-    ScriptResource* pScriptRes = scripts_.findAsset(nameStr);
+    ScriptResource* pScriptRes = scripts_.findAsset(nameView);
     if (pScriptRes) {
         pScriptRes->addReference();
         return pScriptRes;
     }
 
-    pScriptRes = scripts_.createAsset(nameStr, arena_, nameStr);
+    pScriptRes = scripts_.createAsset(nameView, nameView, arena_);
 
     addLoadRequest(pScriptRes);
 

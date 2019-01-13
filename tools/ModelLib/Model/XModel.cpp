@@ -8,7 +8,7 @@
 
 X_NAMESPACE_BEGIN(model)
 
-XModel::XModel(core::string& name) :
+XModel::XModel(core::string_view name) :
     core::AssetBase(name, assetDb::AssetType::MODEL),
     inverseBones_(g_ModelLibArena)
 {

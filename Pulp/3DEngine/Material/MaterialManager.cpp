@@ -146,8 +146,7 @@ Material* XMaterialManager::loadMaterial(core::string_view name)
             return pMatRes;
         }
 
-        core::string nameStr(name.data(), name.length());
-        pMatRes = materials_.createAsset(nameStr, nameStr, arena_);
+        pMatRes = materials_.createAsset(name, name, arena_);
     }
 
     // add to list of Materials that need loading.

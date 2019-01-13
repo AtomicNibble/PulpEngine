@@ -130,7 +130,7 @@ public:
     typedef core::Array<Sampler> SamplerArr;
 
 public:
-    X_INLINE Material(core::string& name, core::MemoryArenaBase* arena);
+    X_INLINE Material(core::string_view name, core::MemoryArenaBase* arena);
     ~Material() = default;
 
     X_INLINE Tech* getTech(core::StrHash hash, render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags);

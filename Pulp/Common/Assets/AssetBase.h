@@ -10,7 +10,7 @@ typedef int32_t AssetID;
 class AssetBase
 {
 public:
-    AssetBase(core::string& name, assetDb::AssetType::Enum type);
+    AssetBase(core::string_view name, assetDb::AssetType::Enum type);
 
     X_INLINE const AssetID getID(void) const;
     X_INLINE void setID(AssetID id);
@@ -32,8 +32,8 @@ protected:
     assetDb::AssetType::Enum type_;
 };
 
-X_INLINE AssetBase::AssetBase(core::string& name, assetDb::AssetType::Enum type) :
-    name_(name),
+X_INLINE AssetBase::AssetBase(core::string_view name, assetDb::AssetType::Enum type) :
+    name_(name.data(), name.length()),
     id_(-1),
     status_(core::LoadStatus::NotLoaded),
     type_(type)

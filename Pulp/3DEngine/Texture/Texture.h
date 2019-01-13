@@ -10,7 +10,7 @@ X_NAMESPACE_BEGIN(engine)
 class Texture : public core::AssetBase
 {
 public:
-    Texture(core::string name, texture::TextureFlags flags, render::IDeviceTexture* pDeviceTexture);
+    Texture(core::string_view name, texture::TextureFlags flags, render::IDeviceTexture* pDeviceTexture);
     ~Texture() = default;
 
     X_INLINE const int32_t getDeviceID(void) const;

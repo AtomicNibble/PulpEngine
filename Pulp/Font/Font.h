@@ -31,7 +31,7 @@ class XFont : public IFont, public core::AssetBase
 {
 public:
 public:
-    XFont(XFontSystem& fontSys, core::string& name);
+    XFont(core::string_view name, XFontSystem& fontSys);
     ~XFont();
 
     // IFont

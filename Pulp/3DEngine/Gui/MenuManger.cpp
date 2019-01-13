@@ -101,8 +101,7 @@ namespace gui
         }
 
         // we create a model and give it back
-        core::string nameStr(name.data(), name.length());
-        pMenu = menus_.createAsset(nameStr, nameStr);
+        pMenu = menus_.createAsset(name, name);
 
         addLoadRequest(pMenu);
 

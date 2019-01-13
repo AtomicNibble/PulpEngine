@@ -170,6 +170,7 @@ Texture* TextureManager::loadTexture(core::string_view name, texture::TextureFla
         pTexRes->addReference();
     }
     else {
+        // TODO: remove.
         core::string nameStr(name.data(), name.length());
 
         auto* pDevicTex = gEnv->pRender->getDeviceTexture(currentDeviceTexId_++, nameStr.c_str());
@@ -177,7 +178,7 @@ Texture* TextureManager::loadTexture(core::string_view name, texture::TextureFla
             return nullptr;
         }
 
-        pTexRes = textures_.createAsset(nameStr, nameStr, flags, pDevicTex);
+        pTexRes = textures_.createAsset(name, name, flags, pDevicTex);
         threadPolicy.Leave();
 
         addLoadRequest(pTexRes);

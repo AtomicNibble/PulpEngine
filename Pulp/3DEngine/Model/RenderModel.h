@@ -18,7 +18,7 @@ class RenderModel : public XModel
     X_NO_ASSIGN(RenderModel);
 
 public:
-    RenderModel(core::string& name);
+    RenderModel(core::string_view name);
     ~RenderModel() X_OVERRIDE;
 
     X_INLINE const XRenderMesh& getLodRenderMesh(size_t idx) const;

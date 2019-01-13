@@ -5,7 +5,7 @@ X_NAMESPACE_BEGIN(script)
 
 using namespace lua;
 
-Script::Script(core::MemoryArenaBase* arena, core::string& name) :
+Script::Script(core::string_view name, core::MemoryArenaBase* arena) :
     core::AssetBase(name, assetDb::AssetType::SCRIPT),
     dataSize_(0),
     chunk_(lua::Ref::Nil),

@@ -122,9 +122,8 @@ IVideo* XVideoSys::loadVideo(core::string_view name)
         pVideoRes->addReference();
         return pVideoRes;
     }
-
-    core::string nameStr(name.data(), name.length());
-    pVideoRes = videos_.createAsset(nameStr, nameStr, vars_, blockArena_);
+    
+    pVideoRes = videos_.createAsset(name, name, vars_, blockArena_);
 
     queueLoadRequest(pVideoRes);
 

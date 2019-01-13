@@ -7,7 +7,7 @@
 
 X_NAMESPACE_BEGIN(model)
 
-RenderModel::RenderModel(core::string& name) :
+RenderModel::RenderModel(core::string_view name) :
     XModel(name)
 {
 }

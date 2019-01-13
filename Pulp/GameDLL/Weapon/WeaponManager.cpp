@@ -111,8 +111,7 @@ namespace weapon
                 return pWeaponDefRes;
             }
 
-            core::string nameStr(name.data(), name.length());
-            pWeaponDefRes = weaponDefs_.createAsset(nameStr, nameStr);
+            pWeaponDefRes = weaponDefs_.createAsset(name, name);
         }
 
         addLoadRequest(pWeaponDefRes);

@@ -9,7 +9,7 @@ X_NAMESPACE_BEGIN(game)
 
 namespace weapon
 {
-    WeaponDef::WeaponDef(core::string& name) :
+    WeaponDef::WeaponDef(core::string_view name) :
         AssetBase(name, assetDb::AssetType::WEAPON),
         ammoTypeId_(weapon::INVALID_AMMO_TYPE),
 		pHdr_(nullptr)

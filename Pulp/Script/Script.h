@@ -17,7 +17,7 @@ public:
     typedef core::Hash::xxHash64::HashVal HashVal;
 
 public:
-    Script(core::MemoryArenaBase* arena, core::string& name);
+    Script(core::string_view name, core::MemoryArenaBase* arena);
 
     bool processData(core::UniquePointer<char[]> data, uint32_t dataSize);
 
@@ -45,7 +45,6 @@ public:
     {
         return lastResult_;
     }
-
     X_INLINE void setLastCallResult(lua::CallResult::Enum res)
     {
         lastResult_ = res;
