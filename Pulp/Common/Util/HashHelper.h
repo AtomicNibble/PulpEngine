@@ -2,6 +2,7 @@
 
 #include <Hashing\Fnva1Hash.h>
 #include <String\StrRef.h>
+#include <String\StringHash.h>
 
 X_NAMESPACE_BEGIN(core)
 
@@ -24,6 +25,16 @@ struct hash : public _Bitwise_hash<_Ktype>
 {
     static const bool _Value = __is_enum(_Ktype);
 };
+
+template<>
+struct hash<core::StrHash>
+{
+    constexpr size_t operator()(const core::StrHash str) const
+    {
+        return (size_t)str.hash();
+    }
+};
+
 
 template<>
 struct hash<core::string>
@@ -116,6 +127,15 @@ template<class _Type = void>
 struct equal_to
 {
     bool operator()(const _Type& lhs, const _Type& rhs) const
+    {
+        return (lhs == rhs);
+    }
+};
+
+template<>
+struct equal_to<core::StrHash>
+{
+    constexpr bool operator()(const core::StrHash lhs, const core::StrHash rhs) const
     {
         return (lhs == rhs);
     }
