@@ -63,7 +63,7 @@ constexpr string_view::string_view() :
 
 constexpr string_view::string_view(const_pointer pStr) :
     pBegin_(pStr),
-    size_(__builtin_strlen(pStr)) // Visual studio seams to have this?
+    size_(pStr ? __builtin_strlen(pStr) : 0_sz) // Visual studio seams to have this?
 {
 }
 
