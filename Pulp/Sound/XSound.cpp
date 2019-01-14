@@ -1511,12 +1511,13 @@ bool XSound::waitForBankLoad(Bank& bank)
 
 void XSound::listBanks(const char* pSearchPatten) const
 {
-    core::CriticalSection::ScopedLock lock(cs_);
+    core::string_view searchPattern(pSearchPatten);
 
+    core::CriticalSection::ScopedLock lock(cs_);
     core::Array<const Bank*> sorted_banks(g_SoundArena);
 
     for (const auto& bank : banks_) {
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(bank.name))) {
+        if (searchPattern.empty() || core::strUtil::WildCompare(searchPattern, core::string_view(bank.name))) {
             sorted_banks.push_back(&bank);
         }
     }
