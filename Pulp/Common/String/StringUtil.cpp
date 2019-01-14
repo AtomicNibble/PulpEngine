@@ -960,9 +960,59 @@ namespace strUtil
 
     bool WildCompare(core::string_view wild, core::string_view string)
     {
-        X_UNUSED(wild, string);
-        X_ASSERT_NOT_IMPLEMENTED();
-        return true;
+        // empty wild don't match anything.
+        if (wild.empty()) {
+            return false;
+        }
+
+        auto* pWild = wild.begin();
+        auto* pWildEnd = wild.end();
+
+        auto* pStr = string.begin();
+        auto* pStrEnd = string.end();
+
+        // move forward :D
+        while (pStr < pStrEnd && pWild < pWildEnd && *pWild != '*')
+        {
+            if (*pWild != *pStr && *pWild != '?') {
+                return false;
+            }
+
+            pStr++;
+            pWild++;
+        }
+
+        const char *cp = nullptr, *mp = nullptr;
+
+        while (pStr < pStrEnd)
+        {
+            if (*pWild == '*') 
+            {
+                if (++pWild == pWildEnd) {
+                    return true;
+                }
+
+                mp = pWild;
+                cp = pStr + 1;
+            }
+            else if (*pWild == *pStr || *pWild == '?')
+            {
+                pWild++;
+                pStr++;
+            }
+            else 
+            {
+                pWild = mp;
+                pStr = cp++;
+            }
+        }
+
+        while (pWild < pWildEnd && *pWild == '*') {
+            pWild++;
+        }
+
+        // end of wild?
+        return pWild == pWildEnd;
     }
 
     bool WildCompare(const char* wild, const char* string)

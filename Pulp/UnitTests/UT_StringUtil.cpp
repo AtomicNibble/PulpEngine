@@ -5,6 +5,7 @@
 X_USING_NAMESPACE;
 
 using namespace core;
+using namespace core::string_view_literals;
 
 TEST(StringUtil, StringBytes)
 {
@@ -621,6 +622,36 @@ TEST(StringUtil, WildCard)
     // only match if offset
     //	EXPECT_TRUE(strUtil::WildCompare("Same", "offset_Same", 7));
     //	EXPECT_TRUE(strUtil::WildCompare("Goat*", "pre_Goat_extra_chars", 4));
+}
+
+TEST(StringUtil, WildCardRange)
+{
+    EXPECT_TRUE(strUtil::WildCompare("*"_sv, "Hello"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("**"_sv, "Hello"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("*"_sv, "t"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("***"_sv, "t"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("*t"_sv, "_t"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("*t*"_sv, "_t_"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("***Example"_sv, "Example"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("***Example"_sv, "space Example"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("***Exa*mple"_sv, "space Exa_^$^+$^$+^$_mple"_sv));
+    EXPECT_TRUE(strUtil::WildCompare("Same"_sv, "Same"_sv));
+    // wild matches empty string since it's 0-N
+    EXPECT_TRUE(strUtil::WildCompare("*"_sv, ""_sv));
+
+    EXPECT_FALSE(strUtil::WildCompare("Cow*CatDog*"_sv, "Cow Cat Dog"_sv));
+    EXPECT_FALSE(strUtil::WildCompare("LOWER"_sv, "lower"_sv));
+    EXPECT_FALSE(strUtil::WildCompare("y*NameIsTom"_sv, "MyNameIsTom"_sv));
+
+    // only match if offset
+    auto str1 = "pre_Goat_extra_chars";
+    EXPECT_TRUE(strUtil::WildCompare("Goat*"_sv, core::string_view(str1 + 4, strlen(str1))));
+    
+    // limit string so wild matches.
+    auto str2 = "meow_to_the_meow";
+    EXPECT_FALSE(strUtil::WildCompare("meow_*_the"_sv, core::string_view(str2, strlen(str2))));
+    EXPECT_FALSE(strUtil::WildCompare("meow_*_the"_sv, core::string_view(str2, strlen(str2) - 6)));
+    EXPECT_TRUE(strUtil::WildCompare("meow_*_the"_sv, core::string_view(str2, strlen(str2) - 5)));
 }
 
 TEST(StringUtil, WildCardW)
