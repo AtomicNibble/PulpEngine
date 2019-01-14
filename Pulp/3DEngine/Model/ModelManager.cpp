@@ -217,23 +217,9 @@ bool XModelManager::processData(core::AssetBase* pAsset, core::UniquePointer<cha
 void XModelManager::listModels(const char* pSearchPatten) const
 {
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
-
+    
     core::Array<ModelResource*> sorted_models(g_3dEngineArena);
-    sorted_models.setGranularity(models_.size());
-
-    for (const auto& model : models_) {
-        auto* pModelRes = model.second;
-
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pModelRes->getName()))) {
-            sorted_models.push_back(pModelRes);
-        }
-    }
-
-    std::sort(sorted_models.begin(), sorted_models.end(), [](ModelResource* a, ModelResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    models_.getSortedAssertList(sorted_models, core::string_view(pSearchPatten));
 
     X_LOG0("Model", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
 
