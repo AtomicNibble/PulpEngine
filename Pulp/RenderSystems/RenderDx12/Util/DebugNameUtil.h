@@ -39,7 +39,7 @@ namespace D3DDebug
         pResource->SetName(wideName);
 #else
         UNREFERENCED_PARAMETER(pResource);
-        UNREFERENCED_PARAMETER(pName);
+        UNREFERENCED_PARAMETER(name);
 #endif
     }
 
