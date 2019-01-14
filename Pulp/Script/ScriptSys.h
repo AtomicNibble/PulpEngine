@@ -75,7 +75,7 @@ public:
 
     bool asyncInitFinalize(void) X_FINAL;
 
-    void update(core::FrameData& frame) X_FINAL;
+    void update(const core::FrameData& frame) X_FINAL;
 
     IScript* findScript(core::string_view name) X_FINAL;
     IScript* loadScript(core::string_view name) X_FINAL;

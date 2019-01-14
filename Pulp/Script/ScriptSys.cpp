@@ -200,11 +200,11 @@ bool XScriptSys::asyncInitFinalize(void)
 }
 
 
-void XScriptSys::update(core::FrameData& frame)
+void XScriptSys::update(const core::FrameData& frame)
 {
     X_PROFILE_BEGIN("ScriptUpdate", core::profiler::SubSys::SCRIPT);
 
-    auto ti = frame.timeInfo;
+    const auto ti = frame.timeInfo;
 
     auto timeGame = ti.ellapsed[core::ITimer::Timer::GAME].GetMilliSeconds();
     auto timeMS = ti.ellapsed[core::ITimer::Timer::UI].GetMilliSeconds();
