@@ -247,8 +247,9 @@ namespace shader
         if (FAILED(hr) || pErrorBlob || !pBlob) {
             if (pErrorBlob) {
                 const char* pErrStr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
+                auto bufSize = static_cast<size_t>(pErrorBlob->GetBufferSize());
 
-                logErrorStr(id, hr, sourceName, pErrStr);
+                logErrorStr(id, hr, sourceName, core::string_view(pErrStr, bufSize));
             }
             else {
                 X_ERROR("Shader", "(%" PRIu32 ") Failed to compile: %x", id, hr);
@@ -310,9 +311,9 @@ namespace shader
         return true;
     }
 
-    void XHWShader::logErrorStr(int32_t id, HRESULT hr, const core::string& sourceName, const char* pErrorStr)
+    void XHWShader::logErrorStr(int32_t id, HRESULT hr, const core::string& sourceName, core::string_view errorStr)
     {
-        core::StackString<4096> filterd(pErrorStr, pErrorStr + strlen(pErrorStr));
+        core::StackString<4096> filterd(errorStr.begin(), errorStr.end());
 
         // skip file path.
         auto* pErrStr = filterd.find(sourceName.begin(), sourceName.end());

@@ -101,7 +101,7 @@ namespace shader
         bool reflectShader(ID3D10Blob * pShaderBlob);
 
     private:
-        void logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, const char* pErrorStr);
+        void logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, core::string_view errorStr);
         static bool extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col);
 
     protected:
