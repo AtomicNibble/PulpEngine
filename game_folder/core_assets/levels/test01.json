@@ -349,12 +349,16 @@
             },
             "NetworkSync" : {
             },
-            "Emitter" : {
-      //          "effect" : "test/env/smk_test",
-                "offset" : {"x": 0, "y": 0, "z": 20}
+          //  "Emitter" : {
+          //      "effect" : "test/env/smk_test",
+          //      "offset" : {"x": 0, "y": 0, "z": 20}
+          //}
+            "Light" : {
+                "raduis" : 50,
+                "color" : {"r": 0, "g": 0.6, "b": 0}
             }
         },
-        {
+        /*{
             "origin" : {"x": -0, "y": 0, "z": 60},
             "angles" : {"p": 0, "y": 90, "r": 0},
 
@@ -363,7 +367,7 @@
             },
             "MeshRenderer" : {
             }
-        },
+        },*/
         {
             "origin" : {"x": -0, "y": 0, "z": 20},
          //   "angles" : {"p": 0, "y": 90, "r": 0},
