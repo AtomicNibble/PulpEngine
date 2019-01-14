@@ -268,6 +268,32 @@ public:
         freeList_.push(id);
     }
 
+    void getSortedAssertList(core::Array<Resource*>& sortedList, core::string_view searchPattern) const
+    {
+        sortedList.setGranularity(size());
+
+        if (searchPattern.empty())
+        {
+            for (const auto& asset : *this) {
+                sortedList.push_back(asset.second);
+            }
+        }
+        else
+        {
+            for (const auto& asset : *this) {
+                if (core::strUtil::WildCompare(searchPattern, core::string_view(asset.second->getName()))) {
+                    sortedList.push_back(asset.second);
+                }
+            }
+        }
+
+        std::sort(sortedList.begin(), sortedList.end(), [](Resource* a, Resource* b) {
+            const auto& nameA = a->getName();
+            const auto& nameB = b->getName();
+            return nameA.compareInt(nameB) < 0;
+        });
+    }
+
 public:
     X_INLINE ResourceItor begin(void)
     {
