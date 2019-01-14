@@ -100,21 +100,7 @@ void AnimManager::listAnims(const char* pSearchPatten) const
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
     core::Array<AnimResource*> sorted_anims(g_3dEngineArena);
-    sorted_anims.setGranularity(anims_.size());
-
-    for (const auto& anim : anims_) {
-        auto* pAnimRes = anim.second;
-
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pAnimRes->getName()))) {
-            sorted_anims.push_back(pAnimRes);
-        }
-    }
-
-    std::sort(sorted_anims.begin(), sorted_anims.end(), [](AnimResource* a, AnimResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    anims_.getSortedAssertList(sorted_anims, core::string_view(pSearchPatten));
 
     X_LOG0("Anim", "------------ ^8Anims(%" PRIuS ")^7 ---------------", sorted_anims.size());
 

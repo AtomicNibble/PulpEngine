@@ -276,21 +276,7 @@ namespace weapon
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
         core::Array<WeaponDefResource*> sorted(arena_);
-        sorted.setGranularity(weaponDefs_.size());
-
-        for (const auto& wpn : weaponDefs_) {
-            auto* pWpnRes = wpn.second;
-
-            if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pWpnRes->getName()))) {
-                sorted.push_back(pWpnRes);
-            }
-        }
-
-        std::sort(sorted.begin(), sorted.end(), [](WeaponDefResource* a, WeaponDefResource* b) {
-            const auto& nameA = a->getName();
-            const auto& nameB = b->getName();
-            return nameA.compareInt(nameB) < 0;
-        });
+        weaponDefs_.getSortedAssertList(sorted, core::string_view(pSearchPatten));
 
         X_LOG0("WeaponDef", "------------ ^8Weapons(%" PRIuS ")^7 ---------------", sorted.size());
 

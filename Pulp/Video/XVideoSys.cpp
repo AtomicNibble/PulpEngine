@@ -332,21 +332,7 @@ void XVideoSys::listVideos(const char* pSearchPatten) const
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
     core::Array<VideoResource*> sorted_videos(arena_);
-    sorted_videos.setGranularity(videos_.size());
-
-    for (const auto& video : videos_) {
-        auto* pVideoRes = video.second;
-
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pVideoRes->getName()))) {
-            sorted_videos.push_back(pVideoRes);
-        }
-    }
-
-    std::sort(sorted_videos.begin(), sorted_videos.end(), [](VideoResource* a, VideoResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    videos_.getSortedAssertList(sorted_videos, core::string_view(pSearchPatten));
 
     X_LOG0("Video", "------------ ^8Videos(%" PRIuS ")^7 ---------------", sorted_videos.size());
 

@@ -1292,21 +1292,7 @@ void XScriptSys::listScripts(const char* pSearchPatten) const
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
     core::Array<ScriptResource*> sorted_scripts(arena_);
-    sorted_scripts.setGranularity(scripts_.size());
-
-    for (const auto& script : scripts_) {
-        auto* pScriptRes = script.second;
-
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pScriptRes->getName()))) {
-            sorted_scripts.push_back(pScriptRes);
-        }
-    }
-
-    std::sort(sorted_scripts.begin(), sorted_scripts.end(), [](ScriptResource* a, ScriptResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    scripts_.getSortedAssertList(sorted_scripts, core::string_view(pSearchPatten));
 
     X_LOG0("Script", "------------ ^8Scripts(%" PRIuS ")^7 --------------", sorted_scripts.size());
 

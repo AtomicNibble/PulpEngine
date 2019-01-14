@@ -206,19 +206,7 @@ void XMaterialManager::listMaterials(const char* pSearchPatten) const
     core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
 
     core::Array<MaterialResource*> sorted_mats(arena_);
-    sorted_mats.setGranularity(materials_.size());
-
-    for (const auto& mat : materials_) {
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(mat.second->getName()))) {
-            sorted_mats.push_back(mat.second);
-        }
-    }
-
-    std::sort(sorted_mats.begin(), sorted_mats.end(), [](MaterialResource* a, MaterialResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    materials_.getSortedAssertList(sorted_mats, core::string_view(pSearchPatten));
 
     X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
 

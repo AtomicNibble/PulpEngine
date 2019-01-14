@@ -211,21 +211,7 @@ void XFontSystem::listFonts(const char* pSearchPatten) const
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
     core::Array<FontResource*> sorted(g_fontArena);
-    sorted.setGranularity(fonts_.size());
-
-    for (const auto& font : fonts_) {
-        auto* pFontRes = font.second;
-
-        if (!pSearchPatten || core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pFontRes->getName()))) {
-            sorted.push_back(pFontRes);
-        }
-    }
-
-    std::sort(sorted.begin(), sorted.end(), [](FontResource* a, FontResource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    fonts_.getSortedAssertList(sorted, core::string_view(pSearchPatten));
 
     FontFlags::Description FlagDesc;
 
