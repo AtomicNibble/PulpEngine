@@ -71,10 +71,12 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
 
     using ParseFlags = Flags<ParseFlag>;
 
+    static const size_t MAX_COMMAND_NAME_LEN = 64;
     static const size_t MAX_STRING_CHARS = 1024;
     static const size_t MAX_COMMAND_ARGS = 64;
     static const size_t MAX_COMMAND_STRING = 2 * MAX_STRING_CHARS;
 
+    using CommandNameStr = core::StackString<MAX_COMMAND_NAME_LEN>;
     using CommandStr = core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>;
 
     using ArgPtrArr = std::array<const char*, MAX_COMMAND_ARGS>;

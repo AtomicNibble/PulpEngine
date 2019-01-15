@@ -1134,15 +1134,15 @@ void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
 
 void XConsole::executeStringInternal(const ExecCommand& cmd)
 {
-    core::StackString512 name;
+    ConsoleCommandArgs::CommandNameStr name;
     ConsoleCommandArgs::CommandStr value;
-    core::StringRange<char> range(nullptr, nullptr);
+    
     CommandParser parser(cmd.command.begin());
-    const char* pPos;
 
+    core::StringRange<char> range(nullptr, nullptr);
     while (parser.extractCommand(range)) {
         // work out name / value
-        pPos = range.find('=');
+        const char* pPos = range.find('=');
 
         if (pPos) {
             name.set(range.getStart(), pPos);
