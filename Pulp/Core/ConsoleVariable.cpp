@@ -32,17 +32,14 @@ namespace
 
         int32_t val = 0;
 
-#if 1
-        X_ASSERT_NOT_IMPLEMENTED();
-#else
         const char* pEnd = nullptr;
 
         // Full number
-        val = core::strUtil::StringToInt<int32_t>(pStr, &pEnd, 10);
+        val = core::strUtil::StringToInt<int32_t>(str.begin(), str.end(), &pEnd, 10);
 
         // Check letter codes.
-        if (pEnd) {
-            for (; *pEnd >= 'a' && *pEnd <= 'z'; pEnd++) {
+        if (pEnd != str.end()) {
+            for (; pEnd != str.end() && *pEnd >= 'a' && *pEnd <= 'z'; pEnd++) {
                 val |= core::bitUtil::AlphaBit(*pEnd);
             }
 
@@ -56,7 +53,6 @@ namespace
                 val = current ^ val;
             }
         }
-#endif
 
         return val;
     }
