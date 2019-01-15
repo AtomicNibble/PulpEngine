@@ -243,19 +243,7 @@ namespace fx
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
         core::Array<EffectContainer::Resource*> sorted_efxs(arena_);
-        sorted_efxs.reserve(effects_.size());
-
-        for (const auto& mat : effects_) {
-            if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(mat.second->getName()))) {
-                sorted_efxs.push_back(mat.second);
-            }
-        }
-
-        std::sort(sorted_efxs.begin(), sorted_efxs.end(), [](EffectContainer::Resource* a, EffectContainer::Resource* b) {
-            const auto& nameA = a->getName();
-            const auto& nameB = b->getName();
-            return nameA.compareInt(nameB) < 0;
-        });
+        effects_.getSortedAssertList(sorted_efxs, core::string_view(pSearchPattern));
 
         X_LOG0("Effect", "------------- ^8Effects(%" PRIuS ")^7 -------------", sorted_efxs.size());
 

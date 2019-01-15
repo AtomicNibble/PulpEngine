@@ -498,19 +498,7 @@ void TextureManager::listTextures(const char* pSearchPattern)
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
     core::Array<TextureContainer::Resource*> sorted_texs(arena_);
-    sorted_texs.reserve(textures_.size());
-
-    for (const auto& mat : textures_) {
-        if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(mat.second->getName()))) {
-            sorted_texs.push_back(mat.second);
-        }
-    }
-
-    std::sort(sorted_texs.begin(), sorted_texs.end(), [](TextureContainer::Resource* a, TextureContainer::Resource* b) {
-        const auto& nameA = a->getName();
-        const auto& nameB = b->getName();
-        return nameA.compareInt(nameB) < 0;
-    });
+    textures_.getSortedAssertList(sorted_texs, core::string_view(pSearchPattern));
 
     X_LOG0("Texture", "------------- ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
 

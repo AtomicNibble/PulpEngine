@@ -424,19 +424,8 @@ namespace shader
         core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
         core::Array<HWShaderContainer::Resource*> sorted_shaders(arena_);
-        sorted_shaders.reserve(hwShaders_.size());
+        hwShaders_.getSortedAssertList(sorted_shaders, core::string_view(pSearchPattern));
 
-        for (const auto& shader : hwShaders_) {
-            if (!pSearchPattern || core::strUtil::WildCompare(core::string_view(pSearchPattern), core::string_view(shader.second->getName()))) {
-                sorted_shaders.emplace_back(shader.second);
-            }
-        }
-
-        std::sort(sorted_shaders.begin(), sorted_shaders.end(), [](HWShaderContainer::Resource* a, HWShaderContainer::Resource* b) {
-            const auto& nameA = a->getName();
-            const auto& nameB = b->getName();
-            return nameA.compareInt(nameB) < 0;
-        });
 
         X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", hwShaders_.size());
         for (const auto& it : sorted_shaders) {
