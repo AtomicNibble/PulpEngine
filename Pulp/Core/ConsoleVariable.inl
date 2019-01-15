@@ -42,7 +42,7 @@ template<class T>
 CVarString<T>::CVarString(XConsole* pConsole, core::string_view name, const char* pDefault,
     VarFlags Flags, const char* pDesc) :
     T(pConsole, name, Flags | VarFlag::STRING, pDesc),
-    String_(pDefault)
+    string_(pDefault)
 {
 }
 
@@ -54,20 +54,20 @@ CVarString<T>::~CVarString()
 template<class T>
 int CVarString<T>::GetInteger(void) const
 {
-    return atoi(String_.c_str());
+    return core::strUtil::StringToInt<int>(string_.begin(), string_.end());
 }
 
 template<class T>
 float CVarString<T>::GetFloat(void) const
 {
-    return core::strUtil::StringToFloat<float>(String_.c_str());
+    return core::strUtil::StringToFloat<float>(string_.c_str());
 }
 
 template<class T>
 const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 {
     X_UNUSED(buf);
-    return String_.c_str();
+    return string_.c_str();
 }
 
 template<class T>
@@ -78,11 +78,11 @@ void CVarString<T>::ForceSet(const char* pStr)
     }
 
     // check if same?
-    if (String_.compare(pStr)) {
+    if (string_.compare(pStr)) {
         return;
     }
 
-    String_ = pStr;
+    string_ = pStr;
     CVarBase::OnModified();
 }
 

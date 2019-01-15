@@ -105,7 +105,7 @@ public:
     X_INLINE int32_t GetDefaultInt(void) const X_FINAL;
 
 private:
-    string String_;
+    string string_;
 };
 
 //////////////////////////////////////////////////////////////////////////
