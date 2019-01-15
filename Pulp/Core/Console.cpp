@@ -1227,7 +1227,6 @@ void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::Com
         }
 
         cmd.func.Invoke(&cmdArgs);
-        return;
     }
 }
 
