@@ -43,9 +43,9 @@ int XBinds_Core::exec(IFunctionHandler* pH)
     SCRIPT_CHECK_PARAMETERS(1);
 
     const char* pCmdStr = nullptr;
-    pH->getParam(1, pCmdStr);
+    pH->getParam(1, pCmdStr); // TODO: return view?
 
-    pConsole_->exec(pCmdStr);
+    pConsole_->exec(core::string_view(pCmdStr));
 
     return pH->endFunction();
 }

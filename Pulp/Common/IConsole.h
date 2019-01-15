@@ -130,7 +130,7 @@ struct IConsole
     virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_ABSTRACT;
     virtual void unRegisterCommand(const char* pName) X_ABSTRACT;
 
-    virtual void exec(const char* pCommand) X_ABSTRACT;
+    virtual void exec(core::string_view command) X_ABSTRACT;
 
     //	virtual void ConfigExec(const char* command) X_ABSTRACT;
     virtual bool loadAndExecConfigFile(const char* pFileName) X_ABSTRACT;

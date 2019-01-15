@@ -915,11 +915,9 @@ void XConsole::unRegisterCommand(const char* pName)
     }
 }
 
-void XConsole::exec(const char* pCommand)
+void XConsole::exec(core::string_view command)
 {
-    X_ASSERT_NOT_NULL(pCommand);
-
-    addCmd(core::string_view(pCommand), ExecSource::SYSTEM, false);
+    addCmd(command, ExecSource::SYSTEM, false);
 }
 
 

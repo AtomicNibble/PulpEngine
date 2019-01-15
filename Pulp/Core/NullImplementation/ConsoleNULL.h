@@ -51,7 +51,7 @@ public:
     virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
     virtual void unRegisterCommand(const char* Name) X_FINAL;
 
-    virtual void exec(const char* command) X_FINAL;
+    virtual void exec(core::string_view command) X_FINAL;
 
     //	virtual void ConfigExec(const char* command) X_FINAL;
     virtual bool loadAndExecConfigFile(const char* fileName) X_FINAL;

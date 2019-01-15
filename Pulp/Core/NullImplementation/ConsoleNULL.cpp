@@ -189,7 +189,7 @@ void XConsoleNULL::unRegisterCommand(const char* Name)
     X_UNUSED(Name);
 }
 
-void XConsoleNULL::exec(const char* command)
+void XConsoleNULL::exec(core::string_view command)
 {
     X_UNUSED(command);
 }

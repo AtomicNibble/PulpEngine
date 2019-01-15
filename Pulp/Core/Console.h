@@ -202,7 +202,7 @@ public:
     void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
     void unRegisterCommand(const char* pName) X_FINAL;
 
-    void exec(const char* pCommand) X_FINAL;
+    void exec(core::string_view command) X_FINAL;
     bool loadAndExecConfigFile(const char* pFileName) X_FINAL;
 
     void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
