@@ -2633,16 +2633,15 @@ void XConsole::listVariables(const char* pSearchPatten)
 
 void XConsole::listVariablesValues(const char* pSearchPatten)
 {
-    // i'm not storing the vars in a ordered map since it's slow to get them.
-    // and i only need order when priting them.
-    // so it's not biggy doing the sorting here.
+    core::string_view searchPattern(pSearchPatten);
+
     core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
         ICVar* var = it.second;
 
-        if (!pSearchPatten || strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(var->GetName()))) {
+        if (searchPattern.empty() || strUtil::WildCompare(searchPattern, core::string_view(var->GetName()))) {
             sorted_vars.emplace_back(var);
         }
     }
