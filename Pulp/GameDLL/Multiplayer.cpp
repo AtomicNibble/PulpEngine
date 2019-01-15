@@ -179,6 +179,7 @@ void Multiplayer::playerLeft(int32_t localIndex)
 void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
 {
     X_ASSERT(pSession_->isHost(), "Should only be called on host")();
+    X_ASSERT(name.length() <= net::MAX_USERNAME_LEN && msg.length() <= net::MAX_CHAT_MSG_LEN, "Chat msg too big")(name.length(), msg.length());
 
     addChatLine(name, msg);
 
@@ -192,11 +193,13 @@ void Multiplayer::handleChatMsg(core::string_view name, core::string_view msg)
 
 void Multiplayer::addChatLine(core::string_view name, core::string_view msg)
 {
+    X_ASSERT(name.length() <= net::MAX_USERNAME_LEN && msg.length() <= net::MAX_CHAT_MSG_LEN, "Chat msg too big")(name.length(), msg.length());
+
     if (chatLines_.freeSpace() == 0) {
         chatLines_.pop();
     }
 
-    core::StackString256 str;
+    core::StackString<net::CHAT_MSG_BUFFER_SIZE> str;
     str.setFmt("%.*s: %.*s", name.length(), name.data(), msg.length(), msg.data());
 
     chatLines_.emplace(core::string_view(str.begin(), str.length()));

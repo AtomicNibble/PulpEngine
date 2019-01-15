@@ -37,7 +37,8 @@ static const uint32_t MAX_RESOLVE_ADDR = 6; // the max address resolve will retu
 
 static const uint32_t MAX_CHAT_MSG_LEN = 256; // plz no life stories
 static const uint32_t MAX_CHAT_MSGS = 16;
-static const uint32_t MAX_CHAT_BUFFER_SIZE = 1024;
+
+static const uint32_t CHAT_MSG_BUFFER_SIZE = MAX_CHAT_MSG_LEN + MAX_USERNAME_LEN + 32;
 
 static const uint32_t MAX_USERCMD_SEND = 8;
 static const uint32_t MAX_RECEIVE_SNAPSHOT_BUFFER_SIZE = 8; // the max recveive snapshots we can have buffered.

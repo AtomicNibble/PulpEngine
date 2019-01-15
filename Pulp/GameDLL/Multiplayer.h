@@ -69,7 +69,7 @@ class Multiplayer
     using PlayerStateArr = std::array<PlayerState, net::MAX_PLAYERS>;
 
 public:
-    using ChatPacketBs = core::FixedBitStreamStack<net::MAX_USERNAME_LEN + net::MAX_CHAT_MSG_LEN + 16>;
+    using ChatPacketBs = core::FixedBitStreamStack<net::CHAT_MSG_BUFFER_SIZE>;
     using EventPacketBs = core::FixedBitStreamStack<64>;
 
 public:
