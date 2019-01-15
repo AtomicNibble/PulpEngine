@@ -38,6 +38,13 @@ public:
 
     constexpr string_view& operator=(const string_view&) = default;
 
+    constexpr bool operator<(const string_view rhs) const;
+    constexpr bool operator>(const string_view rhs) const;
+    constexpr bool operator<=(const string_view rhs) const;
+    constexpr bool operator>=(const string_view rhs) const;
+
+    constexpr int compare(const string_view rhs) const;
+
     constexpr const_reference operator[](const size_type idx) const;
     constexpr const_reference at(const size_type idx) const;
 
@@ -85,6 +92,45 @@ constexpr string_view::string_view(const StackString<N, value_type>& str) :
     pBegin_(str.data()),
     size_(str.length())
 {
+}
+
+constexpr bool string_view::operator<(const string_view rhs) const
+{
+    return compare(rhs) < 0;
+}
+
+constexpr bool string_view::operator>(const string_view rhs) const
+{
+    return rhs < *this;
+}
+
+constexpr bool string_view::operator<=(const string_view rhs) const
+{
+    return !(rhs < *this);
+}
+
+constexpr bool string_view::operator>=(const string_view rhs) const
+{
+    return !(*this < rhs);
+}
+
+constexpr int string_view::compare(const string_view rhs) const
+{
+    const int res = __builtin_memcmp(pBegin_, rhs.pBegin_, core::Min(size_, rhs.size_));
+
+    if (res != 0) {
+        return res;
+    }
+
+    if (size_ < rhs.size_) {
+        return -1;
+    }
+
+    if (size_ > rhs.size_) {
+        return 1;
+    }
+
+    return 0;
 }
 
 constexpr typename string_view::const_reference string_view::operator[](const size_type idx) const
