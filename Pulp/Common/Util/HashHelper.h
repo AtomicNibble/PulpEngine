@@ -211,6 +211,11 @@ struct equal_to<const char*>
     {
         return core::strUtil::IsEqual(rhs.begin(), rhs.end(), lhs);
     }
+
+    bool operator()(const char* const lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqual(rhs.begin(), rhs.end(), lhs);
+    }
 };
 
 template<>
@@ -222,6 +227,11 @@ struct equal_to<const char* const>
     }
 
     bool operator()(const char* const lhs, const core::string& rhs) const
+    {
+        return core::strUtil::IsEqual(rhs.begin(), rhs.end(), lhs);
+    }
+
+    bool operator()(const char* const lhs, const core::string_view& rhs) const
     {
         return core::strUtil::IsEqual(rhs.begin(), rhs.end(), lhs);
     }
@@ -250,6 +260,11 @@ struct equal_to_case_insen<core::string>
     {
         return lhs.compareCaseInsen(rhs);
     }
+
+    bool operator()(const core::string& lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
 };
 
 template<>
@@ -264,6 +279,11 @@ struct equal_to_case_insen<const char*>
     {
         return core::strUtil::IsEqualCaseInsen(rhs.begin(), rhs.end(), lhs);
     }
+
+    bool operator()(const char* const lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(rhs.begin(), rhs.end(), lhs);
+    }
 };
 
 template<>
@@ -275,6 +295,11 @@ struct equal_to_case_insen<const char* const>
     }
 
     bool operator()(const char* const lhs, const core::string& rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(rhs.begin(), rhs.end(), lhs);
+    }
+
+    bool operator()(const char* const lhs, const core::string_view& rhs) const
     {
         return core::strUtil::IsEqualCaseInsen(rhs.begin(), rhs.end(), lhs);
     }
