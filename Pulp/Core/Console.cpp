@@ -899,9 +899,9 @@ void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarF
         cmd.desc = pDesc;
     }
 
-    // pass cmd.Name instead of Name, saves creating a second core::string
     if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
-        X_WARNING("Console", "command already exsists: \"%*.s", name.length(), name.data());
+        X_ERROR("Console", "command already exsists: \"%*.s", name.length(), name.data());
+        return;
     }
 
     cmdMap_.emplace(cmd.name, cmd);
