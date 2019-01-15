@@ -88,6 +88,7 @@ public:
 
     virtual size_t GetArgCount(void) const X_FINAL;
     virtual const char* GetArg(size_t idx) const X_FINAL;
+    virtual core::string_view GetArgSV(size_t idx) const X_FINAL;
 
 private:
     void TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags);

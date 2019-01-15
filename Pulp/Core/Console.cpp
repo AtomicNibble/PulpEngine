@@ -219,6 +219,12 @@ const char* ConsoleCommandArgs::GetArg(size_t Idx) const
     return argv_[Idx];
 }
 
+core::string_view ConsoleCommandArgs::GetArgSV(size_t Idx) const
+{
+    X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
+    return core::string_view(argv_[Idx]);
+}
+
 // we want to get arguemtns.
 // how will a command be formated.
 // command val, val1, #var_name, string var3,
