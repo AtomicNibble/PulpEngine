@@ -2579,13 +2579,15 @@ void XConsole::OnCoreEvent(const CoreEventData& ed)
 
 void XConsole::listCommands(const char* pSearchPatten)
 {
+    core::string_view searchPattern(pSearchPatten);
+
     core::Array<const ConsoleCommand*> sorted_cmds(g_coreArena);
     sorted_cmds.setGranularity(cmdMap_.size());
 
     for (auto itrCmd = cmdMap_.begin(); itrCmd != cmdMap_.end(); ++itrCmd) {
         ConsoleCommand& cmd = itrCmd->second;
 
-        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, cmd.name.c_str())) {
+        if (searchPattern.empty() || strUtil::WildCompare(searchPattern, core::string_view(cmd.name))) {
             sorted_cmds.append(&cmd);
         }
     }
@@ -2604,16 +2606,15 @@ void XConsole::listCommands(const char* pSearchPatten)
 
 void XConsole::listVariables(const char* pSearchPatten)
 {
-    // i'm not storing the vars in a ordered map since it's slow to get them.
-    // and i only need order when priting them.
-    // so it's not biggy doing the sorting here.
+    core::string_view searchPattern(pSearchPatten);
+
     core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
     for (const auto& it : varMap_) {
         ICVar* var = it.second;
 
-        if (!pSearchPatten || strUtil::WildCompare(pSearchPatten, var->GetName())) {
+        if (searchPattern.empty() || strUtil::WildCompare(searchPattern, core::string_view(var->GetName()))) {
             sorted_vars.emplace_back(var);
         }
     }
