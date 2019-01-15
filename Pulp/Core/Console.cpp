@@ -912,7 +912,7 @@ void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
         X_WARNING("Console", "command already exsists: \"%s", pName);
     }
 
-    cmdMap_.insert(std::make_pair(cmd.name, cmd));
+    cmdMap_.emplace(cmd.name, cmd);
 }
 
 void XConsole::unRegisterCommand(const char* pName)
@@ -1162,18 +1162,16 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
         }
 
         // === Check if is a command ===
-        auto itrCmd = cmdMap_.find(name.c_str());
-        if (itrCmd != cmdMap_.end()) {
+        if (auto it = cmdMap_.find(name.c_str()); it != cmdMap_.end()) {
             value.set(range);
             value.trim();
-            executeCommand((itrCmd->second), value);
+            executeCommand((it->second), value);
             continue;
         }
 
         // === check for var ===
-        auto itrVar = varMap_.find(name.c_str());
-        if (itrVar != varMap_.end()) {
-            ICVar* pCVar = itrVar->second;
+        if (auto it = varMap_.find(name.c_str()); it != varMap_.end()) {
+            ICVar* pCVar = it->second;
 
             if (pPos) // is there a space || = symbol (meaning there is a possible value)
             {
@@ -1205,7 +1203,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
 
             auto it = configCmds_.find(name.c_str());
             if (it == configCmds_.end()) {
-                configCmds_.emplace(name.c_str(), string(value.begin(), value.end()));
+                configCmds_.emplace(string(name.begin(), name.end()), string(value.begin(), value.end()));
             }
             else {
                 it->second = string(value.begin(), value.end());
