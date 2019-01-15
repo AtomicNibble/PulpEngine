@@ -328,7 +328,7 @@ private:
     ConfigCmdsMap configCmds_;
     ConfigCmdsMap varArchive_;
 
-    ExecCmdList cmds_;
+    ExecCmdList pendingCmdsQueue_;
 
     consoleState::Enum consoleState_;
 

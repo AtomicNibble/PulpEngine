@@ -374,7 +374,7 @@ XConsole::XConsole() :
     binds_(g_coreArena, bitUtil::NextPowerOfTwo(MAX_CONSOLE_BINS * 2)),
     configCmds_(g_coreArena, 256),
     varArchive_(g_coreArena, 256),
-    cmds_(g_coreArena),
+    pendingCmdsQueue_(g_coreArena),
     coreEventListernRegd_(false),
     historyLoadPending_(false),
     historyFileSize_(0),
@@ -708,9 +708,9 @@ void XConsole::dispatchRepeateInputEvents(core::FrameTimeData& time)
 
 void XConsole::runCmds(void)
 {
-    while (cmds_.isNotEmpty()) {
-        executeStringInternal(cmds_.peek());
-        cmds_.pop();
+    while (pendingCmdsQueue_.isNotEmpty()) {
+        executeStringInternal(pendingCmdsQueue_.peek());
+        pendingCmdsQueue_.pop();
     }
 }
 
@@ -1123,12 +1123,12 @@ void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
 
 X_INLINE void XConsole::addCmd(const char* pCommand, ExecSource::Enum src, bool silent)
 {
-    cmds_.emplace(string(pCommand), src, silent);
+    pendingCmdsQueue_.emplace(string(pCommand), src, silent);
 }
 
 void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
 {
-    cmds_.emplace(command, src, silent);
+    pendingCmdsQueue_.emplace(command, src, silent);
 }
 
 
