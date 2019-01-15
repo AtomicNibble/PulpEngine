@@ -875,7 +875,7 @@ void XConsole::unregisterVariable(const char* pVarName)
 
     auto* pVar = it->second;
 
-    varMap_.erase(pVarName);
+    varMap_.erase(it);
     X_DELETE(pVar, &varArena_);
 }
 
