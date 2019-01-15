@@ -14,6 +14,7 @@ X_DISABLE_WARNING(4714) // __forceinline not inlined.
 // some std includes.
 #include <limits>
 #include <array>
+#include <charconv> // TODO: try remove? (used by stringUtil)
 
 // Util
 #include <Util\UserLiterals.h>

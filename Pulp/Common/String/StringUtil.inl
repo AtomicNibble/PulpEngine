@@ -310,6 +310,14 @@ namespace strUtil
         return safe_static_cast<T>(val);
     }
 
+    template<typename T>
+    inline T StringToInt(const char* startInclusive, const char* endExclusive, const char** pEndPtr, int32_t base)
+    {
+        T val;
+        auto res = std::from_chars(startInclusive, endExclusive, val, base);
+        *pEndPtr = res.ptr;
+        return val;
+    }
 
     // -------------------------
 
