@@ -1022,16 +1022,11 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
     if (safe_static_cast<int32_t, size_t>(consoleLog_.size()) > bufferSize) {
         consoleLog_.pop();
 
-        // too handle the case we log after render has been shutdown or not init.
-        // really the MaxVisibleLogLines should be updated to not use render interface
-        // and just listen for core events to get size.
-        if (pRender_) {
-            const auto noneScroll = maxVisibleLogLines();
+        const auto noneScroll = maxVisibleLogLines();
 
-            // move scroll wheel with the moving items?
-            if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
-                scrollPos_++;
-            }
+        // move scroll wheel with the moving items?
+        if (scrollPos_ > 0 && scrollPos_ < (safe_static_cast<std::remove_const<decltype(noneScroll)>::type>(consoleLog_.size()) - noneScroll)) {
+            scrollPos_++;
         }
     }
     else {
