@@ -2,6 +2,8 @@
 
 #include <String\StringUtil.h>
 
+// Fuck std::string_view
+
 X_NAMESPACE_BEGIN(core)
 
 template<typename TChar>
