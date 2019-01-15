@@ -247,7 +247,7 @@ private:
     void addCmdToHistory(const char* pCommand);
     void addCmdToHistory(const string& command);
     void resetHistoryPos(void);
-    const char* getHistory(CmdHistory::Enum direction);
+    core::string_view getHistory(CmdHistory::Enum direction);
 
     // Binds 
     void addBind(const char* pKey, const char* pCmd);

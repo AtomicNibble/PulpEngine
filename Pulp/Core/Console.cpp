@@ -1620,14 +1620,14 @@ bool XConsole::processInput(const input::InputEvent& event)
             autoCompleteIdx_ = core::Max(-1, --autoCompleteIdx_);
         }
         else {
-            const char* pHistoryLine = getHistory(CmdHistory::UP);
+            auto historyLine = getHistory(CmdHistory::UP);
 
-            if (pHistoryLine) {
+            if (!historyLine.empty()) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%s", pHistoryLine);
+                    X_LOG0("Cmd history", "%*.s", historyLine.length(), historyLine.data());
                 }
 
-                inputBuffer_ = pHistoryLine;
+                inputBuffer_.assign(historyLine.data(), historyLine.length());
                 cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
@@ -1645,14 +1645,14 @@ bool XConsole::processInput(const input::InputEvent& event)
             resetHistoryPos();
         }
         else {
-            const char* pHistoryLine = getHistory(CmdHistory::DOWN);
+            auto historyLine = getHistory(CmdHistory::DOWN);
 
-            if (pHistoryLine) {
+            if (!historyLine.empty()) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%s", pHistoryLine);
+                    X_LOG0("Cmd history", "%*.s", historyLine.length(), historyLine.data());
                 }
 
-                inputBuffer_ = pHistoryLine;
+                inputBuffer_.assign(historyLine.data(), historyLine.length());
                 cursorPos_ = safe_static_cast<int32_t>(inputBuffer_.size());
             }
         }
@@ -1809,22 +1809,22 @@ void XConsole::resetHistoryPos(void)
 }
 
 
-const char* XConsole::getHistory(CmdHistory::Enum direction)
+core::string_view XConsole::getHistory(CmdHistory::Enum direction)
 {
     if (cmdHistory_.isEmpty()) {
-        return nullptr;
+        return {};
     }
 
     if (direction == CmdHistory::UP) {
 
         if (historyPos_ <= 0) {
-            return nullptr;
+            return {};
         }
 
         historyPos_--;
 
         refString_ = cmdHistory_[historyPos_];
-        return refString_.c_str();
+        return core::string_view(refString_);
     }
     else // down
     {
@@ -1834,11 +1834,11 @@ const char* XConsole::getHistory(CmdHistory::Enum direction)
 
             // adds a refrence to the string.
             refString_ = cmdHistory_[historyPos_];
-            return refString_.c_str();
+            return core::string_view(refString_);
         }
     }
 
-    return nullptr;
+    return {};
 }
 
 // --------------------------------
