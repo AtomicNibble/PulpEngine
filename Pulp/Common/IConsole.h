@@ -10,11 +10,9 @@
 
 struct ICore;
 
-X_NAMESPACE_DECLARE(core,
-    struct FrameTimeData);
-
 X_NAMESPACE_BEGIN(core)
 
+struct FrameTimeData;
 static const size_t MAX_CONSOLE_VAR = 1024;
 static const size_t MAX_CONSOLE_CMD = 256;
 static const size_t MAX_CONSOLE_BINS = 128;
