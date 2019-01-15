@@ -2584,8 +2584,8 @@ void XConsole::listCommands(const char* pSearchPatten)
     core::Array<const ConsoleCommand*> sorted_cmds(g_coreArena);
     sorted_cmds.setGranularity(cmdMap_.size());
 
-    for (auto itrCmd = cmdMap_.begin(); itrCmd != cmdMap_.end(); ++itrCmd) {
-        ConsoleCommand& cmd = itrCmd->second;
+    for (const auto& it : cmdMap_) {
+        const ConsoleCommand& cmd = it.second;
 
         if (searchPattern.empty() || strUtil::WildCompare(searchPattern, core::string_view(cmd.name))) {
             sorted_cmds.append(&cmd);
