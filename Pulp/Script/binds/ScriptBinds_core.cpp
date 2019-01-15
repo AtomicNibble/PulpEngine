@@ -140,9 +140,9 @@ int XBinds_Core::setDvar(IFunctionHandler* pH)
             pVar->Set(fValue);
         }
         else if (type == Type::String) {
-            const char* sValue = "";
-            pH->getParam(2, sValue);
-            pVar->Set(sValue);
+            const char* pValue = "";
+            pH->getParam(2, pValue);
+            pVar->Set(core::string_view(pValue));
         }
         else {
             X_ASSERT_NOT_IMPLEMENTED();

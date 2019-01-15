@@ -157,9 +157,9 @@ struct ICVar
     virtual float GetFloat(void) const X_ABSTRACT;
     virtual const char* GetString(StrBuf& buf) const X_ABSTRACT;
 
-    virtual void SetDefault(const char* s) X_ABSTRACT;
-    virtual void Set(const char* s) X_ABSTRACT;
-    virtual void ForceSet(const char* s) X_ABSTRACT;
+    virtual void SetDefault(core::string_view str) X_ABSTRACT;
+    virtual void Set(core::string_view str) X_ABSTRACT;
+    virtual void ForceSet(core::string_view str) X_ABSTRACT;
 
     virtual void Set(const float f) X_ABSTRACT;
     virtual void Set(const int i) X_ABSTRACT;

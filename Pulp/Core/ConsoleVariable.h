@@ -27,8 +27,8 @@ public:
     virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
     virtual void SetModified(void) X_FINAL;
 
-    virtual void ForceSet(const char* s) X_OVERRIDE;
-    virtual void SetDefault(const char* s) X_OVERRIDE;
+    virtual void ForceSet(core::string_view str) X_OVERRIDE;
+    virtual void SetDefault(core::string_view str) X_OVERRIDE;
 
     virtual ICVar* SetOnChangeCallback(ConsoleVarFunc pChangeFunc) X_OVERRIDE;
     virtual ConsoleVarFunc GetOnChangeCallback(void) const X_OVERRIDE;
@@ -88,8 +88,8 @@ public:
     X_INLINE float GetFloat(void) const X_FINAL;
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
 
-    X_INLINE void ForceSet(const char* s) X_FINAL;
-    X_INLINE void Set(const char* s) X_FINAL;
+    X_INLINE void ForceSet(core::string_view str) X_FINAL;
+    X_INLINE void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE VarFlag::Enum GetType(void) const X_FINAL;
@@ -121,9 +121,9 @@ public:
     X_INLINE int GetInteger(void) const X_FINAL;
     X_INLINE float GetFloat(void) const X_FINAL;
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
-    X_INLINE void SetDefault(const char* s) X_FINAL;
+    X_INLINE void SetDefault(core::string_view str) X_FINAL;
 
-    void Set(const char* s) X_FINAL;
+    void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE VarFlag::Enum GetType(void) const X_FINAL;
@@ -157,9 +157,9 @@ public:
     X_INLINE int GetInteger(void) const X_FINAL;
     X_INLINE float GetFloat(void) const X_FINAL;
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
-    X_INLINE void SetDefault(const char* s) X_FINAL;
+    X_INLINE void SetDefault(core::string_view str) X_FINAL;
 
-    X_INLINE void Set(const char* s) X_FINAL;
+    X_INLINE void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE VarFlag::Enum GetType(void) const X_FINAL;
@@ -193,7 +193,7 @@ public:
     X_INLINE float GetFloat(void) const X_FINAL;
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
 
-    void Set(const char* s) X_FINAL;
+    void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE VarFlag::Enum GetType(void) const X_FINAL;
@@ -229,7 +229,7 @@ public:
     X_INLINE float GetFloat(void) const X_FINAL;
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
 
-    X_INLINE void Set(const char* s) X_FINAL;
+    X_INLINE void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE VarFlag::Enum GetType(void) const X_FINAL;
@@ -266,7 +266,7 @@ public:
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
     X_INLINE const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_FINAL;
 
-    void Set(const char* s) X_FINAL;
+    void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
     X_INLINE void Reset(void) X_FINAL;
@@ -281,7 +281,7 @@ public:
     X_INLINE const Color& GetColor(void) const;
     X_INLINE const Color& GetDefaultColor(void) const;
 
-    static bool ColorFromString(const char* pStr, Color& out, bool Slient = true);
+    static bool ColorFromString(core::string_view str, Color& out, bool Slient = true);
 
 private:
     X_NO_ASSIGN(CVarColRef);
@@ -305,7 +305,7 @@ public:
     X_INLINE const char* GetString(CVarBase::StrBuf& buf) const X_FINAL;
     X_INLINE const char* GetDefaultStr(CVarBase::StrBuf& buf) const X_FINAL;
 
-    void Set(const char* s) X_FINAL;
+    void Set(core::string_view str) X_FINAL;
     X_INLINE void Set(const float f) X_FINAL;
     X_INLINE void Set(const int i) X_FINAL;
 
@@ -321,7 +321,7 @@ public:
     X_INLINE const Vec3f& GetVal(void) const;
     X_INLINE const Vec3f& GetDefaultVal(void) const;
 
-    static bool Vec3FromString(const char* pStr, Vec3f& out, bool Slient = true);
+    static bool Vec3FromString(core::string_view str, Vec3f& out, bool Slient = true);
 
 private:
     X_NO_ASSIGN(CVarVec3Ref);

@@ -15,22 +15,26 @@ template class CVarInt<CVarBaseHeap>;
 
 namespace
 {
-    inline int32_t TextToInt(const char* pStr, int32_t current, bool bitField)
+    inline int32_t TextToInt(core::string_view str, int32_t current, bool bitField)
     {
-        if (!pStr) {
+        if (str.empty()) {
             return current;
         }
 
-        const size_t strLen = core::strUtil::strlen(pStr);
+        const size_t strLen = str.length();
         if (!strLen) {
             return current;
         }
 
         if (!bitField) {
-            return core::strUtil::StringToInt<int32_t>(pStr, 10);
+            return core::strUtil::StringToInt<int32_t>(str.begin(), str.end());
         }
 
         int32_t val = 0;
+
+#if 1
+        X_ASSERT_NOT_IMPLEMENTED();
+#else
         const char* pEnd = nullptr;
 
         // Full number
@@ -52,6 +56,7 @@ namespace
                 val = current ^ val;
             }
         }
+#endif
 
         return val;
     }
@@ -69,16 +74,16 @@ CVarBase::~CVarBase()
 {
 }
 
-void CVarBase::ForceSet(const char* pStr)
+void CVarBase::ForceSet(core::string_view str)
 {
     X_ASSERT_NOT_IMPLEMENTED();
-    X_UNUSED(pStr);
+    X_UNUSED(str);
 }
 
-void CVarBase::SetDefault(const char* pStr)
+void CVarBase::SetDefault(core::string_view str)
 {
     X_ASSERT_NOT_IMPLEMENTED();
-    X_UNUSED(pStr);
+    X_UNUSED(str);
 }
 
 ICVar::FlagType CVarBase::GetFlags(void) const
@@ -142,39 +147,37 @@ void CVarBase::Reset(void)
 // ========================================================
 
 template<class T>
-void CVarInt<T>::Set(const char* pStr)
+void CVarInt<T>::Set(core::string_view str)
 {
-    int32_t val = TextToInt(pStr, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(str, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
     Set(val);
 }
 
 // ========================================================
 
-void CVarIntRef::Set(const char* pStr)
+void CVarIntRef::Set(core::string_view str)
 {
-    int32_t val = TextToInt(pStr, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(str, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
     Set(val);
 }
 
 // ========================================================
 
-bool CVarColRef::ColorFromString(const char* pStr, Color& out, bool silent)
+bool CVarColRef::ColorFromString(core::string_view str, Color& out, bool silent)
 {
-    return Color::fromString(pStr, pStr + strlen(pStr), out, silent);
+    return Color::fromString(str.begin(), str.end(), out, silent);
 }
 
-void CVarColRef::Set(const char* pStr)
+void CVarColRef::Set(core::string_view str)
 {
-    X_ASSERT_NOT_NULL(pStr);
-
     if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
         return;
     }
 
     Color col;
-    if (!ColorFromString(pStr, col, false)) {
+    if (!ColorFromString(str, col, false)) {
         return;
     }
 
@@ -190,12 +193,12 @@ void CVarColRef::Set(const char* pStr)
 
 // ========================================================
 
-bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
+bool CVarVec3Ref::Vec3FromString(core::string_view str, Vec3f& out, bool Slient)
 {
     Vec3f vec;
     int i;
 
-    core::XLexer lex(pStr, pStr + strlen(pStr));
+    core::XLexer lex(str.begin(), str.end());
     core::XLexToken token;
 
     for (i = 0; i < 3; i++) {
@@ -227,17 +230,15 @@ bool CVarVec3Ref::Vec3FromString(const char* pStr, Vec3f& out, bool Slient)
     return true;
 }
 
-void CVarVec3Ref::Set(const char* pStr)
+void CVarVec3Ref::Set(core::string_view str)
 {
-    X_ASSERT_NOT_NULL(pStr);
-
     if (flags_.IsSet(VarFlag::READONLY)) {
         return;
     }
 
     Vec3f vec;
 
-    if (!Vec3FromString(pStr, vec, false)) {
+    if (!Vec3FromString(str, vec, false)) {
         return;
     }
 

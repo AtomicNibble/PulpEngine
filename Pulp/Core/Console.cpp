@@ -1040,7 +1040,7 @@ void XConsole::registerVar(ICVar* pCVar)
     auto it = configCmds_.find(pCVar->GetName());
     if (it != configCmds_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
-            pCVar->Set(it->second.c_str());
+            pCVar->Set(core::string_view(it->second));
         }
 
         X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
@@ -1049,7 +1049,7 @@ void XConsole::registerVar(ICVar* pCVar)
     it = varArchive_.find(pCVar->GetName());
     if (it != varArchive_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
-            pCVar->Set(it->second.c_str());
+            pCVar->Set(core::string_view(it->second));
         }
 
         // mark as archive.
@@ -1159,7 +1159,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
                     displayVarInfo(pCVar);
                 }
                 else if (cvarModifyBegin(pCVar, cmd.source)) {
-                    pCVar->Set(value.c_str());
+                    pCVar->Set(core::string_view(value));
                     displayVarValue(pCVar);
                 }
             }
@@ -2390,7 +2390,7 @@ void XConsole::drawInputTxt(const Vec2f& start)
 
                             // parse it.
                             Color previewCol;
-                            if (CVarColRef::ColorFromString(colorStr.c_str(), previewCol)) {
+                            if (CVarColRef::ColorFromString(core::string_view(colorStr), previewCol)) {
                                 // draw a box on the end cus i'm a goat.
                                 pPrimContext_->drawQuad(xpos + width + 5, ypos, height, height, previewCol, Col_Black);
                             }
@@ -2858,7 +2858,7 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
                 merged.append(" ");
             }
 
-            pCBar->Set(merged.c_str());
+            pCBar->Set(core::string_view(merged));
         }
         else {
             if (Num != 3) {
@@ -2867,8 +2867,7 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
             }
 
             auto argStr = Cmd->GetArg(2);
-            core::StackString512 val(argStr.begin(), argStr.end()); // TODO: remove
-            pCBar->Set(val.c_str());
+            pCBar->Set(argStr);
         }
 
         pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);

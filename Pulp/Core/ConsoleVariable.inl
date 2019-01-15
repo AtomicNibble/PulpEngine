@@ -69,43 +69,43 @@ const char* CVarString<T>::GetString(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-void CVarString<T>::ForceSet(const char* pStr)
+void CVarString<T>::ForceSet(core::string_view str)
 {
-    if (!pStr) {
+    if (str.empty()) {
         return;
     }
 
     // check if same?
-    if (string_.compare(pStr)) {
+    if (core::strUtil::IsEqual(str, core::string_view(string_))) {
         return;
     }
 
-    string_ = pStr;
+    string_.assign(str.begin(), str.length());
     CVarBase::OnModified();
 }
 
 template<class T>
-void CVarString<T>::Set(const char* pStr)
+void CVarString<T>::Set(core::string_view str)
 {
     if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
         return;
     }
 
-    ForceSet(pStr);
+    ForceSet(str);
 }
 
 template<class T>
 void CVarString<T>::Set(const float f)
 {
     StackString<32> val(f);
-    Set(val.c_str());
+    Set(core::string_view(val));
 }
 
 template<class T>
 void CVarString<T>::Set(const int i)
 {
     StackString<32> val(i);
-    Set(val.c_str());
+    Set(core::string_view(val));
 }
 
 template<class T>
@@ -201,9 +201,9 @@ const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-void CVarInt<T>::SetDefault(const char* s)
+void CVarInt<T>::SetDefault(core::string_view str)
 {
-    Set(s);
+    Set(str);
     intDefault_ = intValue_;
 }
 
@@ -331,22 +331,22 @@ const char* CVarFloat<T>::GetString(CVarBase::StrBuf& buf) const
 }
 
 template<class T>
-void CVarFloat<T>::SetDefault(const char* s)
+void CVarFloat<T>::SetDefault(core::string_view str)
 {
-    Set(s);
+    Set(str);
     fDefault_ = fValue_;
 }
 
 template<class T>
-void CVarFloat<T>::Set(const char* s)
+void CVarFloat<T>::Set(core::string_view str)
 {
     if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
         return;
     }
 
     float fValue = 0;
-    if (s) {
-        fValue = core::strUtil::StringToFloat<float>(s);
+    if (!str.empty()) {
+        fValue = core::strUtil::StringToFloat<float>(str.begin(), str.end());
     }
 
     Set(fValue);
@@ -580,15 +580,15 @@ const char* CVarFloatRef::GetString(CVarBase::StrBuf& buf) const
     return buf;
 }
 
-void CVarFloatRef::Set(const char* s)
+void CVarFloatRef::Set(core::string_view str)
 {
     if (CVarBase::flags_.IsSet(VarFlag::READONLY)) {
         return;
     }
 
     float fValue = 0;
-    if (s) {
-        fValue = core::strUtil::StringToFloat<float>(s);
+    if (!str.empty()) {
+        fValue = core::strUtil::StringToFloat<float>(str.begin(), str.end());
     }
 
     Set(fValue);
