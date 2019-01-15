@@ -458,7 +458,7 @@ void XConsole::registerCmds(void)
     ADD_COMMAND_MEMBER("listDvarValues", this, XConsole, &XConsole::Command_ListDvarsValues, VarFlag::SYSTEM, "Same as 'listDvars' but showing values");
     ADD_COMMAND_MEMBER("exit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
     ADD_COMMAND_MEMBER("quit", this, XConsole, &XConsole::Command_Exit, VarFlag::SYSTEM, "closes the game");
-    ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM, "prints text in argument, prefix dvar's with # to print value");
+    ADD_COMMAND_MEMBER("echo", this, XConsole, &XConsole::Command_Echo, VarFlag::SYSTEM | VarFlag::SINGLE_ARG, "prints text in argument, prefix dvar's with # to print value");
     ADD_COMMAND_MEMBER("vreset", this, XConsole, &XConsole::Command_VarReset, VarFlag::SYSTEM, "resets a variable to it's default value");
     ADD_COMMAND_MEMBER("vdesc", this, XConsole, &XConsole::Command_VarDescribe, VarFlag::SYSTEM, "describes a variable");
     ADD_COMMAND_MEMBER("seta", this, XConsole, &XConsole::Command_SetVarArchive, VarFlag::SYSTEM, "set a var and flagging it to be archived");
@@ -2758,38 +2758,15 @@ void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
 
 void XConsole::Command_Echo(IConsoleCmdArgs* pCmd)
 {
-    // we only print the 1st arg ?
-    StackString<1024> txt;
-
-    size_t TotalLen = 0;
-    size_t Len = 0;
-
-    for (size_t i = 1; i < pCmd->GetArgCount(); i++) {
-        const char* str = pCmd->GetArg(i);
-
-        Len = strlen(str);
-
-        if ((TotalLen + Len) >= 896) // we need to make sure other info like channle name fit into 1024
-        {
-            X_WARNING("Echo", "input too long truncating");
-
-            // trim it to be sorter then total length.
-            // but not shorter than it's length.
-            size_t new_len = core::Min(Len, 896 - TotalLen);
-            //									  o o
-            // watch this become a bug one day.  ~~~~~
-            const_cast<char*>(str)[new_len] = '\0';
-
-            txt.appendFmt("%s", str);
-            break; // stop adding.
-        }
-
-        txt.appendFmt("%s ", str);
-
-        TotalLen = txt.length();
+    if (pCmd->GetArgCount() != 2) {
+        X_WARNING("Console", "echo <text>");
+        return;
     }
 
-    X_LOG0("echo", txt.c_str());
+    const char* pStr = pCmd->GetArg(1);
+
+    // don't pass as the format string otherwise we could crash based on user input.
+    X_LOG0("echo", "%s", pStr);
 }
 
 void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
