@@ -927,7 +927,7 @@ void XConsole::exec(const char* pCommand)
 {
     X_ASSERT_NOT_NULL(pCommand);
 
-    addCmd(pCommand, ExecSource::SYSTEM, false);
+    addCmd(core::string_view(pCommand), ExecSource::SYSTEM, false);
 }
 
 
@@ -1121,14 +1121,14 @@ void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
 
 // -------------------------
 
-X_INLINE void XConsole::addCmd(const char* pCommand, ExecSource::Enum src, bool silent)
+X_INLINE void XConsole::addCmd(core::string_view command, ExecSource::Enum src, bool silent)
 {
-    pendingCmdsQueue_.emplace(string(pCommand), src, silent);
+    pendingCmdsQueue_.emplace(string(command.data(), command.length()), src, silent);
 }
 
-void XConsole::addCmd(const string& command, ExecSource::Enum src, bool silent)
+void XConsole::addCmd(string&& command, ExecSource::Enum src, bool silent)
 {
-    pendingCmdsQueue_.emplace(command, src, silent);
+    pendingCmdsQueue_.emplace(std::move(command), src, silent);
 }
 
 
@@ -1259,7 +1259,7 @@ void XConsole::configExec(const char* pCommand, const char* pEnd)
     // for now i'll let any be used
 
     if (gEnv->isRunning()) {
-        addCmd(pCommand, ExecSource::CONFIG, false);
+        addCmd(core::string_view(pCommand, pEnd), ExecSource::CONFIG, false);
     }
     else {
         // we run the command now.
@@ -1327,12 +1327,12 @@ void XConsole::executeInputBuffer(void)
         return;
     }
 
-    core::string Temp = inputBuffer_;
+    core::string temp = inputBuffer_;
     clearInputBuffer();
 
-    addCmdToHistory(Temp);
+    addCmdToHistory(temp);
 
-    addCmd(Temp, ExecSource::CONSOLE, false);
+    addCmd(std::move(temp), ExecSource::CONSOLE, false);
 }
 
 

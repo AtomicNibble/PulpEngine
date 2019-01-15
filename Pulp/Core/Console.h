@@ -221,8 +221,8 @@ private:
     void displayVarInfo(const ICVar* pVar, bool full = false);
 
     // Cmds
-    void addCmd(const char* pCommand, ExecSource::Enum src, bool silent);
-    void addCmd(const string& command, ExecSource::Enum src, bool silent);
+    void addCmd(core::string_view command, ExecSource::Enum src, bool silent);
+    void addCmd(string&& command, ExecSource::Enum src, bool silent);
     void executeStringInternal(const ExecCommand& cmd); // executes a command string, may contain multiple commands
                                                         // runs a single cmd. even tho it's 'const' a command may alter the consoles state. :| aka 'clearBinds', 'consoleHide', ...
     void executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::CommandStr& str) const;
