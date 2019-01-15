@@ -894,13 +894,10 @@ void XConsole::unregisterVariable(ICVar* pCVar)
 
 // Commands :)
 
-void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
+void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
 {
-    X_ASSERT_NOT_NULL(pName);
-
     ConsoleCommand cmd;
-
-    cmd.name = pName;
+    cmd.name.assign(name.data(), name.length());
     cmd.flags = Flags;
     cmd.func = func;
     if (pDesc) {
@@ -909,7 +906,7 @@ void XConsole::registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags 
 
     // pass cmd.Name instead of Name, saves creating a second core::string
     if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
-        X_WARNING("Console", "command already exsists: \"%s", pName);
+        X_WARNING("Console", "command already exsists: \"%*.s", name.length(), name.data());
     }
 
     cmdMap_.emplace(cmd.name, cmd);

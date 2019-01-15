@@ -478,14 +478,16 @@ extern core::MallocFreeAllocator* gMalloc;
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<_func>();                                                      \
-    gEnv->pConsole->registerCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
+    constexpr auto name = core::string_view(_name, __builtin_strlen(_name));                  \
+    gEnv->pConsole->registerCommand(name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc));  \
     X_MULTILINE_MACRO_END
 
 #define ADD_COMMAND_MEMBER(_name, __inst, __class, _func, _flags, _Desc)                      \
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<__class, _func>(__inst);                                       \
-    gEnv->pConsole->registerCommand(_name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
+    constexpr auto name = core::string_view(_name, __builtin_strlen(_name));                  \
+    gEnv->pConsole->registerCommand(name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_Desc)); \
     X_MULTILINE_MACRO_END
 
 // All logging done via this.

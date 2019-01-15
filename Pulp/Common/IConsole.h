@@ -125,7 +125,7 @@ struct IConsole
     virtual void unregisterVariable(const char* pVarName) X_ABSTRACT;
     virtual void unregisterVariable(ICVar* pVar) X_ABSTRACT;
 
-    virtual void registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_ABSTRACT;
+    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_ABSTRACT;
     virtual void unRegisterCommand(const char* pName) X_ABSTRACT;
 
     virtual void exec(const char* pCommand) X_ABSTRACT;

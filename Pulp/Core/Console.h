@@ -198,7 +198,7 @@ public:
     void unregisterVariable(const char* pVarName) X_FINAL;
     void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    void registerCommand(const char* pName, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
+    void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
     void unRegisterCommand(const char* pName) X_FINAL;
 
     void exec(const char* pCommand) X_FINAL;

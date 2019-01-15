@@ -48,7 +48,7 @@ public:
     virtual void unregisterVariable(const char* sVarName) X_FINAL;
     virtual void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    virtual void registerCommand(const char* Name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
+    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
     virtual void unRegisterCommand(const char* Name) X_FINAL;
 
     virtual void exec(const char* command) X_FINAL;
