@@ -472,7 +472,7 @@ extern core::MallocFreeAllocator* gMalloc;
 
 #define ADD_CVAR_INT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerInt(core::string_view(_name), (_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
 #define ADD_CVAR_FLOAT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerFloat(core::string_view(_name), (_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_STRING(_name, _val, _flags, _desc) gEnv->pConsole->registerString(core::string_view(_name), (_val), (_flags), CVARTEXT(_desc))
+#define ADD_CVAR_STRING(_name, _val, _flags, _desc) gEnv->pConsole->registerString(core::string_view(_name), core::string_view(_val), (_flags), CVARTEXT(_desc))
 
 #define ADD_COMMAND(_name, _func, _flags, _desc)                                              \
     X_MULTILINE_MACRO_BEGIN                                                                   \

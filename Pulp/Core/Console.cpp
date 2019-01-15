@@ -742,7 +742,7 @@ bool XConsole::onInputEvent(const input::InputEvent& event)
 }
 
 
-ICVar* XConsole::registerString(core::string_view name, const char* Value,
+ICVar* XConsole::registerString(core::string_view name, core::string_view value,
     VarFlags Flags, core::string_view desc)
 {
     ICVar* pCVar = getCVar(name);
@@ -751,10 +751,10 @@ ICVar* XConsole::registerString(core::string_view name, const char* Value,
     }
 
     if (Flags.IsSet(VarFlag::CPY_NAME)) {
-        pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarString<H>")(this, name, Value, Flags, desc);
+        pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarString<H>")(this, name, value, Flags, desc);
     }
     else {
-        pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, "CVarString")(this, name, Value, Flags, desc);
+        pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, "CVarString")(this, name, value, Flags, desc);
     }
 
     registerVar(pCVar);

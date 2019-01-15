@@ -37,10 +37,10 @@ core::string_view CVarBaseHeap::GetName(void) const
 // ------------------------------------------------------------
 
 template<class T>
-CVarString<T>::CVarString(XConsole* pConsole, core::string_view name, const char* pDefault,
+CVarString<T>::CVarString(XConsole* pConsole, core::string_view name, core::string_view value,
     VarFlags Flags, core::string_view desc) :
     T(pConsole, name, Flags | VarFlag::STRING, desc),
-    string_(pDefault)
+    string_(value.data(), value.length())
 {
 }
 

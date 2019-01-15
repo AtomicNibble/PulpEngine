@@ -79,7 +79,7 @@ template<class T>
 class CVarString : public T
 {
 public:
-    X_INLINE CVarString(XConsole* pConsole, core::string_view name, const char* pDefault,
+    X_INLINE CVarString(XConsole* pConsole, core::string_view name, core::string_view value,
         VarFlags flags, core::string_view desc);
 
     X_INLINE ~CVarString() X_FINAL;

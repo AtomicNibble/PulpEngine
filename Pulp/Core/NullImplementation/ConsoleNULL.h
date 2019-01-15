@@ -33,7 +33,7 @@ public:
 
     virtual consoleState::Enum getVisState(void) const X_FINAL;
 
-    virtual ICVar* registerString(core::string_view name, const char* Value, VarFlags Flags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerString(core::string_view name, core::string_view value, VarFlags Flags, core::string_view desc) X_FINAL;
     virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags Flags, core::string_view desc) X_FINAL;
     virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags Flags, core::string_view desc) X_FINAL;
 

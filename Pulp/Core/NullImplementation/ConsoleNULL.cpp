@@ -67,11 +67,11 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
     return consoleState::CLOSED;
 }
 
-ICVar* XConsoleNULL::registerString(core::string_view name, const char* Value, VarFlags Flags,
+ICVar* XConsoleNULL::registerString(core::string_view name, core::string_view value, VarFlags Flags,
     core::string_view desc)
 {
     X_UNUSED(name);
-    X_UNUSED(Value);
+    X_UNUSED(value);
     X_UNUSED(Flags);
     X_UNUSED(desc);
     return nullptr;
