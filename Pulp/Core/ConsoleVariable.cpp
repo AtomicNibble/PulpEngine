@@ -1,12 +1,12 @@
 #include "stdafx.h"
 
+#include <String\Lexer.h>
 
 #include "Console.h"
 #include "ConsoleVariable.h"
 
 #include <IConsole.h>
 
-#include "String\Lexer.h"
 
 X_NAMESPACE_BEGIN(core)
 
@@ -58,8 +58,8 @@ namespace
 
 } // namespace
 
-CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, const char* desc) :
-    pDesc_(desc),
+CVarBase::CVarBase(XConsole* pConsole, VarFlags nFlags, core::string_view desc) :
+    desc_(desc),
     flags_(nFlags),
     pConsole_(pConsole)
 {
@@ -97,14 +97,14 @@ void CVarBase::SetModified(void)
     flags_.Set(VarFlag::MODIFIED);
 }
 
-const char* CVarBase::GetDesc(void) const
+core::string_view CVarBase::GetDesc(void) const
 {
-    return pDesc_;
+    return desc_;
 }
 
-void CVarBase::SetDesc(const char* pDesc)
+void CVarBase::SetDesc(core::string_view desc)
 {
-    pDesc_ = pDesc;
+    desc_ = desc;
 }
 
 ICVar* CVarBase::SetOnChangeCallback(ConsoleVarFunc changeFunc)

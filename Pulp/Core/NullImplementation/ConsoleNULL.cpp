@@ -68,7 +68,7 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
 }
 
 ICVar* XConsoleNULL::registerString(core::string_view name, const char* Value, VarFlags Flags,
-    const char* desc)
+    core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(Value);
@@ -78,7 +78,7 @@ ICVar* XConsoleNULL::registerString(core::string_view name, const char* Value, V
 }
 
 ICVar* XConsoleNULL::registerInt(core::string_view name, int Value, int Min, int Max,
-    VarFlags Flags, const char* desc)
+    VarFlags Flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(Value);
@@ -90,7 +90,7 @@ ICVar* XConsoleNULL::registerInt(core::string_view name, int Value, int Min, int
 }
 
 ICVar* XConsoleNULL::registerFloat(core::string_view name, float Value, float Min, float Max,
-    VarFlags flags, const char* desc)
+    VarFlags flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(Value);
@@ -103,7 +103,7 @@ ICVar* XConsoleNULL::registerFloat(core::string_view name, float Value, float Mi
 
 // refrenced based, these are useful if we want to use the value alot so we just register it's address.
 ICVar* XConsoleNULL::registerRef(core::string_view name, float* src, float defaultvalue,
-    float Min, float Max, VarFlags flags, const char* desc)
+    float Min, float Max, VarFlags flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(src);
@@ -119,7 +119,7 @@ ICVar* XConsoleNULL::registerRef(core::string_view name, float* src, float defau
 }
 
 ICVar* XConsoleNULL::registerRef(core::string_view name, int* src, int defaultvalue,
-    int Min, int Max, VarFlags flags, const char* desc)
+    int Min, int Max, VarFlags flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(src);
@@ -135,7 +135,7 @@ ICVar* XConsoleNULL::registerRef(core::string_view name, int* src, int defaultva
 }
 
 ICVar* XConsoleNULL::registerRef(core::string_view name, Color* src, Color defaultvalue,
-    VarFlags flags, const char* desc)
+    VarFlags flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(src);
@@ -148,7 +148,7 @@ ICVar* XConsoleNULL::registerRef(core::string_view name, Color* src, Color defau
 }
 
 ICVar* XConsoleNULL::registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue,
-    VarFlags flags, const char* desc)
+    VarFlags flags, core::string_view desc)
 {
     X_UNUSED(name);
     X_UNUSED(src);
@@ -179,7 +179,7 @@ void XConsoleNULL::unregisterVariable(ICVar* pVar)
 }
 
 void XConsoleNULL::registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags,
-    const char* desc)
+    core::string_view desc)
 {
     X_UNUSED(name,func,Flags,desc);
 }

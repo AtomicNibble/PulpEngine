@@ -13,6 +13,9 @@ struct ICore;
 X_NAMESPACE_BEGIN(core)
 
 struct FrameTimeData;
+
+class string_view;
+
 static const size_t MAX_CONSOLE_VAR = 1024;
 static const size_t MAX_CONSOLE_CMD = 256;
 static const size_t MAX_CONSOLE_BINS = 128;
@@ -110,22 +113,22 @@ struct IConsole
     virtual consoleState::Enum getVisState(void) const X_ABSTRACT;
 
     // Register variables.
-    virtual ICVar* registerString(core::string_view name, const char* Value, VarFlags flags, const char* pDesc) X_ABSTRACT;
-    virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, const char* pDesc) X_ABSTRACT;
-    virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, const char* pDesc) X_ABSTRACT;
+    virtual ICVar* registerString(core::string_view name, const char* Value, VarFlags flags, core::string_view desc) X_ABSTRACT;
+    virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
+    virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    virtual ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* pDesc) X_ABSTRACT;
-    virtual ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* pDesc) X_ABSTRACT;
-    virtual ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, const char* pDesc) X_ABSTRACT;
-    virtual ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* pDesc) X_ABSTRACT;
+    virtual ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
+    virtual ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, core::string_view desc) X_ABSTRACT;
+    virtual ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, core::string_view desc) X_ABSTRACT;
+    virtual ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, core::string_view desc) X_ABSTRACT;
 
     virtual ICVar* getCVar(core::string_view name) X_ABSTRACT;
 
     virtual void unregisterVariable(const char* pVarName) X_ABSTRACT;
     virtual void unregisterVariable(ICVar* pVar) X_ABSTRACT;
 
-    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_ABSTRACT;
+    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_ABSTRACT;
     virtual void unRegisterCommand(const char* pName) X_ABSTRACT;
 
     virtual void exec(core::string_view command) X_ABSTRACT;
@@ -147,9 +150,9 @@ struct ICVar
     virtual ~ICVar() = default;
 
     virtual const char* GetName(void) const X_ABSTRACT;
-    virtual const char* GetDesc(void) const X_ABSTRACT;
+    virtual core::string_view GetDesc(void) const X_ABSTRACT;
     virtual const char* GetDefaultStr(StrBuf& buf) const X_ABSTRACT;
-    virtual void SetDesc(const char* pDesc) X_ABSTRACT;
+    virtual void SetDesc(core::string_view desc) X_ABSTRACT;
 
     virtual int GetInteger(void) const X_ABSTRACT;
     virtual float GetFloat(void) const X_ABSTRACT;

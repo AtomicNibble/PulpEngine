@@ -184,22 +184,22 @@ public:
     // input callbacks
     bool onInputEvent(const input::InputEvent& event);
 
-    ICVar* registerString(core::string_view name, const char* Value, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerString(core::string_view name, const char* Value, VarFlags flags, core::string_view desc) X_FINAL;
+    ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, core::string_view desc) X_FINAL;
+    ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, core::string_view desc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, core::string_view desc) X_FINAL;
+    ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, core::string_view desc) X_FINAL;
+    ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, core::string_view desc) X_FINAL;
+    ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, core::string_view desc) X_FINAL;
 
     ICVar* getCVar(core::string_view name) X_FINAL;
 
     void unregisterVariable(const char* pVarName) X_FINAL;
     void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc) X_FINAL;
+    void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_FINAL;
     void unRegisterCommand(const char* pName) X_FINAL;
 
     void exec(core::string_view command) X_FINAL;

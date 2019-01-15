@@ -15,13 +15,13 @@ class XConsole;
 class CVarBase : public ICVar
 {
 public:
-    CVarBase(XConsole* pConsole, VarFlags flags, const char* pDesc);
+    CVarBase(XConsole* pConsole, VarFlags flags, core::string_view desc);
 
     virtual ~CVarBase();
 
     // interface ICvar
-    virtual const char* GetDesc(void) const X_OVERRIDE;
-    virtual void SetDesc(const char* pDesc) X_OVERRIDE;
+    virtual core::string_view GetDesc(void) const X_OVERRIDE;
+    virtual void SetDesc(core::string_view desc) X_OVERRIDE;
 
     virtual FlagType GetFlags(void) const X_OVERRIDE;
     virtual FlagType SetFlags(FlagType flags) X_OVERRIDE;
@@ -39,7 +39,7 @@ public:
     // interface ~ICvar
 
 protected:
-    const char* pDesc_;
+    core::string_view desc_;
 
     FlagType flags_;
 
@@ -50,7 +50,7 @@ protected:
 class CVarBaseConst : public CVarBase
 {
 public:
-    X_INLINE CVarBaseConst(XConsole* pConsole, core::string_view name, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseConst(XConsole* pConsole, core::string_view name, VarFlags flags, core::string_view desc);
 
     X_INLINE ~CVarBaseConst() X_OVERRIDE;
 
@@ -63,7 +63,7 @@ protected:
 class CVarBaseHeap : public CVarBase
 {
 public:
-    X_INLINE CVarBaseHeap(XConsole* pConsole, core::string_view name, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseHeap(XConsole* pConsole, core::string_view name, VarFlags flags, core::string_view desc);
 
     X_INLINE ~CVarBaseHeap() X_OVERRIDE;
 
@@ -80,7 +80,7 @@ class CVarString : public T
 {
 public:
     X_INLINE CVarString(XConsole* pConsole, core::string_view name, const char* pDefault,
-        VarFlags flags, const char* pDesc);
+        VarFlags flags, core::string_view desc);
 
     X_INLINE ~CVarString() X_FINAL;
 
@@ -114,7 +114,7 @@ class CVarInt : public T
 public:
     // constructor
     X_INLINE CVarInt(XConsole* pConsole, core::string_view name, const int iDefault,
-        int Min, int Max, VarFlags Flags, const char* pDesc);
+        int Min, int Max, VarFlags Flags, core::string_view desc);
 
     X_INLINE ~CVarInt() X_FINAL;
 
@@ -150,7 +150,7 @@ class CVarFloat : public T
 public:
     // constructor
     CVarFloat(XConsole* pConsole, core::string_view name, const float fDefault,
-        float Min, float Max, VarFlags nFlags, const char* pDesc);
+        float Min, float Max, VarFlags nFlags, core::string_view desc);
 
     X_INLINE ~CVarFloat() X_FINAL;
 
@@ -185,7 +185,7 @@ class CVarIntRef : public CVarBaseConst
 public:
     // constructor
     X_INLINE CVarIntRef(XConsole* pConsole, core::string_view name, int* pVar,
-        int Min, int Max, VarFlags nFlags, const char* pDesc);
+        int Min, int Max, VarFlags nFlags, core::string_view desc);
 
     X_INLINE ~CVarIntRef() X_FINAL;
 
@@ -221,7 +221,7 @@ class CVarFloatRef : public CVarBaseConst
 public:
     // constructor
     X_INLINE CVarFloatRef(XConsole* pConsole, core::string_view name, float* pVal,
-        float Min, float Max, VarFlags nFlags, const char* pDesc);
+        float Min, float Max, VarFlags nFlags, core::string_view desc);
 
     X_INLINE ~CVarFloatRef() X_FINAL;
 
@@ -257,7 +257,7 @@ class CVarColRef : public CVarBaseConst
 public:
     // constructor
     X_INLINE CVarColRef(XConsole* pConsole,
-        core::string_view name, Color* pVal, VarFlags nFlags, const char* pDesc);
+        core::string_view name, Color* pVal, VarFlags nFlags, core::string_view desc);
 
     X_INLINE ~CVarColRef() X_FINAL;
 
@@ -296,7 +296,7 @@ class CVarVec3Ref : public CVarBaseConst
 public:
     // constructor
     X_INLINE CVarVec3Ref(XConsole* pConsole, core::string_view name, Vec3f* pVal,
-        VarFlags nFlags, const char* pDesc);
+        VarFlags nFlags, core::string_view desc);
 
     X_INLINE ~CVarVec3Ref() X_FINAL;
 

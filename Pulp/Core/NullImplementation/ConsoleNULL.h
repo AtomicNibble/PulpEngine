@@ -33,22 +33,22 @@ public:
 
     virtual consoleState::Enum getVisState(void) const X_FINAL;
 
-    virtual ICVar* registerString(core::string_view name, const char* Value, VarFlags Flags, const char* desc) X_FINAL;
-    virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags Flags, const char* desc) X_FINAL;
-    virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags Flags, const char* desc) X_FINAL;
+    virtual ICVar* registerString(core::string_view name, const char* Value, VarFlags Flags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags Flags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags Flags, core::string_view desc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    virtual ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags nFlags, const char* desc) X_FINAL;
-    virtual ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* desc) X_FINAL;
+    virtual ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags nFlags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags nFlags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags nFlags, core::string_view desc) X_FINAL;
+    virtual ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, core::string_view desc) X_FINAL;
 
     virtual ICVar* getCVar(core::string_view name) X_FINAL;
 
     virtual void unregisterVariable(const char* sVarName) X_FINAL;
     virtual void unregisterVariable(ICVar* pVar) X_FINAL;
 
-    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* desc) X_FINAL;
+    virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_FINAL;
     virtual void unRegisterCommand(const char* Name) X_FINAL;
 
     virtual void exec(core::string_view command) X_FINAL;

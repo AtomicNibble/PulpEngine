@@ -743,7 +743,7 @@ bool XConsole::onInputEvent(const input::InputEvent& event)
 
 
 ICVar* XConsole::registerString(core::string_view name, const char* Value,
-    VarFlags Flags, const char* pDesc)
+    VarFlags Flags, core::string_view desc)
 {
     ICVar* pCVar = getCVar(name);
     if (pCVar) {
@@ -751,12 +751,10 @@ ICVar* XConsole::registerString(core::string_view name, const char* Value,
     }
 
     if (Flags.IsSet(VarFlag::CPY_NAME)) {
-        pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_,
-            "CVarString<H>")(this, name, Value, Flags, pDesc);
+        pCVar = X_NEW(CVarString<CVarBaseHeap>, &varArena_, "CVarString<H>")(this, name, Value, Flags, desc);
     }
     else {
-        pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_,
-            "CVarString")(this, name, Value, Flags, pDesc);
+        pCVar = X_NEW(CVarString<CVarBaseConst>, &varArena_, "CVarString")(this, name, Value, Flags, desc);
     }
 
     registerVar(pCVar);
@@ -764,33 +762,33 @@ ICVar* XConsole::registerString(core::string_view name, const char* Value,
 }
 
 ICVar* XConsole::registerInt(core::string_view name, int Value, int Min,
-    int Max, VarFlags Flags, const char* pDesc)
+    int Max, VarFlags Flags, core::string_view desc)
 {
     ICVar* pCVar = getCVarForRegistration(name);
     if (pCVar) {
         return pCVar;
     }
 
-    pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, name, Value, Min, Max, Flags, pDesc);
+    pCVar = X_NEW(CVarInt<CVarBaseConst>, &varArena_, "CVarInt")(this, name, Value, Min, Max, Flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
 
 ICVar* XConsole::registerFloat(core::string_view name, float Value, float Min,
-    float Max, VarFlags Flags, const char* pDesc)
+    float Max, VarFlags Flags, core::string_view desc)
 {
     ICVar* pCVar = getCVarForRegistration(name);
     if (pCVar) {
         return pCVar;
     }
 
-    pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, name, Value, Min, Max, Flags, pDesc);
+    pCVar = X_NEW(CVarFloat<CVarBaseConst>, &varArena_, "CVarFloat")(this, name, Value, Min, Max, Flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
 
 ICVar* XConsole::registerRef(core::string_view name, float* src, float defaultvalue,
-    float Min, float Max, VarFlags flags, const char* pDesc)
+    float Min, float Max, VarFlags flags, core::string_view desc)
 {
     X_ASSERT_NOT_NULL(src);
 
@@ -801,13 +799,13 @@ ICVar* XConsole::registerRef(core::string_view name, float* src, float defaultva
 
     *src = defaultvalue;
 
-    pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, name, src, Min, Max, flags, pDesc);
+    pCVar = X_NEW(CVarFloatRef, &varArena_, "CVarRefFloat")(this, name, src, Min, Max, flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
 
 ICVar* XConsole::registerRef(core::string_view name, int* src, int defaultvalue,
-    int Min, int Max, VarFlags flags, const char* pDesc)
+    int Min, int Max, VarFlags flags, core::string_view desc)
 {
     X_ASSERT_NOT_NULL(src);
 
@@ -818,13 +816,13 @@ ICVar* XConsole::registerRef(core::string_view name, int* src, int defaultvalue,
 
     *src = defaultvalue;
 
-    pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, name, src, Min, Max, flags, pDesc);
+    pCVar = X_NEW(CVarIntRef, &varArena_, "CVarRefInt")(this, name, src, Min, Max, flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
 
 ICVar* XConsole::registerRef(core::string_view name, Color* src, Color defaultvalue,
-    VarFlags flags, const char* pDesc)
+    VarFlags flags, core::string_view desc)
 {
     X_ASSERT_NOT_NULL(src);
 
@@ -835,13 +833,13 @@ ICVar* XConsole::registerRef(core::string_view name, Color* src, Color defaultva
 
     *src = defaultvalue;
 
-    pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, name, src, flags, pDesc);
+    pCVar = X_NEW(CVarColRef, &varArena_, "CVarRefCol")(this, name, src, flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
 
 ICVar* XConsole::registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue,
-    VarFlags flags, const char* pDesc)
+    VarFlags flags, core::string_view desc)
 {
     X_ASSERT_NOT_NULL(src);
 
@@ -852,7 +850,7 @@ ICVar* XConsole::registerRef(core::string_view name, Vec3f* src, Vec3f defaultva
 
     *src = defaultvalue;
 
-    pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, name, src, flags, pDesc);
+    pCVar = X_NEW(CVarVec3Ref, &varArena_, "CVarRefVec3")(this, name, src, flags, desc);
     registerVar(pCVar);
     return pCVar;
 }
@@ -889,15 +887,13 @@ void XConsole::unregisterVariable(ICVar* pCVar)
 
 // Commands :)
 
-void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, const char* pDesc)
+void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc)
 {
     ConsoleCommand cmd;
     cmd.name.assign(name.data(), name.length());
+    cmd.desc.assign(desc.data(), desc.length()); // TODO: do we need a copy?
     cmd.flags = Flags;
     cmd.func = func;
-    if (pDesc) {
-        cmd.desc = pDesc;
-    }
 
     if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
         X_ERROR("Console", "command already exsists: \"%*.s", name.length(), name.data());
@@ -2287,7 +2283,11 @@ void XConsole::drawInputTxt(const Vec2f& start)
                     value.appendFmt("%s", pCvar->GetString(strBuf));
                     defaultValue.appendFmt("%s", pCvar->GetDefaultStr(strBuf));
                 }
-                description.append(pCvar->GetDesc()); // dose string length for us / caps.
+
+                {
+                    auto desc = pCvar->GetDesc();
+                    description.append(desc.data(), desc.length());
+                }
 
                 if (pCvar->GetType() == VarFlag::INT) {
                     if (flags.IsSet(VarFlag::BITFIELD)) {
