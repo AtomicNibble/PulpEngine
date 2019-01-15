@@ -3,7 +3,6 @@
 #ifndef _X_CONSOLE_VAR_X_H_
 #define _X_CONSOLE_VAR_X_H_
 
-// #include <String\xStr.h>
 #include <String\StackString.h>
 #include <String\StrRef.h>
 
