@@ -196,7 +196,7 @@ float CVarInt<T>::GetFloat(void) const
 template<class T>
 const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", intValue_);
+    sprintf_s(buf, "%" PRIi32, intValue_);
     return buf;
 }
 
@@ -252,7 +252,7 @@ void CVarInt<T>::Reset(void)
 template<class T>
 const char* CVarInt<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", intDefault_);
+    sprintf_s(buf, "%" PRIi32, intDefault_);
     return buf;
 }
 
@@ -464,7 +464,7 @@ float CVarIntRef::GetFloat(void) const
 
 const char* CVarIntRef::GetString(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", GetInteger());
+    sprintf_s(buf, "%" PRIi32, intValue_);
     return buf;
 }
 
@@ -512,7 +512,7 @@ void CVarIntRef::Reset(void)
 
 const char* CVarIntRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", defaultVal_);
+    sprintf_s(buf, "%" PRIi32, defaultVal_);
     return buf;
 }
 
