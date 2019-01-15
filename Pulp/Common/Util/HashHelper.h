@@ -94,6 +94,25 @@ struct hash<core::Path<CharT>>
 };
 
 template<>
+struct hash<core::string_view>
+{
+    size_t operator()(const core::string_view& str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
+    }
+
+    size_t operator()(const core::string& str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
+    }
+
+    size_t operator()(const char* const str) const
+    {
+        return (size_t)core::Hash::Fnv1aHash(str, strlen(str));
+    }
+};
+
+template<>
 struct hash<const char*>
 {
     size_t operator()(const char* const str) const
@@ -200,6 +219,25 @@ struct equal_to<core::Path<CharT>>
 };
 
 template<>
+struct equal_to<core::string_view>
+{
+    bool operator()(const core::string_view& lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+
+    bool operator()(const core::string_view& lhs, const core::string& rhs) const
+    {
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+
+    bool operator()(const core::string_view& lhs, const char* const rhs) const
+    {
+        return core::strUtil::IsEqual(lhs.begin(), lhs.end(), rhs);
+    }
+};
+
+template<>
 struct equal_to<const char*>
 {
     bool operator()(const char* const lhs, const char* const rhs) const
@@ -264,6 +302,25 @@ struct equal_to_case_insen<core::string>
     bool operator()(const core::string& lhs, const core::string_view& rhs) const
     {
         return core::strUtil::IsEqualCaseInsen(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+};
+
+template<>
+struct equal_to_case_insen<core::string_view>
+{
+    bool operator()(const core::string_view& lhs, const core::string_view& rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+
+    bool operator()(const core::string_view& lhs, const core::string& rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+    }
+
+    bool operator()(const core::string_view& lhs, const char* const rhs) const
+    {
+        return core::strUtil::IsEqualCaseInsen(lhs.begin(), lhs.end(), rhs);
     }
 };
 
