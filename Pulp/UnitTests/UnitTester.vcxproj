@@ -667,6 +667,7 @@
     <ClCompile Include="UT_StringTable.cpp" />
     <ClCompile Include="UT_StringTokenizer.cpp" />
     <ClCompile Include="UT_StringUtil.cpp" />
+    <ClCompile Include="UT_StringView.cpp" />
     <ClCompile Include="UT_SymbolRes.cpp" />
     <ClCompile Include="UT_TexureLoaders.cpp" />
     <ClCompile Include="UT_Thread.cpp" />
