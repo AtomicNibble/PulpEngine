@@ -58,7 +58,7 @@ int CVarString<T>::GetInteger(void) const
 template<class T>
 float CVarString<T>::GetFloat(void) const
 {
-    return core::strUtil::StringToFloat<float>(string_.c_str());
+    return core::strUtil::StringToFloat(string_.c_str());
 }
 
 template<class T>
@@ -346,7 +346,7 @@ void CVarFloat<T>::Set(core::string_view str)
 
     float fValue = 0;
     if (!str.empty()) {
-        fValue = core::strUtil::StringToFloat<float>(str.begin(), str.end());
+        fValue = core::strUtil::StringToFloat(str.begin(), str.end());
     }
 
     Set(fValue);
@@ -588,7 +588,7 @@ void CVarFloatRef::Set(core::string_view str)
 
     float fValue = 0;
     if (!str.empty()) {
-        fValue = core::strUtil::StringToFloat<float>(str.begin(), str.end());
+        fValue = core::strUtil::StringToFloat(str.begin(), str.end());
     }
 
     Set(fValue);

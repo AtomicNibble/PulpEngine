@@ -124,7 +124,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 
                 if (val.GetType() == core::json::kStringType) {
                     const char* pValue = val.GetString();
-                    p.val[i] = core::strUtil::StringToFloat<float32_t>(pValue);
+                    p.val[i] = core::strUtil::StringToFloat(pValue);
                 }
                 else {
                     p.val[i] = val.GetFloat();
@@ -151,10 +151,11 @@ bool MaterialCompiler::loadFromJson(core::string& str)
                 case ParamType::Color: {
                     // this is space seperated floats. "1 1 1 1"
                     const char* pEnd = nullptr;
-                    p.val[0] = core::strUtil::StringToFloat<float32_t>(pValue, &pEnd);
-                    p.val[1] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
-                    p.val[2] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
-                    p.val[3] = core::strUtil::StringToFloat<float32_t>(pEnd, &pEnd);
+                    // TODO: use StringToFloat taking begin / end with a end return
+                    p.val[0] = core::strUtil::StringToFloat(pValue, &pEnd);
+                    p.val[1] = core::strUtil::StringToFloat(pEnd, &pEnd);
+                    p.val[2] = core::strUtil::StringToFloat(pEnd, &pEnd);
+                    p.val[3] = core::strUtil::StringToFloat(pEnd, &pEnd);
                     break;
                 }
 

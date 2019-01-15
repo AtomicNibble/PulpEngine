@@ -246,18 +246,9 @@ namespace strUtil
 
     /// \brief Converts a string into any floating-point type.
     /// \remark Returns 0 if the string does not represent a valid floating-point value.
-    template<typename T>
-    inline T StringToFloat(const char* str);
-    template<typename T>
-    inline T StringToFloat(const wchar_t* str);
-
-    template<typename T>
-    inline T StringToFloat(const char* str, const char** pEndPtr);
-    template<typename T>
-    inline T StringToFloat(const wchar_t* str, const wchar_t** pEndPtr);
-
-    template<typename T>
-    inline T StringToFloat(const char* startInclusive, const char* endExclusive);
+    float StringToFloat(const char* str);
+    float StringToFloat(const char* str, const char** pEndPtr);
+    float StringToFloat(const char* startInclusive, const char* endExclusive);
 
     bool StringToBool(const char* str);
     bool StringToBool(const char* startInclusive, const char* endExclusive);

@@ -4,6 +4,7 @@
 
 #include "StrRef.h"
 #include <locale> // TODO: remove
+#include <charconv> // TODO: try remove?
 
 #include <direct.h>
 
@@ -888,6 +889,23 @@ namespace strUtil
         }
 
         return nullptr;
+    }
+
+    float StringToFloat(const char* str)
+    {
+        return StringToFloat(str, str + strlen(str));
+    }
+
+    float StringToFloat(const char* str, const char** pEndPtr)
+    {
+        return strtof(str, const_cast<char**>(pEndPtr));
+    }
+
+    float StringToFloat(const char* startInclusive, const char* endExclusive)
+    {
+        float val;
+        auto res = std::from_chars(startInclusive, endExclusive, val, std::chars_format::general);
+        return val;
     }
 
     // we support numeric and:'true', 'false'

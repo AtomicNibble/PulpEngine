@@ -1498,7 +1498,7 @@ void XPhysics::cmd_SetAllScales(core::IConsoleCmdArgs* pArgs)
     }
 
     auto scaleStr = pArgs->GetArg(1);
-    const float scle = core::strUtil::StringToFloat<float>(scaleStr.begin(), scaleStr.end());
+    const float scle = core::strUtil::StringToFloat(scaleStr.begin(), scaleStr.end());
 
     vars_.SetAllScalesToValue(scle);
 }

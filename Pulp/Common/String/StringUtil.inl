@@ -310,55 +310,6 @@ namespace strUtil
         return safe_static_cast<T>(val);
     }
 
-    template<typename T>
-    inline T StringToFloat(const char* str)
-    {
-        return static_cast<T>(atof(str));
-    }
-
-    template<typename T>
-    inline T StringToFloat(const wchar_t* str)
-    {
-        return static_cast<T>(_wtof(str));
-    }
-
-    template<>
-    inline float StringToFloat(const char* str, const char** pEndPtr)
-    {
-        return strtof(str, const_cast<char**>(pEndPtr));
-    }
-
-    template<>
-    inline double StringToFloat(const char* str, const char** pEndPtr)
-    {
-        return strtod(str, const_cast<char**>(pEndPtr));
-    }
-
-    template<>
-    inline float StringToFloat(const wchar_t* str, const wchar_t** pEndPtr)
-    {
-        return wcstof(str, const_cast<wchar_t**>(pEndPtr));
-    }
-
-    template<>
-    inline double StringToFloat(const wchar_t* str, const wchar_t** pEndPtr)
-    {
-        return wcstod(str, const_cast<wchar_t**>(pEndPtr));
-    }
-
-    template<>
-    inline float StringToFloat(const char* startInclusive, const char* endExclusive)
-    {
-        X_UNUSED(startInclusive, endExclusive);
-        return 0;
-    }
-
-    template<>
-    inline double StringToFloat(const char* startInclusive, const char* endExclusive)
-    {
-        X_UNUSED(startInclusive, endExclusive);
-        return 0;
-    }
 
     // -------------------------
 
@@ -366,7 +317,6 @@ namespace strUtil
     {
         return FileExtension(path.begin(), path.end());
     }
-
 
 
 } // namespace strUtil

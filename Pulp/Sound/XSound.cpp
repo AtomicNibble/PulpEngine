@@ -1769,7 +1769,7 @@ void XSound::cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
     }
 
     auto nameID = getIDFromStr(nameStr);
-    float value = core::strUtil::StringToFloat<float>(valueStr.begin(), valueStr.end());
+    float value = core::strUtil::StringToFloat(valueStr.begin(), valueStr.end());
 
     AKRESULT res = SoundEngine::SetRTPCValue(nameID, value, objectId);
     if (res != AK_Success) {
