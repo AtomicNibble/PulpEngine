@@ -139,6 +139,7 @@ public:
     void setVoiceVolume(float vol) X_FINAL;
     void setSFXVolume(float vol) X_FINAL;
 
+    uint32_t getIDFromStr(core::string_view str) const X_FINAL;
     uint32_t getIDFromStr(const char* pStr) const X_FINAL;
     uint32_t getIDFromStr(const wchar_t* pStr) const X_FINAL;
 

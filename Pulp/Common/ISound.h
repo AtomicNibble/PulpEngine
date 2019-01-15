@@ -129,6 +129,11 @@ X_DECLARE_ENUM8(OcclusionType)
     SingleRay,
     MultiRay);
 
+X_INLINE HashVal getIDFromStr(core::string_view str)
+{
+    return core::Hash::Fnv1HashLower(str.data(), str.length());
+}
+
 X_INLINE HashVal getIDFromStr(const char* pStr)
 {
     return core::Hash::Fnv1HashLower(pStr, core::strUtil::strlen(pStr));
@@ -186,6 +191,7 @@ struct ISound : public core::IEngineSysBase
     virtual void setVoiceVolume(float vol) X_ABSTRACT;
     virtual void setSFXVolume(float vol) X_ABSTRACT;
 
+    virtual uint32_t getIDFromStr(core::string_view str) const X_ABSTRACT;
     virtual uint32_t getIDFromStr(const char* pStr) const X_ABSTRACT;
     virtual uint32_t getIDFromStr(const wchar_t* pStr) const X_ABSTRACT;
 

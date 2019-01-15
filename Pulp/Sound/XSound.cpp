@@ -875,6 +875,12 @@ void XSound::setSFXVolume(float vol)
 
 // ----------------------------------------------
 
+uint32_t XSound::getIDFromStr(core::string_view str) const
+{
+    X_ASSERT(core::strUtil::IsLower(str.begin(), str.end()), "must be lower case")();
+    return core::Hash::Fnv1Hash(str.data(), str.length());
+}
+
 uint32_t XSound::getIDFromStr(const char* pStr) const
 {
     X_ASSERT(core::strUtil::IsLower(pStr), "must be lower case")(pStr);
