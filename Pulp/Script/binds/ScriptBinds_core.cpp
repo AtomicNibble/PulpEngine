@@ -57,7 +57,7 @@ int XBinds_Core::getDvarInt(IFunctionHandler* pH)
     const char* varName = nullptr;
     pH->getParam(1, varName);
 
-    core::ICVar* pVar = pConsole_->getCVar(varName);
+    core::ICVar* pVar = pConsole_->getCVar(core::string_view(varName));
 
     if (pVar) {
         return pH->endFunction(pVar->GetInteger());
@@ -74,9 +74,9 @@ int XBinds_Core::getDvarFloat(IFunctionHandler* pH)
     SCRIPT_CHECK_PARAMETERS(1);
 
     const char* varName = nullptr;
-    pH->getParam(1, varName);
+    pH->getParam(1, varName); // todo: give me string_view?>
 
-    core::ICVar* pVar = pConsole_->getCVar(varName);
+    core::ICVar* pVar = pConsole_->getCVar(core::string_view(varName));
 
     if (pVar) {
         return pH->endFunction(pVar->GetFloat());
@@ -95,7 +95,7 @@ int XBinds_Core::getDvar(IFunctionHandler* pH)
     const char* varName = nullptr;
     pH->getParam(1, varName);
 
-    core::ICVar* pVar = pConsole_->getCVar(varName);
+    core::ICVar* pVar = pConsole_->getCVar(core::string_view(varName));
 
     if (pVar) {
         if (pVar->GetType() == core::VarFlag::INT) {
@@ -129,7 +129,7 @@ int XBinds_Core::setDvar(IFunctionHandler* pH)
     const char* varName = nullptr;
     pH->getParam(1, varName);
 
-    core::ICVar* pVar = pConsole_->getCVar(varName);
+    core::ICVar* pVar = pConsole_->getCVar(core::string_view(varName));
 
     if (pVar) {
         Type::Enum type = pH->getParamType(2);

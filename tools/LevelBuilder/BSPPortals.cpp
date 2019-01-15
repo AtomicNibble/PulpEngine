@@ -14,6 +14,8 @@ namespace
 
 X_NAMESPACE_BEGIN(level)
 
+using namespace core::string_view_literals;
+
 // =============================================================================
 
 void bspPortal::MakeNodePortal(XPlaneSet& planeSet, bspNode* node)
@@ -135,7 +137,7 @@ void bspPortal::MakeHeadnodePortals(bspTree& tree)
         }
     }
 
-    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity");
+    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity"_sv);
     if (!pLogVerbosity || pLogVerbosity->GetInteger() >= 1) {
         X_LOG1("BspPortal", "Head node windings");
         // print the head nodes portal bounds.

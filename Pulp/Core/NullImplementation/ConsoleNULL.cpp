@@ -67,20 +67,20 @@ consoleState::Enum XConsoleNULL::getVisState(void) const
     return consoleState::CLOSED;
 }
 
-ICVar* XConsoleNULL::registerString(const char* Name, const char* Value, VarFlags Flags,
+ICVar* XConsoleNULL::registerString(core::string_view name, const char* Value, VarFlags Flags,
     const char* desc)
 {
-    X_UNUSED(Name);
+    X_UNUSED(name);
     X_UNUSED(Value);
     X_UNUSED(Flags);
     X_UNUSED(desc);
     return nullptr;
 }
 
-ICVar* XConsoleNULL::registerInt(const char* Name, int Value, int Min, int Max,
+ICVar* XConsoleNULL::registerInt(core::string_view name, int Value, int Min, int Max,
     VarFlags Flags, const char* desc)
 {
-    X_UNUSED(Name);
+    X_UNUSED(name);
     X_UNUSED(Value);
     X_UNUSED(Min);
     X_UNUSED(Max);
@@ -89,10 +89,10 @@ ICVar* XConsoleNULL::registerInt(const char* Name, int Value, int Min, int Max,
     return nullptr;
 }
 
-ICVar* XConsoleNULL::registerFloat(const char* Name, float Value, float Min, float Max,
+ICVar* XConsoleNULL::registerFloat(core::string_view name, float Value, float Min, float Max,
     VarFlags flags, const char* desc)
 {
-    X_UNUSED(Name);
+    X_UNUSED(name);
     X_UNUSED(Value);
     X_UNUSED(Min);
     X_UNUSED(Max);
@@ -102,7 +102,7 @@ ICVar* XConsoleNULL::registerFloat(const char* Name, float Value, float Min, flo
 }
 
 // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-ICVar* XConsoleNULL::registerRef(const char* name, float* src, float defaultvalue,
+ICVar* XConsoleNULL::registerRef(core::string_view name, float* src, float defaultvalue,
     float Min, float Max, VarFlags flags, const char* desc)
 {
     X_UNUSED(name);
@@ -118,7 +118,7 @@ ICVar* XConsoleNULL::registerRef(const char* name, float* src, float defaultvalu
     return nullptr;
 }
 
-ICVar* XConsoleNULL::registerRef(const char* name, int* src, int defaultvalue,
+ICVar* XConsoleNULL::registerRef(core::string_view name, int* src, int defaultvalue,
     int Min, int Max, VarFlags flags, const char* desc)
 {
     X_UNUSED(name);
@@ -134,7 +134,7 @@ ICVar* XConsoleNULL::registerRef(const char* name, int* src, int defaultvalue,
     return nullptr;
 }
 
-ICVar* XConsoleNULL::registerRef(const char* name, Color* src, Color defaultvalue,
+ICVar* XConsoleNULL::registerRef(core::string_view name, Color* src, Color defaultvalue,
     VarFlags flags, const char* desc)
 {
     X_UNUSED(name);
@@ -147,7 +147,7 @@ ICVar* XConsoleNULL::registerRef(const char* name, Color* src, Color defaultvalu
     return nullptr;
 }
 
-ICVar* XConsoleNULL::registerRef(const char* name, Vec3f* src, Vec3f defaultvalue,
+ICVar* XConsoleNULL::registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue,
     VarFlags flags, const char* desc)
 {
     X_UNUSED(name);
@@ -161,7 +161,7 @@ ICVar* XConsoleNULL::registerRef(const char* name, Vec3f* src, Vec3f defaultvalu
     return nullptr;
 }
 
-ICVar* XConsoleNULL::getCVar(const char* name)
+ICVar* XConsoleNULL::getCVar(core::string_view name)
 {
     X_UNUSED(name);
 

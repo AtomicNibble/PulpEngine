@@ -352,7 +352,7 @@ namespace gui
 
     void GuiContex::slider(const char* pLabel, const char* pVarName, float increment)
     {
-        auto* pVar = gEnv->pConsole->getCVar(pVarName);
+        auto* pVar = gEnv->pConsole->getCVar(core::string_view(pVarName));
         if (!pVar) {
             X_ERROR("Gui", "Failed to find var for slider: \"%s\"", pVarName);
             return;
@@ -450,7 +450,7 @@ namespace gui
 
     void GuiContex::checkbox(const char* pLabel, const char* pVarName)
     {
-        auto* pVar = gEnv->pConsole->getCVar(pVarName);
+        auto* pVar = gEnv->pConsole->getCVar(core::string_view(pVarName));
         if (!pVar) {
             X_ERROR("Gui", "Failed to find var for checkbox: \"%s\"", pVarName);
             return;

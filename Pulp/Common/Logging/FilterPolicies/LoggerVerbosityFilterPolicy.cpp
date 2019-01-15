@@ -5,6 +5,8 @@
 
 X_NAMESPACE_BEGIN(core)
 
+using namespace core::string_view_literals;
+
 LoggerVerbosityFilterPolicy::LoggerVerbosityFilterPolicy(int initialVerbosityLvl,
     const char* nickName) :
     logVerbosity_(initialVerbosityLvl),
@@ -26,7 +28,7 @@ void LoggerVerbosityFilterPolicy::RegisterVars(void)
     // check if 'log_verbosity' has already been registered
     // that way all verbosity instances are controlled by same var.
 
-    core::ICVar* pVar = gEnv->pConsole->getCVar("log_verbosity");
+    core::ICVar* pVar = gEnv->pConsole->getCVar("log_verbosity"_sv);
     if (pVar) {
         pVar_ = pVar;
     }

@@ -51,7 +51,7 @@ protected:
 class CVarBaseConst : public CVarBase
 {
 public:
-    X_INLINE CVarBaseConst(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseConst(XConsole* pConsole, core::string_view name, VarFlags flags, const char* pDesc);
 
     X_INLINE ~CVarBaseConst() X_OVERRIDE;
 
@@ -64,7 +64,7 @@ protected:
 class CVarBaseHeap : public CVarBase
 {
 public:
-    X_INLINE CVarBaseHeap(XConsole* pConsole, const char* pName, VarFlags flags, const char* pDesc);
+    X_INLINE CVarBaseHeap(XConsole* pConsole, core::string_view name, VarFlags flags, const char* pDesc);
 
     X_INLINE ~CVarBaseHeap() X_OVERRIDE;
 
@@ -80,7 +80,7 @@ template<class T>
 class CVarString : public T
 {
 public:
-    X_INLINE CVarString(XConsole* pConsole, const char* pName, const char* Default,
+    X_INLINE CVarString(XConsole* pConsole, core::string_view name, const char* pDefault,
         VarFlags flags, const char* pDesc);
 
     X_INLINE ~CVarString() X_FINAL;
@@ -114,7 +114,7 @@ class CVarInt : public T
 {
 public:
     // constructor
-    X_INLINE CVarInt(XConsole* pConsole, const char* pName, const int iDefault,
+    X_INLINE CVarInt(XConsole* pConsole, core::string_view name, const int iDefault,
         int Min, int Max, VarFlags Flags, const char* pDesc);
 
     X_INLINE ~CVarInt() X_FINAL;
@@ -150,7 +150,7 @@ class CVarFloat : public T
 {
 public:
     // constructor
-    CVarFloat(XConsole* pConsole, const char* pName, const float fDefault,
+    CVarFloat(XConsole* pConsole, core::string_view name, const float fDefault,
         float Min, float Max, VarFlags nFlags, const char* pDesc);
 
     X_INLINE ~CVarFloat() X_FINAL;
@@ -185,7 +185,7 @@ class CVarIntRef : public CVarBaseConst
 {
 public:
     // constructor
-    X_INLINE CVarIntRef(XConsole* pConsole, const char* pName, int* pVar,
+    X_INLINE CVarIntRef(XConsole* pConsole, core::string_view name, int* pVar,
         int Min, int Max, VarFlags nFlags, const char* pDesc);
 
     X_INLINE ~CVarIntRef() X_FINAL;
@@ -221,7 +221,7 @@ class CVarFloatRef : public CVarBaseConst
 {
 public:
     // constructor
-    X_INLINE CVarFloatRef(XConsole* pConsole, const char* pName, float* pVal,
+    X_INLINE CVarFloatRef(XConsole* pConsole, core::string_view name, float* pVal,
         float Min, float Max, VarFlags nFlags, const char* pDesc);
 
     X_INLINE ~CVarFloatRef() X_FINAL;
@@ -258,7 +258,7 @@ class CVarColRef : public CVarBaseConst
 public:
     // constructor
     X_INLINE CVarColRef(XConsole* pConsole,
-        const char* pName, Color* pVal, VarFlags nFlags, const char* pDesc);
+        core::string_view name, Color* pVal, VarFlags nFlags, const char* pDesc);
 
     X_INLINE ~CVarColRef() X_FINAL;
 
@@ -296,7 +296,7 @@ class CVarVec3Ref : public CVarBaseConst
 {
 public:
     // constructor
-    X_INLINE CVarVec3Ref(XConsole* pConsole, const char* pName, Vec3f* pVal,
+    X_INLINE CVarVec3Ref(XConsole* pConsole, core::string_view name, Vec3f* pVal,
         VarFlags nFlags, const char* pDesc);
 
     X_INLINE ~CVarVec3Ref() X_FINAL;

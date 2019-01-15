@@ -184,17 +184,17 @@ public:
     // input callbacks
     bool onInputEvent(const input::InputEvent& event);
 
-    ICVar* registerString(const char* pName, const char* Value, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerInt(const char* pName, int Value, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerFloat(const char* pName, float Value, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerString(core::string_view name, const char* Value, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerInt(core::string_view name, int Value, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerFloat(core::string_view name, float Value, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
 
     // refrenced based, these are useful if we want to use the value alot so we just register it's address.
-    ICVar* registerRef(const char* pName, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(const char* pName, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(const char* pName, Color* src, Color defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
-    ICVar* registerRef(const char* pName, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(core::string_view name, float* src, float defaultvalue, float Min, float Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(core::string_view name, int* src, int defaultvalue, int Min, int Max, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(core::string_view name, Color* src, Color defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
+    ICVar* registerRef(core::string_view name, Vec3f* src, Vec3f defaultvalue, VarFlags flags, const char* pDesc) X_FINAL;
 
-    ICVar* getCVar(const char* pName) X_FINAL;
+    ICVar* getCVar(core::string_view name) X_FINAL;
 
     void unregisterVariable(const char* pVarName) X_FINAL;
     void unregisterVariable(ICVar* pVar) X_FINAL;
@@ -215,7 +215,7 @@ public:
 
 private:
     // vars
-    ICVar* getCVarForRegistration(const char* pName);
+    ICVar* getCVarForRegistration(core::string_view name);
     void registerVar(ICVar* pCVar);
 
     void displayVarValue(const ICVar* pVar);

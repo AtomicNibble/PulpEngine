@@ -7,6 +7,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+using namespace core::string_view_literals;
+
 namespace
 {
 
@@ -63,10 +65,10 @@ protected:
     {
         pNet_ = gEnv->pNet;
 
-        core::ICVar* pTimeout = gEnv->pConsole->getCVar("net_default_timeout");
+        core::ICVar* pTimeout = gEnv->pConsole->getCVar("net_default_timeout"_sv);
         defaultTimeout_ = core::TimeVal::fromMS(pTimeout->GetInteger());
 
-        core::ICVar* pWait = gEnv->pConsole->getCVar("net_wait_for_players");
+        core::ICVar* pWait = gEnv->pConsole->getCVar("net_wait_for_players"_sv);
         waitForPlayers_ = pWait->GetInteger() != 0;
 
 

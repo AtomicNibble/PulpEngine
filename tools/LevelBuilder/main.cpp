@@ -149,6 +149,8 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
     // compile my anus.
     int res = 1;
 
+    using namespace core::string_view_literals;
+
     {
         core::MallocFreeAllocator allocator;
         LvlBuilderArena arena(&allocator, "LevelBuilderArena");
@@ -162,7 +164,7 @@ int APIENTRY _tWinMain(_In_ HINSTANCE hInstance,
             if (engine.Init(hInstance, lpCmdLine, &arena)) 
             {
                 {
-                    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity");
+                    core::ICVar* pLogVerbosity = gEnv->pConsole->getCVar("log_verbosity"_sv);
                     X_ASSERT_NOT_NULL(pLogVerbosity);
                     pLogVerbosity->Set(0);
                 }
