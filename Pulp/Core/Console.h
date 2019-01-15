@@ -133,8 +133,9 @@ class XConsole : public IConsole
         bool _pad[3];
     };
 
-    // members.
-    typedef core::FixedHashTable<const char*, ICVar*, core::hash<const char*>, equal_to_case_insen<const char*>> ConsoleVarMap; // key points into string stored in ICVar or in .exe/.dll
+    
+    // key points into string stored in ICVar or in .exe/.dll
+    typedef core::FixedHashTable<core::string_view, ICVar*, core::hash<core::string_view>, equal_to_case_insen<core::string_view>> ConsoleVarMap; 
     typedef core::FixedHashTable<string, ConsoleCommand, core::hash<string>, equal_to_case_insen<core::string>> ConsoleCmdMap;
     typedef core::FixedHashTable<string, string, core::hash<string>, equal_to_case_insen<core::string>> ConfigCmdsMap;
     typedef core::FixedHashTable<string, string> ConsoleBindMap;

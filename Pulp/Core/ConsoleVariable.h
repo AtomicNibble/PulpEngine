@@ -54,10 +54,10 @@ public:
 
     X_INLINE ~CVarBaseConst() X_OVERRIDE;
 
-    X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+    X_INLINE virtual core::string_view GetName(void) const X_OVERRIDE;
 
 protected:
-    const char* pName_;
+    core::string_view name_;
 };
 
 class CVarBaseHeap : public CVarBase
@@ -67,7 +67,7 @@ public:
 
     X_INLINE ~CVarBaseHeap() X_OVERRIDE;
 
-    X_INLINE virtual const char* GetName(void) const X_OVERRIDE;
+    X_INLINE virtual core::string_view GetName(void) const X_OVERRIDE;
 
 protected:
     string name_;

@@ -149,7 +149,7 @@ struct ICVar
 
     virtual ~ICVar() = default;
 
-    virtual const char* GetName(void) const X_ABSTRACT;
+    virtual core::string_view GetName(void) const X_ABSTRACT;
     virtual core::string_view GetDesc(void) const X_ABSTRACT;
     virtual const char* GetDefaultStr(StrBuf& buf) const X_ABSTRACT;
     virtual void SetDesc(core::string_view desc) X_ABSTRACT;

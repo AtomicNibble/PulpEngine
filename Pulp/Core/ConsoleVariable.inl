@@ -4,19 +4,17 @@ X_NAMESPACE_BEGIN(core)
 
 CVarBaseConst::CVarBaseConst(XConsole* pConsole, core::string_view name, VarFlags Flags, core::string_view desc) :
     CVarBase(pConsole, Flags, desc),
-    pName_(name.data())
+    name_(name)
 {
-    bool hasNullterm = *name.end() == '\0';
-    X_ASSERT(hasNullterm, "Cvars still require null term string currently")(hasNullterm);
 }
 
 CVarBaseConst::~CVarBaseConst()
 {
 }
 
-const char* CVarBaseConst::GetName(void) const
+core::string_view CVarBaseConst::GetName(void) const
 {
-    return pName_;
+    return name_;
 }
 
 // ------------------------------------------------------------
@@ -31,9 +29,9 @@ CVarBaseHeap::~CVarBaseHeap()
 {
 }
 
-const char* CVarBaseHeap::GetName(void) const
+core::string_view CVarBaseHeap::GetName(void) const
 {
-    return name_.c_str();
+    return core::string_view(name_);
 }
 
 // ------------------------------------------------------------

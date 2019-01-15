@@ -70,7 +70,7 @@ namespace
     {
         std::sort(vars.begin(), vars.end(),
             [](const core::ICVar* a, const core::ICVar* b) {
-                return std::strcmp(a->GetName(), b->GetName()) < 0;
+                return a->GetName() < b->GetName();
             }
         );
     }
@@ -665,11 +665,11 @@ void XConsole::saveChangedVars(void)
 
         if (save) {
             // save out name + value.
-            const char* pName = pVar->GetName();
+            auto name = pVar->GetName();
             const char* pValue = pVar->GetString(strBuf);
             
             stream.write("seta ", 5);
-            stream.write(pName, core::strUtil::strlen(pName));
+            stream.write(name.data(), name.length());
             stream.write(' ');
             stream.write(pValue, core::strUtil::strlen(pValue));
             stream.write('\n');
@@ -2083,8 +2083,6 @@ void XConsole::drawInputTxt(const Vec2f& start)
     if (pFont_ && pPrimContext_) {
         const char* inputBegin = inputBuffer_.begin();
         const char* inputEnd = inputBuffer_.end();
-        const char* pName;
-        size_t NameLen, inputLen;
 
         if (inputBuffer_.isEmpty()) {
             resetAutoCompletion();
@@ -2106,7 +2104,7 @@ void XConsole::drawInputTxt(const Vec2f& start)
             inputEnd = space; // cap search. (-1 will be safe since must be 1 char in string)
         }
 
-        inputLen = inputEnd - inputBegin;
+        const size_t inputLen = inputEnd - inputBegin;
         if (inputLen == 0) {
             return;
         }
@@ -2124,17 +2122,19 @@ void XConsole::drawInputTxt(const Vec2f& start)
         auto it = varMap_.begin();
 
         for (; it != varMap_.end(); ++it) {
-            pName = it->second->GetName();
-            NameLen = core::strUtil::strlen(pName);
-
+            auto name = it->second->GetName();
+            
             // if var name shorter than search leave it !
-            if (NameLen < inputLen) {
+            if (name.length() < inputLen) {
                 continue;
             }
 
+            // TODO: make results take string_view
+            X_ASSERT(*name.end() == '\0', "Name needs to be nullterm untill this is code is updated")();
+
             // we search same length.
-            if (pComparison(pName, pName + inputLen, inputBegin, inputEnd)) {
-                results.emplace_back(pName, it->second, nullptr);
+            if (pComparison(name.begin(), name.end(), inputBegin, inputEnd)) {
+                results.emplace_back(name.data(), it->second, nullptr);
             }
 
             if (results.size() == results.capacity()) {
@@ -2146,11 +2146,11 @@ void XConsole::drawInputTxt(const Vec2f& start)
             // do the commands baby!
             auto cmdIt = cmdMap_.begin();
             for (; cmdIt != cmdMap_.end(); ++cmdIt) {
-                pName = cmdIt->second.name.c_str();
-                NameLen = cmdIt->second.name.length();
+                const char* pName = cmdIt->second.name.c_str();
+                size_t nameLen = cmdIt->second.name.length();
 
                 // if cmd name shorter than search leave it !
-                if (NameLen < inputLen) {
+                if (nameLen < inputLen) {
                     continue;
                 }
 
