@@ -1515,10 +1515,8 @@ bool XSound::waitForBankLoad(Bank& bank)
     return bank.status == Bank::Status::Loaded;
 }
 
-void XSound::listBanks(const char* pSearchPatten) const
+void XSound::listBanks(core::string_view searchPattern) const
 {
-    core::string_view searchPattern(pSearchPatten);
-
     core::CriticalSection::ScopedLock lock(cs_);
     core::Array<const Bank*> sorted_banks(g_SoundArena);
 
@@ -1760,18 +1758,20 @@ void XSound::cmd_SetRtpc(core::IConsoleCmdArgs* pArgs)
         return;
     }
 
-    const char* pName = pArgs->GetArg(1);
-    const char* pValue = pArgs->GetArg(2);
+    auto nameStr = pArgs->GetArg(1);
+    auto valueStr = pArgs->GetArg(2);
 
     // optional ObjectId
     AkGameObjectID objectId = GLOBAL_OBJECT_ID;
     if (pArgs->GetArgCount() > 3) {
-        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
+        auto objectIDStr = pArgs->GetArg(1);
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(objectIDStr.begin(), objectIDStr.end());
     }
 
-    float value = core::strUtil::StringToFloat<float>(pValue);
+    auto nameID = getIDFromStr(nameStr);
+    float value = core::strUtil::StringToFloat<float>(valueStr.begin(), valueStr.end());
 
-    AKRESULT res = SoundEngine::SetRTPCValue(pName, value, objectId);
+    AKRESULT res = SoundEngine::SetRTPCValue(nameID, value, objectId);
     if (res != AK_Success) {
         AkResult::Description desc;
         X_ERROR("SoundSys", "Error setting RTPC value. %s", AkResult::ToString(res, desc));
@@ -1786,16 +1786,20 @@ void XSound::cmd_SetSwitchState(core::IConsoleCmdArgs* pArgs)
         return;
     }
 
-    const char* pName = pArgs->GetArg(1);
-    const char* pState = pArgs->GetArg(2);
+    auto nameStr = pArgs->GetArg(1);
+    auto stateStr = pArgs->GetArg(2);
 
     // optional ObjectId
     AkGameObjectID objectId = GLOBAL_OBJECT_ID;
     if (pArgs->GetArgCount() > 3) {
-        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(3));
+        auto objectIDStr = pArgs->GetArg(1);
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(objectIDStr.begin(), objectIDStr.end());
     }
 
-    AKRESULT res = SoundEngine::SetSwitch(pName, pState, objectId);
+    auto nameID = getIDFromStr(nameStr);
+    auto stateID = getIDFromStr(stateStr);
+
+    AKRESULT res = SoundEngine::SetSwitch(nameID, stateID, objectId);
     if (res != AK_Success) {
         AkResult::Description desc;
         X_ERROR("SoundSys", "Error setting switch state. %s", AkResult::ToString(res, desc));
@@ -1810,8 +1814,8 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
         return;
     }
 
-    const char* pEventName = pArgs->GetArg(1);
-    auto eventId = SoundEngine::GetIDFromString(pEventName);
+    auto eventName = pArgs->GetArg(1);
+    auto eventId = getIDFromStr(eventName);
 
     // optional ObjectId
     if (pArgs->GetArgCount() < 3) {
@@ -1821,16 +1825,15 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
     }
 
     // we want a specific object.
-    const char* pObjectStr = pArgs->GetArg(2);
-
-    SoundObject* pObject = findObjectForNick(core::string_view(pObjectStr));
+    auto objectStr = pArgs->GetArg(1);
+    SoundObject* pObject = findObjectForNick(objectStr);
     if (!pObject) {
-        X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+        X_WARNING("Console", "Failed to find sound object with id: \"%*.s\"", objectStr.length(), objectStr.data());
         return;
     }
 
     const auto& pos = pObject->trans.pos;
-    X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %s object-pos: (%g,%g,%g)", eventId, pObjectStr, pos.x, pos.y, pos.z);
+    X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %*.s object-pos: (%g,%g,%g)", eventId, objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
 
     postEvent(eventId, SoundObjToObjHandle(pObject));
 }
@@ -1843,17 +1846,18 @@ void XSound::cmd_StopEvent(core::IConsoleCmdArgs* pArgs)
         return;
     }
 
-    const char* pEventName = pArgs->GetArg(1);
+    auto eventName = pArgs->GetArg(1);
     //	auto eventId = SoundEngine::GetIDFromString(pEventName);
 
     // optional ObjectId
     AkGameObjectID objectId = GLOBAL_OBJECT_ID;
     if (pArgs->GetArgCount() > 2) {
-        objectId = core::strUtil::StringToInt<AkGameObjectID>(pArgs->GetArg(2));
+        auto objectIDStr = pArgs->GetArg(1);
+        objectId = core::strUtil::StringToInt<AkGameObjectID>(objectIDStr.begin(), objectIDStr.end());
     }
 
     // TODO
-    X_UNUSED(pEventName);
+    X_UNUSED(eventName);
     X_UNUSED(objectId);
 }
 
@@ -1868,28 +1872,29 @@ void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
     }
 
     // we want a specific object.
-    const char* pObjectStr = pArgs->GetArg(1);
-    SoundObject* pObject = findObjectForNick(core::string_view(pObjectStr));
+    auto objectStr = pArgs->GetArg(1);
+    SoundObject* pObject = findObjectForNick(objectStr);
 
     if (!pObject) {
-        X_WARNING("Console", "Failed to find sound object with id: \"%s\"", pObjectStr);
+        X_WARNING("Console", "Failed to find sound object with id: \"%*.s\"", objectStr.length(), objectStr.data());
         return;
     }
 
     const auto& pos = pObject->trans.pos;
-    X_LOG0("Sound", "snd_stop_all: object: %s object-pos: (%g,%g,%g)", pObjectStr, pos.x, pos.y, pos.z);
+    X_LOG0("Sound", "snd_stop_all: object: %*.s object-pos: (%g,%g,%g)", objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
 
     stopAll(SoundObjToObjHandle(pObject));
 }
 
 void XSound::cmd_ListBanks(core::IConsoleCmdArgs* pArgs)
 {
-    const char* pSearchString = nullptr;
-    if (pArgs->GetArgCount() > 1) {
-        pSearchString = pArgs->GetArg(1);
+    core::string_view searchPattern;
+
+    if (pArgs->GetArgCount() >= 2) {
+        searchPattern = pArgs->GetArg(1);
     }
 
-    listBanks(pSearchString);
+    listBanks(searchPattern);
 }
 
 X_NAMESPACE_END

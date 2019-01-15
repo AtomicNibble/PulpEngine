@@ -72,7 +72,7 @@ public:
         PermatationFlags permFlags);
 
     // ~IMaterialManager
-    void listMaterials(const char* pSearchPatten = nullptr) const;
+    void listMaterials(core::string_view searchPattern) const;
 
 private:
     void setRegisters(TechDefPerm* pTech, render::Commands::ResourceStateBase* pResourceState, const RegisterCtx& regs);

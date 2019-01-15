@@ -179,7 +179,7 @@ public:
     Bank* getBankForID(AkBankID id);
     bool waitForBankLoad(Bank& bank);
 
-    void listBanks(const char* pSearchString) const;
+    void listBanks(core::string_view searchPattern) const;
 
 private:
     void drawDebug(void) const;

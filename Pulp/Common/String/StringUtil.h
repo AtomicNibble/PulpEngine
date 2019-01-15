@@ -127,6 +127,7 @@ namespace strUtil
     bool IsEqual(const wchar_t* startInclusiveS1, const wchar_t* endExclusiveS1, const wchar_t* startInclusiveS2, const wchar_t* endExclusiveS2);
 
     /// Returns whether two strings are equal. case-insensitive
+    bool IsEqualCaseInsen(core::string_view str1, core::string_view str2);
     bool IsEqualCaseInsen(const char* str1, const char* str2);
     bool IsEqualCaseInsen(const wchar_t* str1, const wchar_t* str2);
     /// Returns whether two strings are equal, checks the length of the 1sr range.
@@ -254,6 +255,9 @@ namespace strUtil
     inline T StringToFloat(const char* str, const char** pEndPtr);
     template<typename T>
     inline T StringToFloat(const wchar_t* str, const wchar_t** pEndPtr);
+
+    template<typename T>
+    inline T StringToFloat(const char* startInclusive, const char* endExclusive);
 
     bool StringToBool(const char* str);
     bool StringToBool(const char* startInclusive, const char* endExclusive);

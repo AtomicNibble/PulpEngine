@@ -95,12 +95,12 @@ void AnimManager::releaseAnim(Anim* pAnim)
 }
 
 
-void AnimManager::listAnims(const char* pSearchPatten) const
+void AnimManager::listAnims(core::string_view searchPattern) const
 {
     core::ScopedLock<AnimContainer::ThreadPolicy> lock(anims_.getThreadPolicy());
 
     core::Array<AnimResource*> sorted_anims(g_3dEngineArena);
-    anims_.getSortedAssertList(sorted_anims, core::string_view(pSearchPatten));
+    anims_.getSortedAssertList(sorted_anims, searchPattern);
 
     X_LOG0("Anim", "------------ ^8Anims(%" PRIuS ")^7 ---------------", sorted_anims.size());
 
@@ -203,14 +203,13 @@ bool AnimManager::onFileChanged(const core::AssetName& assetName, const core::st
 
 void AnimManager::Cmd_ListAnims(core::IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listAnims(pSearchPatten);
+    listAnims(searchPattern);
 }
 
 X_NAMESPACE_END

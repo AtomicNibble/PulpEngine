@@ -155,7 +155,7 @@ public:
     bool waitForLoad(core::AssetBase* pVideo) X_FINAL; // returns true if load succeed.
     bool waitForLoad(IVideo* pVideo) X_FINAL;          // returns true if load succeed.
 
-    void listVideos(const char* pSearchPatten = nullptr) const;
+    void listVideos(core::string_view searchPattern) const;
 
     void pauseAll(void);
     void resumeAll(void);

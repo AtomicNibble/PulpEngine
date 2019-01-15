@@ -238,12 +238,12 @@ namespace fx
 
     // -----------------------------------
 
-    void EffectManager::listAssets(const char* pSearchPattern)
+    void EffectManager::listAssets(core::string_view searchPattern)
     {
         core::ScopedLock<EffectContainer::ThreadPolicy> lock(effects_.getThreadPolicy());
 
         core::Array<EffectContainer::Resource*> sorted_efxs(arena_);
-        effects_.getSortedAssertList(sorted_efxs, core::string_view(pSearchPattern));
+        effects_.getSortedAssertList(sorted_efxs, searchPattern);
 
         X_LOG0("Effect", "------------- ^8Effects(%" PRIuS ")^7 -------------", sorted_efxs.size());
 
@@ -259,13 +259,13 @@ namespace fx
 
     void EffectManager::Cmd_ListAssets(core::IConsoleCmdArgs* pCmd)
     {
-        const char* pSearchPattern = nullptr;
+        core::string_view searchPattern;
 
         if (pCmd->GetArgCount() >= 2) {
-            pSearchPattern = pCmd->GetArg(1);
+            searchPattern = pCmd->GetArg(1);
         }
 
-        listAssets(pSearchPattern);
+        listAssets(searchPattern);
     }
 
 } // namespace fx

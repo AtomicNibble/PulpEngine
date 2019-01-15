@@ -1875,10 +1875,8 @@ bool xFileSys::openPak(const PathT& relPath)
     return true;
 }
 
-void xFileSys::listPaks(const char* pSearchPatten) const
+void xFileSys::listPaks(core::string_view searchPattern) const
 {
-    X_UNUSED(pSearchPatten); // TODO
-
     size_t numPacks = 0;
 
     X_LOG0("FileSys", "-------------- ^8Paks(%" PRIuS ")^7 ---------------", numPacks);
@@ -1886,6 +1884,12 @@ void xFileSys::listPaks(const char* pSearchPatten) const
     for (Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
         if (!pSearch->pPak) {
             continue;
+        }
+
+        if (!searchPattern.empty()) {
+            if (!core::strUtil::WildCompare(searchPattern, pSearch->pPak->name)) {
+                continue;
+            }
         }
 
         auto* pPak = pSearch->pPak;
@@ -1898,16 +1902,16 @@ void xFileSys::listPaks(const char* pSearchPatten) const
     X_LOG0("FileSys", "-------------- ^8Paks End^7 --------------");
 }
 
-void xFileSys::listSearchPaths(const char* pSearchPatten) const
+void xFileSys::listSearchPaths(core::string_view searchPattern) const
 {
-    X_UNUSED(pSearchPatten); // TODO
+    X_UNUSED(searchPattern); // TODO: paths are wild.
 
     size_t numPacks = 0;
 
     X_LOG0("FileSys", "-------------- ^8Paths(%" PRIuS ")^7 ---------------", numPacks);
 
     for (Search* pSearch = searchPaths_; pSearch; pSearch = pSearch->pNext) {
-        if (pSearch->pPak) {
+        if (!pSearch->pDir) {
             continue;
         }
 
@@ -1920,25 +1924,25 @@ void xFileSys::listSearchPaths(const char* pSearchPatten) const
 
 void xFileSys::Cmd_ListPaks(IConsoleCmdArgs* pCmd)
 {
-    const char* pSearchPattern = nullptr;
+    core::string_view searchPattern;
 
-    if (pCmd->GetArgCount() > 1) {
-        pSearchPattern = pCmd->GetArg(1);
+    if (pCmd->GetArgCount() >= 2) {
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listPaks(pSearchPattern);
+    listPaks(searchPattern);
 }
 
 
 void xFileSys::Cmd_ListSearchPaths(IConsoleCmdArgs* pCmd)
 {
-    const char* pSearchPattern = nullptr;
+    core::string_view searchPattern;
 
-    if (pCmd->GetArgCount() > 1) {
-        pSearchPattern = pCmd->GetArg(1);
+    if (pCmd->GetArgCount() >= 2) {
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listSearchPaths(pSearchPattern);
+    listSearchPaths(searchPattern);
 }
 
 X_NAMESPACE_END

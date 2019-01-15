@@ -42,7 +42,7 @@ ReplaySys::~ReplaySys()
     X_ASSERT(pFile_ == nullptr, "File was not closed")(pFile_);
 }
 
-void ReplaySys::record(const core::string& name)
+void ReplaySys::record(core::string_view name)
 {
     stop();
 
@@ -63,10 +63,10 @@ void ReplaySys::record(const core::string& name)
 
     mode_ = Mode::RECORD;
     startTime_ = gEnv->pTimer->GetTimeNowNoScale();
-    X_LOG0("ReplaySys", "Started recording replay \"%s\"", name.c_str());
+    X_LOG0("ReplaySys", "Started recording replay \"%*.s\"", name.length(), name.data());
 }
 
-void ReplaySys::play(const core::string& name)
+void ReplaySys::play(core::string_view name)
 {
     stop();
 
@@ -95,7 +95,7 @@ void ReplaySys::play(const core::string& name)
 
     mode_ = Mode::PLAY;
     startTime_ = gEnv->pTimer->GetTimeNowNoScale();
-    X_LOG0("ReplaySys", "Started playing replay \"%s\"", name.c_str());
+    X_LOG0("ReplaySys", "Started playing replay \"%*.s\"", name.length(), name.data());
 }
 
 void ReplaySys::stop(void)

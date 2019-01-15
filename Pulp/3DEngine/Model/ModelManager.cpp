@@ -214,12 +214,12 @@ bool XModelManager::processData(core::AssetBase* pAsset, core::UniquePointer<cha
     return pModel->processData(std::move(data), dataSize, X_ASSERT_NOT_NULL(engine::gEngEnv.pMaterialMan_));
 }
 
-void XModelManager::listModels(const char* pSearchPatten) const
+void XModelManager::listModels(core::string_view searchPattern) const
 {
     core::ScopedLock<ModelContainer::ThreadPolicy> lock(models_.getThreadPolicy());
     
     core::Array<ModelResource*> sorted_models(g_3dEngineArena);
-    models_.getSortedAssertList(sorted_models, core::string_view(pSearchPatten));
+    models_.getSortedAssertList(sorted_models, searchPattern);
 
     X_LOG0("Model", "------------ ^8Models(%" PRIuS ")^7 ---------------", sorted_models.size());
 
@@ -252,14 +252,13 @@ bool XModelManager::onFileChanged(const core::AssetName& assetName, const core::
 
 void XModelManager::Cmd_ListModels(core::IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listModels(pSearchPatten);
+    listModels(searchPattern);
 }
 
 X_NAMESPACE_END

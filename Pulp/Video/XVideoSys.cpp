@@ -327,12 +327,12 @@ void XVideoSys::processData_job(core::V2::JobSystem& jobSys, size_t threadIdx, c
     loadRequestCleanup(pLoadReq);
 }
 
-void XVideoSys::listVideos(const char* pSearchPatten) const
+void XVideoSys::listVideos(core::string_view searchPattern) const
 {
     core::ScopedLock<VideoContainer::ThreadPolicy> lock(videos_.getThreadPolicy());
 
     core::Array<VideoResource*> sorted_videos(arena_);
-    videos_.getSortedAssertList(sorted_videos, core::string_view(pSearchPatten));
+    videos_.getSortedAssertList(sorted_videos, searchPattern);
 
     X_LOG0("Video", "------------ ^8Videos(%" PRIuS ")^7 ---------------", sorted_videos.size());
 
@@ -402,14 +402,13 @@ Vec2f XVideoSys::drawDebug(engine::IPrimativeContext* pPrim, Vec2f pos) const
 
 void XVideoSys::Cmd_ListVideo(core::IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listVideos(pSearchPatten);
+    listVideos(searchPattern);
 }
 
 

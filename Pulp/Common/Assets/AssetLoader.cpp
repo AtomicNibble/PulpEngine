@@ -440,20 +440,19 @@ void AssetLoader::Cmd_ReloadAsset(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    auto* pTypeStr = pCmd->GetArg(1);
-    auto* pName = pCmd->GetArg(2);
-
+    auto typeStr = pCmd->GetArg(1);
+    auto nameStr = pCmd->GetArg(2);
 
     assetDb::AssetType::Enum type;
-    if (!assetDb::assetTypeFromStr(pTypeStr, pTypeStr + strUtil::strlen(pTypeStr), type)) {
-        X_ERROR("AssetLoader", "Invalid asset type: \"%s\"", pTypeStr);
+    if (!assetDb::assetTypeFromStr(typeStr.begin(), typeStr.end(), type)) {
+        X_ERROR("AssetLoader", "Invalid asset type: \"%s\"", typeStr.length(), typeStr.data());
         return;
     }
 
-    core::string name(pName);
-    core::AssetName assetName(type, name);
+    core::AssetName assetName(type, nameStr);
 
     // re use the onFileChanged logic.
+    // TODO: perf - don't drop length.
     onFileChanged(assetName.c_str());
 }
 

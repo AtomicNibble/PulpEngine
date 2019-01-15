@@ -194,7 +194,7 @@ void XConsoleNULL::exec(core::string_view command)
     X_UNUSED(command);
 }
 
-bool XConsoleNULL::loadAndExecConfigFile(const char* fileName)
+bool XConsoleNULL::loadAndExecConfigFile(core::string_view fileName)
 {
     X_UNUSED(fileName);
     return true;

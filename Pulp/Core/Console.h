@@ -87,8 +87,7 @@ public:
     ~ConsoleCommandArgs() X_FINAL;
 
     virtual size_t GetArgCount(void) const X_FINAL;
-    virtual const char* GetArg(size_t idx) const X_FINAL;
-    virtual core::string_view GetArgSV(size_t idx) const X_FINAL;
+    virtual core::string_view GetArg(size_t idx) const X_FINAL;
 
 private:
     void TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags);
@@ -204,7 +203,7 @@ public:
     void unRegisterCommand(core::string_view name) X_FINAL;
 
     void exec(core::string_view command) X_FINAL;
-    bool loadAndExecConfigFile(const char* pFileName) X_FINAL;
+    bool loadAndExecConfigFile(core::string_view fileName) X_FINAL;
 
     void addLineToLog(const char* pStr, uint32_t length) X_FINAL;
     int32_t getLineCount(void) const X_FINAL;
@@ -254,8 +253,8 @@ private:
     core::string_view getHistory(CmdHistory::Enum direction);
 
     // Binds 
-    void addBind(const char* pKey, const char* pCmd);
-    const char* findBind(const char* pKey);
+    void addBind(core::string_view key, core::string_view cmd);
+    core::string_view findBind(core::string_view key);
     void clearAllBinds(void);
     void listbinds(IKeyBindDumpSink* CallBack);
 
@@ -288,9 +287,9 @@ private:
     // ~ICoreEventListener
 
 private:
-    void listCommands(const char* pSearchPatten = nullptr);
-    void listVariables(const char* pSearchPatten = nullptr);
-    void listVariablesValues(const char* pSearchPatten = nullptr);
+    void listCommands(core::string_view searchPattern);
+    void listVariables(core::string_view searchPattern);
+    void listVariablesValues(core::string_view searchPattern);
 
 private:
     void Command_Exit(IConsoleCmdArgs* Cmd);

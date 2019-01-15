@@ -54,8 +54,8 @@ public:
     ReplaySys(core::MemoryArenaBase* arena);
     ~ReplaySys();
 
-    void record(const core::string& name);
-    void play(const core::string& name);
+    void record(core::string_view name);
+    void play(core::string_view name);
     void stop(void);
 
     void update(FrameInput& inputFrame);

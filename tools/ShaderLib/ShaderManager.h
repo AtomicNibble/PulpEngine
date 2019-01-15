@@ -113,8 +113,8 @@ namespace shader
 
         void freeSourcebin(void);
         void freeHwShaders(void);
-        void listHWShaders(const char* pSarchPatten = nullptr);
-        void listShaderSources(const char* pSarchPatten = nullptr);
+        void listHWShaders(core::string_view searchPattern);
+        void listShaderSources(core::string_view searchPattern);
 
     private:
         void IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t);

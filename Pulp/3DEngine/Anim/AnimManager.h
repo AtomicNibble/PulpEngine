@@ -40,7 +40,7 @@ public:
 
     void releaseAnim(Anim* pAnim);
 
-    void listAnims(const char* pSearchPatten = nullptr) const;
+    void listAnims(core::string_view searchPattern) const;
 
     // returns true if load succeed.
     bool waitForLoad(core::AssetBase* pAnim) X_FINAL;

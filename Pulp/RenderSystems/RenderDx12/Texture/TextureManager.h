@@ -76,7 +76,7 @@ private:
 
     void releaseDanglingTextures(void);
 
-    void listTextures(const char* pSearchPattern);
+    void listTextures(core::string_view searchPattern);
 
 private:
     void Cmd_ListTextures(core::IConsoleCmdArgs* pCmd);

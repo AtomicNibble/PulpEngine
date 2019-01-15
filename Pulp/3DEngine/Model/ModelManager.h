@@ -46,7 +46,7 @@ public:
 
     void releaseModel(XModel* pModel) X_FINAL;
 
-    void listModels(const char* pSearchPatten = nullptr) const;
+    void listModels(core::string_view searchPattern) const;
 
     bool waitForLoad(XModel* pModel) X_FINAL; // returns true if load succeed.
 

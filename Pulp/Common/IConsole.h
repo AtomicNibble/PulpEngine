@@ -70,8 +70,7 @@ struct IConsoleCmdArgs
     // Gets number of arguments supplied to the command (including the command itself)
     virtual size_t GetArgCount(void) const X_ABSTRACT;
     // Gets argument by index, idx must be in 0 <= idx < GetArgCount()
-    virtual const char* GetArg(size_t idx) const X_ABSTRACT; // TODO: phase out
-    virtual core::string_view GetArgSV(size_t idx) const X_ABSTRACT;
+    virtual core::string_view GetArg(size_t idx) const X_ABSTRACT;
 
 };
 
@@ -134,7 +133,7 @@ struct IConsole
     virtual void exec(core::string_view command) X_ABSTRACT;
 
     //	virtual void ConfigExec(const char* command) X_ABSTRACT;
-    virtual bool loadAndExecConfigFile(const char* pFileName) X_ABSTRACT;
+    virtual bool loadAndExecConfigFile(core::string_view fileName) X_ABSTRACT;
 
     // Logging
     virtual void addLineToLog(const char* pStr, uint32_t length) X_ABSTRACT;

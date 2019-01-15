@@ -56,7 +56,7 @@ namespace shader
         SHADERLIB_EXPORT SourceFile* loadRawSourceFile(const core::string& name, bool reload);
         SHADERLIB_EXPORT SourceFile* sourceForName(const core::string& name);
 
-        SHADERLIB_EXPORT void listShaderSources(const char* pSearchPatten);
+        SHADERLIB_EXPORT void listShaderSources(core::string_view searchPattern);
 
     private:
         void parseIncludesAndPrePro_r(SourceFile* file, SourceRefArr& includedFiles,

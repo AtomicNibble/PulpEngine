@@ -73,7 +73,7 @@ namespace fx
         bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
     private:
-        void listAssets(const char* pSearchPattern);
+        void listAssets(core::string_view searchPattern);
 
     private:
         void Cmd_ListAssets(core::IConsoleCmdArgs* pCmd);

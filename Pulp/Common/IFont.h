@@ -57,7 +57,7 @@ struct IFontSys : public core::IEngineSysBase
     virtual bool waitForLoad(IFont* pFont) X_ABSTRACT;
 
     // this should really take a sink no?
-    virtual void listFonts(const char* pSearchPatten = nullptr) const X_ABSTRACT;
+    virtual void listFonts(core::string_view searchPattern) const X_ABSTRACT;
 };
 
 #ifdef GetCharWidth

@@ -54,7 +54,7 @@ public:
     virtual void exec(core::string_view command) X_FINAL;
 
     //	virtual void ConfigExec(const char* command) X_FINAL;
-    virtual bool loadAndExecConfigFile(const char* fileName) X_FINAL;
+    virtual bool loadAndExecConfigFile(core::string_view fileName) X_FINAL;
 
     // Loggging
     virtual void addLineToLog(const char* pStr, uint32_t length) X_FINAL;

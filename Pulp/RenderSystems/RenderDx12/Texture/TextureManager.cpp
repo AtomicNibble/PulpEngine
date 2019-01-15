@@ -493,12 +493,12 @@ void TextureManager::releaseDanglingTextures(void)
 
 // -----------------------------------
 
-void TextureManager::listTextures(const char* pSearchPattern)
+void TextureManager::listTextures(core::string_view searchPattern)
 {
     core::ScopedLock<TextureContainer::ThreadPolicy> lock(textures_.getThreadPolicy());
 
     core::Array<TextureContainer::Resource*> sorted_texs(arena_);
-    textures_.getSortedAssertList(sorted_texs, core::string_view(pSearchPattern));
+    textures_.getSortedAssertList(sorted_texs, searchPattern);
 
     X_LOG0("Texture", "------------- ^8Textures(%" PRIuS ")^7 ------------", sorted_texs.size());
 
@@ -515,13 +515,13 @@ void TextureManager::listTextures(const char* pSearchPattern)
 
 void TextureManager::Cmd_ListTextures(core::IConsoleCmdArgs* pCmd)
 {
-    const char* pSearchPattern = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPattern = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listTextures(pSearchPattern);
+    listTextures(searchPattern);
 }
 
 X_NAMESPACE_END

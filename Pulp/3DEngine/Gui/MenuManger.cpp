@@ -192,20 +192,21 @@ namespace gui
         return true;
     }
 
-    void XMenuManager::listGuis(const char* pWildcardSearch) const
+    void XMenuManager::listGuis(core::string_view searchPattern) const
     {
-        X_UNUSED(pWildcardSearch);
+        X_UNUSED(searchPattern);
+        X_ASSERT_NOT_IMPLEMENTED();
     }
 
-    void XMenuManager::Cmd_ListUis(core::IConsoleCmdArgs* pArgs)
+    void XMenuManager::Cmd_ListUis(core::IConsoleCmdArgs* pCmd)
     {
-        // we support wildcards
-        const char* pSearchString = nullptr;
-        if (pArgs->GetArgCount() > 1) {
-            pSearchString = pArgs->GetArg(1);
+        core::string_view searchPattern;
+
+        if (pCmd->GetArgCount() >= 2) {
+            searchPattern = pCmd->GetArg(1);
         }
 
-        listGuis(pSearchString);
+        listGuis(searchPattern);
     }
 
 } // namespace gui

@@ -528,6 +528,11 @@ namespace strUtil
         return false;
     }
 
+    bool IsEqualCaseInsen(core::string_view str1, core::string_view str2)
+    {
+        return IsEqualCaseInsen(str1.begin(), str1.end(), str2.begin(), str2.end());
+    }
+
     bool IsEqualCaseInsen(const char* str1, const char* str2)
     {
         X_ASSERT_NOT_NULL(str1);

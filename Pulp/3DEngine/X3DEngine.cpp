@@ -1350,19 +1350,19 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pBufferStr = pCmd->GetArg(1);
+    auto bufferStr = pCmd->GetArg(1);
 
     render::IPixelBuffer* pBuffer = nullptr;
 
-    if (core::strUtil::IsEqualCaseInsen(pBufferStr, "2d")) {
+    if (core::strUtil::IsEqualCaseInsen(bufferStr, "2d"_sv)) {
         pBuffer = pixelBufffers_[PixelBuf::COL_2D];
     } 
-    else if (core::strUtil::IsEqualCaseInsen(pBufferStr, "3d")) {
+    else if (core::strUtil::IsEqualCaseInsen(bufferStr, "3d"_sv)) {
         pBuffer = pixelBufffers_[PixelBuf::COL_3D];
     }
 
     if (!pBuffer) {
-        X_ERROR("3DEngine", "Unkown buffer: %s", pBufferStr);
+        X_ERROR("3DEngine", "Unkown buffer: %*.s", bufferStr.length(), bufferStr.data());
         return;
     }
 
@@ -1375,7 +1375,7 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
     }
 
     core::Path<> name;
-    name.setFmt("framebuffer_%s.dds", pBufferStr);
+    name.setFmt("framebuffer_%*.s.dds", bufferStr.length(), bufferStr.data());
 
     core::XFileScoped file;
     if (!file.openFile(name, core::FileFlags::WRITE | core::FileFlags::RECREATE)) {

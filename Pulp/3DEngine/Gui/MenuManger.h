@@ -47,7 +47,7 @@ namespace gui
         void releaseGui(IMenu* pMenu) X_FINAL;
         bool waitForLoad(IMenu* pMenu) X_FINAL;
 
-        void listGuis(const char* pWildcardSearch = nullptr) const X_FINAL;
+        void listGuis(core::string_view searchPattern) const X_FINAL;
         //~IMenuManager
 
     private:

@@ -201,22 +201,6 @@ void XMaterialManager::releaseResources(Material* pMat)
     X_UNUSED(pMat);
 }
 
-void XMaterialManager::listMaterials(const char* pSearchPatten) const
-{
-    core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
-
-    core::Array<MaterialResource*> sorted_mats(arena_);
-    materials_.getSortedAssertList(sorted_mats, core::string_view(pSearchPatten));
-
-    X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
-
-    for (const auto* pMat : sorted_mats) {
-        X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName().c_str(), pMat->getRefCount());
-    }
-
-    X_LOG0("Material", "------------ ^8Materials End^7 -----------");
-}
-
 bool XMaterialManager::waitForLoad(core::AssetBase* pMaterial)
 {
     X_ASSERT(pMaterial->getType() == assetDb::AssetType::MATERIAL, "Invalid asset passed")();
@@ -800,6 +784,22 @@ TechDefPerm* XMaterialManager::getCodeTech(const core::string& name, core::StrHa
     return pPerm;
 }
 
+void XMaterialManager::listMaterials(core::string_view searchPattern) const
+{
+    core::ScopedLock<MaterialContainer::ThreadPolicy> lock(materials_.getThreadPolicy());
+
+    core::Array<MaterialResource*> sorted_mats(arena_);
+    materials_.getSortedAssertList(sorted_mats, searchPattern);
+
+    X_LOG0("Material", "------------ ^8Materials(%" PRIuS ")^7 ------------", sorted_mats.size());
+
+    for (const auto* pMat : sorted_mats) {
+        X_LOG0("Material", "^2\"%s\"^7 refs: %" PRIi32, pMat->getName().c_str(), pMat->getRefCount());
+    }
+
+    X_LOG0("Material", "------------ ^8Materials End^7 -----------");
+}
+
 bool XMaterialManager::onFileChanged(const core::AssetName& assetName, const core::string& name)
 {
     X_UNUSED(assetName, name);
@@ -809,14 +809,13 @@ bool XMaterialManager::onFileChanged(const core::AssetName& assetName, const cor
 
 void XMaterialManager::Cmd_ListMaterials(core::IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listMaterials(pSearchPatten);
+    listMaterials(searchPattern);
 }
 
 X_NAMESPACE_END

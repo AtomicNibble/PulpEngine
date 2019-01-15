@@ -132,7 +132,7 @@ public:
 
 public:
     // writes the texture to a file.
-    bool WriteToFile(const char* filename);
+    bool WriteToFile(core::string_view filename);
 
 private:
     void Clear(void);

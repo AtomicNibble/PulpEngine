@@ -592,7 +592,8 @@ void XCore::Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd)
     bool verbose = false;
 
     if (pCmd->GetArgCount() > 1) {
-        verbose = core::strUtil::StringToBool(pCmd->GetArg(1));
+        auto verboseStr = pCmd->GetArg(1);
+        verbose = core::strUtil::StringToBool(verboseStr.begin(), verboseStr.end());
     }
 
     ListDisplayDevices(verbose);
@@ -600,13 +601,13 @@ void XCore::Cmd_ListDisplayDevices(core::IConsoleCmdArgs* pCmd)
 
 void XCore::Cmd_ReplayRecord(core::IConsoleCmdArgs* pCmd)
 {
-    core::string name;
+    core::string_view name;
 
     if (pCmd->GetArgCount() > 1) {
         name = pCmd->GetArg(1);
     }
     else {
-        name = "replay";
+        name = "replay"_sv;
     }
 
     pReplaySys_->record(name);
@@ -614,13 +615,13 @@ void XCore::Cmd_ReplayRecord(core::IConsoleCmdArgs* pCmd)
 
 void XCore::Cmd_ReplayPlay(core::IConsoleCmdArgs* pCmd)
 {
-    core::string name;
+    core::string_view name;
 
     if (pCmd->GetArgCount() > 1) {
         name = pCmd->GetArg(1);
     }
     else {
-        name = "replay";
+        name = "replay"_sv;
     }
 
     pReplaySys_->play(name);

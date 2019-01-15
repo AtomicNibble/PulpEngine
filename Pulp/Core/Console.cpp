@@ -213,16 +213,10 @@ size_t ConsoleCommandArgs::GetArgCount(void) const
     return argNum_;
 }
 
-const char* ConsoleCommandArgs::GetArg(size_t Idx) const
+core::string_view ConsoleCommandArgs::GetArg(size_t idx) const
 {
-    X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
-    return argv_[Idx];
-}
-
-core::string_view ConsoleCommandArgs::GetArgSV(size_t Idx) const
-{
-    X_ASSERT(Idx < argNum_, "Argument index out of range")(argNum_, Idx);
-    return core::string_view(argv_[Idx]);
+    X_ASSERT(idx < argNum_, "Argument index out of range")(argNum_, idx);
+    return core::string_view(argv_[idx]);
 }
 
 // we want to get arguemtns.
@@ -917,15 +911,16 @@ void XConsole::exec(core::string_view command)
 }
 
 
-bool XConsole::loadAndExecConfigFile(const char* pFileName)
+bool XConsole::loadAndExecConfigFile(core::string_view fileName)
 {
     core::Path<char> path;
 
     path = "config";
-    path /= pFileName;
+    path.ensureSlash();
+    path.append(fileName.data(), fileName.length());
     path.setExtension(CONFIG_FILE_EXTENSION);
 
-    X_LOG0("Config", "Loading config: \"%s\"", pFileName);
+    X_LOG0("Config", "Loading config: \"%*.s\"", fileName.data(), fileName.length());
 
     core::XFileScoped file;
     if (!file.openFile(path, FileFlag::READ, core::VirtualDirectory::SAVE)) {
@@ -1824,36 +1819,39 @@ core::string_view XConsole::getHistory(CmdHistory::Enum direction)
 // --------------------------------
 
 // Binds a cmd to a key
-void XConsole::addBind(const char* pKey, const char* pCmd)
+void XConsole::addBind(core::string_view key, core::string_view cmd)
 {
     // check for override ?
-    auto it = binds_.find(pKey);
-
+    auto it = binds_.find(key);
     if (it == binds_.end()) {
-        binds_.emplace(pKey, pCmd);
+        binds_.emplace(core::string(key.data(), key.length()), core::string(cmd.data(), cmd.length()));
         return;
     }
 
-    if (it->second.compare(pCmd)) {
+    if (core::strUtil::IsEqual(cmd, core::string_view(it->second))) {
         // bind is same.
         return;
     }
+
     if (console_debug) {
-        X_LOG1("Console", "Overriding bind \"%s\" -> %s with -> %s", pKey, it->second.c_str(), pCmd);
+        X_LOG1("Console", "Overriding bind \"%*.s\" -> %*.s with -> %*.s", 
+            key.length(), key.data(), 
+            it->second.length(), it->second.data(), 
+            cmd.length(), cmd.data());
     }
 
-    it->second = pCmd;
+    it->second = core::string(cmd.data(), cmd.length());
 }
 
 // returns the command for a given key
 // returns null if no bind found
-const char* XConsole::findBind(const char* pKey)
+core::string_view XConsole::findBind(core::string_view key)
 {
-    auto it = binds_.find(pKey);
-    if (it != binds_.end()) {
-        return it->second.c_str();
+    if (auto it = binds_.find(key); it != binds_.end()) {
+        return core::string_view(it->second);
     }
-    return nullptr;
+
+    return {};
 }
 
 // removes all the binds.
@@ -2561,10 +2559,8 @@ void XConsole::OnCoreEvent(const CoreEventData& ed)
 
 // ----------------------
 
-void XConsole::listCommands(const char* pSearchPatten)
+void XConsole::listCommands(core::string_view searchPattern)
 {
-    core::string_view searchPattern(pSearchPatten);
-
     core::Array<const ConsoleCommand*> sorted_cmds(g_coreArena);
     sorted_cmds.setGranularity(cmdMap_.size());
 
@@ -2588,10 +2584,8 @@ void XConsole::listCommands(const char* pSearchPatten)
     X_LOG0("Console", "------------ ^8Commands End^7 ------------");
 }
 
-void XConsole::listVariables(const char* pSearchPatten)
+void XConsole::listVariables(core::string_view searchPattern)
 {
-    core::string_view searchPattern(pSearchPatten);
-
     core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
@@ -2615,10 +2609,8 @@ void XConsole::listVariables(const char* pSearchPatten)
     X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
 }
 
-void XConsole::listVariablesValues(const char* pSearchPatten)
+void XConsole::listVariablesValues(core::string_view searchPattern)
 {
-    core::string_view searchPattern(pSearchPatten);
-
     core::Array<const ICVar*> sorted_vars(g_coreArena);
     sorted_vars.setGranularity(varMap_.size());
 
@@ -2651,24 +2643,24 @@ void XConsole::Command_Exec(IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pFilename = pCmd->GetArg(1);
+    auto filename = pCmd->GetArg(1);
 
-    loadAndExecConfigFile(pFilename);
+    loadAndExecConfigFile(filename);
 }
 
 void XConsole::Command_History(IConsoleCmdArgs* pCmd)
 {
-    const char* pSearch = nullptr;
+    core::string_view searchPattern;
     if (pCmd->GetArgCount() == 2) {
-        pSearch = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
     X_LOG0("Console", "-------------- ^8History^7 ---------------");
     X_LOG_BULLET;
 
     int32_t idx = 0;
-    for (auto& history : cmdHistory_) {
-        if (!pSearch || history.find(pSearch)) {
+    for (const auto& history : cmdHistory_) {
+        if (searchPattern.empty() || core::strUtil::WildCompare(searchPattern, core::string_view(history))) {
             X_LOG0("Console", "> %" PRIi32 " %s", idx, history.c_str());
         }
 
@@ -2691,38 +2683,35 @@ void XConsole::Command_Help(IConsoleCmdArgs* pCmd)
 
 void XConsole::Command_ListCmd(IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listCommands(pSearchPatten);
+    listCommands(searchPattern);
 }
 
 void XConsole::Command_ListDvars(IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listVariables(pSearchPatten);
+    listVariables(searchPattern);
 }
 
 void XConsole::Command_ListDvarsValues(IConsoleCmdArgs* pCmd)
 {
-    // optional search criteria
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listVariablesValues(pSearchPatten);
+    listVariablesValues(searchPattern);
 }
 
 void XConsole::Command_Exit(IConsoleCmdArgs* pCmd)
@@ -2747,10 +2736,8 @@ void XConsole::Command_Echo(IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pStr = pCmd->GetArg(1);
-
-    // don't pass as the format string otherwise we could crash based on user input.
-    X_LOG0("echo", "%s", pStr);
+    auto str = pCmd->GetArg(1);
+    X_LOG0("echo", "%*.s", str.length(), str.data());
 }
 
 void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
@@ -2761,9 +2748,11 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
     }
 
     // find the var
-    ICVar* pCvar = getCVar(pCmd->GetArgSV(1));
+    auto str = pCmd->GetArg(1);
+
+    ICVar* pCvar = getCVar(str);
     if (!pCvar) {
-        X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
+        X_ERROR("Console", "var with name \"%*.s\" not found", str.length(), str.data());
         return;
     }
 
@@ -2780,9 +2769,11 @@ void XConsole::Command_VarDescribe(IConsoleCmdArgs* pCmd)
     }
 
     // find the var
-    ICVar* pCvar = getCVar(pCmd->GetArgSV(1));
+    auto str = pCmd->GetArg(1);
+
+    ICVar* pCvar = getCVar(str);
     if (!pCvar) {
-        X_ERROR("Console", "var with name \"%s\" not found", pCmd->GetArg(1));
+        X_ERROR("Console", "var with name \"%*.s\" not found", str.length(), str.data());
         return;
     }
 
@@ -2800,8 +2791,10 @@ void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
 
     core::StackString<1024> cmd;
 
+    // concat args into a command
     for (size_t i = 2; i < Num; i++) {
-        cmd.append(pCmd->GetArg(i));
+        auto argStr = pCmd->GetArg(i);
+        cmd.append(argStr.data(), argStr.length());
         if (i + 1 == Num) {
             cmd.append(';', 1);
         }
@@ -2810,7 +2803,7 @@ void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
         }
     }
 
-    addBind(pCmd->GetArg(1), cmd.c_str());
+    addBind(pCmd->GetArg(1), core::string_view(cmd));
 }
 
 void XConsole::Command_BindsClear(IConsoleCmdArgs* pCmd)
@@ -2850,7 +2843,8 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
         return;
     }
 
-    auto varName = Cmd->GetArgSV(1);
+    // TODO: improve logic IConsoleCmdArgs should just expose a way to geta view of all data after a given arg idx.
+    auto varName = Cmd->GetArg(1);
 
     if (ICVar* pCBar = getCVar(varName)) {
         VarFlag::Enum type = pCBar->GetType();
@@ -2859,7 +2853,8 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
             core::StackString512 merged;
 
             for (size_t i = 2; i < Num; i++) {
-                merged.append(Cmd->GetArg(i));
+                auto argStr = Cmd->GetArg(i);
+                merged.append(argStr.begin(), argStr.end());
                 merged.append(" ");
             }
 
@@ -2871,7 +2866,9 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
                 return;
             }
 
-            pCBar->Set(Cmd->GetArg(2));
+            auto argStr = Cmd->GetArg(2);
+            core::StackString512 val(argStr.begin(), argStr.end()); // TODO: remove
+            pCBar->Set(val.c_str());
         }
 
         pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
@@ -2880,7 +2877,8 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
         core::string merged;
 
         for (size_t i = 2; i < Num; i++) {
-            merged.append(Cmd->GetArg(i));
+            auto argStr = Cmd->GetArg(i);
+            merged.append(argStr.begin(), argStr.end());
             merged.append(" ");
         }
 

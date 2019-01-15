@@ -346,6 +346,20 @@ namespace strUtil
         return wcstod(str, const_cast<wchar_t**>(pEndPtr));
     }
 
+    template<>
+    inline float StringToFloat(const char* startInclusive, const char* endExclusive)
+    {
+        X_UNUSED(startInclusive, endExclusive);
+        return 0;
+    }
+
+    template<>
+    inline double StringToFloat(const char* startInclusive, const char* endExclusive)
+    {
+        X_UNUSED(startInclusive, endExclusive);
+        return 0;
+    }
+
     // -------------------------
 
     X_INLINE const char* FileExtension(core::string_view path)

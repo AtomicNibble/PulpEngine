@@ -50,7 +50,7 @@ public:
 
     bool waitForLoad(IFont* pFont) X_FINAL;
 
-    void listFonts(const char* pSearchPatten = nullptr) const X_FINAL;
+    void listFonts(core::string_view searchPattern) const X_FINAL;
     // ~IXFont
 
     X_INLINE const FontVars& getVars(void) const;

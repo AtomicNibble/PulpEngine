@@ -916,13 +916,13 @@ void XGame::Command_Map(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pMapName = pCmd->GetArg(1);
+    auto mapName = pCmd->GetArg(1);
 
     // holly moly!!!!
     net::MatchParameters match;
     match.numSlots = 2;
     match.mode = net::GameMode::SinglePlayer;
-    match.mapName.set(pMapName);
+    match.mapName.set(mapName.begin(), mapName.end());
 
     // i need to wait for state changes, but don't really want to stall.
     // so i basically need to track state?
@@ -961,17 +961,16 @@ void XGame::Cmd_OpenMenu(core::IConsoleCmdArgs* pArgs)
         return;
     }
 
-    auto* pMenuName = pArgs->GetArg(1);
+    auto menuName = pArgs->GetArg(1);
 
     pMenuHandler_->close();
-    pMenuHandler_->openMenu(core::string_view(pMenuName));
+    pMenuHandler_->openMenu(menuName);
 }
 
 void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
 {
-    auto* pMsg = pCmd->GetArg(1);
-
-    if (!pMsg) {
+    auto msg = pCmd->GetArg(1);
+    if (msg.empty()) {
         return;
     }
 
@@ -985,7 +984,6 @@ void XGame::Cmd_Chat(core::IConsoleCmdArgs* pCmd)
     
     // want the name of the player.
     core::string_view name = "player"_sv;
-    core::string_view msg(pMsg);
 
     if (userNetMap_.localPlayerIdx >= 0) {
         const auto& netGuid = userNetMap_.getLocalPlayerGUID();

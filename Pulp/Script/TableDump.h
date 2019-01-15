@@ -36,6 +36,6 @@ private:
     size_t size_;
 };
 
-bool dumpStateToFile(lua_State* L, const char* pFileName);
+bool dumpStateToFile(lua_State* L, core::string_view fileName);
 
 X_NAMESPACE_END

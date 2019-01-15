@@ -17,6 +17,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+using namespace core::string_view_literals;
+
 XNet::XNet(core::MemoryArenaBase* arena) :
     arena_(arena),
     pInitJob_(nullptr)
@@ -323,12 +325,12 @@ void XNet::Cmd_listRemoteSystems(core::IConsoleCmdArgs* pCmd)
     bool verbose = false;
 
     if (pCmd->GetArgCount() == 2) {
-        const char* pVerboseStr = pCmd->GetArg(1);
-        if (core::strUtil::IsNumeric(pVerboseStr)) {
-            verbose = core::strUtil::StringToInt<int32_t>(pVerboseStr) == 1;
+        auto verboseStr = pCmd->GetArg(1);
+        if (core::strUtil::IsNumeric(verboseStr.begin(), verboseStr.end())) {
+            verbose = core::strUtil::StringToInt<int32_t>(verboseStr.begin(), verboseStr.end()) == 1;
         }
         else {
-            verbose = core::strUtil::IsEqualCaseInsen(pVerboseStr, "true");
+            verbose = core::strUtil::IsEqualCaseInsen(verboseStr, "true"_sv);
         }
     }
 
@@ -376,14 +378,13 @@ void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pIP = pCmd->GetArg(1);
-    if (core::strUtil::strlen(pIP) > IPStr::BUF_SIZE) {
+    auto ipStr = pCmd->GetArg(1);
+    if (ipStr.length() > IPStr::BUF_SIZE) {
         X_WARNING("Net", "Ip is too long");
         return;
     }
 
-    IPStr ip(pIP);
-
+    IPStr ip(ipStr.begin(), ipStr.end());
     if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
         X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
         return;
@@ -391,7 +392,8 @@ void XNet::Cmd_addBan(core::IConsoleCmdArgs* pCmd)
 
     core::TimeVal timeout;
 
-    int32_t timeoutMS = core::strUtil::StringToInt<int32_t>(pCmd->GetArg(2));
+    auto timeoutStr = pCmd->GetArg(2);
+    int32_t timeoutMS = core::strUtil::StringToInt<int32_t>(timeoutStr.begin(), timeoutStr.end());
     if (timeoutMS < 0) {
         timeoutMS = 0;
     }
@@ -410,13 +412,13 @@ void XNet::Cmd_removeBan(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pIP = pCmd->GetArg(1);
-    if (core::strUtil::strlen(pIP) > IPStr::BUF_SIZE) {
+    auto ipStr = pCmd->GetArg(1);
+    if (ipStr.length() > IPStr::BUF_SIZE) {
         X_WARNING("Net", "Ip is too long");
         return;
     }
 
-    IPStr ip(pIP);
+    IPStr ip(ipStr.begin(), ipStr.end());
     if (!SystemAddressEx::isValidIP(ip, IpVersion::Any)) {
         X_ERROR("Net", "Can't add ban for \"%s\" it's a invalid address", ip.c_str());
         return;
@@ -434,19 +436,19 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pHost = pCmd->GetArg(1);
-    if (core::strUtil::strlen(pHost) > HostStr::BUF_SIZE) {
+    auto hostStr = pCmd->GetArg(1);
+    if (hostStr.length() > HostStr::BUF_SIZE) {
         X_WARNING("Net", "Host name is too long");
         return;
     }
 
     IpVersion::Enum ipVersion = IpVersion::Any;
     if (pCmd->GetArgCount() > 2) {
-        const char* pIpVersion = pCmd->GetArg(2);
-        if (core::strUtil::IsEqualCaseInsen(pIpVersion, "ipv4")) {
+        auto ipVersionStr = pCmd->GetArg(2);
+        if (core::strUtil::IsEqualCaseInsen(ipVersionStr, "ipv4"_sv)) {
             ipVersion = IpVersion::Ipv4;
         }
-        else if (core::strUtil::IsEqualCaseInsen(pIpVersion, "ipv6")) {
+        else if (core::strUtil::IsEqualCaseInsen(ipVersionStr, "ipv6"_sv)) {
             ipVersion = IpVersion::Ipv6;
         }
         else {
@@ -456,10 +458,10 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
 
     core::StopWatch timer;
 
-    HostStr hostStr(pHost);
+    HostStr host(hostStr.begin(), hostStr.end());
     SystemAddressEx::AddressArr address;
 
-    if (!SystemAddressEx::resolve(hostStr, true, address, ipVersion)) {
+    if (!SystemAddressEx::resolve(host, true, address, ipVersion)) {
         X_WARNING("Net", "Failed to resolve");
         return;
     }
@@ -467,10 +469,10 @@ void XNet::Cmd_resolveHost(core::IConsoleCmdArgs* pCmd)
     IPStr ipStr;
 
     if (address.size() == 1) {
-        X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", hostStr.c_str(), address.front().toString(ipStr), timer.GetMilliSeconds());
+        X_LOG0("Net", "Host: \"%s\" address: \"%s\" ^6%gms", host.c_str(), address.front().toString(ipStr), timer.GetMilliSeconds());
     }
     else {
-        X_LOG0("Net", "Host: \"%s\" ^6%gms", hostStr.c_str(), timer.GetMilliSeconds());
+        X_LOG0("Net", "Host: \"%s\" ^6%gms", host.c_str(), timer.GetMilliSeconds());
         X_LOG_BULLET;
 
         for (auto& a : address) {
@@ -493,8 +495,8 @@ void XNet::Cmd_connect(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pHost = pCmd->GetArg(1);
-    HostStr host(pHost);
+    auto hostStr = pCmd->GetArg(1);
+    HostStr host(hostStr.begin(), hostStr.end());
 
     SystemAddressEx sa;
     if (!sa.fromHost(host, SystemAddressEx::PORT_DELIMITER, IpVersion::Any)) {
@@ -547,15 +549,15 @@ void XNet::Cmd_createMatch(core::IConsoleCmdArgs* pCmd)
 
     auto* pSession = sessions_.front();
 
-    const char* pMap = "test01";
+    auto map = "test01"_sv;
 
     if (pCmd->GetArgCount() > 1) {
-        pMap = pCmd->GetArg(1);
+        map = pCmd->GetArg(1);
     }
 
     MatchParameters params;
     params.numSlots = 8;
-    params.mapName.set(pMap);
+    params.mapName.set(map.begin(), map.end());
     params.mode = GameMode::SinglePlayer;
     params.flags.Set(MatchFlag::Online);
 
@@ -571,10 +573,10 @@ void XNet::Cmd_createLobby(core::IConsoleCmdArgs* pCmd)
 
     auto* pSession = sessions_.front();
 
-    const char* pMap = "test01";
+    auto map = "test01"_sv;
 
     if (pCmd->GetArgCount() > 1) {
-        pMap = pCmd->GetArg(1);
+        map = pCmd->GetArg(1);
     }
 
     auto waitForState = [&](net::SessionStatus::Enum status) {
@@ -585,7 +587,7 @@ void XNet::Cmd_createLobby(core::IConsoleCmdArgs* pCmd)
 
     MatchParameters params;
     params.numSlots = 8;
-    params.mapName.set(pMap);
+    params.mapName.set(map.begin(), map.end());
     params.mode = GameMode::SinglePlayer;
     params.flags.Set(MatchFlag::Online);
 
@@ -644,9 +646,9 @@ void XNet::Cmd_chat(core::IConsoleCmdArgs* pCmd)
 
     X_ASSERT_NOT_NULL(pLobby);
 
-    auto* pMsg = pCmd->GetArg(1);
+    auto msg = pCmd->GetArg(1);
 
-    pLobby->sendChatMsg(core::string_view(pMsg));
+    pLobby->sendChatMsg(msg);
 }
 
 X_NAMESPACE_END

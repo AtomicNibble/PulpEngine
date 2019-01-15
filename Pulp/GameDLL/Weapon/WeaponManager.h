@@ -52,7 +52,7 @@ namespace weapon
         bool waitForLoad(WeaponDef* pWeaponDef); // returns true if load succeed.
         void releaseWeaponDef(WeaponDef* pWeaponDef);
 
-        void listWeapons(const char* pSearchPatten = nullptr) const;
+        void listWeapons(core::string_view searchPattern) const;
 
         AmmoTypeId getAmmoTypeId(const char* pName);
 

@@ -24,6 +24,7 @@
 X_NAMESPACE_BEGIN(script)
 
 using namespace lua;
+using namespace core::string_view_literals;
 
 namespace
 {
@@ -1287,12 +1288,12 @@ void XScriptSys::listBinds(void) const
     X_LOG0("Script", "------------- ^8Binds End^7 --------------");
 }
 
-void XScriptSys::listScripts(const char* pSearchPatten) const
+void XScriptSys::listScripts(core::string_view searchPattern) const
 {
     core::ScopedLock<ScriptContainer::ThreadPolicy> lock(scripts_.getThreadPolicy());
 
     core::Array<ScriptResource*> sorted_scripts(arena_);
-    scripts_.getSortedAssertList(sorted_scripts, core::string_view(pSearchPatten));
+    scripts_.getSortedAssertList(sorted_scripts, searchPattern);
 
     X_LOG0("Script", "------------ ^8Scripts(%" PRIuS ")^7 --------------", sorted_scripts.size());
 
@@ -1314,23 +1315,23 @@ void XScriptSys::listBinds(core::IConsoleCmdArgs* pArgs)
 
 void XScriptSys::listScripts(core::IConsoleCmdArgs* pArgs)
 {
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
-    if (pArgs->GetArgCount() > 1) {
-        pSearchPatten = pArgs->GetArg(1);
+    if (pArgs->GetArgCount() >= 2) {
+        searchPattern = pArgs->GetArg(1);
     }
 
-    listScripts(pSearchPatten);
+    listScripts(searchPattern);
 }
 
 void XScriptSys::dumpState(core::IConsoleCmdArgs* pArgs)
 {
-    const char* pFileName = "lua_state.txt";
+    auto fileName = "lua_state.txt"_sv;
     if (pArgs->GetArgCount() > 1) {
-        pFileName = pArgs->GetArg(1);
+        fileName = pArgs->GetArg(1);
     }
 
-    dumpStateToFile(L, pFileName);
+    dumpStateToFile(L, fileName);
 }
 
 X_NAMESPACE_END

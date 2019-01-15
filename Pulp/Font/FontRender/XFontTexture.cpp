@@ -321,13 +321,12 @@ void XFontTexture::CreateGradientSlot(void)
 
     for (uint32 dwY = 0; dwY < pSlot->charHeight; ++dwY) {
         for (uint32 dwX = 0; dwX < pSlot->charWidth; ++dwX) {
-            pBuffer[dwX + dwY * width_] = safe_static_cast<uint8_t, uint32_t>(
-                dwY * 255 / (pSlot->charHeight - 1));
+            pBuffer[dwX + dwY * width_] = safe_static_cast<uint8_t, uint32_t>(dwY * 255 / (pSlot->charHeight - 1));
         }
     }
 }
 
-bool XFontTexture::WriteToFile(const char* filename)
+bool XFontTexture::WriteToFile(core::string_view filename)
 {
     core::XFileScoped file;
     core::Path<char> path;
@@ -335,7 +334,7 @@ bool XFontTexture::WriteToFile(const char* filename)
     BITMAPINFOHEADER pInfoHeader;
 
     path = "Fonts/";
-    path.setFileName(filename);
+    path.setFileName(filename.begin(), filename.end());
     path.setExtension(".bmp");
 
     if (textureBuffer_.isEmpty()) {

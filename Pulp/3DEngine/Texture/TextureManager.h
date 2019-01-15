@@ -107,7 +107,7 @@ private:
     bool processData(core::AssetBase* pAsset, core::UniquePointer<char[]> data, uint32_t dataSize) X_FINAL;
     bool onFileChanged(const core::AssetName& assetName, const core::string& name) X_FINAL;
 
-    void listTextures(const char* pSearchPattern);
+    void listTextures(core::string_view searchPattern);
 
 private:
     void Cmd_ListTextures(core::IConsoleCmdArgs* pCmd);

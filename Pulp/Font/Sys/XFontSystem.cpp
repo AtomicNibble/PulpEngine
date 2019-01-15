@@ -206,12 +206,12 @@ bool XFontSystem::processData(core::AssetBase* pAsset, core::UniquePointer<char[
     return pFont->processData(std::move(data), dataSize);
 }
 
-void XFontSystem::listFonts(const char* pSearchPatten) const
+void XFontSystem::listFonts(core::string_view searchPattern) const
 {
     core::ScopedLock<FontContainer::ThreadPolicy> lock(fonts_.getThreadPolicy());
 
     core::Array<FontResource*> sorted(g_fontArena);
-    fonts_.getSortedAssertList(sorted, core::string_view(pSearchPatten));
+    fonts_.getSortedAssertList(sorted, searchPattern);
 
     FontFlags::Description FlagDesc;
 
@@ -249,13 +249,13 @@ bool XFontSystem::onFileChanged(const core::AssetName& assetName, const core::st
 
 void XFontSystem::Cmd_ListFonts(core::IConsoleCmdArgs* pCmd)
 {
-    const char* pSearchPatten = nullptr;
+    core::string_view searchPattern;
 
     if (pCmd->GetArgCount() >= 2) {
-        pSearchPatten = pCmd->GetArg(1);
+        searchPattern = pCmd->GetArg(1);
     }
 
-    listFonts(pSearchPatten);
+    listFonts(searchPattern);
 }
 
 void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
@@ -267,15 +267,15 @@ void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
         return;
     }
 
-    const char* pName = pCmd->GetArg(1);
-    XFont* pFont = static_cast<XFont*>(findFont(core::string_view(pName)));
+    auto name = pCmd->GetArg(1);
+    XFont* pFont = static_cast<XFont*>(findFont(name));
     if (pFont) {
-        if (pFont->getFontTexture()->WriteToFile(pName)) {
+        if (pFont->getFontTexture()->WriteToFile(name)) {
             X_LOG0("FontSys", "^8font texture successfully dumped!");
         }
     }
     else {
-        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %s", pName);
+        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %*.s", name.length(), name.data());
     }
 }
 

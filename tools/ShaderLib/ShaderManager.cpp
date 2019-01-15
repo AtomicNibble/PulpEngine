@@ -419,12 +419,12 @@ namespace shader
         hwShaders_.free();
     }
 
-    void XShaderManager::listHWShaders(const char* pSearchPattern)
+    void XShaderManager::listHWShaders(core::string_view searchPattern)
     {
         core::ScopedLock<HWShaderContainer::ThreadPolicy> lock(hwShaders_.getThreadPolicy());
 
         core::Array<HWShaderContainer::Resource*> sorted_shaders(arena_);
-        hwShaders_.getSortedAssertList(sorted_shaders, core::string_view(pSearchPattern));
+        hwShaders_.getSortedAssertList(sorted_shaders, searchPattern);
 
 
         X_LOG0("Shader", "------------- ^8Shaders(%" PRIuS ")^7 -------------", hwShaders_.size());
@@ -454,9 +454,9 @@ namespace shader
         X_LOG0("Shader", "------------ ^8Shaders End^7 -------------");
     }
 
-    void XShaderManager::listShaderSources(const char* pSearchPatten)
+    void XShaderManager::listShaderSources(core::string_view searchPattern)
     {
-        sourceBin_.listShaderSources(pSearchPatten);
+        sourceBin_.listShaderSources(searchPattern);
     }
 
     void XShaderManager::IoCallback(core::IFileSys&, const core::IoRequestBase*, core::XFileAsync*, uint32_t)
@@ -531,26 +531,24 @@ namespace shader
 
     void XShaderManager::Cmd_ListHWShaders(core::IConsoleCmdArgs* pArgs)
     {
-        // optional search criteria
-        const char* pSearchPatten = nullptr;
+        core::string_view searchPattern;
 
-        if (pArgs->GetArgCount() > 1) {
-            pSearchPatten = pArgs->GetArg(1);
+        if (pArgs->GetArgCount() >= 2) {
+            searchPattern = pArgs->GetArg(1);
         }
 
-        listHWShaders(pSearchPatten);
+        listHWShaders(searchPattern);
     }
 
     void XShaderManager::Cmd_ListShaderSources(core::IConsoleCmdArgs* pArgs)
     {
-        // optional search criteria
-        const char* pSearchPatten = nullptr;
+        core::string_view searchPattern;
 
-        if (pArgs->GetArgCount() > 1) {
-            pSearchPatten = pArgs->GetArg(1);
+        if (pArgs->GetArgCount() >= 2) {
+            searchPattern = pArgs->GetArg(1);
         }
 
-        listShaderSources(pSearchPatten);
+        listShaderSources(searchPattern);
     }
 
 } // namespace shader

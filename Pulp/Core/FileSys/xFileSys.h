@@ -326,8 +326,8 @@ public:
     bool startRequestWorker(void);
     void shutDownRequestWorker(void);
 
-    void listPaks(const char* pSearchPatten = nullptr) const;
-    void listSearchPaths(const char* pSearchPatten = nullptr) const;
+    void listPaks(core::string_view searchPattern) const;
+    void listSearchPaths(core::string_view searchPattern) const;
 
 private:
     template<typename FileT, typename PakFuncT, typename FuncT>

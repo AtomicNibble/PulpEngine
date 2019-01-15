@@ -271,12 +271,12 @@ namespace weapon
         return true;
     }
 
-    void WeaponDefManager::listWeapons(const char* pSearchPatten) const
+    void WeaponDefManager::listWeapons(core::string_view searchPattern) const
     {
         core::ScopedLock<WeaponDefContainer::ThreadPolicy> lock(weaponDefs_.getThreadPolicy());
 
         core::Array<WeaponDefResource*> sorted(arena_);
-        weaponDefs_.getSortedAssertList(sorted, core::string_view(pSearchPatten));
+        weaponDefs_.getSortedAssertList(sorted, searchPattern);
 
         X_LOG0("WeaponDef", "------------ ^8Weapons(%" PRIuS ")^7 ---------------", sorted.size());
 
@@ -291,13 +291,13 @@ namespace weapon
 
     void WeaponDefManager::Cmd_List(core::IConsoleCmdArgs* pCmd)
     {
-        const char* pSearchPatten = nullptr;
+        core::string_view searchPattern;
 
         if (pCmd->GetArgCount() >= 2) {
-            pSearchPatten = pCmd->GetArg(1);
+            searchPattern = pCmd->GetArg(1);
         }
 
-        listWeapons(pSearchPatten);
+        listWeapons(searchPattern);
     }
 
 } // namespace weapon

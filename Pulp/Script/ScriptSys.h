@@ -156,7 +156,7 @@ private:
 
 private:
     void listBinds(void) const;
-    void listScripts(const char* pSearchPatten = nullptr) const;
+    void listScripts(core::string_view searchPattern) const;
 
 private:
     void listBinds(core::IConsoleCmdArgs* pArgs);

@@ -54,7 +54,7 @@ namespace gui
 
         virtual bool waitForLoad(IMenu* pMenu) X_ABSTRACT;
 
-        virtual void listGuis(const char* pWildcardSearch = nullptr) const X_ABSTRACT;
+        virtual void listGuis(core::string_view searchPattern) const X_ABSTRACT;
     };
 
 } // namespace gui

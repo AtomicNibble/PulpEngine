@@ -439,7 +439,7 @@ namespace shader
         }
     }
 
-    void SourceBin::listShaderSources(const char* pSearchPatten)
+    void SourceBin::listShaderSources(core::string_view searchPattern)
     {
         core::CriticalSection::ScopedLock lock(cs_);
 
@@ -451,7 +451,7 @@ namespace shader
                 pSource->getSourceCrc32());
         };
 
-        if (!pSearchPatten) {
+        if (searchPattern.empty()) {
             for (const auto& s : source_) {
                 printfunc(s.second);
             }
@@ -461,7 +461,7 @@ namespace shader
 
             for (const auto& s : source_) {
                 pSource = s.second;
-                if (core::strUtil::WildCompare(core::string_view(pSearchPatten), core::string_view(pSource->getName()))) {
+                if (core::strUtil::WildCompare(searchPattern, core::string_view(pSource->getName()))) {
                     printfunc(pSource);
                 }
             }
