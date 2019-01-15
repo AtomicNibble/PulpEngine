@@ -162,13 +162,13 @@ template<class T>
 CVarInt<T>::CVarInt(XConsole* pConsole, core::string_view name, const int iDefault,
     int Min, int Max, VarFlags Flags, core::string_view desc) :
     T(pConsole, name, Flags | VarFlag::INT, desc),
-    IntValue_(iDefault),
-    IntMin_(Min),
-    IntMax_(Max),
-    IntDefault_(iDefault)
+    intValue_(iDefault),
+    intMin_(Min),
+    intMax_(Max),
+    intDefault_(iDefault)
 {
 #if X_DEBUG
-    if (IntMin_ <= IntMax_) {
+    if (intMin_ <= intMax_) {
         X_ASSERT(iDefault >= Min && iDefault <= Max,
             "Error VarInt has a default value outside min/max")
         (iDefault, Min, Max);
@@ -184,19 +184,19 @@ CVarInt<T>::~CVarInt()
 template<class T>
 int CVarInt<T>::GetInteger(void) const
 {
-    return IntValue_;
+    return intValue_;
 }
 
 template<class T>
 float CVarInt<T>::GetFloat(void) const
 {
-    return static_cast<float>(IntValue_);
+    return static_cast<float>(intValue_);
 }
 
 template<class T>
 const char* CVarInt<T>::GetString(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", IntValue_);
+    sprintf_s(buf, "%d", intValue_);
     return buf;
 }
 
@@ -204,7 +204,7 @@ template<class T>
 void CVarInt<T>::SetDefault(const char* s)
 {
     Set(s);
-    IntDefault_ = IntValue_;
+    intDefault_ = intValue_;
 }
 
 template<class T>
@@ -223,15 +223,15 @@ void CVarInt<T>::Set(const int i)
     int iVal = i;
 
     // min bigger than max disables the check.
-    if (IntMin_ <= IntMax_) {
-        iVal = math<int32_t>::clamp(iVal, IntMin_, IntMax_);
+    if (intMin_ <= intMax_) {
+        iVal = math<int32_t>::clamp(iVal, intMin_, intMax_);
     }
 
-    if (iVal == IntValue_) {
+    if (iVal == intValue_) {
         return;
     }
 
-    IntValue_ = iVal;
+    intValue_ = iVal;
     CVarBase::OnModified();
 }
 
@@ -246,44 +246,44 @@ void CVarInt<T>::Reset(void)
 {
     // do i want to set modified here HUMUM
     // i don't think so.
-    IntValue_ = IntDefault_;
+    intValue_ = intDefault_;
 }
 
 template<class T>
 const char* CVarInt<T>::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", IntDefault_);
+    sprintf_s(buf, "%d", intDefault_);
     return buf;
 }
 
 template<class T>
 float CVarInt<T>::GetMin(void) const
 {
-    return static_cast<float>(IntMin_);
+    return static_cast<float>(intMin_);
 }
 
 template<class T>
 float CVarInt<T>::GetMax(void) const
 {
-    return static_cast<float>(IntMax_);
+    return static_cast<float>(intMax_);
 }
 
 template<class T>
 int32_t CVarInt<T>::GetMinInt(void) const
 {
-    return IntMin_;
+    return intMin_;
 }
 
 template<class T>
 int32_t CVarInt<T>::GetMaxInt(void) const
 {
-    return IntMax_;
+    return intMax_;
 }
 
 template<class T>
 int32_t CVarInt<T>::GetDefaultInt(void) const
 {
-    return IntDefault_;
+    return intDefault_;
 }
 
 // ------------------------------------------------------------
@@ -434,13 +434,13 @@ int32_t CVarFloat<T>::GetDefaultInt(void) const
 CVarIntRef::CVarIntRef(XConsole* pConsole, core::string_view name, int* pVar,
     int Min, int Max, VarFlags nFlags, core::string_view desc) :
     CVarBaseConst(pConsole, name, nFlags | VarFlag::INT, desc),
-    IntValue_(*pVar),
-    IntMin_(Min),
-    IntMax_(Max),
-    DefaultVal_(*pVar)
+    intValue_(*pVar),
+    intMin_(Min),
+    intMax_(Max),
+    defaultVal_(*pVar)
 {
 #if X_DEBUG
-    if (IntMin_ <= IntMax_) {
+    if (intMin_ <= intMax_) {
         X_ASSERT(*pVar >= Min && *pVar <= Max,
             "Error VarInt has a default value outside min/max")
         (*pVar, Min, Max);
@@ -454,12 +454,12 @@ CVarIntRef::~CVarIntRef()
 
 int CVarIntRef::GetInteger(void) const
 {
-    return IntValue_;
+    return intValue_;
 }
 
 float CVarIntRef::GetFloat(void) const
 {
-    return static_cast<float>(IntValue_);
+    return static_cast<float>(intValue_);
 }
 
 const char* CVarIntRef::GetString(CVarBase::StrBuf& buf) const
@@ -482,15 +482,15 @@ void CVarIntRef::Set(const int i)
     int iVal = i;
 
     // cap it sally.
-    if (IntMin_ <= IntMax_) {
-        iVal = math<int32_t>::clamp(i, IntMin_, IntMax_);
+    if (intMin_ <= intMax_) {
+        iVal = math<int32_t>::clamp(i, intMin_, intMax_);
     }
 
-    if (iVal == IntValue_) {
+    if (iVal == intValue_) {
         return;
     }
 
-    IntValue_ = iVal;
+    intValue_ = iVal;
     CVarBase::OnModified();
 }
 
@@ -501,9 +501,9 @@ VarFlag::Enum CVarIntRef::GetType(void) const
 
 void CVarIntRef::Reset(void)
 {
-    bool changed = IntValue_ != DefaultVal_;
+    bool changed = intValue_ != defaultVal_;
 
-    IntValue_ = DefaultVal_;
+    intValue_ = defaultVal_;
 
     if (changed && changeFunc_) {
         changeFunc_.Invoke(this); // change callback.
@@ -512,33 +512,33 @@ void CVarIntRef::Reset(void)
 
 const char* CVarIntRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%d", DefaultVal_);
+    sprintf_s(buf, "%d", defaultVal_);
     return buf;
 }
 
 float CVarIntRef::GetMin(void) const
 {
-    return static_cast<float>(IntMin_);
+    return static_cast<float>(intMin_);
 }
 
 float CVarIntRef::GetMax(void) const
 {
-    return static_cast<float>(IntMax_);
+    return static_cast<float>(intMax_);
 }
 
 int32_t CVarIntRef::GetMinInt(void) const
 {
-    return IntMin_;
+    return intMin_;
 }
 
 int32_t CVarIntRef::GetMaxInt(void) const
 {
-    return IntMax_;
+    return intMax_;
 }
 
 int32_t CVarIntRef::GetDefaultInt(void) const
 {
-    return DefaultVal_;
+    return defaultVal_;
 }
 
 // ------------------------------------------------------------
@@ -665,8 +665,8 @@ int32_t CVarFloatRef::GetDefaultInt(void) const
 CVarColRef::CVarColRef(XConsole* pConsole, core::string_view name, Color* pVal,
     VarFlags nFlags, core::string_view desc) :
     CVarBaseConst(pConsole, name, nFlags | VarFlag::FLOAT | VarFlag::COLOR, desc),
-    ColValue_(*pVal),
-    ColDefault_(*pVal)
+    colValue_(*pVal),
+    colDefault_(*pVal)
 {
 }
 
@@ -686,15 +686,15 @@ float CVarColRef::GetFloat(void) const
 
 const char* CVarColRef::GetString(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%g %g %g %g", ColValue_.r,
-        ColValue_.g, ColValue_.b, ColValue_.a);
+    sprintf_s(buf, "%g %g %g %g", colValue_.r,
+        colValue_.g, colValue_.b, colValue_.a);
     return buf;
 }
 
 const char* CVarColRef::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%g %g %g %g", ColDefault_.r,
-        ColDefault_.g, ColDefault_.b, ColDefault_.a);
+    sprintf_s(buf, "%g %g %g %g", colDefault_.r,
+        colDefault_.g, colDefault_.b, colDefault_.a);
     return buf;
 }
 
@@ -720,7 +720,7 @@ void CVarColRef::Set(const int i)
 
 void CVarColRef::Reset(void)
 {
-    ColValue_ = ColDefault_;
+    colValue_ = colDefault_;
 }
 
 VarFlag::Enum CVarColRef::GetType(void) const
@@ -755,12 +755,12 @@ int32_t CVarColRef::GetDefaultInt(void) const
 
 const Color& CVarColRef::GetColor(void) const
 {
-    return ColValue_;
+    return colValue_;
 }
 
 const Color& CVarColRef::GetDefaultColor(void) const
 {
-    return ColDefault_;
+    return colDefault_;
 }
 
 // ------------------------------------------------------------
@@ -769,8 +769,8 @@ const Color& CVarColRef::GetDefaultColor(void) const
 CVarVec3Ref::CVarVec3Ref(XConsole* pConsole, core::string_view name, Vec3f* pVal,
     VarFlags nFlags, core::string_view desc) :
     CVarBaseConst(pConsole, name, nFlags | VarFlag::FLOAT | VarFlag::VECTOR, desc),
-    Value_(*pVal),
-    Default_(*pVal)
+    value_(*pVal),
+    default_(*pVal)
 {
 }
 
@@ -790,15 +790,15 @@ float CVarVec3Ref::GetFloat(void) const
 
 const char* CVarVec3Ref::GetString(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%g %g %g", Value_.x,
-        Value_.y, Value_.z);
+    sprintf_s(buf, "%g %g %g", value_.x,
+        value_.y, value_.z);
     return buf;
 }
 
 const char* CVarVec3Ref::GetDefaultStr(CVarBase::StrBuf& buf) const
 {
-    sprintf_s(buf, "%g %g %g", Default_.x,
-        Default_.y, Default_.z);
+    sprintf_s(buf, "%g %g %g", default_.x,
+        default_.y, default_.z);
     return buf;
 }
 
@@ -822,7 +822,7 @@ void CVarVec3Ref::Set(const int i)
 
 void CVarVec3Ref::Reset(void)
 {
-    Value_ = Default_;
+    value_ = default_;
 }
 
 VarFlag::Enum CVarVec3Ref::GetType(void) const
@@ -857,12 +857,12 @@ int32_t CVarVec3Ref::GetDefaultInt(void) const
 
 const Vec3f& CVarVec3Ref::GetVal(void) const
 {
-    return Value_;
+    return value_;
 }
 
 const Vec3f& CVarVec3Ref::GetDefaultVal(void) const
 {
-    return Default_;
+    return default_;
 }
 
 X_NAMESPACE_END

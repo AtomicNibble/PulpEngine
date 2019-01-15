@@ -144,7 +144,7 @@ void CVarBase::Reset(void)
 template<class T>
 void CVarInt<T>::Set(const char* pStr)
 {
-    int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(pStr, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
     Set(val);
 }
@@ -153,7 +153,7 @@ void CVarInt<T>::Set(const char* pStr)
 
 void CVarIntRef::Set(const char* pStr)
 {
-    int32_t val = TextToInt(pStr, IntValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
+    int32_t val = TextToInt(pStr, intValue_, CVarBase::flags_.IsSet(VarFlag::BITFIELD));
 
     Set(val);
 }
@@ -179,12 +179,12 @@ void CVarColRef::Set(const char* pStr)
     }
 
     // any diffrent?
-    if (ColValue_.compare(col, 0.001f)) {
+    if (colValue_.compare(col, 0.001f)) {
         return;
     }
 
     // assign
-    ColValue_ = col;
+    colValue_ = col;
     OnModified();
 }
 
@@ -242,12 +242,12 @@ void CVarVec3Ref::Set(const char* pStr)
     }
 
     // any diffrent?
-    if (Value_.compare(vec, 0.001f)) {
+    if (value_.compare(vec, 0.001f)) {
         return;
     }
 
     // assign
-    Value_ = vec;
+    value_ = vec;
     OnModified();
 }
 

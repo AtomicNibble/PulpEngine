@@ -137,10 +137,10 @@ public:
     X_INLINE int32_t GetDefaultInt(void) const X_FINAL;
 
 protected:
-    int IntValue_;
-    int IntMin_;
-    int IntMax_;
-    int IntDefault_;
+    int intValue_;
+    int intMin_;
+    int intMax_;
+    int intDefault_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -209,10 +209,10 @@ public:
 protected:
     X_NO_ASSIGN(CVarIntRef);
 
-    int& IntValue_;
-    int IntMin_;
-    int IntMax_;
-    int DefaultVal_;
+    int& intValue_;
+    int intMin_;
+    int intMax_;
+    int defaultVal_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -286,8 +286,8 @@ public:
 private:
     X_NO_ASSIGN(CVarColRef);
 
-    Color& ColValue_;
-    Color ColDefault_;
+    Color& colValue_;
+    Color colDefault_;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -326,8 +326,8 @@ public:
 private:
     X_NO_ASSIGN(CVarVec3Ref);
 
-    Vec3f& Value_;
-    Vec3f Default_;
+    Vec3f& value_;
+    Vec3f default_;
 };
 
 X_NAMESPACE_END
