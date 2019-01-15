@@ -45,11 +45,11 @@ public:
 
     virtual ICVar* getCVar(core::string_view name) X_FINAL;
 
-    virtual void unregisterVariable(const char* sVarName) X_FINAL;
+    virtual void unregisterVariable(core::string_view varName) X_FINAL;
     virtual void unregisterVariable(ICVar* pVar) X_FINAL;
 
     virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_FINAL;
-    virtual void unRegisterCommand(const char* Name) X_FINAL;
+    virtual void unRegisterCommand(core::string_view name) X_FINAL;
 
     virtual void exec(core::string_view command) X_FINAL;
 

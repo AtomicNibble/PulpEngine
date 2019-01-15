@@ -35,8 +35,10 @@ PSODeviceCache::~PSODeviceCache()
 {
     destoryAll();
 
+    using namespace core::string_view_literals;
+
     if (gEnv && gEnv->pConsole) {
-        gEnv->pConsole->unregisterVariable("r_pso_stall_help_with_work");
+        gEnv->pConsole->unregisterVariable("r_pso_stall_help_with_work"_sv);
     }
 }
 

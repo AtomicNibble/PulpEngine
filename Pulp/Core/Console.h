@@ -197,11 +197,11 @@ public:
 
     ICVar* getCVar(core::string_view name) X_FINAL;
 
-    void unregisterVariable(const char* pVarName) X_FINAL;
+    void unregisterVariable(core::string_view varName) X_FINAL;
     void unregisterVariable(ICVar* pVar) X_FINAL;
 
     void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_FINAL;
-    void unRegisterCommand(const char* pName) X_FINAL;
+    void unRegisterCommand(core::string_view name) X_FINAL;
 
     void exec(core::string_view command) X_FINAL;
     bool loadAndExecConfigFile(const char* pFileName) X_FINAL;

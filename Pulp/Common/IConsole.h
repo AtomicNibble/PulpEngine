@@ -125,11 +125,11 @@ struct IConsole
 
     virtual ICVar* getCVar(core::string_view name) X_ABSTRACT;
 
-    virtual void unregisterVariable(const char* pVarName) X_ABSTRACT;
+    virtual void unregisterVariable(core::string_view varName) X_ABSTRACT;
     virtual void unregisterVariable(ICVar* pVar) X_ABSTRACT;
 
     virtual void registerCommand(core::string_view name, ConsoleCmdFunc func, VarFlags Flags, core::string_view desc) X_ABSTRACT;
-    virtual void unRegisterCommand(const char* pName) X_ABSTRACT;
+    virtual void unRegisterCommand(core::string_view name) X_ABSTRACT;
 
     virtual void exec(core::string_view command) X_ABSTRACT;
 

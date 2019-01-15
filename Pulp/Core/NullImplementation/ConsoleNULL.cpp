@@ -168,9 +168,9 @@ ICVar* XConsoleNULL::getCVar(core::string_view name)
     return nullptr;
 }
 
-void XConsoleNULL::unregisterVariable(const char* sVarName)
+void XConsoleNULL::unregisterVariable(core::string_view varName)
 {
-    X_UNUSED(sVarName);
+    X_UNUSED(varName);
 }
 
 void XConsoleNULL::unregisterVariable(ICVar* pVar)
@@ -184,9 +184,9 @@ void XConsoleNULL::registerCommand(core::string_view name, ConsoleCmdFunc func, 
     X_UNUSED(name,func,Flags,desc);
 }
 
-void XConsoleNULL::unRegisterCommand(const char* Name)
+void XConsoleNULL::unRegisterCommand(core::string_view name)
 {
-    X_UNUSED(Name);
+    X_UNUSED(name);
 }
 
 void XConsoleNULL::exec(core::string_view command)

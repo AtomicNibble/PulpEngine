@@ -863,11 +863,11 @@ ICVar* XConsole::getCVar(core::string_view name)
     return nullptr;
 }
 
-void XConsole::unregisterVariable(const char* pVarName)
+void XConsole::unregisterVariable(core::string_view varName)
 {
-    auto it = varMap_.find(pVarName);
+    auto it = varMap_.find(varName);
     if (it == varMap_.end()) {
-        X_WARNING("Console", "Failed to find var \"%s\" for removal", pVarName);
+        X_WARNING("Console", "Failed to find var \"%*.s\" for removal", varName.length(), varName.data());
         return;
     }
 
@@ -903,9 +903,9 @@ void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarF
     cmdMap_.emplace(cmd.name, cmd);
 }
 
-void XConsole::unRegisterCommand(const char* pName)
+void XConsole::unRegisterCommand(core::string_view name)
 {
-    auto it = cmdMap_.find(pName);
+    auto it = cmdMap_.find(name);
     if (it != cmdMap_.end()) {
         cmdMap_.erase(it);
     }

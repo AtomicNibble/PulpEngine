@@ -8,6 +8,8 @@
 
 X_NAMESPACE_BEGIN(game)
 
+using namespace core::string_view_literals;
+
 namespace entity
 {
     CameraSystem::CameraSystem(GameVars& vars) :
@@ -23,9 +25,9 @@ namespace entity
         }
 
         auto* pConsole = gEnv->pConsole;
-        pConsole->unregisterVariable("cam_pos");
-        pConsole->unregisterVariable("cam_angle");
-        pConsole->unregisterVariable("cam_angle_rad");
+        pConsole->unregisterVariable("cam_pos"_sv);
+        pConsole->unregisterVariable("cam_angle"_sv);
+        pConsole->unregisterVariable("cam_angle_rad"_sv);
     }
 
     bool CameraSystem::init(void)
