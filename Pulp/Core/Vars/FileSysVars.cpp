@@ -50,7 +50,7 @@ void XFileSysVars::registerVars(void)
     for (i = 0; i < FS_MAX_VIRTUAL_DIR; i++) {
         name.set("filesys_mod_dir_");
         name.appendFmt("%" PRIuS, i);
-        pVirtualDirs_[i] = ADD_CVAR_STRING(name.c_str(), "",
+        pVirtualDirs_[i] = ADD_CVAR_STRING(core::string_view(name), "",
             core::VarFlag::SYSTEM | core::VarFlag::READONLY | core::VarFlag::CPY_NAME,
             "Virtual mod directory");
     }
