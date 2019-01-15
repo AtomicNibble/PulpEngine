@@ -1828,12 +1828,12 @@ void XSound::cmd_PostEvent(core::IConsoleCmdArgs* pArgs)
     auto objectStr = pArgs->GetArg(1);
     SoundObject* pObject = findObjectForNick(objectStr);
     if (!pObject) {
-        X_WARNING("Console", "Failed to find sound object with id: \"%*.s\"", objectStr.length(), objectStr.data());
+        X_WARNING("Console", "Failed to find sound object with id: \"%.*s\"", objectStr.length(), objectStr.data());
         return;
     }
 
     const auto& pos = pObject->trans.pos;
-    X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %*.s object-pos: (%g,%g,%g)", eventId, objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
+    X_LOG0("Sound", "snd_post_event: id: %" PRIu32 " object: %.*s object-pos: (%g,%g,%g)", eventId, objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
 
     postEvent(eventId, SoundObjToObjHandle(pObject));
 }
@@ -1876,12 +1876,12 @@ void XSound::cmd_StopAllEvent(core::IConsoleCmdArgs* pArgs)
     SoundObject* pObject = findObjectForNick(objectStr);
 
     if (!pObject) {
-        X_WARNING("Console", "Failed to find sound object with id: \"%*.s\"", objectStr.length(), objectStr.data());
+        X_WARNING("Console", "Failed to find sound object with id: \"%.*s\"", objectStr.length(), objectStr.data());
         return;
     }
 
     const auto& pos = pObject->trans.pos;
-    X_LOG0("Sound", "snd_stop_all: object: %*.s object-pos: (%g,%g,%g)", objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
+    X_LOG0("Sound", "snd_stop_all: object: %.*s object-pos: (%g,%g,%g)", objectStr.length(), objectStr.data(), pos.x, pos.y, pos.z);
 
     stopAll(SoundObjToObjHandle(pObject));
 }

@@ -101,7 +101,7 @@ XModel* XModelManager::findModel(core::string_view name) const
         return pModel;
     }
 
-    X_WARNING("ModelManager", "Failed to find model: \"%*.s\"", name.length(), name.data());
+    X_WARNING("ModelManager", "Failed to find model: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 

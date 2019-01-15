@@ -63,7 +63,7 @@ void ReplaySys::record(core::string_view name)
 
     mode_ = Mode::RECORD;
     startTime_ = gEnv->pTimer->GetTimeNowNoScale();
-    X_LOG0("ReplaySys", "Started recording replay \"%*.s\"", name.length(), name.data());
+    X_LOG0("ReplaySys", "Started recording replay \"%.*s\"", name.length(), name.data());
 }
 
 void ReplaySys::play(core::string_view name)
@@ -95,7 +95,7 @@ void ReplaySys::play(core::string_view name)
 
     mode_ = Mode::PLAY;
     startTime_ = gEnv->pTimer->GetTimeNowNoScale();
-    X_LOG0("ReplaySys", "Started playing replay \"%*.s\"", name.length(), name.data());
+    X_LOG0("ReplaySys", "Started playing replay \"%.*s\"", name.length(), name.data());
 }
 
 void ReplaySys::stop(void)

@@ -153,7 +153,7 @@ Texture* TextureManager::findTexture(core::string_view name) const
         return pTex;
     }
 
-    X_WARNING("Texture", "Failed to find Texture: \"%*.s\"", name.length(), name.data());
+    X_WARNING("Texture", "Failed to find Texture: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 

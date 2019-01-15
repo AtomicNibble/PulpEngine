@@ -117,7 +117,7 @@ namespace gui
             return pMenu;
         }
 
-        X_WARNING("MenuManager", "Failed to find menu: \"%*.s\"", name.length(), name.data());
+        X_WARNING("MenuManager", "Failed to find menu: \"%.*s\"", name.length(), name.data());
         return nullptr;
     }
 

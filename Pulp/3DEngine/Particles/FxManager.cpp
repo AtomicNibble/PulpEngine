@@ -98,7 +98,7 @@ namespace fx
             return pEffectRes;
         }
 
-        X_WARNING("EffectManager", "Failed to find anim: \"%*.s\"", name.length(), name.data());
+        X_WARNING("EffectManager", "Failed to find anim: \"%.*s\"", name.length(), name.data());
         return nullptr;
     }
 

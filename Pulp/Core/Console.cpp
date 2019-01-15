@@ -176,7 +176,8 @@ namespace
         ICVar::FlagType flags = pCVar->GetFlags();
 
         if (flags.IsSet(VarFlag::READONLY)) {
-            X_ERROR("Console", "can't set value of read only cvar: %s", pCVar->GetName());
+            auto name = pCVar->GetName();
+            X_ERROR("Console", "can't set value of read only cvar: %.*s", name.length(), name.data());
             return false;
         }
 
@@ -861,7 +862,7 @@ void XConsole::unregisterVariable(core::string_view varName)
 {
     auto it = varMap_.find(varName);
     if (it == varMap_.end()) {
-        X_WARNING("Console", "Failed to find var \"%*.s\" for removal", varName.length(), varName.data());
+        X_WARNING("Console", "Failed to find var \"%.*s\" for removal", varName.length(), varName.data());
         return;
     }
 
@@ -873,9 +874,9 @@ void XConsole::unregisterVariable(core::string_view varName)
 
 void XConsole::unregisterVariable(ICVar* pCVar)
 {
-    auto pName = pCVar->GetName();
+    auto name = pCVar->GetName();
 
-    varMap_.erase(pName);
+    varMap_.erase(name);
     X_DELETE(pCVar, &varArena_);
 }
 
@@ -890,7 +891,7 @@ void XConsole::registerCommand(core::string_view name, ConsoleCmdFunc func, VarF
     cmd.func = func;
 
     if (cmdMap_.find(cmd.name) != cmdMap_.end()) {
-        X_ERROR("Console", "command already exsists: \"%*.s", name.length(), name.data());
+        X_ERROR("Console", "command already exsists: \"%.*s", name.length(), name.data());
         return;
     }
 
@@ -920,7 +921,7 @@ bool XConsole::loadAndExecConfigFile(core::string_view fileName)
     path.append(fileName.data(), fileName.length());
     path.setExtension(CONFIG_FILE_EXTENSION);
 
-    X_LOG0("Config", "Loading config: \"%*.s\"", fileName.data(), fileName.length());
+    X_LOG0("Config", "Loading config: \"%.*s\"", fileName.length(), fileName.data());
 
     core::XFileScoped file;
     if (!file.openFile(path, FileFlag::READ, core::VirtualDirectory::SAVE)) {
@@ -1028,7 +1029,7 @@ ICVar* XConsole::getCVarForRegistration(core::string_view name)
 {
     if (auto it = varMap_.find(name); it != varMap_.end()) {
         // if you get this warning you need to fix it.
-        X_ERROR("Console", "var(%*.s) is already registerd", name.length(), name.data());
+        X_ERROR("Console", "var(%.*s) is already registerd", name.length(), name.data());
         return it->second;
     }
 
@@ -1037,17 +1038,17 @@ ICVar* XConsole::getCVarForRegistration(core::string_view name)
 
 void XConsole::registerVar(ICVar* pCVar)
 {
-    auto it = configCmds_.find(pCVar->GetName());
-    if (it != configCmds_.end()) {
+    auto name = pCVar->GetName();
+
+    if (auto it = configCmds_.find(name); it != configCmds_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) {
             pCVar->Set(core::string_view(it->second));
         }
 
-        X_LOG2("Console", "Var \"%s\" was set by config on registeration", pCVar->GetName());
+        X_LOG2("Console", "Var \"%.*s\" was set by config on registeration", name.length(), name.data());
     }
 
-    it = varArchive_.find(pCVar->GetName());
-    if (it != varArchive_.end()) {
+    if (auto it = varArchive_.find(name); it != varArchive_.end()) {
         if (cvarModifyBegin(pCVar, ExecSource::CONFIG)) { // is this always gonna be config?
             pCVar->Set(core::string_view(it->second));
         }
@@ -1055,7 +1056,7 @@ void XConsole::registerVar(ICVar* pCVar)
         // mark as archive.
         pCVar->SetFlags(pCVar->GetFlags() | VarFlag::ARCHIVE);
 
-        X_LOG2("Console", "Var \"%s\" was set by seta on registeration", pCVar->GetName());
+        X_LOG2("Console", "Var \"%.*s\" was set by seta on registeration", name.length(), name.data());
     }
 
     varMap_.emplace(pCVar->GetName(), pCVar);
@@ -1069,8 +1070,10 @@ void XConsole::displayVarValue(const ICVar* pVar)
         return;
     }
 
+    auto name = pVar->GetName();
+
     core::ICVar::StrBuf strBuf;
-    X_LOG0("Dvar", "^2\"%s\"^7 = ^6%s", pVar->GetName(), pVar->GetString(strBuf));
+    X_LOG0("Dvar", "^2\"%.*s\"^7 = ^6%s", name.length(), name.data(), pVar->GetString(strBuf));
 }
 
 void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
@@ -1082,14 +1085,17 @@ void XConsole::displayVarInfo(const ICVar* pVar, bool fullInfo)
     ICVar::FlagType::Description dsc;
     core::ICVar::StrBuf strBuf;
 
+    auto name = pVar->GetName();
+
     if (fullInfo) {
         auto min = pVar->GetMin();
         auto max = pVar->GetMax();
-        X_LOG0("Dvar", "^2\"%s\"^7 = '%s' min: %f max: %f [^1%s^7] Desc: \"%s\"", pVar->GetName(), pVar->GetString(strBuf), min, max,
-            pVar->GetFlags().ToString(dsc), pVar->GetDesc());
+        auto desc = pVar->GetDesc();
+        X_LOG0("Dvar", "^2\"%.*s\"^7 = '%s' min: %f max: %f [^1%s^7] Desc: \"%.*s\"", name.length(), name.data(), pVar->GetString(strBuf), min, max,
+            pVar->GetFlags().ToString(dsc), desc.length(), desc.data());
     }
     else {
-        X_LOG0("Dvar", "^2\"%s\"^7 = %s [^1%s^7]", pVar->GetName(), pVar->GetString(strBuf),
+        X_LOG0("Dvar", "^2\"%.*s\"^7 = %s [^1%s^7]", name.length(), name.data(), pVar->GetString(strBuf),
             pVar->GetFlags().ToString(dsc));
     }
 }
@@ -1599,7 +1605,7 @@ bool XConsole::processInput(const input::InputEvent& event)
 
             if (!historyLine.empty()) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%*.s", historyLine.length(), historyLine.data());
+                    X_LOG0("Cmd history", "%.*s", historyLine.length(), historyLine.data());
                 }
 
                 inputBuffer_.assign(historyLine.data(), historyLine.length());
@@ -1624,7 +1630,7 @@ bool XConsole::processInput(const input::InputEvent& event)
 
             if (!historyLine.empty()) {
                 if (console_debug) {
-                    X_LOG0("Cmd history", "%*.s", historyLine.length(), historyLine.data());
+                    X_LOG0("Cmd history", "%.*s", historyLine.length(), historyLine.data());
                 }
 
                 inputBuffer_.assign(historyLine.data(), historyLine.length());
@@ -1834,7 +1840,7 @@ void XConsole::addBind(core::string_view key, core::string_view cmd)
     }
 
     if (console_debug) {
-        X_LOG1("Console", "Overriding bind \"%*.s\" -> %*.s with -> %*.s", 
+        X_LOG1("Console", "Overriding bind \"%.*s\" -> %.*s with -> %.*s", 
             key.length(), key.data(), 
             it->second.length(), it->second.data(), 
             cmd.length(), cmd.data());
@@ -2272,7 +2278,10 @@ void XConsole::drawInputTxt(const Vec2f& start)
                 // Description.
                 // Possible Values;
 
-                nameStr.appendFmt("%s", pCvar->GetName());
+                {
+                    auto name = pCvar->GetName();
+                    nameStr.append(name.data(), name.length());
+                }
                 defaultStr.append("	default");
 
                 {
@@ -2603,7 +2612,10 @@ void XConsole::listVariables(core::string_view searchPattern)
 
     ICVar::FlagType::Description dsc;
     for (const auto& var : sorted_vars) {
-        X_LOG0("Dvar", "^2\"%s\"^7 [^1%s^7] Desc: \"%s\"", var->GetName(), var->GetFlags().ToString(dsc), var->GetDesc());
+        auto name = var->GetName();
+        auto desc = var->GetDesc();
+        X_LOG0("Dvar", "^2\"%.*s\"^7 [^1%s^7] Desc: \"%.*s\"", 
+            name.length(), name.data(), var->GetFlags().ToString(dsc), desc.length(), desc.data());
     }
 
     X_LOG0("Console", "-------------- ^8Vars End^7 --------------");
@@ -2737,7 +2749,7 @@ void XConsole::Command_Echo(IConsoleCmdArgs* pCmd)
     }
 
     auto str = pCmd->GetArg(1);
-    X_LOG0("echo", "%*.s", str.length(), str.data());
+    X_LOG0("echo", "%.*s", str.length(), str.data());
 }
 
 void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
@@ -2752,7 +2764,7 @@ void XConsole::Command_VarReset(IConsoleCmdArgs* pCmd)
 
     ICVar* pCvar = getCVar(str);
     if (!pCvar) {
-        X_ERROR("Console", "var with name \"%*.s\" not found", str.length(), str.data());
+        X_ERROR("Console", "var with name \"%.*s\" not found", str.length(), str.data());
         return;
     }
 
@@ -2773,7 +2785,7 @@ void XConsole::Command_VarDescribe(IConsoleCmdArgs* pCmd)
 
     ICVar* pCvar = getCVar(str);
     if (!pCvar) {
-        X_ERROR("Console", "var with name \"%*.s\" not found", str.length(), str.data());
+        X_ERROR("Console", "var with name \"%.*s\" not found", str.length(), str.data());
         return;
     }
 

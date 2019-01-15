@@ -118,7 +118,7 @@ bool dumpStateToFile(lua_State* L, core::string_view fileName)
         return false;
     }
 
-    X_LOG0("Script", "Dumping state to: \"%*.s\"", fileName.length(), fileName.data());
+    X_LOG0("Script", "Dumping state to: \"%.*s\"", fileName.length(), fileName.data());
 
     XRecursiveLuaDumpToFile sink(*file.GetFile());
 

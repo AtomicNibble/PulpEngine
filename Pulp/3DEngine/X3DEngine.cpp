@@ -1362,7 +1362,7 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
     }
 
     if (!pBuffer) {
-        X_ERROR("3DEngine", "Unkown buffer: %*.s", bufferStr.length(), bufferStr.data());
+        X_ERROR("3DEngine", "Unkown buffer: %.*s", bufferStr.length(), bufferStr.data());
         return;
     }
 
@@ -1375,7 +1375,7 @@ void X3DEngine::Command_WriteBufferToFile(core::IConsoleCmdArgs* pCmd)
     }
 
     core::Path<> name;
-    name.setFmt("framebuffer_%*.s.dds", bufferStr.length(), bufferStr.data());
+    name.setFmt("framebuffer_%.*s.dds", bufferStr.length(), bufferStr.data());
 
     core::XFileScoped file;
     if (!file.openFile(name, core::FileFlags::WRITE | core::FileFlags::RECREATE)) {

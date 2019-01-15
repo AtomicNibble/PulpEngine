@@ -134,7 +134,7 @@ IFont* XFontSystem::findFont(core::string_view name) const
         return pFontRes;
     }
 
-    X_WARNING("FontSys", "Failed to find model: \"%*.s\"", name.length(), name.data());
+    X_WARNING("FontSys", "Failed to find model: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 
@@ -275,7 +275,7 @@ void XFontSystem::Cmd_DumpForName(core::IConsoleCmdArgs* pCmd)
         }
     }
     else {
-        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %*.s", name.length(), name.data());
+        X_ERROR("FontSys", "failed to dump font, no font exsists for name: %.*s", name.length(), name.data());
     }
 }
 

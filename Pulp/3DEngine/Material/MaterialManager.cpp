@@ -127,7 +127,7 @@ Material* XMaterialManager::findMaterial(core::string_view name) const
         return pMtl;
     }
 
-    X_WARNING("Material", "Failed to find material: \"%*.s\"", name.length(), name.data());
+    X_WARNING("Material", "Failed to find material: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 

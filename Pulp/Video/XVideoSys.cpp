@@ -107,7 +107,7 @@ IVideo* XVideoSys::findVideo(core::string_view name) const
         return pVideo;
     }
 
-    X_WARNING("VidManager", "Failed to find video: \"%*.s\"", name.length(), name.data());
+    X_WARNING("VidManager", "Failed to find video: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 

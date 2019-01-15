@@ -59,7 +59,7 @@ Anim* AnimManager::findAnim(core::string_view name) const
         return pAnim;
     }
 
-    X_WARNING("AnimManager", "Failed to find anim: \"%*.s\"", name.length(), name.data());
+    X_WARNING("AnimManager", "Failed to find anim: \"%.*s\"", name.length(), name.data());
     return nullptr;
 }
 
