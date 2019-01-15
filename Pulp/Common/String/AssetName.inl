@@ -6,6 +6,11 @@ inline AssetName::AssetName()
 {
 }
 
+inline AssetName::AssetName(assetDb::AssetType::Enum type, const core::string_view name)
+{
+    set(type, name);
+}
+
 inline AssetName::AssetName(assetDb::AssetType::Enum type, const core::string& name)
 {
     set(type, name);
@@ -44,6 +49,11 @@ inline void AssetName::replaceSeprators(void)
 }
 
 inline void AssetName::set(assetDb::AssetType::Enum type, const core::string& name)
+{
+    set(type, core::string_view(name));
+}
+
+inline void AssetName::set(assetDb::AssetType::Enum type, const core::string_view name)
 {
     BaseType::set(assetDb::AssetType::ToString(type));
     BaseType::append('s', 1);

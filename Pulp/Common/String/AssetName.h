@@ -18,6 +18,7 @@ public:
 
 public:
     AssetName();
+    AssetName(assetDb::AssetType::Enum type, const core::string_view name);
     AssetName(assetDb::AssetType::Enum type, const core::string& name);
     AssetName(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
     AssetName(const AssetName& oth);
@@ -31,6 +32,7 @@ public:
     void replaceSeprators(void);
 
     void set(assetDb::AssetType::Enum type, const core::string& name);
+    void set(assetDb::AssetType::Enum type, const core::string_view name);
     bool stripAssetFolder(assetDb::AssetType::Enum type);
 
     const char* extension(bool incDot) const;
