@@ -2818,10 +2818,12 @@ void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
 
     for (size_t i = 2; i < Num; i++) {
         cmd.append(pCmd->GetArg(i));
-        if (i + 1 == Num)
+        if (i + 1 == Num) {
             cmd.append(';', 1);
-        else
+        }
+        else {
             cmd.append(' ', 1);
+        }
     }
 
     addBind(pCmd->GetArg(1), cmd.c_str());
@@ -2840,9 +2842,9 @@ void XConsole::Command_BindsList(IConsoleCmdArgs* pCmd)
 
     struct PrintBinds : public IKeyBindDumpSink
     {
-        virtual void OnKeyBindFound(const char* Bind, const char* Command)
+        virtual void OnKeyBindFound(const char* pBind, const char* pCommand) X_FINAL
         {
-            X_LOG0("Console", "Key: %s Cmd: \"%s\"", Bind, Command);
+            X_LOG0("Console", "Key: %s Cmd: \"%s\"", pBind, pCommand);
         }
     };
 
