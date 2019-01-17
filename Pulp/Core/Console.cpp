@@ -2794,21 +2794,9 @@ void XConsole::Command_Bind(IConsoleCmdArgs* pCmd)
         return;
     }
 
-    core::StackString<1024> cmd;
+    auto cmdStr = pCmd->GetArgToEnd(2);
 
-    // concat args into a command
-    for (size_t i = 2; i < Num; i++) {
-        auto argStr = pCmd->GetArg(i);
-        cmd.append(argStr.data(), argStr.length());
-        if (i + 1 == Num) {
-            cmd.append(';', 1);
-        }
-        else {
-            cmd.append(' ', 1);
-        }
-    }
-
-    addBind(pCmd->GetArg(1), core::string_view(cmd));
+    addBind(pCmd->GetArg(1), cmdStr);
 }
 
 void XConsole::Command_BindsClear(IConsoleCmdArgs* pCmd)
@@ -2854,16 +2842,8 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
     if (ICVar* pCBar = getCVar(varName)) {
         VarFlag::Enum type = pCBar->GetType();
         if (type == VarFlag::COLOR || type == VarFlag::VECTOR) {
-            // just concat themm all into a string
-            core::StackString512 merged;
-
-            for (size_t i = 2; i < Num; i++) {
-                auto argStr = Cmd->GetArg(i);
-                merged.append(argStr.begin(), argStr.end());
-                merged.append(" ");
-            }
-
-            pCBar->Set(core::string_view(merged));
+            auto argStr = Cmd->GetArgToEnd(2);
+            pCBar->Set(argStr);
         }
         else {
             if (Num != 3) {
@@ -2878,23 +2858,16 @@ void XConsole::Command_SetVarArchive(IConsoleCmdArgs* Cmd)
         pCBar->SetFlags(pCBar->GetFlags() | VarFlag::ARCHIVE);
     }
     else {
-        core::string merged;
 
-        for (size_t i = 2; i < Num; i++) {
-            auto argStr = Cmd->GetArg(i);
-            merged.append(argStr.begin(), argStr.end());
-            merged.append(" ");
-        }
-
-        merged.trimRight();
+        auto argStr = Cmd->GetArgToEnd(2);
 
         // we just add it to config cmd map
         auto it = varArchive_.find(varName);
         if (it == varArchive_.end()) {
-            varArchive_.emplace(core::string(varName.data(), varName.length()), merged);
+            varArchive_.emplace(core::string(varName.data(), varName.length()), core::string(argStr.data(), argStr.length()));
         }
         else {
-            it->second = merged;
+            it->second = core::string(argStr.data(), argStr.length());
         }
     }
 }
