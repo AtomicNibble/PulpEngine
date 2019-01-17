@@ -79,23 +79,25 @@ struct ConsoleCommandArgs : public IConsoleCmdArgs
     using CommandNameStr = core::StackString<MAX_COMMAND_NAME_LEN>;
     using CommandStr = core::StackString<ConsoleCommandArgs::MAX_STRING_CHARS>;
 
-    using ArgPtrArr = std::array<const char*, MAX_COMMAND_ARGS>;
+    using IndexRange = std::pair<int32_t, int32_t>;
+    using IndexRangeArr = std::array<IndexRange, MAX_COMMAND_ARGS>;
     using StringBufArr = std::array<char, MAX_COMMAND_STRING>;
 
 public:
-    explicit ConsoleCommandArgs(CommandStr& line, ParseFlags flags);
+    explicit ConsoleCommandArgs(const CommandStr& line, ParseFlags flags);
     ~ConsoleCommandArgs() X_FINAL;
 
     virtual size_t GetArgCount(void) const X_FINAL;
     virtual core::string_view GetArg(size_t idx) const X_FINAL;
+    virtual core::string_view GetArgToEnd(size_t idx) const X_FINAL;
 
 private:
-    void TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags);
+    void TokenizeString(ParseFlags flags);
 
 private:
-    size_t argNum_;             // number of arguments
-    ArgPtrArr argv_;            // points into tokenized
-    StringBufArr tokenized_;    // will have terminator bytes inserted
+    size_t argNum_;                 // number of arguments
+    IndexRangeArr argv_;            // offset + length of each arg.
+    const CommandStr str_;
 };
 
 X_DECLARE_ENUM(CmdHistory)

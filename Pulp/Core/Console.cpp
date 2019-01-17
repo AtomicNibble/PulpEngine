@@ -198,11 +198,11 @@ ConsoleCommand::ConsoleCommand() // flags default con is (0)
 
 // ==================================================
 
-ConsoleCommandArgs::ConsoleCommandArgs(CommandStr& line, ParseFlags flags) :
-    argNum_(0)
+ConsoleCommandArgs::ConsoleCommandArgs(const CommandStr& line, ParseFlags flags) :
+    argNum_(0),
+    str_(line)
 {
-    core::zero_object(tokenized_);
-    TokenizeString(line.begin(), line.end(), flags);
+    TokenizeString(flags);
 }
 
 ConsoleCommandArgs::~ConsoleCommandArgs()
@@ -217,118 +217,112 @@ size_t ConsoleCommandArgs::GetArgCount(void) const
 core::string_view ConsoleCommandArgs::GetArg(size_t idx) const
 {
     X_ASSERT(idx < argNum_, "Argument index out of range")(argNum_, idx);
-    return core::string_view(argv_[idx]);
+    auto arg = argv_[idx];
+
+    X_ASSERT(arg.first + arg.second <= str_.length(), "Argument out of range")(arg.first + arg.second, str_.length());
+    return core::string_view(str_.data() + arg.first, arg.second);
 }
 
-// we want to get arguemtns.
-// how will a command be formated.
-// command val, val1, #var_name, string var3,
-void ConsoleCommandArgs::TokenizeString(const char* pBegin, const char* pEnd, ParseFlags flags)
+core::string_view ConsoleCommandArgs::GetArgToEnd(size_t idx) const
 {
-    const size_t strLength = static_cast<size_t>(pEnd - pBegin);
-    if (strLength < 1) {
+    X_ASSERT(idx < argNum_, "Argument index out of range")(argNum_, idx);
+    auto arg = argv_[idx];
+
+    X_ASSERT(arg.first < str_.length(), "Argument out of range")(arg.first, str_.length());
+    return core::string_view(str_.data() + arg.first, str_.end());
+}
+
+void ConsoleCommandArgs::TokenizeString(ParseFlags flags)
+{
+    if (str_.isEmpty()) {
         return;
     }
 
-    if (flags.IsSet(ParseFlag::SINGLE_ARG)) {
+    auto* pBegin = str_.begin();
+    auto* pCur = pBegin;
+    auto* pEnd = str_.end();
 
+    if (flags.IsSet(ParseFlag::SINGLE_ARG)) 
+    {
         // just need to split out the command.
-        const char* pCur = pBegin;
-
         while (*pCur != ' ' && pCur < pEnd) {
             ++pCur;
         }
 
         const auto commandNameLen = pCur - pBegin;
-
-        std::memcpy(tokenized_.data(), pBegin, commandNameLen);
-
-        argv_[argNum_] = tokenized_.data();
+        
+        argv_[argNum_] = {0_i32, static_cast<int32_t>(commandNameLen)};
         argNum_++;
 
-        const auto commandNameLenNullTrem = commandNameLen + 1;
-        const auto trailing = strLength - commandNameLenNullTrem;
+        const auto trailing = str_.length() - commandNameLen;
         if (trailing == 0) {
             return;
         }
 
-        std::memcpy(tokenized_.data() + commandNameLenNullTrem, pCur + 1, trailing);
-
-        argv_[argNum_] = tokenized_.data() + commandNameLenNullTrem;
+        argv_[argNum_] = { static_cast<int32_t>(commandNameLen), static_cast<int32_t>(trailing) };
         argNum_++;
         return;
     }
 
-    size_t totalLen = 0;
+    // want to split based on spaces but we join quoted strings.
+    auto* pStart = pCur;
 
-    // TODO: need to be made use of.
-    X_UNUSED(pEnd, flags);
-    
-
-    const char* pStart = pBegin;
-    const char* pCommandLine = pBegin;
-
-    while (char ch = *pCommandLine++)
+    while (pCur < pEnd)
     {
         if (argNum_ == MAX_COMMAND_ARGS) {
             return;
         }
 
+        char ch = *pCur++;
+
         switch (ch) {
-            case '\'':
-            case '\"': {
-                while ((*pCommandLine++ != ch) && *pCommandLine)
-                    ; // find end
-
-                argv_[argNum_] = tokenized_.data() + totalLen;
-                argNum_++;
-
-                size_t len = (pCommandLine - pStart) - 2;
-
-                ::memcpy(tokenized_.data() + totalLen, pStart + 1, len);
-                totalLen += len + 1;
-
-                pStart = pCommandLine;
+            case ' ': {
+                pStart = pCur;
                 break;
             }
-            case ' ': {
-                pStart = pCommandLine;
-                break;
+            case '\'':
+            case '\"': {
+
+                // is there a matching close?
+                auto* pClose = strUtil::Find(pCur, pEnd, ch);
+                if (pClose)
+                {
+                    auto startIdx = std::distance(pBegin, pStart);
+                    auto length = std::distance(pStart, pClose);
+
+                    argv_[argNum_] = { static_cast<int32_t>(startIdx), static_cast<int32_t>(length) };
+                    argNum_++;
+
+                    pCur = pClose + 1;
+                    pStart = pCur;
+                    break;
+                }
+                
+                // ignore it.
+                [[fallthrough]];
             }
 
             default: {
-                if ((*pCommandLine == ' ') || !*pCommandLine) {
-                    argv_[argNum_] = tokenized_.data() + totalLen;
-                    argNum_++;
+
+                // next char is a space?
+                if (*pCur == ' ' || pCur == pEnd)
+                {
+                    auto startIdx = std::distance(pBegin, pStart);
+                    auto length = std::distance(pStart, pCur);
 
                     if (*pStart == '#') {
-                        ++pStart;
+                        // TODO: support var replacement again.
+                        // so: `echo fps limit is: #maxfps` works
 
-                        core::StackString256 name(pStart, pCommandLine);
-
-                        // it's a var name.
-                        ICVar* var = gEnv->pConsole->getCVar(core::string_view(name));
-
-                        if (var) {
-                            core::ICVar::StrBuf strBuf;
-
-                            name.clear();
-                            name.append(var->GetString(strBuf));
-
-                            ::memcpy(tokenized_.data() + totalLen, name.begin(), name.length());
-                            totalLen += (name.length() + 1);
-                            pStart = pCommandLine + 1;
-                            continue;
-                        }
                     }
 
-                    size_t len = (pCommandLine - pStart);
+                    argv_[argNum_] = { static_cast<int32_t>(startIdx), static_cast<int32_t>(length) };
+                    argNum_++;
 
-                    ::memcpy(tokenized_.data() + totalLen, pStart, len);
-                    totalLen += (len + 1);
-
-                    pStart = pCommandLine + 1;
+                    pCur = pCur + 1;
+                    pStart = pCur;
                 }
+
                 break;
             }
         }

@@ -71,7 +71,8 @@ struct IConsoleCmdArgs
     virtual size_t GetArgCount(void) const X_ABSTRACT;
     // Gets argument by index, idx must be in 0 <= idx < GetArgCount()
     virtual core::string_view GetArg(size_t idx) const X_ABSTRACT;
-
+    // returns a view from arg N to the end.
+    virtual core::string_view GetArgToEnd(size_t idx) const X_ABSTRACT;
 };
 
 struct IKeyBindDumpSink
