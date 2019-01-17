@@ -2187,5 +2187,8 @@
     <Natvis Include="FixedFifo.natvis">
       <Filter>Natvis</Filter>
     </Natvis>
+    <Natvis Include="StringView.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>

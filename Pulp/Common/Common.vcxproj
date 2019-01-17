@@ -1203,6 +1203,7 @@
     <Natvis Include="ResourceStateBase.natvis" />
     <Natvis Include="Stack.natvis" />
     <Natvis Include="String.natvis" />
+    <Natvis Include="StringView.natvis" />
     <Natvis Include="Winding.natvis" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
