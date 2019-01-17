@@ -1147,7 +1147,7 @@ namespace entity
                     rl.col = light.col;
                     rl.trans = trans;
 
-                    p3DWorld_->addRenderLight(rl);
+                    light.pLight = p3DWorld_->addRenderLight(rl);
                     break;
                 }
 
