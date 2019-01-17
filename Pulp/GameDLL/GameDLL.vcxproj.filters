@@ -144,6 +144,9 @@
     <ClInclude Include="NetInterpolationState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Enity\LightSys.h">
+      <Filter>Header Files\Enity\Systems</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
@@ -216,6 +219,9 @@
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
     <ClCompile Include="Enity\NetworkSys.cpp">
+      <Filter>Source Files\Entity\Systems</Filter>
+    </ClCompile>
+    <ClCompile Include="Enity\LightSys.cpp">
       <Filter>Source Files\Entity\Systems</Filter>
     </ClCompile>
   </ItemGroup>

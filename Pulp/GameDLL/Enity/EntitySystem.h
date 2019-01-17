@@ -15,6 +15,7 @@
 #include "MeshRendererSys.h"
 #include "HealthSys.h"
 #include "NetworkSys.h"
+#include "LightSys.h"
 
 #include "DataTranslator.h"
 
@@ -153,6 +154,7 @@ namespace entity
         MeshRendererSys meshRendererSys_;
         HealthSystem healthSys_;
         NetworkSystem networkSys_;
+        LightSystem lightSys_;
 
         EntityId endOfmapEnts_;
         EntityIdMapArr entIdMap_;

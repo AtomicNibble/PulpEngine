@@ -154,6 +154,10 @@ namespace entity
             return false;
         }
 
+        if (!lightSys_.init(reg_, p3DWorld)) {
+            return false;
+        }
+
         for (uint32_t i = 0; i < net::MAX_PLAYERS; i++) {
             auto id = reg_.create();
             if (id != i) {
@@ -266,6 +270,7 @@ namespace entity
 
         healthSys_.update(frame.timeInfo, reg_);
 
+        lightSys_.update(frame, reg_);
 
         // do this before the next frame so that it's not simulated in physics.
         // otherwise we can end up with transform updates for deleted ents.

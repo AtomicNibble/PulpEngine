@@ -58,6 +58,7 @@ public:
 public:
     Transformf trans;
     Color8u col;
+    int32_t lastModifiedFrameNum; // to determine if it is constantly changing,
 };
 
 struct AreaNode

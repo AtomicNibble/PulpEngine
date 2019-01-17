@@ -764,6 +764,7 @@ IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
     auto* pRenderLight = X_NEW(RenderLight, arena_, "RenderLight")();
     pRenderLight->trans = ent.trans;
     pRenderLight->col = ent.col;
+    pRenderLight->lastModifiedFrameNum = 0;
 
     renderLights_.append(pRenderLight);
 
@@ -772,7 +773,17 @@ IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
 
 void World3D::updateLight(IRenderLight* pLight, const Transformf& trans)
 {
-    X_UNUSED(pLight, trans);
+    RenderLight* pRenderLight = static_cast<RenderLight*>(pLight);
+
+    // try skipping update.
+    if (pRenderLight->trans == trans) {
+        return;
+    }
+
+    pRenderLight->lastModifiedFrameNum = frameNumber_;
+    pRenderLight->trans = trans;
+
+    //	createEntityRefs(pRenderEnt);
 }
 
 void World3D::freeLight(IRenderLight* pLight)

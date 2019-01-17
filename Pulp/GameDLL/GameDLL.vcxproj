@@ -408,6 +408,7 @@
     <ClInclude Include="Enity\EntitySystem.h" />
     <ClInclude Include="Enity\EntityComponents.h" />
     <ClInclude Include="Enity\HealthSys.h" />
+    <ClInclude Include="Enity\LightSys.h" />
     <ClInclude Include="Enity\MeshRendererSys.h" />
     <ClInclude Include="Enity\NetworkSys.h" />
     <ClInclude Include="Enity\PhysicsSystem.h" />
@@ -435,6 +436,7 @@
     <ClCompile Include="Enity\EntitySystem.cpp" />
     <ClCompile Include="Enity\EntityComponents.cpp" />
     <ClCompile Include="Enity\HealthSys.cpp" />
+    <ClCompile Include="Enity\LightSys.cpp" />
     <ClCompile Include="Enity\MeshRendererSys.cpp" />
     <ClCompile Include="Enity\NetworkSys.cpp" />
     <ClCompile Include="Enity\PhysicsSystem.cpp" />
