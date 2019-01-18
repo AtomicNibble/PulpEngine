@@ -2010,9 +2010,9 @@ void XConsole::drawBuffer(void)
 
             for (int32_t i = (num - 1); i >= 0 && yPos >= 30; --i, ++scroll) {
                 if (scroll >= scrollPos_) {
-                    const char* pBuf = consoleLog_[i].c_str();
+                    const auto& text = consoleLog_[i];
 
-                    pPrimContext_->drawText(xPos, yPos, ctx, pBuf);
+                    pPrimContext_->drawText(xPos, yPos, ctx, text.begin(), text.end());
                     yPos -= fCharHeight;
                 }
             }
