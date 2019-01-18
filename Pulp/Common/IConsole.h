@@ -78,7 +78,7 @@ struct IConsoleCmdArgs
 struct IKeyBindDumpSink
 {
     virtual ~IKeyBindDumpSink() = default;
-    virtual void OnKeyBindFound(const char* Bind, const char* Command) X_ABSTRACT;
+    virtual void OnKeyBindFound(core::string_view bind, core::string_view command) X_ABSTRACT;
 };
 
 // typedef core::traits::Function<void(ICVar*)> ConsoleVarFunc;

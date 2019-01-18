@@ -1862,7 +1862,7 @@ void XConsole::clearAllBinds(void)
 void XConsole::listbinds(IKeyBindDumpSink* CallBack)
 {
     for (auto bind : binds_) {
-        CallBack->OnKeyBindFound(bind.first.c_str(), bind.second.c_str());
+        CallBack->OnKeyBindFound(core::string_view(bind.first), core::string_view(bind.second));
     }
 }
 
@@ -2812,9 +2812,9 @@ void XConsole::Command_BindsList(IConsoleCmdArgs* pCmd)
 
     struct PrintBinds : public IKeyBindDumpSink
     {
-        virtual void OnKeyBindFound(const char* pBind, const char* pCommand) X_FINAL
+        virtual void OnKeyBindFound(core::string_view bind, core::string_view command) X_FINAL
         {
-            X_LOG0("Console", "Key: %s Cmd: \"%s\"", pBind, pCommand);
+            X_LOG0("Console", "Key: %.*s Cmd: \"%.*s\"", bind.length(), bind.data(), command.length(), command.data());
         }
     };
 
