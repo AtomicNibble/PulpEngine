@@ -26,7 +26,7 @@ namespace
         "                        ",
         "                          ",
         "                            ",
-        "                               "};
+        "                              "};
 
 #define X_CALL_LOGGERS(pfnc)                                                 \
     for (LoggerBase* logger = listHead_; logger; logger = logger->GetNext()) \
