@@ -182,7 +182,7 @@ public:
     bool SetModPath(const core::string& name, const core::Path<char>& outDir);
     bool SetModPath(ModId modId, const core::Path<char>& outDir);
     ModId GetModId(const core::string& name);
-    ModId GetcurrentModId(void) const;
+    ModId GetCurrentModId(void) const;
     bool GetModInfo(ModId id, Mod& modOut);
 
     // mod specific counts

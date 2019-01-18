@@ -113,7 +113,7 @@ namespace
             return false;
         }
 
-        auto modId = db.GetcurrentModId();
+        auto modId = db.GetCurrentModId();
 
         assetDb::AssetDB::Mod modInfo;
         if (!db.GetModInfo(modId, modInfo)) {

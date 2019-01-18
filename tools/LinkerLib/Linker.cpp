@@ -301,7 +301,7 @@ bool Linker::AddAssetList(core::Path<char>& inputFile)
     {
         // want to just add load of fooking files!
         assetDb::AssetDB::Mod mod;
-        if (!db_.GetModInfo(db_.GetcurrentModId(), mod)) {
+        if (!db_.GetModInfo(db_.GetCurrentModId(), mod)) {
             X_ERROR("Linker", "Failed to get mod info");
             return false;
         }

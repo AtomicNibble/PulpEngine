@@ -1837,7 +1837,7 @@ AssetDB::ModId AssetDB::GetModId(const core::string& name)
     return id;
 }
 
-AssetDB::ModId AssetDB::GetcurrentModId(void) const
+AssetDB::ModId AssetDB::GetCurrentModId(void) const
 {
     return modId_;
 }
