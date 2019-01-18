@@ -502,7 +502,7 @@ FileT* xFileSys::findFile(const PathT& relPath, FileFlags mode, VirtualDirectory
             {
                 auto* pPak = pSearch->pPak;
 
-                auto idx = pPak->find(hash, relPath.c_str());
+                auto idx = pPak->find(hash, core::string_view(relPath));
                 if (idx != core::Pak::INVALID_INDEX) {
                     return pakFunc(pPak, idx);
                 }
@@ -868,7 +868,7 @@ bool xFileSys::fileExists(const PathT& relPath) const
         {
             auto* pPak = pSearch->pPak;
 
-            auto idx = pPak->find(hash, relPath.c_str());
+            auto idx = pPak->find(hash, core::string_view(relPath));
             if (idx != core::Pak::INVALID_INDEX) {
                 return true;
             }
@@ -1832,22 +1832,20 @@ bool xFileSys::openPak(const PathT& relPath)
         return false;
     }
 
-    core::MemCursor cursor(pPak->data.data() + hdr.stringDataOffset, stringBlockSize);
+    {
+        auto& strings = pPak->strings;
 
-    pPak->strings.push_back(cursor.getPtr<const char>());
+        core::MemCursor stringsCursor(pPak->data.data() + hdr.stringDataOffset, stringBlockSize);
 
-    for (auto* pData = cursor.begin(); pData < cursor.end(); ++pData) {
-        if (*pData == '\0') {
-            pPak->strings.push_back(pData + 1);
-            if (pPak->strings.size() == hdr.numAssets) {
-                break;
-            }
+        // lets change this 
+        for (uint32_t i = 0; i < hdr.numAssets; i++)
+        {
+            auto length = stringsCursor.getSeek<AssetPak::NameLengthType>();
+            const char* pStringBegin = stringsCursor.getPtr<const char>();
+            stringsCursor.seekBytes(length);
+
+            strings.emplace_back(pStringBegin, length);
         }
-    }
-
-    if (pPak->strings.size() != hdr.numAssets) {
-        X_ERROR("FileSys", "Error loading pak");
-        return false;
     }
 
     auto numassetsPow2 = core::bitUtil::NextPowerOfTwo(hdr.numAssets);
@@ -1858,8 +1856,8 @@ bool xFileSys::openPak(const PathT& relPath)
 
     // we need to build a hash table of the goat.
     for (size_t i = 0; i < pPak->strings.size(); ++i) {
-        const char* pString = pPak->strings[i];
-        core::StrHash hash(pString, core::strUtil::strlen(pString));
+        const auto& string = pPak->strings[i];
+        core::StrHash hash(string.data(), string.length());
 
         pPak->hash.add(hash, safe_static_cast<int32_t>(i));
     }

@@ -92,7 +92,7 @@ X_NAMESPACE_BEGIN(AssetPak)
 //  basically want a hash index i think.
 
 static const uint32_t PAK_MAGIC = core::X_FOURCC<uint32_t>('a', 'p', 'a', 'k');
-static const uint8_t PAK_VERSION = 2;
+static const uint8_t PAK_VERSION = 3;
 static const char* PAK_FILE_EXTENSION = "apak";
 
 static const size_t PAK_BLOCK_PADDING = 16; // each section of the pak file is aligned to this, aka string / entry data.
@@ -109,6 +109,10 @@ static const uint32_t PAK_FU_SPARE_ASSET_SLOTS = 128;
 static const uint32_t PAK_STR_POOL_BLOCK_SIZE = 16; // smaller = less waste / larger = more capaciy.
 
 X_ENSURE_GE(PAK_STR_POOL_BLOCK_SIZE, 8, "padding must be greater or equal to 8");
+
+using NameLengthType = uint8_t;
+
+static_assert(assetDb::ASSET_NAME_MAX_LENGTH <= std::numeric_limits<NameLengthType>::max(), "Can't store name length in single byte");
 
 struct AssetOffset
 {

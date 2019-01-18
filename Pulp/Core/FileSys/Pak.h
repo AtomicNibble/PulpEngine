@@ -17,7 +17,7 @@ struct Pak
     Pak(core::MemoryArenaBase* arena);
     ~Pak();
 
-    int32_t find(core::StrHash hash, const char* pName) const;
+    int32_t find(core::StrHash hash, core::string_view name) const;
 
 public:
     // have you seen this pak format?
@@ -32,7 +32,7 @@ public:
     PakMode::Enum mode;
 
     core::Array<uint8_t> data; // from 0-data (or whole file if memory mode)
-    core::Array<const char*> strings;
+    core::Array<core::string_view> strings;
     const AssetPak::APakEntry* pEntires;
     core::XHashIndex hash;
 
@@ -59,10 +59,10 @@ inline Pak::~Pak()
     X_ASSERT(pFile == nullptr, "File handle leak")(pFile);
 }
 
-inline int32_t Pak::find(core::StrHash nameHash, const char* pName) const
+inline int32_t Pak::find(core::StrHash nameHash, core::string_view fileName) const
 {
     auto idx = hash.first(nameHash);
-    while (idx != INVALID_INDEX && strUtil::IsEqual(strings[idx], pName) == false) {
+    while (idx != INVALID_INDEX && strUtil::IsEqual(strings[idx], fileName) == false) {
         idx = hash.next(idx);
     }
 

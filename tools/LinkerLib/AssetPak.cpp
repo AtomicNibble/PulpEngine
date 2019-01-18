@@ -440,24 +440,31 @@ bool AssetPakBuilder::save(const core::Path<char>& path)
                 stringDataSize += assetExt[a.type].length();
             }
 
-            ++stringDataSize; // null term
+            stringDataSize += sizeof(NameLengthType);
         }
 
         stringDataSize = core::bitUtil::RoundUpToMultiple<uint64_t>(stringDataSize, PAK_BLOCK_PADDING);
 
         strings.reserve(safe_static_cast<size_t>(stringDataSize));
 
+        core::StackString<assetDb::ASSET_NAME_MAX_LENGTH> name;
+
         for (const auto& a : assets_) {
             const auto& prefix = assetPrefixes[a.type];
-            strings.write(prefix.c_str(), prefix.length());
-            strings.write(a.name.data(), core::strUtil::StringBytes(a.name));
+
+            name.clear();
+            name.append(prefix.data(), prefix.length());
+            name.append(a.name.data(), core::strUtil::StringBytes(a.name));
 
             if (a.id != assetDb::INVALID_ASSET_ID) {
                 const auto& ext = assetExt[a.type];
-                 strings.write(ext.c_str(), ext.length());
+                name.append(ext.data(), ext.length());
             }
 
-            strings.write('\0');
+            auto length = safe_static_cast<NameLengthType>(name.length());
+
+            strings.write<NameLengthType>(length);
+            strings.write(name.data(), name.length());
         }
 
         strings.alignWrite(PAK_BLOCK_PADDING);
