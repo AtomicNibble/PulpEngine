@@ -16,6 +16,8 @@
 
 X_NAMESPACE_BEGIN(net)
 
+using namespace core::string_view_literals;
+
 namespace
 {
     template <typename T, size_t Length, size_t ... Index>
@@ -1795,30 +1797,30 @@ void XPeer::remoteReliabilityTick(RemoteSystem& rs, UpdateBitStream& updateBS, c
 
     if (deadConnection || disconnectingNoData || connectionOpenTimeout || dissconectNoAck || socketClosed) {
         if (vars_.debugEnabled()) {
-            const char* pCloseReason = "<ukn>";
+            auto closeReason = "<ukn>"_sv;
 
             if (deadConnection) {
                 // did we timeout waiting for acks to send?
                 if (disconnectingAfterAck) {
-                    pCloseReason = "Disconnect noack timeout";
+                    closeReason = "Disconnect noack timeout"_sv;
                 }
                 else {
-                    pCloseReason = "Connection timeout";
+                    closeReason = "Connection timeout"_sv;
                 }
             }
             else if (disconnectingNoData) {
-                pCloseReason = "Disconnection request";
+                closeReason = "Disconnection request"_sv;
             }
             else if (connectionOpenTimeout) {
-                pCloseReason = "Partial connection timeout";
+                closeReason = "Partial connection timeout"_sv;
             }
             else if (dissconectNoAck) {
-                pCloseReason = "Disconnect request(noack)";
+                closeReason = "Disconnect request(noack)"_sv;
             }
 
             IPStr ipStr;
-            X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%s\" State: \"%s\"", 
-                rs.systemAddress.toString(ipStr), pCloseReason, ConnectState::ToString(rs.connectState));
+            X_LOG0("Net", "Closing connection for remote system: \"%s\" reason: \"%.*s\" State: \"%s\"", 
+                rs.systemAddress.toString(ipStr), closeReason.length(), closeReason.data(), ConnectState::ToString(rs.connectState));
         }
 
         if (rs.connectState != ConnectState::DisconnectAsapSilent)
