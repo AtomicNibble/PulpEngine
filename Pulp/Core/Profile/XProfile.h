@@ -32,11 +32,10 @@ namespace profiler
         {
             SubSystemInfo()
             {
-                pName = nullptr;
                 pWarningMat = nullptr;
             }
 
-            const char* pName;
+            core::string_view name;
             engine::Material* pWarningMat;
             Color8u col;
         };

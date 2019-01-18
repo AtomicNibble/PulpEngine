@@ -165,20 +165,20 @@ namespace profiler
         static_assert(profiler::SubSys::ENUM_COUNT == 14, "Added subsys? this code needs updating");
 
         core::zero_object(subSystemInfo_);
-        subSystemInfo_[profiler::SubSys::CORE].pName = "Core";
-        subSystemInfo_[profiler::SubSys::ENGINE3D].pName = "3DEngine";
-        subSystemInfo_[profiler::SubSys::FONT].pName = "Font";
-        subSystemInfo_[profiler::SubSys::INPUT].pName = "Input";
-        subSystemInfo_[profiler::SubSys::RENDER].pName = "Render";
-        subSystemInfo_[profiler::SubSys::SCRIPT].pName = "Script";
-        subSystemInfo_[profiler::SubSys::SOUND].pName = "Sound";
-        subSystemInfo_[profiler::SubSys::GAME].pName = "Game";
-        subSystemInfo_[profiler::SubSys::PHYSICS].pName = "Physics";
-        subSystemInfo_[profiler::SubSys::NETWORK].pName = "Network";
-        subSystemInfo_[profiler::SubSys::VIDEO].pName = "Video";
-        subSystemInfo_[profiler::SubSys::UNCLASSIFIED].pName = "UnClassified";
-        subSystemInfo_[profiler::SubSys::TOOL].pName = "Tool";
-        subSystemInfo_[profiler::SubSys::UNITTEST].pName = "UnitTests";
+        subSystemInfo_[profiler::SubSys::CORE].name = "Core"_sv;
+        subSystemInfo_[profiler::SubSys::ENGINE3D].name = "3DEngine"_sv;
+        subSystemInfo_[profiler::SubSys::FONT].name = "Font"_sv;
+        subSystemInfo_[profiler::SubSys::INPUT].name = "Input"_sv;
+        subSystemInfo_[profiler::SubSys::RENDER].name = "Render"_sv;
+        subSystemInfo_[profiler::SubSys::SCRIPT].name = "Script"_sv;
+        subSystemInfo_[profiler::SubSys::SOUND].name = "Sound"_sv;
+        subSystemInfo_[profiler::SubSys::GAME].name = "Game"_sv;
+        subSystemInfo_[profiler::SubSys::PHYSICS].name = "Physics"_sv;
+        subSystemInfo_[profiler::SubSys::NETWORK].name = "Network"_sv;
+        subSystemInfo_[profiler::SubSys::VIDEO].name = "Video"_sv;
+        subSystemInfo_[profiler::SubSys::UNCLASSIFIED].name = "UnClassified"_sv;
+        subSystemInfo_[profiler::SubSys::TOOL].name = "Tool"_sv;
+        subSystemInfo_[profiler::SubSys::UNITTEST].name = "UnitTests"_sv;
 
         subSystemInfo_[profiler::SubSys::CORE].col = Col_Red;
         subSystemInfo_[profiler::SubSys::ENGINE3D].col = Col_Orange;
@@ -921,12 +921,11 @@ namespace profiler
 
                     ctx.col = subSystemInfo_[i].col;
 
-                    const char* pBegin = subSystemInfo_[i].pName;
-                    const char* pEnd = pBegin + core::strUtil::strlen(subSystemInfo_[i].pName);
+                    const auto& name = subSystemInfo_[i].name;
 
-                    auto txtSize = pFont_->GetTextSize(pBegin, pEnd, ctx);
+                    auto txtSize = pFont_->GetTextSize(name.begin(), name.end(), ctx);
 
-                    pPrim->drawText(keyX, keyY, ctx, subSystemInfo_[i].pName);
+                    pPrim->drawText(keyX, keyY, ctx, name.begin(), name.end());
 
                     keyX += txtSize.x + 10.f;
                 }
