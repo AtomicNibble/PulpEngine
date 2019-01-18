@@ -458,36 +458,34 @@ extern CoreGlobals* gEnv;
 extern core::MallocFreeAllocator* gMalloc;
 
 #if defined(X_CVAR_NO_DESCRIPTION) && X_CVAR_NO_DESCRIPTION == 1
-#define CVARTEXT(_desc) core::string_view()
+#define CVAR_DESC(_desc) core::string_view()
 #else
-#define CVARTEXT(_desc) core::string_view(_desc)
+#define CVAR_DESC(_desc) core::string_view(_desc, sizeof(_desc) - 1)
 #endif
 
-#define ADD_CVAR_REF(_name, _var, _def_val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name), &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_REF_VEC3(_name, _var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name), &(_var), (_def_val), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_REF_COL(_name, _var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name), &(_var), (_def_val), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_REF_NO_NAME(_var, _def_val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var)), &(_var), (_def_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_REF_COL_NO_NAME(_var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var)), &(_var), (_def_val), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_REF_VEC3_NO_NAME(_var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var)), &(_var), (_def_val), (_flags), CVARTEXT(_desc))
+#define ADD_CVAR_REF(_name, _var, _def_val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name, sizeof(_name) - 1), &(_var), (_def_val), (_Min), (_Max), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_REF_VEC3(_name, _var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name, sizeof(_name) - 1), &(_var), (_def_val), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_REF_COL(_name, _var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(_name, sizeof(_name) - 1), &(_var), (_def_val), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_REF_NO_NAME(_var, _def_val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var), sizeof(X_STRINGIZE(_var)) - 1), &(_var), (_def_val), (_Min), (_Max), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_REF_COL_NO_NAME(_var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var), sizeof(X_STRINGIZE(_var)) - 1), &(_var), (_def_val), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_REF_VEC3_NO_NAME(_var, _def_val, _flags, _desc) gEnv->pConsole->registerRef(core::string_view(X_STRINGIZE(_var), sizeof(X_STRINGIZE(_var)) - 1), &(_var), (_def_val), (_flags), CVAR_DESC(_desc))
 
-#define ADD_CVAR_INT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerInt(core::string_view(_name), (_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_FLOAT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerFloat(core::string_view(_name), (_val), (_Min), (_Max), (_flags), CVARTEXT(_desc))
-#define ADD_CVAR_STRING(_name, _val, _flags, _desc) gEnv->pConsole->registerString(core::string_view(_name), core::string_view(_val), (_flags), CVARTEXT(_desc))
+#define ADD_CVAR_INT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerInt(core::string_view(_name, sizeof(_name) - 1), (_val), (_Min), (_Max), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_FLOAT(_name, _val, _Min, _Max, _flags, _desc) gEnv->pConsole->registerFloat(core::string_view(_name, sizeof(_name) - 1), (_val), (_Min), (_Max), (_flags), CVAR_DESC(_desc))
+#define ADD_CVAR_STRING(_name, _val, _flags, _desc) gEnv->pConsole->registerString(core::string_view(_name, sizeof(_name) - 1), core::string_view(_val, sizeof(_val) - 1), (_flags), CVAR_DESC(_desc))
 
 #define ADD_COMMAND(_name, _func, _flags, _desc)                                              \
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<_func>();                                                      \
-    constexpr auto name = core::string_view(_name, __builtin_strlen(_name));                  \
-    gEnv->pConsole->registerCommand(name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_desc));  \
+    gEnv->pConsole->registerCommand(core::string_view(_name, sizeof(_name) - 1), X_PP_UNIQUE_NAME(del), (_flags), CVAR_DESC(_desc));  \
     X_MULTILINE_MACRO_END
 
 #define ADD_COMMAND_MEMBER(_name, __inst, __class, _func, _flags, _desc)                      \
     X_MULTILINE_MACRO_BEGIN                                                                   \
     core::ConsoleCmdFunc X_PP_UNIQUE_NAME(del);                                               \
     X_PP_UNIQUE_NAME(del).Bind<__class, _func>(__inst);                                       \
-    constexpr auto name = core::string_view(_name, __builtin_strlen(_name));                  \
-    gEnv->pConsole->registerCommand(name, X_PP_UNIQUE_NAME(del), (_flags), CVARTEXT(_desc)); \
+    gEnv->pConsole->registerCommand(core::string_view(_name, sizeof(_name) - 1), X_PP_UNIQUE_NAME(del), (_flags), CVAR_DESC(_desc)); \
     X_MULTILINE_MACRO_END
 
 // All logging done via this.
