@@ -144,6 +144,12 @@ X_INLINE HashVal getIDFromStr(const char* pStr, size_t len)
     return core::Hash::Fnv1HashLower(pStr, len);
 }
 
+template<HashVal N>
+inline constexpr HashVal force_hash(void)
+{
+    return N;
+}
+
 namespace Literals
 {
 

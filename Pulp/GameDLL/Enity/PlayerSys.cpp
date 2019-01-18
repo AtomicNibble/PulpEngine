@@ -222,7 +222,7 @@ namespace entity
             state.Set(Player::State::Crouch);
             crouched = true;
 
-            gEnv->pSound->postEvent(force_hash<"player_brag"_soundId>(), sound::GLOBAL_OBJECT_ID);
+            gEnv->pSound->postEvent(sound::force_hash<"player_brag"_soundId>(), sound::GLOBAL_OBJECT_ID);
         }
         else if (leaveCrouch) {
             state.Remove(Player::State::Crouch);
@@ -234,7 +234,7 @@ namespace entity
             state.Set(Player::State::Jump);
             player.jumpTime = core::TimeVal(0ll);
 
-            gEnv->pSound->postEvent(force_hash<"player_jump"_soundId>(), sound::GLOBAL_OBJECT_ID);
+            gEnv->pSound->postEvent(sound::force_hash<"player_jump"_soundId>(), sound::GLOBAL_OBJECT_ID);
         }
 
         // update the view angles.
@@ -289,7 +289,7 @@ namespace entity
                 ++frames;
                 if (frames == 15) {
                     frames = 0;
-                    gEnv->pSound->postEvent(force_hash<"player_footstep"_soundId>(), sound::GLOBAL_OBJECT_ID);
+                    gEnv->pSound->postEvent(sound::force_hash<"player_footstep"_soundId>(), sound::GLOBAL_OBJECT_ID);
                 }
             }
 

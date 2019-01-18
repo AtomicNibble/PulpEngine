@@ -108,12 +108,6 @@ namespace Hash
             return Fnv1Const::Hash(pStr, strLen);
         }
 
-        template<uint32_t N>
-        inline constexpr uint32_t force_hash(void)
-        {
-            return N;
-        }
-
     } // namespace Literals
 } // namespace Hash
 
