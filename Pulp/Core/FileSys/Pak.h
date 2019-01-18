@@ -62,7 +62,7 @@ inline Pak::~Pak()
 inline int32_t Pak::find(core::StrHash nameHash, const char* pName) const
 {
     auto idx = hash.first(nameHash);
-    while (idx != -1 && strUtil::IsEqual(strings[idx], pName) == false) {
+    while (idx != INVALID_INDEX && strUtil::IsEqual(strings[idx], pName) == false) {
         idx = hash.next(idx);
     }
 
