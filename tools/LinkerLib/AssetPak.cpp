@@ -11,6 +11,7 @@
 #include <String\HumanSize.h>
 #include <String\HumanDuration.h>
 #include <String\StringHash.h>
+#include <Memory\MemCursor.h>
 
 #include <Threading\JobSystem2.h>
 
@@ -832,32 +833,27 @@ bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
     const size_t stringDataSize = hdr.entryTableOffset - hdr.stringDataOffset;
 
     core::Array<char> stringData(arena_);
-    core::Array<const char*> strings(arena_);
+    core::Array<core::string_view> strings(arena_);
     stringData.resize(stringDataSize);
     strings.reserve(hdr.numAssets);
 
     file.seek(hdr.stringDataOffset, core::SeekMode::SET);
     file.read(stringData.data(), stringData.size());
 
-    strings.push_back(stringData.begin());
-
     size_t longestString = 0;
 
-    for (size_t i = 0; i < stringData.size() && strings.size() < hdr.numAssets; i++) {
-        if (stringData[i] == '\0') {
-            strings.push_back(&stringData[i + 1]);
+    {
+        core::MemCursor stringsCursor(stringData.data(), stringData.size());
 
-            auto strLength = static_cast<size_t>(strings.back() - strings[strings.size() - 2]) - 1;
-            longestString = core::Max(longestString, strLength);
+        for (uint32_t i = 0; i < hdr.numAssets; i++)
+        {
+            auto length = stringsCursor.getSeek<AssetPak::NameLengthType>();
+            const char* pStringBegin = stringsCursor.getPtr<const char>();
+            stringsCursor.seekBytes(length);
 
-            ++i;
+            strings.emplace_back(pStringBegin, length);
+            longestString = core::Max<size_t>(longestString, length);
         }
-    }
-
-    // trailing.
-    if (strings.isNotEmpty()) {
-        auto strLength = core::strUtil::strlen(strings.back());
-        longestString = core::Max(longestString, strLength);
     }
 
     // add some space.
@@ -868,8 +864,9 @@ bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
     X_LOG0("AssetPak", "%-4s %-*s %-10s %-10s %-12s %s", "Idx", longestString, "Name", "Offset", "Size", "NameHash", "Type");
 
     for (size_t i = 0; i < strings.size(); i++) {
-        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-*s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32 "   ^8%s", 
-            i, longestString, strings[i], (uint64_t)entries[i].offset + hdr.dataOffset, entries[i].size, core::StrHash(strings[i]).hash(), AssetType::ToString(entries[i].type));
+        const auto& name = strings[i];
+        X_LOG0("AssetPak", "%-4" PRIuS " ^5%-*.*s ^6%-10" PRIu64 " %-10" PRIu32 " 0x%08" PRIx32 "   ^8%s", 
+            i, longestString, name.length(), name.data(), (uint64_t)(entries[i].offset + hdr.dataOffset), entries[i].size, core::StrHash(name.data(), name.length()).hash(), AssetType::ToString(entries[i].type));
     }
 
     return true;
