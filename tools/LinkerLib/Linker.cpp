@@ -68,11 +68,15 @@ bool Linker::Build(BuildOptions& options)
         core::Path<char> levelAssList;
         core::Path<char> levelAssListInc;
 
-        // TODO: remove hardcoded mod.
-        level.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_FILE_EXTENSION);
-        levelEntDesc.setFmt("core_assets/levels/%s.%s", options.level.c_str(), level::LVL_ENT_FILE_EXTENSION);
-        levelAssList.setFmt("core_assets/levels/%s.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
-        levelAssListInc.setFmt("core_assets/levels/%s_inc.%s", options.level.c_str(), assetDb::ASSET_LIST_EXT);
+        assetDb::AssetDB::Mod modInfo;
+        if (!db_.GetModInfo(db_.GetCurrentModId(), modInfo)) {
+            return false;
+        }
+        
+        level.setFmt("%s/levels/%s.%s", modInfo.outDir.c_str(), options.level.c_str(), level::LVL_FILE_EXTENSION);
+        levelEntDesc.setFmt("%s/levels/%s.%s", modInfo.outDir.c_str(), options.level.c_str(), level::LVL_ENT_FILE_EXTENSION);
+        levelAssList.setFmt("%s/levels/%s.%s", modInfo.outDir.c_str(), options.level.c_str(), assetDb::ASSET_LIST_EXT);
+        levelAssListInc.setFmt("%s/levels/%s_inc.%s", modInfo.outDir.c_str(), options.level.c_str(), assetDb::ASSET_LIST_EXT);
 
         // load the level.
         if (!AddAssetFromDisk(assetDb::AssetType::LEVEL, options.level + "." + level::LVL_FILE_EXTENSION, level)) {
