@@ -102,6 +102,7 @@ void XLog::RemoveLogger(LoggerBase* logger)
 
 const char* XLog::GetIndentation(void)
 {
+    // TODO: perf maybe faster to return string_view or just pass length to the format policy since it's just whitespace now.
     return INDENTATION_STRINGS[logVerbosity_ & 0xF];
 }
 
