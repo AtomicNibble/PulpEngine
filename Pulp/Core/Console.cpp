@@ -1217,7 +1217,8 @@ void XConsole::executeCommand(const ConsoleCommand& cmd, ConsoleCommandArgs::Com
         ConsoleCommandArgs cmdArgs(str, flags);
 
         if (console_debug) {
-            X_LOG0("Console", "Running command \"%s\"", cmdArgs.GetArg(0));
+            auto cmdStr = cmdArgs.GetArg(0);
+            X_LOG0("Console", "Running command \"%.*s\"", cmdStr.length(), cmdStr.data());
         }
 
         cmd.func.Invoke(&cmdArgs);
