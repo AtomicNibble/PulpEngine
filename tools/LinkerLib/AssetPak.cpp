@@ -742,7 +742,10 @@ bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
     entries.resize(hdr.numAssets);
 
     file.seek(hdr.entryTableOffset, core::SeekMode::SET);
-    file.readObjs(entries.data(), entries.size());
+    if (file.readObjs(entries.data(), entries.size()) != entries.size()) {
+        X_ERROR("AssetPak", "Failed to read entry table");
+        return false;
+    }
 
     uint64_t totalInflatedSize = 0;
 
@@ -838,7 +841,10 @@ bool AssetPakBuilder::dumpMetaOS(core::Path<wchar_t>& osPath)
     strings.reserve(hdr.numAssets);
 
     file.seek(hdr.stringDataOffset, core::SeekMode::SET);
-    file.read(stringData.data(), stringData.size());
+    if (file.read(stringData.data(), stringData.size()) != stringData.size()) {
+        X_ERROR("AssetPak", "Failed to read string data");
+        return false;
+    }
 
     size_t longestString = 0;
 
