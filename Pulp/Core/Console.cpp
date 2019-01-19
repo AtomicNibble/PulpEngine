@@ -1299,7 +1299,7 @@ void XConsole::executeInputBuffer(void)
     core::string temp = inputBuffer_;
     clearInputBuffer();
 
-    addCmdToHistory(temp);
+    addCmdToHistory(core::string_view(temp.data(), temp.length()));
 
     addCmd(std::move(temp), ExecSource::CONSOLE, false);
 }
@@ -1745,12 +1745,6 @@ void XConsole::parseCmdHistory(const char* pBegin, const char* pEnd)
     }
 
     resetHistoryPos();
-}
-
-
-X_INLINE void XConsole::addCmdToHistory(const string& command)
-{
-    addCmdToHistory(core::string_view(command));
 }
 
 void XConsole::addCmdToHistory(core::string_view command)
