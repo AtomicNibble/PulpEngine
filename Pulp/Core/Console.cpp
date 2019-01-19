@@ -87,12 +87,6 @@ namespace
     class CommandParser
     {
     public:
-        explicit CommandParser(const char* cmd) :
-            begin_(cmd),
-            end_(cmd + core::strUtil::strlen(cmd))
-        {
-        }
-
         CommandParser(const char* pBegin, const char* pEnd) :
             begin_(pBegin),
             end_(pEnd)
@@ -1112,7 +1106,7 @@ void XConsole::executeStringInternal(const ExecCommand& cmd)
     ConsoleCommandArgs::CommandNameStr name;
     ConsoleCommandArgs::CommandStr value;
     
-    CommandParser parser(cmd.command.begin());
+    CommandParser parser(cmd.command.begin(), cmd.command.end());
 
     core::StringRange<char> range(nullptr, nullptr);
     while (parser.extractCommand(range)) {
