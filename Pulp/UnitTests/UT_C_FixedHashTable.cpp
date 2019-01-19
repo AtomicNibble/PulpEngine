@@ -53,6 +53,15 @@ class FixedHashTable : public ::testing::Test
 public:
 };
 
+typedef ::testing::Types<short, int, float> MyTypes;
+TYPED_TEST_CASE(FixedHashTableOwning, MyTypes);
+
+template<typename T>
+class FixedHashTableOwning : public ::testing::Test
+{
+public:
+};
+
 TEST(FixedHashTable, ComplexKey)
 {
     resetConConters();
@@ -312,5 +321,74 @@ TEST(FixedHashTable, FindT)
         EXPECT_EQ(1, it->second);
         it = cht.find("2");
         EXPECT_TRUE(it == cht.end());
+    }
+}
+
+// -----------------------------------------------------------------
+
+
+TYPED_TEST(FixedHashTableOwning, Iterator)
+{
+    using HashTable = core::FixedHashTable<TypeParam, TypeParam>;
+
+    HashTable ht(g_arena, 128);
+    const auto& cht = ht;
+
+    EXPECT_TRUE(ht.begin() == ht.end());
+    EXPECT_TRUE(cht.begin() == cht.end());
+    EXPECT_TRUE(ht.cbegin() == ht.cend());
+    EXPECT_TRUE(ht.cbegin() == cht.begin());
+    EXPECT_TRUE(ht.cend() == cht.end());
+
+    EXPECT_FALSE(ht.begin() != ht.end());
+    EXPECT_FALSE(cht.begin() != cht.end());
+    EXPECT_FALSE(ht.cbegin() != ht.cend());
+    EXPECT_FALSE(ht.cbegin() != cht.begin());
+    EXPECT_FALSE(ht.cend() != cht.end());
+
+    {
+        const auto cit = ht.begin();
+        EXPECT_TRUE(cit == ht.end());
+        EXPECT_FALSE(cit != ht.end());
+    }
+
+    for (int i = 1; i < 100; ++i) {
+        ht[(TypeParam)i] = (TypeParam)i;
+    }
+
+    std::array<bool, 100> visited = {};
+    for (auto it = ht.begin(); it != ht.end(); ++it) {
+        visited[(int)it->first] = true;
+    }
+
+    for (int i = 1; i < 100; ++i) {
+        EXPECT_TRUE(visited[i]);
+    }
+
+    // Test for iterator traits
+    EXPECT_TRUE(std::all_of(ht.begin(), ht.end(), [](const auto& item) {
+        return item.second > 0;
+    }
+    ));
+
+    // check iterators after free
+    ht.free();
+
+    EXPECT_TRUE(ht.begin() == ht.end());
+    EXPECT_TRUE(cht.begin() == cht.end());
+    EXPECT_TRUE(ht.cbegin() == ht.cend());
+    EXPECT_TRUE(ht.cbegin() == cht.begin());
+    EXPECT_TRUE(ht.cend() == cht.end());
+
+    EXPECT_FALSE(ht.begin() != ht.end());
+    EXPECT_FALSE(cht.begin() != cht.end());
+    EXPECT_FALSE(ht.cbegin() != ht.cend());
+    EXPECT_FALSE(ht.cbegin() != cht.begin());
+    EXPECT_FALSE(ht.cend() != cht.end());
+
+    {
+        const auto cit = ht.begin();
+        EXPECT_TRUE(cit == ht.end());
+        EXPECT_FALSE(cit != ht.end());
     }
 }
