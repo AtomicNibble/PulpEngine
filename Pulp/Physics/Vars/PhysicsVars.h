@@ -73,7 +73,6 @@ private:
     int32_t unifiedHeightFields_;
     Vec3f gravityVec_;
 
-    const char* scaleVarNames_[physx::PxVisualizationParameter::eNUM_VALUES];
     core::ICVar* scaleVars_[physx::PxVisualizationParameter::eNUM_VALUES];
 };
 

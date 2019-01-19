@@ -6,6 +6,8 @@
 
 X_NAMESPACE_BEGIN(physics)
 
+using namespace core::string_view_literals;
+
 PhysXVars::PhysXVars() :
     pScene_(nullptr),
     pVarDllOverride_(nullptr),
@@ -21,7 +23,6 @@ PhysXVars::PhysXVars() :
     debugDraw_ = 0;
     unifiedHeightFields_ = 0;
 
-    core::zero_object(scaleVarNames_);
     core::zero_object(scaleVars_);
 }
 
@@ -92,45 +93,47 @@ void PhysXVars::RegisterVars(void)
 
     // we have to define the names manually since physx declares a normal enum so we don't have toString() like engine enums.
     // plus defining the full name as a const char means we don't have to allocate memory for each one to store the full name.
-    scaleVarNames_[physx::PxVisualizationParameter::eSCALE] = "phys_draw_debug_scale";
-    scaleVarNames_[physx::PxVisualizationParameter::eWORLD_AXES] = "phys_draw_debug_scale_world_axes";
-    scaleVarNames_[physx::PxVisualizationParameter::eBODY_AXES] = "phys_draw_debug_scale_body_axes";
-    scaleVarNames_[physx::PxVisualizationParameter::eBODY_MASS_AXES] = "phys_draw_debug_scale_body_mass_axes";
-    scaleVarNames_[physx::PxVisualizationParameter::eBODY_LIN_VELOCITY] = "phys_draw_debug_scale_body_lin_verlocity";
-    scaleVarNames_[physx::PxVisualizationParameter::eBODY_ANG_VELOCITY] = "phys_draw_debug_scale_body_ang_velocity";
-    scaleVarNames_[physx::PxVisualizationParameter::eBODY_JOINT_GROUPS] = "phys_draw_debug_scale_body_joint_groups";
-    scaleVarNames_[physx::PxVisualizationParameter::eCONTACT_POINT] = "phys_draw_debug_scale_contat_point";
-    scaleVarNames_[physx::PxVisualizationParameter::eCONTACT_NORMAL] = "phys_draw_debug_scale_contat_normal";
-    scaleVarNames_[physx::PxVisualizationParameter::eCONTACT_ERROR] = "phys_draw_debug_scale_contat_error";
-    scaleVarNames_[physx::PxVisualizationParameter::eCONTACT_FORCE] = "phys_draw_debug_scale_contat_force";
-    scaleVarNames_[physx::PxVisualizationParameter::eACTOR_AXES] = "phys_draw_debug_scale_actor_axes";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_AABBS] = "phys_draw_debug_scale_col_aabbs";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_SHAPES] = "phys_draw_debug_scale_col_shapes";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_AXES] = "phys_draw_debug_scale_col_axes";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_COMPOUNDS] = "phys_draw_debug_scale_col_compounds";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_FNORMALS] = "phys_draw_debug_scale_col_fnormals";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_EDGES] = "phys_draw_debug_scale_col_edges";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_STATIC] = "phys_draw_debug_scale_col_static";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_DYNAMIC] = "phys_draw_debug_scale_col_dynamic";
-    scaleVarNames_[physx::PxVisualizationParameter::eCOLLISION_PAIRS] = "phys_draw_debug_scale_col_pairs";
-    scaleVarNames_[physx::PxVisualizationParameter::eJOINT_LOCAL_FRAMES] = "phys_draw_debug_scale_joint_local_frames";
-    scaleVarNames_[physx::PxVisualizationParameter::eJOINT_LIMITS] = "phys_draw_debug_scale_joint_limits";
+    core::string_view scaleVarNames[physx::PxVisualizationParameter::eNUM_VALUES];
+
+    scaleVarNames[physx::PxVisualizationParameter::eSCALE] = "phys_draw_debug_scale"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eWORLD_AXES] = "phys_draw_debug_scale_world_axes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eBODY_AXES] = "phys_draw_debug_scale_body_axes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eBODY_MASS_AXES] = "phys_draw_debug_scale_body_mass_axes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eBODY_LIN_VELOCITY] = "phys_draw_debug_scale_body_lin_verlocity"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eBODY_ANG_VELOCITY] = "phys_draw_debug_scale_body_ang_velocity"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eBODY_JOINT_GROUPS] = "phys_draw_debug_scale_body_joint_groups"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCONTACT_POINT] = "phys_draw_debug_scale_contat_point"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCONTACT_NORMAL] = "phys_draw_debug_scale_contat_normal"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCONTACT_ERROR] = "phys_draw_debug_scale_contat_error"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCONTACT_FORCE] = "phys_draw_debug_scale_contat_force"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eACTOR_AXES] = "phys_draw_debug_scale_actor_axes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_AABBS] = "phys_draw_debug_scale_col_aabbs"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_SHAPES] = "phys_draw_debug_scale_col_shapes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_AXES] = "phys_draw_debug_scale_col_axes"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_COMPOUNDS] = "phys_draw_debug_scale_col_compounds"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_FNORMALS] = "phys_draw_debug_scale_col_fnormals"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_EDGES] = "phys_draw_debug_scale_col_edges"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_STATIC] = "phys_draw_debug_scale_col_static"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_DYNAMIC] = "phys_draw_debug_scale_col_dynamic"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eCOLLISION_PAIRS] = "phys_draw_debug_scale_col_pairs"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eJOINT_LOCAL_FRAMES] = "phys_draw_debug_scale_joint_local_frames"_sv;
+    scaleVarNames[physx::PxVisualizationParameter::eJOINT_LIMITS] = "phys_draw_debug_scale_joint_limits"_sv;
     // skipped particle ones for now
     // ..
     // this enables cull box not visulization of cull box.
     //	scaleVarNames_[physx::PxVisualizationParameter::eCULL_BOX]   				= "phys_draw_debug_scale_cull_box";
     // skipped cloth ones for now
     // ..
-    scaleVarNames_[physx::PxVisualizationParameter::eMBP_REGIONS] = "phys_draw_debug_scale_mpb_regions";
+    scaleVarNames[physx::PxVisualizationParameter::eMBP_REGIONS] = "phys_draw_debug_scale_mpb_regions"_sv;
 
     // lets get fancy and auto gen the vars.
     for (uint32_t i = 0; i < physx::PxVisualizationParameter::eNUM_VALUES; i++) {
         // if name is not define we just don't expose it.
-        if (!scaleVarNames_[i]) {
+        if (scaleVarNames[i].empty()) {
             continue;
         }
 
-        auto* pVar = ADD_CVAR_FLOAT(scaleVarNames_[i], 0.f, 0.f, 128.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Debug draw scale");
+        auto* pVar = ADD_CVAR_FLOAT(scaleVarNames[i], 0.f, 0.f, 128.f, core::VarFlag::SYSTEM | core::VarFlag::SAVE_IF_CHANGED, "Debug draw scale");
         pVar->SetOnChangeCallback(scaleChangedDel);
 
         scaleVars_[i] = pVar;
