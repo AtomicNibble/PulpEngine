@@ -1117,7 +1117,7 @@ void XRender::applyState(GraphicsContext& context, State& curState, const StateH
 
                     uint32_t rootIdx = newState.bufferRootIdxBase + t;
 
-                    // support inline dynalic buffer descriptions.
+                    // support inline dynamic buffer descriptions.
                     if (pBuffMan_->ValidHandle(bufState.buf)) {
                         auto* pCbuf = pBuffMan_->VBFromHandle(bufState.buf);
                         auto& buf = pCbuf->getBuf();
