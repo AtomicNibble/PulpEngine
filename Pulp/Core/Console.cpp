@@ -995,7 +995,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
     const int32_t bufferSize = console_buffer_size;
 
-    if (safe_static_cast<int32_t, size_t>(consoleLog_.size()) > bufferSize) {
+    if (safe_static_cast<int32_t>(consoleLog_.size()) > bufferSize) {
         consoleLog_.pop();
 
         const auto noneScroll = maxVisibleLogLines();
@@ -1014,7 +1014,7 @@ void XConsole::addLineToLog(const char* pStr, uint32_t length)
 
 int32_t XConsole::getLineCount(void) const
 {
-    return safe_static_cast<int32_t, size_t>(consoleLog_.size());
+    return safe_static_cast<int32_t>(consoleLog_.size());
 }
 
 // -------------------------------------------------
