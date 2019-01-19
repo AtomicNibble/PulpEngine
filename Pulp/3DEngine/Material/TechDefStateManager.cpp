@@ -291,7 +291,7 @@ TechDef* TechDefState::getTech(core::StrHash hash)
 
 TechDefStateManager::TechDefStateManager(core::MemoryArenaBase* arena) :
     arena_(arena),
-    techs_(arena, TECH_DEFS_MAX),
+    techs_(arena, core::bitUtil::NextPowerOfTwo(TECH_DEFS_MAX)),
     techsPoolHeap_(
         core::bitUtil::RoundUpToMultiple<size_t>(
             PoolArena::getMemoryRequirement(sizeof(TechDefState)) * TECH_DEFS_MAX,
@@ -335,27 +335,26 @@ void TechDefStateManager::shutDown(void)
     }
 }
 
-TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, const core::string& name)
+TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, core::string_view name)
 {
-    TechCatNamePair pair(cat, name);
-
     TechDefState** pTechDefRef = nullptr;
     bool loaded = true;
     {
         core::CriticalSection::ScopedLock lock(cacheLock_);
 
-        auto it = techs_.find(pair);
+        auto it = techs_.find(TechCatNameViewPair(cat, name));
         if (it != techs_.end()) {
             pTechDefRef = &it->second;
         }
         else {
             loaded = false;
-            auto insertIt = techs_.insert(std::make_pair(pair, nullptr));
+            auto insertIt = techs_.insert({ TechCatNamePair{cat, core::string(name.data(), name.length())}, nullptr });
 
             pTechDefRef = &insertIt.first->second;
         }
     }
 
+    // this is just down here so we drop the lock.
     if (loaded) {
         while (*pTechDefRef == nullptr) {
             core::Thread::yield();
@@ -369,9 +368,9 @@ TechDefState* TechDefStateManager::getTechDefState(const MaterialCat::Enum cat, 
     }
 
     // not in cache.
-    auto* pTechDef = loadTechDefState(cat, name);
+    auto* pTechDef = loadTechDefState(cat, core::string(name.data(), name.length()));
     if (!pTechDef) {
-        X_ERROR("TechDefState", "Failed to load tech state def: %s:%s", MaterialCat::ToString(cat), name.c_str());
+        X_ERROR("TechDefState", "Failed to load tech state def: %s:%.*s", MaterialCat::ToString(cat), name.length(), name.data());
         *pTechDefRef = INVALID_TECH_DEF_STATE;
         return nullptr;
     }

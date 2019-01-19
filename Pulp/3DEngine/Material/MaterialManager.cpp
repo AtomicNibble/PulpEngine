@@ -309,7 +309,7 @@ bool XMaterialManager::processData(Material* pMaterial, core::XFile* pFile)
     X_WARNING_IF(left > 0, "Material", "potential read fail, bytes left in file: %" PRIu64, left);
 #endif // !X_DEBUG
 
-    TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, catType);
+    TechDefState* pTechDefState = pTechDefMan_->getTechDefState(hdr.cat, core::string_view(catType));
     if (!pTechDefState) {
         X_ERROR("Material", "Failed to get techdefstate");
         return false;
@@ -760,7 +760,7 @@ X_INLINE void XMaterialManager::setRegisters(TechDefPerm* pTech,
     }
 }
 
-TechDefPerm* XMaterialManager::getCodeTech(const core::string& name, core::StrHash techName,
+TechDefPerm* XMaterialManager::getCodeTech(core::string_view name, core::StrHash techName,
     render::shader::VertexFormat::Enum vertFmt, PermatationFlags permFlags)
 {
     TechDefState* pTechDefState = pTechDefMan_->getTechDefState(MaterialCat::CODE, name);

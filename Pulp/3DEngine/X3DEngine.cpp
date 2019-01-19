@@ -33,6 +33,7 @@
 X_NAMESPACE_BEGIN(engine)
 
 using namespace core::string_view_literals;
+using namespace core::hash_literals;
 
 EngineEnv gEngEnv;
 
@@ -391,8 +392,8 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
         if (drawVars_.drawDepth()) {
             TechDefPerm* pTech = pMaterialManager_->getCodeTech(
-                core::string("fullscreen_depth"),
-                core::StrHash("unlit"),
+                "fullscreen_depth"_sv,
+                "unlit"_strhash,
                 render::shader::VertexFormat::NONE,
                 PermatationFlags::Textured);
 
@@ -466,13 +467,13 @@ void X3DEngine::onFrameBegin(core::FrameData& frame)
 
         // so i think i'm just gonna draw a quad, that way i can control filtering better.
         TechDefPerm* pTechBlend = pMaterialManager_->getCodeTech(
-            core::string("fullscreen"),
+            "fullscreen"_sv,
             core::StrHash("blend"),
             render::shader::VertexFormat::NONE,
             PermatationFlags::Textured);
 
         TechDefPerm* pPreMul = pMaterialManager_->getCodeTech(
-            core::string("fullscreen"),
+            "fullscreen"_sv,
             core::StrHash("premul"),
             render::shader::VertexFormat::NONE,
             PermatationFlags::Textured);

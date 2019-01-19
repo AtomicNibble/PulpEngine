@@ -2,6 +2,7 @@
 
 #include <Containers\Array.h>
 #include <Containers\HashIndex.h>
+#include <Containers\FixedHashTable.h>
 
 #include <String\StringHash.h>
 
@@ -67,19 +68,39 @@ public:
 class TechDefStateManager
 {
     typedef std::pair<MaterialCat::Enum, core::string> TechCatNamePair;
+    typedef std::pair<MaterialCat::Enum, core::string_view> TechCatNameViewPair;
 
     struct tech_pair_hash
     {
+        // just add the cat enum, not a great hash but should be fine for this.
         size_t operator()(const TechCatNamePair& p) const
         {
-            // just add the cat enum, not a great hash but should be fine for this.
             return core::Hash::Fnv1aHash(p.second.data(), p.second.length()) + p.first;
+        }
+
+        size_t operator()(const TechCatNameViewPair& p) const
+        {
+            return core::Hash::Fnv1aHash(p.second.data(), p.second.length()) + p.first;
+        }
+    };
+
+    struct tech_pair_equal
+    {
+        // just add the cat enum, not a great hash but should be fine for this.
+        size_t operator()(const TechCatNamePair& lhs, const TechCatNamePair& rhs) const
+        {
+            return lhs.first == rhs.first && lhs.second == rhs.second;
+        }
+
+        size_t operator()(const TechCatNamePair& lhs, const TechCatNameViewPair& rhs) const
+        {
+            return lhs.first == rhs.first && core::strUtil::IsEqual(lhs.second.begin(), lhs.second.end(), rhs.second.begin(), rhs.second.end());
         }
     };
 
     // store pointers since we return pointers so growing of this would invalidate returned pointers.
     typedef core::Array<TechDefState*> TechStatesArr;
-    typedef core::HashMap<TechCatNamePair, TechDefState*, tech_pair_hash> TechStatesMap;
+    typedef core::FixedHashTable<TechCatNamePair, TechDefState*, tech_pair_hash, tech_pair_equal> TechStatesMap;
 
     typedef core::MemoryArena<
         core::PoolAllocator,
@@ -102,7 +123,7 @@ public:
 
     void shutDown(void);
 
-    TechDefState* getTechDefState(const MaterialCat::Enum cat, const core::string& name);
+    TechDefState* getTechDefState(const MaterialCat::Enum cat, core::string_view name);
 
 private:
     TechDefState* loadTechDefState(const MaterialCat::Enum cat, const core::string& name);
