@@ -249,7 +249,7 @@ private:
     void historyIoRequestCallback(core::IFileSys& fileSys, const core::IoRequestBase* pRequest,
         core::XFileAsync* pFile, uint32_t bytesTransferred);
     void parseCmdHistory(const char* pBegin, const char* pEnd);
-    void addCmdToHistory(const char* pCommand);
+    void addCmdToHistory(core::string_view command);
     void addCmdToHistory(const string& command);
     void resetHistoryPos(void);
     core::string_view getHistory(CmdHistory::Enum direction);

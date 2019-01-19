@@ -1748,16 +1748,16 @@ void XConsole::parseCmdHistory(const char* pBegin, const char* pEnd)
 }
 
 
-X_INLINE void XConsole::addCmdToHistory(const char* pCommand)
+X_INLINE void XConsole::addCmdToHistory(const string& command)
 {
-    addCmdToHistory(string(pCommand));
+    addCmdToHistory(core::string_view(command));
 }
 
-void XConsole::addCmdToHistory(const string& command)
+void XConsole::addCmdToHistory(core::string_view command)
 {
     // make sure it's not same as last command
-    if (cmdHistory_.isEmpty() || cmdHistory_.front() != command) {
-        cmdHistory_.emplace(command);
+    if (cmdHistory_.isEmpty() || !cmdHistory_.front().compare(command.begin(), command.length())) {
+        cmdHistory_.emplace(command.data(), command.length());
     }
 
     // limit hte history.
