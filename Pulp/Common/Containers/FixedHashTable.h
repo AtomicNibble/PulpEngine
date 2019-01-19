@@ -28,7 +28,12 @@ private:
         pHashTable_(pHashTable),
         idx_(0)
     { 
-        skipPastEmpty();
+        if (!pHashTable->pData_) {
+            idx_ = pHashTable->num_;
+        }
+        else {
+            skipPastEmpty();
+        }
     }
     
     explicit HashTableIterator(HashTableT* pHashTable, size_type idx) :
