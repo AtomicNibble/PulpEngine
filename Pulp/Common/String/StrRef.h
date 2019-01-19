@@ -148,6 +148,7 @@ public:
     // compare the goat.com
     bool compare(const StrT& Str) const;
     bool compare(const_str ptr) const;
+    bool compare(const_str ptr, size_type length) const;
 
     //	<0	the first character that does not match has a lower
     //		value in ptr1 than in ptr2

@@ -846,6 +846,13 @@ bool StringRef<CharT>::compare(const_str ptr) const
 }
 
 template<typename CharT>
+bool StringRef<CharT>::compare(const_str ptr, size_type length) const
+{
+    X_ASSERT_NOT_NULL(ptr);
+    return core::strUtil::IsEqual(begin(), end(), ptr, ptr + length);
+}
+
+template<typename CharT>
 int StringRef<CharT>::compareInt(const StrT& _Str) const
 {
     return strcmp(str_, _Str.str_);
