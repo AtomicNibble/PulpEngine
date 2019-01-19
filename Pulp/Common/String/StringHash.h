@@ -41,11 +41,6 @@ namespace hash_literals
     
 } // namespace hash_literals
 
-namespace Literals
-{
-    using namespace hash_literals;
-} // namespace Literals
-
 #include "StringHash.inl"
 
 X_NAMESPACE_END

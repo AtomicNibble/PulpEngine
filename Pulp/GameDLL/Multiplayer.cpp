@@ -13,7 +13,7 @@
 
 X_NAMESPACE_BEGIN(game)
 
-using namespace core::Literals;
+using namespace core::hash_literals;
 
 namespace
 {
