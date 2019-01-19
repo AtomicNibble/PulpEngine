@@ -100,7 +100,7 @@
 
 // can't seam to find a way to have this define by X_DECLARE_FLAGS
 #define X_DECLARE_FLAG_OPERATORS(FlagsType)                            \
-    X_INLINE FlagsType operator|(FlagsType::Enum a, FlagsType::Enum b) \
+    X_INLINE constexpr FlagsType operator|(FlagsType::Enum a, FlagsType::Enum b) \
     {                                                                  \
         FlagsType r(a);                                                \
         r.Set(b);                                                      \
