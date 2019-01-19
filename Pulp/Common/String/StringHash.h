@@ -32,12 +32,18 @@ private:
     Type hash_;
 };
 
-namespace Literals
+namespace hash_literals
 {
     inline constexpr StrHash operator"" _strhash(const char* const pStr, const size_t strLen)
     {
         return StrHash(Hash::Fnv1aConst::Internal::Hash(pStr, strLen, Hash::Fnv1aConst::default_offset_basis));
     }
+    
+} // namespace hash_literals
+
+namespace Literals
+{
+    using namespace hash_literals;
 } // namespace Literals
 
 #include "StringHash.inl"
