@@ -139,6 +139,7 @@ private:
     static X_INLINE ConstBuffer* constBufferForHandle(BufferHandle handle);
 
 private:
+    core::MemoryArenaBase* arena_;
     core::CriticalSection cs_;
 
     ID3D12Device* pDevice_;

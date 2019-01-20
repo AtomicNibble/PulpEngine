@@ -30,6 +30,7 @@ BufferManager::Stats::Stats()
 
 BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice,
     ContextManager& contextMan, DescriptorAllocator& descriptorAllocator) :
+    arena_(arena),
     pDevice_(pDevice),
     contextMan_(contextMan),
     descriptorAllocator_(descriptorAllocator),
@@ -50,7 +51,7 @@ BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice
 
 BufferManager::~BufferManager()
 {
-
+    arena_->removeChildArena(&poolArena_);
 }
 
 bool BufferManager::init(void)
