@@ -151,8 +151,12 @@ namespace shader
 
     // -----------------------------------------------------------------------
 
-    // this use to be a enum, but in some cases i use it as flags (eg shader stage visibility flags)
-    // now it's back to enum cus it's too nayoing to use as flags.
+    X_DECLARE_ENUM8(ShaderTextureIdx)
+    (
+        DIFFUSE,
+        BUMP,
+        SPEC);
+
     X_DECLARE_ENUM8(ShaderType)
     (
         Vertex,
@@ -162,13 +166,6 @@ namespace shader
         Domain,
         UnKnown);
 
-    X_DECLARE_ENUM8(ShaderTextureIdx)
-    (
-        DIFFUSE,
-        BUMP,
-        SPEC);
-
-    // kinda same as flags, but used for checking set stages etc.
     X_DECLARE_FLAGS8(ShaderStage)
     (
         Vertex,
