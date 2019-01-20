@@ -1577,7 +1577,6 @@ bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation&
 {
     RootSignature& rootSig = pState->rootSig;
 
-#if 1
 
     // we are going to create a rootsig based on the shader.
     // we should try be smart about it like using static samplers if possible.
@@ -1675,19 +1674,6 @@ bool XRender::buildRootSig(DeviceState* pState, const shader::ShaderPermatation&
         }
     }
 
-#else
-    // we need a root sig that maps correct with this shader.
-    // maybe just having the root sig in the shader def makes sense then?
-    // id rather not i think the render system should be able to decide;
-    // but should it just be worked out based on the shader?
-    // so the description is part of the hwshader.
-    rootSig.getParamRef(0).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, TextureSlot::ENUM_COUNT, D3D12_SHADER_VISIBILITY_PIXEL);
-    rootSig.getParamRef(1).initAsCBV(0, D3D12_SHADER_VISIBILITY_VERTEX);
-    //	rootSig.getParamRef(2).initAsSRV(1, D3D12_SHADER_VISIBILITY_PIXEL);
-    //	rootSig.getParamRef(2).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 0, 6, D3D12_SHADER_VISIBILITY_PIXEL);
-    //	rootSig.getParamRef(3).initAsDescriptorRange(D3D12_DESCRIPTOR_RANGE_TYPE_UAV, 0, 1);
-    rootSig.initStaticSampler(0, samplerLinearClampDesc_, D3D12_SHADER_VISIBILITY_PIXEL);
-#endif
 
     if (!rootSig.finalize(*pRootSigCache_,
             D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT
