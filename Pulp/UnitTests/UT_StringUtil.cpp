@@ -548,16 +548,10 @@ TEST(StringUtil, IntW)
 TEST(StringUtil, Float)
 {
     EXPECT_FLOAT_EQ(strUtil::StringToFloat("1"), 1.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("+1"), 1.f);
     EXPECT_FLOAT_EQ(strUtil::StringToFloat("-1"), -1.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("+-1"), 0.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("-+1"), 0.f);
 
     EXPECT_FLOAT_EQ(strUtil::StringToFloat("1.0"), 1.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("+1.0"), 1.f);
     EXPECT_FLOAT_EQ(strUtil::StringToFloat("-1.0"), -1.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("+-1.0"), 0.f);
-    EXPECT_FLOAT_EQ(strUtil::StringToFloat("-+1.0"), 0.f);
 }
 
 TEST(StringUtil, HasFileExtension)
