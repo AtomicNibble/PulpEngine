@@ -101,6 +101,9 @@ TEST(StringUtil, FindLast)
 {
     StackString512 str("my name is bob. Hello jane.");
     StackString512 str1("z is at the start");
+    StackString512 str2("my name is my name is same");
+    StackString512 what0("name");
+    StackString512 what1("z");
 
     const char* pFind0 = strUtil::FindLast(str.begin(), str.end(), 'o');
     const char* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, 'o');
@@ -108,17 +111,25 @@ TEST(StringUtil, FindLast)
     const char* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, 'm');
     const char* pFind4 = strUtil::FindLast(str1.begin(), str1.end(), 'z');
     
+    const char* pFind5 = strUtil::FindLast(str2.begin(), str2.end(), what0.begin(), what0.end());
+    const char* pFind6 = strUtil::FindLast(str1.begin(), str1.end(), what1.begin(), what1.end());
+
     EXPECT_TRUE(pFind0 == (str.begin() + 20));
     EXPECT_TRUE(pFind1 == nullptr);
     EXPECT_TRUE(pFind2 == (str.begin() + 5));
     EXPECT_TRUE(pFind3 == str.begin());
     EXPECT_TRUE(pFind4 == str1.begin());
+    EXPECT_TRUE(pFind5 == (str2.begin() + 14));
+    EXPECT_TRUE(pFind6 == str1.begin());
 }
 
 TEST(StringUtil, FindLastW)
 {
     StackStringW512 str(L"my name is bob. Hello jane.");
     StackStringW512 str1(L"z is at the start");
+    StackStringW512 str2(L"my name is my name is same");
+    StackStringW512 what0(L"name");
+    StackStringW512 what1(L"z");
 
     const wchar_t* pFind0 = strUtil::FindLast(str.begin(), str.end(), L'o');
     const wchar_t* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, L'o');
@@ -126,11 +137,16 @@ TEST(StringUtil, FindLastW)
     const wchar_t* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, L'm');
     const wchar_t* pFind4 = strUtil::FindLast(str1.begin(), str1.end(), L'z');
 
+    const wchar_t* pFind5 = strUtil::FindLast(str2.begin(), str2.end(), what0.begin(), what0.end());
+    const wchar_t* pFind6 = strUtil::FindLast(str1.begin(), str1.end(), what1.begin(), what1.end());
+
     EXPECT_TRUE(pFind0 == (str.begin() + 20));
     EXPECT_TRUE(pFind1 == nullptr);
     EXPECT_TRUE(pFind2 == (str.begin() + 5));
     EXPECT_TRUE(pFind3 == str.begin());
     EXPECT_TRUE(pFind4 == str1.begin());
+    EXPECT_TRUE(pFind5 == (str2.begin() + 14));
+    EXPECT_TRUE(pFind6 == str1.begin());
 }
 
 TEST(StringUtil, WhiteSpace)

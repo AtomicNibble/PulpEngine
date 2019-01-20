@@ -218,6 +218,31 @@ namespace strUtil
         return result;
     }
 
+    const wchar_t* FindLast(const wchar_t* startInclusive, const wchar_t* endExclusive, const wchar_t* whatStart, const wchar_t* whatEnd)
+    {
+        if (whatStart >= whatEnd) {
+            return nullptr;
+        }
+
+        const ptrdiff_t whatLen = whatEnd - whatStart;
+
+        if (startInclusive + whatLen > endExclusive) {
+            return nullptr;
+        }
+
+        const wchar_t* pResult = endExclusive - whatLen;
+
+        while (!IsEqual(pResult, pResult + whatLen, whatStart, whatEnd))
+        {
+            if (pResult == startInclusive) {
+                return nullptr;
+            }
+            --pResult;
+        }
+
+        return pResult;
+    }
+
     /// \brief Finds the last character in a string that is not a certain character, and returns a pointer to it.
     /// \remark Returns a \c nullptr if the character could not be found.
     const wchar_t* FindLastNon(const wchar_t* startInclusive, const wchar_t* endExclusive, wchar_t what)
