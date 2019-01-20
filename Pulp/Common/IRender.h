@@ -388,6 +388,8 @@ X_DECLARE_ENUM(BufUsage)
 
 typedef Flags<CpuAccess> CpuAccessFlags;
 
+X_DECLARE_FLAG_OPERATORS(CpuAccessFlags);
+
 struct IRender
 {
     virtual ~IRender() = default;
