@@ -232,6 +232,8 @@ X3DBuffer* BufferManager::Int_CreateVB(uint32_t size)
     stats_.maxVertexBytes = core::Max(stats_.maxVertexBytes, stats_.vertexBytes);
     stats_.numVertexBuffers++;
     stats_.maxVertexBuffers = core::Max(stats_.maxVertexBuffers, stats_.numVertexBuffers);
+#else
+    X_UNUSED(size);
 #endif // !VID_MEMORY_STATS
 
     return pBuf;
@@ -246,6 +248,8 @@ X3DBuffer* BufferManager::Int_CreateIB(uint32_t size)
     stats_.maxIndexesBytes = core::Max(stats_.maxIndexesBytes, stats_.indexesBytes);
     stats_.numIndexBuffers++;
     stats_.maxIndexBuffers = core::Max(stats_.maxIndexBuffers, stats_.numIndexBuffers);
+#else
+    X_UNUSED(size);
 #endif // !VID_MEMORY_STATS
 
     return pBuf;
@@ -260,6 +264,8 @@ ConstBuffer* BufferManager::Int_CreateCB(uint32_t size)
     stats_.maxConstBufferBytes = core::Max(stats_.maxConstBufferBytes, stats_.constBufferBytes);
     stats_.numConstBuffers++;
     stats_.maxConstBuffers = core::Max(stats_.maxConstBuffers, stats_.numConstBuffers);
+#else
+    X_UNUSED(size);
 #endif // !VID_MEMORY_STATS
 
     return pBuf;
