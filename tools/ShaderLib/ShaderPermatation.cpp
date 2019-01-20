@@ -72,14 +72,26 @@ namespace shader
         return true;
     }
 
-    const ShaderPermatation::BufferArr& ShaderPermatation::getBuffers(void) const
+    size_t ShaderPermatation::getNumBuffersTotal(void) const
     {
-        // need to probs work something out for collecting buffers across stages.
-        if (!isStageSet(ShaderType::Vertex)) {
+        size_t num = 0;
+
+        for (const auto* pShader : stages_) {
+            if (pShader) {
+                num += pShader->getBuffers().size();
+            }
+        }
+
+        return num;
+    }
+
+    const ShaderPermatation::BufferArr& ShaderPermatation::getBuffers(ShaderType::Enum type) const
+    {
+        if (!isStageSet(type)) {
             X_ASSERT_UNREACHABLE();
         }
 
-        return getStage(ShaderType::Vertex)->getBuffers();
+        return getStage(type)->getBuffers();
     }
 
     const ShaderPermatation::SamplerArr& ShaderPermatation::getSamplers(void) const

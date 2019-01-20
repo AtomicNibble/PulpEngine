@@ -317,7 +317,8 @@ typedef Flags<TechFlag> TechFlags;
 
         virtual InputLayoutFormat::Enum getILFmt(void) const X_ABSTRACT;
         virtual const CBufLinksArr& getCbufferLinks(void) const X_ABSTRACT;
-        virtual const BufferArr& getBuffers(void) const X_ABSTRACT;
+        virtual size_t getNumBuffersTotal(void) const X_ABSTRACT;
+        virtual const BufferArr& getBuffers(ShaderType::Enum type) const X_ABSTRACT;
         virtual const SamplerArr& getSamplers(void) const X_ABSTRACT;
         virtual const TexutreArr& getTextures(void) const X_ABSTRACT;
     };

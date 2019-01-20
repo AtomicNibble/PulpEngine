@@ -1850,17 +1850,23 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
         auto variableStateSize = pVariableState->getStateSize();
 
 #if 1
-        if (permFlags.IsSet(engine::PermatationFlags::HwSkin)) {
-            auto& buffers = pPerm->pShaderPerm->getBuffers();
-            for (size_t i = 0; i < buffers.size(); i++) {
-                auto& buf = buffers[i];
+        {
+            size_t bufOffset = 0;
 
-                if (buf.getName() == "BoneMatrices") {
-                    auto* pBuffers = pVariableState->getBuffers();
+            if (permFlags.IsSet(engine::PermatationFlags::HwSkin)) {
+                auto& buffers = pPerm->pShaderPerm->getBuffers(render::shader::ShaderType::Vertex);
+                for (size_t i = 0; i < buffers.size(); i++) {
+                    auto& buf = buffers[i];
 
-                    pBuffers[i].buf = boneData;
-                    break;
+                    if (buf.getName() == "BoneMatrices") {
+                        auto* pBuffers = pVariableState->getBuffers();
+
+                        pBuffers[i].buf = boneData;
+                        break;
+                    }
                 }
+
+                bufOffset += buffers.size();
             }
         }
 #endif

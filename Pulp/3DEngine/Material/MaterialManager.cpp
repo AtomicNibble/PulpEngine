@@ -400,7 +400,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
     // from the shader perm we can see how many const buffers we need to provide.
     const auto& cbLinks = pShaderPerm->getCbufferLinks();
-    const auto& buffers = pShaderPerm->getBuffers();
+    auto numBuffers = pShaderPerm->getNumBuffersTotal();
     const auto& permSamplers = pShaderPerm->getSamplers();
     const auto& permTextures = pShaderPerm->getTextures();
 
@@ -410,7 +410,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
     // him -> pTechDef
     const size_t numTex = permTextures.size();
     const size_t numCb = cbLinks.size();
-    const size_t numBuffers = buffers.size();
     size_t numSamplers = permSamplers.size();
 
     if (pTechDef->pTechSecDef_->allSamplersAreStatic()) {

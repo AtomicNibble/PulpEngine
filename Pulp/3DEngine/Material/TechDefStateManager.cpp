@@ -227,7 +227,7 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
     // work out variable state size.
     {
         const auto& cbLinks = pPerm->getCbufferLinks();
-        const auto& buffers = pPerm->getBuffers();
+        auto numBuffers = pPerm->getNumBuffersTotal();
         const auto& permSamplers = pPerm->getSamplers();
         const auto& permTextures = pPerm->getTextures();
 
@@ -241,14 +241,14 @@ TechDefPerm* TechDef::getOrCreatePerm(render::shader::VertexFormat::Enum vertFmt
             permTextures.size(),
             numSamplers,
             cbLinks.size(),
-            buffers.size());
+            numBuffers);
 
         pCompilingPerm->variableStateSize = safe_static_cast<int8_t>(size);
 
         pCompilingPerm->numTextStates = safe_static_cast<int8_t>(permTextures.size());
         pCompilingPerm->numSamplers = safe_static_cast<int8_t>(numSamplers);
         pCompilingPerm->numCbs = safe_static_cast<int8_t>(cbLinks.size());
-        pCompilingPerm->numBuffers = safe_static_cast<int8_t>(buffers.size());
+        pCompilingPerm->numBuffers = safe_static_cast<int8_t>(numBuffers);
     }
 
     pCompilingPerm->pTechDef = this;
