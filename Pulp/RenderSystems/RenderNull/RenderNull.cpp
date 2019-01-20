@@ -101,7 +101,7 @@ VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t
     X_UNUSED(elementSize);
     X_UNUSED(usage);
     X_UNUSED(accessFlag);
-    return 0;
+    return INVALID_BUF_HANLDE;
 }
 
 VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t elementSize,
@@ -112,7 +112,7 @@ VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t
     X_UNUSED(pInitialData);
     X_UNUSED(usage);
     X_UNUSED(accessFlag);
-    return 0;
+    return INVALID_BUF_HANLDE;
 }
 
 IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t elementSize,
@@ -122,7 +122,7 @@ IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t e
     X_UNUSED(elementSize);
     X_UNUSED(usage);
     X_UNUSED(accessFlag);
-    return 0;
+    return INVALID_BUF_HANLDE;
 }
 
 IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t elementSize,
@@ -133,7 +133,7 @@ IndexBufferHandle RenderNull::createIndexBuffer(uint32_t numElements, uint32_t e
     X_UNUSED(pInitialData);
     X_UNUSED(usage);
     X_UNUSED(accessFlag);
-    return 0;
+    return INVALID_BUF_HANLDE;
 }
 
 void RenderNull::destoryVertexBuffer(VertexBufferHandle handle)
