@@ -97,6 +97,36 @@ TEST(StringUtil, FindW2)
     EXPECT_TRUE(findCI == (str.begin() + 21));
 }
 
+TEST(StringUtil, FindLast)
+{
+    StackString512 str("my name is bob. Hello jane.");
+
+    const char* pFind0 = strUtil::FindLast(str.begin(), str.end(), 'o');
+    const char* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, 'o');
+    const char* pFind2 = strUtil::FindLast(str.begin(), str.end(), 'm');
+    const char* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, 'm');
+    
+    EXPECT_TRUE(pFind0 == (str.begin() + 20));
+    EXPECT_TRUE(pFind1 == nullptr);
+    EXPECT_TRUE(pFind2 == (str.begin() + 5));
+    EXPECT_TRUE(pFind3 == (str.begin() + 0));
+}
+
+TEST(StringUtil, FindLastW)
+{
+    StackStringW512 str(L"my name is bob. Hello jane.");
+
+    const wchar_t* pFind0 = strUtil::FindLast(str.begin(), str.end(), L'o');
+    const wchar_t* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, L'o');
+    const wchar_t* pFind2 = strUtil::FindLast(str.begin(), str.end(), L'm');
+    const wchar_t* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, L'm');
+
+    EXPECT_TRUE(pFind0 == (str.begin() + 20));
+    EXPECT_TRUE(pFind1 == nullptr);
+    EXPECT_TRUE(pFind2 == (str.begin() + 5));
+    EXPECT_TRUE(pFind3 == (str.begin() + 0));
+}
+
 TEST(StringUtil, WhiteSpace)
 {
     // check every char.
