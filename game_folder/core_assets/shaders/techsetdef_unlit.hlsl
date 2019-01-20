@@ -42,26 +42,30 @@ SamplerState        diffuseSampler;
 StructuredBuffer<float4x4> BoneMatrices;
 #endif // !X_HWSKIN
 
+#if 1
+StructuredBuffer<Light> lights;
+#else
 static Light lights[2] = {
     {
-      float4(-128,136,72,1),
+      float4(-200,275,72,1),
       float4(0.964706, 0.247059, 0.121569,1),
       float4(-0.05,0.5,1,1),
-      cos(radians(20.5)),
-      cos(radians(69.5)),
-      (1.f / (cos(radians(20.5)) - cos(radians(69.5)))),
+      cos(radians(50.0)),
+      cos(radians(75.0)),
+      (1.f / (cos(radians(50.0)) - cos(radians(75.0)))),
       1.f / 1024.f
     },
     {
-      float4(30,-950,-50,1),
-      float4(0,0,1,1),
+      float4(0,136,72,1),
+      float4(0,1,0,1),
       float4(0,0,0,0),
       cos(radians(20.5)),
       cos(radians(69.5)),
       (1.f / (cos(radians(20.5)) - cos(radians(69.5)))),
-      1.f / 512.f
+      1.f / 128.f
     }
 };
+#endif
 
 VS_OUTPUT vs_main( VS_INPUT IN )
 {

@@ -204,8 +204,11 @@ World3D::World3D(DrawVars& vars, engine::PrimativeContext* pPrimContex, CBufferM
     staticModels_(arena),
     renderEnts_(arena),
     renderLights_(arena),
-    emitters_(arena)
+    emitters_(arena),
+    lightData_(arena)
 {
+    lightBuffer_ = render::INVALID_BUF_HANLDE;
+
     viewCount_ = 0;
     frameNumber_ = 0;
     camArea_ = -1;
@@ -234,6 +237,49 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
     cam_ = frame.view.cam;
 
     auto* pJobSys = gEnv->pJobSys;
+
+    {
+
+        if (lightBuffer_ == render::INVALID_BUF_HANLDE)
+        {
+            lightData_.resize(2);
+
+            for (auto& light : lightData_)
+            {
+                light.pos = Vec4f(-128.f, 136.f, 72.f, 1.f);
+                light.color = Color(1.f, 0.f, 0.f, 1.f);
+
+                light.direction = Vec4f(-0.05f, 0.5f, 1.f, 1.f);
+                light.direction = Vec4f::zero();
+
+                light.innerCone = math<float>::cos(toRadians(20.f));
+                light.outerCone = math<float>::cos(toRadians(69.5f));
+                light.invConeDifference = 1.f / (light.innerCone - light.outerCone);
+                light.invLightRadius = 1.f / 128.f;
+            }
+
+            lightData_[0].pos = Vec4f(-128.f, 136.f, 72.f, 1.f);
+            lightData_[0].color = Color(1.f, 0.f, 0.f, 1.f);
+
+            lightData_[1].pos = Vec4f(0.f, 136.f, 72.f, 1.f);
+            lightData_[1].color = Color(0.f, 1.f, 1.f, 1.f);
+
+            lightBuffer_ = gEnv->pRender->createBuffer(sizeof(LightData), 2, lightData_.data(),
+                render::BufUsage::DYNAMIC, render::CpuAccess::WRITE);
+        }
+
+    }
+
+    // update my buffer!
+    if(lightBuffer_ != render::INVALID_BUF_HANLDE)
+    {
+        auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
+        pUpdateVb->vertexBuffer = lightBuffer_;
+        pUpdateVb->pData = lightData_.data();
+        pUpdateVb->size = safe_static_cast<uint32_t>(sizeof(LightData) * lightData_.size());
+        pUpdateVb->dstOffset = 0;
+    }
+
 
     {
         core::V2::Job* pSyncJob = pJobSys->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::ENGINE3D));
@@ -782,6 +828,8 @@ void World3D::updateLight(IRenderLight* pLight, const Transformf& trans)
 
     pRenderLight->lastModifiedFrameNum = frameNumber_;
     pRenderLight->trans = trans;
+
+    lightData_[0].pos = trans.pos;
 
     //	createEntityRefs(pRenderEnt);
 }
@@ -1868,6 +1916,22 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 
                 bufOffset += buffers.size();
             }
+
+            //if (permFlags.IsSet(engine::PermatationFlags::Textured)) 
+            {
+                auto& buffers = pPerm->pShaderPerm->getBuffers(render::shader::ShaderType::Pixel);
+                for (size_t i = 0; i < buffers.size(); i++) {
+                    auto& buf = buffers[i];
+
+                    if (buf.getName() == "lights") {
+                        auto* pBuffers = pVariableState->getBuffers();
+
+                        pBuffers[bufOffset + i].buf = boneData;
+                        break;
+                    }
+                }
+            }
+
         }
 #endif
 
@@ -2014,6 +2078,21 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
         const auto stateHandle = pPerm->stateHandle;
         auto* pVariableState = pTech->pVariableState;
         auto variableStateSize = pVariableState->getStateSize();
+
+        //if (permFlags.IsSet(engine::PermatationFlags::Textured)) 
+        {
+            auto& buffers = pPerm->pShaderPerm->getBuffers(render::shader::ShaderType::Pixel);
+            for (size_t i = 0; i < buffers.size(); i++) {
+                auto& buf = buffers[i];
+
+                if (buf.getName() == "lights") {
+                    auto* pBuffers = pVariableState->getBuffers();
+
+                    pBuffers[i].buf = lightBuffer_;
+                    break;
+                }
+            }
+        }
 
         uint32_t sortKey = static_cast<uint32_t>(distanceFromCam);
 
@@ -2309,6 +2388,15 @@ void World3D::debugDraw_Lights(void) const
         Sphere s(pLight->trans.pos, 2.f);
         pPrimContex_->drawSphere(s, pLight->col, true);
     }
+
+#if 1
+
+    for (auto& light : lightData_) {
+        Sphere s(light.pos.xyz(), 2.f);
+        pPrimContex_->drawSphere(s, Color8u(light.color), true);
+    }
+
+#endif
 }
 
 X_NAMESPACE_END

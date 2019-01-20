@@ -159,6 +159,20 @@ public:
     RenderEntPtrArr renderEnts;
 };
 
+struct LightData
+{
+    Vec4f pos;
+    Color color;
+
+    // spot
+    Vec4f direction;
+    float innerCone;
+    float outerCone;
+    float invConeDifference;
+    float invLightRadius;
+};
+
+
 // these should be like 3d representation of the world.
 class World3D : public IWorld3D
 {
@@ -175,6 +189,12 @@ class World3D : public IWorld3D
     typedef core::Array<RenderEnt*> RenderEntPtrArr;
     typedef core::Array<RenderLight*> RenderLightPtrArr;
     typedef core::Array<fx::Emitter*> EmitterPtrArr;
+
+    template<typename T>
+    using AlignedArray = core::Array<T, core::ArrayAlignedAllocatorFixed<T, 16>>;
+
+    using LightDataArr = AlignedArray<LightData>;
+
 
     struct AreaRefInfo
     {
@@ -313,6 +333,11 @@ private:
 
     core::Spinlock visAreaLock_;
     AreaPtrArr visibleAreas_;
+
+private:
+    render::BufferHandle lightBuffer_;
+
+    LightDataArr lightData_;
 
 private:
     RenderEntPtrArr renderEnts_;
