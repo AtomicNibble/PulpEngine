@@ -116,7 +116,8 @@ PS_OUTPUT ps_main( VS_OUTPUT IN )
       viewPosition, vsNormal, albedo, lights[0]
     );
 
-    float4 lightColor2 = ComputeSpotLight(
+
+    float4 lightColor2 = ComputePointLight(
       viewPosition, vsNormal, albedo, lights[1]
     );
 
