@@ -632,15 +632,21 @@ inline bool StackString<N, TChar>::isEqual(const TChar* other) const
 }
 
 template<size_t N, typename TChar>
-inline const TChar* StackString<N, TChar>::find(TChar ch) const
-{
-    return strUtil::Find(str_, str_ + len_, ch);
-}
-
-template<size_t N, typename TChar>
 inline const TChar* StackString<N, TChar>::findLast(TChar ch) const
 {
     return strUtil::FindLast(str_, str_ + len_, ch);
+}
+
+template<size_t N, typename TChar>
+inline const TChar* StackString<N, TChar>::findLast(const TChar* pBegin, const TChar* pEnd) const
+{
+    return strUtil::FindLast(str_, str_ + len_, pBegin, pEnd);
+}
+
+template<size_t N, typename TChar>
+inline const TChar* StackString<N, TChar>::find(TChar ch) const
+{
+    return strUtil::Find(str_, str_ + len_, ch);
 }
 
 template<size_t N, typename TChar>
@@ -650,9 +656,9 @@ inline const TChar* StackString<N, TChar>::find(const TChar* string) const
 }
 
 template<size_t N, typename TChar>
-inline const TChar* StackString<N, TChar>::find(const TChar* pBeging, const TChar* pEnd) const
+inline const TChar* StackString<N, TChar>::find(const TChar* pBegin, const TChar* pEnd) const
 {
-    return strUtil::Find(str_, str_ + len_, pBeging, pEnd);
+    return strUtil::Find(str_, str_ + len_, pBegin, pEnd);
 }
 
 template<size_t N, typename TChar>

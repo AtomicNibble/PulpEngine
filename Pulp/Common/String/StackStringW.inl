@@ -626,15 +626,21 @@ inline bool StackString<N, wchar_t>::isEqual(const wchar_t* other) const
 }
 
 template<size_t N>
-inline const wchar_t* StackString<N, wchar_t>::find(wchar_t ch) const
-{
-    return strUtil::Find(str_, str_ + len_, ch);
-}
-
-template<size_t N>
 inline const wchar_t* StackString<N, wchar_t>::findLast(wchar_t ch) const
 {
     return strUtil::FindLast(str_, str_ + len_, ch);
+}
+
+template<size_t N>
+inline const wchar_t* StackString<N, wchar_t>::findLast(const wchar_t* pBegin, const wchar_t* pEnd) const
+{
+    return strUtil::FindLast(str_, str_ + len_, pBegin, pEnd);
+}
+
+template<size_t N>
+inline const wchar_t* StackString<N, wchar_t>::find(wchar_t ch) const
+{
+    return strUtil::Find(str_, str_ + len_, ch);
 }
 
 template<size_t N>
@@ -644,9 +650,9 @@ inline const wchar_t* StackString<N, wchar_t>::find(const wchar_t* string) const
 }
 
 template<size_t N>
-inline const wchar_t* StackString<N, wchar_t>::find(const wchar_t* pBeging, const wchar_t* pEnd) const
+inline const wchar_t* StackString<N, wchar_t>::find(const wchar_t* pBegin, const wchar_t* pEnd) const
 {
-    return strUtil::Find(str_, str_ + len_, pBeging, pEnd);
+    return strUtil::Find(str_, str_ + len_, pBegin, pEnd);
 }
 
 template<size_t N>

@@ -111,16 +111,13 @@ public:
     /// Returns whether the string equals a given string.
     inline bool isEqual(const TChar* other) const;
 
-    /// \brief Finds a character in the string, and returns a pointer to the last occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    
     inline const TChar* findLast(TChar ch) const;
-    /// \brief Finds a character in the string, and returns a pointer to the first occurrence of the character.
-    /// \remark Returns a \c nullptr if the character could not be found.
+    inline const TChar* findLast(const TChar* pBegin, const TChar* pEnd) const;
+    
     inline const TChar* find(TChar ch) const;
-    /// \brief Finds a string inside the string, and returns a pointer to it.
-    /// \remark Returns a \c nullptr if the string could not be found.
     inline const TChar* find(const TChar* string) const;
-    inline const TChar* find(const TChar* pBeging, const TChar* pEnd) const;
+    inline const TChar* find(const TChar* pBegin, const TChar* pEnd) const;
 
     inline const TChar* findCaseInsen(TChar ch) const;
     inline const TChar* findCaseInsen(const TChar* string) const;
@@ -221,9 +218,11 @@ public:
     inline bool isEqual(const wchar_t* other) const;
 
     inline const wchar_t* findLast(wchar_t ch) const;
+    inline const wchar_t* findLast(const wchar_t* pBegin, const wchar_t* pEnd) const;
+
     inline const wchar_t* find(wchar_t ch) const;
     inline const wchar_t* find(const wchar_t* string) const;
-    inline const wchar_t* find(const wchar_t* pBeging, const wchar_t* pEnd) const;
+    inline const wchar_t* find(const wchar_t* pBegin, const wchar_t* pEnd) const;
 
     inline const wchar_t* findCaseInsen(wchar_t ch) const;
     inline const wchar_t* findCaseInsen(const wchar_t* string) const;
