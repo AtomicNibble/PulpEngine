@@ -109,7 +109,7 @@ inline void AssetName::setExtension(core::string_view extension)
         BaseType::trimRight(remove);
     }
 
-    if (!extension.empty()) {
+    if (extension.empty()) {
         return;
     }
 
