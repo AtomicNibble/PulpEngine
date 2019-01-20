@@ -103,10 +103,19 @@ bool AssetLoader::onFileChanged(const char* pName)
     core::AssetName tmp(assetName);
     tmp.replaceSeprators();
     tmp.stripAssetFolder(type);
-    tmp.removeExtension();
+
+    const auto& ext = assetExt_[type];
+    if (!ext.empty()) {
+        auto* pExt = tmp.findLast(ext.begin(), ext.end());
+        if (pExt) {
+            tmp.trimRight(pExt);
+        }
+    }
 
     core::string nameStr(tmp.begin(), tmp.end());
 
+    // what's the diffrence?
+    // is one just without folder prefix and extension?
     assetsinks_[type]->onFileChanged(assetName, nameStr);
     return true;
 }
