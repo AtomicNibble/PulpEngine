@@ -6,9 +6,15 @@ inline AssetName::AssetName()
 {
 }
 
-inline AssetName::AssetName(assetDb::AssetType::Enum type, const core::string_view name)
+inline AssetName::AssetName(assetDb::AssetType::Enum type, core::string_view name)
 {
     set(type, name);
+}
+
+inline AssetName::AssetName(assetDb::AssetType::Enum type, core::string_view name, core::string_view ext)
+{
+    set(type, name);
+    setExtension(ext);
 }
 
 inline AssetName::AssetName(assetDb::AssetType::Enum type, const core::string& name)
@@ -93,21 +99,27 @@ inline const char* AssetName::extension(bool incDot) const
 
 inline void AssetName::setExtension(const char* pExtension)
 {
-    const char* remove = BaseType::findLast('.'); // need to remvoe a extension?
-    bool has_dot = (pExtension[0] == '.');        // new extension got a dot?
-    bool is_blank = (pExtension[0] == '\0');      //
+    setExtension(core::string_view(pExtension));
+}
 
+inline void AssetName::setExtension(core::string_view extension)
+{
+    const char* remove = BaseType::findLast('.'); // need to remvoe a extension?
     if (remove) {
         BaseType::trimRight(remove);
     }
 
-    if (!is_blank) {
-        if (!has_dot) {
-            BaseType::append('.', 1);
-        }
-
-        BaseType::append(pExtension);
+    if (!extension.empty()) {
+        return;
     }
+
+    bool has_dot = (extension[0] == '.'); // new extension got a dot?
+
+    if (!has_dot) {
+        BaseType::append('.', 1);
+    }
+
+    BaseType::append(extension.begin(), extension.end());
 }
 
 inline void AssetName::removeExtension(void)

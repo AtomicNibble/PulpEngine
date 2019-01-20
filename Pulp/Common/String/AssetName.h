@@ -19,6 +19,7 @@ public:
 public:
     AssetName();
     AssetName(assetDb::AssetType::Enum type, const core::string_view name);
+    AssetName(assetDb::AssetType::Enum type, core::string_view name, core::string_view ext);
     AssetName(assetDb::AssetType::Enum type, const core::string& name);
     AssetName(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
     AssetName(const AssetName& oth);
@@ -37,6 +38,7 @@ public:
 
     const char* extension(bool incDot) const;
     void setExtension(const char* pExtension);
+    void setExtension(core::string_view extension);
     void removeExtension(void);
 };
 
