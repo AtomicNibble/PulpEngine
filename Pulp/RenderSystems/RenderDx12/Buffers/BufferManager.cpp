@@ -43,13 +43,14 @@ BufferManager::BufferManager(core::MemoryArenaBase* arena, ID3D12Device* pDevice
         PoolArena::getMemoryRequirement(POOL_ALLOCATION_SIZE),
         PoolArena::getMemoryAlignmentRequirement(POOL_ALLOCATION_ALIGN),
         PoolArena::getMemoryOffsetRequirement()),
-    arena_(&pool_, "VidMemHandlePool")
+    poolArena_(&pool_, "VidMemHandlePool")
 {
-    arena->addChildArena(&arena_);
+    arena->addChildArena(&poolArena_);
 }
 
 BufferManager::~BufferManager()
 {
+
 }
 
 bool BufferManager::init(void)
@@ -96,7 +97,7 @@ BufferManager::VertexBufferHandle BufferManager::createVertexBuf(uint32_t numEle
     pBuf->size_ = size;
     pBuf->unPaddedSize_ = size;
 
-    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "VbBuf");
+    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &poolArena_, "VbBuf");
     pBuf->pBackingHeap_ = nullptr;
 
     pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, numElements, elementSize, pInitialData);
@@ -121,7 +122,7 @@ BufferManager::IndexBufferHandle BufferManager::createIndexBuf(uint32_t numEleme
     pBuf->size_ = size;
     pBuf->unPaddedSize_ = size;
 
-    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "IbBuf");
+    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &poolArena_, "IbBuf");
     pBuf->pBackingHeap_ = nullptr;
 
     pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, numElements, elementSize, pInitialData);
@@ -144,7 +145,7 @@ BufferManager::ConstantBufferHandle BufferManager::createConstBuf(uint32_t size,
     pBuf->size_ = size;
     pBuf->unPaddedSize_ = size;
 
-    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &arena_, "CbBuf");
+    pBuf->pBuffer_ = X_NEW(ByteAddressBuffer, &poolArena_, "CbBuf");
     pBuf->pBackingHeap_ = nullptr;
 
     pBuf->pBuffer_->create(pDevice_, contextMan_, descriptorAllocator_, size, 1, pInitialData);
@@ -165,8 +166,8 @@ void BufferManager::freeIB(IndexBufferHandle IBHandle)
     stats_.numIndexBuffers--;
 #endif // !VID_MEMORY_STATS
 
-    X_DELETE(pBuf->pBuffer_, &arena_);
-    X_DELETE(pBuf, &arena_);
+    X_DELETE(pBuf->pBuffer_, &poolArena_);
+    X_DELETE(pBuf, &poolArena_);
 }
 
 void BufferManager::freeVB(VertexBufferHandle VBHandle)
@@ -180,8 +181,8 @@ void BufferManager::freeVB(VertexBufferHandle VBHandle)
     stats_.numVertexBuffers--;
 #endif // !VID_MEMORY_STATS
 
-    X_DELETE(pBuf->pBuffer_, &arena_);
-    X_DELETE(pBuf, &arena_);
+    X_DELETE(pBuf->pBuffer_, &poolArena_);
+    X_DELETE(pBuf, &poolArena_);
 }
 
 void BufferManager::freeCB(VertexBufferHandle CBHandle)
@@ -195,8 +196,8 @@ void BufferManager::freeCB(VertexBufferHandle CBHandle)
     stats_.numConstBuffers--;
 #endif // !VID_MEMORY_STATS
 
-    X_DELETE(pBuf->pBuffer_, &arena_);
-    X_DELETE(pBuf, &arena_);
+    X_DELETE(pBuf->pBuffer_, &poolArena_);
+    X_DELETE(pBuf, &poolArena_);
 }
 
 void BufferManager::getBufSize(BufferHandle handle, int32_t* pOriginal, int32_t* pDeviceSize) const
@@ -225,7 +226,7 @@ BufferManager::Stats BufferManager::getStats(void) const
 
 X3DBuffer* BufferManager::Int_CreateVB(uint32_t size)
 {
-    X3DBuffer* pBuf = X_NEW(X3DBuffer, &arena_, "VidMemVertex");
+    X3DBuffer* pBuf = X_NEW(X3DBuffer, &poolArena_, "VidMemVertex");
 
 #if VID_MEMORY_STATS
     stats_.vertexBytes += size;
@@ -241,7 +242,7 @@ X3DBuffer* BufferManager::Int_CreateVB(uint32_t size)
 
 X3DBuffer* BufferManager::Int_CreateIB(uint32_t size)
 {
-    X3DBuffer* pBuf = X_NEW(X3DBuffer, &arena_, "VidMemIndexes");
+    X3DBuffer* pBuf = X_NEW(X3DBuffer, &poolArena_, "VidMemIndexes");
 
 #if VID_MEMORY_STATS
     stats_.indexesBytes += size;
@@ -257,7 +258,7 @@ X3DBuffer* BufferManager::Int_CreateIB(uint32_t size)
 
 ConstBuffer* BufferManager::Int_CreateCB(uint32_t size)
 {
-    ConstBuffer* pBuf = X_NEW(ConstBuffer, &arena_, "VidMemCB");
+    ConstBuffer* pBuf = X_NEW(ConstBuffer, &poolArena_, "VidMemCB");
 
 #if VID_MEMORY_STATS
     stats_.constBufferBytes += size;

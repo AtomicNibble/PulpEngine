@@ -147,7 +147,7 @@ private:
 
     core::HeapArea heap_;
     core::PoolAllocator pool_;
-    PoolArena arena_;
+    PoolArena poolArena_;
 
 private:
 #if VID_MEMORY_STATS
