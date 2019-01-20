@@ -57,7 +57,7 @@ private:
 class AssetLoader
 {
     typedef std::array<IAssetLoadSink*, assetDb::AssetType::ENUM_COUNT> AssetLoadSinksArr;
-    typedef std::array<const char*, assetDb::AssetType::ENUM_COUNT> AssetExtArr;
+    typedef std::array<core::string_view, assetDb::AssetType::ENUM_COUNT> AssetExtArr;
 
     struct AssetLoadRequest
     {

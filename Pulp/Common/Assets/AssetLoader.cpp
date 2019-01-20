@@ -51,7 +51,6 @@ AssetLoader::AssetLoader(core::MemoryArenaBase* arena, core::MemoryArenaBase* bl
     pendingRequests_.setGranularity(32);
 
     assetsinks_.fill(nullptr);
-    assetExt_.fill("");
 }
 
 void AssetLoader::registerCmds(void)
@@ -71,7 +70,7 @@ void AssetLoader::registerAssetType(assetDb::AssetType::Enum type, IAssetLoadSin
     X_ASSERT(assetsinks_[type] == nullptr, "Asset type already had a registered handler")(assetDb::AssetType::ToString(type));
 
     assetsinks_[type] = pSink;
-    assetExt_[type] = pExt;
+    assetExt_[type] = core::string_view(pExt);
 }
 
 bool AssetLoader::onFileChanged(const char* pName)
@@ -267,7 +266,7 @@ void AssetLoader::dispatchLoadRequest(AssetLoadRequest* pLoadReq)
 
     pLoadReq->dispatchTime = gEnv->pTimer->GetTimeNowReal();
 
-    core::AssetName assetName(pAsset->getType(), name, assetExt_[type]);
+    core::AssetName assetName(pAsset->getType(), core::string_view(name), assetExt_[type]);
 
     // dispatch a read request baby!
     core::IoRequestOpen open;
