@@ -602,17 +602,17 @@ namespace strUtil
     /// \remark Returns a \c nullptr if the character could not be found.
     const char* FindLast(const char* startInclusive, const char* endExclusive, char what)
     {
-        const char* result = endExclusive - 1;
-
-        if (startInclusive >= result) {
+        if (startInclusive >= endExclusive) {
             return nullptr;
         }
 
+        const char* result = endExclusive - 1;
+
         while (*result != what) {
-            --result;
-            if (startInclusive >= result) {
+            if (result == startInclusive) {
                 return nullptr;
             }
+            --result;
         }
 
         return result;

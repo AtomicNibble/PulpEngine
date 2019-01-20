@@ -100,31 +100,37 @@ TEST(StringUtil, FindW2)
 TEST(StringUtil, FindLast)
 {
     StackString512 str("my name is bob. Hello jane.");
+    StackString512 str1("z is at the start");
 
     const char* pFind0 = strUtil::FindLast(str.begin(), str.end(), 'o');
     const char* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, 'o');
     const char* pFind2 = strUtil::FindLast(str.begin(), str.end(), 'm');
     const char* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, 'm');
+    const char* pFind4 = strUtil::FindLast(str1.begin(), str1.end(), 'z');
     
     EXPECT_TRUE(pFind0 == (str.begin() + 20));
     EXPECT_TRUE(pFind1 == nullptr);
     EXPECT_TRUE(pFind2 == (str.begin() + 5));
-    EXPECT_TRUE(pFind3 == (str.begin() + 0));
+    EXPECT_TRUE(pFind3 == str.begin());
+    EXPECT_TRUE(pFind4 == str1.begin());
 }
 
 TEST(StringUtil, FindLastW)
 {
     StackStringW512 str(L"my name is bob. Hello jane.");
+    StackStringW512 str1(L"z is at the start");
 
     const wchar_t* pFind0 = strUtil::FindLast(str.begin(), str.end(), L'o');
     const wchar_t* pFind1 = strUtil::FindLast(str.begin(), str.begin() + 1, L'o');
     const wchar_t* pFind2 = strUtil::FindLast(str.begin(), str.end(), L'm');
     const wchar_t* pFind3 = strUtil::FindLast(str.begin(), str.begin() + 1, L'm');
+    const wchar_t* pFind4 = strUtil::FindLast(str1.begin(), str1.end(), L'z');
 
     EXPECT_TRUE(pFind0 == (str.begin() + 20));
     EXPECT_TRUE(pFind1 == nullptr);
     EXPECT_TRUE(pFind2 == (str.begin() + 5));
-    EXPECT_TRUE(pFind3 == (str.begin() + 0));
+    EXPECT_TRUE(pFind3 == str.begin());
+    EXPECT_TRUE(pFind4 == str1.begin());
 }
 
 TEST(StringUtil, WhiteSpace)
