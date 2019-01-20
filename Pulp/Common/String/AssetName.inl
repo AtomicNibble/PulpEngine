@@ -27,10 +27,10 @@ inline AssetName::AssetName(const AssetName& oth) :
 {
 }
 
-template<size_t Size>
-inline AssetName::AssetName(const core::StackString<Size, char>& oth)
+template<size_t N>
+inline AssetName::AssetName(const core::StackString<N, char>& oth)
 {
-    BaseType::append(oth.c_str(), oth.length());
+    BaseType::append(oth.data(), oth.length());
 }
 
 inline AssetName::AssetName(const char* const str) :

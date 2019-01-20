@@ -22,8 +22,8 @@ public:
     AssetName(assetDb::AssetType::Enum type, const core::string& name);
     AssetName(assetDb::AssetType::Enum type, const core::string& name, const char* pExt);
     AssetName(const AssetName& oth);
-    template<size_t Size>
-    explicit AssetName(const core::StackString<Size, char>& oth);
+    template<size_t N>
+    explicit AssetName(const core::StackString<N, char>& oth);
 
     explicit AssetName(const char* const str);
     AssetName(const char* const beginInclusive, const char* const endExclusive);
