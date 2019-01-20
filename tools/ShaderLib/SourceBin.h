@@ -2,7 +2,7 @@
 
 #include <IShader.h>
 
-#include <Containers\HashMap.h>
+#include <Containers\FixedHashTable.h>
 
 #include <Memory\AllocationPolicies\PoolAllocator.h>
 #include <Memory\ThreadPolicies\MultiThreadPolicy.h>
@@ -16,7 +16,7 @@ namespace shader
 
     class SourceBin
     {
-        typedef core::HashMap<core::string, SourceFile*> ShaderSourceMap;
+        typedef core::FixedHashTable<core::string, SourceFile*> ShaderSourceMap;
         typedef core::Array<SourceFile*> SourceRefArr;
         typedef core::Array<uint8_t> ByteArr;
 

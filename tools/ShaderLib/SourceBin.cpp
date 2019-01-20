@@ -99,7 +99,7 @@ namespace shader
     SourceBin::SourceBin(core::MemoryArenaBase* arena) :
         arena_(arena),
         pCrc32_(nullptr),
-        source_(arena, MAX_SHADER_SOURCE),
+        source_(arena, core::bitUtil::NextPowerOfTwo(MAX_SHADER_SOURCE)),
         sourcePoolHeap_(
             core::bitUtil::RoundUpToMultiple<size_t>(
                 PoolArena::getMemoryRequirement(sizeof(SourceFile)) * MAX_SHADER_SOURCE,
