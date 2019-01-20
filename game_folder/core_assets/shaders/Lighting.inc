@@ -39,7 +39,7 @@ float4 BlinnPhong(float4 radiance, float3 n, float3 l, float3 v,
 }
 
 
-float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
+float4 ComputeSpotLight(float3 viewPosition, float3 vsNormal, float4 albedo,
   Light light)
 {
     float3 l = light.pos.xyz - viewPosition;
@@ -67,7 +67,7 @@ float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
     return col;
 }
 
-float4 ComputeSpotLight(float3 viewPosition, float3 vsNormal, float4 albedo,
+float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
   Light light)
 {
     float3 l = light.pos.xyz - viewPosition;
