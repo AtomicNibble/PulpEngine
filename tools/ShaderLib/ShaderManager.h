@@ -129,6 +129,8 @@ namespace shader
 
     private:
         core::MemoryArenaBase* arena_;
+        core::AssetLoader* pAssetLoader_;
+
         ShaderBin shaderBin_;
         SourceBin sourceBin_;
 

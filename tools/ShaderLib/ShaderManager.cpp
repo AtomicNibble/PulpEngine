@@ -2,6 +2,8 @@
 #include "ShaderManager.h"
 #include "ShaderPermatation.h"
 
+#include <Assets\AssetLoader.h>
+
 #include <Hashing\crc32.h>
 #include <Hashing\sha1.h>
 #include <String\Lexer.h>
@@ -44,6 +46,7 @@ namespace shader
 
     XShaderManager::XShaderManager(core::MemoryArenaBase* arena) :
         arena_(arena),
+        pAssetLoader_(nullptr),
         shaderBin_(arena),
         sourceBin_(arena),
         hwShaders_(arena, sizeof(HWShaderResource), X_ALIGN_OF(HWShaderResource), "HWShaderPool"),
@@ -89,6 +92,9 @@ namespace shader
         X_ASSERT_NOT_NULL(gEnv);
         X_LOG1("ShadersManager", "Starting");
         X_PROFILE_NO_HISTORY_BEGIN("ShaderMan", core::profiler::SubSys::RENDER);
+
+        pAssetLoader_ = gEnv->pCore->GetAssetLoader();
+        pAssetLoader_->registerAssetType(assetDb::AssetType::SHADER, this, COMPILED_SHADER_FILE_EXTENSION);
 
         return true;
     }
