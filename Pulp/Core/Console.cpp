@@ -2119,7 +2119,7 @@ void XConsole::drawInputTxt(const Vec2f& start)
             X_ASSERT(*name.end() == '\0', "Name needs to be nullterm untill this is code is updated")();
 
             // we search same length.
-            if (pComparison(name.begin(), name.end(), inputBegin, inputEnd)) {
+            if (pComparison(name.data(), name.data() + inputLen, inputBegin, inputEnd)) {
                 results.emplace_back(name.data(), it->second, nullptr);
             }
 
