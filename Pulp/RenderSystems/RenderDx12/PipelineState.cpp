@@ -92,6 +92,7 @@ bool PSODeviceCache::compile(D3D12_GRAPHICS_PIPELINE_STATE_DESC& gpsoDesc, ID3D1
         if (FAILED(hr)) {
             Error::Description Dsc;
             X_ERROR("Dx12", "Failed to create graphics PSO: %s", Error::ToString(hr, Dsc));
+            X_BREAKPOINT;
 
             // so other threads waiting can find out that this failed.
             *pPSORef = reinterpret_cast<ID3D12PipelineState*>(INVALID_PSO);
