@@ -114,7 +114,7 @@ bool AssetLoader::onFileChanged(const char* pName)
 
     core::string nameStr(tmp.begin(), tmp.end());
 
-    // what's the diffrence?
+    // TODO: what's the diffrence?
     // is one just without folder prefix and extension?
     assetsinks_[type]->onFileChanged(assetName, nameStr);
     return true;
