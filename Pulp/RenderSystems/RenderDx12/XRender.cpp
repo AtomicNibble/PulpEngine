@@ -1240,6 +1240,12 @@ IRenderTarget* XRender::getCurBackBuffer(uint32_t* pIdx)
     return pDisplayPlanes_[currentBufferIdx_];
 }
 
+BufferHandle XRender::createBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+    // TODO: make something for this?
+    return pBuffMan_->createVertexBuf(numElements, elementSize, pInitialData, usage, accessFlag);
+}
+
 VertexBufferHandle XRender::createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag)
 {
     return pBuffMan_->createVertexBuf(numElements, elementSize, nullptr, usage, accessFlag);

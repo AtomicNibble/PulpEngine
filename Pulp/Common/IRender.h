@@ -44,6 +44,7 @@ static const uint32_t MAX_SAMPLERS_BOUND = 12;
 static const uint32_t MAX_SAMPLERS_STATIC = MAX_SAMPLERS_BOUND;
 
 typedef uintptr_t Handle;
+typedef Handle BufferHandle;
 typedef Handle VertexBufferHandle;
 typedef Handle IndexBufferHandle;
 typedef Handle ConstantBufferHandle;
@@ -422,6 +423,8 @@ struct IRender
 
     virtual IRenderTarget* getCurBackBuffer(uint32_t* pIdx = nullptr) X_ABSTRACT;
 
+    // TODO: just have a single createBuffer function?
+    virtual BufferHandle createBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = CpuAccessFlags()) X_ABSTRACT;
     virtual VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag = CpuAccessFlags()) X_ABSTRACT;
     virtual VertexBufferHandle createVertexBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag = CpuAccessFlags()) X_ABSTRACT;
     virtual IndexBufferHandle createIndexBuffer(uint32_t elementSize, uint32_t numElements, BufUsage::Enum usage, CpuAccessFlags accessFlag = CpuAccessFlags()) X_ABSTRACT;

@@ -82,6 +82,7 @@ IPixelBuffer* RenderNull::createColorBuffer(core::string_view nickName, Vec2i di
 
     return nullptr;
 }
+
 void RenderNull::releasePixelBuffer(render::IPixelBuffer* pPixelBuf)
 {
     X_UNUSED(pPixelBuf);
@@ -92,6 +93,16 @@ IRenderTarget* RenderNull::getCurBackBuffer(uint32_t* pIdx)
     X_UNUSED(pIdx);
 
     return nullptr;
+}
+
+BufferHandle RenderNull::createBuffer(uint32_t elementSize, uint32_t numElements, const void* pInitialData, BufUsage::Enum usage, CpuAccessFlags accessFlag)
+{
+    X_UNUSED(numElements);
+    X_UNUSED(elementSize);
+    X_UNUSED(pInitialData);
+    X_UNUSED(usage);
+    X_UNUSED(accessFlag);
+    return INVALID_BUF_HANLDE;
 }
 
 VertexBufferHandle RenderNull::createVertexBuffer(uint32_t numElements, uint32_t elementSize,
