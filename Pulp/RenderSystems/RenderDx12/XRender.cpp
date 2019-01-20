@@ -779,7 +779,7 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
                 } break;
                 case Commands::Command::COPY_VERTEX_BUF_DATA: {
                     const Commands::CopyVertexBufferData& updateVB = *reinterpret_cast<const Commands::CopyVertexBufferData*>(pCmd);
-                    auto pVBuf = pBuffMan_->IBFromHandle(updateVB.vertexBuffer);
+                    auto pVBuf = pBuffMan_->VBFromHandle(updateVB.vertexBuffer);
 
                     X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
 
