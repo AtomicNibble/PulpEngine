@@ -58,6 +58,7 @@ public:
 public:
     Transformf trans;
     Color8u col;
+    float invRadius;
     int32_t lastModifiedFrameNum; // to determine if it is constantly changing,
 };
 
@@ -162,7 +163,7 @@ public:
 struct LightData
 {
     Vec4f pos;
-    Color color;
+    Color col;
 
     // spot
     Vec4f direction;

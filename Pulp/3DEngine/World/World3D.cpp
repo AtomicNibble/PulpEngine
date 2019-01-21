@@ -239,15 +239,26 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
     auto* pJobSys = gEnv->pJobSys;
 
     {
+        lightData_.resize(renderLights_.size());
+
+        for (size_t i=0;i< renderLights_.size(); i++)
+        {
+            auto* pLight = renderLights_[i];
+
+            lightData_[i].pos = pLight->trans.pos;
+            lightData_[i].col = pLight->col;
+            lightData_[i].invLightRadius = pLight->invRadius;
+        }
 
         if (lightBuffer_ == render::INVALID_BUF_HANLDE)
         {
-            lightData_.resize(2);
+            const size_t max_lights = 4;
+            lightData_.resize(max_lights);
 
             for (auto& light : lightData_)
             {
-                light.pos = Vec4f(-128.f, 136.f, 72.f, 1.f);
-                light.color = Color(1.f, 0.f, 0.f, 1.f);
+                light.pos = Vec4f(0.f, 0.f, 0.f, 1.f);
+                light.col = Color(1.f, 0.f, 0.f, 1.f);
 
                 light.direction = Vec4f(-0.05f, 0.5f, 1.f, 1.f);
                 light.direction = Vec4f::zero();
@@ -255,16 +266,11 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
                 light.innerCone = math<float>::cos(toRadians(20.f));
                 light.outerCone = math<float>::cos(toRadians(69.5f));
                 light.invConeDifference = 1.f / (light.innerCone - light.outerCone);
-                light.invLightRadius = 1.f / 128.f;
+                light.invLightRadius = 1.f / 256.f;
             }
 
-            lightData_[0].pos = Vec4f(-128.f, 136.f, 72.f, 1.f);
-            lightData_[0].color = Color(1.f, 0.f, 0.f, 1.f);
 
-            lightData_[1].pos = Vec4f(0.f, 136.f, 72.f, 1.f);
-            lightData_[1].color = Color(0.f, 1.f, 1.f, 1.f);
-
-            lightBuffer_ = gEnv->pRender->createBuffer(sizeof(LightData), 2, lightData_.data(),
+            lightBuffer_ = gEnv->pRender->createBuffer(sizeof(LightData), static_cast<uint32_t>(lightData_.size()), lightData_.data(),
                 render::BufUsage::DYNAMIC, render::CpuAccess::WRITE);
         }
 
@@ -273,13 +279,12 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
     // update my buffer!
     if(lightBuffer_ != render::INVALID_BUF_HANLDE)
     {
-        auto* pUpdateVb = bucket.addCommand<render::Commands::CopyVertexBufferData>(0, 0);
-        pUpdateVb->vertexBuffer = lightBuffer_;
+        auto* pUpdateVb = bucket.addCommand<render::Commands::CopyBufferData>(0, 0);
+        pUpdateVb->buffer = lightBuffer_;
         pUpdateVb->pData = lightData_.data();
         pUpdateVb->size = safe_static_cast<uint32_t>(sizeof(LightData) * lightData_.size());
         pUpdateVb->dstOffset = 0;
     }
-
 
     {
         core::V2::Job* pSyncJob = pJobSys->CreateEmtpyJob(JOB_SYS_SUB_ARG_SINGLE(core::profiler::SubSys::ENGINE3D));
@@ -810,6 +815,7 @@ IRenderLight* World3D::addRenderLight(const RenderLightDesc& ent)
     auto* pRenderLight = X_NEW(RenderLight, arena_, "RenderLight")();
     pRenderLight->trans = ent.trans;
     pRenderLight->col = ent.col;
+    pRenderLight->invRadius = 1.f / ent.radius;
     pRenderLight->lastModifiedFrameNum = 0;
 
     renderLights_.append(pRenderLight);
@@ -828,8 +834,6 @@ void World3D::updateLight(IRenderLight* pLight, const Transformf& trans)
 
     pRenderLight->lastModifiedFrameNum = frameNumber_;
     pRenderLight->trans = trans;
-
-    lightData_[0].pos = trans.pos;
 
     //	createEntityRefs(pRenderEnt);
 }
@@ -2393,7 +2397,7 @@ void World3D::debugDraw_Lights(void) const
 
     for (auto& light : lightData_) {
         Sphere s(light.pos.xyz(), 2.f);
-        pPrimContex_->drawSphere(s, Color8u(light.color), true);
+        pPrimContex_->drawSphere(s, Color8u(light.col), true);
     }
 
 #endif
