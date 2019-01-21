@@ -116,16 +116,15 @@ PS_OUTPUT ps_main( VS_OUTPUT IN )
 
     float4 ambient = albedo * float4(0.5,0.5,0.5,1);
 
-    float4 lightColor1 = ComputePointLight(
-      viewPosition, vsNormal, albedo, lights[0]
-    );
+    float4 lightColor;
 
+    for(int i=0; i<3; i++)
+    {
+      lightColor += ComputePointLight(
+        viewPosition, vsNormal, albedo, lights[i]
+      );
+    }
 
-    float4 lightColor2 = ComputePointLight(
-      viewPosition, vsNormal, albedo, lights[1]
-    );
-
-    output.color = saturate(ambient + lightColor1 + lightColor2);
-
+    output.color = saturate(ambient + lightColor);
     return output;
 }
