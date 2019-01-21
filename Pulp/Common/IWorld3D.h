@@ -20,8 +20,8 @@ struct RenderEntDesc
 struct RenderLightDesc
 {
     Transformf trans;
-
     Color8u col;
+    float radius;
 };
 
 struct EmitterDesc
