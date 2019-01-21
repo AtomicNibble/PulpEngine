@@ -13,6 +13,7 @@ namespace Commands
         DRAW_INDEXED,
         DRAW_INSTANCED,
         DRAW_INSTANCED_INDEXED,
+        COPY_BUF_DATA,
         COPY_CONST_BUF_DATA,
         COPY_INDEXES_BUF_DATA,
         COPY_VERTEX_BUF_DATA,
@@ -322,6 +323,16 @@ namespace Commands
         VertexBufferHandleArr vertexBuffers;
         IndexBufferHandle indexBuffer;
         ResourceStateBase resourceState;
+    };
+
+    struct CopyBufferData : public CmdBase
+    {
+        static const Command::Enum CMD = Command::COPY_BUF_DATA;
+
+        BufferHandle buffer;
+        const void* pData;
+        uint32_t size;
+        uint32_t dstOffset;
     };
 
     struct CopyConstantBufferData : public CmdBase

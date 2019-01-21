@@ -753,6 +753,15 @@ CommandListHandle XRender::createCommandLists(CommandBucket<uint32_t>& cmdBucket
 #endif // !RENDER_STATS
                     break;
                 }
+                case Commands::Command::COPY_BUF_DATA: {
+                    const Commands::CopyBufferData& updateBuf = *reinterpret_cast<const Commands::CopyBufferData*>(pCmd);
+                    auto pVBuf = pBuffMan_->VBFromHandle(updateBuf.buffer);
+
+                    X_ASSERT(pVBuf->getUsage() != BufUsage::IMMUTABLE, "Can't update a IMMUTABLE buffer")(pVBuf->getUsage());
+
+                    context.writeBuffer(pVBuf->getBuf(), updateBuf.dstOffset, updateBuf.pData, updateBuf.size);
+                } break;
+
                 case Commands::Command::COPY_CONST_BUF_DATA: {
                     const Commands::CopyConstantBufferData& updateCB = *reinterpret_cast<const Commands::CopyConstantBufferData*>(pCmd);
                     auto pCBuf = pBuffMan_->CBFromHandle(updateCB.constantBuffer);
