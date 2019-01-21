@@ -31,8 +31,10 @@ namespace entity
             return;
         }
 
-        auto& trans = reg.get<TransForm>(msg.id);
+        auto trans = reg.get<TransForm>(msg.id);
         auto& light = reg.get<Light>(msg.id);
+
+        trans.pos += trans.quat * light.offset;
 
         p3DWorld_->updateLight(light.pLight, trans);
     }

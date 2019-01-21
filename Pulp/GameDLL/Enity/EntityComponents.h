@@ -313,6 +313,7 @@ namespace entity
         }
 
         Color8u col;
+        Vec3f offset;
         engine::IRenderLight* pLight;
     };
 
