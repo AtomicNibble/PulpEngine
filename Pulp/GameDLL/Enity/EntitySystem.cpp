@@ -1122,12 +1122,26 @@ namespace entity
                 }
                 case "Mover"_fnv1a: {
                     auto& mov = reg_.assign<Mover>(ent);
-                    if (!parseComponent(dtMover_, mov, value)) {
+                    
+                    bool hasStart = value.HasMember("start");
+                    bool hasEnd = value.HasMember("end");
+
+                    if (!hasStart) {
+                        mov.start = trans.pos;
+                    }
+                    else if (!parseVec(value["start"], mov.start)) {
                         return false;
                     }
 
-                    mov.fract = 0.f;
+                    if (hasEnd && !parseVec(value["end"], mov.end)) {
+                        return false;
+                    }
 
+                    if (!value.HasMember("time")) {
+                        return false;
+                    }
+
+                    mov.time = value["time"].GetFloat();
                     break;
                 }
 
