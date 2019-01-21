@@ -286,6 +286,11 @@ namespace entity
 
     struct Mover // move back and forth
     {
+        Mover() :
+            time(0.f),
+            fract(0.f)
+        {}
+
         Vec3f start;
         Vec3f end;
         float time;
