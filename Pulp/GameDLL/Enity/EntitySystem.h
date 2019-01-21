@@ -123,6 +123,7 @@ namespace entity
         static bool parseComponent(DataTranslator<CompnentT>& translator, CompnentT& comp, const core::json::Value& compDesc);
 
         static bool parseColor(const core::json::Value& value, Color8u& col);
+        static bool parseVec(const core::json::Value& value, Vec3f& vec);
 
         bool parseEntDesc(core::json::Value& val);
 

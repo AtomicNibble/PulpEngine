@@ -940,6 +940,22 @@ namespace entity
         return true;
     }
 
+    bool EnititySystem::parseVec(const core::json::Value& value, Vec3f& vec)
+    {
+        if (!value.IsObject()) {
+            return false;
+        }
+
+        if (!value.HasMember("x") || !value.HasMember("y") || !value.HasMember("z")) {
+            return false;
+        }
+
+        vec.x = value["x"].GetFloat();
+        vec.y = value["y"].GetFloat();
+        vec.z = value["z"].GetFloat();
+        return true;
+    }
+
     bool EnititySystem::parseEntDesc(core::json::Value& entDesc)
     {
         if (entDesc.GetType() != core::json::Type::kObjectType) {
@@ -1151,6 +1167,18 @@ namespace entity
                     engine::RenderLightDesc rl;
                     rl.col = light.col;
                     rl.trans = trans;
+                    rl.radius = 256.f;
+
+                    if (value.HasMember("offset")) {
+                        if (!parseVec(value["offset"], light.offset)) {
+                            return false;
+                        }
+                        rl.trans.pos += trans.quat * light.offset;
+                    }
+
+                    if (value.HasMember("radius")) {
+                        rl.radius = value["radius"].GetFloat();
+                    }
 
                     light.pLight = p3DWorld_->addRenderLight(rl);
                     break;
@@ -1164,14 +1192,11 @@ namespace entity
                 // loosy goosy
                 case "origin"_fnv1a: {
                     // x,y,z
-                    if (!value.HasMember("x") || !value.HasMember("y") || !value.HasMember("z")) {
+                    if (!parseVec(value, trans.pos)) {
                         X_ERROR("Ents", "Invalid origin");
                         return false;
                     }
-
-                    trans.pos.x = value["x"].GetFloat();
-                    trans.pos.y = value["y"].GetFloat();
-                    trans.pos.z = value["z"].GetFloat();
+                   
                 } break;
                 case "angles"_fnv1a: {
                     Anglesf angles;
