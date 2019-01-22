@@ -855,13 +855,15 @@ bool AssetProperties::save(QString& errorString)
 
 	core::string args;
 	if (!extractArgs(args)) {
-		errorString = "Error extracting asset '" + assetName + "' props";
+		auto str = "Error extracting asset '" + assetName + "' props";
+		errorString.fromLatin1(str.data(), static_cast<int32_t>(str.length()));
 		return false;
 	}
 
 	auto res = db_.UpdateAssetArgs(type, assetName, args);
 	if (res != assetDb::AssetDB::Result::OK) {
-		errorString = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
+		auto str = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
+		errorString.fromLatin1(str.data(), static_cast<int32_t>(str.length()));
 		return false;
 	}
 	else {

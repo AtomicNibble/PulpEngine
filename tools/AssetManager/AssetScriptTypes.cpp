@@ -559,7 +559,7 @@ std::string AssetScriptProps::getMaterialTypes(std::string& catStr)
 	std::string s;
 	for (const auto& t : types)
 	{
-		s += t;
+		s.append(t.data(), t.length());
 		s += "|";
 	}
 
@@ -605,7 +605,8 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 	// right now we just need to show the props that are part of this techSetDef.
 
 	auto showProps = [&](const core::string& propName, const engine::techset::AssManProps& assProps) {
-		auto propIt = map_.find(std::string(propName));
+       
+		auto propIt = map_.find(std::string(propName.data(), propName.length()));
 		if (propIt != map_.end())
 		{
 			auto* pProp = *(propIt);
@@ -615,17 +616,17 @@ void AssetScriptProps::addMaterialTypeProps(std::string& catStr, std::string& ty
 			// set the active cat.
 			if (assProps.cat.isNotEmpty())
 			{
-				props_.BeginGroup(std::string(assProps.cat));
+				props_.BeginGroup(std::string(assProps.cat.data(), assProps.cat.length()));
 				props_.showInCurrentCat(pProp->prop());
 			}
 
 			if (assProps.title.isNotEmpty())
 			{
-				pProp->SetTitle(std::string(assProps.title));
+				pProp->SetTitle(std::string(assProps.title.data(), assProps.title.length()));
 			}
 			if (assProps.defaultVal.isNotEmpty())
 			{
-				pProp->SetDefaultValue(std::string(assProps.defaultVal));
+				pProp->SetDefaultValue(std::string(assProps.defaultVal.data(), assProps.defaultVal.length()));
 			}
 		}
 		else

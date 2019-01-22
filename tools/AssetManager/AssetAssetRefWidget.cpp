@@ -86,7 +86,7 @@ void AssetAssetRefWidget::browseClicked(void)
 	{
 		const QString oldName = pLineEdit_->text();
 		const QString assName = dig.getSelectedName();
-
+		const auto assNameStd = assName.toStdString();
 
 		int32_t assetId;
 		if (!db_.AssetExists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
@@ -107,14 +107,14 @@ void AssetAssetRefWidget::browseClicked(void)
 			{
 				if (db_.GetAssetInfoForAsset(id, info))
 				{
-					if (info.type == type_ && info.name == assName)
+					if (info.type == type_ && info.name.compare(assNameStd.data(), assNameStd.length()))
 					{
 						// it was renamed.
 						X_LOG0("AssetRef", "Detected ref rename, updating name from: \"%s\" -> \"%s\"", 
 							qPrintable(oldName), qPrintable(assName));
 
 						pLineEdit_->setText(assName);
-						emit valueChanged(assName.toStdString());
+						emit valueChanged(assNameStd);
 						return;
 					}
 				}
@@ -133,7 +133,7 @@ void AssetAssetRefWidget::browseClicked(void)
 
 		pLineEdit_->setText(assName);
 
-		emit valueChanged(assName.toStdString());
+		emit valueChanged(assNameStd);
 	}
 }
 

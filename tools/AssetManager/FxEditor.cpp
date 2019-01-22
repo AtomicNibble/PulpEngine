@@ -71,7 +71,8 @@ bool FxProperties::save(QString& errorString)
 
 	auto res = db_.UpdateAssetArgs(type, assetName, current_);
 	if (res != assetDb::AssetDB::Result::OK) {
-		errorString = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
+		auto str = "Failed to save asset '" + assetName + "' props. Error: " + assetDb::AssetDB::Result::ToString(res);
+		errorString.fromLocal8Bit(str.data(), static_cast<int32_t>(str.length()));
 		return false;
 	}
 	else {
