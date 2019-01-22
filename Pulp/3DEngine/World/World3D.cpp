@@ -238,7 +238,34 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 
     auto* pJobSys = gEnv->pJobSys;
 
-    if(lightData_.isNotEmpty())
+    // need buffer to be valid before we try draw.
+    if (lightBuffer_ == render::INVALID_BUF_HANLDE)
+    {
+        const size_t max_lights = 4;
+        lightData_.resize(max_lights);
+
+        for (auto& light : lightData_)
+        {
+            light.pos = Vec4f(0.f, 0.f, 0.f, 1.f);
+            light.col = Color(1.f, 0.f, 0.f, 1.f);
+
+            light.direction = Vec4f(-0.05f, 0.5f, 1.f, 1.f);
+            light.direction = Vec4f::zero();
+
+            light.innerCone = math<float>::cos(toRadians(20.f));
+            light.outerCone = math<float>::cos(toRadians(69.5f));
+            light.invConeDifference = 1.f / (light.innerCone - light.outerCone);
+            light.invLightRadius = 1.f / 256.f;
+        }
+
+        lightBuffer_ = gEnv->pRender->createBuffer(sizeof(LightData), static_cast<uint32_t>(lightData_.size()), lightData_.data(),
+            render::BufUsage::DYNAMIC, render::CpuAccess::WRITE);
+
+        lightData_.clear();
+    }
+
+    // copy lights data to buffer.
+    if(renderLights_.isNotEmpty())
     {
         lightData_.resize(renderLights_.size());
 
@@ -250,31 +277,6 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
             lightData_[i].col = pLight->col;
             lightData_[i].invLightRadius = pLight->invRadius;
         }
-
-        if (lightBuffer_ == render::INVALID_BUF_HANLDE)
-        {
-            const size_t max_lights = 4;
-            lightData_.resize(max_lights);
-
-            for (auto& light : lightData_)
-            {
-                light.pos = Vec4f(0.f, 0.f, 0.f, 1.f);
-                light.col = Color(1.f, 0.f, 0.f, 1.f);
-
-                light.direction = Vec4f(-0.05f, 0.5f, 1.f, 1.f);
-                light.direction = Vec4f::zero();
-
-                light.innerCone = math<float>::cos(toRadians(20.f));
-                light.outerCone = math<float>::cos(toRadians(69.5f));
-                light.invConeDifference = 1.f / (light.innerCone - light.outerCone);
-                light.invLightRadius = 1.f / 256.f;
-            }
-
-
-            lightBuffer_ = gEnv->pRender->createBuffer(sizeof(LightData), static_cast<uint32_t>(lightData_.size()), lightData_.data(),
-                render::BufUsage::DYNAMIC, render::CpuAccess::WRITE);
-        }
-
     }
 
     // update my buffer!
@@ -2092,6 +2094,8 @@ void World3D::addMeshTobucket(const model::MeshHeader& mesh, const model::XRende
 
                 if (buf.getName() == "lights") {
                     auto* pBuffers = pVariableState->getBuffers();
+
+                    X_ASSERT(lightBuffer_ != render::INVALID_BUF_HANLDE, "Light buffer is not valid")();
 
                     pBuffers[i].buf = lightBuffer_;
                     break;
