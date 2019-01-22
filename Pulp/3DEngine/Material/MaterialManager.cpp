@@ -453,6 +453,7 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
 
         auto* pTexMan = gEngEnv.pTextureMan_;
         auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
+        auto* pDefaultNormal = pTexMan->getDefault(render::TextureSlot::NORMAL);
 
         for (size_t i = 0; i < numTex; i++) {
             auto& texState = pTexStates[i];
@@ -499,6 +500,11 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
                 // this way we can return defaults that would actually not look retarded.
 
                 texState.textureId = pDefaultTex->getDeviceID();
+
+                if (permTexture.getName() == "normalMap") {
+                    texState.textureId = pDefaultNormal->getDeviceID();
+                    continue;
+                }
             }
 
             //		texSet:;
