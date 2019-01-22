@@ -1305,7 +1305,7 @@ bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 // -----------------------------------
 
 
-bool AssetDB::Export(core::Path<char>& path)
+bool AssetDB::Export(const core::Path<char>& path)
 {
     // Pump and dump!
     // Should probs change some of this to call the helpers like GetRawfileForRawId
@@ -1606,9 +1606,10 @@ bool AssetDB::Export(core::Path<char>& path)
     return true;
 }
 
-bool AssetDB::Import(core::Path<char>& path)
+bool AssetDB::Import(const core::Path<char>& path)
 {
     X_ASSERT_NOT_IMPLEMENTED();
+    X_UNUSED(path);
     return true;
 }
 

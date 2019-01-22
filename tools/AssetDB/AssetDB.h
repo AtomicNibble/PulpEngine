@@ -164,8 +164,8 @@ public:
     bool Chkdsk(bool updateDB = false);
     bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
-    bool Export(core::Path<char>& path);
-    bool Import(core::Path<char>& path);
+    bool Export(const core::Path<char>& path);
+    bool Import(const core::Path<char>& path);
 
     // Conversion Profile api.
     Result::Enum AddProfile(const core::string& name, int32_t precedence);

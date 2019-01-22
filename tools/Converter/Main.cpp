@@ -226,7 +226,7 @@ namespace
             }
         }
         else if (mode == ConvertMode::DUMP) {
-            core::Path<char> path("asset_db\\db.json");
+            core::Path<char> path("asset_db/db.json");
             if (!db.Export(path)) {
                 X_ERROR("Convert", "Failed to dump db");
                 return false;
