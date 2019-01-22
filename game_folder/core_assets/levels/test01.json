@@ -348,14 +348,58 @@
             "DynamicObject" : {
             },
             "NetworkSync" : {
-            },
+            }
           //  "Emitter" : {
           //      "effect" : "test/env/smk_test",
           //      "offset" : {"x": 0, "y": 0, "z": 20}
           //}
+        },
+        {
+            "origin" : {"x": -100, "y": -100, "z": 50},
+
+            "Mesh" : {
+                "name" : "test/prop/rustic_candle"
+            },
+            "MeshRenderer" : {
+            },
             "Light" : {
                 "raduis" : 50,
                 "color" : {"r": 0, "g": 0.6, "b": 0}
+            },
+            "Mover" : {
+                "start" : {"x": -100, "y": -100, "z": 50},
+                "end" : {"x": 0, "y": 0, "z": 50},
+                "time" : 3.0
+            }
+        },
+        {
+            "origin" : {"x": 0, "y": 0, "z": 50},
+
+            "Light" : {
+                "radius" : 256,
+                "color" : {"r": 1, "g": 0, "b": 0},
+                "offset" : {"x": 0, "y": 0, "z": 0}
+            },
+            "Mover" : {
+                "start" : {"x": 0, "y": 0, "z": 100},
+                "end" : {"x": 0, "y": 0, "z": 10},
+                "time" : 3.0
+            }
+        },
+        {
+            "origin" : {"x": 20, "y": -1000, "z": -15},
+
+            "Light" : {
+                "radius" : 256,
+                "color" : {"r": 0.6, "g": 1, "b": 0.9}
+            }
+        },
+        {
+            "origin" : {"x": 0, "y": -400, "z": 50},
+
+            "Light" : {
+                "radius" : 256,
+                "color" : {"r": 1, "g": 0.9, "b": 0.75}
             }
         },
         /*{
