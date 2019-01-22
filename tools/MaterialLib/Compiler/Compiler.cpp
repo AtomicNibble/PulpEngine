@@ -176,34 +176,36 @@ bool MaterialCompiler::loadFromJson(core::string& str)
         tex.texSlot = textureDesc.texSlot;
 
         if (textureDesc.propName.isNotEmpty()) {
+
             // we need to look for the texture value in props.
-            if (!d.HasMember(textureDesc.propName.c_str())) {
-                // if we have a default texture we just use that.
-                if (textureDesc.defaultName.isNotEmpty()) {
-                    tex.value = textureDesc.defaultName;
-                }
-                else {
-                    X_ERROR("Mat", "Required texture property is missing: \"%s\"", textureDesc.propName.c_str());
-                    return false;
-                }
-            }
-            else {
-                const char* pValue = d[textureDesc.propName.c_str()].GetString();
-                tex.value = pValue;
-            }
+			if (d.HasMember(textureDesc.propName.c_str())) {
+				auto& value = d[textureDesc.propName.c_str()];
+
+				if (value.GetStringLength() > 9) {
+					tex.value.assign(value.GetString(), value.GetStringLength());
+				}
+			}
+			else {
+				X_WARNING("Mat", "Required texture property is missing: \"%s\"", textureDesc.propName.c_str());
+			}
+
+			// get a value?
+			if (tex.value.isEmpty() && textureDesc.defaultName.isNotEmpty()) {
+				tex.value = textureDesc.defaultName;
+			}
         }
         else if (textureDesc.defaultName.isNotEmpty()) {
             tex.value = textureDesc.defaultName;
         }
 
         if (tex.value.isEmpty()) {
-            const char* pName = textureDesc.propName.c_str();
+            core::string_view propName = core::string_view(textureDesc.propName);
 
             if (textureDesc.assProps.title.isNotEmpty()) {
-                pName = textureDesc.assProps.title.c_str();
+				propName = core::string_view(textureDesc.assProps.title);
             }
 
-            X_ERROR("Mat", "Required texture property is empty: \"%s\"", pName);
+            X_ERROR("Mat", "Required texture property is empty: \"%.*s\"", propName.length(), propName.data());
             return false;
         }
 
