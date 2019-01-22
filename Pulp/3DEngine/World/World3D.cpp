@@ -238,6 +238,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
 
     auto* pJobSys = gEnv->pJobSys;
 
+    if(lightData_.isNotEmpty())
     {
         lightData_.resize(renderLights_.size());
 
@@ -277,7 +278,7 @@ void World3D::renderView(core::FrameData& frame, render::CommandBucket<uint32_t>
     }
 
     // update my buffer!
-    if(lightBuffer_ != render::INVALID_BUF_HANLDE)
+    if(lightBuffer_ != render::INVALID_BUF_HANLDE && lightData_.isNotEmpty())
     {
         auto* pUpdateVb = bucket.addCommand<render::Commands::CopyBufferData>(0, 0);
         pUpdateVb->buffer = lightBuffer_;
