@@ -118,7 +118,7 @@ void GenerateUI( asset& Asset )
         Asset.AddCombo( "tileColor", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
         Asset.AddCombo( "filterColor", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
 
-        Asset.AddCheckBox( "alphaTextyre", false ).SetTitle( "Alpha Blend" ).SetToolTip("Enable alpha blending").SetVisible(false);
+        Asset.AddCheckBox( "alphaTexture", false ).SetTitle( "Alpha Blend" ).SetToolTip("Enable alpha blending").SetVisible(false);
     }
 
 
