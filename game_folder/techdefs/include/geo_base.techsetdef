@@ -22,6 +22,27 @@ Texture( "colorMap" )
     }
 }
 
+Sampler( "normalSampler" )
+{
+    repeat = <tileNormal>
+    filter = <filterNormal>
+
+    ass = AssProps()
+    {
+        cat  = "Normal"
+    }
+}
+
+Texture( "normalMap" )
+{
+    image = Image( <mapNormal, "default/$identitynormal"> )
+
+    ass = AssProps()
+    {
+        cat  = "Normal"
+        title  = "Normal Map"
+    }
+}
 
 VertexShader( "vs_default" )
 {
