@@ -29,7 +29,7 @@ BOOL APIENTRY DllMain(HANDLE hModule,
 #endif // !X_LIB
 
 extern "C" {
-IPCORE_API ICore* CreateCoreInterface(const CoreInitParams& startupParams)
+IPCORE_API ICore* CreateCoreInterface(CoreInitParams& startupParams)
 {
     X_ASSERT_NOT_NULL(startupParams.pCoreArena);
 
@@ -39,7 +39,7 @@ IPCORE_API ICore* CreateCoreInterface(const CoreInitParams& startupParams)
         return nullptr;
     }
 
-    auto* pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", 16);
+    auto* pCore = X_NEW_ALIGNED(XCore, startupParams.pCoreArena, "XCore", core::Max<size_t>(X_ALIGN_OF(XCore), 16));
 
     LinkModule(pCore, "Core");
 

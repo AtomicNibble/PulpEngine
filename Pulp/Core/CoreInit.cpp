@@ -338,7 +338,7 @@ bool XCore::IntializeEngineModule(const char* pDllName, const char* pModuleClass
 }
 
 //////////////////////////////////////////////////////////////////////////
-bool XCore::Init(const CoreInitParams& startupParams)
+bool XCore::Init(CoreInitParams& startupParams)
 {
     core::StopWatch time;
 
@@ -381,7 +381,7 @@ bool XCore::Init(const CoreInitParams& startupParams)
     }
 #endif
 
-    if (!ParseCmdArgs(startupParams.pCmdLine)) {
+    if (!ParseCmdArgs(startupParams)) {
         return false;
     }
 
@@ -746,9 +746,11 @@ bool XCore::InitAsyncWait(void)
     return allOk;
 }
 
-bool XCore::ParseCmdArgs(const wchar_t* pArgs)
+bool XCore::ParseCmdArgs(CoreInitParams& initParams)
 {
     // should never be null
+    const wchar_t* pArgs = initParams.pCmdLine;
+
     if (!pArgs) {
         return false;
     }
@@ -780,6 +782,10 @@ bool XCore::ParseCmdArgs(const wchar_t* pArgs)
 
     if (GetCommandLineArgForVarW(L"nopause")) {
         env_.noPause_ = true;
+    }
+
+    if (GetCommandLineArgForVarW(L"noconsole")) {
+        initParams.bConsoleLog = false;
     }
 
     return true;

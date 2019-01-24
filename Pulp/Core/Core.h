@@ -76,7 +76,7 @@ public:
     XCore();
     ~XCore() X_FINAL;
 
-    bool Init(const CoreInitParams& startupParams) X_FINAL;
+    bool Init(CoreInitParams& startupParams) X_FINAL;
     bool InitAsyncWait(void) X_FINAL;
     void ShutDown(void); // not part of ICore currently
     void Release(void) X_FINAL;
@@ -136,7 +136,7 @@ private:
 
     bool IntializeEngineModule(const char* pDllName, const char* pModuleClassName, const CoreInitParams& initParams);
 
-    bool ParseCmdArgs(const wchar_t* pArgs);
+    bool ParseCmdArgs(CoreInitParams& initParams);
     bool parseSeed(Vec4i seed);
 
     bool InitConsole(const CoreInitParams& initParams);
