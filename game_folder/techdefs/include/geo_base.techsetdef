@@ -11,17 +11,6 @@ Sampler( "colorSampler" )
     }
 }
 
-Texture( "colorMap" )
-{
-    image = Image( <mapColor, "default/white"> )
-
-    ass = AssProps()
-    {
-        cat  = "Color"
-        title  = "Color Map"
-    }
-}
-
 Sampler( "normalSampler" )
 {
     repeat = <tileNormal>
@@ -30,6 +19,18 @@ Sampler( "normalSampler" )
     ass = AssProps()
     {
         cat  = "Normal"
+    }
+}
+
+
+Texture( "colorMap" )
+{
+    image = Image( <mapColor, "default/$white"> )
+
+    ass = AssProps()
+    {
+        cat  = "Color"
+        title  = "Color Map"
     }
 }
 
@@ -43,6 +44,52 @@ Texture( "normalMap" )
         title  = "Normal Map"
     }
 }
+
+Texture( "roughnessMap" )
+{
+    image = Image( <mapRoughness, "default/$black"> )
+
+    ass = AssProps()
+    {
+        cat  = "Roughness"
+        title  = "Roughness Map"
+    }
+}
+
+Texture( "ambientOcclusionMap" )
+{
+    image = Image( <mapAmbientOcclusion, "default/$white"> )
+
+    ass = AssProps()
+    {
+        cat  = "AmbientOcclusion"
+        title  = "AmbientOcclusion Map"
+    }
+}
+
+Texture( "metallicMap" )
+{
+    image = Image( <mapMetallic, "default/$black"> )
+
+    ass = AssProps()
+    {
+        cat  = "Metallic"
+        title  = "Metallic Map"
+    }
+}
+
+Texture( "displacementMap" )
+{
+    image = Image( <mapDisplacement, "default/$black"> )
+
+    ass = AssProps()
+    {
+        cat  = "Displacement"
+        title  = "Displacement Map"
+    }
+}
+
+
 
 VertexShader( "vs_default" )
 {
