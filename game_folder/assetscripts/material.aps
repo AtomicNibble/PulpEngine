@@ -130,20 +130,36 @@ void GenerateUI( asset& Asset )
         Asset.AddCombo( "filterNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
     }
 
-    // DetailNormalMap
+    // Roughness
     {
-        Asset.AddAssetRef( "mapDetailNormal", "img").SetTitle("DetailNormal Map").SetVisible(false);
+        Asset.AddAssetRef( "mapRoughness", "img").SetTitle("Roughness Map").SetVisible(false);
 
-        Asset.AddCombo( "tileDetailNormal", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
-        Asset.AddCombo( "filterDetailNormal", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
+        Asset.AddCombo( "tileRoughness", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
+        Asset.AddCombo( "filterRoughness", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
     }
 
-    // SpecColMap
+    // AmbientOcclusion
     {
-        Asset.AddAssetRef( "mapSpecCol", "img" ).SetTitle("SpecCol Map").SetVisible(false);
+        Asset.AddAssetRef( "mapAmbientOcclusion", "img" ).SetTitle("Ambient Occlusion Map").SetVisible(false);
 
-        Asset.AddCombo( "tileSpecCol", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
-        Asset.AddCombo( "filterSpecCol", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "linear (mip nearest)" ).SetVisible(false);
+        Asset.AddCombo( "tileAmbientOcclusion", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
+        Asset.AddCombo( "filterAmbientOcclusion", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
+    }
+
+    // Metallic
+    {
+        Asset.AddAssetRef( "mapMetallic", "img" ).SetTitle("Metallic Map").SetVisible(false);
+
+        Asset.AddCombo( "tileMetallic", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
+        Asset.AddCombo( "filterMetallic", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
+    }
+
+    // Displacement
+    {
+        Asset.AddAssetRef( "mapDisplacement", "img" ).SetTitle("Displacement Map").SetVisible(false);
+
+        Asset.AddCombo( "tileDisplacement", tileTypes ).SetTitle( "Tile Mode" ).SetToolTip( TileTip ).SetVisible(false);
+        Asset.AddCombo( "filterDisplacement", filters ).SetTitle( "Filter Mode" ).SetToolTip( FilterTip ).SetDefaultValue( "aniso2x (mip linear)" ).SetVisible(false);
     }
 
     // Cammo Map
