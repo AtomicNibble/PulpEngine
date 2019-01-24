@@ -13,7 +13,7 @@ namespace PNG
 
     class XTexLoaderPNG : public ITextureFmt
     {
-        static const int32_t BLOCK_SIZE = 1024 * 32;              // save as 32kb chunks.
+        static const int32_t BLOCK_SIZE = 1024 * 128;              // save as 128kb chunks.
         static const int32_t IO_READ_BLOCK_SIZE = (1024 * 4) * 4; // read the IDAT in max of 16kb chunks regardless of it's size.
 
     public:
