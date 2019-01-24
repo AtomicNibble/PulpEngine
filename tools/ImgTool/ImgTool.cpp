@@ -262,7 +262,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     core::StopWatch timer;
 
     if (!texture::Process(arena)) {
-        gEnv->pConsoleWnd->pressToContinue();
+        if (gEnv->pConsoleWnd) {
+            gEnv->pConsoleWnd->pressToContinue();
+        }
         return 1;
     }
    
