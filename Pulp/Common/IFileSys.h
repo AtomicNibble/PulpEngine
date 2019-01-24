@@ -521,6 +521,96 @@ private:
     core::ByteStream& stream_;
 };
 
+// Buffers small write calls using local buffer.
+template<size_t BUF_SIZE>
+struct XFileBufWriteIO : public core::XFile
+{
+    static constexpr size_t SKIP_BUF_SIZE = BUF_SIZE / 2;
+
+    static_assert(core::bitUtil::IsPowerOfTwo(BUF_SIZE));
+    static_assert(SKIP_BUF_SIZE <= BUF_SIZE, "Skip buffer size must be less than buffer size");
+
+public:
+    XFileBufWriteIO(core::XFile* pFile) :
+        pFile_(pFile),
+        bufSize_(0)
+    {
+    }
+
+    ~XFileBufWriteIO() X_FINAL {
+        flushBuffer();
+    }
+
+
+    size_t read(void* pBuf, size_t len) X_FINAL
+    {
+        flushBuffer();
+
+        return pFile_->read(pBuf, len);
+    }
+
+    size_t write(const void* pBuf, size_t len) X_FINAL
+    {
+        // if above certain size write direct.
+        if (len >= SKIP_BUF_SIZE) {
+            flushBuffer();
+            return pFile_->write(pBuf, len);
+        }
+
+        size_t spaceInBuffer = BUF_SIZE - bufSize_;
+        if (spaceInBuffer < len) {
+            flushBuffer();
+        }
+
+        std::memcpy(&buf_[bufSize_], pBuf, len);
+        bufSize_ += len;
+
+        return len;
+    }
+
+    X_INLINE void seek(int64_t position, core::SeekMode::Enum origin) X_FINAL
+    {
+        flushBuffer();
+
+        pFile_->seek(position, origin);
+    }
+
+    X_INLINE uint64_t remainingBytes(void) const X_FINAL
+    {
+        return pFile_->remainingBytes();
+    }
+
+    X_INLINE uint64_t tell(void) const X_FINAL
+    {
+        return pFile_->tell();
+    }
+
+    X_INLINE void setSize(int64_t numBytes) X_FINAL
+    {
+        pFile_->setSize(numBytes);
+    }
+
+private:
+
+    X_INLINE void flushBuffer(void)
+    {
+        if (bufSize_ == 0) {
+            return;
+        }
+
+        pFile_->write(buf_, bufSize_);
+        bufSize_ = 0;
+    }
+
+private:
+    core::XFile* pFile_;
+
+    size_t bufSize_;
+    uint8_t buf_[BUF_SIZE];
+};
+
+
+
 // stuff for io requests
 X_DECLARE_ENUM(IoRequest)
 (
