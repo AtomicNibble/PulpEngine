@@ -511,6 +511,8 @@ namespace PNG
 
     bool XTexLoaderPNG::saveTexture(core::XFile* file, const XTextureFile& imgFile, core::MemoryArenaBase* swapArena)
     {
+        core::XFileBufWriteIO<256> bufferdFile(file);
+
         // some validation.
         if (imgFile.getNumMips() > 1) {
             X_ERROR("TexturePNG", "Can't save image with mips");
@@ -542,7 +544,7 @@ namespace PNG
 
         core::Crc32* pCrc = gEnv->pCore->GetCrc32();
 
-        file->writeObj(PNG_FILE_MAGIC);
+        bufferdFile.writeObj(PNG_FILE_MAGIC);
 
         // write a IHDR
         IHDR ihdr;
@@ -555,9 +557,9 @@ namespace PNG
         ihdr.filter = FilterMethod::Adaptivee;         // filter method
         ihdr.interLace = InterlaceMethod::None;        // interlace method
 
-        file->writeObj(core::Endian::swap<int32_t>(IHDR::TAG_SIZE));
-        file->writeObj(ihdr);
-        file->writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(ihdr)));
+        bufferdFile.writeObj(core::Endian::swap<int32_t>(IHDR::TAG_SIZE));
+        bufferdFile.writeObj(ihdr);
+        bufferdFile.writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(ihdr)));
 
         // complete my ego.
         {
@@ -569,10 +571,10 @@ namespace PNG
             pCrc->Update(str.c_str(), str.length(), crc);
             crc = pCrc->Finish(crc);
 
-            file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length() + 1)));
-            file->writeObj(tEXt::TAG_ID);
-            file->write(str.c_str(), str.length() + 1);
-            file->writeObj(core::Endian::swap(crc));
+            bufferdFile.writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length() + 1)));
+            bufferdFile.writeObj(tEXt::TAG_ID);
+            bufferdFile.write(str.c_str(), str.length() + 1);
+            bufferdFile.writeObj(core::Endian::swap(crc));
         }
 
         // now we write the data.
@@ -594,10 +596,10 @@ namespace PNG
             crc = pCrc->Finish(crc);
 
             // write it.
-            file->writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(len)));
-            file->writeObj(IDAT::TAG_ID);
-            file->write(pData, len);
-            file->writeObj(core::Endian::swap(crc));
+            bufferdFile.writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(len)));
+            bufferdFile.writeObj(IDAT::TAG_ID);
+            bufferdFile.write(pData, len);
+            bufferdFile.writeObj(core::Endian::swap(crc));
         }, core::Compression::CompressLevel::NORMAL);
 
         zlib.setBufferSize(BLOCK_SIZE);
@@ -659,9 +661,9 @@ namespace PNG
             X_ASSERT(pSrcCur <= (pSrc + srcSize), "Out of range")(pSrcCur, pSrc, srcSize); 
         }
 
-        file->writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));
-        file->writeObj(IEND::TAG_ID);
-        file->writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(IEND::TAG_ID)));
+        bufferdFile.writeObj(core::Endian::swap<int32_t>(IEND::TAG_SIZE));
+        bufferdFile.writeObj(IEND::TAG_ID);
+        bufferdFile.writeObj(core::Endian::swap(pCrc->GetCRC32OfObject(IEND::TAG_ID)));
         return true;
     }
 
