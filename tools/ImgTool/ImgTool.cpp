@@ -86,6 +86,7 @@ namespace
         X_LOG0("ImgTool", "^6-of^7		(output file, default: file + fmt ext) ^9not-required");
         X_LOG0("ImgTool", "^6-dim^7		(dimensions) ^9not-required");
         X_LOG0("ImgTool", "^6-fmt^7		(output file format) ^9not-required");
+        X_LOG0("ImgTool", "^6-force^7	(force) ^9not-required");
     }
 
 } // namespace
@@ -94,7 +95,6 @@ X_NAMESPACE_BEGIN(texture)
 
 namespace
 {
-   
 
     bool Process(ImgToolArena& arena)
     {
@@ -105,6 +105,7 @@ namespace
         Vec2<uint16_t> dim;
 
         bool resize = false;
+        bool force = false;
 
         ImgFileFormat::Enum outputFileFmt = ImgFileFormat::TGA;
 
@@ -145,6 +146,17 @@ namespace
                     return false;
                 }
             }
+
+            const wchar_t* pForce = gEnv->pCore->GetCommandLineArgForVarW(L"force");
+            if (pForce) {
+                // TOOD: hack - make it work like a flag.
+                if (core::strUtil::strlen(pForce) == 0) {
+                    force = true;
+                }
+                else {
+                    force = core::strUtil::StringToBool(pForce);
+                }
+            }
         }
 
         if (outFile.isEmpty())
@@ -158,8 +170,13 @@ namespace
 
         // output exists?
         if (gEnv->pFileSys->fileExistsOS(outFile)) {
-            X_WARNING("ImgTool", "Target already exsists skipping");
-            return true;
+            if (force) {
+                X_WARNING("ImgTool", "Target already exsists overwriting");
+            }
+            else {
+                X_WARNING("ImgTool", "Target already exsists skipping");
+                return true;
+            }
         }
 
         X_LOG0("ImgTool", "Loading: \"%ls\"", inFile.c_str());
