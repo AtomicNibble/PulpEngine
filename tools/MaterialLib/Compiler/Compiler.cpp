@@ -181,7 +181,7 @@ bool MaterialCompiler::loadFromJson(core::string& str)
 			if (d.HasMember(textureDesc.propName.c_str())) {
 				auto& value = d[textureDesc.propName.c_str()];
 
-				if (value.GetStringLength() > 9) {
+				if (value.GetStringLength() > 0) {
 					tex.value.assign(value.GetString(), value.GetStringLength());
 				}
 			}
