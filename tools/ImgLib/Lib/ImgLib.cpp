@@ -657,13 +657,19 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
         case ImgFileFormat::DDS:
         case ImgFileFormat::TGA:
         case ImgFileFormat::PSD:
-            // re compress.
+            if (compAlgo == targetAlgo) {
+                return true;
+            }
+
             break;
 
         case ImgFileFormat::JPG:
             // just store JGP no real gains to be had.
             // or can convert to TGA and compress, but don't see point.
             targetAlgo = core::Compression::Algo::STORE;
+            if (compAlgo == targetAlgo) {
+                return true;
+            }
             break;
 
         case ImgFileFormat::PNG:
@@ -675,8 +681,12 @@ bool ImgLib::Repack(IConverterHost& host, assetDb::AssetId assetId) const
                 return false;
             }
 
+            // why do we store rgb8 as png still?
             if (srcImg.getFormat() == Texturefmt::R8G8B8) {
                 targetAlgo = core::Compression::Algo::STORE;
+                if (compAlgo == targetAlgo) {
+                    return true;
+                }
                 break;
             }
 
