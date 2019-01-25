@@ -59,9 +59,16 @@ namespace Compression
         X_NO_ASSIGN(LZ4);
     };
 
-    class LZ4HC : public LZ4
+    class LZ4HC : private LZ4
     {
     public:
+        static Algo::Enum getAlgo(void);
+
+        using LZ4::maxSourceSize;
+        using LZ4::requiredDeflateDestBuf;
+        using LZ4::inflate;
+
+
         // none buffed single step inflate / deflate.
         static bool deflate(const void* pSrcBuf, size_t srcBufLen,
             void* pDstBuf, size_t destBufLen, size_t& destLenOut,

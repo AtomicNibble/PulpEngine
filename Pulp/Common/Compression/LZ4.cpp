@@ -103,6 +103,12 @@ namespace Compression
 
     // ---------------------------------------
 
+
+    Algo::Enum LZ4HC::getAlgo(void)
+    {
+        return Algo::LZ4HC;
+    }
+
     bool LZ4HC::deflate(const void* pSrcBuf, size_t srcBufLen,
         void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
     {

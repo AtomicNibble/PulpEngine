@@ -45,9 +45,15 @@ namespace Compression
         X_NO_ASSIGN(LZ5);
     };
 
-    class LZ5HC : public LZ5
+    class LZ5HC : private LZ5
     {
     public:
+        static Algo::Enum getAlgo(void);
+
+        using LZ5::maxSourceSize;
+        using LZ5::requiredDeflateDestBuf;
+        using LZ5::inflate;
+
         // none buffed single step inflate / deflate.
         static bool deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
             void* pDstBuf, size_t destBufLen, size_t& destLenOut,

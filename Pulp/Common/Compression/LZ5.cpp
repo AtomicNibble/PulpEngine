@@ -163,6 +163,11 @@ namespace Compression
 
     // ---------------------------------------
 
+    Algo::Enum LZ5HC::getAlgo(void)
+    {
+        return Algo::LZ5HC;
+    }
+
     bool LZ5HC::deflate(core::MemoryArenaBase* arena, const void* pSrcBuf, size_t srcBufLen,
         void* pDstBuf, size_t destBufLen, size_t& destLenOut, CompressLevel::Enum lvl)
     {
