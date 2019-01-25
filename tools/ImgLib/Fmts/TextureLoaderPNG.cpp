@@ -185,7 +185,7 @@ namespace PNG
 
         const Png_Header* pHdr = reinterpret_cast<const Png_Header*>(fileData.data());
 
-        return pHdr->magic == PNG_FILE_MAGIC;
+        return pHdr->isValid();
     }
 
     // ITextureFmt
