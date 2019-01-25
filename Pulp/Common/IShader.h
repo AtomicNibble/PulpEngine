@@ -151,11 +151,13 @@ namespace shader
 
     // -----------------------------------------------------------------------
 
+#if 0
     X_DECLARE_ENUM8(ShaderTextureIdx)
     (
         DIFFUSE,
-        BUMP,
-        SPEC);
+        BUMP
+        );
+#endif
 
     X_DECLARE_ENUM8(ShaderType)
     (
