@@ -2413,11 +2413,11 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
     auto nameHash = getNameHash(newName.c_str(), newName.length());
 
     sql::SqlLiteTransaction trans(db_);
-    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET name = ? hash = ? WHERE type = ? AND name = ?");
+    sql::SqlLiteCmd cmd(db_, "UPDATE file_ids SET name = ?, nameHash = ? WHERE type = ? AND name = ?");
     cmd.bind(1, newName);
     cmd.bind(2, static_cast<int32_t>(nameHash));
     cmd.bind(3, type);
-    cmd.bind(4, name.c_str());
+    cmd.bind(4, name);
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
