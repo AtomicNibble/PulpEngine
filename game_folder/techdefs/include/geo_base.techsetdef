@@ -26,7 +26,7 @@ Sampler( "normalSampler" )
 Texture( "colorMap" )
 {
     image = Image( <mapColor, "default/$white"> )
-
+    semantic = "diffuse"
     ass = AssProps()
     {
         cat  = "Color"
@@ -37,7 +37,7 @@ Texture( "colorMap" )
 Texture( "normalMap" )
 {
     image = Image( <mapNormal, "default/$identitynormal"> )
-
+    semantic = "normal"
     ass = AssProps()
     {
         cat  = "Normal"
@@ -48,7 +48,7 @@ Texture( "normalMap" )
 Texture( "roughnessMap" )
 {
     image = Image( <mapRoughness, "default/$black"> )
-
+    semantic = "rougthness"
     ass = AssProps()
     {
         cat  = "Roughness"
@@ -59,7 +59,7 @@ Texture( "roughnessMap" )
 Texture( "ambientOcclusionMap" )
 {
     image = Image( <mapAmbientOcclusion, "default/$white"> )
-
+    semantic = "occlusion"
     ass = AssProps()
     {
         cat  = "AmbientOcclusion"
@@ -70,7 +70,7 @@ Texture( "ambientOcclusionMap" )
 Texture( "metallicMap" )
 {
     image = Image( <mapMetallic, "default/$black"> )
-
+    semantic = "metallic"
     ass = AssProps()
     {
         cat  = "Metallic"
@@ -81,7 +81,7 @@ Texture( "metallicMap" )
 Texture( "displacementMap" )
 {
     image = Image( <mapDisplacement, "default/$black"> )
-
+    semantic = "displacement"
     ass = AssProps()
     {
         cat  = "Displacement"
