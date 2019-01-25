@@ -36,7 +36,8 @@ TextureManager::TextureManager(core::MemoryArenaBase* arena) :
     streamQueue_(arena),
     currentDeviceTexId_(0),
     pTexDefault_(nullptr),
-    pTexDefaultBump_(nullptr)
+    pTexDefaultBump_(nullptr),
+    pTexDefaultWhite_(nullptr)
 {
     defaultLookup_.fill(nullptr);
 }
@@ -132,6 +133,10 @@ bool TextureManager::asyncInitFinalize(void)
         X_ERROR("Texture", "failed to load default bump texture: %s", texture::TEX_DEFAULT_BUMP);
         return false;
     }
+    if (pTexDefaultWhite_->loadFailed()) {
+        X_ERROR("Texture", "failed to load default bump texture: %s", texture::TEX_DEFAULT_WHITE);
+        return false;
+    }
 
     return std::all_of(defaultLookup_.begin(), defaultLookup_.end(), [](Texture* pTex) { return pTex->isLoaded(); });
 }
@@ -225,13 +230,18 @@ bool TextureManager::loadDefaultTextures(void)
 {
     using namespace texture;
 
+    static_assert(render::TextureSlot::ENUM_COUNT == 7, "More slots? this might need updating");
+
     TextureFlags default_flags = TextureFlags::DONT_RESIZE | TextureFlags::DONT_STREAM;
 
     pTexDefault_ = loadTexture(core::string_view(TEX_DEFAULT_DIFFUSE), default_flags);
     pTexDefaultBump_ = loadTexture(core::string_view(TEX_DEFAULT_BUMP), default_flags);
+    pTexDefaultWhite_ = loadTexture(core::string_view(TEX_DEFAULT_WHITE), default_flags);
 
-    defaultLookup_.fill(pTexDefault_);
+    defaultLookup_.fill(pTexDefaultWhite_);
+    defaultLookup_[render::TextureSlot::DIFFUSE] = pTexDefault_;
     defaultLookup_[render::TextureSlot::NORMAL] = pTexDefaultBump_;
+    defaultLookup_[render::TextureSlot::UNBOUND] = nullptr;
 
     return true;
 }
@@ -244,9 +254,13 @@ void TextureManager::releaseDefaultTextures(void)
     if (pTexDefaultBump_) {
         releaseTexture(pTexDefaultBump_);
     }
+    if (pTexDefaultWhite_) {
+        releaseTexture(pTexDefaultWhite_);
+    }
 
     pTexDefault_ = nullptr;
     pTexDefaultBump_ = nullptr;
+    pTexDefaultWhite_ = nullptr;
 }
 
 void TextureManager::addLoadRequest(TextureResource* pTexture)

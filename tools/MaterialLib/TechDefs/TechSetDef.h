@@ -109,7 +109,9 @@ namespace techset
 
     struct Texture
     {
-        Texture() = default;
+        Texture() :
+            texSlot(render::TextureSlot::UNBOUND)
+        {}
 
         bool SSave(core::XFile* pFile) const;
         bool SLoad(core::XFile* pFile);

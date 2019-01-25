@@ -135,6 +135,7 @@ private:
 
     Texture* pTexDefault_;
     Texture* pTexDefaultBump_;
+    Texture* pTexDefaultWhite_;
 
     TextureSlotArr defaultLookup_;
 };

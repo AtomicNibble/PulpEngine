@@ -186,12 +186,12 @@ X_DECLARE_ENUM8(TextureSlot)
 (
     DIFFUSE,
     NORMAL,
-    DETAIL,
-    SPECCOL,
-    CAMO,
+    ROUGTHNESS,
     OCCLUSION,
-    OPACITY,
-    ROUGTHNESS);
+    METALLIC,
+    DISPLACEMENT,
+    UNBOUND
+);
 
 static_assert(MAX_TEXTURES_BOUND >= TextureSlot::ENUM_COUNT, "Slots bound must be greater or equal to num slots");
 

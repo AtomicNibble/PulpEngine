@@ -492,30 +492,26 @@ namespace Util
 
     render::TextureSlot::Enum TextureSlotFromStr(const char* pBegin, const char* pEnd)
     {
-        static_assert(render::TextureSlot::ENUM_COUNT == 8, "Added TextureSlots? this code needs updating.");
+        static_assert(render::TextureSlot::ENUM_COUNT == 7, "Added TextureSlots? this code needs updating.");
 
         const size_t len = (pEnd - pBegin);
         switch (core::Hash::Fnv1aHash(pBegin, len)) {
-            case "camo"_fnv1a:
-                return render::TextureSlot::CAMO;
-            case "detail"_fnv1a:
-                return render::TextureSlot::DETAIL;
             case "diffuse"_fnv1a:
                 return render::TextureSlot::DIFFUSE;
             case "normal"_fnv1a:
                 return render::TextureSlot::NORMAL;
-            case "occlusion"_fnv1a:
-                return render::TextureSlot::OCCLUSION;
-            case "opacity"_fnv1a:
-                return render::TextureSlot::OPACITY;
             case "rougthness"_fnv1a:
                 return render::TextureSlot::ROUGTHNESS;
-            case "speccol"_fnv1a:
-                return render::TextureSlot::SPECCOL;
+            case "occlusion"_fnv1a:
+                return render::TextureSlot::OCCLUSION;
+            case "metallic"_fnv1a:
+                return render::TextureSlot::METALLIC;
+            case "displacement"_fnv1a:
+                return render::TextureSlot::DISPLACEMENT;
 
             default:
                 X_ERROR("Mtl", "Unknown TextureSlot func: '%.*s' (case-sen)", len, pBegin);
-                return render::TextureSlot::CAMO;
+                return render::TextureSlot::UNBOUND;
         }
     }
 
