@@ -313,7 +313,7 @@ namespace strUtil
     template<typename T>
     inline T StringToInt(const char* startInclusive, const char* endExclusive, const char** pEndPtr, int32_t base)
     {
-        T val;
+        T val = T();
         auto res = std::from_chars(startInclusive, endExclusive, val, base);
         *pEndPtr = res.ptr;
         return val;
