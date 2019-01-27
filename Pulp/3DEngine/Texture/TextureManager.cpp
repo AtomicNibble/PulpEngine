@@ -241,7 +241,6 @@ bool TextureManager::loadDefaultTextures(void)
     defaultLookup_.fill(pTexDefaultWhite_);
     defaultLookup_[render::TextureSlot::DIFFUSE] = pTexDefault_;
     defaultLookup_[render::TextureSlot::NORMAL] = pTexDefaultBump_;
-    defaultLookup_[render::TextureSlot::UNBOUND] = nullptr;
 
     return true;
 }
