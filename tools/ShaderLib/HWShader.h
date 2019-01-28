@@ -98,7 +98,7 @@ namespace shader
 
     private:
         bool compileFromSource(const ByteArr& source, CompileFlags compileFlags);
-        bool reflectShader(ID3D10Blob * pShaderBlob);
+        bool reflectShader(ID3D10Blob* pShaderBlob);
 
     private:
         void logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, core::string_view errorStr);
