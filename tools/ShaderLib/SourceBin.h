@@ -16,10 +16,6 @@ namespace shader
 
     class SourceBin
     {
-        typedef core::FixedHashTable<core::string, SourceFile*> ShaderSourceMap;
-        typedef core::Array<SourceFile*> SourceRefArr;
-        typedef core::Array<uint8_t> ByteArr;
-
         // Shader Source
         typedef core::MemoryArena<
             core::PoolAllocator,
@@ -35,6 +31,11 @@ namespace shader
 #endif // !X_ENABLE_MEMORY_SIMPLE_TRACKING
             >
             PoolArena;
+
+    public:
+        typedef core::FixedHashTable<core::string, SourceFile*> ShaderSourceMap;
+        typedef core::Array<SourceFile*> SourceRefArr;
+        typedef core::Array<uint8_t> ByteArr;
 
     public:
         struct SourceInfo
