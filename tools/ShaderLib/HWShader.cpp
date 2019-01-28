@@ -529,8 +529,8 @@ namespace shader
                         type = texture::TextureType::TCube;
                         break;
                     default:
-                        X_WARNING("Shader", "Unhandled texture dimension: %" PRIi32, InputBindDesc.Dimension);
-                        break;
+                        X_ERROR("Shader", "Unhandled texture dimension: %" PRIi32, InputBindDesc.Dimension);
+                        return false;
                 }
 
                 textures_.emplace_back(
