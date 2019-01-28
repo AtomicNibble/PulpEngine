@@ -188,7 +188,9 @@ namespace shader
                 return false;
             }
 
-            if (!pHWShader->compile(source, flags)) {
+            const bool compiled = pHWShader->compile(source, flags);
+
+            if (!compiled) {
                 auto errLine = pHWShader->getErrorLineNumber();
                 if (errLine >= 0) {
                     auto info = sourceBin_.getSourceInfoForMergedLine(pSource, errLine);
@@ -199,20 +201,14 @@ namespace shader
                 else {
                     X_ERROR("ShadersManager", "Failed to compile shader");
                 }
-
-                return false;
             }
 
             if (vars_.writeMergedSource()) {
-                X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe, to dispatch background write")(); 
-
-                // just dispatch a async write request.
-                // the source memory will get cleaned up for us once complete.
-                core::IoRequestOpenWrite req(std::move(source));
-                getShaderCompileSrc(pHWShader, req.path);
-                req.callback.Bind<XShaderManager, &XShaderManager::IoCallback>(this);
-
-                gEnv->pFileSys->AddIoRequestToQue(req);
+                saveMergedSource(pHWShader, std::move(source));
+            }
+            
+            if (!compiled) {
+                return false;
             }
 
             // save it
@@ -242,6 +238,19 @@ namespace shader
         }
 
         return true;
+    }
+
+    void XShaderManager::saveMergedSource(const XHWShader* pHWShader, ShaderSourceByteArr&& source)
+    {
+        X_ASSERT(arena_->isThreadSafe(), "Arena must be thread safe, to dispatch background write")();
+
+        // just dispatch a async write request.
+        // the source memory will get cleaned up for us once complete.
+        core::IoRequestOpenWrite req(std::move(source));
+        getShaderCompileSrc(pHWShader, req.path);
+        req.callback.Bind<XShaderManager, &XShaderManager::IoCallback>(this);
+
+        gEnv->pFileSys->AddIoRequestToQue(req);
     }
 
     void XShaderManager::compileShader_job(CompileJobInfo* pJobInfo, uint32_t num)

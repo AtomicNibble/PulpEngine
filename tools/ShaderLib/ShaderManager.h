@@ -33,6 +33,8 @@ namespace shader
 
     class XShaderManager : private core::IAssetLoadSink
     {
+        typedef SourceBin::ByteArr ShaderSourceByteArr;
+
         // HWShaders
         typedef core::AssetContainer<XHWShader, MAX_HW_SHADERS, core::MultiThreadPolicy<core::Spinlock>> HWShaderContainer;
         typedef HWShaderContainer::Resource HWShaderResource;
@@ -101,6 +103,7 @@ namespace shader
         X_INLINE ShaderBin& getBin(void);
 
     private:
+        void saveMergedSource(const XHWShader* pShader, ShaderSourceByteArr&& source);
         bool compilePermatation_Int(ShaderPermatation* pPerm);
 
         void compileShader_job(CompileJobInfo* pJobInfo, uint32_t num);
