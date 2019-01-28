@@ -368,27 +368,30 @@ namespace shader
         const core::string& entry, const core::string& customDefines, const core::string& sourceFile,
         const shader::PermatationFlags permFlags, ILFlags ILFlags)
     {
-        core::StackString256 name;
-
-        const char* pEntry = DEFAULT_SHADER_ENTRY[type];
-        if (entry.isNotEmpty()) {
-            pEntry = entry.c_str();
-        }
-
         core::Hash::SHA1 sha1;
         core::Hash::SHA1Digest::String sha1Buf;
-        sha1.update(pEntry);
+
+        if (entry.isNotEmpty()) {
+            sha1.update(entry.data(), entry.length());
+        }
+        else {
+            const char* pEntry = DEFAULT_SHADER_ENTRY[type];
+            sha1.update(pEntry);
+        }
+
         sha1.update(customDefines.begin(), customDefines.length());
         sha1.update(permFlags);
         sha1.update(ILFlags);
         sha1.update(type); // include this?
         auto digest = sha1.finalize();
 
-        name.appendFmt("%s@", sourceFile.c_str());
+        core::StackString256 name;
+        name.append(sourceFile.data(), sourceFile.length());
+        name.append('@', 1);
         name.append(digest.ToString(sha1Buf));
 
 #if X_DEBUG
-        X_LOG1("Shader", "Load: \"%s\"", name.c_str());
+        X_LOG1("Shader", "Load: \"%.*s\"", name.length(), name.data());
 #endif // !X_DEBUG
 
         core::string_view nameView(name);
