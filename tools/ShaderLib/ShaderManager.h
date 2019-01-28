@@ -109,7 +109,7 @@ namespace shader
             const core::string& sourceFile, const shader::PermatationFlags permFlags, ILFlags ILFlags);
 
     private:
-        static void getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut);
+        static void getShaderCompileSrc(const XHWShader* pShader, core::Path<char>& srcOut);
 
         void freeSourcebin(void);
         void freeHwShaders(void);

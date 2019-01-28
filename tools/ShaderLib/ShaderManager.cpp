@@ -349,10 +349,11 @@ namespace shader
         X_DELETE(pPerm, &permArena_);
     }
 
-    void XShaderManager::getShaderCompileSrc(XHWShader* pShader, core::Path<char>& srcOut)
+    void XShaderManager::getShaderCompileSrc(const XHWShader* pShader, core::Path<char>& srcOut)
     {
+        const auto& name = pShader->getName();
         srcOut.clear();
-        srcOut.appendFmt("shaders/temp/%s.fxcb.%s", pShader->getName().c_str(), SOURCE_FILE_EXTENSION);
+        srcOut.appendFmt("shaders/temp/%.*s.fxcb.%s", name.length(), name.data(), SOURCE_FILE_EXTENSION);
 
         // make sure the directory is created.
         gEnv->pFileSys->createDirectoryTree(srcOut, core::VirtualDirectory::BASE);
