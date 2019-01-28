@@ -26,7 +26,7 @@ namespace shader
         struct ShaderBinHeader
         {
             static const uint32_t X_SHADER_BIN_FOURCC = X_TAG('X', 'S', 'C', 'B');
-            static const uint32_t X_SHADER_BIN_VERSION = 6; // change this to force all shaders to be recompiled.
+            static const uint32_t X_SHADER_BIN_VERSION = 7; // change this to force all shaders to be recompiled.
 
             uint32_t forcc;
             uint8_t version;
@@ -50,9 +50,13 @@ namespace shader
             uint8_t numCBufs;
             uint8_t numBuffers;
             uint16_t numInstructions;
-
+            
             // 4
             PermatationFlags permFlags;
+            
+            // 8
+            XHWShader::Hasher::HashVal inputBindHash;
+
             // 4
             ILFlags ILFlags;
 
@@ -62,13 +66,14 @@ namespace shader
             CompileFlags compileFlags;
             uint8_t _pad[1];
 
+
             X_INLINE const bool isValid(void) const
             {
                 return forcc == X_SHADER_BIN_FOURCC;
             }
         };
 
-        X_ENSURE_SIZE(ShaderBinHeader, 48);
+        X_ENSURE_SIZE(ShaderBinHeader, 56);
 
     } // namespace
 
@@ -128,6 +133,7 @@ namespace shader
         hdr.numCBufs = pShader->getNumConstantBuffers();
         hdr.numBuffers = pShader->getNumBuffers();
         hdr.numInstructions = pShader->getNumInstructions();
+        hdr.inputBindHash = pShader->getInputBindHash();
 
         hdr.permFlags = pShader->getPermFlags();
         hdr.ILFlags = pShader->getILFlags();
@@ -302,6 +308,7 @@ namespace shader
         pShader->compileFlags_ = hdr.compileFlags;
         pShader->numInputParams_ = hdr.numInputParams;
         pShader->numInstructions_ = hdr.numInstructions;
+        pShader->inputBindHash_ = hdr.inputBindHash;
         pShader->numRenderTargets_ = hdr.numRenderTargets;
         X_ASSERT(pShader->getNumConstantBuffers() == hdr.numCBufs, "Cbuffer count not correct")();
 

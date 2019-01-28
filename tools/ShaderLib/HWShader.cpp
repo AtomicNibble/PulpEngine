@@ -628,15 +628,46 @@ namespace shader
         pShaderReflection->Release();
 
         // save some data.
+        numInstructions_ = safe_static_cast<int32_t>(shaderDesc.InstructionCount);
+        numInputParams_ = safe_static_cast<int32_t>(shaderDesc.InputParameters);
         if (type_ == ShaderType::Pixel) {
             numRenderTargets_ = safe_static_cast<int32_t>(shaderDesc.OutputParameters);
         }
-        else {
-            numRenderTargets_ = 0;
+
+        // include numRenderTargets_ ?
+        core::Hash::xxHash64 hash;
+        hash.update(numInputParams_);
+        hash.update(IlFmt_);
+
+        for (const auto& cb : cbuffers_)
+        {
+            hash.update(cb.getHash());
+        }
+        for (const auto& sampler : samplers_)
+        {
+            auto& name = sampler.getName();
+            hash.updateBytes(name.data(), name.length());
+            hash.update(sampler.getBindPoint());
+            hash.update(sampler.getBindCount());
+        }
+        for (const auto& texture : textures_)
+        {
+            auto& name = texture.getName();
+            hash.updateBytes(name.data(), name.length());
+            hash.update(texture.getBindPoint());
+            hash.update(texture.getBindCount());
+            hash.update(texture.getType());
+        }
+        for (const auto& buffer : buffers_)
+        {
+            auto& name = buffer.getName();
+            hash.updateBytes(name.data(), name.length());
+            hash.update(buffer.getBindPoint());
+            hash.update(buffer.getBindCount());
+            hash.update(buffer.getType());
         }
 
-        numInstructions_ = safe_static_cast<int32_t>(shaderDesc.InstructionCount);
-        numInputParams_ = safe_static_cast<int32_t>(shaderDesc.InputParameters);
+        inputBindHash_ = hash.finalize();
         return true;
     }
 

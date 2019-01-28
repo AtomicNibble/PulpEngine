@@ -42,6 +42,9 @@ namespace shader
         friend class ShaderBin;
 
     public:
+        typedef core::Hash::xxHash64 Hasher;
+        typedef Hasher::HashVal HashVal;
+
         typedef core::Spinlock LockType;
 
     public:
@@ -69,6 +72,7 @@ namespace shader
         X_INLINE int32_t getNumBuffers(void) const;
         X_INLINE int32_t getNumInputParams(void) const;
         X_INLINE int32_t getNumInstructions(void) const;
+        X_INLINE HashVal getInputBindHash(void) const;
         X_INLINE CompileFlags getCompileFlags(void) const;
         X_INLINE int32_t getErrorLineNumber(void) const;
 
@@ -133,15 +137,17 @@ namespace shader
         ILFlags ILFlags_;
 
         // save info from shader reflection.
+        int32_t numInstructions_;
         int32_t numInputParams_;
         int32_t numRenderTargets_;
-        int32_t numInstructions_;
         CompileFlags compileFlags_;
 
         CBufferArr cbuffers_;
         SamplerArr samplers_;
         TextureArr textures_;
         BufferArr buffers_;
+
+        HashVal inputBindHash_;
 
         ByteArr bytecode_;
     };

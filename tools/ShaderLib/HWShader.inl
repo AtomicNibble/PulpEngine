@@ -82,6 +82,10 @@ namespace shader
     {
         return numInstructions_;
     }
+    X_INLINE XHWShader::HashVal XHWShader::getInputBindHash(void) const
+    {
+        return inputBindHash_;
+    }
     X_INLINE CompileFlags XHWShader::getCompileFlags(void) const
     {
         return compileFlags_;
