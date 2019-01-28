@@ -195,7 +195,7 @@ namespace shader
     static const char* DEFAULT_SHADER_ENTRY[ShaderStage::FLAGS_COUNT] = {
         "vs_main",
         "ps_main",
-        "gs_main"
+        "gs_main",
         "hs_main",
         "ds_main",
     };
