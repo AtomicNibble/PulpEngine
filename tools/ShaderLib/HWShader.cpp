@@ -31,6 +31,8 @@ namespace shader
         entryPoint_(entry),
         customDefines_(customDefines),
         sourceFile_(sourceFile),
+        id_(-1),
+        errLineNo_(-1),
         status_(ShaderStatus::NotCompiled),
         permFlags_(permFlags),
         type_(type),
@@ -44,8 +46,7 @@ namespace shader
         textures_(arena),
         buffers_(arena),
         bytecode_(arena),
-        id_(-1),
-        errLineNo_(-1)
+        inputBindHash_(0)
     {
 #if X_ENABLE_RENDER_SHADER_RELOAD
         compileCount_ = 0;

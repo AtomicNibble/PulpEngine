@@ -115,11 +115,11 @@ namespace shader
         core::string sourceFile_;
 
         int32_t id_;
+        int32_t errLineNo_;
+
 #if X_ENABLE_RENDER_SHADER_RELOAD
         int32_t compileCount_;
 #endif // !X_ENABLE_RENDER_SHADER_RELOAD
-
-        int32_t errLineNo_;
 
         // status
         ShaderStatus::Enum status_;
