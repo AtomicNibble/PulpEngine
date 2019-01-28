@@ -9,6 +9,7 @@
 #include <IFileSys.h>
 #include <Threading\JobSystem2.h>
 
+#include <wrl/client.h>
 #include <D3Dcompiler.h>
 #include <../../3rdparty/source/directx/D3DX9Shader.h>
 
@@ -219,9 +220,9 @@ namespace shader
 
         // add blank one.
         macros.push_back({ nullptr, nullptr });
-
-        ID3DBlob* pBlob = nullptr;
-        ID3DBlob* pErrorBlob = nullptr;
+         
+        Microsoft::WRL::ComPtr<ID3DBlob> blob;
+        Microsoft::WRL::ComPtr<ID3DBlob> errorBlob;
 
         core::StopWatch timer;
         core::string sourceName = name_ + "." + SOURCE_MERGED_FILE_EXTENSION;
@@ -241,13 +242,13 @@ namespace shader
             Util::getProfileFromType(type_),
             D3DCompileflags, // Flags
             0,               // Flags2
-            &pBlob,
-            &pErrorBlob);
+            &blob,
+            &errorBlob);
 
-        if (FAILED(hr) || pErrorBlob || !pBlob) {
-            if (pErrorBlob) {
-                const char* pErrStr = static_cast<const char*>(pErrorBlob->GetBufferPointer());
-                auto bufSize = static_cast<size_t>(pErrorBlob->GetBufferSize());
+        if (FAILED(hr) || errorBlob || !blob) {
+            if (errorBlob) {
+                const char* pErrStr = static_cast<const char*>(errorBlob->GetBufferPointer());
+                auto bufSize = static_cast<size_t>(errorBlob->GetBufferSize());
 
                 logErrorStr(id, hr, sourceName, core::string_view(pErrStr, bufSize));
             }
@@ -255,51 +256,43 @@ namespace shader
                 X_ERROR("Shader", "(%" PRIu32 ") Failed to compile: %x", id, hr);
             }
 
-            core::SafeReleaseDX(pErrorBlob);
-            core::SafeReleaseDX(pBlob);
             return false;
         }
 
-        if (!reflectShader(pBlob)) {
-            core::SafeReleaseDX(pBlob);
+        if (!reflectShader(blob.Get())) {
             X_ERROR("Shader", "(%" PRIu32 ") Failed to reflect shader", id);
             return false;
         }
 
         {
-            ID3DBlob* pStripped = nullptr;
+            Microsoft::WRL::ComPtr<ID3DBlob> strippedBlob;
 
-            const size_t preStripSize = pBlob->GetBufferSize();
+            const size_t preStripSize = blob->GetBufferSize();
 
             hr = D3DStripShader(
-                pBlob->GetBufferPointer(),
-                pBlob->GetBufferSize(),
+                blob->GetBufferPointer(),
+                blob->GetBufferSize(),
                 D3DCOMPILER_STRIP_ROOT_SIGNATURE | // you silly slut.
                 D3DCOMPILER_STRIP_REFLECTION_DATA | D3DCOMPILER_STRIP_TEST_BLOBS,
-                &pStripped);
+                &strippedBlob);
 
             if (SUCCEEDED(hr)) {
                 if (vars_.compileDebug()) {
-                    const size_t strippedBytes = preStripSize - pStripped->GetBufferSize();
+                    const size_t strippedBytes = preStripSize - strippedBlob->GetBufferSize();
                     X_LOG0("Shader", "(%" PRIu32 ") Stripped %" PRIuS " bytes from shader", id, strippedBytes);
                 }
 
-                core::SafeReleaseDX(pBlob);
-                pBlob = pStripped;
+                blob = strippedBlob;
             }
             else {
-                core::SafeReleaseDX(pStripped);
                 X_ERROR("Shader", "(%" PRIu32 ") Failed to strip blob: %x", id, hr);
             }
         }
 
         // copy the byte code.
-        bytecode_.resize(pBlob->GetBufferSize());
-        std::memcpy(bytecode_.data(), pBlob->GetBufferPointer(), pBlob->GetBufferSize());
+        bytecode_.resize(blob->GetBufferSize());
+        std::memcpy(bytecode_.data(), blob->GetBufferPointer(), blob->GetBufferSize());
 
-        // release
-        core::SafeReleaseDX(pErrorBlob);
-        core::SafeReleaseDX(pBlob);
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         ++compileCount_;
