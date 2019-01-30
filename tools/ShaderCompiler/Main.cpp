@@ -146,10 +146,13 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
             if (con.Init()) {
                 con.setForceCompile(ForceModeEnabled());
+                
+                auto flags = render::shader::COMPILE_BAKE_FLAGS;
                 if (DebugCompile()) {
-                    con.setCompileFlags(
-                        render::shader::CompileFlag::Debug | render::shader::CompileFlag::OptimizationLvl0 | render::shader::CompileFlag::TreatWarningsAsErrors);
+                    flags = render::shader::COMPILE_DEBUG_FLAGS;
                 }
+                
+                con.setCompileFlags(flags);
 
                 if (!GetMode(mode)) {
                     mode = CompileMode::SINGLE;

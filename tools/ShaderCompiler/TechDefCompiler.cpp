@@ -10,8 +10,7 @@ namespace compiler
         techDefs_(arena),
         shaderMan_(arena)
     {
-        compileFlags_ |= render::shader::CompileFlag::OptimizationLvl3;
-        compileFlags_ |= render::shader::CompileFlag::TreatWarningsAsErrors;
+        compileFlags_ = render::shader::COMPILE_BAKE_FLAGS;
 
         // max comp.
         shaderMan_.getBin().setCompressionLvl(core::Compression::CompressLevel::HIGH);

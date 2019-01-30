@@ -300,9 +300,9 @@ namespace shader
         CompileFlags flags;
 
 #if X_DEBUG
-        flags = CompileFlags::OptimizationLvl0 | CompileFlags::Debug;
+		flags = COMPILE_DEBUG_FLAGS;
 #else
-        flags = CompileFlags::OptimizationLvl2;
+        flags = COMPILE_RELEASE_FLAGS;
 #endif // !X_DEBUG
 
         // we want to compile this then work out the cbuffer links.

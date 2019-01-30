@@ -373,6 +373,11 @@ typedef Flags<TechFlag> TechFlags;
 
     X_DECLARE_FLAG_OPERATORS(CompileFlags);
 
+    inline constexpr CompileFlags COMPILE_DEBUG_FLAGS = CompileFlag::Debug | CompileFlag::OptimizationLvl0;
+    inline constexpr CompileFlags COMPILE_RELEASE_FLAGS = CompileFlag::TreatWarningsAsErrors | CompileFlag::OptimizationLvl2;
+    inline constexpr CompileFlags COMPILE_BAKE_FLAGS = CompileFlag::TreatWarningsAsErrors | CompileFlag::OptimizationLvl3;
+
+
     struct IHWShader
     {
         virtual ~IHWShader() = default;
