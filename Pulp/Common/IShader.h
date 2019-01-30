@@ -358,7 +358,7 @@ typedef Flags<TechFlag> TechFlags;
 
     X_DECLARE_FLAG_OPERATORS(PermatationFlags);
 
-    X_DECLARE_FLAGS8(CompileFlag)
+    X_DECLARE_FLAGS(CompileFlag)
     (
         Debug,
         TreatWarningsAsErrors,
@@ -367,9 +367,10 @@ typedef Flags<TechFlag> TechFlags;
         OptimizationLvl2,
         OptimizationLvl3,
         PackMatrixRowMajor,
-        PackMatrixColumnMajor);
+        PackMatrixColumnMajor,
+        AllResourcesBound);
 
-    typedef Flags8<CompileFlag> CompileFlags;
+    typedef Flags<CompileFlag> CompileFlags;
 
     X_DECLARE_FLAG_OPERATORS(CompileFlags);
 

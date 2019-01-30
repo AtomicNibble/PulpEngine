@@ -134,6 +134,10 @@ namespace shader
             D3DCompileflags |= D3DCOMPILE_PACK_MATRIX_COLUMN_MAJOR;
         }
 
+        if (flags.IsSet(CompileFlag::AllResourcesBound)) {
+            D3DCompileflags |= D3DCOMPILE_ALL_RESOURCES_BOUND;;
+        }
+
         // allow 16 flags.
         core::FixedArray<D3D_SHADER_MACRO, 17> macros;
         std::array<char, 2048> macroBuffer;
