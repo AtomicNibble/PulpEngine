@@ -1058,23 +1058,28 @@ bool XLexer::ReadNumber(XLexToken& token)
         // decimal integer or floating point number or ip address
         dot = 0;
         negative = 0;
+
+        // only leading '-'
+        if (c == '-') {
+            negative = 1;
+            c = *(++current_);
+        }
+
         X_DISABLE_WARNING(4127)
         while (true)
-            X_ENABLE_WARNING(4127)
-            {
-                if (c >= '0' && c <= '9') {
-                }
-                else if (c == '.') {
-                    dot++;
-                }
-                else if (c == '-') {
-                    negative = 1;
-                }
-                else {
-                    break;
-                }
-                c = *(++current_);
+        {
+            if (c >= '0' && c <= '9') {
             }
+            else if (c == '.') {
+                dot++;
+            }
+            else {
+                break;
+            }
+            c = *(++current_);
+        }
+        X_ENABLE_WARNING(4127)
+
         if (c == 'e' && dot == 0) {
             //We have scientific notation without a decimal point
             dot++;
