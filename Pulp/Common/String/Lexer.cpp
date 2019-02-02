@@ -716,77 +716,75 @@ bool XLexer::ReadWhiteSpace(void)
 
     X_DISABLE_WARNING(4127)
     while (1)
-        X_ENABLE_WARNING(4127)
-        {
-            // skip white space
-            while (*current_ <= ' ') {
+    {
+        // skip white space
+        while (*current_ <= ' ') {
+            if (isEOF()) {
+                return false;
+            }
+            if (*current_ == '\n') {
+                curLine_++;
+            }
+            current_++;
+        }
+
+        // skip comments
+        if (*current_ == '/') {
+            // comments //
+            if (*(current_ + 1) == '/') {
+                current_++;
+                do {
+                    current_++;
+                    if (isEOF()) {
+                        return false;
+                    }
+                } while (*current_ != '\n');
+                curLine_++;
+                current_++;
                 if (isEOF()) {
                     return false;
                 }
-                if (*current_ == '\n') {
-                    curLine_++;
+                continue;
+            }
+            // comments /* */
+            else if (*(current_ + 1) == '*') {
+                current_++;
+                while (1) {
+                    current_++;
+                    if (isEOF()) {
+                        return false;
+                    }
+                    if (*current_ == '\n') {
+                        curLine_++;
+                    }
+                    else if (*current_ == '/') {
+                        if (*(current_ - 1) == '*') {
+                            break;
+                        }
+                        if (*(current_ + 1) == '*') {
+                            Warning("nested comment");
+                        }
+                    }
                 }
                 current_++;
-            }
 
-            // skip comments
-            if (*current_ == '/') {
-                // comments //
-                if (*(current_ + 1) == '/') {
-                    current_++;
-                    do {
-                        current_++;
-                        if (isEOF()) {
-                            return false;
-                        }
-                    } while (*current_ != '\n');
-                    curLine_++;
-                    current_++;
-                    if (isEOF()) {
-                        return false;
-                    }
-                    continue;
+                if (isEOF()) {
+                    return false;
                 }
-                // comments /* */
-                else if (*(current_ + 1) == '*') {
-                    current_++;
-                    X_DISABLE_WARNING(4127)
-                    while (1)
-                        X_ENABLE_WARNING(4127)
-                        {
-                            current_++;
-                            if (isEOF()) {
-                                return false;
-                            }
-                            if (*current_ == '\n') {
-                                curLine_++;
-                            }
-                            else if (*current_ == '/') {
-                                if (*(current_ - 1) == '*') {
-                                    break;
-                                }
-                                if (*(current_ + 1) == '*') {
-                                    Warning("nested comment");
-                                }
-                            }
-                        }
-                    current_++;
 
-                    if (isEOF()) {
-                        return false;
-                    }
+                current_++;
 
-                    current_++;
-
-                    if (isEOF()) {
-                        return false;
-                    }
-
-                    continue;
+                if (isEOF()) {
+                    return false;
                 }
+
+                continue;
             }
-            break;
         }
+        break;
+    }
+
+    X_ENABLE_WARNING(4127)
     return true;
 }
 
@@ -904,72 +902,70 @@ bool XLexer::ReadString(XLexToken& token, int32_t quote)
     token.start_ = current_;
 
     X_DISABLE_WARNING(4127)
-    while (1)
-        X_ENABLE_WARNING(4127)
-        {
-            // if there is an escape character and escape characters are allowed
-            if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
-                char ch;
-                if (!ReadEscapeCharacter(&ch)) {
-                    return 0;
-                }
-            }
-            // if a trailing quote
-            else if (*current_ == quote) {
-                // step over the quote
-                current_++;
-
-                // if consecutive strings should not be concatenated
-                if (flags_.IsSet(LexFlag::NOSTRINGCONCAT) && (!flags_.IsSet(LexFlag::ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"'))) {
-                    break;
-                }
-
-                const char* tmpscript_p = current_;
-                int32_t tmpline = curLine_;
-
-                // read white space between possible two consecutive strings
-                if (!ReadWhiteSpace()) {
-                    current_ = tmpscript_p;
-                    curLine_ = tmpline;
-                    break;
-                }
-
-                if (flags_.IsSet(LexFlag::NOSTRINGCONCAT)) {
-                    if (*current_ != '\\') {
-                        current_ = tmpscript_p;
-                        curLine_ = tmpline;
-                        break;
-                    }
-                    // step over the '\\'
-                    current_++;
-                    if (!ReadWhiteSpace() || (*current_ != quote)) {
-                        Error("expecting string after '\' terminated line");
-                        return false;
-                    }
-                }
-
-                // if there's no leading qoute
-                if (*current_ != quote) {
-                    current_ = tmpscript_p;
-                    curLine_ = tmpline;
-                    break;
-                }
-                // step over the new leading quote
-                current_++;
-            }
-            else {
-                if (*current_ == '\0') {
-                    Error("missing trailing quote");
-                    return false;
-                }
-                if (*current_ == '\n') {
-                    Error("newline inside string");
-                    return false;
-                }
-
-                current_++;
+    while (1) {
+        // if there is an escape character and escape characters are allowed
+        if (*current_ == '\\' && !(flags_.IsSet(LexFlag::NOSTRINGESCAPECHARS))) {
+            char ch;
+            if (!ReadEscapeCharacter(&ch)) {
+                return 0;
             }
         }
+        // if a trailing quote
+        else if (*current_ == quote) {
+            // step over the quote
+            current_++;
+
+            // if consecutive strings should not be concatenated
+            if (flags_.IsSet(LexFlag::NOSTRINGCONCAT) && (!flags_.IsSet(LexFlag::ALLOWBACKSLASHSTRINGCONCAT) || (quote != '\"'))) {
+                break;
+            }
+
+            const char* tmpscript_p = current_;
+            int32_t tmpline = curLine_;
+
+            // read white space between possible two consecutive strings
+            if (!ReadWhiteSpace()) {
+                current_ = tmpscript_p;
+                curLine_ = tmpline;
+                break;
+            }
+
+            if (flags_.IsSet(LexFlag::NOSTRINGCONCAT)) {
+                if (*current_ != '\\') {
+                    current_ = tmpscript_p;
+                    curLine_ = tmpline;
+                    break;
+                }
+                // step over the '\\'
+                current_++;
+                if (!ReadWhiteSpace() || (*current_ != quote)) {
+                    Error("expecting string after '\' terminated line");
+                    return false;
+                }
+            }
+
+            // if there's no leading qoute
+            if (*current_ != quote) {
+                current_ = tmpscript_p;
+                curLine_ = tmpline;
+                break;
+            }
+            // step over the new leading quote
+            current_++;
+        }
+        else {
+            if (*current_ == '\0') {
+                Error("missing trailing quote");
+                return false;
+            }
+            if (*current_ == '\n') {
+                Error("newline inside string");
+                return false;
+            }
+
+            current_++;
+        }
+    }
 
     token.end_ = (current_ - 1);
 
@@ -985,6 +981,8 @@ bool XLexer::ReadString(XLexToken& token, int32_t quote)
         // the sub type is the length of the string
         token.subtype_ = TokenSubTypeFlags(safe_static_cast<int32_t>(token.length()));
     }
+
+    X_ENABLE_WARNING(4127)
 
     return true;
 }
