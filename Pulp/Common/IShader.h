@@ -146,6 +146,7 @@ namespace shader
 
         // double coords
         P3F_T4F_C4B_N3F,
+        P3F_T4F_C4B_N3F_TB3F,
 
         NONE);
 
@@ -257,10 +258,10 @@ namespace shader
         POS_UV,
         POS_UV_COL,
         POS_UV_COL_NORM,
-        POS_UV_COL_NORM_TAN,
         POS_UV_COL_NORM_TAN_BI,
 
         POS_UV2_COL_NORM,
+        POS_UV2_COL_NORM_TAN_BI,
 
         NONE // shaders that don't take verts.
     );

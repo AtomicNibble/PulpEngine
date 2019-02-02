@@ -84,7 +84,7 @@ namespace shader
 
         InputLayoutFormat::Enum ILfromVertexFormat(const VertexFormat::Enum fmt)
         {
-            static_assert(VertexFormat::ENUM_COUNT == 10, "Added vertex formats? this code needs updating.");
+            static_assert(VertexFormat::ENUM_COUNT == 11, "Added vertex formats? this code needs updating.");
 
             switch (fmt) {
                 case VertexFormat::P3F_T3F:
@@ -109,6 +109,8 @@ namespace shader
 
                 case VertexFormat::P3F_T4F_C4B_N3F:
                     return InputLayoutFormat::POS_UV2_COL_NORM;
+                case VertexFormat::P3F_T4F_C4B_N3F_TB3F:
+                    return InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI;
 
                 case VertexFormat::NONE:
                     return InputLayoutFormat::NONE;
@@ -125,7 +127,7 @@ namespace shader
 
         ILFlags IlFlagsForVertexFormat(const VertexFormat::Enum fmt)
         {
-            static_assert(VertexFormat::ENUM_COUNT == 10, "Added vertex formats? this code needs updating.");
+            static_assert(VertexFormat::ENUM_COUNT == 11, "Added vertex formats? this code needs updating.");
 
             switch (fmt) {
                 case VertexFormat::P3F_T3F:
@@ -150,6 +152,8 @@ namespace shader
 
                 case VertexFormat::P3F_T4F_C4B_N3F:
                     return ILFlag::Color | ILFlag::Normal | ILFlag::Uv2;
+                case VertexFormat::P3F_T4F_C4B_N3F_TB3F:
+                    return ILFlag::Color | ILFlag::Normal | ILFlag::Uv2 | ILFlag::BiNormal;
 
                 case VertexFormat::NONE:
                     return ILFlags();

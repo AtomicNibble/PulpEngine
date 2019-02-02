@@ -18,6 +18,8 @@ namespace shader
         static ILTreeNode uv2("TEXCOORD");
         static ILTreeNode col2("COLOR");
         static ILTreeNode nor2("NORMAL");
+        static ILTreeNode tan2("TANGENT");
+        static ILTreeNode bin2("BINORMAL");
 
         class ILTreeBuilder
         {
@@ -27,10 +29,15 @@ namespace shader
                 blank.SetFormat(InputLayoutFormat::NONE);
 
                 ILTreeNode& uvBase = blank.AddChild(pos).AddChild(uv, InputLayoutFormat::POS_UV);
-                uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL).AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM).AddChild(tan, InputLayoutFormat::POS_UV_COL_NORM_TAN).AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
+
+                uvBase.AddChild(col, InputLayoutFormat::POS_UV_COL)
+                    .AddChild(nor, InputLayoutFormat::POS_UV_COL_NORM)
+                    .AddChild(tan)
+                    .AddChild(bin, InputLayoutFormat::POS_UV_COL_NORM_TAN_BI);
 
                 // double text coords.
-                uvBase.AddChild(uv2).AddChild(col2).AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM);
+                uvBase.AddChild(uv2).AddChild(col2).AddChild(nor2, InputLayoutFormat::POS_UV2_COL_NORM).AddChild(tan2)
+                    .AddChild(bin2, InputLayoutFormat::POS_UV2_COL_NORM_TAN_BI);
             }
         };
 
