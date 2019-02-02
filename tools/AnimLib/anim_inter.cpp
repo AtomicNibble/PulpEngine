@@ -369,17 +369,11 @@ namespace Inter
         }
 
         // get value
-        if (!lex.ReadToken(token)) {
+        if (!lex.ParseInt(valOut)) {
             X_ERROR("Anim", "Failed to read '%s' value", pName);
             return false;
         }
 
-        if (token.GetType() != core::TokenType::NUMBER) {
-            X_ERROR("Anim", "Failed to read '%s' value, it's not of interger type", pName);
-            return false;
-        }
-
-        valOut = token.GetIntValue();
         return true;
     }
 
@@ -401,17 +395,12 @@ namespace Inter
                 return false;
             }
 
-            if (!lex.ReadTokenOnLine(token)) {
+            int32_t frame;
+            if (!lex.ParseInt(frame)) {
                 X_ERROR("Anim", "Failed to read 'NOTE' frame");
                 return false;
             }
-
-            if (token.GetType() != core::TokenType::NUMBER) {
-                X_ERROR("Anim", "Failed to read 'NOTE' frame expected number");
-                return false;
-            }
-
-            int32_t frame = token.GetIntValue();
+            
             if (frame < 0) {
                 X_ERROR("Anim", "Invalid 'NOTE' frame index: %" PRIi32, frame);
                 return false;

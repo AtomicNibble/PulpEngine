@@ -248,9 +248,9 @@ public:
     bool SkipUntilString(const char* string);
     bool SkipRestOfLine(void);
 
-    int32_t ParseInt(void);
-    bool ParseBool(void);
-    float ParseFloat(void);
+    bool ParseInt(int32_t& out);
+    bool ParseBool(bool& out);
+    bool ParseFloat(float& out);
 
     // parse matrices with floats
     bool Parse1DMatrix(int32_t x, float* m);

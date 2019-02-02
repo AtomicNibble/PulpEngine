@@ -224,17 +224,10 @@ namespace RawModel
             }
 
             // read the parent idx.
-            if (!lex.ReadTokenOnLine(token)) {
-                X_ERROR("RawModel", "Failed to read parent index token");
+            if (!lex.ParseInt(bone.parIndx_)) {
+                X_ERROR("RawModel", "Failed to read parent index");
                 return false;
             }
-
-            if (token.GetType() != core::TokenType::NUMBER) {
-                X_ERROR("RawModel", "Parent index token is invalid");
-                return false;
-            }
-
-            bone.parIndx_ = token.GetIntValue();
 
             if (bone.parIndx_ < lastParentIdx) {
                 X_ERROR("RawModel", "Parent index must ascend (aka sorted)");
@@ -410,21 +403,20 @@ namespace RawModel
 
             // read binds.
             if (numBinds > safe_static_cast<int32_t, size_t>(vert.binds_.capacity())) {
-                X_ERROR("RawModel", "Vert(%" PRIuS ") has too many binds. max: %" PRIuS,
-                    i, vert.binds_.capacity());
+                X_ERROR("RawModel", "Vert(%" PRIuS ") has too many binds. max: %" PRIuS, i, vert.binds_.capacity());
                 return false;
             }
 
             vert.binds_.resize(numBinds);
             for (auto& bind : vert.binds_) {
                 // boneIDx + weigth
-                bind.boneIdx_ = lex.ParseInt();
-                bind.weight_ = lex.ParseFloat();
+                if (!lex.ParseInt(bind.boneIdx_) || !lex.ParseFloat(bind.weight_)) {
+                    X_ERROR("RawModel", "Vert(%s" PRIuS ") failed to read bind info", i);
+                }
 
                 // check the bone idx is valid
                 if (bind.boneIdx_ > numBones) {
-                    X_ERROR("RawModel", "Vert(%s" PRIuS ") bind has invalid bone idx: %" PRIi32 " max: %" PRIi32,
-                        i, bind.boneIdx_, numBones);
+                    X_ERROR("RawModel", "Vert(%s" PRIuS ") bind has invalid bone idx: %" PRIi32 " max: %" PRIi32, i, bind.boneIdx_, numBones);
                     return false;
                 }
             }
@@ -452,7 +444,13 @@ namespace RawModel
 				*/
 
                 TriVert& vert = tri[t];
-                vert.index_ = lex.ParseInt();
+
+                int32_t val;
+                if (!lex.ParseInt(val)) {
+                    return false;
+                }
+
+                vert.index_ = val;
 
                 // validate the index.
                 if (vert.index_ > numVerts) {
@@ -593,8 +591,6 @@ namespace RawModel
 
     bool Model::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
     {
-        core::XLexToken token(nullptr, nullptr);
-
         valOut = 0;
 
         if (!lex.SkipUntilString(pName)) {
@@ -602,25 +598,16 @@ namespace RawModel
             return false;
         }
 
-        // get value
-        if (!lex.ReadToken(token)) {
+        if (!lex.ParseInt(valOut)) {
             X_ERROR("RawModel", "Failed to read '%s' value", pName);
             return false;
         }
 
-        if (token.GetType() != core::TokenType::NUMBER) {
-            X_ERROR("RawModel", "Failed to read '%s' value, it's not of interger type", pName);
-            return false;
-        }
-
-        valOut = token.GetIntValue();
         return true;
     }
 
     bool Model::ReadheaderToken(core::XLexer& lex, const char* pName, uint32_t& valOut)
     {
-        core::XLexToken token(nullptr, nullptr);
-
         valOut = 0;
 
         if (!lex.SkipUntilString(pName)) {
@@ -628,18 +615,13 @@ namespace RawModel
             return false;
         }
 
-        // get value
-        if (!lex.ReadToken(token)) {
+        int32_t val;
+        if (!lex.ParseInt(val)) {
             X_ERROR("RawModel", "Failed to read '%s' value", pName);
             return false;
         }
 
-        if (token.GetType() != core::TokenType::NUMBER) {
-            X_ERROR("RawModel", "Failed to read '%s' value, it's not of interger type", pName);
-            return false;
-        }
-
-        valOut = static_cast<uint32_t>(token.GetIntValue());
+        valOut = static_cast<uint32_t>(val);
         return true;
     }
 

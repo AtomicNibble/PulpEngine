@@ -264,17 +264,11 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
         }
 
         // read the parent idx.
-        if (!lex.ReadTokenOnLine(token)) {
-            X_ERROR("RawModel", "Failed to read parent index token");
+        int32_t parIdx;
+        if (!lex.ParseInt(parIdx)) {
+            X_ERROR("RawModel", "Failed to read parent index");
             return false;
         }
-
-        if (token.GetType() != core::TokenType::NUMBER) {
-            X_ERROR("RawModel", "Parent index token is invalid");
-            return false;
-        }
-
-        int32_t parIdx = token.GetIntValue();
 
         if (parIdx >= 0) {
             tree_[i] = safe_static_cast<uint8_t>(parIdx);
@@ -354,8 +348,6 @@ bool ModelSkeleton::ReadBones(core::XLexer& lex, int32_t numBones)
 
 bool ModelSkeleton::ReadheaderToken(core::XLexer& lex, const char* pName, int32_t& valOut)
 {
-    core::XLexToken token(nullptr, nullptr);
-
     valOut = 0;
 
     if (!lex.SkipUntilString(pName)) {
@@ -364,17 +356,11 @@ bool ModelSkeleton::ReadheaderToken(core::XLexer& lex, const char* pName, int32_
     }
 
     // get value
-    if (!lex.ReadToken(token)) {
+    if (!lex.ParseInt(valOut)) {
         X_ERROR("RawModel", "Failed to read '%s' value", pName);
         return false;
     }
-
-    if (token.GetType() != core::TokenType::NUMBER) {
-        X_ERROR("RawModel", "Failed to read '%s' value, it's not of interger type", pName);
-        return false;
-    }
-
-    valOut = token.GetIntValue();
+    
     return true;
 }
 

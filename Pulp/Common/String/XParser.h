@@ -104,9 +104,9 @@ public:
     bool ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags subtype,
         PunctuationId::Enum puncId, XLexToken& token);
 
-    int ParseInt(void);
-    bool ParseBool(void);
-    float ParseFloat(void);
+    bool ParseInt(int32_t& out);
+    bool ParseBool(bool& out);
+    bool ParseFloat(float& out);
 
     void UnreadToken(const XLexToken& token);
     bool isEOF(void) const;

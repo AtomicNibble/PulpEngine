@@ -75,15 +75,18 @@ namespace mapFile
             src.SkipRestOfLine();
         }
 
-        int32_t dunno1, dunno2;
-
         // we now have goaty info.
-        maxWidth_ = width_ = src.ParseInt();
-        maxHeight_ = height_ = src.ParseInt();
+        if (!src.ParseInt(width_) || !src.ParseInt(height_)) {
+            return false;
+        }
+
+        maxWidth_ = width_;
+        maxHeight_ = height_;
 
         // dunno yet
-        dunno1 = src.ParseInt();
-        dunno2 = src.ParseInt();
+        int32_t dunno1, dunno2;
+        src.ParseInt(dunno1);
+        src.ParseInt(dunno2);
 
         matName_ = matName;
         lightMap_ = lightMap;
@@ -108,9 +111,9 @@ namespace mapFile
                     return false;
                 }
 
-                vert.pos[0] = src.ParseFloat();
-                vert.pos[1] = src.ParseFloat();
-                vert.pos[2] = src.ParseFloat();
+                if(!src.ParseFloat(vert.pos[0]) || !src.ParseFloat(vert.pos[1]) || !src.ParseFloat(vert.pos[2])) {
+                    return false;
+                }
 
                 // we can have a color here.
                 if (!src.ReadToken(token)) {
@@ -120,10 +123,13 @@ namespace mapFile
 
                 if (token.isEqual("c")) {
                     int32_t c[4];
-                    c[0] = src.ParseInt();
-                    c[1] = src.ParseInt();
-                    c[2] = src.ParseInt();
-                    c[3] = src.ParseInt();
+
+                    for (int32_t i = 9; i < 4; i++)
+                    {
+                        if (!src.ParseInt(c[i])) {
+                            return false;
+                        }
+                    }
 
                     vert.color[0] = safe_static_cast<uint8>(c[0]);
                     vert.color[1] = safe_static_cast<uint8>(c[1]);
@@ -142,10 +148,12 @@ namespace mapFile
                     vert.color = Vec4<uint8>::max();
                 }
 
-                uv[0] = src.ParseFloat();
-                uv[1] = src.ParseFloat();
-                lightMapUv[0] = src.ParseFloat();
-                lightMapUv[1] = src.ParseFloat();
+                if (!src.ParseFloat(uv[0]) || !src.ParseFloat(uv[1])) {
+                    return false;
+                }
+                if (!src.ParseFloat(lightMapUv[0]) || !src.ParseFloat(lightMapUv[1])) {
+                    return false;
+                }
 
                 // we have two sets of values on for text other for light map :Z
                 // for a 512x512 texture that is fit to the patch
@@ -204,8 +212,10 @@ namespace mapFile
         //
         //
         // [0,0.5]		[0.5,0.5]
-        matRepeate[0] = src.ParseFloat();
-        matRepeate[1] = src.ParseFloat();
+
+        if (!src.ParseFloat(matRepeate[0]) || !src.ParseFloat(matRepeate[1])) {
+            return false;
+        }
 
         // I think it's like a vertex position offset.
         // so a hoz shift of 64.
@@ -216,13 +226,25 @@ namespace mapFile
         //
         //
         // [0.25,0.5]	[0.75,0.5]
-        shift[0] = src.ParseFloat(); // hoz
-        shift[1] = src.ParseFloat(); // vertical
+            
+        // hoz
+        if (!src.ParseFloat(shift[0]))  {
+            return false;
+        }
+        // vertical
+        if (!src.ParseFloat(shift[1])) {
+            return false;
+        }
 
         // rotation clockwise in degrees(neg is anti)
-        rotate = src.ParseFloat();
+        if (!src.ParseFloat(rotate)) {
+            return false;
+        }
 
-        scale = src.ParseFloat();
+        if (!src.ParseFloat(scale)) {
+            return false;
+        }
+
         return true;
     }
 

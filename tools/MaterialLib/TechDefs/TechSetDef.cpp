@@ -999,17 +999,12 @@ namespace techset
             return false;
         }
 
-        core::XLexToken token;
-        if (!lex.ReadToken(token)) {
+        int32_t val;
+        if (!lex.ParseInt(val)) {
             return false;
         }
 
-        if (token.GetType() != core::TokenType::NUMBER) {
-            X_ERROR("TechDef", "Expected numeric token for stencilRef. Line: %" PRIi32, lex.GetLineNumber());
-            return false;
-        }
-
-        stencilRef = static_cast<uint32_t>(token.GetIntValue());
+        stencilRef = static_cast<uint32_t>(val);
         return true;
     }
 
@@ -1620,6 +1615,7 @@ namespace techset
         }
         else {
             // we want a float.
+            // TODO: handled negative here.
             if (token.GetType() != core::TokenType::NUMBER) {
                 return false;
             }
@@ -1995,8 +1991,7 @@ namespace techset
             return false;
         }
 
-        out = lex.ParseBool();
-        return true;
+        return lex.ParseBool(out);
     }
 
     bool TechSetDef::parseString(core::XParser& lex, core::string& out)

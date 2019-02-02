@@ -95,37 +95,39 @@ bool XParser::SetMemory(const char* startInclusive, const char* endExclusive, co
 bool XParser::ReadToken(XLexToken& token)
 {
     X_DISABLE_WARNING(4127)
+
     while (true)
-        X_ENABLE_WARNING(4127)
-        {
-            if (!ReadSourceToken(token)) {
+    {
+        if (!ReadSourceToken(token)) {
+            return false;
+        }
+
+        if (token.GetType() == TokenType::PUNCTUATION && token.GetPuncId() == PunctuationId::PRECOMP) {
+            if (!ReadDirective()) {
                 return false;
             }
+            continue;
+        }
 
-            if (token.GetType() == TokenType::PUNCTUATION && token.GetPuncId() == PunctuationId::PRECOMP) {
-                if (!ReadDirective()) {
+        // keep reading skipped tokens.
+        if (skip_) {
+            continue;
+        }
+
+        if (token.GetType() == TokenType::NAME) {
+            MacroDefine* define = FindDefine(token);
+            if (define) {
+                // expand the defined macro
+                if (!ExpandDefineIntoSource(token, define)) {
                     return false;
                 }
                 continue;
             }
-
-            // keep reading skipped tokens.
-            if (skip_) {
-                continue;
-            }
-
-            if (token.GetType() == TokenType::NAME) {
-                MacroDefine* define = FindDefine(token);
-                if (define) {
-                    // expand the defined macro
-                    if (!ExpandDefineIntoSource(token, define)) {
-                        return false;
-                    }
-                    continue;
-                }
-            }
-            return true;
         }
+        return true;
+    }
+
+    X_ENABLE_WARNING(4127)
 }
 
 bool XParser::ExpectTokenString(const char* string)
@@ -138,8 +140,7 @@ bool XParser::ExpectTokenString(const char* string)
     }
 
     if (!token.isEqual(string)) {
-        X_LOG0("Parser", "expected '%s' but found '%.*s'",
-            string, token.length(), token.begin());
+        X_LOG0("Parser", "expected '%s' but found '%.*s'", string, token.length(), token.begin());
         return false;
     }
     return true;
@@ -216,28 +217,32 @@ bool XParser::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags
     return true;
 }
 
-int32_t XParser::ParseInt(void)
+bool XParser::ParseInt(int32_t& out)
 {
     XLexToken token;
 
     if (!XParser::ReadToken(token)) {
         Error("couldn't read expected integer");
-        return 0;
+        return false;
     }
-    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-        ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER,
-            PunctuationId::UNUSET, token);
 
-        return -(safe_static_cast<int32_t>(token.GetIntValue()));
+    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
+        ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER, PunctuationId::UNUSET, token);
+
+        out = -(safe_static_cast<int32_t>(token.GetIntValue()));
     }
-    else if (token.GetType() != TokenType::NUMBER
-             || token.GetSubType() == TokenSubType::FLOAT) {
+    else if (token.GetType() != TokenType::NUMBER || token.GetSubType() == TokenSubType::FLOAT) {
         Error("expected integer value, found '%.*s'", token.length(), token.begin());
+        return false;
     }
-    return token.GetIntValue();
+    else {
+        out = token.GetIntValue();
+    }
+
+    return true;
 }
 
-bool XParser::ParseBool(void)
+bool XParser::ParseBool(bool& out)
 {
     XLexToken token;
 
@@ -247,39 +252,51 @@ bool XParser::ParseBool(void)
     }
 
     if (token.GetType() == TokenType::NUMBER) {
-        return (token.GetIntValue() != 0);
+        out = (token.GetIntValue() != 0);
     }
     else if (token.GetType() == TokenType::NAME) {
         if (token.isEqual("true")) {
-            return true;
+            out = true;
         }
         else if (token.isEqual("false")) {
+            out = false;
+        }
+        else {
+            Error("couldn't read expected boolean");
             return false;
         }
     }
-
-    Error("couldn't read expected boolean");
-    return false;
+    else {
+        Error("couldn't read expected boolean");
+        return false;
+    }
+    
+    return true;
 }
 
-float XParser::ParseFloat(void)
+bool XParser::ParseFloat(float& out)
 {
     XLexToken token;
 
     if (!XParser::ReadToken(token)) {
         Error("couldn't read expected floating point number");
-        return 0.0f;
+        return false;
     }
-    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-        ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET,
-            PunctuationId::UNUSET, token);
 
-        return -token.GetFloatValue();
+    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
+        ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET, PunctuationId::UNUSET, token);
+
+        out = -token.GetFloatValue();
     }
     else if (token.GetType() != TokenType::NUMBER) {
         Error("expected float value, found '%.*s'", token.length(), token.begin());
+        return false;
     }
-    return token.GetFloatValue();
+    else {
+        out = token.GetFloatValue();
+    }
+
+    return true;
 }
 
 void XParser::UnreadToken(const XLexToken& token)
@@ -472,52 +489,55 @@ bool XParser::Directive_define(void)
 
         if (!CheckTokenString(")")) {
             X_DISABLE_WARNING(4127)
-            while (true)
-                X_ENABLE_WARNING(4127)
-                {
-                    if (!ReadLine(token)) {
-                        Error("expected define parameter");
-                        return false;
-                    }
-                    // if it isn't a name
-                    if (token.GetType() != TokenType::NAME) {
-                        Error("invalid define parameter");
-                        return false;
-                    }
 
-                    if (FindDefineParm(define, token) >= 0) {
-                        Error("two the same define parameters");
-                        return false;
-                    }
-
-                    // add the define parm
-                    t = X_NEW(XLexToken, arena_, "MarcoParam")(token);
-                    //	t->ClearTokenWhiteSpace();
-                    t->pNext_ = nullptr;
-                    if (last)
-                        last->pNext_ = t;
-                    else
-                        define->pParms = t;
-
-                    last = t;
-                    define->numParams++;
-
-                    // read next token
-                    if (!ReadLine(token)) {
-                        Error("define parameters not terminated");
-                        return false;
-                    }
-
-                    // the end?
-                    if (token.isEqual(")")) {
-                        break;
-                    }
-                    // then it must be a comma
-                    if (!token.isEqual(",")) {
-                        Error("define not terminated");
-                        return false;
-                    }
+            while (true) {
+                if (!ReadLine(token)) {
+                    Error("expected define parameter");
+                    return false;
                 }
+                // if it isn't a name
+                if (token.GetType() != TokenType::NAME) {
+                    Error("invalid define parameter");
+                    return false;
+                }
+
+                if (FindDefineParm(define, token) >= 0) {
+                    Error("two the same define parameters");
+                    return false;
+                }
+
+                // add the define parm
+                t = X_NEW(XLexToken, arena_, "MarcoParam")(token);
+                //	t->ClearTokenWhiteSpace();
+                t->pNext_ = nullptr;
+                if (last) {
+                    last->pNext_ = t;
+                }
+                else {
+                    define->pParms = t;
+                }
+
+                last = t;
+                define->numParams++;
+
+                // read next token
+                if (!ReadLine(token)) {
+                    Error("define parameters not terminated");
+                    return false;
+                }
+
+                // the end?
+                if (token.isEqual(")")) {
+                    break;
+                }
+                // then it must be a comma
+                if (!token.isEqual(",")) {
+                    Error("define not terminated");
+                    return false;
+                }
+            }
+
+            X_ENABLE_WARNING(4127)
 
             if (!ReadLine(token)) {
                 return true;

@@ -186,12 +186,12 @@ XMapPatch* XMapPatch::Parse(XLexer& src, const Vec3f& origin)
     }
 
     // we now have goaty info.
-    groups = src.ParseInt();
-    entries = src.ParseInt();
+    EXPECT_TRUE(src.ParseInt(groups));
+    EXPECT_TRUE(src.ParseInt(entries));
 
     // dunno yet
-    dunno1 = src.ParseInt();
-    dunno2 = src.ParseInt();
+    EXPECT_TRUE(src.ParseInt(dunno1));
+    EXPECT_TRUE(src.ParseInt(dunno2));
 
     // we now how x groups each with y entryies.
     for (x = 0; x < groups; x++) {
@@ -201,12 +201,13 @@ XMapPatch* XMapPatch::Parse(XLexer& src, const Vec3f& origin)
 
         for (y = 0; y < entries; y++) {
             // each line has a -v and a -t
-            if (!src.ExpectTokenString("v"))
+            if (!src.ExpectTokenString("v")) {
                 return nullptr;
+            }
 
-            v[0] = src.ParseFloat();
-            v[1] = src.ParseFloat();
-            v[2] = src.ParseFloat();
+            for (int32_t i = 0; i < 3; i++) {
+                EXPECT_TRUE(src.ParseFloat(v[i]));
+            }
 
             // we can have a color here.
             if (!src.ReadToken(token)) {
@@ -215,23 +216,23 @@ XMapPatch* XMapPatch::Parse(XLexer& src, const Vec3f& origin)
             }
 
             if (token.isEqual("c")) {
-                c[0] = src.ParseInt();
-                c[1] = src.ParseInt();
-                c[2] = src.ParseInt();
-                c[3] = src.ParseInt();
 
-                if (!src.ExpectTokenString("t"))
+                for (int32_t i = 0; i < 4; i++) {
+                    EXPECT_TRUE(src.ParseInt(c[i]));
+                }
+
+                if (!src.ExpectTokenString("t")) {
                     return nullptr;
+                }
             }
             else if (!token.isEqual("t")) {
                 src.Error("XMapPatch::Parse: expected t");
                 return false;
             }
 
-            t[0] = src.ParseFloat();
-            t[1] = src.ParseFloat();
-            t[2] = src.ParseFloat();
-            t[3] = src.ParseFloat();
+            for (int32_t i = 0; i < 4; i++) {
+                EXPECT_TRUE(src.ParseFloat(t[i]));
+            }
 
             // some lines have "f 1"
             // get rekt.
@@ -306,16 +307,17 @@ bool XMapBrushSide::ParseMatInfo(XLexer& src, XMapBrushSide::MaterialInfo& info)
 
     info.name = core::StackString<64>(token.begin(), token.end());
 
-    info.matRepeate[0] = src.ParseFloat();
-    info.matRepeate[1] = src.ParseFloat();
+    EXPECT_TRUE(src.ParseFloat(info.matRepeate[0]));
+    EXPECT_TRUE(src.ParseFloat(info.matRepeate[1]));
 
-    info.shift[0] = src.ParseFloat();
-    info.shift[1] = src.ParseFloat();
+    EXPECT_TRUE(src.ParseFloat(info.shift[0]));
+    EXPECT_TRUE(src.ParseFloat(info.shift[1]));
 
-    info.rotate = src.ParseFloat();
+    EXPECT_TRUE(src.ParseFloat(info.rotate));
 
     // dunno what this value is.
-    src.ParseFloat();
+    float dunno;
+    src.ParseFloat(dunno);
     return true;
 }
 

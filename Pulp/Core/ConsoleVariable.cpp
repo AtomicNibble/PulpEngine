@@ -191,15 +191,14 @@ void CVarColRef::Set(core::string_view str)
 
 bool CVarVec3Ref::Vec3FromString(core::string_view str, Vec3f& out, bool Slient)
 {
-    Vec3f vec;
-    int i;
-
     core::XLexer lex(str.begin(), str.end());
     core::XLexToken token;
 
-    for (i = 0; i < 3; i++) {
+    // TODO: fix for negative numbers by using ParseFloat, but also need to handled only been one value and extending it.
+    Vec3f vec;
+    for (int32_t i = 0; i < 3; i++) {
         if (lex.ReadToken(token)) {
-            if (token.GetType() == TokenType::NUMBER) // && core::bitUtil::IsBitFlagSet(token.subtype,TT_FLOAT))
+            if (token.GetType() == TokenType::NUMBER)
             {
                 vec[i] = token.GetFloatValue();
             }

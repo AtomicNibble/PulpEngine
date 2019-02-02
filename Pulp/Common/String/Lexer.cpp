@@ -122,12 +122,6 @@ void XLexToken::NumberValue(void)
         else {
             double m;
             bool div;
-            bool negative = false;
-
-            if (*p == '-') {
-                negative = true;
-                p++;
-            }
 
             while (*p && *p != '.' && *p != 'e') {
                 floatvalue_ = floatvalue_ * 10.0 + static_cast<double>(*p - '0');
@@ -169,29 +163,15 @@ void XLexToken::NumberValue(void)
                     floatvalue_ *= m;
                 }
             }
-
-            if (negative) {
-                floatvalue_ -= floatvalue_ * 2;
-            }
         }
 #endif
         intvalue_ = static_cast<long>(floatvalue_);
     }
     else if (subtype_.IsSet(TokenSubType::DECIMAL)) {
-        bool negative = false;
-
-        if (*p == '-') {
-            negative = true;
-            p++;
-        }
 
         while (*p != ' ' && *p) {
             intvalue_ = intvalue_ * 10 + (*p - '0');
             p++;
-        }
-
-        if (negative) {
-            intvalue_ = -intvalue_;
         }
 
         floatvalue_ = intvalue_;
@@ -431,7 +411,7 @@ bool XLexer::ReadToken(XLexToken& token)
         }
     }
     // if there is a number
-    else if ((c >= '0' && c <= '9') || ((c == '.' || c == '-') && (*(current_ + 1) >= '0' && *(current_ + 1) <= '9'))) {
+    else if ((c >= '0' && c <= '9') || (c == '.' && (*(current_ + 1) >= '0' && *(current_ + 1) <= '9'))) {
         if (!ReadNumber(token)) {
             return false;
         }
@@ -560,27 +540,31 @@ bool XLexer::ExpectTokenType(TokenType::Enum type, XLexToken::TokenSubTypeFlags 
     return true;
 }
 
-int XLexer::ParseInt(void)
+bool XLexer::ParseInt(int32_t& out)
 {
     XLexToken token;
 
     if (!ReadToken(token)) {
         Error("couldn't read expected integer");
-        return 0;
+        return false;
     }
-    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-        ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER,
-            PunctuationId::UNUSET, token);
 
-        return -(safe_static_cast<signed int>(token.GetIntValue()));
+    if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
+        ExpectTokenType(TokenType::NUMBER, TokenSubType::INTEGER, PunctuationId::UNUSET, token);
+        out = -(safe_static_cast<signed int>(token.GetIntValue()));
     }
     else if (token.GetType() != TokenType::NUMBER || token.GetSubType() == TokenSubType::FLOAT) {
         Error("expected integer value, found '%.*s'", token.length(), token.begin());
+        return false;
     }
-    return token.GetIntValue();
+    else {
+        out = token.GetIntValue();
+    }
+
+    return true;
 }
 
-bool XLexer::ParseBool(void)
+bool XLexer::ParseBool(bool& out)
 {
     XLexToken token;
 
@@ -590,38 +574,50 @@ bool XLexer::ParseBool(void)
     }
 
     if (token.GetType() == TokenType::NUMBER) {
-        return (token.GetIntValue() != 0);
+        out = (token.GetIntValue() != 0);
     }
     else if (token.GetType() == TokenType::NAME) {
         if (token.isEqual("true")) {
-            return true;
+            out = true;
         }
         else if (token.isEqual("false")) {
+            out = false;
+        }
+        else {
+            Error("couldn't read expected boolean");
             return false;
         }
     }
+    else {
+        Error("couldn't read expected boolean");
+        return false;
+    }
 
-    Error("couldn't read expected boolean");
-    return false;
+    return true;
 }
 
-float XLexer::ParseFloat()
+bool XLexer::ParseFloat(float& out)
 {
     XLexToken token;
 
     if (!ReadToken(token)) {
         Error("couldn't read expected floating point number");
-        return 0.f;
+        return false;
     }
+
     if (token.GetType() == TokenType::PUNCTUATION && token.isEqual("-")) {
-        ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET,
-            PunctuationId::UNUSET, token);
-        return -token.GetFloatValue();
+        ExpectTokenType(TokenType::NUMBER, TokenSubType::UNUSET, PunctuationId::UNUSET, token);
+        out = -token.GetFloatValue();
     }
     else if (token.GetType() != TokenType::NUMBER) {
         Error("expected float value, found '%.*s'", token.length(), token.begin());
+        return false;
     }
-    return token.GetFloatValue();
+    else {
+        out = token.GetFloatValue();
+    }
+
+    return true;
 }
 
 bool XLexer::Parse1DMatrix(int32_t x, float* m)
@@ -633,7 +629,9 @@ bool XLexer::Parse1DMatrix(int32_t x, float* m)
     }
 
     for (int32_t i = 0; i < x; i++) {
-        m[i] = ParseFloat();
+        if (!ParseFloat(m[i])) {
+            return false;
+        }
     }
 
     if (!ExpectTokenString(")")) {
