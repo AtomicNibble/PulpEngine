@@ -60,6 +60,7 @@ bool CBufferManager::update(core::FrameData& frame, bool othro)
 
     // view
     setViewPort(frame.view.viewport);
+    setCameraPos(frame.view.cam.getPosition());
 
     if (!othro) {
         setMatrixes(frame.view.viewMatrix, frame.view.projMatrix,
@@ -295,6 +296,9 @@ X_INLINE void CBufferManager::setParamValue(const render::shader::XShaderParam& 
             break;
         case ParamType::PF_ScreenSize:
             std::memcpy(pDst, &screenSize_, sizeof(screenSize_));
+            break;
+        case ParamType::PF_CameraPos:
+            std::memcpy(pDst, &cameraPos_, sizeof(cameraPos_));
             break;
 
         case ParamType::Unknown:

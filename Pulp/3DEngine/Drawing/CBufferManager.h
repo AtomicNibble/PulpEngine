@@ -84,6 +84,7 @@ private:
     X_INLINE void setTime(core::TimeVal time);
     X_INLINE void setFrameTime(core::ITimer::Timer::Enum timer, core::TimeVal time);
     X_INLINE void setViewPort(const XViewPort& viewport);
+    X_INLINE void setCameraPos(const Vec3f& pos);
 
 private:
     render::IRender* pRender_;
@@ -98,6 +99,7 @@ private:
     float frameTime_[core::ITimer::Timer::ENUM_COUNT];
 
     Vec4f screenSize_;
+    Vec4f cameraPos_;
 
     X_ALIGN16_MATRIX44F(view_);
     X_ALIGN16_MATRIX44F(inView_);
@@ -152,6 +154,16 @@ X_INLINE void CBufferManager::setViewPort(const XViewPort& viewport)
     if (screenSize_ != screenSize) {
         screenSize_ = screenSize;
         dirtyFlags_.Set(render::shader::ParamType::PF_ScreenSize);
+    }
+}
+
+X_INLINE void CBufferManager::setCameraPos(const Vec3f& pos)
+{
+    Vec4f pos4(pos, 1.f);
+
+    if (cameraPos_ != pos4) {
+        pos4 = pos4;
+        dirtyFlags_.Set(render::shader::ParamType::PF_CameraPos);
     }
 }
 
