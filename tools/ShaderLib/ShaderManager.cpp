@@ -191,12 +191,14 @@ namespace shader
             const bool compiled = pHWShader->compile(source, flags);
 
             if (!compiled) {
-                auto errLine = pHWShader->getErrorLineNumber();
-                if (errLine >= 0) {
-                    auto info = sourceBin_.getSourceInfoForMergedLine(pSource, errLine);
+                auto errInfo = pHWShader->getErrorInfo();
+                if (errInfo.lineNo >= 0) {
+                    auto info = sourceBin_.getSourceInfoForMergedLine(pSource, errInfo.lineNo);
 
-                    X_ERROR("ShadersManager", "Failed to compile shader. Error in \"%s\" line: %" PRIi32,
-                        info.name.c_str(), info.line);
+                    X_ERROR("ShadersManager", "Failed to compile shader. Error in \"%s\" line: %" PRIi32 " col: %" PRIi32 "-%" PRIi32,
+                        info.name.c_str(), info.line, errInfo.colBegin, errInfo.colEnd);
+
+                    X_BREAKPOINT;
                 }
                 else {
                     X_ERROR("ShadersManager", "Failed to compile shader");

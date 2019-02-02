@@ -30,6 +30,19 @@ namespace shader
     class SourceFile;
     class ShaderVars;
 
+    struct ErrorInfo
+    {
+        ErrorInfo() {
+            lineNo = -1;
+            colBegin = 0;
+            colEnd = 0;
+        }
+
+        int32_t lineNo;
+        int32_t colBegin;
+        int32_t colEnd;
+    };
+
     X_ALIGNED_SYMBOL(class XHWShader, 64) :
         public IHWShader
     {
@@ -74,7 +87,7 @@ namespace shader
         X_INLINE int32_t getNumInstructions(void) const;
         X_INLINE HashVal getInputBindHash(void) const;
         X_INLINE CompileFlags getCompileFlags(void) const;
-        X_INLINE int32_t getErrorLineNumber(void) const;
+        X_INLINE ErrorInfo getErrorInfo(void) const;
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         X_INLINE int32_t getCompileCount(void) const;
@@ -106,7 +119,7 @@ namespace shader
 
     private:
         void logErrorStr(int32_t id, HRESULT hr, const core::string& sourcName, core::string_view errorStr);
-        static bool extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col);
+        static bool extractLineNumberInfo(const char* pBegin, const char* pEnd, ErrorInfo& info);
 
     protected:
         LockType lock_;
@@ -119,7 +132,7 @@ namespace shader
         core::string sourceFile_;
 
         int32_t id_;
-        int32_t errLineNo_;
+        ErrorInfo errInfo_;
 
 #if X_ENABLE_RENDER_SHADER_RELOAD
         int32_t compileCount_;

@@ -91,9 +91,9 @@ namespace shader
         return compileFlags_;
     }
 
-    X_INLINE int32_t XHWShader::getErrorLineNumber(void) const
+    X_INLINE ErrorInfo XHWShader::getErrorInfo(void) const
     {
-        return errLineNo_;
+        return errInfo_;
     }
 
 #if X_ENABLE_RENDER_SHADER_RELOAD

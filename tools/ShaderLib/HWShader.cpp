@@ -32,7 +32,6 @@ namespace shader
         customDefines_(customDefines),
         sourceFile_(sourceFile),
         id_(-1),
-        errLineNo_(-1),
         status_(ShaderStatus::NotCompiled),
         permFlags_(permFlags),
         type_(type),
@@ -91,7 +90,7 @@ namespace shader
             numInputParams_ = 0;
             numRenderTargets_ = 0;
             numInstructions_ = 0;
-            errLineNo_ = -1;
+            errInfo_ = ErrorInfo();
 
             cbuffers_.clear();
             samplers_.clear();
@@ -325,10 +324,9 @@ namespace shader
         // we have: name(line, col)
         pErrStr = filterd.find(sourceName.begin(), sourceName.end());
         if (pErrStr) {
-            int32_t line, col;
-
-            if (extractLineNumberInfo(pErrStr + sourceName.length(), filterd.end(), line, col)) {
-                errLineNo_ = line;
+            ErrorInfo info;
+            if (extractLineNumberInfo(pErrStr + sourceName.length(), filterd.end(), info)) {
+                errInfo_ = info;
             }
         }
 
@@ -337,8 +335,9 @@ namespace shader
         X_ERROR("Shader", "(%" PRIu32 ") Failed to compile(%x): %s", id, hr, filterd.c_str());
     }
 
-    bool XHWShader::extractLineNumberInfo(const char* pBegin, const char* pEnd, int32_t& line, int32_t& col)
+    bool XHWShader::extractLineNumberInfo(const char* pBegin, const char* pEnd, ErrorInfo& info)
     {
+        // (422,27-57)
         core::XLexer lex(pBegin, pEnd);
         core::XLexToken token;
 
@@ -346,14 +345,27 @@ namespace shader
             return false;
         }
 
-        line = lex.ParseInt();
+        if (!lex.ParseInt(info.lineNo)) {
+            return false;
+        }
 
         if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
             core::TokenSubType::UNUSET, core::PunctuationId::COMMA, token)) {
             return false;
         }
 
-        col = lex.ParseInt();
+        if (!lex.ParseInt(info.colBegin)) {
+            return false;
+        }
+
+        if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
+            core::TokenSubType::UNUSET, core::PunctuationId::SUB, token)) {
+            return false;
+        }
+
+        if (!lex.ParseInt(info.colEnd)) {
+            return false;
+        }
 
         if (!lex.ExpectTokenString(")")) {
             return false;
