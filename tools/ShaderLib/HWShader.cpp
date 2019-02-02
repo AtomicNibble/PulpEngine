@@ -358,16 +358,31 @@ namespace shader
             return false;
         }
 
-        if (!lex.ExpectTokenType(core::TokenType::PUNCTUATION,
-            core::TokenSubType::UNUSET, core::PunctuationId::SUB, token)) {
+        if (!lex.ReadToken(token)) {
             return false;
         }
 
-        if (!lex.ParseInt(info.colEnd)) {
+        // can be either '-' or ')'
+        if (token.GetType() != core::TokenType::PUNCTUATION) {
             return false;
         }
 
-        if (!lex.ExpectTokenString(")")) {
+        if (token.GetPuncId() == core::PunctuationId::COMMA)
+        {
+            if (!lex.ParseInt(info.colEnd)) {
+                return false;
+            }
+
+            if (!lex.ExpectTokenString(")")) {
+                return false;
+            }
+        }
+        else if (token.GetPuncId() == core::PunctuationId::PARENTHESESCLOSE)
+        {
+            info.colEnd = info.colBegin + 1;
+        }
+        else
+        {
             return false;
         }
 
