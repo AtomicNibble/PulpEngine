@@ -29,7 +29,7 @@ namespace shader
                 XParamDB("frameTime", ParamType::PF_FrameTime, UpdateFreq::FRAME, ParamFlag::FLOAT),
                 XParamDB("frameTimeUI", ParamType::PF_FrameTimeUI, UpdateFreq::FRAME, ParamFlag::FLOAT),
                 XParamDB("screensize", ParamType::PF_ScreenSize, UpdateFreq::FRAME, ParamFlag::VEC4),
-                XParamDB("cameraPos", ParamType::PF_CameraPos, UpdateFreq::FRAME, ParamFlag::FLOAT),
+                XParamDB("cameraPos", ParamType::PF_CameraPos, UpdateFreq::FRAME, ParamFlag::VEC4),
 
                 XParamDB("objectToWorldMatrix", ParamType::PI_objectToWorldMatrix, UpdateFreq::INSTANCE, ParamFlag::MATRIX),
                 XParamDB("worldMatrix", ParamType::PI_worldMatrix, UpdateFreq::INSTANCE, ParamFlag::MATRIX),
