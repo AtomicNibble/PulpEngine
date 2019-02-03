@@ -452,8 +452,6 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
         const auto& matTextures = pMat->getTextures();
 
         auto* pTexMan = gEngEnv.pTextureMan_;
-        auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
-        auto* pDefaultNormal = pTexMan->getDefault(render::TextureSlot::NORMAL);
 
         for (size_t i = 0; i < numTex; i++) {
             auto& texState = pTexStates[i];
@@ -498,11 +496,34 @@ Material::Tech* XMaterialManager::getTechForMaterial_int(Material* pMat, core::S
                 // really we should know what type of texture would be set
                 // eg TextureSlot::Enum
                 // this way we can return defaults that would actually not look retarded.
+                auto* pDefaultTex = pTexMan->getDefault(render::TextureSlot::DIFFUSE);
+                auto* pDefaultNormal = pTexMan->getDefault(render::TextureSlot::NORMAL);
+                auto* pDefaultRougthness = pTexMan->getDefault(render::TextureSlot::ROUGTHNESS);
+                auto* pDefaultAO = pTexMan->getDefault(render::TextureSlot::OCCLUSION);
+                auto* pDefaultMetallic = pTexMan->getDefault(render::TextureSlot::METALLIC);
+                auto* pDefaultDisplacement = pTexMan->getDefault(render::TextureSlot::DISPLACEMENT);
 
                 texState.textureId = pDefaultTex->getDeviceID();
 
+                // TODO: hack - moucho hacko!
                 if (permTexture.getName() == "normalMap") {
                     texState.textureId = pDefaultNormal->getDeviceID();
+                    continue;
+                }
+                else if (permTexture.getName() == "roughnessMap") {
+                    texState.textureId = pDefaultRougthness->getDeviceID();
+                    continue;
+                }
+                else if (permTexture.getName() == "ambientOcclusionMap") {
+                    texState.textureId = pDefaultAO->getDeviceID();
+                    continue;
+                }
+                else if (permTexture.getName() == "metallicMap") {
+                    texState.textureId = pDefaultMetallic->getDeviceID();
+                    continue;
+                }
+                else if (permTexture.getName() == "displacementMap") {
+                    texState.textureId = pDefaultDisplacement->getDeviceID();
                     continue;
                 }
             }
