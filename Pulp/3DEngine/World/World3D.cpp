@@ -1858,12 +1858,12 @@ void World3D::drawRenderEnts()
             pBoneDataDes->pData = pRendEnt->bones.data();
             pBoneDataDes->size = safe_static_cast<uint32_t>(pRendEnt->bones.size() * sizeof(Matrix44f));
 
-            addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
+            addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F,
                 world, distanceFromCam, pBoneDataDes->asBufferHandle());
         }
         else {
 
-            addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F,
+            addMeshTobucket(mesh, renderMesh, render::shader::VertexFormat::P3F_T2S_C4B_N3F_TB3F,
                 world, distanceFromCam);
         }
     }
