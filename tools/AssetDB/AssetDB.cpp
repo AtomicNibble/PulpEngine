@@ -1258,6 +1258,49 @@ bool AssetDB::Chkdsk(bool updateDB)
     return true;
 }
 
+bool AssetDB::CleanupOldRawFiles(void)
+{
+    // want all rawfiles that are no longer pointed to by a file_id.
+    X_LOG0("AssetDB", "Deleteing old RawFile");
+
+    sql::SqlLiteQuery qry(db_, R"(
+        SELECT t1.*
+        FROM raw_files t1
+            LEFT JOIN file_ids t2 ON t2.raw_file = t1.id
+        WHERE t2.raw_file IS NULL
+    )");
+
+    auto it = qry.begin();
+    for (; it != qry.end(); ++it) {
+        auto row = *it;
+
+        int32_t rawFileId = row.get<int32_t>(0);
+        RawFile rawfileInfo;
+
+        if (!GetRawfileForRawId(rawFileId, rawfileInfo)) {
+            X_ERROR("AssetDB", "Failed to get rawfile path");
+            return false;
+        }
+
+        core::Path<char> filePath;
+        AssetPathForRawFile(rawfileInfo, filePath);
+
+        if (gEnv->pFileSys->fileExists(filePath, virDir))
+        {
+            X_LOG1("AssetDB", "Removing: ^5%s", filePath.c_str());
+
+            if (!gEnv->pFileSys->deleteFile(filePath, virDir)) {
+                X_ERROR("AssetDB", "Failed to move asset raw file");
+                return false;
+            }
+        }
+    }
+
+    X_LOG0("AssetDB", "RawFile cleanup complete");
+
+    return true;
+}
+
 bool AssetDB::AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts)
 {
     // adds a load of junk data for testing.

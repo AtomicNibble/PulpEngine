@@ -48,7 +48,7 @@ typedef core::MemoryArena<
 namespace
 {
     X_DECLARE_ENUM(ConvertMode)
-    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK, REPACK, DUMP);
+    (SINGLE, ALL, CLEAN, CLEAN_THUMBS, GEN_THUMBS, CHKDSK, CLEAN_RAW_FILE, REPACK, DUMP);
 
     bool GetMode(ConvertMode::Enum& mode)
     {
@@ -71,6 +71,9 @@ namespace
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"chkdsk")) {
                 mode = ConvertMode::CHKDSK;
+            }
+            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean_raw_file")) {
+                mode = ConvertMode::CLEAN_RAW_FILE;
             }
             else if (core::strUtil::IsEqualCaseInsen(pMode, L"repack")) {
                 mode = ConvertMode::REPACK;
@@ -216,6 +219,12 @@ namespace
         else if (mode == ConvertMode::CHKDSK) {
             if (!con.Chkdsk()) {
                 X_ERROR("Convert", "Failed to perform Chkdsk");
+                return false;
+            }
+        }
+        else if (mode == ConvertMode::CLEAN_RAW_FILE) {
+            if (!con.CleanupOldRawFiles()) {
+                X_ERROR("Convert", "Failed to perform raw file cleanup");
                 return false;
             }
         }

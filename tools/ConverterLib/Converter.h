@@ -73,6 +73,7 @@ public:
     CONVERTERLIB_EXPORT bool CleanThumbs(void);
     CONVERTERLIB_EXPORT bool GenerateThumbs(void); // generates thumbs for assets that don't have thumbs already and we support auto thumb generation.
     CONVERTERLIB_EXPORT bool Chkdsk(void);
+    CONVERTERLIB_EXPORT bool CleanupOldRawFiles(void);
     CONVERTERLIB_EXPORT bool Repack(void);
 
     // IConverterHost

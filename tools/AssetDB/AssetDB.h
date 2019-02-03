@@ -162,6 +162,7 @@ public:
     bool AddDefaultProfiles(void);
     bool PerformMigrations(void);
     bool Chkdsk(bool updateDB = false);
+    bool CleanupOldRawFiles(void);
     bool AddTestData(size_t numMods, const AssetTypeCountsArr& assetCounts);
 
     bool Export(const core::Path<char>& path);

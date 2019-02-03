@@ -435,6 +435,13 @@ bool Converter::Chkdsk(void)
     return db_.Chkdsk(false);
 }
 
+bool Converter::CleanupOldRawFiles(void)
+{
+    X_LOG0("Converter", "CleanupOldRawFiles");
+
+    return db_.CleanupOldRawFiles();
+}
+
 bool Converter::Repack(void)
 {
     X_LOG0("Converter", "Repack");
