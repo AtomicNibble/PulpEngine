@@ -247,6 +247,7 @@ PS_OUTPUT ps_main( VS_OUTPUT input )
 
     // Calculate the light vector.
     float3 Li = normalize(light.pos.xyz - attributes.position.xyz);
+
     // Half-vector between Li and Lo.
     float3 Lh = normalize(Li + Lo);
 
@@ -255,8 +256,8 @@ PS_OUTPUT ps_main( VS_OUTPUT input )
     //float3 H = normalize(V + L);
     float dist        = length(light.pos.xyz - attributes.position.xyz) * 0.01;
     float attenuation = 1.0 / (dist * dist);
-    //float3 Lradiance  = light.color.rgb * attenuation;
-    float3 Lradiance  = float3(0.9,0.9,0.9) * attenuation;
+    float3 Lradiance  = light.color.rgb * attenuation;
+    //float3 Lradiance  = float3(1,1,1) * attenuation;
 
 
     // Calculate angles between surface normal and various light vectors.
