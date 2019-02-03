@@ -43,12 +43,17 @@ AssetAssetRefWidget::AssetAssetRefWidget(QWidget *parent, assetDb::AssetDB& db, 
 	pLineEdit_ = new QLineEdit(this);
 	pLineEdit_->setReadOnly(true);
 
+    QToolButton* pClear = new QToolButton();
+    pClear->setIcon(QIcon(":/style/img/Close.png"));
+    connect(pClear, SIGNAL(clicked()), this, SLOT(clearClicked()));
+
 	// browse button
 	QToolButton* pBrowse = new QToolButton();
 	pBrowse->setText("...");
 	connect(pBrowse, SIGNAL(clicked()), this, SLOT(browseClicked()));
 
-	pLayout->addWidget(pLineEdit_);
+    pLayout->addWidget(pLineEdit_);
+    pLayout->addWidget(pClear);
 	pLayout->addWidget(pBrowse);
 
 	setValue(value);
@@ -73,6 +78,25 @@ void AssetAssetRefWidget::setValue(const std::string& value)
 	pLineEdit_->blockSignals(true);
 	pLineEdit_->setText(QString::fromStdString(value));
 	pLineEdit_->blockSignals(false);
+}
+
+
+void AssetAssetRefWidget::clearClicked(void)
+{
+    const QString curName = pLineEdit_->text();
+
+    int32_t assetId;
+    if (!db_.AssetExists(pAssEntry_->type(), pAssEntry_->nameNarrow(), &assetId)) {
+        X_ERROR("AssetRef", "Failed to get source asset id");
+        return;
+    }
+
+    if (!removeRef(assetId, curName)) {
+        return;
+    }
+
+    pLineEdit_->setText("");
+    emit valueChanged("");
 }
 
 void AssetAssetRefWidget::browseClicked(void)

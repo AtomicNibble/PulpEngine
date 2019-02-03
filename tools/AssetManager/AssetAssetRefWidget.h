@@ -25,7 +25,8 @@ signals:
 
 private slots:
 	void setValue(const std::string& value);
-	void browseClicked(void);
+    void clearClicked(void);
+    void browseClicked(void);
 
 private:
 	bool removeRef(int32_t assetId, const QString& assName);
