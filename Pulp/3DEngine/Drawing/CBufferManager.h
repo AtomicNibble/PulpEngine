@@ -162,7 +162,7 @@ X_INLINE void CBufferManager::setCameraPos(const Vec3f& pos)
     Vec4f pos4(pos, 1.f);
 
     if (cameraPos_ != pos4) {
-        pos4 = pos4;
+        cameraPos_ = pos4;
         dirtyFlags_.Set(render::shader::ParamType::PF_CameraPos);
     }
 }
