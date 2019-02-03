@@ -89,3 +89,45 @@ float4 ComputePointLight(float3 viewPosition, float3 vsNormal, float4 albedo,
 #endif
     return col;
 }
+
+// -----------------------------------------------------
+
+#define PI 3.1415926535897932384626433832795f
+#define GAMMA 2.2f
+
+// NDF / D - Normal Distribution Function
+// GGX/Towbridge-Reitz normal distribution function.
+// Uses Disney's reparametrization of alpha = roughness^2.
+float NormalDistributionGGX(float cosLh, float roughness)
+{
+  float alpha   = roughness * roughness;
+  float alphaSq = alpha * alpha;
+
+  float denom = (cosLh * cosLh) * (alphaSq - 1.0) + 1.0;
+  return alphaSq / (PI * denom * denom);
+}
+
+
+// Single term for separable Schlick-GGX below.
+float __gaSchlickG1(float cosTheta, float k)
+{
+  return cosTheta / (cosTheta * (1.0 - k) + k);
+}
+
+// G - Geometry shadowing term
+// Schlick-GGX approximation of geometric attenuation function using Smith's method.
+float GeometrySchlickGGX(float cosLi, float cosLo, float roughness)
+{
+  // Epic suggests using this roughness remapping for analytic lights.
+  float r = roughness + 1.0;
+  float k = (r * r) / 8.0;
+
+  return __gaSchlickG1(cosLi, k) * __gaSchlickG1(cosLo, k);
+}
+
+// F - Fresnel factor called
+// Shlick's approximation of the Fresnel factor.
+float3 FresnelSchlick(float3 F0, float cosTheta)
+{
+  return F0 + (1.0 - F0) * pow(1.0 - cosTheta, 5.0);
+}
