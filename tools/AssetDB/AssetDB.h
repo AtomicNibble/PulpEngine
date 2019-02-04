@@ -82,7 +82,7 @@ public:
     struct Mod
     {
         X_INLINE Mod() = default;
-        X_INLINE Mod(ModId modId, core::string, core::Path<char>& path);
+        X_INLINE Mod(ModId modId, core::string, const core::Path<char>& path);
         X_INLINE Mod(ModId modId, const char* pName, const char* pOutDir);
 
         ModId modId;

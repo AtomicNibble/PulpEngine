@@ -18,7 +18,7 @@ X_INLINE AssetDB::ThumbInfo::ThumbInfo(ThumbId id_, int32_t fileSize_, Vec2i thu
 
 // -----------------------------------------------------
 
-X_INLINE AssetDB::Mod::Mod(ModId modId, core::string name_, core::Path<char>& outdir) :
+X_INLINE AssetDB::Mod::Mod(ModId modId, core::string name_, const core::Path<char>& outdir) :
     modId(modId),
     name(name_),
     outDir(outdir)
