@@ -568,7 +568,7 @@ namespace PNG
 
             uint32_t crc = pCrc->Begin();
             pCrc->Update(&tEXt::TAG_ID, sizeof(tEXt::TAG_ID), crc);
-            pCrc->Update(str.c_str(), str.length(), crc);
+            pCrc->Update(str.c_str(), str.length() + 1, crc);
             crc = pCrc->Finish(crc);
 
             bufferdFile.writeObj(core::Endian::swap<int32_t>(static_cast<int32_t>(str.length() + 1)));
