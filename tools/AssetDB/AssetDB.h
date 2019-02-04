@@ -42,8 +42,9 @@ class ASSETDB_EXPORT AssetDB
     // Version 10: change thumb hash coloum to binary. 
     // Version 11: add precedence to conversion profiles.
     // Version 12: add name hash collision detection
+    // Version 13: fix slashes for raw_files so they are all forward.
 public:
-    static const int32_t DB_VERSION = 12;
+    static const int32_t DB_VERSION = 13;
 
     static const char* ASSET_DB_FOLDER;
     static const char* DB_NAME;

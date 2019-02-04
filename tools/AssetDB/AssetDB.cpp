@@ -1151,6 +1151,39 @@ bool AssetDB::PerformMigrations(void)
         }
     }
 
+    if (dbVersion_ < 13) {
+        X_WARNING("AssetDB", "Performing migrations from db version %" PRIi32 " to verison 13", dbVersion_);
+
+        sql::SqlLiteTransaction trans(db_);
+        sql::SqlLiteQuery qry(db_, "SELECT id, path FROM raw_files");
+
+        core::StackString512 buf;
+
+        auto it = qry.begin();
+        for (; it != qry.end(); ++it) {
+            auto row = *it;
+
+            int32_t rawFileId = row.get<int32_t>(0);
+            const char* pPath = row.get<const char*>(1);
+            auto pathLen = row.columnBytes(1);
+
+            buf.set(pPath, pPath + pathLen);
+            buf.replaceAll(assetDb::ASSET_NAME_INVALID_SLASH, assetDb::ASSET_NAME_SLASH);
+
+            sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE id = ?");
+            cmd.bind(1, buf.data(), buf.length());
+            cmd.bind(2, rawFileId);
+
+            sql::Result::Enum res = cmd.execute();
+            if (res != sql::Result::OK) {
+                X_ERROR("AssetDB", "Failed to update RawFileData");
+                return false;
+            }
+        }
+
+        trans.commit();
+    }
+
     return true;
 }
 
