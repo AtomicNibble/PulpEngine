@@ -244,6 +244,8 @@ AssetManager:
   ☐ Fix tree view not updating for add / remove.
   ✔ Make it so can clear refrenced images / assets. @done (19-02-03 14:34)
   ☐ Make it so refrenced asset name is not store just it's id, so renaming breaks nothing.
+  ☐ Only open one editor per asset type (maybe a mode?)
+  ☐ Have some way to bulk edit.
 
 
 Converter:
@@ -285,6 +287,7 @@ LevelBuilder:
         Curently it's just materials and models. The models materials are not inc.
   ☐ Bake lighting for level
     Rip
+  ☐ Generate tangents/binormals for level
 
 Sql:
 
