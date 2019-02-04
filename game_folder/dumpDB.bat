@@ -1,1 +1,1 @@
-"../../build/x64/Release Dynamic/engine_Converter.exe" +mode dump +nopause 1
+"../../build/x64/Debug Dynamic/engine_Converter.exe" +mode dump +nopause 1
