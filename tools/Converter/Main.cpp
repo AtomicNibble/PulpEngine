@@ -52,40 +52,48 @@ namespace
 
     bool GetMode(ConvertMode::Enum& mode)
     {
+        using namespace core::Hash::Literals;
+
         const wchar_t* pMode = gEnv->pCore->GetCommandLineArgForVarW(L"mode");
         if (pMode) {
-            if (core::strUtil::IsEqualCaseInsen(pMode, L"single")) {
-                mode = ConvertMode::SINGLE;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"all")) {
-                mode = ConvertMode::ALL;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean")) {
-                mode = ConvertMode::CLEAN;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean_thumbs")) {
-                mode = ConvertMode::CLEAN_THUMBS;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"gen_thumbs")) {
-                mode = ConvertMode::GEN_THUMBS;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"chkdsk")) {
-                mode = ConvertMode::CHKDSK;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"clean_raw_file")) {
-                mode = ConvertMode::CLEAN_RAW_FILE;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"repack")) {
-                mode = ConvertMode::REPACK;
-            }
-            else if (core::strUtil::IsEqualCaseInsen(pMode, L"dump")) {
-                mode = ConvertMode::DUMP;
-            }
-            else {
-                X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
-                return false;
-            }
 
+            core::StackString256 modeStr(pMode);
+            modeStr.toLower();
+
+            switch (core::Hash::Fnv1aHash(modeStr.data(), modeStr.length()))
+            {
+                case "single"_fnv1a:
+                    mode = ConvertMode::SINGLE;
+                    break;
+                case "all"_fnv1a:
+                    mode = ConvertMode::ALL;
+                    break;
+                case "clean"_fnv1a:
+                    mode = ConvertMode::CLEAN;
+                    break;
+                case "clean_thumbs"_fnv1a:
+                    mode = ConvertMode::CLEAN_THUMBS;
+                    break;
+                case "gen_thumbs"_fnv1a:
+                    mode = ConvertMode::GEN_THUMBS;
+                    break;
+                case "chkdsk"_fnv1a:
+                    mode = ConvertMode::CHKDSK;
+                    break;
+                case "clean_raw_file"_fnv1a:
+                    mode = ConvertMode::CLEAN_RAW_FILE;
+                    break;
+                case "repack"_fnv1a:
+                    mode = ConvertMode::REPACK;
+                    break;
+                case "dump"_fnv1a:
+                    mode = ConvertMode::DUMP;
+                    break;
+                default:
+                    X_ERROR("Converter", "Unknown mode: \"%ls\"", pMode);
+                    return false;
+            }
+        
             return true;
         }
 
