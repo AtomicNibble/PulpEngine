@@ -1713,8 +1713,8 @@ AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::
 
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteCmd cmd(db_, "INSERT INTO conversion_profiles (name, data, precedence) VALUES(?,?,?)");
-    cmd.bind(1, name.c_str());
-    cmd.bind(2, data.c_str());
+    cmd.bind(1, name.data(), name.length());
+    cmd.bind(2, data.data(), data.length());
     cmd.bind(3, precedence);
 
     int32_t res = cmd.execute();
@@ -1729,7 +1729,7 @@ AssetDB::Result::Enum AssetDB::AddProfile(const core::string& name, const core::
 bool AssetDB::ProfileExsists(const core::string& name, ProfileId* pProfileId)
 {
     sql::SqlLiteQuery qry(db_, "SELECT profile_id FROM conversion_profiles WHERE name = ?");
-    qry.bind(1, name.c_str());
+    qry.bind(1, name.data(), name.length());
 
     const auto it = qry.begin();
 
@@ -1752,8 +1752,8 @@ bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
 
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteCmd cmd(db_, "UPDATE conversion_profiles SET data = ? WHERE name = ?");
-    cmd.bind(1, data.c_str());
-    cmd.bind(2, name.c_str());
+    cmd.bind(1, data.data(), data.length());
+    cmd.bind(2, name.data(), name.length());
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -1767,7 +1767,7 @@ bool AssetDB::SetProfileData(const core::string& name, const core::string& data)
 bool AssetDB::GetProfileData(const core::string& name, core::string& dataOut, int32_t& precedenceOut)
 {
     sql::SqlLiteQuery qry(db_, "SELECT data, precedence FROM conversion_profiles WHERE name = ?");
-    qry.bind(1, name.c_str());
+    qry.bind(1, name.data(), name.length());
 
     sql::SqlLiteQuery::iterator it = qry.begin();
 
@@ -1803,8 +1803,8 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, const core::Path
 
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteCmd cmd(db_, "INSERT INTO mods (name, out_dir) VALUES(?,?)");
-    cmd.bind(1, name.c_str());
-    cmd.bind(2, outDir.c_str());
+    cmd.bind(1, name.data(), name.length());
+    cmd.bind(2, outDir.data(), outDir.length());
 
     int32_t res = cmd.execute();
     if (res != 0) {
@@ -1818,7 +1818,7 @@ AssetDB::Result::Enum AssetDB::AddMod(const core::string& name, const core::Path
 bool AssetDB::SetMod(const core::string& name)
 {
     sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
-    qry.bind(1, name.c_str());
+    qry.bind(1, name.data(), name.length());
 
     sql::SqlLiteQuery::iterator it = qry.begin();
 
@@ -1860,7 +1860,7 @@ bool AssetDB::SetMod(ModId id)
 bool AssetDB::ModExsists(const core::string& name, ModId* pModId)
 {
     sql::SqlLiteQuery qry(db_, "SELECT mod_id FROM mods WHERE name = ?");
-    qry.bind(1, name.c_str());
+    qry.bind(1, name.data(), name.length());
 
     const auto it = qry.begin();
 
@@ -1889,7 +1889,7 @@ bool AssetDB::SetModPath(ModId modId, const core::Path<char>& outDir)
 {
     sql::SqlLiteTransaction trans(db_);
     sql::SqlLiteCmd cmd(db_, "UPDATE mods SET out_dir = ? WHERE mod_id = ?");
-    cmd.bind(1, outDir.c_str());
+    cmd.bind(1, outDir.data(), outDir.length());
     cmd.bind(2, modId);
 
     sql::Result::Enum res = cmd.execute();
@@ -2287,7 +2287,7 @@ AssetDB::Result::Enum AssetDB::AddAsset(const sql::SqlLiteTransaction& trans, Mo
     auto nameHash = getNameHash(name.c_str(), name.length());
 
     sql::SqlLiteCmd cmd(db_, "INSERT INTO file_ids (name, namehash, type, mod_id) VALUES(?,?,?,?)");
-    cmd.bind(1, name.c_str());
+    cmd.bind(1, name.data(), name.length());
     cmd.bind(2, static_cast<int32_t>(nameHash));
     cmd.bind(3, type);
     cmd.bind(4, modId_);
@@ -2410,7 +2410,7 @@ AssetDB::Result::Enum AssetDB::DeleteAsset(AssetType::Enum type, const core::str
     sql::SqlLiteCmd cmd(db_, "DELETE FROM file_ids WHERE file_id = ? AND type = ? AND name = ?");
     cmd.bind(1, assetId); // make sure it's same one we found above.
     cmd.bind(2, type);
-    cmd.bind(3, name.c_str());
+    cmd.bind(3, name.data(), name.length());
 
     sql::Result::Enum res = cmd.execute();
     if (res != sql::Result::OK) {
@@ -2456,7 +2456,7 @@ AssetDB::Result::Enum AssetDB::RenameAsset(AssetType::Enum type, const core::str
 
             sql::SqlLiteTransaction trans(db_);
             sql::SqlLiteCmd cmd(db_, "UPDATE raw_files SET path = ? WHERE id = ?");
-            cmd.bind(1, path.c_str());
+            cmd.bind(1, path.data(), path.length());
             cmd.bind(2, rawId);
 
             sql::Result::Enum res = cmd.execute();
@@ -2565,8 +2565,8 @@ AssetDB::Result::Enum AssetDB::UpdateAsset(AssetType::Enum type, const core::str
 
     sql::SqlLiteCmd cmd(db_, stmt.c_str());
     cmd.bind(":t", type);
-    cmd.bind(":n", name.c_str());
-    cmd.bind(":args", args.c_str());
+    cmd.bind(":n", name.data(), name.length());
+    cmd.bind(":args", args.data(), args.length());
     cmd.bind(":argsHash", static_cast<int64_t>(argsHash));
 
     sql::Result::Enum res = cmd.execute();
@@ -2743,7 +2743,7 @@ AssetDB::Result::Enum AssetDB::UpdateAssetRawFileHelper(const sql::SqlLiteTransa
         {
             sql::SqlLiteCmd cmd(db_, "INSERT INTO raw_files (file_id, path, size, hash) VALUES(?,?,?,?)");
             cmd.bind(1, assetId);
-            cmd.bind(2, path.c_str(), path.length());
+            cmd.bind(2, path.data(), path.length());
             cmd.bind(3, safe_static_cast<int32_t>(compressedData.size()));
             cmd.bind(4, static_cast<int64_t>(dataHash));
 
@@ -2807,8 +2807,8 @@ AssetDB::Result::Enum AssetDB::UpdateAssetArgs(AssetType::Enum type, const core:
 
     sql::SqlLiteCmd cmd(db_, stmt.c_str());
     cmd.bind(":t", type);
-    cmd.bind(":n", name.c_str());
-    cmd.bind(":args", args.c_str());
+    cmd.bind(":n", name.data(), name.length());
+    cmd.bind(":args", args.data(), args.length());
     cmd.bind(":argsHash", static_cast<int64_t>(hash));
 
     sql::Result::Enum res = cmd.execute();
@@ -3035,7 +3035,7 @@ bool AssetDB::AssetExists(AssetType::Enum type, const core::string& name, AssetI
 
     sql::SqlLiteQuery qry(db_, "SELECT file_id, mod_id FROM file_ids WHERE type = ? AND name = ?");
     qry.bind(1, type);
-    qry.bind(2, name.c_str());
+    qry.bind(2, name.data(), name.length());
 
     const auto it = qry.begin();
 
@@ -3061,7 +3061,7 @@ bool AssetDB::AssetExists(AssetType::Enum type, const core::string& name, ModId 
 
     sql::SqlLiteQuery qry(db_, "SELECT file_id FROM file_ids WHERE type = ? AND name = ? AND mod_id = ?");
     qry.bind(1, type);
-    qry.bind(2, name.c_str());
+    qry.bind(2, name.data(), name.length());
     qry.bind(3, modId);
 
     const auto it = qry.begin();

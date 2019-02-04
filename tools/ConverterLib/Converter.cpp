@@ -676,7 +676,7 @@ bool Converter::SetDependencies(assetDb::AssetId assetId, core::span<AssetDep> d
         sql::SqlLiteCmd cmd(cacheDb_, "INSERT INTO dependencies (assetId, type, name) VALUES(?,?,?)");
         cmd.bind(1, assetId);
         cmd.bind(2, dep.type);
-        cmd.bind(3, dep.name.c_str(), dep.name.length());
+        cmd.bind(3, dep.name.data(), dep.name.length());
 
         if (cmd.execute() != sql::Result::OK) {
             X_ERROR("Converter", "Failed to insert dependencies for asset: %" PRIi32, assetId);
