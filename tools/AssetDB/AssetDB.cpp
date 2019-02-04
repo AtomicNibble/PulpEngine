@@ -1396,6 +1396,9 @@ bool AssetDB::Export(const core::Path<char>& path)
 
     writer.StartObject();
 
+    writer.Key("version");
+    writer.Int(dbVersion_);
+
     writer.Key("mods");
     writer.StartArray();
 
