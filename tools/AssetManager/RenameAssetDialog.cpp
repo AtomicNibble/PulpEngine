@@ -36,6 +36,7 @@ void RenameAssetDialog::createGui(const QString& name)
 		pAssetName_->setMaxLength(assetDb::ASSET_NAME_MAX_LENGTH);
 		pAssetName_->setValidator(new QRegularExpressionValidator(re));
 		pAssetName_->setText(name);
+        pAssetName_->setMinimumWidth(256);
 
 		pFormLayout->addRow("Name", pAssetName_);
 	}

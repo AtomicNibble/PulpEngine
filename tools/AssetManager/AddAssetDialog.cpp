@@ -29,6 +29,7 @@ AddAssetDialog::AddAssetDialog(QWidget *parent, assetDb::AssetDB& db) :
 
 		pAssetName_->setMaxLength(assetDb::ASSET_NAME_MAX_LENGTH);
 		pAssetName_->setValidator(new QRegularExpressionValidator(re));
+        pAssetName_->setMinimumWidth(256);
 
 		pFormLayout->addRow("Name", pAssetName_);
 	}
