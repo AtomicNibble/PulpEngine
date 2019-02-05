@@ -11489,6 +11489,21 @@ echo #include "stdafx.h"&gt;&gt;stdafx.h.cpp</Command>
   <ItemGroup>
     <Image Include="img\icon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\Pulp\Common\Array.natvis" />
+    <Natvis Include="..\..\Pulp\Common\ByteStream.natvis" />
+    <Natvis Include="..\..\Pulp\Common\FiFo.natvis" />
+    <Natvis Include="..\..\Pulp\Common\FixedArray.natvis" />
+    <Natvis Include="..\..\Pulp\Common\FixedByteStreamRing.natvis" />
+    <Natvis Include="..\..\Pulp\Common\FixedFifo.natvis" />
+    <Natvis Include="..\..\Pulp\Common\Math.natvis" />
+    <Natvis Include="..\..\Pulp\Common\Pointer.natvis" />
+    <Natvis Include="..\..\Pulp\Common\ResourceStateBase.natvis" />
+    <Natvis Include="..\..\Pulp\Common\Stack.natvis" />
+    <Natvis Include="..\..\Pulp\Common\String.natvis" />
+    <Natvis Include="..\..\Pulp\Common\StringView.natvis" />
+    <Natvis Include="..\..\Pulp\Common\Winding.natvis" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets" />
   <ProjectExtensions>

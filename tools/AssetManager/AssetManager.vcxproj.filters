@@ -175,6 +175,9 @@
     <Filter Include="Generated Files\Release Dynamic">
       <UniqueIdentifier>{c3965725-0233-443f-bfe1-f31f4ec0d7df}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Natvis">
+      <UniqueIdentifier>{a2cb8060-04c8-464a-bbaa-3544ec0ab218}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="assetmanager.cpp">
@@ -2102,5 +2105,46 @@
     <ClInclude Include="ImageLoader.h">
       <Filter>Header Files\Misc</Filter>
     </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <Natvis Include="..\..\Pulp\Common\Array.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\ByteStream.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\FiFo.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\FixedArray.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\FixedByteStreamRing.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\FixedFifo.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\Math.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\Pointer.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\ResourceStateBase.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\Stack.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\String.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\StringView.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
+    <Natvis Include="..\..\Pulp\Common\Winding.natvis">
+      <Filter>Natvis</Filter>
+    </Natvis>
   </ItemGroup>
 </Project>
