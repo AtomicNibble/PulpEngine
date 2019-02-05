@@ -1481,7 +1481,8 @@ bool AssetDB::Export(const core::Path<char>& path)
             // 6 raw_File
             // 7 thumb_id
             const char* pAddTimeStr = row.get<const char*>(8);
-            const char* pUpdateTimeStr = row.get<const char*>(9);
+            auto addTimeLength = row.columnBytes(8);
+
             // 10 parent_id
             const int32_t modId = row.columnBytes(11);
 
@@ -1521,12 +1522,18 @@ bool AssetDB::Export(const core::Path<char>& path)
             }
 
             writer.Key("addTime");
-            writer.String(pAddTimeStr);
-            writer.Key("updateTime");
-            writer.String(pUpdateTimeStr);
+            writer.String(pAddTimeStr, addTimeLength);
+
+            if (row.columnType(9) != sql::ColumType::SNULL) {
+                const char* pUpdateTimeStr = row.get<const char*>(9);
+                auto length = row.columnBytes(9);
+
+                writer.Key("updateTime");
+                writer.String(pUpdateTimeStr, length);
+            }
 
             writer.Key("mod");
-            writer.Int64(modId);
+            writer.Int(modId);
 
             writer.EndObject();
         }
