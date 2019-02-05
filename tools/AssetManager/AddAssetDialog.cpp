@@ -8,7 +8,8 @@ X_NAMESPACE_BEGIN(assman)
 AddAssetDialog::AddAssetDialog(QWidget* parent, assetDb::AssetDB& db) :
     QDialog(parent, Qt::WindowCloseButtonHint | Qt::WindowSystemMenuHint | Qt::WindowTitleHint),
     db_(db),
-    modId_(assetDb::AssetDB::INVALID_MOD_ID)
+    modId_(assetDb::AssetDB::INVALID_MOD_ID),
+    assetNames_(g_arena)
 {
     // hey, you looking at my code? you loco!
     // We want:
@@ -22,7 +23,7 @@ AddAssetDialog::AddAssetDialog(QWidget* parent, assetDb::AssetDB& db) :
     {
         pAssetName_ = new QLineEdit();
 
-        QRegularExpression re(QString("[a-z0-9_\\%1\\%2]*").arg(QChar(assetDb::ASSET_NAME_PREFIX)).arg(QChar(assetDb::ASSET_NAME_SLASH)));
+        QRegularExpression re(QString("[a-z0-9_\\%1\\%2{,}.]*").arg(QChar(assetDb::ASSET_NAME_PREFIX)).arg(QChar(assetDb::ASSET_NAME_SLASH)));
 
         pAssetName_->setMaxLength(assetDb::ASSET_NAME_MAX_LENGTH);
         pAssetName_->setValidator(new QRegularExpressionValidator(re));
@@ -110,9 +111,9 @@ void AddAssetDialog::setNameHint(const QString& hint)
     pAssetName_->setText(hint);
 }
 
-core::string AddAssetDialog::getName(void) const
+const AddAssetDialog::AssetNameArr& AddAssetDialog::getNames(void) const
 {
-    return assetName_;
+    return assetNames_;
 }
 
 assetDb::AssetType::Enum AddAssetDialog::getType(void) const
@@ -130,6 +131,7 @@ void AddAssetDialog::accept(void)
     modId_ = assetDb::AssetDB::INVALID_MOD_ID;
 
     // name
+    core::string assetName;
     {
         // my nuggger.
         QString name = pAssetName_->text();
@@ -144,9 +146,7 @@ void AddAssetDialog::accept(void)
             return;
         }
 
-        const auto latinStr = name.toLatin1();
-
-        assetName_ = latinStr;
+        assetName = name.toLatin1();
     }
 
     // type
@@ -181,27 +181,39 @@ void AddAssetDialog::accept(void)
         modId_ = variant.toInt();
     }
 
-    // o baby!
-    auto res = db_.AddAsset(modId_, type_, assetName_);
-    if (res == assetDb::AssetDB::Result::OK) {
-        done(QDialog::Accepted);
+    expandName(assetName);
+
+    if (assetNames_.isEmpty()) {
+        QMessageBox::critical(this, "Add Asset", "Failed to parse assetname", QMessageBox::Ok);
         return;
     }
 
-    // fuck you
-    if (res == assetDb::AssetDB::Result::NAME_TAKEN) {
-        QMessageBox::warning(this, "Add Asset", "Failed to add asset, asset with same name and type already exsists", QMessageBox::Ok);
-    }
-    // fuck me
-    else if (res == assetDb::AssetDB::Result::ERROR) {
-        QMessageBox::critical(this, "Add Asset", "Error adding asset to db, check error log", QMessageBox::Ok);
-    }
-    else {
-        QString msg = QString("Error adding asset. Unknown error(%1)").arg(QString::number(res));
-        QMessageBox::critical(this, "Add Asset", msg, QMessageBox::Ok);
+    for (auto& assetName : assetNames_)
+    {
+        // o baby!
+        auto res = db_.AddAsset(modId_, type_, assetName);
+        if (res == assetDb::AssetDB::Result::OK) {
+            continue;
+        }
+
+        // fuck you
+        if (res == assetDb::AssetDB::Result::NAME_TAKEN) {
+            QMessageBox::warning(this, "Add Asset", "Failed to add asset, asset with same name and type already exsists", QMessageBox::Ok);
+        }
+        // fuck me
+        else if (res == assetDb::AssetDB::Result::ERROR) {
+            QMessageBox::critical(this, "Add Asset", "Error adding asset to db, check error log", QMessageBox::Ok);
+        }
+        else {
+            QString msg = QString("Error adding asset. Unknown error(%1)").arg(QString::number(res));
+            QMessageBox::critical(this, "Add Asset", msg, QMessageBox::Ok);
+        }
+
+        // make them close it for errors.
+        return;
     }
 
-    // make them click canel to close.
+    done(QDialog::Accepted);
 }
 
 void AddAssetDialog::reject(void)
@@ -213,5 +225,122 @@ void AddAssetDialog::done(int32_t val)
 {
     QDialog::done(val);
 }
+
+void AddAssetDialog::expandName(const core::string& assetName)
+{
+    if (!assetName.find('{')) {
+        assetNames_.emplace_back(assetName);
+        return;
+    }
+
+    // i support expansion so can create multiple assets at once.
+    // currently i think it will just be numeric ranges and comma seperalted string list.
+    // {0..1}_{goat,boat,moat} 
+    // Results in:
+    //  0_goat
+    //  0_boat
+    //  0_moat
+    //  1_goat
+    //  1_boat
+    //  1_moat
+
+
+    BraceArr braces(g_arena);
+
+    auto* pBeginBrace = assetName.begin();
+    auto* pNameBegin = pBeginBrace;
+    while ((pBeginBrace = core::strUtil::Find(pBeginBrace, assetName.end(), '{')) != nullptr) {
+        auto* pEndBrace = core::strUtil::Find(pBeginBrace, assetName.end(), '}');
+        if (!pEndBrace) {
+            QMessageBox::critical(this, "Add Asset", "Brace expansion missing closing brace }", QMessageBox::Ok);
+            return;
+        }
+
+        auto* pBegin = pBeginBrace + 1;
+        auto* pEnd = pEndBrace;
+
+        if (pBegin >= pEnd) {
+            QMessageBox::critical(this, "Add Asset", "Brace expansion empty", QMessageBox::Ok);
+            return;
+        }
+
+        auto& brace = braces.AddOne(g_arena);
+        brace.base.assign(pNameBegin, pBeginBrace);
+
+        auto* pEntryBegin = pBegin;
+        auto* pEntryEnd = pBegin;
+
+        do {
+            // now look for commas.
+            auto* pNextComma = core::strUtil::Find(pEntryBegin, pEnd, ',');
+            if (pNextComma) {
+                pEntryEnd = pNextComma;
+            }
+            else {
+                pEntryEnd = pEnd;
+            }
+
+            core::string value(pEntryBegin, pEntryEnd);
+            if (auto* pDots = value.find(".."); pDots) {
+                // get start end and generate all the shit.
+                int32_t start = core::strUtil::StringToInt<int32_t>(value.begin(), pDots);
+                int32_t end = core::strUtil::StringToInt<int32_t>(pDots + 2, value.end());
+
+                if (start >= end) {
+                    QMessageBox::critical(this, "Add Asset", "Brace expansion invalid int range", QMessageBox::Ok);
+                    return;
+                }
+
+                while (start <= end) {
+                    core::StackString<64> str(start);
+
+                    brace.values.emplace_back(str.begin(), str.end());
+                    ++start;
+                }
+            }
+            else {
+                brace.values.emplace_back(std::move(value));
+            }
+
+            // move to next one.
+            pEntryBegin = pEntryEnd;
+            if (pNextComma) {
+                pEntryBegin = pNextComma + 1;
+            }
+
+        } while (pEntryEnd != pEnd);
+
+        pBeginBrace = pEndBrace + 1;
+        pNameBegin = pBeginBrace;
+    }
+
+    if (braces.isEmpty()) {
+        QMessageBox::critical(this, "Add Asset", "Brace expansion failed", QMessageBox::Ok);
+        return;
+    }
+
+    addSubBraces(braces, core::string(), 0);
+}
+
+void AddAssetDialog::addSubBraces(const BraceArr& braces, core::string& name, size_t idx)
+{
+    auto& brace = braces[idx];
+    auto isLast = idx + 1 == braces.size();
+
+    // for each value.
+    for (size_t i = 0; i < brace.values.size(); i++)
+    {
+        auto& value = brace.values[i];
+        core::string subName = name + brace.base + value;
+
+        if (isLast) {
+            assetNames_.append(subName);
+        }
+        else {
+            addSubBraces(braces, subName, idx + 1);
+        }
+    }
+}
+
 
 X_NAMESPACE_END

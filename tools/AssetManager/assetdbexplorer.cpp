@@ -772,7 +772,12 @@ void AssetExplorer::addNewAssetType(void)
 
 	if (dialog.exec() == QDialog::Accepted) 
 	{
-		pAssetTypeFolder->addFile(dialog.getName(), dialog.getType());
+        auto& names = dialog.getNames();
+
+        for (auto& name : names)
+        {
+		    pAssetTypeFolder->addFile(name, dialog.getType());
+        }
 	}
 }
 

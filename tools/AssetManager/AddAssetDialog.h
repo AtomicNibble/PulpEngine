@@ -11,7 +11,22 @@ X_NAMESPACE_BEGIN(assman)
 
 class AddAssetDialog : public QDialog
 {
-	Q_OBJECT
+    Q_OBJECT
+
+    using StrArr = core::Array<core::string>;
+    using AssetNameArr = StrArr;
+
+    struct BraceExpansion
+    {
+        BraceExpansion(core::MemoryArenaBase* arena) :
+            values(arena)
+        {}
+
+        core::string base;
+        StrArr values;
+    };
+
+    using BraceArr = core::Array<BraceExpansion>;
 
 public:
 	AddAssetDialog(QWidget *parent, assetDb::AssetDB& db);
@@ -21,7 +36,7 @@ public:
 	void setPrefredMod(const QString& modName);
 	void setNameHint(const QString& hint);
 
-	core::string getName(void) const;
+	const AssetNameArr& getNames(void) const;
 	assetDb::AssetType::Enum getType(void) const;
 	int32_t getModId(void) const;
 
@@ -30,6 +45,9 @@ private slots:
 	void reject(void);
 	void done(int32_t val);
 
+private:
+    void expandName(const core::string& assetNamename);
+    void addSubBraces(const BraceArr& braces, core::string& name, size_t idx);
 
 private:
 	assetDb::AssetDB& db_;
@@ -39,7 +57,7 @@ private:
 	QComboBox* pMod_;
 
 private:
-	core::string assetName_;
+    AssetNameArr assetNames_;
 	assetDb::AssetType::Enum type_;
 	int32_t modId_;
 };
