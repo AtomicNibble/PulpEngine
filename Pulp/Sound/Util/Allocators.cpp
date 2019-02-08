@@ -160,7 +160,7 @@ namespace AK
     void* AllocHook(size_t in_size)
     {
 #if X_ENABLE_MEMORY_SOURCE_INFO
-        const X_NAMESPACE(core)::SourceInfo sourceInfo("sound", __FILE__, __LINE__, __FUNCTION__, __FUNCSIG__);
+        const X_NAMESPACE(core)::SourceInfo sourceInfo( __FILE__, __LINE__, __FUNCTION__, __FUNCSIG__);
 #endif
 
         return akArena.allocate(in_size, 1, 0 X_MEM_IDS("SndAlloc", "uint8_t") X_SOURCE_INFO_MEM_CB(sourceInfo));
@@ -200,7 +200,7 @@ namespace AK
     void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
     {
 #if X_ENABLE_ASSERTIONS
-        core::SourceInfo sourceInfo("SoundSys", pszFileName, lineNumber, "", "");
+        core::SourceInfo sourceInfo(pszFileName, lineNumber, "", "");
         core::Assert(sourceInfo, "Assertion \"%s\" failed.", pszExpression)
             .Variable("FileName", pszFileName)
             .Variable("LineNumber", lineNumber);

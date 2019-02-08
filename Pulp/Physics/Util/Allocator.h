@@ -14,7 +14,7 @@ public:
     X_INLINE void* allocate(size_t size, const char* typeName, const char* filename, int line) X_FINAL
     {
 #if X_ENABLE_MEMORY_SOURCE_INFO
-        core::SourceInfo srcInfo("Physx", filename, line, "-", "-");
+        core::SourceInfo srcInfo(filename, line, "-", "-");
         return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName), srcInfo);
 #else
         return arena_->allocate(size, 16, 0 X_MEM_IDS("Physx", typeName));

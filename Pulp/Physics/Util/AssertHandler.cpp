@@ -10,7 +10,7 @@ void AssetHandler::operator()(const char* exp, const char* file, int line, bool&
     X_UNUSED(ignore);
 
 #if X_ENABLE_ASSERTIONS
-    core::SourceInfo sourceInfo("Physics", file, line, "", "");
+    core::SourceInfo sourceInfo(file, line, "", "");
     core::Assert(sourceInfo, "Assertion \"%s\" failed.", exp)
         .Variable("FileName", file)
         .Variable("LineNumber", line);

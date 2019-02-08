@@ -157,7 +157,7 @@ X_NAMESPACE_END
 #if X_ENABLE_ASSERTIONS_SOURCE_INFO
 #define X_SOURCE_INFO_ASSERT X_SOURCE_INFO
 #else
-static const X_NAMESPACE(core)::SourceInfo g_blank_source_info("<none>", "", -1, "", "");
+static const X_NAMESPACE(core)::SourceInfo g_blank_source_info("", -1, "", "");
 #define X_SOURCE_INFO_ASSERT g_blank_source_info
 #endif // !X_ENABLE_ASSERTIONS_SOURCE_INFO
 

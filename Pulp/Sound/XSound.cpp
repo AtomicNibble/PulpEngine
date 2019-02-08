@@ -167,7 +167,7 @@ namespace
     void akAssertHook(const char* pszExpression, const char* pszFileName, int lineNumber)
     {
 #if X_ENABLE_ASSERTIONS
-        core::SourceInfo sourceInfo("SoundSys", pszFileName, lineNumber, "", "");
+        core::SourceInfo sourceInfo(pszFileName, lineNumber, "", "");
         core::Assert(sourceInfo, "Assertion \"%s\" failed.", pszExpression)
             .Variable("FileName", pszFileName)
             .Variable("LineNumber", lineNumber);
