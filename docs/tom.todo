@@ -246,6 +246,7 @@ AssetManager:
   ☐ Make it so refrenced asset name is not store just it's id, so renaming breaks nothing.
   ☐ Only open one editor per asset type (maybe a mode?)
   ☐ Have some way to bulk edit.
+  ✔ Support brace expansion for addAsset so can create lots of assets at once. @done (19-02-05 20:16)
 
 
 Converter:
