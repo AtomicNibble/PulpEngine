@@ -175,7 +175,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 core::StackString<96, char> strLower(pMode);
                 strLower.toLower();
 
-                switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length())) {
+                switch (core::Hash::Fnv1aHash(strLower.data(), strLower.length())) {
                     case "ut"_fnv1a:
                     case "unit"_fnv1a:
                     case "unittests"_fnv1a:

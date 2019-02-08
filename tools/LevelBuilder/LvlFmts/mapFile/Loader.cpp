@@ -111,7 +111,7 @@ namespace mapFile
 
             using namespace core::Hash::Literals;
 
-            switch (core::Hash::Fnv1aHash(classname.c_str(), classname.length())) {
+            switch (core::Hash::Fnv1aHash(classname.data(), classname.length())) {
                 case "worldspawn"_fnv1a:
                     ent.classType = game::ClassType::WORLDSPAWN;
                     break;

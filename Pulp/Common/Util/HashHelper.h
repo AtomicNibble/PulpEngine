@@ -65,7 +65,7 @@ struct hash<core::StackString<N>>
 {
     size_t operator()(const core::StackString<N>& str) const
     {
-        return (size_t)core::Hash::Fnv1aHash(str.c_str(), str.length());
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
     }
 
     size_t operator()(const core::Path<char>& str) const
@@ -89,7 +89,7 @@ struct hash<core::Path<CharT>>
 {
     size_t operator()(const core::Path<CharT>& str) const
     {
-        return (size_t)core::Hash::Fnv1aHash(str.c_str(), str.length());
+        return (size_t)core::Hash::Fnv1aHash(str.data(), str.length());
     }
 };
 

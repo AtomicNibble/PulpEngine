@@ -16,7 +16,7 @@ namespace Util
         core::StackString<96, char> strLower(pBegin, pEnd);
         strLower.toLower();
 
-        switch (core::Hash::Fnv1aHash(strLower.c_str(), strLower.length())) {
+        switch (core::Hash::Fnv1aHash(strLower.data(), strLower.length())) {
             case "codetexture0"_fnv1a:
                 return Register::CodeTexture0;
             case "codetexture1"_fnv1a:
@@ -94,7 +94,7 @@ namespace Util
 
         static_assert(MaterialUsage::ENUM_COUNT == 16, "Added additional material usage? this code needs updating.");
 
-        switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+        switch (core::Hash::Fnv1aHash(strUpper.data(), strUpper.length())) {
             case "none"_fnv1a:
             case "<none>"_fnv1a:
                 return MaterialUsage::NONE;
@@ -146,7 +146,7 @@ namespace Util
 
         static_assert(MaterialSurType::ENUM_COUNT == 26, "Added additional surface types? this code needs updating.");
 
-        switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+        switch (core::Hash::Fnv1aHash(strUpper.data(), strUpper.length())) {
             case "none"_fnv1a:
             case "<none>"_fnv1a:
                 return MaterialSurType::NONE;

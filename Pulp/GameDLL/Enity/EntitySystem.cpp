@@ -1007,7 +1007,7 @@ namespace entity
                     if (snd.occType.isNotEmpty()) {
                         sound::OcclusionType::Enum occ = sound::OcclusionType::None;
 
-                        switch (core::Hash::Fnv1aHash(snd.occType.c_str(), snd.occType.length())) {
+                        switch (core::Hash::Fnv1aHash(snd.occType.data(), snd.occType.length())) {
                             case "None"_fnv1a:
                                 occ = sound::OcclusionType::None;
                                 break;

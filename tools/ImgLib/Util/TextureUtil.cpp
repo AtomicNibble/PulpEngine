@@ -578,7 +578,7 @@ namespace Util
 
         static_assert(Texturefmt::ENUM_COUNT == 56, "Added additional texture fmts? this code needs updating.");
 
-        switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+        switch (core::Hash::Fnv1aHash(strUpper.data(), strUpper.length())) {
             case "A8"_fnv1a:
                 return Texturefmt::A8;
 
@@ -724,7 +724,7 @@ namespace Util
 
         static_assert(ImgFileFormat::ENUM_COUNT == 7, "Added additional texture file fmts? this code needs updating.");
 
-        switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+        switch (core::Hash::Fnv1aHash(strUpper.data(), strUpper.length())) {
             case "CI"_fnv1a:
                 return ImgFileFormat::CI;
             case "DDS"_fnv1a:

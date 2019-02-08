@@ -72,7 +72,7 @@ namespace shader
             strUpper.toUpper();
 
             static_assert(ILFlag::FLAGS_COUNT == 4, "ILFlag count changed? this code needs updating.");
-            switch (core::Hash::Fnv1aHash(strUpper.c_str(), strUpper.length())) {
+            switch (core::Hash::Fnv1aHash(strUpper.data(), strUpper.length())) {
                 case "UV2"_fnv1a:
                     flagOut = ILFlag::Uv2;
                     break;
