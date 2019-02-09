@@ -5,6 +5,9 @@
   </PropertyGroup>
   <ImportGroup Label="PropertySheets" />
   <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)..\Pulp\Common;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
     <Link>
 	<AdditionalDependencies>engine_Common.lib;%(AdditionalDependencies)</AdditionalDependencies>
 	<AdditionalLibraryDirectories>$(SolutionDir)..\..\code\3rdparty\$(PlatformToolset)\$(PlatformName)\;$(SolutionDir)..\..\build\$(PlatformName)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
