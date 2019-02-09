@@ -80,6 +80,8 @@
 #define X_ENGINE_BUILD_REF -1
 #endif // !CI_COMMIT_SHA
 
+#define X_ENGINE_BUILD_REF_STR X_STRINGIZE(X_ENGINE_BUILD_REF)
+
 #define X_INCLUDE(path) X_STRINGIZE(path)
 
 #if X_DEBUG
