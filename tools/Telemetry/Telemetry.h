@@ -41,6 +41,8 @@ enum TtError
     Error,
     InvalidParam,
     InvalidContex,
+
+    ConnectionRejected
 };
 
 #ifdef __cplusplus

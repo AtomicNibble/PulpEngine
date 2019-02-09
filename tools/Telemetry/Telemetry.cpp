@@ -49,6 +49,38 @@ namespace
         }
     }
 
+    bool handleConnectionResponse(tt_uint8* pData, tt_size len)
+    {
+        if (len < 1) {
+            return false;
+        }
+
+        tt_uint8 type = pData[0];
+        if (type >= PacketType::Num) {
+            return false;
+        }
+
+        switch (type)
+        {
+            case PacketType::ConnectionRequestAccepted:
+                // don't care about response currently.
+                return true;
+            case PacketType::ConnectionRequestRejected: {
+                if (len != sizeof(ConnectionRequestRejectedData)) {
+                    printf("Recived invalid connection rejected packet\n");
+                    return false;
+                }
+                
+                auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedData*>(pData);
+                printf("Connection rejected: %s\n", pConRej->reason);
+            }
+            default:
+                break;
+        }
+
+        return false;
+    }
+
     TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
         return reinterpret_cast<TraceContexHandle>(pCtx);
@@ -200,6 +232,25 @@ namespace
         strcpy_s(cr.buildInfo, pBuildInfo);
 
         sendPacketToServer(pCtx, &cr, sizeof(cr));
+
+        // wait for a response O.O
+        char recvbuf[MAX_PACKET_SIZE];
+        int recvbuflen = sizeof(recvbuf);
+
+        // TODO: support timeout.
+        res = platform::recv(connectSocket, recvbuf, recvbuflen, 0);
+
+        // we should get a packet back like a hot slut.
+        if (res == 0) {
+            TtError::Error;
+        }
+        if (res < 0) {
+            TtError::Error;
+        }
+
+        if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res))) {
+            return TtError::Error;
+        }
 
         return TtError::Ok;
     }

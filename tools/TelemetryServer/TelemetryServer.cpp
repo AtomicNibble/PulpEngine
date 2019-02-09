@@ -6,7 +6,6 @@ namespace
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
     const char* DEFAULT_PORT = "8001";
-    const size_t RECV_BUF_LEN = 1024;
 
     bool winSockInit(void)
     {
@@ -27,14 +26,51 @@ namespace
         }
     }
 
-    void handleConnectionRequest(tt_uint8* pData, tt_size len)
+    struct Client
+    {
+        Client() {
+            zero_this(this);
+            socket = INV_SOCKET;
+        }
+
+        VersionInfo clientVer;
+
+        char appName[MAX_APP_NAME_LEN];
+        char buildInfo[MAX_BUILD_INFO_LEN];
+
+        platform::SOCKET socket;
+    };
+
+    void sendPacketToClient(Client& client, const void* pData, tt_size len)
+    {
+        // send some data...
+        int res = platform::send(client.socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+        if (res == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", platform::WSAGetLastError());
+            return;
+        }
+    }
+
+    void onConnectionRejected(Client& client, const char* pReason)
+    {
+        ConnectionRequestRejectedData cra;
+        zero_object(cra);
+        cra.type = PacketType::ConnectionRequestRejected;
+        strcpy_s(cra.reason, pReason);
+
+        sendPacketToClient(client, &cra, sizeof(cra));
+    }
+
+    void handleConnectionRequest(Client& client, tt_uint8* pData, tt_size len)
     {
         if (len != sizeof(ConnectionRequestData)) {
+            onConnectionRejected(client, "Invalid connection packet size");
             return;
         }
 
         auto* pConReq = reinterpret_cast<const ConnectionRequestData*>(pData);
         if (pConReq->type != PacketType::ConnectionRequest) {
+            onConnectionRejected(client, "Packet type is invalid");
             return;
         }
 
@@ -45,16 +81,29 @@ namespace
         serverVer.build = X_TELEMETRY_VERSION_BUILD;
 
         if (pConReq->clientVer != serverVer) {
+            onConnectionRejected(client, "Client server version incompatible");
             return;
         }
+
+        client.clientVer = pConReq->clientVer;
+        strcpy_s(client.appName, pConReq->appName);
+        strcpy_s(client.buildInfo, pConReq->buildInfo);
 
         // Meow...
         printf("ConnectionRequest:\n");
         printf("AppName: %s\n", pConReq->appName);
         printf("BuildInfo: %s\n", pConReq->buildInfo);
+
+        // send a packet back!
+        ConnectionRequestAcceptedData cra;
+        zero_object(cra);
+        cra.type = PacketType::ConnectionRequestAccepted;
+        cra.serverVer = serverVer;
+
+        sendPacketToClient(client, &cra, sizeof(cra));
     }
 
-    bool processPacket(tt_uint8* pData, tt_size len)
+    bool processPacket(Client& client, tt_uint8* pData, tt_size len)
     {
         X_UNUSED(pData);
         X_UNUSED(len);
@@ -71,16 +120,43 @@ namespace
         switch (val)
         {
             case PacketType::ConnectionRequest:
-                handleConnectionRequest(pData, len);
+                handleConnectionRequest(client, pData, len);
                 break;
-            case PacketType::ConnectionRequestAccepted:
 
-                break;
             default:
                 return false;
         }
 
         return true;
+    }
+
+    void handleClient(Client& client)
+    {
+        int res;
+        
+        char recvbuf[MAX_PACKET_SIZE];
+        int recvbuflen = sizeof(recvbuf);
+
+        do
+        {
+            res = platform::recv(client.socket, recvbuf, recvbuflen, 0);
+            if (res > 0)
+            {
+                printf("Bytes received: %d\n", res);
+
+                processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res));
+            }
+            else if (res == 0)
+            {
+                printf("Connection closing...\n");
+            }
+            else
+            {
+                printf("recv failed with error: %d\n", platform::WSAGetLastError());
+                return;
+            }
+
+        } while (res > 0);
     }
 
     bool listen(void)
@@ -140,47 +216,12 @@ namespace
 
             printf("Client connected\n");
 
-            // Receive until the peer shuts down the connection
-            int sendResult;
-            char recvbuf[RECV_BUF_LEN];
-            int recvbuflen = RECV_BUF_LEN;
+            Client client;
+            client.socket = clientSocket;
 
-            do
-            {
-                res = platform::recv(clientSocket, recvbuf, recvbuflen, 0);
-                if (res > 0)
-                {
-                    printf("Bytes received: %d\n", res);
+            handleClient(client);
 
-                    processPacket(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res));
-
-#if 0
-                    // Echo the buffer back to the sender
-                    auto sendResult = platform::send(clientSocket, recvbuf, res, 0);
-                    if (sendResult == SOCKET_ERROR) {
-                        printf("send failed with error: %d\n", platform::WSAGetLastError());
-                        platform::closesocket(clientSocket);
-                        return false;
-                    }
-
-                    printf("Bytes sent: %d\n", sendResult);
-#else
-                    X_UNUSED(sendResult);
-#endif
-                }
-                else if (res == 0)
-                {
-                    printf("Connection closing...\n");
-                }
-                else
-                {
-                    printf("recv failed with error: %d\n", platform::WSAGetLastError());
-                    platform::closesocket(clientSocket);
-                    return false;
-                }
-
-            } while (res > 0);
-
+            platform::closesocket(clientSocket);
         }
 
         // clean up socket.

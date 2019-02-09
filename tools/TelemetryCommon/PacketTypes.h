@@ -6,10 +6,10 @@ enum PacketType
 {
     ConnectionRequest,
     ConnectionRequestAccepted,
+    ConnectionRequestRejected,
 
     Num
 };
-
 
 struct VersionInfo
 {
@@ -32,6 +32,8 @@ struct VersionInfo
 
 constexpr tt_size MAX_APP_NAME_LEN = 64;
 constexpr tt_size MAX_BUILD_INFO_LEN = 128;
+constexpr tt_size MAX_ERR_MSG_LEN = 256;
+constexpr tt_size MAX_PACKET_SIZE = 1024;
 
 struct PacketBase
 {
@@ -44,4 +46,14 @@ struct ConnectionRequestData : public PacketBase
 
     char appName[MAX_APP_NAME_LEN];
     char buildInfo[MAX_BUILD_INFO_LEN];
+};
+
+struct ConnectionRequestAcceptedData : public PacketBase
+{
+    VersionInfo serverVer;
+};
+
+struct ConnectionRequestRejectedData : public PacketBase
+{
+    char reason[MAX_ERR_MSG_LEN];
 };
