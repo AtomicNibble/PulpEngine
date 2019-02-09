@@ -3,7 +3,6 @@
 #ifndef X_TELEMETRY_LIB_H_
 #define X_TELEMETRY_LIB_H_
 
-#include <Core\Compiler.h>
 
 #ifndef TELEMETRYLIB_EXPORT
 #ifdef X_LIB
