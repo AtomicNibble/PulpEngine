@@ -4,13 +4,13 @@
 #define _X_FILE_SYSTEM_I_H_
 
 // why the fuck is this here?
-// #include <io.h>
+// #include "io.h"
 
-#include <Util\Delegate.h>
-#include <Containers\Array.h>
+#include "Util\Delegate.h"
+#include "Containers\Array.h"
 
 #if X_ENABLE_FILE_STATS
-#include <Time\TimeVal.h>
+#include "Time\TimeVal.h"
 #endif // !X_ENABLE_FILE_STATS
 
 // i need the definition :|

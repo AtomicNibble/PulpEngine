@@ -3,23 +3,23 @@
 #ifndef _X_ASSET_MODEL_H_
 #define _X_ASSET_MODEL_H_
 
-#include <Util\FlagsMacros.h>
-#include <Util\Pointer64.h>
+#include "Util\FlagsMacros.h"
+#include "Util\Pointer64.h"
 
-#include <String\StackString.h>
-#include <String\CmdArgs.h>
+#include "String\StackString.h"
+#include "String\CmdArgs.h"
 
-#include <Math\XVector.h>
-#include <Math\XAabb.h>
-#include <Math\XQuatCompressed.h>
-#include <Math\XVecCompressed.h>
-#include <Math\XHalf.h>
-#include <Math\VertexFormats.h>
+#include "Math\XVector.h"
+#include "Math\XAabb.h"
+#include "Math\XQuatCompressed.h"
+#include "Math\XVecCompressed.h"
+#include "Math\XHalf.h"
+#include "Math\VertexFormats.h"
 
-#include <Time\CompressedStamps.h>
+#include "Time\CompressedStamps.h"
 
-#include <IMaterial.h>
-#include <IConverterModule.h>
+#include "IMaterial.h"
+#include "IConverterModule.h"
 
 X_NAMESPACE_BEGIN(model)
 

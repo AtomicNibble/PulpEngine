@@ -1,22 +1,22 @@
 #pragma once
 
-#include <Traits\FunctionTraits.h>
-#include <Traits\MemberFunctionTraits.h>
+#include "Traits\FunctionTraits.h"
+#include "Traits\MemberFunctionTraits.h"
 
-#include <Threading\AtomicInt.h>
-#include <Threading\ThreadLocalStorage.h>
-#include <Threading\JobSystem2.h>
+#include "Threading\AtomicInt.h"
+#include "Threading\ThreadLocalStorage.h"
+#include "Threading\JobSystem2.h"
 
-#include <Memory\AllocationPolicies\LinearAllocator.h>
+#include "Memory\AllocationPolicies\LinearAllocator.h"
 
-#include <Containers\Array.h>
+#include "Containers\Array.h"
 
-#include <Math\XViewPort.h>
+#include "Math\XViewPort.h"
 
-#include <Util\PointerFlags.h>
+#include "Util\PointerFlags.h"
 
-#include <IRender.h>
-#include <IRenderCommands.h>
+#include "IRender.h"
+#include "IRenderCommands.h"
 
 // A single CommandBucket can and should be populated using multiple jobs.
 // as it is designed to scale well.

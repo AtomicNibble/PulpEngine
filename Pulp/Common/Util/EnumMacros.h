@@ -3,10 +3,10 @@
 #ifndef X_ENUM_MACRO_UTIL_H_
 #define X_ENUM_MACRO_UTIL_H_
 
-#include <Prepro\PreproNumArgs.h>
-#include <Prepro\PreproStringize.h>
-#include <Prepro\PreproExpandArgs.h>
-#include <Prepro\PreproPassArgs.h>
+#include "Prepro\PreproNumArgs.h"
+#include "Prepro\PreproStringize.h"
+#include "Prepro\PreproExpandArgs.h"
+#include "Prepro\PreproPassArgs.h"
 
 #define X_DECLARE_ENUM_IMPL_ENUM(value, n) value = n,
 #define X_DECLARE_ENUM_IMPL_TO_STRING(value, n) \

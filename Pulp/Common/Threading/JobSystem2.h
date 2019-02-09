@@ -1,26 +1,26 @@
 #pragma once
 
-#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
-#include <Memory\AllocationPolicies\PoolAllocator.h>
-#include <Memory\BoundsCheckingPolicies\NoBoundsChecking.h>
-#include <Memory\MemoryTrackingPolicies\NoMemoryTracking.h>
-#include <Memory\MemoryTaggingPolicies\NoMemoryTagging.h>
-#include <Memory\HeapArea.h>
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
+#include "Memory\AllocationPolicies\PoolAllocator.h"
+#include "Memory\BoundsCheckingPolicies\NoBoundsChecking.h"
+#include "Memory\MemoryTrackingPolicies\NoMemoryTracking.h"
+#include "Memory\MemoryTaggingPolicies\NoMemoryTagging.h"
+#include "Memory\HeapArea.h"
 
-#include <Traits\FunctionTraits.h>
+#include "Traits\FunctionTraits.h"
 
-#include <Threading\ThreadLocalStorage.h>
-#include <Threading\ConditionVariable.h>
+#include "Threading\ThreadLocalStorage.h"
+#include "Threading\ConditionVariable.h"
 
-#include <Containers\FixedArray.h>
-#include <Containers\Freelist.h>
+#include "Containers\FixedArray.h"
+#include "Containers\Freelist.h"
 
-#include <Util\Delegate.h>
+#include "Util\Delegate.h"
 
 #if X_ENABLE_JOBSYS_PROFILER
-#include <Time\TimeVal.h>
+#include "Time\TimeVal.h"
 
-#include <Containers\Array.h>
+#include "Containers\Array.h"
 #endif // !X_ENABLE_JOBSYS_PROFILER
 
 X_NAMESPACE_BEGIN(core)

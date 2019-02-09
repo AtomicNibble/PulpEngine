@@ -3,12 +3,12 @@
 #ifndef _X_FONT_I_H_
 #define _X_FONT_I_H_
 
-#include <ITexture.h>
-#include <IRender.h>
-#include <IConverterModule.h>
+#include "ITexture.h"
+#include "IRender.h"
+#include "IConverterModule.h"
 
-#include <Time\CompressedStamps.h>
-#include <String\StringHash.h>
+#include "Time\CompressedStamps.h"
+#include "String\StringHash.h"
 
 struct ICore;
 

@@ -4,12 +4,10 @@
 #define X_STRINGUTIL_H_
 
 #include <stdlib.h>
-
 #include <emmintrin.h>
 
-#include <Util\BitUtil.h>
-
-#include <String\StringView.h>
+#include "Util\BitUtil.h"
+#include "String\StringView.h"
 
 X_NAMESPACE_BEGIN(core)
 

@@ -3,7 +3,7 @@
 #ifndef _X_THREADING_ATOMIC_INT_H_
 #define _X_THREADING_ATOMIC_INT_H_
 
-#include <Threading\Atomic.h>
+#include "Threading\Atomic.h"
 
 X_NAMESPACE_BEGIN(core)
 

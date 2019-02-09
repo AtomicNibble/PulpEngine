@@ -1,11 +1,11 @@
 #pragma once
 
-#include <IShader.h>
+#include "IShader.h"
 
-#include <Containers\Array.h>
+#include "Containers\Array.h"
 
-#include <String\StringHash.h>
-#include <Hashing\xxHash.h>
+#include "String\StringHash.h"
+#include "Hashing\xxHash.h"
 
 X_NAMESPACE_BEGIN(render)
 

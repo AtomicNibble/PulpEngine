@@ -3,12 +3,12 @@
 #ifndef _X_CORE_I_H_
 #define _X_CORE_I_H_
 
-#include <Core\Platform.h>
-#include <Traits\FunctionTraits.h>
+#include "Core\Platform.h"
+#include "Traits\FunctionTraits.h"
 
-#include <Math\XVector.h>
+#include "Math\XVector.h"
 
-#include <Random\XorShift.h>
+#include "Random\XorShift.h"
 
 // defaults.
 // #include <Memory\MemoryArenaBase.h>
@@ -19,7 +19,7 @@
 #define IPCORE_API DLL_IMPORT
 #endif
 
-#include <ILog.h>
+#include "ILog.h"
 
 struct ICore;
 struct IEngineFactoryRegistry;

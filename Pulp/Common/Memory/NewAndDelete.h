@@ -5,9 +5,9 @@
 
 #include "CompileTime/IntToType.h"
 #include "CompileTime/IsPOD.h"
-#include <new>
+#include "Memory/MemoryArenaBase.h"
 
-#include <Memory\MemoryArenaBase.h>
+#include <new> // TODO: needed?
 
 X_NAMESPACE_BEGIN(core)
 

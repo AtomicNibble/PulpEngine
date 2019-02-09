@@ -3,23 +3,23 @@
 #ifndef X_BASE_ASSET_H_
 #define X_BASE_ASSET_H_
 
-#include <Threading\AtomicInt.h>
-#include <Threading\ScopedLock.h>
-#include <Containers\HashMap.h>
-#include <Containers\FixedHashTable.h>
-#include <Containers\Array.h>
-#include <Containers\Fifo.h>
+#include "Threading\AtomicInt.h"
+#include "Threading\ScopedLock.h"
+#include "Containers\HashMap.h"
+#include "Containers\FixedHashTable.h"
+#include "Containers\Array.h"
+#include "Containers\Fifo.h"
 
-#include <String\StringHash.h>
+#include "String\StringHash.h"
 
 // for new
-#include <IAssetDb.h>
-#include <Util\BitUtil.h>
-#include <Util\ReferenceCounted.h>
-#include <Memory\AllocationPolicies\PoolAllocator.h>
-#include <Memory\HeapArea.h>
-#include <Memory\ThreadPolicies\MultiThreadPolicy.h>
-#include <Memory\VirtualMem.h>
+#include "IAssetDb.h"
+#include "Util\BitUtil.h"
+#include "Util\ReferenceCounted.h"
+#include "Memory\AllocationPolicies\PoolAllocator.h"
+#include "Memory\HeapArea.h"
+#include "Memory\ThreadPolicies\MultiThreadPolicy.h"
+#include "Memory\VirtualMem.h"
 
 X_NAMESPACE_BEGIN(core)
 

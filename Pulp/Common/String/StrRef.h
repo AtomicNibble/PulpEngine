@@ -3,11 +3,12 @@
 #ifndef _X_REFSTRING_H_
 #define _X_REFSTRING_H_
 
+// TODO: remove
 #include <string.h>
 #include <wchar.h>
 #include <stdio.h>
 
-#include <String\StringUtil.h>
+#include "String\StringUtil.h"
 
 X_NAMESPACE_BEGIN(core)
 

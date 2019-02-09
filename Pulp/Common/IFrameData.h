@@ -1,11 +1,11 @@
 #pragma once
 
-#include <Time\TimeVal.h>
+#include "Time\TimeVal.h"
 
-#include <IInput.h>
-#include <ITimer.h>
+#include "IInput.h"
+#include "ITimer.h"
 
-#include <Math\XViewPort.h>
+#include "Math\XViewPort.h"
 
 X_NAMESPACE_BEGIN(core)
 

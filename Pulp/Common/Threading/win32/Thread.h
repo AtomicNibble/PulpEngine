@@ -3,11 +3,11 @@
 #ifndef _X_THREAD_H_
 #define _X_THREAD_H_
 
-#include <Traits/FunctionTraits.h>
-#include <Util\Delegate.h>
-#include <Util\LastError.h>
+#include "Traits\FunctionTraits.h"
+#include "Util\Delegate.h"
+#include "Util\LastError.h"
 
-#include <String\StackString.h>
+#include "String\StackString.h"
 
 #ifdef YieldProcessor
 #undef YieldProcessor

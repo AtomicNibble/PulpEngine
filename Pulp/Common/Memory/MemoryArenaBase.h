@@ -10,7 +10,7 @@
 #if X_COMPILER_CLANG
 #include <vector>
 #else
-#include <Containers\FixedArray.h>
+#include "Containers\FixedArray.h"
 #endif // !X_COMPILER_CLANG
 
 #endif // !X_ENABLE_MEMORY_ARENA_CHILDREN
