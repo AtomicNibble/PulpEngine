@@ -5,8 +5,6 @@
 
 X_NAMESPACE_BEGIN(core)
 
-class MemoryArenaBase;
-
 template<class T>
 X_INLINE constexpr const T& Max(const T& x, const T& y)
 {
