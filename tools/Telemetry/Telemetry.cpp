@@ -1,9 +1,10 @@
 #include "stdafx.h"
 #include "TelemetryLib.h"
 
-#include "Util/PrePro.h"
-
 #include <cstdio>
+
+#include <../TelemetryCommon/Version.h>
+#include <../TelemetryCommon/PacketTypes.h>
 
 namespace platform
 {
@@ -38,6 +39,16 @@ namespace
         platform::SOCKET socket;
     };
 
+    void sendPacketToServer(TraceContext* pCtx, const void* pData, tt_size len)
+    {
+        // send some data...
+        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+        if (res == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", platform::WSAGetLastError());
+            return;
+        }
+    }
+
     TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
         return reinterpret_cast<TraceContexHandle>(pCtx);
@@ -58,6 +69,9 @@ namespace
 
     bool ttInit(void)
     {
+        AllocConsole();
+        freopen("CONOUT$", "w", stdout);
+
         platform::WSADATA winsockInfo;
 
         if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0) {
@@ -130,7 +144,7 @@ namespace
 
         // need to connect to the server :O
         struct platform::addrinfo hints, *servinfo = nullptr;
-        ZeroMemory(&hints, sizeof(hints));
+        zero_object(hints);
         hints.ai_family = AF_UNSPEC; // ipv4/6
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = platform::IPPROTO_TCP;
@@ -171,13 +185,41 @@ namespace
             return TtError::Error;
         }
 
+        auto* pCtx = handleToContext(ctx);
+        pCtx->socket = connectSocket;
+
+        ConnectionRequestData cr;
+        zero_object(cr);
+        cr.type = PacketType::ConnectionRequest;
+        cr.clientVer.major = X_TELEMETRY_VERSION_MAJOR;
+        cr.clientVer.minor = X_TELEMETRY_VERSION_MINOR;
+        cr.clientVer.patch = X_TELEMETRY_VERSION_PATCH;
+        cr.clientVer.build = X_TELEMETRY_VERSION_BUILD;
+
+        strcpy_s(cr.appName, pAppName);
+        strcpy_s(cr.buildInfo, pBuildInfo);
+
+        sendPacketToServer(pCtx, &cr, sizeof(cr));
 
         return TtError::Ok;
     }
 
     bool ttClose(TraceContexHandle ctx)
     {
-        X_UNUSED(ctx);
+        auto* pCtx = handleToContext(ctx);
+
+#if 0 // TODO: needed?
+        int res = platform::shutdown(pCtx->socket, SD_BOTH);
+        if (res == SOCKET_ERROR) {
+            printf("shutdown failed with error: %d\n", platform::WSAGetLastError());
+        }
+#endif
+
+        if (pCtx->socket != INV_SOCKET) {
+            platform::closesocket(pCtx->socket);
+            pCtx->socket = INV_SOCKET;
+        }
+
         return true;
     }
 

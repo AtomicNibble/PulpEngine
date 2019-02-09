@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+
 namespace
 {
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
@@ -26,19 +27,75 @@ namespace
         }
     }
 
+    void handleConnectionRequest(tt_uint8* pData, tt_size len)
+    {
+        if (len != sizeof(ConnectionRequestData)) {
+            return;
+        }
+
+        auto* pConReq = reinterpret_cast<const ConnectionRequestData*>(pData);
+        if (pConReq->type != PacketType::ConnectionRequest) {
+            return;
+        }
+
+        VersionInfo serverVer;
+        serverVer.major = X_TELEMETRY_VERSION_MAJOR;
+        serverVer.minor = X_TELEMETRY_VERSION_MINOR;
+        serverVer.patch = X_TELEMETRY_VERSION_PATCH;
+        serverVer.build = X_TELEMETRY_VERSION_BUILD;
+
+        if (pConReq->clientVer != serverVer) {
+            return;
+        }
+
+        // Meow...
+        printf("ConnectionRequest:\n");
+        printf("AppName: %s\n", pConReq->appName);
+        printf("BuildInfo: %s\n", pConReq->buildInfo);
+    }
+
+    bool processPacket(tt_uint8* pData, tt_size len)
+    {
+        X_UNUSED(pData);
+        X_UNUSED(len);
+
+        if (len < 1) {
+            return false;
+        }
+
+        tt_uint8 val = pData[0];
+        if (val >= PacketType::Num) {
+            return false;
+        }
+
+        switch (val)
+        {
+            case PacketType::ConnectionRequest:
+                handleConnectionRequest(pData, len);
+                break;
+            case PacketType::ConnectionRequestAccepted:
+
+                break;
+            default:
+                return false;
+        }
+
+        return true;
+    }
+
     bool listen(void)
     {
         struct platform::addrinfo hints;
         struct platform::addrinfo *result = nullptr;
 
-        ZeroMemory(&hints, sizeof(hints));
+        zero_object(hints);
         hints.ai_family = AF_INET;
         hints.ai_socktype = SOCK_STREAM;
         hints.ai_protocol = platform::IPPROTO_TCP;
         hints.ai_flags = AI_PASSIVE;
 
         // Resolve the server address and port
-        auto res = platform::getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
+        int res = platform::getaddrinfo(NULL, DEFAULT_PORT, &hints, &result);
         if (res != 0) {
             return false;
         }
@@ -94,6 +151,8 @@ namespace
                 if (res > 0)
                 {
                     printf("Bytes received: %d\n", res);
+
+                    processPacket(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res));
 
 #if 0
                     // Echo the buffer back to the sender

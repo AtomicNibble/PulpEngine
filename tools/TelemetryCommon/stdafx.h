@@ -1,9 +1,9 @@
 #pragma once
 
-
-#include <../TelemetryCommon/TelemetryCommonLib.h>
-
-// --------------------------------------
+#include "Types.h"
+#include "Compiler.h"
+#include "PlatformWin32.h"
+#include "Util.h"
 
 
 #ifdef X_LIB
