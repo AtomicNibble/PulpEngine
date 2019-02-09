@@ -156,8 +156,21 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         const size_t telemBufSize = 1024 * 1024;
         auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 16);
 
-        telem::TraceContexHandle ctx;
+        telem::ContexHandle ctx;
         telem::InitializeContext(ctx, telemBuf.ptr(), telemBufSize);
+
+        auto res = telem::Open(ctx, 
+            X_ENGINE_NAME "Engine", 
+            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF,
+            "127.0.0.1",
+            8001,
+            telem::ConnectionType::Tcp,
+            1000);
+
+        if (res != telem::Error::Ok) {
+            // rip
+            return -1;
+        }
 
         {
             core::Thread thread;

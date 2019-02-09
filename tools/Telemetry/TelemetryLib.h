@@ -5,6 +5,7 @@
 
 
 #ifndef TELEMETRYLIB_EXPORT
+
 #ifdef X_LIB
 #define TELEMETRYLIB_EXPORT
 #else
@@ -14,6 +15,7 @@
 #define TELEMETRYLIB_EXPORT X_IMPORT
 #endif // !TELEMETRY_LIB_EXPORT
 #endif // X_LIB
+
 #endif // !TELEMETRYLIB_EXPORT
 
 

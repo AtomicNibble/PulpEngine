@@ -3,6 +3,8 @@
 
 #include "Util/PrePro.h"
 
+#include <cstdio>
+
 namespace platform
 {
     #ifndef NEAR
@@ -23,6 +25,8 @@ namespace platform
 
 namespace
 {
+    const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
+
     struct TraceContext
     {
         tt_uint8* pScratchBuf;
@@ -30,6 +34,8 @@ namespace
 
         bool isEnabled;
         bool _pad[3];
+
+        platform::SOCKET socket;
     };
 
     TraceContexHandle contextToHandle(TraceContext* pCtx)
@@ -85,6 +91,7 @@ namespace
         pCtx->pScratchBuf = pBufU8 + contexSize;
         pCtx->bufLen = bufLen - contexSize;
         pCtx->isEnabled = true;
+        pCtx->socket = INV_SOCKET;
 
 
         out = contextToHandle(pCtx);
@@ -98,13 +105,13 @@ namespace
     }
 
     TtError ttOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        ConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS)
+        tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS)
     {
         if (!isValidContext(ctx)) {
             return TtError::InvalidContex;
         }
 
-        if (conType != ConnectionType::ReliableUdp) {
+        if (conType != TtConnectionType::Tcp) {
             return TtError::InvalidParam;
         }
 
@@ -120,6 +127,49 @@ namespace
         X_UNUSED(pServerAddress);
         X_UNUSED(serverPort);
 
+
+        // need to connect to the server :O
+        struct platform::addrinfo hints, *servinfo = nullptr;
+        ZeroMemory(&hints, sizeof(hints));
+        hints.ai_family = AF_UNSPEC; // ipv4/6
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = platform::IPPROTO_TCP;
+
+        char portStr[32] = {};
+        sprintf(portStr, "%d", serverPort);
+
+        // Resolve the server address and port
+        auto res = platform::getaddrinfo(pServerAddress, portStr, &hints, &servinfo);
+        if (res != 0) {
+            return TtError::Error;
+        }
+
+        platform::SOCKET connectSocket = INV_SOCKET;
+
+        for (auto pPtr = servinfo; pPtr != nullptr; pPtr = pPtr->ai_next) {
+
+            // Create a SOCKET for connecting to server
+            connectSocket = platform::socket(pPtr->ai_family, pPtr->ai_socktype, pPtr->ai_protocol);
+            if (connectSocket == INV_SOCKET) {
+                return TtError::Error;
+            }
+
+            // Connect to server.
+            res = connect(connectSocket, pPtr->ai_addr, static_cast<int>(pPtr->ai_addrlen));
+            if (res == SOCKET_ERROR) {
+                platform::closesocket(connectSocket);
+                connectSocket = INV_SOCKET;
+                continue;
+            }
+
+            break;
+        }
+
+        platform::freeaddrinfo(servinfo);
+
+        if (connectSocket == INV_SOCKET) {
+            return TtError::Error;
+        }
 
 
         return TtError::Ok;

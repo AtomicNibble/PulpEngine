@@ -34,9 +34,9 @@ static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
 using TraceContexHandle = tt_uintptr;
 inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
-enum ConnectionType
+enum TtConnectionType
 {
-    ReliableUdp
+    Tcp
 };
 
 enum TtLockResult
@@ -64,11 +64,12 @@ enum TtPlotType
     Untyped
 };
 
-enum class TtError
+enum TtError
 {
     Ok,
+    Error,
     InvalidParam,
-    InvalidContex
+    InvalidContex,
 };
 
 #ifdef __cplusplus
@@ -88,7 +89,7 @@ extern "C"
     TELEMETRYLIB_EXPORT void ttShutdownContext(TraceContexHandle ctx);
 
     TELEMETRYLIB_EXPORT TtError ttOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        ConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS);
+        tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS);
 
     TELEMETRYLIB_EXPORT bool ttClose(TraceContexHandle ctx);
 
@@ -140,7 +141,13 @@ extern "C"
 
 namespace telem
 {
-    using TraceContexHandle = TraceContexHandle;
+    using ContexHandle = TraceContexHandle;
+    using ConnectionType = TtConnectionType;
+    using LockResult = TtLockResult;
+    using LockState = TtLockState;
+    using LockState = TtLockState;
+    using PlotType = TtPlotType;
+    using Error = TtError;
 
 
     inline bool Init(void)
@@ -154,23 +161,23 @@ namespace telem
     }
 
     // Context
-    inline bool InitializeContext(TraceContexHandle& out, void* pBuf, tt_size bufLen)
+    inline bool InitializeContext(ContexHandle& out, void* pBuf, tt_size bufLen)
     {
         return ttInitializeContext(out, pBuf, bufLen);
     }
 
-    inline void ShutdownContext(TraceContexHandle ctx)
+    inline void ShutdownContext(ContexHandle ctx)
     {
         ttShutdownContext(ctx);
     }
 
-    inline TtError Open(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        ConnectionType conType, tt_uint16 serverPort, tt_int32 timeoutMS)
+    inline TtError Open(ContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
+        tt_uint16 serverPort, ConnectionType conType, tt_int32 timeoutMS)
     {
-        return ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, conType, serverPort, timeoutMS);
+        return ttOpen(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS);
     }
 
-    inline bool Close(TraceContexHandle ctx)
+    inline bool Close(ContexHandle ctx)
     {
         return ttClose(ctx);
     }
