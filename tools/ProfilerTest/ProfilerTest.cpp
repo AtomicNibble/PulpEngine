@@ -160,8 +160,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         telem::InitializeContext(ctx, telemBuf.ptr(), telemBufSize);
 
         auto res = telem::Open(ctx, 
-            X_ENGINE_NAME "Engine", 
-            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF,
+            X_ENGINE_NAME " - Engine", 
+            X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",
             8001,
             telem::ConnectionType::Tcp,
