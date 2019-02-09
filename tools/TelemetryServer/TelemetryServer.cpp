@@ -56,6 +56,7 @@ namespace
         // Setup the TCP listening socket
         res = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
         if (res == SOCKET_ERROR) {
+            printf("bind failed with error: %d\n", platform::WSAGetLastError());
             platform::freeaddrinfo(result);
             platform::closesocket(listenSocket);
             return false;
@@ -69,60 +70,72 @@ namespace
             return false;
         }
 
-        // Accept a client socket
-        clientSocket = platform::accept(listenSocket, NULL, NULL);
-        if (clientSocket == INV_SOCKET) {
-            platform::closesocket(listenSocket);
-            return false;
-        }
-
-        // No longer need server socket
-        platform::closesocket(listenSocket);
-
-        // Receive until the peer shuts down the connection
-        int sendResult;
-        char recvbuf[RECV_BUF_LEN];
-        int recvbuflen = RECV_BUF_LEN;
-
-        do 
+        while (true)
         {
-            res = platform::recv(clientSocket, recvbuf, recvbuflen, 0);
-            if (res > 0) 
-            {
-                printf("Bytes received: %d\n", res);
+            printf("Waiting for client on port: %s\n", DEFAULT_PORT);
 
-#if 0
-                // Echo the buffer back to the sender
-                auto sendResult = platform::send(clientSocket, recvbuf, res, 0);
-                if (sendResult == SOCKET_ERROR) {
-                    printf("send failed with error: %d\n", platform::WSAGetLastError());
-                    platform::closesocket(clientSocket);
-                    return false;
-                }
-            
-                printf("Bytes sent: %d\n", sendResult);
-#else
-                X_UNUSED(sendResult);
-#endif
-            }
-            else if (res == 0)
-            {
-                printf("Connection closing...\n");
-            }
-            else 
-            {
-                printf("recv failed with error: %d\n", platform::WSAGetLastError());
-                platform::closesocket(clientSocket);
+            // Accept a client socket
+            clientSocket = platform::accept(listenSocket, NULL, NULL);
+            if (clientSocket == INV_SOCKET) {
+                platform::closesocket(listenSocket);
                 return false;
             }
 
-        } while (res > 0);
+            printf("Client connected\n");
+
+            // Receive until the peer shuts down the connection
+            int sendResult;
+            char recvbuf[RECV_BUF_LEN];
+            int recvbuflen = RECV_BUF_LEN;
+
+            do
+            {
+                res = platform::recv(clientSocket, recvbuf, recvbuflen, 0);
+                if (res > 0)
+                {
+                    printf("Bytes received: %d\n", res);
+
+#if 0
+                    // Echo the buffer back to the sender
+                    auto sendResult = platform::send(clientSocket, recvbuf, res, 0);
+                    if (sendResult == SOCKET_ERROR) {
+                        printf("send failed with error: %d\n", platform::WSAGetLastError());
+                        platform::closesocket(clientSocket);
+                        return false;
+                    }
+
+                    printf("Bytes sent: %d\n", sendResult);
+#else
+                    X_UNUSED(sendResult);
+#endif
+                }
+                else if (res == 0)
+                {
+                    printf("Connection closing...\n");
+                }
+                else
+                {
+                    printf("recv failed with error: %d\n", platform::WSAGetLastError());
+                    platform::closesocket(clientSocket);
+                    return false;
+                }
+
+            } while (res > 0);
+
+        }
+
+        // clean up socket.
+        platform::closesocket(listenSocket);
 
         return true;
     }
 
 } // namespace
 
+#if 1 // SubSystem /console
+int main() 
+{
+#else
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR lpCmdLine,
@@ -132,13 +145,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     X_UNUSED(hPrevInstance);
     X_UNUSED(lpCmdLine);
     X_UNUSED(nCmdShow);
+#endif
 
     if (!winSockInit()) {
         return 1;
     }
 
     // have the server listen...
-    listen();
+    if (!listen()) {
+        getchar();
+    }
 
     winSockShutDown();
     return 0;
