@@ -52,14 +52,12 @@ namespace pointerUtil
     template<typename T>
     X_INLINE bool IsAligned(T value, unsigned int alignment, unsigned int offset)
     {
-        // T is an integer type, thus we can simply use the modulo operator
         return ((value + offset) % alignment) == 0;
     }
 
     template<typename T>
     X_INLINE bool IsAligned(T* value, unsigned int alignment, unsigned int offset)
     {
-        // T is a pointer-type, which must first be cast into a suitable integer before we can use the modulo operator
         return ((union_cast<uintptr_t>(value) + offset) % alignment) == 0;
     }
 
