@@ -68,6 +68,7 @@ namespace
         const char* pLabel_;
     };
 
+
     struct BlockData
     {
         uint64_t start;
@@ -162,9 +163,9 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         const size_t telemBufSize = 1024 * 1024;
         auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 16);
 
-        telem::InitializeContext(ctx, telemBuf.ptr(), telemBufSize);
+        ttInitializeContext(ctx, telemBuf.ptr(), telemBufSize);
 
-        auto res = telem::Open(ctx, 
+        auto res = ttOpen(ctx, 
             X_ENGINE_NAME " - Engine", 
             X_BUILD_STRING " Version: " X_ENGINE_VERSION_STR " Rev: " X_ENGINE_BUILD_REF_STR,
             "127.0.0.1",

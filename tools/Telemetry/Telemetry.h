@@ -50,6 +50,21 @@ enum TtError
     ConnectionRejected
 };
 
+struct TtSourceInfo
+{
+    inline TtSourceInfo(const char* const pFile, const char* const pFunction, int line) :
+        pFile_(pFile),
+        pFunction_(pFunction),
+        line_(line)
+    {}
+
+    const char* const pFile_;
+    const char* const pFunction_;
+    const int line_;
+};
+
+#define TT_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
+
 #ifdef __cplusplus
 extern "C" 
 {
@@ -81,8 +96,8 @@ extern "C"
     TELEMETRYLIB_EXPORT void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pName);
 
     // Zones
-    TELEMETRYLIB_EXPORT void TelemEnter(TraceContexHandle ctx, const char* pZoneName);
-    TELEMETRYLIB_EXPORT void TelemEnterEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName);
+    TELEMETRYLIB_EXPORT void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName);
+    TELEMETRYLIB_EXPORT void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName);
     TELEMETRYLIB_EXPORT void TelemLeave(TraceContexHandle ctx);
     TELEMETRYLIB_EXPORT void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId);
 
@@ -124,10 +139,10 @@ namespace telem
 
     struct ScopedZone
     {
-        ScopedZone(TraceContexHandle ctx, const char* pLabel) :
+        ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pLabel) :
             ctx_(ctx)
         {
-            TelemEnter(ctx, pLabel);
+            TelemEnter(ctx, sourceInfo, pLabel);
         }
 
         ~ScopedZone() {
@@ -140,10 +155,10 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        ScopedZoneFilterd(TraceContexHandle ctx, tt_uint64 minMicroSec, const char* pLabel) :
+        ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pLabel) :
             ctx_(ctx)
         {
-            TelemEnterEx(ctx, matchId_, minMicroSec, pLabel);
+            TelemEnterEx(ctx, sourceInfo, matchId_, minMicroSec, pLabel);
         }
 
         ~ScopedZoneFilterd() {
@@ -161,8 +176,8 @@ namespace telem
 
 #if TTELEMETRY_ENABLED
 
-#define ttZone(ctx, pLabel) telem::ScopedZone X_TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, pLabel);
-#define ttZoneFilterd(ctx, minMicroSec, pLabel) telem::ScopedZoneFilterd X_TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, minMicroSec, pLabel);
+#define ttZone(ctx, pLabel) telem::ScopedZone X_TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, pLabel);
+#define ttZoneFilterd(ctx, minMicroSec, pLabel) telem::ScopedZoneFilterd X_TELEMETRY_UNIQUE_NAME(scopedzone_)(ctx, TT_SOURCE_INFO, minMicroSec, pLabel);
 
 #define ttInit() TelemInit()
 #define ttShutDown() TelemShutDown()

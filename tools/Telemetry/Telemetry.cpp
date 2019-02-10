@@ -331,7 +331,7 @@ namespace
         tt_uint64 time;
     };
 
-    void TelemEnter(TraceContexHandle ctx, const char* pZoneName)
+    void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
     {
         auto* pCtx = handleToContext(ctx);
         if (!pCtx->isEnabled) {
@@ -339,6 +339,7 @@ namespace
         }
 
         X_UNUSED(ctx);
+        X_UNUSED(sourceInfo);
         X_UNUSED(pZoneName);
 
         ZoneEnterData packet;
@@ -346,9 +347,10 @@ namespace
 
     }
 
-    void TelemEnterEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
+    void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
     {
         X_UNUSED(ctx);
+        X_UNUSED(sourceInfo);
         X_UNUSED(matchIdOut);
         X_UNUSED(minMicroSec);
         X_UNUSED(pZoneName);
