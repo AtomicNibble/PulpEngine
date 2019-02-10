@@ -1,19 +1,21 @@
 
-// ---------------------------------------------------------------------------------------------------------------------
+
 inline CRITICAL_SECTION* CriticalSection::GetNativeObject(void)
 {
     return &cs_;
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-inline CriticalSection::ScopedLock::ScopedLock(CriticalSection& criticalSection) :
-    cs_(criticalSection)
+inline void CriticalSection::Enter(void)
 {
-    criticalSection.Enter();
+    EnterCriticalSection(&cs_);
 }
 
-// ---------------------------------------------------------------------------------------------------------------------
-inline CriticalSection::ScopedLock::~ScopedLock(void)
+inline bool CriticalSection::TryEnter(void)
 {
-    cs_.Leave();
+    return TryEnterCriticalSection(&cs_) != 0;
+}
+
+inline void CriticalSection::Leave(void)
+{
+    LeaveCriticalSection(&cs_);
 }

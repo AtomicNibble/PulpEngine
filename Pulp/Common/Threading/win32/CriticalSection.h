@@ -3,37 +3,29 @@
 #ifndef X_CRITICALSECTION_H_
 #define X_CRITICALSECTION_H_
 
+#include "Threading/ScopedLock.h"
+
 X_NAMESPACE_BEGIN(core)
 
 
 class CriticalSection
 {
 public:
+    typedef ScopedLock<CriticalSection> ScopedLock;
+
+public:
     CriticalSection(void);
     explicit CriticalSection(uint32_t spinCount);
 
     ~CriticalSection(void);
 
-    void Enter(void);
-    bool TryEnter(void);
-    void Leave(void);
+    inline void Enter(void);
+    inline bool TryEnter(void);
+    inline void Leave(void);
 
     void SetSpinCount(uint32_t count);
 
     inline CRITICAL_SECTION* GetNativeObject(void);
-
-    class ScopedLock
-    {
-    public:
-        inline explicit ScopedLock(CriticalSection& criticalSection);
-        inline ~ScopedLock(void);
-
-    private:
-        X_NO_COPY(ScopedLock);
-        X_NO_ASSIGN(ScopedLock);
-
-        CriticalSection& cs_;
-    };
 
 private:
     CRITICAL_SECTION cs_;
