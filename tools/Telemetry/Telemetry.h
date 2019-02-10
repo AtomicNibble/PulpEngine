@@ -4,10 +4,12 @@
 
 #define TTELEMETRY_ENABLED 1
 
-#define X_TELEMETRY_UNIQUE_NAME_HELPER(_0, _1)  _0##_1
+#define X_TELEMETRY_UNIQUE_NAME_HELPER_0(_0, _1)  _0##_1
+#define X_TELEMETRY_UNIQUE_NAME_HELPER(_0, _1) X_TELEMETRY_UNIQUE_NAME_HELPER_0(_0, _1)
 #define X_TELEMETRY_UNIQUE_NAME(name) X_TELEMETRY_UNIQUE_NAME_HELPER(name, __LINE__)
 
 using TraceContexHandle = tt_uintptr;
+
 inline TraceContexHandle INVALID_TRACE_CONTEX = 0;
 
 enum TtConnectionType
