@@ -127,6 +127,10 @@ namespace
     {
         X_UNUSED(thread);
 
+        ttZone(ctx, "Aint no camel like me!");
+
+        core::Thread::sleep(10);
+
         {
             ttZone(ctx, "Slap my goat!");
 
@@ -161,7 +165,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #if TTELEMETRY_ENABLED
 
         const size_t telemBufSize = 1024 * 1024;
-        auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 16);
+        auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 64);
 
         ttInitializeContext(ctx, telemBuf.ptr(), telemBufSize);
 

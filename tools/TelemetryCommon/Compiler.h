@@ -8,6 +8,8 @@
 #define X_FINAL                                 override final
 
 #define X_PRAGMA(pragma)                        __pragma(pragma)
+#define X_DISABLE_WARNING(number)               X_PRAGMA(warning(disable: number))
+#define X_ENABLE_WARNING(number)                X_PRAGMA(warning(default: number))
 #define X_PUSH_WARNING_LEVEL(level)             X_PRAGMA(warning(push, level))
 #define X_POP_WARNING_LEVEL                     X_PRAGMA(warning(pop))
 #define X_ALIGN_OF(type)                        __alignof(type)

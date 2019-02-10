@@ -5,6 +5,8 @@
 
 #include <../TelemetryCommon/Version.h>
 #include <../TelemetryCommon/PacketTypes.h>
+#include <../TelemetryCommon/StringTable.h>
+#include <../TelemetryCommon/StringCompress.h>
 
 namespace platform
 {
@@ -26,18 +28,109 @@ namespace platform
 
 namespace
 {
+    X_INLINE tt_uint32 getThreadID(void)
+    {
+        return ::GetCurrentThreadId();
+    }
+
+    X_INLINE tt_uint64 getTicks(void)
+    {
+        return __rdtsc();
+    }
+
+    X_INLINE void* AlignTop(void* ptr, tt_size alignment)
+    {
+        union
+        {
+            void* as_void;
+            tt_uintptr as_uintptr_t;
+        };
+
+        const tt_size mask = alignment - 1;
+        as_void = ptr;
+        as_uintptr_t += mask;
+        as_uintptr_t &= ~mask;
+        return as_void;
+    }
+
+    template<typename T>
+    X_INLINE bool IsAligned(T value, unsigned int alignment, unsigned int offset)
+    {
+        return ((value + offset) % alignment) == 0;
+    }
+
+
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
-    struct TraceContext
+
+    struct TraceZone
     {
-        tt_uint8* pScratchBuf;
-        tt_size bufLen;
+        tt_uint64 start;
+        tt_uint64 end;
+
+        const char* pZoneName;
+        const TtSourceInfo* pSourceInfo;
+    };
+
+    X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
+
+    // some data for each thread!
+    X_ALIGNED_SYMBOL(struct TraceThread, 64)
+    {
+        TraceThread() {
+            id = getThreadID();
+            stackDepth = 0;
+
+            // Debug only?
+            zero_object(zones);
+        }
+
+        TtthreadId id;
+        tt_int32 stackDepth;
+
+        TraceZone zones[MAX_ZONE_DEPTH];
+    };
+
+    thread_local TraceThread* threadData = nullptr;
+
+    // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
+    X_ALIGNED_SYMBOL(struct TraceContext, 64)
+    {
+        //tt_uint8* pScratchBuf;
+        //tt_size scratchBufLen;
 
         bool isEnabled;
         bool _pad[3];
 
+        TraceThread* pThreadData;
+        tt_int32 numThreadData;
+
+        StringTable strTable;
+
         platform::SOCKET socket;
     };
+
+    X_ENABLE_WARNING(4324)
+
+
+    TraceThread* getThreadData(TraceContext* pCtx)
+    {
+        auto* pThreadData = threadData;
+        if (!pThreadData) {
+
+            if (pCtx->numThreadData == MAX_ZONE_THREADS) {
+                return nullptr;
+            }
+
+            pThreadData = new (&pCtx->pThreadData[pCtx->numThreadData]) TraceThread();
+            ++pCtx->numThreadData;
+
+            threadData = pThreadData;
+        }
+
+        return pThreadData;
+    }
+
 
     void sendPacketToServer(TraceContext* pCtx, const void* pData, tt_size len)
     {
@@ -92,6 +185,54 @@ namespace
         return false;
     }
 
+    void writeStringPacket(TraceContext* pCtx, const char* pStr)
+    {
+        tt_size strLen = strlen(pStr);
+        if (strLen > MAX_STRING_LEN) {
+            strLen = MAX_STRING_LEN;
+        }
+
+        tt_size packetLen = sizeof(StringTableAddData) + strLen;
+
+        tt_uint8 strDataBuf[sizeof(StringTableAddData) + MAX_STRING_LEN];
+        auto* pHeader = reinterpret_cast<StringTableAddData*>(strDataBuf);
+        pHeader->type = DataStreamType::StringTableAdd;
+        pHeader->length = static_cast<tt_uint16>(strLen);
+
+        memcpy(strDataBuf + sizeof(StringTableAddData), pStr, strLen);
+
+        addDataPacket(pCtx, &strDataBuf, packetLen);
+    }
+
+
+    void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
+    {
+        // TODO: sort this out.
+
+        ZoneData packet;
+        packet.type = DataStreamType::Zone;
+        packet.start = zone.start;
+        packet.end = zone.end;
+        packet.threadID = pThread->id;
+        packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFile_);
+        packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFunction_);
+        packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
+
+        // i want to write the string data.
+        if (packet.strIdxFile.inserted) {
+            writeStringPacket(pCtx, zone.pSourceInfo->pFile_);
+        }
+        if (packet.strIdxFunction.inserted) {
+            writeStringPacket(pCtx, zone.pSourceInfo->pFunction_);
+        }
+        if (packet.strIdxZone.inserted) {
+            writeStringPacket(pCtx, zone.pZoneName);
+        }
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+
     TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
         return reinterpret_cast<TraceContexHandle>(pCtx);
@@ -106,12 +247,6 @@ namespace
     {
         return handle != INVALID_TRACE_CONTEX;
     }
-
-    X_INLINE tt_uint64 getTicks(void)
-    {
-        return __rdtsc();
-    }
-
 
 } // namespace
 
@@ -138,22 +273,38 @@ void TelemShutDown(void)
     }
 }
 
-bool TelemInitializeContext(TraceContexHandle& out, void* pBuf, tt_size bufLen)
+bool TelemInitializeContext(TraceContexHandle& out, void* pBuf_, tt_size bufLen)
 {
     out = INVALID_TRACE_CONTEX;
 
-    auto contexSize = sizeof(TraceContext);
-    if (bufLen < contexSize) {
+    // need to align upto 64bytes.
+    auto pBuf = AlignTop(pBuf_, 64);
+    const tt_uintptr alignmentSize = reinterpret_cast<tt_uintptr>(pBuf) - reinterpret_cast<tt_uintptr>(pBuf_);
+
+    constexpr tt_size contexSize = sizeof(TraceContext);
+    constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
+    constexpr tt_size strTableSize = sizeof(void*) * 1024;
+
+    constexpr tt_size minSize = contexSize + strTableSize + threadDataSize;
+    if (bufLen < minSize + alignmentSize) {
         return false;
     }
 
     tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
 
+    tt_uint8* pThreadDataBuf = pBufU8 + contexSize;
+    tt_uint8* pStrTableBuf = pThreadDataBuf + threadDataSize;
+
+
     TraceContext* pCtx = reinterpret_cast<TraceContext*>(pBuf);
-    pCtx->pScratchBuf = pBufU8 + contexSize;
-    pCtx->bufLen = bufLen - contexSize;
     pCtx->isEnabled = true;
     pCtx->socket = INV_SOCKET;
+    pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
+    pCtx->numThreadData = 0;
+    pCtx->strTable = CreateStringTable(pStrTableBuf, strTableSize);
+
+  //  pCtx->pScratchBuf = pBufU8 + contexSize;
+  //  pCtx->bufLen = bufLen - contexSize;
 
     out = contextToHandle(pCtx);
     return true;
@@ -324,6 +475,8 @@ bool TelemIsPaused(TraceContexHandle ctx)
     return handleToContext(ctx)->isEnabled;
 }
 
+
+
 // Zones
 void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
 {
@@ -332,15 +485,18 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
         return;
     }
 
-    X_UNUSED(ctx);
-    X_UNUSED(sourceInfo);
-    X_UNUSED(pZoneName);
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
 
-    ZoneEnterData packet;
-    packet.type = DataStreamType::ZoneEnter;
-    packet.time = getTicks();
+    auto depth = pThreadData->stackDepth;
+    ++pThreadData->stackDepth;
 
-    addDataPacket(pCtx, &packet, sizeof(packet));
+    auto& zone = pThreadData->zones[depth];
+    zone.start = getTicks();
+    zone.pZoneName = pZoneName;
+    zone.pSourceInfo = &sourceInfo;
 }
 
 void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
@@ -350,6 +506,10 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     X_UNUSED(matchIdOut);
     X_UNUSED(minMicroSec);
     X_UNUSED(pZoneName);
+
+    // this can be called from multiple threads with diffrent values.
+    // so in the exit we need to know what value was used.
+    // might just make like a free list on the thread context.
 }
 
 void TelemLeave(TraceContexHandle ctx)
@@ -359,11 +519,17 @@ void TelemLeave(TraceContexHandle ctx)
         return;
     }
 
-    ZoneLeaveData packet;
-    packet.type = DataStreamType::ZoneLeave;
-    packet.time = getTicks();
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
 
-    addDataPacket(pCtx, &packet, sizeof(packet));
+    auto depth = --pThreadData->stackDepth;
+
+    auto& zone = pThreadData->zones[depth];
+    zone.end = getTicks();
+
+    queueZone(pCtx, pThreadData, zone);
 }
 
 void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)

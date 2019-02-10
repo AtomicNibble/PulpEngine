@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Types.h"
+#include "StringTable.h"
 
 struct PacketType
 {
@@ -34,10 +35,14 @@ struct VersionInfo
     tt_uint8 build;
 };
 
+constexpr tt_size MAX_PACKET_SIZE = 1024;
 constexpr tt_size MAX_APP_NAME_LEN = 64;
 constexpr tt_size MAX_BUILD_INFO_LEN = 128;
 constexpr tt_size MAX_ERR_MSG_LEN = 256;
-constexpr tt_size MAX_PACKET_SIZE = 1024;
+constexpr tt_size MAX_STRING_LEN = 256;
+
+constexpr tt_size MAX_ZONE_THREADS = 64;
+constexpr tt_size MAX_ZONE_DEPTH = 32;
 
 struct PacketBase
 {
@@ -75,23 +80,35 @@ struct DataStreamType
 {
     enum Enum : tt_uint8
     {
-        ZoneEnter,
-        ZoneLeave,
+        StringTableAdd,
+
+        Zone,
         Num
     };
 };
+
+
+using TtthreadId = tt_uint32;
+using TtZoneId = tt_uint32;
 
 struct DataPacketBase
 {
     DataStreamType::Enum type;
 };
 
-struct ZoneEnterData : public DataPacketBase
+struct StringTableAddData : public DataPacketBase
 {
-    tt_uint64 time;
+    tt_uint16 length;
 };
 
-struct ZoneLeaveData : public DataPacketBase
+struct ZoneData : public DataPacketBase
 {
-    tt_uint64 time;
+    tt_uint64 start;
+    tt_uint64 end;
+    TtthreadId threadID;
+    tt_int32 stackDepth;
+
+    StringTableIndex strIdxFile;
+    StringTableIndex strIdxFunction;
+    StringTableIndex strIdxZone;
 };

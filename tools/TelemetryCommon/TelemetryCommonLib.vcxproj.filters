@@ -35,12 +35,21 @@
     <ClInclude Include="PacketTypes.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="StringTable.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="StringCompress.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="stdafx.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="TelemetryCommon.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="StringCompress.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
