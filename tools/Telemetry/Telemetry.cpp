@@ -49,6 +49,17 @@ namespace
         }
     }
 
+    void addDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
+    {
+        // add packet to end of buffer, if we are full force a flush?
+        DataStreamData ds;
+        ds.type = PacketType::DataStream;
+        ds.dataSize = static_cast<tt_uint32>(len);
+
+        sendPacketToServer(pCtx, &ds, sizeof(ds));
+        sendPacketToServer(pCtx, pData, len);
+    }
+
     bool handleConnectionResponse(tt_uint8* pData, tt_size len)
     {
         if (len < 1) {
@@ -320,17 +331,6 @@ namespace
 
 
     // Zones
-
-    struct ZoneEnterData
-    {
-        tt_uint64 time;
-    };
-
-    struct ZoneLeaveData
-    {
-        tt_uint64 time;
-    };
-
     void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
     {
         auto* pCtx = handleToContext(ctx);
@@ -343,8 +343,10 @@ namespace
         X_UNUSED(pZoneName);
 
         ZoneEnterData packet;
+        packet.type = DataStreamType::ZoneEnter;
         packet.time = getTicks();
 
+        addDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
@@ -365,8 +367,10 @@ namespace
         }
 
         ZoneLeaveData packet;
+        packet.type = DataStreamType::ZoneLeave;
         packet.time = getTicks();
 
+        addDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)

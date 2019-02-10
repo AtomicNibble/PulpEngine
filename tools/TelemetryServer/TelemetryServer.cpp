@@ -103,26 +103,29 @@ namespace
         sendPacketToClient(client, &cra, sizeof(cra));
     }
 
-    bool processPacket(Client& client, tt_uint8* pData, tt_size len)
+    void handleDataSream(Client& client, tt_uint8* pData, tt_size len)
     {
+        X_UNUSED(client);
         X_UNUSED(pData);
         X_UNUSED(len);
 
+    }
+
+    bool processPacket(Client& client, tt_uint8* pData, tt_size len)
+    {
         if (len < 1) {
             return false;
         }
 
-        tt_uint8 val = pData[0];
-        if (val >= PacketType::Num) {
-            return false;
-        }
-
-        switch (val)
+        auto type = pData[0];
+        switch (type)
         {
             case PacketType::ConnectionRequest:
                 handleConnectionRequest(client, pData, len);
                 break;
-
+            case PacketType::DataStream:
+                handleDataSream(client, pData, len);
+                break;
             default:
                 return false;
         }

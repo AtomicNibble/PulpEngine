@@ -2,13 +2,17 @@
 
 #include "Types.h"
 
-enum PacketType
+struct PacketType
 {
-    ConnectionRequest,
-    ConnectionRequestAccepted,
-    ConnectionRequestRejected,
+    enum Enum : tt_uint8
+    {
+        ConnectionRequest,
+        ConnectionRequestAccepted,
+        ConnectionRequestRejected,
+        DataStream,
 
-    Num
+        Num
+    };
 };
 
 struct VersionInfo
@@ -37,7 +41,7 @@ constexpr tt_size MAX_PACKET_SIZE = 1024;
 
 struct PacketBase
 {
-    tt_uint8 type;
+    PacketType::Enum type;
 };
 
 struct ConnectionRequestData : public PacketBase
@@ -56,4 +60,38 @@ struct ConnectionRequestAcceptedData : public PacketBase
 struct ConnectionRequestRejectedData : public PacketBase
 {
     char reason[MAX_ERR_MSG_LEN];
+};
+
+struct DataStreamData : public PacketBase
+{
+    tt_uint32 dataSize;
+};
+
+
+// Not packet types but part of data
+// TODO: move?
+
+struct DataStreamType
+{
+    enum Enum : tt_uint8
+    {
+        ZoneEnter,
+        ZoneLeave,
+        Num
+    };
+};
+
+struct DataPacketBase
+{
+    DataStreamType::Enum type;
+};
+
+struct ZoneEnterData : public DataPacketBase
+{
+    tt_uint64 time;
+};
+
+struct ZoneLeaveData : public DataPacketBase
+{
+    tt_uint64 time;
 };
