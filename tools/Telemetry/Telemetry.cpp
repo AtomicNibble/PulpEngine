@@ -166,7 +166,6 @@ namespace
         tt_uint8* pPacketBuffer;
         tt_int32 packetBufSize;
         tt_int32 packetBufCapacity;
-      //  tt_int32 packetBufCapacityRaw; // includes header.
 
         DWORD threadId_;
         HANDLE hThread_;
@@ -228,6 +227,7 @@ namespace
     void sendDataToServer(TraceContext* pCtx, const void* pData, tt_size len)
     {
         // send some data...
+        // TODO: none blocking?
         int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
         if (res == SOCKET_ERROR) {
             printf("send failed with error: %d\n", platform::WSAGetLastError());
@@ -365,12 +365,18 @@ DWORD __stdcall WorkerThread(LPVOID pParam)
             break;
         }
 
+        auto start = gSysTimer.GetMicro();
+
         // process the bufffer.
         // we only have zone info currently.
-        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 0 : 1;
+        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 1 : 0;
 
         const auto* pBuf = pCtx->pTickBufs[curIdx];
         const auto size = pCtx->tickBufOffsets[curIdx];
+
+        if (size == 0) {
+            ::DebugBreak();
+        }
 
         if (size % sizeof(ZoneRawData) != 0) {
             ::DebugBreak();
@@ -378,7 +384,7 @@ DWORD __stdcall WorkerThread(LPVOID pParam)
 
         // right you dirty whore.
         auto* pZones = reinterpret_cast<const ZoneRawData*>(pBuf);
-        const auto numZones = size / sizeof(ZoneRawData);
+        const tt_int32 numZones = size / sizeof(ZoneRawData);
 
         for (tt_int32 i = 0; i < numZones; i++)
         {
@@ -412,9 +418,15 @@ DWORD __stdcall WorkerThread(LPVOID pParam)
         // flush anything left over.
         flushPacketBuffer(pCtx);
 
-        ::Sleep(100);
-    }
+        pCtx->tickBufOffsets[curIdx] = 0;
 
+        auto end = gSysTimer.GetMicro();
+        auto ellapsed = end - start;
+        
+        printf("processed: %d in: %lld\n", numZones, ellapsed);
+    }
+    
+    
     return 0;
 }
 
@@ -719,6 +731,10 @@ void TelemFlush(TraceContexHandle ctx)
 
     // TODO: maybe not return
     if (!pCtx->isEnabled) {
+        return;
+    }
+
+    if (pCtx->tickBufOffset == 0) {
         return;
     }
 
