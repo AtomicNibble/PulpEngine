@@ -122,40 +122,6 @@ namespace telem
     using PlotType = TtPlotType;
     using Error = TtError;
 
-
-    inline bool Init(void)
-    {
-        return TelemInit();
-    }
-
-    inline void ShutDown(void)
-    {
-        TelemShutDown();
-    }
-
-    // Context
-    inline bool InitializeContext(ContexHandle& out, void* pBuf, tt_size bufLen)
-    {
-        return TelemInitializeContext(out, pBuf, bufLen);
-    }
-
-    inline void ShutdownContext(ContexHandle ctx)
-    {
-        TelemShutdownContext(ctx);
-    }
-
-    inline TtError Open(ContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
-        tt_uint16 serverPort, ConnectionType conType, tt_int32 timeoutMS)
-    {
-        return TelemOpen(ctx, pAppName, pBuildInfo, pServerAddress, serverPort, conType, timeoutMS);
-    }
-
-    inline bool Close(ContexHandle ctx)
-    {
-        return TelemClose(ctx);
-    }
-
-
     struct ScopedZone
     {
         ScopedZone(TraceContexHandle ctx, const char* pLabel) :
