@@ -165,10 +165,6 @@ namespace
         }
 
         tt_uint8 type = pData[0];
-        if (type >= PacketType::Num) {
-            return false;
-        }
-
         switch (type)
         {
             case PacketType::ConnectionRequestAccepted:
@@ -184,10 +180,8 @@ namespace
                 printf("Connection rejected: %s\n", pConRej->reason);
             }
             default:
-                break;
+                return false;
         }
-
-        return false;
     }
 
     void writeStringPacket(TraceContext* pCtx, const char* pStr)
@@ -216,9 +210,10 @@ namespace
 
         ZoneData packet;
         packet.type = DataStreamType::Zone;
+        packet.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
+        packet.threadID = pThread->id;
         packet.start = zone.start;
         packet.end = zone.end;
-        packet.threadID = pThread->id;
         packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFile_);
         packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFunction_);
         packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
@@ -234,6 +229,7 @@ namespace
             writeStringPacket(pCtx, zone.pZoneName);
         }
 
+        sizeof(ConnectionRequestRejectedData);
         addDataPacket(pCtx, &packet, sizeof(packet));
     }
 
@@ -581,7 +577,6 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     // work out if we send it.
     auto minMicroSec = matchId;
     auto elpased = zone.end - zone.start;
-
     auto elapsedMicro = TicksToMicro(elpased);
 
     if (elapsedMicro > minMicroSec) {

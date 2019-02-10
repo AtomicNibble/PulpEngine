@@ -129,20 +129,20 @@ namespace
 
         ttZone(ctx, "Aint no camel like me!");
 
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 500; i++)
         {
-            core::Thread::sleep(10);
+            core::Thread::sleep(2);
 
             {
                 ttZone(ctx, "Slap my goat!");
 
-                core::Thread::sleep(10);
+                core::Thread::sleep(1);
             }
 
             {
                 ttZoneFilterd(ctx, 1000, "Always filtered");
 
-                core::Thread::sleep(10);
+                core::Thread::sleep(5);
             }
         }
 
@@ -210,7 +210,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     thread.join();
                     thread.destroy();
 
-                    gEnv->pConsoleWnd->pressToContinue();
+                //    gEnv->pConsoleWnd->pressToContinue();
                 }
             }
         }

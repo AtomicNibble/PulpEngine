@@ -51,6 +51,7 @@ struct PacketBase
 
 struct ConnectionRequestData : public PacketBase
 {
+    tt_int8     _pad0[3];
     VersionInfo clientVer;
 
     char appName[MAX_APP_NAME_LEN];
@@ -72,6 +73,11 @@ struct DataStreamData : public PacketBase
     tt_uint32 dataSize;
 };
 
+static_assert(sizeof(VersionInfo) == 4, "Incorrect size");
+static_assert(sizeof(PacketBase) == 1, "Incorrect size");
+static_assert(sizeof(ConnectionRequestData) == 200, "Incorrect size");
+static_assert(sizeof(ConnectionRequestAcceptedData) == 5, "Incorrect size");
+static_assert(sizeof(ConnectionRequestRejectedData) == 257, "Incorrect size");
 
 // Not packet types but part of data
 // TODO: move?
@@ -101,14 +107,30 @@ struct StringTableAddData : public DataPacketBase
     tt_uint16 length;
 };
 
+X_PACK_PUSH(4)
+
 struct ZoneData : public DataPacketBase
 {
+    // 3
+    tt_int8 stackDepth;
+    tt_int8  _pad0[2];
+
+    // 4
+    TtthreadId threadID;
+
+    // 16
     tt_uint64 start;
     tt_uint64 end;
-    TtthreadId threadID;
-    tt_int32 stackDepth;
 
+    // 6
     StringTableIndex strIdxFile;
     StringTableIndex strIdxFunction;
     StringTableIndex strIdxZone;
+    tt_int8  _pad1[2];
 };
+
+static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
+static_assert(sizeof(ZoneData) == 32, "Incorrect size");
+
+
+X_PACK_POP

@@ -5,11 +5,14 @@
 #include <memory.h>
 
 // TODO: see what the compilers generates.
+
 struct StringTableIndex
 {
-    bool inserted : 1;
+    tt_uint16 inserted : 1;
     tt_uint16 index : 15;
 };
+
+static_assert(sizeof(StringTableIndex) == 2, "Incorrect size");
 
 inline StringTableIndex BuildIndex(bool inserted, tt_uintptr index)
 {

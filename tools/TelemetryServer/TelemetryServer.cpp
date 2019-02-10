@@ -39,6 +39,8 @@ namespace
         char buildInfo[MAX_BUILD_INFO_LEN];
 
         platform::SOCKET socket;
+
+        FILE* pFile;
     };
 
     void sendPacketToClient(Client& client, const void* pData, tt_size len)
@@ -147,6 +149,10 @@ namespace
             {
                 printf("Bytes received: %d\n", res);
 
+                if (client.pFile) {
+                    fwrite(recvbuf, res, 1, client.pFile);
+                }
+
                 processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res));
             }
             else if (res == 0)
@@ -221,8 +227,13 @@ namespace
 
             Client client;
             client.socket = clientSocket;
+            client.pFile = fopen("stream.dump", "wb");
 
             handleClient(client);
+
+            if (client.pFile) {
+                fclose(client.pFile);
+            }
 
             platform::closesocket(clientSocket);
         }

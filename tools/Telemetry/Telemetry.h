@@ -141,13 +141,13 @@ namespace telem
 
     struct ScopedZone
     {
-        ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pLabel) :
+        inline ScopedZone(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pLabel) :
             ctx_(ctx)
         {
             TelemEnter(ctx, sourceInfo, pLabel);
         }
 
-        ~ScopedZone() {
+        inline ~ScopedZone() {
             TelemLeave(ctx_);
         }
 
@@ -157,13 +157,13 @@ namespace telem
 
     struct ScopedZoneFilterd
     {
-        ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pLabel) :
+        inline ScopedZoneFilterd(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64 minMicroSec, const char* pLabel) :
             ctx_(ctx)
         {
             TelemEnterEx(ctx, sourceInfo, matchId_, minMicroSec, pLabel);
         }
 
-        ~ScopedZoneFilterd() {
+        inline ~ScopedZoneFilterd() {
             TelemLeaveEx(ctx_, matchId_);
         }
 
