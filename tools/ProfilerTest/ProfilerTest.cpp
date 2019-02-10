@@ -129,12 +129,21 @@ namespace
 
         ttZone(ctx, "Aint no camel like me!");
 
-        core::Thread::sleep(10);
-
+        for (int i = 0; i < 1000; i++)
         {
-            ttZone(ctx, "Slap my goat!");
-
             core::Thread::sleep(10);
+
+            {
+                ttZone(ctx, "Slap my goat!");
+
+                core::Thread::sleep(10);
+            }
+
+            {
+                ttZoneFilterd(ctx, 1000, "Always filtered");
+
+                core::Thread::sleep(10);
+            }
         }
 
         return core::Thread::ReturnValue(0);

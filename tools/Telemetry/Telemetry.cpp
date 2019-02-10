@@ -3,10 +3,9 @@
 
 #include <cstdio>
 
-#include <../TelemetryCommon/Version.h>
-#include <../TelemetryCommon/PacketTypes.h>
-#include <../TelemetryCommon/StringTable.h>
-#include <../TelemetryCommon/StringCompress.h>
+#include <../TelemetryCommon/TelemetryCommonLib.h>
+
+X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
 namespace platform
 {
@@ -28,6 +27,13 @@ namespace platform
 
 namespace
 {
+    tt_uint64 gTicksPerMicro;
+
+    X_INLINE tt_uint64 TicksToMicro(tt_uint64 tsc) 
+    {
+        return (tsc / gTicksPerMicro);
+    }
+
     X_INLINE tt_uint32 getThreadID(void)
     {
         return ::GetCurrentThreadId();
@@ -91,16 +97,15 @@ namespace
         TraceZone zones[MAX_ZONE_DEPTH];
     };
 
-    thread_local TraceThread* threadData = nullptr;
+    thread_local TraceThread* gThreadData = nullptr;
 
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     X_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
-        //tt_uint8* pScratchBuf;
-        //tt_size scratchBufLen;
-
         bool isEnabled;
         bool _pad[3];
+
+        tt_uint64 ticksPerMicro;
 
         TraceThread* pThreadData;
         tt_int32 numThreadData;
@@ -115,7 +120,7 @@ namespace
 
     TraceThread* getThreadData(TraceContext* pCtx)
     {
-        auto* pThreadData = threadData;
+        auto* pThreadData = gThreadData;
         if (!pThreadData) {
 
             if (pCtx->numThreadData == MAX_ZONE_THREADS) {
@@ -125,7 +130,7 @@ namespace
             pThreadData = new (&pCtx->pThreadData[pCtx->numThreadData]) TraceThread();
             ++pCtx->numThreadData;
 
-            threadData = pThreadData;
+            gThreadData = pThreadData;
         }
 
         return pThreadData;
@@ -248,6 +253,8 @@ namespace
         return handle != INVALID_TRACE_CONTEX;
     }
 
+    SysTimer gSysTimer;
+
 } // namespace
 
 
@@ -262,6 +269,26 @@ bool TelemInit(void)
         return false;
     }
 
+    if (!gSysTimer.StartUp()) {
+        return false;
+    }
+
+    // want to work out ticks per micro.
+    const auto micro_start = gSysTimer.GetMicro();
+    const auto tsc_start = getTicks();
+
+    tt_uint64 micro_end;
+    tt_uint64 tsc_end;
+
+    for (;;) {
+        tsc_end = getTicks();
+        micro_end = gSysTimer.GetMicro();
+        if ((micro_end - micro_start) > 100000) {
+            break;
+        }
+    }
+
+    gTicksPerMicro = (tsc_end - tsc_start) / (micro_end - micro_start);
     return true;
 }
 
@@ -326,17 +353,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::InvalidParam;
     }
 
-    X_UNUSED(pAppName);
-    X_UNUSED(pBuildInfo);
     X_UNUSED(timeoutMS);
-
-    // need to open a connection yo.
-    // should i reuse all my networking stuff.
-    // or just use TCP.
-    // think it be good if it's all totaly seperate from engine tho.
-    // so lets just write some raw winsock shit.
-    X_UNUSED(pServerAddress);
-    X_UNUSED(serverPort);
 
     // need to connect to the server :O
     struct platform::addrinfo hints, *servinfo = nullptr;
@@ -499,19 +516,6 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     zone.pSourceInfo = &sourceInfo;
 }
 
-void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
-{
-    X_UNUSED(ctx);
-    X_UNUSED(sourceInfo);
-    X_UNUSED(matchIdOut);
-    X_UNUSED(minMicroSec);
-    X_UNUSED(pZoneName);
-
-    // this can be called from multiple threads with diffrent values.
-    // so in the exit we need to know what value was used.
-    // might just make like a free list on the thread context.
-}
-
 void TelemLeave(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
@@ -532,8 +536,57 @@ void TelemLeave(TraceContexHandle ctx)
     queueZone(pCtx, pThreadData, zone);
 }
 
+void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto depth = pThreadData->stackDepth;
+    ++pThreadData->stackDepth;
+
+    auto& zone = pThreadData->zones[depth];
+    zone.start = getTicks();
+    zone.pZoneName = pZoneName;
+    zone.pSourceInfo = &sourceInfo;
+
+    // we can just copy it?
+    matchIdOut = minMicroSec;
+}
+
+
 void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
 {
-    X_UNUSED(ctx);
-    X_UNUSED(matchId);
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto depth = --pThreadData->stackDepth;
+
+    auto& zone = pThreadData->zones[depth];
+    zone.end = getTicks();
+
+    // work out if we send it.
+    auto minMicroSec = matchId;
+    auto elpased = zone.end - zone.start;
+
+    auto elapsedMicro = TicksToMicro(elpased);
+
+    if (elapsedMicro > minMicroSec) {
+        return;
+    }
+
+    queueZone(pCtx, pThreadData, zone);
 }
