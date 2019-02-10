@@ -19,14 +19,14 @@ inline StringTableIndex BuildIndex(bool inserted, tt_uintptr index)
     return { inserted, static_cast<tt_uint16>(index & 0x7FFF) };
 }
 
+// TODO: if this string table is always the same size just make the mask a constant.
+// then can skip some loads.
 struct StringTable
 {
     const void** pTable;
     tt_uint32 size;
     tt_uint32 sizeMask;
 };
-
-
 
 inline StringTable CreateStringTable(tt_uint8* pBuf, tt_size size)
 {

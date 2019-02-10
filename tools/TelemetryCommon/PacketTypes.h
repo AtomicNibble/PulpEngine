@@ -35,14 +35,18 @@ struct VersionInfo
     tt_uint8 build;
 };
 
-constexpr tt_size MAX_PACKET_SIZE = 1024;
+constexpr tt_size MAX_PACKET_SIZE = 1450;
 constexpr tt_size MAX_APP_NAME_LEN = 64;
 constexpr tt_size MAX_BUILD_INFO_LEN = 128;
 constexpr tt_size MAX_ERR_MSG_LEN = 256;
 constexpr tt_size MAX_STRING_LEN = 256;
 
+// TODO: move?
 constexpr tt_size MAX_ZONE_THREADS = 64;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
+constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = 1024 * 32;
+
+
 
 struct PacketBase
 {

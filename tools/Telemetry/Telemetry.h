@@ -48,21 +48,27 @@ enum TtError
     Error,
     InvalidParam,
     InvalidContex,
+    ArenaTooSmall,
+    NetNotInit,
 
     ConnectionRejected
 };
 
 struct TtSourceInfo
 {
+    TtSourceInfo() = default;
+    TtSourceInfo(const TtSourceInfo& oth) = default;
     inline TtSourceInfo(const char* const pFile, const char* const pFunction, int line) :
         pFile_(pFile),
         pFunction_(pFunction),
         line_(line)
     {}
 
-    const char* const pFile_;
-    const char* const pFunction_;
-    const int line_;
+    TtSourceInfo& operator =(const TtSourceInfo& oth) = default;
+
+    const char* pFile_;
+    const char* pFunction_;
+    int line_;
 };
 
 #define TT_SOURCE_INFO TtSourceInfo(__FILE__, __FUNCTION__, __LINE__)
@@ -79,7 +85,7 @@ extern "C"
     TELEMETRYLIB_EXPORT void TelemShutDown(void);
 
     // Context
-    TELEMETRYLIB_EXPORT bool TelemInitializeContext(TraceContexHandle& out, void* pBuf, tt_size bufLen);
+    TELEMETRYLIB_EXPORT TtError TelemInitializeContext(TraceContexHandle& out, void* pBuf, tt_size bufLen);
     TELEMETRYLIB_EXPORT void TelemShutdownContext(TraceContexHandle ctx);
 
     TELEMETRYLIB_EXPORT TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
@@ -87,8 +93,8 @@ extern "C"
 
     TELEMETRYLIB_EXPORT bool TelemClose(TraceContexHandle ctx);
 
-    TELEMETRYLIB_EXPORT bool TelemTick(TraceContexHandle ctx);
-    TELEMETRYLIB_EXPORT bool TelemFlush(TraceContexHandle ctx);
+    TELEMETRYLIB_EXPORT void TelemTick(TraceContexHandle ctx);
+    TELEMETRYLIB_EXPORT void TelemFlush(TraceContexHandle ctx);
     TELEMETRYLIB_EXPORT void TelemUpdateSymbolData(TraceContexHandle ctx);
 
     TELEMETRYLIB_EXPORT void TelemPause(TraceContexHandle ctx, bool pause);
@@ -193,8 +199,8 @@ namespace telem
 
 #define ttClose(ctx) TelemClose(ctx)
 
-#define ttTick(ctx) TelemTic(ctx)
-#define ttFlush(ctx) TelemFlusg(ctx)
+#define ttTick(ctx) TelemTick(ctx)
+#define ttFlush(ctx) TelemFlush(ctx)
 #define ttUpdateSymbolData(ctx) TelemUpdateSymbolData(ctx)
 
 #define ttPause(ctx, pause) TelemPause(ctx, pause)

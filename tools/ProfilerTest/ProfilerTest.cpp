@@ -127,24 +127,27 @@ namespace
     {
         X_UNUSED(thread);
 
-        ttZone(ctx, "Aint no camel like me!");
-
-        for (int i = 0; i < 500; i++)
         {
-            core::Thread::sleep(2);
+            ttZone(ctx, "Aint no camel like me!");
 
+            for (int i = 0; i < 500; i++)
             {
-                ttZone(ctx, "Slap my goat!");
+                {
+                    ttZone(ctx, "Slap my goat!");
 
-                core::Thread::sleep(1);
-            }
+                    core::Thread::sleep(1);
+                }
 
-            {
-                ttZoneFilterd(ctx, 1000, "Always filtered");
+                {
+                    ttZoneFilterd(ctx, 1000, "Always filtered");
 
-                core::Thread::sleep(5);
+                    core::Thread::sleep(2);
+                }
             }
         }
+
+        ttTick(ctx);
+        ttFlush(ctx);
 
         return core::Thread::ReturnValue(0);
     }

@@ -1,7 +1,9 @@
 #include "stdafx.h"
 #include "TelemetryLib.h"
 
+// TODO: get rid of
 #include <cstdio>
+#include <stddef.h> // for offsetof rip
 
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 
@@ -27,6 +29,33 @@ namespace platform
 
 namespace
 {
+    X_PACK_PUSH(8)
+    struct THREADNAME_INFO
+    {
+        DWORD dwType;     // Must be 0x1000.
+        LPCSTR szName;    // Pointer to name (in user addr space).
+        DWORD dwThreadID; // Thread ID (-1=caller thread).
+        DWORD dwFlags;    // Reserved for future use, must be zero.
+    };
+    X_PACK_POP;
+
+    void setThreadName(DWORD dwThreadID, const char* pThreadName)
+    {
+        THREADNAME_INFO info;
+        info.dwType = 0x1000;
+        info.szName = pThreadName;
+        info.dwThreadID = dwThreadID;
+        info.dwFlags = 0;
+
+        constexpr DWORD MS_VC_EXCEPTION = 0x406D1388;
+
+        __try {
+            RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR*)&info);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER) {
+        }
+    }
+
     tt_uint64 gTicksPerMicro;
 
     X_INLINE tt_uint64 TicksToMicro(tt_uint64 tsc) 
@@ -60,11 +89,22 @@ namespace
     }
 
     template<typename T>
-    X_INLINE bool IsAligned(T value, unsigned int alignment, unsigned int offset)
+    X_INLINE constexpr bool IsAligned(T value, unsigned int alignment, unsigned int offset)
     {
         return ((value + offset) % alignment) == 0;
     }
 
+    template<typename T>
+    X_INLINE constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
+    {
+        return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+    }
+
+    template<typename T>
+    X_INLINE constexpr T RoundDownToMultiple(T numToRound, T multipleOf)
+    {
+        return numToRound & ~(multipleOf - 1);
+    }
 
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
@@ -75,7 +115,7 @@ namespace
         tt_uint64 end;
 
         const char* pZoneName;
-        const TtSourceInfo* pSourceInfo;
+        TtSourceInfo sourceInfo;
     };
 
     X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
@@ -105,15 +145,37 @@ namespace
         bool isEnabled;
         bool _pad[3];
 
-        tt_uint64 ticksPerMicro;
+        tt_uint64 lastTick;
 
         TraceThread* pThreadData;
         tt_int32 numThreadData;
 
         StringTable strTable;
 
+        // zone buffers.
+        tt_uint8* pActiveTickBuf;
+        tt_int32 tickBufCapacity;
+        volatile tt_int32 tickBufOffset;
+
+        // -- Cace lane boundry --
+
+        tt_uint8* pTickBufs[2];
+        tt_int32 tickBufOffsets[2];
+
+        // used by background thread
+        tt_uint8* pPacketBuffer;
+        tt_int32 packetBufSize;
+        tt_int32 packetBufCapacity;
+      //  tt_int32 packetBufCapacityRaw; // includes header.
+
+        DWORD threadId_;
+        HANDLE hThread_;
+        HANDLE hSignal_;
         platform::SOCKET socket;
     };
+
+    static_assert(X_OFFSETOF(TraceContext, tickBufOffset) < 64, "Cold fields not on firstcache lane");
+    static_assert(X_OFFSETOF(TraceContext, pTickBufs) == 64, "Cold fields not on next cache lane");
 
     X_ENABLE_WARNING(4324)
 
@@ -136,30 +198,9 @@ namespace
         return pThreadData;
     }
 
-
-    void sendPacketToServer(TraceContext* pCtx, const void* pData, tt_size len)
-    {
-        // send some data...
-        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
-        if (res == SOCKET_ERROR) {
-            printf("send failed with error: %d\n", platform::WSAGetLastError());
-            return;
-        }
-    }
-
-    void addDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
-    {
-        // add packet to end of buffer, if we are full force a flush?
-        DataStreamData ds;
-        ds.type = PacketType::DataStream;
-        ds.dataSize = static_cast<tt_uint32>(len);
-
-        sendPacketToServer(pCtx, &ds, sizeof(ds));
-        sendPacketToServer(pCtx, pData, len);
-    }
-
     bool handleConnectionResponse(tt_uint8* pData, tt_size len)
     {
+        // TODO: this can't actually happen.
         if (len < 1) {
             return false;
         }
@@ -184,6 +225,48 @@ namespace
         }
     }
 
+    void sendDataToServer(TraceContext* pCtx, const void* pData, tt_size len)
+    {
+        // send some data...
+        int res = platform::send(pCtx->socket, reinterpret_cast<const char*>(pData), static_cast<int>(len), 0);
+        if (res == SOCKET_ERROR) {
+            printf("send failed with error: %d\n", platform::WSAGetLastError());
+            return;
+        }
+    }
+
+    void flushPacketBuffer(TraceContext* pCtx)
+    {
+        if (pCtx->packetBufSize == sizeof(DataStreamData)) {
+            return;
+        }
+
+        // patch the length
+        auto* pHdr = reinterpret_cast<DataStreamData*>(pCtx->pPacketBuffer);
+        pHdr->dataSize = pCtx->packetBufSize;
+
+        // flush to socket.
+        sendDataToServer(pCtx, pCtx->pPacketBuffer, pCtx->packetBufSize);
+        pCtx->packetBufSize = sizeof(DataStreamData);
+    }
+
+    void addDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
+    {
+        // even fit in a packet?
+        if (len > pCtx->packetBufCapacity - sizeof(DataStreamData)) {
+            ::DebugBreak();
+        }
+
+        // can we fit this data?
+        const auto space = pCtx->packetBufCapacity - pCtx->packetBufSize;
+        if (space < len) {
+            flushPacketBuffer(pCtx);
+        }
+
+        memcpy(&pCtx->pPacketBuffer[pCtx->packetBufSize], pData, len);
+        pCtx->packetBufSize += static_cast<tt_int32>(len);
+    }
+
     void writeStringPacket(TraceContext* pCtx, const char* pStr)
     {
         tt_size strLen = strlen(pStr);
@@ -191,6 +274,7 @@ namespace
             strLen = MAX_STRING_LEN;
         }
 
+        // TODO: skip the copy and write this directly to packet buffer?
         tt_size packetLen = sizeof(StringTableAddData) + strLen;
 
         tt_uint8 strDataBuf[sizeof(StringTableAddData) + MAX_STRING_LEN];
@@ -203,34 +287,46 @@ namespace
         addDataPacket(pCtx, &strDataBuf, packetLen);
     }
 
+    struct ZoneRawData
+    {
+        tt_int8 stackDepth;
+        TtthreadId threadID;
+        
+        TraceZone zone;
+    };
 
     void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
     {
-        // TODO: sort this out.
+        ZoneRawData data;
+        data.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
+        data.threadID = pThread->id;
+        data.zone = zone;
 
-        ZoneData packet;
-        packet.type = DataStreamType::Zone;
-        packet.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
-        packet.threadID = pThread->id;
-        packet.start = zone.start;
-        packet.end = zone.end;
-        packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFile_);
-        packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.pSourceInfo->pFunction_);
-        packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
+        // TODO: make thread safe.
+        auto* pBuf = pCtx->pActiveTickBuf;
+        auto offset = pCtx->tickBufOffset;
+        pCtx->tickBufOffset += sizeof(data);
 
-        // i want to write the string data.
-        if (packet.strIdxFile.inserted) {
-            writeStringPacket(pCtx, zone.pSourceInfo->pFile_);
-        }
-        if (packet.strIdxFunction.inserted) {
-            writeStringPacket(pCtx, zone.pSourceInfo->pFunction_);
-        }
-        if (packet.strIdxZone.inserted) {
-            writeStringPacket(pCtx, zone.pZoneName);
-        }
+        memcpy(pBuf + offset, &data, sizeof(data));
+    }
 
-        sizeof(ConnectionRequestRejectedData);
-        addDataPacket(pCtx, &packet, sizeof(packet));
+    void FLipBuffer(TraceContext* pCtx)
+    {
+        // flush it baby.
+        // basically want to flip the pointers and tell the background thread.
+        X_UNUSED(pCtx);
+
+        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 0 : 1;
+
+        // TODO: this needs to be atomic so if something try to write when we doing this it's okay.
+        // o also need to know if the background thread finished with the old buffer.
+        pCtx->tickBufOffsets[curIdx] = pCtx->tickBufOffset;
+        pCtx->pActiveTickBuf = pCtx->pTickBufs[curIdx ^ 1];
+        pCtx->tickBufOffset = 0;
+
+        // tell the background thread we are HOT!
+
+        ::SetEvent(pCtx->hSignal_);
     }
 
 
@@ -253,11 +349,82 @@ namespace
 
 } // namespace
 
+DWORD __stdcall WorkerThread(LPVOID pParam)
+{
+    setThreadName(::GetCurrentThreadId(), "Telemetry");
+
+    auto* pCtx = reinterpret_cast<TraceContext*>(pParam);
+    
+    const bool alertable = false;
+
+    for (;;)
+    {
+        DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, alertable);
+        if (result != WAIT_OBJECT_0) {
+            // rip.
+            break;
+        }
+
+        // process the bufffer.
+        // we only have zone info currently.
+        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 0 : 1;
+
+        const auto* pBuf = pCtx->pTickBufs[curIdx];
+        const auto size = pCtx->tickBufOffsets[curIdx];
+
+        if (size % sizeof(ZoneRawData) != 0) {
+            ::DebugBreak();
+        }
+
+        // right you dirty whore.
+        auto* pZones = reinterpret_cast<const ZoneRawData*>(pBuf);
+        const auto numZones = size / sizeof(ZoneRawData);
+
+        for (tt_int32 i = 0; i < numZones; i++)
+        {
+            auto& zoneInfo = pZones[i];
+            auto& zone = zoneInfo.zone;
+
+            ZoneData packet;
+            packet.type = DataStreamType::Zone;
+            packet.stackDepth = static_cast<tt_uint8>(zoneInfo.stackDepth);
+            packet.threadID = zoneInfo.threadID;
+            packet.start = zone.start;
+            packet.end = zone.end;
+            packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFile_);
+            packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFunction_);
+            packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
+
+            // i want to write the string data.
+            if (packet.strIdxFile.inserted) {
+                writeStringPacket(pCtx, zone.sourceInfo.pFile_);
+            }
+            if (packet.strIdxFunction.inserted) {
+                writeStringPacket(pCtx, zone.sourceInfo.pFunction_);
+            }
+            if (packet.strIdxZone.inserted) {
+                writeStringPacket(pCtx, zone.pZoneName);
+            }
+
+            addDataPacket(pCtx, &packet, sizeof(packet));
+        }
+
+        // flush anything left over.
+        flushPacketBuffer(pCtx);
+
+        ::Sleep(100);
+    }
+
+    return 0;
+}
+
 
 bool TelemInit(void)
 {
+#if 1 // TODO: temp
     AllocConsole();
     freopen("CONOUT$", "w", stdout);
+#endif
 
     platform::WSADATA winsockInfo;
 
@@ -296,46 +463,115 @@ void TelemShutDown(void)
     }
 }
 
-bool TelemInitializeContext(TraceContexHandle& out, void* pBuf_, tt_size bufLen)
+TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size bufLen)
 {
     out = INVALID_TRACE_CONTEX;
 
-    // need to align upto 64bytes.
-    auto pBuf = AlignTop(pBuf_, 64);
-    const tt_uintptr alignmentSize = reinterpret_cast<tt_uintptr>(pBuf) - reinterpret_cast<tt_uintptr>(pBuf_);
+    const auto* pEnd = reinterpret_cast<tt_uint8*>(pArena) + bufLen;
 
+    // need to align upto 64bytes.
+    auto* pBuf = AlignTop(pArena, 64);
+    const tt_uintptr alignmentSize = reinterpret_cast<tt_uintptr>(pBuf) - reinterpret_cast<tt_uintptr>(pArena);
+
+    bufLen -= alignmentSize;
+
+    // send packets this size?
+    constexpr tt_size packetBufSize = MAX_PACKET_SIZE;
     constexpr tt_size contexSize = sizeof(TraceContext);
     constexpr tt_size threadDataSize = sizeof(TraceThread) * MAX_ZONE_THREADS;
     constexpr tt_size strTableSize = sizeof(void*) * 1024;
+    constexpr tt_size minBufferSize = 1024 * 10; // 10kb.. enougth?
 
-    constexpr tt_size minSize = contexSize + strTableSize + threadDataSize;
-    if (bufLen < minSize + alignmentSize) {
-        return false;
+    constexpr tt_size internalSize = packetBufSize + contexSize + threadDataSize + strTableSize;
+    if (bufLen < internalSize + minBufferSize) {
+        return TtError::ArenaTooSmall;
     }
 
-    tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
+    // i want to split this into two buffers both starting on 64bit boundry.
+    // and both multiple of 64.
+    // so if we have a number need to round down till it's a multiple of 128?
+    const tt_size internalEndAligned = RoundUpToMultiple<tt_size>(internalSize, 64);
+    const tt_size bytesLeft = bufLen - internalEndAligned;
+    if (bytesLeft < minBufferSize) {
+        ::DebugBreak(); // should not happen.
+        return TtError::ArenaTooSmall;
+    }
 
+    const tt_size tickBufferSize = RoundDownToMultiple<tt_size>(bytesLeft, 128) / 2;
+    
+
+    tt_uint8* pBufU8 = reinterpret_cast<tt_uint8*>(pBuf);
     tt_uint8* pThreadDataBuf = pBufU8 + contexSize;
     tt_uint8* pStrTableBuf = pThreadDataBuf + threadDataSize;
+    tt_uint8* pPacketBuffer = pStrTableBuf + strTableSize;
+    tt_uint8* pTickBuffer0 = reinterpret_cast<tt_uint8*>(AlignTop(pPacketBuffer + packetBufSize, 64));
+    tt_uint8* pTickBuffer1 = pTickBuffer0 + tickBufferSize;
 
+    // retard check.
+    const tt_ptrdiff trailingBytes = pEnd - (pTickBuffer1 + tickBufferSize);
+    if (trailingBytes < 0) {
+        ::DebugBreak(); // should not happen, we would write out of bounds.
+        return TtError::Error;
+    }
+    if (trailingBytes > 128) {
+        ::DebugBreak(); // should not happen, we are underusing the buffer.
+        return TtError::Error;
+    }
 
     TraceContext* pCtx = reinterpret_cast<TraceContext*>(pBuf);
+    pCtx->lastTick = gSysTimer.GetMicro();
     pCtx->isEnabled = true;
     pCtx->socket = INV_SOCKET;
     pCtx->pThreadData = reinterpret_cast<TraceThread*>(pThreadDataBuf);
     pCtx->numThreadData = 0;
     pCtx->strTable = CreateStringTable(pStrTableBuf, strTableSize);
+    pCtx->pPacketBuffer = pPacketBuffer;
+    pCtx->packetBufSize = sizeof(DataStreamData);
+    pCtx->packetBufCapacity = packetBufSize;
 
-  //  pCtx->pScratchBuf = pBufU8 + contexSize;
-  //  pCtx->bufLen = bufLen - contexSize;
+    // pre fill the header.
+    auto* pDataHeader = reinterpret_cast<DataStreamData*>(pCtx->pPacketBuffer);
+    pDataHeader->type = PacketType::DataStream;
+    pDataHeader->dataSize = 0;
+
+    pCtx->pTickBufs[0] = pTickBuffer0;
+    pCtx->pTickBufs[1] = pTickBuffer1;
+    pCtx->tickBufOffsets[0] = 0;
+    pCtx->tickBufOffsets[1] = 0;
+    pCtx->pActiveTickBuf = pCtx->pTickBufs[0];
+    pCtx->tickBufCapacity = static_cast<tt_uint32>(tickBufferSize);
+    pCtx->tickBufOffset = 0;
+
+    pCtx->hThread_ = ::CreateThread(nullptr, BACKGROUND_THREAD_STACK_SIZE, WorkerThread, pCtx, 0, &pCtx->threadId_);
+    if (!pCtx->hThread_) {
+        return TtError::Error;
+    }
+
+    // make sure we don't get starved, since the host program might make use of all cores
+    if (!SetThreadPriority(pCtx->hThread_, THREAD_PRIORITY_ABOVE_NORMAL)) {
+        // not fatal.
+    }
+
+    pCtx->hSignal_ = CreateEventW(nullptr, false, false, nullptr);
+
 
     out = contextToHandle(pCtx);
-    return true;
+    return TtError::Ok;
 }
 
 void TelemShutdownContext(TraceContexHandle ctx)
 {
-    X_UNUSED(ctx);
+    auto* pCtx = handleToContext(ctx);
+
+
+    if (::WaitForSingleObject(pCtx->hThread_, INFINITE) == WAIT_FAILED) {
+        // rip
+        return;
+    }
+
+    if (pCtx->hSignal_) {
+        ::CloseHandle(pCtx->hSignal_);
+    }
 }
 
 TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
@@ -407,7 +643,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     strcpy_s(cr.appName, pAppName);
     strcpy_s(cr.buildInfo, pBuildInfo);
 
-    sendPacketToServer(pCtx, &cr, sizeof(cr));
+    sendDataToServer(pCtx, &cr, sizeof(cr));
 
     // wait for a response O.O
     char recvbuf[MAX_PACKET_SIZE];
@@ -450,19 +686,43 @@ bool TelemClose(TraceContexHandle ctx)
     return true;
 }
 
-bool TelemTick(TraceContexHandle ctx)
+void TelemTick(TraceContexHandle ctx)
 {
-    X_UNUSED(ctx);
+    auto* pCtx = handleToContext(ctx);
 
-    // send some data to the server!
+    // TODO: maybe not return
+    if (!pCtx->isEnabled) {
+        return;
+    }
 
-    return true;
+    auto curTime = gSysTimer.GetMicro();
+    auto sinceLast = curTime - pCtx->lastTick;
+
+    // if we are been called at a very high freq don't bother sending unless needed.
+    if (sinceLast < 1000000) {
+        // if the buffer is half full send it!
+        auto halfBufferCap = pCtx->tickBufCapacity / 2;
+        if (pCtx->tickBufOffset < halfBufferCap) {
+            return;
+        }
+    }
+
+    pCtx->lastTick = curTime;
+
+    FLipBuffer(pCtx);
+    return;
 }
 
-bool TelemFlush(TraceContexHandle ctx)
+void TelemFlush(TraceContexHandle ctx)
 {
-    X_UNUSED(ctx);
-    return true;
+    auto* pCtx = handleToContext(ctx);
+
+    // TODO: maybe not return
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    FLipBuffer(pCtx);
 }
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
@@ -509,7 +769,7 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
     auto& zone = pThreadData->zones[depth];
     zone.start = getTicks();
     zone.pZoneName = pZoneName;
-    zone.pSourceInfo = &sourceInfo;
+    zone.sourceInfo = sourceInfo;
 }
 
 void TelemLeave(TraceContexHandle ctx)
@@ -550,7 +810,7 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
     auto& zone = pThreadData->zones[depth];
     zone.start = getTicks();
     zone.pZoneName = pZoneName;
-    zone.pSourceInfo = &sourceInfo;
+    zone.sourceInfo = sourceInfo;
 
     // we can just copy it?
     matchIdOut = minMicroSec;

@@ -23,6 +23,7 @@
 #define X_LINK_LIB(libName)                     X_PRAGMA(comment(lib, libName))
 #define X_ALIGNED_SYMBOL(symbol, alignment)     __declspec(align(alignment)) symbol
 #define X_ALIGN_OF(type)                        __alignof(type)
+#define X_OFFSETOF(s, m)                        offsetof(s, m)
 
 #define X_PACK_PUSH(val)                        X_PRAGMA(pack(push, val))
 #define X_PACK_POP                              X_PRAGMA(pack(pop))
