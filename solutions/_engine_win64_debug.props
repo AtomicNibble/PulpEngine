@@ -12,7 +12,7 @@
       <MinimalRebuild>false</MinimalRebuild>
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;X_DEBUG=1;X_RELEASE=0;X_SUPER=0;X_64=1;_AMD64_;_WIN64;_ALLOW_RTCc_IN_STL=1;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <StringPooling>false</StringPooling>
+      <StringPooling>true</StringPooling>
       <SmallerTypeCheck>true</SmallerTypeCheck>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <FunctionLevelLinking>true</FunctionLevelLinking>
