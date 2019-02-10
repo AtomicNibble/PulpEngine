@@ -31,7 +31,7 @@ namespace
     struct TraceContext
     {
         tt_uint8* pScratchBuf;
-        size_t bufLen;
+        tt_size bufLen;
 
         bool isEnabled;
         bool _pad[3];
@@ -96,10 +96,16 @@ namespace
         return handle != INVALID_TRACE_CONTEX;
     }
 
+    X_INLINE tt_uint64 getTicks(void)
+    {
+        return __rdtsc();
+    }
+
+
 } // namespace
 
 
-    bool ttInit(void)
+    bool TelemInit(void)
     {
         AllocConsole();
         freopen("CONOUT$", "w", stdout);
@@ -113,7 +119,7 @@ namespace
         return true;
     }
 
-    void ttShutDown(void)
+    void TelemShutDown(void)
     {
         if (platform::WSACleanup() != 0) {
             // rip
@@ -122,7 +128,7 @@ namespace
 
     }
 
-    bool ttInitializeContext(TraceContexHandle& out, void* pBuf, size_t bufLen)
+    bool TelemInitializeContext(TraceContexHandle& out, void* pBuf, tt_size bufLen)
     {
         out = INVALID_TRACE_CONTEX;
 
@@ -144,13 +150,13 @@ namespace
         return true;
     }
 
-    void ttShutdownContext(TraceContexHandle ctx)
+    void TelemShutdownContext(TraceContexHandle ctx)
     {
         X_UNUSED(ctx);
 
     }
 
-    TtError ttOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
+    TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuildInfo, const char* pServerAddress,
         tt_uint16 serverPort, TtConnectionType conType, tt_int32 timeoutMS)
     {
         if (!isValidContext(ctx)) {
@@ -255,7 +261,7 @@ namespace
         return TtError::Ok;
     }
 
-    bool ttClose(TraceContexHandle ctx)
+    bool TelemClose(TraceContexHandle ctx)
     {
         auto* pCtx = handleToContext(ctx);
 
@@ -274,24 +280,27 @@ namespace
         return true;
     }
 
-    bool ttTick(TraceContexHandle ctx)
+    bool TelemTick(TraceContexHandle ctx)
+    {
+        X_UNUSED(ctx);
+
+        // send some data to the server!
+
+        return true;
+    }
+
+    bool TelemFlush(TraceContexHandle ctx)
     {
         X_UNUSED(ctx);
         return true;
     }
 
-    bool ttFlush(TraceContexHandle ctx)
-    {
-        X_UNUSED(ctx);
-        return true;
-    }
-
-    void ttUpdateSymbolData(TraceContexHandle ctx)
+    void TelemUpdateSymbolData(TraceContexHandle ctx)
     {
         X_UNUSED(ctx);
     }
 
-    void ttPause(TraceContexHandle ctx, bool pause)
+    void TelemPause(TraceContexHandle ctx, bool pause)
     {
         if (!isValidContext(ctx)) {
             return;
@@ -300,7 +309,7 @@ namespace
         handleToContext(ctx)->isEnabled = pause;
     }
 
-    bool ttIsPaused(TraceContexHandle ctx)
+    bool TelemIsPaused(TraceContexHandle ctx)
     {
         if (!isValidContext(ctx)) {
             return true;
@@ -310,3 +319,57 @@ namespace
     }
 
 
+    // Zones
+
+    struct ZoneEnterData
+    {
+        tt_uint64 time;
+    };
+
+    struct ZoneLeaveData
+    {
+        tt_uint64 time;
+    };
+
+    void TelemEnter(TraceContexHandle ctx, const char* pZoneName)
+    {
+        auto* pCtx = handleToContext(ctx);
+        if (!pCtx->isEnabled) {
+            return;
+        }
+
+        X_UNUSED(ctx);
+        X_UNUSED(pZoneName);
+
+        ZoneEnterData packet;
+        packet.time = getTicks();
+
+    }
+
+    void TelemEnterEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
+    {
+        X_UNUSED(ctx);
+        X_UNUSED(matchIdOut);
+        X_UNUSED(minMicroSec);
+        X_UNUSED(pZoneName);
+
+    }
+
+    void TelemLeave(TraceContexHandle ctx)
+    {
+        auto* pCtx = handleToContext(ctx);
+        if (!pCtx->isEnabled) {
+            return;
+        }
+
+        ZoneLeaveData packet;
+        packet.time = getTicks();
+
+    }
+
+    void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
+    {
+        X_UNUSED(ctx);
+        X_UNUSED(matchId);
+
+    }

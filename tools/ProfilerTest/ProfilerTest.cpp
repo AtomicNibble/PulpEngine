@@ -48,6 +48,9 @@ core::MemoryArenaBase* g_arena = nullptr;
 
 namespace
 {
+#if TTELEMETRY_ENABLED
+    telem::ContexHandle ctx;
+#endif // !TTELEMETRY_ENABLED
 
     X_INLINE uint64_t getTicks(void)
     {
@@ -124,6 +127,7 @@ namespace
         X_UNUSED(thread);
 
         {
+            ttZone(ctx, "Slap my goat!");
 
             core::Thread::sleep(10);
         }
@@ -149,14 +153,15 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     {
         // Setup telem.
-        if (!telem::Init()) {
+        if (!ttInit()) {
             return 1;
         }
+
+#if TTELEMETRY_ENABLED
 
         const size_t telemBufSize = 1024 * 1024;
         auto telemBuf = core::makeUnique<uint8_t[]>(&arena, telemBufSize, 16);
 
-        telem::ContexHandle ctx;
         telem::InitializeContext(ctx, telemBuf.ptr(), telemBufSize);
 
         auto res = telem::Open(ctx, 
@@ -171,6 +176,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             // rip
             return -1;
         }
+
+#endif // TTELEMETRY_ENABLED
 
         {
             core::Thread thread;
@@ -195,7 +202,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
         }
     }
 
-    telem::ShutDown();
+    ttShutDown();
 
     return 0;
 }
