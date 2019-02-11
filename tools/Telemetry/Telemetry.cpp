@@ -58,6 +58,7 @@ namespace
         }
     }
 
+    SysTimer gSysTimer;
     tt_uint64 gTicksPerMicro;
 
     X_INLINE tt_uint64 TicksToMicro(tt_uint64 tsc) 
@@ -575,8 +576,6 @@ namespace
     {
         return handle != INVALID_TRACE_CONTEX;
     }
-
-    SysTimer gSysTimer;
 
     void queueProcessZone(TraceContext* pCtx, const QueueDataZone* pBuf)
     {
@@ -1119,6 +1118,10 @@ void TelemFlush(TraceContexHandle ctx)
 void TelemUpdateSymbolData(TraceContexHandle ctx)
 {
     X_UNUSED(ctx);
+
+    // So do i actually need todo this?
+    // can't i just listen for loader events.
+    // will see...
 }
 
 void TelemPause(TraceContexHandle ctx, bool pause)
