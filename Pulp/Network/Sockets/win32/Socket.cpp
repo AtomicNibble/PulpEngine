@@ -386,6 +386,9 @@ void NetSocket::setSocketOptions(void)
     int32_t sock_opt;
     lastErrorWSA::Description Dsc;
 
+    // TODO: these buffers should be diffrent for server / client.
+    // but if you are a client that then hosts a server we would need to change it?
+
     // TODO: perf maybe lower these buffers
     // set the recive buffer to decent size
     sock_opt = 1024 * 256;
