@@ -805,6 +805,9 @@ bool TelemInit(void)
     // freopen("CONOUT$", "w", stdout);
 #endif
 
+    // Just stop it, ok?
+    _CrtSetDebugFillThreshold(0);
+
     platform::WSADATA winsockInfo;
 
     if (platform::WSAStartup(MAKEWORD(2, 2), &winsockInfo) != 0) {
