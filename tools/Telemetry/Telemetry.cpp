@@ -537,7 +537,7 @@ namespace
         // wait for the background thread to finish process that last buffer.
         // TODO: maybe come up with a fast path for when we don't need to wait.
         // check if the signal has a userspace atomic it checks before waiting.
-        DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, false);
+        DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
         if (result != WAIT_OBJECT_0) {
             ::DebugBreak();
             return;
