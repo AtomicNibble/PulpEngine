@@ -87,7 +87,7 @@ namespace
 
         core::CriticalSection cs;
 
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 15; i++)
         {
             ttTick(ctx);
 
@@ -102,11 +102,12 @@ namespace
                 }
 
                 {
-                    ttZoneFilterd(ctx, 1000, "Always filtered");
+                    ttZoneFilterd(ctx, 2, "Sometimes filtered");
                   
-                    core::Thread::sleep(1);
+                    core::Thread::sleep(0);
                 }
 
+                for (int y = 0; y < 10; y++)
                 {
                     ttEnter(ctx, "Yep")
                     ttLeave(ctx)
