@@ -763,9 +763,14 @@ namespace
                         queueProcessMemFree(pCtx, reinterpret_cast<const QueueDataMemFree*>(pBuf));
                         pBuf += sizeof(QueueDataMemFree);
                         break;
+
                     default:
+#if X_DEBUG
                         ::DebugBreak();
                         break;
+#else
+                        X_NO_SWITCH_DEFAULT; // jump table me baby!
+#endif
                 }
             }
 

@@ -16,6 +16,7 @@
 #define X_INLINE                                __forceinline
 #define X_NO_INLINE                             __declspec(noinline)
 #define X_HINT(hint)                            __assume(hint)
+#define X_NO_SWITCH_DEFAULT                     X_HINT(0)
 #define X_RESTRICT                              __restrict
 #define X_RESTRICT_RV                           __declspec(restrict)
 #define X_NO_ALIAS                              __declspec(noalias)
