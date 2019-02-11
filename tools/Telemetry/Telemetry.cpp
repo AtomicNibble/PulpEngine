@@ -5,6 +5,8 @@
 #include <cstdio>
 #include <stddef.h> // for offsetof rip
 
+#include <intrin.h>
+
 #include <../TelemetryCommon/TelemetryCommonLib.h>
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
@@ -158,6 +160,12 @@ namespace
 
     thread_local TraceThread* gThreadData = nullptr;
 
+    struct TickBuffer
+    {
+        tt_uint8* pTickBuf;   // fixed
+        volatile tt_int32 bufOffset;
+    };
+
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     X_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
@@ -171,15 +179,18 @@ namespace
 
         StringTable strTable;
 
-        // zone buffers.
-        tt_uint8* pActiveTickBuf;
-        tt_int32 tickBufCapacity;
-        volatile tt_int32 tickBufOffset;
-
         // -- Cace lane boundry --
 
-        tt_uint8* pTickBufs[2];
-        tt_int32 tickBufOffsets[2];
+        tt_uint8 _lanePad0[14];
+
+        volatile tt_int32 activeTickBufIdx;
+        TickBuffer tickBuffers[2];
+
+        tt_int32 tickBufCapacity;
+
+        tt_uint8 _lanePad1[20];
+
+        // -- Cace lane boundry --
 
         // used by background thread
         tt_uint8* pPacketBuffer;
@@ -193,10 +204,23 @@ namespace
         platform::SOCKET socket;
     };
 
-    static_assert(X_OFFSETOF(TraceContext, tickBufOffset) < 64, "Cold fields not on firstcache lane");
-    static_assert(X_OFFSETOF(TraceContext, pTickBufs) == 64, "Cold fields not on next cache lane");
+ //   constexpr size_t size0 = sizeof(TickBuffer);
+ //   constexpr size_t size1 = X_OFFSETOF(TraceContext, tickBuffers);
+ //   constexpr size_t size2 = X_OFFSETOF(TraceContext, activeTickBufIdx);
+
+    static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
+    static_assert(X_OFFSETOF(TraceContext, pPacketBuffer) == 128, "Cold fields not on next cache lane");
+    static_assert(sizeof(TraceContext) == 192, "Size changed");
 
     X_ENABLE_WARNING(4324)
+
+
+    tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
+    {
+        auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
+        return buf.bufOffset;
+    }
+
 
     TraceLock* addLock(TraceThread* pThread, const void* pLockPtr)
     {
@@ -414,12 +438,12 @@ namespace
 
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
-        // TODO: make thread safe.
-        auto* pBuf = pCtx->pActiveTickBuf;
-        auto offset = pCtx->tickBufOffset;
-        pCtx->tickBufOffset += static_cast<tt_int32>(size);
+        auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
+        
+        long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
 
-        memcpy(pBuf + offset, pPtr, size);
+        // the writes will overlap cache lanes, but we never read.
+        memcpy(buf.pTickBuf + offset, pPtr, size);
     }
 
     void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
@@ -519,13 +543,13 @@ namespace
             return;
         }
 
-        // basically want to flip the pointers and tell the background thread.
-        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 0 : 1;
+        // the background thread has finished with old buffer.
+        // make sure that buffers offset is reset before making it live.
+        const auto oldIdx = pCtx->activeTickBufIdx ^ 1;
+        _InterlockedExchange(reinterpret_cast<volatile long*>(&pCtx->tickBuffers[oldIdx].bufOffset), 0l);
 
-        // TODO: this needs to be atomic so if something try to write when we doing this it's okay.
-        pCtx->tickBufOffsets[curIdx] = pCtx->tickBufOffset;
-        pCtx->pActiveTickBuf = pCtx->pTickBufs[curIdx ^ 1];
-        pCtx->tickBufOffset = 0;
+        // flip the buffers.
+        (void)_InterlockedXor(reinterpret_cast<volatile long*>(&pCtx->activeTickBufIdx), 1l);
 
         // tell the background thread we are HOT!
         ::SetEvent(pCtx->hSignal_);
@@ -689,11 +713,10 @@ namespace
             auto start = gSysTimer.GetMicro();
 
             // process the bufffer.
-            // we only have zone info currently.
-            const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 1 : 0;
+            auto tickBuf = pCtx->tickBuffers[pCtx->activeTickBufIdx ^ 1];
 
-            const auto size = pCtx->tickBufOffsets[curIdx];
-            const auto* pBegin = pCtx->pTickBufs[curIdx];
+            const auto size = tickBuf.bufOffset;
+            const auto* pBegin = tickBuf.pTickBuf;
             const auto* pEnd = pBegin + size;
             const auto* pBuf = pBegin;
 
@@ -752,10 +775,6 @@ namespace
 
             // flush anything left over to the socket.
             flushPacketBuffer(pCtx);
-
-#if X_DEBUG
-            pCtx->tickBufOffsets[curIdx] = 0;
-#endif // X_DEBUG
 
             auto end = gSysTimer.GetMicro();
             auto ellapsed = end - start;
@@ -885,13 +904,12 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pDataHeader->type = PacketType::DataStream;
     pDataHeader->dataSize = 0;
 
-    pCtx->pTickBufs[0] = pTickBuffer0;
-    pCtx->pTickBufs[1] = pTickBuffer1;
-    pCtx->tickBufOffsets[0] = 0;
-    pCtx->tickBufOffsets[1] = 0;
-    pCtx->pActiveTickBuf = pCtx->pTickBufs[0];
+    pCtx->activeTickBufIdx = 0;
+    pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
+    pCtx->tickBuffers[0].bufOffset = 0;
+    pCtx->tickBuffers[1].pTickBuf = pTickBuffer1;
+    pCtx->tickBuffers[1].bufOffset = 0;
     pCtx->tickBufCapacity = static_cast<tt_uint32>(tickBufferSize);
-    pCtx->tickBufOffset = 0;
 
     pCtx->hThread_ = ::CreateThread(nullptr, BACKGROUND_THREAD_STACK_SIZE, WorkerThread, pCtx, 0, &pCtx->threadId_);
     if (!pCtx->hThread_) {
@@ -1063,7 +1081,9 @@ void TelemTick(TraceContexHandle ctx)
     if (sinceLast < 1000000) {
         // if the buffer is half full send it!
         auto halfBufferCap = pCtx->tickBufCapacity / 2;
-        if (pCtx->tickBufOffset < halfBufferCap) {
+        auto bufSize = getActiveTickBufferSize(pCtx);
+
+        if (bufSize < halfBufferCap) {
             return;
         }
     }
@@ -1083,7 +1103,9 @@ void TelemFlush(TraceContexHandle ctx)
         return;
     }
 
-    if (pCtx->tickBufOffset == 0) {
+    auto bufSize = getActiveTickBufferSize(pCtx);
+
+    if (bufSize == 0) {
         return;
     }
 
