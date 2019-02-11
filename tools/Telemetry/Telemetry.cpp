@@ -143,8 +143,10 @@ namespace
             stackDepth = 0;
 
             // TODO: Debug only?
+#if X_DEBUG
             zero_object(zones);
             zero_object(locks);
+#endif // X_DEBUG
         }
 
         TtthreadId id;
@@ -187,6 +189,7 @@ namespace
         DWORD threadId_;
         HANDLE hThread_;
         HANDLE hSignal_;
+        HANDLE hSignalIdle_;
         platform::SOCKET socket;
     };
 
@@ -507,20 +510,24 @@ namespace
 
     void FLipBuffer(TraceContext* pCtx)
     {
-        // flush it baby.
-        // basically want to flip the pointers and tell the background thread.
-        X_UNUSED(pCtx);
+        // wait for the background thread to finish process that last buffer.
+        // TODO: maybe come up with a fast path for when we don't need to wait.
+        // check if the signal has a userspace atomic it checks before waiting.
+        DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, false);
+        if (result != WAIT_OBJECT_0) {
+            ::DebugBreak();
+            return;
+        }
 
+        // basically want to flip the pointers and tell the background thread.
         const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 0 : 1;
 
         // TODO: this needs to be atomic so if something try to write when we doing this it's okay.
-        // o also need to know if the background thread finished with the old buffer.
         pCtx->tickBufOffsets[curIdx] = pCtx->tickBufOffset;
         pCtx->pActiveTickBuf = pCtx->pTickBufs[curIdx ^ 1];
         pCtx->tickBufOffset = 0;
 
         // tell the background thread we are HOT!
-
         ::SetEvent(pCtx->hSignal_);
     }
 
@@ -671,6 +678,8 @@ namespace
 
         for (;;)
         {
+            ::SetEvent(pCtx->hSignalIdle_);
+
             DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, alertable);
             if (result != WAIT_OBJECT_0) {
                 // rip.
@@ -741,10 +750,12 @@ namespace
                 ::DebugBreak();
             }
 
-            // flush anything left over.
+            // flush anything left over to the socket.
             flushPacketBuffer(pCtx);
 
+#if X_DEBUG
             pCtx->tickBufOffsets[curIdx] = 0;
+#endif // X_DEBUG
 
             auto end = gSysTimer.GetMicro();
             auto ellapsed = end - start;
@@ -893,7 +904,14 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     }
 
     pCtx->hSignal_ = CreateEventW(nullptr, false, false, nullptr);
+    if (!pCtx->hSignal_) {
+        return TtError::Error;
+    }
 
+    pCtx->hSignalIdle_ = CreateEventW(nullptr, false, false, nullptr);
+    if (!pCtx->hSignalIdle_) {
+        return TtError::Error;
+    }
 
     out = contextToHandle(pCtx);
     return TtError::Ok;
@@ -911,6 +929,9 @@ void TelemShutdownContext(TraceContexHandle ctx)
 
     if (pCtx->hSignal_) {
         ::CloseHandle(pCtx->hSignal_);
+    }
+    if (pCtx->hSignalIdle_) {
+        ::CloseHandle(pCtx->hSignalIdle_);
     }
 }
 
