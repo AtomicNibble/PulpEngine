@@ -1025,6 +1025,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     res = platform::setsockopt(connectSocket, SOL_SOCKET, SO_SNDBUF, (char*)&sock_opt, sizeof(sock_opt));
     if (res != 0) {
         printf("Failed to set sndbuf on socket. Error: %d\n", platform::WSAGetLastError());
+        return TtError::Error;
     }
 
 
@@ -1053,10 +1054,10 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
 
     // we should get a packet back like a hot slut.
     if (res == 0) {
-        TtError::Error;
+        return TtError::Error;
     }
     if (res < 0) {
-        TtError::Error;
+        return TtError::Error;
     }
 
     if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res))) {
