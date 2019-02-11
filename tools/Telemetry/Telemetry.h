@@ -17,30 +17,6 @@ enum TtConnectionType
     Tcp
 };
 
-enum TtLockResult
-{
-    Acquired,
-    Fail
-};
-
-enum TtLockState
-{
-    Locked,
-    Released
-};
-
-// Plots
-enum TtPlotType
-{
-    Time,
-    Time_us,
-    Time_clocks,
-    Time_cycles,
-    Integer,
-    Percentage_computed,
-    Percentage_direct,
-    Untyped
-};
 
 enum TtError
 {
@@ -110,15 +86,17 @@ extern "C"
     TELEMETRYLIB_EXPORT void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId);
 
     // Lock util
-    TELEMETRYLIB_EXPORT void TelemSetLockName(TraceContexHandle ctx, tt_uint32 threadID, const char* pName);
-    TELEMETRYLIB_EXPORT void TelemTryLock(TraceContexHandle ctx, const void* pPtr, const char* pLockName);
+    TELEMETRYLIB_EXPORT void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pLockName);
+    TELEMETRYLIB_EXPORT void TelemTryLock(TraceContexHandle ctx, const void* pPtr, const char* pDescription);
+    TELEMETRYLIB_EXPORT void TelemTryLockEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription);
     TELEMETRYLIB_EXPORT void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result);
-    TELEMETRYLIB_EXPORT void TelemSetLockState(TraceContexHandle ctx, const void* pPtr, TtLockState state, const char* pLabel);
-    TELEMETRYLIB_EXPORT void TelemSignalLockCount(TraceContexHandle ctx, const void* pPtr, tt_int32 count, const char* pLabel);
+    TELEMETRYLIB_EXPORT void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result);
+    TELEMETRYLIB_EXPORT void TelemSetLockState(TraceContexHandle ctx, const void* pPtr, TtLockState state);
+    TELEMETRYLIB_EXPORT void TelemSignalLockCount(TraceContexHandle ctx, const void* pPtr, tt_int32 count);
 
     // Some allocation tracking.
-    void TelemAlloc(TraceContexHandle ctx, void* pPtr, tt_size size);
-    void TelemFree(TraceContexHandle ctx, void* pPtr);
+    TELEMETRYLIB_EXPORT void TelemAlloc(TraceContexHandle ctx, void* pPtr, tt_size size);
+    TELEMETRYLIB_EXPORT void TelemFree(TraceContexHandle ctx, void* pPtr);
 
     void TelemPlot(TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
     void TelemPlotF32(TraceContexHandle ctx, TtPlotType type, float value, const char* pName);
@@ -217,15 +195,17 @@ namespace telem
 
 
 // Lock util
-#define ttSetLockName(ctx, threadID, pName);
-#define ttTryLock(ctx, pPtr, pLockName);
-#define ttEndTryLock(ctx, pPtr, result);
-#define ttSetLockState(ctx, pPtr, state, pLabel);
-#define ttSignalLockCount(ctx, pPtr, count, pLabel);
+#define ttSetLockName(ctx, pPtr, pLockName) TelemSetLockName(ctx, pPtr, pLockName);
+#define ttTryLock(ctx, pPtr, pDescription) TelemTryLock(ctx, pPtr, pDescription);
+#define ttTryLockEx(ctx, matchIdOut, minMicroSec, pPtr, pDescription) TelemTryLock(ctx, matchIdOut, minMicroSec, pPtr, pDescription);
+#define ttEndTryLock(ctx, pPtr, result) TelemEndTryLock(ctx, pPtr, result);
+#define ttEndTryLockEx(ctx, matchIdOut, pPtr, result) TelemEndTryLockEx(ctx, matchIdOut, pPtr, result);
+#define ttSetLockState(ctx, pPtr, state) TelemSetLockState(ctx, pPtr, state);
+#define ttSignalLockCount(ctx, pPtr, count) TelemSignalLockCount(ctx, pPtr, count);
 
 // Some allocation tracking.
-#define ttAlloc(ctx, pPtr, size);
-#define ttFree(ctx, pPtr);
+#define ttAlloc(ctx, pPtr, size) TelemAlloc(ctx, pPtr, size);
+#define ttFree(ctx, pPtr) TelemFree(ctx, pPtr);
 
 #define ttPlot(ctx, type, value, pName);
 #define ttPlotF32(ctx, type, value, pName);

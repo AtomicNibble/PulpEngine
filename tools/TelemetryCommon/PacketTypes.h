@@ -44,6 +44,7 @@ constexpr tt_size MAX_STRING_LEN = 256;
 // TODO: move?
 constexpr tt_size MAX_ZONE_THREADS = 64;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
+constexpr tt_size MAX_THREAD_LOCKS = 16;
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = 1024 * 32;
 
 
@@ -93,6 +94,13 @@ struct DataStreamType
         StringTableAdd,
 
         Zone,
+        ThreadSetName,
+        LockSetName,
+        LockTry,
+        LockCount,
+        MemAlloc,
+        MemFree,
+
         Num
     };
 };
@@ -106,14 +114,14 @@ struct DataPacketBase
     DataStreamType::Enum type;
 };
 
-struct StringTableAddData : public DataPacketBase
+struct DataPacketStringTableAdd : public DataPacketBase
 {
     tt_uint16 length;
 };
 
 X_PACK_PUSH(4)
 
-struct ZoneData : public DataPacketBase
+struct DataPacketZone : public DataPacketBase
 {
     // 3
     tt_int8 stackDepth;
@@ -133,8 +141,96 @@ struct ZoneData : public DataPacketBase
     tt_int8  _pad1[2];
 };
 
+struct DataPacketThreadSetName : public DataPacketBase
+{
+    // 2
+    StringTableIndex strIdxName;
+
+    TtthreadId threadID;
+};
+
+struct DataPacketLockSetName : public DataPacketBase
+{
+    // 2
+    StringTableIndex strIdxName;
+
+    // 8
+    tt_uint64 lockHandle;
+};
+
+struct DataPacketLockTry : public DataPacketBase
+{
+    // 4
+    TtthreadId threadID;
+
+    // 16
+    tt_uint64 start;
+    tt_uint64 end;
+
+    // 8
+    tt_uint64 lockHandle;
+
+    // 2
+    StringTableIndex strIdxDescrption;
+};
+
+
+struct DataPacketLockState : public DataPacketBase
+{
+    // 4
+    TtLockState state;
+
+    // 4
+    TtthreadId threadID;
+
+    // 8
+    tt_uint64 lockHandle;
+};
+
+struct DataPacketLockCount : public DataPacketBase
+{
+    // 2
+    tt_uint16 count;
+
+    // 4
+    TtthreadId threadID;
+
+    // 8
+    tt_uint64 lockHandle;
+};
+
+struct DataPacketMemAlloc : public DataPacketBase
+{
+    // 4
+    TtthreadId threadID;
+
+    // 4
+    tt_uint32 size;
+
+    // 8
+    tt_uint64 ptr;
+};
+
+struct DataPacketMemFree : public DataPacketBase
+{
+    // 4
+    TtthreadId threadID;
+
+    // 8
+    tt_uint64 ptr;
+};
+
+
 static_assert(sizeof(DataPacketBase) == 1, "Incorrect size");
-static_assert(sizeof(ZoneData) == 32, "Incorrect size");
+static_assert(sizeof(DataPacketStringTableAdd) == 4, "Incorrect size");
+static_assert(sizeof(DataPacketZone) == 32, "Incorrect size");
+static_assert(sizeof(DataPacketThreadSetName) == 8, "Incorrect size");
+static_assert(sizeof(DataPacketLockSetName) == 12, "Incorrect size");
+static_assert(sizeof(DataPacketLockTry) == 36, "Incorrect size");
+static_assert(sizeof(DataPacketLockState) == 20, "Incorrect size");
+static_assert(sizeof(DataPacketLockCount) == 16, "Incorrect size");
+static_assert(sizeof(DataPacketMemAlloc) == 20, "Incorrect size");
+static_assert(sizeof(DataPacketMemFree) == 16, "Incorrect size");
 
 
 X_PACK_POP

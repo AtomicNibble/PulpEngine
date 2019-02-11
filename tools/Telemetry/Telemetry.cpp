@@ -65,6 +65,7 @@ namespace
 
     X_INLINE tt_uint32 getThreadID(void)
     {
+        // TODO: remove function call.
         return ::GetCurrentThreadId();
     }
 
@@ -108,6 +109,20 @@ namespace
 
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
+    struct TraceLock
+    {
+        tt_uint64 start;
+        tt_uint64 end;
+
+        TtLockResult result;
+        const char* pDescription;
+    };
+
+    struct TraceLocks
+    {
+        const void* pLockPtr[MAX_THREAD_LOCKS];
+        TraceLock locks[MAX_THREAD_LOCKS];
+    };
 
     struct TraceZone
     {
@@ -127,14 +142,16 @@ namespace
             id = getThreadID();
             stackDepth = 0;
 
-            // Debug only?
+            // TODO: Debug only?
             zero_object(zones);
+            zero_object(locks);
         }
 
         TtthreadId id;
         tt_int32 stackDepth;
 
         TraceZone zones[MAX_ZONE_DEPTH];
+        TraceLocks locks;
     };
 
     thread_local TraceThread* gThreadData = nullptr;
@@ -178,6 +195,40 @@ namespace
 
     X_ENABLE_WARNING(4324)
 
+    TraceLock* addLock(TraceThread* pThread, const void* pLockPtr)
+    {
+        auto& locks = pThread->locks;
+        for (tt_int32 i = 0; i < MAX_THREAD_LOCKS; i++)
+        {
+            if (!locks.pLockPtr[i])
+            {
+                locks.pLockPtr[i] = pLockPtr;
+                return &locks.locks[i];
+            }
+        }
+
+        return nullptr;
+    }
+
+
+    TraceLock* getLock(TraceThread* pThread, const void* pLockPtr)
+    {
+        TraceLock* pLock = nullptr;
+
+        auto& locks = pThread->locks;
+        for (tt_int32 i = 0; i < MAX_THREAD_LOCKS; i++)
+        {
+            if (locks.pLockPtr[i] == pLockPtr)
+            {
+                pLock = &locks.locks[i];
+                // TODO: is breaking faster here?
+                // I'm guessing not as long as this loop is unrolled.
+                // break;
+            }
+        }
+
+        return pLock;
+    }
 
     TraceThread* getThreadData(TraceContext* pCtx)
     {
@@ -275,19 +326,42 @@ namespace
         }
 
         // TODO: skip the copy and write this directly to packet buffer?
-        tt_size packetLen = sizeof(StringTableAddData) + strLen;
+        tt_size packetLen = sizeof(DataPacketStringTableAdd) + strLen;
 
-        tt_uint8 strDataBuf[sizeof(StringTableAddData) + MAX_STRING_LEN];
-        auto* pHeader = reinterpret_cast<StringTableAddData*>(strDataBuf);
+        tt_uint8 strDataBuf[sizeof(DataPacketStringTableAdd) + MAX_STRING_LEN];
+        auto* pHeader = reinterpret_cast<DataPacketStringTableAdd*>(strDataBuf);
         pHeader->type = DataStreamType::StringTableAdd;
         pHeader->length = static_cast<tt_uint16>(strLen);
 
-        memcpy(strDataBuf + sizeof(StringTableAddData), pStr, strLen);
+        memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
 
         addDataPacket(pCtx, &strDataBuf, packetLen);
     }
 
-    struct ZoneRawData
+    enum class QueueDataType
+    {
+        Zone,
+        ThreadSetName,
+        LockSetName,
+        LockTry,
+        LockState,
+        LockCount,
+        MemAlloc,
+        MemFree
+    };
+
+    struct QueueDataBase
+    {
+        QueueDataType type;
+    };
+
+    struct QueueDataThreadSetName : public QueueDataBase
+    {
+        TtthreadId threadID;
+        const char* pName;
+    };
+
+    struct QueueDataZone : public QueueDataBase
     {
         tt_int8 stackDepth;
         TtthreadId threadID;
@@ -295,20 +369,141 @@ namespace
         TraceZone zone;
     };
 
+    struct QueueDataLockSetName : public QueueDataBase
+    {
+        const void* pLockPtr;
+        const char* pLockName;
+    };
+
+    struct QueueDataLockTry : public QueueDataBase
+    {
+        TtthreadId threadID;
+        TraceLock lock;
+        const void* pLockPtr;
+    };
+
+    struct QueueDataLockState : public QueueDataBase
+    {
+        TtthreadId threadID;
+        TtLockState state;
+        const void* pLockPtr;
+    };
+
+    struct QueueDataLockCount : public QueueDataBase
+    {
+        tt_uint16 count;
+        TtthreadId threadID;
+        const void* pLockPtr;
+    };
+
+    struct QueueDataMemAlloc : public QueueDataBase
+    {
+        TtthreadId threadID;
+        const void* pPtr;
+        tt_uint32 size;
+    };
+
+    struct QueueDataMemFree : public QueueDataBase
+    {
+        TtthreadId threadID;
+        const void* pPtr;
+    };
+
+    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
+    {
+        // TODO: make thread safe.
+        auto* pBuf = pCtx->pActiveTickBuf;
+        auto offset = pCtx->tickBufOffset;
+        pCtx->tickBufOffset += static_cast<tt_int32>(size);
+
+        memcpy(pBuf + offset, pPtr, size);
+    }
+
+    void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
+    {
+        QueueDataThreadSetName data;
+        data.type = QueueDataType::ThreadSetName;
+        data.threadID = threadID;
+        data.pName = pName;
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
     void queueZone(TraceContext* pCtx, TraceThread* pThread, TraceZone& zone)
     {
-        ZoneRawData data;
+        QueueDataZone data;
+        data.type = QueueDataType::Zone;
         data.stackDepth = static_cast<tt_uint8>(pThread->stackDepth);
         data.threadID = pThread->id;
         data.zone = zone;
 
-        // TODO: make thread safe.
-        auto* pBuf = pCtx->pActiveTickBuf;
-        auto offset = pCtx->tickBufOffset;
-        pCtx->tickBufOffset += sizeof(data);
-
-        memcpy(pBuf + offset, &data, sizeof(data));
+        addToTickBuffer(pCtx, &data, sizeof(data));
     }
+
+    void queueLockSetName(TraceContext* pCtx, const void* pPtr, const char* pLockName)
+    {
+        QueueDataLockSetName data;
+        data.type = QueueDataType::LockSetName;
+        data.pLockPtr = pPtr;
+        data.pLockName = pLockName;
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+    void queueLock(TraceContext* pCtx, TraceThread* pThread, TraceLock* pLock)
+    {
+        QueueDataLockTry data;
+        data.type = QueueDataType::LockTry;
+        data.threadID = pThread->id;
+        data.lock = *pLock;
+        data.pLockPtr = nullptr;
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+    void queueLockState(TraceContext* pCtx, const void* pPtr, TtLockState state)
+    {
+        QueueDataLockState data;
+        data.type = QueueDataType::LockState;
+        data.pLockPtr = pPtr;
+        data.state = state;
+        data.threadID = getThreadID();
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+    void queueLockCount(TraceContext* pCtx, const void* pPtr, tt_int32 count)
+    {
+        QueueDataLockCount data;
+        data.type = QueueDataType::LockCount;
+        data.pLockPtr = pPtr;
+        data.count = static_cast<tt_uint16>(count);
+        data.threadID = getThreadID();
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+    void queueMemAlloc(TraceContext* pCtx, const void* pPtr, tt_size size)
+    {
+        QueueDataMemAlloc data;
+        data.type = QueueDataType::MemAlloc;
+        data.pPtr = pPtr;
+        data.size = static_cast<tt_uint32>(size);;
+        data.threadID = getThreadID();
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
+    void queueMemFree(TraceContext* pCtx, const void* pPtr)
+    {
+        QueueDataMemFree data;
+        data.type = QueueDataType::MemFree;
+        data.pPtr = pPtr;
+        data.threadID = getThreadID();
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
+    }
+
 
     void FLipBuffer(TraceContext* pCtx)
     {
@@ -347,95 +542,228 @@ namespace
 
     SysTimer gSysTimer;
 
+    void queueProcessZone(TraceContext* pCtx, const QueueDataZone* pBuf)
+    {
+        auto& zone = pBuf->zone;
+
+        DataPacketZone packet;
+        packet.type = DataStreamType::Zone;
+        packet.stackDepth = static_cast<tt_uint8>(pBuf->stackDepth);
+        packet.threadID = pBuf->threadID;
+        packet.start = zone.start;
+        packet.end = zone.end;
+        packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFile_);
+        packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFunction_);
+        packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
+
+        // i want to write the string data.
+        if (packet.strIdxFile.inserted) {
+            writeStringPacket(pCtx, zone.sourceInfo.pFile_);
+        }
+        if (packet.strIdxFunction.inserted) {
+            writeStringPacket(pCtx, zone.sourceInfo.pFunction_);
+        }
+        if (packet.strIdxZone.inserted) {
+            writeStringPacket(pCtx, zone.pZoneName);
+        }
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessThreadSetName(TraceContext* pCtx, const QueueDataThreadSetName* pBuf)
+    {
+        DataPacketThreadSetName packet;
+        packet.type = DataStreamType::ThreadSetName;
+        packet.threadID = pBuf->threadID;
+        packet.strIdxName = StringTableGetIndex(pCtx->strTable, pBuf->pName);
+
+        if (packet.strIdxName.inserted) {
+            writeStringPacket(pCtx, pBuf->pName);
+        }
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessLockSetName(TraceContext* pCtx, const QueueDataLockSetName* pBuf)
+    {
+        DataPacketLockSetName packet;
+        packet.type = DataStreamType::LockSetName;
+        packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+        packet.strIdxName = StringTableGetIndex(pCtx->strTable, pBuf->pLockName);
+
+        if (packet.strIdxName.inserted) {
+            writeStringPacket(pCtx, pBuf->pLockName);
+        }
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessLockTry(TraceContext* pCtx, const QueueDataLockTry* pBuf)
+    {
+        auto& lock = pBuf->lock;
+
+        DataPacketLockTry packet;
+        packet.type = DataStreamType::LockTry;
+        packet.threadID = pBuf->threadID;
+        packet.start = lock.start;
+        packet.end = lock.end;
+        packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+        packet.strIdxDescrption = StringTableGetIndex(pCtx->strTable, lock.pDescription);
+
+        if (packet.strIdxDescrption.inserted) {
+            writeStringPacket(pCtx, lock.pDescription);
+        }
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessLockState(TraceContext* pCtx, const QueueDataLockState* pBuf)
+    {
+        DataPacketLockState packet;
+        packet.type = DataStreamType::LockTry;
+        packet.threadID = pBuf->threadID;
+        packet.state = pBuf->state;
+        packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessLockCount(TraceContext* pCtx, const QueueDataLockCount* pBuf)
+    {
+        DataPacketLockCount packet;
+        packet.type = DataStreamType::LockCount;
+        packet.threadID = pBuf->threadID;
+        packet.count = pBuf->count;
+        packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessMemAlloc(TraceContext* pCtx, const QueueDataMemAlloc* pBuf)
+    {
+        DataPacketMemAlloc packet;
+        packet.type = DataStreamType::MemAlloc;
+        packet.threadID = pBuf->threadID;
+        packet.size = pBuf->size;
+        packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessMemFree(TraceContext* pCtx, const QueueDataMemFree* pBuf)
+    {
+        DataPacketMemFree packet;
+        packet.type = DataStreamType::MemFree;
+        packet.threadID = pBuf->threadID;
+        packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
+
+        addDataPacket(pCtx, &packet, sizeof(packet));
+    }
+
+
+    DWORD __stdcall WorkerThread(LPVOID pParam)
+    {
+        setThreadName(getThreadID(), "Telemetry");
+
+        auto* pCtx = reinterpret_cast<TraceContext*>(pParam);
+
+        const bool alertable = false;
+
+        for (;;)
+        {
+            DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, alertable);
+            if (result != WAIT_OBJECT_0) {
+                // rip.
+                break;
+            }
+
+            auto start = gSysTimer.GetMicro();
+
+            // process the bufffer.
+            // we only have zone info currently.
+            const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 1 : 0;
+
+            const auto size = pCtx->tickBufOffsets[curIdx];
+            const auto* pBegin = pCtx->pTickBufs[curIdx];
+            const auto* pEnd = pBegin + size;
+            const auto* pBuf = pBegin;
+
+            if (size == 0) {
+                ::DebugBreak();
+            }
+
+            // process the packets.
+            while (pBuf < pEnd)
+            {
+                auto type = *reinterpret_cast<const QueueDataType*>(pBuf);
+
+                switch (type)
+                {
+                    case QueueDataType::Zone:
+                        queueProcessZone(pCtx, reinterpret_cast<const QueueDataZone*>(pBuf));
+                        pBuf += sizeof(QueueDataZone);
+                        break;
+                    case QueueDataType::ThreadSetName:
+                        queueProcessThreadSetName(pCtx, reinterpret_cast<const QueueDataThreadSetName*>(pBuf));
+                        pBuf += sizeof(QueueDataThreadSetName);
+                        break;
+                    case QueueDataType::LockSetName:
+                        queueProcessLockSetName(pCtx, reinterpret_cast<const QueueDataLockSetName*>(pBuf));
+                        pBuf += sizeof(QueueDataLockSetName);
+                        break;
+                    case QueueDataType::LockTry:
+                        queueProcessLockTry(pCtx, reinterpret_cast<const QueueDataLockTry*>(pBuf));
+                        pBuf += sizeof(QueueDataLockTry);
+                        break;
+                    case QueueDataType::LockState:
+                        queueProcessLockState(pCtx, reinterpret_cast<const QueueDataLockState*>(pBuf));
+                        pBuf += sizeof(QueueDataLockState);
+                        break;
+                    case QueueDataType::LockCount:
+                        queueProcessLockCount(pCtx, reinterpret_cast<const QueueDataLockCount*>(pBuf));
+                        pBuf += sizeof(QueueDataLockCount);
+                        break;
+                    case QueueDataType::MemAlloc:
+                        queueProcessMemAlloc(pCtx, reinterpret_cast<const QueueDataMemAlloc*>(pBuf));
+                        pBuf += sizeof(QueueDataMemAlloc);
+                        break;
+                    case QueueDataType::MemFree:
+                        queueProcessMemFree(pCtx, reinterpret_cast<const QueueDataMemFree*>(pBuf));
+                        pBuf += sizeof(QueueDataMemFree);
+                        break;
+                    default:
+                        ::DebugBreak();
+                        break;
+                }
+            }
+
+            if (pBuf > pEnd) {
+                ::DebugBreak();
+            }
+
+            // flush anything left over.
+            flushPacketBuffer(pCtx);
+
+            pCtx->tickBufOffsets[curIdx] = 0;
+
+            auto end = gSysTimer.GetMicro();
+            auto ellapsed = end - start;
+
+            printf("processed in: %lld\n", ellapsed);
+        }
+
+        return 0;
+    }
+
 } // namespace
 
-DWORD __stdcall WorkerThread(LPVOID pParam)
-{
-    setThreadName(::GetCurrentThreadId(), "Telemetry");
 
-    auto* pCtx = reinterpret_cast<TraceContext*>(pParam);
-    
-    const bool alertable = false;
-
-    for (;;)
-    {
-        DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, alertable);
-        if (result != WAIT_OBJECT_0) {
-            // rip.
-            break;
-        }
-
-        auto start = gSysTimer.GetMicro();
-
-        // process the bufffer.
-        // we only have zone info currently.
-        const tt_int32 curIdx = pCtx->pActiveTickBuf == pCtx->pTickBufs[0] ? 1 : 0;
-
-        const auto* pBuf = pCtx->pTickBufs[curIdx];
-        const auto size = pCtx->tickBufOffsets[curIdx];
-
-        if (size == 0) {
-            ::DebugBreak();
-        }
-
-        if (size % sizeof(ZoneRawData) != 0) {
-            ::DebugBreak();
-        }
-
-        // right you dirty whore.
-        auto* pZones = reinterpret_cast<const ZoneRawData*>(pBuf);
-        const tt_int32 numZones = size / sizeof(ZoneRawData);
-
-        for (tt_int32 i = 0; i < numZones; i++)
-        {
-            auto& zoneInfo = pZones[i];
-            auto& zone = zoneInfo.zone;
-
-            ZoneData packet;
-            packet.type = DataStreamType::Zone;
-            packet.stackDepth = static_cast<tt_uint8>(zoneInfo.stackDepth);
-            packet.threadID = zoneInfo.threadID;
-            packet.start = zone.start;
-            packet.end = zone.end;
-            packet.strIdxFile = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFile_);
-            packet.strIdxFunction = StringTableGetIndex(pCtx->strTable, zone.sourceInfo.pFunction_);
-            packet.strIdxZone = StringTableGetIndex(pCtx->strTable, zone.pZoneName);
-
-            // i want to write the string data.
-            if (packet.strIdxFile.inserted) {
-                writeStringPacket(pCtx, zone.sourceInfo.pFile_);
-            }
-            if (packet.strIdxFunction.inserted) {
-                writeStringPacket(pCtx, zone.sourceInfo.pFunction_);
-            }
-            if (packet.strIdxZone.inserted) {
-                writeStringPacket(pCtx, zone.pZoneName);
-            }
-
-            addDataPacket(pCtx, &packet, sizeof(packet));
-        }
-
-        // flush anything left over.
-        flushPacketBuffer(pCtx);
-
-        pCtx->tickBufOffsets[curIdx] = 0;
-
-        auto end = gSysTimer.GetMicro();
-        auto ellapsed = end - start;
-        
-        printf("processed: %d in: %lld\n", numZones, ellapsed);
-    }
-    
-    
-    return 0;
-}
-
+// --------------------------------------------------------------------
 
 bool TelemInit(void)
 {
 #if 1 // TODO: temp
-    AllocConsole();
-    freopen("CONOUT$", "w", stdout);
+    // freopen("CONOUT$", "w", stdout);
 #endif
 
     platform::WSADATA winsockInfo;
@@ -764,9 +1092,18 @@ bool TelemIsPaused(TraceContexHandle ctx)
     return handleToContext(ctx)->isEnabled;
 }
 
+void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* pName)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
 
+    queueThreadSetName(pCtx, threadID, pName);
+}
 
-// Zones
+// ----------- Zones -----------
+
 void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
 {
     auto* pCtx = handleToContext(ctx);
@@ -810,26 +1147,9 @@ void TelemLeave(TraceContexHandle ctx)
 
 void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const char* pZoneName)
 {
-    auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
-
-    auto* pThreadData = getThreadData(pCtx);
-    if (!pThreadData) {
-        return;
-    }
-
-    auto depth = pThreadData->stackDepth;
-    ++pThreadData->stackDepth;
-
-    auto& zone = pThreadData->zones[depth];
-    zone.start = getTicks();
-    zone.pZoneName = pZoneName;
-    zone.sourceInfo = sourceInfo;
-
     // we can just copy it?
     matchIdOut = minMicroSec;
+    TelemEnter(ctx, sourceInfo, pZoneName);
 }
 
 
@@ -860,4 +1180,141 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
     }
 
     queueZone(pCtx, pThreadData, zone);
+}
+
+
+// ----------- Lock stuff -----------
+
+void TelemSetLockName(TraceContexHandle ctx, const void* pPtr, const char* pLockName)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueLockSetName(pCtx, pPtr, pLockName);
+}
+
+void TelemTryLock(TraceContexHandle ctx, const void* pPtr, const char* pDescription)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto* pLock = addLock(pThreadData, pPtr);
+    if (!pLock) {
+        return;
+    }
+
+    pLock->start = getTicks();
+    pLock->pDescription = pDescription;
+}
+
+void TelemTryLockEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minMicroSec, const void* pPtr, const char* pDescription)
+{
+    matchIdOut = minMicroSec;
+    TelemTryLock(ctx, pPtr, pDescription);
+}
+
+void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto* pLock = getLock(pThreadData, pPtr);
+    if (!pLock) {
+        return;
+    }
+
+    pLock->end = getTicks();
+    pLock->result = result;
+
+    queueLock(pCtx, pThreadData, pLock);
+}
+
+void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    auto* pThreadData = getThreadData(pCtx);
+    if (!pThreadData) {
+        return;
+    }
+
+    auto* pLock = getLock(pThreadData, pPtr);
+    if (!pLock) {
+        return;
+    }
+
+    pLock->end = getTicks();
+    pLock->result = result;
+
+    // work out if we send it.
+    auto minMicroSec = matchId;
+    auto elpased = pLock->end - pLock->start;
+    auto elapsedMicro = TicksToMicro(elpased);
+
+    if (elapsedMicro > minMicroSec) {
+        return;
+    }
+    
+    queueLock(pCtx, pThreadData, pLock);
+}
+
+void TelemSetLockState(TraceContexHandle ctx, const void* pPtr, TtLockState state)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueLockState(pCtx, pPtr, state);
+}
+
+void TelemSignalLockCount(TraceContexHandle ctx, const void* pPtr, tt_int32 count)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueLockCount(pCtx, pPtr, count);
+}
+
+// ----------- Allocation stuff -----------
+
+void TelemAlloc(TraceContexHandle ctx, void* pPtr, tt_size size)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueMemAlloc(pCtx, pPtr, size);
+}
+
+void TelemFree(TraceContexHandle ctx, void* pPtr)
+{
+    auto* pCtx = handleToContext(ctx);
+    if (!pCtx->isEnabled) {
+        return;
+    }
+
+    queueMemFree(pCtx, pPtr);
 }

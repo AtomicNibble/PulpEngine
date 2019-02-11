@@ -28,3 +28,31 @@ using tt_size = unsigned int;
 #endif
 
 static_assert(sizeof(tt_uintptr) == sizeof(void*), "Size missmatch");
+
+
+// TODO: find better home.
+
+enum TtLockResult
+{
+    Acquired,
+    Fail
+};
+
+enum TtLockState
+{
+    Locked,
+    Released
+};
+
+// Plots
+enum TtPlotType
+{
+    Time,
+    Time_us,
+    Time_clocks,
+    Time_cycles,
+    Integer,
+    Percentage_computed,
+    Percentage_direct,
+    Untyped
+};

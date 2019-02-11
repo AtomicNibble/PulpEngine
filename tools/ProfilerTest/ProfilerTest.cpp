@@ -52,31 +52,67 @@ namespace
     telem::ContexHandle ctx;
 #endif // !TTELEMETRY_ENABLED
 
+    template<class ThreadPolicy>
+    class ScopedLockTelemetry
+    {
+    public:
+        inline explicit ScopedLockTelemetry(ThreadPolicy& policy) :
+            policy_(policy)
+        {
+            ttTryLock(ctx, &policy_, "Lock!");
+
+            policy_.Enter();
+
+            ttEndTryLock(ctx, &policy_, TtLockResult::Acquired);
+            ttSetLockState(ctx, &policy_, TtLockState::Locked);
+        }
+
+        inline ~ScopedLockTelemetry(void) 
+        {
+            policy_.Leave();
+            ttSetLockState(ctx, &policy_, TtLockState::Released);
+        }
+
+    private:
+        X_NO_COPY(ScopedLockTelemetry);
+        X_NO_ASSIGN(ScopedLockTelemetry);
+
+        ThreadPolicy& policy_;
+    };
+
 
     core::Thread::ReturnValue threadFunc(const core::Thread& thread)
     {
         X_UNUSED(thread);
 
+        core::CriticalSection cs;
+
+        for (int i = 0; i < 5; i++)
         {
+            ttTick(ctx);
+
             ttZone(ctx, "Aint no camel like me!");
 
-            for (int i = 0; i < 500; i++)
+            for (int x = 0; x < 500; x++)
             {
                 {
                     ttZone(ctx, "Slap my goat!");
 
-                    core::Thread::sleep(1);
+                    core::Thread::sleep(0);
                 }
 
                 {
                     ttZoneFilterd(ctx, 1000, "Always filtered");
-
-                    core::Thread::sleep(2);
+                  
+                    core::Thread::sleep(1);
                 }
             }
+
+            // Lock me up like a goat.
+            ScopedLockTelemetry lock(cs);
+            core::Thread::sleep(0);
         }
 
-        ttTick(ctx);
         ttFlush(ctx);
 
         return core::Thread::ReturnValue(0);
@@ -127,10 +163,6 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif // TTELEMETRY_ENABLED
 
         {
-            core::Thread thread;
-            thread.create("Test");
-            thread.start(threadFunc);
-
             {
                 EngineApp engine;
 
@@ -139,11 +171,17 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                     X_ASSERT_NOT_NULL(gEnv);
                     X_ASSERT_NOT_NULL(gEnv->pCore);
 
+                    gEnv->pConsoleWnd->redirectSTD();
+
+                    core::Thread thread;
+                    thread.create("Test");
+                    thread.start(threadFunc);
+
 
                     thread.join();
                     thread.destroy();
 
-                //    gEnv->pConsoleWnd->pressToContinue();
+                    gEnv->pConsoleWnd->pressToContinue();
                 }
             }
         }
