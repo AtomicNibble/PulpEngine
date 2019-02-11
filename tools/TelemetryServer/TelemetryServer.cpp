@@ -195,6 +195,12 @@ namespace
             return false;
         }
 
+        tt_int32 sock_opt = 1024 * 256;
+        res = platform::setsockopt(listenSocket, SOL_SOCKET, SO_RCVBUF, (char*)&sock_opt, sizeof(sock_opt));
+        if (res != 0) {
+            printf("Failed to set rcvbuf on socket. Error: %d\n", platform::WSAGetLastError());
+        }
+
         // Setup the TCP listening socket
         res = bind(listenSocket, result->ai_addr, (int)result->ai_addrlen);
         if (res == SOCKET_ERROR) {
