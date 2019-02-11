@@ -35,8 +35,10 @@ namespace
 
         VersionInfo clientVer;
 
-        char appName[MAX_APP_NAME_LEN];
-        char buildInfo[MAX_BUILD_INFO_LEN];
+        // TODO: not need nullterm.
+        char appName[MAX_APP_NAME_LEN + 1];
+        char buildInfo[MAX_BUILD_INFO_LEN + 1];
+        char cmdLine[MAX_CMDLINE_LEN + 1];
 
         platform::SOCKET socket;
 
@@ -53,26 +55,32 @@ namespace
         }
     }
 
-    void onConnectionRejected(Client& client, const char* pReason)
+    void sendConnectionRejected(Client& client, const char* pReason)
     {
-        ConnectionRequestRejectedData cra;
-        zero_object(cra);
-        cra.type = PacketType::ConnectionRequestRejected;
-        strcpy_s(cra.reason, pReason);
+        printf("ConnectionRejected:\n");
 
-        sendPacketToClient(client, &cra, sizeof(cra));
-    }
+        tt_size msgLen = strlen(pReason);
+        tt_size datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
 
-    void handleConnectionRequest(Client& client, tt_uint8* pData, tt_size len)
-    {
-        if (len != sizeof(ConnectionRequestData)) {
-            onConnectionRejected(client, "Invalid connection packet size");
-            return;
+        if (msgLen > MAX_ERR_MSG_LEN) {
+            msgLen = MAX_ERR_MSG_LEN;
         }
 
-        auto* pConReq = reinterpret_cast<const ConnectionRequestData*>(pData);
+        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_ERR_MSG_LEN];
+
+        auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
+        pCr->dataSize = static_cast<tt_uint16>(datalen);
+        pCr->type = PacketType::ConnectionRequestRejected;
+
+        memcpy(pCr + 1, pReason, msgLen);
+        sendPacketToClient(client, buf, datalen);
+    }
+
+    void handleConnectionRequest(Client& client, tt_uint8* pData)
+    {
+        auto* pConReq = reinterpret_cast<const ConnectionRequestHdr*>(pData);
         if (pConReq->type != PacketType::ConnectionRequest) {
-            onConnectionRejected(client, "Packet type is invalid");
+            sendConnectionRejected(client, "Packet type is invalid");
             return;
         }
 
@@ -83,50 +91,60 @@ namespace
         serverVer.build = X_TELEMETRY_VERSION_BUILD;
 
         if (pConReq->clientVer != serverVer) {
-            onConnectionRejected(client, "Client server version incompatible");
+            sendConnectionRejected(client, "Client server version incompatible");
             return;
         }
 
         client.clientVer = pConReq->clientVer;
-        strcpy_s(client.appName, pConReq->appName);
-        strcpy_s(client.buildInfo, pConReq->buildInfo);
+
+        // now need to read the strings.
+
+        zero_object(client.appName);
+        zero_object(client.buildInfo);
+        zero_object(client.cmdLine);
+
+        auto* pStrData = reinterpret_cast<const tt_uint8*>(pConReq + 1);
+        memcpy(client.appName, pStrData, pConReq->appNameLen);
+        pStrData += pConReq->appNameLen;
+        memcpy(client.buildInfo, pStrData, pConReq->buildInfoLen);
+        pStrData += pConReq->buildInfoLen;
+        memcpy(client.cmdLine, pStrData, pConReq->cmdLineLen);
 
         // Meow...
-        printf("ConnectionRequest:\n");
-        printf("AppName: %s\n", pConReq->appName);
-        printf("BuildInfo: %s\n", pConReq->buildInfo);
+        printf("ConnectionAccepted:\n");
+        printf("> AppName: %s\n", client.appName);
+        printf("> BuildInfo: %s\n", client.buildInfo);
+        printf("> CmdLine: %s\n", client.cmdLine);
 
         // send a packet back!
-        ConnectionRequestAcceptedData cra;
+        ConnectionRequestAcceptedHdr cra;
         zero_object(cra);
+        cra.dataSize = sizeof(cra);
         cra.type = PacketType::ConnectionRequestAccepted;
         cra.serverVer = serverVer;
 
         sendPacketToClient(client, &cra, sizeof(cra));
     }
 
-    void handleDataSream(Client& client, tt_uint8* pData, tt_size len)
+    void handleDataSream(Client& client, tt_uint8* pData)
     {
         X_UNUSED(client);
         X_UNUSED(pData);
-        X_UNUSED(len);
+        
 
     }
 
-    bool processPacket(Client& client, tt_uint8* pData, tt_size len)
+    bool processPacket(Client& client, tt_uint8* pData)
     {
-        if (len < 1) {
-            return false;
-        }
+        auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
 
-        auto type = pData[0];
-        switch (type)
+        switch (pPacketHdr->type)
         {
             case PacketType::ConnectionRequest:
-                handleConnectionRequest(client, pData, len);
+                handleConnectionRequest(client, pData);
                 break;
             case PacketType::DataStream:
-                handleDataSream(client, pData, len);
+                handleDataSream(client, pData);
                 break;
             default:
                 return false;
@@ -135,37 +153,73 @@ namespace
         return true;
     }
 
-    void handleClient(Client& client)
+    bool readPacket(Client& client, char* pBuffer, int& bufLength)
     {
-        int res;
-        
-        char recvbuf[MAX_PACKET_SIZE];
-        int recvbuflen = sizeof(recvbuf);
+        // this should return complete packets or error.
+        int bytesRead = 0;
 
-        do
+        while (1)
         {
-            res = platform::recv(client.socket, recvbuf, recvbuflen, 0);
-            if (res > 0)
-            {
-                printf("Bytes received: %d\n", res);
+            int maxReadSize = bufLength - bytesRead;
+            int res = platform::recv(client.socket, &pBuffer[bytesRead], maxReadSize, 0);
 
-                if (client.pFile) {
-                    fwrite(recvbuf, res, 1, client.pFile);
-                }
-
-                processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res));
-            }
-            else if (res == 0)
+            if (res == 0)
             {
                 printf("Connection closing...\n");
+                return false;
             }
-            else
+            else if(res < 0)
             {
                 printf("recv failed with error: %d\n", platform::WSAGetLastError());
+                return false;
+            }
+
+            bytesRead += res;
+
+            if (bytesRead >= sizeof(PacketBase))
+            {
+                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
+                if (pHdr->dataSize == 0) {
+                    printf("Client sent packet with length zero...\n");
+                    return false;
+                }
+
+                bufLength = pHdr->dataSize;
+
+                if (bytesRead == bufLength) {
+                    return true;
+                }
+                else if(bytesRead >= bufLength) {
+                    printf("Overread packet bytesRead: %d recvbuflen: %d\n", bytesRead, bufLength);
+                    return false;
+                }
+            }
+
+            printf("got: %d bytes\n", res);
+        }
+    }
+
+    void handleClient(Client& client)
+    {
+        char recvbuf[MAX_PACKET_SIZE];
+
+        while(1)
+        {
+            int recvbuflen = sizeof(recvbuf);
+            if (!readPacket(client, recvbuf, recvbuflen)) {
                 return;
             }
 
-        } while (res > 0);
+            printf("Bytes received: %d\n", recvbuflen);
+
+            if (client.pFile) {
+                fwrite(recvbuf, recvbuflen, 1, client.pFile);
+            }
+
+            if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
+                return;
+            }
+        }
     }
 
     bool listen(void)
@@ -279,3 +333,5 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
     winSockShutDown();
     return 0;
 }
+
+

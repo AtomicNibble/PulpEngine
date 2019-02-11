@@ -110,6 +110,36 @@ namespace
         return numToRound & ~(multipleOf - 1);
     }
 
+    bool Convert(const wchar_t* pSrc, tt_size srcSize,
+        char* output, tt_size outputBytes, tt_size& lengthOut)
+    {
+        lengthOut = 0;
+        if (!outputBytes) {
+            return false;
+        }
+
+        const tt_int32 srcLenChars = static_cast<tt_int32>(srcSize);
+        const tt_int32 bytesWritten = WideCharToMultiByte(
+            CP_UTF8,
+            0,
+            pSrc,
+            srcLenChars,
+            output,
+            static_cast<tt_int32>(outputBytes),
+            nullptr,
+            nullptr
+        );
+
+        if (bytesWritten == 0) {
+            // error
+            return false;
+        }
+
+        lengthOut = bytesWritten;
+        return true;
+    }
+
+
     const platform::SOCKET INV_SOCKET = (platform::SOCKET)(~0);
 
     struct TraceLock
@@ -278,25 +308,19 @@ namespace
 
     bool handleConnectionResponse(tt_uint8* pData, tt_size len)
     {
-        // TODO: this can't actually happen.
-        if (len < 1) {
-            return false;
-        }
+        X_UNUSED(len);
 
-        tt_uint8 type = pData[0];
-        switch (type)
+        auto* pPacketHdr = reinterpret_cast<const PacketBase*>(pData);
+        switch (pPacketHdr->type)
         {
             case PacketType::ConnectionRequestAccepted:
                 // don't care about response currently.
                 return true;
             case PacketType::ConnectionRequestRejected: {
-                if (len != sizeof(ConnectionRequestRejectedData)) {
-                    printf("Recived invalid connection rejected packet\n");
-                    return false;
-                }
-                
-                auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedData*>(pData);
-                printf("Connection rejected: %s\n", pConRej->reason);
+                auto* pConRej = reinterpret_cast<const ConnectionRequestRejectedHdr*>(pData);
+                auto* pStrData = reinterpret_cast<const char*>(pConRej + 1);
+                printf("Connection rejected: %.*s\n", pConRej->reasonLen, pStrData);
+
             }
             default:
                 return false;
@@ -314,32 +338,32 @@ namespace
         }
     }
 
-    void flushPacketBuffer(TraceContext* pCtx)
+    void flushDataPacketBuffer(TraceContext* pCtx)
     {
-        if (pCtx->packetBufSize == sizeof(DataStreamData)) {
+        if (pCtx->packetBufSize == sizeof(DataStreamHdr)) {
             return;
         }
 
         // patch the length
-        auto* pHdr = reinterpret_cast<DataStreamData*>(pCtx->pPacketBuffer);
-        pHdr->dataSize = pCtx->packetBufSize;
+        auto* pHdr = reinterpret_cast<DataStreamHdr*>(pCtx->pPacketBuffer);
+        pHdr->dataSize = static_cast<tt_uint16>(pCtx->packetBufSize);
 
         // flush to socket.
         sendDataToServer(pCtx, pCtx->pPacketBuffer, pCtx->packetBufSize);
-        pCtx->packetBufSize = sizeof(DataStreamData);
+        pCtx->packetBufSize = sizeof(DataStreamHdr);
     }
 
-    void addDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
+    void addToDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
     {
         // even fit in a packet?
-        if (len > pCtx->packetBufCapacity - sizeof(DataStreamData)) {
+        if (len > pCtx->packetBufCapacity - sizeof(DataStreamHdr)) {
             ::DebugBreak();
         }
 
         // can we fit this data?
         const auto space = pCtx->packetBufCapacity - pCtx->packetBufSize;
         if (space < len) {
-            flushPacketBuffer(pCtx);
+            flushDataPacketBuffer(pCtx);
         }
 
         memcpy(&pCtx->pPacketBuffer[pCtx->packetBufSize], pData, len);
@@ -363,7 +387,7 @@ namespace
 
         memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
 
-        addDataPacket(pCtx, &strDataBuf, packetLen);
+        addToDataPacket(pCtx, &strDataBuf, packetLen);
     }
 
     enum class QueueDataType
@@ -602,7 +626,7 @@ namespace
             writeStringPacket(pCtx, zone.pZoneName);
         }
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessThreadSetName(TraceContext* pCtx, const QueueDataThreadSetName* pBuf)
@@ -616,7 +640,7 @@ namespace
             writeStringPacket(pCtx, pBuf->pName);
         }
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockSetName(TraceContext* pCtx, const QueueDataLockSetName* pBuf)
@@ -630,7 +654,7 @@ namespace
             writeStringPacket(pCtx, pBuf->pLockName);
         }
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockTry(TraceContext* pCtx, const QueueDataLockTry* pBuf)
@@ -649,7 +673,7 @@ namespace
             writeStringPacket(pCtx, lock.pDescription);
         }
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockState(TraceContext* pCtx, const QueueDataLockState* pBuf)
@@ -660,7 +684,7 @@ namespace
         packet.state = pBuf->state;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockCount(TraceContext* pCtx, const QueueDataLockCount* pBuf)
@@ -671,7 +695,7 @@ namespace
         packet.count = pBuf->count;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessMemAlloc(TraceContext* pCtx, const QueueDataMemAlloc* pBuf)
@@ -682,7 +706,7 @@ namespace
         packet.size = pBuf->size;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessMemFree(TraceContext* pCtx, const QueueDataMemFree* pBuf)
@@ -692,7 +716,7 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
-        addDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacket(pCtx, &packet, sizeof(packet));
     }
 
 
@@ -783,7 +807,7 @@ namespace
             }
 
             // flush anything left over to the socket.
-            flushPacketBuffer(pCtx);
+            flushDataPacketBuffer(pCtx);
 
             auto end = gSysTimer.GetMicro();
             auto ellapsed = end - start;
@@ -908,13 +932,13 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
     pCtx->numThreadData = 0;
     pCtx->strTable = CreateStringTable(pStrTableBuf, strTableSize);
     pCtx->pPacketBuffer = pPacketBuffer;
-    pCtx->packetBufSize = sizeof(DataStreamData);
+    pCtx->packetBufSize = sizeof(DataStreamHdr);
     pCtx->packetBufCapacity = packetBufSize;
 
     // pre fill the header.
-    auto* pDataHeader = reinterpret_cast<DataStreamData*>(pCtx->pPacketBuffer);
-    pDataHeader->type = PacketType::DataStream;
+    auto* pDataHeader = reinterpret_cast<DataStreamHdr*>(pCtx->pPacketBuffer);
     pDataHeader->dataSize = 0;
+    pDataHeader->type = PacketType::DataStream;
 
     pCtx->activeTickBufIdx = 0;
     pCtx->tickBuffers[0].pTickBuf = pTickBuffer0;
@@ -1028,11 +1052,10 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
         return TtError::Error;
     }
 
-
     auto* pCtx = handleToContext(ctx);
     pCtx->socket = connectSocket;
 
-    ConnectionRequestData cr;
+    ConnectionRequestHdr cr;
     zero_object(cr);
     cr.type = PacketType::ConnectionRequest;
     cr.clientVer.major = X_TELEMETRY_VERSION_MAJOR;
@@ -1040,16 +1063,45 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     cr.clientVer.patch = X_TELEMETRY_VERSION_PATCH;
     cr.clientVer.build = X_TELEMETRY_VERSION_BUILD;
 
-    strcpy_s(cr.appName, pAppName);
-    strcpy_s(cr.buildInfo, pBuildInfo);
+    LPWSTR pCmdLine = GetCommandLineW();
+
+    const auto appNameLen = strlen(pAppName);
+    const auto buildInfoLen = strlen(pBuildInfo);
+    const auto cmdLineLen = wcslen(pCmdLine);
+
+    if (appNameLen > MAX_APP_NAME_LEN) {
+        return TtError::InvalidParam;
+    }
+    if (buildInfoLen > MAX_BUILD_INFO_LEN) {
+        return TtError::InvalidParam;
+    }
+    if (cmdLineLen > MAX_CMDLINE_LEN) {
+        return TtError::InvalidParam;
+    }
+
+    char cmdLine[MAX_CMDLINE_LEN] = {};
+    tt_size cmdLenUtf8;
+    if (!Convert(pCmdLine, cmdLineLen, cmdLine, sizeof(cmdLine), cmdLenUtf8)) {
+        return TtError::Error;
+    }
+
+    cr.appNameLen = static_cast<tt_uint16>(appNameLen);
+    cr.buildInfoLen = static_cast<tt_uint16>(buildInfoLen);
+    cr.cmdLineLen = static_cast<tt_uint16>(cmdLenUtf8);
+    cr.dataSize = sizeof(cr) + cr.appNameLen + cr.buildInfoLen + cr.cmdLineLen;
 
     sendDataToServer(pCtx, &cr, sizeof(cr));
+
+    sendDataToServer(pCtx, pAppName, appNameLen);
+    sendDataToServer(pCtx, pBuildInfo, buildInfoLen);
+    sendDataToServer(pCtx, cmdLine, cmdLenUtf8);
 
     // wait for a response O.O
     char recvbuf[MAX_PACKET_SIZE];
     int recvbuflen = sizeof(recvbuf);
 
     // TODO: support timeout.
+    // TODO: make sure we read the whole packet.
     res = platform::recv(connectSocket, recvbuf, recvbuflen, 0);
 
     // we should get a packet back like a hot slut.
@@ -1061,7 +1113,7 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     }
 
     if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res))) {
-        return TtError::Error;
+        return TtError::HandeshakeFail;
     }
 
     return TtError::Ok;

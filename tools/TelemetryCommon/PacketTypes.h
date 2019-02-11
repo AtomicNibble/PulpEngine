@@ -38,6 +38,7 @@ struct VersionInfo
 constexpr tt_size MAX_PACKET_SIZE = 1450;
 constexpr tt_size MAX_APP_NAME_LEN = 64;
 constexpr tt_size MAX_BUILD_INFO_LEN = 128;
+constexpr tt_size MAX_CMDLINE_LEN = 1024 * 8;
 constexpr tt_size MAX_ERR_MSG_LEN = 256;
 constexpr tt_size MAX_STRING_LEN = 256;
 
@@ -47,42 +48,45 @@ constexpr tt_size MAX_ZONE_DEPTH = 32;
 constexpr tt_size MAX_THREAD_LOCKS = 16;
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = 1024 * 32;
 
-
+X_PACK_PUSH(1)
 
 struct PacketBase
 {
+    tt_uint16 dataSize;
     PacketType::Enum type;
 };
 
-struct ConnectionRequestData : public PacketBase
+struct ConnectionRequestHdr : public PacketBase
 {
-    tt_int8     _pad0[3];
     VersionInfo clientVer;
 
-    char appName[MAX_APP_NAME_LEN];
-    char buildInfo[MAX_BUILD_INFO_LEN];
+    tt_uint16 appNameLen;
+    tt_uint16 buildInfoLen;
+    tt_uint16 cmdLineLen;
 };
 
-struct ConnectionRequestAcceptedData : public PacketBase
+struct ConnectionRequestAcceptedHdr : public PacketBase
 {
     VersionInfo serverVer;
 };
 
-struct ConnectionRequestRejectedData : public PacketBase
+struct ConnectionRequestRejectedHdr : public PacketBase
 {
-    char reason[MAX_ERR_MSG_LEN];
+    tt_uint16 reasonLen;
 };
 
-struct DataStreamData : public PacketBase
+struct DataStreamHdr : public PacketBase
 {
-    tt_uint32 dataSize;
 };
+
+X_PACK_POP;
 
 static_assert(sizeof(VersionInfo) == 4, "Incorrect size");
-static_assert(sizeof(PacketBase) == 1, "Incorrect size");
-static_assert(sizeof(ConnectionRequestData) == 200, "Incorrect size");
-static_assert(sizeof(ConnectionRequestAcceptedData) == 5, "Incorrect size");
-static_assert(sizeof(ConnectionRequestRejectedData) == 257, "Incorrect size");
+static_assert(sizeof(PacketBase) == 3, "Incorrect size");
+static_assert(sizeof(ConnectionRequestHdr) == 13, "Incorrect size");
+static_assert(sizeof(ConnectionRequestAcceptedHdr) == 7, "Incorrect size");
+static_assert(sizeof(ConnectionRequestRejectedHdr) == 5, "Incorrect size");
+static_assert(sizeof(DataStreamHdr) == 3, "Incorrect size");
 
 // Not packet types but part of data
 // TODO: move?

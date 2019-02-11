@@ -27,7 +27,7 @@ enum TtError
     ArenaTooSmall,
     NetNotInit,
 
-    ConnectionRejected
+    HandeshakeFail
 };
 
 struct TtSourceInfo
