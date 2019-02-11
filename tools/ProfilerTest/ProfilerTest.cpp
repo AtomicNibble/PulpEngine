@@ -106,6 +106,11 @@ namespace
                   
                     core::Thread::sleep(1);
                 }
+
+                {
+                    ttEnter(ctx, "Yep")
+                    ttLeave(ctx)
+                }
             }
 
             // Lock me up like a goat.

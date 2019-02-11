@@ -188,10 +188,10 @@ namespace telem
 #define ttSetThreadName(ctx, threadID, pName);
 
 // Zones
-#define ttEnter(ctx, pZoneName);
-#define ttEnterEx(ctx, matchIdOut, minMicroSec, pZoneName);
-#define ttLeave(ctx);
-#define ttLeaveEx(ctx, matchId);
+#define ttEnter(ctx, pZoneName) TelemEnter(ctx, TT_SOURCE_INFO, pZoneName);
+#define ttEnterEx(ctx, matchIdOut, minMicroSec, pZoneName) TelemEnterEx(ctx, TT_SOURCE_INFO, matchIdOut, minMicroSec, pZoneName);
+#define ttLeave(ctx) TelemLeave(ctx);
+#define ttLeaveEx(ctx, matchId) TelemLeaveEx(ctx, matchId);
 
 
 // Lock util
