@@ -17,22 +17,31 @@ Signal::Signal(bool autoReset) :
 
 Signal::~Signal()
 {
-    CloseHandle(hHandle_);
+    if (!::CloseHandle(hHandle_)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Signal", "failed to destroy event. Error: %s", core::lastError::ToString(Dsc));
+    }
 }
 
 void Signal::raise(void)
 {
-    SetEvent(hHandle_);
+    if (!::SetEvent(hHandle_)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Signal", "failed to set event. Error: %s", core::lastError::ToString(Dsc));
+    }
 }
 
 void Signal::clear(void)
 {
-    ResetEvent(hHandle_);
+    if (!::ResetEvent(hHandle_)) {
+        core::lastError::Description Dsc;
+        X_ERROR("Signal", "failed to reset event. Error: %s", core::lastError::ToString(Dsc));
+    }
 }
 
 bool Signal::wait(uint32_t timeoutMS, bool alertable)
 {
-    DWORD result = WaitForSingleObjectEx(hHandle_, timeoutMS == Signal::WAIT_INFINITE ? INFINITE : timeoutMS, alertable);
+    DWORD result = ::WaitForSingleObjectEx(hHandle_, timeoutMS == Signal::WAIT_INFINITE ? INFINITE : timeoutMS, alertable);
 
     if (result != WAIT_OBJECT_0) {
         if (alertable && result == WAIT_IO_COMPLETION) {
