@@ -448,6 +448,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="Compiler.h" />
+    <ClInclude Include="Net.h" />
     <ClInclude Include="PacketTypes.h" />
     <ClInclude Include="PlatformWin32.h" />
     <ClInclude Include="StringCompress.h" />
@@ -460,6 +461,7 @@
     <ClInclude Include="Version.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Net.cpp" />
     <ClCompile Include="StringCompress.cpp" />
     <ClCompile Include="SysTimer.cpp" />
     <ClCompile Include="TelemetryCommon.cpp" />

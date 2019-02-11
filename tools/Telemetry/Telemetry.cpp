@@ -11,24 +11,6 @@
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
-namespace platform
-{
-    #ifndef NEAR
-    #define NEAR
-    #endif
-
-    #ifndef FAR
-    #define FAR
-    #endif
-
-    #include <WinSock2.h>
-    #include <Ws2tcpip.h>
-
-    X_LINK_LIB("Ws2_32.lib");
-
-} // namespace platform
-
-
 namespace
 {
     X_PACK_PUSH(8)
@@ -1101,18 +1083,11 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     int recvbuflen = sizeof(recvbuf);
 
     // TODO: support timeout.
-    // TODO: make sure we read the whole packet.
-    res = platform::recv(connectSocket, recvbuf, recvbuflen, 0);
-
-    // we should get a packet back like a hot slut.
-    if (res == 0) {
-        return TtError::Error;
-    }
-    if (res < 0) {
+    if (!readPacket(connectSocket, recvbuf, recvbuflen)) {
         return TtError::Error;
     }
 
-    if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(res))) {
+    if (!handleConnectionResponse(reinterpret_cast<tt_uint8*>(recvbuf), static_cast<tt_size>(recvbuflen))) {
         return TtError::HandeshakeFail;
     }
 

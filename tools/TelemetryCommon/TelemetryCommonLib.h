@@ -22,6 +22,7 @@
 
 #include "Version.h"
 #include "PacketTypes.h"
+#include "Net.h"
 
 #include "StringTable.h"
 #include "StringCompress.h"

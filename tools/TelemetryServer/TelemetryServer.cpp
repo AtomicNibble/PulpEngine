@@ -1,5 +1,6 @@
 #include "stdafx.h"
 
+X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
 namespace
 {
@@ -153,52 +154,6 @@ namespace
         return true;
     }
 
-    bool readPacket(Client& client, char* pBuffer, int& bufLength)
-    {
-        // this should return complete packets or error.
-        int bytesRead = 0;
-
-        while (1)
-        {
-            int maxReadSize = bufLength - bytesRead;
-            int res = platform::recv(client.socket, &pBuffer[bytesRead], maxReadSize, 0);
-
-            if (res == 0)
-            {
-                printf("Connection closing...\n");
-                return false;
-            }
-            else if(res < 0)
-            {
-                printf("recv failed with error: %d\n", platform::WSAGetLastError());
-                return false;
-            }
-
-            bytesRead += res;
-
-            if (bytesRead >= sizeof(PacketBase))
-            {
-                auto* pHdr = reinterpret_cast<const PacketBase*>(pBuffer);
-                if (pHdr->dataSize == 0) {
-                    printf("Client sent packet with length zero...\n");
-                    return false;
-                }
-
-                bufLength = pHdr->dataSize;
-
-                if (bytesRead == bufLength) {
-                    return true;
-                }
-                else if(bytesRead >= bufLength) {
-                    printf("Overread packet bytesRead: %d recvbuflen: %d\n", bytesRead, bufLength);
-                    return false;
-                }
-            }
-
-            printf("got: %d bytes\n", res);
-        }
-    }
-
     void handleClient(Client& client)
     {
         char recvbuf[MAX_PACKET_SIZE];
@@ -206,7 +161,7 @@ namespace
         while(1)
         {
             int recvbuflen = sizeof(recvbuf);
-            if (!readPacket(client, recvbuf, recvbuflen)) {
+            if (!readPacket(client.socket, recvbuf, recvbuflen)) {
                 return;
             }
 
