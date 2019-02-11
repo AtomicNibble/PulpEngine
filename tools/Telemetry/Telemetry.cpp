@@ -448,6 +448,10 @@ namespace
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
+        
+        if (offset + size > pCtx->tickBufCapacity) {
+            ::DebugBreak();
+        }
 
         // the writes will overlap cache lanes, but we never read.
         memcpy(buf.pTickBuf + offset, pPtr, size);
