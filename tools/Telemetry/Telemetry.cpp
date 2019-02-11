@@ -443,6 +443,15 @@ namespace
         const void* pPtr;
     };
 
+    constexpr size_t size0 = sizeof(QueueDataThreadSetName);
+    constexpr size_t size1 = sizeof(QueueDataZone);
+    constexpr size_t size2 = sizeof(QueueDataLockSetName);
+    constexpr size_t size3 = sizeof(QueueDataLockTry);
+    constexpr size_t size4 = sizeof(QueueDataLockState);
+    constexpr size_t size5 = sizeof(QueueDataLockCount);
+    constexpr size_t size6 = sizeof(QueueDataMemAlloc);
+    constexpr size_t size7 = sizeof(QueueDataMemFree);
+
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
@@ -454,6 +463,36 @@ namespace
         }
 
         // the writes will overlap cache lanes, but we never read.
+        // so zone and lockTry are pretty close to been 64bytes.
+        // which are going to be the most popular events, i could bump everything up to 64bytes
+        // so we don't get false sharing.
+        // that would mean that can have 8k zones per tickBuffer if provide 1MB of memory, not bad.
+        
+        // still leaves the problem of running out of buffer.
+        // and forcing a flip.
+        // since there could be pending writes.
+        // one thread will notice first.
+        // and try to force the flush.
+        // but the other threads need to finish writing.
+        // if they get uncheduled mid write we can't read them
+        // but we don't want to just drop them.
+        // how to wait for them?
+        // i could do something mad like pause all the threads and find out where they are.
+        // or:
+        // could have a second counter per thread
+        // that is not altomic that we set when reading.
+        // then we pause all threads and make sure they are all done writing?
+        // if we pause all the threads we will throw tracing out of whack.
+        // but if we can zone it so it shows on the viewer as a stall should be okay.
+        // but if you have one every frame will kinda suck.
+        // but then again you want to know you are slow because of tracer stalls.
+
+        // So i think i will just stop the threads and run them till they are done.
+        // then check if you are in this function, and run you till you leave.
+        // might not work well with inlining.
+        // can just keep going till the rip is also trying to force a flip or left the trace module.
+
+
         memcpy(buf.pTickBuf + offset, pPtr, size);
     }
 
