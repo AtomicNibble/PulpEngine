@@ -534,6 +534,11 @@ namespace
 
     void FLipBuffer(TraceContext* pCtx)
     {
+        auto bufSize = getActiveTickBufferSize(pCtx);
+        if (bufSize == 0) {
+            return;
+        }
+
         // wait for the background thread to finish process that last buffer.
         // TODO: maybe come up with a fast path for when we don't need to wait.
         // check if the signal has a userspace atomic it checks before waiting.
@@ -1105,12 +1110,6 @@ void TelemFlush(TraceContexHandle ctx)
 
     // TODO: maybe not return
     if (!pCtx->isEnabled) {
-        return;
-    }
-
-    auto bufSize = getActiveTickBufferSize(pCtx);
-
-    if (bufSize == 0) {
         return;
     }
 
