@@ -218,6 +218,8 @@ namespace
         volatile tt_int32 shutDownFlag;
         platform::SOCKET socket;
 
+        // -- Cace lane boundry --
+
         CriticalSection cs_;
         tt_int32 numStalls;
         tt_int32 totalEvents;
@@ -225,10 +227,11 @@ namespace
 
  //   constexpr size_t size0 = sizeof(TickBuffer);
  //   constexpr size_t size1 = X_OFFSETOF(TraceContext, tickBuffers);
- //   constexpr size_t size2 = X_OFFSETOF(TraceContext, activeTickBufIdx);
+ //   constexpr size_t size2 = X_OFFSETOF(TraceContext, cs_);
 
     static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(X_OFFSETOF(TraceContext, pPacketBuffer) == 128, "Cold fields not on next cache lane");
+    static_assert(X_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
     static_assert(sizeof(TraceContext) == 256, "Size changed");
 
     tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
