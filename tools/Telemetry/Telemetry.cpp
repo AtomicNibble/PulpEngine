@@ -568,12 +568,12 @@ namespace
         flipBuffer(pCtx, true, false);
     }
 
-    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
+    void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_int32 size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
         
-        if (offset + static_cast<tt_int32>(size) <= pCtx->tickBufCapacity) {
+        if (offset + size <= pCtx->tickBufCapacity) {
             memcpy(buf.pTickBuf + offset, pPtr, size);
             return;
         }
