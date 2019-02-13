@@ -180,7 +180,11 @@ namespace
         volatile tt_int32 bufOffset;
     };
 
+#if X_64
+    #define X86_PAD(bytes)
+#else
     #define X86_PAD(bytes) tt_uint8 X_TELEMETRY_UNIQUE_NAME(__pad)[bytes];
+#endif // X_64
 
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     X_ALIGNED_SYMBOL(struct TraceContext, 64)
