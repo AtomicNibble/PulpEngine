@@ -12,7 +12,10 @@
 
 
 #include <../Telemetry/TelemetryLib.h>
+
+#if TTELEMETRY_LINK
 X_LINK_ENGINE_LIB("TelemetryLib")
+#endif // !TTELEMETRY_LINK
 
 
 #define _LAUNCHER
