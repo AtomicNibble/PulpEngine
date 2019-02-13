@@ -213,7 +213,7 @@ core::string_view ConsoleCommandArgs::GetArg(size_t idx) const
     X_ASSERT(idx < argNum_, "Argument index out of range")(argNum_, idx);
     auto arg = argv_[idx];
 
-    X_ASSERT(arg.first + arg.second <= str_.length(), "Argument out of range")(arg.first + arg.second, str_.length());
+    X_ASSERT(arg.first + arg.second <= static_cast<int32_t>(str_.length()), "Argument out of range")(arg.first + arg.second, str_.length());
     return core::string_view(str_.data() + arg.first, arg.second);
 }
 
@@ -222,7 +222,7 @@ core::string_view ConsoleCommandArgs::GetArgToEnd(size_t idx) const
     X_ASSERT(idx < argNum_, "Argument index out of range")(argNum_, idx);
     auto arg = argv_[idx];
 
-    X_ASSERT(arg.first < str_.length(), "Argument out of range")(arg.first, str_.length());
+    X_ASSERT(arg.first < static_cast<int32_t>(str_.length()), "Argument out of range")(arg.first, str_.length());
     return core::string_view(str_.data() + arg.first, str_.end());
 }
 
