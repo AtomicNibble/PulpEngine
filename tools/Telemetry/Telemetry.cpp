@@ -464,10 +464,16 @@ namespace
     static_assert(64 == sizeof(QueueDataMemAlloc));
     static_assert(64 == sizeof(QueueDataMemFree));
 
-    void FLipBufferInternal(TraceContext* pCtx)
+    void FLipBufferInternal(TraceContext* pCtx, bool force)
     {
         auto bufSize = getActiveTickBufferSize(pCtx);
         if (bufSize == 0) {
+            return;
+        }
+
+        // don't flip if not half full and force is false.
+        auto halfBufferCap = pCtx->tickBufCapacity / 2;
+        if (force && bufSize < halfBufferCap) {
             return;
         }
 
@@ -493,23 +499,26 @@ namespace
     }
 
 
-    void FLipBuffer(TraceContext* pCtx, bool stalled)
+    void FLipBuffer(TraceContext* pCtx, bool stalled, bool force)
     {
         // this can be entered from multiple threads but we only want to flip once.
+        // TODO: if we just flipped we should not flip again
         if (pCtx->cs_.TryEnter())
         {
             if (stalled) {
                 pCtx->numStalls++;
             }
 
-            FLipBufferInternal(pCtx);
+            FLipBufferInternal(pCtx, force);
 
             pCtx->cs_.Leave();
         }
         else
         {
-            // TODO: wait.
-            ::DebugBreak();
+            // need to wait.
+            // lets just take the lock, not ideal if lots of threads end up here.
+            // but got biggeer problems if that happening tbh.
+            ScopedLock lock(pCtx->cs_);
         }
     }
 
@@ -530,7 +539,7 @@ namespace
         // so i update the tail after write is finished.
         // that way the background thread can know the writes are finished.
 
-        FLipBuffer(pCtx, true);
+        FLipBuffer(pCtx, true, false);
     }
 
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
@@ -1234,7 +1243,7 @@ void TelemTick(TraceContexHandle ctx)
 
     pCtx->lastTick = curTime;
 
-    FLipBuffer(pCtx, false);
+    FLipBuffer(pCtx, false, true);
     return;
 }
 
@@ -1247,7 +1256,7 @@ void TelemFlush(TraceContexHandle ctx)
         return;
     }
 
-    FLipBuffer(pCtx, false);
+    FLipBuffer(pCtx, false, true);
 }
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
