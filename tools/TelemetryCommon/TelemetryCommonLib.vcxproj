@@ -456,6 +456,7 @@
     <ClInclude Include="SysTimer.h" />
     <ClInclude Include="TelemetryCommonLib.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="Threading.h" />
     <ClInclude Include="Types.h" />
     <ClInclude Include="Util.h" />
     <ClInclude Include="Version.h" />

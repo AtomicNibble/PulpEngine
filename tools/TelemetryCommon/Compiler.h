@@ -32,5 +32,16 @@
 #define X_IMPORT                                __declspec(dllimport)
 #define X_EXPORT                                __declspec(dllexport)
 
-
 #define X_UNUSED(x)                             UNREFERENCED_PARAMETER(x)
+
+
+#define X_NO_CREATE(className) \
+private:                       \
+    className(void);           \
+    ~className(void)
+#define X_NO_COPY(className) className(const className&) = delete
+#define X_NO_ASSIGN(className) className& operator=(const className&) = delete
+#define X_NO_ASSIGN_VOLATILE(className) className& operator=(const className&) volatile = delete
+
+#define X_NO_MOVE(className) className(className&&) = delete
+#define X_NO_MOVE_ASSIGN(className) className& operator=(className&&) = delete

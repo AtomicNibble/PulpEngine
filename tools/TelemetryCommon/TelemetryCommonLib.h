@@ -19,6 +19,7 @@
 #include "Compiler.h"
 #include "PlatformWin32.h"
 #include "Util.h"
+#include "Threading.h"
 
 #include "Version.h"
 #include "PacketTypes.h"
