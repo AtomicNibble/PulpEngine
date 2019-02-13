@@ -1425,12 +1425,9 @@ void TelemTryLockEx(TraceContexHandle ctx, tt_uint64& matchIdOut, tt_uint64 minM
 void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult result)
 {
     auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
+    auto* pThreadData = gThreadData;
 
-    auto* pThreadData = getThreadData(pCtx);
-    if (!pThreadData) {
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
@@ -1448,12 +1445,9 @@ void TelemEndTryLock(TraceContexHandle ctx, const void* pPtr, TtLockResult resul
 void TelemEndTryLockEx(TraceContexHandle ctx, tt_uint64 matchId, const void* pPtr, TtLockResult result)
 {
     auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
+    auto* pThreadData = gThreadData;
 
-    auto* pThreadData = getThreadData(pCtx);
-    if (!pThreadData) {
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
