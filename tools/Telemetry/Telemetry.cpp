@@ -1334,13 +1334,9 @@ void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const cha
 void TelemLeave(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
-
-    // don't allow add in Leave.
     auto* pThreadData = gThreadData;
-    if (!pThreadData) {
+
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
@@ -1363,13 +1359,9 @@ void TelemEnterEx(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, tt_uint
 void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
 {
     auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
-
-    // don't allow add in Leave.
     auto* pThreadData = gThreadData;
-    if (!pThreadData) {
+
+    if (!pCtx->isEnabled | !pThreadData) {
         return;
     }
 
