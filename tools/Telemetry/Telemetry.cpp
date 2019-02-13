@@ -1361,12 +1361,9 @@ void TelemSetThreadName(TraceContexHandle ctx, tt_uint32 threadID, const char* p
 void TelemEnter(TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName)
 {
     auto* pCtx = handleToContext(ctx);
-    if (!pCtx->isEnabled) {
-        return;
-    }
-
     auto* pThreadData = getThreadData(pCtx);
-    if (!pThreadData) {
+
+    if (!pCtx->isEnabled || !pThreadData) {
         return;
     }
 
