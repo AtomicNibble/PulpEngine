@@ -156,6 +156,7 @@ namespace telem
 
         TelemetryAPI() {
             memset(this, 0, sizeof(*this));
+            setBlank();
         }
 
         bool loadModule()
@@ -261,6 +262,10 @@ namespace telem
         HMODULE hLib_;
     };
 
+    // if you have multiple dll's this will be diffrent.
+    // so you would have to call it in each dll init.
+    // but also means you can conditionally enable telemetry for various modules.
+    // it's not safe to resole functions during a zone.
     static TelemetryAPI gTelemApi;
 
 #endif // TTELEMETRY_LINK
