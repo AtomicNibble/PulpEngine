@@ -180,6 +180,8 @@ namespace
         volatile tt_int32 bufOffset;
     };
 
+    #define X86_PAD(bytes) tt_uint8 X_TELEMETRY_UNIQUE_NAME(__pad)[bytes];
+
     // This is padded to 64bit to make placing TraceThread data on it's own boundy more simple.
     X_ALIGNED_SYMBOL(struct TraceContext, 64)
     {
@@ -193,9 +195,10 @@ namespace
 
         StringTable strTable;
 
-        // -- Cace lane boundry --
-
         tt_uint8 _lanePad0[14];
+        X86_PAD(12)
+
+        // -- Cace lane boundry --
 
         volatile tt_int32 activeTickBufIdx;
         TickBuffer tickBuffers[2];
@@ -203,6 +206,7 @@ namespace
         tt_int32 tickBufCapacity;
 
         tt_uint8 _lanePad1[20];
+        X86_PAD(20)
 
         // -- Cace lane boundry --
 
@@ -218,6 +222,8 @@ namespace
         volatile tt_int32 shutDownFlag;
         platform::SOCKET socket;
 
+        X86_PAD(28)
+
         // -- Cace lane boundry --
 
         CriticalSection cs_;
@@ -225,9 +231,9 @@ namespace
         tt_int32 totalEvents;
     };
 
- //   constexpr size_t size0 = sizeof(TickBuffer);
- //   constexpr size_t size1 = X_OFFSETOF(TraceContext, tickBuffers);
- //   constexpr size_t size2 = X_OFFSETOF(TraceContext, cs_);
+//    constexpr size_t size0 = sizeof(TraceContext);
+//    constexpr size_t size1 = X_OFFSETOF(TraceContext, activeTickBufIdx);
+//    constexpr size_t size2 = X_OFFSETOF(TraceContext, cs_);
 
     static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(X_OFFSETOF(TraceContext, pPacketBuffer) == 128, "Cold fields not on next cache lane");
@@ -357,7 +363,7 @@ namespace
 
         // can we fit this data?
         const auto space = pCtx->packetBufCapacity - pCtx->packetBufSize;
-        if (space < len) {
+        if (space < static_cast<tt_int32>(len)) {
             flushDataPacketBuffer(pCtx);
         }
 
@@ -557,7 +563,7 @@ namespace
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
         
-        if (offset + size <= pCtx->tickBufCapacity) {
+        if (offset + static_cast<tt_int32>(size) <= pCtx->tickBufCapacity) {
             memcpy(buf.pTickBuf + offset, pPtr, size);
             return;
         }
