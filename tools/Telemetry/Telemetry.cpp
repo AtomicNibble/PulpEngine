@@ -138,8 +138,8 @@ namespace
 
     struct TraceLocks
     {
-        const void* pLockPtr[MAX_THREAD_LOCKS];
-        TraceLock locks[MAX_THREAD_LOCKS];
+        const void* pLockPtr[MAX_LOCKS_HELD_PER_THREAD];
+        TraceLock locks[MAX_LOCKS_HELD_PER_THREAD];
     };
 
     struct TraceZone
@@ -244,7 +244,7 @@ namespace
     TraceLock* addLock(TraceThread* pThread, const void* pLockPtr)
     {
         auto& locks = pThread->locks;
-        for (tt_int32 i = 0; i < MAX_THREAD_LOCKS; i++)
+        for (tt_int32 i = 0; i < MAX_LOCKS_HELD_PER_THREAD; i++)
         {
             if (!locks.pLockPtr[i])
             {
@@ -262,7 +262,7 @@ namespace
         TraceLock* pLock = nullptr;
 
         auto& locks = pThread->locks;
-        for (tt_int32 i = 0; i < MAX_THREAD_LOCKS; i++)
+        for (tt_int32 i = 0; i < MAX_LOCKS_HELD_PER_THREAD; i++)
         {
             if (locks.pLockPtr[i] == pLockPtr)
             {

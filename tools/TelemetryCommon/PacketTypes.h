@@ -45,7 +45,7 @@ constexpr tt_size MAX_STRING_LEN = 256;
 // TODO: move?
 constexpr tt_size MAX_ZONE_THREADS = 32;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
-constexpr tt_size MAX_THREAD_LOCKS = 16;
+constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
 constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = 1024 * 32;
 
 X_PACK_PUSH(1)
