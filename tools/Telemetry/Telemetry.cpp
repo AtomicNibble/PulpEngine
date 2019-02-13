@@ -394,6 +394,7 @@ namespace
     enum class QueueDataType
     {
         Zone,
+        TickInfo,
         ThreadSetName,
         LockSetName,
         LockTry,
@@ -406,6 +407,14 @@ namespace
     struct QueueDataBase
     {
         QueueDataType type;
+    };
+
+    
+    X_ALIGNED_SYMBOL(struct QueueDataTickInfo, 64) : public QueueDataBase
+    {
+        TtthreadId threadID;
+        tt_uint64 ticks;
+        tt_uint64 timeMicro;
     };
 
     X_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
@@ -472,6 +481,7 @@ namespace
     constexpr size_t size7 = sizeof(QueueDataMemFree);
 
     static_assert(64 == sizeof(QueueDataThreadSetName));
+    static_assert(64 == sizeof(QueueDataTickInfo));
     static_assert(64 == sizeof(QueueDataZone));
     static_assert(64 == sizeof(QueueDataLockSetName));
     static_assert(64 == sizeof(QueueDataLockTry));
@@ -577,6 +587,17 @@ namespace
 
         tickBufferFull(pCtx);
         addToTickBuffer(pCtx, pPtr, size);
+    }
+
+    void queueTickInfo(TraceContext* pCtx)
+    {
+        QueueDataTickInfo data;
+        data.type = QueueDataType::TickInfo;
+        data.threadID = getThreadID();
+        data.ticks = getTicks();
+        data.timeMicro = gSysTimer.GetMicro();
+
+        addToTickBuffer(pCtx, &data, sizeof(data));
     }
 
     void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
@@ -703,6 +724,17 @@ namespace
         if (packet.strIdxZone.inserted) {
             writeStringPacket(pCtx, zone.pZoneName);
         }
+
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
+    }
+
+    void queueProcessTickInfo(TraceContext* pCtx, const QueueDataTickInfo* pBuf)
+    {
+        DataPacketTickInfo packet;
+        packet.type = DataStreamType::TickInfo;
+        packet.threadID = pBuf->threadID;
+        packet.ticks = pBuf->ticks;
+        packet.timeMicro = pBuf->timeMicro;
 
         addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
@@ -854,6 +886,10 @@ namespace
                     case QueueDataType::Zone:
                         queueProcessZone(pCtx, reinterpret_cast<const QueueDataZone*>(pBuf));
                         pBuf += sizeof(QueueDataZone);
+                        break;
+                    case QueueDataType::TickInfo:
+                        queueProcessTickInfo(pCtx, reinterpret_cast<const QueueDataTickInfo*>(pBuf));
+                        pBuf += sizeof(QueueDataTickInfo);
                         break;
                     case QueueDataType::ThreadSetName:
                         queueProcessThreadSetName(pCtx, reinterpret_cast<const QueueDataThreadSetName*>(pBuf));
@@ -1247,6 +1283,8 @@ void TelemTick(TraceContexHandle ctx)
 
     auto curTime = gSysTimer.GetMicro();
     auto sinceLast = curTime - pCtx->lastTick;
+
+    queueTickInfo(pCtx);
 
     // if we are been called at a very high freq don't bother sending unless needed.
     if (sinceLast < 1000000) {

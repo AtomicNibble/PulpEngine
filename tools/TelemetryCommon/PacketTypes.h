@@ -98,6 +98,7 @@ struct DataStreamType
         StringTableAdd,
 
         Zone,
+        TickInfo,
         ThreadSetName,
         LockSetName,
         LockTry,
@@ -145,11 +146,21 @@ struct DataPacketZone : public DataPacketBase
     tt_int8  _pad1[2];
 };
 
+struct DataPacketTickInfo : public DataPacketBase
+{
+    // 4
+    TtthreadId threadID;
+
+    // 16
+    tt_uint64 ticks;
+    tt_uint64 timeMicro;
+};
+
 struct DataPacketThreadSetName : public DataPacketBase
 {
     // 2
     StringTableIndex strIdxName;
-
+    // 4
     TtthreadId threadID;
 };
 
