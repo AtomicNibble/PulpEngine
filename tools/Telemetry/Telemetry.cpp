@@ -216,6 +216,8 @@ namespace
         HANDLE hSignal_;
         HANDLE hSignalIdle_;
         platform::SOCKET socket;
+
+        CriticalSection cs_;
     };
 
  //   constexpr size_t size0 = sizeof(TickBuffer);
@@ -224,7 +226,7 @@ namespace
 
     static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(X_OFFSETOF(TraceContext, pPacketBuffer) == 128, "Cold fields not on next cache lane");
-    static_assert(sizeof(TraceContext) == 192, "Size changed");
+    static_assert(sizeof(TraceContext) == 256, "Size changed");
 
     tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
     {
@@ -458,6 +460,72 @@ namespace
     static_assert(64 == sizeof(QueueDataLockCount));
     static_assert(64 == sizeof(QueueDataMemAlloc));
     static_assert(64 == sizeof(QueueDataMemFree));
+
+    void FLipBufferInternal(TraceContext* pCtx)
+    {
+        auto bufSize = getActiveTickBufferSize(pCtx);
+        if (bufSize == 0) {
+            return;
+        }
+
+        // wait for the background thread to finish process that last buffer.
+        // TODO: maybe come up with a fast path for when we don't need to wait.
+        // check if the signal has a userspace atomic it checks before waiting.
+        DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
+        if (result != WAIT_OBJECT_0) {
+            ::DebugBreak();
+            return;
+        }
+
+        // the background thread has finished with old buffer.
+        // make sure that buffers offset is reset before making it live.
+        const auto oldIdx = pCtx->activeTickBufIdx ^ 1;
+        _InterlockedExchange(reinterpret_cast<volatile long*>(&pCtx->tickBuffers[oldIdx].bufOffset), 0l);
+
+        // flip the buffers.
+        (void)_InterlockedXor(reinterpret_cast<volatile long*>(&pCtx->activeTickBufIdx), 1l);
+
+        // tell the background thread we are HOT!
+        ::SetEvent(pCtx->hSignal_);
+    }
+
+
+    void FLipBuffer(TraceContext* pCtx)
+    {
+        // this can be entered from multiple threads but we only want to flip once.
+        if (pCtx->cs_.TryEnter())
+        {
+            FLipBufferInternal(pCtx);
+
+            pCtx->cs_.Leave();
+        }
+        else
+        {
+            // TODO: wait.
+            ::DebugBreak();
+        }
+    }
+
+
+    void tickBufferFull(TraceContext* pCtx)
+    {
+        // we are full.
+        // in order to flip we need to make everythread has finished writing to the tick buffer
+        // and is ready for the flip.
+        // but then again, I don't do any of this for normal flips.
+        // shit.
+
+        // I was thinking of looking at all the threads and make sure they are outside this module or also waiting for 
+        // flip.
+
+        // but can't be doing that every tick.
+        // so think i will need to keep like a tail and head value
+        // so i update the tail after write is finished.
+        // that way the background thread can know the writes are finished.
+
+        FLipBuffer(pCtx);
+    }
+
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
@@ -465,39 +533,14 @@ namespace
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
         
         if (offset + size > pCtx->tickBufCapacity) {
-            ::DebugBreak();
+            tickBufferFull(pCtx);
+            addToTickBuffer(pCtx, pPtr, size);
+            return;
         }
 
-        // the writes will overlap cache lanes, but we never read.
-        // so zone and lockTry are pretty close to been 64bytes.
-        // which are going to be the most popular events, i could bump everything up to 64bytes
-        // so we don't get false sharing.
-        // that would mean that can have 8k zones per tickBuffer if provide 1MB of memory, not bad.
-        
-        // still leaves the problem of running out of buffer.
-        // and forcing a flip.
-        // since there could be pending writes.
-        // one thread will notice first.
-        // and try to force the flush.
-        // but the other threads need to finish writing.
-        // if they get uncheduled mid write we can't read them
-        // but we don't want to just drop them.
-        // how to wait for them?
-        // i could do something mad like pause all the threads and find out where they are.
-        // or:
-        // could have a second counter per thread
-        // that is not altomic that we set when reading.
-        // then we pause all threads and make sure they are all done writing?
-        // if we pause all the threads we will throw tracing out of whack.
-        // but if we can zone it so it shows on the viewer as a stall should be okay.
-        // but if you have one every frame will kinda suck.
-        // but then again you want to know you are slow because of tracer stalls.
-
-        // So i think i will just stop the threads and run them till they are done.
-        // then check if you are in this function, and run you till you leave.
-        // might not work well with inlining.
-        // can just keep going till the rip is also trying to force a flip or left the trace module.
-
+        if (offset + size > pCtx->tickBufCapacity) {
+            ::DebugBreak();
+        }
 
         memcpy(buf.pTickBuf + offset, pPtr, size);
     }
@@ -586,36 +629,6 @@ namespace
 
         addToTickBuffer(pCtx, &data, sizeof(data));
     }
-
-
-    void FLipBuffer(TraceContext* pCtx)
-    {
-        auto bufSize = getActiveTickBufferSize(pCtx);
-        if (bufSize == 0) {
-            return;
-        }
-
-        // wait for the background thread to finish process that last buffer.
-        // TODO: maybe come up with a fast path for when we don't need to wait.
-        // check if the signal has a userspace atomic it checks before waiting.
-        DWORD result = WaitForSingleObjectEx(pCtx->hSignalIdle_, INFINITE, false);
-        if (result != WAIT_OBJECT_0) {
-            ::DebugBreak();
-            return;
-        }
-
-        // the background thread has finished with old buffer.
-        // make sure that buffers offset is reset before making it live.
-        const auto oldIdx = pCtx->activeTickBufIdx ^ 1;
-        _InterlockedExchange(reinterpret_cast<volatile long*>(&pCtx->tickBuffers[oldIdx].bufOffset), 0l);
-
-        // flip the buffers.
-        (void)_InterlockedXor(reinterpret_cast<volatile long*>(&pCtx->activeTickBufIdx), 1l);
-
-        // tell the background thread we are HOT!
-        ::SetEvent(pCtx->hSignal_);
-    }
-
 
     TraceContexHandle contextToHandle(TraceContext* pCtx)
     {
@@ -774,7 +787,14 @@ namespace
             // process the bufffer.
             auto tickBuf = pCtx->tickBuffers[pCtx->activeTickBufIdx ^ 1];
 
-            const auto size = tickBuf.bufOffset;
+            auto size = tickBuf.bufOffset;
+
+            // if we are past the end it means we filled the buffer.
+            // did nto actually write past the end.
+            if (size > pCtx->tickBufCapacity) {
+                size = pCtx->tickBufCapacity;
+            }
+
             const auto* pBegin = tickBuf.pTickBuf;
             const auto* pEnd = pBegin + size;
             const auto* pBuf = pBegin;
@@ -955,7 +975,7 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
         return TtError::Error;
     }
 
-    TraceContext* pCtx = reinterpret_cast<TraceContext*>(pBuf);
+    TraceContext* pCtx = new (pBuf) TraceContext();
     pCtx->lastTick = gSysTimer.GetMicro();
     pCtx->isEnabled = true;
     pCtx->socket = INV_SOCKET;
