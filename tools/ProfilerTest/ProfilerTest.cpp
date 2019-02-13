@@ -140,7 +140,12 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 
     g_arena = &arena;
 
+
     {
+        if (!ttLoadLibary()) {
+            return 1;
+        }
+
         // Setup telem.
         if (!ttInit()) {
             return 1;
