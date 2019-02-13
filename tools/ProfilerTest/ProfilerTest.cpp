@@ -169,26 +169,22 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
 #endif // TTELEMETRY_ENABLED
 
         {
-            {
-                EngineApp engine;
+            EngineApp engine;
 
-                if (engine.Init(hInstance, lpCmdLine))
-                {
-                    X_ASSERT_NOT_NULL(gEnv);
-                    X_ASSERT_NOT_NULL(gEnv->pCore);
+            if (engine.Init(hInstance, lpCmdLine)) {
+                X_ASSERT_NOT_NULL(gEnv);
+                X_ASSERT_NOT_NULL(gEnv->pCore);
 
-                    gEnv->pConsoleWnd->redirectSTD();
+                gEnv->pConsoleWnd->redirectSTD();
 
-                    core::Thread thread;
-                    thread.create("Test");
-                    thread.start(threadFunc);
+                core::Thread thread;
+                thread.create("Test");
+                thread.start(threadFunc);
 
+                thread.join();
+                thread.destroy();
 
-                    thread.join();
-                    thread.destroy();
-
-                    gEnv->pConsoleWnd->pressToContinue();
-                }
+                gEnv->pConsoleWnd->pressToContinue();
             }
         }
 
