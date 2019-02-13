@@ -11,7 +11,7 @@ using tt_uint16 = unsigned short;
 using tt_uint32 = unsigned int;
 using tt_uint64 = unsigned long long;
 
-#ifdef X_64
+#if X_64
 
 using tt_intptr = __int64;
 using tt_uintptr = unsigned __int64;
