@@ -338,7 +338,7 @@ namespace
         pCtx->packetBufSize = sizeof(DataStreamHdr);
     }
 
-    void addToDataPacket(TraceContext* pCtx, const void* pData, tt_size len)
+    void addToDataPacketBuffer(TraceContext* pCtx, const void* pData, tt_size len)
     {
         // even fit in a packet?
         if (len > pCtx->packetBufCapacity - sizeof(DataStreamHdr)) {
@@ -372,7 +372,7 @@ namespace
 
         memcpy(strDataBuf + sizeof(DataPacketStringTableAdd), pStr, strLen);
 
-        addToDataPacket(pCtx, &strDataBuf, packetLen);
+        addToDataPacketBuffer(pCtx, &strDataBuf, packetLen);
     }
 
     enum class QueueDataType
@@ -686,7 +686,7 @@ namespace
             writeStringPacket(pCtx, zone.pZoneName);
         }
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessThreadSetName(TraceContext* pCtx, const QueueDataThreadSetName* pBuf)
@@ -700,7 +700,7 @@ namespace
             writeStringPacket(pCtx, pBuf->pName);
         }
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockSetName(TraceContext* pCtx, const QueueDataLockSetName* pBuf)
@@ -714,7 +714,7 @@ namespace
             writeStringPacket(pCtx, pBuf->pLockName);
         }
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockTry(TraceContext* pCtx, const QueueDataLockTry* pBuf)
@@ -733,7 +733,7 @@ namespace
             writeStringPacket(pCtx, lock.pDescription);
         }
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockState(TraceContext* pCtx, const QueueDataLockState* pBuf)
@@ -744,7 +744,7 @@ namespace
         packet.state = pBuf->state;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessLockCount(TraceContext* pCtx, const QueueDataLockCount* pBuf)
@@ -755,7 +755,7 @@ namespace
         packet.count = pBuf->count;
         packet.lockHandle = reinterpret_cast<tt_uint64>(pBuf->pLockPtr);
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessMemAlloc(TraceContext* pCtx, const QueueDataMemAlloc* pBuf)
@@ -766,7 +766,7 @@ namespace
         packet.size = pBuf->size;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
     void queueProcessMemFree(TraceContext* pCtx, const QueueDataMemFree* pBuf)
@@ -776,7 +776,7 @@ namespace
         packet.threadID = pBuf->threadID;
         packet.ptr = reinterpret_cast<tt_uint64>(pBuf->pPtr);
 
-        addToDataPacket(pCtx, &packet, sizeof(packet));
+        addToDataPacketBuffer(pCtx, &packet, sizeof(packet));
     }
 
 
