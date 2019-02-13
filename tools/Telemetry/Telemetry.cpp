@@ -11,6 +11,9 @@
 
 X_LINK_LIB("engine_TelemetryCommonLib.lib");
 
+X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
+
+
 namespace
 {
     X_PACK_PUSH(8)
@@ -148,8 +151,6 @@ namespace
         TtSourceInfo sourceInfo;
     };
 
-    X_DISABLE_WARNING(4324) //  structure was padded due to alignment specifier
-
     // some data for each thread!
     X_ALIGNED_SYMBOL(struct TraceThread, 64)
     {
@@ -224,9 +225,6 @@ namespace
     static_assert(X_OFFSETOF(TraceContext, activeTickBufIdx) == 64, "Cold fields not on firstcache lane");
     static_assert(X_OFFSETOF(TraceContext, pPacketBuffer) == 128, "Cold fields not on next cache lane");
     static_assert(sizeof(TraceContext) == 192, "Size changed");
-
-    X_ENABLE_WARNING(4324)
-
 
     tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
     {
@@ -389,13 +387,13 @@ namespace
         QueueDataType type;
     };
 
-    struct QueueDataThreadSetName : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataThreadSetName, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const char* pName;
     };
 
-    struct QueueDataZone : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataZone, 64) : public QueueDataBase
     {
         tt_int8 stackDepth;
         TtthreadId threadID;
@@ -403,41 +401,41 @@ namespace
         TraceZone zone;
     };
 
-    struct QueueDataLockSetName : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataLockSetName, 64) : public QueueDataBase
     {
         const void* pLockPtr;
         const char* pLockName;
     };
 
-    struct QueueDataLockTry : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataLockTry, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         TraceLock lock;
         const void* pLockPtr;
     };
 
-    struct QueueDataLockState : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataLockState, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         TtLockState state;
         const void* pLockPtr;
     };
 
-    struct QueueDataLockCount : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataLockCount, 64) : public QueueDataBase
     {
         tt_uint16 count;
         TtthreadId threadID;
         const void* pLockPtr;
     };
 
-    struct QueueDataMemAlloc : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataMemAlloc, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const void* pPtr;
         tt_uint32 size;
     };
 
-    struct QueueDataMemFree : public QueueDataBase
+    X_ALIGNED_SYMBOL(struct QueueDataMemFree, 64) : public QueueDataBase
     {
         TtthreadId threadID;
         const void* pPtr;
@@ -452,6 +450,14 @@ namespace
     constexpr size_t size6 = sizeof(QueueDataMemAlloc);
     constexpr size_t size7 = sizeof(QueueDataMemFree);
 
+    static_assert(64 == sizeof(QueueDataThreadSetName));
+    static_assert(64 == sizeof(QueueDataZone));
+    static_assert(64 == sizeof(QueueDataLockSetName));
+    static_assert(64 == sizeof(QueueDataLockTry));
+    static_assert(64 == sizeof(QueueDataLockState));
+    static_assert(64 == sizeof(QueueDataLockCount));
+    static_assert(64 == sizeof(QueueDataMemAlloc));
+    static_assert(64 == sizeof(QueueDataMemFree));
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
