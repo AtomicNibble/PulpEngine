@@ -244,12 +244,26 @@ namespace
     static_assert(X_OFFSETOF(TraceContext, cs_) == 192, "cache lane boundry changed");
     static_assert(sizeof(TraceContext) == 256, "Size changed");
 
+    TraceContexHandle contextToHandle(TraceContext* pCtx)
+    {
+        return reinterpret_cast<TraceContexHandle>(pCtx);
+    }
+
+    TraceContext* handleToContext(TraceContexHandle handle)
+    {
+        return reinterpret_cast<TraceContext*>(handle);
+    }
+
+    bool isValidContext(TraceContexHandle handle)
+    {
+        return handle != INVALID_TRACE_CONTEX;
+    }
+
     tt_int32 getActiveTickBufferSize(TraceContext* pCtx)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
         return buf.bufOffset;
     }
-
 
     TraceLock* addLock(TraceThread* pThread, const void* pLockPtr)
     {
@@ -687,21 +701,6 @@ namespace
         data.threadID = getThreadID();
 
         addToTickBuffer(pCtx, &data, sizeof(data));
-    }
-
-    TraceContexHandle contextToHandle(TraceContext* pCtx)
-    {
-        return reinterpret_cast<TraceContexHandle>(pCtx);
-    }
-
-    TraceContext* handleToContext(TraceContexHandle handle)
-    {
-        return reinterpret_cast<TraceContext*>(handle);
-    }
-
-    bool isValidContext(TraceContexHandle handle)
-    {
-        return handle != INVALID_TRACE_CONTEX;
     }
 
     void queueProcessZone(TraceContext* pCtx, const QueueDataZone* pBuf)
