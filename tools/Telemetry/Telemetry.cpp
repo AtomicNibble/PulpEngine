@@ -464,7 +464,7 @@ namespace
     static_assert(64 == sizeof(QueueDataMemAlloc));
     static_assert(64 == sizeof(QueueDataMemFree));
 
-    void FLipBufferInternal(TraceContext* pCtx, bool force)
+    void flipBufferInternal(TraceContext* pCtx, bool force)
     {
         auto bufSize = getActiveTickBufferSize(pCtx);
         if (bufSize == 0) {
@@ -499,7 +499,7 @@ namespace
     }
 
 
-    void FLipBuffer(TraceContext* pCtx, bool stalled, bool force)
+    void flipBuffer(TraceContext* pCtx, bool stalled, bool force)
     {
         // this can be entered from multiple threads but we only want to flip once.
         // TODO: if we just flipped we should not flip again
@@ -509,7 +509,7 @@ namespace
                 pCtx->numStalls++;
             }
 
-            FLipBufferInternal(pCtx, force);
+            flipBufferInternal(pCtx, force);
 
             pCtx->cs_.Leave();
         }
@@ -539,7 +539,7 @@ namespace
         // so i update the tail after write is finished.
         // that way the background thread can know the writes are finished.
 
-        FLipBuffer(pCtx, true, false);
+        flipBuffer(pCtx, true, false);
     }
 
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
@@ -1243,7 +1243,7 @@ void TelemTick(TraceContexHandle ctx)
 
     pCtx->lastTick = curTime;
 
-    FLipBuffer(pCtx, false, true);
+    flipBuffer(pCtx, false, true);
     return;
 }
 
@@ -1256,7 +1256,7 @@ void TelemFlush(TraceContexHandle ctx)
         return;
     }
 
-    FLipBuffer(pCtx, false, true);
+    flipBuffer(pCtx, false, true);
 }
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
