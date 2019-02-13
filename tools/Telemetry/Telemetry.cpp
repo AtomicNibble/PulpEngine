@@ -276,19 +276,26 @@ namespace
         return pLock;
     }
 
-    TraceThread* getThreadData(TraceContext* pCtx)
+    X_NO_INLINE TraceThread* addThreadData(TraceContext* pCtx)
+    {
+        if (pCtx->numThreadData == MAX_ZONE_THREADS) {
+            return nullptr;
+        }
+
+        ++pCtx->numThreadData;
+
+        auto* pThreadData = new (&pCtx->pThreadData[pCtx->numThreadData]) TraceThread();
+        // set the TLS value.
+        gThreadData = pThreadData;
+
+        return pThreadData;
+    }
+
+    X_INLINE TraceThread* getThreadData(TraceContext* pCtx)
     {
         auto* pThreadData = gThreadData;
         if (!pThreadData) {
-
-            if (pCtx->numThreadData == MAX_ZONE_THREADS) {
-                return nullptr;
-            }
-
-            pThreadData = new (&pCtx->pThreadData[pCtx->numThreadData]) TraceThread();
-            ++pCtx->numThreadData;
-
-            gThreadData = pThreadData;
+            return addThreadData(pCtx);
         }
 
         return pThreadData;
@@ -526,7 +533,7 @@ namespace
     }
 
 
-    void tickBufferFull(TraceContext* pCtx)
+    X_NO_INLINE void tickBufferFull(TraceContext* pCtx)
     {
         // we are full.
         // in order to flip we need to make everythread has finished writing to the tick buffer
@@ -548,20 +555,22 @@ namespace
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
     {
         auto& buf = pCtx->tickBuffers[pCtx->activeTickBufIdx];
-        
         long offset = _InterlockedExchangeAdd(reinterpret_cast<volatile long*>(&buf.bufOffset), static_cast<long>(size));
         
-        if (offset + size > pCtx->tickBufCapacity) {
-            tickBufferFull(pCtx);
-            addToTickBuffer(pCtx, pPtr, size);
+        if (offset + size <= pCtx->tickBufCapacity) {
+            memcpy(buf.pTickBuf + offset, pPtr, size);
             return;
         }
 
+        // no space,
+#if X_DEBUG
         if (offset + size > pCtx->tickBufCapacity) {
             ::DebugBreak();
         }
+#endif // X_DEBUG
 
-        memcpy(buf.pTickBuf + offset, pPtr, size);
+        tickBufferFull(pCtx);
+        addToTickBuffer(pCtx, pPtr, size);
     }
 
     void queueThreadSetName(TraceContext* pCtx, tt_uint32 threadID, const char* pName)
@@ -1329,7 +1338,8 @@ void TelemLeave(TraceContexHandle ctx)
         return;
     }
 
-    auto* pThreadData = getThreadData(pCtx);
+    // don't allow add in Leave.
+    auto* pThreadData = gThreadData;
     if (!pThreadData) {
         return;
     }
@@ -1357,7 +1367,8 @@ void TelemLeaveEx(TraceContexHandle ctx, tt_uint64 matchId)
         return;
     }
 
-    auto* pThreadData = getThreadData(pCtx);
+    // don't allow add in Leave.
+    auto* pThreadData = gThreadData;
     if (!pThreadData) {
         return;
     }
