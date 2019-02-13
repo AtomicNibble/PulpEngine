@@ -218,6 +218,8 @@ namespace
         platform::SOCKET socket;
 
         CriticalSection cs_;
+        tt_int32 numStalls;
+        tt_int32 totalEvents;
     };
 
  //   constexpr size_t size0 = sizeof(TickBuffer);
@@ -490,11 +492,15 @@ namespace
     }
 
 
-    void FLipBuffer(TraceContext* pCtx)
+    void FLipBuffer(TraceContext* pCtx, bool stalled)
     {
         // this can be entered from multiple threads but we only want to flip once.
         if (pCtx->cs_.TryEnter())
         {
+            if (stalled) {
+                pCtx->numStalls++;
+            }
+
             FLipBufferInternal(pCtx);
 
             pCtx->cs_.Leave();
@@ -523,7 +529,7 @@ namespace
         // so i update the tail after write is finished.
         // that way the background thread can know the writes are finished.
 
-        FLipBuffer(pCtx);
+        FLipBuffer(pCtx, true);
     }
 
     void addToTickBuffer(TraceContext* pCtx, const void* pPtr, tt_size size)
@@ -795,6 +801,9 @@ namespace
                 size = pCtx->tickBufCapacity;
             }
 
+            const auto num = size / 64;
+            pCtx->totalEvents += num;
+
             const auto* pBegin = tickBuf.pTickBuf;
             const auto* pEnd = pBegin + size;
             const auto* pBuf = pBegin;
@@ -1018,6 +1027,8 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
         return TtError::Error;
     }
 
+    pCtx->numStalls = 0;
+    pCtx->totalEvents = 0;
     out = contextToHandle(pCtx);
     return TtError::Ok;
 }
@@ -1207,7 +1218,7 @@ void TelemTick(TraceContexHandle ctx)
 
     pCtx->lastTick = curTime;
 
-    FLipBuffer(pCtx);
+    FLipBuffer(pCtx, false);
     return;
 }
 
@@ -1220,7 +1231,7 @@ void TelemFlush(TraceContexHandle ctx)
         return;
     }
 
-    FLipBuffer(pCtx);
+    FLipBuffer(pCtx, false);
 }
 
 void TelemUpdateSymbolData(TraceContexHandle ctx)
