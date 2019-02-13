@@ -215,6 +215,7 @@ namespace
         HANDLE hThread_;
         HANDLE hSignal_;
         HANDLE hSignalIdle_;
+        volatile tt_int32 shutDownFlag;
         platform::SOCKET socket;
 
         CriticalSection cs_;
@@ -782,6 +783,10 @@ namespace
         {
             ::SetEvent(pCtx->hSignalIdle_);
 
+            if (pCtx->shutDownFlag) {
+                break;
+            }
+
             DWORD result = WaitForSingleObjectEx(pCtx->hSignal_, INFINITE, alertable);
             if (result != WAIT_OBJECT_0) {
                 // rip.
@@ -1027,8 +1032,10 @@ TtError TelemInitializeContext(TraceContexHandle& out, void* pArena, tt_size buf
         return TtError::Error;
     }
 
+    pCtx->shutDownFlag = 0;
     pCtx->numStalls = 0;
     pCtx->totalEvents = 0;
+
     out = contextToHandle(pCtx);
     return TtError::Ok;
 }
@@ -1037,6 +1044,15 @@ void TelemShutdownContext(TraceContexHandle ctx)
 {
     auto* pCtx = handleToContext(ctx);
 
+    // wait for background thread to idle
+    // then flag shutodwn and wake up.
+    if (::WaitForSingleObject(pCtx->hSignalIdle_, INFINITE) == WAIT_FAILED) {
+        // rip
+    }
+
+    pCtx->shutDownFlag = 1;
+
+    ::SetEvent(pCtx->hSignal_);
 
     if (::WaitForSingleObject(pCtx->hThread_, INFINITE) == WAIT_FAILED) {
         // rip
