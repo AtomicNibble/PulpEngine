@@ -191,6 +191,8 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
                 }
             }
         }
+
+        ttShutdownContext(ctx);
     }
 
     ttShutDown();
