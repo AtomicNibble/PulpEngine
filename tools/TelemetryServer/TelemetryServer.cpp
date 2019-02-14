@@ -37,8 +37,8 @@ namespace
         VersionInfo clientVer;
 
         // TODO: not need nullterm.
-        char appName[MAX_APP_NAME_LEN + 1];
-        char buildInfo[MAX_BUILD_INFO_LEN + 1];
+        char appName[MAX_STRING_LEN + 1];
+        char buildInfo[MAX_STRING_LEN + 1];
         char cmdLine[MAX_CMDLINE_LEN + 1];
 
         platform::SOCKET socket;

@@ -1363,10 +1363,10 @@ TtError TelemOpen(TraceContexHandle ctx, const char* pAppName, const char* pBuil
     const auto buildInfoLen = strlen(pBuildInfo);
     const auto cmdLineLen = wcslen(pCmdLine);
 
-    if (appNameLen > MAX_APP_NAME_LEN) {
+    if (appNameLen > MAX_STRING_LEN) {
         return TtError::InvalidParam;
     }
-    if (buildInfoLen > MAX_BUILD_INFO_LEN) {
+    if (buildInfoLen > MAX_STRING_LEN) {
         return TtError::InvalidParam;
     }
     if (cmdLineLen > MAX_CMDLINE_LEN) {

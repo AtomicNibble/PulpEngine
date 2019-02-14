@@ -52,8 +52,6 @@ struct VersionInfo
 // if i set this to datagram size it's too slow.
 // need to tune this with data for a real program.
 constexpr tt_size MAX_PACKET_SIZE = 1024 * 16; 
-constexpr tt_size MAX_APP_NAME_LEN = 128;
-constexpr tt_size MAX_BUILD_INFO_LEN = 128;
 constexpr tt_size MAX_CMDLINE_LEN = 1024 * 8;
 constexpr tt_size MAX_STRING_LEN = 256;
 
