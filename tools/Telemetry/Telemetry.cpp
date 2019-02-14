@@ -1000,7 +1000,7 @@ namespace
 
         SocketBuffer buffer = {
             packetBuff,
-            0,
+            sizeof(DataStreamHdr),
             sizeof(packetBuff),
         };
 
