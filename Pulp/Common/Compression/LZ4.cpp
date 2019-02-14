@@ -1,8 +1,8 @@
 #include <EngineCommon.h>
 #include "LZ4.h"
 
-#include <../../3rdparty/source/lz4-1.7.4.2/lz4_lib.h>
-#include <../../3rdparty/source/lz4-1.7.4.2/lz4hc.h>
+#include <../../3rdparty/source/lz4-1.8.3/lz4_lib.h>
+#include <../../3rdparty/source/lz4-1.8.3/lz4hc.h>
 
 X_NAMESPACE_BEGIN(core)
 

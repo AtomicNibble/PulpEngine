@@ -2052,10 +2052,10 @@
     <ClCompile Include="CBuffer.cpp">
       <Filter>Interfaces_h\Render</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4_lib.c">
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.8.3\lz4_lib.c">
       <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4hc.c">
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.8.3\lz4hc.c">
       <Filter>SourceFiles\Compression\lz4</Filter>
     </ClCompile>
     <ClCompile Include="Compression\LZ5.cpp">

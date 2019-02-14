@@ -758,7 +758,7 @@
     <None Include="Time\TimeVal.inl" />
     <None Include="Util\BitUtil.inl" />
     <None Include="Util\Cpu.inl" />
-    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4hc.c">
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.8.3\lz4hc.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
@@ -780,7 +780,7 @@
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|Win32'">Default</BasicRuntimeChecks>
       <BasicRuntimeChecks Condition="'$(Configuration)|$(Platform)'=='Debug Dynamic|x64'">Default</BasicRuntimeChecks>
     </ClCompile>
-    <ClCompile Include="..\..\3rdparty\source\lz4-1.7.4.2\lz4_lib.c">
+    <ClCompile Include="..\..\3rdparty\source\lz4-1.8.3\lz4_lib.c">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release Dynamic|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Super|Win32'">NotUsing</PrecompiledHeader>
