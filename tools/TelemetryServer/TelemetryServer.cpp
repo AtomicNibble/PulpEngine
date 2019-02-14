@@ -148,6 +148,7 @@ namespace
                 handleDataSream(client, pData);
                 break;
             default:
+                printf("Unknow packet type %i\n", static_cast<int>(pPacketHdr->type));
                 return false;
         }
 
@@ -162,6 +163,7 @@ namespace
         {
             int recvbuflen = sizeof(recvbuf);
             if (!readPacket(client.socket, recvbuf, recvbuflen)) {
+                printf("Error reading packet\n");
                 return;
             }
 
@@ -172,6 +174,7 @@ namespace
             }
 
             if (!processPacket(client, reinterpret_cast<tt_uint8*>(recvbuf))) {
+                printf("Failed to process packet\n");
                 return;
             }
         }

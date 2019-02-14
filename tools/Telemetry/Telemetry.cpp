@@ -445,7 +445,7 @@ namespace
         pBuffer->packetBufSize += space;
     }
 
-#define PACKET_COMPRESSION 0
+#define PACKET_COMPRESSION 1
 
     struct PacketCompressor
     {
