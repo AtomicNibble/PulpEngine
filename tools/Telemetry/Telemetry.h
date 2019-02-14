@@ -39,6 +39,11 @@ enum TtError
     HandeshakeFail
 };
 
+struct TtCallStack
+{
+    // meow
+};
+
 struct TtSourceInfo
 {
     TtSourceInfo() = default;
@@ -104,6 +109,10 @@ extern "C"
 
     // Thread
     TELEM_API_VOID(TelemSetThreadName, TraceContexHandle ctx, tt_uint32 threadID, const char* pName);
+
+    // Callstack
+    TELEM_API_BOOL(TelemGetCallStack, TraceContexHandle ctx, TtCallStack& stackOut);
+    TELEM_API_BOOL(TelemSendCallStack, TraceContexHandle ctx, const TtCallStack& stackOut);
 
     // Zones
     TELEM_API_VOID(TelemEnter, TraceContexHandle ctx, const TtSourceInfo& sourceInfo, const char* pZoneName);

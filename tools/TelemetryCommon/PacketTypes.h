@@ -3,6 +3,20 @@
 #include "Types.h"
 #include "StringTable.h"
 
+// TODO: move
+template<typename T>
+X_INLINE constexpr T RoundUpToMultiple(T numToRound, T multipleOf)
+{
+    return (numToRound + multipleOf - 1) & ~(multipleOf - 1);
+}
+
+template<typename T>
+X_INLINE constexpr T RoundDownToMultiple(T numToRound, T multipleOf)
+{
+    return numToRound & ~(multipleOf - 1);
+}
+
+
 struct PacketType
 {
     enum Enum : tt_uint8
@@ -47,7 +61,14 @@ constexpr tt_size MAX_STRING_LEN = 256;
 constexpr tt_size MAX_ZONE_THREADS = 32;
 constexpr tt_size MAX_ZONE_DEPTH = 32;
 constexpr tt_size MAX_LOCKS_HELD_PER_THREAD = 16;
-constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = 1024 * 32;
+
+constexpr tt_size COMPRESSION_MAX_INPUT_SIZE = 1024 * 8;
+constexpr tt_size COMPRESSION_RING_BUFFER_SIZE = 1024 * 64;
+
+constexpr tt_size BACKGROUND_THREAD_STACK_SIZE_BASE = 1024 * 8; // base size for anything that's not a compression buffer.
+constexpr tt_size BACKGROUND_THREAD_STACK_SIZE = RoundUpToMultiple<tt_size>(
+        COMPRESSION_RING_BUFFER_SIZE + MAX_PACKET_SIZE + BACKGROUND_THREAD_STACK_SIZE_BASE, 1024 * 4);
+
 
 X_PACK_PUSH(1)
 
