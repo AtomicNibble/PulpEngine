@@ -63,11 +63,11 @@ namespace
         tt_size msgLen = strlen(pReason);
         tt_size datalen = sizeof(ConnectionRequestRejectedHdr) + msgLen;
 
-        if (msgLen > MAX_ERR_MSG_LEN) {
-            msgLen = MAX_ERR_MSG_LEN;
+        if (msgLen > MAX_STRING_LEN) {
+            msgLen = MAX_STRING_LEN;
         }
 
-        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_ERR_MSG_LEN];
+        char buf[sizeof(ConnectionRequestRejectedHdr) + MAX_STRING_LEN];
 
         auto* pCr = reinterpret_cast<ConnectionRequestRejectedHdr*>(buf);
         pCr->dataSize = static_cast<tt_uint16>(datalen);

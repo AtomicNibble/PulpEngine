@@ -39,7 +39,6 @@ constexpr tt_size MAX_PACKET_SIZE = 1450;
 constexpr tt_size MAX_APP_NAME_LEN = 64;
 constexpr tt_size MAX_BUILD_INFO_LEN = 128;
 constexpr tt_size MAX_CMDLINE_LEN = 1024 * 8;
-constexpr tt_size MAX_ERR_MSG_LEN = 256;
 constexpr tt_size MAX_STRING_LEN = 256;
 
 // TODO: move?
