@@ -889,7 +889,7 @@ namespace
                 break;
             }
 
-            auto start = gSysTimer.GetMicro();
+            auto start = gSysTimer.GetTicks();
 
             // process the bufffer.
             auto tickBuf = pCtx->tickBuffers[pCtx->activeTickBufIdx ^ 1];
@@ -902,7 +902,7 @@ namespace
                 size = pCtx->tickBufCapacity;
             }
 
-            const auto num = size / 64;
+            const tt_int32 num = size / 64;
             pCtx->totalEvents += num;
 
             const auto* pBegin = tickBuf.pTickBuf;
@@ -974,10 +974,10 @@ namespace
             // flush anything left over to the socket.
             flushDataPacketBuffer(pCtx);
 
-            auto end = gSysTimer.GetMicro();
+            auto end = gSysTimer.GetTicks();
             auto ellapsed = end - start;
 
-            writeLog(pCtx, LogType::Msg, "processed in: %lld", ellapsed);
+            writeLog(pCtx, LogType::Msg, "processed %iin: %fms", num, gSysTimer.ToMilliSeconds(ellapsed));
         }
 
         return 0;
