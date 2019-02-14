@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Types.h"
+#include "Compiler.h"
+#include "Configuration.h"
+#include "PlatformWin32.h"
 
 #ifndef TELEMETRY_COMLIB_EXPORT
 
@@ -15,9 +19,7 @@
 
 #endif // !TELEMETRY_COMLIB_EXPORT
 
-#include "Types.h"
-#include "Compiler.h"
-#include "PlatformWin32.h"
+
 #include "Util.h"
 #include "Threading.h"
 

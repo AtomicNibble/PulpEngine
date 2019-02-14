@@ -2,9 +2,9 @@
 
 #include "Types.h"
 #include "Compiler.h"
+#include "Configuration.h"
 #include "PlatformWin32.h"
 #include "Util.h"
-
 
 
 #ifndef TELEMETRY_COMLIB_EXPORT
