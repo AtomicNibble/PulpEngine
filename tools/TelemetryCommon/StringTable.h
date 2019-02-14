@@ -44,7 +44,7 @@ inline StringTable CreateStringTable(tt_uint8* pBuf, tt_size size)
 inline tt_uintptr getHash(const void* pPtr)
 {
     tt_uintptr val = reinterpret_cast<tt_uintptr>(pPtr);
-
+    // TODO: something better?
     return val;
 }
 
