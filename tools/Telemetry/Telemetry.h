@@ -55,9 +55,6 @@ extern "C"
 {
 #endif
 
-    // Loads the telemty module
-    // bool ttLoadModule(void);
-
 #if TTELEMETRY_LINK
 #define TELEM_API_BLANK(func) 
 #else
@@ -74,7 +71,7 @@ extern "C"
         TELEM_API_BLANK(inline TtError __blank##name(__VA_ARGS__) { return TtError::Ok; })
 
 #pragma warning( push )
-#pragma warning(disable: 4100)
+#pragma warning(disable: 4100) // unused param (caused by the blank functions).
 
     TELEM_API_BOOL(TelemInit);
     TELEM_API_VOID(TelemShutDown);
@@ -371,6 +368,8 @@ namespace telem
 
 
 #else // TTELEMETRY_ENABLED
+
+#define ttLoadLibary() true
 
 #define ttZone(...)
 #define ttZoneFilterd(...)
