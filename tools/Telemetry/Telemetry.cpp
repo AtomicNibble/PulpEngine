@@ -964,10 +964,6 @@ namespace
 
 bool TelemInit(void)
 {
-#if 1 // TODO: temp
-    // freopen("CONOUT$", "w", stdout);
-#endif
-
     // Just stop it, ok?
     _CrtSetDebugFillThreshold(0);
 
