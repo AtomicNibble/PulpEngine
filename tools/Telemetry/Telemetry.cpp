@@ -445,6 +445,8 @@ namespace
         pBuffer->packetBufSize += space;
     }
 
+#define PACKET_COMPRESSION 0
+
     struct PacketCompressor
     {
         PacketCompressor() {
@@ -482,8 +484,10 @@ namespace
         char cmpBuf[LZ4_COMPRESSBOUND(COMPRESSION_MAX_INPUT_SIZE)];
     };
 
+
     void flushCompressionBuffer(PacketCompressor* pComp)
     {
+#if PACKET_COMPRESSION
         // compress it.
         const auto* pInBegin = &pComp->srcRingBuf[pComp->writeBegin];
         const auto inBytes = pComp->writeEnd - pComp->writeBegin;
@@ -514,10 +518,15 @@ namespace
             pComp->writeBegin = 0;
             pComp->writeEnd = 0;
         }
+#else
+        X_UNUSED(pComp);
+#endif // !PACKET_COMPRESSION
     }
 
     void addToCompressionBuffer(PacketCompressor* pComp, const void* pData, tt_int32 len)
     {
+#if PACKET_COMPRESSION
+
 #if X_DEBUG
         if (len > COMPRESSION_MAX_INPUT_SIZE) {
             ::DebugBreak();
@@ -532,6 +541,9 @@ namespace
 
         memcpy(&pComp->srcRingBuf[pComp->writeEnd], pData, len);
         pComp->writeEnd += len;
+#else
+        addToPacketBuffer(pComp->pCtx, pComp->pBuffer, pData, len);
+#endif // !PACKET_COMPRESSION
     }
 
     void writeStringCompressionBuffer(PacketCompressor* pComp, const char* pStr)
