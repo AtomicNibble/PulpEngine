@@ -145,8 +145,10 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
             return status;
         }
 
+        MString name(getName().data(), static_cast<int32_t>(getName().length()));
+
         int32_t assetId, modId;
-        status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::ANIM, MString(getName()), &assetId, &modId);
+        status = maya::AssetDB::Get()->AssetExsists(maya::AssetDB::AssetType::ANIM, name, &assetId, &modId);
         if (!status) {
             X_ERROR("Anim", "Failed to get meta from server");
             return status;
@@ -196,7 +198,7 @@ MStatus PotatoAnimExporter::convert(const MArgList& args)
 
             // hellllo asset server :D
             status = maya::AssetDB::Get()->UpdateAsset(maya::AssetDB::AssetType::ANIM,
-                MString(getName()),
+                name,
                 argsToJson(),
                 compressed,
                 &unChanged);
@@ -243,7 +245,7 @@ core::Path<wchar_t> PotatoAnimExporter::getFilePath(void) const
     return path;
 }
 
-core::string PotatoAnimExporter::getName(void) const
+const core::string& PotatoAnimExporter::getName(void) const
 {
     return name_;
 }

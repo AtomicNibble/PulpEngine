@@ -31,7 +31,7 @@ private:
     void setOutdir(const MString& path);
 
     core::Path<wchar_t> getFilePath(void) const;
-    core::string getName(void) const;
+    const core::string& getName(void) const;
 
     MStatus getInputObjects(void);
     MStatus getExportObjects(void);
